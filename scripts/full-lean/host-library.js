@@ -90,6 +90,7 @@ addToLibrary({
     slots: null,
     depth: 0,
     doorbell: 0,
+    hostWait: undefined,
     slotBytes: 104,
     replyBytes: 65536,
     newSlot: function () {
@@ -119,7 +120,12 @@ addToLibrary({
         Atomics.add(HEAP32, lasmFullRPC.doorbell / 4, 1);
         Atomics.notify(HEAP32, lasmFullRPC.doorbell / 4);
       }
-      while (Atomics.load(HEAP32, (slot + 4) / 4) === 0) _emscripten_futex_wait(slot + 4, 0, Infinity);
+      // Programs with Lasm.JS list the wait (lasm_js_host_wait in library/c/lasm_js.c),
+      // so Node's main thread can tell, inside a synchronous callback, when every
+      // Lean thread waits.
+      if (lasmFullRPC.hostWait === undefined) lasmFullRPC.hostWait = Module['_lasm_js_host_wait'] ?? null;
+      var wait = lasmFullRPC.hostWait;
+      while (Atomics.load(HEAP32, (slot + 4) / 4) === 0) wait ? wait(BigInt(slot + 4)) : _emscripten_futex_wait(slot + 4, 0, Infinity);
       return HEAP32[(slot + 20) / 4];
     },
     call: function (kind, operation, handle, argument, input, length) {

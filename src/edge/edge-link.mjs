@@ -16,6 +16,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
+import { glueLinkFlags } from '../lasm-library.mjs';
 import { linkWithNode, bundledNativeSigs, linkTemporaryDirectory, removeTemporary } from '../link-driver/link.mjs';
 import { liveMembers, memberFiles, wasmImports } from '../application-live-members.mjs';
 import { compileObject } from '../link-driver/compile.mjs';
@@ -70,7 +71,9 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
   // A seeded dev link (src/application-link.mjs) also lists the lookup marker
   // object reachability.o, which the edge program never contains, and the Node
   // runtime's members (application-live-members.mjs) in place of its archives.
-  const kept = rsp.filter(arg => arg.endsWith('.o') && basename(arg) !== 'reachability.o' && !arg.endsWith('.lasm-member.o') || arg.startsWith('-Wl,--wrap='));
+  // The Node glue's wraps (glueLinkFlags) go with it.
+  const kept = rsp.filter(arg => arg.endsWith('.o') && basename(arg) !== 'reachability.o' && !arg.endsWith('.lasm-member.o')
+    || arg.startsWith('-Wl,--wrap=') && !glueLinkFlags.includes(arg));
   let objects = kept.filter(arg => !(arg.endsWith('.o') && /^lasm_js_available$/m.test(nm(arg))));
   const usesJs = objects.length !== kept.length;
   mkdirSync(out, { recursive: true });

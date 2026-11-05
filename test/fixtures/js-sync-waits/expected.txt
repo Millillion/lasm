@@ -1,0 +1,11 @@
+1. a task that finishes by itself: returned 4500001500000
+2. a task that makes a JavaScript call: failed: TypeError: Waiting for a Lean task inside a synchronous callback can't finish, because the JavaScript thread is waiting for the callback; use Function.ofFn
+3. Async run with .block: failed: TypeError: Waiting for a Lean task inside a synchronous callback can't finish, because the JavaScript thread is waiting for the callback; use Function.ofFn
+4. a timer started in the callback: failed: TypeError: Waiting for a timer, DNS lookup or socket operation inside a synchronous callback can't finish, because the JavaScript thread is waiting for the callback; use Function.ofFn
+5. a DNS lookup started in the callback: failed: TypeError: Waiting for a timer, DNS lookup or socket operation inside a synchronous callback can't finish, because the JavaScript thread is waiting for the callback; use Function.ofFn
+6. a socket read started in the callback: failed: TypeError: Waiting for a timer, DNS lookup or socket operation inside a synchronous callback can't finish, because the JavaScript thread is waiting for the callback; use Function.ofFn
+7. a JavaScript promise's task (Value.toTask): failed: TypeError: Waiting for a JavaScript promise inside a synchronous callback can't finish, because the JavaScript thread is waiting for the callback; use Function.ofFn
+8. a JavaScript promise (Value.await): returned caught: Waiting for a JavaScript promise (Value.await) inside a synchronous callback can't finish, because the JavaScript thread is waiting for the callback; use Function.ofFn
+9. a promise kept for later (Value.toTask): returned started
+9. after the callback returned, the promise settled: late
+10. a callback after those: returned still works

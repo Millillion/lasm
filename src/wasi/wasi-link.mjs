@@ -21,6 +21,7 @@ import { basename, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
+import { glueLinkFlags } from '../lasm-library.mjs';
 import { emscriptenResponseFile } from '../link-driver/link.mjs';
 import { testUnoptimized } from '../test-switches.mjs';
 import { lowerAtomics, moduleImports, keepExports } from './lower-atomics.mjs';
@@ -93,7 +94,9 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
   // the WASI link uses the edge runtime's archives instead, so both are dropped,
   // as in src/edge/edge-link.mjs. Kept, a Node dev build followed by
   // `lasm build --target wasi --dev` failed with duplicate host symbols.
-  const inputs = rsp.filter(arg => arg.endsWith('.o') && basename(arg) !== 'reachability.o' && !arg.endsWith('.lasm-member.o') || arg.startsWith('-Wl,--wrap='))
+  // The Node glue's wraps (glueLinkFlags) go with it.
+  const inputs = rsp.filter(arg => arg.endsWith('.o') && basename(arg) !== 'reachability.o' && !arg.endsWith('.lasm-member.o')
+    || arg.startsWith('-Wl,--wrap=') && !glueLinkFlags.includes(arg))
     .filter(arg => !(arg.endsWith('.o') && /^(?:lasm_js_available|lasm_fetch_platform)$/m.test(nm(arg))))
     .map(arg => arg.startsWith('-Wl,') ? arg.slice(4) : arg);
   const archive = name => edge.libraries[`lib${name}.a`] ?? join(nodeRuntime.directory, 'lib', `lib${name}.a`);

@@ -8,7 +8,13 @@
 //   - js-callbacks: a JavaScript callback before any promise is awaited and no
 //     `waitForever` (the host starts the poller), then awaits;
 //   - hono: a server that ends in `waitForever` (`main` becomes the poller),
-//     started, asked GET / and stopped.
+//     started, asked GET / and stopped;
+//   - js-sync-waits: waits inside synchronous callbacks (test/fixtures/js-sync-waits),
+//     built first; each numbered part alone once (a part that hangs is reported
+//     on its own), then the whole program, against expected.txt;
+//   - js-sync-cost (only with --only js-sync-cost): per-call costs of the
+//     Lasm.JS host bridge (bench/fixtures/js-sync-cost), built in the release
+//     profile and run three times, for comparing two builds.
 // A run still going after the timeout gets a Node diagnostic report (every
 // thread's JavaScript and Wasm stack), Lasm.JS's poller state and every Lean
 // thread's pending host request (diag preload below), then is killed.
@@ -105,13 +111,15 @@ const result = { platform: `${process.platform}-${process.arch}`, node: process.
 // Output that may differ between correct runs: timings.
 const normalize = text => text.replace(/\r\n/g, '\n').replace(/\d+ ms\b/g, 'N ms');
 const save = () => writeFileSync(output, JSON.stringify(result, null, 2) + '\n');
-async function stress(name, project, { expected, viaCli = 0, server = false }) {
+async function stress(name, project, { expected, viaCli = 0, server = false, parts = 0 }) {
   const record = result.programs[name] = { pass: 0, hang: 0, fail: 0, failures: [], msMax: 0, msTotal: 0 };
   if (fuzz) viaCli = 0;
   let reference = expected === undefined ? undefined : normalize(expected);
   // Build first, untimed (a cold build downloads tools): every timed run then
   // reuses the cached build, as the acceptance's run does after its first build.
-  if (!server) {
+  // A program with parts is only built: its first run could hang.
+  if (parts) execFileSync(process.execPath, [lasm, 'build', 'Main.lean', '--dev'], { cwd: project, stdio: 'inherit', env: { ...process.env, CI: '1' } });
+  else if (!server) {
     // A program that hangs here (before any timed run) leaves its state after a
     // minute, if its event loop still runs (none: Node's main thread is blocked).
     const firstDiag = join(work, 'hangs', `${name}-first-run`);
@@ -129,6 +137,7 @@ async function stress(name, project, { expected, viaCli = 0, server = false }) {
   const run = async (i, diagDir, seed, trace) => {
     if (!server && i < viaCli) return once(process.execPath, [lasm, 'Main.lean'], project, diagDir);
     const dist = server ? join(project, 'dist') : cachedDist(project);
+    if (parts) return once(process.execPath, [join(project, 'dist', 'main.mjs')], project, diagDir, { seed, trace });
     if (server) {
       const port = await freePort();
       process.env.PORT = String(port);
@@ -144,6 +153,19 @@ async function stress(name, project, { expected, viaCli = 0, server = false }) {
     reference ??= normalize(r.stdout);
     return normalize(r.stdout) === reference;
   };
+  // Each part alone, once: its lines of the expected output.
+  if (parts) {
+    record.parts = {};
+    for (let k = 1; k <= parts; k++) {
+      const r = await once(process.execPath, [join(project, 'dist', 'main.mjs'), String(k)], project, join(work, 'hangs', `${name}-part-${k}`));
+      const lines = normalize(expected).split('\n').filter(line => line.startsWith(`${k}. `)).join('\n') + '\n';
+      const verdict = r.hung ? 'hang' : r.code !== 0 ? `fail ${r.code}` : normalize(r.stdout) === lines ? 'pass' : 'wrong output';
+      record.parts[k] = { verdict, ms: r.ms, stdout: r.stdout.slice(-600), stderrTail: r.stderr.slice(-600) };
+      if (verdict === 'hang') record.hang++; else if (verdict !== 'pass') record.fail++;
+      console.log(`${name} part ${k}: ${verdict.toUpperCase()} after ${r.ms} ms${verdict === 'pass' ? '' : `; output: ${JSON.stringify(r.stdout.slice(-300))}`}`);
+    }
+    save();
+  }
   for (let i = 0; i < total; i++) {
     const diagDir = join(work, 'hangs', `${name}-${i}`);
     const seed = fuzz ? baseSeed + i : undefined;
@@ -174,6 +196,21 @@ async function stress(name, project, { expected, viaCli = 0, server = false }) {
 
 const npmProject = dir => execFileSync(npm, ['install', '--offline', '--no-audit', '--no-fund'], { cwd: dir, stdio: 'inherit', shell: windows });
 const want = name => !only || only.split(',').includes(name);
+if (only.split(',').includes('js-sync-cost')) {
+  const dir = join(work, 'js sync cost');
+  cpSync(join(root, 'bench/fixtures/js-sync-cost'), dir, { recursive: true });
+  const record = result.programs['js-sync-cost'] = { pass: 0, hang: 0, fail: 0, runs: [] };
+  let built = true;
+  try { execFileSync(process.execPath, [lasm, 'build', 'Main.lean'], { cwd: dir, stdio: 'inherit', env: { ...process.env, CI: '1' } }); }
+  catch (error) { built = false; record.fail++; console.log(`js-sync-cost: the build failed: ${error.message}`); }
+  for (let i = 0; built && i < 3; i++) {
+    const r = await once(process.execPath, [join(dir, 'dist', 'main.mjs')], dir, join(work, 'hangs', `js-sync-cost-${i}`));
+    record.runs.push(r.stdout);
+    r.code === 0 && !r.hung ? record.pass++ : r.hung ? record.hang++ : record.fail++;
+    console.log(`js-sync-cost run ${i}:\n${r.stdout}${r.stderr.slice(-600)}`);
+  }
+  save();
+}
 if (want('js-interop')) {
   const dir = join(work, 'js interop λ');
   cpSync(join(root, 'test/fixtures/js-interop'), dir, { recursive: true });
@@ -184,6 +221,11 @@ if (want('js-callbacks')) {
   const dir = join(work, 'js callbacks');
   cpSync(join(root, 'test/fixtures/js-callbacks'), dir, { recursive: true });
   await stress('js-callbacks', dir, {});
+}
+if (want('js-sync-waits')) {
+  const dir = join(work, 'js sync waits');
+  cpSync(join(root, 'test/fixtures/js-sync-waits'), dir, { recursive: true });
+  await stress('js-sync-waits', dir, { expected: readFileSync(join(dir, 'expected.txt'), 'utf8'), parts: 10 });
 }
 if (want('hono')) {
   const dir = join(work, 'hono');

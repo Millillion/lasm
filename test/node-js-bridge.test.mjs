@@ -457,7 +457,7 @@ test('statistics: op 213, the global hooks, owns, release and close', () => {
   assert.equal(js.owns(firstJsHandle - 1), false);
   const stats = JSON.parse(js.dispatch(213, 0, 0n).toString());
   assert.deepEqual(stats, { values: 1, pendingCalls: 0, queuedEvents: 0, functionsLive: 0, released: 0, callbacks: 0, syncCallbacks: 0,
-    functionsCreated: 0, functionsCollected: 0, pollerSpawns: 0, poller: { polled: false, waiting: false, spawnTimer: false } });
+    syncWaitsStopped: 0, syncPromises: 0, functionsCreated: 0, functionsCollected: 0, pollerSpawns: 0, poller: { polled: false, waiting: false, spawnTimer: false } });
   assert.deepEqual(globalThis[Symbol.for('lasm.js.stats')](), stats);
   assert.equal(globalThis[Symbol.for('lasm.js.sync')](), null);
   js.release(id);
@@ -656,9 +656,11 @@ test('synchronous callbacks without a mailbox hook still poll the host', () => {
 
 // Regression: inside a synchronous callback Node's main thread waits for the
 // Lean thread, so a JavaScript promise the callback waits for can never settle
-// (before, `Value.await`, `toTask` and Async calls hung there for good). Every
-// request that waits for a promise fails at once, with a message that says why;
-// outside a callback the same requests work.
+// (before, awaited and Async calls hung there for good). Every request that
+// waits for a promise fails at once, with a message that says why; outside a
+// callback the same requests work. `Value.toTask` (op 207) only registers the
+// promise: it settles after the callback returns (waiting for it is a task
+// wait, stopped as in the tests below).
 test('synchronous callbacks: requests that wait for a JavaScript promise fail at once', async () => {
   let calls = 0;
   const root = project({ lib: `module.exports = { later: v => { globalThis.__laterCalls = (globalThis.__laterCalls ?? 0) + 1; return Promise.resolve(v); }, now: v => v,
@@ -706,24 +708,249 @@ test('synchronous callbacks: requests that wait for a JavaScript promise fail at
     await new Promise(resolve => setTimeout(resolve, 20));
   } finally { process.off('unhandledRejection', onUnhandled); }
   assert.deepEqual(unhandled, []);
-  const why = 'inside a synchronous Lean callback (Lasm.JS.Function.ofSyncFn): JavaScript promises settle only after the callback returns, while Node waits for it. Use an asynchronous callback (Function.ofFn)';
+  const why = what => `TypeError: Waiting for ${what} inside a synchronous callback can't finish, because the JavaScript thread is waiting for the callback; use Function.ofFn`;
   assert.deepEqual(tried, [
-    ['await', `TypeError: Cannot await a JavaScript value (Value.await, Value.toTask) ${why}`],
-    ['async call', `TypeError: Cannot wait for a JavaScript call (an Async call, method or binding) ${why}`],
-    ['async binding', `TypeError: Cannot wait for a JavaScript call (an Async call, method or binding) ${why}`],
-    ['awaited call', `TypeError: Cannot await the promise returned by method "later" ${why}`],
-    ['awaited binding', `TypeError: Cannot await the promise returned by binding "lib later" ${why}`],
-    ['awaited function', `TypeError: Cannot await the promise returned by a call ${why}`],
-    ['awaited rejection', `TypeError: Cannot await the promise returned by binding "lib fails" ${why}`],
+    ['await', 'ok'],
+    ['async call', why('a JavaScript call (an Async call, method or binding)')],
+    ['async binding', why('a JavaScript call (an Async call, method or binding)')],
+    ['awaited call', why('the promise returned by method "later"')],
+    ['awaited binding', why('the promise returned by binding "lib later"')],
+    ['awaited function', why('the promise returned by a call')],
+    ['awaited rejection', why('the promise returned by binding "lib fails"')],
     ['plain call', 'ok'], ['promise result', 'ok']]);
   // The waiting requests that fail before calling JavaScript call nothing (the Async ones); awaited calls ran once each
   // (and the binding's result that is not awaited).
   assert.equal(globalThis.__laterCalls, 4);
-  // Outside a callback the same requests work.
+  // Outside a callback the same requests work. The promise registered inside settled after the callback returned.
   js.dispatch(207, 0, 0x50n, wire({ ref: promise }));
   await js.dispatch(214, 0, 16n, Buffer.concat([u64(0x51), wire(['T.later', 'lib', 'later', [7]])]));
   assert.equal(js.decode(await js.dispatch(205, 0, 2n | 8n, wire([{ ref: id }, 'later', [8]]))), 8);
   const settled = [];
-  while (settled.length < 2) settled.push(...events(await poll(js)).map(e => [e.promise, js.decode(e.bytes)]));
-  assert.deepEqual(settled.sort(), [[0x50n, 5], [0x51n, 7]]);
+  while (settled.length < 3) settled.push(...events(await poll(js)).map(e => [e.promise, js.decode(e.bytes)]));
+  assert.deepEqual(settled.sort(), [[0x40n, 5], [0x50n, 5], [0x51n, 7]]);
+});
+
+// ---- task waits inside synchronous callbacks (library/c/lasm_js.c sync_wait) ----
+// Channel words: 40 the wait (generation << 2 | 0 none, 1 waiting, 2 stop asked),
+// 44 stopped, 48 the wait list, 56 the Lean thread. Wait list: 0 epoch, 4 size,
+// 8 size × u64 waiting threads.
+// Regression: before, a callback that waited for a Lean task no thread could
+// finish (one making host calls, `Async` run with `.block`, a timer or socket
+// started in the callback) never returned.
+const waitLayout = { ...layout, table: 4096 };
+const SELF = 0x9000n;
+function waitingHost({ live = [SELF, 0xa000n], started = () => 0, memory = new WebAssembly.Memory({ initial: 2, maximum: 4, shared: true }), onTick }) {
+  const view = new DataView(memory.buffer);
+  const { channel, slot, buffer, table } = waitLayout;
+  view.setBigUint64(channel + 16, BigInt(buffer), true);
+  view.setBigUint64(channel + 24, 4096n, true);
+  view.setBigUint64(channel + 48, BigInt(table), true);
+  view.setBigUint64(channel + 56, SELF, true);
+  view.setInt32(table + 4, 4, true);
+  let ticks = 0;
+  const lean = {
+    memory, get view() { return new DataView(memory.buffer); }, get i32() { return new Int32Array(memory.buffer); },
+    get word() { return Atomics.load(this.i32, channel / 4 + 10); },
+    wait(generation) { Atomics.store(this.i32, channel / 4 + 10, generation << 2 | 1); },
+    list(threads, at = table) { const v = new DataView(memory.buffer); for (let k = 0; k < 4; k++) v.setBigUint64(at + 8 + 8 * k, threads[k] ?? 0n, true); },
+    epoch(n) { Atomics.store(this.i32, table / 4, n); },
+    post(state, value, stopped = 0) {
+      const out = value === undefined ? new Uint8Array(0) : state === 3 ? new TextEncoder().encode(value) : wire(value);
+      new Uint8Array(memory.buffer).set(out, buffer);
+      const v = new DataView(memory.buffer);
+      v.setBigUint64(channel + 32, BigInt(out.length), true);
+      Atomics.store(this.i32, channel / 4 + 11, stopped);
+      Atomics.store(this.i32, channel / 4, state);
+    },
+    // The Lean thread's answer to a stop request: what sync_main does after longjmp.
+    stopIfAsked() {
+      if ((this.word & 3) !== 2) return false;
+      Atomics.store(this.i32, channel / 4 + 10, this.word & ~3);
+      this.post(3, undefined, 1);
+      return true;
+    },
+  };
+  const js = host({ wasmMemory: () => memory, liveThreads: () => live, startedOperations: started,
+    serveSync: () => { if (++ticks > 300) throw new Error('never answered'); onTick(lean, ticks); } });
+  js.dispatch(211, 0, 0n, Buffer.concat([u64(channel), u64(slot)]));
+  const f = js.values.get(js.dispatch(210, 1, 2n).readUInt32LE(1));
+  return { js, f, lean, ticks: () => ticks };
+}
+const stopText = what => `TypeError: Waiting for ${what} inside a synchronous callback can't finish, because the JavaScript thread is waiting for the callback; use Function.ofFn`;
+
+test('a task wait no Lean thread can end is stopped once nothing changed for 50 ms, with the reason', () => {
+  // Every other thread (0xa000) waits: once that has lasted 50 ms the wait is asked to stop.
+  let asked, since;
+  const { js, f, lean } = waitingHost({ onTick: (lean, tick) => {
+    if (tick === 1) { lean.wait(1); lean.list([0xa000n]); lean.epoch(7); since = performance.now(); return; }
+    if (lean.stopIfAsked()) asked = performance.now() - since;
+  } });
+  assert.throws(() => f(), { message: stopText('a Lean task'), leanUserError: true });
+  assert.ok(asked >= 50 && asked < 1000, `asked after ${asked} ms`);
+  assert.equal(js.snapshot().syncWaitsStopped, 1);
+  // The stopped flag is cleared: a later Lean failure keeps its own message.
+  assert.equal(Atomics.load(lean.i32, waitLayout.channel / 4 + 11), 0);
+  const again = waitingHost({ onTick: lean => lean.post(3, 'Lean failure') });
+  assert.throws(() => again.f(), { message: 'Error: Lean failure' });
+  assert.equal(again.js.snapshot().syncWaitsStopped, 0);
+});
+
+test('a task wait is not stopped while another thread runs, or while the waits change', () => {
+  // 0xb000 is not waiting for 15 ticks: no stop; then the task finishes and the callback returns.
+  const runs = waitingHost({ live: ['36864', '40960', '45056'], onTick: (lean, tick) => {
+    if (tick === 1) { lean.wait(1); lean.list([0xa000n]); }
+    assert.equal(lean.word & 3, 1, 'no stop asked');
+    if (tick === 15) { Atomics.store(lean.i32, waitLayout.channel / 4 + 10, 1 << 2); lean.post(2, 'finished'); }
+  } });
+  assert.equal(runs.f(), 'finished');
+  assert.equal(runs.js.snapshot().syncWaitsStopped, 0);
+  // The wait list changes at every look for 150 ms (threads wake and wait again): no stop until it settles.
+  let settled;
+  const changing = waitingHost({ onTick: (lean, tick) => {
+    if (tick === 1) { lean.wait(1); lean.list([0xa000n]); settled = performance.now() + 150; }
+    if (performance.now() < settled) { lean.epoch(tick); assert.equal(lean.word & 3, 1); return; }
+    if (lean.stopIfAsked()) assert.ok(performance.now() - settled >= 50);
+  } });
+  assert.throws(() => changing.f(), { message: stopText('a Lean task') });
+  // No wait (word 0) or one that ended (state 0): nothing is asked.
+  const none = waitingHost({ onTick: (lean, tick) => {
+    lean.list([0xa000n]);
+    if (tick === 3) Atomics.store(lean.i32, waitLayout.channel / 4 + 10, 2 << 2);
+    assert.equal(lean.word & 3, 0);
+    if (tick === 12) lean.post(2, 1);
+  } });
+  assert.equal(none.f(), 1);
+  // A new wait began between the look and the request (another generation): that wait is not asked to stop.
+  // A clock of 10 ms per look: the sixth look (50 ms after the first) would ask; the new wait begins during it.
+  const now = performance.now;
+  let clock = 0, looks = 0, raced, checked = false;
+  performance.now = () => clock;
+  try {
+    const live = { *[Symbol.iterator]() {
+      yield SELF; yield 0xa000n;
+      if (++looks === 6) Atomics.store(raced.lean.i32, waitLayout.channel / 4 + 10, 2 << 2 | 1);
+    } };
+    raced = waitingHost({ live, onTick: (lean, tick) => {
+      clock = tick * 10;
+      if (tick === 1) { lean.wait(1); lean.list([0xa000n]); }
+      if (tick === 7) { checked = true; assert.equal(lean.word, 2 << 2 | 1, 'the new wait is not asked to stop'); }
+      if (lean.stopIfAsked()) assert.equal(tick, 13);
+    } });
+    assert.throws(() => raced.f(), { message: stopText('a Lean task') });
+    assert.ok(checked);
+  } finally { performance.now = now; }
+});
+
+test('a stopped wait names what the callback started that only the event loop finishes', () => {
+  const run = (setup, options = {}) => {
+    const { f } = waitingHost({ ...options, onTick: (lean, tick) => {
+      if (tick === 1) { lean.wait(1); lean.list([0xa000n]); setup?.(); }
+      lean.stopIfAsked();
+    } });
+    try { f(); } catch (error) { return error.message; }
+    return 'returned';
+  };
+  // An operation started inline during the callback (op 94): a timer, DNS lookup or socket operation.
+  let started = 3;
+  assert.equal(run(() => started++, { started: () => started }), stopText('a timer, DNS lookup or socket operation'));
+  // Started before the callback only: a Lean task.
+  assert.equal(run(undefined, { started: () => started }), stopText('a Lean task'));
+  // A promise registered during the callback (Value.toTask, op 207): a JavaScript promise.
+  let js;
+  const promised = waitingHost({ onTick: (lean, tick) => {
+    if (tick === 1) { js.dispatch(207, 0, 0x60n, wire(1)); lean.wait(1); lean.list([0xa000n]); }
+    lean.stopIfAsked();
+  } });
+  js = promised.js;
+  assert.throws(() => promised.f(), { message: stopText('a JavaScript promise') });
+});
+
+test('a task wait is checked on the memory as it is now (grown during the callback)', () => {
+  const memory = new WebAssembly.Memory({ initial: 1, maximum: 4, shared: true });
+  const table = 65536 + 512;
+  const { f } = waitingHost({ memory, onTick: (lean, tick) => {
+    if (tick === 1) {
+      memory.grow(1);
+      lean.view.setBigUint64(waitLayout.channel + 48, BigInt(table), true);
+      new DataView(memory.buffer).setInt32(table + 4, 4, true);
+      lean.list([0xa000n], table);
+      lean.wait(1);
+      return;
+    }
+    lean.stopIfAsked();
+  } });
+  assert.throws(() => f(), { message: stopText('a Lean task') });
+});
+
+test('a stop request wakes the waiting Lean thread', async () => {
+  // A second thread plays sync_wait: it blocks on the wait word with no timeout, so only the request's notify ends it.
+  const memory = new WebAssembly.Memory({ initial: 2, maximum: 2, shared: true });
+  const { channel, slot, buffer, table } = waitLayout;
+  const view = new DataView(memory.buffer);
+  view.setBigUint64(channel + 16, BigInt(buffer), true);
+  view.setBigUint64(channel + 24, 4096n, true);
+  view.setBigUint64(channel + 48, BigInt(table), true);
+  view.setBigUint64(channel + 56, SELF, true);
+  view.setInt32(table + 4, 4, true);
+  view.setBigUint64(table + 8, 0xa000n, true);
+  const js = host({ wasmMemory: () => memory, liveThreads: () => [SELF, 0xa000n], serveSync: () => {} });
+  js.dispatch(211, 0, 0n, Buffer.concat([u64(channel), u64(slot)]));
+  const worker = moduleWorker(`
+import { workerData } from 'node:worker_threads';
+const { memory, channel } = workerData;
+const i32 = new Int32Array(memory.buffer);
+for (;;) {
+  Atomics.wait(i32, channel / 4, 0);
+  if (Atomics.load(i32, channel / 4) !== 1) continue;
+  const waiting = 1 << 2 | 1;
+  Atomics.store(i32, channel / 4 + 10, waiting);
+  Atomics.wait(i32, channel / 4 + 10, waiting);
+  if (Atomics.load(i32, channel / 4 + 10) !== (1 << 2 | 2)) throw new Error('woken without a stop request');
+  Atomics.store(i32, channel / 4 + 10, 1 << 2);
+  new DataView(memory.buffer).setBigUint64(channel + 32, 0n, true);
+  Atomics.store(i32, channel / 4 + 11, 1);
+  Atomics.store(i32, channel / 4, 3);
+  Atomics.add(i32, channel / 4 + 1, 1); Atomics.notify(i32, channel / 4 + 1);
+  break;
+}
+`, { workerData: { memory, channel } });
+  try {
+    await new Promise(resolve => setTimeout(resolve, 50));
+    const f = js.values.get(js.dispatch(210, 1, 2n).readUInt32LE(1));
+    assert.throws(() => f(), { message: stopText('a Lean task') });
+  } finally { await worker.terminate(); }
+});
+
+test('task waits: the whole wait list is read; a stopped flag alone, results, and hosts without the thread hook', () => {
+  // The other thread is listed in the last entry.
+  const last = waitingHost({ onTick: (lean, tick) => { if (tick === 1) { lean.wait(1); lean.list([0n, 0n, 0n, 0xa000n]); } lean.stopIfAsked(); } });
+  assert.throws(() => last.f(), { message: stopText('a Lean task') });
+  // A failure posted as stopped without a request (no reason recorded): a Lean task.
+  const flagged = waitingHost({ onTick: lean => lean.post(3, undefined, 1) });
+  assert.throws(() => flagged.f(), { message: stopText('a Lean task') });
+  assert.equal(flagged.js.snapshot().syncWaitsStopped, 1);
+  // A result is a result, whatever the stopped word says.
+  const result = waitingHost({ onTick: lean => lean.post(2, 'ok', 1) });
+  assert.equal(result.f(), 'ok');
+  // Without the live-threads hook nothing is checked: the callback returns when Lean answers.
+  const memory = new WebAssembly.Memory({ initial: 2, maximum: 2, shared: true });
+  const view = new DataView(memory.buffer), i32 = new Int32Array(memory.buffer);
+  const { channel, slot, buffer } = waitLayout;
+  view.setBigUint64(channel + 16, BigInt(buffer), true);
+  view.setBigUint64(channel + 24, 4096n, true);
+  Atomics.store(i32, channel / 4 + 10, 1 << 2 | 1);
+  let ticks = 0;
+  const js = host({ wasmMemory: () => memory, serveSync: () => {
+    if (++ticks < 8) return;
+    const out = wire(5);
+    new Uint8Array(memory.buffer).set(out, buffer);
+    view.setBigUint64(channel + 32, BigInt(out.length), true);
+    Atomics.store(i32, channel / 4, 2);
+  } });
+  js.dispatch(211, 0, 0n, Buffer.concat([u64(channel), u64(slot)]));
+  assert.equal(js.values.get(js.dispatch(210, 1, 2n).readUInt32LE(1))(), 5);
+  assert.equal(Atomics.load(i32, channel / 4 + 10) & 3, 1);
+  // A promise registered outside a callback is not counted as one the callback started.
+  js.dispatch(207, 0, 0x70n, wire(1));
+  assert.equal(js.snapshot().syncPromises, 0);
 });

@@ -12,6 +12,10 @@ Notes for the next release, collected as changes land. They move to
   - If you ran or packaged the `dist/` that a platform build wrote, build it explicitly: `lasm build Main.lean --target node` (or `lasm build Main.lean` under Node).
   - Delete a stale Node build left at a platform `--output`; Lasm refuses to replace it and says so.
 
+## Fixes
+
+- **Lasm.JS: waits inside synchronous callbacks fail at once instead of never finishing.** Inside a `Function.ofSyncFn` callback, waiting for a Lean task that makes host calls (including `Async` run with `.block`), or for a timer, DNS lookup or socket read started in the callback, used to hang the program. It now ends the callback with an error that says what it waited for, as soon as every other Lean thread waits too (JavaScript gets the error; a Lean `try` inside the callback cannot catch it). `Value.await` and the `…Await` forms still fail as errors the callback can catch. A wait for a task that needs nothing from Node still works, and `Value.toTask` without waiting no longer fails: the promise settles after the callback returns. Measured per-call costs (Lean→JS calls, synchronous callbacks, finished-task waits, promise awaits) show no slowdown.
+
 ## Changes
 
 - **Edge and browser: a shorter stack-overflow message.** A C-stack overflow on the edge (#115) now stops with "Stack overflow: the program used all of its 1 MiB C stack (deep recursion?). See https://github.com/Millillion/lasm/blob/main/docs/EDGE.md#stack". The original trap is still the error's `cause`.

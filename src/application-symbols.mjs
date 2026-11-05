@@ -42,7 +42,8 @@ export function applicationSymbolRegistry(sources, symbols, hook = 'lasm_lookup_
   const missing = names.filter(name => !declarations.has(name));
   if (missing.length) throw new Error(`Missing C declarations for application symbols: ${missing.slice(0, 20).join(', ')}`);
   const exports = [...new Set(symbols.filter(({ name, type }) => isLeanSymbol(name) ? 'BDGRS'.includes(type)
-    : !['__main_argc_argv', '__main_void'].includes(name) && !name.startsWith('__em_lib_deps_'))
+    // --wrap wrappers (__wrap_*) are reached through the symbol they wrap.
+    : !['__main_argc_argv', '__main_void'].includes(name) && !name.startsWith('__em_lib_deps_') && !name.startsWith('__wrap_'))
     .map(({ name }) => '_' + name))].sort();
   const source = `// Generated from the application's C declarations and defined object symbols.
 #include <lean/lean.h>

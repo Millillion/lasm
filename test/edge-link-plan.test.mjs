@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { linkEdgeProgram, withoutIncludePaths, provisionEdgeLinker, edgeLinkSettings, edgeRecipe, edgeRecipeHas, edgeRecipeMode, asyncifyStackBytes } from '../src/edge/edge-link.mjs';
 import { compactInitializerWrappers } from '../src/edge/edge-initializers.mjs';
 import { responseFile } from '../src/platform.mjs';
+import { glueLinkFlags } from '../src/lasm-library.mjs';
 import { installTools, wasmObject, archive, temporaryDirectory } from './fixtures/link-stand-ins/toolchain.mjs';
 import { registerProgram } from './fixtures/link-stand-ins/programs.mjs';
 
@@ -41,7 +42,8 @@ function fixture({ plan = true, js = true, wrappers = true, exportsList = ['_mai
   const wrapperObjects = wrappers ? [0, 1, 2, 3].map(part => object(`initializers-${part}.o`, { functions: [{ name: `wrapper_${part}_${tag}` }] })) : [];
   // A path the response file quotes and escapes; names that only contain the glue marker.
   const second = object(join('with "quote" and space', 'module-1.o'), { functions: [{ name: `l_helper_${tag}` }, { name: 'xlasm_js_available' }, { name: 'lasm_js_available_x' }] });
-  writeFileSync(join(linkWork, 'link.rsp'), responseFile([main, ...(js ? [jsGlue] : []), '-Wl,--wrap=initialize_Main', marker, member,
+  // A program with Lasm.JS's Node glue also has the glue's wraps, which the edge link drops with it.
+  writeFileSync(join(linkWork, 'link.rsp'), responseFile([main, ...(js ? [jsGlue, ...glueLinkFlags] : []), '-Wl,--wrap=initialize_Main', marker, member,
     ...wrapperObjects.slice(0, 2), '-Wl,--wrap=initialize_Init', ...wrapperObjects.slice(2), second, '-Oz', '-sMEMORY64=1', '-o', 'program.cjs']));
   writeFileSync(join(linkWork, 'exports.json'), JSON.stringify(exportsList) + '\n');
   writeFileSync(join(linkWork, 'application-pre.js'), 'Module.lasmLeanVersion = "4.35.0";\n');

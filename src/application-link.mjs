@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { readApplicationSymbols, readInitializationFreeCppSymbols } from './application-symbols.mjs';
 import { readApplicationLinkRequirements, reachabilityRegistry, canSpecializeInitialization, selectiveInitialization } from './application-reachability.mjs';
 import { requireAotApplication } from './application-policy.mjs';
+import { glueLinkFlags } from './lasm-library.mjs';
 import { describeLibrary, dynamicLoadingStubs, librariesForUndefinedSymbols, undefinedSymbols as linkUndefinedSymbols, UnsupportedNativeLibrary } from './application-native.mjs';
 import { cInitTargets, coreInitTargets, initializerWrapperParts, initializerWrappers, planInitializers, readLiveSymbols } from './application-initialization.mjs';
 import { buildJobs } from './managed-link-toolchain.mjs';
@@ -68,6 +69,10 @@ export function initializerStubs(stubs) {
  * further threads start on demand either way. Each pre-started Worker costs
  * 30–40 ms of CPU, and a Lasm program starts few threads (docs/BENCHMARKS.md
  * "Cold start"). */
+/** The link flags of a program whose sources include Lasm.JS's Node glue
+ * (library/c/lasm_js.c), which wraps Lean's task waits and Emscripten's futex wait. */
+export const lasmJsLinkFlags = sources => sources.some(file => /(?:^|[\\/])lasm_js\.c$/.test(file)) ? [...glueLinkFlags] : [];
+
 export function configurableThreadPool(glue) {
   const recorded = 'var pthreadPoolSize = 4;';
   if (glue.split(recorded).length !== 2) throw new Error('Unexpected Emscripten thread pool in the application glue');
@@ -432,7 +437,7 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   const analysis = { initializationFreeCppSymbols: specializeInitialization
     ? readInitializationFreeCppSymbols(join(runtime.directory, 'lib/libleancpp.a'),
       join(sdk.prefix, 'bin', executableName('llvm-nm'))) : new Set() };
-  const initializationInputs = [];
+  const initializationInputs = [...lasmJsLinkFlags(sources)];
   if (specializeInitialization) {
     const initializeC = join(work, 'initialization.c'); await writeFile(initializeC, selectiveInitialization);
     compile(initializeC, initializeObject, { shared: true });
