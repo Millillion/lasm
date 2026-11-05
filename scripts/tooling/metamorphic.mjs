@@ -93,10 +93,10 @@ export async function runMetamorphic({ lasm, targets, profiles, work, log = cons
   const coldCache = temporaryDirectory('cold-cache', work);
   try {
     for (const target of targets) for (const profile of profiles) {
-      // Edge and WASI builds write their platform directory (workers/, wasi/);
-      // --output names the Node build they relink, so it is left at its default.
+      // Edge, WASI and browser builds write their platform directory (workers/,
+      // wasi/, dist/) by default; node gets --output dist explicitly.
       const out = { node: 'dist', browser: 'dist', wasi: 'wasi', workers: 'workers' }[target] ?? target;
-      const flags = ['--target', target, ...(out === 'dist' ? ['--output', 'dist'] : []), ...(profile === 'dev' ? ['--dev'] : []),
+      const flags = ['--target', target, ...(target === 'node' ? ['--output', 'dist'] : []), ...(profile === 'dev' ? ['--dev'] : []),
         ...(profile === 'dev' && !['node', 'browser', 'wasi'].includes(target) ? ['--allow-dev'] : [])];
       const projects = [];
       // Every project is a directory named app (in its own parent): a browser

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parseLasmArguments } from '../src/cli-arguments.mjs';
+import { parseLasmArguments, platformBuildTargets, fixedLayoutTargets, edgeBuildTargets, wasiBuildTargets } from '../src/cli-arguments.mjs';
 
 test('ordinary Lean files default to run on Node, and preserve arguments after --', () => {
   assert.deepEqual(parseLasmArguments(['Main.lean', '--', 'hello', '--target', 'user-option']), {
@@ -33,6 +33,27 @@ test('build targets: node by default, or a function platform packaged after the 
   }
   assert.deepEqual(parseLasmArguments(['build', 'Main.lean', '--target', 'lambda', '--output', 'out']),
     { command: 'build', input: 'Main.lean', output: 'out', target: 'lambda', rebuild: false, verbose: false, profile: 'release', args: [] });
+});
+
+test('--output: the Node build for node and function targets, the deployable directory for platform targets (0.5.0)', () => {
+  // node and the function platforms: the Node build, default dist/ (lasm package reads it).
+  for (const target of ['node', 'lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'])
+    assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target]).output, 'dist', target);
+  // Platform targets: no default here; each target's writer uses its own directory
+  // in the project (workers/, wasi/, bin/, dist/ for the browser, …).
+  for (const target of platformBuildTargets) {
+    if (fixedLayoutTargets.includes(target)) continue;
+    assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target]).output, undefined, target);
+    assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target, '--output', 'out']).output, 'out', target);
+    assert.equal(parseLasmArguments(['build', 'Main.lean', 'out', '--target', target]).output, 'out', target);
+  }
+  assert.deepEqual(platformBuildTargets, [...edgeBuildTargets, ...wasiBuildTargets, 'browser']);
+  // Vercel Edge and Netlify Edge: the platform fixes the layout, so --output is refused.
+  for (const target of fixedLayoutTargets) {
+    assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target]).output, undefined, target);
+    assert.throws(() => parseLasmArguments(['build', 'Main.lean', '--target', target, '--output', 'out']), /--output does not apply to --target .*fixes its layout/);
+    assert.throws(() => parseLasmArguments(['build', 'Main.lean', 'out', '--target', target]), /--output does not apply/);
+  }
 });
 
 test('profiles: lasm build is release, lasm run is dev; --dev and --release choose', () => {

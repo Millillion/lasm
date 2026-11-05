@@ -5,6 +5,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSy
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fastlyToml } from './wasi/wasi-build.mjs';
+import { packageTargets } from './package.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const templateRoot = join(root, 'templates');
@@ -727,14 +728,16 @@ name = "View"
         // Every other target: the browser app is embedded in the server program
         // (embed_dir! in Server.lean), so the same build serves everything.
         // Cloudflare Workers (wrangler.toml; Workers also serve dist/public as static assets).
-        'build:workers': 'npm run build:client && lasm build Server.lean --target workers --output dist/server',
+        'build:workers': 'npm run build:client && lasm build Server.lean --target workers',
         // Bun and Deno: bun bun/main.mjs, deno run -A --unstable-kv deno/main.mjs (on $PORT; Deno KV keeps the todos).
-        'build:bun': 'npm run build:client && lasm build Server.lean --target bun --output dist/server',
+        'build:bun': 'npm run build:client && lasm build Server.lean --target bun',
         'start:bun': 'bun bun/main.mjs',
-        'build:deno': 'npm run build:client && lasm build Server.lean --target deno --output dist/server',
+        'build:deno': 'npm run build:client && lasm build Server.lean --target deno',
         'start:deno': 'deno run -A --unstable-kv deno/main.mjs',
         ...Object.fromEntries(deploy.filter(t => !['workers'].includes(t)).map(t => [`build:${deployTargets[t].package}`,
-          `npm run build:client && lasm build Server.lean --target ${deployTargets[t].package} --output dist/server`])),
+          // A function platform packages the Node server in dist/server; a
+          // platform target writes its own directory (bin/, wasi-http/, …).
+          `npm run build:client && lasm build Server.lean --target ${deployTargets[t].package}${packageTargets[deployTargets[t].package] ? ' --output dist/server' : ''}`])),
         ...(deploy.includes('fastly') ? { 'start:fastly': 'fastly compute serve' } : {}),
         ...(deploy.includes('spin') ? { 'start:spin': 'spin up' } : {}),
         ...(deploy.includes('wasi-http') ? { 'start:wasi-http': 'wasmtime serve wasi-http/main.wasm' } : {}),

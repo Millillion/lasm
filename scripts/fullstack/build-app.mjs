@@ -35,7 +35,8 @@ const run = script => lasm(scripts[script].replace(/^lasm /, '').split(' '));
 const record = { schema: 1, platform: `${process.platform}-${process.arch}`, seconds: {} };
 record.seconds.client = run('build:client');
 // The platform builds (each `npm run build:client && lasm build Server.lean --target T`),
-// then the Node server last: dist/server is its output.
+// then the Node server: dist/server is its output (platform targets keep their
+// Node build in the build cache).
 for (const target of ['workers', 'bun', 'deno', 'fastly', 'wasi-http'])
   record.seconds[target] = lasm(scripts[`build:${target}`].split('&& ')[1].replace(/^lasm /, '').split(' '));
 record.seconds.server = run('build:server');
