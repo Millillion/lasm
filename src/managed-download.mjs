@@ -68,15 +68,24 @@ function retryAfter(response, now) {
   return Number.isFinite(ms) ? Math.max(0, ms) : 0;
 }
 
+/** fetch's global dispatcher, if it has one yet: undici 8 (Node 26) keeps it
+ * under `undici.globalDispatcher.2`, and under `.1` only a wrapper for the
+ * older dispatcher API; undici 7 (Node 24) keeps it under `.1`. */
+export function globalDispatcher(scope = globalThis) {
+  return scope[Symbol.for('undici.globalDispatcher.2')] ?? scope[Symbol.for('undici.globalDispatcher.1')];
+}
+
 /** A connection pool of its own for one download attempt (#152). Aborting a
- * fetch does not reliably release its connection: through Node's env-proxy
- * dispatcher (NODE_USE_ENV_PROXY), a half-open CONNECT tunnel kept every retry
- * waiting behind it, with no new tunnel opened. Each attempt therefore uses a
+ * fetch does not always release its connection: Node 26's fetch (undici 8)
+ * speaks HTTP/2 where the server offers it, as GitHub's CDN does, and an abort
+ * only resets the stream. The session stays open, and every retry to the same
+ * origin was a new stream on the stalled session (through a proxy: no new
+ * CONNECT tunnel), which never got its headers. Each attempt therefore uses a
  * new dispatcher of the class Node made the global one (EnvHttpProxyAgent with
  * a proxy, else Agent; both read their settings from the environment), and
  * destroys it with the attempt, so a retry always opens a fresh connection.
  * Undefined, and fetch's global dispatcher, when there is none yet. */
-export function attemptDispatcher(global = globalThis[Symbol.for('undici.globalDispatcher.1')]) {
+export function attemptDispatcher(global = globalDispatcher()) {
   const Dispatcher = global?.constructor;
   if (typeof Dispatcher !== 'function' || typeof Dispatcher.prototype?.destroy !== 'function') return undefined;
   try { return new Dispatcher(); } catch { return undefined; }

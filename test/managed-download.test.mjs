@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
-import { attemptDispatcher, downloadArtifact, downloadPolicy, retryDelay, transportDiagnostic } from '../src/managed-download.mjs';
+import { attemptDispatcher, downloadArtifact, globalDispatcher, downloadPolicy, retryDelay, transportDiagnostic } from '../src/managed-download.mjs';
 
 const bytes = Buffer.from('a small but complete download');
 const artifact = { name: 'fixture', url: 'https://example.invalid/tool', bytes: bytes.length,
@@ -195,9 +195,23 @@ test('attemptDispatcher makes a new instance of the global dispatcher class', ()
   assert.equal(attemptDispatcher(Object.create(null)), undefined);
   assert.equal(attemptDispatcher(new (class { close() {} })()), undefined, 'no destroy: not a dispatcher');
   assert.equal(attemptDispatcher(new (class Broken { constructor(fail) { if (fail !== false) throw new Error('needs options'); } destroy() {} })(false)), undefined);
-  // Node's own: the global dispatcher once fetch has been used.
+});
+
+test("attemptDispatcher defaults to a new pool of the kind fetch's own global dispatcher is", async () => {
+  const current = Symbol.for('undici.globalDispatcher.2'), legacy = Symbol.for('undici.globalDispatcher.1');
+  assert.equal(globalDispatcher({ [current]: 'v2', [legacy]: 'v1 wrapper' }), 'v2');
+  assert.equal(globalDispatcher({ [legacy]: 'v1' }), 'v1');
+  assert.equal(globalDispatcher({}), undefined);
+  // Node's own, once fetch has been used: Agent (or EnvHttpProxyAgent), never
+  // undici 8's wrapper for the older API, which cannot be made without a pool.
+  await fetch('data:,').then(r => r.text());
+  const global = globalDispatcher();
+  assert.ok(global, 'fetch has a global dispatcher');
   const native = attemptDispatcher();
-  if (native) { assert.equal(typeof native.destroy, 'function'); assert.notEqual(native, globalThis[Symbol.for('undici.globalDispatcher.1')]); native.destroy(); }
+  assert.ok(native, `a new ${global.constructor.name}`);
+  assert.equal(native.constructor, global.constructor); assert.notEqual(native, global);
+  assert.match(native.constructor.name, /^(Agent|EnvHttpProxyAgent)$/);
+  await native.destroy();
 });
 
 test('Retry-After beyond the total budget fails rather than retrying early', async t => {
