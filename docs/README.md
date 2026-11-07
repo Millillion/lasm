@@ -36,6 +36,7 @@ in the current release on npm (`npm view @lasm/cli version`).
 
 | Reference | Contents |
 | --- | --- |
+| [How Lasm works](HOW_LASM_WORKS.md) | The pipeline from Lean to C to WebAssembly, the host bridge, how each target wraps the program, the build cache, the libraries (draft) |
 | [CLI reference](../README.md#cli-reference) | Every command, option and environment variable |
 | [Lean support and restrictions](../README.md#lean-support-and-restrictions) | Exactly what a deployed program cannot do (ahead-of-time only) |
 | [Where apps run](DEPLOYMENT.md) | Every platform and how CI tests it |

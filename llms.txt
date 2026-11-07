@@ -10,31 +10,72 @@ Key commands:
 - Targets: node (default), lambda, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge, bun, deno, wasi, wasi-http, fastly, browser
 - Editor support for `import Lasm.*`: `npx lasm editor`; version for bug reports: `npx lasm --version`
 
-## Docs
+## Getting started
 
-- [README](https://github.com/Millillion/lasm/blob/main/README.md): quick facts, start-here table, recipes per target, full CLI reference, limits
-- [Agent guide](https://github.com/Millillion/lasm/blob/main/docs/AI.md): rules and pitfalls for AI agents writing Lasm code
+- [README](https://github.com/Millillion/lasm/blob/main/README.md): quick facts, the start-here table, recipes per target, measured numbers, limits
 - [Getting started](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md): a Hono server with Lean handlers, an npm package, a container, a function platform, editor setup
-- [JS/npm bindings](https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md): `@[js]` declarations, type conversions, `Async`, callbacks, errors, a checklist for agents
+- [Agent guide](https://github.com/Millillion/lasm/blob/main/docs/AI.md): rules and pitfalls for AI agents writing Lasm code
+- [How Lasm works](https://github.com/Millillion/lasm/blob/main/docs/HOW_LASM_WORKS.md): the pipeline from Lean to C to WebAssembly, the host bridge, the targets, the cache, the libraries
+- [The edit loop](https://github.com/Millillion/lasm/blob/main/docs/DEVELOPER_WORKFLOW.md): `lasm dev`, build errors, several outputs at once
+- [All documentation](https://github.com/Millillion/lasm/blob/main/docs/README.md): every document in reading order
+
+## CLI
+
+- [CLI reference](https://github.com/Millillion/lasm/blob/main/README.md#cli-reference): every command, option and environment variable
+- [Templates](https://github.com/Millillion/lasm/tree/main/templates): what `npm create @lasm` and `lasm init --template` create (plain, express, hono, fastify, std-http, web, fetch, fullstack)
+- [Tool cache and requirements](https://github.com/Millillion/lasm/blob/main/docs/NODE_SUPPORT.md): where Lasm keeps Lean and its tools, and how to recover
+- [Installation hardening](https://github.com/Millillion/lasm/blob/main/docs/INSTALLATION_HARDENING.md): retries, offline repair, proxies and private CAs
+- [System Git](https://github.com/Millillion/lasm/blob/main/docs/MANAGED_GIT.md): Git for Lake dependencies
+
+## Libraries
+
+- [Lasm.JS](https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md): `@[js]` declarations, type conversions, `Async`, callbacks, errors, a checklist for agents
 - [Lasm.Fetch](https://github.com/Millillion/lasm/blob/main/docs/FETCH.md): one `Request → Async Response` handler for every server target, outbound `fetch`, streaming
 - [Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md): browser apps (Elm architecture, `html!`, commands, subscriptions, routing, SSR, hydration, what is proved)
-- [Lasm.RPC](https://github.com/Millillion/lasm/blob/main/docs/RPC.md): typed endpoints shared by server and browser, validation proved once
-- [Browser target](https://github.com/Millillion/lasm/blob/main/docs/BROWSER.md): loader, mount API, `Lasm.Web`, Vite plugin
-- [Edge](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md), [Bun and Deno](https://github.com/Millillion/lasm/blob/main/docs/BUN_DENO.md), [WASI and Fastly](https://github.com/Millillion/lasm/blob/main/docs/WASI.md), [deploy recipes](https://github.com/Millillion/lasm/blob/main/docs/deploy/README.md)
+- [Lasm.RPC and Lasm.KV](https://github.com/Millillion/lasm/blob/main/docs/RPC.md): typed endpoints shared by server and browser, validation proved once; a key-value store over each platform's own
+- [Lasm.Web](https://github.com/Millillion/lasm/blob/main/docs/BROWSER.md): typed DOM and web-platform bindings, the browser loader and mount API, the Vite plugin
+- [Library sources](https://github.com/Millillion/lasm/tree/main/library/Lasm): the Lean code of every library, including Lasm.Fastly (Fastly's stores)
+
+## Platforms
+
+- [Where apps run](https://github.com/Millillion/lasm/blob/main/docs/DEPLOYMENT.md): every platform and how CI tests it
+- [Supported platforms](https://github.com/Millillion/lasm/blob/main/README.md#supported-platforms) and [build machines](https://github.com/Millillion/lasm/blob/main/README.md#supported-environments): the table with evidence levels; operating systems, architectures, Node/Bun/Deno versions
+- [Deploy recipes](https://github.com/Millillion/lasm/blob/main/docs/deploy/README.md): Docker/Kubernetes, Lambda, Lambda@Edge, Vercel, Netlify, Azure, Google Cloud, Fly.io, Railway, Render, Heroku, DigitalOcean
+- [Edge functions](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md): Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy, Supabase; the single-threaded profile and its limits
+- [Bun and Deno](https://github.com/Millillion/lasm/blob/main/docs/BUN_DENO.md): the compiler and your programs on Bun or Deno
+- [WASI, wasi-http and Fastly Compute](https://github.com/Millillion/lasm/blob/main/docs/WASI.md): standard WebAssembly with no JavaScript (wasmtime, wasmer, Spin, Fastly)
+- [Browser](https://github.com/Millillion/lasm/blob/main/docs/BROWSER.md): `--target browser`, static hosting ([deploy guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/browser.md))
 
 ## Examples
 
 - [examples/conduit](https://github.com/Millillion/lasm/tree/main/examples/conduit) (flagship): the RealWorld "Conduit" app entirely in Lean. It has a REST API, a server-rendered Lasm.UI frontend (hydration, Markdown in Lean) and 52 proved propositions (307 theorems) about the running code ([PROOFS.md](https://github.com/Millillion/lasm/blob/main/examples/conduit/PROOFS.md): authorization, follows, favorites, slugs, pagination, shared validation, JSON round trips, Markdown link safety; no `sorry`). It runs on Node (`node:sqlite`), Cloudflare Workers (D1) and Bun (`bun:sqlite`) through one `@[js]` binding module each, and the official RealWorld API and Playwright suites pass. Run: `cd examples/conduit && npm install && npm run build && npm start`; `npm run proofs`; `npm test`; `npm run test:e2e`
 - [examples/README.md](https://github.com/Millillion/lasm/blob/main/examples/README.md): every example with its one-command run
+- [tandem](https://github.com/Millillion/lasm/tree/main/examples/tandem) (flagship): a collaborative editor on a sequence CRDT, the same Lean in the browser and the sync server, with proved convergence
+- [folio](https://github.com/Millillion/lasm/tree/main/examples/folio): a CommonMark renderer and static-site generator with proofs that Markdown cannot inject HTML
+- [porter](https://github.com/Millillion/lasm/tree/main/examples/porter) and [ledger](https://github.com/Millillion/lasm/tree/main/examples/ledger) (in progress): an OpenID Connect provider and a double-entry ledger, proofs first
 - [hello](https://github.com/Millillion/lasm/tree/main/examples/hello), [js-fetch](https://github.com/Millillion/lasm/tree/main/examples/js-fetch) (a `@[js]` binding), [js-crud](https://github.com/Millillion/lasm/tree/main/examples/js-crud) (Express/Hono + Postgres + JWT), [fetch](https://github.com/Millillion/lasm/tree/main/examples/fetch) (pure Lean HTTP everywhere), [edge-pure](https://github.com/Millillion/lasm/tree/main/examples/edge-pure), [wasi-cli](https://github.com/Millillion/lasm/tree/main/examples/wasi-cli), [ui](https://github.com/Millillion/lasm/tree/main/examples/ui) (counter, TodoMVC with proofs)
 - [templates/fullstack](https://github.com/Millillion/lasm/tree/main/templates/fullstack): server + browser + verified API (what `--template fullstack` creates)
 
-## Optional
+## Testing and evidence
 
-- [Benchmarks](https://github.com/Millillion/lasm/blob/main/docs/BENCHMARKS.md): cold start, size, memory, throughput, build times with CI runs
-- [Where apps run](https://github.com/Millillion/lasm/blob/main/docs/DEPLOYMENT.md) and how each platform is tested
-- [Language coverage](https://github.com/Millillion/lasm/blob/main/docs/LANGUAGE_COVERAGE.md), [compatible Lean packages](https://github.com/Millillion/lasm/blob/main/docs/COMPATIBILITY.md)
-- [All documentation](https://github.com/Millillion/lasm/blob/main/docs/README.md), [decisions](https://github.com/Millillion/lasm/blob/main/docs/DECISIONS.md), [release notes](https://github.com/Millillion/lasm/tree/main/docs/release)
+- [How Lasm is tested](https://github.com/Millillion/lasm/blob/main/docs/TESTING.md): differential testing against native Lean, target equivalence, scenario matrix, host-bridge model and schedule fuzzing, mutation testing, evidence levels
+- [Language coverage](https://github.com/Millillion/lasm/blob/main/docs/LANGUAGE_COVERAGE.md): per-platform results for the language and standard library
+- [Compatible Lean packages](https://github.com/Millillion/lasm/blob/main/docs/COMPATIBILITY.md): Lake packages tested with Lasm
+- [Benchmarks](https://github.com/Millillion/lasm/blob/main/docs/BENCHMARKS.md): cold start, size, memory, throughput, interop cost, build times with CI runs
+- [Evidence records](https://github.com/Millillion/lasm/tree/main/docs/evidence): recorded test results
+
+## Release notes
+
+- [Lasm 0.5.0](https://github.com/Millillion/lasm/blob/main/docs/release/0.5.0-notes.md): the current release
+- [All release notes](https://github.com/Millillion/lasm/tree/main/docs/release) and [GitHub releases](https://github.com/Millillion/lasm/releases)
+- [Releasing](https://github.com/Millillion/lasm/blob/main/docs/RELEASING.md): how a version bump becomes an npm release
+- [Decisions](https://github.com/Millillion/lasm/blob/main/docs/DECISIONS.md): choices made, with how to undo each
+
+## Limitations
+
+- [Known limitations](https://github.com/Millillion/lasm/blob/main/README.md#known-limitations): what each target cannot do (single-threaded targets have no sockets or processes; files only on Node and WASI)
+- [Lean support and restrictions](https://github.com/Millillion/lasm/blob/main/README.md#lean-support-and-restrictions): exactly what a deployed program cannot do (ahead-of-time only)
+- [Licenses](https://github.com/Millillion/lasm/blob/main/docs/LICENSING.md): licensing of apps you build; the notices are written on every build ([license audit](https://github.com/Millillion/lasm/blob/main/docs/LICENSE_AUDIT.md))
 
 ## Support
 
