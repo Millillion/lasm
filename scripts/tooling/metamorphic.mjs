@@ -249,7 +249,9 @@ export async function runMetamorphic({ lasm, targets, profiles, work, playwright
         incrementalProblems.push(...await equivalent('after reverting the edit', original.hashes, (await build(a)).hashes, ref, join(a, out)));
         record(target, profile, 'incremental', incrementalProblems);
 
-        record(target, profile, 'lasm dev', await devSession({ lasm, target, profile, out, flags, project, build, equivalent, text, work, log,
+        // lasm dev has no wasi target (src/dev.mjs devTargets): lasm build covers WASI.
+        if (target === 'wasi') log(`     wasi/${profile} lasm dev: not applicable (lasm dev has no wasi target)`);
+        else record(target, profile, 'lasm dev', await devSession({ lasm, target, profile, out, flags, project, build, equivalent, text, work, log,
           references: { original: { hashes: original.hashes, dir: ref }, edited: { hashes: clean.hashes, dir: join(d, out) } } }));
       } catch (error) {
         record(target, profile, 'run', [error.message]);
@@ -318,6 +320,9 @@ async function devSession({ lasm, target, profile, out, flags, project, build, r
     const since = output.slice(mark);
     if (failed.test(since)) problems.push(`${label}: the rebuild failed: ${tail(since, 12)}`);
     if (rebuild === 'required' && !rebuilt.test(since)) problems.push(`${label}: lasm dev reported no rebuild: ${tail(since, 6)}`);
+    // A change back to an earlier state may reuse that state's cached build
+    // ("Up to date"), but lasm dev must have seen the change.
+    if (rebuild === 'seen' && !browser && !/changed; rebuilding/.test(since)) problems.push(`${label}: lasm dev did not see the change: ${tail(since, 6)}`);
     if (!rebuild && (rebuilt.test(since) || count() > n)) problems.push(`${label}: lasm dev rebuilt although no source changed: ${tail(since, 6)}`);
     return current();
   };
@@ -338,10 +343,10 @@ async function devSession({ lasm, target, profile, out, flags, project, build, r
     state = await step('rename file', () => renameSync(join(directory, 'Notes.lean'), join(directory, 'Scratch.lean')), { rebuild: 'any' });
     problems.push(...same(edited.hashes, state.hashes, 'lasm dev after renaming an unimported module', edited.dir, state.dir));
 
-    state = await step('revert', () => { renameSync(join(directory, 'Scratch.lean'), join(directory, 'Notes.lean')); atomicSave(greeting, text); }, { rebuild: 'required' });
+    state = await step('revert', () => { renameSync(join(directory, 'Scratch.lean'), join(directory, 'Notes.lean')); atomicSave(greeting, text); }, { rebuild: 'seen' });
     problems.push(...await equivalent('lasm dev after reverting the edit vs the clean build', references.original.hashes, state.hashes, references.original.dir, state.dir));
 
-    state = await step('edit again', () => atomicSave(greeting, edit(text)), { rebuild: 'required' });
+    state = await step('edit again', () => atomicSave(greeting, edit(text)), { rebuild: 'seen' });
     problems.push(...await equivalent('lasm dev after a second edit (saved by rename) vs a clean build of the edit', references.edited.hashes, state.hashes, references.edited.dir, state.dir));
   } catch (error) {
     problems.push(error.message);

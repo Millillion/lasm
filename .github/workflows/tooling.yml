@@ -140,7 +140,7 @@ jobs:
           node "$LASM_BIN" --version
           node scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- /usr/bin/env CI=1 GITHUB_STEP_SUMMARY="$GITHUB_STEP_SUMMARY" \
             node scripts/tooling/error-corpus.mjs --lasm "$LASM_BIN" --only network --old-node "$OLD_NODE" --work "$RUNNER_TEMP/corpus" --report "$RUNNER_TEMP/error-corpus.json" \
-            ${{ matrix.cli == 'candidate' && '--inventory report' || '' }}
+            ${{ matrix.cli == 'candidate' && '--inventory check' || '' }}
       - if: always()
         run: cat "$RUNNER_TEMP/error-corpus.json" 2>/dev/null || true
 

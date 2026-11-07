@@ -239,7 +239,7 @@ export async function runFaults({ lasm, pkg, only, work, target = 'node', log = 
       writeFileSync(join(directory, 'App.lean'), fixture['App.lean'].replace('Hello', 'Hey'));
       // Node's delivery stage; an edge, WASI or browser build writes its platform directory last.
       const delivery = stages.includes('Verifying and writing application output') && target === 'node' ? 'Verifying and writing application output'
-        : stages.findLast(stage => /writ|output/i.test(stage)) ?? stages.at(-1);
+        : stages.at(-1);
       await scenario(`killed build of an edit while replacing the output ("${delivery}")`, { directory, compareSuccess: false,
         inject: () => build(directory, env(), { killWhen: text => text.includes(delivery) }),
         recover: () => writeFileSync(join(directory, 'App.lean'), fixture['App.lean']) });
