@@ -1,0 +1,22 @@
+# Cloudflare Workers: npm run build:workers writes workers/ (ServerEdge.lean,
+# the site server); npx wrangler dev serves it locally with a local Workers KV
+# namespace, and npx wrangler deploy deploys it to your account (Lasm never
+# runs wrangler). The site's files go in the namespace:
+#   node tools/kv.mjs json > kv.json && npx wrangler kv bulk put kv.json --binding folio --local
+# (without --local for the deployed namespace).
+name = "folio"
+main = "workers/worker.mjs"
+compatibility_date = "2026-10-01"
+
+# The site's files. wrangler dev keeps a local copy under .wrangler/ with any
+# id; to deploy, create one (npx wrangler kv namespace create folio) and put
+# its id here.
+[[kv_namespaces]]
+binding = "folio"
+id = "00000000000000000000000000000000"
+
+# Lasm's program.wasm is imported as a precompiled module.
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = false

@@ -9,21 +9,27 @@
 //   every other example must still pass, and every difference must be
 //   explained by raw HTML or an unsafe URL in the input.
 //
-//   node test/spec.mjs [--json results.json]
+//   node test/spec.mjs [--engine ENGINE] [--json results.json]
+//
+// ENGINE is the build that renders them (test/batch.mjs): node (the
+// default), native, wasmtime, wasmer, node-wasi, chromium, firefox, webkit,
+// or the URL of a running edge server (ServerEdge.lean's POST /api/render).
 //
 // It fails (exit 1) unless both hold, and prints the counts by section.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { renderAll } from './batch.mjs';
+import { renderAllAsync } from './batch.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const examples = JSON.parse(readFileSync(join(root, 'test', 'commonmark-spec', 'spec.json'), 'utf8'));
-const jsonOut = process.argv.includes('--json') ? process.argv[process.argv.indexOf('--json') + 1] : null;
+const option = name => process.argv.includes(name) ? process.argv[process.argv.indexOf(name) + 1] : null;
+const jsonOut = option('--json');
+const engine = option('--engine') ?? process.env.FOLIO_BATCH ?? 'node';
 
 const started = Date.now();
-const unsafe = renderAll(examples.map(e => ({ markdown: e.markdown, unsafe: true })));
-const safe = renderAll(examples.map(e => ({ markdown: e.markdown, unsafe: false })));
+const unsafe = await renderAllAsync(examples.map(e => ({ markdown: e.markdown, unsafe: true })), { engine });
+const safe = await renderAllAsync(examples.map(e => ({ markdown: e.markdown, unsafe: false })), { engine });
 const seconds = ((Date.now() - started) / 1000).toFixed(1);
 
 const failures = [];
@@ -59,11 +65,11 @@ for (const d of unexplained.slice(0, 10)) {
   console.log(`\n--- safe mode, unexplained: example ${d.example}\n${JSON.stringify(d.markdown)}\nexpected ${JSON.stringify(d.expected)}\nactual   ${JSON.stringify(d.actual)}`);
 }
 const passed = examples.length - failures.length;
-console.log(`\nCommonMark 0.31.2: ${passed}/${examples.length} examples pass with raw HTML enabled; ` +
+console.log(`\nCommonMark 0.31.2 on ${engine}: ${passed}/${examples.length} examples pass with raw HTML enabled; ` +
   `with the safe defaults ${safeSame} are identical and ${safeDiffs.length} differ on purpose ` +
   `(raw HTML shown as text, or an unsafe URL dropped)${unexplained.length ? `, ${unexplained.length} of them unexplained` : ''} (${seconds} s).`);
 if (jsonOut) {
   mkdirSync(join(jsonOut, '..'), { recursive: true });
-  writeFileSync(jsonOut, JSON.stringify({ passed, total: examples.length, safeSame, safeDiffs: safeDiffs.map(d => d.example), failures }, null, 2));
+  writeFileSync(jsonOut, JSON.stringify({ engine, passed, total: examples.length, safeSame, safeDiffs: safeDiffs.map(d => d.example), failures }, null, 2));
 }
 process.exitCode = failures.length || unexplained.length ? 1 : 0;

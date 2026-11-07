@@ -1,0 +1,185 @@
+name: Folio on every platform
+# examples/folio beyond Node (folio.yml), on each platform's own local tooling:
+# - edge: the site server (ServerEdge.lean) on Fastly (Viceroy 0.21.1, a KV
+#   Store from fastly.toml), Cloudflare Workers (wrangler dev, local Workers
+#   KV) and Deno Deploy's build (the Deno CLI, Deno KV in a local file). The
+#   example site is put in the store, and every page served must be byte for
+#   byte what `folio build` writes; a changed site in a new store must be
+#   served the same way; then the CommonMark specification's 652 examples
+#   run on the server through POST /api/render (test/edge.mjs --spec).
+# - wasi: the 652 examples on the WASI build of the batch renderer
+#   (dist/batch-wasi) on wasmtime 49.0.4, wasmer 7.4.2 and node:wasi.
+# - browser: the 652 examples on the browser build (dist/batch-browser) in
+#   headless Chromium, Firefox and WebKit.
+# Every engine must pass all 652 with raw HTML enabled, and with the safe
+# defaults differ only where raw HTML or an unsafe URL is (test/spec.mjs).
+# Local tooling only: no account, nothing deployed, CI=1. Free runners only.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/folio-platforms.yml'
+      - 'examples/folio/**'
+      - '!examples/folio/Proofs/**'
+      - '!examples/folio/Proofs.lean'
+      - '!examples/folio/**/*.md'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/folio-platforms.yml'
+      - 'examples/folio/**'
+      - '!examples/folio/Proofs/**'
+      - '!examples/folio/Proofs.lean'
+      - '!examples/folio/**/*.md'
+permissions:
+  contents: read
+concurrency:
+  group: folio-platforms-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CI: '1'
+  BROWSER: 'none'
+jobs:
+  edge:
+    name: ${{ matrix.title }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: fastly
+            title: Fastly Compute (Viceroy 0.21.1, KV Store)
+          - platform: workers
+            title: Cloudflare Workers (wrangler dev, local Workers KV)
+          - platform: deno-deploy
+            title: Deno Deploy's build (Deno 2.9.6, Deno KV)
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+      DO_NOT_TRACK: '1'
+      FOLIO: examples/folio
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - uses: ./.github/actions/process-guard
+      - name: npm ci
+        working-directory: ${{ env.FOLIO }}
+        run: npm ci --no-audit --no-fund
+      - name: The platform's pinned tools
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T/node_modules/.bin"
+          case "$PLATFORM" in
+            workers) npm install --prefix "$T" --no-audit --no-fund wrangler@4.152.0 ;;
+            deno-deploy) npm install --prefix "$T" --no-audit --no-fund deno@2.9.6 ;;
+            fastly)
+              curl -fsSL --retry 3 -o "$RUNNER_TEMP/viceroy.tgz" https://github.com/fastly/Viceroy/releases/download/v0.21.1/viceroy_v0.21.1_linux-amd64.tar.gz
+              echo "54a5b46ab05ce1492f4df136728b2eb81b350cb42da5d9f2eec66558ddc1e233  $RUNNER_TEMP/viceroy.tgz" | sha256sum -c
+              tar -xzf "$RUNNER_TEMP/viceroy.tgz" -C "$T/node_modules/.bin" viceroy ;;
+          esac
+          echo "$T/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: Build the folio command (the reference) and the site server for ${{ matrix.platform }}
+        working-directory: ${{ env.FOLIO }}
+        run: |
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:${{ matrix.platform }}
+      - name: fastly.toml is tools/kv.mjs's for site/
+        if: matrix.platform == 'fastly'
+        working-directory: ${{ env.FOLIO }}
+        run: node tools/kv.mjs fastly | diff fastly.toml -
+      - name: The site from the store, a changed site, and the 652 CommonMark examples on the server
+        working-directory: ${{ env.FOLIO }}
+        run: node test/edge.mjs --platform ${{ matrix.platform }} --spec
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: folio-${{ matrix.platform }}
+          path: ${{ env.FOLIO }}/test-results/
+          retention-days: 14
+          if-no-files-found: ignore
+  wasi:
+    name: The 652 CommonMark examples on WASI (wasmtime 49.0.4, wasmer 7.4.2, node:wasi)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - uses: ./.github/actions/process-guard
+      - name: npm ci, and the pinned engines
+        working-directory: examples/folio
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          W="$RUNNER_TEMP/wasi-tools"; mkdir -p "$W"
+          get() { curl -fsSL --retry 3 -o "$RUNNER_TEMP/$2" "$1"; echo "$3  $RUNNER_TEMP/$2" | sha256sum -c; }
+          get https://github.com/bytecodealliance/wasmtime/releases/download/v49.0.4/wasmtime-v49.0.4-x86_64-linux.tar.xz wasmtime.tar.xz 6561abd54bdf941b6519cce883e0857cc9bce94d92c65287ed838d895a27f5a9
+          tar -xJf "$RUNNER_TEMP/wasmtime.tar.xz" -C "$W" --strip-components=1
+          get https://github.com/wasmerio/wasmer/releases/download/v7.4.2/wasmer-linux-amd64.tar.gz wasmer.tar.gz 07271f7ecf449135bbd44cfe9f38a65e54ab25f1564a9c6bd2d0d5cca5743963
+          mkdir -p "$RUNNER_TEMP/wasmer" && tar -xzf "$RUNNER_TEMP/wasmer.tar.gz" -C "$RUNNER_TEMP/wasmer"
+          ln -s "$RUNNER_TEMP/wasmer/bin/wasmer" "$W/wasmer"
+          echo "$W" >> "$GITHUB_PATH"
+      - name: npm run build:batch-wasi (the renderer, compiled by Lasm for WASI)
+        working-directory: examples/folio
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:batch-wasi
+      - name: The CommonMark 0.31.2 specification's 652 examples on each engine
+        working-directory: examples/folio
+        run: |
+          for engine in wasmtime wasmer node-wasi; do
+            node test/spec.mjs --engine "$engine" --json "test-results/spec-$engine.json"
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: folio-spec-wasi
+          path: examples/folio/test-results/
+          retention-days: 14
+          if-no-files-found: warn
+  browser:
+    name: The 652 CommonMark examples in headless Chromium, Firefox and WebKit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - uses: ./.github/actions/process-guard
+      - name: npm ci
+        working-directory: examples/folio
+        run: npm ci --no-audit --no-fund
+      - name: npm run build:batch-browser (the renderer, compiled by Lasm for the browser)
+        working-directory: examples/folio
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:batch-browser
+      - name: The pinned Playwright's browsers, with their system packages
+        timeout-minutes: 30
+        uses: ./.github/actions/playwright
+        with:
+          browsers: chromium firefox webkit
+      - name: The CommonMark 0.31.2 specification's 652 examples in each browser
+        working-directory: examples/folio
+        run: |
+          for engine in chromium firefox webkit; do
+            node test/spec.mjs --engine "$engine" --json "test-results/spec-$engine.json"
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: folio-spec-browser
+          path: examples/folio/test-results/
+          retention-days: 14
+          if-no-files-found: warn
