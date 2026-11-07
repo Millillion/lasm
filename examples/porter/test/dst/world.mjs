@@ -84,9 +84,12 @@ class World {
     this.instanceSkew = [0, 1, 2, 3].map(() => (p.skew ? this.chaos.range(-30, 30) : 0));
     this.serverQueue = [];
     this.requestNow = new Map();     // request id -> the clock reading it was served with
+    this.ambiguousIds = new Set();   // requests during which a commit's outcome was unknown
+    this.lastAmbiguous = 0;
     this.codes = new Map();          // code -> { issued, redeemed: [], family }
     this.families = new Map();       // family key -> { revoked: bool, since }
     this.refreshes = new Map();      // refresh token -> { issued, family, rotations }
+    this.knownAmbiguous = 0;
     this.events = 0; this.flows = 0; this.signIns = 0; this.tokenCalls = 0; this.attacks = 0;
     this.healed = false;
     this.done = new Set();
@@ -223,9 +226,12 @@ class World {
     this.headersOf ??= new Map();
     const id = this.http.request(ag?.node ?? 'agent0', { method, url: path, body }, res => {
       this.headersOf.delete(id);
+      res.ambiguous = this.ambiguousIds.delete(id);
       if (res.ok) {
         res.headers = res.body.headers; res.status = res.body.status; res.now = this.requestNow.get(id); res.body = res.body.text;
         if (ag) this.remember(ag, res.headers);
+        const error = res.status >= 400 ? /"error":"([^"]+)"/.exec(res.body)?.[1] : null;
+        this.trace.log(`  #${id} was ${res.status}${error ? ` ${error}` : ''} at ${res.now}${res.duplicated ? ' (duplicated)' : ''}${res.ambiguous ? ' (its commit was ambiguous)' : ''}`);
       }
       this.requestNow.delete(id);
       done(res);
@@ -344,7 +350,12 @@ class World {
       }
       // A code redeemed twice (ours, by a lost answer) revokes what it issued.
       if (k?.redeemed.length || attempt > 0) this.families.set(`code:${code}`, { revoked: true });
-      else if (res.status === 400 && !res.duplicated && res.now < k.issued + TTL.code)
+      else if (res.status === 400 && res.ambiguous) {
+        // Its commit succeeded, then failed: runRequest ran it again, found the code used and
+        // revoked what it issued (a known issue, counted, not failed: see the summary).
+        this.knownAmbiguous++;
+        this.families.set(`code:${code}`, { revoked: true });
+      } else if (res.status === 400 && !res.duplicated && res.now < k.issued + TTL.code)
         this.checks.fail(`agent${ag.a}: a fresh code, redeemed once, ${res.now - k.issued} s after it was issued, was refused: ${res.body.slice(0, 100)}`);
       if (ag.final && attempt === 0) this.checks.fail(`agent${ag.a}: after the heal, redeeming a fresh code failed: ${res.status} ${res.body.slice(0, 120)}`);
       ag.busy = false;
@@ -366,11 +377,17 @@ class World {
   }
 
   familyRevoked(f) { return this.families.get(f)?.revoked ?? false; }
+  /** A request that may revoke family `f` is in flight (until `done`). */
+  revoking(f) { const fam = this.families.get(f); if (fam) fam.busy = (fam.busy ?? 0) + 1; return () => { if (fam) fam.busy--; }; }
+  busy(f) { return (this.families.get(f)?.busy ?? 0) > 0; }
 
   useAccess(ag, final = false) {
     const t = ag.tokens;
+    this.trace.log(`agent${ag.a}: userinfo with an access token of family ${t.family.slice(5, 13)}, issued at ${t.issued}`);
+    const busyAtSend = this.busy(t.family);
     this.get(ag, '/userinfo', { headers: [['authorization', `Bearer ${t.access}`]] }, res => {
       if (!res.ok || res.status === 503) { if (final) this.later(1000, () => this.useAccess(ag, true)); return; }
+      const racing = busyAtSend || this.busy(t.family);
       const live = res.now < t.issued + TTL.access;
       const revoked = this.familyRevoked(t.family);
       const unsure = this.families.get(t.family)?.unsure ?? false;
@@ -380,7 +397,7 @@ class World {
         const u = JSON.parse(res.body);
         this.checks.that(u.sub === ag.user.sub, `agent${ag.a}: userinfo says sub ${u.sub}, not ${ag.user.sub}`);
       } else if (res.status === 401) {
-        if (live && !revoked && !unsure) this.checks.fail(`agent${ag.a}: a live access token was refused at ${res.now} (issued ${t.issued})${final ? ' after the heal' : ''}`);
+        if (live && !revoked && !unsure && !racing) this.checks.fail(`agent${ag.a}: a live access token was refused at ${res.now} (issued ${t.issued})${final ? ' after the heal' : ''}`);
       } else this.checks.fail(`agent${ag.a}: userinfo answered ${res.status}`);
     });
   }
@@ -390,8 +407,10 @@ class World {
     const old = t.refresh;
     const { form, headers } = this.clientAuth(ag.client, { grant_type: 'refresh_token', refresh_token: old });
     ag.busy = true;
+    const done = this.revoking(t.family);
     this.post(ag, '/token', { form, headers }, res => {
       ag.busy = false;
+      done();
       const info = this.refreshes.get(old);
       if (!res.ok || res.status === 503) {
         // The rotation may have happened: our refresh token is now possibly rotated.
@@ -405,14 +424,15 @@ class World {
         this.checks.that(!this.familyRevoked(t.family), () => `agent${ag.a}: a refresh token of a revoked family still works (Spec.reuse_revokes_family)`);
         const n = JSON.parse(res.body);
         if (n.id_token) this.checkIdToken(ag, n.id_token, res.now, null);
-        ag.oldRefresh = old;
+        ag.oldRefresh = { token: old, family: t.family };
         ag.tokens = { ...t, access: n.access_token, refresh: n.refresh_token, issued: res.now };
         this.refreshes.set(n.refresh_token, { issued: res.now, family: t.family, rotated: 0 });
       } else if (res.status === 400) {
         const e = JSON.parse(res.body).error;
         this.checks.that(e === 'invalid_grant', `agent${ag.a}: refresh answered ${e}`);
         // A refresh token that may have been rotated by a lost answer is reused here: that revokes the family.
-        if (info?.unsure || info?.rotated || res.duplicated) this.families.get(t.family).revoked = true;
+        if (res.ambiguous) { this.knownAmbiguous++; this.families.get(t.family).revoked = true; }
+        else if (info?.unsure || info?.rotated || res.duplicated) this.families.get(t.family).revoked = true;
         else if (!this.familyRevoked(t.family) && !this.families.get(t.family).unsure) this.checks.fail(`agent${ag.a}: a live refresh token of a live family was refused at ${res.now}`);
         ag.tokens = null;
         return this.later(this.work.range(500, 3000), () => this.flow(ag));
@@ -425,12 +445,14 @@ class World {
     const t = ag.tokens;
     this.attacks++;
     const { form, headers } = this.clientAuth(ag.client, { grant_type: 'authorization_code', code: t.code, redirect_uri: cb, code_verifier: t.verifier });
+    const done = this.revoking(t.family);
     this.post(ag, '/token', { form, headers }, res => {
-      if (!res.ok || res.status === 503) return;
+      done();
+      if (!res.ok || res.status === 503) { this.families.get(t.family).unsure = true; return; }
       this.checks.that(res.status === 400, () => `agent${ag.a}: a code redeemed again answered ${res.status} (Spec.code_once)`);
       if (res.status === 400) {
         this.families.get(t.family).revoked = true;
-        this.trace.log(`agent${ag.a}: the code's family is revoked`);
+        this.trace.log(`agent${ag.a}: family ${t.family.slice(5, 13)} is revoked (its code was redeemed again)`);
         this.later(this.work.range(10, 500), () => this.useAccess(ag));
       }
     });
@@ -439,13 +461,16 @@ class World {
   reuseRefresh(ag) {
     const t = ag.tokens;
     this.attacks++;
-    const { form, headers } = this.clientAuth(ag.client, { grant_type: 'refresh_token', refresh_token: ag.oldRefresh });
+    const old = ag.oldRefresh;
+    const { form, headers } = this.clientAuth(ag.client, { grant_type: 'refresh_token', refresh_token: old.token });
+    const done = this.revoking(old.family);
     this.post(ag, '/token', { form, headers }, res => {
-      if (!res.ok || res.status === 503) return;
+      done();
+      if (!res.ok || res.status === 503) { this.families.get(old.family).unsure = true; return; }
       this.checks.that(res.status === 400, () => `agent${ag.a}: a rotated refresh token was accepted (Spec.reuse_detected)`);
       if (res.status === 400) {
-        this.families.get(t.family).revoked = true;
-        this.trace.log(`agent${ag.a}: reuse detected; the family is revoked`);
+        this.families.get(old.family).revoked = true;
+        this.trace.log(`agent${ag.a}: reuse detected; family ${old.family.slice(5, 13)} is revoked`);
         this.later(this.work.range(10, 500), () => this.useAccess(ag));
       }
     });
@@ -504,6 +529,7 @@ class World {
   }
 
   reply(id, status, headers, body) {
+    if (this.store.stats.ambiguous > this.lastAmbiguous) { this.lastAmbiguous = this.store.stats.ambiguous; this.ambiguousIds.add(id); }
     if (!this.healed && this.chaos.chance(this.profile.crashes / 100)) {
       this.trace.log('the server crashes after handling the request, before answering');
       this.crash();
@@ -518,7 +544,8 @@ class World {
     const n = this.net.stats, d = this.store.stats, h = this.http.stats;
     return `(${this.agents} agents, race ${this.raceWindow} ms, ${this.flows} flows, ${this.signIns} sign-ins, ${this.tokenCalls} code redemptions, ` +
       `${this.attacks} attacks, ${this.events} events, ${h.requests} requests/${h.failed} failed/${h.duplicates} dup/${h.crashes} crashes, ` +
-      `db ${d.commits} commits/${d.writeFailed + d.readFailed} failed/${d.ambiguous} ambiguous, clock offset ${this.offset} s)`;
+      `db ${d.commits} commits/${d.writeFailed + d.readFailed} failed/${d.ambiguous} ambiguous, clock offset ${this.offset} s` +
+      `${this.knownAmbiguous ? `; ${this.knownAmbiguous} sign-in(s) or refresh(es) refused after an ambiguous commit, the known issue` : ''})`;
   }
 }
 

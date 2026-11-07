@@ -235,6 +235,9 @@ class World {
         const order = this.rng.shuffle([...Array(n).keys()]);
         for (let i = 0, d = this.rng.int(Math.min(n, 50)); i < d; i++) order.splice(this.rng.int(order.length + 1), 0, this.rng.int(n));
         this.lawChecks++;
+        // The laws read the log through the store: no faults while they do.
+        this.savedFaults = { readFail: this.store.readFail, writeFail: this.store.writeFail, ambiguous: this.store.ambiguous, isDown: this.store.isDown };
+        this.store.heal();
         return { k: 'laws', order };
       }
       case 'heal': {
@@ -412,6 +415,7 @@ class World {
   }
 
   laws(r) {
+    if (this.savedFaults) { if (!this.healed) Object.assign(this.store, this.savedFaults); this.savedFaults = null; }
     for (const k of ['converge', 'applyMany', 'text', 'noDuplicates'])
       this.checks.that(r[k], `CRDT law ${k} failed on the server's log of ${r.ops} operations (the compiled Lean disagrees with Proofs/Spec.lean)`);
   }

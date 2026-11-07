@@ -64,6 +64,14 @@ def syncOnce (env : Env) (doc : String) (req : Wire.Request) : Nat → Async (Wi
     if added.isEmpty then return (reply, n, [])
     let committed ← try env.db.batch (commitStatements doc n added); pure true catch _ => pure false
     if committed then return (reply, n, added)
+    -- The commit failed, or it committed and then reported an error (its
+    -- outcome unknown, as with a lost reply from D1). If the log now holds
+    -- exactly these operations at `n`, it committed: answer, and push them.
+    -- (Running the sync again would find them known, append nothing and push
+    -- nothing, and a tab that is not typing would never hear of them: found
+    -- by the deterministic simulation, test/dst.mjs.)
+    let landed ← try (do return (← rd.slice n added.length) == added) catch _ => pure false
+    if landed then return (reply, n, added)
     else
       -- Another commit took the positions. Where writers do not take turns
       -- (Workers), many racing writers could keep colliding: wait a random,

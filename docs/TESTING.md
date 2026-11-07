@@ -39,6 +39,7 @@ proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
 | [Dependable tooling](#dependable-tooling) | Every user-triggerable error prints a clear message (error corpus); incremental, repeated, renamed and touched builds give the clean build's bytes (metamorphic); killed, offline, full-disk, read-only and corrupted runs end in success or a clear error (fault injection) | `scripts/tooling/`, `tooling.yml` | PR (corpus), nightly (all) |
 | [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage | planned | nightly |
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
+| [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (subset), release |
 | [Flaky tests](#flaky-tests) | A flaky test is quarantined at once, then fixed or deleted within a week | `test/quarantine.json`, `scripts/test/`, `scripts/ci/flaky-report.mjs` (`flaky.yml`) | nightly report; quarantine on every unit run |
@@ -478,6 +479,93 @@ memory-model effects (the model is sequentially consistent, as JavaScript's
 `Atomics` are); the Lean thread's Wasm-side steps are checked only through
 their effects in a trace. The model assumes each slot is used by one thread at a
 time and that the event loop eventually runs every queued task.
+
+### Deterministic simulation of the example apps
+
+The apps' distributed behaviour (several browsers and a sync server, clients
+racing over one ledger, relying parties and an identity provider) is tested by
+running their own compiled Lean in a simulated world: the clock, the network,
+the storage and the users are simulated, every decision is drawn from one
+seed, and so a failing run replays exactly from its seed alone, as in
+FoundationDB's simulation and TigerBeetle's VOPR.
+
+**The harness** ([`scripts/sim/index.mjs`](../scripts/sim/index.mjs), no
+dependencies; its own tests are [`test/sim.test.mjs`](../test/sim.test.mjs)):
+
+- `Rng`: a seeded PRNG (xoshiro128\*\*, seeded by splitmix32) with independent
+  named streams (`fork`), so that one component drawing more numbers does not
+  change what the others draw;
+- `Scheduler`: simulated time, a priority queue of events by (time, order);
+  nothing in a simulation reads the real clock, and runs take seconds for
+  minutes of simulated time;
+- `Clock`: a node's clock, with skew, drift and jumps;
+- `Network`: messages between named nodes with latency, latency spikes,
+  reordering (or FIFO per channel, for a socket), drops, duplication and
+  partitions (pairwise or a node isolated; a message in flight when a link is
+  cut is lost); `HttpSim` puts HTTP on it: a lost request or answer is a network
+  error after a timeout, a server that crashed resets the connections it held;
+- `Kv` (localStorage, Workers KV): write failures, and a crash that loses
+  writes not yet flushed;
+- `SqlStore`: SQLite in memory (`node:sqlite`) behind the `Sql` record the
+  apps' servers already use (`all`, `run`, `batch`), as SQLite or as D1: failed
+  reads, failed commits, commits whose outcome is unknown (committed, then an
+  error), outages, and crash-restarts that keep exactly what was committed;
+- `faultProfile`: each seed draws which faults are on and how often (swarm
+  testing), so the seeds cover calm runs, single kinds of fault and storms;
+  `--faults none|normal|heavy` scales them;
+- `Trace`: the last events of a run, shown with a failure (and the events
+  before its first violation), and a hash of every event, which
+  `--check-determinism` compares across two runs of each seed;
+- `SeedLoop`: one seed (`--seed N`), a fixed range (`--seeds N`, `--first N`),
+  or random seeds for a time budget (`--minutes M`); each failing seed is
+  printed with a one-line repro command, and as a GitHub error annotation.
+
+**How an app uses it.** Each app has a small Lean driver, `Sim.lean`, built
+for Node like the app (`npm run build:sim`), that runs the app's own code:
+the server's HTTP handler or its request pipeline on the simulated `Sql`, and
+for Tandem the browser editor's `update` too (a `Lasm.UI` command is data, so
+the driver performs each one in the world: timers, HTTP requests, storage,
+random bytes). The driver asks the world (`test/dst/world.mjs`, loaded with
+Lasm.JS's `require`) for the next event, runs the code it reaches, and hands
+back what that code asked for. Everything else (users, relying parties,
+network, database faults, crashes) is JavaScript in the world, which also
+checks the invariants. `node test/dst.mjs` starts it.
+
+| App | What is simulated | Invariants |
+| --- | --- | --- |
+| Tandem | 2 to 5 tabs running `Tandem.Ui.update` (replica, syncs, retries, WebSocket and long-poll, the state saved in `localStorage`), users typing, pasting and deleting; the server's `handler`; WebSockets, or none (as on Workers, so tabs long-poll); lost requests and answers, duplicated requests, broken sockets, tabs cut off and back, page reloads, server crashes (also after a commit, before the answer), database faults | an operation that leaves a tab's `pending` is in the server's log (`Spec.ack_stored`, for the whole browser state machine); the log only grows, each operation once (`acked_never_lost`, `log_no_duplicates`); what a request appends is pushed; an edit yields the typed text (`edit_yields_text`); the CRDT laws on the real log in a random order with duplicates, one at a time and in bulk (`converge`, `ops_commute`, `ops_idempotent`, `apply_many`, `no_duplicates`); after the heal, every tab is online, has nothing pending, and holds the server's document, cursor and text |
+| Ledger | a funding account and 4 to 10 customers; writers sending batches (single-phase, pending, posts and voids, linked chains, transfers that must fail, earlier transfers again) and resending a batch with the same ids when its answer is lost; readers; requests served one at a time (the writers' permit) or racing (all read before any commits, each at its own instance's skewed clock, then commit in a random order with the version check); crashes, database faults, the clock jumping | every read and the database after every commit: debits = credits, posted and pending, no customer below zero, money neither created nor destroyed; the auditor (`Audit.verify`) at checkpoints; an id answered `created` or `exists` is stored as sent, one never answered so is not, and no id is `created` twice; linked chains all or nothing; every batch answered after the heal |
+| Porter | 1 to 4 agents (a browser with cookies and a relying party, one of each kind of client) signing in with the code flow and PKCE, calling userinfo, refreshing, signing in again with the session, logging out, and attacking (a code redeemed twice, a rotated refresh token reused); racing requests; instances' clocks skewed and the server's clock jumping by seconds to hours, past every lifetime; crashes and database faults | a code yields tokens once, before it expires, and redeeming it again revokes what it issued; a refresh token rotates once, and reusing a rotated one revokes its family; an access token works exactly while its lifetime lasts on the clock of the instance answering and its family is not revoked; every ID token's claims (iss, aud, sub, nonce, iat, exp) and its signature against `/jwks`; no password asked during a live session; after the heal, every agent signs in |
+
+**CI.** Each app's workflow (`tandem.yml`, `ledger.yml`, `porter.yml`, on
+changes to the app or to `scripts/sim`) runs 30 fixed seeds, each twice to
+check that it replays exactly (`--seeds 30 --check-determinism`).
+[`dst-nightly.yml`](../.github/workflows/dst-nightly.yml) runs random seeds
+for 20 minutes per app, then 10 minutes with heavy faults. A failure prints:
+
+```
+  seed 4: FAILED (4 tabs, ws, 2308 ops, …)
+    - tab2 stopped treating 7 operation(s) as pending that the server does not have, …
+  the events before the first violation: …
+  repro: cd examples/tandem && npm run build:sim && node test/dst.mjs --seed 4
+```
+
+**What it found.** In Tandem's editor: a WebSocket push that did not continue
+the replica's log sent a second sync while one was in flight, and the first
+reply then dropped from `pending` operations the second carried (an edit lost
+if that sync failed); and a failed catch-up sync was never retried, leaving
+the editor "Offline" with nothing pending and behind the log. Both are fixed
+(see [Bugs found](#bugs-found)).
+
+**What it cannot catch.** Concurrency inside one Lean program (the world runs
+one event at a time, so interleavings come only from the world's choices:
+racing requests read and commit in a chosen order, but no two run in
+parallel); the platforms' real network stacks, browsers and databases (their
+behaviour is modelled; the e2e and platform tests cover the real ones); the
+DOM (Tandem's text area is the model's text); timing-dependent code that reads
+the real clock (`Std.Async.sleep` in Tandem's commit retry, Tandem's long-poll
+loop, which the world replaces by answering a poll when the log grows or after
+20 simulated seconds); and anything the invariants do not state.
 
 ### Coverage and mutation testing
 

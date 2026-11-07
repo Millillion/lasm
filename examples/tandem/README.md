@@ -16,6 +16,7 @@ npm test                    # the protocol tests against a fresh server
 npm run build:batch && npm run test:differential     # against Yjs (--histories N, --seed N)
 npm run build:clients && npm run test:simulate       # many replicas, an unreliable network, a killed server
 npm run test:fuzz           # the protocol fuzzer (--seconds N, --seed N)
+npm run build:sim && npm run test:dst               # the deterministic simulation: the editor and the server under faults (--seed N)
 npx playwright install chromium && npm run test:e2e   # the editor in a browser (BROWSERS=chromium,firefox,webkit)
 npm run proofs              # check every theorem
 ```
