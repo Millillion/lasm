@@ -12,7 +12,7 @@ name: Nightly tier
 # Not a release dependency: release-checks.yml never calls this workflow.
 on:
   schedule:
-    - cron: '7 1 * * *'
+    - cron: '7 1 * * 0,2-6'
   workflow_dispatch:
     inputs:
       force:
