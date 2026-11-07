@@ -32,6 +32,9 @@
 
 import { DatabaseSync } from 'node:sqlite';
 
+// The real clock, for run budgets only (a simulation may replace Date.now).
+const realNow = Date.now.bind(Date);
+
 /* ------------------------------------------------------------------ PRNG */
 
 /** splitmix32: spreads a 32-bit seed into well-mixed words. */
@@ -414,7 +417,7 @@ minutes (nightly). Stops at the first failure unless `--keep-going`.
 export class SeedLoop {
   constructor({ name, repro, opts = options() }) {
     this.name = name; this.repro = repro; this.opts = opts;
-    this.started = Date.now(); this.done = 0; this.failed = [];
+    this.started = realNow(); this.done = 0; this.failed = [];
     if (opts.seed !== undefined) this.queue = [opts.seed];
     else if (opts.minutes !== undefined) this.queue = null;
     else {
@@ -422,18 +425,18 @@ export class SeedLoop {
       const first = opts.first ?? 1;
       this.queue = Array.from({ length: n }, (_, i) => first + i);
     }
-    this.random = new Rng(Number(process.env.SIM_META_SEED ?? (Date.now() % 2 ** 31)));
+    this.random = new Rng(Number(process.env.SIM_META_SEED ?? (realNow() % 2 ** 31)));
     console.log(`${name}: ${opts.seed !== undefined ? `seed ${opts.seed}` : opts.minutes !== undefined ? `random seeds for ${opts.minutes} min` : `seeds ${this.queue[0]}..${this.queue.at(-1)}`}, faults ${opts.level}`);
   }
   /** The next seed, or null when the run is over. */
   next() {
     if (this.failed.length && !this.opts.keepGoing) return null;
     if (this.queue) return this.queue.length ? this.queue.shift() : null;
-    if (Date.now() - this.started > this.opts.minutes * 60_000) return null;
+    if (realNow() - this.started > this.opts.minutes * 60_000) return null;
     return this.random.int(2 ** 31);
   }
   /** Records one seed's result: `failures` (strings), the trace, a summary line. */
-  report(seed, { failures = [], trace = null, summary = '' }) {
+  report(seed, { failures = [], trace = null, summary = '', context = null }) {
     this.done++;
     if (failures.length === 0) {
       if (this.opts.verbose || this.opts.seed !== undefined || this.done % 25 === 0 || this.queue) console.log(`  seed ${seed}: ok ${summary}${trace ? ` [trace ${trace.digest}, ${trace.count} events]` : ''}`);
@@ -443,6 +446,10 @@ export class SeedLoop {
     console.log(`\n  seed ${seed}: FAILED ${summary}`);
     for (const f of failures.slice(0, 20)) console.log(`    - ${f}`);
     if (failures.length > 20) console.log(`    … ${failures.length - 20} more`);
+    if (context) {
+      console.log(`  the events before the first violation:`);
+      for (const line of context) console.log(`    ${line}`);
+    }
     if (trace) {
       console.log(`  the last ${Math.min(60, trace.lines.length)} of ${trace.count} events:`);
       for (const line of trace.tail(60)) console.log(`    ${line}`);
@@ -453,7 +460,7 @@ export class SeedLoop {
   }
   /** Prints the summary; returns the exit code. */
   finish() {
-    const secs = ((Date.now() - this.started) / 1000).toFixed(1);
+    const secs = ((realNow() - this.started) / 1000).toFixed(1);
     if (this.failed.length) {
       console.log(`${this.name}: ${this.failed.length} failing seed(s) of ${this.done}: ${this.failed.join(', ')} (${secs} s)`);
       for (const s of this.failed) console.log(`  repro: ${this.repro(s)}`);
@@ -467,7 +474,85 @@ export class SeedLoop {
 /** Collects invariant violations for one run. */
 export class Checks {
   constructor() { this.failures = []; }
-  that(ok, message) { if (!ok) this.failures.push(typeof message === 'function' ? message() : message); return ok; }
+  that(ok, message) { if (!ok && this.failures.length < 500) this.failures.push(typeof message === "function" ? message() : message); return ok; }
   fail(message) { this.failures.push(message); }
   get ok() { return this.failures.length === 0; }
+}
+
+/* -------------------------------------------------------------- HttpSim */
+
+/**
+HTTP between simulated clients (in JavaScript) and one simulated server (the
+app's own handler, usually compiled Lean that the app's driver runs), over a
+`Network`. A request is a message to the server; when it arrives, it waits
+in `inbox` for the driver (`take`); the driver's answer (`respond`) is a
+message back. What a client sees, through its callback, is `{ ok: true,
+status, body }` or `{ ok: false }` (a network error): a lost request or
+response fails after a timeout, a request to a server that is down fails at
+once, and a response from a server process that crashed before it arrived
+is a connection reset. A duplicated request reaches the server twice; the
+client gets one answer.
+
+`crash()` is a crash of the server process (its in-flight answers are lost;
+`downFor` ms until it accepts connections again).
+*/
+export class HttpSim {
+  constructor({ net, scheduler, rng, trace, server = 'server', timeout = [1000, 15_000] }) {
+    this.net = net; this.scheduler = scheduler; this.rng = rng; this.trace = trace; this.server = server; this.timeout = timeout;
+    this.requests = new Map(); this.inbox = []; this.nextId = 0; this.epoch = 0; this.up = true;
+    this.stats = { requests: 0, failed: 0, duplicates: 0, crashes: 0 };
+  }
+  /** Sends a request from `from`; `done(result)` is called once. */
+  request(from, { method = 'GET', url, body = '' }, done) {
+    const id = this.nextId++;
+    const req = { id, from, method, url, body, done, finished: false, epoch: this.epoch };
+    this.requests.set(id, req);
+    this.stats.requests++;
+    this.trace?.log(`${from} → ${method} ${url} (#${id})`);
+    if (!this.net.reachable(from, this.server)) this.fail(id, [1, 50]);
+    else if (this.net.send(from, this.server, { http: 'req', id }) === 0) this.fail(id);
+    return id;
+  }
+  fail(id, range = this.timeout) { this.scheduler.after(this.rng.range(...range), { type: 'http', id, ok: false }); }
+  /** Handles the network and timer events of HTTP; returns true if it was one. */
+  handle(ev) {
+    if (ev.type === 'http') { this.finish(ev.id, ev); return true; }
+    if (ev.type !== 'net' || !ev.payload?.http) return false;
+    const m = ev.payload;
+    if (!this.net.arrive(ev)) { this.fail(m.id); return true; }
+    const req = this.requests.get(m.id);
+    if (!req) return true;
+    if (m.http === 'req') {
+      if (!this.up) { this.fail(m.id, [1, 50]); return true; }
+      if (ev.copy) this.stats.duplicates++;
+      req.epoch = this.epoch;
+      this.inbox.push({ id: m.id, duplicate: ev.copy > 0, method: req.method, url: req.url, body: req.body });
+    } else this.finish(m.id, { ok: req.epoch === this.epoch, status: m.status, body: m.body });
+    return true;
+  }
+  finish(id, result) {
+    const req = this.requests.get(id);
+    if (!req || req.finished) return;
+    req.finished = true; this.requests.delete(id);
+    if (!result.ok) this.stats.failed++;
+    this.trace?.log(`${req.from} ← ${req.method} ${req.url} (#${id}): ${result.ok ? result.status : 'network error'}`);
+    req.done(result.ok ? { ok: true, status: result.status, body: result.body } : { ok: false });
+  }
+  /** The requests that reached the server, for the driver. */
+  take() { const out = this.inbox; this.inbox = []; return out; }
+  /** The server's answer to request `id` (ignored for a duplicate). */
+  respond(id, status, body, duplicate = false) {
+    const req = this.requests.get(id);
+    if (!req || duplicate) return;
+    if (this.net.send(this.server, req.from, { http: 'res', id, status, body }) === 0) this.fail(id);
+  }
+  crash(downFor = this.rng.range(200, 5000)) {
+    this.epoch++; this.up = false; this.stats.crashes++;
+    this.trace?.log(`the server crashes (epoch ${this.epoch})`);
+    for (const r of this.inbox) this.fail(r.id, [1, 50]);
+    this.inbox = [];
+    this.scheduler.after(downFor, { type: 'httpServerUp' });
+  }
+  /** Handles `httpServerUp`; returns true if it was it. */
+  handleUp(ev) { if (ev.type !== 'httpServerUp') return false; this.up = true; this.trace?.log('the server is up'); return true; }
 }

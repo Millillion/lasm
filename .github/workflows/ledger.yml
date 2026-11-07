@@ -16,6 +16,12 @@ name: Ledger
 #   official TigerBeetle 0.17.9 release binary (SHA-256 pinned) and its
 #   official Node client: random workloads, every result code and balance
 #   must agree. Five seeds of 1500 batches per run, each printed.
+# - dst: the deterministic simulation (test/dst.mjs, on scripts/sim): the
+#   server's own code, compiled, under concurrent writers (also racing past
+#   the writers' permit, at skewed clocks), lost and duplicated requests,
+#   retried batches, crashes, database faults and clock jumps, decided by one
+#   seed; 30 fixed seeds, each run twice to check it replays exactly (the
+#   nightly runs random seeds for 30 minutes);
 # - e2e: the browser page's end-to-end tests (test/e2e, Playwright) against
 #   the Node build, on Chromium, Firefox and WebKit, no retries.
 # Local runtimes only: no account, nothing deployed, CI=1. Free runners only.
@@ -26,11 +32,13 @@ on:
     paths:
       - '.github/workflows/ledger.yml'
       - 'examples/ledger/**'
+      - 'scripts/sim/**'
   push:
     branches: [main]
     paths:
       - '.github/workflows/ledger.yml'
       - 'examples/ledger/**'
+      - 'scripts/sim/**'
 permissions:
   contents: read
 concurrency:
@@ -107,6 +115,27 @@ jobs:
           path: examples/ledger/test-results/
           retention-days: 14
           if-no-files-found: warn
+  dst:
+    name: Deterministic simulation (fixed seeds)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: npm ci
+        working-directory: examples/ledger
+        run: npm ci --no-audit --no-fund
+      - name: npm run build:sim
+        working-directory: examples/ledger
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:sim
+      - name: The simulation, 30 fixed seeds, each replayed (a failure prints its seed and a repro command)
+        working-directory: examples/ledger
+        run: node test/dst.mjs --seeds 30 --check-determinism --keep-going
   tigerbeetle:
     name: Differential test against TigerBeetle 0.17.9
     runs-on: ubuntu-24.04

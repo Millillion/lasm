@@ -47,6 +47,7 @@ const ALPHABET = 'abcdefghij      \n\n.,é中🙂'.match(/./gsu);
 const SERVER = 'server';
 const ACTIVE = [30_000, 150_000];   // how long users type (ms)
 const HEAL = 90_000;                // after the heal, before the final check
+const DUP = 1_000_000_000;          // request ids of duplicated requests (the original's + DUP)
 
 let W = null;
 
@@ -133,6 +134,7 @@ class World {
         const kind = u.int(10);
         const ins = kind < 6 ? pickText(u, 1 + u.int(3)) : kind < 8 ? '' : pickText(u, 1 + u.int(40));
         const del = kind < 6 ? (u.chance(0.1) ? 1 : 0) : kind < 8 ? 1 + u.int(8) : u.int(4);
+        this.trace.log(`tab${ev.c} types: delete ${del}, insert ${[...ins].length}`);
         return { k: 'input', c: ev.c, gen: cl.gen, pos: u.next(), del, ins };
       }
       case 'timer':
@@ -144,7 +146,7 @@ class World {
         req.done = true; this.requests.delete(ev.id);
         if (!this.live(req.c, req.gen)) return null;
         if (ev.ok && req.epoch !== this.epoch) ev = { ok: false };   // the server crashed meanwhile: connection reset
-        this.trace.log(`tab${req.c} ← ${req.method} ${shortUrl(req.url)}: ${ev.ok ? ev.status : 'network error'}`);
+        this.trace.log(`tab${req.c} ← ${req.method} ${shortUrl(req.url)} (request ${req.id}): ${ev.ok ? `${ev.status} ${(ev.body ?? '').split('\n')[1] ?? ''}` : 'network error'}`);
         return { k: 'http', c: req.c, gen: req.gen, token: req.token, ok: ev.ok, status: ev.status ?? 0, body: ev.body ?? '' };
       }
       case 'net': {
@@ -290,6 +292,7 @@ class World {
       const cl = this.clients.get(c);
       if (!cl.ws || cl.ws.id !== m.socket || !cl.ws.open || !this.live(c, cl.gen)) return null;
       if (cl.ws.epoch !== this.epoch) return null;
+      this.trace.log(`tab${c} ← push ${m.text.split('\n')[1]}`);
       return { k: 'push', c, gen: cl.gen, text: m.text };
     }
     return null;
@@ -297,7 +300,7 @@ class World {
 
   toServer(req, duplicate = false) {
     this.trace.log(`server ← ${req.method} ${shortUrl(req.url)} (request ${req.id}${duplicate ? ', duplicate' : ''})`);
-    return { k: 'request', id: duplicate ? -1 - req.id : req.id, method: req.method, url: req.url, body: req.body };
+    return { k: 'request', id: duplicate ? DUP + req.id : req.id, method: req.method, url: req.url, body: req.body };
   }
 
   count() { return this.store.peek('SELECT COUNT(*) AS n FROM ops WHERE doc = ?', this.doc)[0].n; }
@@ -347,13 +350,13 @@ class World {
   }
 
   reply(id, status, body, pushes) {
-    const duplicate = id < 0;
-    const req = this.requests.get(duplicate ? -1 - id : id);
+    const duplicate = id >= DUP;
+    const req = this.requests.get(duplicate ? id - DUP : id);
     const n = this.count();
     if (n !== this.log.length) this.checkLog();
     // Long-polls waiting for the log to grow.
-    for (const [pid, poll] of this.polls) if (n > poll.cursor) {
-      this.polls.delete(pid); this.sched.cancel(poll.timer);
+    for (const [pid, poll] of this.polls) if (n > poll.cursor && !poll.released) {
+      poll.released = true; this.sched.cancel(poll.timer);
       this.sched.after(0, { type: 'pollTimeout', id: pid });
     }
     // A crash right after the commit, before the reply and the pushes.
@@ -387,10 +390,12 @@ class World {
   acked(c, ops) {
     const missing = ops.filter(op => this.store.peek('SELECT 1 AS x FROM ops WHERE doc = ? AND op = ?', this.doc, op).length === 0);
     for (const op of ops) this.ackedOps.add(op);
+    this.trace.log(`tab${c}: ${ops.length} operation(s) leave pending`);
     if (missing.length) {
       this.checks.fail(`tab${c} stopped treating ${missing.length} operation(s) as pending that the server does not have, ` +
         `so they are never sent (an acknowledged edit lost; Spec.ack_stored): ${missing.slice(0, 3).map(o => JSON.stringify(o)).join(', ')}`);
       this.trace.log(`VIOLATION tab${c} dropped unacknowledged ${missing.join(' | ')}`);
+      this.context ??= this.trace.tail(120);
     }
   }
 
@@ -399,7 +404,7 @@ class World {
       this.checks.that(r[k], `CRDT law ${k} failed on the server's log of ${r.ops} operations (the compiled Lean disagrees with Proofs/Spec.lean)`);
   }
 
-  fail(message) { this.checks.fail(message); this.trace.log(`VIOLATION ${message}`); }
+  fail(message) { this.checks.fail(message); this.trace.log(`VIOLATION ${message}`); this.context ??= this.trace.tail(120); }
 
   report(r) {
     this.checkLog();
@@ -411,7 +416,7 @@ class World {
       if (!this.checks.that(cl.ready, `${t} never finished loading`)) continue;
       this.checks.that(!cl.offline, `${t} still shows "offline" a minute and a half after the network healed`);
       this.checks.that(cl.pending === 0, `${t} still has ${cl.pending} pending operation(s) after the network healed`);
-      this.checks.that(cl.same, () => `${t} did not converge: it shows ${JSON.stringify(cl.text.slice(0, 80))} (${[...cl.text].length} characters), the server ${JSON.stringify(r.server.slice(0, 80))} (${[...r.server].length})`);
+      this.checks.that(cl.same, () => `${t} did not converge: it shows ${JSON.stringify([...cl.text].slice(0, 60).join(''))} (${[...cl.text].length} characters), the server ${JSON.stringify([...r.server].slice(0, 60).join(''))} (${[...r.server].length})`);
       this.checks.that(cl.cursor === r.ops, `${t}'s cursor is ${cl.cursor}, the log has ${r.ops} operations`);
       this.checks.that(cl.shown, `${t}'s text area does not show its replica's text`);
     }
@@ -438,7 +443,7 @@ function finishSeed() {
     if (prev === undefined) digests.set(W.seed, W.trace.digest);
     else if (prev !== W.trace.digest) failures = [...failures, `seed ${W.seed} did not replay: trace ${prev} then ${W.trace.digest}`];
   }
-  loop.report(W.seed, { failures, trace: W.trace, summary: W.summary() });
+  loop.report(W.seed, { failures, trace: W.trace, summary: W.summary(), context: W.context });
   W.store.close();
   W = null;
 }

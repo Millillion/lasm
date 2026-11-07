@@ -7,9 +7,11 @@
   "scripts": {
     "build": "npm run build:client && lasm build ServerNode.lean --output dist/server",
     "build:client": "lasm build Client.lean --target browser --output dist/public",
+    "build:sim": "lasm build Sim.lean --output dist/sim",
     "start": "node dist/server/main.mjs",
     "test": "node test/api.mjs",
     "test:bank": "node test/bank.mjs",
+    "test:dst": "node test/dst.mjs",
     "test:tigerbeetle": "node test/tigerbeetle.mjs",
     "test:e2e": "playwright test -c test/playwright.config.mjs",
     "build:bun": "npm run build:client && bunx --bun lasm build ServerBun.lean --target bun",
