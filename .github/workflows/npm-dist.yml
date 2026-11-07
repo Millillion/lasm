@@ -95,12 +95,8 @@ jobs:
           node-version: ${{ inputs.node }}
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable the process-tree guard
-        if: runner.os == 'Linux'
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - if: runner.os == 'Linux'
+        uses: ./.github/actions/process-guard
       - name: Unit tests (source resolution, fix messages, package layout)
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 1024 --report .work/npm-unit-resources.json -- node --test --test-concurrency=1 test/npm-artifacts.test.mjs test/npm-dist-packages.test.mjs test/create-lasm.test.mjs test/managed-artifacts.test.mjs test/release.test.mjs
       - name: Fetch and verify the retained candidate

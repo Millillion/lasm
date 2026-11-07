@@ -17,24 +17,6 @@ on:
   workflow_call:
     inputs:
       release-check: { type: boolean, default: false }
-  push:
-    branches: [wasi, launch]
-    paths:
-      - '.github/workflows/wasi.yml'
-      - 'src/wasi/**'
-      - 'scripts/wasi/**'
-      - 'library/**'
-      - 'examples/fetch/**'
-      - 'examples/wasi-cli/**'
-      - 'templates/fetch/**'
-      - 'src/application-cli.mjs'
-      - 'src/cli-arguments.mjs'
-      - 'src/init.mjs'
-      - 'src/lasm-library.mjs'
-      - 'src/edge/**'
-      - 'runtime/edge.cpp'
-      - 'test/wasi.test.mjs'
-      - 'src/managed-link-toolchain.mjs'
 permissions:
   # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
   contents: write
@@ -75,11 +57,7 @@ jobs:
           architecture: x64
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: Native host pieces (koffi, helpers)
         run: |
           node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
@@ -110,11 +88,7 @@ jobs:
           architecture: x64
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - uses: actions/download-artifact@v4
         with:
           name: wasi-native-host

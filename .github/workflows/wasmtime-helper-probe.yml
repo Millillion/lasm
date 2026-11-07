@@ -28,11 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: node --max-old-space-size=128 scripts/ci/check-acceptance-versions.mjs .work/wasmtime-probe-versions.json
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: Probe stock Node under one guard
         run: >-
           node scripts/full-lean/run-bounded.mjs --memory-mib 1024

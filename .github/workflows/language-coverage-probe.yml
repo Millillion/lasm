@@ -58,12 +58,8 @@ jobs:
           mkdir -p .work/install && cd .work/install
           echo '{"private":true}' > package.json
           npm install --no-audit --no-fund "../node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz"
-      - name: Enable process-tree resource guard
-        if: runner.os == 'Linux'
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - if: runner.os == 'Linux'
+        uses: ./.github/actions/process-guard
       - name: Run the probe
         env:
           PROBE: ${{ inputs.probe }}

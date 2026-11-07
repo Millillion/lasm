@@ -129,12 +129,8 @@ jobs:
       - name: Overlay the proposed fixes onto the installed copy (not a candidate)
         if: matrix.variant != 'candidate'
         run: node scripts/server-mvp/overlay-fix.mjs .work/install/node_modules/@lasm/compiler "$VARIANT" ${{ (matrix.variant == 'runtime' || matrix.variant == 'transport') && '.work/runtime-overlay' || '' }} | tee .work/robustness-overlay.json
-      - name: Enable process-tree resource guard
-        if: runner.os == 'Linux'
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - if: runner.os == 'Linux'
+        uses: ./.github/actions/process-guard
       # Archive download/extraction stays outside the build's guard.
       - name: Download and verify the full native Lean oracle
         run: node scripts/server-mvp/provision.mjs native "$LASM_LEAN" "$PWD/.work/install/node_modules/@lasm/compiler" .work/server-mvp-provision

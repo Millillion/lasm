@@ -13,33 +13,6 @@ on:
   workflow_call:
     inputs:
       release-check: { type: boolean, default: false }
-  push:
-    branches: [phase-7, launch]
-    paths:
-      - '.github/workflows/workers.yml'
-      - '.github/workflows/edge-runtime.yml'
-      - 'src/edge/**'
-      - 'src/application-build.mjs'
-      - 'src/application-cli.mjs'
-      - 'src/js-runtime.mjs'
-      - 'src/application-binding-check.mjs'
-      - 'src/application-build-worker.mjs'
-      - 'src/link-driver/**'
-      - 'src/cli-arguments.mjs'
-      - 'src/npm-artifacts.mjs'
-      - 'packages/create-lasm/**'
-      - 'scripts/package-node-release.mjs'
-      - 'src/init.mjs'
-      - 'library/**'
-      - 'templates/hono/**'
-      - 'examples/edge-pure/**'
-      - 'scripts/edge/**'
-      - 'runtime/edge.cpp'
-      - 'runtime/node-async.cpp'
-      - 'runtime/node.hpp'
-      - 'scripts/full-lean/build-application-runtime.mjs'
-      - 'scripts/full-lean/configure-host.mjs'
-      - 'scripts/full-lean/patches/lean-4.35.0-edge.patch'
 permissions:
   # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
   contents: write
@@ -68,11 +41,7 @@ jobs:
           architecture: x64
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: Native host pieces (koffi, helpers)
         run: |
           node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
@@ -104,11 +73,7 @@ jobs:
           architecture: x64
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - uses: actions/download-artifact@v4
         with:
           name: native-host
@@ -181,12 +146,9 @@ jobs:
           architecture: ${{ matrix.arch }}
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'${{ matrix.platform }}')"
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - name: Check the native engine
+        run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'${{ matrix.platform }}')"
+      - uses: ./.github/actions/process-guard
       - uses: actions/download-artifact@v4
         with:
           name: native-host
@@ -234,11 +196,7 @@ jobs:
           node-version: 26.13.0
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: Download the pinned retained runtime input
         env:
           GH_TOKEN: ${{ github.token }}
@@ -284,12 +242,8 @@ jobs:
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'${{ matrix.platform }}')"
-      - name: Enable process-tree guard (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - if: runner.os == 'Linux'
+        uses: ./.github/actions/process-guard
       - uses: actions/download-artifact@v4
         with:
           name: packed-candidate

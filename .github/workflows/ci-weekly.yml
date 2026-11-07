@@ -3,7 +3,7 @@ name: Weekly tier
 # same reusable workflows. A 100-minute differential campaign in the release and
 # the dev profile (differential.yml; its nightly campaign is 60 minutes), and the
 # Lasm.JS soak, 200 runs per program on four platforms (lasm-js-stress.yml; a
-# release runs 50). The weekly fuzzing campaign stays in fuzz.yml (Sunday) and
+# release runs 50). The weekly fuzzing campaign stays in fuzz.yml (Saturday) and
 # the image re-pin in image-pins.yml (Monday). Not a release dependency.
 on:
   schedule:

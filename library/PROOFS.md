@@ -1,6 +1,6 @@
 # What is proved about Lasm's library
 
-Lasm's own Lean library (Lasm.UI, Lasm.RPC, Lasm.KV, Lasm.Fetch) is ordinary
+Lasm's own Lean library (Lasm.UI, Lasm.RPC, Lasm.KV, Lasm.Fetch, Lasm.JS) is ordinary
 Lean code, and programs run exactly that code. So some of its guarantees are
 proved, for every possible input, rather than only tested. This page lists
 each proved proposition in plain English. The propositions are for Jordan to
@@ -21,7 +21,8 @@ proofs in that file:
 - [`Lasm/UI/Spec.lean`](Lasm/UI/Spec.lean): the diff and the commands;
 - [`Lasm/RPC/Spec.lean`](Lasm/RPC/Spec.lean): request validation, serving, dispatch and the client;
 - [`Lasm/KV/Spec.lean`](Lasm/KV/Spec.lean): the memory store;
-- [`Lasm/Fetch/Spec.lean`](Lasm/Fetch/Spec.lean): request paths.
+- [`Lasm/Fetch/Spec.lean`](Lasm/Fetch/Spec.lean): request paths;
+- [`Lasm/JS/Spec.lean`](Lasm/JS/Spec.lean): the value codec between Lean and JavaScript.
 
 A reviewer can read those files and ignore the proofs: the check fails unless
 
@@ -41,7 +42,7 @@ managed Lean 4.35.0 and only Lean's own library (no Mathlib).
 
 The propositions are about the shipped code (`Lasm.UI.diff`,
 `Lasm.RPC.Endpoint.decodeRequest`, `Lasm.KV.Table.write`, …). The Spec,
-Theorems and `Lasm/UI/Proofs*` modules are a proofs-only target: they are not
+Theorems, `Lasm/UI/Proofs*` and `Lasm/JS/Proofs*` modules are a proofs-only target: they are not
 in the shipped library (`libraryModules` in
 [src/lasm-library.mjs](../src/lasm-library.mjs)), so they are not compiled
 into the Lean prefix or [prebuilt/](prebuilt), cost a program's build
@@ -57,13 +58,17 @@ the binary patch encoding, which is written in Lean as a reference decoder
 src/lasm-modules/ui-dom.mjs) and proved to read every frame back as exactly
 its patch (`frames_decode`), while the JavaScript itself is tested (patch
 fixtures written by Lean in test/ui-dom.test.mjs, and the ui-patch fuzz
-target); Lean's JSON parser and printer; the `IO.Ref` that holds the memory
+target); the JavaScript half of the Lasm.JS value codec (src/node-js.mjs,
+src/edge/edge-js.mjs), tested against Lean's (test/node-js.test.mjs,
+test/edge-js.test.mjs), while the Lean half's reader is the very function
+`Wire.decode` runs (`decodeWith`, in `IO` there and in `Except String` in the
+theorems); Lean's JSON parser and printer; the `IO.Ref` that holds the memory
 store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**31 proved propositions (193 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**33 proved propositions (239 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
 ## Lasm.UI (10)
 
@@ -143,6 +148,15 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 | Proposition | In plain English |
 | --- | --- |
 | [`segments_no_dot_segments`](Lasm/Fetch/Spec.lean#L22) | **No path segment is `.` or `..`.** Whatever the request's URL, on every platform (including escaped forms such as `%2e%2E`), no segment of `r.segments` is `.` or `..`: a handler that maps segments to files or keys never sees a parent reference. |
+
+## Lasm.JS (2)
+
+### The value codec: every value crosses intact
+
+| Proposition | In plain English |
+| --- | --- |
+| [`decode_encode`](Lasm/JS/Spec.lean#L37) | **Every value that is encoded is read back exactly.** Take any plain value `d` (no references) that `encode` accepts, as the bytes `b`. The reader (`decodeWith`, which `decode` runs) reads `b` back as `d`, every number with the same bits: never an error, nothing left over, nothing misread. |
+| [`encode_ok_iff_fits`](Lasm/JS/Spec.lean#L46) | **Lengths never wrap.** `encode d` succeeds exactly when every length in `d` fits the format's u32 (`d.Fits`). A string, byte array, array or object with 2³² or more bytes, elements or fields is an error naming it, never a length that wraps around and makes the reader misread what follows. |
 <!-- END PROPOSITIONS -->
 
 ## Candidates not yet proved

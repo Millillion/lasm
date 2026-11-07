@@ -21,7 +21,7 @@ on:
         type: boolean
         default: true
   push:
-    branches: [browser, browser-ui, dx-browser, launch]
+    branches: [browser-ui, dx-browser]
     paths:
       - '.github/workflows/browser.yml'
       - '.github/workflows/edge-runtime.yml'
