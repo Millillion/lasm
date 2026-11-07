@@ -777,6 +777,33 @@ requirement short of L3: the Porter nightly fuzzer had found a failing request.
 No platform but Node has fuzzing or simulation in CI yet, so no other platform
 can reach L3.
 
+## The test-evidence page
+
+[`content/learn/test-evidence.md`](../content/learn/test-evidence.md) is the
+public summary of this page's layers, published on the Millillion website at
+https://millillion.org/learn/lasm/test-evidence/. [`scripts/evidence/page.mjs`](../scripts/evidence/page.mjs)
+generates it, and [`evidence-page.yml`](../.github/workflows/evidence-page.yml)
+runs it at 10:41 UTC, Monday to Saturday (no runs on a Sunday, US Eastern time), after the nightly tier, and commits the result
+to `main`. Each section keeps two kinds of fact apart:
+
+- **Measured by CI**, read from the GitHub API when the page is generated, with
+  the date and a link to each run: the platform levels (computed as
+  [Evidence levels](#evidence-levels) computes them), the latest run of each CI
+  tier's main workflows, and the latest scheduled mutation, fuzzing, DST and
+  differential runs. Job logs supply the numbers: each module's score and
+  mutants, each fuzz target's runs and seed, each app's seeds and failing seeds,
+  each campaign's programs, cases and divergences. The equivalence jobs and
+  Conduit's RealWorld jobs come from the latest merge to `main`.
+- **Recorded in the repository** and checked by CI on every change: the
+  mutation baseline and thresholds, the proposition and theorem counts that
+  each PROOFS.md states (its proof check fails when the page is stale), the
+  fuzz targets and DST apps (the workflows' matrices), the equivalence targets
+  and the latest benchmark table ([BENCHMARKS.md](BENCHMARKS.md)).
+
+The same facts are in [`docs/evidence/test-evidence.json`](evidence/test-evidence.json).
+A workflow with no scheduled run yet shows as "no run yet". `node
+scripts/evidence/page.mjs --offline` renders the page without the API.
+
 ## Flaky tests
 
 A flaky test is one that both passes and fails on the same code. It costs
