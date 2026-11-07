@@ -9,39 +9,8 @@ import { dirname, join, resolve, relative } from 'node:path';
 
 import { startStaticServer } from './static-server.mjs';
 
-
-export const devUsage = `Usage: lasm dev [Main.lean] --target browser [--release] [--no-watch] [--port 5173] [--host 127.0.0.1] [--output DIR]
-
-Builds the Lean app for the browser and serves it; saving a .lean file rebuilds
-it and reloads the page. --release serves the release build (default output
-dist/, as lasm build writes it); dev builds go to .lake/lasm/browser-dev.`;
-
-export function parseDevArguments(tokens) {
-  const result = { command: 'dev', target: undefined, release: false, watch: true, port: 5173, host: '127.0.0.1' };
-  const positional = [];
-  for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i];
-    if (token === '--help' || token === '-h') return { command: 'dev-help' };
-    if (token === '--release') { result.release = true; continue; }
-    if (token === '--no-watch') { result.watch = false; continue; }
-    const option = /^--(target|port|host|output)(?:=(.*))?$/.exec(token);
-    if (option) {
-      const value = option[2] ?? tokens[++i];
-      if (!value || value.startsWith('--')) throw new Error(`--${option[1]} requires a value\n\n${devUsage}`);
-      result[option[1]] = option[1] === 'port' ? Number(value) : value;
-      continue;
-    }
-    if (token.startsWith('-')) throw new Error(`Unknown lasm dev option: ${token}\n\n${devUsage}`);
-    positional.push(token);
-  }
-  if (positional.length > 1) throw new Error(devUsage);
-  result.input = positional[0] ?? 'Main.lean';
-  if (!result.input.endsWith('.lean')) throw new Error(`lasm dev expects a Lean source file\n\n${devUsage}`);
-  if (result.target !== 'browser') throw new Error(`lasm dev needs --target browser (the other targets run with lasm Main.lean)\n\n${devUsage}`);
-  if (!Number.isInteger(result.port) || result.port < 0 || result.port > 65535) throw new Error('--port must be a port number');
-  return result;
-}
-
+// lasm dev's arguments, --target browser's among them, are parsed by
+// src/dev.mjs (parseDevArguments), which calls runBrowserDev with them.
 export async function runBrowserDev(options) {
   const source = resolve(options.input);
   if (!existsSync(source)) throw new Error(`${options.input} does not exist`);

@@ -20,7 +20,8 @@
 //                    (artifacts, derived, objects) and the project build cache.
 //
 //   stalled network  tunnels that stop carrying data but stay open (a dropped
-//                    Wi-Fi link): the download's idle timer must end each one;
+//                    Wi-Fi link): the download's idle timer must end each one,
+//                    and the retry open a new tunnel (twice: must recover);
 //   killed npm install  SIGKILL `npm install` of the CLI (--package: a .tgz or
 //                    @lasm/cli@VERSION), rerun it, then build with it; npm
 //                    install through cut connections and onto a full disk;
@@ -183,7 +184,7 @@ export async function runFaults({ lasm, pkg, only, work, target = 'node', log = 
 
   /** One scenario: `inject` runs the faulty build(s) and returns the result to
    * judge; `recover` removes the fault; then a plain rerun must give the reference. */
-  async function scenario(name, { directory, inject, recover = () => {}, environment = env(), allowSuccess = true, expect, compareSuccess = true }) {
+  async function scenario(name, { directory, inject, recover = () => {}, environment = env(), allowSuccess = true, mustSucceed = false, expect, compareSuccess = true }) {
     if (!selected(name)) return;
     const problems = [];
     let outcome = '';
@@ -198,6 +199,7 @@ export async function runFaults({ lasm, pkg, only, work, target = 'node', log = 
         if (d.length) problems.push(`succeeded with different bytes (${d.length} files: ${d.slice(0, 6).join('; ')})`);
       } else if (!faulty.killed) {
         outcome = 'failed with: ' + tail(text, 3).replace(/\n/g, ' | ');
+        if (mustSucceed) problems.push(`failed although the build should recover from this fault: ${tail(text, 12)}`);
         const message = messageProblems(text);
         if (message.length) problems.push(`unclear failure (${message.join('; ')}): ${tail(text, 12)}`);
         if (expect && !expect.test(text)) problems.push(`the message does not say ${expect}: ${tail(text, 6)}`);
@@ -334,15 +336,18 @@ export async function runFaults({ lasm, pkg, only, work, target = 'node', log = 
     }
 
     // Network: tunnels cut part way through downloads, or stalled (open, silent).
-    for (const [label, cuts, allowSuccess, stall] of [['recovers from 3 cut connections', 3, true, false], ['every connection cut', Infinity, false, false],
-      ['recovers from 2 stalled connections', 2, true, true], ['every connection stalls', Infinity, false, true]]) {
+    // A stalled tunnel is abandoned and the retry opens a new one (#152): with
+    // three attempts per download, two stalls must be recovered from. Cuts may
+    // all land on one download, so there a clear failure is allowed.
+    for (const [label, cuts, allowSuccess, stall, mustSucceed] of [['recovers from 3 cut connections', 3, true, false, false], ['every connection cut', Infinity, false, false, false],
+      ['recovers from 2 stalled connections', 2, true, true, true], ['every connection stalls', Infinity, false, true, false]]) {
       if (!selected(`network: ${label}`)) continue;
       const proxy = await cuttingProxy({ cutAfter: 4 * 1024 * 1024, cuts, stall });
       const key = `${stall ? 'stall' : 'cut'}-${cuts}`, cache = join(root, `network-${key}`), directory = project(`network-${key}`);
       const proxied = env(cache, { LASM_ARTIFACT_SOURCE: 'https', HTTPS_PROXY: proxy.url, NODE_USE_ENV_PROXY: '1', LASM_DOWNLOAD_ATTEMPTS: '3',
         ...(stall ? { LASM_DOWNLOAD_IDLE_MS: '5000' } : {}) });
       try {
-        await scenario(`network: ${label}`, { directory, allowSuccess, environment: env(cache, { LASM_ARTIFACT_SOURCE: 'https' }),
+        await scenario(`network: ${label}`, { directory, allowSuccess, mustSucceed, environment: env(cache, { LASM_ARTIFACT_SOURCE: 'https' }),
           ...(stall && !allowSuccess ? { expect: /stopped receiving data|idle/i } : {}),
           inject: () => build(directory, proxied, { timeoutMs: 1_800_000 }), recover: () => proxy.close() });
         log(`     proxy: ${JSON.stringify(proxy.stats())}`);

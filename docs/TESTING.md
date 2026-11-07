@@ -415,7 +415,8 @@ build stage and while replacing an existing output; SIGKILL while a cold tool
 cache is filled from the npm packages and over HTTPS; HTTPS downloads through
 a CONNECT proxy that cuts tunnels after 4 MiB (three times: may recover;
 always: must fail clearly) or stalls them, open and silent, as after a dropped
-Wi-Fi link (the idle timer must end each one); the tool cache on a 64 MiB and a
+Wi-Fi link (the idle timer must end each one and the retry open a new tunnel:
+twice must recover; always: must fail clearly); the tool cache on a 64 MiB and a
 700 MiB ext4 loop file system, the project on one filled to 1, 4 and 12 MiB
 free; an empty read-only tool cache, a filled one made read-only, a read-only
 project build cache; a flipped byte and a removed file in the tool archives,

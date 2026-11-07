@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
-import { downloadArtifact, downloadPolicy, retryDelay, transportDiagnostic } from '../src/managed-download.mjs';
+import { attemptDispatcher, downloadArtifact, downloadPolicy, retryDelay, transportDiagnostic } from '../src/managed-download.mjs';
 
 const bytes = Buffer.from('a small but complete download');
 const artifact = { name: 'fixture', url: 'https://example.invalid/tool', bytes: bytes.length,
@@ -148,6 +148,56 @@ test('header stalls retry; body stalls retry; overall and caller cancellation ar
       assert.equal(requests, ['overall', 'caller'].includes(mode) ? 1 : 4);
     } finally { clearTimeout(timer); }
   }
+});
+
+// #152: a stalled attempt's connection pool is destroyed with it, and the
+// retry (and every redirect hop of an attempt) uses a pool of its own.
+test('every attempt fetches through its own dispatcher, destroyed when the attempt ends', async t => {
+  const f = await fixture(t), made = [], seen = [];
+  const newDispatcher = () => {
+    const dispatcher = { id: made.length, destroyed: false, destroy: async () => { dispatcher.destroyed = true; } };
+    made.push(dispatcher); return dispatcher;
+  };
+  await downloadArtifact(artifact, f.file, { ...f.options, dispatcher: newDispatcher, policy: { ...policy, idleMs: 30 },
+    fetch: async (url, { dispatcher, signal }) => {
+      seen.push({ url, id: dispatcher.id, live: made.filter(d => !d.destroyed).map(d => d.id) });
+      if (!url.endsWith('/cdn')) return new Response('', { status: 302, headers: { location: '/cdn' } });
+      if (made.length === 1) return new Response(new ReadableStream({ start(c) { c.enqueue(bytes.subarray(0, 4)); } }), { headers: { etag: '"v"' } });
+      assert.equal(signal.aborted, false);
+      return new Response(bytes.subarray(4), { status: 206, headers: { etag: '"v"', 'content-range': `bytes 4-${bytes.length - 1}/${bytes.length}` } });
+    } });
+  assert.deepEqual(await readFile(f.file), bytes);
+  // Two attempts, two hops each; while one attempt runs, its own pool is the only one open.
+  assert.deepEqual(seen, [
+    { url: artifact.url, id: 0, live: [0] }, { url: 'https://example.invalid/cdn', id: 0, live: [0] },
+    { url: artifact.url, id: 1, live: [1] }, { url: 'https://example.invalid/cdn', id: 1, live: [1] }]);
+  assert.deepEqual(made.map(d => d.destroyed), [true, true]);
+});
+
+test('a dispatcher that fails to close does not fail the download; none means the global one', async t => {
+  const f = await fixture(t); const options = [];
+  await downloadArtifact(artifact, f.file, { ...f.options, dispatcher: () => ({ destroy: () => Promise.reject(new Error('already closed')) }),
+    fetch: async (url, init) => { options.push(init); return new Response(bytes); } });
+  assert.ok(options[0].dispatcher);
+  const g = await fixture(t);
+  await downloadArtifact(artifact, g.file, { ...g.options, dispatcher: () => undefined,
+    fetch: async (url, init) => { options.push(init); return new Response(bytes); } });
+  assert.equal('dispatcher' in options[1], false);
+});
+
+test('attemptDispatcher makes a new instance of the global dispatcher class', () => {
+  class Pool { constructor() { this.fresh = true; } destroy() {} }
+  const global = new Pool(); global.fresh = false;
+  const made = attemptDispatcher(global);
+  assert.ok(made instanceof Pool); assert.notEqual(made, global); assert.equal(made.fresh, true);
+  assert.equal(attemptDispatcher(null), undefined, 'no global dispatcher yet');
+  assert.equal(attemptDispatcher({}), undefined, 'a plain object is no dispatcher class');
+  assert.equal(attemptDispatcher(Object.create(null)), undefined);
+  assert.equal(attemptDispatcher(new (class { close() {} })()), undefined, 'no destroy: not a dispatcher');
+  assert.equal(attemptDispatcher(new (class Broken { constructor(fail) { if (fail !== false) throw new Error('needs options'); } destroy() {} })(false)), undefined);
+  // Node's own: the global dispatcher once fetch has been used.
+  const native = attemptDispatcher();
+  if (native) { assert.equal(typeof native.destroy, 'function'); assert.notEqual(native, globalThis[Symbol.for('undici.globalDispatcher.1')]); native.destroy(); }
 });
 
 test('Retry-After beyond the total budget fails rather than retrying early', async t => {
