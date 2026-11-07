@@ -74,7 +74,7 @@ lean_object* lean_io_get_random_bytes(size_t);
 uint64_t lean_uint64_lor(uint64_t, uint64_t);
 lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_Binding_payload(lean_object*, lean_object*);
 lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_hostCallWith(uint32_t, uint64_t, lean_object*, uint32_t);
-lean_object* l_Lasm_JS_Wire_decode(lean_object*);
+lean_object* l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(lean_object*);
 lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_Binding_context(lean_object*);
 lean_object* lean_string_append(lean_object*, lean_object*);
 lean_object* lean_string_utf8_byte_size(lean_object*);
@@ -1263,7 +1263,7 @@ lean_object* v_a_349_; lean_object* v___x_350_;
 v_a_349_ = lean_ctor_get(v___x_348_, 0);
 lean_inc(v_a_349_);
 lean_dec_ref_known(v___x_348_, 1);
-v___x_350_ = l_Lasm_JS_Wire_decode(v_a_349_);
+v___x_350_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_a_349_);
 lean_dec(v_a_349_);
 if (lean_obj_tag(v___x_350_) == 0)
 {
@@ -1813,7 +1813,7 @@ lean_object* v_a_585_; lean_object* v___x_586_;
 v_a_585_ = lean_ctor_get(v___x_584_, 0);
 lean_inc(v_a_585_);
 lean_dec_ref_known(v___x_584_, 1);
-v___x_586_ = l_Lasm_JS_Wire_decode(v_a_585_);
+v___x_586_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_a_585_);
 lean_dec(v_a_585_);
 if (lean_obj_tag(v___x_586_) == 0)
 {
