@@ -175,7 +175,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `tandem-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 11 min (max 74) | examples/tandem on Bun, Deno, Docker, Workers | PR (paths), main |
 | `tandem.yml` | dispatch, PR (paths), push main (paths) | Linux | 19 min (max 97) | examples/tandem: proofs, protocol, Yjs, fuzzer, DST, E2E | PR (paths), main |
 | `templates.yml` | call, dispatch | Linux, macOS, Windows | 23 min | Every lasm init template on five platforms | Release (called) |
-| `tooling.yml` | PR (paths-ignore), push main, cron 17 5 * * *, dispatch | Linux | 17 min (max 59) | Error corpus; metamorphic builds and fault injection | PR, main, nightly |
+| `tooling.yml` | PR (paths-ignore), push main, cron 17 5 * * *, dispatch | Linux | 17 min (max 59) | Error corpus with the error inventory check; metamorphic builds and `lasm dev` sessions, and fault injection, one job per target (node, wasi, workers, browser) | PR (corpus; all on harness changes), main, nightly |
 | `ui.yml` | dispatch, call, push browser,browser-ui,launch,fullstack (paths) | Linux | 1 min (max 19) | Lasm.UI library, proofs, diff model, DOM applier | Release, nightly |
 | `unit.yml` | PR (paths-ignore), dispatch, call, push launch | Linux | 5 min (max 31) | The whole unit suite with coverage baseline | PR (paths), release, nightly |
 | `upstream-native-build-time.yml` | dispatch | Linux | 2 min (max 20) | Upstream native build-time checks | On demand |

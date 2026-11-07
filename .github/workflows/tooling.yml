@@ -8,10 +8,12 @@ name: Dependable tooling
 #     builds equal clean ones, the same input gives the same bytes (two
 #     directories, a cold tool cache), renaming an unrelated file or definition
 #     changes nothing else, touching sources rebuilds nothing; lasm build and
-#     lasm dev; node, wasi, workers and browser, release and dev profiles.
-#   - fault injection (scripts/tooling/faults.mjs): killed builds, installs and
-#     npm installs, cut downloads, full disks, read-only and corrupted caches;
-#     each must end in success on retry or a clear error.
+#     a lasm dev session (edit, touch, rename, revert, a save by rename); node,
+#     wasi, workers and browser, release and dev profiles.
+#   - fault injection (scripts/tooling/faults.mjs), one job per target: killed
+#     builds and installs, cut and stalled downloads, full disks, read-only and
+#     corrupted caches; with node also npm installs (killed, cut, full disk) and
+#     killed lasm dev sessions; each must end in success on retry or a clear error.
 # Metamorphic and fault runs are slow: nightly, by hand, and on pull requests
 # that change scripts/tooling/ or this workflow.
 # Each run installs the CLI with npm, as a user does, into a fresh directory.
@@ -137,7 +139,8 @@ jobs:
         run: |
           node "$LASM_BIN" --version
           node scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- /usr/bin/env CI=1 GITHUB_STEP_SUMMARY="$GITHUB_STEP_SUMMARY" \
-            node scripts/tooling/error-corpus.mjs --lasm "$LASM_BIN" --only network --old-node "$OLD_NODE" --work "$RUNNER_TEMP/corpus" --report "$RUNNER_TEMP/error-corpus.json"
+            node scripts/tooling/error-corpus.mjs --lasm "$LASM_BIN" --only network --old-node "$OLD_NODE" --work "$RUNNER_TEMP/corpus" --report "$RUNNER_TEMP/error-corpus.json" \
+            ${{ matrix.cli == 'candidate' && '--inventory check' || '' }}
       - if: always()
         run: cat "$RUNNER_TEMP/error-corpus.json" 2>/dev/null || true
 
@@ -170,20 +173,35 @@ jobs:
         with:
           artifact: tooling-packed-candidate
           version: ${{ env.LASM_CANDIDATE_VERSION }}
+      # Dev builds whose bytes differ from a clean build are compared by running
+      # both; the browser's run in headless Chromium.
+      - name: Pinned Playwright and Chromium (browser target)
+        if: matrix.target == 'browser'
+        timeout-minutes: 30
+        uses: ./.github/actions/playwright
+        with:
+          browsers: chromium
+          cache-key: playwright-1.63.0-tooling-chromium-ubuntu-24.04
       - name: Metamorphic build tests
         run: |
           # Not under run-bounded: it keeps 8 GiB of host headroom, which on a
           # 16 GiB runner stops a browser or edge build (about 5 GiB) part way.
-          LASM_TOOLCHAIN_CACHE="$RUNNER_TEMP/tool-cache" node scripts/tooling/metamorphic.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" --targets ${{ matrix.target }} --work "$RUNNER_TEMP/mm" --report "$RUNNER_TEMP/metamorphic.json"
+          LASM_TOOLCHAIN_CACHE="$RUNNER_TEMP/tool-cache" node scripts/tooling/metamorphic.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" --targets ${{ matrix.target }} \
+            ${{ matrix.target == 'browser' && '--playwright "$GITHUB_WORKSPACE/.work/pw"' || '' }} --work "$RUNNER_TEMP/mm" --report "$RUNNER_TEMP/metamorphic.json"
       - if: always()
         run: cat "$RUNNER_TEMP/metamorphic.json" 2>/dev/null || true
 
   faults:
-    name: Fault injection
+    name: Fault injection (${{ matrix.target }})
     needs: [scope, pack]
     if: needs.scope.outputs.slow == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        # node also runs the npm install and lasm dev scenarios.
+        target: [node, wasi, workers, browser]
     env:
       CI: '1'
       BROWSER: 'none'
@@ -206,7 +224,7 @@ jobs:
       # systems with sudo, which a transient systemd scope would not see.
       - name: Fault injection
         run: |
-          node scripts/tooling/faults.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
+          node scripts/tooling/faults.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" --target ${{ matrix.target }} \
             --package "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --work "$RUNNER_TEMP/faults" --report "$RUNNER_TEMP/faults.json"
       - if: always()
         run: cat "$RUNNER_TEMP/faults.json" 2>/dev/null || true

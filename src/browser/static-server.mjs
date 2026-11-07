@@ -84,7 +84,7 @@ export function startStaticServer(root, { port = 0, host = '127.0.0.1', liveRelo
     }
   });
   return new Promise((resolveServer, reject) => {
-    server.once('error', reject);
+    server.once('error', error => reject(listenError(error, port, host)));
     server.listen(port, host, () => {
       const address = server.address();
       const shown = host === '0.0.0.0' || host === '::' ? 'localhost' : host.includes(':') ? `[${host}]` : host;
@@ -93,4 +93,16 @@ export function startStaticServer(root, { port = 0, host = '127.0.0.1', liveRelo
         close() { for (const client of clients) client.end(); return new Promise(done => server.close(done)); } });
     });
   });
+}
+
+/** A listen failure the user can act on: a port in use or not allowed, an
+ * address this machine does not have (Node says only "listen EADDRINUSE: …"). */
+export function listenError(error, port, host) {
+  const where = `${host.includes(':') ? `[${host}]` : host}:${port}`;
+  const message = {
+    EADDRINUSE: `Port ${port} on ${host} is already in use. Stop the program that uses it, or choose another port with --port.`,
+    EACCES: `Not allowed to listen on ${where} (ports below 1024 need extra privileges). Choose another port with --port.`,
+    EADDRNOTAVAIL: `Cannot listen on ${where}: this machine has no address ${host}. Choose another with --host (for example 127.0.0.1).`,
+  }[error?.code];
+  return message ? Object.assign(new Error(message), { code: error.code, lasmInternal: false }) : error;
 }

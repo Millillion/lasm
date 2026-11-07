@@ -92,7 +92,8 @@ export function relevantFile(name) {
 }
 /** Files a build writes into the project itself (Lake's manifest). */
 export const generatedByBuild = file => basename(file) === 'lake-manifest.json';
-const ignoredDirectory = name => name === 'node_modules' || name.startsWith('.') || ['dist', 'build'].includes(name);
+// *.lasm-staging: the edge and browser writers' staging directories, created and removed during a build.
+const ignoredDirectory = name => name === 'node_modules' || name.startsWith('.') || name.endsWith('.lasm-staging') || ['dist', 'build'].includes(name);
 
 /** The watched files under `directory` (for content comparison and polling). */
 export function projectFiles(directory) {
@@ -137,7 +138,10 @@ export function watchProject(directory, onEvent, { pollMs = 1000, watchFile = wa
       if (event === 'rename' && !ignoredDirectory(String(name))) {
         let isDirectory = false;
         try { isDirectory = statSync(file).isDirectory(); } catch {}
-        if (isDirectory) { armTree(file); return onEvent(); }
+        // A directory may vanish between the event and its watch (a build's
+        // staging directory): watching it then throws ENOENT, which must not
+        // end lasm dev with a stack trace.
+        if (isDirectory) { try { armTree(file); } catch {} return onEvent(); }
         if (watchers.has(file)) { watchers.get(file).close(); watchers.delete(file); return onEvent(); }
       }
       if (relevantFile(String(name))) onEvent();
@@ -275,7 +279,9 @@ export async function runDev(options, hooks = {}) {
   const { createBuildService } = await import('./dev-build-service.mjs');
   const { findApplicationProject } = await import('./application-sources.mjs');
   const source = resolve(options.input);
-  if (!existsSync(source)) (await import('./application-cli.mjs')).assertSourceExists(options.input);
+  // Every output's source (--target node=Server.lean,browser=Client.lean), before any build.
+  for (const input of new Set([options.input, ...options.outputs.map(o => o.input)]))
+    if (!existsSync(resolve(input))) (await import('./application-cli.mjs')).assertSourceExists(input);
   const project = findApplicationProject(source) ?? dirname(source);
   const target = options.target;
   // The browser target's dev server (docs/BROWSER.md) builds and serves dist/ itself.
