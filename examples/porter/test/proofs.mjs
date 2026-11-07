@@ -146,6 +146,9 @@ try {
   syncCounts(data);
   if (problems.length) {
     for (const p of problems) console.error(`error: ${p}`);
+    // The check's data, so the docs can be regenerated without a Lean build:
+    // save the line to a file and run `PORTER_PROOFS_JSON=file npm run proofs -- --docs-only --write`.
+    if (!write) console.log(`proofs.json: ${JSON.stringify(data)}`);
     process.exitCode = 1;
   } else {
     console.log(`\n${data.propositions.length} propositions and ${data.theorems} theorems checked; PROOFS.md, SPEC.md and the stated counts agree (${((Date.now() - started) / 1000).toFixed(0)} s).`);
