@@ -3,7 +3,7 @@ name: Evidence page
 # scripts/evidence/page.mjs reads the repository and the latest CI results
 # (GitHub API and job logs) and writes content/learn/test-evidence.md, which the
 # Millillion website publishes under Learn, and docs/evidence/test-evidence.json.
-# Nightly at 10:41 UTC, after the nightly tier (01:07 to 09:17 UTC) and the
+# Monday to Saturday at 10:41 UTC (never on a Sunday, US Eastern time), after the nightly tier (01:07 to 09:17 UTC) and the
 # evidence levels (08:23), and by hand. The page changes every night (its
 # timestamp and run links), so it is committed straight to main, as
 # release-benchmarks.yml commits docs/BENCHMARKS.md, and not by pull request:
@@ -16,7 +16,8 @@ name: Evidence page
 # Pull requests that change the generator run it without committing.
 on:
   schedule:
-    - cron: '41 10 * * *'
+    # Never on a Sunday in US Eastern time: 10:41 UTC is 05:41 or 06:41 ET, so skip Sunday UTC.
+    - cron: '41 10 * * 1-6'
   workflow_dispatch:
   pull_request:
     branches: [main]
@@ -87,5 +88,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.WEBSITE_SYNC_TOKEN }}
         run: |
+          if [ "$(TZ=America/New_York date +%u)" = 7 ]; then echo "Sunday in US Eastern time: no automatic dispatch."; exit 0; fi
           if [ -z "$GH_TOKEN" ]; then echo "No WEBSITE_SYNC_TOKEN: the website's hourly sync-content.yml picks the page up within the hour."; exit 0; fi
           gh workflow run sync-content.yml --repo Millillion/website

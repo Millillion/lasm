@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "about": "Lasm test evidence (scripts/evidence/page.mjs). \"ci\" holds what CI measured, read from the GitHub API at generatedAt; \"repository\" holds what is recorded in the repository and checked by CI on every change. Rendered as content/learn/test-evidence.md.",
-  "generatedAt": "2026-11-07T18:19:02.018Z",
+  "generatedAt": "2026-11-07T18:35:29.705Z",
   "repository": "Millillion/lasm",
   "commit": null,
   "repository_facts": {
@@ -367,11 +367,11 @@
         "workflow": "tooling.yml",
         "what": "the tooling error corpus",
         "run": {
-          "id": 42395300299,
-          "url": "https://github.com/Millillion/lasm/actions/runs/42395300299",
+          "id": 42399791859,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42399791859",
           "event": "push",
           "branch": "main",
-          "date": "2026-11-07T17:28:54Z",
+          "date": "2026-11-07T18:22:40Z",
           "conclusion": "success"
         }
       },
@@ -406,11 +406,11 @@
         "workflow": "conduit-platforms.yml",
         "what": "Conduit on 15 more platforms, equivalence",
         "run": {
-          "id": 42381691127,
-          "url": "https://github.com/Millillion/lasm/actions/runs/42381691127",
+          "id": 42399791755,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42399791755",
           "event": "push",
           "branch": "main",
-          "date": "2026-11-07T16:18:10Z",
+          "date": "2026-11-07T18:30:24Z",
           "conclusion": "success"
         }
       },
@@ -732,88 +732,88 @@
       },
       "conduitPlatforms": {
         "run": {
-          "id": 42381691127,
-          "url": "https://github.com/Millillion/lasm/actions/runs/42381691127",
+          "id": 42399791755,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42399791755",
           "event": "push",
           "branch": "main",
-          "date": "2026-11-07T16:18:10Z",
+          "date": "2026-11-07T18:30:24Z",
           "conclusion": "success"
         },
         "jobs": [
           {
-            "name": "Deno Deploy (Deno 2.9.6, Deno KV)",
-            "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430469815"
-          },
-          {
-            "name": "Fastly Compute (Viceroy 0.21.1, Fastly KV)",
-            "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430469967"
-          },
-          {
-            "name": "Azure Functions (func start)",
-            "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430469994"
-          },
-          {
-            "name": "AWS Lambda .zip (sam local start-api, nodejs24.x)",
-            "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470033"
-          },
-          {
-            "name": "Deno 2.9.6 (node:sqlite)",
-            "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470041"
-          },
-          {
-            "name": "Vercel Edge (vercel build offline, edge-runtime)",
-            "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470061"
-          },
-          {
-            "name": "AWS Lambda container image (sam local start-api, AWS base image)",
-            "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470067"
-          },
-          {
             "name": "Docker (node:24-bookworm-slim, read-only, 512 MB)",
             "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470069"
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885293"
           },
           {
             "name": "Netlify Functions (netlify build offline; Netlify's bootstrap in the Lambda Node 24 image)",
             "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470079"
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885296"
           },
           {
             "name": "Vercel Functions (vercel build offline, Vercel's Node launcher)",
             "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470081"
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885346"
+          },
+          {
+            "name": "Vercel Edge (vercel build offline, edge-runtime)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885351"
           },
           {
             "name": "Spin 4.2.2 (wasi-http; Postgres through PostgREST)",
             "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470083"
-          },
-          {
-            "name": "Supabase Edge Functions (supabase start, supabase functions serve; Postgres)",
-            "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470092"
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885429"
           },
           {
             "name": "Netlify Edge (netlify build offline; Deno with Netlify Blobs' local server)",
             "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470109"
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885439"
+          },
+          {
+            "name": "Deno Deploy (Deno 2.9.6, Deno KV)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885440"
+          },
+          {
+            "name": "Azure Functions (func start)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885449"
+          },
+          {
+            "name": "AWS Lambda .zip (sam local start-api, nodejs24.x)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885505"
           },
           {
             "name": "wasi-http (wasmtime 49.0.4 serve; Postgres through PostgREST)",
             "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470147"
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885508"
+          },
+          {
+            "name": "Fastly Compute (Viceroy 0.21.1, Fastly KV)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885532"
+          },
+          {
+            "name": "Supabase Edge Functions (supabase start, supabase functions serve; Postgres)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885538"
           },
           {
             "name": "Google Cloud Functions (Functions Framework)",
             "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470230"
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885554"
+          },
+          {
+            "name": "AWS Lambda container image (sam local start-api, AWS base image)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885570"
+          },
+          {
+            "name": "Deno 2.9.6 (node:sqlite)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885838"
           }
         ]
       }

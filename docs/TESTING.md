@@ -783,7 +783,7 @@ can reach L3.
 public summary of this page's layers, published on the Millillion website at
 https://millillion.org/learn/lasm/test-evidence/. [`scripts/evidence/page.mjs`](../scripts/evidence/page.mjs)
 generates it, and [`evidence-page.yml`](../.github/workflows/evidence-page.yml)
-runs it every night at 10:41 UTC, after the nightly tier, and commits the result
+runs it at 10:41 UTC, Monday to Saturday (no runs on a Sunday, US Eastern time), after the nightly tier, and commits the result
 to `main`. Each section keeps two kinds of fact apart:
 
 - **Measured by CI**, read from the GitHub API when the page is generated, with
