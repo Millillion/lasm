@@ -93,10 +93,12 @@ jobs:
         run: |
           case "$EVENT" in
             pull_request) files=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR/files" --jq '.[].filename') ;;
-            # An unknown range (a new branch, a failed comparison) counts as a macOS change.
-            push) files=$(gh api "repos/$GITHUB_REPOSITORY/compare/$BEFORE...$GITHUB_SHA" --jq '.files[].filename' || echo .github/workflows/differential.yml) ;;
-            *) echo macos=true >> "$GITHUB_OUTPUT"; exit 0 ;;
+            push) files=$(gh api "repos/$GITHUB_REPOSITORY/compare/$BEFORE...$GITHUB_SHA" --jq '.files[].filename' || true) ;;
+            *) files= ;;
           esac
+          # Not a pull request or a push (schedule, dispatch, a call from ci-weekly.yml), or an
+          # unknown range (a new branch, a failed comparison, no files): the macOS jobs run.
+          if [ -z "$files" ] || printf '%s' "$BEFORE" | grep -qE '^0+$'; then files=.github/workflows/differential.yml; fi
           if printf '%s\n' "$files" | grep -qE "$MACOS_PATHS"; then echo macos=true; else echo macos=false; fi | tee -a "$GITHUB_OUTPUT"
   pack:
     if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
