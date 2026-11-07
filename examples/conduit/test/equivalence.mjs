@@ -104,7 +104,7 @@ export async function startRecorder(upstream) {
       if (framed) headers.push('Content-Length', String(body.length));
       const exchange = { request: { method: req.method, path: req.url, headers: pairs(req.rawHeaders), body: body.toString('base64') } };
       exchanges.push(exchange);
-      const out = request({ host: target.hostname, port: target.port, method: req.method, path: req.url, headers, agent: false }, up => {
+      const out = request({ host: target.hostname, port: target.port, method: req.method, path: req.url, agent: false, setDefaultHeaders: false }, up => {
         const parts = [];
         up.on('data', c => parts.push(c));
         up.on('end', () => {
@@ -128,6 +128,16 @@ export async function startRecorder(upstream) {
         res.end(`equivalence proxy: ${e.message}`);
       };
       out.on('error', fail);
+      // setHeader (not a raw header array, which Node writes at once) so that
+      // the framing below still applies; a repeated field becomes one array.
+      const grouped = new Map();
+      for (let i = 0; i < headers.length; i += 2) {
+        const key = headers[i].toLowerCase();
+        if (!grouped.has(key)) grouped.set(key, [headers[i], []]);
+        grouped.get(key)[1].push(headers[i + 1]);
+      }
+      for (const [name, values] of grouped.values()) out.setHeader(name, values.length === 1 ? values[0] : values);
+      out.setHeader('Connection', 'close'); // one connection per request
       if (!framed) out.useChunkedEncodingByDefault = false;
       out.end(body.length ? body : undefined);
     });
