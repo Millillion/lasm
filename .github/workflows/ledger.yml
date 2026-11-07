@@ -136,6 +136,10 @@ jobs:
       - name: The simulation, 30 fixed seeds, each replayed (a failure prints its seed and a repro command)
         working-directory: examples/ledger
         run: node test/dst.mjs --seeds 30 --check-determinism --keep-going
+      - name: The simulation, 10 fixed seeds with heavy faults
+        if: ${{ !cancelled() }}
+        working-directory: examples/ledger
+        run: node test/dst.mjs --seeds 10 --first 1001 --faults heavy --keep-going
   tigerbeetle:
     name: Differential test against TigerBeetle 0.17.9
     runs-on: ubuntu-24.04

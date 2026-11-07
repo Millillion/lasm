@@ -60,7 +60,7 @@ class World {
     const rng = this.rng = new Rng(seed);
     this.sched = new Scheduler();
     this.trace = new Trace({ scheduler: this.sched, echo: opts.verbose });
-    this.checks = new Checks();
+    this.checks = new Checks(() => this.trace.tail(120));
     const p = this.profile = faultProfile(rng.fork('profile'), opts.level);
     this.customers = 4 + rng.int(7);
     this.writers = 2 + rng.int(5);
@@ -405,7 +405,7 @@ function finishSeed() {
     if (prev === undefined) digests.set(W.seed, W.trace.digest);
     else if (prev !== W.trace.digest) failures = [...failures, `seed ${W.seed} did not replay: trace ${prev} then ${W.trace.digest}`];
   }
-  loop.report(W.seed, { failures, trace: W.trace, summary: W.summary(), context: W.context });
+  loop.report(W.seed, { failures, trace: W.trace, summary: W.summary(), context: W.context ?? W.checks.context });
   W.store.close();
   W = null;
 }

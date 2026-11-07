@@ -539,7 +539,8 @@ checks the invariants. `node test/dst.mjs` starts it.
 
 **CI.** Each app's workflow (`tandem.yml`, `ledger.yml`, `porter.yml`, on
 changes to the app or to `scripts/sim`) runs 30 fixed seeds, each twice to
-check that it replays exactly (`--seeds 30 --check-determinism`).
+check that it replays exactly (`--seeds 30 --check-determinism`), then 10
+fixed seeds with heavy faults.
 [`dst-nightly.yml`](../.github/workflows/dst-nightly.yml) runs random seeds
 for 20 minutes per app, then 10 minutes with heavy faults. A failure prints:
 
@@ -550,12 +551,19 @@ for 20 minutes per app, then 10 minutes with heavy faults. A failure prints:
   repro: cd examples/tandem && npm run build:sim && node test/dst.mjs --seed 4
 ```
 
-**What it found.** In Tandem's editor: a WebSocket push that did not continue
-the replica's log sent a second sync while one was in flight, and the first
-reply then dropped from `pending` operations the second carried (an edit lost
-if that sync failed); and a failed catch-up sync was never retried, leaving
-the editor "Offline" with nothing pending and behind the log. Both are fixed
-(see [Bugs found](#bugs-found)).
+**What it found.** In Tandem, three bugs, now fixed: the editor sent a second
+sync while one was in flight (after a WebSocket push that did not continue its
+log), and the first reply then dropped from `pending` operations the second
+carried, so an edit was lost if that sync failed; a failed catch-up sync was
+never retried, leaving the editor "Offline" with nothing pending and behind
+the log; and a commit that succeeded and then reported an error appended
+operations that were never pushed, so tabs that were not typing never heard of
+them. In Porter, one issue, reported, not fixed (a trade-off, #138): a token
+request whose commit succeeded and then reported an error is run again, finds
+its own code used (or its refresh token rotated) and revokes the family it
+just issued; the simulation counts these as the known issue. In Ledger,
+nothing: every seed kept every invariant, racing commits at skewed clocks
+included. See [Bugs found](#bugs-found).
 
 **What it cannot catch.** Concurrency inside one Lean program (the world runs
 one event at a time, so interleavings come only from the world's choices:
@@ -867,3 +875,7 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Host bridge (approved 2026-11-04) | **Waiting inside a synchronous callback for a Lean task that needs Node hung for good**: a task that makes host calls (`Async` run with `.block`), or a timer, DNS lookup or socket read started in the callback. Node's main thread waits for the callback, and the task's thread (or the completion) waits for the main thread | Fixed: the callback's task waits poll (`sync_wait`, through `--wrap` of `lean_task_get` and `lean_io_wait_any_core`), every other thread's indefinite wait is listed (`--wrap` of `emscripten_futex_wait`, `lasm_js_host_wait`), and the main thread stops a wait once every other Lean thread has waited for 50 ms with nothing changed; regressions in `test/fixtures/js-sync-waits` (each part alone, then all), `test/node-js-bridge.test.mjs`, and the model's `taskWaits`, `pureWaits` and mutants |
 | Mutation testing (`build-service`, first run) | **`createBuildService({ unref: true })` did not let the process exit** (the Vite plugin's build worker): the worker's stdout and stderr were piped, and a worker stdio stream waiting for data refs the worker; `unref()` also came before the `'message'` listener, which refs it again | Fixed ([#49](https://github.com/Millillion/lasm/issues/49)): Node forwards the worker's output itself, and `unref()` comes last; regression in `test/dev-build-service.test.mjs` |
 | Mutation testing (`host-bridge`, `edge-glue`) | **Lasm.JS failures wrapped twice**: a settled value that could not be converted, or an awaited promise rejected with a Lasm.JS failure, reached Lean as `Error: TypeError: …`, on Node and the edge | Fixed ([#51](https://github.com/Millillion/lasm/issues/51)) in `src/node-js.mjs` and `src/edge/edge-js.mjs`; regressions in `test/node-js-bridge.test.mjs` and `test/edge-js.test.mjs` |
+| Deterministic simulation of Tandem (first CI run: 12 of 30 seeds) | **The editor could drop an unsent edit from `pending`:** a WebSocket push that did not continue the replica's log sent a second sync while one was in flight, without marking it in flight, so two replies came back and the first one's count (`onReply sent`) dropped operations the second carried. The edit was lost if that second sync failed | Fixed: a push that arrives while a sync is in flight marks the editor behind, and it syncs again when the reply returns (`Frontend/Ui.lean`) |
+| Deterministic simulation of Tandem (first CI run) | A failed catch-up sync (nothing pending) was never retried: the retry ran only while edits were pending, so the editor showed "Offline: 0 edits waiting" and stayed behind the log until someone else typed | Fixed: the retry always syncs |
+| Deterministic simulation of Tandem (third CI run, most seeds with an ambiguous commit) | A commit that succeeded and then reported an error (D1's lost reply, a timeout after `COMMIT`): `syncOnce` ran the sync again, found the operations known and appended and pushed nothing, so tabs that were not typing never heard of them | Fixed: a failed commit checks whether the log holds exactly its operations at its position, and if so answers and pushes them (`Server/App.lean`) |
+| Deterministic simulation of Porter (4 of 30 seeds) | A token request whose commit succeeded and then reported an error is run again by `runRequest`, finds its own code used or its refresh token rotated, answers `invalid_grant` and revokes the family it just issued: one transient database error signs a user out | Reported (#138: a commit receipt, a per-endpoint check, or documenting it); counted by the simulation as the known issue |

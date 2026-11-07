@@ -473,9 +473,13 @@ export class SeedLoop {
 
 /** Collects invariant violations for one run. */
 export class Checks {
-  constructor() { this.failures = []; }
-  that(ok, message) { if (!ok && this.failures.length < 500) this.failures.push(typeof message === "function" ? message() : message); return ok; }
-  fail(message) { this.failures.push(message); }
+  /** `context()`: what to keep when the first violation happens (a trace's tail). */
+  constructor(context = null) { this.failures = []; this.contextOf = context; this.context = null; }
+  that(ok, message) { if (!ok) this.fail(typeof message === 'function' ? message() : message); return ok; }
+  fail(message) {
+    if (this.failures.length === 0 && this.contextOf) this.context = this.contextOf();
+    if (this.failures.length < 500) this.failures.push(message);
+  }
   get ok() { return this.failures.length === 0; }
 }
 
