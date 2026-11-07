@@ -275,7 +275,9 @@ export async function runDev(options, hooks = {}) {
   const { createBuildService } = await import('./dev-build-service.mjs');
   const { findApplicationProject } = await import('./application-sources.mjs');
   const source = resolve(options.input);
-  if (!existsSync(source)) (await import('./application-cli.mjs')).assertSourceExists(options.input);
+  // Every output's source (--target node=Server.lean,browser=Client.lean), before any build.
+  for (const input of new Set([options.input, ...options.outputs.map(o => o.input)]))
+    if (!existsSync(resolve(input))) (await import('./application-cli.mjs')).assertSourceExists(input);
   const project = findApplicationProject(source) ?? dirname(source);
   const target = options.target;
   // The browser target's dev server (docs/BROWSER.md) builds and serves dist/ itself.
