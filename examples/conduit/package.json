@@ -42,7 +42,7 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.5.0",
+    "@lasm/cli": "0.5.1",
     "@netlify/blobs": "11.1.7",
     "@orangeopensource/hurl": "8.0.4",
     "@playwright/test": "1.63.0"

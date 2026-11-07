@@ -5,6 +5,7 @@ for the first page of a URL (with the data it has, logged out), renders
 app starts from the same model, so it hydrates the server's HTML.
 -/
 import Lean.Data.Json
+import Lasm.RPC.Core
 import Lasm.UI.Cmd
 import Conduit.Types
 import Frontend.Route
@@ -136,7 +137,7 @@ inductive Msg where
 
 /-- The messages of an error body (`"email can't be blank"`), or a fallback. -/
 def errorMessages (status : Nat) (body : String) : List String :=
-  match (Json.parse body).toOption.bind (fun j => (ApiError.decode status j).toOption) with
+  match (Lasm.RPC.parseJson body).toOption.bind (fun j => (ApiError.decode status j).toOption) with
   | some e =>
     let msgs := e.errors.flatMap fun (k, ms) => ms.map fun m => s!"{k} {m}"
     if msgs.isEmpty then [s!"The server answered {status}."] else msgs
@@ -148,7 +149,7 @@ def readAnswer {α : Type} (r : Answer) (key : String) (decode : Json → Except
   | .error _ => .error ["Unable to connect to the server. Check your connection and try again."]
   | .ok res =>
     if res.ok then
-      match Json.parse res.body with
+      match Lasm.RPC.parseJson res.body with
       | .ok j =>
         match Decode.get? j key with
         | some v => (decode v).mapError fun e => [s!"Unexpected answer: {e}"]
@@ -162,7 +163,7 @@ def readList (r : Answer) : Except (List String) ArticleList :=
   | .error _ => .error ["Unable to connect to the server. Check your connection and try again."]
   | .ok res =>
     if res.ok then
-      match Json.parse res.body with
+      match Lasm.RPC.parseJson res.body with
       | .ok j => (ArticleList.decode j).mapError fun e => [s!"Unexpected answer: {e}"]
       | .error e => .error [s!"Unexpected answer: {e}"]
     else .error (errorMessages res.status res.body)

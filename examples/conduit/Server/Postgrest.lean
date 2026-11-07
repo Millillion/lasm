@@ -11,6 +11,7 @@ security, which allows nothing to anyone else).
 import Lasm.Fetch
 import Lasm.KV
 import Lean.Data.Json
+import Lasm.RPC.Core
 open Lean Lasm.Fetch
 
 namespace Conduit.Server.Postgrest
@@ -41,7 +42,7 @@ def «open» (url : String) (key : Option String) (table : String := "conduit_kv
     kind := "postgrest"
     get := fun k => do
       let r ← call "GET" s!"{url}?select=value&key=eq.{encode k}" #[("accept", "application/json")]
-      match (Json.parse ((r.text?).getD "")).toOption with
+      match (Lasm.RPC.parseJson ((r.text?).getD "")).toOption with
       | some (.arr rows) => return rows[0]?.bind fun row => (row.getObjValAs? String "value").toOption
       | _ => return none
     put := fun k v => do

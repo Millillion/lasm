@@ -128,11 +128,7 @@ def rpc (input : ByteArray) : String := Id.run do
   | .ok j =>
     match Lasm.RPC.parseJson j.compress with
     | .ok j' => if j'.compress != j.compress then return s!"JSON changed in a round trip: {j.compress} → {j'.compress}"
-    | .error e =>
-      -- Known: Lean prints a zero with more than ten decimal places (`0e-11`)
-      -- as `0.e-N`, which is not JSON (an upstream printer bug, #135);
-      -- anything else is new.
-      if (j.compress.splitOn ".e").length == 1 then return s!"compressed JSON does not parse: {e}"
+    | .error e => return s!"compressed JSON does not parse: {e}"
   | .error _ => pure ()
   return ""
 

@@ -85,14 +85,26 @@ def hugeExponent (text : String) : Bool := Id.run do
     else afterDigit := c.isDigit || c == '.'
   return false
 
+/-- `j` with every zero written `0`. Lean prints a zero with more than ten
+decimal places (`0e-11`, which `-0.0e-51` parses to) as `0.e-42`, which is
+not JSON, so a parsed zero echoed back could not be read (#135). -/
+partial def zerosAsZero : Json → Json
+  | .num n => if n.mantissa == 0 then .num ⟨0, 0⟩ else .num n
+  | .arr a => .arr (a.map zerosAsZero)
+  | .obj kvs => .obj (kvs.foldl (fun acc k v => acc.insert k (zerosAsZero v)) kvs)
+  | j => j
+
 /-- `Json.parse`, refusing numbers with exponents of more than four digits
-(`hugeExponent`): use it for JSON from the network. -/
+(`hugeExponent`), with zeros written `0` (`zerosAsZero`): use it for JSON
+from the network. -/
 def parseJson (text : String) : Except String Json :=
   if hugeExponent text then .error "a number's exponent has more than four digits"
-  else Json.parse text
+  else zerosAsZero <$> Json.parse text
 
 #guard hugeExponent "{\"a\":1e10000}" && hugeExponent "[2E+26191701]" && hugeExponent "1.5e-99999"
 #guard !hugeExponent "{\"a\":1e9999,\"b\":\"1e99999\"}" && !hugeExponent "1e0000005" && !hugeExponent "[\"\\\"1e99999\"]"
+#guard (parseJson "[1,2,{\"a\":[null,true,-0.0e-51]},0e-11,0.0,-2.50e-1]").toOption.map (·.compress)
+  == some "[1,2,{\"a\":[null,true,0]},0,0,-0.25]"
 
 namespace Endpoint
 variable {Req Res : Type}

@@ -10,6 +10,7 @@ A request is strict: an unknown field (for example `timeout` or
 `imported`, which Ledger does not implement) is an error, not ignored.
 -/
 import Lean.Data.Json
+import Lasm.RPC.Core
 import Ledger.Types
 import Ledger.Audit
 open Lean
@@ -174,7 +175,7 @@ def journal (text : String) : Except String (List Account × List Transfer) := d
   for line in text.splitOn "\n" do
     n := n + 1
     if line.trimAscii.isEmpty then continue
-    let j ← Json.parse line |>.mapError (fun _ => s!"line {n}: not JSON")
+    let j ← Lasm.RPC.parseJson line |>.mapError (fun _ => s!"line {n}: not JSON")
     let kvs ← object s!"line {n}" ["type", "data"] j
     match kvs.get? "type", kvs.get? "data" with
     | some (.str "account"), some d => accounts := accounts.push (← decodeAccount s!"line {n}" d)
@@ -187,7 +188,7 @@ def maxBatch : Nat := 8189
 
 /-- A batch: a JSON array of events. -/
 def batch {α : Type} (dec : String → Json → Except String α) (body : String) : Except String (List α) := do
-  let j ← Json.parse body |>.mapError (fun _ => "the body is not valid JSON")
+  let j ← Lasm.RPC.parseJson body |>.mapError (fun _ => "the body is not valid JSON")
   match j with
   | .arr a =>
     if a.size > maxBatch then throw s!"a batch has at most {maxBatch} events"

@@ -3,8 +3,9 @@ version = "0.1.0"
 defaultTargets = ["Ledger", "Proofs"]
 
 # The pure ledger: accounts, transfers, result codes, the rules (generic
-# over the store), JSON, the API and the journal auditor. `lake build`
-# checks it with plain Lean 4.35.0: no Lasm, no JavaScript.
+# over the store), JSON, the API and the journal auditor. No JavaScript; its
+# one Lasm import is Lasm.RPC.Core (pure Lean: the JSON parser for request
+# bodies), so check it with `npm run proofs`.
 [[lean_lib]]
 name = "Ledger"
 
