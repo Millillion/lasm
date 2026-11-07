@@ -11,7 +11,7 @@ sources:
 aiGenerated: true
 ---
 
-> **Generated** by [`scripts/evidence/page.mjs`](../../scripts/evidence/page.mjs) at **2026-11-07 18:35:29 UTC**, and regenerated Monday to Saturday by [`evidence-page.yml`](../../.github/workflows/evidence-page.yml). Do not edit it by hand. The same facts, machine-readable: [`test-evidence.json`](../../docs/evidence/test-evidence.json).
+> **Generated** by [`scripts/evidence/page.mjs`](../../scripts/evidence/page.mjs) at **2026-11-07 19:41:03 UTC**, and regenerated Monday to Saturday by [`evidence-page.yml`](../../.github/workflows/evidence-page.yml). Do not edit it by hand. The same facts, machine-readable: [`test-evidence.json`](../../docs/evidence/test-evidence.json).
 
 This page collects the evidence behind Lasm in one place. Each section has two parts:
 
@@ -55,11 +55,11 @@ A platform has a level when CI's jobs for it, and for every level below, succeed
 
 | Tier | Workflow | What it runs | Latest run | Result |
 | --- | --- | --- | --- | --- |
-| PR | [`differential.yml`](../../.github/workflows/differential.yml) | differential regressions and seeded programs, target equivalence, stack depth | [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42395300306) | passed |
-| PR | [`fuzz.yml`](../../.github/workflows/fuzz.yml) | the fuzz corpus and regressions, replayed | [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42399791659) | passed |
-| PR | [`tooling.yml`](../../.github/workflows/tooling.yml) | the tooling error corpus | [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42399791859) | passed |
+| PR | [`differential.yml`](../../.github/workflows/differential.yml) | differential regressions and seeded programs, target equivalence, stack depth | [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42401197297) | passed |
+| PR | [`fuzz.yml`](../../.github/workflows/fuzz.yml) | the fuzz corpus and regressions, replayed | [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42405927990) | passed |
+| PR | [`tooling.yml`](../../.github/workflows/tooling.yml) | the tooling error corpus | [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42401197275) | passed |
 | PR | [`library-proofs.yml`](../../.github/workflows/library-proofs.yml) | the library's proofs | [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42399791680) | passed |
-| PR | [`conduit.yml`](../../.github/workflows/conduit.yml) | Conduit: RealWorld API and E2E suites, equivalence | [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42381691066) | passed |
+| PR | [`conduit.yml`](../../.github/workflows/conduit.yml) | Conduit: RealWorld API and E2E suites, equivalence | [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42399791656) | passed |
 | PR | [`conduit-platforms.yml`](../../.github/workflows/conduit-platforms.yml) | Conduit on 15 more platforms, equivalence | [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42399791755) | passed |
 | Nightly | [`ci-nightly.yml`](../../.github/workflows/ci-nightly.yml) | the release suites: unit, browser, edge, Bun/Deno, WASI, UI, fullstack, dev loop, Lasm.JS stress | no run yet | — |
 | Nightly | [`nightly.yml`](../../.github/workflows/nightly.yml) | the upstream Lean suite and the ecosystem | [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42379475399) | passed |
@@ -138,7 +138,7 @@ No scheduled fuzzing campaign on `main` yet. Until there is one, the corpus and 
 
 ### About
 
-Coverage-guided fuzzing feeds generated inputs to the code that reads input from outside, and fails on a crash, a hang or a broken property. Nightly campaigns run 10 minutes per target, and the Sunday campaign 60 minutes. The targets:
+Coverage-guided fuzzing feeds generated inputs to the code that reads input from outside, and fails on a crash, a hang or a broken property. Nightly campaigns run 10 minutes per target, and the weekly campaign 60 minutes. The targets:
 
 - `cli-arguments` (JavaScript (V8 block coverage)): the CLI's argument parser (src/cli-arguments.mjs and the init, dev and package parsers it calls).
 - `serverless-http` (JavaScript (V8 block coverage)): the function platforms' HTTP boundary (src/serverless/): AWS Lambda's event → request mapping (API Gateway REST and HTTP API, function URLs, ALB, CloudFront) in lasm-lambda.mjs, and the cookie and body helpers of lasm-server.mjs every platform shim uses (joinCookies, parseSetCookie, azureReply, isTextual).
@@ -178,21 +178,21 @@ Generated Lean programs are compiled by Lasm and by Lean's own native compiler, 
 
 ### Measured by CI
 
-The fetch app on every server target, latest merge: [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42395300306).
+The fetch app on every server target, latest merge: [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42401197297).
 
 | Job | Result |
 | --- | --- |
-| equivalence (fetch-example) | [passed](https://github.com/Millillion/lasm/actions/runs/42395300306/job/128473642080) |
-| equivalence (fetch-template) | [passed](https://github.com/Millillion/lasm/actions/runs/42395300306/job/128473642135) |
+| equivalence (fetch-template) | [passed](https://github.com/Millillion/lasm/actions/runs/42401197297/job/128495994749) |
+| equivalence (fetch-example) | [passed](https://github.com/Millillion/lasm/actions/runs/42401197297/job/128495994782) |
 
-Conduit's RealWorld traffic compared with Node's, latest merge: [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42381691066) and [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42399791755).
+Conduit's RealWorld traffic compared with Node's, latest merge: [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42399791656) and [2026-11-07](https://github.com/Millillion/lasm/actions/runs/42399791755).
 
 | Platform | Result |
 | --- | --- |
-| Bun (bun:sqlite) | [passed](https://github.com/Millillion/lasm/actions/runs/42381691066/job/128430469514) |
-| Node 26.13.0 | [passed](https://github.com/Millillion/lasm/actions/runs/42381691066/job/128430469606) |
-| Cloudflare Workers (wrangler dev, local D1) | [passed](https://github.com/Millillion/lasm/actions/runs/42381691066/job/128430469759) |
-| Node 24 | [passed](https://github.com/Millillion/lasm/actions/runs/42381691066/job/128430469789) |
+| Cloudflare Workers (wrangler dev, local D1) | [passed](https://github.com/Millillion/lasm/actions/runs/42399791656/job/128484884334) |
+| Node 24 | [passed](https://github.com/Millillion/lasm/actions/runs/42399791656/job/128484884517) |
+| Node 26.13.0 | [passed](https://github.com/Millillion/lasm/actions/runs/42399791656/job/128484884579) |
+| Bun (bun:sqlite) | [passed](https://github.com/Millillion/lasm/actions/runs/42399791656/job/128484884734) |
 | Docker (node:24-bookworm-slim, read-only, 512 MB) | [passed](https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885293) |
 | Netlify Functions (netlify build offline; Netlify's bootstrap in the Lambda Node 24 image) | [passed](https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885296) |
 | Vercel Functions (vercel build offline, Vercel's Node launcher) | [passed](https://github.com/Millillion/lasm/actions/runs/42399791755/job/128484885346) |

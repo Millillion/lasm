@@ -9,7 +9,7 @@ name: DST nightly
 # are new; or on demand. Not a release gate.
 on:
   schedule:
-    - cron: '23 3 * * *'
+    - cron: '23 3 * * 0,2-6'
   workflow_dispatch:
 permissions:
   contents: read

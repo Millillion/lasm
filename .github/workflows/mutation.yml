@@ -8,7 +8,7 @@ name: Mutation testing
 # Free runners; the tests need no managed Lean or native helpers.
 on:
   schedule:
-    - cron: '37 5 * * *'
+    - cron: '37 5 * * 1-6'
   workflow_dispatch:
     inputs:
       modules:

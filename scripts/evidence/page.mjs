@@ -358,7 +358,7 @@ export function renderPage(summary) {
     p(table(['Target', 'Seconds', 'Runs', 'Seed', 'Result'], ci.fuzz.targets.map(t => [t.name.replace(/^Fuzz /, ''), num(t.seconds), num(t.runs), t.seed ?? '—', `[${outcome(t.conclusion)}](${t.url})`])));
   }
   p('### About');
-  p('Coverage-guided fuzzing feeds generated inputs to the code that reads input from outside, and fails on a crash, a hang or a broken property. Nightly campaigns run 10 minutes per target, and the Sunday campaign 60 minutes. The targets:',
+  p('Coverage-guided fuzzing feeds generated inputs to the code that reads input from outside, and fails on a crash, a hang or a broken property. Nightly campaigns run 10 minutes per target, and the weekly campaign 60 minutes. The targets:',
     '', ...r.fuzzTargets.map(t => `- \`${t.name}\` (${t.engine}): ${t.description}`), '', 'Details: [Fuzzing at the boundaries](../../docs/TESTING.md#fuzzing-at-the-boundaries).');
 
   // DST

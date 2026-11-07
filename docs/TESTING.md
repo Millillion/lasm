@@ -448,7 +448,7 @@ to `main` replays the committed corpus and regressions of the JavaScript
 targets, and of the native targets when `library/`, `src/wasi/`, the Lean
 provisioning or `test/fuzz/` change (also `test/fuzz-replay.test.mjs` in the
 unit suite); nightly (02:23 UTC) a 10-minute campaign per target; weekly
-(Sunday 06:41 UTC) a 60-minute campaign per target. A campaign fails on any
+(Saturday 06:41 UTC) a 60-minute campaign per target. A campaign fails on any
 failing input and uploads its new corpus entries and failing inputs (artifact
 `fuzz-<target>`, 30 days).
 
@@ -729,7 +729,7 @@ tier and why that is safe, and the PR-tier measurements. In short:
 | --- | --- | --- |
 | PR | every pull request (path-filtered), then the push to `main` unfiltered | the unit suite; boundary fuzzing: the committed corpus and regressions replayed (seconds; native targets when their sources change); host bridge: the model (about 1 s), 20 schedule-fuzzed runs per stress program on Linux and their traces' conformance; differential: regressions + three seeded program pairs (525 cases) on node, wasi, node:wasi, edge, plus the interpreter, `node-O0` and the edge `.wasm` on Node, Bun and SpiderMonkey; target equivalence of the fetch template and `examples/fetch` on node, deno, bun, wasi-http, workers; recursion depth on Linux and Windows. macOS only when macOS-specific code changes. Skipped for a change to docs or the flagship apps only (they have their own workflows) |
 | Nightly | 01:07 to 09:17 UTC | the release suites (`ci-nightly.yml`: unit, browser, edge and Bun/Deno, WASI, UI, fullstack, dev loop, Lasm.JS stress); boundary fuzzing: 10 minutes per target (`fuzz.yml`); host bridge: 200 schedule-fuzzed runs per stress program on four platforms; differential: 60-minute campaigns for the release and the dev profile, every oracle, and the macOS jobs (recursion depth, the C tier on three macOS runners); tooling metamorphic and fault runs; mutation on every module; the example apps' DST with random seeds and campaigns; the nightly upstream suite (`nightly.yml`) |
-| Weekly | Saturday 12:07 and Sunday 06:41 UTC | differential: 100-minute campaigns in both profiles, and the Lasm.JS soak (200 runs per program on four platforms) (`ci-weekly.yml`); boundary fuzzing: 60 minutes per target (`fuzz.yml`) |
+| Weekly | Saturday 06:41 and 12:07 UTC | differential: 100-minute campaigns in both profiles, and the Lasm.JS soak (200 runs per program on four platforms) (`ci-weekly.yml`); boundary fuzzing: 60 minutes per target (`fuzz.yml`) |
 | Release | a version bump (`release-checks`) | every launch workflow, Lasm.JS stress, unit suite, npm rehearsal (unchanged) |
 
 ## Evidence levels

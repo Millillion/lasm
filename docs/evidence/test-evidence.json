@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "about": "Lasm test evidence (scripts/evidence/page.mjs). \"ci\" holds what CI measured, read from the GitHub API at generatedAt; \"repository\" holds what is recorded in the repository and checked by CI on every change. Rendered as content/learn/test-evidence.md.",
-  "generatedAt": "2026-11-07T18:35:29.705Z",
+  "generatedAt": "2026-11-07T19:41:03.759Z",
   "repository": "Millillion/lasm",
   "commit": null,
   "repository_facts": {
@@ -341,11 +341,11 @@
         "workflow": "differential.yml",
         "what": "differential regressions and seeded programs, target equivalence, stack depth",
         "run": {
-          "id": 42395300306,
-          "url": "https://github.com/Millillion/lasm/actions/runs/42395300306",
+          "id": 42401197297,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42401197297",
           "event": "push",
           "branch": "main",
-          "date": "2026-11-07T17:38:56Z",
+          "date": "2026-11-07T19:28:21Z",
           "conclusion": "success"
         }
       },
@@ -354,11 +354,11 @@
         "workflow": "fuzz.yml",
         "what": "the fuzz corpus and regressions, replayed",
         "run": {
-          "id": 42399791659,
-          "url": "https://github.com/Millillion/lasm/actions/runs/42399791659",
+          "id": 42405927990,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42405927990",
           "event": "push",
           "branch": "main",
-          "date": "2026-11-07T18:15:43Z",
+          "date": "2026-11-07T19:26:08Z",
           "conclusion": "success"
         }
       },
@@ -367,11 +367,11 @@
         "workflow": "tooling.yml",
         "what": "the tooling error corpus",
         "run": {
-          "id": 42399791859,
-          "url": "https://github.com/Millillion/lasm/actions/runs/42399791859",
+          "id": 42401197275,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42401197275",
           "event": "push",
           "branch": "main",
-          "date": "2026-11-07T18:22:40Z",
+          "date": "2026-11-07T18:53:42Z",
           "conclusion": "success"
         }
       },
@@ -393,11 +393,11 @@
         "workflow": "conduit.yml",
         "what": "Conduit: RealWorld API and E2E suites, equivalence",
         "run": {
-          "id": 42381691066,
-          "url": "https://github.com/Millillion/lasm/actions/runs/42381691066",
+          "id": 42399791656,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42399791656",
           "event": "push",
           "branch": "main",
-          "date": "2026-11-07T15:46:37Z",
+          "date": "2026-11-07T18:57:06Z",
           "conclusion": "success"
         }
       },
@@ -678,55 +678,55 @@
     "equivalence": {
       "fetch": {
         "run": {
-          "id": 42395300306,
-          "url": "https://github.com/Millillion/lasm/actions/runs/42395300306",
+          "id": 42401197297,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42401197297",
           "event": "push",
           "branch": "main",
-          "date": "2026-11-07T17:38:56Z",
+          "date": "2026-11-07T19:28:21Z",
           "conclusion": "success"
         },
         "jobs": [
           {
-            "name": "equivalence (fetch-example)",
-            "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42395300306/job/128473642080"
-          },
-          {
             "name": "equivalence (fetch-template)",
             "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42395300306/job/128473642135"
+            "url": "https://github.com/Millillion/lasm/actions/runs/42401197297/job/128495994749"
+          },
+          {
+            "name": "equivalence (fetch-example)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42401197297/job/128495994782"
           }
         ]
       },
       "conduit": {
         "run": {
-          "id": 42381691066,
-          "url": "https://github.com/Millillion/lasm/actions/runs/42381691066",
+          "id": 42399791656,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42399791656",
           "event": "push",
           "branch": "main",
-          "date": "2026-11-07T15:46:37Z",
+          "date": "2026-11-07T18:57:06Z",
           "conclusion": "success"
         },
         "jobs": [
           {
-            "name": "API on Bun (bun:sqlite)",
-            "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691066/job/128430469514"
-          },
-          {
-            "name": "API on Node 26.13.0",
-            "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691066/job/128430469606"
-          },
-          {
             "name": "API on Cloudflare Workers (wrangler dev, local D1)",
             "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691066/job/128430469759"
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791656/job/128484884334"
           },
           {
             "name": "API on Node 24",
             "conclusion": "success",
-            "url": "https://github.com/Millillion/lasm/actions/runs/42381691066/job/128430469789"
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791656/job/128484884517"
+          },
+          {
+            "name": "API on Node 26.13.0",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791656/job/128484884579"
+          },
+          {
+            "name": "API on Bun (bun:sqlite)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42399791656/job/128484884734"
           }
         ]
       },
