@@ -74,7 +74,8 @@ def ctx (d : Data) : Porter.Ctx :=
 
 def answer (w : Value) (env : Porter.Server.Env) (d : Data) (reply : Porter.Reply) : IO Unit := do
   let wire := reply.render env.cfg
-  call w "reply" #[toJS (nat d "id"), toJS wire.status, toJS (wire.headers.map fun (k, v) => #[k, v]), toJS wire.body]
+  call w "reply" #[toJS (nat d "id"), toJS wire.status, toJS (wire.headers.map fun (k, v) => #[k, v]), toJS wire.body,
+    toJS (nat d "now")]
 
 /-- What one request read before committing (`race`). -/
 structure Read where

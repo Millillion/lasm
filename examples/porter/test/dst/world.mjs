@@ -98,7 +98,6 @@ class World {
     this.offset = 0;
     this.instanceSkew = [0, 1, 2, 3].map(() => (p.skew ? this.chaos.range(-30, 30) : 0));
     this.serverQueue = [];
-    this.requestNow = new Map();     // request id -> the clock reading it was served with
     this.ambiguousIds = new Set();   // requests during which a commit's outcome was unknown
     this.lastAmbiguous = 0;
     this.uncheckedIds = new Set();   // requests whose receipt could not be read after an ambiguous commit
@@ -140,8 +139,6 @@ class World {
 
   serverEvent(r, i = 0) {
     const now = this.now(i);
-    if (!r.duplicate) this.requestNow.set(r.id, now);
-    else if (!this.requestNow.has(r.id)) this.requestNow.set(r.id, now);
     return { id: r.id, method: r.method, url: r.url, body: r.body, headers: r.headers, now, ...this.freshValues() };
   }
 
@@ -246,12 +243,11 @@ class World {
       res.ambiguous = this.ambiguousIds.delete(id);
       res.unchecked = this.uncheckedIds.delete(id);
       if (res.ok) {
-        res.headers = res.body.headers; res.status = res.body.status; res.now = this.requestNow.get(id); res.body = res.body.text;
+        res.headers = res.body.headers; res.status = res.body.status; res.now = res.body.now; res.body = res.body.text;
         if (ag) this.remember(ag, res.headers);
         const error = res.status >= 400 ? /"error":"([^"]+)"/.exec(res.body)?.[1] : null;
         this.trace.log(`  #${id} was ${res.status}${error ? ` ${error}` : ''} at ${res.now}${res.duplicated ? ' (duplicated)' : ''}${res.ambiguous ? ' (its commit was ambiguous)' : ''}`);
       }
-      this.requestNow.delete(id);
       done(res);
     });
     this.headersOf.set(id, hs);
@@ -426,10 +422,14 @@ class World {
     const old = t.refresh;
     const { form, headers } = this.clientAuth(ag.client, { grant_type: 'refresh_token', refresh_token: old });
     ag.busy = true;
+    const busyAtSend = this.busy(t.family);
     const done = this.revoking(t.family);
     this.post(ag, '/token', { form, headers }, res => {
       ag.busy = false;
       done();
+      // Another request that may revoke the family (a replayed code, a reused refresh token)
+      // was in flight: it may have revoked it before this refresh was served.
+      const racing = busyAtSend || this.busy(t.family);
       const info = this.refreshes.get(old);
       if (!res.ok || res.status === 503) {
         // The rotation may have happened: our refresh token is now possibly rotated.
@@ -457,6 +457,7 @@ class World {
           this.families.get(t.family).unsure = true;
           if (info) info.unsure = true;
         }
+        else if (racing) this.families.get(t.family).unsure = true;
         else if (!this.familyRevoked(t.family) && !this.families.get(t.family).unsure) this.checks.fail(`agent${ag.a}: a live refresh token of a live family was refused at ${res.now}`);
         ag.tokens = null;
         return this.later(this.work.range(500, 3000), () => this.flow(ag));
@@ -552,7 +553,10 @@ class World {
     this.begin();
   }
 
-  reply(id, status, headers, body) {
+  /** Porter's answer to a request, served at clock reading `now` (a duplicated request is
+  served twice, each copy at its own instance's clock; the agent gets whichever answer
+  arrives first, so each answer carries its own `now`). */
+  reply(id, status, headers, body, now) {
     if (this.store.stats.ambiguous > this.lastAmbiguous) { this.lastAmbiguous = this.store.stats.ambiguous; this.ambiguousIds.add(id); }
     if (this.uncheckedPending) { this.uncheckedPending = false; this.uncheckedIds.add(id); }
     if (!this.healed && this.chaos.chance(this.profile.crashes / 100)) {
@@ -560,7 +564,7 @@ class World {
       this.crash();
       return;
     }
-    this.http.respond(id, 200, { status, headers, text: body });
+    this.http.respond(id, 200, { status, headers, text: body, now });
   }
 
   fail(message) { this.checks.fail(message); this.trace.log(`VIOLATION ${message}`); this.context ??= this.trace.tail(120); }
