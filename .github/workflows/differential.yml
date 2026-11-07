@@ -22,6 +22,17 @@ name: Differential testing
 on:
   pull_request:
     branches: [main]
+    # Not on a change to docs, Markdown, content/ or the five flagship apps only
+    # (they have their own workflows); the push to main always runs (docs/CI.md).
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'content/**'
+      - 'examples/conduit/**'
+      - 'examples/folio/**'
+      - 'examples/ledger/**'
+      - 'examples/porter/**'
+      - 'examples/tandem/**'
   push:
     branches: [main]
   schedule:
@@ -46,7 +57,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: differential-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
+  # github.workflow: ci-weekly.yml's call never queues behind this workflow's own nightly run.
+  group: differential-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 env:
   WASMTIME_VERSION: v49.0.4
@@ -62,6 +74,32 @@ env:
   DIFF_TARGETS_PR: node,wasi,wasi-node,deno,interp,node-O0,edge-node,edge-bun,edge-sm,bun,browser-chromium
   DIFF_TARGETS_FULL: node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm,bun,bun-O0,browser-chromium,browser-firefox,browser-webkit
 jobs:
+  # The macOS jobs (stack-depth on macOS, macos-c-tier) run nightly, weekly and by
+  # hand; on a pull request or a push to main only when macOS-specific code
+  # changes (docs/CI.md#what-moved-out-of-the-pr-tier-and-why-that-is-safe).
+  scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      macos: ${{ steps.scope.outputs.macos }}
+    steps:
+      - id: scope
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          PR: ${{ github.event.pull_request.number }}
+          BEFORE: ${{ github.event.before }}
+          MACOS_PATHS: '^(src/macos-tbd\.mjs|src/managed-lean\.mjs|src/managed-artifacts\.mjs|scripts/lean-dist/|scripts/ci/macos-c-tier\.mjs|scripts/ci/stack-depth\.mjs|scripts/ecosystem/projects/native-tactic/|test/macos-tbd\.test\.mjs|test/managed-lean-tiers\.test\.mjs|test/fixtures/macos-tbd/|\.github/workflows/differential\.yml$|\.github/actions/install-candidate/)'
+        run: |
+          case "$EVENT" in
+            pull_request) files=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR/files" --jq '.[].filename') ;;
+            push) files=$(gh api "repos/$GITHUB_REPOSITORY/compare/$BEFORE...$GITHUB_SHA" --jq '.files[].filename' || true) ;;
+            *) files= ;;
+          esac
+          # Not a pull request or a push (schedule, dispatch, a call from ci-weekly.yml), or an
+          # unknown range (a new branch, a failed comparison, no files): the macOS jobs run.
+          if [ -z "$files" ] || printf '%s' "$BEFORE" | grep -qE '^0+$'; then files=.github/workflows/differential.yml; fi
+          if printf '%s\n' "$files" | grep -qE "$MACOS_PATHS"; then echo macos=true; else echo macos=false; fi | tee -a "$GITHUB_OUTPUT"
   pack:
     if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     # The retained runtime input is a draft release asset (needs contents: write to read).
@@ -267,11 +305,11 @@ jobs:
   # scripts/ci/stack-depth.mjs): the default stack differs there (Windows
   # commits thread stacks), so it is checked on each.
   stack-depth:
-    needs: pack
+    needs: [scope, pack]
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-15, windows-2025]
+        runner: ${{ fromJSON(needs.scope.outputs.macos == 'true' && '["macos-15","windows-2025"]' || '["windows-2025"]') }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     defaults:
@@ -311,8 +349,8 @@ jobs:
   # with the SDK as it is and once with an SDK whose stub lists the arm64e.x1
   # targets of newer SDKs (rejected by that linker unless Lasm filters them).
   macos-c-tier:
-    needs: pack
-    if: github.event_name != 'schedule'
+    needs: [scope, pack]
+    if: needs.scope.outputs.macos == 'true'
     strategy:
       fail-fast: false
       matrix:

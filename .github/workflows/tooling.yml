@@ -18,6 +18,17 @@ name: Dependable tooling
 on:
   pull_request:
     branches: [main]
+    # Not on a change to docs, Markdown, content/ or the five flagship apps only
+    # (they have their own workflows); the push to main always runs (docs/CI.md).
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'content/**'
+      - 'examples/conduit/**'
+      - 'examples/folio/**'
+      - 'examples/ledger/**'
+      - 'examples/porter/**'
+      - 'examples/tandem/**'
   push:
     branches: [main]
   schedule:
