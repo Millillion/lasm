@@ -33,13 +33,25 @@ structure Store where
 
 instance : Inhabited Store := ⟨{ kind := "none", get := fun _ => pure none, put := fun _ _ => pure (), delete := fun _ => pure () }⟩
 
+/-- The memory store's contents. `get`, `put` and `delete` of the memory
+store are these functions on the table it holds, which is what its proofs
+are about (library/Lasm/KV/Spec.lean). -/
+abbrev Table := Std.HashMap String String
+
+/-- The value of `key`, if any. -/
+def Table.read (t : Table) (key : String) : Option String := t[key]?
+/-- The table with `key` set to `value`. -/
+def Table.write (t : Table) (key value : String) : Table := t.insert key value
+/-- The table without `key`. -/
+def Table.remove (t : Table) (key : String) : Table := t.erase key
+
 /-- A store in memory. -/
 def memory : IO Store := do
-  let table ← IO.mkRef ({} : Std.HashMap String String)
+  let table ← IO.mkRef ({} : Table)
   return { kind := "memory",
-           get := fun k => do return (← table.get)[k]?,
-           put := fun k v => table.modify (·.insert k v),
-           delete := fun k => table.modify (·.erase k) }
+           get := fun k => do return Table.read (← table.get) k,
+           put := fun k v => table.modify (Table.write · k v),
+           delete := fun k => table.modify (Table.remove · k) }
 
 /-- The binding `name` of the edge platform's `env` (Workers), if it is an object. -/
 def binding (name : String) : IO (Option Value) := do

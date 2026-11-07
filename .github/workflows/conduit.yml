@@ -116,11 +116,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           package-manager-cache: false
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: npm ci
         working-directory: examples/conduit
         run: npm ci --no-audit --no-fund
@@ -156,11 +152,7 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: npm ci, and the pinned wrangler (with workerd)
         working-directory: examples/conduit
         run: |
@@ -198,11 +190,7 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: npm ci, and the pinned Bun
         working-directory: examples/conduit
         run: |
@@ -247,11 +235,7 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: npm ci
         working-directory: examples/conduit
         run: npm ci --no-audit --no-fund
@@ -260,9 +244,9 @@ jobs:
         run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
       - name: The pinned Playwright's ${{ matrix.browser }}, with its system packages
         timeout-minutes: 30
-        run: |
-          npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
-          bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
+        uses: ./.github/actions/playwright
+        with:
+          browsers: ${{ matrix.browser }}
       - name: The official RealWorld end-to-end suite
         working-directory: examples/conduit
         env:
@@ -300,11 +284,7 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: npm ci, and the pinned wrangler (with workerd)
         working-directory: examples/conduit
         run: |
@@ -315,9 +295,10 @@ jobs:
         working-directory: examples/conduit
         run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:workers
       - name: The pinned Playwright's chromium
-        run: |
-          npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
-          bash scripts/ci/playwright-install.sh chromium
+        timeout-minutes: 30
+        uses: ./.github/actions/playwright
+        with:
+          browsers: chromium
       - name: The official RealWorld end-to-end suite against wrangler dev
         working-directory: examples/conduit
         env:
@@ -348,11 +329,7 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: npm ci, and the pinned Bun
         working-directory: examples/conduit
         run: |
@@ -364,9 +341,9 @@ jobs:
         run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:bun
       - name: The pinned Playwright's chromium
         timeout-minutes: 30
-        run: |
-          npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
-          bash scripts/ci/playwright-install.sh chromium
+        uses: ./.github/actions/playwright
+        with:
+          browsers: chromium
       - name: The official RealWorld end-to-end suite against Bun
         working-directory: examples/conduit
         env:

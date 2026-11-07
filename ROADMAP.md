@@ -39,6 +39,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - The next example apps: **Ledger** (landed 2026-11-02), then the **Markdown site generator** (building now), following [NEXT_EXAMPLE_APPS.md](docs/proposals/NEXT_EXAMPLE_APPS.md)'s build plan. Ledger follows TigerBeetle's data model and result codes, so TigerBeetle can serve as its differential oracle.
 
 ## Jordan's checklist (his words, 2026-11-02; from issue #21)
+- [ ] (J) Hone the propositions of Lasm's own library: 30 in [library/Lasm/UI/Spec.lean](library/Lasm/UI/Spec.lean), [RPC/Spec.lean](library/Lasm/RPC/Spec.lean), [KV/Spec.lean](library/Lasm/KV/Spec.lean) and [Fetch/Spec.lean](library/Lasm/Fetch/Spec.lean) ([library/PROOFS.md](library/PROOFS.md)).
 - [ ] (J) Hone the Lean code of every example, especially the propositions and the theorem structure: Conduit first (52 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean)), then Ledger (31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean)).
 - [ ] (J) Review the whole `lasm` CLI: its UX, and that it works.
 - [ ] (J) Hone the libraries Lasm added: Lasm.Fetch, Lasm.UI, Lasm.JS, Lasm.RPC, Lasm.Web, Lasm.KV.
@@ -147,7 +148,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [x] Target equivalence for Conduit's RealWorld traffic, with token and timestamp normalization: every Conduit API job (Node 24 and 26, Workers, Bun and the 15 platforms of `conduit-platforms.yml`) compares the official suite's 154 exchanges with Node's committed recording (`examples/conduit/test/equivalence.mjs`, docs/TESTING.md#conduits-realworld-traffic). No divergence in Conduit or Lasm; the first run found only platform-added headers and the key-value stores' shared id sequence (both normalized, documented).
 - [ ] Consolidate the 63 CI workflows into PR, nightly, weekly and release tiers.
 - [ ] Example app 3: the Markdown site generator, held to CommonMark's 652 examples, on WASI, Fastly, the edge and the browser.
-- [ ] Organize the proofs of Lasm's own libraries (Lasm.UI, RPC, KV) like Conduit's Spec.lean, for human review (issue #21).
+- [x] Organize the proofs of Lasm's own libraries (Lasm.UI, RPC, KV) like Conduit's Spec.lean, for human review (issue #21). 30 propositions in four Spec files (Lasm.UI 9, Lasm.RPC 14, Lasm.KV 6, Lasm.Fetch 1), each proved by its `Theorems.lean`, listed in [library/PROOFS.md](library/PROOFS.md) with the candidates not yet proved; `library-proofs.yml` checks them on every library change.
 - [ ] Lean 4.36: resume when 4.36.0 stable ships, around mid-November. It becomes the next minor release after 0.4.0.
 
 ## Later (first half of 2027)

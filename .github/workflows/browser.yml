@@ -73,11 +73,7 @@ jobs:
           architecture: x64
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: Native host pieces (koffi, helpers)
         run: |
           node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
@@ -106,11 +102,7 @@ jobs:
           architecture: x64
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - uses: actions/download-artifact@v4
         with:
           name: browser-native-host
@@ -157,16 +149,13 @@ jobs:
           node bin/lasm.mjs init .work/browser-work/dev-edge --template hono --deploy workers
           (cd .work/browser-work/dev-edge && node -e "const p=require('./package.json');delete p.devDependencies;require('fs').writeFileSync('package.json',JSON.stringify(p,null,2))" && npm install --no-audit --no-fund)
           node scripts/edge/dev-edge-check.mjs .work/browser-work/dev-edge .work/browser-apps/dev-edge.json
-      - name: Playwright's Chromium, cached per version (for vite dev)
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ env.PLAYWRIGHT }}-chromium-ubuntu-24.04
-      - name: Pinned Playwright and Chromium
+      - name: Pinned Playwright and Chromium, cached per version (for vite dev)
         timeout-minutes: 30
-        run: |
-          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          bash scripts/ci/playwright-install.sh chromium
+        uses: ./.github/actions/playwright
+        with:
+          version: ${{ env.PLAYWRIGHT }}
+          browsers: chromium
+          cache-key: playwright-${{ env.PLAYWRIGHT }}-chromium-ubuntu-24.04
       - name: 'The Vite plugin (@lasm/cli/vite, installed from a packed CLI) in development: edit Main.lean, the app is rebuilt and remounted in place'
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
@@ -207,19 +196,14 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - name: Playwright's browser builds, cached per version
-        if: steps.gate.outputs.run == 'true'
-        uses: actions/cache@v4
-        with:
-          path: ${{ runner.os == 'macOS' && '~/Library/Caches/ms-playwright' || '~/.cache/ms-playwright' }}
-          key: playwright-${{ env.PLAYWRIGHT }}-${{ matrix.browser }}-${{ matrix.runner }}
-      - name: Pinned Playwright and its ${{ matrix.browser }} build
+      - name: Pinned Playwright and its ${{ matrix.browser }} build, cached per version
         if: steps.gate.outputs.run == 'true'
         timeout-minutes: 30
-        shell: bash
-        run: |
-          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
+        uses: ./.github/actions/playwright
+        with:
+          version: ${{ env.PLAYWRIGHT }}
+          browsers: ${{ matrix.browser }}
+          cache-key: playwright-${{ env.PLAYWRIGHT }}-${{ matrix.browser }}-${{ matrix.runner }}
       - uses: actions/download-artifact@v4
         if: steps.gate.outputs.run == 'true'
         with:
