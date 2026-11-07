@@ -36,7 +36,7 @@ const jsonPath = process.env.LIBRARY_PROOFS_JSON ?? join(work, 'proofs.json');
 // The proof modules, in import order, and the libraries whose Spec.lean
 // PROOFS.md lists (in that order).
 const proofModules = ['Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.Proofs.Children',
-  'Lasm.UI.Proofs.TwoEnded', 'Lasm.UI.Proofs.Diff', 'Lasm.UI.Proofs', 'Lasm.UI.Spec', 'Lasm.UI.Theorems',
+  'Lasm.UI.Proofs.TwoEnded', 'Lasm.UI.Proofs.Diff', 'Lasm.UI.Proofs', 'Lasm.UI.Proofs.Decode', 'Lasm.UI.Proofs.Wire', 'Lasm.UI.Spec', 'Lasm.UI.Theorems',
   'Lasm.RPC.Spec', 'Lasm.RPC.Theorems', 'Lasm.KV.Spec', 'Lasm.KV.Theorems', 'Lasm.Fetch.Spec', 'Lasm.Fetch.Theorems'];
 const libraries = ['Lasm.UI', 'Lasm.RPC', 'Lasm.KV', 'Lasm.Fetch'];
 const sourceOf = module => join(library, ...module.split('.')) + '.lean';
