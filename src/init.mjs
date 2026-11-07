@@ -95,7 +95,7 @@ export function parseInitArguments(tokens) {
     const deploy = /^--deploy(?:=(.*))?$/.exec(token);
     if (deploy) {
       const value = deploy[1] ?? tokens[++i];
-      if (!deployTargets[value]) throw new Error(`--deploy accepts ${Object.keys(deployTargets).join(', ')}\n\n` + initUsage);
+      if (!Object.hasOwn(deployTargets, value ?? '')) throw new Error(`--deploy accepts ${Object.keys(deployTargets).join(', ')}\n\n` + initUsage);
       if (!result.deploy.includes(value)) result.deploy.push(value);
       continue;
     }
@@ -103,7 +103,8 @@ export function parseInitArguments(tokens) {
     positional.push(token);
   }
   if (positional.length !== 1) throw new Error(initUsage);
-  if (!templates[result.template])
+  // Own keys only: `constructor` or `__proto__` is not a template (found by test/fuzz).
+  if (!Object.hasOwn(templates, result.template))
     throw new Error(`Unknown template "${result.template}". Choose one of: ${Object.keys(templates).join(', ')}`);
   const serverOnly = result.deploy.find(target => !deployTargets[target].cli);
   if (serverOnly && !templates[result.template].server)
@@ -629,7 +630,7 @@ const spinName = name => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(
 
 /** Creates the project; returns { directory, files }. */
 export function initProject({ directory, template, deploy = [] }) {
-  if (!templates[template]) throw new Error(`Unknown template "${template}"`);
+  if (!Object.hasOwn(templates, template)) throw new Error(`Unknown template "${template}"`);
   const target = resolve(directory);
   if (existsSync(target)) {
     if (!statSync(target).isDirectory()) throw new Error(`${directory} is a file, not a directory. Choose a new or empty directory.`);

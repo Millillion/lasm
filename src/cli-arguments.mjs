@@ -32,7 +32,8 @@ const targetAliases = { cloudflare: 'workers', 'cloudflare-workers': 'workers', 
   cloudfront: 'lambda-edge', supabase: 'supabase-edge', 'deno-deploy-edge': 'deno-deploy', spin: 'wasi-http', wasmtime: 'wasi', web: 'browser',
   vite: 'browser', 'azure-functions': 'azure', 'google-cloud-functions': 'gcf', 'cloud-functions': 'gcf', 'vercel-functions': 'vercel', 'netlify-functions': 'netlify' };
 export function targetHint(value) {
-  const guess = targetAliases[value.toLowerCase()] ?? closest(value, buildTargets);
+  const alias = value.toLowerCase();
+  const guess = (Object.hasOwn(targetAliases, alias) ? targetAliases[alias] : undefined) ?? closest(value, buildTargets);
   return guess ? ` (did you mean --target ${guess}?)` : '';
 }
 
@@ -83,7 +84,6 @@ export function parseLasmArguments(argv) {
   if (tokens[0] === 'init') return parseInitArguments(tokens.slice(1));
   if (tokens[0] === 'dev') return parseDevArguments(tokens.slice(1));
   if (tokens[0] === 'package') return parsePackageArguments(tokens.slice(1));
-  if (tokens[0] === 'dev') return parseDevArguments(tokens.slice(1));
   if (tokens[0] === 'editor') {
     if (tokens.includes('--help') || tokens.includes('-h')) return { command: 'help' };
     if (tokens.length > 2 || tokens[1]?.startsWith('-')) throw new Error('Usage: lasm editor [project-directory]');

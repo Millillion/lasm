@@ -4,7 +4,7 @@
 // library/c/lasm_js.c. Design and measurements: docs/JS_INTEROP.md.
 //
 // Values cross in one wire format (little endian), written and read by Lean
-// (library/Lasm/JS/Wire.lean) and here:
+// (namespace Wire in library/Lasm/JS/Core.lean) and here:
 //   0 undefined  1 null  2 false  3 true  4 number (f64)  5 string (u32 n, UTF-8)
 //   6 bigint (u32 n, decimal)  7 bytes (u32 n, Uint8Array)  8 array (u32 n, n values)
 //   9 object (u32 n, n × (u32 key length, key UTF-8, value))

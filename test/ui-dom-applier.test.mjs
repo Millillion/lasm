@@ -78,8 +78,41 @@ test('varints of every width address nodes (ids of 1, 2 and 3 bytes, continuatio
     ui.applyForTest(frame().insert(0, 0, f => f.el(id, 'p', () => 0, [f => f.text(id + 1, 'x')])).u8);
     ui.applyForTest(frame().setText(id + 1, `id ${id}`).u8);
     assert.equal(root.lastChild.textContent, `id ${id}`);
+    assert.equal(root.lastChild.$i, id);
   }
   assert.equal(root.innerHTML, '<p>id 5</p><p>id 300</p><p>id 16384</p><p>id 2100000</p>');
+});
+
+test('malformed frames fail with a Lasm.UI error that names the problem (test/fuzz/regressions/ui-patch)', () => {
+  const { root } = page();
+  const ui = createUi({ root });
+  const fails = (bytes, message) => assert.throws(() => ui.applyForTest(Uint8Array.from(bytes)), { message });
+  ui.applyForTest(frame().insert(0, 0, f => f.el(1, 'p', () => 0, [f => f.text(2, 'x')])).u8);
+  // A frame that ends where a varint starts, inside one, or inside a string.
+  fails([5], 'Lasm.UI: truncated patch at byte 1');
+  fails([5, 0x80], 'Lasm.UI: truncated patch at byte 2');
+  fails([5, 0x82, 0x80], 'Lasm.UI: truncated patch at byte 3');
+  fails([5, 2, 5, 97, 98], 'Lasm.UI: truncated patch at byte 3');
+  fails([5, 2, 30, 97], 'Lasm.UI: truncated patch at byte 3');
+  // The last byte of a string may be the frame's last byte.
+  ui.applyForTest(Uint8Array.from([5, 2, 2, 97, 98]));
+  assert.equal(root.textContent, 'ab');
+  // An insert without its node, and a node kind past MathML (3).
+  fails([1, 0, 0], 'Lasm.UI: truncated patch at byte 3');
+  fails([1, 0, 0, 4, 9], 'Lasm.UI: bad node kind 4 at byte 3');
+  fails([1, 0, 0, 0xff, 9], 'Lasm.UI: bad node kind 255 at byte 3');
+  // Name and value references past their tables (one name and one value interned here).
+  ui.applyForTest(frame().attrs(1, 1, f => f.byte(0).lit('class', true).lit('big', true)).u8);
+  assert.equal(root.firstChild.getAttribute('class'), 'big');
+  ui.applyForTest(frame().attrs(1, 1, f => f.byte(0).ref(0).ref(0)).u8);
+  fails(frame().attrs(1, 1, f => f.byte(0).ref(1).ref(0)).bytes, 'Lasm.UI: no name 1');
+  fails(frame().attrs(1, 1, f => f.byte(0).ref(0).ref(1)).bytes, 'Lasm.UI: no value 1');
+  fails(frame().attrs(1, 1, f => f.byte(0).ref(5).ref(0)).bytes, 'Lasm.UI: no name 5');
+  // Attribute ops on a text node.
+  fails(frame().attrs(2, 1, f => f.attr('title', 't')).bytes, 'Lasm.UI: node 2 is not an element');
+  fails(frame().attrs(2, 0, () => {}).bytes, 'Lasm.UI: node 2 is not an element');
+  // None of it changed the DOM.
+  assert.equal(root.innerHTML, '<p class="big">ab</p>');
 });
 
 test('strings: short and long, ASCII and not, including a short one that starts outside ASCII', () => {
