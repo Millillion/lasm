@@ -14,6 +14,13 @@ name: Porter
 #   adversarial suite (RFC 6749/6819/9700, OpenID Connect Core);
 # - fuzz: the endpoint fuzzer for three minutes against the Node build
 #   (seeded; the seed is printed first; failing requests uploaded);
+# - dst: the deterministic simulation (test/dst.mjs, on scripts/sim): the
+#   server's own code, compiled, signing agents in, refreshing and attacking
+#   (codes redeemed twice, rotated refresh tokens reused) under lost and
+#   duplicated requests, racing requests at skewed clocks, the clock jumping
+#   past every lifetime, crashes and database faults, decided by one seed;
+#   30 fixed seeds, each run twice to check it replays exactly (the nightly
+#   runs random seeds for 30 minutes);
 # - e2e: the sign-in and consent pages (the Lasm.UI app) in Chromium,
 #   Firefox and WebKit (Playwright, no retries): sign in, consent, deny, a
 #   wrong password, the pages without JavaScript, no script error or CSP
@@ -25,11 +32,13 @@ on:
     paths:
       - '.github/workflows/porter.yml'
       - 'examples/porter/**'
+      - 'scripts/sim/**'
   push:
     branches: [main]
     paths:
       - '.github/workflows/porter.yml'
       - 'examples/porter/**'
+      - 'scripts/sim/**'
 permissions:
   contents: read
 concurrency:
@@ -97,6 +106,27 @@ jobs:
       - name: The adversarial suite
         working-directory: examples/porter
         run: node test/attacks.mjs --name "node-${{ matrix.node }}"
+  dst:
+    name: Deterministic simulation (fixed seeds)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: npm ci
+        working-directory: examples/porter
+        run: npm ci --no-audit --no-fund
+      - name: npm run build:sim
+        working-directory: examples/porter
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:sim
+      - name: The simulation, 30 fixed seeds, each replayed (a failure prints its seed and a repro command)
+        working-directory: examples/porter
+        run: node test/dst.mjs --seeds 30 --check-determinism --keep-going
   fuzz:
     name: The endpoint fuzzer (3 minutes)
     runs-on: ubuntu-24.04

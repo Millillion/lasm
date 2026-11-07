@@ -1,0 +1,52 @@
+name: DST nightly
+# The deterministic simulations of the example apps (docs/TESTING.md,
+# "Deterministic simulation of the example apps"; the harness is scripts/sim)
+# with random seeds: for each of Tandem, Ledger and Porter, 20 minutes of seeds
+# with the normal fault mix, then 10 minutes with heavy faults. Every failing
+# seed is printed with a one-line repro command (`node test/dst.mjs --seed N`),
+# which replays it exactly. The PR workflows (tandem.yml, ledger.yml,
+# porter.yml) run 30 fixed seeds instead. Every night, since each night's seeds
+# are new; or on demand. Not a release gate.
+on:
+  schedule:
+    - cron: '23 3 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: dst-nightly
+  cancel-in-progress: false
+env:
+  CI: '1'
+  BROWSER: 'none'
+jobs:
+  dst:
+    name: ${{ matrix.app }}, random seeds
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [tandem, ledger, porter]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: npm ci
+        working-directory: examples/${{ matrix.app }}
+        run: npm ci --no-audit --no-fund
+      - name: npm run build:sim
+        id: build
+        working-directory: examples/${{ matrix.app }}
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:sim
+      - name: 20 minutes of random seeds (each failing seed is printed with its repro command)
+        working-directory: examples/${{ matrix.app }}
+        run: node test/dst.mjs --minutes 20 --keep-going
+      - name: 10 minutes of random seeds, heavy faults
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        working-directory: examples/${{ matrix.app }}
+        run: node test/dst.mjs --minutes 10 --faults heavy --keep-going

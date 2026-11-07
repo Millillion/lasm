@@ -524,8 +524,9 @@ export class HttpSim {
     if (!req) return true;
     if (m.http === 'req') {
       if (!this.up) { this.fail(m.id, [1, 50]); return true; }
-      if (ev.copy) this.stats.duplicates++;
+      if (ev.copy) { this.stats.duplicates++; req.duplicated = true; }
       req.epoch = this.epoch;
+      req.atServer = true;
       this.inbox.push({ id: m.id, duplicate: ev.copy > 0, method: req.method, url: req.url, body: req.body });
     } else this.finish(m.id, { ok: req.epoch === this.epoch, status: m.status, body: m.body });
     return true;
@@ -536,7 +537,7 @@ export class HttpSim {
     req.finished = true; this.requests.delete(id);
     if (!result.ok) this.stats.failed++;
     this.trace?.log(`${req.from} ← ${req.method} ${req.url} (#${id}): ${result.ok ? result.status : 'network error'}`);
-    req.done(result.ok ? { ok: true, status: result.status, body: result.body } : { ok: false });
+    req.done(result.ok ? { ok: true, status: result.status, body: result.body, duplicated: !!req.duplicated } : { ok: false, duplicated: !!req.duplicated });
   }
   /** The requests that reached the server, for the driver. */
   take() { const out = this.inbox; this.inbox = []; return out; }
@@ -544,12 +545,14 @@ export class HttpSim {
   respond(id, status, body, duplicate = false) {
     const req = this.requests.get(id);
     if (!req || duplicate) return;
+    req.atServer = false;
     if (this.net.send(this.server, req.from, { http: 'res', id, status, body }) === 0) this.fail(id);
   }
   crash(downFor = this.rng.range(200, 5000)) {
     this.epoch++; this.up = false; this.stats.crashes++;
     this.trace?.log(`the server crashes (epoch ${this.epoch})`);
-    for (const r of this.inbox) this.fail(r.id, [1, 50]);
+    // Requests the server held (in its inbox, or being handled) get a connection reset.
+    for (const req of this.requests.values()) if (req.atServer) { req.atServer = false; this.fail(req.id, [1, 50]); }
     this.inbox = [];
     this.scheduler.after(downFor, { type: 'httpServerUp' });
   }

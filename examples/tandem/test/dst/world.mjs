@@ -271,6 +271,7 @@ class World {
       if (!this.serverUp) { this.failSoon(m.id); return null; }
       if (ev.copy) this.trace.log(`server ← duplicate of request ${m.id}`);
       req.epoch = this.epoch;
+      req.atServer = true;
       const poll = /^\/doc\/[^/]+\/poll\?cursor=(\d+)$/.exec(req.url);
       if (poll && !ev.copy) {
         const cursor = Number(poll[1]);
@@ -320,8 +321,10 @@ class World {
     this.serverUp = false;
     this.store.crash();
     this.trace.log(`the server crashes (epoch ${this.epoch})`);
-    for (const [id, poll] of this.polls) { this.sched.cancel(poll.timer); this.failSoon(id); }
+    for (const poll of this.polls.values()) this.sched.cancel(poll.timer);
     this.polls.clear();
+    // Every request the server held (parked polls, the one being handled) gets a connection reset.
+    for (const req of this.requests.values()) if (req.atServer) { req.atServer = false; this.failSoon(req.id); }
     for (const cl of this.clients.values()) if (cl.ws) this.sched.after(this.chaos.range(0, 500), { type: 'wsClose', c: cl.c, gen: cl.gen, socket: cl.ws.id });
     this.sched.after(this.chaos.range(200, 5000), { type: 'serverUp' });
   }
@@ -367,6 +370,7 @@ class World {
         this.closeSocket(cl.c, cl.ws.id);
     }
     if (duplicate || !req) return;
+    req.atServer = false;
     if (this.net.send(SERVER, this.tab(req.c), { kind: 'res', id: req.id, status, body }) === 0) this.failLater(req.id);
   }
 

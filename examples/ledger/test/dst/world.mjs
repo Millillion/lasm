@@ -83,6 +83,7 @@ class World {
     this.sent = new Map();         // transfer id -> { event, statuses: [], body }
     this.chainsSent = [];          // chains of fresh transfer ids
     this.pendings = [];            // pending transfer ids not yet resolved by a batch
+    this.singles = [];             // fresh transfers that were not in a chain
     this.serverQueue = [];
     this.outstanding = new Set();  // writers with a batch not yet answered
     this.events = 0; this.batches = 0; this.reads = 0; this.audits = 0; this.gaveUp = 0;
@@ -229,10 +230,10 @@ class World {
     const fresh = [];
     for (let i = 0; i < n; i++) {
       const roll = u.next();
-      if (roll < 0.08 && this.sent.size) {
+      if (roll < 0.08 && this.singles.length) {
         // An earlier transfer again, in a new batch (it must answer `exists`, or fail as it did).
-        const ids = [...this.sent.keys()];
-        events.push(this.sent.get(u.pick(ids)).event);
+        // Only one that was not in a chain: a chain's event alone could succeed where its chain failed.
+        events.push(this.sent.get(u.pick(this.singles)).event);
         continue;
       }
       const id = String(this.ids.next++);
@@ -260,7 +261,9 @@ class World {
         chain = [];
       }
     });
-    for (const i of fresh) this.sent.set(events[i].id, { event: events[i], statuses: [] });
+    for (const i of fresh) this.sent.set(events[i].id, { event: events[i], statuses: [], body: null });
+    // Events alone in their chain (neither linked nor after a linked one), which may be reused.
+    events.forEach((e, i) => { if (fresh.includes(i) && !e.flags?.linked && !(i > 0 && events[i - 1].flags?.linked)) this.singles.push(e.id); });
     const body = JSON.stringify(events);
     this.outstanding.add(w);
     this.send(w, events, body, 0);
@@ -271,7 +274,12 @@ class World {
       if (res.ok && res.status === 200) {
         const statuses = JSON.parse(res.body).map(r => r.status);
         if (!this.checks.that(statuses.length === events.length, `a batch of ${events.length} got ${statuses.length} results`)) return;
-        events.forEach((e, i) => this.sent.get(e.id)?.statuses.push(statuses[i]));
+        events.forEach((e, i) => {
+          const s = this.sent.get(e.id);
+          if (!s) return;
+          if (s.body === null) s.body = body;
+          (s.body === body ? s.statuses : (s.elsewhere ??= [])).push(statuses[i]);
+        });
         // A pending transfer the batch did not create can be resolved by nobody.
         events.forEach((e, i) => { if (e.flags?.pending && !SUCCESS.has(statuses[i])) this.pendings = this.pendings.filter(p => p !== e.id); });
         this.batches++;
@@ -351,11 +359,12 @@ class World {
       .map(r => [r.id, r]));
     for (const [id, s] of this.sent) {
       const row = rows.get(id);
-      const acked = s.statuses.filter(x => SUCCESS.has(x));
+      const acked = [...s.statuses, ...(s.elsewhere ?? [])].filter(x => SUCCESS.has(x));
+      const created = [...s.statuses, ...(s.elsewhere ?? [])].filter(x => x === 'created').length;
       if (row) {
         this.checks.that(s.statuses.every(x => SUCCESS.has(x) || x === 'linked_event_failed'),
           () => `transfer ${id} is in the journal, but was answered ${JSON.stringify(s.statuses)}`);
-        this.checks.that(s.statuses.filter(x => x === 'created').length <= 1, () => `transfer ${id} was answered "created" ${s.statuses.filter(x => x === 'created').length} times`);
+        this.checks.that(created <= 1, () => `transfer ${id} was answered "created" ${created} times`);
         const e = s.event;
         if (!e.pending_id) this.checks.that(row.debit_account_id === e.debit_account_id && row.credit_account_id === e.credit_account_id && row.amount === e.amount,
           () => `transfer ${id} is stored as ${row.debit_account_id}→${row.credit_account_id} ${row.amount}, but was sent as ${e.debit_account_id}→${e.credit_account_id} ${e.amount}`);
@@ -363,7 +372,7 @@ class World {
     }
     for (const chain of this.chainsSent) {
       const present = chain.filter(id => rows.has(id)).length;
-      this.checks.that(present === 0 || present === chain.length, () => `a linked chain is half applied: ${present} of ${chain.join(', ')}`);
+      this.checks.that(present === 0 || present === chain.length, () => `a linked chain is half applied: ${present} of ${chain.join(', ')} (answered ${chain.map(id => JSON.stringify(this.sent.get(id).statuses)).join(', ')})`);
     }
     this.checks.that(this.outstanding.size === 0, () => `${this.outstanding.size} writer(s) still wait for an answer a minute after the heal`);
     this.checks.that(rows.size === transferCount, `the auditor saw ${transferCount} transfers, the database has ${rows.size}`);
