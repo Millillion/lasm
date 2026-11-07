@@ -26,8 +26,8 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '23 2 * * *'
-    - cron: '41 6 * * 0'
+    - cron: '23 2 * * 0,2-6'
+    - cron: '41 6 * * 6'
   workflow_dispatch:
     inputs:
       seconds:
@@ -103,7 +103,7 @@ jobs:
           node test/fuzz/native/build.mjs ${{ matrix.target }}
       - name: Campaign (the seed is printed first)
         env:
-          SECONDS_PER_TARGET: ${{ github.event.inputs.seconds || (github.event.schedule == '41 6 * * 0' && '3600') || '600' }}
+          SECONDS_PER_TARGET: ${{ github.event.inputs.seconds || (github.event.schedule == '41 6 * * 6' && '3600') || '600' }}
         run: node test/fuzz/run.mjs fuzz --seconds "$SECONDS_PER_TARGET" --seed "$((GITHUB_RUN_ID % 2147483647))" ${{ matrix.target }}
       - name: New corpus entries and failing inputs
         if: always()

@@ -9,7 +9,7 @@ name: Evidence levels
 # the result.
 on:
   schedule:
-    - cron: '23 8 * * *'
+    - cron: '23 8 * * 1-6'
   workflow_dispatch:
   pull_request:
     branches: [main]

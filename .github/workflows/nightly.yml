@@ -15,7 +15,7 @@ name: nightly
 # older than 7 days, keeping the newest and any the baseline or the issue names.
 on:
   schedule:
-    - cron: '17 7 * * *'
+    - cron: '17 7 * * 1-6'
   workflow_dispatch:
     inputs:
       force:

@@ -42,7 +42,7 @@ on:
       - verification/host-bridge/**
       - scripts/bridge-fuzz/**
   schedule:
-    - cron: '17 3 * * *'
+    - cron: '17 3 * * 0,2-6'
   workflow_dispatch:
     inputs:
       runs:

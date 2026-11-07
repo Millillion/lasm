@@ -20,7 +20,7 @@ on:
     types: [completed]
     branches: [main]
   schedule:
-    - cron: '17 9 * * *'
+    - cron: '17 9 * * 1-6'
   push:
     branches: [phase-7]
     paths:
