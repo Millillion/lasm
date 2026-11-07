@@ -15,6 +15,7 @@ npm start            # http://localhost:3000 (PORT, HOST, ISSUER, DATABASE_PATH,
 npm test             # openid-client and oauth4webapi sign in, refresh and log out against a fresh server
 npm run test:attacks # the adversarial suite
 npm run test:fuzz    # the endpoint fuzzer (--seconds N, --seed N)
+npm run build:sim && npm run test:dst    # the deterministic simulation: sign-ins, refreshes and attacks under faults and jumping clocks (--seed N)
 npx playwright install chromium && npm run test:e2e   # the sign-in pages in a browser (BROWSERS=chromium,firefox,webkit)
 npm run proofs       # check every theorem
 ```

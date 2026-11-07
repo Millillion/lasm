@@ -18,6 +18,11 @@ name: Tandem
 #   unreliable network, the server killed and restarted mid-run);
 # - fuzz: the protocol fuzzer for three minutes against the Node build
 #   (HTTP and WebSockets; seeded; failing inputs uploaded);
+# - dst: the deterministic simulation (test/dst.mjs, on scripts/sim): the
+#   editor's own state machine in several tabs and the server's own handler,
+#   compiled, in a simulated world of network, database, storage and users
+#   with faults, decided by one seed; 30 fixed seeds, each run twice to check
+#   that it replays exactly (the nightly runs random seeds for 30 minutes);
 # - e2e: the editor (the Lasm.UI app) in Chromium, Firefox and WebKit
 #   (Playwright, no retries): typing, two browsers at once (live, and
 #   concurrently at one place), offline then reconnecting, a reload while
@@ -31,11 +36,13 @@ on:
     paths:
       - '.github/workflows/tandem.yml'
       - 'examples/tandem/**'
+      - 'scripts/sim/**'
   push:
     branches: [main]
     paths:
       - '.github/workflows/tandem.yml'
       - 'examples/tandem/**'
+      - 'scripts/sim/**'
 permissions:
   contents: read
 concurrency:
@@ -142,6 +149,33 @@ jobs:
           path: examples/tandem/test-results/
           retention-days: 14
           if-no-files-found: ignore
+  dst:
+    name: Deterministic simulation (fixed seeds)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: The harness's own tests (scripts/sim)
+        run: node --test test/sim.test.mjs
+      - name: npm ci
+        working-directory: examples/tandem
+        run: npm ci --no-audit --no-fund
+      - name: npm run build:sim
+        working-directory: examples/tandem
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:sim
+      - name: The simulation, 30 fixed seeds, each replayed (a failure prints its seed and a repro command)
+        working-directory: examples/tandem
+        run: node test/dst.mjs --seeds 30 --check-determinism --keep-going
+      - name: The simulation, 10 fixed seeds with heavy faults
+        if: ${{ !cancelled() }}
+        working-directory: examples/tandem
+        run: node test/dst.mjs --seeds 10 --first 1001 --faults heavy --keep-going
   e2e:
     name: The editor on ${{ matrix.server }}, ${{ matrix.browser }}
     runs-on: ubuntu-24.04

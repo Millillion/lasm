@@ -10,6 +10,7 @@
     "test": "node test/oracles.mjs",
     "test:attacks": "node test/attacks.mjs",
     "test:fuzz": "node test/fuzz.mjs",
+    "test:dst": "node test/dst.mjs",
     "build:bun": "npm run build:client && bunx --bun lasm build ServerBun.lean --target bun",
     "start:bun": "bun bun/main.mjs",
     "build:deno": "npm run build:client && lasm build ServerNode.lean --target deno",
@@ -25,6 +26,7 @@
     "proofs": "node test/proofs.mjs",
     "proofs:paranoid": "node test/paranoid.mjs",
     "build:client": "lasm build Client.lean --target browser --output dist/public/ui",
+    "build:sim": "lasm build Sim.lean --output dist/sim",
     "test:e2e": "playwright test -c test/playwright.config.mjs"
   },
   "engines": {
