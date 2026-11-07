@@ -76,28 +76,9 @@ jobs:
           package-manager-cache: false
       - name: Upstream Lean 4.35.0 (pinned release archive)
         id: lean
-        run: |
-          node -e "const a=require('./scripts/lean-dist/lean-4.35.0-upstream.json').lean['4.35.0'].artifacts['linux-x64']; console.log('url='+a.url); console.log('sha256='+a.sha256); console.log('root='+a.root)" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: lean-cache
+        uses: ./.github/actions/upstream-lean
         with:
-          path: ${{ runner.temp }}/lean-archive
-          key: upstream-lean-${{ steps.lean.outputs.sha256 }}
-      - name: Install Lean
-        run: |
-          set -euo pipefail
-          A="$RUNNER_TEMP/lean-archive"; mkdir -p "$A"
-          [ -f "$A/lean.tar.zst" ] || curl -fsSL --retry 3 -o "$A/lean.tar.zst" "${{ steps.lean.outputs.url }}"
-          echo "${{ steps.lean.outputs.sha256 }}  $A/lean.tar.zst" | sha256sum -c
-          mkdir -p "$RUNNER_TEMP/lean" && tar --zstd -xf "$A/lean.tar.zst" -C "$RUNNER_TEMP/lean"
-          echo "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" >> "$GITHUB_PATH"
-          "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin/lean" --version
-      - if: steps.lean-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        continue-on-error: true
-        with:
-          path: ${{ runner.temp }}/lean-archive
-          key: upstream-lean-${{ steps.lean.outputs.sha256 }}
+          add-to-path: 'true'
       - name: Build the model checker
         working-directory: verification/host-bridge
         run: lake build
@@ -162,22 +143,9 @@ jobs:
           package-manager-cache: false
       - name: Upstream Lean 4.35.0 (pinned release archive)
         id: lean
-        run: |
-          node -e "const a=require('./scripts/lean-dist/lean-4.35.0-upstream.json').lean['4.35.0'].artifacts['linux-x64']; console.log('url='+a.url); console.log('sha256='+a.sha256); console.log('root='+a.root)" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: lean-cache
+        uses: ./.github/actions/upstream-lean
         with:
-          path: ${{ runner.temp }}/lean-archive
-          key: upstream-lean-${{ steps.lean.outputs.sha256 }}
-      - name: Install Lean
-        run: |
-          set -euo pipefail
-          A="$RUNNER_TEMP/lean-archive"; mkdir -p "$A"
-          [ -f "$A/lean.tar.zst" ] || curl -fsSL --retry 3 -o "$A/lean.tar.zst" "${{ steps.lean.outputs.url }}"
-          echo "${{ steps.lean.outputs.sha256 }}  $A/lean.tar.zst" | sha256sum -c
-          mkdir -p "$RUNNER_TEMP/lean" && tar --zstd -xf "$A/lean.tar.zst" -C "$RUNNER_TEMP/lean"
-          echo "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" >> "$GITHUB_PATH"
-          "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin/lean" --version
+          add-to-path: 'true'
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: lasm-js-stress-*

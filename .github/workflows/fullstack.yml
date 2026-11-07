@@ -82,11 +82,7 @@ jobs:
           architecture: x64
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: Native host pieces (koffi, helpers)
         run: |
           node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
@@ -115,11 +111,7 @@ jobs:
           architecture: x64
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - uses: actions/download-artifact@v4
         with:
           name: fullstack-native-host
@@ -170,9 +162,10 @@ jobs:
           package-manager-cache: false
       - name: Pinned Playwright and its ${{ matrix.browser }} build
         timeout-minutes: 30
-        run: |
-          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
+        uses: ./.github/actions/playwright
+        with:
+          version: ${{ env.PLAYWRIGHT }}
+          browsers: ${{ matrix.browser }}
       - uses: actions/download-artifact@v4
         with:
           name: fullstack-app
@@ -205,12 +198,16 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - name: Pinned wrangler (with workerd), Playwright and Chromium
+      - name: Pinned wrangler (with workerd)
         timeout-minutes: 30
         run: |
           npm install --prefix .work/tools --no-audit --no-fund wrangler@4.152.0
-          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          bash scripts/ci/playwright-install.sh chromium
+      - name: Pinned Playwright and Chromium
+        timeout-minutes: 30
+        uses: ./.github/actions/playwright
+        with:
+          version: ${{ env.PLAYWRIGHT }}
+          browsers: chromium
       - uses: actions/download-artifact@v4
         with:
           name: fullstack-app
@@ -252,14 +249,18 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - name: Pinned Bun, Deno (from npm), Playwright and Chromium
+      - name: Pinned Bun and Deno (from npm)
         timeout-minutes: 30
         run: |
           npm install --prefix .work/tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
-          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          bash scripts/ci/playwright-install.sh chromium
           .work/tools/node_modules/.bin/bun --version
           .work/tools/node_modules/.bin/deno --version
+      - name: Pinned Playwright and Chromium
+        timeout-minutes: 30
+        uses: ./.github/actions/playwright
+        with:
+          version: ${{ env.PLAYWRIGHT }}
+          browsers: chromium
       - uses: actions/download-artifact@v4
         with:
           name: fullstack-app
@@ -305,7 +306,7 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - name: Pinned wasmtime, Viceroy, Playwright and Chromium
+      - name: Pinned wasmtime and Viceroy
         timeout-minutes: 30
         run: |
           set -euo pipefail
@@ -316,8 +317,12 @@ jobs:
           get "https://github.com/fastly/Viceroy/releases/download/$VICEROY_VERSION/viceroy_${VICEROY_VERSION}_linux-amd64.tar.gz" viceroy.tar.gz "$VICEROY_SHA256"
           tar -xzf $T/dl/viceroy.tar.gz -C $T/viceroy
           rm -rf $T/dl
-          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          bash scripts/ci/playwright-install.sh chromium
+      - name: Pinned Playwright and Chromium
+        timeout-minutes: 30
+        uses: ./.github/actions/playwright
+        with:
+          version: ${{ env.PLAYWRIGHT }}
+          browsers: chromium
       - uses: actions/download-artifact@v4
         with:
           name: fullstack-app
@@ -366,11 +371,7 @@ jobs:
           architecture: x64
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - uses: actions/download-artifact@v4
         with:
           name: fullstack-native-host
