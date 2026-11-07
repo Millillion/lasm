@@ -529,7 +529,7 @@ failing input and uploads its new corpus entries and failing inputs (artifact
   query with a space, a non-ASCII character, `?` or `#` made http.request
   throw (a 502) or moved part of the path into the query (now
   percent-encoded: `requestTarget`); a forged Host (`x/admin#`) reached the
-  server, which Express and Hono build their URL from (now replaced:
+  server, which may build its URL from it (now replaced:
   `outgoingHeaders`); empty Cookie fields were forwarded; a Latin-1 text
   body lost its accented letters (text only when valid UTF-8); and a reply
   field named `__proto__` or `constructor` was dropped or threw a

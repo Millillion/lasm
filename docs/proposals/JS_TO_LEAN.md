@@ -199,7 +199,7 @@ breaks if it is wrong, how much of it is pure) against what it costs.
   a non-ASCII character, `?`, `#`) made http.request throw, a 502, or moved
   part of the path into the query (`requestTarget` percent-encodes what a
   target cannot carry); a forged Host reached servers that build their URL
-  from it, as Express and Hono do (`outgoingHeaders` keeps the first plain
+  from it, as Hono's Node adapter does (`outgoingHeaders` keeps the first plain
   Host, else the loopback address, as Lasm.Fetch already did); empty Cookie
   fields were forwarded; a Latin-1 `text/html` body went as text and lost its
   accented letters (`isTextual` now also asks for valid UTF-8); and a reply

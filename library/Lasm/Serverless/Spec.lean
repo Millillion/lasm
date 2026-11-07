@@ -90,8 +90,8 @@ def host_once : Prop :=
     ∃ n v, (outgoing hs d).filter (isHost ·.1) = [(n, v)] ∧ plainHost v = true
 
 /-- **A plain Host cannot move the path.** A server that builds its URL
-from the Host field and the target (`http://` + host + target, as Express,
-Hono's Node adapter and Lasm.Fetch do) reads back exactly that host and that
+from the Host field and the target (`http://` + host + target, as Hono's
+Node adapter and Lasm.Fetch's Node host do) reads back exactly that host and that
 target, for every plain host and every target that starts with `/`. Together
 with `host_once` and `target_split`: no client can change the path or query
 a server sees through Host (`Host: x/admin#` once made `/public` read as

@@ -183,7 +183,7 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 | Proposition | In plain English |
 | --- | --- |
 | [`host_once`](Lasm/Serverless/Spec.lean#L83) | **Exactly one Host, a plain one.** Whatever fields an event carries (none, several, or a forged `Host: x/admin#`), forward() and pipe() send exactly one Host field, and its value is a plain `host[:port]`: visible ASCII without `/ ? # \ @` (the first such Host of the event, else the loopback address). |
-| [`host_url`](Lasm/Serverless/Spec.lean#L92) | **A plain Host cannot move the path.** A server that builds its URL from the Host field and the target (`http://` + host + target, as Express, Hono's Node adapter and Lasm.Fetch do) reads back exactly that host and that target, for every plain host and every target that starts with `/`. Together with `host_once` and `target_split`: no client can change the path or query a server sees through Host (`Host: x/admin#` once made `/public` read as `/admin` in Lasm.Fetch). |
+| [`host_url`](Lasm/Serverless/Spec.lean#L92) | **A plain Host cannot move the path.** A server that builds its URL from the Host field and the target (`http://` + host + target, as Hono's Node adapter and Lasm.Fetch's Node host do) reads back exactly that host and that target, for every plain host and every target that starts with `/`. Together with `host_once` and `target_split`: no client can change the path or query a server sees through Host (`Host: x/admin#` once made `/public` read as `/admin` in Lasm.Fetch). |
 
 ### Query strings
 
