@@ -1,0 +1,5 @@
+{
+  "lean-fetch-request": { "kind": "lean", "entry": "lasm_fuzz_fetch_request", "binary": "lean-fetch-request", "description": "Lasm.Fetch request parsing as Node's host builds requests (path, query, cookies, Host)" },
+  "lean-rpc": { "kind": "lean", "entry": "lasm_fuzz_rpc", "binary": "lean-rpc", "description": "Lasm.RPC request and response decoding, and Lean's JSON round trip" },
+  "wasi-cgi": { "kind": "c", "binary": "wasi-cgi", "description": "the WASI C host's CGI request and response (src/wasi/lasm_fetch_wasi.c), with ASan and UBSan" }
+}

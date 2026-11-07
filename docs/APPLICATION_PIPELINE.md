@@ -9,10 +9,15 @@ Neither pipeline is yet a complete implementation of the current product plan.
 
 `src/managed-lean.mjs` finds the nearest ordinary `lean-toolchain`, chooses the
 matching versioned catalog entry, and supplies Lean/Lake in a private cache. The
-initial catalog selects Lean 4.34.0. Unsupported pins fail without modifying the
-project. The primary application CLI now uses this module.
+catalog ([`src/toolchains.json`](../src/toolchains.json)) now contains only
+Lean 4.35.0, which is also the default. Unsupported pins fail without modifying
+the project. The primary application CLI now uses this module.
 
-Lean 4.34.1 was published during this work and is the new latest-release target.
+The rest of this section is the historical record of the Lean 4.34.0 and 4.34.1
+work that preceded the 4.35.0 upgrade (see [PLAN.md](PLAN.md)); its 4.34
+versions are not current.
+
+Lean 4.34.1 was published during this work and became the latest-release target then.
 Its [verified native bootstrap](evidence/lean-4.34.1-native-bootstrap-2026-09-25.json)
 passes on Linux x64, including the unchanged upstream reference-count regression,
 both new BitVec tests and interpreted-versus-compiled ordinary IO/error cases.

@@ -25,11 +25,16 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
 
   // ---- patches ----
   let bytes = null, p = 0;
+  // A frame that ends inside a value is a clean error: reading past the end
+  // looped forever (a varint of `undefined` bytes never ends; test/fuzz).
+  const truncated = () => { throw new Error(`Lasm.UI: truncated patch at byte ${p}`); };
   function v() {
+    if (p >= bytes.length) truncated();
     let x = bytes[p++];
     if (x < 128) return x;
     x &= 127;
     for (let shift = 128; ; shift *= 128) {
+      if (p >= bytes.length) truncated();
       const b = bytes[p++];
       x += (b & 127) * shift;
       if (b < 128) return x;
@@ -37,6 +42,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   }
   function str() {
     const n = v(), end = p + n;
+    if (end > bytes.length) truncated();
     if (n < 24) {
       let s = '';
       for (let i = p; i < end; i++) {
@@ -53,14 +59,14 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   }
   function name() {
     const x = v();
-    if (x > 1) return names[x - 2];
+    if (x > 1) { if (x - 2 >= names.length) throw new Error(`Lasm.UI: no name ${x - 2}`); return names[x - 2]; }
     const s = str();
     if (x === 0) names.push(s);
     return s;
   }
   function value() {
     const x = v();
-    if (x > 1) return values[x - 2];
+    if (x > 1) { if (x - 2 >= values.length) throw new Error(`Lasm.UI: no value ${x - 2}`); return values[x - 2]; }
     const s = str();
     if (x === 0) values.push(s);
     return s;
@@ -83,7 +89,10 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   }
   // A node from the stream (created, or adopted from `existing` when hydrating).
   function node(existing) {
-    const kind = bytes[p++], id = v();
+    if (p >= bytes.length) truncated();
+    const kind = bytes[p++];
+    if (kind > 3) throw new Error(`Lasm.UI: bad node kind ${kind} at byte ${p - 1}`);
+    const id = v();
     let n;
     if (kind === 0) {
       const s = str();
@@ -124,6 +133,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     if (!sweeping) { sweeping = true; setTimeout(sweep, 0); }
   }
   const at = id => { const n = nodes.get(id); if (!n) throw new Error(`Lasm.UI: no node ${id}`); return n; };
+  const notElement = n => { throw new Error(`Lasm.UI: node ${n.$i} is not an element`); };
   function apply(frame) {
     bytes = frame; p = 0;
     // Hydration: the first frame's inserts under the root adopt its children in order.
@@ -152,7 +162,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
         break;
       }
       case 5: { const n = at(v()); n.data = str(); break; }
-      case 6: { const n = at(v()); for (let c = v(); c > 0; c--) attr(n, bytes[p++]); break; }
+      case 6: { const n = at(v()); if (n.nodeType !== 1) notElement(n); for (let c = v(); c > 0; c--) attr(n, bytes[p++]); break; }
       case 7: {
         const d = v(), paths = [];
         for (let c = v(); c > 0; c--) { const path = []; for (let k = v(); k > 0; k--) path.push(str()); paths.push(path); }

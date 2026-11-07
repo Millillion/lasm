@@ -19,6 +19,17 @@ function query(single, multi) {
   return text ? '?' + text : '';
 }
 
+// An ALB's query values arrive as the client sent them, still percent-encoded:
+// they are forwarded unchanged. (Decoding them threw URIError on a malformed
+// escape such as `?q=%E0`, so any client could turn a request into a 502;
+// test/fuzz/regressions/serverless-http/.)
+function rawQuery(single, multi) {
+  const parts = [];
+  if (multi) for (const [name, values] of Object.entries(multi)) for (const value of values ?? []) parts.push(`${name}=${value}`);
+  else if (single) for (const [name, value] of Object.entries(single)) parts.push(`${name}=${value}`);
+  return parts.length ? '?' + parts.join('&') : '';
+}
+
 function headerPairs(single, multi) {
   const pairs = [];
   if (multi) for (const [name, values] of Object.entries(multi)) for (const value of values ?? []) pairs.push([name, value]);
@@ -71,13 +82,10 @@ export async function handler(event) {
     return { statusCode: reply.status, headers: single, ...(cookies.length ? { cookies } : {}), ...body(reply) };
   }
   if (event?.httpMethod) {
-    // ALB query values arrive URL-encoded; API Gateway REST values are decoded.
+    // ALB query values arrive URL-encoded (forwarded as they are); API Gateway REST values are decoded.
     const alb = Boolean(event.requestContext?.elb);
-    const unescape = values => values && Object.fromEntries(Object.entries(values).map(([name, value]) =>
-      [decodeURIComponent(name.replace(/\+/g, ' ')), Array.isArray(value) ? value.map(v => decodeURIComponent(v.replace(/\+/g, ' '))) : decodeURIComponent(value.replace(/\+/g, ' '))]));
-    const single = alb ? unescape(event.queryStringParameters) : event.queryStringParameters;
-    const multi = alb ? unescape(event.multiValueQueryStringParameters) : event.multiValueQueryStringParameters;
-    const reply = await forward({ method: event.httpMethod, path: (event.path || '/') + query(single, multi),
+    const single = event.queryStringParameters, multi = event.multiValueQueryStringParameters;
+    const reply = await forward({ method: event.httpMethod, path: (event.path || '/') + (alb ? rawQuery(single, multi) : query(single, multi)),
       headers: headerPairs(event.headers, event.multiValueHeaders), body: decode(event.body, event.isBase64Encoded) });
     const response = { statusCode: reply.status, ...body(reply) };
     if (alb) response.statusDescription = `${reply.status} ${reply.statusText}`;

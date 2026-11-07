@@ -29,13 +29,14 @@ in the current release on npm (`npm view @lasm/cli version`).
 | [Frontends in Lean (`Lasm.UI`)](UI.md) | The Elm architecture, `html!` markup, commands, subscriptions, routing, SSR and hydration | 0.3.0 |
 | [The whole stack (`Lasm.RPC`)](RPC.md) | A server and a browser app sharing typed endpoints and validation, proved once for both sides | 0.3.0 |
 | Verification | What is proved and what is tested: [UI diff](UI.md#what-is-proved), [RPC](RPC.md#what-is-proved), [testing and proving your app](UI.md#testing-and-proving-your-app) | 0.3.0 |
-| [Lean IO under Lasm](IO.md) | Files, processes, sockets, threads and their exact behavior on Node | 0.1.0 |
+| [Lean IO under Lasm](IO.md) | Files, processes, sockets, threads and their exact behavior on Node; what IO each other target provides | 0.1.0 |
 | [Lean packages that work](COMPATIBILITY.md) | Batteries, Aesop, Qq, LSpec, leansqlite and others, tested | 0.1.0 |
 
 ## 3. Reference
 
 | Reference | Contents |
 | --- | --- |
+| [How Lasm works](HOW_LASM_WORKS.md) | The pipeline from Lean to C to WebAssembly, the host bridge, how each target wraps the program, the build cache, the libraries (draft) |
 | [CLI reference](../README.md#cli-reference) | Every command, option and environment variable |
 | [Lean support and restrictions](../README.md#lean-support-and-restrictions) | Exactly what a deployed program cannot do (ahead-of-time only) |
 | [Where apps run](DEPLOYMENT.md) | Every platform and how CI tests it |
@@ -46,7 +47,7 @@ in the current release on npm (`npm view @lasm/cli version`).
 | [Installation hardening](INSTALLATION_HARDENING.md) | Retries, offline repair, proxies and private CAs |
 | [System Git](MANAGED_GIT.md) | Git for Lake dependencies |
 | [License audit](LICENSE_AUDIT.md) | Every distributed component and its license |
-| Release notes | [0.1.0](release/0.1.0-notes.md), [0.2.0](release/0.2.0-notes.md) |
+| [Release notes](release/) | One file per release, `release/<version>-notes.md`, from 0.1.0 to 0.5.0; unreleased changes in [next-notes.md](release/next-notes.md) |
 
 ## 4. Deploy guides
 
