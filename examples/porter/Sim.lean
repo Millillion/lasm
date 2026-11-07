@@ -14,7 +14,8 @@ users and relying parties (test/dst/world.mjs, on scripts/sim).
 As in Ledger's simulation, a request is served alone (`request`) or racing
 others (`race`: all read before any commits, each at its own instance's
 clock, then they commit in the world's order with the version check, and a
-request whose commit found the version changed runs again). -/
+request whose commit found the version changed runs again; one whose commit
+landed but threw is recognised by its commit receipt). -/
 import Porter
 import Server.App
 import Lasm.JS
@@ -73,7 +74,8 @@ def ctx (d : Data) : Porter.Ctx :=
 
 def answer (w : Value) (env : Porter.Server.Env) (d : Data) (reply : Porter.Reply) : IO Unit := do
   let wire := reply.render env.cfg
-  call w "reply" #[toJS (nat d "id"), toJS wire.status, toJS (wire.headers.map fun (k, v) => #[k, v]), toJS wire.body]
+  call w "reply" #[toJS (nat d "id"), toJS wire.status, toJS (wire.headers.map fun (k, v) => #[k, v]), toJS wire.body,
+    toJS (nat d "now")]
 
 /-- What one request read before committing (`race`). -/
 structure Read where
@@ -85,10 +87,9 @@ structure Read where
 
 def commitRead (env : Porter.Server.Env) (r : Read) : Async Porter.Reply := do
   if r.writes.isEmpty then return r.reply
-  let ok ← try env.db.batch (Porter.Server.commitStatements r.version r.writes); pure true catch _ => pure false
-  if ok then return r.reply
-  if (← Porter.Server.version env.db) != r.version then Porter.Server.runRequest env r.ctx r.req 20
-  else throw (IO.userError "the database rejected a commit")
+  match ← Porter.Server.commitRequest env r.ctx r.version r.reply r.writes with
+  | some reply => return reply
+  | none => Porter.Server.runRequest env r.ctx r.req 20
 
 def unavailable : Porter.Reply := { status := 503 }
 

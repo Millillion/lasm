@@ -86,6 +86,14 @@ one process, create requests also take turns (a semaphore), and every statement 
 workload found both of those: without them, reads saw totals off by a partial batch, and
 concurrent writers retried until they gave up.
 
+A commit can also land and still report an error (a lost reply from D1, a timeout after
+`COMMIT`). The request then runs again, finds its transfers stored and answers `exists`
+for them: TigerBeetle's own answer to a retried transfer, so the client learns that they
+are stored, which is correct, and nothing is applied twice. Porter, whose rerun in that
+case revoked the tokens it had just issued, adds a commit receipt (a row per commit,
+looked up after a failed commit; Porter's README, #138); the same receipt would let Ledger
+answer `created` instead, but Ledger keeps `exists`, which is the answer TigerBeetle gives.
+
 ## The data model
 
 | | |

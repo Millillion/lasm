@@ -102,6 +102,12 @@ and [`test/fuzz.mjs`](test/fuzz.mjs) (the endpoint fuzzer).
 | Token responses are not cached (RFC 6749 §5.1) | The adversarial suite |
 | The sign-in and consent pages work in Chromium, Firefox and WebKit, with and without JavaScript, with no script error or CSP violation | The end-to-end tests ([`test/e2e`](test/e2e)) |
 
+## 9. Commits under database faults
+
+| Requirement | Covered by |
+| --- | --- |
+| A commit that landed but reported an error is not run again (its reply stands, nothing it issued is revoked) | `Spec.landed_commit_stands` (the server's choice after a failed commit, given its receipt); the deterministic simulation (ambiguous commits, heavy-fault seeds) |
+
 ## Out of scope
 
 - Dynamic client registration, the implicit and hybrid flows, the

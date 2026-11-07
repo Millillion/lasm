@@ -14,7 +14,9 @@ functions over any monad `m`:
 The provider never writes. A request computes its `Write`s, and the server
 commits them in one transaction after checking that no other request
 committed since this one read (`Server/Sql.lean`), so the theorems, which are
-about one request at a time, describe what the server does.
+about one request at a time, describe what the server does. A commit that
+throws is decided by `afterFailedCommit`: one that landed anyway (its receipt
+is in the database) is not run again.
 -/
 import Porter.Types
 
@@ -77,5 +79,27 @@ structure Ctx where
   now : Nat
   fresh : Fresh
   deriving DecidableEq, Repr, Inhabited
+
+/-- What the server does after a commit throws. -/
+inductive AfterFailedCommit where
+  /-- The commit landed (its success was lost): the request's reply stands. -/
+  | stand
+  /-- Another request committed first: the request runs again. -/
+  | rerun
+  /-- Nothing changed: the database refused the commit. -/
+  | fail
+  deriving DecidableEq, Repr
+
+/-- The server's choice after a commit throws (`Server/App.lean`). `landed`:
+whether the request's commit receipt is in the database, `none` if even that
+could not be read; `moved`: whether the database's version changed since the
+request read it. A commit whose receipt is there is never run again; one
+whose receipt could not be read is decided by the version alone, as before
+receipts. -/
+def afterFailedCommit (landed : Option Bool) (moved : Bool) : AfterFailedCommit :=
+  match landed, moved with
+  | some true, _ => .stand
+  | _, true => .rerun
+  | _, false => .fail
 
 end Porter
