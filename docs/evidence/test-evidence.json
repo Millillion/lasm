@@ -1,0 +1,822 @@
+{
+  "schema": 1,
+  "about": "Lasm test evidence (scripts/evidence/page.mjs). \"ci\" holds what CI measured, read from the GitHub API at generatedAt; \"repository\" holds what is recorded in the repository and checked by CI on every change. Rendered as content/learn/test-evidence.md.",
+  "generatedAt": "2026-11-07T18:19:02.018Z",
+  "repository": "Millillion/lasm",
+  "commit": null,
+  "repository_facts": {
+    "platformLevels": {
+      "L0": "It builds",
+      "L1": "Its smoke tests pass",
+      "L2": "Its output matches Node's across the differential tests, and the platform's own conformance suites pass",
+      "L3": "A full example app also passes an independent test suite, plus fuzzing and simulation"
+    },
+    "maxAgeDays": 30,
+    "mutationBaseline": {
+      "measuredAt": "2026-11-03",
+      "tool": "Stryker 10.0.0 with the tap runner over node:test (scripts/mutation/run.mjs)",
+      "run": "mutation.yml run 41749603692 (Node 26.13.0, main at the branch point)",
+      "modules": {
+        "host-bridge": {
+          "initial": 56.5,
+          "score": 96,
+          "mutants": 743,
+          "threshold": 96
+        },
+        "ui-dom": {
+          "initial": 55.1,
+          "score": 92.8,
+          "mutants": 684,
+          "threshold": 92
+        },
+        "build-service": {
+          "initial": 52.4,
+          "score": 94.3,
+          "mutants": 464,
+          "threshold": 94
+        },
+        "link-driver": {
+          "initial": 53.9,
+          "score": 93,
+          "mutants": 3260,
+          "threshold": 93
+        },
+        "target-link": {
+          "initial": 5.9,
+          "score": 86.8,
+          "mutants": 1950,
+          "threshold": 86
+        },
+        "edge-glue": {
+          "initial": 15.2,
+          "score": 97.3,
+          "mutants": 1235,
+          "threshold": 97
+        },
+        "notices": {
+          "initial": 62.5,
+          "score": 91.5,
+          "mutants": 475,
+          "threshold": 91
+        }
+      }
+    },
+    "proofs": [
+      {
+        "name": "Lasm's library",
+        "path": "library/PROOFS.md",
+        "propositions": 30,
+        "theorems": 120,
+        "sections": [
+          {
+            "name": "Lasm.UI",
+            "propositions": 9
+          },
+          {
+            "name": "Lasm.RPC",
+            "propositions": 14
+          },
+          {
+            "name": "Lasm.KV",
+            "propositions": 6
+          },
+          {
+            "name": "Lasm.Fetch",
+            "propositions": 1
+          }
+        ]
+      },
+      {
+        "name": "Conduit",
+        "path": "examples/conduit/PROOFS.md",
+        "propositions": 52,
+        "theorems": 307
+      },
+      {
+        "name": "Folio",
+        "path": "examples/folio/PROOFS.md",
+        "propositions": 22,
+        "theorems": 122
+      },
+      {
+        "name": "Ledger",
+        "path": "examples/ledger/PROOFS.md",
+        "propositions": 31,
+        "theorems": 191
+      },
+      {
+        "name": "Porter",
+        "path": "examples/porter/PROOFS.md",
+        "propositions": 28,
+        "theorems": 197
+      },
+      {
+        "name": "Tandem",
+        "path": "examples/tandem/PROOFS.md",
+        "propositions": 29,
+        "theorems": 218
+      }
+    ],
+    "fuzzTargets": [
+      {
+        "name": "cli-arguments",
+        "engine": "JavaScript (V8 block coverage)",
+        "description": "the CLI's argument parser (src/cli-arguments.mjs and the init, dev and package parsers it calls)."
+      },
+      {
+        "name": "serverless-http",
+        "engine": "JavaScript (V8 block coverage)",
+        "description": "the function platforms' HTTP boundary (src/serverless/): AWS Lambda's event → request mapping (API Gateway REST and HTTP API, function URLs, ALB, CloudFront) in lasm-lambda.mjs, and the cookie and body helpers of lasm-server.mjs every platform shim uses (joinCookies, parseSetCookie, azureReply, isTextual)."
+      },
+      {
+        "name": "ui-patch",
+        "engine": "JavaScript (V8 block coverage)",
+        "description": "the Lasm.UI patch decoder (src/lasm-modules/ui-dom.mjs, the browser side of library/Lasm/UI/Encode.lean) against happy-dom."
+      },
+      {
+        "name": "lean-fetch-request",
+        "engine": "libFuzzer",
+        "description": "Lasm.Fetch request parsing as Node's host builds requests (path, query, cookies, Host)"
+      },
+      {
+        "name": "lean-rpc",
+        "engine": "libFuzzer",
+        "description": "Lasm.RPC request and response decoding, and Lean's JSON round trip"
+      },
+      {
+        "name": "wasi-cgi",
+        "engine": "libFuzzer",
+        "description": "the WASI C host's CGI request and response (src/wasi/lasm_fetch_wasi.c), with ASan and UBSan"
+      }
+    ],
+    "dstApps": [
+      "tandem",
+      "ledger",
+      "porter"
+    ],
+    "equivalence": {
+      "apps": [
+        "fetch-template",
+        "fetch-example"
+      ],
+      "targets": [
+        "node",
+        "deno",
+        "bun",
+        "wasi-http",
+        "workers"
+      ]
+    },
+    "benchmarks": {
+      "version": "0.1.0-experimental.42381817859",
+      "date": "2026-11-07",
+      "metrics": 37,
+      "change": "No metric is worse by more than its threshold (5 % for sizes, 20 % for timings, by same-runner ratio where one exists).",
+      "table": "| Area | Metric | Median | Spread (min – max) | Same-runner comparison |\n| --- | --- | ---: | --- | --- |\n| Cold start | Trivial program, start to exit | 137 ms | 131 ms – 188 ms (n=10) | 5.50× node-hello |\n| Cold start | Hono + Lean handler, start to first HTTP response | 184 ms | 173 ms – 200 ms (n=10) | 3.89× node-http |\n| Cold start | Std.Http server, start to first HTTP response | 259 ms | 240 ms – 311 ms (n=10) | 5.45× node-http |\n| Bundle size | Trivial program: dist/ | 8.2 MiB |  |  |\n| Bundle size | Trivial program: program.wasm | 530 KiB |  |  |\n| Bundle size | Trivial program: dist/, brotli | 1.6 MiB |  |  |\n| Bundle size | Hono app: dist/ without node_modules | 8.5 MiB |  |  |\n| Bundle size | Hono app: program.wasm, brotli | 167 KiB |  |  |\n| Bundle size | Hono app: dist/node_modules | 1.4 MiB |  |  |\n| Memory | Trivial program, peak RSS | 96 MiB | 96 MiB – 96 MiB (n=3) | 1.53× node-hello |\n| Memory | Hono + Lean handler, idle RSS | 120 MiB | 120 MiB – 120 MiB (n=3) | 1.92× node-http |\n| Memory | Hono + Lean handler, peak RSS under load | 272 MiB | 270 MiB – 275 MiB (n=3) | 3.21× node-http |\n| Memory | Std.Http server, peak RSS under load | 395 MiB | 377 MiB – 410 MiB (n=3) | 4.58× node-http |\n| HTTP | Hono + Lean handler, throughput | 25,726 req/s | 25,475 req/s – 25,794 req/s (n=3) | 0.27× node-http; 0.28× node-hono |\n| HTTP | Hono + Lean handler, p99 latency | 4.4 ms | 4.3 ms – 5.4 ms (n=3) | 12.47× node-http |\n| HTTP | Express + Lean handler, throughput | 18,549 req/s | 18,479 req/s – 19,180 req/s (n=3) | 0.20× node-http; 0.34× node-express |\n| HTTP | Express + Lean handler, p99 latency | 5.1 ms | 5.1 ms – 5.4 ms (n=3) | 15.73× node-http |\n| HTTP | Std.Http server, throughput | 1,262 req/s | 1,208 req/s – 1,287 req/s (n=3) | 0.01× node-http |\n| HTTP | Std.Http server, p99 latency | 19 ms | 19 ms – 20 ms (n=3) | 56.44× node-http |\n| HTTP | Plain Node node:http (reference) | 95,915 req/s | 94,876 req/s – 99,507 req/s (n=3) |  |\n| Interop | Lean→JS call round trip, p50 | 21 µs | 19 µs – 21 µs (n=3) |  |\n| Interop | Await a resolved JS promise, p50 | 20 µs | 20 µs – 21 µs (n=3) |  |\n| Big numbers | 10,000-digit multiplication | 821 µs | 795 µs – 825 µs (n=3) |  |\n| Big numbers | 20,000 by 5,000-digit division | 1430 µs | 1418 µs – 1433 µs (n=3) |  |\n| Big numbers | 10,000-digit toString | 82774 µs | 82178 µs – 83253 µs (n=3) |  |\n| Build | Clean build, trivial program | 3.2 s | 3.1 s – 3.2 s (n=3) |  |\n| Build | Incremental build after a one-line change, trivial program | 5.1 s | 5.1 s – 5.3 s (n=3) |  |\n| Build | Clean build, Hono app | 5.0 s | 5.0 s – 28 s (n=3) |  |\n| Build | Incremental build after a one-line change, Hono app | 7.4 s | 7.4 s – 7.4 s (n=3) |  |\n| Build | Incremental dev build (--dev, lasm run), trivial program | 1.2 s | 1.1 s – 1.6 s (n=3) |  |\n| Build | Incremental dev build (--dev, lasm run), Hono app | 2.1 s | 2.0 s – 2.5 s (n=3) |  |\n| Bundle size | Hono app: program.wasm, dev profile | 933 KiB |  |  |\n| Install | Package download (npm tarball) | 71 MiB |  |  |\n| Install | Installed size | 404 MiB |  |  |\n| Install | npm install, empty cache | 4.6 s | 4.6 s – 4.9 s (n=3) |  |\n| Install | First build incl. one-time tool download | 25 s |  |  |\n| Install | Tool cache on disk after the first build | 2504 MiB |  |  |",
+      "page": "docs/BENCHMARKS.md"
+    }
+  },
+  "ci": {
+    "platforms": [
+      {
+        "id": "node",
+        "row": "Node.js 24+",
+        "level": "L3",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "holds"
+        },
+        "unmet": []
+      },
+      {
+        "id": "bun-deno",
+        "row": "Bun / Deno",
+        "level": "L2",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "no evidence yet"
+        },
+        "unmet": []
+      },
+      {
+        "id": "workers",
+        "row": "Cloudflare Workers",
+        "level": "L2",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "no evidence yet"
+        },
+        "unmet": []
+      },
+      {
+        "id": "vercel",
+        "row": "Vercel Functions / Vercel Edge",
+        "level": "L2",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "no evidence yet"
+        },
+        "unmet": []
+      },
+      {
+        "id": "netlify",
+        "row": "Netlify Functions / Netlify Edge",
+        "level": "L2",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "no evidence yet"
+        },
+        "unmet": []
+      },
+      {
+        "id": "deno-deploy",
+        "row": "Deno Deploy",
+        "level": "L2",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "no evidence yet"
+        },
+        "unmet": []
+      },
+      {
+        "id": "supabase",
+        "row": "Supabase Edge Functions",
+        "level": "L2",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "no evidence yet"
+        },
+        "unmet": []
+      },
+      {
+        "id": "lambda",
+        "row": "AWS Lambda",
+        "level": "L2",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "no evidence yet"
+        },
+        "unmet": []
+      },
+      {
+        "id": "azure",
+        "row": "Azure Functions",
+        "level": "L2",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "no evidence yet"
+        },
+        "unmet": []
+      },
+      {
+        "id": "gcf",
+        "row": "Google Cloud Functions",
+        "level": "L2",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "no evidence yet"
+        },
+        "unmet": []
+      },
+      {
+        "id": "fastly",
+        "row": "Fastly Compute",
+        "level": "L2",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "no evidence yet"
+        },
+        "unmet": []
+      },
+      {
+        "id": "wasi",
+        "row": "WASI / wasi-http / Spin",
+        "level": "L2",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "no evidence yet"
+        },
+        "unmet": []
+      },
+      {
+        "id": "browser",
+        "row": "Browsers",
+        "level": "L2",
+        "levels": {
+          "L0": "holds",
+          "L1": "holds",
+          "L2": "holds",
+          "L3": "no evidence yet"
+        },
+        "unmet": []
+      }
+    ],
+    "tiers": [
+      {
+        "tier": "PR",
+        "workflow": "differential.yml",
+        "what": "differential regressions and seeded programs, target equivalence, stack depth",
+        "run": {
+          "id": 42395300306,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42395300306",
+          "event": "push",
+          "branch": "main",
+          "date": "2026-11-07T17:38:56Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "PR",
+        "workflow": "fuzz.yml",
+        "what": "the fuzz corpus and regressions, replayed",
+        "run": {
+          "id": 42399791659,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42399791659",
+          "event": "push",
+          "branch": "main",
+          "date": "2026-11-07T18:15:43Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "PR",
+        "workflow": "tooling.yml",
+        "what": "the tooling error corpus",
+        "run": {
+          "id": 42395300299,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42395300299",
+          "event": "push",
+          "branch": "main",
+          "date": "2026-11-07T17:28:54Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "PR",
+        "workflow": "library-proofs.yml",
+        "what": "the library's proofs",
+        "run": {
+          "id": 42399791680,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42399791680",
+          "event": "push",
+          "branch": "main",
+          "date": "2026-11-07T18:17:17Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "PR",
+        "workflow": "conduit.yml",
+        "what": "Conduit: RealWorld API and E2E suites, equivalence",
+        "run": {
+          "id": 42381691066,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42381691066",
+          "event": "push",
+          "branch": "main",
+          "date": "2026-11-07T15:46:37Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "PR",
+        "workflow": "conduit-platforms.yml",
+        "what": "Conduit on 15 more platforms, equivalence",
+        "run": {
+          "id": 42381691127,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42381691127",
+          "event": "push",
+          "branch": "main",
+          "date": "2026-11-07T16:18:10Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "Nightly",
+        "workflow": "ci-nightly.yml",
+        "what": "the release suites: unit, browser, edge, Bun/Deno, WASI, UI, fullstack, dev loop, Lasm.JS stress",
+        "run": null
+      },
+      {
+        "tier": "Nightly",
+        "workflow": "nightly.yml",
+        "what": "the upstream Lean suite and the ecosystem",
+        "run": {
+          "id": 42379475399,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42379475399",
+          "event": "schedule",
+          "branch": "main",
+          "date": "2026-11-07T14:25:41Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "Nightly",
+        "workflow": "differential.yml",
+        "what": "60-minute differential campaigns, both profiles; macOS jobs",
+        "run": {
+          "id": 42367691753,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42367691753",
+          "event": "schedule",
+          "branch": "main",
+          "date": "2026-11-07T13:16:46Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "Nightly",
+        "workflow": "fuzz.yml",
+        "what": "boundary fuzzing campaigns",
+        "run": null
+      },
+      {
+        "tier": "Nightly",
+        "workflow": "mutation.yml",
+        "what": "mutation testing of every module",
+        "run": {
+          "id": 42370045127,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42370045127",
+          "event": "schedule",
+          "branch": "main",
+          "date": "2026-11-07T14:00:09Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "Nightly",
+        "workflow": "dst-nightly.yml",
+        "what": "deterministic simulation of the example apps, random seeds",
+        "run": null
+      },
+      {
+        "tier": "Nightly",
+        "workflow": "bridge-verification.yml",
+        "what": "host bridge: model and schedule fuzzing on four platforms",
+        "run": null
+      },
+      {
+        "tier": "Nightly",
+        "workflow": "tooling.yml",
+        "what": "tooling metamorphic builds and fault injection",
+        "run": {
+          "id": 42369402176,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42369402176",
+          "event": "schedule",
+          "branch": "main",
+          "date": "2026-11-07T13:48:01Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "Nightly",
+        "workflow": "folio-nightly.yml",
+        "what": "Folio campaign",
+        "run": {
+          "id": 42367124815,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42367124815",
+          "event": "schedule",
+          "branch": "main",
+          "date": "2026-11-07T11:19:10Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "Nightly",
+        "workflow": "porter-nightly.yml",
+        "what": "Porter campaign",
+        "run": {
+          "id": 42367521499,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42367521499",
+          "event": "schedule",
+          "branch": "main",
+          "date": "2026-11-07T12:08:55Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "Nightly",
+        "workflow": "tandem-nightly.yml",
+        "what": "Tandem campaign",
+        "run": {
+          "id": 42369579075,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42369579075",
+          "event": "schedule",
+          "branch": "main",
+          "date": "2026-11-07T14:03:14Z",
+          "conclusion": "success"
+        }
+      },
+      {
+        "tier": "Nightly",
+        "workflow": "installation-confidence.yml",
+        "what": "cold installation on every platform",
+        "run": {
+          "id": 42362852155,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42362852155",
+          "event": "schedule",
+          "branch": "main",
+          "date": "2026-11-07T10:34:15Z",
+          "conclusion": "failure"
+        }
+      },
+      {
+        "tier": "Weekly",
+        "workflow": "ci-weekly.yml",
+        "what": "100-minute differential campaigns, Lasm.JS soak",
+        "run": null
+      },
+      {
+        "tier": "Release",
+        "workflow": "release-checks.yml",
+        "what": "the release candidate: build, five-platform installed acceptance and every launch workflow",
+        "run": {
+          "id": 42364903897,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42364903897",
+          "event": "push",
+          "branch": "main",
+          "date": "2026-11-07T16:33:32Z",
+          "conclusion": "success"
+        }
+      }
+    ],
+    "mutation": {
+      "run": {
+        "id": 42370045127,
+        "url": "https://github.com/Millillion/lasm/actions/runs/42370045127",
+        "event": "schedule",
+        "branch": "main",
+        "date": "2026-11-07T14:00:09Z",
+        "conclusion": "success"
+      },
+      "modules": [
+        {
+          "name": "module (edge-glue)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/42370045127/job/128413577069",
+          "module": "edge-glue",
+          "score": 97.1,
+          "mutants": 1260,
+          "threshold": 97
+        },
+        {
+          "name": "module (notices)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/42370045127/job/128413577078",
+          "module": "notices",
+          "score": 91.5,
+          "mutants": 475,
+          "threshold": 91
+        },
+        {
+          "name": "module (target-link)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/42370045127/job/128413577086",
+          "module": "target-link",
+          "score": 86.8,
+          "mutants": 1964,
+          "threshold": 86
+        },
+        {
+          "name": "module (host-bridge)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/42370045127/job/128413577125",
+          "module": "host-bridge",
+          "score": 96.4,
+          "mutants": 825,
+          "threshold": 96
+        },
+        {
+          "name": "module (ui-dom)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/42370045127/job/128413577146",
+          "module": "ui-dom",
+          "score": 93.6,
+          "mutants": 758,
+          "threshold": 92
+        },
+        {
+          "name": "module (build-service)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/42370045127/job/128413577169",
+          "module": "build-service",
+          "score": 94.3,
+          "mutants": 464,
+          "threshold": 94
+        },
+        {
+          "name": "module (link-driver)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/42370045127/job/128413577192",
+          "module": "link-driver",
+          "score": 93,
+          "mutants": 3260,
+          "threshold": 93
+        }
+      ]
+    },
+    "fuzz": {
+      "run": null,
+      "targets": []
+    },
+    "dst": {
+      "run": null,
+      "apps": []
+    },
+    "differential": {
+      "run": {
+        "id": 42367691753,
+        "url": "https://github.com/Millillion/lasm/actions/runs/42367691753",
+        "event": "schedule",
+        "branch": "main",
+        "date": "2026-11-07T13:16:46Z",
+        "conclusion": "success"
+      },
+      "jobs": [
+        {
+          "name": "differential (release)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/42367691753/job/128389813817",
+          "programs": 80,
+          "cases": 9500,
+          "divergences": 0,
+          "harnessErrors": 0
+        },
+        {
+          "name": "differential (dev)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/42367691753/job/128389813958",
+          "programs": 108,
+          "cases": 12825,
+          "divergences": 0,
+          "harnessErrors": 0
+        }
+      ]
+    },
+    "equivalence": {
+      "fetch": {
+        "run": {
+          "id": 42395300306,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42395300306",
+          "event": "push",
+          "branch": "main",
+          "date": "2026-11-07T17:38:56Z",
+          "conclusion": "success"
+        },
+        "jobs": [
+          {
+            "name": "equivalence (fetch-example)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42395300306/job/128473642080"
+          },
+          {
+            "name": "equivalence (fetch-template)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42395300306/job/128473642135"
+          }
+        ]
+      },
+      "conduit": {
+        "run": {
+          "id": 42381691066,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42381691066",
+          "event": "push",
+          "branch": "main",
+          "date": "2026-11-07T15:46:37Z",
+          "conclusion": "success"
+        },
+        "jobs": [
+          {
+            "name": "API on Bun (bun:sqlite)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691066/job/128430469514"
+          },
+          {
+            "name": "API on Node 26.13.0",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691066/job/128430469606"
+          },
+          {
+            "name": "API on Cloudflare Workers (wrangler dev, local D1)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691066/job/128430469759"
+          },
+          {
+            "name": "API on Node 24",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691066/job/128430469789"
+          }
+        ]
+      },
+      "conduitPlatforms": {
+        "run": {
+          "id": 42381691127,
+          "url": "https://github.com/Millillion/lasm/actions/runs/42381691127",
+          "event": "push",
+          "branch": "main",
+          "date": "2026-11-07T16:18:10Z",
+          "conclusion": "success"
+        },
+        "jobs": [
+          {
+            "name": "Deno Deploy (Deno 2.9.6, Deno KV)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430469815"
+          },
+          {
+            "name": "Fastly Compute (Viceroy 0.21.1, Fastly KV)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430469967"
+          },
+          {
+            "name": "Azure Functions (func start)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430469994"
+          },
+          {
+            "name": "AWS Lambda .zip (sam local start-api, nodejs24.x)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470033"
+          },
+          {
+            "name": "Deno 2.9.6 (node:sqlite)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470041"
+          },
+          {
+            "name": "Vercel Edge (vercel build offline, edge-runtime)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470061"
+          },
+          {
+            "name": "AWS Lambda container image (sam local start-api, AWS base image)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470067"
+          },
+          {
+            "name": "Docker (node:24-bookworm-slim, read-only, 512 MB)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470069"
+          },
+          {
+            "name": "Netlify Functions (netlify build offline; Netlify's bootstrap in the Lambda Node 24 image)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470079"
+          },
+          {
+            "name": "Vercel Functions (vercel build offline, Vercel's Node launcher)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470081"
+          },
+          {
+            "name": "Spin 4.2.2 (wasi-http; Postgres through PostgREST)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470083"
+          },
+          {
+            "name": "Supabase Edge Functions (supabase start, supabase functions serve; Postgres)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470092"
+          },
+          {
+            "name": "Netlify Edge (netlify build offline; Deno with Netlify Blobs' local server)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470109"
+          },
+          {
+            "name": "wasi-http (wasmtime 49.0.4 serve; Postgres through PostgREST)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470147"
+          },
+          {
+            "name": "Google Cloud Functions (Functions Framework)",
+            "conclusion": "success",
+            "url": "https://github.com/Millillion/lasm/actions/runs/42381691127/job/128430470230"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -95,16 +95,21 @@ export function render(readme, results, config) {
   return readme.slice(0, start + START.length) + '\n' + out.join('\n') + '\n\n' + legend(config) + '\n' + readme.slice(end);
 }
 
-async function collect(config, { repository, token, now }) {
-  const api = async path => {
+/** A GitHub REST GET for `repository` (JSON), retried on 5xx and 429. */
+export function githubApi(repository, token, agent = 'lasm-evidence-levels') {
+  return async path => {
     for (let attempt = 1; ; attempt++) {
       const response = await fetch(`https://api.github.com/repos/${repository}/${path}`, { headers: { Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github+json', 'User-Agent': 'lasm-evidence-levels' }, signal: AbortSignal.timeout(60_000) });
+        Accept: 'application/vnd.github+json', 'User-Agent': agent }, signal: AbortSignal.timeout(60_000) });
       if (response.ok) return response.json();
       if (attempt < 4 && (response.status >= 500 || response.status === 429)) { await new Promise(done => setTimeout(done, 5000 * attempt)); continue; }
       throw new Error(`GET ${path}: HTTP ${response.status} ${(await response.text()).slice(0, 200)}`);
     }
   };
+}
+
+/** The runs and jobs `evaluate` needs, from the GitHub API. */
+export async function collect(config, { repository, token, now, api = githubApi(repository, token) }) {
   const requirements = config.platforms.flatMap(p => LEVELS.flatMap(name => p[name] ?? []));
   const runs = {}, jobs = {};
   for (const workflow of [...new Set(requirements.map(r => r.workflow))]) {
@@ -164,4 +169,4 @@ async function main() {
   }
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) await main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();
