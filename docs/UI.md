@@ -500,10 +500,16 @@ theorem diffAttrs_correct (old new : List (Attr Msg)) : applyAttrOps (diffAttrs 
   ids; attribute slots as functions, so their order is unobservable as in the
   DOM; `insertBefore`, `remove`, `textContent = ""` and setting/removing
   attributes, properties, styles and listeners.
-- **Not proved, tested instead**: that the binary encoding
-  ([Encode.lean](../library/Lasm/UI/Encode.lean)) and the JavaScript applier
-  ([ui-dom.mjs](../src/lasm-modules/ui-dom.mjs)) implement the model's
-  operations, and that browsers implement the DOM. `test/ui-dom.test.mjs` applies
+- **The encoding** ([Encode.lean](../library/Lasm/UI/Encode.lean)): the
+  applier's reading of the binary frames is written in Lean as a reference
+  decoder ([Proofs/Decode.lean](../library/Lasm/UI/Proofs/Decode.lean)), and
+  `Lasm.UI.Spec.frames_decode` proves that over any session it reads every
+  frame back as exactly the patch that was encoded, its interning tables never
+  out of step.
+- **Not proved, tested instead**: that the JavaScript applier
+  ([ui-dom.mjs](../src/lasm-modules/ui-dom.mjs)) reads as the reference
+  decoder does and implements the model's operations, and that browsers
+  implement the DOM. `test/ui-dom.test.mjs` applies
   480 frames that Lean's diff and encoder wrote for random views to a DOM
   implementation and compares each result with the view; the browser suite
   runs the examples in Chromium, Firefox and WebKit. One deliberate difference:

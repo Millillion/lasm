@@ -11,9 +11,11 @@ Lasm.UI's diff is proved correct against the DOM model (Lasm.UI.Model).
 * `session_correct`: any sequence of frames, starting from an empty root.
 * `diffAttrs_correct`: the attribute diff.
 
-What is modelled (and so outside the theorem): that the binary encoding
-(Lasm.UI.Encode) and the JavaScript applier (src/lasm-modules/ui-dom.mjs) implement
-`applyOps` (tested, not proved), and that the DOM behaves as the model.
+What is modelled (and so outside the theorem): that the JavaScript applier
+(src/lasm-modules/ui-dom.mjs) implements `applyOps` (tested, not proved), and
+that the DOM behaves as the model. That the applier reads the binary encoding
+(Lasm.UI.Encode) back as exactly the patch is proved separately, against a
+reference decoder (Proofs/Decode.lean, Proofs/Wire.lean: Spec.frames_decode).
 
 Proof files: Proofs/Basic (unfolding, `WF`, `create`, attributes),
 Proofs/Lists (sibling lists, slices), Proofs/Children (steps of the children

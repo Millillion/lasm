@@ -51,35 +51,46 @@ A few theorems that the library itself uses sit beside its code
 `call_invalid`; `segments_no_dot_segments`); the Theorems files cite them.
 
 What is modelled, and so outside the theorems: the DOM (Lasm.UI.Model), with
-the JavaScript applier and the binary patch encoding tested against it, not
-proved; Lean's JSON parser and printer; the `IO.Ref` that holds the memory
+the JavaScript applier tested against it, not proved; how the applier reads
+the binary patch encoding, which is written in Lean as a reference decoder
+(Lasm/UI/Proofs/Decode.lean, function for function the reading half of
+src/lasm-modules/ui-dom.mjs) and proved to read every frame back as exactly
+its patch (`frames_decode`), while the JavaScript itself is tested (patch
+fixtures written by Lean in test/ui-dom.test.mjs, and the ui-patch fuzz
+target); Lean's JSON parser and printer; the `IO.Ref` that holds the memory
 store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**30 proved propositions (120 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**31 proved propositions (193 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
-## Lasm.UI (9)
+## Lasm.UI (10)
 
 ### Rendering: the DOM always shows the view
 
 | Proposition | In plain English |
 | --- | --- |
-| [`diff_correct`](Lasm/UI/Spec.lean#L35) | **The diff is correct.** Take any well-formed rendered tree `old` and any next view `new`. Applying the patch that `diff old new next` returns to the DOM of `old` gives exactly the DOM of the new rendered tree; that tree shows `new`; it is well formed again; and the next free id never goes down (so ids are never reused). This is about the executable `diff` itself, with every case it has: keyed moves, the two-ended matching and its key-map fallback, inserts, removals, clearing, replacing nodes whose kind or tag changed, text changes and attribute changes. |
-| [`mount_correct`](Lasm/UI/Spec.lean#L49) | **The first render is correct.** Under an empty root, the patch of the first render (`mountOps`) builds the DOM of a well-formed rendered tree that shows the view. |
-| [`session_correct`](Lasm/UI/Spec.lean#L57) | **Every frame stays correct.** Start from an empty root and render any sequence of views, one frame each (diff the rendered tree against the next view and apply the patch to the DOM, as the runtime does: `Session.step`). After any number of frames, the DOM is exactly the DOM of the rendered tree, that tree is well formed, and it shows the latest view. |
-| [`diffAttrs_correct`](Lasm/UI/Spec.lean#L67) | **The attribute diff is correct.** The attribute operations that `diffAttrs old new` returns turn the attribute slots of `old` (attributes, properties, styles and listeners, the last setting of each slot winning) into exactly those of `new`: every slot `new` sets has its value, and every other slot is unset. |
-| [`create_correct`](Lasm/UI/Spec.lean#L75) | **New nodes get fresh ids.** Rendering a view `h` from scratch with `create h n` gives a tree whose root has id `n`, whose ids are all below the returned next free id (which is above `n`), whose sibling ids are distinct, and which shows `h`. |
+| [`diff_correct`](Lasm/UI/Spec.lean#L38) | **The diff is correct.** Take any well-formed rendered tree `old` and any next view `new`. Applying the patch that `diff old new next` returns to the DOM of `old` gives exactly the DOM of the new rendered tree; that tree shows `new`; it is well formed again; and the next free id never goes down (so ids are never reused). This is about the executable `diff` itself, with every case it has: keyed moves, the two-ended matching and its key-map fallback, inserts, removals, clearing, replacing nodes whose kind or tag changed, text changes and attribute changes. |
+| [`mount_correct`](Lasm/UI/Spec.lean#L52) | **The first render is correct.** Under an empty root, the patch of the first render (`mountOps`) builds the DOM of a well-formed rendered tree that shows the view. |
+| [`session_correct`](Lasm/UI/Spec.lean#L60) | **Every frame stays correct.** Start from an empty root and render any sequence of views, one frame each (diff the rendered tree against the next view and apply the patch to the DOM, as the runtime does: `Session.step`). After any number of frames, the DOM is exactly the DOM of the rendered tree, that tree is well formed, and it shows the latest view. |
+| [`diffAttrs_correct`](Lasm/UI/Spec.lean#L70) | **The attribute diff is correct.** The attribute operations that `diffAttrs old new` returns turn the attribute slots of `old` (attributes, properties, styles and listeners, the last setting of each slot winning) into exactly those of `new`: every slot `new` sets has its value, and every other slot is unset. |
+| [`create_correct`](Lasm/UI/Spec.lean#L78) | **New nodes get fresh ids.** Rendering a view `h` from scratch with `create h n` gives a tree whose root has id `n`, whose ids are all below the returned next free id (which is above `n`), whose sibling ids are distinct, and which shows `h`. |
+
+### The patch encoding: the browser reads exactly the patch
+
+| Proposition | In plain English |
+| --- | --- |
+| [`frames_decode`](Lasm/UI/Spec.lean#L89) | **The browser reads every frame as exactly the patch Lean encoded.** Lean sends each frame's patch to the browser as bytes (`Encode.frame`), with tag, attribute and event names, short attribute values and event decoder shapes interned in tables that both sides keep from frame to frame. Take any session: any sequence of frames, each any patch on the children of any node, encoded in turn from empty tables (`Decode.encodeAll`). The applier's reading of those bytes (`Decode.frames`: Lasm.UI.Proofs.Decode, the reading half of src/lasm-modules/ui-dom.mjs, its tables also carried from frame to frame) never fails, and gives for each frame exactly the operations of its patch (`Wire.ofOps`): every insert with the DOM of the inserted tree (`toDom`), and every move, removal, clear, text change and attribute operation, each on its node, in order. So the tables never fall out of step, and every interned name, value and decoder shape is read back as the one Lean meant. (An attribute operation that sets a slot to a value of another kind, which `diff` never produces, is sent as a removal of the slot: `AttrOp.wire`.) |
 
 ### Commands
 
 | Proposition | In plain English |
 | --- | --- |
-| [`cmd_map_comp`](Lasm/UI/Spec.lean#L90) | **Mapping commands composes.** `Cmd.map` is how a parent embeds a child component's commands (its messages wrapped in the parent's). Mapping by `g` and then by `f` is the same command as mapping once by `f ∘ g`, so components nest to any depth. |
-| [`cmd_map_effects`](Lasm/UI/Spec.lean#L97) | **Mapping commands keeps their effects.** Mapping a command by any `f` keeps exactly its effects, in order, each of the same kind with the same data (the same request, delay, URL, storage key …): with the messages they deliver forgotten (`Effect.forget`), the effects before and after are equal. Only the messages change. |
-| [`cmd_map_id`](Lasm/UI/Spec.lean#L105) | **Mapping by the identity changes nothing.** |
-| [`cmd_map_batch`](Lasm/UI/Spec.lean#L109) | **Mapping commutes with batching.** Mapping a batch of commands is the batch of the mapped commands: no effect is lost, duplicated or reordered. |
+| [`cmd_map_comp`](Lasm/UI/Spec.lean#L116) | **Mapping commands composes.** `Cmd.map` is how a parent embeds a child component's commands (its messages wrapped in the parent's). Mapping by `g` and then by `f` is the same command as mapping once by `f ∘ g`, so components nest to any depth. |
+| [`cmd_map_effects`](Lasm/UI/Spec.lean#L123) | **Mapping commands keeps their effects.** Mapping a command by any `f` keeps exactly its effects, in order, each of the same kind with the same data (the same request, delay, URL, storage key …): with the messages they deliver forgotten (`Effect.forget`), the effects before and after are equal. Only the messages change. |
+| [`cmd_map_id`](Lasm/UI/Spec.lean#L131) | **Mapping by the identity changes nothing.** |
+| [`cmd_map_batch`](Lasm/UI/Spec.lean#L135) | **Mapping commutes with batching.** Mapping a batch of commands is the batch of the mapped commands: no effect is lost, duplicated or reordered. |
 
 ## Lasm.RPC (14)
 
@@ -139,10 +150,12 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 Guarantees worth proving that need more than a modest effort; each is
 covered by tests today.
 
-- **Lasm.UI: the applier and the encoding implement the model.**
-  `Lasm.UI.Encode` writes each patch as the binary stream that
-  src/lasm-modules/ui-dom.mjs reads; a proof would need a model of the
-  JavaScript applier (tested: test/ui-dom.test.mjs, the patch fixtures).
+- **Lasm.UI: the JavaScript applier implements the decoder and the model.**
+  That the encoding is read back exactly is proved (`frames_decode`, against
+  the reference decoder Lasm/UI/Proofs/Decode.lean); that
+  src/lasm-modules/ui-dom.mjs reads as that decoder does and changes the DOM
+  as `applyOps` says would need a model of JavaScript and the DOM (tested:
+  test/ui-dom.test.mjs, the patch fixtures, the ui-patch fuzz target).
 - **Lasm.UI: an unchanged view produces an empty patch.** `diff old
   (old.map Live.erase)` emits no operations (tested by the diff model checks).
 - **Lasm.UI: keyed reorders only move.** When the new children are a
