@@ -150,12 +150,24 @@ private theorem resolve_kept : ∀ (stack input : List String), (∀ x ∈ stack
       | head => exact Or.inr ⟨by simpa [isDot] using h2, by simpa [isDotDot] using h1⟩
       | tail _ hx => exact h x hx
 
+/-- Whether `s` is a URL scheme (`http`, `https`, `x-y+z.1`): a letter, then
+letters, digits, `+`, `-` and `.`. -/
+private def isScheme (s : String) : Bool :=
+  match s.toList with
+  | c :: cs => c.isAlpha && cs.all fun c => c.isAlphanum || c == '+' || c == '-' || c == '.'
+  | [] => false
+
 /-- The raw path of `url`: from the `/` after the host, without the query. -/
 private def rawPath (url : String) : String :=
   -- Drop the query and fragment first: they may contain `://` (#76).
   let beforeQuery := (url.takeWhile (fun c => c != '?' && c != '#')).toString
+  -- Only a scheme before the first `://` makes the URL absolute: the path
+  -- itself may hold `://` (`/go/https://example.com`), which once made the
+  -- whole URL the path (test/fuzz/regressions/lean-fetch-request/).
   match beforeQuery.splitOn "://" with
-    | [_, rest] => (rest.dropWhile (· != '/')).toString
+    | scheme :: rest@(_ :: _) =>
+      if isScheme scheme then (("://".intercalate rest).dropWhile (fun c => c != '/' && c != '\\')).toString
+      else beforeQuery
     | _ => beforeQuery
 
 /-- The path's raw segments, resolved: `\\` counts as `/`, and `.`, `..`
@@ -220,6 +232,11 @@ private def pathOf (url : String) : String := ({ method := "GET", url } : Reques
 #guard pathOf "http://h" == "/"
 #guard pathOf "http://h/hello/%2e%2E/hello/Ada" == "/hello/Ada"
 #guard ({ method := "GET", url := "http://h/a/b?u=http://c/d" } : Request).segments == ["a", "b"]
+-- `://` in the path itself (found by test/fuzz).
+#guard pathOf "http://h/go/https://example.com/x" == "/go/https://example.com/x"
+#guard pathOf "/go/https://example.com/x" == "/go/https://example.com/x"
+#guard pathOf "/a://b" == "/a://b"
+#guard pathOf "http://h\\a/b" == "/a/b"
 
 /-- The first header named `name`, ignoring case. -/
 def header? (r : Request) (name : String) : Option String :=
@@ -428,6 +445,24 @@ def jsFetchHandler (handler : Handler) (options : ServeOptions := {}) : IO Value
     let r ← respond handler req
     return toJS (← jsResponse method r)
 
+/-- The absolute URL of a request Node's HTTP server received: `target` (the
+request line's path, or the absolute URL a proxy request carries) under the
+Host header. A Host that is not a plain `host[:port]` (one holding `/`, `?`,
+`#`, `\\`, `@`, whitespace or a control character) is replaced by
+`localhost:<port>`, so a client cannot move the path or the query with it
+(`Host: x/admin#` once turned `GET /public` into `/admin`; test/fuzz). -/
+def nodeRequestUrl (target : String) (host : Option String) (port : Nat) : String :=
+  let plain := fun (h : String) => !h.isEmpty && h.all fun c =>
+    !(c == '/' || c == '?' || c == '#' || c == '\\' || c == '@' || c.isWhitespace || c.toNat < 32 || c.toNat == 127)
+  let host := match host with
+    | some h => if plain h then h else s!"localhost:{port}"
+    | none => s!"localhost:{port}"
+  if target.startsWith "/" then s!"http://{host}{target}" else target
+
+#guard nodeRequestUrl "/public" (some "x/admin#") 80 == "http://localhost:80/public"
+#guard nodeRequestUrl "/a?b" (some "example.com:8080") 80 == "http://example.com:8080/a?b"
+#guard nodeRequestUrl "http://p/x" none 80 == "http://p/x"
+
 open Lasm.JS in
 /-- Node: an HTTP server (node:http) on $HOST:$PORT that runs `handler`. -/
 def serveNode (handler : Handler) (options : ServeOptions := {}) : IO Unit := do
@@ -450,9 +485,9 @@ def serveNode (handler : Handler) (options : ServeOptions := {}) : IO Unit := do
       let mut out := #[]
       for i in [0:raw.size / 2] do out := out.push (raw[2*i]!, raw[2*i+1]!)
       return out
-    let hostHeader := (headers.find? fun (k, _) => lower k == "host").map (·.2) |>.getD s!"localhost:{port}"
+    let hostHeader := (headers.find? fun (k, _) => lower k == "host").map (·.2)
     let hasBody := headers.any fun (k, _) => let k := lower k; k == "content-length" || k == "transfer-encoding"
-    let url := if target.startsWith "/" then s!"http://{hostHeader}{target}" else target
+    let url := nodeRequestUrl target hostHeader port
     let request : Request ← if !hasBody then pure { method, url, headers }
       else if options.streamRequestBody ({ method, url : Request }.path) then
         pure { method, url, headers, read := ← jsChunks (← readableClass.callMethod "toWeb" #[.ref req ""]) }
