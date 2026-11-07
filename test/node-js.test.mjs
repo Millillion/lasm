@@ -53,10 +53,10 @@ test('values round-trip through the wire format', () => {
 
 // Lengths travel as u32: one of 2^32 or more fails with a clear error instead
 // of wrapping (#154). A Uint8Array that only claims the length: nothing is allocated.
-class Huge extends Uint8Array { get length() { return 2 ** 32 + 3; } }
+class Huge extends Uint8Array { get length() { return 2 ** 32; } }
 test('a length that does not fit the wire format fails loudly instead of wrapping', () => {
   const js = createNodeJs();
-  const message = 'RangeError: Lasm.JS: cannot pass a Uint8Array of 4294967299 bytes to Lean (lengths cross as 32-bit numbers, so at most 4294967295)';
+  const message = 'RangeError: Lasm.JS: cannot pass 4294967296 bytes to Lean (lengths cross as 32-bit numbers, so at most 4294967295)';
   assert.throws(() => js.encode(new Huge(0), 'data'), { message });
   assert.throws(() => js.encode([1, { b: new Huge(0) }], 'data'), { message });
   assert.deepEqual(js.decode(js.encode(new Uint8Array(3), 'data')), new Uint8Array(3));

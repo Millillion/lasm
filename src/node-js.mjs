@@ -39,9 +39,11 @@ export const jsProtocolVersion = 1;
 export const firstJsHandle = 0x40000000;
 const decoder = new TextDecoder();
 const maximumDepth = 64;
-// Lengths travel as u32 (Lean's Wire.maxLength): a longer one is an error, never a wrapped length (#154).
-const maximumLength = 0xFFFFFFFF;
-const tooLong = (what, n, unit) => jsFailure(new RangeError(`Lasm.JS: cannot pass ${what} of ${n} ${unit} to Lean (lengths cross as 32-bit numbers, so at most ${maximumLength})`));
+// Lengths travel as u32 (Lean's Wire.maxLength): a longer one is an error, never a
+// wrapped length (#154). Only a Uint8Array can be that long: JavaScript arrays hold
+// fewer than 2^32 elements, and strings fewer than 2^30 UTF-16 units (under 2^32
+// UTF-8 bytes). A long encoded result is refused where it is framed (takeEvents).
+const lengthLimit = 2 ** 32;
 
 /** A JavaScript failure reported to Lean as an IO user error with this text. */
 export function jsFailure(error) {
@@ -85,10 +87,11 @@ class Writer {
   u32(v) { this.reserve(4); this.buffer.writeUInt32LE(v, this.length); this.length += 4; }
   f64(v) { this.reserve(8); this.buffer.writeDoubleLE(v, this.length); this.length += 8; }
   u64(v) { this.reserve(8); this.buffer.writeBigUInt64LE(BigInt.asUintN(64, BigInt(v)), this.length); this.length += 8; }
-  bytes(b) { if (b.length > maximumLength) throw tooLong('a Uint8Array', b.length, 'bytes'); this.u32(b.length); this.reserve(b.length); this.buffer.set(b, this.length); this.length += b.length; }
+  bytes(b) {
+    if (b.length >= lengthLimit) throw jsFailure(new RangeError(`Lasm.JS: cannot pass ${b.length} bytes to Lean (lengths cross as 32-bit numbers, so at most ${lengthLimit - 1})`));
+    this.u32(b.length); this.reserve(b.length); this.buffer.set(b, this.length); this.length += b.length; }
   string(s) {
     const n = Buffer.byteLength(s);
-    if (n > maximumLength) throw tooLong('a string', n, 'bytes');
     this.u32(n); this.reserve(n); this.buffer.write(s, this.length, 'utf8'); this.length += n;
   }
   result() { return this.buffer.subarray(0, this.length); }
@@ -143,12 +146,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
     }
     w.u8(10); w.u32(reference(value)); w.u32(0);
   }
-  function encode(value, mode) {
-    const w = new Writer(); write(w, value, mode);
-    // Results reach Lean framed with a u32 length too (interop events).
-    if (w.length > maximumLength) throw tooLong('a value', w.length, 'bytes');
-    return w.result();
-  }
+  function encode(value, mode) { const w = new Writer(); write(w, value, mode); return w.result(); }
   function read(r) {
     const tag = r.u8();
     switch (tag) {
