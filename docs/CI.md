@@ -1,6 +1,6 @@
 # CI tiers
 
-Status: in place since 2026-11-07 (#142: shared setup; #143: tiers).
+Status: in place since 2026-11-07 (#142: shared setup; #144: tiers).
 
 Lasm's CI is 87 workflow files in `.github/workflows/`. This page says
 which tier each check belongs to, why it is there, and how the tiers fit together.
@@ -20,9 +20,9 @@ for an hour or more.
 
 | Tier | When | What runs | Budget |
 | --- | --- | --- | --- |
-| **PR** | every pull request; the same workflows again on the push to `main` | Linux-first checks that must pass before merge, filtered by path. The unit suite; differential testing (regressions plus three seeded program pairs), host fixtures, target equivalence, Async depth and Windows recursion depth; boundary-fuzzing corpus replay; the tooling error corpus; installer faults on Linux and Windows; the example apps whose files changed; bridge verification, mutation, content, evidence and flaky-report checks when their files change; `release-checks` (`detect` only, unless the version changes). No macOS job unless the change touches macOS-specific code. | about 20 minutes of wall clock; no macOS runner for a typical change |
+| **PR** | every pull request; the same workflows again on the push to `main` (except the unit suite, which runs nightly on `main`) | Linux-first checks that must pass before merge, filtered by path. The unit suite; differential testing (regressions plus three seeded program pairs), host fixtures, target equivalence, Async depth and Windows recursion depth; boundary-fuzzing corpus replay; the tooling error corpus; installer faults on Linux and Windows; the example apps whose files changed; bridge verification, mutation, content, evidence and flaky-report checks when their files change; `release-checks` (`detect` only, unless the version changes). No macOS job unless the change touches macOS-specific code. | about 20 minutes of wall clock; no macOS runner for a typical change |
 | **Nightly** | 01:07 to 09:17 UTC, on `main` | Everything the PR tier leaves out, plus campaigns. `ci-nightly.yml` runs the release suites, which until now ran only for a release: the unit suite, browser (with WebKit on macOS), edge and Bun/Deno on five platforms, WASI/Fastly, Lasm.UI, fullstack, the dev loop and the Lasm.JS stress test. The workflows' own schedules add: differential 60-minute campaigns (release and dev profiles) and the macOS jobs (recursion depth on macOS, the macOS C tier on three macOS runners); 10-minute fuzzing per target; tooling metamorphic builds and fault injection; mutation on every module; host-bridge schedule fuzzing on four platforms; example-app DST with random seeds; the Folio, Porter and Tandem campaigns; cold installation confidence; the upstream suite and ecosystem (`nightly.yml`); content sources; published Bun/Deno; evidence levels; the flaky report. | about 2 hours, at night |
-| **Weekly** | Saturday 12:07 UTC (`ci-weekly.yml`); Sunday 06:41 UTC (`fuzz.yml`); Monday 06:17 UTC (`image-pins.yml`) | Long campaigns: a 100-minute differential campaign in each profile, the Lasm.JS soak (200 runs per program on four platforms), 60 minutes of fuzzing per target, and the image re-pin. | about 6 runner-hours |
+| **Weekly** | Saturday 12:07 UTC (`ci-weekly.yml`); Saturday 06:41 UTC (`fuzz.yml`); Monday 06:17 UTC (`image-pins.yml`) | Long campaigns: a 100-minute differential campaign in each profile, the Lasm.JS soak (200 runs per program on four platforms), 60 minutes of fuzzing per target, and the image re-pin. | about 6 runner-hours |
 | **Release** | every pull request and push to `main` whose root `version` changes (`release-checks.yml`) | Unchanged: the candidate build and five-platform installed acceptance (with installer faults, templates, js-interop, platform support and benchmarks), the npm loopback rehearsal, browser, edge, WASI, UI, fullstack, unit, dev loop and Lasm.JS stress. `release.yml` publishes only after a full `release-checks` run on the push to `main`. After publishing: `published-templates.yml` and `bun-deno-published.yml`. | as before |
 
 **On demand.** About 35 workflows run only by `workflow_dispatch`: maintainer
@@ -213,3 +213,20 @@ jobs, six of them on macOS (16 to 17 macOS minutes). It took 16 to 32 minutes
 when the runners were free, and up to 93 minutes when the macOS queue was
 long. In #133, `differential (release)` waited 84 minutes for a runner.
 
+### After (2026-11-07, `main` at 0b044e0)
+
+| PR | What it changed | Workflows | Jobs run | macOS jobs | Wall clock | Runner minutes (Linux / macOS / Windows) |
+| --- | --- | --- | --- | --- | --- | --- |
+| #145 | all five flagship apps, `library/`, `test/fuzz/`, docs | 18 | 113 | 0 | 38 min | 395 (392 / 0 / 3) |
+| #145, compiler suites only | the part a typical code PR runs: differential, tooling, fuzz, installer faults, unit, mutation, release-checks | 7 | 24 | 0 | 38 min | 47 (44 / 0 / 3) |
+
+A typical code PR now runs the compiler suites and nothing on macOS: about 24
+jobs and 47 runner minutes, against 28 to 33 jobs and 63 to 99 minutes before,
+16 to 17 of them on macOS. That is about 30 % fewer jobs, about 40 % fewer
+runner minutes and no macOS minutes at all. The unit suite (4 minutes) is new
+on PRs. A docs-only PR now runs only `release-checks` and the unit suite (the
+docs lints), about 5 runner minutes against 54 before. #145, which touched all
+five apps, ran 113 jobs in 38 minutes. #133 was the closest before (four apps,
+79 jobs), and it took 110 minutes, waiting for macOS for much of that time.
+Wall clock depends mostly on the queue: `differential` (about 34 runner minutes
+in 9 jobs) is now the critical path.

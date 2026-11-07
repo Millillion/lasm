@@ -9,12 +9,14 @@ theorem and every theorem uses only Lean's standard axioms. library/PROOFS.md
 is generated from this file.
 
 Reading guide. The propositions are about the code the browser runs: `diff`
-(Lasm.UI.Diff), which computes the patch for each frame, and the commands of
-Lasm.UI.Cmd. The DOM is a model (Lasm.UI.Model: nodes with ids, attribute
-slots, and what each patch operation does), which the JavaScript applier
-(src/lasm-modules/ui-dom.mjs) implements with the DOM API; that the applier
-and the binary encoding of the patch (Lasm.UI.Encode) match the model is
-tested, not proved.
+(Lasm.UI.Diff), which computes the patch for each frame, the binary encoding
+of the patch (Lasm.UI.Encode), and the commands of Lasm.UI.Cmd. The DOM is a
+model (Lasm.UI.Model: nodes with ids, attribute slots, and what each patch
+operation does), which the JavaScript applier (src/lasm-modules/ui-dom.mjs)
+implements with the DOM API. How the applier reads the bytes is written in
+Lean as a reference decoder (Lasm.UI.Proofs.Decode, function for function the
+reading half of the applier); that the JavaScript applier does what the
+decoder and the model say is tested, not proved.
 
 Vocabulary used below:
 - `Html Msg` is a view; `Live Msg` is a rendered tree (the view plus the DOM
@@ -25,6 +27,7 @@ Vocabulary used below:
 - `applyOps ops dom` is the DOM after the applier runs the patch `ops`.
 -/
 import Lasm.UI.Proofs
+import Lasm.UI.Proofs.Wire
 import Lasm.UI.Cmd
 
 namespace Lasm.UI.Spec
@@ -80,6 +83,29 @@ def create_correct : Prop :=
   ∀ (Msg : Type) (h : Html Msg) (n : Nat),
     let r := create h n
     r.1.id = n ∧ n < r.2 ∧ WFn r.2 r.1 ∧ r.1.erase = h
+
+/-! ## The patch encoding: the browser reads exactly the patch -/
+
+/-- **The browser reads every frame as exactly the patch Lean encoded.**
+Lean sends each frame's patch to the browser as bytes (`Encode.frame`),
+with tag, attribute and event names, short attribute values and event
+decoder shapes interned in tables that both sides keep from frame to frame.
+Take any session: any sequence of frames, each any patch on the children of
+any node, encoded in turn from empty tables (`Decode.encodeAll`). The
+applier's reading of those bytes (`Decode.frames`: Lasm.UI.Proofs.Decode,
+the reading half of src/lasm-modules/ui-dom.mjs, its tables also carried
+from frame to frame) never fails, and gives for each frame exactly the
+operations of its patch (`Wire.ofOps`): every insert with the DOM of the
+inserted tree (`toDom`), and every move, removal, clear, text change and
+attribute operation, each on its node, in order. So the tables never fall out
+of step, and every interned name, value and decoder shape is read back as
+the one Lean meant. (An attribute operation that sets a slot to a value of
+another kind, which `diff` never produces, is sent as a removal of the slot:
+`AttrOp.wire`.) -/
+def frames_decode : Prop :=
+  ∀ (Msg : Type) (frames : List (Array (Op Msg) × Nat)),
+    Decode.frames {} (Decode.encodeAll {} frames) =
+      some (frames.map fun (ops, root) => Decode.Wire.ofOps root ops.toList)
 
 /-! ## Commands -/
 

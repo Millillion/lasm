@@ -7,7 +7,7 @@ name: Porter nightly
 # or on demand. Not a release gate.
 on:
   schedule:
-    - cron: '41 4 * * *'
+    - cron: '41 3 * * 0,2-6'
   workflow_dispatch:
 permissions:
   contents: read

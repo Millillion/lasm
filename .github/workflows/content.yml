@@ -21,7 +21,7 @@ on:
       - 'docs/release/**'
       - '.github/workflows/content.yml'
   schedule:
-    - cron: '23 5 * * *'
+    - cron: '23 5 * * 1-6'
   workflow_dispatch:
 permissions:
   contents: read
