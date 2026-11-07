@@ -21,12 +21,6 @@ on:
     branches: [main]
   schedule:
     - cron: '17 9 * * 1-6'
-  push:
-    branches: [phase-7]
-    paths:
-      - '.github/workflows/bun-deno-published.yml'
-      - 'scripts/edge/published-ci.mjs'
-      - 'scripts/edge/portable-check.mjs'
 permissions:
   contents: read
 concurrency:
@@ -67,12 +61,8 @@ jobs:
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - run: node -e "require('node:assert/strict').equal(process.platform+'-'+process.arch,'${{ matrix.platform }}')"
-      - name: Enable process-tree guard (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - if: runner.os == 'Linux'
+        uses: ./.github/actions/process-guard
       - name: Pinned Bun and Deno
         run: npm install --prefix .work/host-tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
       - name: Install and run the published packages with Bun and Deno

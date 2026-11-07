@@ -67,11 +67,7 @@ jobs:
           # The recorded archive uses the full-commit directory prefix, not the
           # tag-based prefix. Preserve its original checksum and source manifest.
           node scripts/language-coverage/fetch-pristine.mjs "${LASM_NATIVE_LEAN:?}" --no-extract
-      - name: Enable the per-user resource boundary on this disposable runner
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: Prepare the exact shard within the resource boundary
         run: node scripts/full-lean/run-bounded.mjs --report .work/upstream-native-ci-prepare-resources.json -- /bin/bash scripts/application-tests/native-ci.sh prepare "${LASM_NATIVE_SELECTION:?}" "${LASM_NATIVE_SHARD:?}" "${LASM_NATIVE_SHARDS:?}" "${LASM_NATIVE_LEAN:?}"
       - name: Execute one bounded native campaign
