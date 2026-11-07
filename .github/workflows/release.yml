@@ -131,11 +131,7 @@ jobs:
             if (!at(process.versions.node, '22.14.0') || !at(npm, '11.15.0')) throw new Error('Node ' + process.versions.node + ' / npm ' + npm + ' cannot use trusted publishing');
             console.log('Node ' + process.versions.node + ', npm ' + npm);"
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable the process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: The rehearsal record and the accepted candidate
         env:
           GH_TOKEN: ${{ github.token }}

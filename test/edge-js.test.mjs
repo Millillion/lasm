@@ -91,6 +91,19 @@ test('jsFailure and describe match the Node bridge', () => {
     assert.equal(describe(value), text);
 });
 
+// Lengths travel as u32: one of 2^32 or more fails with a clear error instead
+// of wrapping, as DataView.setUint32 would (#154). The Uint8Array only claims
+// the length: nothing is allocated.
+class Huge extends Uint8Array { get length() { return 2 ** 32; } }
+test('a length that does not fit the wire format fails loudly instead of wrapping', () => {
+  const { value } = edge({ modules: { lib: { huge: new Huge(0), nested: [1, { b: new Huge(0) }], small: new Uint8Array(3) } } });
+  const lib = value(201, 0, 1, enc.encode('lib'));
+  const message = 'RangeError: Lasm.JS: cannot pass 4294967296 bytes to Lean (lengths cross as 32-bit numbers, so at most 4294967295)';
+  assert.throws(() => value(203, lib.ref, 0, wire('huge')), { message });
+  assert.throws(() => value(203, lib.ref, 0, wire('nested')), { message });
+  assert.deepEqual(value(203, lib.ref, 0, wire('small')), new Uint8Array(3));
+});
+
 test('modules come from the static map; others fail with how to add them', () => {
   const lib = { add: (a, b) => a + b, nested: { f: () => 'deep' } };
   const { value } = edge({ modules: { lib } });

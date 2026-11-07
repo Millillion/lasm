@@ -10,6 +10,8 @@
 //   9 object (u32 n, n × (u32 key length, key UTF-8, value))
 //  10 reference (u32 handle, u32 n, description UTF-8): a JavaScript value held
 //     in this module's handle table on Lean's behalf, released by Lean's finalizer.
+// A length that does not fit a u32 is an error on both sides, never wrapped (#154);
+// Lean's half is proved to read back whatever it writes (library/Lasm/JS/Spec.lean).
 // "Data" conversion turns primitives, arrays, plain objects, Uint8Array and
 // bigint into wire values and every other value (functions, class instances,
 // promises, Map, Date, …) into a reference. "Reference" conversion returns a
@@ -37,6 +39,11 @@ export const jsProtocolVersion = 1;
 export const firstJsHandle = 0x40000000;
 const decoder = new TextDecoder();
 const maximumDepth = 64;
+// Lengths travel as u32 (Lean's Wire.maxLength): a longer one is an error, never a
+// wrapped length (#154). Only a Uint8Array can be that long: JavaScript arrays hold
+// fewer than 2^32 elements, and strings fewer than 2^30 UTF-16 units (under 2^32
+// UTF-8 bytes). A long encoded result is refused where it is framed (takeEvents).
+const lengthLimit = 2 ** 32;
 
 /** A JavaScript failure reported to Lean as an IO user error with this text. */
 export function jsFailure(error) {
@@ -80,7 +87,9 @@ class Writer {
   u32(v) { this.reserve(4); this.buffer.writeUInt32LE(v, this.length); this.length += 4; }
   f64(v) { this.reserve(8); this.buffer.writeDoubleLE(v, this.length); this.length += 8; }
   u64(v) { this.reserve(8); this.buffer.writeBigUInt64LE(BigInt.asUintN(64, BigInt(v)), this.length); this.length += 8; }
-  bytes(b) { this.u32(b.length); this.reserve(b.length); this.buffer.set(b, this.length); this.length += b.length; }
+  bytes(b) {
+    if (b.length >= lengthLimit) throw jsFailure(new RangeError(`Lasm.JS: cannot pass ${b.length} bytes to Lean (lengths cross as 32-bit numbers, so at most ${lengthLimit - 1})`));
+    this.u32(b.length); this.reserve(b.length); this.buffer.set(b, this.length); this.length += b.length; }
   string(s) {
     const n = Buffer.byteLength(s);
     this.u32(n); this.reserve(n); this.buffer.write(s, this.length, 'utf8'); this.length += n;

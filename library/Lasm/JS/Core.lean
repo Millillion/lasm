@@ -69,95 +69,164 @@ def field (d : Data) (key : String) : Data :=
 
 end Data
 
-/-! Wire format shared with src/node-js.mjs (little endian). -/
+/-! Wire format shared with the hosts' JavaScript (src/node-js.mjs and
+src/edge/edge-js.mjs), little endian. Proved (library/Lasm/JS/Spec.lean):
+whatever `encode` accepts, `decodeWith` reads back as the same value, and
+`encode` refuses exactly the values with a length that does not fit a u32. -/
 namespace Wire
 
-private def pushU32 (b : ByteArray) (n : UInt32) : ByteArray :=
+/-- The largest length the wire format carries: the lengths of strings, byte
+arrays, arrays and objects travel as u32. -/
+def maxLength : Nat := UInt32.size - 1
+
+def pushU32 (b : ByteArray) (n : UInt32) : ByteArray :=
   b.push n.toUInt8 |>.push (n >>> 8).toUInt8 |>.push (n >>> 16).toUInt8 |>.push (n >>> 24).toUInt8
-private def pushU64 (b : ByteArray) (n : UInt64) : ByteArray := Id.run do
-  let mut b := b
-  for i in [0:8] do b := b.push (n >>> (8 * i).toUInt64).toUInt8
-  return b
-private def pushBytes (b : ByteArray) (x : ByteArray) : ByteArray := pushU32 b x.size.toUInt32 ++ x
-private def pushString (b : ByteArray) (s : String) : ByteArray := pushBytes b s.toUTF8
+def pushU64 (b : ByteArray) (n : UInt64) : ByteArray :=
+  b.push n.toUInt8 |>.push (n >>> 8).toUInt8 |>.push (n >>> 16).toUInt8 |>.push (n >>> 24).toUInt8
+    |>.push (n >>> 32).toUInt8 |>.push (n >>> 40).toUInt8 |>.push (n >>> 48).toUInt8 |>.push (n >>> 56).toUInt8
 
-partial def write (b : ByteArray) : Data → ByteArray
-  | .undefined => b.push 0
-  | .null => b.push 1
-  | .bool false => b.push 2
-  | .bool true => b.push 3
-  | .number n => pushU64 (b.push 4) n.toBits
+/-- Appends the length `n` of `what` (`unit`s), or fails if it does not fit in
+a u32: a larger length would wrap and the reader would misread everything
+after it. -/
+def pushLength (b : ByteArray) (n : Nat) (what unit : String) : Except String ByteArray :=
+  if n ≤ maxLength then .ok (pushU32 b n.toUInt32)
+  else .error s!"Lasm.JS: cannot pass {what} of {n} {unit} to JavaScript (lengths cross as 32-bit numbers, so at most {maxLength})"
+def pushString (b : ByteArray) (s : String) (what := "a string") : Except String ByteArray := do
+  return (← pushLength b s.utf8ByteSize what "bytes") ++ s.toUTF8
+
+/-- Appends `d`, or fails if a string, byte array, array or object in it is
+longer than `maxLength`. -/
+def write (b : ByteArray) : Data → Except String ByteArray
+  | .undefined => .ok (b.push 0)
+  | .null => .ok (b.push 1)
+  | .bool false => .ok (b.push 2)
+  | .bool true => .ok (b.push 3)
+  | .number n => .ok (pushU64 (b.push 4) n.toBits)
   | .string s => pushString (b.push 5) s
-  | .bigint i => pushString (b.push 6) (toString i)
-  | .bytes x => pushBytes (b.push 7) x
-  | .array xs => xs.foldl write (pushU32 (b.push 8) xs.size.toUInt32)
-  | .object fs => fs.foldl (fun b (k, v) => write (pushString b k) v) (pushU32 (b.push 9) fs.size.toUInt32)
-  | .ref v _ => pushU32 (pushU32 (b.push 10) (valueHandle v)) 0
+  | .bigint i => pushString (b.push 6) (toString i) "a bigint"
+  | .bytes x => do return (← pushLength (b.push 7) x.size "a ByteArray" "bytes") ++ x
+  | .array xs => do xs.foldlM write (← pushLength (b.push 8) xs.size "an array" "elements")
+  | .object fs => do
+    fs.foldlM (fun b kv => do write (← pushString b kv.1 "an object key") kv.2)
+      (← pushLength (b.push 9) fs.size "an object" "fields")
+  | .ref v _ => .ok (pushU32 (pushU32 (b.push 10) (valueHandle v)) 0)
+termination_by d => d
+decreasing_by
+  all_goals
+    have := Array.sizeOf_lt_of_mem ‹_ ∈ _›
+    first | (simp_all; omega) | (cases ‹String × Data›; simp_all; omega)
 
-def encode (d : Data) : ByteArray := write .empty d
+/-- The wire bytes of `d`, or why it cannot cross (a length above `maxLength`). -/
+def encode (d : Data) : Except String ByteArray := write .empty d
 
-private def readU32 (b : ByteArray) (o : Nat) : Except String UInt32 :=
-  if o + 4 ≤ b.size then
-    .ok (b[o]!.toUInt32 ||| (b[o+1]!.toUInt32 <<< 8) ||| (b[o+2]!.toUInt32 <<< 16) ||| (b[o+3]!.toUInt32 <<< 24))
-  else .error "Malformed Lasm.JS value (truncated)"
-private def readU64 (b : ByteArray) (o : Nat) : Except String UInt64 :=
-  if o + 8 ≤ b.size then .ok <| Id.run do
-    let mut v : UInt64 := 0
-    for i in [0:8] do v := v ||| (b[o + i]!.toUInt64 <<< (8 * i).toUInt64)
-    return v
-  else .error "Malformed Lasm.JS value (truncated)"
-private def readRaw (b : ByteArray) (o : Nat) : Except String (ByteArray × Nat) := do
-  let n := (← readU32 b o).toNat
-  if o + 4 + n ≤ b.size then return (b.extract (o + 4) (o + 4 + n), o + 4 + n)
-  else throw "Malformed Lasm.JS value (truncated)"
-private def readString (b : ByteArray) (o : Nat) : Except String (String × Nat) := do
-  let (raw, o) ← readRaw b o
-  match String.fromUTF8? raw with
-  | some s => return (s, o)
-  | none => throw "Malformed Lasm.JS value (invalid UTF-8)"
+-- (`+` rather than `|||`: the bytes do not overlap, so they are the same, and `+` is what `omega` proves things about.)
+def readU32 (b : ByteArray) (o : Nat) : Option UInt32 :=
+  if h : o + 4 ≤ b.size then
+    some (b[o].toUInt32 + (b[o+1].toUInt32 <<< 8) + (b[o+2].toUInt32 <<< 16) + (b[o+3].toUInt32 <<< 24))
+  else none
+def readU64 (b : ByteArray) (o : Nat) : Option UInt64 :=
+  if h : o + 8 ≤ b.size then
+    some (b[o].toUInt64 + (b[o+1].toUInt64 <<< 8) + (b[o+2].toUInt64 <<< 16) + (b[o+3].toUInt64 <<< 24) +
+      (b[o+4].toUInt64 <<< 32) + (b[o+5].toUInt64 <<< 40) + (b[o+6].toUInt64 <<< 48) + (b[o+7].toUInt64 <<< 56))
+  else none
+/-- A length-prefixed run of bytes at `o`, and the offset after it. -/
+def readRaw (b : ByteArray) (o : Nat) : Option (ByteArray × Nat) :=
+  match readU32 b o with
+  | some n => if o + 4 + n.toNat ≤ b.size then some (b.extract (o + 4) (o + 4 + n.toNat), o + 4 + n.toNat) else none
+  | none => none
+def readString (b : ByteArray) (o : Nat) : Except String (String × Nat) :=
+  match readRaw b o with
+  | some (raw, o) => match String.fromUTF8? raw with
+    | some s => .ok (s, o)
+    | none => .error "Malformed Lasm.JS value (invalid UTF-8)"
+  | none => .error "Malformed Lasm.JS value (truncated)"
 
-private def lift (e : Except String α) : IO α := IO.ofExcept (e.mapError IO.userError)
+section Read
+variable {m : Type → Type} [Monad m] {ε : Type} [MonadExceptOf ε m] (err : String → ε)
+  (ref : UInt32 → String → m Data)
 
-/-- Reads one value at `o`; references become owned `Value`s. -/
-partial def read (b : ByteArray) (o : Nat) : IO (Data × Nat) := do
-  if o ≥ b.size then throw (IO.userError "Malformed Lasm.JS value (truncated)")
-  let o' := o + 1
-  match b[o]! with
-  | 0 => return (.undefined, o')
-  | 1 => return (.null, o')
-  | 2 => return (.bool false, o')
-  | 3 => return (.bool true, o')
-  | 4 => return (.number (Float.ofBits (← lift (readU64 b o'))), o' + 8)
-  | 5 => let (s, o) ← lift (readString b o'); return (.string s, o)
-  | 6 => let (s, o) ← lift (readString b o'); return (.bigint (s.toInt?.getD 0), o)
-  | 7 => let (x, o) ← lift (readRaw b o'); return (.bytes x, o)
-  | 8 =>
-    let n := (← lift (readU32 b o')).toNat
-    let mut o := o' + 4
-    let mut items := Array.mkEmpty n
-    for _ in [0:n] do
-      let (d, o2) ← read b o
-      items := items.push d; o := o2
-    return (.array items, o)
-  | 9 =>
-    let n := (← lift (readU32 b o')).toNat
-    let mut o := o' + 4
-    let mut fields := Array.mkEmpty n
-    for _ in [0:n] do
-      let (k, o2) ← lift (readString b o)
-      let (d, o3) ← read b o2
-      fields := fields.push (k, d); o := o3
-    return (.object fields, o)
-  | 10 =>
-    let h ← lift (readU32 b o')
-    let (d, o) ← lift (readString b (o' + 4))
-    return (.ref (← valueOfHandle h) d, o)
-  | t => throw (IO.userError s!"Malformed Lasm.JS value (tag {t})")
+mutual
+/-- Reads one value at `o` and returns it with the offset after it; `ref`
+turns a reference (handle and description) into a value. `fuel` bounds the
+bytes left (`decodeWith` passes the size), so the reader is total. -/
+@[specialize] def readAt : Nat → ByteArray → Nat → m (Data × Nat)
+  | 0, _, _ => throw (err "Malformed Lasm.JS value (truncated)")
+  | fuel + 1, b, o =>
+    if h : o < b.size then
+      let o' := o + 1
+      match b[o] with
+      | 0 => pure (.undefined, o')
+      | 1 => pure (.null, o')
+      | 2 => pure (.bool false, o')
+      | 3 => pure (.bool true, o')
+      | 4 => match readU64 b o' with
+        | some v => pure (.number (Float.ofBits v), o' + 8)
+        | none => throw (err "Malformed Lasm.JS value (truncated)")
+      | 5 => match readString b o' with
+        | .ok (s, o) => pure (.string s, o)
+        | .error e => throw (err e)
+      | 6 => match readString b o' with
+        | .ok (s, o) => match s.toInt? with
+          | some i => pure (.bigint i, o)
+          | none => throw (err "Malformed Lasm.JS value (bigint)")
+        | .error e => throw (err e)
+      | 7 => match readRaw b o' with
+        | some (x, o) => pure (.bytes x, o)
+        | none => throw (err "Malformed Lasm.JS value (truncated)")
+      | 8 => match readU32 b o' with
+        -- Every element takes at least a byte: never reserve more than are left.
+        | some n => do
+          let (xs, o) ← readItems fuel b n.toNat (o' + 4) (Array.mkEmpty (min n.toNat (b.size - o)))
+          pure (.array xs, o)
+        | none => throw (err "Malformed Lasm.JS value (truncated)")
+      | 9 => match readU32 b o' with
+        | some n => do
+          let (fs, o) ← readFields fuel b n.toNat (o' + 4) (Array.mkEmpty (min n.toNat (b.size - o)))
+          pure (.object fs, o)
+        | none => throw (err "Malformed Lasm.JS value (truncated)")
+      | 10 => match readU32 b o' with
+        | some handle => match readString b (o' + 4) with
+          | .ok (d, o) => do return (← ref handle d, o)
+          | .error e => throw (err e)
+        | none => throw (err "Malformed Lasm.JS value (truncated)")
+      | t => throw (err s!"Malformed Lasm.JS value (tag {t})")
+    else throw (err "Malformed Lasm.JS value (truncated)")
+termination_by fuel _ _ => (fuel, 0)
+/-- Reads `n` values from `o`, appending them to `acc`. -/
+@[specialize] def readItems (fuel : Nat) (b : ByteArray) : Nat → Nat → Array Data → m (Array Data × Nat)
+  | 0, o, acc => pure (acc, o)
+  | n + 1, o, acc => do
+    let (d, o) ← readAt fuel b o
+    readItems fuel b n o (acc.push d)
+termination_by n _ _ => (fuel, n + 1)
+/-- Reads `n` fields (key and value) from `o`, appending them to `acc`. -/
+@[specialize] def readFields (fuel : Nat) (b : ByteArray) : Nat → Nat → Array (String × Data) → m (Array (String × Data) × Nat)
+  | 0, o, acc => pure (acc, o)
+  | n + 1, o, acc => match readString b o with
+    | .ok (k, o) => do
+      let (d, o) ← readAt fuel b o
+      readFields fuel b n o (acc.push (k, d))
+    | .error e => throw (err e)
+termination_by n _ _ => (fuel, n + 1)
+end
 
-def decode (b : ByteArray) : IO Data := do
-  let (d, o) ← read b 0
-  if o != b.size then throw (IO.userError "Malformed Lasm.JS value (trailing bytes)")
-  return d
+/-- Reads the one value that `b` holds. -/
+@[specialize] def decodeWith (b : ByteArray) : m Data := do
+  let (d, o) ← readAt err ref b.size b 0
+  if o != b.size then throw (err "Malformed Lasm.JS value (trailing bytes)")
+  pure d
+
+end Read
+
+/-- Reads the one value that `b` holds; references become owned `Value`s. -/
+def decode (b : ByteArray) : IO Data :=
+  decodeWith IO.userError (fun h d => return .ref (← valueOfHandle h) d) b
+
+/-- `encode` in `IO`: a value that cannot cross is an `IO.userError`. -/
+def encodeIO (d : Data) : IO ByteArray :=
+  match encode d with
+  | .ok b => pure b
+  | .error e => throw (IO.userError e)
 
 end Wire
 
@@ -165,8 +234,8 @@ end Wire
 alive (and its handles unreleased) until the host has read the request. -/
 @[extern "lasm_js_call"] private opaque hostCallKeep (op handle : UInt32) (arg : UInt64) (input : @& ByteArray) (keep : @& Data) : IO ByteArray
 private def hostCall (op handle : UInt32) (arg : UInt64) (input : ByteArray) : IO ByteArray := hostCallKeep op handle arg input .undefined
-private def hostCallWith (op : UInt32) (arg : UInt64) (payload : Data) (handle : UInt32 := 0) : IO ByteArray :=
-  hostCallKeep op handle arg (Wire.encode payload) payload
+private def hostCallWith (op : UInt32) (arg : UInt64) (payload : Data) (handle : UInt32 := 0) : IO ByteArray := do
+  hostCallKeep op handle arg (← Wire.encodeIO payload) payload
 /-- A call (205) or binding (214) whose result resolves `p` when it settles. -/
 @[extern "lasm_js_call_into"] private opaque hostCallInto (p : @& IO.Promise (Except String ByteArray)) (op handle : UInt32) (arg : UInt64) (input : @& ByteArray) (keep : @& Data) : IO Unit
 
@@ -321,17 +390,21 @@ private def errorText (e : IO.Error) : String := toString e
 
 private def reply (call : UInt64) (result : Except IO.Error Function.Reply) : IO Unit := do
   -- Status 0 a value, 1 a Lean error (message), 2 a method call [target, name, args].
-  let (failed, payload, keep) : UInt8 × ByteArray × Data := match result with
-    | .ok (.value d) => (0, Wire.encode d, d)
-    | .ok (.callMethod target name args) =>
-      let d : Data := .array #[.ref target "", .string name, .array args]
-      (2, Wire.encode d, d)
-    | .error e => (1, (errorText e).toUTF8, .undefined)
-  let mut b := ByteArray.empty
-  for i in [0:8] do b := b.push (call >>> (8 * i).toUInt64).toUInt8
-  b := b.push failed
-  let n := payload.size.toUInt32
-  b := b.push n.toUInt8 |>.push (n >>> 8).toUInt8 |>.push (n >>> 16).toUInt8 |>.push (n >>> 24).toUInt8
+  let failure (message : String) : UInt8 × ByteArray × Data := (1, message.toUTF8, .undefined)
+  let encoded (status : UInt8) (d : Data) : UInt8 × ByteArray × Data :=
+    match Wire.encode d with
+    | .ok bytes => (status, bytes, d)
+    | .error message => failure message
+  let (failed, payload, keep) := match result with
+    | .ok (.value d) => encoded 0 d
+    | .ok (.callMethod target name args) => encoded 2 (.array #[.ref target "", .string name, .array args])
+    | .error e => failure (errorText e)
+  -- Replies are framed (u64 call, u8 status, u32 length): a payload too long for
+  -- the u32 fails the call instead.
+  let header (status : UInt8) := Wire.pushU64 .empty call |>.push status
+  let (b, payload, keep) := match Wire.pushLength (header failed) payload.size "a Lean function's result" "bytes" with
+    | .ok b => (b, payload, keep)
+    | .error message => (Wire.pushU32 (header 1) message.utf8ByteSize.toUInt32, message.toUTF8, .undefined)
   discard <| hostCallKeep 208 0 0 (b ++ payload) keep
 
 private def argsOf (bytes : ByteArray) : IO (Array Data) := do
@@ -368,7 +441,9 @@ private def syncDispatch (fn : UInt32) (bytes : ByteArray) : IO (ByteArray × Da
       | throw (IO.userError "Lasm.JS: the Lean function was released")
     f (← argsOf bytes)).toBaseIO
   return match result with
-    | .ok d => (ByteArray.mk #[0] ++ Wire.encode d, d)
+    | .ok d => match Wire.encode d with
+      | .ok bytes => (ByteArray.mk #[0] ++ bytes, d)
+      | .error message => (ByteArray.mk #[1] ++ message.toUTF8, .undefined)
     | .error e => (ByteArray.mk #[1] ++ (errorText e).toUTF8, .undefined)
 
 private def ensureStarted : IO Unit := startThread dispatch
@@ -402,7 +477,7 @@ private def callAsync (α : Type) [FromJS α] (context : String) (op : UInt32) (
   ensureStarted
   let p : IO.Promise (Except String ByteArray) ← IO.Promise.new
   let settled : Async ByteArray := do
-    hostCallInto p op 0 flags (Wire.encode payload) payload
+    hostCallInto p op 0 flags (← Wire.encodeIO payload) payload
     awaitBytes p
   let bytes ← if failurePrefix.isEmpty then settled
     else try settled catch e => throw (IO.userError s!"{failurePrefix}{e}")
@@ -431,18 +506,18 @@ def describe (v : Value) : IO String := do
 
 /-- `o[key]` -/
 def get (o : Value) (key : String) (α : Type := Value) [FromJS α] : IO α := do
-  receive α s!"get {repr key}" (← hostCallKeep 203 (valueHandle o) (modeArg (FromJS.mode α)) (Wire.encode (.string key)) (.ref o ""))
+  receive α s!"get {repr key}" (← hostCallKeep 203 (valueHandle o) (modeArg (FromJS.mode α)) (← Wire.encodeIO (.string key)) (.ref o ""))
 
 /-- Several properties in one call: `{k₁: o[k₁], …}` as data (non-plain values as
 references), converted to `α`. Each JavaScript call costs tens of microseconds;
 reading an HTTP request's fields this way takes one. -/
 def getFields (o : Value) (keys : Array String) (α : Type := Data) [FromJS α] : IO α := do
-  receive α "getFields" (← hostCallKeep 203 (valueHandle o) 0 (Wire.encode (.array (keys.map .string))) (.ref o ""))
+  receive α "getFields" (← hostCallKeep 203 (valueHandle o) 0 (← Wire.encodeIO (.array (keys.map .string))) (.ref o ""))
 
 /-- `o[key] = x` -/
 def set [ToJS α] (o : Value) (key : String) (x : α) : IO Unit := do
   let payload := Data.array #[.string key, toJS x, .ref o ""]
-  discard <| hostCallKeep 204 (valueHandle o) 0 (Wire.encode (.array #[.string key, toJS x])) payload
+  discard <| hostCallKeep 204 (valueHandle o) 0 (← Wire.encodeIO (.array #[.string key, toJS x])) payload
 
 /-- Flags: 1 reference result, 2 await a promise result, 4 construct, 8 method call. -/
 def invokeRaw (target receiver : Data) (args : Array Data) (flags : UInt64) : IO ByteArray :=
@@ -482,7 +557,7 @@ whether `Value.await` waits for it. -/
 private def toTaskKeeping (v : Value) (α : Type) [FromJS α] (keep : Data) : IO (Task (Except IO.Error α)) := do
   ensureStarted
   let p ← IO.Promise.new
-  awaitInto p (Wire.encode (.ref v "")) keep
+  awaitInto p (← Wire.encodeIO (.ref v "")) keep
   IO.mapTask (t := p.result!) fun
     | .ok bytes => do decodeAs α "await" (← Wire.decode bytes)
     | .error message => throw (IO.userError message)
@@ -503,7 +578,7 @@ def await [MonadJS m] (v : Value) (α : Type := Data) [FromJS α] : m α :=
     (do
       ensureStarted
       let p : IO.Promise (Except String ByteArray) ← IO.Promise.new
-      awaitInto p (Wire.encode (.ref v "")) (.ref v "")
+      awaitInto p (← Wire.encodeIO (.ref v "")) (.ref v "")
       decodeAs α "await" (← Wire.decode (← awaitBytes p)))
 
 end Value

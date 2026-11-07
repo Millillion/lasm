@@ -6,6 +6,11 @@
 // `notify`; the runtime takes them with op 209, which never waits here.
 const encoder = new TextEncoder(), decoder = new TextDecoder();
 const maximumDepth = 64;
+// Lengths travel as u32 (Lean's Wire.maxLength): a longer one is an error, never a
+// wrapped length (#154). Only a Uint8Array can be that long: JavaScript arrays hold
+// fewer than 2^32 elements, and strings fewer than 2^30 UTF-16 units (under 2^32
+// UTF-8 bytes). A long encoded result is refused where it is framed (takeEvents).
+const lengthLimit = 2 ** 32;
 export const firstJsHandle = 0x40000000;
 
 export function jsFailure(error) {
@@ -46,7 +51,9 @@ class Writer {
   u32(v) { this.reserve(4); this.view.setUint32(this.length, v, true); this.length += 4; }
   f64(v) { this.reserve(8); this.view.setFloat64(this.length, v, true); this.length += 8; }
   u64(v) { this.reserve(8); this.view.setBigUint64(this.length, BigInt.asUintN(64, BigInt(v)), true); this.length += 8; }
-  bytes(b) { this.u32(b.length); this.reserve(b.length); this.buffer.set(b, this.length); this.length += b.length; }
+  bytes(b) {
+    if (b.length >= lengthLimit) throw jsFailure(new RangeError(`Lasm.JS: cannot pass ${b.length} bytes to Lean (lengths cross as 32-bit numbers, so at most ${lengthLimit - 1})`));
+    this.u32(b.length); this.reserve(b.length); this.buffer.set(b, this.length); this.length += b.length; }
   string(s) {
     this.reserve(s.length * 3 + 4);
     const { written } = encoder.encodeInto(s, this.buffer.subarray(this.length + 4));

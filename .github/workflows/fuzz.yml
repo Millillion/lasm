@@ -6,7 +6,7 @@ name: Fuzz
 # request (libFuzzer, ASan; UBSan for the C host).
 #   - pull requests and pushes to main: the committed corpus and regressions,
 #     once each (seconds); the native targets when their sources change;
-#   - nightly: 10 minutes per target; weekly (Sunday): 60 minutes per target.
+#   - nightly: 10 minutes per target; weekly (Saturday): 60 minutes per target.
 # A campaign fails on any failing input (a crash, a hang, a broken property)
 # and uploads its new corpus entries and failing inputs as an artifact.
 on:
