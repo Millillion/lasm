@@ -103,6 +103,22 @@ try {
   console.log(`\nRealWorld API tests (${name}): ${result.succeededFiles}/${result.files} files, ${result.requests} requests` +
     (run.status === 0 ? ', all passed' : ', FAILED'));
   process.exitCode = run.status === 0 && result.failedFiles === 0 ? 0 : 1;
+  // #135: Lean's Json.parse computes 10 ^ exponent, so a 90-byte body (or a
+  // token's header, read before its signature) hung the server. Both are
+  // refused at once: 422 for the body, 401 for the token.
+  const huge = '{"title":"x","done":false,"tags":[],"priority":33330000000049E026191701}';
+  const header = Buffer.from('{"alg":"HS256","typ":"JWT","n":1E026191701}').toString('base64url');
+  const answers = [
+    ['a body with a huge exponent', 422, () => fetch(`${base}/api/users`, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: huge, signal: AbortSignal.timeout(10_000) })],
+    ['a token header with a huge exponent', 401, () => fetch(`${base}/api/user`, {
+      headers: { authorization: `Token ${header}.e30.c2ln` }, signal: AbortSignal.timeout(10_000) })],
+  ];
+  for (const [what, expected, request] of answers) {
+    const status = await request().then(r => r.status, e => `no answer within 10 s (${e.name})`);
+    console.log(`${status === expected ? 'ok  ' : 'FAIL'} ${what}: ${status} (expected ${expected}, at once)`);
+    if (status !== expected) process.exitCode = 1;
+  }
   if (recorder) {
     await recorder.close();
     const traffic = normalize(recorder.exchanges, name);

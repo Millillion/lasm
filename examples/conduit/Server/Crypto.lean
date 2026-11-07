@@ -10,6 +10,7 @@ Deno and Cloudflare Workers all provide, through `Lasm.JS`:
 -/
 import Lasm.JS
 import Lean.Data.Json
+import Lasm.RPC.Core
 import Server.Base64
 open Lasm.JS Lean
 
@@ -80,7 +81,7 @@ def readToken (secret : String) (token : String) (now : Nat) : Async (Option Nat
   let decodeJson (part : String) : Option Json := do
     let bytes ← b64decode part
     let text ← String.fromUTF8? bytes
-    (Json.parse text).toOption
+    (Lasm.RPC.parseJson text).toOption
   let some h := decodeJson header | return none
   unless (h.getObjValAs? String "alg").toOption == some "HS256" do return none
   let ok ← (← subtle).callMethodAwait "verify" #[toJS "HMAC", .ref (← hmacKey secret "verify") "",

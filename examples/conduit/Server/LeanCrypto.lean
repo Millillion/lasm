@@ -7,6 +7,7 @@ moves between targets. Randomness is `IO.getRandomBytes` (the host's random
 source); test/crypto-check.mjs checks these functions against Node's crypto.
 -/
 import Lean.Data.Json
+import Lasm.RPC.Core
 import Std.Time.DateTime.Timestamp
 import Std.Async.Basic
 import Conduit.Store
@@ -164,7 +165,7 @@ def readToken (secret token : String) (now : Nat) : Option Nat := do
   let sigBytes ← b64decode sig
   let decodeJson (part : String) : Option Json := do
     let text ← String.fromUTF8? (← b64decode part)
-    (Json.parse text).toOption
+    (Lasm.RPC.parseJson text).toOption
   let h ← decodeJson header
   unless (h.getObjValAs? String "alg").toOption == some "HS256" do none
   unless sameBytes (hmac secret.toUTF8 s!"{header}.{payload}".toUTF8) sigBytes do none

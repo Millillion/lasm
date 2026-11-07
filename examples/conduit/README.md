@@ -114,7 +114,7 @@ What differs between platforms, honestly:
 ## Layout
 
 ```
-Conduit/              the app's rules, pure Lean (no Lasm, no JavaScript)
+Conduit/              the app's rules, pure Lean (no JavaScript; Lasm.RPC.Core's parseJson)
   Types.lean          the API's data and its JSON encoding and decoding
   Validation.lean     request rules ("can't be blank", NIST passwords, …) → validated types
   Slug.lean           titles → slugs, and unique slugs

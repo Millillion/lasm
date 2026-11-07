@@ -124,6 +124,16 @@ try {
     assert.equal((await api(base, 'DELETE', '/accounts')).status, 405);
     assert.equal((await api(base, 'GET', '/accounts/77')).status, 404);
   });
+  await test('a number with a huge exponent is refused at once (#135), not expanded', async () => {
+    // Lean's Json.parse computes 10 ^ exponent: this 90-byte body hung the server.
+    const body = '{"title":"x","done":false,"tags":[],"priority":33330000000049E026191701}';
+    for (const path of ['/api/accounts', '/api/transfers']) {
+      const r = await fetch(base + path, { method: 'POST', body, signal: AbortSignal.timeout(10_000) });
+      assert.equal(r.status, 400);
+    }
+    const batch = '[{"id":"9","ledger":1,"code":1e99999}]';
+    assert.equal((await fetch(base + '/api/accounts', { method: 'POST', body: batch, signal: AbortSignal.timeout(10_000) })).status, 400);
+  });
   await test('the browser page and its files are served', async () => {
     const page = await fetch(base + '/');
     assert.equal(page.status, 200);

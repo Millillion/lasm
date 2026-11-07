@@ -26,7 +26,7 @@ inductive Msg where
 
 /-- A JSON array of `decode`d items. -/
 def decodeList {α : Type} (decode : String → Json → Except String α) (body : String) : Except String (List α) := do
-  match ← Json.parse body with
+  match ← Lasm.RPC.parseJson body with
   | .arr a => a.toList.mapM (decode "")
   | _ => throw "expected an array"
 
