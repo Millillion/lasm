@@ -1,0 +1,3699 @@
+{
+  "exchanges": [
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 125",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"art_equivalence\",\n    \"email\": \"art_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"art_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#1>\",\"username\":\"art_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#1>",
+          "content-length: 185",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Test Article equivalence\",\n    \"description\": \"Test description\",\n    \"body\": \"Test body content\",\n    \"tagList\": [\"d_equivalence\", \"t_equivalence\"]\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"body\":\"Test body content\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[\"d_equivalence\",\"t_equivalence\"],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[\"d_equivalence\",\"t_equivalence\"],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":1}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles?author=art_equivalence",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[\"d_equivalence\",\"t_equivalence\"],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":1}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#1>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[\"d_equivalence\",\"t_equivalence\"],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":1}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles?author=art_equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#1>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[\"d_equivalence\",\"t_equivalence\"],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":1}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles?tag=d_equivalence",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[\"d_equivalence\",\"t_equivalence\"],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":1}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[\"d_equivalence\",\"t_equivalence\"],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":1}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/test-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"body\":\"Test body content\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[\"d_equivalence\",\"t_equivalence\"],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/articles/test-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#1>",
+          "content-length: 57",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"body\": \"Updated body content\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"body\":\"Updated body content\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[\"d_equivalence\",\"t_equivalence\"],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/test-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"body\":\"Updated body content\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[\"d_equivalence\",\"t_equivalence\"],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/articles/test-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#1>",
+          "content-length: 63",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"body\": \"Body without touching tags\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"body\":\"Body without touching tags\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[\"d_equivalence\",\"t_equivalence\"],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/articles/test-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#1>",
+          "content-length: 40",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"tagList\": []\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"body\":\"Body without touching tags\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/test-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"art_equivalence\"},\"body\":\"Body without touching tags\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Test description\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"test-article-equivalence\",\"tagList\":[],\"title\":\"Test Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/articles/test-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#1>",
+          "content-length: 42",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"tagList\": null\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"tagList\":[\"must be a list of strings\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/test-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#1>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/test-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"article\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 127",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"auth_equivalence\",\n    \"email\": \"auth_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users/login",
+        "headers": [
+          "accept: */*",
+          "content-length: 91",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"email\": \"auth_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "content-length: 44",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"bio\": \"Updated bio\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Updated bio\",\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Updated bio\",\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "content-length: 33",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"bio\": \"\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "content-length: 46",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"bio\": \"Temporary bio\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Temporary bio\",\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "content-length: 35",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"bio\": null\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "content-length: 44",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"bio\": \"Updated bio\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Updated bio\",\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "content-length: 64",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"image\": \"https://example.com/photo.jpg\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Updated bio\",\"email\":\"auth_equivalence@test.com\",\"image\":\"https://example.com/photo.jpg\",\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Updated bio\",\"email\":\"auth_equivalence@test.com\",\"image\":\"https://example.com/photo.jpg\",\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "content-length: 35",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"image\": \"\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Updated bio\",\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Updated bio\",\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "content-length: 63",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"image\": \"https://example.com/temp.jpg\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Updated bio\",\"email\":\"auth_equivalence@test.com\",\"image\":\"https://example.com/temp.jpg\",\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "content-length: 37",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"image\": null\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Updated bio\",\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Updated bio\",\"email\":\"auth_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "content-length: 104",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"auth_equivalence_upd\",\n    \"email\": \"auth_equivalence_upd@test.com\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Updated bio\",\"email\":\"auth_equivalence_upd@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence_upd\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#2>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":\"Updated bio\",\"email\":\"auth_equivalence_upd@test.com\",\"image\":null,\"token\":\"<jwt#2>\",\"username\":\"auth_equivalence_upd\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 125",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"cmt_equivalence\",\n    \"email\": \"cmt_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"cmt_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#3>\",\"username\":\"cmt_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#3>",
+          "content-length: 128",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Comment Article equivalence\",\n    \"description\": \"For comments\",\n    \"body\": \"Article body\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"cmt_equivalence\"},\"body\":\"Article body\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"For comments\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"comment-article-equivalence\",\"tagList\":[],\"title\":\"Comment Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles/comment-article-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#3>",
+          "content-length: 54",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"comment\": {\n    \"body\": \"Test comment body\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"comment\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"cmt_equivalence\"},\"body\":\"Test comment body\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"id\":1,\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/comment-article-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#3>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"comments\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"cmt_equivalence\"},\"body\":\"Test comment body\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"id\":1,\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}]}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/comment-article-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"comments\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"cmt_equivalence\"},\"body\":\"Test comment body\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"id\":1,\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}]}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/comment-article-equivalence/comments/1",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#3>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/comment-article-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"comments\":[]}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles/comment-article-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#3>",
+          "content-length: 50",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"comment\": {\n    \"body\": \"First comment\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"comment\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"cmt_equivalence\"},\"body\":\"First comment\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"id\":2,\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles/comment-article-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#3>",
+          "content-length: 51",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"comment\": {\n    \"body\": \"Second comment\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"comment\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"cmt_equivalence\"},\"body\":\"Second comment\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"id\":3,\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/comment-article-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"comments\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"cmt_equivalence\"},\"body\":\"First comment\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"id\":2,\"updatedAt\":\"0000-00-00T00:00:00.000Z\"},{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"cmt_equivalence\"},\"body\":\"Second comment\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"id\":3,\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}]}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/comment-article-equivalence/comments/2",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#3>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/comment-article-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"comments\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"cmt_equivalence\"},\"body\":\"Second comment\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"id\":3,\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}]}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/comment-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#3>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "content-length: 100",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"No Auth Article\",\n    \"description\": \"test\",\n    \"body\": \"test\"\n  }\n}"
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"token\":[\"is missing\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/unknown-slug-equivalence",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"article\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/articles/some-slug",
+        "headers": [
+          "accept: */*",
+          "content-length: 41",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"body\": \"test\"\n  }\n}"
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"token\":[\"is missing\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/some-slug",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"token\":[\"is missing\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/feed",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"token\":[\"is missing\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles/some-slug/favorite",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"token\":[\"is missing\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/some-slug/favorite",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"token\":[\"is missing\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 131",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"ea_art_equivalence\",\n    \"email\": \"ea_art_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"ea_art_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#4>\",\"username\":\"ea_art_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#4>",
+          "content-length: 85",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"\",\n    \"description\": \"test\",\n    \"body\": \"test\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"title\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#4>",
+          "content-length: 101",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Err Desc equivalence\",\n    \"description\": \"\",\n    \"body\": \"test\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"description\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#4>",
+          "content-length: 101",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Err Body equivalence\",\n    \"description\": \"test\",\n    \"body\": \"\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"body\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#4>",
+          "content-length: 108",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Dup Title equivalence\",\n    \"description\": \"first\",\n    \"body\": \"first\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"ea_art_equivalence\"},\"body\":\"first\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"first\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"dup-title-equivalence\",\"tagList\":[],\"title\":\"Dup Title equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#4>",
+          "content-length: 110",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Dup Title equivalence\",\n    \"description\": \"second\",\n    \"body\": \"second\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"ea_art_equivalence\"},\"body\":\"second\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"second\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"dup-title-equivalence-2\",\"tagList\":[],\"title\":\"Dup Title equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/articles/unknown-slug-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#4>",
+          "content-length: 41",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"body\": \"test\"\n  }\n}"
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"article\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles/unknown-slug-equivalence/favorite",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#4>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"article\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/unknown-slug-equivalence/favorite",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#4>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"article\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/articles/unknown-slug-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#4>",
+          "content-length: 41",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"body\": \"test\"\n  }\n}"
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"article\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/unknown-slug-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#4>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"article\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/dup-title-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#4>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/dup-title-equivalence-2",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#4>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 115",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"\",\n    \"email\": \"ea_blank_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"username\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 106",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"ea_blank_equivalence\",\n    \"email\": \"\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"email\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 126",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"ea_blankp_equivalence\",\n    \"email\": \"ea_blankp_equivalence@test.com\",\n    \"password\": \"\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"password\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 131",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"ea_dup_equivalence\",\n    \"email\": \"ea_dup_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"ea_dup_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#5>\",\"username\":\"ea_dup_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 132",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"ea_dup_equivalence\",\n    \"email\": \"ea_dup2_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 409,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"username\":[\"has already been taken\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 132",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"ea_dup2_equivalence\",\n    \"email\": \"ea_dup_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 409,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"email\":[\"has already been taken\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users/login",
+        "headers": [
+          "accept: */*",
+          "content-length: 66",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"email\": \"\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"email\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users/login",
+        "headers": [
+          "accept: */*",
+          "content-length: 82",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"email\": \"ea_dup_equivalence@test.com\",\n    \"password\": \"\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"password\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users/login",
+        "headers": [
+          "accept: */*",
+          "content-length: 95",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"email\": \"ea_dup_equivalence@test.com\",\n    \"password\": \"wrongpassword\"\n  }\n}"
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"credentials\":[\"invalid\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"token\":[\"is missing\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "content-length: 37",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"bio\": \"test\"\n  }\n}"
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"token\":[\"is missing\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#5>",
+          "content-length: 35",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"email\": \"\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"email\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#5>",
+          "content-length: 38",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"username\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#5>",
+          "content-length: 37",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"email\": null\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"email\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#5>",
+          "content-length: 40",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": null\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"username\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#5>",
+          "content-length: 38",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"password\": \"\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"password\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#5>",
+          "content-length: 40",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"password\": null\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"password\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#5>",
+          "content-length: 45",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"password\": \"short7c\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"password\":[\"is too short (minimum is 8 characters)\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#5>",
+          "content-length: 46",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"password\": \"bonjour1\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"ea_dup_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#5>\",\"username\":\"ea_dup_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/user",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#5>",
+          "content-length: 102",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"password\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n  }\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"ea_dup_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#5>\",\"username\":\"ea_dup_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 133",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"authz_a_equivalence\",\n    \"email\": \"authz_a_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"authz_a_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#6>\",\"username\":\"authz_a_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 133",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"authz_b_equivalence\",\n    \"email\": \"authz_b_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"authz_b_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#7>\",\"username\":\"authz_b_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#6>",
+          "content-length: 110",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Authz Article equivalence\",\n    \"description\": \"test\",\n    \"body\": \"test\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"authz_a_equivalence\"},\"body\":\"test\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"test\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"authz-article-equivalence\",\"tagList\":[],\"title\":\"Authz Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/authz-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#7>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 403,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"article\":[\"forbidden\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "PUT",
+        "path": "/api/articles/authz-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#7>",
+          "content-length: 45",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"body\": \"hijacked\"\n  }\n}"
+      },
+      "response": {
+        "status": 403,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"article\":[\"forbidden\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles/authz-article-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#6>",
+          "content-length: 48",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"comment\": {\n    \"body\": \"A's comment\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"comment\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"authz_a_equivalence\"},\"body\":\"A's comment\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"id\":4,\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/authz-article-equivalence/comments/4",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#7>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 403,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"comment\":[\"forbidden\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/authz-article-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"comments\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"authz_a_equivalence\"},\"body\":\"A's comment\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"id\":4,\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}]}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/authz-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#6>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles/some-slug/comments",
+        "headers": [
+          "accept: */*",
+          "content-length: 41",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"comment\": {\n    \"body\": \"test\"\n  }\n}"
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"token\":[\"is missing\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/some-slug/comments/1",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"token\":[\"is missing\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 123",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"ec_equivalence\",\n    \"email\": \"ec_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"ec_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#8>\",\"username\":\"ec_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#8>",
+          "content-length: 112",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Err Comment Art equivalence\",\n    \"description\": \"test\",\n    \"body\": \"test\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"ec_equivalence\"},\"body\":\"test\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"test\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"err-comment-art-equivalence\",\"tagList\":[],\"title\":\"Err Comment Art equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles/err-comment-art-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#8>",
+          "content-length: 37",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"comment\": {\n    \"body\": \"\"\n  }\n}"
+      },
+      "response": {
+        "status": 422,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"body\":[\"can't be blank\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles/unknown-slug-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#8>",
+          "content-length: 43",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"comment\": {\n    \"body\": \"orphan\"\n  }\n}"
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"article\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/unknown-slug-equivalence/comments",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"article\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/unknown-slug-equivalence/comments/99999",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#8>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"article\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/err-comment-art-equivalence/comments/99999",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#8>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"comment\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/err-comment-art-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#8>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/profiles/unknown-user-equivalence",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"profile\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/profiles/unknown-user-equivalence/follow",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"token\":[\"is missing\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/profiles/unknown-user-equivalence/follow",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 401,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"token\":[\"is missing\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 123",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"ep_equivalence\",\n    \"email\": \"ep_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"ep_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#9>\",\"username\":\"ep_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/profiles/unknown-user-equivalence/follow",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#9>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"profile\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/profiles/unknown-user-equivalence/follow",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#9>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 404,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"errors\":{\"profile\":[\"not found\"]}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 125",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"fav_equivalence\",\n    \"email\": \"fav_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"fav_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#10>\",\"username\":\"fav_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#10>",
+          "content-length: 130",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Favorite Article equivalence\",\n    \"description\": \"For favorites\",\n    \"body\": \"Article body\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"fav_equivalence\"},\"body\":\"Article body\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"For favorites\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"favorite-article-equivalence\",\"tagList\":[],\"title\":\"Favorite Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles/favorite-article-equivalence/favorite",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#10>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"fav_equivalence\"},\"body\":\"Article body\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"For favorites\",\"favorited\":true,\"favoritesCount\":1,\"slug\":\"favorite-article-equivalence\",\"tagList\":[],\"title\":\"Favorite Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/favorite-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#10>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"fav_equivalence\"},\"body\":\"Article body\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"For favorites\",\"favorited\":true,\"favoritesCount\":1,\"slug\":\"favorite-article-equivalence\",\"tagList\":[],\"title\":\"Favorite Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles?favorited=fav_equivalence",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"fav_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"For favorites\",\"favorited\":false,\"favoritesCount\":1,\"slug\":\"favorite-article-equivalence\",\"tagList\":[],\"title\":\"Favorite Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":1}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles?favorited=fav_equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#10>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"fav_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"For favorites\",\"favorited\":true,\"favoritesCount\":1,\"slug\":\"favorite-article-equivalence\",\"tagList\":[],\"title\":\"Favorite Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":1}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/favorite-article-equivalence/favorite",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#10>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"fav_equivalence\"},\"body\":\"Article body\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"For favorites\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"favorite-article-equivalence\",\"tagList\":[],\"title\":\"Favorite Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/favorite-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#10>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"fav_equivalence\"},\"body\":\"Article body\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"For favorites\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"favorite-article-equivalence\",\"tagList\":[],\"title\":\"Favorite Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/favorite-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#10>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 129",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"feedm_equivalence\",\n    \"email\": \"feedm_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"feedm_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#11>\",\"username\":\"feedm_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 129",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"feedc_equivalence\",\n    \"email\": \"feedc_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"feedc_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#12>\",\"username\":\"feedc_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/feed",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#11>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[],\"articlesCount\":0}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/profiles/feedc_equivalence/follow",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#11>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"profile\":{\"bio\":null,\"following\":true,\"image\":null,\"username\":\"feedc_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#12>",
+          "content-length: 125",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Feed Article 1 equivalence\",\n    \"description\": \"Feed test 1\",\n    \"body\": \"Feed body 1\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"feedc_equivalence\"},\"body\":\"Feed body 1\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Feed test 1\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"feed-article-1-equivalence\",\"tagList\":[],\"title\":\"Feed Article 1 equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#12>",
+          "content-length: 125",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Feed Article 2 equivalence\",\n    \"description\": \"Feed test 2\",\n    \"body\": \"Feed body 2\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"feedc_equivalence\"},\"body\":\"Feed body 2\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Feed test 2\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"feed-article-2-equivalence\",\"tagList\":[],\"title\":\"Feed Article 2 equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/feed",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#11>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":true,\"image\":null,\"username\":\"feedc_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Feed test 2\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"feed-article-2-equivalence\",\"tagList\":[],\"title\":\"Feed Article 2 equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"},{\"author\":{\"bio\":null,\"following\":true,\"image\":null,\"username\":\"feedc_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Feed test 1\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"feed-article-1-equivalence\",\"tagList\":[],\"title\":\"Feed Article 1 equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":2}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/feed?limit=1",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#11>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":true,\"image\":null,\"username\":\"feedc_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Feed test 2\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"feed-article-2-equivalence\",\"tagList\":[],\"title\":\"Feed Article 2 equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":2}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles/feed?limit=1&offset=1",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#11>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":true,\"image\":null,\"username\":\"feedc_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Feed test 1\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"feed-article-1-equivalence\",\"tagList\":[],\"title\":\"Feed Article 1 equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":2}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/feed-article-1-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#12>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/feed-article-2-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#12>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/profiles/feedc_equivalence/follow",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#11>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"profile\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"feedc_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 127",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"page_equivalence\",\n    \"email\": \"page_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"page_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#13>\",\"username\":\"page_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#13>",
+          "content-length: 123",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Pagination 1 equivalence\",\n    \"description\": \"Page test 1\",\n    \"body\": \"Page body 1\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"page_equivalence\"},\"body\":\"Page body 1\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Page test 1\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"pagination-1-equivalence\",\"tagList\":[],\"title\":\"Pagination 1 equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#13>",
+          "content-length: 123",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Pagination 2 equivalence\",\n    \"description\": \"Page test 2\",\n    \"body\": \"Page body 2\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"page_equivalence\"},\"body\":\"Page body 2\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Page test 2\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"pagination-2-equivalence\",\"tagList\":[],\"title\":\"Pagination 2 equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles?author=page_equivalence&limit=1",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"page_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Page test 2\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"pagination-2-equivalence\",\"tagList\":[],\"title\":\"Pagination 2 equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":2}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/articles?author=page_equivalence&limit=1&offset=1",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"articles\":[{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"page_equivalence\"},\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"Page test 1\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"pagination-1-equivalence\",\"tagList\":[],\"title\":\"Pagination 1 equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}],\"articlesCount\":2}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/pagination-1-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#13>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/pagination-2-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#13>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 127",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"prof_equivalence\",\n    \"email\": \"prof_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"prof_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#14>\",\"username\":\"prof_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 129",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"celeb_equivalence\",\n    \"email\": \"celeb_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"celeb_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#15>\",\"username\":\"celeb_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/profiles/celeb_equivalence",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"profile\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"celeb_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/profiles/celeb_equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#14>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"profile\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"celeb_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/profiles/celeb_equivalence/follow",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#14>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"profile\":{\"bio\":null,\"following\":true,\"image\":null,\"username\":\"celeb_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/profiles/celeb_equivalence/follow",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#14>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"profile\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"celeb_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/profiles/celeb_equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#14>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"profile\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"celeb_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/users",
+        "headers": [
+          "accept: */*",
+          "content-length: 125",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"user\": {\n    \"username\": \"tag_equivalence\",\n    \"email\": \"tag_equivalence@test.com\",\n    \"password\": \"password123\"\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"user\":{\"bio\":null,\"email\":\"tag_equivalence@test.com\",\"image\":null,\"token\":\"<jwt#16>\",\"username\":\"tag_equivalence\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "POST",
+        "path": "/api/articles",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#16>",
+          "content-length: 171",
+          "content-type: application/json",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": "{\n  \"article\": {\n    \"title\": \"Tag Article equivalence\",\n    \"description\": \"For tags\",\n    \"body\": \"Article body\",\n    \"tagList\": [\"h_equivalence\", \"t_equivalence\"]\n  }\n}"
+      },
+      "response": {
+        "status": 201,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"article\":{\"author\":{\"bio\":null,\"following\":false,\"image\":null,\"username\":\"tag_equivalence\"},\"body\":\"Article body\",\"createdAt\":\"0000-00-00T00:00:00.000Z\",\"description\":\"For tags\",\"favorited\":false,\"favoritesCount\":0,\"slug\":\"tag-article-equivalence\",\"tagList\":[\"h_equivalence\",\"t_equivalence\"],\"title\":\"Tag Article equivalence\",\"updatedAt\":\"0000-00-00T00:00:00.000Z\"}}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "path": "/api/tags",
+        "headers": [
+          "accept: */*",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *",
+          "content-type: application/json"
+        ],
+        "body": "{\"tags\":[\"h_equivalence\",\"t_equivalence\"]}"
+      }
+    },
+    {
+      "request": {
+        "method": "DELETE",
+        "path": "/api/articles/tag-article-equivalence",
+        "headers": [
+          "accept: */*",
+          "authorization: Token <jwt#16>",
+          "user-agent: hurl/8.0.1"
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 204,
+        "headers": [
+          "access-control-allow-headers: authorization, content-type",
+          "access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS",
+          "access-control-allow-origin: *"
+        ],
+        "body": ""
+      }
+    }
+  ],
+  "tokens": [
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "1"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "2"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "3"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "4"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "5"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "6"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "7"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "8"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "9"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "10"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "11"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "12"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "13"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "14"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "15"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    },
+    {
+      "header": {
+        "alg": "HS256",
+        "typ": "JWT"
+      },
+      "claims": {
+        "sub": "16"
+      },
+      "lifetime": 2592000,
+      "times": [
+        "iat",
+        "exp"
+      ]
+    }
+  ],
+  "clientTokens": 0
+}

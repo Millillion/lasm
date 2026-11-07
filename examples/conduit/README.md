@@ -162,7 +162,10 @@ wrangler.toml, vercel.json, netlify.toml, fastly.toml, spin.toml, supabase/
                       each platform's own configuration
 test/
   platforms.mjs       every platform: its build, the command that serves it locally, its store
-  api.mjs             a fresh server and database (--platform NAME), then upstream's run-api-tests-hurl.sh
+  api.mjs             a fresh server and database (--platform NAME), then upstream's run-api-tests-hurl.sh;
+                      --equivalence also records the suite's traffic through a proxy
+  equivalence.mjs     compare NAME: that traffic, normalized (tokens, timestamps, ids, platform
+                      headers), against Node's recording in equivalence/realworld.json
   e2e-server.mjs      the end-to-end suite's server (E2E_PLATFORM)
   playwright.config.ts  upstream's playwright.base with our server and browsers
   vercel-serve.mjs, vercel-edge-serve.mjs, supabase-serve.mjs, postgrest.mjs

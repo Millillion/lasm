@@ -11,7 +11,9 @@ name: Conduit on every platform
 # CLI's local stack and functions serve, Postgres); Fastly Compute (Viceroy,
 # Fastly KV); wasi-http on wasmtime serve and Spin (Postgres through
 # PostgREST). One job per platform: the build, the official RealWorld API
-# suite, then the official end-to-end suite (Chromium, no retries).
+# suite, then the official end-to-end suite (Chromium, no retries), then
+# target equivalence: the API suite's traffic, normalized, equals Node's
+# recording (test/equivalence.mjs, test/equivalence/realworld.json).
 # Local runtimes and emulators only: no account, nothing deployed, CI=1.
 # Free runners only. Changes to the proofs alone do not run it.
 on:
@@ -201,7 +203,7 @@ jobs:
         run: node "$GITHUB_WORKSPACE/scripts/full-lean/run-bounded.mjs" --memory-mib 8192 -- node test/crypto-check.mjs
       - name: The official RealWorld API suite
         working-directory: ${{ env.CONDUIT }}
-        run: node test/api.mjs --platform ${{ matrix.platform }}
+        run: node test/api.mjs --platform ${{ matrix.platform }} --equivalence
       - name: The pinned Playwright's chromium
         timeout-minutes: 30
         run: |
@@ -217,6 +219,10 @@ jobs:
           npm run test:e2e -- --retries=0 || status=$?
           node test/e2e-summary.mjs test-results/e2e-${{ matrix.platform }}-chromium.json
           exit ${status:-0}
+      - name: Target equivalence with Node's recorded RealWorld traffic (test/equivalence.mjs)
+        if: ${{ !cancelled() }}
+        working-directory: ${{ env.CONDUIT }}
+        run: node test/equivalence.mjs compare ${{ matrix.platform }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
