@@ -2,7 +2,7 @@
 
 Status: in place since 2026-11-07 (#142: shared setup; #143: tiers).
 
-Lasm's CI is 86 workflow files in `.github/workflows/`. This page says
+Lasm's CI is 87 workflow files in `.github/workflows/`. This page says
 which tier each check belongs to, why it is there, and how the tiers fit together.
 Every check that ran before the tiers were set up still runs in at least one
 tier, and nothing that gates a release was removed. The test layers themselves
@@ -136,6 +136,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `ledger-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 47 min (max 104) | examples/ledger on Bun, Deno, Docker, Workers, WASI auditor | PR (paths), main |
 | `ledger.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 25 min (max 88) | examples/ledger: proofs, API, DST fixed seeds, TigerBeetle differential, E2E | PR (paths), main |
 | `library-prebuilt.yml` | push prebuilt/**, dispatch | Linux | 3 min (max 16) | Regenerates library/prebuilt (maintainer) | On demand |
+| `library-proofs.yml` | dispatch, call, PR (paths), push main (paths) | Linux | — | Proofs of Lasm's library: theorems match Spec.lean, standard axioms only, library/PROOFS.md current | PR (paths), main |
 | `link-toolchain-fixtures.yml` | dispatch | Linux, macOS, Windows | 12 min | Link toolchain fixtures (maintainer) | On demand |
 | `link-toolchain.yml` | dispatch | Linux, macOS, Windows | 11 min | Builds the link toolchain distribution (maintainer) | On demand |
 | `managed-sdk.yml` | dispatch | Linux, macOS, Windows | 7 min | Managed compiler SDK provisioning | On demand |
