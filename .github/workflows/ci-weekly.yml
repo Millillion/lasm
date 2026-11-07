@@ -1,0 +1,36 @@
+name: Weekly tier
+# The weekly tier (docs/CI.md): campaigns too long for every night, through the
+# same reusable workflows. A 100-minute differential campaign in the release and
+# the dev profile (differential.yml; its nightly campaign is 60 minutes), and the
+# Lasm.JS soak, 200 runs per program on four platforms (lasm-js-stress.yml; a
+# release runs 50). The weekly fuzzing campaign stays in fuzz.yml (Sunday) and
+# the image re-pin in image-pins.yml (Monday). Not a release dependency.
+on:
+  schedule:
+    - cron: '7 12 * * 6'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-weekly-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  differential:
+    if: github.event.repository.visibility == 'public'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/differential.yml
+    with:
+      budget-min: '100'
+
+  soak:
+    if: github.event.repository.visibility == 'public'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/lasm-js-stress.yml
+    with:
+      runs: '200'
+      cli-runs: '20'
+      timeout-s: '30'

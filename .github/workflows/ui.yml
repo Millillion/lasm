@@ -23,7 +23,8 @@ on:
       - 'scripts/ui/**'
       - 'templates/fullstack/**'
 concurrency:
-  group: ui-${{ github.ref }}
+  # github.workflow is the caller's name in a call: release-checks and ci-nightly never cancel each other.
+  group: ui-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   ui:

@@ -1,8 +1,8 @@
 # CI tiers
 
-Status: being put in place (November 2026). The shared setup actions came first; the tier triggers and the `ci-nightly.yml` / `ci-weekly.yml` orchestrators follow.
+Status: in place since 2026-11-07 (#142: shared setup; #143: tiers).
 
-Lasm's CI is about 85 workflow files in `.github/workflows/`. This page says
+Lasm's CI is 87 workflow files in `.github/workflows/`. This page says
 which tier each check belongs to, why it is there, and how the tiers fit together.
 Every check that ran before the tiers were set up still runs in at least one
 tier, and nothing that gates a release was removed. The test layers themselves
@@ -102,14 +102,16 @@ it), and "dispatch" means `workflow_dispatch`.
 | `application-module-data-files.yml` | dispatch | Linux, macOS, Windows | 2 min | Module data file loader controls (diagnosis) | On demand |
 | `application-module-data.yml` | dispatch | Linux | 1 min | Native module data layout controls (diagnosis) | On demand |
 | `application-runtime-source.yml` | dispatch | Linux | 6 min (max 69) | Cold reproducible build of the application runtime from source | On demand |
-| `bridge-verification.yml` | PR (paths), push main (paths), cron 17 3 * * *, dispatch | Linux | 29 min (max 109) | Host bridge: Lean model, schedule-fuzzed Lasm.JS runs, trace conformance | PR (paths), main, nightly |
-| `browser.yml` | dispatch, call, push browser,browser-ui,dx-browser,launch (paths) | Linux, macOS | 32 min (max 86) | Browser target: web template, Lasm.Web, Vite plugin, Chromium/Firefox/WebKit (+ WebKit on macOS) | Release, nightly |
-| `build-profile.yml` | dispatch | Linux, macOS, Windows | 10 min (max 35) | Per-stage build times of a candidate on five platforms | On demand |
+| `bridge-verification.yml` | PR (paths), push main (paths), cron 17 3 * * *, dispatch | Linux + called workflows | 29 min (max 109) | Host bridge: Lean model, schedule-fuzzed Lasm.JS runs, trace conformance | PR (paths), main, nightly |
+| `browser.yml` | dispatch, call, push browser,browser-ui,dx-browser,launch (paths) | Linux, macOS + called workflows | 32 min (max 86) | Browser target: web template, Lasm.Web, Vite plugin, Chromium/Firefox/WebKit (+ WebKit on macOS) | Release, nightly |
+| `build-profile.yml` | dispatch | Linux, macOS, Windows + called workflows | 10 min (max 35) | Per-stage build times of a candidate on five platforms | On demand |
 | `bun-deno-published.yml` | dispatch, after release, cron 17 9 * * *, push phase-7 (paths) | Linux, macOS, Windows | 19 min (max 39) | Published @lasm/cli with Bun and Deno only, five platforms | After release, nightly |
+| `ci-nightly.yml` | cron 7 1 * * *, dispatch | Linux + called workflows | — | Nightly tier: the release suites on main | Nightly |
+| `ci-weekly.yml` | cron 7 12 * * 6, dispatch | called workflows | — | Weekly tier: long campaigns | Weekly |
 | `conduit-platforms.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 35 min (max 103) | examples/conduit on 15 non-Node platforms, RealWorld traffic equivalence | PR (paths), main |
 | `conduit.yml` | dispatch, call, PR (paths), push main,conduit (paths) | Linux | 24 min (max 107) | examples/conduit: proofs, API on Node/Workers/Bun, RealWorld E2E in three browsers | PR (paths), main |
 | `content.yml` | PR (paths), cron 23 5 * * *, dispatch | Linux | 12 min (max 85) | content/ pages and runnable tutorials | PR (paths), nightly |
-| `differential.yml` | PR, push main, cron 41 4 * * *, call, dispatch | Linux, macOS, Windows | 35 min (max 110) | Compiler output vs native Lean on every target, host fixtures, target equivalence, recursion and Async depth, macOS C tier | PR, main, nightly (campaign), weekly (long campaign) |
+| `differential.yml` | PR (paths-ignore), push main, cron 41 4 * * *, call, dispatch | Linux, macOS, Windows | 35 min (max 110) | Compiler output vs native Lean on every target, host fixtures, target equivalence, recursion and Async depth, macOS C tier | PR, main, nightly (campaign), weekly (long campaign) |
 | `dst-nightly.yml` | cron 23 3 * * *, dispatch | Linux | — | Example-app deterministic simulation with random seeds | Nightly |
 | `dx-dev-loop.yml` | dispatch, call, push dx,launch (paths) | Linux | 7 min (max 48) | Template dev loop, editor support, cold start | Release, nightly |
 | `ecosystem.yml` | dispatch | Linux, macOS | 93 min (max 586) | Lake projects of the ecosystem built on five targets | Nightly (dispatched by nightly.yml), on demand |
@@ -120,11 +122,11 @@ it), and "dispatch" means `workflow_dispatch`.
 | `folio-nightly.yml` | cron 23 4 * * *, dispatch | Linux | 41 min | Folio: CommonMark differential and 40-minute fuzzing | Nightly |
 | `folio.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 16 min (max 96) | examples/folio: proofs, CommonMark examples, CLI, WASI, live preview | PR (paths), main |
 | `fullstack.yml` | dispatch, call, push fullstack,launch (paths) | Linux | 27 min (max 79) | Fullstack template on Node, Workers, Bun, Deno, Fastly, wasmtime serve; npm run dev | Release, nightly |
-| `fuzz.yml` | PR, push main, cron 23 2 * * *; 41 6 * * 0, dispatch | Linux | 8 min (max 18) | Boundary fuzzing: corpus replay; 10-minute campaigns; 60-minute campaigns | PR, main, nightly, weekly |
+| `fuzz.yml` | PR (paths-ignore), push main, cron 23 2 * * *; 41 6 * * 0, dispatch | Linux | 8 min (max 18) | Boundary fuzzing: corpus replay; 10-minute campaigns; 60-minute campaigns | PR, main, nightly, weekly |
 | `image-pins.yml` | cron 17 6 * * 1, dispatch | Linux | 0 min (max 3) | Re-pins cached CI images to upstream digests (opens a PR) | Weekly |
-| `installation-confidence.yml` | dispatch, cron 17 3 * * * | Linux, macOS, Windows | 73 min (max 417) | Repeated cold installs of the retained candidate on five platforms | Nightly |
+| `installation-confidence.yml` | dispatch, cron 17 3 * * * | Linux, macOS, Windows + called workflows | 73 min (max 417) | Repeated cold installs of the retained candidate on five platforms | Nightly |
 | `installer-faults.yml` | push main (paths), PR (paths), dispatch, call | Linux, macOS, Windows | 6 min (max 69) | Installer fault injection on five platforms | PR (paths, Linux and Windows), main, release, nightly |
-| `interop-soak.yml` | dispatch | Linux, macOS, Windows | 123 min | Express/Hono apps with Lean handlers under soak | On demand |
+| `interop-soak.yml` | dispatch | Linux, macOS, Windows + called workflows | 123 min | Express/Hono apps with Lean handlers under soak | On demand |
 | `io-error-decoder.yml` | dispatch | Linux, Windows | 7 min | Native Lean IO error ABI comparison (diagnosis) | On demand |
 | `js-interop-examples.yml` | call, dispatch | Linux, macOS, Windows | 11 min | examples/js-crud and js-fetch on five platforms | Release (called by node-linux-acceptance) |
 | `language-coverage-baseline.yml` | dispatch | Linux, macOS | 41 min | Upstream Lean test suites on five targets (launch gate shards) | Nightly (dispatched by nightly.yml), on demand |
@@ -134,23 +136,24 @@ it), and "dispatch" means `workflow_dispatch`.
 | `ledger-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 47 min (max 104) | examples/ledger on Bun, Deno, Docker, Workers, WASI auditor | PR (paths), main |
 | `ledger.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 25 min (max 88) | examples/ledger: proofs, API, DST fixed seeds, TigerBeetle differential, E2E | PR (paths), main |
 | `library-prebuilt.yml` | push prebuilt/**, dispatch | Linux | 3 min (max 16) | Regenerates library/prebuilt (maintainer) | On demand |
+| `library-proofs.yml` | dispatch, call, PR (paths), push main (paths) | Linux | — | Proofs of Lasm's library: theorems match Spec.lean, standard axioms only, library/PROOFS.md current | PR (paths), main |
 | `link-toolchain-fixtures.yml` | dispatch | Linux, macOS, Windows | 12 min | Link toolchain fixtures (maintainer) | On demand |
 | `link-toolchain.yml` | dispatch | Linux, macOS, Windows | 11 min | Builds the link toolchain distribution (maintainer) | On demand |
 | `managed-sdk.yml` | dispatch | Linux, macOS, Windows | 7 min | Managed compiler SDK provisioning | On demand |
 | `managed-tools.yml` | dispatch | Linux, macOS, Windows | 4 min | Managed Lean tool provisioning | On demand |
 | `mutation.yml` | cron 37 5 * * *, dispatch, PR (paths) | Linux | 11 min (max 27) | Stryker mutation scores of critical modules | PR (changed modules), nightly |
-| `nightly.yml` | cron 17 7 * * *, dispatch | Linux | 3 min (max 27) | Nightly upstream suite and ecosystem runs vs baseline | Nightly |
+| `nightly.yml` | cron 17 7 * * *, dispatch | Linux + called workflows | 3 min (max 27) | Nightly upstream suite and ecosystem runs vs baseline | Nightly |
 | `node-candidate-input.yml` | call | Linux | — | Authenticated candidate input (called) | Called |
-| `node-darwin-candidate-recheck.yml` | dispatch | macOS | 28 min (max 87) | Recheck a candidate on macOS | On demand |
+| `node-darwin-candidate-recheck.yml` | dispatch | macOS + called workflows | 28 min (max 87) | Recheck a candidate on macOS | On demand |
 | `node-darwin-consumer.yml` | call | input | — | Installed candidate on macOS (called) | Called |
 | `node-darwin-controls.yml` | dispatch | macOS | 1 min | macOS resource and isolation controls | On demand |
-| `node-linux-acceptance.yml` | push main (paths), dispatch, call | Linux, macOS, Windows | 142 min (max 422) | Candidate build and five-platform installed acceptance, templates, js-interop, platform support, benchmarks | Release (candidate), main (paths) |
-| `node-linux-candidate-recheck.yml` | dispatch | Linux | 20 min | Recheck a candidate on Linux | On demand |
+| `node-linux-acceptance.yml` | push main (paths), dispatch, call | Linux, macOS, Windows + called workflows | 142 min (max 422) | Candidate build and five-platform installed acceptance, templates, js-interop, platform support, benchmarks | Release (candidate), main (paths) |
+| `node-linux-candidate-recheck.yml` | dispatch | Linux + called workflows | 20 min | Recheck a candidate on Linux | On demand |
 | `node-linux-candidate-retain.yml` | dispatch | Linux, Windows | 1 min | Retain a verified candidate draft | On demand |
 | `node-linux-consumer.yml` | call | input | — | Installed candidate on Linux (called) | Called |
 | `node-linux-runtime.yml` | dispatch | Linux | 49 min (max 146) | Builds the pinned Node runtime inputs | On demand |
 | `node-runtime-handoff-recover.yml` | dispatch | Linux | 0 min | Recovers a runtime handoff from cache | On demand |
-| `node-windows-candidate-recheck.yml` | dispatch | Windows | 44 min | Recheck a candidate on Windows | On demand |
+| `node-windows-candidate-recheck.yml` | dispatch | Windows + called workflows | 44 min | Recheck a candidate on Windows | On demand |
 | `node-windows-consumer.yml` | call | Windows | — | Installed candidate on Windows (called) | Called |
 | `node-windows-controls.yml` | dispatch | Windows | 2 min (max 12) | Windows resource and isolation controls | On demand |
 | `npm-dist.yml` | call, dispatch | Linux, macOS, Windows | 43 min | npm packages of the candidate through a loopback registry; Bun/Deno installs | Release (rehearsal) |
@@ -159,11 +162,11 @@ it), and "dispatch" means `workflow_dispatch`.
 | `porter-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 32 min (max 101) | examples/porter on Bun, Deno, Docker, Workers | PR (paths), main |
 | `porter.yml` | dispatch, PR (paths), push main (paths) | Linux | 18 min (max 86) | examples/porter: proofs, oracles, DST, fuzzer, E2E | PR (paths), main |
 | `published-templates.yml` | dispatch, after release | Linux | 0 min (max 30) | npm create @lasm from the registry after a release | After release |
-| `release-benchmarks.yml` | call, dispatch | Linux, macOS, Windows | 58 min | Release benchmark set | Release (called), on demand |
-| `release-checks.yml` | PR, push main, dispatch | Linux, macOS | 9 min (max 208) | The single required status of a release | Release (every PR and push to main: detect) |
+| `release-benchmarks.yml` | call, dispatch | Linux, macOS, Windows + called workflows | 58 min | Release benchmark set | Release (called), on demand |
+| `release-checks.yml` | PR, push main, dispatch | Linux + called workflows | 9 min (max 208) | The single required status of a release | Release (every PR and push to main: detect) |
 | `release.yml` | push main (paths), after release-checks, dispatch | Linux | 1 min (max 32) | Publishes to npm (OIDC) after release-checks | Release |
-| `server-mvp-robustness.yml` | dispatch | Linux, macOS, Windows | 49 min (max 164) | Server MVP load, faults, soak | On demand |
-| `server-mvp-upstream.yml` | dispatch | Linux | 7 min (max 27) | Server MVP upstream runtime comparisons | On demand |
+| `server-mvp-robustness.yml` | dispatch | Linux, macOS, Windows + called workflows | 49 min (max 164) | Server MVP load, faults, soak | On demand |
+| `server-mvp-upstream.yml` | dispatch | Linux + called workflows | 7 min (max 27) | Server MVP upstream runtime comparisons | On demand |
 | `serverless-adapters.yml` | dispatch, PR (paths), push main (paths) | Linux | 14 min (max 72) | Function-platform shims on local emulators | PR (paths), main |
 | `serverless.yml` | dispatch | Linux | 23 min (max 66) | Function-platform claims with local runtimes | On demand |
 | `signal-controls.yml` | dispatch | Linux | 1 min | Native signal routing controls | On demand |
@@ -171,16 +174,16 @@ it), and "dispatch" means `workflow_dispatch`.
 | `tandem-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 11 min (max 74) | examples/tandem on Bun, Deno, Docker, Workers | PR (paths), main |
 | `tandem.yml` | dispatch, PR (paths), push main (paths) | Linux | 19 min (max 97) | examples/tandem: proofs, protocol, Yjs, fuzzer, DST, E2E | PR (paths), main |
 | `templates.yml` | call, dispatch | Linux, macOS, Windows | 23 min | Every lasm init template on five platforms | Release (called) |
-| `tooling.yml` | PR, push main, cron 17 5 * * *, dispatch | Linux | 17 min (max 59) | Error corpus; metamorphic builds and fault injection | PR, main, nightly |
+| `tooling.yml` | PR (paths-ignore), push main, cron 17 5 * * *, dispatch | Linux | 17 min (max 59) | Error corpus; metamorphic builds and fault injection | PR, main, nightly |
 | `ui.yml` | dispatch, call, push browser,browser-ui,launch,fullstack (paths) | Linux | 1 min (max 19) | Lasm.UI library, proofs, diff model, DOM applier | Release, nightly |
-| `unit.yml` | dispatch, call, push launch | Linux | 5 min (max 31) | The whole unit suite with coverage baseline | PR (paths), release, nightly |
+| `unit.yml` | PR (paths-ignore), dispatch, call, push launch | Linux | 5 min (max 31) | The whole unit suite with coverage baseline | PR (paths), release, nightly |
 | `upstream-native-build-time.yml` | dispatch | Linux | 2 min (max 20) | Upstream native build-time checks | On demand |
-| `wasi.yml` | dispatch, call, push wasi,launch (paths) | Linux | 13 min (max 74) | WASI, wasi-http, Fastly on wasmtime, wasmer, node:wasi, Spin, Viceroy | Release, nightly |
+| `wasi.yml` | dispatch, call, push wasi,launch (paths) | Linux + called workflows | 13 min (max 74) | WASI, wasi-http, Fastly on wasmtime, wasmer, node:wasi, Spin, Viceroy | Release, nightly |
 | `wasmtime-helper-probe.yml` | dispatch | Linux | 0 min (max 1) | Wasmtime helper feasibility probe | On demand |
 | `windows-guard-controls.yml` | dispatch | Windows | 2 min | Windows resource guard controls | On demand |
 | `windows-lean-path-controls.yml` | dispatch | Windows | 3 min | Windows Lean long-path controls | On demand |
 | `windows-timezone-host.yml` | dispatch | Windows | 5 min | Windows timezone host comparisons | On demand |
-| `workers.yml` | dispatch, call, push phase-7,launch (paths) | Linux, macOS, Windows | 29 min (max 90) | Edge targets (Workers, Vercel/Netlify Edge, Deno, Supabase) and Bun/Deno on five platforms | Release, nightly |
+| `workers.yml` | dispatch, call, push phase-7,launch (paths) | Linux, macOS, Windows + called workflows | 29 min (max 90) | Edge targets (Workers, Vercel/Netlify Edge, Deno, Supabase) and Bun/Deno on five platforms | Release, nightly |
 
 ## Measurements
 

@@ -51,7 +51,8 @@ permissions:
   # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
   contents: write
 concurrency:
-  group: browser-${{ github.ref }}-${{ github.event_name }}
+  # github.workflow is the caller's name in a call: release-checks and ci-nightly never cancel each other.
+  group: browser-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 env:
   PLAYWRIGHT: 1.63.0
