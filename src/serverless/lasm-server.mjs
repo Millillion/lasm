@@ -7,6 +7,7 @@
 // PORT and HOST are set to a free loopback port before main.mjs runs, and the
 // first request waits until that port accepts connections. Any server works:
 // Express, Hono on @hono/node-server, or pure-Lean Std.Http.
+import { isUtf8 } from 'node:buffer';
 import http from 'node:http';
 import net from 'node:net';
 import { fileURLToPath } from 'node:url';
@@ -98,13 +99,15 @@ const cookieComma = /\s*,\s*(?=[!#$%&'*+\-.^_`|~0-9A-Za-z]+=)/g;
  * CloudFront's header lists); the Lean server sees what a browser sends.
  */
 export function joinCookies(pairs) {
-  const values = pairs.filter(([name]) => name.toLowerCase() === 'cookie').map(([, value]) => value.replace(cookieComma, '; ')).filter(value => value !== '');
-  if (!values.length) return pairs;
+  const isCookie = ([name]) => name.toLowerCase() === 'cookie';
+  if (!pairs.some(isCookie)) return pairs;
+  // Empty Cookie fields carry nothing: when every one is empty, none is sent.
+  const joined = pairs.filter(isCookie).map(([, value]) => value.replace(cookieComma, '; ')).filter(value => value !== '').join('; ');
   const out = [];
   let placed = false;
   for (const pair of pairs) {
-    if (pair[0].toLowerCase() !== 'cookie') out.push(pair);
-    else if (!placed) { out.push([pair[0], values.join('; ')]); placed = true; }
+    if (!isCookie(pair)) out.push(pair);
+    else if (!placed && joined) { out.push([pair[0], joined]); placed = true; }
   }
   return out;
 }
@@ -141,18 +144,63 @@ export function parseSetCookie(header) {
   return { ...cookie, dropped };
 }
 
+// The Lean model of this file's request and response mapping, and of
+// lasm-lambda.mjs's, is library/Lasm/Serverless/Proofs/Model.lean (its
+// theorems: library/PROOFS.md); the serverless-http fuzz target checks the
+// two agree.
+
+const hex = byte => '%' + byte.toString(16).toUpperCase().padStart(2, '0');
+// Percent-encodes, as UTF-8 (a lone surrogate as U+FFFD), what matches `unsafe`.
+const escape = (text, unsafe) => text.replace(unsafe, c => [...Buffer.from(c)].map(hex).join(''));
+
+/**
+ * The request target http.request sends for a path and a query (without its
+ * `?`) that a platform event holds: what a request target cannot carry
+ * (a space, a control or non-ASCII character, `#`; in the path also `?`) is
+ * percent-encoded, as UTF-8. A gateway that hands over the path decoded
+ * (`/a b`, `/a?b`) would otherwise make http.request throw (a 502) or move
+ * part of the path into the query; a target that is already valid, such as
+ * a raw path with escapes, is sent unchanged.
+ */
+export function requestTarget(path, query = '') {
+  return escape(path || '/', /[^\x21-\x7e]|[?#]/gu) + (query ? '?' + escape(query, /[^\x21-\x7e]|#/gu) : '');
+}
+
+/** Whether a Host header is a plain `host[:port]`: printable ASCII without `/ ? # \ @`. */
+export const plainHost = value => /^[\x21-\x7e]+$/.test(value) && !/[/?#\\@]/.test(value);
+
+/**
+ * The header fields forward() sends, as [[name, value], …]: the Cookie
+ * fields joined into one (joinCookies), without hop-by-hop fields or the
+ * event's Content-Length (`bodyLength` sets it). One Host: the first plain
+ * one, else `defaultHost`, so a forged Host (`x/admin#`) cannot move the path
+ * or query a server that builds its URL from Host sees.
+ */
+export function outgoingHeaders(headers, bodyLength, defaultHost) {
+  const out = [];
+  let hasHost = false;
+  for (const [name, value] of joinCookies(headers)) {
+    const lower = name.toLowerCase();
+    if (hopByHop.has(lower) || lower === 'content-length') continue;
+    if (lower === 'host') {
+      if (hasHost || !plainHost(value)) continue;
+      hasHost = true;
+    }
+    out.push([name, value]);
+  }
+  if (!hasHost) out.push(['host', defaultHost]);
+  if (bodyLength) out.push(['content-length', String(bodyLength)]);
+  return out;
+}
+
 /**
  * Sends one request to the Lean server.
- * request: { method, path (with query string), headers: [[name, value], …], body: Buffer | undefined }
+ * request: { method, path (a request target, with its query), headers: [[name, value], …], body: Buffer | undefined }
  * returns { status, statusText, headers: [[name, value], …] (set-cookie repeated), body: Buffer }
  */
 export async function forward({ method, path, headers, body }) {
   const port = await startLeanServer();
-  const outgoing = [];
-  for (const [name, value] of joinCookies(headers)) if (!hopByHop.has(name.toLowerCase()) && name.toLowerCase() !== 'content-length') outgoing.push(name, value);
-  // HTTP/1.1 requires Host; events built by hand or by tests may omit it.
-  if (!headers.some(([name]) => name.toLowerCase() === 'host')) outgoing.push('host', `${host}:${port}`);
-  if (body?.length) outgoing.push('content-length', String(body.length));
+  const outgoing = outgoingHeaders(headers, body?.length ?? 0, `${host}:${port}`).flat();
   return new Promise((resolve, reject) => {
     const request = http.request({ host, port, method, path: path || '/', headers: outgoing, agent }, response => {
       const chunks = [];
@@ -192,12 +240,8 @@ export async function pipe(req, res) {
   const port = await startLeanServer();
   const body = await requestBody(req);
   const pairs = [];
-  for (let i = 0; i < req.rawHeaders.length; i += 2) {
-    const name = req.rawHeaders[i].toLowerCase();
-    if (!hopByHop.has(name) && name !== 'content-length') pairs.push([req.rawHeaders[i], req.rawHeaders[i + 1]]);
-  }
-  const headers = joinCookies(pairs).flat();
-  if (body.length) headers.push('content-length', String(body.length));
+  for (let i = 0; i < req.rawHeaders.length; i += 2) pairs.push([req.rawHeaders[i], req.rawHeaders[i + 1]]);
+  const headers = outgoingHeaders(pairs, body.length, `${host}:${port}`).flat();
   await new Promise((resolve, reject) => {
     const request = http.request({ host, port, method: req.method, path: req.originalUrl ?? req.url, headers, agent }, response => {
       const out = [];
@@ -217,14 +261,18 @@ export async function pipe(req, res) {
 export async function fetchLean(request) {
   const url = new URL(request.url);
   const body = ['GET', 'HEAD'].includes(request.method) ? undefined : Buffer.from(await request.arrayBuffer());
-  const reply = await forward({ method: request.method, path: url.pathname + url.search, headers: [...request.headers], body });
+  return webReply(await forward({ method: request.method, path: url.pathname + url.search, headers: [...request.headers], body }), request.method);
+}
+
+/** A forward() reply to a request with `method` as a WHATWG Response (fetchLean). */
+export function webReply(reply, method) {
   const headers = new Headers();
   for (const [name, value] of reply.headers) headers.append(name, value);
   // A null-body status must not carry a body in a Response. An empty body is
   // no body at all: Netlify's streaming bootstrap answers a Response with a
   // zero-length body stream (a 303 with only a Location) with nothing, not
   // even the status (#82).
-  const empty = [101, 204, 205, 304].includes(reply.status) || request.method === 'HEAD' || reply.body.length === 0;
+  const empty = [101, 204, 205, 304].includes(reply.status) || method === 'HEAD' || reply.body.length === 0;
   return new Response(empty ? null : reply.body, { status: reply.status, statusText: reply.statusText, headers });
 }
 
@@ -265,10 +313,15 @@ export function azureReply(reply) {
   return { status: reply.status, headers, ...(cookies.length ? { cookies } : {}), body: reply.body.length ? reply.body : undefined };
 }
 
-/** Whether a response body can travel as UTF-8 text rather than base64. */
-export function isTextual(headers) {
+/**
+ * Whether a response body can travel as UTF-8 text rather than base64: its
+ * type is textual and, when given, `body` is valid UTF-8 (a text/html body in
+ * Latin-1 would otherwise arrive with U+FFFD in place of its accented letters).
+ */
+export function isTextual(headers, body) {
   const get = name => headers.find(([key]) => key === name)?.[1] ?? '';
   if (get('content-encoding') && get('content-encoding') !== 'identity') return false;
   const type = get('content-type').toLowerCase();
-  return !type || /^text\/|[/+](json|xml|javascript|ecmascript)\b|^application\/(x-www-form-urlencoded|graphql)/.test(type);
+  return (!type || /^text\/|[/+](json|xml|javascript|ecmascript)\b|^application\/(x-www-form-urlencoded|graphql)/.test(type))
+    && (body === undefined || isUtf8(body));
 }
