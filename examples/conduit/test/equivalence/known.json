@@ -1,0 +1,4 @@
+{
+  "about": "Known differences in Conduit's RealWorld traffic (test/equivalence.mjs): each entry is reported, not failed, and has an open issue. targets: the target names (test/api.mjs --name or --platform); request: a regular expression over 'METHOD /path' (or '(tokens)').",
+  "known": []
+}

@@ -10,6 +10,10 @@ name: Conduit
 #   against the same suite;
 # - on Node and Bun also test/concurrency.mjs: overlapping writes and reads
 #   against one server never see a write half done;
+# - target equivalence (test/equivalence.mjs): the suite's traffic, recorded
+#   through a proxy and normalized (tokens, timestamps, platform headers),
+#   equals Node's committed recording test/equivalence/realworld.json, on
+#   Node 24 and 26, Workers and Bun (and every platform, conduit-platforms.yml);
 # - proofs: every proposition of Proofs/Spec.lean has its theorem, every
 #   theorem in Proofs/ compiles and uses only propext, Classical.choice and
 #   Quot.sound (no sorry), with Lasm's managed Lean; PROOFS.md, SPEC.md and
@@ -22,7 +26,8 @@ name: Conduit
 #   WebKit; Workers (wrangler dev, local D1) and Bun on Chromium; no retries;
 #   on Node also Conduit's own browser tests (test/conduit);
 # - conduit-platforms.yml: every other platform, with its own local tooling;
-# - pinned: test/realworld is byte-identical to the upstream commit.
+# - pinned: test/realworld is byte-identical to the upstream commit; the
+#   equivalence normalizer's self-test.
 # Local runtimes and emulators only: no account, nothing deployed, CI=1.
 # Free runners only.
 on:
@@ -65,6 +70,9 @@ jobs:
           cmp LICENSE "$RUNNER_TEMP/rw/LICENSE"
           for f in $(find specs -type f); do cmp "$f" "$RUNNER_TEMP/rw/$f"; done
           echo "$(find specs -type f | wc -l) files identical to gothinkster/realworld@$commit"
+      - name: The equivalence normalizer and diff on made-up traffic (test/equivalence.mjs self-test)
+        working-directory: examples/conduit
+        run: node test/equivalence.mjs self-test
   proofs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -121,10 +129,14 @@ jobs:
         run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
       - name: npm test (the official RealWorld API suite)
         working-directory: examples/conduit
-        run: node test/api.mjs --name "node-${{ matrix.node }}"
+        run: node test/api.mjs --name "node-${{ matrix.node }}" --equivalence
       - name: Isolation between concurrent requests (test/concurrency.mjs)
         working-directory: examples/conduit
         run: node test/concurrency.mjs --seconds 15
+      - name: Target equivalence with Node's recorded RealWorld traffic (test/equivalence.mjs)
+        if: ${{ !cancelled() }}
+        working-directory: examples/conduit
+        run: node test/equivalence.mjs compare "node-${{ matrix.node }}"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -162,7 +174,11 @@ jobs:
         working-directory: examples/conduit
         env:
           WRANGLER_SEND_METRICS: 'false'
-        run: node test/api.mjs --name workers --command "wrangler dev --port {port} --ip 127.0.0.1"
+        run: node test/api.mjs --name workers --command "wrangler dev --port {port} --ip 127.0.0.1" --equivalence
+      - name: Target equivalence with Node's recorded RealWorld traffic (test/equivalence.mjs)
+        if: ${{ !cancelled() }}
+        working-directory: examples/conduit
+        run: node test/equivalence.mjs compare workers
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -200,10 +216,14 @@ jobs:
           node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:bun
       - name: The official RealWorld API suite against Bun
         working-directory: examples/conduit
-        run: node test/api.mjs --name bun --command "bun bun/main.mjs"
+        run: node test/api.mjs --name bun --command "bun bun/main.mjs" --equivalence
       - name: Isolation between concurrent requests on Bun (test/concurrency.mjs)
         working-directory: examples/conduit
         run: node test/concurrency.mjs --seconds 15 --command "bun bun/main.mjs"
+      - name: Target equivalence with Node's recorded RealWorld traffic (test/equivalence.mjs)
+        if: ${{ !cancelled() }}
+        working-directory: examples/conduit
+        run: node test/equivalence.mjs compare bun
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
