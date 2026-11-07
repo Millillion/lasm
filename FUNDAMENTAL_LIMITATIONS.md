@@ -11,8 +11,7 @@ These current restrictions must not be mistaken for fundamental limitations:
 | --- | --- |
 | Signed JavaScript heap indexing above 2 GiB | Fixed SDK port defect; regression passes in Node. |
 | Host calls stalled above 4 GiB | Repaired bridge defect triggered by Node truncating cloned typed-array offsets. Numeric-offset requests and the original high-memory Lean test pass in Node. Broader full-suite validation remains necessary. |
-| 32-bit `USize` in the application runtime | Runtime target choice; the experimental full compiler preserves native 64-bit values. |
-| 4 GiB memory ceiling in the lowered-memory64 build | Native memory64 accesses above 4 GiB pass in Node. |
+| Memory ceiling per target | Link settings, not Lean limits. Node links wasm64 with 64-bit memory (`-sMEMORY64=1`, 8 GiB maximum; `src/application-link.mjs`). The edge, Bun/Deno and browser builds (`src/edge/edge-link.mjs`, `-sMEMORY64=2`) and WASI/Fastly builds (`src/wasi/wasi-link.mjs`, Binaryen `--memory64-lowering`) lower wasm64 code to 32-bit memory with a 2 GiB maximum. `USize` and `size_t` stay 64-bit on every target, because the code is wasm64 throughout. |
 | Missing runtime externs, module initializers, or compiled symbol lookup | Implementation gaps. |
 | Native libraries lacking a Wasm build or host adapter | Missing integration; evaluate the actual dependency before claiming impossibility. |
 | Test deadlines or resource exhaustion under instrumentation | Investigate separately with documented parallel-harness adjustments. |
