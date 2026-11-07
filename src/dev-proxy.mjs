@@ -8,6 +8,7 @@ import { createServer, request as httpRequest } from 'node:http';
 import { createServer as createNetServer, connect } from 'node:net';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve, sep } from 'node:path';
+import { listenError } from './browser/static-server.mjs';
 
 const reloadClient = `<script type="module">
 // Injected by lasm dev: reloads the page when a rebuild finishes.
@@ -116,7 +117,7 @@ export function startDevProxy({ port, host = '127.0.0.1', upstreamPort }) {
     request.on('end', () => forward(request, response, Buffer.concat(chunks)));
   });
   return new Promise((done, fail) => {
-    server.once('error', fail);
+    server.once('error', error => fail(listenError(error, port, host)));
     server.listen(port, host, () => {
       const shown = host === '0.0.0.0' || host === '::' ? 'localhost' : host;
       done({ url: `http://${shown}:${server.address().port}/`, port: server.address().port,

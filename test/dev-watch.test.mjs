@@ -56,3 +56,25 @@ test('Lake\'s manifest is the build\'s own output', () => {
   assert.equal(generatedByBuild('/p/App.lean'), false);
   assert.equal(generatedByBuild('/p/lakefile.toml'), false);
 });
+
+test('a directory that vanishes before lasm dev watches it (a build\'s staging directory) ends nothing', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-watch-vanish-'));
+  try {
+    mkdirSync(join(root, 'out'));
+    const callbacks = new Map();
+    // As fs.watch does for a directory removed between the event and the watch.
+    const watchFile = (dir, callback) => {
+      if (callbacks.has(root) && dir !== root) throw Object.assign(new Error(`ENOENT: no such file or directory, watch '${dir}'`), { code: 'ENOENT' });
+      callbacks.set(dir, callback);
+      return { on() {}, close() {} };
+    };
+    let events = 0;
+    const watcher = watchProject(root, () => { events++; }, { watchFile });
+    assert.doesNotThrow(() => callbacks.get(root)('rename', 'out'));
+    assert.equal(events, 1);
+    // Staging directories are not watched at all.
+    mkdirSync(join(root, 'workers.lasm-staging'));
+    assert.doesNotThrow(() => callbacks.get(root)('rename', 'workers.lasm-staging'));
+    watcher.close();
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

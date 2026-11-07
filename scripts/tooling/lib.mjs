@@ -3,34 +3,42 @@
 // an installed `lasm` (the packed candidate or the published @lasm/cli) as a
 // user would, in fresh temporary projects, and judge only what it prints,
 // its exit status and the files it writes.
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, writeFileSync, readdirSync, readFileSync, statSync, lstatSync, rmSync, chmodSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative } from 'node:path';
 
 /** Runs `lasm args…` under Node with a time limit; kills the whole process
- * group on timeout (a hang is a failure, not a wait). `killAfter`: a function
- * (text so far) => true to SIGKILL the group at that moment (fault injection). */
-export function runLasm(lasm, args, { cwd, env = {}, timeoutMs = 300_000, node = process.execPath, killWhen, stdin = 'ignore' } = {}) {
+ * group on timeout (a hang is a failure, not a wait). `killWhen`: a function
+ * (text so far) => true to SIGKILL the group at that moment (fault injection);
+ * `interruptWhen`: the same for SIGINT to the group, as Ctrl+C in a terminal. */
+export function runLasm(lasm, args, { cwd, env = {}, timeoutMs = 300_000, node = process.execPath, killWhen, interruptWhen, stdin = 'ignore' } = {}) {
   return new Promise(resolve => {
     const started = Date.now();
     const child = spawn(node, [lasm, ...args], { cwd, env: { ...baseEnvironment(), ...env }, stdio: [stdin, 'pipe', 'pipe'],
       detached: process.platform !== 'win32', windowsHide: true });
-    let stdout = '', stderr = '', timedOut = false, killed = false;
+    let stdout = '', stderr = '', timedOut = false, killed = false, interrupted = false;
     const kill = () => {
-      try { if (process.platform === 'win32') child.kill('SIGKILL'); else process.kill(-child.pid, 'SIGKILL'); } catch {}
+      // Windows: taskkill /T ends the whole tree (child.kill ends only Node).
+      try { if (process.platform === 'win32') spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { windowsHide: true }); else process.kill(-child.pid, 'SIGKILL'); } catch {}
     };
-    const check = () => { if (killWhen && !killed && killWhen(stdout + stderr)) { killed = true; kill(); } };
+    const check = () => {
+      if (killWhen && !killed && killWhen(stdout + stderr)) { killed = true; kill(); }
+      if (interruptWhen && !interrupted && interruptWhen(stdout + stderr)) {
+        interrupted = true;
+        try { if (process.platform === 'win32') child.kill('SIGINT'); else process.kill(-child.pid, 'SIGINT'); } catch {}
+      }
+    };
     child.stdout.on('data', chunk => { stdout += chunk; check(); });
     child.stderr.on('data', chunk => { stderr += chunk; check(); });
     const timer = setTimeout(() => { timedOut = true; kill(); }, timeoutMs);
-    child.once('error', error => { clearTimeout(timer); resolve({ code: null, signal: null, stdout, stderr: stderr + String(error), timedOut, killed, ms: Date.now() - started }); });
+    child.once('error', error => { clearTimeout(timer); resolve({ code: null, signal: null, stdout, stderr: stderr + String(error), timedOut, killed, interrupted, ms: Date.now() - started }); });
     child.once('close', (code, signal) => {
       clearTimeout(timer);
       // The group may still hold workers after the leader exits: reap it.
       if (timedOut || killed) kill();
-      resolve({ code, signal, stdout, stderr, timedOut, killed, ms: Date.now() - started });
+      resolve({ code, signal, stdout, stderr, timedOut, killed, interrupted, ms: Date.now() - started });
     });
   });
 }

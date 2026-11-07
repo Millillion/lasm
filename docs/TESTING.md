@@ -348,51 +348,98 @@ file-system text (`EACCES: …, mkdir '…'`), a bare C library message without 
 path, the internal-error line, unhandled rejections and empty output.
 
 **Error corpus** ([`error-corpus.mjs`](../scripts/tooling/error-corpus.mjs)):
-about 60 errors a user can cause: bad and conflicting flags, missing or
-misnamed sources, Lean type, syntax and UTF-8 errors (also in an imported
-module), missing imports, no `main`, broken `lakefile.toml`/`lakefile.lean`,
-a missing Lake path dependency, unsupported or garbage `lean-toolchain`,
-output paths that are files or not Lasm builds, read-only project, output and
-tool-cache directories, packaging a dev build, an unreachable download, an
-invalid download setting, Node 22. Each must exit non-zero within its limit,
-say what the case names, and pass the judge. A case fixed after the latest
-release carries `fixedIn`; against an older CLI it is reported as known.
+about 120 errors a user can cause: bad and conflicting flags of `lasm build`,
+`lasm dev`, `lasm init` and `lasm package`; missing or misnamed sources (also a
+per-output source of `lasm dev --target node=A.lean,browser=B.lean`); Lean
+type, syntax and UTF-8 errors (also in an imported module), cyclic imports,
+missing imports, no `main`; broken `lakefile.toml`/`lakefile.lean`, a missing
+Lake path dependency, unsupported or garbage `lean-toolchain`; output paths
+that are files, not Lasm builds, inside `public/`, or a generated file the
+user edited; a browser `index.html` without `</head>` or with its own loader;
+an edge entry module the user wrote; a bad `lasm.edge.modules`; read-only
+project, output and tool-cache directories, a tool cache that is a file;
+packaging a dev build, a link, or a build without a target's npm package;
+`lasm dev` with a Lean error in its first build and in a rebuild (it must keep
+watching), a browser port already in use, a browser app whose first build
+fails (it must exit, not hang); Ctrl+C during a build (then a clean rebuild);
+an unreachable download, invalid `LASM_DOWNLOAD_*` and `LASM_ARTIFACT_SOURCE`
+settings; Node 22. Each must exit non-zero (Ctrl+C: or by SIGINT; `lasm dev`
+after Ctrl+C: 0) within its limit, say what the case names, and pass the
+judge. A case fixed after the latest release carries `fixedIn`; against an
+older CLI it is reported as known.
+
+**Error inventory** ([`error-inventory.mjs`](../scripts/tooling/error-inventory.mjs)):
+"every error a user can trigger" is measured, not assumed. The inventory is
+every `new Error(…)` in the 20 modules a command reaches before a program
+runs (arguments, commands, sources, outputs, caches, tools, downloads; 148
+sites). The candidate's corpus run (`--inventory check`) counts a message as
+covered when some case printed its fixed text; each other message needs a
+stated reason in [`error-inventory.json`](../scripts/tooling/error-inventory.json)
+(an internal invariant, generated code that runs on a platform, macOS only, a
+check the CLI makes earlier, …). A new message with neither, or a reason for a
+message that is gone or now covered, fails the job. Messages that are not
+user errors never print a stack trace either: `reportCliError` prints a stack
+only for internal errors (a `TypeError`, a failed assertion), with the bug
+report line.
 
 **Metamorphic build tests** ([`metamorphic.mjs`](../scripts/tooling/metamorphic.mjs)),
 for node, wasi, workers and browser, release and dev profiles, on a small Lake
-project: two clean builds in different directories, and a build with a cold
-tool cache, give the same bytes; edit then build equals a clean build of the
-edited project, and reverting gives the original bytes; renaming a module
-nothing imports changes no byte; renaming an unused definition changes only
-the input fingerprints in JSON metadata (release profile); touching sources, or
-building again, links nothing and rewrites no output file; after `lasm dev`
-rebuilt an edit and ignored a touch, `lasm build --dev` reuses its build, which
-equals a clean one. Each target is judged on its own output directory (`dist/`
-for node and the browser, `wasi/`, `workers/`). Dev rebuilds plan
+project. `lasm build`: two clean builds in different directories, and a build
+with a cold tool cache, give the same bytes; edit then build equals a clean
+build of the edited project, and reverting gives the original bytes; renaming a
+module nothing imports changes no byte; renaming an unused definition changes
+only the input fingerprints in JSON metadata (release; dev builds keep function
+names, so there the program must behave the same); touching sources, or
+building again, links nothing and rewrites no output file. `lasm dev` (node,
+workers and the browser; it has no WASI target), one session per profile
+(`--release` too), driven as an editor would: its first build equals a clean
+build; an edit is rebuilt and equals a clean build of the edit; a touch
+rebuilds nothing and rewrites no output file; renaming an unimported module
+keeps every byte; a revert saved by renaming a new file over the old one (as
+Vim, JetBrains' safe write and many formatters save) is seen and equals the
+original clean build; a second edit saved that way is still seen; afterwards
+`lasm build` reuses the session's build (node: without linking). Each target is
+judged on its own output directory (`dist/` for node and the browser, `wasi/`,
+`workers/`; the browser's dev session writes `.lake/lasm/browser-dev`; a node
+session's build is copied out with `lasm build --output`). Dev rebuilds plan
 initialization from the previous build's plan, so for the dev profile
-"incremental equals clean" means the same behaviour (on node: the same output
-when run), not the same bytes; clean dev builds must still be byte-identical.
+"incremental equals clean" means the same behaviour, not the same bytes: where
+the bytes differ, both outputs run and must print the same (node; WASI under
+`node:wasi`; the Worker's own program, host and `edge-start.mjs` on Node; the
+browser app in headless Chromium through the differential's browser runner).
+Clean dev builds must still be byte-identical.
 
-**Fault injection** ([`faults.mjs`](../scripts/tooling/faults.mjs)), node
-target: SIGKILL of the process tree at every build stage and while replacing an
-existing output; SIGKILL while a cold tool cache is filled from the npm
-packages and over HTTPS; SIGKILL of `npm install` of the CLI; HTTPS downloads
-through a CONNECT proxy that cuts tunnels after 4 MiB (three times: must
-recover; always: must fail clearly); the tool cache on a 64 MiB and a 700 MiB
-ext4 loop file system, the project on one filled to 1, 4 and 12 MiB free; an
-empty read-only tool cache, a filled one made read-only, a read-only project
-build cache; a flipped byte and a removed file in the tool archives, derived
-tools, shared objects and the project build cache. Outcome: success with the
-clean build's bytes, or a clear failure followed, once the fault is gone (after
-`lasm cache repair` for corruption), by a rerun with the clean build's bytes.
+**Fault injection** ([`faults.mjs`](../scripts/tooling/faults.mjs)), one job
+per target (node, wasi, workers, browser): SIGKILL of the process tree at every
+build stage and while replacing an existing output; SIGKILL while a cold tool
+cache is filled from the npm packages and over HTTPS; HTTPS downloads through
+a CONNECT proxy that cuts tunnels after 4 MiB (three times: may recover;
+always: must fail clearly) or stalls them, open and silent, as after a dropped
+Wi-Fi link (the idle timer must end each one); the tool cache on a 64 MiB and a
+700 MiB ext4 loop file system, the project on one filled to 1, 4 and 12 MiB
+free; an empty read-only tool cache, a filled one made read-only, a read-only
+project build cache; a flipped byte and a removed file in the tool archives,
+derived tools, shared objects and the project build cache. With node also:
+SIGKILL of `npm install` of the CLI, `npm install` through cut connections and
+onto a full 48 MiB disk (then a plain install and a build with it), and SIGKILL
+of a `lasm dev` session 0.5, 2 and 4 s into the rebuild of an edit (then
+`lasm build --dev` must print the edit and a new session must build). Outcome:
+success with the clean build's bytes, or a clear failure followed, once the
+fault is gone (after `lasm cache repair` for corruption), by a rerun with the
+clean build's bytes. Found: a stalled download never reconnects (#152; it
+fails clearly, so the contract holds, but one half-open connection fails the
+install).
 
 **CI** ([tooling.yml](../.github/workflows/tooling.yml)): the corpus against the
-candidate and the published package on every pull request, push to `main` and
-nightly; metamorphic (one job per target) and fault injection nightly, by hand,
-and on pull requests that change the harness.
-**What it cannot catch:** errors outside the corpus; nondeterminism that two
-runs on one machine share (same OS, CPU, locale); faults on macOS and Windows
-(Linux runners only, except the unit-level controls in `installer-faults.yml`).
+candidate (with the inventory check) and the published package on every pull
+request, push to `main` and nightly; metamorphic and fault injection (one job
+per target each) nightly, by hand, and on pull requests that change the
+harness.
+**What it cannot catch:** errors outside the corpus whose reason is wrong;
+nondeterminism that two runs on one machine share (same OS, CPU, locale);
+the black-box harnesses on macOS and Windows (Linux runners only; the
+unit-level installer controls in `installer-faults.yml` run on all five
+platforms); `lasm dev` with several outputs at once.
 
 ### Fuzzing at the boundaries
 
