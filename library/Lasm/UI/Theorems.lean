@@ -1,7 +1,8 @@
 /-
 The theorems of Lasm.UI's propositions (Spec.lean): each `Theorems.x` has
 type exactly `Spec.x`. The diff's proofs are in Proofs/ (Proofs.lean lists
-them); this file connects them to the propositions and proves the rest.
+them), the encoding's in Proofs/Wire.lean; this file connects them to the
+propositions and proves the rest.
 -/
 import Lasm.UI.Spec
 
@@ -19,6 +20,9 @@ theorem session_correct : Spec.session_correct :=
 
 theorem diffAttrs_correct : Spec.diffAttrs_correct :=
   fun _ old new => Proofs.diffAttrs_correct old new
+
+theorem frames_decode : Spec.frames_decode :=
+  fun _ frames => Proofs.Wire.frames_decode {} {} frames Proofs.Wire.synced_empty
 
 theorem create_correct : Spec.create_correct := by
   intro _ h n
