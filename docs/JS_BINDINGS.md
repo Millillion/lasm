@@ -292,15 +292,14 @@ Function.ofSyncFn2 (f : α → β → IO γ)
     console output, and waiting for a Lean task that needs nothing from Node (a
     computation). Starting a timer, a DNS lookup, a socket read or `Value.toTask`
     is fine too: it finishes after the callback returns.
-  - What fails at once with an error: waiting for anything that needs Node's main
-    thread, which is waiting for the callback. That is a JavaScript promise
-    (`Value.await`, a `toTask`'s task, the `…Await` forms), Lean file IO, a Lean
-    task that makes host calls (including `Async` run with `.block`), and a
-    timer, DNS lookup or socket read started in the callback.
-  - A promise wait (`Value.await`, the `…Await` forms) and file IO fail as errors
-    the callback can catch. A failed wait for a Lean task (`IO.wait`, `Task.get`,
-    `.block`, a `toTask`'s task) ends the whole callback: JavaScript gets the
-    error, and the Lean values the callback held are not freed.
+  - What fails at once: waiting for anything that needs Node's main thread, which
+    is waiting for the callback. How it fails depends on the wait:
+    - *An error the callback can catch:* a JavaScript promise (`Value.await`, the
+      `…Await` forms) and Lean file IO.
+    - *It ends the whole callback:* waiting for a Lean task (`IO.wait`,
+      `Task.get`, `.block`, a `toTask`'s task) that makes host calls, or for a
+      timer, DNS lookup or socket read started in the callback. JavaScript gets
+      the error, and the memory the callback was using leaks.
   - A synchronous callback cannot call another synchronous callback.
 - **Replying with a method call (`ofFnReply`), for HTTP handlers.** A handler
   usually ends by calling `res.json(body)` (Express) or returning `c.json(body)`
