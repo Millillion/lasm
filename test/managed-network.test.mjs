@@ -14,7 +14,7 @@ import { createInstallerCertificate } from './fixtures/create-installer-certific
 const bytes = Buffer.from('real TLS transport fixture, complete and authenticated');
 const childScript = fileURLToPath(new URL('./fixtures/download-network.mjs', import.meta.url));
 
-async function setup(t) {
+async function setup(t, { stallTunnels = 0 } = {}) {
   const base = await mkdtemp(join(tmpdir(), 'lasm-tls-fault-'));
   const ephemeral = createInstallerCertificate(), certificate = join(base, 'test-ca.pem');
   await writeFile(certificate, ephemeral.certificate);
@@ -33,6 +33,7 @@ async function setup(t) {
     if (req.url === '/resume' && count === 1) {
       res.write(bytes.subarray(0, 5)); setTimeout(() => res.destroy(), 100); return;
     }
+    if (req.url === '/stall') { res.write(bytes.subarray(offset, offset + 5)); setTimeout(() => res.end(bytes.subarray(offset + 5)), 800); return; }
     if (req.url === '/slow') { res.write(bytes.subarray(0, 5)); setTimeout(() => res.end(bytes.subarray(5)), 400); return; }
     res.end(bytes.subarray(offset));
   });
@@ -45,7 +46,20 @@ async function setup(t) {
     tunnels.push({ target: request.url, authenticated: request.headers['proxy-authorization'] === 'Basic ' + Buffer.from('fixture:private-test-password').toString('base64') });
     if (request.url !== `installer.invalid:${port}`) { client.destroy(); return; }
     const upstream = connect(port, '127.0.0.1'); track(upstream);
-    upstream.once('connect', () => { client.write('HTTP/1.1 200 Connection Established\r\n\r\n'); if (head.length) upstream.write(head); client.pipe(upstream); upstream.pipe(client); });
+    // The first `stallTunnels` tunnels carry the handshake and the response
+    // headers, then go silent in both directions while staying open (a
+    // half-open link): /stall sends the rest of its body 800 ms after the start.
+    const stall = stallTunnels-- > 0;
+    let last = 0, silent = false;
+    upstream.once('connect', () => { client.write('HTTP/1.1 200 Connection Established\r\n\r\n'); if (head.length) upstream.write(head); client.pipe(upstream);
+      if (!stall) { upstream.pipe(client); return; }
+      upstream.on('data', chunk => {
+        if (silent) return;
+        // The handshake and headers arrive at once; the rest of the body later.
+        if (last && Date.now() - last > 400) { silent = true; upstream.pause(); client.unpipe(upstream); return; }
+        last = Date.now(); client.write(chunk);
+      });
+    });
     upstream.on('error', () => client.destroy()); client.on('error', () => upstream.destroy());
     client.on('close', () => upstream.destroy());
   });
@@ -113,3 +127,14 @@ for (const path of ['/retry', '/resume', '/headers', '/idle', '/slow'])
     assert.equal(f.requests.length, path === '/slow' ? 1 : 2);
     if (path === '/resume') assert.deepEqual(f.requests[1], { path, range: 'bytes=5-', ifRange: '"tls-fixture"' });
   });
+
+// #152: the idle timeout must abandon the silent tunnel; the retry opens a new
+// CONNECT tunnel and resumes, rather than waiting behind the stalled one.
+test('a stalled proxy tunnel is abandoned: the retry opens a fresh tunnel and resumes', { timeout: 30_000 }, async t => {
+  const f = await setup(t, { stallTunnels: 1 });
+  const result = await f.run('/stall', { throughProxy: true, policy: { idleMs: 1500, connectMs: 3000 } });
+  assert.equal(result.code, 0, result.stderr);
+  assert.deepEqual(await readFile(result.destination), bytes);
+  assert.ok(f.tunnels.length >= 2, `a new tunnel after the stall (${f.tunnels.length})`);
+  assert.deepEqual(f.requests.map(r => r.range), [undefined, 'bytes=5-']);
+});
