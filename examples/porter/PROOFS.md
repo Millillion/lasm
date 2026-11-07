@@ -118,7 +118,7 @@ Totality (checked by test/Axioms.lean, not a theorem): the request handlers reac
 
 | Proposition | In plain English |
 | --- | --- |
-| [`landed_commit_stands`](Proofs/Spec.lean#L307) | **A landed commit stands** (issue #138): when a commit throws, the server (`afterFailedCommit`) runs the request again only if its commit receipt is not in the database (or could not be read) and another commit came in between; if the receipt is there, the commit landed and the request's reply stands, so a transient database error never makes a request run against its own writes. |
+| [`landed_commit_stands`](Proofs/Spec.lean#L301) | **A landed commit stands** (issue #138): when a commit throws, the server (`afterFailedCommit`) runs the request again only if its commit receipt is not in the database (or could not be read) and another commit came in between; if the receipt is there, the commit landed and the request's reply stands, so a transient database error never makes a request run against its own writes. |
 <!-- END PROPOSITIONS -->
 
 ## What is trusted, not proved
