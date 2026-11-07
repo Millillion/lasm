@@ -19,6 +19,14 @@ import { join } from 'node:path';
 import { runLasm, messageProblems, temporaryDirectory, writeTree, removeTree, options, versionAtLeast, summary, tail } from './lib.mjs';
 import { inventoryCoverage } from './error-inventory.mjs';
 
+/** A registry on 127.0.0.1 that answers every request 404. */
+async function notFoundRegistry() {
+  const { createServer: createHttpServer } = await import('node:http');
+  const server = createHttpServer((request, response) => { response.writeHead(404, { 'content-type': 'application/json' }); response.end('{"error":"Not found"}'); });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  return { port: server.address().port, cleanup: () => new Promise(resolve => { server.closeAllConnections?.(); server.close(resolve); }) };
+}
+
 /** A port something else listens on (for the "port in use" case). */
 async function occupyPort() {
   const server = createServer();
@@ -103,11 +111,22 @@ export const cases = [
   { id: 'output-twice', kind: 'parse', args: ['build', 'Main.lean', '--output', 'a', '--output', 'b'], files: { 'Main.lean': main }, expect: /Specify --output only once/ },
   { id: 'suspend-twice', kind: 'parse', args: ['build', 'Main.lean', '--target', 'browser', '--suspend', 'jspi', '--suspend', 'none'], files: { 'Main.lean': main }, expect: /Specify --suspend only once/ },
   { id: 'output-for-vercel-edge', kind: 'parse', args: ['build', 'Main.lean', '--target', 'vercel-edge', '--output', 'x'], files: { 'Main.lean': main }, expect: /--output does not apply to --target vercel-edge: the platform fixes its layout/ },
+  // Binding configurations (.json), which the CLI no longer builds.
+  { id: 'binding-configuration', kind: 'parse', args: ['build', 'lasm.json'], files: { 'lasm.json': '{}\n' }, expect: /This Lasm candidate builds ordinary \.lean applications for Node/ },
+  { id: 'binding-configuration-dev', kind: 'parse', args: ['build', 'lasm.json', '--dev'], files: { 'lasm.json': '{}\n' }, expect: /--dev and --release apply to Lean applications/ },
+  { id: 'binding-configuration-target', kind: 'parse', args: ['build', 'lasm.json', '--target', 'wasi'], files: { 'lasm.json': '{}\n' }, expect: /--target applies to Lean applications, not binding configurations/ },
   // Lasm's environment settings.
   { id: 'download-idle-too-small', kind: 'network', args: ['build', 'Main.lean'], files: { 'Main.lean': main },
     env: dir => ({ LASM_ARTIFACT_SOURCE: 'https', LASM_TOOLCHAIN_CACHE: join(dir, 'empty-cache'), LASM_DOWNLOAD_IDLE_MS: '5' }), expect: /LASM_DOWNLOAD_IDLE_MS must be an integer from 1000 to 1800000/ },
   { id: 'artifact-source-invalid', kind: 'network', args: ['build', 'Main.lean'], files: { 'Main.lean': main },
     env: dir => ({ LASM_ARTIFACT_SOURCE: 'ftp', LASM_TOOLCHAIN_CACHE: join(dir, 'empty-cache') }), expect: /LASM_ARTIFACT_SOURCE must be one of/ },
+  // LASM_ARTIFACT_SOURCE=npm: tools only from npm's registry (npm_config_registry), never a direct download.
+  { id: 'npm-registry-not-https', kind: 'network', args: ['build', 'Main.lean'], files: { 'Main.lean': main },
+    env: dir => ({ LASM_ARTIFACT_SOURCE: 'npm', LASM_TOOLCHAIN_CACHE: join(dir, 'empty-cache'), npm_config_registry: 'http://registry.example.invalid/' }), expect: /LASM_ARTIFACT_SOURCE=npm forbids/ },
+  { id: 'npm-registry-unreachable', kind: 'network', args: ['build', 'Main.lean'], files: { 'Main.lean': main },
+    env: dir => ({ LASM_ARTIFACT_SOURCE: 'npm', LASM_TOOLCHAIN_CACHE: join(dir, 'empty-cache'), npm_config_registry: 'http://127.0.0.1:9/' }), expect: /LASM_ARTIFACT_SOURCE=npm forbids/, timeoutMs: 600_000 },
+  { id: 'npm-registry-not-found', kind: 'network', args: ['build', 'Main.lean'], files: { 'Main.lean': main }, before: notFoundRegistry,
+    env: (dir, { port }) => ({ LASM_ARTIFACT_SOURCE: 'npm', LASM_TOOLCHAIN_CACHE: join(dir, 'empty-cache'), npm_config_registry: `http://127.0.0.1:${port}/` }), expect: /404/ },
   { id: 'tool-cache-is-a-file', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': main, 'cache-file': 'x\n' },
     env: dir => ({ LASM_TOOLCHAIN_CACHE: join(dir, 'cache-file') }), expect: /cache-file/ },
 
@@ -187,7 +206,7 @@ export async function runCorpus({ lasm, only = 'network', oldNode, work, id, log
       writeTree(directory, entry.files ?? {});
       entry.setup?.(directory);
       context = await entry.before?.(directory) ?? {};
-      const env = typeof entry.env === 'function' ? entry.env(directory) : entry.env ?? {};
+      const env = typeof entry.env === 'function' ? entry.env(directory, context) : entry.env ?? {};
       const cwd = join(directory, entry.cwd ?? '.');
       if (entry.prepare) {
         const prepared = await runLasm(lasm, entry.prepare, { cwd, env, timeoutMs: 600_000 });
