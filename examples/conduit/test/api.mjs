@@ -105,7 +105,7 @@ try {
   process.exitCode = run.status === 0 && result.failedFiles === 0 ? 0 : 1;
   if (recorder) {
     await recorder.close();
-    const traffic = normalize(recorder.exchanges);
+    const traffic = normalize(recorder.exchanges, name);
     writeFileSync(join(root, `test-results/traffic-${name}.json`), JSON.stringify({ target: name, exchanges: recorder.exchanges }, null, 2) + '\n');
     writeFileSync(join(root, `test-results/realworld-${name}.json`), JSON.stringify(traffic, null, 2) + '\n');
   }

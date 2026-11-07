@@ -7,7 +7,7 @@
 // (apart from the documented IGNORED_HEADERS) and byte-equal bodies, request
 // by request, in the order the suite sent them.
 //
-//   node test/equivalence.mjs compare NAME   # test-results/realworld-NAME.json against the golden file;
+//   node test/equivalence.mjs compare NAME   # test-results/traffic-NAME.json, normalized, against the golden file;
 //                                            # writes test-results/equivalence-NAME.{txt,json}
 //   node test/equivalence.mjs self-test      # the normalizer and the diff on made-up traffic
 //
@@ -27,6 +27,12 @@
 //   (header, claims, exp - iat) are compared in `tokens`, and every token a
 //   request sends must be one a response issued earlier, or the same literal
 //   the suite itself sent on Node.
+// - Generated ids become ordinals by first appearance: a token's sub (users)
+//   and the "id" fields of response bodies (comments), and a request path's
+//   /comments/N when N was issued. SQL stores number each table from 1; the
+//   key-value stores (Deno KV, Netlify Blobs, Fastly KV, memory, PostgREST's
+//   table) use one sequence for every kind of row (Server/Kv.lean), so the
+//   values differ while the order and the references between them must not.
 // - ISO 8601 timestamps (createdAt, updatedAt) keep their shape with each digit
 //   replaced by 0: the format is compared, the clock is not.
 // - Header names are lower-cased and sorted (HTTP field names are
@@ -37,8 +43,10 @@
 //   must be present on both sides with the same value.
 // - The request's host (the proxy's own port) and the reason phrase (optional
 //   in HTTP/1.1, not sent in HTTP/2) are not compared.
-// Ids are not normalized: every run starts on an empty store with a fixed
-// UID_VAL, so the ids and slugs the suite sees are the same on every target.
+// - PLATFORM_HEADERS: headers one platform's local runtime adds, on that
+//   platform only.
+// Slugs, names and emails are not normalized: every run starts on an empty
+// store with a fixed UID_VAL, so they are the same on every target.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { createServer, request } from 'node:http';
 import { join } from 'node:path';
@@ -53,6 +61,19 @@ export const IGNORED_HEADERS = {
   'content-length': 'framing: the body bytes are compared instead (chunked or not is the platform\'s choice)',
   server: 'the platform\'s product name',
 };
+
+// Headers one platform's local runtime adds by itself, only on that platform.
+export const PLATFORM_HEADERS = [
+  { targets: ['netlify'], name: /^x-nf-/, reason: 'Netlify\'s function bootstrap adds x-nf-invocation-metadata and x-nf-start-timestamp to every response' },
+  { targets: ['lambda', 'lambda-image'], name: /^content-type$/, value: /^application\/json$/, emptyBody: true,
+    reason: 'sam local start-api gives a bodiless response (204) Content-Type: application/json when the function sets none' },
+  { targets: ['supabase-edge'], name: /^(via|x-kong-proxy-latency|x-kong-upstream-latency)$/, reason: 'the local stack\'s Kong gateway (in front of every function, as on Supabase) adds via and its latencies' },
+  { targets: ['supabase-edge'], name: /^vary$/, value: /^Accept-Encoding$/, reason: 'Supabase\'s edge runtime may compress responses and says so in Vary' },
+];
+function platformHeader(target, name, value, res) {
+  return PLATFORM_HEADERS.some(rule => rule.targets.includes(target) && rule.name.test(name) &&
+    (!rule.value || rule.value.test(value)) && (!rule.emptyBody || !res.body));
+}
 
 // ---------- recording ----------
 
@@ -74,8 +95,13 @@ export async function startRecorder(upstream) {
         const name = req.rawHeaders[i];
         const lower = name.toLowerCase();
         if (lower === 'host') headers.push(name, target.host);
-        else if (lower !== 'connection' && lower !== 'keep-alive') headers.push(name, req.rawHeaders[i + 1]);
+        else if (!['connection', 'keep-alive', 'transfer-encoding', 'content-length'].includes(lower)) headers.push(name, req.rawHeaders[i + 1]);
       }
+      // The same framing as the client's: a length when it sent a body or a
+      // length, nothing when it sent neither (Node would otherwise chunk a
+      // bodiless POST, which some launchers reject).
+      const framed = body.length > 0 || req.headers['content-length'] !== undefined;
+      if (framed) headers.push('Content-Length', String(body.length));
       const exchange = { request: { method: req.method, path: req.url, headers: pairs(req.rawHeaders), body: body.toString('base64') } };
       exchanges.push(exchange);
       const out = request({ host: target.hostname, port: target.port, method: req.method, path: req.url, headers, agent: false }, up => {
@@ -102,7 +128,8 @@ export async function startRecorder(upstream) {
         res.end(`equivalence proxy: ${e.message}`);
       };
       out.on('error', fail);
-      out.end(body);
+      if (!framed) out.useChunkedEncodingByDefault = false;
+      out.end(body.length ? body : undefined);
     });
   });
   await new Promise((ok, fail) => server.once('error', fail).listen(0, '127.0.0.1', ok));
@@ -122,11 +149,12 @@ const JWT = /eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*/g;
 const ISO_TIME = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/g;
 
 const b64json = part => { try { return JSON.parse(Buffer.from(part, 'base64url').toString('utf8')); } catch { return null; } };
-function identity(token) {
+function identity(token, user) {
   const [h, p] = token.split('.');
   const header = b64json(h), claims = b64json(p);
   if (!header || !claims || typeof claims !== 'object') return { key: `opaque:${token}`, info: { opaque: true } };
   const rest = { ...claims };
+  if (rest.sub !== undefined) rest.sub = user(rest.sub);
   const lifetime = typeof claims.iat === 'number' && typeof claims.exp === 'number' ? claims.exp - claims.iat : undefined;
   delete rest.iat; delete rest.exp;
   const info = { header, claims: rest, ...(lifetime !== undefined ? { lifetime } : {}), times: ['iat', 'exp'].filter(k => k in claims) };
@@ -140,13 +168,19 @@ function decode(base64) {
 }
 
 /** Normalized traffic: { exchanges, tokens, clientTokens } (see the header comment). */
-export function normalize(exchanges) {
+export function normalize(exchanges, target = 'node') {
   const ids = new Map(); // identity key -> placeholder number
   const tokens = [];
   const issued = new Set(); // raw tokens a response has carried
   const sentFirst = new Set(); // raw tokens a request carried before any response did
+  // Generated ids become their ordinal, by first appearance: users (a token's
+  // sub) and the "id" fields of response bodies (comments); a request path's
+  // /comments/N takes the same ordinal when N was issued, else stays literal.
+  const users = new Map(), rowIds = new Map();
+  const ordinal = (map, v) => { if (!map.has(v)) map.set(v, map.size + 1); return map.get(v); };
+  const user = sub => String(ordinal(users, String(sub)));
   const replaceTokens = (text, where) => text.replace(JWT, token => {
-    const { key, info } = identity(token);
+    const { key, info } = identity(token, user);
     if (!ids.has(key)) { ids.set(key, tokens.length + 1); tokens.push(info); }
     if (where === 'response') issued.add(token);
     else if (!issued.has(token)) sentFirst.add(token);
@@ -155,13 +189,16 @@ export function normalize(exchanges) {
   const scrub = (text, where) => replaceTokens(text, where).replace(ISO_TIME, t => t.replace(/\d/g, '0'));
   const body = (base64, where) => {
     const d = decode(base64 ?? '');
-    return d.text !== undefined ? scrub(d.text, where) : { base64: d.base64 };
+    if (d.text === undefined) return { base64: d.base64 };
+    const text = scrub(d.text, where);
+    return where === 'response' ? text.replace(/"id":(\d+)/g, (_, n) => `"id":${ordinal(rowIds, n)}`) : text;
   };
+  const path = p => scrub(p, 'request').replace(/\/comments\/(\d+)/g, (m, n) => rowIds.has(n) ? `/comments/${rowIds.get(n)}` : m);
   const out = exchanges.map(x => {
     const req = x.request;
     const request = {
       method: req.method,
-      path: scrub(req.path, 'request'),
+      path: path(req.path),
       headers: sortHeaders(req.headers.filter(([n]) => n.toLowerCase() !== 'host').map(([n, v]) => [n.toLowerCase(), scrub(v, 'request')])),
       body: body(req.body, 'request'),
     };
@@ -169,7 +206,7 @@ export function normalize(exchanges) {
     const res = x.response;
     const response = {
       status: res.status,
-      headers: sortHeaders(res.headers.map(([n, v]) => [n.toLowerCase(), v]).filter(([n]) => !(n in IGNORED_HEADERS)).map(([n, v]) => [n, scrub(v, 'response')])),
+      headers: sortHeaders(res.headers.map(([n, v]) => [n.toLowerCase(), v]).filter(([n, v]) => !(n in IGNORED_HEADERS) && !platformHeader(target, n, v, res)).map(([n, v]) => [n, scrub(v, 'response')])),
       body: body(res.body, 'response'),
     };
     return { request, response };
@@ -311,16 +348,17 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   if (command === 'self-test') selfTest();
   else if (command === 'compare' && name) {
     const golden = join(root, 'test/equivalence/realworld.json');
-    const traffic = join(root, `test-results/realworld-${name}.json`);
+    const traffic = join(root, `test-results/traffic-${name}.json`);
     if (!existsSync(traffic)) {
       console.log(`No recording ${traffic}: run node test/api.mjs --equivalence first`);
       process.exitCode = 1;
     } else if (!existsSync(golden)) {
-      console.log(`No golden recording ${golden}: review ${traffic} (Node's) and commit it there`);
+      console.log(`No golden recording ${golden}: review test-results/realworld-${name}.json (Node's) and commit it there`);
       process.exitCode = 1;
     } else {
       const { known } = JSON.parse(readFileSync(join(root, 'test/equivalence/known.json'), 'utf8'));
-      const outcome = compare(JSON.parse(readFileSync(golden, 'utf8')), JSON.parse(readFileSync(traffic, 'utf8')), { target: name, known });
+      const observed = normalize(JSON.parse(readFileSync(traffic, 'utf8')).exchanges, name);
+      const outcome = compare(JSON.parse(readFileSync(golden, 'utf8')), observed, { target: name, known });
       writeFileSync(join(root, `test-results/equivalence-${name}.json`), JSON.stringify({ target: name, differences: outcome.differences }, null, 2) + '\n');
       writeFileSync(join(root, `test-results/equivalence-${name}.txt`), outcome.report + '\n');
       console.log(outcome.report);

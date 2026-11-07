@@ -142,7 +142,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 ## Next (December 2026 to January 2027)
 - [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.
 - [ ] Deterministic simulation testing of the example apps: simulated clock, network and storage, with faults.
-- [ ] Target equivalence for Conduit's RealWorld traffic, with token and timestamp normalization.
+- [x] Target equivalence for Conduit's RealWorld traffic, with token and timestamp normalization: every Conduit API job (Node 24 and 26, Workers, Bun and the 15 platforms of `conduit-platforms.yml`) compares the official suite's 154 exchanges with Node's committed recording (`examples/conduit/test/equivalence.mjs`, docs/TESTING.md#conduits-realworld-traffic). No divergence in Conduit or Lasm; the first run found only platform-added headers and the key-value stores' shared id sequence (both normalized, documented).
 - [ ] Consolidate the 63 CI workflows into PR, nightly, weekly and release tiers.
 - [ ] Example app 3: the Markdown site generator, held to CommonMark's 652 examples, on WASI, Fastly, the edge and the browser.
 - [ ] Organize the proofs of Lasm's own libraries (Lasm.UI, RPC, KV) like Conduit's Spec.lean, for human review (issue #21).

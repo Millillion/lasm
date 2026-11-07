@@ -32,7 +32,7 @@ proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
 | Layer | What it checks | Where | CI tier |
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) | Lasm-compiled programs behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly |
-| [Target equivalence](#target-equivalence) | One server answers the same on every target | `scripts/equivalence/` | PR, nightly |
+| [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic equals Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs` | PR, nightly |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, after publish, daily |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
@@ -264,10 +264,64 @@ too: a change on Node shows up as a diff in review.
 (header handling, body encoding, streaming, status mapping, error pages),
 platform differences in URL parsing. **What it cannot catch:** behaviour the
 corpus does not exercise; timing; headers platforms add themselves (`date`,
-`server`, framing), which are deliberately not compared. Conduit already runs
-the official RealWorld API suite on Node, Workers and Bun (`conduit.yml`); its
-responses carry tokens and timestamps, so it is compared by that suite's
-assertions rather than byte for byte.
+`server`, framing), which are deliberately not compared. Conduit's RealWorld
+traffic is compared too, with its tokens and timestamps normalized (next section).
+
+#### Conduit's RealWorld traffic
+**Property.** On every target Conduit's CI runs, the official RealWorld API
+suite (the pinned hurl specs, about 150 requests) gets the same answers as on
+Node: equal statuses, equal response headers (apart from a documented list) and
+byte-equal bodies, once tokens and timestamps are normalized.
+
+`node test/api.mjs --equivalence` (in `examples/conduit`) puts a recording proxy
+([`test/equivalence.mjs`](../examples/conduit/test/equivalence.mjs)) between
+hurl and the server and fixes the suite's `UID_VAL`, so that on an empty store
+the names, slugs and ids are the same everywhere. `node test/equivalence.mjs
+compare NAME` then compares the normalized traffic with Node's, committed as
+[`test/equivalence/realworld.json`](../examples/conduit/test/equivalence/realworld.json).
+It aligns the two sequences by method and path (a hurl file stops at its first
+failed assertion, which must not shift every later comparison) and prints a
+line diff of each differing header block or pretty-printed body. Every Conduit
+API job runs it as its last step: Node 24 and 26, Workers and Bun in
+`conduit.yml`; Deno, Docker, Lambda (.zip and image), Vercel, Netlify, Azure,
+Google Cloud Functions, Deno Deploy, Vercel Edge, Netlify Edge, Fastly,
+wasi-http, Spin and Supabase Edge in `conduit-platforms.yml`.
+
+What is normalized, and why that is legitimate:
+
+| Normalized | How | Why |
+| --- | --- | --- |
+| JWTs, in any header or body | `<jwt#N>`, numbered by first appearance of the token's identity (its header and claims without `iat` and `exp`); the identities, `exp - iat`, and the number of tokens a request sent before any response issued them are compared separately | The signature depends on each target's secret, `iat` and `exp` on the clock, and whether a second login returns the same token on whether a second boundary passed. The identity table checks that the same user's token maps consistently and that requests use the tokens responses issued |
+| ISO 8601 timestamps (`createdAt`, `updatedAt`) | each digit becomes `0`, the shape stays | The clock differs; the format (milliseconds, `Z`) is still compared |
+| Header names and order | lower-cased, sorted by name; a repeated field keeps its order | Field names are case-insensitive and the order of different fields carries no meaning (RFC 9110 5.3) |
+| `date`, `connection`, `keep-alive`, `transfer-encoding`, `content-length`, `server` (`IGNORED_HEADERS`, each with its reason in the file) | not compared | The clock, hop-by-hop fields, framing (the body bytes are compared instead) and the platform's product name |
+| Headers one platform's local runtime adds (`PLATFORM_HEADERS`, on that platform only) | not compared | Netlify's function bootstrap adds `x-nf-invocation-metadata` and `x-nf-start-timestamp`; `sam local start-api` gives a bodiless 204 `Content-Type: application/json`; the Supabase stack's Kong gateway adds `via`, `x-kong-*-latency` and `vary: Accept-Encoding` |
+| Generated ids: a token's `sub` (users) and the `"id"` fields of response bodies (comments) | their ordinal by first appearance; a request path's `/comments/N` takes the same ordinal when `N` was issued | SQL stores number each table from 1; the key-value stores (Deno KV, Netlify Blobs, Fastly KV, memory, the PostgREST table) use one sequence for every kind of row (`Server/Kv.lean`), so user 2 is `sub` 3 there. RealWorld promises integers, not values; the order and every reference between them are still compared |
+| The request's `host`, the reason phrase | not compared | The proxy's own port; the reason phrase is optional in HTTP/1.1 |
+
+Slugs, names and emails are **not** normalized: each run starts on an empty
+store with the same `UID_VAL`, so a different one is a real difference. Known differences, each with an open issue,
+go in [`test/equivalence/known.json`](../examples/conduit/test/equivalence/known.json)
+and are reported, not failed. `test/equivalence.mjs self-test` (in the
+`pinned` job) checks the normalizer and the diff on made-up traffic.
+
+**Why a committed golden file rather than a Node recording made in the same
+run.** The targets run in two workflows (`conduit.yml`, `conduit-platforms.yml`)
+whose jobs cannot depend on each other, and a same-run recording would make
+every platform job wait for the Node job or rebuild Node itself (another Lean
+build per job). The golden file is reviewed like code: a change in Conduit's or
+Lasm's answers fails the Node jobs too and shows up as a diff in the pull
+request that caused it, instead of moving the reference silently. Conduit pins
+`@lasm/cli` and the suite's commit, so the recording changes only when one of
+them, or Conduit, does. Re-recording is copying `test-results/realworld-node-24.json`
+from the `api-node` job's artifact over the golden file.
+
+**What it catches:** a target answering differently from Node anywhere in the
+suite's traffic: a status, a header the app or the platform adapter sets, a
+body byte (key order, escaping, number formatting, error bodies), which user a
+token belongs to, a write a store lost. **What it cannot catch:** requests the
+suite does not send; behaviour under concurrency (`test/concurrency.mjs`);
+bugs that are the same on every target, Node included; timing.
 
 ### Scenario matrix
 
@@ -766,6 +820,7 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Target equivalence (fetch template, `examples/fetch`) | `GET /hello/../hello/Ada`: Node, Deno and wasi-http route the raw dot segments (404); Bun and Workers remove them first (200). Same handler, different routing per platform, and `..` reaches handlers on Node | [#27](https://github.com/Millillion/lasm/issues/27) (proposal: `remove_dot_segments` in `Request.path`), listed as `known` |
 | Differential testing, `deep` and `ending` cases | wasmtime turns an exit status of 126–255 into exit 1 with an error (docs/WASI.md says modulo 256); edge and WASI recursion stops just below 10,000 frames of a small function (docs/EDGE.md says 10,000 pass) | Documented ([#30](https://github.com/Millillion/lasm/issues/30)): measured bounds in [WASI.md](WASI.md) and [EDGE.md](EDGE.md); wasmtime's status limit stays in `KNOWN` (a host limit); generator bound 5,000 |
 | Target equivalence, first CI run | Bun answered some requests with "socket hang up", among them `/hello/a%2Fb` (the only one in the template's run, 41233271298): the harness sent `Connection: close` through Node's pooled keep-alive agent, which then reused the socket Bun had closed as asked. Not Bun and not Lasm: every run since answers `Hello, a/b` on Bun (e.g. 41650866547) | Harness fix (fresh connections, b88e671); a `keepAlive` corpus case now sends `/hello/a%2Fb` three times among five requests on one persistent connection, on every target |
+| Conduit traffic equivalence, first CI run (42329506498) | Vercel Functions answered five bodiless `POST`s (favorite, follow) with 500 "invalid transfer-encoding header" from Vercel's launcher: the recording proxy forwarded hurl's bodiless `POST` (no `Content-Length`) with Node's default `Transfer-Encoding: chunked`. The harness's, not Vercel's or Lasm's: hurl sends no framing there and passes on Vercel directly | Harness fix: the proxy keeps the client's framing (a length when it sent a body or a length, none otherwise) |
 | Dev-profile campaign 41241443151 | **`lasm build --dev` followed by `lasm build --target wasi --dev` in the same project failed** (also in 0.3.5): the WASI link took the seeded dev link's Node archive members (`*.lasm-member.o`) and `reachability.o` along with the edge runtime's archives, so every host symbol was defined twice. The edge link already dropped them | Fixed in `src/wasi/wasi-link.mjs` (#34); the PR tier now replays the regressions in the dev profile |
 | Dev-profile campaign 41241443151 | `Float.pow` differed in the 17th digit between native (glibc) and Wasm (musl's libm): expected, libm functions are not correctly rounded | Generator: libm results go through `approx` (9 significant digits) |
 | Nightly-style campaign 41241440598 (9,450 cases) | Two "divergences" on every Wasm target were the harness's own: it decoded each pipe chunk of the oracle's output separately, so a UTF-8 character split by native Lean's 4,096-byte writes became U+FFFD (the Wasm targets wrote it whole). `scripts/ci/lasm-js-stress.mjs` had the same pattern | Harness fix (#33) |
