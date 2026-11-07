@@ -30,6 +30,10 @@ scripts and no API credentials.
 
 ## Pages: `learn/<slug>.md`
 
+`learn/test-evidence.md` is generated every night by
+[`scripts/evidence/page.mjs`](../scripts/evidence/page.mjs)
+([TESTING.md](../docs/TESTING.md#the-test-evidence-page)); edit the generator, not the page.
+
 The slug is the file name. The front matter:
 
 ```yaml
