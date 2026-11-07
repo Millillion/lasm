@@ -24,13 +24,11 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: 3
+      # Pull requests (this workflow's own trigger): Linux and Windows. The push to main,
+      # release-checks (through node-linux-acceptance.yml, where github.workflow is
+      # the caller's) and the nightly cold installs keep macOS (docs/CI.md).
       matrix:
-        include:
-          - { platform: linux-x64, runner: ubuntu-24.04, arch: x64 }
-          - { platform: linux-arm64, runner: ubuntu-24.04-arm, arch: arm64 }
-          - { platform: darwin-x64, runner: macos-15-intel, arch: x64 }
-          - { platform: darwin-arm64, runner: macos-15, arch: arm64 }
-          - { platform: win32-x64, runner: windows-2025, arch: x64 }
+        include: ${{ fromJSON(github.event_name == 'pull_request' && github.workflow == 'Installer fault controls' && '[{"platform":"linux-x64","runner":"ubuntu-24.04","arch":"x64"},{"platform":"linux-arm64","runner":"ubuntu-24.04-arm","arch":"arm64"},{"platform":"win32-x64","runner":"windows-2025","arch":"x64"}]' || '[{"platform":"linux-x64","runner":"ubuntu-24.04","arch":"x64"},{"platform":"linux-arm64","runner":"ubuntu-24.04-arm","arch":"arm64"},{"platform":"darwin-x64","runner":"macos-15-intel","arch":"x64"},{"platform":"darwin-arm64","runner":"macos-15","arch":"arm64"},{"platform":"win32-x64","runner":"windows-2025","arch":"x64"}]') }}
     env:
       LASM_EXPECT_PLATFORM: ${{ matrix.platform }}
     steps:
