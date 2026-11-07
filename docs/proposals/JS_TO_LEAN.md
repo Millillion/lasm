@@ -2,8 +2,9 @@
 
 Status: written 2026-11-07 for the ROADMAP item "Move JavaScript glue code into
 Lean where it can be proved, starting with what mutation testing shows is
-riskiest" (issue #21). The first candidate is implemented (PR #151); the
-rest are proposals.
+riskiest" (issue #21). The first two candidates are implemented (PR #151,
+the UI patch encoding; the Lasm.JS value codec, issue #154); the rest are
+proposals.
 
 ## What can move, and what cannot
 
@@ -99,28 +100,47 @@ breaks if it is wrong, how much of it is pure) against what it costs.
   unproved link in the UI pipeline whose other end was already proved; it is
   pure; and it costs nothing at run time.
 
-### 2. The Lasm.JS value codec (host-bridge, edge-glue, Lasm.JS.Core) — recommended next
+### 2. The Lasm.JS value codec (host-bridge, edge-glue, Lasm.JS.Core) — done
 
-- **What moves.** The Lean half (`Data.write`, `Data.read` in
-  library/Lasm/JS/Core.lean) becomes total: `read` today is `partial` and in
-  `IO` (it turns references into `Value`s), so nothing about it can be proved.
-  Split it into a pure reader returning handles and an `IO` step that wraps
-  them. On the JavaScript side, the two copies of the codec (node-js.mjs and
-  edge-js.mjs, about 70 lines each, differing only in Buffer versus DataView)
-  become one shared module.
-- **What gets proved.** `read (encode d) = d` for every `Data` whose numbers
-  are not NaN payloads and whose arrays, objects and strings have fewer than
-  2³² elements or bytes (lengths travel as u32: a larger one wraps today,
-  which the proof would surface; the fix is a size check in `write`). Floats
-  travel as their bits; Lean's library has no lemma relating
-  `Float.ofBits` and `Float.toBits`, so the statement compares `toBits`.
-- **How the JavaScript shrinks.** By one copy of the codec (about 70 lines and
-  its survivors in edge-js.mjs).
-- **Runtime cost.** None expected: the same bytes are written and read; a
-  total `read` compiles to the same loop. To be measured with the Lasm.JS
-  interop benchmark (docs/BENCHMARKS.md: Lean→JS call round trip p50 21 µs).
-- **Risk.** Medium: it changes a shipped module, so library/prebuilt is
-  regenerated, and every Lasm.JS call goes through it.
+- **What moved.** The Lean half (library/Lasm/JS/Core.lean, `Wire`) is
+  total. `Wire.write` is structural (well-founded on the value) and returns
+  `Except String ByteArray`; the reader is `Wire.decodeWith`, generic in the
+  monad and in how a reference becomes a value, with fuel (the bytes left)
+  so it terminates, and `Wire.decode` runs it in `IO`, where a reference
+  becomes an owned `Value`. The reader is specialised for `IO` at compile
+  time, so no monad dictionaries are passed at run time.
+- **What is proved.** `Lasm.JS.Spec.decode_encode`: for every plain value
+  (no references) that `encode` accepts, `decodeWith` reads the bytes back
+  as the same value, numbers compared by their bits (`Data.wire`).
+  `Lasm.JS.Spec.encode_ok_iff_fits`: `encode` succeeds exactly when every
+  length fits the u32 (`Data.Fits`). 46 theorems
+  ([library/Lasm/JS/Proofs/Wire.lean](../../library/Lasm/JS/Proofs/Wire.lean)),
+  only the standard axioms.
+- **The bug it surfaced (#154).** Lengths of 2³² or more wrapped silently in
+  Lean (wasm64 on Node, where such a value can exist) and on the edge
+  (`DataView.setUint32`), and threw a bare `RangeError` on Node. Each side
+  now refuses them with an error naming the value; Lean's reply framing
+  (op 208) checks its length too.
+- **Runtime cost.** None measured: the same bytes cross. Compiled natively
+  (Lean 4.35.0, `-O3`), encoding a typical call payload (475 bytes: an
+  object of eight fields with headers, 64 bytes, a bigint and 20 numbers)
+  takes the same time as before (about 3.0–3.4 µs either way) and decoding
+  it is about 25 % faster (7.8 µs against 10.4 µs), from the `Option`
+  readers and dropping the `IO` wrapping of each step. The readers add with
+  `+` rather than `|||` (equal for non-overlapping bytes; `omega` proves
+  things about `+`).
+- **Why the JavaScript stays in two copies.** Node's host files are copied
+  flat into each application's `host/` directory and into the frozen
+  full-Lean toolchain's host set (scripts/full-lean), the edge's into each
+  edge output's `lasm/` directory, and the browser bundle inlines
+  edge-js.mjs. A shared module would be a new file in every one of those
+  outputs (and a subdirectory in `host/`, since node-js.mjs and edge-js.mjs
+  live in different source directories), would change the browser bundle,
+  and would replace Node's `Buffer` reads and writes with `DataView`, an
+  unmeasured change on the hottest path. The copies differ only in
+  `Buffer` against `DataView`; each is tested against Lean's side of the
+  format (test/node-js.test.mjs, test/edge-js.test.mjs), including the new
+  length check. Revisit if the host files are ever bundled.
 
 ### 3. Function-platform request and response mapping (src/serverless/)
 
@@ -166,9 +186,9 @@ simplifying it (issue #21, "shrink it to its irreducible state").
 ## Recommendation
 
 1. **The UI patch encoding** (done in this change).
-2. **The Lasm.JS value codec** next: a total Lean `read` with its round-trip
-   theorem, the u32 size check it will surface, and one shared JavaScript
-   codec for Node and the edge.
+2. **The Lasm.JS value codec** (done, #154): a total Lean reader with its
+   round-trip theorem, and the u32 length check it surfaced. The two
+   JavaScript copies stay (sharing them would change every host output).
 
 After those, specify the function-platform mapping in Lean (candidate 3).
 Candidates 4 and 5 need no move: their proofs, where useful, are about Lean

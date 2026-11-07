@@ -6,6 +6,9 @@
 // `notify`; the runtime takes them with op 209, which never waits here.
 const encoder = new TextEncoder(), decoder = new TextDecoder();
 const maximumDepth = 64;
+// Lengths travel as u32 (Lean's Wire.maxLength): a longer one is an error, never a wrapped length (#154).
+const maximumLength = 0xFFFFFFFF;
+const tooLong = (what, n, unit) => jsFailure(new RangeError(`Lasm.JS: cannot pass ${what} of ${n} ${unit} to Lean (lengths cross as 32-bit numbers, so at most ${maximumLength})`));
 export const firstJsHandle = 0x40000000;
 
 export function jsFailure(error) {
@@ -46,10 +49,11 @@ class Writer {
   u32(v) { this.reserve(4); this.view.setUint32(this.length, v, true); this.length += 4; }
   f64(v) { this.reserve(8); this.view.setFloat64(this.length, v, true); this.length += 8; }
   u64(v) { this.reserve(8); this.view.setBigUint64(this.length, BigInt.asUintN(64, BigInt(v)), true); this.length += 8; }
-  bytes(b) { this.u32(b.length); this.reserve(b.length); this.buffer.set(b, this.length); this.length += b.length; }
+  bytes(b) { if (b.length > maximumLength) throw tooLong('a Uint8Array', b.length, 'bytes'); this.u32(b.length); this.reserve(b.length); this.buffer.set(b, this.length); this.length += b.length; }
   string(s) {
     this.reserve(s.length * 3 + 4);
     const { written } = encoder.encodeInto(s, this.buffer.subarray(this.length + 4));
+    if (written > maximumLength) throw tooLong('a string', written, 'bytes');
     this.view.setUint32(this.length, written, true); this.length += 4 + written;
   }
   result() { return this.buffer.subarray(0, this.length); }
@@ -102,7 +106,12 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
     }
     w.u8(10); w.u32(reference(value)); w.u32(0);
   }
-  function encode(value, mode) { const w = new Writer(); write(w, value, mode); return w.result(); }
+  function encode(value, mode) {
+    const w = new Writer(); write(w, value, mode);
+    // Results reach Lean framed with a u32 length too (interop events).
+    if (w.length > maximumLength) throw tooLong('a value', w.length, 'bytes');
+    return w.result();
+  }
   function read(r) {
     const tag = r.u8();
     switch (tag) {
