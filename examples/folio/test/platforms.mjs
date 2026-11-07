@@ -16,7 +16,7 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 
 // Deno's default KV database is per --location (and DENO_DIR): the seeding
 // script and the server share it.
-const deno = 'DENO_DIR={data}/deno deno run -A --unstable-kv --location http://folio.test/';
+const deno = (exec = '') => `DENO_DIR={data}/deno ${exec}deno run -A --unstable-kv --location http://folio.test/`;
 
 export const platforms = {
   // Viceroy, Fastly's local simulator (what fastly compute serve runs), with
@@ -43,8 +43,8 @@ export const platforms = {
   // a local SQLite database under DENO_DIR, here in the run's directory).
   'deno-deploy': {
     build: 'build:deno-deploy',
-    seed: () => `${deno} tools/kv.mjs deno {data}/site`,
-    serve: `exec ${deno} deno/main.mjs`,
+    seed: () => `${deno()} tools/kv.mjs deno {data}/site`,
+    serve: `${deno('exec ')} deno/main.mjs`,
     store: 'deno',
   },
 };
