@@ -43,7 +43,7 @@ itself comes from the platform (Web Crypto) and is trusted, not proved.
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from Proofs/Spec.lean by `npm run proofs -- --write`; do not edit by hand. -->
 
-**27 propositions**, each proved by the theorem of the same name in `Proofs/` (196 theorems in all: the 27 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
+**28 propositions**, each proved by the theorem of the same name in `Proofs/` (197 theorems in all: the 28 below and the lemmas their proofs are built from). Every one uses only Lean's standard axioms.
 
 Totality (checked by test/Axioms.lean, not a theorem): the request handlers reach 1185 definitions (358 of them Porter's); none is `partial`, `unsafe` or opaque, and none is a panic.
 
@@ -113,6 +113,12 @@ Totality (checked by test/Axioms.lean, not a theorem): the request handlers reac
 | --- | --- |
 | [`expired_code_refused`](Proofs/Spec.lean#L286) | **Expired codes are refused** *(consequence)*: at any time at or after a code's expiry, it gets no tokens. |
 | [`dead_refresh_refused`](Proofs/Spec.lean#L293) | **Expired or revoked refresh tokens are refused** *(consequence)*. |
+
+### I. A commit that landed is not run again
+
+| Proposition | In plain English |
+| --- | --- |
+| [`landed_commit_stands`](Proofs/Spec.lean#L307) | **A landed commit stands** (issue #138): when a commit throws, the server (`afterFailedCommit`) runs the request again only if its commit receipt is not in the database (or could not be read) and another commit came in between; if the receipt is there, the commit landed and the request's reply stands, so a transient database error never makes a request run against its own writes. |
 <!-- END PROPOSITIONS -->
 
 ## What is trusted, not proved
@@ -126,7 +132,9 @@ Totality (checked by test/Axioms.lean, not a theorem): the request handlers reac
 - **Isolation.** The propositions are about one request at a time: between a
   request's reads and its commit, no other write happens. The server makes
   that true with a version check on every commit (a request that finds the
-  database changed is run again) and, within a process, one writer at a
+  database changed is run again; one whose commit landed but reported an
+  error is recognised by its commit receipt and not run again,
+  `landed_commit_stands`) and, within a process, one writer at a
   time. The adversarial suite's concurrent redemptions of one code and
   concurrent refreshes of one token are the evidence.
 - **The cryptography.** SHA-256, PBKDF2, ECDSA P-256 and Ed25519 come from

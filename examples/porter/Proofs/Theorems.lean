@@ -341,4 +341,12 @@ theorem dead_refresh_refused : Spec.dead_refresh_refused := by
   rw [hx] at hx'; cases hx'
   exact ⟨by omega, hrev⟩
 
+/-! ## I. A commit that landed is not run again -/
+
+theorem landed_commit_stands : Spec.landed_commit_stands := by
+  intro landed moved
+  cases landed with
+  | none => cases moved <;> first | decide | simp [afterFailedCommit]
+  | some b => cases b <;> cases moved <;> first | decide | simp [afterFailedCommit]
+
 end Porter.Proofs

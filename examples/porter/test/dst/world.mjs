@@ -39,6 +39,12 @@
 //     against /jwks (Spec.id_token_claims);
 //   - a sign-in with a live session cookie needs no password; the session
 //     ends after 8 hours of the server's clock;
+//   - a token request whose commit landed and then threw (an ambiguous
+//     commit) keeps its first reply (its commit receipt, #138): a fresh code
+//     or a live refresh token is never refused because of it. The one
+//     exception is the documented one: the receipt itself could not be read
+//     (a failed read right after), then the server decides as before
+//     receipts and may refuse, but revokes nothing (counted, not failed);
 //   - after the heal, every agent signs in, redeems its code and calls
 //     userinfo successfully.
 import { createHash, createPublicKey, verify as verifySignature } from 'node:crypto';
@@ -79,6 +85,15 @@ class World {
     this.http = new HttpSim({ net: this.net, scheduler: this.sched, rng: rng.fork('http'), trace: this.trace, timeout: [500, 8000] });
     this.store = new SqlStore({ rng: rng.fork('sql'), trace: this.trace, profile: this.raceWindow ? 'd1' : 'sqlite' });
     this.storeFaults = { readFail: p.readFail, writeFail: p.writeFail, ambiguous: p.ambiguous };
+    // A request whose commit receipt could not be read after an ambiguous commit
+    // (the read of `commits` failed): the documented case, decided by the version alone.
+    const all = this.store.all.bind(this.store);
+    this.store.all = (sql, params) => {
+      try { return all(sql, params); } catch (error) {
+        if (/\bFROM commits\b/.test(sql) && this.store.stats.ambiguous > this.lastAmbiguous) this.uncheckedPending = true;
+        throw error;
+      }
+    };
     // Seconds of offset of the server's clock (jumps), and of each racing instance.
     this.offset = 0;
     this.instanceSkew = [0, 1, 2, 3].map(() => (p.skew ? this.chaos.range(-30, 30) : 0));
@@ -86,10 +101,12 @@ class World {
     this.requestNow = new Map();     // request id -> the clock reading it was served with
     this.ambiguousIds = new Set();   // requests during which a commit's outcome was unknown
     this.lastAmbiguous = 0;
+    this.uncheckedIds = new Set();   // requests whose receipt could not be read after an ambiguous commit
+    this.uncheckedPending = false;
     this.codes = new Map();          // code -> { issued, redeemed: [], family }
     this.families = new Map();       // family key -> { revoked: bool, since }
     this.refreshes = new Map();      // refresh token -> { issued, family, rotations }
-    this.knownAmbiguous = 0;
+    this.uncheckedRefused = 0;
     this.events = 0; this.flows = 0; this.signIns = 0; this.tokenCalls = 0; this.attacks = 0;
     this.healed = false;
     this.done = new Set();
@@ -227,6 +244,7 @@ class World {
     const id = this.http.request(ag?.node ?? 'agent0', { method, url: path, body }, res => {
       this.headersOf.delete(id);
       res.ambiguous = this.ambiguousIds.delete(id);
+      res.unchecked = this.uncheckedIds.delete(id);
       if (res.ok) {
         res.headers = res.body.headers; res.status = res.body.status; res.now = this.requestNow.get(id); res.body = res.body.text;
         if (ag) this.remember(ag, res.headers);
@@ -350,11 +368,12 @@ class World {
       }
       // A code redeemed twice (ours, by a lost answer) revokes what it issued.
       if (k?.redeemed.length || attempt > 0) this.families.set(`code:${code}`, { revoked: true });
-      else if (res.status === 400 && res.ambiguous) {
-        // Its commit succeeded, then failed: runRequest ran it again, found the code used and
-        // revoked what it issued (a known issue, counted, not failed: see the summary).
-        this.knownAmbiguous++;
-        this.families.set(`code:${code}`, { revoked: true });
+      else if (res.status === 400 && res.unchecked) {
+        // Its commit landed, then threw, and its receipt could not be read: the server ran it
+        // again, found the code used and refused, but that rerun's commit failed (one receipt
+        // per request), so what it issued is not revoked; the agent never got it.
+        this.uncheckedRefused++;
+        this.families.set(`code:${code}`, { revoked: false, unsure: true });
       } else if (res.status === 400 && !res.duplicated && res.now < k.issued + TTL.code)
         this.checks.fail(`agent${ag.a}: a fresh code, redeemed once, ${res.now - k.issued} s after it was issued, was refused: ${res.body.slice(0, 100)}`);
       if (ag.final && attempt === 0) this.checks.fail(`agent${ag.a}: after the heal, redeeming a fresh code failed: ${res.status} ${res.body.slice(0, 120)}`);
@@ -431,8 +450,13 @@ class World {
         const e = JSON.parse(res.body).error;
         this.checks.that(e === 'invalid_grant', `agent${ag.a}: refresh answered ${e}`);
         // A refresh token that may have been rotated by a lost answer is reused here: that revokes the family.
-        if (res.ambiguous) { this.knownAmbiguous++; this.families.get(t.family).revoked = true; }
-        else if (info?.unsure || info?.rotated || res.duplicated) this.families.get(t.family).revoked = true;
+        if (info?.unsure || info?.rotated || res.duplicated) this.families.get(t.family).revoked = true;
+        else if (res.unchecked) {
+          // As in `redeem`: the receipt could not be read; the rotation landed, the rerun's revocation did not.
+          this.uncheckedRefused++;
+          this.families.get(t.family).unsure = true;
+          if (info) info.unsure = true;
+        }
         else if (!this.familyRevoked(t.family) && !this.families.get(t.family).unsure) this.checks.fail(`agent${ag.a}: a live refresh token of a live family was refused at ${res.now}`);
         ag.tokens = null;
         return this.later(this.work.range(500, 3000), () => this.flow(ag));
@@ -530,6 +554,7 @@ class World {
 
   reply(id, status, headers, body) {
     if (this.store.stats.ambiguous > this.lastAmbiguous) { this.lastAmbiguous = this.store.stats.ambiguous; this.ambiguousIds.add(id); }
+    if (this.uncheckedPending) { this.uncheckedPending = false; this.uncheckedIds.add(id); }
     if (!this.healed && this.chaos.chance(this.profile.crashes / 100)) {
       this.trace.log('the server crashes after handling the request, before answering');
       this.crash();
@@ -545,7 +570,7 @@ class World {
     return `(${this.agents} agents, race ${this.raceWindow} ms, ${this.flows} flows, ${this.signIns} sign-ins, ${this.tokenCalls} code redemptions, ` +
       `${this.attacks} attacks, ${this.events} events, ${h.requests} requests/${h.failed} failed/${h.duplicates} dup/${h.crashes} crashes, ` +
       `db ${d.commits} commits/${d.writeFailed + d.readFailed} failed/${d.ambiguous} ambiguous, clock offset ${this.offset} s` +
-      `${this.knownAmbiguous ? `; ${this.knownAmbiguous} sign-in(s) or refresh(es) refused after an ambiguous commit, the known issue` : ''})`;
+      `${this.uncheckedRefused ? `; ${this.uncheckedRefused} sign-in(s) or refresh(es) refused after an ambiguous commit whose receipt could not be read (documented; nothing revoked)` : ''})`;
   }
 }
 

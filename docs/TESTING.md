@@ -689,10 +689,13 @@ carried, so an edit was lost if that sync failed; a failed catch-up sync was
 never retried, leaving the editor "Offline" with nothing pending and behind
 the log; and a commit that succeeded and then reported an error appended
 operations that were never pushed, so tabs that were not typing never heard of
-them (until someone else typed). In Porter, one issue, reported, not fixed (a trade-off, #138): a token
-request whose commit succeeded and then reported an error is run again, finds
-its own code used (or its refresh token rotated) and revokes the family it
-just issued; the simulation counts these as the known issue. In Ledger,
+them (until someone else typed). In Porter, one bug, now fixed (#138): a token
+request whose commit succeeded and then reported an error was run again, found
+its own code used (or its refresh token rotated) and revoked the family it
+had just issued; each commit now inserts a commit receipt, which a failed
+commit looks up, and the simulation fails if a fresh code or a live refresh
+token is refused after an ambiguous commit (except when the receipt itself
+could not be read, the documented case, in which nothing is revoked). In Ledger,
 nothing: every seed kept every invariant, racing commits at skewed clocks
 included. See [Bugs found](#bugs-found).
 
@@ -1011,4 +1014,4 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Deterministic simulation of Tandem (first CI run: 12 of 30 seeds) | **The editor could drop an unsent edit from `pending`:** a WebSocket push that did not continue the replica's log sent a second sync while one was in flight, without marking it in flight, so two replies came back and the first one's count (`onReply sent`) dropped operations the second carried. The edit was lost if that second sync failed | Fixed: a push that arrives while a sync is in flight marks the editor behind, and it syncs again when the reply returns (`Frontend/Ui.lean`) |
 | Deterministic simulation of Tandem (first CI run) | A failed catch-up sync (nothing pending) was never retried: the retry ran only while edits were pending, so the editor showed "Offline: 0 edits waiting" and stayed behind the log until someone else typed | Fixed: the retry always syncs |
 | Deterministic simulation of Tandem (third CI run, most seeds with an ambiguous commit) | A commit that succeeded and then reported an error (D1's lost reply, a timeout after `COMMIT`): `syncOnce` ran the sync again, found the operations known and appended and pushed nothing, so tabs that were not typing never heard of them | Fixed: a failed commit checks whether the log holds exactly its operations at its position, and if so answers and pushes them; and a sync whose operations were all in the log already pushes its reply, which holds them (`Server/App.lean`; the second part was found by the heavy-fault seeds, when that check could not read the log) |
-| Deterministic simulation of Porter (4 of 30 seeds) | A token request whose commit succeeded and then reported an error is run again by `runRequest`, finds its own code used or its refresh token rotated, answers `invalid_grant` and revokes the family it just issued: one transient database error signs a user out | Reported (#138: a commit receipt, a per-endpoint check, or documenting it); counted by the simulation as the known issue |
+| Deterministic simulation of Porter (4 of 30 seeds) | A token request whose commit succeeded and then reported an error is run again by `runRequest`, finds its own code used or its refresh token rotated, answers `invalid_grant` and revokes the family it just issued: one transient database error signs a user out | Fixed (#138, Jordan's choice of a commit receipt): each commit inserts a row keyed by an id from the request's random values (the same on a rerun), and a failed commit whose receipt is there keeps its reply (`Server/App.lean`, `Spec.landed_commit_stands`); the simulation no longer tolerates the refusal |
