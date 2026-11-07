@@ -2,8 +2,8 @@
 
 Status: written 2026-11-07 for the ROADMAP item "Move JavaScript glue code into
 Lean where it can be proved, starting with what mutation testing shows is
-riskiest" (issue #21). The first candidate is implemented (PR "UI patch
-encoding proved"); the rest are proposals.
+riskiest" (issue #21). The first candidate is implemented (PR #151); the
+rest are proposals.
 
 ## What can move, and what cannot
 
