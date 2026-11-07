@@ -114,8 +114,9 @@ test('Lambda zip: every event shape reaches the server and returns its response 
     assert.equal(replies.get.status, 200, kind);
     const get = json(replies.get);
     assert.equal(get.method, 'GET');
-    // Single-value forms keep only the last value of a repeated query parameter.
-    assert.equal(get.url, kind === 'alb' ? '/hello/Ada?a=z' : '/hello/Ada?a=x+y&a=z', kind);
+    // Single-value forms keep only the last value of a repeated query parameter;
+    // an ALB's still-encoded values are forwarded as they came.
+    assert.equal(get.url, kind === 'alb' ? '/hello/Ada?a=z' : kind === 'alb-multi-value' ? '/hello/Ada?a=x%20y&a=z' : '/hello/Ada?a=x+y&a=z', kind);
     assert.ok(get.host, kind);
     const post = json(replies.post);
     assert.deepEqual([post.method, post.url, post.type, post.body], ['POST', '/echo', 'application/json', '{"s":"λ"}'], kind);

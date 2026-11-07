@@ -140,7 +140,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] (J) Review the propositions in [Proofs/Spec.lean](examples/tandem/Proofs/Spec.lean).
 
 ## Next (December 2026 to January 2027)
-- [ ] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI.
+- [x] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI. Six coverage-guided targets in `test/fuzz/` (`fuzz.yml`, [TESTING.md](docs/TESTING.md#fuzzing-at-the-boundaries)): the CLI's arguments, the function platforms' HTTP mapping and the Lasm.UI patch decoder (JavaScript, V8 block coverage), Lasm.Fetch's request parsing and Lasm.RPC's decoding (Lean compiled to C under libFuzzer), the WASI CGI host (libFuzzer, ASan, UBSan). Found and fixed: a decoder hang on a truncated frame, inherited keys accepted by `lasm init`/`package`, a `URIError` 502 on ALB queries, `://` in a path and a Host header that moved the path (Node and WASI hosts), an RPC request that hung the server with a huge exponent; #135 tracks the upstream JSON bugs and the example apps.
 - [ ] Deterministic simulation testing of the example apps: simulated clock, network and storage, with faults.
 - [ ] Target equivalence for Conduit's RealWorld traffic, with token and timestamp normalization.
 - [ ] Consolidate the 63 CI workflows into PR, nightly, weekly and release tiers.
@@ -150,7 +150,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 
 ## Later (first half of 2027)
 - [~] Example apps 4 and 5: the identity provider (Porter, done) and the collaborative editor (Tandem, in progress).
-- [ ] Continuous fuzzing in our own CI: nightly and weekly campaigns on every boundary, corpora and crashes kept in the repo, coverage-guided (libFuzzer for the C host, Jazzer.js or fast-check for JavaScript, Plausible for Lean).
+- [x] Continuous fuzzing in our own CI: nightly and weekly campaigns on every boundary, corpora and crashes kept in the repo, coverage-guided (libFuzzer for the C host, Jazzer.js or fast-check for JavaScript, Plausible for Lean). Nightly 10 minutes and weekly 60 minutes per target, a corpus replay on every PR, `test/fuzz/corpus/` and `test/fuzz/regressions/`; a V8-coverage engine instead of Jazzer.js (no ES module support) and libFuzzer on Lean's C output instead of Plausible ([DECISIONS](docs/DECISIONS.md)).
 - [ ] Move JavaScript glue code into Lean where it can be proved, starting with what mutation testing shows is riskiest (issue #21).
 - [ ] Translation validation for selected Binaryen passes. Assess verifying or replacing parts of the toolchain: Clang, LLVM, Emscripten, Binaryen (issue #21).
 - [ ] Simplify the codebase toward its irreducible state, once the tests are strong enough to allow it (issue #21).

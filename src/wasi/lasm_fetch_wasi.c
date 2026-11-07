@@ -120,6 +120,16 @@ LEAN_EXPORT lean_obj_res lasm_fetch_read(uint32_t max) {
     free(buf);
     return lean_io_result_mk_ok(chunk);
 }
+/* A Host header that is a plain host[:port]: one with `/`, `?`, `#`, `\\`, `@`,
+   whitespace or a control character could move the URL's path or query
+   (`Host: x/admin#`), so it is not used (as in Lasm.Fetch.nodeRequestUrl;
+   found by test/fuzz, target wasi-cgi). */
+static bool plain_host(const char *host) {
+    if (!host || !*host) return false;
+    for (const unsigned char *c = (const unsigned char *)host; *c; c++)
+        if (*c <= ' ' || *c == 127 || strchr("/?#\\@", *c)) return false;
+    return true;
+}
 static lean_object *request_head(const char **method_out, lean_object **url_out, lean_object **headers_out) {
     const char *method = lasm_wasi_getenv("REQUEST_METHOD");
     if (!method || !*method)
@@ -133,12 +143,15 @@ static lean_object *request_head(const char **method_out, lean_object **url_out,
         const char *https = lasm_wasi_getenv("HTTPS"), *host = lasm_wasi_getenv("HTTP_HOST");
         const char *scheme = https && (!strcmp(https, "on") || !strcmp(https, "1")) ? "https://" : "http://";
         grow_put(&url, scheme, strlen(scheme));
-        if (host && *host) grow_put(&url, host, strlen(host));
+        if (plain_host(host)) grow_put(&url, host, strlen(host));
         else {
             const char *name = lasm_wasi_getenv("SERVER_NAME"), *port = lasm_wasi_getenv("SERVER_PORT");
-            name = name && *name ? name : "localhost";
+            /* Some servers fill SERVER_NAME from the client's Host: the same check. */
+            name = plain_host(name) ? name : "localhost";
             grow_put(&url, name, strlen(name));
-            if (port && *port && strcmp(port, "80") && strcmp(port, "443")) { grow_put(&url, ":", 1); grow_put(&url, port, strlen(port)); }
+            if (port && *port && strspn(port, "0123456789") == strlen(port) && strcmp(port, "80") && strcmp(port, "443")) {
+                grow_put(&url, ":", 1); grow_put(&url, port, strlen(port));
+            }
         }
         const char *uri = lasm_wasi_getenv("REQUEST_URI");
         if (uri && *uri) grow_put(&url, uri, strlen(uri));

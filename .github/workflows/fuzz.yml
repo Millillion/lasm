@@ -1,0 +1,106 @@
+name: Fuzz
+# Coverage-guided fuzzing at Lasm's input boundaries (docs/TESTING.md#fuzzing-at-the-boundaries,
+# test/fuzz/): the CLI's argument parser, the Lasm.UI patch decoder and the
+# function platforms' HTTP mapping (JavaScript, under V8 block coverage), and
+# Lasm.Fetch's request parsing, Lasm.RPC's decoding and the WASI C host's CGI
+# request (libFuzzer, ASan; UBSan for the C host).
+#   - pull requests and pushes to main: the committed corpus and regressions,
+#     once each (seconds); the native targets when their sources change;
+#   - nightly: 10 minutes per target; weekly (Sunday): 60 minutes per target.
+# A campaign fails on any failing input (a crash, a hang, a broken property)
+# and uploads its new corpus entries and failing inputs as an artifact.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 2 * * *'
+    - cron: '41 6 * * 0'
+  workflow_dispatch:
+    inputs:
+      seconds:
+        description: Seconds per target
+        default: '600'
+permissions:
+  contents: read
+concurrency:
+  group: fuzz-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+env:
+  CI: '1'
+  BROWSER: 'none'
+jobs:
+  replay:
+    name: Replay the corpus
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: JavaScript targets
+        run: node test/fuzz/run.mjs replay cli-arguments serverless-http ui-patch
+      - name: Do the native targets' sources change?
+        id: native
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = push ] || git diff --name-only "$BASE" HEAD | grep -qE '^(library/|src/wasi/|src/managed-lean\.mjs|src/lasm-library\.mjs|src/toolchains\.json|test/fuzz/|\.github/workflows/fuzz\.yml)'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: libFuzzer runtime
+        if: steps.native.outputs.changed == 'true'
+        run: scripts/fuzz/ensure-libfuzzer.sh
+      - name: Build the native targets
+        if: steps.native.outputs.changed == 'true'
+        run: node test/fuzz/native/build.mjs
+      - name: Native targets
+        if: steps.native.outputs.changed == 'true'
+        run: node test/fuzz/run.mjs replay lean-fetch-request lean-rpc wasi-cgi
+
+  campaign:
+    name: Fuzz ${{ matrix.target }}
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        target: [cli-arguments, serverless-http, ui-patch, lean-fetch-request, lean-rpc, wasi-cgi]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Native target
+        if: startsWith(matrix.target, 'lean-') || matrix.target == 'wasi-cgi'
+        run: |
+          scripts/fuzz/ensure-libfuzzer.sh
+          node test/fuzz/native/build.mjs ${{ matrix.target }}
+      - name: Campaign (the seed is printed first)
+        env:
+          SECONDS_PER_TARGET: ${{ github.event.inputs.seconds || (github.event.schedule == '41 6 * * 0' && '3600') || '600' }}
+        run: node test/fuzz/run.mjs fuzz --seconds "$SECONDS_PER_TARGET" --seed "$((GITHUB_RUN_ID % 2147483647))" ${{ matrix.target }}
+      - name: New corpus entries and failing inputs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fuzz-${{ matrix.target }}
+          path: |
+            .work/fuzz/${{ matrix.target }}
+            .work/fuzz/summary.json
+          retention-days: 30
+          if-no-files-found: ignore
