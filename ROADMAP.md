@@ -146,6 +146,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] Consolidate the 63 CI workflows into PR, nightly, weekly and release tiers.
 - [ ] Example app 3: the Markdown site generator, held to CommonMark's 652 examples, on WASI, Fastly, the edge and the browser.
 - [ ] Organize the proofs of Lasm's own libraries (Lasm.UI, RPC, KV) like Conduit's Spec.lean, for human review (issue #21).
+- [ ] (J) Library API proposals, drafted 2026-11-04 and awaiting Jordan's decision: [Lasm.Web.Crypto](docs/proposals/LASM_WEB_CRYPTO.md), [WebSocket upgrades in `Lasm.Fetch.serve`](docs/proposals/WEBSOCKET_UPGRADE.md), [Lasm.Markdown](docs/proposals/LASM_MARKDOWN.md).
 - [ ] Lean 4.36: resume when 4.36.0 stable ships, around mid-November. It becomes the next minor release after 0.4.0.
 
 ## Later (first half of 2027)
