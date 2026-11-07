@@ -1,7 +1,8 @@
 name: Fuzz
 # Coverage-guided fuzzing at Lasm's input boundaries (docs/TESTING.md#fuzzing-at-the-boundaries,
 # test/fuzz/): the CLI's argument parser, the Lasm.UI patch decoder and the
-# function platforms' HTTP mapping (JavaScript, under V8 block coverage), and
+# function platforms' HTTP mapping (JavaScript, under V8 block coverage; checked
+# against its Lean model, library/Lasm/Serverless/Proofs/Model.lean), and
 # Lasm.Fetch's request parsing, Lasm.RPC's decoding and the WASI C host's CGI
 # request (libFuzzer, ASan; UBSan for the C host).
 #   - pull requests and pushes to main: the committed corpus and regressions,
@@ -57,7 +58,11 @@ jobs:
           node-version: 26.13.0
           package-manager-cache: false
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: The Lean model of src/serverless/ (serverless-http's oracle)
+        run: node test/fuzz/support/serverless-model.mjs
       - name: JavaScript targets
+        env:
+          LASM_SERVERLESS_MODEL: required
         run: node test/fuzz/run.mjs replay cli-arguments serverless-http ui-patch
       - name: Do the native targets' sources change?
         id: native
@@ -96,6 +101,11 @@ jobs:
           node-version: 26.13.0
           package-manager-cache: false
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: The Lean model of src/serverless/ (the oracle)
+        if: matrix.target == 'serverless-http'
+        run: |
+          node test/fuzz/support/serverless-model.mjs
+          echo "LASM_SERVERLESS_MODEL=required" >> "$GITHUB_ENV"
       - name: Native target
         if: startsWith(matrix.target, 'lean-') || matrix.target == 'wasi-cgi'
         run: |

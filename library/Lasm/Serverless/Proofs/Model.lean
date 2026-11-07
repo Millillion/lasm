@@ -113,9 +113,67 @@ def formByte (b : UInt8) : List Char :=
 /-- A name or value as `URLSearchParams` writes it (its UTF-8 bytes). -/
 def formText (s : String) : List Char := s.toUTF8.data.toList.flatMap formByte
 
+/-- Parts joined with `sep` between them. -/
+def joinWith (sep : Char) : List (List Char) → List Char
+  | [] => []
+  | [x] => x
+  | x :: xs => x ++ sep :: joinWith sep xs
+
 /-- `new URLSearchParams(pairs).toString()`. -/
 def formEncode (pairs : List (String × String)) : String :=
-  String.ofList (List.intercalate ['&'] (pairs.map fun (k, v) => formText k ++ '=' :: formText v))
+  String.ofList (joinWith '&' (pairs.map fun (k, v) => formText k ++ '=' :: formText v))
+
+/-- A hexadecimal digit's value. -/
+def unhex (c : Char) : Option Nat :=
+  if '0' ≤ c && c ≤ '9' then some (c.toNat - 48)
+  else if 'A' ≤ c && c ≤ 'F' then some (c.toNat - 55)
+  else if 'a' ≤ c && c ≤ 'f' then some (c.toNat - 87)
+  else none
+
+/-- The bytes of a name or value of `application/x-www-form-urlencoded` text
+(WHATWG URL, "urlencoded parsing"): `+` is a space, `%XX` a byte, a `%`
+without two hexadecimal digits itself, any other character its UTF-8. -/
+def formBytes : List Char → List UInt8
+  | [] => []
+  | c :: r =>
+    if c == '+' then 32 :: formBytes r
+    else if c == '%' then
+      match _hr : r with
+      | a :: b :: r' =>
+        match unhex a, unhex b with
+        | some x, some y => (16 * x + y).toUInt8 :: formBytes r'
+        | _, _ => 37 :: formBytes r
+      | _ => 37 :: formBytes r
+    else String.utf8EncodeChar c ++ formBytes r
+termination_by l => l.length
+decreasing_by all_goals simp_all <;> omega
+
+/-- A name or value decoded, when its bytes are UTF-8. -/
+def formText? (l : List Char) : Option String := String.fromUTF8? ⟨(formBytes l).toArray⟩
+
+/-- Before and after the first `sep` (`indexOf`), if there is one. -/
+def splitFirst (sep : Char) (l : List Char) : Option (List Char × List Char) :=
+  match l.dropWhile (· != sep) with
+  | [] => none
+  | _ :: after => some (l.takeWhile (· != sep), after)
+
+/-- Splits at every `sep` (`split`). -/
+def splitOn (sep : Char) : List Char → List (List Char)
+  | [] => [[]]
+  | c :: r =>
+    if c == sep then [] :: splitOn sep r
+    else match splitOn sep r with
+      | p :: ps => (c :: p) :: ps
+      | [] => [[c]]
+
+/-- How a server reads a query (`new URLSearchParams(query)`): the pairs,
+split at `&` and at each one's first `=`. -/
+def formDecode (s : String) : Option (List (String × String)) :=
+  if s.isEmpty then some []
+  else (splitOn '&' s.toList).mapM fun part =>
+    match splitFirst '=' part with
+    | some (k, v) => do pure (← formText? k, ← formText? v)
+    | none => do pure (← formText? part, "")
 
 /-- The pairs of an object and its multi-value form (`query`, `headerPairs`):
 the multi-value form when the event has one, each name once per value. -/
@@ -198,6 +256,17 @@ send (a body adds its Content-Length after them). -/
 def outgoing (hs : Headers) (defaultHost : String) : Headers :=
   let kept := keep false (joinCookies hs)
   if kept.any (isHost ·.1) then kept else kept ++ [("host", defaultHost)]
+
+/-- How a server reads the URL it builds from Host and the target
+(`http://` + host + target, WHATWG URL): the host (after the authority's
+last `@`; the authority ends at the first `/ \ ? #`) and the rest. -/
+def urlHost (url : String) : Option (String × String) :=
+  match url.toList with
+  | 'h' :: 't' :: 't' :: 'p' :: ':' :: '/' :: '/' :: rest =>
+    let stop := fun c => c == '/' || c == '\\' || c == '?' || c == '#'
+    let authority := rest.takeWhile (!stop ·)
+    some (String.ofList (authority.reverse.takeWhile (· != '@')).reverse, String.ofList (rest.dropWhile (!stop ·)))
+  | _ => none
 
 /-! ## Bodies -/
 
@@ -429,21 +498,6 @@ deriving Repr, DecidableEq
 def integer (s : String) : Bool :=
   let digits := match s.toList with | '-' :: r => r | l => l
   !digits.isEmpty && digits.all Char.isDigit
-
-/-- Splits at every `sep` (`split`). -/
-def splitOn (sep : Char) : List Char → List (List Char)
-  | [] => [[]]
-  | c :: r =>
-    if c == sep then [] :: splitOn sep r
-    else match splitOn sep r with
-      | p :: ps => (c :: p) :: ps
-      | [] => [[c]]
-
-/-- Before and after the first `sep` (`indexOf`), if there is one. -/
-def splitFirst (sep : Char) (l : List Char) : Option (List Char × List Char) :=
-  match l.dropWhile (· != sep) with
-  | [] => none
-  | _ :: after => some (l.takeWhile (· != sep), after)
 
 /-- One attribute of a Set-Cookie applied to the cookie. -/
 def applyAttribute (validDate : String → Bool) (c : Cookie) (a : List Char) : Cookie :=
