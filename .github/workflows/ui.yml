@@ -9,7 +9,7 @@ on:
   # release-checks.yml gates releases on it.
   workflow_call:
   push:
-    branches: [browser, browser-ui, launch, fullstack]
+    branches: [browser-ui]
     paths:
       - '.github/workflows/ui.yml'
       - 'library/**'

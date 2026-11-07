@@ -8,15 +8,6 @@ on:
   workflow_dispatch:
   # release-checks.yml gates releases on it.
   workflow_call:
-  push:
-    branches: [dx, launch]
-    paths:
-      - 'src/**'
-      - 'templates/**'
-      - 'library/**'
-      - 'scripts/templates/**'
-      - 'scripts/serverless/**'
-      - '.github/workflows/dx-dev-loop.yml'
 permissions:
   contents: read
 concurrency:
@@ -42,11 +33,7 @@ jobs:
           node-version: 26.13.0
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: Download the pinned retained runtime input
         env:
           GH_TOKEN: ${{ github.token }}
@@ -147,11 +134,7 @@ jobs:
         with:
           name: dx-packed-candidate
           path: .work/node-candidate
-      - name: Enable the systemd user session (CPU quotas)
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: Build hono, express and fastify apps
         run: |
           set -e
