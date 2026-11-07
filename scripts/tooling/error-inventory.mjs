@@ -1,4 +1,4 @@
-// The inventory of errors the `lasm` CLI raises on purpose (docs/TESTING.md#error-corpus):
+// The inventory of errors the `lasm` CLI raises on purpose (docs/TESTING.md#dependable-tooling):
 // every `new Error(…)` in the modules a user's command reaches before a
 // program runs. The error corpus (error-corpus.mjs --inventory) counts a site
 // as covered when some case's output contains its message's fixed text: the

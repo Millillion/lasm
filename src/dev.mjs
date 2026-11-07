@@ -92,7 +92,8 @@ export function relevantFile(name) {
 }
 /** Files a build writes into the project itself (Lake's manifest). */
 export const generatedByBuild = file => basename(file) === 'lake-manifest.json';
-const ignoredDirectory = name => name === 'node_modules' || name.startsWith('.') || ['dist', 'build'].includes(name);
+// *.lasm-staging: the edge and browser writers' staging directories, created and removed during a build.
+const ignoredDirectory = name => name === 'node_modules' || name.startsWith('.') || name.endsWith('.lasm-staging') || ['dist', 'build'].includes(name);
 
 /** The watched files under `directory` (for content comparison and polling). */
 export function projectFiles(directory) {
@@ -137,7 +138,10 @@ export function watchProject(directory, onEvent, { pollMs = 1000, watchFile = wa
       if (event === 'rename' && !ignoredDirectory(String(name))) {
         let isDirectory = false;
         try { isDirectory = statSync(file).isDirectory(); } catch {}
-        if (isDirectory) { armTree(file); return onEvent(); }
+        // A directory may vanish between the event and its watch (a build's
+        // staging directory): watching it then throws ENOENT, which must not
+        // end lasm dev with a stack trace.
+        if (isDirectory) { try { armTree(file); } catch {} return onEvent(); }
         if (watchers.has(file)) { watchers.get(file).close(); watchers.delete(file); return onEvent(); }
       }
       if (relevantFile(String(name))) onEvent();

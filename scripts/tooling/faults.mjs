@@ -172,7 +172,9 @@ export async function runFaults({ lasm, pkg, only, work, target = 'node', log = 
   const root = temporaryDirectory('faults', work);
   const warmCache = join(root, 'warm-cache');
   const env = (cache = warmCache, extra = {}) => ({ LASM_TOOLCHAIN_CACHE: cache, ...extra });
-  const project = name => { const d = join(root, name); mkdirSync(d, { recursive: true }); writeTree(d, fixture); return d; };
+  // Every project is a directory named app (in its own parent): browser and
+  // edge outputs name the app after its directory (wrangler.toml, the loader).
+  const project = name => { const d = join(root, name, 'app'); mkdirSync(d, { recursive: true }); writeTree(d, fixture); return d; };
   const build = (directory, environment = env(), extra = {}) => runLasm(lasm, ['build', 'Main.lean', ...targetFlags], { cwd: directory, env: environment, timeoutMs: 1_200_000, ...extra });
   const output = directory => existsSync(join(directory, outDirectory)) ? treeHashes(join(directory, outDirectory)) : {};
   const selected = name => !only || only.some(o => name.startsWith(o));

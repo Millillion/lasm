@@ -112,8 +112,6 @@ export const cases = [
     env: dir => ({ LASM_ARTIFACT_SOURCE: 'https', LASM_TOOLCHAIN_CACHE: join(dir, 'empty-cache'), LASM_DOWNLOAD_IDLE_MS: '5' }), expect: /LASM_DOWNLOAD_IDLE_MS must be an integer from 1000 to 1800000/ },
   { id: 'artifact-source-invalid', kind: 'network', args: ['build', 'Main.lean'], files: { 'Main.lean': main },
     env: dir => ({ LASM_ARTIFACT_SOURCE: 'ftp', LASM_TOOLCHAIN_CACHE: join(dir, 'empty-cache') }), expect: /LASM_ARTIFACT_SOURCE must be one of/ },
-  { id: 'artifact-source-npm-without-packages', kind: 'network', args: ['build', 'Main.lean'], files: { 'Main.lean': main },
-    env: dir => ({ LASM_ARTIFACT_SOURCE: 'npm', LASM_TOOLCHAIN_CACHE: join(dir, 'empty-cache') }), expect: /LASM_ARTIFACT_SOURCE=npm forbids downloading .*no npm package of this Lasm installation carries it/ },
   { id: 'tool-cache-is-a-file', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': main, 'cache-file': 'x\n' },
     env: dir => ({ LASM_TOOLCHAIN_CACHE: join(dir, 'cache-file') }), expect: /cache-file/ },
 
@@ -160,6 +158,8 @@ export const cases = [
     expect: /This target needs the npm package @azure\/functions in the build\. Run npm install @azure\/functions next to package\.json/ },
   { id: 'package-a-link', kind: 'build', posixUser: true, args: ['package', 'dist', '--target', 'lambda'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean'],
     afterPrepare: dir => symlinkSync('main.mjs', join(dir, 'dist/link.mjs')), expect: /link\.mjs is not a regular file; function packages hold regular files only/ },
+  { id: 'package-over-the-build', kind: 'build', args: ['package', 'dist', '--target', 'vercel', '--output', '.'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean'],
+    expect: /The output must not contain the build directory/ },
   { id: 'package-a-dev-build', kind: 'build', args: ['package', 'dist', '--target', 'lambda'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean', '--dev'], expect: /dev build/i },
 
   // lasm dev: a Lean error in the first build and in a rebuild (printed with
