@@ -36,7 +36,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '41 4 * * *'
+    - cron: '47 3 * * 0,2-6'
   workflow_call:
     inputs:
       budget-min: { type: string, default: '0' }

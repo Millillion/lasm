@@ -2,7 +2,7 @@ name: Repeated cold installation confidence
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 3 * * *'
+    - cron: '17 3 * * 0,2-6'
 permissions:
   contents: read
 concurrency:
