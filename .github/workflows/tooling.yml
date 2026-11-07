@@ -61,11 +61,7 @@ jobs:
           node-version: 26.12.1
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: Download the pinned retained runtime input
         env:
           GH_TOKEN: ${{ github.token }}
@@ -109,11 +105,7 @@ jobs:
           node-version: 26.12.1
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - if: matrix.cli == 'candidate'
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
@@ -161,20 +153,12 @@ jobs:
           node-version: 26.12.1
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: tooling-packed-candidate
-          path: .work/node-candidate
+      - uses: ./.github/actions/process-guard
       - name: Install the candidate as a user would
-        run: |
-          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
-          echo '{"private":true}' > package.json
-          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: tooling-packed-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
       - name: Metamorphic build tests
         run: |
           # Not under run-bounded: it keeps 8 GiB of host headroom, which on a
@@ -202,15 +186,11 @@ jobs:
           node-version: 26.12.1
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: tooling-packed-candidate
-          path: .work/node-candidate
       - name: Install the candidate as a user would
-        run: |
-          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
-          echo '{"private":true}' > package.json
-          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: tooling-packed-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
       # Not under run-bounded: the full-disk scenarios mount small loop file
       # systems with sudo, which a transient systemd scope would not see.
       - name: Fault injection

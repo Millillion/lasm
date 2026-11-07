@@ -89,11 +89,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           package-manager-cache: false
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: npm ci
         working-directory: examples/porter
         run: npm ci --no-audit --no-fund
@@ -143,11 +139,7 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: npm ci
         working-directory: examples/porter
         run: npm ci --no-audit --no-fund
@@ -180,11 +172,7 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: npm ci
         working-directory: examples/porter
         run: npm ci --no-audit --no-fund
@@ -193,9 +181,9 @@ jobs:
         run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
       - name: The pinned Playwright's ${{ matrix.browser }}, with its system packages
         timeout-minutes: 30
-        run: |
-          npm install --prefix .work/pw --no-audit --no-fund playwright-core@1.63.0
-          bash scripts/ci/playwright-install.sh "${{ matrix.browser }}"
+        uses: ./.github/actions/playwright
+        with:
+          browsers: ${{ matrix.browser }}
       - name: The end-to-end tests
         working-directory: examples/porter
         env:

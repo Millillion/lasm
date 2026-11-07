@@ -1,0 +1,15 @@
+name: Process-tree guard (Linux)
+description: >-
+  Enables lingering for the runner user and exports XDG_RUNTIME_DIR and
+  DBUS_SESSION_BUS_ADDRESS, so scripts/full-lean/run-bounded.mjs can run
+  commands in transient systemd user scopes with memory limits.
+  docs/CI.md#shared-setup.
+runs:
+  using: composite
+  steps:
+    - name: Enable process-tree guard
+      shell: bash
+      run: |
+        sudo loginctl enable-linger "$(id -un)"
+        printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
+        printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"

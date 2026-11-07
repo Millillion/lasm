@@ -1,0 +1,35 @@
+name: Install a packed candidate as a user would
+description: >-
+  Downloads a candidate tarball packed earlier in the run (an Actions
+  artifact holding lasm-compiler-<version>.tgz) and installs it with npm into
+  a fresh $RUNNER_TEMP/lasm, as a user installs @lasm/cli. Output `lasm` is
+  the installed CLI's entry point. docs/CI.md#shared-setup.
+inputs:
+  artifact:
+    description: The artifact holding the packed tarball
+    required: true
+  version:
+    description: The candidate's version (lasm-compiler-<version>.tgz)
+    required: true
+outputs:
+  lasm:
+    description: The installed bin/lasm.mjs
+    value: ${{ steps.install.outputs.lasm }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      with:
+        name: ${{ inputs.artifact }}
+        path: .work/node-candidate
+    - name: npm install the tarball
+      id: install
+      shell: bash
+      env:
+        CANDIDATE: ${{ github.workspace }}/.work/node-candidate/lasm-compiler-${{ inputs.version }}.tgz
+      run: |
+        mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
+        echo '{"private":true}' > package.json
+        npm install "$CANDIDATE" --no-audit --no-fund
+        node node_modules/@lasm/compiler/bin/lasm.mjs --version
+        echo "lasm=$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" >> "$GITHUB_OUTPUT"

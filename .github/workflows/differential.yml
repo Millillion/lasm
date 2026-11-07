@@ -81,11 +81,7 @@ jobs:
           node-version: 26.13.0
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - name: Enable process-tree guard
-        run: |
-          sudo loginctl enable-linger "$(id -un)"
-          printf 'XDG_RUNTIME_DIR=/run/user/%s\n' "$(id -u)" >> "$GITHUB_ENV"
-          printf 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%s/bus\n' "$(id -u)" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/process-guard
       - name: Download the pinned retained runtime input
         env:
           GH_TOKEN: ${{ github.token }}
@@ -121,33 +117,17 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: differential-packed-candidate
-          path: .work/node-candidate
       - name: Install the candidate as a user would
-        run: |
-          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
-          echo '{"private":true}' > package.json
-          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
-          node node_modules/@lasm/compiler/bin/lasm.mjs --version
-      - name: The oracle's pin (upstream Lean 4.35.0 release archive)
-        id: lean
-        run: |
-          node -e "const a=require('./scripts/lean-dist/lean-4.35.0-upstream.json').lean['4.35.0'].artifacts['linux-x64']; console.log('url='+a.url); console.log('sha256='+a.sha256); console.log('root='+a.root)" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: lean-cache
+        uses: ./.github/actions/install-candidate
         with:
-          path: ${{ runner.temp }}/lean-archive
-          key: upstream-lean-${{ steps.lean.outputs.sha256 }}
-      - name: Native Lean (the oracle), wasmtime, Deno, Bun and SpiderMonkey
+          artifact: differential-packed-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: Native Lean (the oracle)
+        id: lean
+        uses: ./.github/actions/upstream-lean
+      - name: wasmtime, Deno, Bun and SpiderMonkey
         run: |
           set -euo pipefail
-          A="$RUNNER_TEMP/lean-archive"; mkdir -p "$A"
-          [ -f "$A/lean.tar.zst" ] || curl -fsSL --retry 3 -o "$A/lean.tar.zst" "${{ steps.lean.outputs.url }}"
-          echo "${{ steps.lean.outputs.sha256 }}  $A/lean.tar.zst" | sha256sum -c
-          mkdir -p "$RUNNER_TEMP/lean" && tar --zstd -xf "$A/lean.tar.zst" -C "$RUNNER_TEMP/lean"
-          "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin/lean" --version
           T="$RUNNER_TEMP/tools"; mkdir -p "$T/wasmtime"
           curl -fsSL --retry 3 -o "$T/wasmtime.tar.xz" "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasmtime-$WASMTIME_VERSION-x86_64-linux.tar.xz"
           echo "$WASMTIME_SHA256  $T/wasmtime.tar.xz" | sha256sum -c
@@ -161,12 +141,6 @@ jobs:
           echo "$JSSHELL_SHA256  $T/jsshell.zip" | sha256sum -c
           unzip -q "$T/jsshell.zip" -d "$T/jsshell"
           "$T/wasmtime/wasmtime" --version; "$T/node_modules/.bin/deno" --version; "$T/bun-linux-x64/bun" --version; "$T/jsshell/js" --version
-      - if: steps.lean-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        continue-on-error: true
-        with:
-          path: ${{ runner.temp }}/lean-archive
-          key: upstream-lean-${{ steps.lean.outputs.sha256 }}
       # One program pair (pull requests, pushes): Chromium only; a campaign: all three browsers.
       - name: Plan
         id: plan
@@ -176,23 +150,13 @@ jobs:
           echo "budget=$BUDGET" >> "$GITHUB_OUTPUT"
           if [ "$BUDGET" = 0 ]; then B="chromium"; else B="chromium firefox webkit"; fi
           echo "browsers=$B" >> "$GITHUB_OUTPUT"; echo "browsers-key=${B// /-}" >> "$GITHUB_OUTPUT"
-      - name: Playwright's browser builds, cached per version
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: pw-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ env.PLAYWRIGHT }}-differential-${{ steps.plan.outputs.browsers-key }}-ubuntu-24.04
-      - name: Pinned Playwright and its browsers
+      - name: Pinned Playwright and its browsers, cached per version
         timeout-minutes: 30
-        run: |
-          npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PLAYWRIGHT"
-          for b in ${{ steps.plan.outputs.browsers }}; do bash scripts/ci/playwright-install.sh "$b"; done
-      - if: steps.pw-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        continue-on-error: true
+        uses: ./.github/actions/playwright
         with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ env.PLAYWRIGHT }}-differential-${{ steps.plan.outputs.browsers-key }}-ubuntu-24.04
+          version: ${{ env.PLAYWRIGHT }}
+          browsers: ${{ steps.plan.outputs.browsers }}
+          cache-key: playwright-${{ env.PLAYWRIGHT }}-differential-${{ steps.plan.outputs.browsers-key }}-ubuntu-24.04
       - name: Differential run
         id: run
         run: |
@@ -207,7 +171,7 @@ jobs:
           if [ "$BUDGET" = 0 ]; then AMOUNT="--programs 3"; TARGETS="$DIFF_TARGETS_PR"; else AMOUNT="--budget-min $BUDGET"; TARGETS="$DIFF_TARGETS_FULL"; fi
           T="$RUNNER_TEMP/tools"
           node scripts/differential/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
-            --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/difftest" \
+            --lean-bin "${{ steps.lean.outputs.bin }}" --work "$RUNNER_TEMP/difftest" \
             --seed "$SEED" $AMOUNT --cases 150 --fs-cases 25 --targets "$TARGETS" \
             --profile "${{ matrix.profile }}" --regressions test/differential/regressions \
             --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js" --playwright "$GITHUB_WORKSPACE/.work/pw" 2>&1 | tee "$RUNNER_TEMP/difftest.log"
@@ -218,7 +182,7 @@ jobs:
         run: |
           T="$RUNNER_TEMP/tools"
           node scripts/differential/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
-            --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/difftest-dev" \
+            --lean-bin "${{ steps.lean.outputs.bin }}" --work "$RUNNER_TEMP/difftest-dev" \
             --programs 0 --targets "$DIFF_TARGETS_PR" --profile dev --regressions test/differential/regressions \
             --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js" --playwright "$GITHUB_WORKSPACE/.work/pw"
       # Recursion depth (issue #66): Node's default stack against native Lean's
@@ -278,35 +242,18 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: differential-packed-candidate
-          path: .work/node-candidate
       - name: Install the candidate as a user would
-        run: |
-          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
-          echo '{"private":true}' > package.json
-          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
-      - name: The oracle's pin (upstream Lean 4.35.0 release archive)
-        id: lean
-        run: |
-          node -e "const a=require('./scripts/lean-dist/lean-4.35.0-upstream.json').lean['4.35.0'].artifacts['linux-x64']; console.log('url='+a.url); console.log('sha256='+a.sha256); console.log('root='+a.root)" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        uses: ./.github/actions/install-candidate
         with:
-          path: ${{ runner.temp }}/lean-archive
-          key: upstream-lean-${{ steps.lean.outputs.sha256 }}
+          artifact: differential-packed-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
       - name: Native Lean (the oracle)
-        run: |
-          set -euo pipefail
-          A="$RUNNER_TEMP/lean-archive"; mkdir -p "$A"
-          [ -f "$A/lean.tar.zst" ] || curl -fsSL --retry 3 -o "$A/lean.tar.zst" "${{ steps.lean.outputs.url }}"
-          echo "${{ steps.lean.outputs.sha256 }}  $A/lean.tar.zst" | sha256sum -c
-          mkdir -p "$RUNNER_TEMP/lean" && tar --zstd -xf "$A/lean.tar.zst" -C "$RUNNER_TEMP/lean"
-          "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin/lean" --version
+        id: lean
+        uses: ./.github/actions/upstream-lean
       - name: Host fixtures
         run: |
           node integration/host-fixtures.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
-            --lean-bin "$RUNNER_TEMP/lean/${{ steps.lean.outputs.root }}/bin" --work "$RUNNER_TEMP/host-fixtures" \
+            --lean-bin "${{ steps.lean.outputs.bin }}" --work "$RUNNER_TEMP/host-fixtures" \
             --out "$RUNNER_TEMP/host-fixtures.json"
       - name: Preserve the report
         if: always()
@@ -342,16 +289,11 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: differential-packed-candidate
-          path: .work/node-candidate
       - name: Install the candidate as a user would
-        run: |
-          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
-          echo '{"private":true}' > package.json
-          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
-          node node_modules/@lasm/compiler/bin/lasm.mjs --version
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: differential-packed-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
       - name: Recursion depth
         run: |
           node scripts/ci/stack-depth.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
@@ -390,16 +332,11 @@ jobs:
           node-version: 26.13.0
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: differential-packed-candidate
-          path: .work/node-candidate
       - name: Install the candidate as a user would
-        run: |
-          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
-          echo '{"private":true}' > package.json
-          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
-          node node_modules/@lasm/compiler/bin/lasm.mjs --version
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: differential-packed-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
       - name: Native Lake build linking against the SDK's libSystem.tbd
         # Two native C-tier Lake builds peak near half of a 7 GB runner's RAM;
         # --host-fraction 0.7 (CI runners only) keeps them clear of the stop.
@@ -443,16 +380,14 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      - name: Install the candidate as a user would
+        uses: ./.github/actions/install-candidate
         with:
-          name: differential-packed-candidate
-          path: .work/node-candidate
-      - name: Install the candidate, wasmtime, Deno, Bun and wrangler (local workerd only)
+          artifact: differential-packed-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: Wasmtime, Deno, Bun and wrangler (local workerd only)
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
-          echo '{"private":true}' > package.json
-          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
           T="$RUNNER_TEMP/tools"; mkdir -p "$T/wasmtime"
           curl -fsSL --retry 3 -o "$T/wasmtime.tar.xz" "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasmtime-$WASMTIME_VERSION-x86_64-linux.tar.xz"
           echo "$WASMTIME_SHA256  $T/wasmtime.tar.xz" | sha256sum -c
@@ -495,16 +430,14 @@ jobs:
         with:
           node-version: 26.13.0
           package-manager-cache: false
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      - name: Install the candidate as a user would
+        uses: ./.github/actions/install-candidate
         with:
-          name: differential-packed-candidate
-          path: .work/node-candidate
-      - name: Install the candidate, Deno, Bun and wrangler (local workerd only)
+          artifact: differential-packed-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: Deno, Bun and wrangler (local workerd only)
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/lasm" && cd "$RUNNER_TEMP/lasm"
-          echo '{"private":true}' > package.json
-          npm install "$GITHUB_WORKSPACE/.work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" --no-audit --no-fund
           npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund deno@2.9.6 bun@1.4.4 wrangler@4.152.0
       - name: Async loop depth
         env:
