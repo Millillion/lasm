@@ -8,7 +8,9 @@ Each request draws its clock reading and four random values, runs
 version check (`Server/Sql.lean`): if another request committed in between,
 the commit is rolled back and the request runs again from the start (with
 the same random values), so every committed request saw the database exactly
-as it was when it committed.
+as it was when it committed. Each commit also inserts a receipt, an id from
+the request's random values, so a commit that landed but reported an error is
+recognised and not run again (issue #138).
 -/
 import Lasm.Fetch
 import Lasm.Fetch.Assets
@@ -77,18 +79,45 @@ def setup (db : Sql) (getEnv' : String → IO (Option String)) : Async Env := do
     sign := fun alg input => Crypto.sign (match alg with | .ES256 => es | .EdDSA => ed) input }
   return { cfg, db, crypto }
 
-/-- Runs a request, committing its writes; a commit that finds the version
-changed is retried (at most `fuel` times). -/
+/-- The request's commit receipt id: unique to the request (its four fresh
+values) and the same on every rerun (a rerun reuses `ctx`), and no secret
+(a SHA-256 of the fresh values, which are tokens, codes and cookies, not one
+of them). -/
+def receiptId (ctx : Ctx) : Async String :=
+  Crypto.sha256 s!"porter-commit:{ctx.fresh.a}:{ctx.fresh.b}:{ctx.fresh.c}:{ctx.fresh.d}"
+
+/-- Commits a request's writes (read at version `v`, answering `reply`) and
+returns the reply, or `none` if the request must run again. A commit that
+throws may have landed anyway (a lost reply from D1, a timeout after
+`COMMIT`): its receipt decides (`Porter.afterFailedCommit`). If the receipt
+is there, the commit landed and its reply stands; if not, a commit that
+found the version changed runs the request again. If even the receipt
+cannot be read, the version alone decides, as before receipts (the rerun
+may then answer an error, but cannot commit: its receipt's insert fails). -/
+def commitRequest (env : Env) (ctx : Ctx) (v : Nat) (reply : Reply) (w : List Write) : Async (Option Reply) := do
+  let id ← receiptId ctx
+  let committed ← try env.db.batch (commitStatements v id ctx.now w); pure true catch _ => pure false
+  if committed then return some reply
+  let landed ← try (some <$> receiptLanded env.db id) catch _ => pure none
+  let moved ← match landed with
+    | some true => pure false
+    | _ => (· != v) <$> version env.db
+  match afterFailedCommit landed moved with
+  | .stand => return some reply
+  | .rerun => return none
+  | .fail => throw (IO.userError "the database rejected a commit")
+
+/-- Runs a request, committing its writes (`commitRequest`); a commit that finds
+the version changed is retried (at most `fuel` times). -/
 def runRequest (env : Env) (ctx : Ctx) (r : Porter.Request) : Nat → Async Reply
   | 0 => return { status := 503 }
   | fuel + 1 => do
     let v ← version env.db
     let (reply, w) ← Porter.handle env.cfg env.crypto (reads env.db) ctx r
     if w.isEmpty then return reply
-    let committed ← try env.db.batch (commitStatements v w); pure true catch _ => pure false
-    if committed then return reply
-    else if (← version env.db) != v then runRequest env ctx r fuel
-    else throw (IO.userError "the database rejected a commit")
+    match ← commitRequest env ctx v reply w with
+    | some reply => return reply
+    | none => runRequest env ctx r fuel
 
 /-- Takes turns between requests that may write, within this process. -/
 def exclusive {α : Type} (writers : Option Std.Semaphore) (act : Async α) : Async α := do

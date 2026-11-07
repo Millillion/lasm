@@ -2,7 +2,7 @@
 
 **An OpenID Connect provider written in Lean 4 and compiled to WebAssembly by [Lasm](https://github.com/Millillion/lasm), with proofs.**
 Users sign in with a password and approve an application; the application gets an authorization code, then ID, access and refresh tokens: the authorization code flow with PKCE (S256 only), ID tokens signed with ES256 or EdDSA by the platform's Web Crypto, refresh-token rotation with reuse detection, sessions, consent and RP-initiated logout.
-196 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: a code is redeemed at most once and only by its client, for its exact redirect URI and with its PKCE verifier; Porter redirects only to registered URIs, compared exactly; a reused refresh token revokes its whole family; every ID token's claims are the session's and the client's; no error reveals a secret; and every request, however malformed, gets an answer ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement of OAuth 2.0, its security best current practice and OpenID Connect onto them).
+197 theorems, checked with no `sorry` and only Lean's standard axioms, prove properties of the code that actually runs: a code is redeemed at most once and only by its client, for its exact redirect URI and with its PKCE verifier; Porter redirects only to registered URIs, compared exactly; a reused refresh token revokes its whole family; every ID token's claims are the session's and the client's; no error reveals a secret; and every request, however malformed, gets an answer ([PROOFS.md](PROOFS.md); [SPEC.md](SPEC.md) maps each requirement of OAuth 2.0, its security best current practice and OpenID Connect onto them).
 
 Porter is an example of what Lasm can build, not a production identity
 provider: it has no rate limiting, no account management, no key rotation,
@@ -172,6 +172,24 @@ another commit came first, and the request runs again), so two requests can
 never both redeem one code or rotate one refresh token. Within one process,
 requests that may write also take turns. The adversarial suite's concurrent
 redemptions and refreshes check it.
+
+A commit can land and still report an error (a lost reply from D1, a timeout
+after `COMMIT`). So each commit also inserts a **commit receipt**, a row of
+the `commits` table keyed by an id unique to the request and the same when it
+runs again (a SHA-256 of the request's four random values, so no secret is
+stored). When a commit throws, the server looks for its receipt: if it is
+there, the commit landed and the request's reply stands; if not, the request
+runs again as above. Before receipts, such a request ran again against its own
+writes, found its code used or its refresh token rotated, answered
+`invalid_grant` and revoked the tokens it had just issued (#138). If even the
+receipt cannot be read, the version alone decides, as before: the request may
+run again and answer `invalid_grant`, but its commit then fails (a receipt is
+inserted once), so nothing it issued is revoked. Receipts are needed only for
+that moment, so each commit deletes the ones older than a day, in the same
+transaction (`commits (at)` is indexed). The table is created with the others
+(`CREATE TABLE IF NOT EXISTS`, on SQLite and D1 alike), so an existing database
+gains it on the next start. `Spec.landed_commit_stands` states the server's
+choice; the deterministic simulation checks it under ambiguous commits.
 
 ## The provider
 

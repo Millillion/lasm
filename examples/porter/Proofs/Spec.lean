@@ -296,4 +296,16 @@ def dead_refresh_refused : Prop :=
     param ps "grant_type" = .one "refresh_token" → (param ps "refresh_token").value? = some tok →
     D.refresh? (e.H tok) = some x → ¬ x.expires ≤ ctx.now ∧ x.family ∉ D.revoked
 
+/-! ## I. A commit that landed is not run again -/
+
+/-- **A landed commit stands** (issue #138): when a commit throws, the
+server (`afterFailedCommit`) runs the request again only if its commit
+receipt is not in the database (or could not be read) and another commit
+came in between; if the receipt is there, the commit landed and the
+request's reply stands, so a transient database error never makes a
+request run against its own writes. -/
+def landed_commit_stands : Prop :=
+  ∀ landed moved, afterFailedCommit (some true) moved = .stand ∧
+    (afterFailedCommit landed moved = .rerun ↔ landed ≠ some true ∧ moved = true)
+
 end Porter.Spec

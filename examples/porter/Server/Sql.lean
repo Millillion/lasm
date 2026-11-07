@@ -15,6 +15,21 @@ before the request's reads (a `CHECK` constraint fails otherwise, rolling
 the transaction back), then increments it; the server then runs the request
 again. So two requests can never both redeem one code or both rotate one
 refresh token, on any store.
+
+Commit receipts. Each commit also inserts a row into `commits`, keyed by an
+id unique to the request and the same on its reruns (`receiptId`,
+`Server/App.lean`). A commit can land and still throw (a lost reply from D1,
+a timeout after `COMMIT`); the server then looks for its receipt
+(`receiptLanded`): there, the commit landed and its reply stands; absent, it
+did not. The key also means a request's writes can never land twice: a
+second commit with the same receipt fails. Receipts are only needed for the
+moment between a failed commit and that check, so each commit deletes those
+older than `receiptLifetime` (a day: far past any retry, and past any
+plausible clock difference between instances), in the same transaction;
+`commits (at)` is indexed, so the delete costs one index range. The tables
+are created with `CREATE TABLE IF NOT EXISTS` on every start, so an existing
+database gains `commits` the first time a new server starts on it (SQLite on
+Node, Bun and Deno, D1 on Workers: one schema for all).
 -/
 import Lasm.JS
 import Porter.Store
@@ -56,7 +71,10 @@ def schema : List String := [
   "CREATE TABLE IF NOT EXISTS meta (k INTEGER PRIMARY KEY CHECK (k = 0), version INTEGER NOT NULL)",
   "INSERT OR IGNORE INTO meta (k, version) VALUES (0, 0)",
   "CREATE TABLE IF NOT EXISTS commit_guard (expected INTEGER NOT NULL, actual INTEGER NOT NULL,
-     CHECK (expected = actual))"]
+     CHECK (expected = actual))",
+  -- Commit receipts (issue #138): one row per commit, pruned after `receiptLifetime`.
+  "CREATE TABLE IF NOT EXISTS commits (id TEXT PRIMARY KEY, at INTEGER NOT NULL)",
+  "CREATE INDEX IF NOT EXISTS commits_at ON commits (at)"]
 
 /-! ## Rows -/
 
@@ -179,12 +197,24 @@ def version (db : Sql) : Async Nat := do
   return (← db.all "SELECT CAST(version AS TEXT) AS version FROM meta WHERE k = 0" #[])[0]?.map (nat · "version")
     |>.getD 0
 
-/-- A commit: the version check, then every write's statements, in order. -/
-def commitStatements (expected : Nat) (ws : List Write) : Array (String × Array Data) :=
+/-- How long a commit receipt is kept, in seconds. -/
+def receiptLifetime : Nat := 24 * 3600
+
+/-- A commit: the version check, the receipt (`receipt`, inserted at `now`,
+with the receipts older than `receiptLifetime` deleted), then every write's
+statements, in order. -/
+def commitStatements (expected : Nat) (receipt : String) (now : Nat) (ws : List Write) :
+    Array (String × Array Data) :=
   #[("INSERT INTO commit_guard (expected, actual) SELECT ?, version FROM meta WHERE k = 0", #[num expected]),
     ("DELETE FROM commit_guard", #[]),
-    ("UPDATE meta SET version = version + 1 WHERE k = 0", #[])] ++
+    ("UPDATE meta SET version = version + 1 WHERE k = 0", #[]),
+    ("DELETE FROM commits WHERE at < ?", #[num (now - receiptLifetime)]),
+    ("INSERT INTO commits (id, at) VALUES (?, ?)", #[toJS receipt, num now])] ++
   (ws.flatMap statements).toArray
+
+/-- Whether the commit with receipt `id` landed. -/
+def receiptLanded (db : Sql) (id : String) : Async Bool := do
+  return !(← db.all "SELECT 1 AS landed FROM commits WHERE id = ?" #[toJS id]).isEmpty
 
 /-- Creates the tables (each binding module runs this once at start). -/
 def migrate (db : Sql) : Async Unit := do
