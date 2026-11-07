@@ -62,7 +62,7 @@ export function parsePackageArguments(tokens) {
   }
   if (positional.length > 1) throw new Error(packageUsage);
   if (!result.target) throw new Error('--target is required\n\n' + packageUsage);
-  if (!packageTargets[result.target] && result.target !== 'browser') throw new Error(`Unknown target "${result.target}". Choose one of: ${[...Object.keys(packageTargets), 'browser'].join(', ')}`);
+  if (!Object.hasOwn(packageTargets, result.target) && result.target !== 'browser') throw new Error(`Unknown target "${result.target}". Choose one of: ${[...Object.keys(packageTargets), 'browser'].join(', ')}`);
   if (result.target === 'browser' && result.output !== undefined) throw new Error('lasm package --target browser checks the build in place; --output does not apply');
   result.input = positional[0] ?? 'dist';
   return result;

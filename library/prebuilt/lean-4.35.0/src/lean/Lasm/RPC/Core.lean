@@ -52,6 +52,48 @@ def Error.toString : Error → String
 
 instance : ToString Error := ⟨Error.toString⟩
 
+/-- Whether JSON text holds a number, outside strings, whose exponent has more
+than four significant digits (`1e10000`). Lean's parser computes
+`10 ^ exponent` for such a number, so a 90-byte request with `1E26191701`
+took the server's whole time and memory (test/fuzz, target lean-rpc). -/
+def hugeExponent (text : String) : Bool := Id.run do
+  let mut inString := false
+  let mut escaped := false
+  let mut afterDigit := false
+  -- `some n`: inside an exponent, with `n` significant digits so far.
+  let mut exponent : Option Nat := none
+  for c in text.toList do
+    if inString then
+      if escaped then escaped := false
+      else if c == '\\' then escaped := true
+      else if c == '"' then inString := false
+      continue
+    if let some n := exponent then
+      if c.isDigit then
+        if n == 0 && c == '0' then continue
+        if n + 1 > 4 then return true
+        exponent := some (n + 1)
+        continue
+      if (c == '+' || c == '-') && n == 0 then continue
+      exponent := none
+    if c == '"' then
+      inString := true
+      afterDigit := false
+    else if (c == 'e' || c == 'E') && afterDigit then
+      exponent := some 0
+      afterDigit := false
+    else afterDigit := c.isDigit || c == '.'
+  return false
+
+/-- `Json.parse`, refusing numbers with exponents of more than four digits
+(`hugeExponent`): use it for JSON from the network. -/
+def parseJson (text : String) : Except String Json :=
+  if hugeExponent text then .error "a number's exponent has more than four digits"
+  else Json.parse text
+
+#guard hugeExponent "{\"a\":1e10000}" && hugeExponent "[2E+26191701]" && hugeExponent "1.5e-99999"
+#guard !hugeExponent "{\"a\":1e9999,\"b\":\"1e99999\"}" && !hugeExponent "1e0000005" && !hugeExponent "[\"\\\"1e99999\"]"
+
 namespace Endpoint
 variable {Req Res : Type}
 
@@ -63,7 +105,7 @@ def encodeRequest [ToJson Req] (_ : Endpoint Req Res) (r : Req) : String := (toJ
 
 /-- A request body decoded and validated: what the server runs the handler on. -/
 def decodeRequest [FromJson Req] (e : Endpoint Req Res) (body : String) : Except Error Req := do
-  let j ← (Json.parse body).mapError fun m => Error.invalid s!"the request is not JSON: {m}"
+  let j ← (parseJson body).mapError fun m => Error.invalid s!"the request is not JSON: {m}"
   let r ← (fromJson? j : Except String Req).mapError fun m => Error.invalid s!"malformed request: {m}"
   match e.validate r with
   | .ok () => return r
@@ -89,7 +131,7 @@ def encodeResponse [ToJson Res] (_ : Endpoint Req Res) : Except String Res → S
 
 /-- The client's reading of an answer with this status and body. -/
 def decodeResponse [FromJson Res] (_ : Endpoint Req Res) (status : Nat) (body : String) : Except Error Res :=
-  match Json.parse body with
+  match parseJson body with
   | .error m => if 200 ≤ status && status < 300 then .error (.decode m) else .error (.failed status body)
   | .ok j =>
     match j.getObjVal? "ok", j.getObjValAs? String "error" with
