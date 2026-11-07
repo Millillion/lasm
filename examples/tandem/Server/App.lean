@@ -64,6 +64,13 @@ def syncOnce (env : Env) (doc : String) (req : Wire.Request) : Nat → Async (Wi
     if added.isEmpty then return (reply, n, [])
     let committed ← try env.db.batch (commitStatements doc n added); pure true catch _ => pure false
     if committed then return (reply, n, added)
+    -- The commit failed, or it committed and then reported an error (its
+    -- outcome unknown, as with a lost reply from D1). If the log now holds
+    -- exactly these operations at `n`, it committed: answer, and push them.
+    -- (Running the sync again would find them known and append nothing; when
+    -- this check cannot read the log, `handleSync` pushes them then.)
+    let landed ← try (do return (← rd.slice n added.length) == added) catch _ => pure false
+    if landed then return (reply, n, added)
     else
       -- Another commit took the positions. Where writers do not take turns
       -- (Workers), many racing writers could keep colliding: wait a random,
@@ -78,8 +85,19 @@ def handleSync (env : Env) (doc : String) (body : String) : Async String := do
   | .error e => return Wire.encodeReply (.error e)
   | .ok req =>
     let (reply, n, added) ← exclusive env.writers (syncOnce env doc req 40)
-    unless added.isEmpty do
+    if !added.isEmpty then
       env.push doc (Wire.encodeReply (.ops n (n + added.length) added))
+    else if !req.ops.isEmpty then
+      -- Every operation of the request was in the log already. Usually an
+      -- earlier request of this client appended and pushed them, but one whose
+      -- commit succeeded and then reported an error appended them without a
+      -- push (found by the deterministic simulation, test/dst.mjs). So push
+      -- the reply, the log from the client's cursor, which holds them (within
+      -- one chunk): a tab that is not typing hears of them, one that has them
+      -- ignores it, one that is behind catches up.
+      match reply with
+      | .ops _ _ (_ :: _) => env.push doc (Wire.encodeReply reply)
+      | _ => pure ()
     return Wire.encodeReply reply
 
 /-- Long-poll: the log from `cursor` as soon as it is longer, or nothing new. -/

@@ -10,6 +10,7 @@ npm run build        # the Node server (dist/server)
 npm start            # http://localhost:3000: the page, and the API under /api (PORT, HOST, DATABASE_PATH)
 npm test             # the API test against a fresh server
 npm run test:bank    # the bank workload: concurrent transfers and reads, every read sees the same total
+npm run build:sim && npm run test:dst    # the deterministic simulation: the bank workload under faults, crashes and racing commits (--seed N)
 npx playwright install chromium && npm run test:e2e   # the browser page's end-to-end tests (BROWSERS=chromium,firefox,webkit)
 npm run proofs       # check every theorem
 ```
