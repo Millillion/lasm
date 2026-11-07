@@ -7,6 +7,17 @@ name: Unit tests
 # listed in scripts/ci/unit-tests.mjs with the reason; every other failure fails
 # the job. Free runner, one job.
 on:
+  # Every pull request but one that changes only content/ or the five flagship
+  # apps (docs/CI.md). Docs changes run it: lint tests read the docs.
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - 'content/**'
+      - 'examples/conduit/**'
+      - 'examples/folio/**'
+      - 'examples/ledger/**'
+      - 'examples/porter/**'
+      - 'examples/tandem/**'
   workflow_dispatch:
   # release-checks.yml gates releases on it.
   workflow_call:
@@ -15,11 +26,12 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: unit-${{ github.ref }}
+  # github.workflow is the caller's name in a call: release-checks and ci-nightly never cancel each other.
+  group: unit-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   unit:
-    if: github.event.repository.visibility == 'public'
+    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 75
     permissions:

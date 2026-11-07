@@ -14,6 +14,7 @@ Notes for the next release, collected as changes land. They move to
 ## Testing (no change to how programs build or run)
 
 - **The library's proofs are checked on every library change.** `node scripts/library-proofs.mjs` (CI: `library-proofs.yml`) checks that every proposition has its theorem of exactly that type, that every theorem in the library uses only Lean's standard axioms, and that library/PROOFS.md is current.
+- **CI in four tiers** ([CI.md](../CI.md)): PR, nightly, weekly and release. Pull requests run Linux-first checks filtered by path, and use macOS only when macOS-specific code changes, so they wait less for scarce macOS runners. The unit suite now runs on every pull request. The release suites (browser, edge and Bun/Deno, WASI and Fastly, Lasm.UI, fullstack, the dev loop and the Lasm.JS stress test), which used to run only for a release, now run on `main` every night. A weekly tier adds 100-minute differential campaigns and a 200-run Lasm.JS soak. The release checks themselves are unchanged.
 
 ## Example apps
 

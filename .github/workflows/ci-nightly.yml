@@ -1,0 +1,149 @@
+name: Nightly tier
+# The nightly tier (docs/CI.md): the release suites that release-checks.yml runs
+# for a version bump, run every night on main, so a release never meets weeks-old
+# breakage. Each is the same reusable workflow release-checks calls, with the same
+# inputs: the unit suite, the browser target (WebKit on macOS too), the edge
+# targets and Bun/Deno on five platforms, WASI and Fastly, Lasm.UI, the
+# fullstack template, the dev loop and the Lasm.JS hang stress. The other
+# nightly checks keep their own schedules (fuzz, differential, tooling,
+# mutation, the example apps' campaigns, nightly.yml and so on; docs/CI.md).
+# Skips when main has not changed since the last passing run. Any failure opens
+# or updates the issue "Nightly tier failures on main"; a clean run closes it.
+# Not a release dependency: release-checks.yml never calls this workflow.
+on:
+  schedule:
+    - cron: '7 1 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Run even if main has not changed since the last passing run
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: ci-nightly-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  gate:
+    # On main; by hand on any branch (a rehearsal of a workflow change).
+    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    outputs:
+      run: ${{ steps.gate.outputs.run }}
+    steps:
+      - id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORCE: ${{ inputs.force == true || github.ref != 'refs/heads/main' }}
+        run: |
+          last=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci-nightly.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].head_sha // ""' || true)
+          if [ "$FORCE" != true ] && [ "$last" = "$GITHUB_SHA" ]; then
+            echo "main is at $GITHUB_SHA, as on the last passing run: nothing to do" | tee -a "$GITHUB_STEP_SUMMARY"
+            echo run=false >> "$GITHUB_OUTPUT"
+          else
+            echo run=true >> "$GITHUB_OUTPUT"
+          fi
+
+  unit:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/unit.yml
+
+  browser:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/browser.yml
+    with:
+      macos: true
+
+  edge:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/workers.yml
+    with:
+      release-check: true
+
+  wasi:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/wasi.yml
+    with:
+      release-check: true
+
+  ui:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ui.yml
+
+  fullstack:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/fullstack.yml
+    with:
+      release-check: true
+
+  dx:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/dx-dev-loop.yml
+
+  stress:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/lasm-js-stress.yml
+    with:
+      runs: '50'
+      cli-runs: '10'
+      timeout-s: '30'
+
+  report:
+    needs: [gate, unit, browser, edge, wasi, ui, fullstack, dx, stress]
+    if: always() && needs.gate.outputs.run == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Results, and the issue on main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULTS: ${{ toJSON(needs) }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ON_MAIN: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          failed=$(node -e "const n=JSON.parse(process.env.RESULTS);console.log(Object.entries(n).filter(([k,v])=>k!=='gate'&&v.result!=='success').map(([k,v])=>k+' ('+v.result+')').join(', '))")
+          { echo '### Nightly tier'; echo; echo "${failed:-all passed} at $GITHUB_SHA"; } >> "$GITHUB_STEP_SUMMARY"
+          [ "$ON_MAIN" = true ] || { [ -z "$failed" ]; exit; }
+          title='Nightly tier failures on main'
+          issue=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$title\" in:title" --json number,title --jq ".[] | select(.title == \"$title\") | .number" | head -1)
+          if [ -n "$failed" ]; then
+            body="The nightly tier ($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/main/docs/CI.md) failed on $GITHUB_SHA: $failed. Run: $RUN_URL"
+            if [ -n "$issue" ]; then gh issue comment "$issue" --repo "$GITHUB_REPOSITORY" --body "$body"; else gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "$body"; fi
+            exit 1
+          fi
+          if [ -n "$issue" ]; then gh issue close "$issue" --repo "$GITHUB_REPOSITORY" --comment "Passed on $GITHUB_SHA: $RUN_URL"; fi
