@@ -23,7 +23,8 @@
 //   - acknowledged edits are never lost: whenever a tab stops treating an
 //     operation as pending, the server's log has it (Spec.ack_stored, for the
 //     whole browser state machine), and the log only grows (append-only, each
-//     operation once: Spec.acked_never_lost, Spec.log_no_duplicates);
+//     operation once: Spec.acked_never_lost, Spec.log_no_duplicates), and
+//     everything appended is pushed, by its request or a later one;
 //   - an edit yields the typed text (Spec.edit_yields_text, checked in Lean);
 //   - the CRDT laws on the real log, at checkpoints: any order, with
 //     duplicates, one at a time or in bulk, gives the same document
@@ -79,6 +80,7 @@ class World {
     this.polls = new Map();          // id -> parked long-poll { cursor, timer }
     this.log = [];                   // the server's log as last seen
     this.ackedOps = new Set();          // every operation a tab treated as acknowledged
+    this.unpushed = [];                 // ranges of the log appended and not yet pushed
     this.events = 0;
     this.lawChecks = 0;
     this.clients = new Map();
@@ -362,12 +364,12 @@ class World {
     const before = this.log.length;
     if (n !== before) {
       this.checkLog();
-      // What a request appended is pushed to every open socket: an idle tab
-      // hears of it only so (Server/App.lean's handleSync).
-      const pushed = pushes.map(t => /^tandem 1\nops (\d+) (\d+)/.exec(t)).filter(Boolean).map(m => [Number(m[1]), Number(m[2])]);
-      this.checks.that(pushed.some(([a, b]) => a <= before && b >= n),
-        () => `the server appended operations ${before}..${n} without pushing them (pushes: ${JSON.stringify(pushed)}); a tab that is not typing never hears of them`);
+      this.unpushed.push([before, n]);
     }
+    // What a request appended is pushed to every open socket, by it or by a
+    // later request (an idle tab hears of it only so: Server/App.lean's handleSync).
+    const pushed = pushes.map(t => /^tandem 1\nops (\d+) (\d+)/.exec(t)).filter(Boolean).map(m => [Number(m[1]), Number(m[2])]);
+    this.unpushed = this.unpushed.filter(([a, b]) => !pushed.some(([x, y]) => x <= a && y >= b));
     // Long-polls waiting for the log to grow.
     for (const [pid, poll] of this.polls) if (n > poll.cursor && !poll.released) {
       poll.released = true; this.sched.cancel(poll.timer);
@@ -424,6 +426,7 @@ class World {
 
   report(r) {
     this.checkLog();
+    for (const [a, b] of this.unpushed) this.checks.fail(`the server appended operations ${a}..${b} and never pushed them; a tab that is not typing never hears of them`);
     const missing = [...this.ackedOps].filter(op => !this.log.includes(op));
     this.checks.that(missing.length === 0, () => `${missing.length} acknowledged operation(s) are not in the final log`);
     this.final = r;
