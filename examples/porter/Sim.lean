@@ -56,7 +56,7 @@ def simSql (s : Value) : Porter.Server.Sql where
 def headers (d : Data) : List (String × String) :=
   match d.field "headers" with
   | .array xs => xs.toList.filterMap fun
-    | .array kv => match kv[0]?, kv[1]? with
+    | .array kv => match (kv[0]? : Option Data), (kv[1]? : Option Data) with
       | some (.string k), some (.string v) => some (k, v)
       | _, _ => none
     | _ => none

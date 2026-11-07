@@ -356,7 +356,15 @@ class World {
     const duplicate = id >= DUP;
     const req = this.requests.get(duplicate ? id - DUP : id);
     const n = this.count();
-    if (n !== this.log.length) this.checkLog();
+    const before = this.log.length;
+    if (n !== before) {
+      this.checkLog();
+      // What a request appended is pushed to every open socket: an idle tab
+      // hears of it only so (Server/App.lean's handleSync).
+      const pushed = pushes.map(t => /^tandem 1\nops (\d+) (\d+)/.exec(t)).filter(Boolean).map(m => [Number(m[1]), Number(m[2])]);
+      this.checks.that(pushed.some(([a, b]) => a <= before && b >= n),
+        () => `the server appended operations ${before}..${n} without pushing them (pushes: ${JSON.stringify(pushed)}); a tab that is not typing never hears of them`);
+    }
     // Long-polls waiting for the log to grow.
     for (const [pid, poll] of this.polls) if (n > poll.cursor && !poll.released) {
       poll.released = true; this.sched.cancel(poll.timer);

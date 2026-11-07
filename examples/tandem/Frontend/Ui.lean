@@ -42,6 +42,9 @@ structure Model where
   ready : Bool := false
   /-- The number of pending operations the sync in flight carries. -/
   inflight : Option Nat := none
+  /-- A push did not continue the replica's log while a sync was in flight:
+  sync again when it returns, whatever it brings. -/
+  behind : Bool := false
   /-- The last sync failed: the server is unreachable. -/
   offline : Bool := false
   live : Live := .connecting
@@ -153,7 +156,7 @@ def syncCmd (m : Model) : Model × Cmd Msg :=
   if m.inflight.isSome || !m.ready then (m, .none)
   else
     let req := m.rp.request
-    ({ m with inflight := some req.ops.length },
+    ({ m with inflight := some req.ops.length, behind := false },
      Http.post s!"/doc/{m.doc}/sync" (Wire.encodeRequest req) (fun r => .synced req.ops.length (r.mapError (·.toString)))
        (contentType := "text/plain"))
 
@@ -199,14 +202,19 @@ def update (msg : Msg) (m : Model) : Model × Cmd Msg :=
     let (m, c) := if m.offline then (m, .none) else syncCmd m
     (m, c ++ Cmd.delay 400 .save)
   | .select start stop => ({ m with sel := (start, stop) }, .none)
-  | .syncNow => kick m .none
+  -- The retry after a failed sync: sync even with nothing pending (the failed
+  -- one may have been a catch-up), so the editor leaves "offline" and gets
+  -- what it missed.
+  | .syncNow =>
+    let (m, c) := syncCmd m
+    kick m c
   | .synced sent (.ok body) =>
     let m0 := { m with inflight := none }
     match Wire.decodeReply body with
     | .ok reply =>
       let m1 := { m0 with rp := m0.rp.onReply sent reply, offline := false }
       let (m2, c) := refresh m m1
-      let more := !m2.rp.pending.isEmpty || Replica.full reply
+      let more := !m2.rp.pending.isEmpty || Replica.full reply || m.behind
       if more then let (m3, c2) := syncCmd m2; (m3, c ++ c2) else (m2, c)
     | .error _ => ({ m0 with offline := true }, Cmd.delay 2000 .syncNow)
   | .synced _ (.error _) => ({ m with inflight := none, offline := true }, Cmd.delay 2000 .syncNow)
@@ -215,8 +223,15 @@ def update (msg : Msg) (m : Model) : Model × Cmd Msg :=
     | .ok reply =>
       let rp := m.rp.onPush reply
       if rp.cursor == m.rp.cursor then
-        -- Not the next part of the log: catch up with a sync.
-        kick m (syncCmd m).2
+        -- Not the next part of the log: catch up with a sync, or, if one is in
+        -- flight, with another when it returns. (Sending a second sync while
+        -- one is in flight would let the first reply's `sent` drop operations
+        -- the second carries from `pending`: found by the deterministic
+        -- simulation, test/dst.mjs.)
+        if m.inflight.isSome then ({ m with behind := true }, .none)
+        else
+          let (m, c) := syncCmd m
+          kick m c
       else refresh m { m with rp }
     | .error _ => (m, .none)
   | .wsOpen =>
