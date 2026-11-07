@@ -1,0 +1,54 @@
+name: Library proofs
+# The proofs of Lasm's own library (library/PROOFS.md), as conduit.yml's
+# proofs job does for Conduit: scripts/library-proofs.mjs compiles the proof
+# modules (library/Lasm/UI/Proofs*, each library's Spec.lean and
+# Theorems.lean) against the compiled library with the managed Lean 4.35.0,
+# checks that every proposition of a Spec.lean has its theorem of exactly
+# that type and that every theorem uses only propext, Classical.choice and
+# Quot.sound (no sorry), and that library/PROOFS.md is current.
+# Free runner only.
+on:
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
+    paths:
+      - '.github/workflows/library-proofs.yml'
+      - 'library/**'
+      - 'scripts/library-proofs.mjs'
+      - 'test/library-proofs/**'
+      - 'src/lasm-library.mjs'
+      - 'src/managed-lean.mjs'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/library-proofs.yml'
+      - 'library/**'
+      - 'scripts/library-proofs.mjs'
+      - 'test/library-proofs/**'
+      - 'src/lasm-library.mjs'
+      - 'src/managed-lean.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: library-proofs-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  proofs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CI: '1'
+      BROWSER: 'none'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: The library's proofs and library/PROOFS.md
+        run: |
+          if grep -rnw sorry library/Lasm --include=*.lean; then echo "::error::sorry in the library"; exit 1; fi
+          node scripts/library-proofs.mjs
