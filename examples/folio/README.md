@@ -13,6 +13,8 @@ npm run test:cli             # build the example site and check it
 npm run build:batch          # the renderer as a Node program (dist/batch), for the tests
 npm test                     # the CommonMark specification's 652 examples
 npm run test:differential    # random documents, Folio against commonmark.js (the seed is printed first)
+npm run build:batch-wasi && node test/spec.mjs --engine wasmtime       # the 652 examples on WASI (or wasmer, node-wasi)
+npm run build:batch-browser && node test/spec.mjs --engine chromium    # in a headless browser (or firefox, webkit)
 npm run proofs               # check every theorem
 ```
 
@@ -51,7 +53,10 @@ behaviour, for trusted text only.
 The CommonMark specification comes with its own tests, and the reference implementation is on npm,
 so Folio is checked against both ([folio.yml](../../.github/workflows/folio.yml)):
 
-- **The specification's 652 examples** ([`test/spec.mjs`](test/spec.mjs)), taken from the
+- **The specification's 652 examples** ([`test/spec.mjs`](test/spec.mjs)) on every target the
+  renderer runs on (`--engine`: the Node build, the WASI build on wasmtime, wasmer and
+  `node:wasi`, the browser build in headless Chromium, Firefox and WebKit, and the edge server on
+  Fastly, Workers and Deno Deploy's build; [folio-platforms.yml](../../.github/workflows/folio-platforms.yml)), taken from the
   [commonmark-spec](https://github.com/commonmark/commonmark-spec) repository at tag `0.31.2` and
   vendored with its license ([`test/commonmark-spec`](test/commonmark-spec)). With raw HTML enabled,
   as the specification expects, all 652 pass byte for byte. With the safe defaults, 580 are
@@ -118,6 +123,36 @@ The tests ([`test/e2e`](test/e2e)) check that the sample renders, that the previ
 edit, that the page and the server produce the same HTML, and that hostile Markdown (`<script>`,
 `onerror`, `<iframe src="javascript:…">`, `javascript:` links, `onload`) runs nothing: no dialog,
 no script or frame element, no handler attribute, every element one of Folio's.
+
+## At the edge
+
+[`ServerEdge.lean`](ServerEdge.lean) serves a site from the platform's key-value store
+(`Lasm.KV.open "folio"`). Every request builds the site from the store with `Folio.Site.build`, the
+function `folio build` runs, and answers with the page it asks for. `GET /` serves the index,
+`/feed.xml` the feed and `/SLUG/` a page (`/SLUG` redirects there). `POST /api/render` renders the
+request's body: by default with the safe defaults, as HTML; with `?raw_html=1` with raw HTML
+enabled, as text. No request writes to the store. The site changes when its files in the store
+change.
+
+The store holds each file of the site's directory under its path (`index.md`, `content/hello.md`,
+`layouts/page.html`), and `files`, the list of those paths, one per line.
+[`tools/kv.mjs`](tools/kv.mjs) writes them in each platform's format:
+
+| Platform | Build | Store | Run locally |
+| --- | --- | --- | --- |
+| Fastly Compute | `npm run build:fastly` | the KV Store `folio` | `viceroy serve -C fastly.toml bin/main.wasm` (`fastly.toml`'s local KV Store holds `site/`: `node tools/kv.mjs fastly > fastly.toml`) |
+| Cloudflare Workers | `npm run build:workers` | Workers KV, the binding `folio` ([wrangler.toml](wrangler.toml)) | `node tools/kv.mjs json > kv.json && npx wrangler kv bulk put kv.json --binding folio --local`, then `npx wrangler dev` |
+| Deno Deploy | `npm run build:deno-deploy` | Deno KV, keys `["folio", path]` | `deno run -A --unstable-kv --location http://folio.test/ tools/kv.mjs deno`, then `deno run -A --unstable-kv --location http://folio.test/ deno/main.mjs` |
+
+To deploy, put the same entries in the deployed store (`wrangler kv bulk put` without `--local`; a
+Fastly KV Store linked to the service; on Deno Deploy, `tools/kv.mjs deno site DATABASE_URL`).
+[`test/edge.mjs`](test/edge.mjs) checks each platform on its local tooling only
+([folio-platforms.yml](../../.github/workflows/folio-platforms.yml)). It puts the example site in the store, and every page served must be
+byte for byte the page `folio build` writes, with the right content type, from the platform's
+store. A draft is 404, an unknown page is 404, there are no redirects off the site, and other
+methods get 405. A changed site in a new store (a new page with a new layout, an edited page, a
+page made a draft) must be served the same way. Then the 652 examples run on the server through
+`POST /api/render`.
 
 ## Untrusted input can't crash it or stall it
 
@@ -190,8 +225,9 @@ fuzzing and twenty differential seeds of larger documents.
 | [`Proofs/`](Proofs) | The proofs, and the HTML tokenizer the propositions use |
 | [`Cli.lean`](Cli.lean), [`site/`](site) | The `folio` command, and an example site |
 | [`Preview/Page.lean`](Preview/Page.lean), [`PreviewClient.lean`](PreviewClient.lean), [`PreviewServer.lean`](PreviewServer.lean) | The live preview and its server |
-| [`Batch.lean`](Batch.lean) | Renders many documents in one run, for the tests |
-| [`test/`](test) | The specification's examples, the differential test, the pathological inputs and the fuzzer, the command's checks, the proof checks |
+| [`ServerEdge.lean`](ServerEdge.lean), [`tools/kv.mjs`](tools/kv.mjs) | The site server for Fastly, Workers and Deno Deploy, and the store's entries for a site |
+| [`Batch.lean`](Batch.lean), [`BatchBrowser.lean`](BatchBrowser.lean), [`Folio/Batch.lean`](Folio/Batch.lean) | Renders many documents in one run (Node, WASI, the browser), for the tests |
+| [`test/`](test) | The specification's examples, the edge platforms' tests, the differential test, the pathological inputs and the fuzzer, the command's checks, the proof checks |
 
 Every function is total, with no `partial`: loops run over bounded ranges, and recursion is
 structural or on a decreasing measure. `npm run proofs` checks that none of the 583 definitions
