@@ -296,6 +296,43 @@ test('adapter helpers: one Cookie header, Set-Cookie as cookie objects, Azure re
   assert.deepEqual([plain.cookies, plain.headers.getSetCookie()], [[{ name: 'a', value: '1' }], ['b=2; Partitioned; Secure']]);
 });
 
+test('adapter helpers: request targets, outgoing fields, textual bodies, web replies (the Lean model, library/Lasm/Serverless)', async () => {
+  const { requestTarget, outgoingHeaders, plainHost, isTextual, joinCookies, webReply } = await import('../src/serverless/lasm-server.mjs');
+  // A valid target is sent unchanged: escapes, `://`, a malformed escape in the query.
+  assert.equal(requestTarget('/go/https://example.com/a%20b', 'q=%E0&x=1'), '/go/https://example.com/a%20b?q=%E0&x=1');
+  assert.equal(requestTarget('', ''), '/');
+  assert.equal(requestTarget(undefined, undefined), '/');
+  // A decoded path (API Gateway REST): what a target cannot carry is percent-encoded as UTF-8, `?` and `#` included.
+  assert.equal(requestTarget('/a b?c#d/é/\u{1F600}', 'a b#c?d'), '/a%20b%3Fc%23d/%C3%A9/%F0%9F%98%80?a%20b%23c?d');
+  assert.equal(requestTarget('/\uD800'), '/%EF%BF%BD', 'a lone surrogate as U+FFFD, not a URIError');
+  assert.equal(requestTarget('/x\x7f\x00'), '/x%7F%00');
+
+  assert.deepEqual([plainHost('example.com:8080'), plainHost('[::1]:3000'), plainHost(''), plainHost('x/admin#'), plainHost('a b'),
+    plainHost('u@h'), plainHost('h\\x'), plainHost('h?'), plainHost('é')], [true, true, false, false, false, false, false, false, false]);
+  // One Host: the first plain one, else the default; no hop-by-hop field, the body's Content-Length.
+  assert.deepEqual(outgoingHeaders([['Host', 'x/admin#'], ['host', 'a.example'], ['HOST', 'b.example'], ['Connection', 'close'],
+    ['Content-Length', '99'], ['x', '1']], 3, '127.0.0.1:1'), [['host', 'a.example'], ['x', '1'], ['content-length', '3']]);
+  assert.deepEqual(outgoingHeaders([['Host', 'x/admin#'], ['Cookie', 'a=1'], ['cookie', 'b=2']], 0, '127.0.0.1:1'),
+    [['Cookie', 'a=1; b=2'], ['host', '127.0.0.1:1']]);
+  assert.deepEqual(outgoingHeaders([], 0, 'h:1'), [['host', 'h:1']]);
+  // Empty Cookie fields carry nothing: none is sent.
+  assert.deepEqual(joinCookies([['cookie', ''], ['x', '1'], ['Cookie', '']]), [['x', '1']]);
+
+  // Text only when the type is textual and the body is valid UTF-8.
+  assert.equal(isTextual([['content-type', 'text/html; charset=iso-8859-1']], Buffer.from([0x63, 0xe9])), false);
+  assert.equal(isTextual([['content-type', 'text/html']], Buffer.from('café')), true);
+  assert.equal(isTextual([['content-type', 'application/problem+json']]), true);
+  assert.equal(isTextual([['content-type', 'application/jsonx']]), false);
+  assert.equal(isTextual([['content-type', 'text/plain'], ['content-encoding', 'gzip']], Buffer.from('x')), false);
+  assert.equal(isTextual([], Buffer.from([0xff])), false);
+
+  const reply = (status, body = '') => ({ status, statusText: 'S', headers: [['x', '1'], ['x', '2']], body: Buffer.from(body) });
+  const ok = webReply(reply(200, 'hi'), 'GET');
+  assert.deepEqual([ok.status, ok.headers.get('x'), await ok.text()], [200, '1, 2', 'hi']);
+  for (const [r, method] of [[reply(204, 'x'), 'GET'], [reply(304, 'x'), 'GET'], [reply(200, 'x'), 'HEAD'], [reply(303), 'GET']])
+    assert.equal(webReply(r, method).body, null, `${r.status} ${method}`);
+});
+
 test('a program that does not listen fails clearly', () => {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-nolisten-'));
   const app = fakeApplication(join(directory, 'dist'));

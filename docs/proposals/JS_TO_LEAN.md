@@ -2,9 +2,10 @@
 
 Status: written 2026-11-07 for the ROADMAP item "Move JavaScript glue code into
 Lean where it can be proved, starting with what mutation testing shows is
-riskiest" (issue #21). The first two candidates are implemented (PR #151,
-the UI patch encoding; the Lasm.JS value codec, issue #154); the rest are
-proposals.
+riskiest" (issue #21). The first three candidates are implemented (PR #151,
+the UI patch encoding; the Lasm.JS value codec, issue #154; the
+function-platform mapping, specified in Lean and checked by fuzzing); the
+rest are proposals.
 
 ## What can move, and what cannot
 
@@ -142,25 +143,72 @@ breaks if it is wrong, how much of it is pure) against what it costs.
   format (test/node-js.test.mjs, test/edge-js.test.mjs), including the new
   length check. Revisit if the host files are ever bundled.
 
-### 3. Function-platform request and response mapping (src/serverless/)
+### 3. Function-platform request and response mapping (src/serverless/) — done
 
 - **What it is.** Event to request (API Gateway REST and HTTP, function URLs,
-  ALB, CloudFront), `joinCookies`, `parseSetCookie`, `azureReply`,
-  `isTextual`. Pure, and the most exposed code Lasm has: every byte of it is
-  chosen by a client. Real bugs have been found here: a malformed percent
-  escape in an ALB query that turned the request into a 502 (found by the
-  fuzz target), and cookies sent twice by some gateways (#80).
-- **Why it does not move now.** The shim runs before and outside the Lean
+  ALB, CloudFront), the fields forward() and pipe() send, `joinCookies`,
+  `parseSetCookie`, `azureReply`, `webReply`, `isTextual`. Pure, and the most
+  exposed code Lasm has: every byte of it is chosen by a client.
+- **Why it does not move.** The shim runs before and outside the Lean
   program: it forwards to the program's own HTTP server over loopback, and
   that server may be Express or Hono, not Lean. Calling Lean would mean
   shipping a second, Lean-compiled Wasm module (with its own copy of the
   Lean runtime) in every function package, instantiated on every cold start,
   and a marshalled call per request, to replace about 200 lines of
   JavaScript.
-- **What to do instead.** Specify it: a Lean model of the mapping with
-  theorems (each cookie arrives once; query values decoded by the platform
-  are re-encoded to the same values; the body round-trips), and the fuzz
-  target's oracle checked against the model. Worth doing after candidate 2.
+- **What was done instead: a model, its theorems, and the fuzzer checking the
+  JavaScript against it.** [library/Lasm/Serverless/Proofs/Model.lean](../../library/Lasm/Serverless/Proofs/Model.lean)
+  is the mapping in Lean, function for function lasm-lambda.mjs and
+  lasm-server.mjs (its header maps each Lean function to its JavaScript one).
+  [Lasm/Serverless/Spec.lean](../../library/Lasm/Serverless/Spec.lean) states
+  20 propositions, proved in Lasm.Serverless.Proofs.Mapping (87 theorems,
+  only the standard axioms; [library/PROOFS.md](../../library/PROOFS.md)):
+  every forwarded target is one http.request accepts; the path a server sees
+  is the event's path and the query its query (`target_split`), unchanged
+  when it is already valid, so `://` in a path and `%E0` in an ALB query go
+  through as they are; no header chooses the target; exactly one Host is
+  sent and it is plain, and a plain Host cannot move the path of the URL a
+  server builds from it (`host_once`, `host_url`); what `URLSearchParams`
+  writes decodes to the same pairs (`form_roundtrip`), so API Gateway
+  REST's decoded query values arrive with the same values; at most one
+  Cookie field, never empty, and a payload 2.0 event's cookies once
+  (#80); every other field goes through in order; the body is the
+  server's byte for byte; every reply field reaches each response shape
+  (CloudFront: every field it accepts); and every cookie object Azure gets
+  arrives unchanged when at most one Set-Cookie would change. Left to the
+  platform: Node's base64, `Date.parse`, `Number`, the order of a
+  JavaScript object's keys.
+- **How the oracle runs the model.** The serverless-http fuzz target sends
+  each input's event and reply as one JSON line to `lean --run
+  test/fuzz/support/ServerlessModel.lean` (the model compiled to an .olean
+  by `test/fuzz/support/serverless-model.mjs`, the managed Lean 4.35.0) and
+  fails unless the JavaScript's request, response, Azure and Netlify replies
+  and parsed cookies are exactly the model's. Required in CI (fuzz.yml: the
+  replay on every pull request, the nightly and weekly campaigns). Chosen
+  over the alternatives because it checks every input a campaign makes, not
+  only those of a table, and needs only Lean: a golden table written by Lean
+  would check only its own cases, and a Lasm (Wasm) build of the model would
+  put the Lean runtime and a link in front of a JavaScript fuzz target. One
+  long-lived process interprets the few hundred lines of pure Lean in well
+  under a millisecond per input (about 300 inputs a second with the model,
+  locally).
+- **What it found.** The shim disagreed with the model in five places, each
+  a shim bug, now fixed with a regression input
+  (test/fuzz/regressions/serverless-http/) and unit tests
+  (test/serverless.test.mjs): a decoded path or an unencoded query (a space,
+  a non-ASCII character, `?`, `#`) made http.request throw, a 502, or moved
+  part of the path into the query (`requestTarget` percent-encodes what a
+  target cannot carry); a forged Host reached servers that build their URL
+  from it, as Hono's Node adapter does (`outgoingHeaders` keeps the first plain
+  Host, else the loopback address, as Lasm.Fetch already did); empty Cookie
+  fields were forwarded; a Latin-1 `text/html` body went as text and lost its
+  accented letters (`isTextual` now also asks for valid UTF-8); and a reply
+  field named `__proto__` or `constructor` was dropped or threw a
+  `TypeError` in the Lambda and CloudFront responses (header maps without a
+  prototype).
+- **Runtime cost.** Two regular-expression replacements per request target
+  and a UTF-8 check of each Lambda response body; no change to what a
+  package ships beyond the shim's own code.
 
 ### 4. Path and URL handling
 
@@ -190,6 +238,9 @@ simplifying it (issue #21, "shrink it to its irreducible state").
    round-trip theorem, and the u32 length check it surfaced. The two
    JavaScript copies stay (sharing them would change every host output).
 
-After those, specify the function-platform mapping in Lean (candidate 3).
+3. **The function-platform mapping** (done): specified in Lean
+   (Lasm.Serverless, 20 propositions), the fuzz oracle checking the shim
+   against the model on every input; five shim bugs fixed.
+
 Candidates 4 and 5 need no move: their proofs, where useful, are about Lean
 code that already exists, and their JavaScript is calls to the platform.

@@ -2,7 +2,8 @@
 // (docs/DECISIONS.md, 2026-11-07), as examples/conduit/test/proofs.mjs does
 // for Conduit:
 //
-// 1. compiles the proof modules (library/Lasm/UI/Proofs*, Lasm/JS/Proofs*, and each library's
+// 1. compiles the proof modules (library/Lasm/UI/Proofs*, Lasm/JS/Proofs*, Lasm/Serverless/Proofs*
+//    (the model of src/serverless/), and each library's
 //    Spec.lean and Theorems.lean) against Lasm's compiled library with the
 //    managed Lean 4.35.0, then runs test/library-proofs/Axioms.lean, which
 //    fails unless every proposition of a Spec.lean has its theorem (of
@@ -38,8 +39,9 @@ const jsonPath = process.env.LIBRARY_PROOFS_JSON ?? join(work, 'proofs.json');
 const proofModules = ['Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.Proofs.Children',
   'Lasm.UI.Proofs.TwoEnded', 'Lasm.UI.Proofs.Diff', 'Lasm.UI.Proofs', 'Lasm.UI.Proofs.Decode', 'Lasm.UI.Proofs.Wire', 'Lasm.UI.Spec', 'Lasm.UI.Theorems',
   'Lasm.RPC.Spec', 'Lasm.RPC.Theorems', 'Lasm.KV.Spec', 'Lasm.KV.Theorems', 'Lasm.Fetch.Spec', 'Lasm.Fetch.Theorems',
-  'Lasm.JS.Proofs.Wire', 'Lasm.JS.Spec', 'Lasm.JS.Theorems'];
-const libraries = ['Lasm.UI', 'Lasm.RPC', 'Lasm.KV', 'Lasm.Fetch', 'Lasm.JS'];
+  'Lasm.JS.Proofs.Wire', 'Lasm.JS.Spec', 'Lasm.JS.Theorems',
+  'Lasm.Serverless.Proofs.Model', 'Lasm.Serverless.Proofs.Mapping', 'Lasm.Serverless.Spec', 'Lasm.Serverless.Theorems'];
+const libraries = ['Lasm.UI', 'Lasm.RPC', 'Lasm.KV', 'Lasm.Fetch', 'Lasm.JS', 'Lasm.Serverless'];
 const sourceOf = module => join(library, ...module.split('.')) + '.lean';
 
 async function check() {
