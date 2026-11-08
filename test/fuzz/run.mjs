@@ -99,7 +99,7 @@ function runJs(name) {
     }, 250);
     worker.on('message', message => {
       if (message.type === 'failure') failures.push(message);
-      else if (message.type === 'stats') console.log(`  ${name}: ${message.execs} runs, corpus ${message.corpus}, ${message.blocks} blocks, ${message.features} features`);
+      else if (message.type === 'stats') console.log(`  ${name}: ${message.execs} runs, corpus ${message.corpus}, ${message.blocks} blocks, ${message.features} features, heap ${message.heapMb} MB`);
       else if (message.type === 'done') {
         result = message;
         if (message.crash) failures.push({ file: message.crash, error: message.error });

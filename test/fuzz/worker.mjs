@@ -5,6 +5,7 @@
 // block a new number of times (libFuzzer's count buckets), joins the corpus.
 // The current input is mirrored into shared memory before each run, so the
 // main thread can save it when a run hangs (it then terminates this worker).
+// Between runs the event loop turns, so timers a run queued fire (execute).
 import { workerData, parentPort } from 'node:worker_threads';
 import { Session } from 'node:inspector';
 import { createHash } from 'node:crypto';
@@ -36,6 +37,13 @@ async function execute(input) {
     return undefined;
   } catch (error) {
     return error ?? new Error('undefined thrown');
+  } finally {
+    // Let the tasks the run queued run, as a page's would between frames.
+    // Awaiting only settled promises never leaves the microtask queue, so the
+    // timers phase never came: ui-patch's decoder queues setTimeout(sweep, 0)
+    // after each removal, and every unmounted UI and its DOM stayed reachable
+    // from its pending timer until the heap ran out (issue #160).
+    await new Promise(resolve => setImmediate(resolve));
   }
 }
 
@@ -126,7 +134,7 @@ if (mode === 'replay') {
     if (features() > 0) keep(input, true);
     if (Date.now() - lastReport > 10_000) {
       lastReport = Date.now();
-      parentPort.postMessage({ type: 'stats', execs, corpus: corpus.length, features: seen.size, blocks: blocks.size });
+      parentPort.postMessage({ type: 'stats', execs, corpus: corpus.length, features: seen.size, blocks: blocks.size, heapMb: Math.round(process.memoryUsage().heapUsed / 1048576) });
     }
   }
   stop(crashed?.file, crashed?.error);
