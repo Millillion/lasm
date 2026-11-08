@@ -466,7 +466,12 @@ count buckets), joins the corpus. The mutations are libFuzzer's (bits, bytes,
 interesting values, insertions, deletions, copies, splices, dictionary tokens)
 plus whole 0x00-separated fields replaced or dropped, since the targets read
 their inputs as fields (`test/fuzz/input.mjs`). The main thread mirrors each
-input in shared memory and saves it when a run does not finish in 10 s. Jazzer.js
+input in shared memory and saves it when a run does not finish in 10 s.
+Between runs the worker lets the event loop turn, so the timers a run queued
+(the patch decoder's deferred sweep of removed nodes) fire as they would in a
+page; when they never fired, each unmounted UI stayed reachable from its timer
+and the ui-patch worker ran out of memory after about 50,000 runs (issue #160).
+Progress lines print the worker's heap. Jazzer.js
 was not used: it instruments CommonJS through Babel hooks and does not
 instrument ES modules, which all of Lasm's JavaScript is; fast-check is a
 property tester without coverage feedback. The Lean targets are
