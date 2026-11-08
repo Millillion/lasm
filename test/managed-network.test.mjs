@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer as httpsServer } from 'node:https';
+import { createSecureServer as http2Server } from 'node:http2';
 import { createServer as httpServer } from 'node:http';
 import { connect } from 'node:net';
 import { readFile, writeFile, mkdtemp, rm } from 'node:fs/promises';
@@ -14,25 +15,29 @@ import { createInstallerCertificate } from './fixtures/create-installer-certific
 const bytes = Buffer.from('real TLS transport fixture, complete and authenticated');
 const childScript = fileURLToPath(new URL('./fixtures/download-network.mjs', import.meta.url));
 
-async function setup(t) {
+async function setup(t, { stallTunnels = 0, http2 = false } = {}) {
   const base = await mkdtemp(join(tmpdir(), 'lasm-tls-fault-'));
   const ephemeral = createInstallerCertificate(), certificate = join(base, 'test-ca.pem');
   await writeFile(certificate, ephemeral.certificate);
-  const requests = [], tunnels = [], sockets = new Set(), counters = new Map();
+  const requests = [], protocols = [], tunnels = [], sockets = new Set(), counters = new Map();
   const track = socket => { sockets.add(socket); socket.once('close', () => sockets.delete(socket)); };
-  const server = httpsServer({ key: ephemeral.privateKey.export({ type: 'pkcs8', format: 'pem' }), cert: ephemeral.certificate }, (req, res) => {
+  // With http2, ALPN offers h2 too (as GitHub's release CDN does); a client
+  // that asks for it multiplexes every request to the origin on one session.
+  const tls = { key: ephemeral.privateKey.export({ type: 'pkcs8', format: 'pem' }), cert: ephemeral.certificate };
+  const server = (http2 ? http2Server.bind(null, { ...tls, allowHTTP1: true }) : httpsServer.bind(null, tls))((req, res) => {
     const count = (counters.get(req.url) ?? 0) + 1; counters.set(req.url, count);
-    requests.push({ path: req.url, range: req.headers.range, ifRange: req.headers['if-range'] });
+    requests.push({ path: req.url, range: req.headers.range, ifRange: req.headers['if-range'] }); protocols.push(req.httpVersion);
     if (req.url === '/headers' && count === 1) return;
     if (req.url === '/retry' && count === 1) { res.writeHead(503, { 'Retry-After': '1' }); res.end('later'); return; }
     const offset = req.headers.range ? Number(/^bytes=(\d+)-$/.exec(req.headers.range)?.[1]) : 0;
     const headers = { ETag: '"tls-fixture"', 'Content-Length': bytes.length - offset,
       ...(offset ? { 'Content-Range': `bytes ${offset}-${bytes.length - 1}/${bytes.length}` } : {}) };
-    res.writeHead(offset ? 206 : 200, headers); res.flushHeaders();
+    res.writeHead(offset ? 206 : 200, headers); res.flushHeaders?.();
     if (req.url === '/idle' && count === 1) return;
     if (req.url === '/resume' && count === 1) {
       res.write(bytes.subarray(0, 5)); setTimeout(() => res.destroy(), 100); return;
     }
+    if (req.url === '/stall') { res.write(bytes.subarray(offset, offset + 5)); setTimeout(() => res.end(bytes.subarray(offset + 5)), 800); return; }
     if (req.url === '/slow') { res.write(bytes.subarray(0, 5)); setTimeout(() => res.end(bytes.subarray(5)), 400); return; }
     res.end(bytes.subarray(offset));
   });
@@ -45,7 +50,20 @@ async function setup(t) {
     tunnels.push({ target: request.url, authenticated: request.headers['proxy-authorization'] === 'Basic ' + Buffer.from('fixture:private-test-password').toString('base64') });
     if (request.url !== `installer.invalid:${port}`) { client.destroy(); return; }
     const upstream = connect(port, '127.0.0.1'); track(upstream);
-    upstream.once('connect', () => { client.write('HTTP/1.1 200 Connection Established\r\n\r\n'); if (head.length) upstream.write(head); client.pipe(upstream); upstream.pipe(client); });
+    // The first `stallTunnels` tunnels carry the handshake and the response
+    // headers, then go silent in both directions while staying open (a
+    // half-open link): /stall sends the rest of its body 800 ms after the start.
+    const stall = stallTunnels-- > 0;
+    let last = 0, silent = false;
+    upstream.once('connect', () => { client.write('HTTP/1.1 200 Connection Established\r\n\r\n'); if (head.length) upstream.write(head); client.pipe(upstream);
+      if (!stall) { upstream.pipe(client); return; }
+      upstream.on('data', chunk => {
+        if (silent) return;
+        // The handshake and headers arrive at once; the rest of the body later.
+        if (last && Date.now() - last > 400) { silent = true; upstream.pause(); client.unpipe(upstream); return; }
+        last = Date.now(); client.write(chunk);
+      });
+    });
     upstream.on('error', () => client.destroy()); client.on('error', () => upstream.destroy());
     client.on('close', () => upstream.destroy());
   });
@@ -78,7 +96,7 @@ async function setup(t) {
     assert.doesNotMatch(stdout + stderr, /private-test-password/, 'Proxy credentials must not appear in diagnostics');
     return { code, stdout, stderr, destination };
   };
-  return { run, requests, tunnels };
+  return { run, requests, protocols, tunnels };
 }
 
 test('real TLS rejects an untrusted CA and accepts an explicit startup CA through the build worker', { timeout: 30_000 }, async t => {
@@ -112,4 +130,18 @@ for (const path of ['/retry', '/resume', '/headers', '/idle', '/slow'])
     assert.deepEqual(await readFile(result.destination), bytes);
     assert.equal(f.requests.length, path === '/slow' ? 1 : 2);
     if (path === '/resume') assert.deepEqual(f.requests[1], { path, range: 'bytes=5-', ifRange: '"tls-fixture"' });
+  });
+
+// #152: the idle timeout must abandon the silent tunnel; the retry opens a new
+// CONNECT tunnel and resumes, rather than waiting behind the stalled one (on
+// HTTP/2, a new stream on the stalled session would never get its headers).
+for (const http2 of [false, true])
+  test(`a stalled proxy tunnel is abandoned: the retry opens a fresh tunnel and resumes${http2 ? ' (h2 offered)' : ''}`, { timeout: 30_000 }, async t => {
+    const f = await setup(t, { stallTunnels: 1, http2 });
+    const result = await f.run('/stall', { throughProxy: true, policy: { idleMs: 1500, connectMs: 3000 } });
+    const context = `HTTP ${f.protocols.join(', ')}; undici ${process.versions.undici}; ${f.tunnels.length} tunnels\n${result.stderr}`;
+    assert.equal(result.code, 0, context);
+    assert.deepEqual(await readFile(result.destination), bytes);
+    assert.ok(f.tunnels.length >= 2, context);
+    assert.deepEqual(f.requests.map(r => r.range), [undefined, 'bytes=5-'], context);
   });

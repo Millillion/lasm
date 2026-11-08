@@ -68,13 +68,36 @@ function retryAfter(response, now) {
   return Number.isFinite(ms) ? Math.max(0, ms) : 0;
 }
 
+/** fetch's global dispatcher, if it has one yet: undici 8 (Node 26) keeps it
+ * under `undici.globalDispatcher.2`, and under `.1` only a wrapper for the
+ * older dispatcher API; undici 7 (Node 24) keeps it under `.1`. */
+export function globalDispatcher(scope = globalThis) {
+  return scope[Symbol.for('undici.globalDispatcher.2')] ?? scope[Symbol.for('undici.globalDispatcher.1')];
+}
+
+/** A connection pool of its own for one download attempt (#152). Aborting a
+ * fetch does not always release its connection: Node 26's fetch (undici 8)
+ * speaks HTTP/2 where the server offers it, as GitHub's CDN does, and an abort
+ * only resets the stream. The session stays open, and every retry to the same
+ * origin was a new stream on the stalled session (through a proxy: no new
+ * CONNECT tunnel), which never got its headers. Each attempt therefore uses a
+ * new dispatcher of the class Node made the global one (EnvHttpProxyAgent with
+ * a proxy, else Agent; both read their settings from the environment), and
+ * destroys it with the attempt, so a retry always opens a fresh connection.
+ * Undefined, and fetch's global dispatcher, when there is none yet. */
+export function attemptDispatcher(global = globalDispatcher()) {
+  const Dispatcher = global?.constructor;
+  if (typeof Dispatcher !== 'function' || typeof Dispatcher.prototype?.destroy !== 'function') return undefined;
+  try { return new Dispatcher(); } catch { return undefined; }
+}
+
 /** Stream to a private file, resume only a validated response, then hash the
  * entire archive. Timers bound silent connections and stalls independently of
  * progressing transfers. Nothing is extracted until the pinned digest matches.
  */
 export async function downloadArtifact(artifact, destination, {
   fetch: fetch_ = fetch, update, event, signal, policy = downloadPolicy(),
-  random = Math.random, sleep = delay,
+  random = Math.random, sleep = delay, dispatcher: newDispatcher = attemptDispatcher,
 } = {}) {
   const overall = new AbortController();
   const totalTimer = setTimeout(() => overall.abort(error('Download exceeded its overall time budget', 'LASM_TOTAL_TIMEOUT')), policy.totalMs);
@@ -91,6 +114,7 @@ export async function downloadArtifact(artifact, destination, {
       if (offset === artifact.bytes) break;
       const controller = new AbortController();
       const attemptSignal = AbortSignal.any([lifetime, controller.signal]);
+      const dispatcher = newDispatcher();
       let timer, response, received = offset, waitMs = 0;
       const arm = (ms, code, message) => {
         clearTimeout(timer);
@@ -99,7 +123,7 @@ export async function downloadArtifact(artifact, destination, {
       event?.({ type: 'attempt', attempt, maximumAttempts: policy.attempts, offset });
       try {
         arm(policy.connectMs, 'LASM_CONNECT_TIMEOUT', 'Timed out connecting or waiting for download headers');
-        response = await fetchArtifact(artifact.url, { signal: attemptSignal,
+        response = await fetchArtifact(artifact.url, { signal: attemptSignal, ...(dispatcher ? { dispatcher } : {}),
           headers: { 'accept-encoding': 'identity', ...(offset ? { range: `bytes=${offset}-`, 'if-range': validator } : {}) } }, fetch_);
         // Redirects are followed explicitly below so HTTP downgrades are refused
         // before a request is made, not after fetch has followed them.
@@ -152,6 +176,8 @@ export async function downloadArtifact(artifact, destination, {
       } finally {
         clearTimeout(timer);
         if (response?.body && !response.body.locked) await response.body.cancel().catch(() => {});
+        // Close this attempt's connections, a stalled one included.
+        await dispatcher?.destroy().catch(() => {});
       }
       await sleep(waitMs, undefined, { signal: lifetime });
     }
