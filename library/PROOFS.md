@@ -2,7 +2,9 @@
 
 Lasm's own Lean library (Lasm.UI, Lasm.RPC, Lasm.KV, Lasm.Fetch, Lasm.JS) is ordinary
 Lean code, and programs run exactly that code. So some of its guarantees are
-proved, for every possible input, rather than only tested. This page lists
+proved, for every possible input, rather than only tested. One more set of
+propositions is about a Lean model of JavaScript that Lasm ships: the
+function-platform shims (src/serverless/, Lasm.Serverless). This page lists
 each proved proposition in plain English. The propositions are for Jordan to
 hone (issue #21); Conduit's [PROOFS.md](../examples/conduit/PROOFS.md) is the
 model.
@@ -22,7 +24,8 @@ proofs in that file:
 - [`Lasm/RPC/Spec.lean`](Lasm/RPC/Spec.lean): request validation, serving, dispatch and the client;
 - [`Lasm/KV/Spec.lean`](Lasm/KV/Spec.lean): the memory store;
 - [`Lasm/Fetch/Spec.lean`](Lasm/Fetch/Spec.lean): request paths;
-- [`Lasm/JS/Spec.lean`](Lasm/JS/Spec.lean): the value codec between Lean and JavaScript.
+- [`Lasm/JS/Spec.lean`](Lasm/JS/Spec.lean): the value codec between Lean and JavaScript;
+- [`Lasm/Serverless/Spec.lean`](Lasm/Serverless/Spec.lean): the function platforms' request and response mapping (a model of src/serverless/).
 
 A reviewer can read those files and ignore the proofs: the check fails unless
 
@@ -42,7 +45,7 @@ managed Lean 4.35.0 and only Lean's own library (no Mathlib).
 
 The propositions are about the shipped code (`Lasm.UI.diff`,
 `Lasm.RPC.Endpoint.decodeRequest`, `Lasm.KV.Table.write`, …). The Spec,
-Theorems, `Lasm/UI/Proofs*` and `Lasm/JS/Proofs*` modules are a proofs-only target: they are not
+Theorems, `Lasm/UI/Proofs*`, `Lasm/JS/Proofs*` and `Lasm/Serverless/Proofs*` modules are a proofs-only target: they are not
 in the shipped library (`libraryModules` in
 [src/lasm-library.mjs](../src/lasm-library.mjs)), so they are not compiled
 into the Lean prefix or [prebuilt/](prebuilt), cost a program's build
@@ -62,13 +65,18 @@ target); the JavaScript half of the Lasm.JS value codec (src/node-js.mjs,
 src/edge/edge-js.mjs), tested against Lean's (test/node-js.test.mjs,
 test/edge-js.test.mjs), while the Lean half's reader is the very function
 `Wire.decode` runs (`decodeWith`, in `IO` there and in `Except String` in the
-theorems); Lean's JSON parser and printer; the `IO.Ref` that holds the memory
+theorems); the function-platform shims (src/serverless/), which are JavaScript
+that runs before the program: Lasm.Serverless's propositions are about a Lean
+model of them (Lasm/Serverless/Proofs/Model.lean, function for function
+lasm-lambda.mjs and lasm-server.mjs), and the serverless-http fuzz target
+checks the JavaScript against the model on every input, while Node's base64,
+`Date.parse` and the platforms themselves are left outside it; Lean's JSON parser and printer; the `IO.Ref` that holds the memory
 store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**33 proved propositions (239 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**53 proved propositions (326 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
 ## Lasm.UI (10)
 
@@ -157,6 +165,53 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 | --- | --- |
 | [`decode_encode`](Lasm/JS/Spec.lean#L37) | **Every value that is encoded is read back exactly.** Take any plain value `d` (no references) that `encode` accepts, as the bytes `b`. The reader (`decodeWith`, which `decode` runs) reads `b` back as `d`, every number with the same bits: never an error, nothing left over, nothing misread. |
 | [`encode_ok_iff_fits`](Lasm/JS/Spec.lean#L46) | **Lengths never wrap.** `encode d` succeeds exactly when every length in `d` fits the format's u32 (`d.Fits`). A string, byte array, array or object with 2³² or more bytes, elements or fields is an error naming it, never a length that wraps around and makes the reader misread what follows. |
+
+## Lasm.Serverless (20)
+
+### Request targets: the path a server sees is the event's
+
+| Proposition | In plain English |
+| --- | --- |
+| [`target_valid`](Lasm/Serverless/Spec.lean#L39) | **Every target is one http.request sends.** Whatever the event's path and query (a decoded path with spaces, `?` or `#`, an emoji, a query sent unencoded), every character of the forwarded target is visible ASCII and none is `#`: Node never refuses it (which was a 502), and no part of it is a fragment. |
+| [`target_split`](Lasm/Serverless/Spec.lean#L47) | **The path stays the path, the query the query.** A server reads the forwarded target's path up to its first `?`: that is exactly the event's path (`/` when empty), escaped, so a `?` in a decoded path cannot move part of it into the query. After that `?` comes exactly the event's query, escaped, and there is no `?` at all when the event has no query. |
+| [`target_unchanged`](Lasm/Serverless/Spec.lean#L57) | **A valid target goes through unchanged.** When the event's path holds only what a target's path may (visible ASCII but `?` and `#`) and its query only what a query may (visible ASCII but `#`), the target is the path, `?` and the query, as they are: percent escapes stay escapes, `://` in a path (`/go/https://example.com`) stays in the path, and a malformed escape in a query (`?q=%E0`) arrives as the client sent it. |
+| [`target_slash`](Lasm/Serverless/Spec.lean#L67) | **Every target starts with `/`** when the event's path does, or is empty. |
+| [`target_ignores_headers`](Lasm/Serverless/Spec.lean#L72) | **No header chooses the target.** For every Lambda event (API Gateway REST, ALB, payload 2.0 and function URLs, CloudFront), the forwarded target is the same whatever header fields (Host among them) and cookies the event carries. |
+
+### Host: one, and it cannot move the path
+
+| Proposition | In plain English |
+| --- | --- |
+| [`host_once`](Lasm/Serverless/Spec.lean#L83) | **Exactly one Host, a plain one.** Whatever fields an event carries (none, several, or a forged `Host: x/admin#`), forward() and pipe() send exactly one Host field, and its value is a plain `host[:port]`: visible ASCII without `/ ? # \ @` (the first such Host of the event, else the loopback address). |
+| [`host_url`](Lasm/Serverless/Spec.lean#L92) | **A plain Host cannot move the path.** A server that builds its URL from the Host field and the target (`http://` + host + target, as Hono's Node adapter and Lasm.Fetch's Node host do) reads back exactly that host and that target, for every plain host and every target that starts with `/`. Together with `host_once` and `target_split`: no client can change the path or query a server sees through Host (`Host: x/admin#` once made `/public` read as `/admin` in Lasm.Fetch). |
+
+### Query strings
+
+| Proposition | In plain English |
+| --- | --- |
+| [`form_roundtrip`](Lasm/Serverless/Spec.lean#L104) | **What URLSearchParams writes, a server reads back.** For any names and values (any text), the query `URLSearchParams` writes decodes, as a server decodes `application/x-www-form-urlencoded` text, to exactly those pairs, in order. |
+| [`rest_query`](Lasm/Serverless/Spec.lean#L111) | **API Gateway REST's query values arrive with the same values.** API Gateway REST hands over the query decoded; the forwarded target's query decodes to exactly the event's pairs: the multi-value form when the event has one (each value of a name, in order), else the single-value one. |
+| [`alb_query`](Lasm/Serverless/Spec.lean#L119) | **An ALB's query arrives as the client sent it.** An ALB hands over the query still encoded (or malformed: `%E0`); when a target can carry it as it is, the forwarded query is exactly `name=value` joined with `&`, unchanged (decoding it threw `URIError` on `%E0`: a 502; test/fuzz). |
+
+### Cookies and the other fields
+
+| Proposition | In plain English |
+| --- | --- |
+| [`cookie_once`](Lasm/Serverless/Spec.lean#L130) | **At most one Cookie field, never an empty one.** Whatever Cookie fields an event carries (repeated, split by HTTP/2, joined with commas by a proxy, empty), forward() and pipe() send at most one, and it is not empty. |
+| [`v2_cookies_once`](Lasm/Serverless/Spec.lean#L137) | **A payload 2.0 event's cookies arrive once.** When an API Gateway HTTP API or function URL event has cookies in `cookies`, the one Cookie field sent is those cookies joined with `; ` (and commas a proxy put between cookies made `; `), whatever Cookie fields the headers also hold (SAM's local gateway leaves them there too: they were sent twice, #80). |
+| [`other_fields`](Lasm/Serverless/Spec.lean#L147) | **Every other field goes through, in order.** The fields sent other than Cookie and Host are exactly the event's fields other than Cookie, Host, the hop-by-hop fields and Content-Length (forward() sets the body's own), with their names and values, in their order. |
+
+### Responses
+
+| Proposition | In plain English |
+| --- | --- |
+| [`body_kept`](Lasm/Serverless/Spec.lean#L158) | **The body is the server's, byte for byte.** For every Lambda response (REST and ALB, payload 2.0, CloudFront), the body stands for exactly the reply's bytes, and it travels as text only when the reply's type is textual and its bytes are valid UTF-8 (a Latin-1 `text/html` body went as text and lost its accented letters), as base64 otherwise. |
+| [`status_kept`](Lasm/Serverless/Spec.lean#L168) | **The status is the server's.** Every Lambda response carries the reply's status. |
+| [`rest_headers`](Lasm/Serverless/Spec.lean#L175) | **Every field of the reply reaches an API Gateway REST or multi-value ALB response**, each name with all its values in order (every Set-Cookie among them, once each). Header maps have no prototype: a field named `__proto__` or `constructor` is a field like any other (it was dropped, or threw a TypeError). |
+| [`v2_headers`](Lasm/Serverless/Spec.lean#L185) | **A payload 2.0 response holds every field of the reply**: each Set-Cookie once, in order, in `cookies`, and every other name with its values joined with `, `. |
+| [`cloudfront_headers`](Lasm/Serverless/Spec.lean#L193) | **A CloudFront response holds every field CloudFront accepts**, each name with all its values in order, and none it refuses in a generated response (Content-Length, Via, `x-amz-cf-…`, …). |
+| [`web_null_body`](Lasm/Serverless/Spec.lean#L200) | **A Netlify response to a HEAD, or with a null-body status, has no body** (a Response with one would throw). |
+| [`azure_exact`](Lasm/Serverless/Spec.lean#L206) | **Every cookie object Azure gets arrives unchanged** when at most one Set-Cookie of the reply would change in Azure's `cookies` list (which percent-encodes values and has no field for some attributes): that one stays a Set-Cookie header, and every cookie object sent is one `cookies` carries exactly. |
 <!-- END PROPOSITIONS -->
 
 ## Candidates not yet proved

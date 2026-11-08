@@ -2,8 +2,11 @@
 // Maps API Gateway REST (payload 1.0), API Gateway HTTP API (payload 2.0),
 // Lambda function URL, Application Load Balancer and CloudFront (Lambda@Edge
 // origin-request / viewer-request) events to HTTP requests for the Lean
-// server, and its responses back to each event's response shape.
-import { forward, isTextual, startLeanServer } from './lasm-server.mjs';
+// server, and its responses back to each event's response shape. The Lean
+// model of this mapping, with its theorems, is
+// library/Lasm/Serverless/Proofs/Model.lean; the serverless-http fuzz target
+// checks this file against it.
+import { forward, isTextual, requestTarget, startLeanServer } from './lasm-server.mjs';
 
 // Start the server during Lambda's init phase (top-level await), so its time
 // counts as init rather than as the first invocation.
@@ -15,8 +18,7 @@ function query(single, multi) {
   const search = new URLSearchParams();
   if (multi) for (const [name, values] of Object.entries(multi)) for (const value of values ?? []) search.append(name, value);
   else if (single) for (const [name, value] of Object.entries(single)) search.append(name, value);
-  const text = search.toString();
-  return text ? '?' + text : '';
+  return search.toString();
 }
 
 // An ALB's query values arrive as the client sent them, still percent-encoded:
@@ -27,7 +29,7 @@ function rawQuery(single, multi) {
   const parts = [];
   if (multi) for (const [name, values] of Object.entries(multi)) for (const value of values ?? []) parts.push(`${name}=${value}`);
   else if (single) for (const [name, value] of Object.entries(single)) parts.push(`${name}=${value}`);
-  return parts.length ? '?' + parts.join('&') : '';
+  return parts.join('&');
 }
 
 function headerPairs(single, multi) {
@@ -37,8 +39,12 @@ function headerPairs(single, multi) {
   return pairs;
 }
 
+// Header maps of the responses: objects without a prototype, so a header
+// named `__proto__` or `constructor` is a header like any other.
+const map = () => Object.create(null);
+
 function body(reply) {
-  const text = isTextual(reply.headers);
+  const text = isTextual(reply.headers, reply.body);
   return { body: reply.body.toString(text ? 'utf8' : 'base64'), isBase64Encoded: !text };
 }
 
@@ -47,16 +53,16 @@ async function cloudFront(record) {
   const { request } = record.cf;
   const headers = [];
   for (const entries of Object.values(request.headers ?? {})) for (const { key, value } of entries) headers.push([key, value]);
-  const reply = await forward({ method: request.method, path: request.uri + (request.querystring ? '?' + request.querystring : ''),
+  const reply = await forward({ method: request.method, path: requestTarget(request.uri, request.querystring),
     headers, body: request.body?.data ? decode(request.body.data, request.body.encoding === 'base64') : undefined });
-  const out = {};
+  const out = map();
   // CloudFront rejects or ignores these in generated responses.
   const refused = new Set(['content-length', 'via', 'x-cache', 'x-real-ip', 'x-forwarded-proto', 'expect', 'proxy-authenticate', 'proxy-authorization']);
   for (const [name, value] of reply.headers) {
     if (refused.has(name) || name.startsWith('x-amz-cf-') || name.startsWith('x-edge-') || name.startsWith('x-accel-')) continue;
     (out[name] ??= []).push({ key: name, value });
   }
-  const text = isTextual(reply.headers);
+  const text = isTextual(reply.headers, reply.body);
   return { status: String(reply.status), statusDescription: reply.statusText, headers: out,
     body: reply.body.toString(text ? 'utf8' : 'base64'), bodyEncoding: text ? 'text' : 'base64' };
 }
@@ -72,9 +78,9 @@ export async function handler(event) {
     const headers = Object.entries(event.headers ?? {}).filter(([name]) => !sent.length || name.toLowerCase() !== 'cookie');
     if (sent.length) headers.push(['cookie', sent.join('; ')]);
     const reply = await forward({ method: event.requestContext.http.method,
-      path: (event.rawPath || '/') + (event.rawQueryString ? '?' + event.rawQueryString : ''),
+      path: requestTarget(event.rawPath, event.rawQueryString),
       headers, body: decode(event.body, event.isBase64Encoded) });
-    const single = {}, cookies = [];
+    const single = map(), cookies = [];
     for (const [name, value] of reply.headers) {
       if (name === 'set-cookie') cookies.push(value);
       else single[name] = single[name] === undefined ? value : `${single[name]}, ${value}`;
@@ -85,19 +91,19 @@ export async function handler(event) {
     // ALB query values arrive URL-encoded (forwarded as they are); API Gateway REST values are decoded.
     const alb = Boolean(event.requestContext?.elb);
     const single = event.queryStringParameters, multi = event.multiValueQueryStringParameters;
-    const reply = await forward({ method: event.httpMethod, path: (event.path || '/') + (alb ? rawQuery(single, multi) : query(single, multi)),
+    const reply = await forward({ method: event.httpMethod, path: requestTarget(event.path, alb ? rawQuery(single, multi) : query(single, multi)),
       headers: headerPairs(event.headers, event.multiValueHeaders), body: decode(event.body, event.isBase64Encoded) });
     const response = { statusCode: reply.status, ...body(reply) };
     if (alb) response.statusDescription = `${reply.status} ${reply.statusText}`;
     // API Gateway REST takes multiValueHeaders; an ALB takes the form the
     // request used (multi-value headers are a target group setting).
     if (!alb || event.multiValueHeaders) {
-      response.multiValueHeaders = {};
+      response.multiValueHeaders = map();
       for (const [name, value] of reply.headers) (response.multiValueHeaders[name] ??= []).push(value);
     } else {
       // Single-value ALB responses hold one value per header: join repeats,
       // except Set-Cookie, which cannot be joined.
-      response.headers = {};
+      response.headers = map();
       for (const [name, value] of reply.headers)
         response.headers[name] = response.headers[name] === undefined || name === 'set-cookie' ? value : `${response.headers[name]}, ${value}`;
     }
