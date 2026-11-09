@@ -364,6 +364,18 @@ async function campaignProgram(seed, kind) {
     return;
   }
   rec.nativeMs = ev.nat.ms;
+  // Native Lean itself took a tenth of the run timeout or more: the generator
+  // broke its own bound (a power tower of bignums, in campaign 42572268410),
+  // and a slower target (bignums without GMP) would only time out. Nothing to
+  // compare: a generator error naming the case that was running.
+  if (ev.nat.code === 'timeout' || ev.nat.ms > runTimeoutMs / 10) {
+    rec.native = ev.nat.code === 'timeout' ? 'timeout' : `slow (${ev.nat.ms} ms)`;
+    const lastCase = ev.nat.stderr.match(/^@(\S+)$/gm)?.pop() ?? 'no case';
+    summary.harnessErrors.push({ seed, kind, error: `the native run took ${ev.nat.code === 'timeout' ? 'longer than the timeout' : `${ev.nat.ms} ms`} (a generator bound is too loose)`, lastCase });
+    console.log(`seed ${seed} ${kind}: GENERATOR ERROR (native run ${rec.native}; last case started: ${lastCase})`);
+    save();
+    return;
+  }
   for (const t of tlist) {
     const res = ev.results[t];
     if (res.buildFailed) {

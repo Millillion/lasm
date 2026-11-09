@@ -424,7 +424,7 @@ for (const t of Object.keys(SBITS)) {
 }
 xop('Float', ['Int64'], a => `${a}.toFloat`, 1);
 // Float32: IEEE-exact operations only (libm's single-precision functions are not correctly rounded).
-xlit('Float32', r => r.chance(0.15) ? r.pick(['(0.0/0.0)', '(1.0/0.0)', '(-1.0/0.0)', '(-0.0)']) : (r.chance(0.3) ? '-' : '') + r.pick(FLOAT_LITS));
+xlit('Float32', r => r.chance(0.15) ? r.pick(['((0.0 : Float32) / 0.0)', '((1.0 : Float32) / 0.0)', '((-1.0 : Float32) / 0.0)', '(-(0.0 : Float32))']) : (r.chance(0.3) ? '-' : '') + r.pick(FLOAT_LITS));
 for (const o of ['+', '-', '*', '/']) xop('Float32', ['Float32', 'Float32'], (a, b) => `(${a} ${o} ${b})`, 2);
 for (const f of ['sqrt', 'abs', 'floor', 'ceil', 'round']) xop('Float32', ['Float32'], a => `${a}.${f}`, 1);
 xop('Float32', ['Float32'], a => `(-(${a}))`, 1);

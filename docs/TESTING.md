@@ -258,7 +258,7 @@ usual format (it carries its own declarations).
 **Running it.** The same harness ([Running it](#differential-testing)):
 `--feat-cases 80` (the default) adds a feature program to every seed of the
 run; `--feat-seeds 1,2 --feat-random 0` replays only those seeds' feature
-programs (the PR tier's fixed set).
+programs (the PR tier's fixed set). `--cases 0 --fs-cases 0 --feat-cases 200` runs feature programs only; `differential.yml` dispatched with `feature-only: true` does that for a campaign.
 
 **Tiers** ([differential.yml](../.github/workflows/differential.yml)):
 

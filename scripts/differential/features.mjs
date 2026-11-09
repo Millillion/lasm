@@ -85,7 +85,8 @@ const GEN = {
     const types = [];
     for (const t of ['Nat', 'Int', 'UInt64', 'UInt8', 'String', 'ListNat', 'ArrayInt', 'Int32']) if (r.chance(0.4)) types.push(t);
     if (!types.length) types.push(r.pick(['Nat', 'String', 'Int']));
-    const insts = types.map(t => ({ t, e: [exv(r, t, 2, [{ name: 'a', t }, { name: 'b', t }]), ex(r, t, 1)], name: r.chance(0.4) ? stringLit(r) : null }));
+    // The operation is iterated (pow, mconcat): only cheap operations, so no power tower.
+    const insts = types.map(t => ({ t, e: [exv(r, t, 2, [{ name: 'a', t }, { name: 'b', t }], { allow: cheap }), ex(r, t, 1)], name: r.chance(0.4) ? stringLit(r) : null }));
     const chk = [];
     for (let i = r.int(2, 6); i > 0; i--) {
       const t = r.pick(types), k = r.pick(['mconcat', 'pow', 'combine3', 'name', 'pair', 'opt', 'idem']);
