@@ -68,6 +68,18 @@
       "score": 97.1,
       "mutants": 830,
       "threshold": 97
+    },
+    "dev": {
+      "initial": 29.2,
+      "score": 91,
+      "mutants": 1605,
+      "threshold": 91
+    },
+    "browser": {
+      "initial": 26.1,
+      "score": 96.6,
+      "mutants": 1813,
+      "threshold": 96
     }
   },
   "run": "mutation.yml run 41749603692 (Node 26.13.0, main at the branch point)"
