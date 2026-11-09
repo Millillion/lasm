@@ -124,3 +124,9 @@ test('universal newlines, identifiers, strip and split', () => {
   assert.deepEqual(pythonSplit('one'), ['one']);
   assert.deepEqual(dedupList(['b', 'a', 'b', 'c', 'a']), ['b', 'a', 'c']);
 });
+
+test('Python equality never equates a string with an object of its characters', () => {
+  assert.equal(pythonEquals('ab', { 0: 'a', 1: 'b' }), false);
+  assert.equal(pythonEquals({ 0: 'a' }, 'a'), false);
+  assert.equal(pythonEquals({ a: 1, b: 2 }, { a: 1, b: 3 }), false, 'every key must match, not just one');
+});

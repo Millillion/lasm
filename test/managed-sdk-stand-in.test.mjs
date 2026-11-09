@@ -30,7 +30,7 @@ function nativeHeader() {
 
 async function archive(name, files) {
   const members = Object.entries(files).map(([path, content]) => ({ path, type: 'file', content: Buffer.from(content),
-    size: Buffer.byteLength(content), executable: path.startsWith('bin/') }));
+    size: Buffer.byteLength(content), executable: path.startsWith('bin/') || path.endsWith('.exe') }));
   const chunks = [];
   const result = await packArchive(name, members, { open: member => Readable.from([member.content]), zstd: { level: 3, windowLog: 20, long: false },
     sink: new Writable({ write(chunk, encoding, done) { chunks.push(chunk); done(); } }) });
@@ -93,6 +93,30 @@ test('managed Python is provisioned, then identified by running it isolated', { 
   }
 });
 
+test('managed Python for another architecture or Windows: the catalog host, the interpreter path and the machine aliases', { skip: !posix }, async t => {
+  for (const name of ['ARM64', 'arm64', 'aarch64']) {
+    const f = await fixture(t, { identity: { version: '3.13.15', machine: name, platform: process.platform } });
+    const catalog = { version: '3.13.15', artifacts: { [`${process.platform}-arm64`]: f.pythonCatalog.artifacts[host] } };
+    const stages = [];
+    const python = await provisionPython({ cache: f.cache, fetch: f.fetch, log() {}, catalog, arch: 'arm64', progress: event => stages.push(event.stage) });
+    assert.equal(python.machine, name); assert.equal(python.platform, `${process.platform}-arm64`);
+    assert.ok(stages.includes('Downloading Python 3.13.15'), stages.join('\n'));
+  }
+  const g = await fixture(t, { identity: { version: '3.13.15', machine: 'x86_64', platform: process.platform } });
+  await assert.rejects(provisionPython({ cache: g.cache, fetch: g.fetch, log() {}, arch: 'arm64',
+    catalog: { version: '3.13.15', artifacts: { [`${process.platform}-arm64`]: g.pythonCatalog.artifacts[host] } } }), /identity mismatch/);
+  await assert.rejects(provisionPython({ cache: g.cache, fetch: g.fetch, log() {}, arch: 'ia32',
+    catalog: { version: '3.13.15', artifacts: { [`${process.platform}-ia32`]: g.pythonCatalog.artifacts[host] } } }), /identity mismatch/, 'an architecture without aliases matches no machine');
+  // On Windows the interpreter is python.exe at the root of the archive.
+  const windowsPython = await archive('python-windows-stand-in', { 'python.exe': pythonScript({ version: '3.13.15', machine: 'AMD64', platform: 'win32' }) });
+  const w = await fixture(t);
+  const fetch = async url => url === windowsPython.artifact.url ? new Response(windowsPython.bytes) : w.fetch(url);
+  const python = await provisionPython({ cache: w.cache, fetch, log() {}, platform: 'win32', arch: 'x64',
+    catalog: { version: '3.13.15', artifacts: { 'win32-x64': windowsPython.artifact } } });
+  assert.equal(python.executable, join(python.directory, 'python.exe'));
+  assert.equal(python.machine, 'AMD64'); assert.equal(python.platform, 'win32-x64');
+});
+
 test('a Python reporting another version, platform or machine is refused', { skip: !posix }, async t => {
   for (const identity of [{ version: '3.12.0', machine, platform: process.platform }, { version: '3.13.15', machine, platform: 'win32' },
     { version: '3.13.15', machine: process.arch === 'x64' ? 'aarch64' : 'x86_64', platform: process.platform }]) {
@@ -132,7 +156,7 @@ test('the SDK: verified programs, a private configuration and an environment fre
   const saved = { ...process.env }, savedFetch = globalThis.fetch;
   globalThis.fetch = async url => assert.fail(`no network: ${url}`);
   t.after(() => { globalThis.fetch = savedFetch; for (const key of Object.keys(process.env)) if (!(key in saved)) delete process.env[key]; Object.assign(process.env, saved); });
-  Object.assign(process.env, { EMCC_DEBUG: 'leak', LLVM_ROOT: '/leak', PYTHONPATH: '/leak', EM_CACHE: '/leak', EMSDK: '/leak', BINARYEN_ROOT: '/leak', LASM_KEEP: 'kept' });
+  Object.assign(process.env, { EMCC_DEBUG: 'leak', LLVM_ROOT: '/leak', PYTHONPATH: '/leak', EM_CACHE: '/leak', EMSDK: '/leak', BINARYEN_ROOT: '/leak', LASM_KEEP: 'kept', MY_PYTHON_SETTING: 'kept' });
   const progress = [];
   f.requests.length = 0;
   const sdk = await provisionSdk({ cache: f.cache, fetch: f.fetch, log() {}, catalog: f.sdkCatalog, repairs: false, progress: event => progress.push(event.stage) });
@@ -155,7 +179,7 @@ test('the SDK: verified programs, a private configuration and an environment fre
     `CACHE = ${JSON.stringify(join(sdk.state, 'cache'))}`, `PORTS = ${JSON.stringify(join(sdk.state, 'ports'))}`].join('\n') + '\n');
   assert.deepEqual(await readdir(sdk.state), [basename(config)], 'no pending configuration is left');
   for (const key of ['EMCC_DEBUG', 'LLVM_ROOT', 'PYTHONPATH', 'EM_CACHE', 'EMSDK', 'BINARYEN_ROOT']) assert.equal(key in sdk.env, false, key);
-  assert.equal(sdk.env.LASM_KEEP, 'kept');
+  assert.equal(sdk.env.LASM_KEEP, 'kept'); assert.equal(sdk.env.MY_PYTHON_SETTING, 'kept', 'only variables that start with a toolchain prefix are removed');
   assert.deepEqual({ EM_CONFIG: sdk.env.EM_CONFIG, EMSDK_PYTHON: sdk.env.EMSDK_PYTHON, PYTHONDONTWRITEBYTECODE: sdk.env.PYTHONDONTWRITEBYTECODE,
     BINARYEN_CORES: sdk.env.BINARYEN_CORES, EMCC_CORES: sdk.env.EMCC_CORES, SOURCE_DATE_EPOCH: sdk.env.SOURCE_DATE_EPOCH, PATH: sdk.env.PATH },
   { EM_CONFIG: config, EMSDK_PYTHON: sdk.python.executable, PYTHONDONTWRITEBYTECODE: '1', BINARYEN_CORES: '1', EMCC_CORES: '1', SOURCE_DATE_EPOCH: '315532800',

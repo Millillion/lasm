@@ -136,3 +136,37 @@ test('a manifest whose files are not an object is refused before any file is rea
   writeFileSync(join(directory, 'target.json'), JSON.stringify({ schema: 1, name: targetName, leanCommit, files: 'ab', linkLibraries: ['0'] }));
   assert.throws(() => readTargetManifest(directory), { message: 'Incompatible Lasm target archive' });
 });
+
+test('Node.js 24 is the oldest supported release', async t => {
+  const { assertPlatform } = await import('../src/toolchain.mjs');
+  const original = process.versions.node;
+  t.after(() => Object.defineProperty(process.versions, 'node', { value: original }));
+  for (const [version, ok] of [['23.11.0', false], ['24.0.0', true], ['26.1.0', true]]) {
+    Object.defineProperty(process.versions, 'node', { value: version });
+    if (ok) assert.doesNotThrow(() => assertPlatform('linux', 'x64'), version);
+    else assert.throws(() => assertPlatform('linux', 'x64'), { message: 'Lasm requires Node.js 24 or newer' }, version);
+  }
+});
+
+test('resolveLean asks the compiler from the project directory (Elan picks the toolchain there)', { skip: process.platform === 'win32' }, async t => {
+  const base = mkdtempSync(join(tmpdir(), 'lasm-resolve-cwd-'));
+  const saved = { LEAN: process.env.LEAN, PATH: process.env.PATH, ELAN_HOME: process.env.ELAN_HOME, HOME: process.env.HOME };
+  t.after(() => { for (const [key, value] of Object.entries(saved)) if (value === undefined) delete process.env[key]; else process.env[key] = value;
+    rmSync(base, { recursive: true, force: true }); });
+  const cwd = realpathSync(base);
+  const script = (file, body) => { mkdirSync(join(file, '..'), { recursive: true }); writeFileSync(file, `#!/bin/sh\n${body}\n`); chmodSync(file, 0o755); return file; };
+  process.env.LEAN = script(join(base, 'lean'), `[ "$PWD" = "${cwd}" ] || { echo "run in $PWD" >&2; exit 1; }\ncase "$1" in --githash) echo ${leanCommit};; --print-prefix) echo /p;; esac`);
+  const { resolveLean } = await import('../src/toolchain.mjs?cwd-check');
+  assert.equal(resolveLean(cwd).prefix, '/p');
+  // Without ELAN_HOME, the installed toolchain is looked up under ~/.elan.
+  delete process.env.LEAN; delete process.env.ELAN_HOME;
+  process.env.HOME = join(base, 'home');
+  script(join(base, 'path/lean'), 'echo "error: no default toolchain configured" >&2; exit 1');
+  process.env.PATH = join(base, 'path') + ':' + saved.PATH;
+  script(join(base, 'home/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean'),
+    `[ "$PWD" = "${cwd}" ] || exit 1\ncase "$1" in --githash) echo ${leanCommit};; --print-prefix) echo /elan;; esac`);
+  const { resolveLean: fromHome } = await import('../src/toolchain.mjs?home-elan');
+  const { homedir } = await import('node:os');
+  if (homedir() === join(base, 'home')) assert.equal(fromHome(cwd).prefix, '/elan');
+  else t.diagnostic('homedir() does not follow HOME here');
+});
