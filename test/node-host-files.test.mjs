@@ -164,3 +164,66 @@ test('Lean 4.35 reports its loop as always alive', async () => {
   const old = createNodeRuntimeHost({ leanVersion: '4.35.0' });
   try { assert.equal(old.request(145, 0, 0n, Buffer.alloc(0)).bytes.readBigUInt64LE(), 1n); } finally { old.close(); }
 });
+
+test('operation numbers route to their subsystems at each range boundary', async t => {
+  const { raw } = setup(t);
+  const message = async op => { const result = await raw(op); return result.error ? result.bytes.subarray(16).toString() : 'ok'; };
+  assert.deepEqual((await raw(192)).bytes, Buffer.from([1]));
+  assert.equal(await message(190), 'malformed fetch request');
+  assert.equal(await message(199), 'Unsupported fetch operation 199');
+  assert.equal(await message(189), 'Unsupported Lean async operation 189');
+  assert.equal(await message(220), 'Unsupported Lean async operation 220');
+  assert.notEqual(await message(200), 'Unsupported Lean async operation 200');
+  assert.notEqual(await message(219), 'Unsupported Lean async operation 219');
+  assert.equal(await message(165), 'Unsupported Lean async operation 165');
+  assert.equal(await message(164), 'Invalid or closed resource');
+  assert.equal(await message(160), 'ok');
+  assert.equal(await message(159), 'Unsupported Lean async operation 159');
+  assert.equal(await message(146), 'Unsupported Lean async operation 146');
+  assert.equal((await raw(144)).error, false);
+  assert.equal((await raw(120)).bytes.toString(), process.title);
+  assert.equal(await message(119), 'Unsupported Lean async operation 119');
+  assert.equal(await message(99), 'Unsupported Lean async operation 99');
+  assert.equal(await message(100), 'ok');
+  assert.equal(await message(114), 'Invalid or closed resource');
+  assert.equal(await message(79), 'Unsupported Lean async operation 79');
+  assert.equal(await message(85), 'ok');
+  assert.equal(await message(89), 'Invalid or closed resource');
+  assert.equal(await message(39), 'Unsupported Lean runtime operation 39');
+  assert.equal(await message(40), 'ok');
+});
+
+test('standard output and error go to the embedder\'s sinks', async t => {
+  const out = [], err = [];
+  const { ok, host } = setup(t, { stdio: { stdout: async bytes => out.push(Buffer.from(bytes).toString()), stderr: async bytes => err.push(Buffer.from(bytes).toString()) } });
+  await ok(3, 1, 0n, 'to out');
+  await ok(3, 2, 0n, 'to err');
+  assert.deepEqual([out, err], [['to out'], ['to err']]);
+  assert.equal((await host.flushStdIO()).length, 2);
+});
+
+test('a resource that arrives after disposal is closed and the request cancelled', { skip: !posix }, async t => {
+  const { directory, raw, host } = setup(t);
+  const pending = raw(1, 0, 1, 'created');
+  host.close();
+  const result = await pending;
+  assert.equal(result.error, true);
+  assert.deepEqual([Number(result.bytes.readBigUInt64LE()), result.bytes.subarray(16).toString()], [10, 'Lean runtime disposed']);
+  assert.ok(existsSync(join(directory, 'created')));
+  host.close();
+});
+
+test('temporary files use the C library\'s template under the temporary directory, with or without its slash', { skip: process.platform !== 'linux' }, async t => {
+  const { directory, ok, fails } = setup(t);
+  const { nativeFiles } = await import('../src/native-files.mjs');
+  const previous = process.env.TMPDIR;
+  t.after(() => previous === undefined ? nativeFiles().unsetEnvironment('TMPDIR') : nativeFiles().setEnvironment('TMPDIR', previous));
+  for (const base of [directory, directory + '/']) {
+    nativeFiles().setEnvironment('TMPDIR', base);
+    const name = (await ok(21)).toString();
+    assert.match(name, new RegExp(`^${directory}/tmp\\.[A-Za-z0-9]{8}$`));
+    assert.ok(statSync(name).isDirectory());
+  }
+  nativeFiles().setEnvironment('TMPDIR', '');
+  assert.deepEqual(await fails(20), { kind: 1, errno: 2, message: 'no such file or directory' });
+});
