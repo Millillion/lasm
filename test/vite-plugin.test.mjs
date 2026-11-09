@@ -218,3 +218,88 @@ test('Vite plugin, development with a configured CLI: a process per build with -
     } finally { delete process.env.LASM_CLI; }
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+test('Vite plugin: details: the CLI\'s exact arguments and environment, its stderr, a loader without a banner, source map positions', async () => {
+  const root = project();
+  mkdirSync(join(root, 'src', 'node_modules'), { recursive: true });
+  writeFileSync(join(root, 'src', 'node_modules', 'Dep.lean'), '');
+  const source = join(root, 'src', 'Main.lean');
+  const savedCI = process.env.CI;
+  delete process.env.CI;
+  try {
+    const p = plugin(root, { cli }, 'serve');
+    const ctx = context();
+    await p.load.call(ctx, '\0lasm:' + source);
+    assert.deepEqual(ctx.watched.sort(), [join(root, 'src', 'Main.lean'), join(root, 'src', 'deep', 'Util.lean')], 'node_modules is not watched');
+    const output = join(root, 'node_modules', '.vite', 'lasm', (await import('node:crypto')).createHash('sha256').update(source).digest('hex').slice(0, 16));
+    const ran = JSON.parse(readFileSync(join(output, 'ran.json'), 'utf8'));
+    assert.deepEqual(ran.args, ['build', source, '--target', 'browser', '--bundler', '--output', output, '--dev']);
+    assert.equal(ran.CI, '');
+  } finally { if (savedCI === undefined) delete process.env.CI; else process.env.CI = savedCI; }
+  // A failing CLI: its stderr is shown as it comes and ends the error message.
+  const shown = [];
+  const write = process.stderr.write;
+  process.stderr.write = chunk => { shown.push(String(chunk)); return true; };
+  process.env.LASM_TEST_CLI_FAIL = 'short';
+  try {
+    await assert.rejects(plugin(root, { cli }).load.call(context(), '\0lasm:' + source), { message: `lasm build ${join('src', 'Main.lean')} failed:\nMain.lean:1:0: error: broken\n` });
+  } finally { delete process.env.LASM_TEST_CLI_FAIL; process.stderr.write = write; }
+  assert.equal(shown.join(''), 'Main.lean:1:0: error: broken\n');
+  // A loader without a licence banner: nothing is added to the chunks.
+  process.env.LASM_TEST_NO_BANNER = '1';
+  try {
+    const p = plugin(root, { cli });
+    await p.load.call(context(), '\0lasm:' + source);
+    const entry = join(root, 'node_modules', '.vite', 'lasm', (await import('node:crypto')).createHash('sha256').update(source).digest('hex').slice(0, 16), 'app.0123456789ab.js');
+    const bundle = { 'a.js': { type: 'chunk', moduleIds: [entry], code: 'x();' } };
+    p.generateBundle.call({ emitFile() {} }, {}, bundle);
+    assert.equal(bundle['a.js'].code, 'x();');
+  } finally { delete process.env.LASM_TEST_NO_BANNER; }
+  // Where the banner goes: before a final source map comment only, keeping one newline.
+  const p = plugin(root, { cli });
+  await p.load.call(context(), '\0lasm:' + source);
+  const entry = join(root, 'node_modules', '.vite', 'lasm', (await import('node:crypto')).createHash('sha256').update(source).digest('hex').slice(0, 16), 'app.0123456789ab.js');
+  const banner = '/*! The app web app, built by Lasm. */\n';
+  const cases = {
+    'tail();\n': 'tail();\n' + banner,
+    'a();\n\n//# sourceMappingURL=a.map\n': 'a();\n' + banner + '//# sourceMappingURL=a.map\n',
+    'b();\n//# sourceMappingURL=b.map': 'b();\n' + banner + '//# sourceMappingURL=b.map',
+    '//# sourceMappingURL=c.map': '\n' + banner + '//# sourceMappingURL=c.map',
+    'd();\n//# sourceMappingURL=d.map\nmore();': 'd();\n//# sourceMappingURL=d.map\nmore();\n' + banner,
+  };
+  const bundle = Object.fromEntries(Object.keys(cases).map((code, i) => [`${i}.js`, { type: 'chunk', moduleIds: [entry], code }]));
+  p.generateBundle.call({ emitFile() {} }, {}, bundle);
+  assert.deepEqual(Object.values(bundle).map(chunk => chunk.code), Object.values(cases));
+  // An entry that no longer exists is compared by its path, not matched with every unknown module.
+  rmSync(entry);
+  const unknown = { 'u.js': { type: 'chunk', moduleIds: ['/nonexistent/module.js'], code: 'u();' } };
+  p.generateBundle.call({ emitFile() {} }, {}, unknown);
+  assert.equal(unknown['u.js'].code, 'u();');
+  rmSync(root, { recursive: true, force: true });
+});
+
+test('Vite plugin, development: worker failures (trimmed, at most 8000 characters), the update URL, closing before any build', async () => {
+  const root = project();
+  const source = join(root, 'src', 'Main.lean');
+  state.services = []; state.builds = []; state.fail = null;
+  const write = process.stderr.write;
+  process.stderr.write = () => true;
+  try {
+    const p = plugin(root, {}, 'serve');
+    let closeServer;
+    p.configureServer({ httpServer: { once: (event, fn) => { closeServer = fn; } } });
+    assert.doesNotThrow(() => closeServer(), 'no worker yet');
+    state.fail = Object.assign(new Error('m'), { stdout: '  out  ', stderr: undefined });
+    await assert.rejects(p.load.call(context(), '\0lasm:' + source), { message: `lasm build ${join('src', 'Main.lean')} failed:\nout` });
+    state.fail = Object.assign(new Error('m'), { stderr: 'y'.repeat(9000) + 'END' });
+    const p2 = plugin(root, {}, 'serve');
+    await assert.rejects(p2.load.call(context(), '\0lasm:' + source), error => error.message === `lasm build ${join('src', 'Main.lean')} failed:\n` + ('y'.repeat(9000) + 'END').slice(-8000));
+    state.fail = null;
+    const p3 = plugin(root, {}, 'serve');
+    await p3.load.call(context(), '\0lasm:' + source);
+    const sent = [];
+    await p3.handleHotUpdate({ file: source, server: { ws: { send: m => sent.push(m) } } });
+    const entry = join(state.builds.at(-1).options.output, 'app.0123456789ab.js');
+    assert.match(sent[0].data.url, new RegExp(`^/@fs/${entry.slice(1).replace(/[.]/g, '\\.')}\\?t=\\d+$`));
+  } finally { process.stderr.write = write; rmSync(root, { recursive: true, force: true }); }
+});

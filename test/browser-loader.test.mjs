@@ -332,3 +332,42 @@ test('loader: its default export, and no User Timing', async () => {
     await quiet.preload();
   } finally { performance.mark = mark; }
 });
+
+test('loader: more MIME types; no fetch at evaluation; no navigator; a start that throws nothing useful; the start time', async () => {
+  const { compileStreaming, compile } = WebAssembly;
+  const used = [];
+  WebAssembly.compileStreaming = async response => { used.push('streaming'); return compile(await response.arrayBuffer()); };
+  WebAssembly.compile = async bytes => { used.push('buffered'); return compile(bytes); };
+  try {
+    for (const type of [' \tapplication/wasm \t', 'xapplication/wasm', 'application/wasmx', 'application/wasm x']) {
+      serve({ type });
+      await (await loader()).preload();
+    }
+  } finally { WebAssembly.compileStreaming = compileStreaming; WebAssembly.compile = compile; }
+  assert.deepEqual(used, ['streaming', 'buffered', 'buffered', 'buffered']);
+  // A page without fetch at evaluation: compilation waits for preload, which then works.
+  delete globalThis.fetch;
+  const late = await loader({}, page());
+  serve();
+  assert.ok(await late.preload() instanceof WebAssembly.Module);
+  // No navigator at all (a worker-like host): JSPI as configured.
+  state.startLean = async () => instance();
+  const navigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+  Object.defineProperty(globalThis, 'navigator', { value: undefined, configurable: true });
+  try {
+    const { mount } = await loader({ suspend: 'jspi' });
+    await mount(new Element());
+    assert.equal(state.starts[0].jspi, true);
+  } finally { Object.defineProperty(globalThis, 'navigator', navigator); }
+  // startLean throwing undefined or null.
+  const { mount } = await loader({ name: 'n' });
+  for (const thrown of [undefined, null]) {
+    state.startLean = async () => { throw thrown; };
+    await assert.rejects(mount(new Element()), { message: `Lasm app n failed to start: ${thrown}` });
+  }
+  // The mounted mark's start time is how long startLean took.
+  state.startLean = async () => { await new Promise(r => setTimeout(r, 30)); return instance(); };
+  await mount(new Element());
+  const [mounted] = performance.getEntriesByName('lasm:mounted').filter(e => e.detail?.name === 'n');
+  assert.ok(mounted.detail.startMs >= 25 && mounted.detail.startMs < 5000, String(mounted.detail.startMs));
+});

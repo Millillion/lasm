@@ -7,6 +7,8 @@ import { test } from 'node:test';
 import * as web from '../src/lasm-modules/web.mjs';
 import * as app from '../src/lasm-modules/app.mjs';
 
+const realSetTimeout = globalThis.setTimeout;
+
 /** A stand-in node: records method calls in `calls`, keeps style and class lists. */
 function node(extra = {}) {
   const calls = [];
@@ -487,4 +489,113 @@ test('lasm:app instances: root, flags, target, messages, ports, hot state, unmou
   console.error = e => errors.push(e);
   try { bare.report('to console'); } finally { console.error = error; }
   assert.deepEqual(errors, ['to console']);
+});
+
+test('lasm:web bookkeeping in detail: the listener options, what an unmount removes, cleared and fired timers', async () => {
+  // A target that records what is added and removed.
+  const added = [], removed = [];
+  const target = {
+    addEventListener: (type, handler, options) => added.push({ type, handler, options }),
+    removeEventListener: (type, handler, options) => removed.push({ type, handler, options }),
+  };
+  const disposers = [];
+  const instance = web.lasmInstance({ onDispose: fn => disposers.push(fn), report: () => {} });
+  const calls = [];
+  instance.listen(target, 'plain', () => calls.push('plain'));
+  instance.listen(target, 'flag', () => {}, true);
+  instance.listen(target, 'text', () => {}, 'capture');
+  instance.listen(target, 'opts', () => {}, { capture: 1, passive: 'yes' });
+  const once = instance.listen(target, 'once', () => calls.push('once'), { once: true });
+  const twice = instance.listen(target, 'twice', () => {});
+  assert.deepEqual(added.map(a => [a.type, a.options]), [['plain', undefined], ['flag', undefined], ['text', undefined],
+    ['opts', { capture: true, passive: true, once: false }], ['once', { capture: false, passive: false, once: true }], ['twice', undefined]]);
+  // A once listener that fired is forgotten: removing it later removes nothing.
+  added[4].handler({});
+  once.remove();
+  assert.deepEqual(removed, []);
+  // Removing twice removes once.
+  twice.remove(); twice.remove();
+  assert.deepEqual(removed.map(r => r.type), ['twice']);
+  assert.equal(removed[0].handler, added[5].handler);
+  instance.unlisten({});
+  instance.unlisten(undefined);
+  // Timers and intervals: ids in one sequence; clearing a fired or cleared timer clears nothing.
+  const cleared = [];
+  const realClearTimeout = globalThis.clearTimeout, realClearInterval = globalThis.clearInterval;
+  globalThis.clearTimeout = handle => { cleared.push(['timeout', handle === undefined ? 'none' : 'handle']); realClearTimeout(handle); };
+  globalThis.clearInterval = handle => { cleared.push(['interval', handle === undefined ? 'none' : 'handle']); realClearInterval(handle); };
+  try {
+    const fired = instance.setTimeout(() => calls.push('fired'), 0);
+    const interval = instance.setInterval(() => {}, 1000);
+    assert.equal(interval, fired + 1);
+    const pending = instance.setTimeout(() => calls.push('pending'), 1000);
+    assert.equal(pending, interval + 1);
+    await new Promise(r => realSetTimeout(r, 20));
+    instance.clearTimeout(fired);
+    instance.clearInterval(interval);
+    instance.clearInterval(interval);
+    assert.deepEqual(cleared, [['timeout', 'none'], ['interval', 'handle'], ['interval', 'none']]);
+    cleared.length = 0;
+    // Unmount: every remaining listener is removed with its options, the pending timer is cleared; fired and cleared ones are not.
+    removed.length = 0;
+    const plainHandler = added[0].handler;
+    for (const fn of disposers) fn();
+    assert.deepEqual(removed.map(r => [r.type, r.options]), [['plain', undefined], ['flag', undefined], ['text', undefined], ['opts', { capture: true, passive: true, once: false }]]);
+    assert.deepEqual(cleared, [['timeout', 'handle']]);
+    // After the unmount a handler that still runs (a browser dispatching an event already queued) does nothing.
+    plainHandler({});
+    assert.deepEqual(calls, ['once', 'fired']);
+    // Nothing is tracked any more: removing a listener or clearing a timer touches nothing.
+    removed.length = 0; cleared.length = 0;
+    twice.remove();
+    instance.clearTimeout(pending);
+    assert.deepEqual(removed, []);
+    assert.deepEqual(cleared, [['timeout', 'none']]);
+  } finally { globalThis.clearTimeout = realClearTimeout; globalThis.clearInterval = realClearInterval; }
+  // Frames without cancelAnimationFrame (a host with requestAnimationFrame only): cancel and unmount do not throw.
+  const frameDisposers = [];
+  const frames = web.lasmInstance({ onDispose: fn => frameDisposers.push(fn) });
+  await withGlobal('requestAnimationFrame', () => 7, async () => {
+    const id = frames.requestAnimationFrame(() => {});
+    assert.equal(id, 7);
+    const had = Object.getOwnPropertyDescriptor(globalThis, 'cancelAnimationFrame');
+    delete globalThis.cancelAnimationFrame;
+    try {
+      assert.doesNotThrow(() => frames.requestAnimationFrame(() => {}));
+      assert.doesNotThrow(() => { for (const fn of frameDisposers) fn(); });
+      assert.doesNotThrow(() => frames.cancelAnimationFrame(7));
+    } finally { if (had) Object.defineProperty(globalThis, 'cancelAnimationFrame', had); }
+  });
+});
+
+test('lasm:web small cases: toggles with null, requests without a body, search params from an object', async () => {
+  const e = node();
+  web.toggleAttribute(e, 'hidden', null);
+  web.classToggle(e, 'c', undefined);
+  assert.deepEqual(e.calls, [['toggleAttribute', 'hidden'], ['toggle', 'c']]);
+  const requests = [];
+  await withGlobal('fetch', async (url, init) => { requests.push(init); return new Response(''); }, async () => {
+    await web.fetch('/x', { method: 'GET' });
+    await web.fetch('/y', { headers: 'not pairs', body: '' });
+  });
+  assert.deepEqual(requests, [{ method: 'GET' }, { body: '' }]);
+  assert.equal(Object.keys(requests[0]).join(), 'method');
+  assert.equal(web.searchParams({ a: 1 }).toString(), '', 'only strings and pairs');
+  assert.equal(web.searchParams(null).toString(), '');
+});
+
+test('lasm:app: exact stand-in messages, a queued send is a promise, errors without a report function', async () => {
+  assert.throws(() => app.onMessage(), { message: 'Lasm.Web.App: messages is only available in an app mounted by the browser loader (lasm build --target browser)' });
+  assert.throws(() => app.onUnmount(), { message: 'Lasm.Web.App: onUnmount is only available in an app mounted by the browser loader (lasm build --target browser)' });
+  const disposers = [];
+  const context = { onDispose: fn => disposers.push(fn) };
+  const instance = app.lasmInstance(context);
+  const queued = context.app.ports.p.send(1);
+  assert.ok(queued instanceof Promise);
+  assert.equal(await queued, undefined);
+  const port = instance.port('p');
+  context.app.ports.p.subscribe(() => { throw new Error('no report function'); });
+  assert.doesNotThrow(() => port.emit(1));
+  instance.onUnmount(() => { throw new Error('no report function either'); });
+  assert.doesNotThrow(() => { for (const fn of disposers) fn(); });
 });
