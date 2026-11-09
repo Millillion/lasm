@@ -29,9 +29,9 @@
     },
     "target-link": {
       "initial": 5.9,
-      "score": 86.8,
-      "mutants": 1950,
-      "threshold": 86
+      "score": 90.6,
+      "mutants": 1964,
+      "threshold": 90
     },
     "edge-glue": {
       "initial": 15.2,
