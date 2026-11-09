@@ -1,0 +1,2183 @@
+{
+  "schema": 1,
+  "version": "0.1.0-experimental.42631170043",
+  "candidate": {
+    "name": "@lasm/compiler",
+    "version": "0.1.0-experimental.42631170043",
+    "sha256": "40ff0cf09cba22ccf0ae4c237fbcb33c7fb4f3e58e97ba2f2b90bde988bc5666",
+    "sourceRevision": "caec72180a62ebb586827a0665fef4c647c0aaa2",
+    "release": "node-linux-candidate-42631170043",
+    "requiredNode": ">=24.0.0"
+  },
+  "reference": "linux-x64",
+  "platforms": {
+    "linux-x64": {
+      "schema": 1,
+      "suite": "lasm-release-benchmarks",
+      "recordedAt": "2026-11-09T15:49:50.348Z",
+      "candidate": {
+        "name": "@lasm/compiler",
+        "version": "0.1.0-experimental.42631170043",
+        "sha256": "40ff0cf09cba22ccf0ae4c237fbcb33c7fb4f3e58e97ba2f2b90bde988bc5666",
+        "sourceRevision": "caec72180a62ebb586827a0665fef4c647c0aaa2",
+        "release": "node-linux-candidate-42631170043",
+        "requiredNode": ">=24.0.0"
+      },
+      "harness": {
+        "commit": "caec72180a62ebb586827a0665fef4c647c0aaa2",
+        "loadGenerator": "bench/load.mjs (closed loop, 2 threads)"
+      },
+      "environment": {
+        "platform": "linux-x64",
+        "os": "Linux",
+        "osRelease": "7.0.0-1017-azure",
+        "distro": "Ubuntu 24.04.5 LTS",
+        "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+        "cpus": 4,
+        "memoryBytes": 16760348672,
+        "node": "26.13.0",
+        "npm": "11.20.0",
+        "v8": "14.6.202.34-node.40",
+        "runner": {
+          "kind": "github-actions",
+          "name": "GitHub Actions 1000034325",
+          "environment": "github-hosted",
+          "image": "ubuntu24",
+          "imageVersion": "20261101.360.1",
+          "runId": "42631170043",
+          "runAttempt": "1"
+        },
+        "pinning": {
+          "server": "0-1",
+          "load": "2-3"
+        }
+      },
+      "settings": {
+        "phases": [
+          "install",
+          "build",
+          "start",
+          "http",
+          "interop",
+          "bignum"
+        ],
+        "startReps": 10,
+        "loadReps": 3,
+        "loadSeconds": 10,
+        "warmupSeconds": 3,
+        "connections": 16,
+        "buildReps": 3,
+        "installReps": 3,
+        "interopReps": 3,
+        "interopSamples": 5000,
+        "maxRssMiB": 2048,
+        "bignumReps": 3,
+        "bignumDigits": 10000,
+        "idleSettleMs": 1000,
+        "reuse": false
+      },
+      "calibration": {
+        "cpuMs": {
+          "median": 774.601741,
+          "min": 771.9457189999999,
+          "max": 779.204522,
+          "n": 10
+        },
+        "beforeMs": {
+          "median": 775.315964,
+          "min": 771.9457189999999,
+          "max": 779.204522,
+          "n": 5
+        },
+        "afterMs": {
+          "median": 774.0253869999999,
+          "min": 772.3311689999999,
+          "max": 775.20746,
+          "n": 5
+        },
+        "description": "Fixed single-threaded JavaScript workload (SHA-256 of 64 MiB, JSON round trips, an integer loop) in a fresh Node process"
+      },
+      "metrics": {
+        "install.download_bytes": {
+          "value": 74662421,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "install",
+          "label": "Package download (npm tarball)"
+        },
+        "install.installed_bytes": {
+          "value": 425035702,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "install",
+          "label": "Installed size (node_modules)"
+        },
+        "install.package_bytes": {
+          "value": 425033255,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "install",
+          "label": "Installed size (the Lasm package itself)"
+        },
+        "install.time_ms": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "install",
+          "label": "npm install time, empty npm cache",
+          "value": 5651.744208,
+          "spread": {
+            "min": 5551.421649,
+            "max": 5783.163146999999,
+            "n": 3
+          }
+        },
+        "install.first_build_ms": {
+          "value": 24019.522402999995,
+          "unit": "ms",
+          "better": "lower",
+          "group": "install",
+          "label": "First build on a new machine (includes one-time tool download)"
+        },
+        "install.tool_cache_bytes": {
+          "value": 2625701512,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "install",
+          "label": "Tool cache after the first build (on disk)"
+        },
+        "size.dist_bytes.hello": {
+          "value": 8622208,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, hello"
+        },
+        "size.dist_gzip_bytes.hello": {
+          "value": 2563368,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, gzip -9 per file, hello"
+        },
+        "size.dist_brotli_bytes.hello": {
+          "value": 1701770,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, brotli 11 per file, hello"
+        },
+        "size.wasm_bytes.hello": {
+          "value": 542426,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, hello"
+        },
+        "size.wasm_gzip_bytes.hello": {
+          "value": 167034,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, gzip -9, hello"
+        },
+        "size.wasm_brotli_bytes.hello": {
+          "value": 128303,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, brotli 11, hello"
+        },
+        "size.node_modules_bytes.hello": {
+          "value": 0,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/node_modules (npm dependencies), hello"
+        },
+        "size.wasm_bytes_dev.hello": {
+          "value": 674309,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, dev profile, hello"
+        },
+        "build.clean_ms.hello": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "build",
+          "label": "Clean build (--rebuild), hello",
+          "normalize": "cpu",
+          "value": 3941.58217899999,
+          "spread": {
+            "min": 3788.399298999997,
+            "max": 5104.102515000006,
+            "n": 3
+          }
+        },
+        "build.incremental_ms.hello": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "build",
+          "label": "Incremental build after a one-line change, hello",
+          "normalize": "cpu",
+          "value": 5889.240042000005,
+          "spread": {
+            "min": 5824.1120660000015,
+            "max": 5906.0762470000045,
+            "n": 3
+          }
+        },
+        "build.incremental_dev_ms.hello": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "build",
+          "label": "Incremental dev build (--dev) after a one-line change, hello",
+          "normalize": "cpu",
+          "value": 1288.0558599999931,
+          "spread": {
+            "min": 1280.3372429999872,
+            "max": 1830.620939000015,
+            "n": 3
+          }
+        },
+        "size.dist_bytes.hono": {
+          "value": 8924401,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, hono"
+        },
+        "size.dist_gzip_bytes.hono": {
+          "value": 2652409,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, gzip -9 per file, hono"
+        },
+        "size.dist_brotli_bytes.hono": {
+          "value": 1768121,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, brotli 11 per file, hono"
+        },
+        "size.wasm_bytes.hono": {
+          "value": 765735,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, hono"
+        },
+        "size.wasm_gzip_bytes.hono": {
+          "value": 229656,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, gzip -9, hono"
+        },
+        "size.wasm_brotli_bytes.hono": {
+          "value": 171579,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, brotli 11, hono"
+        },
+        "size.node_modules_bytes.hono": {
+          "value": 1432523,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/node_modules (npm dependencies), hono"
+        },
+        "size.wasm_bytes_dev.hono": {
+          "value": 958713,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, dev profile, hono"
+        },
+        "build.clean_ms.hono": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "build",
+          "label": "Clean build (--rebuild), hono",
+          "normalize": "cpu",
+          "value": 6544.553960999998,
+          "spread": {
+            "min": 6257.819358000008,
+            "max": 28828.463958000008,
+            "n": 3
+          }
+        },
+        "build.incremental_ms.hono": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "build",
+          "label": "Incremental build after a one-line change, hono",
+          "normalize": "cpu",
+          "value": 9025.326942000014,
+          "spread": {
+            "min": 8734.041121999995,
+            "max": 9031.949346000009,
+            "n": 3
+          }
+        },
+        "build.incremental_dev_ms.hono": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "build",
+          "label": "Incremental dev build (--dev) after a one-line change, hono",
+          "normalize": "cpu",
+          "value": 2571.3442649999924,
+          "spread": {
+            "min": 2508.9235599999956,
+            "max": 3111.84792,
+            "n": 3
+          }
+        },
+        "build.clean_ms.express": {
+          "value": 12457.850748999976,
+          "unit": "ms",
+          "better": "lower",
+          "group": "build",
+          "label": "Clean build, express",
+          "normalize": "cpu",
+          "spread": {
+            "n": 1
+          }
+        },
+        "size.dist_bytes.express": {
+          "value": 8920578,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, express"
+        },
+        "size.dist_gzip_bytes.express": {
+          "value": 2652073,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, gzip -9 per file, express"
+        },
+        "size.dist_brotli_bytes.express": {
+          "value": 1767927,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, brotli 11 per file, express"
+        },
+        "size.wasm_bytes.express": {
+          "value": 762337,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, express"
+        },
+        "size.wasm_gzip_bytes.express": {
+          "value": 228662,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, gzip -9, express"
+        },
+        "size.wasm_brotli_bytes.express": {
+          "value": 171111,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, brotli 11, express"
+        },
+        "size.node_modules_bytes.express": {
+          "value": 2257187,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/node_modules (npm dependencies), express"
+        },
+        "build.clean_ms.std-http": {
+          "value": 16859.383453999995,
+          "unit": "ms",
+          "better": "lower",
+          "group": "build",
+          "label": "Clean build, std-http",
+          "normalize": "cpu",
+          "spread": {
+            "n": 1
+          }
+        },
+        "size.dist_bytes.std-http": {
+          "value": 9799075,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, std-http"
+        },
+        "size.dist_gzip_bytes.std-http": {
+          "value": 2825511,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, gzip -9 per file, std-http"
+        },
+        "size.dist_brotli_bytes.std-http": {
+          "value": 1872283,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, brotli 11 per file, std-http"
+        },
+        "size.wasm_bytes.std-http": {
+          "value": 1719284,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, std-http"
+        },
+        "size.wasm_gzip_bytes.std-http": {
+          "value": 429172,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, gzip -9, std-http"
+        },
+        "size.wasm_brotli_bytes.std-http": {
+          "value": 298823,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, brotli 11, std-http"
+        },
+        "size.node_modules_bytes.std-http": {
+          "value": 0,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/node_modules (npm dependencies), std-http"
+        },
+        "build.clean_ms.interop": {
+          "value": 10895.765336000011,
+          "unit": "ms",
+          "better": "lower",
+          "group": "build",
+          "label": "Clean build, interop",
+          "normalize": "cpu",
+          "spread": {
+            "n": 1
+          }
+        },
+        "size.dist_bytes.interop": {
+          "value": 8832460,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, interop"
+        },
+        "size.dist_gzip_bytes.interop": {
+          "value": 2622580,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, gzip -9 per file, interop"
+        },
+        "size.dist_brotli_bytes.interop": {
+          "value": 1743214,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, brotli 11 per file, interop"
+        },
+        "size.wasm_bytes.interop": {
+          "value": 746905,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, interop"
+        },
+        "size.wasm_gzip_bytes.interop": {
+          "value": 224865,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, gzip -9, interop"
+        },
+        "size.wasm_brotli_bytes.interop": {
+          "value": 168551,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, brotli 11, interop"
+        },
+        "size.node_modules_bytes.interop": {
+          "value": 0,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/node_modules (npm dependencies), interop"
+        },
+        "build.clean_ms.bignum": {
+          "value": 6779.647643000004,
+          "unit": "ms",
+          "better": "lower",
+          "group": "build",
+          "label": "Clean build, bignum",
+          "normalize": "cpu",
+          "spread": {
+            "n": 1
+          }
+        },
+        "size.dist_bytes.bignum": {
+          "value": 8648233,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, bignum"
+        },
+        "size.dist_gzip_bytes.bignum": {
+          "value": 2571679,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, gzip -9 per file, bignum"
+        },
+        "size.dist_brotli_bytes.bignum": {
+          "value": 1707249,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/ without node_modules, brotli 11 per file, bignum"
+        },
+        "size.wasm_bytes.bignum": {
+          "value": 568451,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, bignum"
+        },
+        "size.wasm_gzip_bytes.bignum": {
+          "value": 175351,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, gzip -9, bignum"
+        },
+        "size.wasm_brotli_bytes.bignum": {
+          "value": 133810,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "program.wasm, brotli 11, bignum"
+        },
+        "size.node_modules_bytes.bignum": {
+          "value": 0,
+          "unit": "bytes",
+          "better": "lower",
+          "group": "size",
+          "label": "dist/node_modules (npm dependencies), bignum"
+        },
+        "start.exit_ms.node-hello": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to exit, Plain Node console.log (reference)",
+          "ratioTo": "node-hello",
+          "reference": true,
+          "value": 26.129822999995667,
+          "spread": {
+            "min": 24.75284900004044,
+            "max": 29.092461000022013,
+            "n": 10
+          }
+        },
+        "start.first_output_ms.node-hello": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to first output, Plain Node console.log (reference)",
+          "reference": true,
+          "value": 23.696693500009133,
+          "spread": {
+            "min": 22.581612000009045,
+            "max": 26.413632999989204,
+            "n": 10
+          }
+        },
+        "start.exit_ms.lasm-hello": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to exit, Trivial Lean program",
+          "ratio": 5.99,
+          "ratioTo": "node-hello",
+          "value": 156.41163550000056,
+          "spread": {
+            "min": 152.446781000006,
+            "max": 160.61822000000393,
+            "n": 10
+          }
+        },
+        "start.first_output_ms.lasm-hello": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to first output, Trivial Lean program",
+          "value": 147.63116399999126,
+          "spread": {
+            "min": 143.50637100002496,
+            "max": 151.94664199999534,
+            "n": 10
+          }
+        },
+        "start.ready_ms.node-http": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to listening, Plain Node node:http (reference)",
+          "reference": true,
+          "value": 48.5459555000125,
+          "spread": {
+            "min": 47.46843200002331,
+            "max": 55.05664299998898,
+            "n": 10
+          }
+        },
+        "start.first_response_ms.node-http": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to first HTTP response, Plain Node node:http (reference)",
+          "ratioTo": "node-http",
+          "reference": true,
+          "value": 51.95472099998733,
+          "spread": {
+            "min": 50.79619399999501,
+            "max": 58.9635540000163,
+            "n": 10
+          }
+        },
+        "start.ready_ms.node-hono": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to listening, Hono, JavaScript handler (reference)",
+          "reference": true,
+          "value": 65.79692199997953,
+          "spread": {
+            "min": 62.324465000012424,
+            "max": 67.58574400004,
+            "n": 10
+          }
+        },
+        "start.first_response_ms.node-hono": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to first HTTP response, Hono, JavaScript handler (reference)",
+          "ratio": 1.35,
+          "ratioTo": "node-http",
+          "reference": true,
+          "value": 69.91703749998123,
+          "spread": {
+            "min": 66.58630700001959,
+            "max": 73.32575400004862,
+            "n": 10
+          }
+        },
+        "start.ready_ms.node-express": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to listening, Express, JavaScript handler (reference)",
+          "reference": true,
+          "value": 77.95383099999162,
+          "spread": {
+            "min": 72.60999500000617,
+            "max": 81.64899000001606,
+            "n": 10
+          }
+        },
+        "start.first_response_ms.node-express": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to first HTTP response, Express, JavaScript handler (reference)",
+          "ratio": 1.62,
+          "ratioTo": "node-http",
+          "reference": true,
+          "value": 84.33253349998267,
+          "spread": {
+            "min": 77.76682100002654,
+            "max": 87.47135399997933,
+            "n": 10
+          }
+        },
+        "start.ready_ms.lasm-hono": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to listening, Hono with a Lean handler",
+          "value": 226.26391700000386,
+          "spread": {
+            "min": 218.69309900002554,
+            "max": 237.5059889999684,
+            "n": 10
+          }
+        },
+        "start.first_response_ms.lasm-hono": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to first HTTP response, Hono with a Lean handler",
+          "ratio": 3.97,
+          "ratioTo": "node-http",
+          "value": 206.42058800000814,
+          "spread": {
+            "min": 197.9846869999892,
+            "max": 217.5430129999877,
+            "n": 10
+          }
+        },
+        "start.ready_ms.lasm-express": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to listening, Express with a Lean handler",
+          "value": 249.78820750000887,
+          "spread": {
+            "min": 240.34094600001117,
+            "max": 260.276772000012,
+            "n": 10
+          }
+        },
+        "start.first_response_ms.lasm-express": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to first HTTP response, Express with a Lean handler",
+          "ratio": 4.4,
+          "ratioTo": "node-http",
+          "value": 228.5691030000453,
+          "spread": {
+            "min": 218.15399299998535,
+            "max": 239.21309299999848,
+            "n": 10
+          }
+        },
+        "start.ready_ms.lasm-std-http": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to listening, Lean's Std.Http server",
+          "value": 195.6111399999936,
+          "spread": {
+            "min": 188.43922900001053,
+            "max": 213.90086399996653,
+            "n": 10
+          }
+        },
+        "start.first_response_ms.lasm-std-http": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "start",
+          "label": "Start to first HTTP response, Lean's Std.Http server",
+          "ratio": 5.59,
+          "ratioTo": "node-http",
+          "value": 290.3558395,
+          "spread": {
+            "min": 272.52080900000874,
+            "max": 306.44696099997964,
+            "n": 10
+          }
+        },
+        "memory.max_rss_bytes.node-hello": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "label": "Peak RSS, Plain Node console.log (reference)",
+          "reference": true,
+          "ratioTo": "node-hello",
+          "value": 61997056,
+          "spread": {
+            "min": 61997056,
+            "max": 61997056,
+            "n": 3
+          }
+        },
+        "memory.max_rss_bytes.lasm-hello": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "label": "Peak RSS, Trivial Lean program",
+          "ratio": 1.62,
+          "ratioTo": "node-hello",
+          "value": 100372480,
+          "spread": {
+            "min": 100061184,
+            "max": 100601856,
+            "n": 3
+          }
+        },
+        "http.rps.node-http": {
+          "unit": "req/s",
+          "better": "higher",
+          "group": "http",
+          "reference": true,
+          "label": "Throughput, Plain Node node:http (reference)",
+          "value": 85598,
+          "spread": {
+            "min": 84950.9,
+            "max": 86528.8,
+            "n": 3
+          }
+        },
+        "http.p50_ms.node-http": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "http",
+          "reference": true,
+          "label": "Latency p50, Plain Node node:http (reference)",
+          "value": 0.164,
+          "spread": {
+            "min": 0.162,
+            "max": 0.165,
+            "n": 3
+          }
+        },
+        "http.p99_ms.node-http": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "http",
+          "reference": true,
+          "label": "Latency p99, Plain Node node:http (reference)",
+          "value": 0.397,
+          "spread": {
+            "min": 0.369,
+            "max": 0.417,
+            "n": 3
+          }
+        },
+        "memory.idle_rss_bytes.node-http": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "reference": true,
+          "label": "Idle RSS after start, Plain Node node:http (reference)",
+          "value": 65392640,
+          "spread": {
+            "min": 65196032,
+            "max": 65462272,
+            "n": 3
+          }
+        },
+        "memory.peak_rss_bytes.node-http": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "reference": true,
+          "label": "Peak RSS under load, Plain Node node:http (reference)",
+          "value": 88604672,
+          "spread": {
+            "min": 87891968,
+            "max": 90554368,
+            "n": 3
+          }
+        },
+        "http.rps.node-hono": {
+          "unit": "req/s",
+          "better": "higher",
+          "group": "http",
+          "reference": true,
+          "label": "Throughput, Hono, JavaScript handler (reference)",
+          "ratio": 0.906,
+          "ratioTo": "node-http",
+          "value": 76982.3,
+          "spread": {
+            "min": 75868.8,
+            "max": 77633.8,
+            "n": 3
+          }
+        },
+        "http.p50_ms.node-hono": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "http",
+          "reference": true,
+          "label": "Latency p50, Hono, JavaScript handler (reference)",
+          "ratio": 1.11,
+          "ratioTo": "node-http",
+          "value": 0.182,
+          "spread": {
+            "min": 0.182,
+            "max": 0.187,
+            "n": 3
+          }
+        },
+        "http.p99_ms.node-hono": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "http",
+          "reference": true,
+          "label": "Latency p99, Hono, JavaScript handler (reference)",
+          "ratio": 1.152,
+          "ratioTo": "node-http",
+          "value": 0.43,
+          "spread": {
+            "min": 0.425,
+            "max": 0.458,
+            "n": 3
+          }
+        },
+        "memory.idle_rss_bytes.node-hono": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "reference": true,
+          "label": "Idle RSS after start, Hono, JavaScript handler (reference)",
+          "ratio": 1.076,
+          "ratioTo": "node-http",
+          "value": 70352896,
+          "spread": {
+            "min": 70287360,
+            "max": 70434816,
+            "n": 3
+          }
+        },
+        "memory.peak_rss_bytes.node-hono": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "reference": true,
+          "label": "Peak RSS under load, Hono, JavaScript handler (reference)",
+          "ratio": 1.08,
+          "ratioTo": "node-http",
+          "value": 95834112,
+          "spread": {
+            "min": 94916608,
+            "max": 96899072,
+            "n": 3
+          }
+        },
+        "http.rps.node-express": {
+          "unit": "req/s",
+          "better": "higher",
+          "group": "http",
+          "reference": true,
+          "label": "Throughput, Express, JavaScript handler (reference)",
+          "ratio": 0.417,
+          "ratioTo": "node-http",
+          "value": 36094.5,
+          "spread": {
+            "min": 34179.3,
+            "max": 36174.9,
+            "n": 3
+          }
+        },
+        "http.p50_ms.node-express": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "http",
+          "reference": true,
+          "label": "Latency p50, Express, JavaScript handler (reference)",
+          "ratio": 2.488,
+          "ratioTo": "node-http",
+          "value": 0.403,
+          "spread": {
+            "min": 0.401,
+            "max": 0.424,
+            "n": 3
+          }
+        },
+        "http.p99_ms.node-express": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "http",
+          "reference": true,
+          "label": "Latency p99, Express, JavaScript handler (reference)",
+          "ratio": 2.355,
+          "ratioTo": "node-http",
+          "value": 0.869,
+          "spread": {
+            "min": 0.851,
+            "max": 0.946,
+            "n": 3
+          }
+        },
+        "memory.idle_rss_bytes.node-express": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "reference": true,
+          "label": "Idle RSS after start, Express, JavaScript handler (reference)",
+          "ratio": 1.113,
+          "ratioTo": "node-http",
+          "value": 72646656,
+          "spread": {
+            "min": 72228864,
+            "max": 72769536,
+            "n": 3
+          }
+        },
+        "memory.peak_rss_bytes.node-express": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "reference": true,
+          "label": "Peak RSS under load, Express, JavaScript handler (reference)",
+          "ratio": 1.17,
+          "ratioTo": "node-http",
+          "value": 105033728,
+          "spread": {
+            "min": 103690240,
+            "max": 105476096,
+            "n": 3
+          }
+        },
+        "http.rps.lasm-hono": {
+          "unit": "req/s",
+          "better": "higher",
+          "group": "http",
+          "label": "Throughput, Hono with a Lean handler",
+          "ratio": 0.164,
+          "ratioTo": "node-http",
+          "frameworkRatio": 0.183,
+          "frameworkRef": "node-hono",
+          "value": 14056.1,
+          "spread": {
+            "min": 14046.3,
+            "max": 14080.2,
+            "n": 3
+          }
+        },
+        "http.p50_ms.lasm-hono": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "http",
+          "label": "Latency p50, Hono with a Lean handler",
+          "ratio": 6.366,
+          "ratioTo": "node-http",
+          "value": 1.039,
+          "spread": {
+            "min": 1.039,
+            "max": 1.044,
+            "n": 3
+          }
+        },
+        "http.p99_ms.lasm-hono": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "http",
+          "label": "Latency p99, Hono with a Lean handler",
+          "ratio": 16.512,
+          "ratioTo": "node-http",
+          "value": 6.522,
+          "spread": {
+            "min": 6.093,
+            "max": 6.621,
+            "n": 3
+          }
+        },
+        "memory.idle_rss_bytes.lasm-hono": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "label": "Idle RSS after start, Hono with a Lean handler",
+          "ratio": 1.922,
+          "ratioTo": "node-http",
+          "value": 125710336,
+          "spread": {
+            "min": 125681664,
+            "max": 127565824,
+            "n": 3
+          }
+        },
+        "memory.peak_rss_bytes.lasm-hono": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "label": "Peak RSS under load, Hono with a Lean handler",
+          "ratio": 3.2,
+          "ratioTo": "node-http",
+          "value": 285982720,
+          "spread": {
+            "min": 283512832,
+            "max": 286277632,
+            "n": 3
+          }
+        },
+        "http.rps.lasm-express": {
+          "unit": "req/s",
+          "better": "higher",
+          "group": "http",
+          "label": "Throughput, Express with a Lean handler",
+          "ratio": 0.109,
+          "ratioTo": "node-http",
+          "frameworkRatio": 0.259,
+          "frameworkRef": "node-express",
+          "value": 9362.4,
+          "spread": {
+            "min": 9340.1,
+            "max": 9500.2,
+            "n": 3
+          }
+        },
+        "http.p50_ms.lasm-express": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "http",
+          "label": "Latency p50, Express with a Lean handler",
+          "ratio": 9.835,
+          "ratioTo": "node-http",
+          "value": 1.613,
+          "spread": {
+            "min": 1.586,
+            "max": 1.619,
+            "n": 3
+          }
+        },
+        "http.p99_ms.lasm-express": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "http",
+          "label": "Latency p99, Express with a Lean handler",
+          "ratio": 19.116,
+          "ratioTo": "node-http",
+          "value": 7.589,
+          "spread": {
+            "min": 7.479,
+            "max": 7.703,
+            "n": 3
+          }
+        },
+        "memory.idle_rss_bytes.lasm-express": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "label": "Idle RSS after start, Express with a Lean handler",
+          "ratio": 1.992,
+          "ratioTo": "node-http",
+          "value": 130269184,
+          "spread": {
+            "min": 129126400,
+            "max": 141250560,
+            "n": 3
+          }
+        },
+        "memory.peak_rss_bytes.lasm-express": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "label": "Peak RSS under load, Express with a Lean handler",
+          "ratio": 3.214,
+          "ratioTo": "node-http",
+          "value": 283648000,
+          "spread": {
+            "min": 282451968,
+            "max": 285081600,
+            "n": 3
+          }
+        },
+        "http.rps.lasm-std-http": {
+          "unit": "req/s",
+          "better": "higher",
+          "group": "http",
+          "label": "Throughput, Lean's Std.Http server",
+          "ratio": 0.01,
+          "ratioTo": "node-http",
+          "value": 867.2,
+          "spread": {
+            "min": 859.8,
+            "max": 883.3,
+            "n": 3
+          }
+        },
+        "http.p50_ms.lasm-std-http": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "http",
+          "label": "Latency p50, Lean's Std.Http server",
+          "ratio": 112.648,
+          "ratioTo": "node-http",
+          "value": 18.587,
+          "spread": {
+            "min": 18.118,
+            "max": 18.741,
+            "n": 3
+          }
+        },
+        "http.p99_ms.lasm-std-http": {
+          "unit": "ms",
+          "better": "lower",
+          "group": "http",
+          "label": "Latency p99, Lean's Std.Http server",
+          "ratio": 70.83,
+          "ratioTo": "node-http",
+          "value": 26.748,
+          "spread": {
+            "min": 26.618,
+            "max": 29.536,
+            "n": 3
+          }
+        },
+        "memory.idle_rss_bytes.lasm-std-http": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "label": "Idle RSS after start, Lean's Std.Http server",
+          "ratio": 2.783,
+          "ratioTo": "node-http",
+          "value": 181825536,
+          "spread": {
+            "min": 181448704,
+            "max": 182312960,
+            "n": 3
+          }
+        },
+        "memory.peak_rss_bytes.lasm-std-http": {
+          "unit": "bytes",
+          "better": "lower",
+          "group": "memory",
+          "label": "Peak RSS under load, Lean's Std.Http server",
+          "ratio": 4.521,
+          "ratioTo": "node-http",
+          "value": 401219584,
+          "spread": {
+            "min": 397336576,
+            "max": 406986752,
+            "n": 3
+          }
+        },
+        "interop.call_p50_us": {
+          "unit": "µs",
+          "better": "lower",
+          "group": "interop",
+          "label": "Lean→JS synchronous call round trip (Math.max()), p50",
+          "normalize": "cpu",
+          "value": 6.72,
+          "spread": {
+            "min": 6.59,
+            "max": 7.001,
+            "n": 3
+          }
+        },
+        "interop.call_p99_us": {
+          "unit": "µs",
+          "better": "lower",
+          "group": "interop",
+          "label": "Lean→JS synchronous call round trip (Math.max()), p99",
+          "normalize": "cpu",
+          "value": 51.337,
+          "spread": {
+            "min": 50.556,
+            "max": 55.859,
+            "n": 3
+          }
+        },
+        "interop.await_p50_us": {
+          "unit": "µs",
+          "better": "lower",
+          "group": "interop",
+          "label": "Lean awaits a resolved JS promise (Promise.resolve(1)), p50",
+          "normalize": "cpu",
+          "value": 14.923,
+          "spread": {
+            "min": 14.242,
+            "max": 19.78,
+            "n": 3
+          }
+        },
+        "interop.await_p99_us": {
+          "unit": "µs",
+          "better": "lower",
+          "group": "interop",
+          "label": "Lean awaits a resolved JS promise (Promise.resolve(1)), p99",
+          "normalize": "cpu",
+          "value": 44.747,
+          "spread": {
+            "min": 39.8,
+            "max": 47.411,
+            "n": 3
+          }
+        },
+        "bignum.mul_10k_us": {
+          "unit": "µs",
+          "better": "lower",
+          "group": "bignum",
+          "label": "Big numbers, multiplication, 10000-digit operands",
+          "normalize": "cpu",
+          "value": 965.178,
+          "spread": {
+            "min": 948.513,
+            "max": 982.484,
+            "n": 3
+          }
+        },
+        "bignum.div_10k_us": {
+          "unit": "µs",
+          "better": "lower",
+          "group": "bignum",
+          "label": "Big numbers, division (2n by n/2 digits), 10000-digit operands",
+          "normalize": "cpu",
+          "value": 1909.313,
+          "spread": {
+            "min": 1908.863,
+            "max": 1914.301,
+            "n": 3
+          }
+        },
+        "bignum.mod_10k_us": {
+          "unit": "µs",
+          "better": "lower",
+          "group": "bignum",
+          "label": "Big numbers, remainder, 10000-digit operands",
+          "normalize": "cpu",
+          "value": 1896.474,
+          "spread": {
+            "min": 1894.842,
+            "max": 1897.076,
+            "n": 3
+          }
+        },
+        "bignum.toString_10k_us": {
+          "unit": "µs",
+          "better": "lower",
+          "group": "bignum",
+          "label": "Big numbers, toString (decimal), 10000-digit operands",
+          "normalize": "cpu",
+          "value": 105493.692,
+          "spread": {
+            "min": 105307.986,
+            "max": 105539.832,
+            "n": 3
+          }
+        },
+        "bignum.ofString_10k_us": {
+          "unit": "µs",
+          "better": "lower",
+          "group": "bignum",
+          "label": "Big numbers, String.toNat? (decimal), 10000-digit operands",
+          "normalize": "cpu",
+          "value": 19826.726,
+          "spread": {
+            "min": 19676.431,
+            "max": 19901.423,
+            "n": 3
+          }
+        },
+        "bignum.gcd_10k_us": {
+          "unit": "µs",
+          "better": "lower",
+          "group": "bignum",
+          "label": "Big numbers, Nat.gcd, 10000-digit operands",
+          "normalize": "cpu",
+          "value": 28881.458,
+          "spread": {
+            "min": 28873.335,
+            "max": 28935.474,
+            "n": 3
+          }
+        }
+      },
+      "raw": {
+        "distFiles": {
+          "hello": 68,
+          "hono": 68,
+          "express": 68,
+          "std-http": 68,
+          "interop": 68,
+          "bignum": 68
+        },
+        "start": {
+          "lasm-hello.first_output": [
+            144.2935909999651,
+            143.50637100002496,
+            143.81168399995659,
+            148.5664059999981,
+            150.66171399998711,
+            151.88338700000895,
+            151.94664199999534,
+            145.93855600000825,
+            147.77040799998213,
+            147.4919200000004
+          ],
+          "lasm-hello.exit": [
+            153.35778799996478,
+            152.446781000006,
+            152.46214399999008,
+            157.61413200001698,
+            159.11158799997065,
+            160.61822000000393,
+            160.40148000000045,
+            154.663172999979,
+            156.88082899997244,
+            155.94244200002868
+          ],
+          "node-hello.first_output": [
+            22.581612000009045,
+            23.041741999972146,
+            23.414767000009306,
+            25.482964000024367,
+            23.274731000012252,
+            23.97862000000896,
+            22.867894000024535,
+            26.1066620000056,
+            26.413632999989204,
+            24.906182000006083
+          ],
+          "node-hello.exit": [
+            24.75284900004044,
+            25.571891999978106,
+            25.83770099998219,
+            28.236192999989726,
+            25.501710999989882,
+            26.421945000009146,
+            25.28534000000218,
+            28.6885150000453,
+            29.092461000022013,
+            27.504263999988325
+          ],
+          "node-hono.ready": [
+            62.324465000012424,
+            66.29733400000259,
+            63.14318800001638,
+            66.06861099996604,
+            65.52523299999302,
+            62.83970399998361,
+            62.78076200000942,
+            66.65756100002909,
+            67.58574400004,
+            67.55958500003908
+          ],
+          "node-hono.first_response": [
+            66.58630700001959,
+            71.59379900002386,
+            67.38254700001562,
+            70.23295799997868,
+            69.60111699998379,
+            66.8152279999922,
+            66.94439800002147,
+            71.11255399999209,
+            73.32575400004862,
+            72.03200400003698
+          ],
+          "node-express.ready": [
+            74.43546599999536,
+            78.31131499999901,
+            77.59634699998423,
+            77.26840599998832,
+            80.51178900001105,
+            75.43130799999926,
+            78.60673200001474,
+            81.64899000001606,
+            72.60999500000617,
+            79.52639100002125
+          ],
+          "node-express.first_response": [
+            81.29325299995253,
+            83.59160499996506,
+            86.24553100002231,
+            82.48661299998639,
+            86.37819900002796,
+            79.983367000008,
+            85.07346200000029,
+            87.47135399997933,
+            77.76682100002654,
+            85.38226500002202
+          ],
+          "lasm-hono.ready": [
+            218.69309900002554,
+            221.74810699996306,
+            228.04217799997423,
+            221.43507200002205,
+            231.8461139999563,
+            237.5059889999684,
+            225.70435000001453,
+            226.8234839999932,
+            224.8039390000049,
+            228.00316399999429
+          ],
+          "lasm-hono.first_response": [
+            197.9846869999892,
+            203.09584899997571,
+            208.31218299997272,
+            200.76339500001632,
+            211.9445799999521,
+            217.5430129999877,
+            207.41547499998705,
+            205.47062300000107,
+            204.06115299998783,
+            207.3705530000152
+          ],
+          "lasm-express.ready": [
+            240.34094600001117,
+            244.89042900002096,
+            255.4250099999481,
+            249.36526200000662,
+            247.36923900002148,
+            260.276772000012,
+            256.7731409999542,
+            254.0721650000196,
+            250.2111530000111,
+            244.27021499996772
+          ],
+          "lasm-express.first_response": [
+            221.48919800005388,
+            226.70829600002617,
+            239.21309299999848,
+            224.13926299999002,
+            227.3452620000462,
+            231.9640810000128,
+            232.4847159999772,
+            233.70777600002475,
+            229.79294400004437,
+            218.15399299998535
+          ],
+          "lasm-std-http.ready": [
+            194.25153199996566,
+            203.09683500003302,
+            193.89941399998497,
+            194.2583379999851,
+            188.43922900001053,
+            196.96394200000213,
+            202.62521000002744,
+            213.90086399996653,
+            201.26670099998591,
+            193.08415200002491
+          ],
+          "lasm-std-http.first_response": [
+            289.043537999969,
+            299.902070000011,
+            274.5654299999587,
+            275.2918059999938,
+            272.52080900000874,
+            286.4109700000263,
+            291.668141000031,
+            306.44696099997964,
+            293.66577199997846,
+            292.3581160000176
+          ],
+          "node-http.ready": [
+            50.40739000000758,
+            49.73722900002031,
+            55.05664299998898,
+            47.84765000001062,
+            48.18446999997832,
+            47.46843200002331,
+            48.45104600000195,
+            50.16048600000795,
+            47.91218799998751,
+            48.64086500002304
+          ],
+          "node-http.first_response": [
+            54.149803999986034,
+            52.550388999981806,
+            58.9635540000163,
+            50.84334299998591,
+            51.03604799997993,
+            51.229684000019915,
+            53.2726590000093,
+            53.27361600002041,
+            50.79619399999501,
+            51.359052999992855
+          ]
+        },
+        "http": [
+          {
+            "rep": 0,
+            "server": "node-http",
+            "idleRssBytes": 65196032,
+            "peakRssBytes": 88604672,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 855980,
+            "rps": 85598,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 0.164,
+              "p90": 0.311,
+              "p99": 0.417,
+              "max": 6.403,
+              "mean": 0.187
+            }
+          },
+          {
+            "rep": 0,
+            "server": "node-hono",
+            "idleRssBytes": 70352896,
+            "peakRssBytes": 96899072,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 776338,
+            "rps": 77633.8,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 0.182,
+              "p90": 0.347,
+              "p99": 0.43,
+              "max": 5.627,
+              "mean": 0.206
+            }
+          },
+          {
+            "rep": 0,
+            "server": "node-express",
+            "idleRssBytes": 72646656,
+            "peakRssBytes": 103690240,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 361749,
+            "rps": 36174.9,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 0.401,
+              "p90": 0.629,
+              "p99": 0.851,
+              "max": 8.506,
+              "mean": 0.442
+            }
+          },
+          {
+            "rep": 0,
+            "server": "lasm-hono",
+            "idleRssBytes": 127565824,
+            "peakRssBytes": 283512832,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 140463,
+            "rps": 14046.3,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 1.044,
+              "p90": 1.158,
+              "p99": 6.522,
+              "max": 23.341,
+              "mean": 1.139
+            }
+          },
+          {
+            "rep": 0,
+            "server": "lasm-express",
+            "idleRssBytes": 129126400,
+            "peakRssBytes": 285081600,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 93624,
+            "rps": 9362.4,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 1.613,
+              "p90": 1.667,
+              "p99": 7.703,
+              "max": 21.426,
+              "mean": 1.709
+            }
+          },
+          {
+            "rep": 0,
+            "server": "lasm-std-http",
+            "idleRssBytes": 181448704,
+            "peakRssBytes": 406986752,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 8833,
+            "rps": 883.3,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 18.118,
+              "p90": 20.768,
+              "p99": 29.536,
+              "max": 50.836,
+              "mean": 18.084
+            }
+          },
+          {
+            "rep": 1,
+            "server": "node-hono",
+            "idleRssBytes": 70434816,
+            "peakRssBytes": 95834112,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 758688,
+            "rps": 75868.8,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 0.187,
+              "p90": 0.354,
+              "p99": 0.425,
+              "max": 5.511,
+              "mean": 0.211
+            }
+          },
+          {
+            "rep": 1,
+            "server": "node-express",
+            "idleRssBytes": 72228864,
+            "peakRssBytes": 105033728,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 360945,
+            "rps": 36094.5,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 0.403,
+              "p90": 0.535,
+              "p99": 0.869,
+              "max": 5.85,
+              "mean": 0.443
+            }
+          },
+          {
+            "rep": 1,
+            "server": "lasm-hono",
+            "idleRssBytes": 125710336,
+            "peakRssBytes": 285982720,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 140802,
+            "rps": 14080.2,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 1.039,
+              "p90": 1.175,
+              "p99": 6.093,
+              "max": 21.394,
+              "mean": 1.136
+            }
+          },
+          {
+            "rep": 1,
+            "server": "lasm-express",
+            "idleRssBytes": 141250560,
+            "peakRssBytes": 283648000,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 93401,
+            "rps": 9340.1,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 1.619,
+              "p90": 1.674,
+              "p99": 7.479,
+              "max": 20.618,
+              "mean": 1.711
+            }
+          },
+          {
+            "rep": 1,
+            "server": "lasm-std-http",
+            "idleRssBytes": 182312960,
+            "peakRssBytes": 401219584,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 8598,
+            "rps": 859.8,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 18.741,
+              "p90": 21.233,
+              "p99": 26.748,
+              "max": 33.801,
+              "mean": 18.567
+            }
+          },
+          {
+            "rep": 1,
+            "server": "node-http",
+            "idleRssBytes": 65462272,
+            "peakRssBytes": 90554368,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 865288,
+            "rps": 86528.8,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 0.162,
+              "p90": 0.309,
+              "p99": 0.369,
+              "max": 7.293,
+              "mean": 0.185
+            }
+          },
+          {
+            "rep": 2,
+            "server": "node-express",
+            "idleRssBytes": 72769536,
+            "peakRssBytes": 105476096,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 341793,
+            "rps": 34179.3,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 0.424,
+              "p90": 0.658,
+              "p99": 0.946,
+              "max": 4.99,
+              "mean": 0.468
+            }
+          },
+          {
+            "rep": 2,
+            "server": "lasm-hono",
+            "idleRssBytes": 125681664,
+            "peakRssBytes": 286277632,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 140561,
+            "rps": 14056.1,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 1.039,
+              "p90": 1.155,
+              "p99": 6.621,
+              "max": 19.91,
+              "mean": 1.138
+            }
+          },
+          {
+            "rep": 2,
+            "server": "lasm-express",
+            "idleRssBytes": 130269184,
+            "peakRssBytes": 282451968,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 95002,
+            "rps": 9500.2,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 1.586,
+              "p90": 1.632,
+              "p99": 7.589,
+              "max": 21.456,
+              "mean": 1.684
+            }
+          },
+          {
+            "rep": 2,
+            "server": "lasm-std-http",
+            "idleRssBytes": 181825536,
+            "peakRssBytes": 397336576,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 8672,
+            "rps": 867.2,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 18.587,
+              "p90": 21.173,
+              "p99": 26.618,
+              "max": 36.529,
+              "mean": 18.411
+            }
+          },
+          {
+            "rep": 2,
+            "server": "node-http",
+            "idleRssBytes": 65392640,
+            "peakRssBytes": 87891968,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 849509,
+            "rps": 84950.9,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 0.165,
+              "p90": 0.315,
+              "p99": 0.397,
+              "max": 7.381,
+              "mean": 0.188
+            }
+          },
+          {
+            "rep": 2,
+            "server": "node-hono",
+            "idleRssBytes": 70287360,
+            "peakRssBytes": 94916608,
+            "capped": false,
+            "alive": true,
+            "connections": 16,
+            "threads": 2,
+            "seconds": 10,
+            "requests": 769823,
+            "rps": 76982.3,
+            "errors": 0,
+            "timeouts": 0,
+            "non2xx": 0,
+            "latencyMs": {
+              "p50": 0.182,
+              "p90": 0.348,
+              "p99": 0.458,
+              "max": 5.59,
+              "mean": 0.207
+            }
+          }
+        ],
+        "interop": {
+          "call": [
+            {
+              "op": "call",
+              "samples": 5000,
+              "p50Ns": 7001,
+              "p90Ns": 20591,
+              "p99Ns": 55859,
+              "meanNs": 10915
+            },
+            {
+              "op": "call",
+              "samples": 5000,
+              "p50Ns": 6720,
+              "p90Ns": 16645,
+              "p99Ns": 51337,
+              "meanNs": 9943
+            },
+            {
+              "op": "call",
+              "samples": 5000,
+              "p50Ns": 6590,
+              "p90Ns": 17246,
+              "p99Ns": 50556,
+              "meanNs": 10150
+            }
+          ],
+          "await": [
+            {
+              "op": "await",
+              "samples": 5000,
+              "p50Ns": 19780,
+              "p90Ns": 29674,
+              "p99Ns": 47411,
+              "meanNs": 20567
+            },
+            {
+              "op": "await",
+              "samples": 5000,
+              "p50Ns": 14242,
+              "p90Ns": 21893,
+              "p99Ns": 39800,
+              "meanNs": 15876
+            },
+            {
+              "op": "await",
+              "samples": 5000,
+              "p50Ns": 14923,
+              "p90Ns": 27111,
+              "p99Ns": 44747,
+              "meanNs": 18063
+            }
+          ]
+        },
+        "bignum": {
+          "mul": [
+            {
+              "op": "mul",
+              "digits": 10000,
+              "medianNs": 948513,
+              "check": 1
+            },
+            {
+              "op": "mul",
+              "digits": 10000,
+              "medianNs": 965178,
+              "check": 1
+            },
+            {
+              "op": "mul",
+              "digits": 10000,
+              "medianNs": 982484,
+              "check": 1
+            }
+          ],
+          "div": [
+            {
+              "op": "div",
+              "digits": 10000,
+              "medianNs": 1908863,
+              "check": 898
+            },
+            {
+              "op": "div",
+              "digits": 10000,
+              "medianNs": 1914301,
+              "check": 898
+            },
+            {
+              "op": "div",
+              "digits": 10000,
+              "medianNs": 1909313,
+              "check": 898
+            }
+          ],
+          "mod": [
+            {
+              "op": "mod",
+              "digits": 10000,
+              "medianNs": 1894842,
+              "check": 503
+            },
+            {
+              "op": "mod",
+              "digits": 10000,
+              "medianNs": 1896474,
+              "check": 503
+            },
+            {
+              "op": "mod",
+              "digits": 10000,
+              "medianNs": 1897076,
+              "check": 503
+            }
+          ],
+          "toString": [
+            {
+              "op": "toString",
+              "digits": 10000,
+              "medianNs": 105307986,
+              "check": 10000
+            },
+            {
+              "op": "toString",
+              "digits": 10000,
+              "medianNs": 105493692,
+              "check": 10000
+            },
+            {
+              "op": "toString",
+              "digits": 10000,
+              "medianNs": 105539832,
+              "check": 10000
+            }
+          ],
+          "ofString": [
+            {
+              "op": "ofString",
+              "digits": 10000,
+              "medianNs": 19901423,
+              "check": 490
+            },
+            {
+              "op": "ofString",
+              "digits": 10000,
+              "medianNs": 19676431,
+              "check": 490
+            },
+            {
+              "op": "ofString",
+              "digits": 10000,
+              "medianNs": 19826726,
+              "check": 490
+            }
+          ],
+          "gcd": [
+            {
+              "op": "gcd",
+              "digits": 10000,
+              "medianNs": 28935474,
+              "check": 1
+            },
+            {
+              "op": "gcd",
+              "digits": 10000,
+              "medianNs": 28881458,
+              "check": 1
+            },
+            {
+              "op": "gcd",
+              "digits": 10000,
+              "medianNs": 28873335,
+              "check": 1
+            }
+          ]
+        }
+      },
+      "notes": [],
+      "errors": [],
+      "finishedAt": "2026-11-09T16:00:57.271Z",
+      "passed": true
+    }
+  },
+  "recordedAt": "2026-11-09T15:49:50.348Z"
+}

@@ -8,7 +8,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, wr
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { asyncGlueSource, compileLibrary, fetchGlueSource, glueLinkFlags, glueSource, importsLibrary, libraryFiles, libraryIdentity, libraryLeanVersions,
+import { compileLibrary, fetchGlueSource, asyncGlueSource, glueLinkFlags, glueSource, importsLibrary, libraryFiles, libraryIdentity, libraryLeanVersions,
   libraryModules, libraryOutputs, librarySources, linkedLibraryModules, prebuiltLibrary } from '../src/lasm-library.mjs';
 import { toolchainCatalog } from '../src/managed-lean.mjs';
 
