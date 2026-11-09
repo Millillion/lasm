@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       iterations: { type: string, default: '100' }
-      modes: { type: string, default: 'sum' }
+      modes: { type: string, default: 'sum,wide,deepSum' }
       variants: { type: string, default: 'O0' }
 permissions:
   contents: read
@@ -83,4 +83,4 @@ jobs:
       - name: Probe
         run: |
           node scripts/ci/bun-hang-probe.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" --bun "$BUN" \
-            --work "$RUNNER_TEMP/probe" --iterations "${{ inputs.iterations || '100' }}" --modes "${{ inputs.modes || 'sum' }}" --variants "${{ inputs.variants || 'O0' }}"
+            --work "$RUNNER_TEMP/probe" --iterations "${{ inputs.iterations || '150' }}" --modes "${{ inputs.modes || 'sum,wide,deepSum' }}" --variants "${{ inputs.variants || 'O0' }}"

@@ -62,22 +62,27 @@ for (const bun of buns) {
     if (!ok(first)) { log(`${v} ${mode}: ${lo} fails: ${JSON.stringify(first).slice(0, 400)}`); continue; }
     while (hi - lo > lo / 50 + 1) { const mid = Math.floor((lo + hi) / 2); if (ok(await runOnce(bun, v, [mode, String(mid)], 60_000, false))) lo = mid; else hi = mid; }
     const n = Math.ceil(lo * 1.1) + 10;
-    let hangs = 0, captured = 0, other = 0; const times = [];
-    for (let i = 0; i < iterations; i++) {
-      const r = await runOnce(bun, v, [mode, String(n)], timeoutMs, captured < 2);
+    // A sweep: n from 0.9 × the limit to 2 × it, plus the issue's 8588 for sum.
+    const ns = Array.from({ length: iterations }, (_, i) => Math.round(lo * (0.9 + 1.1 * i / iterations)));
+    if (mode === 'sum') ns.push(8588, 8588, 8588, 1000000, 1000000);
+    let hangs = 0, captured = 0, other = 0; const times = [], hungAt = [];
+    for (let i = 0; i < ns.length; i++) {
+      const r = await runOnce(bun, v, [mode, String(ns[i])], timeoutMs, captured < 2);
+      if (r.hung) hungAt.push(ns[i]);
+      if (!r.hung && ok(r)) continue;
       if (r.hung) {
         hangs++;
-        if (captured < 2) { captured++; log(`### hang ${hangs} (${v} ${mode} ${n}, iteration ${i}); stdout ${JSON.stringify(r.stdout)} stderr ${JSON.stringify(r.stderr.slice(0, 500))}\n\n\`\`\`\n${r.diag}\n\`\`\``); }
+        if (captured < 2) { captured++; log(`### hang ${hangs} (${v} ${mode} ${ns[i]}, iteration ${i}); stdout ${JSON.stringify(r.stdout)} stderr ${JSON.stringify(r.stderr.slice(0, 500))}\n\n\`\`\`\n${r.diag}\n\`\`\``); }
       } else {
         times.push(r.ms);
-        if (!(r.code === 1 && r.stdout === '' && r.stderr.startsWith('[lasm] the Lean instance stopped: '))) { other++; if (other <= 3) log(`unexpected (${v} ${mode} ${n}): ${JSON.stringify({ code: r.code, signal: r.signal, stderr: r.stderr.slice(0, 300) })}`); }
+        if (!(r.code === 1 && r.stdout === '' && r.stderr.startsWith('[lasm] the Lean instance stopped: '))) { other++; if (other <= 3) log(`unexpected (${v} ${mode} ${ns[i]}): ${JSON.stringify({ code: r.code, signal: r.signal, stderr: r.stderr.slice(0, 300) })}`); }
         else if (i < 1) log(`first stop (${v} ${mode} ${n}): ${JSON.stringify(r.stderr.slice(0, 300))}`);
       }
     }
     times.sort((a, b) => a - b);
-    const line = `**${version} ${v} ${mode}**: deepest ${lo}, n ${n}: ${hangs}/${iterations} hangs, ${other} unexpected; stop ms median ${times[times.length >> 1]} max ${times[times.length - 1]}`;
+    const line = `**${version} ${v} ${mode}**: deepest ${lo}, n ${ns[0]}..${ns[iterations - 1]}: ${hangs}/${ns.length} hangs at ${JSON.stringify(hungAt)}, ${other} unexpected; stop ms median ${times[times.length >> 1]} max ${times[times.length - 1]}`;
     log(line);
-    results[`${version} ${v} ${mode}`] = { deepest: lo, n, hangs, iterations, other };
+    results[`${version} ${v} ${mode}`] = { deepest: lo, hungAt, runs: ns.length, other };
   }
 }
 writeFileSync(join(work, 'results.json'), JSON.stringify(results, null, 2));
