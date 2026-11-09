@@ -544,3 +544,135 @@ test('retry delays stay within 75-100 % of the capped doubling backoff', async (
   assert.equal(retryDelay(1, () => 0.5), 1750);
   assert.equal(retryDelay(7, () => 0), 45_000);
 });
+
+const failure = promise => promise.then(() => assert.fail('expected a failure'), error => error);
+const diagnosticOf = error => error.message.slice(error.message.indexOf(': ') + 2, error.message.indexOf('. Check network access'));
+
+test('each timeout names itself: headers, idle body, overall budget', async t => {
+  const stall = async (url, { signal }) => new Promise((resolve, reject) => signal.addEventListener('abort', () => reject(signal.reason), { once: true }));
+  const f = await fixture(t);
+  const headers = await failure(downloadArtifact(artifact, f.file, { ...f.options, policy: { ...policy, attempts: 1, connectMs: 20 }, fetch: stall }));
+  assert.equal(headers.code, 'LASM_CONNECT_TIMEOUT');
+  assert.equal(diagnosticOf(headers), 'LASM_CONNECT_TIMEOUT: Timed out connecting or waiting for download headers');
+  const g = await fixture(t);
+  const idle = await failure(downloadArtifact(artifact, g.file, { ...g.options, policy: { ...policy, attempts: 1, idleMs: 20 },
+    fetch: async () => new Response(new ReadableStream({ start(c) { c.enqueue(bytes.subarray(0, 3)); } })) }));
+  assert.equal(idle.code, 'LASM_IDLE_TIMEOUT');
+  assert.equal(diagnosticOf(idle), 'LASM_IDLE_TIMEOUT: Download stopped receiving data');
+  const h = await fixture(t);
+  const overall = await failure(downloadArtifact(artifact, h.file, { ...h.options, policy: { ...policy, connectMs: 5000, totalMs: 30 }, fetch: stall }));
+  assert.equal(overall.code, 'LASM_TOTAL_TIMEOUT');
+  assert.equal(diagnosticOf(overall), 'LASM_TOTAL_TIMEOUT: Download exceeded its overall time budget');
+});
+
+test('HTTP failures are described exactly', async t => {
+  const f = await fixture(t);
+  const notFound = await failure(downloadArtifact(artifact, f.file, { ...f.options, fetch: async () => new Response('', { status: 404 }) }));
+  assert.equal(diagnosticOf(notFound), 'LASM_HTTP: HTTP 404');
+  const g = await fixture(t);
+  const busy = await failure(downloadArtifact(artifact, g.file, { ...g.options, policy: { ...policy, attempts: 1 }, fetch: async () => new Response('', { status: 503 }) }));
+  assert.equal(diagnosticOf(busy), 'LASM_HTTP_RETRY: HTTP 503');
+  const h = await fixture(t);
+  const gzip = await failure(downloadArtifact(artifact, h.file, { ...h.options, fetch: async () => new Response(bytes, { headers: { 'content-encoding': 'gzip' } }) }));
+  assert.equal(diagnosticOf(gzip), 'LASM_INTEGRITY: Unexpected download content encoding');
+  const i = await fixture(t);
+  const large = await failure(downloadArtifact(artifact, i.file, { ...i.options, fetch: async () => new Response(Buffer.concat([bytes, bytes])) }));
+  assert.equal(diagnosticOf(large), 'LASM_INTEGRITY: Download size mismatch: fixture');
+  const j = await fixture(t);
+  const short = await failure(downloadArtifact(artifact, j.file, { ...j.options, fetch: async () => new Response(bytes.subarray(2)) }));
+  assert.equal(diagnosticOf(short), 'LASM_INTEGRITY: Download checksum or size mismatch: fixture');
+  assert.equal(j.events.some(e => e.type === 'transferred'), false, 'a short body is not reported as transferred');
+  // Statuses outside 100-599 (only a non-standard fetch returns them) are not server errors to retry.
+  const k = await fixture(t); let requests = 0;
+  const odd = await failure(downloadArtifact(artifact, k.file, { ...k.options, fetch: async () => { requests++; return { status: 600, ok: false, url: '', headers: new Headers(), body: null }; } }));
+  assert.equal(odd.code, 'LASM_HTTP'); assert.equal(requests, 1);
+});
+
+test('Retry-After: only whole seconds count as seconds', async t => {
+  for (const [value, expected] of [['10', [10_000]], ['5.3', [2000]], ['7e1', [2000]]]) {
+    const f = await fixture(t);
+    await downloadArtifact(artifact, f.file, { ...f.options, random: () => 1, policy: { ...policy, totalMs: 600_000 },
+      fetch: (() => { let n = 0; return async () => ++n === 1 ? new Response('', { status: 503, headers: { 'retry-after': value } }) : new Response(bytes); })() });
+    assert.deepEqual(f.waits, expected, value);
+  }
+});
+
+test('a resume from a two-digit offset is validated exactly', async t => {
+  const f = await fixture(t); let requests = 0;
+  await downloadArtifact(artifact, f.file, { ...f.options, fetch: async (url, { headers }) => {
+    if (++requests === 1) return new Response(new ReadableStream({ async start(c) {
+      c.enqueue(bytes.subarray(0, 12));
+      for (let i = 0; i < 500 && !await stat(f.file).then(s => s.size === 12, () => false); i++) await delay(10);
+      c.error(failed('ECONNRESET'));
+    } }), { headers: { etag: '"v"' } });
+    assert.equal(headers.range, 'bytes=12-');
+    return new Response(bytes.subarray(12), { status: 206, headers: { etag: '"v"', 'content-range': `bytes 12-${bytes.length - 1}/${bytes.length}`,
+      'content-length': String(bytes.length - 12) } });
+  } });
+  assert.deepEqual(await readFile(f.file), bytes);
+  const g = await fixture(t); let calls = 0;
+  await assert.rejects(downloadArtifact(artifact, g.file, { ...g.options, fetch: async () => {
+    if (++calls === 1) return new Response(new ReadableStream({ start(c) { c.enqueue(bytes.subarray(0, 5)); setTimeout(() => c.error(failed('ECONNRESET')), 50); } }), { headers: { etag: '"v"' } });
+    return new Response(bytes.subarray(5), { status: 206, headers: { etag: '"v"', 'content-range': `bytes 5-${bytes.length - 1}/${bytes.length}x` } });
+  } }), error => error.code === 'LASM_RANGE');
+});
+
+test('a partial file that disappears before the retry is downloaded again; other file errors stop', async t => {
+  const f = await fixture(t); const ranges = [];
+  await downloadArtifact(artifact, f.file, { ...f.options, sleep: async () => { await rm(f.file); },
+    fetch: async (url, { headers }) => {
+      ranges.push(headers.range);
+      if (ranges.length === 1) return new Response(new ReadableStream({ start(c) { c.enqueue(bytes.subarray(0, 5)); setTimeout(() => c.error(failed('ECONNRESET')), 50); } }), { headers: { etag: '"v"' } });
+      return new Response(bytes);
+    } });
+  assert.deepEqual(ranges, [undefined, undefined]);
+  assert.deepEqual(await readFile(f.file), bytes);
+  const base = await mkdtemp(join(tmpdir(), 'lasm-download-gone-'));
+  t.after(() => rm(base, { recursive: true, force: true }));
+  const { mkdir, writeFile } = await import('node:fs/promises');
+  await mkdir(join(base, 'parent'));
+  const file = join(base, 'parent', 'archive'); let requests = 0;
+  const error = await failure(downloadArtifact(artifact, file, { ...f.options, sleep: async () => { await rm(join(base, 'parent'), { recursive: true }); await writeFile(join(base, 'parent'), ''); },
+    fetch: async () => { requests++; return new Response(new ReadableStream({ start(c) { c.enqueue(bytes.subarray(0, 5)); setTimeout(() => c.error(failed('ECONNRESET')), 50); } }), { headers: { etag: '"v"' } }); } }));
+  assert.equal(error.code, 'ENOTDIR'); assert.equal(requests, 1);
+});
+
+test('cancellation is honoured between attempts and during an attempt, whatever its reason', async t => {
+  const f = await fixture(t); const abort = new AbortController(); let requests = 0;
+  const error = await failure(downloadArtifact(artifact, f.file, { ...f.options, signal: abort.signal, sleep: async () => { abort.abort(failed('STOPPED')); },
+    fetch: async () => { requests++; return requests === 1 ? new Response('', { status: 503 }) : new Response(bytes); } }));
+  assert.equal(error.code, 'STOPPED'); assert.equal(requests, 1);
+  // A caller's reason that looks transient is still final.
+  const g = await fixture(t); const stop = new AbortController(); let calls = 0;
+  const reset = await failure(downloadArtifact(artifact, g.file, { ...g.options, signal: stop.signal, fetch: async (url, { signal }) => {
+    calls++; setTimeout(() => stop.abort(failed('ECONNRESET')), 10);
+    return new Promise((resolve, reject) => signal.addEventListener('abort', () => reject(signal.reason), { once: true }));
+  } }));
+  assert.equal(reset.code, 'ECONNRESET'); assert.equal(calls, 1);
+});
+
+test('an unread error body is cancelled', async t => {
+  const f = await fixture(t); let cancelled = 0;
+  await downloadArtifact(artifact, f.file, { ...f.options, fetch: (() => { let n = 0; return async () => ++n === 1
+    ? new Response(new ReadableStream({ cancel() { cancelled++; } }), { status: 503 }) : new Response(bytes); })() });
+  assert.equal(cancelled, 1);
+});
+
+test('the final error keeps the failure that ended the download, else the last attempt\'s code', async t => {
+  const f = await fixture(t);
+  const thrown = new Error('sleep failed');
+  const plain = await failure(downloadArtifact(artifact, f.file, { ...f.options, sleep: async () => { throw thrown; }, fetch: async () => new Response('', { status: 503 }) }));
+  assert.equal(plain.cause, thrown); assert.equal(plain.code, 'LASM_HTTP_RETRY');
+  const g = await fixture(t);
+  const coded = await failure(downloadArtifact(artifact, g.file, { ...g.options, sleep: async () => { throw failed('X_SLEEP'); }, fetch: async () => new Response('', { status: 503 }) }));
+  assert.equal(coded.code, 'X_SLEEP');
+  // A failure with neither code nor cause is the cause itself (not an error from classifying it).
+  for (const make of [() => new Error('plain'), () => new AggregateError([new Error('x')]), () => new Error('outer', { cause: new Error('inner') })]) {
+    const h = await fixture(t); const error = make();
+    assert.equal((await failure(downloadArtifact(artifact, h.file, { ...h.options, fetch: async () => { throw error; } }))).cause, error);
+  }
+});
+
+test('a constructor without a prototype is no dispatcher class', () => {
+  assert.equal(attemptDispatcher({ constructor: () => {} }), undefined);
+});
