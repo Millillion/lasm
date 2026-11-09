@@ -35,7 +35,7 @@ jobs:
 
   modules:
     needs: sunday
-    if: needs.sunday.outputs.skip != 'true' && github.event.repository.visibility == 'public'
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public')
     runs-on: ubuntu-24.04
     outputs:
       names: ${{ steps.list.outputs.names }}
@@ -57,7 +57,7 @@ jobs:
           fi
   module:
     needs: [sunday, modules]
-    if: needs.sunday.outputs.skip != 'true' && needs.modules.outputs.names != '[]'
+    if: needs.sunday.outputs.skip != 'true' && (needs.modules.outputs.names != '[]')
     runs-on: ubuntu-24.04
     timeout-minutes: 150
     strategy:

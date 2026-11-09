@@ -247,7 +247,9 @@ function binary(text) {
   } finally { module.dispose(); }
 }
 function validWithout(bytes, without) {
-  if (!binaryen) return WebAssembly.validate(bytes) && lowerAtomics(bytes) === bytes;
+  // V8 checks validity only when it knows every proposal the test modules use (Node 26 has dropped the legacy
+  // exception-handling instructions); the lowering must find no atomic instruction left either way.
+  if (!binaryen) return lowerAtomics(bytes) === bytes && (!v8KnowsEveryKind() || WebAssembly.validate(bytes));
   let module;
   try { module = binaryen.readBinary(bytes, features & ~without); }
   catch { return false; }
@@ -337,6 +339,9 @@ function kitchenSink(memory64, chosen) {
   ${chosen.join('\n  ')}
   (i32.const 0)))`;
 }
+
+let v8Knows;
+const v8KnowsEveryKind = () => v8Knows ??= [false, true].every(memory64 => WebAssembly.validate(binary(kitchenSink(memory64, statements(memory64 ? 'i64' : 'i32')))));
 
 // ∀ s : list of statements of every kind, ∀ i : atomic instructions placed between them,
 //   valid (lower (module s i)) without threads ∧ lower (module s []) = module s []
