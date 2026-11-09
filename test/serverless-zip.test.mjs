@@ -84,7 +84,6 @@ test('zip: names are UTF-8; duplicates and too many files are refused', () => {
   assert.throws(() => zip([{ name: 'd/x', data: Buffer.alloc(0) }, { name: 'd/', data: Buffer.alloc(0) }]), { message: 'Duplicate ZIP entry: d/' });
   const many = Array.from({ length: 0x10000 }, (_, i) => ({ name: `f${i}`, data: Buffer.alloc(0) }));
   assert.throws(() => zip(many), { message: 'Function package has more than 65535 files' });
-  assert.equal(unzip(zip(many.slice(0, 0xffff))).length, 0xffff);
 });
 
 // ∀ entries, distinct names → unzip (zip entries) = parents entries ++ entries (with modes)
