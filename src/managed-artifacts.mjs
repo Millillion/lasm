@@ -10,6 +10,7 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { Parser as TarParser } from 'tar';
 import { isDeepStrictEqual } from 'node:util';
+import { setTimeout as delay } from 'node:timers/promises';
 import { downloadArtifact } from './managed-download.mjs';
 import { acquireArtifact } from './npm-artifacts.mjs';
 import { withCacheEntryLock, removeOwnedStaging, createOwnedStaging, storageDiagnostic, checkDownloadSpace } from './cache-lifecycle.mjs';
@@ -153,10 +154,15 @@ async function extract(artifact, archive, directory, python, hashes) {
       child.once('close', (code, signal) => resolve({ code, signal }));
     });
     try {
-      await pipeline(child.stdout, unpack);
-      const result = await finished;
-      if (result.error) throw result.error;
-      if (result.code !== 0) throw new Error(`SDK archive decoder failed (${result.code ?? result.signal}): ${diagnostic}`);
+      let streamError;
+      try { await pipeline(child.stdout, unpack); } catch (error) { streamError = error; }
+      // A decoder that failed (or never started) leaves a truncated or empty
+      // stream: its own error explains that better than the tar parser's. One
+      // still running after a broken stream is stopped below.
+      const result = streamError ? await Promise.race([finished, delay(2000).then(() => undefined)]) : await finished;
+      if (result?.error) throw result.error;
+      if (result && result.code !== 0) throw new Error(`SDK archive decoder failed (${result.code ?? result.signal}): ${diagnostic}`);
+      if (streamError) throw streamError;
     } finally {
       if (child.exitCode === null && child.signalCode === null) child.kill();
       await finished;

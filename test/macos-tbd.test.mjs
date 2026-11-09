@@ -2,7 +2,7 @@
 // src/macos-tbd.mjs). The fixtures are synthetic stubs written by hand.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdtempSync, rmSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, rmSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { filterTapiStub, knownTarget, checkLibSystemStub, linkerArchitecture } from '../src/macos-tbd.mjs';
@@ -103,4 +103,107 @@ test('Lean\'s ld64.lld rejects the v4 fixture and reads every filtered stub', { 
     writeFileSync(file, filterTapiStub(fixture(name)).text);
     for (const arch of ['arm64', 'x64']) assert.equal(checkLibSystemStub(realLinker, file, arch), null, `${name} ${arch}`);
   }
+});
+
+// Synthetic stubs, one rule each (the YAML forms are line-oriented, so each case
+// pins the exact text that remains).
+const filtered = text => filterTapiStub(text);
+
+test('YAML: Windows line endings are kept', () => {
+  assert.deepEqual(filtered('--- !tapi-tbd\r\ntbd-version: 4\r\ntargets: [ arm64-macos, bad-ios ]\r\ninstall-name: /x\r\n...\r\n'),
+    { text: '--- !tapi-tbd\r\ntbd-version: 4\r\ntargets: [ arm64-macos ]\r\ninstall-name: /x\r\n...\r\n', removed: ['bad-ios'], targets: ['arm64-macos'] });
+});
+
+test('YAML: a removed item takes its blank and comment lines with it', () => {
+  assert.equal(filtered('--- !tapi-tbd\ntargets: [ arm64-macos ]\nexports:\n  - targets: [ bad-ios ]\n\n    # a comment about the symbols\n'
+    + '    symbols: [ _gone ]\n  - targets: [ arm64-macos ]\n    symbols: [ _kept ]\n...\n').text,
+  '--- !tapi-tbd\ntargets: [ arm64-macos ]\nexports:\n  - targets: [ arm64-macos ]\n    symbols: [ _kept ]\n...\n');
+});
+
+test('YAML: UUID items name their target after any spacing, quoted or not', () => {
+  assert.deepEqual(filtered("--- !tapi-tbd\ntargets: [ arm64-macos ]\nuuids:\n  -   target:   'bad-ios'\n      value: 1\n  -   target: arm64-macos\n      value: 2\n...\n"),
+    { text: '--- !tapi-tbd\ntargets: [ arm64-macos ]\nuuids:\n  -   target: arm64-macos\n      value: 2\n...\n', removed: ['bad-ios'], targets: ['arm64-macos'] });
+});
+
+test('YAML: a target list after other keys removes the whole item, found by its content column', () => {
+  assert.equal(filtered('--- !tapi-tbd\ntargets: [ arm64-macos ]\nexports:\n    -   symbols: [ _x ]\n        weak-symbols: [ _w ]\n        targets: [ bad-ios ]\n'
+    + '    -   symbols: [ _y ]\n        targets: [ arm64-macos ]\n...\n').text,
+  '--- !tapi-tbd\ntargets: [ arm64-macos ]\nexports:\n    -   symbols: [ _y ]\n        targets: [ arm64-macos ]\n...\n');
+  assert.throws(() => filtered('--- !tapi-tbd\ntargets: [ arm64-macos ]\nexports:\n  targets: [ bad-ios ]\n...\n'),
+    { message: 'Unsupported TAPI stub: a target list outside a list item (targets: [  ])' });
+  assert.throws(() => filtered('--- !tapi-tbd\ntargets: [ arm64-macos ]\nexports:\n  - targets:\n      - arm64-macos\n'),
+    { message: 'Unsupported TAPI stub: a target list that is not a flow sequence (- targets:)' });
+});
+
+test('YAML: sections left without items go; a list at the key\'s own indentation belongs to it', () => {
+  assert.equal(filtered('--- !tapi-tbd\ntargets: [ arm64-macos ]\nexports:\n- targets: [ arm64-macos ]\n  symbols: [ _a ]\nreexports:\n  - targets: [ bad-ios ]\n'
+    + '    symbols: [ _b ]\n\nclients:\n  - targets: [ bad-ios ]\n    clients: [ c ]\n\n').text,
+  '--- !tapi-tbd\ntargets: [ arm64-macos ]\nexports:\n- targets: [ arm64-macos ]\n  symbols: [ _a ]');
+  assert.equal(filtered('--- !tapi-tbd\ntargets: [ arm64-macos ]\nempty:\nnested:\n  inner:\n    - targets: [ bad-ios ]\nkept: yes\n').text,
+    '--- !tapi-tbd\ntargets: [ arm64-macos ]\nkept: yes\n', 'emptied sections, nested ones too, go until none is left');
+  assert.equal(filtered('--- !tapi-tbd\ntargets: [ arm64-macos ]\nsection:\n\n   value\n').text, '--- !tapi-tbd\ntargets: [ arm64-macos ]\nsection:\n\n   value\n',
+    'a section with deeper content after blank lines stays');
+});
+
+test('YAML documents: the first must keep a target; later ones may go; "---" and "..." only at line starts', () => {
+  assert.throws(() => filtered('--- !tapi-tbd\ntargets: [ bad-ios ]\n--- !tapi-tbd\ntargets: [ arm64-macos ]\n'), { message: 'The stub lists no target that Lean\'s linker knows' });
+  assert.deepEqual(filtered("--- !tapi-tbd\ntargets: [ arm64-macos ]\nsymbols: [ '---x', '...' ]\n--- !tapi-tbd\ntargets: [ bad-ios ]\ninstall-name: /gone\n...  \n"),
+    { text: "--- !tapi-tbd\ntargets: [ arm64-macos ]\nsymbols: [ '---x', '...' ]\n...  \n", removed: ['bad-ios'], targets: ['arm64-macos'] });
+  assert.equal(filtered('--- !tapi-tbd\ntargets: [ arm64-macos ]\n').text, '--- !tapi-tbd\ntargets: [ arm64-macos ]\n', 'no stream end marker');
+  assert.equal(filtered('--- !tapi-tbd\ntargets: [ arm64-macos ]\n...\n# after the end\n').text, '--- !tapi-tbd\ntargets: [ arm64-macos ]\n...\n# after the end\n');
+});
+
+test('YAML lists: spacing, quotes, empty entries and the main targets', () => {
+  assert.deepEqual(filtered("--- !tapi-tbd\ntargets   : [ 'arm64-macos', x'bad', \"x86_64-macos\"q, x86_64-macos, ]\n"),
+    { text: "--- !tapi-tbd\ntargets   : [ 'arm64-macos', x86_64-macos ]\n", removed: ['"x86_64-macos"q', "x'bad'"], targets: ['arm64-macos', 'x86_64-macos'] });
+  assert.deepEqual(filtered('--- !tapi-tbd\nexports:\n  - targets: [ x86_64-macos ]\n    symbols: [ _a ]\ntargets: [ arm64-macos, x86_64-macos ]\n').targets,
+    ['arm64-macos', 'x86_64-macos'], 'the main targets are the top-level list, wherever it is');
+  assert.deepEqual(filtered("--- !tapi-tbd-v3\narchs: [ x86_64 , arm64, bad, ]\nuuids  : [ 'x86_64 : A' ,'bad: B', 'arm64: C' ]\nplatform: macosx\n"
+    + "libs:\n  - archs: [ x86_64 ]\n    uuids: [ 'x86_64: D', 'bad: E', ]\n"),
+  { text: "--- !tapi-tbd-v3\narchs: [ x86_64, arm64 ]\nuuids  : [ 'x86_64 : A', 'arm64: C' ]\nplatform: macosx\nlibs:\n  - archs: [ x86_64 ]\n    uuids: [ 'x86_64: D' ]\n",
+    removed: ['bad'], targets: ['x86_64', 'arm64'] });
+});
+
+test('JSON: leading whitespace, nulls and nested arrays, every library\'s target_info, sorted removals', () => {
+  const { text, removed, targets } = filtered('  \n{"main_library":{"target_info":[{"target":"zz-ios"},{"target":"arm64-macos"},{"target":"aa-ios"}],'
+    + '"misc":[null,[1,{"target":"bad-x"}],"s"]},"libraries":[{"target_info":[{"target":"arm64-macos"},{"target":"bad-y"}],'
+    + '"exports":[{"targets":["bad-z"]},{"targets":["arm64-macos","bad-w"]}]},{"target_info":[{"target":"gone-ios"}]}]}');
+  assert.deepEqual(removed, ['aa-ios', 'bad-w', 'bad-x', 'bad-y', 'bad-z', 'gone-ios', 'zz-ios']);
+  assert.deepEqual(targets, ['arm64-macos']);
+  assert.ok(text.endsWith('}\n'));
+  assert.deepEqual(JSON.parse(text), { main_library: { target_info: [{ target: 'arm64-macos' }], misc: [null, [1], 's'] },
+    libraries: [{ target_info: [{ target: 'arm64-macos' }], exports: [{ targets: ['arm64-macos'] }] }] });
+  assert.equal(text, JSON.stringify(JSON.parse(text), null, 2) + '\n');
+  assert.throws(() => filtered('{"main_library":{}}'), { message: 'The stub lists no target that Lean\'s linker knows' });
+});
+
+test('linker architectures exist only for x64 and arm64', () => {
+  for (const arch of ['ia32', 'arm', 'x86_64', ''])
+    assert.throws(() => linkerArchitecture(arch), { message: `No macOS linker architecture for ${arch}` });
+});
+
+test('the linker check: exact arguments, trimmed messages, exit status without output, no temporary files left', { skip: process.platform === 'win32' }, t => {
+  const directory = mkdtempSync(join(tmpdir(), 'lasm-tbd-args-'));
+  const temporary = join(directory, 'tmp');
+  const saved = process.env.TMPDIR;
+  t.after(() => { if (saved === undefined) delete process.env.TMPDIR; else process.env.TMPDIR = saved; rmSync(directory, { recursive: true, force: true }); });
+  mkdirSync(temporary); process.env.TMPDIR = temporary;
+  const linker = join(directory, 'ld64.lld');
+  writeFileSync(linker, `#!/usr/bin/env node
+const fs = require('fs'), path = require('path');
+const args = process.argv.slice(2), mode = fs.readFileSync(args.at(-1), 'utf8').trim();
+const expected = ['-arch', 'x86_64', '-platform_version', 'macos', '11.0', '11.0', '-dylib', '-o'];
+if (JSON.stringify(args.slice(0, 8)) !== JSON.stringify(expected) || path.basename(args[8]) !== 'probe.dylib' || !fs.existsSync(path.dirname(args[8])))
+  { console.error('unexpected arguments ' + JSON.stringify(args)); process.exit(2); }
+if (mode === 'silent') process.exit(3);
+if (mode === 'both') { process.stdout.write(' out\\n'); process.stderr.write('  err '); process.exit(1); }
+`, { mode: 0o755 });
+  const stub = name => { const file = join(directory, name); writeFileSync(file, name); return file; };
+  assert.equal(checkLibSystemStub(linker, stub('ok'), 'x64'), null);
+  assert.equal(checkLibSystemStub(linker, stub('silent'), 'x64'), 'exit status 3');
+  assert.equal(checkLibSystemStub(linker, stub('both'), 'x64'), 'err  out');
+  assert.match(checkLibSystemStub(linker, stub('ok'), 'arm64'), /^unexpected arguments/);
+  assert.deepEqual(readdirSync(temporary), [], 'the probe directory is removed');
+  assert.throws(() => checkLibSystemStub(linker, stub('ok'), 'ia32'), /No macOS linker architecture/);
+  assert.deepEqual(readdirSync(temporary), []);
 });

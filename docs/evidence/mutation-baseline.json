@@ -44,6 +44,18 @@
       "score": 91.5,
       "mutants": 475,
       "threshold": 91
+    },
+    "downloads": {
+      "initial": 59.3,
+      "score": 89.7,
+      "mutants": 2350,
+      "threshold": 89
+    },
+    "toolchains": {
+      "initial": 58.9,
+      "score": 89.7,
+      "mutants": 1820,
+      "threshold": 89
     }
   },
   "run": "mutation.yml run 41749603692 (Node 26.13.0, main at the branch point)"
