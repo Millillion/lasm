@@ -72,6 +72,41 @@ pull request before, so none of them is a check that was dropped.
 5. **No job, workflow or artifact name changes without a grep** of `scripts/`,
    `test/`, `docs/` and `.github/`. The evidence levels match job names by
    regular expression.
+6. **No runs on Sunday** (below): every workflow with a `schedule:` calls the
+   Sunday guard, and every other job in it needs it.
+
+## No runs on Sunday
+
+No scheduled run does anything on a Sunday in US Eastern time (Jordan,
+2026-11-07). Two layers, both checked by `test/no-sunday-schedules.test.mjs`:
+
+- **Cron times.** Every firing is off Sunday at both UTC-5 and UTC-4 and at
+  least 12 hours before Sunday begins in New York. GitHub starts scheduled runs
+  hours late (on 2026-11-08, runs due 01:07 to 03:53 UTC started 07:12 to
+  10:47 UTC, Sunday morning in New York), so the Saturday-evening firings
+  (day 0 in UTC, before 04:00) were dropped rather than moved: the nightly
+  campaigns that ran six evenings a week now run Monday to Friday evenings,
+  the 05:00 to 10:41 UTC ones still run Monday to Saturday, and the latest
+  firing before Sunday is the weekly tier at Saturday 12:07 UTC. The example
+  campaigns' "changed since the last run" windows cover the weekend gap
+  (Folio and Porter 74 hours, Tandem 50).
+- **Runtime guard.** However late a run starts, `sunday-guard.yml` decides: its
+  output `skip` is `true` only when `github.event_name` is `schedule` and
+  `TZ=America/New_York date +%u` is 7. Each scheduled workflow calls it as the
+  job `sunday`; every other job has `sunday` in its `needs` and
+  `if: needs.sunday.outputs.skip != 'true'`, or
+  `needs.sunday.outputs.skip != 'true' && (<its own condition>)` with the
+  original kept whole in parentheses, so an `always()` inside keeps its
+  meaning and the report jobs (the issue "Nightly tier failures on main", the
+  installation-confidence report) never run on a guarded Sunday. Pushes, pull
+  requests, dispatches and `workflow_call` runs are never skipped; the guard
+  costs a few seconds there.
+
+A guarded run concludes `success` with every other job skipped. Readers of
+past runs leave it out through `scripts/ci/sunday-guard.mjs` (a scheduled run
+that started on Sunday in New York): the test-evidence page's latest runs, the
+installation-confidence gate's campaigns, and `ci-nightly.yml`'s "unchanged
+since the last passing run" check.
 
 ## Shared setup
 
@@ -102,17 +137,17 @@ it), and "dispatch" means `workflow_dispatch`.
 | `application-module-data-files.yml` | dispatch | Linux, macOS, Windows | 2 min | Module data file loader controls (diagnosis) | On demand |
 | `application-module-data.yml` | dispatch | Linux | 1 min | Native module data layout controls (diagnosis) | On demand |
 | `application-runtime-source.yml` | dispatch | Linux | 6 min (max 69) | Cold reproducible build of the application runtime from source | On demand |
-| `bridge-verification.yml` | PR (paths), push main (paths), cron 17 3 * * 0,2-6, dispatch | Linux + called workflows | 29 min (max 109) | Host bridge: Lean model, schedule-fuzzed Lasm.JS runs, trace conformance | PR (paths), main, nightly |
+| `bridge-verification.yml` | PR (paths), push main (paths), cron 17 3 * * 2-6, dispatch | Linux + called workflows | 29 min (max 109) | Host bridge: Lean model, schedule-fuzzed Lasm.JS runs, trace conformance | PR (paths), main, nightly |
 | `browser.yml` | dispatch, call, push browser-ui,dx-browser (paths) | Linux, macOS + called workflows | 32 min (max 86) | Browser target: web template, Lasm.Web, Vite plugin, Chromium/Firefox/WebKit (+ WebKit on macOS) | Release, nightly |
 | `build-profile.yml` | dispatch | Linux, macOS, Windows + called workflows | 10 min (max 35) | Per-stage build times of a candidate on five platforms | On demand |
 | `bun-deno-published.yml` | dispatch, after release, cron 17 9 * * 1-6 | Linux, macOS, Windows | 19 min (max 39) | Published @lasm/cli with Bun and Deno only, five platforms | After release, nightly |
-| `ci-nightly.yml` | cron 7 1 * * 0,2-6, dispatch | Linux + called workflows | — | Nightly tier: the release suites on main | Nightly |
+| `ci-nightly.yml` | cron 7 1 * * 2-6, dispatch | Linux + called workflows | — | Nightly tier: the release suites on main | Nightly |
 | `ci-weekly.yml` | cron 7 12 * * 6, dispatch | called workflows | — | Weekly tier: long campaigns | Weekly |
 | `conduit-platforms.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 35 min (max 103) | examples/conduit on 15 non-Node platforms, RealWorld traffic equivalence | PR (paths), main |
 | `conduit.yml` | dispatch, call, PR (paths), push main,conduit (paths) | Linux | 24 min (max 107) | examples/conduit: proofs, API on Node/Workers/Bun, RealWorld E2E in three browsers | PR (paths), main |
 | `content.yml` | PR (paths), cron 23 5 * * 1-6, dispatch | Linux | 12 min (max 85) | content/ pages and runnable tutorials | PR (paths), nightly |
-| `differential.yml` | PR (paths-ignore), push main, cron 47 3 * * 0,2-6, call, dispatch | Linux, macOS, Windows | 35 min (max 110) | Compiler output vs native Lean on every target, host fixtures, target equivalence, recursion and Async depth, macOS C tier | PR, main, nightly (campaign), weekly (long campaign) |
-| `dst-nightly.yml` | cron 23 3 * * 0,2-6, dispatch | Linux | — | Example-app deterministic simulation with random seeds | Nightly |
+| `differential.yml` | PR (paths-ignore), push main, cron 47 3 * * 2-6, call, dispatch | Linux, macOS, Windows | 35 min (max 110) | Compiler output vs native Lean on every target, host fixtures, target equivalence, recursion and Async depth, macOS C tier | PR, main, nightly (campaign), weekly (long campaign) |
+| `dst-nightly.yml` | cron 23 3 * * 2-6, dispatch | Linux | — | Example-app deterministic simulation with random seeds | Nightly |
 | `dx-dev-loop.yml` | dispatch, call | Linux | 7 min (max 48) | Template dev loop, editor support, cold start | Release, nightly |
 | `ecosystem.yml` | dispatch | Linux, macOS | 93 min (max 586) | Lake projects of the ecosystem built on five targets | Nightly (dispatched by nightly.yml), on demand |
 | `edge-runtime.yml` | dispatch, call | Linux | 10 min (max 59) | Single-threaded edge runtime build (called by workers/wasi/browser) | Called |
@@ -120,13 +155,13 @@ it), and "dispatch" means `workflow_dispatch`.
 | `evidence-page.yml` | cron 41 10 * * 1-6, dispatch, PR (paths) | Linux | new | the public test-evidence page (`content/learn/test-evidence.md`) from the repository and the latest CI results, committed to `main` | PR (paths), nightly |
 | `extract-bench.yml` | dispatch | Linux, macOS, Windows | 35 min | Tier-archive extraction speed per platform | On demand |
 | `flaky.yml` | cron 53 7 * * 1-6, dispatch, PR (paths) | Linux | 12 min (max 40) | Flaky-test report of the last 24 h (issue `flaky`) | PR (paths), nightly |
-| `folio-nightly.yml` | cron 53 3 * * 0,2-6, dispatch | Linux | 41 min | Folio: CommonMark differential and 40-minute fuzzing | Nightly |
+| `folio-nightly.yml` | cron 53 3 * * 2-6, dispatch | Linux | 41 min | Folio: CommonMark differential and 40-minute fuzzing | Nightly |
 | `folio.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 16 min (max 96) | examples/folio: proofs, CommonMark examples, CLI, WASI, live preview | PR (paths), main |
 | `folio-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 7 min | examples/folio: the site server on Fastly (Viceroy), Workers and Deno Deploy with KV; the 652 CommonMark examples on WASI, three browsers and the edge | PR (paths), main |
 | `fullstack.yml` | dispatch, call | Linux | 27 min (max 79) | Fullstack template on Node, Workers, Bun, Deno, Fastly, wasmtime serve; npm run dev | Release, nightly |
-| `fuzz.yml` | PR (paths-ignore), push main, cron 23 2 * * 0,2-6; 41 6 * * 6, dispatch | Linux | 8 min (max 18) | Boundary fuzzing: corpus replay; 10-minute campaigns; 60-minute campaigns | PR, main, nightly, weekly |
+| `fuzz.yml` | PR (paths-ignore), push main, cron 23 2 * * 2-6; 41 6 * * 6, dispatch | Linux | 8 min (max 18) | Boundary fuzzing: corpus replay; 10-minute campaigns; 60-minute campaigns | PR, main, nightly, weekly |
 | `image-pins.yml` | cron 17 6 * * 1, dispatch | Linux | 0 min (max 3) | Re-pins cached CI images to upstream digests (opens a PR) | Weekly |
-| `installation-confidence.yml` | dispatch, cron 17 3 * * 0,2-6 | Linux, macOS, Windows + called workflows | 73 min (max 417) | Repeated cold installs of the retained candidate on five platforms | Nightly |
+| `installation-confidence.yml` | dispatch, cron 17 3 * * 2-6 | Linux, macOS, Windows + called workflows | 73 min (max 417) | Repeated cold installs of the retained candidate on five platforms | Nightly |
 | `installer-faults.yml` | push main (paths), PR (paths), dispatch, call | Linux, macOS, Windows | 6 min (max 69) | Installer fault injection on five platforms | PR (paths, Linux and Windows), main, release, nightly |
 | `interop-soak.yml` | dispatch | Linux, macOS, Windows + called workflows | 123 min | Express/Hono apps with Lean handlers under soak | On demand |
 | `io-error-decoder.yml` | dispatch | Linux, Windows | 7 min | Native Lean IO error ABI comparison (diagnosis) | On demand |
@@ -143,7 +178,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `link-toolchain.yml` | dispatch | Linux, macOS, Windows | 11 min | Builds the link toolchain distribution (maintainer) | On demand |
 | `managed-sdk.yml` | dispatch | Linux, macOS, Windows | 7 min | Managed compiler SDK provisioning | On demand |
 | `managed-tools.yml` | dispatch | Linux, macOS, Windows | 4 min | Managed Lean tool provisioning | On demand |
-| `mutation.yml` | cron 37 5 * * 1-6, dispatch, PR (paths) | Linux | 11 min (max 27) | Stryker mutation scores of critical modules | PR (changed modules), nightly |
+| `mutation.yml` | cron 37 5 * * 1-6, dispatch, PR (paths) | Linux | 11 min (max 27) | Stryker mutation scores of every `src/` module (21 modules, one job each) | PR (changed modules), nightly |
 | `nightly.yml` | cron 17 7 * * 1-6, dispatch | Linux + called workflows | 3 min (max 27) | Nightly upstream suite and ecosystem runs vs baseline | Nightly |
 | `node-candidate-input.yml` | call | Linux | — | Authenticated candidate input (called) | Called |
 | `node-darwin-candidate-recheck.yml` | dispatch | macOS + called workflows | 28 min (max 87) | Recheck a candidate on macOS | On demand |
@@ -160,7 +195,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `node-windows-controls.yml` | dispatch | Windows | 2 min (max 12) | Windows resource and isolation controls | On demand |
 | `npm-dist.yml` | call, dispatch | Linux, macOS, Windows | 43 min | npm packages of the candidate through a loopback registry; Bun/Deno installs | Release (rehearsal) |
 | `platform-support.yml` | call, dispatch, push main (paths) | Linux, macOS, Windows | 12 min (max 196) | Launch platform claims: builds, containers, Lambda, native hosts | Release (called), main (paths) |
-| `porter-nightly.yml` | cron 41 3 * * 0,2-6, dispatch | Linux | 43 min | Porter: 40-minute endpoint fuzzing | Nightly |
+| `porter-nightly.yml` | cron 41 3 * * 2-6, dispatch | Linux | 43 min | Porter: 40-minute endpoint fuzzing | Nightly |
 | `porter-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 32 min (max 101) | examples/porter on Bun, Deno, Docker, Workers | PR (paths), main |
 | `porter.yml` | dispatch, PR (paths), push main (paths) | Linux | 18 min (max 86) | examples/porter: proofs, oracles, DST, fuzzer, E2E | PR (paths), main |
 | `published-templates.yml` | dispatch, after release | Linux | 0 min (max 30) | npm create @lasm from the registry after a release | After release |
@@ -172,6 +207,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `serverless-adapters.yml` | dispatch, PR (paths), push main (paths) | Linux | 14 min (max 72) | Function-platform shims on local emulators | PR (paths), main |
 | `serverless.yml` | dispatch | Linux | 23 min (max 66) | Function-platform claims with local runtimes | On demand |
 | `signal-controls.yml` | dispatch | Linux | 1 min | Native signal routing controls | On demand |
+| `sunday-guard.yml` | call | Linux | a few seconds | The Sunday guard: `skip=true` for a scheduled run on a Sunday in New York ([No runs on Sunday](#no-runs-on-sunday)) | Every scheduled workflow |
 | `tandem-nightly.yml` | cron 17 5 * * 1-6, dispatch | Linux | 47 min | Tandem: 40-minute fuzzing, Yjs differential, simulation | Nightly |
 | `tandem-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 11 min (max 74) | examples/tandem on Bun, Deno, Docker, Workers | PR (paths), main |
 | `tandem.yml` | dispatch, PR (paths), push main (paths) | Linux | 19 min (max 97) | examples/tandem: proofs, protocol, Yjs, fuzzer, DST, E2E | PR (paths), main |
@@ -181,7 +217,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `unit.yml` | PR (paths-ignore), dispatch, call | Linux | 5 min (max 31) | The whole unit suite with coverage baseline | PR (paths), release, nightly |
 | `upstream-native-build-time.yml` | dispatch | Linux | 2 min (max 20) | Upstream native build-time checks | On demand |
 | `wasi.yml` | dispatch, call | Linux + called workflows | 13 min (max 74) | WASI, wasi-http, Fastly on wasmtime, wasmer, node:wasi, Spin, Viceroy | Release, nightly |
-| `wasmtime-helper-probe.yml` | dispatch | Linux | 0 min (max 1) | Wasmtime helper feasibility probe | On demand |
+| `wasmtime-helper-probe.yml` | dispatch | Linux | 0 min (max 1) | Scalar atomic adapter and Wasm synchronization probe | On demand |
 | `windows-guard-controls.yml` | dispatch | Windows | 2 min | Windows resource guard controls | On demand |
 | `windows-lean-path-controls.yml` | dispatch | Windows | 3 min | Windows Lean long-path controls | On demand |
 | `windows-timezone-host.yml` | dispatch | Windows | 5 min | Windows timezone host comparisons | On demand |

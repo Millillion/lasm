@@ -437,6 +437,19 @@ def leanChecks (checks : Checks) : IO Unit := do
       discard <| e.val.callMethod "noSuchMethod" #[] (α := Unit)
       return (false, "no error")
     catch err => return ((toString err).contains "noSuchMethod", toString err)
+  -- Property keys of any kind: a Symbol, a number, an array (its string).
+  check checks "lean.js-keys" do
+    let symbolClass ← (← global).get "Symbol"
+    let tag ← symbolClass.callMethod "for" #[toJS "lasm.tag"]
+    let box ← (← global).get "Object" >>= (·.new)
+    box.set tag "tagged"
+    box.set (2 : Nat) "two"
+    box.set #["a", "b"] "joined"
+    let items ← (← global).get "Array" >>= (·.callMethod "of" #[toJS 7])
+    let iterator ← (← items.get (← symbolClass.get "iterator")).call (this := toJS items)
+    let first := ((← iterator.callMethod "next" #[] Data).field "value").describe
+    let got := s!"{← box.get tag String} {← box.get "2" String} {← box.get "a,b" String} {first}"
+    return expectEq got "tagged two joined number 7"
 
 /-! The app: flags, ports, messages, unmount -/
 

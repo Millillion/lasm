@@ -4,7 +4,8 @@ name: Tandem nightly
 # in four seeded runs of ten minutes (each seed printed; replay with --seed),
 # failing inputs uploaded; then 20,000 differential histories against Yjs, ten
 # rounds of the live simulation, and the protocol tests on the same build.
-# Runs when main changed examples/tandem in the last day, or on demand. Not a
+# Runs when main changed examples/tandem since the previous scheduled run (50
+# hours covers Saturday to Monday, as there is no Sunday run), or on demand. Not a
 # release gate.
 on:
   schedule:
@@ -19,7 +20,13 @@ env:
   CI: '1'
   BROWSER: 'none'
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   changed:
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true'
     runs-on: ubuntu-24.04
     outputs:
       run: ${{ steps.check.outputs.run }}
@@ -27,17 +34,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-          fetch-depth: 50
+          fetch-depth: 400
       - id: check
         run: |
-          if [ "${{ github.event_name }}" = workflow_dispatch ] || [ -n "$(git log --since='26 hours ago' --format=%H -- examples/tandem | head -1)" ]; then
+          if [ "${{ github.event_name }}" = workflow_dispatch ] || [ -n "$(git log --since='50 hours ago' --format=%H -- examples/tandem | head -1)" ]; then
             echo run=true >> "$GITHUB_OUTPUT"
           else
             echo run=false >> "$GITHUB_OUTPUT"
           fi
   fuzz:
-    needs: changed
-    if: needs.changed.outputs.run == 'true'
+    needs: [sunday, changed]
+    if: needs.sunday.outputs.skip != 'true' && (needs.changed.outputs.run == 'true')
     name: 40 minutes of fuzzing
     runs-on: ubuntu-24.04
     timeout-minutes: 90

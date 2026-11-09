@@ -158,6 +158,7 @@ The result type `α` is the last argument and defaults to `Value` (`Data` for th
 | `o.get "key"` / `o.get "key" Nat` | `o.key` |
 | `o.getFields #["a", "b"]` | `{a: o.a, b: o.b}` in **one** call (use it to read an HTTP request) |
 | `o.set "key" x` | `o.key = x` |
+| `o.get sym` / `o.set sym x` (`sym : Value`, a Symbol) / `o.get (3 : Nat)` | `o[sym]` / `o[sym] = x` / `o[3]` |
 | `f.call #[a, b]` / `f.callAwait #[a, b] String` | `f(a, b)` / `await f(a, b)` |
 | `o.callMethod "m" #[a]` / `o.callMethodAwait "m" #[a] Data` | `o.m(a)` / `await o.m(a)` |
 | `C.new #[a]` | `new C(a)` |
@@ -178,6 +179,21 @@ Example (`pg`):
 def rows (pool : Value) (sql : String) (params : Array Data) : Async (Array Data) := do
   let result ← pool.callMethodAwait "query" #[toJS sql, .array params] Value  -- pg Result (a class instance)
   result.get "rows" (Array Data)                                               -- plain row objects
+```
+
+### Property keys: strings, numbers, Symbols
+
+`get` and `set` take a key of any type with `ToJS`, as JavaScript's `o[key]`
+does: a `String`, a number, or a JavaScript value such as a Symbol. An array
+key is its string (`o[["a", "b"]]` is `o["a,b"]`); `getFields` takes strings.
+
+```lean
+let symbolClass ← (← global).get "Symbol"
+let tag ← symbolClass.callMethod "for" #[toJS "app.tag"]   -- Symbol.for("app.tag")
+box.set tag "tagged"                                       -- box[tag] = "tagged"
+let s ← box.get tag String
+let iterator ← (← items.get (← symbolClass.get "iterator")).call (this := toJS items)
+let first ← iterator.callMethod "next" #[] Data             -- {value, done}
 ```
 
 ## Conversions: `ToJS` and `FromJS`
@@ -417,6 +433,11 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
   which serves every host call, is the limit; use `ofFnReply` and `getFields`.
   Measurements: [JS_INTEROP.md](JS_INTEROP.md).
 - **Lasm only.** Programs that use interop run only under Lasm.
+- **No inline JavaScript, no classes defined in Lean.** JavaScript that is not an
+  existing export goes in a module of its own (a local `file:` npm package), and a
+  class (`extends HTMLElement`, a Durable Object) is written in JavaScript with
+  methods that call Lean functions. Options and recommendations:
+  [proposals/LASM_JS_GAPS.md](proposals/LASM_JS_GAPS.md).
 - **Waiting in `IO` holds a thread.** Lean code that waits for JavaScript in
   `IO` (an `IO R` binding returning a promise, `callAwait` or `Value.await` in
   an `IO` function, `IO.wait`, `IO.sleep`) blocks a Lean worker thread, and

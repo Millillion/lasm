@@ -129,9 +129,12 @@ function run(target, args, { extra = {}, flags, timeout = 180_000, measure = fal
   const r = spawnSync(command, commandArgs, { cwd: work, env: { ...env, ...more }, encoding: 'utf8', timeout, maxBuffer: 64 << 20 });
   let stderr = r.stderr ?? '', peakKiB;
   stderr = stderr.replace(/(?:Command exited with non-zero status \d+\n)?lasm-peak-kib=(\d+)\n?$/, (_, kib) => { peakKiB = Number(kib); return ''; });
+  const timedOut = r.error?.code === 'ETIMEDOUT';
+  // Said at once, so a hang is never a silent wait (issue #126).
+  if (timedOut) console.log(`hung ${target}: ${args.join(' ')} gave no result in ${timeout / 1000} s and was killed (stderr ${JSON.stringify(stderr.slice(0, 200))})`);
   let code = r.status;
   if (target === 'edge-sm' && existsSync(join(work, 'sm-exit'))) code = Number(readFileSync(join(work, 'sm-exit'), 'utf8'));
-  return { code, signal: r.signal, timedOut: r.error?.code === 'ETIMEDOUT', stdout: r.stdout ?? '', stderr, peakKiB, ms: Math.round(performance.now() - started) };
+  return { code, signal: r.signal, timedOut, stdout: r.stdout ?? '', stderr, peakKiB, ms: Math.round(performance.now() - started) };
 }
 const sumOf = n => String(BigInt(n) * BigInt(n - 1) / 2n) + '\n';
 const passes = (target, n, options) => { const r = run(target, ['sum', String(n)], options); return r.code === 0 && r.stdout === sumOf(n); };
@@ -202,23 +205,24 @@ for (const target of targets) {
     // first, depending on the engine and the frame; a C-stack overflow must be
     // named, never left as the trap that follows it ("memory access out of bounds").
     const overflows = [];
+    // Every run here ends in well under a second: 30 s is a hang (issue #126).
     for (const mode of ['sum', 'wide', 'deepSum']) {
-      const ok = (t, n) => { const r = run(t, [mode, String(n)]); return r.code === 0 && /^\d+\n$/.test(r.stdout); };
+      const ok = (t, n) => { const r = run(t, [mode, String(n)], { timeout: 30_000 }); return r.code === 0 && /^\d+\n$/.test(r.stdout); };
       const deepest = limit(target, 100, 50_000, undefined, ok), n = Math.ceil(deepest * 1.1) + 10;
-      const over = run(target, [mode, String(n)], { timeout: 120_000 });
+      const over = run(target, [mode, String(n)], { timeout: 30_000 });
       const named = over.stderr.includes(`[lasm] the Lean instance stopped: ${edgeOverflow}\n`);
       if (named) overflows.push(mode);
       (report.targets[target].limits ??= {})[mode] = { deepest, stop: named ? 'C stack' : over.stderr.split('\n')[0] };
       expect(target, `${mode} ${n}: stops with a stack overflow, never the trap after it`,
         !over.timedOut && over.code === 1 && over.stdout === '' && !/out of bounds/i.test(over.stderr)
           && (named || /^\[lasm\] the Lean instance stopped: (Maximum call stack size exceeded|too much recursion)/.test(over.stderr)),
-        JSON.stringify({ code: over.code, signal: over.signal, deepest, stderr: over.stderr.slice(0, 400) }));
+        JSON.stringify({ code: over.code, signal: over.signal, timedOut: over.timedOut, deepest, stderr: over.stderr.slice(0, 400) }));
     }
     expect(target, 'a recursion exhausts the 1 MiB C stack and is named', overflows.length > 0, JSON.stringify(report.targets[target].limits));
     report.targets[target].limit = report.targets[target].limits.sum.deepest;
   } else {
     expect(target, 'sumTo of 5,000 elements', passes(target, 5000), '');
-    const over = run(target, ['sum', '1000000'], { timeout: 120_000 });
+    const over = run(target, ['sum', '1000000'], { timeout: 60_000 });
     expect(target, 'an overflow fails without hanging', !over.timedOut && over.code !== 0 && over.stdout === '',
       JSON.stringify({ code: over.code, signal: over.signal, stderr: over.stderr.slice(0, 300) }));
     report.targets[target].limit = limit(target, 1000, 1_000_000);

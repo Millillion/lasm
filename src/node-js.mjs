@@ -19,7 +19,8 @@
 //
 // Operations (arg bit 0 = reference conversion of the result):
 //   200 protocol version   201 require(specifier)   202 globalThis
-//   203 get(handle, key, or an array of keys: an object of them)   204 set(handle, [key, value])
+//   203 get(handle, key: any value, a Symbol included; arg bit 2: an array of keys,
+//       an object of them)   204 set(handle, [key, value])
 //   206 describe(handle)
 //   205 call [target, receiver or method name, arguments]; arg flags 2 await a
 //       promise result, 4 construct, 8 method call, 16 settle: the request
@@ -410,15 +411,16 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
       case 201: { const value = load(decoder.decode(bytes)); return encode(value, modeOf(arg)); }
       case 202: return encode(globalThis, modeOf(arg));
       case 203: {
-        // One key, or an array of keys: an object of those properties (one call).
+        // One key (any value: a string, a number, a Symbol), or with arg bit 2
+        // an array of keys: an object of those properties (one call).
         const key = decode(bytes), object = lookup(id);
-        if (Array.isArray(key)) return encode(Object.fromEntries(key.map(k => [k, object?.[k]])), 'data');
+        if (Number(arg) & 2) return encode(Object.fromEntries(key.map(k => [k, object?.[k]])), 'data');
         return encode(object[key], modeOf(arg));
       }
       case 204: {
         const [key, value] = decode(bytes);
         const object = lookup(id);
-        if (object === null || typeof object !== 'object' && typeof object !== 'function') throw failure(`Cannot set ${JSON.stringify(key)} on ${describe(object)}`);
+        if (object === null || typeof object !== 'object' && typeof object !== 'function') throw failure(`Cannot set ${typeof key === 'string' ? JSON.stringify(key) : describe(key)} on ${describe(object)}`);
         object[key] = value;
         return Buffer.alloc(0);
       }

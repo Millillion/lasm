@@ -29,8 +29,13 @@ concurrency:
   group: mutation-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   modules:
-    if: github.event.repository.visibility == 'public'
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && github.event.repository.visibility == 'public'
     runs-on: ubuntu-24.04
     outputs:
       names: ${{ steps.list.outputs.names }}
@@ -51,10 +56,10 @@ jobs:
             echo "names=$(node scripts/mutation/run.mjs $REQUESTED --list)" >> "$GITHUB_OUTPUT"
           fi
   module:
-    needs: modules
-    if: needs.modules.outputs.names != '[]'
+    needs: [sunday, modules]
+    if: needs.sunday.outputs.skip != 'true' && needs.modules.outputs.names != '[]'
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:

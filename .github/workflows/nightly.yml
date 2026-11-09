@@ -34,8 +34,13 @@ concurrency:
   cancel-in-progress: false
   queue: max
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   gate:
-    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.continue_from == '')
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.continue_from == ''))
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -57,7 +62,8 @@ jobs:
         run: node scripts/nightly/driver.mjs gate --sha "$GITHUB_SHA" $([ "${{ inputs.force }}" = true ] && echo --force)
 
   cleanup:
-    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.continue_from == '')
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.continue_from == ''))
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -78,8 +84,8 @@ jobs:
         run: node scripts/nightly/cleanup-drafts.mjs
 
   candidate:
-    needs: gate
-    if: needs.gate.outputs.proceed == 'true'
+    needs: [sunday, gate]
+    if: needs.sunday.outputs.skip != 'true' && (needs.gate.outputs.proceed == 'true')
     permissions:
       contents: write
       actions: write # cache-budget.mjs may evict old candidate caches
@@ -90,8 +96,8 @@ jobs:
       release-check: true
 
   drive:
-    needs: [gate, candidate]
-    if: always() && (needs.candidate.result == 'success' || inputs.continue_from != '' && needs.gate.result == 'skipped')
+    needs: [sunday, gate, candidate]
+    if: needs.sunday.outputs.skip != 'true' && (always() && (needs.candidate.result == 'success' || inputs.continue_from != '' && needs.gate.result == 'skipped'))
     runs-on: ubuntu-24.04
     timeout-minutes: 350
     permissions:

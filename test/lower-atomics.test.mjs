@@ -4,9 +4,16 @@
 // instruction run in V8 before and after lowering; modules of every other
 // instruction kind (made with binaryen) must come out valid without atomics,
 // which they cannot if the decoder misreads one instruction's immediates.
-import test from 'node:test';
+// binaryen is not a dependency: the modules it made are recorded in
+// test/fixtures/lower-atomics-modules.json (by the text's SHA-256). With
+// binaryen installed (`npm install --no-save binaryen@132.0.0`), missing ones
+// are made and `LASM_UPDATE_LOWER_ATOMICS=1` records them, and validity is
+// checked with the threads feature off; without it, V8 validates the output
+// and the lowering must find no atomic instruction left in it.
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
-import binaryen from 'binaryen';
+import { createHash } from 'node:crypto';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { lowerAtomics, moduleImports, keepExports } from '../src/wasi/lower-atomics.mjs';
 import { forAll } from './helpers/property.mjs';
 
@@ -214,14 +221,33 @@ test('lowerAtomics: malformed and unsupported modules fail naming the problem', 
 
 // Modules of every other instruction kind: binaryen writes them, the lowering
 // decodes every instruction, and its output must be valid without atomics.
-const F = binaryen.Features;
-const features = F.Atomics | F.MutableGlobals | F.NontrappingFPToInt | F.BulkMemory | F.SignExt | F.ExceptionHandling | F.TailCall | F.ReferenceTypes
-  | F.Multivalue | F.GC | F.BulkMemoryOpt | F.Memory64;
+const binaryen = await import('binaryen').then(m => m.default, () => null);
+const F = binaryen?.Features ?? { Atomics: 0 };
+const features = binaryen ? F.Atomics | F.MutableGlobals | F.NontrappingFPToInt | F.BulkMemory | F.SignExt | F.ExceptionHandling | F.TailCall | F.ReferenceTypes
+  | F.Multivalue | F.GC | F.BulkMemoryOpt | F.Memory64 : 0;
+const fixtureFile = new URL('./fixtures/lower-atomics-modules.json', import.meta.url);
+const recorded = JSON.parse(readFileSync(fixtureFile, 'utf8'));
+let added = 0;
+after(() => {
+  if (added && process.env.LASM_UPDATE_LOWER_ATOMICS === '1')
+    writeFileSync(fixtureFile, '{\n' + Object.keys(recorded).sort().map(key => `${JSON.stringify(key)}: ${JSON.stringify(recorded[key])}`).join(',\n') + '\n}\n');
+});
 function binary(text) {
+  const key = createHash('sha256').update(text).digest('hex');
+  if (recorded[key]) return new Uint8Array(Buffer.from(recorded[key], 'base64'));
+  assert.ok(binaryen, 'no recorded module for this text: install binaryen and run with LASM_UPDATE_LOWER_ATOMICS=1');
   const module = binaryen.parseText(text);
-  try { module.setFeatures(features); assert.ok(module.validate(), 'the test module is valid'); return module.emitBinary(); } finally { module.dispose(); }
+  try {
+    module.setFeatures(features);
+    assert.ok(module.validate(), 'the test module is valid');
+    const bytes = module.emitBinary();
+    recorded[key] = Buffer.from(bytes).toString('base64');
+    added++;
+    return bytes;
+  } finally { module.dispose(); }
 }
 function validWithout(bytes, without) {
+  if (!binaryen) return WebAssembly.validate(bytes) && lowerAtomics(bytes) === bytes;
   let module;
   try { module = binaryen.readBinary(bytes, features & ~without); }
   catch { return false; }

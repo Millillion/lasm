@@ -21,15 +21,20 @@ on:
   workflow_dispatch:
   pull_request:
     branches: [main]
-    paths: [.github/workflows/evidence-page.yml, 'scripts/evidence/**', test/evidence-page.test.mjs]
+    paths: [.github/workflows/evidence-page.yml, 'scripts/evidence/**', scripts/ci/sunday-guard.mjs, test/evidence-page.test.mjs]
 permissions:
   contents: read
 concurrency:
   group: evidence-page-${{ github.event_name }}
   cancel-in-progress: false
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   page:
-    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { confidencePlatforms, installationConfidence, unavailableInstallation, resourceReportPassed } from './installation-confidence.mjs';
+import { sundayGuarded } from './sunday-guard.mjs';
 
 const repository = 'Millillion/lasm';
 assert.equal(process.env.GITHUB_REPOSITORY, repository);
@@ -39,6 +40,8 @@ for (const id of ids) {
   const run = json(`actions/runs/${id}`);
   if (!['.github/workflows/node-linux-acceptance.yml', '.github/workflows/installation-confidence.yml'].includes(run.path)) continue;
   assert.equal(run.head_branch, 'main'); assert.equal(run.repository.full_name, repository);
+  // A scheduled Sunday run in New York ran no job (sunday-guard.yml): no campaign.
+  if (sundayGuarded(run)) continue;
   // Attribute even failures before the installer starts to the exact scheduled
   // selection. Never make a lost log or failed preparation disappear from the
   // denominator just because it did not print an acceptance report.

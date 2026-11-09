@@ -195,10 +195,10 @@ test('ops 202-204: globalThis, get one key or several, set, and their errors', (
   const target = { a: 1, b: 'two', inner: { c: 3 }, f() {} };
   const id = hold(js, target);
   assert.equal(js.decode(js.dispatch(203, id, 0n, wire('a'))), 1);
-  assert.deepEqual(js.decode(js.dispatch(203, id, 0n, wire(['a', 'b', 'missing']))), { a: 1, b: 'two', missing: undefined });
+  assert.deepEqual(js.decode(js.dispatch(203, id, 2n, wire(['a', 'b', 'missing']))), { a: 1, b: 'two', missing: undefined });
   const inner = js.dispatch(203, id, 1n, wire('inner'));
   assert.equal(js.values.get(inner.readUInt32LE(1)), target.inner);
-  assert.deepEqual(js.decode(js.dispatch(203, hold(js, null), 0n, wire(['x']))), { x: undefined });
+  assert.deepEqual(js.decode(js.dispatch(203, hold(js, null), 2n, wire(['x']))), { x: undefined });
   assert.throws(() => js.dispatch(203, hold(js, null), 0n, wire('x')), /TypeError: Cannot read properties of null/);
   assert.equal(js.dispatch(204, id, 0n, wire(['a', 5])).length, 0);
   assert.equal(target.a, 5);
@@ -207,6 +207,24 @@ test('ops 202-204: globalThis, get one key or several, set, and their errors', (
   assert.equal(fn.tag, 'set');
   for (const [value, text] of [[null, 'null'], [7, 'number 7'], ['s', 'string "s"'], [undefined, 'undefined']])
     assert.throws(() => js.dispatch(204, hold(js, value), 0n, wire(['k', 1])), { message: `TypeError: Cannot set "k" on ${text}` });
+});
+
+test('ops 203-204: keys of any kind (Symbols, numbers, arrays); getFields only with arg bit 2', () => {
+  const js = host();
+  const tag = Symbol('tag'), target = { [tag]: 'symbol', 2: 'two', 'a,b': 'joined', a: 'one' };
+  const id = hold(js, target), key = { ref: hold(js, tag) };
+  assert.equal(js.decode(js.dispatch(203, id, 0n, wire(key))), 'symbol');
+  assert.equal(js.decode(js.dispatch(203, id, 0n, wire(2))), 'two');
+  assert.equal(js.decode(js.dispatch(203, id, 0n, wire(['a', 'b']))), 'joined', 'an array key is its string, as in JavaScript');
+  assert.deepEqual(js.decode(js.dispatch(203, id, 2n, wire(['a', 2]))), { a: 'one', 2: 'two' });
+  const reference = js.dispatch(203, id, 1n, wire(key));
+  assert.equal(js.values.get(reference.readUInt32LE(1)), 'symbol', 'arg bit 0 still asks for a reference');
+  assert.equal(js.dispatch(204, id, 0n, wire([key, 'set'])).length, 0);
+  assert.equal(target[tag], 'set');
+  js.dispatch(204, id, 0n, wire([3, 'three']));
+  assert.equal(target[3], 'three');
+  assert.throws(() => js.dispatch(204, hold(js, null), 0n, wire([key, 1])), { message: 'TypeError: Cannot set symbol tag on null' });
+  assert.throws(() => js.dispatch(204, hold(js, null), 0n, wire([3, 1])), { message: 'TypeError: Cannot set number 3 on null' });
 });
 
 test('op 205: calls, methods and construction; their errors; awaiting', async () => {

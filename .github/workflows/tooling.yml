@@ -1,5 +1,5 @@
 name: Dependable tooling
-# Claim 4 of docs/proposals/TESTING_STRATEGY.md, black box (docs/TESTING.md#dependable-tooling):
+# Claim 4 of docs/TESTING_STRATEGY.md, black box (docs/TESTING.md#dependable-tooling):
 #   - error corpus (scripts/tooling/error-corpus.mjs): every error a user can
 #     trigger prints a clear message, never a stack trace. Against a candidate
 #     packed from this commit and against the published @lasm/cli@latest;
@@ -42,7 +42,13 @@ concurrency:
   group: tooling-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   scope:
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
@@ -56,7 +62,8 @@ jobs:
           files=$(gh api --paginate "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" --jq '.[].filename')
           if echo "$files" | grep -qE '^(scripts/tooling/|\.github/workflows/tooling\.yml$)'; then echo slow=true; else echo slow=false; fi >> "$GITHUB_OUTPUT"
   pack:
-    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
     # The retained runtime input is a draft release asset (needs contents: write to read).
     permissions:
       contents: write
@@ -91,8 +98,9 @@ jobs:
           if-no-files-found: error
 
   error-corpus:
+    if: needs.sunday.outputs.skip != 'true'
     name: Error corpus (${{ matrix.cli }})
-    needs: pack
+    needs: [sunday, pack]
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     strategy:
@@ -146,8 +154,8 @@ jobs:
 
   metamorphic:
     name: Metamorphic (${{ matrix.target }})
-    needs: [scope, pack]
-    if: needs.scope.outputs.slow == 'true'
+    needs: [sunday, scope, pack]
+    if: needs.sunday.outputs.skip != 'true' && (needs.scope.outputs.slow == 'true')
     runs-on: ubuntu-24.04
     timeout-minutes: 150
     strategy:
@@ -193,8 +201,8 @@ jobs:
 
   faults:
     name: Fault injection (${{ matrix.target }})
-    needs: [scope, pack]
-    if: needs.scope.outputs.slow == 'true'
+    needs: [sunday, scope, pack]
+    if: needs.sunday.outputs.skip != 'true' && (needs.scope.outputs.slow == 'true')
     runs-on: ubuntu-24.04
     timeout-minutes: 240
     strategy:

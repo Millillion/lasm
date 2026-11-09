@@ -6,7 +6,7 @@ differential), target equivalence and the test-quality audit below are
 implemented and run in CI; the other layers are marked as existing (with their
 workflow) or planned. The plan is issue #21 (testing and verification half);
 the long-term strategy (evidence levels, tier consolidation, corpora) is the
-proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
+strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 
 ## Principles
 
@@ -141,7 +141,7 @@ threads is never printed); performance; in browsers, which exit status a failing
 
 ### More oracles
 
-Three more comparisons from [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md)
+Three more comparisons from [TESTING_STRATEGY.md](TESTING_STRATEGY.md)
 pillar 1, implemented as targets of the same harness, so every generated case,
 the shrinker and the regression replay cover them.
 
@@ -338,7 +338,7 @@ accounts, by policy), OS versions and configurations outside the runners.
 
 ### Dependable tooling
 
-Claim 4 of [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md), tested black
+Claim 4 of [TESTING_STRATEGY.md](TESTING_STRATEGY.md), tested black
 box: each harness installs the CLI with npm (a candidate packed from the commit,
 and for the corpus also the published `@lasm/cli@latest`) and judges only what
 it prints, its exit status and the files it writes. The judge of a message,
@@ -796,10 +796,18 @@ tier and why that is safe, and the PR-tier measurements. In short:
 | Weekly | Saturday 06:41 and 12:07 UTC | differential: 100-minute campaigns in both profiles, and the Lasm.JS soak (200 runs per program on four platforms) (`ci-weekly.yml`); boundary fuzzing: 60 minutes per target (`fuzz.yml`) |
 | Release | a version bump (`release-checks`) | every launch workflow, Lasm.JS stress, unit suite, npm rehearsal (unchanged) |
 
+No scheduled run does anything on a Sunday in US Eastern time: cron times stay
+off Sunday with a 12-hour margin, and every scheduled workflow's jobs wait on
+the Sunday guard (`sunday-guard.yml`), which skips them when a late run starts
+on Sunday in New York ([CI.md](CI.md#no-runs-on-sunday);
+`test/no-sunday-schedules.test.mjs` requires both). The campaigns that fired
+before 04:00 UTC run Monday to Friday evenings, New York time; the rest Monday
+to Saturday.
+
 ## Evidence levels
 
 Each platform in the README's table has an evidence level. The levels are those
-of [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md#5-rules-of-the-process),
+of [TESTING_STRATEGY.md](TESTING_STRATEGY.md#5-rules-of-the-process),
 and CI results decide them:
 
 | Level | Meaning |
@@ -830,7 +838,7 @@ that kind of evidence for the platform yet.
 The script rewrites only the region of README.md between the
 `evidence-levels` markers: the table's How well tested column and the legend under it.
 Every other cell stays as written. [`evidence-levels.yml`](../.github/workflows/evidence-levels.yml)
-runs it every night (08:23 UTC). When a level moved, it opens a pull request
+runs it Monday to Saturday (08:23 UTC). When a level moved, it opens a pull request
 with that change, as `image-pins.yml` does for image digests. Its artifact
 `evidence-levels.json` lists every requirement: the run behind it, and whether
 it failed, was missing or was stale.
@@ -998,16 +1006,24 @@ pull request, only the modules whose sources or tests changed. A module whose
 score is below its **threshold** in
 [evidence/mutation-baseline.json](evidence/mutation-baseline.json) fails the
 job. The threshold is a ratchet: the module's recorded score rounded down to a
-whole percent, never below 80 % and never lowered. When tests improve, record
+whole percent, never lowered. The goal for every module is 80 %; a module added
+below it would start at its first measured score and rise with its tests (none
+is below it now). When tests improve, record
 the new score with `--update` (CI's run is the measurement), which raises the
 threshold with it; `--check` names a module whose score has passed its next
 whole percent.
 
 ### Scores
 
-Measured 2026-11-03 (mutation.yml run 41749603692, Node 26, Linux x64). *Initial*: with the tests that existed before
-mutation testing; *now*: with the tests written to kill survivors (CI's
-measurement on Node 26 is the recorded floor).
+Every JavaScript file under `src/` is in one of the 21 modules except
+`src/edge/edge-library.js` (an Emscripten library with preprocessor lines, which
+Stryker cannot parse). The first seven modules were measured 2026-11-03 (mutation.yml
+run 41749603692); the fourteen others, which cover the rest of `src/`, were added
+2026-11-09: their *initial* scores are from mutation.yml run 42571078799 (the run
+that added them) or from each group's first run where that run could not score
+them, and *now* from each group's last run (Node 26, Linux x64). *Initial*: with
+the tests that existed before mutation testing; *now*: with the tests written to
+kill survivors (CI's measurement on Node 26 is the recorded floor).
 
 | Module | Files | Initial | Now | Threshold |
 | --- | --- | ---: | ---: | ---: |
@@ -1029,6 +1045,9 @@ measurement on Node 26 is the recorded floor).
 | `edge-build` | `edge/edge-build.mjs`, `edge/builtin-modules.mjs`, `edge/edge-initializers.mjs`, `edge/edge-pre.js` | 31.5 % | **89.4 %** | 89 % |
 | `wasi-build` | `wasi/wasi-build.mjs`, `wasi/wasi-component.mjs`, `wasi/lower-atomics.mjs` | 45.8 % | **95.6 %** | 95 % |
 | `wasmtime` | `wasmtime-runtime.mjs`, `wasmtime-standalone.mjs`, `wasmtime-worker.mjs`, `wasmtime-artifact.mjs`, `wasmtime-bundle.mjs`, `wasmtime-console.mjs`, `wasmtime-file-host.mjs`, `wasmtime-file-imports.mjs`, `wasmtime-guest-memory.mjs`, `wasmtime-module-data.mjs`, `wasmtime-native-stdio.mjs`, `wasmtime-process-host.mjs`, `wasmtime-wasi-stdio.mjs` | 32.4 % | **88 %** | 88 % |
+| `node-host` | `node-host.mjs`, `node-network.mjs`, `node-process.mjs`, `node-signal.mjs`, `node-system.mjs`, `node-udp.mjs`, `node-fetch.mjs`, `lean-io-errors.mjs`, `handle-table.mjs`, `process-exec.mjs`, `working-directory.mjs`, `linux-memory.mjs`, `thread-id.cjs`, `native-clock.mjs`, `native-dns.mjs`, `native-interfaces.mjs`, `native-windows-timezone.mjs`, `native-tcp.mjs` | 42 % | **86.1 %** | 86 % |
+| `native-files` | `native-files.mjs`, `native-file-message.mjs`, `native-file-worker.mjs`, `native-file-worker-pool.mjs`, `native-worker-cwd.cjs`, `worker-stdio.cjs`, `native-process.mjs`, `native-signals.mjs`, `native-program.mjs`, `native-abort.cjs`, `native-pthread-factory.cjs` | 29.4 % | **86.5 %** | 86 % |
+| `serverless` | `serverless/lasm-server.mjs`, `serverless/lasm-lambda.mjs`, `serverless/lasm-vercel.mjs`, `serverless/lasm-netlify.mjs`, `serverless/lasm-azure.mjs`, `serverless/lasm-gcf.mjs`, `serverless/zip.mjs` | 40.5 % | **SERVERLESS %** | SERVERLESS_T % |
 
 `edge-build`, `wasi-build` and `wasmtime` were measured 2026-11-09 (run 42581537537; initial scores in runs
 42571769129 and, for `edge-build` without `edge-library.js`, 42579064935). `src/edge/edge-library.js` is not
@@ -1039,12 +1058,19 @@ module globals (`test/edge-pre.test.mjs`); the generated edge entries as their p
 and the Wasmtime runner and supervisor over a stand-in FFI and per-module `node:worker_threads`
 (`test/fixtures/wasmtime-stand-ins/`: a Lean instance with memory, exports, callbacks and thread entry
 points). The atomics lowering is checked by properties: random atomic programs run in V8 before and after
-lowering, binaryen-made modules of every other instruction kind stay valid without the threads feature, and
+lowering, binaryen-made modules of every other instruction kind stay valid without the threads feature (binaryen is no
+longer a dependency: the modules it made are recorded in `test/fixtures/lower-atomics-modules.json`, and
+without it V8 validates the output), and
 random instruction streams come out byte for byte as documented.
-| `node-host` | `node-host.mjs`, `node-network.mjs`, `node-process.mjs`, `node-signal.mjs`, `node-system.mjs`, `node-udp.mjs`, `node-fetch.mjs`, `lean-io-errors.mjs`, `handle-table.mjs`, `process-exec.mjs`, `working-directory.mjs`, `linux-memory.mjs`, `thread-id.cjs`, `native-clock.mjs`, `native-dns.mjs`, `native-interfaces.mjs`, `native-windows-timezone.mjs`, `native-tcp.mjs` | 42 % | **86.1 %** | 86 % |
-| `native-files` | `native-files.mjs`, `native-file-message.mjs`, `native-file-worker.mjs`, `native-file-worker-pool.mjs`, `native-worker-cwd.cjs`, `worker-stdio.cjs`, `native-process.mjs`, `native-signals.mjs`, `native-program.mjs`, `native-abort.cjs`, `native-pthread-factory.cjs` | 29.4 % | **86.5 %** | 86 % |
 
-Every module is above 80 %; each threshold is its score rounded down. The link driver and the target links
+Every module is above 80 %; each threshold is its score rounded down. Tests whose assertion is a general
+property use `forAll` from [`test/helpers/property.mjs`](../test/helpers/property.mjs) (seeded, so a failure
+names its seed and input) and state the proposition they check in a comment above the test, in Lean notation
+(`// ∀ entries, distinct names → unzip (zip entries) = parents entries ++ entries`), so that it can become a
+`Candidates.lean` entry and later a theorem ([TESTING_STRATEGY.md §4](TESTING_STRATEGY.md)). The function-platform
+shims run in the test process (`test/serverless-shims.test.mjs`): each shim against a programmable stand-in
+server, with `@azure/functions` and `@google-cloud/functions-framework` stood in through `module.registerHooks`,
+and `zip.mjs` is read back by a ZIP reader written from the specification (`test/serverless-zip.test.mjs`). The link driver and the target links
 are tested with stand-in toolchains: `test/link-driver-pipeline.test.mjs`
 drives `linkWithNode` through every recipe step with a stand-in `execute`, and
 `test/application-link-plan.test.mjs`, `test/application-link-node.test.mjs`,
