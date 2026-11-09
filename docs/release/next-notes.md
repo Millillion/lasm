@@ -33,3 +33,7 @@ Notes for the next release, collected as changes land. They move to
   a leading byte order mark, so `"\uFEFFtest"` reached JavaScript as `"test"`
   (and Lasm.UI text nodes that began with one lost it). Found by the
   Lasm.JS.Web conformance run (WPT's urlencoded-parser case `\uFEFFtest=\uFEFF`).
+
+## Repository
+
+- **Unused code and dependencies removed (no behaviour change).** The repository no longer depends on `binaryen`, `@yarnpkg/cli-dist`, `pnpm` or `miniflare` (about 400 MB less `node_modules` per checkout and CI job), and the Lean 4.32 `lean/` (`Lasm.IO`) and the unused `runtime/host.cpp`, `core.cpp`, `stack.cpp` and `tasks.inc.cpp` are deleted. The published `@lasm/cli` is unchanged.

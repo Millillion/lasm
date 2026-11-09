@@ -865,20 +865,11 @@ and do not establish full-suite conformance. See
 - [ ] Warm main caches use source/config/compiler fingerprints, not an integrity
   audit of every installed Lean binary or generated output on every invocation.
   Force a rebuild after manually modifying toolchain installations/artifacts.
-- [ ] Legacy custom-host IO inside module initializers is unsupported. Standard
-  Node IO initializers need broader conformance testing.
+- [ ] Standard Node IO inside module initializers needs broader conformance
+  testing.
 
-## Legacy custom adapters and other hosts
+## Other hosts
 
-- [ ] Existing `Lasm.IO` byte/fetch wrappers remain for compatibility. They have
-  three fixed operations rather than a general typed JS interop mechanism.
-- [ ] Their filesystem adapter is confined to one existing directory, has stricter
-  file/symlink policies, and is not a race-proof security sandbox.
-- [ ] Their outbound HTTP adapter is GET-only, rejects redirects/non-2xx responses,
-  returns bytes without metadata, buffers bounded bodies, and has host-configured
-  timeouts. Those restrictions are separate from standard HTTP server support.
-- [ ] Legacy host errors use generic user errors and truncated messages; custom
-  hosts must implement their own cancellation and external-operation cleanup.
 - [ ] Standard Node IO is not available in browsers or Workers. Their portable
   WASI has empty stdin and explicit output callbacks; storage keys are not a
   POSIX filesystem, and CORS/platform limitations still apply.
@@ -900,7 +891,7 @@ and do not establish full-suite conformance. See
   is not a general leak proof or production reliability claim.
 
 Implementation: [IO runtime](runtime/node-io.cpp), [async runtime](runtime/node-async.cpp),
-[tasks](runtime/tasks.inc.cpp), [Node primitives](src/node-host.mjs),
+[Node primitives](src/node-host.mjs),
 [network/timers](src/node-network.mjs).
 
 Recent fixes (2026-09-18): real shared/exclusive locks, C-library buffered file

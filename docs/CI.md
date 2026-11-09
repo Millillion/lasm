@@ -217,7 +217,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `unit.yml` | PR (paths-ignore), dispatch, call | Linux | 5 min (max 31) | The whole unit suite with coverage baseline | PR (paths), release, nightly |
 | `upstream-native-build-time.yml` | dispatch | Linux | 2 min (max 20) | Upstream native build-time checks | On demand |
 | `wasi.yml` | dispatch, call | Linux + called workflows | 13 min (max 74) | WASI, wasi-http, Fastly on wasmtime, wasmer, node:wasi, Spin, Viceroy | Release, nightly |
-| `wasmtime-helper-probe.yml` | dispatch | Linux | 0 min (max 1) | Wasmtime helper feasibility probe | On demand |
+| `wasmtime-helper-probe.yml` | dispatch | Linux | 0 min (max 1) | Scalar atomic adapter and Wasm synchronization probe | On demand |
 | `web-bindings.yml` | PR (paths), push main (paths), dispatch | Linux | new | Lasm.JS.Web: the generated bindings are the generator's output; the conformance program on Node 26 and 24, Bun, Deno, Workers (workerd) and Chromium | PR (paths), main |
 | `windows-guard-controls.yml` | dispatch | Windows | 2 min | Windows resource guard controls | On demand |
 | `windows-lean-path-controls.yml` | dispatch | Windows | 3 min | Windows Lean long-path controls | On demand |

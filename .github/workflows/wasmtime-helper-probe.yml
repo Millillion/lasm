@@ -29,13 +29,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: node --max-old-space-size=128 scripts/ci/check-acceptance-versions.mjs .work/wasmtime-probe-versions.json
       - uses: ./.github/actions/process-guard
-      - name: Probe stock Node under one guard
-        run: >-
-          node scripts/full-lean/run-bounded.mjs --memory-mib 1024
-          --report .work/wasmtime-helper-resources.json --
-          python3 scripts/full-lean/base-pages.py
-          node --max-old-space-size=128 scripts/full-lean/probe-wasmtime-helper.mjs
-          .work/wasmtime-helper node
       - name: Check scalar atomic adapter and Wasm synchronization
         run: >-
           node scripts/full-lean/run-bounded.mjs --memory-mib 1024
@@ -45,4 +38,4 @@ jobs:
           .work/native-atomic-views node
       - name: Preserve bounded experiment receipts
         if: always()
-        run: node -e "const f=require('node:fs');for(const p of ['.work/wasmtime-helper/preparation.json','.work/wasmtime-helper/result.json','.work/wasmtime-helper-resources.json','.work/native-atomic-views/result.json','.work/native-atomic-views-resources.json','.work/wasmtime-probe-versions.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"
+        run: node -e "const f=require('node:fs');for(const p of ['.work/native-atomic-views/result.json','.work/native-atomic-views-resources.json','.work/wasmtime-probe-versions.json'])if(f.existsSync(p))console.log(p+'\n'+f.readFileSync(p,'utf8'))"

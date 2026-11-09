@@ -112,8 +112,6 @@ inheritance when directory permissions change. A module created with
 `createModule` keeps an isolated instance directory by default.
 `System.Platform` reports Node's operating system with Wasm's 32-bit pointer
 width, so ordinary Lean path operations follow the host's path conventions.
-The older capability-limited `Lasm.IO` adapter is separate and remains available
-for existing library/browser/Worker experiments.
 
 ## Embedding and lifecycle
 

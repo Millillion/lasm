@@ -165,7 +165,8 @@ Jordan's direction: rock solid first, then the irreducible essence, then proposi
    - [ ] The proposition lint (every `Proposition:` and `Tested by:` reference exists).
    - [ ] 30 consecutive clean nightly campaigns (Sundays excluded).
 3. Reduce ([docs/proposals/IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md), a proposal for Jordan; the removals change no API)
-   - [ ] M1: unused dependencies (`binaryen`, `@yarnpkg/cli-dist`, `pnpm`; `miniflare` to Folio; `vitest`'s one use), the Lean 4.32 `lean/` and unused `runtime/*.cpp`, the wasmtime-preview cluster, `src/toolchain.mjs`, unreferenced integration programs, experiments and scripts, duplicate licence texts.
+   - [x] M1, first part (2026-11-09): the unused dependencies `binaryen`, `@yarnpkg/cli-dist`, `pnpm` and `miniflare`; the Lean 4.32 `lean/` and unused `runtime/*.cpp`.
+   - [ ] M1, rest: `vitest`'s one use, the wasmtime-preview cluster, `src/toolchain.mjs`, unreferenced integration programs, experiments and scripts, duplicate licence texts.
    - [ ] M2: unreferenced evidence and compatibility data out of the repository, closed diagnosis workflows, historical docs to `docs/history/`; the full emsdk and Python paths maintainer-only.
    - [ ] M3: one Lasm.JS wire codec in JavaScript, no `tar` dependency, `library/prebuilt` generated (each held to the mutation scores).
    - [ ] Simplify the codebase toward its irreducible state, once the tests are strong enough to allow it (issue #21): M1–M3 are its first concrete steps.

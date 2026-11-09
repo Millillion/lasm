@@ -95,9 +95,8 @@ executable, write an ordinary `Main.lean` and run `npx lasm run Main.lean`; Lake
 projects work too. Only callable libraries need an export manifest. See
 [Node applications](NODE_APPS.md) for the full Lean server example.
 
-The same tarball is tested with `pnpm add -D` or `yarn add -D` on Linux. Yarn uses
-`nodeLinker: node-modules`, since Lake reads Lean sources as ordinary filesystem
-files. Yarn PnP is outside this release's supported installation modes.
+The same tarball is tested with `pnpm add -D` on Linux (`npm-dist.yml`). Yarn
+is not tested.
 
 See [DEVELOPER_WORKFLOW.md](DEVELOPER_WORKFLOW.md) for the Lake and npm configuration.
 The built output contains everything needed by the application runtime. Deploying
@@ -164,7 +163,7 @@ the compiler and ordinary-server tests and one tarball on Linux, then runs the
 same npm-only acceptance suite on all five supported
 OS/architecture combinations. It has not run. It is prepared for a future
 authorized remote and manual dispatch; it does not publish an npm package.
-The Linux development suite additionally tests pnpm and Yarn. Wine execution is
+The Linux development suite additionally tests pnpm. Wine execution is
 useful for finding Windows-specific bugs but cannot establish native Windows
 support, and fixture-based path tests cannot establish macOS support.
 

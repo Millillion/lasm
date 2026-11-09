@@ -1,7 +1,7 @@
 # Lean IO in Lasm
 
 For executable applications, use ordinary Lean APIs: `main`, `IO.FS`, console
-streams and `Std.Http.Server`. Application source needs no `Lasm.IO` imports.
+streams and `Std.Http.Server`. Application source needs no Lasm-specific imports.
 The managed CLI builds the application ahead of time, for Node by default:
 
 ```sh
