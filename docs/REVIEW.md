@@ -35,32 +35,42 @@ decisions themselves are logged with their reasoning in
     [proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md#3-ranked-removal-list)
     waits on it.
 
-### MAJOR: generated standard-library bindings (awaiting Jordan)
-- [ ] **Major decision.** The proposal is to generate bindings from
+### MAJOR: generated standard-library bindings (decided by Jordan, 2026-11-09)
+- [x] **Major decision, decided (A).** The bindings are generated from
   authoritative sources:
   - WebIDL, through w3c/webref;
   - `@types/node`;
   - Deno's `lib.deno.d.ts`;
   - `bun-types`.
 
-  They would be spec-faithful: standard names and shapes, with only Lean
-  typing added (`Promise` → `Async`, nullable → `Option`, dictionaries →
-  structures).
+  They are generated into the Lasm repository and **ship inside
+  `@lasm/cli`**. There is no optional download component, ever.
+- They live under `Lasm.JS` and are named after the platform or standard
+  they mirror:
 
-  There would be three tiers:
-  1. The WinterTC Minimum Common Web API, for every JavaScript target: fetch,
-     Request/Response, URL, `crypto.subtle`/`getRandomValues`,
-     TextEncoder/TextDecoder, streams, AbortController, timers,
-     `structuredClone` and console.
-  2. The full web platform, which would replace the hand-written `Lasm.Web`.
-  3. Node core, `Deno.*` and `Bun.*`, pinned per supported version.
+  | Module | Mirrors |
+  | --- | --- |
+  | `Lasm.JS.Web` | Web standards, including the WinterTC common subset |
+  | `Lasm.JS.Node` | Node core modules, for example `Lasm.JS.Node.Fs` |
+  | `Lasm.JS.Deno` | Deno's APIs |
+  | `Lasm.JS.Bun` | Bun's APIs |
 
-  npm libraries (for example bcrypt) stay ad hoc bindings. The bindings would
-  be tested with web-platform-tests and official test vectors.
-  - It depends on the packaging decision above and on naming.
-  - **Claude's recommendation:** start with tier 1, judge it on a real app,
-    then do tiers 2 and 3.
-  - **Status:** awaiting Jordan.
+- They are callable `@[js]` bindings and spec-faithful: standard names and
+  shapes, with only Lean typing added (`Promise` → `Async`, nullable →
+  `Option`, dictionaries → structures).
+- Each platform has one surface, generated against the oldest supported
+  version. Newer APIs are labelled with the version that added them.
+- npm libraries (for example bcrypt) stay ad hoc bindings.
+- The bindings are tested with web-platform-tests and official test vectors.
+- Today's hand-written `Lasm.Web` will be replaced by the generated
+  `Lasm.JS.Web`. That is a breaking rename, which is fine before 1.0.
+- The first piece of work is tier 1: the common web APIs (fetch,
+  Request/Response, URL, `crypto.subtle`/`getRandomValues`,
+  TextEncoder/TextDecoder, streams, AbortController, timers,
+  `structuredClone`, console). It is in ROADMAP.md, after the current
+  testing work.
+- Still for Jordan to review when it lands: the generated surface and its
+  naming details.
 
 ### High-priority work to define with Jordan
 - [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,
