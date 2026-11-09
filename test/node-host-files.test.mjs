@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync, writeFileSync, readFileSync, mkdirSync, symlinkSync, statSync, existsSync, realpathSync, lstatSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createNodeRuntimeHost } from '../src/node-host.mjs';
+import { createNodeRuntimeHost, numbers } from '../src/node-host.mjs';
 
 const posix = process.platform !== 'win32';
 function setup(t, options = {}) {
@@ -226,4 +226,64 @@ test('temporary files use the C library\'s template under the temporary director
   }
   nativeFiles().setEnvironment('TMPDIR', '');
   assert.deepEqual(await fails(20), { kind: 1, errno: 2, message: 'no such file or directory' });
+});
+
+test('file handles rewind, truncate, lock and report terminals', { skip: !posix }, async t => {
+  const { directory, ok } = setup(t);
+  writeFileSync(join(directory, 'data'), 'abcdef');
+  const id = Number((await ok(1, 0, 3, 'data')).readBigUInt64LE());
+  const other = Number((await ok(1, 0, 0, 'data')).readBigUInt64LE());
+  assert.equal((await ok(2, id, 3)).toString(), 'abc');
+  assert.deepEqual(await ok(5, id), Buffer.alloc(0));
+  assert.equal((await ok(2, id, 2)).toString(), 'ab');
+  assert.deepEqual(await ok(6, id), Buffer.alloc(0));
+  assert.equal(readFileSync(join(directory, 'data'), 'utf8'), 'ab');
+  assert.deepEqual(await ok(4, id), Buffer.alloc(0));
+  // 32 locks (blocking), 33 tries, 34 unlocks; n selects an exclusive lock.
+  assert.deepEqual(await ok(32, id, 1), numbers(1));
+  assert.deepEqual(await ok(33, other, 0), numbers(0));
+  assert.deepEqual(await ok(34, id, 0), numbers(1));
+  assert.deepEqual(await ok(33, other, 0), numbers(1));
+  assert.deepEqual(await ok(33, id, 1), numbers(0));
+  assert.deepEqual(await ok(33, id, 0), numbers(1));
+  assert.deepEqual(await ok(9, id), numbers(0));
+});
+
+test('Windows: paths, listings, removal, renames and temporary names follow the Windows host', { skip: process.platform !== 'linux' }, async t => {
+  const { directory, ok, raw } = setup(t);
+  mkdirSync(join(directory, 'sub'));
+  writeFileSync(join(directory, 'sub', 'x'), '');
+  const saved = Object.getOwnPropertyDescriptor(process, 'platform');
+  const windows = async action => {
+    Object.defineProperty(process, 'platform', { ...saved, value: 'win32' });
+    try { return await action(); } finally { Object.defineProperty(process, 'platform', saved); }
+  };
+  assert.equal((await windows(() => ok(12, 0, 0, 'sub'))).toString(), join(directory, 'sub'));
+  assert.deepEqual((await windows(() => ok(13, 0, 0, 'sub'))).toString(), 'x\0');
+  assert.deepEqual(await windows(() => ok(15, 0, 0, 'sub/x')), Buffer.alloc(0));
+  // Windows reports a failed rename with the engine's error, not the C library's.
+  const renamed = await windows(() => raw(17, 0, 7, Buffer.from('missing\0other')));
+  assert.equal(renamed.error, true);
+  assert.equal(Number(renamed.bytes.readBigUInt64LE()), 1);
+  const file = await windows(() => ok(20));
+  const name = file.subarray(8).toString();
+  assert.match(name, /\/lean-[0-9a-f]{32}$/);
+  assert.ok(existsSync(name));
+  rmSync(name);
+  const folder = (await windows(() => ok(21))).toString();
+  assert.match(folder, /\/lean-\w{6}$/);
+  rmSync(folder, { recursive: true });
+  // setCurrentDir keeps a NUL on Windows, where it is an invalid argument.
+  const nul = await windows(() => raw(29, 0, 0, Buffer.from('sub\0x')));
+  assert.deepEqual([Number(nul.bytes.readBigUInt64LE()), nul.bytes.subarray(16).toString()], [4, 'string contains NUL bytes']);
+});
+
+test('processExit asks the C library to exit, forced when the id says so', async t => {
+  const { nativeFiles } = await import('../src/native-files.mjs');
+  const exits = [];
+  t.mock.method(nativeFiles(), 'exitProcess', (code, force) => { exits.push([code, force]); return Buffer.alloc(0); });
+  const { raw } = setup(t, { processExit: true });
+  await raw(30, 0, 3);
+  await raw(30, 1, 4);
+  assert.deepEqual(exits, [[3, false], [4, true]]);
 });

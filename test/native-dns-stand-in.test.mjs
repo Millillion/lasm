@@ -38,7 +38,7 @@ async function resolver(platform, { records = [], status = 0, errno = 0, nameSta
       if (parts.length !== 4) return 0;
       output.set(parts); return 1;
     }),
-    $decode: pointer => pointer.entry,
+    $decode: (pointer, type) => { state.layout = type.struct; return pointer.entry; },
     $view: (pointer, length) => pointer.bytes.subarray(0, length),
   });
   const original = koffi.ffi.load;
@@ -78,6 +78,10 @@ for (const platform of ['linux', 'darwin', 'win32']) test(`${platform}: addresse
       canonical: null, address: null, next: null });
   }
   assert.equal((await dns.getAddrInfo('h', 's')).length, 51);
+  // struct addrinfo: BSD and Windows put ai_canonname before ai_addr; Windows' ai_addrlen is a size_t.
+  const pointers = platform === 'linux' ? { address: 'void *', canonical: 'void *' } : { canonical: 'void *', address: 'void *' };
+  assert.deepEqual(Object.entries(state.layout), Object.entries({ flags: 'int', family: 'int', socktype: 'int', protocol: 'int',
+    length: platform === 'win32' ? 'size_t' : 'uint32_t', ...pointers, next: 'void *' }));
   assert.equal(state.hints.at(-1).family, 0);
 });
 

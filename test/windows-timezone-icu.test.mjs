@@ -166,3 +166,22 @@ test('outside Windows the zone queries fail as Lean\'s do', { skip: process.plat
     { message: 'failed to get timezone, its windows only.', code: 'EINVAL', errno: constants.errno.EINVAL, nativeMessage: true });
   assert.throws(() => zone.localIdentifier(0n), { message: 'timezone retrieval is Windows-only', code: 'EINVAL', nativeMessage: true });
 });
+
+// ICU 4C's C prototypes (unicode/ustring.h, unicode/ucal.h): pointers, int32_t
+// lengths and enums, UDate (double) and UBool (int8_t).
+const icuAbi = {
+  u_strFromUTF8: ['void *', ['void *', 'int32_t', 'void *', 'void *', 'int32_t', 'void *']],
+  u_strToUTF8: ['void *', ['void *', 'int32_t', 'void *', 'void *', 'int32_t', 'void *']],
+  ucal_open: ['void *', ['void *', 'int32_t', 'str', 'int', 'void *']],
+  ucal_close: ['void', ['void *']],
+  ucal_setMillis: ['void', ['void *', 'double', 'void *']],
+  ucal_getTimeZoneTransitionDate: ['int8_t', ['void *', 'int', 'void *', 'void *']],
+  ucal_get: ['int32_t', ['void *', 'int', 'void *']],
+  ucal_getTimeZoneDisplayName: ['int32_t', ['void *', 'int', 'str', 'void *', 'int32_t', 'void *']],
+  ucal_getTimeZoneID: ['int32_t', ['void *', 'void *', 'int32_t', 'void *']],
+};
+test('every ICU function is bound with its C prototype', () => {
+  const declared = {};
+  createIcuTimeZoneDatabase({ func(name, result, args) { declared[name] = [result, args]; return () => 0; } });
+  assert.deepEqual(declared, icuAbi);
+});
