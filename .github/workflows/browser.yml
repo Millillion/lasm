@@ -212,6 +212,8 @@ jobs:
           path: .work/browser-apps
       - name: Run the apps in ${{ matrix.browser }}
         if: steps.gate.outputs.run == 'true'
+        # About a minute normally; each app has its own 5-minute timeout in the script (#162).
+        timeout-minutes: 25
         run: node scripts/browser/browser-ci.mjs --browser ${{ matrix.browser }} --apps .work/browser-apps --out .work/browser-results/${{ matrix.browser }}-${{ runner.os }}.json --playwright .work/pw
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always() && steps.gate.outputs.run == 'true'
