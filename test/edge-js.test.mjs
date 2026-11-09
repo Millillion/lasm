@@ -215,7 +215,7 @@ test('ops 203-206: get, set, calls, methods, construction and their errors', asy
   const ref = value(201, 0, 1, enc.encode('lib')).ref;
   const t = value(203, ref, 1, wire('target')).ref;
   assert.equal(value(203, t, 0, wire('a')), 1);
-  assert.deepEqual(value(203, t, 0, wire(['a', 'n', 'none'])), { a: 1, n: 4, none: undefined });
+  assert.deepEqual(value(203, t, 2, wire(['a', 'n', 'none'])), { a: 1, n: 4, none: undefined });
   assert.ok(value(203, t, 1, wire('inner')).ref >= firstJsHandle);
   assert.equal(call(204, t, 0, wire(['a', 9])).length, 0);
   assert.equal(target.a, 9);
@@ -384,12 +384,32 @@ test('requests: values after released handles, truncated replies, nested objects
   assert.equal(e.value(214, 0, 0, wire(['T', 'ab', 'c', []])), 'module ab');
 });
 
+test('get and set: keys of any kind (Symbols, numbers, arrays); getFields only with arg bit 2', () => {
+  const tag = Symbol('tag'), target = { [tag]: 'symbol', 2: 'two', 'a,b': 'joined', a: 'one' };
+  const lib = { target, tag };
+  const e = edge({ modules: { lib } });
+  const ref = e.value(201, 0, 1, enc.encode('lib')).ref;
+  const t = e.value(203, ref, 1, wire('target')).ref, key = { ref: e.value(203, ref, 1, wire('tag')).ref };
+  assert.equal(e.value(203, t, 0, wire(key)), 'symbol');
+  assert.equal(e.value(203, t, 0, wire(2)), 'two');
+  assert.equal(e.value(203, t, 0, wire(['a', 'b'])), 'joined', 'an array key is its string, as in JavaScript');
+  assert.deepEqual(e.value(203, t, 2, wire(['a', 2])), { a: 'one', 2: 'two' });
+  assert.ok(e.value(203, t, 1, wire(key)).ref >= firstJsHandle, 'arg bit 0 still asks for a reference');
+  assert.equal(e.call(204, t, 0, wire([key, 'set'])).length, 0);
+  assert.equal(target[tag], 'set');
+  e.call(204, t, 0, wire([3, 'three']));
+  assert.equal(target[3], 'three');
+  const nil = e.value(214, 0, 1, wire(['T', 'globalThis', 'Number', [null]])).ref;
+  assert.throws(() => e.call(204, nil, 0, wire([key, 1])), { message: 'TypeError: Cannot set symbol tag on number 0' });
+  assert.throws(() => e.call(204, nil, 0, wire([3, 1])), { message: 'TypeError: Cannot set number 3 on number 0' });
+});
+
 test('get and set: fields of null through a key list, properties of functions, null targets', () => {
   const lib = { nil: null, fn: function f() {} };
   const e = edge({ modules: { lib } });
   const ref = e.value(201, 0, 1, enc.encode('lib')).ref;
   const nil = e.value(203, ref, 1, wire('nil')).ref;
-  assert.deepEqual(e.value(203, nil, 0, wire(['a'])), { a: undefined });
+  assert.deepEqual(e.value(203, nil, 2, wire(['a'])), { a: undefined });
   assert.throws(() => e.call(204, nil, 0, wire(['k', 1])), { message: 'TypeError: Cannot set "k" on null' });
   const fn = e.value(203, ref, 1, wire('fn')).ref;
   assert.equal(e.call(204, fn, 0, wire(['tag', 7])).length, 0);

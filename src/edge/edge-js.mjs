@@ -296,13 +296,13 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
       case 202: return encode(globalThis, 'reference');
       case 203: {
         const key = decode(bytes), object = lookup(id);
-        if (Array.isArray(key)) return encode(Object.fromEntries(key.map(k => [k, object?.[k]])), 'data');
+        if (Number(arg) & 2) return encode(Object.fromEntries(key.map(k => [k, object?.[k]])), 'data');
         return encode(object[key], modeOf(arg));
       }
       case 204: {
         const [key, value] = decode(bytes);
         const object = lookup(id);
-        if (object === null || typeof object !== 'object' && typeof object !== 'function') throw failure(`Cannot set ${JSON.stringify(key)} on ${describe(object)}`);
+        if (object === null || typeof object !== 'object' && typeof object !== 'function') throw failure(`Cannot set ${typeof key === 'string' ? JSON.stringify(key) : describe(key)} on ${describe(object)}`);
         object[key] = value;
         return empty;
       }

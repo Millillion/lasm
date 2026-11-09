@@ -505,20 +505,27 @@ namespace Value
 def describe (v : Value) : IO String := do
   return String.fromUTF8! (← hostCallWith 206 0 (.ref v "") (valueHandle v))
 
-/-- `o[key]` -/
-def get (o : Value) (key : String) (α : Type := Value) [FromJS α] : IO α := do
-  receive α s!"get {repr key}" (← hostCallKeep 203 (valueHandle o) (modeArg (FromJS.mode α)) (← Wire.encodeIO (.string key)) (.ref o ""))
+/-- A property key in error messages: a string as Lean writes it, else the value. -/
+private def keyText : Data → String
+  | .string s => (repr s).pretty
+  | d => d.describe
+
+/-- `o[key]`. The key is any value with `ToJS`, as in JavaScript: a `String`, a
+number, or a Symbol `Value` (`Symbol.iterator`, `Symbol.for "k"`). -/
+def get [ToJS κ] (o : Value) (key : κ) (α : Type := Value) [FromJS α] : IO α := do
+  let k := toJS key
+  receive α s!"get {keyText k}" (← hostCallKeep 203 (valueHandle o) (modeArg (FromJS.mode α)) (← Wire.encodeIO k) (.array #[k, .ref o ""]))
 
 /-- Several properties in one call: `{k₁: o[k₁], …}` as data (non-plain values as
 references), converted to `α`. Each JavaScript call costs tens of microseconds;
 reading an HTTP request's fields this way takes one. -/
 def getFields (o : Value) (keys : Array String) (α : Type := Data) [FromJS α] : IO α := do
-  receive α "getFields" (← hostCallKeep 203 (valueHandle o) 0 (← Wire.encodeIO (.array (keys.map .string))) (.ref o ""))
+  receive α "getFields" (← hostCallKeep 203 (valueHandle o) 2 (← Wire.encodeIO (.array (keys.map .string))) (.ref o ""))
 
-/-- `o[key] = x` -/
-def set [ToJS α] (o : Value) (key : String) (x : α) : IO Unit := do
-  let payload := Data.array #[.string key, toJS x, .ref o ""]
-  discard <| hostCallKeep 204 (valueHandle o) 0 (← Wire.encodeIO (.array #[.string key, toJS x])) payload
+/-- `o[key] = x`; the key as for `get`. -/
+def set [ToJS κ] [ToJS α] (o : Value) (key : κ) (x : α) : IO Unit := do
+  let payload := Data.array #[toJS key, toJS x, .ref o ""]
+  discard <| hostCallKeep 204 (valueHandle o) 0 (← Wire.encodeIO (.array #[toJS key, toJS x])) payload
 
 /-- Flags: 1 reference result, 2 await a promise result, 4 construct, 8 method call. -/
 def invokeRaw (target receiver : Data) (args : Array Data) (flags : UInt64) : IO ByteArray :=
