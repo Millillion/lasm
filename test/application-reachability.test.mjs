@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { applicationLinkRequirements, readApplicationLinkRequirements, canSpecializeInitialization } from '../src/application-reachability.mjs';
+import { applicationLinkRequirements, readApplicationLinkRequirements, canSpecializeInitialization, reachabilityRegistry, selectiveInitialization } from '../src/application-reachability.mjs';
 
 const map = (...symbols) => '    Addr      Off     Size Out     In      Symbol\n'
   + '       -       48      600 CODE\n'
@@ -87,4 +87,44 @@ test('missing or unfamiliar linker evidence fails closed', () => {
   for (const invalid of ['', map().replace('Addr', 'Address'), map() + 'unexpected row\n',
     map().replace('CODE', 'DATA'), map().replace('main', 'unrelated')])
     assert.throws(() => applicationLinkRequirements(invalid), /linker map/);
+});
+
+test('every audited runtime of the Lean 4.35.0 series may use the smaller initializer', () => {
+  for (const identity of ['d1b1394ce2df4f9af2624cbd9bcca2162ee051da6be60ec38b08119c33fbd981', '79968781629d674bc8b506b3050c367ebc14503c869bc45436244c49ee5aee02',
+    '9921c696161a9852442863a19e16990f2d540aa369adaa353906504bb589649a'])
+    assert.equal(canSpecializeInitialization({ identity }), true, identity);
+  assert.equal(canSpecializeInitialization({ identity: '' }), false);
+  assert.equal(canSpecializeInitialization({}), false);
+  assert.equal(selectiveInitialization, 'void lean_initialize_runtime_module(void);\nvoid __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n');
+  assert.equal(reachabilityRegistry, 'void *lasm_lookup_lean_symbol(const char *name) { (void)name; return 0; }\n');
+});
+
+test('entry points, sections and rows of the map are read exactly', () => {
+  for (const entry of ['__main_argc_argv', '__main_void']) {
+    const text = map().replace(/ main\n/, ` ${entry}\n`);
+    assert.equal(applicationLinkRequirements(text).mode, 'static', entry);
+  }
+  // Module data: every reader and writer variant, sorted; similar names are not.
+  const result = applicationLinkRequirements(map('lean_write_module_data_x', 'lean_read_module_data', 'l_Lean_findSysroot___boxed', 'xlean_read_module_data',
+    'lean_read_module_datax', 'l_Lean_findSysrootx', 'l_Lean_initSearchPath'));
+  assert.deepEqual(result.moduleData, ['l_Lean_findSysroot___boxed', 'l_Lean_initSearchPath', 'lean_read_module_data', 'lean_write_module_data_x']);
+  // C++ members on Windows paths, sorted and unique; read-only data needs nothing.
+  const cxx = applicationLinkRequirements(map('C:\\r\\libleancpp.a(b.o):(f)', '/r/libleancpp.a(a.o):(g)', '/r/libleancpp.a(a.o):(h)', '/r/libleancpp.a(c.o):(.rodata)'));
+  assert.deepEqual(cxx.cxxRuntime, ['a.o', 'b.o']);
+  assert.equal(cxx.mode, 'dynamic');
+  assert.throws(() => applicationLinkRequirements(map('/r/libleancpp.a(x.o) without a section')), { message: 'Unrecognized C++ section in application linker map' });
+  // A map whose CODE section is missing, or whose rows have another shape, is refused.
+  assert.throws(() => applicationLinkRequirements('    Addr      Off     Size Out     In      Symbol\n       -       58       20                 main\n'),
+    { message: 'Application linker map has no executable entry point' });
+  assert.throws(() => applicationLinkRequirements(map() + 'zz 1 2 x\n'), { message: 'Unrecognized application linker map row' });
+  assert.throws(() => applicationLinkRequirements('Addr Off Size Out In Symbol\n'), { message: 'Unrecognized application linker map header' });
+  assert.deepEqual(applicationLinkRequirements(map() + '\n   \n'), { mode: 'static', dynamic: [], cxxRuntime: [], moduleData: [], requiresModuleData: false });
+  // Dynamic symbols are listed in their fixed order.
+  assert.deepEqual(applicationLinkRequirements(map('emscripten_dlopen', 'dlopen', 'lasm_lookup_lean_symbol')).dynamic, ['lasm_lookup_lean_symbol', 'dlopen', 'emscripten_dlopen']);
+  // Only RTTI and vtables (_ZTI, _ZTV) of shared helpers are read-only relocations.
+  const options = { initializationFreeCppSymbols: new Set(['_ZTSfoo', '_ZTIfoo']) };
+  assert.equal(applicationLinkRequirements(map('/l/libleancpp.a(r.o):(.data.rel.ro._ZTSfoo)'), options).mode, 'dynamic');
+  assert.equal(applicationLinkRequirements(map('/l/libleancpp.a(r.o):(.data.rel.ro._ZTIfoo)'), options).mode, 'static');
+  assert.equal(applicationLinkRequirements(map('/l/libleancpp.a(r.o):(.rodatax)'), options).mode, 'dynamic');
+  assert.equal(applicationLinkRequirements(map('/l/libleancpp.a(r.o):(.rodata.str)'), options).mode, 'static');
 });

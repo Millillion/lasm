@@ -21,7 +21,8 @@ export function preload() {
     const response = await fetch(url, { credentials: 'same-origin' });
     if (!response.ok) throw new Error(`Lasm app ${name}: ${url} answered HTTP ${response.status} ${response.statusText}`.trimEnd());
     const type = response.headers.get('content-type') ?? '';
-    const module = typeof WebAssembly.compileStreaming === 'function' && /^application\/wasm\b/i.test(type)
+    // compileStreaming accepts exactly application/wasm (any case, no parameters).
+    const module = typeof WebAssembly.compileStreaming === 'function' && /^[\t ]*application\/wasm[\t ]*$/i.test(type)
       ? await WebAssembly.compileStreaming(response)
       : await WebAssembly.compile(await response.arrayBuffer());
     mark('lasm:compiled', { name });

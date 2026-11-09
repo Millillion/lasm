@@ -79,3 +79,51 @@ test('standalone deployment carries every local JavaScript dependency', () => {
   const names = [...new Set([...applicationHostFiles, ...wasmtimeHostFiles])];
   assert.deepEqual(isolatedImportFailures(names), []);
 });
+
+// Each check of the application's native files on its own (docs/TESTING.md#mutation-testing).
+test('artifact checks: Lean version form, schema, backend, sizes and links', async t => {
+  const { root, manifest, save } = await fixture(t);
+  for (const leanVersion of ['4.34', 'v4.34.1', '4.34.1-rc1', '4.34.1 ', '14.34.1x', 'a4.34.1']) {
+    manifest.leanVersion = leanVersion; save();
+    await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), { message: 'This Wasmtime application does not match the current native platform' }, leanVersion);
+  }
+  for (const leanVersion of ['10.234.15', '4.34.1']) { manifest.leanVersion = leanVersion; save(); assert.equal((await readWasmtimeArtifact(root, 'linux', 'x64')).leanVersion, leanVersion); }
+  for (const [key, value] of [['backend', 'wasmtime-48.0.0'], ['schema', 3]]) {
+    const previous = manifest[key]; manifest[key] = value; save();
+    await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), /native platform/);
+    manifest[key] = previous;
+  }
+  save();
+  assert.deepEqual(await readWasmtimeArtifact(root), manifest, 'this process\'s platform by default');
+  const original = manifest.files['program.cwasm'];
+  for (const value of [{ ...original, bytes: 0 }, { ...original, sha256: original.sha256 + 'a' }, { ...original, sha256: 'a' + original.sha256 }, {}]) {
+    manifest.files['program.cwasm'] = value; save();
+    await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), { message: 'Invalid Wasmtime application file identity' });
+  }
+  // A one-byte file is a valid native file; an empty one is not, even with its true hash.
+  writeFileSync(join(root, 'program.cwasm'), 'x');
+  manifest.files['program.cwasm'] = { bytes: 1, sha256: await hashWasmtimeFile(join(root, 'program.cwasm')) }; save();
+  assert.equal((await readWasmtimeArtifact(root, 'linux', 'x64')).files['program.cwasm'].bytes, 1);
+  writeFileSync(join(root, 'program.cwasm'), '');
+  manifest.files['program.cwasm'] = { bytes: 0, sha256: await hashWasmtimeFile(join(root, 'program.cwasm')) }; save();
+  await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), { message: 'Invalid Wasmtime application file identity' });
+  writeFileSync(join(root, 'program.cwasm'), 'fixture bytes for program.cwasm');
+  // A size that differs, a directory or a link in place of a file.
+  manifest.files['program.cwasm'] = { ...original, bytes: original.bytes + 1 }; save();
+  await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), { message: 'Wasmtime application file changed: program.cwasm' });
+  manifest.files['program.cwasm'] = original; save();
+  const file = join(root, 'host/instance.so'), bytes = readFileSync(file);
+  rmSync(file); mkdirSync(file);
+  await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), { message: 'Wasmtime application file changed: host/instance.so' });
+  rmSync(file, { recursive: true }); writeFileSync(join(root, 'elsewhere.so'), bytes); symlinkSync(join(root, 'elsewhere.so'), file);
+  await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), { message: 'Wasmtime application file changed: host/instance.so' });
+  delete manifest.files; save();
+  await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), { message: 'Invalid Wasmtime application file manifest' });
+});
+
+test('artifact constants: the CPU target and the host files a standalone output ships', () => {
+  assert.equal(wasmtimeCpuTarget, 'x86_64-unknown-linux-gnu');
+  assert.deepEqual(wasmtimeHostFiles, ['wasmtime-runtime.mjs', 'wasmtime-worker.mjs', 'wasmtime-standalone.mjs', 'application-metadata-runtime.mjs',
+    'wasmtime-artifact.mjs', 'wasmtime-native-stdio.mjs', 'wasmtime-guest-memory.mjs', 'wasmtime-wasi-stdio.mjs', 'wasmtime-console.mjs',
+    'wasmtime-process-host.mjs', 'wasmtime-file-host.mjs', 'wasmtime-file-imports.mjs']);
+});

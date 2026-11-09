@@ -1,0 +1,14 @@
+name = "stack_app_ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
+version = "0.1.0"
+defaultTargets = ["Shared", "View"]
+
+# Shared by the server and the browser app: data, API, validation (Shared)
+# and the page (View). `lake build` checks them, proofs included.
+[[lean_lib]]
+name = "Shared"
+
+[[lean_lib]]
+name = "View"
+
+# Server.lean and Client.lean are the two programs: lasm builds them
+# (npm run build). They are not Lake targets.

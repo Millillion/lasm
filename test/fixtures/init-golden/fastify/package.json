@@ -1,0 +1,20 @@
+{
+  "name": "fastify-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fastify 5 with Lean route handlers (Lasm.JS), compiled to WebAssembly by Lasm",
+  "scripts": {
+    "dev": "lasm dev Main.lean",
+    "build": "lasm build Main.lean",
+    "start": "node dist/main.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "fastify": "5.12.7"
+  },
+  "devDependencies": {
+    "@lasm/compiler": "<LASM_VERSION>"
+  }
+}

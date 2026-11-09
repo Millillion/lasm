@@ -1,0 +1,5 @@
+# Netlify runs the build: lasm build --target netlify-edge writes the edge
+# function netlify/edge-functions/lasm.mjs, which serves every path.
+[build]
+  command = "npm run build:netlify-edge"
+  publish = "public"

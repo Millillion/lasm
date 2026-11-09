@@ -3,7 +3,7 @@
 // in real browsers is tested by .github/workflows/browser.yml.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, readFileSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdtempSync, writeFileSync, readFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { pathToFileURL } from 'node:url';
@@ -32,7 +32,8 @@ test('builtin modules: relative imports between builtins are followed', () => {
 
 test('builtin modules: every builtin module uses web-standard JavaScript only', () => {
   for (const name of builtinModuleNames()) {
-    const text = readFileSync(builtinModuleFile('lasm:' + name), 'utf8');
+    // Stryker's instrumentation (mutation testing) reads its mutant from g.process.env: not the module's own code.
+    const text = readFileSync(builtinModuleFile('lasm:' + name), 'utf8').replace(/\bg\.process\b/g, 'g');
     assert.doesNotMatch(text, /from ['"]node:|require\(|\bprocess\.|\bBuffer\b/, name);
   }
 });
@@ -202,7 +203,8 @@ test('lasm:web: an app instance has every export of the module', async () => {
   instance.clearTimeout(id);
 });
 
-test('every lasm:web and lasm:app binding of Lasm.Web names an export', async () => {
+// library/ is not copied into the mutation-testing sandbox (scripts/mutation/run.mjs).
+test('every lasm:web and lasm:app binding of Lasm.Web names an export', { skip: !existsSync(new URL('../library/Lasm/Web/', import.meta.url)) && 'library/ is not here (mutation sandbox)' }, async () => {
   const { readdirSync } = await import('node:fs');
   const exports = { 'lasm:web': await import('../src/lasm-modules/web.mjs'), 'lasm:app': await import('../src/lasm-modules/app.mjs') };
   const directory = new URL('../library/Lasm/Web/', import.meta.url);

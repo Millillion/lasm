@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.lake/
+bun/
+deno/
+bin/
+pkg/
+wasi/
+wasi-http/
+wasi-http/
+.spin/
+workers/
+.wrangler/

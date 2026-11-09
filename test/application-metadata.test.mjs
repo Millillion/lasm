@@ -4,6 +4,7 @@ import { mkdtemp, mkdir, writeFile, readFile, rm, rename, symlink, lstat } from 
 import { tmpdir } from 'node:os';
 import { join, dirname, delimiter } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { createHash } from 'node:crypto';
 import { applicationMetadata, copyApplicationMetadata } from '../src/application-metadata.mjs';
 import { prepareApplicationMetadata } from '../src/application-metadata-runtime.mjs';
 
@@ -121,4 +122,97 @@ test('an explicit sysroot also selects the standard data in the default search p
       join(output, 'lean/packages/0'), join(output, 'lean/packages/1'), join(value, 'lib/lean'),
     ]);
   }
+});
+
+test('module data is needed only by programs that initialize Lean or Lake modules', async t => {
+  const { lean, generated, put } = await fixture(t);
+  for (const [text, needed] of [['initialize_Lean(builtin);', true], ['initialize_Lake_Load(builtin)', true], ['initialize_Lean (builtin)', true],
+    ['initialize_LeanX(builtin)', false], ['xinitialize_Lean_A(builtin)', false], ['initialize_Lakefile(builtin)', false], ['initialize_Std(builtin)', false]]) {
+    await writeFile(generated.sources[0], text);
+    assert.equal((await applicationMetadata(generated, lean)) !== null, needed, text);
+  }
+  // Any of the program's sources.
+  generated.sources.push(join(dirname(generated.sources[0]), 'Second.c'));
+  await writeFile(generated.sources[0], 'nothing');
+  await put(generated.sources[1], 'initialize_Lean_Elab(builtin);');
+  assert.notEqual(await applicationMetadata(generated, lean), null);
+});
+
+test('the manifest lists every data file with its size and digest; other files are left out', async t => {
+  const { lean, generated, put } = await fixture(t);
+  await put(join(lean.prefix, 'lib/lean/Lean/Environment.ilean'), 'language server index');
+  await put(join(generated.metadataRoots[0], 'Same.olean.private'), 'private');
+  const data = await applicationMetadata(generated, lean);
+  const { manifest } = data;
+  assert.equal(manifest.schema, 1);
+  assert.equal(manifest.lean, 'test');
+  assert.equal(manifest.leanCommit, 'test');
+  assert.deepEqual(manifest.roots, ['packages/0', 'packages/1']);
+  assert.deepEqual(manifest.files.map(file => file.path), ['lib/lean/Init.olean', 'lib/lean/Lean/Environment.ir', 'lib/lean/Lean/Environment.ir.sig',
+    'lib/lean/Lean/Environment.olean.private', 'lib/lean/Lean/Environment.olean.server', 'packages/0/Same.olean', 'packages/0/Same.olean.private', 'packages/1/Same.olean']);
+  const init = manifest.files[0];
+  assert.deepEqual(init, { path: 'lib/lean/Init.olean', bytes: 13, sha256: createHash('sha256').update('standard data').digest('hex') });
+  assert.equal(manifest.bytes, manifest.files.reduce((total, file) => total + file.bytes, 0));
+  assert.equal(data.identity, createHash('sha256').update(JSON.stringify(manifest)).digest('hex'));
+  assert.equal(data.files[0].source, join(lean.prefix, 'lib/lean/Init.olean'));
+  const output = join(dirname(lean.prefix), 'out');
+  await copyApplicationMetadata(data, output);
+  assert.deepEqual(JSON.parse(await readFile(join(output, 'lean/metadata.json'), 'utf8')), manifest);
+  assert.ok((await readFile(join(output, 'lean/metadata.json'), 'utf8')).endsWith('}\n'));
+  await copyApplicationMetadata(null, join(dirname(lean.prefix), 'nothing'));
+  await assert.rejects(readFile(join(dirname(lean.prefix), 'nothing/lean/metadata.json')), { code: 'ENOENT' });
+});
+
+test('a toolchain without its standard module data, or a missing standard directory, is an error', async t => {
+  const { lean, generated } = await fixture(t);
+  await rm(join(lean.prefix, 'lib/lean/Init.olean'));
+  await assert.rejects(applicationMetadata(generated, lean), { message: 'The managed Lean toolchain is missing its standard module data' });
+  await rm(join(lean.prefix, 'lib/lean'), { recursive: true });
+  await assert.rejects(applicationMetadata(generated, lean), { code: 'ENOENT' });
+});
+
+test('an empty project library is still a search-path entry; the deployed manifest is validated', async t => {
+  const { directory, lean, generated } = await fixture(t);
+  await rm(generated.metadataRoots[1], { recursive: true });
+  await mkdir(generated.metadataRoots[1]);
+  const data = await applicationMetadata(generated, lean);
+  assert.deepEqual(data.manifest.roots, ['packages/0', 'packages/1']);
+  const output = join(directory, 'output');
+  await copyApplicationMetadata(data, output);
+  assert.ok((await lstat(join(output, 'lean/packages/1'))).isDirectory());
+  const main = pathToFileURL(join(output, 'main.mjs'));
+  for (const manifest of [{ schema: 2, roots: [] }, { schema: 1 }, { schema: 1, roots: 'packages/0' }, { schema: 1, roots: [0] }, { schema: 1, roots: ['packages/x'] },
+    { schema: 1, roots: ['packages/0/'] }, { schema: 1, roots: ['xpackages/0'] }]) {
+    await writeFile(join(output, 'lean/metadata.json'), JSON.stringify(manifest));
+    assert.throws(() => prepareApplicationMetadata(main, {}), { message: 'Invalid deployed Lean module-data manifest' }, JSON.stringify(manifest));
+  }
+  await writeFile(join(output, 'lean/metadata.json'), JSON.stringify({ schema: 1, roots: [] }));
+  const env = {};
+  prepareApplicationMetadata(main, env);
+  assert.deepEqual(env, { LEAN_SYSROOT: join(output, 'lean'), LEAN_PATH: join(output, 'lean', 'lib/lean') });
+  await rm(join(output, 'lean/metadata.json'));
+  await mkdir(join(output, 'lean/metadata.json'));
+  assert.throws(() => prepareApplicationMetadata(main, {}), { code: 'EISDIR' });
+  // The process environment by default.
+  const saved = { LEAN_SYSROOT: process.env.LEAN_SYSROOT, LEAN_PATH: process.env.LEAN_PATH };
+  try {
+    await rm(join(output, 'lean/metadata.json'), { recursive: true });
+    await writeFile(join(output, 'lean/metadata.json'), JSON.stringify({ schema: 1, roots: [] }));
+    delete process.env.LEAN_SYSROOT; delete process.env.LEAN_PATH;
+    prepareApplicationMetadata(main);
+    assert.equal(process.env.LEAN_SYSROOT, join(output, 'lean'));
+  } finally { for (const [key, value] of Object.entries(saved)) if (value === undefined) delete process.env[key]; else process.env[key] = value; }
+});
+
+test('package roots beyond nine; a module-data root that cannot be read is an error', async t => {
+  const { directory, lean, generated, put } = await fixture(t);
+  const output = join(directory, 'output');
+  await copyApplicationMetadata(await applicationMetadata(generated, lean), output);
+  await writeFile(join(output, 'lean/metadata.json'), JSON.stringify({ schema: 1, roots: ['packages/10'] }));
+  const env = {};
+  prepareApplicationMetadata(pathToFileURL(join(output, 'main.mjs')), env);
+  assert.equal(env.LEAN_PATH.split(delimiter)[0], join(output, 'lean', 'packages/10'));
+  await put(join(directory, 'plain-file'), 'x');
+  generated.metadataRoots.push(join(directory, 'plain-file', 'sub'));
+  await assert.rejects(applicationMetadata(generated, lean), { code: 'ENOTDIR' });
 });

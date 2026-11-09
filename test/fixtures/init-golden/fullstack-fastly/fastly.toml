@@ -1,0 +1,14 @@
+# Fastly Compute (Lasm): `npm run build:fastly` writes bin/main.wasm and pkg/todo-kv.tar.gz.
+# Run locally with `fastly compute serve` (Fastly's Viceroy); deploy with
+# `fastly compute deploy`. See https://github.com/Millillion/lasm/blob/main/docs/deploy/fastly.md
+manifest_version = 3
+name = "todo-kv"
+description = "A Lean program compiled to WebAssembly by Lasm"
+authors = []
+language = "other"
+
+[scripts]
+build = "npm run build:fastly"
+
+[local_server.kv_stores]
+  TODOS = []

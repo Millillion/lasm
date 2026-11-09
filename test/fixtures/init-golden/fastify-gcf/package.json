@@ -1,0 +1,22 @@
+{
+  "name": "fastify_gcf",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fastify 5 with Lean route handlers (Lasm.JS), compiled to WebAssembly by Lasm",
+  "scripts": {
+    "dev": "lasm dev Main.lean",
+    "build": "lasm build Main.lean",
+    "start": "node dist/main.mjs",
+    "build:gcf": "lasm build Main.lean --target gcf"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "5.0.5",
+    "fastify": "5.12.7"
+  },
+  "devDependencies": {
+    "@lasm/compiler": "<LASM_VERSION>"
+  }
+}

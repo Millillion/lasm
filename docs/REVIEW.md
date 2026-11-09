@@ -103,6 +103,27 @@ decisions themselves are logged with their reasoning in
     After: `get [ToJS κ] (o : Value) (key : κ) …` and `set [ToJS κ] [ToJS α] (o : Value) (key : κ) (x : α)`.
     A String, a number or a Symbol `Value` works, as in JavaScript's `o[key]`.
     Source compatible; no new names or types (docs/JS_BINDINGS.md, "Property keys").
+  - [ ] **#90 depth limit (PR #175): fixed, no API change.** Lasm's link wraps
+    Std.Async's `bindAsyncTask` (`library/c/lasm_async.c`): past 128 nested
+    ready binds (16,384 on Node) the rest of the loop continues as a queued
+    Lean task. CI runs 1,000,000 steps of every kind on Node, Deno, Bun,
+    workerd and in Chromium, Firefox and WebKit (docs/EDGE.md, "Async loops").
+  - [ ] **Waits inside synchronous callbacks stay a clear error, by design.**
+    Promises cannot settle while the JavaScript caller waits (run to
+    completion; JSPI cannot suspend through its frames). On Node, serving other
+    Lean threads' host calls during the callback would run unrelated
+    JavaScript in the middle of the caller. On the single-threaded targets,
+    waiting for Lean work that needs no JavaScript event already works
+    (docs/JS_BINDINGS.md, "Callbacks").
+  - [ ] **Call cost (PR #171): about 5 µs per consecutive call on Node** (was
+    22–24 µs), no API change; a lone call or a loaded server still costs
+    20–30 µs. Review the first Stryker-disable comments in the repo (fast paths
+    whose effect is speed only).
+  - [ ] **Inline JavaScript and classes: proposal, not implemented**
+    ([proposals/LASM_JS_GAPS.md](proposals/LASM_JS_GAPS.md), PR #169).
+    Recommended: `@[js "./ffi/foo.mjs" "f"]` paths relative to the Lean file
+    for inline JS, and a `Lasm.JS.Class.define` builder (real `class extends`,
+    no eval) for classes; Durable Objects later, generated at build time.
 
 ### The testing strategy ([TESTING_STRATEGY.md §6](TESTING_STRATEGY.md#6-decisions))
 - [ ] 1. Evidence levels keep the names L0–L3, in the README's platform table.
@@ -147,10 +168,9 @@ decisions themselves are logged with their reasoning in
 - [ ] **Fire-and-forget `Async` in `ofSyncFn` is dropped.** Letting a
   synchronous JS callback start an `Async` task without waiting for it would be
   a new API. Waits that cannot work there fail at once, as in 0.5.0.
-- [ ] **The #90 limit is fixed in `Async` only, without an API change.** Long
-  loops of steps that complete at once overflow the JavaScript stack on Bun,
-  Deno and workerd. The fix is inside `Async`'s runner; no new function or
-  option.
+- [ ] **The #90 limit is fixed without an API change** (PR #175, above): long
+  loops of steps that complete at once no longer overflow the JavaScript stack
+  on Bun, Deno, workerd or browsers.
 - [ ] **0.6.0's breaking change:** `Lasm.JS.Wire.encode` returns `Except String ByteArray`
   instead of `ByteArray`, so a length that does not fit 32 bits fails instead
   of being misread (#154; [0.6.0-notes.md](release/0.6.0-notes.md)).

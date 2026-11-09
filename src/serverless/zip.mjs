@@ -18,6 +18,8 @@ export function zip(entries) {
   }
   const all = [...[...directories].sort().map(name => ({ name, data: Buffer.alloc(0), mode: 0o40755 })),
     ...entries.map(entry => ({ ...entry, mode: 0o100000 | (entry.mode ?? 0o644) }))];
+  // Before any record is written: the end record's 16-bit counts would not hold more.
+  if (all.length > 0xffff) throw new Error('Function package has more than 65535 files');
   for (const { name, data, mode } of all) {
     if (names.has(name)) throw new Error('Duplicate ZIP entry: ' + name);
     names.add(name);
@@ -47,6 +49,5 @@ export function zip(entries) {
   const end = Buffer.alloc(22);
   end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(all.length, 8); end.writeUInt16LE(all.length, 10);
   end.writeUInt32LE(directory.length, 12); end.writeUInt32LE(offset, 16);
-  if (all.length > 0xffff) throw new Error('Function package has more than 65535 files');
   return Buffer.concat([...local, directory, end]);
 }
