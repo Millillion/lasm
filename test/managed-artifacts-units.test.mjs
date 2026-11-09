@@ -179,3 +179,151 @@ test('linking many files completes them all', async t => {
   assert.equal((await readdir(join(base, 'out', 'd'))).length, 70);
   assert.equal(await readFile(join(base, 'out/d/f69'), 'utf8'), '69');
 });
+
+// provisionArtifact and deriveArtifact from a small gzip archive served in-process.
+async function served(t, files = { 'tool/bin/run': 'run', 'tool/NOTICE': 'notice' }) {
+  const base = await scratch(t);
+  const { c: createTar } = await import('tar');
+  const source = join(base, 'source');
+  await mkdir(join(source, 'tool'), { recursive: true });
+  for (const [name, text] of Object.entries(files)) { await mkdir(join(source, name, '..'), { recursive: true }); if (text !== null) await writeFile(join(source, name), text); }
+  await createTar({ cwd: source, file: join(base, 'a.tgz'), gzip: true, portable: true }, ['tool']);
+  const bytes = await readFile(join(base, 'a.tgz'));
+  const artifact = { name: 'tool', root: 'tool', url: 'https://example.invalid/tool.tgz', format: 'tar.gz', bytes: bytes.length,
+    sha256: sha(bytes), maximumExtractedBytes: 10_000 };
+  let requests = 0;
+  const cache = join(base, 'cache');
+  return { base, cache, artifact, bytes, requests: () => requests,
+    options: { cache, log() {}, env: {}, fetch: async () => { requests++; return new Response(bytes); } } };
+}
+const { provisionArtifact, deriveArtifact, verifyArtifactDirectory } = await import('../src/managed-artifacts.mjs');
+
+test('concurrent requests in one process share one operation and its result', async t => {
+  const f = await served(t);
+  const [a, b] = await Promise.all([provisionArtifact(f.artifact, f.options), provisionArtifact(f.artifact, f.options)]);
+  assert.equal(a, b, 'the same result object');
+  assert.equal(f.requests(), 1);
+  const produce = async tree => { await writeFile(join(tree, 'out'), 'x'); };
+  const [c, d] = await Promise.all([deriveArtifact({ k: 1 }, produce, { cache: f.cache, log() {} }), deriveArtifact({ k: 1 }, produce, { cache: f.cache, log() {} })]);
+  assert.equal(c, d);
+  // Once settled, a new request is a new (cached) operation.
+  const again = await provisionArtifact(f.artifact, f.options);
+  assert.notEqual(again, a); assert.equal(again.cacheHit, true);
+});
+
+test('installation reports each stage, records the tree as verified, and writes a newline-terminated receipt', async t => {
+  const f = await served(t);
+  const stages = [];
+  const installed = await provisionArtifact(f.artifact, { ...f.options, label: 'the tool', progress: event => stages.push(event.stage) });
+  for (const stage of ['Downloading the tool', 'Extracting the tool', 'Verifying installed the tool', 'Finishing the tool setup']) assert.ok(stages.includes(stage), stage);
+  const receipt = await readFile(join(installed.directory, '.lasm-artifact.json'), 'utf8');
+  assert.ok(receipt.endsWith('}\n'));
+  assert.deepEqual(JSON.parse(receipt), installed.receipt);
+  assert.deepEqual(installed.receipt.source, { kind: 'https', url: f.artifact.url });
+  const key = `managed-artifact\0${installed.identity}\0${installed.directory}`;
+  assert.deepEqual(await readdir(join(f.cache, 'verified')), [sha(key) + '.json']);
+  // Reuse is verified by that record, with its own progress stage.
+  stages.length = 0;
+  const reused = await provisionArtifact(f.artifact, { ...f.options, label: 'the tool', progress: event => stages.push(event.stage) });
+  assert.equal(reused.cacheHit, true);
+  assert.deepEqual(stages, ['Verifying cached the tool']);
+});
+
+test('retries are reported through progress, or logged without it', async t => {
+  for (const withProgress of [true, false]) {
+    const f = await served(t);
+    let calls = 0; const stages = [], logs = [], events = [];
+    await provisionArtifact(f.artifact, { ...f.options, label: 'the tool', log: line => logs.push(line),
+      progress: withProgress ? event => stages.push(event.stage) : undefined,
+      download: { sleep: async () => {}, random: () => 0, event: event => events.push(event.type) },
+      fetch: async () => ++calls === 1 ? new Response('', { status: 503 }) : new Response(f.bytes) });
+    const message = 'Retrying the tool in 2s (attempt 2): LASM_HTTP_RETRY: HTTP 503';
+    if (withProgress) { assert.ok(stages.includes(message), stages.join('\n')); assert.equal(logs.includes(message), false); }
+    else assert.ok(logs.includes(message), logs.join('\n'));
+    assert.deepEqual(events, ['attempt', 'failed-attempt', 'retry', 'attempt', 'transferred'], 'the caller\'s event hook sees every event');
+  }
+});
+
+test('an archive with no files is refused', async t => {
+  const f = await served(t, {});
+  await assert.rejects(provisionArtifact(f.artifact, f.options), { message: 'Managed artifact is empty' });
+  await assert.rejects(deriveArtifact({ empty: true }, async () => {}, { cache: f.cache, log() {} }), { message: 'Derived tool tree is empty' });
+});
+
+test('receipts are checked: identity, schema, files, and no symbolic links', async t => {
+  const f = await served(t);
+  const installed = await provisionArtifact(f.artifact, f.options);
+  const receiptFile = join(installed.directory, '.lasm-artifact.json');
+  const original = await readFile(receiptFile, 'utf8');
+  await verifyArtifactDirectory(installed.directory, installed.identity);
+  await assert.rejects(verifyArtifactDirectory(installed.directory, 'other'), { message: 'Managed artifact receipt does not match the requested toolchain' });
+  for (const change of [{ schema: 2 }, { files: undefined }, { files: {} }]) {
+    await writeFile(receiptFile, JSON.stringify({ ...JSON.parse(original), ...change }));
+    await assert.rejects(verifyArtifactDirectory(installed.directory, installed.identity), { message: 'Managed artifact receipt does not match the requested toolchain' }, JSON.stringify(change));
+  }
+  await writeFile(receiptFile, original);
+  if (process.platform !== 'win32') {
+    const { symlink, rename } = await import('node:fs/promises');
+    await rename(receiptFile, join(f.base, 'receipt.json'));
+    await symlink(join(f.base, 'receipt.json'), receiptFile);
+    await assert.rejects(verifyArtifactDirectory(installed.directory, installed.identity), { message: `Managed artifact directory and receipt must not be symbolic links: ${installed.directory}` });
+    const link = join(f.base, 'linked-tool');
+    await symlink(installed.directory, link);
+    await assert.rejects(verifyArtifactDirectory(link, installed.identity), /must not be symbolic links/);
+  }
+});
+
+test('a changed tree names up to ten changed entries', async t => {
+  const files = {};
+  for (let i = 0; i < 12; i++) files[`tool/f${String(i).padStart(2, '0')}`] = 'x';
+  const f = await served(t, files);
+  const installed = await provisionArtifact(f.artifact, f.options);
+  for (let i = 0; i < 11; i++) await writeFile(join(installed.directory, `f${String(i).padStart(2, '0')}`), 'changed');
+  const error = await verifyArtifactDirectory(installed.directory, installed.identity).then(() => null, e => e);
+  assert.equal(error.message, `Managed cache contents changed: ${installed.directory}. Changed entries (11): `
+    + Array.from({ length: 10 }, (_, i) => `"f${String(i).padStart(2, '0')}"`).join(', ') + ', .... Run lasm cache repair, then retry to download a verified replacement.');
+  await writeFile(join(installed.directory, 'f10'), 'x');
+  const ten = await verifyArtifactDirectory(installed.directory, installed.identity).then(() => null, e => e);
+  assert.ok(ten.message.includes('Changed entries (10): ') && ten.message.includes('"f09". Run lasm cache repair'), ten.message);
+});
+
+test('a cached tree whose receipt is missing is incomplete, never overwritten', async t => {
+  const f = await served(t);
+  const installed = await provisionArtifact(f.artifact, f.options);
+  await rm(join(installed.directory, '.lasm-artifact.json'));
+  await assert.rejects(provisionArtifact(f.artifact, f.options), { message: `Incomplete managed cache: ${installed.directory}. Run lasm cache repair and retry.` });
+  const derived = await deriveArtifact({ d: 1 }, async tree => { await writeFile(join(tree, 'out'), 'x'); }, { cache: f.cache, log() {} });
+  await rm(join(derived.directory, '.lasm-artifact.json'));
+  await assert.rejects(deriveArtifact({ d: 1 }, async () => assert.fail('not rebuilt'), { cache: f.cache, log() {} }), { message: `Incomplete derived tool cache: ${derived.directory}` });
+  await assert.rejects(deriveArtifact({ d: 2 }, async () => assert.fail('not built'), { cache: f.cache, log() {}, cachedOnly: true }),
+    { code: 'ERR_LASM_NOT_CACHED', message: 'Not in the tool cache yet' });
+});
+
+test('an installation waits for another holder of its lock, and says so', async t => {
+  const f = await served(t);
+  const { withCacheEntryLock } = await import('../src/cache-lifecycle.mjs');
+  const identity = validateArtifact(f.artifact);
+  const stages = [];
+  let release, waiting;
+  const waited = new Promise(resolve => { waiting = resolve; });
+  const holder = withCacheEntryLock(f.cache, 'artifacts', identity, () => new Promise(resolve => { release = resolve; }));
+  while (!release) await new Promise(resolve => setTimeout(resolve, 5));
+  const installing = provisionArtifact(f.artifact, { ...f.options, label: 'the tool', progress: event => { stages.push(event.stage); if (/^Waiting/.test(event.stage)) waiting(); } });
+  await waited;
+  assert.equal(stages[0], 'Waiting for another the tool installation or cache repair');
+  release(); await holder;
+  assert.equal((await installing).cacheHit, false);
+  // The same for derivations.
+  const derivedStages = [];
+  const provenance = { waits: true };
+  const derivedIdentity = sha(JSON.stringify(provenance));
+  let releaseDerived, derivedWaiting;
+  const derivedWaited = new Promise(resolve => { derivedWaiting = resolve; });
+  const derivedHolder = withCacheEntryLock(f.cache, 'derived', derivedIdentity, () => new Promise(resolve => { releaseDerived = resolve; }));
+  while (!releaseDerived) await new Promise(resolve => setTimeout(resolve, 5));
+  const deriving = deriveArtifact(provenance, async tree => { await writeFile(join(tree, 'o'), 'o'); },
+    { cache: f.cache, log() {}, progress: event => { derivedStages.push(event.stage); derivedWaiting(); } });
+  await derivedWaited;
+  assert.deepEqual(derivedStages, ['Waiting for another tool derivation or cache repair']);
+  releaseDerived(); await derivedHolder; await deriving;
+});
