@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { readApplicationSymbols, readInitializationFreeCppSymbols } from './application-symbols.mjs';
 import { readApplicationLinkRequirements, reachabilityRegistry, canSpecializeInitialization, selectiveInitialization } from './application-reachability.mjs';
 import { requireAotApplication } from './application-policy.mjs';
-import { glueLinkFlags } from './lasm-library.mjs';
+import { asyncLinkFlags, glueLinkFlags } from './lasm-library.mjs';
 import { describeLibrary, dynamicLoadingStubs, librariesForUndefinedSymbols, undefinedSymbols as linkUndefinedSymbols, UnsupportedNativeLibrary } from './application-native.mjs';
 import { cInitTargets, coreInitTargets, initializerWrapperParts, initializerWrappers, planInitializers, readLiveSymbols } from './application-initialization.mjs';
 import { buildJobs } from './managed-link-toolchain.mjs';
@@ -71,7 +71,9 @@ export function initializerStubs(stubs) {
  * "Cold start"). */
 /** The link flags of a program whose sources include Lasm.JS's Node glue
  * (library/c/lasm_js.c), which wraps Lean's task waits and Emscripten's futex wait. */
-export const lasmJsLinkFlags = sources => sources.some(file => /(?:^|[\\/])lasm_js\.c$/.test(file)) ? [...glueLinkFlags] : [];
+export const lasmJsLinkFlags = sources => [...sources.some(file => /(?:^|[\\/])lasm_js\.c$/.test(file)) ? glueLinkFlags : [],
+  // library/c/lasm_async.c (#90): its wrap of Std.Async's bind, kept by the edge and WASI links.
+  ...sources.some(file => /(?:^|[\\/])lasm_async\.c$/.test(file)) ? asyncLinkFlags : []];
 
 export function configurableThreadPool(glue) {
   const recorded = 'var pthreadPoolSize = 4;';

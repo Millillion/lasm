@@ -255,6 +255,8 @@ LEAN_EXPORT lean_obj_res lasm_js_park(void) {
 /* (p : @& IO.Promise (Except String ByteArray)) (value : @& ByteArray) : IO Unit
    The host resolves p when the JavaScript value (a promise or not) settles. */
 static _Thread_local int in_sync_callback; /* the synchronous-callback thread inside a callback */
+/* For library/c/lasm_async.c: Async binds nest without limit inside a callback. */
+int lasm_js_sync_callback_active(void) { return in_sync_callback; }
 /* `Value.await` marks its value (Data.ref, constructor 9, described "Value.await"). */
 static int awaits(b_lean_obj_arg keep) {
     if (lean_is_scalar(keep) || lean_obj_tag(keep) != 9) return 0;
