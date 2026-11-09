@@ -27,7 +27,14 @@ const { runBrowserDev } = await import('../src/browser/browser-dev.mjs');
 const { bugReportLine } = await import('../src/application-cli.mjs');
 
 const pause = ms => new Promise(done => setTimeout(done, ms));
-async function until(condition, what, ms = 8000) {
+// Once a test fails the rest are skipped (they would only wait for their own
+// timeouts): a mutant is killed by the first failure (scripts/mutation).
+let failedBefore = false;
+const dtest = (name, fn) => test(name, async t => {
+  if (failedBefore) { t.skip('an earlier test failed'); return; }
+  try { await fn(t); } catch (error) { failedBefore = true; throw error; }
+});
+async function until(condition, what, ms = 4000) {
   const deadline = Date.now() + ms;
   while (!condition()) {
     if (Date.now() > deadline) assert.fail(`timed out waiting for ${what}\n--- stderr ---\n${stderr.text()}`);
@@ -89,7 +96,12 @@ async function stopAll() {
   await signalDev();
   await Promise.allSettled([...active]);
 }
-after(async () => { await stopAll(); for (const server of state.servers) await server.close(); });
+after(async () => {
+  await stopAll();
+  for (const server of state.servers) await server.close();
+  // Whatever a failed test left running (a watcher, a server, a program) does not keep this file alive.
+  setTimeout(() => process.exit(), 1500).unref();
+});
 const reset = async () => { await stopAll(); for (const server of state.servers) await server.close(); state.calls = []; state.services = []; state.servers = []; state.watchers = []; state.port = undefined; state.serverOptions = undefined; stderr.reset(); programLines.length = 0; };
 /** Stops a runDev: as Ctrl+C does. */
 async function stop(running) {
@@ -105,7 +117,7 @@ async function nextEvent(reader, what = 'an event') {
   let buffer = buffers.get(reader) ?? '';
   while (!buffer.includes('\n\n')) {
     let timer;
-    const timeout = new Promise((_, fail) => { timer = setTimeout(() => fail(new Error(`timed out waiting for ${what}\n--- stderr ---\n${stderr.text()}`)), 8000); });
+    const timeout = new Promise((_, fail) => { timer = setTimeout(() => fail(new Error(`timed out waiting for ${what}\n--- stderr ---\n${stderr.text()}`)), 4000); });
     try {
       const { value, done } = await Promise.race([reader.read(), timeout]);
       if (done) return null;
@@ -117,7 +129,7 @@ async function nextEvent(reader, what = 'an event') {
   return buffer.slice(0, at);
 }
 
-test('lasm dev (edge target): first build, rebuilds on content changes only, queued changes, build errors, stop', async () => {
+dtest('lasm dev (edge target): first build, rebuilds on content changes only, queued changes, build errors, stop', async () => {
   await reset();
   const dir = project();
   const main = join(dir, 'Main.lean');
@@ -162,9 +174,9 @@ test('lasm dev (edge target): first build, rebuilds on content changes only, que
     assert.ok(stderr.text().startsWith('[lasm dev] Main.lean changed; rebuilding\n'), stderr.text());
     assert.match(stderr.text(), /\[lasm dev\] Up to date in \d+\.\d s\n/);
     // The same content again, and the manifest the build wrote: nothing to do.
-    await pause(200);
+    await pause(150);
     writeFileSync(main, 'def main : IO Unit := pure () -- 2\n');
-    await pause(400);
+    await pause(300);
     assert.equal(state.calls.length, 2);
 
     // Several files: the first three are named.
@@ -181,7 +193,7 @@ test('lasm dev (edge target): first build, rebuilds on content changes only, que
     writeFileSync(join(dir, 'A.lean'), 'A2');
     await until(() => state.calls.length === 4, 'the fourth build to start');
     writeFileSync(join(dir, 'B.lean'), 'B2');
-    await pause(300);
+    await pause(200);
     assert.equal(state.calls.length, 4, 'one build at a time');
     gate = null; open();
     await until(() => state.calls.length === 5 && (stderr.text().match(/is up to date/g) ?? []).length === 2, 'the queued build');
@@ -223,12 +235,12 @@ test('lasm dev (edge target): first build, rebuilds on content changes only, que
     assert.equal(state.services[0].closed, true);
     const built = state.calls.length;
     writeFileSync(main, 'def main : IO Unit := pure () -- after\n');
-    await pause(300);
+    await pause(200);
     assert.equal(state.calls.length, built, 'nothing is built after lasm dev stops');
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('lasm dev: a first build that fails says so; release profile; a terminal gets status lines and colors', async () => {
+dtest('lasm dev: a first build that fails says so; release profile; a terminal gets status lines and colors', async () => {
   await reset();
   const dir = project();
   const main = join(dir, 'Main.lean');
@@ -279,7 +291,7 @@ ${stay ? 'setInterval(() => {}, 1000);' : `process.exitCode = ${code};`}
 }
 const ran = output => JSON.parse(readFileSync(join(output, 'ran.json'), 'utf8'));
 
-test('lasm dev (node target): runs the program with its arguments, restarts it after each build, reports its exit', async () => {
+dtest('lasm dev (node target): runs the program with its arguments, restarts it after each build, reports its exit', async () => {
   await reset();
   const dir = project();
   const main = join(dir, 'Main.lean');
@@ -307,7 +319,7 @@ test('lasm dev (node target): runs the program with its arguments, restarts it a
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('lasm dev runs bun and deno programs with their own commands; a missing runtime is named', async () => {
+dtest('lasm dev runs bun and deno programs with their own commands; a missing runtime is named', async () => {
   const bin = mkdtempSync(join(tmpdir(), 'lasm-dev-bin-'));
   const savedPath = process.env.PATH;
   for (const runtime of ['bun', 'deno']) {
@@ -345,7 +357,7 @@ test('lasm dev runs bun and deno programs with their own commands; a missing run
   } finally { rmSync(bin, { recursive: true, force: true }); }
 });
 
-test('lasm dev --no-run only rebuilds; rs rebuilds and restarts on request; a missing source is named', async () => {
+dtest('lasm dev --no-run only rebuilds; rs rebuilds and restarts on request; a missing source is named', async () => {
   await reset();
   const dir = project({ 'Other.lean': '' });
   const main = join(dir, 'Main.lean');
@@ -373,7 +385,7 @@ test('lasm dev --no-run only rebuilds; rs rebuilds and restarts on request; a mi
   } finally { rmSync(missing, { recursive: true, force: true }); }
 });
 
-test('lasm dev with a server and its browser app: one URL, the program behind a proxy, only affected outputs rebuilt', async () => {
+dtest('lasm dev with a server and its browser app: one URL, the program behind a proxy, only affected outputs rebuilt', async () => {
   await reset();
   const dir = project({
     'Shared.lean': 'def s := 1\n',
@@ -455,7 +467,7 @@ createServer((request, response) => response.writeHead(200, { 'content-type': 't
   } finally { delete process.env.LASM_DEV_WORKERS; rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('lasm dev with two workers builds a server and its browser app concurrently after the first build', async () => {
+dtest('lasm dev with two workers builds a server and its browser app concurrently after the first build', async () => {
   await reset();
   const dir = project({ 'Server.lean': '', 'Client.lean': '' });
   const server = join(dir, '.lake', 'server');
@@ -492,7 +504,7 @@ createServer((q, s) => s.end('ok')).listen(Number(process.env.PORT), process.env
   } finally { delete process.env.LASM_DEV_WORKERS; delete process.env.LASM_DEV_TRACE; rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('lasm dev with a browser output and hooks: the static server with the hooks\' routes, reloads', async () => {
+dtest('lasm dev with a browser output and hooks: the static server with the hooks\' routes, reloads', async () => {
   await reset();
   const dir = project();
   const browserOutput = join(dir, 'www');
@@ -526,7 +538,7 @@ test('lasm dev with a browser output and hooks: the static server with the hooks
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('lasm dev --target browser hands over to the browser dev server with its defaults', async () => {
+dtest('lasm dev --target browser hands over to the browser dev server with its defaults', async () => {
   await reset();
   const dir = project();
   state.port = 0;
@@ -548,7 +560,7 @@ test('lasm dev --target browser hands over to the browser dev server with its de
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('browser dev server: serves the build, rebuilds on content changes only, reports errors to the page', async () => {
+dtest('browser dev server: serves the build, rebuilds on content changes only, reports errors to the page', async () => {
   await reset();
   const dir = project();
   const main = join(dir, 'Main.lean');
@@ -626,7 +638,7 @@ test('browser dev server: serves the build, rebuilds on content changes only, re
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('browser dev server: a failed first build without an earlier output stops; --release builds into dist; a busy port', async () => {
+dtest('browser dev server: a failed first build without an earlier output stops; --release builds into dist; a busy port', async () => {
   await reset();
   const dir = project();
   state.port = 0;
@@ -648,7 +660,7 @@ test('browser dev server: a failed first build without an earlier output stops; 
     assert.equal(state.serverOptions.liveReload, false);
     assert.equal(state.watchers.length, 0, '--no-watch watches nothing');
     assert.ok(stderr.text().includes(`at ${state.servers[0].url}\n`), 'no rebuild note without watching');
-    assert.equal(await (await fetch(state.servers[0].url)).text(), '<p>old</p>');
+    assert.equal(await (await fetch(state.servers[0].url, { headers: { connection: 'close' } })).text(), '<p>old</p>');
     // The port is taken: the build worker is stopped and the error is the listen error.
     await state.servers[0].close();
     await reset();
