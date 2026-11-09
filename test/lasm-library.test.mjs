@@ -8,7 +8,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, wr
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compileLibrary, fetchGlueSource, glueLinkFlags, glueSource, importsLibrary, libraryFiles, libraryIdentity, libraryLeanVersions,
+import { compileLibrary, fetchGlueSource, asyncGlueSource, glueLinkFlags, glueSource, importsLibrary, libraryFiles, libraryIdentity, libraryLeanVersions,
   libraryModules, libraryOutputs, librarySources, linkedLibraryModules, prebuiltLibrary } from '../src/lasm-library.mjs';
 import { toolchainCatalog } from '../src/managed-lean.mjs';
 
@@ -115,11 +115,12 @@ test('the library sources a program links come from the prefix, with the glue, a
   put(program, call('Lasm.JS'));
   const result = librarySources(lean, [program]);
   assert.deepEqual(result.modules, ['Lasm.JS.Core', 'Lasm.JS']);
-  assert.deepEqual(result.sources, [c('Lasm.JS.Core'), c('Lasm.JS'), glueSource, fetchGlueSource]);
+  assert.deepEqual(result.sources, [c('Lasm.JS.Core'), c('Lasm.JS'), glueSource, fetchGlueSource, asyncGlueSource]);
   assert.deepEqual(result.inputs, [
     { module: '+Lasm.JS.Core', source: join(prefix, 'src', 'lean', 'Lasm', 'JS', 'Core.lean') },
     { module: '+Lasm.JS', source: join(prefix, 'src', 'lean', 'Lasm', 'JS.lean') },
-    { module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource }]);
+    { module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource },
+    { module: 'lasm_async.c', source: asyncGlueSource }]);
   assert.deepEqual(result.oleans, [join(prefix, 'lib', 'lean', 'Lasm', 'JS', 'Core.olean'), join(prefix, 'lib', 'lean', 'Lasm', 'JS.olean')]);
   rmSync(c('Lasm.RPC'));
   assert.throws(() => librarySources(lean, [program]), { message: `This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean 4.35.0 or Lean's elaborator libraries (the extended tier); it is missing from ${prefix}`.replace('4.35.0 or Lean', '4.35.0 with Lean') });
