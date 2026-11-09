@@ -27,7 +27,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '23 2 * * 0,2-6'
+    - cron: '23 2 * * 2-6'
     - cron: '41 6 * * 6'
   workflow_dispatch:
     inputs:
@@ -43,9 +43,14 @@ env:
   CI: '1'
   BROWSER: 'none'
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   replay:
+    needs: sunday
     name: Replay the corpus
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    if: needs.sunday.outputs.skip != 'true' && (github.event_name == 'pull_request' || github.event_name == 'push')
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -83,8 +88,9 @@ jobs:
         run: node test/fuzz/run.mjs replay lean-fetch-request lean-rpc wasi-cgi
 
   campaign:
+    needs: sunday
     name: Fuzz ${{ matrix.target }}
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: needs.sunday.outputs.skip != 'true' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     strategy:

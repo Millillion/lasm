@@ -15,8 +15,13 @@ concurrency:
   group: ci-weekly-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   differential:
-    if: github.event.repository.visibility == 'public'
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public')
     permissions:
       contents: write
       actions: read
@@ -25,7 +30,8 @@ jobs:
       budget-min: '100'
 
   soak:
-    if: github.event.repository.visibility == 'public'
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public')
     permissions:
       contents: write
       actions: read

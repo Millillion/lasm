@@ -9,10 +9,11 @@ name: Folio nightly
 #   document must render within a time budget linear in its length, and the
 #   safe output must pass the strict tokenizer; failing documents uploaded;
 # - pathological: cmark 0.31.1's pathological inputs (test/pathological.mjs).
-# Runs when main changed in the last day, or on demand. Not a release gate.
+# Runs when main changed since the previous scheduled run (74 hours covers
+# Friday to Monday, as there is no run on a weekend), or on demand. Not a release gate.
 on:
   schedule:
-    - cron: '53 3 * * 0,2-6'
+    - cron: '53 3 * * 2-6'
   workflow_dispatch:
 permissions:
   contents: read
@@ -23,7 +24,13 @@ env:
   CI: '1'
   BROWSER: 'none'
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   changed:
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true'
     runs-on: ubuntu-24.04
     outputs:
       run: ${{ steps.check.outputs.run }}
@@ -31,17 +38,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-          fetch-depth: 50
+          fetch-depth: 400
       - id: check
         run: |
-          if [ "${{ github.event_name }}" = workflow_dispatch ] || [ -n "$(git log --since='26 hours ago' --format=%H -- examples/folio | head -1)" ]; then
+          if [ "${{ github.event_name }}" = workflow_dispatch ] || [ -n "$(git log --since='74 hours ago' --format=%H -- examples/folio | head -1)" ]; then
             echo run=true >> "$GITHUB_OUTPUT"
           else
             echo run=false >> "$GITHUB_OUTPUT"
           fi
   campaign:
-    needs: changed
-    if: needs.changed.outputs.run == 'true'
+    needs: [sunday, changed]
+    if: needs.sunday.outputs.skip != 'true' && (needs.changed.outputs.run == 'true')
     name: ${{ matrix.campaign }}
     runs-on: ubuntu-24.04
     timeout-minutes: 90

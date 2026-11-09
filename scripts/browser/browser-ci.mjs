@@ -12,7 +12,12 @@
 //     the js-framework-benchmark against vanilla JavaScript, the counter and
 //     the feature demo;
 //   - any other app directory: it mounts and reports no error.
-// Writes OUT (JSON); exits 1 when a check fails.
+// Writes OUT (JSON); exits 1 when a check fails. Each app gets APP_TIMEOUT_MS
+// (LASM_BROWSER_APP_TIMEOUT_MS, default 5 minutes; the whole suite takes about a
+// minute): past it the app fails with what it was doing and the page's state,
+// the browser is relaunched, and the suite goes on (page.evaluate has no
+// timeout of its own, and a WebKit page once waited until the job's 60-minute
+// limit, #162). One line per app as it finishes.
 //   node scripts/browser/browser-ci.mjs --browser chromium --apps DIR --out FILE [--playwright DIR]
 import { readFileSync, readdirSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
@@ -28,14 +33,18 @@ const apps = resolve(values.apps), out = resolve(values.out);
 const playwrightModule = values.playwright ? pathToFileURL(join(resolve(values.playwright), 'node_modules/playwright-core/index.mjs')).href : 'playwright-core';
 const playwright = await import(playwrightModule);
 
+const appTimeoutMs = Number(process.env.LASM_BROWSER_APP_TIMEOUT_MS ?? 5 * 60_000);
 const report = { schema: 1, engine, platform: `${process.platform}-${process.arch}`, node: process.version, startedAt: new Date().toISOString(), apps: {} };
 const failures = [];
+// Apps past their timeout: their abandoned checks may still settle; those results are dropped.
+const timedOut = new Set();
 const expect = (app, name, ok, detail = '') => {
+  if (timedOut.has(app)) return;
   (report.apps[app].checks ??= []).push({ name, ok: !!ok, detail: String(detail).slice(0, 300) });
   if (!ok) failures.push(`${app}: ${name}: ${detail}`);
 };
 
-const browser = await playwright[engine].launch({ headless: true });
+let browser = await playwright[engine].launch({ headless: true });
 report.browserVersion = browser.version();
 // Observes app startup: the loader's lasm:evaluated mark, then the first frame
 // after the app mounted (lasm:mounted is dispatched on the element; capture
@@ -53,10 +62,14 @@ const timingScript = () => {
   }, true);
 };
 
+// The current app's pages and what it is doing (step), for the timeout message.
+let current = { pages: [], step: 'starting' };
+const step = label => { current.step = label; };
 async function openPage(server, path) {
   const context = await browser.newContext();
   const page = await context.newPage();
   const consoleLines = [];
+  current.pages.push({ path, page, consoleLines });
   page.on('console', message => consoleLines.push(`${message.type()}: ${message.text()}`));
   page.on('pageerror', error => consoleLines.push(`pageerror: ${error.message}`));
   await page.addInitScript(timingScript);
@@ -72,6 +85,7 @@ async function resourceSizes(page) {
 async function counter(server, name, manifest) {
   const { context, page, consoleLines } = await openPage(server, `/${name}/`);
   try {
+    step('mount and clicks');
     await page.waitForSelector('button', { timeout: 30_000 });
     const [minus, plus] = await page.$$('button');
     for (let i = 0; i < 3; i++) await plus.click();
@@ -81,6 +95,7 @@ async function counter(server, name, manifest) {
     expect(name, 'counter.clicks', counted, await page.textContent('output'));
     const cold = await page.waitForFunction(() => window.__lasm.mounts?.[0], null, { timeout: 10_000 }).then(h => h.jsonValue());
     report.apps[name].sizes = await resourceSizes(page);
+    step('warm start');
     // Warm start: the same page again, with the content-hashed files in the HTTP cache.
     await page.reload({ waitUntil: 'load' });
     await page.waitForSelector('button', { timeout: 30_000 });
@@ -94,12 +109,13 @@ async function counter(server, name, manifest) {
 async function platform(server, name, manifest) {
   const { context, page, consoleLines } = await openPage(server, `/${name}/`);
   try {
+    step('the automatic checks');
     await page.waitForSelector('#app #done', { timeout: 60_000 });
     const results = JSON.parse(await page.textContent('#app #results'));
     for (const r of results) expect(name, r.name, r.ok, r.detail);
     expect(name, 'platform.automatic-checks', results.length >= 40, `${results.length} checks`);
     const text = selector => page.textContent(`#app ${selector}`);
-    // Events
+    step('events');
     await page.click('#app #click-me'); await page.click('#app #click-me');
     expect(name, 'events.click', (await text('#click-count')) === '2', await text('#click-count'));
     expect(name, 'events.once', (await text('#once-count')) === '1', await text('#once-count'));
@@ -127,6 +143,7 @@ async function platform(server, name, manifest) {
     // The console (Console.log and IO.println).
     expect(name, 'console.lines', consoleLines.some(l => l.includes('lasm-console-check') && l.includes('42')) && consoleLines.some(l => l.includes('lasm-println-check')),
       consoleLines.filter(l => l.includes('check')).join(' | '));
+    step('ports and messages');
     // Ports and messages through the loader's app handle.
     const entry = new URL(`/${name}/${manifest.entry}`, server.url).href;
     const doubled = await page.evaluate(async entry => {
@@ -139,6 +156,7 @@ async function platform(server, name, manifest) {
     }, entry);
     expect(name, 'app.ports', doubled === 42, doubled);
     expect(name, 'app.send', (await text('#message')) === 'hello, Lean', await text('#message'));
+    step('a second app on the page');
     // A second app on the same page, then unmounted; a blocking wait stops an instance.
     const second = await page.evaluate(async entry => {
       const loader = await import(entry);
@@ -156,6 +174,7 @@ async function platform(server, name, manifest) {
     expect(name, 'app.unmount', second.cleared && second.unmountHandler && second.stopped && second.firstAlive, JSON.stringify(second));
     await page.click('#app #click-me');
     expect(name, 'app.first-unaffected', (await text('#click-count')) === '3', await text('#click-count'));
+    step('a blocking wait');
     await page.click('#app #block');
     await page.waitForTimeout(200);
     const stopped = await page.evaluate(async entry => (await import(entry)).appOf(document.getElementById('app')).stopped, entry);
@@ -183,6 +202,33 @@ async function generic(server, name) {
   } finally { report.apps[name].console = consoleLines.slice(-50); await context.close(); }
 }
 
+const bounded = (promise, ms, fallback) => Promise.race([promise.catch(error => `failed: ${error.message}`), new Promise(resolve => setTimeout(resolve, ms, fallback))]);
+// Runs one app's checks within appTimeoutMs. On a timeout: the failure names
+// the step and each page's state; the browser is replaced, so a wedged engine
+// cannot stall the apps after it.
+async function runApp(name, run) {
+  const started = Date.now();
+  current = { pages: [], step: 'starting' };
+  let timer;
+  const timeout = new Promise(resolve => { timer = setTimeout(resolve, appTimeoutMs, 'timeout'); });
+  const outcome = await Promise.race([run().then(() => 'done', error => error), timeout]);
+  clearTimeout(timer);
+  if (outcome === 'timeout') {
+    const pages = await Promise.all(current.pages.map(async ({ path, page, consoleLines }) => {
+      const state = await bounded(page.evaluate(() => `visibilityState ${document.visibilityState}, hasFocus ${document.hasFocus()}, readyState ${document.readyState}`), 5_000, 'not responding');
+      return `${path}: ${state}; console: ${consoleLines.slice(-5).join(' | ') || '(empty)'}`;
+    }));
+    expect(name, 'timeout', false, `no result after ${appTimeoutMs / 1000} s, at: ${current.step}. ${pages.join(' || ')}`);
+    report.apps[name].timeout = { step: current.step, pages };
+    timedOut.add(name);
+    const wedged = browser;
+    browser = await playwright[engine].launch({ headless: true });
+    await bounded(wedged.close(), 30_000);
+  } else if (outcome !== 'done') expect(name, 'runner', false, outcome?.stack ?? outcome?.message ?? String(outcome));
+  const app = report.apps[name], checks = app.checks ?? [];
+  console.log(`${new Date().toISOString()} ${name}: ${checks.filter(c => c.ok).length}/${checks.length} checks in ${((Date.now() - started) / 1000).toFixed(1)} s${outcome === 'timeout' ? ' (TIMED OUT at ' + current.step + ')' : ''}`);
+}
+
 const server = await startTestServer(apps);
 try {
   for (const name of readdirSync(apps).sort()) {
@@ -192,13 +238,12 @@ try {
     report.apps[name] = { transfer: manifest.transfer, entry: manifest.entry, wasm: manifest.wasm };
     const ui = uiChecks[name];
     const run = name === 'counter' ? counter : name === 'platform' || name === 'platform-jspi' ? platform
-      : ui ? (s, n, m) => ui({ server: s, name: n, manifest: m, openPage, expect, report }) : generic;
-    try { await run(server, name, manifest); }
-    catch (error) { expect(name, 'runner', false, error.stack ?? error.message); }
+      : ui ? (s, n, m) => ui({ server: s, name: n, manifest: m, openPage, expect, report, step }) : generic;
+    await runApp(name, () => run(server, name, manifest));
   }
 } finally {
-  await server.close();
-  await browser.close();
+  await bounded(server.close(), 10_000);
+  await bounded(browser.close(), 30_000);
   report.finishedAt = new Date().toISOString();
   report.failures = failures;
   mkdirSync(dirname(out), { recursive: true });
