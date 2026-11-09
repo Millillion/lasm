@@ -1018,6 +1018,8 @@ measurement on Node 26 is the recorded floor).
 | `target-link` | `application-link.mjs`, `edge/edge-link.mjs`, `wasi/wasi-link.mjs` | 5.9 % | **86.8 %** | 86 % |
 | `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **97.3 %** | 97 % |
 | `notices` | `notices.mjs` | 62.5 % | **91.5 %** | 91 % |
+| `application-sources` | `application-sources.mjs`, `application-initialization.mjs`, `application-diagnosis.mjs`, `application-binding-check.mjs`, `application-reachability.mjs`, `application-symbols.mjs`, `application-live-members.mjs`, `application-policy.mjs`, `wasm-objects.mjs`, `lasm-library.mjs` | 44.5 % | **85.4 %** | 85 % |
+| `application-output` | `application-build.mjs`, `application-output.mjs`, `application-native.mjs`, `application-npm.mjs`, `application-runtime.mjs`, `application-support.mjs`, `application-lock.mjs`, `application-metadata.mjs`, `application-metadata-runtime.mjs`, `native-bundle.mjs`, `package.mjs`, `js-runtime.mjs` | 51.1 % | **92.5 %** | 92 % |
 
 Every module is above 80 %; each threshold is its score rounded down. The link driver and the target links
 are tested with stand-in toolchains: `test/link-driver-pipeline.test.mjs`
@@ -1030,6 +1032,19 @@ tiny C-to-relocatable-Wasm compiler, ar archives and a garbage-collecting linker
 with `--wrap`, `-Map` and `--why-extract`), run in-process so that a module's
 run takes minutes. The stand-ins need a POSIX shell, so those tests are skipped
 on Windows; the pure-function tests run everywhere.
+
+The application modules (measured 2026-11-09, mutation.yml run 42582914197) are
+tested the same way: `test/application-sources.test.mjs` runs the build front
+end against stand-in `lean` and `lake` executables that answer from a JSON
+world and log every run (`test/fixtures/lean-stand-in.mjs`);
+`test/application-build.test.mjs` replaces the build driver's managed-Lean,
+runtime, link and SDK collaborators through module hooks and keeps the real
+lock, cache lease, npm closure and output delivery; the initialization planner
+runs with a scripted probe (`test/application-initialization-plan.test.mjs`).
+`application-sources` keeps `library/` in its sandbox (`keepInSandbox` in
+`modules.json`) for the prebuilt-library tests. The generated entry point embeds
+functions by their source text, which is instrumented under Stryker: its tests
+start the child with `test/helpers/stryker-child-preamble.mjs`.
 
 Mutants whose test file had to be stopped (more than 1 GiB, or alive after its
 runner) are *runtime errors*: Stryker leaves them out of the score
@@ -1078,6 +1093,16 @@ stay, with the reason; they are not chased with tests that look at the code.
 | edge glue | the random-bytes loops' `i < n` → `<=`; op 94's check flag read big-endian; its rejection handler; `result?.then`; the sort of `operationCounts` | An empty last chunk, a write past the end is ignored; the flag is only compared with zero; `request` never returns a rejecting promise; `dispatch` always returns a value; `Object.fromEntries` orders integer keys anyway |
 | edge glue | `Writer.reserve`'s `<=` → `<`; `error?.leanUserError` when encoding a settled value; `'reference'` → `''` for `globalThis` and for Lean functions | The buffer grows one write early; encoding only throws `Error`s; Node's global object is not a plain object, and a function is a reference in either mode |
 | edge glue | `'utf8'` → `''` before `JSON.parse`; `startLean`'s `if (disposed) return` → never | A Buffer parses the same; a second disposal finds no cleanups left |
+| application sources, application output (not equivalent) | the Windows and macOS branches: `canonicalApplicationPath`'s native realpath, `nativeLeanEnvironment`'s `PATH` key and namespaced `LEAN_SYSROOT`/`LEAN_PATH`, `macosSdkPath` (`xcode-select`, `xcrun`), `compileLibrary`'s Windows environment, drive letters in `liveMembers`' map paths and `preprocessorArguments`' path keys; Deno and Bun detection in `js-runtime.mjs` | They run only on Windows, on macOS or under Deno and Bun (the unit, release-checks and Bun/Deno workflows run them there) |
+| application sources, application output | `windowsHide`, `encoding: 'utf8'` before `JSON.parse` or a regular expression, `stdio`, `maxBuffer` and `timeout` of `spawnSync`/`execFile` calls (Lean, Lake, `llvm-nm`, the binding checker) and the checker's kill timer | No observable effect on POSIX with small outputs |
+| application sources | `standaloneImportsModules`' `unknown module` pattern and `wanted.has(…)` | A `lean --src-deps` that fails returns `true` whatever the message says (the larger prefix is preferred) |
+| application sources, application output | separators and labels inside hashed keys (`lakeConfigurationKey`'s `\0`, `manifest\0`, `header\0`, the adapter's source URL; `workspaceImportsKey`'s separators and entry sort; the binding cache's runtime label; the npm closure's `lasm-node-modules-1\0` and separators; the build driver identity's inputs and its `sessionTrusted` reuse) | A key only has to change with its inputs; these change only when Lasm's own sources or the directory order of the file system change, which no test controls |
+| application sources | paired fallbacks: `trim()` and `filter(Boolean)` on Lean's and Lake's output; the binding checker finding the project by `LASM_BINDING_PROJECT` or by its last argument; `?? ''` after `spawnSync` with an encoding; `Number(…)` of ar header fields with or without `trim()` | Each one alone gives the same result as both |
+| application sources | ar reading: the `/` and `/SYM64/` checks of members after the index, the header guards (`raw.length < 60`, the `` ` `` magic, `isFinite`), the `/` suffix and `/N` patterns of member names, `closeSync` in `finally`, `liveMembers`' region column for non-CODE sections and the duplicate guard of unattributed members | The index is read first, so later headers never repeat it; one guard stops the walk whenever the other would; names Lasm's archives use have one trailing `/`; only CODE sections are named by symbol |
+| application sources, application output | performance-only code: the `leanPrefixes`, library-text and archive-index caches, early returns for empty binding lists, `if (record)` inside `try` blocks, `Math.min(jobs, …)` of the npm copy, the npm closure's and `lasm package`'s second sort, `files.filter(name !== 'package.json')` before the generated `package.json` overwrites it | Same result, different speed |
+| application sources (not equivalent) | `prebuiltLibrary`'s manifest checks (schema, release, library identity, file list) and its damaged-file error | They need a changed shipped `library/prebuilt`, which tests must not modify (the release checks verify the shipped copy) |
+| application output (not equivalent) | `requireApplicationSupport()` in `buildApplication`, `applicationSupport()`'s read errors; `options.cache ?? managedCacheDirectory()` for the cache lease | A research checkout has no `application-support.json`; the lease location only matters with the user's real cache |
+| application output | `kind` labels `'optional'`/`'peer'` in the npm closure; `wasm-objects.mjs`' `bytes.length < 8` and initial `codeStart`; `application-reachability.mjs`' `trimEnd`/blank-line handling | Only `'required'` is compared; a short buffer fails the magic check the same way; blank rows are skipped either way |
 
 Delivery's failure paths in `src/application-files.mjs` (a failing copy,
 `rename` or `rm`, an output that cannot be inspected) are tested by fault
