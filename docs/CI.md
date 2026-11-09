@@ -178,7 +178,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `link-toolchain.yml` | dispatch | Linux, macOS, Windows | 11 min | Builds the link toolchain distribution (maintainer) | On demand |
 | `managed-sdk.yml` | dispatch | Linux, macOS, Windows | 7 min | Managed compiler SDK provisioning | On demand |
 | `managed-tools.yml` | dispatch | Linux, macOS, Windows | 4 min | Managed Lean tool provisioning | On demand |
-| `mutation.yml` | cron 37 5 * * 1-6, dispatch, PR (paths) | Linux | 11 min (max 27) | Stryker mutation scores of every `src/` module (21 modules, one job each) | PR (changed modules), nightly |
+| `mutation.yml` | cron 37 5 * * 1-6, dispatch, PR (paths) | Linux | 13 min (max 73, `dev`) | Stryker mutation scores of every `src/` module (21 modules, one job each) | PR (changed modules), nightly |
 | `nightly.yml` | cron 17 7 * * 1-6, dispatch | Linux + called workflows | 3 min (max 27) | Nightly upstream suite and ecosystem runs vs baseline | Nightly |
 | `node-candidate-input.yml` | call | Linux | — | Authenticated candidate input (called) | Called |
 | `node-darwin-candidate-recheck.yml` | dispatch | macOS + called workflows | 28 min (max 87) | Recheck a candidate on macOS | On demand |
