@@ -60,6 +60,10 @@ on:
         description: release or dev
         default: release
         type: string
+      feature-only:
+        description: Feature programs only, 200 cases each (docs/TESTING.md#differential-fuzzing)
+        default: 'false'
+        type: string
 permissions:
   contents: read
 concurrency:
@@ -217,10 +221,12 @@ jobs:
           # Pull requests: the cheap subset of the extra oracles; campaigns: all of them.
           # Feature programs: the fixed seeds on pull requests, one per seed in campaigns.
           if [ "$BUDGET" = 0 ]; then AMOUNT="--programs 3 --feat-seeds $DIFF_FEATURE_SEEDS_PR --feat-random 0"; TARGETS="$DIFF_TARGETS_PR"; else AMOUNT="--budget-min $BUDGET"; TARGETS="$DIFF_TARGETS_FULL"; fi
+          SIZES="--cases 150 --fs-cases 25 --feat-cases 80"
+          if [ "${{ inputs.feature-only || 'false' }}" = true ]; then SIZES="--cases 0 --fs-cases 0 --feat-cases 200"; fi
           T="$RUNNER_TEMP/tools"
           node scripts/differential/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
             --lean-bin "${{ steps.lean.outputs.bin }}" --work "$RUNNER_TEMP/difftest" \
-            --seed "$SEED" $AMOUNT --cases 150 --fs-cases 25 --feat-cases 80 --targets "$TARGETS" \
+            --seed "$SEED" $AMOUNT $SIZES --targets "$TARGETS" \
             --profile "${{ matrix.profile }}" --regressions test/differential/regressions \
             --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js" --playwright "$GITHUB_WORKSPACE/.work/pw" 2>&1 | tee "$RUNNER_TEMP/difftest.log"
       # The regression corpus in the dev profile too (node, then the other targets,

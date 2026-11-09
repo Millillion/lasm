@@ -351,6 +351,7 @@ async function campaignProgram(seed, kind) {
   const list = kind === 'feat' ? genFeatureProgram(seed, { cases: nFeatCases })
     : fsProgram ? g.genProgram(seed, { cases: nFsCases, kinds: ['fs', 'io'] })
     : (PROGRAMS[kind] ?? (x => x))(g.genProgram(seed, { cases: nCases }));
+  if (!list.length) return; // --cases 0 / --fs-cases 0: no program of that kind
   const ending = g.ENDINGS[seed % g.ENDINGS.length];
   const dir = join(work, `s${seed}-${kind}`);
   const ev = await evaluate(dir, list, tlist, { ending });
