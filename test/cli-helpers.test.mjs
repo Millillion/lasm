@@ -191,6 +191,20 @@ test('build progress: stage lines, elapsed time, byte sizes and the waiting note
   assert.equal(r.lines.length, final);
 });
 
+test('build progress: minutes from 60 s, and the total from the start', async () => {
+  const { createBuildProgress } = await import('../src/build-progress.mjs');
+  let now = 5000, tick;
+  const lines = [];
+  const progress = createBuildProgress({ log: text => lines.push(text), now: () => now, schedule: callback => { tick = callback; }, cancel: () => {} });
+  progress.update({ stage: 'Linking' });
+  now = 64_999; tick();
+  assert.equal(lines.at(-1), '[lasm] Linking — 59s elapsed');
+  now = 65_000; tick();
+  assert.equal(lines.at(-1), '[lasm] Linking — 1m 0s elapsed');
+  progress.finish('Done');
+  assert.equal(lines.at(-1), '[lasm] Done (1m 0s total).');
+});
+
 test('build progress: finish without text prints nothing; a timer without unref is fine', async () => {
   const lines = [];
   const { createBuildProgress } = await import('../src/build-progress.mjs');

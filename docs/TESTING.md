@@ -1078,6 +1078,13 @@ stay, with the reason; they are not chased with tests that look at the code.
 | edge glue | the random-bytes loops' `i < n` → `<=`; op 94's check flag read big-endian; its rejection handler; `result?.then`; the sort of `operationCounts` | An empty last chunk, a write past the end is ignored; the flag is only compared with zero; `request` never returns a rejecting promise; `dispatch` always returns a value; `Object.fromEntries` orders integer keys anyway |
 | edge glue | `Writer.reserve`'s `<=` → `<`; `error?.leanUserError` when encoding a settled value; `'reference'` → `''` for `globalThis` and for Lean functions | The buffer grows one write early; encoding only throws `Error`s; Node's global object is not a plain object, and a function is a reference in either mode |
 | edge glue | `'utf8'` → `''` before `JSON.parse`; `startLean`'s `if (disposed) return` → never | A Buffer parses the same; a second disposal finds no cleanups left |
+| init | `web`'s `interop: true` and `fullstack`'s `interop: false` flipped | The browser and fullstack templates write their own file sets; neither reads `interop` |
+| init | `--deploy`'s `value ?? ''` and `conflicts ?? []` → another string or `['Stryker was here']`; `nextSteps`' default `'node'` → `''` | The made-up name is no deploy target; every runtime other than Bun and Deno gets the npm steps |
+| init | `'utf8'` → `''` reading `package.json`, `toolchains.json` and the template files; `writeFiles`' `flag: 'wx'` removed | A Buffer parses and is written with the same bytes; `initProject` has already checked that the directory is new or empty |
+| init | `packageJson`'s `deploy = []` default; the dependency sort's `a < b` → `<=`; `templates[template]?.portable` → `.portable` | Its only call without deploy targets (the browser template) returns first; dependency names are unique; the template is always valid there |
+| init | deno-deploy's `'deno/'` in `.gitignore`; the fullstack scripts' `filter(t => t !== 'workers')` removed | `--deploy deno-deploy` accepts only portable templates, which already ignore `deno/` (a set); the workers script it would write is the same string |
+| init | `spinName`'s `^-+` → `^-` and `-+$` → `-$` | Its input is a `packageName`, which never starts with a separator, and the previous replacement has already joined runs into one `-` |
+| init (not equivalent) | the fullstack scripts' ` --output dist/server` for function platforms | Function-platform `--deploy` targets with `--template fullstack` write a broken project ([#168](https://github.com/Millillion/lasm/issues/168)); not tested until that is decided |
 
 Delivery's failure paths in `src/application-files.mjs` (a failing copy,
 `rename` or `rm`, an output that cannot be inspected) are tested by fault

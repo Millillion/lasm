@@ -425,6 +425,12 @@ test('reportCliError: Lean and Lake diagnostics are formatted, with the build-fa
     ['error: dependency fetch failed', '[lasm] Build failed. Fix the error above and run the command again.']);
   const message = reported(Object.assign(new Error('m'.repeat(3000)), { stderr: 'error: build failed\n', projectDirectory }));
   assert.equal(message[1].length, 2000);
+  // Only Lean positions, Lake traces at a line start and Lake's own final line count as diagnostics.
+  for (const text of ['see A.lean:1', 'a trace: x', 'note: error: build failed', 'error: build failed later'])
+    assert.deepEqual(reported(Object.assign(new Error(text), { projectDirectory })), [text], text);
+  assert.equal(reported(Object.assign(new Error('x'), { stderr: `error: ${process.cwd()}/A.lean:12:34: oops\n` }))[0], 'A.lean:12:34: error: oops');
+  // A first line already shown is not repeated; a position anywhere but at a line start does not count.
+  assert.equal(reported(Object.assign(new Error('Lake: see A.lean:1:2: x\nmore'), { stderr: 'error: build failed\nnote: A.lean:1:2: x\n', projectDirectory })).length, 3);
   // The working directory when the error names no project.
   assert.equal(reported(Object.assign(new Error('x'), { stderr: `error: ${process.cwd()}/A.lean:1:2: oops\n` }))[0], 'A.lean:1:2: error: oops');
 });
@@ -462,6 +468,14 @@ test('describeFileSystemError: what Lasm tried, on which path, why, and what to 
     'Could not create the directory /x: permission denied (EACCES). Check that you can write there, or choose another directory.');
   assert.equal(describeFileSystemError(error('No space left on device', { code: 'ENOSPC' })),
     'A file operation failed: no space left on device (ENOSPC). The disk is full; free some space and run the command again.');
+  assert.equal(describeFileSystemError(error("EACCES: no a.b access, open '/x'", { code: 'EACCES' })),
+    'Could not open /x: no a.b access (EACCES). Check that you can write there, or choose another directory.');
+  const bare59 = 'Permission denied' + ' x'.repeat(21);
+  assert.equal(bare59.length, 59);
+  assert.ok(describeFileSystemError(error(bare59, { code: 'EACCES' })));
+  assert.equal(describeFileSystemError(error(bare59 + 'x', { code: 'EACCES' })), undefined);
+  for (const message of ["xEACCES: denied, open '/x'", "EACCES: denied, open '/x' later", 'see Permission denied', 'Permission denied!'])
+    assert.equal(describeFileSystemError(error(message, { code: 'EACCES' })), undefined, message);
   // Messages Lasm already explained, unknown codes and non-errors: undefined.
   for (const value of [error('Lasm could not create /x because it is a file you made earlier, so move it first', { code: 'EEXIST' }),
     error('EACCES: permission denied', { code: 'EACCES' }), error('permission denied', { code: 'EACCES' }),
@@ -485,6 +499,10 @@ test('assertSourceExists: where Lasm looked and which sources are there', () => 
   assert.equal(assertSourceExists(source), undefined);
   const many = join(root, 'many');
   mkdirSync(many);
+  const eight = join(root, 'eight');
+  mkdirSync(eight);
+  for (const name of 'ABCDEFGH') writeFileSync(join(eight, name + '.lean'), '');
+  assert.throws(() => assertSourceExists(join(eight, 'Zebra.lean')), { message: `${join(eight, 'Zebra.lean')} not found in ${eight}. Lean files there: A.lean, B.lean, C.lean, D.lean, E.lean, F.lean, G.lean, H.lean.` });
   for (const name of ['lakefile.lean', 'J.lean', 'I.lean', 'H.lean', 'G.lean', 'F.lean', 'E.lean', 'D.lean', 'C.lean', 'B.lean', 'A.lean', 'notes.txt'])
     writeFileSync(join(many, name), '');
   assert.throws(() => assertSourceExists(join(many, 'Zebra.lean')),

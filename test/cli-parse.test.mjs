@@ -126,6 +126,15 @@ test('--target', () => {
   fails(['build', 'bindings.json', '--target', 'workers'], '--target applies to Lean applications, not binding configurations');
 });
 
+test('option names match whole tokens only', () => {
+  for (const flag of ['--targets', '--suspended', '--outputs', '--target-x'])
+    fails(['build', 'Main.lean', flag, 'node'], `Unknown Lasm option: ${flag}. Application arguments must follow --.`);
+  for (const input of ['x--target.lean', 'x--suspend.lean', 'x--output.lean'])
+    assert.equal(parseLasmArguments(['build', input]).input, input);
+  // lasm package reads its own arguments, not the word package.
+  assert.equal(parseLasmArguments(['package', '--target', 'lambda']).input, parseLasmArguments(['package', 'dist', '--target', 'lambda']).input);
+});
+
 test('target hints: aliases, near misses, and nothing for inherited names', () => {
   for (const [alias, target] of [['cloudflare', 'workers'], ['cloudflare-workers', 'workers'], ['worker', 'workers'], ['aws', 'lambda'],
     ['aws-lambda', 'lambda'], ['cloudfront', 'lambda-edge'], ['supabase', 'supabase-edge'], ['deno-deploy-edge', 'deno-deploy'], ['spin', 'wasi-http'],
@@ -339,6 +348,9 @@ test('original engine arguments on Linux: NUL-terminated byte strings, read in c
   const argv = ['/usr/bin/node', '--stack-size=99', 'λ main.mjs', '', 'x'.repeat(9000)];
   const content = Buffer.concat(argv.map(a => Buffer.from(a + '\0')));
   const { calls, libc } = linuxLibc(content);
+  // Descriptor 0 is a valid descriptor.
+  assert.deepEqual(originalArguments(ffi(), { func: signature => signature.startsWith('int open') ? () => 0 : signature.startsWith('intptr_t read')
+    ? (() => { let done = false; return (fd, bytes) => { assert.equal(fd, 0); if (done) return 0; done = true; return Buffer.from('a\0b\0').copy(bytes); }; })() : () => 0 }).map(String), ['a\0', 'b\0']);
   const result = originalArguments(ffi(), libc);
   assert.deepEqual(result.map(b => b.toString()), argv.map(a => a + '\0'));
   assert.ok(result.every(Buffer.isBuffer));
