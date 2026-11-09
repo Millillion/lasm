@@ -23,9 +23,11 @@ Node globals (`fetch`) and npm packages, and lets JavaScript call Lean functions
   Lean the first time it is used. There is no Lake dependency to add. Programs that
   import it use Lasm's larger Lean download (the "extended" tier, which includes
   Lean's elaborator), as Lake projects already do.
-- **Cost: about 25–35 µs per JavaScript call** (measured on Linux x64). Every call crosses from the Lean thread to Node's
-  main thread. Make one call per real operation (a query, a sign, an HTTP
-  response), not one per tiny step.
+- **Cost: about 5 µs per JavaScript call when a Lean thread makes calls one
+  after another, 20–30 µs for a lone call or while other Lean threads call too**
+  (measured on Linux x64; [BENCHMARKS.md](BENCHMARKS.md#lasmjs-call-cost)). Every
+  call crosses from the Lean thread to Node's main thread. Make one call per real
+  operation (a query, a sign, an HTTP response), not one per tiny step.
 
 ## Quick start
 
@@ -408,7 +410,9 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
   timer or socket started there) fails at once.
 - **Module loading.** Modules load with `require`: ES modules with top-level await
   cannot be loaded. pnpm/Yarn Plug'n'Play layouts are not supported.
-- **Cost per call.** Each call costs about 25–35 µs. An asynchronous callback round
+- **Cost per call.** Each call costs about 5 µs when a Lean thread makes calls
+  one after another, and 20–30 µs for a lone call or under load (other Lean
+  threads calling too). An asynchronous callback round
   trip (JavaScript calls Lean, and Lean awaits the answer) costs about 0.27 ms.
   On the 4-CPU benchmark runner, a Hono server with a Lean handler serves about
   9,700 requests per second and Express about 6,300: 0.18× and 0.12× a plain Node
