@@ -7,7 +7,11 @@ Every check is a property: the comment above it states the Lean proposition
 it checks, over WPT's data (Wpt.lean), published test vectors, or generated
 inputs (a seeded generator, so a failure is reproducible). The oracle is,
 where one exists, Lean itself (UTF-8 encoding and validation) or the
-standard's own test data; otherwise the spec's stated behaviour.
+standard's own test data; otherwise the spec's stated behaviour. These are
+properties of the JavaScript runtimes behind the bindings, which Lean has no
+model of, so (docs/TESTING_STRATEGY.md §4) they stay comments here rather than
+`Candidates.lean` definitions: the binding code itself is uniform generator
+output, and what can fail is the runtime or the mapping.
 
 Output: a line `FAIL <check>: <detail>` per failed check, a line
 `section <name>: <passed> passed, <failed> failed` per section, and

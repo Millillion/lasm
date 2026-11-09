@@ -6,7 +6,7 @@ differential), target equivalence and the test-quality audit below are
 implemented and run in CI; the other layers are marked as existing (with their
 workflow) or planned. The plan is issue #21 (testing and verification half);
 the long-term strategy (evidence levels, tier consolidation, corpora) is the
-proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
+strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 
 ## Principles
 
@@ -142,7 +142,7 @@ threads is never printed); performance; in browsers, which exit status a failing
 
 ### More oracles
 
-Three more comparisons from [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md)
+Three more comparisons from [TESTING_STRATEGY.md](TESTING_STRATEGY.md)
 pillar 1, implemented as targets of the same harness, so every generated case,
 the shrinker and the regression replay cover them.
 
@@ -334,7 +334,8 @@ Chromium): *c* holds on *t*, unless *t*'s runtime itself deviates from the spec
 there, which [`known.json`](../test/fixtures/js-web/known.json) states with the
 reason. Each check's comment states its Lean proposition, for example
 `∀ c ∈ urltestdata, ¬ c.failure → ∀ f ∈ fields, (URL.new c.input c.base).f = c.f` or
-`∀ b : ByteArray, (fatal TextDecoder.decode b succeeds ↔ String.fromUTF8? b ≠ none)`.
+`∀ b : ByteArray, (fatal TextDecoder.decode b succeeds ↔ String.fromUTF8? b ≠ none)`. They are properties of the runtimes, which Lean has no model of, so they
+are not `Candidates.lean` definitions ([TESTING_STRATEGY.md §4](TESTING_STRATEGY.md#4-property-testing-convention-propositions-that-carry-over-to-proofs)).
 
 **Oracles and inputs.** WPT at a pinned commit
 ([`scripts/bindings/wpt-data.mjs`](../scripts/bindings/wpt-data.mjs) writes
@@ -383,7 +384,7 @@ accounts, by policy), OS versions and configurations outside the runners.
 
 ### Dependable tooling
 
-Claim 4 of [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md), tested black
+Claim 4 of [TESTING_STRATEGY.md](TESTING_STRATEGY.md), tested black
 box: each harness installs the CLI with npm (a candidate packed from the commit,
 and for the corpus also the published `@lasm/cli@latest`) and judges only what
 it prints, its exit status and the files it writes. The judge of a message,
@@ -852,7 +853,7 @@ to Saturday.
 ## Evidence levels
 
 Each platform in the README's table has an evidence level. The levels are those
-of [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md#5-rules-of-the-process),
+of [TESTING_STRATEGY.md](TESTING_STRATEGY.md#5-rules-of-the-process),
 and CI results decide them:
 
 | Level | Meaning |

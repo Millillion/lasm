@@ -344,8 +344,12 @@ empty.
   before the engine's stack. The instance then stops with
   `Stack overflow: the program used all of its 1 MiB C stack (deep recursion?). See …/docs/EDGE.md#stack`
   instead of the trap that follows the overflow (usually "memory access out of
-  bounds"). It is recognised from the stack pointer after the trap, at no cost
-  per call.
+  bounds"). The stack is the first thing in memory (`--stack-first`, as on the
+  WASI target), so an overflow runs below address 0 and traps at its first
+  access; it is then recognised from the stack pointer after the trap, at no
+  cost per call. (Until issue #126 the stack lay above the static data: an
+  overflow first overwrote that data, and an unoptimized build could then
+  loop forever on Bun instead of trapping.)
 - **`IO.Process.exit` fails.** An isolate cannot exit.
 
 ### Environment variables

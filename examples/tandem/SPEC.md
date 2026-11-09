@@ -13,7 +13,7 @@ Beresford verify it ("Verifying strong eventual consistency in distributed
 systems", OOPSLA 2017, [arXiv:1707.01747](https://arxiv.org/abs/1707.01747)),
 Fugue's non-interleaving (Weidner and Kleppmann, [arXiv:2305.00583](https://arxiv.org/abs/2305.00583)),
 the proposal in [NEXT_EXAMPLE_APPS.md](../../docs/proposals/NEXT_EXAMPLE_APPS.md),
-and claim 5 of [TESTING_STRATEGY.md](../../docs/proposals/TESTING_STRATEGY.md):
+and claim 5 of [TESTING_STRATEGY.md](../../docs/TESTING_STRATEGY.md):
 untrusted input can't crash or subvert a Lasm program.
 
 ## 1. Strong eventual consistency
