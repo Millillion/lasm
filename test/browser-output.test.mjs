@@ -365,6 +365,10 @@ test('browser output: details: the glue\'s URL without spaces, the banner\'s end
     assert.match(bundle, /Licence texts: THIRD_PARTY_NOTICES\.txt \*\/\nimport \* as __lasmExternal0 /, 'the banner ends the header, no blank line');
     const kib = n => (n / 1024).toFixed(1) + ' KiB';
     assert.ok(logged[0].endsWith(`: ${kib(manifest.transfer.brotli)} brotli, ${kib(manifest.transfer.gzip)} gzip, ${kib(manifest.transfer.uncompressed)} uncompressed)`), logged[0]);
+    // An output whose parent does not exist yet (and no staging left over).
+    const fresh = join(root, 'fresh', 'parent', 'dist');
+    writeBrowserOutput(args({ output: fresh }));
+    assert.ok(existsSync(join(fresh, 'lasm-manifest.json')));
     // Several npm modules are named together; a module that only contains a URL is still npm's.
     writeFileSync(join(project, 'package.json'), JSON.stringify({ lasm: { edge: { modules: ['b-pkg', 'a-pkg', 'pkg-https://x'] } } }));
     assert.throws(() => writeBrowserOutput(args({ output: join(root, 'o') })), error => error.message.startsWith('The program uses npm modules (a-pkg, b-pkg, pkg-https://x), which'));

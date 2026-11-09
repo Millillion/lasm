@@ -106,7 +106,12 @@ const reset = async () => { await stopAll(); for (const server of state.servers)
 /** Stops a runDev: as Ctrl+C does. */
 async function stop(running) {
   await signalDev();
-  assert.equal(await running, 0);
+  assert.equal(await Promise.race([running, pause(4000).then(() => 'still running')]), 0);
+}
+/** fetch that gives up after 3 s (a broken lasm dev must fail the test, not hang it). */
+function get(url, init) {
+  let timer;
+  return Promise.race([fetch(url, init), new Promise((_, fail) => { timer = setTimeout(() => fail(new Error(`no answer from ${url}`)), 3000); })]).finally(() => clearTimeout(timer));
 }
 const rel = file => relative(process.cwd(), file);
 /** The next server-sent event chunk, or a failure that shows lasm dev's output. */
@@ -485,7 +490,7 @@ createServer((request, response) => response.writeHead(200, { 'content-type': 't
     assert.ok(stderr.text().includes(`[lasm dev] Open ${url}: Server.lean with Client.lean, live reload.\n`), stderr.text());
     assert.deepEqual(state.calls.map(c => [c.target, c.slot, c.options.output]), [[undefined, 0, undefined], ['browser', 1, browserOutput]]);
     assert.deepEqual(built, [['node', 'Server.lean', server], ['browser', 'Client.lean', browserOutput]]);
-    const page = await (await fetch(url)).text();
+    const page = await (await get(url)).text();
     assert.match(page, /^<body>client 2<script type="module">[\s\S]*<\/script>\n<\/body> arg 127\.0\.0\.1$/);
     await until(() => programLines.length >= 2, 'the program\'s output');
     // Its private address is shown as the user's URL.
@@ -504,7 +509,7 @@ createServer((request, response) => response.writeHead(200, { 'content-type': 't
     assert.deepEqual(built, [['browser', 'Client.lean', browserOutput]]);
     assert.match(stderr.text(), /\[lasm dev\] Reloaded \d+\.\d s after the change \(unchanged: Server\.lean\)\.\n/);
     assert.match((await nextEvent(reader)), /event: reload/);
-    assert.match(await (await fetch(url)).text(), /client 3/);
+    assert.match(await (await get(url)).text(), /client 3/);
 
     // A shared module rebuilds both.
     stderr.reset();
@@ -531,10 +536,10 @@ createServer((request, response) => response.writeHead(200, { 'content-type': 't
     await until(() => /Server\.lean stopped \(SIGKILL\)/.test(stderr.text()), 'the crash report');
     writeFileSync(join(dir, 'Client.lean'), 'import Shared\n-- fixed\n');
     await until(() => Number(readFileSync(join(dir, 'server.pid'), 'utf8')) !== pid, 'the restarted server');
-    assert.match(await (await fetch(url)).text(), /<\/body> arg 127\.0\.0\.1$/);
+    assert.match(await (await get(url)).text(), /<\/body> arg 127\.0\.0\.1$/);
     await stop(running);
     await until(() => programLines.includes('lasm-test-program unterminated'), 'the last unterminated line');
-    await assert.rejects(fetch(url), 'the proxy is closed');
+    await assert.rejects(get(url), 'the proxy is closed');
   } finally { delete process.env.LASM_DEV_WORKERS; rmSync(dir, { recursive: true, force: true }); }
 });
 
@@ -588,6 +593,8 @@ createServer((q, s) => s.end('ok')).listen(Number(process.env.PORT), process.env
     writeFileSync(join(dir, 'lakefile.toml'), 'name = "app3"\n');
     await until(() => /Build failed/.test(stderr.text()), 'the failed concurrent rebuild');
     assert.ok(stderr.text().includes('browser build failed'));
+    // The server restarted alongside: let it listen before stopping (lasm dev waits for its port).
+    await pause(500);
     await stop(running);
   } finally { delete process.env.LASM_DEV_WORKERS; delete process.env.LASM_DEV_TRACE; rmSync(dir, { recursive: true, force: true }); }
 });
@@ -615,13 +622,13 @@ dtest('lasm dev with a browser output and hooks: the static server with the hook
     assert.ok(url, stderr.text());
     assert.ok(stderr.text().includes(`[lasm dev] Serving ${rel(browserOutput)} at ${url} with live reload (open it in your browser).\n`));
     assert.ok(stderr.text().includes(`${rel(edgeOutput)} is up to date`));
-    assert.equal(await (await fetch(url + 'api')).text(), 'api');
-    assert.match(await (await fetch(url)).text(), /^<body>v1<script/);
+    assert.equal(await (await get(url + 'api')).text(), 'api');
+    assert.match(await (await get(url)).text(), /^<body>v1<script/);
     const reader = (await fetch(url + '__lasm/events')).body.getReader();
     await nextEvent(reader);
     writeFileSync(join(dir, 'Main.lean'), '-- edit\n');
     assert.match((await nextEvent(reader)), /event: reload/);
-    assert.match(await (await fetch(url)).text(), /^<body>v3<script/);
+    assert.match(await (await get(url)).text(), /^<body>v3<script/);
     await stop(running);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
@@ -648,7 +655,7 @@ createServer((q, s) => s.end('port ' + process.env.PORT)).listen(Number(process.
     await until(() => /Open /.test(stderr.text()), 'the proxy');
     assert.ok(stderr.text().includes(`Open http://127.0.0.1:${port}/:`), stderr.text());
     assert.equal(state.calls[1].options.output, join(dir, '.lake/lasm/browser-dev'));
-    assert.notEqual(await (await fetch(`http://127.0.0.1:${port}/`)).text(), `port ${port}`, 'the program runs on a private port behind the proxy');
+    assert.notEqual(await (await get(`http://127.0.0.1:${port}/`)).text(), `port ${port}`, 'the program runs on a private port behind the proxy');
     await stop(running);
   } finally {
     if (savedPort === undefined) delete process.env.PORT; else process.env.PORT = savedPort;
@@ -714,7 +721,7 @@ dtest('browser dev server: serves the build, rebuilds on content changes only, r
     assert.equal(state.watchers[0].directory, dir);
     assert.ok(stderr.text().includes('building for the browser\n'));
     assert.ok(stderr.text().includes(`[lasm dev] Serving ${rel(output)} at ${server.url} (rebuilds on save; Ctrl+C stops)\n`), stderr.text());
-    assert.match(await (await fetch(server.url)).text(), /^<body>build 1<script/);
+    assert.match(await (await get(server.url)).text(), /^<body>build 1<script/);
     const reader = (await fetch(server.url + '__lasm/events')).body.getReader();
     await nextEvent(reader);
     const event = () => { state.watchers[0].onEvent(); };
@@ -799,7 +806,7 @@ dtest('browser dev server: a failed first build without an earlier output stops;
     assert.equal(state.serverOptions.liveReload, false);
     assert.equal(state.watchers.length, 0, '--no-watch watches nothing');
     assert.ok(stderr.text().includes(`at ${state.servers[0].url}\n`), 'no rebuild note without watching');
-    assert.equal(await (await fetch(state.servers[0].url, { headers: { connection: 'close' } })).text(), '<p>old</p>');
+    assert.equal(await (await get(state.servers[0].url, { headers: { connection: 'close' } })).text(), '<p>old</p>');
     // The port is taken: the build worker is stopped and the error is the listen error.
     await state.servers[0].close();
     await reset();
