@@ -4,7 +4,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, mkdtempSync, writeFileSync, readFileSync, mkdirSync } from 'node:fs';
-import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { pathToFileURL } from 'node:url';
@@ -206,8 +205,6 @@ test('lasm:web: an app instance has every export of the module', async () => {
 
 // library/ is not copied into the mutation-testing sandbox (scripts/mutation/run.mjs).
 test('every lasm:web and lasm:app binding of Lasm.Web names an export', { skip: !existsSync(new URL('../library/Lasm/Web/', import.meta.url)) && 'library/ is not here (mutation sandbox)' }, async () => {
-// The mutation-testing sandbox leaves out library/ (scripts/mutation/run.mjs ignorePatterns).
-test('every lasm:web and lasm:app binding of Lasm.Web names an export', { skip: !existsSync(new URL('../library/Lasm/Web/', import.meta.url)) && 'no library/ here' }, async () => {
   const { readdirSync } = await import('node:fs');
   const exports = { 'lasm:web': await import('../src/lasm-modules/web.mjs'), 'lasm:app': await import('../src/lasm-modules/app.mjs') };
   const directory = new URL('../library/Lasm/Web/', import.meta.url);

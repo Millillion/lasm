@@ -1,6 +1,6 @@
 # Lasm (next release)
 
-Since 0.6.0 (docs/release/0.6.0-notes.md), main has had only benchmark records; this release's work is mutation testing of every JavaScript module under `src/` (docs/TESTING.md, "Mutation testing"), and the fixes below are bugs those tests found.
+Since 0.6.0 (docs/release/0.6.0-notes.md), main has gained a fix for the UI patch fuzz worker running out of memory (#161), benchmark records, and mutation testing of every JavaScript module under `src/` (docs/TESTING.md, "Mutation testing"; #165), whose new tests found the fixes below. These notes move to `docs/release/<version>-notes.md` when the version is cut.
 
 ## Fixes
 
@@ -10,20 +10,6 @@ Since 0.6.0 (docs/release/0.6.0-notes.md), main has had only benchmark records; 
 - **A failing async Lean event handler is reported once.** `lasm:web`'s listeners report a handler's rejected promise to the app; the promise was also handed back to the event target, and Node's `EventTarget` (edge and server targets) turns a listener's rejected promise into an uncaught exception. The listener now hands back a promise that does not reject.
 - **`Lasm.Web.Canvas.draw` rejects every unknown command.** A command named like an `Object` method (`constructor`, `toString`) was run as one instead of failing with "unknown drawing command".
 - **A browser build into `public/` leaves nothing behind.** `lasm build --target browser --output public/dist` was refused, as it should be, but only after its staging directory had been created inside `public/`, where the next build then found it.
-Nothing user-facing has landed on main since 0.6.0 besides benchmark records; the work since then raises mutation-testing scores across the JavaScript of `src/` (every module now has behavioural tests that a changed line fails). The fixes those tests found are below.
-
-## Fixes
-
 - **`lasm build --target workers` no longer keeps a generated `workers/wrangler.toml` once the project has its own.** A project that added `wrangler.toml`, `wrangler.json` or `wrangler.jsonc` at its root after an earlier build still had the earlier generated `workers/wrangler.toml` when the program had not changed (an unchanged rebuild keeps the output directory as it was). It is now removed, as a build from scratch leaves none.
-Since 0.6.0, main has gained a fix for the UI patch fuzz worker running out of
-memory (#161), benchmark records, and mutation testing of every JavaScript
-module under src/ (#165 and its follow-ups), whose new tests found the fixes
-below. These notes move to `docs/release/<version>-notes.md` when the version is cut.
-
-## Fixes
-
-- **macOS network interfaces report the right hardware (MAC) address.** The Node host
-  read the link-layer address of `Std.Net.interfaceAddresses` at the wrong offset of
-  macOS's `sockaddr_dl` (after `sdl_alen` bytes of the name instead of `sdl_nlen`), so an
-  interface such as `en0` reported bytes of its name and address mixed. It now follows
-  libuv's `LLADDR`.
+- **macOS network interfaces report the right hardware (MAC) address.** The Node host read the link-layer address of `Std.Net.interfaceAddresses` at the wrong offset of macOS's `sockaddr_dl` (after `sdl_alen` bytes of the name instead of `sdl_nlen`), so an interface such as `en0` reported bytes of its name and address mixed. It now follows libuv's `LLADDR`.
+- **`lasm package` says why it refuses more than 65,535 files.** A function package with more entries than a ZIP's 16-bit count holds failed with Node's `RangeError` about an out-of-range value instead of "Function package has more than 65535 files"; the check now comes before any record is written.
