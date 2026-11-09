@@ -1,11 +1,16 @@
 // `lasm dev --target browser` on a copy of the web template: serve, check that
-// the page carries the live-reload script, then edit one view expression three
-// times and time each rebuild (the "Rebuilt in" line, and save to reload event).
+// the page carries the live-reload script, then edit one view expression eight
+// times and time each rebuild (the "Rebuilt in" line: the build worker's build
+// only, without the watcher's 80 ms debounce; and save to reload event). The
+// first edit warms the worker; evidence.mjs takes the median of the other seven.
+// Rebuilds on one runner agree to about 0.1 s; runners differ by up to 1.8x
+// (docs/BROWSER.md#budgets-measured-in-ci-recorded-per-release), so the runner's CPU is recorded with them.
 //   node dev-loop-check.mjs APP_DIR RESULT.json
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import net from 'node:net';
+import { cpus } from 'node:os';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -21,12 +26,13 @@ const wait = async (re, from, ms = 600_000) => {
   throw new Error(`no ${re}:\n${out.slice(-3000)}`);
 };
 const main = resolve(app, 'Main.lean'), original = readFileSync(main, 'utf8');
-const result = { what: 'lasm dev --target browser: edit one view expression, time to "Rebuilt in"', rebuilds: [] };
+const result = { what: 'lasm dev --target browser: edit one view expression, time to "Rebuilt in"', rebuilds: [],
+  runner: { cpu: cpus()[0]?.model ?? null, cpus: cpus().length } };
 try {
   await wait(/Serving .* at (http\S+)/, 0);
   const page = await (await fetch(`http://127.0.0.1:${port}/`)).text();
   assert.match(page, /EventSource/, 'the page carries the live-reload script');
-  for (const [index, text] of ['Lean!', 'Lean!!', 'Lean!!!', 'Lean!!!!'].entries()) {
+  for (const [index, text] of Array.from({ length: 8 }, (_, i) => 'Lean' + '!'.repeat(i + 1)).entries()) {
     const edited = original.replace('{App.greet "Lean"}', `{App.greet "${text}"}`);
     assert.notEqual(edited, original, 'the web template changed: update the view edit');
     const mark = out.length, started = performance.now();
