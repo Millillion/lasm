@@ -106,7 +106,15 @@ async function nextEvent(reader, what = 'an event') {
   return buffer.slice(0, at);
 }
 
-test('lasm dev (edge target): first build, rebuilds on content changes only, queued changes, build errors, stop', async () => {
+// TEMPORARY (mutation sandbox debugging): a failure's details beside the mutation report.
+const debugDir = join(process.cwd(), '..', '..', '..', 'mutation', 'dev');
+const traced = fn => async t => {
+  try { await fn(t); } catch (error) {
+    if (existsSync(debugDir)) writeFileSync(join(debugDir, `debug-${process.pid}-${Date.now()}.txt`), `${process.version}\n${error.stack}\n${JSON.stringify(error.actual)?.slice(0, 4000)}\n--- stderr ---\n${stderr.text()}`);
+    throw error;
+  }
+};
+test('lasm dev (edge target): first build, rebuilds on content changes only, queued changes, build errors, stop', traced(async () => {
   await reset();
   const dir = project();
   const main = join(dir, 'Main.lean');
@@ -215,7 +223,7 @@ test('lasm dev (edge target): first build, rebuilds on content changes only, que
     await pause(300);
     assert.equal(state.calls.length, built, 'nothing is built after lasm dev stops');
   } finally { rmSync(dir, { recursive: true, force: true }); }
-});
+}));
 
 test('lasm dev: a first build that fails says so; release profile; a terminal gets status lines and colors', async () => {
   await reset();

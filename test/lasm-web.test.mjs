@@ -41,7 +41,8 @@ async function withGlobal(name, value, fn) {
 
 test('lasm:web globals need a browser and name the missing global', async () => {
   for (const name of ['window', 'document', 'localStorage', 'sessionStorage', 'location', 'history']) {
-    assert.throws(() => web[name](), { message: `Lasm.Web: ${name} needs a browser (${name} is not defined here)` });
+    // Node 25 and later define localStorage and sessionStorage: each global is taken away for the check.
+    await withGlobal(name, undefined, () => assert.throws(() => web[name](), { message: `Lasm.Web: ${name} needs a browser (${name} is not defined here)` }));
     const value = { stand: name };
     assert.equal(await withGlobal(name, value, () => web[name]()), value);
   }
