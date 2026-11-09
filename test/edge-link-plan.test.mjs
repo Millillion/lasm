@@ -60,7 +60,7 @@ const commonFlags = (f, suspend) => [
   '-sMODULARIZE=1', '-sEXPORT_ES6=1', '-sENVIRONMENT=web', '-sEXIT_RUNTIME=0', '-sFILESYSTEM=0', '-sALLOW_MEMORY_GROWTH=1', '-sINITIAL_MEMORY=4194304',
   '-sMAXIMUM_MEMORY=2147483648', '-sSTACK_SIZE=1048576', '-sEXPORTED_RUNTIME_METHODS=callMain,HEAPU8,HEAPU32', '-sDYNAMIC_EXECUTION=0',
   '-sINCOMING_MODULE_JS_API=instantiateWasm,noInitialRun,print,printErr,onAbort', '-sDEFAULT_LIBRARY_FUNCS_TO_INCLUDE=$stackSave,$stackRestore',
-  '-Wl,--export-if-defined=__cpp_exception', '-Wno-experimental', `-Wl,-Map=${join(f.out, 'program.map')}`, '-Wl,--start-group',
+  '-Wl,--stack-first', '-Wl,--export-if-defined=__cpp_exception', '-Wno-experimental', `-Wl,-Map=${join(f.out, 'program.map')}`, '-Wl,--start-group',
   f.edge.libraries['libInit.a'] ?? join(f.nodeRuntime.directory, 'lib', 'libInit.a'), f.edge.libraries['libleanrt.a'], '-Wl,--end-group',
   '--pre-js', join(f.linkWork, 'application-pre.js'), '--pre-js', join(here, 'edge-pre.js'), '--js-library', join(here, 'edge-library.js'),
   ...(suspend === 'jspi' ? ['-sJSPI', "-sJSPI_EXPORTS=['lasm_edge_pump','main']"] : []),
@@ -145,6 +145,19 @@ test('edge recordings per suspension mode', () => {
   assert.equal(edgeRecipeHas('asyncify', { link: { modes: { 'edge-asyncify': {} } } }), true);
   assert.equal(edgeRecipeMode('none'), undefined);
   assert.equal(edgeRecipe(), edgeRecipe(), 'read once');
+});
+
+test('both edge recordings put the C stack first in memory (issue #126)', () => {
+  // Below the stack there is then nothing to overwrite: an overflow runs below
+  // address 0 and traps at once (an overflow into the static data hung Bun).
+  for (const mode of ['edge', 'edge-asyncify']) {
+    const spec = edgeRecipe().link.modes[mode];
+    const wasmLd = spec.pipeline.find(step => step.program === 'wasm-ld');
+    assert.ok(wasmLd.args.includes('--stack-first') && !wasmLd.args.includes('--no-stack-first'), mode);
+    assert.ok(!wasmLd.args.some(arg => arg.startsWith('--global-base')), `${mode}: emcc passes no --global-base with --stack-first`);
+    assert.ok(spec.pipeline.every(step => !step.args?.includes('--low-memory-unused')), `${mode}: low memory holds the stack`);
+    assert.equal(spec.settings.STACK_FIRST, true, mode);
+  }
 });
 
 /** The Node link driver with stand-in tools: Emscripten's JavaScript symbol

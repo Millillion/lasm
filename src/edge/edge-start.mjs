@@ -14,9 +14,10 @@ const stackDocs = 'https://github.com/Millillion/lasm/blob/main/docs/EDGE.md#sta
 
 /**
  * A trap with Lean's C stack pointer at or beyond the end of its stack (stack:
- * edge-pre.js stoppedStack) is a C-stack overflow. Nothing guards the stack in
- * linear memory, so it surfaces as whatever trap follows (usually "memory access
- * out of bounds"); this names it, as native Lean does. Otherwise undefined.
+ * edge-pre.js stoppedStack) is a C-stack overflow. The stack is first in linear
+ * memory (edge-link.mjs, --stack-first), so an overflow runs below address 0 and
+ * surfaces as the trap of its first access (usually "memory access out of
+ * bounds"); this names it, as native Lean does. Otherwise undefined.
  */
 export function stackOverflowCause(error, stack, size = edgeStackBytes) {
   if (!stack || typeof stack.top !== 'number' || typeof stack.pointer !== 'number') return undefined;

@@ -105,6 +105,12 @@ if (process.env.LASM_KEEP_LINK_WORK) {
     process.execPath, join(root, 'scripts/edge/compare-edge-link.mjs'), builds[0], process.env.LASM_EDGE_RUNTIME,
     process.env.LASM_APPLICATION_RUNTIME, out]);
   results.edgeLinkCompare = JSON.parse(readFileSync(join(out, 'compare.json'), 'utf8'));
+  // The Asyncify recording (supabase-edge) on the same inputs.
+  const asyncifyOut = join(work, 'edge-link-compare-asyncify');
+  run(process.execPath, [join(root, 'scripts/full-lean/run-bounded.mjs'), '--', 'python3', join(root, 'scripts/full-lean/base-pages.py'),
+    process.execPath, join(root, 'scripts/edge/compare-edge-link.mjs'), builds[0], process.env.LASM_EDGE_RUNTIME,
+    process.env.LASM_APPLICATION_RUNTIME, asyncifyOut, '--suspend', 'asyncify']);
+  results.edgeLinkCompareAsyncify = JSON.parse(readFileSync(join(asyncifyOut, 'compare.json'), 'utf8'));
 }
 writeFileSync(join(work, 'workers-results.json'), JSON.stringify(results, null, 2) + '\n');
 const engines = ['workerd', 'node', 'deno', 'bun', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'bun-portable'];
@@ -116,6 +122,7 @@ const failed = Object.entries(results.apps).flatMap(([name, a]) => [
   ...engines.filter(e => !a[e].passed).map(e => `${name} on ${e}`),
   ...Object.entries(a.budget).filter(([, ok]) => !ok).map(([what]) => `${name} ${what} budget`)]);
 if (results.edgeLinkCompare && !results.edgeLinkCompare.identical) failed.push('the Node link driver\'s edge link differs from emcc\'s');
+if (results.edgeLinkCompareAsyncify && !results.edgeLinkCompareAsyncify.identical) failed.push('the Node link driver\'s Asyncify edge link differs from emcc\'s');
 // Supabase Edge Functions (Asyncify link; Supabase's edge runtime image in
 // Docker): scripts/edge/supabase-ci.mjs, results beside these.
 const supabase = spawnSync(process.execPath, [join(root, 'scripts/edge/supabase-ci.mjs'), join(work, 'supabase'), work], { stdio: 'inherit' });
