@@ -18,6 +18,7 @@ on:
       - 'library/prebuilt/**'
       - 'scripts/bindings/**'
       - 'test/fixtures/js-web/**'
+      - 'test/fixtures/js-web-size/**'
       - 'test/web-bindings.test.mjs'
       - 'src/node-js.mjs'
       - 'src/edge/**'
@@ -31,6 +32,7 @@ on:
       - 'library/prebuilt/**'
       - 'scripts/bindings/**'
       - 'test/fixtures/js-web/**'
+      - 'test/fixtures/js-web-size/**'
       - 'src/node-js.mjs'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'
@@ -149,7 +151,7 @@ jobs:
           node scripts/bindings/test-web.mjs --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-web" \
             --targets node,node24,bun,deno,workers,browser-chromium --node24 "$NODE24" --bun "$T/bun-linux-x64/bun" \
             --deno "$T/node_modules/.bin/deno" --wrangler "$T/node_modules/.bin/wrangler" --playwright .work/pw \
-            --report "$RUNNER_TEMP/js-web/report.json"
+            --report "$RUNNER_TEMP/js-web/report.json" --sizes
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:

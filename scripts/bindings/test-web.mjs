@@ -25,6 +25,7 @@ const { values } = parseArgs({ options: {
   lasm: { type: 'string' }, work: { type: 'string' }, targets: { type: 'string', default: 'node,bun,deno' },
   node24: { type: 'string' }, bun: { type: 'string', default: 'bun' }, deno: { type: 'string', default: 'deno' },
   wrangler: { type: 'string', default: 'wrangler' }, playwright: { type: 'string' }, report: { type: 'string' },
+  sizes: { type: 'boolean', default: false },
 } });
 if (!values.lasm || !values.work) { console.error('--lasm and --work are required'); process.exit(2); }
 const lasm = resolve(values.lasm), work = resolve(values.work);
@@ -148,7 +149,26 @@ for (const target of targets) {
   for (const p of result.stale ?? []) console.log(`  listed in known.json but passed: ${p}`);
   if (result.error) console.log(`  ${result.error.split('\n').join('\n  ')}`);
 }
-if (values.report) writeFileSync(values.report, JSON.stringify(results, null, 1) + '\n');
+// --sizes: what importing Lasm.JS.Web costs, against the same program on Lasm.JS
+// alone (test/fixtures/js-web-size), for Node and the edge runtime (--target deno):
+// build time of a new project with warm tools, and the program's Wasm.
+const sizes = [];
+if (values.sizes) {
+  const wasmBytes = dir => existsSync(dir) ? readdirSync(dir, { recursive: true }).filter(f => String(f).endsWith('.wasm'))
+    .reduce((n, f) => n + statSync(join(dir, f)).size, 0) : 0;
+  for (const [target, flags, output] of [['node', [], 'dist'], ['deno', ['--target', 'deno'], 'deno']]) {
+    for (const program of ['Base', 'Web']) {
+      const dir = join(work, `size-${target}-${program}`);
+      cpSync(join(root, 'test', 'fixtures', 'js-web-size'), dir, { recursive: true });
+      const b = await exec(process.execPath, [lasm, 'build', `${program}.lean`, ...flags], { cwd: dir, timeout: 30 * 60_000 });
+      const entry = { target, program, buildMs: b.ms, ok: b.code === 0, wasmBytes: wasmBytes(join(dir, output)), outputBytes: dirSize(join(dir, output)) };
+      if (!entry.ok) { entry.error = (b.stdout + b.stderr).slice(-3000); ok = false; }
+      sizes.push(entry);
+      console.log(`size ${target} ${program}: ${entry.ok ? `build ${(b.ms / 1000).toFixed(1)} s, wasm ${entry.wasmBytes} bytes, output ${entry.outputBytes} bytes` : 'build failed\n' + entry.error}`);
+    }
+  }
+}
+if (values.report) writeFileSync(values.report, JSON.stringify({ results, sizes }, null, 1) + '\n');
 // Availability: which targets lack each generated member that some target lacks.
 const lacking = new Map();
 for (const r of results) for (const m of r.missing ?? []) lacking.set(m, [...(lacking.get(m) ?? []), r.target]);
@@ -157,6 +177,6 @@ console.log(`\nGenerated members missing on some target (${lacking.size}):`);
 for (const [member, where] of [...lacking].sort(([a], [b]) => a.localeCompare(b))) console.log(`  ${member}: ${where.join(', ')}`);
 if (process.env.GITHUB_STEP_SUMMARY) {
   const rows = results.map(r => `| ${r.target} | ${r.pass ? 'pass' : '**fail**'} | ${r.summary ? `${r.summary.passed} / ${r.summary.failed}` : '–'} | ${r.failures ? r.failures.length - r.unexpected.length : '–'} | ${r.buildMs !== undefined ? (r.buildMs / 1000).toFixed(1) + ' s' : '–'} | ${r.outputBytes ? (r.outputBytes / 1048576).toFixed(2) + ' MiB' : '–'} |`);
-  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## Lasm.JS.Web conformance\n\n| Target | Result | Passed / failed checks | Known deviations | Build | Output |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\n### Generated members a runtime lacks\n\n| Member | Missing on |\n| --- | --- |\n${availability.join('\n')}\n`);
+  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## Lasm.JS.Web conformance\n\n| Target | Result | Passed / failed checks | Known deviations | Build | Output |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\n### Cost of importing Lasm.JS.Web\n\n| Target | Program | Build | Wasm | Output |\n| --- | --- | --- | --- | --- |\n${sizes.map(e => `| ${e.target} | ${e.program} | ${(e.buildMs / 1000).toFixed(1)} s | ${e.wasmBytes} | ${e.outputBytes} |`).join('\n')}\n\n### Generated members a runtime lacks\n\n| Member | Missing on |\n| --- | --- |\n${availability.join('\n')}\n`);
 }
 process.exit(ok ? 0 : 1);
