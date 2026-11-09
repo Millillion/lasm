@@ -1,7 +1,9 @@
 /- Per-call costs of the Lasm.JS paths that waits inside synchronous callbacks
 touch (docs/DECISIONS.md 2026-11-04), for comparing two builds:
 scripts/ci/lasm-js-stress.mjs --only js-sync-cost builds this program (release
-profile) and runs it three times. Each line: the median of 5 rounds. -/
+profile) and runs it three times, on Node and (Linux) on Deno, the edge build.
+Each line: the median of 5 rounds. The first rows split one call's cost: the
+Lean wire codec alone, then whole calls with small and larger data. -/
 import Lasm.JS
 open Lasm.JS
 
@@ -24,11 +26,26 @@ def report (label : String) (ns : Float) : IO Unit :=
 def main : IO Unit := do
   let g ← global
   let math : Value ← g.get "Math" Value
+  -- The Lean half of a call's encoding alone: the request of `math.callMethod
+  -- "max" #[1, 2]` encoded, and an 8-byte number reply decoded.
+  let reply ← Wire.encodeIO (.number 2)
+  report "Lean wire codec of one call (encode request, decode reply)" (← timePer 200000 fun n => do
+    for _ in [0:n] do
+      let _ ← Wire.encodeIO (.array #[.ref math "", .string "max", .array #[toJS (1 : Nat), toJS (2 : Nat)]])
+      let _ ← Wire.decode reply)
+  report "Lean→JS get (Math.PI)" (← timePer 20000 fun n => do
+    for _ in [0:n] do let _ : Float ← math.get "PI" Float)
   report "Lean→JS call (Math.max)" (← timePer 20000 fun n => do
     for _ in [0:n] do let _ : Nat ← math.callMethod "max" #[toJS (1 : Nat), toJS (2 : Nat)] Nat)
+  -- A 20-field object (numbers and short strings) each way.
+  let F : Value ← g.get "Function" Value
+  let echo : Value ← F.new #[toJS "x", toJS "return x"]
+  let record := Data.object ((Array.range 20).map fun i =>
+    (s!"field{i}", if i % 2 == 0 then toJS i else toJS s!"value {i}"))
+  report "Lean→JS call with a 20-field object argument and result" (← timePer 10000 fun n => do
+    for _ in [0:n] do let _ : Data ← echo.call #[record] Data)
   -- JavaScript calls a synchronous Lean function n times in one loop.
   let f ← Function.ofSyncFn fun args => return args[0]!
-  let F : Value ← g.get "Function" Value
   let loop : Value ← F.new #[toJS "f", toJS "n", toJS "let s = 0; for (let i = 0; i < n; i++) s += f(i); return s"]
   report "JS→Lean synchronous callback" (← timePer 20000 fun n => do
     let _ : Nat ← loop.call #[toJS f, toJS n] Nat)

@@ -209,6 +209,21 @@ if (only.split(',').includes('js-sync-cost')) {
     r.code === 0 && !r.hung ? record.pass++ : r.hung ? record.hang++ : record.fail++;
     console.log(`js-sync-cost run ${i}:\n${r.stdout}${r.stderr.slice(-600)}`);
   }
+  // The edge build on Deno (Linux only): host calls are direct calls on one thread.
+  if (built && process.platform === 'linux') {
+    const deno = join(work, 'tools', 'node_modules', '.bin', 'deno');
+    try {
+      execFileSync(npm, ['install', '--prefix', join(work, 'tools'), '--no-audit', '--no-fund', 'deno@2.9.6'], { stdio: 'inherit' });
+      execFileSync(process.execPath, [lasm, 'build', 'Main.lean', '--target', 'deno'], { cwd: dir, stdio: 'inherit', env: { ...process.env, CI: '1' } });
+      const edge = record.deno = { pass: 0, fail: 0, runs: [] };
+      for (let i = 0; i < 3; i++) {
+        const r = await once(deno, ['run', '-A', '--no-lock', join(dir, 'deno', 'main.mjs')], dir, join(work, 'hangs', `js-sync-cost-deno-${i}`));
+        edge.runs.push(r.stdout);
+        r.code === 0 && !r.hung ? edge.pass++ : edge.fail++;
+        console.log(`js-sync-cost (Deno) run ${i}:\n${r.stdout}${r.stderr.slice(-600)}`);
+      }
+    } catch (error) { console.log(`js-sync-cost (Deno): ${error.message}`); record.denoError = error.message; }
+  }
   save();
 }
 if (want('js-interop')) {
