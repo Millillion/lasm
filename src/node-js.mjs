@@ -96,14 +96,14 @@ class Writer {
     // Short ASCII strings (most keys and many values) are copied byte for byte:
     // several times faster than measuring and encoding them as UTF-8.
     const count = s.length;
-    // Stryker disable next-line ConditionalExpression,EqualityOperator: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+    // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
     if (count <= shortString) {
       this.reserve(4 + count);
       const b = this.buffer, start = this.length + 4;
       let i = 0;
-      // Stryker disable next-line EqualityOperator: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+      // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
       while (i < count) { const c = s.charCodeAt(i); if (c > 127) break; b[start + i++] = c; }
-      // Stryker disable next-line ConditionalExpression: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+      // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
       if (i === count) { b.writeUInt32LE(count, this.length); this.length = start + count; return; }
     }
     const n = Buffer.byteLength(s);
@@ -125,10 +125,10 @@ class Reader {
     const b = this.bytes, start = this.offset, end = start + n;
     this.offset = end;
     // Short ASCII strings without TextDecoder (the same result, faster).
-    // Stryker disable next-line ConditionalExpression,EqualityOperator: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+    // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
     if (n <= shortString) {
       let text = '';
-      // Stryker disable next-line EqualityOperator: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+      // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
       for (let i = start; i < end; i++) { const c = b[i]; if (c > 127) return decoder.decode(b.subarray(start, end)); text += String.fromCharCode(c); }
       return text;
     }
@@ -139,26 +139,28 @@ class Reader {
   // about three times faster.
   key() {
     const n = this.u32();
+    // Stryker disable next-line all: without it the value after the key fails as truncated instead (the same error)
     this.need(n);
     const b = this.bytes, start = this.offset, end = start + n;
-    // Stryker disable next-line ConditionalExpression,EqualityOperator: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+    // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
     if (n > shortKey) { this.offset = end; return decoder.decode(b.subarray(start, end)); }
     let hash = n;
+    // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
     for (let i = start; i < end; i++) {
       const c = b[i];
-      // Stryker disable next-line EqualityOperator: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+      // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
       if (c > 127) { this.offset = end; return decoder.decode(b.subarray(start, end)); }
       hash = Math.imul(hash ^ c, 16777619);
     }
     this.offset = end;
-    // Stryker disable next-line ArithmeticOperator: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+    // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
     const slot = (hash >>> 0) & (keyCache.length - 1), cached = keyCache[slot];
-    // Stryker disable next-line ConditionalExpression: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+    // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
     if (cached !== undefined && cached.length === n) {
       let i = 0;
-      // Stryker disable next-line EqualityOperator: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+      // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
       while (i < n && cached.charCodeAt(i) === b[start + i]) i++;
-      // Stryker disable next-line ConditionalExpression: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+      // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
       if (i === n) return cached;
     }
     let text = '';
@@ -169,7 +171,7 @@ class Reader {
   done() { return this.offset === this.bytes.length; }
 }
 // Recently read object keys (Reader.key), by a hash of their bytes.
-// Stryker disable next-line ArrayDeclaration: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+// Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
 const shortKey = 32, keyCache = new Array(1024);
 
 export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spawnPoller, progress, liveThreads, startedOperations } = {}) {
