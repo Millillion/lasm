@@ -109,6 +109,10 @@ test('bundle checks: platform, catalog identity, configuration and every file re
     manifest.files['compiler.so'] = value; await save();
     await assert.rejects(verifyWasmtimeBundle(directory, expected, platform), /Wasmtime native bundle (file changed: compiler\.so|contains missing or unrecorded files)/, why);
   }
+  // An empty file is not a native file, even with its true size and hash.
+  await writeFile(join(directory, 'compiler.so'), '');
+  manifest.files['compiler.so'] = { bytes: 0, sha256: hash('') }; await save();
+  await assert.rejects(verifyWasmtimeBundle(directory, expected, platform), { message: 'Wasmtime native bundle file changed: compiler.so' });
   // A one-byte file is a valid record.
   await writeFile(join(directory, 'compiler.so'), 'x');
   manifest.files['compiler.so'] = { bytes: 1, sha256: hash('x') }; await save();

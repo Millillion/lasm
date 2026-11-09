@@ -199,6 +199,9 @@ test('lowerAtomics: malformed and unsupported modules fail naming the problem', 
   assert.throws(() => lowerAtomics(moduleOf([{ name: 'f', params: [], results: [], code: [0xfd, 12, 0xfe, 0x03, 0] }])),
     /Unsupported WebAssembly instruction 0xfd \(SIMD and GC/);
   assert.throws(() => lowerAtomics(moduleOf([{ name: 'f', params: [], results: [], code: [0xfb, 1, 0xfe, 0x03, 0] }])), /Unsupported WebAssembly instruction 0xfb/);
+  // Opcodes no proposal assigns, below the memory instructions.
+  for (const op of [0x16, 0x17, 0x1d, 0x1e, 0x27])
+    assert.throws(() => lowerAtomics(moduleOf([{ name: 'f', params: [], results: [], code: [op, 0, 0, 0xfe, 0x03, 0] }])), new RegExp(`Unsupported WebAssembly instruction 0x${op.toString(16)}`));
   // A code section with more bodies than the function section declares.
   const mismatched = Uint8Array.from([...header, ...section(1, vec([[0x60, 0, 0]])), ...section(3, vec([[0]])),
     ...section(10, vec([[2, 0, 0x0b], [2, 0, 0x0b]]))]);

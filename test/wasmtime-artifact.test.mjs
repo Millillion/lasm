@@ -100,6 +100,14 @@ test('artifact checks: Lean version form, schema, backend, sizes and links', asy
     manifest.files['program.cwasm'] = value; save();
     await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), { message: 'Invalid Wasmtime application file identity' });
   }
+  // A one-byte file is a valid native file; an empty one is not, even with its true hash.
+  writeFileSync(join(root, 'program.cwasm'), 'x');
+  manifest.files['program.cwasm'] = { bytes: 1, sha256: await hashWasmtimeFile(join(root, 'program.cwasm')) }; save();
+  assert.equal((await readWasmtimeArtifact(root, 'linux', 'x64')).files['program.cwasm'].bytes, 1);
+  writeFileSync(join(root, 'program.cwasm'), '');
+  manifest.files['program.cwasm'] = { bytes: 0, sha256: await hashWasmtimeFile(join(root, 'program.cwasm')) }; save();
+  await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), { message: 'Invalid Wasmtime application file identity' });
+  writeFileSync(join(root, 'program.cwasm'), 'fixture bytes for program.cwasm');
   // A size that differs, a directory or a link in place of a file.
   manifest.files['program.cwasm'] = { ...original, bytes: original.bytes + 1 }; save();
   await assert.rejects(readWasmtimeArtifact(root, 'linux', 'x64'), { message: 'Wasmtime application file changed: program.cwasm' });

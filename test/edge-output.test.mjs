@@ -51,6 +51,8 @@ test('edge output: the program, its host and builtins, licences and build inform
     assert.equal(readFileSync(join(out, 'lasm/modules/web.mjs'), 'utf8'), readFileSync(new URL('../src/lasm-modules/web.mjs', import.meta.url), 'utf8'));
     for (const file of edgeHostFiles) assert.equal(readFileSync(join(out, 'lasm', file), 'utf8'), readFileSync(new URL('../src/edge/' + file, import.meta.url), 'utf8'));
     const notices = readFileSync(join(out, 'THIRD_PARTY_NOTICES.txt'), 'utf8');
+    assert.ok(notices.includes('This Bun output was compiled by Lasm.'), 'the notices name the target');
+    assert.ok(readFileSync(join(out, 'build-info.json'), 'utf8').endsWith('}\n'));
     const glue = readFileSync(join(out, 'lasm/program.mjs')), wasm = readFileSync(join(out, 'lasm/program.wasm'));
     assert.ok(glue.toString().endsWith('export default function createProgram() {}\n'));
     assert.match(glue.toString(), /THIRD_PARTY_NOTICES\.txt, also embedded in program\.wasm as its lasm\.notices section/);
@@ -118,7 +120,7 @@ test('edge output: Workers configuration when the project has none, and the hint
     assert.match(config, new RegExp(`^compatibility_date = "${workersCompatibilityDate}"$`, 'm'));
     assert.match(config, /^fallthrough = false$/m);
     assert.equal(readFileSync(join(out, 'worker.mjs'), 'utf8'), workersEntry([]));
-    assert.match(f.lines[0], /for Cloudflare Workers: [^;]*\)$/, 'no hint without a project configuration');
+    assert.match(f.lines[0], /for Cloudflare Workers: [^;]* \(program\.wasm \d+\.\d\d MiB\)$/, 'no hint without a project configuration');
     // A project configuration: no generated one (also none left from the build before, docs/release/next-notes.md),
     // and a hint about what it must contain.
     for (const [file, text, hint] of [['wrangler.toml', 'main = "workers/worker.mjs"\n[[rules]]\ntype = "CompiledWasm"\n', 'run it with npx wrangler dev (wrangler.toml)'],

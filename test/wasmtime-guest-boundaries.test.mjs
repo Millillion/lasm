@@ -249,6 +249,8 @@ test('file imports: stat, readv, seek and close with their ranges and errors', (
   assert.equal(invokeFileImport(f.input(19, [3n, 100n, 1n, 300n])), 21, 'a vector past the end of memory');
   f.bytes.writeBigUInt64LE(8189n, 100);
   assert.equal(invokeFileImport(f.input(19, [3n, 100n, 1n, 300n])), 0, 'a vector to the end of memory');
+  f.bytes.writeBigUInt64LE(8192n, 100); f.bytes.writeBigUInt64LE(0n, 108);
+  assert.equal(invokeFileImport(f.input(19, [3n, 100n, 1n, 300n])), 0, 'an empty vector at the end of memory');
   // Totals beyond a Buffer: EOVERFLOW, before any request.
   const big = { ...f.input(19, [3n, 0n, 2n, 300n]), memoryBytes: MAX_U64, read: (address) => { const v = Buffer.alloc(16); v.writeBigUInt64LE(0n); v.writeBigUInt64LE(address === 0n ? 1n << 52n : 1n << 52n, 8); return v; } };
   const before = f.requests.length;
