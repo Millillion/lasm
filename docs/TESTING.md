@@ -1019,7 +1019,7 @@ measurement on Node 26 is the recorded floor).
 | `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **97.3 %** | 97 % |
 | `notices` | `notices.mjs` | 62.5 % | **91.5 %** | 91 % |
 | `dev` | `dev.mjs`, `dev-proxy.mjs`, `dev-build-worker.mjs`, `application-build-worker.mjs`, `browser/browser-dev.mjs`, `browser/static-server.mjs` | 29.2 % | **91 %** | 91 % |
-| `browser` | `browser/browser-build.mjs`, `browser/browser-package.mjs`, `browser/bundle.mjs`, `browser/loader.mjs`, `lasm-modules/app.mjs`, `lasm-modules/web.mjs`, `vite/index.mjs` | 26.1 % | **96.5 %** | 96 % |
+| `browser` | `browser/browser-build.mjs`, `browser/browser-package.mjs`, `browser/bundle.mjs`, `browser/loader.mjs`, `lasm-modules/app.mjs`, `lasm-modules/web.mjs`, `vite/index.mjs` | 26.1 % | **96.6 %** | 96 % |
 
 Every module is above 80 %; each threshold is its score rounded down. The link driver and the target links
 are tested with stand-in toolchains: `test/link-driver-pipeline.test.mjs`

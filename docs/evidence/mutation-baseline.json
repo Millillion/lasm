@@ -53,7 +53,7 @@
     },
     "browser": {
       "initial": 26.1,
-      "score": 96.5,
+      "score": 96.6,
       "mutants": 1813,
       "threshold": 96
     }
