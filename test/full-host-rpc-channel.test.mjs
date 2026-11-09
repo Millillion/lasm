@@ -224,6 +224,19 @@ test('the watch sees a new request at once, gives up after its window, then rest
   assert.equal(context.lasmFullWatch(slot, i32, 1), true);
 });
 
+test('nothing is watched while other threads make host calls too', () => {
+  const context = { ENVIRONMENT_IS_PTHREAD: false, Module: {}, performance };
+  runInNewContext(prelude, context);
+  const a = {}, b = {}, crowd = context.lasmFullCrowdMs;
+  assert.equal(context.lasmFullCrowded(a, 100), false);
+  assert.equal(context.lasmFullCrowded(a, 100.5), false);
+  // b, 0.5 ms after a: crowded until crowd ms after a's last call.
+  assert.equal(context.lasmFullCrowded(b, 101), true);
+  assert.equal(context.lasmFullCrowded(b, 100.5 + crowd - 0.1), true);
+  assert.equal(context.lasmFullCrowded(b, 100.5 + crowd + 0.1), false);
+  assert.equal(context.lasmFullCrowded(a, 100.5 + crowd + 0.2), true);
+});
+
 test('a thread calling JavaScript in a tight loop is served in order, and the event loop still runs (burst yields)', async () => {
   // A watch that never gives up: only the burst limit lets the timer run.
   let served = 0, timerFired = false;

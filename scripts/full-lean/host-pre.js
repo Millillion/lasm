@@ -224,7 +224,11 @@ if (!ENVIRONMENT_IS_PTHREAD) {
   // lasmFullSpinCooling calls, and serving without a break yields to the
   // event loop every lasmFullBurstMs (setImmediate), so timers, I/O and
   // promise reactions keep running while Lean calls JavaScript in a loop.
-  var lasmFullSpinMs = 0.02, lasmFullSpinCooling = 8, lasmFullBurstMs = 1;
+  // Nothing is watched while other threads make host calls too (one served in
+  // the last lasmFullCrowdMs): then this thread has other requests to serve,
+  // as under load, and a watch would only delay them.
+  var lasmFullSpinMs = 0.02, lasmFullSpinCooling = 8, lasmFullBurstMs = 1, lasmFullCrowdMs = 2;
+  var lasmFullLast = { slot: null, at: -Infinity, other: -Infinity };
   var lasmFullSpinnable = function (kind, operation, argument) {
     // Not: promise settlements (207), callback replies (208), the interop long
     // poll (209), and calls that settle a Lean promise later (flag 16): their
@@ -232,9 +236,17 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     return kind === 0 && operation >= 200 && operation <= 219 && operation !== 207 && operation !== 208 && operation !== 209
       && !((operation === 205 || operation === 214) && (argument & 16n));
   };
-  var lasmFullWatch = function (slot, i32, index) {
+  // Records that `slot` was served at `now`; whether another slot was served
+  // within lasmFullCrowdMs before.
+  var lasmFullCrowded = function (slot, now) {
+    const last = lasmFullLast;
+    if (last.slot !== slot) { last.other = last.at; last.slot = slot; }
+    last.at = now;
+    return now - last.other < lasmFullCrowdMs;
+  };
+  var lasmFullWatch = function (slot, i32, index, now = performance.now()) {
     if (slot.cooling > 0) { slot.cooling--; return false; }
-    const until = performance.now() + lasmFullSpinMs;
+    const until = now + lasmFullSpinMs;
     do { if (i32[index] !== slot.sequence) return true; } while (performance.now() < until);
     if (i32[index] !== slot.sequence) return true;
     slot.cooling = lasmFullSpinCooling;
@@ -253,8 +265,9 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       if (performance.now() - burst > lasmFullBurstMs) { setImmediate(() => lasmFullServe(slot)); return; }
       slot.sequence = sequence;
       const pending = lasmFullServeOne(slot);
+      const now = performance.now(), crowded = lasmFullCrowded(slot, now);
       if (pending) { pending.then(() => lasmFullServe(slot)); return; }
-      if (slot.spin) lasmFullWatch(slot, i32, index);
+      if (slot.spin && !crowded) lasmFullWatch(slot, i32, index, now);
     }
   };
   // Serve the pending requests of a Lean thread now, on this thread, while the

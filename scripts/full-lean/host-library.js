@@ -92,8 +92,11 @@ addToLibrary({
     doorbell: 0,
     hostWait: undefined,
     slotBytes: 104,
-    // How long a calling thread watches for its reply before it sleeps (ms).
+    // How long a calling thread watches for its reply before it sleeps (ms),
+    // and for how many calls it does not after a watch timed out.
     spinMs: 0.02,
+    spinRest: 16,
+    spinResting: 0,
     replyBytes: 65536,
     newSlot: function () {
       var slot = Number(_malloc(lasmFullRPC.slotBytes));
@@ -127,14 +130,23 @@ addToLibrary({
       // Lean thread waits.
       if (lasmFullRPC.hostWait === undefined) lasmFullRPC.hostWait = Module['_lasm_js_host_wait'] ?? null;
       var wait = lasmFullRPC.hostWait;
-      // Most replies come within microseconds (a synchronous JavaScript call):
-      // watch for one for up to spinMs before sleeping, which saves this
-      // thread's futex wake-up. Plain reads, so the spin is not part of the
-      // bridge's Atomics protocol (or its traces); the loop below confirms.
-      for (var k = 0, until = 0; HEAP32[(slot + 4) / 4] === 0; k++) {
-        if ((k & 31) !== 0) continue;
-        var now = performance.now();
-        if (!until) until = now + lasmFullRPC.spinMs; else if (now >= until) break;
+      // A synchronous Lasm.JS call (ops 200-219 but the interop long poll, 209)
+      // is usually answered within microseconds: watch for the reply for up to
+      // spinMs before sleeping, which saves this thread's futex wake-up. Plain
+      // reads, so the watch is not part of the bridge's Atomics protocol (or its
+      // traces); the loop below confirms. A watch that times out (Node's main
+      // thread is busy, as under load) is skipped for this thread's next
+      // spinRest calls, so a busy program does not spend its CPUs watching.
+      if (kind === 0 && operation >= 200 && operation <= 219 && operation !== 209) {
+        if (lasmFullRPC.spinResting > 0) lasmFullRPC.spinResting--;
+        else {
+          for (var k = 0, until = 0; HEAP32[(slot + 4) / 4] === 0; k++) {
+            if ((k & 31) !== 0) continue;
+            var now = performance.now();
+            if (!until) until = now + lasmFullRPC.spinMs;
+            else if (now >= until) { lasmFullRPC.spinResting = lasmFullRPC.spinRest; break; }
+          }
+        }
       }
       while (Atomics.load(HEAP32, (slot + 4) / 4) === 0) wait ? wait(BigInt(slot + 4)) : _emscripten_futex_wait(slot + 4, 0, Infinity);
       return HEAP32[(slot + 20) / 4];
