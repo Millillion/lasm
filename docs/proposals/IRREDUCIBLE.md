@@ -20,6 +20,7 @@ This proposal covers Jordan's direction of 2026-11-09, items 2 to 4:
 | --- | ---: | ---: | --- |
 | `src/` JavaScript | 140 | 20,480 | CLI, build (Lean → C → Wasm), link driver, Node host and bridge, edge/browser/WASI glue, function-platform shims, `lasm dev`, installer and tool cache |
 | `src/` C and `runtime/`, `native/` | 15 | 4,308 | WASI and Fastly C hosts (`src/wasi/*.c`), the edge Lasm.JS C side, the Node runtime additions (`runtime/node-*.cpp`, `edge.cpp`), the process launcher and signal helper |
+| 16 | **Pending Jordan's decision, not planned** ([REVIEW.md §1, MAJOR](../REVIEW.md#major-where-the-lasm-libraries-live-jordans-to-decide-later)). Split the libraries: keep bundled only what is tied to the compiler (`Lasm.JS`, a minimal `Lasm.Fetch` core with the WASI, Fastly and wasi-http C glue); the pure-Lean layers (`Lasm.Web`, `Lasm.UI`, `Lasm.RPC`, `Lasm.KV`, `Lasm.Fastly`, `Lasm.Fetch.Assets`) become separate opt-in Lake packages, or some are deleted | Jordan decided on 2026-11-09 that they stay under `Lasm` for now | A smaller CLI and trusted base; libraries versioned independently | Lake builds against the managed Lean; first-build time (prebuilt caching); new repositories need Jordan's OK. Not part of M1–M7 unless Jordan decides it |
 | `src/` JSON | 9 | 5,971 | pinned toolchains, link recipes (Emscripten 6.0.9, edge), native signatures, Lean init targets, SDK repairs |
 | `src/notices/` | 7 | 924 | third-party licence texts |
 | `library/Lasm/` | 62 | 11,310 | the `Lasm.*` libraries and their proofs |

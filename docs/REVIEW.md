@@ -13,6 +13,28 @@ decisions themselves are logged with their reasoning in
 
 ## 1. Decisions Claude made that Jordan may want to revisit
 
+### MAJOR: where the Lasm.* libraries live (Jordan's, to decide later)
+- [ ] **Major decision.** Today every `Lasm.*` library ships inside `@lasm/cli`
+  under the `Lasm` namespace, so there is nothing to install.
+  - **The option:** bundle only the code tied to the compiler, and move or
+    delete the rest.
+    - Bundled:
+      - `Lasm.JS`, whose externs and wire format are tied to the exact Lasm version;
+      - a minimal `Lasm.Fetch` core, with the WASI, Fastly and wasi-http C glue.
+    - Moved: the pure-Lean layers (`Lasm.Web`, `Lasm.UI`, `Lasm.RPC`,
+      `Lasm.KV`, `Lasm.Fastly`, `Lasm.Fetch.Assets`) become separate Lake
+      packages in their own repositories. They would be opt-in and versioned
+      independently, likely without the `Lasm.` prefix.
+    - Or some of them are deleted.
+  - **The costs:**
+    - Lake builds against Lasm's managed Lean.
+    - First-build time, because `library/prebuilt` caching no longer covers the moved packages.
+    - New repositories need your OK.
+  - **Status:** decided by you on 2026-11-09. They stay under `Lasm` for now,
+    and the decision is yours to make later. Removal 16 of
+    [proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md#3-ranked-removal-list)
+    waits on it.
+
 ### The testing strategy ([TESTING_STRATEGY.md §6](TESTING_STRATEGY.md#6-decisions))
 - [ ] 1. Evidence levels keep the names L0–L3, in the README's platform table.
 - [ ] 2. CI budgets, all on free runners, with no scheduled runs on Sunday:
