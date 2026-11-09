@@ -274,7 +274,6 @@ function packageJson(name, template, deploy = []) {
   if (templates[template].portable) Object.assign(pkg.scripts, {
     'dev:bun': templates[template].server ? 'bun x --bun lasm dev Main.lean' : 'bun x --bun lasm Main.lean --', 'build:bun': 'bun x --bun lasm build Main.lean --target bun', 'start:bun': 'bun bun/main.mjs',
     'build:deno': 'lasm build Main.lean --target deno', 'start:deno': 'deno run -A deno/main.mjs' });
-  else if (deploy.includes('deno-deploy')) pkg.scripts['start:deno'] = 'deno run -A deno/main.mjs';
   // Edge and portable builds import the npm modules Lean binds; the Node server stays out.
   if (template === 'hono') pkg.lasm = { edge: { exclude: ['@hono/node-server'] } };
   const dependencies = Object.assign({}, npm[template], ...deploy.map(target => deployTargets[target].dependencies));
@@ -625,8 +624,9 @@ See the [Cloud Functions guide](${guide('cloud-functions')}).
 };
 
 const fastlyName = directory => packageName(directory).replace(/[^a-z0-9_-]+/g, '-');
-// Spin component and application names: lowercase words joined by '-'.
-const spinName = name => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/^(?=[0-9])/, 'app-') || 'lean-app';
+// Spin component and application names: lowercase words joined by '-' (from
+// packageName, which always has a letter or digit).
+const spinName = name => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/^(?=[0-9])/, 'app-');
 
 /** Creates the project; returns { directory, files }. */
 export function initProject({ directory, template, deploy = [] }) {
@@ -669,7 +669,6 @@ export function initProject({ directory, template, deploy = [] }) {
     '.gitignore': deployGitignore(deploy, template, name),
   };
   if (deploy.includes('lambda')) files['Dockerfile.lambda'] = lambdaDockerfile();
-  if (templates[template].browser) delete files['Dockerfile'];
   if (deploy.includes('vercel')) files['vercel.json'] = vercelJson;
   if (deploy.includes('netlify')) { files['netlify.toml'] = netlifyToml; files['public/.gitkeep'] = ''; }
   if (deploy.includes('workers')) files['wrangler.toml'] = wranglerToml(name);
@@ -695,10 +694,10 @@ function writeFiles(target, name, files) {
  * and client modules; the client is built for the browser into
  * dist/public/client, which the Node server serves and Workers serves as
  * static assets. */
-function fullstackFiles(name, deploy = []) {
+function fullstackFiles(name, deploy) {
   const lasm = lasmPackage();
   const read = file => readFileSync(join(templateRoot, 'fullstack', file), 'utf8');
-  const worker = name.replace(/[^a-z0-9-]+/g, '-').slice(0, 54) || 'lean-app';
+  const worker = name.replace(/[^a-z0-9-]+/g, '-').slice(0, 54);
   return {
     'lean-toolchain': `leanprover/lean4:v${defaultLean()}\n`,
     'lakefile.toml': `name = "${lakeName(name)}"

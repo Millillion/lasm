@@ -65,7 +65,7 @@
       "name": "cli",
       "description": "The CLI: argument parsing, the command dispatcher and its errors, the launcher, build progress, output directories, editor setup, platform names",
       "mutate": ["src/cli-arguments.mjs", "src/posix-arguments.mjs", "src/application-cli.mjs", "src/launcher.mjs", "src/process-launcher.mjs", "src/elapsed-ticker.mjs", "src/elapsed-ticker-worker.mjs", "src/build-progress.mjs", "src/test-switches.mjs", "src/platform.mjs", "src/output-directory.mjs", "src/editor.mjs", "src/application-signals.mjs"],
-      "tests": ["test/cli-arguments.test.mjs", "test/cli-errors.test.mjs", "test/cli-error-messages.test.mjs", "test/fuzz-replay.test.mjs", "test/application-launcher.test.mjs", "test/process-launcher.test.mjs", "test/build-progress.test.mjs", "test/platform.test.mjs", "test/portable.test.mjs", "test/output-directory.test.mjs", "test/platform-output.test.mjs", "test/editor.test.mjs", "test/application-signals.test.mjs"]
+      "tests": ["test/cli-arguments.test.mjs", "test/cli-errors.test.mjs", "test/cli-error-messages.test.mjs", "test/fuzz-replay.test.mjs", "test/application-launcher.test.mjs", "test/build-progress.test.mjs", "test/platform.test.mjs", "test/portable.test.mjs", "test/output-directory.test.mjs", "test/platform-output.test.mjs", "test/editor.test.mjs", "test/cli-parse.test.mjs", "test/cli-dispatch.test.mjs", "test/cli-helpers.test.mjs", "test/editor-setup.test.mjs"]
     },
     {
       "name": "dev",
@@ -95,7 +95,7 @@
       "name": "init",
       "description": "lasm init and create-lasm: project templates and their files",
       "mutate": ["src/init.mjs"],
-      "tests": ["test/init.test.mjs", "test/create-lasm.test.mjs", "test/cli-error-messages.test.mjs", "test/notices.test.mjs", "test/wasi.test.mjs"]
+      "tests": ["test/init.test.mjs", "test/init-golden.test.mjs", "test/create-lasm.test.mjs", "test/cli-error-messages.test.mjs", "test/notices.test.mjs", "test/wasi.test.mjs"]
     },
     {
       "name": "edge-build",

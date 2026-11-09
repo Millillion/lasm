@@ -1,0 +1,11 @@
+[
+  ".gitignore",
+  "App.lean",
+  "Main.lean",
+  "README.md",
+  "index.html",
+  "lakefile.toml",
+  "lean-toolchain",
+  "package.json",
+  "public/style.css"
+]

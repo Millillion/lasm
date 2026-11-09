@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.lake/
+bun/
+deno/
+workers/
+.wrangler/
+.vercel/
+api/lasm.mjs
+api/_lasm/
+.netlify/
+netlify/lasm/
+netlify/edge-functions/lasm.mjs
+supabase/functions/edge-app/
+supabase/.temp/
+supabase/.branches/

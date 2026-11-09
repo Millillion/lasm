@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.lake/
+lambda.zip
+lambda-edge.zip
+.vercel/
+.netlify/
+netlify/functions/lasm/
+azure-functions/
+gcf/

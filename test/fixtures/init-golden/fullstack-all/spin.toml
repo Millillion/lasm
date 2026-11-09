@@ -1,0 +1,18 @@
+# Fermyon Spin (Lasm): npm run build:wasi-http writes wasi-http/main.wasm; spin up serves it.
+spin_manifest_version = 2
+
+[application]
+name = "app-1st-stack"
+version = "0.1.0"
+
+[[trigger.http]]
+route = "/..."
+component = "app-1st-stack"
+
+[component.app-1st-stack]
+source = "wasi-http/main.wasm"
+# Hosts Lasm.Fetch.fetch may reach, for example ["https://api.example.com"].
+allowed_outbound_hosts = []
+
+[component.app-1st-stack.build]
+command = "npm run build:wasi-http"

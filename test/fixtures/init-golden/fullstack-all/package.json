@@ -1,0 +1,33 @@
+{
+  "name": "1st-stack",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A full-stack Lean app (Lasm.RPC, Lasm.Fetch, Lasm.UI), compiled to WebAssembly by Lasm",
+  "scripts": {
+    "dev": "lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "lasm build Client.lean --target browser --output dist/public/client",
+    "build:server": "lasm build Server.lean --output dist/server",
+    "start": "node dist/server/main.mjs",
+    "build:workers": "npm run build:client && lasm build Server.lean --target workers",
+    "build:bun": "npm run build:client && lasm build Server.lean --target bun",
+    "start:bun": "bun bun/main.mjs",
+    "build:deno": "npm run build:client && lasm build Server.lean --target deno",
+    "start:deno": "deno run -A --unstable-kv deno/main.mjs",
+    "build:vercel-edge": "npm run build:client && lasm build Server.lean --target vercel-edge",
+    "build:netlify-edge": "npm run build:client && lasm build Server.lean --target netlify-edge",
+    "build:deno-deploy": "npm run build:client && lasm build Server.lean --target deno-deploy",
+    "build:fastly": "npm run build:client && lasm build Server.lean --target fastly",
+    "build:wasi-http": "npm run build:client && lasm build Server.lean --target wasi-http",
+    "start:fastly": "fastly compute serve",
+    "start:spin": "spin up",
+    "start:wasi-http": "wasmtime serve wasi-http/main.wasm"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@lasm/compiler": "<LASM_VERSION>"
+  }
+}

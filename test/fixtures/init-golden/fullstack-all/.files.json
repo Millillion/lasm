@@ -1,0 +1,19 @@
+[
+  ".gitignore",
+  "Client.lean",
+  "README.md",
+  "Server.lean",
+  "Shared.lean",
+  "View.lean",
+  "fastly.toml",
+  "lakefile.toml",
+  "lean-toolchain",
+  "netlify.toml",
+  "package.json",
+  "public/.gitkeep",
+  "public/lasm.txt",
+  "public/style.css",
+  "spin.toml",
+  "vercel.json",
+  "wrangler.toml"
+]
