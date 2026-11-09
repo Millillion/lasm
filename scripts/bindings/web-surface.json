@@ -1,0 +1,693 @@
+{
+  "generatedBy": "scripts/bindings/generate-web.mjs (@webref/idl 3.86.0)",
+  "surface": {
+    "EventTarget": {
+      "module": "Dom",
+      "static": [],
+      "prototype": [
+        "addEventListener",
+        "removeEventListener",
+        "dispatchEvent"
+      ]
+    },
+    "Event": {
+      "module": "Dom",
+      "static": [],
+      "prototype": [
+        "type",
+        "target",
+        "srcElement",
+        "currentTarget",
+        "composedPath",
+        "eventPhase",
+        "stopPropagation",
+        "cancelBubble",
+        "stopImmediatePropagation",
+        "bubbles",
+        "cancelable",
+        "returnValue",
+        "preventDefault",
+        "defaultPrevented",
+        "composed",
+        "isTrusted",
+        "timeStamp",
+        "initEvent"
+      ]
+    },
+    "CustomEvent": {
+      "module": "Dom",
+      "static": [],
+      "prototype": [
+        "detail",
+        "initCustomEvent"
+      ]
+    },
+    "AbortController": {
+      "module": "Dom",
+      "static": [],
+      "prototype": [
+        "signal",
+        "abort"
+      ]
+    },
+    "AbortSignal": {
+      "module": "Dom",
+      "static": [
+        "abort",
+        "timeout",
+        "any"
+      ],
+      "prototype": [
+        "aborted",
+        "reason",
+        "throwIfAborted",
+        "onabort"
+      ]
+    },
+    "DOMException": {
+      "module": "Dom",
+      "static": [],
+      "prototype": [
+        "name",
+        "message",
+        "code"
+      ]
+    },
+    "MessageChannel": {
+      "module": "Messaging",
+      "static": [],
+      "prototype": [
+        "port1",
+        "port2"
+      ]
+    },
+    "MessagePort": {
+      "module": "Messaging",
+      "static": [],
+      "prototype": [
+        "postMessage",
+        "start",
+        "close",
+        "onmessage",
+        "onmessageerror"
+      ]
+    },
+    "MessageEvent": {
+      "module": "Messaging",
+      "static": [],
+      "prototype": [
+        "data",
+        "origin",
+        "lastEventId",
+        "source",
+        "ports",
+        "initMessageEvent"
+      ]
+    },
+    "ErrorEvent": {
+      "module": "Messaging",
+      "static": [],
+      "prototype": [
+        "message",
+        "filename",
+        "lineno",
+        "colno",
+        "error"
+      ]
+    },
+    "PromiseRejectionEvent": {
+      "module": "Messaging",
+      "static": [],
+      "prototype": [
+        "promise",
+        "reason"
+      ]
+    },
+    "ReadableStream": {
+      "module": "Streams",
+      "static": [
+        "from"
+      ],
+      "prototype": [
+        "locked",
+        "cancel",
+        "getReader",
+        "pipeThrough",
+        "pipeTo",
+        "tee"
+      ]
+    },
+    "ReadableStreamDefaultReader": {
+      "module": "Streams",
+      "static": [],
+      "prototype": [
+        "read",
+        "releaseLock",
+        "closed",
+        "cancel"
+      ]
+    },
+    "ReadableStreamBYOBReader": {
+      "module": "Streams",
+      "static": [],
+      "prototype": [
+        "read",
+        "releaseLock",
+        "closed",
+        "cancel"
+      ]
+    },
+    "ReadableStreamDefaultController": {
+      "module": "Streams",
+      "static": [],
+      "prototype": [
+        "desiredSize",
+        "close",
+        "enqueue",
+        "error"
+      ]
+    },
+    "ReadableByteStreamController": {
+      "module": "Streams",
+      "static": [],
+      "prototype": [
+        "byobRequest",
+        "desiredSize",
+        "close",
+        "enqueue",
+        "error"
+      ]
+    },
+    "ReadableStreamBYOBRequest": {
+      "module": "Streams",
+      "static": [],
+      "prototype": [
+        "view",
+        "respond",
+        "respondWithNewView"
+      ]
+    },
+    "WritableStream": {
+      "module": "Streams",
+      "static": [],
+      "prototype": [
+        "locked",
+        "abort",
+        "close",
+        "getWriter"
+      ]
+    },
+    "WritableStreamDefaultWriter": {
+      "module": "Streams",
+      "static": [],
+      "prototype": [
+        "closed",
+        "desiredSize",
+        "ready",
+        "abort",
+        "close",
+        "releaseLock",
+        "write"
+      ]
+    },
+    "WritableStreamDefaultController": {
+      "module": "Streams",
+      "static": [],
+      "prototype": [
+        "signal",
+        "error"
+      ]
+    },
+    "TransformStream": {
+      "module": "Streams",
+      "static": [],
+      "prototype": [
+        "readable",
+        "writable"
+      ]
+    },
+    "TransformStreamDefaultController": {
+      "module": "Streams",
+      "static": [],
+      "prototype": [
+        "desiredSize",
+        "enqueue",
+        "error",
+        "terminate"
+      ]
+    },
+    "ByteLengthQueuingStrategy": {
+      "module": "Streams",
+      "static": [],
+      "prototype": [
+        "highWaterMark",
+        "size"
+      ]
+    },
+    "CountQueuingStrategy": {
+      "module": "Streams",
+      "static": [],
+      "prototype": [
+        "highWaterMark",
+        "size"
+      ]
+    },
+    "Blob": {
+      "module": "File",
+      "static": [],
+      "prototype": [
+        "size",
+        "type",
+        "slice",
+        "stream",
+        "text",
+        "arrayBuffer",
+        "textStream",
+        "bytes"
+      ]
+    },
+    "File": {
+      "module": "File",
+      "static": [],
+      "prototype": [
+        "name",
+        "lastModified"
+      ]
+    },
+    "TextEncoder": {
+      "module": "Encoding",
+      "static": [],
+      "prototype": [
+        "encode",
+        "encodeInto",
+        "encoding"
+      ]
+    },
+    "TextDecoder": {
+      "module": "Encoding",
+      "static": [],
+      "prototype": [
+        "decode",
+        "encoding",
+        "fatal",
+        "ignoreBOM"
+      ]
+    },
+    "TextEncoderStream": {
+      "module": "Encoding",
+      "static": [],
+      "prototype": [
+        "encoding",
+        "readable",
+        "writable"
+      ]
+    },
+    "TextDecoderStream": {
+      "module": "Encoding",
+      "static": [],
+      "prototype": [
+        "encoding",
+        "fatal",
+        "ignoreBOM",
+        "readable",
+        "writable"
+      ]
+    },
+    "CompressionStream": {
+      "module": "Compression",
+      "static": [],
+      "prototype": [
+        "readable",
+        "writable"
+      ]
+    },
+    "DecompressionStream": {
+      "module": "Compression",
+      "static": [],
+      "prototype": [
+        "readable",
+        "writable"
+      ]
+    },
+    "URL": {
+      "module": "Url",
+      "static": [
+        "createObjectURL",
+        "revokeObjectURL",
+        "parse",
+        "canParse"
+      ],
+      "prototype": [
+        "href",
+        "origin",
+        "protocol",
+        "username",
+        "password",
+        "host",
+        "hostname",
+        "port",
+        "pathname",
+        "search",
+        "searchParams",
+        "hash",
+        "toJSON"
+      ]
+    },
+    "URLSearchParams": {
+      "module": "Url",
+      "static": [],
+      "prototype": [
+        "size",
+        "append",
+        "delete",
+        "get",
+        "getAll",
+        "has",
+        "set",
+        "sort"
+      ]
+    },
+    "URLPattern": {
+      "module": "Url",
+      "static": [],
+      "prototype": [
+        "test",
+        "exec",
+        "protocol",
+        "username",
+        "password",
+        "hostname",
+        "port",
+        "pathname",
+        "search",
+        "hash",
+        "hasRegExpGroups"
+      ]
+    },
+    "Headers": {
+      "module": "Fetch",
+      "static": [],
+      "prototype": [
+        "append",
+        "delete",
+        "get",
+        "getSetCookie",
+        "has",
+        "set"
+      ]
+    },
+    "Request": {
+      "module": "Fetch",
+      "static": [],
+      "prototype": [
+        "method",
+        "url",
+        "headers",
+        "destination",
+        "referrer",
+        "referrerPolicy",
+        "mode",
+        "credentials",
+        "cache",
+        "redirect",
+        "integrity",
+        "keepalive",
+        "isReloadNavigation",
+        "isHistoryNavigation",
+        "signal",
+        "duplex",
+        "clone",
+        "body",
+        "bodyUsed",
+        "arrayBuffer",
+        "blob",
+        "bytes",
+        "formData",
+        "json",
+        "text",
+        "textStream"
+      ]
+    },
+    "Response": {
+      "module": "Fetch",
+      "static": [
+        "error",
+        "redirect",
+        "json"
+      ],
+      "prototype": [
+        "type",
+        "url",
+        "redirected",
+        "status",
+        "ok",
+        "statusText",
+        "headers",
+        "clone",
+        "body",
+        "bodyUsed",
+        "arrayBuffer",
+        "blob",
+        "bytes",
+        "formData",
+        "json",
+        "text",
+        "textStream"
+      ]
+    },
+    "FormData": {
+      "module": "Fetch",
+      "static": [],
+      "prototype": [
+        "append",
+        "delete",
+        "get",
+        "getAll",
+        "has",
+        "set"
+      ]
+    },
+    "fetch": {
+      "module": "Fetch",
+      "global": true
+    },
+    "Crypto": {
+      "module": "Crypto",
+      "static": [],
+      "prototype": [
+        "subtle",
+        "getRandomValues",
+        "randomUUID"
+      ]
+    },
+    "CryptoKey": {
+      "module": "Crypto",
+      "static": [],
+      "prototype": [
+        "type",
+        "extractable",
+        "algorithm",
+        "usages"
+      ]
+    },
+    "SubtleCrypto": {
+      "module": "Crypto",
+      "static": [],
+      "prototype": [
+        "encrypt",
+        "decrypt",
+        "sign",
+        "verify",
+        "digest",
+        "generateKey",
+        "deriveKey",
+        "deriveBits",
+        "importKey",
+        "exportKey",
+        "wrapKey",
+        "unwrapKey"
+      ]
+    },
+    "crypto": {
+      "module": "Crypto",
+      "global": true
+    },
+    "Performance": {
+      "module": "Performance",
+      "static": [],
+      "prototype": [
+        "now",
+        "timeOrigin",
+        "toJSON"
+      ]
+    },
+    "performance": {
+      "module": "Performance",
+      "global": true
+    },
+    "setTimeout": {
+      "module": "Timers",
+      "global": true
+    },
+    "clearTimeout": {
+      "module": "Timers",
+      "global": true
+    },
+    "setInterval": {
+      "module": "Timers",
+      "global": true
+    },
+    "clearInterval": {
+      "module": "Timers",
+      "global": true
+    },
+    "queueMicrotask": {
+      "module": "Timers",
+      "global": true
+    },
+    "Navigator": {
+      "module": "Global",
+      "static": [],
+      "prototype": [
+        "userAgent"
+      ]
+    },
+    "atob": {
+      "module": "Global",
+      "global": true
+    },
+    "btoa": {
+      "module": "Global",
+      "global": true
+    },
+    "structuredClone": {
+      "module": "Global",
+      "global": true
+    },
+    "reportError": {
+      "module": "Global",
+      "global": true
+    },
+    "navigator": {
+      "module": "Global",
+      "global": true
+    },
+    "console": {
+      "module": "Console",
+      "namespace": [
+        "assert",
+        "clear",
+        "debug",
+        "error",
+        "info",
+        "log",
+        "table",
+        "trace",
+        "warn",
+        "dir",
+        "dirxml",
+        "count",
+        "countReset",
+        "group",
+        "groupCollapsed",
+        "groupEnd",
+        "time",
+        "timeLog",
+        "timeEnd"
+      ]
+    },
+    "WebAssembly.Module": {
+      "module": "Wasm",
+      "static": [
+        "exports",
+        "imports",
+        "customSections"
+      ],
+      "prototype": []
+    },
+    "WebAssembly.Instance": {
+      "module": "Wasm",
+      "static": [],
+      "prototype": [
+        "exports"
+      ]
+    },
+    "WebAssembly.Memory": {
+      "module": "Wasm",
+      "static": [],
+      "prototype": [
+        "grow",
+        "toFixedLengthBuffer",
+        "toResizableBuffer",
+        "buffer"
+      ]
+    },
+    "WebAssembly.Table": {
+      "module": "Wasm",
+      "static": [],
+      "prototype": [
+        "grow",
+        "get",
+        "set",
+        "length"
+      ]
+    },
+    "WebAssembly.Global": {
+      "module": "Wasm",
+      "static": [],
+      "prototype": [
+        "valueOf",
+        "value"
+      ]
+    },
+    "WebAssembly.Tag": {
+      "module": "Wasm",
+      "static": [],
+      "prototype": []
+    },
+    "WebAssembly.Exception": {
+      "module": "Wasm",
+      "static": [],
+      "prototype": [
+        "getArg",
+        "is",
+        "stack"
+      ]
+    },
+    "WebAssembly.CompileError": {
+      "module": "Wasm",
+      "static": [],
+      "prototype": [
+        "name",
+        "message"
+      ]
+    },
+    "WebAssembly.LinkError": {
+      "module": "Wasm",
+      "static": [],
+      "prototype": [
+        "name",
+        "message"
+      ]
+    },
+    "WebAssembly.RuntimeError": {
+      "module": "Wasm",
+      "static": [],
+      "prototype": [
+        "name",
+        "message"
+      ]
+    },
+    "WebAssembly": {
+      "module": "Wasm",
+      "namespace": [
+        "validate",
+        "compile",
+        "instantiate",
+        "JSTag",
+        "compileStreaming",
+        "instantiateStreaming"
+      ]
+    }
+  }
+}

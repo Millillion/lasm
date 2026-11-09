@@ -1,0 +1,3 @@
+{
+  "$comment": "Checks of test/fixtures/js-web that fail on a target because of the runtime itself, never the binding, with the reason (scripts/bindings/test-web.mjs). A name ending in * matches every check it prefixes."
+}

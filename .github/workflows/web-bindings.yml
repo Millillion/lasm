@@ -1,0 +1,161 @@
+name: Standard bindings (Lasm.JS.Web)
+# Lasm.JS.Web, the WinterTC Minimum Common Web API generated from WebIDL
+# (docs/JS_BINDINGS.md, "Standard bindings"; docs/TESTING.md):
+#   - generated: the committed library/Lasm/JS/Web/*.lean are the output of
+#     scripts/bindings/generate-web.mjs for the pinned @webref/idl, and the WPT
+#     data of the conformance program is the pinned commit's;
+#   - conformance: a candidate packed from this commit and installed with npm
+#     builds test/fixtures/js-web for Node (26 and 24), Bun, Deno, Cloudflare
+#     Workers (workerd through wrangler dev, offline) and headless Chromium, and
+#     runs its property checks (WPT's URL and urlencoded data, Lean's UTF-8 as
+#     the encoder's oracle, published Web Crypto vectors, generated inputs)
+#     there. Deviations of a runtime itself are listed in known.json.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'library/Lasm/JS/**'
+      - 'library/prebuilt/**'
+      - 'scripts/bindings/**'
+      - 'test/fixtures/js-web/**'
+      - 'test/web-bindings.test.mjs'
+      - 'src/node-js.mjs'
+      - 'src/edge/**'
+      - 'src/lasm-library.mjs'
+      - 'package.json'
+      - '.github/workflows/web-bindings.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'library/Lasm/JS/**'
+      - 'library/prebuilt/**'
+      - 'scripts/bindings/**'
+      - 'test/fixtures/js-web/**'
+      - 'src/node-js.mjs'
+      - 'src/edge/**'
+      - 'src/lasm-library.mjs'
+      - '.github/workflows/web-bindings.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: web-bindings-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+env:
+  BUN_VERSION: 1.4.4
+  BUN_SHA256: bf8ccbfb2b0b80159e0f9a6d15c55317add8077534dbc6130a3edb52fccb395c
+  DENO_VERSION: 2.9.6
+  WRANGLER_VERSION: 4.152.0
+  PLAYWRIGHT: 1.63.0
+jobs:
+  generated:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: The generated bindings are the generator's output
+        run: node scripts/bindings/generate-web.mjs --check
+      - name: The WPT data is the pinned commit's
+        run: node scripts/bindings/wpt-data.mjs --check
+      - run: node --test test/web-bindings.test.mjs
+  pack:
+    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    # The retained runtime input is a draft release asset (needs contents: write to read).
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: ./.github/actions/process-guard
+      - name: Download the pinned retained runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - name: Pack
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: web-bindings-candidate
+          path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
+          retention-days: 3
+          if-no-files-found: error
+  conformance:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      # Node 24 (the oldest supported) runs Node's build; Node 26 runs everything else.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24.22.2
+          package-manager-cache: false
+      - run: echo "NODE24=$(command -v node)" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: Install the candidate as a user would
+        id: candidate
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: web-bindings-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: Bun, Deno and wrangler (workerd)
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T"
+          curl -fsSL --retry 3 -o "$T/bun.zip" "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-linux-x64.zip"
+          echo "$BUN_SHA256  $T/bun.zip" | sha256sum -c
+          unzip -q "$T/bun.zip" -d "$T"
+          npm install --prefix "$T" --no-audit --no-fund "deno@$DENO_VERSION" "wrangler@$WRANGLER_VERSION"
+          "$T/bun-linux-x64/bun" --version; "$T/node_modules/.bin/deno" --version; "$T/node_modules/.bin/wrangler" --version; "$NODE24" --version
+      - name: Pinned Playwright and Chromium, cached per version
+        timeout-minutes: 30
+        uses: ./.github/actions/playwright
+        with:
+          version: ${{ env.PLAYWRIGHT }}
+          browsers: chromium
+          cache-key: playwright-${{ env.PLAYWRIGHT }}-web-bindings-chromium-ubuntu-24.04
+      - name: Build and run the conformance program on every target
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node scripts/bindings/test-web.mjs --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-web" \
+            --targets node,node24,bun,deno,workers,browser-chromium --node24 "$NODE24" --bun "$T/bun-linux-x64/bun" \
+            --deno "$T/node_modules/.bin/deno" --wrangler "$T/node_modules/.bin/wrangler" --playwright .work/pw \
+            --report "$RUNNER_TEMP/js-web/report.json"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: web-bindings-conformance
+          path: |
+            ${{ runner.temp }}/js-web/*.txt
+            ${{ runner.temp }}/js-web/report.json
+          retention-days: 14
+          if-no-files-found: ignore
