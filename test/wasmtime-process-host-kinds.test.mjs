@@ -11,7 +11,7 @@ const { createWasmtimeProcessHost } = await import('../src/wasmtime-process-host
 const create = () => createWasmtimeProcessHost({ programName: '/owned/main.mjs', leanVersion: '4.35.0', args: [], helper: '/stand-in/host/instance.so' });
 const host = (operation, handle = 0, argument = 0n, mode = 'request') => ({ kind: 'host', operation, handle, argument, mode, byteBuffer: new ArrayBuffer(0), byteOffset: 0, byteLength: 0 });
 
-test('process host: file imports open the file host once, for the helper library', async () => {
+test('process host: file imports open the file host once, for the helper library', { skip: !(process.platform === 'linux' && process.arch === 'x64') && 'Linux x64 only' }, async () => {
   const closed = [];
   const call = fn => Object.assign(() => {}, { async: (...args) => { const done = args.pop(); setImmediate(() => done(null, fn(...args))); } });
   const koffi = standInKoffi({ helper: { openat: call(() => 0), fstat: call(() => 0) }, libc: { read: call(() => 0), lseek: call(() => 0n), close: call(fd => { closed.push(fd); return 0; }) } });

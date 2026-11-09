@@ -7,6 +7,8 @@ import assert from 'node:assert/strict';
 import { installStandIns, standInKoffi } from './fixtures/wasmtime-stand-ins/index.mjs';
 
 installStandIns();
+// The file host is the Linux x64 supervisor's (it checks the platform first).
+const linuxX64 = process.platform === 'linux' && process.arch === 'x64';
 const { createWasmtimeFileHost } = await import('../src/wasmtime-file-host.mjs');
 const errnos = { EBADF: 9, ENOENT: 2, EACCES: 13, EINVAL: 22, EISDIR: 21, ENOTDIR: 20 };
 
@@ -46,7 +48,7 @@ function nativeFiles(files) {
   return { koffi, calls, open };
 }
 
-test('file host: opens, reads, seeks, stats and closes guest descriptors on native ones', async () => {
+test('file host: opens, reads, seeks, stats and closes guest descriptors on native ones', { skip: !linuxX64 && 'Linux x64 only' }, async () => {
   const native = nativeFiles({ '/data/a.txt': Buffer.from('hello world'), 'rel.txt': Buffer.from('relative') });
   const host = createWasmtimeFileHost('/stand-in/host/instance.so');
   assert.deepEqual(native.koffi.loaded, ['/stand-in/host/instance.so']);
@@ -81,7 +83,7 @@ test('file host: opens, reads, seeks, stats and closes guest descriptors on nati
   assert.deepEqual(await host.request({ operation: 'openat', directory: -100, path: Buffer.from('/data/a.txt'), flags: 0, mode: 0 }), { errno: 0, fd: 3 });
 });
 
-test('file host: native errors become WASI errno numbers; anything else is thrown', async () => {
+test('file host: native errors become WASI errno numbers; anything else is thrown', { skip: !linuxX64 && 'Linux x64 only' }, async () => {
   const native = nativeFiles({ '/f': Buffer.from('x') });
   const host = createWasmtimeFileHost('/h.so');
   assert.deepEqual(await host.request({ operation: 'openat', directory: -100, path: Buffer.from('/missing'), flags: 0, mode: 0 }), { errno: 44 }, 'ENOENT');
@@ -100,7 +102,7 @@ test('file host: native errors become WASI errno numbers; anything else is throw
   assert.deepEqual(await host.request({ operation: 'close', fd }), { errno: 8 });
 });
 
-test('file host: only on Linux x64', () => {
+test('file host: only on Linux x64', { skip: !linuxX64 && 'Linux x64 only' }, () => {
   nativeFiles({});
   const original = Object.getOwnPropertyDescriptor(process, 'arch');
   Object.defineProperty(process, 'arch', { value: 'arm64' });

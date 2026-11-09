@@ -601,7 +601,8 @@ async function runDiagnosticThread(d, { code = 0 } = {}) {
   const done = await waiting.reply();
   assert.equal(Buffer.from(done.byteBuffer, done.byteOffset, done.byteLength).toString(), 'ready!!!');
   assert.deepEqual(await rpc(worker, { ...hostPacket(0, Buffer.alloc(0), 'release'), handle: 99 }).reply(), {});
-  assert.deepEqual(await rpc(worker, { kind: 'file-import', operation: 'close', fd: 77 }).reply(), { errno: 8 });
+  // File imports use the supervisor's file host, which is Linux x64's.
+  if (process.platform === 'linux' && process.arch === 'x64') assert.deepEqual(await rpc(worker, { kind: 'file-import', operation: 'close', fd: 77 }).reply(), { errno: 8 });
   worker.emit('message', { kind: 'thread-result', pthread: '12288', result: '0' });
   worker.emit('message', { kind: 'cleanup', pthread: 0x3000n });
   worker.emit('exit', 0);

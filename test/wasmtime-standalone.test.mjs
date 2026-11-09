@@ -16,6 +16,8 @@ import { hashWasmtimeFile, wasmtimeCpuTarget } from '../src/wasmtime-artifact.mj
 import { encodeFileMessage, decodeFileMessage } from '../src/native-file-message.mjs';
 
 installStandIns();
+// The standalone backend is Linux x64 only (its own check is tested on every platform).
+const linuxX64 = process.platform === 'linux' && process.arch === 'x64';
 // The supervisor resets SIGUSR1 only when nothing listens to it.
 const keepSignal = () => {};
 process.on('SIGUSR1', keepSignal);
@@ -59,7 +61,7 @@ function hostRequest(worker, request, sender = 1n) {
 }
 const packet = (operation, handle = 0, argument = 0n) => ({ kind: 'host', mode: 'request', operation, handle, argument, byteBuffer: new ArrayBuffer(0), byteOffset: 0, byteLength: 0 });
 
-test('standalone: verifies the application, starts the runtime root and serves its host requests', async t => {
+test('standalone: verifies the application, starts the runtime root and serves its host requests', { skip: !linuxX64 && 'Linux x64 only' }, async t => {
   const s = await supervise(t);
   const { worker, app } = s;
   assert.match(worker.url, /\/src\/wasmtime-worker\.mjs$/);
@@ -101,7 +103,7 @@ test('standalone: verifies the application, starts the runtime root and serves i
   assert.deepEqual(s.exits, [-1]);
 });
 
-test('standalone: a forced exit skips the flush and still exits with the code', async t => {
+test('standalone: a forced exit skips the flush and still exits with the code', { skip: !linuxX64 && 'Linux x64 only' }, async t => {
   const s = await supervise(t, { args: [] });
   s.worker.emit('message', { kind: 'application-exit', code: 2, force: true });
   await until(() => s.exits.length);
@@ -109,7 +111,7 @@ test('standalone: a forced exit skips the flush and still exits with the code', 
   assert.deepEqual(s.worker.options.workerData.options.args, []);
 });
 
-test('standalone: failures exit with status 1', async t => {
+test('standalone: failures exit with status 1', { skip: !linuxX64 && 'Linux x64 only' }, async t => {
   for (const provoke of [
     w => w.emit('message', { kind: 'diagnostic-failure', result: { failure: 'runtime root failed' } }),
     w => w.emit('message', { kind: 'other' }),
@@ -138,6 +140,7 @@ test('standalone: only on the main thread of Linux x64, and only a verified appl
       await assert.rejects(main.runWasmtimeApplication(app.entrypoint, []), /requires Linux x64/);
     } finally { Object.defineProperty(process, property, original); }
   }
+  if (!linuxX64) return;
   const changed = await application(t, manifest => { manifest.leanVersion = 'main'; });
   FakeWorker.started.length = 0;
   const main = await importWithThread('wasmtime-standalone.mjs', { isMainThread: true });
