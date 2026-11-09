@@ -140,10 +140,14 @@ def MessageChannel.new : IO MessageChannel :=
     (Support.args #[]) (await := false)
 
 /-- `readonly attribute MessagePort port1` -/
-def MessageChannel.port1 (self : MessageChannel) : IO MessagePort := self.val.get "port1" MessagePort
+def MessageChannel.port1 (self : MessageChannel) : IO MessagePort := do
+  let r ← self.val.get "port1" Value
+  pure { val := r }
 
 /-- `readonly attribute MessagePort port2` -/
-def MessageChannel.port2 (self : MessageChannel) : IO MessagePort := self.val.get "port2" MessagePort
+def MessageChannel.port2 (self : MessageChannel) : IO MessagePort := do
+  let r ← self.val.get "port2" Value
+  pure { val := r }
 
 /-- `attribute EventHandler onmessage` -/
 def MessagePort.onmessage (self : MessagePort) : IO (Option EventHandlerNonNull) := self.val.get "onmessage" (Option EventHandlerNonNull)

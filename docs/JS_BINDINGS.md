@@ -394,6 +394,55 @@ runtime lacks. Not generated: `globalThis` and `self` (use `Lasm.JS.global`),
 and the global `onerror`, `onunhandledrejection` and `onrejectionhandled`
 handlers (the global object is an `EventTarget` only in browsers).
 
+### Where each member exists (measured)
+
+The conformance run (below) also looks up every generated member on each
+runtime. On 2026-11-09 (`web-bindings.yml` run 42586336122: Node 26.13.0 and
+24.22.2, Bun 1.4.4, Deno 2.9.6, workerd from wrangler 4.152.0, Chromium of
+Playwright 1.63.0) every interface, global and namespace member existed
+everywhere except these. "Not on the prototype" can also mean the runtime
+defines the attribute on each instance instead (workerd does for `CryptoKey`,
+`DOMException.code`, `MessageEvent` and `Request`; those calls work there).
+
+| Member | Missing, or not on the prototype |
+| --- | --- |
+| `PromiseRejectionEvent` | Node 26 and 24, Bun (workerd's cannot be constructed) |
+| `ErrorEvent` | Node 24 |
+| `reportError` | Node 26 and 24 |
+| `Navigator` (the interface; `navigator.userAgent` works) | Bun |
+| `ReadableStream.from` | Chromium |
+| `Request.textStream`, `Response.textStream` | Node 24, Workers |
+| `Blob.textStream` | Bun, Workers |
+| `WebAssembly.Memory` `toFixedLengthBuffer`, `toResizableBuffer` | Node 24 |
+| `WebAssembly.compileStreaming`, `instantiateStreaming` | Workers |
+| `Request` `duplex`, `isHistoryNavigation`, `isReloadNavigation` | Bun, Deno, Workers |
+| `Request.destination` | Deno, Workers |
+| `Request.keepalive`, `Performance.now` (on the prototype) | Bun |
+| `Event.initEvent`, `CustomEvent.initCustomEvent`, `MessageEvent.initMessageEvent` (legacy) | Deno, Workers; `initCustomEvent` also Node |
+| `MessageChannel` `port1`, `port2` (on the prototype) | Node, Workers |
+
+Workers also forbid compiling WebAssembly at run time and do not implement
+`URL.createObjectURL`. The runtimes' own deviations from the specs that the
+checks found are listed, with reasons, in
+[`test/fixtures/js-web/known.json`](../test/fixtures/js-web/known.json)
+(Deno's, Bun's and Chromium's URL parsers on some WPT cases, Bun's header order
+and content types, workerd's urlencoded form decoding).
+
+### Cost
+
+- **Wasm size: nothing for what is not called.** The same program through
+  `Lasm.JS.Web` (all of it imported) and through `Lasm.JS` alone: 684,604 and
+  739,253 bytes of Wasm on Node, 554,125 and 554,601 on the edge runtime
+  (`--target deno`); the linker drops unused bindings.
+- **Build time: about 3 to 8 seconds more** for a new project with warm tools
+  (Lean loads and the link sees 16 more modules): Node 12.4 → 15.6 s and
+  19.2 → 26.4 s, the edge runtime 8.6 → 12.9 s and 14.0 → 22.4 s on two CI
+  runs. Importing only the modules a program uses (`Lasm.JS.Web.Url`) costs less.
+- **Package size:** the compiled library (`library/prebuilt`) grows from 41.0
+  to 60.9 MB (14.3 MB of `.olean` files, 5.3 MB of generated C), 4.4 MB
+  compressed: about 5 % of the installed `@lasm/cli` (430 MB for 0.5.1). First builds copy it as
+  before; nothing is compiled on the user's machine.
+
 ### How a WebIDL declaration becomes Lean
 
 | WebIDL | Lean |

@@ -575,7 +575,9 @@ instance : ToJS Pbkdf2Params := ⟨fun d => Support.fields #[("name", toJS d.nam
     ("hash", toJS d.hash)]⟩
 
 /-- `readonly attribute SubtleCrypto subtle` -/
-def Crypto.subtle (self : Crypto) : IO SubtleCrypto := self.val.get "subtle" SubtleCrypto
+def Crypto.subtle (self : Crypto) : IO SubtleCrypto := do
+  let r ← self.val.get "subtle" Value
+  pure { val := r }
 
 /-- `ArrayBufferView getRandomValues(ArrayBufferView array)` -/
 def Crypto.getRandomValues (self : Crypto) (array : ByteArray) : IO ByteArray :=
@@ -626,8 +628,9 @@ def SubtleCrypto.generateKey (self : SubtleCrypto) (algorithm : AlgorithmIdentif
   self.val.callMethodAwait "generateKey" (Support.args #[toJS algorithm, toJS extractable, toJS keyUsages]) CryptoKeyOrCryptoKeyPair
 
 /-- `Promise<CryptoKey> deriveKey(AlgorithmIdentifier algorithm, CryptoKey baseKey, AlgorithmIdentifier derivedKeyType, boolean extractable, sequence<KeyUsage> keyUsages)` -/
-def SubtleCrypto.deriveKey (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (baseKey : CryptoKey) (derivedKeyType : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey :=
-  self.val.callMethodAwait "deriveKey" (Support.args #[toJS algorithm, toJS baseKey, toJS derivedKeyType, toJS extractable, toJS keyUsages]) CryptoKey
+def SubtleCrypto.deriveKey (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (baseKey : CryptoKey) (derivedKeyType : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey := do
+  let r ← self.val.callMethodAwait "deriveKey" (Support.args #[toJS algorithm, toJS baseKey, toJS derivedKeyType, toJS extractable, toJS keyUsages]) Value
+  pure { val := r }
 
 /-- `Promise<ArrayBuffer> deriveBits(AlgorithmIdentifier algorithm, CryptoKey baseKey, optional unsigned long? length)` -/
 def SubtleCrypto.deriveBits (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (baseKey : CryptoKey) (length : Option Nat := none) : Async ByteArray := do
@@ -635,8 +638,9 @@ def SubtleCrypto.deriveBits (self : SubtleCrypto) (algorithm : AlgorithmIdentifi
   Support.arrayBufferBytes r
 
 /-- `Promise<CryptoKey> importKey(KeyFormat format, (BufferSource or JsonWebKey) keyData, AlgorithmIdentifier algorithm, boolean extractable, sequence<KeyUsage> keyUsages)` -/
-def SubtleCrypto.importKey (self : SubtleCrypto) (format : KeyFormat) (keyData : BufferSourceOrJsonWebKey) (algorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey :=
-  self.val.callMethodAwait "importKey" (Support.args #[toJS format, toJS keyData, toJS algorithm, toJS extractable, toJS keyUsages]) CryptoKey
+def SubtleCrypto.importKey (self : SubtleCrypto) (format : KeyFormat) (keyData : BufferSourceOrJsonWebKey) (algorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey := do
+  let r ← self.val.callMethodAwait "importKey" (Support.args #[toJS format, toJS keyData, toJS algorithm, toJS extractable, toJS keyUsages]) Value
+  pure { val := r }
 
 /-- `Promise<(ArrayBuffer or JsonWebKey)> exportKey(KeyFormat format, CryptoKey key)` -/
 def SubtleCrypto.exportKey (self : SubtleCrypto) (format : KeyFormat) (key : CryptoKey) : Async ArrayBufferOrJsonWebKey := do
@@ -649,10 +653,13 @@ def SubtleCrypto.wrapKey (self : SubtleCrypto) (format : KeyFormat) (key : Crypt
   Support.arrayBufferBytes r
 
 /-- `Promise<CryptoKey> unwrapKey(KeyFormat format, BufferSource wrappedKey, CryptoKey unwrappingKey, AlgorithmIdentifier unwrapAlgorithm, AlgorithmIdentifier unwrappedKeyAlgorithm, boolean extractable, sequence<KeyUsage> keyUsages)` -/
-def SubtleCrypto.unwrapKey (self : SubtleCrypto) (format : KeyFormat) (wrappedKey : ByteArray) (unwrappingKey : CryptoKey) (unwrapAlgorithm : AlgorithmIdentifier) (unwrappedKeyAlgorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey :=
-  self.val.callMethodAwait "unwrapKey" (Support.args #[toJS format, toJS wrappedKey, toJS unwrappingKey, toJS unwrapAlgorithm, toJS unwrappedKeyAlgorithm, toJS extractable, toJS keyUsages]) CryptoKey
+def SubtleCrypto.unwrapKey (self : SubtleCrypto) (format : KeyFormat) (wrappedKey : ByteArray) (unwrappingKey : CryptoKey) (unwrapAlgorithm : AlgorithmIdentifier) (unwrappedKeyAlgorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey := do
+  let r ← self.val.callMethodAwait "unwrapKey" (Support.args #[toJS format, toJS wrappedKey, toJS unwrappingKey, toJS unwrapAlgorithm, toJS unwrappedKeyAlgorithm, toJS extractable, toJS keyUsages]) Value
+  pure { val := r }
 
 /-- `readonly attribute Crypto crypto` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)) -/
-def crypto : IO Crypto := Support.getGlobal ["crypto"] Crypto
+def crypto : IO Crypto := do
+  let r ← Support.getGlobal ["crypto"] Value
+  pure { val := r }
 
 end Lasm.JS.Web

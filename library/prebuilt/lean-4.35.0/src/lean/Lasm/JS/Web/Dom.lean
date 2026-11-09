@@ -269,7 +269,9 @@ def AbortController.new : IO AbortController :=
     (Support.args #[]) (await := false)
 
 /-- `readonly attribute AbortSignal signal` -/
-def AbortController.signal (self : AbortController) : IO AbortSignal := self.val.get "signal" AbortSignal
+def AbortController.signal (self : AbortController) : IO AbortSignal := do
+  let r ← self.val.get "signal" Value
+  pure { val := r }
 
 /-- `undefined abort(optional any reason)` -/
 def AbortController.abort (self : AbortController) (reason : Data := .undefined) : IO Unit :=
@@ -289,19 +291,22 @@ def AbortSignal.setOnabort (self : AbortSignal) (value : Option EventHandlerNonN
   self.val.set "onabort" (toJS value)
 
 /-- `static AbortSignal abort(optional any reason)` -/
-def AbortSignal.abort (reason : Data := .undefined) : IO AbortSignal :=
-  Lasm.JS.Binding.invoke AbortSignal { name := "Lasm.JS.Web.AbortSignal.abort", module := "globalThis", path := "AbortSignal.abort", construct := false, arity := 1 }
+def AbortSignal.abort (reason : Data := .undefined) : IO AbortSignal := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.AbortSignal.abort", module := "globalThis", path := "AbortSignal.abort", construct := false, arity := 1 }
     (Support.args #[reason]) (await := false)
+  pure { val := r }
 
 /-- `static AbortSignal timeout(unsigned long long milliseconds)` -/
-def AbortSignal.timeout (milliseconds : Nat) : IO AbortSignal :=
-  Lasm.JS.Binding.invoke AbortSignal { name := "Lasm.JS.Web.AbortSignal.timeout", module := "globalThis", path := "AbortSignal.timeout", construct := false, arity := 1 }
+def AbortSignal.timeout (milliseconds : Nat) : IO AbortSignal := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.AbortSignal.timeout", module := "globalThis", path := "AbortSignal.timeout", construct := false, arity := 1 }
     (Support.args #[toJS milliseconds]) (await := false)
+  pure { val := r }
 
 /-- `static AbortSignal any(sequence<AbortSignal> signals)` -/
-def AbortSignal.any (signals : Array AbortSignal) : IO AbortSignal :=
-  Lasm.JS.Binding.invoke AbortSignal { name := "Lasm.JS.Web.AbortSignal.any", module := "globalThis", path := "AbortSignal.any", construct := false, arity := 1 }
+def AbortSignal.any (signals : Array AbortSignal) : IO AbortSignal := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.AbortSignal.any", module := "globalThis", path := "AbortSignal.any", construct := false, arity := 1 }
     (Support.args #[toJS signals]) (await := false)
+  pure { val := r }
 
 /-- `undefined throwIfAborted()` -/
 def AbortSignal.throwIfAborted (self : AbortSignal) : IO Unit :=

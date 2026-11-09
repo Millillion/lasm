@@ -113,10 +113,14 @@ def TextEncoderStream.new : IO TextEncoderStream :=
 def TextEncoderStream.encoding (self : TextEncoderStream) : IO String := self.val.get "encoding" String
 
 /-- `readonly attribute ReadableStream readable` -/
-def TextEncoderStream.readable (self : TextEncoderStream) : IO ReadableStream := self.val.get "readable" ReadableStream
+def TextEncoderStream.readable (self : TextEncoderStream) : IO ReadableStream := do
+  let r ← self.val.get "readable" Value
+  pure { val := r }
 
 /-- `readonly attribute WritableStream writable` -/
-def TextEncoderStream.writable (self : TextEncoderStream) : IO WritableStream := self.val.get "writable" WritableStream
+def TextEncoderStream.writable (self : TextEncoderStream) : IO WritableStream := do
+  let r ← self.val.get "writable" Value
+  pure { val := r }
 
 /-- `constructor(optional DOMString label, optional TextDecoderOptions options)` -/
 def TextDecoderStream.new (label : Option String := none) (options : Option TextDecoderOptions := none) : IO TextDecoderStream :=
@@ -133,9 +137,13 @@ def TextDecoderStream.fatal (self : TextDecoderStream) : IO Bool := self.val.get
 def TextDecoderStream.ignoreBOM (self : TextDecoderStream) : IO Bool := self.val.get "ignoreBOM" Bool
 
 /-- `readonly attribute ReadableStream readable` -/
-def TextDecoderStream.readable (self : TextDecoderStream) : IO ReadableStream := self.val.get "readable" ReadableStream
+def TextDecoderStream.readable (self : TextDecoderStream) : IO ReadableStream := do
+  let r ← self.val.get "readable" Value
+  pure { val := r }
 
 /-- `readonly attribute WritableStream writable` -/
-def TextDecoderStream.writable (self : TextDecoderStream) : IO WritableStream := self.val.get "writable" WritableStream
+def TextDecoderStream.writable (self : TextDecoderStream) : IO WritableStream := do
+  let r ← self.val.get "writable" Value
+  pure { val := r }
 
 end Lasm.JS.Web

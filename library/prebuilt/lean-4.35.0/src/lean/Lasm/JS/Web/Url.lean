@@ -242,7 +242,9 @@ def URL.setSearch (self : URL) (value : String) : IO Unit :=
   self.val.set "search" (toJS value)
 
 /-- `readonly attribute URLSearchParams searchParams` -/
-def URL.searchParams (self : URL) : IO URLSearchParams := self.val.get "searchParams" URLSearchParams
+def URL.searchParams (self : URL) : IO URLSearchParams := do
+  let r ← self.val.get "searchParams" Value
+  pure { val := r }
 
 /-- `attribute USVString hash` -/
 def URL.hash (self : URL) : IO String := self.val.get "hash" String
@@ -368,7 +370,8 @@ def URLPattern.test (self : URLPattern) (input : Option URLPatternInput := none)
   self.val.callMethod "test" (Support.args #[Support.optional input, Support.optional baseURL]) Bool
 
 /-- `URLPatternResult? exec(optional URLPatternInput input, optional USVString baseURL)` -/
-def URLPattern.exec (self : URLPattern) (input : Option URLPatternInput := none) (baseURL : Option String := none) : IO (Option URLPatternResult) :=
-  self.val.callMethod "exec" (Support.args #[Support.optional input, Support.optional baseURL]) (Option URLPatternResult)
+def URLPattern.exec (self : URLPattern) (input : Option URLPatternInput := none) (baseURL : Option String := none) : IO (Option URLPatternResult) := do
+  let r ← self.val.callMethod "exec" (Support.args #[Support.optional input, Support.optional baseURL]) Value
+  Support.cloneAs (Option URLPatternResult) r
 
 end Lasm.JS.Web

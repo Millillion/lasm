@@ -523,7 +523,9 @@ def Request.method (self : Request) : IO String := self.val.get "method" String
 def Request.url (self : Request) : IO String := self.val.get "url" String
 
 /-- `readonly attribute Headers headers` -/
-def Request.headers (self : Request) : IO Headers := self.val.get "headers" Headers
+def Request.headers (self : Request) : IO Headers := do
+  let r ← self.val.get "headers" Value
+  pure { val := r }
 
 /-- `readonly attribute RequestDestination destination` -/
 def Request.destination (self : Request) : IO RequestDestination := self.val.get "destination" RequestDestination
@@ -559,7 +561,9 @@ def Request.isReloadNavigation (self : Request) : IO Bool := self.val.get "isRel
 def Request.isHistoryNavigation (self : Request) : IO Bool := self.val.get "isHistoryNavigation" Bool
 
 /-- `readonly attribute AbortSignal signal` -/
-def Request.signal (self : Request) : IO AbortSignal := self.val.get "signal" AbortSignal
+def Request.signal (self : Request) : IO AbortSignal := do
+  let r ← self.val.get "signal" Value
+  pure { val := r }
 
 /-- `readonly attribute RequestDuplex duplex` -/
 def Request.duplex (self : Request) : IO RequestDuplex := self.val.get "duplex" RequestDuplex
@@ -571,8 +575,9 @@ def Request.body (self : Request) : IO (Option ReadableStream) := self.val.get "
 def Request.bodyUsed (self : Request) : IO Bool := self.val.get "bodyUsed" Bool
 
 /-- `Request clone()` -/
-def Request.clone (self : Request) : IO Request :=
-  self.val.callMethod "clone" (Support.args #[]) Request
+def Request.clone (self : Request) : IO Request := do
+  let r ← self.val.callMethod "clone" (Support.args #[]) Value
+  pure { val := r }
 
 /-- `Promise<ArrayBuffer> arrayBuffer()` -/
 def Request.arrayBuffer (self : Request) : Async ByteArray := do
@@ -580,16 +585,18 @@ def Request.arrayBuffer (self : Request) : Async ByteArray := do
   Support.arrayBufferBytes r
 
 /-- `Promise<Blob> blob()` -/
-def Request.blob (self : Request) : Async Blob :=
-  self.val.callMethodAwait "blob" (Support.args #[]) Blob
+def Request.blob (self : Request) : Async Blob := do
+  let r ← self.val.callMethodAwait "blob" (Support.args #[]) Value
+  pure { val := r }
 
 /-- `Promise<Uint8Array> bytes()` -/
 def Request.bytes (self : Request) : Async ByteArray :=
   self.val.callMethodAwait "bytes" (Support.args #[]) ByteArray
 
 /-- `Promise<FormData> formData()` -/
-def Request.formData (self : Request) : Async FormData :=
-  self.val.callMethodAwait "formData" (Support.args #[]) FormData
+def Request.formData (self : Request) : Async FormData := do
+  let r ← self.val.callMethodAwait "formData" (Support.args #[]) Value
+  pure { val := r }
 
 /-- `Promise<any> json()` -/
 def Request.json (self : Request) : Async Data :=
@@ -600,8 +607,9 @@ def Request.text (self : Request) : Async String :=
   self.val.callMethodAwait "text" (Support.args #[]) String
 
 /-- `ReadableStream textStream()` -/
-def Request.textStream (self : Request) : IO ReadableStream :=
-  self.val.callMethod "textStream" (Support.args #[]) ReadableStream
+def Request.textStream (self : Request) : IO ReadableStream := do
+  let r ← self.val.callMethod "textStream" (Support.args #[]) Value
+  pure { val := r }
 
 /-- `constructor(optional BodyInit? body, optional ResponseInit init)` -/
 def Response.new (body : Option BodyInit := none) (init : Option ResponseInit := none) : IO Response :=
@@ -627,7 +635,9 @@ def Response.ok (self : Response) : IO Bool := self.val.get "ok" Bool
 def Response.statusText (self : Response) : IO String := self.val.get "statusText" String
 
 /-- `readonly attribute Headers headers` -/
-def Response.headers (self : Response) : IO Headers := self.val.get "headers" Headers
+def Response.headers (self : Response) : IO Headers := do
+  let r ← self.val.get "headers" Value
+  pure { val := r }
 
 /-- `readonly attribute ReadableStream? body` -/
 def Response.body (self : Response) : IO (Option ReadableStream) := self.val.get "body" (Option ReadableStream)
@@ -636,23 +646,27 @@ def Response.body (self : Response) : IO (Option ReadableStream) := self.val.get
 def Response.bodyUsed (self : Response) : IO Bool := self.val.get "bodyUsed" Bool
 
 /-- `static Response error()` -/
-def Response.error : IO Response :=
-  Lasm.JS.Binding.invoke Response { name := "Lasm.JS.Web.Response.error", module := "globalThis", path := "Response.error", construct := false, arity := 0 }
+def Response.error : IO Response := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Response.error", module := "globalThis", path := "Response.error", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
+  pure { val := r }
 
 /-- `static Response redirect(USVString url, optional unsigned short status)` -/
-def Response.redirect (url : String) (status : Option Nat := none) : IO Response :=
-  Lasm.JS.Binding.invoke Response { name := "Lasm.JS.Web.Response.redirect", module := "globalThis", path := "Response.redirect", construct := false, arity := 2 }
+def Response.redirect (url : String) (status : Option Nat := none) : IO Response := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Response.redirect", module := "globalThis", path := "Response.redirect", construct := false, arity := 2 }
     (Support.args #[toJS url, Support.optional status]) (await := false)
+  pure { val := r }
 
 /-- `static Response json(any data, optional ResponseInit init)` -/
-def Response.staticJson (data : Data) (init : Option ResponseInit := none) : IO Response :=
-  Lasm.JS.Binding.invoke Response { name := "Lasm.JS.Web.Response.staticJson", module := "globalThis", path := "Response.json", construct := false, arity := 2 }
+def Response.staticJson (data : Data) (init : Option ResponseInit := none) : IO Response := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Response.staticJson", module := "globalThis", path := "Response.json", construct := false, arity := 2 }
     (Support.args #[toJS data, Support.optional init]) (await := false)
+  pure { val := r }
 
 /-- `Response clone()` -/
-def Response.clone (self : Response) : IO Response :=
-  self.val.callMethod "clone" (Support.args #[]) Response
+def Response.clone (self : Response) : IO Response := do
+  let r ← self.val.callMethod "clone" (Support.args #[]) Value
+  pure { val := r }
 
 /-- `Promise<ArrayBuffer> arrayBuffer()` -/
 def Response.arrayBuffer (self : Response) : Async ByteArray := do
@@ -660,16 +674,18 @@ def Response.arrayBuffer (self : Response) : Async ByteArray := do
   Support.arrayBufferBytes r
 
 /-- `Promise<Blob> blob()` -/
-def Response.blob (self : Response) : Async Blob :=
-  self.val.callMethodAwait "blob" (Support.args #[]) Blob
+def Response.blob (self : Response) : Async Blob := do
+  let r ← self.val.callMethodAwait "blob" (Support.args #[]) Value
+  pure { val := r }
 
 /-- `Promise<Uint8Array> bytes()` -/
 def Response.bytes (self : Response) : Async ByteArray :=
   self.val.callMethodAwait "bytes" (Support.args #[]) ByteArray
 
 /-- `Promise<FormData> formData()` -/
-def Response.formData (self : Response) : Async FormData :=
-  self.val.callMethodAwait "formData" (Support.args #[]) FormData
+def Response.formData (self : Response) : Async FormData := do
+  let r ← self.val.callMethodAwait "formData" (Support.args #[]) Value
+  pure { val := r }
 
 /-- `Promise<any> json()` -/
 def Response.json (self : Response) : Async Data :=
@@ -680,8 +696,9 @@ def Response.text (self : Response) : Async String :=
   self.val.callMethodAwait "text" (Support.args #[]) String
 
 /-- `ReadableStream textStream()` -/
-def Response.textStream (self : Response) : IO ReadableStream :=
-  self.val.callMethod "textStream" (Support.args #[]) ReadableStream
+def Response.textStream (self : Response) : IO ReadableStream := do
+  let r ← self.val.callMethod "textStream" (Support.args #[]) Value
+  pure { val := r }
 
 /-- `constructor(optional HTMLFormElement form, optional HTMLElement? submitter)` -/
 def FormData.new (form : Option Value := none) (submitter : Option Value := none) : IO FormData :=
@@ -733,8 +750,9 @@ def FormData.values (self : FormData) : IO (Array FormDataEntryValue) :=
   Support.iterate self.val "values" (Array FormDataEntryValue)
 
 /-- `Promise<Response> fetch(RequestInfo input, optional RequestInit init)` (Fetch Standard (https://fetch.spec.whatwg.org/)) -/
-def fetch (input : RequestInfo) (init : Option RequestInit := none) : Async Response :=
-  Lasm.JS.Binding.invokeAsync Response { name := "Lasm.JS.Web.fetch", module := "globalThis", path := "fetch", construct := false, arity := 2 }
+def fetch (input : RequestInfo) (init : Option RequestInit := none) : Async Response := do
+  let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.fetch", module := "globalThis", path := "fetch", construct := false, arity := 2 }
     (Support.args #[toJS input, Support.optional init])
+  pure { val := r }
 
 end Lasm.JS.Web

@@ -58,6 +58,10 @@ def arrayBufferBytes (buffer : Value) : IO ByteArray :=
 def number (α : Type) [FromJS α] (v : Value) : IO α :=
   Binding.invoke α { name := "Lasm.JS.Web.Support.number", module := "globalThis", path := "Number", construct := false, arity := 1 } #[.ref v ""] (await := false)
 
+/-- `structuredClone(v)`, read as `α`: a dictionary whose objects some runtime does not make plain (Node's URLPattern groups). -/
+def cloneAs (α : Type) [FromJS α] (v : Value) : IO α :=
+  Binding.invoke α { name := "Lasm.JS.Web.Support.cloneAs", module := "globalThis", path := "structuredClone", construct := false, arity := 1 } #[.ref v ""] (await := false)
+
 /-- `Array.from(o[method]())`, read as `α`: the entries, keys or values of an iterable. -/
 def iterate (o : Value) (method : String) (α : Type) [FromJS α] : IO α := do
   let iterator ← o.callMethod method #[] Value
