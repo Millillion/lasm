@@ -18,7 +18,7 @@ import { withApplicationLock } from '../src/application-lock.mjs';
 
 const build = new URL('../src/application-build.mjs', import.meta.url).href;
 const stubbed = ['managed-lean.mjs', 'managed-link-toolchain.mjs', 'system-git.mjs', 'application-runtime.mjs', 'application-sources.mjs',
-  'lasm-library.mjs', 'application-binding-check.mjs', 'application-link.mjs', 'application-output.mjs', 'notices.mjs', 'application-files.mjs', 'managed-sdk.mjs'];
+  'lasm-library.mjs', 'application-binding-check.mjs', 'application-link.mjs', 'application-output.mjs', 'notices.mjs', 'application-files.mjs', 'managed-sdk.mjs', 'application-native.mjs'];
 const stubDirectory = mkdtempSync(join(tmpdir(), 'lasm-build-stubs-'));
 const stubs = globalThis.lasmBuildStubs = {};
 const isClass = value => typeof value === 'function' && /^class\b/.test(Function.prototype.toString.call(value));
@@ -398,4 +398,72 @@ test('a maintainer link driver uses the full SDK and records its identity', asyn
   assert.equal('linkToolchainIdentity' in result, false);
   assert.equal(named('provisionLinkToolchain').length, 0);
   assert.equal(named('linkApplication')[0][1].linkDriver, 'emcc');
+});
+
+test('without progress: waits, the C tier and Lasm.JS checks run silently; with progress nothing is logged', async t => {
+  const { directory, run, named, cache, root } = setup(t);
+  let release;
+  const holding = new Promise(resolve => { release = resolve; });
+  let held;
+  const holder = withApplicationLock(join(directory, '.lake/lasm/application-build.lock'), () => { held(); return holding; });
+  await new Promise(resolve => { held = resolve; });
+  const waiting = run();
+  await new Promise(resolve => setTimeout(resolve, 200));
+  release();
+  await holder;
+  const result = await waiting;
+  assert.equal(result.cacheHit, false);
+  const [, , options] = named('provisionLean')[0];
+  assert.equal(options.cache, cache);
+  assert.equal(typeof options.log, 'function');
+  assert.equal(options.progress, undefined);
+  assert.deepEqual(Object.keys(named('provisionLinkToolchain')[0][1]).sort(), ['cache', 'log', 'progress']);
+  assert.equal(named('provisionLinkToolchain')[0][1].cache, cache);
+  // With progress: nothing logged.
+  const before = named('log').length;
+  stubs.programC = 'int main(int argc, char ** argv) { return 3; }\n';
+  await run({ progress() {} });
+  assert.equal(named('log').length, before);
+  assert.ok(root);
+});
+
+test('the program must define main; the C tier without progress; licences of native sources', async t => {
+  const { run, named, lean, directory } = setup(t, { project: true });
+  stubs.programC = 'void helper(void) {}\n';
+  await assert.rejects(run(), /has no `main` function/);
+  let first = true;
+  stubs['application-sources.mjs:applicationSources'] = (file, _lean, work, options) => {
+    if (first) { first = false; return { needsCCompiler: true, native: [{ package: 'c' }] }; }
+    stubs.secondOptions = options;
+    const c = put(join(work, 'Main.c'), 'int main(int argc, char ** argv) {}\n');
+    return { project: directory, sources: [c], inputs: [{ module: 'Main', source: file }], env: {}, metadataRoots: [], oleans: () => [], nativeLink: { objs: [] } };
+  };
+  const nativeSource = put(join(directory, 'native.c'), 'int x;');
+  stubs['application-native.mjs:planNativeInputs'] = (info, options) => { stubs.nativeOptions = options;
+    return { compilations: [{ object: '/o/native.o', identity: 'native-identity', source: nativeSource, extraArgs: ['-DX'] }], unavailable: [] }; };
+  stubs['notices.mjs:lakeDependencyLicenses'] = (...args) => { stubs.licenceArgs = args; return []; };
+  stubs['application-runtime.mjs:applicationRuntime'] = async (l, options) => ({ directory: options.directory, identity: 'rt', manifest: { name: 'rt', emscripten: linkToolchainCatalog.version } });
+  const result = await run();
+  assert.equal(typeof stubs.secondOptions.log, 'function');
+  assert.deepEqual(stubs.nativeOptions.leanPrefix, [lean.prefix, undefined]);
+  assert.ok(stubs.nativeOptions.runtimeInclude.endsWith(join('runtime', 'include')));
+  assert.deepEqual(stubs.licenceArgs[1], [join(directory, 'Main.lean'), nativeSource]);
+  assert.deepEqual(stubs.licenceArgs[2], { exclude: [lean.prefix, undefined] });
+  assert.deepEqual(result.nativeObjects, [{ object: '/o/native.o', identity: 'native-identity', sourceSha256: sha('int x;'), args: ['-DX'] }]);
+  assert.deepEqual(named('linkApplication').at(-1)[1].nativeCompilations.map(item => item.object), ['/o/native.o']);
+});
+
+test('a tiered Lean records its tier and components; a link-only build copies no npm packages', async t => {
+  const { directory, run } = setup(t);
+  stubs['managed-lean.mjs:provisionLean'] = async () => ({ version: '4.35.0', commit: toolchainCatalog.lean['4.35.0'].commit, identity: 'tiered',
+    prefix: '/lean', distribution: 'tiers', tier: 'extended', components: ['base', 'extended'] });
+  put(join(directory, 'package.json'), JSON.stringify({ dependencies: { left: '1' } }));
+  put(join(directory, 'node_modules/left/package.json'), JSON.stringify({ name: 'left', version: '1.0.0' }));
+  const result = await run();
+  assert.equal(result.nativeLeanTier, 'extended');
+  assert.deepEqual(result.nativeLeanComponents, ['base', 'extended']);
+  assert.ok(readFileSync(join(result.cached, '.lasm-application.json'), 'utf8').endsWith('}\n'));
+  const linkOnly = await run({ profile: 'dev', keepLinkWork: true, linkOnly: true });
+  assert.equal(existsSync(join(linkOnly.cached, 'node_modules')), false);
+  assert.ok(existsSync(join(result.cached, 'node_modules/left/package.json')));
 });

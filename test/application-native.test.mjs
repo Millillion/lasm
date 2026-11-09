@@ -191,3 +191,37 @@ test('undefined symbols of a failed link, and the libraries they point to', () =
   assert.match(dynamicLoadingStubs, /void \*lasm_package_dlopen\(const char \*file, int mode\) \{ \(void\)file; \(void\)mode; lasm_package_dl_failed = 1; return NULL; \}/);
   assert.match(dynamicLoadingStubs, /char \*lasm_package_dlerror\(void\) \{ if \(!lasm_package_dl_failed\) return NULL; lasm_package_dl_failed = 0; return lasm_package_dl_message; \}/);
 });
+
+test('options that take a value consume it, whatever it looks like; only path options re-join spaced paths', t => {
+  for (const option of ['-o', '-MF', '-MT', '-MQ', '-x', '-target', '--sysroot', '-arch', '-Xclang', '-Xlinker', '-L', '-l', '-isysroot', '-std', '-mllvm'])
+    assert.deepEqual(preprocessorArguments([option, '-DX'], { leanPrefix: '/lean', runtimeInclude: '/rt', cwd: '/p' }), { kept: [], dropped: [option, '-DX'] }, option);
+  const directory = mkdtempSync(join(tmpdir(), 'lasm-native-words-'));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  mkdirSync(join(directory, 'with space'));
+  mkdirSync(join(directory, 'inc -O2'));
+  for (const option of ['-I', '-isystem', '-iquote', '-idirafter', '-include', '-imacros'])
+    assert.deepEqual(splitLoggedArguments(`${option} ${directory}/with space -c`), [option, `${directory}/with space`, '-c'], option);
+  assert.deepEqual(splitLoggedArguments(`-o ${directory}/with space`), ['-o', `${directory}/with`, 'space'], 'not a path option');
+  assert.deepEqual(splitLoggedArguments(`-I ${directory}/inc -O2`), ['-I', `${directory}/inc`, '-O2'], 'an option is never part of a path');
+  // Joined -include and -imacros forms are not path options for the Wasm compile.
+  assert.deepEqual(preprocessorArguments(['-includefoo.h', '-imacrosm.h'], { leanPrefix: '/lean', runtimeInclude: '/rt', cwd: '/p' }),
+    { kept: [], dropped: ['-includefoo.h', '-imacrosm.h'] });
+  assert.deepEqual(preprocessorArguments(['-xc', '-DA', '-std=c99', '-Wstd=x', '-fD'], { leanPrefix: '/lean', runtimeInclude: '/rt', cwd: '/p' }),
+    { kept: ['-DA', '-std=c99'], dropped: ['-xc', '-Wstd=x', '-fD'] });
+});
+
+test('another Lean installation is recognized up to eight levels above a path, by its lean.h', t => {
+  const other = mkdtempSync(join(tmpdir(), 'lasm-native-depth-'));
+  t.after(() => rmSync(other, { recursive: true, force: true }));
+  mkdirSync(join(other, 'include', 'lean'), { recursive: true });
+  const deep = join(other, 'a/b/c/d/e/f/g');
+  mkdirSync(deep, { recursive: true });
+  assert.equal(otherLeanPrefix(deep), undefined, 'include/lean without lean.h');
+  const second = mkdtempSync(join(tmpdir(), 'lasm-native-depth-'));
+  t.after(() => rmSync(second, { recursive: true, force: true }));
+  mkdirSync(join(second, 'include', 'lean'), { recursive: true });
+  writeFileSync(join(second, 'include', 'lean', 'lean.h'), '');
+  mkdirSync(join(second, 'a/b/c/d/e/f/g/h'), { recursive: true });
+  assert.equal(otherLeanPrefix(join(second, 'a/b/c/d/e/f/g')), second, 'seven levels up');
+  assert.equal(otherLeanPrefix(join(second, 'a/b/c/d/e/f/g/h')), undefined, 'eight levels up is too far');
+});
