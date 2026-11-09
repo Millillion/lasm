@@ -1,0 +1,86 @@
+name: Bun hang probe (temporary, issue 126)
+on:
+  push:
+    branches: [bun-stack-hang]
+    paths: ['scripts/ci/bun-hang-probe.mjs', '.github/workflows/bun-hang-probe.yml', 'src/edge/**']
+  workflow_dispatch:
+    inputs:
+      iterations: { type: string, default: '100' }
+      modes: { type: string, default: 'sum' }
+      variants: { type: string, default: 'O0' }
+permissions:
+  contents: read
+jobs:
+  pack:
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: ./.github/actions/process-guard
+      - name: Download the pinned retained runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - name: Pack
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: probe-packed-candidate
+          path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
+          retention-days: 3
+          if-no-files-found: error
+  probe:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        bun: [release, profile, canary]
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - uses: ./.github/actions/install-candidate
+        with:
+          artifact: probe-packed-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: Bun and gdb
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T"
+          case "${{ matrix.bun }}" in
+            release) URL=https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-linux-x64.zip; D=bun-linux-x64 ;;
+            profile) URL=https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-linux-x64-profile.zip; D=bun-linux-x64-profile ;;
+            canary) URL=https://github.com/oven-sh/bun/releases/download/canary/bun-linux-x64.zip; D=bun-linux-x64 ;;
+          esac
+          curl -fsSL --retry 3 -o "$T/bun.zip" "$URL"; unzip -q "$T/bun.zip" -d "$T"
+          B="$T/$D/bun"; [ -x "$B" ] || B=$(find "$T/$D" -name 'bun*' -type f -perm -u+x | head -1)
+          "$B" --version; echo "BUN=$B" >> "$GITHUB_ENV"
+          which gdb || (sudo apt-get update -qq && sudo apt-get install -y -qq gdb)
+      - name: Probe
+        run: |
+          node scripts/ci/bun-hang-probe.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" --bun "$BUN" \
+            --work "$RUNNER_TEMP/probe" --iterations "${{ inputs.iterations || '100' }}" --modes "${{ inputs.modes || 'sum' }}" --variants "${{ inputs.variants || 'O0' }}"
