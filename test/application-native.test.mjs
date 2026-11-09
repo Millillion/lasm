@@ -225,3 +225,33 @@ test('another Lean installation is recognized up to eight levels above a path, b
   assert.equal(otherLeanPrefix(join(second, 'a/b/c/d/e/f/g')), second, 'seven levels up');
   assert.equal(otherLeanPrefix(join(second, 'a/b/c/d/e/f/g/h')), undefined, 'eight levels up is too far');
 });
+
+test('library and symbol names are matched whole, not as parts of other names', () => {
+  for (const name of ['curl', 'ssl', 'crypto', 'libssl', 'libcrypto', 'pq', 'libpq', 'hiredis', 'blas', 'cblas', 'openblas', 'lapack', 'sqlite3', 'z', 'zlib', 'gmp', 'libgmp']) {
+    assert.notEqual(describeLibrary(name).advice, '', name);
+    for (const other of ['x' + name, name + 'x']) assert.equal(describeLibrary(other).label, `the native library ${other.replace(/^lib/, '')}`, other);
+  }
+  for (const [name, base] of [['libfoo.so.1', 'foo'], ['libfoo.so.12.3', 'foo'], ['foo.so.x', 'foo.so.x'], ['libfoo.dylib.bak', 'foo.dylib.bak'], ['/a/b/libbar.a', 'bar'],
+    ['C:\\a\\bar.lib', 'bar'], ['libz,1', 'z'], ['a,b/libc.so', 'a']])
+    assert.equal(describeLibrary(name).name, base, name);
+  const unavailable = planNativeInputs({ args: ['-lfoo', 'x-lbar', '/l/libq.so.1', '/l/libr.so.1x', '/l/libs.sox', '/l/libt.so.1.2'].map(arg => ({ package: 'p', arg })),
+    objs: [{ package: 'p', path: '/l/libu.so.2' }, { package: 'p', path: '/l/libv.so.x' }] }, {}).unavailable;
+  assert.deepEqual(unavailable.map(item => item.library), ['foo', '/l/libq.so.1', '/l/libt.so.1.2', '/l/libu.so.2', '/l/libv.so.x']);
+  assert.equal(unavailable.at(-1).reason.startsWith('Lake has no build record'), true, 'not a shared library: an object without a record');
+  const symbols = ['xcurl_init', 'xSSL_new', 'xPQconnect', 'xredisConnect', 'xcblas_x', 'xsqlite3_open', 'xdeflate', 'deflateX', 'compress3', 'x__gmpz_init', '__gmpzx', 'lean_alloc_mpzx', 'lean_extract_mpz_valuex', '__gmp_x']
+    .map(name => `undefined symbol: ${name}`).join('\n');
+  assert.deepEqual(librariesForUndefinedSymbols(symbols), [{ library: 'gmp', symbol: '__gmp_x' }]);
+  assert.deepEqual(librariesForUndefinedSymbols('undefined symbol: compress\nundefined symbol: uncompress'), [{ library: 'z', symbol: 'compress' }]);
+});
+
+test('unsupported-library lines: the reason is shown unless it is a prebuilt or shared library', () => {
+  const message = new UnsupportedNativeLibrary([{ library: 'a', reason: 'its C source x does not compile' }, { library: 'b', reason: 'shared-ish' },
+    { library: 'c', reason: 'note: does not compile' }]).message;
+  assert.match(message, /  the program links the native library a \(a\) \[its C source x does not compile\]\n/);
+  assert.match(message, /  the program links the native library b \(b\)\n/);
+  assert.match(message, /  the program links the native library c \(c\) \[note: does not compile\]\n/);
+  assert.match(new UnsupportedNativeLibrary([{ library: 'ssl' }]).message, /links OpenSSL \(ssl\)\. Node-backed cryptography is a follow-up candidate\.\n/);
+  for (const [library, advice] of [['pq', 'A pure-Lean or Node-backed PostgreSQL client is a follow-up candidate.'], ['hiredis', 'Use a pure-Lean Redis client (for example lean-redis).'],
+    ['blas', 'No Wasm BLAS is provided.'], ['sqlite3', 'Use leansqlite, which bundles SQLite as C source.'], ['gmp', "Lasm's runtime uses Lean's own big-number code (no GMP); use Lean's Nat and Int."]])
+    assert.equal(describeLibrary(library).advice, advice);
+});
