@@ -12,7 +12,7 @@ name: Nightly tier
 # Not a release dependency: release-checks.yml never calls this workflow.
 on:
   schedule:
-    - cron: '7 1 * * 0,2-6'
+    - cron: '7 1 * * 2-6'
   workflow_dispatch:
     inputs:
       force:
@@ -25,9 +25,14 @@ concurrency:
   group: ci-nightly-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   gate:
+    needs: sunday
     # On main; by hand on any branch (a rehearsal of a workflow change).
-    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'))
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -40,7 +45,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           FORCE: ${{ inputs.force == true || github.ref != 'refs/heads/main' }}
         run: |
-          last=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci-nightly.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].head_sha // ""' || true)
+          # The newest passing run that ran: a scheduled run on a Sunday in New York
+          # passed without testing anything (sunday-guard.yml).
+          last=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci-nightly.yml/runs?branch=main&status=success&per_page=30" \
+            --jq '.workflow_runs[] | [.event, .run_started_at, .head_sha] | @tsv' |
+            while IFS=$'\t' read -r event started sha; do
+              if [ "$event" = schedule ] && [ "$(TZ=America/New_York date -d "$started" +%u)" = 7 ]; then continue; fi
+              echo "$sha"; break
+            done || true)
           if [ "$FORCE" != true ] && [ "$last" = "$GITHUB_SHA" ]; then
             echo "main is at $GITHUB_SHA, as on the last passing run: nothing to do" | tee -a "$GITHUB_STEP_SUMMARY"
             echo run=false >> "$GITHUB_OUTPUT"
@@ -49,16 +61,16 @@ jobs:
           fi
 
   unit:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
+    needs: [sunday, gate]
+    if: needs.sunday.outputs.skip != 'true' && (needs.gate.outputs.run == 'true')
     permissions:
       contents: write
       actions: read
     uses: ./.github/workflows/unit.yml
 
   browser:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
+    needs: [sunday, gate]
+    if: needs.sunday.outputs.skip != 'true' && (needs.gate.outputs.run == 'true')
     permissions:
       contents: write
     uses: ./.github/workflows/browser.yml
@@ -66,8 +78,8 @@ jobs:
       macos: true
 
   edge:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
+    needs: [sunday, gate]
+    if: needs.sunday.outputs.skip != 'true' && (needs.gate.outputs.run == 'true')
     permissions:
       contents: write
     uses: ./.github/workflows/workers.yml
@@ -75,8 +87,8 @@ jobs:
       release-check: true
 
   wasi:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
+    needs: [sunday, gate]
+    if: needs.sunday.outputs.skip != 'true' && (needs.gate.outputs.run == 'true')
     permissions:
       contents: write
       actions: read
@@ -85,15 +97,15 @@ jobs:
       release-check: true
 
   ui:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
+    needs: [sunday, gate]
+    if: needs.sunday.outputs.skip != 'true' && (needs.gate.outputs.run == 'true')
     permissions:
       contents: read
     uses: ./.github/workflows/ui.yml
 
   fullstack:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
+    needs: [sunday, gate]
+    if: needs.sunday.outputs.skip != 'true' && (needs.gate.outputs.run == 'true')
     permissions:
       contents: write
       actions: read
@@ -102,16 +114,16 @@ jobs:
       release-check: true
 
   dx:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
+    needs: [sunday, gate]
+    if: needs.sunday.outputs.skip != 'true' && (needs.gate.outputs.run == 'true')
     permissions:
       contents: write
       actions: read
     uses: ./.github/workflows/dx-dev-loop.yml
 
   stress:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
+    needs: [sunday, gate]
+    if: needs.sunday.outputs.skip != 'true' && (needs.gate.outputs.run == 'true')
     permissions:
       contents: write
       actions: read
@@ -122,8 +134,8 @@ jobs:
       timeout-s: '30'
 
   report:
-    needs: [gate, unit, browser, edge, wasi, ui, fullstack, dx, stress]
-    if: always() && needs.gate.outputs.run == 'true'
+    needs: [sunday, gate, unit, browser, edge, wasi, ui, fullstack, dx, stress]
+    if: needs.sunday.outputs.skip != 'true' && (always() && needs.gate.outputs.run == 'true')
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:

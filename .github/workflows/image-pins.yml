@@ -15,8 +15,13 @@ concurrency:
   group: image-pins
   cancel-in-progress: false
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   refresh:
-    if: github.event.repository.visibility == 'public'
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:

@@ -42,7 +42,7 @@ on:
       - verification/host-bridge/**
       - scripts/bridge-fuzz/**
   schedule:
-    - cron: '17 3 * * 0,2-6'
+    - cron: '17 3 * * 2-6'
   workflow_dispatch:
     inputs:
       runs:
@@ -63,7 +63,13 @@ concurrency:
   group: bridge-verification-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   model:
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -90,6 +96,8 @@ jobs:
         run: |
           { echo '### Host bridge model'; echo '```'; cat "$RUNNER_TEMP/model.txt" 2>/dev/null | grep -E '^(PASS|FAIL)|checks as' || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
   seed:
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
@@ -115,8 +123,8 @@ jobs:
           echo "platforms=$platforms" >> "$GITHUB_OUTPUT"; echo "trace-every=$every" >> "$GITHUB_OUTPUT"
           echo "Schedule fuzzing: seeds $seed.. ($runs runs per program, $platforms); traces every $every runs" >> "$GITHUB_STEP_SUMMARY"
   fuzz:
-    needs: seed
-    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    needs: [sunday, seed]
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
     permissions:
       contents: write
       actions: read
@@ -129,8 +137,8 @@ jobs:
       seed: ${{ needs.seed.outputs.seed }}
       trace-every: ${{ needs.seed.outputs.trace-every }}
   conformance:
-    needs: fuzz
-    if: always() && needs.fuzz.result != 'skipped' && needs.fuzz.result != 'cancelled'
+    needs: [sunday, fuzz]
+    if: needs.sunday.outputs.skip != 'true' && (always() && needs.fuzz.result != 'skipped' && needs.fuzz.result != 'cancelled')
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
