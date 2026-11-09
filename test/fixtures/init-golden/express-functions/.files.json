@@ -1,0 +1,15 @@
+[
+  ".dockerignore",
+  ".gitignore",
+  "App.lean",
+  "Dockerfile",
+  "Dockerfile.lambda",
+  "Main.lean",
+  "README.md",
+  "lakefile.toml",
+  "lean-toolchain",
+  "netlify.toml",
+  "package.json",
+  "public/.gitkeep",
+  "vercel.json"
+]

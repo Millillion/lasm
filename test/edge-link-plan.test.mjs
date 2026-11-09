@@ -16,6 +16,7 @@ import { responseFile } from '../src/platform.mjs';
 import { glueLinkFlags } from '../src/lasm-library.mjs';
 import { installTools, wasmObject, archive, temporaryDirectory } from './fixtures/link-stand-ins/toolchain.mjs';
 import { registerProgram } from './fixtures/link-stand-ins/programs.mjs';
+import { finishLinks, links as finishedLinks, hooks as linkHooks } from './fixtures/link-stand-ins/link-driver.mjs';
 
 const posix = process.platform !== 'win32';
 const here = fileURLToPath(new URL('../src/edge/', import.meta.url));
@@ -60,7 +61,7 @@ const commonFlags = (f, suspend) => [
   '-sMODULARIZE=1', '-sEXPORT_ES6=1', '-sENVIRONMENT=web', '-sEXIT_RUNTIME=0', '-sFILESYSTEM=0', '-sALLOW_MEMORY_GROWTH=1', '-sINITIAL_MEMORY=4194304',
   '-sMAXIMUM_MEMORY=2147483648', '-sSTACK_SIZE=1048576', '-sEXPORTED_RUNTIME_METHODS=callMain,HEAPU8,HEAPU32', '-sDYNAMIC_EXECUTION=0',
   '-sINCOMING_MODULE_JS_API=instantiateWasm,noInitialRun,print,printErr,onAbort', '-sDEFAULT_LIBRARY_FUNCS_TO_INCLUDE=$stackSave,$stackRestore',
-  '-Wl,--export-if-defined=__cpp_exception', '-Wno-experimental', `-Wl,-Map=${join(f.out, 'program.map')}`, '-Wl,--start-group',
+  '-Wl,--stack-first', '-Wl,--export-if-defined=__cpp_exception', '-Wno-experimental', `-Wl,-Map=${join(f.out, 'program.map')}`, '-Wl,--start-group',
   f.edge.libraries['libInit.a'] ?? join(f.nodeRuntime.directory, 'lib', 'libInit.a'), f.edge.libraries['libleanrt.a'], '-Wl,--end-group',
   '--pre-js', join(f.linkWork, 'application-pre.js'), '--pre-js', join(here, 'edge-pre.js'), '--js-library', join(here, 'edge-library.js'),
   ...(suspend === 'jspi' ? ['-sJSPI', "-sJSPI_EXPORTS=['lasm_edge_pump','main']"] : []),
@@ -145,6 +146,19 @@ test('edge recordings per suspension mode', () => {
   assert.equal(edgeRecipeHas('asyncify', { link: { modes: { 'edge-asyncify': {} } } }), true);
   assert.equal(edgeRecipeMode('none'), undefined);
   assert.equal(edgeRecipe(), edgeRecipe(), 'read once');
+});
+
+test('both edge recordings put the C stack first in memory (issue #126)', () => {
+  // Below the stack there is then nothing to overwrite: an overflow runs below
+  // address 0 and traps at once (an overflow into the static data hung Bun).
+  for (const mode of ['edge', 'edge-asyncify']) {
+    const spec = edgeRecipe().link.modes[mode];
+    const wasmLd = spec.pipeline.find(step => step.program === 'wasm-ld');
+    assert.ok(wasmLd.args.includes('--stack-first') && !wasmLd.args.includes('--no-stack-first'), mode);
+    assert.ok(!wasmLd.args.some(arg => arg.startsWith('--global-base')), `${mode}: emcc passes no --global-base with --stack-first`);
+    assert.ok(spec.pipeline.every(step => !step.args?.includes('--low-memory-unused')), `${mode}: low memory holds the stack`);
+    assert.equal(spec.settings.STACK_FIRST, true, mode);
+  }
 });
 
 /** The Node link driver with stand-in tools: Emscripten's JavaScript symbol
@@ -241,6 +255,10 @@ test('the compact wrappers are compiled once per plan, tools and runtime; at mos
     linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, `plan-${index}`) });
   }
   assert.equal(compiles(), 20);
+  // The sixteen most recent are kept.
+  writeFileSync(join(f.linkWork, 'initialization-plan.json'), JSON.stringify({ ...plan, closure: [...plan.closure, 'initialize_Extra1'] }));
+  linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'kept') });
+  assert.equal(compiles(), 20);
   writeFileSync(join(f.linkWork, 'initialization-plan.json'), JSON.stringify(plan));
   linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'e') });
   assert.equal(compiles(), 21);
@@ -263,6 +281,14 @@ test('the Node link driver compiles the compact wrappers with clang; its tools\'
   // --verbose: the tools write to the terminal.
   assert.throws(() => linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, verbose: true }),
     error => error.stderr == null && error.status === 1);
+  // A compact-wrapper compile that fails: its diagnostics are captured, or shown with --verbose.
+  f.tools.fail('clang', 'clang: error: stand-in compact failure\n');
+  const plan = JSON.parse(readFileSync(join(f.linkWork, 'initialization-plan.json'), 'utf8'));
+  for (const [index, verbose] of [[0, false], [1, true]]) {
+    writeFileSync(join(f.linkWork, 'initialization-plan.json'), JSON.stringify({ ...plan, closure: [...plan.closure, `initialize_Failing${index}`] }));
+    assert.throws(() => linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, verbose }),
+      error => error.status === 1 && (verbose ? error.stderr == null : /stand-in compact failure/.test(String(error.stderr))));
+  }
 });
 
 test('the edge linker: the link toolchain when the edge runtime carries what the Node driver needs, else the SDK', async () => {
@@ -293,6 +319,11 @@ test('llvm-nm listings are kept for the 512 most recent objects', { skip: !posix
   // The last 512 are listed already; the first eight were evicted, and listing them evicts others in turn.
   linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'b') });
   assert.deepEqual(f.tools.calls('llvm-nm').slice(0, 8).map(args => args.at(-1)), many.slice(0, 8));
+  // 512 objects listed most recently are all kept.
+  f.tools.clear();
+  writeFileSync(join(f.linkWork, 'link.rsp'), responseFile(many.slice(-512)));
+  linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'kept') });
+  assert.equal(f.tools.calls('llvm-nm').length, 0);
   f.tools.clear();
   writeFileSync(join(f.linkWork, 'link.rsp'), responseFile(many.slice(-500)));
   linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'c') });
@@ -318,4 +349,61 @@ test('edge glue keeps only the file names of included files', { skip: !posix }, 
   assert.equal(readFileSync(result.program, 'utf8'), portable);
   write(portable);
   assert.equal(readFileSync(linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'again') }).program, 'utf8'), portable);
+});
+
+test('the edge dev profile records the full link\'s members and imports, and accepts a member link that imports nothing new', { skip: !posix }, async () => {
+  const { linkEdgeProgram: link } = await finishLinks(new URL('../src/edge/edge-link.mjs', import.meta.url).href);
+  const f = nodeDriver(fixture({ plan: false }));
+  // The program imports two host functions.
+  writeFileSync(f.objects.main, wasmObject({ functions: [{ name: '__main_argc_argv', refs: ['initialize_Main', 'js_edge_host', 'js_edge_other', 'l_other'] }, { name: 'initialize_Main' }, { name: `tag_finished_${unique++}` }] }));
+  const libInit = f.edge.libraries['libInit.a'], libleanrt = f.edge.libraries['libleanrt.a'];
+  const saved = [];
+  const members = (record, save = item => saved.push(item)) => ({ directory: join(f.base, 'members'), record, save });
+  const wasmLinks = () => f.tools.calls('wasm-ld');
+  const memberLink = args => args.some(arg => arg.endsWith('.lasm-member.o'));
+  const run = options => { f.tools.clear(); finishedLinks.length = 0; return link({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, optimize: false, ...options }); };
+
+  // No record yet: a full link, whose kept members and imports are saved.
+  const result = run({ members: members(undefined) });
+  assert.deepEqual(result, { program: join(f.out, 'program.mjs'), wasm: join(f.out, 'program.wasm'), usesJs: true, suspend: 'jspi', driver: 'node' });
+  assert.deepEqual(wasmLinks().map(memberLink), [false]);
+  assert.deepEqual(finishedLinks.map(item => [item.mode, item.optimize, item.stdio]), [['edge', false, ['ignore', 'pipe', 'pipe']]]);
+  assert.equal(saved.length, 1);
+  const record = saved[0];
+  assert.deepEqual(record.imports, ['env\0js_edge_host\0function', 'env\0js_edge_other\0function']);
+  assert.deepEqual(Object.keys(record.liveMembers), [libInit, libleanrt]);
+  assert.deepEqual(record.liveMembers[libInit], [archiveOffset(libInit, 'Other.o')], 'the member the program does not use is not kept');
+  // The glue names its included files by name only.
+  assert.ok(readFileSync(result.program, 'utf8').includes('// include: edge-pre.js\n'));
+
+  // The record: the member link is accepted, and nothing is saved.
+  saved.length = 0;
+  run({ members: members(record) });
+  assert.deepEqual(wasmLinks().map(memberLink), [true]);
+  assert.ok(!wasmLinks()[0].includes(libInit) && !wasmLinks()[0].includes(libleanrt));
+  assert.deepEqual(saved, []);
+
+  // A record whose imports lack one of them: the member link imports more, so the program links in full.
+  run({ members: members({ ...record, imports: record.imports.slice(0, 1) }) });
+  assert.deepEqual(wasmLinks().map(memberLink), [true, false]);
+  assert.deepEqual(saved, [record]);
+  // Members of an archive this program does not link (even none): linked in full at once.
+  saved.length = 0;
+  run({ members: members({ ...record, liveMembers: { ...record.liveMembers, '/elsewhere/libX.a': [] } }) });
+  assert.deepEqual(wasmLinks().map(memberLink), [false]);
+  assert.deepEqual(saved, [record]);
+  // --verbose: the link's tools write to the terminal.
+  run({ members: members(record), verbose: true });
+  assert.deepEqual(finishedLinks.map(item => item.stdio), [['ignore', 'inherit', 'inherit']]);
+  // An optimized link uses and saves no members.
+  saved.length = 0;
+  run({ members: members(record), optimize: true });
+  assert.deepEqual(wasmLinks().map(memberLink), [false]);
+  assert.deepEqual(finishedLinks.map(item => item.optimize), [true]);
+  assert.deepEqual(saved, []);
+  // A program whose Wasm cannot be read: no record; a record that cannot be saved is not an error.
+  linkHooks.after = () => writeFileSync(join(f.out, 'program.wasm'), 'not wasm');
+  try { run({ members: members(undefined) }); } finally { linkHooks.after = undefined; }
+  assert.deepEqual(saved, []);
+  assert.doesNotThrow(() => run({ members: members(undefined, () => { throw new Error('unwritable'); }) }));
 });

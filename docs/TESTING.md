@@ -6,7 +6,7 @@ differential), target equivalence and the test-quality audit below are
 implemented and run in CI; the other layers are marked as existing (with their
 workflow) or planned. The plan is issue #21 (testing and verification half);
 the long-term strategy (evidence levels, tier consolidation, corpora) is the
-proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
+strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 
 ## Principles
 
@@ -33,6 +33,7 @@ proposal [proposals/TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md).
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) and [fuzzing](#differential-fuzzing) | Lasm-compiled programs (generated expressions, statements, and feature programs declaring classes, inductives, closures, loops, structures) behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
 | [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic equals Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs` | PR, nightly |
+| [Standard bindings](#standard-bindings) | Lasm.JS.Web is its generator's output, and behaves as the specs say on every JavaScript target: WPT's URL and urlencoded data, Lean's UTF-8 as the encoder's oracle, published Web Crypto vectors, generated round trips | `scripts/bindings/`, `test/fixtures/js-web/`, `web-bindings.yml` | PR (paths), main |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
@@ -142,7 +143,7 @@ threads is never printed); performance; in browsers, which exit status a failing
 
 ### More oracles
 
-Three more comparisons from [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md)
+Three more comparisons from [TESTING_STRATEGY.md](TESTING_STRATEGY.md)
 pillar 1, implemented as targets of the same harness, so every generated case,
 the shrinker and the regression replay cover them.
 
@@ -423,6 +424,51 @@ token belongs to, a write a store lost. **What it cannot catch:** requests the
 suite does not send; behaviour under concurrency (`test/concurrency.mjs`);
 bugs that are the same on every target, Node included; timing.
 
+### Standard bindings
+
+**Property.** For every check *c* of the conformance program
+[`test/fixtures/js-web/Main.lean`](../test/fixtures/js-web/Main.lean) and every
+JavaScript target *t* (Node 26 and 24, Bun, Deno, Workers on workerd, headless
+Chromium): *c* holds on *t*, unless *t*'s runtime itself deviates from the spec
+there, which [`known.json`](../test/fixtures/js-web/known.json) states with the
+reason. Each check's comment states its Lean proposition, for example
+`∀ c ∈ urltestdata, ¬ c.failure → ∀ f ∈ fields, (URL.new c.input c.base).f = c.f` or
+`∀ b : ByteArray, (fatal TextDecoder.decode b succeeds ↔ String.fromUTF8? b ≠ none)`. They are properties of the runtimes, which Lean has no model of, so they
+are not `Candidates.lean` definitions ([TESTING_STRATEGY.md §4](TESTING_STRATEGY.md#4-property-testing-convention-propositions-that-carry-over-to-proofs)).
+
+**Oracles and inputs.** WPT at a pinned commit
+([`scripts/bindings/wpt-data.mjs`](../scripts/bindings/wpt-data.mjs) writes
+`Wpt.lean`): all of `url/resources/urltestdata.json`, the
+`application/x-www-form-urlencoded` cases of `url/urlencoded-parser.any.js`
+(through `URLSearchParams` and `Response.formData`) and the invalid UTF-8
+sequences of `encoding/textdecoder-fatal.any.js`. Lean itself where it has the
+same function: `String.toUTF8` for `TextEncoder`, `String.fromUTF8?` for the fatal
+`TextDecoder`, over generated strings and mutated byte arrays. Published test
+vectors: FIPS 180 digests, RFC 4231 HMAC, the GCM specification's test case 2,
+RFC 3602 AES-CBC, RFC 6070 PBKDF2, RFC 5869 HKDF, RFC 4648 base64. Generated
+round trips from a seeded generator: base64, structured cloning, query strings,
+gzip/deflate/deflate-raw, AES-GCM, ECDSA P-256, Wasm `add`. The rest checks the
+specs' stated behaviour (header combining and sorting, event dispatch and
+`preventDefault` from a synchronous listener, abort reasons, timers, streams and
+their queuing strategies, BYOB reads, `MessageChannel`).
+
+**Harness.** [`scripts/bindings/test-web.mjs`](../scripts/bindings/test-web.mjs)
+builds the program with an installed candidate for each target and runs it
+(Workers: `wrangler dev`, offline, in CI only; the checks run inside the
+request). The program prints a line per failed check and a summary; the run
+fails on a failed check that `known.json` does not list, and on a listed one
+that passes. [`web-bindings.yml`](../.github/workflows/web-bindings.yml) also
+checks that the committed bindings are the generator's output.
+
+**What it catches:** wrong conversions (a type, an optional argument passed as
+`null`, a dictionary member left in, a union read back wrongly), wrong host
+paths or receivers, callbacks that run at the wrong time, and members a runtime
+lacks. **What it cannot catch:** members the program does not call (the
+generator's mapping is uniform, so a member is wrong only when its types are),
+behaviour beyond the checks, Firefox and WebKit (not run yet), and the Vercel,
+Netlify and Supabase edge runtimes (their APIs are those of Deno and workerd,
+which run).
+
 ### Scenario matrix
 
 Template × `--target` × OS × runtime, always from a packed candidate or the
@@ -437,7 +483,7 @@ accounts, by policy), OS versions and configurations outside the runners.
 
 ### Dependable tooling
 
-Claim 4 of [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md), tested black
+Claim 4 of [TESTING_STRATEGY.md](TESTING_STRATEGY.md), tested black
 box: each harness installs the CLI with npm (a candidate packed from the commit,
 and for the corpus also the published `@lasm/cli@latest`) and judges only what
 it prints, its exit status and the files it writes. The judge of a message,
@@ -906,7 +952,7 @@ to Saturday.
 ## Evidence levels
 
 Each platform in the README's table has an evidence level. The levels are those
-of [TESTING_STRATEGY.md](proposals/TESTING_STRATEGY.md#5-rules-of-the-process),
+of [TESTING_STRATEGY.md](TESTING_STRATEGY.md#5-rules-of-the-process),
 and CI results decide them:
 
 | Level | Meaning |
@@ -1105,28 +1151,71 @@ pull request, only the modules whose sources or tests changed. A module whose
 score is below its **threshold** in
 [evidence/mutation-baseline.json](evidence/mutation-baseline.json) fails the
 job. The threshold is a ratchet: the module's recorded score rounded down to a
-whole percent, never below 80 % and never lowered. When tests improve, record
+whole percent, never lowered. The goal for every module is 80 %; a module added
+below it would start at its first measured score and rise with its tests (none
+is below it now). When tests improve, record
 the new score with `--update` (CI's run is the measurement), which raises the
 threshold with it; `--check` names a module whose score has passed its next
 whole percent.
 
 ### Scores
 
-Measured 2026-11-03 (mutation.yml run 41749603692, Node 26, Linux x64). *Initial*: with the tests that existed before
-mutation testing; *now*: with the tests written to kill survivors (CI's
-measurement on Node 26 is the recorded floor).
+Every JavaScript file under `src/` is in one of the 21 modules except
+`src/edge/edge-library.js` (an Emscripten library with preprocessor lines, which
+Stryker cannot parse). The first seven modules were measured 2026-11-03 (mutation.yml
+run 41749603692); the fourteen others, which cover the rest of `src/`, were added
+2026-11-09: their *initial* scores are from mutation.yml run 42571078799 (the run
+that added them) or from each group's first run where that run could not score
+them, and *now* from mutation.yml run 42615928074 on #165, which measured all 21 modules together (Node 26, Linux x64; 1 to 73 minutes a module, `dev` the longest). *Initial*: with
+the tests that existed before mutation testing; *now*: with the tests written to
+kill survivors (CI's measurement on Node 26 is the recorded floor).
 
 | Module | Files | Initial | Now | Threshold |
 | --- | --- | ---: | ---: | ---: |
-| `host-bridge` | `node-js.mjs` | 56.5 % | **96 %** | 96 % |
-| `ui-dom` | `lasm-modules/ui-dom.mjs` | 55.1 % | **92.8 %** | 92 % |
+| `host-bridge` | `node-js.mjs` | 56.5 % | **96.4 %** | 96 % |
+| `ui-dom` | `lasm-modules/ui-dom.mjs` | 55.1 % | **93.6 %** | 93 % |
 | `build-service` | `dev-build-service.mjs`, `application-build-client.mjs`, `application-files.mjs`, `cache-lifecycle.mjs` | 52.4 % | **94.3 %** | 94 % |
 | `link-driver` | `link-driver/link.mjs`, `link-driver/glue.mjs`, `link-driver/wasm.mjs`, `link-driver/metadata.mjs`, `link-driver/settings.mjs`, `link-driver/compile.mjs` | 53.9 % | **93 %** | 93 % |
-| `target-link` | `application-link.mjs`, `edge/edge-link.mjs`, `wasi/wasi-link.mjs` | 5.9 % | **86.8 %** | 86 % |
-| `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **97.3 %** | 97 % |
+| `target-link` | `application-link.mjs`, `edge/edge-link.mjs`, `wasi/wasi-link.mjs` | 5.9 % | **90.6 %** | 90 % |
+| `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **97.1 %** | 97 % |
 | `notices` | `notices.mjs` | 62.5 % | **91.5 %** | 91 % |
+| `downloads` | `managed-download.mjs`, `managed-artifacts.mjs`, `managed-lean.mjs`, `npm-artifacts.mjs`, `cache-repair.mjs` | 59.3 % | **89.7 %** | 89 % |
+| `toolchains` | `managed-sdk.mjs`, `managed-python.mjs`, `managed-link-toolchain.mjs`, `sdk-repairs.mjs`, `toolchain.mjs`, `system-git.mjs`, `windows-tool-paths.mjs`, `macos-tbd.mjs`, `link-driver/python.mjs` | 58.9 % | **89.7 %** | 89 % |
+| `cli` | `cli-arguments.mjs`, `posix-arguments.mjs`, `application-cli.mjs`, `launcher.mjs`, `process-launcher.mjs`, `elapsed-ticker.mjs`, `elapsed-ticker-worker.mjs`, `build-progress.mjs`, `test-switches.mjs`, `platform.mjs`, `output-directory.mjs`, `editor.mjs`, `application-signals.mjs` | 42.7 % | **95 %** | 95 % |
+| `init` | `init.mjs` | 53.6 % | **97.1 %** | 97 % |
+| `dev` | `dev.mjs`, `dev-proxy.mjs`, `dev-build-worker.mjs`, `application-build-worker.mjs`, `browser/browser-dev.mjs`, `browser/static-server.mjs` | 29.2 % | **91 %** | 91 % |
+| `browser` | `browser/browser-build.mjs`, `browser/browser-package.mjs`, `browser/bundle.mjs`, `browser/loader.mjs`, `lasm-modules/app.mjs`, `lasm-modules/web.mjs`, `vite/index.mjs` | 26.1 % | **96.6 %** | 96 % |
+| `application-sources` | `application-sources.mjs`, `application-initialization.mjs`, `application-diagnosis.mjs`, `application-binding-check.mjs`, `application-reachability.mjs`, `application-symbols.mjs`, `application-live-members.mjs`, `application-policy.mjs`, `wasm-objects.mjs`, `lasm-library.mjs` | 44.5 % | **85.4 %** | 85 % |
+| `application-output` | `application-build.mjs`, `application-output.mjs`, `application-native.mjs`, `application-npm.mjs`, `application-runtime.mjs`, `application-support.mjs`, `application-lock.mjs`, `application-metadata.mjs`, `application-metadata-runtime.mjs`, `native-bundle.mjs`, `package.mjs`, `js-runtime.mjs` | 51.1 % | **92.5 %** | 92 % |
+| `edge-build` | `edge/edge-build.mjs`, `edge/builtin-modules.mjs`, `edge/edge-initializers.mjs`, `edge/edge-pre.js` | 31.5 % | **89.4 %** | 89 % |
+| `wasi-build` | `wasi/wasi-build.mjs`, `wasi/wasi-component.mjs`, `wasi/lower-atomics.mjs` | 45.8 % | **95.6 %** | 95 % |
+| `wasmtime` | `wasmtime-runtime.mjs`, `wasmtime-standalone.mjs`, `wasmtime-worker.mjs`, `wasmtime-artifact.mjs`, `wasmtime-bundle.mjs`, `wasmtime-console.mjs`, `wasmtime-file-host.mjs`, `wasmtime-file-imports.mjs`, `wasmtime-guest-memory.mjs`, `wasmtime-module-data.mjs`, `wasmtime-native-stdio.mjs`, `wasmtime-process-host.mjs`, `wasmtime-wasi-stdio.mjs` | 32.4 % | **88 %** | 88 % |
+| `node-host` | `node-host.mjs`, `node-network.mjs`, `node-process.mjs`, `node-signal.mjs`, `node-system.mjs`, `node-udp.mjs`, `node-fetch.mjs`, `lean-io-errors.mjs`, `handle-table.mjs`, `process-exec.mjs`, `working-directory.mjs`, `linux-memory.mjs`, `thread-id.cjs`, `native-clock.mjs`, `native-dns.mjs`, `native-interfaces.mjs`, `native-windows-timezone.mjs`, `native-tcp.mjs` | 42 % | **86.2 %** | 86 % |
+| `native-files` | `native-files.mjs`, `native-file-message.mjs`, `native-file-worker.mjs`, `native-file-worker-pool.mjs`, `native-worker-cwd.cjs`, `worker-stdio.cjs`, `native-process.mjs`, `native-signals.mjs`, `native-program.mjs`, `native-abort.cjs`, `native-pthread-factory.cjs` | 29.4 % | **86.4 %** | 86 % |
+| `serverless` | `serverless/lasm-server.mjs`, `serverless/lasm-lambda.mjs`, `serverless/lasm-vercel.mjs`, `serverless/lasm-netlify.mjs`, `serverless/lasm-azure.mjs`, `serverless/lasm-gcf.mjs`, `serverless/zip.mjs` | 40.5 % | **88.5 %** | 88 % |
 
-Every module is above 80 %; each threshold is its score rounded down. The link driver and the target links
+`edge-build`, `wasi-build` and `wasmtime` were measured 2026-11-09 (run 42581537537; initial scores in runs
+42571769129 and, for `edge-build` without `edge-library.js`, 42579064935). `src/edge/edge-library.js` is not
+mutated: its Emscripten preprocessor lines (`#if JSPI || ASYNCIFY`) are not JavaScript Stryker can parse. The
+code that only runs inside built outputs is run in-process: `edge-pre.js` in a script scope with stand-in
+module globals (`test/edge-pre.test.mjs`); the generated edge entries as their platforms run them, with
+`cloudflare:workers`, `.wasm` modules, `Deno`, `Bun` and `Netlify` stood in (`test/edge-entries.test.mjs`);
+and the Wasmtime runner and supervisor over a stand-in FFI and per-module `node:worker_threads`
+(`test/fixtures/wasmtime-stand-ins/`: a Lean instance with memory, exports, callbacks and thread entry
+points). The atomics lowering is checked by properties: random atomic programs run in V8 before and after
+lowering, binaryen-made modules of every other instruction kind stay valid without the threads feature (binaryen is no
+longer a dependency: the modules it made are recorded in `test/fixtures/lower-atomics-modules.json`, and
+without it V8 validates the output), and
+random instruction streams come out byte for byte as documented.
+
+Every module is above 80 %; each threshold is its score rounded down. Tests whose assertion is a general
+property use `forAll` from [`test/helpers/property.mjs`](../test/helpers/property.mjs) (seeded, so a failure
+names its seed and input) and state the proposition they check in a comment above the test, in Lean notation
+(`// ∀ entries, distinct names → unzip (zip entries) = parents entries ++ entries`), so that it can become a
+`Candidates.lean` entry and later a theorem ([TESTING_STRATEGY.md §4](TESTING_STRATEGY.md)). The function-platform
+shims run in the test process (`test/serverless-shims.test.mjs`): each shim against a programmable stand-in
+server, with `@azure/functions` and `@google-cloud/functions-framework` stood in through `module.registerHooks`,
+and `zip.mjs` is read back by a ZIP reader written from the specification (`test/serverless-zip.test.mjs`). The link driver and the target links
 are tested with stand-in toolchains: `test/link-driver-pipeline.test.mjs`
 drives `linkWithNode` through every recipe step with a stand-in `execute`, and
 `test/application-link-plan.test.mjs`, `test/application-link-node.test.mjs`,
@@ -1135,8 +1224,37 @@ drives `linkWithNode` through every recipe step with a stand-in `execute`, and
 compilers, `llvm-nm`, linkers and Binaryen (`test/fixtures/link-stand-ins/`: a
 tiny C-to-relocatable-Wasm compiler, ar archives and a garbage-collecting linker
 with `--wrap`, `-Map` and `--why-extract`), run in-process so that a module's
-run takes minutes. The stand-ins need a POSIX shell, so those tests are skipped
+run takes minutes. The stand-in toolchain stops a Node-driver link after
+wasm-ld; for full dev builds and the edge dev fast link, a stand-in
+`link-driver/link.mjs` (`link-driver.mjs` there, put in place by a
+`module.registerHooks` resolve hook for fresh module instances) writes the glue
+after that wasm-ld. The stand-ins need a POSIX shell, so those tests are skipped
 on Windows; the pure-function tests run everywhere.
+
+The application modules (measured 2026-11-09, mutation.yml run 42582914197) are
+tested the same way: `test/application-sources.test.mjs` runs the build front
+end against stand-in `lean` and `lake` executables that answer from a JSON
+world and log every run (`test/fixtures/lean-stand-in.mjs`);
+`test/application-build.test.mjs` replaces the build driver's managed-Lean,
+runtime, link and SDK collaborators through module hooks and keeps the real
+lock, cache lease, npm closure and output delivery; the initialization planner
+runs with a scripted probe (`test/application-initialization-plan.test.mjs`).
+`application-sources` keeps `library/` in its sandbox (`keepInSandbox` in
+`modules.json`) for the prebuilt-library tests. The generated entry point embeds
+functions by their source text, which is instrumented under Stryker: its tests
+start the child with `test/helpers/stryker-child-preamble.mjs`.
+The Node host (`node-host`, `native-files`) runs in-process: the native
+adapters that bind the C library through koffi are loaded against a scripted
+libc (`test/helpers/koffi-stand-in.mjs`, a `module.registerHooks` stand-in for
+koffi), which also covers their Windows and macOS branches by presenting
+`process.platform` as that platform for the test; the file worker's adapter,
+its message protocol and the pthread cwd factory, which normally run in worker
+threads (where Stryker records no coverage), are called in the test's thread;
+and the child-side launcher `process-exec.mjs`, which ends by replacing its
+process with `execvp`, runs in-process against the scripted libc. The mutation
+job has no native helpers (the signal adapter, the native process launcher):
+the tests that need them skip there, and `native-signals.mjs` is loaded from a
+copy beside a stand-in adapter.
 
 Mutants whose test file had to be stopped (more than 1 GiB, or alive after its
 runner) are *runtime errors*: Stryker leaves them out of the score
@@ -1179,12 +1297,96 @@ stay, with the reason; they are not chased with tests that look at the code.
 | target links | performance-only branches (serial or parallel compiles, concurrent probes, shared-store bookkeeping), the 64 MiB map bound, `force: true` on files that exist, the 512 and 16 entry bounds of in-memory caches | Same result, different speed or memory |
 | target links | conditions that hold whenever reached (`linkDriver === 'node'` under the dev profile, the seeded "delivered" checks, `imports` always readable, requirements of body probes never read, `'@'` argument forms) and guards inside `try`/`catch` | The other branch cannot be reached with valid options, or the catch takes it |
 | target links | anchors on names Lasm itself produces (`lib/lib*.a`, `initializers-N.o`, `*.c`); `relabelPreJs`' `$` | Those names always have that form; `.` never matches a newline |
+| target links | `writeStoreEntry`'s counter `++` → `--`; the header-length check → `true`; a vanished entry's `return undefined` → nothing; the shipped-analysis fallback `[]` → a made-up name; `archiveUnitCache.load`'s outside-the-runtime guard | Names stay unique either way; a shorter file fails the hash comparison; `undefined` either way; no such file exists; `save` never writes a record for such a file and the shipped analysis has none |
+| target links | probe records: the live code set (`[...live.code]` → `[]`, the sorts), `?.`, the `'null'` fallback and `schema === 2`; `initialization-plan.json`'s call filter | Planning reads only the live data symbols; a missing record throws inside the `try` and links as if absent; only an older Lasm writes another schema; every call of a unit in the closure is in the closure |
+| target links | the seed's probe subset recorded after a member link (`if (linked)` either way, `??=` → `&&=`, `{}`), `initializationSeed && seedOut` → `true`/`\|\|`, `fullLinked` starting `true`, `fastMembers` → `true` | The written seed merges the previous probes back; without a plan the write throws inside its `try`; `fullLinked` is assigned before it is read; `undefined.liveMembers` throws inside the `try` |
+| target links | the link-failure text's `?? ''`; the emcc driver's probe-link mode and `mapOnly`; the default `mapOnly`/`optimize` parameters and the `[arg]` of arguments without `@`; the Node driver's guard against running emcc or em++ | Undefined symbols are found in the same text; em++ takes only the arguments; every call passes them and every link reads one response file; no Node-driver path calls `execute` |
+| target links | `specializedInitialization`'s `mode === 'static'` → `true`; the policy re-check's `error.code !==` → `false`; `rejectionExplanation`'s `return []` → nothing and its `stdio`; `'Unreadable application linker map'` → `''` | A program in another mode is rejected before the value is returned; only the policy error is thrown there; `[]` is the default; every probe without requirements records its error |
+| target links (not equivalent) | shared globals left after eight planning rounds; the WASI Windows response file on POSIX; the rejection explanation's archive filter (`gmp`, `lasmsymbols`) and the program's undefined symbols | They need eight real planning rounds, Windows (the platform workflows run them), or a rejection reached through an initializer or a specialization inside Lean's compiler |
 | target links (not equivalent) | full (not link-only) Node-driver builds, the edge dev fast link's acceptance, shared globals left after eight planning rounds, the WASI Windows response file on POSIX | They need Emscripten's complete glue pipeline, eight real planning rounds, or Windows (the platform workflows run them) |
+| browser | `'utf8'` → `''` before `JSON.parse` or a regular expression (`browserAppName`, the manifests, the Vite plugin's banner); compression options (`BROTLI_PARAM_*`, gzip `level`) → `{}` | A Buffer parses and matches the same; the copies are valid at any level, only their size differs |
+| browser | `browserBundle`'s externals list → every module, or `endsWith(builtinPrefix)`; `externals = 'error'` → `''`; `targetNotices`' `{ label: 'browser' }` → `{}`; `destination === project` → `false`; `result.jsBindings ?? []` → a made-up binding | The configuration module imports builtin modules by relative paths, which never reach the external check; only `'keep'` is tested for; the label defaults to the kind; a destination equal to the project contains the source, which the other half of the check refuses; a binding without a `module` is dropped |
+| browser | the bundler's `^` anchors and `\s+` → `\s` in a replacement after the line's own `^import`/`^export` gate; `external` default `() => false` → `() => undefined`; `visiting.delete` removed; `id !== entry` → `true`; the `''` that removes `import.meta`/`import(` before the static-import check | Each line was already matched at its start; `undefined` is as false; a module is looked up in `transformed` before `visiting`; the entry is visited last, so its variable is never read; no glue spells `import` around those words |
+| browser | the loader's `detail === undefined`, `text === undefined`, `{ app: null }` → `{}`, `?? ''` fallbacks of the type and the user agent, `lean?.lasmDispose?.()` → `lean?.lasmDispose()` | `mark` is always called with a detail and `getAttribute` answers `null`, not `undefined`; `appOf` maps both to `null`; the fallback fails the same pattern; `lean` is unset whenever that `catch` runs |
+| browser | the loader's 20-line stderr bound (`> 20` → `>= 20`/`false`, `shift` removed) | Only the last line is read; the bound only limits memory |
+| browser | `lasm:web`: `getValue`'s and `messageData`'s `typeof … === 'string'` → `false`; `requestInit`'s non-object checks; `randomBytes`' `i < n` → `<=`; `'log'` → `''` in the level list; `frames.clear()`/`sockets.clear()` after an unmount | `String(s)` is `s` and a string is not an `ArrayBuffer`; a non-object has none of the fields read; the extra round fills an empty view; an unknown level logs with `log` anyway; cancelled frames and closed sockets are never looked up again |
+| browser | the Vite plugin: `command = 'serve'` default, `'serve'` checks in `generateBundle` (notices exist only after a build), `chunk.type !== 'chunk'` → `false`, `texts.length === 1` → `false`, `/\?.*$/` → `/\?.*/`, the banner pattern's `^`, `filter(Boolean)` before `trim()`, the `'error'` event of the spawned CLI, `replace(/^\n/, '')` → any `\n` | `configResolved` always sets the command; an asset has no module ids; one text joined is itself; ids have one line; the banner is the loader's first line; `trim` removes what `undefined` joins to; `process.execPath` always starts; the tail starts with the only newline it has |
+| browser (not equivalent) | the Vite plugin's default CLI path (`'../../bin/lasm.mjs'`), production builds with the plugin's own CLI (`command === 'serve'` → `true`), its CLI's `stdio`, and `/^\//` of the `/@fs/` URL | They run the real Lasm CLI (examples/vite, the browser workflow), or need Windows paths |
+| dev | loopback hosts `'127.0.0.1'` → `''` in `freePort`, `waitForPort` and the proxy's upstream request, the upstream `host` header → `''`, `waitForPort`'s `<` → `<=`, `socket.end()` removed, `'error'` → `''` on `freePort`'s server, the content type's `?? ''` | Node uses localhost (127.0.0.1) for an empty host and sets the Host header itself; a probe socket closes with the process; the fallback fails the same pattern |
+| dev | `importClosure`: `\s+` → `\s` in the import split, the header pattern's `^` and some `\s+` → `\s`; `formatLeanDiagnostics`: the location pattern's quantifiers and `^`, `^trace: `, `^(\.\/)+` → `(\.\/)` or unanchored, the `$` of `error: build failed` and the failure list's `^`/`$` | Empty names fail the name check; each line is trimmed first; `resolve` normalizes `./`; Lake writes those lines whole, from their first column |
+| dev | `relevantFile`'s `'lakefile.lean'` → `''`; `ignoredDirectory` order and `files.sort()` (readdir order happens to be sorted on CI's file system); `jsRuntime === target` → `false` | A `.lean` file is relevant anyway; on Node, `bun` and `deno` are never the own runtime |
+| dev | the watcher's `watchers.get(dir) === watcher` → `true`, `watchers.clear()` in the polling fallback; `clearTimeout(timer)` before re-arming the debounce; `changeAt ??=` → `&&=`; `again`/`queued`/`stopping` initial values and the `stopping` guard; `previous.get(file) !== hash` → `true` when settling the manifest | A stale entry is replaced on the next arm; a cleared or doubled debounce rebuilds once (an unchanged snapshot builds nothing); the reload time is not checked to the millisecond; a second stop does what the first did |
+| dev | `reason` → `true`, `stages` → a made-up stage, `force` → `&&`, `every` → `some` for concurrent builds, `-1` → `+1` in the stage check, `options.host ?? …` → `&&` (servers default to 127.0.0.1), joins `', '` of lists with one entry, `filter(Boolean)` before `trim()`, the `'\n'` of `split('\n')[0]` in the condition | Every rebuild has a reason; a stage without a time adds nothing to any group; a first build is forced and no output is added later; repeated stages are equal; one name needs no separator; `trim` removes what `undefined` joins to |
+| dev | `totalmem() >= 6 GiB` → `true`/`>`/`6 / 2 ** 30` | CI's runners have 16 GiB: two workers either way (the test checks the rule against the machine) |
+| dev | `setEncoding?.`/`pause?.`/`server?.close?.()` → without `?.`, `setEncoding('utf8')` → `''`, `windowsHide: true` → `false`, the rewritten program's stdio list, `!existsSync(resolve(input))` → `true` before `assertSourceExists` | Real stdin and every server have those methods; Buffers join to the same lines for ASCII output; no effect on POSIX; `assertSourceExists` returns for an existing file |
+| dev | the static server's `request.method === 'HEAD'` → `false` and the log's `?? ''`; `clients.delete` on close (server and proxy); `!response.headersSent` in the server's `catch` | Node sends no body for HEAD; writing to an ended event stream is ignored; headers are only sent after the last statement that can throw |
+| dev (not equivalent) | the proxy's 502 page after 100 retries (`attempt < 100` variants, the page), `SIGKILL` 5 s after a SIGTERM the program ignores, the editor set-up after the first build (`editorChecked`, its log), `ERR_MODULE_NOT_FOUND` for a missing browser target, the restart of the server while a concurrent browser build still runs (`restarting`), the terminal status line's output prefix, the `'\n'` handling of rewritten partial stdout lines | They take 10 s or 5 s of waiting per mutant, need the managed Lean (editor), a Lasm without `src/browser/`, timing between two builds, a terminal, or a program that writes partial lines; the proxy retry itself is tested |
 | edge glue | `encodeError`'s `err?.` → `err.`; `fileError`'s `{ errno }` → `{}`; `IO.Process.exit`'s `{ exit: n }` → `{}` | Every error that reaches it is an `Error`; the errno falls back to the same table; nothing reads `exit` after `request` encodes the error |
 | edge glue | timers: `t.promise && !t.done` → `true`/`\|\|`, `'finished'` → `''`, `delay > 2_147_483_647n` → `>=` | Resolving a settled or dropped promise does nothing; the phase is only compared with `'running'` and `'initial'`; the same delay |
 | edge glue | the random-bytes loops' `i < n` → `<=`; op 94's check flag read big-endian; its rejection handler; `result?.then`; the sort of `operationCounts` | An empty last chunk, a write past the end is ignored; the flag is only compared with zero; `request` never returns a rejecting promise; `dispatch` always returns a value; `Object.fromEntries` orders integer keys anyway |
 | edge glue | `Writer.reserve`'s `<=` → `<`; `error?.leanUserError` when encoding a settled value; `'reference'` → `''` for `globalThis` and for Lean functions | The buffer grows one write early; encoding only throws `Error`s; Node's global object is not a plain object, and a function is a reference in either mode |
 | edge glue | `'utf8'` → `''` before `JSON.parse`; `startLean`'s `if (disposed) return` → never | A Buffer parses the same; a second disposal finds no cleanups left |
+| downloads | `'utf8'` → `''` before `JSON.parse` (catalogs, receipts, verification records, package manifests); the receipt's `flag: 'wx'`; `{ extracted }`/`{ known }` passed to `inventory`; `made` (the created-directory set) and the 32-way link concurrency | A Buffer parses the same; staging trees are fresh; the hashes are only a shortcut for bytes just written or hard-linked, and every directory exists already |
+| downloads | the `.sort()` of directory listings in `inventory`, `treeFingerprint` and `linkArtifactTree`'s receipt order | Receipts are compared with `isDeepStrictEqual` (key order is ignored); an unchanged directory lists in the same order, so a fingerprint is stable either way |
+| downloads | `retryable`'s `cause?.` chains; `retryAfter`'s `!value`; `attemptDispatcher`'s `return undefined` → nothing; `?? ''` → another string before the Content-Range pattern | A thrown value is an object (a primitive fails earlier, at `cause.code`); a missing header parses to no wait; the fallback string fails the same pattern |
+| downloads | `lifetime.aborted` after a failed attempt → `false`; `throwIfAborted` after the loop and the hashing read's `signal`; the final `bytes !== artifact.bytes` | The next attempt's `throwIfAborted` stops it with the same reason; a size difference also changes the SHA-256 |
+| downloads | the progress throttle's `>= 250` → `> 250` | A millisecond's difference in when progress is reported |
+| downloads | `npm-artifacts.mjs`: the `?? ''` fallbacks of the manifest checks; `tar.x`'s `strict`/`preservePaths`/`preserveOwner` and `rm`'s `force`; the npm output buffers' bounds and initial value; `windowsHide` and stdio; `checkInstalledToolPackages(…).catch(() => null)` → `undefined` | A fallback string fails the same pattern; the tarball's sha512 is pinned before extraction; the buffers only bound memory (the message keeps six lines); `?.missing` treats both alike |
+| downloads | `lstat` of a package's archive: errors other than `ENOENT` reported as missing | The archive name has no separators, so only `ENOENT` occurs for a name in an existing directory |
+| downloads | `managed-lean.mjs`: the `'tiers'` default distribution → `''`; `typeof name !== 'string'` → `false`; the `$` of `-c.tar.zst`; the empty-detail branch of the SDK error; `compileLibrary`'s options | `''` is not `'full'` either; a non-string fails the name pattern; catalog names end there; the linker check always returns a message; Lasm's library compiles only for a release with its `Init.olean` |
+| downloads | `cache-repair.mjs`'s `{ log }` → `{}` when removing a quarantine that is not there | Nothing is logged when the removal succeeds |
+| downloads (not equivalent) | the extraction free-space accounting (`occupied`, block size); `EXDEV`/`EPERM`/`EMLINK` copies instead of hard links; `EEXIST`/`EPERM`/`EACCES` from the publishing `rename` (Linux reports `ENOTEMPTY`, tested); cache repair's rethrown `EPERM`/`ENOSPC`/`EDQUOT`/`EROFS`/`EIO` (`EACCES` is tested); the 2 GiB registry tarball bound; `registryFallback` under Bun and Deno | They need a nearly full disk, a second file system, a file system fault or another JavaScript runtime |
+| downloads (not equivalent) | Windows paths: `inside`'s `\\`, `managedCacheDirectory`'s `LOCALAPPDATA` (tested by argument), the receipt's missing `executable` field, `provisionLean`'s Windows tool prefix and `toNamespacedPath`, cache repair's Windows tool prefixes | Only on Windows (the Windows unit job runs these tests) |
+| toolchains | `'utf8'` → `''` before `JSON.parse` (catalogs, `emscripten-version.txt` as JSON); `execFileSync`/`spawnSync` options (`encoding`, `timeout`, `windowsHide`, stdio) where the output is parsed as JSON or only its status is read | A Buffer parses and converts the same; no observable effect on POSIX |
+| toolchains | `linuxAvailableMemory`'s `attempt` returning nothing, `?? []` → `['Stryker was here']` for the cgroup lines, the v1 `limit !== undefined` → `true`; `buildJobs` with `limit < 2 ** 60` → `<=` | An unparsed value is `undefined` either way; a made-up line names no controller; `Math.min` with `NaN` is excluded by the usage check; no real limit is exactly 2^60 |
+| toolchains | `knownTarget`'s `dash > 0` → `>= 0`/`true`; `indentOf`'s `^`; the YAML filter's `lists--`; `kept[0]?.`; the loops' `<` → `<=` at the end of the lines; the top-level targets' `.filter(Boolean)`; `filterJson`'s `typeof stub !== 'object'` | No architecture is empty or matches a prefix of a target without its dash; `' *'` always matches at 0; any count but zero is truthy; the first document is never dropped; past the end a line is `undefined` and matches nothing; a rewritten list has no empty entries; JSON that starts with `{` is an object |
+| toolchains | `system-git.mjs`: the manifest's `?? []`, the `statSync(...).isFile()` check and its `catch`, following a local path that does not exist, PATH entries that are empty, the delimiter for another POSIX platform, `shell` for `.cmd`/`.bat` on POSIX | A made-up entry has no `type`; spawning a directory or a missing file fails like a failing git; a missing project has no requirements; `:` on every POSIX platform; the stand-ins run either way |
+| toolchains | `pythonEquals`/`truthy`'s `Array.isArray(value)` → `false` | An array's keys are its indices, so the object test gives the same answer |
+| toolchains | `windows-tool-paths.mjs`: the `.sort()`s before comparing listings; the marker's `flag: 'wx'` and `{ log }` | `readdir` lists the same directory in the same order; the staging directory is fresh; nothing is logged when cleanup succeeds |
+| toolchains (not equivalent) | `provisionSdk`'s runtime repairs (`prepareSdkRepairs` after its version check), the macOS `vm_stat` runner, `resolveLean`'s `assertPlatform`, the copy fallbacks and rename races of Windows tool prefixes, `provisionPython`'s Windows-only branches | They need the real Emscripten SDK sources, macOS, an unsupported host, a second file system or a concurrent process |
+| cli | `runApplicationChild`'s `stdio: 'inherit'` and `windowsHide`; `child.exitCode === null` → `true` before forwarding a signal | The child's terminal streams and console window are not observable in-process (every `lasm Main.lean` run in CI uses them); killing a child that has exited does nothing |
+| cli | `'utf8'` → `''` before `JSON.parse` (`versionText`, `buildEdge`, the editor marker, `foreignOutputError`) | A Buffer parses the same |
+| cli | `--allow-dev`'s `result.command === 'build'` → `true` | Only `lasm build` accepts `--target`, so no other command reaches it with one |
+| cli | `sameOutputTree`'s `.sort()` of both listings | Only membership and per-name comparisons are used; the order does not matter |
+| cli (not equivalent) | `lasm build`'s default target on Bun and Deno (`jsRuntime === 'node'` in `cli-arguments.mjs`) | Differs only when the CLI runs on Bun or Deno (`bun-deno-*.yml`); under Node every mutant parses the same |
+| init | `web`'s `interop: true` and `fullstack`'s `interop: false` flipped | The browser and fullstack templates write their own file sets; neither reads `interop` |
+| init | `--deploy`'s `value ?? ''` and `conflicts ?? []` → another string or `['Stryker was here']`; `nextSteps`' default `'node'` → `''` | The made-up name is no deploy target; every runtime other than Bun and Deno gets the npm steps |
+| init | `'utf8'` → `''` reading `package.json`, `toolchains.json` and the template files; `writeFiles`' `flag: 'wx'` removed | A Buffer parses and is written with the same bytes; `initProject` has already checked that the directory is new or empty |
+| init | `packageJson`'s `deploy = []` default; the dependency sort's `a < b` → `<=`; `templates[template]?.portable` → `.portable` | Its only call without deploy targets (the browser template) returns first; dependency names are unique; the template is always valid there |
+| init | deno-deploy's `'deno/'` in `.gitignore`; the fullstack scripts' `filter(t => t !== 'workers')` removed | `--deploy deno-deploy` accepts only portable templates, which already ignore `deno/` (a set); the workers script it would write is the same string |
+| init | `spinName`'s `^-+` → `^-` and `-+$` → `-$` | Its input is a `packageName`, which never starts with a separator, and the previous replacement has already joined runs into one `-` |
+| init (not equivalent) | the fullstack scripts' ` --output dist/server` for function platforms | Function-platform `--deploy` targets with `--template fullstack` write a broken project ([#168](https://github.com/Millillion/lasm/issues/168)); not tested until that is decided |
+| application sources, application output (not equivalent) | the Windows and macOS branches: `canonicalApplicationPath`'s native realpath, `nativeLeanEnvironment`'s `PATH` key and namespaced `LEAN_SYSROOT`/`LEAN_PATH`, `macosSdkPath` (`xcode-select`, `xcrun`), `compileLibrary`'s Windows environment, drive letters in `liveMembers`' map paths and `preprocessorArguments`' path keys; Deno and Bun detection in `js-runtime.mjs` | They run only on Windows, on macOS or under Deno and Bun (the unit, release-checks and Bun/Deno workflows run them there) |
+| application sources, application output | `windowsHide`, `encoding: 'utf8'` before `JSON.parse` or a regular expression, `stdio`, `maxBuffer` and `timeout` of `spawnSync`/`execFile` calls (Lean, Lake, `llvm-nm`, the binding checker) and the checker's kill timer | No observable effect on POSIX with small outputs |
+| application sources | `standaloneImportsModules`' `unknown module` pattern and `wanted.has(…)` | A `lean --src-deps` that fails returns `true` whatever the message says (the larger prefix is preferred) |
+| application sources, application output | separators and labels inside hashed keys (`lakeConfigurationKey`'s `\0`, `manifest\0`, `header\0`, the adapter's source URL; `workspaceImportsKey`'s separators and entry sort; the binding cache's runtime label; the npm closure's `lasm-node-modules-1\0` and separators; the build driver identity's inputs and its `sessionTrusted` reuse) | A key only has to change with its inputs; these change only when Lasm's own sources or the directory order of the file system change, which no test controls |
+| application sources | paired fallbacks: `trim()` and `filter(Boolean)` on Lean's and Lake's output; the binding checker finding the project by `LASM_BINDING_PROJECT` or by its last argument; `?? ''` after `spawnSync` with an encoding; `Number(…)` of ar header fields with or without `trim()` | Each one alone gives the same result as both |
+| application sources | ar reading: the `/` and `/SYM64/` checks of members after the index, the header guards (`raw.length < 60`, the `` ` `` magic, `isFinite`), the `/` suffix and `/N` patterns of member names, `closeSync` in `finally`, `liveMembers`' region column for non-CODE sections and the duplicate guard of unattributed members | The index is read first, so later headers never repeat it; one guard stops the walk whenever the other would; names Lasm's archives use have one trailing `/`; only CODE sections are named by symbol |
+| application sources, application output | performance-only code: the `leanPrefixes`, library-text and archive-index caches, early returns for empty binding lists, `if (record)` inside `try` blocks, `Math.min(jobs, …)` of the npm copy, the npm closure's and `lasm package`'s second sort, `files.filter(name !== 'package.json')` before the generated `package.json` overwrites it | Same result, different speed |
+| application sources (not equivalent) | `prebuiltLibrary`'s manifest checks (schema, release, library identity, file list) and its damaged-file error | They need a changed shipped `library/prebuilt`, which tests must not modify (the release checks verify the shipped copy) |
+| application output (not equivalent) | `requireApplicationSupport()` in `buildApplication`, `applicationSupport()`'s read errors; `options.cache ?? managedCacheDirectory()` for the cache lease | A research checkout has no `application-support.json`; the lease location only matters with the user's real cache |
+| application output | `kind` labels `'optional'`/`'peer'` in the npm closure; `wasm-objects.mjs`' `bytes.length < 8` and initial `codeStart`; `application-reachability.mjs`' `trimEnd`/blank-line handling | Only `'required'` is compared; a short buffer fails the magic check the same way; blank rows are skipped either way |
+| edge build | `'utf8'` → `''` before `JSON.parse` or a regular expression; `force`/`recursive` of `rmSync` on staging directories that never or always exist there; `entry !== key` → `true` when superseding programs; the staging names (`'.'`, `'.partial'`); the cache-key source lists (`linkSources`) | A Buffer parses and matches the same; the path is gone or a directory either way; the key's directory is removed next anyway; any unique sibling works; see the target-links row on cache keys |
+| edge build | `?? []` → `['Stryker was here']` in `edgeModules`, the `^` of the Supabase prefix pattern, the comparator of superseded programs and `older.slice` outside dev builds, `verbose = false` → `true`, `state === 'idle'` / `'running'` → `''` in `syncCall` | The made-up name is never a binding and is filtered out; npm names have no `:`; every older program is removed in a release build; only the link's console output differs; inside a callback Lean cannot suspend and notify does not pump in either state |
+| edge build | `edge-pre.js`: `typeof WebAssembly.Suspending === 'function'` → `true`; `listeners` → `['Stryker was here']`; `at > stackTop` → `>=`; `sp !== undefined` → `true`; `if (size)` before `HEAPU8.set`; `state = 'idle'` → `''` in `poison` and `close`; `notify`'s `state === 'suspended' && waking`; `pump`'s `result && typeof result.then`; `syncDepth--` → `++` after a failed callback | The chosen object always has `Suspending` (the engine's or the identity wrapper); calling a string throws inside the listener `try`; the same top; every caller passes the stack pointer; an empty set writes nothing; a stopped instance runs nothing either way; `waking` is set only while suspended and `wake` without it does nothing; `catch` on a non-promise throws inside the pump's `try`; the instance is stopped |
+| edge build | `edge-initializers.mjs`: `calls[unit] ?? []` → `['Stryker was here']`; `builtin-modules.mjs`: `.sort()` of the names removed | An unknown unit is never kept and visiting it does nothing; libuv returns directory entries sorted on Linux and macOS |
+| edge build (not equivalent) | `edgeStepCache`, `edgeMembers` and the dev profile's two retained programs in `linkCachedEdgeProgram`; `findEdgeProgram` and `cachedProgram` | They run with the Node link driver's recorded replay (dev edge links) or a provisioned edge runtime; `test/edge-link-plan.test.mjs` (module `target-link`) tests the dev link itself |
+| WASI build | `lower-atomics.mjs`: `s64`'s negative branch; `Bytes.push`'s `values.length` → `true`; the helper type key `join(',')` → `join('')` and `'notify'` → `''`; single-byte value, block and heap types read as LEBs (and the reverse); `limits`' maximum read as u32 or u64; empty `case 0x40`/`case 0x41` bodies; `sub >= 15` → `true` | Only non-negative offsets and masks are encoded; an empty part adds no bytes; the keys of the helpers' signatures do not collide, and no other helper has an empty key; those bytes are below 0x80, so either read takes one byte; both read the same LEB; they fall through to a case that skips the same LEB; the subopcodes below 15 that reach it are 9, 11 and 13 |
+| WASI build | `wasi-build.mjs`: `'utf8'` → `''`; `force`/`recursive` of staging removals; `entry !== key` → `true`; `{ level: 9 }` → `{}` for the Fastly package; `let note = ''` → another string. `wasi-component.mjs`: the section list's `[]` → `['Stryker was here']`, `at < length` → `<=` in both section walks, `startsWith`'s length check → `true` | As for the edge build; the compression level changes only the package's size; every branch assigns the note; strings have no section id, an extra pass at the end adds an empty piece, and `every` fails on the missing bytes |
+| Wasmtime | `'utf8'` → `''` before `JSON.parse`; the hex form of file hashes and `!item` checks in the bundle, artifact and module-data checks; the Buffer-capacity bounds (`bufferConstants.MAX_LENGTH`, `Math.min` → `Math.max`) in the console, guest-memory and WASI code; the console's `remaining < 65536n` and trailing-byte bounds → `<=`/`true`; the `>= 0n` halves of guest range checks; `if (count) write(...)` | A Buffer parses the same; the inventory hash compared next rejects the same records, and the key-set check before guarantees each record; on 64-bit Node `MAX_LENGTH` equals `Number.MAX_SAFE_INTEGER`, checked first; the same bytes are decoded; guest offsets and lengths are uint64 values; an empty write writes nothing |
+| Wasmtime (not equivalent) | the runtime's checks of what the native instance reports (stack bounds, mailbox registration, function globals' pointers), diagnostic RPC deadlines, failure reports written to stderr on the main thread, Workers terminated at shutdown; the standalone supervisor's `prepareApplicationSignals`, `prepareApplicationMetadata` and `forwardWorkerStdio` calls; a failing native descriptor write; the process host's `applicationCommand` and console write failure | They need the real Wasmtime instance and native helpers, a real process, or a failing descriptor: `wasmtime.yml` runs standalone outputs, and those functions have their own tests |
+| node host, native files | `fd < 0` → `<= 0` (and `>= 0` → `> 0`) for descriptors and counts the C library returns | Descriptor 0 is the process's stdin and is never returned by `open`, `dup`, `socket` or `mkstemp`; a zero count reaches the same branch either way |
+| node host | `leanAtLeast`'s `i < 3` → `<=`, `a[i] > b[i]` → `>=`; the Windows case list's `trim()` and `/\s+/` → `/\s/` | Index 3 is undefined in both versions, so the loop still ends equal; the comparison runs only when the parts differ; an empty name is never an error code |
+| native files | the pooled wrappers (`flushAll`, `checkDirectorySearch`, `flush`/`rewind`/`truncate`, `read`/`write`/`closeAsync` guards) removed or emptied | The synchronous adapter underneath does the same thing on the calling thread: only which thread blocks differs |
+| native files | `!windows` → `true` around the optional `mkostemp` binding | Without `mkostemp` the adapter falls back to `mkstemp` and sets close-on-exec itself: the same descriptor and flags |
+| node host, native files (not equivalent) | koffi type strings and argument lists of the Windows and macOS bindings (`_setmode`, `_get_osfhandle`, `_errno`, `_NSGetEnviron`, kernel32, `scandir$INODE64`, ICU's loader), library names (`ucrtbase.dll`, `kernel32.dll`, `icu.dll`, `/usr/lib/libSystem.B.dylib`) and `process.platform === 'darwin'` choices taken at load | The scripted C library ignores declared types and paths; the real ones are checked by the macOS and Windows unit jobs. The ICU prototypes and `struct addrinfo` layouts are checked against the C headers (`test/windows-timezone-icu.test.mjs`, `test/native-dns-stand-in.test.mjs`) |
+| node host (not equivalent) | the zone fallback in `pathAt` (a missing or unreadable `/etc/localtime` served as the bundled UTC zone, its one warning) | Needs a host without tzdata; `timeZoneFile` itself is tested with injected `open` (`test/node-host-zone.test.mjs`) |
+| node host (not equivalent) | `loopAlive` through `request` (operation 145) under Lean 4.36 | Lean 4.36 has no verified IO error policy yet (`checkLeanIOVersion`), so a host cannot be created for it; `loopAlive` is tested directly |
+| native files (not equivalent) | the private cwd factory's failed start (`Private cwd worker factory failed: …`, startup timeout) and its unexpected exit, `MessagePort`'s `addEventListener` form | They need a factory thread that cannot `unshare(CLONE_FS)` or dies, or a web-style port; `runCwdFactory`'s failure report is tested with a scripted libc |
+| native files (not equivalent) | `native-signals.mjs`' koffi struct and argument types, and the `.cache/native-host/signals/` location | The adapter library is built by the native helper build, absent from the mutation job; the loader is tested from a copy beside a stand-in adapter (`test/native-signals-stand-in.test.mjs`) |
+| serverless | `parseSetCookie`'s `.trim()`s and `!key`/`!cookie.name` checks where the attribute or name test fails the same way; the hop-by-hop names `proxy-connection` and `te` (Node's HTTP client sends neither); `'error'` → `''` event names on sockets that do not fail in the tests; `isTextual`'s regular-expression anchors whose other alternatives already match | Same result for every value a platform sends; the error paths that matter (an unreachable server, a reply broken off) are tested |
+| serverless | the platform shims' `startLeanServer().catch(…)` handlers; `freePort`'s and `accepts`' `socket.destroy()` | They only run when start-up fails while a function loads, which the next request reports anyway; a probe socket left open is closed by the server |
+| serverless (not equivalent) | `startLeanServer` in a worker thread (`!isMainThread`: the environment through the native host) and a program that exits before it listens (`exited`); `zip`'s 4 GiB bound and the exact 65,535-file boundary | A worker-thread function runtime (`netlify functions:serve`) and `process.exit` cannot run in the test process; a 4 GiB archive, or 65,535 deflate streams, exceed the mutation job's 1 GiB cap (`test/serverless.test.mjs` packages real archives) |
 
 Delivery's failure paths in `src/application-files.mjs` (a failing copy,
 `rename` or `rm`, an output that cannot be inspected) are tested by fault
@@ -1204,7 +1406,9 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Dev-profile campaign 41241443151 | `Float.pow` differed in the 17th digit between native (glibc) and Wasm (musl's libm): expected, libm functions are not correctly rounded | Generator: libm results go through `approx` (9 significant digits) |
 | Nightly-style campaign 41241440598 (9,450 cases) | Two "divergences" on every Wasm target were the harness's own: it decoded each pipe chunk of the oracle's output separately, so a UTF-8 character split by native Lean's 4,096-byte writes became U+FFFD (the Wasm targets wrote it whole). `scripts/ci/lasm-js-stress.mjs` had the same pattern | Harness fix (#33) |
 | Browser differential, first campaign (41718626550, `IO.Process.exit 7` ending, all three browsers) | **`IO.Process.exit` in an isolate stopped the instance with "unreachable"** (Firefox: "unreachable executed", WebKit: "Unreachable code should not be executed") instead of the host's refusal: the runtime traps right after the exit call (`runtime/node-io.cpp`), and the trap, not the refusal, became the stop cause. Affects the browser and every edge isolate (Workers and the other edge platforms); Bun and Deno exit | Fixed in `src/edge/edge-host.mjs` (the refusal is kept as `exitRequested`) and `src/edge/edge-start.mjs` (it is the stop cause and the rejection); regressions in `test/edge-host.test.mjs` and `test/edge-runtime.test.mjs`. The page still cannot exit: a `KNOWN` entry in `run.mjs` (a documented host limit) |
+| Mutation testing, `edge-build` (`test/edge-output.test.mjs`) | **`lasm build --target workers` kept a generated `workers/wrangler.toml` after the project added its own** `wrangler.toml`/`wrangler.json`/`wrangler.jsonc`, whenever the program was unchanged: an unchanged rebuild keeps the output directory, and the generated file was only ever written, never removed | Fixed in `src/edge/edge-build.mjs` (the Workers target removes it when the project has a configuration); regression in `test/edge-output.test.mjs`; [next release notes](release/next-notes.md) |
 | Browser differential, first PR run (41718617906) | A panic in a page prints a JavaScript backtrace: a page has no environment, so `LEAN_BACKTRACE=0` cannot be set. Documented behaviour ([EDGE.md](EDGE.md#environment-variables)), not a bug | `KNOWN` entry in `run.mjs` |
+| Mutation testing (`init`, 2026-11-09) | `lasm init --template fullstack` accepts the function-platform `--deploy` targets and writes a broken project: `--deploy lambda` gives the script `build:undefined` (`--target undefined`), `vercel`/`netlify` get no `vercel.json`/`netlify.toml`, `azure`/`gcf` no npm dependency | [#168](https://github.com/Millillion/lasm/issues/168) (refuse or support: a behaviour decision) |
 | Nightly campaigns since 2026-11-02 (`deno-O0`), the first `bun-O0` campaign (41729836793) | `deep` cases of 3,000 frames stopped the unoptimized edge builds with "memory access out of bounds" (Bun: "Out of bounds memory access"), cutting off every later case: clang `-O0` keeps every local on the edge link's 1 MiB C stack (`src/edge/edge-link.mjs`), which those frames overflow. A capacity limit of unoptimized code, not an optimizer difference. The optimized edge builds pass 5,000 | Harness: the edge `-O0` targets run the core program with `deep` cases of at most 1,000 frames (`withDeepAtMost`, program `shallow`). Fixed: the instance stops with "Stack overflow detected: Lean exhausted the edge profile's 1 MiB C stack (WebAssembly linear memory)" when the C stack pointer is at or past the end of the stack after a trap (`src/edge/edge-pre.js` keeps it, `src/edge/edge-start.mjs` names it); regressions in `test/edge-js.test.mjs`, `test/edge-runtime.test.mjs` and `scripts/ci/stack-depth.mjs` (`edge-O0`, `edge-O0-node`, `edge-O0-bun`: three recursions just past their `-O0` limits; V8 runs out of its engine stack first for small frames, Bun of the C stack) |
 | Test-quality audit | `candidate-readme.test.mjs` broke on `main` when the README's headings changed (PR #22), failing `installer-faults.yml` on every PR | Fixed in #25 |
 | Host bridge model (proxied work in a synchronous callback) | **A synchronous Lasm.JS callback that made the program's first asynchronous runtime request (a timer, socket, DNS lookup) hung for good.** The request starts the completion thread; `pthread_create` on a Lean thread is proxied synchronously to Node's main thread, which waited in `syncFunction` on the doorbell and never ran proxied work. Found while modelling the lazy completion thread, then reproduced (0.3.5) | Fixed: the wait runs the main thread's mailbox (`serveMailbox`, Emscripten's `_emscripten_check_mailbox`) whenever it times out, every 10 ms; regression in `test/node-js.test.mjs` and part 4 of `test/fixtures/js-callbacks`; the model's mutation keeps the old wait |
@@ -1213,8 +1417,10 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Host bridge (approved 2026-11-04) | **Waiting inside a synchronous callback for a Lean task that needs Node hung for good**: a task that makes host calls (`Async` run with `.block`), or a timer, DNS lookup or socket read started in the callback. Node's main thread waits for the callback, and the task's thread (or the completion) waits for the main thread | Fixed: the callback's task waits poll (`sync_wait`, through `--wrap` of `lean_task_get` and `lean_io_wait_any_core`), every other thread's indefinite wait is listed (`--wrap` of `emscripten_futex_wait`, `lasm_js_host_wait`), and the main thread stops a wait once every other Lean thread has waited for 50 ms with nothing changed; regressions in `test/fixtures/js-sync-waits` (each part alone, then all), `test/node-js-bridge.test.mjs`, and the model's `taskWaits`, `pureWaits` and mutants |
 | Mutation testing (`build-service`, first run) | **`createBuildService({ unref: true })` did not let the process exit** (the Vite plugin's build worker): the worker's stdout and stderr were piped, and a worker stdio stream waiting for data refs the worker; `unref()` also came before the `'message'` listener, which refs it again | Fixed ([#49](https://github.com/Millillion/lasm/issues/49)): Node forwards the worker's output itself, and `unref()` comes last; regression in `test/dev-build-service.test.mjs` |
 | Mutation testing (`host-bridge`, `edge-glue`) | **Lasm.JS failures wrapped twice**: a settled value that could not be converted, or an awaited promise rejected with a Lasm.JS failure, reached Lean as `Error: TypeError: …`, on Node and the edge | Fixed ([#51](https://github.com/Millillion/lasm/issues/51)) in `src/node-js.mjs` and `src/edge/edge-js.mjs`; regressions in `test/node-js-bridge.test.mjs` and `test/edge-js.test.mjs` |
+| Mutation testing (`node-host`, scripted `getifaddrs`) | **macOS network interfaces reported a wrong hardware (MAC) address**: `src/native-interfaces.mjs` read the link-layer address of a `sockaddr_dl` after `sdl_alen` (byte 6) bytes of the name instead of `sdl_nlen` (byte 5), so `en0` reported bytes of its name and address mixed | Fixed (libuv's `LLADDR`); regression in `test/native-interfaces.test.mjs`, and `test/native-interfaces-host.test.mjs` compares every interface with the engine's `os.networkInterfaces()` on each platform |
 | Deterministic simulation of Tandem (first CI run: 12 of 30 seeds) | **The editor could drop an unsent edit from `pending`:** a WebSocket push that did not continue the replica's log sent a second sync while one was in flight, without marking it in flight, so two replies came back and the first one's count (`onReply sent`) dropped operations the second carried. The edit was lost if that second sync failed | Fixed: a push that arrives while a sync is in flight marks the editor behind, and it syncs again when the reply returns (`Frontend/Ui.lean`) |
 | Deterministic simulation of Tandem (first CI run) | A failed catch-up sync (nothing pending) was never retried: the retry ran only while edits were pending, so the editor showed "Offline: 0 edits waiting" and stayed behind the log until someone else typed | Fixed: the retry always syncs |
 | Deterministic simulation of Tandem (third CI run, most seeds with an ambiguous commit) | A commit that succeeded and then reported an error (D1's lost reply, a timeout after `COMMIT`): `syncOnce` ran the sync again, found the operations known and appended and pushed nothing, so tabs that were not typing never heard of them | Fixed: a failed commit checks whether the log holds exactly its operations at its position, and if so answers and pushes them; and a sync whose operations were all in the log already pushes its reply, which holds them (`Server/App.lean`; the second part was found by the heavy-fault seeds, when that check could not read the log) |
 | Deterministic simulation of Porter (4 of 30 seeds) | A token request whose commit succeeded and then reported an error is run again by `runRequest`, finds its own code used or its refresh token rotated, answers `invalid_grant` and revokes the family it just issued: one transient database error signs a user out | Fixed (#138, Jordan's choice of a commit receipt): each commit inserts a row keyed by an id from the request's random values (the same on a rerun), and a failed commit whose receipt is there keeps its reply (`Server/App.lean`, `Spec.landed_commit_stands`); the simulation no longer tolerates the refusal |
+| Mutation testing (`downloads`, 2026-11-09) | **A failing SDK archive decoder was reported as the tar parser's error**: when the managed Python's decoder for `.tar.xz`/`.zip` SDK archives (`src/archive-stream.py`) failed, could not start or was killed, `extract` reported `TAR_BAD_ARCHIVE: Unrecognized archive format` for the empty or truncated stream it left, not the decoder's exit status and messages | Fixed in `src/managed-artifacts.mjs` (the decoder's result is preferred after a broken stream); regressions in `test/managed-artifacts-decoder.test.mjs`; `docs/release/next-notes.md` |
 | Differential fuzzing, feature programs (campaign 42620999209, seed 620999216, case 132; `wasi`, `wasi-node`, `deno`, the edge engines, browsers, both profiles) | `(repr a).pretty` of an `Array Int` of 5,120 elements stops with "call stack exhausted" / "Maximum call stack size exceeded": Lean's formatter recurses with the number of elements, and the WASI and edge stacks hold about 9,000–11,000 frames. Native Lean and the Node target print it | Open: [#179](https://github.com/Millillion/lasm/issues/179) (the documented recursion-depth limit, reached through the standard library); the generator keeps printed arrays below that size |

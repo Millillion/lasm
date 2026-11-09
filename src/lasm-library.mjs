@@ -19,6 +19,11 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   // Lasm.Web (docs/BROWSER.md): web-platform bindings on Lasm.JS.
   'Lasm.Web.Types', 'Lasm.Web.Dom', 'Lasm.Web.Events', 'Lasm.Web.Timers', 'Lasm.Web.Fetch', 'Lasm.Web.Url', 'Lasm.Web.Storage',
   'Lasm.Web.History', 'Lasm.Web.WebSocket', 'Lasm.Web.Crypto', 'Lasm.Web.Console', 'Lasm.Web.Canvas', 'Lasm.Web.App', 'Lasm.Web',
+  // Lasm.JS.Web (docs/JS_BINDINGS.md, "Standard bindings"): the WinterTC Minimum Common Web API,
+  // generated from WebIDL by scripts/bindings/generate-web.mjs.
+  'Lasm.JS.Web.Support', 'Lasm.JS.Web.Dom', 'Lasm.JS.Web.Messaging', 'Lasm.JS.Web.Streams', 'Lasm.JS.Web.File',
+  'Lasm.JS.Web.Encoding', 'Lasm.JS.Web.Compression', 'Lasm.JS.Web.Url', 'Lasm.JS.Web.Fetch', 'Lasm.JS.Web.Crypto',
+  'Lasm.JS.Web.Performance', 'Lasm.JS.Web.Timers', 'Lasm.JS.Web.Global', 'Lasm.JS.Web.Console', 'Lasm.JS.Web.Wasm', 'Lasm.JS.Web',
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
   'Lasm.UI.Url', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',
@@ -34,6 +39,10 @@ export const glueSource = join(root, 'c', 'lasm_js.c');
 export const glueLinkFlags = ['lean_task_get', 'lean_io_wait_any_core', 'emscripten_futex_wait'].map(name => `-Wl,--wrap=${name}`);
 // Lasm.Fetch's glue on Node and the edge (WASI builds link src/wasi/lasm_fetch_wasi.c).
 export const fetchGlueSource = join(root, 'c', 'lasm_fetch.c');
+// Std.Async binds of steps that complete at once, bounded in depth (#90): kept by
+// every link, with its wrap (asyncLinkFlags), unlike the Node glue's.
+export const asyncGlueSource = join(root, 'c', 'lasm_async.c');
+export const asyncLinkFlags = ['l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg'].map(name => `-Wl,--wrap=${name}`);
 // Lasm.JS.Meta (deriving, `@[js]`) uses Lean's elaborator: only prefixes that
 // contain it (the extended tier) get the library.
 const requiredOlean = ['Lean', 'Elab', 'Deriving', 'Basic.olean'];
@@ -146,8 +155,9 @@ export function librarySources(lean, programSources) {
   for (const module of modules) {
     sources.push(libraryC(lean, module)); inputs.push({ module: '+' + module, source: join(lean.prefix, 'src', 'lean', ...module.split('.')) + '.lean' });
   }
-  sources.push(glueSource, fetchGlueSource);
-  inputs.push({ module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource });
+  sources.push(glueSource, fetchGlueSource, asyncGlueSource);
+  inputs.push({ module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource },
+    { module: 'lasm_async.c', source: asyncGlueSource });
   const oleans = modules.map(module => join(lean.prefix, 'lib', 'lean', ...module.split('.')) + '.olean');
   return { sources, inputs, modules, oleans };
 }

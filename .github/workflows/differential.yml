@@ -477,10 +477,11 @@ jobs:
             ${{ runner.temp }}/equivalence/*.json
           retention-days: 30
           if-no-files-found: ignore
-  # Async loop depth (issue #90, scripts/ci/async-depth.mjs): the deepest Async
-  # loop of awaited (and synchronous) Lasm.JS host calls on Node, Deno, Bun and
-  # workerd (wrangler dev, offline), held above a floor, and the documented
-  # workaround (Std.Async.sleep 0 every 100 calls) completing 100,000 calls.
+  # Async loop depth (issue #90, scripts/ci/async-depth.mjs): Async loops of
+  # 100,000 and 1,000,000 steps that complete at once (synchronous Lasm.JS host
+  # calls, IO, pure) and of 100,000 awaited calls, on Node, Deno, Bun and workerd
+  # (wrangler dev, offline), with no pause (library/c/lasm_async.c), and the
+  # former workaround (Std.Async.sleep 0 every 100 steps) still passing.
   async-depth:
     if: needs.sunday.outputs.skip != 'true'
     needs: [sunday, pack]

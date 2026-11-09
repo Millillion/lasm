@@ -42,7 +42,9 @@ export async function nativeInterfaces() {
             if (!(entry.flags & 1) || !(entry.flags & 64) || !entry.address) continue;
             const family = ffi.decode(entry.address, darwin ? 1 : 0, darwin ? 'uint8_t' : 'uint16_t');
             if (family === familyLink) {
-              const start = darwin ? 8 + ffi.decode(entry.address, 6, 'uint8_t') : 12;
+              // sockaddr_dl: LLADDR is sdl_data (byte 8) + sdl_nlen (byte 5);
+              // sockaddr_ll: sll_addr is at byte 12.
+              const start = darwin ? 8 + ffi.decode(entry.address, 5, 'uint8_t') : 12;
               const bytes = Buffer.from(ffi.view(entry.address, start + 6));
               physical.push({ name: entry.name, bytes: Buffer.from(bytes.subarray(start, start + 6)) });
             } else if (family === 2 || family === family6) {

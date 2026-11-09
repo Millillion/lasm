@@ -1,0 +1,17 @@
+{
+  "name": "std-http-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "an HTTP server in pure Lean (Std.Http), compiled to WebAssembly by Lasm",
+  "scripts": {
+    "dev": "lasm dev Main.lean",
+    "build": "lasm build Main.lean",
+    "start": "node dist/main.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@lasm/compiler": "<LASM_VERSION>"
+  }
+}

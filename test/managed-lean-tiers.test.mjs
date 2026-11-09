@@ -5,10 +5,12 @@ import { join, basename, delimiter } from 'node:path';
 import { tmpdir } from 'node:os';
 import { Readable, Writable } from 'node:stream';
 import { packArchive } from '../scripts/lean-dist/tiers.mjs';
-import { leanDistribution, assembleLeanPrefix, toolchainCatalog } from '../src/managed-lean.mjs';
-import { validateArtifact } from '../src/managed-artifacts.mjs';
-import { standaloneImportsModules, cCompilerEnvironment } from '../src/application-sources.mjs';
-import { repairManagedCache } from '../src/cache-repair.mjs';
+import './helpers/library-stand-in.mjs';
+// After the stand-in (mutation sandboxes have no library/ sources).
+const { leanDistribution, assembleLeanPrefix, toolchainCatalog } = await import('../src/managed-lean.mjs');
+const { validateArtifact } = await import('../src/managed-artifacts.mjs');
+const { standaloneImportsModules, cCompilerEnvironment } = await import('../src/application-sources.mjs');
+const { repairManagedCache } = await import('../src/cache-repair.mjs');
 
 const host = process.platform + '-' + process.arch;
 async function tierArchive(name, files) {

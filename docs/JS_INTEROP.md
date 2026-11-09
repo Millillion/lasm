@@ -70,8 +70,16 @@ measurements that chose the architecture, and the implementation notes below.
   reads the bindings from the program's `.olean` files with the managed Lean (an
   environment extension of `Lasm.JS.Meta`). It then loads each module in a separate
   Node process.
+- **Measured cost of the library, now** (CI, Linux x64, 2026-11-09;
+  [BENCHMARKS.md](BENCHMARKS.md#lasmjs-call-cost)): a call, `get` or method call
+  made right after the previous one costs about 5 µs (it was 22–33 µs); one
+  with a 20-field object each way about 18 µs (41–67 µs). A lone call, or calls
+  while other Lean threads make host calls too, still costs 20–30 µs: the
+  saving comes from not waking either thread between consecutive calls
+  (below, "Waking the threads").
 - **Measured cost of the library** (Linux x64, local host under load;
-  [evidence](evidence/js-interop-library-2026-10-22.json)), mean per call:
+  [evidence](evidence/js-interop-library-2026-10-22.json)), mean per call, before
+  the 2026-11-09 changes:
   - `get` is about 25 µs, `callMethod` 24–28 µs, a typed binding 30–37 µs.
   - Awaiting a resolved promise as a task costs about 110 µs.
   - JavaScript calling an asynchronous Lean callback that Lean awaits costs about
@@ -91,6 +99,54 @@ measurements that chose the architecture, and the implementation notes below.
   argument and defaults to `Value` (`Data` for `…Await` and `await`), for example
   `o.get "rows" (Array Todo)`. Constructors bind as `"new Class"`, the module itself
   as `""`, globals with module `"globalThis"`.
+
+### Waking the threads (2026-11-09)
+
+Where one call's time went on Node (CI, Linux x64, `Math.max(1, 2)` from a Lean
+loop, `bench/fixtures/js-sync-cost`):
+
+| Part | Before | After |
+| --- | --- | --- |
+| Lean wire codec (encode the request, decode the reply) | 0.5–0.75 µs | 0.5–0.6 µs |
+| Host dispatch in JavaScript (decode, call, encode; measured alone) | ~1.2 µs | ~0.9 µs |
+| Thread hop (both wake-ups, slot exchange, copies) | ~21 µs | ~3.3 µs |
+| Whole call | 22–24 µs | 4.7–4.9 µs |
+
+The hop was two wake-ups: Node's main thread woken through `Atomics.waitAsync`
+and the event loop (about 14 µs alone, measured with a bare worker ping-pong),
+then the Lean thread's futex wake. Neither is needed when calls follow one
+another:
+
+- **Node's main thread watches the slot** (`host-pre.js` `lasmFullWatch`) for up
+  to 20 µs after it answers a synchronous Lasm.JS call (ops 200–219, not 207,
+  208, 209 or flag 16: their work ends in promise reactions, which a watch would
+  delay). The thread's next request is served at once, inside the same task.
+  - A slot whose watch found nothing is not watched for its next 8 calls.
+  - Nothing is watched while another slot was served in the last 2 ms. Several
+    Lean threads calling at once means the main thread has other requests to
+    serve (as under HTTP load), and a watch would only delay them.
+  - Serving without a break yields to the event loop every 1 ms
+    (`setImmediate`), so timers, I/O and promise reactions keep running while
+    Lean calls JavaScript in a loop. Before, a thread whose next request was
+    already posted was also served without a break, with no limit.
+- **The calling Lean thread watches for its reply** (`host-library.js`
+  `exchange`) for up to 20 µs before its futex wait, for synchronous Lasm.JS calls
+  only. After a watch that timed out (the main thread is busy), it skips its
+  next 16.
+
+Both watches use plain reads of the shared slot, then the same Atomics
+operations as before: the bridge's protocol and its model
+(`verification/host-bridge`) are unchanged. A first version that always watched
+cost 21 % of Hono's HTTP throughput and 26 % of `Std.Http`'s, by spending CPUs
+that the busy main thread and the load needed. With the limits above, HTTP
+throughput is unchanged (BENCHMARKS.md).
+
+The codec got cheaper too, on Node and on the edge: short ASCII strings skip
+`Buffer.byteLength`/`TextEncoder` and `TextDecoder`, and object keys come from a
+small cache, so a repeated key is the same internalized string. JavaScript-side
+encode and decode of a 20-field object went from 6.5 and 12 µs to 2.2 and 4.8 µs.
+The C glue builds requests up to 1 KiB on the stack and copies a reply once,
+straight into the Lean `ByteArray`.
 
 ## Options
 
@@ -233,7 +289,8 @@ Reasons:
    prelude and runtime identity on all five platforms.
 
 Costs to accept with A, and how step 2 addresses them:
-- **~16 µs per Lean→JS call** (B: ~1 µs). Bindings should be coarse-grained: one call per
+- **~16 µs per Lean→JS call** (B: ~1 µs). Since 2026-11-09 about 5 µs for
+  consecutive calls from one thread (see "Waking the threads" below). Bindings should be coarse-grained: one call per
   operation, values passed in one compact encoding (primitives inline, objects as handles,
   JSON for plain data), batch-friendly APIs. A pg query or a JWT verify is 1–3 calls.
 - **Synchronous callbacks cost ~9 µs each and block the event loop** while they run. A

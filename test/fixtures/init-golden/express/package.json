@@ -1,0 +1,20 @@
+{
+  "name": "express-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Express 5 with Lean request handlers (Lasm.JS), compiled to WebAssembly by Lasm",
+  "scripts": {
+    "dev": "lasm dev Main.lean",
+    "build": "lasm build Main.lean",
+    "start": "node dist/main.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "express": "5.2.1"
+  },
+  "devDependencies": {
+    "@lasm/compiler": "<LASM_VERSION>"
+  }
+}

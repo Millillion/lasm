@@ -1,4 +1,4 @@
-// The endpoint fuzzer (claim 5 of docs/proposals/TESTING_STRATEGY.md:
+// The endpoint fuzzer (claim 5 of docs/TESTING_STRATEGY.md:
 // untrusted input cannot crash or subvert a Lasm program). Random and
 // mutated requests go to every endpoint of the compiled server, aimed at its
 // parsers: query strings and forms (percent-escapes, broken escapes, invalid

@@ -34,12 +34,17 @@ export function runTool(name, log, raw, env = {}) {
   // The SDK's tools run with the SDK's environment (sdk.env, toolchain.env).
   if (name !== 'llvm-nm' && env.LASM_STAND_IN_SDK !== '1') return fail(`${name}: not run with the SDK environment\n`, 3);
   // A chatty linker (LASM_STAND_IN_CHATTY): warnings on stderr, as a large program's link has (not the delivered link).
-  if (name === 'wasm-ld' && env.LASM_STAND_IN_CHATTY && !args.some(arg => arg.endsWith('final.map'))) stderr += 'wasm-ld: warning: stand-in diagnostic\n'.repeat(100);
+  if (name === 'wasm-ld' && env.LASM_STAND_IN_CHATTY && !args.some(arg => arg.endsWith('final.map'))) {
+    stderr += 'wasm-ld: warning: stand-in diagnostic\n'.repeat(100);
+    stdout += 'wasm-ld: stand-in note on stdout\n';
+  }
   if (name === 'clang') {
     const source = readFileSync(after('-c'), 'utf8');
     // C that does not compile for Wasm: a diagnostic as clang prints it.
     if (source.includes('#error')) return fail(`${after('-c')}:1:2: error: ${/#error (.*)/.exec(source)[1]}\n1 error generated.\n`
       + (env.LASM_STAND_IN_CHATTY ? 'note: stand-in context\n'.repeat(1000) : ''));
+    // A compiler with many warnings (LASM_STAND_IN_WARNINGS): about 100 KiB on stderr, and the compile succeeds.
+    if (env.LASM_STAND_IN_WARNINGS) stderr += `${after('-c')}:1:1: warning: stand-in warning\n`.repeat(Math.ceil(100 * 1024 / (after('-c').length + 30)));
     const output = args.includes('-o') ? after('-o') : args.find(arg => arg.startsWith('-o')).slice(2);
     writeFileSync(output, compileToObject(source, args.filter(arg => /^-O[0-3sz]$/.test(arg)).join(' ')));
   } else if (name === 'llvm-nm') {
@@ -112,8 +117,9 @@ function outcome(file, args, options, { status, stdout, stderr }, { async = fals
   const maxBuffer = options?.maxBuffer ?? 1024 * 1024;
   if (out === 'pipe' && Buffer.byteLength(stdout) > maxBuffer || err === 'pipe' && Buffer.byteLength(stderr) > maxBuffer)
     return { error: Object.assign(new Error(`spawnSync ${file} ENOBUFS`), { code: 'ENOBUFS', errno: -105, ...captured }), ...captured };
+  // execFile's error carries no stdout or stderr (its callback gets them); execFileSync's does.
   if (status !== 0) return { error: Object.assign(new Error(`Command failed: ${[file, ...args].join(' ')}\n${err === 'pipe' ? stderr : ''}`),
-    { status, signal: null, ...(async ? { code: status, killed: false } : {}), ...captured }), ...captured };
+    { status, signal: null, ...(async ? { code: status, killed: false } : captured) }), ...captured };
   return { ...captured };
 }
 

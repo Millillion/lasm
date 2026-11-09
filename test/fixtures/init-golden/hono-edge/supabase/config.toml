@@ -1,0 +1,9 @@
+# Supabase project settings for the Lean function (supabase init writes a
+# fuller file; keep this one or merge it). npm run build:supabase-edge writes the
+# function to supabase/functions/edge-app/: index.ts, deno.json (the npm imports,
+# pinned to the installed versions) and the Lean program.
+project_id = "edge-app"
+
+[functions.edge-app]
+verify_jwt = true
+import_map = "./functions/edge-app/deno.json"

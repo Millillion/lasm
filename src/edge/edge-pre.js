@@ -31,6 +31,14 @@ Module.lasmEdge = (() => {
   // Pending host calls, innermost last (Lean's waits nest on its one stack).
   const pendingCalls = [];
   let state = 'idle', syncDepth = 0, poisoned = null, scheduled = false;
+  // A synchronous callback ran while an entry was running: the Lean work it
+  // queued (a resolved promise's continuation) runs when that entry completes.
+  // With JSPI an entry's promise settles a microtask after Lean returned, and
+  // JavaScript that runs in between (an earlier microtask, or a task in an
+  // engine that settles it later) may call Lean synchronously (#162).
+  // `onStack` counts entries whose Lean code is on the JavaScript stack now (a
+  // callback inside one returns to Lean, which runs that work itself).
+  let owed = false, onStack = 0;
   // A JavaScript exception or trap that unwinds Lean's stack (Wasm stack
   // exhaustion, a blocking wait that cannot suspend, an abort) leaves the
   // runtime in an unknown state: no C++ cleanup ran and the task queue may be
@@ -69,9 +77,13 @@ Module.lasmEdge = (() => {
     state = 'running';
     const sp = stackSave();
     entered(sp);
-    const done = () => { state = 'idle'; if (!poisoned && host.pending()) controller.pump(); };
+    const done = () => {
+      state = 'idle';
+      if (!poisoned && (owed || host.pending())) { owed = false; controller.pump(); }
+    };
     let result;
-    try { result = run(); } catch (failure) { throw poison(failure, sp); }
+    onStack++;
+    try { result = run(); } catch (failure) { throw poison(failure, sp); } finally { onStack--; }
     // Asyncify builds: an export that unwound (Lean waits) returns at once;
     // its completion is Asyncify.whenDone().
     if (typeof Asyncify !== 'undefined' && Asyncify.currData) result = Asyncify.whenDone();
@@ -161,8 +173,12 @@ Module.lasmEdge = (() => {
       _free(input); _free(size);
       syncDepth--; state = previous;
       // Lean tasks the callback queued (IO.asTask, Async work, settled
-      // promises) run when the JavaScript that called it has returned.
-      if (previous === 'idle' && !scheduled) { scheduled = true; queueMicrotask(() => { scheduled = false; controller.pump(); }); }
+      // promises) run when the JavaScript that called it has returned; after
+      // the running entry completes; or, when Lean is suspended, once it
+      // resumes, so it is woken (it takes the work before waiting again).
+      if (previous === 'idle') { if (!scheduled) { scheduled = true; queueMicrotask(() => { scheduled = false; controller.pump(); }); } }
+      else if (previous === 'suspended') controller.wake();
+      else if (onStack === 0) owed = true;
       return result;
     },
   };

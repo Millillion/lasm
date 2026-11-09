@@ -8,7 +8,7 @@
 // Each mounted app gets its own instance (lasmInstance); ports and app.send
 // go through lasm:app. Web-standard JavaScript only.
 const NS = [, 'http://www.w3.org/1999/xhtml', 'http://www.w3.org/2000/svg', 'http://www.w3.org/1998/Math/MathML'];
-const decoder = new TextDecoder();
+const decoder = new TextDecoder('utf-8', { ignoreBOM: true }); // keeps a text's leading U+FEFF
 
 export function createUi({ root, flags = null, hydrate = false, window: win = root.ownerDocument.defaultView ?? globalThis } = {}) {
   const doc = root.ownerDocument;

@@ -69,20 +69,31 @@ static reply_t host_call_raw(uint32_t op, uint32_t handle, uint64_t arg, const u
     lasm_node_copy(r.bytes, r.size);
     return r;
 }
-static reply_t host_call(uint32_t op, uint32_t handle, uint64_t arg, const uint8_t *input, size_t length) {
+/* A request: [u32 count][count × u32 released handle][payload]. Small ones
+   are built in `small` (the caller's stack), larger ones in a malloc'ed buffer. */
+#define SMALL_REQUEST 1024
+static uint8_t *build_request(uint8_t *small, const uint8_t *input, size_t length, size_t *size) {
     uint32_t ids[RELEASE_CAPACITY];
+    uint32_t count = 0;
     pthread_mutex_lock(&released_mutex);
-    uint32_t count = (uint32_t)released_count;
-    memcpy(ids, released, count * sizeof(uint32_t));
+    count = (uint32_t)released_count;
+    if (count) memcpy(ids, released, count * sizeof(uint32_t));
     released_count = 0;
     pthread_mutex_unlock(&released_mutex);
     size_t prefix = 4 + (size_t)count * 4;
-    uint8_t *request = (uint8_t *)malloc(prefix + length + 1);
+    *size = prefix + length;
+    uint8_t *request = *size <= SMALL_REQUEST ? small : (uint8_t *)malloc(*size + 1);
     memcpy(request, &count, 4);
     if (count) memcpy(request + 4, ids, (size_t)count * 4);
     if (length) memcpy(request + prefix, input, length);
-    reply_t r = host_call_raw(op, handle, arg, request, prefix + length);
-    free(request);
+    return request;
+}
+static reply_t host_call(uint32_t op, uint32_t handle, uint64_t arg, const uint8_t *input, size_t length) {
+    uint8_t small[SMALL_REQUEST];
+    size_t size;
+    uint8_t *request = build_request(small, input, length, &size);
+    reply_t r = host_call_raw(op, handle, arg, request, size);
+    if (request != small) free(request);
     return r;
 }
 /* Host failures carry [u64 kind][u64 errno][message]. */
@@ -109,7 +120,21 @@ static lean_obj_res reply_bytes(reply_t r) {
 LEAN_EXPORT lean_obj_res lasm_js_call(uint32_t op, uint32_t handle, uint64_t arg, b_lean_obj_arg input, b_lean_obj_arg keep) {
     (void)keep;
     if (op < 200 || op > 219) return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string("Invalid Lasm.JS operation")));
-    return reply_bytes(host_call(op, handle, arg, lean_sarray_cptr(input), lean_sarray_size(input)));
+    uint8_t small[SMALL_REQUEST];
+    size_t size;
+    uint8_t *request = build_request(small, lean_sarray_cptr(input), lean_sarray_size(input), &size);
+    int64_t n = lasm_node_call(op, handle, arg, request, size);
+    if (request != small) free(request);
+    if (n < 0) {
+        reply_t r = { 1, NULL, (size_t)(-(n + 1)) };
+        r.bytes = (uint8_t *)malloc(r.size ? r.size : 1);
+        lasm_node_copy(r.bytes, r.size);
+        return reply_bytes(r);
+    }
+    /* The reply goes straight into the Lean ByteArray (one copy, no buffer of its own). */
+    lean_object *o = lean_alloc_sarray(1, (size_t)n, (size_t)n);
+    lasm_node_copy(lean_sarray_cptr(o), (size_t)n);
+    return lean_io_result_mk_ok(o);
 }
 
 /* ---- JavaScript values held by Lean ---- */
@@ -230,6 +255,8 @@ LEAN_EXPORT lean_obj_res lasm_js_park(void) {
 /* (p : @& IO.Promise (Except String ByteArray)) (value : @& ByteArray) : IO Unit
    The host resolves p when the JavaScript value (a promise or not) settles. */
 static _Thread_local int in_sync_callback; /* the synchronous-callback thread inside a callback */
+/* For library/c/lasm_async.c: Async binds nest without limit inside a callback. */
+int lasm_js_sync_callback_active(void) { return in_sync_callback; }
 /* `Value.await` marks its value (Data.ref, constructor 9, described "Value.await"). */
 static int awaits(b_lean_obj_arg keep) {
     if (lean_is_scalar(keep) || lean_obj_tag(keep) != 9) return 0;

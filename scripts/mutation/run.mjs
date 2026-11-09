@@ -4,12 +4,13 @@
 // per test file, and only the files that executed the mutated code).
 //   node scripts/mutation/run.mjs [MODULE ...] [--concurrency 2] [--out .work/mutation]
 //     [--check docs/evidence/mutation-baseline.json] [--update docs/evidence/mutation-baseline.json]
-//     [--changed-since REF]
+//     [--changed-since REF] [--list]
 // --check fails when a module's score is below its threshold in the baseline file.
 // --update records the measured scores and ratchets each threshold up to the
-// score rounded down to a whole percent (never below 80, never lowered); each
-// module's `initial` score, from before its tests were improved, stays.
+// score rounded down to a whole percent (never lowered); each module's
+// `initial` score, from before its tests were improved, stays.
 // --changed-since runs only the modules whose mutated or test files changed since REF.
+// --list prints the selected module names as JSON (for the workflow's matrix) and runs nothing.
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -18,6 +19,7 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const args = process.argv.slice(2);
 const options = new Set(['--concurrency', '--out', '--check', '--update', '--changed-since']);
+const listOnly = args.includes('--list');
 const opt = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
 const names = args.filter((arg, i) => !arg.startsWith('--') && !options.has(args[i - 1]));
 const { modules } = JSON.parse(readFileSync(join(root, 'scripts/mutation/modules.json'), 'utf8'));
@@ -31,11 +33,13 @@ if (since) {
   // The tool, its configuration and the baselines affect every module.
   const all = [...changed].some(file => file.startsWith('scripts/mutation/') || file === 'docs/evidence/mutation-baseline.json' || file === 'package-lock.json');
   selected = all ? selected : selected.filter(m => [...m.mutate, ...m.tests].some(file => changed.has(file)));
-  console.log(`Changed since ${since}: ${selected.map(m => m.name).join(', ') || 'no mutation-tested module'}`);
+  if (!listOnly) console.log(`Changed since ${since}: ${selected.map(m => m.name).join(', ') || 'no mutation-tested module'}`);
 }
+if (listOnly) { console.log(JSON.stringify(selected.map(m => m.name))); process.exit(0); }
 const out = resolve(root, opt('--out', '.work/mutation'));
 const concurrency = Number(opt('--concurrency', '2'));
 // Large directories no test of these modules reads; the sandbox copies everything else.
+// A module whose tests read one of them lists it in "keepInSandbox" (e.g. "/library").
 const ignorePatterns = ['/docs', '/library', '/lean', '/native', '/bench', '/experiments', '/verification',
   '/integration', '/deploy', '/.work', '/.cache', '/dist', '/.github'];
 
@@ -58,13 +62,14 @@ function summarize(report) {
   return { score: valid ? Math.floor(1000 * detected / valid) / 10 : 100, mutants: valid, counts, survivors };
 }
 
-// The ratchet (docs/DECISIONS.md, 2026-11-03): a module's threshold is its score
-// rounded down to a whole percent, at least 80 %; it only ever rises.
-const minimumThreshold = 80;
-const ratchet = (score, previous = minimumThreshold) => Math.max(minimumThreshold, previous, Math.floor(score));
+// The ratchet (docs/DECISIONS.md, 2026-11-03 and 2026-11-09): a module's
+// threshold is its score rounded down to a whole percent and only ever rises.
+// The goal for every module is 80 %; a module added below it starts at its
+// measured score (its first --update) and rises as its tests improve.
+const ratchet = (score, previous = 0) => Math.max(previous, Math.floor(score));
 const baselineFile = resolve(root, opt('--check') ?? opt('--update') ?? 'docs/evidence/mutation-baseline.json');
 const recorded = existsSync(baselineFile) ? JSON.parse(readFileSync(baselineFile, 'utf8')).modules : {};
-const thresholdOf = name => recorded[name]?.threshold ?? minimumThreshold;
+const thresholdOf = name => recorded[name]?.threshold;
 
 const results = {};
 let failed = false;
@@ -81,7 +86,12 @@ for (const module of selected) {
     // makes that test process fail at once instead of exhausting the machine.
     // scripts/mutation/watchdog.mjs ends test processes that outlive their runner.
     tap: { testFiles: tests, nodeArgs: ['--max-old-space-size=768', '--import', join(root, 'scripts/mutation/watchdog.mjs'), '--test-reporter=tap', '--test-concurrency=1', '-r', '{{hookFile}}', '{{testFile}}'], forceBail: true },
-    coverageAnalysis: 'perTest', mutate: module.mutate, ignorePatterns,
+    // perTest: per mutant, only the test files that executed it. A module whose
+    // code also runs in worker threads or child processes (where Stryker cannot
+    // record coverage) sets "coverageAnalysis": "off": every test file runs
+    // against every mutant.
+    coverageAnalysis: module.coverageAnalysis ?? 'perTest', mutate: module.mutate,
+    ignorePatterns: ignorePatterns.filter(pattern => !(module.keepInSandbox ?? []).includes(pattern)),
     concurrency, timeoutMS: 20000, timeoutFactor: 2, cleanTempDir: 'always',
     tempDirName: join('.work', 'stryker-tmp', module.name),
     reporters: ['json', 'html', 'progress-append-only'],
@@ -98,10 +108,10 @@ for (const module of selected) {
   const summary = summarize(JSON.parse(readFileSync(reportFile, 'utf8')));
   results[module.name] = { ...summary, threshold: thresholdOf(module.name), minutes: +((performance.now() - started) / 60000).toFixed(1) };
   writeFileSync(join(directory, 'survivors.json'), JSON.stringify(summary.survivors, null, 2) + '\n');
-  console.log(`${module.name}: ${summary.score} % of ${summary.mutants} mutants (threshold ${thresholdOf(module.name)} %) ${JSON.stringify(summary.counts)}`);
+  console.log(`${module.name}: ${summary.score} % of ${summary.mutants} mutants (threshold ${thresholdOf(module.name) ?? 'none'} %) ${JSON.stringify(summary.counts)}`);
 }
 
-const table = Object.entries(results).map(([name, r]) => `${name.padEnd(14)} ${String(r.score).padStart(5)} %  ${String(r.mutants).padStart(4)} mutants  threshold ${r.threshold} %  ${r.minutes} min`);
+const table = Object.entries(results).map(([name, r]) => `${name.padEnd(20)} ${String(r.score).padStart(5)} %  ${String(r.mutants).padStart(4)} mutants  threshold ${r.threshold} %  ${r.minutes} min`);
 console.log('\n' + table.join('\n'));
 // No module may have run (a PR that changes none of them).
 mkdirSync(out, { recursive: true });

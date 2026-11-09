@@ -11,7 +11,9 @@ test('Linux native spawn and each engine child reaper coexist',
       ['node', process.execPath, []],
     ]) {
       if (!existsSync(executable)) { t.diagnostic(`${name}: not installed`); continue; }
-      for (const launcher of ['javascript', 'native']) await t.test(`${name}: ${launcher}`, () => {
+      // The native launcher is built by scripts/build-process-launcher.mjs (absent in a bare npm ci checkout).
+      const nativeBuilt = ['src/native/process', '.cache/native-host/process'].some(path => existsSync(join(root, path, 'manifest.json')));
+      for (const launcher of ['javascript', 'native']) await t.test(`${name}: ${launcher}`, { skip: launcher === 'native' && !nativeBuilt && 'native process launcher not built' }, () => {
         const result = spawnSync(executable, [...prefix, join(root, 'test/fixtures/native-process-host.mjs'), launcher], {
           encoding: 'utf8', timeout: 20_000, killSignal: 'SIGKILL',
         });

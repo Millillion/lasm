@@ -29,7 +29,10 @@ export const edgeTargets = {
     write({ staging, projectDirectory, modules }) {
       writeFileIfChanged(join(staging, 'worker.mjs'), workersEntry(modules));
       const rootConfig = ['wrangler.toml', 'wrangler.json', 'wrangler.jsonc'].find(name => existsSync(join(projectDirectory, name)));
+      // The generated configuration is only for projects without their own; an
+      // earlier one is removed (an unchanged rebuild keeps the owned directory).
       if (!rootConfig) writeFileIfChanged(join(staging, 'wrangler.toml'), workersConfig(workerName(projectDirectory)));
+      else rmSync(join(staging, 'wrangler.toml'), { force: true });
       const configured = rootConfig && /worker\.mjs/.test(readFileSync(join(projectDirectory, rootConfig), 'utf8')) && /CompiledWasm/.test(readFileSync(join(projectDirectory, rootConfig), 'utf8'));
       return { note: rootConfig && (out => configured ? `run it with npx wrangler dev (${rootConfig})` : `your ${rootConfig} must use main = "${out}/worker.mjs" and the CompiledWasm rule`) };
     } },

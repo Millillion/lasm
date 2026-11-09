@@ -23,8 +23,10 @@ export const budgets = [
   { name: 'Start (module evaluated → first frame), wasm cached, CI Chromium', limit: 60, unit: 'ms', enforced: true,
     actual: chromium?.apps.counter?.start?.warm?.startMs ?? null },
   // The edit loop as developers run it: lasm dev's warm build worker, the
-  // median of the edits after the first (scripts/browser/dev-loop-check.mjs).
-  { name: 'Incremental rebuild after editing one view function (lasm dev --target browser, warm), Linux runner', limit: 2, unit: 's', enforced: true,
+  // median of the seven edits after the first (scripts/browser/dev-loop-check.mjs).
+  // 2.5 s, not 2: the slowest runner class (AMD EPYC 7763) rebuilds in 1.8-2.3 s,
+  // the faster ones in 1.2-1.6 s (docs/BROWSER.md#budgets-measured-in-ci-recorded-per-release, DECISIONS.md 2026-11-09).
+  { name: 'Incremental rebuild after editing one view function (lasm dev --target browser, warm), Linux runner', limit: 2.5, unit: 's', enforced: true,
     actual: median((devLoop?.rebuilds ?? []).slice(1).map(r => r.seconds)) },
   { name: 'Vite dev: edit one view function to the remounted app (warm), Linux runner', limit: 2, unit: 's', enforced: false,
     actual: viteDev?.updates ? median(viteDev.updates.slice(1)) : viteDev?.updateSeconds ?? null },
@@ -49,6 +51,7 @@ writeFileSync(out, JSON.stringify(record, null, 2) + '\n');
 const failedEngines = engines.filter(e => e.failures.length);
 for (const budget of budgets)
   console.log(`${budget.pass ? 'PASS' : budget.enforced ? 'FAIL' : 'OVER'} ${budget.name}: ${budget.actual === null ? 'not measured' : budget.unit === 'bytes' ? (budget.actual / KiB).toFixed(1) + ' KiB' : budget.actual.toFixed(budget.unit === 's' ? 1 : 0) + ' ' + budget.unit} (budget ${budget.unit === 'bytes' ? budget.limit / KiB + ' KiB' : budget.limit + ' ' + budget.unit}${budget.enforced ? '' : ', recorded'})`);
+if (devLoop) console.log(`lasm dev --target browser rebuilds (s): ${(devLoop.rebuilds ?? []).map(r => r.seconds).join(' ')} on ${devLoop.runner?.cpu ?? 'an unrecorded CPU'}${devLoop.runner ? ` (${devLoop.runner.cpus} CPUs)` : ''}`);
 for (const e of engines) console.log(`${e.engine} ${e.browserVersion} (${e.platform}): ${e.failures.length ? e.failures.length + ' failures' : 'passed'}`);
 if (process.env.BROWSERS_RESULT && process.env.BROWSERS_RESULT !== 'success') console.log(`The browser jobs ended with ${process.env.BROWSERS_RESULT}.`);
 const viteFailed = record.viteDev?.checks?.some(c => !c.ok) ?? false;

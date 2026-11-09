@@ -178,7 +178,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `link-toolchain.yml` | dispatch | Linux, macOS, Windows | 11 min | Builds the link toolchain distribution (maintainer) | On demand |
 | `managed-sdk.yml` | dispatch | Linux, macOS, Windows | 7 min | Managed compiler SDK provisioning | On demand |
 | `managed-tools.yml` | dispatch | Linux, macOS, Windows | 4 min | Managed Lean tool provisioning | On demand |
-| `mutation.yml` | cron 37 5 * * 1-6, dispatch, PR (paths) | Linux | 11 min (max 27) | Stryker mutation scores of critical modules | PR (changed modules), nightly |
+| `mutation.yml` | cron 37 5 * * 1-6, dispatch, PR (paths) | Linux | 13 min (max 73, `dev`) | Stryker mutation scores of every `src/` module (21 modules, one job each) | PR (changed modules), nightly |
 | `nightly.yml` | cron 17 7 * * 1-6, dispatch | Linux + called workflows | 3 min (max 27) | Nightly upstream suite and ecosystem runs vs baseline | Nightly |
 | `node-candidate-input.yml` | call | Linux | — | Authenticated candidate input (called) | Called |
 | `node-darwin-candidate-recheck.yml` | dispatch | macOS + called workflows | 28 min (max 87) | Recheck a candidate on macOS | On demand |
@@ -217,7 +217,8 @@ it), and "dispatch" means `workflow_dispatch`.
 | `unit.yml` | PR (paths-ignore), dispatch, call | Linux | 5 min (max 31) | The whole unit suite with coverage baseline | PR (paths), release, nightly |
 | `upstream-native-build-time.yml` | dispatch | Linux | 2 min (max 20) | Upstream native build-time checks | On demand |
 | `wasi.yml` | dispatch, call | Linux + called workflows | 13 min (max 74) | WASI, wasi-http, Fastly on wasmtime, wasmer, node:wasi, Spin, Viceroy | Release, nightly |
-| `wasmtime-helper-probe.yml` | dispatch | Linux | 0 min (max 1) | Wasmtime helper feasibility probe | On demand |
+| `wasmtime-helper-probe.yml` | dispatch | Linux | 0 min (max 1) | Scalar atomic adapter and Wasm synchronization probe | On demand |
+| `web-bindings.yml` | PR (paths), push main (paths), dispatch | Linux | new | Lasm.JS.Web: the generated bindings are the generator's output; the conformance program on Node 26 and 24, Bun, Deno, Workers (workerd) and Chromium | PR (paths), main |
 | `windows-guard-controls.yml` | dispatch | Windows | 2 min | Windows resource guard controls | On demand |
 | `windows-lean-path-controls.yml` | dispatch | Windows | 3 min | Windows Lean long-path controls | On demand |
 | `windows-timezone-host.yml` | dispatch | Windows | 5 min | Windows timezone host comparisons | On demand |

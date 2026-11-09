@@ -23,9 +23,11 @@ Node globals (`fetch`) and npm packages, and lets JavaScript call Lean functions
   Lean the first time it is used. There is no Lake dependency to add. Programs that
   import it use Lasm's larger Lean download (the "extended" tier, which includes
   Lean's elaborator), as Lake projects already do.
-- **Cost: about 25–35 µs per JavaScript call** (measured on Linux x64). Every call crosses from the Lean thread to Node's
-  main thread. Make one call per real operation (a query, a sign, an HTTP
-  response), not one per tiny step.
+- **Cost: about 5 µs per JavaScript call when a Lean thread makes calls one
+  after another, 20–30 µs for a lone call or while other Lean threads call too**
+  (measured on Linux x64; [BENCHMARKS.md](BENCHMARKS.md#lasmjs-call-cost)). Every
+  call crosses from the Lean thread to Node's main thread. Make one call per real
+  operation (a query, a sign, an HTTP response), not one per tiny step.
 
 ## Quick start
 
@@ -158,6 +160,7 @@ The result type `α` is the last argument and defaults to `Value` (`Data` for th
 | `o.get "key"` / `o.get "key" Nat` | `o.key` |
 | `o.getFields #["a", "b"]` | `{a: o.a, b: o.b}` in **one** call (use it to read an HTTP request) |
 | `o.set "key" x` | `o.key = x` |
+| `o.get sym` / `o.set sym x` (`sym : Value`, a Symbol) / `o.get (3 : Nat)` | `o[sym]` / `o[sym] = x` / `o[3]` |
 | `f.call #[a, b]` / `f.callAwait #[a, b] String` | `f(a, b)` / `await f(a, b)` |
 | `o.callMethod "m" #[a]` / `o.callMethodAwait "m" #[a] Data` | `o.m(a)` / `await o.m(a)` |
 | `C.new #[a]` | `new C(a)` |
@@ -178,6 +181,21 @@ Example (`pg`):
 def rows (pool : Value) (sql : String) (params : Array Data) : Async (Array Data) := do
   let result ← pool.callMethodAwait "query" #[toJS sql, .array params] Value  -- pg Result (a class instance)
   result.get "rows" (Array Data)                                               -- plain row objects
+```
+
+### Property keys: strings, numbers, Symbols
+
+`get` and `set` take a key of any type with `ToJS`, as JavaScript's `o[key]`
+does: a `String`, a number, or a JavaScript value such as a Symbol. An array
+key is its string (`o[["a", "b"]]` is `o["a,b"]`); `getFields` takes strings.
+
+```lean
+let symbolClass ← (← global).get "Symbol"
+let tag ← symbolClass.callMethod "for" #[toJS "app.tag"]   -- Symbol.for("app.tag")
+box.set tag "tagged"                                       -- box[tag] = "tagged"
+let s ← box.get tag String
+let iterator ← (← items.get (← symbolClass.get "iterator")).call (this := toJS items)
+let first ← iterator.callMethod "next" #[] Data             -- {value, done}
 ```
 
 ## Conversions: `ToJS` and `FromJS`
@@ -248,6 +266,11 @@ settles, as after `await` in JavaScript. Rules:
 - **`try … catch`, `throw`, `for`, `let mut` and `return`** work as in `IO`.
 - **From `IO`** (a script's `main`, server startup), run an `Async` computation
   and wait for it with `.block`: `let reply ← (request url).block`.
+- **Loops of any length**: an `Async` loop (a recursion, `for`, `List.mapM`) of
+  steps that complete at once, such as synchronous calls, `IO` actions and `pure`,
+  runs on every target without overflowing the stack; CI runs 1,000,000 such
+  steps on Node, Deno, Bun, workerd and browsers. Before #90's fix such a loop
+  failed after about 2,000 steps on Deno and Workers and 8,000 on Bun.
 - **To wait for time**, bind a JavaScript timer:
   `@[js "node:timers/promises" "setTimeout"] opaque sleep : Nat → Async Unit`.
   `IO.sleep` and `IO.wait` block a thread.
@@ -301,6 +324,25 @@ Function.ofSyncFn2 (f : α → β → IO γ)
       timer, DNS lookup or socket read started in the callback. JavaScript gets
       the error, and the memory the callback was using leaks.
   - A synchronous callback cannot call another synchronous callback.
+  - On the single-threaded targets (Deno, Bun, Workers, browsers) the callback
+    runs on the JavaScript stack. Waiting for a Lean task works there when its
+    work needs no JavaScript event: the wait runs the task, including its
+    synchronous JavaScript calls (`(loop).block` of an `Async` loop of
+    `callMethod`s, say). Waiting for a JavaScript event fails at once with an error
+    that names the cause: a promise, a timer, `fetch` or `Std.Async.sleep`.
+  - Why these waits cannot be made to work, on any target: JavaScript runs a
+    function to completion. A promise settles, and its reactions run, only after
+    the JavaScript code that called the callback has returned, and that code is
+    waiting for the callback's result. Suspending the WebAssembly stack (JSPI)
+    cannot help: it cannot suspend through the caller's JavaScript frames, and
+    the caller needs its result synchronously. On Node, Node's main thread could
+    in principle serve other Lean threads' host calls while it waits, so that a
+    task that calls JavaScript could finish. It would then run JavaScript for
+    unrelated Lean threads (another request's handler) in the middle of the
+    caller's synchronous code, which JavaScript code does not expect, and it
+    cannot tell the callback's own tasks from unrelated ones. So these waits
+    keep failing at once with a clear error. Use `Function.ofFn` when the
+    callback must wait.
 - **Replying with a method call (`ofFnReply`), for HTTP handlers.** A handler
   usually ends by calling `res.json(body)` (Express) or returning `c.json(body)`
   (Hono). Returning `Function.Reply.callMethod res "json" #[body]` instead lets the host make
@@ -333,6 +375,238 @@ A server's `main` must not return while JavaScript serves requests: end it with
   `new Error(message)`.
 - **Released or invalid handles** report `Invalid or released Lasm.JS value handle`.
   This cannot happen through the API: Lean keeps each handle alive while a call uses it.
+
+## Standard bindings: `Lasm.JS.Web`
+
+`import Lasm.JS.Web` gives typed bindings of the **WinterTC Minimum Common Web
+API** ([min-common-api.proposal.wintertc.org](https://min-common-api.proposal.wintertc.org/),
+draft of 31 July 2026), the web APIs that every JavaScript target Lasm supports
+has: Node 24 and 26, Bun, Deno, Cloudflare Workers, the Vercel, Netlify and
+Supabase edge functions, and browsers. Status: **current source, not yet
+released** (tier 1 of the standard bindings; later tiers are `Lasm.JS.Node`,
+`Lasm.JS.Deno`, `Lasm.JS.Bun` and `Lasm.JS.Cloudflare`, one surface per platform).
+
+```lean
+import Lasm.JS.Web
+open Lasm.JS Lasm.JS.Web
+
+def main : IO Unit := do
+  let digest ← ((← (← crypto).subtle).digest (.domString "SHA-256") "abc".toUTF8).block
+  IO.println s!"{digest.size} bytes"
+  let url ← URL.new "/b?x=1" (some "https://example.com/a/")
+  IO.println (← url.href)                                 -- https://example.com/a/b?x=1
+  let res ← (fetch (.usvString "https://example.com")).block
+  IO.println s!"{← res.status} {(← (← res.headers).get "content-type").getD ""}"
+```
+
+They are **generated, not written by hand**, from the WebIDL of the
+specifications, so names, argument order and shapes are the standards' own;
+only Lean typing is added. Programs that need an npm package keep writing their
+own `@[js]` bindings (above). `Lasm.Web` (the browser library with DOM helpers,
+[BROWSER.md](BROWSER.md)) is unchanged.
+
+### What is covered
+
+One module per spec area; `import Lasm.JS.Web` imports all of them, and a program
+may import only the ones it uses (`import Lasm.JS.Web.Fetch`), which links less.
+
+| Module | Interfaces and globals | Spec |
+| --- | --- | --- |
+| `Lasm.JS.Web.Dom` | `EventTarget`, `Event`, `CustomEvent`, `AbortController`, `AbortSignal`, `DOMException` | DOM, Web IDL |
+| `Lasm.JS.Web.Messaging` | `MessageChannel`, `MessagePort`, `MessageEvent`, `ErrorEvent`, `PromiseRejectionEvent` | HTML |
+| `Lasm.JS.Web.Streams` | `ReadableStream` and its readers, controllers and BYOB request, `WritableStream` and its writer and controller, `TransformStream` and its controller, `ByteLengthQueuingStrategy`, `CountQueuingStrategy` | Streams |
+| `Lasm.JS.Web.File` | `Blob`, `File` | File API |
+| `Lasm.JS.Web.Encoding` | `TextEncoder`, `TextDecoder`, `TextEncoderStream`, `TextDecoderStream` | Encoding |
+| `Lasm.JS.Web.Compression` | `CompressionStream`, `DecompressionStream` | Compression |
+| `Lasm.JS.Web.Url` | `URL`, `URLSearchParams`, `URLPattern` | URL, URL Pattern |
+| `Lasm.JS.Web.Fetch` | `Headers`, `Request`, `Response`, `FormData`; `fetch` | Fetch, XMLHttpRequest |
+| `Lasm.JS.Web.Crypto` | `Crypto`, `CryptoKey`, `SubtleCrypto` and every algorithm dictionary; `crypto` | Web Cryptography |
+| `Lasm.JS.Web.Performance` | `Performance`; `performance` | High Resolution Time |
+| `Lasm.JS.Web.Timers` | `setTimeout`, `clearTimeout`, `setInterval`, `clearInterval`, `queueMicrotask` | HTML |
+| `Lasm.JS.Web.Global` | `atob`, `btoa`, `structuredClone`, `reportError`, `navigator.userAgent` | HTML |
+| `Lasm.JS.Web.Console` | the `console` namespace | Console |
+| `Lasm.JS.Web.Wasm` | the `WebAssembly` namespace and its `Module`, `Instance`, `Memory`, `Table`, `Global`, `Tag`, `Exception`, `CompileError`, `LinkError`, `RuntimeError` | WebAssembly JS and Web APIs |
+
+Every member of these interfaces in the listed specs is generated, including
+partials from those specs (`URL.createObjectURL` from the File API) and members
+the specs added recently (`Blob.textStream`, `Response.textStream`). The
+Minimum Common API does not promise every member everywhere:
+**test a member on your target**; the CI run below records which members each
+runtime lacks. Not generated: `globalThis` and `self` (use `Lasm.JS.global`),
+and the global `onerror`, `onunhandledrejection` and `onrejectionhandled`
+handlers (the global object is an `EventTarget` only in browsers).
+
+### Where each member exists (measured)
+
+The conformance run (below) also looks up every generated member on each
+runtime. On 2026-11-09 (`web-bindings.yml` run 42586336122: Node 26.13.0 and
+24.22.2, Bun 1.4.4, Deno 2.9.6, workerd from wrangler 4.152.0, Chromium of
+Playwright 1.63.0) every interface, global and namespace member existed
+everywhere except these. "Not on the prototype" can also mean the runtime
+defines the attribute on each instance instead (workerd does for `CryptoKey`,
+`DOMException.code`, `MessageEvent` and `Request`; those calls work there).
+
+| Member | Missing, or not on the prototype |
+| --- | --- |
+| `PromiseRejectionEvent` | Node 26 and 24, Bun (workerd's cannot be constructed) |
+| `ErrorEvent` | Node 24 |
+| `reportError` | Node 26 and 24 |
+| `Navigator` (the interface; `navigator.userAgent` works) | Bun |
+| `ReadableStream.from` | Chromium |
+| `Request.textStream`, `Response.textStream` | Node 24, Workers |
+| `Blob.textStream` | Bun, Workers |
+| `WebAssembly.Memory` `toFixedLengthBuffer`, `toResizableBuffer` | Node 24 |
+| `WebAssembly.compileStreaming`, `instantiateStreaming` | Workers |
+| `Request` `duplex`, `isHistoryNavigation`, `isReloadNavigation` | Bun, Deno, Workers |
+| `Request.destination` | Deno, Workers |
+| `Request.keepalive`, `Performance.now` (on the prototype) | Bun |
+| `Event.initEvent`, `CustomEvent.initCustomEvent`, `MessageEvent.initMessageEvent` (legacy) | Deno, Workers; `initCustomEvent` also Node |
+| `MessageChannel` `port1`, `port2` (on the prototype) | Node, Workers |
+
+Workers also forbid compiling WebAssembly at run time and do not implement
+`URL.createObjectURL`. The runtimes' own deviations from the specs that the
+checks found are listed, with reasons, in
+[`test/fixtures/js-web/known.json`](../test/fixtures/js-web/known.json)
+(Deno's, Bun's and Chromium's URL parsers on some WPT cases, Bun's header order
+and content types, workerd's urlencoded form decoding).
+
+### Cost
+
+- **Wasm size: nothing for what is not called.** The same program through
+  `Lasm.JS.Web` (all of it imported) and through `Lasm.JS` alone: 684,604 and
+  739,253 bytes of Wasm on Node, 554,125 and 554,601 on the edge runtime
+  (`--target deno`); the linker drops unused bindings.
+- **Build time: about 3 to 8 seconds more** for a new project with warm tools
+  (Lean loads and the link sees 16 more modules): Node 12.4 → 15.6 s and
+  19.2 → 26.4 s, the edge runtime 8.6 → 12.9 s and 14.0 → 22.4 s on two CI
+  runs. Importing only the modules a program uses (`Lasm.JS.Web.Url`) costs less.
+- **Package size:** the compiled library (`library/prebuilt`) grows from 41.0
+  to 60.9 MB (14.3 MB of `.olean` files, 5.3 MB of generated C), 4.4 MB
+  compressed: about 5 % of the installed `@lasm/cli` (430 MB for 0.5.1). First builds copy it as
+  before; nothing is compiled on the user's machine.
+
+### How a WebIDL declaration becomes Lean
+
+| WebIDL | Lean |
+| --- | --- |
+| `interface I` | `structure I where val : Value`, a handle to the JavaScript object (`ToJS`, `FromJS`, `Nonempty`). In a namespace: `WebAssembly.Module`. |
+| `interface I : P` | `structure I extends P`: `P`'s functions apply to an `I` (`signal.addEventListener …` on an `AbortSignal`) |
+| `constructor(…)` | `I.new … : IO I` |
+| `attribute T a` | `I.a (self) : IO T`; unless `readonly`, also `I.setA (self) (value : T) : IO Unit`. A `Promise` attribute (`reader.closed`) is `Async T`. |
+| operation `R op(…)` | `I.op (self) … : IO R`; `static` ones take no `self` (`URL.canParse`). A static operation that shares its name with an instance one gets the prefix `static`: `Response.staticJson` (`Response.json(data)`) beside `response.json`. |
+| `Promise<T>` result | `Async T` (awaited without holding a Lean thread; `.block` from `IO`) |
+| overloads | the first in IDL order keeps the name; each other adds `With` and its first argument that differs by name: `FormData.append` (string) and `FormData.appendWithBlobValue`, `URLPattern.new` and `URLPattern.newWithOptions`, `WebAssembly.instantiate` and `WebAssembly.instantiateWithModuleObject` |
+| `optional T x` | `(x : Option T := none)`; `none` passes nothing (`undefined`), so the spec's default applies. `optional any x` is `(x : Data := .undefined)`. |
+| `T... xs` (variadic) | `(xs : Array T := #[])` |
+| `T?` (nullable) | `Option T`; `none` is `null` |
+| `DOMString`, `USVString`, `ByteString` | `String` |
+| `boolean`; `byte`, `short`, `long`, `long long`, `bigint`; `octet`, `unsigned …`; `float`, `double` (also `unrestricted`) | `Bool`; `Int`; `Nat`; `Float` |
+| `BufferSource`, `ArrayBufferView`, typed arrays, `ArrayBuffer` | `ByteArray` (a copy; see limits) |
+| `sequence<T>`, `FrozenArray<T>` | `Array T` |
+| `record<K, V>` | `Record V` (`⟨#[("name", v), …]⟩`, `Lasm.JS.Web.Record`) |
+| `any`, `object` | `Data` |
+| `undefined` result | `Unit` |
+| `dictionary D` | `structure D`, members that are not `required` are `Option`s defaulting to `none`, which leaves them out; inherited members are flattened in |
+| `enum E` | `inductive E`, one constructor per value in lowerCamelCase: `"no-cors"` is `.noCors`, `""` is `.empty` |
+| `typedef (A or B) U`, or an inline union | `inductive U` with one constructor per member type, named after the type: `BodyInit.usvString`, `.blob`, `.readableStream`, `.bufferSource`. Inline unions are named after their members: `AddEventListenerOptionsOrBoolean`. Read back from JavaScript (a result) when the members are told apart by their JavaScript kind (string, number, boolean, bytes, array, plain object, other object): `FormData.get` gives `.usvString` or `.file`, `generateKey` `.cryptoKey` or `.cryptoKeyPair`. Otherwise a result union is a `Value` when every member is an interface (`ReadableStream.getReader`: wrap it, `{ val := v : ReadableStreamDefaultReader }`) and `Data` else. |
+| `callback`, `callback interface` | a handle `structure C where val : Value` made from a Lean function by `C.ofFn` (asynchronous, `… → Async R`: returns a promise at once, the Lean code runs as a task) or `C.ofSyncFn` (synchronous, `… → IO R`: JavaScript waits for the result). The same handle can be added and removed (`removeEventListener`). `Function` is `JSFunction` (`Array Data → Async Data`), so that it does not hide `Lasm.JS.Function`. |
+| `iterable<K, V>` | `entries`, `keys` and `values`, collected into arrays (`headers.entries : IO (Array (String × String))`) |
+| `stringifier` | `I.toString` |
+| `const T C = v` | `def I.C : T := v` (`DOMException.ABORT_ERR`) |
+| a type outside tier 1 (`WindowProxy`, `HTMLFormElement`, `TrustedScript`) | `Value` in arguments, `Data` in results |
+
+Choose `ofFn` or `ofSyncFn` by what the caller does with the callback: a
+listener that calls `preventDefault`, a queuing strategy's `size` and any
+callback whose result JavaScript uses at once must be synchronous (`ofSyncFn`);
+a stream's `pull`, `write` or `transform` (which return a promise) and timer
+callbacks that wait for more JavaScript should be asynchronous (`ofFn`). The
+rules for each are those of `Lasm.JS.Function.ofFn` and `ofSyncFn`
+([Callbacks](#callbacks-lean-functions-called-by-javascript)).
+
+```lean
+-- A stream from a Lean source, through a Lean transform
+let start ← UnderlyingSourceStartCallback.ofSyncFn fun c => do
+  let ctl : ReadableStreamDefaultController := { val := c }   -- the controller union is a Value
+  ctl.enqueue (.string "hello"); ctl.close; return .undefined
+let upper ← TransformerTransformCallback.ofFn fun chunk c =>
+  c.enqueue (.string (match chunk with | .string t => t.toUpper | _ => ""))
+let source ← ReadableStream.new (toJS ({ start := some start } : UnderlyingSource))
+let ts ← TransformStream.new (toJS ({ transform := some upper } : Transformer))
+let out ← source.pipeThrough { readable := ← ts.readable, writable := ← ts.writable }
+-- HMAC-SHA-256
+let s ← (← crypto).subtle
+let key ← s.importKey .raw (.bufferSource secret) (.object (toJS ({ name := "HMAC", hash := .domString "SHA-256" } : HmacImportParams))) false #[.sign]
+let mac ← s.sign (.domString "HMAC") key message
+```
+
+Arguments the specs type `object` (a stream's underlying source, Web Crypto's
+algorithm parameters) are `Data`: write the dictionary the spec's prose names
+(`UnderlyingSource`, `HmacImportParams`, …; all are generated) and pass it with
+`toJS`.
+
+### Limits of the mapping (exact)
+
+- **Bytes are copies.** A `ByteArray` argument reaches JavaScript as a new
+  `Uint8Array`, and a result is copied back. Writes into an argument are not
+  seen by Lean: `TextEncoder.encodeInto` returns `{read, written}` but its
+  destination is a copy; `crypto.getRandomValues` and BYOB reads return the
+  filled bytes, so use the result. `WebAssembly.Memory.buffer` is a snapshot.
+- **`ArrayBuffer` results cost one more host call** (copied through
+  `new Uint8Array(buffer)`): `digest`, `sign`, `encrypt`, `arrayBuffer()`.
+  `bytes()` returns a `Uint8Array` and needs none.
+- **Nullable optional members are collapsed:** `BodyInit? body` in a dictionary
+  is `Option BodyInit`, so an explicit `null` cannot be passed (`none` leaves the
+  member out, which the specs treat alike in every tier-1 dictionary but
+  `RequestInit.signal`, where `null` detaches a signal copied from the input).
+- **Strings are Unicode scalar values.** A Lean `String` cannot hold a lone
+  surrogate; JavaScript strings containing one arrive with U+FFFD in its place.
+- **Enums follow the current spec.** An enum lists the values of the pinned
+  WebIDL (`CompressionFormat.brotli`, `KeyUsage.encapsulateKey`); a runtime
+  that does not know a value rejects it, and a value the pinned WebIDL lacks
+  fails to decode.
+- **Some results take one more host call.** An interface result is read as a
+  reference (Bun returns `navigator` as a plain object, which would otherwise be
+  copied), at no extra cost; a dictionary result that holds a `record` is copied
+  through `structuredClone` first (`URLPattern.exec`: Node's `groups` objects
+  are not plain).
+- **Timers return numbers.** `setTimeout` and `setInterval` return the timer's
+  number (`Number(timeout)` on Node and Bun, whose timers are objects), one more
+  host call; `clearTimeout` takes it on every target.
+- **Not generated:** async iteration (`for await` over a `ReadableStream`: use a
+  reader) and `forEach` of iterables (use `entries`).
+- **No build-time binding check.** Unlike `@[js]` bindings, the standard
+  bindings are not checked by `lasm build` against the build machine's Node:
+  the deployment's runtime is what counts (a browser, a Worker). A member the
+  runtime lacks fails when called, with an error naming it (`Lasm.JS binding
+  Lasm.JS.Web.URLPattern.new (globalThis URLPattern): …` or `… has no method
+  "textStream"`).
+
+### How they are generated
+
+[`scripts/bindings/generate-web.mjs`](../scripts/bindings/generate-web.mjs)
+reads the WebIDL of the pinned `@webref/idl` (w3c/webref's curated IDL, parsed
+with `webidl2`; both development dependencies, never installed by users) for the
+list in [`scripts/bindings/web-tier1.mjs`](../scripts/bindings/web-tier1.mjs) and
+writes `library/Lasm/JS/Web/*.lean` (marked generated) and `Lasm/JS/Web.lean`.
+The generated calls are built on Lasm.JS core: `Lasm.JS.Binding.invoke` for
+constructors, static operations and globals (resolved from `globalThis` once
+and cached by the host), `Value.callMethod`, `get` and `set` for members, and a
+few hand-written helpers in `library/Lasm/JS/Web/Support.lean`. To update:
+bump `@webref/idl` in `package.json`, run the generator, regenerate
+`library/prebuilt` (`library-prebuilt.yml`), and commit.
+[`web-bindings.yml`](../.github/workflows/web-bindings.yml) fails when the
+committed files differ from the generator's output.
+
+**Tests.** [`test/fixtures/js-web`](../test/fixtures/js-web) is one program of
+property checks over WPT's URL parser data (`urltestdata.json`) and
+`application/x-www-form-urlencoded` cases, Lean's UTF-8 encoder and validator
+as the oracle of `TextEncoder`/`TextDecoder`, WPT's invalid UTF-8 sequences,
+published Web Crypto vectors (FIPS 180, RFC 4231, the GCM spec, RFC 3602,
+RFC 6070, RFC 5869) and generated inputs (round trips of base64, structured
+cloning, compression, AES-GCM, ECDSA and query strings). `web-bindings.yml`
+builds it with a packed candidate for Node 26 and 24, Bun, Deno, Workers
+(workerd, local) and headless Chromium and runs it on each
+([TESTING.md](TESTING.md#standard-bindings)).
 
 ## Worked examples (all built and run by CI)
 
@@ -405,10 +679,15 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
 - **Deriving** covers only structures without parameters and enumerations.
 - **Synchronous callbacks** block Node's event loop. Inside them, waiting for
   anything that needs Node (a promise, file IO, a task that makes host calls, a
-  timer or socket started there) fails at once.
+  timer or socket started there) fails at once. On the single-threaded targets,
+  waiting for a JavaScript event fails the same way, while waiting for Lean work
+  that needs no event works. These waits cannot be made to work
+  ([Callbacks](#callbacks-lean-functions-called-by-javascript)).
 - **Module loading.** Modules load with `require`: ES modules with top-level await
   cannot be loaded. pnpm/Yarn Plug'n'Play layouts are not supported.
-- **Cost per call.** Each call costs about 25–35 µs. An asynchronous callback round
+- **Cost per call.** Each call costs about 5 µs when a Lean thread makes calls
+  one after another, and 20–30 µs for a lone call or under load (other Lean
+  threads calling too). An asynchronous callback round
   trip (JavaScript calls Lean, and Lean awaits the answer) costs about 0.27 ms.
   On the 4-CPU benchmark runner, a Hono server with a Lean handler serves about
   9,700 requests per second and Express about 6,300: 0.18× and 0.12× a plain Node

@@ -8,7 +8,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createEdgeJs, describe, jsFailure, firstJsHandle } from '../src/edge/edge-js.mjs';
 
-const enc = new TextEncoder(), dec = new TextDecoder();
+const enc = new TextEncoder(), dec = new TextDecoder('utf-8', { ignoreBOM: true });
 const cat = (...parts) => { const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0)); let o = 0; for (const p of parts) { out.set(p, o); o += p.length; } return out; };
 const u32 = n => { const b = new Uint8Array(4); new DataView(b.buffer).setUint32(0, n, true); return b; };
 const u64 = n => { const b = new Uint8Array(8); new DataView(b.buffer).setBigUint64(0, BigInt(n), true); return b; };
@@ -115,6 +115,43 @@ test('modules come from the static map; others fail with how to add them', () =>
   assert.throws(() => value(201, 0, 0, enc.encode('other')), /JavaScript module "other" is not in this edge build/);
 });
 
+// Strings and object keys have ASCII fast paths (Writer.string, Reader.string,
+// Reader.key); their bytes and values must be exactly the general path's
+// (TextEncoder's UTF-8; TextDecoder), on both sides of every boundary.
+const samples = ['', 'a', 'field12', '\x7f', 'caf\u00e9', '\u00e9t\u00e9', 'x\u{1F600}', '\u{1F600}', 'ab\u0080', '\ufeffbom', 'lone \ud800 surrogate',
+  ...[31, 32, 33, 63, 64, 65, 200].flatMap(n => ['k'.repeat(n), 'k'.repeat(n - 1) + '\u00e9', '\u00e9' + 'k'.repeat(n - 1)])];
+test('strings and keys encode as UTF-8 and decode as TextDecoder does, on every fast-path boundary', () => {
+  const seen = [];
+  const { call } = edge({ modules: { echo: { id: x => { seen.push(x); return x; } } } });
+  const echo = x => call(214, 0, 0, wire(['T.id', 'echo', 'id', [x]]));
+  for (const s of samples) {
+    const text = dec.decode(enc.encode(s));
+    assert.deepEqual(echo(s), wire(text), JSON.stringify(s));
+    assert.equal(seen.pop(), text, JSON.stringify(s));
+    // Twice: the second read of a key comes from the key cache.
+    for (let round = 0; round < 2; round++) {
+      assert.deepEqual(echo({ [s]: s, after: 1 }), wire({ [text]: text, after: 1 }), JSON.stringify(s));
+      assert.deepEqual(Object.entries(seen.pop()), [[text, text], ['after', 1]], JSON.stringify(s));
+    }
+  }
+  // Bytes that are not valid UTF-8 decode as TextDecoder replaces them, as values and keys.
+  for (const raw of [[0x61, 0xff], [0xc3], [0x80, 0x61], [0x7f, 0x80]]) {
+    const bytes = cat(u32(raw.length), Uint8Array.from(raw)), text = dec.decode(Uint8Array.from(raw));
+    const args = items => cat(Uint8Array.of(8), u32(4), wire('T.id'), wire('echo'), wire('id'), Uint8Array.of(8), u32(1), items);
+    call(214, 0, 0, args(cat(Uint8Array.of(5), bytes)));
+    assert.equal(seen.pop(), text);
+    call(214, 0, 0, args(cat(Uint8Array.of(9), u32(1), bytes, Uint8Array.of(0))));
+    assert.deepEqual(Object.keys(seen.pop()), [text]);
+  }
+  // Many strings in one value: the writer grows its buffer in the middle of the fast path.
+  const many = Object.fromEntries(Array.from({ length: 300 }, (_, i) => [`key${i}`, i % 3 ? `value number ${i}` : i]));
+  assert.deepEqual(echo(many), wire(many));
+  // Keys that share a cache slot or a length still decode as themselves.
+  const wide = Object.fromEntries(Array.from({ length: 3000 }, (_, i) => [`k${i}`, i]));
+  for (let round = 0; round < 2; round++) { echo(wide); assert.deepEqual(seen.pop(), wide); }
+  for (let round = 0; round < 2; round++) for (const k of ['ab', 'ba', 'ac', 'abc', 'ab']) { echo({ [k]: 0 }); assert.deepEqual(Object.keys(seen.pop()), [k]); }
+});
+
 test('values: every kind round-trips, including ones larger than the first buffer', () => {
   const { value, js } = edge({ modules: { echo: { id: x => x } } });
   const id = x => value(214, 0, 0, wire(['T.id', 'echo', 'id', [x]]));
@@ -178,7 +215,7 @@ test('ops 203-206: get, set, calls, methods, construction and their errors', asy
   const ref = value(201, 0, 1, enc.encode('lib')).ref;
   const t = value(203, ref, 1, wire('target')).ref;
   assert.equal(value(203, t, 0, wire('a')), 1);
-  assert.deepEqual(value(203, t, 0, wire(['a', 'n', 'none'])), { a: 1, n: 4, none: undefined });
+  assert.deepEqual(value(203, t, 2, wire(['a', 'n', 'none'])), { a: 1, n: 4, none: undefined });
   assert.ok(value(203, t, 1, wire('inner')).ref >= firstJsHandle);
   assert.equal(call(204, t, 0, wire(['a', 9])).length, 0);
   assert.equal(target.a, 9);
@@ -347,12 +384,32 @@ test('requests: values after released handles, truncated replies, nested objects
   assert.equal(e.value(214, 0, 0, wire(['T', 'ab', 'c', []])), 'module ab');
 });
 
+test('get and set: keys of any kind (Symbols, numbers, arrays); getFields only with arg bit 2', () => {
+  const tag = Symbol('tag'), target = { [tag]: 'symbol', 2: 'two', 'a,b': 'joined', a: 'one' };
+  const lib = { target, tag };
+  const e = edge({ modules: { lib } });
+  const ref = e.value(201, 0, 1, enc.encode('lib')).ref;
+  const t = e.value(203, ref, 1, wire('target')).ref, key = { ref: e.value(203, ref, 1, wire('tag')).ref };
+  assert.equal(e.value(203, t, 0, wire(key)), 'symbol');
+  assert.equal(e.value(203, t, 0, wire(2)), 'two');
+  assert.equal(e.value(203, t, 0, wire(['a', 'b'])), 'joined', 'an array key is its string, as in JavaScript');
+  assert.deepEqual(e.value(203, t, 2, wire(['a', 2])), { a: 'one', 2: 'two' });
+  assert.ok(e.value(203, t, 1, wire(key)).ref >= firstJsHandle, 'arg bit 0 still asks for a reference');
+  assert.equal(e.call(204, t, 0, wire([key, 'set'])).length, 0);
+  assert.equal(target[tag], 'set');
+  e.call(204, t, 0, wire([3, 'three']));
+  assert.equal(target[3], 'three');
+  const nil = e.value(214, 0, 1, wire(['T', 'globalThis', 'Number', [null]])).ref;
+  assert.throws(() => e.call(204, nil, 0, wire([key, 1])), { message: 'TypeError: Cannot set symbol tag on number 0' });
+  assert.throws(() => e.call(204, nil, 0, wire([3, 1])), { message: 'TypeError: Cannot set number 3 on number 0' });
+});
+
 test('get and set: fields of null through a key list, properties of functions, null targets', () => {
   const lib = { nil: null, fn: function f() {} };
   const e = edge({ modules: { lib } });
   const ref = e.value(201, 0, 1, enc.encode('lib')).ref;
   const nil = e.value(203, ref, 1, wire('nil')).ref;
-  assert.deepEqual(e.value(203, nil, 0, wire(['a'])), { a: undefined });
+  assert.deepEqual(e.value(203, nil, 2, wire(['a'])), { a: undefined });
   assert.throws(() => e.call(204, nil, 0, wire(['k', 1])), { message: 'TypeError: Cannot set "k" on null' });
   const fn = e.value(203, ref, 1, wire('fn')).ref;
   assert.equal(e.call(204, fn, 0, wire(['tag', 7])).length, 0);
@@ -479,4 +536,10 @@ test('edge: the controller keeps the C stack pointer at the stop, before restori
   assert.deepEqual({ ...controller.stoppedStack }, { top: 3 << 20, pointer: 2 ** 32 - 64 });
   assert.deepEqual(restored, [[3 << 20, -64]]);
   assert.equal(controller.stopped, trap);
+});
+
+test('strings keep a leading U+FEFF in both directions (found by the Lasm.JS.Web conformance run)', () => {
+  const e = edge();
+  const f = e.value(214, 0, 1, wire(['T', 'globalThis', 'Function', ['s', 'return [s.length, s.charCodeAt(0), s]']])).ref;
+  assert.deepEqual(e.value(205, 0, 0, wire([{ ref: f }, null, ['﻿test=﻿']])), [7, 0xFEFF, '﻿test=﻿']);
 });

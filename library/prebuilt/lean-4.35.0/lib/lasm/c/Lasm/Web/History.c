@@ -47,7 +47,7 @@ lean_object* lean_string_length(lean_object*);
 uint64_t l___private_Lasm_JS_Core_0__Lasm_JS_modeArg(uint8_t);
 lean_object* l_Lasm_Web_window();
 lean_object* l_Lasm_Web_EventTarget_addEventListener(lean_object*, lean_object*, lean_object*, lean_object*);
-lean_object* l_Std_Format_pretty(lean_object*, lean_object*, lean_object*, lean_object*);
+lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_Value_keyText(lean_object*);
 extern lean_object* l_Lasm_JS_instFromJSString;
 static const lean_string_object l_Lasm_Web_Raw_location___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 9, .m_capacity = 9, .m_length = 8, .m_data = "location"};
 static const lean_object* l_Lasm_Web_Raw_location___closed__0 = (const lean_object*)&l_Lasm_Web_Raw_location___closed__0_value;
@@ -1760,7 +1760,7 @@ lean_inc(v_a_475_);
 lean_dec_ref_known(v___x_474_, 1);
 v___x_476_ = 203;
 v___x_477_ = lasm_js_value_handle(v_o_467_);
-v___x_478_ = 0ULL;
+v___x_478_ = 2ULL;
 v___x_479_ = ((lean_object*)(l_Lasm_Web_instInhabitedLocation_default___closed__0));
 v___x_480_ = lean_alloc_ctor(9, 2, 0);
 lean_ctor_set(v___x_480_, 0, v_o_467_);
@@ -2793,14 +2793,13 @@ return v___x_793_;
 LEAN_EXPORT lean_object* l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0(lean_object* v_o_794_, lean_object* v_key_795_){
 _start:
 {
-lean_object* v___x_797_; lean_object* v___x_798_; 
-v___x_797_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_797_, 0, v_key_795_);
-v___x_798_ = l_Lasm_JS_Wire_encodeIO(v___x_797_);
-lean_dec_ref_known(v___x_797_, 1);
+lean_object* v_k_797_; lean_object* v___x_798_; 
+v_k_797_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v_k_797_, 0, v_key_795_);
+v___x_798_ = l_Lasm_JS_Wire_encodeIO(v_k_797_);
 if (lean_obj_tag(v___x_798_) == 0)
 {
-lean_object* v_a_799_; uint32_t v___x_800_; uint32_t v___x_801_; uint64_t v___x_802_; lean_object* v___x_803_; lean_object* v___x_804_; lean_object* v___x_805_; 
+lean_object* v_a_799_; uint32_t v___x_800_; uint32_t v___x_801_; uint64_t v___x_802_; lean_object* v___x_803_; lean_object* v___x_804_; lean_object* v___x_805_; lean_object* v___x_806_; lean_object* v___x_807_; lean_object* v___x_808_; lean_object* v___x_809_; lean_object* v___x_810_; 
 v_a_799_ = lean_ctor_get(v___x_798_, 0);
 lean_inc(v_a_799_);
 lean_dec_ref_known(v___x_798_, 1);
@@ -2811,1032 +2810,1039 @@ v___x_803_ = ((lean_object*)(l_Lasm_Web_instInhabitedLocation_default___closed__
 v___x_804_ = lean_alloc_ctor(9, 2, 0);
 lean_ctor_set(v___x_804_, 0, v_o_794_);
 lean_ctor_set(v___x_804_, 1, v___x_803_);
-v___x_805_ = lasm_js_call(v___x_800_, v___x_801_, v___x_802_, v_a_799_, v___x_804_);
-lean_dec_ref_known(v___x_804_, 2);
+v___x_805_ = lean_unsigned_to_nat(2u);
+v___x_806_ = lean_mk_empty_array_with_capacity(v___x_805_);
+v___x_807_ = lean_array_push(v___x_806_, v_k_797_);
+v___x_808_ = lean_array_push(v___x_807_, v___x_804_);
+v___x_809_ = lean_alloc_ctor(7, 1, 0);
+lean_ctor_set(v___x_809_, 0, v___x_808_);
+v___x_810_ = lasm_js_call(v___x_800_, v___x_801_, v___x_802_, v_a_799_, v___x_809_);
+lean_dec_ref_known(v___x_809_, 1);
 lean_dec(v_a_799_);
-if (lean_obj_tag(v___x_805_) == 0)
+if (lean_obj_tag(v___x_810_) == 0)
 {
-lean_object* v_a_806_; lean_object* v___x_807_; 
-v_a_806_ = lean_ctor_get(v___x_805_, 0);
-lean_inc(v_a_806_);
-lean_dec_ref_known(v___x_805_, 1);
-v___x_807_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_a_806_);
-lean_dec(v_a_806_);
-return v___x_807_;
+lean_object* v_a_811_; lean_object* v___x_812_; 
+v_a_811_ = lean_ctor_get(v___x_810_, 0);
+lean_inc(v_a_811_);
+lean_dec_ref_known(v___x_810_, 1);
+v___x_812_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_a_811_);
+lean_dec(v_a_811_);
+return v___x_812_;
 }
 else
 {
-lean_object* v_a_808_; lean_object* v___x_810_; uint8_t v_isShared_811_; uint8_t v_isSharedCheck_815_; 
-v_a_808_ = lean_ctor_get(v___x_805_, 0);
-v_isSharedCheck_815_ = !lean_is_exclusive(v___x_805_);
-if (v_isSharedCheck_815_ == 0)
+lean_object* v_a_813_; lean_object* v___x_815_; uint8_t v_isShared_816_; uint8_t v_isSharedCheck_820_; 
+v_a_813_ = lean_ctor_get(v___x_810_, 0);
+v_isSharedCheck_820_ = !lean_is_exclusive(v___x_810_);
+if (v_isSharedCheck_820_ == 0)
 {
-v___x_810_ = v___x_805_;
-v_isShared_811_ = v_isSharedCheck_815_;
-goto v_resetjp_809_;
+v___x_815_ = v___x_810_;
+v_isShared_816_ = v_isSharedCheck_820_;
+goto v_resetjp_814_;
 }
 else
 {
-lean_inc(v_a_808_);
-lean_dec(v___x_805_);
-v___x_810_ = lean_box(0);
-v_isShared_811_ = v_isSharedCheck_815_;
-goto v_resetjp_809_;
+lean_inc(v_a_813_);
+lean_dec(v___x_810_);
+v___x_815_ = lean_box(0);
+v_isShared_816_ = v_isSharedCheck_820_;
+goto v_resetjp_814_;
 }
-v_resetjp_809_:
+v_resetjp_814_:
 {
-lean_object* v___x_813_; 
-if (v_isShared_811_ == 0)
+lean_object* v___x_818_; 
+if (v_isShared_816_ == 0)
 {
-v___x_813_ = v___x_810_;
-goto v_reusejp_812_;
+v___x_818_ = v___x_815_;
+goto v_reusejp_817_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_814_; 
-v_reuseFailAlloc_814_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_814_, 0, v_a_808_);
-v___x_813_ = v_reuseFailAlloc_814_;
-goto v_reusejp_812_;
+lean_object* v_reuseFailAlloc_819_; 
+v_reuseFailAlloc_819_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_819_, 0, v_a_813_);
+v___x_818_ = v_reuseFailAlloc_819_;
+goto v_reusejp_817_;
 }
-v_reusejp_812_:
+v_reusejp_817_:
 {
-return v___x_813_;
+return v___x_818_;
 }
 }
 }
 }
 else
 {
-lean_object* v_a_816_; lean_object* v___x_818_; uint8_t v_isShared_819_; uint8_t v_isSharedCheck_823_; 
+lean_object* v_a_821_; lean_object* v___x_823_; uint8_t v_isShared_824_; uint8_t v_isSharedCheck_828_; 
+lean_dec_ref_known(v_k_797_, 1);
 lean_dec(v_o_794_);
-v_a_816_ = lean_ctor_get(v___x_798_, 0);
-v_isSharedCheck_823_ = !lean_is_exclusive(v___x_798_);
-if (v_isSharedCheck_823_ == 0)
+v_a_821_ = lean_ctor_get(v___x_798_, 0);
+v_isSharedCheck_828_ = !lean_is_exclusive(v___x_798_);
+if (v_isSharedCheck_828_ == 0)
 {
-v___x_818_ = v___x_798_;
-v_isShared_819_ = v_isSharedCheck_823_;
-goto v_resetjp_817_;
+v___x_823_ = v___x_798_;
+v_isShared_824_ = v_isSharedCheck_828_;
+goto v_resetjp_822_;
 }
 else
 {
-lean_inc(v_a_816_);
+lean_inc(v_a_821_);
 lean_dec(v___x_798_);
-v___x_818_ = lean_box(0);
-v_isShared_819_ = v_isSharedCheck_823_;
-goto v_resetjp_817_;
+v___x_823_ = lean_box(0);
+v_isShared_824_ = v_isSharedCheck_828_;
+goto v_resetjp_822_;
 }
-v_resetjp_817_:
+v_resetjp_822_:
 {
-lean_object* v___x_821_; 
-if (v_isShared_819_ == 0)
+lean_object* v___x_826_; 
+if (v_isShared_824_ == 0)
 {
-v___x_821_ = v___x_818_;
-goto v_reusejp_820_;
+v___x_826_ = v___x_823_;
+goto v_reusejp_825_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_822_; 
-v_reuseFailAlloc_822_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_822_, 0, v_a_816_);
-v___x_821_ = v_reuseFailAlloc_822_;
-goto v_reusejp_820_;
+lean_object* v_reuseFailAlloc_827_; 
+v_reuseFailAlloc_827_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_827_, 0, v_a_821_);
+v___x_826_ = v_reuseFailAlloc_827_;
+goto v_reusejp_825_;
 }
-v_reusejp_820_:
+v_reusejp_825_:
 {
-return v___x_821_;
+return v___x_826_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0___boxed(lean_object* v_o_824_, lean_object* v_key_825_, lean_object* v_a_826_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0___boxed(lean_object* v_o_829_, lean_object* v_key_830_, lean_object* v_a_831_){
 _start:
 {
-lean_object* v_res_827_; 
-v_res_827_ = l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0(v_o_824_, v_key_825_);
-return v_res_827_;
+lean_object* v_res_832_; 
+v_res_832_ = l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0(v_o_829_, v_key_830_);
+return v_res_832_;
 }
 }
 LEAN_EXPORT lean_object* l_Lasm_Web_History_state(){
 _start:
 {
-lean_object* v___x_830_; 
-v___x_830_ = l_Lasm_Web_Raw_history();
-if (lean_obj_tag(v___x_830_) == 0)
+lean_object* v___x_835_; 
+v___x_835_ = l_Lasm_Web_Raw_history();
+if (lean_obj_tag(v___x_835_) == 0)
 {
-lean_object* v_a_831_; lean_object* v___x_832_; lean_object* v___x_833_; 
-v_a_831_ = lean_ctor_get(v___x_830_, 0);
-lean_inc(v_a_831_);
-lean_dec_ref_known(v___x_830_, 1);
-v___x_832_ = ((lean_object*)(l_Lasm_Web_History_state___closed__0));
-v___x_833_ = l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0(v_a_831_, v___x_832_);
-return v___x_833_;
+lean_object* v_a_836_; lean_object* v___x_837_; lean_object* v___x_838_; 
+v_a_836_ = lean_ctor_get(v___x_835_, 0);
+lean_inc(v_a_836_);
+lean_dec_ref_known(v___x_835_, 1);
+v___x_837_ = ((lean_object*)(l_Lasm_Web_History_state___closed__0));
+v___x_838_ = l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0(v_a_836_, v___x_837_);
+return v___x_838_;
 }
 else
 {
-lean_object* v_a_834_; lean_object* v___x_836_; uint8_t v_isShared_837_; uint8_t v_isSharedCheck_841_; 
-v_a_834_ = lean_ctor_get(v___x_830_, 0);
-v_isSharedCheck_841_ = !lean_is_exclusive(v___x_830_);
-if (v_isSharedCheck_841_ == 0)
+lean_object* v_a_839_; lean_object* v___x_841_; uint8_t v_isShared_842_; uint8_t v_isSharedCheck_846_; 
+v_a_839_ = lean_ctor_get(v___x_835_, 0);
+v_isSharedCheck_846_ = !lean_is_exclusive(v___x_835_);
+if (v_isSharedCheck_846_ == 0)
 {
-v___x_836_ = v___x_830_;
-v_isShared_837_ = v_isSharedCheck_841_;
-goto v_resetjp_835_;
+v___x_841_ = v___x_835_;
+v_isShared_842_ = v_isSharedCheck_846_;
+goto v_resetjp_840_;
 }
 else
 {
-lean_inc(v_a_834_);
-lean_dec(v___x_830_);
-v___x_836_ = lean_box(0);
-v_isShared_837_ = v_isSharedCheck_841_;
-goto v_resetjp_835_;
+lean_inc(v_a_839_);
+lean_dec(v___x_835_);
+v___x_841_ = lean_box(0);
+v_isShared_842_ = v_isSharedCheck_846_;
+goto v_resetjp_840_;
 }
-v_resetjp_835_:
+v_resetjp_840_:
 {
-lean_object* v___x_839_; 
-if (v_isShared_837_ == 0)
+lean_object* v___x_844_; 
+if (v_isShared_842_ == 0)
 {
-v___x_839_ = v___x_836_;
-goto v_reusejp_838_;
+v___x_844_ = v___x_841_;
+goto v_reusejp_843_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_840_; 
-v_reuseFailAlloc_840_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_840_, 0, v_a_834_);
-v___x_839_ = v_reuseFailAlloc_840_;
-goto v_reusejp_838_;
+lean_object* v_reuseFailAlloc_845_; 
+v_reuseFailAlloc_845_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_845_, 0, v_a_839_);
+v___x_844_ = v_reuseFailAlloc_845_;
+goto v_reusejp_843_;
 }
-v_reusejp_838_:
+v_reusejp_843_:
 {
-return v___x_839_;
+return v___x_844_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_Web_History_state___boxed(lean_object* v_a_842_){
+LEAN_EXPORT lean_object* l_Lasm_Web_History_state___boxed(lean_object* v_a_847_){
 _start:
 {
-lean_object* v_res_843_; 
-v_res_843_ = l_Lasm_Web_History_state();
-return v_res_843_;
+lean_object* v_res_848_; 
+v_res_848_ = l_Lasm_Web_History_state();
+return v_res_848_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0_spec__0___redArg(lean_object* v_bytes_844_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0_spec__0___redArg(lean_object* v_bytes_849_){
 _start:
 {
-lean_object* v___x_846_; 
-v___x_846_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_bytes_844_);
-return v___x_846_;
+lean_object* v___x_851_; 
+v___x_851_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_bytes_849_);
+return v___x_851_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0_spec__0___redArg___boxed(lean_object* v_bytes_847_, lean_object* v_a_848_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0_spec__0___redArg___boxed(lean_object* v_bytes_852_, lean_object* v_a_853_){
 _start:
 {
-lean_object* v_res_849_; 
-v_res_849_ = l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0_spec__0___redArg(v_bytes_847_);
-lean_dec_ref(v_bytes_847_);
-return v_res_849_;
+lean_object* v_res_854_; 
+v_res_854_ = l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0_spec__0___redArg(v_bytes_852_);
+lean_dec_ref(v_bytes_852_);
+return v_res_854_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0_spec__0(lean_object* v_context_850_, lean_object* v_bytes_851_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0_spec__0(lean_object* v_context_855_, lean_object* v_bytes_856_){
 _start:
 {
-lean_object* v___x_853_; 
-v___x_853_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_bytes_851_);
-return v___x_853_;
+lean_object* v___x_858_; 
+v___x_858_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_bytes_856_);
+return v___x_858_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0_spec__0___boxed(lean_object* v_context_854_, lean_object* v_bytes_855_, lean_object* v_a_856_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0_spec__0___boxed(lean_object* v_context_859_, lean_object* v_bytes_860_, lean_object* v_a_861_){
 _start:
 {
-lean_object* v_res_857_; 
-v_res_857_ = l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0_spec__0(v_context_854_, v_bytes_855_);
-lean_dec_ref(v_bytes_855_);
-lean_dec_ref(v_context_854_);
-return v_res_857_;
+lean_object* v_res_862_; 
+v_res_862_ = l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0_spec__0(v_context_859_, v_bytes_860_);
+lean_dec_ref(v_bytes_860_);
+lean_dec_ref(v_context_859_);
+return v_res_862_;
 }
 }
 static lean_object* _init_l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__1(void){
 _start:
 {
-lean_object* v___x_859_; lean_object* v___x_860_; 
-v___x_859_ = lean_unsigned_to_nat(0u);
-v___x_860_ = lean_nat_to_int(v___x_859_);
-return v___x_860_;
+lean_object* v___x_864_; lean_object* v___x_865_; 
+v___x_864_ = lean_unsigned_to_nat(0u);
+v___x_865_ = lean_nat_to_int(v___x_864_);
+return v___x_865_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1(lean_object* v_context_863_, lean_object* v_d_864_){
+LEAN_EXPORT lean_object* l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1(lean_object* v_context_868_, lean_object* v_d_869_){
 _start:
 {
-lean_object* v___y_867_; lean_object* v___y_868_; lean_object* v___y_873_; lean_object* v_received_874_; lean_object* v___y_893_; lean_object* v_a_896_; lean_object* v_a_921_; 
-switch(lean_obj_tag(v_d_864_))
+lean_object* v___y_872_; lean_object* v___y_873_; lean_object* v___y_878_; lean_object* v_received_879_; lean_object* v___y_898_; lean_object* v_a_901_; lean_object* v_a_926_; 
+switch(lean_obj_tag(v_d_869_))
 {
 case 3:
 {
-double v_n_927_; lean_object* v___x_928_; 
-v_n_927_ = lean_ctor_get_float(v_d_864_, 0);
-v___x_928_ = l___private_Lasm_JS_Core_0__Lasm_JS_floatToInt_x3f(v_n_927_);
-if (lean_obj_tag(v___x_928_) == 0)
+double v_n_932_; lean_object* v___x_933_; 
+v_n_932_ = lean_ctor_get_float(v_d_869_, 0);
+v___x_933_ = l___private_Lasm_JS_Core_0__Lasm_JS_floatToInt_x3f(v_n_932_);
+if (lean_obj_tag(v___x_933_) == 0)
 {
-lean_object* v___x_929_; 
-v___x_929_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__3));
-v_a_896_ = v___x_929_;
-goto v___jp_895_;
+lean_object* v___x_934_; 
+v___x_934_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__3));
+v_a_901_ = v___x_934_;
+goto v___jp_900_;
 }
 else
 {
-lean_object* v_val_930_; 
-v_val_930_ = lean_ctor_get(v___x_928_, 0);
-lean_inc(v_val_930_);
-lean_dec_ref_known(v___x_928_, 1);
-v_a_921_ = v_val_930_;
-goto v___jp_920_;
+lean_object* v_val_935_; 
+v_val_935_ = lean_ctor_get(v___x_933_, 0);
+lean_inc(v_val_935_);
+lean_dec_ref_known(v___x_933_, 1);
+v_a_926_ = v_val_935_;
+goto v___jp_925_;
 }
 }
 case 5:
 {
-lean_object* v_i_931_; 
-v_i_931_ = lean_ctor_get(v_d_864_, 0);
-lean_inc(v_i_931_);
-v_a_921_ = v_i_931_;
-goto v___jp_920_;
+lean_object* v_i_936_; 
+v_i_936_ = lean_ctor_get(v_d_869_, 0);
+lean_inc(v_i_936_);
+v_a_926_ = v_i_936_;
+goto v___jp_925_;
 }
 default: 
 {
-lean_object* v___x_932_; 
-v___x_932_ = ((lean_object*)(l_Lasm_Web_instInhabitedLocation_default___closed__0));
-v_a_896_ = v___x_932_;
-goto v___jp_895_;
+lean_object* v___x_937_; 
+v___x_937_ = ((lean_object*)(l_Lasm_Web_instInhabitedLocation_default___closed__0));
+v_a_901_ = v___x_937_;
+goto v___jp_900_;
 }
 }
-v___jp_866_:
+v___jp_871_:
 {
-lean_object* v___x_869_; lean_object* v___x_870_; lean_object* v___x_871_; 
-v___x_869_ = lean_string_append(v___y_867_, v___y_868_);
-lean_dec_ref(v___y_868_);
-v___x_870_ = lean_alloc_ctor(18, 1, 0);
-lean_ctor_set(v___x_870_, 0, v___x_869_);
-v___x_871_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v___x_871_, 0, v___x_870_);
-return v___x_871_;
+lean_object* v___x_874_; lean_object* v___x_875_; lean_object* v___x_876_; 
+v___x_874_ = lean_string_append(v___y_872_, v___y_873_);
+lean_dec_ref(v___y_873_);
+v___x_875_ = lean_alloc_ctor(18, 1, 0);
+lean_ctor_set(v___x_875_, 0, v___x_874_);
+v___x_876_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v___x_876_, 0, v___x_875_);
+return v___x_876_;
 }
-v___jp_872_:
+v___jp_877_:
 {
-lean_object* v___x_875_; lean_object* v___x_876_; lean_object* v___x_877_; lean_object* v___x_878_; lean_object* v___x_879_; lean_object* v___x_880_; lean_object* v___x_881_; lean_object* v___x_882_; lean_object* v___x_883_; lean_object* v___x_884_; lean_object* v___x_885_; uint8_t v___x_886_; 
-v___x_875_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__0));
-v___x_876_ = lean_string_append(v___x_875_, v_context_863_);
-v___x_877_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__1));
-v___x_878_ = lean_string_append(v___x_876_, v___x_877_);
-v___x_879_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__0));
-v___x_880_ = lean_string_append(v___x_878_, v___x_879_);
-v___x_881_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__2));
-v___x_882_ = lean_string_append(v___x_880_, v___x_881_);
-v___x_883_ = lean_string_append(v___x_882_, v_received_874_);
-lean_dec_ref(v_received_874_);
-v___x_884_ = lean_string_utf8_byte_size(v___y_873_);
-v___x_885_ = lean_unsigned_to_nat(0u);
-v___x_886_ = lean_nat_dec_eq(v___x_884_, v___x_885_);
-if (v___x_886_ == 0)
+lean_object* v___x_880_; lean_object* v___x_881_; lean_object* v___x_882_; lean_object* v___x_883_; lean_object* v___x_884_; lean_object* v___x_885_; lean_object* v___x_886_; lean_object* v___x_887_; lean_object* v___x_888_; lean_object* v___x_889_; lean_object* v___x_890_; uint8_t v___x_891_; 
+v___x_880_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__0));
+v___x_881_ = lean_string_append(v___x_880_, v_context_868_);
+v___x_882_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__1));
+v___x_883_ = lean_string_append(v___x_881_, v___x_882_);
+v___x_884_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__0));
+v___x_885_ = lean_string_append(v___x_883_, v___x_884_);
+v___x_886_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__2));
+v___x_887_ = lean_string_append(v___x_885_, v___x_886_);
+v___x_888_ = lean_string_append(v___x_887_, v_received_879_);
+lean_dec_ref(v_received_879_);
+v___x_889_ = lean_string_utf8_byte_size(v___y_878_);
+v___x_890_ = lean_unsigned_to_nat(0u);
+v___x_891_ = lean_nat_dec_eq(v___x_889_, v___x_890_);
+if (v___x_891_ == 0)
 {
-lean_object* v___x_887_; lean_object* v___x_888_; lean_object* v___x_889_; lean_object* v___x_890_; 
-v___x_887_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__3));
-v___x_888_ = lean_string_append(v___x_887_, v___y_873_);
-v___x_889_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__4));
-v___x_890_ = lean_string_append(v___x_888_, v___x_889_);
-v___y_867_ = v___x_883_;
-v___y_868_ = v___x_890_;
-goto v___jp_866_;
-}
-else
-{
-lean_object* v___x_891_; 
-v___x_891_ = ((lean_object*)(l_Lasm_Web_instInhabitedLocation_default___closed__0));
-v___y_867_ = v___x_883_;
-v___y_868_ = v___x_891_;
-goto v___jp_866_;
-}
-}
-v___jp_892_:
-{
-lean_object* v___x_894_; 
-v___x_894_ = l_Lasm_JS_Data_describe(v_d_864_);
-v___y_873_ = v___y_893_;
-v_received_874_ = v___x_894_;
-goto v___jp_872_;
-}
-v___jp_895_:
-{
-if (lean_obj_tag(v_d_864_) == 9)
-{
-lean_object* v_value_897_; lean_object* v_description_898_; lean_object* v___x_899_; uint8_t v___x_900_; 
-v_value_897_ = lean_ctor_get(v_d_864_, 0);
-v_description_898_ = lean_ctor_get(v_d_864_, 1);
-v___x_899_ = ((lean_object*)(l_Lasm_Web_instInhabitedLocation_default___closed__0));
-v___x_900_ = lean_string_dec_eq(v_description_898_, v___x_899_);
-if (v___x_900_ == 0)
-{
-v___y_893_ = v_a_896_;
-goto v___jp_892_;
+lean_object* v___x_892_; lean_object* v___x_893_; lean_object* v___x_894_; lean_object* v___x_895_; 
+v___x_892_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__3));
+v___x_893_ = lean_string_append(v___x_892_, v___y_878_);
+v___x_894_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__4));
+v___x_895_ = lean_string_append(v___x_893_, v___x_894_);
+v___y_872_ = v___x_888_;
+v___y_873_ = v___x_895_;
+goto v___jp_871_;
 }
 else
 {
-lean_object* v___x_902_; uint8_t v_isShared_903_; uint8_t v_isSharedCheck_917_; 
-lean_inc(v_value_897_);
-v_isSharedCheck_917_ = !lean_is_exclusive(v_d_864_);
-if (v_isSharedCheck_917_ == 0)
+lean_object* v___x_896_; 
+v___x_896_ = ((lean_object*)(l_Lasm_Web_instInhabitedLocation_default___closed__0));
+v___y_872_ = v___x_888_;
+v___y_873_ = v___x_896_;
+goto v___jp_871_;
+}
+}
+v___jp_897_:
 {
-lean_object* v_unused_918_; lean_object* v_unused_919_; 
-v_unused_918_ = lean_ctor_get(v_d_864_, 1);
-lean_dec(v_unused_918_);
-v_unused_919_ = lean_ctor_get(v_d_864_, 0);
-lean_dec(v_unused_919_);
-v___x_902_ = v_d_864_;
-v_isShared_903_ = v_isSharedCheck_917_;
-goto v_resetjp_901_;
+lean_object* v___x_899_; 
+v___x_899_ = l_Lasm_JS_Data_describe(v_d_869_);
+v___y_878_ = v___y_898_;
+v_received_879_ = v___x_899_;
+goto v___jp_877_;
+}
+v___jp_900_:
+{
+if (lean_obj_tag(v_d_869_) == 9)
+{
+lean_object* v_value_902_; lean_object* v_description_903_; lean_object* v___x_904_; uint8_t v___x_905_; 
+v_value_902_ = lean_ctor_get(v_d_869_, 0);
+v_description_903_ = lean_ctor_get(v_d_869_, 1);
+v___x_904_ = ((lean_object*)(l_Lasm_Web_instInhabitedLocation_default___closed__0));
+v___x_905_ = lean_string_dec_eq(v_description_903_, v___x_904_);
+if (v___x_905_ == 0)
+{
+v___y_898_ = v_a_901_;
+goto v___jp_897_;
 }
 else
 {
-lean_dec(v_d_864_);
-v___x_902_ = lean_box(0);
-v_isShared_903_ = v_isSharedCheck_917_;
-goto v_resetjp_901_;
-}
-v_resetjp_901_:
+lean_object* v___x_907_; uint8_t v_isShared_908_; uint8_t v_isSharedCheck_922_; 
+lean_inc(v_value_902_);
+v_isSharedCheck_922_ = !lean_is_exclusive(v_d_869_);
+if (v_isSharedCheck_922_ == 0)
 {
-uint32_t v___x_904_; uint64_t v___x_905_; lean_object* v___x_907_; 
-v___x_904_ = 206;
-v___x_905_ = 0ULL;
-lean_inc(v_value_897_);
-if (v_isShared_903_ == 0)
-{
-lean_ctor_set(v___x_902_, 1, v___x_899_);
-v___x_907_ = v___x_902_;
-goto v_reusejp_906_;
+lean_object* v_unused_923_; lean_object* v_unused_924_; 
+v_unused_923_ = lean_ctor_get(v_d_869_, 1);
+lean_dec(v_unused_923_);
+v_unused_924_ = lean_ctor_get(v_d_869_, 0);
+lean_dec(v_unused_924_);
+v___x_907_ = v_d_869_;
+v_isShared_908_ = v_isSharedCheck_922_;
+goto v_resetjp_906_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_916_; 
-v_reuseFailAlloc_916_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v_reuseFailAlloc_916_, 0, v_value_897_);
-lean_ctor_set(v_reuseFailAlloc_916_, 1, v___x_899_);
-v___x_907_ = v_reuseFailAlloc_916_;
-goto v_reusejp_906_;
+lean_dec(v_d_869_);
+v___x_907_ = lean_box(0);
+v_isShared_908_ = v_isSharedCheck_922_;
+goto v_resetjp_906_;
 }
-v_reusejp_906_:
+v_resetjp_906_:
 {
-uint32_t v___x_908_; lean_object* v___x_909_; 
-v___x_908_ = lasm_js_value_handle(v_value_897_);
-lean_dec(v_value_897_);
-v___x_909_ = l___private_Lasm_JS_Core_0__Lasm_JS_hostCallWith(v___x_904_, v___x_905_, v___x_907_, v___x_908_);
-lean_dec_ref(v___x_907_);
-if (lean_obj_tag(v___x_909_) == 0)
+uint32_t v___x_909_; uint64_t v___x_910_; lean_object* v___x_912_; 
+v___x_909_ = 206;
+v___x_910_ = 0ULL;
+lean_inc(v_value_902_);
+if (v_isShared_908_ == 0)
 {
-lean_object* v_a_910_; uint8_t v___x_911_; 
-v_a_910_ = lean_ctor_get(v___x_909_, 0);
-lean_inc(v_a_910_);
-lean_dec_ref_known(v___x_909_, 1);
-v___x_911_ = lean_string_validate_utf8(v_a_910_);
-if (v___x_911_ == 0)
-{
-lean_object* v___x_912_; lean_object* v___x_913_; 
-lean_dec(v_a_910_);
-v___x_912_ = lean_obj_once(&l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__8, &l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__8_once, _init_l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__8);
-v___x_913_ = l_panic___at___00IO_FS_withIsolatedStreams___at___00Lean_Elab_Command_wrapAsyncAsSnapshot_spec__1_spec__11(v___x_912_);
-v___y_873_ = v_a_896_;
-v_received_874_ = v___x_913_;
-goto v___jp_872_;
+lean_ctor_set(v___x_907_, 1, v___x_904_);
+v___x_912_ = v___x_907_;
+goto v_reusejp_911_;
 }
 else
 {
-lean_object* v___x_914_; 
-v___x_914_ = lean_string_from_utf8_unchecked(v_a_910_);
-v___y_873_ = v_a_896_;
-v_received_874_ = v___x_914_;
-goto v___jp_872_;
+lean_object* v_reuseFailAlloc_921_; 
+v_reuseFailAlloc_921_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v_reuseFailAlloc_921_, 0, v_value_902_);
+lean_ctor_set(v_reuseFailAlloc_921_, 1, v___x_904_);
+v___x_912_ = v_reuseFailAlloc_921_;
+goto v_reusejp_911_;
 }
+v_reusejp_911_:
+{
+uint32_t v___x_913_; lean_object* v___x_914_; 
+v___x_913_ = lasm_js_value_handle(v_value_902_);
+lean_dec(v_value_902_);
+v___x_914_ = l___private_Lasm_JS_Core_0__Lasm_JS_hostCallWith(v___x_909_, v___x_910_, v___x_912_, v___x_913_);
+lean_dec_ref(v___x_912_);
+if (lean_obj_tag(v___x_914_) == 0)
+{
+lean_object* v_a_915_; uint8_t v___x_916_; 
+v_a_915_ = lean_ctor_get(v___x_914_, 0);
+lean_inc(v_a_915_);
+lean_dec_ref_known(v___x_914_, 1);
+v___x_916_ = lean_string_validate_utf8(v_a_915_);
+if (v___x_916_ == 0)
+{
+lean_object* v___x_917_; lean_object* v___x_918_; 
+lean_dec(v_a_915_);
+v___x_917_ = lean_obj_once(&l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__8, &l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__8_once, _init_l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__8);
+v___x_918_ = l_panic___at___00IO_FS_withIsolatedStreams___at___00Lean_Elab_Command_wrapAsyncAsSnapshot_spec__1_spec__11(v___x_917_);
+v___y_878_ = v_a_901_;
+v_received_879_ = v___x_918_;
+goto v___jp_877_;
 }
 else
 {
-lean_object* v___x_915_; 
-lean_dec_ref_known(v___x_909_, 1);
-v___x_915_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__9));
-v___y_873_ = v_a_896_;
-v_received_874_ = v___x_915_;
-goto v___jp_872_;
-}
-}
-}
+lean_object* v___x_919_; 
+v___x_919_ = lean_string_from_utf8_unchecked(v_a_915_);
+v___y_878_ = v_a_901_;
+v_received_879_ = v___x_919_;
+goto v___jp_877_;
 }
 }
 else
 {
-v___y_893_ = v_a_896_;
-goto v___jp_892_;
+lean_object* v___x_920_; 
+lean_dec_ref_known(v___x_914_, 1);
+v___x_920_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_getFields___at___00Lasm_Web_location_spec__0_spec__0_spec__1___closed__9));
+v___y_878_ = v_a_901_;
+v_received_879_ = v___x_920_;
+goto v___jp_877_;
 }
 }
-v___jp_920_:
+}
+}
+}
+else
 {
-lean_object* v___x_922_; uint8_t v___x_923_; 
-v___x_922_ = lean_obj_once(&l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__1, &l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__1_once, _init_l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__1);
-v___x_923_ = lean_int_dec_le(v___x_922_, v_a_921_);
-if (v___x_923_ == 0)
+v___y_898_ = v_a_901_;
+goto v___jp_897_;
+}
+}
+v___jp_925_:
 {
-lean_object* v___x_924_; 
-lean_dec(v_a_921_);
-v___x_924_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__2));
-v_a_896_ = v___x_924_;
-goto v___jp_895_;
+lean_object* v___x_927_; uint8_t v___x_928_; 
+v___x_927_ = lean_obj_once(&l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__1, &l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__1_once, _init_l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__1);
+v___x_928_ = lean_int_dec_le(v___x_927_, v_a_926_);
+if (v___x_928_ == 0)
+{
+lean_object* v___x_929_; 
+lean_dec(v_a_926_);
+v___x_929_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___closed__2));
+v_a_901_ = v___x_929_;
+goto v___jp_900_;
 }
 else
 {
-lean_object* v___x_925_; lean_object* v___x_926_; 
-lean_dec(v_d_864_);
-v___x_925_ = l_Int_toNat(v_a_921_);
-lean_dec(v_a_921_);
-v___x_926_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_926_, 0, v___x_925_);
-return v___x_926_;
+lean_object* v___x_930_; lean_object* v___x_931_; 
+lean_dec(v_d_869_);
+v___x_930_ = l_Int_toNat(v_a_926_);
+lean_dec(v_a_926_);
+v___x_931_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_931_, 0, v___x_930_);
+return v___x_931_;
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___boxed(lean_object* v_context_933_, lean_object* v_d_934_, lean_object* v_a_935_){
+LEAN_EXPORT lean_object* l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1___boxed(lean_object* v_context_938_, lean_object* v_d_939_, lean_object* v_a_940_){
 _start:
 {
-lean_object* v_res_936_; 
-v_res_936_ = l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1(v_context_933_, v_d_934_);
-lean_dec_ref(v_context_933_);
-return v_res_936_;
+lean_object* v_res_941_; 
+v_res_941_ = l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1(v_context_938_, v_d_939_);
+lean_dec_ref(v_context_938_);
+return v_res_941_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0(lean_object* v_context_937_, lean_object* v_bytes_938_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0(lean_object* v_context_942_, lean_object* v_bytes_943_){
 _start:
 {
-lean_object* v___x_940_; 
-v___x_940_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_bytes_938_);
-if (lean_obj_tag(v___x_940_) == 0)
+lean_object* v___x_945_; 
+v___x_945_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_bytes_943_);
+if (lean_obj_tag(v___x_945_) == 0)
 {
-lean_object* v_a_941_; lean_object* v___x_942_; 
-v_a_941_ = lean_ctor_get(v___x_940_, 0);
-lean_inc(v_a_941_);
-lean_dec_ref_known(v___x_940_, 1);
-v___x_942_ = l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1(v_context_937_, v_a_941_);
-return v___x_942_;
+lean_object* v_a_946_; lean_object* v___x_947_; 
+v_a_946_ = lean_ctor_get(v___x_945_, 0);
+lean_inc(v_a_946_);
+lean_dec_ref_known(v___x_945_, 1);
+v___x_947_ = l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0_spec__1(v_context_942_, v_a_946_);
+return v___x_947_;
 }
 else
 {
-lean_object* v_a_943_; lean_object* v___x_945_; uint8_t v_isShared_946_; uint8_t v_isSharedCheck_950_; 
-v_a_943_ = lean_ctor_get(v___x_940_, 0);
-v_isSharedCheck_950_ = !lean_is_exclusive(v___x_940_);
-if (v_isSharedCheck_950_ == 0)
+lean_object* v_a_948_; lean_object* v___x_950_; uint8_t v_isShared_951_; uint8_t v_isSharedCheck_955_; 
+v_a_948_ = lean_ctor_get(v___x_945_, 0);
+v_isSharedCheck_955_ = !lean_is_exclusive(v___x_945_);
+if (v_isSharedCheck_955_ == 0)
 {
-v___x_945_ = v___x_940_;
-v_isShared_946_ = v_isSharedCheck_950_;
-goto v_resetjp_944_;
+v___x_950_ = v___x_945_;
+v_isShared_951_ = v_isSharedCheck_955_;
+goto v_resetjp_949_;
 }
 else
 {
-lean_inc(v_a_943_);
-lean_dec(v___x_940_);
-v___x_945_ = lean_box(0);
-v_isShared_946_ = v_isSharedCheck_950_;
-goto v_resetjp_944_;
+lean_inc(v_a_948_);
+lean_dec(v___x_945_);
+v___x_950_ = lean_box(0);
+v_isShared_951_ = v_isSharedCheck_955_;
+goto v_resetjp_949_;
 }
-v_resetjp_944_:
+v_resetjp_949_:
 {
-lean_object* v___x_948_; 
-if (v_isShared_946_ == 0)
+lean_object* v___x_953_; 
+if (v_isShared_951_ == 0)
 {
-v___x_948_ = v___x_945_;
-goto v_reusejp_947_;
+v___x_953_ = v___x_950_;
+goto v_reusejp_952_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_949_; 
-v_reuseFailAlloc_949_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_949_, 0, v_a_943_);
-v___x_948_ = v_reuseFailAlloc_949_;
-goto v_reusejp_947_;
+lean_object* v_reuseFailAlloc_954_; 
+v_reuseFailAlloc_954_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_954_, 0, v_a_948_);
+v___x_953_ = v_reuseFailAlloc_954_;
+goto v_reusejp_952_;
 }
-v_reusejp_947_:
+v_reusejp_952_:
 {
-return v___x_948_;
+return v___x_953_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0___boxed(lean_object* v_context_951_, lean_object* v_bytes_952_, lean_object* v_a_953_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0___boxed(lean_object* v_context_956_, lean_object* v_bytes_957_, lean_object* v_a_958_){
 _start:
 {
-lean_object* v_res_954_; 
-v_res_954_ = l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0(v_context_951_, v_bytes_952_);
-lean_dec_ref(v_bytes_952_);
-lean_dec_ref(v_context_951_);
-return v_res_954_;
+lean_object* v_res_959_; 
+v_res_959_ = l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0(v_context_956_, v_bytes_957_);
+lean_dec_ref(v_bytes_957_);
+lean_dec_ref(v_context_956_);
+return v_res_959_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0(lean_object* v_o_956_, lean_object* v_key_957_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0(lean_object* v_o_961_, lean_object* v_key_962_){
 _start:
 {
-lean_object* v___x_959_; lean_object* v___x_960_; 
-lean_inc_ref(v_key_957_);
-v___x_959_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_959_, 0, v_key_957_);
-v___x_960_ = l_Lasm_JS_Wire_encodeIO(v___x_959_);
-lean_dec_ref_known(v___x_959_, 1);
-if (lean_obj_tag(v___x_960_) == 0)
+lean_object* v_k_964_; lean_object* v___x_965_; 
+v_k_964_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v_k_964_, 0, v_key_962_);
+v___x_965_ = l_Lasm_JS_Wire_encodeIO(v_k_964_);
+if (lean_obj_tag(v___x_965_) == 0)
 {
-lean_object* v_a_961_; uint32_t v___x_962_; uint32_t v___x_963_; uint64_t v___x_964_; lean_object* v___x_965_; lean_object* v___x_966_; lean_object* v___x_967_; 
-v_a_961_ = lean_ctor_get(v___x_960_, 0);
-lean_inc(v_a_961_);
-lean_dec_ref_known(v___x_960_, 1);
-v___x_962_ = 203;
-v___x_963_ = lasm_js_value_handle(v_o_956_);
-v___x_964_ = lean_uint64_once(&l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0___closed__0, &l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0___closed__0_once, _init_l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0___closed__0);
-v___x_965_ = ((lean_object*)(l_Lasm_Web_instInhabitedLocation_default___closed__0));
-v___x_966_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_966_, 0, v_o_956_);
-lean_ctor_set(v___x_966_, 1, v___x_965_);
-v___x_967_ = lasm_js_call(v___x_962_, v___x_963_, v___x_964_, v_a_961_, v___x_966_);
-lean_dec_ref_known(v___x_966_, 2);
-lean_dec(v_a_961_);
-if (lean_obj_tag(v___x_967_) == 0)
+lean_object* v_a_966_; uint32_t v___x_967_; uint32_t v___x_968_; uint64_t v___x_969_; lean_object* v___x_970_; lean_object* v___x_971_; lean_object* v___x_972_; lean_object* v___x_973_; lean_object* v___x_974_; lean_object* v___x_975_; lean_object* v___x_976_; lean_object* v___x_977_; 
+v_a_966_ = lean_ctor_get(v___x_965_, 0);
+lean_inc(v_a_966_);
+lean_dec_ref_known(v___x_965_, 1);
+v___x_967_ = 203;
+v___x_968_ = lasm_js_value_handle(v_o_961_);
+v___x_969_ = lean_uint64_once(&l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0___closed__0, &l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0___closed__0_once, _init_l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0___closed__0);
+v___x_970_ = ((lean_object*)(l_Lasm_Web_instInhabitedLocation_default___closed__0));
+v___x_971_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_971_, 0, v_o_961_);
+lean_ctor_set(v___x_971_, 1, v___x_970_);
+v___x_972_ = lean_unsigned_to_nat(2u);
+v___x_973_ = lean_mk_empty_array_with_capacity(v___x_972_);
+lean_inc_ref(v_k_964_);
+v___x_974_ = lean_array_push(v___x_973_, v_k_964_);
+v___x_975_ = lean_array_push(v___x_974_, v___x_971_);
+v___x_976_ = lean_alloc_ctor(7, 1, 0);
+lean_ctor_set(v___x_976_, 0, v___x_975_);
+v___x_977_ = lasm_js_call(v___x_967_, v___x_968_, v___x_969_, v_a_966_, v___x_976_);
+lean_dec_ref_known(v___x_976_, 1);
+lean_dec(v_a_966_);
+if (lean_obj_tag(v___x_977_) == 0)
 {
-lean_object* v_a_968_; lean_object* v___x_969_; lean_object* v___x_970_; lean_object* v___x_971_; lean_object* v___x_972_; lean_object* v___x_973_; lean_object* v___x_974_; lean_object* v___x_975_; lean_object* v___x_976_; 
-v_a_968_ = lean_ctor_get(v___x_967_, 0);
-lean_inc(v_a_968_);
-lean_dec_ref_known(v___x_967_, 1);
-v___x_969_ = ((lean_object*)(l_Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0___closed__0));
-v___x_970_ = l_String_quote(v_key_957_);
-v___x_971_ = lean_alloc_ctor(3, 1, 0);
-lean_ctor_set(v___x_971_, 0, v___x_970_);
-v___x_972_ = lean_unsigned_to_nat(120u);
-v___x_973_ = lean_unsigned_to_nat(0u);
-v___x_974_ = l_Std_Format_pretty(v___x_971_, v___x_972_, v___x_973_, v___x_973_);
-v___x_975_ = lean_string_append(v___x_969_, v___x_974_);
-lean_dec_ref(v___x_974_);
-v___x_976_ = l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0(v___x_975_, v_a_968_);
-lean_dec(v_a_968_);
-lean_dec_ref(v___x_975_);
-return v___x_976_;
-}
-else
-{
-lean_object* v_a_977_; lean_object* v___x_979_; uint8_t v_isShared_980_; uint8_t v_isSharedCheck_984_; 
-lean_dec_ref(v_key_957_);
-v_a_977_ = lean_ctor_get(v___x_967_, 0);
-v_isSharedCheck_984_ = !lean_is_exclusive(v___x_967_);
-if (v_isSharedCheck_984_ == 0)
-{
-v___x_979_ = v___x_967_;
-v_isShared_980_ = v_isSharedCheck_984_;
-goto v_resetjp_978_;
-}
-else
-{
-lean_inc(v_a_977_);
-lean_dec(v___x_967_);
-v___x_979_ = lean_box(0);
-v_isShared_980_ = v_isSharedCheck_984_;
-goto v_resetjp_978_;
-}
-v_resetjp_978_:
-{
-lean_object* v___x_982_; 
-if (v_isShared_980_ == 0)
-{
-v___x_982_ = v___x_979_;
-goto v_reusejp_981_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_983_; 
-v_reuseFailAlloc_983_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_983_, 0, v_a_977_);
-v___x_982_ = v_reuseFailAlloc_983_;
-goto v_reusejp_981_;
-}
-v_reusejp_981_:
-{
+lean_object* v_a_978_; lean_object* v___x_979_; lean_object* v___x_980_; lean_object* v___x_981_; lean_object* v___x_982_; 
+v_a_978_ = lean_ctor_get(v___x_977_, 0);
+lean_inc(v_a_978_);
+lean_dec_ref_known(v___x_977_, 1);
+v___x_979_ = ((lean_object*)(l_Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0___closed__0));
+v___x_980_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_keyText(v_k_964_);
+v___x_981_ = lean_string_append(v___x_979_, v___x_980_);
+lean_dec_ref(v___x_980_);
+v___x_982_ = l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0_spec__0(v___x_981_, v_a_978_);
+lean_dec(v_a_978_);
+lean_dec_ref(v___x_981_);
 return v___x_982_;
 }
+else
+{
+lean_object* v_a_983_; lean_object* v___x_985_; uint8_t v_isShared_986_; uint8_t v_isSharedCheck_990_; 
+lean_dec_ref_known(v_k_964_, 1);
+v_a_983_ = lean_ctor_get(v___x_977_, 0);
+v_isSharedCheck_990_ = !lean_is_exclusive(v___x_977_);
+if (v_isSharedCheck_990_ == 0)
+{
+v___x_985_ = v___x_977_;
+v_isShared_986_ = v_isSharedCheck_990_;
+goto v_resetjp_984_;
+}
+else
+{
+lean_inc(v_a_983_);
+lean_dec(v___x_977_);
+v___x_985_ = lean_box(0);
+v_isShared_986_ = v_isSharedCheck_990_;
+goto v_resetjp_984_;
+}
+v_resetjp_984_:
+{
+lean_object* v___x_988_; 
+if (v_isShared_986_ == 0)
+{
+v___x_988_ = v___x_985_;
+goto v_reusejp_987_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_989_; 
+v_reuseFailAlloc_989_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_989_, 0, v_a_983_);
+v___x_988_ = v_reuseFailAlloc_989_;
+goto v_reusejp_987_;
+}
+v_reusejp_987_:
+{
+return v___x_988_;
+}
 }
 }
 }
 else
 {
-lean_object* v_a_985_; lean_object* v___x_987_; uint8_t v_isShared_988_; uint8_t v_isSharedCheck_992_; 
-lean_dec_ref(v_key_957_);
-lean_dec(v_o_956_);
-v_a_985_ = lean_ctor_get(v___x_960_, 0);
-v_isSharedCheck_992_ = !lean_is_exclusive(v___x_960_);
-if (v_isSharedCheck_992_ == 0)
+lean_object* v_a_991_; lean_object* v___x_993_; uint8_t v_isShared_994_; uint8_t v_isSharedCheck_998_; 
+lean_dec_ref_known(v_k_964_, 1);
+lean_dec(v_o_961_);
+v_a_991_ = lean_ctor_get(v___x_965_, 0);
+v_isSharedCheck_998_ = !lean_is_exclusive(v___x_965_);
+if (v_isSharedCheck_998_ == 0)
 {
-v___x_987_ = v___x_960_;
-v_isShared_988_ = v_isSharedCheck_992_;
-goto v_resetjp_986_;
+v___x_993_ = v___x_965_;
+v_isShared_994_ = v_isSharedCheck_998_;
+goto v_resetjp_992_;
 }
 else
 {
-lean_inc(v_a_985_);
-lean_dec(v___x_960_);
-v___x_987_ = lean_box(0);
-v_isShared_988_ = v_isSharedCheck_992_;
-goto v_resetjp_986_;
+lean_inc(v_a_991_);
+lean_dec(v___x_965_);
+v___x_993_ = lean_box(0);
+v_isShared_994_ = v_isSharedCheck_998_;
+goto v_resetjp_992_;
 }
-v_resetjp_986_:
+v_resetjp_992_:
 {
-lean_object* v___x_990_; 
-if (v_isShared_988_ == 0)
+lean_object* v___x_996_; 
+if (v_isShared_994_ == 0)
 {
-v___x_990_ = v___x_987_;
-goto v_reusejp_989_;
+v___x_996_ = v___x_993_;
+goto v_reusejp_995_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_991_; 
-v_reuseFailAlloc_991_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_991_, 0, v_a_985_);
-v___x_990_ = v_reuseFailAlloc_991_;
-goto v_reusejp_989_;
+lean_object* v_reuseFailAlloc_997_; 
+v_reuseFailAlloc_997_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_997_, 0, v_a_991_);
+v___x_996_ = v_reuseFailAlloc_997_;
+goto v_reusejp_995_;
 }
-v_reusejp_989_:
+v_reusejp_995_:
 {
-return v___x_990_;
+return v___x_996_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0___boxed(lean_object* v_o_993_, lean_object* v_key_994_, lean_object* v_a_995_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0___boxed(lean_object* v_o_999_, lean_object* v_key_1000_, lean_object* v_a_1001_){
 _start:
 {
-lean_object* v_res_996_; 
-v_res_996_ = l_Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0(v_o_993_, v_key_994_);
-return v_res_996_;
+lean_object* v_res_1002_; 
+v_res_1002_ = l_Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0(v_o_999_, v_key_1000_);
+return v_res_1002_;
 }
 }
 LEAN_EXPORT lean_object* l_Lasm_Web_History_length(){
 _start:
 {
-lean_object* v___x_999_; 
-v___x_999_ = l_Lasm_Web_Raw_history();
-if (lean_obj_tag(v___x_999_) == 0)
+lean_object* v___x_1005_; 
+v___x_1005_ = l_Lasm_Web_Raw_history();
+if (lean_obj_tag(v___x_1005_) == 0)
 {
-lean_object* v_a_1000_; lean_object* v___x_1001_; lean_object* v___x_1002_; 
-v_a_1000_ = lean_ctor_get(v___x_999_, 0);
-lean_inc(v_a_1000_);
-lean_dec_ref_known(v___x_999_, 1);
-v___x_1001_ = ((lean_object*)(l_Lasm_Web_History_length___closed__0));
-v___x_1002_ = l_Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0(v_a_1000_, v___x_1001_);
-return v___x_1002_;
-}
-else
-{
-lean_object* v_a_1003_; lean_object* v___x_1005_; uint8_t v_isShared_1006_; uint8_t v_isSharedCheck_1010_; 
-v_a_1003_ = lean_ctor_get(v___x_999_, 0);
-v_isSharedCheck_1010_ = !lean_is_exclusive(v___x_999_);
-if (v_isSharedCheck_1010_ == 0)
-{
-v___x_1005_ = v___x_999_;
-v_isShared_1006_ = v_isSharedCheck_1010_;
-goto v_resetjp_1004_;
-}
-else
-{
-lean_inc(v_a_1003_);
-lean_dec(v___x_999_);
-v___x_1005_ = lean_box(0);
-v_isShared_1006_ = v_isSharedCheck_1010_;
-goto v_resetjp_1004_;
-}
-v_resetjp_1004_:
-{
-lean_object* v___x_1008_; 
-if (v_isShared_1006_ == 0)
-{
-v___x_1008_ = v___x_1005_;
-goto v_reusejp_1007_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1009_; 
-v_reuseFailAlloc_1009_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1009_, 0, v_a_1003_);
-v___x_1008_ = v_reuseFailAlloc_1009_;
-goto v_reusejp_1007_;
-}
-v_reusejp_1007_:
-{
+lean_object* v_a_1006_; lean_object* v___x_1007_; lean_object* v___x_1008_; 
+v_a_1006_ = lean_ctor_get(v___x_1005_, 0);
+lean_inc(v_a_1006_);
+lean_dec_ref_known(v___x_1005_, 1);
+v___x_1007_ = ((lean_object*)(l_Lasm_Web_History_length___closed__0));
+v___x_1008_ = l_Lasm_JS_Value_get___at___00Lasm_Web_History_length_spec__0(v_a_1006_, v___x_1007_);
 return v___x_1008_;
 }
-}
-}
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_Web_History_length___boxed(lean_object* v_a_1011_){
-_start:
+else
 {
-lean_object* v_res_1012_; 
-v_res_1012_ = l_Lasm_Web_History_length();
-return v_res_1012_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_Web_Event_prop___at___00Lasm_Web_onPopState_spec__0(lean_object* v_e_1013_, lean_object* v_name_1014_){
-_start:
+lean_object* v_a_1009_; lean_object* v___x_1011_; uint8_t v_isShared_1012_; uint8_t v_isSharedCheck_1016_; 
+v_a_1009_ = lean_ctor_get(v___x_1005_, 0);
+v_isSharedCheck_1016_ = !lean_is_exclusive(v___x_1005_);
+if (v_isSharedCheck_1016_ == 0)
 {
-lean_object* v___x_1016_; 
-v___x_1016_ = l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0(v_e_1013_, v_name_1014_);
-return v___x_1016_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_Web_Event_prop___at___00Lasm_Web_onPopState_spec__0___boxed(lean_object* v_e_1017_, lean_object* v_name_1018_, lean_object* v_a_1019_){
-_start:
-{
-lean_object* v_res_1020_; 
-v_res_1020_ = l_Lasm_Web_Event_prop___at___00Lasm_Web_onPopState_spec__0(v_e_1017_, v_name_1018_);
-return v_res_1020_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_Web_onPopState___lam__0(lean_object* v_f_1021_, lean_object* v_e_1022_){
-_start:
-{
-lean_object* v___x_1024_; lean_object* v___x_1025_; 
-v___x_1024_ = ((lean_object*)(l_Lasm_Web_History_state___closed__0));
-v___x_1025_ = l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0(v_e_1022_, v___x_1024_);
-if (lean_obj_tag(v___x_1025_) == 0)
-{
-lean_object* v_a_1026_; lean_object* v___x_1027_; 
-v_a_1026_ = lean_ctor_get(v___x_1025_, 0);
-lean_inc(v_a_1026_);
-lean_dec_ref_known(v___x_1025_, 1);
-v___x_1027_ = lean_apply_2(v_f_1021_, v_a_1026_, lean_box(0));
-return v___x_1027_;
+v___x_1011_ = v___x_1005_;
+v_isShared_1012_ = v_isSharedCheck_1016_;
+goto v_resetjp_1010_;
 }
 else
 {
-lean_object* v_a_1028_; lean_object* v___x_1030_; uint8_t v_isShared_1031_; uint8_t v_isSharedCheck_1035_; 
-lean_dec_ref(v_f_1021_);
-v_a_1028_ = lean_ctor_get(v___x_1025_, 0);
-v_isSharedCheck_1035_ = !lean_is_exclusive(v___x_1025_);
-if (v_isSharedCheck_1035_ == 0)
+lean_inc(v_a_1009_);
+lean_dec(v___x_1005_);
+v___x_1011_ = lean_box(0);
+v_isShared_1012_ = v_isSharedCheck_1016_;
+goto v_resetjp_1010_;
+}
+v_resetjp_1010_:
 {
-v___x_1030_ = v___x_1025_;
-v_isShared_1031_ = v_isSharedCheck_1035_;
-goto v_resetjp_1029_;
+lean_object* v___x_1014_; 
+if (v_isShared_1012_ == 0)
+{
+v___x_1014_ = v___x_1011_;
+goto v_reusejp_1013_;
 }
 else
 {
-lean_inc(v_a_1028_);
-lean_dec(v___x_1025_);
-v___x_1030_ = lean_box(0);
-v_isShared_1031_ = v_isSharedCheck_1035_;
-goto v_resetjp_1029_;
+lean_object* v_reuseFailAlloc_1015_; 
+v_reuseFailAlloc_1015_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1015_, 0, v_a_1009_);
+v___x_1014_ = v_reuseFailAlloc_1015_;
+goto v_reusejp_1013_;
 }
-v_resetjp_1029_:
+v_reusejp_1013_:
 {
-lean_object* v___x_1033_; 
-if (v_isShared_1031_ == 0)
-{
-v___x_1033_ = v___x_1030_;
-goto v_reusejp_1032_;
+return v___x_1014_;
 }
-else
-{
-lean_object* v_reuseFailAlloc_1034_; 
-v_reuseFailAlloc_1034_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1034_, 0, v_a_1028_);
-v___x_1033_ = v_reuseFailAlloc_1034_;
-goto v_reusejp_1032_;
 }
-v_reusejp_1032_:
+}
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_Web_History_length___boxed(lean_object* v_a_1017_){
+_start:
 {
+lean_object* v_res_1018_; 
+v_res_1018_ = l_Lasm_Web_History_length();
+return v_res_1018_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_Web_Event_prop___at___00Lasm_Web_onPopState_spec__0(lean_object* v_e_1019_, lean_object* v_name_1020_){
+_start:
+{
+lean_object* v___x_1022_; 
+v___x_1022_ = l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0(v_e_1019_, v_name_1020_);
+return v___x_1022_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_Web_Event_prop___at___00Lasm_Web_onPopState_spec__0___boxed(lean_object* v_e_1023_, lean_object* v_name_1024_, lean_object* v_a_1025_){
+_start:
+{
+lean_object* v_res_1026_; 
+v_res_1026_ = l_Lasm_Web_Event_prop___at___00Lasm_Web_onPopState_spec__0(v_e_1023_, v_name_1024_);
+return v_res_1026_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_Web_onPopState___lam__0(lean_object* v_f_1027_, lean_object* v_e_1028_){
+_start:
+{
+lean_object* v___x_1030_; lean_object* v___x_1031_; 
+v___x_1030_ = ((lean_object*)(l_Lasm_Web_History_state___closed__0));
+v___x_1031_ = l_Lasm_JS_Value_get___at___00Lasm_Web_History_state_spec__0(v_e_1028_, v___x_1030_);
+if (lean_obj_tag(v___x_1031_) == 0)
+{
+lean_object* v_a_1032_; lean_object* v___x_1033_; 
+v_a_1032_ = lean_ctor_get(v___x_1031_, 0);
+lean_inc(v_a_1032_);
+lean_dec_ref_known(v___x_1031_, 1);
+v___x_1033_ = lean_apply_2(v_f_1027_, v_a_1032_, lean_box(0));
 return v___x_1033_;
 }
+else
+{
+lean_object* v_a_1034_; lean_object* v___x_1036_; uint8_t v_isShared_1037_; uint8_t v_isSharedCheck_1041_; 
+lean_dec_ref(v_f_1027_);
+v_a_1034_ = lean_ctor_get(v___x_1031_, 0);
+v_isSharedCheck_1041_ = !lean_is_exclusive(v___x_1031_);
+if (v_isSharedCheck_1041_ == 0)
+{
+v___x_1036_ = v___x_1031_;
+v_isShared_1037_ = v_isSharedCheck_1041_;
+goto v_resetjp_1035_;
+}
+else
+{
+lean_inc(v_a_1034_);
+lean_dec(v___x_1031_);
+v___x_1036_ = lean_box(0);
+v_isShared_1037_ = v_isSharedCheck_1041_;
+goto v_resetjp_1035_;
+}
+v_resetjp_1035_:
+{
+lean_object* v___x_1039_; 
+if (v_isShared_1037_ == 0)
+{
+v___x_1039_ = v___x_1036_;
+goto v_reusejp_1038_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1040_; 
+v_reuseFailAlloc_1040_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1040_, 0, v_a_1034_);
+v___x_1039_ = v_reuseFailAlloc_1040_;
+goto v_reusejp_1038_;
+}
+v_reusejp_1038_:
+{
+return v___x_1039_;
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_Web_onPopState___lam__0___boxed(lean_object* v_f_1036_, lean_object* v_e_1037_, lean_object* v___y_1038_){
+}
+LEAN_EXPORT lean_object* l_Lasm_Web_onPopState___lam__0___boxed(lean_object* v_f_1042_, lean_object* v_e_1043_, lean_object* v___y_1044_){
 _start:
 {
-lean_object* v_res_1039_; 
-v_res_1039_ = l_Lasm_Web_onPopState___lam__0(v_f_1036_, v_e_1037_);
-return v_res_1039_;
+lean_object* v_res_1045_; 
+v_res_1045_ = l_Lasm_Web_onPopState___lam__0(v_f_1042_, v_e_1043_);
+return v_res_1045_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_Web_onPopState(lean_object* v_f_1043_){
+LEAN_EXPORT lean_object* l_Lasm_Web_onPopState(lean_object* v_f_1049_){
 _start:
 {
-lean_object* v___f_1045_; lean_object* v___x_1046_; 
-v___f_1045_ = lean_alloc_closure((void*)(l_Lasm_Web_onPopState___lam__0___boxed), 3, 1);
-lean_closure_set(v___f_1045_, 0, v_f_1043_);
-v___x_1046_ = l_Lasm_Web_window();
-if (lean_obj_tag(v___x_1046_) == 0)
+lean_object* v___f_1051_; lean_object* v___x_1052_; 
+v___f_1051_ = lean_alloc_closure((void*)(l_Lasm_Web_onPopState___lam__0___boxed), 3, 1);
+lean_closure_set(v___f_1051_, 0, v_f_1049_);
+v___x_1052_ = l_Lasm_Web_window();
+if (lean_obj_tag(v___x_1052_) == 0)
 {
-lean_object* v_a_1047_; lean_object* v___x_1048_; lean_object* v___x_1049_; lean_object* v___x_1050_; 
-v_a_1047_ = lean_ctor_get(v___x_1046_, 0);
-lean_inc(v_a_1047_);
-lean_dec_ref_known(v___x_1046_, 1);
-v___x_1048_ = ((lean_object*)(l_Lasm_Web_onPopState___closed__0));
-v___x_1049_ = ((lean_object*)(l_Lasm_Web_onPopState___closed__1));
-v___x_1050_ = l_Lasm_Web_EventTarget_addEventListener(v_a_1047_, v___x_1048_, v___f_1045_, v___x_1049_);
-return v___x_1050_;
-}
-else
-{
-lean_object* v_a_1051_; lean_object* v___x_1053_; uint8_t v_isShared_1054_; uint8_t v_isSharedCheck_1058_; 
-lean_dec_ref(v___f_1045_);
-v_a_1051_ = lean_ctor_get(v___x_1046_, 0);
-v_isSharedCheck_1058_ = !lean_is_exclusive(v___x_1046_);
-if (v_isSharedCheck_1058_ == 0)
-{
-v___x_1053_ = v___x_1046_;
-v_isShared_1054_ = v_isSharedCheck_1058_;
-goto v_resetjp_1052_;
-}
-else
-{
-lean_inc(v_a_1051_);
-lean_dec(v___x_1046_);
-v___x_1053_ = lean_box(0);
-v_isShared_1054_ = v_isSharedCheck_1058_;
-goto v_resetjp_1052_;
-}
-v_resetjp_1052_:
-{
-lean_object* v___x_1056_; 
-if (v_isShared_1054_ == 0)
-{
-v___x_1056_ = v___x_1053_;
-goto v_reusejp_1055_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1057_; 
-v_reuseFailAlloc_1057_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1057_, 0, v_a_1051_);
-v___x_1056_ = v_reuseFailAlloc_1057_;
-goto v_reusejp_1055_;
-}
-v_reusejp_1055_:
-{
+lean_object* v_a_1053_; lean_object* v___x_1054_; lean_object* v___x_1055_; lean_object* v___x_1056_; 
+v_a_1053_ = lean_ctor_get(v___x_1052_, 0);
+lean_inc(v_a_1053_);
+lean_dec_ref_known(v___x_1052_, 1);
+v___x_1054_ = ((lean_object*)(l_Lasm_Web_onPopState___closed__0));
+v___x_1055_ = ((lean_object*)(l_Lasm_Web_onPopState___closed__1));
+v___x_1056_ = l_Lasm_Web_EventTarget_addEventListener(v_a_1053_, v___x_1054_, v___f_1051_, v___x_1055_);
 return v___x_1056_;
 }
+else
+{
+lean_object* v_a_1057_; lean_object* v___x_1059_; uint8_t v_isShared_1060_; uint8_t v_isSharedCheck_1064_; 
+lean_dec_ref(v___f_1051_);
+v_a_1057_ = lean_ctor_get(v___x_1052_, 0);
+v_isSharedCheck_1064_ = !lean_is_exclusive(v___x_1052_);
+if (v_isSharedCheck_1064_ == 0)
+{
+v___x_1059_ = v___x_1052_;
+v_isShared_1060_ = v_isSharedCheck_1064_;
+goto v_resetjp_1058_;
+}
+else
+{
+lean_inc(v_a_1057_);
+lean_dec(v___x_1052_);
+v___x_1059_ = lean_box(0);
+v_isShared_1060_ = v_isSharedCheck_1064_;
+goto v_resetjp_1058_;
+}
+v_resetjp_1058_:
+{
+lean_object* v___x_1062_; 
+if (v_isShared_1060_ == 0)
+{
+v___x_1062_ = v___x_1059_;
+goto v_reusejp_1061_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1063_; 
+v_reuseFailAlloc_1063_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1063_, 0, v_a_1057_);
+v___x_1062_ = v_reuseFailAlloc_1063_;
+goto v_reusejp_1061_;
+}
+v_reusejp_1061_:
+{
+return v___x_1062_;
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_Web_onPopState___boxed(lean_object* v_f_1059_, lean_object* v_a_1060_){
+}
+LEAN_EXPORT lean_object* l_Lasm_Web_onPopState___boxed(lean_object* v_f_1065_, lean_object* v_a_1066_){
 _start:
 {
-lean_object* v_res_1061_; 
-v_res_1061_ = l_Lasm_Web_onPopState(v_f_1059_);
-return v_res_1061_;
+lean_object* v_res_1067_; 
+v_res_1067_ = l_Lasm_Web_onPopState(v_f_1065_);
+return v_res_1067_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_Web_onHashChange___lam__0(lean_object* v_f_1062_, lean_object* v_x_1063_){
+LEAN_EXPORT lean_object* l_Lasm_Web_onHashChange___lam__0(lean_object* v_f_1068_, lean_object* v_x_1069_){
 _start:
 {
-lean_object* v___x_1065_; 
-v___x_1065_ = l_Lasm_Web_location();
-if (lean_obj_tag(v___x_1065_) == 0)
+lean_object* v___x_1071_; 
+v___x_1071_ = l_Lasm_Web_location();
+if (lean_obj_tag(v___x_1071_) == 0)
 {
-lean_object* v_a_1066_; lean_object* v_hash_1067_; lean_object* v___x_1068_; 
-v_a_1066_ = lean_ctor_get(v___x_1065_, 0);
-lean_inc(v_a_1066_);
-lean_dec_ref_known(v___x_1065_, 1);
-v_hash_1067_ = lean_ctor_get(v_a_1066_, 8);
-lean_inc_ref(v_hash_1067_);
-lean_dec(v_a_1066_);
-v___x_1068_ = lean_apply_2(v_f_1062_, v_hash_1067_, lean_box(0));
-return v___x_1068_;
-}
-else
-{
-lean_object* v_a_1069_; lean_object* v___x_1071_; uint8_t v_isShared_1072_; uint8_t v_isSharedCheck_1076_; 
-lean_dec_ref(v_f_1062_);
-v_a_1069_ = lean_ctor_get(v___x_1065_, 0);
-v_isSharedCheck_1076_ = !lean_is_exclusive(v___x_1065_);
-if (v_isSharedCheck_1076_ == 0)
-{
-v___x_1071_ = v___x_1065_;
-v_isShared_1072_ = v_isSharedCheck_1076_;
-goto v_resetjp_1070_;
-}
-else
-{
-lean_inc(v_a_1069_);
-lean_dec(v___x_1065_);
-v___x_1071_ = lean_box(0);
-v_isShared_1072_ = v_isSharedCheck_1076_;
-goto v_resetjp_1070_;
-}
-v_resetjp_1070_:
-{
-lean_object* v___x_1074_; 
-if (v_isShared_1072_ == 0)
-{
-v___x_1074_ = v___x_1071_;
-goto v_reusejp_1073_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1075_; 
-v_reuseFailAlloc_1075_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1075_, 0, v_a_1069_);
-v___x_1074_ = v_reuseFailAlloc_1075_;
-goto v_reusejp_1073_;
-}
-v_reusejp_1073_:
-{
+lean_object* v_a_1072_; lean_object* v_hash_1073_; lean_object* v___x_1074_; 
+v_a_1072_ = lean_ctor_get(v___x_1071_, 0);
+lean_inc(v_a_1072_);
+lean_dec_ref_known(v___x_1071_, 1);
+v_hash_1073_ = lean_ctor_get(v_a_1072_, 8);
+lean_inc_ref(v_hash_1073_);
+lean_dec(v_a_1072_);
+v___x_1074_ = lean_apply_2(v_f_1068_, v_hash_1073_, lean_box(0));
 return v___x_1074_;
 }
+else
+{
+lean_object* v_a_1075_; lean_object* v___x_1077_; uint8_t v_isShared_1078_; uint8_t v_isSharedCheck_1082_; 
+lean_dec_ref(v_f_1068_);
+v_a_1075_ = lean_ctor_get(v___x_1071_, 0);
+v_isSharedCheck_1082_ = !lean_is_exclusive(v___x_1071_);
+if (v_isSharedCheck_1082_ == 0)
+{
+v___x_1077_ = v___x_1071_;
+v_isShared_1078_ = v_isSharedCheck_1082_;
+goto v_resetjp_1076_;
+}
+else
+{
+lean_inc(v_a_1075_);
+lean_dec(v___x_1071_);
+v___x_1077_ = lean_box(0);
+v_isShared_1078_ = v_isSharedCheck_1082_;
+goto v_resetjp_1076_;
+}
+v_resetjp_1076_:
+{
+lean_object* v___x_1080_; 
+if (v_isShared_1078_ == 0)
+{
+v___x_1080_ = v___x_1077_;
+goto v_reusejp_1079_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1081_; 
+v_reuseFailAlloc_1081_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1081_, 0, v_a_1075_);
+v___x_1080_ = v_reuseFailAlloc_1081_;
+goto v_reusejp_1079_;
+}
+v_reusejp_1079_:
+{
+return v___x_1080_;
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_Web_onHashChange___lam__0___boxed(lean_object* v_f_1077_, lean_object* v_x_1078_, lean_object* v___y_1079_){
+}
+LEAN_EXPORT lean_object* l_Lasm_Web_onHashChange___lam__0___boxed(lean_object* v_f_1083_, lean_object* v_x_1084_, lean_object* v___y_1085_){
 _start:
 {
-lean_object* v_res_1080_; 
-v_res_1080_ = l_Lasm_Web_onHashChange___lam__0(v_f_1077_, v_x_1078_);
-lean_dec(v_x_1078_);
-return v_res_1080_;
+lean_object* v_res_1086_; 
+v_res_1086_ = l_Lasm_Web_onHashChange___lam__0(v_f_1083_, v_x_1084_);
+lean_dec(v_x_1084_);
+return v_res_1086_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_Web_onHashChange(lean_object* v_f_1082_){
+LEAN_EXPORT lean_object* l_Lasm_Web_onHashChange(lean_object* v_f_1088_){
 _start:
 {
-lean_object* v___f_1084_; lean_object* v___x_1085_; 
-v___f_1084_ = lean_alloc_closure((void*)(l_Lasm_Web_onHashChange___lam__0___boxed), 3, 1);
-lean_closure_set(v___f_1084_, 0, v_f_1082_);
-v___x_1085_ = l_Lasm_Web_window();
-if (lean_obj_tag(v___x_1085_) == 0)
+lean_object* v___f_1090_; lean_object* v___x_1091_; 
+v___f_1090_ = lean_alloc_closure((void*)(l_Lasm_Web_onHashChange___lam__0___boxed), 3, 1);
+lean_closure_set(v___f_1090_, 0, v_f_1088_);
+v___x_1091_ = l_Lasm_Web_window();
+if (lean_obj_tag(v___x_1091_) == 0)
 {
-lean_object* v_a_1086_; lean_object* v___x_1087_; lean_object* v___x_1088_; lean_object* v___x_1089_; 
-v_a_1086_ = lean_ctor_get(v___x_1085_, 0);
-lean_inc(v_a_1086_);
-lean_dec_ref_known(v___x_1085_, 1);
-v___x_1087_ = ((lean_object*)(l_Lasm_Web_onHashChange___closed__0));
-v___x_1088_ = ((lean_object*)(l_Lasm_Web_onPopState___closed__1));
-v___x_1089_ = l_Lasm_Web_EventTarget_addEventListener(v_a_1086_, v___x_1087_, v___f_1084_, v___x_1088_);
-return v___x_1089_;
-}
-else
-{
-lean_object* v_a_1090_; lean_object* v___x_1092_; uint8_t v_isShared_1093_; uint8_t v_isSharedCheck_1097_; 
-lean_dec_ref(v___f_1084_);
-v_a_1090_ = lean_ctor_get(v___x_1085_, 0);
-v_isSharedCheck_1097_ = !lean_is_exclusive(v___x_1085_);
-if (v_isSharedCheck_1097_ == 0)
-{
-v___x_1092_ = v___x_1085_;
-v_isShared_1093_ = v_isSharedCheck_1097_;
-goto v_resetjp_1091_;
-}
-else
-{
-lean_inc(v_a_1090_);
-lean_dec(v___x_1085_);
-v___x_1092_ = lean_box(0);
-v_isShared_1093_ = v_isSharedCheck_1097_;
-goto v_resetjp_1091_;
-}
-v_resetjp_1091_:
-{
-lean_object* v___x_1095_; 
-if (v_isShared_1093_ == 0)
-{
-v___x_1095_ = v___x_1092_;
-goto v_reusejp_1094_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1096_; 
-v_reuseFailAlloc_1096_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1096_, 0, v_a_1090_);
-v___x_1095_ = v_reuseFailAlloc_1096_;
-goto v_reusejp_1094_;
-}
-v_reusejp_1094_:
-{
+lean_object* v_a_1092_; lean_object* v___x_1093_; lean_object* v___x_1094_; lean_object* v___x_1095_; 
+v_a_1092_ = lean_ctor_get(v___x_1091_, 0);
+lean_inc(v_a_1092_);
+lean_dec_ref_known(v___x_1091_, 1);
+v___x_1093_ = ((lean_object*)(l_Lasm_Web_onHashChange___closed__0));
+v___x_1094_ = ((lean_object*)(l_Lasm_Web_onPopState___closed__1));
+v___x_1095_ = l_Lasm_Web_EventTarget_addEventListener(v_a_1092_, v___x_1093_, v___f_1090_, v___x_1094_);
 return v___x_1095_;
 }
+else
+{
+lean_object* v_a_1096_; lean_object* v___x_1098_; uint8_t v_isShared_1099_; uint8_t v_isSharedCheck_1103_; 
+lean_dec_ref(v___f_1090_);
+v_a_1096_ = lean_ctor_get(v___x_1091_, 0);
+v_isSharedCheck_1103_ = !lean_is_exclusive(v___x_1091_);
+if (v_isSharedCheck_1103_ == 0)
+{
+v___x_1098_ = v___x_1091_;
+v_isShared_1099_ = v_isSharedCheck_1103_;
+goto v_resetjp_1097_;
+}
+else
+{
+lean_inc(v_a_1096_);
+lean_dec(v___x_1091_);
+v___x_1098_ = lean_box(0);
+v_isShared_1099_ = v_isSharedCheck_1103_;
+goto v_resetjp_1097_;
+}
+v_resetjp_1097_:
+{
+lean_object* v___x_1101_; 
+if (v_isShared_1099_ == 0)
+{
+v___x_1101_ = v___x_1098_;
+goto v_reusejp_1100_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1102_; 
+v_reuseFailAlloc_1102_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1102_, 0, v_a_1096_);
+v___x_1101_ = v_reuseFailAlloc_1102_;
+goto v_reusejp_1100_;
+}
+v_reusejp_1100_:
+{
+return v___x_1101_;
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_Web_onHashChange___boxed(lean_object* v_f_1098_, lean_object* v_a_1099_){
+}
+LEAN_EXPORT lean_object* l_Lasm_Web_onHashChange___boxed(lean_object* v_f_1104_, lean_object* v_a_1105_){
 _start:
 {
-lean_object* v_res_1100_; 
-v_res_1100_ = l_Lasm_Web_onHashChange(v_f_1098_);
-return v_res_1100_;
+lean_object* v_res_1106_; 
+v_res_1106_ = l_Lasm_Web_onHashChange(v_f_1104_);
+return v_res_1106_;
 }
 }
 lean_object* initialize_Init(uint8_t builtin);

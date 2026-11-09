@@ -51,6 +51,41 @@ test('values round-trip through the wire format', () => {
   assert.equal(js.values.size, 1);
 });
 
+// Strings and object keys have ASCII fast paths (Writer.string, Reader.string,
+// Reader.key); their bytes and values must be exactly the general path's
+// (Buffer.byteLength and UTF-8; TextDecoder), on both sides of every boundary.
+const samples = ['', 'a', 'field12', '\x7f', 'caf\u00e9', '\u00e9t\u00e9', 'x\u{1F600}', '\u{1F600}', 'ab\u0080', '\ufeffbom', 'lone \ud800 surrogate',
+  ...[31, 32, 33, 63, 64, 65, 200].flatMap(n => ['k'.repeat(n), 'k'.repeat(n - 1) + '\u00e9', '\u00e9' + 'k'.repeat(n - 1)])];
+test('strings and keys encode as UTF-8 and decode as TextDecoder (keeping a leading U+FEFF) does, on every fast-path boundary', () => {
+  const js = createNodeJs();
+  for (const s of samples) {
+    assert.deepEqual(js.encode(s, 'data'), wire(s), JSON.stringify(s));
+    const object = { [s]: s, after: 1 };
+    assert.deepEqual(js.encode(object, 'data'), wire(object), JSON.stringify(s));
+    const text = new TextDecoder('utf-8', { ignoreBOM: true }).decode(Buffer.from(s));
+    assert.equal(js.decode(wire(s)), text, JSON.stringify(s));
+    // Twice: the second read of a key comes from the key cache.
+    for (let round = 0; round < 2; round++) assert.deepEqual(Object.entries(js.decode(wire(object))), [[text, text], ['after', 1]], JSON.stringify(s));
+  }
+  // Bytes that are not valid UTF-8 decode as TextDecoder replaces them, as values and keys.
+  for (const raw of [[0x61, 0xff], [0xc3], [0x80, 0x61], [0x7f, 0x80]]) {
+    const bytes = Buffer.concat([u32(raw.length), Buffer.from(raw)]), text = new TextDecoder('utf-8', { ignoreBOM: true }).decode(Buffer.from(raw));
+    assert.equal(js.decode(Buffer.concat([Buffer.from([5]), bytes])), text);
+    assert.deepEqual(Object.keys(js.decode(Buffer.concat([Buffer.from([9]), u32(1), bytes, Buffer.from([0])]))), [text]);
+  }
+  // Many strings in one value: the writer grows its buffer in the middle of the fast path.
+  const many = Object.fromEntries(Array.from({ length: 300 }, (_, i) => [`key${i}`, i % 3 ? `value number ${i}` : i]));
+  assert.deepEqual(js.encode(many, 'data'), wire(many));
+  assert.deepEqual(js.decode(js.encode(many, 'data')), many);
+  // Keys that share a cache slot or a length still decode as themselves.
+  const keys = Array.from({ length: 3000 }, (_, i) => `k${i}`), wide = Object.fromEntries(keys.map(k => [k, k]));
+  for (let round = 0; round < 2; round++) assert.deepEqual(js.decode(wire(wide)), wide);
+  for (let round = 0; round < 2; round++) for (const k of ['ab', 'ba', 'ac', 'abc', 'ab']) assert.deepEqual(Object.keys(js.decode(wire({ [k]: 0 }))), [k]);
+  // A truncated string or key fails, as before.
+  assert.throws(() => js.decode(Buffer.concat([Buffer.from([5]), u32(4), Buffer.from('ab')])), /truncated/);
+  assert.throws(() => js.decode(Buffer.concat([Buffer.from([9]), u32(1), u32(4), Buffer.from('ab')])), /truncated/);
+});
+
 // Lengths travel as u32: one of 2^32 or more fails with a clear error instead
 // of wrapping (#154). A Uint8Array that only claims the length: nothing is allocated.
 class Huge extends Uint8Array { get length() { return 2 ** 32; } }
