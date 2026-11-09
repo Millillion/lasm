@@ -94,7 +94,9 @@ async function signalDev() {
 async function stopAll() {
   if (!active.size) return;
   await signalDev();
-  await Promise.allSettled([...active]);
+  // A lasm dev stuck in its first build (a failed test) is left behind, not waited for.
+  await Promise.race([Promise.allSettled([...active]), pause(3000)]);
+  active.clear();
 }
 after(async () => {
   await stopAll();
@@ -166,6 +168,13 @@ dtest('lasm dev (edge target): first build, rebuilds on content changes only, qu
     assert.equal(state.calls[0].slot, 0);
     assert.equal(state.services[0].workers, 1);
     assert.equal(process.env.LASM_DEV_SERVER, '1');
+    assert.doesNotMatch(out, /\x1b\[|\r/, 'no terminal control codes without a terminal');
+    assert.doesNotMatch(out, /trace/, 'no stage trace unless LASM_DEV_TRACE is set');
+    assert.ok(Number(/Built in (\d+\.\d) s/.exec(out)[1]) < 30);
+    // Ctrl+C and SIGTERM both stop it.
+    const own = signal => process.listeners(signal).filter(fn => !foreignListeners.has(fn));
+    await until(() => own('SIGINT').length && own('SIGTERM').length, 'the signal listeners');
+    assert.equal(own('SIGINT')[0], own('SIGTERM')[0]);
 
     // A save with new content rebuilds (here: a cache hit, "Up to date" without stages).
     stderr.reset();
@@ -185,18 +194,23 @@ dtest('lasm dev (edge target): first build, rebuilds on content changes only, qu
     writeFileSync(main, 'def main : IO Unit := pure () -- 3\n');
     await until(() => state.calls.length === 3 && /is up to date/.test(stderr.text()), 'the third build');
     assert.ok(stderr.text().includes('[lasm dev] A.lean, B.lean, C.lean and 1 more changed; rebuilding\n'), stderr.text());
+    // Three files: all named.
+    stderr.reset();
+    for (const name of ['A.lean', 'B.lean', 'C.lean']) writeFileSync(join(dir, name), name + '!');
+    await until(() => state.calls.length === 4 && /is up to date/.test(stderr.text()), 'the build of three files');
+    assert.ok(stderr.text().includes('[lasm dev] A.lean, B.lean, C.lean changed; rebuilding\n'), stderr.text());
 
     // A change during a build is built after it.
     let open;
     gate = new Promise(done => { open = done; });
     stderr.reset();
     writeFileSync(join(dir, 'A.lean'), 'A2');
-    await until(() => state.calls.length === 4, 'the fourth build to start');
+    await until(() => state.calls.length === 5, 'the fifth build to start');
     writeFileSync(join(dir, 'B.lean'), 'B2');
-    await pause(200);
-    assert.equal(state.calls.length, 4, 'one build at a time');
+    await pause(500);
+    assert.equal(state.calls.length, 5, 'one build at a time');
     gate = null; open();
-    await until(() => state.calls.length === 5 && (stderr.text().match(/is up to date/g) ?? []).length === 2, 'the queued build');
+    await until(() => state.calls.length === 6 && (stderr.text().match(/is up to date/g) ?? []).length === 2, 'the queued build');
     assert.ok(stderr.text().includes('[lasm dev] B.lean changed; rebuilding\n'), stderr.text());
 
     // A Lean error: shown with its source line; the last good build keeps running.
@@ -209,6 +223,14 @@ dtest('lasm dev (edge target): first build, rebuilds on content changes only, qu
     assert.doesNotMatch(text, /Command failed/);
     assert.doesNotMatch(text, /report it/);
     assert.match(text, /\[lasm dev\] Build failed after \d+\.\d s; the last good build keeps running\. Fix the error and save\.\n$/);
+    assert.ok(Number(/Build failed after (\d+\.\d) s/.exec(text)[1]) < 30);
+
+    // A very long log: its last 12000 characters.
+    stderr.reset();
+    failure = Object.assign(new Error('Command failed'), { stdout: 'y'.repeat(13000) + 'END' });
+    writeFileSync(main, 'def main : IO Unit := long\n');
+    await until(() => /Build failed/.test(stderr.text()), 'the long failure');
+    assert.equal((stderr.text().match(/y/g) ?? []).length, 12000 - 3);
 
     // A failure whose message the diagnostics do not contain: the message's first line too.
     stderr.reset();
@@ -226,7 +248,7 @@ dtest('lasm dev (edge target): first build, rebuilds on content changes only, qu
     writeFileSync(main, 'def main : IO Unit := oops3\n');
     await until(() => /Build failed/.test(stderr.text()), 'the third failed build');
     text = stderr.text();
-    assert.ok(text.includes('x.map is not a function\n'));
+    assert.equal(text.split('\n').filter(line => line === 'x.map is not a function').length, 1, 'the message once');
     assert.ok(text.includes(`TypeError: x.map is not a function\n    at `), text);
     assert.ok(text.includes(bugReportLine + '\n'));
 
@@ -262,7 +284,7 @@ dtest('lasm dev: a first build that fails says so; release profile; a terminal g
     assert.ok(text.includes('\r\x1b[K\x1b[2m[lasm dev] Compiling application module 1 of 2…\x1b[0m'), JSON.stringify(text));
     assert.ok(text.includes('\r\x1b[Ka log line\n'), JSON.stringify(text));
     assert.ok(text.includes('\x1b[36m[lasm dev]\x1b[0m Watching'), JSON.stringify(text));
-    assert.ok(text.includes(`\x1b[1m${rel(main)}:1:0\x1b[0m: \x1b[31;1merror\x1b[0m: bad`), JSON.stringify(text));
+    assert.ok(text.includes(`\r\x1b[K\x1b[1m${rel(main)}:1:0\x1b[0m: \x1b[31;1merror\x1b[0m: bad`), JSON.stringify(text));
     assert.match(text, /\x1b\[31mBuild failed after \d+\.\d s\x1b\[0m\. Fix the error and save\.\n$/);
     assert.ok(text.includes('target netlify-edge, release profile.'));
     stderr.reset();
@@ -270,7 +292,7 @@ dtest('lasm dev: a first build that fails says so; release profile; a terminal g
     writeFileSync(main, 'def main : IO Unit := pure () -- fixed\n');
     await until(() => /is up to date/.test(stderr.text()), 'the good build');
     text = stderr.text();
-    assert.match(text, /\x1b\[32mBuilt\x1b\[0m in \d+\.\d s \(C \d+\.\ds\) — release profile\n/);
+    assert.match(text, /\r\x1b\[K\x1b\[36m\[lasm dev\]\x1b\[0m \x1b\[32mBuilt\x1b\[0m in \d+\.\d s \(C \d+\.\ds\) — release profile\n/);
     assert.deepEqual(state.calls.at(-1).options, { profile: 'release', verbose: false });
     await stop(running);
   } finally {
@@ -354,6 +376,21 @@ dtest('lasm dev runs bun and deno programs with their own commands; a missing ru
       process.env.PATH = savedPath;
       await stop(running);
     } finally { process.env.PATH = savedPath; rmSync(dir, { recursive: true, force: true }); }
+    // A runtime that cannot be run is named with its error.
+    await reset();
+    const blocked = mkdtempSync(join(tmpdir(), 'lasm-dev-bin-blocked-'));
+    writeFileSync(join(blocked, 'bun'), '#!/bin/sh\n');
+    chmodSync(join(blocked, 'bun'), 0o644);
+    const other = project();
+    state.build = async () => ({ output: programOutput(other, 'blocked') });
+    process.env.PATH = blocked;
+    try {
+      const running = startDev(parseDevArguments([join(other, 'Main.lean'), '--target', 'bun']));
+      await until(() => /Could not start/.test(stderr.text()), 'the start failure');
+      assert.ok(stderr.text().includes('[lasm dev] Could not start Main.lean: spawn bun EACCES\n'), stderr.text());
+      process.env.PATH = savedPath;
+      await stop(running);
+    } finally { process.env.PATH = savedPath; rmSync(other, { recursive: true, force: true }); rmSync(blocked, { recursive: true, force: true }); }
   } finally { rmSync(bin, { recursive: true, force: true }); }
 });
 
@@ -377,6 +414,30 @@ dtest('lasm dev --no-run only rebuilds; rs rebuilds and restarts on request; a m
     assert.ok(stderr.text().includes('[lasm dev] Rebuilding (rs)\n'));
     await stop(running);
   } finally { delete process.env.LASM_DEV_STDIN; rmSync(dir, { recursive: true, force: true }); }
+  // A source in a subdirectory of the Lake project: the project is watched. A lone source in
+  // the current directory: "1 file in .".
+  await reset();
+  const lake = project();
+  mkdirSync(join(lake, 'src'));
+  writeFileSync(join(lake, 'src', 'App.lean'), '');
+  state.build = async () => ({ edgeOutput: join(lake, 'out') });
+  try {
+    const running = startDev(parseDevArguments([join(lake, 'src', 'App.lean'), '--target', 'workers', '--no-run']));
+    await until(() => /Built in/.test(stderr.text()), 'the subdirectory build');
+    assert.ok(stderr.text().includes(`Watching 3 files in ${rel(lake)} (events)`), stderr.text());
+    await stop(running);
+  } finally { rmSync(lake, { recursive: true, force: true }); }
+  await reset();
+  const lone = mkdtempSync(join(tmpdir(), 'lasm-dev-lone-'));
+  writeFileSync(join(lone, 'Main.lean'), '');
+  const cwd = process.cwd();
+  try {
+    process.chdir(lone);
+    const running = startDev(parseDevArguments(['Main.lean', '--target', 'workers', '--no-run']));
+    await until(() => /Built in/.test(stderr.text()), 'the lone build');
+    assert.ok(stderr.text().includes('Watching 1 file in . (events); target workers'), stderr.text());
+    await stop(running);
+  } finally { process.chdir(cwd); rmSync(lone, { recursive: true, force: true }); }
   const missing = mkdtempSync(join(tmpdir(), 'lasm-dev-missing-'));
   try {
     writeFileSync(join(missing, 'App.lean'), '');
@@ -396,10 +457,11 @@ dtest('lasm dev with a server and its browser app: one URL, the program behind a
   mkdirSync(server, { recursive: true });
   // The program serves the browser output and says where it listens (on its private port).
   writeFileSync(join(server, 'main.mjs'), `import { createServer } from 'node:http';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 const port = Number(process.env.PORT);
 createServer((request, response) => response.writeHead(200, { 'content-type': 'text/html' })
-  .end(readFileSync(${JSON.stringify(join(dir, 'public-out', 'index.html'))}, 'utf8') + ' ' + process.argv.slice(2).join(','))).listen(port, process.env.HOST, () => {
+  .end(readFileSync(${JSON.stringify(join(dir, 'public-out', 'index.html'))}, 'utf8') + ' ' + process.argv.slice(2).join(',') + ' ' + process.env.HOST)).listen(port, process.env.HOST, () => {
+  writeFileSync(${JSON.stringify(join(dir, 'server.pid'))}, String(process.pid));
   console.log('lasm-test-program Listening on http://127.0.0.1:' + port + '/ and http://localhost:' + port);
   console.log('lasm-test-program second line');
   process.stdout.write('lasm-test-program unterminated');
@@ -426,7 +488,7 @@ createServer((request, response) => response.writeHead(200, { 'content-type': 't
     assert.deepEqual(state.calls.map(c => [c.target, c.slot, c.options.output]), [[undefined, 0, undefined], ['browser', 1, browserOutput]]);
     assert.deepEqual(built, [['node', 'Server.lean', server], ['browser', 'Client.lean', browserOutput]]);
     const page = await (await fetch(url)).text();
-    assert.match(page, /^<body>client 2<script type="module">[\s\S]*<\/script>\n<\/body> arg$/);
+    assert.match(page, /^<body>client 2<script type="module">[\s\S]*<\/script>\n<\/body> arg 127\.0\.0\.1$/);
     await until(() => programLines.length >= 2, 'the program\'s output');
     // Its private address is shown as the user's URL.
     assert.deepEqual(programLines.slice(0, 2), [`lasm-test-program Listening on ${url} and ${url}`, 'lasm-test-program second line']);
@@ -452,7 +514,11 @@ createServer((request, response) => response.writeHead(200, { 'content-type': 't
     await until(() => /Reloaded/.test(stderr.text()), 'the second reload');
     assert.deepEqual(state.calls.slice(3).map(c => c.target), [undefined, 'browser']);
     assert.match(stderr.text(), /Reloaded \d+\.\d s after the change\.\n/);
+    assert.ok(Number(/Reloaded (\d+\.\d) s/.exec(stderr.text())[1]) < 30);
     assert.match((await nextEvent(reader)), /event: reload/);
+    // With one worker the two builds run one after the other, not as concurrent builds.
+    assert.deepEqual(state.calls.slice(3).map(c => c.options.releaseAfterImports), [undefined, undefined]);
+    assert.ok(state.calls[3].finished <= state.calls[4].started);
 
     // A failed build is reported to the page.
     stderr.reset();
@@ -461,6 +527,13 @@ createServer((request, response) => response.writeHead(200, { 'content-type': 't
     writeFileSync(join(dir, 'Client.lean'), 'broken\n');
     assert.equal((await nextEvent(reader)), 'event: error-report\ndata: "Client.lean:1:0: error: broken"\n\n');
     state.build = good;
+    // The server stopped (crashed): the next build starts it again, although it did not change.
+    const pid = Number(readFileSync(join(dir, 'server.pid'), 'utf8'));
+    process.kill(pid, 'SIGKILL');
+    await until(() => /Server\.lean stopped \(SIGKILL\)/.test(stderr.text()), 'the crash report');
+    writeFileSync(join(dir, 'Client.lean'), 'import Shared\n-- fixed\n');
+    await until(() => Number(readFileSync(join(dir, 'server.pid'), 'utf8')) !== pid, 'the restarted server');
+    assert.match(await (await fetch(url)).text(), /<\/body> arg 127\.0\.0\.1$/);
     await stop(running);
     await until(() => programLines.includes('lasm-test-program unterminated'), 'the last unterminated line');
     await assert.rejects(fetch(url), 'the proxy is closed');
@@ -476,11 +549,14 @@ dtest('lasm dev with two workers builds a server and its browser app concurrentl
 createServer((q, s) => s.end('ok')).listen(Number(process.env.PORT), process.env.HOST);
 `);
   const browserOutput = join(dir, 'public-out');
+  let failBrowser = false;
   state.build = async call => {
-    call.onProgress({ stage: call.target === 'browser' ? 'Compiling application module 1 of 3' : 'Running Lake' });
+    if (call.target === 'browser') call.onProgress({ stage: 'Compiling application module 1 of 3' });
+    else { call.onProgress({ stage: 'Compiling application module 3 of 3' }); call.onProgress({ stage: 'Running Lake' }); call.onProgress({ stage: 'Running Lake' }); }
     call.onProgress({ stage: 'Compiling application module 2 of 3' });
     call.onProgress({ stage: 'Writing output' });
-    await pause(30);
+    await pause(60);
+    if (failBrowser && call.target === 'browser') throw new Error('browser build failed');
     return { output: call.target === 'browser' ? join(dir, 'x') : server };
   };
   const proxyPort = await (await import('../src/dev-proxy.mjs')).freePort();
@@ -497,9 +573,23 @@ createServer((q, s) => s.end('ok')).listen(Number(process.env.PORT), process.env
     await until(() => /Reloaded/.test(stderr.text()), 'the concurrent rebuild');
     assert.deepEqual(state.calls.slice(2).map(c => c.options.releaseAfterImports), [true, true]);
     assert.match(stderr.text(), /Built in \d+\.\d s \(node: [^;]*; browser: [^;]*; concurrently\)/);
-    // Each output's own stages; of the modules compiled, only the first is traced.
-    assert.match(stderr.text(), /\[lasm dev\] trace node: 0\.\d\d Running Lake \| 0\.\d\d Writing output \| 0\.\d\d done\n/);
+    // The two builds overlap.
+    const [a, b] = state.calls.slice(2);
+    assert.ok(a.started < b.finished && b.started < a.finished, 'concurrent');
+    // Each output's own stages, a repeated stage once; of the modules compiled, only the first one and a first stage are traced.
+    assert.match(stderr.text(), /\[lasm dev\] trace node: 0\.\d\d Compiling application module 3 of 3 \| 0\.\d\d Running Lake \| 0\.\d\d Writing output \| 0\.\d\d done\n/);
     assert.match(stderr.text(), /\[lasm dev\] trace browser: 0\.\d\d Compiling application module 1 of 3 \| 0\.\d\d Writing output \| 0\.\d\d done\n/);
+    // One changed output builds alone, not as a concurrent build.
+    stderr.reset();
+    writeFileSync(join(dir, 'Client.lean'), '-- edit\n');
+    await until(() => /Reloaded/.test(stderr.text()), 'the client rebuild');
+    assert.deepEqual(state.calls.slice(4).map(c => [c.target, c.options.releaseAfterImports]), [['browser', undefined]]);
+    // A failure of one concurrent build fails the rebuild.
+    stderr.reset();
+    failBrowser = true;
+    writeFileSync(join(dir, 'lakefile.toml'), 'name = "app3"\n');
+    await until(() => /Build failed/.test(stderr.text()), 'the failed concurrent rebuild');
+    assert.ok(stderr.text().includes('browser build failed'));
     await stop(running);
   } finally { delete process.env.LASM_DEV_WORKERS; delete process.env.LASM_DEV_TRACE; rmSync(dir, { recursive: true, force: true }); }
 });
@@ -534,6 +624,45 @@ dtest('lasm dev with a browser output and hooks: the static server with the hook
     writeFileSync(join(dir, 'Main.lean'), '-- edit\n');
     assert.match((await nextEvent(reader)), /event: reload/);
     assert.match(await (await fetch(url)).text(), /^<body>v3<script/);
+    await stop(running);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+dtest('lasm dev: $PORT names the one URL\'s port; a browser output among others is served by lasm dev itself, in .lake/lasm/browser-dev', async () => {
+  await reset();
+  const dir = project({ 'Server.lean': '', 'Client.lean': '' });
+  const server = join(dir, '.lake', 'server');
+  mkdirSync(server, { recursive: true });
+  writeFileSync(join(server, 'main.mjs'), `import { createServer } from 'node:http';
+createServer((q, s) => s.end('port ' + process.env.PORT)).listen(Number(process.env.PORT), process.env.HOST);
+`);
+  state.build = async call => {
+    if (call.target === 'browser') { mkdirSync(call.options.output, { recursive: true }); writeFileSync(join(call.options.output, 'index.html'), '<p>b</p>'); return {}; }
+    if (call.target === 'workers') return { edgeOutput: join(dir, 'edge') };
+    return { output: server };
+  };
+  const savedPort = process.env.PORT;
+  const port = await (await import('../src/dev-proxy.mjs')).freePort();
+  process.env.PORT = String(port);
+  process.env.LASM_DEV_WORKERS = '1';
+  try {
+    const running = startDev(parseDevArguments(['--target', `node=${join(dir, 'Server.lean')},browser=${join(dir, 'Client.lean')}`]));
+    await until(() => /Open /.test(stderr.text()), 'the proxy');
+    assert.ok(stderr.text().includes(`Open http://127.0.0.1:${port}/:`), stderr.text());
+    assert.equal(state.calls[1].options.output, join(dir, '.lake/lasm/browser-dev'));
+    assert.notEqual(await (await fetch(`http://127.0.0.1:${port}/`)).text(), `port ${port}`, 'the program runs on a private port behind the proxy');
+    await stop(running);
+  } finally {
+    if (savedPort === undefined) delete process.env.PORT; else process.env.PORT = savedPort;
+    delete process.env.LASM_DEV_WORKERS;
+  }
+  // A browser output first, with an edge output and no hooks: lasm dev's own static server.
+  await reset();
+  try {
+    const running = startDev(parseDevArguments([join(dir, 'Client.lean'), '--target', 'browser,workers', '--port', '0']));
+    await until(() => /Serving/.test(stderr.text()), 'the static server');
+    assert.equal(state.watchers.length, 0, 'not the single-output browser dev server');
+    assert.ok(stderr.text().includes(`Serving ${rel(join(dir, '.lake/lasm/browser-dev'))} at http://127.0.0.1:`), stderr.text());
     await stop(running);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
@@ -604,6 +733,11 @@ dtest('browser dev server: serves the build, rebuilds on content changes only, r
     assert.match((await nextEvent(reader)), /^event: reload\n/);
     assert.equal(state.calls.length, 2);
     assert.match(stderr.text(), /\[lasm dev\] Rebuilt in \d+\.\d s; reloading\n/);
+    assert.ok(Number(/Rebuilt in (\d+\.\d) s/.exec(stderr.text())[1]) < 30);
+    // The manifest that rebuild wrote is not a change either.
+    event();
+    await pause(200);
+    assert.equal(state.calls.length, 2);
 
     // A change during a build: built after it.
     let open;
@@ -634,6 +768,13 @@ dtest('browser dev server: serves the build, rebuilds on content changes only, r
     writeFileSync(main, '-- 6\n');
     event();
     assert.equal((await nextEvent(reader)), 'event: error-report\ndata: "just a message"\n\n');
+    // Both of a failure's outputs, a line each.
+    stderr.reset();
+    failure = Object.assign(new Error('m'), { stdout: 'from stdout', stderr: 'from stderr' });
+    writeFileSync(main, '-- 7\n');
+    event();
+    assert.equal((await nextEvent(reader)), 'event: error-report\ndata: "from stdout\\nfrom stderr"\n\n');
+    assert.ok(stderr.text().includes('from stdout\nfrom stderr\n'), stderr.text());
     await server.close();
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });

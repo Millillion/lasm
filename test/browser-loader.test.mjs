@@ -367,7 +367,9 @@ test('loader: more MIME types; no fetch at evaluation; no navigator; a start tha
   }
   // The mounted mark's start time is how long startLean took.
   state.startLean = async () => { await new Promise(r => setTimeout(r, 30)); return instance(); };
+  const before = performance.now();
   await mount(new Element());
+  const took = performance.now() - before;
   const [mounted] = performance.getEntriesByName('lasm:mounted').filter(e => e.detail?.name === 'n');
-  assert.ok(mounted.detail.startMs >= 25 && mounted.detail.startMs < 5000, String(mounted.detail.startMs));
+  assert.ok(mounted.detail.startMs >= 25 && mounted.detail.startMs <= took, `${mounted.detail.startMs} of ${took}`);
 });

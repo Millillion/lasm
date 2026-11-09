@@ -185,3 +185,33 @@ test('importClosure: import modifiers, header end, missing and unreadable files'
     assert.equal(affects(project, at('Main.lean'), []), false);
   } finally { rmSync(project, { recursive: true, force: true }); }
 });
+
+test('the dev proxy: content-encoding of a rewritten page is dropped; its event stream is kept alive; an IPv6 wildcard shows localhost', async () => {
+  const upstreamPort = await freePort();
+  const upstream = createServer((req, res) => res.writeHead(200, { 'content-type': 'text/html', 'content-encoding': 'identity' }).end('<body></body>'));
+  await new Promise(r => upstream.listen(upstreamPort, '127.0.0.1', r));
+  const proxy = await startDevProxy({ port: 0, upstreamPort });
+  try {
+    const page = await raw(proxy.port, '/');
+    assert.equal(page.headers['content-encoding'], undefined);
+    assert.match(page.body, /<script type="module">/);
+    const headers = await new Promise(resolve => {
+      const req = httpRequest({ host: '127.0.0.1', port: proxy.port, path: '/__lasm/events' }, response => { resolve(response.headers); req.destroy(); });
+      req.on('error', () => {}).end();
+    });
+    assert.equal(headers.connection, 'keep-alive');
+  } finally { await proxy.close(); await new Promise(r => upstream.close(r)); }
+  let wildcard;
+  try { wildcard = await startDevProxy({ port: 0, host: '::', upstreamPort }); } catch { return; }  // no IPv6 here
+  try { assert.equal(wildcard.url, `http://localhost:${wildcard.port}/`); } finally { await wildcard.close(); }
+});
+
+test('importClosure: indented imports, doubled spaces, a "module" word later in a line, names that are not modules', () => {
+  const project = mkdtempSync(join(tmpdir(), 'lasm-dev-proxy-'));
+  try {
+    writeFileSync(join(project, 'Main.lean'), '  import   A\npublic  meta  import  B\nimport 1bad D-x\ndef module := 1\nimport C\n');
+    for (const name of ['A', 'B', 'C', '1bad', 'D', 'D-x']) writeFileSync(join(project, name + '.lean'), '');
+    const names = [...importClosure(project, join(project, 'Main.lean'))].map(f => f.slice(project.length + 1)).sort();
+    assert.deepEqual(names, ['A.lean', 'B.lean', 'Main.lean']);
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});

@@ -114,3 +114,11 @@ test('the one-build worker: a failure keeps the subprocess diagnostics and sets 
   assert.deepEqual({ ...error, stack: undefined }, { name: 'Error', message: 'lean failed', code: 'ENOENT', path: '/x', syscall: 'spawn', stderr: 'Main.lean:1:0: error', stdout: 'o', stack: undefined });
   assert.match(error.stack, /^Error: lean failed/);
 });
+
+test('the one-build worker: a failure without subprocess output', async () => {
+  const port = reset({ file: '/p/Main.lean', options: {} });
+  port.close = () => {};
+  state.buildApplication = async () => { throw new Error('no output'); };
+  try { await load('application-build-worker.mjs'); } finally { process.exitCode = undefined; }
+  assert.deepEqual({ ...port.messages[0].error, stack: undefined }, { name: 'Error', message: 'no output', code: undefined, path: undefined, syscall: undefined, stderr: undefined, stdout: undefined, stack: undefined });
+});

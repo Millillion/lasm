@@ -265,3 +265,47 @@ test('MIME types and hashed names', () => {
   assert.equal(hashedFile.test('app.0123456789ab.js.br'), false);
   assert.equal(hashedFile.test('app.0123456789ab.css'), false);
 });
+
+test('static server: every content type, which types are served precompressed, files without an extension, odd errors', async () => {
+  assert.deepEqual({ ...mimeTypes }, {
+    '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
+    '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.wasm': 'application/wasm',
+    '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp',
+    '.avif': 'image/avif', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.map': 'application/json; charset=utf-8',
+    '.woff': 'font/woff', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json', '.xml': 'application/xml',
+  });
+  const root = mkdtempSync(join(tmpdir(), 'lasm-static-types-'));
+  const compressible = ['.html', '.js', '.mjs', '.css', '.json', '.wasm', '.svg', '.txt', '.map', '.xml', '.webmanifest'];
+  for (const extension of Object.keys(mimeTypes)) {
+    writeFileSync(join(root, 'f' + extension), 'plain');
+    writeFileSync(join(root, 'f' + extension + '.gz'), gzipSync('plain'));
+  }
+  writeFileSync(join(root, 'index.html'), 'page');
+  writeFileSync(join(root, 'LICENSE'), 'licence text');
+  const server = await startStaticServer(root, {
+    routes(request, response, url) { if (url.pathname === '/null') throw null; return false; },
+  });
+  try {
+    for (const extension of Object.keys(mimeTypes)) {
+      const answer = await raw(server, '/f' + extension, { headers: { 'accept-encoding': 'gzip' } });
+      assert.equal(answer.headers['content-type'], mimeTypes[extension], extension);
+      assert.equal(answer.headers['content-encoding'], compressible.includes(extension) ? 'gzip' : undefined, extension);
+    }
+    // An existing file without an extension is served as itself, not as the page.
+    const licence = await raw(server, '/LICENSE');
+    assert.equal(licence.body.toString(), 'licence text');
+    assert.equal(licence.headers['content-type'], 'application/octet-stream');
+    const thrown = await raw(server, '/null');
+    assert.equal(thrown.status, 500);
+    assert.equal(thrown.body.toString(), 'null');
+  } finally { await server.close(); rmSync(root, { recursive: true, force: true }); }
+  // The event stream is kept alive.
+  const live = await startStaticServer(tmpdir(), { liveReload: true });
+  try {
+    const headers = await new Promise((resolve, reject) => {
+      const req = request({ host: '127.0.0.1', port: live.port, path: '/__lasm/events' }, response => { resolve(response.headers); req.destroy(); });
+      req.on('error', () => {}).end();
+    });
+    assert.equal(headers.connection, 'keep-alive');
+  } finally { await live.close(); }
+});

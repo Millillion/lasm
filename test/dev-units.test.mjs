@@ -268,3 +268,69 @@ test('summarizeStages groups stage times into Lean, C, link and output', () => {
   assert.equal(summarizeStages([], 10), '');
   assert.equal(summarizeStages([{ stage: 'lake update', at: 0 }], 300), 'Lean 0.3s');
 });
+
+test('lasm dev details: option names are whole tokens; files listed in order; diagnostics anchors and terminal colors; the Compiling group', () => {
+  assert.throws(() => parseDevArguments(['--portx', '1']), /Unknown lasm dev option: --portx/);
+  assert.throws(() => parseDevArguments(['-x--port', '1']), /Unknown lasm dev option: -x--port/);
+  const project = mkdtempSync(join(tmpdir(), 'lasm-dev-order-'));
+  try {
+    const names = ['m.lean', 'c.lean', 'x.lean', 'a.lean', 'q.lean', 'b.lean', 'z.lean', 'k.lean', 'e.lean', 'r.lean'];
+    for (const name of names) writeFileSync(join(project, name), '');
+    assert.deepEqual(projectFiles(project).map(file => relative(project, file)), [...names].sort());
+  } finally { rmSync(project, { recursive: true, force: true }); }
+  const dir = mkdtempSync(join(tmpdir(), 'lasm-dev-anchors-'));
+  try {
+    writeFileSync(join(dir, 'Main.lean'), 'def a := 1\n');
+    const shown = relative(process.cwd(), join(dir, 'Main.lean'));
+    // Only whole Lake noise lines are dropped.
+    assert.equal(formatLeanDiagnostics(['- first', 'note: error: build failed', 'x ✖ [1/2] y', 'see Command failed: z', 'trace:x',
+      'Some required targets logged failures: and more', 'Some required targets logged failures:', '- a b', '- two  ', 'x- c'].join('\n'), dir),
+      ['- first', 'note: error: build failed', 'x ✖ [1/2] y', 'see Command failed: z', 'trace:x', 'Some required targets logged failures: and more', '- a b', '- two  ', 'x- c'].join('\n'));
+    assert.equal(formatLeanDiagnostics('✖ [12/345] Building Main\nok', dir), 'ok');
+    // The severity of a located line without one: the line's prefix, else error.
+    assert.equal(formatLeanDiagnostics('warning: Main.lean:1:0: an error inside', dir), `${shown}:1:0: warning: an error inside`);
+    assert.equal(formatLeanDiagnostics('Main.lean:1:0: just a warning', dir).split('\n')[0], `${shown}:1:0: error: just a warning`);
+    // Colors on a terminal: bold location, red errors with a dim gutter, yellow warnings.
+    const tty = Object.getOwnPropertyDescriptor(process.stderr, 'isTTY');
+    const noColor = process.env.NO_COLOR;
+    process.stderr.isTTY = true;
+    delete process.env.NO_COLOR;
+    try {
+      assert.equal(formatLeanDiagnostics('Main.lean:1:4: warning: w', dir), `\x1b[1m${shown}:1:4\x1b[0m: \x1b[33;1mwarning\x1b[0m: w`);
+      assert.equal(formatLeanDiagnostics('Main.lean:1:4: info: i', dir), `\x1b[1m${shown}:1:4\x1b[0m: info: i`);
+      assert.equal(formatLeanDiagnostics('Main.lean:1:4: error: e', dir), [`\x1b[1m${shown}:1:4\x1b[0m: \x1b[31;1merror\x1b[0m: e`,
+        '\x1b[2m    1 |\x1b[0m def a := 1', '\x1b[2m      |\x1b[0m     \x1b[31;1m^\x1b[0m'].join('\n'));
+      process.env.NO_COLOR = '1';
+      assert.equal(formatLeanDiagnostics('Main.lean:1:4: warning: w', dir), `${shown}:1:4: warning: w`);
+    } finally {
+      if (tty) Object.defineProperty(process.stderr, 'isTTY', tty); else delete process.stderr.isTTY;
+      if (noColor === undefined) delete process.env.NO_COLOR; else process.env.NO_COLOR = noColor;
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+  assert.equal(summarizeStages([{ stage: 'Not Compiling yet', at: 0 }], 1000), 'output 1.0s');
+});
+
+test('watchProject: a directory is armed once; a change event on a directory name is not a rename', () => {
+  const project = mkdtempSync(join(tmpdir(), 'lasm-dev-arm-'));
+  try {
+    mkdirSync(join(project, 'Sub', 'Deep'), { recursive: true });
+    const counts = new Map();
+    const callbacks = new Map();
+    const watchFile = (dir, callback) => {
+      counts.set(dir, (counts.get(dir) ?? 0) + 1);
+      callbacks.set(dir, callback);
+      return { on() {}, close() {} };
+    };
+    let events = 0;
+    const watcher = watchProject(project, () => { events++; }, { watchFile });
+    // A new directory appears: only it is armed, not again its parent's existing subdirectories.
+    mkdirSync(join(project, 'Sub', 'New'));
+    callbacks.get(join(project, 'Sub'))('rename', 'New');
+    callbacks.get(project)('rename', 'Sub');
+    assert.deepEqual([...counts.values()], [1, 1, 1, 1]);
+    assert.equal(events, 2);
+    callbacks.get(project)('change', 'Sub');
+    assert.equal(events, 2, 'a change event names a file');
+    watcher.close();
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});

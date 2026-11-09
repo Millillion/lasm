@@ -501,7 +501,7 @@ test('lasm:web bookkeeping in detail: the listener options, what an unmount remo
   const disposers = [];
   const instance = web.lasmInstance({ onDispose: fn => disposers.push(fn), report: () => {} });
   const calls = [];
-  instance.listen(target, 'plain', () => calls.push('plain'));
+  const plain = instance.listen(target, 'plain', () => calls.push('plain'));
   instance.listen(target, 'flag', () => {}, true);
   instance.listen(target, 'text', () => {}, 'capture');
   instance.listen(target, 'opts', () => {}, { capture: 1, passive: 'yes' });
@@ -530,27 +530,32 @@ test('lasm:web bookkeeping in detail: the listener options, what an unmount remo
     assert.equal(interval, fired + 1);
     const pending = instance.setTimeout(() => calls.push('pending'), 1000);
     assert.equal(pending, interval + 1);
+    const cancelled = instance.setTimeout(() => calls.push('cancelled'), 1000);
+    const kept = instance.setInterval(() => {}, 1000);
     await new Promise(r => realSetTimeout(r, 20));
     instance.clearTimeout(fired);
     instance.clearInterval(interval);
     instance.clearInterval(interval);
-    assert.deepEqual(cleared, [['timeout', 'none'], ['interval', 'handle'], ['interval', 'none']]);
+    instance.clearTimeout(cancelled);
+    assert.deepEqual(cleared, [['timeout', 'none'], ['interval', 'handle'], ['interval', 'none'], ['timeout', 'handle']]);
     cleared.length = 0;
     // Unmount: every remaining listener is removed with its options, the pending timer is cleared; fired and cleared ones are not.
     removed.length = 0;
     const plainHandler = added[0].handler;
     for (const fn of disposers) fn();
     assert.deepEqual(removed.map(r => [r.type, r.options]), [['plain', undefined], ['flag', undefined], ['text', undefined], ['opts', { capture: true, passive: true, once: false }]]);
-    assert.deepEqual(cleared, [['timeout', 'handle']]);
+    assert.deepEqual(cleared, [['timeout', 'handle'], ['interval', 'handle']], 'the pending timer and the kept interval, not the cancelled timer');
     // After the unmount a handler that still runs (a browser dispatching an event already queued) does nothing.
     plainHandler({});
     assert.deepEqual(calls, ['once', 'fired']);
     // Nothing is tracked any more: removing a listener or clearing a timer touches nothing.
     removed.length = 0; cleared.length = 0;
     twice.remove();
+    plain.remove();
     instance.clearTimeout(pending);
+    instance.clearInterval(kept);
     assert.deepEqual(removed, []);
-    assert.deepEqual(cleared, [['timeout', 'none']]);
+    assert.deepEqual(cleared, [['timeout', 'none'], ['interval', 'none']]);
   } finally { globalThis.clearTimeout = realClearTimeout; globalThis.clearInterval = realClearInterval; }
   // Frames without cancelAnimationFrame (a host with requestAnimationFrame only): cancel and unmount do not throw.
   const frameDisposers = [];
