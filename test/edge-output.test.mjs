@@ -1,0 +1,208 @@
+// The edge targets' outputs (src/edge/edge-build.mjs writeEdgeOutput) from a
+// stand-in Node build and linked program: the owned directory, the inlined
+// Wasm, the build information, licences, builtin modules, the entries and
+// configuration each platform needs, and the line the build prints.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
+import { tmpdir } from 'node:os';
+import { createHash } from 'node:crypto';
+import { writeEdgeOutput, edgeTargets, edgeHostFiles, edgeModules, supabaseImportMap, workersConfig, workersEntry, edgeTargetSuspend, edgeProgramKey,
+  workersCompatibilityDate } from '../src/edge/edge-build.mjs';
+import { edgeLinkSettings } from '../src/edge/edge-link.mjs';
+import { applicationNotices, leanRuntimeChanges, noticesSectionName } from '../src/notices.mjs';
+
+const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
+const emptyModule = Buffer.from([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00]);
+const nodeNotices = applicationNotices({ name: 'lean-4.35.0-wasm64', lean: '4.35.0', leanCommit: 'eb6cafb7290e8bd5f2937522d8d804f58f02bafc', emscripten: '6.0.9',
+  libraries: ['Init', 'Std', 'Lean', 'leanrt', 'uv'].map(name => `lib/lib${name}.a`),
+  patches: Object.fromEntries(Object.keys(leanRuntimeChanges).map(name => [name, '0'.repeat(64)])) },
+['Lean', 'Emscripten', 'LLVM libc++', 'musl', 'mimalloc', 'libuv'].map(name => `=== ${name} ===\n${name} licence text\n`).join('\n'));
+
+function fixture({ pkg = { name: '@me/Edge App' }, bindings = [] } = {}) {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-edge-output-'));
+  const project = join(root, 'app');
+  mkdirSync(project);
+  if (pkg) writeFileSync(join(project, 'package.json'), JSON.stringify(pkg));
+  writeFileSync(join(project, 'Main.lean'), 'def main : IO Unit := pure ()\n');
+  const cached = join(project, '.lake/lasm/applications/0123/signature/dist');
+  mkdirSync(cached, { recursive: true });
+  writeFileSync(join(cached, 'THIRD_PARTY_NOTICES.txt'), nodeNotices);
+  const program = join(root, 'program');
+  mkdirSync(program);
+  writeFileSync(join(program, 'program.mjs'), 'export default function createProgram() {}\n');
+  writeFileSync(join(program, 'program.wasm'), emptyModule);
+  const lines = [];
+  return { root, project, lines, options: { source: join(project, 'Main.lean'), projectDirectory: project,
+    result: { output: cached, cached, signature: 'signature', lean: '4.35.0', profile: 'release', jsBindings: bindings },
+    edge: { manifest: { files: { 'libleanrt.a': 'abc' } } }, program: { directory: program, meta: { suspend: 'jspi', key: 'edge-key' } }, log: line => lines.push(line) } };
+}
+
+test('edge output: the program, its host and builtins, licences and build information', () => {
+  const f = fixture({ bindings: [{ module: 'lasm:web' }, { module: 'hono' }] });
+  try {
+    const built = writeEdgeOutput({ ...f.options, target: 'bun' });
+    const out = join(f.project, 'bun');
+    assert.equal(built.output, out);
+    assert.deepEqual(readdirSync(out).sort(), ['THIRD_PARTY_NOTICES.txt', 'build-info.json', 'lasm', 'main.mjs']);
+    assert.deepEqual(readdirSync(join(out, 'lasm')).sort(), [...edgeHostFiles, 'modules', 'program.mjs', 'program.wasm'].sort());
+    assert.deepEqual(readdirSync(join(out, 'lasm/modules')), ['web.mjs']);
+    assert.equal(readFileSync(join(out, 'lasm/modules/web.mjs'), 'utf8'), readFileSync(new URL('../src/lasm-modules/web.mjs', import.meta.url), 'utf8'));
+    for (const file of edgeHostFiles) assert.equal(readFileSync(join(out, 'lasm', file), 'utf8'), readFileSync(new URL('../src/edge/' + file, import.meta.url), 'utf8'));
+    const notices = readFileSync(join(out, 'THIRD_PARTY_NOTICES.txt'), 'utf8');
+    const glue = readFileSync(join(out, 'lasm/program.mjs')), wasm = readFileSync(join(out, 'lasm/program.wasm'));
+    assert.ok(glue.toString().endsWith('export default function createProgram() {}\n'));
+    assert.match(glue.toString(), /THIRD_PARTY_NOTICES\.txt, also embedded in program\.wasm as its lasm\.notices section/);
+    assert.match(glue.toString(), /Bun/);
+    assert.deepEqual(WebAssembly.Module.customSections(new WebAssembly.Module(wasm), noticesSectionName).map(b => Buffer.from(b).toString()), [notices]);
+    const info = JSON.parse(readFileSync(join(out, 'build-info.json'), 'utf8'));
+    assert.deepEqual(info, { schema: 1, target: 'bun', profile: 'edge', buildProfile: 'release', experimental: false, nodeBuildSignature: 'signature', lean: '4.35.0',
+      edgeRuntime: { 'libleanrt.a': 'abc' }, link: { ...edgeLinkSettings, suspend: 'jspi' }, wasm: 'lasm/program.wasm', programKey: 'edge-key', modules: ['hono', 'lasm:web'],
+      files: { 'lasm/program.mjs': sha256(glue), 'lasm/program.wasm': sha256(wasm) } });
+    assert.deepEqual(built.info, info);
+    assert.equal(existsSync(out + '.lasm-staging'), false);
+    assert.equal(f.lines[0], `Built ${relative(process.cwd(), f.options.source)} for Bun: ${relative(process.cwd(), out)} (program.wasm ${(wasm.length / 1048576).toFixed(2)} MiB; run it with bun bun/main.mjs)`);
+    // A dev build says so; a reused program too. No builtins: no modules directory.
+    const g = fixture();
+    writeEdgeOutput({ ...g.options, result: { ...g.options.result, profile: 'dev' }, target: 'deno', cacheHit: true });
+    assert.equal(JSON.parse(readFileSync(join(g.project, 'deno/build-info.json'), 'utf8')).buildProfile, 'dev');
+    assert.equal(existsSync(join(g.project, 'deno/lasm/modules')), false);
+    assert.match(g.lines[0], /^Reused .* for Deno: /);
+    const h = fixture();
+    writeEdgeOutput({ ...h.options, result: { ...h.options.result, profile: undefined, jsBindings: undefined }, target: 'deno' });
+    assert.equal(JSON.parse(readFileSync(join(h.project, 'deno/build-info.json'), 'utf8')).buildProfile, 'release');
+    rmSync(g.root, { recursive: true, force: true }); rmSync(h.root, { recursive: true, force: true });
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test('edge output: inlined Wasm for Netlify and Supabase, fixed layouts beside the owned directory', () => {
+  const f = fixture({ pkg: { name: 'web-app' } });
+  try {
+    writeEdgeOutput({ ...f.options, target: 'netlify-edge' });
+    const owned = join(f.project, 'netlify/lasm');
+    assert.equal(existsSync(join(owned, 'lasm/program.wasm')), false);
+    const inlined = readFileSync(join(owned, 'lasm/program.wasm.mjs'), 'utf8');
+    assert.match(inlined, /^\/\/ Generated by Lasm: program\.wasm as base64 \(\d+ bytes\)/);
+    assert.equal(JSON.parse(readFileSync(join(owned, 'build-info.json'), 'utf8')).wasm, 'lasm/program.wasm.mjs');
+    assert.match(readFileSync(join(f.project, 'netlify/edge-functions/lasm.mjs'), 'utf8'), /^\/\/ Generated by Lasm \(lasm build --target netlify-edge\)/);
+    assert.match(f.lines[0], /for Netlify Edge: .*; the edge function is netlify\/edge-functions\/lasm\.mjs\)$/);
+    // An entry the project wrote itself is never replaced.
+    writeFileSync(join(f.project, 'netlify/edge-functions/lasm.mjs'), 'export default () => new Response("mine");\n');
+    assert.throws(() => writeEdgeOutput({ ...f.options, target: 'netlify-edge' }), /lasm\.mjs exists and was not generated by Lasm; remove or rename it/);
+    // Supabase: supabase/functions/<name>/ with index.ts and deno.json.
+    writeEdgeOutput({ ...f.options, target: 'supabase-edge' });
+    const fn = join(f.project, 'supabase/functions/web-app');
+    assert.deepEqual(readdirSync(fn).sort(), ['THIRD_PARTY_NOTICES.txt', 'build-info.json', 'deno.json', 'index.ts', 'lasm']);
+    assert.deepEqual(JSON.parse(readFileSync(join(fn, 'deno.json'), 'utf8')), { imports: {} });
+    assert.ok(readFileSync(join(fn, 'deno.json'), 'utf8').endsWith('}\n'));
+    assert.ok(existsSync(join(fn, 'lasm/program.wasm.mjs')));
+    assert.match(f.lines.at(-1), /for Supabase Edge Functions: .*; deploy it with supabase functions deploy web-app\)$/);
+    // Vercel: api/lasm.mjs, api/_lasm/ and the Build Output API function.
+    writeEdgeOutput({ ...f.options, target: 'vercel-edge' });
+    assert.ok(existsSync(join(f.project, 'api/_lasm/lasm/program.wasm')));
+    assert.ok(existsSync(join(f.project, '.vercel/output/functions/api/lasm.func/api/lasm.mjs')));
+    assert.match(f.lines.at(-1), /the function is api\/lasm\.mjs \(also \.vercel\/output\/functions\/api\/lasm\.func\)\)$/);
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test('edge output: Workers configuration when the project has none, and the hint when it has its own', () => {
+  const f = fixture({ pkg: { name: '@scope/' + 'A very long Worker name, with punctuation!'.repeat(2) } });
+  try {
+    writeEdgeOutput({ ...f.options, target: 'workers' });
+    const out = join(f.project, 'workers');
+    const config = readFileSync(join(out, 'wrangler.toml'), 'utf8');
+    const name = 'a-very-long-worker-name-with-punctuation-a-very-long-worker-name-with-punctuation'.slice(0, 54);
+    assert.equal(config, workersConfig(name));
+    assert.match(config, new RegExp(`^name = "${name}"$`, 'm'));
+    assert.match(config, new RegExp(`^compatibility_date = "${workersCompatibilityDate}"$`, 'm'));
+    assert.match(config, /^fallthrough = false$/m);
+    assert.equal(readFileSync(join(out, 'worker.mjs'), 'utf8'), workersEntry([]));
+    assert.match(f.lines[0], /for Cloudflare Workers: [^;]*\)$/, 'no hint without a project configuration');
+    // A project configuration: no generated one (also none left from the build before, docs/release/next-notes.md),
+    // and a hint about what it must contain.
+    for (const [file, text, hint] of [['wrangler.toml', 'main = "workers/worker.mjs"\n[[rules]]\ntype = "CompiledWasm"\n', 'run it with npx wrangler dev (wrangler.toml)'],
+      ['wrangler.json', '{"main":"workers/worker.mjs"}', 'your wrangler.json must use main = "workers/worker.mjs" and the CompiledWasm rule'],
+      ['wrangler.jsonc', '// CompiledWasm only\n{}', 'your wrangler.jsonc must use main = "workers/worker.mjs" and the CompiledWasm rule']]) {
+      for (const other of ['wrangler.toml', 'wrangler.json', 'wrangler.jsonc']) rmSync(join(f.project, other), { force: true });
+      writeFileSync(join(f.project, file), text);
+      writeEdgeOutput({ ...f.options, target: 'workers' });
+      assert.equal(existsSync(join(out, 'wrangler.toml')), false, file);
+      assert.ok(f.lines.at(-1).endsWith(`; ${hint})`), f.lines.at(-1));
+    }
+    // No package.json name: the directory's; nothing usable: lasm-app.
+    const g = fixture({ pkg: null });
+    writeEdgeOutput({ ...g.options, target: 'workers' });
+    assert.match(readFileSync(join(g.project, 'workers/wrangler.toml'), 'utf8'), /^name = "app"$/m);
+    const h = fixture({ pkg: { name: '!!!' } });
+    writeEdgeOutput({ ...h.options, target: 'workers' });
+    assert.match(readFileSync(join(h.project, 'workers/wrangler.toml'), 'utf8'), /^name = "lasm-app"$/m);
+    rmSync(g.root, { recursive: true, force: true }); rmSync(h.root, { recursive: true, force: true });
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test('edge output: unknown targets, directories holding the sources and directories Lasm does not own', () => {
+  const f = fixture();
+  try {
+    assert.throws(() => writeEdgeOutput({ ...f.options, target: 'lambda' }), { message: 'Unknown edge target lambda' });
+    assert.throws(() => writeEdgeOutput({ ...f.options, target: 'bun', output: f.project }), { message: 'The edge output directory must not contain the Lean sources' });
+    assert.throws(() => writeEdgeOutput({ ...f.options, target: 'bun', output: f.root }), /must not contain the Lean sources/);
+    const mine = join(f.project, 'bun');
+    mkdirSync(mine);
+    writeFileSync(join(mine, 'build-info.json'), JSON.stringify({ profile: 'wasi' }));
+    assert.throws(() => writeEdgeOutput({ ...f.options, target: 'bun' }), /exists and is not a Lasm edge build/);
+    writeFileSync(join(mine, 'build-info.json'), 'not json');
+    assert.throws(() => writeEdgeOutput({ ...f.options, target: 'bun' }), /is not a Lasm edge build/);
+    writeFileSync(join(mine, 'build-info.json'), JSON.stringify({ profile: 'edge' }));
+    writeFileSync(join(mine, 'stale.txt'), 'old');
+    writeEdgeOutput({ ...f.options, target: 'bun' });
+    assert.equal(existsSync(join(mine, 'stale.txt')), false, 'an earlier edge build is replaced');
+    // An unchanged rebuild leaves the entry alone.
+    const before = readFileSync(join(mine, 'main.mjs'));
+    writeEdgeOutput({ ...f.options, target: 'bun' });
+    assert.deepEqual(readFileSync(join(mine, 'main.mjs')), before);
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test('edge modules and Supabase import maps: configuration checks, exclusions and pinned versions', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-edge-modules-'));
+  try {
+    assert.deepEqual(edgeModules(root, [{ module: 'b' }, { module: 'a' }, { module: '' }, {}, { module: 'globalThis' }, { module: 'b' }]), ['a', 'b']);
+    assert.deepEqual(edgeModules(root), []);
+    for (const edge of [{ modules: 'x' }, { exclude: 'x' }, { modules: [''] }, { exclude: [3] }, { modules: [null] }])
+      { writeFileSync(join(root, 'package.json'), JSON.stringify({ lasm: { edge } }));
+        assert.throws(() => edgeModules(root, []), { message: `package.json "lasm.edge.${Object.keys(edge)[0]}" must be an array of module names` }); }
+    writeFileSync(join(root, 'package.json'), JSON.stringify({ lasm: { edge: { modules: ['z', 'a'] } } }));
+    assert.deepEqual(edgeModules(root, [{ module: 'm' }]), ['a', 'm', 'z']);
+    writeFileSync(join(root, 'package.json'), JSON.stringify({ lasm: {} }));
+    assert.deepEqual(edgeModules(root, [{ module: 'm' }]), ['m']);
+    writeFileSync(join(root, 'package.json'), JSON.stringify({}));
+    assert.deepEqual(edgeModules(root, [{ module: 'm' }]), ['m']);
+    // Only npm modules are pinned; versions come from node_modules here or in a directory above (workspaces).
+    const project = join(root, 'packages/app');
+    mkdirSync(join(root, 'node_modules/@s/pkg'), { recursive: true });
+    writeFileSync(join(root, 'node_modules/@s/pkg/package.json'), JSON.stringify({ version: '2.0.0' }));
+    mkdirSync(join(project, 'node_modules/hono'), { recursive: true });
+    writeFileSync(join(project, 'node_modules/hono/package.json'), JSON.stringify({ version: '4.1.0' }));
+    const skipped = ['node:fs', 'npm:x@1', 'jsr:@std/path', 'https://esm.sh/x', 'http://x/y.js', 'data:text/javascript,1', 'lasm:web', './local.mjs', '/abs.mjs'];
+    assert.deepEqual(supabaseImportMap(project, [...skipped, 'hono', 'hono/jsx', '@s/pkg/sub/path', '@s/pkg']),
+      { imports: { hono: 'npm:hono@4.1.0', 'hono/': 'npm:hono@4.1.0/', '@s/pkg': 'npm:@s/pkg@2.0.0', '@s/pkg/': 'npm:@s/pkg@2.0.0/' } });
+    const asked = [];
+    supabaseImportMap(project, ['a', 'a/b', 'a'], name => { asked.push(name); return '1.0.0'; });
+    assert.deepEqual(asked, ['a'], 'each package once');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+  // Suspension per target, and the cache key's inputs.
+  assert.equal(edgeTargetSuspend('nope'), 'jspi');
+  assert.equal(edgeTargetSuspend('netlify-edge'), 'jspi');
+  const result = { signature: 'a' }, edge = { identity: 'e' };
+  const key = edgeProgramKey({ result, edge });
+  assert.match(key, /^[0-9a-f]{64}$/);
+  assert.equal(edgeProgramKey({ result, edge, suspend: 'jspi' }), key, 'JSPI by default');
+  assert.notEqual(edgeProgramKey({ result: { signature: 'b' }, edge }), key);
+  assert.notEqual(edgeProgramKey({ result, edge: { identity: 'f' } }), key);
+  // Every target is supported, with a label and a summary naming its directory.
+  for (const [name, target] of Object.entries(edgeTargets)) {
+    assert.equal(target.supported, true, name);
+    assert.ok(target.label && target.summary.length > 20, name);
+  }
+});

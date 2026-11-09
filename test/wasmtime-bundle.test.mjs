@@ -88,3 +88,55 @@ test('the package catalog distinguishes an unsupported platform from a damaged b
   await assert.rejects(packagedWasmtimeBundle({ catalog, directory, ...platform }), /missing or unrecorded/);
   await assert.rejects(packagedWasmtimeBundle({ catalog: { schema: 2, platforms: {} }, ...platform }), /Invalid.*catalog/);
 });
+
+// Each check of the bundle on its own (docs/TESTING.md#mutation-testing).
+test('bundle checks: platform, catalog identity, configuration and every file record', async t => {
+  const { directory, expected, manifest, save } = await fixture(t);
+  for (const [p, a] of [['linux', 'arm64'], ['darwin', 'x64']])
+    await assert.rejects(verifyWasmtimeBundle(directory, expected, { platform: p, arch: a }), { message: `A Wasmtime native bundle is not implemented for ${p}-${a}` });
+  for (const identity of [undefined, {}, { manifestSha256: 'x' + expected.manifestSha256 }, { manifestSha256: expected.manifestSha256 + 'x' },
+    { manifestSha256: expected.manifestSha256.toUpperCase() }, { manifestSha256: '0'.repeat(64) }])
+    await assert.rejects(verifyWasmtimeBundle(directory, identity, platform), { message: 'Wasmtime native bundle manifest differs from its release catalog' });
+  for (const changes of [{ schema: 2 }, { schema: '1' }])
+    { const previous = structuredClone(manifest); Object.assign(manifest, changes); await save();
+      await assert.rejects(verifyWasmtimeBundle(directory, expected, platform), { message: 'Wasmtime native bundle configuration does not match the current platform' });
+      Object.assign(manifest, previous); }
+  await save();
+  const record = manifest.files['compiler.so'];
+  for (const [value, why] of [[undefined, 'missing'], [{ ...record, bytes: 0 }, 'empty'], [{ ...record, bytes: String(record.bytes) }, 'text size'],
+    [{ ...record, bytes: record.bytes + 1 }, 'other size'], [{ ...record, sha256: 'x' + record.sha256.slice(1) }, 'not hex'], [{ ...record, sha256: record.sha256 + '0' }, 'long'],
+    [{ ...record, sha256: '0' + record.sha256 }, 'long prefix']]) {
+    manifest.files['compiler.so'] = value; await save();
+    await assert.rejects(verifyWasmtimeBundle(directory, expected, platform), /Wasmtime native bundle (file changed: compiler\.so|contains missing or unrecorded files)/, why);
+  }
+  // A one-byte file is a valid record.
+  await writeFile(join(directory, 'compiler.so'), 'x');
+  manifest.files['compiler.so'] = { bytes: 1, sha256: hash('x') }; await save();
+  assert.equal((await verifyWasmtimeBundle(directory, expected, platform)).manifest.files['compiler.so'].bytes, 1);
+  // The manifest must be a file.
+  await rm(join(directory, 'manifest.json'));
+  await mkdir(join(directory, 'manifest.json'));
+  await assert.rejects(verifyWasmtimeBundle(directory, expected, platform));
+});
+
+test('packaged bundles: the catalog\'s shape, the platform it names and the default directory', async t => {
+  const { directory, expected } = await fixture(t);
+  for (const catalog of [{ schema: 1 }, { schema: 1, platforms: 'linux-x64' }, { schema: 1, platforms: [expected] }, { schema: 1, platforms: null }, { platforms: {} }])
+    await assert.rejects(packagedWasmtimeBundle({ catalog, ...platform }), { message: 'Invalid Wasmtime native bundle catalog' }, JSON.stringify(catalog));
+  // The named platform is the one verified, not this process's.
+  const catalog = { schema: 1, platforms: { 'darwin-x64': expected, 'linux-x64': expected } };
+  await assert.rejects(packagedWasmtimeBundle({ catalog, directory, platform: 'darwin', arch: 'x64' }), /not implemented for darwin-x64/);
+  assert.equal(await packagedWasmtimeBundle({ catalog, directory, platform: 'linux', arch: 'arm64' }), null);
+  // Without a directory: the one in the package, which a checkout does not have.
+  await assert.rejects(packagedWasmtimeBundle({ catalog, ...platform }), { code: 'ENOENT' });
+  // The package's own catalog.
+  const shipped = await packagedWasmtimeBundle({ platform: 'freebsd', arch: 'x64' });
+  assert.equal(shipped, null);
+  const ownCatalog = JSON.parse(await (await import('node:fs/promises')).readFile(new URL('../src/wasmtime-bundles.json', import.meta.url), 'utf8'));
+  assert.equal(ownCatalog.schema, 1);
+  // This process's platform by default.
+  const here = { schema: 1, platforms: { [`${process.platform}-${process.arch}`]: expected } };
+  const result = await packagedWasmtimeBundle({ catalog: here, directory }).catch(error => error);
+  if (process.platform === 'linux' && process.arch === 'x64') assert.equal(result.identity, expected.manifestSha256);
+  else assert.match(result.message, /not implemented/);
+});

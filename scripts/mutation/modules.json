@@ -101,7 +101,7 @@
       "name": "edge-build",
       "description": "Edge builds: platform outputs, builtin modules, initializers, the Emscripten pre-JS (not edge-library.js: its Emscripten preprocessor lines are not JavaScript Stryker can parse)",
       "mutate": ["src/edge/edge-build.mjs", "src/edge/builtin-modules.mjs", "src/edge/edge-initializers.mjs", "src/edge/edge-pre.js"],
-      "tests": ["test/edge.test.mjs", "test/browser.test.mjs", "test/notices.test.mjs", "test/platform-output.test.mjs", "test/edge-link-plan.test.mjs", "test/application-link-plan.test.mjs", "test/edge-js.test.mjs", "test/edge-pre.test.mjs", "test/edge-initializers.test.mjs", "test/builtin-modules.test.mjs"]
+      "tests": ["test/edge.test.mjs", "test/browser.test.mjs", "test/notices.test.mjs", "test/platform-output.test.mjs", "test/edge-link-plan.test.mjs", "test/application-link-plan.test.mjs", "test/edge-js.test.mjs", "test/edge-pre.test.mjs", "test/edge-initializers.test.mjs", "test/builtin-modules.test.mjs", "test/edge-entries.test.mjs", "test/edge-output.test.mjs"]
     },
     {
       "name": "wasi-build",
@@ -113,7 +113,7 @@
       "name": "wasmtime",
       "description": "The standalone wasmtime host: runtime, bundles, artifacts, console, files, processes, guest memory, module data, stdio",
       "mutate": ["src/wasmtime-runtime.mjs", "src/wasmtime-standalone.mjs", "src/wasmtime-worker.mjs", "src/wasmtime-artifact.mjs", "src/wasmtime-bundle.mjs", "src/wasmtime-console.mjs", "src/wasmtime-file-host.mjs", "src/wasmtime-file-imports.mjs", "src/wasmtime-guest-memory.mjs", "src/wasmtime-module-data.mjs", "src/wasmtime-native-stdio.mjs", "src/wasmtime-process-host.mjs", "src/wasmtime-wasi-stdio.mjs"],
-      "tests": ["test/wasmtime-artifact.test.mjs", "test/wasmtime-bundle.test.mjs", "test/wasmtime-console.test.mjs", "test/wasmtime-file-imports.test.mjs", "test/wasmtime-guest-memory.test.mjs", "test/wasmtime-module-data.test.mjs", "test/wasmtime-process-host.test.mjs", "test/wasmtime-wasi-stdio.test.mjs", "test/wasmtime-runtime.test.mjs"]
+      "tests": ["test/wasmtime-artifact.test.mjs", "test/wasmtime-bundle.test.mjs", "test/wasmtime-console.test.mjs", "test/wasmtime-file-imports.test.mjs", "test/wasmtime-guest-memory.test.mjs", "test/wasmtime-module-data.test.mjs", "test/wasmtime-process-host.test.mjs", "test/wasmtime-wasi-stdio.test.mjs", "test/wasmtime-runtime.test.mjs", "test/wasmtime-standalone.test.mjs", "test/wasmtime-file-host.test.mjs", "test/wasmtime-native-stdio.test.mjs", "test/wasmtime-process-host-kinds.test.mjs", "test/wasmtime-guest-boundaries.test.mjs"]
     },
     {
       "name": "node-host",
