@@ -417,6 +417,11 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
   which serves every host call, is the limit; use `ofFnReply` and `getFields`.
   Measurements: [JS_INTEROP.md](JS_INTEROP.md).
 - **Lasm only.** Programs that use interop run only under Lasm.
+- **No inline JavaScript, no classes defined in Lean.** JavaScript that is not an
+  existing export goes in a module of its own (a local `file:` npm package), and a
+  class (`extends HTMLElement`, a Durable Object) is written in JavaScript with
+  methods that call Lean functions. Options and recommendations:
+  [proposals/LASM_JS_GAPS.md](proposals/LASM_JS_GAPS.md).
 - **Waiting in `IO` holds a thread.** Lean code that waits for JavaScript in
   `IO` (an `IO R` binding returning a promise, `callAwait` or `Value.await` in
   an `IO` function, `IO.wait`, `IO.sleep`) blocks a Lean worker thread, and
