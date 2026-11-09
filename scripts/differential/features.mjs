@@ -50,10 +50,14 @@ import { rng, genExpr, renderExpr, exprShrinks, exprSize, exprType, show, lt, le
 export const FAMILIES = ['ext', 'class', 'adt', 'closure', 'loop', 'struct', 'exc'];
 const WEIGHT = { ext: 4, class: 2, adt: 2, closure: 2, loop: 2, struct: 1, exc: 1 };
 
-// Operations whose cost grows with their arguments (or that recurse): kept
-// out of loop bodies run up to 200,000 times.
-const HEAVY = /fibL|collatz|ack|digitSum|\^ \(|Tree|hm|wordCount|replicate|range|pushn|Superscript|toDigits|<<< \(|repr|qsort|mergeSort|insertionSort|eraseDups|splitOn|intercalate|join|replace|toString|insertMany|Float32\.ofScientific|Float\.ofScientific/;
-const cheap = o => !o.bind && !(o.r && HEAVY.test(o.r.toString()));
+// Operations whose cost grows with their arguments (or that recurse), that
+// panic (`set!` out of bounds: 200,000 panic messages, campaign 42620999209),
+// or that touch floats (a literal such as 1e300 is Float.ofScientific with a
+// 300-digit power of ten, recomputed every iteration: 51 s natively for
+// 200,000 iterations, campaign 42621004028): kept out of loop bodies run up to
+// 200,000 times and out of class operations that are iterated.
+const HEAVY = /fibL|collatz|ack|digitSum|\^ \(|Tree|hm|wordCount|replicate|range|pushn|Superscript|toDigits|<<< \(|repr|qsort|mergeSort|insertionSort|eraseDups|splitOn|intercalate|join|replace|toString|insertMany|ofScientific|!/;
+const cheap = o => !o.bind && !o.panic && ![o.t, ...o.args].some(t => t === 'Float' || t === 'Float32') && !(o.r && HEAVY.test(o.r.toString()));
 
 const SIMPLE = ['Nat', 'Int', 'UInt8', 'UInt64', 'String', 'Bool', 'ListNat', 'Int32', 'Char'];
 const ex = (r, t, depth, env = [], flags = {}) => genExpr(r, t, depth, env, { ext: true, ...flags });
@@ -91,7 +95,9 @@ const GEN = {
     for (let i = r.int(2, 6); i > 0; i--) {
       const t = r.pick(types), k = r.pick(['mconcat', 'pow', 'combine3', 'name', 'pair', 'opt', 'idem']);
       if (k === 'mconcat') chk.push({ k, t, e: Array.from({ length: r.int(0, 4) }, () => ex(r, t, 1)) });
-      else if (k === 'pow') chk.push({ k, t, n: r.int(0, 12), e: [ex(r, t, 1)] });
+      // At most 6: an operation that doubles an array, printed with repr, overflows
+      // the Wasm stack of WASI and the edge targets past ~5,000 elements (issue #179).
+      else if (k === 'pow') chk.push({ k, t, n: r.int(0, 6), e: [ex(r, t, 1)] });
       else if (k === 'combine3') chk.push({ k, t, e: [ex(r, t, 1), ex(r, t, 1), ex(r, t, 1)] });
       else if (k === 'name') chk.push({ k, t });
       else if (k === 'pair') { const u = r.pick(types); chk.push({ k, t, u, e: [ex(r, t, 1), ex(r, u, 1), ex(r, t, 1), ex(r, u, 1)] }); }

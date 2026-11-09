@@ -167,7 +167,7 @@ function exec(cmd, args, { cwd, timeout = 30 * 60_000, extraEnv } = {}) {
     child.stdout.on('data', d => { if (outBytes < 8e6) { out.push(d); outBytes += d.length; } });
     child.stderr.on('data', d => { if (errBytes < 8e6) { err.push(d); errBytes += d.length; } });
     child.on('error', e => { spawnError += String(e); });
-    child.on('close', (code, signal) => { clearTimeout(timer); done({ code, signal, stdout: Buffer.concat(out).toString('utf8'), stderr: Buffer.concat(err).toString('utf8') + spawnError, timedOut, ms: Math.round(performance.now() - started) }); });
+    child.on('close', (code, signal) => { clearTimeout(timer); done({ code, signal, stdout: Buffer.concat(out).toString('utf8') + (outBytes >= 8e6 ? '\n[harness: stdout cut at 8 MB]\n' : ''), stderr: Buffer.concat(err).toString('utf8') + (errBytes >= 8e6 ? '\n[harness: stderr cut at 8 MB]\n' : '') + spawnError, timedOut, ms: Math.round(performance.now() - started) }); });
   });
 }
 
@@ -251,6 +251,16 @@ function diverging(ids, nat, tgt, target) {
   if (TARGETS[target]?.zeroOrNot) { nat = { ...nat, code: outcomeOf(nat.code) }; tgt = { ...tgt, code: outcomeOf(tgt.code) }; }
   const a = byCase(nat.stdout), b = byCase(tgt.stdout);
   const ae = byCase(nat.stderr, true), be = byCase(tgt.stderr, true);
+  // The interpreter evaluates a closed term on first use, where compiled code
+  // evaluates it while the module initializes: a closed term that panics prints
+  // its message before the first case natively, inside its case when
+  // interpreted. For the interpreter, stderr is compared as a multiset of lines.
+  if (target === 'interp') {
+    const lines = t => t.split('\n').sort().join('\n');
+    const bad = ids.filter(id => a.get(id) !== b.get(id));
+    const stderr = lines(nat.stderr) !== lines(tgt.stderr);
+    return { bad, stderr, code: nat.code !== tgt.code, any: bad.length > 0 || stderr || nat.code !== tgt.code };
+  }
   const bad = ids.filter(id => a.get(id) !== b.get(id) || ae.get(id) !== be.get(id));
   return { bad, stderr: nat.stderr !== tgt.stderr, code: nat.code !== tgt.code, any: bad.length > 0 || nat.stderr !== tgt.stderr || nat.code !== tgt.code };
 }

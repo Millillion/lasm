@@ -236,8 +236,9 @@ extension operations enabled), drawn so that they use the variables in scope.
 Everything terminates by construction (bounded counts, fuel, measures that Lean
 checks) and needs no file system, sleep or environment, so a feature program
 runs on **every** target, the browsers and the `-O0` edge builds included (no
-recursion is deeper than 500 frames; the loops compile to C loops, checked
-natively with a 100 KB stack). The extension operations are appended after the
+recursion is deeper than 500 frames; the loops compile to C loops: no generated
+function calls itself in the emitted C, and `Nat.fold` and `while` run 10⁸
+iterations natively where a recursion of that depth aborts). The extension operations are appended after the
 core ones and filtered out of core cases, so every core case of every seed is
 unchanged (a unit test pins their hash). Each case draws from its own stream
 `rng(seed, 'feat', index)`.
