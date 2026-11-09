@@ -572,69 +572,61 @@ Free limit, and under Vercel Edge's 1 MB-gzip Hobby limit. The Node profile's
 | `Std.Mutex`, condition variables (single thread) | Locks never contend | `Std.Http` server (no listening sockets on the edge; a fetch-handler API is planned) |
 | `IO.println`/`eprintln` (lines to `console`), `IO.getEnv` (string bindings; the C runtime's `getenv`, which reads `LEAN_BACKTRACE` and `LEAN_ABORT_ON_PANIC`, sees the same variables: see [Environment variables](#environment-variables)), clocks, `IO.getRandomBytes` | Random bytes during startup on Workers are not cryptographic, and only for initializers | `IO.Process.exit`, `IO.appPath`, `IO.currentDir` (fixed values) |
 | `Lasm.JS`: values, calls, `Async` callbacks (`ofFn`, `ofFnReply`), `callAwait` in `Async`, typed bindings, `globalThis` | `require` and bindings resolve only modules the build imported statically | Native C (`extern_lib`) needing threads or POSIX; `import Lean` elaboration at run time (as on Node) |
-| Errors: Lean errors reject JS promises; stack exhaustion stops the instance cleanly | Synchronous callbacks (`ofSyncFn`) cannot wait | |
+| Errors: Lean errors reject JS promises; stack exhaustion stops the instance cleanly | Synchronous callbacks (`ofSyncFn`) can wait for Lean work that needs no JavaScript event, not for an event ([JS_BINDINGS.md](JS_BINDINGS.md#callbacks-lean-functions-called-by-javascript)) | |
 
 An `Async` loop of steps that complete at once (synchronous host calls, `IO`,
-`pure`) nests on the JavaScript stack: about 2,000 steps on Deno and Workers,
-8,000 on Bun. See [Async loops](#async-loops-of-steps-that-complete-at-once-issue-90).
+`pure`) runs at any length, as on Node. See
+[Async loops](#async-loops-of-steps-that-complete-at-once-issue-90).
 
 ### Async loops of steps that complete at once (issue #90)
 
-**Symptom.** On Bun, Deno and the edge targets, a loop in `Async` (a recursion,
-`for`, `List.mapM`) of a few thousand steps fails with `RangeError: Maximum call
-stack size exceeded`. The same loop works on Node. A Lasm.Fetch handler answers
-it with status 500 unless it catches the error.
+**Fixed.** Until #90's fix, a loop in `Async` (a recursion, `for`, `List.mapM`)
+of a few thousand steps that complete at once failed on Bun, Deno, Workers and
+browsers with `RangeError: Maximum call stack size exceeded`: about 2,001 steps
+on Deno 2.9.6, 8,099 on Bun 1.4.4 and 1,855 on workerd (CI run 41846096224).
+Such steps are synchronous host calls (`callMethod`, `bun:sqlite`, D1's
+`prepare(…).bind(…)`), `IO` actions and `pure` values. Now these loops run at
+any length on every target, with no change to the program.
 
-**Cause.** When a step's value is already there, `Async`'s bind runs the next
-step at once on the same JavaScript stack. On the portable runtime Lean shares
-the engine's single stack, so N such steps nest about N levels of calls. A step
-that really waits resumes later from an empty stack, so it ends the nesting.
-That includes an awaited host call, even of a value that is not a promise, and
-`Std.Async.sleep`. Node runs each Lean thread on its own 1 GiB stack.
+**Cause.** When a step's value is already there, `Async`'s bind calls the rest
+of the computation at once, inside the bind. On the portable runtime Lean
+shares the engine's single stack, so N such steps nested N binds on it. A step
+that really waits (an awaited host call, `Std.Async.sleep`) resumes later from
+an empty stack.
+
+**How it is fixed.** Every `Async` bind in compiled code calls one function of
+Lean's standard library (`Std.Async.BaseAsync.bind`'s `bindAsyncTask`). Lasm's
+link wraps it (`library/c/lasm_async.c`) with a count of the binds nested on
+the current thread. Past 128 of them, the wrapper continues the computation as
+if the step had been an awaited, finished task: the rest of the loop is queued
+as a Lean task, the nested binds return, and the task starts from a shallow
+stack (the event pump, or the wait that runs it). Results, the order of effects
+and errors do not change. Only where the rest runs changes, every 128 steps.
+The wrapper is linked into every program that imports Lasm's library; on Node
+its limit is 16,384, since Node runs Lean on threads with 1 GiB stacks.
 
 **Measured** (`scripts/ci/async-depth.mjs`, the `async-depth` job of
-`differential.yml`, run 41846096224, Linux x64, 2026-11-04). This is the deepest
-loop of N steps in one Lasm.Fetch request:
+`differential.yml`, [run 42615416214](https://github.com/Millillion/lasm/actions/runs/42615416214), 2026-11-09, Linux x64). Time for one Lasm.Fetch request
+running N steps one after another, with no pause:
 
-| Step | Node | Deno 2.9.6 | Bun 1.4.4 | Workers (workerd, `wrangler dev` 4.152.0) |
+| Step (N = 100,000 / 1,000,000) | Node | Deno 2.9.6 | Bun 1.4.4 | Workers (workerd, `wrangler dev` 4.152.0) |
 | --- | --- | --- | --- | --- |
-| `o.callMethod …` (a synchronous host call) | ≥ 100,000 | 2,001 | 8,099 | 1,855 |
-| An `IO` action, or `pure` | ≥ 100,000 | 2,001 | 8,099 | 1,855 |
-| `o.callMethodAwait …` of a promise, or of a plain value | ≥ 100,000 | ≥ 100,000 | ≥ 100,000 | ≥ 100,000 |
+| `pure` | 22 / 183 ms | 16 / 136 ms | 14 / 103 ms | 16 / 113 ms |
+| An `IO` action | 170 / 1,662 ms | 202 / 2,238 ms | 91 / 854 ms | 108 / 979 ms |
+| `o.callMethod …` (a synchronous host call) | 915 / 8,945 ms | 433 / 4,718 ms | 293 / 2,801 ms | 340 / 3,037 ms |
+| `o.callMethodAwait …` of a plain value (100,000) | 6,626 ms | 2,068 ms | 947 ms | 1,215 ms |
+| `o.callMethodAwait …` of a promise (100,000) | 6,702 ms | 1,828 ms | 1,039 ms | 1,258 ms |
 
-CI fails if a limit drops below about half these values, or if an awaited loop
-stops reaching 100,000. Tandem hit this with synchronous `bun:sqlite` and
-`node:sqlite` queries on Bun and Deno, and with D1's synchronous
-`prepare(…).bind(…)` on Workers.
+The cost of the fix is small: before it, 100,000 `pure` steps with the
+workaround (`Std.Async.sleep 0` every 100 steps, one event-loop turn each) took
+2,136 ms on Deno, 1,111 ms on Bun and 1,160 ms on workerd (run 41930411906); now
+they take 14–16 ms with no pause. On Node, where the wrapper almost never
+defers, 100,000 `pure` and `IO` steps took 48 and 322 ms in run 41930411906
+and 22 and 170 ms now.
 
-**Workaround.** Yield to the event loop every K steps with `Std.Async.sleep 0`,
-where K is well under the limit (100 in CI). With that, 100,000 steps of every
-kind above pass on all four engines. `IO.sleep 0` does not help: it waits on
-the same stack.
-
-```lean
--- Fails past about 2,000 statements on Deno and Workers.
-def runAll (db : Lasm.JS.Value) : List String → Async Unit
-  | [] => pure ()
-  | sql :: rest => do
-    let _ ← db.callMethod "exec" #[.string sql] Lasm.JS.Data
-    runAll db rest
-
--- Any length: every 100th step waits on a timer, from an empty stack.
-def runAll' (db : Lasm.JS.Value) (i : Nat := 0) : List String → Async Unit
-  | [] => pure ()
-  | sql :: rest => do
-    let _ ← db.callMethod "exec" #[.string sql] Lasm.JS.Data
-    if i % 100 == 99 then Std.Async.sleep 0
-    runAll' db (i + 1) rest
-```
-
-You can also take the loop out of `Async`. Batch the work into fewer host calls,
-and run pure work as pure, tail-recursive functions. Tandem does both
-(`examples/tandem`, commits 4a2dbad2 and 386b5016): one query per 90 operations,
-and rows decoded with `List.map` instead of `List.mapM`. A loop in `IO` does not
-nest like this.
-
+CI fails if any of these loops fails. The former workaround, `Std.Async.sleep 0`
+every 100 steps, still works but is no longer needed. Batching work into fewer
+host calls is still faster: each host call costs microseconds.
 
 ## API plan: `Lasm.JS` stays source-compatible
 

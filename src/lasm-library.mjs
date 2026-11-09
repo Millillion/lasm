@@ -39,6 +39,10 @@ export const glueSource = join(root, 'c', 'lasm_js.c');
 export const glueLinkFlags = ['lean_task_get', 'lean_io_wait_any_core', 'emscripten_futex_wait'].map(name => `-Wl,--wrap=${name}`);
 // Lasm.Fetch's glue on Node and the edge (WASI builds link src/wasi/lasm_fetch_wasi.c).
 export const fetchGlueSource = join(root, 'c', 'lasm_fetch.c');
+// Std.Async binds of steps that complete at once, bounded in depth (#90): kept by
+// every link, with its wrap (asyncLinkFlags), unlike the Node glue's.
+export const asyncGlueSource = join(root, 'c', 'lasm_async.c');
+export const asyncLinkFlags = ['l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg'].map(name => `-Wl,--wrap=${name}`);
 // Lasm.JS.Meta (deriving, `@[js]`) uses Lean's elaborator: only prefixes that
 // contain it (the extended tier) get the library.
 const requiredOlean = ['Lean', 'Elab', 'Deriving', 'Basic.olean'];
@@ -151,8 +155,9 @@ export function librarySources(lean, programSources) {
   for (const module of modules) {
     sources.push(libraryC(lean, module)); inputs.push({ module: '+' + module, source: join(lean.prefix, 'src', 'lean', ...module.split('.')) + '.lean' });
   }
-  sources.push(glueSource, fetchGlueSource);
-  inputs.push({ module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource });
+  sources.push(glueSource, fetchGlueSource, asyncGlueSource);
+  inputs.push({ module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource },
+    { module: 'lasm_async.c', source: asyncGlueSource });
   const oleans = modules.map(module => join(lean.prefix, 'lib', 'lean', ...module.split('.')) + '.olean');
   return { sources, inputs, modules, oleans };
 }
