@@ -69,6 +69,22 @@ decisions themselves are logged with their reasoning in
   TextEncoder/TextDecoder, streams, AbortController, timers,
   `structuredClone`, console). It is in ROADMAP.md, after the current
   testing work.
+- **Tier 3 adds `Lasm.JS.Cloudflare`** (Jordan, 2026-11-09). It is generated
+  from Cloudflare's published workers-types: Workers KV, D1, R2, Durable
+  Objects, env bindings and the rest. When it is done, it replaces the hand
+  bindings in the example apps (Porter, Ledger).
+- **What becomes obsolete once `Lasm.JS.*` is complete**
+  ([proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md#3-ranked-removal-list),
+  removal 17):
+  - All of `Lasm.Web`. `Lasm.Web.App`'s mount glue moves into `Lasm.UI`.
+  - From `Lasm.Fetch`: the outbound fetch and get, the URL and query helpers,
+    and the Node and edge plumbing on JavaScript hosts. `serve`'s portable
+    handler and Assets/`embed_dir!` stay, because WASI, Fastly and wasi-http
+    need them.
+  - From `Lasm.KV`: the Deno and Workers backends. The `Store` abstraction
+    and the memory and Fastly backends remain, pending your KV review.
+  - `Lasm.UI` and `Lasm.RPC` switch their browser side to `Lasm.JS.Web`,
+    with no API change.
 - Still for Jordan to review when it lands: the generated surface and its
   naming details.
 
