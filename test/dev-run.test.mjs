@@ -30,9 +30,15 @@ const pause = ms => new Promise(done => setTimeout(done, ms));
 // Once a test fails the rest are skipped (they would only wait for their own
 // timeouts): a mutant is killed by the first failure (scripts/mutation).
 let failedBefore = false;
+// TEMPORARY: outcomes for the mutation sandbox's dry run (written beside its report).
+const outcomes = [];
+const debugDir = join(process.cwd(), '..', '..', '..', 'mutation', 'dev');
+process.on('exit', code => {
+  if (existsSync(debugDir)) writeFileSync(join(debugDir, `debug-${process.pid}.txt`), `${process.version} exit ${code} exitCode ${process.exitCode}\n${outcomes.join('\n')}\n--- stderr tail ---\n${stderr.text().slice(-3000)}`);
+});
 const dtest = (name, fn) => test(name, async t => {
-  if (failedBefore) { t.skip('an earlier test failed'); return; }
-  try { await fn(t); } catch (error) { failedBefore = true; throw error; }
+  if (failedBefore) { t.skip('an earlier test failed'); outcomes.push('skip ' + name); return; }
+  try { await fn(t); outcomes.push('ok ' + name); } catch (error) { failedBefore = true; outcomes.push(`FAIL ${name}\n${error.stack}`); throw error; }
 });
 async function until(condition, what, ms = 4000) {
   const deadline = Date.now() + ms;
