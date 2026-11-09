@@ -627,6 +627,8 @@ test('a partial file that disappears before the retry is downloaded again; other
     } });
   assert.deepEqual(ranges, [undefined, undefined]);
   assert.deepEqual(await readFile(f.file), bytes);
+  // A file where the parent directory was: ENOTDIR on POSIX; Windows reports ENOENT, the same as a missing file.
+  if (process.platform === 'win32') return;
   const base = await mkdtemp(join(tmpdir(), 'lasm-download-gone-'));
   t.after(() => rm(base, { recursive: true, force: true }));
   const { mkdir, writeFile } = await import('node:fs/promises');
