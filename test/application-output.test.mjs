@@ -9,6 +9,9 @@ import { applicationHostFiles, writeApplicationEntrypoint } from '../src/applica
 import { applicationPolicy } from '../src/application-policy.mjs';
 import { isolatedImportFailures } from './helpers/isolated-import.mjs';
 
+// Stryker's switch functions for the embedded source text (see the helper).
+const preamble = ['--import', fileURLToPath(new URL('./helpers/stryker-child-preamble.mjs', import.meta.url))];
+
 test('entrypoint resolves host/glue relative to deployment, independent of build and working directory', t => {
   const base = realpathSync(mkdtempSync(join(tmpdir(), 'lasm-deployment-')));
   t.after(() => rmSync(base, { recursive: true, force: true }));
@@ -23,7 +26,7 @@ test('entrypoint resolves host/glue relative to deployment, independent of build
     app: process.env.LASM_FULL_APP_PATH, cwd: process.cwd(), threads: process.env.LEAN_NUM_THREADS
   }));`);
   renameSync(original, moved);
-  const out = execFileSync(process.execPath, ['--max-old-space-size=64', join(moved, 'main.mjs'), 'hello', '--target', 'application-value'],
+  const out = execFileSync(process.execPath, [...preamble, '--max-old-space-size=64', join(moved, 'main.mjs'), 'hello', '--target', 'application-value'],
     { cwd: base, env: { ...process.env, LEAN_NUM_THREADS: '7' }, encoding: 'utf8' });
   const record = JSON.parse(out);
   assert.equal(record.cwd, base);
@@ -50,7 +53,7 @@ test('stale or compiler-capable deployments fail before loading host code or the
   for (const info of [{}, { applicationPolicy, linkRequirements: {
     mode: 'dynamic', dynamic: ['dlopen'], cxxRuntime: [], moduleData: [], requiresModuleData: true } }]) {
     writeFileSync(join(base, 'build-info.json'), JSON.stringify(info));
-    const result = spawnSync(process.execPath, ['--max-old-space-size=64', join(base, 'main.mjs')], { encoding: 'utf8' });
+    const result = spawnSync(process.execPath, [...preamble, '--max-old-space-size=64', join(base, 'main.mjs')], { encoding: 'utf8' });
     assert.equal(result.status, 1);
     assert.match(result.stderr, /Rebuild/);
     assert.doesNotMatch(result.stderr, /PAYLOAD EXECUTED|ERR_MODULE_NOT_FOUND/);
@@ -72,7 +75,7 @@ for (const [name, support, message, native] of [
     mkdirSync(join(base, 'host/native'), { recursive: true });
     writeFileSync(join(base, 'host/native/manifest.json'), JSON.stringify({ deployment: { target: 'node', targets } }));
   }
-  const result = spawnSync(process.execPath, [join(base, 'main.mjs')], { encoding: 'utf8' });
+  const result = spawnSync(process.execPath, [...preamble, join(base, 'main.mjs')], { encoding: 'utf8' });
   assert.equal(result.status, 1);
   assert.match(result.stderr, name === 'host' ? new RegExp(`includes native support for ${targets.join(', ')}; it is running on ${process.platform}-${process.arch}\\..*rebuild`) : message);
   assert.doesNotMatch(result.stderr, /ERR_MODULE_NOT_FOUND/);
@@ -89,7 +92,7 @@ test('a deployment that carries this host\'s native pieces runs on any Node from
   writeFileSync(join(base, 'build-info.json'), JSON.stringify({ applicationPolicy,
     linkRequirements: { mode: 'static', dynamic: [], cxxRuntime: [], moduleData: [], requiresModuleData: false } }));
   writeFileSync(join(base, 'program.cjs'), 'console.log("started")');
-  assert.equal(execFileSync(process.execPath, [join(base, 'main.mjs')], { encoding: 'utf8' }), 'started\n');
+  assert.equal(execFileSync(process.execPath, [...preamble, join(base, 'main.mjs')], { encoding: 'utf8' }), 'started\n');
 });
 
 // Behavioural (docs/TESTING.md#test-quality-audit): the shipped host files alone,
