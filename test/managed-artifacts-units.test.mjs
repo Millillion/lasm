@@ -327,3 +327,137 @@ test('an installation waits for another holder of its lock, and says so', async 
   assert.deepEqual(derivedStages, ['Waiting for another tool derivation or cache repair']);
   releaseDerived(); await derivedHolder; await deriving;
 });
+
+// Raw tar archives, entry by entry, for the extraction rules.
+async function rawArchive(entries) {
+  const { Header } = await import('tar');
+  const { zstdCompressSync } = await import('node:zlib');
+  const parts = [];
+  for (const entry of entries) {
+    const body = Buffer.from(entry.body ?? '');
+    const header = new Header({ mode: 0o644, type: 'File', ...entry, size: body.length });
+    header.encode(); parts.push(header.block, body, Buffer.alloc((512 - body.length % 512) % 512));
+  }
+  return zstdCompressSync(Buffer.concat([...parts, Buffer.alloc(1024)]));
+}
+async function install(t, entries, change = {}) {
+  const base = await scratch(t);
+  const bytes = await rawArchive(entries);
+  const artifact = { name: 'raw', root: 'tool', url: 'https://example.invalid/raw', sha256: sha(bytes), bytes: bytes.length,
+    format: 'tar.zst', maximumExtractedBytes: 1000, ...change };
+  const cache = join(base, 'cache');
+  return { base, cache, artifact, run: () => provisionArtifact(artifact, { cache, log() {}, env: {}, fetch: async () => new Response(bytes) }) };
+}
+
+test('directory entries for the archive root: "." and "./" in rootless archives only', async t => {
+  for (const path of ['.', './']) {
+    const ok = await install(t, [{ path, type: 'Directory', mode: 0o755 }, { path: './file', body: 'x' }], { root: '.' });
+    assert.deepEqual(Object.keys((await ok.run()).receipt.files), ['file'], path);
+  }
+  const file = await install(t, [{ path: '.', type: 'File', body: 'x' }, { path: './file', body: 'x' }], { root: '.' });
+  await assert.rejects(file.run(), /Unsafe or duplicate archive entry/);
+  const rooted = await install(t, [{ path: '.', type: 'Directory', mode: 0o755 }, { path: 'tool/file', body: 'x' }]);
+  await assert.rejects(rooted.run(), { message: 'Unsafe or duplicate archive entry: .' });
+});
+
+test('the first unsafe entry is the one reported', async t => {
+  const f = await install(t, [{ path: 'tool/ok', body: 'x' }, { path: 'other/first', body: 'x' }, { path: 'other/second', body: 'x' }]);
+  await assert.rejects(f.run(), { message: 'Unsafe or duplicate archive entry: other/first' });
+  const duplicate = await install(t, [{ path: 'tool/a', body: 'x' }, { path: 'tool/a', body: 'y' }]);
+  await assert.rejects(duplicate.run(), { message: 'Unsafe or duplicate archive entry: tool/a' });
+});
+
+test('link targets: no backslash or colon; rootless links stay inside', async t => {
+  for (const linkpath of ['a\\b', 'C:x'])
+    await assert.rejects((await install(t, [{ path: 'tool/f', body: 'x' }, { path: 'tool/l', type: 'SymbolicLink', linkpath }])).run(),
+      /Archive link escapes its toolchain: tool\/l|Unsafe/, JSON.stringify(linkpath));
+  await assert.rejects((await install(t, [{ path: './f', body: 'x' }, { path: './l', type: 'SymbolicLink', linkpath: '../f' }], { root: '.' })).run(),
+    { message: 'Archive link escapes its toolchain: ./l' });
+  // A target that only looks like a parent reference is ordinary.
+  const dots = await install(t, [{ path: 'tool/..data', body: 'x' }, { path: 'tool/l', type: 'SymbolicLink', linkpath: '..data' }]);
+  if (process.platform !== 'win32') assert.equal(await readFile(join((await dots.run()).directory, 'l'), 'utf8'), 'x');
+});
+
+test('hardlinks may point forward; cycles and missing targets are refused', async t => {
+  const forward = await install(t, [{ path: 'tool/b', type: 'Link', linkpath: 'tool/c' }, { path: 'tool/a', type: 'Link', linkpath: 'tool/b' }, { path: 'tool/c', body: 'data' }]);
+  const installed = await forward.run();
+  assert.equal(await readFile(join(installed.directory, 'a'), 'utf8'), 'data');
+  for (const entries of [[{ path: 'tool/a', type: 'Link', linkpath: 'tool/b' }, { path: 'tool/b', type: 'Link', linkpath: 'tool/a' }],
+    [{ path: 'tool/f', body: 'x' }, { path: 'tool/a', type: 'Link', linkpath: 'tool/missing' }]])
+    await assert.rejects((await install(t, entries)).run(), { message: 'Archive has unresolved or cyclic hardlinks' });
+});
+
+test('the extraction limit is inclusive', async t => {
+  const exact = await install(t, [{ path: 'tool/a', body: 'x'.repeat(600) }, { path: 'tool/b', body: 'y'.repeat(400) }]);
+  await exact.run();
+  const over = await install(t, [{ path: 'tool/a', body: 'x'.repeat(600) }, { path: 'tool/b', body: 'y'.repeat(401) }]);
+  await assert.rejects(over.run(), { message: 'Extracted artifact exceeds its size limit: raw' });
+});
+
+test('receipts record types, sizes, hashes, executability and link targets', { skip: process.platform === 'win32' }, async t => {
+  const f = await install(t, [{ path: 'tool/bin/run', body: 'run', mode: 0o755 }, { path: 'tool/data', body: 'data', mode: 0o644 },
+    { path: 'tool/link', type: 'SymbolicLink', linkpath: 'data' }]);
+  const { receipt } = await f.run();
+  assert.deepEqual(receipt.files, { bin: { type: 'directory' }, 'bin/run': { type: 'file', bytes: 3, sha256: sha('run'), executable: true },
+    data: { type: 'file', bytes: 4, sha256: sha('data'), executable: false }, link: { type: 'symlink', target: 'data' } });
+});
+
+test('tampering after installation: escaping or absolute links and special files are refused by verification', { skip: process.platform === 'win32' }, async t => {
+  const { symlink, unlink } = await import('node:fs/promises');
+  const { execFileSync } = await import('node:child_process');
+  for (const [name, change, message] of [
+    ['a link to the parent', async d => symlink('..', join(d, 'escape')), 'Managed cache link escapes its toolchain: escape'],
+    ['a link outside', async d => symlink('../outside', join(d, 'escape')), 'Managed cache link escapes its toolchain: escape'],
+    ['an absolute link', async d => symlink(join(d, 'data'), join(d, 'escape')), 'Managed cache link escapes its toolchain: escape'],
+    ['a link through a link outside', async (d, base) => { await writeFile(join(base, 'x'), 'outside'); await symlink(base, join(d, 'out')); await symlink('out/x', join(d, 'escape')); },
+      'Managed cache link escapes its toolchain: escape'],
+    ['a named pipe', async d => execFileSync('mkfifo', [join(d, 'pipe')]), 'Unexpected managed cache entry: pipe'],
+  ]) {
+    const f = await install(t, [{ path: 'tool/data', body: 'data' }]);
+    const installed = await f.run();
+    await change(installed.directory, f.base);
+    await assert.rejects(verifyArtifactDirectory(installed.directory, installed.identity), { message }, name);
+    void unlink;
+  }
+  // A link inside the tree, to a name that merely starts with dots, verifies as changed content, not as an escape.
+  const g = await install(t, [{ path: 'tool/data', body: 'data' }]);
+  const installed = await g.run();
+  await writeFile(join(installed.directory, '..dots'), 'x');
+  await symlink('..dots', join(installed.directory, 'inner'));
+  await assert.rejects(verifyArtifactDirectory(installed.directory, installed.identity), /Managed cache contents changed: .*"\.\.dots", "inner"/);
+});
+
+test('when another process installs first, its complete tree is verified and used', async t => {
+  const f = await served(t);
+  const identity = validateArtifact(f.artifact);
+  const directory = join(f.cache, 'artifacts', identity);
+  let competitor;
+  const result = await provisionArtifact(f.artifact, { ...f.options, fetch: async () => {
+    // The competitor publishes the same verified tree while this download runs.
+    competitor = await provisionArtifact(f.artifact, { ...f.options, cache: join(f.base, 'other-cache') });
+    const { cp } = await import('node:fs/promises');
+    await cp(competitor.directory, directory, { recursive: true });
+    return new Response(f.bytes);
+  } });
+  assert.equal(result.cacheHit, false);
+  assert.equal(result.directory, directory);
+  assert.equal(await readFile(join(directory, 'bin/run'), 'utf8'), 'run');
+  // A competitor's tree that does not verify is an error.
+  const g = await served(t);
+  const other = join(g.cache, 'artifacts', validateArtifact(g.artifact));
+  await assert.rejects(provisionArtifact(g.artifact, { ...g.options, fetch: async () => {
+    await mkdir(other, { recursive: true }); await writeFile(join(other, 'junk'), 'x');
+    return new Response(g.bytes);
+  } }), { code: 'ENOENT' });
+  // The same for derivations.
+  const provenance = { raced: true };
+  const derivedDirectory = join(g.cache, 'derived', sha(JSON.stringify(provenance)));
+  const raced = await deriveArtifact(provenance, async tree => {
+    await writeFile(join(tree, 'out'), 'x');
+    const theirs = await deriveArtifact(provenance, async inner => { await writeFile(join(inner, 'out'), 'x'); }, { cache: join(g.base, 'their-cache'), log() {} });
+    const { cp } = await import('node:fs/promises');
+    await cp(theirs.directory, derivedDirectory, { recursive: true });
+  }, { cache: g.cache, log() {} });
+  assert.equal(raced.cacheHit, false);
+  assert.equal(await readFile(join(derivedDirectory, 'out'), 'utf8'), 'x');
+});
