@@ -17,6 +17,9 @@ mismatch: Lasm.JS get "greet": expected Lean type Nat, received JavaScript funct
 mapSync: #[2, 4, 6]
 applyAsync: HELLO, CALLBACKS
 lean error in JS: Lasm.JS binding applyAsync (local-lib applyAsync): Error: from Lean
+keys: tagged two joined string "two"
+symbol mismatch: Lasm.JS get JavaScript value (a reference): expected Lean type Nat, received JavaScript string "tagged"
+iterator: number 1
 async binding: async
 async rejection: Lasm.JS binding failAsync (local-lib fail): RangeError: late boom
 async method: method
