@@ -796,6 +796,14 @@ tier and why that is safe, and the PR-tier measurements. In short:
 | Weekly | Saturday 06:41 and 12:07 UTC | differential: 100-minute campaigns in both profiles, and the Lasm.JS soak (200 runs per program on four platforms) (`ci-weekly.yml`); boundary fuzzing: 60 minutes per target (`fuzz.yml`) |
 | Release | a version bump (`release-checks`) | every launch workflow, Lasm.JS stress, unit suite, npm rehearsal (unchanged) |
 
+No scheduled run does anything on a Sunday in US Eastern time: cron times stay
+off Sunday with a 12-hour margin, and every scheduled workflow's jobs wait on
+the Sunday guard (`sunday-guard.yml`), which skips them when a late run starts
+on Sunday in New York ([CI.md](CI.md#no-runs-on-sunday);
+`test/no-sunday-schedules.test.mjs` requires both). The campaigns that fired
+before 04:00 UTC run Monday to Friday evenings, New York time; the rest Monday
+to Saturday.
+
 ## Evidence levels
 
 Each platform in the README's table has an evidence level. The levels are those
@@ -830,7 +838,7 @@ that kind of evidence for the platform yet.
 The script rewrites only the region of README.md between the
 `evidence-levels` markers: the table's How well tested column and the legend under it.
 Every other cell stays as written. [`evidence-levels.yml`](../.github/workflows/evidence-levels.yml)
-runs it every night (08:23 UTC). When a level moved, it opens a pull request
+runs it Monday to Saturday (08:23 UTC). When a level moved, it opens a pull request
 with that change, as `image-pins.yml` does for image digests. Its artifact
 `evidence-levels.json` lists every requirement: the run behind it, and whether
 it failed, was missing or was stale.

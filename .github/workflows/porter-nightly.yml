@@ -3,11 +3,11 @@ name: Porter nightly
 # the endpoint fuzzer (test/fuzz.mjs) for 40 minutes against the Node build,
 # in four seeded runs of ten minutes (each seed printed; replay with --seed),
 # failing requests uploaded; then the oracle tests and the adversarial suite
-# on the same build. Runs when main changed examples/porter in the last day,
-# or on demand. Not a release gate.
+# on the same build. Runs when main changed examples/porter since the previous
+# scheduled run (74 hours covers Friday to Monday), or on demand. Not a release gate.
 on:
   schedule:
-    - cron: '41 3 * * 0,2-6'
+    - cron: '41 3 * * 2-6'
   workflow_dispatch:
 permissions:
   contents: read
@@ -18,7 +18,13 @@ env:
   CI: '1'
   BROWSER: 'none'
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   changed:
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true'
     runs-on: ubuntu-24.04
     outputs:
       run: ${{ steps.check.outputs.run }}
@@ -26,17 +32,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-          fetch-depth: 50
+          fetch-depth: 400
       - id: check
         run: |
-          if [ "${{ github.event_name }}" = workflow_dispatch ] || [ -n "$(git log --since='26 hours ago' --format=%H -- examples/porter | head -1)" ]; then
+          if [ "${{ github.event_name }}" = workflow_dispatch ] || [ -n "$(git log --since='74 hours ago' --format=%H -- examples/porter | head -1)" ]; then
             echo run=true >> "$GITHUB_OUTPUT"
           else
             echo run=false >> "$GITHUB_OUTPUT"
           fi
   fuzz:
-    needs: changed
-    if: needs.changed.outputs.run == 'true'
+    needs: [sunday, changed]
+    if: needs.sunday.outputs.skip != 'true' && (needs.changed.outputs.run == 'true')
     name: 40 minutes of fuzzing
     runs-on: ubuntu-24.04
     timeout-minutes: 90

@@ -18,8 +18,13 @@ concurrency:
   group: flaky-report
   cancel-in-progress: false
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   report:
-    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
