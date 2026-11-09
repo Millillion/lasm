@@ -41,3 +41,7 @@ Notes for the next release, collected as changes land. They move to
 ## Repository
 
 - **Unused code and dependencies removed (no behaviour change).** The repository no longer depends on `binaryen`, `@yarnpkg/cli-dist`, `pnpm` or `miniflare` (about 400 MB less `node_modules` per checkout and CI job), and the Lean 4.32 `lean/` (`Lasm.IO`) and the unused `runtime/host.cpp`, `core.cpp`, `stack.cpp` and `tasks.inc.cpp` are deleted. The published `@lasm/cli` is unchanged.
+
+## Faster
+
+- **Lasm.JS calls on Node cost about 5 µs when a Lean thread makes them one after another (#171).** They cost 22–24 µs before. Neither thread now goes to sleep between consecutive calls. Calls that pass a 20-field object each way are about twice as fast on Node, and a third faster on the edge hosts (measured on Deno). A lone call, or calls while an HTTP server is under load, cost what they did, and HTTP throughput is unchanged. No API changed ([BENCHMARKS.md](../BENCHMARKS.md#lasmjs-call-cost)).

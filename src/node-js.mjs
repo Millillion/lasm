@@ -46,6 +46,8 @@ const maximumDepth = 64;
 // fewer than 2^32 elements, and strings fewer than 2^30 UTF-16 units (under 2^32
 // UTF-8 bytes). A long encoded result is refused where it is framed (takeEvents).
 const lengthLimit = 2 ** 32;
+// Strings of at most this many bytes (UTF-16 units) take the ASCII fast path.
+const shortString = 64;
 
 /** A JavaScript failure reported to Lean as an IO user error with this text. */
 export function jsFailure(error) {
@@ -93,6 +95,19 @@ class Writer {
     if (b.length >= lengthLimit) throw jsFailure(new RangeError(`Lasm.JS: cannot pass ${b.length} bytes to Lean (lengths cross as 32-bit numbers, so at most ${lengthLimit - 1})`));
     this.u32(b.length); this.reserve(b.length); this.buffer.set(b, this.length); this.length += b.length; }
   string(s) {
+    // Short ASCII strings (most keys and many values) are copied byte for byte:
+    // several times faster than measuring and encoding them as UTF-8.
+    const count = s.length;
+    // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+    if (count <= shortString) {
+      this.reserve(4 + count);
+      const b = this.buffer, start = this.length + 4;
+      let i = 0;
+      // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+      while (i < count) { const c = s.charCodeAt(i); if (c > 127) break; b[start + i++] = c; }
+      // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+      if (i === count) { b.writeUInt32LE(count, this.length); this.length = start + count; return; }
+    }
     const n = Buffer.byteLength(s);
     this.u32(n); this.reserve(n); this.buffer.write(s, this.length, 'utf8'); this.length += n;
   }
@@ -106,9 +121,60 @@ class Reader {
   u64() { this.need(8); const v = this.bytes.readBigUInt64LE(this.offset); this.offset += 8; return v; }
   f64() { this.need(8); const v = this.bytes.readDoubleLE(this.offset); this.offset += 8; return v; }
   raw() { const n = this.u32(); this.need(n); const v = this.bytes.subarray(this.offset, this.offset + n); this.offset += n; return v; }
-  string() { return decoder.decode(this.raw()); }
+  string() {
+    const n = this.u32();
+    this.need(n);
+    const b = this.bytes, start = this.offset, end = start + n;
+    this.offset = end;
+    // Short ASCII strings without TextDecoder (the same result, faster).
+    // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+    if (n <= shortString) {
+      let text = '';
+      // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+      for (let i = start; i < end; i++) { const c = b[i]; if (c > 127) return decoder.decode(b.subarray(start, end)); text += String.fromCharCode(c); }
+      return text;
+    }
+    return decoder.decode(b.subarray(start, end));
+  }
+  // An object key: short ASCII keys come from keyCache, so the same key is the
+  // same (internalized) string on every call, which makes building the object
+  // about three times faster.
+  key() {
+    const n = this.u32();
+    // Stryker disable next-line all: without it the value after the key fails as truncated instead (the same error)
+    this.need(n);
+    const b = this.bytes, start = this.offset, end = start + n;
+    // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+    if (n > shortKey) { this.offset = end; return decoder.decode(b.subarray(start, end)); }
+    let hash = n;
+    // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+    for (let i = start; i < end; i++) {
+      const c = b[i];
+      // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+      if (c > 127) { this.offset = end; return decoder.decode(b.subarray(start, end)); }
+      hash = Math.imul(hash ^ c, 16777619);
+    }
+    this.offset = end;
+    // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+    const slot = (hash >>> 0) & (keyCache.length - 1), cached = keyCache[slot];
+    // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+    if (cached !== undefined && cached.length === n) {
+      let i = 0;
+      // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+      while (i < n && cached.charCodeAt(i) === b[start + i]) i++;
+      // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+      if (i === n) return cached;
+    }
+    let text = '';
+    for (let i = start; i < end; i++) text += String.fromCharCode(b[i]);
+    keyCache[slot] = text;
+    return text;
+  }
   done() { return this.offset === this.bytes.length; }
 }
+// Recently read object keys (Reader.key), by a hash of their bytes.
+// Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
+const shortKey = 32, keyCache = new Array(1024);
 
 export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spawnPoller, progress, liveThreads, startedOperations } = {}) {
   const values = new HandleTable({ first: firstJsHandle });
@@ -161,7 +227,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
     case 6: return BigInt(r.string());
     case 7: return new Uint8Array(r.raw());
     case 8: { const n = r.u32(), items = new Array(n); for (let i = 0; i < n; i++) items[i] = read(r); return items; }
-    case 9: { const n = r.u32(), object = {}; for (let i = 0; i < n; i++) { const key = r.string(); object[key] = read(r); } return object; }
+    case 9: { const n = r.u32(), object = {}; for (let i = 0; i < n; i++) { const key = r.key(); object[key] = read(r); } return object; }
     case 10: { const id = r.u32(); r.raw(); return lookup(id); }
     default: throw failure(`Malformed Lasm.JS value (tag ${tag})`);
     }

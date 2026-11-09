@@ -209,6 +209,33 @@ if (only.split(',').includes('js-sync-cost')) {
     r.code === 0 && !r.hung ? record.pass++ : r.hung ? record.hang++ : record.fail++;
     console.log(`js-sync-cost run ${i}:\n${r.stdout}${r.stderr.slice(-600)}`);
   }
+  // The edge build on Deno (Linux only): host calls are direct calls on one thread.
+  if (built && process.platform === 'linux') {
+    const deno = join(work, 'tools', 'node_modules', '.bin', 'deno');
+    try {
+      execFileSync(npm, ['install', '--prefix', join(work, 'tools'), '--no-audit', '--no-fund', 'deno@2.9.6'], { stdio: 'inherit' });
+      execFileSync(process.execPath, [lasm, 'build', 'Main.lean', '--target', 'deno'], { cwd: dir, stdio: 'inherit', env: { ...process.env, CI: '1' } });
+      const edge = record.deno = { pass: 0, fail: 0, runs: [] };
+      for (let i = 0; i < 3; i++) {
+        const r = await once(deno, ['run', '-A', '--no-lock', join(dir, 'deno', 'main.mjs')], dir, join(work, 'hangs', `js-sync-cost-deno-${i}`));
+        edge.runs.push(r.stdout);
+        r.code === 0 && !r.hung ? edge.pass++ : edge.fail++;
+        console.log(`js-sync-cost (Deno) run ${i}:\n${r.stdout}${r.stderr.slice(-600)}`);
+      }
+    } catch (error) { console.log(`js-sync-cost (Deno): ${error.message}`); record.denoError = error.message; }
+  }
+  // HTTP through Lasm.JS (Hono and Express handlers) and the interop latencies
+  // of the release benchmarks (bench/run.mjs), for the same comparison (Linux only).
+  if (built && process.platform === 'linux' && tgz.endsWith('.tgz')) {
+    try {
+      execFileSync(npm, ['ci', '--no-audit', '--no-fund'], { cwd: join(root, 'bench'), stdio: 'inherit' });
+      const benchOut = join(work, 'bench.json');
+      execFileSync(process.execPath, [join(root, 'bench/run.mjs'), tgz, join(work, 'bench'), benchOut], { stdio: 'inherit',
+        env: { ...process.env, BENCH_PHASES: 'build,http,interop', BENCH_BUILD_REPS: '1', BENCH_LOAD_REPS: '3', BENCH_LOAD_SECONDS: '8' } });
+      record.bench = JSON.parse(readFileSync(benchOut, 'utf8'));
+      for (const [key, m] of Object.entries(record.bench.metrics ?? {})) if (/^(http|interop)\./.test(key)) console.log(`bench ${key}: ${m.value} ${m.unit} (${m.spread ? `${m.spread.min}–${m.spread.max}, n=${m.spread.n}` : ''})`);
+    } catch (error) { console.log(`js-sync-cost (bench): ${error.message}`); record.benchError = error.message; }
+  }
   save();
 }
 if (want('js-interop')) {

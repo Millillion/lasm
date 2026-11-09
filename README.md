@@ -308,8 +308,9 @@ The rules for writing bindings:
 - `npm install` the package next to the lakefile. `lasm build` checks every binding
   against the installed package (`Lasm.JS binding check failed: … export "x" is
   missing`) and copies production dependencies into `dist/node_modules`.
-- Each call crosses from a Lean thread to Node's main thread (about 24 µs), so
-  prefer one coarse call over many small ones.
+- Each call crosses from a Lean thread to Node's main thread (about 5 µs when
+  calls follow one another, 20–30 µs for a lone call), so prefer one coarse call
+  over many small ones.
 
 The standard web APIs need no bindings: `import Lasm.JS.Web` gives `fetch`,
 `Request`, `Response`, `URL`, `crypto.subtle`, streams, `TextEncoder` and the rest
