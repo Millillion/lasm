@@ -92,17 +92,14 @@ Linux, macOS and Windows; WASI on wasmtime and `node:wasi`; the edge output on
 Deno, Node, Bun and SpiderMonkey); the browser suite and the Workers checks
 recurse 5,000 frames.
 
-### Async loops on the portable runtime
+### Async loops on the portable runtime (no longer a limit)
 
-On the portable runtime (Bun, Deno and the edge targets; the browser shares
-the runtime but is not measured), an
-`Async` loop of steps that complete at once nests on the JavaScript stack and
-fails with `RangeError: Maximum call stack size exceeded`. Such steps are
-synchronous host calls, `IO` actions and `pure` values. The limit is 2,001 steps
-on Deno, 8,099 on Bun and 1,855 on workerd (CI run 41846096224); Node has no
-such limit. The cause is that `Async`'s bind runs a ready step at once, on the
-engine's single stack. Steps that really wait (awaited host calls,
-`Std.Async.sleep`) have no limit. The workaround is to call
-`Std.Async.sleep 0` every 100 steps, or batch the work into fewer host calls.
-See [EDGE.md: Async loops](docs/EDGE.md#async-loops-of-steps-that-complete-at-once-issue-90).
-`scripts/ci/async-depth.mjs` checks these limits on every pull request.
+An `Async` loop of steps that complete at once (synchronous host calls, `IO`
+actions, `pure` values) used to nest on the JavaScript stack of the portable
+runtime (Bun, Deno, the edge targets, browsers) and overflow after about 1,855
+(workerd) to 8,099 (Bun) steps. Lasm's link now bounds that nesting
+(`library/c/lasm_async.c`), so these loops run at any length on every target.
+`scripts/ci/async-depth.mjs` checks 1,000,000 steps on Node, Deno, Bun and
+workerd on every pull request, and the browser suite checks them in Chromium,
+Firefox and WebKit. See
+[EDGE.md: Async loops](docs/EDGE.md#async-loops-of-steps-that-complete-at-once-issue-90).
