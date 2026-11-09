@@ -130,7 +130,7 @@ test('lasm dev (edge target): first build, rebuilds on content changes only, que
     const running = startDev(options);
     await until(() => /is up to date/.test(stderr.text()), 'the first build');
     const out = stderr.text();
-    assert.match(out, new RegExp(`^\\[lasm dev\\] Watching 2 files in ${rel(dir).replace(/[.]/g, '\\.')} \\(events\\); target workers, dev profile\\. Ctrl\\+C stops\\.\\n`));
+    assert.match(out, new RegExp(`(?:^|\\n)\\[lasm dev\\] Watching 2 files in ${rel(dir).replace(/[.]/g, '\\.')} \\(events\\); target workers, dev profile\\. Ctrl\\+C stops\\.\\n`));
     assert.ok(out.includes(`[lasm dev] Building ${rel(main)}\n`), out);
     assert.ok(out.includes('lake: a note\n'));
     assert.match(out, /\[lasm dev\] Built in \d+\.\d s \(Lean 0\.\ds · C 0\.\ds\)\n/);

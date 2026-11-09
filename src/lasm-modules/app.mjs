@@ -27,6 +27,8 @@ export function lasmInstance(context) {
   const ports = new Map();
   let disposed = false;
   const settle = (value) => Promise.resolve(value);
+  // A handler that throws rejects the sender's promise (it is not thrown at the sender, or at Lean).
+  const attempt = (fn, value) => { try { return Promise.resolve(fn(value)); } catch (error) { return Promise.reject(error); } };
   function makePort(name) {
     let port = ports.get(name);
     if (port) return port;
@@ -42,7 +44,7 @@ export function lasmInstance(context) {
         send(value) {
           if (disposed) throw new Error(`Lasm app port ${name}: the app is unmounted`);
           if (!handlers.length) { queued.push(value); return settle(undefined); }
-          return Promise.all(handlers.map(fn => fn(value))).then(() => undefined);
+          return Promise.all(handlers.map(fn => attempt(fn, value))).then(() => undefined);
         },
         subscribe(fn) {
           if (typeof fn !== 'function') throw new TypeError(`Lasm app port ${name}: subscribe needs a function`);
@@ -66,7 +68,7 @@ export function lasmInstance(context) {
     deliver(message) {
       if (disposed) return Promise.reject(new Error('The Lasm app is unmounted'));
       if (!handler) { return new Promise((resolve, reject) => inbox.push({ message, resolve, reject })); }
-      return settle(handler(message)).then(() => undefined);
+      return attempt(handler, message).then(() => undefined);
     },
     ports: new Proxy({}, {
       get: (_, name) => typeof name === 'string' ? makePort(name).js : undefined,
@@ -87,7 +89,7 @@ export function lasmInstance(context) {
     port: name => { const p = makePort(String(name)); return { emit: value => p.emit(value), listen: fn => p.listen(fn) }; },
     onMessage: fn => {
       handler = fn;
-      for (const { message, resolve, reject } of inbox.splice(0)) settle(fn(message)).then(() => resolve(undefined), reject);
+      for (const { message, resolve, reject } of inbox.splice(0)) attempt(fn, message).then(() => resolve(undefined), reject);
     },
     onUnmount: fn => { unmountHandlers.push(fn); },
     report: error => (context.report ?? console.error)(error),

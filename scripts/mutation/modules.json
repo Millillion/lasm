@@ -71,13 +71,13 @@
       "name": "dev",
       "description": "lasm dev: the watch loop, the dev proxy, the build workers, the browser dev server and static server",
       "mutate": ["src/dev.mjs", "src/dev-proxy.mjs", "src/dev-build-worker.mjs", "src/application-build-worker.mjs", "src/browser/browser-dev.mjs", "src/browser/static-server.mjs"],
-      "tests": ["test/dev-watch.test.mjs", "test/dev-proxy.test.mjs", "test/dev-units.test.mjs", "test/dev-run.test.mjs", "test/static-server.test.mjs", "test/dev-build-service.test.mjs", "test/browser.test.mjs", "test/cli-arguments.test.mjs"]
+      "tests": ["test/dev-watch.test.mjs", "test/dev-proxy.test.mjs", "test/dev-units.test.mjs", "test/dev-run.test.mjs", "test/build-workers.test.mjs", "test/static-server.test.mjs", "test/dev-build-service.test.mjs", "test/browser.test.mjs", "test/cli-arguments.test.mjs"]
     },
     {
       "name": "browser",
       "description": "Browser builds: the browser build and package, the bundler, the page loader, the lasm:app and lasm:web modules, the Vite plugin",
       "mutate": ["src/browser/browser-build.mjs", "src/browser/browser-package.mjs", "src/browser/bundle.mjs", "src/browser/loader.mjs", "src/lasm-modules/app.mjs", "src/lasm-modules/web.mjs", "src/vite/index.mjs"],
-      "tests": ["test/browser.test.mjs", "test/dev-build-service.test.mjs", "test/notices.test.mjs"]
+      "tests": ["test/browser.test.mjs", "test/browser-loader.test.mjs", "test/browser-output.test.mjs", "test/lasm-web.test.mjs", "test/vite-plugin.test.mjs", "test/dev-build-service.test.mjs", "test/notices.test.mjs"]
     },
     {
       "name": "application-sources",

@@ -183,7 +183,7 @@ const drawOps = {
 /** Runs drawing commands [name, ...arguments] in one crossing. */
 export function draw(context, commands) {
   for (const [name, ...args] of commands) {
-    const op = drawOps[name];
+    const op = Object.hasOwn(drawOps, name) ? drawOps[name] : undefined;
     if (!op) throw new Error(`Lasm.Web.Canvas: unknown drawing command ${JSON.stringify(name)}`);
     op(context, ...args);
   }
@@ -219,7 +219,9 @@ function createTracking(context) {
     if (disposed) return undefined;
     try {
       const result = fn(...args);
-      if (result && typeof result.then === 'function') result.then(undefined, report);
+      // A rejection is reported here; the promise handed back no longer rejects
+      // (Node's EventTarget would make a rejected listener result an uncaught exception).
+      if (result && typeof result.then === 'function') return result.then(undefined, report);
       return result;
     } catch (error) { report(error); return undefined; }
   };
