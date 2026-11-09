@@ -232,3 +232,11 @@ test('only a git that exits 0 and prints its version counts', { skip: process.pl
   chmodSync(join(env, 'bin/git'), 0o755);
   assert.equal(findSystemGit({ PATH: join(env, 'bin'), LASM_MARK: 'marked' }).version, 'git version marked');
 });
+
+test('Windows: git.cmd and git.bat count too, under the Path variable whatever comes first', { skip: process.platform === 'win32' }, t => {
+  // POSIX stand-ins named as on Windows (a .cmd or .bat runs through the shell there, and through sh here).
+  const directory = project(t, { 'cmd/git.cmd': 'echo "git version cmd"\n', 'bat/git.bat': 'echo "git version bat"\n' });
+  chmodSync(join(directory, 'cmd/git.cmd'), 0o755); chmodSync(join(directory, 'bat/git.bat'), 0o755);
+  assert.equal(findSystemGit({ HOME: 'x', Path: join(directory, 'cmd') }, 'win32').version, 'git version cmd');
+  assert.equal(findSystemGit({ Path: join(directory, 'bat') }, 'win32').version, 'git version bat');
+});

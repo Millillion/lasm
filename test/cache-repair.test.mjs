@@ -115,9 +115,11 @@ test('a quarantine path that cannot be cleared leaves the damaged tool in place,
   await writeFile(join(damaged.directory, 'out'), 'changed');
   const quarantine = join(f.cache, 'derived', '.repair-' + damaged.identity);
   await writeFile(quarantine, 'a file where the quarantine directory would go');
-  const result = await repairManagedCache({ cache: f.cache, log() {} });
+  const logs = [];
+  const result = await repairManagedCache({ cache: f.cache, log: line => logs.push(line) });
   assert.deepEqual(result.removed, []);
   assert.ok(result.pending.includes(quarantine));
+  assert.equal(logs.filter(line => line.startsWith(`[lasm] Temporary cleanup pending at ${quarantine}`)).length, 2, 'both refusals are logged to the caller');
   assert.equal(result.pending.filter(path => path === quarantine).length, 2, 'once as stale staging, once as the blocked quarantine');
   assert.equal(await readFile(join(damaged.directory, 'out'), 'utf8'), 'changed', 'the damaged tool is not moved or deleted');
 });

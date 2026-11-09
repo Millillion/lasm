@@ -323,3 +323,37 @@ if (process.argv[2] !== '-arch' || process.argv[3] !== 'arm64') { console.error(
   await assert.rejects(assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.bin, label: 'bin' }, { artifact: plain, label: 'c' }], { ...f.options, fetch, platform: 'darwin', arch: 'arm64' }),
     error => error.message.startsWith(`The macOS SDK at ${sdk} has a libSystem.tbd that Lean 9.9.9's linker (ld64.lld) cannot read: Unsupported TAPI stub: no target or architecture list.`));
 });
+
+test('cached-only reuses an assembled prefix; explicit core ignores a lakefile; progress is optional', { skip: !posix }, async t => {
+  const f = await fixture(t);
+  await provisionLean(f.main, { ...f.options, modules: 'core' });
+  const again = await provisionLean(f.main, { ...f.options, modules: 'core', cachedOnly: true });
+  assert.equal(again.cacheHit, true);
+  await writeFile(join(f.project, 'lakefile.toml'), 'name = "p"\n');
+  assert.equal((await provisionLean(f.main, { ...f.options, modules: 'core' })).tier, 'core');
+  await rm(join(f.project, 'lakefile.toml'));
+  const { progress, ...quiet } = f.options; void progress;
+  assert.equal((await provisionLean(f.main, quiet)).tier, 'core', 'auto, without a progress callback');
+  const { assembleLeanPrefix } = await import('../src/managed-lean.mjs');
+  await assembleLeanPrefix('4.35.0', f.release, [{ artifact: f.bin, label: 'bin' }], quiet);
+  const g = await fixture(t);
+  await provisionLean(g.main, { ...g.options, distribution: 'full' });
+  assert.ok(g.stages.includes('Downloading Lean 9.9.9 and Lake'));
+});
+
+test('a C tier that ships other files in lib/libc still gets the SDK stub', { skip: !posix || process.platform === 'darwin' }, async t => {
+  const f = await fixture(t);
+  const { assembleLeanPrefix } = await import('../src/managed-lean.mjs');
+  const sdk = join(f.base, 'MacOSX.sdk');
+  await mkdir(join(sdk, 'usr/include'), { recursive: true }); await mkdir(join(sdk, 'usr/lib'), { recursive: true });
+  await writeFile(join(sdk, 'usr/include/stdio.h'), '');
+  await writeFile(join(sdk, 'usr/lib/libSystem.tbd'), '--- !tapi-tbd\ntargets: [ arm64-macos ]\ninstall-name: /usr/lib/libSystem.B.dylib\n...\n');
+  const saved = process.env.SDKROOT;
+  process.env.SDKROOT = sdk;
+  t.after(() => { if (saved === undefined) delete process.env.SDKROOT; else process.env.SDKROOT = saved; });
+  const other = await tierArchive('lean-9.9.9-other-c', { 'lib/libc/libc.tbd': 'other stub' });
+  const fetch = async url => url === other.artifact.url ? new Response(other.bytes) : f.options.fetch(url);
+  const prefix = await assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.bin, label: 'bin' }, { artifact: other.artifact, label: 'c' }], { ...f.options, fetch, platform: 'darwin', arch: 'arm64' });
+  assert.match(await readFile(join(prefix.directory, 'lib/libc/libSystem.tbd'), 'utf8'), /arm64-macos/);
+  assert.equal(await readFile(join(prefix.directory, 'lib/libc/libc.tbd'), 'utf8'), 'other stub');
+});

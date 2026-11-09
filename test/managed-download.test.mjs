@@ -676,3 +676,28 @@ test('the final error keeps the failure that ended the download, else the last a
 test('a constructor without a prototype is no dispatcher class', () => {
   assert.equal(attemptDispatcher({ constructor: () => {} }), undefined);
 });
+
+test('callers may omit every hook', async t => {
+  const f = await fixture(t);
+  let n = 0;
+  await downloadArtifact(artifact, f.file, { policy, random: () => 0, sleep: async () => {},
+    fetch: async () => ++n === 1 ? new Response('', { status: 503 }) : new Response(bytes) });
+  assert.deepEqual(await readFile(f.file), bytes);
+  // A cancellation before the first attempt has no attempt's code to fall back on.
+  const error = await failure(downloadArtifact(artifact, f.file, { policy, signal: AbortSignal.abort(new Error('stopped')), fetch: async () => assert.fail('no request') }));
+  assert.equal(error.code, undefined);
+});
+
+test('a body that sends nothing after its headers is an idle stall', async t => {
+  const f = await fixture(t);
+  const error = await failure(downloadArtifact(artifact, f.file, { ...f.options, policy: { ...policy, attempts: 1, idleMs: 20 },
+    fetch: async () => new Response(new ReadableStream({ start() {} })) }));
+  assert.equal(diagnosticOf(error), 'LASM_IDLE_TIMEOUT: Download stopped receiving data');
+});
+
+test('time already spent counts against the budget for Retry-After', async t => {
+  const f = await fixture(t);
+  const error = await failure(downloadArtifact(artifact, f.file, { ...f.options, policy: { ...policy, totalMs: 10_030 },
+    fetch: async () => { await delay(60); return new Response('', { status: 503, headers: { 'retry-after': '10' } }); } }));
+  assert.equal(error.code, 'LASM_TOTAL_TIMEOUT');
+});

@@ -406,3 +406,37 @@ test('only a regular file member is the archive', async t => {
   const run = async (npm, args) => { await writeFile(join(args[args.indexOf('--pack-destination') + 1], 'p.tgz'), tgz); return ''; };
   await assert.rejects(fetchNpmPackage({ ...entry, integrity: integrity(tgz) }, join(base, 'w'), { npm: {}, run }), { message: `npm package ${npmSpec(entry)} lacks ${entry.file}` });
 });
+
+test('integrity and platform fields are anchored; npm_execpath names npm-cli.js or npx-cli.js exactly', () => {
+  const good = 'sha512-' + 'A'.repeat(86) + '==';
+  for (const change of [{ integrity: 'x' + good }, { integrity: good + 'x' }, { platform: 'xlinux-x64' }, { platform: 'linux-x64x' }])
+    assert.throws(() => validateNpmToolManifest({ schema: 1, artifacts: { [sha]: { ...entry, ...change } } }), /Invalid npm tool manifest entry/, JSON.stringify(change));
+  assert.equal(findNpm({ env: { npm_execpath: '/q/npm-cli.jsx' }, execPath: '/n/bin/node', platform: 'linux', exists: file => file === '/q/npm-cli.js' }), null);
+});
+
+test('npm failures keep only the last six lines of its messages', { skip: process.platform === 'win32' }, async t => {
+  const base = await scratch(t);
+  const script = join(base, 'npm-cli.js');
+  await writeFile(script, "for (let i = 1; i <= 8; i++) console.error('line ' + i); process.exit(5);\n");
+  await assert.rejects(fetchNpmPackage(entry, join(base, 'w'), { npm: { command: process.execPath, args: [script] }, cwd: base }),
+    { message: 'npm pack failed (5): line 3 | line 4 | line 5 | line 6 | line 7 | line 8' });
+});
+
+test('a link named like the archive is not the archive', { skip: process.platform === 'win32' }, async t => {
+  const base = await scratch(t);
+  const { symlink } = await import('node:fs/promises');
+  await mkdir(join(base, 'src/package'), { recursive: true });
+  await writeFile(join(base, 'src/package/real'), 'x');
+  await symlink('real', join(base, 'src/package', entry.file));
+  const file = join(base, 'link.tgz');
+  await createTar({ cwd: join(base, 'src'), file, gzip: true, portable: true }, ['package']);
+  const tgz = await readFile(file);
+  const run = async (npm, args) => { await writeFile(join(args[args.indexOf('--pack-destination') + 1], 'p.tgz'), tgz); return ''; };
+  await assert.rejects(fetchNpmPackage({ ...entry, integrity: integrity(tgz) }, join(base, 'w'), { npm: {}, run }), { message: `npm package ${npmSpec(entry)} lacks ${entry.file}` });
+});
+
+test('only loopback registries may use plain HTTP', async t => {
+  const base = await scratch(t);
+  await assert.rejects(fetchNpmPackage(entry, join(base, 'w'), { npm: null, registryFallback: true, env: { npm_config_registry: 'ftp://localhost/' }, fetch: async () => assert.fail('no request') }),
+    /credential-free HTTPS/);
+});
