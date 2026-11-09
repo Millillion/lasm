@@ -224,6 +224,18 @@ if (only.split(',').includes('js-sync-cost')) {
       }
     } catch (error) { console.log(`js-sync-cost (Deno): ${error.message}`); record.denoError = error.message; }
   }
+  // HTTP through Lasm.JS (Hono and Express handlers) and the interop latencies
+  // of the release benchmarks (bench/run.mjs), for the same comparison (Linux only).
+  if (built && process.platform === 'linux' && tgz.endsWith('.tgz')) {
+    try {
+      execFileSync(npm, ['ci', '--no-audit', '--no-fund'], { cwd: join(root, 'bench'), stdio: 'inherit' });
+      const benchOut = join(work, 'bench.json');
+      execFileSync(process.execPath, [join(root, 'bench/run.mjs'), tgz, join(work, 'bench'), benchOut], { stdio: 'inherit',
+        env: { ...process.env, BENCH_PHASES: 'build,http,interop', BENCH_BUILD_REPS: '1', BENCH_LOAD_REPS: '3', BENCH_LOAD_SECONDS: '8' } });
+      record.bench = JSON.parse(readFileSync(benchOut, 'utf8'));
+      for (const [key, m] of Object.entries(record.bench.metrics ?? {})) if (/^(http|interop)\./.test(key)) console.log(`bench ${key}: ${m.value} ${m.unit} (${m.spread ? `${m.spread.min}–${m.spread.max}, n=${m.spread.n}` : ''})`);
+    } catch (error) { console.log(`js-sync-cost (bench): ${error.message}`); record.benchError = error.message; }
+  }
   save();
 }
 if (want('js-interop')) {
