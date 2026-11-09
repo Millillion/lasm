@@ -61,6 +61,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 ## Now (November 2026)
 
 - [x] Conduit: requests isolated on node:sqlite and bun:sqlite (issue #59; reads saw other requests' writes half done).
+- [x] Standard bindings, tier 1 (Jordan, 2026-11-09): `Lasm.JS.Web`, the WinterTC Minimum Common Web API generated from WebIDL (`scripts/bindings/generate-web.mjs`, pinned `@webref/idl`), with a conformance program (WPT URL and urlencoded data, Lean's UTF-8 as oracle, Web Crypto vectors, generated round trips) on Node 26 and 24, Bun, Deno, Workers and Chromium (`web-bindings.yml`), PR #172 ([JS_BINDINGS.md](docs/JS_BINDINGS.md#standard-bindings-lasmjsweb)). Next tiers: `Lasm.JS.Node`, `Lasm.JS.Deno`, `Lasm.JS.Bun`, `Lasm.JS.Cloudflare`; `Lasm.Web` stays until Jordan reviews its retirement.
 - [x] Lasm.JS synchronous callbacks (approved 2026-11-04, for 0.5.0; PR #122): every wait there that needs Node fails at once instead of never finishing (a task making host calls, `.block`, a timer, DNS lookup or socket read started inside); `Value.toTask` without waiting works.
 
 ### Releases

@@ -17,6 +17,7 @@ of the response to any request (Workers allow timers and I/O only inside one).
 import Lasm.JS
 import Lasm.JS.Web
 import Wpt
+import Surface
 open Lasm.JS Lasm.JS.Web
 
 /-! Reporting -/
@@ -834,6 +835,32 @@ def wasmCompile (r : Checks) : Async Unit := do
   expect r "instantiate bytes" ((← src.instance.exports).field "add" matches .ref _ _) ""
   expect r "compile rejects invalid bytes" (← throws (WebAssembly.compile (bytesOf [0, 1, 2, 3]))) ""
 
+/-! Availability: which generated members this runtime lacks (reported, never a failure) -/
+
+@[js "globalThis" "Reflect.has"] opaque reflectHas : Value → String → IO Bool
+
+def availability (r : Checks) : Async Unit := do
+  let .object entries ← jsonParse Surface.json | throw (IO.userError "the surface is not an object")
+  let g ← Lasm.JS.global
+  let mut missing : Array String := #[]
+  for (path, info) in entries do
+    let mut cur : Option Value := some g
+    for k in path.splitOn "." do
+      if let some o := cur then
+        cur ← if ← reflectHas o k then some <$> o.get k Value else pure none
+    match cur with
+    | none => missing := missing.push path
+    | some v =>
+      let names (key : String) : Array String := match info.field key with | .array xs => xs.map str | _ => #[]
+      for m in names "namespace" ++ names "static" do
+        unless ← reflectHas v m do missing := missing.push s!"{path}.{m}"
+      let proto := names "prototype"
+      unless proto.isEmpty do
+        let p ← v.get "prototype" Value
+        for m in proto do
+          unless ← reflectHas p m do missing := missing.push s!"{path}.prototype.{m}"
+  r.modify fun s => { s with lines := (s.lines ++ missing.map (s!"missing {·}")).push s!"availability: {missing.size} generated members missing" }
+
 /-! Running -/
 
 def checks : Async (String × Nat) := do
@@ -841,7 +868,8 @@ def checks : Async (String × Nat) := do
   for (name, body) in [("url", urls r), ("searchParams", searchParams r), ("urlPattern", urlPattern r), ("encoding", encoding r),
       ("globals", globals r), ("timers", timers r), ("events", events r), ("aborting", aborting r), ("messaging", messaging r),
       ("fetch", fetching r), ("files", files r), ("streams", streams r), ("compression", compression r),
-      ("crypto", cryptography r), ("wasmValidate", wasmValidate r), ("wasmCompile", wasmCompile r)] do
+      ("crypto", cryptography r), ("wasmValidate", wasmValidate r), ("wasmCompile", wasmCompile r),
+      ("availability", availability r)] do
     runSection r name body
   let s ← r.get
   return ("\n".intercalate (s.lines.push s!"summary {s.passed} {s.failed}").toList ++ "\n", s.failed)

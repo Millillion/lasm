@@ -29,7 +29,6 @@
         "preventDefault",
         "defaultPrevented",
         "composed",
-        "isTrusted",
         "timeStamp",
         "initEvent"
       ]

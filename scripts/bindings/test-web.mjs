@@ -106,7 +106,9 @@ function judge(target, stdout) {
   const unexpected = failures.filter(f => !Object.keys(allowed).some(p => matches(f.name, p)));
   const stale = Object.keys(allowed).filter(p => !failures.some(f => matches(f.name, p)));
   const sections = [...stdout.matchAll(/^section (\S+): (\d+) passed, (\d+) failed$/gm)].map(m => ({ name: m[1], passed: +m[2], failed: +m[3] }));
-  return { summary: summary && { passed: +summary[1], failed: +summary[2] }, failures, unexpected, stale, sections };
+  // Generated members this runtime lacks: reported (docs/JS_BINDINGS.md), never a failure.
+  const missing = stdout.split('\n').filter(l => l.startsWith('missing ')).map(l => l.slice(8));
+  return { summary: summary && { passed: +summary[1], failed: +summary[2] }, failures, unexpected, stale, sections, missing };
 }
 
 rmSync(work, { recursive: true, force: true });
@@ -147,8 +149,14 @@ for (const target of targets) {
   if (result.error) console.log(`  ${result.error.split('\n').join('\n  ')}`);
 }
 if (values.report) writeFileSync(values.report, JSON.stringify(results, null, 1) + '\n');
+// Availability: which targets lack each generated member that some target lacks.
+const lacking = new Map();
+for (const r of results) for (const m of r.missing ?? []) lacking.set(m, [...(lacking.get(m) ?? []), r.target]);
+const availability = [...lacking].sort(([a], [b]) => a.localeCompare(b)).map(([member, where]) => `| \`${member}\` | ${where.join(', ')} |`);
+console.log(`\nGenerated members missing on some target (${lacking.size}):`);
+for (const [member, where] of [...lacking].sort(([a], [b]) => a.localeCompare(b))) console.log(`  ${member}: ${where.join(', ')}`);
 if (process.env.GITHUB_STEP_SUMMARY) {
   const rows = results.map(r => `| ${r.target} | ${r.pass ? 'pass' : '**fail**'} | ${r.summary ? `${r.summary.passed} / ${r.summary.failed}` : '–'} | ${r.failures ? r.failures.length - r.unexpected.length : '–'} | ${r.buildMs !== undefined ? (r.buildMs / 1000).toFixed(1) + ' s' : '–'} | ${r.outputBytes ? (r.outputBytes / 1048576).toFixed(2) + ' MiB' : '–'} |`);
-  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## Lasm.JS.Web conformance\n\n| Target | Result | Passed / failed checks | Known deviations | Build | Output |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n`);
+  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## Lasm.JS.Web conformance\n\n| Target | Result | Passed / failed checks | Known deviations | Build | Output |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\n### Generated members a runtime lacks\n\n| Member | Missing on |\n| --- | --- |\n${availability.join('\n')}\n`);
 }
 process.exit(ok ? 0 : 1);

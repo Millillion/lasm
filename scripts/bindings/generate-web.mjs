@@ -843,13 +843,28 @@ for (const m of plan) {
     surface[jsPath(i)] = {
       module: m.name,
       static: [...new Set(members.filter(x => x.special === 'static' && x.name).map(x => x.name))],
-      prototype: [...new Set(members.filter(x => x.special !== 'static' && (x.type === 'operation' || x.type === 'attribute') && x.name).map(x => x.name))],
+      // [LegacyUnforgeable] attributes are own properties of each instance, not of the prototype.
+      prototype: [...new Set(members.filter(x => x.special !== 'static' && (x.type === 'operation' || x.type === 'attribute') && x.name
+        && !extAttr(x, 'LegacyUnforgeable')).map(x => x.name))],
     };
   }
   for (const g of m.globals) surface[g] = { module: m.name, global: true };
   for (const n of m.namespaces) surface[n] = { module: m.name, namespace: [...new Set(def(n).members.filter(exposedToWorkers).map(x => x.name))] };
 }
 files.set(join(root, 'scripts', 'bindings', 'web-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion})`, surface }, null, 2) + '\n');
+
+// The same surface as Lean data for the conformance program's availability probe.
+files.set(join(root, 'test', 'fixtures', 'js-web', 'Surface.lean'), `/-
+${generatedBy}
+The generated surface (scripts/bindings/web-surface.json), for the availability probe of Main.lean.
+-/
+namespace Surface
+
+/-- \`{path: {static?, prototype?, global?, namespace?}}\` for every generated interface, global and namespace. -/
+def json : String := r#"${JSON.stringify(surface)}"#
+
+end Surface
+`);
 
 let stale = [];
 for (const [file, text] of files) {
