@@ -8,11 +8,13 @@
 // are checked by the integration and platform workflows.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, utimesSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync, utimesSync } from 'node:fs';
 import { join, basename } from 'node:path';
 import { runInNewContext } from 'node:vm';
 import { linkApplication, selectedLinkDriver, configurableThreadPool, initializerStubs, archiveUnitCache, shippedAnalysisDirectory,
-  linkDrivers, buildProfiles, defaultLinkDriver, readStoreEntry, relabelPreJs, sharedStoreLimits } from '../src/application-link.mjs';
+  linkDrivers, buildProfiles, defaultLinkDriver, readStoreEntry, writeStoreEntry, pruneSharedStore, relabelPreJs, sharedStoreLimits } from '../src/application-link.mjs';
+import { createHash } from 'node:crypto';
+import { glueLinkFlags } from '../src/lasm-library.mjs';
 import { responseFile } from '../src/platform.mjs';
 import { compactInitializerWrappers } from '../src/edge/edge-initializers.mjs';
 import { project, emccSdk, nodeSdk, writeRuntime, mainModule, helperModule, specializedIdentity } from './fixtures/link-stand-ins/application.mjs';
@@ -169,7 +171,8 @@ test('runtime evaluation, plugin loading and module-data access are rejected; an
     if (tool === 'em++' && readFileSync(args[0].slice(1), 'utf8').includes('--why-extract')) throw new Error('why-extract failed');
     return execute(tool, args, options);
   };
-  await assert.rejects(build(r, { sdk: failing }), error => error.code === 'ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE' && !/Required by/.test(error.message));
+  await assert.rejects(build(r, { sdk: failing }), error => error.code === 'ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE' && !/Required by/.test(error.message)
+    && /runtime Lean module-data access: lean_read_module_data\.\nMove this operation to build time/.test(error.message));
 });
 
 test('a C entry point `int main(void)` gets an argc/argv entry of its own', { skip: !posix }, async () => {
@@ -536,4 +539,81 @@ test('the shared store stays within its bound after a build, keeping this build\
   const names = readdirSync(sharedCache);
   assert.equal(names.length, 600);
   assert.ok(names.some(name => /^probe-/.test(name)) && names.some(name => /^[0-9a-f]{64}\.o$/.test(name)));
+});
+
+test('the shared store keeps this build\'s entries even when other entries look newer', { skip: !posix }, async () => {
+  // Entries copied from a machine whose clock is ahead: the bound removes them, never this build's.
+  const p = project({ runtime: { identity: specializedIdentity } });
+  const sharedCache = join(p.base, 'shared');
+  mkdirSync(sharedCache);
+  const future = new Date(Date.UTC(2100, 0, 1));
+  for (let index = 0; index < 650; index++) { const file = join(sharedCache, `future-${index}.o`); writeFileSync(file, ''); utimesSync(file, future, future); }
+  await build(p, { sharedCache, linkOnly: true, initialization: 'all' });
+  const names = readdirSync(sharedCache);
+  assert.equal(names.length, 600);
+  const own = names.filter(name => !name.startsWith('future-'));
+  assert.ok(own.some(name => /^probe-/.test(name)) && own.some(name => /^[0-9a-f]{64}\.o$/.test(name)));
+  // The next build of the same program in a new work directory compiles none of Lasm's generated C.
+  const toolchain = emccSdk(p.base);
+  await build({ ...p, work: join(p.base, 'work-2') }, { sdk: toolchain, sharedCache, linkOnly: true, initialization: 'all' });
+  const compiled = toolchain.calls.filter(call => call.tool === 'emcc').map(call => basename(call.args.at(-3)));
+  assert.deepEqual(compiled, ['Main.c', 'Helper.c']);
+});
+
+test('store entries: the magic, the SHA-256 of the content, then the content; damaged entries are removed', () => {
+  const directory = join(project().base, 'store');
+  mkdirSync(directory);
+  const entry = join(directory, 'entry.o'), content = Buffer.from('object bytes');
+  writeStoreEntry(entry, content);
+  const data = readFileSync(entry);
+  assert.deepEqual(data, Buffer.concat([Buffer.from('LASMSTO1'), createHash('sha256').update(content).digest(), content]));
+  assert.deepEqual(readStoreEntry(entry), content);
+  assert.deepEqual(readdirSync(directory), ['entry.o'], 'written atomically: no partial file is left');
+  // One changed byte of the content: the entry no longer reads, and is removed.
+  const damaged = Buffer.from(data);
+  damaged[damaged.length - 1] ^= 1;
+  writeFileSync(entry, damaged);
+  assert.equal(readStoreEntry(entry), undefined);
+  assert.equal(existsSync(entry), false);
+  // A foreign file of the same size, a truncated entry, an empty content.
+  writeFileSync(entry, Buffer.concat([Buffer.from('LASMSTO0'), data.subarray(8)]));
+  assert.equal(readStoreEntry(entry), undefined);
+  writeFileSync(entry, data.subarray(0, 20));
+  assert.equal(readStoreEntry(entry), undefined);
+  writeStoreEntry(entry, Buffer.alloc(0));
+  assert.deepEqual(readStoreEntry(entry), Buffer.alloc(0));
+  assert.equal(readStoreEntry(join(directory, 'missing.o')), undefined);
+});
+
+test('pruning the shared store: oldest first, this build\'s entries and files being written are kept', () => {
+  const directory = join(project().base, 'shared');
+  mkdirSync(directory);
+  const file = (name, year, size = 1) => { const path = join(directory, name); writeFileSync(path, Buffer.alloc(size)); utimesSync(path, new Date(Date.UTC(year, 0, 1)), new Date(Date.UTC(year, 0, 1))); return path; };
+  // Another process is writing an entry (the oldest file here): it is neither counted nor removed.
+  file('entry.o.1.0.0.partial', 2000);
+  const used = file('used.o', 2001);
+  file('a.o', 2002); file('b.o', 2003); file('c.o', 2004);
+  // An entry that disappears while the store is pruned (here: a link to nothing) is skipped.
+  if (posix) symlinkSync(join(directory, 'gone.o'), join(directory, 'dangling.o'));
+  pruneSharedStore(directory, new Set([used]), { entries: 3, bytes: 1000 });
+  assert.deepEqual(readdirSync(directory).filter(name => name !== 'dangling.o').sort(), ['b.o', 'c.o', 'entry.o.1.0.0.partial', 'used.o']);
+  if (posix) rmSync(join(directory, 'dangling.o'));
+  // The byte bound alone.
+  file('big.o', 2005, 600);
+  pruneSharedStore(directory, new Set([used]), { entries: 100, bytes: 601 });
+  assert.deepEqual(readdirSync(directory).sort(), ['big.o', 'entry.o.1.0.0.partial', 'used.o']);
+  // A store that does not exist is not an error.
+  assert.doesNotThrow(() => pruneSharedStore(join(directory, 'missing'), new Set()));
+});
+
+test('a program with Lasm.JS\'s Node glue links with the glue\'s wraps', { skip: !posix }, async () => {
+  const glue = 'int lasm_js_available(void) {\n  return 1;\n}\n';
+  const p = project({ extra: [['lasm_js.c', glue]], runtime: { identity: specializedIdentity } });
+  await build(p, { linkOnly: true });
+  const delivered = readResponse(join(p.work, 'link.rsp'));
+  for (const flag of glueLinkFlags) assert.ok(delivered.includes(flag), flag);
+  // A source that only ends in the glue's name is not the glue.
+  const q = project({ extra: [['not_lasm_js.c', glue]], runtime: { identity: specializedIdentity } });
+  await build(q, { linkOnly: true });
+  assert.ok(!readResponse(join(q.work, 'link.rsp')).some(flag => glueLinkFlags.includes(flag)));
 });

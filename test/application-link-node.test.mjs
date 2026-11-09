@@ -7,11 +7,12 @@
 // run in-process (test/fixtures/link-stand-ins/programs.mjs).
 import test, { describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { linkApplication, initializerStubs } from '../src/application-link.mjs';
 import { project, nodeSdk, emccSdk, mainModule, trivialModule, specializedIdentity } from './fixtures/link-stand-ins/application.mjs';
 import { expandResponseFiles, wasmObject, archive } from './fixtures/link-stand-ins/toolchain.mjs';
+import { finishLinks, links as finishedLinks, hooks as linkHooks } from './fixtures/link-stand-ins/link-driver.mjs';
 
 const posix = process.platform !== 'win32';
 const readResponse = file => expandResponseFiles(['@' + file]);
@@ -163,7 +164,7 @@ describe('the Node link driver', () => {
     writeFileSync(seed, JSON.stringify({ schema: 1, runtime: specializedIdentity, keep: ['initialize_Main'] }));
     toolchain.tools.fail('wasm-ld', 'wasm-ld: error: stand-in failure\n');
     toolchain.tools.clear();
-    await assert.rejects(build(p, toolchain, { profile: 'dev', initializationSeed: seed }), /stand-in failure/);
+    await assert.rejects(build(p, toolchain, { profile: 'dev', initializationSeed: seed }), error => /stand-in failure/.test(error.stderr));
     assert.equal(toolchain.tools.calls('wasm-ld').length, 1);
   });
 
@@ -297,21 +298,25 @@ describe('the Node link driver', () => {
     assert.ok(timings['read map'] > 0, 'the seeded round reads the delivered link\'s map');
     assert.equal(toolchain.tools.calls('wasm-ld').length, 1);
     assert.deepEqual(JSON.parse(readFileSync(seed, 'utf8')).imports, ['env\0js_full\0function']);
-    // Recorded members of archives this runtime does not have: the delivered link is not a member link.
-    writeFileSync(seed, JSON.stringify({ ...record, liveMembers: { ...record.liveMembers, '/elsewhere/libOther.a': [1] } }));
-    toolchain.tools.clear();
-    await build(p, toolchain, { profile: 'dev', initializationSeed: seed });
-    assert.deepEqual(toolchain.tools.calls('wasm-ld').map(args => args.some(isMember)), [false]);
-    const relinked = JSON.parse(readFileSync(seed, 'utf8'));
-    assert.deepEqual(relinked.liveMembers, record.liveMembers);
-    assert.equal(relinked.imports, undefined, 'another member set: the full link\'s import record no longer applies');
+    // Recorded members of archives this runtime does not have (even none of them): the delivered link is not a member link.
+    for (const foreign of [[1], []]) {
+      writeFileSync(seed, JSON.stringify({ ...record, imports: ['env\0js_full\0function'], liveMembers: { ...record.liveMembers, '/elsewhere/libOther.a': foreign } }));
+      toolchain.tools.clear();
+      await build(p, toolchain, { profile: 'dev', initializationSeed: seed });
+      assert.deepEqual(toolchain.tools.calls('wasm-ld').map(args => args.some(isMember)), [false]);
+      const relinked = JSON.parse(readFileSync(seed, 'utf8'));
+      assert.deepEqual(relinked.liveMembers, record.liveMembers);
+      assert.equal(relinked.imports, undefined, 'another member set: the full link\'s import record no longer applies');
+    }
     // Body probes: recorded members of other archives, or a link that now imports more, link in full.
     const touch = 'l_Init_register(); js_host_call();';
-    writeFileSync(seed, JSON.stringify({ ...record, probes: { ...record.probes, baseline: { ...record.probes.baseline, liveMembers: { ...record.probes.baseline.liveMembers, '/elsewhere/libOther.a': [1] } } } }));
-    toolchain.tools.clear();
-    await build(p, toolchain, { profile: 'dev', initializationSeed: seed, work: freshWork(p, 'work-2') });
-    const bodyLinks = toolchain.tools.calls('wasm-ld').filter(args => args.some(arg => /initializers-\d+\.map$/.test(arg)));
-    assert.deepEqual(bodyLinks.map(args => args.some(isMember)).sort(), [false, true]);
+    for (const foreign of [[1], []]) {
+      writeFileSync(seed, JSON.stringify({ ...record, probes: { ...record.probes, baseline: { ...record.probes.baseline, liveMembers: { ...record.probes.baseline.liveMembers, '/elsewhere/libOther.a': foreign } } } }));
+      toolchain.tools.clear();
+      await build(p, toolchain, { profile: 'dev', initializationSeed: seed, work: freshWork(p, `work-2-${foreign.length}`) });
+      const bodyLinks = toolchain.tools.calls('wasm-ld').filter(args => args.some(arg => /initializers-\d+\.map$/.test(arg)));
+      assert.deepEqual(bodyLinks.map(args => args.some(isMember)).sort(), [false, true]);
+    }
     assert.ok(touch);
   });
 
@@ -323,6 +328,11 @@ describe('the Node link driver', () => {
   await build(p, toolchain, { profile: 'dev', initializationSeed: seed });
   const record = JSON.parse(readFileSync(seed, 'utf8'));
   assert.deepEqual(record.probes.reached.imports, ['env\0js_registry_host\0function']);
+  // Unchanged: both body probes link with their members only, the imports as recorded.
+  toolchain.tools.clear();
+  await build(p, toolchain, { profile: 'dev', initializationSeed: seed, work: freshWork(p, 'work-same') });
+  const same = toolchain.tools.calls('wasm-ld').filter(args => args.some(arg => /initializers-\d+\.map$/.test(arg)) && !args.includes(join(p.base, 'work-same', 'module-0.o')));
+  assert.deepEqual(same.map(args => args.some(isMember)), [true, true]);
   writeFileSync(seed, JSON.stringify({ ...record, probes: { ...record.probes, reached: { ...record.probes.reached, imports: [] } } }));
   toolchain.tools.clear();
   await build(p, toolchain, { profile: 'dev', initializationSeed: seed, work: freshWork(p, 'work-2') });
@@ -402,8 +412,9 @@ test('Node driver failures: diagnostics are captured unless verbose; a probe\'s 
   // A probe link that needs a library Lasm cannot link.
   const s = project({ main: mainModule({ calls: 'sqlite3_open(0);' }), runtime: { identity: specializedIdentity } });
   await assert.rejects(build(s, nodeSdk(s.base), { initialization: 'all' }), error => error.code === 'ERR_LASM_NATIVE_LIBRARY' && /sqlite3_open/.test(error.message));
-  // A rejected program is explained by a --why-extract probe link.
-  const t = project({ main: mainModule({ calls: 'dlopen(0);' }), runtime: { identity: specializedIdentity } });
+  // A rejected program is explained by a --why-extract probe link, with runtime archives whose listings are large.
+  const extraInit = Array.from({ length: 60 }, (_, index) => [`Extra${index}.o`, { functions: [{ name: `l_Init_extra_function_with_a_long_name_${index}` }] }]);
+  const t = project({ main: mainModule({ calls: 'dlopen(0);' }), runtime: { identity: specializedIdentity, extraInit } });
   await assert.rejects(build(t, nodeSdk(t.base), { initialization: 'all' }),
     error => error.code === 'ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE' && /Required by: your code → dlopen → lean_read_module_data → module/.test(error.message));
 });
@@ -432,4 +443,156 @@ test('the debug switches plan from the roots and record no members; the unoptimi
   const unoptimized = nodeSdk(q.base);
   await withEnv({ LASM_TEST_UNOPTIMIZED: '1' }, () => build(q, unoptimized, { initialization: 'all' }));
   assert.deepEqual(unoptimized.tools.calls('clang').slice(0, 2).map(optimization), ['-O0', '-O0']);
+});
+
+test('a seed without member or probe records (a debug build\'s) plans with its kept initializers', { skip: !posix }, async () => {
+  const p = project({ runtime: { identity: specializedIdentity } });
+  const toolchain = nodeSdk(p.base);
+  const seed = join(p.base, 'seed.json');
+  writeFileSync(seed, JSON.stringify({ schema: 1, runtime: specializedIdentity, keep: ['initialize_Main', 'initialize_Helper', 'initialize_Init'], importsLinked: [] }));
+  const requirements = await build(p, toolchain, { profile: 'dev', initializationSeed: seed });
+  assert.deepEqual(requirements.initializationPlan, { units: 4, kept: 3, skipped: 1 });
+  const links = toolchain.tools.calls('wasm-ld');
+  assert.ok(!links.some(args => args.some(isMember)), 'no member link without a member record');
+  assert.ok(links.at(-1).includes(join(p.work, 'reachability.o')), 'the planning round is the delivered link');
+  const record = JSON.parse(readFileSync(seed, 'utf8'));
+  assert.deepEqual(Object.keys(record.probes).sort(), ['baseline', 'reached']);
+  assert.ok(record.liveMembers);
+});
+
+test('builds without a plan write no seed; Lasm\'s package stub is shared between projects', { skip: !posix }, async () => {
+  const p = project({ main: mainModule({ calls: 'pkg_add(1);' }), runtime: { identity: specializedIdentity } });
+  const native = join(p.base, 'c', 'pkg.c');
+  writeFileSync(native, 'int pkg_add(int x) {\n  return x + 1;\n}\n');
+  const seed = join(p.base, 'seed.json'), sharedCache = join(p.base, 'shared');
+  const nativeCompilations = [{ identity: 'pkg-1', extraArgs: [], source: native, cwd: p.base, package: 'pkg' }];
+  await build(p, nodeSdk(p.base), { initialization: 'all', initializationSeed: seed, nativeCompilations, sharedCache, objectCache: join(p.base, 'objects') });
+  assert.equal(existsSync(seed), false);
+  const q = project({ main: mainModule({ calls: 'pkg_add(2);' }), runtime: { identity: specializedIdentity } });
+  writeFileSync(join(q.base, 'c', 'pkg.c'), readFileSync(native));
+  const toolchain = nodeSdk(q.base);
+  await build(q, toolchain, { initialization: 'all', nativeCompilations: [{ ...nativeCompilations[0], source: join(q.base, 'c', 'pkg.c') }], sharedCache, objectCache: join(q.base, 'objects') });
+  const compiled = toolchain.tools.calls('clang').map(source);
+  assert.ok(compiled.includes(join(q.base, 'c', 'pkg.c')));
+  assert.ok(!compiled.includes(join(q.work, 'package-dl.c')), 'the package stub is reused from the shared store');
+  assert.ok(readResponse(join(q.work, 'link.rsp')).includes(join(q.work, 'package-dl.o')));
+});
+
+test('probe records reused from the shared store plan as the links did', { skip: !posix }, async () => {
+  const p = project({ runtime: { identity: specializedIdentity } });
+  const toolchain = nodeSdk(p.base);
+  const sharedCache = join(p.base, 'shared');
+  const first = await build(p, toolchain, { sharedCache });
+  const plan = readFileSync(join(p.work, 'initialization-plan.json'), 'utf8');
+  toolchain.tools.clear();
+  const work = freshWork(p, 'work-2');
+  const second = await build(p, toolchain, { sharedCache, work });
+  assert.deepEqual(second, first);
+  assert.equal(readFileSync(join(work, 'initialization-plan.json'), 'utf8'), plan);
+  assert.deepEqual(toolchain.tools.calls('wasm-ld').map(args => args.some(arg => arg.endsWith('final.map'))), [true], 'only the delivered link runs');
+  assert.deepEqual(readResponse(join(work, 'link.rsp')).map(arg => arg.replaceAll(work, p.work)), readResponse(join(p.work, 'link.rsp')));
+});
+
+test('probe links: their output reaches the terminal only when verbose; a failure carries it', { skip: !posix }, async () => {
+  const captured = async run => {
+    // The stand-ins' lines are kept from the terminal; the test runner's own messages pass.
+    const out = process.stdout.write, err = process.stderr.write, output = [];
+    const capture = write => function (chunk, ...rest) { if (!/stand-in/.test(String(chunk))) return write.call(this, chunk, ...rest); output.push(String(chunk)); return true; };
+    process.stdout.write = capture(out);
+    process.stderr.write = capture(err);
+    try { return { result: await run().catch(error => error), output: output.join('') }; } finally { process.stdout.write = out; process.stderr.write = err; }
+  };
+  const p = project({ runtime: { identity: specializedIdentity } });
+  const toolchain = nodeSdk(p.base);
+  toolchain.sdk.env.LASM_STAND_IN_CHATTY = '1';
+  const quiet = await captured(() => build(p, toolchain, { verbose: false }));
+  assert.equal(quiet.result.mode, 'static');
+  assert.equal(quiet.output, '');
+  const loud = await captured(() => build(p, toolchain, { verbose: true, work: freshWork(p, 'work-loud') }));
+  assert.equal(loud.result.mode, 'static');
+  assert.match(loud.output, /wasm-ld: stand-in note on stdout/);
+  assert.match(loud.output, /wasm-ld: warning: stand-in diagnostic/);
+  // A failing probe link: its diagnostics are on the error.
+  const q = project({ runtime: { identity: specializedIdentity } });
+  const failing = nodeSdk(q.base);
+  failing.tools.fail('wasm-ld', 'wasm-ld: error: stand-in probe failure\n', { when: 'initializers-0.map' });
+  const error = await build(q, failing).catch(error => error);
+  assert.match(String(error.stderr), /stand-in probe failure/);
+  assert.equal(typeof error.stdout, 'string');
+  // A failing planning compile (the probes' wrappers compile concurrently): its diagnostics are on the error.
+  const r = project({ runtime: { identity: specializedIdentity } });
+  const compiler = nodeSdk(r.base);
+  compiler.tools.fail('clang', 'clang: error: stand-in wrapper failure\n', { when: 'initializers-probe-0-' });
+  const compileError = await build(r, compiler).catch(error => error);
+  assert.match(String(compileError.stderr), /stand-in wrapper failure/);
+});
+
+test('full (not link-only) Node-driver builds: the delivered link is optimized in release builds only; a dev build records the finished program\'s imports', { skip: !posix }, async () => {
+  // A fresh instance of the link whose delivered links finish (the stand-in driver writes the glue).
+  const { linkApplication: linkFinished } = await finishLinks(new URL('../src/application-link.mjs', import.meta.url).href);
+  const p = project({ main: mainModule({ calls: 'js_host_call();' }), runtime: { identity: specializedIdentity } });
+  const toolchain = nodeSdk(p.base);
+  const seed = join(p.base, 'seed.json');
+  const full = options => linkFinished({ sources: p.sources, sdk: toolchain.sdk, runtime: p.runtime, work: freshWork(p, `work-${Math.random()}`), dist: p.dist,
+    leanVersion: '4.35.0', memoryMode: 1, verbose: false, linkDriver: 'node', ...options });
+  const delivered = () => finishedLinks.filter(item => !item.mapOnly);
+  finishedLinks.length = 0;
+  assert.equal((await full({})).mode, 'static');
+  assert.deepEqual(delivered().map(item => [item.mode, item.optimize]), [['final', true]]);
+  // The tools' diagnostics are captured, or shown with --verbose; the probes' as well.
+  assert.ok(finishedLinks.every(item => JSON.stringify(item.stdio) === JSON.stringify(['ignore', 'pipe', 'pipe'])));
+  finishedLinks.length = 0;
+  await full({ verbose: true });
+  assert.ok(finishedLinks.length > 1 && finishedLinks.every(item => JSON.stringify(item.stdio) === JSON.stringify(['ignore', 'inherit', 'inherit'])));
+  assert.ok(readFileSync(join(p.dist, 'program.cjs'), 'utf8').includes('globalThis.process?.env?.LASM_THREAD_POOL'));
+  // A dev build: the delivered link without Binaryen's optimization; the seed records the finished program's imports.
+  finishedLinks.length = 0;
+  await full({ profile: 'dev', initializationSeed: seed });
+  assert.deepEqual(delivered().map(item => [item.mode, item.optimize]), [['final', false]]);
+  const record = JSON.parse(readFileSync(seed, 'utf8'));
+  assert.deepEqual(record.imports, ['env\0js_host_call\0function']);
+  assert.equal(record.importsLinked, undefined);
+  // A link-only build of the same members keeps the full build's record beside its own, and the full build keeps the link-only one.
+  await build(p, toolchain, { profile: 'dev', initializationSeed: seed, work: freshWork(p, 'work-link-only') });
+  assert.deepEqual(JSON.parse(readFileSync(seed, 'utf8')).imports, ['env\0js_host_call\0function']);
+  finishedLinks.length = 0;
+  writeFileSync(seed, JSON.stringify({ ...JSON.parse(readFileSync(seed, 'utf8')), imports: undefined }));
+  await full({ profile: 'dev', initializationSeed: seed });
+  const again = JSON.parse(readFileSync(seed, 'utf8'));
+  assert.deepEqual(again.importsLinked, ['env\0js_host_call\0function']);
+  assert.deepEqual(again.imports, ['env\0js_host_call\0function']);
+  // The next full dev build links the recorded members only, its delivered link included.
+  finishedLinks.length = 0;
+  toolchain.tools.clear();
+  await full({ profile: 'dev', initializationSeed: seed });
+  const links = toolchain.tools.calls('wasm-ld');
+  assert.ok(links.every(args => args.some(isMember)));
+  assert.equal(links.filter(args => args.some(arg => arg.endsWith('final.map'))).length, 1);
+});
+
+test('the delivered link is checked as well: a program it finds reaching runtime evaluation is rejected', { skip: !posix }, async () => {
+  const { linkApplication: linkFinished } = await finishLinks(new URL('../src/application-link.mjs', import.meta.url).href);
+  // The map of a program that loads plugins (its requirements check rejected it).
+  const t = project({ main: mainModule({ calls: 'dlopen(0);' }), runtime: { identity: specializedIdentity } });
+  await assert.rejects(build(t, nodeSdk(t.base), { initialization: 'all' }), { code: 'ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE' });
+  const rejectedMap = join(t.work, 'reachability.map');
+  // A delivered link that reaches more than its check did (its map is that program's).
+  const p = project({ runtime: { identity: specializedIdentity } });
+  linkHooks.after = options => copyFileSync(rejectedMap, options.args.find(arg => arg.startsWith('-Wl,-Map=')).slice('-Wl,-Map='.length));
+  try {
+    await assert.rejects(linkFinished({ sources: p.sources, sdk: nodeSdk(p.base).sdk, runtime: p.runtime, work: p.work, dist: p.dist, leanVersion: '4.35.0',
+      memoryMode: 1, verbose: false, linkDriver: 'node', initialization: 'all' }), { code: 'ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE' });
+  } finally { linkHooks.after = undefined; }
+});
+
+test('a compiler with many warnings: the build succeeds and does not show them', { skip: !posix }, async () => {
+  const p = project({ main: mainModule({ calls: 'pkg_add(1);' }), runtime: { identity: specializedIdentity } });
+  const native = join(p.base, 'c', 'pkg.c');
+  writeFileSync(native, 'int pkg_add(int x) {\n  return x + 1;\n}\n');
+  const toolchain = nodeSdk(p.base);
+  toolchain.sdk.env.LASM_STAND_IN_WARNINGS = '1';
+  const requirements = await build(p, toolchain, { nativeCompilations: [{ identity: 'pkg-1', extraArgs: [], source: native, cwd: p.base, package: 'pkg' }] });
+  assert.equal(requirements.mode, 'static');
+  assert.deepEqual(requirements.initializationPlan, { units: 4, kept: 3, skipped: 1 });
+  assert.ok(toolchain.tools.calls('clang').some(args => args.includes(native)));
 });
