@@ -203,3 +203,16 @@ test('an empty project library is still a search-path entry; the deployed manife
     assert.equal(process.env.LEAN_SYSROOT, join(output, 'lean'));
   } finally { for (const [key, value] of Object.entries(saved)) if (value === undefined) delete process.env[key]; else process.env[key] = value; }
 });
+
+test('package roots beyond nine; a module-data root that cannot be read is an error', async t => {
+  const { directory, lean, generated, put } = await fixture(t);
+  const output = join(directory, 'output');
+  await copyApplicationMetadata(await applicationMetadata(generated, lean), output);
+  await writeFile(join(output, 'lean/metadata.json'), JSON.stringify({ schema: 1, roots: ['packages/10'] }));
+  const env = {};
+  prepareApplicationMetadata(pathToFileURL(join(output, 'main.mjs')), env);
+  assert.equal(env.LEAN_PATH.split(delimiter)[0], join(output, 'lean', 'packages/10'));
+  await put(join(directory, 'plain-file'), 'x');
+  generated.metadataRoots.push(join(directory, 'plain-file', 'sub'));
+  await assert.rejects(applicationMetadata(generated, lean), { code: 'ENOTDIR' });
+});

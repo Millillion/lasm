@@ -27,7 +27,7 @@ function fixture(t) {
     const files = {};
     for (const arch of ['x64', 'arm64']) for (const abi of ['gnu', 'musl']) {
       const name = `linux-${arch}-${abi}${directory === 'signals' ? '.so' : ''}`, bytes = Buffer.from(name);
-      put(directory + '/' + name, bytes); chmodSync(join(source, directory, name), 0o755);
+      put(directory + '/' + name, bytes); chmodSync(join(source, directory, name), 0o644); // as a Windows build host records them
       files[name] = { bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') };
     }
     if (directory === 'signals') for (const arch of ['x64', 'arm64']) {
@@ -67,7 +67,8 @@ function assertLinuxHelpers(base, extraSignals = []) {
   const signals = JSON.parse(readFileSync(join(base, 'signals/manifest.json')));
   assert.deepEqual(Object.keys(signals.files), ['linux-x64-gnu.so', 'linux-x64-musl.so', 'linux-arm64-gnu.so', 'linux-arm64-musl.so', ...extraSignals]);
   if (process.platform !== 'win32') for (const arch of ['x64', 'arm64']) for (const abi of ['gnu', 'musl'])
-    assert.equal(statSync(join(base, 'process', `linux-${arch}-${abi}`)).mode & 0o111, 0o111);
+    assert.equal(statSync(join(base, 'process', `linux-${arch}-${abi}`)).mode & 0o111, 0o111),
+    assert.equal(statSync(join(base, 'signals', `linux-${arch}-${abi}.so`)).mode & 0o111, 0, 'libraries are not made executable');
 }
 
 for (const arch of ['x64', 'arm64']) test(`a Linux ${arch} build carries both Linux targets (glibc and musl), loaders, licenses and authenticated helpers`, t => {
@@ -222,4 +223,43 @@ test('the host: every support file, the builtin modules, and the whole native bu
   rmSync(output, { recursive: true, force: true });
   copyApplicationHost(output, { platform: 'darwin', arch: 'arm64', sourceRoot: root });
   assert.equal(existsSync(join(output, 'host/lasm-modules')), false);
+});
+
+test('helper records must exist and match by size and digest; a native directory without a manifest is passed over', t => {
+  const { root, output, put, source } = fixture(t);
+  const linux = () => copyApplicationNativeBundle(root, output, { platform: 'linux', arch: 'x64' });
+  const helper = JSON.parse(readFileSync(join(source, 'process/manifest.json')));
+  put('process/manifest.json', JSON.stringify({ ...helper, files: { ...helper.files, 'linux-x64-gnu': { ...helper.files['linux-x64-gnu'], sha256: '0'.repeat(64) } } }));
+  assert.throws(linux, { message: 'Native application helper integrity mismatch: linux-x64-gnu' });
+  put('process/manifest.json', JSON.stringify({ protocol: 1 }));
+  assert.throws(linux, { message: 'Native application helper integrity mismatch: linux-x64-gnu' });
+  put('process/manifest.json', JSON.stringify(helper));
+  // src/native without a manifest (an interrupted preparation): the prepared .cache/native-host is used.
+  const cache = join(root, '.cache/native-host');
+  mkdirSync(join(root, '.cache'), { recursive: true });
+  renameSync(source, cache);
+  mkdirSync(source);
+  linux();
+  assert.equal(readFileSync(join(output, 'native/process/linux-x64-gnu'), 'utf8'), 'linux-x64-gnu');
+});
+
+test('the whole bundle and the process launcher from a prepared .cache/native-host', async t => {
+  const { copyNativeBundle, copyProcessLauncherBundle } = await import('../src/native-bundle.mjs');
+  const { root, output, source } = fixture(t);
+  mkdirSync(join(root, '.cache'), { recursive: true });
+  renameSync(source, join(root, '.cache/native-host'));
+  copyNativeBundle(root, output);
+  assert.ok(existsSync(join(output, 'native/process/manifest.json')));
+  assert.ok(copyProcessLauncherBundle(root, join(root, 'snapshot')).includes('native/process/manifest.json'));
+  assert.ok(existsSync(join(root, 'snapshot/native/process/linux-x64-gnu')));
+});
+
+test('the host for other platforms: a non-Linux host with a glibc report still gets the research layout; macOS gets its own pieces', t => {
+  const { root, output, source } = fixture(t);
+  for (const name of applicationHostFiles) { mkdirSync(dirname(join(root, 'src', name)), { recursive: true }); writeFileSync(join(root, 'src', name), 'host'); }
+  copyApplicationHost(output, { platform: 'freebsd', arch: 'x64', glibc: '2.39', sourceRoot: root });
+  assert.deepEqual(files(join(output, 'host/native')), files(source));
+  rmSync(output, { recursive: true });
+  copyApplicationHost(output, { platform: 'darwin', arch: 'x64', glibc: null, sourceRoot: root });
+  assert.deepEqual(JSON.parse(readFileSync(join(output, 'host/native/manifest.json'))).deployment.targets, ['linux-x64', 'linux-arm64', 'darwin-x64']);
 });

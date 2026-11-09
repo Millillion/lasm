@@ -125,3 +125,18 @@ test('a dependency that resolves outside the project is refused', { skip: proces
   writeFileSync(join(project, 'package.json'), JSON.stringify({ dependencies: { up: '1' } }));
   assert.throws(() => planNodeModules(project), { code: 'ERR_LASM_NPM_MISSING' });
 });
+
+test('a linked package\'s own dependencies must be the project\'s too; nested node_modules deeper inside a package are files', { skip: process.platform === 'win32' }, () => {
+  const outside = mkdtempSync(join(tmpdir(), 'lasm-npm-outside-'));
+  pkg(outside, 'pkg', { name: 'linked', version: '1.0.0', dependencies: { far: '1' } });
+  pkg(outside, 'node_modules/far', { name: 'far', version: '2.0.0' });
+  const root = mkdtempSync(join(tmpdir(), 'lasm-npm-'));
+  writeFileSync(join(root, 'package.json'), JSON.stringify({ dependencies: { linked: '1' } }));
+  mkdirSync(join(root, 'node_modules'));
+  symlinkSync(join(outside, 'pkg'), join(root, 'node_modules/linked'));
+  assert.throws(() => planNodeModules(root), { message: `npm dependency far resolves outside the project (${join(outside, 'node_modules/far')}); install it in the project's node_modules` });
+  const second = mkdtempSync(join(tmpdir(), 'lasm-npm-'));
+  writeFileSync(join(second, 'package.json'), JSON.stringify({ dependencies: { a: '1' } }));
+  pkg(second, 'node_modules/a', { name: 'a', version: '1.0.0' }, { 'index.js': '', 'lib/node_modules/vendored.js': 'kept' });
+  assert.ok(planNodeModules(second).files.some(file => file.path.split(sep).join('/') === 'node_modules/a/lib/node_modules/vendored.js'));
+});

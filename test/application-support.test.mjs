@@ -89,3 +89,13 @@ test('glibc comparisons need well-formed versions on both sides', () => {
   assert.equal(nodeAtLeast('24.0.1', '24.0.0'), true);
   assert.equal(nodeAtLeast('24.0.0', '24.0.1'), false);
 });
+
+test('an exact-release candidate accepts that release; versions compare by whole numbers; a host without a report has no glibc', () => {
+  requireApplicationSupport({ node: '26.12.0', platforms: ['linux-x64'] }, { platform: 'linux', arch: 'x64', versions: { node: '26.12.0' } });
+  assert.equal(glibcAtLeast('12.39', '2.39'), true);
+  assert.equal(glibcAtLeast('2.139', '2.39'), true);
+  assert.equal(nodeAtLeast('24.0.10', '24.0.9'), true);
+  assert.equal(nodeAtLeast('124.0.0', '24.0.0'), true);
+  assert.throws(() => requireApplicationSupport({ ...support, minimumGlibc: '2.28' }, { platform: 'linux', arch: 'x64', versions: { node: '26.12.0' } }),
+    /Your host reports no glibc; musl\/Alpine is not supported/);
+});

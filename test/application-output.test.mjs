@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mkdtempSync, writeFileSync, mkdirSync, rmSync, renameSync, readFileSync, realpathSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync, renameSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -42,7 +42,8 @@ test('the entrypoint is a Node executable module', t => {
   t.after(() => rmSync(base, { recursive: true, force: true }));
   writeApplicationEntrypoint(base);
   assert.ok(readFileSync(join(base, 'main.mjs'), 'utf8').startsWith('#!/usr/bin/env node\n'));
-  assert.deepEqual(JSON.parse(readFileSync(join(base, 'package.json'), 'utf8')), { private: true, type: 'module' });
+  assert.equal(readFileSync(join(base, 'package.json'), 'utf8'), '{"private":true,"type":"module"}\n');
+  if (process.platform !== 'win32') assert.equal(statSync(join(base, 'main.mjs')).mode & 0o777, 0o755);
 });
 
 test('stale or compiler-capable deployments fail before loading host code or the payload', t => {

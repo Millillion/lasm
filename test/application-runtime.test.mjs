@@ -146,3 +146,16 @@ test('applicationRuntime: the catalog entry of the Lean release, a missing bundl
   // A real catalog lists every supported Lean release with a manifest digest.
   for (const entry of Object.values(applicationRuntimeCatalog.lean)) assert.match(entry.manifestSha256, /^[0-9a-f]{64}$/);
 });
+
+test('applicationRuntime passes verification failures on unchanged, records verifications, and checks the manifest\'s Lean release', async t => {
+  const { directory, expected } = await rewritten(t, manifest => { manifest.lean = '4.34.0'; manifest.leanCommit = 'abc'; manifest.allocator = 'other'; });
+  await assert.rejects(applicationRuntime({ version: '4.35.0', commit: 'abc' }, { catalog: { lean: { '4.35.0': expected } }, directory }),
+    { message: 'Unsupported application runtime manifest' });
+  const good = await rewritten(t, manifest => { manifest.lean = '4.34.0'; manifest.leanCommit = 'abc'; });
+  await assert.rejects(applicationRuntime({ version: '4.35.0', commit: 'abc' }, { catalog: { lean: { '4.35.0': good.expected } }, directory: good.directory }),
+    { message: 'Native Lean and the application runtime do not match' });
+  const stamps = await mkdtemp(join(tmpdir(), 'lasm-application-runtime-stamps-'));
+  t.after(() => rm(stamps, { recursive: true, force: true }));
+  await applicationRuntime({ version: '4.34.0', commit: 'abc' }, { catalog: { lean: { '4.34.0': good.expected } }, directory: good.directory, stamps });
+  assert.equal((await readdir(stamps)).length, 1);
+});
