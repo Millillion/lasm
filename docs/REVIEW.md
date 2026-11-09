@@ -35,6 +35,44 @@ decisions themselves are logged with their reasoning in
     [proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md#3-ranked-removal-list)
     waits on it.
 
+### MAJOR: generated standard-library bindings (awaiting Jordan)
+- [ ] **Major decision.** The proposal is to generate bindings from
+  authoritative sources:
+  - WebIDL, through w3c/webref;
+  - `@types/node`;
+  - Deno's `lib.deno.d.ts`;
+  - `bun-types`.
+
+  They would be spec-faithful: standard names and shapes, with only Lean
+  typing added (`Promise` → `Async`, nullable → `Option`, dictionaries →
+  structures).
+
+  There would be three tiers:
+  1. The WinterTC Minimum Common Web API, for every JavaScript target: fetch,
+     Request/Response, URL, `crypto.subtle`/`getRandomValues`,
+     TextEncoder/TextDecoder, streams, AbortController, timers,
+     `structuredClone` and console.
+  2. The full web platform, which would replace the hand-written `Lasm.Web`.
+  3. Node core, `Deno.*` and `Bun.*`, pinned per supported version.
+
+  npm libraries (for example bcrypt) stay ad hoc bindings. The bindings would
+  be tested with web-platform-tests and official test vectors.
+  - It depends on the packaging decision above and on naming.
+  - **Claude's recommendation:** start with tier 1, judge it on a real app,
+    then do tiers 2 and 3.
+  - **Status:** awaiting Jordan.
+
+### High-priority work to define with Jordan
+- [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,
+  2026-11-09). The known weaknesses:
+  - no inline JavaScript;
+  - Symbol-keyed properties can't be reached through `get`;
+  - JavaScript classes can't be defined or subclassed from Lean;
+  - synchronous callbacks are limited: no async waits inside them, and the #90 depth limit;
+  - each call costs about 25–35 µs.
+
+  This is to be scoped together before work starts (ROADMAP.md, top of "Now").
+
 ### The testing strategy ([TESTING_STRATEGY.md §6](TESTING_STRATEGY.md#6-decisions))
 - [ ] 1. Evidence levels keep the names L0–L3, in the README's platform table.
 - [ ] 2. CI budgets, all on free runners, with no scheduled runs on Sunday:

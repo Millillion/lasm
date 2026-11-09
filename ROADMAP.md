@@ -60,6 +60,14 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 
 ## Now (November 2026)
 
+- [ ] **Top priority (scope with Jordan first):** stamp out Lasm.JS's weaknesses as far as possible (Jordan, 2026-11-09). The known weaknesses:
+  - no inline JavaScript;
+  - Symbol-keyed properties not reachable through `get`;
+  - no defining or subclassing JavaScript classes from Lean;
+  - synchronous-callback limits: no async waits inside synchronous callbacks, and the #90 depth limit;
+  - about 25–35 µs per call.
+
+  See [docs/REVIEW.md](docs/REVIEW.md#high-priority-work-to-define-with-jordan).
 - [x] Conduit: requests isolated on node:sqlite and bun:sqlite (issue #59; reads saw other requests' writes half done).
 - [x] Lasm.JS synchronous callbacks (approved 2026-11-04, for 0.5.0; PR #122): every wait there that needs Node fails at once instead of never finishing (a task making host calls, `.block`, a timer, DNS lookup or socket read started inside); `Value.toTask` without waiting works.
 
