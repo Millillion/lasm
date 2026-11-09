@@ -53,7 +53,7 @@
       "name": "downloads",
       "description": "Managed downloads and installation: the downloader, managed artifacts and their verification, the managed Lean, npm artifacts, cache repair",
       "mutate": ["src/managed-download.mjs", "src/managed-artifacts.mjs", "src/managed-lean.mjs", "src/npm-artifacts.mjs", "src/cache-repair.mjs"],
-      "tests": ["test/managed-download.test.mjs", "test/managed-network.test.mjs", "test/managed-artifacts.test.mjs", "test/managed-artifacts-units.test.mjs", "test/managed-lean-tiers.test.mjs", "test/npm-artifacts.test.mjs", "test/npm-artifacts-units.test.mjs", "test/npm-dist-packages.test.mjs", "test/cache-lifecycle.test.mjs", "test/verification-records.test.mjs", "test/installer-bundle.test.mjs", "test/tree-archive.test.mjs", "test/windows-installer-faults.test.mjs", "test/application-runtime.test.mjs", "test/editor.test.mjs"]
+      "tests": ["test/managed-download.test.mjs", "test/managed-network.test.mjs", "test/managed-artifacts.test.mjs", "test/managed-artifacts-units.test.mjs", "test/managed-lean-tiers.test.mjs", "test/npm-artifacts.test.mjs", "test/npm-artifacts-units.test.mjs", "test/npm-dist-packages.test.mjs", "test/cache-lifecycle.test.mjs", "test/cache-repair.test.mjs", "test/verification-records.test.mjs", "test/installer-bundle.test.mjs", "test/tree-archive.test.mjs", "test/windows-installer-faults.test.mjs", "test/application-runtime.test.mjs", "test/editor.test.mjs"]
     },
     {
       "name": "toolchains",
