@@ -1018,6 +1018,21 @@ measurement on Node 26 is the recorded floor).
 | `target-link` | `application-link.mjs`, `edge/edge-link.mjs`, `wasi/wasi-link.mjs` | 5.9 % | **86.8 %** | 86 % |
 | `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **97.3 %** | 97 % |
 | `notices` | `notices.mjs` | 62.5 % | **91.5 %** | 91 % |
+| `edge-build` | `edge/edge-build.mjs`, `edge/builtin-modules.mjs`, `edge/edge-initializers.mjs`, `edge/edge-pre.js` | 31.5 % | **89.4 %** | 89 % |
+| `wasi-build` | `wasi/wasi-build.mjs`, `wasi/wasi-component.mjs`, `wasi/lower-atomics.mjs` | 45.8 % | **95.6 %** | 95 % |
+| `wasmtime` | `wasmtime-runtime.mjs`, `wasmtime-standalone.mjs`, `wasmtime-worker.mjs`, `wasmtime-artifact.mjs`, `wasmtime-bundle.mjs`, `wasmtime-console.mjs`, `wasmtime-file-host.mjs`, `wasmtime-file-imports.mjs`, `wasmtime-guest-memory.mjs`, `wasmtime-module-data.mjs`, `wasmtime-native-stdio.mjs`, `wasmtime-process-host.mjs`, `wasmtime-wasi-stdio.mjs` | 32.4 % | **88 %** | 88 % |
+
+`edge-build`, `wasi-build` and `wasmtime` were measured 2026-11-09 (run 42581537537; initial scores in runs
+42571769129 and, for `edge-build` without `edge-library.js`, 42579064935). `src/edge/edge-library.js` is not
+mutated: its Emscripten preprocessor lines (`#if JSPI || ASYNCIFY`) are not JavaScript Stryker can parse. The
+code that only runs inside built outputs is run in-process: `edge-pre.js` in a script scope with stand-in
+module globals (`test/edge-pre.test.mjs`); the generated edge entries as their platforms run them, with
+`cloudflare:workers`, `.wasm` modules, `Deno`, `Bun` and `Netlify` stood in (`test/edge-entries.test.mjs`);
+and the Wasmtime runner and supervisor over a stand-in FFI and per-module `node:worker_threads`
+(`test/fixtures/wasmtime-stand-ins/`: a Lean instance with memory, exports, callbacks and thread entry
+points). The atomics lowering is checked by properties: random atomic programs run in V8 before and after
+lowering, binaryen-made modules of every other instruction kind stay valid without the threads feature, and
+random instruction streams come out byte for byte as documented.
 
 Every module is above 80 %; each threshold is its score rounded down. The link driver and the target links
 are tested with stand-in toolchains: `test/link-driver-pipeline.test.mjs`

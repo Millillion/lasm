@@ -44,6 +44,24 @@
       "score": 91.5,
       "mutants": 475,
       "threshold": 91
+    },
+    "edge-build": {
+      "initial": 31.5,
+      "score": 89.4,
+      "mutants": 996,
+      "threshold": 89
+    },
+    "wasi-build": {
+      "initial": 45.8,
+      "score": 95.6,
+      "mutants": 1067,
+      "threshold": 95
+    },
+    "wasmtime": {
+      "initial": 32.4,
+      "score": 88,
+      "mutants": 2070,
+      "threshold": 88
     }
   },
   "run": "mutation.yml run 41749603692 (Node 26.13.0, main at the branch point)"
