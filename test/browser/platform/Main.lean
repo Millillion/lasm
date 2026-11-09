@@ -451,6 +451,38 @@ def leanChecks (checks : Checks) : IO Unit := do
     let got := s!"{← box.get tag String} {← box.get "2" String} {← box.get "a,b" String} {first}"
     return expectEq got "tagged two joined number 7"
 
+/-! Async loops of steps that complete at once (#90): each step's bind used to
+nest on the engine's stack, which overflowed after about 2,000 steps. -/
+
+/-- `n` steps of `step` one after another in `Async`, summed. -/
+def asyncLoop (step : Async Nat) : Nat → Nat → Async Nat
+  | 0, acc => pure acc
+  | n + 1, acc => do asyncLoop step n (acc + (← step))
+
+def argumentNat (args : Array Data) : IO Nat :=
+  match args[0]? with
+  | some (.number x) => pure x.toUInt64.toNat
+  | _ => throw (IO.userError "expected a number")
+
+def asyncDepthChecks (checks : Checks) : Async Unit := do
+  let math ← (global : IO Value) >>= (·.get "Math")
+  let steps : List (String × Async Nat) := [("pure", pure 1),
+    ("io", monadLift (do let _ ← IO.monoNanosNow; pure 1 : IO Nat)),
+    ("sync-js", monadLift (math.callMethod "abs" #[.number (-1)] Nat : IO Nat))]
+  for (name, step) in steps do
+    checkAsync checks s!"lean.async-depth-{name}" do
+      let n := if name == "sync-js" then 100000 else 1000000
+      return expectEq (← asyncLoop step n 0) n
+  -- Inside a synchronous callback, waiting for Lean work that needs no
+  -- JavaScript event works on the single-threaded runtime: the wait runs it.
+  checkAsync checks "lean.sync-callback-async-wait" do
+    let f ← Function.ofSyncFn fun args => do
+      let n ← argumentNat args
+      return toJS (← (asyncLoop (monadLift (math.callMethod "abs" #[.number (-1)] Nat : IO Nat)) n 0).block)
+    let items ← (← global).get "Array" >>= (·.callMethod "of" #[toJS (3 : Nat), toJS (200000 : Nat)])
+    let out ← items.callMethod "map" #[toJS f] (Array Nat)
+    return (out == #[3, 200000], s!"{out}")
+
 /-! The app: flags, ports, messages, unmount -/
 
 def appChecks (checks : Checks) : IO Unit := do
@@ -491,6 +523,7 @@ def main : IO Unit := do
     fetchChecks checks
     cryptoAsync checks
     socketChecks checks
+    asyncDepthChecks checks
     let all ← checks.get
     let pre ← createElement "pre"
     pre.setId "results"
