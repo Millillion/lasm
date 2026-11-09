@@ -297,7 +297,8 @@ test('events report each attempt, failure, retry and the transfer in order', asy
 
 test('progress updates report received bytes, then the verified total once', async t => {
   const f = await fixture(t), updates = [];
-  await downloadArtifact(artifact, f.file, { ...f.options, update: (...args) => updates.push(args),
+  // A generous idle bound: a loaded runner's 300 ms pause must not look like a stall (and retry).
+  await downloadArtifact(artifact, f.file, { ...f.options, policy: { ...policy, idleMs: 10_000 }, update: (...args) => updates.push(args),
     fetch: async () => new Response(new ReadableStream({ async start(c) { c.enqueue(bytes.subarray(0, 3)); await delay(300); c.enqueue(bytes.subarray(3)); c.close(); } })) });
   assert.deepEqual(updates, [[3], [bytes.length], [bytes.length, true]]);
   // Chunks closer together than 250 ms are reported once.
