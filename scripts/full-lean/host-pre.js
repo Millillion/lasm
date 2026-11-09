@@ -191,6 +191,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     const { view, u8 } = lasmFullViews(), p = slot.pointer;
     const kind = view.getInt32(p + 8, true);
     if (kind === 3) {
+      slot.spin = false;
       const large = slot.large;
       slot.large = undefined;
       return lasmFullReply(slot, large.status === 2 ? { failure: Buffer.from(large.bytes).toString() }
@@ -200,6 +201,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     const argument = view.getBigUint64(p + 24, true);
     const input = Number(view.getBigUint64(p + 32, true)), length = Number(view.getBigUint64(p + 40, true));
     slot.pending = { kind, operation, since: Date.now() };
+    slot.spin = lasmFullSpinnable(kind, operation, argument);
     // Copy: hosts and completion queues may retain request bytes.
     const bytes = length ? u8.slice(input, input + length) : new Uint8Array(0);
     const context = { fiber: Number(view.getBigUint64(p + 72, true)),
@@ -214,8 +216,48 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     return lasmFullHostValue ? run(lasmFullHostValue)
       : lasmFullLoadHost().then(run, error => lasmFullFail(slot, error));
   };
+  // After a synchronous Lasm.JS call (lasmFullSpinnable), the calling Lean
+  // thread usually sends its next request within microseconds. Watching its
+  // slot for lasmFullSpinMs serves that request at once, rather than waking
+  // this thread again through Atomics.waitAsync and the event loop (about
+  // 14 µs). A slot whose watch found nothing is not watched for its next
+  // lasmFullSpinCooling calls, and serving without a break yields to the
+  // event loop every lasmFullBurstMs (setImmediate), so timers, I/O and
+  // promise reactions keep running while Lean calls JavaScript in a loop.
+  // Nothing is watched while other threads make host calls too (one served in
+  // the last lasmFullCrowdMs): then this thread has other requests to serve,
+  // as under load, and a watch would only delay them.
+  var lasmFullSpinMs = 0.02, lasmFullSpinCooling = 8, lasmFullBurstMs = 1, lasmFullCrowdMs = 2;
+  var lasmFullLast = { slot: null, at: -Infinity, other: -Infinity };
+  var lasmFullSpinnable = function (kind, operation, argument) {
+    // Not: promise settlements (207), callback replies (208), the interop long
+    // poll (209), and calls that settle a Lean promise later (flag 16): their
+    // work finishes in promise reactions, which the watch would delay.
+    return kind === 0 && operation >= 200 && operation <= 219 && operation !== 207 && operation !== 208 && operation !== 209
+      && !((operation === 205 || operation === 214) && (argument & 16n));
+  };
+  // Records that `slot` was served at `now`; whether another slot was served
+  // within lasmFullCrowdMs before.
+  var lasmFullCrowded = function (slot, now) {
+    const last = lasmFullLast;
+    if (last.slot !== slot) { last.other = last.at; last.slot = slot; }
+    last.at = now;
+    return now - last.other < lasmFullCrowdMs;
+  };
+  var lasmFullWatch = function (slot, i32, index, now = performance.now()) {
+    if (slot.cooling > 0) { slot.cooling--; return false; }
+    const until = now + lasmFullSpinMs;
+    do { if (i32[index] !== slot.sequence) return true; } while (performance.now() < until);
+    if (i32[index] !== slot.sequence) return true;
+    slot.cooling = lasmFullSpinCooling;
+    return false;
+  };
   var lasmFullServe = function (slot) {
+    const burst = performance.now();
     for (;;) {
+      // Checked before the sequence is read: a request read is served at once
+      // (the host bridge model, verification/host-bridge, has no second read).
+      if (performance.now() - burst > lasmFullBurstMs) { setImmediate(() => lasmFullServe(slot)); return; }
       const { i32 } = lasmFullViews(), index = slot.pointer / 4;
       const sequence = Atomics.load(i32, index);
       if (sequence === slot.sequence) {
@@ -225,7 +267,9 @@ if (!ENVIRONMENT_IS_PTHREAD) {
       }
       slot.sequence = sequence;
       const pending = lasmFullServeOne(slot);
+      const now = performance.now(), crowded = lasmFullCrowded(slot, now);
       if (pending) { pending.then(() => lasmFullServe(slot)); return; }
+      if (slot.spin && !crowded) lasmFullWatch(slot, i32, index, now);
     }
   };
   // Serve the pending requests of a Lean thread now, on this thread, while the

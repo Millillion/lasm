@@ -308,8 +308,9 @@ The rules for writing bindings:
 - `npm install` the package next to the lakefile. `lasm build` checks every binding
   against the installed package (`Lasm.JS binding check failed: … export "x" is
   missing`) and copies production dependencies into `dist/node_modules`.
-- Each call crosses from a Lean thread to Node's main thread (about 24 µs), so
-  prefer one coarse call over many small ones.
+- Each call crosses from a Lean thread to Node's main thread (about 5 µs when
+  calls follow one another, 20–30 µs for a lone call), so prefer one coarse call
+  over many small ones.
 
 Full guide, with Express, Hono, `pg`, `jose` and `fetch` examples and an agent
 checklist: [docs/JS_BINDINGS.md](docs/JS_BINDINGS.md).

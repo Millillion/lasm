@@ -485,6 +485,48 @@ are quadratic Lean code even natively. Full rows (also 20 and 300 digits, `mod`,
 The release benchmarks record multiplication, division and `toString` at
 10,000 digits on every candidate.
 
+## Lasm.JS call cost
+
+Before and after the call-path changes of 2026-11-09 (PR #171,
+[JS_INTEROP.md](JS_INTEROP.md#waking-the-threads-2026-11-09)). The same
+`ubuntu-24.04` runner type, `lasm-js-stress.yml` with `programs=js-sync-cost`.
+Each figure is the range of 3 runs. Each run is the median of 5 rounds of
+`bench/fixtures/js-sync-cost`, built in the release profile. HTTP and interop are
+`bench/run.mjs` (3 rounds of 8 s at c=16). Before:
+[run 42580297421](https://github.com/Millillion/lasm/actions/runs/42580297421)
+(`main` at f767bc59 plus the measurement scripts). After:
+[run 42585339904](https://github.com/Millillion/lasm/actions/runs/42585339904).
+
+| Node (Lean thread → main thread) | Before | After |
+| --- | --- | --- |
+| Lean wire codec of one call (encode request, decode reply) | 0.54–0.57 µs | 0.54–0.61 µs |
+| `get` (`Math.PI`) | 21.7–23.6 µs | 4.4–4.7 µs |
+| Method call (`Math.max(1, 2)`) | 22.2–23.7 µs | 4.7–5.0 µs |
+| Call with a 20-field object argument and result | 40.6–43.9 µs | 17.5–20.0 µs |
+| JavaScript calls a synchronous Lean callback | 18.5–19.2 µs | 17.5–17.7 µs |
+| Lean awaits a resolved promise (`IO`) | 48.5–50.3 µs | 40.3–45.1 µs |
+| `bench/run.mjs` interop: call round trip, p50 / p99 | 24.8 / 55.3 µs | 6.1 / 49.5 µs |
+| `bench/run.mjs` interop: await a resolved promise, p50 / p99 | 29.2 / 48.3 µs | 21.2 / 45.0 µs |
+| Hono + Lean handler, throughput / p99 | 14,663 req/s / 5.7 ms | 14,663 req/s / 5.2 ms |
+| Express + Lean handler, throughput / p99 | 9,616 req/s / 6.9 ms | 9,604 req/s / 6.5 ms |
+| `Std.Http` server (no Lasm.JS), throughput | 930 req/s (907–931) | 909 req/s (904–918) |
+| Plain Node `http` (reference, same runner) | 87,157 req/s | 87,249 req/s |
+
+| Deno 2.9.6 (edge build: direct calls, one thread) | Before | After |
+| --- | --- | --- |
+| Method call (`Math.max(1, 2)`) | 2.6–2.9 µs | 2.5–2.5 µs |
+| Call with a 20-field object argument and result | 19.6–20.0 µs | 13.1–13.2 µs |
+| JavaScript calls a synchronous Lean callback | 1.8–1.9 µs | 1.9–1.9 µs |
+
+The gain on Node is for calls that follow one another from one Lean thread.
+A lone call, and calls made while other Lean threads make host calls too (an HTTP
+server under load), cost what they did. That is why the HTTP rows do not move.
+An earlier version of the change, which watched in every case, cost Hono 21 % and
+`Std.Http` 26 % of their throughput
+([run 42580300809](https://github.com/Millillion/lasm/actions/runs/42580300809)).
+What remains of a 20-field object call on both hosts is mostly building and
+reading the `Data` values: the object as Lean `Data`, and the JavaScript object.
+
 ## Method
 
 - **Fixtures** are committed in [`bench/fixtures/`](../bench/fixtures): ordinary

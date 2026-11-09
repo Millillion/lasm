@@ -1,7 +1,8 @@
 /-
 Lasm.JS core: JavaScript values, conversions, calls, promises and callbacks for
 Lean programs compiled by Lasm and run on Node.js. Every JavaScript operation
-is a host call to Node's main thread (about 25–35 µs); see docs/JS_INTEROP.md.
+is a host call to Node's main thread (about 5 µs when a thread makes calls one
+after another, 20–30 µs otherwise); see docs/JS_INTEROP.md.
 -/
 import Std.Data.HashMap
 import Std.Async.Basic
