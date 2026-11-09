@@ -110,3 +110,48 @@ test('untrusted source fields cannot override the verified inventory location', 
   const metadata = await wasmtimeModuleData(dist, build);
   assert.equal(metadata.files[0].source, join(dist, 'lean', manifest.files[0].path));
 });
+
+// Each check of the module data on its own (docs/TESTING.md#mutation-testing).
+test('module-data checks: identity form, manifest file, schema, roots, records and totals', async t => {
+  const { dist, build, manifest, save } = await fixture(t);
+  const original = structuredClone(manifest);
+  const reset = async () => { for (const key of Object.keys(manifest)) delete manifest[key]; Object.assign(manifest, structuredClone(original)); await save(); };
+  for (const identity of ['x' + build.moduleDataIdentity.slice(1), build.moduleDataIdentity + '0', '0' + build.moduleDataIdentity, build.moduleDataIdentity.toUpperCase()])
+    await assert.rejects(wasmtimeModuleData(dist, { ...build, moduleDataIdentity: identity }), { code: 'ERR_ASSERTION' }, identity);
+  const rejects = async (change, message) => { await reset(); change(manifest); await save(); await assert.rejects(wasmtimeModuleData(dist, build), message); };
+  await rejects(m => { m.schema = 2; }, { code: 'ERR_ASSERTION', actual: 2, expected: 1 });
+  await rejects(m => { m.roots = ['packages/1', 'packages/0']; }, { message: 'Module-data search roots must retain their generated order' });
+  await rejects(m => { m.roots = ['packages/0', 'packages/0']; }, { message: 'Module-data search roots must retain their generated order' });
+  await rejects(m => { m.roots = 'packages/0'; }, { message: 'Module-data search roots must retain their generated order' });
+  await rejects(m => { m.files = []; m.bytes = 0; }, { code: 'ERR_ASSERTION' });
+  await rejects(m => { m.files = { length: 1 }; }, { code: 'ERR_ASSERTION' });
+  for (const path of [7, 'lib/lean/./Init.olean', 'lib/lean//Init.olean', 'lib/lean/Init.olean\0', 'lib/leanx/Init.olean', 'lib/lean/Init.olean.bak',
+    'lib/lean/Init.ileanx', 'xlib/lean/Init.olean', 'lib/lean/Init.oleanx.private'])
+    await rejects(m => { m.files[0].path = path; }, { message: 'Invalid module-data file path' });
+  for (const path of ['lib/lean/Init.ilean', 'packages/1/Same.ir.sig']) {
+    await reset(); manifest.files.push({ path, bytes: 0, sha256: hash('') }); await save();
+    await assert.rejects(wasmtimeModuleData(dist, build), /recorded inventory/, 'a valid path that is not there');
+  }
+  await rejects(m => { m.files[1].bytes = -1; m.bytes -= m.files[1].bytes + 1; }, { code: 'ERR_ASSERTION' });
+  await rejects(m => { m.files[1].bytes = 1.5; }, { code: 'ERR_ASSERTION' });
+  for (const sha256 of ['x' + original.files[1].sha256.slice(1), original.files[1].sha256 + '0', '0' + original.files[1].sha256])
+    await rejects(m => { m.files[1].sha256 = sha256; }, { code: 'ERR_ASSERTION' });
+  await rejects(m => { m.files[1].bytes = Number.MAX_SAFE_INTEGER; }, { code: 'ERR_ASSERTION' });
+  await rejects(m => { m.files.splice(0, 1); m.bytes = m.files.reduce((n, f) => n + f.bytes, 0); }, { message: 'Standard module data must include Init' });
+  await rejects(m => { m.bytes += 1; }, { code: 'ERR_ASSERTION' });
+  // The build's own total must agree too.
+  await reset();
+  await assert.rejects(wasmtimeModuleData(dist, { ...build, moduleDataBytes: build.moduleDataBytes + 1 }), { code: 'ERR_ASSERTION' });
+  // A directory in place of the manifest.
+  await rm(join(dist, 'lean/metadata.json'));
+  await mkdir(join(dist, 'lean/metadata.json'));
+  await assert.rejects(wasmtimeModuleData(dist, build), { message: 'Module-data manifest must be an ordinary file' });
+});
+
+test('module-data: the result lists every file with its source, path, size and hash', async t => {
+  const { dist, build, manifest } = await fixture(t);
+  const data = await wasmtimeModuleData(dist, build);
+  assert.deepEqual(data.files, manifest.files.map(f => ({ source: join(dist, 'lean', f.path), path: f.path, bytes: f.bytes, sha256: f.sha256 })));
+  assert.deepEqual(data.manifest, manifest);
+  assert.equal(await wasmtimeModuleData(dist, { moduleDataIdentity: undefined }), null);
+});

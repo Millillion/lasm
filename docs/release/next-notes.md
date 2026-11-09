@@ -10,3 +10,8 @@ Since 0.6.0 (docs/release/0.6.0-notes.md), main has had only benchmark records; 
 - **A failing async Lean event handler is reported once.** `lasm:web`'s listeners report a handler's rejected promise to the app; the promise was also handed back to the event target, and Node's `EventTarget` (edge and server targets) turns a listener's rejected promise into an uncaught exception. The listener now hands back a promise that does not reject.
 - **`Lasm.Web.Canvas.draw` rejects every unknown command.** A command named like an `Object` method (`constructor`, `toString`) was run as one instead of failing with "unknown drawing command".
 - **A browser build into `public/` leaves nothing behind.** `lasm build --target browser --output public/dist` was refused, as it should be, but only after its staging directory had been created inside `public/`, where the next build then found it.
+Nothing user-facing has landed on main since 0.6.0 besides benchmark records; the work since then raises mutation-testing scores across the JavaScript of `src/` (every module now has behavioural tests that a changed line fails). The fixes those tests found are below.
+
+## Fixes
+
+- **`lasm build --target workers` no longer keeps a generated `workers/wrangler.toml` once the project has its own.** A project that added `wrangler.toml`, `wrangler.json` or `wrangler.jsonc` at its root after an earlier build still had the earlier generated `workers/wrangler.toml` when the program had not changed (an unchanged rebuild keeps the output directory as it was). It is now removed, as a build from scratch leaves none.
