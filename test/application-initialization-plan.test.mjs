@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { initializerWrapperParts, initializerWrappers, isInitializerUnit, planInitializers } from '../src/application-initialization.mjs';
+import { hasExternalEffect, initializerUnits, initializerWrapperParts, initializerWrappers, isForeignFunction, isInitializerUnit, planInitializers } from '../src/application-initialization.mjs';
 import { archive, wasmObject } from './fixtures/link-stand-ins/toolchain.mjs';
 
 /** main.o: the entry and Main's initializer; effect.o: the program's own effectful module;
@@ -152,4 +152,81 @@ test('wrappers: kept units call their bodies, skipped ones call their initialize
   assert.ok(bodies.endsWith('int main(int argc, char **argv) {\n  (void)argc; (void)argv;\n  __real_initialize_C(1);\n  __real_initialize_A(1);\n  return 0;\n}\n'));
   for (const name of ['initialize_A', 'runtime_initialize_A_B', 'meta_initialize_X9']) assert.ok(isInitializerUnit(name), name);
   for (const name of ['initialize_', 'xinitialize_A', 'initialize_A.B', 'other_initialize_A']) assert.ok(!isInitializerUnit(name), name);
+});
+
+test('a unit: its initializer calls, assigned globals (initialize results after an initFn), reached data, effects and triviality', t => {
+  const directory = mkdtempSync(join(tmpdir(), 'lasm-init-units-'));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const file = join(directory, 'm.o');
+  writeFileSync(file, wasmObject({
+    functions: [
+      { name: 'initialize_M', refs: ['initialize_M', 'initialize_A', 'l_helper', 'l_M_x_initFn', 'l_ref', 'l_after', '_G_initialized', '_G_runtime_initialized', 'l_c_once',
+        'l_t___closed__1', 'l_t___boxed__const__1', 'l_extern', 'lean_mark_persistent', 'initialize_B'] },
+      { name: 'l_helper', refs: ['l_reached', 'l_deeper', 'initialize_Z'] }, { name: 'l_deeper', refs: ['l_deep_data', 'l_helper'] },
+      { name: 'initialize_Z', refs: ['lean_io_prim_put_str'] }, { name: 'initialize_Local', local: true, refs: ['initialize_A'] },
+      { name: 'initialize_E', refs: ['l_e'] }, { name: 'l_e', refs: ['sqlite3_open'] },
+      { name: 'initialize_T', refs: ['initialize_A', '_G_initialized', 'lean_mark_persistent'] }, { name: 'initialize_U', refs: ['initialize_A', '__stack_pointer'] },
+      { name: 'initialize_N', refs: ['l_ref'] }, { name: 'initialize_P', refs: ['lean_io_prim_put_str'] }, { name: 'initialize_Q', refs: ['sqlite3_open'] },
+    ],
+    data: ['l_ref', 'l_after', '_G_initialized', '_G_runtime_initialized', 'l_c_once', 'l_t___closed__1', 'l_t___boxed__const__1', 'l_reached', 'l_deep_data'].map(name => ({ name })),
+    undefinedData: ['l_extern'],
+  }));
+  const units = initializerUnits([file]);
+  const m = units.get('initialize_M');
+  assert.deepEqual(m.calls, ['initialize_A', 'initialize_B']);
+  assert.deepEqual(m.data, ['l_ref', 'l_after', 'l_t___boxed__const__1']);
+  assert.deepEqual(m.initTargets, ['l_ref'], 'only the store right after the initFn call');
+  assert.deepEqual([...m.reaches].sort(), ['l_after', 'l_deep_data', 'l_reached', 'l_ref', 'l_t___boxed__const__1', 'l_t___closed__1', 'l_c_once', '_G_initialized', '_G_runtime_initialized', 'l_extern'].sort(), 'every data symbol the code reaches, defined or not');
+  assert.equal(m.effects, false, 'an effect inside another initializer is that unit\'s');
+  assert.equal(m.trivial, undefined);
+  assert.equal(m.file, file);
+  assert.equal(m.member, null);
+  assert.ok(m.siblings.has('l_helper') && !m.siblings.has('l_ref'));
+  assert.equal(units.has('initialize_Local'), false, 'local initializers are not units');
+  assert.equal(units.get('initialize_E').effects, true, 'a package\'s C function');
+  assert.equal(units.get('initialize_P').effects, true, 'console output');
+  assert.equal(units.get('initialize_Q').effects, true);
+  assert.equal(units.get('initialize_T').trivial, true);
+  assert.equal(units.get('initialize_N').trivial, undefined, 'it assigns a global');
+  assert.equal(units.get('initialize_U').trivial, undefined, 'a call to another C function');
+  assert.equal(units.get('initialize_P').trivial, undefined, 'an effect');
+  assert.equal(units.get('initialize_Q').trivial, undefined, 'foreign code');
+  assert.equal(units.get('initialize_Z').effects, true);
+  // The same unit in two files is an error; archives are cached by their bytes.
+  const copy = join(directory, 'copy.o');
+  writeFileSync(copy, wasmObject({ functions: [{ name: 'initialize_M', refs: ['initialize_A'] }] }));
+  assert.throws(() => initializerUnits([file, copy]), { message: `Lean initializer initialize_M is defined twice (${file}, ${copy})` });
+  const twice = join(directory, 'twice.a');
+  writeFileSync(twice, archive([['a.o', wasmObject({ functions: [{ name: 'initialize_X', refs: ['initialize_A'] }] })], ['b.o', wasmObject({ functions: [{ name: 'initialize_X', refs: ['initialize_A'] }] })]]));
+  assert.throws(() => initializerUnits([twice]), { message: `Lean initializer initialize_X is defined twice (${twice}, ${twice})` });
+  const lib = join(directory, 'lib.a');
+  writeFileSync(lib, archive([['k.o', wasmObject({ functions: [{ name: 'initialize_K', refs: ['initialize_L', 'l_k'] }], data: [{ name: 'l_k' }] })]]));
+  const saved = new Map();
+  const archiveUnits = { load: path => saved.get(path), save: (path, list) => saved.set(path, list) };
+  const first = initializerUnits([file, lib], { archiveUnits });
+  assert.deepEqual([...saved.keys()], [lib], 'only archives are cached');
+  assert.deepEqual(saved.get(lib), [{ name: 'initialize_K', calls: ['initialize_L'], data: ['l_k'], initTargets: [], effects: false, member: 'k.o' }]);
+  writeFileSync(lib, 'replaced: the cache answers');
+  const second = initializerUnits([lib], { archiveUnits });
+  assert.deepEqual({ ...second.get('initialize_K'), reaches: [...second.get('initialize_K').reaches] },
+    { name: 'initialize_K', calls: ['initialize_L'], data: ['l_k'], initTargets: [], effects: false, member: 'k.o', file: lib, reaches: [], siblings: new Set() });
+  assert.deepEqual(first.get('initialize_K').calls, ['initialize_L']);
+  // A graph build reads the objects again, keying local symbols by object.
+  writeFileSync(lib, archive([['k.o', wasmObject({ functions: [{ name: 'initialize_K', refs: ['l_local'] }, { name: 'l_local', local: true, refs: ['l_k'] }], data: [{ name: 'l_k' }] })]]));
+  const graph = new Map();
+  initializerUnits([lib], { archiveUnits, graph });
+  assert.deepEqual(graph.get('initialize_K'), [`${lib}\0k.o\0l_local`]);
+  assert.deepEqual(graph.get(`${lib}\0k.o\0l_local`), ['l_k']);
+});
+
+test('effects and foreign code: the classification of called names', () => {
+  for (const name of ['lean_get_stdout', 'lean_get_set_stderr', 'lean_get_stdin', 'lean_io_prim_x', 'lean_io_process_spawn', 'lean_io_exit', 'lean_io_getenv', 'lean_io_remove_file',
+    'lean_io_create_dir', 'lean_io_rename', 'lean_io_app_path', 'lean_io_current_dir', 'lean_io_read_dir', 'lean_io_realpath', 'lean_io_metadata', 'lean_io_create_tempfile',
+    'lean_io_hard_link', 'lean_io_chmod', 'l_IO_print', 'l_IO_eprintln', 'l_IO_FS_x', 'l_IO_Process_x', 'l_IO_setStdout', 'l_IO_getStdin', 'l_IO_appendLn', 'l_IO_appendToFile'])
+    assert.ok(hasExternalEffect(name), name);
+  for (const name of ['lean_get_stdoutx', 'xlean_io_prim_x', 'lean_io_exitx', 'lean_io_getenvs', 'l_IO_FSx', 'lean_io_mono_ms_now', 'l_IOx_print'])
+    assert.ok(!hasExternalEffect(name), name);
+  for (const name of ['memcpy', 'memmove', 'memset', 'memcmp', 'strlen', 'abort', 'lp_x', '_lean_x', 'runtime_initialize_X', 'meta_initialize_X', '__x'])
+    assert.ok(!isForeignFunction(name), name);
+  for (const name of ['sqlite3_open', 'xlean_y', 'memcpyx', 'my_lp_x', 'meta_x']) assert.ok(isForeignFunction(name), name);
 });
