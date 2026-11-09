@@ -244,3 +244,82 @@ test('tiered catalogs: each malformed field is refused', async t => {
   assert.deepEqual(Object.keys(leanDistribution(f.release, host)), ['kind', 'bin', 'core', 'extended', 'extendedModules', 'c']);
   assert.deepEqual(Object.keys(leanDistribution({ ...f.release, tiers: { ...tiers, c: undefined } }, host)), ['kind', 'bin', 'core', 'extended', 'extendedModules']);
 });
+
+test('more pin forms: multi-digit versions; tiered catalogs need bin per host and string module roots', async t => {
+  const f = await fixture(t, { c: true });
+  const catalog = { defaultLean: '9.9.9', lean: { '9.9.9': {}, '10.11.12': {} } };
+  for (const text of ['leanprover/lean4:v10.11.12', '10.11.12']) {
+    await writeFile(join(f.project, 'lean-toolchain'), text);
+    assert.equal((await selectLeanVersion(f.main, catalog)).version, '10.11.12', text);
+  }
+  const tiers = f.release.tiers;
+  assert.equal(leanDistribution({ ...f.release, tiers: { ...tiers, bin: undefined } }, host).kind, 'full');
+  assert.equal(leanDistribution({ commit: 'c', tiers: { ...tiers, bin: {} } }, host), null, 'no tiers and no artifacts for this host');
+  assert.equal(leanDistribution({ commit: 'c' }, host), null);
+  assert.throws(() => leanDistribution({ ...f.release, tiers: { ...tiers, extendedModules: ['Lean', 'lake'] } }, host), { message: 'Invalid tiered Lean catalog entry' });
+});
+
+test('assembled prefixes: conflicts are named, the library is compiled for its Lean release', async t => {
+  const f = await fixture(t);
+  const { assembleLeanPrefix } = await import('../src/managed-lean.mjs');
+  const clash = { ...f.extended[0] };
+  const stages = [];
+  const options = { ...f.options, progress: event => stages.push(event.stage) };
+  const twin = await tierArchive('lean-9.9.9-twin', { 'lib/lean/Core0.olean': 'other' });
+  const fetch = async url => url === twin.artifact.url ? new Response(twin.bytes) : f.options.fetch(url);
+  await assert.rejects(assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.core[0], label: 'a' }, { artifact: twin.artifact, label: 'b' }], { ...options, fetch }),
+    { message: `Lean archives ${f.core[0].name} and ${twin.artifact.name} both contain lib/lean/Core0.olean` });
+  void clash;
+  await assembleLeanPrefix('4.35.0', f.release, [{ artifact: f.bin, label: 'bin' }], options);
+  assert.ok(stages.includes("Compiling Lasm's Lean library for Lean 4.35.0"));
+  stages.length = 0;
+  await assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.bin, label: 'bin' }], options);
+  assert.equal(stages.some(stage => /Compiling Lasm/.test(stage)), false);
+});
+
+test('macOS C tier without an SDK stops with the fix', { skip: process.platform === 'darwin' }, async t => {
+  const f = await fixture(t, { c: true });
+  const { assembleLeanPrefix } = await import('../src/managed-lean.mjs');
+  const { macosSdkMissing } = await import('../src/application-sources.mjs');
+  const saved = process.env.SDKROOT;
+  process.env.SDKROOT = join(f.base, 'no-sdk');
+  t.after(() => { if (saved === undefined) delete process.env.SDKROOT; else process.env.SDKROOT = saved; });
+  await assert.rejects(assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.bin, label: 'bin' }, { artifact: f.cTier, label: 'c' }], { ...f.options, platform: 'darwin' }),
+    { message: macosSdkMissing });
+  // Linux C tiers need no SDK.
+  await assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.bin, label: 'bin' }, { artifact: f.cTier, label: 'c' }], { ...f.options, platform: 'linux' });
+});
+
+test('macOS C tier: the SDK stub is filtered into the prefix, checked for the requested architecture, or a shipped copy kept', { skip: !posix }, async t => {
+  const f = await fixture(t);
+  const { assembleLeanPrefix } = await import('../src/managed-lean.mjs');
+  const sdk = join(f.base, 'MacOSX.sdk');
+  await mkdir(join(sdk, 'usr/include'), { recursive: true }); await mkdir(join(sdk, 'usr/lib'), { recursive: true });
+  await writeFile(join(sdk, 'usr/include/stdio.h'), '');
+  await writeFile(join(sdk, 'usr/lib/libSystem.tbd'), '--- !tapi-tbd\ntargets: [ arm64-macos, arm64e.x1-macos ]\ninstall-name: /usr/lib/libSystem.B.dylib\n...\n');
+  const saved = process.env.SDKROOT;
+  process.env.SDKROOT = sdk;
+  t.after(() => { if (saved === undefined) delete process.env.SDKROOT; else process.env.SDKROOT = saved; });
+  const extra = [];
+  const tier = async (name, files) => { const item = await tierArchive(name, files); extra.push(item); return item.artifact; };
+  const fetch = async url => { const item = extra.find(x => x.artifact.url === url); return item ? new Response(item.bytes) : f.options.fetch(url); };
+  const linker = `#!/usr/bin/env node
+if (process.argv[2] !== '-arch' || process.argv[3] !== 'arm64') { console.error('linked for ' + process.argv[3]); process.exit(1); }
+`;
+  // No core tier: lib/ does not exist until the stub is written.
+  const plain = await tier('lean-9.9.9-mac-c', { 'include/stdio.h': '' });
+  const one = await assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.bin, label: 'bin' }, { artifact: plain, label: 'c' }], { ...f.options, fetch, platform: 'darwin', arch: 'arm64' });
+  assert.equal(await readFile(join(one.directory, 'lib/libc/libSystem.tbd'), 'utf8'), '--- !tapi-tbd\ntargets: [ arm64-macos ]\ninstall-name: /usr/lib/libSystem.B.dylib\n...\n');
+  const checked = await tier('lean-9.9.9-mac-linker-c', { 'bin/ld64.lld': linker });
+  await assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.bin, label: 'bin' }, { artifact: checked, label: 'c' }], { ...f.options, fetch, platform: 'darwin', arch: 'arm64' });
+  await assert.rejects(assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.bin, label: 'bin' }, { artifact: checked, label: 'c' }], { ...f.options, cache: join(f.base, 'cache-x64'), fetch, platform: 'darwin', arch: 'x64' }),
+    { message: `The macOS SDK at ${sdk} has a libSystem.tbd that Lean 9.9.9's linker (ld64.lld) cannot read: linked for x86_64. Set SDKROOT to another macOS SDK `
+      + '(xcrun --show-sdk-path, or one under /Library/Developer/CommandLineTools/SDKs) and run again, or report this at https://github.com/Millillion/lasm/issues.' });
+  const shipped = await tier('lean-9.9.9-shipped-c', { 'lib/libc/libSystem.tbd': 'shipped stub' });
+  const kept = await assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.bin, label: 'bin' }, { artifact: shipped, label: 'c' }], { ...f.options, fetch, platform: 'darwin', arch: 'arm64' });
+  assert.equal(await readFile(join(kept.directory, 'lib/libc/libSystem.tbd'), 'utf8'), 'shipped stub');
+  // An unreadable SDK stub names the SDK.
+  await writeFile(join(sdk, 'usr/lib/libSystem.tbd'), '--- !tapi-tbd\ninstall-name: /x\n');
+  await assert.rejects(assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.bin, label: 'bin' }, { artifact: plain, label: 'c' }], { ...f.options, fetch, platform: 'darwin', arch: 'arm64' }),
+    error => error.message.startsWith(`The macOS SDK at ${sdk} has a libSystem.tbd that Lean 9.9.9's linker (ld64.lld) cannot read: Unsupported TAPI stub: no target or architecture list.`));
+});
