@@ -3,7 +3,8 @@
 // vanilla JavaScript, the counter, and the feature demo (routing, HTTP, timers,
 // ports, SVG, focus, SSR and hydration), and event decisions (examples/ui/events:
 // preventDefault and stopPropagation decided in Lean per event). Each check gets the suite's helpers:
-// { server, name, manifest, openPage, expect, report }.
+// { server, name, manifest, openPage, expect, report, step } (step(label) names
+// what the check is doing, for the suite's per-app timeout message).
 
 const median = xs => { const s = [...xs].sort((a, b) => a - b); return s.length ? s[Math.floor(s.length / 2)] : null; };
 // Browsers log failed requests as console errors; the demo requests a missing page on purpose.
@@ -146,13 +147,22 @@ const operations = [
   { name: 'clear 1,000 rows', setup: ['clear', 'run'], run: 'clear' },
 ];
 
+// A painted frame: requestAnimationFrame, then a task. A page that gets no
+// frames (in the background, or a stalled engine) fails within frameWaitMs
+// instead of leaving page.evaluate (which has no timeout) waiting forever.
+// (The page's CSP has no 'unsafe-eval', so each evaluated function spells it out.)
+const frameWaitMs = 15_000;
+
 // One timed run of an operation in a page: the setup clicks (each followed by
 // a painted frame), then the click being timed, to the next painted frame.
 async function trial(page, op) {
   // A page in the background may get no animation frames.
   await page.bringToFront();
-  return page.evaluate(async op => {
-    const paint = () => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
+  return page.evaluate(async ([op, frameWaitMs]) => {
+    const paint = () => new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error(`no animation frame within ${frameWaitMs} ms (visibilityState ${document.visibilityState}, hasFocus ${document.hasFocus()})`)), frameWaitMs);
+      requestAnimationFrame(() => setTimeout(() => { clearTimeout(timer); resolve(); }, 0));
+    });
     const target = run => typeof run === 'string' ? document.getElementById(run)
       : run.select ? document.querySelector(`#tbody tr:nth-child(${run.select}) td:nth-child(2) a`)
       : document.querySelector(`#tbody tr:nth-child(${run.remove}) td:nth-child(3) a`);
@@ -163,19 +173,22 @@ async function trial(page, op) {
     el.click();
     await paint();
     return performance.now() - t0;
-  }, op);
+  }, [op, frameWaitMs]);
 }
 
 // The DOM after run then update: 1,000 rows, every 10th label updated.
-const checkRows = async page => (await page.bringToFront(), page.evaluate(async () => {
-  const paint = () => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
+const checkRows = async page => (await page.bringToFront(), page.evaluate(async frameWaitMs => {
+  const paint = () => new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`no animation frame within ${frameWaitMs} ms (visibilityState ${document.visibilityState}, hasFocus ${document.hasFocus()})`)), frameWaitMs);
+    requestAnimationFrame(() => setTimeout(() => { clearTimeout(timer); resolve(); }, 0));
+  });
   for (const id of ['clear', 'run', 'update']) { document.getElementById(id).click(); await paint(); }
   const rows = [...document.querySelectorAll('#tbody tr')];
   return { rows: rows.length, firstUpdated: rows[0]?.querySelector('a')?.textContent.endsWith(' !!!'),
     secondPlain: !rows[1]?.querySelector('a')?.textContent.endsWith(' !!!') };
-}));
+}, frameWaitMs));
 
-async function bench({ server, name, openPage, expect, report }) {
+async function bench({ server, name, openPage, expect, report, step }) {
   const lasm = await openPage(server, `/${name}/`);
   const vanilla = await openPage(server, '/vanilla/');
   const table = {};
@@ -186,16 +199,21 @@ async function bench({ server, name, openPage, expect, report }) {
     // over the first seconds; both pages run every operation a few times first.
     for (let round = 0; round < 3; round++)
       for (const op of operations.filter(o => !o.repeats))
-        for (const page of [lasm.page, vanilla.page]) await trial(page, op);
+        for (const [which, page] of [['Lasm.UI', lasm.page], ['vanilla', vanilla.page]]) {
+          step(`warm-up round ${round + 1}: ${op.name} (${which})`);
+          await trial(page, op);
+        }
     // Trials alternate between the two pages, so both see the same machine
     // state (shared CI runners vary over a run); one more warm-up trial each.
     for (const op of operations) {
       const l = [], v = [], leanMs = [], applyMs = [];
       const n = (op.repeats ?? 10) + 1;
       for (let i = 0; i < n; i++) {
+        step(`trial ${i + 1}/${n}: ${op.name} (Lasm.UI)`);
         const tl = await trial(lasm.page, op);
         // Lean's part of the timed frame (view, diff, encoding) and the applier's.
         const last = await lasm.page.evaluate(() => document.querySelector('[data-lasm-app]')?.lasmUi?.stats().last ?? null);
+        step(`trial ${i + 1}/${n}: ${op.name} (vanilla)`);
         const tv = await trial(vanilla.page, op);
         if (i > 0) { l.push(tl); v.push(tv); if (last) { leanMs.push(last.leanMs); applyMs.push(last.applyMs); } }
       }
@@ -212,6 +230,7 @@ async function bench({ server, name, openPage, expect, report }) {
       }
     }
     report.apps[name].bench = table;
+    step('the final DOM');
     const lc = await checkRows(lasm.page), vc = await checkRows(vanilla.page);
     expect(name, 'bench.dom', lc.rows === 1000 && lc.firstUpdated && lc.secondPlain, JSON.stringify(lc));
     expect(name, 'bench.vanilla-dom', vc.rows === 1000 && vc.firstUpdated, JSON.stringify(vc));
