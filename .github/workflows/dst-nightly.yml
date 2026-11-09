@@ -9,7 +9,7 @@ name: DST nightly
 # are new; or on demand. Not a release gate.
 on:
   schedule:
-    - cron: '23 3 * * 0,2-6'
+    - cron: '23 3 * * 2-6'
   workflow_dispatch:
 permissions:
   contents: read
@@ -20,7 +20,13 @@ env:
   CI: '1'
   BROWSER: 'none'
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   dst:
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true'
     name: ${{ matrix.app }}, random seeds
     runs-on: ubuntu-24.04
     timeout-minutes: 75

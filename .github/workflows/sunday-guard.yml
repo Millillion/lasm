@@ -1,0 +1,34 @@
+name: Sunday guard
+# No scheduled run does anything on a Sunday in US Eastern time (Jordan,
+# 2026-11-07; docs/CI.md#no-runs-on-sunday). Crons keep their nominal times off
+# Sunday, but GitHub starts scheduled runs hours late, so every workflow with a
+# `schedule:` trigger calls this first, as its job `sunday`, and every other job
+# there needs it with `if: needs.sunday.outputs.skip != 'true' && (...)`.
+# skip is true only for a scheduled run that starts on a Sunday in New York;
+# pushes, pull requests, dispatches and calls are never skipped.
+# test/no-sunday-schedules.test.mjs requires the guard in every such workflow.
+on:
+  workflow_call:
+    outputs:
+      skip:
+        description: "'true' when the calling run is scheduled and it is Sunday in New York"
+        value: ${{ jobs.check.outputs.skip }}
+permissions: {}
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    outputs:
+      skip: ${{ steps.day.outputs.skip }}
+    steps:
+      - id: day
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          day=$(TZ=America/New_York date +%u)
+          skip=false
+          if [ "$EVENT" = schedule ] && [ "$day" = 7 ]; then skip=true; fi
+          echo "skip=$skip" >> "$GITHUB_OUTPUT"
+          if [ "$skip" = true ]; then
+            echo "Sunday in New York ($(TZ=America/New_York date)): this scheduled run does nothing." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi

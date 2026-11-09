@@ -33,7 +33,13 @@ env:
   BROWSER: 'none'
   WRANGLER_SEND_METRICS: 'false'
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   static:
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -51,7 +57,8 @@ jobs:
       - name: Tutorials (each page shows its steps)
         run: node scripts/content/check-tutorials.mjs --static
   sources:
-    if: github.event_name != 'pull_request'
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event_name != 'pull_request')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -66,7 +73,8 @@ jobs:
       - name: Every source URL answers
         run: node scripts/content/index.mjs --check-sources
   pack:
-    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
     # The retained runtime input is a draft release asset (needs contents: write to read).
     permissions:
       contents: write
@@ -100,7 +108,8 @@ jobs:
           retention-days: 3
           if-no-files-found: error
   tutorials:
-    needs: [static, pack]
+    if: needs.sunday.outputs.skip != 'true'
+    needs: [sunday, static, pack]
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     strategy:

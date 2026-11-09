@@ -24,6 +24,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { collect, evaluate, githubApi, LEVELS, levelText } from './levels.mjs';
+import { sundayGuarded } from '../ci/sunday-guard.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 export const PAGE = 'content/learn/test-evidence.md';
@@ -172,7 +173,7 @@ async function ciFacts(repo, { api, logOf, now }) {
     return list;
   };
   const latest = async (workflow, event) => (await runsOf(workflow, `&branch=main${event ? `&event=${event}` : ''}`))
-    .find(run => run.conclusion !== 'skipped' && run.conclusion !== 'cancelled') ?? null;
+    .find(run => run.conclusion !== 'skipped' && run.conclusion !== 'cancelled' && !sundayGuarded(run)) ?? null;
   const jobFacts = async (run, pattern, parser) => {
     if (!run) return [];
     const out = [];
