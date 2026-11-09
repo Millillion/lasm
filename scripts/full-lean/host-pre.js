@@ -255,6 +255,9 @@ if (!ENVIRONMENT_IS_PTHREAD) {
   var lasmFullServe = function (slot) {
     const burst = performance.now();
     for (;;) {
+      // Checked before the sequence is read: a request read is served at once
+      // (the host bridge model, verification/host-bridge, has no second read).
+      if (performance.now() - burst > lasmFullBurstMs) { setImmediate(() => lasmFullServe(slot)); return; }
       const { i32 } = lasmFullViews(), index = slot.pointer / 4;
       const sequence = Atomics.load(i32, index);
       if (sequence === slot.sequence) {
@@ -262,7 +265,6 @@ if (!ENVIRONMENT_IS_PTHREAD) {
         if (wait.async) { wait.value.then(() => lasmFullServe(slot)); return; }
         continue;
       }
-      if (performance.now() - burst > lasmFullBurstMs) { setImmediate(() => lasmFullServe(slot)); return; }
       slot.sequence = sequence;
       const pending = lasmFullServeOne(slot);
       const now = performance.now(), crowded = lasmFullCrowded(slot, now);
