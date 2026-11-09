@@ -28,10 +28,10 @@ for (const v of variants) {
 }
 const sh = (cmd) => spawnSync('bash', ['-c', cmd], { encoding: 'utf8', timeout: 120_000 }).stdout ?? '';
 
-function runOnce(bun, v, args, timeout, diagnose) {
+function runOnce(bun, v, args, timeout, diagnose, { entry = 'main.mjs', pre = [], extraEnv = {} } = {}) {
   return new Promise(done => {
     const started = performance.now();
-    const child = spawn(bun, [join(work, v, 'deno/main.mjs'), ...args], { cwd: work, env, stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(bun, [...pre, join(work, v, 'deno', entry), ...args], { cwd: work, env: { ...env, ...extraEnv }, stdio: ['ignore', 'pipe', 'pipe'] });
     let stdout = '', stderr = '', hung = false, diag = '';
     child.stdout.on('data', d => { stdout += d; }); child.stderr.on('data', d => { stderr += d; });
     const timer = setTimeout(() => {
@@ -54,7 +54,7 @@ function runOnce(bun, v, args, timeout, diagnose) {
 const ok = r => r.code === 0 && /^\d+\n$/.test(r.stdout);
 const results = {};
 for (const bun of buns) {
-  const version = spawnSync(bun, ['--version'], { encoding: 'utf8' }).stdout.trim() + (bun.includes('profile') ? ' (profile)' : '');
+  const version = spawnSync(bun, ['--revision'], { encoding: 'utf8' }).stdout.trim() + (bun.includes('profile') ? ' (profile)' : '');
   log(`## Bun ${version} (${bun}); JSPI: ${spawnSync(bun, ['-e', 'console.log(typeof WebAssembly.Suspending)'], { encoding: 'utf8' }).stdout.trim()}`);
   for (const v of variants) for (const mode of modes) {
     let lo = 100, hi = 50_000;
@@ -83,6 +83,43 @@ for (const bun of buns) {
     const line = `**${version} ${v} ${mode}**: deepest ${lo}, n ${ns[0]}..${ns[iterations - 1]}: ${hangs}/${ns.length} hangs at ${JSON.stringify(hungAt)}, ${other} unexpected; stop ms median ${times[times.length >> 1]} max ${times[times.length - 1]}`;
     log(line);
     results[`${version} ${v} ${mode}`] = { deepest: lo, hungAt, runs: ns.length, other };
+  }
+}
+// Phase 2: the hang window with instrumentation and without JSPI.
+writeFileSync(join(work, 'spin.mjs'), `const { writeSync } = await import('node:fs');
+const original = performance.now.bind(performance);
+let calls = 0;
+performance.now = function now() {
+  if (++calls === 3_000_000) { Error.stackTraceLimit = 200; writeSync(2, 'SPIN after ' + calls + ' performance.now calls\\n' + new Error('spin').stack + '\\n'); process.exit(99); }
+  return original();
+};
+process.on('exit', () => { if (process.env.PROBE_COUNT) writeSync(2, 'performance.now calls: ' + calls + '\\n'); });
+`);
+for (const v of variants) {
+  const main = readFileSync(join(work, v, 'deno/main.mjs'), 'utf8');
+  writeFileSync(join(work, v, 'deno/main-nojspi.mjs'), main.replace('startLean({ createProgram,', 'startLean({ jspi: false, createProgram,'));
+}
+const configs = {
+  plain: {},
+  spin: { pre: ['--preload', join(work, 'spin.mjs')] },
+  count: { pre: ['--preload', join(work, 'spin.mjs')], extraEnv: { PROBE_COUNT: '1' } },
+  nojspi: { entry: 'main-nojspi.mjs' },
+};
+for (const bun of buns) for (const v of variants) {
+  let lo = 100, hi = 50_000;
+  while (hi - lo > lo / 50 + 1) { const mid = Math.floor((lo + hi) / 2); if (ok(await runOnce(bun, v, ['sum', String(mid)], 60_000, false))) lo = mid; else hi = mid; }
+  const ns = Array.from({ length: 60 }, (_, i) => Math.round(lo * (1.04 + 0.2 * i / 60)));
+  for (const [name, config] of Object.entries(configs)) {
+    const hungAt = [], stops = {}; let shown = 0;
+    for (const n of ns) {
+      const r = await runOnce(bun, v, ['sum', String(n)], name === 'plain' ? timeoutMs : 60_000, false, config);
+      if (r.hung) hungAt.push(n);
+      const head = r.hung ? 'HUNG' : `${r.code}: ${r.stderr.split('\n').filter(l => !l.startsWith('    ')).slice(0, 2).join(' | ').slice(0, 160)}`;
+      stops[head] = (stops[head] ?? 0) + 1;
+      if (name === 'spin' && r.stderr.includes('SPIN') && shown++ < 2) log(`### spin stack (${v} sum ${n})\n\n\`\`\`\n${r.stderr.slice(0, 12000)}\n\`\`\``);
+      if (name === 'count' && shown++ < 4) log(`count (${v} sum ${n}): ${JSON.stringify(r.stderr.slice(-300))}`);
+    }
+    log(`**phase 2 ${v} ${name}** deepest ${lo}, n ${ns[0]}..${ns[ns.length - 1]}: ${hungAt.length}/${ns.length} hung at ${JSON.stringify(hungAt)}; outcomes ${JSON.stringify(stops)}`);
   }
 }
 writeFileSync(join(work, 'results.json'), JSON.stringify(results, null, 2));
