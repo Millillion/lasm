@@ -1018,6 +1018,8 @@ measurement on Node 26 is the recorded floor).
 | `target-link` | `application-link.mjs`, `edge/edge-link.mjs`, `wasi/wasi-link.mjs` | 5.9 % | **86.8 %** | 86 % |
 | `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **97.3 %** | 97 % |
 | `notices` | `notices.mjs` | 62.5 % | **91.5 %** | 91 % |
+| `node-host` | `node-host.mjs`, `node-network.mjs`, `node-process.mjs`, `node-signal.mjs`, `node-system.mjs`, `node-udp.mjs`, `node-fetch.mjs`, `lean-io-errors.mjs`, `handle-table.mjs`, `process-exec.mjs`, `working-directory.mjs`, `linux-memory.mjs`, `thread-id.cjs`, `native-clock.mjs`, `native-dns.mjs`, `native-interfaces.mjs`, `native-windows-timezone.mjs`, `native-tcp.mjs` | 42 % | **86.1 %** | 86 % |
+| `native-files` | `native-files.mjs`, `native-file-message.mjs`, `native-file-worker.mjs`, `native-file-worker-pool.mjs`, `native-worker-cwd.cjs`, `worker-stdio.cjs`, `native-process.mjs`, `native-signals.mjs`, `native-program.mjs`, `native-abort.cjs`, `native-pthread-factory.cjs` | 29.4 % | **86.5 %** | 86 % |
 
 Every module is above 80 %; each threshold is its score rounded down. The link driver and the target links
 are tested with stand-in toolchains: `test/link-driver-pipeline.test.mjs`
@@ -1030,6 +1032,19 @@ tiny C-to-relocatable-Wasm compiler, ar archives and a garbage-collecting linker
 with `--wrap`, `-Map` and `--why-extract`), run in-process so that a module's
 run takes minutes. The stand-ins need a POSIX shell, so those tests are skipped
 on Windows; the pure-function tests run everywhere.
+
+The Node host (`node-host`, `native-files`) runs in-process: the native
+adapters that bind the C library through koffi are loaded against a scripted
+libc (`test/helpers/koffi-stand-in.mjs`, a `module.registerHooks` stand-in for
+koffi), which also covers their Windows and macOS branches by presenting
+`process.platform` as that platform for the test; the file worker's adapter,
+its message protocol and the pthread cwd factory, which normally run in worker
+threads (where Stryker records no coverage), are called in the test's thread;
+and the child-side launcher `process-exec.mjs`, which ends by replacing its
+process with `execvp`, runs in-process against the scripted libc. The mutation
+job has no native helpers (the signal adapter, the native process launcher):
+the tests that need them skip there, and `native-signals.mjs` is loaded from a
+copy beside a stand-in adapter.
 
 Mutants whose test file had to be stopped (more than 1 GiB, or alive after its
 runner) are *runtime errors*: Stryker leaves them out of the score
