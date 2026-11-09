@@ -47,7 +47,7 @@
       "name": "serverless",
       "description": "Function-platform shims (Lambda, Vercel, Netlify, Azure Functions, Google Cloud Functions), the loopback forwarder and the zip writer",
       "mutate": ["src/serverless/lasm-server.mjs", "src/serverless/lasm-lambda.mjs", "src/serverless/lasm-vercel.mjs", "src/serverless/lasm-netlify.mjs", "src/serverless/lasm-azure.mjs", "src/serverless/lasm-gcf.mjs", "src/serverless/zip.mjs"],
-      "tests": ["test/serverless.test.mjs"]
+      "tests": ["test/serverless.test.mjs", "test/serverless-shims.test.mjs", "test/serverless-zip.test.mjs"]
     },
     {
       "name": "downloads",
