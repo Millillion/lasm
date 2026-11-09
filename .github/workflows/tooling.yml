@@ -1,5 +1,5 @@
 name: Dependable tooling
-# Claim 4 of docs/proposals/TESTING_STRATEGY.md, black box (docs/TESTING.md#dependable-tooling):
+# Claim 4 of docs/TESTING_STRATEGY.md, black box (docs/TESTING.md#dependable-tooling):
 #   - error corpus (scripts/tooling/error-corpus.mjs): every error a user can
 #     trigger prints a clear message, never a stack trace. Against a candidate
 #     packed from this commit and against the published @lasm/cli@latest;
