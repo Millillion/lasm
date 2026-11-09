@@ -1,0 +1,13 @@
+[
+  ".dockerignore",
+  ".gitignore",
+  "App.lean",
+  "Dockerfile",
+  "Dockerfile.lambda",
+  "Main.lean",
+  "README.md",
+  "lakefile.toml",
+  "lean-toolchain",
+  "package.json",
+  "vercel.json"
+]

@@ -1,0 +1,14 @@
+[
+  ".dockerignore",
+  ".gitignore",
+  "App.lean",
+  "Dockerfile",
+  "Main.lean",
+  "README.md",
+  "fastly.toml",
+  "lakefile.toml",
+  "lean-toolchain",
+  "package.json",
+  "spin.toml",
+  "wrangler.toml"
+]

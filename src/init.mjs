@@ -274,7 +274,6 @@ function packageJson(name, template, deploy = []) {
   if (templates[template].portable) Object.assign(pkg.scripts, {
     'dev:bun': templates[template].server ? 'bun x --bun lasm dev Main.lean' : 'bun x --bun lasm Main.lean --', 'build:bun': 'bun x --bun lasm build Main.lean --target bun', 'start:bun': 'bun bun/main.mjs',
     'build:deno': 'lasm build Main.lean --target deno', 'start:deno': 'deno run -A deno/main.mjs' });
-  else if (deploy.includes('deno-deploy')) pkg.scripts['start:deno'] = 'deno run -A deno/main.mjs';
   // Edge and portable builds import the npm modules Lean binds; the Node server stays out.
   if (template === 'hono') pkg.lasm = { edge: { exclude: ['@hono/node-server'] } };
   const dependencies = Object.assign({}, npm[template], ...deploy.map(target => deployTargets[target].dependencies));

@@ -1,0 +1,17 @@
+[
+  ".dockerignore",
+  ".gitignore",
+  "App.lean",
+  "Dockerfile",
+  "Main.lean",
+  "README.md",
+  "lakefile.toml",
+  "lean-toolchain",
+  "netlify.toml",
+  "package.json",
+  "public/.gitkeep",
+  "public/lasm.txt",
+  "supabase/config.toml",
+  "vercel.json",
+  "wrangler.toml"
+]

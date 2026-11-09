@@ -1,3 +1,5 @@
 # Unified patches contain context lines whose leading space is significant.
 *.patch -whitespace
 *.sh text eol=lf
+# lasm init output copies (test/init-golden.test.mjs): compared byte for byte.
+test/fixtures/init-golden/** text eol=lf
