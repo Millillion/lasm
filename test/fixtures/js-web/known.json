@@ -1,5 +1,36 @@
 {
   "$comment": "Checks of test/fixtures/js-web that fail on a target because of the runtime itself, never the binding, with the reason (scripts/bindings/test-web.mjs). A name ending in * matches every check it prefixes.",
+  "node": {
+    "messaging.promiseRejectionEvent (section)": "Node has no PromiseRejectionEvent"
+  },
+  "node24": {
+    "messaging.promiseRejectionEvent (section)": "Node has no PromiseRejectionEvent",
+    "messaging.errorEvent (section)": "Node 24 has no ErrorEvent (Node 26 has)"
+  },
+  "bun": {
+    "url[88] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[99] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[207] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[218] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[296] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[297] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[298] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[299] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[300] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[301] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[700] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[701] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[702] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[738] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "url[813] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
+    "urlencoded[1] formData": "Bun's Response.formData() drops a leading U+FEFF of an urlencoded body (the URL Standard keeps it; URLSearchParams itself is right)",
+    "messaging.promiseRejectionEvent (section)": "Bun has no PromiseRejectionEvent",
+    "headers entries": "Bun lists set-cookie after the other headers instead of in sorted order",
+    "GET with a body throws": "Bun accepts a body on a GET Request",
+    "Response.json": "Bun's Response.json sets content-type application/json;charset=utf-8",
+    "file": "Bun adds ;charset=utf-8 to a File's type",
+    "getRandomValues over 65536 bytes throws": "Bun's getRandomValues does not enforce the 65,536-byte quota"
+  },
   "deno": {
     "url[135] *": "Deno 2.9.6's URL parser differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
     "url[283] *": "Deno 2.9.6's URL parser differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
@@ -82,6 +113,20 @@
     "url[892] *": "Deno 2.9.6's URL parser differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
     "url[893] *": "Deno 2.9.6's URL parser differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
     "url[894] *": "Deno 2.9.6's URL parser differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)"
+  },
+  "workers": {
+    "urlencoded[26] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
+    "urlencoded[27] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
+    "urlencoded[28] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
+    "urlencoded[31] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
+    "urlencoded[32] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
+    "urlencoded[33] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
+    "urlencoded[34] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
+    "performance.timeOrigin": "Workers report a timeOrigin of 0 (time is frozen per request by design)",
+    "files.objectURL (section)": "workerd does not implement URL.createObjectURL",
+    "wasmCompile (section)": "Workers forbid compiling WebAssembly at run time (code generation is disallowed by the embedder)",
+    "urlencoded[1] formData": "workerd's Response.formData() drops a leading U+FEFF of an urlencoded body (the URL Standard keeps it; URLSearchParams itself is right)",
+    "messaging.promiseRejectionEvent (section)": "workerd's PromiseRejectionEvent cannot be constructed (Illegal constructor)"
   },
   "browser-chromium": {
     "url[114] *": "Chromium (Playwright 1.63.0)'s URL parser differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
@@ -172,24 +217,5 @@
     "url[893] *": "Chromium (Playwright 1.63.0)'s URL parser differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
     "url[894] *": "Chromium (Playwright 1.63.0)'s URL parser differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
     "url[897] *": "Chromium (Playwright 1.63.0)'s URL parser differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)"
-  },
-  "workers": {
-    "urlencoded[26] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
-    "urlencoded[27] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
-    "urlencoded[28] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
-    "urlencoded[31] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
-    "urlencoded[32] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
-    "urlencoded[33] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
-    "urlencoded[34] formData": "workerd's Response.formData() decodes malformed percent-escapes in application/x-www-form-urlencoded bodies unlike the URL Standard (URLSearchParams itself is right)",
-    "performance.timeOrigin": "Workers report a timeOrigin of 0 (time is frozen per request by design)",
-    "files.objectURL (section)": "workerd does not implement URL.createObjectURL",
-    "wasmCompile (section)": "Workers forbid compiling WebAssembly at run time (code generation is disallowed by the embedder)"
-  },
-  "node": {
-    "messaging.promiseRejectionEvent (section)": "Node has no PromiseRejectionEvent"
-  },
-  "node24": {
-    "messaging.promiseRejectionEvent (section)": "Node has no PromiseRejectionEvent",
-    "messaging.errorEvent (section)": "Node 24 has no ErrorEvent (Node 26 has)"
   }
 }

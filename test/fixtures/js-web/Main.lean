@@ -548,7 +548,8 @@ def fetching (r : Checks) : Async Unit := do
       && (← (← res.headers).get "x") == some "y") ""
     expect r "response text" ((← res.text) == "body") ""
     let j ← Response.staticJson (obj [("a", toJS 1), ("b", .array #[.bool true])])
-    expect r "Response.json" (dataEq (← j.json) (obj [("a", toJS 1), ("b", .array #[.bool true])]) && (← (← j.headers).get "content-type") == some "application/json") ""
+    let jt ← (← j.headers).get "content-type"
+    expect r "Response.json" (dataEq (← j.json) (obj [("a", toJS 1), ("b", .array #[.bool true])]) && jt == some "application/json") s!"content-type {jt}"
     let e ← Response.error
     expect r "Response.error" ((← e.type) == .error && (← e.status) == 0) ""
     let red ← Response.redirect "https://example.com/next" (some 301)
@@ -620,7 +621,8 @@ def files (r : Checks) : Async Unit := do
   runSection r "files.file" do
     let f ← File.new #[.usvString "data"] "notes.txt" (some { lastModified := some 42, type := some "text/plain" })
     -- File extends Blob: Blob's methods apply to a File
-    expect r "file" ((← f.name) == "notes.txt" && (← f.lastModified) == 42 && (← f.size) == 4 && (← f.text) == "data" && (← f.type) == "text/plain") ""
+    let fields := s!"{← f.name} {← f.lastModified} {← f.size} {← f.type}"
+    expect r "file" ((← f.name) == "notes.txt" && (← f.lastModified) == 42 && (← f.size) == 4 && (← f.text) == "data" && (← f.type) == "text/plain") fields
   runSection r "files.objectURL" do
     let b ← Blob.new (some #[.usvString "x"])
     let objectUrl ← URL.createObjectURL (.blob b)
