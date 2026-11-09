@@ -16,6 +16,12 @@
 // Literals are wrapped in `bb` (a `@[noinline]` identity) at random, so the Lean
 // compiler cannot fold the arithmetic away at compile time: both the folded and
 // the runtime paths get exercised.
+//
+// Feature cases (features.mjs, kind 'feat') add top-level declarations of
+// their own: type classes, inductives with pattern matching, closures of every
+// arity, tail calls and loops, structures, exceptions, and the extension
+// types and panicking operations below.
+import { renderFeature, featureSize, featureShrinks } from './features.mjs';
 
 // ---------- seeded PRNG (sfc32, seeded through splitmix32) ----------
 function splitmix32(a) {
@@ -57,7 +63,7 @@ const NAT_EDGES = ['0', '1', '2', '7', '10', '255', '256', '65535', '65536', '21
   '4294967295', '4294967296', '9223372036854775807', '9223372036854775808', '18446744073709551615',
   '18446744073709551616', '340282366920938463463374607431768211456', '1000000007'];
 const bigDecimal = r => { let s = String(r.int(1, 9)); const n = r.int(1, 60); for (let i = 0; i < n; i++) s += r.int(0, 9); return s; };
-function natLit(r) {
+export function natLit(r) {
   const k = r.next();
   if (k < 0.45) return String(r.int(0, 100));
   if (k < 0.8) return r.pick(NAT_EDGES);
@@ -76,7 +82,7 @@ const FLOAT_LITS = ['0.0', '1.0', '0.1', '0.5', '2.5', '3.14159', '1e300', '1e-3
 // Code points: ASCII, Latin-1, combining marks, CJK, astral (emoji), and a few edge values.
 const CHARS = ['a', 'Z', '0', ' ', '_', 'é', 'ß', 'İ', 'Σ', '́', '中', '\u{1F600}', '\u{1F30D}',
   'ÿ', 'Ā', '\u{10FFFF}', '​', '\t', '\n', '"', '\\', ' ', 'İ', 'ǅ', 'ﬃ'];
-function stringLit(r, quotable = false) {
+export function stringLit(r, quotable = false) {
   const n = r.pick([0, 1, 2, 3, 5, 8, 13]);
   let s = '';
   for (let i = 0; i < n; i++) s += r.chance(0.5) ? r.pick('abcxyz -,.ABC123'.split('')) : r.pick(CHARS);
@@ -104,7 +110,7 @@ function leanChar(ch) {
   return "'" + s.slice(1, -1).replace(/\\"/g, '"').replace(/'/g, "\\'") + "'";
 }
 // U+10FFFF (a noncharacter) goes through Char.ofNat rather than the source text.
-function stringExpr(s) {
+export function stringExpr(s) {
   if ([...s].some(ch => ch.codePointAt(0) === 0x10ffff)) return `(String.ofList [${[...s].map(leanChar).join(', ')}])`;
   return leanString(s);
 }
@@ -116,7 +122,7 @@ function stringExpr(s) {
 export const TYPES = ['Nat', 'Int', 'UInt8', 'UInt16', 'UInt32', 'UInt64', 'Bool', 'Float', 'String', 'Char',
   'ListNat', 'ArrayInt', 'OptNat', 'Tree', 'Pt', 'ListString'];
 export const LEAN_TYPE = { ListNat: 'List Nat', ArrayInt: 'Array Int', OptNat: 'Option Nat', ListString: 'List String' };
-const lt = t => LEAN_TYPE[t] ?? t;
+export const lt = t => LEAN_TYPE[t] ?? t;
 
 const ops = [];
 const op = (t, args, r, w = 1, extra = {}) => ops.push({ t, args, r, w, ...extra, id: ops.length });
@@ -381,16 +387,111 @@ op('Pt', ['Int', 'Int', 'String'], (a, b, c) => `({ x := ${a}, y := ${b}, tag :=
 op('Pt', ['Pt', 'Int'], (a, b) => `({ ${a} with x := ${b} } : Pt)`, 1);
 op('Pt', ['Pt', 'Pt'], (a, b) => `(Pt.add ${a} ${b})`, 1);
 
+// ---------- extension types and operations (feature cases only) ----------
+// Reached only from the feature cases (features.mjs, flags.ext; panicking
+// operations also need flags.panic): appended after every core operation and
+// filtered out otherwise, so the core cases of every seed are unchanged.
+// Signed fixed-width integers, Float32, ByteArray, Std's HashSet and TreeMap,
+// and operations that panic (`xs[i]!`, `get!`, `toNat!`, `back!`).
+export const EXT_TYPES = ['Int8', 'Int16', 'Int32', 'Int64', 'Float32', 'ByteArray', 'HSet', 'TMap'];
+Object.assign(LEAN_TYPE, { HSet: 'HashSet Nat', TMap: 'TreeMap Nat String' });
+const xop = (t, args, r, w = 1, extra = {}) => op(t, args, r, w, { ext: true, ...extra });
+const xlit = (t, gen, w = 3) => ops.push({ t, args: [], lit: gen, r: null, w, ext: true, id: ops.length });
+const SBITS = { Int8: 8, Int16: 16, Int32: 32, Int64: 64 };
+for (const t of Object.keys(SBITS)) {
+  const bits = BigInt(SBITS[t]), max = (1n << (bits - 1n)) - 1n;
+  xlit(t, r => {
+    const k = r.next();
+    if (k < 0.4) return String(r.int(-20, 20));
+    if (k < 0.75) return String(r.pick([max, -max - 1n, max - 1n, -max, -1n, 1n << (bits / 2n), -(1n << (bits / 2n))]));
+    return String((BigInt(Math.floor(r.next() * 2 ** 30)) * BigInt(Math.floor(r.next() * 2 ** 30)) % (2n * max + 2n)) - max - 1n);
+  });
+  for (const o of ['+', '-', '*', '/', '%', '&&&', '|||', '^^^', '<<<', '>>>']) xop(t, [t, t], (a, b) => `(${a} ${o} ${b})`, ['+', '-', '*'].includes(o) ? 3 : 1);
+  xop(t, [t], a => `(-(${a}))`, 1);
+  xop(t, [t], a => `(~~~(${a}))`, 1);
+  xop(t, [t, t], (a, b) => `(min ${a} ${b})`, 1);
+  xop(t, [t, t], (a, b) => `(max ${a} ${b})`, 1);
+  xop(t, ['Int'], a => `(${t}.ofInt ${a})`, 2);
+  xop(t, ['Nat'], a => `(${t}.ofNat ${a})`, 1);
+  xop(t, ['Bool', t, t], (c, a, b) => `(if ${c} then ${a} else ${b})`, 1);
+  xop(t, [`UInt${SBITS[t]}`], a => `${a}.to${t}`, 1);
+  for (const u of Object.keys(SBITS)) if (u !== t) xop(t, [u], a => `${a}.to${t}`, 1);
+  xop('Int', [t], a => `${a}.toInt`, 2);
+  xop('Nat', [t], a => `${a}.toNatClampNeg`, 1);
+  xop(`UInt${SBITS[t]}`, [t], a => `${a}.toUInt${SBITS[t]}`, 1);
+  xop('Bool', [t, t], (a, b) => `(${a} == ${b})`, 1);
+  xop('Bool', [t, t], (a, b) => `(decide (${a} < ${b}))`, 1);
+}
+xop('Float', ['Int64'], a => `${a}.toFloat`, 1);
+// Float32: IEEE-exact operations only (libm's single-precision functions are not correctly rounded).
+xlit('Float32', r => r.chance(0.15) ? r.pick(['(0.0/0.0)', '(1.0/0.0)', '(-1.0/0.0)', '(-0.0)']) : (r.chance(0.3) ? '-' : '') + r.pick(FLOAT_LITS));
+for (const o of ['+', '-', '*', '/']) xop('Float32', ['Float32', 'Float32'], (a, b) => `(${a} ${o} ${b})`, 2);
+for (const f of ['sqrt', 'abs', 'floor', 'ceil', 'round']) xop('Float32', ['Float32'], a => `${a}.${f}`, 1);
+xop('Float32', ['Float32'], a => `(-(${a}))`, 1);
+xop('Float32', ['Nat'], a => `(Float32.ofNat ${a})`, 2);
+xop('Float32', ['Int'], a => `(Float32.ofInt ${a})`, 1);
+xop('Float32', ['Float'], a => `${a}.toFloat32`, 2);
+xop('Float32', ['Nat', 'Nat'], (a, b) => `(Float32.ofScientific ${a} true (${b} % 30))`, 1);
+xop('Float', ['Float32'], a => `${a}.toFloat`, 2);
+xop('UInt32', ['Float32'], a => `${a}.toBits`, 2, { exactArgs: true });
+xop('UInt64', ['Float32'], a => `${a}.toUInt64`, 1);
+xop('Bool', ['Float32'], a => `${a}.isNaN`, 1);
+xop('Bool', ['Float32', 'Float32'], (a, b) => `(decide (${a} < ${b}))`, 1);
+xop('Bool', ['Float32', 'Float32'], (a, b) => `(${a} == ${b})`, 1);
+xop('String', ['Float32'], a => `(toString ${a})`, 1);
+// ByteArray (and UTF-8 validation of arbitrary bytes)
+xlit('ByteArray', r => `(ByteArray.mk #[${Array.from({ length: r.int(0, 6) }, () => uintLit(r, 'UInt8') + ' : UInt8').map(x => `(${x})`).join(', ')}])`, 2);
+xop('ByteArray', ['ByteArray', 'UInt8'], (a, b) => `(${a}.push ${b})`, 2);
+xop('ByteArray', ['ByteArray', 'ByteArray'], (a, b) => `(${a} ++ ${b})`, 1);
+xop('ByteArray', ['ByteArray', 'Nat', 'Nat'], (a, b, c) => `(${a}.extract (${b} % 6) (${c} % 9))`, 1);
+xop('ByteArray', ['ByteArray', 'Nat', 'UInt8'], (a, b, c) => `(${a}.set! (${b} % 8) ${c})`, 1);
+xop('ByteArray', ['String'], a => `${a}.toUTF8`, 2);
+xop('ByteArray', ['ListNat'], a => `(ByteArray.mk (${a}.toArray.map UInt8.ofNat))`, 1);
+xop('Nat', ['ByteArray'], a => `${a}.size`, 1);
+xop('Nat', ['ByteArray'], a => `(${a}.foldl (fun (acc : Nat) (x : UInt8) => acc * 7 + x.toNat) 0)`, 1);
+xop('Nat', ['ByteArray'], a => `(hash ${a}).toNat`, 1);
+xop('String', ['ByteArray'], a => `((String.fromUTF8? ${a}).getD "invalid")`, 2);
+xop('ListNat', ['ByteArray'], a => `(${a}.toList.map UInt8.toNat)`, 1);
+xop('UInt8', ['ByteArray', 'Nat'], (a, b) => `(${a}.get! (${b} % 8))`, 1, { panic: true });
+// Std.HashSet Nat and Std.TreeMap Nat String
+xlit('HSet', r => `(HashSet.ofList ([${Array.from({ length: r.int(0, 6) }, () => natLit(r)).join(', ')}] : List Nat) : HashSet Nat)`, 2);
+xop('HSet', ['HSet', 'Nat'], (a, b) => `(${a}.insert ${b})`, 2);
+xop('HSet', ['HSet', 'Nat'], (a, b) => `(${a}.erase ${b})`, 1);
+xop('HSet', ['HSet', 'ListNat'], (a, b) => `(${a}.insertMany ${b})`, 1);
+xop('ListNat', ['HSet'], a => `(${a}.toList.mergeSort (· ≤ ·))`, 1);
+xop('Nat', ['HSet'], a => `${a}.size`, 1);
+xop('Nat', ['HSet'], a => `(${a}.fold (fun (acc x : Nat) => acc + x * x) 0)`, 1);
+xop('Bool', ['HSet', 'Nat'], (a, b) => `(${a}.contains ${b})`, 1);
+xlit('TMap', r => `(TreeMap.ofList ([${Array.from({ length: r.int(0, 5) }, () => `(${natLit(r)}, ${stringExpr(stringLit(r))})`).join(', ')}] : List (Nat × String)) : TreeMap Nat String)`, 2);
+xop('TMap', ['TMap', 'Nat', 'String'], (a, b, c) => `(${a}.insert ${b} ${c})`, 2);
+xop('TMap', ['TMap', 'Nat'], (a, b) => `(${a}.erase ${b})`, 1);
+xop('TMap', ['TMap', 'Nat'], (a, b) => `(${a}.filter (fun (k : Nat) (_ : String) => k % (${b} % 5 + 1) == 0))`, 1);
+xop('ListNat', ['TMap'], a => `${a}.keys`, 1);
+xop('Nat', ['TMap'], a => `${a}.size`, 1);
+xop('Nat', ['TMap'], a => `(${a}.minKey?.getD 7)`, 1);
+xop('Nat', ['TMap'], a => `(${a}.foldl (fun (acc k : Nat) (v : String) => acc + k + v.length) 0)`, 1);
+xop('String', ['TMap', 'Nat'], (a, b) => `((${a}.get? ${b}).getD "none")`, 1);
+xop('String', ['TMap'], a => `(String.join ${a}.values)`, 1);
+// Operations that panic (native Lean prints the message and continues with the default value).
+xop('Int', ['ArrayInt', 'Nat'], (a, b) => `(${a}[${b} % 8]!)`, 2, { panic: true });
+xop('Int', ['ArrayInt'], a => `${a}.back!`, 1, { panic: true });
+xop('Nat', ['ListNat', 'Nat'], (a, b) => `(${a}[${b} % 8]!)`, 2, { panic: true });
+xop('Nat', ['ListNat'], a => `${a}.head!`, 1, { panic: true });
+xop('Nat', ['OptNat'], a => `${a}.get!`, 1, { panic: true });
+xop('Nat', ['String'], a => `${a}.toNat!`, 1, { panic: true });
+xop('Char', ['String', 'Nat'], (a, b) => `(${a}.toList[${b} % 6]!)`, 1, { panic: true });
+
 export const OPS = ops;
-const byType = Object.fromEntries(TYPES.map(t => [t, ops.filter(o => o.t === t)]));
+const byType = Object.fromEntries([...TYPES, ...EXT_TYPES].map(t => [t, ops.filter(o => o.t === t)]));
 
 // ---------- generation ----------
 // An expression node: { op: op id, k: [children] } or { op, v: literal text, bb: bool } or { var: name, t }.
 let uniq = 0;
-function genExpr(r, t, depth, env, flags) {
+export function setNameBase(n) { uniq = n; }
+export function genExpr(r, t, depth, env, flags) {
   const vars = env.filter(e => e.t === t);
-  if (vars.length && r.chance(0.3)) return { var: r.pick(vars).name, t };
-  let cands = byType[t].filter(o => !(flags.exact && o.inexact));
+  if (vars.length && r.chance(flags.varP ?? 0.3)) return { var: r.pick(vars).name, t };
+  let cands = byType[t].filter(o => !(flags.exact && o.inexact) && (!o.ext || (flags.ext && (!o.panic || flags.panic))) && (!flags.allow || flags.allow(o)));
   if (depth <= 0) {
     const leaves = cands.filter(o => o.lit);
     if (leaves.length) cands = leaves;
@@ -434,6 +535,7 @@ const SHOW = {
   Float: x => `(toString ${x})`, String: x => `(repr ${x}).pretty`, Char: x => `(repr ${x}).pretty`,
   ListNat: x => `(repr ${x}).pretty`, ArrayInt: x => `(repr ${x}).pretty`, OptNat: x => `(repr ${x}).pretty`,
   Tree: x => `(repr ${x}).pretty`, Pt: x => `(repr ${x}).pretty`, ListString: x => `(repr ${x}).pretty`,
+  ByteArray: x => `(toString ${x}.toList)`, HSet: x => `(toString (${x}.toList.mergeSort (· ≤ ·)))`, TMap: x => `(repr ${x}.toList).pretty`,
 };
 export const show = (t, x) => (SHOW[t] ?? (y => `(toString ${y})`))(x);
 
@@ -571,6 +673,7 @@ export function genCase(seed, index, { kinds = ['expr', 'state', 'io', 'task', '
   return { kind, s: genStmts(r, kind, r.int(1, 5), 2) };
 }
 export function renderCase(c, name) {
+  if (c.kind === 'feat') return renderFeature(c, name);
   if (c.kind === 'expr') return `def ${name} : IO Unit := do\n  IO.println (${leanString(name + ' ')} ++ ${show(c.t, renderExpr(c.e))})\n`;
   if (c.kind === 'deep') return `def ${name} : IO Unit := do\n  IO.println s!"${name} {${DEEP[c.f](`(bb ${c.n})`)}}"\n`;
   if (c.kind === 'state') {
@@ -585,6 +688,7 @@ export function renderCase(c, name) {
   throw new Error(`unknown case kind ${c.kind}`);
 }
 export function caseSize(c) {
+  if (c.kind === 'feat') return featureSize(c);
   if (c.kind === 'expr') return exprSize(c.e);
   if (c.kind === 'deep') return Math.log10(c.n);
   const count = ss => ss.reduce((s, st) => s + 1 + (st.e ?? []).reduce((a, e) => a + exprSize(e), 0) + count(st.b ?? []) + count(st.c ?? []), 0);
@@ -594,6 +698,8 @@ export function caseSize(c) {
 // ---------- the program ----------
 export const PREAMBLE = `-- Generated by scripts/differential/generate.mjs (docs/TESTING.md#differential-testing).
 import Std.Data.HashMap
+import Std.Data.HashSet
+import Std.Data.TreeMap
 open Std
 set_option linter.unusedVariables false
 set_option linter.deprecated false
@@ -700,12 +806,13 @@ export function renderProgram(list, { exit, ending } = {}) {
 // One step smaller: every subexpression replaced by a same-typed child or by a
 // minimal literal, and (for statement cases) every statement removed or its body
 // flattened. Candidates are ordered smallest first.
-const MIN_LIT = { Nat: '0', Int: '0', UInt8: '0', UInt16: '0', UInt32: '0', UInt64: '0', Bool: 'false', Float: '0.0', String: '""', Char: "'a'", ListNat: '[]', ArrayInt: '#[]', OptNat: '(none : Option Nat)', Tree: '(Tree.leaf)', ListString: '[]' };
+const MIN_LIT = { Nat: '0', Int: '0', UInt8: '0', UInt16: '0', UInt32: '0', UInt64: '0', Bool: 'false', Float: '0.0', String: '""', Char: "'a'", ListNat: '[]', ArrayInt: '#[]', OptNat: '(none : Option Nat)', Tree: '(Tree.leaf)', ListString: '[]',
+  Int8: '0', Int16: '0', Int32: '0', Int64: '0', Float32: '0.0', ByteArray: '(ByteArray.mk #[])', HSet: '(HashSet.ofList ([] : List Nat) : HashSet Nat)', TMap: '(TreeMap.ofList ([] : List (Nat × String)) : TreeMap Nat String)' };
 function minLit(t) {
   const o = byType[t].find(x => x.lit);
   return o && MIN_LIT[t] !== undefined ? { op: o.id, v: MIN_LIT[t], bb: false } : null;
 }
-function* exprShrinks(e) {
+export function* exprShrinks(e) {
   if (e.var) return;
   const t = exprType(e);
   if (e.v !== undefined) {
@@ -729,6 +836,7 @@ function* stmtShrinks(ss) {
   }
 }
 export function shrinkCandidates(c, limit = 60) {
+  if (c.kind === 'feat') return featureShrinks(c, limit);
   if (c.kind === 'deep') return [10, 100, 1000, 3000].filter(n => n < c.n).map(n => ({ ...c, n }));
   const out = [], seen = new Set([JSON.stringify(c)]);
   const gen = c.kind === 'expr' ? (function* () { for (const e of exprShrinks(c.e)) yield { ...c, e }; })() : (function* () { for (const s of stmtShrinks(c.s)) yield { ...c, s }; })();
