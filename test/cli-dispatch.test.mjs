@@ -120,6 +120,11 @@ test('version and help print and return 0 without building', async () => {
   assert.equal(await cli(['--version']), 0);
   assert.equal(lines.log[0], await versionText());
   assert.match(lines.log[0], new RegExp(`^lasm ${pkg.version.replaceAll('.', '\\.')} \\(${pkg.name}; Lean ${defaultLean.replaceAll('.', '\\.')}; Node ${process.versions.node}; ${process.platform}-${process.arch}\\)$`));
+  for (const [runtime, name] of [['bun', 'Bun'], ['deno', 'Deno']]) {
+    setRuntime(runtime, process.execPath);
+    assert.match(await versionText(), new RegExp(`; ${name} ${process.versions.node.replaceAll('.', '\\.')}; `));
+  }
+  setRuntime('node', process.execPath);
   globalThis.cliStandIns.support.applicationSupport = () => ({ lean: '4.77.0' });
   assert.match(await versionText(), /; Lean 4\.77\.0; /);
   globalThis.cliStandIns.support.applicationSupport = () => undefined;

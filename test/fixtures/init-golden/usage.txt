@@ -1,0 +1,36 @@
+Usage: lasm init <directory> [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy TARGET]…
+
+Creates a Lean project for Lasm: lakefile, lean-toolchain, package.json,
+Main.lean, README.md, Dockerfile, .dockerignore and .gitignore.
+The directory must be new or empty. The default template is plain.
+--deploy (repeatable; server templates, and wasi for plain too) adds a target's files and
+npm scripts (build:<target> runs lasm build --target <target>). Lasm never
+installs or starts a platform's own tools; use the platform's CLI for that:
+  lambda       AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)
+  lambda-zip   AWS Lambda .zip for nodejs24.x (npm run build:lambda)
+  lambda-edge  Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)
+  vercel       Vercel Function (vercel.json; Vercel runs the build)
+  netlify      Netlify Function (netlify.toml; Netlify runs the build)
+  azure        Azure Functions app (npm run build:azure)
+  gcf          Google Cloud Functions gen2 (npm run build:gcf)
+  workers      Cloudflare Workers (wrangler.toml; npm run build:workers, then npx wrangler dev)
+  vercel-edge  Vercel Edge Function (vercel.json; Vercel runs npm run build:vercel-edge)
+  netlify-edge Netlify Edge Function (netlify.toml; Netlify runs npm run build:netlify-edge)
+  deno-deploy  Deno Deploy (npm run build:deno-deploy, then deno task start:deno; entrypoint deno/main.mjs)
+  supabase-edge Supabase Edge Function (supabase/config.toml; npm run build:supabase-edge, then npx supabase functions deploy NAME)
+  fastly       Fastly Compute (fastly.toml; npm run build:fastly, then fastly compute serve)
+  wasi         a WASI module (npm run build:wasi writes wasi/main.wasm; wasmtime run --dir . wasi/main.wasm)
+  wasi-http    a wasi-http component (npm run build:wasi-http writes wasi-http/main.wasm; wasmtime serve wasi-http/main.wasm)
+  spin         Fermyon Spin (spin.toml; npm run build:wasi-http, then spin up)
+
+Templates:
+  plain     a Lean program (IO only)
+  express   Express 5 with Lean request handlers (Lasm.JS)
+  hono      Hono on @hono/node-server with Lean request handlers (Lasm.JS)
+  fastify   Fastify 5 with Lean route handlers (Lasm.JS)
+  std-http  an HTTP server in pure Lean (Std.Http)
+  web       a browser app in Lean (Lasm.UI): a counter
+  fetch     an HTTP handler in pure Lean (Lasm.Fetch) for Node, Fastly Compute, WASI, Spin and the edge
+  fullstack a full-stack Lean app: shared API and validation (Lasm.RPC), a server (Lasm.Fetch) that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target
+
+Example: npx @lasm/cli init my-app --template hono

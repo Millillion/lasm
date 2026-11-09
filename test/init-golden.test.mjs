@@ -15,7 +15,18 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deployTargets, initProject, initUsage, lakeName, nextSteps, packageName, parseInitArguments, runInit, supabaseFunctionNameOf,
   templateDependencies, templates } from '../src/init.mjs';
+import { registerHooks } from 'node:module';
 import { forAll } from './helpers/property.mjs';
+
+// runInit's editor step, as a stand-in that records its arguments.
+registerHooks({
+  resolve(specifier, context, next) {
+    if (specifier === './editor.mjs' && context.parentURL?.endsWith('/src/init.mjs'))
+      return { url: 'data:text/javascript,' + encodeURIComponent('export const autoSetupEditor = (...a) => { globalThis.initEditorCalls.push(a); };'), shortCircuit: true };
+    return next(specifier, context);
+  },
+});
+globalThis.initEditorCalls = [];
 
 const repository = fileURLToPath(new URL('..', import.meta.url));
 const goldenRoot = join(repository, 'test/fixtures/init-golden');
@@ -36,6 +47,10 @@ const configurations = [
   { name: 'plain-wasi', directory: 'plain_wasi', template: 'plain', deploy: ['wasi'] },
   { name: 'fullstack-all', directory: '1st Stack', template: 'fullstack', deploy: ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'fastly', 'wasi-http', 'spin'] },
   { name: 'fullstack-fastly', directory: 'todo-kv', template: 'fullstack', deploy: ['fastly'] },
+  // Long names, runs of dots and trailing separators.
+  { name: 'hono-workers-long', directory: `Workers..App ${'w'.repeat(60)}`, template: 'hono', deploy: ['workers'] },
+  { name: 'fullstack-long', directory: `Stack..App ${'s'.repeat(60)}`, template: 'fullstack', deploy: [] },
+  { name: 'fetch-names', directory: 'a..b-2_', template: 'fetch', deploy: ['fastly', 'spin'] },
 ];
 
 const normalize = text => text.replaceAll(lasm.version, '<LASM_VERSION>').replaceAll(lean, '<LEAN_VERSION>');
@@ -147,6 +162,29 @@ test('lasm init arguments: every option form and every error message', () => {
   fails(['app', '-t', 'hono', '--deploy', 'netlify-edge', '--deploy', 'netlify'], '--deploy netlify-edge and --deploy netlify both configure the same platform; choose one');
 });
 
+test('the init usage, as reviewed', () => {
+  const file = join(goldenRoot, 'usage.txt');
+  if (update) writeFileSync(file, initUsage + '\n');
+  assert.equal(initUsage + '\n', readFileSync(file, 'utf8'), 'test/fixtures/init-golden/usage.txt (LASM_UPDATE_INIT_GOLDEN=1 regenerates it)');
+});
+
+// Which templates each --deploy target accepts (the docs' tables list the same).
+test('every deploy target accepts exactly its templates', () => {
+  const server = ['express', 'hono', 'fastify', 'std-http', 'fetch', 'fullstack'];
+  const accepted = {
+    lambda: server, 'lambda-zip': server, 'lambda-edge': server, vercel: server, netlify: server, azure: server, gcf: server,
+    workers: ['hono', 'fetch', 'fullstack'], 'vercel-edge': ['hono', 'fetch', 'fullstack'], 'netlify-edge': ['hono', 'fetch', 'fullstack'],
+    'deno-deploy': ['hono', 'fetch', 'fullstack'], 'supabase-edge': ['hono'], fastly: ['fetch', 'fullstack'], wasi: ['fetch', 'plain'],
+    'wasi-http': ['fetch', 'fullstack'], spin: ['fetch', 'fullstack'],
+  };
+  assert.deepEqual(Object.keys(accepted), Object.keys(deployTargets));
+  for (const [target, names] of Object.entries(accepted)) for (const template of Object.keys(templates)) {
+    const parse = () => parseInitArguments(['app', '-t', template, '--deploy', target]);
+    if (names.includes(template)) assert.deepEqual(parse().deploy, [target], `${target} ${template}`);
+    else assert.throws(parse, /^Error: --deploy /, `${target} ${template}`);
+  }
+});
+
 test('the init usage lists every template and deploy target with its summary', () => {
   assert.ok(initUsage.startsWith(`Usage: lasm init <directory> [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy TARGET]…\n\nCreates a Lean project`));
   for (const [name, target] of Object.entries(deployTargets)) assert.ok(initUsage.includes(`\n  ${name.padEnd(12)} ${target.summary}\n`), name);
@@ -161,7 +199,7 @@ test('project names', () => {
   for (const [input, name] of [['my-app', 'my_app'], ['1st', 'app_1st'], ['__a__b__', 'a__b'], ['a..b', 'a_b'], ['---', 'app'], ['_9', 'app_9'], ['Ab', 'Ab']])
     assert.equal(lakeName(input), name, input);
   for (const [input, name] of [['@scope/My App', 'my-app'], ['9lives', 'lasm-9lives'], ['--x--', 'x'], ['', 'lasm-app'], ['@a/', 'lasm-app'],
-    ['a'.repeat(60), 'a'.repeat(54)], ['1' + 'a'.repeat(60), ('lasm-1' + 'a'.repeat(60)).slice(0, 54)], ['x@y/z', 'x-y-z']])
+    ['a'.repeat(60), 'a'.repeat(54)], ['a  b..c', 'a-b-c'], ['1' + 'a'.repeat(60), ('lasm-1' + 'a'.repeat(60)).slice(0, 54)], ['x@y/z', 'x-y-z']])
     assert.equal(supabaseFunctionNameOf(input), name, input);
 });
 
@@ -204,6 +242,8 @@ test('runInit prints what it created and the next commands', async t => {
   mkdirSync(root);
   process.chdir(root);
   assert.equal(await runInit({ directory: 'my-app', template: 'plain', deploy: [] }), 0);
+  // The editor is set up only from what is already cached (no download during lasm init).
+  assert.deepEqual(globalThis.initEditorCalls, [[join(process.cwd(), 'my-app', 'Main.lean'), { cachedOnly: true }]]);
   assert.equal(output[0], `Created my-app (template plain):\n  ${initProjectFiles('plain').join(', ')}\n\nNext:\n  cd my-app\n${nextSteps('plain')}`);
   assert.equal(await runInit({ directory: 'Dir With Space', template: 'hono', deploy: [] }), 0);
   assert.match(output[1], /^Created dir-with-space in Dir With Space \(template hono\):\n/);
