@@ -242,6 +242,10 @@ test('the compact wrappers are compiled once per plan, tools and runtime; at mos
     linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, `plan-${index}`) });
   }
   assert.equal(compiles(), 20);
+  // The sixteen most recent are kept.
+  writeFileSync(join(f.linkWork, 'initialization-plan.json'), JSON.stringify({ ...plan, closure: [...plan.closure, 'initialize_Extra1'] }));
+  linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'kept') });
+  assert.equal(compiles(), 20);
   writeFileSync(join(f.linkWork, 'initialization-plan.json'), JSON.stringify(plan));
   linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'e') });
   assert.equal(compiles(), 21);
@@ -264,6 +268,14 @@ test('the Node link driver compiles the compact wrappers with clang; its tools\'
   // --verbose: the tools write to the terminal.
   assert.throws(() => linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, verbose: true }),
     error => error.stderr == null && error.status === 1);
+  // A compact-wrapper compile that fails: its diagnostics are captured, or shown with --verbose.
+  f.tools.fail('clang', 'clang: error: stand-in compact failure\n');
+  const plan = JSON.parse(readFileSync(join(f.linkWork, 'initialization-plan.json'), 'utf8'));
+  for (const [index, verbose] of [[0, false], [1, true]]) {
+    writeFileSync(join(f.linkWork, 'initialization-plan.json'), JSON.stringify({ ...plan, closure: [...plan.closure, `initialize_Failing${index}`] }));
+    assert.throws(() => linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, verbose }),
+      error => error.status === 1 && (verbose ? error.stderr == null : /stand-in compact failure/.test(String(error.stderr))));
+  }
 });
 
 test('the edge linker: the link toolchain when the edge runtime carries what the Node driver needs, else the SDK', async () => {
@@ -294,6 +306,11 @@ test('llvm-nm listings are kept for the 512 most recent objects', { skip: !posix
   // The last 512 are listed already; the first eight were evicted, and listing them evicts others in turn.
   linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'b') });
   assert.deepEqual(f.tools.calls('llvm-nm').slice(0, 8).map(args => args.at(-1)), many.slice(0, 8));
+  // 512 objects listed most recently are all kept.
+  f.tools.clear();
+  writeFileSync(join(f.linkWork, 'link.rsp'), responseFile(many.slice(-512)));
+  linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'kept') });
+  assert.equal(f.tools.calls('llvm-nm').length, 0);
   f.tools.clear();
   writeFileSync(join(f.linkWork, 'link.rsp'), responseFile(many.slice(-500)));
   linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'c') });
@@ -337,7 +354,7 @@ test('the edge dev profile records the full link\'s members and imports, and acc
   const result = run({ members: members(undefined) });
   assert.deepEqual(result, { program: join(f.out, 'program.mjs'), wasm: join(f.out, 'program.wasm'), usesJs: true, suspend: 'jspi', driver: 'node' });
   assert.deepEqual(wasmLinks().map(memberLink), [false]);
-  assert.deepEqual(finishedLinks.map(item => [item.mode, item.optimize]), [['edge', false]]);
+  assert.deepEqual(finishedLinks.map(item => [item.mode, item.optimize, item.stdio]), [['edge', false, ['ignore', 'pipe', 'pipe']]]);
   assert.equal(saved.length, 1);
   const record = saved[0];
   assert.deepEqual(record.imports, ['env\0js_edge_host\0function', 'env\0js_edge_other\0function']);
@@ -362,6 +379,9 @@ test('the edge dev profile records the full link\'s members and imports, and acc
   run({ members: members({ ...record, liveMembers: { ...record.liveMembers, '/elsewhere/libX.a': [] } }) });
   assert.deepEqual(wasmLinks().map(memberLink), [false]);
   assert.deepEqual(saved, [record]);
+  // --verbose: the link's tools write to the terminal.
+  run({ members: members(record), verbose: true });
+  assert.deepEqual(finishedLinks.map(item => item.stdio), [['ignore', 'inherit', 'inherit']]);
   // An optimized link uses and saves no members.
   saved.length = 0;
   run({ members: members(record), optimize: true });
