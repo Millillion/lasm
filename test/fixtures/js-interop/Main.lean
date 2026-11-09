@@ -80,6 +80,20 @@ def main : IO Unit := do
   try
     let _ ← applyAsync failing "x"
   catch e => IO.println s!"lean error in JS: {e}"
+  -- Property keys of any kind (o[key]): a Symbol, a number, an array (its string).
+  let symbolClass ← (← global).get "Symbol"
+  let tag ← symbolClass.callMethod "for" #[toJS "lasm.tag"]
+  let box ← (← global).get "Object" >>= (·.new)
+  box.set tag "tagged"
+  box.set (2 : Nat) "two"
+  box.set #["a", "b"] "joined"
+  IO.println s!"keys: {← box.get tag String} {← box.get "2" String} {← box.get "a,b" String} {((← box.getFields #["2"]).field "2").describe}"
+  try
+    let _ ← box.get tag Nat
+  catch e => IO.println s!"symbol mismatch: {e}"
+  let items ← (← global).get "Array" >>= (·.callMethod "of" #[toJS 1, toJS 2])
+  let iterator ← (← items.get (← symbolClass.get "iterator")).call (this := toJS items)
+  IO.println s!"iterator: {((← iterator.callMethod "next" #[] Data).field "value").describe}"
   (asyncPart lib).block
   for _ in [0:2000] do discard <| lib.get "config"
   let held := ((← stats).splitOn "\"values\":" |>.getD 1 "" |>.takeWhile Char.isDigit).toNat!

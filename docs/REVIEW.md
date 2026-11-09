@@ -98,6 +98,11 @@ decisions themselves are logged with their reasoning in
   - each call costs about 25–35 µs.
 
   This is to be scoped together before work starts (ROADMAP.md, top of "Now").
+  - [ ] **Symbol keys (PR #170): `get`/`set` take any `[ToJS κ]` key.**
+    Before: `get (o : Value) (key : String) …` and `set [ToJS α] (o : Value) (key : String) (x : α)`.
+    After: `get [ToJS κ] (o : Value) (key : κ) …` and `set [ToJS κ] [ToJS α] (o : Value) (key : κ) (x : α)`.
+    A String, a number or a Symbol `Value` works, as in JavaScript's `o[key]`.
+    Source compatible; no new names or types (docs/JS_BINDINGS.md, "Property keys").
 
 ### The testing strategy ([TESTING_STRATEGY.md §6](TESTING_STRATEGY.md#6-decisions))
 - [ ] 1. Evidence levels keep the names L0–L3, in the README's platform table.
