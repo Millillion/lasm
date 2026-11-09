@@ -336,6 +336,36 @@ test('edge-pre: a synchronous JavaScript → Lean call passes the payload, retur
   assert.equal(controller.stopped.message, 'trap in callback');
 });
 
+// #162: a WebKit page waited forever for Lean work a synchronous callback had queued.
+test('edge-pre: a synchronous call after an entry returned, before its promise settled, is followed by a pump', async () => {
+  const { controller, context } = load();
+  let pumps = 0;
+  context._lasm_edge_pump = () => { pumps++; return 0; };
+  context._lasm_js_edge_sync = (fn, input, length, size) => { context.HEAPU32[Number(size) >> 2] = 0; return 3000n; };
+  // A JSPI entry: Lean has returned, its promise settles a microtask later, and
+  // a microtask queued while Lean ran (a Lasm.Web queueMicrotask callback) runs first.
+  context.callMain = () => { queueMicrotask(() => controller.syncCall(1, new Uint8Array(0))); return Promise.resolve(0); };
+  assert.equal(await controller.main([]), 0);
+  await tick();
+  assert.equal(pumps, 1, 'the work the callback queued runs once the entry completed');
+  // A callback inside an entry, with Lean on the stack: Lean runs that work itself.
+  context.callMain = () => { controller.syncCall(2, new Uint8Array(0)); return Promise.resolve(0); };
+  await controller.main([]);
+  await tick();
+  assert.equal(pumps, 1, 'no pump after an entry that ran its own callbacks');
+});
+
+test('edge-pre: a synchronous call while Lean is suspended wakes it to run the queued work', async () => {
+  const { controller, context } = load();
+  context._lasm_js_edge_sync = (fn, input, length, size) => { context.HEAPU32[Number(size) >> 2] = 0; return 3000n; };
+  let waited;
+  context.callMain = () => (waited = controller.wait());
+  const running = controller.main([]);
+  controller.syncCall(1, new Uint8Array(0));
+  assert.equal(await Promise.race([waited, tick().then(() => 'still waiting')]), 1);
+  assert.equal(await running, 1);
+});
+
 // Each transition on its own (docs/TESTING.md#mutation-testing).
 test('edge-pre: a stopped instance runs nothing more, even an entry that would now succeed', () => {
   const { controller, context } = load();
