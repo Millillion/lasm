@@ -1,0 +1,702 @@
+
+{
+  "header": {
+    "reportVersion": 5,
+    "event": "undefined",
+    "trigger": "Signal",
+    "filename": "report.20261109.011900.86657.0.006.json",
+    "dumpEventTime": "2026-11-09T01:19:00Z",
+    "dumpEventTimeStamp": "1794205140418",
+    "processId": 86657,
+    "threadId": 0,
+    "cwd": "/home/lastmjs/development/lasm/wt-mut-host",
+    "commandLine": [
+      "/home/lastmjs/.nvm/versions/node/v24.22.1/bin/node",
+      "--test-coverage-functions=0",
+      "--test-concurrency=0",
+      "--inspect-publish-uid=stderr,http",
+      "--inspect-port=127.0.0.1:9229",
+      "--stack-trace-limit=10",
+      "--report-signal=SIGUSR2",
+      "--test-coverage-lines=0",
+      "--secure-heap-min=2",
+      "--test-isolation=process",
+      "--heap-prof-interval=524288",
+      "--cpu-prof-interval=1000",
+      "--v8-pool-size=4",
+      "--trace-event-file-pattern=node_trace.${rotation}.log",
+      "--test-coverage-branches=0",
+      "--watch-kill-signal=SIGTERM",
+      "--tls-cipher-list=TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:DHE-RSA-AES256-SHA384:ECDHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA256:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!SRP:!CAMELLIA",
+      "--experimental-addon-modules",
+      "--use-largepages=off",
+      "--max-http-header-size=16384",
+      "--test-timeout=0",
+      "--node-snapshot",
+      "--secure-heap=0",
+      "--network-family-autoselection-attempt-timeout=250",
+      "--heapsnapshot-near-heap-limit=0",
+      "--use-system-ca",
+      "test/node-signal-lifecycle.test.mjs"
+    ],
+    "nodejsVersion": "v24.22.1",
+    "glibcVersionRuntime": "2.39",
+    "glibcVersionCompiler": "2.28",
+    "wordSize": 64,
+    "arch": "x64",
+    "platform": "linux",
+    "componentVersions": {
+      "acorn": "8.18.0",
+      "ada": "4.0.0",
+      "amaro": "1.1.11",
+      "ares": "1.34.9",
+      "brotli": "1.2.0",
+      "cldr": "48.0",
+      "icu": "78.3",
+      "llhttp": "9.4.3",
+      "merve": "1.2.2",
+      "modules": "137",
+      "napi": "10",
+      "nbytes": "0.1.4",
+      "ncrypto": "0.0.1",
+      "nghttp2": "1.70.0",
+      "nghttp3": "",
+      "ngtcp2": "",
+      "node": "24.22.1",
+      "openssl": "3.5.9",
+      "simdjson": "4.6.11",
+      "simdutf": "6.4.0",
+      "sqlite": "3.53.4",
+      "tz": "2026e",
+      "undici": "7.30.1",
+      "unicode": "17.0",
+      "uv": "1.52.1",
+      "uvwasi": "0.0.23",
+      "v8": "13.6.233.17-node.58",
+      "zlib": "1.3.2.1-motley-285e94b",
+      "zstd": "1.5.7"
+    },
+    "release": {
+      "name": "node",
+      "lts": "Krypton",
+      "headersUrl": "https://nodejs.org/download/release/v24.22.1/node-v24.22.1-headers.tar.gz",
+      "sourceUrl": "https://nodejs.org/download/release/v24.22.1/node-v24.22.1.tar.gz"
+    },
+    "osName": "Linux",
+    "osRelease": "6.8.0-149-generic",
+    "osVersion": "#149-Ubuntu SMP PREEMPT_DYNAMIC Fri Oct 23 13:21:10 UTC 2026",
+    "osMachine": "x86_64",
+    "cpus": [
+      {
+        "model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "speed": 3145,
+        "user": 1148810,
+        "nice": 42920,
+        "sys": 245930,
+        "idle": 12040340,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "speed": 3199,
+        "user": 1143010,
+        "nice": 46410,
+        "sys": 243690,
+        "idle": 12073570,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "speed": 2968,
+        "user": 1126110,
+        "nice": 44330,
+        "sys": 251790,
+        "idle": 12156300,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "speed": 3226,
+        "user": 1117250,
+        "nice": 30400,
+        "sys": 245180,
+        "idle": 12110810,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "speed": 2670,
+        "user": 1136380,
+        "nice": 45020,
+        "sys": 243820,
+        "idle": 12168130,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "speed": 800,
+        "user": 1051760,
+        "nice": 45480,
+        "sys": 258120,
+        "idle": 12171140,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "speed": 2925,
+        "user": 1097880,
+        "nice": 36730,
+        "sys": 247060,
+        "idle": 12137500,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "speed": 2943,
+        "user": 1140710,
+        "nice": 52990,
+        "sys": 243570,
+        "idle": 12153020,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "speed": 2931,
+        "user": 1131080,
+        "nice": 51250,
+        "sys": 241820,
+        "idle": 12169780,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "speed": 800,
+        "user": 1163420,
+        "nice": 49390,
+        "sys": 241940,
+        "idle": 12144710,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "speed": 2665,
+        "user": 1126570,
+        "nice": 51300,
+        "sys": 243700,
+        "idle": 12168980,
+        "irq": 0
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz",
+        "speed": 2773,
+        "user": 1186190,
+        "nice": 41550,
+        "sys": 241950,
+        "idle": 12132180,
+        "irq": 0
+      }
+    ],
+    "networkInterfaces": [
+      {
+        "name": "lo",
+        "internal": true,
+        "mac": "00:00:00:00:00:00",
+        "address": "127.0.0.1",
+        "netmask": "255.0.0.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "wlp61s0",
+        "internal": false,
+        "mac": "98:3b:8f:92:db:69",
+        "address": "192.168.1.88",
+        "netmask": "255.255.255.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "lo",
+        "internal": true,
+        "mac": "00:00:00:00:00:00",
+        "address": "::1",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "wlp61s0",
+        "internal": false,
+        "mac": "98:3b:8f:92:db:69",
+        "address": "2605:59ca:4952:a108:eb49:6188:4cef:fa3d",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "wlp61s0",
+        "internal": false,
+        "mac": "98:3b:8f:92:db:69",
+        "address": "2605:59ca:4952:a108:495d:fc85:b60f:7884",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "wlp61s0",
+        "internal": false,
+        "mac": "98:3b:8f:92:db:69",
+        "address": "fde5:4864:dd7b:8:b9de:1ffb:b42f:106c",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "wlp61s0",
+        "internal": false,
+        "mac": "98:3b:8f:92:db:69",
+        "address": "fde5:4864:dd7b:8:c1af:8779:93cc:d18e",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "wlp61s0",
+        "internal": false,
+        "mac": "98:3b:8f:92:db:69",
+        "address": "fe80::f41d:1aff:89e4:2efb",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 3
+      }
+    ],
+    "host": "lastmjs-G7-7790"
+  },
+  "javascriptStack": {
+    "message": "",
+    "errorProperties": {
+    }
+  },
+  "javascriptHeap": {
+    "totalMemory": 12636160,
+    "executableMemory": 786432,
+    "totalCommittedMemory": 11403264,
+    "availableMemory": 4487964632,
+    "totalGlobalHandlesMemory": 16384,
+    "usedGlobalHandlesMemory": 16352,
+    "usedMemory": 8317216,
+    "memoryLimit": 4496293888,
+    "mallocedMemory": 549096,
+    "externalMemory": 3198409,
+    "peakMallocedMemory": 409808,
+    "nativeContextCount": 1,
+    "detachedContextCount": 0,
+    "doesZapGarbage": 0,
+    "heapSpaces": {
+      "read_only_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 0,
+        "used": 0,
+        "available": 0
+      },
+      "new_space": {
+        "memorySize": 4194304,
+        "committedMemory": 2748416,
+        "capacity": 2097024,
+        "used": 1577920,
+        "available": 519104
+      },
+      "old_space": {
+        "memorySize": 5423104,
+        "committedMemory": 5505024,
+        "capacity": 5418640,
+        "used": 4811696,
+        "available": 606944
+      },
+      "code_space": {
+        "memorySize": 786432,
+        "committedMemory": 786432,
+        "capacity": 786336,
+        "used": 278656,
+        "available": 507680
+      },
+      "shared_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 0,
+        "used": 0,
+        "available": 0
+      },
+      "trusted_space": {
+        "memorySize": 1966080,
+        "committedMemory": 2097152,
+        "capacity": 1962808,
+        "used": 1386784,
+        "available": 576024
+      },
+      "shared_trusted_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 0,
+        "used": 0,
+        "available": 0
+      },
+      "new_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 2097152,
+        "used": 0,
+        "available": 2097152
+      },
+      "large_object_space": {
+        "memorySize": 266240,
+        "committedMemory": 266240,
+        "capacity": 262160,
+        "used": 262160,
+        "available": 0
+      },
+      "code_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 0,
+        "used": 0,
+        "available": 0
+      },
+      "shared_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 0,
+        "used": 0,
+        "available": 0
+      },
+      "shared_trusted_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 0,
+        "used": 0,
+        "available": 0
+      },
+      "trusted_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 0,
+        "used": 0,
+        "available": 0
+      }
+    }
+  },
+  "nativeStack": [
+    {
+      "pc": "0x0000000000a1b624",
+      "symbol": "node::TriggerNodeReport(v8::Isolate*, node::Environment*, char const*, char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, v8::Local<v8::Value>) [/home/lastmjs/.nvm/versions/node/v24.22.1/bin/node]"
+    },
+    {
+      "pc": "0x0000000000a1bc27",
+      "symbol": "node::TriggerNodeReport(node::Environment*, char const*, char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, v8::Local<v8::Value>) [/home/lastmjs/.nvm/versions/node/v24.22.1/bin/node]"
+    },
+    {
+      "pc": "0x0000000000a2046e",
+      "symbol": "node::report::WriteReport(v8::FunctionCallbackInfo<v8::Value> const&) [/home/lastmjs/.nvm/versions/node/v24.22.1/bin/node]"
+    },
+    {
+      "pc": "0x00007643fb58f08d",
+      "symbol": ""
+    }
+  ],
+  "resourceUsage": {
+    "free_memory": 22237552640,
+    "total_memory": 33456910336,
+    "rss": 59850752,
+    "constrained_memory": 18446744073709551615,
+    "available_memory": 22237552640,
+    "userCpuSeconds": 0.087646,
+    "kernelCpuSeconds": 0.02265,
+    "cpuConsumptionPercent": 11.0296,
+    "userCpuConsumptionPercent": 8.7646,
+    "kernelCpuConsumptionPercent": 2.265,
+    "maxRss": 59850752,
+    "pageFaults": {
+      "IORequired": 5,
+      "IONotRequired": 4687
+    },
+    "fsActivity": {
+      "reads": 1168,
+      "writes": 264
+    }
+  },
+  "uvthreadResourceUsage": {
+    "userCpuSeconds": 0.081067,
+    "kernelCpuSeconds": 0.019772,
+    "cpuConsumptionPercent": 10.0839,
+    "userCpuConsumptionPercent": 8.1067,
+    "kernelCpuConsumptionPercent": 1.9772,
+    "fsActivity": {
+      "reads": 1168,
+      "writes": 264
+    }
+  },
+  "libuv": [
+    {
+      "type": "async",
+      "is_active": true,
+      "is_referenced": false,
+      "address": "0x0000000026412de0"
+    },
+    {
+      "type": "async",
+      "is_active": true,
+      "is_referenced": false,
+      "address": "0x00000000264c5560"
+    },
+    {
+      "type": "timer",
+      "is_active": true,
+      "is_referenced": true,
+      "address": "0x0000000026497490",
+      "repeat": 0,
+      "firesInMsFromNow": 2147483617,
+      "expired": false
+    },
+    {
+      "type": "check",
+      "is_active": true,
+      "is_referenced": false,
+      "address": "0x0000000026497528"
+    },
+    {
+      "type": "idle",
+      "is_active": true,
+      "is_referenced": true,
+      "address": "0x00000000264975a0"
+    },
+    {
+      "type": "prepare",
+      "is_active": true,
+      "is_referenced": false,
+      "address": "0x0000000026497618"
+    },
+    {
+      "type": "check",
+      "is_active": true,
+      "is_referenced": false,
+      "address": "0x0000000026497690"
+    },
+    {
+      "type": "async",
+      "is_active": true,
+      "is_referenced": false,
+      "address": "0x0000000026497708"
+    },
+    {
+      "type": "signal",
+      "is_active": true,
+      "is_referenced": false,
+      "address": "0x0000000026490288",
+      "signum": 12,
+      "signal": "SIGUSR2"
+    },
+    {
+      "type": "pipe",
+      "is_active": false,
+      "is_referenced": true,
+      "address": "0x000000002648fb60",
+      "localEndpoint": null,
+      "remoteEndpoint": null,
+      "sendBufferSize": 131072,
+      "recvBufferSize": 131072,
+      "fd": 2,
+      "stdio": "stderr",
+      "writeQueueSize": 0,
+      "readable": true,
+      "writable": true
+    },
+    {
+      "type": "pipe",
+      "is_active": false,
+      "is_referenced": true,
+      "address": "0x000000002648cea0",
+      "localEndpoint": null,
+      "remoteEndpoint": null,
+      "sendBufferSize": 131072,
+      "recvBufferSize": 131072,
+      "fd": 1,
+      "stdio": "stdout",
+      "writeQueueSize": 0,
+      "readable": true,
+      "writable": true
+    },
+    {
+      "type": "timer",
+      "is_active": true,
+      "is_referenced": false,
+      "address": "0x0000000026591ab0",
+      "repeat": 0,
+      "firesInMsFromNow": 8075,
+      "expired": false
+    },
+    {
+      "type": "loop",
+      "is_active": true,
+      "address": "0x0000000006bc3aa0",
+      "loopIdleTimeSeconds": 0
+    }
+  ],
+  "workers": [
+  ],
+  "environmentVariables": {
+    "NODE_TEST_CONTEXT": "child-v8",
+    "SENTRY-TRACE": "674a74e6fdbe4b42b1876174dfc13386-9598534b63190ab3",
+    "SHELL": "/bin/bash",
+    "COREPACK_ENABLE_AUTO_PIN": "0",
+    "SESSION_MANAGER": "local/lastmjs-G7-7790:@/tmp/.ICE-unix/2942,unix/lastmjs-G7-7790:/tmp/.ICE-unix/2942",
+    "QT_ACCESSIBILITY": "1",
+    "CLAUDE_CODE_ACCOUNT_UUID": "da08f31e-feb9-40cd-9aca-0ca7b22b5158",
+    "XDG_CONFIG_DIRS": "/etc/xdg/xdg-cinnamon:/etc/xdg",
+    "CLAUDE_CODE_CHILD_SESSION": "1",
+    "CLAUDE_CODE_EMIT_TOOL_USE_SUMMARIES": "false",
+    "CLAUDE_PREVIEW_CLASSIFIER_FLOOR": "1",
+    "CLAUDE_CODE_ENABLE_ASK_USER_QUESTION_TOOL": "true",
+    "GNOME_DESKTOP_SESSION_ID": "this-is-deprecated",
+    "GTK_IM_MODULE": "ibus",
+    "AI_AGENT": "claude-code_2-1-317_agent",
+    "CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING": "true",
+    "CLAUDE_DESKTOP_NARROWED_PATH": "/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/snap/bin:/run/current-system/sw/bin:/run/current-system/profile/bin",
+    "CLAUDE_CODE_USER_EMAIL": "jordan.michael.last@gmail.com",
+    "CLAUDE_CODE_SESSION_ID": "5742ff43-8fc4-4b9a-99cb-e66cd55f66a7",
+    "CLAUDE_CODE_DESKTOP_WORKFLOW_LIMIT_WAIT": "1",
+    "CLAUDE_PID": "8906",
+    "SSH_AUTH_SOCK": "/run/user/1000/keyring/ssh",
+    "CLAUDE_EFFORT": "medium",
+    "CINNAMON_VERSION": "6.0.4",
+    "CLAUDE_CODE_REPORT_FINDINGS": "1",
+    "XMODIFIERS": "@im=ibus",
+    "DESKTOP_SESSION": "cinnamon",
+    "ELECTRON_PA_APP_NAME": "Claude",
+    "CLAUDE_CODE_SDK_HAS_HOST_AUTH_REFRESH": "1",
+    "GTK_MODULES": "gail:atk-bridge",
+    "XDG_SEAT": "seat0",
+    "PWD": "/home/lastmjs/development/lasm/wt-mut-host",
+    "CLAUDE_CODE_EAGER_FLUSH": "1",
+    "XDG_SESSION_DESKTOP": "cinnamon",
+    "LOGNAME": "lastmjs",
+    "XDG_SESSION_TYPE": "x11",
+    "CLAUDE_CODE_MESSAGING_SOCKET": "/run/user/1000/cc-socks/8906.sock",
+    "GPG_AGENT_INFO": "/run/user/1000/gnupg/S.gpg-agent:0:1",
+    "XAUTHORITY": "/run/user/1000/gdm/Xauthority",
+    "NoDefaultCurrentDirectoryInExePath": "1",
+    "CLAUDECODE": "1",
+    "GJS_DEBUG_TOPICS": "JS ERROR;JS LOG",
+    "WINDOWPATH": "2",
+    "HOME": "/home/lastmjs",
+    "CLAUDE_AGENT_SDK_VERSION": "0.3.317",
+    "USERNAME": "lastmjs",
+    "LANG": "en_US.UTF-8",
+    "XDG_CURRENT_DESKTOP": "X-Cinnamon",
+    "CLAUDE_CODE_SESSION_ATTENDED": "1",
+    "CLAUDE_CODE_HOST_SESSION_ID": "local_8af5b0c7-d9c7-4c07-bc92-a68f5c1c257f",
+    "CLAUDE_AGENT_SDK_MCP_NO_PREFIX": "0",
+    "CLAUDE_CODE_DISABLE_CRON": "",
+    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1",
+    "QTWEBENGINE_DICTIONARIES_PATH": "/usr/share/hunspell-bdic/",
+    "ANTHROPIC_BASE_URL": "https://api.anthropic.com",
+    "CLAUDE_CODE_OAUTH_SCOPES": "user:inference user:file_upload user:profile user:sessions:claude_code user:plugins",
+    "CHROME_DESKTOP": "com.anthropic.Claude.desktop",
+    "CLUTTER_IM_MODULE": "ibus",
+    "GJS_DEBUG_OUTPUT": "stderr",
+    "CLAUDE_CODE_SIMPLE": "0",
+    "XDG_SESSION_CLASS": "user",
+    "USER": "lastmjs",
+    "DISPLAY": ":0",
+    "SHLVL": "1",
+    "GSM_SKIP_SSH_AGENT_WORKAROUND": "true",
+    "CLAUDE_CODE_EMIT_STARTUP_TIMING": "1",
+    "GIT_EDITOR": "true",
+    "CLAUDE_CODE_STARTUP_FAILURE_RESULTS": "1",
+    "CLAUDE_CODE_TERMINAL_MCP_TOOLS": "mcp__ccd_turn__wrap_up",
+    "QT_IM_MODULE": "ibus",
+    "XDG_VTNR": "2",
+    "XDG_SESSION_ID": "3",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "USE_LOCAL_OAUTH": "",
+    "FC_FONTATIONS": "1",
+    "DISABLE_AUTOUPDATER": "1",
+    "XDG_RUNTIME_DIR": "/run/user/1000",
+    "CLAUDE_CODE_ENTRYPOINT": "claude-desktop",
+    "MCP_SERVER_CONNECTION_BATCH_SIZE": "8",
+    "DEBUGINFOD_URLS": "https://debuginfod.ubuntu.com ",
+    "NODE_USE_SYSTEM_CA": "1",
+    "API_TIMEOUT_MS": "900000",
+    "CLAUDE_DESKTOP_STARTED_PATH": "/home/lastmjs/.elan/bin:/home/lastmjs/.local/share/dfx/bin:/home/lastmjs/.cargo/bin:/home/lastmjs/.local/bin:/home/lastmjs/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin",
+    "MCP_CONNECTION_NONBLOCKING": "true",
+    "GTK3_MODULES": "xapp-gtk3-module",
+    "XDG_DATA_DIRS": "/usr/share/gnome:/usr/share/cinnamon:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop",
+    "CLAUDE_CODE_EXECPATH": "/home/lastmjs/.config/Claude/claude-code/2.1.317/cd557f900744/claude",
+    "PATH": "/home/lastmjs/.nvm/versions/node/v24.22.1/bin:/home/lastmjs/.elan/bin:/home/lastmjs/.local/bin:/home/lastmjs/bin:/home/lastmjs/.wasienv/bin:/home/lastmjs/.wasmer/bin:/home/lastmjs/.wasmtime/bin:/home/lastmjs/.nvm/versions/node/v24.22.1/bin:/home/lastmjs/.elan/bin:/home/lastmjs/.local/share/dfx/bin:/home/lastmjs/.cargo/bin:/home/lastmjs/.local/bin:/home/lastmjs/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/lastmjs/bin:/home/lastmjs/.local/bin:/home/lastmjs/.pyenv/shims",
+    "GDMSESSION": "cinnamon",
+    "CI": "1",
+    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1000/bus",
+    "CLAUDE_CODE_ORGANIZATION_UUID": "ad7a6bb5-fcb8-4496-81df-4c7392473a9e",
+    "CLAUDE_CODE_HOST_SHORT_TEMP_DIRS": "1",
+    "CLAUDE_CODE_DESKTOP_APP_VERSION": "4.23118.0",
+    "BAGGAGE": "sentry-environment=production,sentry-release=Claude%404.23118.0,sentry-public_key=2f98127cbffe4740b1f767a2de77d23b,sentry-trace_id=674a74e6fdbe4b42b1876174dfc13386,sentry-org_id=1158394",
+    "GIO_LAUNCHED_DESKTOP_FILE_PID": "4318",
+    "DISABLE_MICROCOMPACT": "1",
+    "GIO_LAUNCHED_DESKTOP_FILE": "/home/lastmjs/.local/share/applications/com.anthropic.Claude.desktop",
+    "OLDPWD": "/home/lastmjs/development/lasm",
+    "USE_STAGING_OAUTH": "",
+    "CLAUDE_CODE_MESSAGING_TOKEN": "c9436b97257b49599eadae9d902cec10",
+    "_": "/usr/bin/timeout",
+    "NODE_TEST_WORKER_ID": "1"
+  },
+  "userLimits": {
+    "core_file_size_blocks": {
+      "soft": 0,
+      "hard": "unlimited"
+    },
+    "data_seg_size_bytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "file_size_blocks": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "max_locked_memory_bytes": {
+      "soft": 4182110208,
+      "hard": 4182110208
+    },
+    "max_memory_size_bytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "open_files": {
+      "soft": 1048576,
+      "hard": 1048576
+    },
+    "stack_size_bytes": {
+      "soft": 8388608,
+      "hard": "unlimited"
+    },
+    "cpu_time_seconds": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    },
+    "max_user_processes": {
+      "soft": 127123,
+      "hard": 127123
+    },
+    "virtual_memory_bytes": {
+      "soft": "unlimited",
+      "hard": "unlimited"
+    }
+  },
+  "sharedObjects": [
+    "linux-vdso.so.1",
+    "/lib/x86_64-linux-gnu/libdl.so.2",
+    "/lib/x86_64-linux-gnu/libstdc++.so.6",
+    "/lib/x86_64-linux-gnu/libm.so.6",
+    "/lib/x86_64-linux-gnu/libgcc_s.so.1",
+    "/lib/x86_64-linux-gnu/libpthread.so.0",
+    "/lib/x86_64-linux-gnu/libc.so.6",
+    "/lib64/ld-linux-x86-64.so.2"
+  ]
+}
