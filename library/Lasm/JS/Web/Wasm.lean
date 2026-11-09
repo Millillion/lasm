@@ -431,7 +431,9 @@ def WebAssembly.RuntimeError.name (self : WebAssembly.RuntimeError) : IO String 
 def WebAssembly.RuntimeError.message (self : WebAssembly.RuntimeError) : IO String := self.val.get "message" String
 
 /-- `readonly attribute Tag JSTag` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)) -/
-def WebAssembly.JSTag : IO WebAssembly.Tag := Support.getGlobal ["WebAssembly", "JSTag"] WebAssembly.Tag
+def WebAssembly.JSTag : IO WebAssembly.Tag := do
+  let r ← Support.getGlobal ["WebAssembly", "JSTag"] Value
+  pure { val := r }
 
 /-- `boolean validate(AllowSharedBufferSource bytes, optional WebAssemblyCompileOptions options)` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)) -/
 def WebAssembly.validate (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : IO Bool :=
@@ -439,9 +441,10 @@ def WebAssembly.validate (bytes : ByteArray) (options : Option WebAssemblyCompil
     (Support.args #[toJS bytes, Support.optional options]) (await := false)
 
 /-- `Promise<Module> compile(AllowSharedBufferSource bytes, optional WebAssemblyCompileOptions options)` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)) -/
-def WebAssembly.compile (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : Async WebAssembly.Module :=
-  Lasm.JS.Binding.invokeAsync WebAssembly.Module { name := "Lasm.JS.Web.WebAssembly.compile", module := "globalThis", path := "WebAssembly.compile", construct := false, arity := 2 }
+def WebAssembly.compile (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : Async WebAssembly.Module := do
+  let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.WebAssembly.compile", module := "globalThis", path := "WebAssembly.compile", construct := false, arity := 2 }
     (Support.args #[toJS bytes, Support.optional options])
+  pure { val := r }
 
 /-- `Promise<WebAssemblyInstantiatedSource> instantiate(AllowSharedBufferSource bytes, optional object importObject, optional WebAssemblyCompileOptions options)` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)) -/
 def WebAssembly.instantiate (bytes : ByteArray) (importObject : Data := .undefined) (options : Option WebAssemblyCompileOptions := none) : Async WebAssemblyInstantiatedSource :=
@@ -449,14 +452,16 @@ def WebAssembly.instantiate (bytes : ByteArray) (importObject : Data := .undefin
     (Support.args #[toJS bytes, importObject, Support.optional options])
 
 /-- `Promise<Instance> instantiate(Module moduleObject, optional object importObject)` (WebAssembly JavaScript Interface (https://webassembly.github.io/spec/js-api/)) -/
-def WebAssembly.instantiateWithModuleObject (moduleObject : WebAssembly.Module) (importObject : Data := .undefined) : Async WebAssembly.Instance :=
-  Lasm.JS.Binding.invokeAsync WebAssembly.Instance { name := "Lasm.JS.Web.WebAssembly.instantiateWithModuleObject", module := "globalThis", path := "WebAssembly.instantiate", construct := false, arity := 2 }
+def WebAssembly.instantiateWithModuleObject (moduleObject : WebAssembly.Module) (importObject : Data := .undefined) : Async WebAssembly.Instance := do
+  let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.WebAssembly.instantiateWithModuleObject", module := "globalThis", path := "WebAssembly.instantiate", construct := false, arity := 2 }
     (Support.args #[toJS moduleObject, importObject])
+  pure { val := r }
 
 /-- `Promise<Module> compileStreaming(Promise<Response> source, optional WebAssemblyCompileOptions options)` (WebAssembly Web API (https://webassembly.github.io/spec/web-api/)) -/
-def WebAssembly.compileStreaming (source : Value) (options : Option WebAssemblyCompileOptions := none) : Async WebAssembly.Module :=
-  Lasm.JS.Binding.invokeAsync WebAssembly.Module { name := "Lasm.JS.Web.WebAssembly.compileStreaming", module := "globalThis", path := "WebAssembly.compileStreaming", construct := false, arity := 2 }
+def WebAssembly.compileStreaming (source : Value) (options : Option WebAssemblyCompileOptions := none) : Async WebAssembly.Module := do
+  let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.WebAssembly.compileStreaming", module := "globalThis", path := "WebAssembly.compileStreaming", construct := false, arity := 2 }
     (Support.args #[toJS source, Support.optional options])
+  pure { val := r }
 
 /-- `Promise<WebAssemblyInstantiatedSource> instantiateStreaming(Promise<Response> source, optional object importObject, optional WebAssemblyCompileOptions options)` (WebAssembly Web API (https://webassembly.github.io/spec/web-api/)) -/
 def WebAssembly.instantiateStreaming (source : Value) (importObject : Data := .undefined) (options : Option WebAssemblyCompileOptions := none) : Async WebAssemblyInstantiatedSource :=

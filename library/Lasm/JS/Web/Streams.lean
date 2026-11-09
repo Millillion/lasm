@@ -452,9 +452,10 @@ def ReadableStream.new (underlyingSource : Data := .undefined) (strategy : Optio
 def ReadableStream.locked (self : ReadableStream) : IO Bool := self.val.get "locked" Bool
 
 /-- `static ReadableStream from(async_sequence<any> asyncIterable)` -/
-def ReadableStream.«from» (asyncIterable : Data) : IO ReadableStream :=
-  Lasm.JS.Binding.invoke ReadableStream { name := "Lasm.JS.Web.ReadableStream.from", module := "globalThis", path := "ReadableStream.from", construct := false, arity := 1 }
+def ReadableStream.«from» (asyncIterable : Data) : IO ReadableStream := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.ReadableStream.from", module := "globalThis", path := "ReadableStream.from", construct := false, arity := 1 }
     (Support.args #[toJS asyncIterable]) (await := false)
+  pure { val := r }
 
 /-- `Promise<undefined> cancel(optional any reason)` -/
 def ReadableStream.cancel (self : ReadableStream) (reason : Data := .undefined) : Async Unit :=
@@ -465,8 +466,9 @@ def ReadableStream.getReader (self : ReadableStream) (options : Option ReadableS
   self.val.callMethod "getReader" (Support.args #[Support.optional options]) Value
 
 /-- `ReadableStream pipeThrough(ReadableWritablePair transform, optional StreamPipeOptions options)` -/
-def ReadableStream.pipeThrough (self : ReadableStream) (transform : ReadableWritablePair) (options : Option StreamPipeOptions := none) : IO ReadableStream :=
-  self.val.callMethod "pipeThrough" (Support.args #[toJS transform, Support.optional options]) ReadableStream
+def ReadableStream.pipeThrough (self : ReadableStream) (transform : ReadableWritablePair) (options : Option StreamPipeOptions := none) : IO ReadableStream := do
+  let r ← self.val.callMethod "pipeThrough" (Support.args #[toJS transform, Support.optional options]) Value
+  pure { val := r }
 
 /-- `Promise<undefined> pipeTo(WritableStream destination, optional StreamPipeOptions options)` -/
 def ReadableStream.pipeTo (self : ReadableStream) (destination : WritableStream) (options : Option StreamPipeOptions := none) : Async Unit :=
@@ -581,8 +583,9 @@ def WritableStream.close (self : WritableStream) : Async Unit :=
   self.val.callMethodAwait "close" (Support.args #[]) Unit
 
 /-- `WritableStreamDefaultWriter getWriter()` -/
-def WritableStream.getWriter (self : WritableStream) : IO WritableStreamDefaultWriter :=
-  self.val.callMethod "getWriter" (Support.args #[]) WritableStreamDefaultWriter
+def WritableStream.getWriter (self : WritableStream) : IO WritableStreamDefaultWriter := do
+  let r ← self.val.callMethod "getWriter" (Support.args #[]) Value
+  pure { val := r }
 
 /-- `constructor(WritableStream stream)` -/
 def WritableStreamDefaultWriter.new (stream : WritableStream) : IO WritableStreamDefaultWriter :=
@@ -619,7 +622,9 @@ def WritableStreamDefaultWriter.write (self : WritableStreamDefaultWriter) (chun
   self.val.callMethodAwait "write" (Support.args #[chunk]) Unit
 
 /-- `readonly attribute AbortSignal signal` -/
-def WritableStreamDefaultController.signal (self : WritableStreamDefaultController) : IO AbortSignal := self.val.get "signal" AbortSignal
+def WritableStreamDefaultController.signal (self : WritableStreamDefaultController) : IO AbortSignal := do
+  let r ← self.val.get "signal" Value
+  pure { val := r }
 
 /-- `undefined error(optional any e)` -/
 def WritableStreamDefaultController.error (self : WritableStreamDefaultController) (e : Data := .undefined) : IO Unit :=
@@ -631,10 +636,14 @@ def TransformStream.new (transformer : Data := .undefined) (writableStrategy : O
     (Support.args #[transformer, Support.optional writableStrategy, Support.optional readableStrategy]) (await := false)
 
 /-- `readonly attribute ReadableStream readable` -/
-def TransformStream.readable (self : TransformStream) : IO ReadableStream := self.val.get "readable" ReadableStream
+def TransformStream.readable (self : TransformStream) : IO ReadableStream := do
+  let r ← self.val.get "readable" Value
+  pure { val := r }
 
 /-- `readonly attribute WritableStream writable` -/
-def TransformStream.writable (self : TransformStream) : IO WritableStream := self.val.get "writable" WritableStream
+def TransformStream.writable (self : TransformStream) : IO WritableStream := do
+  let r ← self.val.get "writable" Value
+  pure { val := r }
 
 /-- `readonly attribute unrestricted double? desiredSize` -/
 def TransformStreamDefaultController.desiredSize (self : TransformStreamDefaultController) : IO (Option Float) := self.val.get "desiredSize" (Option Float)

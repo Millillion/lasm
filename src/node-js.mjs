@@ -37,7 +37,8 @@ import { HandleTable } from './handle-table.mjs';
 
 export const jsProtocolVersion = 1;
 export const firstJsHandle = 0x40000000;
-const decoder = new TextDecoder();
+// ignoreBOM: a Lean string that begins with U+FEFF keeps it (TextDecoder drops a leading BOM by default).
+const decoder = new TextDecoder('utf-8', { ignoreBOM: true });
 const maximumDepth = 64;
 // Lengths travel as u32 (Lean's Wire.maxLength): a longer one is an error, never a
 // wrapped length (#154). Only a Uint8Array can be that long: JavaScript arrays hold

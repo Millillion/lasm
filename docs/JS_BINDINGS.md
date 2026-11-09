@@ -473,6 +473,11 @@ algorithm parameters) are `Data`: write the dictionary the spec's prose names
   WebIDL (`CompressionFormat.brotli`, `KeyUsage.encapsulateKey`); a runtime
   that does not know a value rejects it, and a value the pinned WebIDL lacks
   fails to decode.
+- **Some results take one more host call.** An interface result is read as a
+  reference (Bun returns `navigator` as a plain object, which would otherwise be
+  copied), at no extra cost; a dictionary result that holds a `record` is copied
+  through `structuredClone` first (`URLPattern.exec`: Node's `groups` objects
+  are not plain).
 - **Timers return numbers.** `setTimeout` and `setInterval` return the timer's
   number (`Number(timeout)` on Node and Bun, whose timers are objects), one more
   host call; `clearTimeout` takes it on every target.

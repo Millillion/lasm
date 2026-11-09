@@ -23,3 +23,11 @@ Notes for the next release, collected as changes land. They move to
   docs/JS_BINDINGS.md, "Standard bindings". A conformance suite (WPT's URL data,
   Web Crypto test vectors, round trips) runs them on Node, Bun, Deno, Workers and
   Chromium in CI. `Lasm.Web` is unchanged.
+
+## Fixes
+
+- **Lasm.JS: a string that begins with U+FEFF keeps it.** On every target the
+  host decoded the strings Lean sends with `TextDecoder`'s default, which drops
+  a leading byte order mark, so `"\uFEFFtest"` reached JavaScript as `"test"`
+  (and Lasm.UI text nodes that began with one lost it). Found by the
+  Lasm.JS.Web conformance run (WPT's urlencoded-parser case `\uFEFFtest=\uFEFF`).

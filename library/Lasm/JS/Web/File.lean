@@ -88,12 +88,14 @@ def Blob.size (self : Blob) : IO Nat := self.val.get "size" Nat
 def Blob.type (self : Blob) : IO String := self.val.get "type" String
 
 /-- `Blob slice(optional long long start, optional long long end, optional DOMString contentType)` -/
-def Blob.slice (self : Blob) (start : Option Int := none) («end» : Option Int := none) (contentType : Option String := none) : IO Blob :=
-  self.val.callMethod "slice" (Support.args #[Support.optional start, Support.optional «end», Support.optional contentType]) Blob
+def Blob.slice (self : Blob) (start : Option Int := none) («end» : Option Int := none) (contentType : Option String := none) : IO Blob := do
+  let r ← self.val.callMethod "slice" (Support.args #[Support.optional start, Support.optional «end», Support.optional contentType]) Value
+  pure { val := r }
 
 /-- `ReadableStream stream()` -/
-def Blob.stream (self : Blob) : IO ReadableStream :=
-  self.val.callMethod "stream" (Support.args #[]) ReadableStream
+def Blob.stream (self : Blob) : IO ReadableStream := do
+  let r ← self.val.callMethod "stream" (Support.args #[]) Value
+  pure { val := r }
 
 /-- `Promise<USVString> text()` -/
 def Blob.text (self : Blob) : Async String :=
@@ -105,8 +107,9 @@ def Blob.arrayBuffer (self : Blob) : Async ByteArray := do
   Support.arrayBufferBytes r
 
 /-- `ReadableStream textStream()` -/
-def Blob.textStream (self : Blob) : IO ReadableStream :=
-  self.val.callMethod "textStream" (Support.args #[]) ReadableStream
+def Blob.textStream (self : Blob) : IO ReadableStream := do
+  let r ← self.val.callMethod "textStream" (Support.args #[]) Value
+  pure { val := r }
 
 /-- `Promise<Uint8Array> bytes()` -/
 def Blob.bytes (self : Blob) : Async ByteArray :=

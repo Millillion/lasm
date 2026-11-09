@@ -58,10 +58,14 @@ def CompressionStream.new (format : CompressionFormat) : IO CompressionStream :=
     (Support.args #[toJS format]) (await := false)
 
 /-- `readonly attribute ReadableStream readable` -/
-def CompressionStream.readable (self : CompressionStream) : IO ReadableStream := self.val.get "readable" ReadableStream
+def CompressionStream.readable (self : CompressionStream) : IO ReadableStream := do
+  let r ← self.val.get "readable" Value
+  pure { val := r }
 
 /-- `readonly attribute WritableStream writable` -/
-def CompressionStream.writable (self : CompressionStream) : IO WritableStream := self.val.get "writable" WritableStream
+def CompressionStream.writable (self : CompressionStream) : IO WritableStream := do
+  let r ← self.val.get "writable" Value
+  pure { val := r }
 
 /-- `constructor(CompressionFormat format)` -/
 def DecompressionStream.new (format : CompressionFormat) : IO DecompressionStream :=
@@ -69,9 +73,13 @@ def DecompressionStream.new (format : CompressionFormat) : IO DecompressionStrea
     (Support.args #[toJS format]) (await := false)
 
 /-- `readonly attribute ReadableStream readable` -/
-def DecompressionStream.readable (self : DecompressionStream) : IO ReadableStream := self.val.get "readable" ReadableStream
+def DecompressionStream.readable (self : DecompressionStream) : IO ReadableStream := do
+  let r ← self.val.get "readable" Value
+  pure { val := r }
 
 /-- `readonly attribute WritableStream writable` -/
-def DecompressionStream.writable (self : DecompressionStream) : IO WritableStream := self.val.get "writable" WritableStream
+def DecompressionStream.writable (self : DecompressionStream) : IO WritableStream := do
+  let r ← self.val.get "writable" Value
+  pure { val := r }
 
 end Lasm.JS.Web

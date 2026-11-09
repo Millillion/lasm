@@ -505,9 +505,25 @@ function resultOf(idlType) {
   const r = resolve(idlType);
   const async = promiseRet(r);
   const t = async ? r.inner : r;
-  return { async, t, lean: retType(t), req: paren(reqType(t)), post: postFn(t) };
+  const lean = retType(t);
+  // An interface result is read as a reference and wrapped: some runtimes return
+  // plain objects for interface instances (Bun's navigator), which data would copy.
+  if (t.k === 'iface') return { async, t, lean, req: 'Value', post: 'wrap' };
+  // A dictionary holding a record is read through structuredClone: Node's
+  // URLPattern returns its groups as objects that are not plain.
+  const dict = t.k === 'nullable' ? t.inner : t;
+  if (dict.k === 'dict' && dictReadable(dict.name) && holdsRecord(dict)) return { async, t, lean, req: 'Value', post: `Support.cloneAs ${paren(lean)}` };
+  return { async, t, lean, req: paren(reqType(t)), post: postFn(t) };
 }
-const finish = (call, res) => res.post ? `do\n  let r ← ${call}\n  ${res.post} r` : call;
+function holdsRecord(t, seen = new Set()) {
+  if (t.k === 'record') return true;
+  if (t.k === 'nullable' || t.k === 'seq') return holdsRecord(t.inner, seen);
+  if (t.k === 'union') return unions.get(t.key).alts.some(a => holdsRecord(a.t, seen));
+  if (t.k === 'dict' && !seen.has(t.name)) { seen.add(t.name); return dictFields(t.name).some(f => holdsRecord(resolve(f.idlType), seen)); }
+  return false;
+}
+const applyPost = (post, x) => post === 'wrap' ? `pure { val := ${x} }` : `${post} ${x}`;
+const finish = (call, res) => res.post ? `do\n  let r ← ${call}\n  ${applyPost(res.post, 'r')}` : call;
 const monad = res => res.async ? 'Async' : 'IO';
 const binding = (name, path, construct, arity) =>
   `{ name := "${NS}.${name}", module := "globalThis", path := "${path}", construct := ${construct}, arity := ${arity} }`;
@@ -571,7 +587,7 @@ function emitInterface(module, name) {
       const call = `Support.getGlobal [${jsPath(name).split('.').map(s => `"${s}"`).join(', ')}, "${a.name}"] ${res.async ? 'Value' : res.req}`;
       fns.push(`${doc(a)}\ndef ${T}.${id(getName)} : ${monad(res)} ${paren(res.lean)} := ${res.async ? `do\n  let p ← ${call}\n  ${finish(`p.await ${res.req}`, res).replace(/^do\n {2}/, '')}` : finish(call, res)}`);
     } else if (res.async) {
-      fns.push(`${doc(a)}\ndef ${T}.${id(getName)} (self : ${T}) : Async ${paren(res.lean)} := do\n  let p ← self.val.get "${a.name}" Value\n  ${res.post ? `let r ← p.await ${res.req}\n  ${res.post} r` : `p.await ${res.req}`}`);
+      fns.push(`${doc(a)}\ndef ${T}.${id(getName)} (self : ${T}) : Async ${paren(res.lean)} := do\n  let p ← self.val.get "${a.name}" Value\n  ${res.post ? `let r ← p.await ${res.req}\n  ${applyPost(res.post, 'r')}` : `p.await ${res.req}`}`);
     } else {
       fns.push(`${doc(a)}\ndef ${T}.${id(getName)} (self : ${T}) : IO ${paren(res.lean)} := ${finish(`self.val.get "${a.name}" ${res.req}`, res)}`);
     }

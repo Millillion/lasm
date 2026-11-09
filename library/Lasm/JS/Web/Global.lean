@@ -23,7 +23,9 @@ instance : FromJS Navigator := ⟨fun | .ref v _ => .ok { val := v } | _ => .err
 def Navigator.userAgent (self : Navigator) : IO String := self.val.get "userAgent" String
 
 /-- `readonly attribute Navigator navigator` (written for Lasm (docs/JS_BINDINGS.md)) -/
-def navigator : IO Navigator := Support.getGlobal ["navigator"] Navigator
+def navigator : IO Navigator := do
+  let r ← Support.getGlobal ["navigator"] Value
+  pure { val := r }
 
 /-- `ByteString atob(DOMString data)` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 def atob (data : String) : IO String :=

@@ -29,6 +29,8 @@ def Performance.toJSON (self : Performance) : IO Data :=
   self.val.callMethod "toJSON" (Support.args #[]) Data
 
 /-- `readonly attribute Performance performance` (High Resolution Time (https://w3c.github.io/hr-time/)) -/
-def performance : IO Performance := Support.getGlobal ["performance"] Performance
+def performance : IO Performance := do
+  let r ← Support.getGlobal ["performance"] Value
+  pure { val := r }
 
 end Lasm.JS.Web

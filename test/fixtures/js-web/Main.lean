@@ -96,7 +96,9 @@ def Rng.bytes (g : Rng) (maxLength : Nat) : ByteArray × Rng := Id.run do
   return (b, g)
 
 @[js "globalThis" "JSON.parse"] opaque jsonParse : String → IO Data
-@[js "globalThis" "Promise.resolve"] opaque promiseResolve : Data → IO Value
+/-- `Promise.resolve(d)` (called on `Promise`, its receiver). -/
+def promiseResolve (d : Data) : IO Value := do
+  (← (← Lasm.JS.global).get "Promise" Value).callMethod "resolve" #[d] Value
 
 def str : Data → String
   | .string s => s
@@ -533,10 +535,11 @@ def fetching (r : Checks) : Async Unit := do
     -- Request
     let req ← Request.new (.usvString "https://example.com/p?q=1") (some { method := some "POST", body := some (.usvString "hello"), headers := some (.record ⟨#[("x-y", "z")]⟩) })
     let copy ← req.clone
+    let copy2 ← req.clone
     expect r "request attributes" ((← req.method) == "POST" && (← req.url) == "https://example.com/p?q=1"
       && (← (← req.headers).get "x-y") == some "z" && (← req.redirect) == .follow && !(← req.bodyUsed)) ""
     expect r "request body" ((← req.text) == "hello" && (← req.bodyUsed) && (← copy.text) == "hello") ""
-    expect r "request of a request" ((← (← Request.new (.request copy)).url) == "https://example.com/p?q=1") ""
+    expect r "request of a request" ((← (← Request.new (.request copy2)).url) == "https://example.com/p?q=1") ""
     expect r "GET with a body throws" (← throws (Request.new (.usvString "https://example.com/") (some { body := some (.usvString "x") }))) ""
   runSection r "fetch.response" do
     -- Response
