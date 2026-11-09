@@ -36,3 +36,14 @@ test('reserved standard handles survive repeated resource and request ID reuse',
   requests.clear();
   assert.equal(requests.allocate('after clear'), 1);
 });
+
+test('handle ranges must be positive signed i32 integers in order', () => {
+  for (const options of [{ first: 0 }, { first: -1 }, { first: 1.5 }, { last: 2.5 }, { first: '1' }, { last: NaN },
+    { first: 5, last: 4 }, { last: 0x80000000 }, { first: 0x80000000, last: 0x80000000 }])
+    assert.throws(() => new HandleTable(options), { name: 'RangeError', message: 'Host handles must fit the positive signed i32 range' }, JSON.stringify(options));
+  for (const options of [{ first: 1, last: 1 }, { first: 0x7fffffff }, { last: 0x7fffffff }, {}]) assert.ok(new HandleTable(options));
+  const single = new HandleTable({ first: 7, last: 7 });
+  assert.equal(single.allocate('only'), 7);
+  assert.throws(() => single.allocate('more'), error => error.code === 'EMFILE' && error.message === 'Host resource handle table is full');
+  assert.equal(new HandleTable().allocate('first'), 1);
+});
