@@ -93,6 +93,9 @@ test('linkCachedEdgeProgram: a failed link leaves the cache as it was; LASM_KEEP
   assert.equal(existsSync(join(f.root, 'f'.repeat(64), '.link')), false);
   assert.throws(() => linkCachedEdgeProgram({ ...f.options, result: { ...f.options.result, linkWork: undefined }, key: '0'.repeat(64) }),
     { message: 'The edge build needs the Node build\'s link inputs (internal error)' });
-  // A dev build needs the Node link driver (Emscripten's cannot skip optimization).
+  // An unoptimized build (a dev build, or LASM_TEST_UNOPTIMIZED) needs the Node link driver.
+  process.env.LASM_TEST_UNOPTIMIZED = '1';
+  try { assert.throws(() => linkCachedEdgeProgram({ ...f.options, key: '2'.repeat(64) }), /The edge dev profile needs the Node link driver/); }
+  finally { delete process.env.LASM_TEST_UNOPTIMIZED; }
   assert.throws(() => linkCachedEdgeProgram({ ...f.options, result: { ...f.options.result, profile: 'dev' }, key: '1'.repeat(64) }), /The edge dev profile needs the Node link driver/);
 });

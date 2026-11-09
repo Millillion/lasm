@@ -46,7 +46,7 @@ test('builtinModuleFile: the file of a builtin; anything else fails naming the b
 //   each once, every one after the builtins it imports, non-builtins dropped
 test('builtinModuleClosure: the requested builtins and those they import, dependencies first', () => {
   const styles = [n => `import { x } from './${n}.mjs';`, n => `import * as m from "./${n}.mjs"`, n => `  export { y } from './${n}.mjs';  `,
-    n => `export * from "./${n}.mjs";`, n => `import d, { e as f } from './${n}.mjs';`];
+    n => `export * from "./${n}.mjs";`, n => `import d, { e as f } from './${n}.mjs';`, n => `import g from'./${n}.mjs'`];
   forAll(g => {
     const names = g.array(g.int(1, 8), (_, i) => `m${i}${g.pick(['', '-x', 'b'])}`);
     const imports = names.map((_, i) => [...new Set(g.array(g.int(0, 3), () => g.int(i + 1, names.length)).filter(j => j < names.length))]);

@@ -111,6 +111,13 @@ test('withoutComponentType drops only the component-type custom sections', () =>
   }, { runs: 150 });
 });
 
+test('withoutComponentType reads names only of custom sections', () => {
+  // A type section whose bytes happen to spell a component-type name stays.
+  const lookalike = section(1, name('component-type:x'));
+  const module = Uint8Array.from([...moduleHeader, ...lookalike, ...section(0, [...name('component-type:x'), 1])]);
+  assert.deepEqual(withoutComponentType(module), Uint8Array.from([...moduleHeader, ...lookalike]));
+});
+
 test('extractCore needs the template\'s placeholder module', () => {
   const noPlaceholder = Uint8Array.from([...componentHeader, ...section(1, [...moduleHeader])]);
   assert.throws(() => extractCore(componentize(Uint8Array.from(moduleHeader)), noPlaceholder), /The component template has no placeholder module/);

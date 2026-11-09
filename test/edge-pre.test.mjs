@@ -335,3 +335,89 @@ test('edge-pre: a synchronous JavaScript → Lean call passes the payload, retur
   assert.throws(() => controller.syncCall(7, Uint8Array.of(0)), /trap in callback/);
   assert.equal(controller.stopped.message, 'trap in callback');
 });
+
+// Each transition on its own (docs/TESTING.md#mutation-testing).
+test('edge-pre: a stopped instance runs nothing more, even an entry that would now succeed', () => {
+  const { controller, context } = load();
+  context.callMain = () => { throw new Error('first'); };
+  assert.throws(() => controller.main([]), /first/);
+  let ran = 0;
+  context.callMain = () => { ran++; return 0; };
+  context._lasm_js_edge_sync = () => { ran++; return 0n; };
+  assert.throws(() => controller.main([]), /first/);
+  assert.throws(() => controller.syncCall(1, new Uint8Array(1)), /first/);
+  assert.equal(ran, 0);
+  // main's arguments default to none.
+  const other = load();
+  let seen;
+  other.context.callMain = args => { seen = args; return 0; };
+  other.controller.main();
+  assert.equal(seen.length, 0);
+});
+
+test('edge-pre: a second failure keeps the first cause and the first stack, and listeners hear one', async () => {
+  const { controller, context, setSp } = load();
+  const heard = [];
+  controller.onStop(error => heard.push(error.message));
+  let reject;
+  setSp(4000);
+  context.callMain = () => new Promise((_, r) => { reject = r; });
+  const running = controller.main([]);
+  setSp(8000);
+  context._lasm_js_edge_sync = () => { setSp(100); throw new Error('sync trap'); };
+  assert.throws(() => controller.syncCall(1, Uint8Array.of(1)), /sync trap/);
+  assert.deepEqual({ ...controller.stoppedStack }, { top: 8000, pointer: 100 }, 'a synchronous entry raises the stack top');
+  setSp(50);
+  reject(new Error('late failure'));
+  await assert.rejects(running, /sync trap/, 'the first cause');
+  assert.deepEqual(heard, ['sync trap']);
+  assert.equal(controller.stopped.message, 'sync trap');
+  assert.deepEqual({ ...controller.stoppedStack }, { top: 8000, pointer: 100 });
+});
+
+test('edge-pre: a suspended Lean resumes when its pending call settles, and may suspend again', async () => {
+  const { controller, context, host } = load();
+  let settle;
+  host.answer = () => new Promise(r => { settle = r; });
+  const states = [];
+  context.callMain = async () => {
+    assert.equal(controller.call(1, 0, 0n, 0, 0), INT64_MIN);
+    const waited = controller.wait();
+    let resumed = false;
+    waited.then(() => { resumed = true; });
+    await tick();
+    states.push(['before', resumed, controller.canSuspend()]);
+    settle({ error: false, bytes: Uint8Array.of(7) });
+    await Promise.race([waited, new Promise((_, r) => setTimeout(() => r(new Error('Lean was not resumed')), 1000).unref())]);
+    states.push(['after', controller.callReady(), controller.canSuspend()]);
+    return controller.takeCall();
+  };
+  assert.equal(await controller.main([]), 1n);
+  assert.deepEqual(states, [['before', false, false], ['after', true, true]], 'suspended until the call settles, running again after');
+  // A rejection without a value is reported as the text "undefined".
+  const other = load();
+  other.host.answer = () => Promise.reject(undefined);
+  other.context.callMain = async () => { other.controller.call(1, 0, 0n, 0, 0); await tick(); await tick(); const n = other.controller.takeCall(); other.controller.copy(100, -Number(n) - 1); return n; };
+  const n = await other.controller.main([]);
+  assert.equal(new TextDecoder().decode(other.context.HEAPU8.subarray(116, 100 + -Number(n) - 1)), 'undefined');
+});
+
+test('edge-pre: host events during a synchronous callback wait for it; each finished callback pumps once', async () => {
+  const { controller, context } = load();
+  const mallocs = [];
+  const malloc = context._malloc;
+  context._malloc = n => { mallocs.push(n); return malloc(n); };
+  let pumps = 0;
+  context._lasm_edge_pump = () => { pumps++; return 0; };
+  context._lasm_js_edge_sync = (_fn, _input, _length, size) => { controller.notify(); context.HEAPU32[Number(size) >> 2] = 0; return 0n; };
+  controller.syncCall(1, new Uint8Array(0));
+  assert.equal(pumps, 0, 'not inside the callback');
+  assert.deepEqual(mallocs, [1, 8], 'an empty payload still gets one byte');
+  controller.syncCall(1, Uint8Array.of(1, 2, 3));
+  assert.deepEqual(mallocs.slice(2), [3, 8]);
+  await tick();
+  assert.equal(pumps, 1);
+  controller.syncCall(1, Uint8Array.of(1));
+  await tick();
+  assert.equal(pumps, 2, 'a later callback schedules its own pump');
+});

@@ -76,6 +76,8 @@ test('root: starts Lean main with the program name and arguments, then serves it
       seen.args = Array.from({ length: Number(argc) }, (_, i) => g.string(g.u64(argv + BigInt(i) * 8n)));
       seen.terminator = g.u64(argv + argc * 8n);
       seen.platform = g.runtimeCall(1); seen.self = g.runtimeCall(6); seen.cpus = g.runtimeCall(7); seen.keepalive = g.runtimeCall(8);
+      const text = guestString(g, 'root says');
+      seen.out = g.runtimeCall(15, text); seen.err = g.runtimeCall(16, text);
       seen.spawn = g.spawn.fn(0x3000n, 0x55n, 0x66n);
       seen.strong = g.events.fn(2, 0x3000n);
       return 0n;
@@ -92,11 +94,16 @@ test('root: starts Lean main with the program name and arguments, then serves it
   assert.deepEqual(seen.keepalive, { status: 0, value: 0n });
   assert.equal(seen.spawn, 0);
   assert.equal(seen.strong, 1);
+  // The root's console output goes to the supervisor as notifications (no reply).
+  assert.deepEqual([seen.out, seen.err], [{ status: 0, value: 0n }, { status: 0, value: 0n }]);
+  assert.deepEqual(r.supervisor.posted.filter(m => m.kind === 'host-notification'), [
+    { kind: 'host-notification', request: { kind: 'emscripten-output', fd: 1, text: 'root says' } },
+    { kind: 'host-notification', request: { kind: 'emscripten-output', fd: 2, text: 'root says' } }]);
   // The instance's startup, in order.
   const names = guest.calls.map(([name]) => name);
   assert.deepEqual(names.slice(0, 6), ['emscripten_stack_init', 'emscripten_stack_get_base', 'emscripten_stack_get_end', '__set_stack_limits', '__wasm_call_ctors', 'pthread_self']);
   assert.deepEqual(guest.calls[3], ['__set_stack_limits', 0x80000n, 0x40000n]);
-  assert.deepEqual(names.slice(6), ['malloc', 'malloc', 'malloc', 'calloc', '_emscripten_proxy_main', 'pthread_self']);
+  assert.deepEqual(names.slice(6), ['malloc', 'malloc', 'malloc', 'calloc', '_emscripten_proxy_main', 'pthread_self', 'malloc']);
   assert.deepEqual(guest.calls.find(([name]) => name === 'calloc'), ['calloc', 4n, 8n]);
   // The thread's Worker.
   const [worker] = FakeWorker.started;
@@ -371,7 +378,11 @@ test('thread: enters its start routine on its own stack and reports the result',
 });
 
 test('thread: a stack outside the instance, a foreign pthread or a short native stack fail the thread', async t => {
-  for (const [settings, cause] of [[{ size: 0n }, /./], [{ top: 0x8000n, size: 0x10000n }, /./], [{ top: BigInt(1 << 21) }, /./],
+  // The stack may end exactly at the end of memory, and must be above its size.
+  const edge = await startThread(t, { thread: () => ({ status: 0, value: 0n }), top: BigInt(1 << 20), size: 0x10000n });
+  await edge.run;
+  assert.equal(messages(edge.parentPort, 'thread-result').length, 1);
+  for (const [settings, cause] of [[{ size: 0n }, /./], [{ top: 0x8000n, size: 0x10000n }, /./], [{ top: 0x10000n, size: 0x10000n }, /./], [{ top: BigInt(1 << 20) + 1n }, /./], [{ top: BigInt(1 << 21) }, /./],
     [{ guestOptions: { exports: { _emscripten_dlsync_self: () => 0n } } }, /./], [{ guestOptions: { self: 0x3001n } }, /./]]) {
     const th = await startThread(t, { thread: () => assert.fail('entered'), ...settings });
     if (settings.guestOptions?.self) th.guest.self = 0x3001n;

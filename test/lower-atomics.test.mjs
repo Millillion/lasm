@@ -186,8 +186,12 @@ test('lowerAtomics: malformed and unsupported modules fail naming the problem', 
   }
   const good = moduleOf([{ name: 'f', params: [I32], results: [I32], code: [0x20, 0, 0xfe, 0x10, 2, 0] }]);
   assert.throws(() => lowerAtomics(good.subarray(0, good.length - 3)), /Unexpected end of WebAssembly module/);
-  // A section whose size LEB runs past the end.
+  // A section whose size LEB runs past the end; a section longer than the module.
   assert.throws(() => lowerAtomics(Uint8Array.from([...header, 1, 0x80])), /Unexpected end of WebAssembly module/);
+  assert.throws(() => lowerAtomics(Uint8Array.from([...header, 1, 5, 0, 0])), /Unexpected end of WebAssembly module/);
+  // A function body longer than its code section.
+  assert.throws(() => lowerAtomics(Uint8Array.from([...header, ...section(1, vec([[0x60, 0, 0]])), ...section(3, vec([[0]])), ...section(10, [1, 6, 0, 0x01, 0x01])])),
+    /Unexpected end of WebAssembly module/);
   const atomic = sub => moduleOf([{ name: 'f', params: [I32], results: [], code: [0x20, 0, 0x41, 0, 0xfe, ...u32(sub), 2, 0] }]);
   assert.throws(() => lowerAtomics(atomic(0x4f)), /Unknown atomic instruction 0xfe 79/);
   assert.throws(() => lowerAtomics(atomic(0x04)), /Unknown atomic instruction 0xfe 4/);
@@ -352,12 +356,12 @@ test('moduleImports: every import kind, with names, past the other sections', ()
   // lowerAtomics counts only the imported functions before its helpers.
   const withImports = Uint8Array.from([...header, ...section(1, vec([[0x60, 1, I32, 1, I32], [0x60, 0, 0]])), ...section(2, vec([
     [...name('env'), ...name('f'), 0x00, 0], [...name('env'), ...name('t'), 0x01, 0x70, 0x00, 1], [...name('env'), ...name('g'), 0x03, I32, 0],
-    [...name('env'), ...name('h'), 0x00, 0], [...name('env'), ...name('tag'), 0x04, 0, 1], [...name('env'), ...name('t64'), 0x01, 0x70, 0x05, ...u64(1), ...u64(9)]])),
+    [...name('env'), ...name('h'), 0x00, 0], [...name('env'), ...name('tag'), 0x04, 0, 1], [...name('env'), ...name('mem2'), 0x02, 0x01, 1, ...u32(300)], [...name('env'), ...name('t64'), 0x01, 0x70, 0x05, ...u64(1), ...u64(9)]])),
   ...section(3, vec([[0]])), ...section(5, vec([[0x00, 1]])), ...section(7, vec([[...name('f'), 0x00, 2], [...name('memory'), 0x02, 0]])),
   ...section(10, vec([(body => [...u32(body.length), ...body])([0, 0x20, 0, 0x41, 3, 0xfe, 0x1e, 2, 0, 0x0b])]))]);
   const lowered = lowerAtomics(withImports);
   const env = { f: x => x, h: x => x, t: new WebAssembly.Table({ initial: 1, element: 'anyfunc' }), g: new WebAssembly.Global({ value: 'i32' }, 0),
-    tag: new WebAssembly.Tag({ parameters: [] }), t64: new WebAssembly.Table({ initial: 1n, maximum: 9n, element: 'anyfunc', address: 'i64' }) };
+    tag: new WebAssembly.Tag({ parameters: [] }), mem2: new WebAssembly.Memory({ initial: 1, maximum: 300 }), t64: new WebAssembly.Table({ initial: 1n, maximum: 9n, element: 'anyfunc', address: 'i64' }) };
   const e = new WebAssembly.Instance(new WebAssembly.Module(lowered), { env }).exports;
   new DataView(e.memory.buffer).setUint32(16, 4, true);
   assert.equal(e.f(16), 4);
@@ -381,3 +385,91 @@ test('keepExports keeps the accepted exports in order and every other section as
   const named = moduleOf([{ name: long, params: [], results: [], code: [] }]);
   assert.deepEqual(WebAssembly.Module.exports(new WebAssembly.Module(keepExports(named, n => n === long))).map(e => e.name), [long]);
 });
+
+// Instruction streams of every encoding the decoder knows, with random
+// immediates (multi-byte indices, constants and memargs, 0xfe bytes inside
+// them), atomics among them, and local declarations of every value type. The
+// bodies need not be valid: the lowering reads instructions, it does not type
+// them. Expected output: each atomic replaced as docs/WASI.md describes, every
+// other byte kept, helper functions numbered after the imported and defined ones.
+const rmwKeys = ['add', 'sub', 'and', 'or', 'xor', 'xchg', 'cmpxchg'];
+const plainOf = { 0x10: 0x28, 0x11: 0x29, 0x12: 0x2d, 0x13: 0x2f, 0x14: 0x31, 0x15: 0x33, 0x16: 0x35, 0x17: 0x36, 0x18: 0x37, 0x19: 0x3a, 0x1a: 0x3b, 0x1b: 0x3c, 0x1c: 0x3d, 0x1d: 0x3e };
+function streamGenerators(g) {
+  const big = () => g.pick([0, 1, 63, 64, 127, 128, 254, 16383, 16384, 0xfe, 0x7e00 + g.int(0, 255), g.int(0, 2 ** 31)]);
+  const heapType = () => g.next() < 0.5 ? [g.int(0x69, 0x74)] : s64(big());
+  const valueType = () => g.next() < 0.6 ? [g.pick([0x7f, 0x7e, 0x7d, 0x7c, 0x7b, 0x70, 0x6f])] : [g.pick([0x63, 0x64]), ...heapType()];
+  const blockType = () => { const k = g.int(0, 3); return k === 0 ? [0x40] : k === 1 ? [g.pick([0x7f, 0x7e, 0x7d, 0x7c, 0x7b, 0x70, 0x6f])] : k === 2 ? [g.pick([0x63, 0x64]), ...heapType()] : s64(big()); };
+  const memarg = () => { const align = g.int(0, 3), memory = g.next() < 0.2; const offset = big(); return { bytes: [...u32(align | (memory ? 0x40 : 0)), ...(memory ? u32(0) : []), ...u64(offset)], offset }; };
+  const plain = () => {
+    const k = g.int(0, 19);
+    if (k === 0) return [g.pick([0x00, 0x01, 0x05, 0x0b, 0x0f, 0x1a, 0x1b, 0xd1, 0xd3, 0xd4, 0x19, 0x0a])];
+    if (k === 1) return [g.int(0x45, 0xc4)];
+    if (k === 2) return [g.pick([0x02, 0x03, 0x04, 0x06]), ...blockType()];
+    if (k === 3) return [g.pick([0x07, 0x08, 0x09, 0x0c, 0x0d, 0x10, 0x12, 0x14, 0x15, 0x18, 0xd2, 0xd5, 0xd6, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26]), ...u32(big())];
+    if (k === 4) { const n = g.int(0, 4); return [0x0e, ...u32(n), ...g.array(n, () => u32(big())).flat(), ...u32(big())]; }
+    if (k === 5) return [g.pick([0x11, 0x13]), ...u32(big()), ...u32(big())];
+    if (k === 6) { const n = g.int(0, 3); return [0x1c, ...u32(n), ...g.array(n, valueType).flat()]; }
+    if (k === 7) { const n = g.int(0, 3); return [0x1f, ...blockType(), ...u32(n), ...g.array(n, () => { const kind = g.int(0, 3); return [kind, ...(kind < 2 ? u32(big()) : []), ...u32(big())]; }).flat()]; }
+    if (k === 8) return [g.pick([0x3f, 0x40]), ...u32(g.int(0, 2))];
+    if (k === 9) return [0x41, ...s64(BigInt.asIntN(32, BigInt(big()) * BigInt(g.pick([1, -1]))))];
+    if (k === 10) return [0x42, ...s64(BigInt(big()) * BigInt(g.pick([1, -1, 1 << 20])))];
+    if (k === 11) return [0x43, ...g.array(4, () => g.pick([0xfe, 0x00, g.int(0, 255)]))];
+    if (k === 12) return [0x44, ...g.array(8, () => g.pick([0xfe, 0x00, g.int(0, 255)]))];
+    if (k === 13) return [0xd0, ...heapType()];
+    if (k === 14) { const sub = g.int(0, 17); return [0xfc, ...u32(sub), ...([8, 10, 12, 14].includes(sub) ? [...u32(big()), ...u32(big())] : sub > 7 ? u32(big()) : [])]; }
+    return [g.int(0x28, 0x3e), ...memarg().bytes];
+  };
+  const atomic = memory64 => {
+    const k = g.int(0, 4);
+    if (k === 0) return { bytes: [0xfe, 0x03, 0x00], lowered: () => [] };
+    const sub = k === 1 ? g.int(0x10, 0x1d) : k === 2 ? g.int(0x1e, 0x4e) : k === 3 ? 0x00 : g.pick([0x01, 0x02]);
+    const m = memarg();
+    const bytes = [0xfe, ...u32(sub), ...m.bytes];
+    if (k === 1) return { bytes, lowered: () => [plainOf[sub], ...m.bytes] };
+    const key = k === 2 ? rmwKeys[Math.floor((sub - 0x1e) / 7)] + (sub - 0x1e) % 7 : sub === 0 ? 'notify' : `wait${sub === 1 ? I32 : I64}`;
+    return { bytes, key, lowered: index => [memory64 ? 0x42 : 0x41, ...s64(m.offset), 0x10, ...u32(index(key))] };
+  };
+  const locals = () => g.array(g.int(0, 4), () => [...u32(g.pick([1, 2, 0x28, 0x41, 0x7f, 0xfe, 300, g.int(0, 70)])), ...valueType()]);
+  return { plain, atomic, locals };
+}
+function codeBodies(bytes) {
+  for (let at = 8; at < bytes.length;) {
+    const id = bytes[at++]; let size = 0, shift = 0, b;
+    do { b = bytes[at++]; size += (b & 0x7f) * 2 ** shift; shift += 7; } while (b & 0x80);
+    if (id === 10) {
+      const bodies = []; let p = at, n = 0; shift = 0;
+      do { b = bytes[p++]; n += (b & 0x7f) * 2 ** shift; shift += 7; } while (b & 0x80);
+      for (let i = 0; i < n; i++) { let s = 0, sh = 0; do { b = bytes[p++]; s += (b & 0x7f) * 2 ** sh; sh += 7; } while (b & 0x80); bodies.push([...bytes.subarray(p, p + s)]); p += s; }
+      return bodies;
+    }
+    at += size;
+  }
+  return [];
+}
+// ∀ bodies b of instructions i₁…iₙ, code (lower (module b)) = [i₁'…iₙ' | b] ++ helpers,
+//   where i' = i for every non-atomic i and the documented replacement otherwise
+for (const memory64 of [false, true]) {
+  test(`lowerAtomics copies every other instruction exactly and replaces each atomic (${memory64 ? 'memory64' : '32-bit memory'})`, () => {
+    forAll(g => {
+      const gen = streamGenerators(g);
+      const imported = g.int(0, 3);
+      const functions = g.array(g.int(1, 4), () => ({ locals: gen.locals(), parts: g.array(g.int(0, 25), () => g.next() < 0.35 ? gen.atomic(memory64) : { bytes: gen.plain() }) }));
+      if (!functions.some(f => f.parts.some(p => p.lowered))) functions[0].parts.push(gen.atomic(memory64));
+      return { imported, functions, types: g.pick([1, 3, 200]) };
+    }, ({ imported, functions, types }) => {
+      const imports = [...Array.from({ length: imported }, (_, i) => [...name('env'), ...name('f' + i), 0x00, 0]), [...name('env'), ...name('g'), 0x03, I32, 0]];
+      const bodies = functions.map(f => [...vec(f.locals), ...f.parts.flatMap(p => p.bytes), 0x0b]);
+      const module = Uint8Array.from([...header, ...section(1, vec(Array.from({ length: types }, () => [0x60, 0, 0]))), ...section(2, vec(imports)),
+        ...section(3, vec(functions.map(() => [0]))), ...section(5, vec([[memory64 ? 0x04 : 0x00, 1]])),
+        ...section(10, vec(bodies.map(b => [...u32(b.length), ...b])))]);
+      const keys = [];
+      const index = key => { if (!keys.includes(key)) keys.push(key); return imported + functions.length + keys.indexOf(key); };
+      const expected = functions.map(f => [...vec(f.locals), ...f.parts.flatMap(p => p.lowered ? p.lowered(index) : p.bytes), 0x0b]);
+      const lowered = lowerAtomics(module);
+      const out = codeBodies(lowered);
+      assert.equal(out.length, functions.length + keys.length, 'one helper per operation and width');
+      assert.deepEqual(out.slice(0, functions.length), expected);
+      assert.deepEqual(sectionCounts(lowered)[3], functions.length + keys.length);
+    }, { runs: 300, seed: memory64 ? 640 : 320 });
+  });
+}

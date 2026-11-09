@@ -67,6 +67,8 @@ test('linkCachedWasiProgram caches the linked program beside the Node build; cac
     const options = { result: f.result, nodeRuntime: f.nodeRuntime, edge: f.edge, toolchain: f.toolchain, target: 'wasi' };
     const key = wasiProgramKey(options);
     assert.equal(cachedWasiProgram(f.result, 'wasi', key), null, 'nothing cached yet');
+    // A staging directory an interrupted build of this process left behind is replaced.
+    mkdirSync(join(f.root('wasi'), `.${key}.${process.pid}.partial`, 'old'), { recursive: true });
     const linked = linkCachedWasiProgram({ ...options, key });
     const directory = join(f.root('wasi'), key);
     assert.equal(linked.directory, directory);
@@ -126,6 +128,7 @@ test('fastlyName: the package name as Fastly allows it, else the directory, else
     assert.equal(at('E Dir', { version: '1.0.0' }), 'e-dir', 'a package.json without a name: the directory');
     assert.equal(at('Plain'), 'plain', 'no package.json: the directory');
     assert.equal(at('f', { name: 'a@b/c' }), 'a-b-c', 'only a leading scope is dropped');
+    assert.equal(at('g', { name: 'My  App!!' }), 'my-app', 'a run of other characters is one dash');
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -175,7 +178,7 @@ test('writeWasiOutput: main.wasm with its notices, the build information and the
       assert.deepEqual(readdirSync(destination).sort(), ['THIRD_PARTY_NOTICES.txt', 'build-info.json', 'main.wasm']);
       const wasm = readFileSync(built.wasm), notices = readFileSync(join(destination, 'THIRD_PARTY_NOTICES.txt'), 'utf8');
       assert.deepEqual(customSections(wasm, noticesSectionName), [notices], 'the licences are inside main.wasm too');
-      assert.match(notices, new RegExp(wasiTargets[target].label));
+      assert.ok(notices.includes(`This ${wasiTargets[target].label} output was compiled by Lasm.`), 'the notices name the target');
       const info = { schema: 1, target, profile: 'wasi', abi: 'wasi_snapshot_preview1', nodeBuildSignature: 'signature', lean: '4.35.0',
         edgeRuntime: { 'libleanrt.a': 'abc' }, link: wasiLinkSettings[target], programKey: 'wasi-key', wasm: 'main.wasm', sha256: sha256(wasm) };
       assert.deepEqual(built.info, info);
@@ -199,6 +202,14 @@ test('writeWasiOutput refuses unknown targets, outputs holding the sources and d
     await assert.rejects(writeWasiOutput({ ...f.options, target: 'wasi-p3' }), { message: 'Unknown WASI target wasi-p3' });
     await assert.rejects(writeWasiOutput({ ...f.options, target: 'wasi', output: f.project }), /must not contain the Lean sources/);
     await assert.rejects(writeWasiOutput({ ...f.options, target: 'wasi', output: f.root }), /must not contain the Lean sources/);
+    // A source outside the project does not make the project directory an output.
+    const elsewhere = join(f.root, 'elsewhere.lean');
+    await assert.rejects(writeWasiOutput({ ...f.options, source: elsewhere, target: 'wasi', output: f.project }), /must not contain the Lean sources/);
+    // A staging directory an interrupted build left behind is replaced.
+    mkdirSync(join(f.project, 'wasi.lasm-staging', 'old'), { recursive: true });
+    await writeWasiOutput({ ...f.options, target: 'wasi' });
+    assert.equal(existsSync(join(f.project, 'wasi.lasm-staging')), false);
+    rmSync(join(f.project, 'wasi'), { recursive: true });
     // Beside the sources is fine.
     const beside = join(f.root, 'beside');
     assert.equal((await writeWasiOutput({ ...f.options, target: 'wasi', output: beside })).output, beside);
@@ -245,11 +256,17 @@ test('writeWasiOutput --target fastly: bin/main.wasm, fastly.toml when missing a
     assert.ok(f.lines[0].endsWith(`(${(wasm.length / 1048576).toFixed(2)} MiB; package ${relative(process.cwd(), pkg)}; run locally with fastly compute serve)`), f.lines[0]);
     assert.ok(f.lines[0].startsWith(`Built ${relative(process.cwd(), f.options.source)} for Fastly Compute: ${relative(process.cwd(), built.wasm)} (`), f.lines[0]);
     // The project's own fastly.toml is kept, and its service name names the package.
-    writeFileSync(join(f.project, 'fastly.toml'), 'manifest_version = 3\n  name = "My Service!"\n');
+    writeFileSync(join(f.project, 'fastly.toml'), 'manifest_version = 3\nservice_name = "other"\n  name = "My  Service!!"\n');
+    // A package staging directory an interrupted build left behind is replaced.
+    mkdirSync(join(f.project, 'pkg', `.My-Service-.${process.pid}`, 'old'), { recursive: true });
     await writeWasiOutput({ ...f.options, target: 'fastly' });
-    assert.equal(readFileSync(join(f.project, 'fastly.toml'), 'utf8'), 'manifest_version = 3\n  name = "My Service!"\n');
+    assert.equal(readFileSync(join(f.project, 'fastly.toml'), 'utf8'), 'manifest_version = 3\nservice_name = "other"\n  name = "My  Service!!"\n');
     assert.ok(existsSync(join(f.project, 'pkg/My-Service-.tar.gz')));
     assert.deepEqual((await entries(join(f.project, 'pkg/My-Service-.tar.gz'))).map(e => e[0])[1], 'My-Service-/fastly.toml');
+    assert.equal(existsSync(join(f.project, 'pkg', `.My-Service-.${process.pid}`)), false);
+    writeFileSync(join(f.project, 'fastly.toml'), 'name="Tight"\n');
+    await writeWasiOutput({ ...f.options, target: 'fastly' });
+    assert.ok(existsSync(join(f.project, 'pkg/Tight.tar.gz')));
     // Without a name in it: the package name.
     writeFileSync(join(f.project, 'fastly.toml'), 'manifest_version = 3\n');
     await writeWasiOutput({ ...f.options, target: 'fastly' });

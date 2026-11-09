@@ -67,7 +67,9 @@ function interpret(source, p, entries) {
   const keep = new Set(p.keep);
   for (const name of p.closure) {
     assert.equal(aliases.has(name), !keep.has(name), `${name}: skipped exactly when not kept`);
-    assert.equal(bodies.has(name) && declaredReal.has(name) && declaredWrap.has(name), keep.has(name), `${name}: declared and defined when kept`);
+    assert.equal(bodies.has(name), keep.has(name), `${name}: defined when kept`);
+    assert.equal(declaredReal.has(name), keep.has(name), `${name}: its initializer declared when kept`);
+    assert.equal(declaredWrap.has(name), keep.has(name), `${name}: its wrapper declared when kept`);
   }
   const done = new Set(), ran = [];
   const wrap = name => {

@@ -106,7 +106,7 @@ test('vercel-edge: lazy start with the process environment; Accept-Encoding neve
   try {
     const seen = [];
     const starts = lean({ handler: (request, env, context) => { seen.push([request.headers.get('accept-encoding'), request.headers.get('x-kept'), env.VERCEL_VALUE, context]); return new Response('ok'); } });
-    const mod = await import(place(vercelEdgeEntry(['lasm:web']), { path: 'api/lasm.mjs', lasm: 'api/_lasm/lasm' }));
+    const mod = await import(place(vercelEdgeEntry(['lasm:web', 'lasm-test-module:c']), { path: 'api/lasm.mjs', lasm: 'api/_lasm/lasm' }));
     assert.deepEqual(mod.config, { runtime: 'edge' });
     await new Promise(resolve => setTimeout(resolve, 0));
     assert.equal(starts.length, 1, 'started when the module is evaluated');
@@ -114,6 +114,7 @@ test('vercel-edge: lazy start with the process environment; Accept-Encoding neve
     assert.equal(starts[0].env.VERCEL_VALUE, 'v');
     assert.ok(Object.values(starts[0].env).every(value => typeof value === 'string'));
     assert.equal(starts[0].modules['lasm:web'].web, true);
+    assert.equal(starts[0].modules['lasm-test-module:c'].name, 'c');
     const context = { geo: {} };
     await mod.default(new Request('http://x/', { headers: { 'accept-encoding': 'br', 'x-kept': 'yes' } }), context);
     await mod.default(new Request('http://x/', { headers: { 'x-kept': 'plain' } }), context);

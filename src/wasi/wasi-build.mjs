@@ -85,7 +85,6 @@ build = "${build}"
 `;
 }
 
-const generatedToml = '# Fastly Compute (Lasm):';
 /** Writes `pkg/<name>.tar.gz` as `fastly compute pack` does: <name>/fastly.toml and <name>/bin/main.wasm. */
 async function writeFastlyPackage(projectDirectory, name, wasm, notices) {
   const tar = await import('tar');
