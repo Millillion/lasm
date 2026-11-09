@@ -9,6 +9,7 @@ Notes for the next release, collected as changes land. They move to
 
 ## Fixes
 
+- **The browser CI's `lasm dev` rebuild budget no longer fails on slower GitHub runners (CI only, no change to Lasm).** The enforced budget is 2.5 s (was 2 s), the median of seven warm edits (was three), and the evidence names the runner's CPU: AMD EPYC 7763 runners rebuild in 1.8–2.3 s, others in 1.2–1.6 s. See docs/BROWSER.md#budgets-measured-in-ci-recorded-per-release.
 - **Edge targets: a C-stack overflow traps at once instead of overwriting static data (#126).** The edge link (every `--target` built on the edge runtime: Workers, Deno, Bun, Vercel and Netlify Edge, Supabase, the browser) placed Lean's 1 MiB C stack above the program's static data, with nothing between them. A recursion that used up the C stack before the engine's own stack ran out (unoptimized code, or large frames) kept writing below the stack, over that data, and what happened next depended on what it overwrote: usually a trap, sometimes a wrong `call_indirect`, and on Bun a loop that never ended (the `edge-O0-bun` hang in CI). The stack now comes first in linear memory (`--stack-first`, as the WASI target already does), so an overflow runs below address 0 and traps on its first access, and the instance stops with `Stack overflow: the program used all of its 1 MiB C stack (deep recursion?)`. The Node link driver's edge recordings (both the JSPI and the Asyncify link) were updated to match emcc's link byte for byte.
 
 ## Repository

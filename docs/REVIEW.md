@@ -156,6 +156,11 @@ decisions themselves are logged with their reasoning in
   of being misread (#154; [0.6.0-notes.md](release/0.6.0-notes.md)).
 
 ### Process
+- [ ] **The browser dev-rebuild budget is 2.5 s, was 2 s (2026-11-09).** It
+  was flaky: GitHub's AMD EPYC 7763 runners rebuild the web template in
+  1.8–2.3 s, the EPYC 9V74 ones in 1.2–1.6 s, so 2 s failed on the slow class
+  (blocking 0.6.0). The check now takes the median of seven warm edits and
+  records the CPU. README still says "about 2 s". [BROWSER.md](BROWSER.md#budgets-measured-in-ci-recorded-per-release).
 - [ ] **`library-prebuilt.yml` stays,** and `library/prebuilt` (40 MB) stays
   committed. A committed copy makes the npm tarball reproducible from the
   commit alone. Generating it in CI is IRREDUCIBLE.md removal 15, deferred.

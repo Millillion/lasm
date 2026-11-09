@@ -4,7 +4,7 @@
 // only, without the watcher's 80 ms debounce; and save to reload event). The
 // first edit warms the worker; evidence.mjs takes the median of the other seven.
 // Rebuilds on one runner agree to about 0.1 s; runners differ by up to 1.8x
-// (docs/BROWSER.md#budgets), so the runner's CPU is recorded with them.
+// (docs/BROWSER.md#budgets-measured-in-ci-recorded-per-release), so the runner's CPU is recorded with them.
 //   node dev-loop-check.mjs APP_DIR RESULT.json
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';

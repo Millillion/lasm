@@ -23,8 +23,10 @@ export const budgets = [
   { name: 'Start (module evaluated → first frame), wasm cached, CI Chromium', limit: 60, unit: 'ms', enforced: true,
     actual: chromium?.apps.counter?.start?.warm?.startMs ?? null },
   // The edit loop as developers run it: lasm dev's warm build worker, the
-  // median of the edits after the first (scripts/browser/dev-loop-check.mjs).
-  { name: 'Incremental rebuild after editing one view function (lasm dev --target browser, warm), Linux runner', limit: 2, unit: 's', enforced: true,
+  // median of the seven edits after the first (scripts/browser/dev-loop-check.mjs).
+  // 2.5 s, not 2: the slowest runner class (AMD EPYC 7763) rebuilds in 1.8-2.3 s,
+  // the faster ones in 1.2-1.6 s (docs/BROWSER.md#budgets-measured-in-ci-recorded-per-release, DECISIONS.md 2026-11-09).
+  { name: 'Incremental rebuild after editing one view function (lasm dev --target browser, warm), Linux runner', limit: 2.5, unit: 's', enforced: true,
     actual: median((devLoop?.rebuilds ?? []).slice(1).map(r => r.seconds)) },
   { name: 'Vite dev: edit one view function to the remounted app (warm), Linux runner', limit: 2, unit: 's', enforced: false,
     actual: viteDev?.updates ? median(viteDev.updates.slice(1)) : viteDev?.updateSeconds ?? null },

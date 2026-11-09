@@ -93,8 +93,9 @@ Programs link only the `Lasm.*` library modules they import.
 
 ## Budgets (measured in CI, recorded per release)
 
-`scripts/browser/evidence.mjs` checks them on every run: the counter transfer
-and the Chromium start are enforced; the rebuild time is recorded.
+`scripts/browser/evidence.mjs` checks them on every run: the counter transfer,
+the Chromium start and the `lasm dev` rebuild are enforced; the Vite and cold
+rebuild times are recorded.
 
 
 | Metric | Budget |
@@ -103,7 +104,22 @@ and the Chromium start are enforced; the rebuild time is recorded.
 | TodoMVC, total transfer (brotli) | ≤ 200 KiB |
 | Start (module evaluated → first frame), wasm cached, CI Chromium | ≤ 60 ms |
 | 1,000-row create / update every 10th row (js-framework-benchmark style) | within 2× vanilla JS or one 60 Hz frame (16.7 ms) of it, whichever is looser; median of ≥ 7 alternating trials ([UI.md](UI.md#benchmark-gate)) |
-| Incremental rebuild after editing one `view` function (dev profile) | ≤ 2 s on the Linux runner |
+| Incremental rebuild after editing one `view` function (dev profile) | ≤ 2.5 s on the Linux runner (`lasm dev --target browser`, warm; median of 7 edits) |
+
+**The rebuild budget is 2.5 s, not 2 s (2026-11-09).** GitHub's `ubuntu-24.04`
+runners are not one machine. On the web template, `lasm dev --target browser`
+rebuilds in 1.2–1.6 s on the faster ones (AMD EPYC 9V74) and in 1.8–2.3 s on
+AMD EPYC 7763 runners: every phase (Lean, link, output, and the cold
+`lasm build --dev`) is about 1.6× slower there, so this is the machine, not a
+regression (the times are flat since the dev worker landed in October). On one
+runner the rebuilds agree to about 0.1 s, so more samples cannot make a 2 s limit
+pass on a 7763: it failed release-checks run 42567642822 at 2.2 s. The check
+times eight edits, skips the first (worker warm-up) and takes the median of the
+other seven; the time is the build worker's build, without the watcher's 80 ms
+debounce. 2.5 s is the slowest runner seen (2.2 s) plus about 15 %, which still
+fails a regression of that size there, or of about 1.7× on the faster runners. The
+record names the runner's CPU (`devLoop.runner`). Developers' machines are
+usually faster than either: the README's "about 2 s" stands.
 
 ## Builtin JavaScript modules (`lasm:*`)
 
