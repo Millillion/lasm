@@ -266,6 +266,11 @@ settles, as after `await` in JavaScript. Rules:
 - **`try … catch`, `throw`, `for`, `let mut` and `return`** work as in `IO`.
 - **From `IO`** (a script's `main`, server startup), run an `Async` computation
   and wait for it with `.block`: `let reply ← (request url).block`.
+- **Loops of any length**: an `Async` loop (a recursion, `for`, `List.mapM`) of
+  steps that complete at once, such as synchronous calls, `IO` actions and `pure`,
+  runs on every target without overflowing the stack; CI runs 1,000,000 such
+  steps on Node, Deno, Bun, workerd and browsers. Before #90's fix such a loop
+  failed after about 2,000 steps on Deno and Workers and 8,000 on Bun.
 - **To wait for time**, bind a JavaScript timer:
   `@[js "node:timers/promises" "setTimeout"] opaque sleep : Nat → Async Unit`.
   `IO.sleep` and `IO.wait` block a thread.
@@ -319,6 +324,25 @@ Function.ofSyncFn2 (f : α → β → IO γ)
       timer, DNS lookup or socket read started in the callback. JavaScript gets
       the error, and the memory the callback was using leaks.
   - A synchronous callback cannot call another synchronous callback.
+  - On the single-threaded targets (Deno, Bun, Workers, browsers) the callback
+    runs on the JavaScript stack. Waiting for a Lean task works there when its
+    work needs no JavaScript event: the wait runs the task, including its
+    synchronous JavaScript calls (`(loop).block` of an `Async` loop of
+    `callMethod`s, say). Waiting for a JavaScript event fails at once with an error
+    that names the cause: a promise, a timer, `fetch` or `Std.Async.sleep`.
+  - Why these waits cannot be made to work, on any target: JavaScript runs a
+    function to completion. A promise settles, and its reactions run, only after
+    the JavaScript code that called the callback has returned, and that code is
+    waiting for the callback's result. Suspending the WebAssembly stack (JSPI)
+    cannot help: it cannot suspend through the caller's JavaScript frames, and
+    the caller needs its result synchronously. On Node, Node's main thread could
+    in principle serve other Lean threads' host calls while it waits, so that a
+    task that calls JavaScript could finish. It would then run JavaScript for
+    unrelated Lean threads (another request's handler) in the middle of the
+    caller's synchronous code, which JavaScript code does not expect, and it
+    cannot tell the callback's own tasks from unrelated ones. So these waits
+    keep failing at once with a clear error. Use `Function.ofFn` when the
+    callback must wait.
 - **Replying with a method call (`ofFnReply`), for HTTP handlers.** A handler
   usually ends by calling `res.json(body)` (Express) or returning `c.json(body)`
   (Hono). Returning `Function.Reply.callMethod res "json" #[body]` instead lets the host make
@@ -423,7 +447,10 @@ Hono handler (from `Hono.lean`), which returns the `Response` that `c.json` crea
 - **Deriving** covers only structures without parameters and enumerations.
 - **Synchronous callbacks** block Node's event loop. Inside them, waiting for
   anything that needs Node (a promise, file IO, a task that makes host calls, a
-  timer or socket started there) fails at once.
+  timer or socket started there) fails at once. On the single-threaded targets,
+  waiting for a JavaScript event fails the same way, while waiting for Lean work
+  that needs no event works. These waits cannot be made to work
+  ([Callbacks](#callbacks-lean-functions-called-by-javascript)).
 - **Module loading.** Modules load with `require`: ES modules with top-level await
   cannot be loaded. pnpm/Yarn Plug'n'Play layouts are not supported.
 - **Cost per call.** Each call costs about 5 µs when a Lean thread makes calls
