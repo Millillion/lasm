@@ -1,6 +1,6 @@
 {
   "comment": "Mutation scores per module (scripts/mutation/run.mjs, docs/TESTING.md#mutation-testing). initial: before the tests were improved (2026-11-02); score: the last recorded measurement; threshold: the floor CI checks (nightly, PRs), the score rounded down to a whole percent, at least 80 % and never lowered (the ratchet, docs/DECISIONS.md 2026-11-03).",
-  "measuredAt": "2026-11-03",
+  "measuredAt": "2026-11-09",
   "tool": "Stryker 10.0.0 with the tap runner over node:test (scripts/mutation/run.mjs)",
   "modules": {
     "host-bridge": {
@@ -122,7 +122,13 @@
       "score": 86.5,
       "mutants": 2028,
       "threshold": 86
+    },
+    "serverless": {
+      "initial": 40.5,
+      "score": 86.4,
+      "mutants": 770,
+      "threshold": 86
     }
   },
-  "run": "mutation.yml run 41749603692 (Node 26.13.0, main at the branch point)"
+  "run": "mutation.yml runs of 2026-11-09 on the group branches and on #165 (42612360594); the first seven modules: 41749603692 (Node 26.13.0)"
 }

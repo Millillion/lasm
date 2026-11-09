@@ -448,3 +448,30 @@ test('property: joinCookies leaves at most one Cookie field and every other fiel
     assert.deepEqual(out.filter(isCookie).flatMap(([, value]) => value.split('; ')), crumbs);
   });
 });
+
+test('parseSetCookie: spaces around names, values and attributes; invalid Max-Age and SameSite are dropped attributes', async () => {
+  const { parseSetCookie, isTextual } = await import(shim('lasm-server.mjs'));
+  assert.deepEqual(parseSetCookie(' a = 1 ; Path = /p ; Max-Age = 5 ; SameSite = Strict ; ; Secure'),
+    { name: 'a', value: '1', path: '/p', maxAge: 5, sameSite: 'Strict', secure: true, dropped: [] });
+  assert.deepEqual(parseSetCookie('a=1; Max-Age=5s; Max-Age=x5; SameSite=lazy; Expires=never; Domain=; Path='),
+    { name: 'a', value: '1', dropped: ['Max-Age=5s', 'Max-Age=x5', 'SameSite=lazy', 'Expires=never', 'Domain=', 'Path='] });
+  assert.deepEqual(parseSetCookie('a=1; SameSite=None; HttpOnly=; Foo'), { name: 'a', value: '1', sameSite: 'None', httpOnly: true, dropped: ['Foo'] });
+  assert.deepEqual(parseSetCookie('a=1; =x'), { name: 'a', value: '1', dropped: [] }, 'an attribute without a name is ignored');
+  assert.equal(parseSetCookie(' =1'), null);
+  assert.equal(parseSetCookie('   =1'), null, 'a name of spaces is no name');
+  assert.deepEqual(parseSetCookie('a='), { name: 'a', value: '', dropped: [] });
+  // An identity Content-Encoding is no encoding.
+  assert.equal(isTextual([['content-type', 'text/plain'], ['content-encoding', 'identity']], Buffer.from('x')), true);
+  assert.equal(isTextual([['content-type', 'x-text/plain']]), false);
+  assert.equal(isTextual([['content-type', 'application/x-www-form-urlencodedx']]), true, 'a prefix test, as the Lean model');
+  assert.equal(isTextual([['content-type', 'image/svg+xml']]), true);
+  assert.equal(isTextual([['content-type', 'my/application/graphql']]), false);
+});
+
+test('Lambda: an empty body string, and cookies only in the event', async () => {
+  const handler = await lambda();
+  const seen = echoed(bodyOf(await handler({ version: '2.0', rawPath: '/e', rawQueryString: '', headers: {}, requestContext: { http: { method: 'POST' } }, body: '', isBase64Encoded: false })));
+  assert.deepEqual([seen.body, named(seen.headers, 'content-length')], ['', []]);
+  const cookies = echoed(bodyOf(await handler({ version: '2.0', rawPath: '/c', headers: { Cookie: 'kept=1' }, cookies: [], requestContext: { http: { method: 'GET' } } })));
+  assert.deepEqual(named(cookies.headers, 'cookie'), ['kept=1'], 'an empty cookies list leaves the header');
+});
