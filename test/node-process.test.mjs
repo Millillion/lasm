@@ -16,7 +16,8 @@ const engines = [
 ];
 
 function droppedChild(executable, args, label) {
-  const result = spawnSync(executable, args, { encoding: 'utf8', timeout: 2000, killSignal: 'SIGKILL' });
+  // Generous: under mutation testing the host runs instrumented and the runner is loaded.
+  const result = spawnSync(executable, args, { encoding: 'utf8', timeout: 10_000, killSignal: 'SIGKILL' });
   const pid = Number(result.stdout.trim());
   try {
     assert.equal(result.status, 0, `${label}: ${result.error?.message ?? result.stdout + result.stderr}`);

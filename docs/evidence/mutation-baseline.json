@@ -110,6 +110,18 @@
       "score": 88,
       "mutants": 2070,
       "threshold": 88
+    },
+    "node-host": {
+      "initial": 42,
+      "score": 86.1,
+      "mutants": 3794,
+      "threshold": 86
+    },
+    "native-files": {
+      "initial": 29.4,
+      "score": 86.5,
+      "mutants": 2028,
+      "threshold": 86
     }
   },
   "run": "mutation.yml run 41749603692 (Node 26.13.0, main at the branch point)"
