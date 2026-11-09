@@ -49,6 +49,7 @@ writeFileSync(out, JSON.stringify(record, null, 2) + '\n');
 const failedEngines = engines.filter(e => e.failures.length);
 for (const budget of budgets)
   console.log(`${budget.pass ? 'PASS' : budget.enforced ? 'FAIL' : 'OVER'} ${budget.name}: ${budget.actual === null ? 'not measured' : budget.unit === 'bytes' ? (budget.actual / KiB).toFixed(1) + ' KiB' : budget.actual.toFixed(budget.unit === 's' ? 1 : 0) + ' ' + budget.unit} (budget ${budget.unit === 'bytes' ? budget.limit / KiB + ' KiB' : budget.limit + ' ' + budget.unit}${budget.enforced ? '' : ', recorded'})`);
+if (devLoop) console.log(`lasm dev --target browser rebuilds (s): ${(devLoop.rebuilds ?? []).map(r => r.seconds).join(' ')} on ${devLoop.runner?.cpu ?? 'an unrecorded CPU'}${devLoop.runner ? ` (${devLoop.runner.cpus} CPUs)` : ''}`);
 for (const e of engines) console.log(`${e.engine} ${e.browserVersion} (${e.platform}): ${e.failures.length ? e.failures.length + ' failures' : 'passed'}`);
 if (process.env.BROWSERS_RESULT && process.env.BROWSERS_RESULT !== 'success') console.log(`The browser jobs ended with ${process.env.BROWSERS_RESULT}.`);
 const viteFailed = record.viteDev?.checks?.some(c => !c.ok) ?? false;
