@@ -16,6 +16,7 @@ import { responseFile } from '../src/platform.mjs';
 import { glueLinkFlags } from '../src/lasm-library.mjs';
 import { installTools, wasmObject, archive, temporaryDirectory } from './fixtures/link-stand-ins/toolchain.mjs';
 import { registerProgram } from './fixtures/link-stand-ins/programs.mjs';
+import { finishLinks, links as finishedLinks, hooks as linkHooks } from './fixtures/link-stand-ins/link-driver.mjs';
 
 const posix = process.platform !== 'win32';
 const here = fileURLToPath(new URL('../src/edge/', import.meta.url));
@@ -318,4 +319,58 @@ test('edge glue keeps only the file names of included files', { skip: !posix }, 
   assert.equal(readFileSync(result.program, 'utf8'), portable);
   write(portable);
   assert.equal(readFileSync(linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'again') }).program, 'utf8'), portable);
+});
+
+test('the edge dev profile records the full link\'s members and imports, and accepts a member link that imports nothing new', { skip: !posix }, async () => {
+  const { linkEdgeProgram: link } = await finishLinks(new URL('../src/edge/edge-link.mjs', import.meta.url).href);
+  const f = nodeDriver(fixture({ plan: false }));
+  // The program imports two host functions.
+  writeFileSync(f.objects.main, wasmObject({ functions: [{ name: '__main_argc_argv', refs: ['initialize_Main', 'js_edge_host', 'js_edge_other', 'l_other'] }, { name: 'initialize_Main' }, { name: `tag_finished_${unique++}` }] }));
+  const libInit = f.edge.libraries['libInit.a'], libleanrt = f.edge.libraries['libleanrt.a'];
+  const saved = [];
+  const members = (record, save = item => saved.push(item)) => ({ directory: join(f.base, 'members'), record, save });
+  const wasmLinks = () => f.tools.calls('wasm-ld');
+  const memberLink = args => args.some(arg => arg.endsWith('.lasm-member.o'));
+  const run = options => { f.tools.clear(); finishedLinks.length = 0; return link({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, optimize: false, ...options }); };
+
+  // No record yet: a full link, whose kept members and imports are saved.
+  const result = run({ members: members(undefined) });
+  assert.deepEqual(result, { program: join(f.out, 'program.mjs'), wasm: join(f.out, 'program.wasm'), usesJs: true, suspend: 'jspi', driver: 'node' });
+  assert.deepEqual(wasmLinks().map(memberLink), [false]);
+  assert.deepEqual(finishedLinks.map(item => [item.mode, item.optimize]), [['edge', false]]);
+  assert.equal(saved.length, 1);
+  const record = saved[0];
+  assert.deepEqual(record.imports, ['env\0js_edge_host\0function', 'env\0js_edge_other\0function']);
+  assert.deepEqual(Object.keys(record.liveMembers), [libInit, libleanrt]);
+  assert.deepEqual(record.liveMembers[libInit], [archiveOffset(libInit, 'Other.o')], 'the member the program does not use is not kept');
+  // The glue names its included files by name only.
+  assert.ok(readFileSync(result.program, 'utf8').includes('// include: edge-pre.js\n'));
+
+  // The record: the member link is accepted, and nothing is saved.
+  saved.length = 0;
+  run({ members: members(record) });
+  assert.deepEqual(wasmLinks().map(memberLink), [true]);
+  assert.ok(!wasmLinks()[0].includes(libInit) && !wasmLinks()[0].includes(libleanrt));
+  assert.deepEqual(saved, []);
+
+  // A record whose imports lack one of them: the member link imports more, so the program links in full.
+  run({ members: members({ ...record, imports: record.imports.slice(0, 1) }) });
+  assert.deepEqual(wasmLinks().map(memberLink), [true, false]);
+  assert.deepEqual(saved, [record]);
+  // Members of an archive this program does not link (even none): linked in full at once.
+  saved.length = 0;
+  run({ members: members({ ...record, liveMembers: { ...record.liveMembers, '/elsewhere/libX.a': [] } }) });
+  assert.deepEqual(wasmLinks().map(memberLink), [false]);
+  assert.deepEqual(saved, [record]);
+  // An optimized link uses and saves no members.
+  saved.length = 0;
+  run({ members: members(record), optimize: true });
+  assert.deepEqual(wasmLinks().map(memberLink), [false]);
+  assert.deepEqual(finishedLinks.map(item => item.optimize), [true]);
+  assert.deepEqual(saved, []);
+  // A program whose Wasm cannot be read: no record; a record that cannot be saved is not an error.
+  linkHooks.after = () => writeFileSync(join(f.out, 'program.wasm'), 'not wasm');
+  try { run({ members: members(undefined) }); } finally { linkHooks.after = undefined; }
+  assert.deepEqual(saved, []);
+  assert.doesNotThrow(() => run({ members: members(undefined, () => { throw new Error('unwritable'); }) }));
 });
