@@ -29,8 +29,7 @@
       "name": "target-link",
       "description": "Application, edge and WASI linking (src/*link*.mjs)",
       "mutate": ["src/application-link.mjs", "src/edge/edge-link.mjs", "src/wasi/wasi-link.mjs"],
-      "tests": ["test/application-link-glue.test.mjs", "test/application-object-store.test.mjs", "test/full-application-link-mode.test.mjs", "test/link-driver-compile.test.mjs", "test/edge.test.mjs", "test/wasi.test.mjs",
-        "test/application-link-plan.test.mjs", "test/application-link-node.test.mjs", "test/edge-link-plan.test.mjs", "test/wasi-link-plan.test.mjs"]
+      "tests": ["test/application-link-glue.test.mjs", "test/application-object-store.test.mjs", "test/full-application-link-mode.test.mjs", "test/link-driver-compile.test.mjs", "test/edge.test.mjs", "test/wasi.test.mjs", "test/application-link-plan.test.mjs", "test/application-link-node.test.mjs", "test/edge-link-plan.test.mjs", "test/wasi-link-plan.test.mjs"]
     },
     {
       "name": "edge-glue",
@@ -43,6 +42,90 @@
       "description": "Licence and third-party notice generation",
       "mutate": ["src/notices.mjs"],
       "tests": ["test/notices.test.mjs", "test/notices-targets.test.mjs", "test/application-output.test.mjs", "test/managed-artifacts.test.mjs", "test/npm-dist-packages.test.mjs"]
+    },
+    {
+      "name": "serverless",
+      "description": "Function-platform shims (Lambda, Vercel, Netlify, Azure Functions, Google Cloud Functions), the loopback forwarder and the zip writer",
+      "mutate": ["src/serverless/lasm-server.mjs", "src/serverless/lasm-lambda.mjs", "src/serverless/lasm-vercel.mjs", "src/serverless/lasm-netlify.mjs", "src/serverless/lasm-azure.mjs", "src/serverless/lasm-gcf.mjs", "src/serverless/zip.mjs"],
+      "tests": ["test/serverless.test.mjs"]
+    },
+    {
+      "name": "downloads",
+      "description": "Managed downloads and installation: the downloader, managed artifacts and their verification, the managed Lean, npm artifacts, cache repair",
+      "mutate": ["src/managed-download.mjs", "src/managed-artifacts.mjs", "src/managed-lean.mjs", "src/npm-artifacts.mjs", "src/cache-repair.mjs"],
+      "tests": ["test/managed-download.test.mjs", "test/managed-network.test.mjs", "test/managed-artifacts.test.mjs", "test/managed-lean-tiers.test.mjs", "test/npm-artifacts.test.mjs", "test/npm-dist-packages.test.mjs", "test/cache-lifecycle.test.mjs", "test/verification-records.test.mjs", "test/installer-bundle.test.mjs", "test/tree-archive.test.mjs", "test/windows-installer-faults.test.mjs", "test/lasm-library-prebuilt.test.mjs", "test/application-runtime.test.mjs", "test/editor.test.mjs"]
+    },
+    {
+      "name": "toolchains",
+      "description": "Managed toolchains: the SDK, Python, the link toolchain and its repairs, toolchain lookup, system Git, Windows tool paths, macOS TBD stubs, the link driver's Python",
+      "mutate": ["src/managed-sdk.mjs", "src/managed-python.mjs", "src/managed-link-toolchain.mjs", "src/sdk-repairs.mjs", "src/toolchain.mjs", "src/system-git.mjs", "src/windows-tool-paths.mjs", "src/macos-tbd.mjs", "src/link-driver/python.mjs"],
+      "tests": ["test/managed-link-toolchain.test.mjs", "test/build-jobs.test.mjs", "test/sdk-archives.test.mjs", "test/sdk-repairs.test.mjs", "test/maintainer-python.test.mjs", "test/toolchain.test.mjs", "test/portable.test.mjs", "test/system-git.test.mjs", "test/network-git.test.mjs", "test/windows-tool-paths.test.mjs", "test/windows-installer-faults.test.mjs", "test/macos-tbd.test.mjs", "test/link-driver-link.test.mjs", "test/cwd-permissions.test.mjs", "test/working-directory.test.mjs"]
+    },
+    {
+      "name": "cli",
+      "description": "The CLI: argument parsing, the command dispatcher and its errors, the launcher, build progress, output directories, editor setup, platform names",
+      "mutate": ["src/cli-arguments.mjs", "src/posix-arguments.mjs", "src/application-cli.mjs", "src/launcher.mjs", "src/process-launcher.mjs", "src/elapsed-ticker.mjs", "src/elapsed-ticker-worker.mjs", "src/build-progress.mjs", "src/test-switches.mjs", "src/platform.mjs", "src/output-directory.mjs", "src/editor.mjs", "src/application-signals.mjs"],
+      "tests": ["test/cli-arguments.test.mjs", "test/cli-errors.test.mjs", "test/cli-error-messages.test.mjs", "test/fuzz-replay.test.mjs", "test/application-launcher.test.mjs", "test/process-launcher.test.mjs", "test/build-progress.test.mjs", "test/platform.test.mjs", "test/portable.test.mjs", "test/output-directory.test.mjs", "test/platform-output.test.mjs", "test/editor.test.mjs", "test/application-signals.test.mjs"]
+    },
+    {
+      "name": "dev",
+      "description": "lasm dev: the watch loop, the dev proxy, the build workers, the browser dev server and static server",
+      "mutate": ["src/dev.mjs", "src/dev-proxy.mjs", "src/dev-build-worker.mjs", "src/application-build-worker.mjs", "src/browser/browser-dev.mjs", "src/browser/static-server.mjs"],
+      "tests": ["test/dev-watch.test.mjs", "test/dev-proxy.test.mjs", "test/dev-build-service.test.mjs", "test/browser.test.mjs", "test/cli-arguments.test.mjs"]
+    },
+    {
+      "name": "browser",
+      "description": "Browser builds: the browser build and package, the bundler, the page loader, the lasm:app and lasm:web modules, the Vite plugin",
+      "mutate": ["src/browser/browser-build.mjs", "src/browser/browser-package.mjs", "src/browser/bundle.mjs", "src/browser/loader.mjs", "src/lasm-modules/app.mjs", "src/lasm-modules/web.mjs", "src/vite/index.mjs"],
+      "tests": ["test/browser.test.mjs", "test/dev-build-service.test.mjs", "test/notices.test.mjs"]
+    },
+    {
+      "name": "application-sources",
+      "description": "The build front end: sources and imports, initialization, diagnosis, binding checks, reachability, symbols, live archive members, policy, Wasm objects, the Lasm library",
+      "mutate": ["src/application-sources.mjs", "src/application-initialization.mjs", "src/application-diagnosis.mjs", "src/application-binding-check.mjs", "src/application-reachability.mjs", "src/application-symbols.mjs", "src/application-live-members.mjs", "src/application-policy.mjs", "src/wasm-objects.mjs", "src/lasm-library.mjs"],
+      "tests": ["test/application-paths.test.mjs", "test/application-initialization.test.mjs", "test/application-diagnosis.test.mjs", "test/application-reachability.test.mjs", "test/application-symbols.test.mjs", "test/application-policy.test.mjs", "test/dev-loop.test.mjs", "test/edge-link-plan.test.mjs", "test/application-link-plan.test.mjs", "test/application-link-glue.test.mjs", "test/wasi-link-plan.test.mjs", "test/lasm-library-prebuilt.test.mjs", "test/editor.test.mjs", "test/managed-lean-tiers.test.mjs", "test/cli-error-messages.test.mjs"]
+    },
+    {
+      "name": "application-output",
+      "description": "Build outputs: the build driver, output layout, native pieces, npm dependencies, the runtime, support files, the build lock, link metadata, native bundles, lasm package",
+      "mutate": ["src/application-build.mjs", "src/application-output.mjs", "src/application-native.mjs", "src/application-npm.mjs", "src/application-runtime.mjs", "src/application-support.mjs", "src/application-lock.mjs", "src/application-metadata.mjs", "src/application-metadata-runtime.mjs", "src/native-bundle.mjs", "src/package.mjs", "src/js-runtime.mjs"],
+      "tests": ["test/application-output.test.mjs", "test/application-native.test.mjs", "test/application-npm.test.mjs", "test/application-runtime.test.mjs", "test/application-support.test.mjs", "test/application-lock.test.mjs", "test/application-metadata.test.mjs", "test/wasmtime-module-data.test.mjs", "test/native-application-bundle.test.mjs", "test/wasmtime-artifact.test.mjs", "test/serverless.test.mjs", "test/edge.test.mjs", "test/link-driver-pipeline.test.mjs", "test/build-cache-files.test.mjs", "test/build-progress.test.mjs", "test/cli-error-messages.test.mjs"]
+    },
+    {
+      "name": "init",
+      "description": "lasm init and create-lasm: project templates and their files",
+      "mutate": ["src/init.mjs"],
+      "tests": ["test/init.test.mjs", "test/create-lasm.test.mjs", "test/cli-error-messages.test.mjs", "test/notices.test.mjs", "test/wasi.test.mjs"]
+    },
+    {
+      "name": "edge-build",
+      "description": "Edge builds: platform outputs, builtin modules, initializers, the Emscripten pre-JS and library",
+      "mutate": ["src/edge/edge-build.mjs", "src/edge/builtin-modules.mjs", "src/edge/edge-initializers.mjs", "src/edge/edge-pre.js", "src/edge/edge-library.js"],
+      "tests": ["test/edge.test.mjs", "test/browser.test.mjs", "test/notices.test.mjs", "test/platform-output.test.mjs", "test/edge-link-plan.test.mjs", "test/application-link-plan.test.mjs", "test/edge-js.test.mjs"]
+    },
+    {
+      "name": "wasi-build",
+      "description": "WASI builds: the build, the component wrapper, the atomics lowering",
+      "mutate": ["src/wasi/wasi-build.mjs", "src/wasi/wasi-component.mjs", "src/wasi/lower-atomics.mjs"],
+      "tests": ["test/wasi.test.mjs", "test/wasi-link-plan.test.mjs", "test/platform-output.test.mjs", "test/notices.test.mjs"]
+    },
+    {
+      "name": "wasmtime",
+      "description": "The standalone wasmtime host: runtime, bundles, artifacts, console, files, processes, guest memory, module data, stdio",
+      "mutate": ["src/wasmtime-runtime.mjs", "src/wasmtime-standalone.mjs", "src/wasmtime-worker.mjs", "src/wasmtime-artifact.mjs", "src/wasmtime-bundle.mjs", "src/wasmtime-console.mjs", "src/wasmtime-file-host.mjs", "src/wasmtime-file-imports.mjs", "src/wasmtime-guest-memory.mjs", "src/wasmtime-module-data.mjs", "src/wasmtime-native-stdio.mjs", "src/wasmtime-process-host.mjs", "src/wasmtime-wasi-stdio.mjs"],
+      "tests": ["test/wasmtime-artifact.test.mjs", "test/wasmtime-bundle.test.mjs", "test/wasmtime-console.test.mjs", "test/wasmtime-file-imports.test.mjs", "test/wasmtime-guest-memory.test.mjs", "test/wasmtime-module-data.test.mjs", "test/wasmtime-process-host.test.mjs", "test/wasmtime-wasi-stdio.test.mjs"]
+    },
+    {
+      "name": "node-host",
+      "description": "The Node runtime host: IO requests, network, processes, signals, system, UDP, fetch, IO errors, handles, the working directory, clocks, DNS, interfaces, time zones, TCP",
+      "mutate": ["src/node-host.mjs", "src/node-network.mjs", "src/node-process.mjs", "src/node-signal.mjs", "src/node-system.mjs", "src/node-udp.mjs", "src/node-fetch.mjs", "src/lean-io-errors.mjs", "src/handle-table.mjs", "src/process-exec.mjs", "src/working-directory.mjs", "src/linux-memory.mjs", "src/thread-id.cjs", "src/native-clock.mjs", "src/native-dns.mjs", "src/native-interfaces.mjs", "src/native-windows-timezone.mjs", "src/native-tcp.mjs"],
+      "tests": ["test/node-host.test.mjs", "test/node-host-zone.test.mjs", "test/node-network.test.mjs", "test/node-process.test.mjs", "test/node-platform.test.mjs", "test/node-system.test.mjs", "test/node-signal.test.mjs", "test/node-udp.test.mjs", "test/node-clock.test.mjs", "test/node-timezone.test.mjs", "test/node-temporary-files.test.mjs", "test/uv-semantics.test.mjs", "test/lean-io-errors.test.mjs", "test/handle-table.test.mjs", "test/native-dns.test.mjs", "test/native-temporary.test.mjs", "test/tcp-error-phases.test.mjs", "test/working-directory.test.mjs", "test/linux-memory.test.mjs", "test/thread-id.test.mjs", "test/node-regular-files.test.mjs"]
+    },
+    {
+      "name": "native-files",
+      "description": "Native files and processes: the file host and its worker pool, messages, worker stdio and cwd, native processes and signals, programs, aborts, the pthread factory",
+      "mutate": ["src/native-files.mjs", "src/native-file-message.mjs", "src/native-file-worker.mjs", "src/native-file-worker-pool.mjs", "src/native-worker-cwd.cjs", "src/worker-stdio.cjs", "src/native-process.mjs", "src/native-signals.mjs", "src/native-program.mjs", "src/native-abort.cjs", "src/native-pthread-factory.cjs"],
+      "tests": ["test/native-files.test.mjs", "test/native-directory.test.mjs", "test/native-file-worker-churn.test.mjs", "test/node-file-worker.test.mjs", "test/node-regular-files.test.mjs", "test/stdio-bytes.test.mjs", "test/getline-native-state.test.mjs", "test/native-file-message.test.mjs", "test/worker-cwd-preload.test.mjs", "test/native-process.test.mjs", "test/native-program.test.mjs", "test/node-process-pipes.test.mjs", "test/stdio-backpressure.test.mjs", "test/native-application-bundle.test.mjs", "test/native-file-abi.test.mjs", "test/worker-stdio.test.mjs"]
     }
   ]
 }
