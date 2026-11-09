@@ -24,7 +24,7 @@ let next = 1024, nestedOnce = false;
 // Programs with Lasm.JS export lasm_js_host_wait (library/c/lasm_js.c): one listed wait for the reply word.
 const hostWaits = [];
 const Module = listed ? { _lasm_js_host_wait: ready => { hostWaits.push(ready); Atomics.wait(new Int32Array(memory), Number(ready) / 4, 0); } } : {};
-const context = vm.createContext({ ENVIRONMENT_IS_PTHREAD: true, require, process, Atomics, BigInt, Number, Error, TextDecoder, TextEncoder, Module, hostWaits,
+const context = vm.createContext({ ENVIRONMENT_IS_PTHREAD: true, require, process, performance, Atomics, BigInt, Number, Error, TextDecoder, TextEncoder, Module, hostWaits,
   HEAP32: new Int32Array(memory), HEAPU32: new Uint32Array(memory), HEAPU64: new BigUint64Array(memory), HEAPU8: new Uint8Array(memory),
   _malloc: size => { const p = next; next += Math.ceil(Number(size) / 16) * 16; return p; },
   _free: () => {}, _pthread_self: () => 77,
@@ -37,12 +37,13 @@ const results = vm.runInContext(script, context);
 parentPort.postMessage({ done: results });
 `;
 
-function run(host, script, { listed = false } = {}) {
+function run(host, script, { listed = false, setup } = {}) {
   const memory = new SharedArrayBuffer(4 * 1024 * 1024);
   const Module = { lasmLeanVersion: '4.35.0' };
   const context = { ENVIRONMENT_IS_PTHREAD: false, Module, wasmMemory: { buffer: memory }, Atomics, Int32Array, Uint8Array,
-    DataView, BigUint64Array, Buffer, process, lasmFullHost: Promise.resolve(host) };
+    DataView, BigUint64Array, Buffer, process, performance, setImmediate, lasmFullHost: Promise.resolve(host) };
   runInNewContext(prelude, context);
+  setup?.(context);
   return new Promise((resolve, reject) => {
     const worker = new Worker(workerSource, { eval: true, workerData: { memory, rpcSource, script, listed } });
     worker.on('message', message => {
@@ -144,7 +145,7 @@ test('inside a synchronous callback, a host call nested in the callback threadâ€
   const Module = { lasmLeanVersion: '4.35.0' };
   const host = { request: op => ({ error: false, bytes: Buffer.from(op === 2 ? 'inner' : 'outer') }) };
   const context = { ENVIRONMENT_IS_PTHREAD: false, Module, wasmMemory: { buffer: memory }, Atomics, Int32Array, Uint8Array,
-    DataView, BigUint64Array, Buffer, process, lasmFullHost: Promise.resolve(host) };
+    DataView, BigUint64Array, Buffer, process, performance, setImmediate, lasmFullHost: Promise.resolve(host) };
   runInNewContext(prelude, context);
   // Words below the worker's allocator (1024): doorbell 512, ready 516, go 520, done 524.
   const i32 = new Int32Array(memory);
@@ -187,4 +188,53 @@ test('inside a synchronous callback, a host call nested in the callback threadâ€
     // Only the first request went through the asynchronous server: nothing was served twice.
     assert.equal(context.lasmFullServed, 1);
   } finally { await worker.terminate(); }
+});
+
+// After a synchronous Lasm.JS call the main thread watches the slot briefly for
+// the thread's next request (host-pre.js lasmFullWatch) instead of waiting for
+// the event loop, except after calls whose work ends in promise reactions.
+test('only synchronous Lasm.JS operations are watched for a next request', () => {
+  const context = { ENVIRONMENT_IS_PTHREAD: false, Module: {}, performance };
+  runInNewContext(prelude, context);
+  const spinnable = context.lasmFullSpinnable;
+  for (const op of [200, 201, 202, 203, 204, 206, 210, 211, 213, 219]) assert.equal(spinnable(0, op, 0n), true, `op ${op}`);
+  for (const op of [205, 214]) {
+    assert.equal(spinnable(0, op, 8n | 1n), true, `op ${op}`);
+    assert.equal(spinnable(0, op, 16n), false, `op ${op} settling a Lean promise`);
+    assert.equal(spinnable(0, op, 16n | 8n), false, `op ${op} settling a Lean promise`);
+  }
+  for (const op of [207, 208, 209, 199, 220, 3, 92, 94]) assert.equal(spinnable(0, op, 0n), false, `op ${op}`);
+  for (const kind of [1, 2, 3]) assert.equal(spinnable(kind, 205, 0n), false, `kind ${kind}`);
+});
+
+test('the watch sees a new request at once, gives up after its window, then rests for a few calls', () => {
+  const context = { ENVIRONMENT_IS_PTHREAD: false, Module: {}, performance };
+  runInNewContext(prelude, context);
+  const i32 = new Int32Array(new SharedArrayBuffer(16)), slot = { sequence: 4 };
+  i32[1] = 5;
+  assert.equal(context.lasmFullWatch(slot, i32, 1), true);
+  i32[1] = 4;
+  const t0 = performance.now();
+  assert.equal(context.lasmFullWatch(slot, i32, 1), false);
+  assert.ok(performance.now() - t0 >= context.lasmFullSpinMs);
+  assert.equal(slot.cooling, context.lasmFullSpinCooling);
+  i32[1] = 5;
+  for (let k = context.lasmFullSpinCooling; k > 0; k--) assert.equal(context.lasmFullWatch(slot, i32, 1), false);
+  assert.equal(slot.cooling, 0);
+  assert.equal(context.lasmFullWatch(slot, i32, 1), true);
+});
+
+test('a thread calling JavaScript in a tight loop is served in order, and the event loop still runs (burst yields)', async () => {
+  // A watch that never gives up: only the burst limit lets the timer run.
+  let served = 0, timerFired = false;
+  const host = { request() {
+    if (served++ === 0) setTimeout(() => { timerFired = true; }, 2);
+    return { error: false, bytes: Buffer.from(timerFired ? [1] : [0]) };
+  } };
+  const results = await run(host, `
+    let ok = 0, sawTimer = false, i = 0;
+    for (; i < 400000 && !sawTimer; i++) { const r = lasmFullRPC.call('request', 205, 0, 8n, 0, 0); if (r.length === 1) ok++; sawTimer = HEAPU8[r.pointer] === 1; }
+    [ok === i, sawTimer]`, { setup: context => { context.lasmFullSpinMs = 200; } });
+  assert.deepEqual(results, [true, true]);
+  assert.ok(served > 0);
 });

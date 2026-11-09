@@ -191,6 +191,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     const { view, u8 } = lasmFullViews(), p = slot.pointer;
     const kind = view.getInt32(p + 8, true);
     if (kind === 3) {
+      slot.spin = false;
       const large = slot.large;
       slot.large = undefined;
       return lasmFullReply(slot, large.status === 2 ? { failure: Buffer.from(large.bytes).toString() }
@@ -200,6 +201,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     const argument = view.getBigUint64(p + 24, true);
     const input = Number(view.getBigUint64(p + 32, true)), length = Number(view.getBigUint64(p + 40, true));
     slot.pending = { kind, operation, since: Date.now() };
+    slot.spin = lasmFullSpinnable(kind, operation, argument);
     // Copy: hosts and completion queues may retain request bytes.
     const bytes = length ? u8.slice(input, input + length) : new Uint8Array(0);
     const context = { fiber: Number(view.getBigUint64(p + 72, true)),
@@ -214,7 +216,32 @@ if (!ENVIRONMENT_IS_PTHREAD) {
     return lasmFullHostValue ? run(lasmFullHostValue)
       : lasmFullLoadHost().then(run, error => lasmFullFail(slot, error));
   };
+  // After a synchronous Lasm.JS call (lasmFullSpinnable), the calling Lean
+  // thread usually sends its next request within microseconds. Watching its
+  // slot for lasmFullSpinMs serves that request at once, rather than waking
+  // this thread again through Atomics.waitAsync and the event loop (about
+  // 14 µs). A slot whose watch found nothing is not watched for its next
+  // lasmFullSpinCooling calls, and serving without a break yields to the
+  // event loop every lasmFullBurstMs (setImmediate), so timers, I/O and
+  // promise reactions keep running while Lean calls JavaScript in a loop.
+  var lasmFullSpinMs = 0.02, lasmFullSpinCooling = 8, lasmFullBurstMs = 1;
+  var lasmFullSpinnable = function (kind, operation, argument) {
+    // Not: promise settlements (207), callback replies (208), the interop long
+    // poll (209), and calls that settle a Lean promise later (flag 16): their
+    // work finishes in promise reactions, which the watch would delay.
+    return kind === 0 && operation >= 200 && operation <= 219 && operation !== 207 && operation !== 208 && operation !== 209
+      && !((operation === 205 || operation === 214) && (argument & 16n));
+  };
+  var lasmFullWatch = function (slot, i32, index) {
+    if (slot.cooling > 0) { slot.cooling--; return false; }
+    const until = performance.now() + lasmFullSpinMs;
+    do { if (i32[index] !== slot.sequence) return true; } while (performance.now() < until);
+    if (i32[index] !== slot.sequence) return true;
+    slot.cooling = lasmFullSpinCooling;
+    return false;
+  };
   var lasmFullServe = function (slot) {
+    const burst = performance.now();
     for (;;) {
       const { i32 } = lasmFullViews(), index = slot.pointer / 4;
       const sequence = Atomics.load(i32, index);
@@ -223,9 +250,11 @@ if (!ENVIRONMENT_IS_PTHREAD) {
         if (wait.async) { wait.value.then(() => lasmFullServe(slot)); return; }
         continue;
       }
+      if (performance.now() - burst > lasmFullBurstMs) { setImmediate(() => lasmFullServe(slot)); return; }
       slot.sequence = sequence;
       const pending = lasmFullServeOne(slot);
       if (pending) { pending.then(() => lasmFullServe(slot)); return; }
+      if (slot.spin) lasmFullWatch(slot, i32, index);
     }
   };
   // Serve the pending requests of a Lean thread now, on this thread, while the
