@@ -108,7 +108,7 @@ rebuild times are recorded.
 
 **The rebuild budget is 2.5 s, not 2 s (2026-11-09).** GitHub's `ubuntu-24.04`
 runners are not one machine. On the web template, `lasm dev --target browser`
-rebuilds in 1.2–1.6 s on the faster ones (AMD EPYC 9V74) and in 1.8–2.3 s on
+rebuilds in 1.2–1.6 s on the faster ones (AMD EPYC 9V74 and 9V45) and in 1.8–2.3 s on
 AMD EPYC 7763 runners: every phase (Lean, link, output, and the cold
 `lasm build --dev`) is about 1.6× slower there, so this is the machine, not a
 regression (the times are flat since the dev worker landed in October). On one
