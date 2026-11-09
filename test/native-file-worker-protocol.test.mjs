@@ -72,3 +72,13 @@ test('failures reply with every field Lean\'s error decoding uses', { skip: !pos
   const removed = (await call('removeFile', ['/nonexistent/lasm/file'])).reply;
   assert.deepEqual([removed.error.errno, removed.error.nativeMessage, removed.error.errorOrigin], [-2, false, 'uv']);
 });
+
+test('every file operation the host uses is accepted by the worker', { skip: !posix }, async () => {
+  const missing = '/nonexistent/lasm/worker-protocol';
+  for (const [operation, args] of [['write', [{}, new Uint8Array(0)]], ['flush', []], ['rewind', []], ['truncate', []], ['getLine', []],
+    ['readDirectory', [missing]], ['readDirectoryName', [missing]], ['realPath', [missing]], ['groupInfo', [4_000_000_123]],
+    ['checkDirectorySearch', [missing]], ['writeDescriptor', [-1, new Uint8Array(0)]], ['flushAll', []], ['read', [{}, 0]]]) {
+    const { reply } = await call(operation, args);
+    assert.notEqual(reply.error?.message, `Invalid native file operation: ${operation}`, operation);
+  }
+});

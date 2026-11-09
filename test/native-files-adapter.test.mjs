@@ -355,3 +355,49 @@ test('read-only regular files open on the host thread; other paths are left to t
   assert.throws(() => host.readRegular(writer, 1), crt(E.EBADF));
   files.close(writer);
 });
+
+test('the pooled adapter runs each operation in a file worker with the same results', { skip: !posix }, async t => {
+  const directory = scratch(t), pooled = nativeFiles();
+  writeFileSync(join(directory, 'lines'), 'a\nb');
+  const file = await pooled.open(join(directory, 'lines'), 3);
+  assert.equal(typeof file.tail?.then, 'function');
+  assert.equal((await pooled.getLine(file)).toString(), 'a\n');
+  assert.equal((await pooled.read(file, 0)).length, 0);
+  assert.equal((await pooled.read(file, 10)).toString(), 'b');
+  await pooled.write(file, Buffer.alloc(0));
+  await pooled.write(file, Buffer.from('c'));
+  await pooled.flush(file);
+  await pooled.rewind(file);
+  assert.equal((await pooled.read(file, 10)).toString(), 'a\nbc');
+  await pooled.rewind(file);
+  await pooled.truncate(file);
+  assert.equal(readFileSync(join(directory, 'lines'), 'utf8'), '');
+  await pooled.closeAsync(file);
+  assert.equal(file.stream, null);
+  await pooled.closeAsync(file);
+  const temporary = await pooled.createTemporary(join(directory, 'tmp.XXXXXX'));
+  assert.ok(Buffer.isBuffer(temporary.path));
+  assert.equal(typeof temporary.file.tail.then, 'function');
+  pooled.close(temporary.file);
+  const folder = await pooled.createTemporary(join(directory, 'dir.XXXXXX'), true);
+  assert.ok(Buffer.isBuffer(folder.path));
+  assert.equal(folder.file, undefined);
+  assert.deepEqual((await pooled.readDirectory(folder.path.toString())), []);
+  assert.deepEqual((await pooled.readDirectory(directory)).map(String).sort(), ['dir.' + folder.path.toString().slice(-6), 'lines', temporary.path.toString().split('/').pop()].sort());
+  assert.deepEqual(await pooled.realPath(directory + '/.'), Buffer.from(directory));
+  assert.equal(await pooled.removeFile(temporary.path.toString()), undefined);
+  await assert.rejects(pooled.removeFile(temporary.path.toString()), { code: 'ENOENT', errno: -2 });
+  assert.equal((await pooled.groupInfo(userInfo().gid)).gid, userInfo().gid);
+  await pooled.checkDirectorySearch(directory);
+  const [readEnd, writeEnd] = pooled.pipe();
+  try {
+    assert.equal(await pooled.writeDescriptor(writeEnd, Buffer.from('pipe')), 4);
+    const bytes = Buffer.alloc(4); readSync(readEnd, bytes);
+    assert.equal(bytes.toString(), 'pipe');
+  } finally { pooled.closeDescriptor(readEnd); pooled.closeDescriptor(writeEnd); }
+  assert.equal(await pooled.flushAll(), undefined);
+  const ordinary = pooled.openRegular(join(directory, 'lines'));
+  assert.equal(ordinary.regular, true);
+  pooled.close(ordinary);
+  assert.equal(pooled.openRegular(join(directory, 'missing')), undefined);
+});

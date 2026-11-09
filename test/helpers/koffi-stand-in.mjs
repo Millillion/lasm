@@ -17,16 +17,16 @@ export function installKoffiStandIn() {
 
 /** A libc whose functions are given by `functions` (by C name). Signatures are
  * either one C declaration or (name, result, args); every call is recorded. */
-export function standInKoffi(functions, { errno: errnoTable = { EINTR: 4, EIO: 5, EINVAL: 22, EBADF: 9, EINPROGRESS: 115, EALREADY: 114, ECANCELED: 125 } } = {}) {
+export function standInKoffi(functions, { errno: errnoTable = { EINTR: 4, EIO: 5, EINVAL: 22, EBADF: 9, EINPROGRESS: 115, EALREADY: 114, ECANCELED: 125 }, fallback, missing = [] } = {}) {
   const calls = [], loads = [];
   const state = { errno: 0 };
   const library = path => ({
     func(...spec) {
       const name = spec.length === 1 ? /([A-Za-z_$][A-Za-z0-9_$]*)\s*\(/.exec(spec[0])[1]
         : spec.length === 4 ? spec[1] : spec[0];
-      const fn = functions[name];
-      if (!fn) throw new Error(`stand-in libc has no ${name}`);
-      const call = (...args) => { calls.push([name, ...args]); return fn(...args); };
+      if (missing.includes(name) || !functions[name] && !fallback) throw new Error(`stand-in libc has no ${name}`);
+      // Looked up on each call, so a test can replace a function after binding.
+      const call = (...args) => { calls.push([name, ...args]); return (functions[name] ?? fallback(name))(...args); };
       call.async = (...args) => {
         const callback = args.pop();
         setImmediate(() => { let value; try { value = call(...args); } catch (error) { return callback(error); } callback(null, value); });
