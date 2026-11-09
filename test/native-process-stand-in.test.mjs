@@ -36,7 +36,8 @@ koffi = standInKoffi({
   read: () => { const next = current.reads.shift() ?? 0; return next < 0 ? errno(-next) : next; },
   close: () => 0,
   waitpid: (pid, status) => {
-    const next = current.waits.shift() ?? [0, 0];
+    // Once a script's statuses are used up the child has exited: no poll outlives its test.
+    const next = current.waits.shift() ?? [42, 0];
     if (next[0] < 0) return errno(-next[0]);
     status[0] = next[1]; return next[0];
   },
@@ -81,8 +82,9 @@ test('each stdio slot becomes a file action, with the transport at slot 3', linu
 
 test('the configuration is written completely across short writes and EINTR, then acknowledged', linux, async t => {
   const { spawn, calls, settle, written } = await spawner(t, { writes: [3, -E.EINTR, 2], reads: [-E.EINTR, 1, 0] });
-  spawn(['ignore', 'ignore', 'ignore'], { big: 'x'.repeat(50) });
+  const child = spawn(['ignore', 'ignore', 'ignore'], { big: 'x'.repeat(50) });
   await settle();
+  assert.equal(await child.exit, 0);
   const sizes = calls('write').map(([, , size]) => size);
   const total = JSON.stringify({ big: 'x'.repeat(50), awaitExec: true }).length;
   assert.deepEqual(sizes, [total, total - 3, total - 3, total - 5]);
@@ -93,17 +95,20 @@ test('the configuration is written completely across short writes and EINTR, the
 
 test('a closed transport stops the handoff without shutdown; a failed shutdown skips the acknowledgement', linux, async t => {
   const closed = await spawner(t, { writes: [0] });
-  closed.spawn(['ignore', 'ignore', 'ignore']);
+  const first = closed.spawn(['ignore', 'ignore', 'ignore']);
   await closed.settle();
+  await first.exit;
   assert.deepEqual(closed.calls('shutdown'), []);
   assert.ok(closed.calls('close').some(([fd]) => fd === 21));
   const failing = await spawner(t, { writes: [-E.EPIPE] });
-  failing.spawn(['ignore', 'ignore', 'ignore']);
+  const second = failing.spawn(['ignore', 'ignore', 'ignore']);
   await failing.settle();
+  await second.exit;
   assert.deepEqual(failing.calls('shutdown'), []);
   const unshut = await spawner(t, { shutdown: E.ENOTCONN });
-  unshut.spawn(['ignore', 'ignore', 'ignore']);
+  const third = unshut.spawn(['ignore', 'ignore', 'ignore']);
   await unshut.settle();
+  await third.exit;
   assert.deepEqual(unshut.calls('read'), []);
   assert.ok(unshut.calls('close').some(([fd]) => fd === 21));
 });
