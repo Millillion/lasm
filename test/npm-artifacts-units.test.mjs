@@ -320,3 +320,89 @@ test('cancellation while fetching from npm is not turned into a download', async
     download: async () => { downloads++; }, verify: async () => {} }), /aborted/);
   assert.equal(downloads, 0);
 });
+
+test('more grammar: multi-digit versions, scoped and unscoped names, extension-less catalog names', () => {
+  for (const change of [{ version: '10.20.30' }, { version: '10.20.30-lasm.12' }, { package: 'a' }, { package: '@lasm/a.b_c-d' }])
+    assert.doesNotThrow(() => validateNpmToolManifest({ schema: 1, artifacts: { [sha]: { ...entry, ...change } } }), JSON.stringify(change));
+  for (const change of [{ package: '@lasm/x/y' }, { package: 'x@1' }, { file: 'tool.tar.zst/' }, { version: '1.2.3-beta+meta' }])
+    assert.throws(() => validateNpmToolManifest({ schema: 1, artifacts: { [sha]: { ...entry, ...change } } }), /Invalid npm tool manifest entry/, JSON.stringify(change));
+  assert.throws(() => validateNpmToolManifest({ schema: 1, artifacts: { ['x' + sha]: entry } }), /Invalid npm tool manifest entry/);
+  assert.throws(() => validateNpmToolManifest({ schema: 1, artifacts: { [sha + 'x']: entry } }), /Invalid npm tool manifest entry/);
+  assert.equal(archiveFileName({ name: 'atar.zst', format: 'tar.zst' }), 'atar.zst.tar.zst', 'the extension follows a dot');
+});
+
+test('the bundled manifest: read once, validated, absent in a source checkout, other read errors reported', async t => {
+  const base = await scratch(t);
+  const { pathToFileURL } = await import('node:url');
+  const file = join(base, 'npm-tools.json');
+  await writeFile(file, JSON.stringify({ schema: 1, artifacts: { [sha]: entry } }));
+  const first = await import('../src/npm-artifacts.mjs?bundled-valid');
+  assert.deepEqual(await first.bundledNpmToolManifest(pathToFileURL(file)), { schema: 1, artifacts: { [sha]: entry } });
+  await writeFile(file, '{ broken');
+  assert.deepEqual(await first.bundledNpmToolManifest(pathToFileURL(file)), { schema: 1, artifacts: { [sha]: entry } }, 'read once per process');
+  const invalid = await import('../src/npm-artifacts.mjs?bundled-invalid');
+  await writeFile(file, JSON.stringify({ schema: 2 }));
+  await assert.rejects(invalid.bundledNpmToolManifest(pathToFileURL(file)), { message: 'Invalid npm tool manifest' });
+  const directory = await import('../src/npm-artifacts.mjs?bundled-directory');
+  await assert.rejects(directory.bundledNpmToolManifest(pathToFileURL(base)), { code: 'EISDIR' });
+  // Without a bundled manifest there is nothing to check.
+  const none = await import('../src/npm-artifacts.mjs?bundled-none');
+  await none.bundledNpmToolManifest(pathToFileURL(join(base, 'missing.json')));
+  assert.equal(await none.checkInstalledToolPackages(null), null);
+  assert.equal(await none.checkInstalledToolPackages(undefined), null);
+});
+
+test('a package that does not export package.json is not installed for Lasm\'s purposes', async t => {
+  const p = await product(t);
+  await writeFile(join(p.directory, 'package.json'), JSON.stringify({ name: entry.package, version: entry.version, exports: { '.': './index.js' } }));
+  assert.deepEqual(await resolveInstalledPackage(entry, { resolveFrom: p.from }), { missing: 'is not installed' });
+});
+
+test('installed-package checks use the given host', async t => {
+  const p = await product(t);
+  const mac = { ...entry, package: '@lasm/tool-darwin-arm64', platform: 'darwin-arm64' };
+  const manifest = { schema: 1, artifacts: { [sha]: entry, ['c'.repeat(64)]: mac } };
+  const report = await checkInstalledToolPackages(manifest, { resolveFrom: p.from, platform: 'darwin', arch: 'arm64' });
+  assert.equal(report.host, 'darwin-arm64');
+  assert.deepEqual(report.installed, []);
+  assert.deepEqual(report.missing.map(item => item.spec), ['@lasm/tool-darwin-arm64@1.2.3-lasm.1']);
+});
+
+test('PATH lookup: the PATH variable whatever other variables come first, and no empty entries', () => {
+  const exists = files => file => files.includes(file);
+  assert.deepEqual(findNpm({ env: { HOME: '/h', PATH: '/b' }, execPath: '/x/node', platform: 'linux', exists: exists(['/b/npm']) }), { command: '/b/npm', args: [] });
+  assert.deepEqual(findNpm({ env: { PATH: ':/b' }, execPath: '/x/node', platform: 'linux', exists: exists(['npm', '/b/npm']) }), { command: '/b/npm', args: [] });
+});
+
+test('every missing package of this host is named in one sorted fix; a failed check names just this one', async t => {
+  const other = { ...entry, package: '@lasm/a-shared', platform: undefined, install: 'required' };
+  const here = { ...entry, platform: `${process.platform}-${process.arch}` };
+  const base = await scratch(t), archive = join(base, 'archive'), logs = [];
+  const manifest = { schema: 1, artifacts: { [sha]: here, ['c'.repeat(64)]: other } };
+  await acquireArtifact(artifact, archive, { label: 'the tool', log: line => logs.push(line), staging: base, env: {},
+    npm: { manifest, resolve: async () => ({ missing: 'is not installed' }), resolveFrom: join(base, 'nowhere.mjs') },
+    download: async () => {}, verify: async () => {} });
+  assert.match(logs[0], /Fix: run `npm install @lasm\/a-shared@1\.2\.3-lasm\.1 @lasm\/tool-linux-x64@1\.2\.3-lasm\.1` in the project/);
+  const failing = [];
+  await acquireArtifact(artifact, archive, { label: 'the tool', log: line => failing.push(line), staging: base, env: {},
+    npm: { manifest: { schema: 1, artifacts: { [sha]: here, ['d'.repeat(64)]: { ...other, install: 'nonsense' } } }, resolve: async () => ({ missing: 'is not installed' }),
+      resolveFrom: 42 }, download: async () => {}, verify: async () => {} });
+  assert.match(failing[0], /Fix: run `npm install @lasm\/tool-linux-x64@1\.2\.3-lasm\.1` in the project/);
+});
+
+test('without npm, plain Node reports npm missing rather than reaching the registry', async t => {
+  const base = await scratch(t);
+  await assert.rejects(fetchNpmPackage(entry, join(base, 'w'), { npm: null, fetch: async () => assert.fail('no registry request') }),
+    { message: 'npm was not found (npm_execpath, beside Node, or on PATH)' });
+});
+
+test('only a regular file member is the archive', async t => {
+  const base = await scratch(t);
+  const source = join(base, 'src');
+  await mkdir(join(source, 'package', entry.file), { recursive: true });
+  const file = join(base, 'dir.tgz');
+  await createTar({ cwd: source, file, gzip: true, portable: true }, ['package']);
+  const tgz = await readFile(file);
+  const run = async (npm, args) => { await writeFile(join(args[args.indexOf('--pack-destination') + 1], 'p.tgz'), tgz); return ''; };
+  await assert.rejects(fetchNpmPackage({ ...entry, integrity: integrity(tgz) }, join(base, 'w'), { npm: {}, run }), { message: `npm package ${npmSpec(entry)} lacks ${entry.file}` });
+});

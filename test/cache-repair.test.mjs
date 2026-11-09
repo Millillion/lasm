@@ -95,3 +95,40 @@ test('a namespace that is not a directory is an error', async t => {
   await writeFile(join(f.cache, 'derived'), 'not a directory');
   await assert.rejects(repairManagedCache({ cache: f.cache, log() {} }), { message: `Cache namespace must be an ordinary directory: ${join(f.cache, 'derived')}` });
 });
+
+test('names must match exactly to be cleaned up or verified', async t => {
+  const f = await setup(t);
+  const artifacts = join(f.cache, 'artifacts');
+  await mkdir(artifacts, { recursive: true });
+  const kept = [];
+  for (const name of ['.repair-' + 'a'.repeat(63), 'x.repair-' + hex('a'), '.repair-' + hex('a') + 'x', '.repair-' + 'g'.repeat(64), 'x' + hex('c'), '.install-' + hex('a') + 'x']) {
+    await mkdir(join(artifacts, name)); kept.push(join(artifacts, name));
+  }
+  const result = await repairManagedCache({ cache: f.cache, log() {} });
+  assert.deepEqual(result.skipped.sort(), [...kept].sort());
+  assert.deepEqual(result.stagingRemoved, []);
+});
+
+test('a quarantine path that cannot be cleared leaves the damaged tool in place, pending', { skip: process.platform === 'win32' }, async t => {
+  const f = await setup(t);
+  const damaged = await deriveArtifact({ kind: 'blocked' }, async tree => { await writeFile(join(tree, 'out'), 'original'); }, { cache: f.cache, log() {} });
+  await writeFile(join(damaged.directory, 'out'), 'changed');
+  const quarantine = join(f.cache, 'derived', '.repair-' + damaged.identity);
+  await writeFile(quarantine, 'a file where the quarantine directory would go');
+  const result = await repairManagedCache({ cache: f.cache, log() {} });
+  assert.deepEqual(result.removed, []);
+  assert.ok(result.pending.includes(quarantine));
+  assert.equal(result.pending.filter(path => path === quarantine).length, 2, 'once as stale staging, once as the blocked quarantine');
+  assert.equal(await readFile(join(damaged.directory, 'out'), 'utf8'), 'changed', 'the damaged tool is not moved or deleted');
+});
+
+test('a tool that cannot be read is an error, not damage to remove', { skip: process.platform === 'win32' || process.getuid?.() === 0 }, async t => {
+  const f = await setup(t);
+  const tool = await provisionArtifact(f.artifact, f.options);
+  const { chmod } = await import('node:fs/promises');
+  await chmod(join(tool.directory, '.lasm-artifact.json'), 0);
+  t.after(() => chmod(join(tool.directory, '.lasm-artifact.json'), 0o644).catch(() => {}));
+  await assert.rejects(repairManagedCache({ cache: f.cache, log() {} }), { code: 'EACCES' });
+  await chmod(join(tool.directory, '.lasm-artifact.json'), 0o644);
+  assert.deepEqual((await repairManagedCache({ cache: f.cache, log() {} })).verified, [tool.directory], 'the tool was kept');
+});
