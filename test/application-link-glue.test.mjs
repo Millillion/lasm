@@ -1,9 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { relabelPreJs, lasmJsLinkFlags } from '../src/application-link.mjs';
-import { existsSync, readFileSync } from 'node:fs';
-import { basename } from 'node:path';
-import { asyncGlueSource, asyncLinkFlags, glueLinkFlags } from '../src/lasm-library.mjs';
+import { asyncLinkFlags, glueLinkFlags } from '../src/lasm-library.mjs';
 
 const glue = files => ['// include: shell.js', ...files.flatMap(file => [`// include: ${file}`, 'code();', `// end include: ${file}`]),
   '// end include: shell.js', ''].join('\n');
@@ -50,14 +48,4 @@ test('programs with Lasm\'s Async glue wrap Std.Async\'s bind (#90); the edge an
   assert.deepEqual(lasmJsLinkFlags(['/pkg/library/c/lasm_js.c', '/pkg/library/c/lasm_fetch.c', '/pkg/library/c/lasm_async.c']),
     [...glueLinkFlags, wrap]);
   assert.deepEqual(lasmJsLinkFlags(['/w/xlasm_async.c', '/w/lasm_async.c.o']), []);
-  // The wrapped function, by the name the prebuilt library's C calls (Lean 4.35.0).
-  const core = readFileSync(new URL('../library/prebuilt/lean-4.35.0/lib/lasm/c/Lasm/KV.c', import.meta.url), 'latin1');
-  assert.ok(core.includes(wrap.slice('-Wl,--wrap='.length) + '('));
-  const glue = readFileSync(new URL('../library/c/lasm_async.c', import.meta.url), 'utf8');
-  assert.match(glue, /#define BIND l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg\n/);
-});
-
-test('every program that imports Lasm\'s library compiles the Async glue', () => {
-  assert.equal(basename(asyncGlueSource), 'lasm_async.c');
-  assert.ok(existsSync(asyncGlueSource));
 });

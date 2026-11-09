@@ -460,8 +460,8 @@ def asyncLoop (step : Async Nat) : Nat → Nat → Async Nat
   | n + 1, acc => do asyncLoop step n (acc + (← step))
 
 def argumentNat (args : Array Data) : IO Nat :=
-  match args[0]? with
-  | some (.number x) => pure x.toUInt64.toNat
+  match (args[0]? : Option Data) with
+  | some (Data.number x) => pure x.toUInt64.toNat
   | _ => throw (IO.userError "expected a number")
 
 def asyncDepthChecks (checks : Checks) : Async Unit := do
