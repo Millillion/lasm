@@ -36,7 +36,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '47 3 * * 0,2-6'
+    - cron: '47 3 * * 2-6'
   workflow_call:
     inputs:
       budget-min: { type: string, default: '0' }
@@ -74,10 +74,16 @@ env:
   DIFF_TARGETS_PR: node,wasi,wasi-node,deno,interp,node-O0,edge-node,edge-bun,edge-sm,bun,browser-chromium
   DIFF_TARGETS_FULL: node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm,bun,bun-O0,browser-chromium,browser-firefox,browser-webkit
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   # The macOS jobs (stack-depth on macOS, macos-c-tier) run nightly, weekly and by
   # hand; on a pull request or a push to main only when macOS-specific code
   # changes (docs/CI.md#what-moved-out-of-the-pr-tier-and-why-that-is-safe).
   scope:
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
@@ -101,7 +107,8 @@ jobs:
           if [ -z "$files" ] || printf '%s' "$BEFORE" | grep -qE '^0+$'; then files=.github/workflows/differential.yml; fi
           if printf '%s\n' "$files" | grep -qE "$MACOS_PATHS"; then echo macos=true; else echo macos=false; fi | tee -a "$GITHUB_OUTPUT"
   pack:
-    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
     # The retained runtime input is a draft release asset (needs contents: write to read).
     permissions:
       contents: write
@@ -135,7 +142,8 @@ jobs:
           retention-days: 3
           if-no-files-found: error
   differential:
-    needs: pack
+    if: needs.sunday.outputs.skip != 'true'
+    needs: [sunday, pack]
     runs-on: ubuntu-24.04
     timeout-minutes: 150
     # Nightly: the release and the dev profile (different Binaryen passes), 60 minutes each.
@@ -264,8 +272,8 @@ jobs:
   # finalizers, TCP, clocks), built with the installed candidate for Node and
   # compared with upstream Lean 4.35.0's `lean --run`. Pull requests and main.
   host-fixtures:
-    needs: pack
-    if: github.event_name != 'schedule'
+    needs: [sunday, pack]
+    if: needs.sunday.outputs.skip != 'true' && (github.event_name != 'schedule')
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     env:
@@ -305,7 +313,8 @@ jobs:
   # scripts/ci/stack-depth.mjs): the default stack differs there (Windows
   # commits thread stacks), so it is checked on each.
   stack-depth:
-    needs: [scope, pack]
+    if: needs.sunday.outputs.skip != 'true'
+    needs: [sunday, scope, pack]
     strategy:
       fail-fast: false
       matrix:
@@ -349,8 +358,8 @@ jobs:
   # with the SDK as it is and once with an SDK whose stub lists the arm64e.x1
   # targets of newer SDKs (rejected by that linker unless Lasm filters them).
   macos-c-tier:
-    needs: [scope, pack]
-    if: needs.scope.outputs.macos == 'true'
+    needs: [sunday, scope, pack]
+    if: needs.sunday.outputs.skip != 'true' && (needs.scope.outputs.macos == 'true')
     strategy:
       fail-fast: false
       matrix:
@@ -399,7 +408,8 @@ jobs:
   # (from `lasm init`) and examples/fetch built for every server target this
   # runner can serve locally, the recorded corpus replayed on each.
   equivalence:
-    needs: pack
+    if: needs.sunday.outputs.skip != 'true'
+    needs: [sunday, pack]
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     strategy:
@@ -453,7 +463,8 @@ jobs:
   # workerd (wrangler dev, offline), held above a floor, and the documented
   # workaround (Std.Async.sleep 0 every 100 calls) completing 100,000 calls.
   async-depth:
-    needs: pack
+    if: needs.sunday.outputs.skip != 'true'
+    needs: [sunday, pack]
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     env:

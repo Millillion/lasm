@@ -2,7 +2,7 @@ name: Repeated cold installation confidence
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 3 * * 0,2-6'
+    - cron: '17 3 * * 2-6'
 permissions:
   contents: read
 concurrency:
@@ -12,8 +12,13 @@ concurrency:
 # One exact retained archive, fresh standard native VMs, empty consumer caches.
 # No Actions artifact uploads; one budgeted archive handoff, compact durable reports.
 jobs:
+  sunday:
+    # Nothing runs on a scheduled Sunday in New York (sunday-guard.yml).
+    uses: ./.github/workflows/sunday-guard.yml
+
   select:
-    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
@@ -33,12 +38,12 @@ jobs:
         run: |
           node --input-type=module -e "import fs from 'node:fs';import assert from 'node:assert/strict';const c=JSON.parse(fs.readFileSync('scripts/ci/node-robustness-candidate.json'));assert.match(c.version,/^0\.1\.0-experimental\.\d+$/);assert.match(c.sha256,/^[a-f0-9]{64}$/);assert.match(c.release,/^node-(?:package|linux-candidate)-\d+$/);assert.match(c.node,/^\d+\.\d+\.\d+$/);for(const k of ['active','version','sha256','release','node'])fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+c[k]+'\n');console.log(JSON.stringify(c,null,2));"
   faults:
-    if: needs.select.outputs.active == 'true'
-    needs: select
+    if: needs.sunday.outputs.skip != 'true' && (needs.select.outputs.active == 'true')
+    needs: [sunday, select]
     uses: ./.github/workflows/installer-faults.yml
   input:
-    if: needs.select.outputs.active == 'true'
-    needs: select
+    if: needs.sunday.outputs.skip != 'true' && (needs.select.outputs.active == 'true')
+    needs: [sunday, select]
     permissions:
       contents: write
       actions: write # cache-budget.mjs may evict old candidate caches
@@ -48,8 +53,8 @@ jobs:
       candidate-release: ${{ needs.select.outputs.release }}
       candidate-version: ${{ needs.select.outputs.version }}
   linux-x64:
-    if: needs.select.outputs.active == 'true'
-    needs: [select, input, faults]
+    if: needs.sunday.outputs.skip != 'true' && (needs.select.outputs.active == 'true')
+    needs: [sunday, select, input, faults]
     uses: ./.github/workflows/node-linux-consumer.yml
     with:
       runner: ubuntu-24.04
@@ -60,8 +65,8 @@ jobs:
       candidate-version: ${{ needs.select.outputs.version }}
       node-version: ${{ needs.select.outputs.node }}
   linux-arm64:
-    if: needs.select.outputs.active == 'true'
-    needs: [select, input, faults]
+    if: needs.sunday.outputs.skip != 'true' && (needs.select.outputs.active == 'true')
+    needs: [sunday, select, input, faults]
     uses: ./.github/workflows/node-linux-consumer.yml
     with:
       runner: ubuntu-24.04-arm
@@ -72,8 +77,8 @@ jobs:
       candidate-version: ${{ needs.select.outputs.version }}
       node-version: ${{ needs.select.outputs.node }}
   darwin-x64:
-    if: needs.select.outputs.active == 'true'
-    needs: [select, input, faults]
+    if: needs.sunday.outputs.skip != 'true' && (needs.select.outputs.active == 'true')
+    needs: [sunday, select, input, faults]
     uses: ./.github/workflows/node-darwin-consumer.yml
     with:
       runner: macos-15-intel
@@ -84,8 +89,8 @@ jobs:
       candidate-version: ${{ needs.select.outputs.version }}
       node-version: ${{ needs.select.outputs.node }}
   darwin-arm64:
-    if: needs.select.outputs.active == 'true'
-    needs: [select, input, faults]
+    if: needs.sunday.outputs.skip != 'true' && (needs.select.outputs.active == 'true')
+    needs: [sunday, select, input, faults]
     uses: ./.github/workflows/node-darwin-consumer.yml
     with:
       runner: macos-15
@@ -96,8 +101,8 @@ jobs:
       candidate-version: ${{ needs.select.outputs.version }}
       node-version: ${{ needs.select.outputs.node }}
   windows-x64:
-    if: needs.select.outputs.active == 'true'
-    needs: [select, input, faults]
+    if: needs.sunday.outputs.skip != 'true' && (needs.select.outputs.active == 'true')
+    needs: [sunday, select, input, faults]
     uses: ./.github/workflows/node-windows-consumer.yml
     with:
       runner: windows-2025
@@ -108,8 +113,8 @@ jobs:
       candidate-version: ${{ needs.select.outputs.version }}
       node-version: ${{ needs.select.outputs.node }}
   report:
-    if: always() && needs.select.outputs.active == 'true'
-    needs: [select, faults, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64]
+    if: needs.sunday.outputs.skip != 'true' && (always() && needs.select.outputs.active == 'true')
+    needs: [sunday, select, faults, linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
