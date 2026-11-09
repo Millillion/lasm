@@ -44,6 +44,18 @@
       "score": 91.5,
       "mutants": 475,
       "threshold": 91
+    },
+    "cli": {
+      "initial": 42.7,
+      "score": 95,
+      "mutants": 1768,
+      "threshold": 95
+    },
+    "init": {
+      "initial": 53.6,
+      "score": 97.1,
+      "mutants": 830,
+      "threshold": 97
     }
   },
   "run": "mutation.yml run 41749603692 (Node 26.13.0, main at the branch point)"
