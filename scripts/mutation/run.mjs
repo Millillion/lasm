@@ -39,6 +39,7 @@ if (listOnly) { console.log(JSON.stringify(selected.map(m => m.name))); process.
 const out = resolve(root, opt('--out', '.work/mutation'));
 const concurrency = Number(opt('--concurrency', '2'));
 // Large directories no test of these modules reads; the sandbox copies everything else.
+// A module whose tests read one of them lists it in "keepInSandbox" (e.g. "/library").
 const ignorePatterns = ['/docs', '/library', '/lean', '/native', '/bench', '/experiments', '/verification',
   '/integration', '/deploy', '/.work', '/.cache', '/dist', '/.github'];
 
@@ -89,7 +90,8 @@ for (const module of selected) {
     // code also runs in worker threads or child processes (where Stryker cannot
     // record coverage) sets "coverageAnalysis": "off": every test file runs
     // against every mutant.
-    coverageAnalysis: module.coverageAnalysis ?? 'perTest', mutate: module.mutate, ignorePatterns,
+    coverageAnalysis: module.coverageAnalysis ?? 'perTest', mutate: module.mutate,
+    ignorePatterns: ignorePatterns.filter(pattern => !(module.keepInSandbox ?? []).includes(pattern)),
     concurrency, timeoutMS: 20000, timeoutFactor: 2, cleanTempDir: 'always',
     tempDirName: join('.work', 'stryker-tmp', module.name),
     reporters: ['json', 'html', 'progress-append-only'],

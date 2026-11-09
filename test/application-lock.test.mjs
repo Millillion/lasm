@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, writeFile, readFile, rm, chmod } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -79,4 +79,58 @@ test('release() lets another build take the lock before the first one finishes',
     await first;
     assert.deepEqual(order, ['first: imports', 'second: imports', 'first: link']);
   } finally { await rm(directory, { recursive: true, force: true }); }
+});
+
+test('a busy lock: tryOnly refuses at once, a waiter is told once and enters after release, an abort ends the wait', async t => {
+  const directory = await mkdtemp(join(tmpdir(), 'lasm-application-lock-busy-'));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const lock = join(directory, 'nested', 'build.lock');
+  let releaseHolder, held;
+  const holding = new Promise(resolve => { held = resolve; });
+  const holder = withApplicationLock(lock, release => new Promise(resolve => { releaseHolder = () => { release(); resolve('holder'); }; held(); }));
+  await holding;
+  await assert.rejects(withApplicationLock(lock, () => 'entered', { tryOnly: true }), error =>
+    error.code === 'LASM_LOCK_BUSY' && error.message === `Lasm cache is in use: ${lock}. Wait for active builds to finish and retry.`);
+  // A shared waiter waits for the exclusive holder as well.
+  let waits = 0;
+  const waiter = withApplicationLock(lock, () => 'waiter', { onWait: () => { waits++; }, exclusive: false });
+  const controller = new AbortController();
+  const aborted = withApplicationLock(lock, () => 'never', { signal: controller.signal });
+  await new Promise(resolve => setTimeout(resolve, 200));
+  assert.equal(waits, 1);
+  controller.abort(new Error('stop waiting'));
+  await assert.rejects(aborted, { message: 'stop waiting' });
+  releaseHolder();
+  assert.equal(await holder, 'holder');
+  assert.equal(await waiter, 'waiter');
+  assert.equal(waits, 1);
+  // Shared holders do not exclude each other.
+  assert.deepEqual(await withApplicationLock(lock, () => withApplicationLock(lock, () => 'both', { exclusive: false, tryOnly: true }), { exclusive: false }), 'both');
+});
+
+test('an aborted signal stops before the lock; the lock path must be an ordinary file', async t => {
+  const directory = await mkdtemp(join(tmpdir(), 'lasm-application-lock-checks-'));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  let entered = false;
+  await assert.rejects(withApplicationLock(join(directory, 'never/build.lock'), () => { entered = true; }, { signal: AbortSignal.abort() }), { name: 'AbortError' });
+  assert.equal(entered, false);
+  await assert.rejects(readFile(join(directory, 'never/build.lock')), { code: 'ENOENT' });
+  await assert.rejects(withApplicationLock(directory, () => { entered = true; }), { message: `Build lock must be an ordinary file: ${directory}` });
+  assert.equal(entered, false);
+  // A relative path is resolved; the lock file stays (waiters share its inode).
+  const cwd = process.cwd();
+  try {
+    process.chdir(directory);
+    assert.equal(await withApplicationLock('relative.lock', () => 'ok'), 'ok');
+  } finally { process.chdir(cwd); }
+  assert.equal(await readFile(join(directory, 'relative.lock'), 'utf8'), '');
+});
+
+test('a lock file that cannot be opened is reported with its path and the open call', { skip: process.platform === 'win32' || process.getuid?.() === 0 }, async t => {
+  const directory = await mkdtemp(join(tmpdir(), 'lasm-application-lock-open-'));
+  t.after(async () => { await chmod(directory, 0o700); await rm(directory, { recursive: true, force: true }); });
+  const lock = join(directory, 'build.lock');
+  await writeFile(lock, '');
+  await chmod(lock, 0o000);
+  await assert.rejects(withApplicationLock(lock, () => 'never'), error => error.path === lock && error.syscall === 'open');
 });

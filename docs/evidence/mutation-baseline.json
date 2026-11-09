@@ -80,6 +80,18 @@
       "score": 96.6,
       "mutants": 1813,
       "threshold": 96
+    },
+    "application-sources": {
+      "initial": 44.5,
+      "score": 85.4,
+      "mutants": 3531,
+      "threshold": 85
+    },
+    "application-output": {
+      "initial": 51.1,
+      "score": 92.5,
+      "mutants": 2358,
+      "threshold": 92
     }
   },
   "run": "mutation.yml run 41749603692 (Node 26.13.0, main at the branch point)"
