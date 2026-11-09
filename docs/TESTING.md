@@ -127,7 +127,8 @@ strings, hashing, panics, uncaught errors, exit codes, tasks, refs, files),
 differences between targets.
 **What it cannot catch:** bugs that native Lean has too (it is the oracle);
 anything outside the generator's grammar (today: no `Std.Http`, sockets,
-processes, `Std.Time`, typeclass-heavy or universe-polymorphic code, deep
+processes, `Std.Time`, universe-polymorphic code (type classes, inductives,
+closures and loops are the [feature programs'](#differential-fuzzing) job), deep
 recursion beyond a few thousand frames, which is a documented limit of the edge and
 WASI targets: the engine's Wasm stack, [EDGE.md](EDGE.md), [WASI.md](WASI.md);
 the generator's `deep` cases stay at or below 5,000 frames, because the measured
@@ -278,7 +279,27 @@ loops): still no `Std.Http`, sockets, processes, `Std.Time`,
 universe-polymorphic code, libm results of `Float32`, or concurrency (tasks stay
 in the core generator).
 
-FEATURE_RESULTS
+**First campaigns** (2026-11-09, PR #167; release and dev profiles, all 16
+targets of `DIFF_TARGETS_FULL`, upstream Lean 4.35.0 as the oracle):
+
+| Run | Programs | Cases | Wall clock | Throughput (every target of each program included) | Result |
+| --- | --- | --- | --- | --- | --- |
+| 42572265503, mixed, release | 55 (11 feature) | 6,105 (880 feature) | 63.5 min | 0.87 programs per minute, 1.6 cases per second | no divergence |
+| 42582065757, feature only, release | 9 | 1,800 | 85 min | — | generator bounds broken: a power tower of bignums in a class operation (86 s natively; every Wasm target, without GMP, timed out), an untyped `Float32` NaN literal |
+| 42620999209, feature only, release | 8 | 1,600 | 60 min | — | **[#179](https://github.com/Millillion/lasm/issues/179)**: `repr` of a 5,120-element array overflows the Wasm stack on WASI and every edge target; 200,000 panic messages in a loop (generator) |
+| 42621004028, feature only, dev | 9 | 1,800 | 60 min | — | a loop recomputing `1e300` (`Float.ofScientific`) 200,000 times (51 s natively: generator) |
+| 42646321682, feature only, release | 13 | 2,600 | 60.7 min | 0.21 programs per minute, 0.71 cases per second (11.4 case-target comparisons per second) | no divergence |
+| 42646328709, feature only, dev | 17 | 3,400 | 60 min | 0.28 programs per minute, 0.94 cases per second | no divergence |
+
+In all, 12,080 feature cases on 16 targets (about 190,000 case runs) and the
+PR tier's 160. The interpreter differed from native Lean only where compiled
+code evaluates a panicking closed term at initialization (before the first
+case, or in a branch never taken) and the interpreter on first use; every Lasm
+target matched native Lean there, so the interpreter's stderr is now compared
+without what native Lean printed before the first case. Each generator fix is
+in `features.mjs` with the run that found it. A native run that takes a tenth
+of the run timeout is now a generator error naming its last case, not a
+divergence of every target.
 
 ### Bun and browser targets
 
@@ -1196,3 +1217,4 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Deterministic simulation of Tandem (first CI run) | A failed catch-up sync (nothing pending) was never retried: the retry ran only while edits were pending, so the editor showed "Offline: 0 edits waiting" and stayed behind the log until someone else typed | Fixed: the retry always syncs |
 | Deterministic simulation of Tandem (third CI run, most seeds with an ambiguous commit) | A commit that succeeded and then reported an error (D1's lost reply, a timeout after `COMMIT`): `syncOnce` ran the sync again, found the operations known and appended and pushed nothing, so tabs that were not typing never heard of them | Fixed: a failed commit checks whether the log holds exactly its operations at its position, and if so answers and pushes them; and a sync whose operations were all in the log already pushes its reply, which holds them (`Server/App.lean`; the second part was found by the heavy-fault seeds, when that check could not read the log) |
 | Deterministic simulation of Porter (4 of 30 seeds) | A token request whose commit succeeded and then reported an error is run again by `runRequest`, finds its own code used or its refresh token rotated, answers `invalid_grant` and revokes the family it just issued: one transient database error signs a user out | Fixed (#138, Jordan's choice of a commit receipt): each commit inserts a row keyed by an id from the request's random values (the same on a rerun), and a failed commit whose receipt is there keeps its reply (`Server/App.lean`, `Spec.landed_commit_stands`); the simulation no longer tolerates the refusal |
+| Differential fuzzing, feature programs (campaign 42620999209, seed 620999216, case 132; `wasi`, `wasi-node`, `deno`, the edge engines, browsers, both profiles) | `(repr a).pretty` of an `Array Int` of 5,120 elements stops with "call stack exhausted" / "Maximum call stack size exceeded": Lean's formatter recurses with the number of elements, and the WASI and edge stacks hold about 9,000–11,000 frames. Native Lean and the Node target print it | Open: [#179](https://github.com/Millillion/lasm/issues/179) (the documented recursion-depth limit, reached through the standard library); the generator keeps printed arrays below that size |

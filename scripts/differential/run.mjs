@@ -251,12 +251,15 @@ function diverging(ids, nat, tgt, target) {
   if (TARGETS[target]?.zeroOrNot) { nat = { ...nat, code: outcomeOf(nat.code) }; tgt = { ...tgt, code: outcomeOf(tgt.code) }; }
   const a = byCase(nat.stdout), b = byCase(tgt.stdout);
   const ae = byCase(nat.stderr, true), be = byCase(tgt.stderr, true);
-  // The interpreter evaluates a closed term on first use, where compiled code
-  // evaluates it while the module initializes: a closed term that panics prints
-  // its message before the first case natively, inside its case when
-  // interpreted. For the interpreter, stderr is compared as a multiset of lines.
+  // Compiled code evaluates every extracted closed term while the module
+  // initializes, the interpreter only those it reaches, on first use: a closed
+  // term that panics prints its message before the first case natively, and
+  // inside its case, or never (an untaken branch), when interpreted. For the
+  // interpreter, stderr is compared as a multiset of lines, without what native
+  // Lean printed before the first case.
   if (target === 'interp') {
-    const lines = t => t.split('\n').sort().join('\n');
+    const all = nat.stderr.split('\n'), first = all.findIndex(l => l.startsWith('@')), early = first < 0 ? [] : all.slice(0, first);
+    const lines = t => { const ls = t.split('\n'); for (const e of early) { const i = ls.indexOf(e); if (i >= 0) ls.splice(i, 1); } return ls.sort().join('\n'); };
     const bad = ids.filter(id => a.get(id) !== b.get(id));
     const stderr = lines(nat.stderr) !== lines(tgt.stderr);
     return { bad, stderr, code: nat.code !== tgt.code, any: bad.length > 0 || stderr || nat.code !== tgt.code };
