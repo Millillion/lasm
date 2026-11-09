@@ -161,3 +161,74 @@ test('findSystemGit searches PATH in order with each platform\'s names and separ
     { env: { PATH: 'p' }, platform: 'linux', find: (...args) => { found.push(args); return { executable: 'g', version: 'v' }; } });
   assert.deepEqual(found, [[{ PATH: 'p' }, 'linux']]);
 });
+
+test('Lean comments: line comments end at the newline; block comments nest and may span lines', t => {
+  const requirements = text => lakeRequirements(project(t, { 'lakefile.lean': text }));
+  assert.deepEqual(requirements('require a -- from git\nrequire b'), [
+    { name: 'a', path: undefined, git: false, scope: false }, { name: 'b', path: undefined, git: false, scope: false }]);
+  assert.deepEqual(requirements('/-\nrequire hidden from git "x"\n-/\nrequire shown'), [{ name: 'shown', path: undefined, git: false, scope: false }]);
+  assert.deepEqual(requirements('/- outer /- inner -/\nrequire hidden\n-/\nrequire shown'), [{ name: 'shown', path: undefined, git: false, scope: false }]);
+  assert.deepEqual(requirements('/- one -/ /- two -/\nrequire shown'), [{ name: 'shown', path: undefined, git: false, scope: false }]);
+  assert.deepEqual(requirements('require last'), [{ name: 'last', path: undefined, git: false, scope: false }], 'no trailing newline');
+  assert.deepEqual(requirements('require last -- comment at the end'), [{ name: 'last', path: undefined, git: false, scope: false }]);
+  assert.deepEqual(requirements('require x from "p"\n-/ stray -/\nrequire y'), [{ name: 'x', path: 'p', git: false, scope: false },
+    { name: 'y', path: undefined, git: false, scope: false }], 'a closing marker outside a comment is ordinary text');
+  assert.deepEqual(requirements('  require indented from  "spaced"\nrequire "o" /"n"'), [{ name: 'indented', path: 'spaced', git: false, scope: false },
+    { name: 'o/n', path: undefined, git: false, scope: true }]);
+  assert.deepEqual(requirements('require «x» from git\nrequire y @git "t"\nrequire z from"q"'), [
+    { name: 'x', path: undefined, git: true, scope: false }, { name: 'y', path: undefined, git: true, scope: false },
+    { name: 'z', path: undefined, git: false, scope: false }]);
+  assert.deepEqual(requirements('requirement := 1\nrequire_x\nrequire ok'), [{ name: 'ok', path: undefined, git: false, scope: false }], 'only the keyword starts a requirement');
+  assert.deepEqual(requirements('xrequire a\nrequire «»'), [{ name: '?', path: undefined, git: false, scope: false }]);
+});
+
+test('lakefile.toml: comments, indented tables and whole keys', t => {
+  const requirements = text => lakeRequirements(project(t, { 'lakefile.toml': text }));
+  assert.deepEqual(requirements('#[[require]]\n## name = "x"\n  [[require]]  \nname   =   "spaced"\n'), [{ name: 'spaced', path: undefined, git: false, scope: false }]);
+  assert.deepEqual(requirements('[[require]]\ngit = "https://example.invalid/[x].git"\nname = "late"\n  [lean_lib]\npath = "not-mine"\n'),
+    [{ name: 'late', path: undefined, git: true, scope: false }]);
+  assert.deepEqual(requirements('[[require]]\nname="tight"\npath="p"\ngit="g"\nscope="s"\n'), [{ name: 'tight', path: 'p', git: true, scope: true }]);
+  assert.deepEqual(requirements('[[require]]\nxname = "decoy"\nxpath = "decoy"\nxgit = "decoy"\nxscope = "decoy"\n'), [{ name: '?', path: undefined, git: false, scope: false }]);
+  assert.deepEqual(requirements('[[require]]\nname = ""\npath = ""\n'), [{ name: '', path: '', git: false, scope: false }]);
+  assert.deepEqual(requirements('x = 1 # [[require]]\n'), []);
+});
+
+test('Git requirement details: manifest entries, first finding wins, reasons name the dependency', t => {
+  const twoGit = project(t, { 'lakefile.toml': 'name = "a"\n', 'lake-manifest.json': JSON.stringify({ packages: [{ type: 'path', name: 'p' }, { type: 'git', name: 'first' }, { type: 'git', name: 'second' }] }) });
+  assert.equal(lakeGitRequirement(twoGit), 'Git dependency first');
+  // A clean manifest still lets the lakefile decide.
+  const lakefile = project(t, { 'lakefile.toml': 'name = "a"\n[[require]]\nname = "r"\ngit = "x"\n', 'lake-manifest.json': JSON.stringify({ packages: [] }) });
+  assert.equal(lakeGitRequirement(lakefile), 'Git dependency r');
+  // A nested project that needs nothing does not end the search.
+  const nested = project(t, { 'lakefile.toml': 'name = "a"\n[[require]]\nname = "l"\npath = "l"\n[[require]]\nname = "s"\nscope = "org"\n', 'l/lakefile.toml': 'name = "l"\n' });
+  assert.equal(lakeGitRequirement(nested), 'Reservoir dependency s');
+  // A project's own path does not loop, and a visited project is not searched twice.
+  const self = project(t, { 'lakefile.toml': 'name = "a"\n[[require]]\nname = "me"\npath = "."\n' });
+  assert.equal(lakeGitRequirement(self), null);
+  const seen = new Set();
+  assert.equal(lakeGitRequirement(self, seen), null);
+  assert.deepEqual([...seen], [self]);
+  const remote = project(t, { 'lakefile.toml': 'name = "a"\n[[require]]\nname = "r"\ngit = "x"\n' });
+  assert.equal(lakeGitRequirement(remote, new Set([remote])), null, 'an already visited project contributes nothing');
+  const error = new GitRequiredError('Git dependency r');
+  assert.equal(error.name, 'GitRequiredError');
+  assert.ok(error instanceof Error);
+});
+
+test('only a git that exits 0 and prints its version counts', { skip: process.platform === 'win32' }, t => {
+  const directory = project(t, {
+    'failing/git': '#!/bin/sh\necho "git version 2.0"\nexit 1\n',
+    'prefixed/git': '#!/bin/sh\necho "fake git version 2.0"\n',
+    'args/git': '#!/bin/sh\n[ "$1" = "--version" ] && [ $# -eq 1 ] && echo "git version 4.0" || echo "wrong arguments"\n',
+    'stdin/git': '#!/bin/sh\nread line && echo "git version from stdin" || echo "git version 5.0"\n',
+  });
+  for (const name of ['failing/git', 'prefixed/git', 'args/git', 'stdin/git']) chmodSync(join(directory, name), 0o755);
+  assert.equal(findSystemGit({ PATH: join(directory, 'failing') }), null);
+  assert.equal(findSystemGit({ PATH: join(directory, 'prefixed') }), null);
+  assert.deepEqual(findSystemGit({ PATH: join(directory, 'args') }), { executable: join(directory, 'args/git'), version: 'git version 4.0' });
+  assert.equal(findSystemGit({ PATH: join(directory, 'stdin') }).version, 'git version 5.0', 'stdin is closed');
+  // The environment given is the one git runs with.
+  const env = project(t, { 'bin/git': '#!/bin/sh\necho "git version $LASM_MARK"\n' });
+  chmodSync(join(env, 'bin/git'), 0o755);
+  assert.equal(findSystemGit({ PATH: join(env, 'bin'), LASM_MARK: 'marked' }).version, 'git version marked');
+});

@@ -130,3 +130,38 @@ test('the shipped catalog, recipe and default driver agree for every supported p
   }
   assert.equal(linkToolchainCatalog.shared.root, `emscripten-${recipe.emscripten}-lasm-shared`);
 });
+
+test('the link toolchain: its program list, progress, provenance identity and conflict messages', async t => {
+  assert.deepEqual(linkToolchainPrograms, ['clang', 'wasm-ld', 'llvm-objcopy', 'llvm-nm', 'wasm-opt', 'wasm-emscripten-finalize', 'wasm-metadce']);
+  assert.ok(Object.isFrozen(linkToolchainPrograms));
+  const f = await fixture(t);
+  const stages = [];
+  const tools = await provisionLinkToolchain({ cache: f.cache, catalog: f.catalog, fetch: f.fetch, log() {}, progress: event => stages.push(event.stage) });
+  assert.deepEqual(Object.keys(tools.nativePrograms), [...linkToolchainPrograms]);
+  for (const stage of ['Checking compiler tools', 'Downloading compiler tools (Emscripten 6.0.9)', 'Downloading compiler libraries (Emscripten 6.0.9)',
+    'Assembling compiler tools']) assert.ok(stages.includes(stage), stage);
+  assert.equal(stages[0], 'Checking compiler tools');
+  const { createHash } = await import('node:crypto');
+  const provenance = { kind: 'link-toolchain', schema: 1, version: '6.0.9', components: [validateArtifact(f.native.artifact), validateArtifact(f.shared.artifact)] };
+  assert.equal(tools.identity, createHash('sha256').update(JSON.stringify(provenance)).digest('hex'), 'the prefix is keyed by both archive identities');
+  assert.equal(tools.version, '6.0.9'); assert.equal(tools.platform, host);
+  // Two archives that both carry a file cannot form one prefix.
+  const clash = await archive('emscripten-6.0.9-lasm-clash', { 'emscripten/emscripten-version.txt': '"6.0.9"\n' });
+  const g = await fixture(t);
+  const fetch = async url => url === clash.artifact.url ? new Response(clash.bytes) : g.fetch(url);
+  await assert.rejects(provisionLinkToolchain({ cache: g.cache, catalog: { ...g.catalog, native: { [host]: clash.artifact } }, fetch, log() {} }),
+    { message: `Compiler tool archives ${clash.artifact.name} and ${g.shared.artifact.name} both contain emscripten/emscripten-version.txt` });
+});
+
+test('link toolchain catalogs: schema, exact version, host entry and both artifacts are checked', async t => {
+  const f = await fixture(t);
+  assert.deepEqual(linkToolchainArtifacts(f.catalog, host), { native: f.native.artifact, shared: f.shared.artifact });
+  for (const release of [undefined, null, { ...f.catalog, schema: undefined }, { ...f.catalog, version: undefined }, { ...f.catalog, version: '6.0' },
+    { ...f.catalog, version: 'v6.0.9' }, { ...f.catalog, version: '6.0.9-rc1' }, { ...f.catalog, version: '6.0.9\n' }])
+    assert.throws(() => linkToolchainArtifacts(release, host), { message: 'Invalid link toolchain catalog' }, JSON.stringify(release));
+  assert.doesNotThrow(() => linkToolchainArtifacts({ ...f.catalog, version: '16.10.29' }, host));
+  assert.throws(() => linkToolchainArtifacts({ ...f.catalog, native: undefined }, host), { message: `The managed compiler tools (Emscripten 6.0.9) are not available for ${host}` });
+  assert.throws(() => linkToolchainArtifacts({ ...f.catalog, native: { [host]: { ...f.native.artifact, url: 'http://x' } } }, host), /HTTPS/);
+  await assert.rejects(provisionLinkToolchain({ cache: f.cache, catalog: f.catalog, fetch: f.fetch, platform: 'freebsd', arch: 'x64' }), /freebsd-x64, which is not supported/);
+  assert.deepEqual(f.requests, []);
+});

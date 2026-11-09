@@ -117,3 +117,22 @@ test('resolveLean uses LEAN, or the exact installed Elan toolchain when no defau
   assert.throws(() => broken.resolveLean(cwd), /no default toolchain configured/);
   assert.ok(installed);
 });
+
+test('the pinned Lean target is named for its release and identified by a full commit', async () => {
+  const toolchain = await import('../src/toolchain.mjs');
+  assert.match(toolchain.leanCommit, /^[0-9a-f]{40}$/);
+  assert.equal(toolchain.targetName, `lean-${toolchain.leanVersion}-wasm32-v1`);
+  assert.match(toolchain.leanVersion, /^\d+\.\d+\.\d+$/);
+  assert.equal(toolchain.sha256('abc'), 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
+  if (process.env.LEAN === undefined) assert.equal(toolchain.lean, process.platform === 'win32' ? 'lean.exe' : 'lean');
+  assert.doesNotThrow(() => toolchain.assertPlatform('linux', 'x64'));
+  assert.throws(() => toolchain.assertPlatform('win32', 'arm64'), /Windows ARM64 is not supported/);
+});
+
+test('a manifest whose files are not an object is refused before any file is read', t => {
+  const directory = mkdtempSync(join(tmpdir(), 'lasm-target-files-'));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  // A string has indexed "own properties": '0' would otherwise pass as a listed library.
+  writeFileSync(join(directory, 'target.json'), JSON.stringify({ schema: 1, name: targetName, leanCommit, files: 'ab', linkLibraries: ['0'] }));
+  assert.throws(() => readTargetManifest(directory), { message: 'Incompatible Lasm target archive' });
+});
