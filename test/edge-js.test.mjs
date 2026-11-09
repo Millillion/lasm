@@ -115,6 +115,43 @@ test('modules come from the static map; others fail with how to add them', () =>
   assert.throws(() => value(201, 0, 0, enc.encode('other')), /JavaScript module "other" is not in this edge build/);
 });
 
+// Strings and object keys have ASCII fast paths (Writer.string, Reader.string,
+// Reader.key); their bytes and values must be exactly the general path's
+// (TextEncoder's UTF-8; TextDecoder), on both sides of every boundary.
+const samples = ['', 'a', 'field12', '\x7f', 'caf\u00e9', '\u00e9t\u00e9', 'x\u{1F600}', '\u{1F600}', 'ab\u0080', '\ufeffbom', 'lone \ud800 surrogate',
+  ...[31, 32, 33, 63, 64, 65, 200].flatMap(n => ['k'.repeat(n), 'k'.repeat(n - 1) + '\u00e9', '\u00e9' + 'k'.repeat(n - 1)])];
+test('strings and keys encode as UTF-8 and decode as TextDecoder does, on every fast-path boundary', () => {
+  const seen = [];
+  const { call } = edge({ modules: { echo: { id: x => { seen.push(x); return x; } } } });
+  const echo = x => call(214, 0, 0, wire(['T.id', 'echo', 'id', [x]]));
+  for (const s of samples) {
+    const text = dec.decode(enc.encode(s));
+    assert.deepEqual(echo(s), wire(text), JSON.stringify(s));
+    assert.equal(seen.pop(), text, JSON.stringify(s));
+    // Twice: the second read of a key comes from the key cache.
+    for (let round = 0; round < 2; round++) {
+      assert.deepEqual(echo({ [s]: s, after: 1 }), wire({ [text]: text, after: 1 }), JSON.stringify(s));
+      assert.deepEqual(Object.entries(seen.pop()), [[text, text], ['after', 1]], JSON.stringify(s));
+    }
+  }
+  // Bytes that are not valid UTF-8 decode as TextDecoder replaces them, as values and keys.
+  for (const raw of [[0x61, 0xff], [0xc3], [0x80, 0x61], [0x7f, 0x80]]) {
+    const bytes = cat(u32(raw.length), Uint8Array.from(raw)), text = dec.decode(Uint8Array.from(raw));
+    const args = items => cat(Uint8Array.of(8), u32(4), wire('T.id'), wire('echo'), wire('id'), Uint8Array.of(8), u32(1), items);
+    call(214, 0, 0, args(cat(Uint8Array.of(5), bytes)));
+    assert.equal(seen.pop(), text);
+    call(214, 0, 0, args(cat(Uint8Array.of(9), u32(1), bytes, Uint8Array.of(0))));
+    assert.deepEqual(Object.keys(seen.pop()), [text]);
+  }
+  // Many strings in one value: the writer grows its buffer in the middle of the fast path.
+  const many = Object.fromEntries(Array.from({ length: 300 }, (_, i) => [`key${i}`, i % 3 ? `value number ${i}` : i]));
+  assert.deepEqual(echo(many), wire(many));
+  // Keys that share a cache slot or a length still decode as themselves.
+  const wide = Object.fromEntries(Array.from({ length: 3000 }, (_, i) => [`k${i}`, i]));
+  for (let round = 0; round < 2; round++) { echo(wide); assert.deepEqual(seen.pop(), wide); }
+  for (let round = 0; round < 2; round++) for (const k of ['ab', 'ba', 'ac', 'abc', 'ab']) { echo({ [k]: 0 }); assert.deepEqual(Object.keys(seen.pop()), [k]); }
+});
+
 test('values: every kind round-trips, including ones larger than the first buffer', () => {
   const { value, js } = edge({ modules: { echo: { id: x => x } } });
   const id = x => value(214, 0, 0, wire(['T.id', 'echo', 'id', [x]]));
