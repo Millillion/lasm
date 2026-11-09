@@ -136,15 +136,14 @@ export function writeBrowserOutput({ source, projectDirectory, result, program, 
   const bundle = Buffer.from(browserBundle({ programGlue: readFileSync(join(program.directory, 'program.mjs'), 'utf8'), name, wasmFile: wasm, modules: builtins, suspend,
     banner: noticeBanner(notices, `The ${name} web app`, externals === 'keep' ? 'THIRD_PARTY_NOTICES.lasm.txt (emitted by the Lasm Vite plugin)' : undefined) }));
   const entry = `app.${shortHash(bundle)}.js`;
+  // public/: copied first, so Lasm's own files win. Checked before the staging directory exists (it would be left inside public/).
+  const publicDirectory = join(projectDirectory, 'public');
+  const hasPublic = existsSync(publicDirectory) && statSync(publicDirectory).isDirectory();
+  if (hasPublic && !relative(publicDirectory, destination).startsWith('..')) throw new Error('The browser output directory must not be inside public/');
   const staging = destination + '.lasm-staging';
   rmSync(staging, { recursive: true, force: true });
   mkdirSync(staging, { recursive: true });
-  // public/: copied first, so Lasm's own files win.
-  const publicDirectory = join(projectDirectory, 'public');
-  if (existsSync(publicDirectory) && statSync(publicDirectory).isDirectory()) {
-    if (!relative(publicDirectory, destination).startsWith('..')) throw new Error('The browser output directory must not be inside public/');
-    cpSync(publicDirectory, staging, { recursive: true });
-  }
+  if (hasPublic) cpSync(publicDirectory, staging, { recursive: true });
   const files = {};
   // Dev builds (lasm dev) are served from this machine: no precompressed copies
   // (brotli at quality 11 took about 2 s of every rebuild).

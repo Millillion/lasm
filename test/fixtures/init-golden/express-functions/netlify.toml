@@ -1,0 +1,10 @@
+# Netlify runs the build: lasm build --target netlify writes a v2 function
+# that serves every path from the Lean server (netlify/functions/lasm).
+[build]
+  command = "npm run build:netlify"
+  publish = "public"
+
+[functions]
+  directory = "netlify/functions"
+  # The function loads program.wasm, host/** and native pieces at run time.
+  included_files = ["netlify/functions/lasm/**"]

@@ -51,7 +51,7 @@ function transform(id, code, resolve, { entry }) {
       else out.push(`const { ${binding(match[4]).map(b => b.name === b.as ? b.name : `${b.name}: ${b.as}`).join(', ')} } = ${variable};`);
       continue;
     }
-    if (/^export\s/.test(line) && !entry) {
+    if (/^export\b/.test(line) && !entry) {
       let match;
       if ((match = exportDeclaration.exec(line))) { exported.push({ name: match[1], as: match[1] }); out.push(line.replace(/^export\s+/, '')); continue; }
       if ((match = exportList.exec(line))) { exported.push(...binding(match[1])); continue; }

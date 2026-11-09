@@ -1,10 +1,10 @@
 name: Mutation testing
-# Stryker on the critical JavaScript (docs/TESTING.md#mutation-testing): each
+# Stryker on the JavaScript under src/ (docs/TESTING.md#mutation-testing): each
 # module of scripts/mutation/modules.json is mutated and its own node:test files
-# run against every mutant. A module whose score falls below its recorded
-# baseline (docs/evidence/mutation-baseline.json, less 0.5 points) fails.
+# run against every mutant. A module whose score falls below its threshold
+# (docs/evidence/mutation-baseline.json) fails.
 # Nightly and on demand: every module, one job each. Pull requests: only the
-# modules whose sources or tests changed (none: the job does nothing).
+# modules whose sources or tests changed, one job each (none: no job runs).
 # Free runners; the tests need no managed Lean or native helpers.
 on:
   schedule:
@@ -17,20 +17,11 @@ on:
         default: ''
   pull_request:
     paths:
-      - 'src/node-js.mjs'
-      - 'src/lasm-modules/ui-dom.mjs'
-      - 'src/dev-build-service.mjs'
-      - 'src/application-build-client.mjs'
-      - 'src/application-files.mjs'
-      - 'src/cache-lifecycle.mjs'
-      - 'src/link-driver/**'
-      - 'src/*link*.mjs'
-      - 'src/edge/**'
-      - 'src/wasi/wasi-link.mjs'
-      - 'src/notices.mjs'
+      - 'src/**'
       - 'test/**'
       - 'scripts/mutation/**'
       - 'docs/evidence/mutation-baseline.json'
+      - 'package-lock.json'
       - '.github/workflows/mutation.yml'
 permissions:
   contents: read
@@ -44,7 +35,7 @@ jobs:
 
   modules:
     needs: sunday
-    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && github.event_name != 'pull_request')
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public')
     runs-on: ubuntu-24.04
     outputs:
       names: ${{ steps.list.outputs.names }}
@@ -52,21 +43,23 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
+          fetch-depth: ${{ github.event_name == 'pull_request' && '0' || '1' }}
       - id: list
         env:
           REQUESTED: ${{ inputs.modules }}
+          BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || '' }}
         run: |
-          node -e '
-            const all = require("./scripts/mutation/modules.json").modules.map(m => m.name);
-            const asked = (process.env.REQUESTED || "").split(/\s+/).filter(Boolean);
-            for (const name of asked) if (!all.includes(name)) { console.error(`Unknown module ${name}`); process.exit(1); }
-            console.log(`names=${JSON.stringify(asked.length ? asked : all)}`);
-          ' >> "$GITHUB_OUTPUT"
+          if [ -n "$BASE" ]; then
+            echo "names=$(node scripts/mutation/run.mjs --changed-since "$BASE" --list)" >> "$GITHUB_OUTPUT"
+          else
+            # shellcheck disable=SC2086
+            echo "names=$(node scripts/mutation/run.mjs $REQUESTED --list)" >> "$GITHUB_OUTPUT"
+          fi
   module:
-    if: needs.sunday.outputs.skip != 'true'
     needs: [sunday, modules]
+    if: needs.sunday.outputs.skip != 'true' && (needs.modules.outputs.names != '[]')
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:
@@ -90,36 +83,6 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: mutation-${{ matrix.name }}
-          path: .work/mutation
-          retention-days: 14
-          if-no-files-found: ignore
-  changed:
-    needs: sunday
-    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && github.event_name == 'pull_request')
-    runs-on: ubuntu-24.04
-    timeout-minutes: 120
-    env:
-      CI: '1'
-      BROWSER: 'none'
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
-        with:
-          node-version: 26.13.0
-          package-manager-cache: false
-      - run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Stryker on the changed modules
-        env:
-          BASE: origin/${{ github.base_ref }}
-        run: node scripts/mutation/run.mjs --changed-since "$BASE" --concurrency 3 --check docs/evidence/mutation-baseline.json
-      - name: Preserve the report
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: mutation-changed
           path: .work/mutation
           retention-days: 14
           if-no-files-found: ignore

@@ -33,3 +33,12 @@ test('derived SDK trees publish atomically, verify reuse and reject cache drift'
   }, { cache }), /fixture failure/);
   assert.deepEqual(await readdir(join(cache, 'derived')), [first.identity]);
 });
+
+test('each file is repaired by its own entry', () => {
+  const manifest = { files: [
+    { path: 'first.py', originalSha256: digest('a\n'), patchedSha256: digest('A\n'), replacements: [{ before: 'a', after: 'A' }] },
+    { path: 'second.py', originalSha256: digest('b\n'), patchedSha256: digest('B\n'), replacements: [{ before: 'b', after: 'B' }] }] };
+  assert.equal(repairSdkFile('second.py', 'b\n', manifest), 'B\n');
+  assert.equal(repairSdkFile('first.py', 'a\n', manifest), 'A\n');
+  assert.throws(() => repairSdkFile('second.py', 'a\n', manifest), { message: 'SDK repair source drift: second.py' });
+});

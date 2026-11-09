@@ -1,0 +1,22 @@
+# Cloudflare Workers: npm run build:workers writes workers/ (the server) and
+# dist/public (the browser app); test with npx wrangler dev, deploy with npx wrangler deploy.
+name = "1st-stack"
+main = "workers/worker.mjs"
+compatibility_date = "2026-10-01"
+
+# The browser app and its files, served by Workers before the Worker runs.
+[assets]
+directory = "./dist/public"
+
+# Lasm.KV keeps the todos in this KV namespace when it is bound (create one with
+# npx wrangler kv namespace create TODOS and put its id here); without it they
+# live in the isolate's memory. wrangler dev keeps a local copy.
+# [[kv_namespaces]]
+# binding = "TODOS"
+# id = "…"
+
+# Lasm's program.wasm is imported as a precompiled module.
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = false

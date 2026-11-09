@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.lake/
+bun/
+deno/
+bin/
+pkg/
+wasi-http/
+.spin/

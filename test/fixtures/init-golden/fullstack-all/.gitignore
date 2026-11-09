@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.lake/
+workers/
+.wrangler/
+bun/
+deno/
+bin/
+pkg/
+wasi-http/
+api/
+netlify/

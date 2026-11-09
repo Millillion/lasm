@@ -1,0 +1,28 @@
+{
+  "name": "func-app.v2",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Express 5 with Lean request handlers (Lasm.JS), compiled to WebAssembly by Lasm",
+  "scripts": {
+    "dev": "lasm dev Main.lean",
+    "build": "lasm build Main.lean",
+    "start": "node dist/main.mjs",
+    "build:lambda": "lasm build Main.lean --target lambda",
+    "build:lambda-edge": "lasm build Main.lean --target lambda-edge",
+    "build:vercel": "lasm build Main.lean --target vercel",
+    "build:netlify": "lasm build Main.lean --target netlify",
+    "build:azure": "lasm build Main.lean --target azure",
+    "build:gcf": "lasm build Main.lean --target gcf"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@azure/functions": "4.17.0",
+    "@google-cloud/functions-framework": "5.0.5",
+    "express": "5.2.1"
+  },
+  "devDependencies": {
+    "@lasm/compiler": "<LASM_VERSION>"
+  }
+}
