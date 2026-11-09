@@ -71,7 +71,7 @@
       "name": "dev",
       "description": "lasm dev: the watch loop, the dev proxy, the build workers, the browser dev server and static server",
       "mutate": ["src/dev.mjs", "src/dev-proxy.mjs", "src/dev-build-worker.mjs", "src/application-build-worker.mjs", "src/browser/browser-dev.mjs", "src/browser/static-server.mjs"],
-      "tests": ["test/dev-watch.test.mjs", "test/dev-proxy.test.mjs", "test/dev-build-service.test.mjs", "test/browser.test.mjs", "test/cli-arguments.test.mjs"]
+      "tests": ["test/dev-watch.test.mjs", "test/dev-proxy.test.mjs", "test/dev-units.test.mjs", "test/dev-run.test.mjs", "test/static-server.test.mjs", "test/dev-build-service.test.mjs", "test/browser.test.mjs", "test/cli-arguments.test.mjs"]
     },
     {
       "name": "browser",
