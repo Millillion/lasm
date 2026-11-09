@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { registerHooks } from 'node:module';
-import { tmpdir } from 'node:os';
+import { tmpdir, totalmem } from 'node:os';
 import { basename, join, relative } from 'node:path';
 
 const standIns = new URL('./fixtures/dev-stand-ins/', import.meta.url);
@@ -73,16 +73,27 @@ function startDev(options, hooks) {
   running.then(() => active.delete(running), () => active.delete(running));
   return running;
 }
+// Ctrl+C as lasm dev sees it: its own SIGINT/SIGTERM listeners are called. The
+// signal is not emitted: other listeners (the mutation test runner's) would exit.
+const foreignListeners = new Set([...process.listeners('SIGINT'), ...process.listeners('SIGTERM')]);
+async function signalDev() {
+  const deadline = Date.now() + 5000;
+  let own;
+  while (!(own = [...new Set([...process.listeners('SIGINT'), ...process.listeners('SIGTERM')])].filter(fn => !foreignListeners.has(fn))).length && Date.now() < deadline)
+    await pause(10);
+  for (const fn of own) { process.removeListener('SIGINT', fn); process.removeListener('SIGTERM', fn); }
+  for (const fn of own) fn();
+}
 async function stopAll() {
   if (!active.size) return;
-  process.emit('SIGTERM');
+  await signalDev();
   await Promise.allSettled([...active]);
 }
 after(async () => { await stopAll(); for (const server of state.servers) await server.close(); });
 const reset = async () => { await stopAll(); for (const server of state.servers) await server.close(); state.calls = []; state.services = []; state.servers = []; state.watchers = []; state.port = undefined; state.serverOptions = undefined; stderr.reset(); programLines.length = 0; };
 /** Stops a runDev: as Ctrl+C does. */
 async function stop(running) {
-  process.emit('SIGTERM');
+  await signalDev();
   assert.equal(await running, 0);
 }
 const rel = file => relative(process.cwd(), file);
@@ -106,15 +117,7 @@ async function nextEvent(reader, what = 'an event') {
   return buffer.slice(0, at);
 }
 
-// TEMPORARY (mutation sandbox debugging): a failure's details beside the mutation report.
-const debugDir = join(process.cwd(), '..', '..', '..', 'mutation', 'dev');
-const traced = fn => async t => {
-  try { await fn(t); } catch (error) {
-    if (existsSync(debugDir)) writeFileSync(join(debugDir, `debug-${process.pid}-${Date.now()}.txt`), `${process.version}\n${error.stack}\n${JSON.stringify(error.actual)?.slice(0, 4000)}\n--- stderr ---\n${stderr.text()}`);
-    throw error;
-  }
-};
-test('lasm dev (edge target): first build, rebuilds on content changes only, queued changes, build errors, stop', traced(async () => {
+test('lasm dev (edge target): first build, rebuilds on content changes only, queued changes, build errors, stop', async () => {
   await reset();
   const dir = project();
   const main = join(dir, 'Main.lean');
@@ -223,7 +226,7 @@ test('lasm dev (edge target): first build, rebuilds on content changes only, que
     await pause(300);
     assert.equal(state.calls.length, built, 'nothing is built after lasm dev stops');
   } finally { rmSync(dir, { recursive: true, force: true }); }
-}));
+});
 
 test('lasm dev: a first build that fails says so; release profile; a terminal gets status lines and colors', async () => {
   await reset();
@@ -506,6 +509,8 @@ test('lasm dev with a browser output and hooks: the static server with the hooks
     const options = parseDevArguments([join(dir, 'Main.lean'), '--target', 'browser,workers', '--port', '0', '--output', browserOutput]);
     const running = startDev(options, { routes: (request, response, url) => url.pathname === '/api' && (response.end('api'), true) });
     await until(() => /Serving/.test(stderr.text()), 'the static server');
+    // Without LASM_DEV_WORKERS: two workers for two outputs when memory allows (6 GiB).
+    assert.equal(state.services[0].workers, totalmem() >= 6 * 2 ** 30 ? 2 : 1);
     const url = /at (http:\/\/127\.0\.0\.1:\d+\/) with live reload \(open it in your browser\)\./.exec(stderr.text())?.[1];
     assert.ok(url, stderr.text());
     assert.ok(stderr.text().includes(`[lasm dev] Serving ${rel(browserOutput)} at ${url} with live reload (open it in your browser).\n`));
