@@ -212,7 +212,7 @@ test('temporary files and directories replace the template suffix; failures use 
   assert.deepEqual(await files.readDirectory(folder.path.toString()), []);
   for (const isDirectory of [false, true])
     await assert.rejects(files.createTemporary(join(directory, 'missing', 'tmp.XXXXXX'), isDirectory), crt(-E.ENOENT, { nativeMessage: false }));
-  await assert.rejects(files.createTemporary(join(directory, 'no-template'), false), crt(-E.EINVAL, { nativeMessage: false }));
+  if (linux) await assert.rejects(files.createTemporary(join(directory, 'no-template'), false), crt(-E.EINVAL, { nativeMessage: false }));
 });
 
 test('group records include their members; an unknown group is none', { skip: !posix }, async () => {

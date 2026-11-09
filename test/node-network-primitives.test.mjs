@@ -26,6 +26,8 @@ const settled = async promise => {
   return state;
 };
 const empty = Buffer.alloc(0);
+// POSIX socket setup (src/native-tcp.mjs); Windows keeps node:net's own.
+const posix = { skip: process.platform === 'win32' };
 
 test('a mutex is held by one fiber; waiters take it in order', async () => {
   const { call, handle, table } = network();
@@ -162,7 +164,7 @@ test('timer intervals must fit UInt64; unknown operations are refused', () => {
 
 const addressBytes = (host, port) => Buffer.concat([numbers(host.includes(':') ? 6 : 4, port), Buffer.from(host)]);
 
-test('an unconnected TCP socket refuses IO and names with libuv\'s errors', async () => {
+test('an unconnected TCP socket refuses IO and names with libuv\'s errors', posix, async () => {
   const { call, handle } = network();
   const s = handle(call(50));
   assert.deepEqual(call(59, s, 0, ''), empty);
@@ -194,7 +196,7 @@ test('Lean 4.36: accepting on a socket that is not listening is invalidArgument;
   assert.throws(() => call(56, s, 0), { code: 'EINVAL', errno: 22, message: 'receive buffer size must be positive' });
 });
 
-test('a connected pair writes, reads, shuts down once and reports both names', async t => {
+test('a connected pair writes, reads, shuts down once and reports both names', posix, async t => {
   const { call, handle, table } = network();
   const server = handle(call(50));
   call(51, server, 0, addressBytes('127.0.0.1', 0));
@@ -246,7 +248,7 @@ test('a connected pair writes, reads, shuts down once and reports both names', a
   assert.deepEqual(call(54, server), numbers(0));
 });
 
-test('connections queue for accept, and the listener releases them on close', async () => {
+test('connections queue for accept, and the listener releases them on close', posix, async () => {
   const { call, handle, table, released } = network();
   const server = handle(call(50));
   await call(52, server, 8);
@@ -262,7 +264,7 @@ test('connections queue for accept, and the listener releases them on close', as
   table.get(first).close();
 });
 
-test('Lean 4.36 rejects a parallel accept with its own message', async () => {
+test('Lean 4.36 rejects a parallel accept with its own message', posix, async () => {
   const { call, handle, table } = network('4.36.0');
   const server = handle(call(50));
   await call(52, server, 1);
@@ -273,7 +275,7 @@ test('Lean 4.36 rejects a parallel accept with its own message', async () => {
   assert.equal((await settled(waiting)).error.code, 'ECANCELED');
 });
 
-test('a refused connection rejects with ECONNREFUSED', async () => {
+test('a refused connection rejects with ECONNREFUSED', posix, async () => {
   const { call, handle } = network();
   const probe = net.createServer().listen(0, '127.0.0.1');
   await once(probe, 'listening');
@@ -283,7 +285,7 @@ test('a refused connection rejects with ECONNREFUSED', async () => {
   await assert.rejects(Promise.resolve(call(65, client, 0, addressBytes('127.0.0.1', port))), { code: 'ECONNREFUSED' });
 });
 
-test('earlier releases report a pending shutdown as EALREADY and a finished one as ENOTCONN', async t => {
+test('earlier releases report a pending shutdown as EALREADY and a finished one as ENOTCONN', posix, async t => {
   const { call, handle, table } = network('4.34.1');
   const server = handle(call(50));
   await call(52, server, 1);

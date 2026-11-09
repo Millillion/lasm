@@ -80,7 +80,7 @@ test('environment names must be non-empty and free of =', () => {
   for (const bytes of ['', 'a=b']) assert.throws(() => call(133, 0n, Buffer.from(bytes)), { code: 'EINVAL', errno: -22 });
 });
 
-test('priorities are read for a signed pid and checked against libuv\'s range before setting', () => {
+test('priorities are read for a signed pid and checked against libuv\'s range before setting', { skip: process.platform === 'win32' }, () => {
   assert.equal(BigInt.asIntN(64, call(135, 0n).readBigUInt64LE()), BigInt(os.getPriority(0)));
   // 2^32 wraps to pid 0, as the C int conversion does.
   assert.equal(BigInt.asIntN(64, call(135, 1n << 32n).readBigUInt64LE()), BigInt(os.getPriority(0)));

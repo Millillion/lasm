@@ -64,7 +64,11 @@ async function load(t, { name, manifest, musl = false, engineBase = 'engine', id
   return { module, koffi, base, adapter };
 }
 
-test('the bundled adapter is required', { skip: process.platform === 'win32' }, async () => {
+test('the bundled adapter is required', { skip: process.platform === 'win32' }, async t => {
+  const { existsSync } = await import('node:fs');
+  if (['../src/native/signals/manifest.json', '../.cache/native-host/signals/manifest.json'].some(path => existsSync(new URL(path, import.meta.url)))) {
+    t.diagnostic('the native signal adapter is built here'); return;
+  }
   const { nativeSignals } = await import('../src/native-signals.mjs');
   assert.throws(() => nativeSignals(), { message: 'The bundled native signal adapter is missing' });
 });

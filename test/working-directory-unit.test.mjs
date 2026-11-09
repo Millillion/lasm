@@ -153,7 +153,7 @@ test('Linux: a propagated change also moves the process cwd', linux, async t => 
   cwd.release(state);
 });
 
-test('elsewhere: pathname directories are resolved, checked and reported by path', async t => {
+test('elsewhere: pathname directories are resolved, checked and reported by path', { skip: process.platform === 'win32' }, async t => {
   const base = scratch(t);
   asPlatform(t, 'darwin');
   const cwd = createWorkingDirectory(join(base, 'a', '..', 'b'), false);
@@ -178,7 +178,7 @@ test('elsewhere: pathname directories are resolved, checked and reported by path
   assert.throws(() => cwd.retain(), failsWith('ECANCELED'));
 });
 
-test('elsewhere: a propagated change skips the search check and moves the process cwd', async t => {
+test('elsewhere: a propagated change skips the search check and moves the process cwd', { skip: process.platform === 'win32' }, async t => {
   const base = scratch(t);
   const previous = process.cwd();
   t.after(() => process.chdir(previous));

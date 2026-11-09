@@ -41,7 +41,7 @@ test('the worker cwd fallback answers the module directory only for a removed cw
   assert.equal(process.cwd(), '/actual');
   failure = Object.assign(new Error('removed'), { code: 'ENOENT' });
   assert.equal(process.cwd(), dirname(path));
-  assert.equal(dirname(path) + '/', source);
+  assert.equal(join(dirname(path), 'x'), join(source, 'x'));
   failure = Object.assign(new Error('denied'), { code: 'EACCES' });
   assert.throws(() => process.cwd(), { message: 'denied' });
 });

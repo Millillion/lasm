@@ -10,7 +10,8 @@ export function installKoffiStandIn() {
   if (installed) return;
   installed = true;
   registerHooks({ resolve(specifier, context, next) {
-    if (specifier === 'koffi') return { url: standIn, format: 'commonjs', shortCircuit: true };
+    // Also the copy a packaged host bundles beside src (src/native/node_modules/koffi).
+    if (specifier === 'koffi' || /[\\/]native[\\/]node_modules[\\/]koffi[\\/]index\.cjs$/.test(specifier)) return { url: standIn, format: 'commonjs', shortCircuit: true };
     return next(specifier, context);
   } });
 }

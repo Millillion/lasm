@@ -298,7 +298,7 @@ test('macOS: opens, regular opens and search checks use the Darwin constants', a
   assert.equal(calls('open')[0][1], fsConstants.O_RDONLY | 0x1000000);
   await files.checkDirectorySearch('/d');
   assert.deepEqual(calls('faccessat')[0], [-2, '/d', fsConstants.X_OK, 0x10]);
-  const regular = pooled().openRegular(new URL(import.meta.url).pathname);
+  const regular = pooled().openRegular((await import('node:url')).fileURLToPath(import.meta.url));
   assert.equal(regular.regular, true);
   assert.equal(calls('open')[1][1], fsConstants.O_RDONLY | fsConstants.O_NONBLOCK | fsConstants.O_NOCTTY | 0x1000000);
 });

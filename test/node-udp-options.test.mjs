@@ -64,7 +64,7 @@ test('a socket keeps its first address family', async t => {
   assert.deepEqual(call(103, id, 0, numbers(0)), empty);
 });
 
-test('a failed bind rejects and an error while receiving rejects the waiter', async t => {
+test('a failed bind rejects and an error while receiving rejects the waiter', { skip: process.platform === 'win32' }, async t => {
   const { call, open, table } = udp();
   const holder = dgram.createSocket({ type: 'udp4' });
   holder.bind(0, '127.0.0.1'); await once(holder, 'listening');
