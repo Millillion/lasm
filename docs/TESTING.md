@@ -33,6 +33,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) | Lasm-compiled programs behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
 | [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic equals Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs` | PR, nightly |
+| [Standard bindings](#standard-bindings) | Lasm.JS.Web is its generator's output, and behaves as the specs say on every JavaScript target: WPT's URL and urlencoded data, Lean's UTF-8 as the encoder's oracle, published Web Crypto vectors, generated round trips | `scripts/bindings/`, `test/fixtures/js-web/`, `web-bindings.yml` | PR (paths), main |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
@@ -323,6 +324,51 @@ body byte (key order, escaping, number formatting, error bodies), which user a
 token belongs to, a write a store lost. **What it cannot catch:** requests the
 suite does not send; behaviour under concurrency (`test/concurrency.mjs`);
 bugs that are the same on every target, Node included; timing.
+
+### Standard bindings
+
+**Property.** For every check *c* of the conformance program
+[`test/fixtures/js-web/Main.lean`](../test/fixtures/js-web/Main.lean) and every
+JavaScript target *t* (Node 26 and 24, Bun, Deno, Workers on workerd, headless
+Chromium): *c* holds on *t*, unless *t*'s runtime itself deviates from the spec
+there, which [`known.json`](../test/fixtures/js-web/known.json) states with the
+reason. Each check's comment states its Lean proposition, for example
+`∀ c ∈ urltestdata, ¬ c.failure → ∀ f ∈ fields, (URL.new c.input c.base).f = c.f` or
+`∀ b : ByteArray, (fatal TextDecoder.decode b succeeds ↔ String.fromUTF8? b ≠ none)`. They are properties of the runtimes, which Lean has no model of, so they
+are not `Candidates.lean` definitions ([TESTING_STRATEGY.md §4](TESTING_STRATEGY.md#4-property-testing-convention-propositions-that-carry-over-to-proofs)).
+
+**Oracles and inputs.** WPT at a pinned commit
+([`scripts/bindings/wpt-data.mjs`](../scripts/bindings/wpt-data.mjs) writes
+`Wpt.lean`): all of `url/resources/urltestdata.json`, the
+`application/x-www-form-urlencoded` cases of `url/urlencoded-parser.any.js`
+(through `URLSearchParams` and `Response.formData`) and the invalid UTF-8
+sequences of `encoding/textdecoder-fatal.any.js`. Lean itself where it has the
+same function: `String.toUTF8` for `TextEncoder`, `String.fromUTF8?` for the fatal
+`TextDecoder`, over generated strings and mutated byte arrays. Published test
+vectors: FIPS 180 digests, RFC 4231 HMAC, the GCM specification's test case 2,
+RFC 3602 AES-CBC, RFC 6070 PBKDF2, RFC 5869 HKDF, RFC 4648 base64. Generated
+round trips from a seeded generator: base64, structured cloning, query strings,
+gzip/deflate/deflate-raw, AES-GCM, ECDSA P-256, Wasm `add`. The rest checks the
+specs' stated behaviour (header combining and sorting, event dispatch and
+`preventDefault` from a synchronous listener, abort reasons, timers, streams and
+their queuing strategies, BYOB reads, `MessageChannel`).
+
+**Harness.** [`scripts/bindings/test-web.mjs`](../scripts/bindings/test-web.mjs)
+builds the program with an installed candidate for each target and runs it
+(Workers: `wrangler dev`, offline, in CI only; the checks run inside the
+request). The program prints a line per failed check and a summary; the run
+fails on a failed check that `known.json` does not list, and on a listed one
+that passes. [`web-bindings.yml`](../.github/workflows/web-bindings.yml) also
+checks that the committed bindings are the generator's output.
+
+**What it catches:** wrong conversions (a type, an optional argument passed as
+`null`, a dictionary member left in, a union read back wrongly), wrong host
+paths or receivers, callbacks that run at the wrong time, and members a runtime
+lacks. **What it cannot catch:** members the program does not call (the
+generator's mapping is uniform, so a member is wrong only when its types are),
+behaviour beyond the checks, Firefox and WebKit (not run yet), and the Vercel,
+Netlify and Supabase edge runtimes (their APIs are those of Deno and workerd,
+which run).
 
 ### Scenario matrix
 

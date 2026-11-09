@@ -56,20 +56,20 @@ test('values round-trip through the wire format', () => {
 // (Buffer.byteLength and UTF-8; TextDecoder), on both sides of every boundary.
 const samples = ['', 'a', 'field12', '\x7f', 'caf\u00e9', '\u00e9t\u00e9', 'x\u{1F600}', '\u{1F600}', 'ab\u0080', '\ufeffbom', 'lone \ud800 surrogate',
   ...[31, 32, 33, 63, 64, 65, 200].flatMap(n => ['k'.repeat(n), 'k'.repeat(n - 1) + '\u00e9', '\u00e9' + 'k'.repeat(n - 1)])];
-test('strings and keys encode as UTF-8 and decode as TextDecoder does, on every fast-path boundary', () => {
+test('strings and keys encode as UTF-8 and decode as TextDecoder (keeping a leading U+FEFF) does, on every fast-path boundary', () => {
   const js = createNodeJs();
   for (const s of samples) {
     assert.deepEqual(js.encode(s, 'data'), wire(s), JSON.stringify(s));
     const object = { [s]: s, after: 1 };
     assert.deepEqual(js.encode(object, 'data'), wire(object), JSON.stringify(s));
-    const text = new TextDecoder().decode(Buffer.from(s));
+    const text = new TextDecoder('utf-8', { ignoreBOM: true }).decode(Buffer.from(s));
     assert.equal(js.decode(wire(s)), text, JSON.stringify(s));
     // Twice: the second read of a key comes from the key cache.
     for (let round = 0; round < 2; round++) assert.deepEqual(Object.entries(js.decode(wire(object))), [[text, text], ['after', 1]], JSON.stringify(s));
   }
   // Bytes that are not valid UTF-8 decode as TextDecoder replaces them, as values and keys.
   for (const raw of [[0x61, 0xff], [0xc3], [0x80, 0x61], [0x7f, 0x80]]) {
-    const bytes = Buffer.concat([u32(raw.length), Buffer.from(raw)]), text = new TextDecoder().decode(Buffer.from(raw));
+    const bytes = Buffer.concat([u32(raw.length), Buffer.from(raw)]), text = new TextDecoder('utf-8', { ignoreBOM: true }).decode(Buffer.from(raw));
     assert.equal(js.decode(Buffer.concat([Buffer.from([5]), bytes])), text);
     assert.deepEqual(Object.keys(js.decode(Buffer.concat([Buffer.from([9]), u32(1), bytes, Buffer.from([0])]))), [text]);
   }

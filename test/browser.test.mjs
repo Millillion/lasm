@@ -51,7 +51,7 @@ test('library modules: only those a program initializes, and their imports', () 
     'Lasm.JS': 'initialize_Lasm_JS_Core( initialize_Lasm_JS_Json( initialize_Lasm_JS_Meta(' };
   const libraryText = module => library[module] ?? '';
   const read = text => text;
-  assert.deepEqual(linkedLibraryModules(['initialize_Lasm_JS('], { read, libraryText }), libraryModules.filter(m => m.startsWith('Lasm.JS')));
+  assert.deepEqual(linkedLibraryModules(['initialize_Lasm_JS('], { read, libraryText }), libraryModules.filter(m => m.startsWith('Lasm.JS') && !m.startsWith('Lasm.JS.Web')));
   assert.deepEqual(linkedLibraryModules(['initialize_Lasm_JS_Core('], { read, libraryText }), ['Lasm.JS.Core']);
   assert.deepEqual(linkedLibraryModules(['nothing'], { read, libraryText }), []);
 });

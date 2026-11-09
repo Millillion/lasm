@@ -5,6 +5,27 @@ Notes for the next release, collected as changes land. They move to
 
 Mutation testing now covers every JavaScript module under `src/` (docs/TESTING.md, "Mutation testing"); the fixes its new tests found are marked *(mutation testing)* below.
 
+## New
+
+- **Standard web APIs from Lean: `Lasm.JS.Web`.** `import Lasm.JS.Web` gives
+  bindings of the WinterTC Minimum Common Web API, the web APIs that Node 24 and
+  26, Bun, Deno, Cloudflare Workers, the Vercel, Netlify and Supabase edge
+  functions and browsers all have: `fetch`, `Request`, `Response`, `Headers`,
+  `FormData`, `URL`, `URLSearchParams`, `URLPattern`, `crypto` and
+  `crypto.subtle`, `TextEncoder` and `TextDecoder`, `Blob` and `File`, readable,
+  writable and transform streams, compression streams, `AbortController`,
+  `EventTarget` and the events, `MessageChannel`, timers, `queueMicrotask`,
+  `structuredClone`, `atob` and `btoa`, `performance`, `console` and
+  `WebAssembly`. They are generated from the specifications' WebIDL, so names
+  and shapes are the standards' own, with Lean types: `Promise` results are
+  `Async`, nullable values `Option`s, dictionaries structures, enums inductive
+  types, and JavaScript callbacks are made from Lean functions
+  (`EventListener.ofSyncFn`, `UnderlyingSourcePullCallback.ofFn`, …). Each spec
+  area is its own module (`import Lasm.JS.Web.Fetch`). Guide and mapping rules:
+  docs/JS_BINDINGS.md, "Standard bindings". A conformance suite (WPT's URL data,
+  Web Crypto test vectors, round trips) runs them on Node, Bun, Deno, Workers and
+  Chromium in CI. `Lasm.Web` is unchanged.
+
 ## Improvements
 
 - **Lasm.JS reads and writes Symbol-keyed properties.** `Value.get` and `Value.set` take a key of any type with `ToJS`, as JavaScript's `o[key]` does: a `String` (unchanged), a number (`o.get (3 : Nat)`), or a Symbol `Value` (`Symbol.iterator`, `Symbol.for "k"`). An array key is its string, as in JavaScript; `getFields` still takes strings. Source compatible: existing calls compile unchanged. *API change for Jordan's review:* `get [ToJS κ] (o : Value) (key : κ) …` and `set [ToJS κ] [ToJS α] (o : Value) (key : κ) (x : α)`, previously `(key : String)`. See docs/JS_BINDINGS.md, "Property keys".
@@ -23,6 +44,12 @@ Mutation testing now covers every JavaScript module under `src/` (docs/TESTING.m
 - **`lasm build --target workers` no longer keeps a generated `workers/wrangler.toml` once the project has its own.** *(mutation testing)* A project that added `wrangler.toml`, `wrangler.json` or `wrangler.jsonc` at its root after an earlier build still had the earlier generated `workers/wrangler.toml` when the program had not changed (an unchanged rebuild keeps the output directory as it was). It is now removed, as a build from scratch leaves none.
 - **macOS network interfaces report the right hardware (MAC) address.** *(mutation testing)* The Node host read the link-layer address of `Std.Net.interfaceAddresses` at the wrong offset of macOS's `sockaddr_dl` (after `sdl_alen` bytes of the name instead of `sdl_nlen`), so an interface such as `en0` reported bytes of its name and address mixed. It now follows libuv's `LLADDR`.
 - **`lasm package` says why it refuses more than 65,535 files.** *(mutation testing)* A function package with more entries than a ZIP's 16-bit count holds failed with Node's `RangeError` about an out-of-range value instead of "Function package has more than 65535 files"; the check now comes before any record is written.
+
+- **Lasm.JS: a string that begins with U+FEFF keeps it.** On every target the
+  host decoded the strings Lean sends with `TextDecoder`'s default, which drops
+  a leading byte order mark, so `"\uFEFFtest"` reached JavaScript as `"test"`
+  (and Lasm.UI text nodes that began with one lost it). Found by the
+  Lasm.JS.Web conformance run (WPT's urlencoded-parser case `\uFEFFtest=\uFEFF`).
 
 ## Repository
 

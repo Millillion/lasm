@@ -4,7 +4,8 @@
 // generated entry module imports), no threads. Events for Lean (promise
 // settlements, calls of Lean functions, releases) are queued and announced with
 // `notify`; the runtime takes them with op 209, which never waits here.
-const encoder = new TextEncoder(), decoder = new TextDecoder();
+// ignoreBOM: a Lean string that begins with U+FEFF keeps it (TextDecoder drops a leading BOM by default).
+const encoder = new TextEncoder(), decoder = new TextDecoder('utf-8', { ignoreBOM: true });
 const maximumDepth = 64;
 // Lengths travel as u32 (Lean's Wire.maxLength): a longer one is an error, never a
 // wrapped length (#154). Only a Uint8Array can be that long: JavaScript arrays hold

@@ -972,3 +972,11 @@ test('task waits: the whole wait list is read; a stopped flag alone, results, an
   js.dispatch(207, 0, 0x70n, wire(1));
   assert.equal(js.snapshot().syncPromises, 0);
 });
+
+test('strings keep a leading U+FEFF in both directions (found by the Lasm.JS.Web conformance run)', () => {
+  const js = host();
+  const f = hold(js, s => [s.length, s.charCodeAt(0), s]);
+  assert.deepEqual(js.decode(js.dispatch(205, 0, 0n, wire([{ ref: f }, null, ['﻿test=﻿']]))), [7, 0xFEFF, '﻿test=﻿']);
+  const o = hold(js, { '﻿k': 1 });
+  assert.equal(js.decode(js.dispatch(203, o, 0n, wire('﻿k'))), 1);
+});

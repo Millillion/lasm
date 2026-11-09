@@ -8,7 +8,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createEdgeJs, describe, jsFailure, firstJsHandle } from '../src/edge/edge-js.mjs';
 
-const enc = new TextEncoder(), dec = new TextDecoder();
+const enc = new TextEncoder(), dec = new TextDecoder('utf-8', { ignoreBOM: true });
 const cat = (...parts) => { const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0)); let o = 0; for (const p of parts) { out.set(p, o); o += p.length; } return out; };
 const u32 = n => { const b = new Uint8Array(4); new DataView(b.buffer).setUint32(0, n, true); return b; };
 const u64 = n => { const b = new Uint8Array(8); new DataView(b.buffer).setBigUint64(0, BigInt(n), true); return b; };
@@ -536,4 +536,10 @@ test('edge: the controller keeps the C stack pointer at the stop, before restori
   assert.deepEqual({ ...controller.stoppedStack }, { top: 3 << 20, pointer: 2 ** 32 - 64 });
   assert.deepEqual(restored, [[3 << 20, -64]]);
   assert.equal(controller.stopped, trap);
+});
+
+test('strings keep a leading U+FEFF in both directions (found by the Lasm.JS.Web conformance run)', () => {
+  const e = edge();
+  const f = e.value(214, 0, 1, wire(['T', 'globalThis', 'Function', ['s', 'return [s.length, s.charCodeAt(0), s]']])).ref;
+  assert.deepEqual(e.value(205, 0, 0, wire([{ ref: f }, null, ['﻿test=﻿']])), [7, 0xFEFF, '﻿test=﻿']);
 });
