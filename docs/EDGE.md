@@ -606,10 +606,23 @@ The wrapper is linked into every program that imports Lasm's library; on Node
 its limit is 16,384, since Node runs Lean on threads with 1 GiB stacks.
 
 **Measured** (`scripts/ci/async-depth.mjs`, the `async-depth` job of
-`differential.yml`, MEASURED_RUN, Linux x64). Time for one Lasm.Fetch request
+`differential.yml`, [run 42615416214](https://github.com/Millillion/lasm/actions/runs/42615416214), 2026-11-09, Linux x64). Time for one Lasm.Fetch request
 running N steps one after another, with no pause:
 
-MEASURED_TABLE
+| Step (N = 100,000 / 1,000,000) | Node | Deno 2.9.6 | Bun 1.4.4 | Workers (workerd, `wrangler dev` 4.152.0) |
+| --- | --- | --- | --- | --- |
+| `pure` | 22 / 183 ms | 16 / 136 ms | 14 / 103 ms | 16 / 113 ms |
+| An `IO` action | 170 / 1,662 ms | 202 / 2,238 ms | 91 / 854 ms | 108 / 979 ms |
+| `o.callMethod …` (a synchronous host call) | 915 / 8,945 ms | 433 / 4,718 ms | 293 / 2,801 ms | 340 / 3,037 ms |
+| `o.callMethodAwait …` of a plain value (100,000) | 6,626 ms | 2,068 ms | 947 ms | 1,215 ms |
+| `o.callMethodAwait …` of a promise (100,000) | 6,702 ms | 1,828 ms | 1,039 ms | 1,258 ms |
+
+The cost of the fix is small: before it, 100,000 `pure` steps with the
+workaround (`Std.Async.sleep 0` every 100 steps, one event-loop turn each) took
+2,136 ms on Deno, 1,111 ms on Bun and 1,160 ms on workerd (run 41930411906); now
+they take 14–16 ms with no pause. On Node, where the wrapper almost never
+defers, 100,000 `pure` and `IO` steps took 48 and 322 ms in run 41930411906
+and 22 and 170 ms now.
 
 CI fails if any of these loops fails. The former workaround, `Std.Async.sleep 0`
 every 100 steps, still works but is no longer needed. Batching work into fewer
