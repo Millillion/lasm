@@ -191,3 +191,59 @@ test('a program\'s imports: module, name and kind, sorted; unreadable files give
   assert.equal(wasmImports(program), undefined);
   assert.equal(wasmImports(join(directory, 'missing.wasm')), undefined);
 });
+
+test('imports with limits, tags and long names are skipped exactly', t => {
+  // A table and a memory without a maximum, then with one, a tag first, and a 200-byte name.
+  const long = 'n'.repeat(200);
+  const imports = [7, ...str('env'), ...str('tag'), 4, 0, 1, ...str('env'), ...str('t0'), 1, 0x70, 0, 2, ...str('env'), ...str('t1'), 1, 0x70, 1, 2, 3,
+    ...str('env'), ...str('m0'), 2, 0, 1, ...str('env'), ...str('m1'), 2, 1, 1, 2, ...str('env'), ...str('g'), 3, 0x7f, 1, ...str(long), ...str('f'), 0, 0];
+  const symbols = [2, 0, 0x10, 0, 4, 0x10, 0];
+  const bytes = Uint8Array.from([...header, ...section(1, [1, 0x60, 0, 0]), ...section(2, imports), ...custom('linking', [2, 8, ...leb(symbols.length), ...symbols])]);
+  assert.deepEqual(parseWasmObject(bytes).symbols.map(symbol => symbol.name), ['f', 'tag']);
+  const directory = scratch(t), file = join(directory, 'p.wasm');
+  writeFileSync(file, bytes);
+  assert.deepEqual(wasmImports(file), ['env\0g\0global', 'env\0m0\0memory', 'env\0m1\0memory', 'env\0t0\0table', 'env\0t1\0table', 'env\0tag\0tag', `${long}\0f\0function`]);
+});
+
+test('references are attributed to the body that contains them, in offset order', () => {
+  // Three bodies; relocations listed out of order.
+  const symbols = [4, 0, 0, 0, ...str('a'), 0, 0, 1, ...str('b'), 0, 0, 2, ...str('c'), 1, 0, ...str('d'), 0, 0, 8];
+  const call = target => [0x10, 0x80 | target, 0x80, 0x80, 0x80, 0];
+  const bodies = [[0, ...call(1), 0x0b], [0, 0x0b], [0, 0x41, 0x80, 0x80, 0x80, 0x80, 0, 0x1a, ...call(0), 0x0b]];
+  const payload = [3, ...bodies.flatMap(body => [...leb(body.length), ...body])];
+  // Offsets in the code section payload: body 0 starts at 1 (+1 size byte), body 2 after the others.
+  const at0 = 1 + 1 + 2, at2 = 1 + 1 + bodies[0].length + 1 + bodies[1].length + 1 + 2, at2b = at2 + 7;
+  const reloc = custom('reloc.CODE', [2, 3, 0, ...leb(at2b), 0, 0, ...leb(at0), 1, 4, ...leb(at2), 3, 0]);
+  const bytes = Uint8Array.from([...header, ...section(1, [1, 0x60, 0, 0]), ...section(3, [3, 0, 0, 0]), ...section(10, payload),
+    ...custom('linking', [2, 8, ...leb(symbols.length), ...symbols]), ...reloc]);
+  const { symbols: parsed, references } = parseWasmObject(bytes);
+  const name = index => parsed[index].name;
+  assert.deepEqual([...references].map(([owner, refs]) => [name(owner), refs.map(name)]), [['a', ['b']], ['c', ['d', 'a']]]);
+});
+
+test('an archive index in the 64-bit format, with an odd size', t => {
+  const directory = scratch(t);
+  const names = 'sym\0';
+  const index = Buffer.alloc(8 + 8 + names.length + 1);
+  const at = 8 + 60 + index.length + 1;
+  index.writeBigUInt64BE(1n, 0); index.writeBigUInt64BE(BigInt(at), 8); index.write(names, 16, 'latin1');
+  const file = join(directory, 'wide.a');
+  writeFileSync(file, rawArchive([['/SYM64/', index], ['m.o/', 'xyz']]));
+  const { symbols, names: members } = archiveIndex(file);
+  assert.equal(symbols.get('sym'), at);
+  assert.deepEqual([...members], [[at, 'm.o']]);
+});
+
+test('a map symbol found in another member than the map names is not that member\'s; offsets are sorted', t => {
+  const directory = scratch(t);
+  const lib = join(directory, 'libX.a');
+  writeFileSync(lib, archive([['A.o', wasmObject({ functions: [{ name: 'l_a' }] })], ['B.o', wasmObject({ functions: [{ name: 'l_b' }] })],
+    ['C.o', wasmObject({ functions: [{ name: 'l_c' }] })]]));
+  const { symbols } = archiveIndex(lib);
+  const code = rows => '       -       a0      100 CODE\n' + rows.map(([member, section]) => `       -       a0       10         ${lib}(${member}):(${section})`).join('\n');
+  // l_a is A.o's, not C.o's: C.o is kept as an unattributed name, A.o is not.
+  assert.deepEqual(liveMembers(code([['C.o', 'l_a']]), [lib]), { [lib]: [symbols.get('l_c')] });
+  assert.deepEqual(liveMembers(code([['C.o', 'l_c'], ['A.o', 'l_a']]), [lib]), { [lib]: [symbols.get('l_a'), symbols.get('l_c')] });
+  // Doubled separators in the map's spelling of the archive path.
+  assert.deepEqual(liveMembers(code([['B.o', 'l_b']]).replace(lib, lib.replaceAll('/', '//')), [lib]), { [lib]: [symbols.get('l_b')] });
+});

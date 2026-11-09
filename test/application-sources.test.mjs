@@ -432,3 +432,157 @@ test('a program needs main: its own module\'s C must define it', t => {
     message: 'Main.lean has no `main` function, so there is no program to build. Define one, for example: def main : IO Unit := IO.println "hello"' });
   assert.throws(() => assertDefinesMain([{ module: 'Main', source: join(directory, 'missing', '..', 'Main.lean') }], [c], source), /has no `main` function/);
 });
+
+test('the import header stops at a command even when it mentions a comment or an import keyword', () => {
+  assert.equal(leanHeader('import A\ndef x := 1 -- note\nimport B'), 'import A');
+  assert.equal(leanHeader('import A\ndef x := module\nimport B'), 'import A');
+  assert.equal(leanHeader('public  meta\timport A\ndef y := 1'), 'public  meta\timport A');
+  assert.equal(leanHeader('import A\ndef x -/\nimport B'), 'import A');
+  assert.equal(leanHeader('import A\n-/ def y\nimport B'), 'import A');
+  assert.equal(leanHeader('import A\n  -/  \nimport B\ndef z'), 'import A\n  -/  \nimport B');
+});
+
+test('a lakefile.toml may mention imports; only a lakefile.lean importing more than Lake prevents reuse', t => {
+  const project = scratch(t);
+  put(join(project, 'lakefile.toml'), 'name = "app"\n# import Mathlib\nimport = "x"');
+  assert.match(lakeConfigurationKey(project, undefined, {}), /^[0-9a-f]{64}$/);
+  put(join(project, 'lakefile.lean'), 'import Lake\nrequire x from git "u" -- import Mathlib\nimport  Lake');
+  assert.match(lakeConfigurationKey(project, undefined, {}), /^[0-9a-f]{64}$/);
+});
+
+test('standalone import queries follow only local imports', posix, t => {
+  const directory = scratch(t), prefix = join(directory, 'lean');
+  const { lean, world, runs } = leanStandIn(prefix);
+  const source = put(join(directory, 'app/Main.lean')), outside = put(join(directory, 'Outside.lean'));
+  world({ deps: { [source]: [outside], [outside]: [join(prefix, 'src/lean/Lean.lean')] } });
+  assert.equal(standaloneImportsModules(source, lean, ['Lean']), false);
+  assert.equal(runs().length, 1, 'the outside file is not read');
+});
+
+test('Lake records replace their predecessors and leave other files alone', posix, t => {
+  const { project, work, source, lean } = lakeProject(t);
+  put(join(work, 'notes.json'), 'kept');
+  applicationSources(source, lean, work, { log() {} });
+  writeFileSync(join(project, 'lakefile.toml'), 'name = "changed"');
+  applicationSources(source, lean, work, { log() {} });
+  const names = readdirSync(work);
+  for (const prefix of ['lake-module-', 'lake-imports-']) assert.equal(names.filter(name => name.startsWith(prefix)).length, 1, prefix);
+  assert.ok(names.includes('notes.json'));
+});
+
+test('Lake projects: C code without the tier, the tier without C code, imports and answers checked', posix, t => {
+  {
+    const { work, source, lean, world } = lakeProject(t);
+    world({ adapter: { imports: [], metadataRoots: [], native: [{ package: 'c' }] }, link: { objs: [] } });
+    const result = applicationSources(source, lean, work, { log() {} });
+    assert.deepEqual(result.nativeLink, { objs: [] }, 'a full Lean has the C compiler');
+    world({ adapter: { imports: [], metadataRoots: [], native: [] } });
+    rmSync(work, { recursive: true }); mkdirSync(work);
+    const tiers = applicationSources(source, { ...lean, distribution: 'tiers' }, work, { log() {} });
+    assert.equal(tiers.needsCCompiler, undefined);
+    assert.equal(tiers.nativeLink, undefined);
+    world({ adapter: { imports: [], metadataRoots: [] } });
+    rmSync(work, { recursive: true }); mkdirSync(work);
+    assert.deepEqual(applicationSources(source, lean, work, { log() {} }).native, [], 'no native field');
+  }
+  {
+    const { work, source, lean, world, runs, clear } = lakeProject(t);
+    world({ adapter: { imports: ['Dep', 4], metadataRoots: [], native: [] } });
+    assert.throws(() => applicationSources(source, lean, work, { log() {} }), { message: 'Unexpected Lake module identity' });
+    rmSync(work, { recursive: true }); mkdirSync(work);
+    world({ adapter: { imports: ['Dep'], metadataRoots: [], native: [] }, trans: { '+Dep': ['Base'] }, missingLean: ['+Base'] });
+    assert.throws(() => applicationSources(source, lean, work, { log() {} }), { message: 'Lake returned no C file for +Base' });
+    rmSync(work, { recursive: true }); mkdirSync(work);
+    world({ adapter: { imports: ['Dep'], metadataRoots: [], native: [] }, trans: { '+Dep': Array.from({ length: 63 }, (_, i) => `M${i}`) }, blank: true, missingOlean: ['+M0'] });
+    clear();
+    const result = applicationSources(source, lean, work, { log() {} });
+    assert.equal(result.sources.length, 65, 'blank lines in Lake\'s answers are ignored');
+    assert.equal(runs().filter(run => run.args.includes('query') && run.args.some(arg => arg.endsWith(':c'))).length, 1, 'exactly 64 targets: one batch');
+    assert.equal(runs().filter(run => run.args.includes('query')).length, 2);
+    const oleans = result.oleans();
+    assert.equal(oleans.length, 64, 'a module without module data is left out');
+    assert.equal(runs().filter(run => run.args.some(arg => arg.endsWith(':olean'))).length, 1);
+    world({ adapter: 'null' });
+    rmSync(work, { recursive: true }); mkdirSync(work);
+    assert.throws(() => applicationSources(source, lean, work, { log() {} }), { message: 'Unexpected Lake module identity' });
+  }
+});
+
+test('the native-package inventory: a null answer and an empty failure are reported', posix, t => {
+  const directory = scratch(t), project = join(directory, 'project');
+  put(join(project, 'lakefile.toml'), 'name = "p"');
+  const { lean, world } = leanStandIn(join(directory, 'lean'));
+  world({ native: 'null' });
+  assert.throws(() => lakeNativePackages(project, lean), { message: 'Unexpected Lake native-package inventory' });
+  world({ adapterFails: '' });
+  assert.throws(() => lakeNativePackages(project, lean), { message: 'Lake could not load the workspace: ' });
+  world({ native: { native: [] } });
+  put(join(project, '.lake/lasm/other.json'), 'kept');
+  lakeNativePackages(project, lean);
+  writeFileSync(join(project, 'lakefile.toml'), 'name = "q"');
+  lakeNativePackages(project, lean);
+  assert.deepEqual(readdirSync(join(project, '.lake/lasm')).filter(name => name.startsWith('lake-native-')).length, 1);
+  assert.ok(existsSync(join(project, '.lake/lasm/other.json')));
+});
+
+test('standalone sources: shared imports compiled once, every output recorded, the Lean identity in the signature', posix, t => {
+  const directory = scratch(t), app = join(directory, 'app'), work = join(directory, 'work');
+  const { lean, world } = leanStandIn(join(directory, 'lean'));
+  const [main, a, b, c] = ['Main', 'A', 'B', 'C'].map(name => put(join(app, name + '.lean')));
+  world({ deps: { [main]: ['A.lean', 'B.lean', join(lean.prefix, 'src/lean/Init.lean')], [a]: ['C.lean'], [b]: ['C.lean'] }, extraOutputs: true });
+  const logged = [];
+  const result = applicationSources(main, lean, work, { log: line => logged.push(line) });
+  assert.deepEqual(result.inputs.map(input => input.module), ['C', 'A', 'B', 'Main']);
+  assert.deepEqual(logged, ['Generating Lean C: C.lean', 'Generating Lean C: A.lean', 'Generating Lean C: B.lean', 'Generating Lean C: Main.lean']);
+  const receiptFile = join(work, 'lean', 'C.lasm.json');
+  assert.ok(readFileSync(receiptFile, 'utf8').endsWith('}\n'));
+  assert.deepEqual(Object.keys(JSON.parse(readFileSync(receiptFile, 'utf8')).files), ['.c', '.olean', '.olean.private', '.olean.server', '.ir']);
+  // Another Lean identity with the same commit: modules importing the standard library are compiled again.
+  logged.length = 0;
+  applicationSources(main, { ...lean, identity: 'another prefix' }, work, { log: line => logged.push(line) });
+  assert.deepEqual(logged, ['Generating Lean C: Main.lean']);
+  // A receipt that is not a file is an error; one without files recompiles.
+  const mainReceipt = join(work, 'lean', 'Main.lasm.json');
+  const { signature } = JSON.parse(readFileSync(mainReceipt, 'utf8'));
+  writeFileSync(mainReceipt, JSON.stringify({ signature }));
+  logged.length = 0;
+  applicationSources(main, { ...lean, identity: 'another prefix' }, work, { log: line => logged.push(line) });
+  assert.deepEqual(logged, ['Generating Lean C: Main.lean']);
+  rmSync(mainReceipt); mkdirSync(mainReceipt);
+  assert.throws(() => applicationSources(main, lean, work, { log() {} }), { code: 'EISDIR' });
+  assert.ok(c);
+});
+
+test('LASM_DEV_TRACE reports seconds', posix, t => {
+  const directory = scratch(t), app = join(directory, 'app'), work = join(directory, 'work');
+  const { lean } = leanStandIn(join(directory, 'lean'));
+  const main = put(join(app, 'Main.lean'));
+  const written = [];
+  const write = process.stderr.write;
+  process.stderr.write = text => { written.push(String(text)); return true; };
+  process.env.LASM_DEV_TRACE = '1';
+  try { applicationSources(main, lean, work, { log() {} }); } finally { process.stderr.write = write; delete process.env.LASM_DEV_TRACE; }
+  for (const line of written) {
+    const seconds = Number(/trace (\d+\.\d\d) s/.exec(line)[1]);
+    assert.ok(seconds >= 0 && seconds < 60, line);
+  }
+  assert.equal(written.length, 2);
+});
+
+test('the first-build notice is removed only as a whole line', posix, t => {
+  const directory = scratch(t), app = join(directory, 'app'), work = join(directory, 'work');
+  const { lean, world } = leanStandIn(join(directory, 'lean'));
+  const main = put(join(app, 'Main.lean'));
+  const written = [];
+  const write = process.stderr.write;
+  process.stderr.write = text => { written.push(String(text)); return true; };
+  world({ notice: 'note: info: x: no previous manifest, creating one from scratch\n' });
+  try { applicationSources(main, lean, work, { log() {} }); } finally { process.stderr.write = write; }
+  assert.deepEqual(written, ['note: info: x: no previous manifest, creating one from scratch\n', 'note: info: x: no previous manifest, creating one from scratch\n']);
+});
+
+test('main: a source that does not exist is compared by its path', t => {
+  const directory = scratch(t);
+  const c = put(join(directory, 'Other.c'), 'no main here');
+  assertDefinesMain([{ module: 'Other', source: join(directory, 'Other.lean') }], [c], join(directory, 'Main.lean'));
+});

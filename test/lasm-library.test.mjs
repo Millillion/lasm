@@ -50,6 +50,8 @@ test('the shipped compilation is used only for its Lean release and commit', () 
 test('a supported prefix with Lean\'s elaborator gets the shipped compilation copied in', t => {
   const tree = scratch(t);
   assert.equal(compileLibrary(tree, '4.35.0', { commit: toolchainCatalog.lean['4.35.0'].commit }), false, 'no elaborator libraries');
+  mkdirSync(join(tree, 'lib/lean/Lean/Elab/Deriving'), { recursive: true });
+  assert.equal(compileLibrary(tree, '4.35.0', { commit: toolchainCatalog.lean['4.35.0'].commit }), false, 'the deriving handlers\' module data is missing');
   put(join(tree, 'lib/lean/Lean/Elab/Deriving/Basic.olean'), '');
   assert.equal(compileLibrary(tree, '4.34.1', { commit: 'x' }), false, 'an unsupported release');
   assert.equal(compileLibrary(tree, '4.35.0', { commit: toolchainCatalog.lean['4.35.0'].commit }), true);
@@ -66,16 +68,17 @@ test('without a shipped compilation each module is compiled in import order by t
 const { appendFileSync, writeFileSync } = require('node:fs');
 const args = process.argv.slice(2);
 writeFileSync(args[args.indexOf('-o') + 1], 'olean'); writeFileSync(args[args.indexOf('-c') + 1], 'c');
-appendFileSync(${JSON.stringify(log)}, JSON.stringify({ args, env: Object.fromEntries(Object.entries(process.env).filter(([k]) => /^(?:lean|lake|elan)_/i.test(k))) }) + '\\n');
+appendFileSync(${JSON.stringify(log)}, JSON.stringify({ args, kept: process.env.MY_LEAN_KEPT, env: Object.fromEntries(Object.entries(process.env).filter(([k]) => /^(?:lean|lake|elan)_/i.test(k))) }) + '\\n');
 `);
     chmodSync(join(tree, 'bin/lean'), 0o755);
-    const saved = { LEAN_PATH: process.env.LEAN_PATH, lake_home: process.env.lake_home, ELAN_HOME: process.env.ELAN_HOME };
-    Object.assign(process.env, { LEAN_PATH: '/elsewhere', lake_home: '/elsewhere', ELAN_HOME: '/elsewhere' });
+    const saved = { LEAN_PATH: process.env.LEAN_PATH, lake_home: process.env.lake_home, ELAN_HOME: process.env.ELAN_HOME, MY_LEAN_KEPT: process.env.MY_LEAN_KEPT };
+    Object.assign(process.env, { LEAN_PATH: '/elsewhere', lake_home: '/elsewhere', ELAN_HOME: '/elsewhere', MY_LEAN_KEPT: 'kept' });
     try { assert.equal(compileLibrary(tree, '4.35.0', { platform: 'linux' }), true); }
     finally { for (const [key, value] of Object.entries(saved)) if (value === undefined) delete process.env[key]; else process.env[key] = value; }
     const runs = readFileSync(log, 'utf8').trim().split('\n').map(line => JSON.parse(line));
     assert.equal(runs.length, libraryModules.length);
-    runs.forEach(({ args, env }, index) => {
+    runs.forEach(({ args, env, kept }, index) => {
+      assert.equal(kept, 'kept', 'other variables are passed on');
       const parts = libraryModules[index].split('.');
       const source = join(tree, 'src', 'lean', ...parts) + '.lean';
       assert.deepEqual(args, ['-j1', '-s8192', '-R', join(tree, 'src', 'lean'), '-Dcompiler.postponeCompile=false',
@@ -93,6 +96,7 @@ test('a program links the library modules whose initializers it calls, and what 
   assert.deepEqual(linkedLibraryModules(['main.c'], { read: read(call('Lasm.JS.Json')), libraryText }), ['Lasm.JS.Json']);
   assert.deepEqual(linkedLibraryModules(['main.c'], { read: read('initialize_Lasm_JSX(builtin); initialize_Lasm_JS_Core'), libraryText }), []);
   assert.deepEqual(linkedLibraryModules([], { libraryText }), []);
+  assert.deepEqual(linkedLibraryModules(['main.c'], { read: read('lean_Lasm_JS(x); Lasm_UI('), libraryText }), [], 'only initializer calls');
 });
 
 test('whether a program imports the library: an initializer call of one of its modules in any generated C', t => {

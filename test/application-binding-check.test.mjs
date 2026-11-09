@@ -18,6 +18,7 @@ function standInLean(directory) {
   const lean = put(join(directory, 'bin', 'lean'), `#!${process.execPath}
 const { appendFileSync } = require('node:fs');
 const [run, reader, ...files] = process.argv.slice(2);
+if (run !== '--run') { process.stderr.write('usage: lean --run FILE'); process.exit(1); }
 appendFileSync(${JSON.stringify(runs)}, JSON.stringify({ run, reader, files }) + '\\n');
 if (process.env.STAND_IN_FAIL) { process.stderr.write('reader failed'); process.exit(1); }
 console.log('Lean says hello');
@@ -161,4 +162,45 @@ test('a check that cannot run is an error with its output', async t => {
   await assert.rejects(checkBindingsAsync(directory, bindings), SyntaxError);
   await assert.rejects(checkBindingsAsync(join(directory, 'no-such-directory'), bindings), { code: 'ENOENT' });
   assert.throws(() => checkBindings(join(directory, 'no-such-directory'), bindings), /failed to run/);
+});
+
+test('read bindings are recorded after an asynchronous read too; a record that is not a list is read again', { skip: process.platform === 'win32' }, async t => {
+  const directory = scratch(t);
+  const { lean, count } = standInLean(directory);
+  const a = put(join(directory, 'A.olean'), 'a'), cache = join(directory, 'deep', 'cache');
+  put(join(directory, 'deep', 'cache', 'keep.txt'), 'not a record');
+  await readBindingsAsync(lean, process.env, [a], { cache });
+  assert.equal(count().length, 1);
+  readBindings(lean, process.env, [a], { cache });
+  assert.equal(count().length, 1, 'the asynchronous read was recorded');
+  const record = readdirSync(cache).find(name => name.startsWith('bindings-'));
+  writeFileSync(join(cache, record), '{"not":"a list"}');
+  readBindings(lean, process.env, [a], { cache });
+  assert.equal(count().length, 2);
+  writeFileSync(a, 'changed');
+  readBindings(lean, process.env, [a], { cache });
+  assert.deepEqual(readdirSync(cache).sort(), [readdirSync(cache).find(name => name.startsWith('bindings-')), 'keep.txt'].sort());
+  // A fresh nested cache directory is created.
+  const nested = join(directory, 'x', 'y', 'z');
+  readBindings(lean, process.env, [a], { cache: nested });
+  assert.equal(readdirSync(nested).length, 1);
+});
+
+test('the check cache: per identity, only results without errors, in a created directory, replacing older records', async t => {
+  const directory = project(t), cache = join(directory, 'nested', 'cache');
+  const good = [{ name: 'Ok', module: 'fns', path: 'two', arity: 2 }];
+  // No identity: never recorded.
+  await checkBindingsAsync(directory, good, { cache });
+  assert.equal(existsSync(cache), false);
+  await checkBindingsAsync(directory, good, { cache, identity: 'a' });
+  put(join(cache, 'keep.txt'), 'not a record');
+  await checkBindingsAsync(directory, good, { cache, identity: 'b' });
+  assert.deepEqual(readdirSync(cache).filter(name => name.startsWith('checked-')).length, 1);
+  assert.ok(readdirSync(cache).includes('keep.txt'));
+  // One broken binding among good ones: not recorded, so installing the package fixes the next check.
+  const mixed = [...good, { name: 'Later', module: 'later', path: 'f', arity: 1 }];
+  assert.match((await checkBindingsAsync(directory, mixed, { cache, identity: 'c' }))[1].error, /not installed/);
+  put(join(directory, 'node_modules', 'later', 'package.json'), JSON.stringify({ name: 'later', main: 'index.js' }));
+  put(join(directory, 'node_modules', 'later', 'index.js'), 'exports.f = x => x;');
+  assert.deepEqual(await checkBindingsAsync(directory, mixed, { cache, identity: 'c' }), mixed);
 });

@@ -31,7 +31,7 @@ if (tool === 'lean') {
     process.stdout.write((world.deps?.[file] ?? []).map(line => line + '\\n').join(''));
   } else if (args.includes('--run')) {
     const rest = args.slice(args.indexOf('--run') + 2);
-    if (world.adapterFails) fail(world.adapterFails, 2);
+    if (world.adapterFails !== undefined) fail(world.adapterFails, 2);
     const answer = rest[0] === '--native' ? world.native : rest[0] === '--link' ? world.link : world.adapter;
     process.stdout.write('adapter progress\\n' + (typeof answer === 'string' ? answer : JSON.stringify(answer)) + '\\n\\n');
   } else {
@@ -40,6 +40,7 @@ if (tool === 'lean') {
     const olean = args[args.indexOf('-o') + 1], c = args[args.indexOf('-c') + 1];
     write(olean, 'olean of ' + file); write(c, world.c?.[file] ?? 'int main(int argc, char ** argv) {}\\n');
     write(olean.replace(/\\.olean$/, '.ir'), 'ir');
+    if (world.extraOutputs) for (const extension of ['.olean.private', '.olean.server']) write(olean + extension.slice(6), extension);
   }
 } else {
   if (args.includes('query')) {
@@ -49,10 +50,12 @@ if (tool === 'lean') {
       const [name, facet] = target.split(':');
       if (facet === 'transImports') return [world.trans?.[name] ?? []];
       if (world.missingC?.includes(name) && facet === 'c') return [null];
+      if (world.missingLean?.includes(name) && facet === 'lean') return [null];
+      if (world.missingOlean?.includes(name) && facet === 'olean') return [null];
       if (world.short && facet === 'lean') return [];
       return ['build/' + name.replace(/^\\+/, '').replaceAll('.', '/') + '.' + facet];
     });
-    process.stdout.write(lines.map(line => JSON.stringify(line) + '\\n').join(''));
+    process.stdout.write(lines.map(line => JSON.stringify(line) + (world.blank ? '\\n\\n' : '\\n')).join(''));
   } else {
     const olean = args[args.indexOf('-o') + 1], c = args[args.indexOf('-c') + 1];
     write(olean, 'script olean'); write(c, world.scriptC ?? 'int main(int argc, char ** argv) {}\\n');
