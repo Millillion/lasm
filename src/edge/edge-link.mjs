@@ -3,7 +3,7 @@
 // Differences from src/application-link.mjs: wasm64 code lowered to 32-bit
 // memory (-sMEMORY64=2), no -pthread/PROXY_TO_PTHREAD/MAIN_MODULE, the
 // single-threaded runtime archives (edge-runtime.mjs), 4 MiB initial memory
-// with growth and a 1 MiB C stack, JSPI with the event pump and `main` as the
+// with growth and a 1 MiB C stack placed first in memory, JSPI with the event pump and `main` as the
 // only promising exports, and the edge host glue (edge-pre.js, edge-library.js,
 // lasm_js_edge.c). Engines without JSPI (Supabase's edge runtime) get the
 // Asyncify link instead (suspend 'asyncify'): Binaryen's asyncify pass, with
@@ -129,7 +129,9 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
     `-sMAXIMUM_MEMORY=${s.maximumMiB * 1048576}`, `-sSTACK_SIZE=${s.stackMiB << 20}`,
     '-sEXPORTED_RUNTIME_METHODS=callMain,HEAPU8,HEAPU32', '-sDYNAMIC_EXECUTION=0',
     '-sINCOMING_MODULE_JS_API=instantiateWasm,noInitialRun,print,printErr,onAbort',
-    '-sDEFAULT_LIBRARY_FUNCS_TO_INCLUDE=$stackSave,$stackRestore', '-Wl,--export-if-defined=__cpp_exception', '-Wno-experimental',
+    // The C stack first in memory (issue #126): an overflow runs below address
+    // 0 and traps at once, instead of overwriting the static data below it.
+    '-sDEFAULT_LIBRARY_FUNCS_TO_INCLUDE=$stackSave,$stackRestore', '-Wl,--stack-first', '-Wl,--export-if-defined=__cpp_exception', '-Wno-experimental',
     `-Wl,-Map=${join(out, 'program.map')}`, '-Wl,--start-group', ...libraries, '-Wl,--end-group',
     '--pre-js', join(linkWork, 'application-pre.js'), '--pre-js', join(here, 'edge-pre.js'), '--js-library', join(here, 'edge-library.js'),
     ...(suspend === 'jspi' ? ['-sJSPI', "-sJSPI_EXPORTS=['lasm_edge_pump','main']"] : []),
