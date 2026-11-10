@@ -1,5 +1,5 @@
 {
-  "generatedBy": "scripts/bindings/generate-web.mjs (@webref/idl 3.86.0)",
+  "generatedBy": "scripts/bindings/generate.mjs (@webref/idl 3.86.0)",
   "surface": {
     "EventTarget": {
       "module": "Dom",

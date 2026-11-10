@@ -1,15 +1,22 @@
-name: Standard bindings (Lasm.JS.Web)
-# Lasm.JS.Web, the WinterTC Minimum Common Web API generated from WebIDL
-# (docs/JS_BINDINGS.md, "Standard bindings"; docs/TESTING.md):
-#   - generated: the committed library/Lasm/JS/Web/*.lean are the output of
-#     scripts/bindings/generate-web.mjs for the pinned @webref/idl, and the WPT
-#     data of the conformance program is the pinned commit's;
+name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node)
+# Lasm.JS.Web, the WinterTC Minimum Common Web API generated from WebIDL, and
+# Lasm.JS.Node, Node's server-essential modules generated from Node's API docs
+# (docs/JS_BINDINGS.md, "Standard bindings" and "Lasm.JS.Node"; docs/TESTING.md):
+#   - generated: the committed library/Lasm/JS/{Web,Node}/*.lean are the output of
+#     scripts/bindings/generate.mjs for the pinned @webref/idl and the pinned
+#     Node.js docs (scripts/bindings/node.idl is node-api.mjs's lowering of
+#     them, their SHA-256 hashes pinned), and the WPT data of the conformance
+#     program is the pinned commit's;
 #   - conformance: a candidate packed from this commit and installed with npm
 #     builds test/fixtures/js-web for Node (26 and 24), Bun, Deno, Cloudflare
 #     Workers (workerd through wrangler dev, offline) and headless Chromium, and
 #     runs its property checks (WPT's URL and urlencoded data, Lean's UTF-8 as
 #     the encoder's oracle, published Web Crypto vectors, generated inputs)
-#     there. Deviations of a runtime itself are listed in known.json.
+#     there. Deviations of a runtime itself are listed in known.json;
+#   - node-conformance: the same candidate builds test/fixtures/js-node (published
+#     hash, HMAC, PBKDF2, scrypt and HKDF vectors; Lean as the oracle of hex,
+#     base64, UTF-8 and path operations; a temporary directory's files; child
+#     processes) for Node 26 and 24, Bun and Deno (their node: compatibility).
 on:
   pull_request:
     branches: [main]
@@ -19,6 +26,8 @@ on:
       - 'scripts/bindings/**'
       - 'test/fixtures/js-web/**'
       - 'test/fixtures/js-web-size/**'
+      - 'test/fixtures/js-node/**'
+      - 'test/fixtures/js-node-size/**'
       - 'test/web-bindings.test.mjs'
       - 'src/node-js.mjs'
       - 'src/edge/**'
@@ -33,6 +42,8 @@ on:
       - 'scripts/bindings/**'
       - 'test/fixtures/js-web/**'
       - 'test/fixtures/js-web-size/**'
+      - 'test/fixtures/js-node/**'
+      - 'test/fixtures/js-node-size/**'
       - 'src/node-js.mjs'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'
@@ -62,8 +73,10 @@ jobs:
           node-version: 26.13.0
           package-manager-cache: false
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: node.idl is the lowering of the pinned Node.js docs (hashes checked)
+        run: node scripts/bindings/node-api.mjs --check
       - name: The generated bindings are the generator's output
-        run: node scripts/bindings/generate-web.mjs --check
+        run: node scripts/bindings/generate.mjs --check
       - name: The WPT data is the pinned commit's
         run: node scripts/bindings/wpt-data.mjs --check
       - run: node --test test/web-bindings.test.mjs
@@ -159,5 +172,57 @@ jobs:
           path: |
             ${{ runner.temp }}/js-web/*.txt
             ${{ runner.temp }}/js-web/report.json
+          retention-days: 14
+          if-no-files-found: ignore
+  node-conformance:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      # Node 24 (the docs' version) runs Node's build; Node 26 runs everything else.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24.22.2
+          package-manager-cache: false
+      - run: echo "NODE24=$(command -v node)" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: Install the candidate as a user would
+        id: candidate
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: web-bindings-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: Bun and Deno
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T"
+          curl -fsSL --retry 3 -o "$T/bun.zip" "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-linux-x64.zip"
+          echo "$BUN_SHA256  $T/bun.zip" | sha256sum -c
+          unzip -q "$T/bun.zip" -d "$T"
+          npm install --prefix "$T" --no-audit --no-fund "deno@$DENO_VERSION"
+          "$T/bun-linux-x64/bun" --version; "$T/node_modules/.bin/deno" --version; "$NODE24" --version
+      - name: Build and run the Lasm.JS.Node conformance program on every target
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node scripts/bindings/test-web.mjs --fixture js-node --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-node" \
+            --targets node,node24,bun,deno --node24 "$NODE24" --bun "$T/bun-linux-x64/bun" --deno "$T/node_modules/.bin/deno" \
+            --report "$RUNNER_TEMP/js-node/report.json" --sizes
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: node-bindings-conformance
+          path: |
+            ${{ runner.temp }}/js-node/*.txt
+            ${{ runner.temp }}/js-node/report.json
           retention-days: 14
           if-no-files-found: ignore

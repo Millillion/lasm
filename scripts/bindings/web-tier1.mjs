@@ -1,7 +1,7 @@
 // Tier 1 of Lasm.JS.Web: the WinterTC Minimum Common Web API
 // (https://min-common-api.proposal.wintertc.org/, draft of 31 July 2026; the
 // 2025 snapshot is its first edition), the web APIs every JavaScript target
-// Lasm supports has. scripts/bindings/generate-web.mjs reads this list and the
+// Lasm supports has. scripts/bindings/generate.mjs reads this list and the
 // WebIDL of the pinned @webref/idl, and writes library/Lasm/JS/Web/*.lean.
 //
 // Each module is one spec area. `interfaces` are taken whole (with their

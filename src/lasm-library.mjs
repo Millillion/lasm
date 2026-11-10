@@ -20,10 +20,14 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   'Lasm.Web.Types', 'Lasm.Web.Dom', 'Lasm.Web.Events', 'Lasm.Web.Timers', 'Lasm.Web.Fetch', 'Lasm.Web.Url', 'Lasm.Web.Storage',
   'Lasm.Web.History', 'Lasm.Web.WebSocket', 'Lasm.Web.Crypto', 'Lasm.Web.Console', 'Lasm.Web.Canvas', 'Lasm.Web.App', 'Lasm.Web',
   // Lasm.JS.Web (docs/JS_BINDINGS.md, "Standard bindings"): the WinterTC Minimum Common Web API,
-  // generated from WebIDL by scripts/bindings/generate-web.mjs.
+  // generated from WebIDL by scripts/bindings/generate.mjs.
   'Lasm.JS.Web.Support', 'Lasm.JS.Web.Dom', 'Lasm.JS.Web.Messaging', 'Lasm.JS.Web.Streams', 'Lasm.JS.Web.File',
   'Lasm.JS.Web.Encoding', 'Lasm.JS.Web.Compression', 'Lasm.JS.Web.Url', 'Lasm.JS.Web.Fetch', 'Lasm.JS.Web.Crypto',
   'Lasm.JS.Web.Performance', 'Lasm.JS.Web.Timers', 'Lasm.JS.Web.Global', 'Lasm.JS.Web.Console', 'Lasm.JS.Web.Wasm', 'Lasm.JS.Web',
+  // Lasm.JS.Node (docs/JS_BINDINGS.md, "Lasm.JS.Node"): Node's server-essential modules, generated from
+  // Node's API docs (scripts/bindings/node-api.mjs, generate.mjs).
+  'Lasm.JS.Node.Support', 'Lasm.JS.Node.Events', 'Lasm.JS.Node.Stream', 'Lasm.JS.Node.Buffer', 'Lasm.JS.Node.Path',
+  'Lasm.JS.Node.Os', 'Lasm.JS.Node.Process', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.ChildProcess', 'Lasm.JS.Node',
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
   'Lasm.UI.Url', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',

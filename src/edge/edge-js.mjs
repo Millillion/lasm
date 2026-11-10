@@ -273,6 +273,12 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
   function load(specifier) {
     if (specifier === 'globalThis') return globalThis;
     if (Object.hasOwn(modules, specifier)) return modules[specifier];
+    // Node's built-in modules (Lasm.JS.Node; `Lasm.JS.require "node:os"`) on runtimes that
+    // implement them (Bun, Deno, Workers with nodejs_compat): process.getBuiltinModule.
+    if (specifier.startsWith('node:') && typeof globalThis.process?.getBuiltinModule === 'function') {
+      const builtin = globalThis.process.getBuiltinModule(specifier);
+      if (builtin !== undefined) return builtin;
+    }
     throw failure(`JavaScript module ${JSON.stringify(specifier)} is not in this edge build. Edge builds import modules statically: use it in a binding (@[js "${specifier}" …]) or list it in the build's modules.`);
   }
   function dispatch(op, id, arg, request) {

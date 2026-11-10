@@ -1,0 +1,361 @@
+{
+  "generatedBy": "scripts/bindings/generate.mjs (Node.js 24.22.2 docs)",
+  "surface": [
+    {
+      "lean": "events",
+      "module": "node:events",
+      "path": "",
+      "leanModule": "Events",
+      "namespace": [
+        "once"
+      ]
+    },
+    {
+      "lean": "EventEmitter",
+      "module": "node:events",
+      "path": "EventEmitter",
+      "leanModule": "Events",
+      "static": [],
+      "prototype": [
+        "emit",
+        "eventNames",
+        "listenerCount",
+        "off",
+        "on",
+        "once",
+        "removeAllListeners"
+      ],
+      "instance": []
+    },
+    {
+      "lean": "stream.Readable",
+      "module": "node:stream",
+      "path": "Readable",
+      "leanModule": "Stream",
+      "static": [
+        "fromWeb",
+        "toWeb"
+      ],
+      "prototype": [],
+      "instance": []
+    },
+    {
+      "lean": "stream.Writable",
+      "module": "node:stream",
+      "path": "Writable",
+      "leanModule": "Stream",
+      "static": [
+        "fromWeb",
+        "toWeb"
+      ],
+      "prototype": [],
+      "instance": []
+    },
+    {
+      "lean": "buffer",
+      "module": "node:buffer",
+      "path": "",
+      "leanModule": "Buffer",
+      "namespace": [
+        "isAscii",
+        "isUtf8",
+        "transcode",
+        "kMaxLength",
+        "kStringMaxLength"
+      ]
+    },
+    {
+      "lean": "Buffer",
+      "module": "node:buffer",
+      "path": "Buffer",
+      "leanModule": "Buffer",
+      "static": [
+        "alloc",
+        "byteLength",
+        "compare",
+        "concat",
+        "from",
+        "isEncoding"
+      ],
+      "prototype": [
+        "compare",
+        "equals",
+        "toString"
+      ],
+      "instance": []
+    },
+    {
+      "lean": "path",
+      "module": "node:path",
+      "path": "",
+      "leanModule": "Path",
+      "namespace": [
+        "basename",
+        "dirname",
+        "extname",
+        "format",
+        "matchesGlob",
+        "isAbsolute",
+        "join",
+        "normalize",
+        "parse",
+        "relative",
+        "resolve",
+        "toNamespacedPath",
+        "delimiter",
+        "sep"
+      ]
+    },
+    {
+      "lean": "os",
+      "module": "node:os",
+      "path": "",
+      "leanModule": "Os",
+      "namespace": [
+        "availableParallelism",
+        "arch",
+        "cpus",
+        "endianness",
+        "freemem",
+        "getPriority",
+        "homedir",
+        "hostname",
+        "loadavg",
+        "machine",
+        "networkInterfaces",
+        "platform",
+        "release",
+        "setPriority",
+        "tmpdir",
+        "totalmem",
+        "type",
+        "uptime",
+        "userInfo",
+        "version",
+        "EOL",
+        "constants",
+        "devNull"
+      ]
+    },
+    {
+      "lean": "process",
+      "module": "node:process",
+      "path": "",
+      "leanModule": "Process",
+      "namespace": [
+        "chdir",
+        "cwd",
+        "exit",
+        "kill",
+        "memoryUsage",
+        "uptime",
+        "arch",
+        "argv",
+        "env",
+        "execArgv",
+        "execPath",
+        "exitCode",
+        "pid",
+        "platform",
+        "ppid",
+        "title",
+        "version",
+        "versions"
+      ]
+    },
+    {
+      "lean": "fsPromises",
+      "module": "node:fs/promises",
+      "path": "",
+      "leanModule": "Fs",
+      "namespace": [
+        "access",
+        "appendFile",
+        "chmod",
+        "chown",
+        "copyFile",
+        "cp",
+        "lchown",
+        "lutimes",
+        "link",
+        "lstat",
+        "mkdir",
+        "mkdtemp",
+        "open",
+        "readdir",
+        "readFile",
+        "readlink",
+        "realpath",
+        "rename",
+        "rmdir",
+        "rm",
+        "stat",
+        "symlink",
+        "truncate",
+        "unlink",
+        "utimes",
+        "writeFile",
+        "constants"
+      ]
+    },
+    {
+      "lean": "fs.Stats",
+      "module": "node:fs",
+      "path": "Stats",
+      "leanModule": "Fs",
+      "static": [],
+      "prototype": [
+        "isBlockDevice",
+        "isCharacterDevice",
+        "isDirectory",
+        "isFIFO",
+        "isFile",
+        "isSocket",
+        "isSymbolicLink"
+      ],
+      "instance": [
+        "dev",
+        "ino",
+        "mode",
+        "nlink",
+        "uid",
+        "gid",
+        "rdev",
+        "size",
+        "blksize",
+        "blocks",
+        "atimeMs",
+        "mtimeMs",
+        "ctimeMs",
+        "birthtimeMs",
+        "atimeNs",
+        "mtimeNs",
+        "ctimeNs",
+        "birthtimeNs",
+        "atime",
+        "mtime",
+        "ctime",
+        "birthtime"
+      ]
+    },
+    {
+      "lean": "fs.Dirent",
+      "module": "node:fs",
+      "path": "Dirent",
+      "leanModule": "Fs",
+      "static": [],
+      "prototype": [
+        "isBlockDevice",
+        "isCharacterDevice",
+        "isDirectory",
+        "isFIFO",
+        "isFile",
+        "isSocket",
+        "isSymbolicLink"
+      ],
+      "instance": [
+        "name",
+        "parentPath"
+      ]
+    },
+    {
+      "lean": "FileHandle",
+      "module": "node:fs/promises",
+      "path": null,
+      "leanModule": "Fs",
+      "static": [],
+      "prototype": [
+        "appendFile",
+        "chmod",
+        "chown",
+        "close",
+        "datasync",
+        "read",
+        "readableWebStream",
+        "readFile",
+        "stat",
+        "sync",
+        "truncate",
+        "utimes",
+        "write",
+        "writeFile"
+      ],
+      "instance": [
+        "fd"
+      ]
+    },
+    {
+      "lean": "crypto",
+      "module": "node:crypto",
+      "path": "",
+      "leanModule": "Crypto",
+      "namespace": [
+        "createHash",
+        "createHmac",
+        "getHashes",
+        "hash",
+        "hkdf",
+        "pbkdf2",
+        "randomBytes",
+        "randomInt",
+        "randomUUID",
+        "scrypt",
+        "timingSafeEqual"
+      ]
+    },
+    {
+      "lean": "Hash",
+      "module": "node:crypto",
+      "path": "Hash",
+      "leanModule": "Crypto",
+      "static": [],
+      "prototype": [
+        "copy",
+        "digest",
+        "update"
+      ],
+      "instance": []
+    },
+    {
+      "lean": "Hmac",
+      "module": "node:crypto",
+      "path": "Hmac",
+      "leanModule": "Crypto",
+      "static": [],
+      "prototype": [
+        "digest",
+        "update"
+      ],
+      "instance": []
+    },
+    {
+      "lean": "child_process",
+      "module": "node:child_process",
+      "path": "",
+      "leanModule": "ChildProcess",
+      "namespace": [
+        "execFile",
+        "spawn"
+      ]
+    },
+    {
+      "lean": "ChildProcess",
+      "module": "node:child_process",
+      "path": "ChildProcess",
+      "leanModule": "ChildProcess",
+      "static": [],
+      "prototype": [
+        "kill"
+      ],
+      "instance": [
+        "exitCode",
+        "killed",
+        "pid",
+        "signalCode",
+        "stderr",
+        "stdin",
+        "stdout"
+      ]
+    }
+  ]
+}

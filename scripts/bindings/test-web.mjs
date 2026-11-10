@@ -1,14 +1,15 @@
-// Builds the Lasm.JS.Web conformance program (test/fixtures/js-web) with an
+// Builds a standard bindings conformance program (test/fixtures/js-web for
+// Lasm.JS.Web, test/fixtures/js-node for Lasm.JS.Node: --fixture) with an
 // installed @lasm/cli for each JavaScript target and runs it there
 // (docs/TESTING.md, "Standard bindings"). A target passes when its build
 // succeeds, the program reports a summary, and every failed check is listed
-// for that target in test/fixtures/js-web/known.json with its reason (a
-// runtime's own deviation from the spec, never a binding bug); a listed check
+// for that target in the fixture's known.json with its reason (a runtime's own
+// deviation from the spec or the docs, never a binding bug); a listed check
 // that passes fails the run too, so the list stays exact.
 //
-//   node scripts/bindings/test-web.mjs --lasm PATH/bin/lasm.mjs --work DIR
+//   node scripts/bindings/test-web.mjs --lasm PATH/bin/lasm.mjs --work DIR [--fixture js-web|js-node]
 //     [--targets node,node24,bun,deno,workers,browser-chromium] [--node24 PATH] [--bun PATH]
-//     [--deno PATH] [--wrangler PATH] [--playwright DIR] [--report FILE]
+//     [--deno PATH] [--wrangler PATH] [--playwright DIR] [--report FILE] [--sizes]
 //
 // CI only for workers (wrangler dev runs workerd locally, offline): platform
 // CLIs are never run on a developer's machine.
@@ -20,14 +21,16 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
-const fixture = join(root, 'test', 'fixtures', 'js-web');
 const { values } = parseArgs({ options: {
-  lasm: { type: 'string' }, work: { type: 'string' }, targets: { type: 'string', default: 'node,bun,deno' },
+  lasm: { type: 'string' }, work: { type: 'string' }, targets: { type: 'string', default: 'node,bun,deno' }, fixture: { type: 'string', default: 'js-web' },
   node24: { type: 'string' }, bun: { type: 'string', default: 'bun' }, deno: { type: 'string', default: 'deno' },
   wrangler: { type: 'string', default: 'wrangler' }, playwright: { type: 'string' }, report: { type: 'string' },
   sizes: { type: 'boolean', default: false },
 } });
 if (!values.lasm || !values.work) { console.error('--lasm and --work are required'); process.exit(2); }
+if (!['js-web', 'js-node'].includes(values.fixture)) { console.error('--fixture is js-web or js-node'); process.exit(2); }
+const fixture = join(root, 'test', 'fixtures', values.fixture);
+const tierName = values.fixture === 'js-web' ? 'Lasm.JS.Web' : 'Lasm.JS.Node';
 const lasm = resolve(values.lasm), work = resolve(values.work);
 const known = JSON.parse(readFileSync(join(fixture, 'known.json'), 'utf8'));
 const env = { ...process.env, CI: '1', BROWSER: 'none', LASM_EDITOR: '0', NO_COLOR: '1', WRANGLER_SEND_METRICS: 'false' };
@@ -149,17 +152,20 @@ for (const target of targets) {
   for (const p of result.stale ?? []) console.log(`  listed in known.json but passed: ${p}`);
   if (result.error) console.log(`  ${result.error.split('\n').join('\n  ')}`);
 }
-// --sizes: what importing Lasm.JS.Web costs, against the same program on Lasm.JS
-// alone (test/fixtures/js-web-size), for Node and the edge runtime (--target deno):
-// build time of a new project with warm tools, and the program's Wasm.
+// --sizes: what importing the tier costs, against the same program on Lasm.JS
+// alone (test/fixtures/<fixture>-size: Base.lean and the tier's program), for Node
+// and the edge runtime (--target deno): build time of a new project with warm
+// tools, and the program's Wasm.
 const sizes = [];
 if (values.sizes) {
   const wasmBytes = dir => existsSync(dir) ? readdirSync(dir, { recursive: true }).filter(f => String(f).endsWith('.wasm'))
     .reduce((n, f) => n + statSync(join(dir, f)).size, 0) : 0;
   for (const [target, flags, output] of [['node', [], 'dist'], ['deno', ['--target', 'deno'], 'deno']]) {
-    for (const program of ['Base', 'Web']) {
+    const sizeFixture = join(root, 'test', 'fixtures', `${values.fixture}-size`);
+    const programs = readdirSync(sizeFixture).filter(f => f.endsWith('.lean')).map(f => f.slice(0, -5)).sort((a, b) => (a !== 'Base') - (b !== 'Base') || a.localeCompare(b));
+    for (const program of programs) {
       const dir = join(work, `size-${target}-${program}`);
-      cpSync(join(root, 'test', 'fixtures', 'js-web-size'), dir, { recursive: true });
+      cpSync(sizeFixture, dir, { recursive: true });
       const b = await exec(process.execPath, [lasm, 'build', `${program}.lean`, ...flags], { cwd: dir, timeout: 30 * 60_000 });
       const entry = { target, program, buildMs: b.ms, ok: b.code === 0, wasmBytes: wasmBytes(join(dir, output)), outputBytes: dirSize(join(dir, output)) };
       if (!entry.ok) { entry.error = (b.stdout + b.stderr).slice(-3000); ok = false; }
@@ -177,6 +183,6 @@ console.log(`\nGenerated members missing on some target (${lacking.size}):`);
 for (const [member, where] of [...lacking].sort(([a], [b]) => a.localeCompare(b))) console.log(`  ${member}: ${where.join(', ')}`);
 if (process.env.GITHUB_STEP_SUMMARY) {
   const rows = results.map(r => `| ${r.target} | ${r.pass ? 'pass' : '**fail**'} | ${r.summary ? `${r.summary.passed} / ${r.summary.failed}` : '–'} | ${r.failures ? r.failures.length - r.unexpected.length : '–'} | ${r.buildMs !== undefined ? (r.buildMs / 1000).toFixed(1) + ' s' : '–'} | ${r.outputBytes ? (r.outputBytes / 1048576).toFixed(2) + ' MiB' : '–'} |`);
-  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## Lasm.JS.Web conformance\n\n| Target | Result | Passed / failed checks | Known deviations | Build | Output |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\n### Cost of importing Lasm.JS.Web\n\n| Target | Program | Build | Wasm | Output |\n| --- | --- | --- | --- | --- |\n${sizes.map(e => `| ${e.target} | ${e.program} | ${(e.buildMs / 1000).toFixed(1)} s | ${e.wasmBytes} | ${e.outputBytes} |`).join('\n')}\n\n### Generated members a runtime lacks\n\n| Member | Missing on |\n| --- | --- |\n${availability.join('\n')}\n`);
+  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## ${tierName} conformance\n\n| Target | Result | Passed / failed checks | Known deviations | Build | Output |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\n### Cost of importing ${tierName}\n\n| Target | Program | Build | Wasm | Output |\n| --- | --- | --- | --- | --- |\n${sizes.map(e => `| ${e.target} | ${e.program} | ${(e.buildMs / 1000).toFixed(1)} s | ${e.wasmBytes} | ${e.outputBytes} |`).join('\n')}\n\n### Generated members a runtime lacks\n\n| Member | Missing on |\n| --- | --- |\n${availability.join('\n')}\n`);
 }
 process.exit(ok ? 0 : 1);

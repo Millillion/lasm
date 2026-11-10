@@ -115,6 +115,19 @@ test('modules come from the static map; others fail with how to add them', () =>
   assert.throws(() => value(201, 0, 0, enc.encode('other')), /JavaScript module "other" is not in this edge build/);
 });
 
+test('node: modules not in the static map come from process.getBuiltinModule where the runtime has it (Lasm.JS.Node)', () => {
+  const { value } = edge({ modules: {} });
+  // Node itself runs this test, so its getBuiltinModule answers.
+  assert.equal(value(214, 0, 0, wire(['T.join', 'node:path', 'join', ['a', 'b']])), ['a', 'b'].join(process.platform === 'win32' ? '\\' : '/'));
+  assert.throws(() => value(201, 0, 0, enc.encode('node:no-such-module')), /JavaScript module "node:no-such-module" is not in this edge build/);
+  const saved = Object.getOwnPropertyDescriptor(globalThis.process, 'getBuiltinModule');
+  try {
+    delete globalThis.process.getBuiltinModule;
+    const { value: other } = edge({ modules: {} });
+    assert.throws(() => other(201, 0, 0, enc.encode('node:os')), /JavaScript module "node:os" is not in this edge build/);
+  } finally { Object.defineProperty(globalThis.process, 'getBuiltinModule', saved); }
+});
+
 // Strings and object keys have ASCII fast paths (Writer.string, Reader.string,
 // Reader.key); their bytes and values must be exactly the general path's
 // (TextEncoder's UTF-8; TextDecoder), on both sides of every boundary.
