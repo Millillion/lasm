@@ -1037,7 +1037,24 @@ objects. Then [`test-serve.mjs`](../scripts/bindings/test-serve.mjs) builds
 on a free port, requests it from another process and shuts it down through
 `/shutdown` (exit status 0). `web-bindings.yml` runs both.
 
-MEASURED_PLACEHOLDER
+On 2026-11-10 (`web-bindings.yml` run 42918093803: Node 26.13.0, Bun 1.4.4,
+Deno 2.9.6, Linux x64) every check passed on Node (30) and Deno (75), and on Bun
+all but one of 51: `server.fetch(request)` calls the handler without its server
+argument, which the declaration says it passes
+([`known.json`](../test/fixtures/js-serve/known.json)). Every generated member
+exists on the live objects of both runtimes. End to end, all 9 checks passed on
+each of the three servers.
+
+- **Wasm size: about the same.** A one-route server through `Lasm.JS.Deno` or
+  `Lasm.JS.Bun`, against the same server with a hand-written call of
+  `Deno.serve` (the Lasm.JS.Web modules they import in both): 722,930 and
+  721,381 bytes of Wasm against 763,171 on Node; 601,746 and 600,131 against
+  585,764 on the edge runtime (`--target deno`), 2.7% more.
+- **Build time: no measurable change** for a new project with warm tools
+  (Node 21.1 s for the baseline, 18.2 and 19.8 s; the edge runtime 17.9 s, 16.4
+  and 16.7 s).
+- **Package size:** the compiled library (`library/prebuilt`) grows by 2.6 MB
+  (1.9 MB of `.olean` files), 0.6 MB compressed.
 
 ### Pinned versions and drift
 
