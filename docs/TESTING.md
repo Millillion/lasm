@@ -1350,6 +1350,17 @@ Mutants whose test file had to be stopped (more than 1 GiB, or alive after its
 runner) are *runtime errors*: Stryker leaves them out of the score
 (16 in `ui-dom`).
 
+**Timing-dependent code takes its clock as a parameter.** A mutant that only
+changes *when* something happens (a debounce whose timer is not cleared, a
+queued run that repeats) is killed or not depending on how fast the runner is,
+and a module's score then moves between runs. Such logic is a small function
+that takes `timers` (`setTimeout`, `clearTimeout`; the global ones by default),
+and its test drives a stand-in clock step by step instead of sleeping: `lasm
+dev`'s watch loop schedule is `createBuildSchedule` in `src/dev.mjs`, tested in
+`test/dev-units.test.mjs`. Where real processes are involved, the test waits
+for an explicit event (a file a program writes when it starts, a build that
+finishes only once a restart happened), never for an amount of time.
+
 ### Survivors that cannot be killed (equivalent mutants)
 
 A mutant is *equivalent* when no input can tell it from the original. These
