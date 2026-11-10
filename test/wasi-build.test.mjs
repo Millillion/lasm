@@ -37,7 +37,8 @@ test('wasiProgramKey: every input of the WASI program is part of its identity', 
   assert.equal(wasiProgramKey({ ...base, toolchain: undefined }), wasiProgramKey({ ...base, toolchain: {} }));
   // The fields, as the cache identity records them (schema 1).
   const sources = ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
-    'wasi-component.mjs', 'component/proxy-template.wasm', '../../library/c/lasm_fastly.c'];
+    'wasi-component.mjs', 'component/proxy-template.wasm', 'lasm_wasi_http_imports.h', '../../library/c/lasm_fastly.c',
+    '../../library/c/lasm_wasi_http_bindings.c'];
   const here = new URL('../src/wasi/', import.meta.url);
   assert.equal(key, sha256(JSON.stringify({ schema: 1, target: 'wasi', node: 'node', runtime: 'edge', settings: wasiLinkSettings.wasi, toolchain: 'clang-20',
     sources: Object.fromEntries(sources.map(file => [file, sha256(readFileSync(new URL(file, here)))])) })));
