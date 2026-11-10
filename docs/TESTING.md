@@ -33,7 +33,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) and [fuzzing](#differential-fuzzing) | Lasm-compiled programs (generated expressions, statements, and feature programs declaring classes, inductives, closures, loops, structures) behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
 | [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic equals Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs` | PR, nightly |
-| [Standard bindings](#standard-bindings) | Lasm.JS.Web and Lasm.JS.Node are their generator's output (Lasm.JS.Node's lowering is that of the pinned Node docs), and behave as the specs and Node's docs say on every target: WPT's URL and urlencoded data, Lean's UTF-8, hex, base64 and path operations as oracles, published crypto vectors, generated round trips, files and child processes | `scripts/bindings/`, `test/fixtures/js-web/`, `test/fixtures/js-node/`, `web-bindings.yml` | PR (paths), main |
+| [Standard bindings](#standard-bindings) | Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun are their generator's output (Lasm.JS.Node's lowering is that of the pinned Node docs, Lasm.JS.Deno's and Lasm.JS.Bun's that of the pinned TypeScript declarations), and behave as the specs, Node's docs and the declarations say on every target: WPT's URL and urlencoded data, Lean's UTF-8, hex, base64 and path operations as oracles, published crypto vectors, generated round trips, files and child processes, a Lean handler served by Deno.serve, Bun.serve and @hono/node-server and requested over HTTP | `scripts/bindings/`, `test/fixtures/js-web/`, `test/fixtures/js-node/`, `test/fixtures/js-serve/`, `web-bindings.yml` | PR (paths), main |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
@@ -485,6 +485,34 @@ against what was written; child processes (`execFile` output and exit status,
 `events.once`. The same harness runs it: `test-web.mjs --fixture js-node`
 (`node-conformance` in `web-bindings.yml`), and `--sizes` builds
 `test/fixtures/js-node-size` with and without Lasm.JS.Node.
+
+**Lasm.JS.Deno, Lasm.JS.Bun and the Node adapter.** For every check *c* of
+[`test/fixtures/js-serve/Main.lean`](../test/fixtures/js-serve/Main.lean) and every
+target *t* (Node 26, Bun, Deno): *c* holds on *t*, unless *t* itself deviates from
+its declarations there ([`known.json`](../test/fixtures/js-serve/known.json), with
+the reason). Each runtime serves `App.handle` with its own server (`Deno.serve` with
+options, with the defaults and with TLS from a test CA; `Bun.serve`;
+`@hono/node-server` on Node, through an `@[js]` binding) and requests it with
+Lasm.JS.Web's `fetch`. Oracle: `App.handle`'s specification over seeded inputs
+(∀ generated Unicode body *s*, `POST /echo` *s* = *s* with its content type; ∀ *n*,
+`/square?n=n` = `{"n":n,"square":n²}`), status codes, ten concurrent 300 ms requests
+finishing within 2.5 s (`Async` handlers hold no thread), and what the declarations
+say of the address, `onListen`, `info.remoteAddr`, `info.completed`, `requestIP`,
+`pendingRequests`, `server.fetch`, `reload`, the abort signal, `shutdown` and
+`stop`; every generated member is looked up on the live objects. Run by
+`test-web.mjs --fixture js-serve` (`serve-conformance` in `web-bindings.yml`, with
+`--sizes` over `test/fixtures/js-serve-size`). End to end,
+[`test-serve.mjs`](../scripts/bindings/test-serve.mjs) builds
+[`Serve.lean`](../test/fixtures/js-serve/Serve.lean) for each runtime, starts it on a
+free port, sends requests from another process (Node's `http`: a 2.4 kB Unicode
+echo, JSON, 404, a throwing handler, 20 concurrent slow requests), then
+`/shutdown`, and expects exit status 0. Unit tests (`test/web-bindings.test.mjs`)
+hold `serve-api.mjs`'s lowering rules and its refusals (an undecided overload or
+member, a stale exclusion or quote, a second generic instantiation) on a
+synthetic declaration file. **What it cannot catch:** members the programs do not
+call, TLS on Bun (not generated), Deno's and Bun's behaviour on other operating
+systems (Linux only), and declarations that misstate their runtime where no check
+looks.
 
 ### Scenario matrix
 

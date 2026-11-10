@@ -120,6 +120,32 @@ decisions themselves are logged with their reasoning in
     npm adapter, per your 2026-11-10 direction), and async iteration (`glob`,
     `watch`, `opendir`).
 
+- [ ] **`Lasm.JS.Deno` and `Lasm.JS.Bun` (tier 2, second part; 2026-11-10) are
+  generated from the runtimes' own TypeScript declarations** (Deno 2.9.6's
+  `lib.deno.ns.d.ts`/`lib.deno_net.d.ts`, Bun 1.4.4's `bun-types`), pinned by hash
+  ([DECISIONS.md](DECISIONS.md), 2026-11-10;
+  [JS_BINDINGS.md](JS_BINDINGS.md#servers-on-javascript-runtimes-lasmjsdeno-lasmjsbun-and-node)).
+  API-shape choices to review:
+  - **Overload names follow Lasm.JS.Web's rule**: `Deno.serve handler`,
+    `Deno.serveWithOptions options handler`, `Deno.serveWithTlsOptions tlsOptions handler`
+    (the TLS form is the `ServeTcpOptions & TlsCertifiedKeyPem` alternative, split
+    into its own function and structure `ServeTcpTlsOptions`).
+  - **Callback types are named after the member** where the declaration has no
+    alias: Deno's `ServeHandler` (an alias), but `ServeOptionsOnListen`,
+    `ServeOptionsOnError`, and Bun's `ServeOptionsFetch`, `ServeOptionsError`.
+    A hand-picked name (`Bun.FetchHandler`) would be nicer and less mechanical.
+  - **Bun's `Serve.Options` is one structure `ServeOptions`** with `fetch` required
+    (the TCP and `fetch` alternatives of its `XOR<…>` types); `port` is the declared
+    `string | number` (`DOMStringOrUnsignedShort`, a `Nat` coerces).
+  - **Numbers the doc comments call ports, counts or sizes are `Nat`**, others
+    `Float` (none in this cut).
+  - **Left out**: Unix sockets, WebSockets (Tandem's proposal), Bun's `routes`,
+    `tls`, `development`, the handler-inside-options overloads; experimental
+    members never (Bun's `http2`/`http3`, Deno's VSOCK).
+  - **Node**: no Lasm API; `@hono/node-server`'s `serve({fetch})` bound with
+    `@[js]` in the user's program, documented in JS_BINDINGS.md and exercised in
+    CI. A user-facing helper (or a template change) is yours to decide.
+
 ### High-priority work to define with Jordan
 - [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,
   2026-11-09). The known weaknesses:
