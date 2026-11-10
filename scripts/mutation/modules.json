@@ -108,6 +108,7 @@
       "name": "wasi-build",
       "description": "WASI builds: the build, the component wrapper, the atomics lowering",
       "mutate": ["src/wasi/wasi-build.mjs", "src/wasi/wasi-component.mjs", "src/wasi/lower-atomics.mjs"],
+      "keepInSandbox": ["/library"],
       "tests": ["test/wasi.test.mjs", "test/wasi-link-plan.test.mjs", "test/platform-output.test.mjs", "test/notices.test.mjs", "test/lower-atomics.test.mjs", "test/wasi-component.test.mjs", "test/wasi-build.test.mjs"]
     },
     {
