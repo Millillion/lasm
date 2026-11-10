@@ -45,7 +45,7 @@ lean_object* lean_array_uget(lean_object*, size_t);
 lean_object* lean_array_uset(lean_object*, size_t, lean_object*);
 size_t lean_usize_add(size_t, size_t);
 lean_object* l_Lasm_JS_Web_Support_argsWith(lean_object*, lean_object*);
-lean_object* l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_AbortSignal_abort_spec__0(lean_object*, lean_object*, uint8_t);
+lean_object* l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_Support_typedArray_spec__0(lean_object*, lean_object*, uint8_t);
 lean_object* l_Lasm_JS_Function_ofSyncFn(lean_object*);
 lean_object* l_Lasm_JS_Function_ofFn(lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Web_TimerHandler_ctorIdx(lean_object*);
@@ -1523,7 +1523,7 @@ v___x_432_ = ((size_t)0ULL);
 v___x_433_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Web_setTimeout_spec__1(v_sz_431_, v___x_432_, v_arguments_420_);
 v___x_434_ = l_Lasm_JS_Web_Support_argsWith(v___x_430_, v___x_433_);
 lean_dec_ref(v___x_433_);
-v___x_435_ = l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_AbortSignal_abort_spec__0(v___x_423_, v___x_434_, v___x_422_);
+v___x_435_ = l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_Support_typedArray_spec__0(v___x_423_, v___x_434_, v___x_422_);
 if (lean_obj_tag(v___x_435_) == 0)
 {
 lean_object* v_a_436_; lean_object* v___x_437_; 
@@ -1901,7 +1901,7 @@ v___x_567_ = ((size_t)0ULL);
 v___x_568_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Web_setTimeout_spec__1(v_sz_566_, v___x_567_, v_arguments_555_);
 v___x_569_ = l_Lasm_JS_Web_Support_argsWith(v___x_565_, v___x_568_);
 lean_dec_ref(v___x_568_);
-v___x_570_ = l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_AbortSignal_abort_spec__0(v___x_558_, v___x_569_, v___x_557_);
+v___x_570_ = l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_Support_typedArray_spec__0(v___x_558_, v___x_569_, v___x_557_);
 if (lean_obj_tag(v___x_570_) == 0)
 {
 lean_object* v_a_571_; lean_object* v___x_572_; 
