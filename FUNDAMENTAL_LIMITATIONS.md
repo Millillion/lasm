@@ -111,7 +111,7 @@ enough:
 | WASI on `node:wasi` (Node 26) | 3,914 | V8's stack |
 | Edge output on Deno 2.9.6 | 3,914 | V8's stack |
 | Edge output on Node's V8 (the engine of Workers, the Vercel and Netlify edge, Chromium) | 3,768 | V8's stack |
-| Edge output on Bun 1.4.4 | 4,254 (varies between runs) | JavaScriptCore's stack |
+| Edge output on Bun 1.4.4 | 4,011 to 4,254 (varies between runs) | JavaScriptCore's stack |
 | Edge output on SpiderMonkey 158 (Firefox's engine) | 3,233 | SpiderMonkey's stack (`too much recursion`) |
 
 The C stack (1 MiB in linear memory on the edge, 8 MiB on WASI) is never what

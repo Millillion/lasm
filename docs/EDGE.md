@@ -342,7 +342,7 @@ empty.
 - **`repr` of a large value** reaches that limit first: Lean's formatter
   recurses about twice per element, so `repr` of an `Array Int` prints at most
   3,768 elements on V8 (Workers, Vercel, Netlify, Chromium), 3,914 on Deno,
-  4,254 on Bun and 3,233 on SpiderMonkey (Firefox), measured 2026-11-10. The
+  4,011 to 4,254 on Bun and 3,233 on SpiderMonkey (Firefox), measured 2026-11-10. The
   engine's stack stops it, not the 1 MiB C stack, so a larger C stack would not
   help. `toString` is iterative and prints 100,000 elements
   ([FUNDAMENTAL_LIMITATIONS.md](../FUNDAMENTAL_LIMITATIONS.md#printing-a-large-value-with-repr-issue-179)).
