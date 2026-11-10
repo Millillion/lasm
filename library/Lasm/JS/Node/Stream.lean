@@ -78,25 +78,25 @@ instance : ToJS stream.Writable.FromWebOptions := ⟨fun d => Support.fields #[(
     ("objectMode", Support.optional d.objectMode),
     ("signal", Support.optional d.signal)]⟩
 
-/-- `stream.Readable.fromWeb(readableStream[, options])`: `static stream.Readable fromWeb(ReadableStream readableStream, optional stream.Readable.FromWebOptions options)` -/
+/-- `stream.Readable.fromWeb(readableStream[, options])` (added in Node.js v17.0.0): `static stream.Readable fromWeb(ReadableStream readableStream, optional stream.Readable.FromWebOptions options)` -/
 def stream.Readable.fromWeb (readableStream : ReadableStream) (options : Option stream.Readable.FromWebOptions := none) : IO stream.Readable := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Readable.fromWeb", module := "node:stream", path := "Readable.fromWeb", construct := false, arity := 2 }
     (Support.args #[toJS readableStream, Support.optional options]) (await := false)
   pure { val := r }
 
-/-- `stream.Readable.toWeb(streamReadable[, options])`: `static ReadableStream toWeb(stream.Readable streamReadable, optional stream.Readable.ToWebOptions options)` -/
+/-- `stream.Readable.toWeb(streamReadable[, options])` (added in Node.js v17.0.0): `static ReadableStream toWeb(stream.Readable streamReadable, optional stream.Readable.ToWebOptions options)` -/
 def stream.Readable.toWeb (streamReadable : stream.Readable) (options : Option stream.Readable.ToWebOptions := none) : IO ReadableStream := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Readable.toWeb", module := "node:stream", path := "Readable.toWeb", construct := false, arity := 2 }
     (Support.args #[toJS streamReadable, Support.optional options]) (await := false)
   pure { val := r }
 
-/-- `stream.Writable.fromWeb(writableStream[, options])`: `static stream.Writable fromWeb(WritableStream writableStream, optional stream.Writable.FromWebOptions options)` -/
+/-- `stream.Writable.fromWeb(writableStream[, options])` (added in Node.js v17.0.0): `static stream.Writable fromWeb(WritableStream writableStream, optional stream.Writable.FromWebOptions options)` -/
 def stream.Writable.fromWeb (writableStream : WritableStream) (options : Option stream.Writable.FromWebOptions := none) : IO stream.Writable := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Writable.fromWeb", module := "node:stream", path := "Writable.fromWeb", construct := false, arity := 2 }
     (Support.args #[toJS writableStream, Support.optional options]) (await := false)
   pure { val := r }
 
-/-- `stream.Writable.toWeb(streamWritable)`: `static WritableStream toWeb(stream.Writable streamWritable)` -/
+/-- `stream.Writable.toWeb(streamWritable)` (added in Node.js v17.0.0): `static WritableStream toWeb(stream.Writable streamWritable)` -/
 def stream.Writable.toWeb (streamWritable : stream.Writable) : IO WritableStream := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Writable.toWeb", module := "node:stream", path := "Writable.toWeb", construct := false, arity := 1 }
     (Support.args #[toJS streamWritable]) (await := false)

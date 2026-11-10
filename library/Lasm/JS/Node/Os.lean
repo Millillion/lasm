@@ -18,116 +18,116 @@ structure os.UserInfoOptions where
   encoding : Option String := none
 instance : ToJS os.UserInfoOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
 
-/-- `os.EOL`: `readonly attribute DOMString EOL` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.EOL` (added in Node.js v0.7.8): `readonly attribute DOMString EOL` (Node.js 24.22.2 documentation, os.md) -/
 def os.EOL : IO String := Support.getExport "node:os" ["EOL"] String
 
-/-- `os.constants`: `readonly attribute object constants` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.constants` (added in Node.js v6.3.0): `readonly attribute object constants` (Node.js 24.22.2 documentation, os.md) -/
 def os.constants : IO Data := Support.getExport "node:os" ["constants"] Data
 
-/-- `os.devNull`: `readonly attribute DOMString devNull` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.devNull` (added in Node.js v16.3.0, v14.18.0): `readonly attribute DOMString devNull` (Node.js 24.22.2 documentation, os.md) -/
 def os.devNull : IO String := Support.getExport "node:os" ["devNull"] String
 
-/-- `os.availableParallelism()`: `long long availableParallelism()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.availableParallelism()` (added in Node.js v19.4.0, v18.14.0): `long long availableParallelism()` (Node.js 24.22.2 documentation, os.md) -/
 def os.availableParallelism : IO Int :=
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.os.availableParallelism", module := "node:os", path := "availableParallelism", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.arch()`: `DOMString arch()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.arch()` (added in Node.js v0.5.0): `DOMString arch()` (Node.js 24.22.2 documentation, os.md) -/
 def os.arch : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.os.arch", module := "node:os", path := "arch", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.cpus()`: `sequence<object> cpus()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.cpus()` (added in Node.js v0.3.3): `sequence<object> cpus()` (Node.js 24.22.2 documentation, os.md) -/
 def os.cpus : IO (Array Data) :=
   Lasm.JS.Binding.invoke (Array Data) { name := "Lasm.JS.Node.os.cpus", module := "node:os", path := "cpus", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.endianness()`: `DOMString endianness()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.endianness()` (added in Node.js v0.9.4): `DOMString endianness()` (Node.js 24.22.2 documentation, os.md) -/
 def os.endianness : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.os.endianness", module := "node:os", path := "endianness", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.freemem()`: `long long freemem()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.freemem()` (added in Node.js v0.3.3): `long long freemem()` (Node.js 24.22.2 documentation, os.md) -/
 def os.freemem : IO Int :=
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.os.freemem", module := "node:os", path := "freemem", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.getPriority([pid])`: `long long getPriority(optional long long pid)` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.getPriority([pid])` (added in Node.js v10.10.0): `long long getPriority(optional long long pid)` (Node.js 24.22.2 documentation, os.md) -/
 def os.getPriority (pid : Option Int := none) : IO Int :=
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.os.getPriority", module := "node:os", path := "getPriority", construct := false, arity := 1 }
     (Support.args #[Support.optional pid]) (await := false)
 
-/-- `os.homedir()`: `DOMString homedir()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.homedir()` (added in Node.js v2.3.0): `DOMString homedir()` (Node.js 24.22.2 documentation, os.md) -/
 def os.homedir : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.os.homedir", module := "node:os", path := "homedir", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.hostname()`: `DOMString hostname()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.hostname()` (added in Node.js v0.3.3): `DOMString hostname()` (Node.js 24.22.2 documentation, os.md) -/
 def os.hostname : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.os.hostname", module := "node:os", path := "hostname", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.loadavg()`: `sequence<double> loadavg()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.loadavg()` (added in Node.js v0.3.3): `sequence<double> loadavg()` (Node.js 24.22.2 documentation, os.md) -/
 def os.loadavg : IO (Array Float) :=
   Lasm.JS.Binding.invoke (Array Float) { name := "Lasm.JS.Node.os.loadavg", module := "node:os", path := "loadavg", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.machine()`: `DOMString machine()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.machine()` (added in Node.js v18.9.0, v16.18.0): `DOMString machine()` (Node.js 24.22.2 documentation, os.md) -/
 def os.machine : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.os.machine", module := "node:os", path := "machine", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.networkInterfaces()`: `object networkInterfaces()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.networkInterfaces()` (added in Node.js v0.6.0): `object networkInterfaces()` (Node.js 24.22.2 documentation, os.md) -/
 def os.networkInterfaces : IO Data :=
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.os.networkInterfaces", module := "node:os", path := "networkInterfaces", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.platform()`: `DOMString platform()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.platform()` (added in Node.js v0.5.0): `DOMString platform()` (Node.js 24.22.2 documentation, os.md) -/
 def os.platform : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.os.platform", module := "node:os", path := "platform", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.release()`: `DOMString release()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.release()` (added in Node.js v0.3.3): `DOMString release()` (Node.js 24.22.2 documentation, os.md) -/
 def os.release : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.os.release", module := "node:os", path := "release", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.setPriority([pid, ]priority)`: `undefined setPriority(long long priority)` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.setPriority([pid, ]priority)` (added in Node.js v10.10.0): `undefined setPriority(long long priority)` (Node.js 24.22.2 documentation, os.md) -/
 def os.setPriority (priority : Int) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.os.setPriority", module := "node:os", path := "setPriority", construct := false, arity := 1 }
     (Support.args #[toJS priority]) (await := false)
 
-/-- `os.setPriority([pid, ]priority)`: `undefined setPriority(long long pid, long long priority)` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.setPriority([pid, ]priority)` (added in Node.js v10.10.0): `undefined setPriority(long long pid, long long priority)` (Node.js 24.22.2 documentation, os.md) -/
 def os.setPriorityWithPid (pid : Int) (priority : Int) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.os.setPriorityWithPid", module := "node:os", path := "setPriority", construct := false, arity := 2 }
     (Support.args #[toJS pid, toJS priority]) (await := false)
 
-/-- `os.tmpdir()`: `DOMString tmpdir()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.tmpdir()` (added in Node.js v0.9.9): `DOMString tmpdir()` (Node.js 24.22.2 documentation, os.md) -/
 def os.tmpdir : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.os.tmpdir", module := "node:os", path := "tmpdir", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.totalmem()`: `long long totalmem()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.totalmem()` (added in Node.js v0.3.3): `long long totalmem()` (Node.js 24.22.2 documentation, os.md) -/
 def os.totalmem : IO Int :=
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.os.totalmem", module := "node:os", path := "totalmem", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.type()`: `DOMString type()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.type()` (added in Node.js v0.3.3): `DOMString type()` (Node.js 24.22.2 documentation, os.md) -/
 def os.type : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.os.type", module := "node:os", path := "type", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.uptime()`: `double uptime()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.uptime()` (added in Node.js v0.3.3): `double uptime()` (Node.js 24.22.2 documentation, os.md) -/
 def os.uptime : IO Float :=
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.os.uptime", module := "node:os", path := "uptime", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `os.userInfo([options])`: `object userInfo(optional os.UserInfoOptions options)` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.userInfo([options])` (added in Node.js v6.0.0): `object userInfo(optional os.UserInfoOptions options)` (Node.js 24.22.2 documentation, os.md) -/
 def os.userInfo (options : Option os.UserInfoOptions := none) : IO Data :=
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.os.userInfo", module := "node:os", path := "userInfo", construct := false, arity := 1 }
     (Support.args #[Support.optional options]) (await := false)
 
-/-- `os.version()`: `DOMString version()` (Node.js 24.22.2 documentation, os.md) -/
+/-- `os.version()` (added in Node.js v13.11.0, v12.17.0): `DOMString version()` (Node.js 24.22.2 documentation, os.md) -/
 def os.version : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.os.version", module := "node:os", path := "version", construct := false, arity := 0 }
     (Support.args #[]) (await := false)

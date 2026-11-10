@@ -159,6 +159,8 @@ function lowerType(typeText, ctx) {
 // ---------- lowering ----------
 
 const capital = s => s[0].toUpperCase() + s.slice(1);
+/** The Node versions the docs say added a member (`meta.added`: the release line's first and its backports), as an attribute. */
+const addedOf = node => node.meta?.added?.length ? `LasmAdded="${node.meta.added.join(', ')}"` : null;
 /** A member's documented signature (`fsPromises.readFile(path[, options])`), for its doc comment. */
 const signatureOf = node => (/`([^`]+)`/.exec(node.textRaw)?.[1] ?? node.textRaw).replace(/"/g, "'");
 /** WebIDL keywords are escaped with a leading underscore where a name is expected (`boolean _bigint`). */
@@ -247,7 +249,7 @@ function lowerContainer(doc, all, mod, c, out) {
     const comment = `  // ${m.node.textRaw.replace(/\s+/g, ' ').slice(0, 200)} [${doc}.md]`;
     if (m.kind === 'properties') {
       const type = p?.returns ? proseType(p.returns) : lowerType(docType(m.node), { where: `${where} ${m.name}` });
-      lines.push(comment, `  [LasmSignature="${docName}"] ${c.kind === 'namespace' ? '' : m.isStatic ? 'static ' : ''}readonly attribute ${type} ${escapeName(m.name)};`);
+      lines.push(comment, `  [${[`LasmSignature="${docName}"`, addedOf(m.node)].filter(Boolean).join(', ')}] ${c.kind === 'namespace' ? '' : m.isStatic ? 'static ' : ''}readonly attribute ${type} ${escapeName(m.name)};`);
       continue;
     }
     const s = m.node.signatures?.[0];
@@ -309,7 +311,7 @@ function lowerContainer(doc, all, mod, c, out) {
       // WebIDL reserves `toString` (and a few others) as identifiers: such a member is written `toString_`, named by LasmName.
       const reserved = ['toString', 'constructor', 'toJSON', 'prototype'].includes(m.name);
       const attrs = [promisify ? 'LasmPromisify' : null, c.kind === 'bytes' && !m.isStatic ? 'LasmBytesThis' : null,
-        reserved ? `LasmName="${m.name}"` : null, `LasmSignature="${signatureOf(m.node)}"`].filter(Boolean);
+        reserved ? `LasmName="${m.name}"` : null, `LasmSignature="${signatureOf(m.node)}"`, addedOf(m.node)].filter(Boolean);
       lines.push(comment, `  ${attrs.length ? `[${attrs.join(', ')}] ` : ''}${c.kind !== 'namespace' && m.isStatic ? 'static ' : ''}${ret} ${m.name}${reserved ? '_' : ''}(${args.join(', ')});`);
     }
     void lastRequired;

@@ -7,228 +7,228 @@
 [LasmModule="node:events", LasmLeanModule="Events", LasmDoc="events", LasmName="events"]
 namespace events {
   // `events.once(emitter, name[, options])` [events.md]
-  [LasmSignature="events.once(emitter, name[, options])"] Promise<sequence<any>> once(Node_EventEmitter emitter, (DOMString or symbol) name, optional Node_events_OnceOptions options);
+  [LasmSignature="events.once(emitter, name[, options])", LasmAdded="v11.13.0, v10.16.0"] Promise<sequence<any>> once(Node_EventEmitter emitter, (DOMString or symbol) name, optional Node_events_OnceOptions options);
 };
 
 // Class: `EventEmitter` (events.md), node:events
 [LasmModule="node:events", LasmPath="EventEmitter", LasmLeanModule="Events", LasmDoc="events", LasmName="EventEmitter"]
 interface Node_EventEmitter {
   // `emitter.emit(eventName[, ...args])` [events.md]
-  [LasmSignature="emitter.emit(eventName[, ...args])"] boolean emit((DOMString or symbol) eventName, any... args);
+  [LasmSignature="emitter.emit(eventName[, ...args])", LasmAdded="v0.1.26"] boolean emit((DOMString or symbol) eventName, any... args);
   // `emitter.eventNames()` [events.md]
-  [LasmSignature="emitter.eventNames()"] (sequence<DOMString> or sequence<symbol>) eventNames();
+  [LasmSignature="emitter.eventNames()", LasmAdded="v6.0.0"] (sequence<DOMString> or sequence<symbol>) eventNames();
   // `emitter.listenerCount(eventName[, listener])` [events.md]
-  [LasmSignature="emitter.listenerCount(eventName[, listener])"] long long listenerCount((DOMString or symbol) eventName, optional Function listener);
+  [LasmSignature="emitter.listenerCount(eventName[, listener])", LasmAdded="v3.2.0"] long long listenerCount((DOMString or symbol) eventName, optional Function listener);
   // `emitter.off(eventName, listener)` [events.md]
-  [LasmSignature="emitter.off(eventName, listener)"] Node_EventEmitter off((DOMString or symbol) eventName, Function listener);
+  [LasmSignature="emitter.off(eventName, listener)", LasmAdded="v10.0.0"] Node_EventEmitter off((DOMString or symbol) eventName, Function listener);
   // `emitter.on(eventName, listener)` [events.md]
-  [LasmSignature="emitter.on(eventName, listener)"] Node_EventEmitter on((DOMString or symbol) eventName, Function listener);
+  [LasmSignature="emitter.on(eventName, listener)", LasmAdded="v0.1.101"] Node_EventEmitter on((DOMString or symbol) eventName, Function listener);
   // `emitter.once(eventName, listener)` [events.md]
-  [LasmSignature="emitter.once(eventName, listener)"] Node_EventEmitter once((DOMString or symbol) eventName, Function listener);
+  [LasmSignature="emitter.once(eventName, listener)", LasmAdded="v0.3.0"] Node_EventEmitter once((DOMString or symbol) eventName, Function listener);
   // `emitter.removeAllListeners([eventName])` [events.md]
-  [LasmSignature="emitter.removeAllListeners([eventName])"] Node_EventEmitter removeAllListeners(optional (DOMString or symbol) eventName);
+  [LasmSignature="emitter.removeAllListeners([eventName])", LasmAdded="v0.1.26"] Node_EventEmitter removeAllListeners(optional (DOMString or symbol) eventName);
 };
 
 // Stream (stream.md), node:stream
 [LasmModule="node:stream", LasmPath="Readable", LasmLeanModule="Stream", LasmDoc="stream", LasmNamespace="stream", LasmName="Readable"]
 interface Node_stream_Readable {
   // `stream.Readable.fromWeb(readableStream[, options])` [stream.md]
-  [LasmSignature="stream.Readable.fromWeb(readableStream[, options])"] static Node_stream_Readable fromWeb(ReadableStream readableStream, optional Node_stream_Readable_FromWebOptions options);
+  [LasmSignature="stream.Readable.fromWeb(readableStream[, options])", LasmAdded="v17.0.0"] static Node_stream_Readable fromWeb(ReadableStream readableStream, optional Node_stream_Readable_FromWebOptions options);
   // `stream.Readable.toWeb(streamReadable[, options])` [stream.md]
-  [LasmSignature="stream.Readable.toWeb(streamReadable[, options])"] static ReadableStream toWeb(Node_stream_Readable streamReadable, optional Node_stream_Readable_ToWebOptions options);
+  [LasmSignature="stream.Readable.toWeb(streamReadable[, options])", LasmAdded="v17.0.0"] static ReadableStream toWeb(Node_stream_Readable streamReadable, optional Node_stream_Readable_ToWebOptions options);
 };
 
 // Stream (stream.md), node:stream
 [LasmModule="node:stream", LasmPath="Writable", LasmLeanModule="Stream", LasmDoc="stream", LasmNamespace="stream", LasmName="Writable"]
 interface Node_stream_Writable {
   // `stream.Writable.fromWeb(writableStream[, options])` [stream.md]
-  [LasmSignature="stream.Writable.fromWeb(writableStream[, options])"] static Node_stream_Writable fromWeb(WritableStream writableStream, optional Node_stream_Writable_FromWebOptions options);
+  [LasmSignature="stream.Writable.fromWeb(writableStream[, options])", LasmAdded="v17.0.0"] static Node_stream_Writable fromWeb(WritableStream writableStream, optional Node_stream_Writable_FromWebOptions options);
   // `stream.Writable.toWeb(streamWritable)` [stream.md]
-  [LasmSignature="stream.Writable.toWeb(streamWritable)"] static WritableStream toWeb(Node_stream_Writable streamWritable);
+  [LasmSignature="stream.Writable.toWeb(streamWritable)", LasmAdded="v17.0.0"] static WritableStream toWeb(Node_stream_Writable streamWritable);
 };
 
 // Class: `Buffer` (buffer.md), node:buffer
 [LasmModule="node:buffer", LasmPath="Buffer", LasmLeanModule="Buffer", LasmDoc="buffer", LasmName="Buffer", LasmNoHandle]
 interface Node_Buffer {
   // `buf.compare(target[, targetStart[, targetEnd[, sourceStart[, sourceEnd]]]])` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.compare(target[, targetStart[, targetEnd[, sourceStart[, sourceEnd]]]])"] long long compare(Uint8Array target, optional long long targetStart, optional long long targetEnd, optional long long sourceStart, optional long long sourceEnd);
+  [LasmBytesThis, LasmSignature="buf.compare(target[, targetStart[, targetEnd[, sourceStart[, sourceEnd]]]])", LasmAdded="v0.11.13"] long long compare(Uint8Array target, optional long long targetStart, optional long long targetEnd, optional long long sourceStart, optional long long sourceEnd);
   // `buf.equals(otherBuffer)` [buffer.md]
-  [LasmBytesThis, LasmSignature="buf.equals(otherBuffer)"] boolean equals(Uint8Array otherBuffer);
+  [LasmBytesThis, LasmSignature="buf.equals(otherBuffer)", LasmAdded="v0.11.13"] boolean equals(Uint8Array otherBuffer);
   // `buf.toString([encoding[, start[, end]]])` [buffer.md]
-  [LasmBytesThis, LasmName="toString", LasmSignature="buf.toString([encoding[, start[, end]]])"] DOMString toString_(optional DOMString encoding, optional long long start, optional long long end);
+  [LasmBytesThis, LasmName="toString", LasmSignature="buf.toString([encoding[, start[, end]]])", LasmAdded="v0.1.90"] DOMString toString_(optional DOMString encoding, optional long long start, optional long long end);
   // Static method: `Buffer.alloc(size[, fill[, encoding]])` [buffer.md]
-  [LasmSignature="Buffer.alloc(size[, fill[, encoding]])"] static Uint8Array alloc(long long size, optional (DOMString or Uint8Array or long long) fill, optional DOMString encoding);
+  [LasmSignature="Buffer.alloc(size[, fill[, encoding]])", LasmAdded="v5.10.0"] static Uint8Array alloc(long long size, optional (DOMString or Uint8Array or long long) fill, optional DOMString encoding);
   // Static method: `Buffer.byteLength(string[, encoding])` [buffer.md]
-  [LasmSignature="Buffer.byteLength(string[, encoding])"] static long long byteLength((DOMString or Uint8Array) string, optional DOMString encoding);
+  [LasmSignature="Buffer.byteLength(string[, encoding])", LasmAdded="v0.1.90"] static long long byteLength((DOMString or Uint8Array) string, optional DOMString encoding);
   // Static method: `Buffer.compare(buf1, buf2)` [buffer.md]
-  [LasmSignature="Buffer.compare(buf1, buf2)"] static long long compare(Uint8Array buf1, Uint8Array buf2);
+  [LasmSignature="Buffer.compare(buf1, buf2)", LasmAdded="v0.11.13"] static long long compare(Uint8Array buf1, Uint8Array buf2);
   // Static method: `Buffer.concat(list[, totalLength])` [buffer.md]
-  [LasmSignature="Buffer.concat(list[, totalLength])"] static Uint8Array concat(sequence<Uint8Array> list, optional long long totalLength);
+  [LasmSignature="Buffer.concat(list[, totalLength])", LasmAdded="v0.7.11"] static Uint8Array concat(sequence<Uint8Array> list, optional long long totalLength);
   // Static method: `Buffer.from(string[, encoding])` [buffer.md]
-  [LasmSignature="Buffer.from(string[, encoding])"] static Uint8Array from(DOMString string, optional DOMString encoding);
+  [LasmSignature="Buffer.from(string[, encoding])", LasmAdded="v5.10.0"] static Uint8Array from(DOMString string, optional DOMString encoding);
   // Static method: `Buffer.isEncoding(encoding)` [buffer.md]
-  [LasmSignature="Buffer.isEncoding(encoding)"] static boolean isEncoding(DOMString encoding);
+  [LasmSignature="Buffer.isEncoding(encoding)", LasmAdded="v0.9.1"] static boolean isEncoding(DOMString encoding);
 };
 
 // `node:buffer` module APIs (buffer.md), node:buffer
 [LasmModule="node:buffer", LasmLeanModule="Buffer", LasmDoc="buffer", LasmName="buffer"]
 namespace buffer {
   // `buffer.isAscii(input)` [buffer.md]
-  [LasmSignature="buffer.isAscii(input)"] boolean isAscii(Uint8Array input);
+  [LasmSignature="buffer.isAscii(input)", LasmAdded="v19.6.0, v18.15.0"] boolean isAscii(Uint8Array input);
   // `buffer.isUtf8(input)` [buffer.md]
-  [LasmSignature="buffer.isUtf8(input)"] boolean isUtf8(Uint8Array input);
+  [LasmSignature="buffer.isUtf8(input)", LasmAdded="v19.4.0, v18.14.0"] boolean isUtf8(Uint8Array input);
   // `buffer.transcode(source, fromEnc, toEnc)` [buffer.md]
-  [LasmSignature="buffer.transcode(source, fromEnc, toEnc)"] Uint8Array transcode(Uint8Array source, DOMString fromEnc, DOMString toEnc);
+  [LasmSignature="buffer.transcode(source, fromEnc, toEnc)", LasmAdded="v7.1.0"] Uint8Array transcode(Uint8Array source, DOMString fromEnc, DOMString toEnc);
   // `kMaxLength` Type: {integer} The largest size allowed for a single `Buffer` instance. [buffer.md]
-  [LasmSignature="buffer.kMaxLength"] readonly attribute long long kMaxLength;
+  [LasmSignature="buffer.kMaxLength", LasmAdded="v3.0.0"] readonly attribute long long kMaxLength;
   // `kStringMaxLength` Type: {integer} The largest length allowed for a single `string` instance. [buffer.md]
-  [LasmSignature="buffer.kStringMaxLength"] readonly attribute long long kStringMaxLength;
+  [LasmSignature="buffer.kStringMaxLength", LasmAdded="v3.0.0"] readonly attribute long long kStringMaxLength;
 };
 
 // Path (path.md), node:path
 [LasmModule="node:path", LasmLeanModule="Path", LasmDoc="path", LasmName="path"]
 namespace path {
   // `path.basename(path[, suffix])` [path.md]
-  [LasmSignature="path.basename(path[, suffix])"] DOMString basename(DOMString path, optional DOMString suffix);
+  [LasmSignature="path.basename(path[, suffix])", LasmAdded="v0.1.25"] DOMString basename(DOMString path, optional DOMString suffix);
   // `path.dirname(path)` [path.md]
-  [LasmSignature="path.dirname(path)"] DOMString dirname(DOMString path);
+  [LasmSignature="path.dirname(path)", LasmAdded="v0.1.16"] DOMString dirname(DOMString path);
   // `path.extname(path)` [path.md]
-  [LasmSignature="path.extname(path)"] DOMString extname(DOMString path);
+  [LasmSignature="path.extname(path)", LasmAdded="v0.1.25"] DOMString extname(DOMString path);
   // `path.format(pathObject)` [path.md]
-  [LasmSignature="path.format(pathObject)"] DOMString format(Node_path_PathObject pathObject);
+  [LasmSignature="path.format(pathObject)", LasmAdded="v0.11.15"] DOMString format(Node_path_PathObject pathObject);
   // `path.matchesGlob(path, pattern)` [path.md]
-  [LasmSignature="path.matchesGlob(path, pattern)"] boolean matchesGlob(DOMString path, DOMString pattern);
+  [LasmSignature="path.matchesGlob(path, pattern)", LasmAdded="v22.5.0, v20.17.0"] boolean matchesGlob(DOMString path, DOMString pattern);
   // `path.isAbsolute(path)` [path.md]
-  [LasmSignature="path.isAbsolute(path)"] boolean isAbsolute(DOMString path);
+  [LasmSignature="path.isAbsolute(path)", LasmAdded="v0.11.2"] boolean isAbsolute(DOMString path);
   // `path.join([...paths])` [path.md]
-  [LasmSignature="path.join([...paths])"] DOMString join(DOMString... paths);
+  [LasmSignature="path.join([...paths])", LasmAdded="v0.1.16"] DOMString join(DOMString... paths);
   // `path.normalize(path)` [path.md]
-  [LasmSignature="path.normalize(path)"] DOMString normalize(DOMString path);
+  [LasmSignature="path.normalize(path)", LasmAdded="v0.1.23"] DOMString normalize(DOMString path);
   // `path.parse(path)` [path.md]
-  [LasmSignature="path.parse(path)"] Node_path_PathObject parse(DOMString path);
+  [LasmSignature="path.parse(path)", LasmAdded="v0.11.15"] Node_path_PathObject parse(DOMString path);
   // `path.relative(from, to)` [path.md]
-  [LasmSignature="path.relative(from, to)"] DOMString relative(DOMString from, DOMString to);
+  [LasmSignature="path.relative(from, to)", LasmAdded="v0.5.0"] DOMString relative(DOMString from, DOMString to);
   // `path.resolve([...paths])` [path.md]
-  [LasmSignature="path.resolve([...paths])"] DOMString resolve(DOMString... paths);
+  [LasmSignature="path.resolve([...paths])", LasmAdded="v0.3.4"] DOMString resolve(DOMString... paths);
   // `path.toNamespacedPath(path)` [path.md]
-  [LasmSignature="path.toNamespacedPath(path)"] DOMString toNamespacedPath(DOMString path);
+  [LasmSignature="path.toNamespacedPath(path)", LasmAdded="v9.0.0"] DOMString toNamespacedPath(DOMString path);
   // `delimiter` Type: {string} [path.md]
-  [LasmSignature="path.delimiter"] readonly attribute DOMString delimiter;
+  [LasmSignature="path.delimiter", LasmAdded="v0.9.3"] readonly attribute DOMString delimiter;
   // `sep` Type: {string} [path.md]
-  [LasmSignature="path.sep"] readonly attribute DOMString sep;
+  [LasmSignature="path.sep", LasmAdded="v0.7.9"] readonly attribute DOMString sep;
 };
 
 // OS (os.md), node:os
 [LasmModule="node:os", LasmLeanModule="Os", LasmDoc="os", LasmName="os"]
 namespace os {
   // `os.availableParallelism()` [os.md]
-  [LasmSignature="os.availableParallelism()"] long long availableParallelism();
+  [LasmSignature="os.availableParallelism()", LasmAdded="v19.4.0, v18.14.0"] long long availableParallelism();
   // `os.arch()` [os.md]
-  [LasmSignature="os.arch()"] DOMString arch();
+  [LasmSignature="os.arch()", LasmAdded="v0.5.0"] DOMString arch();
   // `os.cpus()` [os.md]
-  [LasmSignature="os.cpus()"] sequence<object> cpus();
+  [LasmSignature="os.cpus()", LasmAdded="v0.3.3"] sequence<object> cpus();
   // `os.endianness()` [os.md]
-  [LasmSignature="os.endianness()"] DOMString endianness();
+  [LasmSignature="os.endianness()", LasmAdded="v0.9.4"] DOMString endianness();
   // `os.freemem()` [os.md]
-  [LasmSignature="os.freemem()"] long long freemem();
+  [LasmSignature="os.freemem()", LasmAdded="v0.3.3"] long long freemem();
   // `os.getPriority([pid])` [os.md]
-  [LasmSignature="os.getPriority([pid])"] long long getPriority(optional long long pid);
+  [LasmSignature="os.getPriority([pid])", LasmAdded="v10.10.0"] long long getPriority(optional long long pid);
   // `os.homedir()` [os.md]
-  [LasmSignature="os.homedir()"] DOMString homedir();
+  [LasmSignature="os.homedir()", LasmAdded="v2.3.0"] DOMString homedir();
   // `os.hostname()` [os.md]
-  [LasmSignature="os.hostname()"] DOMString hostname();
+  [LasmSignature="os.hostname()", LasmAdded="v0.3.3"] DOMString hostname();
   // `os.loadavg()` [os.md]
-  [LasmSignature="os.loadavg()"] sequence<double> loadavg();
+  [LasmSignature="os.loadavg()", LasmAdded="v0.3.3"] sequence<double> loadavg();
   // `os.machine()` [os.md]
-  [LasmSignature="os.machine()"] DOMString machine();
+  [LasmSignature="os.machine()", LasmAdded="v18.9.0, v16.18.0"] DOMString machine();
   // `os.networkInterfaces()` [os.md]
-  [LasmSignature="os.networkInterfaces()"] object networkInterfaces();
+  [LasmSignature="os.networkInterfaces()", LasmAdded="v0.6.0"] object networkInterfaces();
   // `os.platform()` [os.md]
-  [LasmSignature="os.platform()"] DOMString platform();
+  [LasmSignature="os.platform()", LasmAdded="v0.5.0"] DOMString platform();
   // `os.release()` [os.md]
-  [LasmSignature="os.release()"] DOMString release();
+  [LasmSignature="os.release()", LasmAdded="v0.3.3"] DOMString release();
   // `os.setPriority([pid, ]priority)` [os.md]
-  [LasmSignature="os.setPriority([pid, ]priority)"] undefined setPriority(long long priority);
+  [LasmSignature="os.setPriority([pid, ]priority)", LasmAdded="v10.10.0"] undefined setPriority(long long priority);
   // `os.setPriority([pid, ]priority)` [os.md]
-  [LasmSignature="os.setPriority([pid, ]priority)"] undefined setPriority(long long pid, long long priority);
+  [LasmSignature="os.setPriority([pid, ]priority)", LasmAdded="v10.10.0"] undefined setPriority(long long pid, long long priority);
   // `os.tmpdir()` [os.md]
-  [LasmSignature="os.tmpdir()"] DOMString tmpdir();
+  [LasmSignature="os.tmpdir()", LasmAdded="v0.9.9"] DOMString tmpdir();
   // `os.totalmem()` [os.md]
-  [LasmSignature="os.totalmem()"] long long totalmem();
+  [LasmSignature="os.totalmem()", LasmAdded="v0.3.3"] long long totalmem();
   // `os.type()` [os.md]
-  [LasmSignature="os.type()"] DOMString type();
+  [LasmSignature="os.type()", LasmAdded="v0.3.3"] DOMString type();
   // `os.uptime()` [os.md]
-  [LasmSignature="os.uptime()"] double uptime();
+  [LasmSignature="os.uptime()", LasmAdded="v0.3.3"] double uptime();
   // `os.userInfo([options])` [os.md]
-  [LasmSignature="os.userInfo([options])"] object userInfo(optional Node_os_UserInfoOptions options);
+  [LasmSignature="os.userInfo([options])", LasmAdded="v6.0.0"] object userInfo(optional Node_os_UserInfoOptions options);
   // `os.version()` [os.md]
-  [LasmSignature="os.version()"] DOMString version();
+  [LasmSignature="os.version()", LasmAdded="v13.11.0, v12.17.0"] DOMString version();
   // `EOL` Type: {string} [os.md]
-  [LasmSignature="os.EOL"] readonly attribute DOMString EOL;
+  [LasmSignature="os.EOL", LasmAdded="v0.7.8"] readonly attribute DOMString EOL;
   // `constants` Type: {Object} [os.md]
-  [LasmSignature="os.constants"] readonly attribute object constants;
+  [LasmSignature="os.constants", LasmAdded="v6.3.0"] readonly attribute object constants;
   // `devNull` Type: {string} [os.md]
-  [LasmSignature="os.devNull"] readonly attribute DOMString devNull;
+  [LasmSignature="os.devNull", LasmAdded="v16.3.0, v14.18.0"] readonly attribute DOMString devNull;
 };
 
 // Process (process.md), node:process
 [LasmModule="node:process", LasmLeanModule="Process", LasmDoc="process", LasmName="process"]
 namespace process {
   // `process.chdir(directory)` [process.md]
-  [LasmSignature="process.chdir(directory)"] undefined chdir(DOMString directory);
+  [LasmSignature="process.chdir(directory)", LasmAdded="v0.1.17"] undefined chdir(DOMString directory);
   // `process.cwd()` [process.md]
-  [LasmSignature="process.cwd()"] DOMString cwd();
+  [LasmSignature="process.cwd()", LasmAdded="v0.1.8"] DOMString cwd();
   // `process.exit([code])` [process.md]
-  [LasmSignature="process.exit([code])"] undefined exit(optional (long long or DOMString) code);
+  [LasmSignature="process.exit([code])", LasmAdded="v0.1.13"] undefined exit(optional (long long or DOMString) code);
   // `process.kill(pid[, signal])` [process.md]
-  [LasmSignature="process.kill(pid[, signal])"] undefined kill(double pid, optional (DOMString or double) signal);
+  [LasmSignature="process.kill(pid[, signal])", LasmAdded="v0.0.6"] undefined kill(double pid, optional (DOMString or double) signal);
   // `process.memoryUsage()` [process.md]
-  [LasmSignature="process.memoryUsage()"] object memoryUsage();
+  [LasmSignature="process.memoryUsage()", LasmAdded="v0.1.16"] object memoryUsage();
   // `process.uptime()` [process.md]
-  [LasmSignature="process.uptime()"] double uptime();
+  [LasmSignature="process.uptime()", LasmAdded="v0.5.0"] double uptime();
   // `arch` Type: {string} [process.md]
-  [LasmSignature="process.arch"] readonly attribute DOMString arch;
+  [LasmSignature="process.arch", LasmAdded="v0.5.0"] readonly attribute DOMString arch;
   // `argv` Type: {string\[]} [process.md]
-  [LasmSignature="process.argv"] readonly attribute sequence<DOMString> argv;
+  [LasmSignature="process.argv", LasmAdded="v0.1.27"] readonly attribute sequence<DOMString> argv;
   // `env` Type: {Object} [process.md]
-  [LasmSignature="process.env"] readonly attribute record<DOMString, DOMString> env;
+  [LasmSignature="process.env", LasmAdded="v0.1.27"] readonly attribute record<DOMString, DOMString> env;
   // `execArgv` Type: {string\[]} [process.md]
-  [LasmSignature="process.execArgv"] readonly attribute sequence<DOMString> execArgv;
+  [LasmSignature="process.execArgv", LasmAdded="v0.7.7"] readonly attribute sequence<DOMString> execArgv;
   // `execPath` Type: {string} [process.md]
-  [LasmSignature="process.execPath"] readonly attribute DOMString execPath;
+  [LasmSignature="process.execPath", LasmAdded="v0.1.100"] readonly attribute DOMString execPath;
   // `exitCode` Type: {integer|string|null|undefined} The exit code. For string type, only integer strings (e.g.,'1') are allowed. **Default:** `undefined`. [process.md]
-  [LasmSignature="process.exitCode"] readonly attribute (long long or DOMString)? exitCode;
+  [LasmSignature="process.exitCode", LasmAdded="v0.11.8"] readonly attribute (long long or DOMString)? exitCode;
   // `pid` Type: {integer} [process.md]
-  [LasmSignature="process.pid"] readonly attribute long long pid;
+  [LasmSignature="process.pid", LasmAdded="v0.1.15"] readonly attribute long long pid;
   // `platform` Type: {string} [process.md]
-  [LasmSignature="process.platform"] readonly attribute DOMString platform;
+  [LasmSignature="process.platform", LasmAdded="v0.1.16"] readonly attribute DOMString platform;
   // `ppid` Type: {integer} [process.md]
-  [LasmSignature="process.ppid"] readonly attribute long long ppid;
+  [LasmSignature="process.ppid", LasmAdded="v9.2.0, v8.10.0, v6.13.0"] readonly attribute long long ppid;
   // `title` Type: {string} [process.md]
-  [LasmSignature="process.title"] readonly attribute DOMString title;
+  [LasmSignature="process.title", LasmAdded="v0.1.104"] readonly attribute DOMString title;
   // `version` Type: {string} [process.md]
-  [LasmSignature="process.version"] readonly attribute DOMString version;
+  [LasmSignature="process.version", LasmAdded="v0.1.3"] readonly attribute DOMString version;
   // `versions` Type: {Object} [process.md]
-  [LasmSignature="process.versions"] readonly attribute record<DOMString, DOMString> versions;
+  [LasmSignature="process.versions", LasmAdded="v0.2.0"] readonly attribute record<DOMString, DOMString> versions;
 };
 
 // Class: `fs.Stats` (fs.md), node:fs
 [LasmModule="node:fs", LasmPath="Stats", LasmLeanModule="Fs", LasmDoc="fs", LasmNamespace="fs", LasmName="Stats"]
 interface Node_fs_Stats {
   // `stats.isBlockDevice()` [fs.md]
-  [LasmSignature="stats.isBlockDevice()"] boolean isBlockDevice();
+  [LasmSignature="stats.isBlockDevice()", LasmAdded="v0.1.10"] boolean isBlockDevice();
   // `stats.isCharacterDevice()` [fs.md]
-  [LasmSignature="stats.isCharacterDevice()"] boolean isCharacterDevice();
+  [LasmSignature="stats.isCharacterDevice()", LasmAdded="v0.1.10"] boolean isCharacterDevice();
   // `stats.isDirectory()` [fs.md]
-  [LasmSignature="stats.isDirectory()"] boolean isDirectory();
+  [LasmSignature="stats.isDirectory()", LasmAdded="v0.1.10"] boolean isDirectory();
   // `stats.isFIFO()` [fs.md]
-  [LasmSignature="stats.isFIFO()"] boolean isFIFO();
+  [LasmSignature="stats.isFIFO()", LasmAdded="v0.1.10"] boolean isFIFO();
   // `stats.isFile()` [fs.md]
-  [LasmSignature="stats.isFile()"] boolean isFile();
+  [LasmSignature="stats.isFile()", LasmAdded="v0.1.10"] boolean isFile();
   // `stats.isSocket()` [fs.md]
-  [LasmSignature="stats.isSocket()"] boolean isSocket();
+  [LasmSignature="stats.isSocket()", LasmAdded="v0.1.10"] boolean isSocket();
   // `stats.isSymbolicLink()` [fs.md]
-  [LasmSignature="stats.isSymbolicLink()"] boolean isSymbolicLink();
+  [LasmSignature="stats.isSymbolicLink()", LasmAdded="v0.1.10"] boolean isSymbolicLink();
   // `dev` Type: {number|bigint} [fs.md]
   [LasmSignature="stats.dev"] readonly attribute (double or bigint) dev;
   // `ino` Type: {number|bigint} [fs.md]
@@ -250,233 +250,233 @@ interface Node_fs_Stats {
   // `blocks` Type: {number|bigint} [fs.md]
   [LasmSignature="stats.blocks"] readonly attribute (double or bigint) blocks;
   // `atimeMs` Type: {number|bigint} [fs.md]
-  [LasmSignature="stats.atimeMs"] readonly attribute (double or bigint) atimeMs;
+  [LasmSignature="stats.atimeMs", LasmAdded="v8.1.0"] readonly attribute (double or bigint) atimeMs;
   // `mtimeMs` Type: {number|bigint} [fs.md]
-  [LasmSignature="stats.mtimeMs"] readonly attribute (double or bigint) mtimeMs;
+  [LasmSignature="stats.mtimeMs", LasmAdded="v8.1.0"] readonly attribute (double or bigint) mtimeMs;
   // `ctimeMs` Type: {number|bigint} [fs.md]
-  [LasmSignature="stats.ctimeMs"] readonly attribute (double or bigint) ctimeMs;
+  [LasmSignature="stats.ctimeMs", LasmAdded="v8.1.0"] readonly attribute (double or bigint) ctimeMs;
   // `birthtimeMs` Type: {number|bigint} [fs.md]
-  [LasmSignature="stats.birthtimeMs"] readonly attribute (double or bigint) birthtimeMs;
+  [LasmSignature="stats.birthtimeMs", LasmAdded="v8.1.0"] readonly attribute (double or bigint) birthtimeMs;
   // `atimeNs` Type: {bigint} [fs.md]
-  [LasmSignature="stats.atimeNs"] readonly attribute bigint atimeNs;
+  [LasmSignature="stats.atimeNs", LasmAdded="v12.10.0"] readonly attribute bigint atimeNs;
   // `mtimeNs` Type: {bigint} [fs.md]
-  [LasmSignature="stats.mtimeNs"] readonly attribute bigint mtimeNs;
+  [LasmSignature="stats.mtimeNs", LasmAdded="v12.10.0"] readonly attribute bigint mtimeNs;
   // `ctimeNs` Type: {bigint} [fs.md]
-  [LasmSignature="stats.ctimeNs"] readonly attribute bigint ctimeNs;
+  [LasmSignature="stats.ctimeNs", LasmAdded="v12.10.0"] readonly attribute bigint ctimeNs;
   // `birthtimeNs` Type: {bigint} [fs.md]
-  [LasmSignature="stats.birthtimeNs"] readonly attribute bigint birthtimeNs;
+  [LasmSignature="stats.birthtimeNs", LasmAdded="v12.10.0"] readonly attribute bigint birthtimeNs;
   // `atime` Type: {Date} [fs.md]
-  [LasmSignature="stats.atime"] readonly attribute object atime;
+  [LasmSignature="stats.atime", LasmAdded="v0.11.13"] readonly attribute object atime;
   // `mtime` Type: {Date} [fs.md]
-  [LasmSignature="stats.mtime"] readonly attribute object mtime;
+  [LasmSignature="stats.mtime", LasmAdded="v0.11.13"] readonly attribute object mtime;
   // `ctime` Type: {Date} [fs.md]
-  [LasmSignature="stats.ctime"] readonly attribute object ctime;
+  [LasmSignature="stats.ctime", LasmAdded="v0.11.13"] readonly attribute object ctime;
   // `birthtime` Type: {Date} [fs.md]
-  [LasmSignature="stats.birthtime"] readonly attribute object birthtime;
+  [LasmSignature="stats.birthtime", LasmAdded="v0.11.13"] readonly attribute object birthtime;
 };
 
 // Class: `fs.Dirent` (fs.md), node:fs
 [LasmModule="node:fs", LasmPath="Dirent", LasmLeanModule="Fs", LasmDoc="fs", LasmNamespace="fs", LasmName="Dirent"]
 interface Node_fs_Dirent {
   // `dirent.isBlockDevice()` [fs.md]
-  [LasmSignature="dirent.isBlockDevice()"] boolean isBlockDevice();
+  [LasmSignature="dirent.isBlockDevice()", LasmAdded="v10.10.0"] boolean isBlockDevice();
   // `dirent.isCharacterDevice()` [fs.md]
-  [LasmSignature="dirent.isCharacterDevice()"] boolean isCharacterDevice();
+  [LasmSignature="dirent.isCharacterDevice()", LasmAdded="v10.10.0"] boolean isCharacterDevice();
   // `dirent.isDirectory()` [fs.md]
-  [LasmSignature="dirent.isDirectory()"] boolean isDirectory();
+  [LasmSignature="dirent.isDirectory()", LasmAdded="v10.10.0"] boolean isDirectory();
   // `dirent.isFIFO()` [fs.md]
-  [LasmSignature="dirent.isFIFO()"] boolean isFIFO();
+  [LasmSignature="dirent.isFIFO()", LasmAdded="v10.10.0"] boolean isFIFO();
   // `dirent.isFile()` [fs.md]
-  [LasmSignature="dirent.isFile()"] boolean isFile();
+  [LasmSignature="dirent.isFile()", LasmAdded="v10.10.0"] boolean isFile();
   // `dirent.isSocket()` [fs.md]
-  [LasmSignature="dirent.isSocket()"] boolean isSocket();
+  [LasmSignature="dirent.isSocket()", LasmAdded="v10.10.0"] boolean isSocket();
   // `dirent.isSymbolicLink()` [fs.md]
-  [LasmSignature="dirent.isSymbolicLink()"] boolean isSymbolicLink();
+  [LasmSignature="dirent.isSymbolicLink()", LasmAdded="v10.10.0"] boolean isSymbolicLink();
   // `name` Type: {string|Buffer} [fs.md]
-  [LasmSignature="dirent.name"] readonly attribute (DOMString or Uint8Array) name;
+  [LasmSignature="dirent.name", LasmAdded="v10.10.0"] readonly attribute (DOMString or Uint8Array) name;
   // `parentPath` Type: {string} [fs.md]
-  [LasmSignature="dirent.parentPath"] readonly attribute DOMString parentPath;
+  [LasmSignature="dirent.parentPath", LasmAdded="v21.4.0, v20.12.0, v18.20.0"] readonly attribute DOMString parentPath;
 };
 
 // Class: `FileHandle` (fs.md), node:fs/promises
 [LasmModule="node:fs/promises", LasmLeanModule="Fs", LasmDoc="fs", LasmName="FileHandle"]
 interface Node_FileHandle {
   // `filehandle.appendFile(data[, options])` [fs.md]
-  [LasmSignature="filehandle.appendFile(data[, options])"] Promise<undefined> appendFile((DOMString or Uint8Array or object) data, optional (Node_FileHandle_AppendFileOptions or DOMString) options);
+  [LasmSignature="filehandle.appendFile(data[, options])", LasmAdded="v10.0.0"] Promise<undefined> appendFile((DOMString or Uint8Array or object) data, optional (Node_FileHandle_AppendFileOptions or DOMString) options);
   // `filehandle.chmod(mode)` [fs.md]
-  [LasmSignature="filehandle.chmod(mode)"] Promise<undefined> chmod(long long mode);
+  [LasmSignature="filehandle.chmod(mode)", LasmAdded="v10.0.0"] Promise<undefined> chmod(long long mode);
   // `filehandle.chown(uid, gid)` [fs.md]
-  [LasmSignature="filehandle.chown(uid, gid)"] Promise<undefined> chown(long long uid, long long gid);
+  [LasmSignature="filehandle.chown(uid, gid)", LasmAdded="v10.0.0"] Promise<undefined> chown(long long uid, long long gid);
   // `filehandle.close()` [fs.md]
-  [LasmSignature="filehandle.close()"] Promise<undefined> close();
+  [LasmSignature="filehandle.close()", LasmAdded="v10.0.0"] Promise<undefined> close();
   // `filehandle.datasync()` [fs.md]
-  [LasmSignature="filehandle.datasync()"] Promise<undefined> datasync();
+  [LasmSignature="filehandle.datasync()", LasmAdded="v10.0.0"] Promise<undefined> datasync();
   // `filehandle.read(buffer, offset, length, position)` [fs.md]
-  [LasmSignature="filehandle.read(buffer, offset, length, position)"] Promise<Node_FileHandle_ReadResult> read(Uint8Array buffer, long long offset, long long length, (long long or bigint)? position);
+  [LasmSignature="filehandle.read(buffer, offset, length, position)", LasmAdded="v10.0.0"] Promise<Node_FileHandle_ReadResult> read(Uint8Array buffer, long long offset, long long length, (long long or bigint)? position);
   // `filehandle.read([options])` [fs.md]
-  [LasmSignature="filehandle.read([options])"] Promise<Node_FileHandle_ReadResult> read(optional Node_FileHandle_ReadOptions options);
+  [LasmSignature="filehandle.read([options])", LasmAdded="v13.11.0, v12.17.0"] Promise<Node_FileHandle_ReadResult> read(optional Node_FileHandle_ReadOptions options);
   // `filehandle.read(buffer[, options])` [fs.md]
-  [LasmSignature="filehandle.read(buffer[, options])"] Promise<Node_FileHandle_ReadResult> read(Uint8Array buffer, optional Node_FileHandle_ReadOptions2 options);
+  [LasmSignature="filehandle.read(buffer[, options])", LasmAdded="v18.2.0, v16.17.0"] Promise<Node_FileHandle_ReadResult> read(Uint8Array buffer, optional Node_FileHandle_ReadOptions2 options);
   // `filehandle.readableWebStream([options])` [fs.md]
-  [LasmSignature="filehandle.readableWebStream([options])"] ReadableStream readableWebStream(optional Node_FileHandle_ReadableWebStreamOptions options);
+  [LasmSignature="filehandle.readableWebStream([options])", LasmAdded="v17.0.0"] ReadableStream readableWebStream(optional Node_FileHandle_ReadableWebStreamOptions options);
   // `filehandle.readFile(options)` [fs.md]
-  [LasmSignature="filehandle.readFile(options)"] Promise<(Uint8Array or DOMString)> readFile((Node_FileHandle_ReadFileOptions or DOMString) options);
+  [LasmSignature="filehandle.readFile(options)", LasmAdded="v10.0.0"] Promise<(Uint8Array or DOMString)> readFile((Node_FileHandle_ReadFileOptions or DOMString) options);
   // `filehandle.stat([options])` [fs.md]
-  [LasmSignature="filehandle.stat([options])"] Promise<Node_fs_Stats> stat(optional Node_FileHandle_StatOptions options);
+  [LasmSignature="filehandle.stat([options])", LasmAdded="v10.0.0"] Promise<Node_fs_Stats> stat(optional Node_FileHandle_StatOptions options);
   // `filehandle.sync()` [fs.md]
-  [LasmSignature="filehandle.sync()"] Promise<undefined> sync();
+  [LasmSignature="filehandle.sync()", LasmAdded="v10.0.0"] Promise<undefined> sync();
   // `filehandle.truncate(len)` [fs.md]
-  [LasmSignature="filehandle.truncate(len)"] Promise<undefined> truncate(long long len);
+  [LasmSignature="filehandle.truncate(len)", LasmAdded="v10.0.0"] Promise<undefined> truncate(long long len);
   // `filehandle.utimes(atime, mtime)` [fs.md]
-  [LasmSignature="filehandle.utimes(atime, mtime)"] Promise<undefined> utimes((double or DOMString or object) atime, (double or DOMString or object) mtime);
+  [LasmSignature="filehandle.utimes(atime, mtime)", LasmAdded="v10.0.0"] Promise<undefined> utimes((double or DOMString or object) atime, (double or DOMString or object) mtime);
   // `filehandle.write(buffer, offset[, length[, position]])` [fs.md]
-  [LasmSignature="filehandle.write(buffer, offset[, length[, position]])"] Promise<Node_FileHandle_WriteResult> write(Uint8Array buffer, long long offset, optional long long length, optional long long position);
+  [LasmSignature="filehandle.write(buffer, offset[, length[, position]])", LasmAdded="v10.0.0"] Promise<Node_FileHandle_WriteResult> write(Uint8Array buffer, long long offset, optional long long length, optional long long position);
   // `filehandle.write(buffer[, options])` [fs.md]
-  [LasmSignature="filehandle.write(buffer[, options])"] Promise<Node_FileHandle_WriteResult> write(Uint8Array buffer, optional Node_FileHandle_WriteOptions options);
+  [LasmSignature="filehandle.write(buffer[, options])", LasmAdded="v18.3.0, v16.17.0"] Promise<Node_FileHandle_WriteResult> write(Uint8Array buffer, optional Node_FileHandle_WriteOptions options);
   // `filehandle.write(string[, position[, encoding]])` [fs.md]
-  [LasmSignature="filehandle.write(string[, position[, encoding]])"] Promise<Node_FileHandle_WriteStringResult> write(DOMString string, optional long long position, optional DOMString encoding);
+  [LasmSignature="filehandle.write(string[, position[, encoding]])", LasmAdded="v10.0.0"] Promise<Node_FileHandle_WriteStringResult> write(DOMString string, optional long long position, optional DOMString encoding);
   // `filehandle.writeFile(data, options)` [fs.md]
-  [LasmSignature="filehandle.writeFile(data, options)"] Promise<undefined> writeFile((DOMString or Uint8Array or object) data, (Node_FileHandle_WriteFileOptions or DOMString) options);
+  [LasmSignature="filehandle.writeFile(data, options)", LasmAdded="v10.0.0"] Promise<undefined> writeFile((DOMString or Uint8Array or object) data, (Node_FileHandle_WriteFileOptions or DOMString) options);
   // `fd` Type: {number} The numeric file descriptor managed by the {FileHandle} object. [fs.md]
-  [LasmSignature="filehandle.fd"] readonly attribute double fd;
+  [LasmSignature="filehandle.fd", LasmAdded="v10.0.0"] readonly attribute double fd;
 };
 
 // Promises API (fs.md), node:fs/promises
 [LasmModule="node:fs/promises", LasmLeanModule="Fs", LasmDoc="fs", LasmName="fsPromises"]
 namespace fsPromises {
   // `fsPromises.access(path[, mode])` [fs.md]
-  [LasmSignature="fsPromises.access(path[, mode])"] Promise<undefined> access((DOMString or Uint8Array or URL) path, optional long long mode);
+  [LasmSignature="fsPromises.access(path[, mode])", LasmAdded="v10.0.0"] Promise<undefined> access((DOMString or Uint8Array or URL) path, optional long long mode);
   // `fsPromises.appendFile(path, data[, options])` [fs.md]
-  [LasmSignature="fsPromises.appendFile(path, data[, options])"] Promise<undefined> appendFile((DOMString or Uint8Array or URL or Node_FileHandle) path, (DOMString or Uint8Array or object) data, optional (Node_fsPromises_AppendFileOptions or DOMString) options);
+  [LasmSignature="fsPromises.appendFile(path, data[, options])", LasmAdded="v10.0.0"] Promise<undefined> appendFile((DOMString or Uint8Array or URL or Node_FileHandle) path, (DOMString or Uint8Array or object) data, optional (Node_fsPromises_AppendFileOptions or DOMString) options);
   // `fsPromises.chmod(path, mode)` [fs.md]
-  [LasmSignature="fsPromises.chmod(path, mode)"] Promise<undefined> chmod((DOMString or Uint8Array or URL) path, (DOMString or long long) mode);
+  [LasmSignature="fsPromises.chmod(path, mode)", LasmAdded="v10.0.0"] Promise<undefined> chmod((DOMString or Uint8Array or URL) path, (DOMString or long long) mode);
   // `fsPromises.chown(path, uid, gid)` [fs.md]
-  [LasmSignature="fsPromises.chown(path, uid, gid)"] Promise<undefined> chown((DOMString or Uint8Array or URL) path, long long uid, long long gid);
+  [LasmSignature="fsPromises.chown(path, uid, gid)", LasmAdded="v10.0.0"] Promise<undefined> chown((DOMString or Uint8Array or URL) path, long long uid, long long gid);
   // `fsPromises.copyFile(src, dest[, mode])` [fs.md]
-  [LasmSignature="fsPromises.copyFile(src, dest[, mode])"] Promise<undefined> copyFile((DOMString or Uint8Array or URL) src, (DOMString or Uint8Array or URL) dest, optional long long mode);
+  [LasmSignature="fsPromises.copyFile(src, dest[, mode])", LasmAdded="v10.0.0"] Promise<undefined> copyFile((DOMString or Uint8Array or URL) src, (DOMString or Uint8Array or URL) dest, optional long long mode);
   // `fsPromises.cp(src, dest[, options])` [fs.md]
-  [LasmSignature="fsPromises.cp(src, dest[, options])"] Promise<undefined> cp((DOMString or URL) src, (DOMString or URL) dest, optional Node_fsPromises_CpOptions options);
+  [LasmSignature="fsPromises.cp(src, dest[, options])", LasmAdded="v16.7.0"] Promise<undefined> cp((DOMString or URL) src, (DOMString or URL) dest, optional Node_fsPromises_CpOptions options);
   // `fsPromises.lchown(path, uid, gid)` [fs.md]
-  [LasmSignature="fsPromises.lchown(path, uid, gid)"] Promise<undefined> lchown((DOMString or Uint8Array or URL) path, long long uid, long long gid);
+  [LasmSignature="fsPromises.lchown(path, uid, gid)", LasmAdded="v10.0.0"] Promise<undefined> lchown((DOMString or Uint8Array or URL) path, long long uid, long long gid);
   // `fsPromises.lutimes(path, atime, mtime)` [fs.md]
-  [LasmSignature="fsPromises.lutimes(path, atime, mtime)"] Promise<undefined> lutimes((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime);
+  [LasmSignature="fsPromises.lutimes(path, atime, mtime)", LasmAdded="v14.5.0, v12.19.0"] Promise<undefined> lutimes((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime);
   // `fsPromises.link(existingPath, newPath)` [fs.md]
-  [LasmSignature="fsPromises.link(existingPath, newPath)"] Promise<undefined> link((DOMString or Uint8Array or URL) existingPath, (DOMString or Uint8Array or URL) newPath);
+  [LasmSignature="fsPromises.link(existingPath, newPath)", LasmAdded="v10.0.0"] Promise<undefined> link((DOMString or Uint8Array or URL) existingPath, (DOMString or Uint8Array or URL) newPath);
   // `fsPromises.lstat(path[, options])` [fs.md]
-  [LasmSignature="fsPromises.lstat(path[, options])"] Promise<Node_fs_Stats> lstat((DOMString or Uint8Array or URL) path, optional Node_fsPromises_LstatOptions options);
+  [LasmSignature="fsPromises.lstat(path[, options])", LasmAdded="v10.0.0"] Promise<Node_fs_Stats> lstat((DOMString or Uint8Array or URL) path, optional Node_fsPromises_LstatOptions options);
   // `fsPromises.mkdir(path[, options])` [fs.md]
-  [LasmSignature="fsPromises.mkdir(path[, options])"] Promise<DOMString?> mkdir((DOMString or Uint8Array or URL) path, optional (Node_fsPromises_MkdirOptions or long long) options);
+  [LasmSignature="fsPromises.mkdir(path[, options])", LasmAdded="v10.0.0"] Promise<DOMString?> mkdir((DOMString or Uint8Array or URL) path, optional (Node_fsPromises_MkdirOptions or long long) options);
   // `fsPromises.mkdtemp(prefix[, options])` [fs.md]
-  [LasmSignature="fsPromises.mkdtemp(prefix[, options])"] Promise<(DOMString or Uint8Array)> mkdtemp((DOMString or Uint8Array or URL) prefix, optional (DOMString or Node_fsPromises_MkdtempOptions) options);
+  [LasmSignature="fsPromises.mkdtemp(prefix[, options])", LasmAdded="v10.0.0"] Promise<(DOMString or Uint8Array)> mkdtemp((DOMString or Uint8Array or URL) prefix, optional (DOMString or Node_fsPromises_MkdtempOptions) options);
   // `fsPromises.open(path, flags[, mode])` [fs.md]
-  [LasmSignature="fsPromises.open(path, flags[, mode])"] Promise<Node_FileHandle> open((DOMString or Uint8Array or URL) path, (DOMString or double) flags, optional (DOMString or long long) mode);
+  [LasmSignature="fsPromises.open(path, flags[, mode])", LasmAdded="v10.0.0"] Promise<Node_FileHandle> open((DOMString or Uint8Array or URL) path, (DOMString or double) flags, optional (DOMString or long long) mode);
   // `fsPromises.readdir(path[, options])` [fs.md]
-  [LasmSignature="fsPromises.readdir(path[, options])"] Promise<sequence<(DOMString or Uint8Array or Node_fs_Dirent)>> readdir((DOMString or Uint8Array or URL) path, optional (DOMString or Node_fsPromises_ReaddirOptions) options);
+  [LasmSignature="fsPromises.readdir(path[, options])", LasmAdded="v10.0.0"] Promise<sequence<(DOMString or Uint8Array or Node_fs_Dirent)>> readdir((DOMString or Uint8Array or URL) path, optional (DOMString or Node_fsPromises_ReaddirOptions) options);
   // `fsPromises.readFile(path[, options])` [fs.md]
-  [LasmSignature="fsPromises.readFile(path[, options])"] Promise<(Uint8Array or DOMString)> readFile((DOMString or Uint8Array or URL or Node_FileHandle) path, optional (Node_fsPromises_ReadFileOptions or DOMString) options);
+  [LasmSignature="fsPromises.readFile(path[, options])", LasmAdded="v10.0.0"] Promise<(Uint8Array or DOMString)> readFile((DOMString or Uint8Array or URL or Node_FileHandle) path, optional (Node_fsPromises_ReadFileOptions or DOMString) options);
   // `fsPromises.readlink(path[, options])` [fs.md]
-  [LasmSignature="fsPromises.readlink(path[, options])"] Promise<(DOMString or Uint8Array)> readlink((DOMString or Uint8Array or URL) path, optional (DOMString or Node_fsPromises_ReadlinkOptions) options);
+  [LasmSignature="fsPromises.readlink(path[, options])", LasmAdded="v10.0.0"] Promise<(DOMString or Uint8Array)> readlink((DOMString or Uint8Array or URL) path, optional (DOMString or Node_fsPromises_ReadlinkOptions) options);
   // `fsPromises.realpath(path[, options])` [fs.md]
-  [LasmSignature="fsPromises.realpath(path[, options])"] Promise<(DOMString or Uint8Array)> realpath((DOMString or Uint8Array or URL) path, optional (DOMString or Node_fsPromises_RealpathOptions) options);
+  [LasmSignature="fsPromises.realpath(path[, options])", LasmAdded="v10.0.0"] Promise<(DOMString or Uint8Array)> realpath((DOMString or Uint8Array or URL) path, optional (DOMString or Node_fsPromises_RealpathOptions) options);
   // `fsPromises.rename(oldPath, newPath)` [fs.md]
-  [LasmSignature="fsPromises.rename(oldPath, newPath)"] Promise<undefined> rename((DOMString or Uint8Array or URL) oldPath, (DOMString or Uint8Array or URL) newPath);
+  [LasmSignature="fsPromises.rename(oldPath, newPath)", LasmAdded="v10.0.0"] Promise<undefined> rename((DOMString or Uint8Array or URL) oldPath, (DOMString or Uint8Array or URL) newPath);
   // `fsPromises.rmdir(path[, options])` [fs.md]
-  [LasmSignature="fsPromises.rmdir(path[, options])"] Promise<undefined> rmdir((DOMString or Uint8Array or URL) path, optional Node_fsPromises_RmdirOptions options);
+  [LasmSignature="fsPromises.rmdir(path[, options])", LasmAdded="v10.0.0"] Promise<undefined> rmdir((DOMString or Uint8Array or URL) path, optional Node_fsPromises_RmdirOptions options);
   // `fsPromises.rm(path[, options])` [fs.md]
-  [LasmSignature="fsPromises.rm(path[, options])"] Promise<undefined> rm((DOMString or Uint8Array or URL) path, optional Node_fsPromises_RmOptions options);
+  [LasmSignature="fsPromises.rm(path[, options])", LasmAdded="v14.14.0"] Promise<undefined> rm((DOMString or Uint8Array or URL) path, optional Node_fsPromises_RmOptions options);
   // `fsPromises.stat(path[, options])` [fs.md]
-  [LasmSignature="fsPromises.stat(path[, options])"] Promise<Node_fs_Stats> stat((DOMString or Uint8Array or URL) path, optional Node_fsPromises_StatOptions options);
+  [LasmSignature="fsPromises.stat(path[, options])", LasmAdded="v10.0.0"] Promise<Node_fs_Stats> stat((DOMString or Uint8Array or URL) path, optional Node_fsPromises_StatOptions options);
   // `fsPromises.symlink(target, path[, type])` [fs.md]
-  [LasmSignature="fsPromises.symlink(target, path[, type])"] Promise<undefined> symlink((DOMString or Uint8Array or URL) target, (DOMString or Uint8Array or URL) path, optional DOMString type);
+  [LasmSignature="fsPromises.symlink(target, path[, type])", LasmAdded="v10.0.0"] Promise<undefined> symlink((DOMString or Uint8Array or URL) target, (DOMString or Uint8Array or URL) path, optional DOMString type);
   // `fsPromises.truncate(path[, len])` [fs.md]
-  [LasmSignature="fsPromises.truncate(path[, len])"] Promise<undefined> truncate((DOMString or Uint8Array or URL) path, optional long long len);
+  [LasmSignature="fsPromises.truncate(path[, len])", LasmAdded="v10.0.0"] Promise<undefined> truncate((DOMString or Uint8Array or URL) path, optional long long len);
   // `fsPromises.unlink(path)` [fs.md]
-  [LasmSignature="fsPromises.unlink(path)"] Promise<undefined> unlink((DOMString or Uint8Array or URL) path);
+  [LasmSignature="fsPromises.unlink(path)", LasmAdded="v10.0.0"] Promise<undefined> unlink((DOMString or Uint8Array or URL) path);
   // `fsPromises.utimes(path, atime, mtime)` [fs.md]
-  [LasmSignature="fsPromises.utimes(path, atime, mtime)"] Promise<undefined> utimes((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime);
+  [LasmSignature="fsPromises.utimes(path, atime, mtime)", LasmAdded="v10.0.0"] Promise<undefined> utimes((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime);
   // `fsPromises.writeFile(file, data[, options])` [fs.md]
-  [LasmSignature="fsPromises.writeFile(file, data[, options])"] Promise<undefined> writeFile((DOMString or Uint8Array or URL or Node_FileHandle) file, (DOMString or Uint8Array or object) data, optional (Node_fsPromises_WriteFileOptions or DOMString) options);
+  [LasmSignature="fsPromises.writeFile(file, data[, options])", LasmAdded="v10.0.0"] Promise<undefined> writeFile((DOMString or Uint8Array or URL or Node_FileHandle) file, (DOMString or Uint8Array or object) data, optional (Node_fsPromises_WriteFileOptions or DOMString) options);
   // `constants` Type: {Object} [fs.md]
-  [LasmSignature="fsPromises.constants"] readonly attribute object constants;
+  [LasmSignature="fsPromises.constants", LasmAdded="v18.4.0, v16.17.0"] readonly attribute object constants;
 };
 
 // Class: `Hash` (crypto.md), node:crypto
 [LasmModule="node:crypto", LasmPath="Hash", LasmLeanModule="Crypto", LasmDoc="crypto", LasmName="Hash"]
 interface Node_Hash {
   // `hash.copy([options])` [crypto.md]
-  [LasmSignature="hash.copy([options])"] Node_Hash copy(optional object options);
+  [LasmSignature="hash.copy([options])", LasmAdded="v13.1.0"] Node_Hash copy(optional object options);
   // `hash.digest([encoding])` [crypto.md]
-  [LasmSignature="hash.digest([encoding])"] (Uint8Array or DOMString) digest(optional DOMString encoding);
+  [LasmSignature="hash.digest([encoding])", LasmAdded="v0.1.92"] (Uint8Array or DOMString) digest(optional DOMString encoding);
   // `hash.update(data[, inputEncoding])` [crypto.md]
-  [LasmSignature="hash.update(data[, inputEncoding])"] undefined update((DOMString or Uint8Array) data, optional DOMString inputEncoding);
+  [LasmSignature="hash.update(data[, inputEncoding])", LasmAdded="v0.1.92"] undefined update((DOMString or Uint8Array) data, optional DOMString inputEncoding);
 };
 
 // Class: `Hmac` (crypto.md), node:crypto
 [LasmModule="node:crypto", LasmPath="Hmac", LasmLeanModule="Crypto", LasmDoc="crypto", LasmName="Hmac"]
 interface Node_Hmac {
   // `hmac.digest([encoding])` [crypto.md]
-  [LasmSignature="hmac.digest([encoding])"] (Uint8Array or DOMString) digest(optional DOMString encoding);
+  [LasmSignature="hmac.digest([encoding])", LasmAdded="v0.1.94"] (Uint8Array or DOMString) digest(optional DOMString encoding);
   // `hmac.update(data[, inputEncoding])` [crypto.md]
-  [LasmSignature="hmac.update(data[, inputEncoding])"] undefined update((DOMString or Uint8Array) data, optional DOMString inputEncoding);
+  [LasmSignature="hmac.update(data[, inputEncoding])", LasmAdded="v0.1.94"] undefined update((DOMString or Uint8Array) data, optional DOMString inputEncoding);
 };
 
 // `node:crypto` module methods and properties (crypto.md), node:crypto
 [LasmModule="node:crypto", LasmLeanModule="Crypto", LasmDoc="crypto", LasmName="crypto"]
 namespace crypto {
   // `crypto.createHash(algorithm[, options])` [crypto.md]
-  [LasmSignature="crypto.createHash(algorithm[, options])"] Node_Hash createHash(DOMString algorithm, optional Node_crypto_CreateHashOptions options);
+  [LasmSignature="crypto.createHash(algorithm[, options])", LasmAdded="v0.1.92"] Node_Hash createHash(DOMString algorithm, optional Node_crypto_CreateHashOptions options);
   // `crypto.createHmac(algorithm, key[, options])` [crypto.md]
-  [LasmSignature="crypto.createHmac(algorithm, key[, options])"] Node_Hmac createHmac(DOMString algorithm, (DOMString or Uint8Array or object or CryptoKey) key, optional Node_crypto_CreateHmacOptions options);
+  [LasmSignature="crypto.createHmac(algorithm, key[, options])", LasmAdded="v0.1.94"] Node_Hmac createHmac(DOMString algorithm, (DOMString or Uint8Array or object or CryptoKey) key, optional Node_crypto_CreateHmacOptions options);
   // `crypto.getHashes()` [crypto.md]
-  [LasmSignature="crypto.getHashes()"] sequence<DOMString> getHashes();
+  [LasmSignature="crypto.getHashes()", LasmAdded="v0.9.3"] sequence<DOMString> getHashes();
   // `crypto.hash(algorithm, data[, options])` [crypto.md]
-  [LasmSignature="crypto.hash(algorithm, data[, options])"] (DOMString or Uint8Array) hash(DOMString? algorithm, (DOMString or Uint8Array) data, optional (Node_crypto_HashOptions or DOMString) options);
+  [LasmSignature="crypto.hash(algorithm, data[, options])", LasmAdded="v21.7.0, v20.12.0"] (DOMString or Uint8Array) hash(DOMString? algorithm, (DOMString or Uint8Array) data, optional (Node_crypto_HashOptions or DOMString) options);
   // `crypto.hkdf(digest, ikm, salt, info, keylen, callback)` [crypto.md]
-  [LasmPromisify, LasmSignature="crypto.hkdf(digest, ikm, salt, info, keylen, callback)"] Promise<ArrayBuffer> hkdf(DOMString digest, (DOMString or Uint8Array or object) ikm, (DOMString or Uint8Array) salt, (DOMString or Uint8Array) info, double keylen);
+  [LasmPromisify, LasmSignature="crypto.hkdf(digest, ikm, salt, info, keylen, callback)", LasmAdded="v15.0.0"] Promise<ArrayBuffer> hkdf(DOMString digest, (DOMString or Uint8Array or object) ikm, (DOMString or Uint8Array) salt, (DOMString or Uint8Array) info, double keylen);
   // `crypto.pbkdf2(password, salt, iterations, keylen, digest, callback)` [crypto.md]
-  [LasmPromisify, LasmSignature="crypto.pbkdf2(password, salt, iterations, keylen, digest, callback)"] Promise<Uint8Array> pbkdf2((DOMString or Uint8Array) password, (DOMString or Uint8Array) salt, double iterations, double keylen, DOMString digest);
+  [LasmPromisify, LasmSignature="crypto.pbkdf2(password, salt, iterations, keylen, digest, callback)", LasmAdded="v0.5.5"] Promise<Uint8Array> pbkdf2((DOMString or Uint8Array) password, (DOMString or Uint8Array) salt, double iterations, double keylen, DOMString digest);
   // `crypto.randomBytes(size[, callback])` [crypto.md]
-  [LasmSignature="crypto.randomBytes(size[, callback])"] Uint8Array randomBytes(double size);
+  [LasmSignature="crypto.randomBytes(size[, callback])", LasmAdded="v0.5.8"] Uint8Array randomBytes(double size);
   // `crypto.randomInt([min, ]max[, callback])` [crypto.md]
-  [LasmSignature="crypto.randomInt([min, ]max[, callback])"] long long randomInt(long long max);
+  [LasmSignature="crypto.randomInt([min, ]max[, callback])", LasmAdded="v14.10.0, v12.19.0"] long long randomInt(long long max);
   // `crypto.randomInt([min, ]max[, callback])` [crypto.md]
-  [LasmSignature="crypto.randomInt([min, ]max[, callback])"] long long randomInt(long long min, long long max);
+  [LasmSignature="crypto.randomInt([min, ]max[, callback])", LasmAdded="v14.10.0, v12.19.0"] long long randomInt(long long min, long long max);
   // `crypto.randomUUID([options])` [crypto.md]
-  [LasmSignature="crypto.randomUUID([options])"] DOMString randomUUID(optional Node_crypto_RandomUUIDOptions options);
+  [LasmSignature="crypto.randomUUID([options])", LasmAdded="v15.6.0, v14.17.0"] DOMString randomUUID(optional Node_crypto_RandomUUIDOptions options);
   // `crypto.scrypt(password, salt, keylen[, options], callback)` [crypto.md]
-  [LasmPromisify, LasmSignature="crypto.scrypt(password, salt, keylen[, options], callback)"] Promise<Uint8Array> scrypt((DOMString or Uint8Array) password, (DOMString or Uint8Array) salt, double keylen, optional Node_crypto_ScryptOptions options);
+  [LasmPromisify, LasmSignature="crypto.scrypt(password, salt, keylen[, options], callback)", LasmAdded="v10.5.0"] Promise<Uint8Array> scrypt((DOMString or Uint8Array) password, (DOMString or Uint8Array) salt, double keylen, optional Node_crypto_ScryptOptions options);
   // `crypto.timingSafeEqual(a, b)` [crypto.md]
-  [LasmSignature="crypto.timingSafeEqual(a, b)"] boolean timingSafeEqual(Uint8Array a, Uint8Array b);
+  [LasmSignature="crypto.timingSafeEqual(a, b)", LasmAdded="v6.6.0"] boolean timingSafeEqual(Uint8Array a, Uint8Array b);
 };
 
 // Class: `ChildProcess` (child_process.md), node:child_process
 [LasmModule="node:child_process", LasmPath="ChildProcess", LasmLeanModule="ChildProcess", LasmDoc="child_process", LasmName="ChildProcess"]
 interface Node_ChildProcess : Node_EventEmitter {
   // `subprocess.kill([signal])` [child_process.md]
-  [LasmSignature="subprocess.kill([signal])"] boolean kill(optional (double or DOMString) signal);
+  [LasmSignature="subprocess.kill([signal])", LasmAdded="v0.1.90"] boolean kill(optional (double or DOMString) signal);
   // `exitCode` Type: {integer} [child_process.md]
   [LasmSignature="subprocess.exitCode"] readonly attribute long long? exitCode;
   // `killed` Type: {boolean} Set to `true` after `subprocess.kill()` is used to successfully send a signal to the child process. [child_process.md]
-  [LasmSignature="subprocess.killed"] readonly attribute boolean killed;
+  [LasmSignature="subprocess.killed", LasmAdded="v0.5.10"] readonly attribute boolean killed;
   // `pid` Type: {integer|undefined} [child_process.md]
-  [LasmSignature="subprocess.pid"] readonly attribute long long? pid;
+  [LasmSignature="subprocess.pid", LasmAdded="v0.1.90"] readonly attribute long long? pid;
   // `signalCode` Type: {string|null} [child_process.md]
   [LasmSignature="subprocess.signalCode"] readonly attribute DOMString? signalCode;
   // `stderr` Type: {stream.Readable|null|undefined} [child_process.md]
-  [LasmSignature="subprocess.stderr"] readonly attribute Node_stream_Readable? stderr;
+  [LasmSignature="subprocess.stderr", LasmAdded="v0.1.90"] readonly attribute Node_stream_Readable? stderr;
   // `stdin` Type: {stream.Writable|null|undefined} [child_process.md]
-  [LasmSignature="subprocess.stdin"] readonly attribute Node_stream_Writable? stdin;
+  [LasmSignature="subprocess.stdin", LasmAdded="v0.1.90"] readonly attribute Node_stream_Writable? stdin;
   // `stdout` Type: {stream.Readable|null|undefined} [child_process.md]
-  [LasmSignature="subprocess.stdout"] readonly attribute Node_stream_Readable? stdout;
+  [LasmSignature="subprocess.stdout", LasmAdded="v0.1.90"] readonly attribute Node_stream_Readable? stdout;
 };
 
 // Asynchronous process creation (child_process.md), node:child_process
 [LasmModule="node:child_process", LasmLeanModule="ChildProcess", LasmDoc="child_process", LasmName="child_process"]
 namespace child_process {
   // `child_process.execFile(file[, args][, options][, callback])` [child_process.md]
-  [LasmPromisify, LasmSignature="child_process.execFile(file[, args][, options][, callback])"] Promise<Node_child_process_ExecFileResult> execFile(DOMString file, optional sequence<DOMString> args, optional Node_child_process_ExecFileOptions options);
+  [LasmPromisify, LasmSignature="child_process.execFile(file[, args][, options][, callback])", LasmAdded="v0.1.91"] Promise<Node_child_process_ExecFileResult> execFile(DOMString file, optional sequence<DOMString> args, optional Node_child_process_ExecFileOptions options);
   // `child_process.spawn(command[, args][, options])` [child_process.md]
-  [LasmSignature="child_process.spawn(command[, args][, options])"] Node_ChildProcess spawn(DOMString command, optional sequence<DOMString> args, optional Node_child_process_SpawnOptions options);
+  [LasmSignature="child_process.spawn(command[, args][, options])", LasmAdded="v0.1.90"] Node_ChildProcess spawn(DOMString command, optional sequence<DOMString> args, optional Node_child_process_SpawnOptions options);
 };
 
 [LasmNamespace="FileHandle", LasmName="ReadResult"]

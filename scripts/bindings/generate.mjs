@@ -529,7 +529,10 @@ const memberIdl = (m, owner) => {
   }
 };
 /** A Lasm.JS.Node member's documented signature (LasmSignature), quoted before its WebIDL. */
-const nodeSignature = m => { const sig = extValue(extAttr(m, 'LasmSignature')); return sig ? `\`${sig}\`: ` : ''; };
+const nodeSignature = m => {
+  const sig = extValue(extAttr(m, 'LasmSignature')), added = extValue(extAttr(m, 'LasmAdded'));
+  return sig ? `\`${sig}\`${added ? ` (added in Node.js ${added})` : ''}: ` : '';
+};
 const specOf = spec => spec === 'synthetic' ? 'written for Lasm (docs/JS_BINDINGS.md)' : specTitles[spec];
 
 // Arguments: Lean binders and the JavaScript argument array.

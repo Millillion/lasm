@@ -38,39 +38,39 @@ structure events.OnceOptions where
   signal : Option AbortSignal := none
 instance : ToJS events.OnceOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
 
-/-- `emitter.emit(eventName[, ...args])`: `boolean emit((DOMString or symbol) eventName, any... args)` -/
+/-- `emitter.emit(eventName[, ...args])` (added in Node.js v0.1.26): `boolean emit((DOMString or symbol) eventName, any... args)` -/
 def EventEmitter.emit (self : EventEmitter) (eventName : DOMStringOrSymbol) (args : Array Data := #[]) : IO Bool :=
   self.val.callMethod "emit" (Support.argsWith #[toJS eventName] (args.map toJS)) Bool
 
-/-- `emitter.eventNames()`: `(sequence<DOMString> or sequence<symbol>) eventNames()` -/
+/-- `emitter.eventNames()` (added in Node.js v6.0.0): `(sequence<DOMString> or sequence<symbol>) eventNames()` -/
 def EventEmitter.eventNames (self : EventEmitter) : IO Data :=
   self.val.callMethod "eventNames" (Support.args #[]) Data
 
-/-- `emitter.listenerCount(eventName[, listener])`: `long long listenerCount((DOMString or symbol) eventName, optional Function listener)` -/
+/-- `emitter.listenerCount(eventName[, listener])` (added in Node.js v3.2.0): `long long listenerCount((DOMString or symbol) eventName, optional Function listener)` -/
 def EventEmitter.listenerCount (self : EventEmitter) (eventName : DOMStringOrSymbol) (listener : Option JSFunction := none) : IO Int :=
   self.val.callMethod "listenerCount" (Support.args #[toJS eventName, Support.optional listener]) Int
 
-/-- `emitter.off(eventName, listener)`: `EventEmitter off((DOMString or symbol) eventName, Function listener)` -/
+/-- `emitter.off(eventName, listener)` (added in Node.js v10.0.0): `EventEmitter off((DOMString or symbol) eventName, Function listener)` -/
 def EventEmitter.off (self : EventEmitter) (eventName : DOMStringOrSymbol) (listener : JSFunction) : IO EventEmitter := do
   let r ← self.val.callMethod "off" (Support.args #[toJS eventName, toJS listener]) Value
   pure { val := r }
 
-/-- `emitter.on(eventName, listener)`: `EventEmitter on((DOMString or symbol) eventName, Function listener)` -/
+/-- `emitter.on(eventName, listener)` (added in Node.js v0.1.101): `EventEmitter on((DOMString or symbol) eventName, Function listener)` -/
 def EventEmitter.on (self : EventEmitter) (eventName : DOMStringOrSymbol) (listener : JSFunction) : IO EventEmitter := do
   let r ← self.val.callMethod "on" (Support.args #[toJS eventName, toJS listener]) Value
   pure { val := r }
 
-/-- `emitter.once(eventName, listener)`: `EventEmitter once((DOMString or symbol) eventName, Function listener)` -/
+/-- `emitter.once(eventName, listener)` (added in Node.js v0.3.0): `EventEmitter once((DOMString or symbol) eventName, Function listener)` -/
 def EventEmitter.once (self : EventEmitter) (eventName : DOMStringOrSymbol) (listener : JSFunction) : IO EventEmitter := do
   let r ← self.val.callMethod "once" (Support.args #[toJS eventName, toJS listener]) Value
   pure { val := r }
 
-/-- `emitter.removeAllListeners([eventName])`: `EventEmitter removeAllListeners(optional (DOMString or symbol) eventName)` -/
+/-- `emitter.removeAllListeners([eventName])` (added in Node.js v0.1.26): `EventEmitter removeAllListeners(optional (DOMString or symbol) eventName)` -/
 def EventEmitter.removeAllListeners (self : EventEmitter) (eventName : Option DOMStringOrSymbol := none) : IO EventEmitter := do
   let r ← self.val.callMethod "removeAllListeners" (Support.args #[Support.optional eventName]) Value
   pure { val := r }
 
-/-- `events.once(emitter, name[, options])`: `Promise<sequence<any>> once(EventEmitter emitter, (DOMString or symbol) name, optional events.OnceOptions options)` (Node.js 24.22.2 documentation, events.md) -/
+/-- `events.once(emitter, name[, options])` (added in Node.js v11.13.0, v10.16.0): `Promise<sequence<any>> once(EventEmitter emitter, (DOMString or symbol) name, optional events.OnceOptions options)` (Node.js 24.22.2 documentation, events.md) -/
 def events.once (emitter : EventEmitter) (name : DOMStringOrSymbol) (options : Option events.OnceOptions := none) : Async (Array Data) :=
   Lasm.JS.Binding.invokeAsync (Array Data) { name := "Lasm.JS.Node.events.once", module := "node:events", path := "once", construct := false, arity := 3 }
     (Support.args #[toJS emitter, toJS name, Support.optional options])

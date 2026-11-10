@@ -583,11 +583,12 @@ algorithm parameters) are `Data`: write the dictionary the spec's prose names
 
 ### How they are generated
 
-[`scripts/bindings/generate-web.mjs`](../scripts/bindings/generate-web.mjs)
+[`scripts/bindings/generate.mjs`](../scripts/bindings/generate.mjs)
 reads the WebIDL of the pinned `@webref/idl` (w3c/webref's curated IDL, parsed
 with `webidl2`; both development dependencies, never installed by users) for the
 list in [`scripts/bindings/web-tier1.mjs`](../scripts/bindings/web-tier1.mjs) and
-writes `library/Lasm/JS/Web/*.lean` (marked generated) and `Lasm/JS/Web.lean`.
+writes `library/Lasm/JS/Web/*.lean` (marked generated) and `Lasm/JS/Web.lean`
+(the same run writes Lasm.JS.Node, below).
 The generated calls are built on Lasm.JS core: `Lasm.JS.Binding.invoke` for
 constructors, static operations and globals (resolved from `globalThis` once
 and cached by the host), `Value.callMethod`, `get` and `set` for members, and a
@@ -607,6 +608,155 @@ cloning, compression, AES-GCM, ECDSA and query strings). `web-bindings.yml`
 builds it with a packed candidate for Node 26 and 24, Bun, Deno, Workers
 (workerd, local) and headless Chromium and runs it on each
 ([TESTING.md](TESTING.md#standard-bindings)).
+
+## Standard bindings for Node: `Lasm.JS.Node`
+
+`import Lasm.JS.Node` gives typed bindings of Node's server-essential modules
+that the web APIs do not cover, as documented for **Node.js 24.22.2** (Node 24
+LTS, the oldest Node Lasm supports). Status: **current source, not yet
+released** (tier 2 of the standard bindings, first part).
+
+```lean
+import Lasm.JS.Node
+open Lasm.JS Lasm.JS.Web Lasm.JS.Node
+
+def run : Async Unit := do
+  let dir ← os.tmpdir
+  let file ← path.join #[dir, "hello.txt"]
+  fsPromises.writeFile (.domString file) (.domString "hi")
+  match ← fsPromises.readFile (.domString file) (some (.domString "utf8")) with
+  | .domString text => IO.println text                        -- hi
+  | .uint8Array _ => pure ()
+  let key ← crypto.scrypt (.domString "password") (.domString "salt") 32
+  IO.println (← Buffer.toString key (some "hex"))
+  let out ← child_process.execFile "git" (some #["--version"])
+  IO.println (match out.stdout with | .domString s => s | _ => "")
+
+def main : IO Unit := run.block
+```
+
+Names are Node's own, as its docs write them: `fsPromises.readFile`,
+`path.join`, `os.cpus`, `process.cwd`, `crypto.createHash`,
+`child_process.spawn`, `buffer.isUtf8`, `Buffer.from`; classes are handle
+types (`FileHandle`, `fs.Stats`, `fs.Dirent`, `Hash`, `Hmac`, `ChildProcess`,
+`EventEmitter`, `stream.Readable`, `stream.Writable`), and options objects are
+structures (`fsPromises.ReadFileOptions`, `child_process.SpawnOptions`).
+
+### What is covered
+
+| Module | Members | Node module |
+| --- | --- | --- |
+| `Lasm.JS.Node.Fs` | every stable member of the promises API (`fsPromises.*`: `readFile`, `writeFile`, `appendFile`, `readdir`, `mkdir`, `mkdtemp`, `stat`, `lstat`, `rm`, `rename`, `copyFile`, `cp`, `symlink`, `readlink`, `realpath`, `open`, …), `FileHandle`, `fs.Stats`, `fs.Dirent` | `node:fs/promises`, `node:fs` |
+| `Lasm.JS.Node.Path` | every member of `path` | `node:path` |
+| `Lasm.JS.Node.Os` | every member of `os` | `node:os` |
+| `Lasm.JS.Node.Process` | `process.argv`, `env`, `exit`, `exitCode`, `cwd`, `chdir`, `platform`, `arch`, `pid`, `ppid`, `version`, `versions`, `execPath`, `execArgv`, `title`, `uptime`, `memoryUsage`, `kill` | `node:process` |
+| `Lasm.JS.Node.Buffer` | `Buffer.from` (string and encoding), `alloc`, `byteLength`, `compare`, `concat`, `isEncoding`, and as functions of bytes `Buffer.toString`, `equals`, `compare`; `buffer.isUtf8`, `isAscii`, `transcode`, `kMaxLength` | `node:buffer` |
+| `Lasm.JS.Node.Crypto` | `crypto.createHash`, `createHmac`, `hash`, `randomBytes`, `randomInt`, `randomUUID`, `timingSafeEqual`, `getHashes`, and `scrypt`, `pbkdf2`, `hkdf` as `Async` (through `util.promisify`); `Hash`, `Hmac` | `node:crypto` |
+| `Lasm.JS.Node.ChildProcess` | `child_process.spawn`, `child_process.execFile` (as `Async`, its documented promisified form: `{stdout, stderr}`), `ChildProcess` (`pid`, `exitCode`, `signalCode`, `killed`, `kill`, `stdin`, `stdout`, `stderr`) | `node:child_process` |
+| `Lasm.JS.Node.Events` | `EventEmitter` (`on`, `once`, `off`, `emit`, `listenerCount`, `eventNames`, `removeAllListeners`), `events.once` (`Async`) | `node:events` |
+| `Lasm.JS.Node.Stream` | `stream.Readable.toWeb`, `fromWeb`, `stream.Writable.toWeb`, `fromWeb`: a child's `stdout` becomes a web `ReadableStream` (read with Lasm.JS.Web) | `node:stream` |
+
+Not generated, with the reason (each listed in
+[`node-tier2.mjs`](../scripts/bindings/node-tier2.mjs)):
+
+- **`node:http`, `node:net`: deferred.** A server is a request listener called
+  for each request with an `IncomingMessage` (a Node `Readable`) and a
+  `ServerResponse` (a `Writable`) whose methods are called many times per
+  request, and the docs type the listener's arguments, the events and their
+  arguments in prose. Binding them faithfully needs the Node stream classes and
+  the events typed, which this cut does not have; serving HTTP today goes through
+  `Lasm.Fetch` or an npm framework with `@[js]` bindings (Hono, Express), and a
+  web `Request`/`Response` server through Lasm.JS.Web.
+- `fsPromises.glob`, `watch` and `opendir` (async iteration, as in Lasm.JS.Web),
+  `statfs`, `mkdtempDisposable` (explicit resource management); `FileHandle`'s
+  `createReadStream`, `createWriteStream` (Node stream classes: use
+  `readableWebStream`), `readLines`, `readv` and `writev` (in-place buffers).
+- `path.posix`, `path.win32` (the same functions again).
+- Members marked Experimental, Deprecated or Legacy in the docs
+  (`filehandle.pull`, `fsPromises.lchmod`, `buffer.atob`), and the callback and
+  synchronous forms of what has a promise form (`fs.readFile`, `fs.readFileSync`).
+
+### How Node's docs become Lean
+
+Node's docs are lowered to WebIDL, then generated by the same generator and
+rules as Lasm.JS.Web ([above](#how-a-webidl-declaration-becomes-lean)):
+
+| Node's docs | WebIDL | Lean |
+| --- | --- | --- |
+| `fsPromises.readFile(path[, options])` | `readFile(… path, optional … options)` in `namespace fsPromises` | `fsPromises.readFile (path) (options := none)` |
+| `{string}`, `{integer}`, `{number}`, `{boolean}`, `{bigint}` | `DOMString`, `long long`, `double`, `boolean`, `bigint` | `String`, `Int`, `Float`, `Bool`, `Int` |
+| `{Buffer}`, `{TypedArray}`, `{DataView}`, `{Uint8Array}` | `Uint8Array` | `ByteArray` (a copy) |
+| `{string\|Buffer\|URL}` | `(DOMString or Uint8Array or URL)` | `DOMStringOrUint8ArrayOrURL`: `.domString "a.txt"`, `.uint8Array b`, `.url u` |
+| `{null}`, `{undefined}` in a type | nullable | `Option` |
+| `{Object}` with documented members (`options`) | `dictionary` | a structure, named after the method and parameter (`fsPromises.ReadFileOptions`) |
+| `{Object}` without them, and classes outside this cut (`KeyObject`, `Date`, `fs.ReadStream`) | `object` | `Data` |
+| `{Function}` | `Function` | `JSFunction` (`ofFn`, `ofSyncFn`) |
+| a class (`Class: FileHandle`) | `interface` | a handle type; `Extends: EventEmitter` gives `structure ChildProcess extends EventEmitter` |
+| `Returns: {Promise} Fulfills with undefined upon success.` | `Promise<undefined>` | `Async Unit` |
+| `Fulfills with the {fs.Stats} object` | `Promise<fs.Stats>` | `Async fs.Stats` |
+| an optional trailing `callback` (`randomBytes(size[, callback])`) | left out | the synchronous form: `crypto.randomBytes 32 : IO ByteArray` |
+| a required trailing `callback(err, value)` (`scrypt(…, callback)`) | `Promise<value>` | `Async ByteArray`, called through `util.promisify` |
+| `[min, ]max` (an optional parameter before a required one) | two overloads | `crypto.randomInt max`, `crypto.randomIntWithMin min max` |
+| `buf.toString([encoding])` (a Buffer method) | an operation on bytes | `Buffer.toString (bytes) (encoding := none)`, called with the bytes as `this` |
+| a `Buffer` result | `Uint8Array` | `ByteArray` |
+
+Where the docs give a type only in prose, [`node-tier2.mjs`](../scripts/bindings/node-tier2.mjs)
+states it in WebIDL and quotes the sentence (the lowering fails if the sentence
+is gone): `readFile` fulfills with `(Uint8Array or DOMString)` ("Fulfills with
+the contents of the file", a string when an encoding is given), `mkdir` with
+`DOMString?`, `events.once` with the event's arguments, `execFile`'s promise with
+`{stdout, stderr}`, `process.env` is a `record<DOMString, DOMString>`. One
+correction states what Node returns against its docs: `os.uptime` is `Float`
+(Node returns fractional seconds; the docs say `{integer}`).
+
+The rest of the mapping is tier 1's, including its limits (bytes are copies,
+nullable optional members are collapsed). Two rules are Node's: an argument named
+like a namespace gets a `_` (`path.basename (path_ : String)`, so that `path`
+still names the namespace), and a union of a namespaced type lives in that
+namespace (`fsPromises.ReadFileOptionsOrDOMString`). Overloads that would get
+one name each add all their argument names (`FileHandle.readWithOptions`,
+`FileHandle.readWithBufferOptions`).
+
+### Where it runs
+
+On Node 24 and 26 everything is native. On Bun and Deno, Lasm's builds load
+`node:` modules through `process.getBuiltinModule`, so the members their Node
+compatibility implements work there; the conformance run records which checks
+each fails ([`test/fixtures/js-node/known.json`](../test/fixtures/js-node/known.json))
+and which generated members each lacks. Workers, the other edge platforms and
+browsers are not targets of `Lasm.JS.Node`.
+
+MEASURED_AVAILABILITY
+
+### Cost
+
+MEASURED_COST
+
+### Pinned version and drift
+
+The docs are fetched from `nodejs.org/dist/v24.22.2/docs/api/<module>.json` and
+checked against SHA-256 hashes in
+[`node-api.lock.json`](../scripts/bindings/node-api.lock.json);
+[`node-api.mjs`](../scripts/bindings/node-api.mjs) writes the lowering
+([`node.idl`](../scripts/bindings/node.idl), committed) and
+[`node-api-26.json`](../scripts/bindings/node-api-26.json), the lowered members
+that differ in the Node 26.13.0 docs. On 2026-11-10 those are: `buffer.isLatin1`
+(Node 26 only), `fsPromises.rmdir`'s `recursive` option (removed in 26), and
+`emitter.eventNames()`, typed `{string[]|symbol[]}` in 24 and `{string[]}` in
+26 (the bindings follow 24). `web-bindings.yml` fails when `node.idl`, the
+comparison or the generated modules differ from what the pinned docs give. To
+move to newer docs: change `version` (and `compareVersion`) in `node-tier2.mjs`,
+run `node scripts/bindings/node-api.mjs --update-lock`, then
+`node scripts/bindings/generate.mjs`, regenerate `library/prebuilt`
+(`library-prebuilt.yml`) and review the diff of `node.idl`.
+
+**Tests.** [`test/fixtures/js-node`](../test/fixtures/js-node) is one program of
+property checks: Lean as the oracle of hex, base64 (RFC 4648), Latin-1, UTF-8
+encoding and validation (`ByteArray.validateUTF8` for `buffer.isUtf8`), byte
+order (`Buffer.compare`) and path operations over generated inputs; published
+vectors (FIPS 180, RFC 1321, RFC 4231, RFC 6070, RFC 7914, RFC 5869); files in a
+fresh temporary directory; child processes, events and stream conversion.
+`web-bindings.yml` runs it on Node 26 and 24, Bun and Deno.
 
 ## Worked examples (all built and run by CI)
 

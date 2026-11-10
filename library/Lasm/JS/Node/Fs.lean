@@ -594,313 +594,313 @@ def fs.Stats.blksize (self : fs.Stats) : IO DoubleOrBigint := self.val.get "blks
 /-- `stats.blocks`: `readonly attribute (double or bigint) blocks` -/
 def fs.Stats.blocks (self : fs.Stats) : IO DoubleOrBigint := self.val.get "blocks" DoubleOrBigint
 
-/-- `stats.atimeMs`: `readonly attribute (double or bigint) atimeMs` -/
+/-- `stats.atimeMs` (added in Node.js v8.1.0): `readonly attribute (double or bigint) atimeMs` -/
 def fs.Stats.atimeMs (self : fs.Stats) : IO DoubleOrBigint := self.val.get "atimeMs" DoubleOrBigint
 
-/-- `stats.mtimeMs`: `readonly attribute (double or bigint) mtimeMs` -/
+/-- `stats.mtimeMs` (added in Node.js v8.1.0): `readonly attribute (double or bigint) mtimeMs` -/
 def fs.Stats.mtimeMs (self : fs.Stats) : IO DoubleOrBigint := self.val.get "mtimeMs" DoubleOrBigint
 
-/-- `stats.ctimeMs`: `readonly attribute (double or bigint) ctimeMs` -/
+/-- `stats.ctimeMs` (added in Node.js v8.1.0): `readonly attribute (double or bigint) ctimeMs` -/
 def fs.Stats.ctimeMs (self : fs.Stats) : IO DoubleOrBigint := self.val.get "ctimeMs" DoubleOrBigint
 
-/-- `stats.birthtimeMs`: `readonly attribute (double or bigint) birthtimeMs` -/
+/-- `stats.birthtimeMs` (added in Node.js v8.1.0): `readonly attribute (double or bigint) birthtimeMs` -/
 def fs.Stats.birthtimeMs (self : fs.Stats) : IO DoubleOrBigint := self.val.get "birthtimeMs" DoubleOrBigint
 
-/-- `stats.atimeNs`: `readonly attribute bigint atimeNs` -/
+/-- `stats.atimeNs` (added in Node.js v12.10.0): `readonly attribute bigint atimeNs` -/
 def fs.Stats.atimeNs (self : fs.Stats) : IO Int := self.val.get "atimeNs" Int
 
-/-- `stats.mtimeNs`: `readonly attribute bigint mtimeNs` -/
+/-- `stats.mtimeNs` (added in Node.js v12.10.0): `readonly attribute bigint mtimeNs` -/
 def fs.Stats.mtimeNs (self : fs.Stats) : IO Int := self.val.get "mtimeNs" Int
 
-/-- `stats.ctimeNs`: `readonly attribute bigint ctimeNs` -/
+/-- `stats.ctimeNs` (added in Node.js v12.10.0): `readonly attribute bigint ctimeNs` -/
 def fs.Stats.ctimeNs (self : fs.Stats) : IO Int := self.val.get "ctimeNs" Int
 
-/-- `stats.birthtimeNs`: `readonly attribute bigint birthtimeNs` -/
+/-- `stats.birthtimeNs` (added in Node.js v12.10.0): `readonly attribute bigint birthtimeNs` -/
 def fs.Stats.birthtimeNs (self : fs.Stats) : IO Int := self.val.get "birthtimeNs" Int
 
-/-- `stats.atime`: `readonly attribute object atime` -/
+/-- `stats.atime` (added in Node.js v0.11.13): `readonly attribute object atime` -/
 def fs.Stats.atime (self : fs.Stats) : IO Data := self.val.get "atime" Data
 
-/-- `stats.mtime`: `readonly attribute object mtime` -/
+/-- `stats.mtime` (added in Node.js v0.11.13): `readonly attribute object mtime` -/
 def fs.Stats.mtime (self : fs.Stats) : IO Data := self.val.get "mtime" Data
 
-/-- `stats.ctime`: `readonly attribute object ctime` -/
+/-- `stats.ctime` (added in Node.js v0.11.13): `readonly attribute object ctime` -/
 def fs.Stats.ctime (self : fs.Stats) : IO Data := self.val.get "ctime" Data
 
-/-- `stats.birthtime`: `readonly attribute object birthtime` -/
+/-- `stats.birthtime` (added in Node.js v0.11.13): `readonly attribute object birthtime` -/
 def fs.Stats.birthtime (self : fs.Stats) : IO Data := self.val.get "birthtime" Data
 
-/-- `stats.isBlockDevice()`: `boolean isBlockDevice()` -/
+/-- `stats.isBlockDevice()` (added in Node.js v0.1.10): `boolean isBlockDevice()` -/
 def fs.Stats.isBlockDevice (self : fs.Stats) : IO Bool :=
   self.val.callMethod "isBlockDevice" (Support.args #[]) Bool
 
-/-- `stats.isCharacterDevice()`: `boolean isCharacterDevice()` -/
+/-- `stats.isCharacterDevice()` (added in Node.js v0.1.10): `boolean isCharacterDevice()` -/
 def fs.Stats.isCharacterDevice (self : fs.Stats) : IO Bool :=
   self.val.callMethod "isCharacterDevice" (Support.args #[]) Bool
 
-/-- `stats.isDirectory()`: `boolean isDirectory()` -/
+/-- `stats.isDirectory()` (added in Node.js v0.1.10): `boolean isDirectory()` -/
 def fs.Stats.isDirectory (self : fs.Stats) : IO Bool :=
   self.val.callMethod "isDirectory" (Support.args #[]) Bool
 
-/-- `stats.isFIFO()`: `boolean isFIFO()` -/
+/-- `stats.isFIFO()` (added in Node.js v0.1.10): `boolean isFIFO()` -/
 def fs.Stats.isFIFO (self : fs.Stats) : IO Bool :=
   self.val.callMethod "isFIFO" (Support.args #[]) Bool
 
-/-- `stats.isFile()`: `boolean isFile()` -/
+/-- `stats.isFile()` (added in Node.js v0.1.10): `boolean isFile()` -/
 def fs.Stats.isFile (self : fs.Stats) : IO Bool :=
   self.val.callMethod "isFile" (Support.args #[]) Bool
 
-/-- `stats.isSocket()`: `boolean isSocket()` -/
+/-- `stats.isSocket()` (added in Node.js v0.1.10): `boolean isSocket()` -/
 def fs.Stats.isSocket (self : fs.Stats) : IO Bool :=
   self.val.callMethod "isSocket" (Support.args #[]) Bool
 
-/-- `stats.isSymbolicLink()`: `boolean isSymbolicLink()` -/
+/-- `stats.isSymbolicLink()` (added in Node.js v0.1.10): `boolean isSymbolicLink()` -/
 def fs.Stats.isSymbolicLink (self : fs.Stats) : IO Bool :=
   self.val.callMethod "isSymbolicLink" (Support.args #[]) Bool
 
-/-- `dirent.name`: `readonly attribute (DOMString or Uint8Array) name` -/
+/-- `dirent.name` (added in Node.js v10.10.0): `readonly attribute (DOMString or Uint8Array) name` -/
 def fs.Dirent.name (self : fs.Dirent) : IO DOMStringOrUint8Array := self.val.get "name" DOMStringOrUint8Array
 
-/-- `dirent.parentPath`: `readonly attribute DOMString parentPath` -/
+/-- `dirent.parentPath` (added in Node.js v21.4.0, v20.12.0, v18.20.0): `readonly attribute DOMString parentPath` -/
 def fs.Dirent.parentPath (self : fs.Dirent) : IO String := self.val.get "parentPath" String
 
-/-- `dirent.isBlockDevice()`: `boolean isBlockDevice()` -/
+/-- `dirent.isBlockDevice()` (added in Node.js v10.10.0): `boolean isBlockDevice()` -/
 def fs.Dirent.isBlockDevice (self : fs.Dirent) : IO Bool :=
   self.val.callMethod "isBlockDevice" (Support.args #[]) Bool
 
-/-- `dirent.isCharacterDevice()`: `boolean isCharacterDevice()` -/
+/-- `dirent.isCharacterDevice()` (added in Node.js v10.10.0): `boolean isCharacterDevice()` -/
 def fs.Dirent.isCharacterDevice (self : fs.Dirent) : IO Bool :=
   self.val.callMethod "isCharacterDevice" (Support.args #[]) Bool
 
-/-- `dirent.isDirectory()`: `boolean isDirectory()` -/
+/-- `dirent.isDirectory()` (added in Node.js v10.10.0): `boolean isDirectory()` -/
 def fs.Dirent.isDirectory (self : fs.Dirent) : IO Bool :=
   self.val.callMethod "isDirectory" (Support.args #[]) Bool
 
-/-- `dirent.isFIFO()`: `boolean isFIFO()` -/
+/-- `dirent.isFIFO()` (added in Node.js v10.10.0): `boolean isFIFO()` -/
 def fs.Dirent.isFIFO (self : fs.Dirent) : IO Bool :=
   self.val.callMethod "isFIFO" (Support.args #[]) Bool
 
-/-- `dirent.isFile()`: `boolean isFile()` -/
+/-- `dirent.isFile()` (added in Node.js v10.10.0): `boolean isFile()` -/
 def fs.Dirent.isFile (self : fs.Dirent) : IO Bool :=
   self.val.callMethod "isFile" (Support.args #[]) Bool
 
-/-- `dirent.isSocket()`: `boolean isSocket()` -/
+/-- `dirent.isSocket()` (added in Node.js v10.10.0): `boolean isSocket()` -/
 def fs.Dirent.isSocket (self : fs.Dirent) : IO Bool :=
   self.val.callMethod "isSocket" (Support.args #[]) Bool
 
-/-- `dirent.isSymbolicLink()`: `boolean isSymbolicLink()` -/
+/-- `dirent.isSymbolicLink()` (added in Node.js v10.10.0): `boolean isSymbolicLink()` -/
 def fs.Dirent.isSymbolicLink (self : fs.Dirent) : IO Bool :=
   self.val.callMethod "isSymbolicLink" (Support.args #[]) Bool
 
-/-- `filehandle.fd`: `readonly attribute double fd` -/
+/-- `filehandle.fd` (added in Node.js v10.0.0): `readonly attribute double fd` -/
 def FileHandle.fd (self : FileHandle) : IO Float := self.val.get "fd" Float
 
-/-- `filehandle.appendFile(data[, options])`: `Promise<undefined> appendFile((DOMString or Uint8Array or object) data, optional (FileHandle.AppendFileOptions or DOMString) options)` -/
+/-- `filehandle.appendFile(data[, options])` (added in Node.js v10.0.0): `Promise<undefined> appendFile((DOMString or Uint8Array or object) data, optional (FileHandle.AppendFileOptions or DOMString) options)` -/
 def FileHandle.appendFile (self : FileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : Option FileHandle.AppendFileOptionsOrDOMString := none) : Async Unit :=
   self.val.callMethodAwait "appendFile" (Support.args #[toJS data, Support.optional options]) Unit
 
-/-- `filehandle.chmod(mode)`: `Promise<undefined> chmod(long long mode)` -/
+/-- `filehandle.chmod(mode)` (added in Node.js v10.0.0): `Promise<undefined> chmod(long long mode)` -/
 def FileHandle.chmod (self : FileHandle) (mode : Int) : Async Unit :=
   self.val.callMethodAwait "chmod" (Support.args #[toJS mode]) Unit
 
-/-- `filehandle.chown(uid, gid)`: `Promise<undefined> chown(long long uid, long long gid)` -/
+/-- `filehandle.chown(uid, gid)` (added in Node.js v10.0.0): `Promise<undefined> chown(long long uid, long long gid)` -/
 def FileHandle.chown (self : FileHandle) (uid : Int) (gid : Int) : Async Unit :=
   self.val.callMethodAwait "chown" (Support.args #[toJS uid, toJS gid]) Unit
 
-/-- `filehandle.close()`: `Promise<undefined> close()` -/
+/-- `filehandle.close()` (added in Node.js v10.0.0): `Promise<undefined> close()` -/
 def FileHandle.close (self : FileHandle) : Async Unit :=
   self.val.callMethodAwait "close" (Support.args #[]) Unit
 
-/-- `filehandle.datasync()`: `Promise<undefined> datasync()` -/
+/-- `filehandle.datasync()` (added in Node.js v10.0.0): `Promise<undefined> datasync()` -/
 def FileHandle.datasync (self : FileHandle) : Async Unit :=
   self.val.callMethodAwait "datasync" (Support.args #[]) Unit
 
-/-- `filehandle.read(buffer, offset, length, position)`: `Promise<FileHandle.ReadResult> read(Uint8Array buffer, long long offset, long long length, (long long or bigint)? position)` -/
+/-- `filehandle.read(buffer, offset, length, position)` (added in Node.js v10.0.0): `Promise<FileHandle.ReadResult> read(Uint8Array buffer, long long offset, long long length, (long long or bigint)? position)` -/
 def FileHandle.read (self : FileHandle) (buffer_ : ByteArray) (offset : Int) (length : Int) (position : Option LongLongOrBigint) : Async FileHandle.ReadResult :=
   self.val.callMethodAwait "read" (Support.args #[toJS buffer_, toJS offset, toJS length, toJS position]) FileHandle.ReadResult
 
-/-- `filehandle.read([options])`: `Promise<FileHandle.ReadResult> read(optional FileHandle.ReadOptions options)` -/
+/-- `filehandle.read([options])` (added in Node.js v13.11.0, v12.17.0): `Promise<FileHandle.ReadResult> read(optional FileHandle.ReadOptions options)` -/
 def FileHandle.readWithOptions (self : FileHandle) (options : Option FileHandle.ReadOptions := none) : Async FileHandle.ReadResult :=
   self.val.callMethodAwait "read" (Support.args #[Support.optional options]) FileHandle.ReadResult
 
-/-- `filehandle.read(buffer[, options])`: `Promise<FileHandle.ReadResult> read(Uint8Array buffer, optional FileHandle.ReadOptions2 options)` -/
+/-- `filehandle.read(buffer[, options])` (added in Node.js v18.2.0, v16.17.0): `Promise<FileHandle.ReadResult> read(Uint8Array buffer, optional FileHandle.ReadOptions2 options)` -/
 def FileHandle.readWithBufferOptions (self : FileHandle) (buffer_ : ByteArray) (options : Option FileHandle.ReadOptions2 := none) : Async FileHandle.ReadResult :=
   self.val.callMethodAwait "read" (Support.args #[toJS buffer_, Support.optional options]) FileHandle.ReadResult
 
-/-- `filehandle.readableWebStream([options])`: `ReadableStream readableWebStream(optional FileHandle.ReadableWebStreamOptions options)` -/
+/-- `filehandle.readableWebStream([options])` (added in Node.js v17.0.0): `ReadableStream readableWebStream(optional FileHandle.ReadableWebStreamOptions options)` -/
 def FileHandle.readableWebStream (self : FileHandle) (options : Option FileHandle.ReadableWebStreamOptions := none) : IO ReadableStream := do
   let r ← self.val.callMethod "readableWebStream" (Support.args #[Support.optional options]) Value
   pure { val := r }
 
-/-- `filehandle.readFile(options)`: `Promise<(Uint8Array or DOMString)> readFile((FileHandle.ReadFileOptions or DOMString) options)` -/
+/-- `filehandle.readFile(options)` (added in Node.js v10.0.0): `Promise<(Uint8Array or DOMString)> readFile((FileHandle.ReadFileOptions or DOMString) options)` -/
 def FileHandle.readFile (self : FileHandle) (options : FileHandle.ReadFileOptionsOrDOMString) : Async Uint8ArrayOrDOMString :=
   self.val.callMethodAwait "readFile" (Support.args #[toJS options]) Uint8ArrayOrDOMString
 
-/-- `filehandle.stat([options])`: `Promise<fs.Stats> stat(optional FileHandle.StatOptions options)` -/
+/-- `filehandle.stat([options])` (added in Node.js v10.0.0): `Promise<fs.Stats> stat(optional FileHandle.StatOptions options)` -/
 def FileHandle.stat (self : FileHandle) (options : Option FileHandle.StatOptions := none) : Async fs.Stats := do
   let r ← self.val.callMethodAwait "stat" (Support.args #[Support.optional options]) Value
   pure { val := r }
 
-/-- `filehandle.sync()`: `Promise<undefined> sync()` -/
+/-- `filehandle.sync()` (added in Node.js v10.0.0): `Promise<undefined> sync()` -/
 def FileHandle.sync (self : FileHandle) : Async Unit :=
   self.val.callMethodAwait "sync" (Support.args #[]) Unit
 
-/-- `filehandle.truncate(len)`: `Promise<undefined> truncate(long long len)` -/
+/-- `filehandle.truncate(len)` (added in Node.js v10.0.0): `Promise<undefined> truncate(long long len)` -/
 def FileHandle.truncate (self : FileHandle) (len : Int) : Async Unit :=
   self.val.callMethodAwait "truncate" (Support.args #[toJS len]) Unit
 
-/-- `filehandle.utimes(atime, mtime)`: `Promise<undefined> utimes((double or DOMString or object) atime, (double or DOMString or object) mtime)` -/
+/-- `filehandle.utimes(atime, mtime)` (added in Node.js v10.0.0): `Promise<undefined> utimes((double or DOMString or object) atime, (double or DOMString or object) mtime)` -/
 def FileHandle.utimes (self : FileHandle) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit :=
   self.val.callMethodAwait "utimes" (Support.args #[toJS atime, toJS mtime]) Unit
 
-/-- `filehandle.write(buffer, offset[, length[, position]])`: `Promise<FileHandle.WriteResult> write(Uint8Array buffer, long long offset, optional long long length, optional long long position)` -/
+/-- `filehandle.write(buffer, offset[, length[, position]])` (added in Node.js v10.0.0): `Promise<FileHandle.WriteResult> write(Uint8Array buffer, long long offset, optional long long length, optional long long position)` -/
 def FileHandle.write (self : FileHandle) (buffer_ : ByteArray) (offset : Int) (length : Option Int := none) (position : Option Int := none) : Async FileHandle.WriteResult :=
   self.val.callMethodAwait "write" (Support.args #[toJS buffer_, toJS offset, Support.optional length, Support.optional position]) FileHandle.WriteResult
 
-/-- `filehandle.write(buffer[, options])`: `Promise<FileHandle.WriteResult> write(Uint8Array buffer, optional FileHandle.WriteOptions options)` -/
+/-- `filehandle.write(buffer[, options])` (added in Node.js v18.3.0, v16.17.0): `Promise<FileHandle.WriteResult> write(Uint8Array buffer, optional FileHandle.WriteOptions options)` -/
 def FileHandle.writeWithOptions (self : FileHandle) (buffer_ : ByteArray) (options : Option FileHandle.WriteOptions := none) : Async FileHandle.WriteResult :=
   self.val.callMethodAwait "write" (Support.args #[toJS buffer_, Support.optional options]) FileHandle.WriteResult
 
-/-- `filehandle.write(string[, position[, encoding]])`: `Promise<FileHandle.WriteStringResult> write(DOMString string, optional long long position, optional DOMString encoding)` -/
+/-- `filehandle.write(string[, position[, encoding]])` (added in Node.js v10.0.0): `Promise<FileHandle.WriteStringResult> write(DOMString string, optional long long position, optional DOMString encoding)` -/
 def FileHandle.writeWithString (self : FileHandle) (string : String) (position : Option Int := none) (encoding : Option String := none) : Async FileHandle.WriteStringResult :=
   self.val.callMethodAwait "write" (Support.args #[toJS string, Support.optional position, Support.optional encoding]) FileHandle.WriteStringResult
 
-/-- `filehandle.writeFile(data, options)`: `Promise<undefined> writeFile((DOMString or Uint8Array or object) data, (FileHandle.WriteFileOptions or DOMString) options)` -/
+/-- `filehandle.writeFile(data, options)` (added in Node.js v10.0.0): `Promise<undefined> writeFile((DOMString or Uint8Array or object) data, (FileHandle.WriteFileOptions or DOMString) options)` -/
 def FileHandle.writeFile (self : FileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : FileHandle.WriteFileOptionsOrDOMString) : Async Unit :=
   self.val.callMethodAwait "writeFile" (Support.args #[toJS data, toJS options]) Unit
 
-/-- `fsPromises.constants`: `readonly attribute object constants` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.constants` (added in Node.js v18.4.0, v16.17.0): `readonly attribute object constants` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.constants : IO Data := Support.getExport "node:fs/promises" ["constants"] Data
 
-/-- `fsPromises.access(path[, mode])`: `Promise<undefined> access((DOMString or Uint8Array or URL) path, optional long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.access(path[, mode])` (added in Node.js v10.0.0): `Promise<undefined> access((DOMString or Uint8Array or URL) path, optional long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.access (path_ : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.access", module := "node:fs/promises", path := "access", construct := false, arity := 2 }
     (Support.args #[toJS path_, Support.optional mode])
 
-/-- `fsPromises.appendFile(path, data[, options])`: `Promise<undefined> appendFile((DOMString or Uint8Array or URL or FileHandle) path, (DOMString or Uint8Array or object) data, optional (fsPromises.AppendFileOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.appendFile(path, data[, options])` (added in Node.js v10.0.0): `Promise<undefined> appendFile((DOMString or Uint8Array or URL or FileHandle) path, (DOMString or Uint8Array or object) data, optional (fsPromises.AppendFileOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.appendFile (path_ : DOMStringOrUint8ArrayOrURLOrFileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : Option fsPromises.AppendFileOptionsOrDOMString := none) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.appendFile", module := "node:fs/promises", path := "appendFile", construct := false, arity := 3 }
     (Support.args #[toJS path_, toJS data, Support.optional options])
 
-/-- `fsPromises.chmod(path, mode)`: `Promise<undefined> chmod((DOMString or Uint8Array or URL) path, (DOMString or long long) mode)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.chmod(path, mode)` (added in Node.js v10.0.0): `Promise<undefined> chmod((DOMString or Uint8Array or URL) path, (DOMString or long long) mode)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.chmod (path_ : DOMStringOrUint8ArrayOrURL) (mode : DOMStringOrLongLong) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.chmod", module := "node:fs/promises", path := "chmod", construct := false, arity := 2 }
     (Support.args #[toJS path_, toJS mode])
 
-/-- `fsPromises.chown(path, uid, gid)`: `Promise<undefined> chown((DOMString or Uint8Array or URL) path, long long uid, long long gid)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.chown(path, uid, gid)` (added in Node.js v10.0.0): `Promise<undefined> chown((DOMString or Uint8Array or URL) path, long long uid, long long gid)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.chown (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.chown", module := "node:fs/promises", path := "chown", construct := false, arity := 3 }
     (Support.args #[toJS path_, toJS uid, toJS gid])
 
-/-- `fsPromises.copyFile(src, dest[, mode])`: `Promise<undefined> copyFile((DOMString or Uint8Array or URL) src, (DOMString or Uint8Array or URL) dest, optional long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.copyFile(src, dest[, mode])` (added in Node.js v10.0.0): `Promise<undefined> copyFile((DOMString or Uint8Array or URL) src, (DOMString or Uint8Array or URL) dest, optional long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.copyFile (src : DOMStringOrUint8ArrayOrURL) (dest : DOMStringOrUint8ArrayOrURL) (mode : Option Int := none) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.copyFile", module := "node:fs/promises", path := "copyFile", construct := false, arity := 3 }
     (Support.args #[toJS src, toJS dest, Support.optional mode])
 
-/-- `fsPromises.cp(src, dest[, options])`: `Promise<undefined> cp((DOMString or URL) src, (DOMString or URL) dest, optional fsPromises.CpOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.cp(src, dest[, options])` (added in Node.js v16.7.0): `Promise<undefined> cp((DOMString or URL) src, (DOMString or URL) dest, optional fsPromises.CpOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.cp (src : DOMStringOrURL) (dest : DOMStringOrURL) (options : Option fsPromises.CpOptions := none) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.cp", module := "node:fs/promises", path := "cp", construct := false, arity := 3 }
     (Support.args #[toJS src, toJS dest, Support.optional options])
 
-/-- `fsPromises.lchown(path, uid, gid)`: `Promise<undefined> lchown((DOMString or Uint8Array or URL) path, long long uid, long long gid)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.lchown(path, uid, gid)` (added in Node.js v10.0.0): `Promise<undefined> lchown((DOMString or Uint8Array or URL) path, long long uid, long long gid)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.lchown (path_ : DOMStringOrUint8ArrayOrURL) (uid : Int) (gid : Int) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.lchown", module := "node:fs/promises", path := "lchown", construct := false, arity := 3 }
     (Support.args #[toJS path_, toJS uid, toJS gid])
 
-/-- `fsPromises.lutimes(path, atime, mtime)`: `Promise<undefined> lutimes((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.lutimes(path, atime, mtime)` (added in Node.js v14.5.0, v12.19.0): `Promise<undefined> lutimes((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.lutimes (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.lutimes", module := "node:fs/promises", path := "lutimes", construct := false, arity := 3 }
     (Support.args #[toJS path_, toJS atime, toJS mtime])
 
-/-- `fsPromises.link(existingPath, newPath)`: `Promise<undefined> link((DOMString or Uint8Array or URL) existingPath, (DOMString or Uint8Array or URL) newPath)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.link(existingPath, newPath)` (added in Node.js v10.0.0): `Promise<undefined> link((DOMString or Uint8Array or URL) existingPath, (DOMString or Uint8Array or URL) newPath)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.link (existingPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.link", module := "node:fs/promises", path := "link", construct := false, arity := 2 }
     (Support.args #[toJS existingPath, toJS newPath])
 
-/-- `fsPromises.lstat(path[, options])`: `Promise<fs.Stats> lstat((DOMString or Uint8Array or URL) path, optional fsPromises.LstatOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.lstat(path[, options])` (added in Node.js v10.0.0): `Promise<fs.Stats> lstat((DOMString or Uint8Array or URL) path, optional fsPromises.LstatOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.lstat (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.LstatOptions := none) : Async fs.Stats := do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Node.fsPromises.lstat", module := "node:fs/promises", path := "lstat", construct := false, arity := 2 }
     (Support.args #[toJS path_, Support.optional options])
   pure { val := r }
 
-/-- `fsPromises.mkdir(path[, options])`: `Promise<DOMString?> mkdir((DOMString or Uint8Array or URL) path, optional (fsPromises.MkdirOptions or long long) options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.mkdir(path[, options])` (added in Node.js v10.0.0): `Promise<DOMString?> mkdir((DOMString or Uint8Array or URL) path, optional (fsPromises.MkdirOptions or long long) options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.mkdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.MkdirOptionsOrLongLong := none) : Async (Option String) :=
   Lasm.JS.Binding.invokeAsync (Option String) { name := "Lasm.JS.Node.fsPromises.mkdir", module := "node:fs/promises", path := "mkdir", construct := false, arity := 2 }
     (Support.args #[toJS path_, Support.optional options])
 
-/-- `fsPromises.mkdtemp(prefix[, options])`: `Promise<(DOMString or Uint8Array)> mkdtemp((DOMString or Uint8Array or URL) prefix, optional (DOMString or fsPromises.MkdtempOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.mkdtemp(prefix[, options])` (added in Node.js v10.0.0): `Promise<(DOMString or Uint8Array)> mkdtemp((DOMString or Uint8Array or URL) prefix, optional (DOMString or fsPromises.MkdtempOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.mkdtemp («prefix» : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrMkdtempOptions := none) : Async DOMStringOrUint8Array :=
   Lasm.JS.Binding.invokeAsync DOMStringOrUint8Array { name := "Lasm.JS.Node.fsPromises.mkdtemp", module := "node:fs/promises", path := "mkdtemp", construct := false, arity := 2 }
     (Support.args #[toJS «prefix», Support.optional options])
 
-/-- `fsPromises.open(path, flags[, mode])`: `Promise<FileHandle> open((DOMString or Uint8Array or URL) path, (DOMString or double) flags, optional (DOMString or long long) mode)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.open(path, flags[, mode])` (added in Node.js v10.0.0): `Promise<FileHandle> open((DOMString or Uint8Array or URL) path, (DOMString or double) flags, optional (DOMString or long long) mode)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.«open» (path_ : DOMStringOrUint8ArrayOrURL) (flags : DOMStringOrDouble) (mode : Option DOMStringOrLongLong := none) : Async FileHandle := do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Node.fsPromises.open", module := "node:fs/promises", path := "open", construct := false, arity := 3 }
     (Support.args #[toJS path_, toJS flags, Support.optional mode])
   pure { val := r }
 
-/-- `fsPromises.readdir(path[, options])`: `Promise<sequence<(DOMString or Uint8Array or fs.Dirent)>> readdir((DOMString or Uint8Array or URL) path, optional (DOMString or fsPromises.ReaddirOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.readdir(path[, options])` (added in Node.js v10.0.0): `Promise<sequence<(DOMString or Uint8Array or fs.Dirent)>> readdir((DOMString or Uint8Array or URL) path, optional (DOMString or fsPromises.ReaddirOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.readdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrReaddirOptions := none) : Async (Array fs.DOMStringOrUint8ArrayOrDirent) :=
   Lasm.JS.Binding.invokeAsync (Array fs.DOMStringOrUint8ArrayOrDirent) { name := "Lasm.JS.Node.fsPromises.readdir", module := "node:fs/promises", path := "readdir", construct := false, arity := 2 }
     (Support.args #[toJS path_, Support.optional options])
 
-/-- `fsPromises.readFile(path[, options])`: `Promise<(Uint8Array or DOMString)> readFile((DOMString or Uint8Array or URL or FileHandle) path, optional (fsPromises.ReadFileOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.readFile(path[, options])` (added in Node.js v10.0.0): `Promise<(Uint8Array or DOMString)> readFile((DOMString or Uint8Array or URL or FileHandle) path, optional (fsPromises.ReadFileOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.readFile (path_ : DOMStringOrUint8ArrayOrURLOrFileHandle) (options : Option fsPromises.ReadFileOptionsOrDOMString := none) : Async Uint8ArrayOrDOMString :=
   Lasm.JS.Binding.invokeAsync Uint8ArrayOrDOMString { name := "Lasm.JS.Node.fsPromises.readFile", module := "node:fs/promises", path := "readFile", construct := false, arity := 2 }
     (Support.args #[toJS path_, Support.optional options])
 
-/-- `fsPromises.readlink(path[, options])`: `Promise<(DOMString or Uint8Array)> readlink((DOMString or Uint8Array or URL) path, optional (DOMString or fsPromises.ReadlinkOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.readlink(path[, options])` (added in Node.js v10.0.0): `Promise<(DOMString or Uint8Array)> readlink((DOMString or Uint8Array or URL) path, optional (DOMString or fsPromises.ReadlinkOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.readlink (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrReadlinkOptions := none) : Async DOMStringOrUint8Array :=
   Lasm.JS.Binding.invokeAsync DOMStringOrUint8Array { name := "Lasm.JS.Node.fsPromises.readlink", module := "node:fs/promises", path := "readlink", construct := false, arity := 2 }
     (Support.args #[toJS path_, Support.optional options])
 
-/-- `fsPromises.realpath(path[, options])`: `Promise<(DOMString or Uint8Array)> realpath((DOMString or Uint8Array or URL) path, optional (DOMString or fsPromises.RealpathOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.realpath(path[, options])` (added in Node.js v10.0.0): `Promise<(DOMString or Uint8Array)> realpath((DOMString or Uint8Array or URL) path, optional (DOMString or fsPromises.RealpathOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.realpath (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.DOMStringOrRealpathOptions := none) : Async DOMStringOrUint8Array :=
   Lasm.JS.Binding.invokeAsync DOMStringOrUint8Array { name := "Lasm.JS.Node.fsPromises.realpath", module := "node:fs/promises", path := "realpath", construct := false, arity := 2 }
     (Support.args #[toJS path_, Support.optional options])
 
-/-- `fsPromises.rename(oldPath, newPath)`: `Promise<undefined> rename((DOMString or Uint8Array or URL) oldPath, (DOMString or Uint8Array or URL) newPath)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.rename(oldPath, newPath)` (added in Node.js v10.0.0): `Promise<undefined> rename((DOMString or Uint8Array or URL) oldPath, (DOMString or Uint8Array or URL) newPath)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.rename (oldPath : DOMStringOrUint8ArrayOrURL) (newPath : DOMStringOrUint8ArrayOrURL) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.rename", module := "node:fs/promises", path := "rename", construct := false, arity := 2 }
     (Support.args #[toJS oldPath, toJS newPath])
 
-/-- `fsPromises.rmdir(path[, options])`: `Promise<undefined> rmdir((DOMString or Uint8Array or URL) path, optional fsPromises.RmdirOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.rmdir(path[, options])` (added in Node.js v10.0.0): `Promise<undefined> rmdir((DOMString or Uint8Array or URL) path, optional fsPromises.RmdirOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.rmdir (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.RmdirOptions := none) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.rmdir", module := "node:fs/promises", path := "rmdir", construct := false, arity := 2 }
     (Support.args #[toJS path_, Support.optional options])
 
-/-- `fsPromises.rm(path[, options])`: `Promise<undefined> rm((DOMString or Uint8Array or URL) path, optional fsPromises.RmOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.rm(path[, options])` (added in Node.js v14.14.0): `Promise<undefined> rm((DOMString or Uint8Array or URL) path, optional fsPromises.RmOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.rm (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.RmOptions := none) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.rm", module := "node:fs/promises", path := "rm", construct := false, arity := 2 }
     (Support.args #[toJS path_, Support.optional options])
 
-/-- `fsPromises.stat(path[, options])`: `Promise<fs.Stats> stat((DOMString or Uint8Array or URL) path, optional fsPromises.StatOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.stat(path[, options])` (added in Node.js v10.0.0): `Promise<fs.Stats> stat((DOMString or Uint8Array or URL) path, optional fsPromises.StatOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.stat (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fsPromises.StatOptions := none) : Async fs.Stats := do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Node.fsPromises.stat", module := "node:fs/promises", path := "stat", construct := false, arity := 2 }
     (Support.args #[toJS path_, Support.optional options])
   pure { val := r }
 
-/-- `fsPromises.symlink(target, path[, type])`: `Promise<undefined> symlink((DOMString or Uint8Array or URL) target, (DOMString or Uint8Array or URL) path, optional DOMString type)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.symlink(target, path[, type])` (added in Node.js v10.0.0): `Promise<undefined> symlink((DOMString or Uint8Array or URL) target, (DOMString or Uint8Array or URL) path, optional DOMString type)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.symlink (target : DOMStringOrUint8ArrayOrURL) (path_ : DOMStringOrUint8ArrayOrURL) (type : Option String := none) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.symlink", module := "node:fs/promises", path := "symlink", construct := false, arity := 3 }
     (Support.args #[toJS target, toJS path_, Support.optional type])
 
-/-- `fsPromises.truncate(path[, len])`: `Promise<undefined> truncate((DOMString or Uint8Array or URL) path, optional long long len)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.truncate(path[, len])` (added in Node.js v10.0.0): `Promise<undefined> truncate((DOMString or Uint8Array or URL) path, optional long long len)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.truncate (path_ : DOMStringOrUint8ArrayOrURL) (len : Option Int := none) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.truncate", module := "node:fs/promises", path := "truncate", construct := false, arity := 2 }
     (Support.args #[toJS path_, Support.optional len])
 
-/-- `fsPromises.unlink(path)`: `Promise<undefined> unlink((DOMString or Uint8Array or URL) path)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.unlink(path)` (added in Node.js v10.0.0): `Promise<undefined> unlink((DOMString or Uint8Array or URL) path)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.unlink (path_ : DOMStringOrUint8ArrayOrURL) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.unlink", module := "node:fs/promises", path := "unlink", construct := false, arity := 1 }
     (Support.args #[toJS path_])
 
-/-- `fsPromises.utimes(path, atime, mtime)`: `Promise<undefined> utimes((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.utimes(path, atime, mtime)` (added in Node.js v10.0.0): `Promise<undefined> utimes((DOMString or Uint8Array or URL) path, (double or DOMString or object) atime, (double or DOMString or object) mtime)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.utimes (path_ : DOMStringOrUint8ArrayOrURL) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrDOMStringOrObject) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.utimes", module := "node:fs/promises", path := "utimes", construct := false, arity := 3 }
     (Support.args #[toJS path_, toJS atime, toJS mtime])
 
-/-- `fsPromises.writeFile(file, data[, options])`: `Promise<undefined> writeFile((DOMString or Uint8Array or URL or FileHandle) file, (DOMString or Uint8Array or object) data, optional (fsPromises.WriteFileOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- `fsPromises.writeFile(file, data[, options])` (added in Node.js v10.0.0): `Promise<undefined> writeFile((DOMString or Uint8Array or URL or FileHandle) file, (DOMString or Uint8Array or object) data, optional (fsPromises.WriteFileOptions or DOMString) options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.writeFile (file : DOMStringOrUint8ArrayOrURLOrFileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : Option fsPromises.WriteFileOptionsOrDOMString := none) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.writeFile", module := "node:fs/promises", path := "writeFile", construct := false, arity := 3 }
     (Support.args #[toJS file, toJS data, Support.optional options])

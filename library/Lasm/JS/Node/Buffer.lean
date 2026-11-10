@@ -41,65 +41,65 @@ instance : FromJS DOMStringOrUint8Array where
     | _ => .error ""
   typeName := "Lasm.JS.Node.DOMStringOrUint8Array"
 
-/-- `buf.compare(target[, targetStart[, targetEnd[, sourceStart[, sourceEnd]]]])`: `long long compare(Uint8Array target, optional long long targetStart, optional long long targetEnd, optional long long sourceStart, optional long long sourceEnd)` -/
+/-- `buf.compare(target[, targetStart[, targetEnd[, sourceStart[, sourceEnd]]]])` (added in Node.js v0.11.13): `long long compare(Uint8Array target, optional long long targetStart, optional long long targetEnd, optional long long sourceStart, optional long long sourceEnd)` -/
 def Buffer.compare (self : ByteArray) (target : ByteArray) (targetStart : Option Int := none) (targetEnd : Option Int := none) (sourceStart : Option Int := none) (sourceEnd : Option Int := none) : IO Int :=
   Support.callOnBytes "node:buffer" "Buffer.prototype.compare" self (Support.args #[toJS target, Support.optional targetStart, Support.optional targetEnd, Support.optional sourceStart, Support.optional sourceEnd]) Int
 
-/-- `buf.equals(otherBuffer)`: `boolean equals(Uint8Array otherBuffer)` -/
+/-- `buf.equals(otherBuffer)` (added in Node.js v0.11.13): `boolean equals(Uint8Array otherBuffer)` -/
 def Buffer.equals (self : ByteArray) (otherBuffer : ByteArray) : IO Bool :=
   Support.callOnBytes "node:buffer" "Buffer.prototype.equals" self (Support.args #[toJS otherBuffer]) Bool
 
-/-- `buf.toString([encoding[, start[, end]]])`: `DOMString toString(optional DOMString encoding, optional long long start, optional long long end)` -/
+/-- `buf.toString([encoding[, start[, end]]])` (added in Node.js v0.1.90): `DOMString toString(optional DOMString encoding, optional long long start, optional long long end)` -/
 def Buffer.toString (self : ByteArray) (encoding : Option String := none) (start : Option Int := none) («end» : Option Int := none) : IO String :=
   Support.callOnBytes "node:buffer" "Buffer.prototype.toString" self (Support.args #[Support.optional encoding, Support.optional start, Support.optional «end»]) String
 
-/-- `Buffer.alloc(size[, fill[, encoding]])`: `static Uint8Array alloc(long long size, optional (DOMString or Uint8Array or long long) fill, optional DOMString encoding)` -/
+/-- `Buffer.alloc(size[, fill[, encoding]])` (added in Node.js v5.10.0): `static Uint8Array alloc(long long size, optional (DOMString or Uint8Array or long long) fill, optional DOMString encoding)` -/
 def Buffer.alloc (size : Int) (fill : Option DOMStringOrUint8ArrayOrLongLong := none) (encoding : Option String := none) : IO ByteArray :=
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.alloc", module := "node:buffer", path := "Buffer.alloc", construct := false, arity := 3 }
     (Support.args #[toJS size, Support.optional fill, Support.optional encoding]) (await := false)
 
-/-- `Buffer.byteLength(string[, encoding])`: `static long long byteLength((DOMString or Uint8Array) string, optional DOMString encoding)` -/
+/-- `Buffer.byteLength(string[, encoding])` (added in Node.js v0.1.90): `static long long byteLength((DOMString or Uint8Array) string, optional DOMString encoding)` -/
 def Buffer.byteLength (string : DOMStringOrUint8Array) (encoding : Option String := none) : IO Int :=
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.Buffer.byteLength", module := "node:buffer", path := "Buffer.byteLength", construct := false, arity := 2 }
     (Support.args #[toJS string, Support.optional encoding]) (await := false)
 
-/-- `Buffer.compare(buf1, buf2)`: `static long long compare(Uint8Array buf1, Uint8Array buf2)` -/
+/-- `Buffer.compare(buf1, buf2)` (added in Node.js v0.11.13): `static long long compare(Uint8Array buf1, Uint8Array buf2)` -/
 def Buffer.staticCompare (buf1 : ByteArray) (buf2 : ByteArray) : IO Int :=
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.Buffer.staticCompare", module := "node:buffer", path := "Buffer.compare", construct := false, arity := 2 }
     (Support.args #[toJS buf1, toJS buf2]) (await := false)
 
-/-- `Buffer.concat(list[, totalLength])`: `static Uint8Array concat(sequence<Uint8Array> list, optional long long totalLength)` -/
+/-- `Buffer.concat(list[, totalLength])` (added in Node.js v0.7.11): `static Uint8Array concat(sequence<Uint8Array> list, optional long long totalLength)` -/
 def Buffer.concat (list : Array ByteArray) (totalLength : Option Int := none) : IO ByteArray :=
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.concat", module := "node:buffer", path := "Buffer.concat", construct := false, arity := 2 }
     (Support.args #[toJS list, Support.optional totalLength]) (await := false)
 
-/-- `Buffer.from(string[, encoding])`: `static Uint8Array from(DOMString string, optional DOMString encoding)` -/
+/-- `Buffer.from(string[, encoding])` (added in Node.js v5.10.0): `static Uint8Array from(DOMString string, optional DOMString encoding)` -/
 def Buffer.«from» (string : String) (encoding : Option String := none) : IO ByteArray :=
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.from", module := "node:buffer", path := "Buffer.from", construct := false, arity := 2 }
     (Support.args #[toJS string, Support.optional encoding]) (await := false)
 
-/-- `Buffer.isEncoding(encoding)`: `static boolean isEncoding(DOMString encoding)` -/
+/-- `Buffer.isEncoding(encoding)` (added in Node.js v0.9.1): `static boolean isEncoding(DOMString encoding)` -/
 def Buffer.isEncoding (encoding : String) : IO Bool :=
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.Buffer.isEncoding", module := "node:buffer", path := "Buffer.isEncoding", construct := false, arity := 1 }
     (Support.args #[toJS encoding]) (await := false)
 
-/-- `buffer.kMaxLength`: `readonly attribute long long kMaxLength` (Node.js 24.22.2 documentation, buffer.md) -/
+/-- `buffer.kMaxLength` (added in Node.js v3.0.0): `readonly attribute long long kMaxLength` (Node.js 24.22.2 documentation, buffer.md) -/
 def buffer.kMaxLength : IO Int := Support.getExport "node:buffer" ["kMaxLength"] Int
 
-/-- `buffer.kStringMaxLength`: `readonly attribute long long kStringMaxLength` (Node.js 24.22.2 documentation, buffer.md) -/
+/-- `buffer.kStringMaxLength` (added in Node.js v3.0.0): `readonly attribute long long kStringMaxLength` (Node.js 24.22.2 documentation, buffer.md) -/
 def buffer.kStringMaxLength : IO Int := Support.getExport "node:buffer" ["kStringMaxLength"] Int
 
-/-- `buffer.isAscii(input)`: `boolean isAscii(Uint8Array input)` (Node.js 24.22.2 documentation, buffer.md) -/
+/-- `buffer.isAscii(input)` (added in Node.js v19.6.0, v18.15.0): `boolean isAscii(Uint8Array input)` (Node.js 24.22.2 documentation, buffer.md) -/
 def buffer.isAscii (input : ByteArray) : IO Bool :=
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.buffer.isAscii", module := "node:buffer", path := "isAscii", construct := false, arity := 1 }
     (Support.args #[toJS input]) (await := false)
 
-/-- `buffer.isUtf8(input)`: `boolean isUtf8(Uint8Array input)` (Node.js 24.22.2 documentation, buffer.md) -/
+/-- `buffer.isUtf8(input)` (added in Node.js v19.4.0, v18.14.0): `boolean isUtf8(Uint8Array input)` (Node.js 24.22.2 documentation, buffer.md) -/
 def buffer.isUtf8 (input : ByteArray) : IO Bool :=
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.buffer.isUtf8", module := "node:buffer", path := "isUtf8", construct := false, arity := 1 }
     (Support.args #[toJS input]) (await := false)
 
-/-- `buffer.transcode(source, fromEnc, toEnc)`: `Uint8Array transcode(Uint8Array source, DOMString fromEnc, DOMString toEnc)` (Node.js 24.22.2 documentation, buffer.md) -/
+/-- `buffer.transcode(source, fromEnc, toEnc)` (added in Node.js v7.1.0): `Uint8Array transcode(Uint8Array source, DOMString fromEnc, DOMString toEnc)` (Node.js 24.22.2 documentation, buffer.md) -/
 def buffer.transcode (source : ByteArray) (fromEnc : String) (toEnc : String) : IO ByteArray :=
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.buffer.transcode", module := "node:buffer", path := "transcode", construct := false, arity := 3 }
     (Support.args #[toJS source, toJS fromEnc, toJS toEnc]) (await := false)

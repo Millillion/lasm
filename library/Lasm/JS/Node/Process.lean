@@ -38,68 +38,68 @@ instance : ToJS DOMStringOrDouble := ⟨fun
   | .domString v => toJS v
   | .double v => toJS v⟩
 
-/-- `process.arch`: `readonly attribute DOMString arch` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.arch` (added in Node.js v0.5.0): `readonly attribute DOMString arch` (Node.js 24.22.2 documentation, process.md) -/
 def process.arch : IO String := Support.getExport "node:process" ["arch"] String
 
-/-- `process.argv`: `readonly attribute sequence<DOMString> argv` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.argv` (added in Node.js v0.1.27): `readonly attribute sequence<DOMString> argv` (Node.js 24.22.2 documentation, process.md) -/
 def process.argv : IO (Array String) := Support.getExport "node:process" ["argv"] (Array String)
 
-/-- `process.env`: `readonly attribute record<DOMString, DOMString> env` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.env` (added in Node.js v0.1.27): `readonly attribute record<DOMString, DOMString> env` (Node.js 24.22.2 documentation, process.md) -/
 def process.env : IO (Record String) := Support.getExport "node:process" ["env"] (Record String)
 
-/-- `process.execArgv`: `readonly attribute sequence<DOMString> execArgv` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.execArgv` (added in Node.js v0.7.7): `readonly attribute sequence<DOMString> execArgv` (Node.js 24.22.2 documentation, process.md) -/
 def process.execArgv : IO (Array String) := Support.getExport "node:process" ["execArgv"] (Array String)
 
-/-- `process.execPath`: `readonly attribute DOMString execPath` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.execPath` (added in Node.js v0.1.100): `readonly attribute DOMString execPath` (Node.js 24.22.2 documentation, process.md) -/
 def process.execPath : IO String := Support.getExport "node:process" ["execPath"] String
 
-/-- `process.exitCode`: `readonly attribute (long long or DOMString)? exitCode` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.exitCode` (added in Node.js v0.11.8): `readonly attribute (long long or DOMString)? exitCode` (Node.js 24.22.2 documentation, process.md) -/
 def process.exitCode : IO (Option LongLongOrDOMString) := Support.getExport "node:process" ["exitCode"] (Option LongLongOrDOMString)
 
-/-- `process.pid`: `readonly attribute long long pid` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.pid` (added in Node.js v0.1.15): `readonly attribute long long pid` (Node.js 24.22.2 documentation, process.md) -/
 def process.pid : IO Int := Support.getExport "node:process" ["pid"] Int
 
-/-- `process.platform`: `readonly attribute DOMString platform` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.platform` (added in Node.js v0.1.16): `readonly attribute DOMString platform` (Node.js 24.22.2 documentation, process.md) -/
 def process.platform : IO String := Support.getExport "node:process" ["platform"] String
 
-/-- `process.ppid`: `readonly attribute long long ppid` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.ppid` (added in Node.js v9.2.0, v8.10.0, v6.13.0): `readonly attribute long long ppid` (Node.js 24.22.2 documentation, process.md) -/
 def process.ppid : IO Int := Support.getExport "node:process" ["ppid"] Int
 
-/-- `process.title`: `readonly attribute DOMString title` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.title` (added in Node.js v0.1.104): `readonly attribute DOMString title` (Node.js 24.22.2 documentation, process.md) -/
 def process.title : IO String := Support.getExport "node:process" ["title"] String
 
-/-- `process.version`: `readonly attribute DOMString version` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.version` (added in Node.js v0.1.3): `readonly attribute DOMString version` (Node.js 24.22.2 documentation, process.md) -/
 def process.version : IO String := Support.getExport "node:process" ["version"] String
 
-/-- `process.versions`: `readonly attribute record<DOMString, DOMString> versions` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.versions` (added in Node.js v0.2.0): `readonly attribute record<DOMString, DOMString> versions` (Node.js 24.22.2 documentation, process.md) -/
 def process.versions : IO (Record String) := Support.getExport "node:process" ["versions"] (Record String)
 
-/-- `process.chdir(directory)`: `undefined chdir(DOMString directory)` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.chdir(directory)` (added in Node.js v0.1.17): `undefined chdir(DOMString directory)` (Node.js 24.22.2 documentation, process.md) -/
 def process.chdir (directory : String) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.chdir", module := "node:process", path := "chdir", construct := false, arity := 1 }
     (Support.args #[toJS directory]) (await := false)
 
-/-- `process.cwd()`: `DOMString cwd()` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.cwd()` (added in Node.js v0.1.8): `DOMString cwd()` (Node.js 24.22.2 documentation, process.md) -/
 def process.cwd : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.process.cwd", module := "node:process", path := "cwd", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `process.exit([code])`: `undefined exit(optional (long long or DOMString) code)` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.exit([code])` (added in Node.js v0.1.13): `undefined exit(optional (long long or DOMString) code)` (Node.js 24.22.2 documentation, process.md) -/
 def process.exit (code : Option LongLongOrDOMString := none) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.exit", module := "node:process", path := "exit", construct := false, arity := 1 }
     (Support.args #[Support.optional code]) (await := false)
 
-/-- `process.kill(pid[, signal])`: `undefined kill(double pid, optional (DOMString or double) signal)` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.kill(pid[, signal])` (added in Node.js v0.0.6): `undefined kill(double pid, optional (DOMString or double) signal)` (Node.js 24.22.2 documentation, process.md) -/
 def process.kill (pid : Float) (signal : Option DOMStringOrDouble := none) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.kill", module := "node:process", path := "kill", construct := false, arity := 2 }
     (Support.args #[toJS pid, Support.optional signal]) (await := false)
 
-/-- `process.memoryUsage()`: `object memoryUsage()` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.memoryUsage()` (added in Node.js v0.1.16): `object memoryUsage()` (Node.js 24.22.2 documentation, process.md) -/
 def process.memoryUsage : IO Data :=
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.process.memoryUsage", module := "node:process", path := "memoryUsage", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `process.uptime()`: `double uptime()` (Node.js 24.22.2 documentation, process.md) -/
+/-- `process.uptime()` (added in Node.js v0.5.0): `double uptime()` (Node.js 24.22.2 documentation, process.md) -/
 def process.uptime : IO Float :=
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.process.uptime", module := "node:process", path := "uptime", construct := false, arity := 0 }
     (Support.args #[]) (await := false)

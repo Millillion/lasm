@@ -152,33 +152,33 @@ instance : ToJS child_process.SpawnOptions := ⟨fun d => Support.fields #[("cwd
 /-- `subprocess.exitCode`: `readonly attribute long long? exitCode` -/
 def ChildProcess.exitCode (self : ChildProcess) : IO (Option Int) := self.val.get "exitCode" (Option Int)
 
-/-- `subprocess.killed`: `readonly attribute boolean killed` -/
+/-- `subprocess.killed` (added in Node.js v0.5.10): `readonly attribute boolean killed` -/
 def ChildProcess.killed (self : ChildProcess) : IO Bool := self.val.get "killed" Bool
 
-/-- `subprocess.pid`: `readonly attribute long long? pid` -/
+/-- `subprocess.pid` (added in Node.js v0.1.90): `readonly attribute long long? pid` -/
 def ChildProcess.pid (self : ChildProcess) : IO (Option Int) := self.val.get "pid" (Option Int)
 
 /-- `subprocess.signalCode`: `readonly attribute DOMString? signalCode` -/
 def ChildProcess.signalCode (self : ChildProcess) : IO (Option String) := self.val.get "signalCode" (Option String)
 
-/-- `subprocess.stderr`: `readonly attribute stream.Readable? stderr` -/
+/-- `subprocess.stderr` (added in Node.js v0.1.90): `readonly attribute stream.Readable? stderr` -/
 def ChildProcess.stderr (self : ChildProcess) : IO (Option stream.Readable) := self.val.get "stderr" (Option stream.Readable)
 
-/-- `subprocess.stdin`: `readonly attribute stream.Writable? stdin` -/
+/-- `subprocess.stdin` (added in Node.js v0.1.90): `readonly attribute stream.Writable? stdin` -/
 def ChildProcess.stdin (self : ChildProcess) : IO (Option stream.Writable) := self.val.get "stdin" (Option stream.Writable)
 
-/-- `subprocess.stdout`: `readonly attribute stream.Readable? stdout` -/
+/-- `subprocess.stdout` (added in Node.js v0.1.90): `readonly attribute stream.Readable? stdout` -/
 def ChildProcess.stdout (self : ChildProcess) : IO (Option stream.Readable) := self.val.get "stdout" (Option stream.Readable)
 
-/-- `subprocess.kill([signal])`: `boolean kill(optional (double or DOMString) signal)` -/
+/-- `subprocess.kill([signal])` (added in Node.js v0.1.90): `boolean kill(optional (double or DOMString) signal)` -/
 def ChildProcess.kill (self : ChildProcess) (signal : Option DoubleOrDOMString := none) : IO Bool :=
   self.val.callMethod "kill" (Support.args #[Support.optional signal]) Bool
 
-/-- `child_process.execFile(file[, args][, options][, callback])`: `Promise<child_process.ExecFileResult> execFile(DOMString file, optional sequence<DOMString> args, optional child_process.ExecFileOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
+/-- `child_process.execFile(file[, args][, options][, callback])` (added in Node.js v0.1.91): `Promise<child_process.ExecFileResult> execFile(DOMString file, optional sequence<DOMString> args, optional child_process.ExecFileOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
 def child_process.execFile (file : String) (args : Option (Array String) := none) (options : Option child_process.ExecFileOptions := none) : Async child_process.ExecFileResult :=
   Support.promisified child_process.ExecFileResult "node:child_process" "execFile" (Support.args #[toJS file, Support.optional args, Support.optional options])
 
-/-- `child_process.spawn(command[, args][, options])`: `ChildProcess spawn(DOMString command, optional sequence<DOMString> args, optional child_process.SpawnOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
+/-- `child_process.spawn(command[, args][, options])` (added in Node.js v0.1.90): `ChildProcess spawn(DOMString command, optional sequence<DOMString> args, optional child_process.SpawnOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
 def child_process.spawn (command : String) (args : Option (Array String) := none) (options : Option child_process.SpawnOptions := none) : IO ChildProcess := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.child_process.spawn", module := "node:child_process", path := "spawn", construct := false, arity := 3 }
     (Support.args #[toJS command, Support.optional args, Support.optional options]) (await := false)
