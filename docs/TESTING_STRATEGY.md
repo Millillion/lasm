@@ -294,7 +294,7 @@ measured). Snapshot of 2026-11-10:
 | 1 | Platforms | Not met | All 13 platforms are at L2 or higher; Node.js is at L3, Workers and the browser at L2 |
 | 2 | Mutation | Not met | 19 of 21 modules passed in the last nightly run; `application-sources` and `node-host` failed in setup (no score). Every threshold is 85–97 % |
 | 3 | Coverage | Partly met | 98.1 % of lines (143 files; baseline 67.5 %); the 0 % files are not yet checked against the integration workflows |
-| 4 | Campaigns | Not met | 0 of 30: the DST campaign failed on 2026-11-08 and 2026-11-10 (Porter #189, Tandem #190), and the nightly fuzzing campaign has no run on `main` yet |
+| 4 | Campaigns | Not met | 0 of 30: the DST campaign failed on 2026-11-08 and 2026-11-10 (Porter #189, Tandem #190; both fixed, the count starts again with the next clean night), and the nightly fuzzing campaign has no run on `main` yet |
 | 5 | Flakes | Partly met | `test/quarantine.json` is empty and has had no entry since it was created (2026-11-03); the 14-day window is not computed yet |
 | 6 | Apps | Not measured | Each app's platform workflows pass; no single check yet compares them with "every platform it claims" |
 | 7 | Propositions | Not met | The lint is green; 10 candidates; 5 of 8 fuzz oracles (not `cli-arguments`, `ui-patch`, `wasi-cgi`) and 2 of 34 `forAll` properties name a proposition; three PROOFS.md items need a model before they can be stated (JavaScript applier, hydration, KV stores) |

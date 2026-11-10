@@ -900,7 +900,10 @@ checks the invariants. `node test/dst.mjs` starts it.
 **CI.** Each app's workflow (`tandem.yml`, `ledger.yml`, `porter.yml`, on
 changes to the app or to `scripts/sim`) runs 30 fixed seeds, each twice to
 check that it replays exactly (`--seeds 30 --check-determinism`), then 10
-fixed seeds with heavy faults.
+fixed seeds with heavy faults, then its regression seeds: every seed that once
+failed in the nightly, kept after its fix (`--seed N,M,…`). An exception thrown
+by the world itself fails its seed (named, replayable) instead of ending the
+campaign.
 [`dst-nightly.yml`](../.github/workflows/dst-nightly.yml) runs random seeds
 for 20 minutes per app, then 10 minutes with heavy faults. A failure prints:
 
@@ -924,7 +927,20 @@ its own code used (or its refresh token rotated) and revoked the family it
 had just issued; each commit now inserts a commit receipt, which a failed
 commit looks up, and the simulation fails if a fresh code or a live refresh
 token is refused after an ambiguous commit (except when the receipt itself
-could not be read, the documented case, in which nothing is revoked). In Ledger,
+could not be read, the documented case, in which nothing is revoked). The
+nightly then found a second Tandem bug of the same family (#190): a retry that
+carried both the operations of an ambiguous commit and newly typed ones pushed
+only the new ones, so the earlier ones were never pushed; the server now
+pushes the reply (the log from the client's cursor) whenever some of a
+request's operations were in the log already. Porter's other nightly failures
+(#189) were the world's own mistakes, now fixed: it expected a live session
+after a logout whose answer was lost, duplicated, or arrived after a newer
+sign-in (whose cookie the logout's answer clears); it counted a revocation
+learned while a userinfo or refresh request was in flight as one that request
+must have seen; it did not count a lost refresh with a possibly rotated token
+as a possible reuse; it required a code to be redeemable after the heal even
+when it had expired on a skewed racing instance; and it threw on an agent
+whose tokens were dropped while a call was scheduled. In Ledger,
 nothing: every seed kept every invariant, racing commits at skewed clocks
 included. See [Bugs found](#bugs-found).
 
@@ -1484,6 +1500,8 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Deterministic simulation of Tandem (first CI run: 12 of 30 seeds) | **The editor could drop an unsent edit from `pending`:** a WebSocket push that did not continue the replica's log sent a second sync while one was in flight, without marking it in flight, so two replies came back and the first one's count (`onReply sent`) dropped operations the second carried. The edit was lost if that second sync failed | Fixed: a push that arrives while a sync is in flight marks the editor behind, and it syncs again when the reply returns (`Frontend/Ui.lean`) |
 | Deterministic simulation of Tandem (first CI run) | A failed catch-up sync (nothing pending) was never retried: the retry ran only while edits were pending, so the editor showed "Offline: 0 edits waiting" and stayed behind the log until someone else typed | Fixed: the retry always syncs |
 | Deterministic simulation of Tandem (third CI run, most seeds with an ambiguous commit) | A commit that succeeded and then reported an error (D1's lost reply, a timeout after `COMMIT`): `syncOnce` ran the sync again, found the operations known and appended and pushed nothing, so tabs that were not typing never heard of them | Fixed: a failed commit checks whether the log holds exactly its operations at its position, and if so answers and pushes them; and a sync whose operations were all in the log already pushes its reply, which holds them (`Server/App.lean`; the second part was found by the heavy-fault seeds, when that check could not read the log) |
+| DST nightly, heavy faults (42807003871, seed 1496820401) | The same family ([#190](https://github.com/Millillion/lasm/issues/190)): a sync whose commit landed and then reported an error, and whose check could not read the log, answered 503; the tab's retry carried those operations and newly typed ones, so the server appended only the new ones and pushed only them. The earlier operations were never pushed | Fixed: a sync with any operation already in the log pushes its reply, and pushes what it appended separately unless the reply holds it (`Server/App.lean`); regression seed in `tandem.yml` |
+| DST nightly (42807003871 and 42471623224, 17 seeds) | Porter: "asked for the password with a live session", "an access token of a revoked family still works", "a live access token was refused", a refused code after the heal, and an uncaught `TypeError` that ended the campaign ([#189](https://github.com/Millillion/lasm/issues/189)). None was Porter's: the world kept a session alive after a logout whose answer was lost or duplicated (one copy ended it, the other's 503 arrived) or that cleared the cookie of a sign-in finished meanwhile; it counted a revocation learned while a request was in flight as one the request must have seen; it did not count a lost refresh of a possibly rotated token as a possible reuse; it expected a code to redeem after the heal when it had expired on a skewed racing instance; and it read the tokens of an agent that had dropped them | World fixes (`examples/porter/test/dst/world.mjs`); a harness exception now fails its seed instead of the campaign; 16 regression seeds in `porter.yml` |
 | Deterministic simulation of Porter (4 of 30 seeds) | A token request whose commit succeeded and then reported an error is run again by `runRequest`, finds its own code used or its refresh token rotated, answers `invalid_grant` and revokes the family it just issued: one transient database error signs a user out | Fixed (#138, Jordan's choice of a commit receipt): each commit inserts a row keyed by an id from the request's random values (the same on a rerun), and a failed commit whose receipt is there keeps its reply (`Server/App.lean`, `Spec.landed_commit_stands`); the simulation no longer tolerates the refusal |
 | Mutation testing (`downloads`, 2026-11-09) | **A failing SDK archive decoder was reported as the tar parser's error**: when the managed Python's decoder for `.tar.xz`/`.zip` SDK archives (`src/archive-stream.py`) failed, could not start or was killed, `extract` reported `TAR_BAD_ARCHIVE: Unrecognized archive format` for the empty or truncated stream it left, not the decoder's exit status and messages | Fixed in `src/managed-artifacts.mjs` (the decoder's result is preferred after a broken stream); regressions in `test/managed-artifacts-decoder.test.mjs`; `docs/release/0.6.1-notes.md` |
 | Differential fuzzing, feature programs (campaign 42620999209, seed 620999216, case 132; `wasi`, `wasi-node`, `deno`, the edge engines, browsers, both profiles) | `(repr a).pretty` of an `Array Int` of 5,120 elements stops with "call stack exhausted" / "Maximum call stack size exceeded": Lean's formatter recurses with the number of elements, and the WASI and edge stacks hold about 9,000–11,000 frames. Native Lean and the Node target print it | Open: [#179](https://github.com/Millillion/lasm/issues/179) (the documented recursion-depth limit, reached through the standard library); the generator keeps printed arrays below that size |
