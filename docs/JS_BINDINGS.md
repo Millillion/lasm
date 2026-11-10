@@ -726,11 +726,11 @@ each fails ([`test/fixtures/js-node/known.json`](../test/fixtures/js-node/known.
 and which generated members each lacks. Workers, the other edge platforms and
 browsers are not targets of `Lasm.JS.Node`.
 
-On 2026-11-10 (`web-bindings.yml` run 42831413882: Node 26.13.0 and 24.22.2,
+On 2026-11-10 (`web-bindings.yml` run 42846454581: Node 26.13.0 and 24.22.2,
 Bun 1.4.4, Deno 2.9.6) every generated function, class and static member exists
-on all four (the availability probe found none missing), and every check
-passed on all four except Deno's `filehandle.write(string)`, which gives the
-bytes written where the docs give the string.
+on all four (the availability probe found none missing), and all 5,535 checks
+passed on Node 26, Node 24 and Bun; on Deno all but one, `filehandle.write(string)`,
+which gives the bytes written where the docs give the string.
 
 ### Cost
 
@@ -738,10 +738,11 @@ bytes written where the docs give the string.
   and a SHA-256 digest) through `Lasm.JS.Node` and through `Lasm.JS` alone:
   691,534 and 738,526 bytes of Wasm on Node, 567,224 and 559,715 on the edge
   runtime (`--target deno`).
-- **Build time: about 4 to 5 seconds more** for a new project with warm tools:
-  Node 13.0 → 16.8 s, the edge runtime 8.8 → 13.9 s (one CI run).
+- **Build time: about 4 to 9 seconds more** for a new project with warm tools:
+  Node 13.0 → 16.8 s and 18.2 → 24.6 s, the edge runtime 8.8 → 13.9 s and
+  12.9 → 21.7 s (two CI runs).
 - **Package size:** the compiled library (`library/prebuilt`) grows from 61.0
-  to 70.7 MB (6.9 MB of `.olean` files), 2.2 MB compressed. Nothing is
+  to 70.8 MB (7.0 MB of `.olean` files), 2.2 MB compressed. Nothing is
   compiled on the user's machine.
 
 ### Pinned version and drift
