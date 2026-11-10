@@ -13,3 +13,6 @@ dist/
 # Editor and OS files.
 .DS_Store
 *~
+
+# Node diagnostic reports (process.report)
+report.[0-9]*.json

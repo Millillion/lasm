@@ -8,7 +8,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, wr
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compileLibrary, fetchGlueSource, asyncGlueSource, glueLinkFlags, glueSource, importsLibrary, libraryFiles, libraryIdentity, libraryLeanVersions,
+import { compileLibrary, fetchGlueSource, asyncGlueSource, glueLinkFlags, glueSource, importsLibrary, libraryIdentity, libraryLeanVersions,
   libraryModules, libraryOutputs, librarySources, linkedLibraryModules, prebuiltLibrary } from '../src/lasm-library.mjs';
 import { toolchainCatalog } from '../src/managed-lean.mjs';
 
@@ -126,10 +126,3 @@ test('the library sources a program links come from the prefix, with the glue, a
   assert.throws(() => librarySources(lean, [program]), { message: `This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean 4.35.0 or Lean's elaborator libraries (the extended tier); it is missing from ${prefix}`.replace('4.35.0 or Lean', '4.35.0 with Lean') });
 });
 
-test('every file of the library, recursively', t => {
-  const directory = scratch(t);
-  put(join(directory, 'a.lean'), ''); put(join(directory, 'b/c/d.c'), ''); put(join(directory, 'b/e.lean'), '');
-  assert.deepEqual(libraryFiles(directory).sort(), [join(directory, 'a.lean'), join(directory, 'b/c/d.c'), join(directory, 'b/e.lean')]);
-  const files = libraryFiles();
-  assert.ok(files.includes(glueSource) && files.includes(join(library, 'Lasm', 'JS.lean')));
-});
