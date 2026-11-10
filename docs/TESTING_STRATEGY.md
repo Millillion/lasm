@@ -48,9 +48,9 @@ Each method below says what it is, what Lasm has today, and the next gap.
 | --- | --- | --- | --- |
 | **Differential testing (vs native Lean)** | The same Lean program, built natively by upstream Lean and by Lasm, must print the same and exit the same | `scripts/differential/`: generator, shrinker, regression replay; four extra oracles: `lean --run`, `-O0`/`-O2`, four engines, Bun and three browsers | Corpora: Lean's own `tests/`, Batteries' tests and book code, run through the harness, not only through the upstream suite |
 | **Target equivalence** | One server or app, the same traffic, every platform; only documented normalizations | `scripts/equivalence/` (fetch template and `examples/fetch` on 5 targets); Conduit's 154 RealWorld exchanges on 18 platforms | Recorded traffic of Ledger, Porter and Tandem; browser DOM traces |
-| **Differential fuzzing** | Generated inputs with a second implementation as the oracle. (a) Generated Lean programs, compiled by Lasm vs native Lean. (b) JavaScript glue vs its Lean model, run with `lean --run` | (a) The differential generator: typed expression trees, statements, tasks, files; campaigns of 60 minutes nightly and 100 minutes weekly. (b) `serverless-http` against `Lasm/Serverless/Proofs/Model.lean` | (a) Coverage feedback (keep programs that reach new runtime C or new Lasm glue) and more language features: type classes, `partial`, `Thunk`, `ST`, structures with many fields, `ByteArray`/`FloatArray`. (b) The same for the UI patch decoder (against `Lasm/UI/Proofs/Decode.lean`) and the Lasm.JS wire codec (against `Lasm/JS/Proofs/Wire.lean`) |
-| **Coverage-guided fuzzing** | Mutated inputs at every input boundary, guided by coverage; no crash, hang or garbage accepted | `test/fuzz/`: 6 targets (V8 block coverage for JavaScript; libFuzzer with ASan/UBSan for Lean's C and the WASI C host); the apps' fuzzers | The Fastly host, the edge host's request mapping, the `lasm dev` proxy, project-file parsing (`lakefile.toml`, `lakefile.lean` options, `package.json`) |
-| **Property testing with transferable propositions** | A named proposition (§4), checked on generated inputs until it is proved | Lean libraries: 50+ propositions in `library/Lasm/*/Spec.lean`, all proved. Apps: `examples/*/Proofs/Spec.lean`. Fuzz oracles that state their property in prose | Every fuzz oracle and JS property names its Lean proposition (§4). The `Candidates` file per library (§4). A lint that every named proposition exists |
+| **Differential fuzzing** | Generated inputs with a second implementation as the oracle. (a) Generated Lean programs, compiled by Lasm vs native Lean. (b) JavaScript glue vs its Lean model, run with `lean --run` | (a) The differential generator: typed expression trees, statements, tasks, files; campaigns of 60 minutes nightly and 100 minutes weekly. (b) `serverless-http` against `Lasm/Serverless/Proofs/Model.lean`; `ui-decode`, the Lasm.UI applier's reading against the reference decoder `Lasm/UI/Proofs/Decode.lean` | (a) Coverage feedback (keep programs that reach new runtime C or new Lasm glue) and more language features: type classes, `partial`, `Thunk`, `ST`, structures with many fields, `ByteArray`/`FloatArray`. (b) The same for the Lasm.JS wire codec (against Lean's `Wire`) |
+| **Coverage-guided fuzzing** | Mutated inputs at every input boundary, guided by coverage; no crash, hang or garbage accepted | `test/fuzz/`: 7 targets (V8 block coverage for JavaScript; libFuzzer with ASan/UBSan for Lean's C and the WASI C host); the apps' fuzzers | The Fastly host, the edge host's request mapping, the `lasm dev` proxy, project-file parsing (`lakefile.toml`, `lakefile.lean` options, `package.json`) |
+| **Property testing with transferable propositions** | A named proposition (§4), checked on generated inputs until it is proved | Lean libraries: 53 propositions in `library/Lasm/*/Spec.lean`, all proved; 10 candidates in `Candidates.lean` (Lasm.UI, Lasm.Fetch, Lasm.RPC), each evaluated on generated inputs (`test/ui/DiffModel.lean`, the `lean-fetch-request` and `lean-rpc` fuzz targets). Apps: `examples/*/Proofs/Spec.lean`. The proposition lint (`scripts/propositions.mjs`, PR tier) | Every fuzz oracle and JS property names its Lean proposition (§4; on 2026-11-10: 3 of 6 oracles, 2 of 33 `forAll` properties) |
 | **Metamorphic testing** | A relation between two runs, e.g. an incremental build equals a clean one | `scripts/tooling/metamorphic.mjs` (`lasm build`, `lasm dev`) | Compiler relations: renaming a definition, adding an unused import, or reordering independent definitions changes no output |
 | **Fault injection** | Killed processes, a full disk, a dropped network, corrupt caches, platform limits | `scripts/tooling/faults.mjs`; installer faults on 5 OSes; DST faults in the apps | Memory and CPU limits of the function platforms; host-call failures inside the Lasm.JS bridge |
 | **Deterministic simulation** | Seeded simulated clock, scheduler, network and storage; every failure replays from its seed | `scripts/sim/` with Tandem, Ledger and Porter; host-bridge schedule fuzzing (`scripts/bridge-fuzz/`) | Conduit and Folio's edge server; `lasm dev`'s rebuild loop |
@@ -76,9 +76,9 @@ How to read a cell:
 | --- | --- | --- | --- | --- | --- |
 | Differential vs native Lean | E: PR, N, W, R | E: PR, N (every target runs the same programs) | P: N (library code in generated programs) | — | E: PR (Ledger vs TigerBeetle, Folio vs commonmark.js, Porter vs openid-client, Tandem vs Yjs) |
 | Target equivalence | E: PR (through the outputs) | E: PR, N | E: PR (through the apps) | P: N (`lasm build` bytes across OSes) | E: PR (Conduit, 18 platforms); P: N (the other four) |
-| Differential fuzzing | E: N, W (generated programs); P: coverage feedback | E: PR, N (`serverless-http` vs its Lean model); P: UI decoder, Lasm.JS wire | P: N (encoders vs their Lean decoders) | — | E: N (Folio, Tandem vs their references) |
+| Differential fuzzing | E: N, W (generated programs); P: coverage feedback | E: PR, N (`serverless-http` vs its Lean model; `ui-decode` vs the reference decoder); P: Lasm.JS wire | P: N (encoders vs their Lean decoders) | — | E: N (Folio, Tandem vs their references) |
 | Coverage-guided fuzzing | P: W (the link driver's inputs: recipes, maps) | E: PR (replay), N, W | E: PR, N, W (Fetch, RPC) | E: PR, N (CLI arguments); P: project files | E: PR, N (Porter, Folio, Tandem) |
-| Property tests, named propositions | P: N (generator properties named) | P: PR (each JS oracle names its proposition) | E: PR (Spec files, proved); P: Candidates | P: PR (error-corpus properties named) | E: PR (Spec files) |
+| Property tests, named propositions | P: N (generator properties named) | E: PR, N (`serverless-http` names 4, two serverless properties); P: PR (the other JS oracles and properties) | E: PR (Spec files, proved); E: PR, N (Candidates: `DiffModel.lean`, native fuzz targets) | P: PR (error-corpus properties named) | E: PR (Spec files) |
 | Metamorphic | P: N (renames, reorders) | — | — | E: N, PR (on harness change) | — |
 | Fault injection | — | E: N (bridge schedules); P: host-call faults | — | E: PR (Linux, Windows), N, R (5 OSes) | E: PR, N (DST) |
 | Deterministic simulation | — | E: PR, N (host bridge model and schedule fuzzing) | — | P: N (`lasm dev` loop) | E: PR (30 seeds), N (random seeds) |
@@ -111,11 +111,12 @@ so that proving it later is a mechanical step:
   - each app's `Proofs/Spec.lean`, for example [examples/ledger/Proofs/Spec.lean](../examples/ledger/Proofs/Spec.lean)
 - **Tested propositions** go in a sibling file, `Candidates.lean`, in the same
   namespace and with the same form. The doc comment adds one line,
-  `Tested by: <path>`, naming the test that checks it. Today these
-  candidates are prose in [library/PROOFS.md](../library/PROOFS.md#candidates-not-yet-proved).
-  They become `Candidates.lean` definitions as they are touched. Moving one to
-  `Spec.lean` and adding its theorem proves it, and `library-proofs.mjs` then
-  requires the theorem.
+  `Tested by: <path>`, naming the test that checks it. They exist for
+  Lasm.UI, Lasm.Fetch and Lasm.RPC
+  ([library/Lasm/UI/Candidates.lean](../library/Lasm/UI/Candidates.lean));
+  the candidates list of [library/PROOFS.md](../library/PROOFS.md#candidates-not-yet-proved)
+  is generated from them. Moving one to `Spec.lean` and adding its theorem
+  proves it, and `library-proofs.mjs` then requires the theorem.
 - **The statement is decidable on samples.** A candidate is stated as
   `∀ x, P x`, with `P x` decidable for concrete `x` (or `Bool`-valued).
   The test then evaluates exactly the same `P` on generated `x`, by one of
@@ -164,9 +165,16 @@ so that proving it later is a mechanical step:
   - the differential generator.
 
   Plausible and fast-check are not added (decision 9, §6).
-- A lint (planned, PR tier) checks two things:
-  - every `Proposition:` line names a definition that exists;
-  - every `Tested by:` path exists.
+- A lint (`node scripts/propositions.mjs`, run by
+  `test/propositions.test.mjs` on every pull request) checks:
+  - every `Proposition:` line names a definition that exists, and the
+    statement on the comment lines after it is the definition's (whitespace
+    aside);
+  - every `Tested by:` path exists and cites the candidate;
+  - library/PROOFS.md's candidates list is current.
+
+  It also counts the fuzz oracles and `forAll` properties that name a
+  proposition, the measure of exit bar 7 ([TESTING.md](TESTING.md#named-propositions)).
 
 ## 5. Rules of the process
 
@@ -273,3 +281,21 @@ on the evidence page.
 
 Until the bar is met, it is the reason to add tests. Once it is met, new
 tests come from bugs, new features and the propositions of §4.
+
+### Status
+
+The [evidence page](../content/learn/test-evidence.md) computes this from CI
+and the repository every time it is regenerated (its first section, "The exit
+bar"; [TESTING.md](TESTING.md#the-test-evidence-page) says how each item is
+measured). Snapshot of 2026-11-10:
+
+| # | Item | Status | What is missing |
+| --- | --- | --- | --- |
+| 1 | Platforms | Not met | All 13 platforms are at L2 or higher; Node.js is at L3, Workers and the browser at L2 |
+| 2 | Mutation | Not met | 19 of 21 modules passed in the last nightly run; `application-sources` and `node-host` failed in setup (no score). Every threshold is 85–97 % |
+| 3 | Coverage | Partly met | 98.1 % of lines (143 files; baseline 67.5 %); the 0 % files are not yet checked against the integration workflows |
+| 4 | Campaigns | Not met | 0 of 30: the DST campaign failed on 2026-11-10, and the nightly fuzzing campaign has no run on `main` yet |
+| 5 | Flakes | Partly met | `test/quarantine.json` is empty and has had no entry since it was created (2026-11-03); the 14-day window is not computed yet |
+| 6 | Apps | Not measured | Each app's platform workflows pass; no single check yet compares them with "every platform it claims" |
+| 7 | Propositions | Not met | The lint is green; 10 candidates; 3 of 6 fuzz oracles and 2 of 34 `forAll` properties name a proposition; three PROOFS.md items need a model before they can be stated (JavaScript applier, hydration, KV stores) |
+| 8 | Differential fuzzing | Not met | Generator features: PR #167; the model differentials for the Lasm.JS wire codec (#187) and the UI decoder (#188) are in review |

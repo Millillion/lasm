@@ -42,6 +42,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
 | [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
+| [Named propositions](#named-propositions) | Every test that names a Lean proposition names one that exists and states it verbatim; every candidate (tested, not yet proved) names a test that cites it | `scripts/propositions.mjs`, `library/Lasm/*/Candidates.lean`, `test/propositions.test.mjs` | PR (`unit.yml`) |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (`unit.yml`), nightly, release |
 | [Flaky tests](#flaky-tests) | A flaky test is quarantined at once, then fixed or deleted within a week | `test/quarantine.json`, `scripts/test/`, `scripts/ci/flaky-report.mjs` (`flaky.yml`) | nightly report; quarantine on every unit run |
 | [Coverage and mutation](#coverage-and-mutation-testing) | How much of the JavaScript the tests execute, and whether they would notice a change | `scripts/coverage/`, `scripts/mutation/` (`mutation.yml`) | PR, nightly and release (coverage); nightly and PR, changed modules only (mutation) |
@@ -600,6 +601,7 @@ where they are; these cover the libraries and hosts every app shares.
 | `cli-arguments` | `src/cli-arguments.mjs` and the `init`, `dev`, `package` parsers | JavaScript | a parse names only targets, templates and deploy targets Lasm has (own keys, never `constructor`); every refusal is a plain `Error` with a readable message |
 | `serverless-http` | `src/serverless/lasm-lambda.mjs` (API Gateway REST and HTTP API, function URLs, ALB, CloudFront events) and `lasm-server.mjs`'s helpers (`outgoingHeaders`, cookies, `isTextual`, `azureReply`, `webReply`) | JavaScript | every well-formed event is answered; the forwarded target is one http.request accepts and starts with `/`, one Cookie and one plain Host header, query values as the platform gave them, the body round-trips byte for byte, each Set-Cookie once; and the request, the response, the Azure and Netlify replies and the parsed cookies are exactly what the Lean model says (`library/Lasm/Serverless/Proofs/Model.lean`, whose theorems are in [library/PROOFS.md](../library/PROOFS.md); run with `lean --run` by `test/fuzz/support/serverless-model.mjs`, required in CI) |
 | `ui-patch` | the Lasm.UI patch decoder (`src/lasm-modules/ui-dom.mjs`) on happy-dom, with hydration | JavaScript | a frame applies, or fails with a `Lasm.UI: …` error or a `DOMException`; never a `TypeError`, a hang, or an attribute from a reference past the name table |
+| `ui-decode` | the same applier's reading of a session's frames, on a recording DOM (the DOM's tree semantics, every slot kept), against Lean's reference decoder (`library/Lasm/UI/Proofs/Decode.lean`, which `Lasm.UI.Spec.frames_decode` proves reads every encoded frame as its patch) | JavaScript | frame by frame, the applier refuses exactly the frames the decoder refuses, and otherwise leaves exactly the DOM the decoder's operations make: every node, id, tag, namespace, text, attribute, property, style, and listener with its decoder's paths. The decoder runs with `lean --run` (`test/fuzz/support/ui-decode-model.mjs`, required in CI). Frames whose meaning depends on the DOM, not the bytes (an id not in the document, a move into its own subtree, an id in use, a property that is a DOM member), and numbers above 2^53, end a session without a verdict; a removed property reads as its type's empty value, so `""`, `false` and unset compare equal |
 | `lean-fetch-request` | `Lasm.Fetch`'s request parsing as Node's host builds requests (`nodeRequestUrl`, `path`, `segments`, `query`, `queryParams`, `header?`, `percentDecode`, `joinCookies`, `splitCookieCommas`) | libFuzzer, ASan | the path starts with `/` and holds no `?`, `#`, `\`; the Host header never moves the path; the target alone has the same path; resolving again changes nothing; no dot segments; one Cookie header |
 | `lean-rpc` | `Lasm.RPC`'s `decodeRequest` and `decodeResponse` for an endpoint with strings, Booleans, arrays, `Nat` and `Option` | libFuzzer, ASan | accepted only when `validate` passes, otherwise refused as invalid (400); request and response round trips; Lean's JSON printer's output parses and prints the same |
 | `wasi-cgi` | the WASI C host's CGI request and response (`src/wasi/lasm_fetch_wasi.c`), compiled natively | libFuzzer, ASan, UBSan | strings handed to Lean are valid UTF-8; the method is `REQUEST_METHOD`; the Host or `SERVER_NAME` never moves the path; the response head is one line per header, no CR, LF or NUL inside a line |
@@ -641,6 +643,7 @@ a fix, or an issue.
     node test/fuzz/run.mjs fuzz --seconds 30 ui-patch   # a campaign; --seed N replays one
     node test/fuzz/native/build.mjs                     # Linux, clang: the native targets
     node test/fuzz/support/serverless-model.mjs         # serverless-http's Lean model (used when prepared)
+    node test/fuzz/support/ui-decode-model.mjs          # ui-decode's Lean decoder (used when prepared)
 
 **CI** ([fuzz.yml](../.github/workflows/fuzz.yml)): every pull request and push
 to `main` replays the committed corpus and regressions of the JavaScript
@@ -685,6 +688,13 @@ failing input and uploads its new corpus entries and failing inputs (artifact
   body lost its accented letters (text only when valid UTF-8); and a reply
   field named `__proto__` or `constructor` was dropped or threw a
   `TypeError` (header maps without a prototype).
+- checked against Lean's reference decoder, the Lasm.UI applier read two
+  kinds of frame the decoder refuses: a listener naming a decoder the stream
+  never defined (an event on it would then have read no fields), and text
+  that is not UTF-8 (read with U+FFFD). Both are now refused
+  (`Lasm.UI: no decoder N`, `Lasm.UI: text that is not UTF-8`). A number
+  above 2^53 is refused instead of rounded, and padding zeros past it, which
+  Lean reads as nothing, no longer turn into `NaN`.
 
 **Cannot catch:** logic errors that produce well-formed wrong answers (the
 differential and equivalence oracles are for that); the Wasm builds'
@@ -928,6 +938,34 @@ The [baseline](#coverage-baseline) is published below. Coverage says which lines
 ran, not that their results were checked; [mutation testing](#mutation-testing)
 says whether the tests would notice a change.
 
+### Named propositions
+
+A property test is a proposition not yet proved
+([TESTING_STRATEGY.md §4](TESTING_STRATEGY.md#4-property-testing-convention-propositions-that-carry-over-to-proofs)).
+Proved propositions are the `def … : Prop` of each `Spec.lean`; tested ones are
+the same kind of definition in the library's `Candidates.lean`, whose doc
+comment ends with `Tested by: <path>`. A test that checks a proposition cites it
+in a comment, with the statement on the comment lines after it, indented:
+
+```js
+// Proposition: Lasm.Serverless.Spec.target_valid
+//   ∀ p q : String, ∀ c ∈ (requestTarget p q).toList, printable c = true ∧ c ≠ '#'
+```
+
+and evaluates that statement on every input it draws (in Lean tests, the
+body itself through `decide`). `node scripts/propositions.mjs` (run by
+`test/propositions.test.mjs` on every pull request) fails when a cited name
+does not exist, when the cited statement is not the definition's (whitespace
+aside), when a candidate's `Tested by:` file is missing or does not cite it,
+or when [library/PROOFS.md](../library/PROOFS.md#candidates-not-yet-proved)'s
+candidates list (generated from the Candidates files; `--write` updates it) is
+stale. It also counts the fuzz oracles and the `forAll` properties that name
+a proposition (`--json` prints the inventory): exit bar 7 needs all of them.
+The Candidates files compile with the proofs (`scripts/library-proofs.mjs`).
+The Lean candidates are checked in `test/ui/DiffModel.lean` (`ui.yml`) and in
+the `lean-fetch-request` and `lean-rpc` fuzz targets
+(`test/fuzz/native/LasmFuzz.lean`, `fuzz.yml`).
+
 ## CI tiers
 
 [CI.md](CI.md) is the reference: the four tiers, the inventory of every
@@ -1016,6 +1054,21 @@ to `main`. Each section keeps two kinds of fact apart:
   each PROOFS.md states (its proof check fails when the page is stale), the
   fuzz targets and DST apps (the workflows' matrices), the equivalence targets
   and the latest benchmark table ([BENCHMARKS.md](BENCHMARKS.md)).
+
+The page opens with the [exit bar](TESTING_STRATEGY.md#7-exit-bar-rock-solid),
+item by item, computed from both kinds of fact: the platform levels, the
+latest nightly mutation run (every module of `scripts/mutation/modules.json`
+passed at 80 % or more), the unit suite's line coverage (the nightly run's
+`unit` job log), the consecutive clean nights of the differential, fuzzing and
+DST campaigns (`campaignStreak`: Sundays in New York are left out; a failed,
+cancelled or missing campaign ends the run), the quarantine list, the
+proposition lint's inventory (`scripts/propositions.mjs`) and the fuzz targets
+that run against Lean. An item reads "met", "partly met" (what is measured
+holds, the rest is not measured yet), "not met", "not measured" or "not read".
+`test/testing-docs.test.mjs` keeps the documents behind it in step with the
+repository: every path and workflow TESTING_STRATEGY.md and CI.md name exists,
+every workflow is in CI.md, and the fuzz table above lists exactly the targets
+`fuzz.yml` runs.
 
 The same facts are in [`docs/evidence/test-evidence.json`](evidence/test-evidence.json).
 A workflow with no scheduled run yet shows as "no run yet". `node

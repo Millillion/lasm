@@ -20,14 +20,17 @@ export const templateDependencies = npm;
 
 // `--deploy` targets. Function platforms run the server through `lasm package`
 // (src/package.mjs); azure and gcf also deploy the platform's npm package.
+// They take the Node server templates, not fullstack: its init writes no
+// platform files for them (issue #168).
+const functionTemplates = ['express', 'hono', 'fastify', 'std-http', 'fetch'];
 export const deployTargets = {
-  lambda: { summary: 'AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)' },
-  'lambda-zip': { summary: 'AWS Lambda .zip for nodejs24.x (npm run build:lambda)', package: 'lambda' },
-  'lambda-edge': { summary: 'Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)', package: 'lambda-edge' },
-  vercel: { summary: 'Vercel Function (vercel.json; Vercel runs the build)', package: 'vercel' },
-  netlify: { summary: 'Netlify Function (netlify.toml; Netlify runs the build)', package: 'netlify' },
-  azure: { summary: 'Azure Functions app (npm run build:azure)', package: 'azure', dependencies: { '@azure/functions': '4.17.0' } },
-  gcf: { summary: 'Google Cloud Functions gen2 (npm run build:gcf)', package: 'gcf', dependencies: { '@google-cloud/functions-framework': '5.0.5' } },
+  lambda: { summary: 'AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)', templates: functionTemplates },
+  'lambda-zip': { summary: 'AWS Lambda .zip for nodejs24.x (npm run build:lambda)', package: 'lambda', templates: functionTemplates },
+  'lambda-edge': { summary: 'Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)', package: 'lambda-edge', templates: functionTemplates },
+  vercel: { summary: 'Vercel Function (vercel.json; Vercel runs the build)', package: 'vercel', templates: functionTemplates },
+  netlify: { summary: 'Netlify Function (netlify.toml; Netlify runs the build)', package: 'netlify', templates: functionTemplates },
+  azure: { summary: 'Azure Functions app (npm run build:azure)', package: 'azure', dependencies: { '@azure/functions': '4.17.0' }, templates: functionTemplates },
+  gcf: { summary: 'Google Cloud Functions gen2 (npm run build:gcf)', package: 'gcf', dependencies: { '@google-cloud/functions-framework': '5.0.5' }, templates: functionTemplates },
   // Edge targets (docs/EDGE.md): the edge build, Hono and fetch templates.
   workers: { summary: 'Cloudflare Workers (wrangler.toml; npm run build:workers, then npx wrangler dev)', package: 'workers', templates: ['hono', 'fetch', 'fullstack'] },
   'vercel-edge': { summary: 'Vercel Edge Function (vercel.json; Vercel runs npm run build:vercel-edge)', package: 'vercel-edge', templates: ['hono', 'fetch', 'fullstack'], conflicts: ['vercel'] },
@@ -110,11 +113,12 @@ export function parseInitArguments(tokens) {
   if (serverOnly && !templates[result.template].server)
     throw new Error(`--deploy ${serverOnly} needs a server template (express, hono, fastify, std-http or fetch), not ${result.template}`);
   for (const target of result.deploy) {
-    if (deployTargets[target].templates && !deployTargets[target].templates.includes(result.template))
+    if (!deployTargets[target].templates.includes(result.template))
       {
         const names = deployTargets[target].templates;
         const list = names.length === 1 ? `the ${names[0]} template` : `the ${names.slice(0, -1).join(', ')} and ${names.at(-1)} templates`;
-        throw new Error(`--deploy ${target} supports ${list}, not ${result.template}`);
+        const supported = Object.keys(deployTargets).filter(name => deployTargets[name].templates.includes(result.template));
+        throw new Error(`--deploy ${target} supports ${list}, not ${result.template}. The ${result.template} template supports --deploy ${supported.join(', ')}`);
       }
     for (const other of deployTargets[target].conflicts ?? [])
       if (result.deploy.includes(other)) throw new Error(`--deploy ${target} and --deploy ${other} both configure the same platform; choose one`);
