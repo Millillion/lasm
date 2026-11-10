@@ -1,4 +1,4 @@
-name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node)
+name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun)
 # Lasm.JS.Web, the WinterTC Minimum Common Web API generated from WebIDL, and
 # Lasm.JS.Node, Node's server-essential modules generated from Node's API docs
 # (docs/JS_BINDINGS.md, "Standard bindings" and "Lasm.JS.Node"; docs/TESTING.md):
@@ -16,7 +16,14 @@ name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node)
 #   - node-conformance: the same candidate builds test/fixtures/js-node (published
 #     hash, HMAC, PBKDF2, scrypt and HKDF vectors; Lean as the oracle of hex,
 #     base64, UTF-8 and path operations; a temporary directory's files; child
-#     processes) for Node 26 and 24, Bun and Deno (their node: compatibility).
+#     processes) for Node 26 and 24, Bun and Deno (their node: compatibility);
+#   - serve-conformance: Lasm.JS.Deno and Lasm.JS.Bun, generated from the runtimes'
+#     TypeScript declarations (scripts/bindings/deno.idl and bun.idl are
+#     serve-api.mjs's lowering of them, their SHA-256 hashes pinned): the same
+#     candidate builds test/fixtures/js-serve for Node, Bun and Deno, whose servers
+#     (Deno.serve, Bun.serve, @hono/node-server on Node) serve a Lean handler that
+#     the program requests over HTTP; then Serve.lean is served by each and
+#     requested from outside the process (scripts/bindings/test-serve.mjs).
 on:
   pull_request:
     branches: [main]
@@ -28,6 +35,8 @@ on:
       - 'test/fixtures/js-web-size/**'
       - 'test/fixtures/js-node/**'
       - 'test/fixtures/js-node-size/**'
+      - 'test/fixtures/js-serve/**'
+      - 'test/fixtures/js-serve-size/**'
       - 'test/web-bindings.test.mjs'
       - 'src/node-js.mjs'
       - 'src/edge/**'
@@ -44,6 +53,8 @@ on:
       - 'test/fixtures/js-web-size/**'
       - 'test/fixtures/js-node/**'
       - 'test/fixtures/js-node-size/**'
+      - 'test/fixtures/js-serve/**'
+      - 'test/fixtures/js-serve-size/**'
       - 'src/node-js.mjs'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'
@@ -75,6 +86,8 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - name: node.idl is the lowering of the pinned Node.js docs (hashes checked)
         run: node scripts/bindings/node-api.mjs --check
+      - name: deno.idl and bun.idl are the lowering of the pinned Deno and Bun declarations (hashes checked)
+        run: node scripts/bindings/serve-api.mjs --check
       - name: The generated bindings are the generator's output
         run: node scripts/bindings/generate-web.mjs --check
       - name: The WPT data is the pinned commit's
@@ -224,5 +237,59 @@ jobs:
           path: |
             ${{ runner.temp }}/js-node/*.txt
             ${{ runner.temp }}/js-node/report.json
+          retention-days: 14
+          if-no-files-found: ignore
+  serve-conformance:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: Install the candidate as a user would
+        id: candidate
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: web-bindings-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: Bun and Deno
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T"
+          curl -fsSL --retry 3 -o "$T/bun.zip" "https://github.com/oven-sh/bun/releases/download/bun-v$BUN_VERSION/bun-linux-x64.zip"
+          echo "$BUN_SHA256  $T/bun.zip" | sha256sum -c
+          unzip -q "$T/bun.zip" -d "$T"
+          npm install --prefix "$T" --no-audit --no-fund "deno@$DENO_VERSION"
+          "$T/bun-linux-x64/bun" --version; "$T/node_modules/.bin/deno" --version
+      - name: Build and run the Lasm.JS.Deno, Lasm.JS.Bun and Node adapter conformance program on every target
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node scripts/bindings/test-web.mjs --fixture js-serve --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-serve" \
+            --targets node,bun,deno --bun "$T/bun-linux-x64/bun" --deno "$T/node_modules/.bin/deno" \
+            --report "$RUNNER_TEMP/js-serve/report.json" --sizes
+      - name: Serve a Lean handler with Deno.serve, Bun.serve and @hono/node-server, requested from outside
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node scripts/bindings/test-serve.mjs --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-serve-e2e" \
+            --targets node,bun,deno --bun "$T/bun-linux-x64/bun" --deno "$T/node_modules/.bin/deno" \
+            --report "$RUNNER_TEMP/js-serve-e2e/report.json"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: serve-bindings-conformance
+          path: |
+            ${{ runner.temp }}/js-serve/*.txt
+            ${{ runner.temp }}/js-serve/report.json
+            ${{ runner.temp }}/js-serve-e2e/*.txt
+            ${{ runner.temp }}/js-serve-e2e/report.json
           retention-days: 14
           if-no-files-found: ignore

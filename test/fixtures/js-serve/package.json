@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "description": "test/fixtures/js-serve: Node serves App.handle through @hono/node-server (an @[js] binding to the npm package); Deno and Bun builds leave it out",
+  "dependencies": {
+    "@hono/node-server": "2.1.3",
+    "hono": "4.13.13"
+  },
+  "lasm": {
+    "edge": {
+      "exclude": ["@hono/node-server"]
+    }
+  }
+}

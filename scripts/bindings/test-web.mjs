@@ -1,5 +1,6 @@
 // Builds a standard bindings conformance program (test/fixtures/js-web for
-// Lasm.JS.Web, test/fixtures/js-node for Lasm.JS.Node: --fixture) with an
+// Lasm.JS.Web, test/fixtures/js-node for Lasm.JS.Node, test/fixtures/js-serve for
+// Lasm.JS.Deno, Lasm.JS.Bun and the Node adapter: --fixture) with an
 // installed @lasm/cli for each JavaScript target and runs it there
 // (docs/TESTING.md, "Standard bindings"). A target passes when its build
 // succeeds, the program reports a summary, and every failed check is listed
@@ -7,7 +8,7 @@
 // deviation from the spec or the docs, never a binding bug); a listed check
 // that passes fails the run too, so the list stays exact.
 //
-//   node scripts/bindings/test-web.mjs --lasm PATH/bin/lasm.mjs --work DIR [--fixture js-web|js-node]
+//   node scripts/bindings/test-web.mjs --lasm PATH/bin/lasm.mjs --work DIR [--fixture js-web|js-node|js-serve]
 //     [--targets node,node24,bun,deno,workers,browser-chromium] [--node24 PATH] [--bun PATH]
 //     [--deno PATH] [--wrangler PATH] [--playwright DIR] [--report FILE] [--sizes]
 //
@@ -28,9 +29,9 @@ const { values } = parseArgs({ options: {
   sizes: { type: 'boolean', default: false },
 } });
 if (!values.lasm || !values.work) { console.error('--lasm and --work are required'); process.exit(2); }
-if (!['js-web', 'js-node'].includes(values.fixture)) { console.error('--fixture is js-web or js-node'); process.exit(2); }
+if (!['js-web', 'js-node', 'js-serve'].includes(values.fixture)) { console.error('--fixture is js-web, js-node or js-serve'); process.exit(2); }
 const fixture = join(root, 'test', 'fixtures', values.fixture);
-const tierName = values.fixture === 'js-web' ? 'Lasm.JS.Web' : 'Lasm.JS.Node';
+const tierName = { 'js-web': 'Lasm.JS.Web', 'js-node': 'Lasm.JS.Node', 'js-serve': 'Lasm.JS.Deno and Lasm.JS.Bun' }[values.fixture];
 const lasm = resolve(values.lasm), work = resolve(values.work);
 const known = JSON.parse(readFileSync(join(fixture, 'known.json'), 'utf8'));
 const env = { ...process.env, CI: '1', BROWSER: 'none', LASM_EDITOR: '0', NO_COLOR: '1', WRANGLER_SEND_METRICS: 'false' };
@@ -127,6 +128,11 @@ for (const target of targets) {
   try {
     if (target !== 'node24' || !existsSync(join(dir, 'dist/main.mjs'))) {
       cpSync(fixture, dir, { recursive: true });
+      // A fixture with npm dependencies (js-serve's @hono/node-server) installs them as a user would.
+      if (existsSync(join(dir, 'package-lock.json'))) {
+        const i = await exec(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['ci', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: dir, timeout: 10 * 60_000 });
+        if (i.code !== 0) throw new Error(`npm ci failed:\n${(i.stdout + i.stderr).slice(-4000)}`);
+      }
       const b = await exec(process.execPath, [lasm, 'build', 'Main.lean', ...TARGETS[target].build], { cwd: dir, timeout: 60 * 60_000 });
       result.buildMs = b.ms;
       if (b.code !== 0) throw new Error(`lasm build ${TARGETS[target].build.join(' ')} failed:\n${(b.stdout + b.stderr).slice(-6000)}`);

@@ -1,0 +1,10 @@
+{
+ "Deno v2.9.6": {
+  "cli/tsc/dts/lib.deno.ns.d.ts": "8e8348a4c8762c5cedfe4c9b9673ba01f79ea49b9f1d3b9a91bbe2e69c316504",
+  "cli/tsc/dts/lib.deno_net.d.ts": "6444509e83bfb0de78e4c435ceb8b9f33f4fe12f2540b2bbf618ddc210da75a9"
+ },
+ "Bun bun-v1.4.4": {
+  "packages/bun-types/serve.d.ts": "a006fe6f5a5c4b583ca303d5ed8e697ea506868d28e2a1d0401bbd64a915a6ec",
+  "packages/bun-types/bun.d.ts": "98936f06c9f0de499093fa4ab66bb9bf2566a17deda4e49cfd335a180c55c3bb"
+ }
+}
