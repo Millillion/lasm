@@ -23,70 +23,56 @@
 #include <lean/lean.h>
 #include "lasm_wasi.h"
 
-#define WIT(module, name) __attribute__((import_module(module), import_name(name)))
-#define TYPES "wasi:http/types@0.2.12"
-#define STREAMS "wasi:io/streams@0.2.12"
-#define POLL "wasi:io/poll@0.2.12"
-
-WIT(TYPES, "[method]incoming-request.method") void h_request_method(uint32_t, uint32_t);
-WIT(TYPES, "[method]incoming-request.path-with-query") void h_request_path(uint32_t, uint32_t);
-WIT(TYPES, "[method]incoming-request.scheme") void h_request_scheme(uint32_t, uint32_t);
-WIT(TYPES, "[method]incoming-request.authority") void h_request_authority(uint32_t, uint32_t);
-WIT(TYPES, "[method]incoming-request.headers") uint32_t h_request_headers(uint32_t);
-WIT(TYPES, "[method]incoming-request.consume") void h_request_consume(uint32_t, uint32_t);
-WIT(TYPES, "[resource-drop]incoming-request") void h_drop_incoming_request(uint32_t);
-WIT(TYPES, "[constructor]fields") uint32_t h_fields_new(void);
-WIT(TYPES, "[method]fields.entries") void h_fields_entries(uint32_t, uint32_t);
-WIT(TYPES, "[method]fields.append") void h_fields_append(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
-WIT(TYPES, "[resource-drop]fields") void h_drop_fields(uint32_t);
-WIT(TYPES, "[method]incoming-body.stream") void h_incoming_body_stream(uint32_t, uint32_t);
-WIT(TYPES, "[static]incoming-body.finish") uint32_t h_incoming_body_finish(uint32_t);
-WIT(TYPES, "[resource-drop]incoming-body") void h_drop_incoming_body(uint32_t);
-WIT(TYPES, "[resource-drop]future-trailers") void h_drop_future_trailers(uint32_t);
-WIT(TYPES, "[constructor]outgoing-response") uint32_t h_response_new(uint32_t);
-WIT(TYPES, "[method]outgoing-response.set-status-code") uint32_t h_response_set_status(uint32_t, uint32_t);
-WIT(TYPES, "[method]outgoing-response.body") void h_response_body(uint32_t, uint32_t);
-WIT(TYPES, "[method]outgoing-body.write") void h_outgoing_body_write(uint32_t, uint32_t);
-WIT(TYPES, "[static]outgoing-body.finish") void h_outgoing_body_finish(uint32_t, uint32_t, uint32_t, uint32_t);
-WIT(TYPES, "[resource-drop]outgoing-body") void h_drop_outgoing_body(uint32_t);
-WIT(TYPES, "[static]response-outparam.set") void h_outparam_set(uint32_t, uint32_t, uint32_t, uint32_t, int64_t, uint32_t, uint32_t, uint32_t, uint32_t);
-WIT(TYPES, "[constructor]outgoing-request") uint32_t h_outgoing_request_new(uint32_t);
-WIT(TYPES, "[method]outgoing-request.set-method") uint32_t h_outgoing_set_method(uint32_t, uint32_t, uint32_t, uint32_t);
-WIT(TYPES, "[method]outgoing-request.set-path-with-query") uint32_t h_outgoing_set_path(uint32_t, uint32_t, uint32_t, uint32_t);
-WIT(TYPES, "[method]outgoing-request.set-scheme") uint32_t h_outgoing_set_scheme(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
-WIT(TYPES, "[method]outgoing-request.set-authority") uint32_t h_outgoing_set_authority(uint32_t, uint32_t, uint32_t, uint32_t);
-WIT(TYPES, "[method]outgoing-request.body") void h_outgoing_request_body(uint32_t, uint32_t);
-WIT(TYPES, "[resource-drop]outgoing-request") void h_drop_outgoing_request(uint32_t);
-WIT(TYPES, "[method]future-incoming-response.subscribe") uint32_t h_future_subscribe(uint32_t);
-WIT(TYPES, "[method]future-incoming-response.get") void h_future_get(uint32_t, uint32_t);
-WIT(TYPES, "[resource-drop]future-incoming-response") void h_drop_future(uint32_t);
-WIT(TYPES, "[method]incoming-response.status") uint32_t h_incoming_status(uint32_t);
-WIT(TYPES, "[method]incoming-response.headers") uint32_t h_incoming_headers(uint32_t);
-WIT(TYPES, "[method]incoming-response.consume") void h_incoming_consume(uint32_t, uint32_t);
-WIT(TYPES, "[resource-drop]incoming-response") void h_drop_incoming_response(uint32_t);
-WIT("wasi:http/outgoing-handler@0.2.12", "handle") void h_outgoing_handle(uint32_t, uint32_t, uint32_t, uint32_t);
-WIT(STREAMS, "[method]input-stream.blocking-read") void s_blocking_read(uint32_t, int64_t, uint32_t);
-WIT(STREAMS, "[method]output-stream.blocking-write-and-flush") void s_blocking_write(uint32_t, uint32_t, uint32_t, uint32_t);
-WIT(STREAMS, "[resource-drop]input-stream") void s_drop_input(uint32_t);
-WIT(STREAMS, "[resource-drop]output-stream") void s_drop_output(uint32_t);
-WIT("wasi:io/error@0.2.12", "[resource-drop]error") void e_drop_error(uint32_t);
-WIT(POLL, "poll") void p_poll(uint32_t, uint32_t, uint32_t);
-WIT(POLL, "[resource-drop]pollable") void p_drop(uint32_t);
-WIT("wasi:clocks/monotonic-clock@0.2.12", "subscribe-duration") uint32_t c_subscribe_duration(int64_t);
-
-/* Every import, referenced, so that every program's module imports the same
-   set (src/wasi/wasi-component.mjs splices it into one component template). */
-__attribute__((used)) void *const lasm_wasi_http_imports[] = {
-    (void *)h_request_method, (void *)h_request_path, (void *)h_request_scheme, (void *)h_request_authority, (void *)h_request_headers,
-    (void *)h_request_consume, (void *)h_drop_incoming_request, (void *)h_fields_new, (void *)h_fields_entries, (void *)h_fields_append,
-    (void *)h_drop_fields, (void *)h_incoming_body_stream, (void *)h_incoming_body_finish, (void *)h_drop_incoming_body,
-    (void *)h_drop_future_trailers, (void *)h_response_new, (void *)h_response_set_status, (void *)h_response_body,
-    (void *)h_outgoing_body_write, (void *)h_outgoing_body_finish, (void *)h_drop_outgoing_body, (void *)h_outparam_set, (void *)h_outgoing_request_new,
-    (void *)h_outgoing_set_method, (void *)h_outgoing_set_path, (void *)h_outgoing_set_scheme, (void *)h_outgoing_set_authority,
-    (void *)h_outgoing_request_body, (void *)h_drop_outgoing_request, (void *)h_future_subscribe, (void *)h_future_get,
-    (void *)h_drop_future, (void *)h_incoming_status, (void *)h_incoming_headers, (void *)h_incoming_consume,
-    (void *)h_drop_incoming_response, (void *)h_outgoing_handle, (void *)s_blocking_read, (void *)s_blocking_write,
-    (void *)s_drop_input, (void *)s_drop_output, (void *)e_drop_error, (void *)p_poll, (void *)p_drop, (void *)c_subscribe_duration };
+/* The host imports: generated with Lasm.WASI.Http (scripts/bindings/generate-wasi-http.mjs), whose
+   glue (library/c/lasm_wasi_http_bindings.c, linked into every wasi-http program) references
+   every one of them, so that every program's module imports the same set. The names below are
+   this file's own for them. */
+#include "lasm_wasi_http_imports.h"
+#define h_request_method lasm_wit_http_types__method_incoming_request_method
+#define h_request_path lasm_wit_http_types__method_incoming_request_path_with_query
+#define h_request_scheme lasm_wit_http_types__method_incoming_request_scheme
+#define h_request_authority lasm_wit_http_types__method_incoming_request_authority
+#define h_request_headers lasm_wit_http_types__method_incoming_request_headers
+#define h_request_consume lasm_wit_http_types__method_incoming_request_consume
+#define h_drop_incoming_request lasm_wit_http_types__drop_incoming_request
+#define h_fields_new lasm_wit_http_types__constructor_fields
+#define h_fields_entries lasm_wit_http_types__method_fields_entries
+#define h_fields_append lasm_wit_http_types__method_fields_append
+#define h_drop_fields lasm_wit_http_types__drop_fields
+#define h_incoming_body_stream lasm_wit_http_types__method_incoming_body_stream
+#define h_incoming_body_finish lasm_wit_http_types__static_incoming_body_finish
+#define h_drop_incoming_body lasm_wit_http_types__drop_incoming_body
+#define h_drop_future_trailers lasm_wit_http_types__drop_future_trailers
+#define h_response_new lasm_wit_http_types__constructor_outgoing_response
+#define h_response_set_status lasm_wit_http_types__method_outgoing_response_set_status_code
+#define h_response_body lasm_wit_http_types__method_outgoing_response_body
+#define h_outgoing_body_write lasm_wit_http_types__method_outgoing_body_write
+#define h_outgoing_body_finish lasm_wit_http_types__static_outgoing_body_finish
+#define h_drop_outgoing_body lasm_wit_http_types__drop_outgoing_body
+#define h_outparam_set lasm_wit_http_types__static_response_outparam_set
+#define h_outgoing_request_new lasm_wit_http_types__constructor_outgoing_request
+#define h_outgoing_set_method lasm_wit_http_types__method_outgoing_request_set_method
+#define h_outgoing_set_path lasm_wit_http_types__method_outgoing_request_set_path_with_query
+#define h_outgoing_set_scheme lasm_wit_http_types__method_outgoing_request_set_scheme
+#define h_outgoing_set_authority lasm_wit_http_types__method_outgoing_request_set_authority
+#define h_outgoing_request_body lasm_wit_http_types__method_outgoing_request_body
+#define h_drop_outgoing_request lasm_wit_http_types__drop_outgoing_request
+#define h_future_subscribe lasm_wit_http_types__method_future_incoming_response_subscribe
+#define h_future_get lasm_wit_http_types__method_future_incoming_response_get
+#define h_drop_future lasm_wit_http_types__drop_future_incoming_response
+#define h_incoming_status lasm_wit_http_types__method_incoming_response_status
+#define h_incoming_headers lasm_wit_http_types__method_incoming_response_headers
+#define h_incoming_consume lasm_wit_http_types__method_incoming_response_consume
+#define h_drop_incoming_response lasm_wit_http_types__drop_incoming_response
+#define h_outgoing_handle lasm_wit_http_outgoing_handler__func_handle
+#define s_blocking_read lasm_wit_io_streams__method_input_stream_blocking_read
+#define s_blocking_write lasm_wit_io_streams__method_output_stream_blocking_write_and_flush
+#define s_drop_input lasm_wit_io_streams__drop_input_stream
+#define s_drop_output lasm_wit_io_streams__drop_output_stream
+#define e_drop_error lasm_wit_io_error__drop_error
+#define p_poll lasm_wit_io_poll__func_poll
+#define p_drop lasm_wit_io_poll__drop_pollable
+#define c_subscribe_duration lasm_wit_clocks_monotonic_clock__func_subscribe_duration
 
 /* From lasm_wasi.c. */
 _Noreturn void lasm_wasi_fail(const char *message);
@@ -109,11 +95,13 @@ extern bool lasm_wasi_stdout_to_stderr;
 static _Alignas(16) uint8_t cabi_arena[256 * 1024];
 static size_t cabi_used;
 static uint8_t *scratch; static size_t scratch_used; static bool armed;
-static void arm(void) {
+void lasm_wasi_http_arm(void) {
     if (!scratch && !(scratch = malloc(SCRATCH_SIZE))) abort();
     scratch_used = 0; armed = true;
 }
-static void disarm(void) { armed = false; }
+void lasm_wasi_http_disarm(void) { armed = false; }
+#define arm lasm_wasi_http_arm
+#define disarm lasm_wasi_http_disarm
 static void cabi_free(void *p) { (void)p; }
 __attribute__((export_name("cabi_realloc"))) uint32_t cabi_realloc(uint32_t pointer, uint32_t old_size, uint32_t align, uint32_t size) {
     if (!size) return align;
@@ -135,12 +123,21 @@ static bool responded;
 __attribute__((export_name("wasi:http/incoming-handler@0.2.12#handle"))) void lasm_wasi_http_handle(uint32_t request, uint32_t outparam) {
     incoming_request = request; response_outparam = outparam;
     lasm_wasi_run_main();
-    if (!responded) {
+    if (!responded && response_outparam) {
         /* main returned without answering: 500. */
         uint32_t response = h_response_new(h_fields_new());
         h_response_set_status(response, 500);
         h_outparam_set(response_outparam, 0, response, 0, 0, 0, 0, 0, 0);
     }
+}
+
+/* Lasm.WASI.Http.IncomingHandler.take: the program takes both handles (Lasm.Fetch.serve then
+   fails, and no 500 is sent for it when main returns). */
+bool lasm_wasi_http_take(uint32_t *request, uint32_t *response_out) {
+    if (!incoming_request || !response_outparam || responded) return false;
+    *request = incoming_request; *response_out = response_outparam;
+    incoming_request = 0; response_outparam = 0;
+    return true;
 }
 
 static lean_obj_res fail(const char *message) {
@@ -498,13 +495,3 @@ void lasm_wasi_io_wait(uint64_t timeout_ns, bool bounded) {
     lasm_wasi_io_poll();
 }
 
-/* Lasm.Fastly (library/Lasm/Fastly.lean): only on --target fastly. */
-static lean_obj_res fastly_only(void) {
-    return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string(
-        "Lasm.Fastly: Fastly stores are available only in programs built with lasm build --target fastly")));
-}
-LEAN_EXPORT lean_obj_res lasm_fastly_config_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
-LEAN_EXPORT lean_obj_res lasm_fastly_secret_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
-LEAN_EXPORT lean_obj_res lasm_fastly_kv_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
-LEAN_EXPORT lean_obj_res lasm_fastly_kv_put(b_lean_obj_arg store, b_lean_obj_arg key, b_lean_obj_arg value) { (void)store; (void)key; (void)value; return fastly_only(); }
-LEAN_EXPORT lean_obj_res lasm_fastly_kv_delete(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }

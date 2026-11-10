@@ -337,7 +337,8 @@ linked only into programs that import them.
 | `Lasm.UI` ([UI.lean](../library/Lasm/UI.lean), [UI.md](UI.md)) | The Elm architecture, `html!`, routing, SSR and hydration. The diff runs in Lean and is proved correct ([UI/Proofs.lean](../library/Lasm/UI/Proofs.lean)) | Browser; rendering to HTML also on the server |
 | `Lasm.RPC` ([RPC.lean](../library/Lasm/RPC.lean), [RPC.md](RPC.md)) | Typed endpoints shared by a server and a browser app | `RPC.Server` with `Lasm.Fetch`, `RPC.Client` with `Lasm.UI` |
 | `Lasm.KV` ([KV.lean](../library/Lasm/KV.lean)) | A small key-value store | Workers KV, Deno KV or Fastly KV where the binding exists; otherwise in memory, one copy per process, isolate or instance |
-| `Lasm.Fastly` ([Fastly.lean](../library/Lasm/Fastly.lean)) | Fastly's config, secret and KV stores | `--target fastly`; elsewhere every call fails and says so |
+| `Lasm.Fastly` ([Fastly/](../library/Lasm/Fastly), [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)) | Fastly Compute's host ABI, generated from its witx: requests, responses, bodies, backends, stores, cache, geolocation, rate limiting | `--target fastly` (generated C glue, [lasm_fastly.c](../library/c/lasm_fastly.c)); elsewhere every call fails with `FastlyStatus.unsupported` |
+| `Lasm.WASI.Http` ([WASI/](../library/Lasm/WASI), [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)) | The wasi:http proxy world, generated from the WASI 0.2.12 WIT: incoming and outgoing requests and responses, fields, streams, poll, the monotonic clock, the incoming-handler export | `--target wasi-http` (generated canonical ABI glue, [lasm_wasi_http_bindings.c](../library/c/lasm_wasi_http_bindings.c)); elsewhere every call fails |
 
 The builtin JavaScript modules `lasm:app` and `lasm:ui-dom`
 ([src/lasm-modules/](../src/lasm-modules),

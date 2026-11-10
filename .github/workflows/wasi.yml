@@ -4,7 +4,10 @@ name: WASI and Fastly Compute
 # examples/wasi-cli and examples/fetch with `lasm build --target wasi|fastly`
 # from this source checkout, and checks them with pinned wasmtime, wasmer,
 # Node's node:wasi, Spin (wagi executor) and Viceroy, Fastly's local
-# simulator; Lasm.Fetch also on Node and Deno (scripts/wasi/wasi-ci.mjs).
+# simulator; Lasm.Fetch also on Node and Deno; examples/fastly and Lasm.Fastly's
+# conformance fixture (test/fixtures/fastly-abi) under Viceroy; examples/wasi-http and
+# Lasm.WASI.Http's conformance fixture (test/fixtures/wasi-http-abi) under
+# wasmtime serve (scripts/wasi/wasi-ci.mjs).
 # Linux only, free runners, no account, no deployment and no publication.
 on:
   workflow_dispatch:
@@ -119,6 +122,10 @@ jobs:
           mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
       - name: Unit tests (atomics lowering, WASI targets, Lasm.Fetch, init)
         run: node --test test/wasi.test.mjs
+      - name: Lasm.Fastly is what its generator makes from the pinned witx
+        run: node scripts/bindings/generate-fastly.mjs --check
+      - name: Lasm.WASI.Http is what its generator makes from the pinned WIT
+        run: node scripts/bindings/generate-wasi-http.mjs --check
       - name: Pinned tools (wasmtime, wasmer, Viceroy, Spin; Deno from npm)
         run: |
           set -euo pipefail
@@ -158,4 +165,10 @@ jobs:
             .work/wasi-apps/fetch/wasi-http/main.wasm
             .work/wasi-apps/fetch/pkg/*.tar.gz
             .work/wasi-apps/cli/wasi/main.wasm
+            .work/wasi-apps/fastly/bin/main.wasm
+            .work/wasi-apps/fastly-abi/bin/main.wasm
+            .work/wasi-apps/wasi-http/wasi-http/main.wasm
+            .work/wasi-apps/wasi-http-abi/wasi-http/main.wasm
+            .work/wasi-apps/fetch-core.wasm
+            .work/wasi-apps/proxy-template.wasm
           retention-days: 14

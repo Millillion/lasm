@@ -2,7 +2,7 @@
 // the wasi-http component wrapper that every `lasm build --target wasi-http`
 // splices its core module into.
 //
-//   node scripts/wasi/make-component-template.mjs --wasm-tools WASM_TOOLS --adapter PROXY_ADAPTER CORE.wasm [--check COMPONENT.wasm]…
+//   node scripts/wasi/make-component-template.mjs --wasm-tools WASM_TOOLS --adapter PROXY_ADAPTER CORE.wasm [--check COMPONENT.wasm]… [--output FILE]
 //
 // CORE.wasm is a program's core module (the `core.wasm` a wasi-http link
 // writes). With wasm-tools (pinned in wasi.yml) it embeds scripts/wasi/wit's
@@ -12,7 +12,8 @@
 // placeholder. With --check it writes nothing; instead it requires that each
 // COMPONENT.wasm (a Lasm build's output) equals wasm-tools' own component for
 // that build's core module, and that the shipped template equals the one
-// made from CORE.wasm.
+// made from CORE.wasm. --output writes the template to FILE instead of the
+// checkout (CI keeps it for review when the check fails).
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -25,14 +26,14 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 export const adapterSha256 = '59c393eeaecf0d7f1c71af71b27d588ab21e9f159f67018ce4e036a565b097bb'; // wasmtime v49.0.4
 const args = process.argv.slice(2);
 const take = name => { const i = args.indexOf(name); return i < 0 ? undefined : args.splice(i, 2)[1]; };
-const wasmTools = take('--wasm-tools'), adapter = take('--adapter');
+const wasmTools = take('--wasm-tools'), adapter = take('--adapter'), output = take('--output');
 const checks = [];
 for (let c; (c = take('--check'));) checks.push(c);
 const [core] = args;
 if (!wasmTools || !adapter || !core) { console.error('Usage: make-component-template.mjs --wasm-tools PATH --adapter PATH CORE.wasm [--check COMPONENT.wasm]…'); process.exit(2); }
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 if (sha(readFileSync(adapter)) !== adapterSha256) throw new Error(`The proxy adapter is not the pinned one (${adapterSha256})`);
-const templateFile = join(root, 'src/wasi/component/proxy-template.wasm');
+const templateFile = output ?? join(root, 'src/wasi/component/proxy-template.wasm');
 
 const work = mkdtempSync(join(tmpdir(), 'lasm-component-'));
 /** wasm-tools' own component for a core module. */

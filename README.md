@@ -59,7 +59,7 @@ files, except on WASI); the rest of Lean works.
 | Output | `dist/` with `program.wasm` + a JS launcher (Node); or a platform package (`--target …`) |
 | Node apps run on | Node ≥ 24, Linux x64/arm64 (glibc 2.28+ or musl) from any build machine, plus the build machine's own OS; ≥ 512 MB memory |
 | JS/npm interop | `import Lasm.JS`; one `@[js "pkg" "export"]` line per function you call; no premade bindings ([guide](docs/JS_BINDINGS.md)) |
-| Frameworks in Lean | `Lasm.Fetch` (HTTP, every server target), `Lasm.UI` (browser, Elm architecture, proved diff), `Lasm.RPC` (typed client/server API), `Lasm.Web` (DOM and web APIs), `Lasm.KV`; `Lasm.JS.Web` (the standard web APIs of every JavaScript target, generated from WebIDL), `Lasm.JS.Node` (Node's fs, path, os, process, crypto, child_process, generated from Node's docs) |
+| Frameworks in Lean | `Lasm.Fetch` (HTTP, every server target), `Lasm.UI` (browser, Elm architecture, proved diff), `Lasm.RPC` (typed client/server API), `Lasm.Web` (DOM and web APIs), `Lasm.KV`; `Lasm.JS.Web` (the standard web APIs of every JavaScript target, generated from WebIDL), `Lasm.JS.Node` (Node's fs, path, os, process, crypto, child_process, generated from Node's docs); `Lasm.Fastly` (Fastly Compute's host ABI, generated from its witx) and `Lasm.WASI.Http` (the wasi:http proxy world, generated from the WASI WIT); source, not yet released |
 | Not available at run time | elaboration, `#eval`-style evaluation, loading `.olean`, Lean's kernel ([exact list](#lean-support-and-restrictions)); all of these work at build time |
 | License | MIT (Lasm); templates, examples and README code samples also MIT-0 |
 | Repository / issues | https://github.com/Millillion/lasm · [report a bug](https://github.com/Millillion/lasm/issues/new?template=bug.yml) (include `npx lasm --version`) |
@@ -73,7 +73,7 @@ files, except on WASI); the rest of Lean works.
 | A server in pure Lean (no npm) | `npm create @lasm@latest my-api -- --template fetch` (any target) or `--template std-http` (Node, also native Lean) | [examples/fetch](examples/fetch); the `std-http` template |
 | A serverless function (Lambda, Vercel, Netlify, Azure, GCF) | `npm create @lasm@latest my-fn -- --template hono --deploy lambda-zip` (or `vercel`, `netlify`, `azure`, `gcf`, `lambda-edge`) | [docs/deploy](docs/deploy/README.md) |
 | An edge function (Workers, Vercel/Netlify Edge, Deno Deploy, Supabase) | `npm create @lasm@latest my-edge -- --template hono --deploy workers` (or `fetch`) | [examples/edge-pure](examples/edge-pure), [docs/EDGE.md](docs/EDGE.md) |
-| A Fastly, WASI or Spin service | `npm create @lasm@latest my-svc -- --template fetch --deploy fastly` (or `wasi-http`, `spin`, `wasi`) | [examples/fetch](examples/fetch), [docs/WASI.md](docs/WASI.md) |
+| A Fastly, WASI or Spin service | `npm create @lasm@latest my-svc -- --template fetch --deploy fastly` (or `wasi-http`, `spin`, `wasi`) | [examples/fetch](examples/fetch), [examples/fastly](examples/fastly) (Fastly's own host calls, `Lasm.Fastly`), [examples/wasi-http](examples/wasi-http) (wasi:http's own interfaces, `Lasm.WASI.Http`), [docs/WASI.md](docs/WASI.md) |
 | A browser app | `npm create @lasm@latest my-web -- --template web` | [examples/ui](examples/ui) (counter, TodoMVC with proofs, feature demo, benchmark) |
 | A complete real-world app (API, browser frontend, SQL, auth) with proofs, on any platform above | `cd examples/conduit && npm install && npm run build && npm start` | [examples/conduit](examples/conduit), the flagship (below) |
 | A full-stack app with a verified API | `npm create @lasm@latest my-app -- --template fullstack` | [templates/fullstack](templates/fullstack) |
@@ -189,6 +189,12 @@ cd my-svc && npm install
 npm run build:fastly && fastly compute serve  # Viceroy on http://127.0.0.1:7676
 npm run build:wasi-http && spin up            # or: wasmtime serve wasi-http/main.wasm
 ```
+
+On Fastly a program can also call Fastly's host ABI directly with
+`import Lasm.Fastly` (generated from Fastly's witx), and a wasi-http component
+the wasi:http interfaces with `import Lasm.WASI.Http` (generated from the WASI
+0.2.12 WIT); current source: [WASI_FASTLY_BINDINGS.md](docs/WASI_FASTLY_BINDINGS.md),
+[examples/fastly](examples/fastly/Main.lean), [examples/wasi-http](examples/wasi-http/Main.lean).
 
 **Browser app.**
 
@@ -385,7 +391,7 @@ is slower than native Lean (no GMP).
   [serverless and containers](docs/deploy/README.md) · [edge](docs/EDGE.md) ·
   [Bun and Deno](docs/BUN_DENO.md) · [browser](docs/BROWSER.md) and
   [Lasm.UI](docs/UI.md) · [full stack (Lasm.RPC)](docs/RPC.md) ·
-  [Lasm.Fetch](docs/FETCH.md) · [WASI and Fastly](docs/WASI.md) ·
+  [Lasm.Fetch](docs/FETCH.md) · [WASI and Fastly](docs/WASI.md) · [Lasm.Fastly and Lasm.WASI.Http](docs/WASI_FASTLY_BINDINGS.md) ·
   [the edit loop](docs/DEVELOPER_WORKFLOW.md#lasm-dev)
 - **Evidence:** [benchmarks](docs/BENCHMARKS.md) · [where apps run](docs/DEPLOYMENT.md) ·
   [language coverage](docs/LANGUAGE_COVERAGE.md) · [compatible Lean packages](docs/COMPATIBILITY.md) ·

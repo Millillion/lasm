@@ -14,6 +14,8 @@ For a new project, use `npm create @lasm@latest` with a [template](../README.md#
 | [js-fetch](js-fetch) | A `@[js]` binding to Node's `fetch`, awaiting in `Async` | `npx @lasm/cli Main.lean -- https://example.com` |
 | [js-crud](js-crud) | A REST API with Postgres (`pg`) and JWT (`jose`), on Express and on Hono | `npm install && npx @lasm/cli Express.lean` |
 | [fetch](fetch) | One pure-Lean HTTP handler (`Lasm.Fetch`) on Node, the edge, Bun, Deno, Fastly, wasi-http and WASI | `npx @lasm/cli build Main.lean && node dist/main.mjs` |
+| [fastly](fastly) | An HTTP server on Fastly Compute's own host calls (`Lasm.Fastly`, generated from Fastly's witx): the routes of `fetch` plus the stores | `npx @lasm/cli build Main.lean --target fastly && fastly compute serve` |
+| [wasi-http](wasi-http) | An HTTP server on the wasi:http interfaces themselves (`Lasm.WASI.Http`, generated from the WASI WIT): the routes of `fetch` | `npx @lasm/cli build Main.lean --target wasi-http && wasmtime serve wasi-http/main.wasm` |
 | [edge-pure](edge-pure) | A pure-Lean Cloudflare Worker (also Vercel/Netlify Edge, Deno Deploy, Supabase) | `npx @lasm/cli build Main.lean --target workers` |
 | [wasi-cli](wasi-cli) | A command-line program as a standard WASI module | `npx @lasm/cli build Main.lean --target wasi` |
 | [ui](ui) | Browser apps with `Lasm.UI`: counter, TodoMVC with proofs, feature demo, benchmark | `npx @lasm/cli dev Main.lean --target browser` |

@@ -1,0 +1,5 @@
+{
+  "name": "lasm-wasi-http-example",
+  "private": true,
+  "description": "An HTTP server on the wasi:http proxy world's own interfaces (Lasm.WASI.Http): lasm build Main.lean --target wasi-http, then wasmtime serve wasi-http/main.wasm"
+}

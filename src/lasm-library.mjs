@@ -13,9 +13,22 @@ import { executableName } from './platform.mjs';
 const root = fileURLToPath(new URL('../library/', import.meta.url));
 // Lean versions the library is compiled for, and its modules in import order.
 export const libraryLeanVersions = ['4.35.0'];
+// The generated Lasm.Fastly modules: Types, one per witx module, then the umbrella module.
+const fastlyModules = ['Types', 'Cache', 'ConfigStore', 'HttpCache', 'Shielding', 'Abi', 'Uap', 'HttpBody', 'Log', 'HttpReq',
+  'HttpDownstream', 'HttpResp', 'Dictionary', 'Geo', 'DeviceDetection', 'Erl', 'ObjectStore', 'ImageOptimizer', 'KvStore', 'SecretStore',
+  'Backend', 'AsyncIo', 'Purge', 'ComputeRuntime', 'Acl'].map(name => `Lasm.Fastly.${name}`).concat('Lasm.Fastly');
+// The generated Lasm.WASI.Http modules: one per WIT interface, then the umbrella module.
+const wasiHttpModules = ['Io.Error', 'Io.Poll', 'Io.Streams', 'Clocks.MonotonicClock', 'Http.Types', 'Http.OutgoingHandler',
+  'Http.IncomingHandler', 'Http'].map(name => `Lasm.WASI.${name}`);
 export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
   // Lasm.Fetch (docs/FETCH.md): one HTTP handler for Node, WASI, Fastly and the edge.
-  'Lasm.Fetch', 'Lasm.Fastly', 'Lasm.Fetch.Assets', 'Lasm.Fetch.Embed', 'Lasm.KV',
+  // Lasm.Fastly (docs/WASI_FASTLY_BINDINGS.md): Fastly Compute's host ABI, generated from its witx
+  // by scripts/bindings/generate-fastly.mjs (fastlyModules, in import order).
+  ...fastlyModules,
+  // Lasm.WASI.Http (docs/WASI_FASTLY_BINDINGS.md): the wasi:http proxy world, generated from the
+  // WASI 0.2.12 WIT by scripts/bindings/generate-wasi-http.mjs (wasiHttpModules, in import order).
+  ...wasiHttpModules,
+  'Lasm.Fetch', 'Lasm.Fetch.Assets', 'Lasm.Fetch.Embed', 'Lasm.KV',
   // Lasm.JS.Web (docs/JS_BINDINGS.md, "Standard bindings"): the WinterTC Minimum Common Web API,
   // generated from WebIDL by scripts/bindings/generate-web.mjs.
   'Lasm.JS.Web.Support', 'Lasm.JS.Web.Dom', 'Lasm.JS.Web.Messaging', 'Lasm.JS.Web.Streams', 'Lasm.JS.Web.File',
@@ -46,6 +59,14 @@ export const fetchGlueSource = join(root, 'c', 'lasm_fetch.c');
 // Std.Async binds of steps that complete at once, bounded in depth (#90): kept by
 // every link, with its wrap (asyncLinkFlags), unlike the Node glue's.
 export const asyncGlueSource = join(root, 'c', 'lasm_async.c');
+// Lasm.Fastly's generated glue (scripts/bindings/generate-fastly.mjs): linked into programs that
+// use Lasm.Fastly; every call fails with $unsupported except in --target fastly, whose WASI link
+// compiles it with -DLASM_WASI_FASTLY (src/wasi/wasi-link.mjs).
+export const fastlyGlueSource = join(root, 'c', 'lasm_fastly.c');
+// Lasm.WASI.Http's generated glue (scripts/bindings/generate-wasi-http.mjs): linked into programs that
+// use Lasm.WASI.Http, where every call fails, and into every --target wasi-http program with its host
+// imports (-DLASM_WASI_HTTP, src/wasi/wasi-link.mjs).
+export const wasiHttpGlueSource = join(root, 'c', 'lasm_wasi_http_bindings.c');
 export const asyncLinkFlags = ['l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg'].map(name => `-Wl,--wrap=${name}`);
 // Lasm.JS.Meta (deriving, `@[js]`) uses Lean's elaborator: only prefixes that
 // contain it (the extended tier) get the library.
@@ -162,6 +183,14 @@ export function librarySources(lean, programSources) {
   sources.push(glueSource, fetchGlueSource, asyncGlueSource);
   inputs.push({ module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource },
     { module: 'lasm_async.c', source: asyncGlueSource });
+  if (modules.some(module => module.startsWith('Lasm.Fastly.'))) {
+    sources.push(fastlyGlueSource);
+    inputs.push({ module: 'lasm_fastly.c', source: fastlyGlueSource });
+  }
+  if (modules.some(module => module.startsWith('Lasm.WASI.'))) {
+    sources.push(wasiHttpGlueSource);
+    inputs.push({ module: 'lasm_wasi_http_bindings.c', source: wasiHttpGlueSource });
+  }
   const oleans = modules.map(module => join(lean.prefix, 'lib', 'lean', ...module.split('.')) + '.olean');
   return { sources, inputs, modules, oleans };
 }
