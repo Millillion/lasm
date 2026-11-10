@@ -65,10 +65,12 @@ def checks (downstream : RequestHandle) : Checks Unit := do
   check "header values set (NUL-separated)" do
     let r ← HttpReq.new; HttpReq.headerValuesSet r "x-set" "a\x00b\x00"
     return (← HttpReq.headerValuesGet r "x-set") == #["a", "b"]
-  -- headerRemove r n *> found? (headerValueGet r n) = pure none   ($none as Option.none)
-  check "header remove, then $none" do
+  -- headerRemove r n *> headerNamesGet r ∌ n
+  -- (Viceroy 0.21.1 answers header_value_get for an absent name with $inval, not $none,
+  -- so absence is checked through the name list: docs/WASI_FASTLY_BINDINGS.md)
+  check "header remove, then the name is gone" do
     let r ← HttpReq.new; HttpReq.headerInsert r "x-gone" "1"; HttpReq.headerRemove r "x-gone"
-    return (← found? (HttpReq.headerValueGet r "x-gone")).isNone
+    return !(← HttpReq.headerNamesGet r).contains "x-gone"
   -- ∀ i < 200, s!"x-lasm-conformance-header-{i}" ∈ headerNamesGet r   (names longer than one buffer: cursor and growth)
   check "200 header names through the cursor" do
     let r ← HttpReq.new
