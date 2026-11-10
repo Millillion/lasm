@@ -4,7 +4,8 @@
 //
 //   1. clang compiles the WASI host (lasm_wasi.c, lasm_wasi_libc.c) and
 //      Lasm.Fetch's WASI glue (lasm_fetch_wasi.c; Fastly's host calls with
-//      --target fastly) for wasm64, as the application objects are.
+//      --target fastly; Lasm.WASI.Http's and lasm_wasi_http.c with --target
+//      wasi-http) for wasm64, as the application objects are.
 //   2. wasm-ld links them with the objects, the standard-library archives of
 //      the Node runtime, the edge runtime's three archives and its
 //      single-threaded Emscripten system libraries. Lasm.JS's and Lasm.Fetch's
@@ -21,7 +22,7 @@ import { basename, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
-import { fastlyGlueSource, glueLinkFlags } from '../lasm-library.mjs';
+import { fastlyGlueSource, wasiHttpGlueSource, glueLinkFlags } from '../lasm-library.mjs';
 import { emscriptenResponseFile } from '../link-driver/link.mjs';
 import { testUnoptimized } from '../test-switches.mjs';
 import { lowerAtomics, moduleImports, keepExports } from './lower-atomics.mjs';
@@ -29,7 +30,8 @@ import { componentize, httpHandlerExport } from './wasi-component.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 export const wasiSources = ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
-  'wasi-component.mjs', 'component/proxy-template.wasm', '../../library/c/lasm_fastly.c'];
+  'wasi-component.mjs', 'component/proxy-template.wasm', 'lasm_wasi_http_imports.h', '../../library/c/lasm_fastly.c',
+  '../../library/c/lasm_wasi_http_bindings.c'];
 
 /** Link settings per WASI target, part of the program's cache identity. The
  * C shadow stack holds Lean's address-taken locals; recursion depth is
@@ -111,6 +113,18 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
         '-I', join(nodeRuntime.directory, 'include'), '-c', fastlyGlueSource, '-o', object]);
       objects.push(object);
     }
+  }
+  // Lasm.WASI.Http's glue (library/c/lasm_wasi_http_bindings.c): every --target wasi-http program
+  // links it with its host imports, which it references all, so that every program's module imports
+  // the same functions and one component template serves them all (wasi-component.mjs); the Node
+  // build's copy, whose calls fail, is dropped.
+  if (target === 'wasi-http') {
+    inputs.splice(0, inputs.length, ...inputs.filter(arg => !(arg.endsWith('.o') && /^lasm_wasi_http_bindings$/m.test(nm(arg)))));
+    const object = join(out, 'lasm_wasi_http_bindings.o');
+    run('clang', ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
+      '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', '-DLASM_WASI_HTTP', '-ffunction-sections', '-fdata-sections',
+      '-I', join(nodeRuntime.directory, 'include'), '-c', wasiHttpGlueSource, '-o', object]);
+    objects.push(object);
   }
   const archive = name => edge.libraries[`lib${name}.a`] ?? join(nodeRuntime.directory, 'lib', `lib${name}.a`);
   const libraries = nodeRuntime.manifest.libraries.map(file => file.replace(/^lib\/lib(.+)\.a$/, '$1'))

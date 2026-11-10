@@ -1,0 +1,49 @@
+name: WASI bindings (Lasm.WASI.Http)
+# Lasm.WASI.Http, the wasi:http proxy world generated from the pinned WASI 0.2.12
+# WIT (docs/WASI_FASTLY_BINDINGS.md):
+#   - generated: the committed library/Lasm/WASI/**, library/c/lasm_wasi_http_bindings.c,
+#     src/wasi/lasm_wasi_http_imports.h, scripts/bindings/wasi-http-surface.json and
+#     test/fixtures/wasi-http-abi/Fixture/EveryCall.lean are
+#     scripts/bindings/generate-wasi-http.mjs's output for scripts/wasi/wit/deps/,
+#     and the canonical ABI's core signatures are wit-bindgen's;
+#   - conformance: release-checks.yml's wasi.yml builds examples/wasi-http and
+#     test/fixtures/wasi-http-abi from this commit and runs them under wasmtime
+#     serve (with the rest of the WASI and Fastly checks). Local runtimes only.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'library/Lasm/WASI/**'
+      - 'library/c/lasm_wasi_http_bindings.c'
+      - 'scripts/bindings/generate-wasi-http.mjs'
+      - 'scripts/bindings/wit.mjs'
+      - 'scripts/bindings/lean-names.mjs'
+      - 'scripts/bindings/wasi-http-surface.json'
+      - 'scripts/wasi/wit/**'
+      - 'examples/wasi-http/**'
+      - 'test/fixtures/wasi-http-abi/**'
+      - 'test/wasi-http-bindings.test.mjs'
+      - 'src/wasi/**'
+      - 'src/lasm-library.mjs'
+      - '.github/workflows/wasi-http-bindings.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: wasi-http-bindings-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  generated:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: The generated bindings are the generator's output
+        run: node scripts/bindings/generate-wasi-http.mjs --check
+      - run: node --test test/wasi-http-bindings.test.mjs test/wasi-link-plan.test.mjs

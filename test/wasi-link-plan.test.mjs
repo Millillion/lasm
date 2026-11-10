@@ -101,8 +101,11 @@ test('Fastly and wasi-http targets: their defines, sources, memory and allowed i
     imports: { new_fields: 'wasi:http/types@0.2.12', now: 'wasi:clocks/monotonic-clock@0.2.12' } }]] });
   const result = linkWasiProgram({ toolchain: h.toolchain, nodeRuntime: h.nodeRuntime, edge: h.edge, linkWork: h.linkWork, out: h.out, target: 'wasi-http' });
   const compiledHttp = h.tools.calls('clang');
-  assert.deepEqual(compiledHttp.map(args => args.at(-3)), ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_wasi_http.c'].map(name => join(here, name)));
+  // Every wasi-http program links Lasm.WASI.Http's glue with its host imports (all of them referenced).
+  assert.deepEqual(compiledHttp.map(args => args.at(-3)), [...['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_wasi_http.c'].map(name => join(here, name)),
+    join(here, '../../library/c/lasm_wasi_http_bindings.c')]);
   assert.equal(compiledHttp[2][9], '-DLASM_WASI_HTTP');
+  assert.ok(compiledHttp[3].includes('-DLASM_WASI_HTTP'));
   const core = join(h.out, 'core.wasm'), program = join(h.out, 'main.wasm');
   const component = readFileSync(program);
   assert.deepEqual(result, { program, core, bytes: component.length });
@@ -171,7 +174,8 @@ test('WASI targets: settings, the sources of the cache identity, and the host in
   assert.deepEqual(wasiLinkSettings, { wasi: { stackMiB: 8, initialMiB: 16, maximumMiB: 2048, optimize: '-Oz' }, fastly: MiB, 'wasi-http': MiB });
   // Every file the WASI link reads is part of the program's cache identity.
   assert.deepEqual(wasiSources, ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
-    'wasi-component.mjs', 'component/proxy-template.wasm', '../../library/c/lasm_fastly.c']);
+    'wasi-component.mjs', 'component/proxy-template.wasm', 'lasm_wasi_http_imports.h', '../../library/c/lasm_fastly.c',
+    '../../library/c/lasm_wasi_http_bindings.c']);
   for (const name of wasiSources) assert.ok(existsSync(join(here, name)), name);
   const accepts = (target, module) => { try { checkWasiModule(programModule([[module, 'f']]), target); return true; } catch { return false; } };
   // Lasm.Fastly binds every witx module (library/c/lasm_fastly.c).
@@ -189,6 +193,11 @@ test('WASI targets: settings, the sources of the cache identity, and the host in
   const glueModules = new Set([...glue.matchAll(/import_module\("([^"]+)"\)/g)].map(m => m[1]));
   assert.ok(glueModules.size > 20);
   for (const module of glueModules) assert.ok(accepts('fastly', module), module);
+  // And every module Lasm.WASI.Http's glue imports is one the wasi-http target accepts.
+  const httpGlue = readFileSync(join(here, '../../library/c/lasm_wasi_http_bindings.c'), 'utf8');
+  const httpModules = new Set([...httpGlue.matchAll(/import_module\("([^"]+)"\)/g)].map(m => m[1]));
+  assert.equal(httpModules.size, 6);
+  for (const module of httpModules) assert.ok(accepts('wasi-http', module), module);
   assert.deepEqual(Object.keys(allowedImportModules), ['wasi', 'fastly', 'wasi-http']);
   assert.throws(() => checkWasiModule(programModule([['env', 'a'], ['env', 'b'], ['wasi_snapshot_preview1', 'c']]), 'wasi'),
     { message: 'The WASI link left imports no WASI host provides: env.a, env.b (internal error)' });
