@@ -1,5 +1,5 @@
 name: Browser
-# The browser target (docs/BROWSER.md): builds the web template and the Lasm.Web
+# The browser target (docs/BROWSER.md): builds the web template and the browser
 # platform suite with `lasm build --target browser` from this source checkout
 # (scripts/browser/build-apps.mjs), serves them as a static host does
 # (scripts/browser/test-server.mjs, with fetch routes and a WebSocket echo), and

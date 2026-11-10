@@ -62,8 +62,8 @@ decisions themselves are logged with their reasoning in
   version. Newer APIs are labelled with the version that added them.
 - npm libraries (for example bcrypt) stay ad hoc bindings.
 - The bindings are tested with web-platform-tests and official test vectors.
-- Today's hand-written `Lasm.Web` will be replaced by the generated
-  `Lasm.JS.Web`. That is a breaking rename, which is fine before 1.0.
+- The hand-written `Lasm.Web` is replaced by the generated
+  `Lasm.JS.Web.Browser` (done 2026-11-10; see "The browser tier" below).
 - The first piece of work is tier 1: the common web APIs (fetch,
   Request/Response, URL, `crypto.subtle`/`getRandomValues`,
   TextEncoder/TextDecoder, streams, AbortController, timers,
@@ -87,6 +87,43 @@ decisions themselves are logged with their reasoning in
     with no API change.
 - Still for Jordan to review when it lands: the generated surface and its
   naming details.
+
+### The browser tier replaced `Lasm.Web` (2026-11-10, Jordan's decision; Claude's choices to review)
+
+- **Layout.** `import Lasm.JS.Web.Browser` = tier 1 plus `Lasm.JS.Web.Geometry`,
+  `Css`, `Html` (the tree, the HTML elements, `Window`, `Location`, `History`,
+  `Storage`; one module because they name each other), `UiEvents`, `Canvas`,
+  `WebSocket`. Tier 1 never sees a browser type
+  ([JS_BINDINGS.md](JS_BINDINGS.md#the-browser-tier-lasmjswebbrowser)).
+- **`Lasm.Web.App` moved to `Lasm.UI.Mount`**, unchanged except that `root`
+  takes the handle type (`Mount.root Element`), so `Lasm.UI` loads nothing of
+  the DOM bindings. It stays hand-written: it binds Lasm's own loader
+  (`lasm:app`), not a standard. `Lasm.UI`'s API is unchanged.
+- **Mapping additions (both tiers):** coercions from an interface to its parent
+  and from a union's member types to the union, so `setAttribute "title" "x"`
+  and `fetch "https://…"` read naturally despite Trusted Types and `RequestInfo`
+  unions. Not generated in the browser tier: event handler attributes
+  (`onclick`: use `addEventListener`), `[HTMLConstructor]` constructors, unnamed
+  getters (`DOMStringMap`, so `dataset` has no properties: use
+  `getAttribute "data-x"`).
+- **What could not be expressed as a binding (no API was invented; yours to
+  decide):**
+  - *Unmount cleanup.* `Lasm.Web` removed an app's listeners, timers, frames and
+    sockets on unmount. Generated bindings act on the page directly; apps
+    remove their own in `Mount.onUnmount`. `Lasm.UI` apps are unaffected.
+  - *Downcasts* are unchecked (`({ val := e.val } : HTMLInputElement)`). A
+    generated checked cast (`HTMLInputElement.cast? : Value → IO (Option …)`
+    through `instanceof`) would be a new generated API.
+  - *Batching.* `Context2D.draw` (many drawing commands in one call) and
+    `Event.info` (the usual event fields in one call) have no counterpart; each
+    method is one call into JavaScript now.
+  - *Not web APIs:* `encodeURIComponent`/`decodeURIComponent` (ECMAScript; call
+    them through `Lasm.JS.global`), `Crypto.hex`, `Lasm.Web.background` (use
+    `Async.asTask` or `Std.Async.background`).
+  - *Spec ahead of browsers:* CSSOM View now types `scrollIntoView` and `scroll`
+    as returning `Promise<ScrollResult>`; browsers return `undefined`, which the
+    generated `Async` accepts (checked in CI).
+- The old-to-new table is in [release/next-notes.md](release/next-notes.md).
 
 ### High-priority work to define with Jordan
 - [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,
@@ -219,6 +256,7 @@ docstrings, the propositions and the names.
 - [ ] `Lasm.UI`:
   - [UI.lean](../library/Lasm/UI.lean)
   - [App](../library/Lasm/UI/App.lean)
+  - [Mount](../library/Lasm/UI/Mount.lean) (moved from `Lasm.Web.App`, 2026-11-10)
   - [Cmd](../library/Lasm/UI/Cmd.lean)
   - [Diff](../library/Lasm/UI/Diff.lean)
   - [Elements](../library/Lasm/UI/Elements.lean)
@@ -230,21 +268,11 @@ docstrings, the propositions and the names.
   - [Url](../library/Lasm/UI/Url.lean)
   - propositions: [UI/Spec.lean](../library/Lasm/UI/Spec.lean)
   - guide: [docs/UI.md](UI.md)
-- [ ] `Lasm.Web`:
-  - [Web.lean](../library/Lasm/Web.lean)
-  - [App](../library/Lasm/Web/App.lean)
-  - [Canvas](../library/Lasm/Web/Canvas.lean)
-  - [Console](../library/Lasm/Web/Console.lean)
-  - [Crypto](../library/Lasm/Web/Crypto.lean)
-  - [Dom](../library/Lasm/Web/Dom.lean)
-  - [Events](../library/Lasm/Web/Events.lean)
-  - [Fetch](../library/Lasm/Web/Fetch.lean)
-  - [History](../library/Lasm/Web/History.lean)
-  - [Storage](../library/Lasm/Web/Storage.lean)
-  - [Timers](../library/Lasm/Web/Timers.lean)
-  - [Types](../library/Lasm/Web/Types.lean)
-  - [Url](../library/Lasm/Web/Url.lean)
-  - [WebSocket](../library/Lasm/Web/WebSocket.lean)
+- [ ] `Lasm.JS.Web` and its browser tier (generated): the surface and its naming
+  ([JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb),
+  [scripts/bindings/web-tier1.mjs](../scripts/bindings/web-tier1.mjs),
+  [scripts/bindings/web-browser.mjs](../scripts/bindings/web-browser.mjs)).
+  `Lasm.Web` was removed on 2026-11-10.
 - [ ] `Lasm.Fastly`: [Fastly.lean](../library/Lasm/Fastly.lean)
 - [ ] `Lasm.Serverless` has proofs only, with no runtime API. Its propositions about the function-platform shims are in [Serverless/Spec.lean](../library/Lasm/Serverless/Spec.lean).
 

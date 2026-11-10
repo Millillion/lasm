@@ -25,7 +25,7 @@ export const modules = [
     interfaces: ['Node', 'Document', 'DocumentType', 'DocumentFragment', 'ShadowRoot', 'Element', 'Attr', 'NamedNodeMap',
       'CharacterData', 'Text', 'Comment', 'NodeList', 'HTMLCollection', 'DOMTokenList', 'DOMStringMap',
       'MutationObserver', 'MutationRecord',
-      'HTMLElement', 'HTMLAnchorElement', 'HTMLButtonElement', 'HTMLDialogElement', 'HTMLDivElement', 'HTMLFormElement',
+      'HTMLElement', 'HTMLAnchorElement', 'HTMLButtonElement', 'HTMLDialogElement', 'HTMLDivElement', 'HTMLFormElement', 'HTMLHeadElement',
       'HTMLImageElement', 'HTMLInputElement', 'HTMLLabelElement', 'HTMLOptionElement', 'HTMLSelectElement',
       'HTMLTemplateElement', 'HTMLTextAreaElement', 'HTMLFormControlsCollection', 'HTMLOptionsCollection', 'RadioNodeList',
       'ValidityState', 'FileList',

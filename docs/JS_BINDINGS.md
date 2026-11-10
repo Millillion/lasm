@@ -654,7 +654,7 @@ def main : IO Unit := do
 | --- | --- | --- |
 | `Lasm.JS.Web.Geometry` | `DOMRectReadOnly`, `DOMRect`, `DOMRectList` | Geometry Interfaces |
 | `Lasm.JS.Web.Css` | `CSSStyleDeclaration`, `CSSStyleProperties`, `MediaQueryList`, `MediaQueryListEvent` | CSSOM, CSSOM View |
-| `Lasm.JS.Web.Html` | the tree: `Node`, `Document`, `DocumentType`, `DocumentFragment`, `ShadowRoot`, `Element`, `Attr`, `NamedNodeMap`, `CharacterData`, `Text`, `Comment`, `NodeList`, `HTMLCollection`, `DOMTokenList`, `DOMStringMap`, `MutationObserver`, `MutationRecord`; the elements: `HTMLElement`, `HTMLAnchorElement`, `HTMLButtonElement`, `HTMLDialogElement`, `HTMLDivElement`, `HTMLFormElement`, `HTMLImageElement`, `HTMLInputElement`, `HTMLLabelElement`, `HTMLOptionElement`, `HTMLSelectElement`, `HTMLTemplateElement`, `HTMLTextAreaElement`, `HTMLFormControlsCollection`, `HTMLOptionsCollection`, `RadioNodeList`, `ValidityState`, `FileList`; the window: `Window`, `Location`, `History`, `Storage`; the globals `window`, `document`, `location`, `history`, `localStorage`, `sessionStorage`, `requestAnimationFrame`, `cancelAnimationFrame`, `getComputedStyle`, `matchMedia` | DOM, HTML, CSSOM View, File API |
+| `Lasm.JS.Web.Html` | the tree: `Node`, `Document`, `DocumentType`, `DocumentFragment`, `ShadowRoot`, `Element`, `Attr`, `NamedNodeMap`, `CharacterData`, `Text`, `Comment`, `NodeList`, `HTMLCollection`, `DOMTokenList`, `DOMStringMap`, `MutationObserver`, `MutationRecord`; the elements: `HTMLElement`, `HTMLAnchorElement`, `HTMLButtonElement`, `HTMLDialogElement`, `HTMLDivElement`, `HTMLFormElement`, `HTMLHeadElement`, `HTMLImageElement`, `HTMLInputElement`, `HTMLLabelElement`, `HTMLOptionElement`, `HTMLSelectElement`, `HTMLTemplateElement`, `HTMLTextAreaElement`, `HTMLFormControlsCollection`, `HTMLOptionsCollection`, `RadioNodeList`, `ValidityState`, `FileList`; the window: `Window`, `Location`, `History`, `Storage`; the globals `window`, `document`, `location`, `history`, `localStorage`, `sessionStorage`, `requestAnimationFrame`, `cancelAnimationFrame`, `getComputedStyle`, `matchMedia` | DOM, HTML, CSSOM View, File API |
 | `Lasm.JS.Web.UiEvents` | `UIEvent`, `MouseEvent`, `WheelEvent`, `KeyboardEvent`, `InputEvent`, `FocusEvent`, `CompositionEvent`, `PointerEvent`, `SubmitEvent`, `HashChangeEvent`, `PopStateEvent`, `StorageEvent` | UI Events, Pointer Events, CSSOM View, HTML |
 | `Lasm.JS.Web.Canvas` | `HTMLCanvasElement`, `CanvasRenderingContext2D`, `CanvasGradient`, `CanvasPattern`, `Path2D`, `TextMetrics`, `ImageData` | HTML |
 | `Lasm.JS.Web.WebSocket` | `WebSocket`, `CloseEvent` | WebSockets |
@@ -687,7 +687,11 @@ imports a browser one).
   of the element's interface from it, as above. The cast is not checked.
 - Listeners and other callbacks act on the page directly, with nothing removed
   for you: remove what an app adds (`removeEventListener`,
-  `cancelAnimationFrame`, `WebSocket.close`) when it no longer needs it.
+  `cancelAnimationFrame`, `WebSocket.close`) when it no longer needs it, in a
+  mounted app in `Lasm.UI.Mount.onUnmount` ([BROWSER.md](BROWSER.md)). The
+  mount glue (`Mount.root Element`, flags, ports) is `Lasm.UI.Mount`.
+- They replace the hand-written `Lasm.Web` (removed 2026-11-10);
+  [release/next-notes.md](release/next-notes.md) maps each of its functions.
 
 **Cost.** Wasm: nothing for what is not called (measured below). The compiled
 library grows by the `.olean` files and generated C of the six modules (see

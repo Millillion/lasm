@@ -184,6 +184,13 @@ instance : ToJS HTMLFormElement := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HTMLFormElement := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.HTMLFormElement", .data⟩
 instance : Coe HTMLFormElement HTMLElement := ⟨HTMLFormElement.toHTMLElement⟩
 
+/-- `interface HTMLHeadElement : HTMLElement` (HTML Standard (https://html.spec.whatwg.org/multipage/)): a handle to the JavaScript object. -/
+structure HTMLHeadElement extends HTMLElement
+instance : Nonempty HTMLHeadElement := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS HTMLHeadElement := ⟨fun x => .ref x.val ""⟩
+instance : FromJS HTMLHeadElement := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.HTMLHeadElement", .data⟩
+instance : Coe HTMLHeadElement HTMLElement := ⟨HTMLHeadElement.toHTMLElement⟩
+
 /-- `interface HTMLImageElement : HTMLElement` (HTML Standard (https://html.spec.whatwg.org/multipage/)): a handle to the JavaScript object. -/
 structure HTMLImageElement extends HTMLElement
 instance : Nonempty HTMLImageElement := ⟨{ val := Classical.ofNonempty }⟩
@@ -1434,7 +1441,7 @@ def Document.setBody (self : Document) (value : Option HTMLElement) : IO Unit :=
   self.val.set "body" (toJS value)
 
 /-- `readonly attribute HTMLHeadElement? head` -/
-def Document.head (self : Document) : IO (Option Data) := self.val.get "head" (Option Data)
+def Document.head (self : Document) : IO (Option HTMLHeadElement) := self.val.get "head" (Option HTMLHeadElement)
 
 /-- `readonly attribute HTMLCollection images` -/
 def Document.images (self : Document) : IO HTMLCollection := do

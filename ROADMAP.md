@@ -42,7 +42,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 - [ ] (J) Hone the propositions of Lasm's own library: 30 in [library/Lasm/UI/Spec.lean](library/Lasm/UI/Spec.lean), [RPC/Spec.lean](library/Lasm/RPC/Spec.lean), [KV/Spec.lean](library/Lasm/KV/Spec.lean) and [Fetch/Spec.lean](library/Lasm/Fetch/Spec.lean) ([library/PROOFS.md](library/PROOFS.md)).
 - [ ] (J) Hone the Lean code of every example, especially the propositions and the theorem structure: Conduit first (52 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean)), then Ledger (31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean)).
 - [ ] (J) Review the whole `lasm` CLI: its UX, and that it works.
-- [ ] (J) Hone the libraries Lasm added: Lasm.Fetch, Lasm.UI, Lasm.JS, Lasm.RPC, Lasm.Web, Lasm.KV.
+- [ ] (J) Hone the libraries Lasm added: Lasm.Fetch, Lasm.UI, Lasm.JS (with the generated Lasm.JS.Web), Lasm.RPC, Lasm.KV.
 - [ ] (J) Work out the whole front-end UI story.
 - [ ] (J) Play with Lasm, front end to back end, and hone what comes up.
 - [ ] (J) Hone the README, [TRUST.md](docs/proposals/TRUST.md) and every human-facing text.
@@ -69,7 +69,7 @@ Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.m
 
   See [docs/REVIEW.md](docs/REVIEW.md#high-priority-work-to-define-with-jordan).
 - [x] Conduit: requests isolated on node:sqlite and bun:sqlite (issue #59; reads saw other requests' writes half done).
-- [x] Standard bindings, tier 1 (Jordan, 2026-11-09): `Lasm.JS.Web`, the WinterTC Minimum Common Web API generated from WebIDL (`scripts/bindings/generate-web.mjs`, pinned `@webref/idl`), with a conformance program (WPT URL and urlencoded data, Lean's UTF-8 as oracle, Web Crypto vectors, generated round trips) on Node 26 and 24, Bun, Deno, Workers and Chromium (`web-bindings.yml`), PR #172 ([JS_BINDINGS.md](docs/JS_BINDINGS.md#standard-bindings-lasmjsweb)). Next tiers: `Lasm.JS.Node`, `Lasm.JS.Deno`, `Lasm.JS.Bun`, `Lasm.JS.Cloudflare`; `Lasm.Web` stays until Jordan reviews its retirement.
+- [x] Standard bindings, tier 1 (Jordan, 2026-11-09): `Lasm.JS.Web`, the WinterTC Minimum Common Web API generated from WebIDL (`scripts/bindings/generate-web.mjs`, pinned `@webref/idl`), with a conformance program (WPT URL and urlencoded data, Lean's UTF-8 as oracle, Web Crypto vectors, generated round trips) on Node 26 and 24, Bun, Deno, Workers and Chromium (`web-bindings.yml`), PR #172 ([JS_BINDINGS.md](docs/JS_BINDINGS.md#standard-bindings-lasmjsweb)). Next tiers: `Lasm.JS.Node`, `Lasm.JS.Deno`, `Lasm.JS.Bun`, `Lasm.JS.Cloudflare`; the browser tier `Lasm.JS.Web.Browser` replaced `Lasm.Web` on 2026-11-10 (Jordan's decision).
 - [x] Lasm.JS synchronous callbacks (approved 2026-11-04, for 0.5.0; PR #122): every wait there that needs Node fails at once instead of never finishing (a task making host calls, `.block`, a timer, DNS lookup or socket read started inside); `Value.toTask` without waiting works.
 
 ### Releases
@@ -183,10 +183,10 @@ Jordan's direction: rock solid first, then the irreducible essence, then proposi
 
 Jordan decided the bindings ship inside `@lasm/cli`, with no optional download, under `Lasm.JS`, named for what they mirror: `Lasm.JS.Web`, `Lasm.JS.Node` (for example `Lasm.JS.Node.Fs`), `Lasm.JS.Deno` and `Lasm.JS.Bun`. They are generated from WebIDL (w3c/webref), `@types/node`, `lib.deno.d.ts` and `bun-types`. They are spec-faithful, with one surface per platform, generated against the oldest supported version and with newer APIs labelled by version. The details are in [docs/REVIEW.md](docs/REVIEW.md).
 - [ ] Tier 1, the first piece of work: the WinterTC common web APIs as `Lasm.JS.Web`, tested with web-platform-tests and official vectors, on every JavaScript target.
-- [ ] Replace the hand-written `Lasm.Web` with the generated `Lasm.JS.Web` (a breaking rename, in a minor release).
+- [x] Replace the hand-written `Lasm.Web` with the generated `Lasm.JS.Web` (2026-11-10): the browser tier `Lasm.JS.Web.Browser` (DOM, HTML elements, window, UI events, canvas 2D, WebSocket; `scripts/bindings/web-browser.mjs`, conformance checks in the platform suite on Chromium, Firefox and WebKit), PR #193; `Lasm.Web` and `lasm:web` deleted, `Lasm.Web.App` moved to `Lasm.UI.Mount`, migration table in [docs/release/next-notes.md](docs/release/next-notes.md).
 - [ ] Tiers 2 and 3: the full web platform, then Node core, `Deno.*`, `Bun.*` and `Lasm.JS.Cloudflare` (from Cloudflare's workers-types: KV, D1, R2, Durable Objects, env bindings), pinned per supported version. `Lasm.JS.Cloudflare` replaces the example apps' hand bindings (Porter, Ledger).
 - [ ] Then remove what `Lasm.JS.*` makes obsolete ([IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md#3-ranked-removal-list), removal 17):
-  - all of `Lasm.Web` (its mount glue moves into `Lasm.UI`);
+  - [x] all of `Lasm.Web` (its mount glue moved into `Lasm.UI.Mount`; done 2026-11-10);
   - `Lasm.Fetch`'s JavaScript-host parts (`serve`'s portable handler and Assets stay);
   - `Lasm.KV`'s Deno and Workers backends (pending Jordan's KV review).
 

@@ -73,7 +73,7 @@ argument union's other member types likewise.
 | `scrollIntoView smooth` | `scrollIntoView (some (.scrollIntoViewOptions { behavior := some .smooth }))` |
 | `rect : IO Rect` | `getBoundingClientRect` (a `DOMRect`: `x`, `y`, `width`, `height`, `top`, `right`, `bottom`, `left`) |
 | `prop name`, `setProp name v` | the interface's own attribute (`HTMLInputElement.disabled`, `HTMLSelectElement.selectedIndex`, `HTMLImageElement.naturalWidth`, …), or `e.val.get name` / `e.val.set name v` (`Lasm.JS`) |
-| `doc.body`, `doc.head` | `doc.body`, `doc.head` (`Option HTMLElement`, `Option HTMLHeadElement` as `Data`) |
+| `doc.body`, `doc.head` | `doc.body`, `doc.head` (`Option HTMLElement`, `Option HTMLHeadElement`) |
 | `doc.title`, `doc.setTitle`, `doc.activeElement` | the same names |
 
 **Events (`Lasm.Web.Events`)**
