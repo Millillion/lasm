@@ -54,6 +54,27 @@ def arg (α : Type) [FromJS α] (args : Array Data) (i : Nat) : IO α :=
 def arrayBufferBytes (buffer : Value) : IO ByteArray :=
   Binding.invoke ByteArray { name := "Lasm.JS.Web.Support.arrayBufferBytes", module := "globalThis", path := "Uint8Array", construct := true, arity := 1 } #[.ref buffer ""] (await := false)
 
+/-- The bytes of a typed array result: a `Uint8Array` arrives as bytes; any other view (ImageData's
+`Uint8ClampedArray`) is copied through `new Uint8Array(view.buffer, view.byteOffset, view.byteLength)`. -/
+def viewBytes : Data → IO ByteArray
+  | .bytes b => pure b
+  | .ref view _ => do
+    let buffer ← view.get "buffer" Value
+    let offset ← view.get "byteOffset" Nat
+    let length ← view.get "byteLength" Nat
+    Binding.invoke ByteArray { name := "Lasm.JS.Web.Support.viewBytes", module := "globalThis", path := "Uint8Array", construct := true, arity := 3 }
+      #[.ref buffer "", toJS offset, toJS length] (await := false)
+  | d => throw (IO.userError s!"Lasm.JS.Web: expected a typed array, received JavaScript {d.describe}")
+
+/-- A typed array other than `Uint8Array` holding `bytes` (an argument typed `Uint8ClampedArray`, `Int16Array`, …):
+`new T(new Uint8Array(bytes).buffer)`, three host calls. -/
+def typedArray (constructor : String) (bytes : ByteArray) : IO Value := do
+  let view ← Binding.invoke Value { name := "Lasm.JS.Web.Support.typedArray", module := "globalThis", path := "Uint8Array", construct := true, arity := 1 }
+    #[.bytes bytes] (await := false)
+  let buffer ← view.get "buffer" Value
+  Binding.invoke Value { name := s!"Lasm.JS.Web.Support.typedArray.{constructor}", module := "globalThis", path := constructor, construct := true, arity := 1 }
+    #[.ref buffer ""] (await := false)
+
 /-- `Number(v)`, read as `α`: an integer some runtimes return as an object with a primitive value (a timer). -/
 def number (α : Type) [FromJS α] (v : Value) : IO α :=
   Binding.invoke α { name := "Lasm.JS.Web.Support.number", module := "globalThis", path := "Number", construct := false, arity := 1 } #[.ref v ""] (await := false)
