@@ -698,9 +698,15 @@ imports a browser one).
 - They replace the hand-written `Lasm.Web` (removed 2026-11-10);
   [release/next-notes.md](release/next-notes.md) maps each of its functions.
 
-**Cost.** Wasm: nothing for what is not called (measured below). The compiled
-library grows by the `.olean` files and generated C of the six modules (see
-[Cost](#cost)); build time grows only for programs that import them.
+**Cost** (`web-bindings.yml --sizes`, run of 2026-11-10 on PR #193: the same
+program through `Lasm.JS` alone, `Lasm.JS.Web`, and `Lasm.JS.Web.Browser`).
+Wasm: nothing for what is not called: 463,710, 463,167 and 463,167 bytes for
+the browser; 560,999, 560,456 and 560,456 for the edge runtime; 739,755,
+685,060 and 685,520 for Node. Build time of a new project with warm tools: the
+browser tier's imports add about 7 seconds (browser 11.9 → 18.2 → 25.1 s, edge
+10.9 → 17.6 → 24.3 s, Node 15.6 → 20.5 → 26.4 s); a program that imports only
+the modules it uses pays less. The compiled library grows by 20.1 MB (see
+[Cost](#cost)).
 
 **Tests.** [`test/browser/platform/Bindings.lean`](../test/browser/platform/Bindings.lean)
 is part of the platform suite that `browser.yml` runs on Chromium, Firefox and
