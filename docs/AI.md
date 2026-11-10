@@ -44,7 +44,9 @@ deploys Lean with Lasm. The [README](../README.md) has the complete reference;
    Fastify with Lean handlers, or `Lasm.Fetch`. For Fastly Compute, use `Lasm.Fastly`
    (Fastly's host ABI, generated: `HttpReq.bodyDownstreamGet`, `HttpResp.sendDownstream`,
    the stores; [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)) or `Lasm.Fetch`. For
-   edge, WASI and Spin, use `Lasm.Fetch` (or Hono with `--deploy workers`). `Std.Http`
+   wasi-http (wasmtime serve, Spin), use `Lasm.WASI.Http` (the WIT's own interfaces,
+   generated: `IncomingHandler.serve`, `OutgoingResponse`, `ResponseOutparam.set`) or
+   `Lasm.Fetch`. For edge and WASI, use `Lasm.Fetch` (or Hono with `--deploy workers`). `Std.Http`
    works on Node only and is slow.
 6. **Single-threaded targets** (edge, Bun/Deno, WASI, browser) have no sockets,
    processes or signals, and no files except on WASI. Tasks are cooperative. In the
