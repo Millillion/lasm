@@ -479,7 +479,10 @@ const dictReadableMemo = new Map();
 function dictReadable(name) {
   if (dictReadableMemo.has(name)) return dictReadableMemo.get(name);
   dictReadableMemo.set(name, false);
-  const ok = inTier(tierOfKey(name), () => dictFields(name).every(f => { const t = resolve(f.idlType); return readable(t) && !needsPost(t); }));
+  // Lasm.JS.Deno's and Lasm.JS.Bun's plain-data objects (a request's info) may hold a promise:
+  // it is read as the promise's Value (`info.completed.await Unit`).
+  const promiseOk = t => t.k === 'promise' && !!hostOf(def(name));
+  const ok = inTier(tierOfKey(name), () => dictFields(name).every(f => { const t = resolve(f.idlType); return promiseOk(t) || (readable(t) && !needsPost(t)); }));
   dictReadableMemo.set(name, ok);
   return ok;
 }

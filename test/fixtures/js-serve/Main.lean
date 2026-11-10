@@ -172,13 +172,12 @@ def deno (r : Checks) (live : Live) : Async Unit := do
     let ac ← AbortController.new
     let handler ← Deno.ServeHandler.ofFn fun req info => do
       if (← (← URL.new (← req.url)).pathname) == "/hello" && (← remote.get).isNone then
-        let a ← info.remoteAddr
+        let a := info.remoteAddr
         remote.set (some (a.hostname, a.port, a.transport == .tcp))
-        live.modify (·.push ("ServeHandlerInfo", info.val))
         -- info.completed settles once the response has been sent.
         Std.Async.background do
           let ok ← try
-              info.completed
+              info.completed.await Unit
               pure true
             catch _ => pure false
           completed.set (some ok)

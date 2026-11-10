@@ -7,10 +7,6 @@
         "serve"
       ],
       "interfaces": {
-        "ServeHandlerInfo": [
-          "remoteAddr",
-          "completed"
-        ],
         "HttpServer": [
           "finished",
           "addr",
