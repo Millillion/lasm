@@ -2,7 +2,9 @@
 // mutexes, and compiler. Never allow duplicate symbols to select an arbitrary ABI.
 import { readFileSync, writeFileSync, copyFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { resolve, join, relative } from 'node:path';
-import { root } from '../../src/toolchain.mjs';
+import { fileURLToPath } from 'node:url';
+
+const root = fileURLToPath(new URL('../..', import.meta.url));
 
 const source = resolve(process.argv[2] ?? '.work/lean-full/lean4-4.32.0/src');
 // --edge: the single-threaded edge profile (docs/EDGE.md). The host bridge has no

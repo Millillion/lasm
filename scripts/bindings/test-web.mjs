@@ -149,15 +149,17 @@ for (const target of targets) {
   for (const p of result.stale ?? []) console.log(`  listed in known.json but passed: ${p}`);
   if (result.error) console.log(`  ${result.error.split('\n').join('\n  ')}`);
 }
-// --sizes: what importing Lasm.JS.Web costs, against the same program on Lasm.JS
-// alone (test/fixtures/js-web-size), for Node and the edge runtime (--target deno):
+// --sizes: what importing Lasm.JS.Web (and its browser tier) costs, against the same
+// program on Lasm.JS alone (test/fixtures/js-web-size), for Node, the edge runtime
+// (--target deno) and the browser:
 // build time of a new project with warm tools, and the program's Wasm.
 const sizes = [];
 if (values.sizes) {
   const wasmBytes = dir => existsSync(dir) ? readdirSync(dir, { recursive: true }).filter(f => String(f).endsWith('.wasm'))
     .reduce((n, f) => n + statSync(join(dir, f)).size, 0) : 0;
-  for (const [target, flags, output] of [['node', [], 'dist'], ['deno', ['--target', 'deno'], 'deno']]) {
-    for (const program of ['Base', 'Web']) {
+  // Browser.lean imports the browser tier too (Lasm.JS.Web.Browser), built for the browser as well.
+  for (const [target, flags, output] of [['node', [], 'dist'], ['deno', ['--target', 'deno'], 'deno'], ['browser', ['--target', 'browser'], 'dist']]) {
+    for (const program of ['Base', 'Web', 'Browser']) {
       const dir = join(work, `size-${target}-${program}`);
       cpSync(join(root, 'test', 'fixtures', 'js-web-size'), dir, { recursive: true });
       const b = await exec(process.execPath, [lasm, 'build', `${program}.lean`, ...flags], { cwd: dir, timeout: 30 * 60_000 });

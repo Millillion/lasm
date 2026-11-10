@@ -16,6 +16,7 @@ structure Performance extends EventTarget
 instance : Nonempty Performance := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS Performance := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Performance := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.Performance", .data⟩
+instance : Coe Performance EventTarget := ⟨Performance.toEventTarget⟩
 
 /-- `readonly attribute DOMHighResTimeStamp timeOrigin` -/
 def Performance.timeOrigin (self : Performance) : IO Float := self.val.get "timeOrigin" Float

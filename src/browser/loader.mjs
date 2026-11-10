@@ -40,9 +40,9 @@ const parseFlags = text => {
 
 /**
  * Starts the Lean program on `target` (an element or a selector): its
- * initializers and `main` run, with the element as `Lasm.Web.App.root`.
- * options: flags (any JSON-like value: Lasm.Web.App.flags), hydrate (adopt
- * server-rendered content: Lasm.Web.App.hydrating), jspi (let blocking waits
+ * initializers and `main` run, with the element as `Lasm.UI.Mount.root`.
+ * options: flags (any JSON-like value: Lasm.UI.Mount.flags), hydrate (adopt
+ * server-rendered content: Lasm.UI.Mount.hydrating), jspi (let blocking waits
  * suspend where the browser has JSPI; default from the build's --suspend),
  * onError(error) (the instance stopped), stdout/stderr (line sinks; default
  * console.log / console.error).
@@ -85,14 +85,14 @@ export async function mount(target, options = {}) {
   let unmounted = false;
   const app = Object.freeze({
     element, name,
-    /** Delivers a message to the handler Lean registered (Lasm.Web.App.onMessage). */
-    send: message => embedder ? embedder.deliver(message) : Promise.reject(new Error(`Lasm app ${name} does not receive messages (it does not use Lasm.Web.App)`)),
+    /** Delivers a message to the handler Lean registered (Lasm.UI.Mount.onMessage). */
+    send: message => embedder ? embedder.deliver(message) : Promise.reject(new Error(`Lasm app ${name} does not receive messages (it does not use Lasm.UI.Mount)`)),
     /** ports.<name>.send(value) (to Lean) and ports.<name>.subscribe(fn) (from Lean). */
     ports: embedder ? embedder.ports : Object.freeze({}),
     get stopped() { return unmounted || !!lean.lasmEdge.stopped; },
     /** Whether Lean's blocking waits can suspend in this app (JSPI). */
     get jspi() { return !!lean.lasmEdge.jspi; },
-    /** The state the app saves for a hot reload (Lasm.Web.App.onHotSave); mount({ hotState }) restores it. */
+    /** The state the app saves for a hot reload (Lasm.UI.Mount.onHotSave); mount({ hotState }) restores it. */
     hotSave: () => embedder?.hotSave(),
     /** The options this app was mounted with. */
     options: Object.freeze({ ...options }),

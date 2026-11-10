@@ -4,7 +4,7 @@
 // connection has one request in flight (no pipelining). After the warm-up,
 // every request completed inside the measured window counts, and its latency
 // (send to last byte) is recorded with microsecond resolution. Prints one JSON
-// summary line. Adapted from experiments/js-interop/load.mjs.
+// summary line. Adapted from experiments/js-interop/load.mjs (removed 2026-11-10; in the git history at 590a923f).
 import net from 'node:net';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { setTimeout as sleep } from 'node:timers/promises';

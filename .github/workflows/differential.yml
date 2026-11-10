@@ -19,6 +19,12 @@ name: Differential testing
 #     three program pairs (3 × (150 + 25) cases) from a seed derived from the commit (reproducible: the
 #     seed is in the log and the summary);
 #   - nightly (and by hand): a campaign of `budget-min` minutes from a fresh seed.
+# Differential fuzzing (docs/TESTING.md#differential-fuzzing): feature programs
+# (scripts/differential/features.mjs: type classes, inductives and pattern
+# matching, closures of every arity, loops and tail calls, structures,
+# exceptions, signed and Float32 arithmetic, ByteArray, HashSet, TreeMap,
+# panics), 80 cases each, on every target: on pull requests and pushes the fixed
+# seeds of DIFF_FEATURE_SEEDS_PR, replayed; in campaigns one per fresh seed.
 on:
   pull_request:
     branches: [main]
@@ -54,6 +60,10 @@ on:
         description: release or dev
         default: release
         type: string
+      feature-only:
+        description: Feature programs only, 200 cases each (docs/TESTING.md#differential-fuzzing)
+        default: 'false'
+        type: string
 permissions:
   contents: read
 concurrency:
@@ -72,6 +82,9 @@ env:
   JSSHELL_SHA256: 6b9158af52a3e687eec10ccd600356a1cab7d6e45f91f3fec9efbbf0bd2c7494
   PLAYWRIGHT: 1.63.0
   DIFF_TARGETS_PR: node,wasi,wasi-node,deno,interp,node-O0,edge-node,edge-bun,edge-sm,bun,browser-chromium
+  # The pull-request tier's fixed feature-program seeds (a change that breaks one
+  # of them fails the same way every time; campaigns draw fresh seeds).
+  DIFF_FEATURE_SEEDS_PR: '1,2'
   DIFF_TARGETS_FULL: node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm,bun,bun-O0,browser-chromium,browser-firefox,browser-webkit
 jobs:
   sunday:
@@ -214,11 +227,14 @@ jobs:
           fi
           echo "seed $SEED, budget $BUDGET min"
           # Pull requests: the cheap subset of the extra oracles; campaigns: all of them.
-          if [ "$BUDGET" = 0 ]; then AMOUNT="--programs 3"; TARGETS="$DIFF_TARGETS_PR"; else AMOUNT="--budget-min $BUDGET"; TARGETS="$DIFF_TARGETS_FULL"; fi
+          # Feature programs: the fixed seeds on pull requests, one per seed in campaigns.
+          if [ "$BUDGET" = 0 ]; then AMOUNT="--programs 3 --feat-seeds $DIFF_FEATURE_SEEDS_PR --feat-random 0"; TARGETS="$DIFF_TARGETS_PR"; else AMOUNT="--budget-min $BUDGET"; TARGETS="$DIFF_TARGETS_FULL"; fi
+          SIZES="--cases 150 --fs-cases 25 --feat-cases 80"
+          if [ "${{ inputs.feature-only || 'false' }}" = true ]; then SIZES="--cases 0 --fs-cases 0 --feat-cases 200"; fi
           T="$RUNNER_TEMP/tools"
           node scripts/differential/run.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
             --lean-bin "${{ steps.lean.outputs.bin }}" --work "$RUNNER_TEMP/difftest" \
-            --seed "$SEED" $AMOUNT --cases 150 --fs-cases 25 --targets "$TARGETS" \
+            --seed "$SEED" $AMOUNT $SIZES --targets "$TARGETS" \
             --profile "${{ matrix.profile }}" --regressions test/differential/regressions \
             --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js" --playwright "$GITHUB_WORKSPACE/.work/pw" 2>&1 | tee "$RUNNER_TEMP/difftest.log"
       # The regression corpus in the dev profile too (node, then the other targets,
@@ -247,6 +263,9 @@ jobs:
           const s = JSON.parse(require('fs').readFileSync(process.env.RUNNER_TEMP + '/difftest/summary.json', 'utf8'));
           const cases = s.programs.reduce((n, p) => n + p.cases, 0);
           let md = '### Differential testing\n\nSeed ' + s.seed0 + ', ' + s.programs.length + ' programs, ' + cases + ' cases, targets ' + s.targets.join(', ') + ' (' + s.profile + '): **' + s.divergences.length + ' divergences**, ' + s.harnessErrors.length + ' harness errors.\n';
+          const secs = (Date.parse(s.finished) - Date.parse(s.started)) / 1000, kinds = {};
+          for (const p of s.programs) { const k = kinds[p.kind] ??= { programs: 0, cases: 0 }; k.programs++; k.cases += p.cases; }
+          md += '\nBy program kind: ' + Object.entries(kinds).map(([k, v]) => k + ' ' + v.programs + ' programs (' + v.cases + ' cases)').join(', ') + '; feature seeds replayed: ' + ((s.featSeeds ?? []).join(', ') || 'none') + '. ' + Math.round(secs) + ' s in all: ' + (s.programs.length / (secs / 60)).toFixed(2) + ' programs per minute, ' + (cases / secs).toFixed(2) + ' cases per second (every target of each program included).\n';
           for (const d of s.divergences) md += '\n- ' + (d.target ?? '') + ' seed ' + (d.seed ?? 'regressions') + ' case ' + (d.case ?? d.cases ?? '') + ': ' + (d.what ?? 'output differs') + (d.regression ? ' (reproducer ' + d.regression + ')' : '');
           const up = s.upstreamSuspects ?? [];
           md += '\n\n**' + up.length + ' upstream suspects** (native Lean and its interpreter disagree: an upstream Lean question, not a Lasm failure).\n';

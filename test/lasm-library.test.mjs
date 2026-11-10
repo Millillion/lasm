@@ -102,7 +102,7 @@ test('a program links the library modules whose initializers it calls, and what 
 test('whether a program imports the library: an initializer call of one of its modules in any generated C', t => {
   const directory = scratch(t);
   const file = (name, text) => { put(join(directory, name), text); return join(directory, name); };
-  assert.equal(importsLibrary([file('a.c', 'initialize_Init(builtin);'), file('b.c', call('Lasm.Web.Dom'))]), true);
+  assert.equal(importsLibrary([file('a.c', 'initialize_Init(builtin);'), file('b.c', call('Lasm.UI.Mount'))]), true);
   assert.equal(importsLibrary([file('c.c', 'initialize_Lasm_Webx(builtin);'), file('d.c', 'initialize_Lasm_JS')]), false);
   assert.equal(importsLibrary([]), false);
 });

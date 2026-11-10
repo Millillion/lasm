@@ -56,7 +56,7 @@ deployment in Node.
 | eval-io adapter, 22 inputs ([run 39004033361](https://github.com/Millillion/lasm/actions/runs/39004033361)) | 22 | 219 | 22/22 | **22/22**, identical output |
 | Runtime adapter ([run 39006173177](https://github.com/Millillion/lasm/actions/runs/39006173177), [rerun 39008042295](https://github.com/Millillion/lasm/actions/runs/39008042295)) | 65 | 1,317 mapped | 1,313 actions ok | **1,255 pass**, 0 deployed failures |
 | Compiled applications (local) | 10 | — | 9 ran, 1 compile-disabled | 7 pass, 2 build rejected, 1 skipped |
-| `examples/lean-server-latest` | 20 HTTP checks + 10×2 smoke | — | 10/10 + 10/10 | **10/10 + 10/10** |
+| `examples/lean-server-latest` (removed 2026-11-10) | 20 HTTP checks + 10×2 smoke | — | 10/10 + 10/10 | **10/10 + 10/10** |
 
 Runtime-adapter action verdicts:
 - 1,255 pass.
@@ -97,7 +97,7 @@ flake was observed.
 
 ### Example server
 
-`integration/managed-http.mjs` built the unchanged Lake project with `.54`,
+`integration/managed-http.mjs` (removed 2026-11-10; in the git history at `590a923f`) built the unchanged Lake project with `.54`,
 using the native oracle from the full release, in 1 min 27 s and peaking at
 2.33 GiB. All 20 differential HTTP checks pass (10 native, 10 Node). These cover
 routing, JSON/Unicode validation, revisions, concurrent mutation, binary and

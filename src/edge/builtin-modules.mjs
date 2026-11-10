@@ -1,14 +1,14 @@
 // Lasm's builtin JavaScript modules: `lasm:<name>` is the ES module
 // src/lasm-modules/<name>.mjs, shipped with the compiler. Lean code uses them
-// like any JavaScript module (`@[js "lasm:web" "createElement"]`,
-// `Lasm.JS.require "lasm:web"`), and every build resolves them statically:
+// like any JavaScript module (`@[js "lasm:ui-dom" "apply"]`,
+// `Lasm.JS.require "lasm:ui-dom"`), and every build resolves them statically:
 //   - browser builds bundle them into the loader (src/browser/browser-build.mjs);
 //   - edge and portable builds copy them to lasm/modules/ and import them from
 //     the generated entry module under their `lasm:` specifier;
 //   - Node builds copy them to host/lasm-modules/ (src/node-js.mjs loads them);
 //   - the build-time binding check loads them from here.
 // A builtin module uses web-standard APIs only (no Node built-ins), and imports
-// only other builtin modules, by relative path ('./web.mjs').
+// only other builtin modules, by relative path ('./app.mjs').
 // `lasm:app` is per app instance: the browser loader gives each mounted app
 // its own (its root element, flags, ports); app.mjs is the stand-in that the
 // binding check and non-browser builds see.

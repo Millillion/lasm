@@ -31,9 +31,9 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 
 | Layer | What it checks | Where | CI tier |
 | --- | --- | --- | --- |
-| [Differential testing](#differential-testing) | Lasm-compiled programs behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
+| [Differential testing](#differential-testing) and [fuzzing](#differential-fuzzing) | Lasm-compiled programs (generated expressions, statements, and feature programs declaring classes, inductives, closures, loops, structures) behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
 | [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic equals Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs` | PR, nightly |
-| [Standard bindings](#standard-bindings) | Lasm.JS.Web is its generator's output, and behaves as the specs say on every JavaScript target: WPT's URL and urlencoded data, Lean's UTF-8 as the encoder's oracle, published Web Crypto vectors, generated round trips | `scripts/bindings/`, `test/fixtures/js-web/`, `web-bindings.yml` | PR (paths), main |
+| [Standard bindings](#standard-bindings) | Lasm.JS.Web is its generator's output, and behaves as the specs say on every JavaScript target: WPT's URL and urlencoded data, Lean's UTF-8 as the encoder's oracle, published Web Crypto vectors, generated round trips; its browser tier against Lean models on Chromium, Firefox and WebKit | `scripts/bindings/`, `test/fixtures/js-web/`, `test/browser/platform/Bindings.lean`, `web-bindings.yml`, `browser.yml` | PR (paths), main; browser.yml on dispatch and release |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
@@ -129,7 +129,8 @@ strings, hashing, panics, uncaught errors, exit codes, tasks, refs, files),
 differences between targets.
 **What it cannot catch:** bugs that native Lean has too (it is the oracle);
 anything outside the generator's grammar (today: no `Std.Http`, sockets,
-processes, `Std.Time`, typeclass-heavy or universe-polymorphic code, deep
+processes, `Std.Time`, universe-polymorphic code (type classes, inductives,
+closures and loops are the [feature programs'](#differential-fuzzing) job), deep
 recursion beyond a few thousand frames, which is a documented limit of the edge and
 WASI targets: the engine's Wasm stack, [EDGE.md](EDGE.md), [WASI.md](WASI.md);
 the generator's `deep` cases stay at or below 5,000 frames, because the measured
@@ -204,6 +205,104 @@ differ per engine: [EDGE.md](EDGE.md)), and anything only browsers do.
 interpreter matched native Lean on every case once its module name was fixed
 (without `--root`, `lean --run` names the module `_stdin` in panic messages).
 
+### Differential fuzzing
+
+**Property.** The same as [differential testing](#differential-testing), for
+programs that declare things of their own: native Lean 4.35.0 and every Lasm
+target print the same stdout and stderr and exit with the same status.
+
+**Why.** The core generator's cases are expressions and statement lists over a
+fixed preamble, so they never declare a type class, an inductive with
+overlapping patterns, a function of 17 arguments or a 200,000-iteration loop.
+Those exercise different parts of Lean's compiler and runtime (instance
+resolution and specialization, the match compiler, `lean_apply_n`/`lean_apply_m`
+and partial applications, tail calls turned into C loops, signed fixed-width
+arithmetic), and so different code in clang, Binaryen and Lasm's runtime.
+
+**Generator** ([`scripts/differential/features.mjs`](../scripts/differential/features.mjs)).
+A feature case is a family and its random parameters (Csmith-style: a seeded,
+size-bounded grammar); it renders as top-level declarations named after the
+case, then `def cN : IO Unit` printing one line per check. Families:
+
+| Family | What it declares and checks |
+| --- | --- |
+| `ext` | expressions over the core types plus the extension types: `Int8`–`Int64` (overflow, `INT_MIN / -1`, shifts past the width, conversions), `Float32` (IEEE-exact operations and its bits), `ByteArray` (UTF-8 validation of arbitrary bytes, `hash`), `Std.HashSet`, `Std.TreeMap`; with a 35 % chance, operations that panic (`xs[i]!`, `get!`, `head!`, `back!`, `toNat!`), whose message goes to stderr before the default value is used |
+| `class` | a class with a default field and a default method; instances for random types whose operation is a random expression over its two arguments; instances derived for products and `Option`; polymorphic functions over the class (`mconcat`, `pow`, `combine3`, an `==` check) |
+| `adt` | an expression language (`lit`, `var`, `add`, `mul`, `neg`, `ite`, de Bruijn `letE`, deriving `Repr`, `BEq`, `Hashable`), an evaluator with an environment, and a simplifier whose alternatives are a random subset of 13 nested, overlapping rules over `Int` literals plus random congruence rules; random terms with bignum literals |
+| `closure` | functions of arity 1 to 18 applied fully and partially (each partial application forced through the `@[noinline]` identity `bb`, then applied in random chunks of 1 to 6 arguments), closures capturing values, arrays of closures folded, composition, functions returning closures |
+| `loop` | self tail recursion up to 200,000 iterations, `Nat.fold`, mutual recursion (at most 500 frames), `partial def` with fuel, well-founded recursion (`termination_by`/`decreasing_by`: a binary search up to 2¹²⁸), `while` with `continue` and `break` in `Id.run` |
+| `struct` | a structure with default fields and one that `extends` it, deriving `Repr`, `BEq`, `Hashable`, `Ord`: values with defaults left out, `compare`, sorting, `with` updates, the parent projection |
+| `exc` | `ExceptT` with a custom error inductive over `StateT Nat IO`: conditional `throw`, `try`/`catch` with a `match` on the error, `try`/`finally`, `for` with `break`, early `return`, an `IO.Ref` |
+
+Holes are expressions from the core generator's operation table (with the
+extension operations enabled), drawn so that they use the variables in scope.
+Everything terminates by construction (bounded counts, fuel, measures that Lean
+checks) and needs no file system, sleep or environment, so a feature program
+runs on **every** target, the browsers and the `-O0` edge builds included (no
+recursion is deeper than 500 frames; the loops compile to C loops: no generated
+function calls itself in the emitted C, and `Nat.fold` and `while` run 10⁸
+iterations natively where a recursion of that depth aborts). The extension operations are appended after the
+core ones and filtered out of core cases, so every core case of every seed is
+unchanged (a unit test pins their hash). Each case draws from its own stream
+`rng(seed, 'feat', index)`.
+
+**Batching.** 80 feature cases per program, one program per seed: one build per
+target covers them all, as for the core program.
+
+**Reducer.** Delta debugging over the case's tree (`featureShrinks`): every
+check removed, every simplifier rule or congruence rule removed, every
+expression hole replaced by a same-typed child or a minimal literal, every
+expression-language term replaced by `0` or a subterm in scope, every count
+lowered. Every candidate type-checks (checks and rules are independent, holes
+keep their type), so the harness's batched shrink rounds (up to 40 candidates
+per build) never stop on a candidate that does not compile. The minimized case
+is written as `r_<target>_<seed>_f<index>.lean`, a regression file in the
+usual format (it carries its own declarations).
+
+**Running it.** The same harness ([Running it](#differential-testing)):
+`--feat-cases 80` (the default) adds a feature program to every seed of the
+run; `--feat-seeds 1,2 --feat-random 0` replays only those seeds' feature
+programs (the PR tier's fixed set). `--cases 0 --fs-cases 0 --feat-cases 200` runs feature programs only; `differential.yml` dispatched with `feature-only: true` does that for a campaign.
+
+**Tiers** ([differential.yml](../.github/workflows/differential.yml)):
+
+| Tier | Feature programs |
+| --- | --- |
+| PR and push to `main` | the fixed seeds of `DIFF_FEATURE_SEEDS_PR` (1 and 2), 80 cases each, on the PR targets |
+| Nightly | one per fresh seed of the 60-minute campaigns (release and dev profile), every target |
+| Weekly | one per fresh seed of the 100-minute campaigns (`ci-weekly.yml`), every target |
+
+The job summary counts programs and cases per kind (`core`, `fs`, `feat`, …)
+and the throughput.
+
+**What it cannot catch:** the same blind spots as differential testing, less the
+ones it covers (type classes, inductives and pattern matching, closures,
+loops): still no `Std.Http`, sockets, processes, `Std.Time`,
+universe-polymorphic code, libm results of `Float32`, or concurrency (tasks stay
+in the core generator).
+
+**First campaigns** (2026-11-09, PR #167; release and dev profiles, all 16
+targets of `DIFF_TARGETS_FULL`, upstream Lean 4.35.0 as the oracle):
+
+| Run | Programs | Cases | Wall clock | Throughput (every target of each program included) | Result |
+| --- | --- | --- | --- | --- | --- |
+| 42572265503, mixed, release | 55 (11 feature) | 6,105 (880 feature) | 63.5 min | 0.87 programs per minute, 1.6 cases per second | no divergence |
+| 42582065757, feature only, release | 9 | 1,800 | 85 min | — | generator bounds broken: a power tower of bignums in a class operation (86 s natively; every Wasm target, without GMP, timed out), an untyped `Float32` NaN literal |
+| 42620999209, feature only, release | 8 | 1,600 | 60 min | — | **[#179](https://github.com/Millillion/lasm/issues/179)**: `repr` of a 5,120-element array overflows the Wasm stack on WASI and every edge target; 200,000 panic messages in a loop (generator) |
+| 42621004028, feature only, dev | 9 | 1,800 | 60 min | — | a loop recomputing `1e300` (`Float.ofScientific`) 200,000 times (51 s natively: generator) |
+| 42646321682, feature only, release | 13 | 2,600 | 60.7 min | 0.21 programs per minute, 0.71 cases per second (11.4 case-target comparisons per second) | no divergence |
+| 42646328709, feature only, dev | 17 | 3,400 | 60 min | 0.28 programs per minute, 0.94 cases per second | no divergence |
+
+In all, 12,080 feature cases on 16 targets (about 190,000 case runs) and the
+PR tier's 160. The interpreter differed from native Lean only where compiled
+code evaluates a panicking closed term at initialization (before the first
+case, or in a branch never taken) and the interpreter on first use; every Lasm
+target matched native Lean there, so the interpreter's stderr is now compared
+without what native Lean printed before the first case. Each generator fix is
+in `features.mjs` with the run that found it. A native run that takes a tenth
+of the run timeout is now a generator error naming its last case, not a
+divergence of every target.
+
 ### Bun and browser targets
 
 Two user-facing targets through the same harness, built as users build them
@@ -241,7 +340,7 @@ five. *Catches:* differences in the Bun entry (`bun/main.mjs`) and the browser
 loader, bundle and host (output streams, uncaught errors, panics), and engine
 behaviour of Chromium's V8, Firefox's SpiderMonkey and WebKit's JavaScriptCore
 with a real web host. *Cannot catch:* the exact non-zero exit status in a
-browser; `IO.sleep` in Firefox and WebKit; the DOM, events and `Lasm.Web`
+browser; `IO.sleep` in Firefox and WebKit; the DOM, events and `Lasm.JS.Web.Browser`
 (browser.yml's suites cover those).
 
 ### Target equivalence
@@ -370,6 +469,20 @@ generator's mapping is uniform, so a member is wrong only when its types are),
 behaviour beyond the checks, Firefox and WebKit (not run yet), and the Vercel,
 Netlify and Supabase edge runtimes (their APIs are those of Deno and workerd,
 which run).
+
+**The browser tier** (`Lasm.JS.Web.Browser`, 2026-11-10).
+[`test/browser/platform/Bindings.lean`](../test/browser/platform/Bindings.lean)
+runs inside the browser platform suite (`browser.yml`) on Chromium, Firefox and
+WebKit, each check reported as `bindings.<name>` and failing the engine's job.
+Each check's comment states its proposition, over generated inputs against a
+Lean model, for example `∀ op sequences, labels (p.childNodes) = model ops` (a
+list under insert, erase and set), `(Text.new s).length = utf16Length s`,
+`e.textContent := s → e.innerHTML = escapeText s`, or
+`∀ R p, isPointInPath (Path2D R) p ↔ p ∈ R`; the rest check the specs' stated
+behaviour (input value sanitization, ignored `lineWidth` and `globalAlpha`
+values, event dispatch and cancelling, a WebSocket echo). An availability probe
+records the generated members each engine lacks (`bindingsMissing` in the
+engine's report).
 
 ### Scenario matrix
 
@@ -502,6 +615,8 @@ where they are; these cover the libraries and hosts every app shares.
 | `cli-arguments` | `src/cli-arguments.mjs` and the `init`, `dev`, `package` parsers | JavaScript | a parse names only targets, templates and deploy targets Lasm has (own keys, never `constructor`); every refusal is a plain `Error` with a readable message |
 | `serverless-http` | `src/serverless/lasm-lambda.mjs` (API Gateway REST and HTTP API, function URLs, ALB, CloudFront events) and `lasm-server.mjs`'s helpers (`outgoingHeaders`, cookies, `isTextual`, `azureReply`, `webReply`) | JavaScript | every well-formed event is answered; the forwarded target is one http.request accepts and starts with `/`, one Cookie and one plain Host header, query values as the platform gave them, the body round-trips byte for byte, each Set-Cookie once; and the request, the response, the Azure and Netlify replies and the parsed cookies are exactly what the Lean model says (`library/Lasm/Serverless/Proofs/Model.lean`, whose theorems are in [library/PROOFS.md](../library/PROOFS.md); run with `lean --run` by `test/fuzz/support/serverless-model.mjs`, required in CI) |
 | `ui-patch` | the Lasm.UI patch decoder (`src/lasm-modules/ui-dom.mjs`) on happy-dom, with hydration | JavaScript | a frame applies, or fails with a `Lasm.UI: …` error or a `DOMException`; never a `TypeError`, a hang, or an attribute from a reference past the name table |
+| `ui-decode` | the same applier's reading of a session's frames, on a recording DOM (the DOM's tree semantics, every slot kept), against Lean's reference decoder (`library/Lasm/UI/Proofs/Decode.lean`, which `Lasm.UI.Spec.frames_decode` proves reads every encoded frame as its patch) | JavaScript | frame by frame, the applier refuses exactly the frames the decoder refuses, and otherwise leaves exactly the DOM the decoder's operations make: every node, id, tag, namespace, text, attribute, property, style, and listener with its decoder's paths. The decoder runs with `lean --run` (`test/fuzz/support/ui-decode-model.mjs`, required in CI). Frames whose meaning depends on the DOM, not the bytes (an id not in the document, a move into its own subtree, an id in use, a property that is a DOM member), and numbers above 2^53, end a session without a verdict; a removed property reads as its type's empty value, so `""`, `false` and unset compare equal |
+| `lasm-js-wire` | the Lasm.JS value codec's JavaScript half (`src/node-js.mjs`'s writer and reader), against Lean's half (`Wire` in `library/Lasm/JS/Core.lean`, whose round trip is proved: `Lasm.JS.Spec.decode_encode`) | JavaScript | on any bytes, JavaScript's reader and Lean's (`Wire.decodeWith`) both refuse, or both read the same value; on any value, JavaScript writes exactly Lean's bytes (`Wire.encode`) and reads them back as the value. Lean's half runs with `lean --run` (`test/fuzz/support/js-wire-model.mjs`, required in CI). Normalizations, JavaScript's own semantics: lone surrogates are written as U+FFFD, a repeated key keeps its last value, NaN payloads are not compared (Lean's `Float.ofBits` keeps none) |
 | `lean-fetch-request` | `Lasm.Fetch`'s request parsing as Node's host builds requests (`nodeRequestUrl`, `path`, `segments`, `query`, `queryParams`, `header?`, `percentDecode`, `joinCookies`, `splitCookieCommas`) | libFuzzer, ASan | the path starts with `/` and holds no `?`, `#`, `\`; the Host header never moves the path; the target alone has the same path; resolving again changes nothing; no dot segments; one Cookie header |
 | `lean-rpc` | `Lasm.RPC`'s `decodeRequest` and `decodeResponse` for an endpoint with strings, Booleans, arrays, `Nat` and `Option` | libFuzzer, ASan | accepted only when `validate` passes, otherwise refused as invalid (400); request and response round trips; Lean's JSON printer's output parses and prints the same |
 | `wasi-cgi` | the WASI C host's CGI request and response (`src/wasi/lasm_fetch_wasi.c`), compiled natively | libFuzzer, ASan, UBSan | strings handed to Lean are valid UTF-8; the method is `REQUEST_METHOD`; the Host or `SERVER_NAME` never moves the path; the response head is one line per header, no CR, LF or NUL inside a line |
@@ -543,6 +658,8 @@ a fix, or an issue.
     node test/fuzz/run.mjs fuzz --seconds 30 ui-patch   # a campaign; --seed N replays one
     node test/fuzz/native/build.mjs                     # Linux, clang: the native targets
     node test/fuzz/support/serverless-model.mjs         # serverless-http's Lean model (used when prepared)
+    node test/fuzz/support/ui-decode-model.mjs          # ui-decode's Lean decoder (used when prepared)
+    node test/fuzz/support/js-wire-model.mjs            # lasm-js-wire's Lean half (used when prepared)
 
 **CI** ([fuzz.yml](../.github/workflows/fuzz.yml)): every pull request and push
 to `main` replays the committed corpus and regressions of the JavaScript
@@ -587,6 +704,21 @@ failing input and uploads its new corpus entries and failing inputs (artifact
   body lost its accented letters (text only when valid UTF-8); and a reply
   field named `__proto__` or `constructor` was dropped or threw a
   `TypeError` (header maps without a prototype).
+- checked against Lean's reference decoder, the Lasm.UI applier read two
+  kinds of frame the decoder refuses: a listener naming a decoder the stream
+  never defined (an event on it would then have read no fields), and text
+  that is not UTF-8 (read with U+FFFD). Both are now refused
+  (`Lasm.UI: no decoder N`, `Lasm.UI: text that is not UTF-8`). A number
+  above 2^53 is refused instead of rounded, and padding zeros past it, which
+  Lean reads as nothing, no longer turn into `NaN`.
+- checked against Lean's half, the Lasm.JS value codec's JavaScript reader
+  (both copies, `src/node-js.mjs` and `src/edge/edge-js.mjs`) disagreed in
+  three ways: a Lean object field named `__proto__` set the JavaScript
+  object's prototype instead of becoming a field; strings and keys that are
+  not UTF-8 were read with U+FFFD where Lean refuses them; and a bigint's
+  text was read by `BigInt`, which also takes `''`, spaces, `+5` and `0x10`,
+  and refuses Lean's `1_000`. The reader now accepts exactly what Lean's
+  `Wire.readAt` accepts, and `__proto__` is an own property.
 
 **Cannot catch:** logic errors that produce well-formed wrong answers (the
 differential and equivalence oracles are for that); the Wasm builds'
@@ -782,7 +914,10 @@ checks the invariants. `node test/dst.mjs` starts it.
 **CI.** Each app's workflow (`tandem.yml`, `ledger.yml`, `porter.yml`, on
 changes to the app or to `scripts/sim`) runs 30 fixed seeds, each twice to
 check that it replays exactly (`--seeds 30 --check-determinism`), then 10
-fixed seeds with heavy faults.
+fixed seeds with heavy faults, then its regression seeds: every seed that once
+failed in the nightly, kept after its fix (`--seed N,M,…`). An exception thrown
+by the world itself fails its seed (named, replayable) instead of ending the
+campaign.
 [`dst-nightly.yml`](../.github/workflows/dst-nightly.yml) runs random seeds
 for 20 minutes per app, then 10 minutes with heavy faults. A failure prints:
 
@@ -806,7 +941,20 @@ its own code used (or its refresh token rotated) and revoked the family it
 had just issued; each commit now inserts a commit receipt, which a failed
 commit looks up, and the simulation fails if a fresh code or a live refresh
 token is refused after an ambiguous commit (except when the receipt itself
-could not be read, the documented case, in which nothing is revoked). In Ledger,
+could not be read, the documented case, in which nothing is revoked). The
+nightly then found a second Tandem bug of the same family (#190): a retry that
+carried both the operations of an ambiguous commit and newly typed ones pushed
+only the new ones, so the earlier ones were never pushed; the server now
+pushes the reply (the log from the client's cursor) whenever some of a
+request's operations were in the log already. Porter's other nightly failures
+(#189) were the world's own mistakes, now fixed: it expected a live session
+after a logout whose answer was lost, duplicated, or arrived after a newer
+sign-in (whose cookie the logout's answer clears); it counted a revocation
+learned while a userinfo or refresh request was in flight as one that request
+must have seen; it did not count a lost refresh with a possibly rotated token
+as a possible reuse; it required a code to be redeemable after the heal even
+when it had expired on a skewed racing instance; and it threw on an agent
+whose tokens were dropped while a call was scheduled. In Ledger,
 nothing: every seed kept every invariant, racing commits at skewed clocks
 included. See [Bugs found](#bugs-found).
 
@@ -866,9 +1014,9 @@ tier and why that is safe, and the PR-tier measurements. In short:
 
 | Tier | When | What this page's layers add there |
 | --- | --- | --- |
-| PR | every pull request (path-filtered), then the push to `main` unfiltered | the unit suite; boundary fuzzing: the committed corpus and regressions replayed (seconds; native targets when their sources change); host bridge: the model (about 1 s), 20 schedule-fuzzed runs per stress program on Linux and their traces' conformance; differential: regressions + three seeded program pairs (525 cases) on node, wasi, node:wasi, edge, plus the interpreter, `node-O0` and the edge `.wasm` on Node, Bun and SpiderMonkey; target equivalence of the fetch template and `examples/fetch` on node, deno, bun, wasi-http, workers; recursion depth on Linux and Windows. macOS only when macOS-specific code changes. Skipped for a change to docs or the flagship apps only (they have their own workflows) |
-| Nightly | 01:07 to 09:17 UTC | the release suites (`ci-nightly.yml`: unit, browser, edge and Bun/Deno, WASI, UI, fullstack, dev loop, Lasm.JS stress); boundary fuzzing: 10 minutes per target (`fuzz.yml`); host bridge: 200 schedule-fuzzed runs per stress program on four platforms; differential: 60-minute campaigns for the release and the dev profile, every oracle, and the macOS jobs (recursion depth, the C tier on three macOS runners); tooling metamorphic and fault runs; mutation on every module; the example apps' DST with random seeds and campaigns; the nightly upstream suite (`nightly.yml`) |
-| Weekly | Saturday 06:41 and 12:07 UTC | differential: 100-minute campaigns in both profiles, and the Lasm.JS soak (200 runs per program on four platforms) (`ci-weekly.yml`); boundary fuzzing: 60 minutes per target (`fuzz.yml`) |
+| PR | every pull request (path-filtered), then the push to `main` unfiltered | the unit suite; boundary fuzzing: the committed corpus and regressions replayed (seconds; native targets when their sources change); host bridge: the model (about 1 s), 20 schedule-fuzzed runs per stress program on Linux and their traces' conformance; differential: regressions + three seeded program pairs (525 cases) and the two fixed-seed [feature programs](#differential-fuzzing) (160 cases) on node, wasi, node:wasi, edge, plus the interpreter, `node-O0` and the edge `.wasm` on Node, Bun and SpiderMonkey; target equivalence of the fetch template and `examples/fetch` on node, deno, bun, wasi-http, workers; recursion depth on Linux and Windows. macOS only when macOS-specific code changes. Skipped for a change to docs or the flagship apps only (they have their own workflows) |
+| Nightly | 01:07 to 09:17 UTC | the release suites (`ci-nightly.yml`: unit, browser, edge and Bun/Deno, WASI, UI, fullstack, dev loop, Lasm.JS stress); boundary fuzzing: 10 minutes per target (`fuzz.yml`); host bridge: 200 schedule-fuzzed runs per stress program on four platforms; differential: 60-minute campaigns for the release and the dev profile, every oracle, a feature program per seed, and the macOS jobs (recursion depth, the C tier on three macOS runners); tooling metamorphic and fault runs; mutation on every module; the example apps' DST with random seeds and campaigns; the nightly upstream suite (`nightly.yml`) |
+| Weekly | Saturday 06:41 and 12:07 UTC | differential: 100-minute campaigns in both profiles (a feature program per seed), and the Lasm.JS soak (200 runs per program on four platforms) (`ci-weekly.yml`); boundary fuzzing: 60 minutes per target (`fuzz.yml`) |
 | Release | a version bump (`release-checks`) | every launch workflow, Lasm.JS stress, unit suite, npm rehearsal (unchanged) |
 
 No scheduled run does anything on a Sunday in US Eastern time: cron times stay
@@ -947,6 +1095,21 @@ to `main`. Each section keeps two kinds of fact apart:
   fuzz targets and DST apps (the workflows' matrices), the equivalence targets
   and the latest benchmark table ([BENCHMARKS.md](BENCHMARKS.md)).
 
+The page opens with the [exit bar](TESTING_STRATEGY.md#7-exit-bar-rock-solid),
+item by item, computed from both kinds of fact: the platform levels, the
+latest nightly mutation run (every module of `scripts/mutation/modules.json`
+passed at 80 % or more), the unit suite's line coverage (the nightly run's
+`unit` job log), the consecutive clean nights of the differential, fuzzing and
+DST campaigns (`campaignStreak`: Sundays in New York are left out; a failed,
+cancelled or missing campaign ends the run), the quarantine list, the
+proposition lint's inventory (`scripts/propositions.mjs`) and the fuzz targets
+that run against Lean. An item reads "met", "partly met" (what is measured
+holds, the rest is not measured yet), "not met", "not measured" or "not read".
+`test/testing-docs.test.mjs` keeps the documents behind it in step with the
+repository: every path and workflow TESTING_STRATEGY.md and CI.md name exists,
+every workflow is in CI.md, and the fuzz table above lists exactly the targets
+`fuzz.yml` runs.
+
 The same facts are in [`docs/evidence/test-evidence.json`](evidence/test-evidence.json).
 A workflow with no scheduled run yet shows as "no run yet". `node
 scripts/evidence/page.mjs --offline` renders the page without the API.
@@ -1016,7 +1179,7 @@ run, except the static mode of `check-tutorials.mjs` (below). Verdicts:
 | `notices.test.mjs` (3 lines of the Apache 4(b) test; the rest is behavioural) | patch names regex-parsed from `build-application-runtime.mjs` | **Keep as a cross-reference lint** until the patch table moves into an importable module (the build script runs when imported) |
 | `notices.test.mjs`: Lasm's licence copy, Wasmtime licence copies, MIT everywhere, MIT-0 texts | file equality and headers; the MIT-0 test also checks eight phrases of the `LICENSE-MIT-0` grant | **Keep**: consistency guards; licence text is what must be shipped, and a change to the grant's scope should be deliberate |
 | 29 unit files (`compiler`, `conformance`, `io`, `runtime`, the `node-*` host files …, listed in `needsTools` in `scripts/ci/unit-tests.mjs`) | not static, but they build with the retired Lean 4.32 library pipeline (system `lean` 4.32 and Zig), so CI never ran them (their failures were reported, not fatal) | **Ported or retired** (2026-11-03). **Ported**: the ordinary-Lean fixtures of 24 files (conformance, finalizers, console buffering, cwd, permissions, environment and path bytes, getLine, platform, process cwd/exit/NUL/lifetime/spawn, realPath, system directories, temporary files, truncate, runtime metadata, standard IO and the forms of `main`, TCP, wall clock) run as 31 cases of `integration/host-fixtures.mjs`, a `differential.yml` job on pull requests and main: built with the installed candidate for Node and compared with upstream Lean 4.35.0's `lean --run` (it found the unsearchable-cwd worker bug fixed with it). **Kept in the unit suite**, without their Lean parts: the Node-host tests in `node-process`, `node-temporary-files`, `node-platform`, `node-environment-bytes` and `platform`. **Retired**: `compiler`, `io`, `lake` and `runtime` test the `lasm.json` library pipeline (`src/build.mjs`), which the published CLI refuses; the earlier runtime's platform emulation, its embedded `index.mjs` API and its wall-clock fault hook; `expr-conformance` became a check that the build is refused with the runtime-kernel diagnostic; `needsTools` is empty |
-| `browser.test.mjs`: every `lasm:web`/`lasm:app` binding names an export | `@[js …]` attributes in `library/Lasm/Web` cross-checked against real exports | **Keep**: a cheap cross-reference lint; a full behavioural check would link a program using every binding |
+| `browser.test.mjs`: every `lasm:app`/`lasm:ui-dom` binding names an export | `@[js …]` attributes in `library/Lasm/UI` cross-checked against real exports (`lasm:web` and `library/Lasm/Web` were removed with `Lasm.Web`, 2026-11-10) | **Keep**: a cheap cross-reference lint; a full behavioural check would link a program using every binding |
 | `scripts/content/check-tutorials.mjs --static` (found 2026-11-03) | tutorial pages against their `steps.json` and project files | **Keep as a doc lint**: the page must show what the tutorial runs; the non-static mode runs those steps against a packed CLI |
 
 ## Coverage baseline
@@ -1041,7 +1204,7 @@ Measured by `unit.yml` run [41234188450](https://github.com/Millillion/lasm/acti
 The host bridge is well covered (`src/node-js.mjs` 91.5 %, `src/node-host.mjs`
 95.0 %); `src/dev.mjs` (`lasm dev`) is at 43 %. The 0 % files fall in two
 groups. Some run only inside built outputs (`src/edge/edge-pre.js`,
-`src/browser/loader.mjs`, `src/wasmtime-runtime.mjs`, `src/serverless/lasm-*.mjs`):
+`src/browser/loader.mjs`, `src/serverless/lasm-*.mjs`):
 they are copied into `dist/` and executed there by the integration workflows, and
 this measurement only counts files at their `src/` path. The others are simply
 not unit-tested (`src/vite/index.mjs`, `src/application-binding-check.mjs`,
@@ -1114,25 +1277,22 @@ kill survivors (CI's measurement on Node 26 is the recorded floor).
 | `cli` | `cli-arguments.mjs`, `posix-arguments.mjs`, `application-cli.mjs`, `launcher.mjs`, `process-launcher.mjs`, `elapsed-ticker.mjs`, `elapsed-ticker-worker.mjs`, `build-progress.mjs`, `test-switches.mjs`, `platform.mjs`, `output-directory.mjs`, `editor.mjs`, `application-signals.mjs` | 42.7 % | **95 %** | 95 % |
 | `init` | `init.mjs` | 53.6 % | **97.1 %** | 97 % |
 | `dev` | `dev.mjs`, `dev-proxy.mjs`, `dev-build-worker.mjs`, `application-build-worker.mjs`, `browser/browser-dev.mjs`, `browser/static-server.mjs` | 29.2 % | **91 %** | 91 % |
-| `browser` | `browser/browser-build.mjs`, `browser/browser-package.mjs`, `browser/bundle.mjs`, `browser/loader.mjs`, `lasm-modules/app.mjs`, `lasm-modules/web.mjs`, `vite/index.mjs` | 26.1 % | **96.6 %** | 96 % |
+| `browser` | `browser/browser-build.mjs`, `browser/browser-package.mjs`, `browser/bundle.mjs`, `browser/loader.mjs`, `lasm-modules/app.mjs`, `lasm-modules/web.mjs` (removed with `Lasm.Web`, 2026-11-10), `vite/index.mjs` | 26.1 % | **96.6 %** | 96 % |
 | `application-sources` | `application-sources.mjs`, `application-initialization.mjs`, `application-diagnosis.mjs`, `application-binding-check.mjs`, `application-reachability.mjs`, `application-symbols.mjs`, `application-live-members.mjs`, `application-policy.mjs`, `wasm-objects.mjs`, `lasm-library.mjs` | 44.5 % | **85.4 %** | 85 % |
-| `application-output` | `application-build.mjs`, `application-output.mjs`, `application-native.mjs`, `application-npm.mjs`, `application-runtime.mjs`, `application-support.mjs`, `application-lock.mjs`, `application-metadata.mjs`, `application-metadata-runtime.mjs`, `native-bundle.mjs`, `package.mjs`, `js-runtime.mjs` | 51.1 % | **92.5 %** | 92 % |
+| `application-output` | `application-build.mjs`, `application-output.mjs`, `application-native.mjs`, `application-npm.mjs`, `application-runtime.mjs`, `application-support.mjs`, `application-lock.mjs`, `native-bundle.mjs`, `package.mjs`, `js-runtime.mjs` | 51.1 % | **92.5 %** | 92 % |
 | `edge-build` | `edge/edge-build.mjs`, `edge/builtin-modules.mjs`, `edge/edge-initializers.mjs`, `edge/edge-pre.js` | 31.5 % | **89.4 %** | 89 % |
 | `wasi-build` | `wasi/wasi-build.mjs`, `wasi/wasi-component.mjs`, `wasi/lower-atomics.mjs` | 45.8 % | **95.6 %** | 95 % |
-| `wasmtime` | `wasmtime-runtime.mjs`, `wasmtime-standalone.mjs`, `wasmtime-worker.mjs`, `wasmtime-artifact.mjs`, `wasmtime-bundle.mjs`, `wasmtime-console.mjs`, `wasmtime-file-host.mjs`, `wasmtime-file-imports.mjs`, `wasmtime-guest-memory.mjs`, `wasmtime-module-data.mjs`, `wasmtime-native-stdio.mjs`, `wasmtime-process-host.mjs`, `wasmtime-wasi-stdio.mjs` | 32.4 % | **88 %** | 88 % |
 | `node-host` | `node-host.mjs`, `node-network.mjs`, `node-process.mjs`, `node-signal.mjs`, `node-system.mjs`, `node-udp.mjs`, `node-fetch.mjs`, `lean-io-errors.mjs`, `handle-table.mjs`, `process-exec.mjs`, `working-directory.mjs`, `linux-memory.mjs`, `thread-id.cjs`, `native-clock.mjs`, `native-dns.mjs`, `native-interfaces.mjs`, `native-windows-timezone.mjs`, `native-tcp.mjs` | 42 % | **86.2 %** | 86 % |
-| `native-files` | `native-files.mjs`, `native-file-message.mjs`, `native-file-worker.mjs`, `native-file-worker-pool.mjs`, `native-worker-cwd.cjs`, `worker-stdio.cjs`, `native-process.mjs`, `native-signals.mjs`, `native-program.mjs`, `native-abort.cjs`, `native-pthread-factory.cjs` | 29.4 % | **86.4 %** | 86 % |
+| `native-files` | `native-files.mjs`, `native-file-message.mjs`, `native-file-worker.mjs`, `native-file-worker-pool.mjs`, `native-worker-cwd.cjs`, `worker-stdio.cjs`, `native-process.mjs`, `native-signals.mjs`, `native-program.mjs`, `native-abort.cjs` | 29.4 % | **86.4 %** | 86 % |
 | `serverless` | `serverless/lasm-server.mjs`, `serverless/lasm-lambda.mjs`, `serverless/lasm-vercel.mjs`, `serverless/lasm-netlify.mjs`, `serverless/lasm-azure.mjs`, `serverless/lasm-gcf.mjs`, `serverless/zip.mjs` | 40.5 % | **88.5 %** | 88 % |
 
-`edge-build`, `wasi-build` and `wasmtime` were measured 2026-11-09 (run 42581537537; initial scores in runs
+`edge-build` and `wasi-build` were measured 2026-11-09 (run 42581537537; initial scores in runs
 42571769129 and, for `edge-build` without `edge-library.js`, 42579064935). `src/edge/edge-library.js` is not
 mutated: its Emscripten preprocessor lines (`#if JSPI || ASYNCIFY`) are not JavaScript Stryker can parse. The
 code that only runs inside built outputs is run in-process: `edge-pre.js` in a script scope with stand-in
 module globals (`test/edge-pre.test.mjs`); the generated edge entries as their platforms run them, with
-`cloudflare:workers`, `.wasm` modules, `Deno`, `Bun` and `Netlify` stood in (`test/edge-entries.test.mjs`);
-and the Wasmtime runner and supervisor over a stand-in FFI and per-module `node:worker_threads`
-(`test/fixtures/wasmtime-stand-ins/`: a Lean instance with memory, exports, callbacks and thread entry
-points). The atomics lowering is checked by properties: random atomic programs run in V8 before and after
+`cloudflare:workers`, `.wasm` modules, `Deno`, `Bun` and `Netlify` stood in (`test/edge-entries.test.mjs`).
+The atomics lowering is checked by properties: random atomic programs run in V8 before and after
 lowering, binaryen-made modules of every other instruction kind stay valid without the threads feature (binaryen is no
 longer a dependency: the modules it made are recorded in `test/fixtures/lower-atomics-modules.json`, and
 without it V8 validates the output), and
@@ -1170,7 +1330,7 @@ runtime, link and SDK collaborators through module hooks and keeps the real
 lock, cache lease, npm closure and output delivery; the initialization planner
 runs with a scripted probe (`test/application-initialization-plan.test.mjs`).
 `application-sources` keeps `library/` in its sandbox (`keepInSandbox` in
-`modules.json`) for the prebuilt-library tests. The generated entry point embeds
+`modules.json`) for the prebuilt-library tests, and so do `wasi-build`, whose program key hashes `library/c/lasm_fastly.c`, and `target-link`, whose WASI link-plan test reads that glue. The generated entry point embeds
 functions by their source text, which is instrumented under Stryker: its tests
 start the child with `test/helpers/stryker-child-preamble.mjs`.
 The Node host (`node-host`, `native-files`) runs in-process: the native
@@ -1189,6 +1349,17 @@ copy beside a stand-in adapter.
 Mutants whose test file had to be stopped (more than 1 GiB, or alive after its
 runner) are *runtime errors*: Stryker leaves them out of the score
 (16 in `ui-dom`).
+
+**Timing-dependent code takes its clock as a parameter.** A mutant that only
+changes *when* something happens (a debounce whose timer is not cleared, a
+queued run that repeats) is killed or not depending on how fast the runner is,
+and a module's score then moves between runs. Such logic is a small function
+that takes `timers` (`setTimeout`, `clearTimeout`; the global ones by default),
+and its test drives a stand-in clock step by step instead of sleeping: `lasm
+dev`'s watch loop schedule is `createBuildSchedule` in `src/dev.mjs`, tested in
+`test/dev-units.test.mjs`. Where real processes are involved, the test waits
+for an explicit event (a file a program writes when it starts, a build that
+finishes only once a restart happened), never for an amount of time.
 
 ### Survivors that cannot be killed (equivalent mutants)
 
@@ -1239,7 +1410,6 @@ stay, with the reason; they are not chased with tests that look at the code.
 | browser | the bundler's `^` anchors and `\s+` → `\s` in a replacement after the line's own `^import`/`^export` gate; `external` default `() => false` → `() => undefined`; `visiting.delete` removed; `id !== entry` → `true`; the `''` that removes `import.meta`/`import(` before the static-import check | Each line was already matched at its start; `undefined` is as false; a module is looked up in `transformed` before `visiting`; the entry is visited last, so its variable is never read; no glue spells `import` around those words |
 | browser | the loader's `detail === undefined`, `text === undefined`, `{ app: null }` → `{}`, `?? ''` fallbacks of the type and the user agent, `lean?.lasmDispose?.()` → `lean?.lasmDispose()` | `mark` is always called with a detail and `getAttribute` answers `null`, not `undefined`; `appOf` maps both to `null`; the fallback fails the same pattern; `lean` is unset whenever that `catch` runs |
 | browser | the loader's 20-line stderr bound (`> 20` → `>= 20`/`false`, `shift` removed) | Only the last line is read; the bound only limits memory |
-| browser | `lasm:web`: `getValue`'s and `messageData`'s `typeof … === 'string'` → `false`; `requestInit`'s non-object checks; `randomBytes`' `i < n` → `<=`; `'log'` → `''` in the level list; `frames.clear()`/`sockets.clear()` after an unmount | `String(s)` is `s` and a string is not an `ArrayBuffer`; a non-object has none of the fields read; the extra round fills an empty view; an unknown level logs with `log` anyway; cancelled frames and closed sockets are never looked up again |
 | browser | the Vite plugin: `command = 'serve'` default, `'serve'` checks in `generateBundle` (notices exist only after a build), `chunk.type !== 'chunk'` → `false`, `texts.length === 1` → `false`, `/\?.*$/` → `/\?.*/`, the banner pattern's `^`, `filter(Boolean)` before `trim()`, the `'error'` event of the spawned CLI, `replace(/^\n/, '')` → any `\n` | `configResolved` always sets the command; an asset has no module ids; one text joined is itself; ids have one line; the banner is the loader's first line; `trim` removes what `undefined` joins to; `process.execPath` always starts; the tail starts with the only newline it has |
 | browser (not equivalent) | the Vite plugin's default CLI path (`'../../bin/lasm.mjs'`), production builds with the plugin's own CLI (`command === 'serve'` → `true`), its CLI's `stdio`, and `/^\//` of the `/@fs/` URL | They run the real Lasm CLI (examples/vite, the browser workflow), or need Windows paths |
 | dev | loopback hosts `'127.0.0.1'` → `''` in `freePort`, `waitForPort` and the proxy's upstream request, the upstream `host` header → `''`, `waitForPort`'s `<` → `<=`, `socket.end()` removed, `'error'` → `''` on `freePort`'s server, the content type's `?? ''` | Node uses localhost (127.0.0.1) for an empty host and sets the Host header itself; a probe socket closes with the process; the fallback fails the same pattern |
@@ -1351,5 +1521,8 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Deterministic simulation of Tandem (first CI run: 12 of 30 seeds) | **The editor could drop an unsent edit from `pending`:** a WebSocket push that did not continue the replica's log sent a second sync while one was in flight, without marking it in flight, so two replies came back and the first one's count (`onReply sent`) dropped operations the second carried. The edit was lost if that second sync failed | Fixed: a push that arrives while a sync is in flight marks the editor behind, and it syncs again when the reply returns (`Frontend/Ui.lean`) |
 | Deterministic simulation of Tandem (first CI run) | A failed catch-up sync (nothing pending) was never retried: the retry ran only while edits were pending, so the editor showed "Offline: 0 edits waiting" and stayed behind the log until someone else typed | Fixed: the retry always syncs |
 | Deterministic simulation of Tandem (third CI run, most seeds with an ambiguous commit) | A commit that succeeded and then reported an error (D1's lost reply, a timeout after `COMMIT`): `syncOnce` ran the sync again, found the operations known and appended and pushed nothing, so tabs that were not typing never heard of them | Fixed: a failed commit checks whether the log holds exactly its operations at its position, and if so answers and pushes them; and a sync whose operations were all in the log already pushes its reply, which holds them (`Server/App.lean`; the second part was found by the heavy-fault seeds, when that check could not read the log) |
+| DST nightly, heavy faults (42807003871, seed 1496820401) | The same family ([#190](https://github.com/Millillion/lasm/issues/190)): a sync whose commit landed and then reported an error, and whose check could not read the log, answered 503; the tab's retry carried those operations and newly typed ones, so the server appended only the new ones and pushed only them. The earlier operations were never pushed | Fixed: a sync with any operation already in the log pushes its reply, and pushes what it appended separately unless the reply holds it (`Server/App.lean`); regression seed in `tandem.yml` |
+| DST nightly (42807003871 and 42471623224, 17 seeds) | Porter: "asked for the password with a live session", "an access token of a revoked family still works", "a live access token was refused", a refused code after the heal, and an uncaught `TypeError` that ended the campaign ([#189](https://github.com/Millillion/lasm/issues/189)). None was Porter's: the world kept a session alive after a logout whose answer was lost or duplicated (one copy ended it, the other's 503 arrived) or that cleared the cookie of a sign-in finished meanwhile; it counted a revocation learned while a request was in flight as one the request must have seen; it did not count a lost refresh of a possibly rotated token as a possible reuse; it expected a code to redeem after the heal when it had expired on a skewed racing instance; and it read the tokens of an agent that had dropped them | World fixes (`examples/porter/test/dst/world.mjs`); a harness exception now fails its seed instead of the campaign; 16 regression seeds in `porter.yml` |
 | Deterministic simulation of Porter (4 of 30 seeds) | A token request whose commit succeeded and then reported an error is run again by `runRequest`, finds its own code used or its refresh token rotated, answers `invalid_grant` and revokes the family it just issued: one transient database error signs a user out | Fixed (#138, Jordan's choice of a commit receipt): each commit inserts a row keyed by an id from the request's random values (the same on a rerun), and a failed commit whose receipt is there keeps its reply (`Server/App.lean`, `Spec.landed_commit_stands`); the simulation no longer tolerates the refusal |
 | Mutation testing (`downloads`, 2026-11-09) | **A failing SDK archive decoder was reported as the tar parser's error**: when the managed Python's decoder for `.tar.xz`/`.zip` SDK archives (`src/archive-stream.py`) failed, could not start or was killed, `extract` reported `TAR_BAD_ARCHIVE: Unrecognized archive format` for the empty or truncated stream it left, not the decoder's exit status and messages | Fixed in `src/managed-artifacts.mjs` (the decoder's result is preferred after a broken stream); regressions in `test/managed-artifacts-decoder.test.mjs`; `docs/release/0.6.1-notes.md` |
+| Differential fuzzing, feature programs (campaign 42620999209, seed 620999216, case 132; `wasi`, `wasi-node`, `deno`, the edge engines, browsers, both profiles) | `(repr a).pretty` of an `Array Int` of 5,120 elements stops with "call stack exhausted" / "Maximum call stack size exceeded": Lean's formatter recurses with the number of elements, and the WASI and edge stacks hold about 9,000–11,000 frames. Native Lean and the Node target print it | Open: [#179](https://github.com/Millillion/lasm/issues/179) (the documented recursion-depth limit, reached through the standard library); the generator keeps printed arrays below that size |

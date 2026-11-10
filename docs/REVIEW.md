@@ -13,8 +13,8 @@ decisions themselves are logged with their reasoning in
 
 ## 1. Decisions Claude made that Jordan may want to revisit
 
-### MAJOR: where the Lasm.* libraries live (Jordan's, to decide later)
-- [ ] **Major decision.** Today every `Lasm.*` library ships inside `@lasm/cli`
+### MAJOR: where the Lasm.* libraries live (deferred by Jordan, 2026-11-10)
+- [ ] **Major decision, deferred (not open).** Today every `Lasm.*` library ships inside `@lasm/cli`
   under the `Lasm` namespace, so there is nothing to install.
   - **The option:** bundle only the code tied to the compiler, and move or
     delete the rest.
@@ -30,10 +30,10 @@ decisions themselves are logged with their reasoning in
     - Lake builds against Lasm's managed Lean.
     - First-build time, because `library/prebuilt` caching no longer covers the moved packages.
     - New repositories need your OK.
-  - **Status:** decided by you on 2026-11-09. They stay under `Lasm` for now,
-    and the decision is yours to make later. Removal 16 of
+  - **Status: deferred** (Jordan, 2026-11-10). Keep everything inside `@lasm/cli` for now (the current setup). Jordan favours option D: platform-coupled code (`Lasm.JS` core, the generated standard bindings, the `Lasm.Fetch` server, platform glue) in the CLI; opinionated frameworks (`Lasm.UI`, `Lasm.RPC`, probably `Lasm.KV`) as separate lockstep-versioned `@lasm/*` npm packages from the same repository. He defers the decision until the `Lasm.*` rewrite is complete and the final APIs are decided and finished.
+    Removal 16 of
     [proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md#3-ranked-removal-list)
-    waits on it.
+    waits on it ([DECISIONS.md](DECISIONS.md), 2026-11-10).
 
 ### MAJOR: generated standard-library bindings (decided by Jordan, 2026-11-09)
 - [x] **Major decision, decided (A).** The bindings are generated from
@@ -62,8 +62,8 @@ decisions themselves are logged with their reasoning in
   version. Newer APIs are labelled with the version that added them.
 - npm libraries (for example bcrypt) stay ad hoc bindings.
 - The bindings are tested with web-platform-tests and official test vectors.
-- Today's hand-written `Lasm.Web` will be replaced by the generated
-  `Lasm.JS.Web`. That is a breaking rename, which is fine before 1.0.
+- The hand-written `Lasm.Web` is replaced by the generated
+  `Lasm.JS.Web.Browser` (done 2026-11-10; see "The browser tier" below).
 - The first piece of work is tier 1: the common web APIs (fetch,
   Request/Response, URL, `crypto.subtle`/`getRandomValues`,
   TextEncoder/TextDecoder, streams, AbortController, timers,
@@ -73,20 +73,119 @@ decisions themselves are logged with their reasoning in
   from Cloudflare's published workers-types: Workers KV, D1, R2, Durable
   Objects, env bindings and the rest. When it is done, it replaces the hand
   bindings in the example apps (Porter, Ledger).
-- **What becomes obsolete once `Lasm.JS.*` is complete**
+- **What `Lasm.JS.*` and the host bindings replace**
   ([proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md#3-ranked-removal-list),
-  removal 17):
-  - All of `Lasm.Web`. `Lasm.Web.App`'s mount glue moves into `Lasm.UI`.
-  - From `Lasm.Fetch`: the outbound fetch and get, the URL and query helpers,
-    and the Node and edge plumbing on JavaScript hosts. `serve`'s portable
-    handler and Assets/`embed_dir!` stay, because WASI, Fastly and wasi-http
-    need them.
+  removals 17 and 18). Decided by Jordan, 2026-11-10: `Lasm.Fetch` and
+  `Lasm.Web` are deleted entirely (this supersedes the earlier note that
+  `Lasm.Fetch` stays).
+  - `Lasm.Fetch`: JavaScript targets serve Web `Request → Async Response`
+    through `Lasm.JS.Web` (Workers and edge `export default { fetch }`,
+    `Deno.serve`, `Bun.serve`, Node through an npm adapter binding); Fastly
+    uses `Lasm.Fastly.*`, WASI `Lasm.WASI.Http`. Its proved
+    `Request`/`Response` model moves into the test suite as the spec.
+  - `Lasm.Web`: done 2026-11-10. The browser tier covers it in full (document
+    and DOM, Canvas and History included); App moved to `Lasm.UI.Mount`.
   - From `Lasm.KV`: the Deno and Workers backends. The `Store` abstraction
     and the memory and Fastly backends remain, pending your KV review.
   - `Lasm.UI` and `Lasm.RPC` switch their browser side to `Lasm.JS.Web`,
-    with no API change.
+    with no API change (`Lasm.UI`: done 2026-11-10, it needed only the mount
+    glue; `Lasm.RPC` never used `Lasm.Web`).
 - Still for Jordan to review when it lands: the generated surface and its
   naming details.
+
+### Host bindings: `Lasm.Fastly` generated, `Lasm.WASI.*` next (decided by Jordan, 2026-11-10)
+- [x] **Decided.** `Lasm.Fetch` is deleted entirely. Bindings are named for
+  the host interface: `Lasm.JS.*`, `Lasm.WASI.*` (generated from the official
+  WIT), `Lasm.Fastly.*` (generated from Fastly's published ABI), all shipped in
+  `@lasm/cli`, drift-checked, tested in local emulators only.
+- [ ] **Review `Lasm.Fastly`** (current source, not released;
+  [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)): 244 of the ABI's 252
+  functions, generated from Viceroy v0.21.1's witx; the hand-written
+  `Lasm.Fastly` (5 store calls) is gone. Points to look at:
+  - **Errors are `EIO FastlyStatus α`**, lifted into `IO` automatically
+    (`Fastly host call failed: <status>`); `found?` maps `$none` to `Option.none`.
+    The alternatives were `IO α` with the status only in the message, or
+    `IO (Except FastlyStatus α)` everywhere.
+  - **Bytes vs text**: witx `char8` outputs are `String` (invalid UTF-8 becomes
+    U+FFFD), `u8` are `ByteArray`; header names and values *in* are `(list u8)`,
+    so `ByteArray`, with a scoped `Coe String ByteArray` under `open Lasm.Fastly`.
+  - **Two generator tables come from witx comments, not witx syntax**: which
+    record pointers are outputs (`$send_error_detail`,
+    `$image_optimizer_error_detail`, `_out` parameters) and two 16-byte output
+    arrays (`addr_octets_out`, `cja3_md5_out`).
+  - **Not bound (8)**: the five `send_v2`/`v3`/`pending_req_*_v2` functions,
+    whose `$send_error_detail` matters when the call fails, so they need an
+    error type carrying it (`EIO (FastlyStatus × SendErrorDetail)`?); and
+    three functions with output records that hold pointers.
+  - Names are the witx's own (`HttpReq.headerValuesGet`, `KvStore.lookupWaitV2`,
+    `Backend.«exists»`), records keep their pointer field's name
+    (`cacheOverridePtr`).
+- [x] **What replaces `Lasm.Fetch.serve` across targets — decided** (Jordan,
+  2026-11-10). `Lasm.Fetch` is deleted entirely. There is **no single handler
+  across JS and Fastly/WASI targets** (accepted trade-off): each target's
+  server is written against its own host interface's generated bindings —
+  JS targets serve a standard Web `Request → Async Response` through
+  `Lasm.JS.Web` (Workers `export default {fetch}`, `Deno.serve`, `Bun.serve`,
+  Node through an npm adapter binding); Fastly uses `Lasm.Fastly.*`; WASI
+  uses `Lasm.WASI.Http`. Multi-target templates and apps get a small
+  per-target entry module each, sharing pure Lean app logic.
+- [ ] **The Fastly and WASI examples and templates.** `examples/fastly` is new
+  (Lasm.Fastly); `examples/fetch` drops its `/fastly/stores` route. The
+  multi-target `lasm init --template fetch|fullstack` projects, Conduit and
+  Folio still serve one `Lasm.Fetch` handler on Fastly and wasi-http; they
+  move to per-target entry modules (decision above) once `Lasm.WASI.Http` and
+  the `Lasm.JS.*` serve path land.
+- [ ] **`Lasm.WASI.Http` is generated** ([WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md#lasmwasihttp)),
+  for review: the mapping rules (`result<T, E>` as `Except E T` inside `IO`,
+  so the WIT's errors are values and `IO.Error` means only "not a wasi-http
+  host"; resources as `structure R where handle : UInt32` with explicit
+  `R.drop`, not freed by reference counting; heck names such as
+  `ErrorCode.httpRequestUriInvalid`); the export as
+  `IncomingHandler.serve fun request responseOut => …`; every wasi-http program
+  importing all 90 functions so one component template serves them; the 2 MiB
+  limit on one call's returned lists. The hand-written Lasm.Fetch glue
+  (src/wasi/lasm_wasi_http.c) stays until Lasm.Fetch is deleted; it now names
+  its imports through the generated header.
+
+### The browser tier replaced `Lasm.Web` (2026-11-10, Jordan's decision; Claude's choices to review)
+
+- **Layout.** `import Lasm.JS.Web.Browser` = tier 1 plus `Lasm.JS.Web.Geometry`,
+  `Css`, `Html` (the tree, the HTML elements, `Window`, `Location`, `History`,
+  `Storage`; one module because they name each other), `UiEvents`, `Canvas`,
+  `WebSocket`. Tier 1 never sees a browser type
+  ([JS_BINDINGS.md](JS_BINDINGS.md#the-browser-tier-lasmjswebbrowser)).
+- **`Lasm.Web.App` moved to `Lasm.UI.Mount`**, unchanged except that `root`
+  takes the handle type (`Mount.root Element`), so `Lasm.UI` loads nothing of
+  the DOM bindings. It stays hand-written: it binds Lasm's own loader
+  (`lasm:app`), not a standard. `Lasm.UI`'s API is unchanged.
+- **Mapping additions (both tiers):** coercions from an interface to its parent
+  and from a union's member types to the union, so `setAttribute "title" "x"`
+  and `fetch "https://…"` read naturally despite Trusted Types and `RequestInfo`
+  unions. Not generated in the browser tier: event handler attributes
+  (`onclick`: use `addEventListener`), `[HTMLConstructor]` constructors, unnamed
+  getters (`DOMStringMap`, so `dataset` has no properties: use
+  `getAttribute "data-x"`).
+- **What could not be expressed as a binding (no API was invented; yours to
+  decide):**
+  - *Unmount cleanup.* `Lasm.Web` removed an app's listeners, timers, frames and
+    sockets on unmount. Generated bindings act on the page directly; apps
+    remove their own in `Mount.onUnmount`. `Lasm.UI` apps are unaffected.
+  - *Downcasts* are unchecked (`({ val := e.val } : HTMLInputElement)`). A
+    generated checked cast (`HTMLInputElement.cast? : Value → IO (Option …)`
+    through `instanceof`) would be a new generated API.
+  - *Batching.* `Context2D.draw` (many drawing commands in one call) and
+    `Event.info` (the usual event fields in one call) have no counterpart; each
+    method is one call into JavaScript now.
+  - *Not web APIs:* `encodeURIComponent`/`decodeURIComponent` (ECMAScript; call
+    them through `Lasm.JS.global`), `Crypto.hex`, `Lasm.Web.background` (use
+    `Async.asTask` or `Std.Async.background`).
+  - *Spec ahead of browsers:* CSSOM View now types `scrollIntoView` and `scroll`
+    as returning `Promise<ScrollResult>`; browsers return `undefined`, which the
+    generated `Async` accepts (checked in CI).
+- The old-to-new table is in [release/next-notes.md](release/next-notes.md).
+- Tandem still uses `Lasm.Web.WebSocket`: it pins the published `@lasm/cli`
+  0.5.1, so it migrates when it moves to the release with the browser tier
+  (ROADMAP.md).
 
 ### High-priority work to define with Jordan
 - [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,
@@ -226,6 +325,7 @@ docstrings, the propositions and the names.
 - [ ] `Lasm.UI`:
   - [UI.lean](../library/Lasm/UI.lean)
   - [App](../library/Lasm/UI/App.lean)
+  - [Mount](../library/Lasm/UI/Mount.lean) (moved from `Lasm.Web.App`, 2026-11-10)
   - [Cmd](../library/Lasm/UI/Cmd.lean)
   - [Diff](../library/Lasm/UI/Diff.lean)
   - [Elements](../library/Lasm/UI/Elements.lean)
@@ -237,22 +337,12 @@ docstrings, the propositions and the names.
   - [Url](../library/Lasm/UI/Url.lean)
   - propositions: [UI/Spec.lean](../library/Lasm/UI/Spec.lean)
   - guide: [docs/UI.md](UI.md)
-- [ ] `Lasm.Web`:
-  - [Web.lean](../library/Lasm/Web.lean)
-  - [App](../library/Lasm/Web/App.lean)
-  - [Canvas](../library/Lasm/Web/Canvas.lean)
-  - [Console](../library/Lasm/Web/Console.lean)
-  - [Crypto](../library/Lasm/Web/Crypto.lean)
-  - [Dom](../library/Lasm/Web/Dom.lean)
-  - [Events](../library/Lasm/Web/Events.lean)
-  - [Fetch](../library/Lasm/Web/Fetch.lean)
-  - [History](../library/Lasm/Web/History.lean)
-  - [Storage](../library/Lasm/Web/Storage.lean)
-  - [Timers](../library/Lasm/Web/Timers.lean)
-  - [Types](../library/Lasm/Web/Types.lean)
-  - [Url](../library/Lasm/Web/Url.lean)
-  - [WebSocket](../library/Lasm/Web/WebSocket.lean)
-- [ ] `Lasm.Fastly`: [Fastly.lean](../library/Lasm/Fastly.lean)
+- [ ] `Lasm.JS.Web` and its browser tier (generated): the surface and its naming
+  ([JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb),
+  [scripts/bindings/web-tier1.mjs](../scripts/bindings/web-tier1.mjs),
+  [scripts/bindings/web-browser.mjs](../scripts/bindings/web-browser.mjs)).
+  `Lasm.Web` was removed on 2026-11-10.
+- [ ] `Lasm.Fastly` (generated): [Fastly/](../library/Lasm/Fastly), the generator [generate-fastly.mjs](../scripts/bindings/generate-fastly.mjs), the mapping rules [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md), the conformance checks [Conformance.lean](../test/fixtures/fastly-abi/Fixture/Conformance.lean), the example [examples/fastly](../examples/fastly/Main.lean)
 - [ ] `Lasm.Serverless` has proofs only, with no runtime API. Its propositions about the function-platform shims are in [Serverless/Spec.lean](../library/Lasm/Serverless/Spec.lean).
 
 ### Example apps: code and propositions
@@ -283,7 +373,6 @@ docstrings, the propositions and the names.
   - `js-crud`
   - `js-fetch`
   - `lean-server`
-  - `lean-server-latest`
   - `ui`
   - `wasi-cli`
 - [ ] The `lasm init` templates in [templates/](../templates):
