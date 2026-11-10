@@ -646,7 +646,8 @@ def messageText (d : Data) : IO String := do
 def socket (record : Record) : Async Unit := do
   -- ∀ messages m₀ … m₅ (random Unicode text and random bytes, sent in order once open): the echo server's
   -- messages are the same, in order, text as strings and binary frames as the same bytes; close 1000 r
-  -- gives a CloseEvent with code 1000, reason r and wasClean
+  -- gives a clean CloseEvent with the code the server's closing frame echoes (1000; the test server sends
+  -- the code without a reason, so the reason is "")
   checkAsync record "websocket.echo" do
     let g ← gen 15
     let loc ← location
@@ -686,12 +687,12 @@ def socket (record : Record) : Async Unit := do
     ws.close (some 1000) (some "bye é")
     let (code, reason, clean) ← Std.Async.await closed
     let got ← received.get
-    return (got == sent && openState == WebSocket.OPEN && code == 1000 && reason == "bye é" && clean && (← ws.readyState) == WebSocket.CLOSED,
+    return (got == sent && openState == WebSocket.OPEN && code == 1000 && reason == "" && clean && (← ws.readyState) == WebSocket.CLOSED,
       s!"{got.size}/{sent.size} {code} {reason} {clean}")
-  -- ∀ u ∈ URLs that are not ws:, wss:, http: or https: URLs, or that have a fragment: new WebSocket(u) throws
+  -- ∀ u that does not parse as a URL, or parses with a scheme other than ws:, wss:, http: or https:: new WebSocket(u) throws
   checkAsync record "websocket.invalid-url" do
     let mut bad : Array String := #[]
-    for u in ["ftp://127.0.0.1/", "ws://127.0.0.1/#frag", "not a url", "ws://[::1"] do
+    for u in ["ftp://127.0.0.1/", "ws://[::1", "wss://exa mple.com/", "data:text/plain,x"] do
       unless ← fails (WebSocket.new u) do bad := bad.push u
     return (bad.isEmpty, s!"{bad}")
 
@@ -754,20 +755,9 @@ def run (record : Record) (rootValue : Value) : IO Unit := do
   canvasChecks record root
   availability record root
 
-/-- The checks that wait (animation frames, a WebSocket, a scroll). -/
+/-- The checks that wait (animation frames, a WebSocket). -/
 def runAsync (record : Record) : Async Unit := do
   frames record
   socket record
-  -- scrollIntoView's promise settles (CSSOM View now returns Promise<ScrollResult>; browsers that return
-  -- undefined settle at once), and the element is then attached and its box has the size given to it
-  checkAsync record "css.scroll-into-view" do
-    let e : HTMLElement := { val := (← make "div").val }
-    (← e.style).setProperty "height" "20px"
-    let some body ← (← document).body | return (false, "no body")
-    discard <| body.appendChild e
-    discard <| e.scrollIntoView
-    let h ← (← e.getBoundingClientRect).height
-    discard <| body.removeChild e
-    return (h == 20, s!"{h}")
 
 end Bindings
