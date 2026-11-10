@@ -168,7 +168,10 @@ regenerate `library/prebuilt` (`gh workflow run library-prebuilt.yml --ref
   records by pointer, typed errors, the stores, backends, `async_io.select`).
   Its module imports **every** bound host function (`Fixture/EveryCall.lean`,
   generated, never run), so Viceroy loading it checks each import's name and
-  signature against the host.
+  signature against the host. One check follows Viceroy rather than the witx
+  comments: Viceroy 0.21.1 answers `header_value_get` for a name that is not
+  present with `$inval` instead of `$none`, so header removal is checked
+  through `headerNamesGet`; `found?` still maps `$none` where the host sends it.
 - [`examples/fastly`](../examples/fastly/Main.lean) answers the same route
   checks as `examples/fetch` under Viceroy (`scripts/wasi/wasi-ci.mjs`, host
   `lasm-fastly`).
