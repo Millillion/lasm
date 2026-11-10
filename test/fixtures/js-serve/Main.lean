@@ -186,6 +186,8 @@ def deno (r : Checks) (live : Live) : Async Unit := do
     let options : Deno.ServeTcpOptions := { port := some 0, hostname := some "127.0.0.1", signal := some signal, onListen := some onListen, onError := some onError }
     let server ← Deno.serveWithOptions options handler
     live.modify (·.push ("HttpServer", server.val))
+    -- The handler's length is its declared arity (Deno.serve calls a handler of length 0 without its request).
+    expect r "handler length" ((← handler.val.get "length" Nat) == 2) s!"{← handler.val.get "length" Nat}"
     let addr ← server.addr
     let port := addr.port
     -- addr is the address listened on: 127.0.0.1, TCP, the port chosen for port 0

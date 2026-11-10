@@ -101,10 +101,16 @@ instance : ToJS ServeHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeHandler.ofFn (f : Request → ServeHandlerInfo → Async Response) : IO ServeHandler := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg ServeHandlerInfo args 1)) }
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg ServeHandlerInfo args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeHandler.ofSyncFn (f : Request → ServeHandlerInfo → IO Response) : IO ServeHandler := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg ServeHandlerInfo args 1)) }
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg ServeHandlerInfo args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
 
 /-- `callback ServeOptionsOnError = Promise<Response> (any error)` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ServeOptionsOnError where
@@ -115,10 +121,16 @@ instance : ToJS ServeOptionsOnError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsOnError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeOptionsOnError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeOptionsOnError.ofFn (f : Data → Async Response) : IO ServeOptionsOnError := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeOptionsOnError.ofSyncFn (f : Data → IO Response) : IO ServeOptionsOnError := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
 
 /-- `callback ServeOptionsOnListen = undefined (NetAddr localAddr)` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ServeOptionsOnListen where
@@ -129,10 +141,16 @@ instance : ToJS ServeOptionsOnListen := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsOnListen := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeOptionsOnListen", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeOptionsOnListen.ofFn (f : NetAddr → Async Unit) : IO ServeOptionsOnListen := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg NetAddr args 0)) }
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg NetAddr args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeOptionsOnListen.ofSyncFn (f : NetAddr → IO Unit) : IO ServeOptionsOnListen := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg NetAddr args 0)) }
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg NetAddr args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
 
 /-- `dictionary ServeTcpOptions : ServeOptions` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ServeTcpOptions where

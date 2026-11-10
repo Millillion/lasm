@@ -966,6 +966,7 @@ fails on one that is neither, so a new version's additions get a decision.
 | a method of an options object (`fetch(req, server)`) | a callback member | `ServeOptionsFetch.ofFn (f : Request → Server → Async Response)` |
 | a function type (`type ServeHandler = (request, info) => …`) | `callback` named after the alias, or the member (`ServeOptionsOnError`) | `.ofFn` (asynchronous) and `.ofSyncFn` |
 | a `this` parameter | left out | — |
+| a callback's parameters | its arity is the JavaScript function's `length` (Lasm.JS's own functions have length 0, and `Deno.serve` calls a handler of length 0 without its request) | `ServeHandler.ofFn` sets it |
 | `Response \| Promise<Response>`, `MaybePromise<Response>` | `Promise<Response>` | the handler is `Async`; it returns a promise |
 | `void` beside a value in a callback's result (Bun's `error`) | left out | return a `Response` |
 | `string`, `boolean`, `number`, `void`, `unknown` | `DOMString`, `boolean`, `double`, `undefined`, `any` | `String`, `Bool`, `Float`, `Unit`, `Data` |

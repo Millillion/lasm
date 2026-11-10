@@ -950,13 +950,17 @@ function emitCallback(module, name) {
   const R = paren(argType(ret));
   const fnType = m => [...params, `${m} ${R}`].join(' → ');
   const call = reads.length ? `f ${reads.join(' ')}` : 'f';
+  // Lasm.JS.Deno and Lasm.JS.Bun: the function's `length` is the callback's arity. Lasm.JS's
+  // functions are variadic (length 0), and Deno.serve calls a handler of length 0 without
+  // its request (a fast path for `() => new Response(…)`).
+  const withLength = fn => !hostOf(d) ? `return { val := ${fn} }` : `let fn ${fn}\n  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"\n    #[toJS fn, toJS "length", obj [("value", toJS ${c.args.filter(a => !a.variadic).length})]] Value\n  return { val := fn }`;
   const lines = [`/-- \`${docText(sig)}\` (${specOf(d.spec)}): a JavaScript function, made from a Lean function with \`ofFn\` (asynchronous) or \`ofSyncFn\`. -/`,
     `structure ${T} where\n  /-- The JavaScript function. -/\n  val : Value`,
     `instance : Nonempty ${T} := ⟨{ val := Classical.ofNonempty }⟩`,
     `instance : ToJS ${T} := ⟨fun x => .ref x.val ""⟩`,
     `instance : FromJS ${T} := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "${nsOf(module)}.${T}", .data⟩`,
-    `/-- A JavaScript function that runs \`f\` asynchronously (\`Lasm.JS.Function.ofFn\`): it returns a promise at once and \`f\` runs as a Lean task, holding no Lean thread while it awaits. -/\ndef ${T}.ofFn (f : ${fnType('Async')}) : IO ${T} := do\n  return { val := ← Lasm.JS.Function.ofFn fun ${reads.length ? 'args' : '_'} => do return toJS (← ${call}) }`,
-    `/-- A JavaScript function that runs \`f\` synchronously (\`Lasm.JS.Function.ofSyncFn\`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling \`preventDefault\`, a queuing strategy's \`size\`). -/\ndef ${T}.ofSyncFn (f : ${fnType('IO')}) : IO ${T} := do\n  return { val := ← Lasm.JS.Function.ofSyncFn fun ${reads.length ? 'args' : '_'} => do return toJS (← ${call}) }`];
+    `/-- A JavaScript function that runs \`f\` asynchronously (\`Lasm.JS.Function.ofFn\`): it returns a promise at once and \`f\` runs as a Lean task, holding no Lean thread while it awaits. -/\ndef ${T}.ofFn (f : ${fnType('Async')}) : IO ${T} := do\n  ${withLength(`← Lasm.JS.Function.ofFn fun ${reads.length ? 'args' : '_'} => do return toJS (← ${call})`)}`,
+    `/-- A JavaScript function that runs \`f\` synchronously (\`Lasm.JS.Function.ofSyncFn\`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling \`preventDefault\`, a queuing strategy's \`size\`). -/\ndef ${T}.ofSyncFn (f : ${fnType('IO')}) : IO ${T} := do\n  ${withLength(`← Lasm.JS.Function.ofSyncFn fun ${reads.length ? 'args' : '_'} => do return toJS (← ${call})`)}`];
   return lines.join('\n');
 }
 function emitDict(module, name) {
