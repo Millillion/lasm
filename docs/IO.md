@@ -23,7 +23,7 @@ are relinked against one of two Lean runtimes.
 | --- | --- | --- | --- |
 | Node (default) | Full Lean runtime: wasm64 with 64-bit memory (`-sMEMORY64=1`, 8 GiB maximum), Lean's real task scheduler on guest pthreads, private host adapters | Files, console, processes, sockets, DNS, signals, timers, environment | This page, [NODE_SUPPORT.md](NODE_SUPPORT.md) |
 | Edge isolates, Bun, Deno (`--target workers`, `bun`, `deno`, …) | Edge runtime: single-threaded cooperative Lean runtime, wasm64 code lowered to 32-bit memory, pure-JS host on web-standard APIs | Console, environment bindings, clocks, random bytes, `Async`, timers; a read-only VFS for time zones; no file system, processes or sockets (use `fetch` through `Lasm.JS`) | [EDGE.md](EDGE.md), [BUN_DENO.md](BUN_DENO.md) |
-| Browser (`--target browser`) | The edge runtime, as an ES-module loader and Wasm file | As on the edge, plus the web platform through `Lasm.Web` and `Lasm.UI` | [BROWSER.md](BROWSER.md), [UI.md](UI.md) |
+| Browser (`--target browser`) | The edge runtime, as an ES-module loader and Wasm file | As on the edge, plus the web platform through `Lasm.JS.Web.Browser` and `Lasm.UI` | [BROWSER.md](BROWSER.md), [UI.md](UI.md) |
 | WASI, Fastly (`--target wasi`, `fastly`, `wasi-http`) | The edge runtime with a C host for WASI preview 1 (or the component model), wasm64 code lowered to 32-bit memory | `IO.FS` inside preopened directories, console, environment, clocks; no sockets, processes or signals in preview 1; `Lasm.JS` fails with a clear message | [WASI.md](WASI.md) |
 
 On the edge, Bun/Deno and browser targets, blocking waits (`Task.get` on

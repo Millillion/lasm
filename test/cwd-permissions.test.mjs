@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
-import { root } from '../src/toolchain.mjs';
+import { fileURLToPath } from 'node:url';
+const root = fileURLToPath(new URL('..', import.meta.url));
 
 test('Linux process cwd inheritance survives loss of directory search permission',
   { skip: process.platform !== 'linux' || process.getuid?.() === 0, timeout: 60_000 }, async t => {

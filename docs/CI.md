@@ -2,7 +2,7 @@
 
 Status: in place since 2026-11-07 (#142: shared setup; #144: tiers).
 
-Lasm's CI is 88 workflow files in `.github/workflows/`. This page says
+Lasm's CI is 85 workflow files in `.github/workflows/`. This page says
 which tier each check belongs to, why it is there, and how the tiers fit together.
 Every check that ran before the tiers were set up still runs in at least one
 tier, and nothing that gates a release was removed. The test layers themselves
@@ -134,11 +134,9 @@ it), and "dispatch" means `workflow_dispatch`.
 | --- | --- | --- | --- | --- | --- |
 | `application-file-controls.yml` | dispatch | Linux, macOS, Windows | 2 min | Native filesystem controls of the application runtime (diagnosis) | On demand |
 | `application-io-controls.yml` | dispatch | Linux, Windows | 7 min | Native IO regression oracles (diagnosis) | On demand |
-| `application-module-data-files.yml` | dispatch | Linux, macOS, Windows | 2 min | Module data file loader controls (diagnosis) | On demand |
-| `application-module-data.yml` | dispatch | Linux | 1 min | Native module data layout controls (diagnosis) | On demand |
 | `application-runtime-source.yml` | dispatch | Linux | 6 min (max 69) | Cold reproducible build of the application runtime from source | On demand |
 | `bridge-verification.yml` | PR (paths), push main (paths), cron 17 3 * * 2-6, dispatch | Linux + called workflows | 29 min (max 109) | Host bridge: Lean model, schedule-fuzzed Lasm.JS runs, trace conformance | PR (paths), main, nightly |
-| `browser.yml` | dispatch, call, push browser-ui,dx-browser (paths) | Linux, macOS + called workflows | 32 min (max 86) | Browser target: web template, Lasm.Web, Vite plugin, Chromium/Firefox/WebKit (+ WebKit on macOS) | Release, nightly |
+| `browser.yml` | dispatch, call, push browser-ui,dx-browser (paths) | Linux, macOS + called workflows | 32 min (max 86) | Browser target: web template, the platform suite (Lasm.JS.Web.Browser), Vite plugin, Chromium/Firefox/WebKit (+ WebKit on macOS) | Release, nightly |
 | `build-profile.yml` | dispatch | Linux, macOS, Windows + called workflows | 10 min (max 35) | Per-stage build times of a candidate on five platforms | On demand |
 | `bun-deno-published.yml` | dispatch, after release, cron 17 9 * * 1-6 | Linux, macOS, Windows | 19 min (max 39) | Published @lasm/cli with Bun and Deno only, five platforms | After release, nightly |
 | `ci-nightly.yml` | cron 7 1 * * 2-6, dispatch | Linux + called workflows | — | Nightly tier: the release suites on main | Nightly |
@@ -217,7 +215,6 @@ it), and "dispatch" means `workflow_dispatch`.
 | `unit.yml` | PR (paths-ignore), dispatch, call | Linux | 5 min (max 31) | The whole unit suite with coverage baseline | PR (paths), release, nightly |
 | `upstream-native-build-time.yml` | dispatch | Linux | 2 min (max 20) | Upstream native build-time checks | On demand |
 | `wasi.yml` | dispatch, call | Linux + called workflows | 13 min (max 74) | WASI, wasi-http, Fastly on wasmtime, wasmer, node:wasi, Spin, Viceroy | Release, nightly |
-| `wasmtime-helper-probe.yml` | dispatch | Linux | 0 min (max 1) | Scalar atomic adapter and Wasm synchronization probe | On demand |
 | `web-bindings.yml` | PR (paths), push main (paths), dispatch | Linux | new | Lasm.JS.Web: the generated bindings are the generator's output; the conformance program on Node 26 and 24, Bun, Deno, Workers (workerd) and Chromium | PR (paths), main |
 | `fastly-bindings.yml` | PR (paths), dispatch | Linux | new | Lasm.Fastly: the generated bindings are the generator's output for the pinned witx, the binding unit tests, then `wasi.yml` (the conformance fixture and `examples/fastly` under Viceroy) | PR (paths) |
 | `windows-guard-controls.yml` | dispatch | Windows | 2 min | Windows resource guard controls | On demand |

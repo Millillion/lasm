@@ -107,8 +107,8 @@ test('browser output: dev builds are not precompressed; the project page, public
   try {
     const output = join(root, 'www');
     const { manifest } = writeBrowserOutput(args({ output, log: line => logged.push(line),
-      result: { ...args().result, profile: 'dev', jsBindings: [{ module: 'lasm:web' }, { module: 'globalThis' }, { module: '' }] } }));
-    assert.deepEqual(manifest.modules, ['https://esm.sh/confetti', 'lasm:app', 'lasm:web']);
+      result: { ...args().result, profile: 'dev', jsBindings: [{ module: 'lasm:ui-dom' }, { module: 'globalThis' }, { module: '' }] } }));
+    assert.deepEqual(manifest.modules, ['https://esm.sh/confetti', 'lasm:app', 'lasm:ui-dom']);
     assert.equal(readdirSync(output).some(file => /\.(br|gz)$/.test(file)), false);
     assert.deepEqual(manifest.immutable, [manifest.entry, manifest.wasm]);
     assert.deepEqual(manifest.transfer, { uncompressed: manifest.files[manifest.wasm].bytes + manifest.files[manifest.entry].bytes });
@@ -122,12 +122,12 @@ test('browser output: dev builds are not precompressed; the project page, public
     assert.equal(page, injectIndexHtml(index, { entry: manifest.entry, wasm: manifest.wasm }));
     const bundle = readFileSync(join(output, manifest.entry), 'utf8');
     assert.match(bundle, /^import \* as __lasmExternal0 from "https:\/\/esm\.sh\/confetti";$/m);
-    assert.match(bundle, /"lasm:web": m\d/);
+    assert.match(bundle, /"lasm:ui-dom": m\d/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
 test('browser output: what it refuses', () => {
-  const { root, project, args } = fixture({ packageJson: { lasm: { edge: { modules: ['left-pad', 'lasm:web'] } } } });
+  const { root, project, args } = fixture({ packageJson: { lasm: { edge: { modules: ['left-pad', 'lasm:ui-dom'] } } } });
   try {
     assert.deepEqual(browserSuspendModes, ['none', 'jspi']);
     assert.throws(() => writeBrowserOutput(args({ suspend: 'asyncify' })), { message: '--suspend must be one of none, jspi' });
@@ -138,7 +138,7 @@ test('browser output: what it refuses', () => {
     assert.throws(() => writeBrowserOutput(args({ output: join(root, 'o1') })), error =>
       error.message.startsWith('The program uses npm modules (left-pad), which a static browser build cannot resolve. Build it with Vite and the CLI\'s plugin, @lasm/cli/vite'));
     const kept = writeBrowserOutput(args({ output: join(root, 'o2'), externals: 'keep' }));
-    assert.deepEqual(kept.manifest.modules, ['lasm:app', 'lasm:web', 'left-pad']);
+    assert.deepEqual(kept.manifest.modules, ['lasm:app', 'lasm:ui-dom', 'left-pad']);
     const bundle = readFileSync(join(root, 'o2', kept.manifest.entry), 'utf8');
     assert.match(bundle, /^import \* as __lasmExternal0 from "left-pad";$/m);
     assert.match(bundle, /Licence texts: THIRD_PARTY_NOTICES\.lasm\.txt \(emitted by the Lasm Vite plugin\) \*\//);
@@ -207,9 +207,9 @@ test('app names', () => {
 });
 
 test('the configuration module and the loader bundle', async () => {
-  assert.equal(browserConfigModule({ name: 'a"b', wasmFile: 'app.0123456789ab.wasm', modules: ['lasm:web', 'https://x.test/m.js'], suspend: 'jspi' }), [
-    'import * as m0 from "./modules/web.mjs";', 'import * as m1 from "https://x.test/m.js";', 'export const name = "a\\"b";',
-    'export const wasmUrl = () => new URL("./app.0123456789ab.wasm", import.meta.url);', 'export const modules = { "lasm:web": m0, "https://x.test/m.js": m1 };',
+  assert.equal(browserConfigModule({ name: 'a"b', wasmFile: 'app.0123456789ab.wasm', modules: ['lasm:ui-dom', 'https://x.test/m.js'], suspend: 'jspi' }), [
+    'import * as m0 from "./modules/ui-dom.mjs";', 'import * as m1 from "https://x.test/m.js";', 'export const name = "a\\"b";',
+    'export const wasmUrl = () => new URL("./app.0123456789ab.wasm", import.meta.url);', 'export const modules = { "lasm:ui-dom": m0, "https://x.test/m.js": m1 };',
     'export const suspend = "jspi";', 'export const autoMount = true;'].join('\n') + '\n');
   assert.match(browserConfigModule({ name: 'x', wasmFile: 'w', modules: [], suspend: 'none', autoMount: false }), /export const modules = \{  \};\nexport const suspend = "none";\nexport const autoMount = false;\n$/);
   const compact = browserBundle({ programGlue: glue, name: 'demo', wasmFile: 'app.0123456789ab.wasm', modules: ['lasm:app'], suspend: 'none' });

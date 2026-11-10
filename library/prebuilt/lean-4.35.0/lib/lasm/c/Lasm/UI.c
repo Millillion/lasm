@@ -1,6 +1,6 @@
 // Lean compiler output
 // Module: Lasm.UI
-// Imports: public import Init public meta import Init public import Lasm.UI.Html public import Lasm.UI.Elements public import Lasm.UI.Diff public import Lasm.UI.Encode public import Lasm.UI.Cmd public import Lasm.UI.Subs public import Lasm.UI.Url public import Lasm.UI.App public import Lasm.UI.Render public import Lasm.UI.Syntax
+// Imports: public import Init public meta import Init public import Lasm.UI.Html public import Lasm.UI.Elements public import Lasm.UI.Diff public import Lasm.UI.Encode public import Lasm.UI.Cmd public import Lasm.UI.Subs public import Lasm.UI.Url public import Lasm.UI.Mount public import Lasm.UI.App public import Lasm.UI.Render public import Lasm.UI.Syntax
 #include <lean/lean.h>
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -22,6 +22,7 @@ lean_object* initialize_Lasm_UI_Encode(uint8_t builtin);
 lean_object* initialize_Lasm_UI_Cmd(uint8_t builtin);
 lean_object* initialize_Lasm_UI_Subs(uint8_t builtin);
 lean_object* initialize_Lasm_UI_Url(uint8_t builtin);
+lean_object* initialize_Lasm_UI_Mount(uint8_t builtin);
 lean_object* initialize_Lasm_UI_App(uint8_t builtin);
 lean_object* initialize_Lasm_UI_Render(uint8_t builtin);
 lean_object* initialize_Lasm_UI_Syntax(uint8_t builtin);
@@ -57,6 +58,9 @@ res = initialize_Lasm_UI_Subs(builtin);
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_Lasm_UI_Url(builtin);
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_Lasm_UI_Mount(builtin);
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_Lasm_UI_App(builtin);

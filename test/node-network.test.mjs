@@ -5,8 +5,9 @@ import { once } from 'node:events';
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createNodeRuntimeHost, numbers } from '../src/node-host.mjs';
-import { root } from '../src/toolchain.mjs';
+const root = fileURLToPath(new URL('..', import.meta.url));
 
 test('bound and failed-bind descriptors are released in each installed engine',
   { skip: process.platform !== 'linux', timeout: 30_000 }, t => {

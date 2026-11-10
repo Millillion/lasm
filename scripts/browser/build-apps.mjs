@@ -1,6 +1,6 @@
 // Builds the browser CI's apps (.github/workflows/browser.yml) from this source
 // checkout, each inside the resource guard: the web template as `lasm init
-// --template web` writes it (counter), the Lasm.Web platform suite
+// --template web` writes it (counter), the browser platform suite
 // (test/browser/platform), and any further projects named on the command line.
 // Records build times, including a dev rebuild after editing the counter's
 // view, and the output sizes, in OUT/build.json.
