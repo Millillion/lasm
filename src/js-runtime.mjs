@@ -37,11 +37,6 @@ export function scriptPrefix(runtime = jsRuntime) {
   return runtime === 'deno' ? denoRun : [];
 }
 
-/** [command, args] that run a script file with this runtime. */
-export function scriptCommand(script, args = [], { runtime = jsRuntime, execPath = runtimeExecutable } = {}) {
-  return [execPath, [...scriptPrefix(runtime), script, ...args]];
-}
-
 /** [command, args] that evaluate code (CommonJS `require` available) with this runtime. */
 export function evalCommand(code, args = [], { runtime = jsRuntime, execPath = runtimeExecutable } = {}) {
   if (runtime === 'deno') return [execPath, ['eval', '--no-lock', '--no-config', '--quiet', code, ...args]];

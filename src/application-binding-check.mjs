@@ -3,7 +3,7 @@
 // from the program's .olean files with the managed native Lean; the modules are
 // loaded in a separate Node process from the project's node_modules, as the
 // deployment will load them.
-import { execFile, spawn, spawnSync } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
@@ -14,19 +14,11 @@ const reader = fileURLToPath(new URL('./lasm-js-bindings.lean', import.meta.url)
 // Lasm's builtin JavaScript modules (lasm:<name>; src/edge/builtin-modules.mjs).
 const builtins = fileURLToPath(new URL('./lasm-modules/', import.meta.url));
 
-/** readBindings without blocking: the build compiles and links meanwhile. */
-export async function readBindingsAsync(lean, env, oleans, options = {}) {
-  return readBindings(lean, env, oleans, { ...options, read: files => new Promise((resolve, reject) =>
-    execFile(lean.lean, ['--run', reader, ...files], { env, encoding: 'utf8', windowsHide: true, timeout: 300_000, maxBuffer: 16 * 1024 * 1024 },
-      (error, stdout, stderr) => error ? reject(error.code === 'ENOENT' || error.killed ? error : new Error(`Cannot read Lasm.JS bindings: ${stderr || stdout}`))
-        : resolve(parseBindings(stdout)))) });
-}
-
-const parseBindings = stdout => stdout.split(/\r?\n/).filter(line => line.startsWith('{')).map(line => JSON.parse(line));
-
-export function readBindings(lean, env, oleans, { cache, read } = {}) {
+/** The bindings the program's module files declare, read without blocking (the
+ * build compiles and links meanwhile). */
+export async function readBindingsAsync(lean, env, oleans, { cache } = {}) {
   const files = oleans.filter(file => existsSync(file));
-  if (!files.length) return read ? Promise.resolve([]) : [];
+  if (!files.length) return [];
   // The bindings are a function of the module files and the reader: unchanged
   // modules (a cache hit, or an edit elsewhere) are not read again by Lean.
   let record;
@@ -37,14 +29,13 @@ export function readBindings(lean, env, oleans, { cache, read } = {}) {
     record = join(cache, `bindings-${hash.digest('hex')}.json`);
     try {
       const saved = JSON.parse(readFileSync(record, 'utf8'));
-      if (Array.isArray(saved)) return read ? Promise.resolve(saved) : saved;
+      if (Array.isArray(saved)) return saved;
     } catch { /* not recorded */ }
   }
-  if (read) return read(files).then(bindings => { save(bindings); return bindings; });
-  const bindings = readBindingsUncached(lean, env, files);
-  save(bindings);
-  return bindings;
-  function save(bindings) {
+  const bindings = await new Promise((resolve, reject) =>
+    execFile(lean.lean, ['--run', reader, ...files], { env, encoding: 'utf8', windowsHide: true, timeout: 300_000, maxBuffer: 16 * 1024 * 1024 },
+      (error, stdout, stderr) => error ? reject(error.code === 'ENOENT' || error.killed ? error : new Error(`Cannot read Lasm.JS bindings: ${stderr || stdout}`))
+        : resolve(parseBindings(stdout))));
   if (record) {
     try {
       mkdirSync(cache, { recursive: true });
@@ -53,16 +44,10 @@ export function readBindings(lean, env, oleans, { cache, read } = {}) {
       renameSync(record + '.' + process.pid + '.partial', record);
     } catch { /* an unwritable cache only costs the next build the read */ }
   }
-  }
+  return bindings;
 }
 
-function readBindingsUncached(lean, env, files) {
-  const result = spawnSync(lean.lean, ['--run', reader, ...files], { env, encoding: 'utf8', windowsHide: true,
-    timeout: 300_000, maxBuffer: 16 * 1024 * 1024 });
-  if (result.error) throw result.error;
-  if (result.status !== 0) throw new Error(`Cannot read Lasm.JS bindings: ${result.stderr || result.stdout}`);
-  return parseBindings(result.stdout);
-}
+const parseBindings = stdout => stdout.split(/\r?\n/).filter(line => line.startsWith('{')).map(line => JSON.parse(line));
 
 // Runs in the child: the last argument is the project directory, the one
 // before it Lasm's builtin module directory, stdin the bindings.
@@ -103,16 +88,7 @@ const results = bindings.map(b => {
 process.stdout.write(JSON.stringify(results));
 `;
 
-export function checkBindings(project, bindings) {
-  if (!bindings.length) return [];
-  const [command, args] = evalCommand(checker, [builtins, project]);
-  const result = spawnSync(command, args, { input: JSON.stringify(bindings), encoding: 'utf8',
-    cwd: project, env: { ...process.env, LASM_BINDING_PROJECT: project, LASM_BINDING_BUILTINS: builtins }, windowsHide: true, timeout: 120_000, maxBuffer: 16 * 1024 * 1024 });
-  if (result.status !== 0) throw new Error(`The Lasm.JS binding check failed to run: ${result.stderr}`);
-  return JSON.parse(result.stdout);
-}
-
-/** checkBindings without blocking. With `cache` and the deployed npm closure's
+/** Checks each binding in a child of this runtime, without blocking. With `cache` and the deployed npm closure's
  * `identity`, a check that found no error is reused while the bindings and the
  * installed production packages are unchanged (errors are always checked again). */
 export function checkBindingsAsync(project, bindings, { cache, identity } = {}) {

@@ -5,7 +5,7 @@
 // its modules and the C glue are linked only into programs that import it.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join, toNamespacedPath } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { executableName } from './platform.mjs';
@@ -175,12 +175,4 @@ export function librarySources(lean, programSources) {
   }
   const oleans = modules.map(module => join(lean.prefix, 'lib', 'lean', ...module.split('.')) + '.olean');
   return { sources, inputs, modules, oleans };
-}
-
-/** Every file of the library, for package checks. */
-export function libraryFiles(directory = root) {
-  return readdirSync(directory).flatMap(name => {
-    const path = join(directory, name);
-    return statSync(path).isDirectory() ? libraryFiles(path) : [path];
-  });
 }
