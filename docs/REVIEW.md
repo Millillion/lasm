@@ -13,8 +13,8 @@ decisions themselves are logged with their reasoning in
 
 ## 1. Decisions Claude made that Jordan may want to revisit
 
-### MAJOR: where the Lasm.* libraries live (Jordan's, to decide later)
-- [ ] **Major decision.** Today every `Lasm.*` library ships inside `@lasm/cli`
+### MAJOR: where the Lasm.* libraries live (deferred by Jordan, 2026-11-10)
+- [ ] **Major decision, deferred (not open).** Today every `Lasm.*` library ships inside `@lasm/cli`
   under the `Lasm` namespace, so there is nothing to install.
   - **The option:** bundle only the code tied to the compiler, and move or
     delete the rest.
@@ -30,10 +30,10 @@ decisions themselves are logged with their reasoning in
     - Lake builds against Lasm's managed Lean.
     - First-build time, because `library/prebuilt` caching no longer covers the moved packages.
     - New repositories need your OK.
-  - **Status:** decided by you on 2026-11-09. They stay under `Lasm` for now,
-    and the decision is yours to make later. Removal 16 of
+  - **Status: deferred** (Jordan, 2026-11-10). Keep everything inside `@lasm/cli` for now (the current setup). Jordan favours option D: platform-coupled code (`Lasm.JS` core, the generated standard bindings, the `Lasm.Fetch` server, platform glue) in the CLI; opinionated frameworks (`Lasm.UI`, `Lasm.RPC`, probably `Lasm.KV`) as separate lockstep-versioned `@lasm/*` npm packages from the same repository. He defers the decision until the `Lasm.*` rewrite is complete and the final APIs are decided and finished.
+    Removal 16 of
     [proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md#3-ranked-removal-list)
-    waits on it.
+    waits on it ([DECISIONS.md](DECISIONS.md), 2026-11-10).
 
 ### MAJOR: generated standard-library bindings (decided by Jordan, 2026-11-09)
 - [x] **Major decision, decided (A).** The bindings are generated from
