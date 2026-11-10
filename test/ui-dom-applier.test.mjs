@@ -115,6 +115,33 @@ test('malformed frames fail with a Lasm.UI error that names the problem (test/fu
   assert.equal(root.innerHTML, '<p class="big">ab</p>');
 });
 
+// The reading agrees with Lean's reference decoder (library/Lasm/UI/Proofs/Decode.lean) on
+// every frame; the ui-decode fuzz target checks it. These are the cases where it did not.
+test('reading as Lean reads: numbers exact to 2^53 (larger ones refused), padding zeros, UTF-8 only, listeners of known decoders', () => {
+  const { root } = page();
+  const ui = createUi({ root });
+  const fails = (bytes, message) => assert.throws(() => ui.applyForTest(Uint8Array.from(bytes)), { message });
+  // 2^53 - 1 is read exactly (here, an id that is not in the document); 2^53 and more are refused, not rounded.
+  fails([5, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0f], 'Lasm.UI: no node 9007199254740991');
+  fails([5, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x10], 'Lasm.UI: number too large at byte 8');
+  fails([5, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x8f, 0x01], 'Lasm.UI: number too large at byte 9');
+  // Zeros past 2^53, however many, add nothing (Lean reads 0x81 0x80 … 0x00 as 1).
+  ui.applyForTest(Uint8Array.from([1, 0x80, ...Array(200).fill(0x80), 0, 0, 0, 0x81, ...Array(10).fill(0x80), 0, 1, 120]));
+  assert.equal(root.lastChild.$i, 1);
+  assert.equal(root.textContent, 'x');
+  // Text that is not UTF-8 is refused, short (under 24 bytes) or long.
+  fails(frame().setText(1, 'a').bytes.slice(0, 2).concat([2, 0xc3, 0x28]), 'Lasm.UI: text that is not UTF-8 at byte 3');
+  fails([5, 1, 30, ...Array(29).fill(97), 0xff], 'Lasm.UI: text that is not UTF-8 at byte 3');
+  assert.equal(root.textContent, 'x');
+  // A listener must name a decoder the stream defined.
+  ui.applyForTest(frame().insert(0, 0, f => f.el(2, 'button')).u8);
+  fails(frame().attrs(2, 1, f => f.on('click', 9)).bytes, 'Lasm.UI: no decoder 9');
+  assert.deepEqual(ui.decodersForTest(), []);
+  ui.applyForTest(frame().decoder(9, [['target', 'value']]).attrs(2, 1, f => f.on('click', 9)).u8);
+  assert.deepEqual(ui.decodersForTest()[9], [['target', 'value']]);
+  assert.equal(root.lastChild.$l.click, 9);
+});
+
 test('strings: short and long, ASCII and not, including a short one that starts outside ASCII', () => {
   const { root } = page();
   const ui = createUi({ root });
