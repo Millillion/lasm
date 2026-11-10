@@ -248,11 +248,9 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   if (!buildProfiles.includes(profile)) throw new Error(`Invalid build profile ${JSON.stringify(profile)}`);
   if (profile === 'dev' && linkDriver !== 'node') throw new Error('The dev build profile needs the Node link driver');
   const nodeLink = linkDriver === 'node', nodeCompile = linkDriver !== 'emcc';
-  // The Node driver never runs emcc, em++ or Python: any SDK driver call is a bug.
-  const execute = nodeLink ? tool => { throw new Error(`The Node link driver must not run ${tool}`); }
-    : (tool, args) => sdk.execute(tool, args, {
-      stdio: verbose ? 'inherit' : ['ignore', 'pipe', 'pipe'], timeout: 1800_000, maxBuffer: 8 * 1024 * 1024,
-    });
+  const execute = (tool, args) => sdk.execute(tool, args, {
+    stdio: verbose ? 'inherit' : ['ignore', 'pipe', 'pipe'], timeout: 1800_000, maxBuffer: 8 * 1024 * 1024,
+  });
   if (nodeCompile && !existsSync(join(emscriptenCache(sdk), 'sysroot_install.stamp')))
     throw new Error('The Node compile driver needs installed Emscripten system headers (a prebuilt or emcc-initialized cache)');
   const recipe = nodeCompile ? bundledRecipe() : undefined;
@@ -652,7 +650,7 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   // map answers the same question.
   const checked = delivered ? { requirements: await readApplicationLinkRequirements(finalMap, analysis) }
     : await probeLink(requirementsInputs, mapFile, argumentsFile);
-  if (!checked.requirements) throw new Error(checked.requirementsError ?? 'Unreadable application linker map');
+  if (!checked.requirements) throw new Error(checked.requirementsError);
   const requirements = structuredClone(checked.requirements);
   // --why-extract (rejection diagnostics only) comes from one more probe link.
   const explainRejection = () => {

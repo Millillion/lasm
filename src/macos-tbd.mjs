@@ -134,7 +134,7 @@ function filterYaml(text) {
     else if (index === 0) throw new Error('The stub lists no target that Lean\'s linker knows');
   }
   let targets = [];
-  const top = kept[0]?.find(line => /^(targets|archs)[ \t]*:/.test(line));
+  const top = kept[0].find(line => /^(targets|archs)[ \t]*:/.test(line));
   if (top) targets = /\[([^\]]*)\]/.exec(top)[1].split(',').map(unquote).filter(Boolean);
   return { text: [...kept.flat(), ...trailer].join(newline), removed: [...removed].sort(), targets };
 }
