@@ -548,9 +548,14 @@ dtest('lasm dev with two workers builds a server and its browser app concurrentl
   const dir = project({ 'Server.lean': '', 'Client.lean': '' });
   const server = join(dir, '.lake', 'server');
   mkdirSync(server, { recursive: true });
+  // Each start of the server is a line of starts.txt, written before it listens.
+  const starts = join(dir, 'starts.txt');
   writeFileSync(join(server, 'main.mjs'), `import { createServer } from 'node:http';
+import { appendFileSync } from 'node:fs';
+appendFileSync(${JSON.stringify(starts)}, process.pid + '\\n');
 createServer((q, s) => s.end('ok')).listen(Number(process.env.PORT), process.env.HOST);
 `);
+  const startCount = () => existsSync(starts) ? readFileSync(starts, 'utf8').split('\n').filter(Boolean).length : 0;
   const browserOutput = join(dir, 'public-out');
   let failBrowser = false;
   state.build = async call => {
@@ -558,7 +563,11 @@ createServer((q, s) => s.end('ok')).listen(Number(process.env.PORT), process.env
     else { call.onProgress({ stage: 'Compiling application module 3 of 3' }); call.onProgress({ stage: 'Running Lake' }); call.onProgress({ stage: 'Running Lake' }); }
     call.onProgress({ stage: 'Compiling application module 2 of 3' });
     call.onProgress({ stage: 'Writing output' });
+    // A concurrent browser build finishes only once the server has restarted alongside it,
+    // so lasm dev's wait for that restart is all that is left when the builds settle.
+    const startsBefore = startCount();
     await pause(60);
+    if (call.target === 'browser' && call.options.releaseAfterImports) await until(() => startCount() > startsBefore, 'the restart alongside');
     if (failBrowser && call.target === 'browser') throw new Error('browser build failed');
     return { output: call.target === 'browser' ? join(dir, 'x') : server };
   };
@@ -571,9 +580,12 @@ createServer((q, s) => s.end('ok')).listen(Number(process.env.PORT), process.env
     assert.equal(state.services[0].workers, 2);
     assert.equal(state.services[0].options.workers, 2);
     assert.equal(state.calls[0].options.releaseAfterImports, undefined, 'a first build is not concurrent');
+    assert.equal(startCount(), 1);
     stderr.reset();
     writeFileSync(join(dir, 'lakefile.toml'), 'name = "app2"\n');
     await until(() => /Reloaded/.test(stderr.text()), 'the concurrent rebuild');
+    // The server restarted once, while the browser app built (lasm dev waited for that restart, not a second one).
+    assert.equal(startCount(), 2, 'one restart per concurrent rebuild');
     assert.deepEqual(state.calls.slice(2).map(c => c.options.releaseAfterImports), [true, true]);
     assert.match(stderr.text(), /Built in \d+\.\d s \(node: [^;]*; browser: [^;]*; concurrently\)/);
     // The two builds overlap.
@@ -587,6 +599,7 @@ createServer((q, s) => s.end('ok')).listen(Number(process.env.PORT), process.env
     writeFileSync(join(dir, 'Client.lean'), '-- edit\n');
     await until(() => /Reloaded/.test(stderr.text()), 'the client rebuild');
     assert.deepEqual(state.calls.slice(4).map(c => [c.target, c.options.releaseAfterImports]), [['browser', undefined]]);
+    assert.equal(startCount(), 2, 'an unchanged server keeps running');
     // A failure of one concurrent build fails the rebuild.
     stderr.reset();
     failBrowser = true;

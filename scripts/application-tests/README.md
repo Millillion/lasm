@@ -1,5 +1,9 @@
 # Managed application upstream tests
 
+> Scripts this page names that are no longer in the repository were removed on
+> 2026-11-10 as unreferenced; they are in the git history at
+> [`590a923f`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1).
+
 This parallel harness uses an exact pinned Lean source archive and the recorded
 upstream inventory. It verifies every original test/helper file and symlink
 before and after execution. Run one campaign at a time through the existing

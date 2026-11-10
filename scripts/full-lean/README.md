@@ -1,5 +1,9 @@
 # Full upstream Lean conformance work
 
+> Scripts this page names that are no longer in the repository were removed on
+> 2026-11-10 as unreferenced; they are in the git history at
+> [`590a923f`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1).
+
 This harness registers the complete pinned Lean 4.32.0 CTest suite, including
 compiler, kernel, elaborator, Lake, runtime, and interactive tests. The older
 `scripts/upstream-tests.mjs` runtime adapter (a narrower experiment) was removed on 2026-11-03.

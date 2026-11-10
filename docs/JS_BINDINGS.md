@@ -402,8 +402,10 @@ def main : IO Unit := do
 They are **generated, not written by hand**, from the WebIDL of the
 specifications, so names, argument order and shapes are the standards' own;
 only Lean typing is added. Programs that need an npm package keep writing their
-own `@[js]` bindings (above). `Lasm.Web` (the browser library with DOM helpers,
-[BROWSER.md](BROWSER.md)) is unchanged.
+own `@[js]` bindings (above). In a browser, `import Lasm.JS.Web.Browser` adds
+the DOM, the HTML elements, the window, user-interface events, canvas 2D and
+WebSocket ([The browser tier](#the-browser-tier-lasmjswebbrowser)), which
+replace the hand-written `Lasm.Web`.
 
 ### What is covered
 
@@ -484,14 +486,17 @@ and content types, workerd's urlencoded form decoding).
   to 60.9 MB (14.3 MB of `.olean` files, 5.3 MB of generated C), 4.4 MB
   compressed: about 5 % of the installed `@lasm/cli` (430 MB for 0.5.1). First builds copy it as
   before; nothing is compiled on the user's machine.
+  The browser tier (below) adds 20.1 MB more (61.0 → 81.1 MB: 13.9 MB of
+  `.olean` files, 5.6 MB of generated C, 4.4 MB compressed with gzip), most of
+  it `Lasm.JS.Web.Html` (7.0 MB `.olean`, 3.2 MB C).
 
 ### How a WebIDL declaration becomes Lean
 
 | WebIDL | Lean |
 | --- | --- |
 | `interface I` | `structure I where val : Value`, a handle to the JavaScript object (`ToJS`, `FromJS`, `Nonempty`). In a namespace: `WebAssembly.Module`. |
-| `interface I : P` | `structure I extends P`: `P`'s functions apply to an `I` (`signal.addEventListener …` on an `AbortSignal`) |
-| `constructor(…)` | `I.new … : IO I` |
+| `interface I : P` | `structure I extends P`: `P`'s functions apply to an `I` (`signal.addEventListener …` on an `AbortSignal`), and `Coe I P` passes an `I` where a `P` is expected (an `HTMLInputElement` to `appendChild`'s `Node`). The other way, a handle of a more specific interface is made from the same object: `({ val := e.val } : HTMLInputElement)`, unchecked (like a TypeScript cast). |
+| `constructor(…)` | `I.new … : IO I`. Not for `[HTMLConstructor]` (HTML elements: their constructor builds only custom elements): use `document.createElement`. |
 | `attribute T a` | `I.a (self) : IO T`; unless `readonly`, also `I.setA (self) (value : T) : IO Unit`. A `Promise` attribute (`reader.closed`) is `Async T`. |
 | operation `R op(…)` | `I.op (self) … : IO R`; `static` ones take no `self` (`URL.canParse`). A static operation that shares its name with an instance one gets the prefix `static`: `Response.staticJson` (`Response.json(data)`) beside `response.json`. |
 | `Promise<T>` result | `Async T` (awaited without holding a Lean thread; `.block` from `IO`) |
@@ -499,18 +504,20 @@ and content types, workerd's urlencoded form decoding).
 | `optional T x` | `(x : Option T := none)`; `none` passes nothing (`undefined`), so the spec's default applies. `optional any x` is `(x : Data := .undefined)`. |
 | `T... xs` (variadic) | `(xs : Array T := #[])` |
 | `T?` (nullable) | `Option T`; `none` is `null` |
-| `DOMString`, `USVString`, `ByteString` | `String` |
+| `DOMString`, `USVString`, `ByteString`, `CSSOMString` | `String` |
 | `boolean`; `byte`, `short`, `long`, `long long`, `bigint`; `octet`, `unsigned …`; `float`, `double` (also `unrestricted`) | `Bool`; `Int`; `Nat`; `Float` |
-| `BufferSource`, `ArrayBufferView`, typed arrays, `ArrayBuffer` | `ByteArray` (a copy; see limits) |
+| `BufferSource`, `ArrayBufferView`, typed arrays, `ArrayBuffer` | `ByteArray` (a copy; see limits). A union of typed arrays (`ImageDataArray`) too. A result that may be a typed array other than `Uint8Array` (`ImageData.data`, a `Uint8ClampedArray`) is copied as its bytes with up to four more host calls; an argument of such a type (`new ImageData(data, …)`'s `Uint8ClampedArray`) is made from the bytes in JavaScript, three more host calls. |
 | `sequence<T>`, `FrozenArray<T>` | `Array T` |
 | `record<K, V>` | `Record V` (`⟨#[("name", v), …]⟩`, `Lasm.JS.Web.Record`) |
 | `any`, `object` | `Data` |
 | `undefined` result | `Unit` |
 | `dictionary D` | `structure D`, members that are not `required` are `Option`s defaulting to `none`, which leaves them out; inherited members are flattened in |
 | `enum E` | `inductive E`, one constructor per value in lowerCamelCase: `"no-cors"` is `.noCors`, `""` is `.empty` |
-| `typedef (A or B) U`, or an inline union | `inductive U` with one constructor per member type, named after the type: `BodyInit.usvString`, `.blob`, `.readableStream`, `.bufferSource`. Inline unions are named after their members: `AddEventListenerOptionsOrBoolean`. Read back from JavaScript (a result) when the members are told apart by their JavaScript kind (string, number, boolean, bytes, array, plain object, other object): `FormData.get` gives `.usvString` or `.file`, `generateKey` `.cryptoKey` or `.cryptoKeyPair`. Otherwise a result union is a `Value` when every member is an interface (`ReadableStream.getReader`: wrap it, `{ val := v : ReadableStreamDefaultReader }`) and `Data` else. |
+| `typedef (A or B) U`, or an inline union | `inductive U` with one constructor per member type, named after the type: `BodyInit.usvString`, `.blob`, `.readableStream`, `.bufferSource`. Inline unions are named after their members: `AddEventListenerOptionsOrBoolean`. Read back from JavaScript (a result) when the members are told apart by their JavaScript kind (string, number, boolean, bytes, array, plain object, other object): `FormData.get` gives `.usvString` or `.file`, `generateKey` `.cryptoKey` or `.cryptoKeyPair`. Otherwise a result union is a `Value` when every member is an interface, generated or not (`ReadableStream.getReader`, `HTMLCanvasElement.getContext`: wrap it, `{ val := v : ReadableStreamDefaultReader }`), and `Data` else. Each member type that no other member shares coerces to the union (`Coe String BodyInit`): `fetch "https://example.com"`, `element.setAttribute "title" "x"` (a `(TrustedHTML or … or DOMString)`). |
 | `callback`, `callback interface` | a handle `structure C where val : Value` made from a Lean function by `C.ofFn` (asynchronous, `… → Async R`: returns a promise at once, the Lean code runs as a task) or `C.ofSyncFn` (synchronous, `… → IO R`: JavaScript waits for the result). The same handle can be added and removed (`removeEventListener`). `Function` is `JSFunction` (`Array Data → Async Data`), so that it does not hide `Lasm.JS.Function`. |
 | `iterable<K, V>` | `entries`, `keys` and `values`, collected into arrays (`headers.entries : IO (Array (String × String))`) |
+| `iterable<V>` | `values`, collected into an array (`nodeList.values : IO (Array Node)`) |
+| unnamed `getter`, `setter`, `deleter` (`DOMStringMap`'s properties, a `Window`'s named elements) | not generated (no method to call; `Storage.getItem` and other named ones are) |
 | `stringifier` | `I.toString` |
 | `const T C = v` | `def I.C : T := v` (`DOMException.ABORT_ERR`) |
 | a type outside tier 1 (`WindowProxy`, `HTMLFormElement`, `TrustedScript`) | `Value` in arguments, `Data` in results |
@@ -607,6 +614,130 @@ cloning, compression, AES-GCM, ECDSA and query strings). `web-bindings.yml`
 builds it with a packed candidate for Node 26 and 24, Bun, Deno, Workers
 (workerd, local) and headless Chromium and runs it on each
 ([TESTING.md](TESTING.md#standard-bindings)).
+
+### The browser tier: `Lasm.JS.Web.Browser`
+
+In a browser (`lasm build --target browser`, [BROWSER.md](BROWSER.md)),
+`import Lasm.JS.Web.Browser` adds the web APIs of a page to tier 1, generated
+the same way from the same pinned `@webref/idl`
+([`scripts/bindings/web-browser.mjs`](../scripts/bindings/web-browser.mjs)).
+Status: **current source, not yet released**.
+
+```lean
+import Lasm.JS.Web.Browser
+open Lasm.JS Lasm.JS.Web
+
+def main : IO Unit := do
+  let doc ← document
+  let some body ← doc.body | return
+  let button ← doc.createElement "button"
+  button.setTextContent (some "0")
+  button.setAttribute "aria-label" "count"            -- a String coerces to the Trusted Types union
+  let clicks ← IO.mkRef 0
+  -- A synchronous listener (ofSyncFn), so it may call preventDefault.
+  button.addEventListener "click" (some (← EventListener.ofSyncFn fun e => do
+    let m : MouseEvent := { val := e.val }               -- the event a click listener gets
+    clicks.modify (· + 1)
+    button.setTextContent (some s!"{← clicks.get} ({← m.clientX}, {← m.clientY})")))
+  discard <| body.appendChild button                     -- an Element is a Node (Coe)
+  let input : HTMLInputElement := { val := (← doc.createElement "input").val }
+  input.setValue "typed"
+  (← localStorage).setItem "last" (← input.value)
+  let canvas : HTMLCanvasElement := { val := (← doc.createElement "canvas").val }
+  let some c ← canvas.getContext "2d" | return
+  let ctx : CanvasRenderingContext2D := { val := c }
+  ctx.setFillStyle "rebeccapurple"
+  ctx.fillRect 0 0 10 10
+```
+
+| Module | Interfaces and globals | Spec |
+| --- | --- | --- |
+| `Lasm.JS.Web.Geometry` | `DOMRectReadOnly`, `DOMRect`, `DOMRectList` | Geometry Interfaces |
+| `Lasm.JS.Web.Css` | `CSSStyleDeclaration`, `CSSStyleProperties`, `MediaQueryList`, `MediaQueryListEvent` | CSSOM, CSSOM View |
+| `Lasm.JS.Web.Html` | the tree: `Node`, `Document`, `DocumentType`, `DocumentFragment`, `ShadowRoot`, `Element`, `Attr`, `NamedNodeMap`, `CharacterData`, `Text`, `Comment`, `NodeList`, `HTMLCollection`, `DOMTokenList`, `DOMStringMap`, `MutationObserver`, `MutationRecord`; the elements: `HTMLElement`, `HTMLAnchorElement`, `HTMLButtonElement`, `HTMLDialogElement`, `HTMLDivElement`, `HTMLFormElement`, `HTMLHeadElement`, `HTMLImageElement`, `HTMLInputElement`, `HTMLLabelElement`, `HTMLOptionElement`, `HTMLSelectElement`, `HTMLTemplateElement`, `HTMLTextAreaElement`, `HTMLFormControlsCollection`, `HTMLOptionsCollection`, `RadioNodeList`, `ValidityState`, `FileList`; the window: `Window`, `Location`, `History`, `Storage`; the globals `window`, `document`, `location`, `history`, `localStorage`, `sessionStorage`, `requestAnimationFrame`, `cancelAnimationFrame`, `getComputedStyle`, `matchMedia` | DOM, HTML, CSSOM View, File API |
+| `Lasm.JS.Web.UiEvents` | `UIEvent`, `MouseEvent`, `WheelEvent`, `KeyboardEvent`, `InputEvent`, `FocusEvent`, `CompositionEvent`, `PointerEvent`, `SubmitEvent`, `HashChangeEvent`, `PopStateEvent`, `StorageEvent` | UI Events, Pointer Events, CSSOM View, HTML |
+| `Lasm.JS.Web.Canvas` | `HTMLCanvasElement`, `CanvasRenderingContext2D`, `CanvasGradient`, `CanvasPattern`, `Path2D`, `TextMetrics`, `ImageData` | HTML |
+| `Lasm.JS.Web.WebSocket` | `WebSocket`, `CloseEvent` | WebSockets |
+
+**Why this layout.** The document tree, the HTML elements and the window
+name each other (`Document.body` is an `HTMLElement`, `Node.ownerDocument` a
+`Document`, `Window.document` a `Document`, `Document.defaultView` a `Window`),
+so they are one module, `Html`; the areas around it that only point into it
+are their own modules, imported alone when that is all a program uses
+(`import Lasm.JS.Web.WebSocket` on any target that has WebSocket). Tier 1 is
+never changed by this tier: a browser interface a tier-1 member names stays
+`Value` or `Data` there (`FormData.new` takes the form as a `Value`:
+`FormData.new (some form.val)`), so `import Lasm.JS.Web` on a server loads
+nothing of the DOM (`test/web-bindings.test.mjs` checks that no tier-1 module
+imports a browser one).
+
+**What differs from tier 1.**
+
+- Members are those exposed to `Window` (tier 1 takes those exposed to workers),
+  with the partials of the specs read (`Element.getBoundingClientRect` and
+  `MouseEvent.offsetX` from CSSOM View, `Window.getComputedStyle` from CSSOM).
+- Event handler IDL attributes (`onclick`, `onmessage`) are not generated:
+  `addEventListener` does the same and can be removed.
+- `Window` does not repeat tier 1's globals (`setTimeout`, `fetch`, `crypto`).
+  The common `Window` members are also globals (`document`, not
+  `(← window).document`), as they are in JavaScript.
+- `WindowProxy` is `Window`.
+- `scroll`, `scrollTo`, `scrollBy` and `scrollIntoView` (of `Element` and
+  `Window`) are `Async Unit`: CSSOM View now types them as returning
+  `Promise<ScrollResult>`, but shipping browsers return `undefined`; an
+  `Async Unit` awaits either (`scripts/bindings/web-browser.mjs`,
+  `undefinedPromises`).
+- HTML elements have no `new` (their `[HTMLConstructor]` only builds custom
+  elements); create them with `document.createElement` and make the handle
+  of the element's interface from it, as above. The cast is not checked.
+- Listeners and other callbacks act on the page directly, with nothing removed
+  for you: remove what an app adds (`removeEventListener`,
+  `cancelAnimationFrame`, `WebSocket.close`) when it no longer needs it, in a
+  mounted app in `Lasm.UI.Mount.onUnmount` ([BROWSER.md](BROWSER.md)). The
+  mount glue (`Mount.root Element`, flags, ports) is `Lasm.UI.Mount`.
+- They replace the hand-written `Lasm.Web` (removed 2026-11-10);
+  [release/next-notes.md](release/next-notes.md) maps each of its functions.
+
+**Cost** (`web-bindings.yml --sizes`, run of 2026-11-10 on PR #193: the same
+program through `Lasm.JS` alone, `Lasm.JS.Web`, and `Lasm.JS.Web.Browser`).
+Wasm: nothing for what is not called: 463,710, 463,167 and 463,167 bytes for
+the browser; 560,999, 560,456 and 560,456 for the edge runtime; 739,755,
+685,060 and 685,520 for Node. Build time of a new project with warm tools: the
+browser tier's imports add about 7 seconds (browser 11.9 → 18.2 → 25.1 s, edge
+10.9 → 17.6 → 24.3 s, Node 15.6 → 20.5 → 26.4 s); a program that imports only
+the modules it uses pays less. The compiled library grows by 20.1 MB (see
+[Cost](#cost)).
+
+**Where each member exists (measured).** The platform suite's availability
+probe looked up every generated member on 2026-11-10 (`browser.yml` run
+42847975929: Chromium 153, Firefox 155, WebKit 26.6 of Playwright 1.63.0). All
+interfaces and globals exist everywhere except `CSSStyleProperties` in Chromium
+(its style objects are `CSSStyleDeclaration`s; the generated functions work on
+them). `Window`'s attributes and operations are properties of the global object
+itself, not of `Window.prototype`, so the probe lists them all (they work).
+Missing in all three, because the pinned specs are ahead of the engines: the
+HTML insertion methods `appendHTML`, `prependHTML`, `beforeHTML`, `afterHTML`,
+`replaceWithHTML` and their `…Unsafe` forms, `getBoxQuads` and the
+`convert…FromNode` methods, `HTMLElement.scrollParent`, `Window.fetchLater`;
+some members are missing in one or two engines (Chromium 8, Firefox 13, WebKit
+28: for example `moveBefore`, `setHTML`, `customElementRegistry`,
+`ImageData.pixelFormat`, `WheelEvent.momentum`; the full lists are each
+engine's `bindingsMissing` in the run's `browser-results-*` artifacts). Test a
+member on the engines you target.
+
+**Tests.** [`test/browser/platform/Bindings.lean`](../test/browser/platform/Bindings.lean)
+is part of the platform suite that `browser.yml` runs on Chromium, Firefox and
+WebKit: property checks with their Lean propositions in comments, over
+generated inputs against Lean models (the children of a node against a list
+under random inserts, removals and replacements; attributes and
+`classList` against association lists; `localStorage` and `sessionStorage`
+against a map; `Text.length` against Lean's UTF-16 count; HTML's text
+serialization; value sanitization of inputs and text areas; event init
+dictionaries read back; dispatch, bubbling and cancelling; canvas pixels
+after `fillRect` and `putImageData`, `isPointInPath` against a rectangle,
+the ignored values of `lineWidth` and `globalAlpha`; a WebSocket echo of text
+and binary frames), and an availability probe that records the generated
+members each engine lacks.
 
 ## Worked examples (all built and run by CI)
 

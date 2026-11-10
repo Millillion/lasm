@@ -178,7 +178,7 @@ a **class**, which is a constructor function with a prototype, methods that see
 
 - **Browser:** `customElements.define("my-el", class extends HTMLElement {…})`
   only accepts a class. `connectedCallback` and `attributeChangedCallback` are
-  called synchronously by the DOM. This matters for Lasm.Web and Lasm.UI
+  called synchronously by the DOM. This matters for Lasm.JS.Web and Lasm.UI
   interop with web components.
 - **Node:** subclasses of `stream.Transform` / `Readable` (`_transform`,
   `_read`), of `EventEmitter`, and of `Error` (so that `instanceof` works for

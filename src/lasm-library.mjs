@@ -29,17 +29,17 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   // WASI 0.2.12 WIT by scripts/bindings/generate-wasi-http.mjs (wasiHttpModules, in import order).
   ...wasiHttpModules,
   'Lasm.Fetch', 'Lasm.Fetch.Assets', 'Lasm.Fetch.Embed', 'Lasm.KV',
-  // Lasm.Web (docs/BROWSER.md): web-platform bindings on Lasm.JS.
-  'Lasm.Web.Types', 'Lasm.Web.Dom', 'Lasm.Web.Events', 'Lasm.Web.Timers', 'Lasm.Web.Fetch', 'Lasm.Web.Url', 'Lasm.Web.Storage',
-  'Lasm.Web.History', 'Lasm.Web.WebSocket', 'Lasm.Web.Crypto', 'Lasm.Web.Console', 'Lasm.Web.Canvas', 'Lasm.Web.App', 'Lasm.Web',
   // Lasm.JS.Web (docs/JS_BINDINGS.md, "Standard bindings"): the WinterTC Minimum Common Web API,
   // generated from WebIDL by scripts/bindings/generate-web.mjs.
   'Lasm.JS.Web.Support', 'Lasm.JS.Web.Dom', 'Lasm.JS.Web.Messaging', 'Lasm.JS.Web.Streams', 'Lasm.JS.Web.File',
   'Lasm.JS.Web.Encoding', 'Lasm.JS.Web.Compression', 'Lasm.JS.Web.Url', 'Lasm.JS.Web.Fetch', 'Lasm.JS.Web.Crypto',
   'Lasm.JS.Web.Performance', 'Lasm.JS.Web.Timers', 'Lasm.JS.Web.Global', 'Lasm.JS.Web.Console', 'Lasm.JS.Web.Wasm', 'Lasm.JS.Web',
+  // Its browser tier (docs/JS_BINDINGS.md, "The browser tier"; scripts/bindings/web-browser.mjs).
+  'Lasm.JS.Web.Geometry', 'Lasm.JS.Web.Css', 'Lasm.JS.Web.Html', 'Lasm.JS.Web.UiEvents', 'Lasm.JS.Web.Canvas', 'Lasm.JS.Web.WebSocket',
+  'Lasm.JS.Web.Browser',
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
-  'Lasm.UI.Url', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',
+  'Lasm.UI.Url', 'Lasm.UI.Mount', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',
   // Lasm.RPC (docs/RPC.md): typed endpoints shared by a Lasm.Fetch server and a Lasm.UI app.
   'Lasm.RPC.Core', 'Lasm.RPC.Server', 'Lasm.RPC.Client', 'Lasm.RPC'];
 // The proofs-only modules (library/Lasm/UI/Proofs*, each library's Spec.lean and Theorems.lean;

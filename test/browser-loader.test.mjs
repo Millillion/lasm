@@ -197,7 +197,7 @@ test('loader: options and defaults: jspi, Firefox, stdout and stderr sinks, erro
     lean.onStops[0](new Error('quiet'));  // no onError: nothing thrown
     assert.equal(app.jspi, false);
     // No embedder: send rejects, ports are empty.
-    await assert.rejects(app.send(1), { message: 'Lasm app demo does not receive messages (it does not use Lasm.Web.App)' });
+    await assert.rejects(app.send(1), { message: 'Lasm app demo does not receive messages (it does not use Lasm.UI.Mount)' });
     assert.deepEqual(app.ports, {});
     assert.ok(Object.isFrozen(app.ports));
     assert.equal(app.hotSave(), undefined);

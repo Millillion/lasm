@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { benchmarks, matrixList, PAGE, parse, proofCounts, renderPage, repositoryFacts, summarize } from '../scripts/evidence/page.mjs';
+import { benchmarks, campaignStreak, exitBar, matrixList, PAGE, parse, proofCounts, renderPage, repositoryFacts, summarize } from '../scripts/evidence/page.mjs';
 import { checkPage } from '../scripts/content/index.mjs';
 import { splitFrontMatter } from '../scripts/content/frontmatter.mjs';
 
@@ -90,4 +90,59 @@ test('the committed page is the generator\'s output format', () => {
   const page = readFileSync(`${root}${PAGE}`, 'utf8');
   assert.deepEqual(checkPage(`${root}${PAGE}`, page), []);
   assert.match(page, /^> \*\*Generated\*\* by \[`scripts\/evidence\/page\.mjs`\]/m);
+});
+
+test('job logs: the unit suite\'s coverage line', () => {
+  assert.deepEqual(parse.coverage('2026-11-10T08:20:43.1Z lines 98.08 %, branches 97.08 %, functions 98.38 % (143 files) -> .work/coverage.json'),
+    { lines: 98.08, branches: 97.08, functions: 98.38, files: 143 });
+  assert.equal(parse.coverage('nothing'), null);
+});
+
+test('campaigns: consecutive clean nights, Sundays left out, ended by a failure, a cancellation or a missing campaign', () => {
+  const r = (path, date, conclusion = 'success') => ({ path: `.github/workflows/${path}`, event: 'schedule', created_at: date, conclusion, html_url: `https://r/${path}/${date}` });
+  // The nights of Tue 10, Sat 7, Fri 6 (dst failed) and Thu 5 (UTC, as the crons run); a failure on Sunday evening in New York is left out.
+  const nights = ['2026-11-10', '2026-11-07', '2026-11-06', '2026-11-05'];
+  const runs = {
+    'differential.yml': nights.map(d => r('differential.yml', `${d}T02:00:00Z`)),
+    'fuzz.yml': [...nights.map(d => r('fuzz.yml', `${d}T07:23:00Z`)), r('fuzz.yml', '2026-11-09T03:00:00Z', 'failure')],
+    'dst-nightly.yml': nights.map(d => r('dst-nightly.yml', `${d}T05:00:00Z`, d === '2026-11-06' ? 'failure' : 'success')),
+  };
+  assert.deepEqual(campaignStreak(runs), { nights: 2, endedOn: '2026-11-06', why: 'dst-nightly.yml failure', run: 'https://r/dst-nightly.yml/2026-11-06T05:00:00Z' });
+  runs['dst-nightly.yml'] = runs['dst-nightly.yml'].filter(x => !x.created_at.startsWith('2026-11-07'));
+  assert.deepEqual(campaignStreak(runs), { nights: 1, endedOn: '2026-11-07', why: 'no run of dst-nightly.yml', run: null });
+  runs['fuzz.yml'][0].conclusion = 'cancelled';
+  assert.equal(campaignStreak(runs).why, 'fuzz.yml cancelled');
+  assert.deepEqual(campaignStreak({ 'fuzz.yml': [] }), { nights: 0, endedOn: null, why: 'no runs yet', run: null });
+  assert.deepEqual(campaignStreak({ 'fuzz.yml': [r('fuzz.yml', '2026-11-10T07:00:00Z')] }), { nights: 1, endedOn: null, why: 'no older runs', run: null });
+});
+
+test('the exit bar: each of the eight items from the repository and CI, met only when all of it holds', () => {
+  const repo = { ...repositoryFacts(), quarantine: [], modelDifferentials: ['serverless-http', 'ui-decode', 'lasm-js-wire'], featureGenerator: true,
+    mutationModules: ['a', 'b'], propositions: { proved: 5, candidates: 2, citations: 4, problems: 0, oracles: { named: 2, total: 2, unnamed: [] }, properties: { named: 1, total: 1, unnamed: [] } } };
+  const platform = (id, level) => ({ id, row: id, level, levels: {} });
+  const ci = {
+    platforms: [platform('node', 3), platform('workers', 3), platform('browser', 3), platform('lambda', 2)],
+    mutation: { run: run(1), modules: [job('module (a)', 'success', { module: 'a', score: 91 }), job('module (b)', 'success', { module: 'b', score: 80 })] },
+    coverage: { run: run(2), jobs: [job('unit / unit', 'success', { lines: 80.5, files: 140 })] },
+    campaigns: { nights: 30, endedOn: null, why: 'no older runs', run: null },
+  };
+  const status = (r, c) => exitBar(r, c).map(x => x.status);
+  assert.deepEqual(status(repo, ci), ['met', 'met', 'partly met', 'met', 'partly met', 'not measured', 'met', 'partly met']);
+  assert.deepEqual(exitBar(repo, ci).map(x => x.item), [1, 2, 3, 4, 5, 6, 7, 8]);
+  // Each item fails on its own.
+  const worse = status({ ...repo, quarantine: [{ since: '2026-11-09' }], modelDifferentials: ['serverless-http'],
+    propositions: { ...repo.propositions, properties: { named: 0, total: 1, unnamed: ['x'] } } },
+  { ...ci, platforms: [platform('node', 3), platform('workers', 2), platform('browser', 3), platform('lambda', -1)],
+    mutation: { run: run(1), modules: [job('module (a)', 'failure', { module: 'a' })] }, coverage: { run: run(2), jobs: [job('unit / unit', 'success', { lines: 70, files: 140 })] },
+    campaigns: { nights: 3, endedOn: '2026-11-06', why: 'dst-nightly.yml failure' } });
+  assert.deepEqual(worse, ['not met', 'not met', 'not met', 'not met', 'not met', 'not measured', 'not met', 'not met']);
+  const rows = exitBar(repo, { ...ci, platforms: [platform('lambda', -1), platform('node', 2)] });
+  assert.match(rows[0].measured, /^1 of 2 platforms at L2 or higher \(not: lambda\); at L3: 0 of 3/);
+  assert.equal(status({ ...repo, featureGenerator: false }, ci)[7], 'not met');
+  assert.deepEqual(status(repo, null).slice(0, 4), ['not read', 'not read', 'not read', 'not read']);
+  assert.equal(status(repo, { ...ci, coverage: { run: null, jobs: [] } })[2], 'not measured');
+  // On the page, first.
+  const page = renderPage(summarize(repo, null, at));
+  assert.ok(page.indexOf('## The exit bar') < page.indexOf('## Platforms'));
+  assert.match(page, /\| 7 \| Propositions \| \*\*met\*\* \| the lint is green; 2 of 2 fuzz oracles and 1 of 1 properties name a proposition; 2 candidates, 5 proved propositions \|/);
 });

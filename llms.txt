@@ -33,7 +33,7 @@ Key commands:
 - [Lasm.Fetch](https://github.com/Millillion/lasm/blob/main/docs/FETCH.md): one `Request → Async Response` handler for every server target, outbound `fetch`, streaming
 - [Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md): browser apps (Elm architecture, `html!`, commands, subscriptions, routing, SSR, hydration, what is proved)
 - [Lasm.RPC and Lasm.KV](https://github.com/Millillion/lasm/blob/main/docs/RPC.md): typed endpoints shared by server and browser, validation proved once; a key-value store over each platform's own
-- [Lasm.Web](https://github.com/Millillion/lasm/blob/main/docs/BROWSER.md): typed DOM and web-platform bindings, the browser loader and mount API, the Vite plugin
+- [Browser apps](https://github.com/Millillion/lasm/blob/main/docs/BROWSER.md): the browser loader and mount API (`Lasm.UI.Mount`), the Vite plugin; DOM and web APIs through the generated `Lasm.JS.Web.Browser` ([JS_BINDINGS.md](https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md))
 - [Library sources](https://github.com/Millillion/lasm/tree/main/library/Lasm): the Lean code of every library, including Lasm.Fastly (Fastly Compute's host ABI, generated from its witx) and Lasm.WASI.Http (the wasi:http proxy world, generated from the WASI WIT): docs/WASI_FASTLY_BINDINGS.md
 
 ## Platforms

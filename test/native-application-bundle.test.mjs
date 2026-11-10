@@ -115,14 +115,6 @@ for (const arch of ['x64']) test(`a Windows ${arch} build carries its adapter pl
     { target: 'node', targets: ['linux-x64', 'linux-arm64', 'win32-x64'], linuxLibc: ['glibc', 'musl'] });
 });
 
-test('deployments never carry the unused pthread working-directory factory', t => {
-  const { root, output } = fixture(t);
-  assert.equal(applicationHostFiles.includes('native-pthread-factory.cjs'), false);
-  for (const name of applicationHostFiles) { mkdirSync(dirname(join(root, 'src', name)), { recursive: true }); writeFileSync(join(root, 'src', name), 'host fixture'); }
-  copyApplicationHost(output, { platform: 'linux', arch: 'x64', glibc: '2.39', sourceRoot: root });
-  assert.equal(existsSync(join(output, 'host/native-pthread-factory.cjs')), false);
-});
-
 test('Windows ARM64 deployments are refused as an unsupported platform', t => {
   const { root, output } = fixture(t);
   assert.throws(() => copyApplicationNativeBundle(root, output, { platform: 'win32', arch: 'arm64' }), /Windows ARM64 is not supported/);

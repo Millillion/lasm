@@ -40,15 +40,15 @@ function fixture({ pkg = { name: '@me/Edge App' }, bindings = [] } = {}) {
 }
 
 test('edge output: the program, its host and builtins, licences and build information', () => {
-  const f = fixture({ bindings: [{ module: 'lasm:web' }, { module: 'hono' }] });
+  const f = fixture({ bindings: [{ module: 'lasm:ui-dom' }, { module: 'hono' }] });
   try {
     const built = writeEdgeOutput({ ...f.options, target: 'bun' });
     const out = join(f.project, 'bun');
     assert.equal(built.output, out);
     assert.deepEqual(readdirSync(out).sort(), ['THIRD_PARTY_NOTICES.txt', 'build-info.json', 'lasm', 'main.mjs']);
     assert.deepEqual(readdirSync(join(out, 'lasm')).sort(), [...edgeHostFiles, 'modules', 'program.mjs', 'program.wasm'].sort());
-    assert.deepEqual(readdirSync(join(out, 'lasm/modules')), ['web.mjs']);
-    assert.equal(readFileSync(join(out, 'lasm/modules/web.mjs'), 'utf8'), readFileSync(new URL('../src/lasm-modules/web.mjs', import.meta.url), 'utf8'));
+    assert.deepEqual(readdirSync(join(out, 'lasm/modules')), ['ui-dom.mjs']);
+    assert.equal(readFileSync(join(out, 'lasm/modules/ui-dom.mjs'), 'utf8'), readFileSync(new URL('../src/lasm-modules/ui-dom.mjs', import.meta.url), 'utf8'));
     for (const file of edgeHostFiles) assert.equal(readFileSync(join(out, 'lasm', file), 'utf8'), readFileSync(new URL('../src/edge/' + file, import.meta.url), 'utf8'));
     const notices = readFileSync(join(out, 'THIRD_PARTY_NOTICES.txt'), 'utf8');
     assert.ok(notices.includes('This Bun output was compiled by Lasm.'), 'the notices name the target');
@@ -60,7 +60,7 @@ test('edge output: the program, its host and builtins, licences and build inform
     assert.deepEqual(WebAssembly.Module.customSections(new WebAssembly.Module(wasm), noticesSectionName).map(b => Buffer.from(b).toString()), [notices]);
     const info = JSON.parse(readFileSync(join(out, 'build-info.json'), 'utf8'));
     assert.deepEqual(info, { schema: 1, target: 'bun', profile: 'edge', buildProfile: 'release', experimental: false, nodeBuildSignature: 'signature', lean: '4.35.0',
-      edgeRuntime: { 'libleanrt.a': 'abc' }, link: { ...edgeLinkSettings, suspend: 'jspi' }, wasm: 'lasm/program.wasm', programKey: 'edge-key', modules: ['hono', 'lasm:web'],
+      edgeRuntime: { 'libleanrt.a': 'abc' }, link: { ...edgeLinkSettings, suspend: 'jspi' }, wasm: 'lasm/program.wasm', programKey: 'edge-key', modules: ['hono', 'lasm:ui-dom'],
       files: { 'lasm/program.mjs': sha256(glue), 'lasm/program.wasm': sha256(wasm) } });
     assert.deepEqual(built.info, info);
     assert.equal(existsSync(out + '.lasm-staging'), false);
@@ -186,7 +186,7 @@ test('edge modules and Supabase import maps: configuration checks, exclusions an
     writeFileSync(join(root, 'node_modules/@s/pkg/package.json'), JSON.stringify({ version: '2.0.0' }));
     mkdirSync(join(project, 'node_modules/hono'), { recursive: true });
     writeFileSync(join(project, 'node_modules/hono/package.json'), JSON.stringify({ version: '4.1.0' }));
-    const skipped = ['node:fs', 'npm:x@1', 'jsr:@std/path', 'https://esm.sh/x', 'http://x/y.js', 'data:text/javascript,1', 'lasm:web', './local.mjs', '/abs.mjs'];
+    const skipped = ['node:fs', 'npm:x@1', 'jsr:@std/path', 'https://esm.sh/x', 'http://x/y.js', 'data:text/javascript,1', 'lasm:ui-dom', './local.mjs', '/abs.mjs'];
     assert.deepEqual(supabaseImportMap(project, [...skipped, 'hono', 'hono/jsx', '@s/pkg/sub/path', '@s/pkg']),
       { imports: { hono: 'npm:hono@4.1.0', 'hono/': 'npm:hono@4.1.0/', '@s/pkg': 'npm:@s/pkg@2.0.0', '@s/pkg/': 'npm:@s/pkg@2.0.0/' } });
     const asked = [];

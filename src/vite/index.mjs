@@ -5,7 +5,7 @@
 // --bundler): Vite bundles it with the page's code, emits the Wasm as an asset
 // (new URL(…, import.meta.url)) and resolves the npm modules Lean binds. In
 // development every save of a .lean file rebuilds the app (a dev build) and
-// remounts it in place, passing it the state it saved (Lasm.Web.App.onHotSave).
+// remounts it in place, passing it the state it saved (Lasm.UI.Mount.onHotSave).
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';

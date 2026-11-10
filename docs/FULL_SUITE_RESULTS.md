@@ -1,5 +1,9 @@
 # Full upstream Lean suite
 
+> Scripts this page names that are no longer in the repository were removed on
+> 2026-11-10 as unreferenced; they are in the git history at
+> [`590a923f`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1).
+
 These are preserved **compiler-in-Wasm research** results. The current
 [product plan](PLAN.md) requires separate application-pipeline acceptance on
 Lean 4.34.0 and stock latest Node. Earlier passes below do not satisfy that
