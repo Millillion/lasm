@@ -75,7 +75,7 @@ lean_object* l_Lasm_JS_Function_ofSyncFn(lean_object*);
 lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_global_spec__0(lean_object*, lean_object*);
 lean_object* lean_nat_abs(lean_object*);
 double l_Float_ofInt(lean_object*);
-lean_object* l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_AbortSignal_abort_spec__0(lean_object*, lean_object*, uint8_t);
+lean_object* l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_Support_typedArray_spec__0(lean_object*, lean_object*, uint8_t);
 lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Event_cancelBubble_spec__0(lean_object*, lean_object*);
 extern lean_object* l_Lasm_JS_instFromJSBool;
 lean_object* l_Lasm_JS_instFromJSOption___redArg(lean_object*);
@@ -8071,7 +8071,7 @@ v___x_2345_ = ((lean_object*)(l_Lasm_JS_Web_ReadableStream_from___closed__2));
 v___x_2346_ = lean_mk_empty_array_with_capacity(v___x_2344_);
 v___x_2347_ = lean_array_push(v___x_2346_, v_asyncIterable_2341_);
 v___x_2348_ = l_Lasm_JS_Web_Support_args(v___x_2347_);
-v___x_2349_ = l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_AbortSignal_abort_spec__0(v___x_2345_, v___x_2348_, v___x_2343_);
+v___x_2349_ = l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_Support_typedArray_spec__0(v___x_2345_, v___x_2348_, v___x_2343_);
 if (lean_obj_tag(v___x_2349_) == 0)
 {
 lean_object* v_a_2350_; lean_object* v___x_2352_; uint8_t v_isShared_2353_; uint8_t v_isSharedCheck_2357_; 
