@@ -1,6 +1,6 @@
 // Differential testing campaign (docs/TESTING.md#differential-testing).
 //
-// Generates random Lean programs (generate-web.mjs), builds each with native Lean
+// Generates random Lean programs (generate.mjs), builds each with native Lean
 // (the oracle: upstream `lean -c` + `leanc`) and with an installed Lasm CLI for
 // every target, runs them all, and compares stdout, stderr and the exit status.
 // A divergence is shrunk to a minimal case (batched: every round builds one
@@ -30,7 +30,7 @@
 //   browser-webkit           without JSPI (docs/BROWSER.md), so an `IO.sleep`
 //                            would stop the instance: they run a third program
 //                            per seed, the core program without `IO.sleep`
-//                            (generate-web.mjs withoutSleep), and the regressions
+//                            (generate.mjs withoutSleep), and the regressions
 //                            that do not sleep.
 //
 //   node scripts/differential/run.mjs --lasm PATH/bin/lasm.mjs --lean-bin DIR --work NEW_DIR
@@ -49,7 +49,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, rmSync
 import { join, resolve, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
-import * as g from './generate-web.mjs';
+import * as g from './generate.mjs';
 
 const argv = process.argv.slice(2);
 const opt = (name, fallback) => { const i = argv.indexOf(name); return i < 0 ? fallback : argv[i + 1]; };

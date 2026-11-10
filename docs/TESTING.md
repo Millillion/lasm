@@ -53,7 +53,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 *P* and Lasm's build of *P* for each target produce the same stdout, the same
 stderr and the same exit status.
 
-**Generator** ([`scripts/differential/generate-web.mjs`](../scripts/differential/generate-web.mjs)).
+**Generator** ([`scripts/differential/generate.mjs`](../scripts/differential/generate.mjs)).
 Typed expression trees over `Nat`/`Int` (bignums, with literals at the 2³¹, 2³²,
 2⁶³ and 2⁶⁴ boundaries), `UInt8`–`UInt64`, `Float` (results of IEEE-exact operations
 may be printed as bits; libm functions such as `sin` only as text), `String`/`Char`
