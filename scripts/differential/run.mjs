@@ -41,6 +41,14 @@
 //     [--playwright DIR (holds node_modules/playwright-core)]
 //     [--wrap "CMD ARGS --"] [--regressions DIR]
 //     [--shrink-rounds 12] [--summary FILE.json]
+//     [--feat-cases 80] [--feat-seeds S1,S2,...] [--feat-random 1|0]
+//
+// Feature programs (features.mjs, docs/TESTING.md#differential-fuzzing): one
+// program of --feat-cases feature cases (type classes, inductives, closures of
+// every arity, loops, structures, exceptions, signed and Float32 arithmetic,
+// ByteArray, HashSet, TreeMap, panics) per seed, on every target. The seeds
+// of --feat-seeds are replayed first (the pull-request tier's fixed set); with
+// --feat-random 1 (the default) every seed of the run gets one too.
 //
 // Exit status: 0 = no divergence, 1 = divergence (reproducers in WORK/repros), 2 = harness error.
 // Upstream suspects (native vs interpreter) are in the summary and never change it.
@@ -50,6 +58,7 @@ import { join, resolve, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import * as g from './generate.mjs';
+import { genFeatureProgram } from './features.mjs';
 
 const argv = process.argv.slice(2);
 const opt = (name, fallback) => { const i = argv.indexOf(name); return i < 0 ? fallback : argv[i + 1]; };
@@ -62,6 +71,9 @@ const programs = Number(opt('--programs', '1'));
 const budgetMs = Number(opt('--budget-min', '0')) * 60_000;
 const nCases = Number(opt('--cases', '120'));
 const nFsCases = Number(opt('--fs-cases', '25'));
+const nFeatCases = Number(opt('--feat-cases', '80'));
+const featSeeds = (opt('--feat-seeds', '') || '').split(',').filter(Boolean).map(Number);
+const featRandom = opt('--feat-random', '1') !== '0';
 const targets = opt('--targets', 'node,wasi,deno').split(',').filter(Boolean);
 const profile = opt('--profile', 'release');
 const wasmtime = opt('--wasmtime', 'wasmtime');
@@ -155,7 +167,7 @@ function exec(cmd, args, { cwd, timeout = 30 * 60_000, extraEnv } = {}) {
     child.stdout.on('data', d => { if (outBytes < 8e6) { out.push(d); outBytes += d.length; } });
     child.stderr.on('data', d => { if (errBytes < 8e6) { err.push(d); errBytes += d.length; } });
     child.on('error', e => { spawnError += String(e); });
-    child.on('close', (code, signal) => { clearTimeout(timer); done({ code, signal, stdout: Buffer.concat(out).toString('utf8'), stderr: Buffer.concat(err).toString('utf8') + spawnError, timedOut, ms: Math.round(performance.now() - started) }); });
+    child.on('close', (code, signal) => { clearTimeout(timer); done({ code, signal, stdout: Buffer.concat(out).toString('utf8') + (outBytes >= 8e6 ? '\n[harness: stdout cut at 8 MB]\n' : ''), stderr: Buffer.concat(err).toString('utf8') + (errBytes >= 8e6 ? '\n[harness: stderr cut at 8 MB]\n' : '') + spawnError, timedOut, ms: Math.round(performance.now() - started) }); });
   });
 }
 
@@ -239,6 +251,23 @@ function diverging(ids, nat, tgt, target) {
   if (TARGETS[target]?.zeroOrNot) { nat = { ...nat, code: outcomeOf(nat.code) }; tgt = { ...tgt, code: outcomeOf(tgt.code) }; }
   const a = byCase(nat.stdout), b = byCase(tgt.stdout);
   const ae = byCase(nat.stderr, true), be = byCase(tgt.stderr, true);
+  // Compiled code evaluates every extracted closed term while the module
+  // initializes, the interpreter only those it reaches, on first use: a closed
+  // term that panics prints its message before the first case natively, and
+  // inside its case, or never (an untaken branch), when interpreted. For the
+  // interpreter, stderr is compared as a multiset of lines, without what native
+  // Lean printed before the first case.
+  if (target === 'interp') {
+    const all = nat.stderr.split('\n'), first = all.findIndex(l => l.startsWith('@')), early = first < 0 ? [] : all.slice(0, first);
+    // Native without its early lines; the interpreter may print each of them
+    // once more than that (on first use) or not at all (never reached).
+    const n = all.slice(early.length), t = tgt.stderr.split('\n');
+    const count = (xs, x) => xs.filter(y => y === x).length;
+    for (const e of early) { if (count(t, e) > count(n, e)) t.splice(t.indexOf(e), 1); }
+    const bad = ids.filter(id => a.get(id) !== b.get(id));
+    const stderr = n.sort().join('\n') !== t.sort().join('\n');
+    return { bad, stderr, code: nat.code !== tgt.code, any: bad.length > 0 || stderr || nat.code !== tgt.code };
+  }
   const bad = ids.filter(id => a.get(id) !== b.get(id) || ae.get(id) !== be.get(id));
   return { bad, stderr: nat.stderr !== tgt.stderr, code: nat.code !== tgt.code, any: bad.length > 0 || nat.stderr !== tgt.stderr || nat.code !== tgt.code };
 }
@@ -304,12 +333,12 @@ async function shrink(dirBase, item, target, ending) {
 // ---------- reproducers and regressions ----------
 function sha(s) { return createHash('sha256').update(s).digest('hex').slice(0, 12); }
 function writeRepro(target, seed, item, nat, tgt, ending, note) {
-  const name = `r_${target.replace(/-/g, '_')}_${seed}_${item.index}`;
+  const name = `r_${target.replace(/-/g, '_')}_${seed}_${item.c.kind === 'feat' ? 'f' : ''}${item.index}`;
   const dir = join(work, 'repros', name);
   mkdirSync(dir, { recursive: true });
   const program = g.renderProgram([{ ...item, name }], { ending });
   writeFileSync(join(dir, 'Main.lean'), program);
-  writeFileSync(join(dir, `${name}.lean`), `-- Differential regression (docs/TESTING.md#differential-testing): ${target}, seed ${seed}, case ${item.index}; main ends with "${(ending ?? '  return 0').trim()}" (see Main.lean).\n-- ${note.replace(/\n/g, ' ')}\n` + g.renderCase(item.c, name));
+  writeFileSync(join(dir, `${name}.lean`), `-- Differential regression (docs/TESTING.md#differential-testing): ${target}, seed ${seed}, ${item.c.kind === 'feat' ? `feature case ${item.index} (${item.c.fam})` : `case ${item.index}`}; main ends with "${(ending ?? '  return 0').trim()}" (see Main.lean).\n-- ${note.replace(/\n/g, ' ')}\n` + g.renderCase(item.c, name));
   writeFileSync(join(dir, 'case.json'), JSON.stringify({ target, seed, index: item.index, case: item.c }, null, 1) + '\n');
   writeFileSync(join(dir, 'native.json'), JSON.stringify(nat, null, 1) + '\n');
   writeFileSync(join(dir, `${target}.json`), JSON.stringify(tgt, null, 1) + '\n');
@@ -324,19 +353,22 @@ export function loadRegressions(dir) {
 }
 
 // ---------- main ----------
-const summary = { started: new Date().toISOString(), seed0, targets, profile, cases: nCases, fsCases: nFsCases, programs: [], divergences: [], upstreamSuspects: [], harnessErrors: [] };
+const summary = { started: new Date().toISOString(), seed0, targets, profile, cases: nCases, fsCases: nFsCases, featCases: nFeatCases, featSeeds, programs: [], divergences: [], upstreamSuspects: [], harnessErrors: [] };
 const save = () => writeFileSync(summaryFile, JSON.stringify(summary, null, 2) + '\n');
 const startedAt = Date.now();
 
 async function campaignProgram(seed, kind) {
   // core: the targets without a `program`; fs: the targets with a file system;
-  // a PROGRAMS name: the core program transformed, for the targets that name it.
+  // a PROGRAMS name: the core program transformed, for the targets that name it;
+  // feat: the feature program, on every target (it has no file system, no
+  // sleep, no environment, and no recursion deeper than 500 frames).
   const fsProgram = kind === 'fs';
-  const tlist = targets.filter(t => fsProgram ? TARGETS[t].fs : (TARGETS[t].program ?? 'core') === kind);
+  const tlist = kind === 'feat' ? targets : targets.filter(t => fsProgram ? TARGETS[t].fs : (TARGETS[t].program ?? 'core') === kind);
   if (!tlist.length) return;
-  const list = fsProgram
-    ? g.genProgram(seed, { cases: nFsCases, kinds: ['fs', 'io'] })
+  const list = kind === 'feat' ? genFeatureProgram(seed, { cases: nFeatCases })
+    : fsProgram ? g.genProgram(seed, { cases: nFsCases, kinds: ['fs', 'io'] })
     : (PROGRAMS[kind] ?? (x => x))(g.genProgram(seed, { cases: nCases }));
+  if (!list.length) return; // --cases 0 / --fs-cases 0: no program of that kind
   const ending = g.ENDINGS[seed % g.ENDINGS.length];
   const dir = join(work, `s${seed}-${kind}`);
   const ev = await evaluate(dir, list, tlist, { ending });
@@ -349,6 +381,18 @@ async function campaignProgram(seed, kind) {
     return;
   }
   rec.nativeMs = ev.nat.ms;
+  // Native Lean itself took a tenth of the run timeout or more: the generator
+  // broke its own bound (a power tower of bignums, in campaign 42572268410),
+  // and a slower target (bignums without GMP) would only time out. Nothing to
+  // compare: a generator error naming the case that was running.
+  if (ev.nat.code === 'timeout' || ev.nat.ms > runTimeoutMs / 10) {
+    rec.native = ev.nat.code === 'timeout' ? 'timeout' : `slow (${ev.nat.ms} ms)`;
+    const lastCase = ev.nat.stderr.match(/^@(\S+)$/gm)?.pop() ?? 'no case';
+    summary.harnessErrors.push({ seed, kind, error: `the native run took ${ev.nat.code === 'timeout' ? 'longer than the timeout' : `${ev.nat.ms} ms`} (a generator bound is too loose)`, lastCase });
+    console.log(`seed ${seed} ${kind}: GENERATOR ERROR (native run ${rec.native}; last case started: ${lastCase})`);
+    save();
+    return;
+  }
   for (const t of tlist) {
     const res = ev.results[t];
     if (res.buildFailed) {
@@ -453,12 +497,14 @@ async function regressionRun() {
 
 try {
   if (regressionsDir) await regressionRun();
+  if (nFeatCases > 0) for (const seed of featSeeds) await campaignProgram(seed, 'feat');
   for (let i = 0; ; i++) {
     if (budgetMs ? Date.now() - startedAt > budgetMs : i >= programs) break;
     const seed = seed0 + i;
     await campaignProgram(seed, 'core');
     if (nFsCases > 0) await campaignProgram(seed, 'fs');
     for (const kind of Object.keys(PROGRAMS)) await campaignProgram(seed, kind);
+    if (nFeatCases > 0 && featRandom) await campaignProgram(seed, 'feat');
   }
 } catch (e) {
   summary.harnessErrors.push({ error: String(e?.stack ?? e) });

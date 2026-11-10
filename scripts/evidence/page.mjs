@@ -25,6 +25,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { collect, evaluate, githubApi, LEVELS, levelText } from './levels.mjs';
 import { sundayGuarded } from '../ci/sunday-guard.mjs';
+import { check as checkPropositions, summary as propositionSummary } from '../propositions.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 export const PAGE = 'content/learn/test-evidence.md';
@@ -113,13 +114,24 @@ export function benchmarks(text) {
     table: rows.join('\n').replace(/\]\(benchmarks\//g, '](../../docs/benchmarks/') };
 }
 
+/** The fuzz targets checked against a Lean model or Lean's own code (they start one: `modelDirectory`). */
+function modelDifferentials(targets) {
+  return targets.filter(t => { const file = `test/fuzz/targets/${t.name}.mjs`; return existsSync(join(root, file)) && /\bmodelDirectory\(/.test(read(file)); }).map(t => t.name);
+}
+
 /** Everything the page says that comes from files in the repository. */
 export function repositoryFacts() {
+  const targets = fuzzTargets();
   return {
+    propositions: propositionSummary(checkPropositions({ root })),
+    quarantine: JSON.parse(read('test/quarantine.json')).tests,
+    mutationModules: JSON.parse(read('scripts/mutation/modules.json')).modules.map(m => m.name),
+    modelDifferentials: modelDifferentials(targets),
+    featureGenerator: existsSync(join(root, 'scripts/differential/features.mjs')),
     platforms: JSON.parse(read('scripts/evidence/platforms.json')),
     mutation: JSON.parse(read('docs/evidence/mutation-baseline.json')),
     proofs: proofs(),
-    fuzzTargets: fuzzTargets(),
+    fuzzTargets: targets,
     dstApps: matrixList(read('.github/workflows/dst-nightly.yml'), 'app'),
     equivalence: equivalenceTargets(),
     benchmarks: benchmarks(read('docs/BENCHMARKS.md')),
@@ -146,6 +158,10 @@ export const parse = {
       phases.push(m[1] !== undefined ? { seeds: Number(m[1]), failing: 0 } : { seeds: Number(m[3]), failing: Number(m[2]) });
     return phases.length ? { phases, seeds: phases.reduce((n, p) => n + p.seeds, 0), failing: phases.reduce((n, p) => n + p.failing, 0) } : null;
   },
+  coverage(log) {
+    const m = /lines ([\d.]+) %, branches ([\d.]+) %, functions ([\d.]+) % \((\d+) files\)/.exec(log);
+    return m ? { lines: Number(m[1]), branches: Number(m[2]), functions: Number(m[3]), files: Number(m[4]) } : null;
+  },
   differential(log) {
     const lines = [...log.matchAll(/ (\d+) programs, (\d+) cases, (\d+) divergences, (\d+) upstream suspects[^\n]*?, (\d+) harness errors/g)];
     if (!lines.length) return null;
@@ -156,11 +172,39 @@ export const parse = {
 
 // ---------------------------------------------------------------- CI
 
+/** The nightly campaigns of exit bar 4 (docs/TESTING_STRATEGY.md §7): differential and equivalence, fuzzing, simulation. */
+export const CAMPAIGNS = ['differential.yml', 'fuzz.yml', 'dst-nightly.yml'];
+
+/** Consecutive nights, newest first, on which every campaign's scheduled runs passed. Sundays (New York) are left out:
+ * they neither count nor break the run. A night without a run of one of them, or with a failed or cancelled one, ends it. */
+export function campaignStreak(runsByWorkflow) {
+  const nights = new Map();
+  for (const [workflow, runs] of Object.entries(runsByWorkflow)) for (const run of runs) {
+    if (sundayGuarded(run)) continue;
+    const night = day(run.run_started_at ?? run.created_at);
+    if (!nights.has(night)) nights.set(night, new Map());
+    const byWorkflow = nights.get(night);
+    if (!byWorkflow.has(workflow)) byWorkflow.set(workflow, []);
+    byWorkflow.get(workflow).push(run);
+  }
+  let count = 0;
+  for (const night of [...nights.keys()].sort().reverse()) {
+    const byWorkflow = nights.get(night);
+    const missing = Object.keys(runsByWorkflow).filter(w => !byWorkflow.has(w));
+    const failed = [...byWorkflow.values()].flat().filter(r => r.conclusion !== 'success');
+    if (missing.length || failed.length)
+      return { nights: count, endedOn: night, why: [...missing.map(w => `no run of ${w}`), ...failed.map(r => `${r.path?.split('/').pop() ?? 'a run'} ${r.conclusion}`)].join('; '),
+        run: failed[0]?.html_url ?? null };
+    count++;
+  }
+  return { nights: count, endedOn: null, why: count ? 'no older runs' : 'no runs yet', run: null };
+}
+
 const runFact = run => run && { id: run.id, url: run.html_url, event: run.event, branch: run.head_branch, date: run.updated_at ?? run.created_at, conclusion: run.conclusion };
 
 async function ciFacts(repo, { api, logOf, now }) {
-  const runsOf = async (workflow, query = '') => {
-    try { return (await api(`actions/workflows/${workflow}/runs?status=completed&per_page=30${query}`)).workflow_runs; }
+  const runsOf = async (workflow, query = '', perPage = 30) => {
+    try { return (await api(`actions/workflows/${workflow}/runs?status=completed&per_page=${perPage}${query}`)).workflow_runs; }
     catch (error) { console.warn(`::warning::${workflow}: ${String(error.message).slice(0, 160)}`); return []; }
   };
   const jobsOf = async run => {
@@ -208,7 +252,12 @@ async function ciFacts(repo, { api, logOf, now }) {
   const equivalenceRun = await latest('differential.yml', 'push');
   const conduitRun = await latest('conduit.yml', 'push');
   const conduitPlatformsRun = await latest('conduit-platforms.yml', 'push');
+  const nightlyRun = await latest('ci-nightly.yml', 'schedule');
+  const campaignRuns = {};
+  for (const workflow of CAMPAIGNS) campaignRuns[workflow] = await runsOf(workflow, '&branch=main&event=schedule', 100);
   return {
+    coverage: { run: runFact(nightlyRun), jobs: await jobFacts(nightlyRun, /^unit\b/, parse.coverage) },
+    campaigns: campaignStreak(campaignRuns),
     platforms,
     tiers,
     mutation: { run: runFact(mutationRun), modules: await jobFacts(mutationRun, /^module \(/, parse.mutation) },
@@ -235,6 +284,68 @@ function logReader(repository, token) {
   };
 }
 
+// ---------------------------------------------------------------- the exit bar
+
+/** The platforms exit bar 1 needs at L3. */
+export const L3_PLATFORMS = ['node', 'workers', 'browser'];
+/** The model differentials exit bar 8 names (the UI decoder, the Lasm.JS wire codec). */
+export const BAR_DIFFERENTIALS = ['ui-decode', 'lasm-js-wire'];
+
+/** Each item of docs/TESTING_STRATEGY.md §7, as far as the repository and CI measure it:
+ * { item, name, status: met | partly met | not met | not measured | not read, measured }. */
+export function exitBar(repo, ci) {
+  const row = (item, name, status, measured) => ({ item, name, status, measured });
+  const out = [];
+  // 1. Platforms
+  if (!ci) out.push(row(1, 'Platforms', 'not read', notRead));
+  else {
+    const level = p => (typeof p.level === 'number' ? p.level : -1);
+    const below = ci.platforms.filter(p => level(p) < 2);
+    const atL3 = L3_PLATFORMS.filter(id => ci.platforms.some(p => p.id === id && level(p) >= 3));
+    out.push(row(1, 'Platforms', below.length || atL3.length < L3_PLATFORMS.length ? 'not met' : 'met',
+      `${ci.platforms.length - below.length} of ${ci.platforms.length} platforms at L2 or higher${below.length ? ` (not: ${below.map(p => p.row).join(', ')})` : ''}; ` +
+      `at L3: ${atL3.length} of ${L3_PLATFORMS.length} (Node.js, Workers, browsers)`));
+  }
+  // 2. Mutation
+  if (!ci) out.push(row(2, 'Mutation', 'not read', notRead));
+  else {
+    const byName = new Map(ci.mutation.modules.map(m => [m.module ?? m.name.replace(/^module \((.*)\)$/, '$1'), m]));
+    const passing = repo.mutationModules.filter(n => byName.get(n)?.conclusion === 'success' && byName.get(n).score >= 80);
+    const scores = [...byName.values()].map(m => m.score).filter(x => typeof x === 'number');
+    out.push(row(2, 'Mutation', passing.length === repo.mutationModules.length ? 'met' : 'not met',
+      `${passing.length} of ${repo.mutationModules.length} modules passed at 80 % or more in the latest nightly run${scores.length ? ` (lowest ${Math.min(...scores)} %)` : ''}`));
+  }
+  // 3. Coverage
+  const lines = ci?.coverage?.jobs?.find(j => typeof j.lines === 'number');
+  if (!ci) out.push(row(3, 'Coverage', 'not read', notRead));
+  else if (!lines) out.push(row(3, 'Coverage', 'not measured', 'no unit-suite coverage in the latest nightly run'));
+  else out.push(row(3, 'Coverage', lines.lines >= 75 ? 'partly met' : 'not met',
+    `${lines.lines} % of lines (${lines.files} files; the goal is 75 %); the 0 % files are not yet checked against the integration workflows`));
+  // 4. Campaigns
+  if (!ci) out.push(row(4, 'Campaigns', 'not read', notRead));
+  else {
+    const c = ci.campaigns ?? { nights: 0, why: 'not measured' };
+    out.push(row(4, 'Campaigns', c.nights >= 30 ? 'met' : 'not met',
+      `${c.nights} of 30 consecutive clean nights of ${CAMPAIGNS.map(w => `\`${w}\``).join(', ')}${c.endedOn ? `; ended on ${c.endedOn}: ${c.why}` : c.why ? ` (${c.why})` : ''}`));
+  }
+  // 5. Flakes
+  const newest = repo.quarantine.map(t => t.since).filter(Boolean).sort().at(-1);
+  out.push(row(5, 'Flakes', repo.quarantine.length ? 'not met' : 'partly met',
+    repo.quarantine.length ? `${repo.quarantine.length} quarantined (newest since ${newest ?? '?'})` : 'no test is quarantined; quarantines in the last 14 days are not yet counted'));
+  // 6. Apps
+  out.push(row(6, 'Apps', 'not measured', 'each app\'s workflows run its outside oracle; no check yet compares them with the platforms each app claims'));
+  // 7. Propositions
+  const pr = repo.propositions;
+  out.push(row(7, 'Propositions', !pr.problems && pr.oracles.named === pr.oracles.total && pr.properties.named === pr.properties.total ? 'met' : 'not met',
+    `the lint is ${pr.problems ? `red (${pr.problems} problems)` : 'green'}; ${pr.oracles.named} of ${pr.oracles.total} fuzz oracles and ${pr.properties.named} of ${pr.properties.total} properties name a proposition; ${pr.candidates} candidates, ${pr.proved} proved propositions`));
+  // 8. Differential fuzzing
+  const missing = BAR_DIFFERENTIALS.filter(t => !repo.modelDifferentials.includes(t));
+  out.push(row(8, 'Differential fuzzing', missing.length ? 'not met' : repo.featureGenerator ? 'partly met' : 'not met',
+    `model differentials in CI: ${repo.modelDifferentials.map(t => `\`${t}\``).join(', ') || 'none'}${missing.length ? ` (missing: ${missing.join(', ')})` : ''}; ` +
+    `generated feature programs: ${repo.featureGenerator ? 'yes' : 'no'}; coverage feedback for generated programs: not yet`));
+  return out;
+}
+
 // ---------------------------------------------------------------- the summary
 
 /** The machine-readable summary: the repository's facts and CI's, side by side. */
@@ -252,6 +363,11 @@ export function summarize(repo, ci, { generatedAt, repository, commit }) {
       dstApps: repo.dstApps,
       equivalence: repo.equivalence,
       benchmarks: repo.benchmarks && { ...repo.benchmarks, page: 'docs/BENCHMARKS.md' },
+      propositions: repo.propositions,
+      quarantine: repo.quarantine,
+      mutationModules: repo.mutationModules,
+      modelDifferentials: repo.modelDifferentials,
+      featureGenerator: repo.featureGenerator,
     },
     ci: ci && {
       platforms: ci.platforms.map(p => ({ id: p.id, row: p.row, level: levelText(p.level),
@@ -259,7 +375,9 @@ export function summarize(repo, ci, { generatedAt, repository, commit }) {
         unmet: LEVELS.flatMap(name => (p.levels[name].requirements ?? []).filter(r => !r.ok).map(r => ({ level: name, workflow: r.workflow, job: r.job,
           why: r.missing ? 'no main-branch run has this job' : r.stale ? `newest run is ${r.ageDays} days old` : (r.failed ?? []).join('; '), run: r.run ?? null }))) })),
       tiers: ci.tiers, mutation: ci.mutation, fuzz: ci.fuzz, dst: ci.dst, differential: ci.differential, equivalence: ci.equivalence,
+      coverage: ci.coverage ?? null, campaigns: ci.campaigns ?? null,
     },
+    exitBar: exitBar(repo, ci),
   };
 }
 
@@ -298,6 +416,13 @@ export function renderPage(summary) {
     '- **About**: what the check is and what it covers. That text is written by hand, and the lists and counts in it come from files in the repository that CI checks on every change.',
     '',
     'How each layer works, and what it cannot catch, is in [How Lasm is tested](../../docs/TESTING.md). How the checks are split into tiers is in [CI tiers](../../docs/CI.md).');
+
+  // The exit bar
+  p('## The exit bar: "rock solid"');
+  p('### Measured by CI and the repository');
+  p(table(['#', 'Item', 'Status', 'Measured'], summary.exitBar.map(x => [String(x.item), x.name, `**${x.status}**`, x.measured])));
+  p('### About');
+  p('Lasm is "rock solid", and its code can be reduced freely, when all eight items of the [exit bar](../../docs/TESTING_STRATEGY.md#7-exit-bar-rock-solid) hold at once. Each row is computed when the page is generated: from CI runs (platform levels, the nightly mutation run and unit-suite coverage, the scheduled campaigns) and from the repository (the quarantine list, the proposition lint\'s inventory, the fuzz targets that run against Lean). "Partly met" means the measured part holds and the rest is not measured yet; "not measured" means nothing measures it yet.');
 
   // Platforms
   p('## Platforms: how well tested');
