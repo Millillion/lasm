@@ -88,6 +88,43 @@ decisions themselves are logged with their reasoning in
 - Still for Jordan to review when it lands: the generated surface and its
   naming details.
 
+### Host bindings: `Lasm.Fastly` generated, `Lasm.WASI.*` next (decided by Jordan, 2026-11-10)
+- [x] **Decided.** `Lasm.Fetch` is deleted entirely. Bindings are named for
+  the host interface: `Lasm.JS.*`, `Lasm.WASI.*` (generated from the official
+  WIT), `Lasm.Fastly.*` (generated from Fastly's published ABI), all shipped in
+  `@lasm/cli`, drift-checked, tested in local emulators only.
+- [ ] **Review `Lasm.Fastly`** (current source, not released;
+  [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)): 244 of the ABI's 252
+  functions, generated from Viceroy v0.21.1's witx; the hand-written
+  `Lasm.Fastly` (5 store calls) is gone. Points to look at:
+  - **Errors are `EIO FastlyStatus α`**, lifted into `IO` automatically
+    (`Fastly host call failed: <status>`); `found?` maps `$none` to `Option.none`.
+    The alternatives were `IO α` with the status only in the message, or
+    `IO (Except FastlyStatus α)` everywhere.
+  - **Bytes vs text**: witx `char8` outputs are `String` (invalid UTF-8 becomes
+    U+FFFD), `u8` are `ByteArray`; header names and values *in* are `(list u8)`,
+    so `ByteArray`, with a scoped `Coe String ByteArray` under `open Lasm.Fastly`.
+  - **Two generator tables come from witx comments, not witx syntax**: which
+    record pointers are outputs (`$send_error_detail`,
+    `$image_optimizer_error_detail`, `_out` parameters) and two 16-byte output
+    arrays (`addr_octets_out`, `cja3_md5_out`).
+  - **Not bound (8)**: the five `send_v2`/`v3`/`pending_req_*_v2` functions,
+    whose `$send_error_detail` matters when the call fails, so they need an
+    error type carrying it (`EIO (FastlyStatus × SendErrorDetail)`?); and
+    three functions with output records that hold pointers.
+  - Names are the witx's own (`HttpReq.headerValuesGet`, `KvStore.lookupWaitV2`,
+    `Backend.«exists»`), records keep their pointer field's name
+    (`cacheOverridePtr`).
+- [ ] **The Fastly and WASI examples and templates.** `examples/fastly` is new
+  (Lasm.Fastly); `examples/fetch` drops its `/fastly/stores` route. The
+  multi-target `lasm init --template fetch|fullstack` projects, Conduit and
+  Folio still serve one `Lasm.Fetch` handler on Fastly and wasi-http: moving
+  them needs the portable-handler question answered (what replaces
+  `Lasm.Fetch.serve` across targets once it is deleted).
+- [ ] **`Lasm.WASI.Http` is not generated yet** ([plan](WASI_FASTLY_BINDINGS.md#lasmwasihttp-not-yet-generated)):
+  the component template must then come from a module that imports every
+  bound wasi:http function.
+
 ### High-priority work to define with Jordan
 - [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,
   2026-11-09). The known weaknesses:
@@ -245,7 +282,7 @@ docstrings, the propositions and the names.
   - [Types](../library/Lasm/Web/Types.lean)
   - [Url](../library/Lasm/Web/Url.lean)
   - [WebSocket](../library/Lasm/Web/WebSocket.lean)
-- [ ] `Lasm.Fastly`: [Fastly.lean](../library/Lasm/Fastly.lean)
+- [ ] `Lasm.Fastly` (generated): [Fastly/](../library/Lasm/Fastly), the generator [generate-fastly.mjs](../scripts/bindings/generate-fastly.mjs), the mapping rules [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md), the conformance checks [Conformance.lean](../test/fixtures/fastly-abi/Fixture/Conformance.lean), the example [examples/fastly](../examples/fastly/Main.lean)
 - [ ] `Lasm.Serverless` has proofs only, with no runtime API. Its propositions about the function-platform shims are in [Serverless/Spec.lean](../library/Lasm/Serverless/Spec.lean).
 
 ### Example apps: code and propositions

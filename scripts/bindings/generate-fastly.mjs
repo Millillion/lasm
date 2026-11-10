@@ -365,7 +365,8 @@ Compute's host ABI: ${source}.
 Do not edit; the mapping rules are in docs/WASI_FASTLY_BINDINGS.md.
 
 The doc comments quote the witx, licensed under the Apache License 2.0 with
-LLVM Exceptions (Apache-2.0 WITH LLVM-exception; scripts/fastly/witx/LICENSE).
+LLVM Exceptions (Apache-2.0 WITH LLVM-exception; the text is
+library/Lasm/Fastly/WITX-LICENSE.txt).
 The bindings are Lasm's code (MIT).
 -/
 `;
@@ -540,6 +541,14 @@ const glue = [helpers, '#ifdef LASM_WASI_FASTLY',
   ...bound.map(cStub),
   '#endif', ''].join('\n');
 files.set(join(root, 'library', 'c', 'lasm_fastly.c'), glue);
+// The witx's licence travels with the doc comments that quote it (library/ ships in @lasm/cli).
+files.set(join(root, 'library', 'Lasm', 'Fastly', 'WITX-LICENSE.txt'), `The doc comments of library/Lasm/Fastly/*.lean quote the witx of Fastly
+Compute's host ABI from ${source.replace(/`/g, '')},
+Copyright Fastly, Inc. and contributors, licensed under the Apache License 2.0
+with LLVM Exceptions (SPDX: Apache-2.0 WITH LLVM-exception), whose text follows.
+The rest of Lasm.Fastly is Lasm's code (MIT).
+
+` + readFileSync(join(witxDir, 'LICENSE'), 'utf8'));
 
 // The surface: what is bound and what is not (and why).
 const surface = { source, abiDigest, modules: plansByModule.map(({ mod, plans }) => ({ witx: mod.name, lean: `${NS}.${upperCamel(mod.name.replace(/^fastly_/, ''))}`,

@@ -23,7 +23,7 @@ Details live in the linked docs. This file only says *what* and *in what order*.
 - [x] (J) Agree to this roadmap, and to keeping it as the single source of truth (2026-11-01).
 - [x] (J) Issue #27: resolve dot segments in `Request.path` on every platform, as browsers do (approved 2026-11-02; ships in 0.3.9).
 - [x] (J) OSS-Fuzz: not doing it (2026-11-02). Fuzzing is built in this repo and runs on our own CI.
-- [ ] (J) `Lasm.Fetch`: keep it, narrow it, or remove it, compared with JS bindings. Deferred by Jordan.
+- [x] (J) `Lasm.Fetch`: decided 2026-11-10, remove it entirely; bindings named for the host interface (`Lasm.JS.*`, `Lasm.WASI.*`, `Lasm.Fastly.*`), generated (below).
 - [ ] (J) Issue #44 (lean-html's shared HTML model with Lasm.UI): on hold, by Jordan.
 - [x] (J) Conduit's headline count: "50 proved propositions (294 theorems)" (2026-11-02).
 - [x] (J) Conduit's two recorded gaps: fixed and proved (2026-11-02): an empty-text link shows its target (SPEC L6), and the delete and remove icons are buttons (SPEC L7).
@@ -189,6 +189,12 @@ Jordan decided the bindings ship inside `@lasm/cli`, with no optional download, 
   - all of `Lasm.Web` (its mount glue moves into `Lasm.UI`);
   - `Lasm.Fetch`'s JavaScript-host parts (`serve`'s portable handler and Assets stay);
   - `Lasm.KV`'s Deno and Workers backends (pending Jordan's KV review).
+
+## Host bindings: Lasm.Fastly, Lasm.WASI, then no Lasm.Fetch (Jordan, 2026-11-10)
+- [x] `Lasm.Fastly` generated from Fastly's witx (Viceroy v0.21.1): 244 of 252 functions, `EIO FastlyStatus` calls, C glue generated; the hand-written `Lasm.Fastly` deleted; `examples/fastly` and the conformance fixture (`test/fixtures/fastly-abi`, 28 checks, every import checked by Viceroy) in `wasi.yml`; [WASI_FASTLY_BINDINGS.md](docs/WASI_FASTLY_BINDINGS.md).
+- [ ] `Lasm.WASI.Http` generated from the WASI 0.2.12 WIT (canonical ABI lowering in the generator; the component template from a module importing every bound function), with an `examples/wasi-http` server and a conformance fixture under `wasmtime serve` ([plan](docs/WASI_FASTLY_BINDINGS.md#lasmwasihttp-not-yet-generated)).
+- [ ] Move the Fastly and wasi-http builds of the templates, Conduit and Folio off `Lasm.Fetch` (needs the cross-target handler question answered, [REVIEW.md](docs/REVIEW.md)).
+- [ ] Then the JavaScript-host step, and delete `Lasm.Fetch` ([IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md#3-ranked-removal-list), removal 18).
 
 ## Next (December 2026 to January 2027)
 - [x] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI. Six coverage-guided targets in `test/fuzz/` (`fuzz.yml`, [TESTING.md](docs/TESTING.md#fuzzing-at-the-boundaries)): the CLI's arguments, the function platforms' HTTP mapping and the Lasm.UI patch decoder (JavaScript, V8 block coverage), Lasm.Fetch's request parsing and Lasm.RPC's decoding (Lean compiled to C under libFuzzer), the WASI CGI host (libFuzzer, ASan, UBSan). Found and fixed: a decoder hang on a truncated frame, inherited keys accepted by `lasm init`/`package`, a `URIError` 502 on ALB queries, `://` in a path and a Host header that moved the path (Node and WASI hosts), an RPC request that hung the server with a huge exponent; #135 (closed): the example apps use `Lasm.RPC.parseJson`, which also writes zeros as `0`; the upstream JSON bugs are drafted for leanprover/lean4 in [LEAN_UPSTREAM_JSON.md](docs/proposals/LEAN_UPSTREAM_JSON.md).

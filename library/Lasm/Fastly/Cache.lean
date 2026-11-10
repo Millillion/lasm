@@ -6,7 +6,8 @@ Compute's host ABI: Viceroy v0.21.1 `wasm_abi/compute-at-edge-abi` (https://gith
 Do not edit; the mapping rules are in docs/WASI_FASTLY_BINDINGS.md.
 
 The doc comments quote the witx, licensed under the Apache License 2.0 with
-LLVM Exceptions (Apache-2.0 WITH LLVM-exception; scripts/fastly/witx/LICENSE).
+LLVM Exceptions (Apache-2.0 WITH LLVM-exception; the text is
+library/Lasm/Fastly/WITX-LICENSE.txt).
 The bindings are Lasm's code (MIT).
 -/
 
