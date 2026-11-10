@@ -114,6 +114,8 @@ async function platform(server, name, manifest) {
     const results = JSON.parse(await page.textContent('#app #results'));
     for (const r of results) expect(name, r.name, r.ok, r.detail);
     expect(name, 'platform.automatic-checks', results.length >= 40, `${results.length} checks`);
+    // Generated members of Lasm.JS.Web's browser tier this engine lacks (test/browser/platform/Bindings.lean): recorded, never a failure.
+    report.apps[name].bindingsMissing = ((await page.textContent('#app #bindings-missing').catch(() => null)) ?? '').split('\n').filter(Boolean);
     const text = selector => page.textContent(`#app ${selector}`);
     step('events');
     await page.click('#app #click-me'); await page.click('#app #click-me');

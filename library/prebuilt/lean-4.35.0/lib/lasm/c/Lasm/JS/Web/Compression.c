@@ -13,7 +13,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_AbortController_signal_spec__0(lean_object*, lean_object*);
+lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(lean_object*, lean_object*);
 lean_object* lean_string_append(lean_object*, lean_object*);
 lean_object* lean_string_utf8_byte_size(lean_object*);
 uint8_t lean_nat_dec_eq(lean_object*, lean_object*);
@@ -1266,7 +1266,7 @@ _start:
 {
 lean_object* v___x_411_; lean_object* v___x_412_; 
 v___x_411_ = ((lean_object*)(l_Lasm_JS_Web_CompressionStream_readable___closed__0));
-v___x_412_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_AbortController_signal_spec__0(v_self_409_, v___x_411_);
+v___x_412_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_self_409_, v___x_411_);
 if (lean_obj_tag(v___x_412_) == 0)
 {
 lean_object* v_a_413_; lean_object* v___x_415_; uint8_t v_isShared_416_; uint8_t v_isSharedCheck_420_; 
@@ -1364,7 +1364,7 @@ _start:
 {
 lean_object* v___x_435_; lean_object* v___x_436_; 
 v___x_435_ = ((lean_object*)(l_Lasm_JS_Web_CompressionStream_writable___closed__0));
-v___x_436_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_AbortController_signal_spec__0(v_self_433_, v___x_435_);
+v___x_436_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_self_433_, v___x_435_);
 if (lean_obj_tag(v___x_436_) == 0)
 {
 lean_object* v_a_437_; lean_object* v___x_439_; uint8_t v_isShared_440_; uint8_t v_isSharedCheck_444_; 
@@ -1881,7 +1881,7 @@ _start:
 {
 lean_object* v___x_594_; lean_object* v___x_595_; 
 v___x_594_ = ((lean_object*)(l_Lasm_JS_Web_CompressionStream_readable___closed__0));
-v___x_595_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_AbortController_signal_spec__0(v_self_592_, v___x_594_);
+v___x_595_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_self_592_, v___x_594_);
 if (lean_obj_tag(v___x_595_) == 0)
 {
 lean_object* v_a_596_; lean_object* v___x_598_; uint8_t v_isShared_599_; uint8_t v_isSharedCheck_603_; 
@@ -1979,7 +1979,7 @@ _start:
 {
 lean_object* v___x_617_; lean_object* v___x_618_; 
 v___x_617_ = ((lean_object*)(l_Lasm_JS_Web_CompressionStream_writable___closed__0));
-v___x_618_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_AbortController_signal_spec__0(v_self_615_, v___x_617_);
+v___x_618_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_self_615_, v___x_617_);
 if (lean_obj_tag(v___x_618_) == 0)
 {
 lean_object* v_a_619_; lean_object* v___x_621_; uint8_t v_isShared_622_; uint8_t v_isSharedCheck_626_; 

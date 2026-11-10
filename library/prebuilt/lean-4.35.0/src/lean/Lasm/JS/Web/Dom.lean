@@ -31,6 +31,7 @@ structure CustomEvent extends Event
 instance : Nonempty CustomEvent := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS CustomEvent := ⟨fun x => .ref x.val ""⟩
 instance : FromJS CustomEvent := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.CustomEvent", .data⟩
+instance : Coe CustomEvent Event := ⟨CustomEvent.toEvent⟩
 
 /-- `interface AbortController` (DOM Standard (https://dom.spec.whatwg.org/)): a handle to the JavaScript object. -/
 structure AbortController where
@@ -45,6 +46,7 @@ structure AbortSignal extends EventTarget
 instance : Nonempty AbortSignal := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS AbortSignal := ⟨fun x => .ref x.val ""⟩
 instance : FromJS AbortSignal := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.AbortSignal", .data⟩
+instance : Coe AbortSignal EventTarget := ⟨AbortSignal.toEventTarget⟩
 
 /-- `interface DOMException` (Web IDL Standard (https://webidl.spec.whatwg.org/)): a handle to the JavaScript object. -/
 structure DOMException where
@@ -92,6 +94,8 @@ inductive AddEventListenerOptionsOrBoolean where
 instance : ToJS AddEventListenerOptionsOrBoolean := ⟨fun
   | .addEventListenerOptions v => toJS v
   | .boolean v => toJS v⟩
+instance : Coe AddEventListenerOptions AddEventListenerOptionsOrBoolean := ⟨.addEventListenerOptions⟩
+instance : Coe Bool AddEventListenerOptionsOrBoolean := ⟨.boolean⟩
 
 /-- `dictionary EventListenerOptions` (DOM Standard (https://dom.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EventListenerOptions where
@@ -108,6 +112,8 @@ inductive EventListenerOptionsOrBoolean where
 instance : ToJS EventListenerOptionsOrBoolean := ⟨fun
   | .eventListenerOptions v => toJS v
   | .boolean v => toJS v⟩
+instance : Coe EventListenerOptions EventListenerOptionsOrBoolean := ⟨.eventListenerOptions⟩
+instance : Coe Bool EventListenerOptionsOrBoolean := ⟨.boolean⟩
 
 /-- `dictionary EventInit` (DOM Standard (https://dom.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure EventInit where

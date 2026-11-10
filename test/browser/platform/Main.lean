@@ -9,6 +9,7 @@ which reads what the handlers wrote into the page.
 import Std.Data.HashMap
 import Std.Async
 import Lasm.Web
+import Bindings
 open Lasm.JS Lasm.Web
 
 /-- One check's outcome. -/
@@ -517,6 +518,8 @@ def main : IO Unit := do
   canvasChecks checks root
   leanChecks checks
   appChecks checks
+  -- The browser tier of Lasm.JS.Web (Bindings.lean).
+  Bindings.run (fun name ok detail => record checks name ok detail) root.val
   let results ← App.port "results"
   background do
     timerChecks checks
@@ -524,6 +527,7 @@ def main : IO Unit := do
     cryptoAsync checks
     socketChecks checks
     asyncDepthChecks checks
+    Bindings.runAsync (fun name ok detail => record checks name ok detail)
     let all ← checks.get
     let pre ← createElement "pre"
     pre.setId "results"
