@@ -30,14 +30,6 @@ instance : Nonempty HttpServer := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS HttpServer := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HttpServer := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.HttpServer", .data⟩
 
-/-- `interface Deno.NetAddr` (Deno 2.9.6 type declarations, lib.deno_net.d.ts): a handle to the JavaScript object. -/
-structure NetAddr where
-  /-- The JavaScript object. -/
-  val : Value
-instance : Nonempty NetAddr := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS NetAddr := ⟨fun x => .ref x.val ""⟩
-instance : FromJS NetAddr := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.NetAddr", .data⟩
-
 /-- `enum NetAddrTransport` (Deno 2.9.6 type declarations): "tcp", "udp". -/
 inductive NetAddrTransport where
   /-- "tcp" -/
@@ -80,6 +72,21 @@ instance : FromJS TlsCertifiedKeyPemKeyFormat where
     | .string "pem" => .ok .pem
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Deno.TlsCertifiedKeyPemKeyFormat"
+
+/-- `dictionary NetAddr` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure NetAddr where
+  /-- `required NetAddrTransport transport` -/
+  transport : NetAddrTransport
+  /-- `required DOMString hostname` -/
+  hostname : String
+  /-- `required unsigned short port` -/
+  port : Nat
+instance : FromJS NetAddr where
+  fromJS d := do return {
+    transport := ← Lasm.JS.readField NetAddrTransport d "transport",
+    hostname := ← Lasm.JS.readField String d "hostname",
+    port := ← Lasm.JS.readField Nat d "port" }
+  typeName := "Lasm.JS.Deno.NetAddr"
 
 /-- `callback ServeHandler = Promise<Response> (Request request, ServeHandlerInfo info)` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ServeHandler where
@@ -193,9 +200,7 @@ instance : ToJS ServeTcpTlsOptions := ⟨fun d => Support.fields #[("signal", Su
     ("cert", toJS d.cert)]⟩
 
 /-- `remoteAddr: Addr`: `readonly attribute NetAddr remoteAddr` -/
-def ServeHandlerInfo.remoteAddr (self : ServeHandlerInfo) : IO NetAddr := do
-  let r ← self.val.get "remoteAddr" Value
-  pure { val := r }
+def ServeHandlerInfo.remoteAddr (self : ServeHandlerInfo) : IO NetAddr := self.val.get "remoteAddr" NetAddr
 
 /-- `completed: Promise<void>`: `readonly attribute Promise<undefined> completed` -/
 def ServeHandlerInfo.completed (self : ServeHandlerInfo) : Async Unit := do
@@ -208,9 +213,7 @@ def HttpServer.finished (self : HttpServer) : Async Unit := do
   p.await Unit
 
 /-- `addr: Addr`: `readonly attribute NetAddr addr` -/
-def HttpServer.addr (self : HttpServer) : IO NetAddr := do
-  let r ← self.val.get "addr" Value
-  pure { val := r }
+def HttpServer.addr (self : HttpServer) : IO NetAddr := self.val.get "addr" NetAddr
 
 /-- `ref(): void`: `undefined ref()` -/
 def HttpServer.ref (self : HttpServer) : IO Unit :=
@@ -223,15 +226,6 @@ def HttpServer.unref (self : HttpServer) : IO Unit :=
 /-- `shutdown(): Promise<void>`: `Promise<undefined> shutdown()` -/
 def HttpServer.shutdown (self : HttpServer) : Async Unit :=
   self.val.callMethodAwait "shutdown" (Support.args #[]) Unit
-
-/-- `transport: 'tcp' | 'udp'`: `readonly attribute NetAddrTransport transport` -/
-def NetAddr.transport (self : NetAddr) : IO NetAddrTransport := self.val.get "transport" NetAddrTransport
-
-/-- `hostname: string`: `readonly attribute DOMString hostname` -/
-def NetAddr.hostname (self : NetAddr) : IO String := self.val.get "hostname" String
-
-/-- `port: number`: `readonly attribute unsigned short port` -/
-def NetAddr.port (self : NetAddr) : IO Nat := self.val.get "port" Nat
 
 /-- `Deno.serve(handler: ServeHandler<Deno.NetAddr>): HttpServer<Deno.NetAddr>`: `HttpServer serve(ServeHandler handler)` (Deno 2.9.6 type declarations) -/
 def serve (handler : ServeHandler) : IO HttpServer := do
