@@ -147,6 +147,16 @@ decisions themselves are logged with their reasoning in
   - **Left out**: Unix sockets, WebSockets (Tandem's proposal), Bun's `routes`,
     `tls`, `development`, the handler-inside-options overloads; experimental
     members never (Bun's `http2`/`http3`, Deno's VSOCK).
+  - **Two Lasm.JS findings, not changed here**: Lasm.JS's functions are variadic
+    (`length` 0), and `Deno.serve` calls a zero-length handler without its
+    request, so the generated callbacks set `length` to their arity; a general
+    `Function.ofFn` arity would fix it for hand-written handlers too. And
+    `lasm build` checks `@[js "globalThis" "Deno.…"]` bindings on Node, where
+    `Deno` does not exist, so a hand-written binding of a Deno- or Bun-only global
+    fails the build (the generated ones look the global up at run time).
+  - **Bun deviates from its declaration**: `server.fetch(request)` calls the handler
+    without the `server` argument, so a generated handler rejects there
+    (`known.json`).
   - **Node**: no Lasm API; `@hono/node-server`'s `serve({fetch})` bound with
     `@[js]` in the user's program, documented in JS_BINDINGS.md and exercised in
     CI. A user-facing helper (or a template change) is yours to decide.
