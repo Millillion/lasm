@@ -278,8 +278,8 @@ def currentProcess (r : Checks) : Async Unit := do
   -- version starts with "v" and versions has an entry "node" (Bun and Deno report the Node version they implement)
   let v ← process.version
   expect r "version" (v.startsWith "v" && (← process.versions).entries.any (·.1 == "node")) v
-  -- exitCode is undefined while nothing set it
-  expect r "exitCode" ((← process.exitCode).isNone) ""
+  -- exitCode reads as undefined or an integer (Lasm's own host may have set it)
+  expect r "exitCode" (match ← process.exitCode with | none => true | some (.longLong _) => true | some _ => false) ""
   -- cwd is absolute; chdir d then cwd = realpath d; chdir back restores it
   let before ← process.cwd
   let tmp ← stringOf <$> fsPromises.realpath (.domString (← os.tmpdir))
@@ -526,7 +526,8 @@ def childProcesses (r : Checks) : Async Unit := do
   -- a non-zero exit rejects
   expect r "execFile exit 3 rejects" (← throws (child_process.execFile "sh" (some #["-c", "exit 3"]))) ""
   -- spawn: stdout through a web stream; 'close' gives the exit code; exitCode is then 3
-  let child ← child_process.spawn "sh" (some #["-c", "echo spawned; read line; echo got:$line; exit 3"])
+  -- (the child waits for the end of stdin, so writing and closing it cannot race its exit)
+  let child ← child_process.spawn "sh" (some #["-c", "echo spawned; read line; cat >/dev/null; echo got:$line; exit 3"])
   expect r "spawn pid" ((← child.pid).isSome) ""
   let some out ← child.stdout | throw (IO.userError "no stdout")
   let some input ← child.stdin | throw (IO.userError "no stdin")

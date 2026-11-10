@@ -571,8 +571,9 @@ function resultOf(idlType) {
   // URLPattern returns its groups as objects that are not plain.
   const dict = t.k === 'nullable' ? t.inner : t;
   if (dict.k === 'dict' && dictReadable(dict.name) && holdsRecord(dict)) return { async, t, lean, req: 'Value', post: `Support.cloneAs ${paren(lean)}` };
-  // A record result is read the same way: Node's process.env is not a plain object.
-  if (dict.k === 'record' && !needsPost(dict.inner)) return { async, t, lean, req: 'Value', post: `Support.cloneAs ${paren(lean)}` };
+  // A record result is read through Object.entries (Lasm.JS.Node.Support.recordOf): Node's
+  // process.env is not a plain object, and Deno's is a Proxy that structuredClone rejects.
+  if (dict.k === 'record' && !needsPost(dict.inner)) return { async, t, lean, req: 'Value', post: `Support.recordOf ${paren(retType(dict.inner))}` };
   return { async, t, lean, req: paren(reqType(t)), post: postFn(t) };
 }
 function holdsRecord(t, seen = new Set()) {

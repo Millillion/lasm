@@ -47,7 +47,7 @@ def process.argv : IO (Array String) := Support.getExport "node:process" ["argv"
 /-- `process.env` (added in Node.js v0.1.27): `readonly attribute record<DOMString, DOMString> env` (Node.js 24.22.2 documentation, process.md) -/
 def process.env : IO (Record String) := do
   let r ← Support.getExport "node:process" ["env"] Value
-  Support.cloneAs (Record String) r
+  Support.recordOf String r
 
 /-- `process.execArgv` (added in Node.js v0.7.7): `readonly attribute sequence<DOMString> execArgv` (Node.js 24.22.2 documentation, process.md) -/
 def process.execArgv : IO (Array String) := Support.getExport "node:process" ["execArgv"] (Array String)
@@ -76,7 +76,7 @@ def process.version : IO String := Support.getExport "node:process" ["version"] 
 /-- `process.versions` (added in Node.js v0.2.0): `readonly attribute record<DOMString, DOMString> versions` (Node.js 24.22.2 documentation, process.md) -/
 def process.versions : IO (Record String) := do
   let r ← Support.getExport "node:process" ["versions"] Value
-  Support.cloneAs (Record String) r
+  Support.recordOf String r
 
 /-- `process.chdir(directory)` (added in Node.js v0.1.17): `undefined chdir(DOMString directory)` (Node.js 24.22.2 documentation, process.md) -/
 def process.chdir (directory : String) : IO Unit :=

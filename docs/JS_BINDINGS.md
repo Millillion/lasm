@@ -713,7 +713,7 @@ The rest of the mapping is tier 1's (`generate-web.mjs` generates both tiers; La
 nullable optional members are collapsed). Two rules are Node's: an argument named
 like a namespace gets a `_` (`path.basename (path_ : String)`, so that `path`
 still names the namespace), and a union of a namespaced type lives in that
-namespace (`fsPromises.ReadFileOptionsOrDOMString`). Overloads that would get
+namespace (`fsPromises.ReadFileOptionsOrDOMString`). A `record` result (`process.env`) is read through `Object.entries`, one more host call: Node's `process.env` is not a plain object and Deno's is a Proxy. Overloads that would get
 one name each add all their argument names (`FileHandle.readWithOptions`,
 `FileHandle.readWithBufferOptions`).
 
