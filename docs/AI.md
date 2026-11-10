@@ -18,8 +18,8 @@ deploys Lean with Lasm. The [README](../README.md) has the complete reference;
   byte-reproducible.
 - **Lake projects** work as usual (local modules, Reservoir/Git dependencies). Pure
   modules without `Lasm.*` imports also build natively with `lake build`.
-- **`Lasm.*` libraries ship inside Lasm** (`Lasm.JS`, `Lasm.Fetch`, `Lasm.UI`,
-  `Lasm.Web`, `Lasm.RPC`, `Lasm.KV`, `Lasm.Fastly`). Never add them as Lake
+- **`Lasm.*` libraries ship inside Lasm** (`Lasm.JS` with its generated
+  `Lasm.JS.Web`, `Lasm.Fetch`, `Lasm.UI`, `Lasm.RPC`, `Lasm.KV`, `Lasm.Fastly`). Never add them as Lake
   dependencies. For the editor, run `npx lasm editor`.
 
 ## Rules

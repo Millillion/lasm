@@ -138,7 +138,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `application-module-data.yml` | dispatch | Linux | 1 min | Native module data layout controls (diagnosis) | On demand |
 | `application-runtime-source.yml` | dispatch | Linux | 6 min (max 69) | Cold reproducible build of the application runtime from source | On demand |
 | `bridge-verification.yml` | PR (paths), push main (paths), cron 17 3 * * 2-6, dispatch | Linux + called workflows | 29 min (max 109) | Host bridge: Lean model, schedule-fuzzed Lasm.JS runs, trace conformance | PR (paths), main, nightly |
-| `browser.yml` | dispatch, call, push browser-ui,dx-browser (paths) | Linux, macOS + called workflows | 32 min (max 86) | Browser target: web template, Lasm.Web, Vite plugin, Chromium/Firefox/WebKit (+ WebKit on macOS) | Release, nightly |
+| `browser.yml` | dispatch, call, push browser-ui,dx-browser (paths) | Linux, macOS + called workflows | 32 min (max 86) | Browser target: web template, the platform suite (Lasm.JS.Web.Browser), Vite plugin, Chromium/Firefox/WebKit (+ WebKit on macOS) | Release, nightly |
 | `build-profile.yml` | dispatch | Linux, macOS, Windows + called workflows | 10 min (max 35) | Per-stage build times of a candidate on five platforms | On demand |
 | `bun-deno-published.yml` | dispatch, after release, cron 17 9 * * 1-6 | Linux, macOS, Windows | 19 min (max 39) | Published @lasm/cli with Bun and Deno only, five platforms | After release, nightly |
 | `ci-nightly.yml` | cron 7 1 * * 2-6, dispatch | Linux + called workflows | — | Nightly tier: the release suites on main | Nightly |

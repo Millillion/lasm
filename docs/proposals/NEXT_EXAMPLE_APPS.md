@@ -108,8 +108,8 @@ WebSockets and stores them, and replicas merge when they reconnect.
   gives standard workloads for comparing speed and memory with Yjs and
   Automerge. Random multi-replica tests with shuffled delivery complete the
   oracle.
-- **Platforms.** The browser (`Lasm.UI`, and `Lasm.Web`'s WebSocket client,
-  which exists today), Node (a WebSocket server through an `@[js]` binding to
+- **Platforms.** The browser (`Lasm.UI`, and the WebSocket client of
+  `Lasm.JS.Web.WebSocket`), Node (a WebSocket server through an `@[js]` binding to
   the `ws` package), Bun and Deno (their built-in WebSocket servers through
   `Lasm.JS`), and Cloudflare Workers (a `WebSocketPair` held by a Durable
   Object). Replaying the editing trace is a CPU-heavy benchmark on every
