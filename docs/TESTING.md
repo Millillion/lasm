@@ -33,7 +33,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) | Lasm-compiled programs behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
 | [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic equals Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs` | PR, nightly |
-| [Standard bindings](#standard-bindings) | Lasm.JS.Web is its generator's output, and behaves as the specs say on every JavaScript target: WPT's URL and urlencoded data, Lean's UTF-8 as the encoder's oracle, published Web Crypto vectors, generated round trips | `scripts/bindings/`, `test/fixtures/js-web/`, `web-bindings.yml` | PR (paths), main |
+| [Standard bindings](#standard-bindings) | Lasm.JS.Web is its generator's output, and behaves as the specs say on every JavaScript target: WPT's URL and urlencoded data, Lean's UTF-8 as the encoder's oracle, published Web Crypto vectors, generated round trips; its browser tier against Lean models on Chromium, Firefox and WebKit | `scripts/bindings/`, `test/fixtures/js-web/`, `test/browser/platform/Bindings.lean`, `web-bindings.yml`, `browser.yml` | PR (paths), main; browser.yml on dispatch and release |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
@@ -370,6 +370,20 @@ generator's mapping is uniform, so a member is wrong only when its types are),
 behaviour beyond the checks, Firefox and WebKit (not run yet), and the Vercel,
 Netlify and Supabase edge runtimes (their APIs are those of Deno and workerd,
 which run).
+
+**The browser tier** (`Lasm.JS.Web.Browser`, 2026-11-10).
+[`test/browser/platform/Bindings.lean`](../test/browser/platform/Bindings.lean)
+runs inside the browser platform suite (`browser.yml`) on Chromium, Firefox and
+WebKit, each check reported as `bindings.<name>` and failing the engine's job.
+Each check's comment states its proposition, over generated inputs against a
+Lean model, for example `∀ op sequences, labels (p.childNodes) = model ops` (a
+list under insert, erase and set), `(Text.new s).length = utf16Length s`,
+`e.textContent := s → e.innerHTML = escapeText s`, or
+`∀ R p, isPointInPath (Path2D R) p ↔ p ∈ R`; the rest check the specs' stated
+behaviour (input value sanitization, ignored `lineWidth` and `globalAlpha`
+values, event dispatch and cancelling, a WebSocket echo). An availability probe
+records the generated members each engine lacks (`bindingsMissing` in the
+engine's report).
 
 ### Scenario matrix
 

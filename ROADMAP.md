@@ -187,6 +187,7 @@ Jordan decided the bindings ship inside `@lasm/cli`, with no optional download, 
 - [ ] Tiers 2 and 3: the full web platform, then Node core, `Deno.*`, `Bun.*` and `Lasm.JS.Cloudflare` (from Cloudflare's workers-types: KV, D1, R2, Durable Objects, env bindings), pinned per supported version. `Lasm.JS.Cloudflare` replaces the example apps' hand bindings (Porter, Ledger).
 - [ ] Then remove what `Lasm.JS.*` makes obsolete ([IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md#3-ranked-removal-list), removal 17):
   - [x] all of `Lasm.Web` (its mount glue moved into `Lasm.UI.Mount`; done 2026-11-10);
+  - [ ] Tandem moves its WebSocket client from `Lasm.Web.WebSocket` to `Lasm.JS.Web.WebSocket` when it pins the first release with the browser tier (it builds with the published `@lasm/cli` 0.5.1, which still has `Lasm.Web`; the change is the `connectSocket` table row of docs/release/next-notes.md);
   - `Lasm.Fetch`'s JavaScript-host parts (`serve`'s portable handler and Assets stay);
   - `Lasm.KV`'s Deno and Workers backends (pending Jordan's KV review).
 

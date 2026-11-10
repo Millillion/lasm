@@ -124,6 +124,9 @@ decisions themselves are logged with their reasoning in
     as returning `Promise<ScrollResult>`; browsers return `undefined`, which the
     generated `Async` accepts (checked in CI).
 - The old-to-new table is in [release/next-notes.md](release/next-notes.md).
+- Tandem still uses `Lasm.Web.WebSocket`: it pins the published `@lasm/cli`
+  0.5.1, so it migrates when it moves to the release with the browser tier
+  (ROADMAP.md).
 
 ### High-priority work to define with Jordan
 - [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,
