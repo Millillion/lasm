@@ -93,8 +93,8 @@ relocated Node deployments. Its static group covers Hello, 1,000 unreachable
 functions, polymorphic recursion, closures, arbitrary-precision arithmetic,
 hash maps, derived JSON, module initializers, tasks, exceptions and the existing
 filesystem fixture. Its separate reflection group evaluates imported Lean
-declarations at runtime with automatically bundled metadata. The existing
-`integration/managed-http.mjs` runs the unchanged 20 HTTP assertions against the
+declarations at runtime with automatically bundled metadata. The former
+`integration/managed-http.mjs` (removed 2026-11-10 with Vitest; in the git history at `590a923f`) ran the unchanged 20 HTTP assertions against the
 native and Node versions of the ordinary Lean server.
 
 Installed-package CI checks deployment size budgets on native Linux x86-64 and

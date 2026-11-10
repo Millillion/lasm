@@ -5,8 +5,8 @@ implemented in current source** (steps 2–4; candidate `.39891445495` passed fi
 user guide is [JS_BINDINGS.md](JS_BINDINGS.md). This document keeps the step 1
 measurements that chose the architecture, and the implementation notes below.
 
-- Prototype source and measurement scripts: [`experiments/js-interop/`](../experiments/js-interop/)
-  (throwaway; kept so the numbers can be reproduced).
+- Prototype source and measurement scripts: [`experiments/js-interop/`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1/experiments/js-interop)
+  (throwaway; removed 2026-11-10, in the git history at `590a923f` so the numbers can be reproduced).
 - Evidence: [js-interop-calls-2026-10-22.json](evidence/js-interop-calls-2026-10-22.json)
   (call costs, synchronous callbacks, compatibility, stack depth) and
   [js-interop-load-2026-10-22.json](evidence/js-interop-load-2026-10-22.json) (HTTP load).
@@ -196,7 +196,7 @@ costs about 1 µs in a sample (its own row "clock": 0.9–1.2 µs median).
 | Await a resolved promise as a Lean task (op 94 + completion thread, then `IO.wait`): mean / p99 | 36–45 / 96–110 µs | 34–42 / 86–111 µs | ~1× |
 | Synchronous JS→Lean callback (`Array.prototype.sort` with a Lean comparator, 93,855 comparisons) | 9.2–9.5 µs per comparison; the main thread blocks in `Atomics.wait` meanwhile | 0.16–0.23 µs per comparison (direct export call) | ~50× |
 
-Engine floor without Lean ([`micro/`](../experiments/js-interop/micro/)): a Wasm→JS
+Engine floor without Lean ([`micro/`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1/experiments/js-interop/micro)): a Wasm→JS
 import costs 8–20 ns, a JS→Wasm export 14–26 ns, a JSPI await of a resolved promise
 220 ns, and a suspending import that returns a plain value 118 ns. So B's ~1 µs per call is
 Lasm's host protocol (byte copies, dispatch, reply objects); A's ~16 µs is two thread
@@ -353,6 +353,8 @@ Implementation outline, from the prototype:
   Check the identity implications before the change.
 
 ## Reproduce
+
+From a checkout of [`590a923f`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1/experiments/js-interop), where the prototype still exists:
 
 ```sh
 export PATH="$PWD/.cache/node-26.12.1/bin:$PATH"   # Node 26.12.1

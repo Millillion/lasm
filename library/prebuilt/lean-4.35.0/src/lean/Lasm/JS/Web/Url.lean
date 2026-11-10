@@ -44,6 +44,7 @@ inductive BlobOrMediaSource where
 instance : ToJS BlobOrMediaSource := ⟨fun
   | .blob v => toJS v
   | .mediaSource v => toJS v⟩
+instance : Coe Blob BlobOrMediaSource := ⟨.blob⟩
 
 /-- `(sequence<sequence<USVString>> or record<USVString, USVString> or USVString)`: one constructor per member type. -/
 inductive SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString where
@@ -57,6 +58,9 @@ instance : ToJS SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString := �
   | .sequence v => toJS v
   | .record v => toJS v
   | .usvString v => toJS v⟩
+instance : Coe (Array (Array String)) SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString := ⟨.sequence⟩
+instance : Coe (Record String) SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString := ⟨.record⟩
+instance : Coe String SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString := ⟨.usvString⟩
 
 /-- `dictionary URLPatternInit` (URL Pattern Standard (https://urlpattern.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure URLPatternInit where
@@ -109,6 +113,8 @@ inductive URLPatternInput where
 instance : ToJS URLPatternInput := ⟨fun
   | .usvString v => toJS v
   | .urlPatternInit v => toJS v⟩
+instance : Coe String URLPatternInput := ⟨.usvString⟩
+instance : Coe URLPatternInit URLPatternInput := ⟨.urlPatternInit⟩
 instance : FromJS URLPatternInput where
   fromJS
     | d@(.string _) => (FromJS.fromJS d : Except String String).map .usvString

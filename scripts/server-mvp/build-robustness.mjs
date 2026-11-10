@@ -1,7 +1,7 @@
 // Build the Server MVP robustness fixture twice from the same ordinary Lean
 // source: with the installed Lasm candidate (default Node link driver) and as a
-// native Lean executable (full release `leanc -O2`, the same oracle recipe as
-// integration/managed-http.mjs). Runs under the maintainer resource guard.
+// native Lean executable (full release `leanc -O2`, the native oracle
+// recipe). Runs under the maintainer resource guard.
 //   node build-robustness.mjs NEW_OUTPUT INSTALLED_COMPILER [LEAN_VERSION]
 // Writes NEW_OUTPUT/application.json for scripts/server-mvp/robustness.mjs.
 import assert from 'node:assert/strict';

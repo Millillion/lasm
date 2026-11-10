@@ -160,9 +160,12 @@ const sizes = [];
 if (values.sizes) {
   const wasmBytes = dir => existsSync(dir) ? readdirSync(dir, { recursive: true }).filter(f => String(f).endsWith('.wasm'))
     .reduce((n, f) => n + statSync(join(dir, f)).size, 0) : 0;
-  for (const [target, flags, output] of [['node', [], 'dist'], ['deno', ['--target', 'deno'], 'deno']]) {
-    const sizeFixture = join(root, 'test', 'fixtures', `${values.fixture}-size`);
-    const programs = readdirSync(sizeFixture).filter(f => f.endsWith('.lean')).map(f => f.slice(0, -5)).sort((a, b) => (a !== 'Base') - (b !== 'Base') || a.localeCompare(b));
+  const sizeFixture = join(root, 'test', 'fixtures', `${values.fixture}-size`);
+  // js-web: Browser.lean imports the browser tier too (Lasm.JS.Web.Browser), built for the browser as well.
+  const sizeTargets = values.fixture === 'js-web' ? [['node', [], 'dist'], ['deno', ['--target', 'deno'], 'deno'], ['browser', ['--target', 'browser'], 'dist']]
+    : [['node', [], 'dist'], ['deno', ['--target', 'deno'], 'deno']];
+  const programs = readdirSync(sizeFixture).filter(f => f.endsWith('.lean')).map(f => f.slice(0, -5)).sort((a, b) => (a !== 'Base') - (b !== 'Base') || a.localeCompare(b));
+  for (const [target, flags, output] of sizeTargets) {
     for (const program of programs) {
       const dir = join(work, `size-${target}-${program}`);
       cpSync(sizeFixture, dir, { recursive: true });

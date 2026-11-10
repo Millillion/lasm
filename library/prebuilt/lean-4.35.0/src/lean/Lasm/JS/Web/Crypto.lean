@@ -162,6 +162,7 @@ inductive AlgorithmIdentifier where
 instance : ToJS AlgorithmIdentifier := ⟨fun
   | .object v => toJS v
   | .domString v => toJS v⟩
+instance : Coe String AlgorithmIdentifier := ⟨.domString⟩
 
 /-- `dictionary CryptoKeyPair` (Web Cryptography API Level 2 (https://w3c.github.io/webcrypto/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CryptoKeyPair where
@@ -293,6 +294,8 @@ inductive BufferSourceOrJsonWebKey where
 instance : ToJS BufferSourceOrJsonWebKey := ⟨fun
   | .bufferSource v => toJS v
   | .jsonWebKey v => toJS v⟩
+instance : Coe ByteArray BufferSourceOrJsonWebKey := ⟨.bufferSource⟩
+instance : Coe JsonWebKey BufferSourceOrJsonWebKey := ⟨.jsonWebKey⟩
 
 /-- `(ArrayBuffer or JsonWebKey)`: one constructor per member type. -/
 inductive ArrayBufferOrJsonWebKey where
@@ -580,8 +583,9 @@ def Crypto.subtle (self : Crypto) : IO SubtleCrypto := do
   pure { val := r }
 
 /-- `ArrayBufferView getRandomValues(ArrayBufferView array)` -/
-def Crypto.getRandomValues (self : Crypto) (array : ByteArray) : IO ByteArray :=
-  self.val.callMethod "getRandomValues" (Support.args #[toJS array]) ByteArray
+def Crypto.getRandomValues (self : Crypto) (array : ByteArray) : IO ByteArray := do
+  let r ← self.val.callMethod "getRandomValues" (Support.args #[toJS array]) Data
+  Support.viewBytes r
 
 /-- `DOMString randomUUID()` -/
 def Crypto.randomUUID (self : Crypto) : IO String :=

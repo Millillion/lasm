@@ -364,6 +364,8 @@ inductive HeadersInit where
 instance : ToJS HeadersInit := ⟨fun
   | .sequence v => toJS v
   | .record v => toJS v⟩
+instance : Coe (Array (Array String)) HeadersInit := ⟨.sequence⟩
+instance : Coe (Record String) HeadersInit := ⟨.record⟩
 
 /-- `typedef Request or USVString RequestInfo`: one constructor per member type. -/
 inductive RequestInfo where
@@ -374,6 +376,8 @@ inductive RequestInfo where
 instance : ToJS RequestInfo := ⟨fun
   | .request v => toJS v
   | .usvString v => toJS v⟩
+instance : Coe Request RequestInfo := ⟨.request⟩
+instance : Coe String RequestInfo := ⟨.usvString⟩
 
 /-- `typedef ReadableStream or Blob or BufferSource or FormData or URLSearchParams or USVString BodyInit`: one constructor per member type. -/
 inductive BodyInit where
@@ -396,6 +400,12 @@ instance : ToJS BodyInit := ⟨fun
   | .formData v => toJS v
   | .urlSearchParams v => toJS v
   | .usvString v => toJS v⟩
+instance : Coe ReadableStream BodyInit := ⟨.readableStream⟩
+instance : Coe Blob BodyInit := ⟨.blob⟩
+instance : Coe ByteArray BodyInit := ⟨.bufferSource⟩
+instance : Coe FormData BodyInit := ⟨.formData⟩
+instance : Coe URLSearchParams BodyInit := ⟨.urlSearchParams⟩
+instance : Coe String BodyInit := ⟨.usvString⟩
 
 /-- `dictionary RequestInit` (Fetch Standard (https://fetch.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure RequestInit where

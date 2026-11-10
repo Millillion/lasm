@@ -13,7 +13,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_AbortController_signal_spec__0(lean_object*, lean_object*);
+lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Event_type_spec__0(lean_object*, lean_object*);
 lean_object* lean_mk_empty_array_with_capacity(lean_object*);
 lean_object* lean_array_push(lean_object*, lean_object*);
@@ -190,7 +190,7 @@ lean_object* v_head_39_; lean_object* v___x_40_;
 v_head_39_ = lean_ctor_get(v_a_34_, 0);
 lean_inc(v_head_39_);
 lean_dec_ref_known(v_a_34_, 2);
-v___x_40_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_AbortController_signal_spec__0(v_o_33_, v_head_39_);
+v___x_40_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_o_33_, v_head_39_);
 return v___x_40_;
 }
 else
@@ -200,7 +200,7 @@ lean_inc(v_tail_38_);
 v_head_41_ = lean_ctor_get(v_a_34_, 0);
 lean_inc(v_head_41_);
 lean_dec_ref_known(v_a_34_, 2);
-v___x_42_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_AbortController_signal_spec__0(v_o_33_, v_head_41_);
+v___x_42_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_o_33_, v_head_41_);
 if (lean_obj_tag(v___x_42_) == 0)
 {
 lean_object* v_a_43_; 

@@ -24,24 +24,28 @@ structure MessagePort extends EventTarget
 instance : Nonempty MessagePort := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS MessagePort := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MessagePort := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.MessagePort", .data⟩
+instance : Coe MessagePort EventTarget := ⟨MessagePort.toEventTarget⟩
 
 /-- `interface MessageEvent : Event` (HTML Standard (https://html.spec.whatwg.org/multipage/)): a handle to the JavaScript object. -/
 structure MessageEvent extends Event
 instance : Nonempty MessageEvent := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS MessageEvent := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MessageEvent := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.MessageEvent", .data⟩
+instance : Coe MessageEvent Event := ⟨MessageEvent.toEvent⟩
 
 /-- `interface ErrorEvent : Event` (HTML Standard (https://html.spec.whatwg.org/multipage/)): a handle to the JavaScript object. -/
 structure ErrorEvent extends Event
 instance : Nonempty ErrorEvent := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS ErrorEvent := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ErrorEvent := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.ErrorEvent", .data⟩
+instance : Coe ErrorEvent Event := ⟨ErrorEvent.toEvent⟩
 
 /-- `interface PromiseRejectionEvent : Event` (HTML Standard (https://html.spec.whatwg.org/multipage/)): a handle to the JavaScript object. -/
 structure PromiseRejectionEvent extends Event
 instance : Nonempty PromiseRejectionEvent := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS PromiseRejectionEvent := ⟨fun x => .ref x.val ""⟩
 instance : FromJS PromiseRejectionEvent := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.PromiseRejectionEvent", .data⟩
+instance : Coe PromiseRejectionEvent Event := ⟨PromiseRejectionEvent.toEvent⟩
 
 /-- `dictionary StructuredSerializeOptions` (HTML Standard (https://html.spec.whatwg.org/multipage/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure StructuredSerializeOptions where
@@ -61,6 +65,7 @@ instance : ToJS MessageEventSource := ⟨fun
   | .windowProxy v => toJS v
   | .messagePort v => toJS v
   | .serviceWorker v => toJS v⟩
+instance : Coe MessagePort MessageEventSource := ⟨.messagePort⟩
 
 /-- `dictionary MessageEventInit : EventInit` (HTML Standard (https://html.spec.whatwg.org/multipage/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MessageEventInit where
