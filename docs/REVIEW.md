@@ -295,6 +295,7 @@ docstrings, the propositions and the names.
   - The README's command table ([README.md](../README.md)) and the usage text in [src/cli-arguments.mjs](../src/cli-arguments.mjs).
 - [ ] `npm create @lasm`, `bun create @lasm` and `deno run -A npm:@lasm/create`: [packages/create-lasm](../packages/create-lasm).
 - [ ] The Vite plugin export `@lasm/cli/vite`: [src/vite/index.d.ts](../src/vite/index.d.ts).
+- [ ] **`lasm init -t fullstack` refuses the function platforms** (issue #168). `--deploy lambda`, `lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` with `--template fullstack` used to write a broken project (a `build:undefined` script, no `vercel.json`/`netlify.toml`/`Dockerfile.lambda`, no platform dependency). Claude chose to refuse them (fewer combinations to keep working before 1.0): the message names the templates the target takes and the targets the template takes, for example "--deploy lambda supports the express, hono, fastify, std-http and fetch templates, not fullstack. The fullstack template supports --deploy workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi-http, spin". The other server templates keep every function platform. If you would rather support them, each needs its platform files, the client build in the package, README text and a CI deploy test ([src/init.mjs](../src/init.mjs), `deployTargets`).
 
 ## 3. User-facing text that changed recently
 
