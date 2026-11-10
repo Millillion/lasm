@@ -277,6 +277,7 @@ jobs:
             --targets node,bun,deno --bun "$T/bun-linux-x64/bun" --deno "$T/node_modules/.bin/deno" \
             --report "$RUNNER_TEMP/js-serve/report.json" --sizes
       - name: Serve a Lean handler with Deno.serve, Bun.serve and @hono/node-server, requested from outside
+        if: success() || failure()
         run: |
           T="$RUNNER_TEMP/tools"
           node scripts/bindings/test-serve.mjs --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-serve-e2e" \
