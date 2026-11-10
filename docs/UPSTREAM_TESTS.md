@@ -1,5 +1,9 @@
 # Testing against Lean itself
 
+> Scripts this page names that are no longer in the repository were removed on
+> 2026-11-10 as unreferenced; they are in the git history at
+> [`590a923f`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1).
+
 > **Historical (Lean 4.32.0, superseded).** This page describes the 2026-09
 > research harness on Lean 4.32.0 (`scripts/upstream-tests.mjs`, its inventories
 > and API audits). `scripts/upstream-tests.mjs` was removed on 2026-11-03 with the

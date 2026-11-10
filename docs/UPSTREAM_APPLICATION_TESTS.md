@@ -400,7 +400,7 @@ A stale-cache preflight and a release-campaign disk stop remain separately
 recorded; neither changed test results. Restoring archived bytes or reinstalling
 the recorded tarball recovers each experiment without modifying its inputs.
 
-Supplementary [ordinary Lean panic controls](../integration/fixtures/PanicSemantics.lean)
+Supplementary [ordinary Lean panic controls](https://github.com/Millillion/lasm/blob/590a923f25403040df064ad417719db130d02fa1/integration/fixtures/PanicSemantics.lean)
 exposed another difference: installed `.15` exited through a JavaScript error
 instead of native `SIGABRT`. Installed `.16` now routes C abort through the host
 CRT. All seven cases

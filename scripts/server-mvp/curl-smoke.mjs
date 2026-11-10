@@ -1,7 +1,7 @@
 // Real-client smoke for the example server: curl (routing, JSON, keep-alive,
 // chunked upload, streamed events), a raw-socket malformed request and Node
 // fetch, against the deployed Node application and its native executable.
-//   node curl-smoke.mjs MANIFEST(application.json from managed-http.mjs) ENGINE OUTPUT.json
+//   node curl-smoke.mjs MANIFEST(application.json naming the Node output and native executable) ENGINE OUTPUT.json
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -90,7 +90,7 @@ async function smoke(kind) {
 
 const results = [];
 for (const kind of ['node', 'native']) results.push(await smoke(kind));
-const report = { scope: 'Real-client smoke of examples/lean-server-latest: curl, a raw socket and Node fetch', curl: curlVersion,
+const report = { scope: 'Real-client smoke of the example server: curl, a raw socket and Node fetch', curl: curlVersion,
   node: spawnSync(engine, ['--version'], { encoding: 'utf8' }).stdout.trim(), lean: manifest.lean, build: { wasm: manifest.wasm, linkDriver: manifest.linkDriver },
   results, passed: results.every(r => r.passed), recordedAt: new Date().toISOString() };
 writeFileSync(outputFile, JSON.stringify(report, null, 2) + '\n');
