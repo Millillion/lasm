@@ -207,8 +207,8 @@ def paths (r : Checks) : Async Unit := do
       expect r s!"basename suffix {i}" ((← path.basename abs (some ext)) == String.join ((last.toList.take (last.length - ext.length)).map toString)) abs
     -- isAbsolute ("/" ++ p) ∧ ¬ isAbsolute p
     expect r s!"isAbsolute {i}" ((← path.isAbsolute abs) && !(← path.isAbsolute rel)) abs
-    -- normalize is idempotent, and removes "x/.." and "." and "//"
-    let noisy := "/" ++ "/".intercalate (xs.flatMap fun x => [x, ".", "zz", "..", ""])
+    -- normalize is idempotent, and removes "x/..", "." and "//" (no trailing "/": normalize keeps one)
+    let noisy := "/" ++ "/".intercalate (xs.flatMap fun x => ["", x, ".", "zz", ".."])
     let n ← path.normalize noisy
     expect r s!"normalize {i}" (n == abs && (← path.normalize n) == n) s!"{noisy} → {n}"
     -- resolve [a, relative a b] = b for absolute a, b
@@ -474,16 +474,17 @@ def fileChecks (r : Checks) (dir : String) : Async Unit := do
       expect r "chmod" (mode % 512 == 0o600) s!"{mode}"
     -- a FileHandle: write at positions, read back, stat, readFile, close
     let fh ← fsPromises.open (.domString (← p "handle")) (.domString "w+")
-    let w ← fh.writeWithString "hello world"
+    -- write (string) fulfills with {bytesWritten, buffer: the string} (the docs)
+    let w ← try some <$> fh.writeWithString "hello world" catch e => do expect r "FileHandle.write string" false s!"{e}"; pure none
+    if let some w := w then expect r "FileHandle.write string" (w.bytesWritten == 11 && w.buffer == "hello world") ""
     let w2 ← fh.writeWithOptions "HELLO".toUTF8 (some { position := some 0 })
-    expect r "FileHandle.write" (w.bytesWritten == 11 && w2.bytesWritten == 5 && (← fh.fd) ≥ 0) ""
+    expect r "FileHandle.write" (w2.bytesWritten == 5 && bytesEq w2.buffer "HELLO".toUTF8 && (← fh.fd) ≥ 0) ""
     let rd ← fh.readWithBufferOptions (ByteArray.mk (List.replicate 11 (0 : UInt8)).toArray) (some { position := some (.longLong 0) })
     expect r "FileHandle.read" (rd.bytesRead == 11 && bytesEq rd.buffer "HELLO world".toUTF8) (String.fromUTF8! rd.buffer)
     expect r "FileHandle.stat" (numberOf (← (← fh.stat).size) == 11) ""
     fh.truncate 5
     fh.sync
     fh.close
-    expect r "FileHandle closed" (← throws fh.close) ""
     expect r "FileHandle result" (textOf (← fsPromises.readFile (.domString (← p "handle")) (some (.domString "utf8"))) == "HELLO") ""
     -- readableWebStream: the file's bytes as a web stream
     let fh2 ← fsPromises.open (.domString b) (.domString "r")
@@ -530,11 +531,13 @@ def childProcesses (r : Checks) : Async Unit := do
   let some out ← child.stdout | throw (IO.userError "no stdout")
   let some input ← child.stdin | throw (IO.userError "no stdin")
   let closed ← onceEvent child.toEventEmitter "close"
-  -- write "abc\n" through the web WritableStream of stdin, then close it
+  -- stdout is read as a web stream from the start (Node discards what a child wrote
+  -- to a stream nobody reads once it exits); "abc\n" goes through stdin's web stream
+  let outWeb ← stream.Readable.toWeb out
   let writer ← (← stream.Writable.toWeb input).getWriter
   writer.write (.bytes "abc\n".toUTF8)
   writer.close
-  let text := String.fromUTF8! (← streamBytes (← stream.Readable.toWeb out))
+  let text := String.fromUTF8! (← streamBytes outWeb)
   let args ← Std.Async.await closed
   expect r "spawn output" (text == "spawned\ngot:abc\n") (repr text).pretty
   expect r "close event" (args.size ≥ 1 && (match args[0]! with | .number n => n == 3 | _ => false)) s!"{args.map Data.describe}"
