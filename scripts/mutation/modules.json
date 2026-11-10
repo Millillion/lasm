@@ -28,6 +28,7 @@
     {
       "name": "target-link",
       "description": "Application, edge and WASI linking (src/*link*.mjs)",
+      "keepInSandbox": ["/library"],
       "mutate": ["src/application-link.mjs", "src/edge/edge-link.mjs", "src/wasi/wasi-link.mjs"],
       "tests": ["test/application-link-glue.test.mjs", "test/application-object-store.test.mjs", "test/full-application-link-mode.test.mjs", "test/link-driver-compile.test.mjs", "test/edge.test.mjs", "test/wasi.test.mjs", "test/application-link-plan.test.mjs", "test/application-link-node.test.mjs", "test/edge-link-plan.test.mjs", "test/wasi-link-plan.test.mjs"]
     },

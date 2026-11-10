@@ -1293,7 +1293,7 @@ runtime, link and SDK collaborators through module hooks and keeps the real
 lock, cache lease, npm closure and output delivery; the initialization planner
 runs with a scripted probe (`test/application-initialization-plan.test.mjs`).
 `application-sources` keeps `library/` in its sandbox (`keepInSandbox` in
-`modules.json`) for the prebuilt-library tests, and so does `wasi-build`, whose program key hashes `library/c/lasm_fastly.c`. The generated entry point embeds
+`modules.json`) for the prebuilt-library tests, and so do `wasi-build`, whose program key hashes `library/c/lasm_fastly.c`, and `target-link`, whose WASI link-plan test reads that glue. The generated entry point embeds
 functions by their source text, which is instrumented under Stryker: its tests
 start the child with `test/helpers/stryker-child-preamble.mjs`.
 The Node host (`node-host`, `native-files`) runs in-process: the native
