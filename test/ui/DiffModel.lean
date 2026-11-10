@@ -4,9 +4,14 @@ natively (`lean --run`) and under Lasm: the model DOM after the patch must
 equal the model DOM of the new live tree, which must show the new view.
 Complements the proofs (Lasm.UI.Proofs) with checks of the executable code
 on many shapes: keyed and unkeyed children, reorders, inserts, removals,
-replacements, attribute changes.
+replacements, attribute changes. It also checks the candidates of
+library/Lasm/UI/Candidates.lean (each cited below by a `Proposition:` line,
+its body evaluated on every generated input; docs/TESTING_STRATEGY.md §4).
+The trees diffed are well formed (`WF`), as `mount_correct` and
+`diff_correct` prove of what `mountOps` and `diff` return.
 -/
 import Lasm.UI.Model
+import Lasm.UI.Url
 open Lasm.UI Lasm.UI.Model
 
 /-- A deterministic generator (xorshift). -/
@@ -131,6 +136,13 @@ def main : IO UInt32 := do
     unless ok do
       failures := failures + 1
       if failures < 5 then IO.eprintln s!"round {round}: diff mismatch\n{repr (dom1.map obs)}\nexpected\n{repr (r.live.map (obs ∘ toDom))}"
+    -- Proposition: Lasm.UI.Candidates.diff_unchanged_empty
+    --   ∀ (Msg : Type) (old : List (Live Msg)) (next : Nat), WF old next →
+    --     (diff old (old.map Live.erase) next).ops.size = 0
+    for (old, next) in [(m.live, m.next), (r.live, r.next)] do
+      unless decide ((diff old (old.map Live.erase) next).ops.size = 0) do
+        failures := failures + 1
+        IO.eprintln s!"round {round}: an unchanged view produced {(diff old (old.map Live.erase) next).ops.size} operations"
   -- keyed list operations: moves are few
   let row (k : Nat) : Html Unit := .elem .html "tr" (some (toString k)) [] [.text (toString k)]
   let rows := (List.range 1000).map row
@@ -147,5 +159,56 @@ def main : IO UInt32 := do
   let (moves, inserts) := countOps sub
   IO.println s!"reverse 1000 rows: {moves} moves, {inserts} inserts"
   unless moves ≤ 1000 && inserts == 0 do failures := failures + 1
+  -- Proposition: Lasm.UI.Candidates.keyed_reorder_only_moves
+  --   ∀ (Msg : Type) (old : List (Live Msg)) (new : List (Html Msg)) (next : Nat), WF old next →
+  --     (∀ x ∈ old, x.key?.isSome) → (old.map Live.key?).Nodup → new.Perm (old.map Live.erase) →
+  --     (diff old new next).ops.all fun op => match op with | .insert .. | .remove _ | .clear => false | _ => true
+  let keyedRounds := 1000
+  for round in [0:keyedRounds] do
+    let (views, g') := (do
+      let n ← rand 12
+      let mut vs : Array (Html Unit) := #[]
+      for i in [0:n] do
+        match ← genHtml 3 with
+        | .elem ns tag _ attrs cs => vs := vs.push (.elem ns tag (some s!"k{i}") attrs cs)
+        | .text s => vs := vs.push (.elem .html "li" (some s!"k{i}") [] [.text s])
+      -- A random permutation (Fisher–Yates).
+      let mut perm := vs
+      for j in [0:perm.size] do
+        let k := j + (← rand (perm.size - j))
+        perm := perm.swapIfInBounds j k
+      return (vs.toList, perm.toList) : R _).run g
+    g := g'
+    let (old, new) := views
+    let m := mountOps old 1
+    let r := diff m.live new m.next
+    unless r.ops.all fun op => match op with | .insert .. | .remove _ | .clear => false | _ => true do
+      failures := failures + 1
+      IO.eprintln s!"keyed round {round}: a reorder of {old.length} keyed children inserted, removed or cleared"
+  -- Proposition: Lasm.UI.Candidates.percent_round_trip
+  --   ∀ s : String, Url.percentDecode (Url.percentEncode s) = some s
+  -- Proposition: Lasm.UI.Candidates.segments_round_trip
+  --   ∀ segs : List String, (∀ s ∈ segs, s ≠ "") →
+  --     Url.segments { path := String.join (segs.map fun s => "/" ++ Url.percentEncode s) } = segs
+  let alphabet := #['a', 'Z', '0', '-', '.', '_', '~', ' ', '%', '+', '/', '?', '#', '&', '=', ':', '\\', '\x00', '\x7f',
+    'é', 'ß', '中', '😀', '\uFFFD', Char.ofNat 0x10FFFF]
+  let urlRounds := 3000
+  for round in [0:urlRounds] do
+    let (segs, g') := (do
+      let mut segs := []
+      for _ in [0:← rand 5] do
+        let mut s := ""
+        for _ in [0:(← rand 8) + 1] do s := s.push (← pick alphabet)
+        segs := s :: segs
+      return segs : R (List String)).run g
+    g := g'
+    for s in segs ++ [String.join segs] do
+      unless decide (Url.percentDecode (Url.percentEncode s) = some s) do
+        failures := failures + 1
+        IO.eprintln s!"url round {round}: {s.quote} does not round-trip: {Url.percentEncode s}"
+    unless decide (Url.segments { path := String.join (segs.map fun s => "/" ++ Url.percentEncode s) } = segs) do
+      failures := failures + 1
+      IO.eprintln s!"url round {round}: segments {segs} do not round-trip"
+  IO.println s!"{keyedRounds} keyed reorders and {urlRounds} URL round trips checked"
   IO.println s!"{rounds} random diffs checked against the DOM model, {failures} failures"
   return if failures == 0 then 0 else 1

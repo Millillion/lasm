@@ -156,6 +156,13 @@ decisions themselves are logged with their reasoning in
   - Tested ones go in `Candidates.lean`, with a `Tested by:` line.
   - JavaScript and C properties name their Lean proposition and check the code
     against a Lean model.
+  - In place since 2026-11-10: the lint (`scripts/propositions.mjs`) also
+    requires the cited statement to be the definition's, verbatim, and a
+    candidate's test to cite it. Ten candidates (Lasm.UI, Lasm.Fetch,
+    Lasm.RPC) are listed in [library/PROOFS.md](../library/PROOFS.md#candidates-not-yet-proved)
+    for your review with the proved ones. Three earlier prose candidates are
+    listed there as "not yet stated in Lean": they need a model of JavaScript,
+    the HTML parser or Lean's runtime first.
 - [ ] The exit bar for "rock solid" ([§7](TESTING_STRATEGY.md#7-exit-bar-rock-solid)): eight measurable conditions.
 - [ ] The reduction and verification path ([proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md)):
   - Lean is recommended over Rust for the rewrite.
