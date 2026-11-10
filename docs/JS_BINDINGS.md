@@ -708,6 +708,23 @@ browser tier's imports add about 7 seconds (browser 11.9 → 18.2 → 25.1 s, ed
 the modules it uses pays less. The compiled library grows by 20.1 MB (see
 [Cost](#cost)).
 
+**Where each member exists (measured).** The platform suite's availability
+probe looked up every generated member on 2026-11-10 (`browser.yml` run
+42847975929: Chromium 153, Firefox 155, WebKit 26.6 of Playwright 1.63.0). All
+interfaces and globals exist everywhere except `CSSStyleProperties` in Chromium
+(its style objects are `CSSStyleDeclaration`s; the generated functions work on
+them). `Window`'s attributes and operations are properties of the global object
+itself, not of `Window.prototype`, so the probe lists them all (they work).
+Missing in all three, because the pinned specs are ahead of the engines: the
+HTML insertion methods `appendHTML`, `prependHTML`, `beforeHTML`, `afterHTML`,
+`replaceWithHTML` and their `…Unsafe` forms, `getBoxQuads` and the
+`convert…FromNode` methods, `HTMLElement.scrollParent`, `Window.fetchLater`;
+some members are missing in one or two engines (Chromium 8, Firefox 13, WebKit
+28: for example `moveBefore`, `setHTML`, `customElementRegistry`,
+`ImageData.pixelFormat`, `WheelEvent.momentum`; the full lists are each
+engine's `bindingsMissing` in the run's `browser-results-*` artifacts). Test a
+member on the engines you target.
+
 **Tests.** [`test/browser/platform/Bindings.lean`](../test/browser/platform/Bindings.lean)
 is part of the platform suite that `browser.yml` runs on Chromium, Firefox and
 WebKit: property checks with their Lean propositions in comments, over
