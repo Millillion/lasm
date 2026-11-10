@@ -583,7 +583,7 @@ algorithm parameters) are `Data`: write the dictionary the spec's prose names
 
 ### How they are generated
 
-[`scripts/bindings/generate.mjs`](../scripts/bindings/generate.mjs)
+[`scripts/bindings/generate-web.mjs`](../scripts/bindings/generate-web.mjs)
 reads the WebIDL of the pinned `@webref/idl` (w3c/webref's curated IDL, parsed
 with `webidl2`; both development dependencies, never installed by users) for the
 list in [`scripts/bindings/web-tier1.mjs`](../scripts/bindings/web-tier1.mjs) and
@@ -659,14 +659,14 @@ structures (`fsPromises.ReadFileOptions`, `child_process.SpawnOptions`).
 Not generated, with the reason (each listed in
 [`node-tier2.mjs`](../scripts/bindings/node-tier2.mjs)):
 
-- **`node:http`, `node:net`: deferred.** A server is a request listener called
-  for each request with an `IncomingMessage` (a Node `Readable`) and a
+- **`node:http`, `node:net`: not generated.** A server is a request listener
+  called for each request with an `IncomingMessage` (a Node `Readable`) and a
   `ServerResponse` (a `Writable`) whose methods are called many times per
   request, and the docs type the listener's arguments, the events and their
-  arguments in prose. Binding them faithfully needs the Node stream classes and
-  the events typed, which this cut does not have; serving HTTP today goes through
-  `Lasm.Fetch` or an npm framework with `@[js]` bindings (Hono, Express), and a
-  web `Request`/`Response` server through Lasm.JS.Web.
+  arguments in prose. Servers on JavaScript targets are Lasm.JS.Web
+  `Request → Async Response` handlers; on Node they are served through an npm
+  adapter bound with `@[js]` (`@hono/node-server`), and outbound HTTP is
+  Lasm.JS.Web's `fetch` on every target.
 - `fsPromises.glob`, `watch` and `opendir` (async iteration, as in Lasm.JS.Web),
   `statfs`, `mkdtempDisposable` (explicit resource management); `FileHandle`'s
   `createReadStream`, `createWriteStream` (Node stream classes: use
@@ -709,7 +709,7 @@ the contents of the file", a string when an encoding is given), `mkdir` with
 correction states what Node returns against its docs: `os.uptime` is `Float`
 (Node returns fractional seconds; the docs say `{integer}`).
 
-The rest of the mapping is tier 1's, including its limits (bytes are copies,
+The rest of the mapping is tier 1's (`generate-web.mjs` generates both tiers; Lasm.JS.Web's output is unchanged), including its limits (bytes are copies,
 nullable optional members are collapsed). Two rules are Node's: an argument named
 like a namespace gets a `_` (`path.basename (path_ : String)`, so that `path`
 still names the namespace), and a union of a namespaced type lives in that
@@ -747,7 +747,7 @@ that differ in the Node 26.13.0 docs. On 2026-11-10 those are: `buffer.isLatin1`
 comparison or the generated modules differ from what the pinned docs give. To
 move to newer docs: change `version` (and `compareVersion`) in `node-tier2.mjs`,
 run `node scripts/bindings/node-api.mjs --update-lock`, then
-`node scripts/bindings/generate.mjs`, regenerate `library/prebuilt`
+`node scripts/bindings/generate-web.mjs`, regenerate `library/prebuilt`
 (`library-prebuilt.yml`) and review the diff of `node.idl`.
 
 **Tests.** [`test/fixtures/js-node`](../test/fixtures/js-node) is one program of

@@ -218,7 +218,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `upstream-native-build-time.yml` | dispatch | Linux | 2 min (max 20) | Upstream native build-time checks | On demand |
 | `wasi.yml` | dispatch, call | Linux + called workflows | 13 min (max 74) | WASI, wasi-http, Fastly on wasmtime, wasmer, node:wasi, Spin, Viceroy | Release, nightly |
 | `wasmtime-helper-probe.yml` | dispatch | Linux | 0 min (max 1) | Scalar atomic adapter and Wasm synchronization probe | On demand |
-| `web-bindings.yml` | PR (paths), push main (paths), dispatch | Linux | new | Lasm.JS.Web: the generated bindings are the generator's output; the conformance program on Node 26 and 24, Bun, Deno, Workers (workerd) and Chromium | PR (paths), main |
+| `web-bindings.yml` | PR (paths), push main (paths), dispatch | Linux | new | Lasm.JS.Web and Lasm.JS.Node: node.idl is the pinned Node docs' lowering and the generated bindings are the generator's output; the Lasm.JS.Web conformance program on Node 26 and 24, Bun, Deno, Workers (workerd) and Chromium, and the Lasm.JS.Node one on Node 26 and 24, Bun and Deno | PR (paths), main |
 | `windows-guard-controls.yml` | dispatch | Windows | 2 min | Windows resource guard controls | On demand |
 | `windows-lean-path-controls.yml` | dispatch | Windows | 3 min | Windows Lean long-path controls | On demand |
 | `windows-timezone-host.yml` | dispatch | Windows | 5 min | Windows timezone host comparisons | On demand |

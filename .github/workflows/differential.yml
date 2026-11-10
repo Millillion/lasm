@@ -1,6 +1,6 @@
 name: Differential testing
 # Black-box differential testing of the compiler (docs/TESTING.md#differential-testing):
-# random well-typed Lean programs (scripts/differential/generate.mjs) built with
+# random well-typed Lean programs (scripts/differential/generate-web.mjs) built with
 # upstream Lean 4.35.0 natively (the oracle) and with a candidate packed from
 # this commit and installed with npm, as a user installs @lasm/cli, for node,
 # wasi (wasmtime and node:wasi) and the edge runtime (--target deno, run by

@@ -59,7 +59,7 @@ files, except on WASI); the rest of Lean works.
 | Output | `dist/` with `program.wasm` + a JS launcher (Node); or a platform package (`--target …`) |
 | Node apps run on | Node ≥ 24, Linux x64/arm64 (glibc 2.28+ or musl) from any build machine, plus the build machine's own OS; ≥ 512 MB memory |
 | JS/npm interop | `import Lasm.JS`; one `@[js "pkg" "export"]` line per function you call; no premade bindings ([guide](docs/JS_BINDINGS.md)) |
-| Frameworks in Lean | `Lasm.Fetch` (HTTP, every server target), `Lasm.UI` (browser, Elm architecture, proved diff), `Lasm.RPC` (typed client/server API), `Lasm.Web` (DOM and web APIs), `Lasm.KV`; `Lasm.JS.Web` (the standard web APIs of every JavaScript target, generated from WebIDL) |
+| Frameworks in Lean | `Lasm.Fetch` (HTTP, every server target), `Lasm.UI` (browser, Elm architecture, proved diff), `Lasm.RPC` (typed client/server API), `Lasm.Web` (DOM and web APIs), `Lasm.KV`; `Lasm.JS.Web` (the standard web APIs of every JavaScript target, generated from WebIDL), `Lasm.JS.Node` (Node's fs, path, os, process, crypto, child_process, generated from Node's docs) |
 | Not available at run time | elaboration, `#eval`-style evaluation, loading `.olean`, Lean's kernel ([exact list](#lean-support-and-restrictions)); all of these work at build time |
 | License | MIT (Lasm); templates, examples and README code samples also MIT-0 |
 | Repository / issues | https://github.com/Millillion/lasm · [report a bug](https://github.com/Millillion/lasm/issues/new?template=bug.yml) (include `npx lasm --version`) |
@@ -316,7 +316,11 @@ The standard web APIs need no bindings: `import Lasm.JS.Web` gives `fetch`,
 `Request`, `Response`, `URL`, `crypto.subtle`, streams, `TextEncoder` and the rest
 of the WinterTC Minimum Common API with their standard names, generated from the
 specs' WebIDL, on Node, Bun, Deno, the edge platforms and browsers
-([Standard bindings](docs/JS_BINDINGS.md#standard-bindings-lasmjsweb)).
+([Standard bindings](docs/JS_BINDINGS.md#standard-bindings-lasmjsweb)). Node's
+own modules are `import Lasm.JS.Node`: `fsPromises.readFile`, `path.join`,
+`os.tmpdir`, `process.argv`, `crypto.scrypt`, `child_process.spawn` and more, as
+Node 24's docs define them, on Node and where Bun and Deno implement them
+([Lasm.JS.Node](docs/JS_BINDINGS.md#standard-bindings-for-node-lasmjsnode)).
 
 Full guide, with Express, Hono, `pg`, `jose` and `fetch` examples and an agent
 checklist: [docs/JS_BINDINGS.md](docs/JS_BINDINGS.md).
@@ -367,7 +371,7 @@ is slower than native Lean (no GMP).
   stack), but about 10,000 on the edge targets, in the browser and on WASI hosts'
   default stacks. Make deep recursion tail recursive
   ([limits per target](FUNDAMENTAL_LIMITATIONS.md#recursion-depth)).
-- **No premade bindings** for npm packages; `Lasm.JS.Web` covers the web APIs every JavaScript target has (the WinterTC Minimum Common API) and `Lasm.Web` the browser's DOM.
+- **No premade bindings** for npm packages; `Lasm.JS.Web` covers the web APIs every JavaScript target has (the WinterTC Minimum Common API), `Lasm.JS.Node` Node's server-essential modules (servers through an npm adapter) and `Lasm.Web` the browser's DOM.
 - **Editor:** `Lasm.*` imports resolve in the editor after `npx lasm editor` (above).
 - **Platforms:** no Windows ARM64 and no Alpine/musl build machines (built apps run
   on Alpine). Hosted platforms are tested with their local tools, never with a real

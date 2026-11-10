@@ -1,5 +1,5 @@
 {
-  "generatedBy": "scripts/bindings/generate.mjs (Node.js 24.22.2 docs)",
+  "generatedBy": "scripts/bindings/generate-web.mjs (Node.js 24.22.2 docs)",
   "surface": [
     {
       "lean": "events",

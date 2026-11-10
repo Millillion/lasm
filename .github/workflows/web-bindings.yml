@@ -3,7 +3,7 @@ name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node)
 # Lasm.JS.Node, Node's server-essential modules generated from Node's API docs
 # (docs/JS_BINDINGS.md, "Standard bindings" and "Lasm.JS.Node"; docs/TESTING.md):
 #   - generated: the committed library/Lasm/JS/{Web,Node}/*.lean are the output of
-#     scripts/bindings/generate.mjs for the pinned @webref/idl and the pinned
+#     scripts/bindings/generate-web.mjs for the pinned @webref/idl and the pinned
 #     Node.js docs (scripts/bindings/node.idl is node-api.mjs's lowering of
 #     them, their SHA-256 hashes pinned), and the WPT data of the conformance
 #     program is the pinned commit's;
@@ -76,7 +76,7 @@ jobs:
       - name: node.idl is the lowering of the pinned Node.js docs (hashes checked)
         run: node scripts/bindings/node-api.mjs --check
       - name: The generated bindings are the generator's output
-        run: node scripts/bindings/generate.mjs --check
+        run: node scripts/bindings/generate-web.mjs --check
       - name: The WPT data is the pinned commit's
         run: node scripts/bindings/wpt-data.mjs --check
       - run: node --test test/web-bindings.test.mjs

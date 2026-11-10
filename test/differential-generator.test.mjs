@@ -1,10 +1,10 @@
-// The differential tester's generator (scripts/differential/generate.mjs): seeded,
+// The differential tester's generator (scripts/differential/generate-web.mjs): seeded,
 // reproducible, cases independent of each other, shrinking strictly smaller.
 // Whether generated programs compile and agree is checked by the campaign itself
 // (differential.yml), which builds them with native Lean.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { genProgram, renderProgram, genCase, renderCase, caseSize, shrinkCandidates, leanString, rng, withoutSleep, withDeepAtMost } from '../scripts/differential/generate.mjs';
+import { genProgram, renderProgram, genCase, renderCase, caseSize, shrinkCandidates, leanString, rng, withoutSleep, withDeepAtMost } from '../scripts/differential/generate-web.mjs';
 
 test('the same seed renders the same program; another seed a different one', () => {
   const a = renderProgram(genProgram(7, { cases: 40 })), b = renderProgram(genProgram(7, { cases: 40 }));

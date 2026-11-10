@@ -4,7 +4,7 @@
 // published at https://nodejs.org/dist/v<version>/docs/api/; MIT, the Node.js
 // license), pinned below with SHA-256 hashes in node-api.lock.json.
 // scripts/bindings/node-api.mjs lowers the members selected here to WebIDL
-// (scripts/bindings/node.idl), which scripts/bindings/generate.mjs turns into
+// (scripts/bindings/node.idl), which scripts/bindings/generate-web.mjs turns into
 // library/Lasm/JS/Node/*.lean with the same mapping rules as Lasm.JS.Web
 // (docs/JS_BINDINGS.md, "Lasm.JS.Node"). DECISIONS.md says why these docs and not
 // @types/node.

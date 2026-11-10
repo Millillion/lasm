@@ -1,6 +1,6 @@
 /-
 Lasm.JS.Node.Support: the definitions the generated Node bindings
-(library/Lasm/JS/Node/*.lean, scripts/bindings/generate.mjs) need beyond
+(library/Lasm/JS/Node/*.lean, scripts/bindings/generate-web.mjs) need beyond
 Lasm.JS.Web.Support: properties of Node modules, functions that take a final
 `(err, value)` callback, and Buffer methods called on bytes. Hand-written; the
 mapping is in docs/JS_BINDINGS.md ("Lasm.JS.Node").
