@@ -1137,9 +1137,10 @@ def ImageData.new (sw : Nat) (sh : Nat) (settings : Option ImageDataSettings := 
     (Support.args #[toJS sw, toJS sh, Support.optional settings]) (await := false)
 
 /-- `constructor(ImageDataArray data, unsigned long sw, optional unsigned long sh, optional ImageDataSettings settings)` -/
-def ImageData.newWithData (data : ByteArray) (sw : Nat) (sh : Option Nat := none) (settings : Option ImageDataSettings := none) : IO ImageData :=
+def ImageData.newWithData (data : ByteArray) (sw : Nat) (sh : Option Nat := none) (settings : Option ImageDataSettings := none) : IO ImageData := do
+  let dataView ← Support.typedArray "Uint8ClampedArray" data
   Lasm.JS.Binding.invoke ImageData { name := "Lasm.JS.Web.ImageData.newWithData", module := "globalThis", path := "ImageData", construct := true, arity := 4 }
-    (Support.args #[toJS data, toJS sw, Support.optional sh, Support.optional settings]) (await := false)
+    (Support.args #[.ref dataView "", toJS sw, Support.optional sh, Support.optional settings]) (await := false)
 
 /-- `readonly attribute unsigned long width` -/
 def ImageData.width (self : ImageData) : IO Nat := self.val.get "width" Nat
