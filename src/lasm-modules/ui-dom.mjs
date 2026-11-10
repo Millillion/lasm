@@ -8,7 +8,9 @@
 // Each mounted app gets its own instance (lasmInstance); ports and app.send
 // go through lasm:app. Web-standard JavaScript only.
 const NS = [, 'http://www.w3.org/1999/xhtml', 'http://www.w3.org/2000/svg', 'http://www.w3.org/1998/Math/MathML'];
-const decoder = new TextDecoder('utf-8', { ignoreBOM: true }); // keeps a text's leading U+FEFF
+// fatal: text that is not UTF-8 is refused, as Lean's reference decoder
+// (library/Lasm/UI/Proofs/Decode.lean) refuses it; ignoreBOM keeps a leading U+FEFF.
+const decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
 
 export function createUi({ root, flags = null, hydrate = false, window: win = root.ownerDocument.defaultView ?? globalThis } = {}) {
   const doc = root.ownerDocument;
@@ -28,6 +30,10 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   // A frame that ends inside a value is a clean error: reading past the end
   // looped forever (a varint of `undefined` bytes never ends; test/fuzz).
   const truncated = () => { throw new Error(`Lasm.UI: truncated patch at byte ${p}`); };
+  // The reading agrees with Lean's reference decoder (Decode.lean) on every
+  // frame: the ui-decode fuzz target checks it. A number above 2^53 (no frame
+  // has one: ids and table indexes count nodes and names) is refused rather
+  // than rounded, and padding zeros (0x80 …) read as Lean reads them.
   function v() {
     if (p >= bytes.length) truncated();
     let x = bytes[p++];
@@ -35,10 +41,16 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     x &= 127;
     for (let shift = 128; ; shift *= 128) {
       if (p >= bytes.length) truncated();
-      const b = bytes[p++];
-      x += (b & 127) * shift;
+      const b = bytes[p++], digit = b & 127;
+      if (digit) {
+        if (shift > 2 ** 49 || (shift === 2 ** 49 && digit > 15)) throw new Error(`Lasm.UI: number too large at byte ${p - 1}`);
+        x += digit * shift;
+      }
       if (b < 128) return x;
     }
+  }
+  function utf8(start, end) {
+    try { return decoder.decode(bytes.subarray(start, end)); } catch { throw new Error(`Lasm.UI: text that is not UTF-8 at byte ${start}`); }
   }
   function str() {
     const n = v(), end = p + n;
@@ -47,13 +59,13 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
       let s = '';
       for (let i = p; i < end; i++) {
         const c = bytes[i];
-        if (c > 127) { s = decoder.decode(bytes.subarray(p, end)); break; }
+        if (c > 127) { s = utf8(p, end); break; }
         s += String.fromCharCode(c);
       }
       p = end;
       return s;
     }
-    const s = decoder.decode(bytes.subarray(p, end));
+    const s = utf8(p, end);
     p = end;
     return s;
   }
@@ -79,7 +91,11 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     case 2: { const a = name(); if (n[a] !== false) n[a] = false; return; }
     case 3: { const a = name(); if (n[a] !== true) n[a] = true; return; }
     case 4: { const a = name(); n.style.setProperty(a, value()); return; }
-    case 5: { const e = name(); (n.$l ??= Object.create(null))[e] = v(); listen(e); return; }
+    case 5: {
+      const e = name(), d = v();
+      if (decoders[d] === undefined) throw new Error(`Lasm.UI: no decoder ${d}`);
+      (n.$l ??= Object.create(null))[e] = d; listen(e); return;
+    }
     case 8: n.removeAttribute(name()); return;
     case 9: { const a = name(), t = typeof n[a]; n[a] = t === 'boolean' ? false : t === 'number' ? 0 : ''; return; }
     case 10: n.style.removeProperty(name()); return;
@@ -390,6 +406,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     // For tests and tools.
     stats: () => (sweep(), { nodes: nodes.size - 1, names: names.length, decoders: decoders.length, last: { ...last } }),
     applyForTest: apply,
+    decodersForTest: () => decoders,
   };
 }
 
