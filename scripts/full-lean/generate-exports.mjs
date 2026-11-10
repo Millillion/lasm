@@ -4,12 +4,14 @@ import { writeFileSync, readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { gunzipSync } from 'node:zlib';
-import { root, resolveLean } from '../../src/toolchain.mjs';
+import { fileURLToPath } from 'node:url';
 import { runtimeAbiArchives, isRuntimeExport, definedAbiSymbols } from './runtime-abi.mjs';
 
 import { ensureResourceGuard } from './resource-guard.mjs';
 
 await ensureResourceGuard();
+
+const root = fileURLToPath(new URL('../..', import.meta.url));
 
 const build = resolve(process.argv[2] ?? '.work/lean-full/wasm');
 const output = resolve(process.argv[3] ?? join(build, 'lasm-wasm-exports.json'));
@@ -19,7 +21,8 @@ const applicationHook = option('--application-hook');
 if (applicationHook && !/^[A-Za-z_][A-Za-z0-9_]*$/.test(applicationHook)) throw new Error('Invalid application registry hook');
 const sdk = resolve(process.env.LASM_EMSDK ?? join(root, '.cache/emsdk-6.0.9'));
 const nm = process.env.LASM_LLVM_NM ?? join(sdk, 'upstream/bin/llvm-nm');
-const nativeLean = option('--native-lean') ?? resolveLean(root).lean;
+const nativeLean = option('--native-lean');
+if (!nativeLean) throw new Error('--native-lean is required');
 const stems = JSON.parse(execFileSync(nativeLean, ['-j2', '-s8192', join(root, 'scripts/full-lean/ExternSymbols.lean')],
   { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 }));
 const linked = new Set(['libInit.a', 'libStd.a', 'libLean.a', 'libleancpp.a', 'libleanrt.a',

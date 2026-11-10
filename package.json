@@ -23,7 +23,7 @@
     "setup": "node scripts/bootstrap.mjs",
     "probe": "node experiments/feasibility/run.mjs",
     "probe:runtime": "node experiments/feasibility/runtime-compile.mjs",
-    "test:platform": "node --test test/platform.test.mjs test/portable.test.mjs test/toolchain.test.mjs",
+    "test:platform": "node --test test/platform.test.mjs test/portable.test.mjs",
     "test": "node scripts/test/node-test.mjs --test-concurrency=1 test/*.test.mjs",
     "build:lean-server": "node bin/lasm.mjs build examples/lean-server/Main.lean examples/lean-server/dist",
     "start:lean-server": "node lasm-node.js examples/lean-server/Main.lean"
