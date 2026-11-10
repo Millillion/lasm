@@ -259,9 +259,13 @@ function diverging(ids, nat, tgt, target) {
   // Lean printed before the first case.
   if (target === 'interp') {
     const all = nat.stderr.split('\n'), first = all.findIndex(l => l.startsWith('@')), early = first < 0 ? [] : all.slice(0, first);
-    const lines = t => { const ls = t.split('\n'); for (const e of early) { const i = ls.indexOf(e); if (i >= 0) ls.splice(i, 1); } return ls.sort().join('\n'); };
+    // Native without its early lines; the interpreter may print each of them
+    // once more than that (on first use) or not at all (never reached).
+    const n = all.slice(early.length), t = tgt.stderr.split('\n');
+    const count = (xs, x) => xs.filter(y => y === x).length;
+    for (const e of early) { if (count(t, e) > count(n, e)) t.splice(t.indexOf(e), 1); }
     const bad = ids.filter(id => a.get(id) !== b.get(id));
-    const stderr = lines(nat.stderr) !== lines(tgt.stderr);
+    const stderr = n.sort().join('\n') !== t.sort().join('\n');
     return { bad, stderr, code: nat.code !== tgt.code, any: bad.length > 0 || stderr || nat.code !== tgt.code };
   }
   const bad = ids.filter(id => a.get(id) !== b.get(id) || ae.get(id) !== be.get(id));
