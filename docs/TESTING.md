@@ -1204,7 +1204,7 @@ Measured by `unit.yml` run [41234188450](https://github.com/Millillion/lasm/acti
 The host bridge is well covered (`src/node-js.mjs` 91.5 %, `src/node-host.mjs`
 95.0 %); `src/dev.mjs` (`lasm dev`) is at 43 %. The 0 % files fall in two
 groups. Some run only inside built outputs (`src/edge/edge-pre.js`,
-`src/browser/loader.mjs`, `src/wasmtime-runtime.mjs`, `src/serverless/lasm-*.mjs`):
+`src/browser/loader.mjs`, `src/serverless/lasm-*.mjs`):
 they are copied into `dist/` and executed there by the integration workflows, and
 this measurement only counts files at their `src/` path. The others are simply
 not unit-tested (`src/vite/index.mjs`, `src/application-binding-check.mjs`,
@@ -1279,23 +1279,20 @@ kill survivors (CI's measurement on Node 26 is the recorded floor).
 | `dev` | `dev.mjs`, `dev-proxy.mjs`, `dev-build-worker.mjs`, `application-build-worker.mjs`, `browser/browser-dev.mjs`, `browser/static-server.mjs` | 29.2 % | **91 %** | 91 % |
 | `browser` | `browser/browser-build.mjs`, `browser/browser-package.mjs`, `browser/bundle.mjs`, `browser/loader.mjs`, `lasm-modules/app.mjs`, `lasm-modules/web.mjs` (removed with `Lasm.Web`, 2026-11-10), `vite/index.mjs` | 26.1 % | **96.6 %** | 96 % |
 | `application-sources` | `application-sources.mjs`, `application-initialization.mjs`, `application-diagnosis.mjs`, `application-binding-check.mjs`, `application-reachability.mjs`, `application-symbols.mjs`, `application-live-members.mjs`, `application-policy.mjs`, `wasm-objects.mjs`, `lasm-library.mjs` | 44.5 % | **85.4 %** | 85 % |
-| `application-output` | `application-build.mjs`, `application-output.mjs`, `application-native.mjs`, `application-npm.mjs`, `application-runtime.mjs`, `application-support.mjs`, `application-lock.mjs`, `application-metadata.mjs`, `application-metadata-runtime.mjs`, `native-bundle.mjs`, `package.mjs`, `js-runtime.mjs` | 51.1 % | **92.5 %** | 92 % |
+| `application-output` | `application-build.mjs`, `application-output.mjs`, `application-native.mjs`, `application-npm.mjs`, `application-runtime.mjs`, `application-support.mjs`, `application-lock.mjs`, `native-bundle.mjs`, `package.mjs`, `js-runtime.mjs` | 51.1 % | **92.5 %** | 92 % |
 | `edge-build` | `edge/edge-build.mjs`, `edge/builtin-modules.mjs`, `edge/edge-initializers.mjs`, `edge/edge-pre.js` | 31.5 % | **89.4 %** | 89 % |
 | `wasi-build` | `wasi/wasi-build.mjs`, `wasi/wasi-component.mjs`, `wasi/lower-atomics.mjs` | 45.8 % | **95.6 %** | 95 % |
-| `wasmtime` | `wasmtime-runtime.mjs`, `wasmtime-standalone.mjs`, `wasmtime-worker.mjs`, `wasmtime-artifact.mjs`, `wasmtime-bundle.mjs`, `wasmtime-console.mjs`, `wasmtime-file-host.mjs`, `wasmtime-file-imports.mjs`, `wasmtime-guest-memory.mjs`, `wasmtime-module-data.mjs`, `wasmtime-native-stdio.mjs`, `wasmtime-process-host.mjs`, `wasmtime-wasi-stdio.mjs` | 32.4 % | **88 %** | 88 % |
 | `node-host` | `node-host.mjs`, `node-network.mjs`, `node-process.mjs`, `node-signal.mjs`, `node-system.mjs`, `node-udp.mjs`, `node-fetch.mjs`, `lean-io-errors.mjs`, `handle-table.mjs`, `process-exec.mjs`, `working-directory.mjs`, `linux-memory.mjs`, `thread-id.cjs`, `native-clock.mjs`, `native-dns.mjs`, `native-interfaces.mjs`, `native-windows-timezone.mjs`, `native-tcp.mjs` | 42 % | **86.2 %** | 86 % |
-| `native-files` | `native-files.mjs`, `native-file-message.mjs`, `native-file-worker.mjs`, `native-file-worker-pool.mjs`, `native-worker-cwd.cjs`, `worker-stdio.cjs`, `native-process.mjs`, `native-signals.mjs`, `native-program.mjs`, `native-abort.cjs`, `native-pthread-factory.cjs` | 29.4 % | **86.4 %** | 86 % |
+| `native-files` | `native-files.mjs`, `native-file-message.mjs`, `native-file-worker.mjs`, `native-file-worker-pool.mjs`, `native-worker-cwd.cjs`, `worker-stdio.cjs`, `native-process.mjs`, `native-signals.mjs`, `native-program.mjs`, `native-abort.cjs` | 29.4 % | **86.4 %** | 86 % |
 | `serverless` | `serverless/lasm-server.mjs`, `serverless/lasm-lambda.mjs`, `serverless/lasm-vercel.mjs`, `serverless/lasm-netlify.mjs`, `serverless/lasm-azure.mjs`, `serverless/lasm-gcf.mjs`, `serverless/zip.mjs` | 40.5 % | **88.5 %** | 88 % |
 
-`edge-build`, `wasi-build` and `wasmtime` were measured 2026-11-09 (run 42581537537; initial scores in runs
+`edge-build` and `wasi-build` were measured 2026-11-09 (run 42581537537; initial scores in runs
 42571769129 and, for `edge-build` without `edge-library.js`, 42579064935). `src/edge/edge-library.js` is not
 mutated: its Emscripten preprocessor lines (`#if JSPI || ASYNCIFY`) are not JavaScript Stryker can parse. The
 code that only runs inside built outputs is run in-process: `edge-pre.js` in a script scope with stand-in
 module globals (`test/edge-pre.test.mjs`); the generated edge entries as their platforms run them, with
-`cloudflare:workers`, `.wasm` modules, `Deno`, `Bun` and `Netlify` stood in (`test/edge-entries.test.mjs`);
-and the Wasmtime runner and supervisor over a stand-in FFI and per-module `node:worker_threads`
-(`test/fixtures/wasmtime-stand-ins/`: a Lean instance with memory, exports, callbacks and thread entry
-points). The atomics lowering is checked by properties: random atomic programs run in V8 before and after
+`cloudflare:workers`, `.wasm` modules, `Deno`, `Bun` and `Netlify` stood in (`test/edge-entries.test.mjs`).
+The atomics lowering is checked by properties: random atomic programs run in V8 before and after
 lowering, binaryen-made modules of every other instruction kind stay valid without the threads feature (binaryen is no
 longer a dependency: the modules it made are recorded in `test/fixtures/lower-atomics-modules.json`, and
 without it V8 validates the output), and
