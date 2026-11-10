@@ -171,9 +171,9 @@ decisions themselves are logged with their reasoning in
 - [ ] **The #90 limit is fixed without an API change** (PR #175, above): long
   loops of steps that complete at once no longer overflow the JavaScript stack
   on Bun, Deno, workerd or browsers.
-- [ ] **0.6.0's breaking change:** `Lasm.JS.Wire.encode` returns `Except String ByteArray`
+- [ ] **0.6.1's breaking change** (from the unpublished 0.6.0): `Lasm.JS.Wire.encode` returns `Except String ByteArray`
   instead of `ByteArray`, so a length that does not fit 32 bits fails instead
-  of being misread (#154; [0.6.0-notes.md](release/0.6.0-notes.md)).
+  of being misread (#154; [0.6.1-notes.md](release/0.6.1-notes.md)).
 
 ### Process
 - [ ] **The browser dev-rebuild budget is 2.5 s, was 2 s (2026-11-09).** It
