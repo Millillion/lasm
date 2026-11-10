@@ -5,7 +5,7 @@ Status: **7.1 (prototype and decision), 7.2 (Cloudflare Workers), packaging,
 2026-10-24.** Every edge target here is supported from 0.2.0. The Node build is unchanged.
 Measured behaviour is marked as measured. Plans are marked as plans.
 
-- Prototype: [`experiments/edge/`](../experiments/edge/).
+- Prototype: [`experiments/edge/`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1/experiments/edge) (removed 2026-11-10; in the git history at `590a923f`).
 - Edge runtime build: `--profile edge` in
   [`build-application-runtime.mjs`](../scripts/full-lean/build-application-runtime.mjs),
   with the patch
@@ -239,7 +239,7 @@ entry: see [BUN_DENO.md](BUN_DENO.md).
 ### Engine features (measured)
 
 These were measured by instantiating tiny Wasm modules, with a real JSPI
-suspension ([`experiments/edge/feature-probe`](../experiments/edge/feature-probe/)).
+suspension ([`experiments/edge/feature-probe`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1/experiments/edge/feature-probe)).
 The results are in the evidence file.
 
 | Runtime | JSPI (`Suspending`/`promising`) | memory64 | Legacy EH | exnref | Threads |
@@ -773,6 +773,9 @@ host calls is still faster: each host call costs microseconds.
    - The edge-profile restrictions in README's Lean support section.
 
 ## Reproduce
+
+The prototype scripts below were removed on 2026-11-10; run them from a checkout of
+[`590a923f`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1/experiments/edge).
 
 ```sh
 # 1. Build a Lean program with the Node pipeline, keeping the link inputs.

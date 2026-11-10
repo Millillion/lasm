@@ -5,7 +5,6 @@ node_modules/
 dist/
 .lake/
 *.log
-.vitest/
 
 # Data from running the Lean server example at the repository root.
 /data/
