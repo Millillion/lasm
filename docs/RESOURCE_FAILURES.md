@@ -1,5 +1,9 @@
 # Desktop shutdown diagnosis, 2026-09-19
 
+> Scripts this page names that are no longer in the repository were removed on
+> 2026-11-10 as unreferenced; they are in the git history at
+> [`590a923f`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1).
+
 The shutdowns had two experimentally observed causes. Both involved the local
 Lasm workload; the first resource-protection attempt also caused a shutdown.
 Subsequent investigations and guarded workload results are recorded below.

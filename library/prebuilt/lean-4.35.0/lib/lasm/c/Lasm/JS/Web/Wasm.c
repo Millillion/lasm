@@ -54,7 +54,7 @@ size_t lean_usize_add(size_t, size_t);
 lean_object* l_Id_instMonad___lam__1___boxed(lean_object*, lean_object*, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Web_Support_args(lean_object*);
 lean_object* l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__1(lean_object*, lean_object*, lean_object*);
-lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_AbortController_signal_spec__0(lean_object*, lean_object*);
+lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Web_Support_arrayBufferBytes(lean_object*);
 extern lean_object* l_Lasm_JS_instFromJSString;
 lean_object* l_Lasm_JS_readField___redArg(lean_object*, lean_object*, lean_object*);
@@ -7980,7 +7980,7 @@ _start:
 {
 lean_object* v___x_2526_; lean_object* v___x_2527_; 
 v___x_2526_ = ((lean_object*)(l_Lasm_JS_Web_WebAssembly_Memory_buffer___closed__0));
-v___x_2527_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_AbortController_signal_spec__0(v_self_2524_, v___x_2526_);
+v___x_2527_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_self_2524_, v___x_2526_);
 if (lean_obj_tag(v___x_2527_) == 0)
 {
 lean_object* v_a_2528_; lean_object* v___x_2529_; 
@@ -11779,7 +11779,7 @@ lean_object* v_head_3883_; lean_object* v___x_3884_;
 v_head_3883_ = lean_ctor_get(v_a_3878_, 0);
 lean_inc(v_head_3883_);
 lean_dec_ref_known(v_a_3878_, 2);
-v___x_3884_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_AbortController_signal_spec__0(v_o_3877_, v_head_3883_);
+v___x_3884_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_o_3877_, v_head_3883_);
 return v___x_3884_;
 }
 else
@@ -11789,7 +11789,7 @@ lean_inc(v_tail_3882_);
 v_head_3885_ = lean_ctor_get(v_a_3878_, 0);
 lean_inc(v_head_3885_);
 lean_dec_ref_known(v_a_3878_, 2);
-v___x_3886_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_AbortController_signal_spec__0(v_o_3877_, v_head_3885_);
+v___x_3886_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_o_3877_, v_head_3885_);
 if (lean_obj_tag(v___x_3886_) == 0)
 {
 lean_object* v_a_3887_; 

@@ -14,6 +14,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as tier from './web-tier1.mjs';
+import * as browser from './web-browser.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const require = createRequire(import.meta.url);
@@ -38,7 +39,9 @@ const fail = message => { throw new Error(`generate-web: ${message}`); };
 
 const specTitles = {};
 const asts = [];
-for (const spec of tier.specs) {
+// Tier 1's specs, then the browser tier's (scripts/bindings/web-browser.mjs).
+const fullSpecs = [...tier.specs, ...browser.specs];
+for (const spec of fullSpecs) {
   const text = readFileSync(join(idlDir, spec + '.idl'), 'utf8');
   const source = /^\/\/ Source: (.*)$/m.exec(text);
   specTitles[spec] = source ? source[1] : spec;
@@ -49,13 +52,17 @@ for (const spec of tier.specs) {
 // member names is generated wherever it is defined: ReferrerPolicy (Referrer
 // Policy), and Web Crypto's KeyFormat and KeyUsage, which webref moves to the
 // Modern Algorithms spec that extends them.
-const typeSpecs = readdirSync(idlDir).filter(f => f.endsWith('.idl')).map(f => f.slice(0, -4)).filter(s => !tier.specs.includes(s)).sort();
+/** Interfaces of the specs read only for their types (WebGLRenderingContext): known to be interfaces, not generated. */
+const otherInterfaces = new Set();
+const typeSpecs = readdirSync(idlDir).filter(f => f.endsWith('.idl')).map(f => f.slice(0, -4)).filter(s => !fullSpecs.includes(s)).sort();
 for (const spec of typeSpecs) {
   const text = readFileSync(join(idlDir, spec + '.idl'), 'utf8');
   const source = /^\/\/ Source: (.*)$/m.exec(text);
   specTitles[spec] = source ? source[1] : spec;
-  for (const d of webidl2.parse(text))
+  for (const d of webidl2.parse(text)) {
     if (!d.partial && ['enum', 'dictionary', 'typedef', 'callback', 'callback interface'].includes(d.type)) asts.push({ spec, d: JSON.parse(JSON.stringify(d)) });
+    if (!d.partial && d.type === 'interface') otherInterfaces.add(d.name);
+  }
 }
 for (const d of webidl2.parse(tier.syntheticIdl)) asts.push({ spec: 'synthetic', d: JSON.parse(JSON.stringify(d)) });
 
@@ -90,6 +97,33 @@ const leanKeywords = new Set(['at', 'by', 'do', 'else', 'end', 'fun', 'have', 'i
   'syntax', 'local', 'private', 'protected', 'public', 'partial', 'unsafe', 'noncomputable', 'theorem', 'example', 'abbrev',
   'inductive', 'extends', 'notation', 'prefix', 'infix', 'infixl', 'infixr', 'postfix', 'mutual', 'attribute', 'export', 'nomatch',
   'nofun', 'calc', 'suffices', 'obtain', 'module', 'meta', 'opaque', 'axiom', 'set_option', 'termination_by', 'decreasing_by',
+  // Every identifier-like token of Lean 4.35 with Lean and Std imported (Lean.Parser's token table): `repeat`, `matches`, `until`.
+  'Prop', 'Sort', 'StateRefT', 'Type', 'abbrev', 'add_decl_doc', 'assert_not_exists', 'assert_not_imported', 'at', 'attribute',
+  'axiom', 'bif', 'binder_predicate', 'break', 'builtin_cbv_simproc', 'builtin_cbv_simproc_decl', 'builtin_dsimproc',
+  'builtin_dsimproc_decl', 'builtin_grind_propagator', 'builtin_initialize', 'builtin_simproc', 'builtin_simproc_decl', 'by',
+  'by_elab', 'calc', 'catch', 'cbv_eval', 'cbv_simproc', 'cbv_simproc_decl', 'class', 'coinductive', 'coinductive_fixpoint',
+  'continue', 'dbg_trace', 'declare_bitwise_int_theorems', 'declare_bitwise_uint_theorems', 'declare_command_config_elab',
+  'declare_command_config_elab_legacy', 'declare_config_elab', 'declare_config_elab_legacy', 'declare_core_config_elab',
+  'declare_eval_bin', 'declare_eval_bin_bitwise', 'declare_eval_bin_bool_pred', 'declare_int_theorems', 'declare_simp_like_tactic',
+  'declare_sint_simprocs', 'declare_syntax_cat', 'declare_term_config_elab', 'declare_uint_simprocs', 'declare_uint_theorems',
+  'decreasing_by', 'def', 'def_eval_config_item', 'deprecated_module', 'deprecated_syntax', 'deriving', 'do', 'docs_to_verso',
+  'dsimproc', 'dsimproc_decl', 'elab', 'elab_rules', 'elab_stx_quot', 'else', 'end', 'eval_prec', 'eval_prio', 'example', 'exists',
+  'export', 'extends', 'finally', 'for', 'forall', 'from', 'fun', 'generalizing', 'grind_annotated', 'grind_pattern',
+  'grind_propagator', 'have', 'haveI', 'hiding', 'idbg', 'if', 'import', 'in', 'include', 'include_str', 'inductive',
+  'inductive_fixpoint', 'inferInstanceAs', 'infix', 'infixl', 'infixr', 'init_grind_norm', 'init_quot', 'initialize', 'instance',
+  'leading_parser', 'let', 'letI', 'let_delayed', 'let_expr', 'let_fun', 'let_tmp', 'local', 'logNamedError', 'logNamedErrorAt',
+  'logNamedWarning', 'logNamedWarningAt', 'macro', 'macro_rules', 'match', 'match_expr', 'matches', 'max_prec', 'meta', 'mod_cast',
+  'monotonicity_by', 'mut', 'mutual', 'namespace', 'nat_lit', 'no_index', 'nofun', 'nomatch', 'noncomputable', 'nonrec',
+  'norm_cast_add_elim', 'notation', 'omit', 'opaque', 'open', 'partial', 'partial_fixpoint', 'postfix', 'prefix', 'private',
+  'protected', 'public', 'recall', 'recommended_spelling', 'register_builtin_option', 'register_error_explanation',
+  'register_grind_attr', 'register_label_attr', 'register_linter_set', 'register_option', 'register_parser_alias',
+  'register_simp_attr', 'register_sym_dsimp', 'register_sym_simp', 'register_sym_simp_attr', 'register_tactic_tag', 'renaming',
+  'repeat', 'reprove', 'return', 'run_cmd', 'run_elab', 'run_meta', 'scoped', 'seal', 'section', 'set_library_suggestions',
+  'set_option', 'show', 'show_panel_widgets', 'show_term', 'show_term_elab', 'simproc', 'simproc_decl', 'sorry', 'structure',
+  'suffices', 'syntax', 'tactic_alt', 'tactic_extension', 'tactic_name', 'tactic_tag', 'termination_by', 'test_extern', 'then',
+  'theorem', 'throwError', 'throwErrorAt', 'throwNamedError', 'throwNamedErrorAt', 'trailing_parser', 'try', 'unif_hint',
+  'universe', 'unless', 'unlock_limits', 'unsafe', 'unseal', 'until', 'using', 'variable', 'where', 'while', 'with',
+  'with_annotate_term', 'with_weak_namespace', 'without_expected_type',
   'fun', 'λ', 'Σ', 'Π', 'exists', 'sorry', 'omit', 'include', 'initialize', 'builtin_initialize', 'elab', 'mod', 'at']);
 const id = name => leanKeywords.has(name) || !/^[A-Za-z_][A-Za-z0-9_']*$/.test(name) ? `«${name}»` : name;
 const capital = s => s ? s[0].toUpperCase() + s.slice(1) : s;
@@ -131,28 +165,63 @@ const exposedToWorkers = node => {
 
 // ---------- selection ----------
 
+const exposedToWindow = node => {
+  const e = extValue(extAttr(node, 'Exposed'));
+  if (e === undefined) return true;
+  const list = Array.isArray(e) ? e : [e];
+  return list.some(x => x === '*' || x === 'Window');
+};
+
+// ---------- tiers ----------
+// Tier 1 (web-tier1.mjs, the modules of Lasm.JS.Web) and the browser tier
+// (web-browser.mjs, the modules Lasm.JS.Web.Browser adds). The tier being
+// generated (ctxTier) decides which members an interface has (exposed to
+// workers, or to Window) and which selected interfaces a type may name: tier 1
+// sees only tier 1's, so its output does not depend on the browser tier.
+// Supporting types are resolved in the tier of the module that owns them.
+let ctxTier = 1;
+const inTier = (t, f) => { const saved = ctxTier; ctxTier = t; try { return f(); } finally { ctxTier = saved; } };
+const allModules = [...tier.modules.map(m => ({ ...m, tier: 1 })), ...browser.modules.map(m => ({ ...m, tier: 2 }))];
+const moduleTier = new Map(allModules.map(m => [m.name, m.tier]));
+if (moduleTier.size !== allModules.length) fail('two modules share a name');
+
 const selectedInterfaces = new Map(); // IDL name → module
 const moduleOfType = new Map();       // IDL name or union key → module name
 const configIdl = n => n.startsWith('WebAssembly.') ? n.slice('WebAssembly.'.length) : n;
-for (const m of tier.modules) for (const n of m.interfaces ?? []) {
+for (const m of allModules) for (const n of m.interfaces ?? []) {
   const name = configIdl(n);
   const d = def(name);
   if (!d || d.type !== 'interface') fail(`interface ${n} not found`);
+  if (selectedInterfaces.has(name)) fail(`interface ${n} is selected twice`);
   selectedInterfaces.set(name, m.name);
   moduleOfType.set(name, m.name);
 }
-for (const m of tier.modules) for (const n of m.namespaces ?? []) if (!def(n) || def(n).type !== 'namespace') fail(`namespace ${n} not found`);
+for (const m of allModules) for (const n of m.namespaces ?? []) if (!def(n) || def(n).type !== 'namespace') fail(`namespace ${n} not found`);
+/** The tier of a supporting type's (or interface's) owner, or the current one before it has an owner. */
+const tierOfKey = key => moduleOfType.has(key) ? moduleTier.get(moduleOfType.get(key)) : ctxTier;
+/** Whether an interface is selected and visible from the current tier. */
+const visibleInterface = n => selectedInterfaces.has(n) && moduleTier.get(selectedInterfaces.get(n)) <= ctxTier;
+// In the browser tier an interface's parent must be generated too (the Lean structure extends it).
+for (const m of browser.modules) for (const n of m.interfaces) {
+  const parent = def(n).inheritance;
+  if (parent && !selectedInterfaces.has(parent)) fail(`${n} extends ${parent}, which is not selected`);
+}
+/** Whether a member is an event handler IDL attribute (`onclick`), not generated in the browser tier. */
+const isEventHandler = m => m.type === 'attribute' && !m.idlType.union && !m.idlType.generic && browser.eventHandlerTypes.includes(m.idlType.idlType);
 
 /** Members of an interface: its own (and partials'), then its mixins'. */
 function membersOf(name) {
   const d = def(name);
   let members = [...d.members];
+  const excluded = ctxTier >= 2 ? browser.excludeMixins[name] ?? [] : [];
   for (const mixin of includes.get(name) ?? []) {
+    if (excluded.includes(mixin)) continue;
     const md = def(mixin);
     if (!md) fail(`mixin ${mixin} not found`);
     members.push(...md.members);
   }
-  members = members.filter(exposedToWorkers);
+  members = members.filter(ctxTier >= 2 ? exposedToWindow : exposedToWorkers);
+  if (ctxTier >= 2) members = members.filter(m => !isEventHandler(m));
   const only = tier.memberFilter[name];
   if (only) members = members.filter(m => only.includes(m.name));
   return members;
@@ -200,7 +269,9 @@ function resolveInner(t) {
   return resolveName(t.idlType);
 }
 function resolveName(n) {
-  if (['DOMString', 'USVString', 'ByteString'].includes(n)) return { k: 'prim', lean: 'String', idl: n };
+  if (ctxTier >= 2) n = browser.aliases[n] ?? n;
+  // CSSOMString is DOMString or USVString, as the implementation chooses (CSSOM).
+  if (['DOMString', 'USVString', 'ByteString', 'CSSOMString'].includes(n)) return { k: 'prim', lean: 'String', idl: n };
   if (n === 'boolean') return { k: 'prim', lean: 'Bool', idl: n };
   if (integerTypes[n]) return { k: 'prim', lean: integerTypes[n], idl: n };
   if (floatTypes.includes(n)) return { k: 'prim', lean: 'Float', idl: n };
@@ -213,7 +284,7 @@ function resolveName(n) {
   if (!d) return { k: 'unknown', idl: n };
   switch (d.type) {
   case 'interface':
-    return selectedInterfaces.has(n) ? { k: 'iface', name: n } : { k: 'unknown', idl: n };
+    return visibleInterface(n) ? { k: 'iface', name: n } : { k: 'unknown', idl: n };
   case 'dictionary': return { k: 'dict', name: n };
   case 'enum': return { k: 'enum', name: n };
   case 'callback': case 'callback interface': return { k: 'callback', name: n };
@@ -257,25 +328,38 @@ function typeKeyName(t) {
 function makeUnion(types, typedefName, outerNullable = false) {
   const flat = flatAlternatives(types);
   let r;
-  if (flat.alts.length === 1) r = resolve(flat.alts[0]);
+  // Typed arrays of either kind (ImageDataArray: Uint8ClampedArray or Float16Array) are bytes.
+  if (flat.alts.length > 1 && flat.alts.every(t => !t.generic && !t.union && !t.nullable && viewTypes.includes(t.idlType))) r = resolve(flat.alts[0]);
+  else if (flat.alts.length === 1) r = resolve(flat.alts[0]);
   else {
-    const key = typedefName ?? flat.alts.map(idlText).join('|');
+    // A union that names a browser interface is resolved anew in the browser tier.
+    const resolved = flat.alts.map(resolve);
+    const browserOnly = ctxTier >= 2 && resolved.some(namesBrowserInterface);
+    const key = (browserOnly ? 'browser:' : '') + (typedefName ?? flat.alts.map(idlText).join('|'));
     if (!unions.has(key)) {
       const name = typedefName ? (tier.renames[typedefName] ?? typedefName) : flat.alts.map(typeKeyName).join('Or');
+      if ([...unions.values()].some(o => o.name === name)) fail(`two unions are named ${name} (one in each tier)`);
       const u = { key, name, alts: [], typedef: typedefName };
       unions.set(key, u);
       const used = new Set();
-      for (const t of flat.alts) {
-        let ctor = altBaseName(t), i = 2;
-        while (used.has(ctor)) ctor = altBaseName(t) + i++;
+      flat.alts.forEach((t, i) => {
+        let ctor = altBaseName(t), j = 2;
+        while (used.has(ctor)) ctor = altBaseName(t) + j++;
         used.add(ctor);
-        u.alts.push({ ctor, t: resolve(t), idl: idlText(t) });
-      }
+        u.alts.push({ ctor, t: resolved[i], idl: idlText(t) });
+      });
     }
     r = { k: 'union', key };
   }
   if ((flat.nullable || outerNullable) && r.k !== 'nullable') r = { k: 'nullable', inner: r };
   return r;
+}
+
+function namesBrowserInterface(t) {
+  if (t.k === 'nullable' || t.k === 'seq' || t.k === 'record' || t.k === 'promise') return namesBrowserInterface(t.inner);
+  if (t.k === 'iface') return moduleTier.get(selectedInterfaces.get(t.name)) >= 2;
+  if (t.k === 'union') return unions.get(t.key).alts.some(a => namesBrowserInterface(a.t));
+  return false;
 }
 
 // ---------- shapes (for reading unions back) ----------
@@ -291,7 +375,9 @@ function shape(t) {
   default: return 'any';
   }
 }
-const needsPost = t => t.k === 'arraybuffer' || (t.k === 'nullable' || t.k === 'seq') && needsPost(t.inner)
+/** A typed array result that may not be a Uint8Array (ImageData's Uint8ClampedArray): Lasm.JS reads only a Uint8Array as bytes. */
+const otherView = t => t.k === 'prim' && t.lean === 'ByteArray' && t.idl !== 'Uint8Array';
+const needsPost = t => t.k === 'arraybuffer' || otherView(t) || (t.k === 'nullable' || t.k === 'seq') && needsPost(t.inner)
   || t.k === 'union' && unionRead(unions.get(t.key)) === 'decode';
 /** How a union is read back: 'fromjs' (an instance), 'decode' (an IO decoder: it holds an ArrayBuffer), 'value' (only interfaces), 'data'. */
 function unionRead(u) {
@@ -299,7 +385,8 @@ function unionRead(u) {
   const distinct = new Set(shapes).size === shapes.length && !shapes.includes('any')
     && u.alts.every(a => a.t.k !== 'promise' && a.t.k !== 'nullable' && (a.t.k !== 'union') && readable(a.t));
   if (distinct) return u.alts.some(a => needsPost(a.t)) ? 'decode' : 'fromjs';
-  if (u.alts.every(a => a.t.k === 'iface')) return 'value';
+  // Only interfaces (generated or not: HTMLCanvasElement.getContext's contexts): a reference.
+  if (u.alts.every(a => a.t.k === 'iface' || a.t.k === 'unknown' && (def(a.t.idl)?.type === 'interface' || otherInterfaces.has(a.t.idl)))) return 'value';
   return 'data';
 }
 /** Whether a type has a FromJS reading (possibly through an IO decoder). */
@@ -315,7 +402,7 @@ const dictReadableMemo = new Map();
 function dictReadable(name) {
   if (dictReadableMemo.has(name)) return dictReadableMemo.get(name);
   dictReadableMemo.set(name, false);
-  const ok = dictFields(name).every(f => { const t = resolve(f.idlType); return readable(t) && !needsPost(t); });
+  const ok = inTier(tierOfKey(name), () => dictFields(name).every(f => { const t = resolve(f.idlType); return readable(t) && !needsPost(t); }));
   dictReadableMemo.set(name, ok);
   return ok;
 }
@@ -359,6 +446,7 @@ function retType(t) {
 }
 /** The FromJS type requested from the host (before IO decoding). */
 function reqType(t) {
+  if (otherView(t)) return 'Data';
   switch (t.k) {
   case 'arraybuffer': return 'Value';
   case 'nullable': return needsPost(t.inner) ? `Option ${paren(reqType(t.inner))}` : retType(t);
@@ -370,6 +458,7 @@ function reqType(t) {
 /** IO decoding from reqType to retType, as a function expression, or null. */
 function postFn(t) {
   if (!needsPost(t)) return null;
+  if (otherView(t)) return 'Support.viewBytes';
   switch (t.k) {
   case 'arraybuffer': return 'Support.arrayBufferBytes';
   case 'nullable': case 'seq': return `(fun x => x.mapM ${postFn(t.inner)})`;
@@ -395,15 +484,17 @@ function visit(t, mode, module) {
   else if (mode === 'from') { if (needFrom.has(key)) return; needFrom.add(key); }
   else if (!first) return;
   const owner = moduleOfType.get(key);
-  if (t.k === 'dict') for (const f of dictFields(t.name)) visit(resolve(f.idlType), mode, owner);
-  if (t.k === 'union') for (const a of unions.get(t.key).alts) visit(a.t, mode, owner);
-  if (t.k === 'callback') {
-    // A callback handle is made from a Lean function: its arguments are read, its result written.
-    const c = callbackSignature(t.name);
-    for (const a of c.args) visit(resolve(a.idlType), 'from', owner);
-    visit(c.ret, 'to', owner);
-    needTo.add(key); needFrom.add(key);
-  }
+  inTier(moduleTier.get(owner), () => {
+    if (t.k === 'dict') for (const f of dictFields(t.name)) visit(resolve(f.idlType), mode, owner);
+    if (t.k === 'union') for (const a of unions.get(t.key).alts) visit(a.t, mode, owner);
+    if (t.k === 'callback') {
+      // A callback handle is made from a Lean function: its arguments are read, its result written.
+      const c = callbackSignature(t.name);
+      for (const a of c.args) visit(resolve(a.idlType), 'from', owner);
+      visit(c.ret, 'to', owner);
+      needTo.add(key); needFrom.add(key);
+    }
+  });
 }
 function callbackSignature(name) {
   const d = def(name);
@@ -413,11 +504,18 @@ function callbackSignature(name) {
 }
 
 // The members to generate, per module.
-const plan = tier.modules.map(m => ({ ...m, ifaces: (m.interfaces ?? []).map(configIdl), globals: m.globals ?? [], namespaces: m.namespaces ?? [] }));
+const plan = allModules.map(m => ({ ...m, ifaces: (m.interfaces ?? []).map(configIdl), globals: m.globals ?? [], namespaces: m.namespaces ?? [],
+  windowGlobals: m.windowGlobals ?? [] }));
 const globalMixin = def('WindowOrWorkerGlobalScope');
 const globalMember = n => {
   const found = globalMixin.members.filter(x => x.name === n);
   if (!found.length) fail(`global ${n} not found`);
+  return found;
+};
+/** A member of Window (with its mixins and partials) that the browser tier also generates as a global (`document`). */
+const windowMember = n => {
+  const found = inTier(2, () => membersOf('Window')).filter(x => x.name === n);
+  if (!found.length) fail(`Window member ${n} not found`);
   return found;
 };
 const promiseRet = t => t.k === 'promise';
@@ -429,11 +527,11 @@ function visitMember(m, module) {
     const r = resolve(m.idlType);
     visit(promiseRet(r) ? r.inner : r, 'from', module);
     if (!m.readonly) visit(r, 'to', module);
-  } else if (m.type === 'iterable' && m.idlType.length === 2) {
+  } else if (m.type === 'iterable' && !m.async) {
     for (const t of m.idlType) visit(resolve(t), 'from', module);
   }
 }
-for (const m of plan) {
+for (const m of plan) inTier(m.tier, () => {
   for (const i of m.ifaces) {
     const d = def(i);
     if (d.inheritance && selectedInterfaces.has(d.inheritance)) visit({ k: 'iface', name: d.inheritance }, 'none', m.name);
@@ -441,12 +539,13 @@ for (const m of plan) {
   }
   for (const g of m.globals) for (const mem of globalMember(g)) visitMember(mem, m.name);
   for (const n of m.namespaces) for (const mem of def(n).members.filter(exposedToWorkers)) visitMember(mem, m.name);
+  for (const g of m.windowGlobals) for (const mem of windowMember(g)) visitMember(mem, m.name);
   for (const x of m.extraTypes ?? []) {
     const d = def(x);
     if (!d) fail(`extra type ${x} not found`);
     visit(resolveName(x), 'to', m.name);
   }
-}
+});
 
 // ---------- emitting ----------
 
@@ -480,7 +579,7 @@ const specOf = spec => spec === 'synthetic' ? 'written for Lasm (docs/JS_BINDING
 
 // Arguments: Lean binders and the JavaScript argument array.
 function argumentList(args) {
-  const binders = [], values = [];
+  const binders = [], values = [], pre = [];
   let rest = null;
   const names = new Set(['self']);
   for (const a of args) {
@@ -494,10 +593,20 @@ function argumentList(args) {
       const lt = argType(inner);
       if (lt === 'Data') { binders.push(`(${id(name)} : Data := .undefined)`); values.push(id(name)); }
       else { binders.push(`(${id(name)} : Option ${paren(lt)} := none)`); values.push(`Support.optional ${id(name)}`); }
+    } else if (otherView(t) && !['BufferSource', 'ArrayBufferView', 'AllowSharedBufferSource'].includes(t.idl)) {
+      // A typed array other than Uint8Array (ImageData's Uint8ClampedArray): made from the bytes in JavaScript.
+      binders.push(`(${id(name)} : ByteArray)`);
+      pre.push(`let ${name}View ← Support.typedArray "${t.idl}" ${id(name)}`);
+      values.push(`.ref ${name}View ""`);
     } else { binders.push(`(${id(name)} : ${argType(t)})`); values.push(toData(t, id(name))); }
   }
   const array = `#[${values.join(', ')}]`;
-  return { binders: binders.join(' '), args: rest ? `(Support.argsWith ${array} ${rest})` : `(Support.args ${array})`, arity: args.length };
+  return { binders: binders.join(' '), args: rest ? `(Support.argsWith ${array} ${rest})` : `(Support.args ${array})`, arity: args.length, pre };
+}
+/** A definition's right-hand side (after `:=`) with the argument conversions that need IO (`pre`) first. */
+function withPre(al, rhs) {
+  if (!al.pre.length) return rhs;
+  return ` do\n  ${al.pre.join('\n  ')}\n  ${rhs.trimStart().replace(/^do\n {2}/, '')}`;
 }
 
 /** The result: Lean type, and how to finish a host call that requested reqType. */
@@ -553,6 +662,8 @@ function emitInterface(module, name) {
   decls.push(`instance : Nonempty ${T} := ⟨{ val := Classical.ofNonempty }⟩`);
   decls.push(`instance : ToJS ${T} := ⟨fun x => .ref x.val ""⟩`);
   decls.push(`instance : FromJS ${T} := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "${NS}.${T}", .data⟩`);
+  // An instance where its parent is expected (an HTMLElement for a Node argument).
+  if (parent) decls.push(`instance : Coe ${T} ${parent} := ⟨${T}.to${parent.split('.').at(-1)}⟩`);
   o.types.push(decls.join('\n'));
 
   const members = membersOf(name);
@@ -563,12 +674,13 @@ function emitInterface(module, name) {
   const fns = [];
   const doc = (m, extra = '') => `/-- \`${docText(memberIdl(m, name))}\`${extra} -/`;
   // Constructors.
-  const ctors = members.filter(m => m.type === 'constructor');
+  // [HTMLConstructor] constructors construct only custom elements (subclasses); for the element itself they throw.
+  const ctors = members.filter(m => m.type === 'constructor' && !extAttr(m, 'HTMLConstructor'));
   overloadNames(ctors.map(c => ({ ...c, name: constructorName }))).forEach((n, i) => {
     const c = ctors[i];
     for (const a of c.arguments) requireType(module, resolve(a.idlType));
     const al = argumentList(c.arguments);
-    fns.push(`${doc(c)}\ndef ${T}.${id(take(n, 'constructor'))}${al.binders ? ' ' + al.binders : ''} : IO ${T} :=\n  Lasm.JS.Binding.invoke ${T} ${binding(`${T}.${n}`, jsPath(name), true, al.arity)}\n    ${al.args} (await := false)`);
+    fns.push(`${doc(c)}\ndef ${T}.${id(take(n, 'constructor'))}${al.binders ? ' ' + al.binders : ''} : IO ${T} :=${withPre(al, `\n  Lasm.JS.Binding.invoke ${T} ${binding(`${T}.${n}`, jsPath(name), true, al.arity)}\n    ${al.args} (await := false)`)}`);
   });
   // Constants.
   for (const c of members.filter(m => m.type === 'const')) {
@@ -607,6 +719,8 @@ function emitInterface(module, name) {
       fns.push(`/-- The stringifier. -/\ndef ${T}.${id(take('toString', 'stringifier'))} (self : ${T}) : IO String := self.val.callMethod "toString" #[] String`);
       continue;
     }
+    // Unnamed getters, setters and deleters (DOMStringMap's properties, Window's named elements) have no method to call.
+    if (!op.name) continue;
     const key = (op.special === 'static' ? 'static ' : '') + op.name;
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(op);
@@ -624,10 +738,10 @@ function emitInterface(module, name) {
       if (isStatic) {
         const b = binding(`${T}.${n}`, `${jsPath(name)}.${op.name}`, false, al.arity);
         body = res.async ? `Lasm.JS.Binding.invokeAsync ${res.req} ${b}\n    ${al.args}` : `Lasm.JS.Binding.invoke ${res.req} ${b}\n    ${al.args} (await := false)`;
-        fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'static operation'))}${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${res.post ? ' ' + finish(body, res) : '\n  ' + body}`);
+        fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'static operation'))}${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`);
       } else {
         body = res.async ? `self.val.callMethodAwait "${op.name}" ${al.args} ${res.req}` : `self.val.callMethod "${op.name}" ${al.args} ${res.req}`;
-        fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'operation'))} (self : ${T})${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${res.post ? ' ' + finish(body, res) : '\n  ' + body}`);
+        fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'operation'))} (self : ${T})${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`);
       }
     });
   }
@@ -641,6 +755,14 @@ function emitInterface(module, name) {
     fns.push(`/-- \`${idl}\`: \`entries()\`, collected into an array. -/\ndef ${T}.${id(take('entries', 'iterable'))} (self : ${T}) : IO (Array (${K} × ${V})) :=\n  Support.iterate self.val "entries" (Array (${K} × ${V}))`);
     fns.push(`/-- \`${idl}\`: \`keys()\`, collected into an array. -/\ndef ${T}.${id(take('keys', 'iterable'))} (self : ${T}) : IO (Array ${K}) :=\n  Support.iterate self.val "keys" (Array ${K})`);
     fns.push(`/-- \`${idl}\`: \`values()\`, collected into an array. -/\ndef ${T}.${id(take('values', 'iterable'))} (self : ${T}) : IO (Array ${V}) :=\n  Support.iterate self.val "values" (Array ${V})`);
+  }
+  // Value iterables (NodeList, DOMTokenList): `values()`, collected into an array.
+  for (const it of members.filter(m => m.type === 'iterable' && m.idlType.length === 1)) {
+    const v = resolve(it.idlType[0]);
+    requireType(module, v);
+    if (needsPost(v)) fail(`${T}: iterable needing decoding`);
+    const V = paren(retType(v));
+    fns.push(`/-- \`iterable<${idlText(it.idlType[0])}>\`: \`values()\`, collected into an array. -/\ndef ${T}.${id(take('values', 'iterable'))} (self : ${T}) : IO (Array ${V}) :=\n  Support.iterate self.val "values" (Array ${V})`);
   }
   if (parent) requireType(module, { k: 'iface', name: d.inheritance });
   o.decls.push(...fns);
@@ -673,7 +795,7 @@ function emitNamespaceOrGlobal(module, owner, members, pathPrefix, leanPrefix) {
       if (tier.numberResults.includes(op.name) && !pathPrefix.length) Object.assign(res, { req: 'Value', post: `Support.number ${paren(res.lean)}` });
       const b = binding(`${leanPrefix}${n}`, [...pathPrefix, op.name].join('.'), false, al.arity);
       const body = res.async ? `Lasm.JS.Binding.invokeAsync ${res.req} ${b}\n    ${al.args}` : `Lasm.JS.Binding.invoke ${res.req} ${b}\n    ${al.args} (await := false)`;
-      o.decls.push(`/-- \`${docText(memberIdl(op, owner))}\` (${specOf(op.spec)}) -/\ndef ${leanPrefix}${id(n)}${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${res.post ? ' ' + finish(body, res) : '\n  ' + body}`);
+      o.decls.push(`/-- \`${docText(memberIdl(op, owner))}\` (${specOf(op.spec)}) -/\ndef ${leanPrefix}${id(n)}${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`);
     });
   }
 }
@@ -768,9 +890,16 @@ function emitUnion(module, key) {
   const decl = [lines.join('\n')];
   const k = 'union:' + key;
   if (needTo.has(k)) decl.push(`instance : ToJS ${u.name} := ⟨fun\n${u.alts.map(a => `  | .${id(a.ctor)} v => ${toData(a.t, 'v')}`).join('\n')}⟩`);
+  // A value of a member type where the union is expected (`setAttribute "title" "x"`, `fetch "https://…"`): one
+  // coercion per member whose Lean type no other member has (not Data or Value, which stand for many).
+  if (needTo.has(k)) for (const a of u.alts) {
+    const L = argType(a.t);
+    if (L === 'Data' || L === 'Value' || u.alts.filter(b => argType(b.t) === L).length > 1) continue;
+    decl.push(`instance : Coe ${paren(L)} ${u.name} := ⟨.${id(a.ctor)}⟩`);
+  }
   if (needFrom.has(k)) {
     const how = unionRead(u);
-    if (how === 'fromjs') decl.push(`instance : FromJS ${u.name} where\n  fromJS\n${u.alts.map(a => `    | d@(${shapePattern[shape(a.t)]}) => (FromJS.fromJS d : Except String ${paren(retType(a.t))}).map .${id(a.ctor)}`).join('\n')}\n    | _ => .error ""\n  typeName := "${NS}.${u.name}"`);
+    if (how === 'fromjs') decl.push(`instance : FromJS ${u.name} where\n  fromJS\n${u.alts.map(a => `    | d@(${shapePattern[shape(a.t)]}) => (FromJS.fromJS d : Except String ${a.t.k === 'unknown' ? 'Value' : paren(retType(a.t))}).map .${id(a.ctor)}`).join('\n')}\n    | _ => .error ""\n  typeName := "${NS}.${u.name}"`);
     if (how === 'decode') decl.push(`/-- Reads a \`${u.name}\` (one member is an ArrayBuffer, copied with one more host call). -/\ndef ${u.name}.decode (d : Data) : IO ${u.name} :=\n  match d with\n${u.alts.map(a => {
       const post = postFn(a.t);
       return `  | ${shapePattern[shape(a.t)]} => do return .${id(a.ctor)} (← ${post ? `${post} (← Lasm.JS.decodeAs ${paren(reqType(a.t))} "${u.name}" d)` : `Lasm.JS.decodeAs ${paren(retType(a.t))} "${u.name}" d`})`;
@@ -781,14 +910,15 @@ function emitUnion(module, key) {
 
 // Collect per module, in dependency order within the module.
 for (const o of out.values()) Object.assign(o, { types: [], support: [] });
-for (const m of plan) for (const i of m.ifaces) emitInterface(m.name, i);
-for (const m of plan) {
+for (const m of plan) inTier(m.tier, () => { for (const i of m.ifaces) emitInterface(m.name, i); });
+for (const m of plan) inTier(m.tier, () => {
   emitNamespaceOrGlobal(m.name, 'WindowOrWorkerGlobalScope', m.globals.flatMap(globalMember), [], '');
   for (const n of m.namespaces) emitNamespaceOrGlobal(m.name, n, def(n).members.filter(exposedToWorkers), [n], `${n}.`);
-}
+  emitNamespaceOrGlobal(m.name, 'Window', m.windowGlobals.flatMap(windowMember), [], '');
+});
 // Supporting declarations, topologically sorted per module.
 const supportKeys = [...moduleOfType.keys()].filter(k => !selectedInterfaces.has(k));
-const depsOf = key => {
+const depsOf = key => inTier(tierOfKey(key), () => {
   const deps = [];
   const walk = t => {
     if (!t) return;
@@ -803,7 +933,7 @@ const depsOf = key => {
     if (d.type === 'callback' || d.type === 'callback interface') { const c = callbackSignature(key); c.args.forEach(a => walk(resolve(a.idlType))); walk(c.ret); }
   }
   return deps;
-};
+});
 const emitted = new Set();
 function emitSupport(key, stack = []) {
   if (emitted.has(key)) return;
@@ -812,12 +942,11 @@ function emitSupport(key, stack = []) {
   emitted.add(key);
   const module = moduleOfType.get(key);
   const o = out.get(module);
-  let text;
-  if (key.startsWith('union:')) text = emitUnion(module, key.slice(6));
-  else {
+  const text = inTier(moduleTier.get(module), () => {
+    if (key.startsWith('union:')) return emitUnion(module, key.slice(6));
     const d = def(key);
-    text = d.type === 'enum' ? emitEnum(key) : d.type === 'dictionary' ? emitDict(module, key) : emitCallback(module, key);
-  }
+    return d.type === 'enum' ? emitEnum(key) : d.type === 'dictionary' ? emitDict(module, key) : emitCallback(module, key);
+  });
   if (text !== null) o.support.push(text);
 }
 // Enums first (nothing depends on order for them), then the rest in first-use order.
@@ -849,11 +978,20 @@ other edge platforms, and browsers. Spec-faithful bindings on Lasm.JS: interface
 types, Promise results are \`Async\`, nullable values \`Option\`s, dictionaries structures
 (docs/JS_BINDINGS.md, "Standard bindings").
 ${generatedBy}
--/`, ...order.map(n => `import ${NS}.${n}`), ''].join('\n'));
+-/`, ...plan.filter(m => m.tier === 1).map(m => `import ${NS}.${m.name}`), ''].join('\n'));
+files.set(join(outDir, 'Browser.lean'), [`/-
+${NS}.Browser: everything Lasm.JS.Web has in a browser: the Minimum Common Web API (\`import Lasm.JS.Web\`)
+and the browser tier (scripts/bindings/web-browser.mjs): the DOM and the HTML elements, the window,
+location, history and storage, user-interface events, canvas 2D and WebSocket
+(docs/JS_BINDINGS.md, "The browser tier").
+${generatedBy}
+-/`, `import ${NS}`, ...plan.filter(m => m.tier === 2).map(m => `import ${NS}.${m.name}`), ''].join('\n'));
 
-// The generated surface, for the availability probe (scripts/bindings/probe-web.mjs).
+// The generated surface, for the availability probes: tier 1's (test/fixtures/js-web)
+// and the browser tier's (test/browser/platform).
+const surfaceOf = t => {
 const surface = {};
-for (const m of plan) {
+for (const m of plan.filter(m => m.tier === t)) inTier(t, () => {
   for (const i of m.ifaces) {
     const members = membersOf(i);
     surface[jsPath(i)] = {
@@ -866,7 +1004,11 @@ for (const m of plan) {
   }
   for (const g of m.globals) surface[g] = { module: m.name, global: true };
   for (const n of m.namespaces) surface[n] = { module: m.name, namespace: [...new Set(def(n).members.filter(exposedToWorkers).map(x => x.name))] };
-}
+  for (const g of m.windowGlobals) surface[g] = { module: m.name, global: true };
+});
+return surface;
+};
+const surface = surfaceOf(1), browserSurface = surfaceOf(2);
 files.set(join(root, 'scripts', 'bindings', 'web-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion})`, surface }, null, 2) + '\n');
 
 // The same surface as Lean data for the conformance program's availability probe.
@@ -878,6 +1020,18 @@ namespace Surface
 
 /-- \`{path: {static?, prototype?, global?, namespace?}}\` for every generated interface, global and namespace. -/
 def json : String := r#"${JSON.stringify(surface)}"#
+
+end Surface
+`);
+files.set(join(root, 'scripts', 'bindings', 'browser-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion})`, surface: browserSurface }, null, 2) + '\n');
+files.set(join(root, 'test', 'browser', 'platform', 'Surface.lean'), `/-
+${generatedBy}
+The browser tier's generated surface (scripts/bindings/browser-surface.json), for the availability probe of Bindings.lean.
+-/
+namespace Surface
+
+/-- \`{path: {static?, prototype?, global?}}\` for every interface and global of the browser tier. -/
+def json : String := r#"${JSON.stringify(browserSurface)}"#
 
 end Surface
 `);

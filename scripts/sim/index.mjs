@@ -395,7 +395,9 @@ export function options(argv = process.argv.slice(2)) {
   const get = k => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : undefined; };
   const num = (k, d) => { const v = get(k); return v === undefined ? d : Number(v); };
   return {
-    seed: get('--seed') === undefined ? undefined : Number(get('--seed')),
+    // `--seed N`, or a list `--seed N,M,…` (the regression seeds of a workflow).
+    seedList: get('--seed') === undefined ? undefined : get('--seed').split(',').map(Number),
+    seed: get('--seed') === undefined ? undefined : Number(get('--seed').split(',')[0]),
     seeds: num('--seeds', undefined),
     first: num('--first', undefined),
     minutes: num('--minutes', undefined),
@@ -408,7 +410,7 @@ export function options(argv = process.argv.slice(2)) {
 
 /**
 Which seeds to run, and what to do with each result. `--seed N` runs one
-seed; `--seeds N` runs N seeds (fixed, from `--first`, default 1, for PRs;
+seed (`--seed N,M,…` a list of them, as a workflow's regression seeds); `--seeds N` runs N seeds (fixed, from `--first`, default 1, for PRs;
 random when `--first` is `random`); `--minutes M` runs random seeds for M
 minutes (nightly). Stops at the first failure unless `--keep-going`.
 
@@ -418,7 +420,7 @@ export class SeedLoop {
   constructor({ name, repro, opts = options() }) {
     this.name = name; this.repro = repro; this.opts = opts;
     this.started = realNow(); this.done = 0; this.failed = [];
-    if (opts.seed !== undefined) this.queue = [opts.seed];
+    if (opts.seed !== undefined) this.queue = [...(opts.seedList ?? [opts.seed])];
     else if (opts.minutes !== undefined) this.queue = null;
     else {
       const n = opts.seeds ?? 10;
@@ -426,7 +428,7 @@ export class SeedLoop {
       this.queue = Array.from({ length: n }, (_, i) => first + i);
     }
     this.random = new Rng(Number(process.env.SIM_META_SEED ?? (realNow() % 2 ** 31)));
-    console.log(`${name}: ${opts.seed !== undefined ? `seed ${opts.seed}` : opts.minutes !== undefined ? `random seeds for ${opts.minutes} min` : `seeds ${this.queue[0]}..${this.queue.at(-1)}`}, faults ${opts.level}`);
+    console.log(`${name}: ${opts.seed !== undefined ? `seed ${this.queue.join(', ')}` : opts.minutes !== undefined ? `random seeds for ${opts.minutes} min` : `seeds ${this.queue[0]}..${this.queue.at(-1)}`}, faults ${opts.level}`);
   }
   /** The next seed, or null when the run is over. */
   next() {
