@@ -579,7 +579,7 @@ const specOf = spec => spec === 'synthetic' ? 'written for Lasm (docs/JS_BINDING
 
 // Arguments: Lean binders and the JavaScript argument array.
 function argumentList(args) {
-  const binders = [], values = [];
+  const binders = [], values = [], pre = [];
   let rest = null;
   const names = new Set(['self']);
   for (const a of args) {
@@ -593,10 +593,20 @@ function argumentList(args) {
       const lt = argType(inner);
       if (lt === 'Data') { binders.push(`(${id(name)} : Data := .undefined)`); values.push(id(name)); }
       else { binders.push(`(${id(name)} : Option ${paren(lt)} := none)`); values.push(`Support.optional ${id(name)}`); }
+    } else if (otherView(t) && !['BufferSource', 'ArrayBufferView', 'AllowSharedBufferSource'].includes(t.idl)) {
+      // A typed array other than Uint8Array (ImageData's Uint8ClampedArray): made from the bytes in JavaScript.
+      binders.push(`(${id(name)} : ByteArray)`);
+      pre.push(`let ${name}View ← Support.typedArray "${t.idl}" ${id(name)}`);
+      values.push(`.ref ${name}View ""`);
     } else { binders.push(`(${id(name)} : ${argType(t)})`); values.push(toData(t, id(name))); }
   }
   const array = `#[${values.join(', ')}]`;
-  return { binders: binders.join(' '), args: rest ? `(Support.argsWith ${array} ${rest})` : `(Support.args ${array})`, arity: args.length };
+  return { binders: binders.join(' '), args: rest ? `(Support.argsWith ${array} ${rest})` : `(Support.args ${array})`, arity: args.length, pre };
+}
+/** A definition's right-hand side (after `:=`) with the argument conversions that need IO (`pre`) first. */
+function withPre(al, rhs) {
+  if (!al.pre.length) return rhs;
+  return ` do\n  ${al.pre.join('\n  ')}\n  ${rhs.trimStart().replace(/^do\n {2}/, '')}`;
 }
 
 /** The result: Lean type, and how to finish a host call that requested reqType. */
@@ -670,7 +680,7 @@ function emitInterface(module, name) {
     const c = ctors[i];
     for (const a of c.arguments) requireType(module, resolve(a.idlType));
     const al = argumentList(c.arguments);
-    fns.push(`${doc(c)}\ndef ${T}.${id(take(n, 'constructor'))}${al.binders ? ' ' + al.binders : ''} : IO ${T} :=\n  Lasm.JS.Binding.invoke ${T} ${binding(`${T}.${n}`, jsPath(name), true, al.arity)}\n    ${al.args} (await := false)`);
+    fns.push(`${doc(c)}\ndef ${T}.${id(take(n, 'constructor'))}${al.binders ? ' ' + al.binders : ''} : IO ${T} :=${withPre(al, `\n  Lasm.JS.Binding.invoke ${T} ${binding(`${T}.${n}`, jsPath(name), true, al.arity)}\n    ${al.args} (await := false)`)}`);
   });
   // Constants.
   for (const c of members.filter(m => m.type === 'const')) {
@@ -728,10 +738,10 @@ function emitInterface(module, name) {
       if (isStatic) {
         const b = binding(`${T}.${n}`, `${jsPath(name)}.${op.name}`, false, al.arity);
         body = res.async ? `Lasm.JS.Binding.invokeAsync ${res.req} ${b}\n    ${al.args}` : `Lasm.JS.Binding.invoke ${res.req} ${b}\n    ${al.args} (await := false)`;
-        fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'static operation'))}${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${res.post ? ' ' + finish(body, res) : '\n  ' + body}`);
+        fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'static operation'))}${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`);
       } else {
         body = res.async ? `self.val.callMethodAwait "${op.name}" ${al.args} ${res.req}` : `self.val.callMethod "${op.name}" ${al.args} ${res.req}`;
-        fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'operation'))} (self : ${T})${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${res.post ? ' ' + finish(body, res) : '\n  ' + body}`);
+        fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'operation'))} (self : ${T})${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`);
       }
     });
   }
@@ -785,7 +795,7 @@ function emitNamespaceOrGlobal(module, owner, members, pathPrefix, leanPrefix) {
       if (tier.numberResults.includes(op.name) && !pathPrefix.length) Object.assign(res, { req: 'Value', post: `Support.number ${paren(res.lean)}` });
       const b = binding(`${leanPrefix}${n}`, [...pathPrefix, op.name].join('.'), false, al.arity);
       const body = res.async ? `Lasm.JS.Binding.invokeAsync ${res.req} ${b}\n    ${al.args}` : `Lasm.JS.Binding.invoke ${res.req} ${b}\n    ${al.args} (await := false)`;
-      o.decls.push(`/-- \`${docText(memberIdl(op, owner))}\` (${specOf(op.spec)}) -/\ndef ${leanPrefix}${id(n)}${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${res.post ? ' ' + finish(body, res) : '\n  ' + body}`);
+      o.decls.push(`/-- \`${docText(memberIdl(op, owner))}\` (${specOf(op.spec)}) -/\ndef ${leanPrefix}${id(n)}${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`);
     });
   }
 }

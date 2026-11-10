@@ -506,7 +506,7 @@ and content types, workerd's urlencoded form decoding).
 | `T?` (nullable) | `Option T`; `none` is `null` |
 | `DOMString`, `USVString`, `ByteString`, `CSSOMString` | `String` |
 | `boolean`; `byte`, `short`, `long`, `long long`, `bigint`; `octet`, `unsigned …`; `float`, `double` (also `unrestricted`) | `Bool`; `Int`; `Nat`; `Float` |
-| `BufferSource`, `ArrayBufferView`, typed arrays, `ArrayBuffer` | `ByteArray` (a copy; see limits). A union of typed arrays (`ImageDataArray`) too. A result that may be a typed array other than `Uint8Array` (`ImageData.data`, a `Uint8ClampedArray`) is copied as its bytes with up to four more host calls. |
+| `BufferSource`, `ArrayBufferView`, typed arrays, `ArrayBuffer` | `ByteArray` (a copy; see limits). A union of typed arrays (`ImageDataArray`) too. A result that may be a typed array other than `Uint8Array` (`ImageData.data`, a `Uint8ClampedArray`) is copied as its bytes with up to four more host calls; an argument of such a type (`new ImageData(data, …)`'s `Uint8ClampedArray`) is made from the bytes in JavaScript, three more host calls. |
 | `sequence<T>`, `FrozenArray<T>` | `Array T` |
 | `record<K, V>` | `Record V` (`⟨#[("name", v), …]⟩`, `Lasm.JS.Web.Record`) |
 | `any`, `object` | `Data` |
