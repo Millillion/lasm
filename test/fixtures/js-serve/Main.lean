@@ -155,7 +155,10 @@ def served (r : Checks) (name base : String) (thrown : Nat) : Async Unit := do
 
 /-! Deno.serve (Lasm.JS.Deno) -/
 
-@[js "globalThis" "Deno.createHttpClient"] opaque denoHttpClient : Data → IO Value
+/-- `Deno.createHttpClient(options)`, looked up at run time (an `@[js]` binding of a Deno-only
+global would fail `lasm build`'s binding check, which runs on Node). -/
+def denoHttpClient (options : Data) : IO Value := do
+  (← (← Lasm.JS.global).get "Deno" Value).callMethod "createHttpClient" #[options] Value
 @[js "globalThis" "fetch"] opaque fetchWith : String → Data → Async Value
 
 def deno (r : Checks) (live : Live) : Async Unit := do

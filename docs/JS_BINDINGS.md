@@ -977,6 +977,11 @@ fails on one that is neither, so a new version's additions get a decision.
 | `ServeTcpOptions \| (ServeTcpOptions & TlsCertifiedKeyPem)` as a parameter | one overload per alternative; the intersection a dictionary inheriting the first | `serveWithOptions`, `serveWithTlsOptions` |
 | overloads of one function | Lasm.JS.Web's overload naming: the first keeps the name, the others add their first differing argument | `serve`, `serveWithOptions`, `serveWithTlsOptions` |
 
+The generated functions look the runtime's global up when called, so a program
+that imports `Lasm.JS.Deno` still builds (and runs its other code) on Node. A
+hand-written `@[js "globalThis" "Deno.serve"]` binding would not: `lasm build`
+checks every `@[js]` export on Node, where `Deno` does not exist.
+
 The functions of the runtime's global object are at the top of the module's
 namespace (`Lasm.JS.Deno.serve`, called as `Deno.serve` after `open Lasm.JS`), and
 every doc comment quotes the member's TypeScript declaration before its WebIDL.
