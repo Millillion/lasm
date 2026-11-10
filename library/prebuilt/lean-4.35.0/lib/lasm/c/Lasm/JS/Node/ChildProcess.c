@@ -71,7 +71,7 @@ lean_object* l_Lasm_JS_instToJSBool___lam__0___boxed(lean_object*);
 lean_object* l_Lasm_JS_Node_instToJSDOMStringOrURL___lam__0(lean_object*);
 lean_object* l_Lasm_JS_Web_Support_optional___redArg(lean_object*, lean_object*);
 lean_object* l_String_splitOnAux(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
-lean_object* l_Lasm_JS_Node_Support_getExport___at___00Lasm_JS_Node_Support_callOnBytes___at___00Lasm_JS_Node_Buffer_compare_spec__1_spec__1(lean_object*, lean_object*);
+lean_object* l_Lasm_JS_Node_Support_getExport___at___00Lasm_JS_Node_process_env_spec__0(lean_object*, lean_object*);
 extern lean_object* l_Lasm_JS_Node_instFromJSDOMStringOrUint8Array;
 lean_object* l_Lasm_JS_readField___redArg(lean_object*, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Event_cancelBubble_spec__0(lean_object*, lean_object*);
@@ -5551,7 +5551,7 @@ v___x_1712_ = lean_unsigned_to_nat(0u);
 v___x_1713_ = lean_box(0);
 v___x_1714_ = l_String_splitOnAux(v_path_1706_, v___x_1711_, v___x_1712_, v___x_1712_, v___x_1712_, v___x_1713_);
 v___x_1715_ = 0;
-v___x_1720_ = l_Lasm_JS_Node_Support_getExport___at___00Lasm_JS_Node_Support_callOnBytes___at___00Lasm_JS_Node_Buffer_compare_spec__1_spec__1(v_module_1705_, v___x_1714_);
+v___x_1720_ = l_Lasm_JS_Node_Support_getExport___at___00Lasm_JS_Node_process_env_spec__0(v_module_1705_, v___x_1714_);
 if (lean_obj_tag(v___x_1720_) == 0)
 {
 lean_object* v_a_1721_; lean_object* v___x_1723_; uint8_t v_isShared_1724_; uint8_t v_isSharedCheck_1728_; 
