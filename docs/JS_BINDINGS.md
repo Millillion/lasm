@@ -486,6 +486,9 @@ and content types, workerd's urlencoded form decoding).
   to 60.9 MB (14.3 MB of `.olean` files, 5.3 MB of generated C), 4.4 MB
   compressed: about 5 % of the installed `@lasm/cli` (430 MB for 0.5.1). First builds copy it as
   before; nothing is compiled on the user's machine.
+  The browser tier (below) adds 20.1 MB more (61.0 → 81.1 MB: 13.9 MB of
+  `.olean` files, 5.6 MB of generated C, 4.4 MB compressed with gzip), most of
+  it `Lasm.JS.Web.Html` (7.0 MB `.olean`, 3.2 MB C).
 
 ### How a WebIDL declaration becomes Lean
 
