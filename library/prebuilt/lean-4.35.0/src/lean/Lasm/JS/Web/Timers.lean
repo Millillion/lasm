@@ -23,6 +23,8 @@ instance : ToJS TimerHandler := ⟨fun
   | .domString v => toJS v
   | .jsFunction v => toJS v
   | .trustedScript v => toJS v⟩
+instance : Coe String TimerHandler := ⟨.domString⟩
+instance : Coe JSFunction TimerHandler := ⟨.jsFunction⟩
 
 /-- `callback VoidFunction = undefined ()` (Web IDL Standard (https://webidl.spec.whatwg.org/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure VoidFunction where

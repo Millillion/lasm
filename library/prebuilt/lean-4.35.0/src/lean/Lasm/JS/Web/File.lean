@@ -24,6 +24,7 @@ structure File extends Blob
 instance : Nonempty File := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS File := ⟨fun x => .ref x.val ""⟩
 instance : FromJS File := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.File", .data⟩
+instance : Coe File Blob := ⟨File.toBlob⟩
 
 /-- `enum EndingType` (File API (https://w3c.github.io/FileAPI/)): "transparent", "native". -/
 inductive EndingType where
@@ -54,6 +55,9 @@ instance : ToJS BlobPart := ⟨fun
   | .bufferSource v => toJS v
   | .blob v => toJS v
   | .usvString v => toJS v⟩
+instance : Coe ByteArray BlobPart := ⟨.bufferSource⟩
+instance : Coe Blob BlobPart := ⟨.blob⟩
+instance : Coe String BlobPart := ⟨.usvString⟩
 
 /-- `dictionary BlobPropertyBag` (File API (https://w3c.github.io/FileAPI/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BlobPropertyBag where
