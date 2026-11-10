@@ -1,0 +1,5 @@
+{
+  "name": "lasm-wasi-http-abi-fixture",
+  "private": true,
+  "description": "Lasm.WASI.Http's conformance checks under wasmtime serve: lasm build Main.lean --target wasi-http"
+}

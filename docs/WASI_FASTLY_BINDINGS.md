@@ -12,7 +12,7 @@ Fastly, wasmtime for WASI), never against real cloud accounts (Jordan,
 | Bindings | Generated from | Generator | Status |
 | --- | --- | --- | --- |
 | `Lasm.Fastly.*` | The witx of Fastly Compute's host ABI that Viceroy v0.21.1 ships (`scripts/fastly/witx/`) | [`scripts/bindings/generate-fastly.mjs`](../scripts/bindings/generate-fastly.mjs) | Current source, not yet released: 244 of 252 functions |
-| `Lasm.WASI.Http` | The WASI 0.2.12 WIT (`scripts/wasi/wit/deps/`) | Not yet ([below](#lasmwasihttp-not-yet-generated)) | Planned |
+| `Lasm.WASI.Http` | The WASI 0.2.12 WIT that Wasmtime v49.0.4 ships (`scripts/wasi/wit/deps/`) | [`scripts/bindings/generate-wasi-http.mjs`](../scripts/bindings/generate-wasi-http.mjs) | Current source, not yet released: every stable function of the wasi:http proxy world's imports (90) and its export |
 
 `Lasm.Fetch` is being removed (Jordan, 2026-11-10): Fastly and WASI programs
 move to these bindings now; its JavaScript-host parts move to `Lasm.JS.*` in a
@@ -181,32 +181,140 @@ drift check and the unit tests on pull requests that touch them, and
 [`wasi.yml`](../.github/workflows/wasi.yml) (with the WASI targets) the Viceroy
 checks.
 
-## Lasm.WASI.Http: not yet generated
+## Lasm.WASI.Http
 
-`--target wasi-http` already builds a `wasi:http/proxy@0.2.12` component
-(docs/WASI.md): the core module imports `wasi:http/types`,
-`outgoing-handler`, `wasi:io` and the monotonic clock, through
-hand-written canonical ABI glue ([`src/wasi/lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c))
-that `Lasm.Fetch.serve` uses, and `lasm build` splices it into a component
-template made by wasm-tools in CI. `Lasm.WASI.Http`, generated from the same
-WIT, needs:
+`import Lasm.WASI.Http` gives the `wasi:http/proxy@0.2.12` world a
+`lasm build --target wasi-http` component lives in, generated from the pinned
+WASI 0.2.12 WIT (`scripts/wasi/wit/deps/`, Wasmtime v49.0.4's copy, licence in
+[LICENSE_AUDIT.md](LICENSE_AUDIT.md)): one Lean module per imported interface,
+with every function and resource member that is not `@unstable` (90 functions),
+and the export.
 
-1. A WIT reader and a canonical ABI lowering in the generator (resources and
-   their handles, `option`, `result`, `variant` with payloads such as
-   `error-code`, `list`, `tuple`, records, flags; flattening up to 16 core
-   parameters and one result, return areas, `cabi_realloc` for returned
-   strings and lists), producing Lean modules and C glue in the shape of
-   Lasm.Fastly's.
-2. The component template made from a core module that imports **every**
-   function the bindings bind (the template supplies each import's canonical
-   lowering; a program may import fewer, never more): the generated
-   `EveryCall` fixture's core module, which CI's
-   `make-component-template.mjs --check` then compares byte for byte.
-3. An export binding for `wasi:http/incoming-handler.handle` (the program's
-   `main` receives the `incoming-request` and `response-outparam` handles).
-4. A conformance fixture and an `examples/wasi-http` server checked under
-   `wasmtime serve`.
+| WIT interface | Lean module |
+| --- | --- |
+| `wasi:io/error@0.2.12` | `Lasm.WASI.Io.Error` |
+| `wasi:io/poll@0.2.12` | `Lasm.WASI.Io.Poll` |
+| `wasi:io/streams@0.2.12` | `Lasm.WASI.Io.Streams` |
+| `wasi:clocks/monotonic-clock@0.2.12` | `Lasm.WASI.Clocks.MonotonicClock` |
+| `wasi:http/types@0.2.12` | `Lasm.WASI.Http.Types` |
+| `wasi:http/outgoing-handler@0.2.12` | `Lasm.WASI.Http.OutgoingHandler` |
+| `wasi:http/incoming-handler@0.2.12` (the export) | `Lasm.WASI.Http.IncomingHandler` |
 
-Only `wasi:http` (with the `wasi:io` streams, poll and error and the clock it
-needs) is planned: Lean's `IO` already covers what `wasi:cli`,
-`wasi:filesystem` and `wasi:random` give through preview 1.
+```lean
+import Lasm.WASI.Http
+open Lasm.WASI.Http Lasm.WASI.Http.Types
+
+def main : IO Unit := IncomingHandler.serve fun request out => do
+  let response ← OutgoingResponse.new (← Fields.new)
+  let .ok body ← response.body | throw (IO.userError "no body")
+  ResponseOutparam.set out (.ok response)
+  let .ok stream ← body.write | throw (IO.userError "no stream")
+  discard <| stream.blockingWriteAndFlush s!"{repr (← request.method)}\n".toUTF8
+  stream.drop
+  discard <| OutgoingBody.finish body none
+```
+
+`lasm build Main.lean --target wasi-http`, then `wasmtime serve
+wasi-http/main.wasm` (or Spin). In every other build each call fails with an
+`IO.Error` naming the function. Only the wasi:http world is bound: Lean's `IO`
+already covers what `wasi:cli`, `wasi:filesystem` and `wasi:random` give
+through preview 1.
+
+### Mapping rules
+
+- **Names**: interfaces, types and resources UpperCamel, functions, fields
+  and cases lowerCamel, acronyms as words (heck's rule, as wit-bindgen):
+  `DNS-error-payload` → `DnsErrorPayload`, `HTTP-request-URI-invalid` →
+  `httpRequestUriInvalid`, `[method]fields.from-list` → `Fields.fromList`,
+  `[constructor]fields` → `Fields.new`, `[resource-drop]fields` → `Fields.drop`,
+  `%stream` → `stream`. A method's first parameter is `self`.
+- **Types**: `bool`, `u8`…`u64` as `Bool`, `UInt8`…`UInt64`; `string` as
+  `String` (lifted with invalid UTF-8 replaced); `list<u8>` as `ByteArray`,
+  `list<T>` as `Array T`; `option<T>` as `Option T`; `result<T, E>` as
+  `Except E T` (`Unit` for a missing side); `tuple<A, B>` as `A × B`; records
+  as structures, variants and enums as inductives (a case's payload is its one
+  field); a resource as a structure holding its `handle : UInt32`, for `own`
+  and `borrow` alike. WIT `type` aliases and `use`d names are `abbrev`s
+  (`Headers := Fields`, `Types.InputStream := Lasm.WASI.Io.Streams.InputStream`).
+- **Calls**: every function is an `IO` action returning its WIT result
+  (`IO (Except HeaderError Unit)`, `IO (Option (Except Unit (Except ErrorCode IncomingResponse)))`):
+  the WIT's own errors are values; an `IO.Error` only means the host is not a
+  wasi-http host (or, in the export, that its handles were taken already).
+- **Ownership** is the WIT's: an `own` parameter moves the handle to the host
+  (`OutgoingBody.finish`, `ResponseOutparam.set`), a `borrow` lends it, and the
+  program drops what it owns with `R.drop`. Handles are not freed by Lean's
+  reference counting.
+- **The export**: `wasi:http/incoming-handler.handle(request, response-out)`
+  runs `main` once per request (one instance per request, as `wasmtime serve`
+  and Spin call it). `IncomingHandler.take` gives `main` the two handles, once;
+  `IncomingHandler.serve handler` takes them and calls `handler`. If `main`
+  returns without taking them the host gets a 500 response.
+- **Limits**: a single call's returned lists and strings (a `blocking-read`'s
+  bytes, `fields.entries`) must fit the 2 MiB scratch buffer `cabi_realloc`
+  uses (src/wasi/lasm_wasi_http.c), so read bodies in chunks (64 KiB is
+  plenty). `blocking-write-and-flush` takes at most 4096 bytes a call (WASI).
+
+### How it is built
+
+[`scripts/bindings/wit.mjs`](../scripts/bindings/wit.mjs) reads the WIT
+(packages, interfaces, `use`, aliases, records, variants, enums, flags,
+resources, functions, docs and `@since`/`@unstable`/`@deprecated` gates);
+[`scripts/bindings/generate-wasi-http.mjs`](../scripts/bindings/generate-wasi-http.mjs)
+resolves the bound interfaces and writes:
+
+- `library/Lasm/WASI/**/*.lean`, whose doc comments quote the WIT (licence:
+  `library/Lasm/WASI/WIT-LICENSE.txt`), and `library/Lasm/WASI/Http.lean`;
+- [`library/c/lasm_wasi_http_bindings.c`](../library/c/lasm_wasi_http_bindings.c):
+  the canonical ABI for the module's 32-bit memory, one lift (memory → Lean),
+  store (Lean → memory) and lower (Lean → core values) helper per type, which
+  follow Lean's object layout (object fields first, then scalars by size;
+  one-field structures and handles unboxed, payload-free variants as `uint8`).
+  Parameters are flattened (at most 16 core values), variants into their
+  joined core types; a result of more than one core value comes back through
+  a return area; lists passed in are copied to temporary memory (strings and
+  byte lists are passed in place); a result holding lists or strings is
+  allocated by `cabi_realloc`, armed around that call only;
+- `src/wasi/lasm_wasi_http_imports.h`, the same import declarations for the
+  hand-written Lasm.Fetch glue ([`src/wasi/lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c),
+  which keeps the export, `cabi_realloc` and Lasm.Fetch's own calls until
+  Lasm.Fetch is deleted), so both name each import by one symbol;
+- `test/fixtures/wasi-http-abi/Fixture/EveryCall.lean` and
+  `scripts/bindings/wasi-http-surface.json`.
+
+Every `--target wasi-http` program links the glue with `-DLASM_WASI_HTTP`
+([`src/wasi/wasi-link.mjs`](../src/wasi/wasi-link.mjs)), and the glue
+references every import (`lasm_wasi_http_bound_imports`), so every program's
+core module imports the same 90 functions and the one component template
+(`src/wasi/component/proxy-template.wasm`) serves them all: CI's
+`make-component-template.mjs --check` requires the template, and each build of
+`examples/fetch`, `examples/wasi-http` and the fixture, to be byte for byte what
+wasm-tools makes. Other builds of a program that imports Lasm.WASI.Http link
+the glue's failing stubs.
+
+To move to a newer WASI release, replace `scripts/wasi/wit/deps/` (with its
+README and licence), regenerate, regenerate the component template in CI
+(wasi.yml keeps `proxy-template.wasm` in its `wasi-results` artifact when the
+check fails) and `library/prebuilt`.
+
+### Tests
+
+- [`test/wasi-http-bindings.test.mjs`](../test/wasi-http-bindings.test.mjs):
+  the committed files are the generator's output; the library ships every
+  module in import order; every extern has its C function with host imports
+  and as a stub with the same parameters; the surface report counts every
+  import; and the core signatures equal wit-bindgen 0.63's for the 45
+  functions the hand-written glue declared before.
+- [`test/fixtures/wasi-http-abi`](../test/fixtures/wasi-http-abi): 35
+  conformance checks under `wasmtime serve`, each stating its Lean proposition
+  in a comment (`∀ n v, (Fields.new >>= fun f => f.append n v *> f.get n) = pure #[v]`,
+  lists of lists and of tuples both ways, typed `header-error`s, immutable
+  request headers, variant round trips such as `.other "PURGE"`, `option<u64>`
+  timeouts, nested `option<result<result<…>>>` futures, `poll`, the clock, a
+  full outgoing exchange, a 300,000-byte body, `connection-refused`).
+- [`examples/wasi-http`](../examples/wasi-http/Main.lean) answers the same
+  route checks as `examples/fetch` under `wasmtime serve`
+  (`scripts/wasi/wasi-ci.mjs`, host `lasm-wasi-http`).
+
+[`wasi-http-bindings.yml`](../.github/workflows/wasi-http-bindings.yml) runs
+the drift check and the unit tests on pull requests that touch them, and
+[`wasi.yml`](../.github/workflows/wasi.yml) the `wasmtime serve` checks.

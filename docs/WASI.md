@@ -239,8 +239,5 @@ of the reachable modules is cheap. Three concurrent outbound requests to a
 - **A wasi-http component with `wasi:cli` imports** (environment,
   arguments, files through `wasi:filesystem`): the component targets the
   proxy world, which has none.
-- **`Lasm.WASI.Http`**, wasi:http generated from its WIT as `Lasm.Fastly` is
-  from Fastly's witx ([WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md#lasmwasihttp-not-yet-generated)).
-  Fastly's whole host ABI is bound: [`Lasm.Fastly`](WASI_FASTLY_BINDINGS.md#lasmfastly).
 - **Sockets in `--target wasi`**: preview 1 has none; `--target wasi-http`
   sends HTTP requests instead.

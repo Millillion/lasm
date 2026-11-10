@@ -135,9 +135,17 @@ decisions themselves are logged with their reasoning in
   Folio still serve one `Lasm.Fetch` handler on Fastly and wasi-http; they
   move to per-target entry modules (decision above) once `Lasm.WASI.Http` and
   the `Lasm.JS.*` serve path land.
-- [ ] **`Lasm.WASI.Http` is not generated yet** ([plan](WASI_FASTLY_BINDINGS.md#lasmwasihttp-not-yet-generated)):
-  the component template must then come from a module that imports every
-  bound wasi:http function.
+- [ ] **`Lasm.WASI.Http` is generated** ([WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md#lasmwasihttp)),
+  for review: the mapping rules (`result<T, E>` as `Except E T` inside `IO`,
+  so the WIT's errors are values and `IO.Error` means only "not a wasi-http
+  host"; resources as `structure R where handle : UInt32` with explicit
+  `R.drop`, not freed by reference counting; heck names such as
+  `ErrorCode.httpRequestUriInvalid`); the export as
+  `IncomingHandler.serve fun request responseOut => …`; every wasi-http program
+  importing all 90 functions so one component template serves them; the 2 MiB
+  limit on one call's returned lists. The hand-written Lasm.Fetch glue
+  (src/wasi/lasm_wasi_http.c) stays until Lasm.Fetch is deleted; it now names
+  its imports through the generated header.
 
 ### The browser tier replaced `Lasm.Web` (2026-11-10, Jordan's decision; Claude's choices to review)
 
