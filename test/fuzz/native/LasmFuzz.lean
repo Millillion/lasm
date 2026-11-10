@@ -3,10 +3,14 @@ Fuzz entry points for Lasm's Lean boundaries, compiled to C with the managed
 Lean and linked into libFuzzer binaries (test/fuzz/native/build.mjs,
 lean_driver.c). Each takes the fuzz input and returns "" or a description of
 the property it broke; the driver aborts on a non-empty answer, and a Lean
-panic aborts too (lean_set_exit_on_panic).
+panic aborts too (lean_set_exit_on_panic). The candidates of
+library/Lasm/Fetch/Candidates.lean and library/Lasm/RPC/Candidates.lean are
+checked here: each is cited by a `Proposition:` line, with its statement, and
+its body is evaluated on every input (docs/TESTING_STRATEGY.md §4).
 -/
 import Lasm.Fetch
 import Lasm.RPC.Core
+import Lasm.UI.Url
 open Lean Lasm.Fetch
 
 namespace LasmFuzz
@@ -70,6 +74,14 @@ def fetchRequest (input : ByteArray) : String := Id.run do
   if again != path then return s!"resolving {path.quote} again gives {again.quote}"
   for s in req.segments do
     if s == "." || s == ".." then return s!"a dot segment in {url.quote}"
+  -- Proposition: Lasm.Fetch.Candidates.segments_nonempty
+  --   ∀ r : Request, ∀ s ∈ r.segments, s ≠ ""
+  unless decide (∀ s ∈ req.segments, s ≠ "") do return s!"an empty segment in {url.quote}"
+  -- Proposition: Lasm.Fetch.Candidates.percent_round_trip
+  --   ∀ s : String, percentDecode (Lasm.UI.Url.percentEncode s) = s
+  for s in [target, method, text body] do
+    unless decide (percentDecode (Lasm.UI.Url.percentEncode s) = s) do
+      return s!"percentDecode does not read percentEncode {s.quote} back"
   if req.query.any (· == '#') then return s!"the query {req.query.quote} holds #"
   if req.queryParams.length > (req.query.splitOn "&").length then return "more parameters than parts"
   if host.isSome && req.header? "HOST" != host then return "header? missed the Host header"
@@ -105,25 +117,39 @@ failed); and Lean's JSON printer's output parses and prints again unchanged. -/
 def rpc (input : ByteArray) : String := Id.run do
   -- The server reads the body as `Request.text`: empty when it is not UTF-8.
   let body := (String.fromUTF8? input).getD ""
+  -- Todo's ToJson and FromJson round-trip (the candidates' hypothesis).
   match addTodo.decodeRequest body with
   | .ok r =>
     if !(addTodo.validate r matches .ok ()) then return "decodeRequest accepted a request that fails validate"
+    -- Proposition: Lasm.RPC.Candidates.request_round_trip
+    --   ∀ (Req Res : Type) [ToJson Req] [FromJson Req] (e : Endpoint Req Res) (r : Req),
+    --     (∀ x : Req, fromJson? (toJson x) = .ok x) → e.validate r = .ok () →
+    --     e.decodeRequest (e.encodeRequest r) = .ok r
     match addTodo.decodeRequest (addTodo.encodeRequest r) with
     | .ok r' => if r' != r then return s!"the request changed in a round trip: {repr r} → {repr r'}"
     | .error e => return s!"the re-encoded request was refused: {e}"
+    -- Proposition: Lasm.RPC.Candidates.response_round_trip
+    --   ∀ (Req Res : Type) [ToJson Res] [FromJson Res] (e : Endpoint Req Res) (r : Res),
+    --     (∀ x : Res, fromJson? (toJson x) = .ok x) →
+    --     e.decodeResponse 200 (e.encodeResponse (.ok r)) = .ok r
     match addTodo.decodeResponse 200 (addTodo.encodeResponse (.ok r)) with
     | .ok r' => if r' != r then return "the response changed in a round trip"
     | .error e => return s!"the encoded response was refused: {e}"
   | .error (.invalid m) =>
-    match addTodo.decodeResponse 400 (addTodo.encodeResponse (.error m)) with
-    | .error (.invalid m') => if m' != m then return "the 400 message changed"
-    | _ => return "a 400 answer was not read as invalid"
-    match addTodo.decodeResponse 500 (addTodo.encodeResponse (.error m)) with
-    | .error (.failed 500 m') => if m' != m then return "the 500 message changed"
-    | _ => return "a 500 answer was not read as failed"
+    -- Proposition: Lasm.RPC.Candidates.error_round_trip
+    --   ∀ (Req Res : Type) [ToJson Res] [FromJson Res] (e : Endpoint Req Res) (m : String) (status : Nat),
+    --     e.decodeResponse status (e.encodeResponse (.error m)) =
+    --       .error (if status == 400 then .invalid m else .failed status m)
+    for status in [400, 500, 200, input.size % 600] do
+      match addTodo.decodeResponse status (addTodo.encodeResponse (.error m)) with
+      | .error e => if e != (if status == 400 then .invalid m else .failed status m) then
+          return s!"a {status} answer with the message {m.quote} was read as {repr e}"
+      | .ok _ => return s!"a {status} answer with the message {m.quote} was read as a result"
   | .error e => return s!"decodeRequest refused with {e}, not as invalid"
   -- Printing is a normal form: what it prints parses and prints the same
   -- (`-0.0e-5` and `0` are equal numbers with different representations).
+  -- Proposition: Lasm.RPC.Candidates.json_print_normal_form
+  --   ∀ (s : String) (j : Json), parseJson s = .ok j → (parseJson j.compress).map Json.compress = .ok j.compress
   match Lasm.RPC.parseJson body with
   | .ok j =>
     match Lasm.RPC.parseJson j.compress with
