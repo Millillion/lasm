@@ -3,7 +3,8 @@ name: Fuzz
 # test/fuzz/): the CLI's argument parser, the Lasm.UI patch decoder, the
 # function platforms' HTTP mapping and the Lasm.JS value codec (JavaScript,
 # under V8 block coverage; the last two checked against Lean: the model
-# library/Lasm/Serverless/Proofs/Model.lean, and Lean's own codec), and
+# library/Lasm/Serverless/Proofs/Model.lean, and Lean's own codec), the
+# Lasm.UI applier's reading against Lean's reference decoder (ui-decode), and
 # Lasm.Fetch's request parsing, Lasm.RPC's decoding and the WASI C host's CGI
 # request (libFuzzer, ASan; UBSan for the C host).
 #   - pull requests and pushes to main: the committed corpus and regressions,
@@ -68,11 +69,14 @@ jobs:
         run: node test/fuzz/support/serverless-model.mjs
       - name: Lean's half of the Lasm.JS value codec (lasm-js-wire's oracle)
         run: node test/fuzz/support/js-wire-model.mjs
+      - name: Lean's reference decoder of Lasm.UI patches (ui-decode's oracle)
+        run: node test/fuzz/support/ui-decode-model.mjs
       - name: JavaScript targets
         env:
           LASM_SERVERLESS_MODEL: required
           LASM_JS_WIRE_MODEL: required
-        run: node test/fuzz/run.mjs replay cli-arguments serverless-http ui-patch lasm-js-wire
+          LASM_UI_DECODE_MODEL: required
+        run: node test/fuzz/run.mjs replay cli-arguments serverless-http ui-patch ui-decode lasm-js-wire
       - name: Do the native targets' sources change?
         id: native
         env:
@@ -101,7 +105,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        target: [cli-arguments, serverless-http, ui-patch, lasm-js-wire, lean-fetch-request, lean-rpc, wasi-cgi]
+        target: [cli-arguments, serverless-http, ui-patch, ui-decode, lasm-js-wire, lean-fetch-request, lean-rpc, wasi-cgi]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -121,6 +125,11 @@ jobs:
         run: |
           node test/fuzz/support/js-wire-model.mjs
           echo "LASM_JS_WIRE_MODEL=required" >> "$GITHUB_ENV"
+      - name: Lean's reference decoder of Lasm.UI patches (the oracle)
+        if: matrix.target == 'ui-decode'
+        run: |
+          node test/fuzz/support/ui-decode-model.mjs
+          echo "LASM_UI_DECODE_MODEL=required" >> "$GITHUB_ENV"
       - name: Native target
         if: startsWith(matrix.target, 'lean-') || matrix.target == 'wasi-cgi'
         run: |
