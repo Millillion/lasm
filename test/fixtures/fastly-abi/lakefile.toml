@@ -1,4 +1,4 @@
-name = "fastly-abi"
+name = "fastlyAbi"
 version = "0.1.0"
 defaultTargets = ["Fixture"]
 
