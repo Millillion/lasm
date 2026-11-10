@@ -271,6 +271,27 @@ function createRunner() {
   };
 }
 
+/** The watch loop's schedule. One build at a time: a request during a build
+ * runs once after it (as a 'change'); changes within `debounceMs` of each
+ * other are one build; nothing is scheduled after stop(). `timers` (setTimeout
+ * and clearTimeout) is the clock, so tests drive it step by step. */
+export function createBuildSchedule(build, { debounceMs = 120, timers = globalThis } = {}) {
+  let building = false, queued = false, stopped = false, timer;
+  const run = async (reason, options) => {
+    if (building) { queued = true; return; }
+    building = true;
+    try { await build(reason, options); } finally {
+      building = false;
+      if (queued && !stopped) { queued = false; timers.setTimeout(() => run('change'), 0); }
+    }
+  };
+  return {
+    run,
+    changed() { timers.clearTimeout(timer); timer = timers.setTimeout(() => run('change'), debounceMs); },
+    stop() { stopped = true; timers.clearTimeout(timer); },
+  };
+}
+
 /** hooks (for templates and tools that drive lasm dev, such as a full-stack
  * template): onBuilt({ target, input, output, result }) after each good build of
  * an output; routes(request, response) → true when handled, for the browser
@@ -313,7 +334,7 @@ export async function runDev(options, hooks = {}) {
   const publicUrl = `http://${options.host ?? '127.0.0.1'}:${options.port ?? (Number(process.env.PORT) || 3000)}/`;
   let lastBuilt = new Map(), changeAt, editorChecked = false;
   const tty = process.stderr.isTTY;
-  let building = false, queued = false, previous = snapshot(project), lastGood, stopping = false, server;
+  let previous = snapshot(project), lastGood, stopping = false, server;
   const browserOutput = resolve(options.output ?? join(project, '.lake/lasm/browser-dev'));
   const status = text => { if (tty) process.stderr.write(`\r\x1b[K${color('2', '[lasm dev] ' + text)}`); };
   const clearStatus = () => { if (tty) process.stderr.write('\r\x1b[K'); };
@@ -331,12 +352,10 @@ export async function runDev(options, hooks = {}) {
   };
 
   const rebuild = async (reason, { force = false } = {}) => {
-    if (building) { queued = true; return; }
-    building = true;
     const next = snapshot(project);
     const changed = changedFiles(previous, next);
     // Nothing changed (an editor touched a file, or the build wrote its own files): no rebuild.
-    if (!force && !changed.length) { building = false; changeAt = undefined; return; }
+    if (!force && !changed.length) { changeAt = undefined; return; }
     previous = next;
     if (reason) say(reason === 'change' ? `${changed.slice(0, 3).map(file => relative(project, file)).join(', ')}${changed.length > 3 ? ` and ${changed.length - 3} more` : ''} changed; rebuilding` : reason);
     const stages = [], started = performance.now(), changedAt = changeAt ?? started;
@@ -439,22 +458,20 @@ export async function runDev(options, hooks = {}) {
       // that is the build's own output, not a change to rebuild for.
       const after = snapshot(project);
       for (const [file, hash] of after) if (generatedByBuild(file) && previous.get(file) !== hash) previous.set(file, hash);
-      building = false;
-      if (queued && !stopping) { queued = false; setTimeout(() => rebuild('change'), 0); }
     }
   };
 
-  let timer;
-  const watcher = watchProject(project, () => { changeAt ??= performance.now(); clearTimeout(timer); timer = setTimeout(() => rebuild('change'), 120); });
+  const schedule = createBuildSchedule(rebuild);
+  const watcher = watchProject(project, () => { changeAt ??= performance.now(); schedule.changed(); });
   const files = projectFiles(project).length;
   say(`Watching ${files} file${files === 1 ? '' : 's'} in ${relative(process.cwd(), project) || '.'} (${watcher.mode}); target ${options.outputs.map(o => o.target).join(', ')}, ${options.profile} profile. Ctrl+C stops.`);
   process.stdin.setEncoding?.('utf8');
-  if (process.stdin.isTTY || process.env.LASM_DEV_STDIN) process.stdin.on('data', text => { if (text.trim() === 'rs') rebuild('Rebuilding (rs)', { force: true }); });
-  await rebuild('Building ' + relative(process.cwd(), source), { force: true });
+  if (process.stdin.isTTY || process.env.LASM_DEV_STDIN) process.stdin.on('data', text => { if (text.trim() === 'rs') schedule.run('Rebuilding (rs)', { force: true }); });
+  await schedule.run('Building ' + relative(process.cwd(), source), { force: true });
   return new Promise(resolveExit => {
     const stop = async () => {
       if (stopping) return; stopping = true;
-      clearTimeout(timer); watcher.close();
+      schedule.stop(); watcher.close();
       await runner.stop(); await server?.close?.(); await service.close();
       process.stdin.pause?.();
       resolveExit(0);

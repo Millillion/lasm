@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
-import { changedFiles, devTargets, devUsage, formatLeanDiagnostics, parseDevArguments, projectFiles, relevantFile, snapshot, summarizeStages, watchProject } from '../src/dev.mjs';
+import { changedFiles, createBuildSchedule, devTargets, devUsage, formatLeanDiagnostics, parseDevArguments, projectFiles, relevantFile, snapshot, summarizeStages, watchProject } from '../src/dev.mjs';
 import { jsRuntime } from '../src/js-runtime.mjs';
 import { forAll } from './helpers/property.mjs';
 
@@ -333,4 +333,117 @@ test('watchProject: a directory is armed once; a change event on a directory nam
     assert.equal(events, 2, 'a change event names a file');
     watcher.close();
   } finally { rmSync(project, { recursive: true, force: true }); }
+});
+
+// The watch loop's schedule on a stand-in clock: every timer is explicit, so
+// queueing, debouncing and stopping are checked step by step, with no sleeps.
+function standInClock() {
+  let now = 0, next = 0;
+  const pending = new Map();
+  return {
+    pending,
+    setTimeout(fn, ms) { pending.set(++next, { at: now + ms, fn }); return next; },
+    clearTimeout(id) { pending.delete(id); },
+    /** Moves the clock forward, firing each due timer in order and letting its promises settle. */
+    async advance(ms) {
+      const end = now + ms;
+      for (;;) {
+        const due = [...pending].filter(([, t]) => t.at <= end).sort((a, b) => a[1].at - b[1].at || a[0] - b[0])[0];
+        if (!due) break;
+        pending.delete(due[0]); now = due[1].at; due[1].fn();
+        for (let i = 0; i < 10; i++) await Promise.resolve();
+      }
+      now = end;
+    },
+  };
+}
+function scheduledBuilds(clock, options) {
+  const calls = [];
+  const schedule = createBuildSchedule((reason, buildOptions) => {
+    let finish;
+    const done = new Promise(resolve => { finish = resolve; });
+    calls.push({ reason, options: buildOptions, finish });
+    return done;
+  }, { timers: clock, ...options });
+  return { calls, schedule };
+}
+const settle = async () => { for (let i = 0; i < 10; i++) await Promise.resolve(); };
+
+test('the build schedule: one build at a time; a request during a build runs once after it', async () => {
+  const clock = standInClock();
+  const { calls, schedule } = scheduledBuilds(clock);
+  const first = schedule.run('Building Main.lean', { force: true });
+  assert.deepEqual(calls.map(c => [c.reason, c.options]), [['Building Main.lean', { force: true }]]);
+  // Two requests during the build: no second build yet, one after it.
+  schedule.run('Rebuilding (rs)', { force: true });
+  schedule.changed();
+  await clock.advance(1000);
+  assert.equal(calls.length, 1, 'one build at a time');
+  calls[0].finish();
+  await first;
+  assert.equal(calls.length, 1, 'the queued build waits for its own turn of the clock');
+  await clock.advance(0);
+  assert.deepEqual(calls.map(c => c.reason), ['Building Main.lean', 'change']);
+  assert.equal(calls[1].options, undefined);
+  calls[1].finish();
+  await settle();
+  // The queue is empty again: nothing more runs, and no timer is left.
+  await clock.advance(1000);
+  assert.equal(calls.length, 2);
+  assert.equal(clock.pending.size, 0);
+  // A build after the queued one: still one at a time, and nothing after it.
+  const third = schedule.run('again');
+  assert.equal(calls.length, 3);
+  calls[2].finish();
+  await third;
+  await clock.advance(1000);
+  assert.equal(calls.length, 3);
+  assert.equal(clock.pending.size, 0);
+  // A build that fails still frees the schedule and runs what was queued.
+  const { calls: failing, schedule: failingSchedule } = scheduledBuilds(clock);
+  const failed = failingSchedule.run('first');
+  failingSchedule.run('during');
+  failing[0].finish(Promise.reject(new Error('build failed')));
+  await assert.rejects(failed, /build failed/);
+  await clock.advance(0);
+  assert.deepEqual(failing.map(c => c.reason), ['first', 'change']);
+});
+
+test('the build schedule: changes within the debounce are one build; stop cancels what is pending', async () => {
+  const clock = standInClock();
+  const { calls, schedule } = scheduledBuilds(clock);
+  schedule.changed();
+  await clock.advance(100);
+  schedule.changed();
+  await clock.advance(100);
+  assert.equal(calls.length, 0, 'the second change restarts the wait');
+  await clock.advance(20);
+  assert.deepEqual(calls.map(c => [c.reason, c.options]), [['change', undefined]]);
+  calls[0].finish();
+  await settle();
+  await clock.advance(1000);
+  assert.equal(calls.length, 1, 'one build for both changes');
+  // A custom debounce.
+  const other = scheduledBuilds(clock, { debounceMs: 5 });
+  other.schedule.changed();
+  await clock.advance(4);
+  assert.equal(other.calls.length, 0);
+  await clock.advance(1);
+  assert.equal(other.calls.length, 1);
+  // A change, then stop: the pending build never runs.
+  schedule.changed();
+  schedule.stop();
+  await clock.advance(1000);
+  assert.equal(calls.length, 1);
+  assert.equal(clock.pending.size, 0);
+  // Stopped during a build: what was queued is dropped.
+  const late = scheduledBuilds(clock);
+  const running = late.schedule.run('first');
+  late.schedule.run('during');
+  late.schedule.stop();
+  late.calls[0].finish();
+  await running;
+  await clock.advance(1000);
+  assert.equal(late.calls.length, 1);
+  assert.equal(clock.pending.size, 0);
 });
