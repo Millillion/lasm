@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { modules } from '../scripts/bindings/web-tier1.mjs';
+import { modules as browserModules } from '../scripts/bindings/web-browser.mjs';
 import { libraryModules } from '../src/lasm-library.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -33,5 +34,23 @@ test('the generated modules are shipped library modules, in import order', () =>
     const source = readFileSync(`${root}library/${m.replaceAll('.', '/')}.lean`, 'utf8');
     for (const [, imported] of source.matchAll(/^import (Lasm\.\S+)$/gm))
       assert.ok(libraryModules.indexOf(imported) < libraryModules.indexOf(m), `${m} imports ${imported}, which comes later`);
+  }
+});
+
+test('every browser-tier interface and window global is generated', () => {
+  const { surface } = JSON.parse(readFileSync(new URL('../scripts/bindings/browser-surface.json', import.meta.url), 'utf8'));
+  for (const m of browserModules) {
+    for (const name of [...m.interfaces, ...m.windowGlobals ?? []]) {
+      assert.ok(surface[name], `${name} is missing from the generated browser surface`);
+      assert.equal(surface[name].module, m.name);
+    }
+  }
+});
+
+test('tier 1 never imports the browser tier (a server program links nothing of the DOM)', () => {
+  const browser = new Set([...browserModules.map(m => `Lasm.JS.Web.${m.name}`), 'Lasm.JS.Web.Browser']);
+  for (const m of [...modules.map(m => `Lasm.JS.Web.${m.name}`), 'Lasm.JS.Web']) {
+    const source = readFileSync(`${root}library/${m.replaceAll('.', '/')}.lean`, 'utf8');
+    for (const [, imported] of source.matchAll(/^import (Lasm\.\S+)$/gm)) assert.ok(!browser.has(imported), `${m} imports ${imported}`);
   }
 });
