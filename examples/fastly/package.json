@@ -1,0 +1,5 @@
+{
+  "name": "lasm-fastly-example",
+  "private": true,
+  "description": "An HTTP server on Fastly Compute's own host calls (Lasm.Fastly): lasm build Main.lean --target fastly"
+}
