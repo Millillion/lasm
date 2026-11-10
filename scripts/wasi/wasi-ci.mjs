@@ -9,6 +9,10 @@
 //     three engines, served by Spin (wagi executor), as Fastly Compute
 //     (`--target fastly`) under Viceroy, and on Node (`lasm build`) and Deno
 //     (`--target deno`): routes, bodies, headers, statuses, async waits and errors;
+//   - examples/fastly, the same routes on Lasm.Fastly (Fastly's host ABI,
+//     generated from its witx), under Viceroy, and test/fixtures/fastly-abi:
+//     Lasm.Fastly's conformance checks, in a module that imports every bound
+//     host function (Viceroy checks each import when it loads the module);
 //   - sizes, startup and per-request times, written to WORK/wasi-results.json.
 //   node scripts/wasi/wasi-ci.mjs WORK TOOLS [--engines wasmtime,wasmer,node,spin,viceroy,lasm-node,deno]
 // TOOLS holds the pinned tools (the workflow installs them): wasmtime/wasmtime,
@@ -46,8 +50,8 @@ for (const [name, path] of Object.entries(toolPath)) {
 const passed = ['LASM_APPLICATION_RUNTIME', 'LASM_EDGE_RUNTIME', 'LASM_BUILD_JOBS', 'LASM_KEEP_LINK_WORK'].filter(key => process.env[key])
   .map(key => `${key}=${key === 'LASM_BUILD_JOBS' ? process.env[key] : resolve(process.env[key])}`);
 const bounded = [join(root, 'scripts/full-lean/run-bounded.mjs'), '--', 'python3', join(root, 'scripts/full-lean/base-pages.py'), 'env', ...passed];
-const cli = join(work, 'cli'), fetchApp = join(work, 'fetch');
-for (const [from, to] of [['examples/wasi-cli', cli], ['examples/fetch', fetchApp]]) {
+const cli = join(work, 'cli'), fetchApp = join(work, 'fetch'), fastlyApp = join(work, 'fastly'), fastlyAbi = join(work, 'fastly-abi');
+for (const [from, to] of [['examples/wasi-cli', cli], ['examples/fetch', fetchApp], ['examples/fastly', fastlyApp], ['test/fixtures/fastly-abi', fastlyAbi]]) {
   rmSync(to, { recursive: true, force: true });
   cpSync(join(root, from), to, { recursive: true });
 }
@@ -63,6 +67,11 @@ lasm(fetchApp, ['build', 'Main.lean', '--target', 'wasi'], 'fetch-wasi');
 Object.assign(results.builds['fetch-wasi'], sizes(join(fetchApp, 'wasi/main.wasm')));
 lasm(fetchApp, ['build', 'Main.lean', '--target', 'fastly'], 'fetch-fastly');
 lasm(fetchApp, ['build', 'Main.lean', '--target', 'wasi-http'], 'fetch-wasi-http');
+// Lasm.Fastly: the example server and the conformance fixture.
+lasm(fastlyApp, ['build', 'Main.lean', '--target', 'fastly'], 'fastly-example');
+Object.assign(results.builds['fastly-example'], sizes(join(fastlyApp, 'bin/main.wasm')));
+lasm(fastlyAbi, ['build', 'Main.lean', '--target', 'fastly'], 'fastly-abi');
+Object.assign(results.builds['fastly-abi'], sizes(join(fastlyAbi, 'bin/main.wasm')));
 Object.assign(results.builds['fetch-wasi-http'], sizes(join(fetchApp, 'wasi-http/main.wasm')));
 // The shipped component template must still be what wasm-tools makes, and the
 // build must equal wasm-tools' own component (scripts/wasi/make-component-template.mjs).
@@ -170,7 +179,7 @@ const routes = [
   { path: '/time', json: { mono: true, random: 8 } },
   { path: '/throw', status: 500, text: 'Internal Server Error\n' },
   { path: '/nope', status: 404, text: 'Not Found\n' },
-  { path: '/fastly/stores', json: { color: 'blue', missing: true, secret: 's3cret', greeting: 'hello kv', counter: '41', deleted: true }, only: ['viceroy'] },
+  { path: '/fastly/stores', json: { color: 'blue', missing: true, secret: 's3cret', greeting: 'hello kv', counter: '41', deleted: true }, only: ['lasm-fastly'] },
   // Streamed bodies (/stream/… requests are read on demand).
   { path: '/stream/out/5', text: Array.from({ length: 5 }, (_, i) => `chunk ${i}\n`).join('') },
   { path: '/stream/in', method: 'POST', body: new Uint8Array(300000).fill(7), headers: { 'content-type': 'application/octet-stream' }, json: { bytes: 300000, chunks: true } },
@@ -182,7 +191,9 @@ const routes = [
   { path: `/outbound?url=${encodeURIComponent(origin + '/origin/echo')}&backend=origin`, json: { status: 200, body: 'POST:ping', echoed: 'POST' }, only: ['viceroy'] },
   { path: `/outbound?url=${encodeURIComponent(origin + '/origin/echo')}`, status: 500, text: 'Internal Server Error\n', only: ['cgi-wasmtime', 'cgi-wasmer', 'cgi-node', 'spin-wagi'] },
 ];
-const applies = (host, route) => !(route.skip?.includes(host) || route.only && !route.only.includes(host)
+// examples/fastly (host lasm-fastly) runs under Viceroy: Viceroy's skips and checks apply to it too.
+const applies = (host, route) => !(route.skip?.includes(host === 'lasm-fastly' ? 'viceroy' : host)
+  || route.only && !route.only.includes(host) && !(host === 'lasm-fastly' && route.only.includes('viceroy'))
   || route.outbound && ['cgi-wasmtime', 'cgi-wasmer', 'cgi-node', 'spin-wagi'].includes(host));
 function checkResponse(host, route, { status, headers, body }) {
   const where = `${host} ${route.method ?? 'GET'} ${route.path}`;
@@ -317,16 +328,50 @@ allowed_outbound_hosts = ["${origin}"]
 }
 if (engines.has('wasmtime'))
   await serveAndCheck('wasmtime-serve', toolPath.wasmtime, ['serve', '--addr', '127.0.0.1:3105', 'wasi-http/main.wasm'], { cwd: fetchApp, port: 3105 });
-if (engines.has('viceroy')) {
-  // A named backend for FetchOptions.backend (Fastly services name theirs).
-  writeFileSync(join(fetchApp, 'fastly.toml'), readFileSync(join(fetchApp, 'fastly.toml'), 'utf8')
+// Viceroy's local service: a named backend (FetchOptions.backend; Fastly services name
+// theirs), a Config Store, a Secret Store and a KV Store.
+const localServer = app => writeFileSync(join(app, 'fastly.toml'), readFileSync(join(app, 'fastly.toml'), 'utf8')
     + `\n[local_server]\n  [local_server.backends]\n    [local_server.backends.origin]\n      url = "${origin}"\n`
     + `  [local_server.config_stores]\n    [local_server.config_stores.settings]\n      format = "inline-toml"\n    [local_server.config_stores.settings.contents]\n      color = "blue"\n`
     + `  [local_server.secret_stores]\n    [[local_server.secret_stores.secrets]]\n      key = "token"\n      data = "s3cret"\n`
     + `  [local_server.kv_stores]\n    [[local_server.kv_stores.kv]]\n      key = "greeting"\n      data = "hello kv"\n`);
-}
-if (engines.has('viceroy'))
+if (engines.has('viceroy')) {
+  localServer(fetchApp);
   await serveAndCheck('viceroy', toolPath.viceroy, ['serve', '--addr', '127.0.0.1:3102', '-C', 'fastly.toml', 'bin/main.wasm'], { cwd: fetchApp, port: 3102 });
+  // examples/fastly: the same routes on Lasm.Fastly.
+  localServer(fastlyApp);
+  await serveAndCheck('lasm-fastly', toolPath.viceroy, ['serve', '--addr', '127.0.0.1:3107', '-C', 'fastly.toml', 'bin/main.wasm'], { cwd: fastlyApp, port: 3107 });
+  // Lasm.Fastly's conformance checks. Viceroy loading the module at all checks every
+  // bound host function's import (the module imports each one).
+  localServer(fastlyAbi);
+  const out = results.fetch['fastly-abi'] = { passed: 0 };
+  const child = spawn(toolPath.viceroy, ['serve', '--addr', '127.0.0.1:3108', '-C', 'fastly.toml', 'bin/main.wasm'],
+    { cwd: fastlyAbi, env: headlessEnvironment(), stdio: ['ignore', 'pipe', 'pipe'] });
+  let log = '';
+  child.stdout.on('data', d => { log += d; }); child.stderr.on('data', d => { log += d; });
+  try {
+    const started = performance.now();
+    for (let ready = false; !ready;) {
+      if (child.exitCode !== null) throw new Error(`Viceroy exited (${child.exitCode}) loading the conformance fixture:\n${log}`);
+      if (performance.now() - started > 120_000) throw new Error(`Viceroy did not start:\n${log}`);
+      try { await fetch('http://127.0.0.1:3108/', { signal: AbortSignal.timeout(2000) }); ready = true; } catch { await new Promise(r => setTimeout(r, 200)); }
+    }
+    const response = await fetch('http://127.0.0.1:3108/conformance');
+    const text = await response.text();
+    const r = JSON.parse(text);
+    Object.assign(out, { passed: r.passed, total: r.total, failed: r.failed });
+    for (const f of r.failed) fail(`fastly-abi conformance: ${f.name}`, f.detail);
+    assert.equal(response.status, 200);
+    assert.ok(r.total >= 28 && r.passed === r.total, `conformance: ${r.passed} of ${r.total} passed`);
+  } catch (error) { fail('fastly-abi', error); }
+  finally {
+    child.kill('SIGTERM');
+    await new Promise(r => setTimeout(r, 500));
+    if (child.exitCode === null) child.kill('SIGKILL');
+    out.log = log.slice(-4000);
+    save();
+  }
+}
 if (engines.has('lasm-node'))
   await serveAndCheck('lasm-node', process.execPath, ['dist/main.mjs'], { cwd: fetchApp, port: 3103, env: { PORT: '3103', HOST: '127.0.0.1', GREETING: 'hello from the host' } });
 if (engines.has('deno'))

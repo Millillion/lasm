@@ -11,9 +11,13 @@ import Lasm.Fetch.Embed
 embedded in the program so every target serves them. -/
 def assets : Lasm.Fetch.Assets := embed_dir! "dist/public"
 
-/-- `JWT_SECRET` from the secret store `conduit`, else the development secret. -/
+/-- `JWT_SECRET` from the secret store `conduit` (Lasm.Fastly.SecretStore), else the development secret. -/
 def secret : IO String := do
-  try return (← Lasm.Fastly.secretText "conduit" "JWT_SECRET").getD Conduit.Server.developmentSecret
+  try
+    let store ← Lasm.Fastly.SecretStore.open "conduit"
+    match ← Lasm.Fastly.found? (Lasm.Fastly.SecretStore.get store "JWT_SECRET") with
+    | some s => Lasm.Fastly.SecretStore.plaintext s
+    | none => return Conduit.Server.developmentSecret
   catch _ => return Conduit.Server.developmentSecret
 
 def main : IO Unit := do

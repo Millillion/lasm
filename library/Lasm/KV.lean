@@ -96,12 +96,50 @@ def deno (name : String) : IO Store := do
     let _ : Data ← kv.callMethodAwait "delete" #[.array #[.string name, .string k]]
   return { kind := "deno", get, put, delete }
 
-/-- A Fastly KV Store. -/
+namespace FastlyKV
+open Lasm.Fastly
+
+/-- A body's bytes, read to its end. -/
+partial def readAll (body : BodyHandle) (acc : ByteArray := .empty) : EIO FastlyStatus ByteArray := do
+  let chunk ← HttpBody.read body 65536
+  if chunk.isEmpty then return acc else readAll body (acc ++ chunk)
+
+/-- Writes all of `bytes` to `body` (a write may take part of them). -/
+partial def writeAll (body : BodyHandle) (bytes : ByteArray) : EIO FastlyStatus Unit := do
+  if bytes.isEmpty then return
+  let n ← HttpBody.write body bytes .back
+  writeAll body (bytes.extract n.toNat bytes.size)
+
+def get (name key : String) : IO (Option String) := do
+  let store ← KvStore.open name
+  let (body, _, _, error) ← KvStore.lookupWaitV2 (← KvStore.lookup store key {} {})
+  match error with
+  | .ok => return String.fromUTF8? (← readAll body)
+  | .notFound => return none
+  | e => throw (IO.userError s!"Lasm.KV: Fastly KV Store {name}: lookup of {key}: {e}")
+
+def put (name key value : String) : IO Unit := do
+  let store ← KvStore.open name
+  let body ← HttpBody.new
+  writeAll body value.toUTF8
+  match ← KvStore.insertWait (← KvStore.insert store key body {} {}) with
+  | .ok => pure ()
+  | e => throw (IO.userError s!"Lasm.KV: Fastly KV Store {name}: insert of {key}: {e}")
+
+def delete (name key : String) : IO Unit := do
+  let store ← KvStore.open name
+  match ← KvStore.deleteWait (← KvStore.delete store key {} {}) with
+  | .ok | .notFound => pure ()
+  | e => throw (IO.userError s!"Lasm.KV: Fastly KV Store {name}: delete of {key}: {e}")
+
+end FastlyKV
+
+/-- A Fastly KV Store (Lasm.Fastly.KvStore). -/
 def fastly (name : String) : Store :=
   { kind := "fastly",
-    get := fun k => (Lasm.Fastly.kvGetText name k : IO _),
-    put := fun k v => (Lasm.Fastly.kvPut name k v.toUTF8 : IO _),
-    delete := fun k => (Lasm.Fastly.kvDelete name k : IO _) }
+    get := fun k => (FastlyKV.get name k : IO _),
+    put := fun k v => (FastlyKV.put name k v : IO _),
+    delete := fun k => (FastlyKV.delete name k : IO _) }
 
 /-- The platform's store named `name` where there is one (see the module
 documentation), else memory. On Workers the binding is looked up per request:
@@ -111,7 +149,7 @@ def «open» (name : String) : IO Store := do
   | 2 =>
     -- Fastly: the store must exist (Viceroy: fastly.toml); otherwise memory.
     try
-      discard <| Lasm.Fastly.kvGet name "lasm:probe"
+      discard <| (Lasm.Fastly.KvStore.open name : IO _)
       return fastly name
     catch _ => memory
   | 0 =>

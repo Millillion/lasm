@@ -1,0 +1,56 @@
+name: Fastly bindings (Lasm.Fastly)
+# Lasm.Fastly, Fastly Compute's host ABI generated from the witx Viceroy ships
+# (docs/WASI_FASTLY_BINDINGS.md):
+#   - generated: the committed library/Lasm/Fastly/*.lean, library/c/lasm_fastly.c,
+#     scripts/bindings/fastly-surface.json and test/fixtures/fastly-abi/Fixture/EveryCall.lean
+#     are scripts/bindings/generate-fastly.mjs's output for scripts/fastly/witx/;
+#   - conformance: wasi.yml builds examples/fastly and test/fixtures/fastly-abi
+#     from this commit and runs them under Viceroy (with the rest of the WASI and
+#     Fastly checks). Local emulators only: no account, no deployment.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'library/Lasm/Fastly/**'
+      - 'library/Lasm/Fastly.lean'
+      - 'library/Lasm/KV.lean'
+      - 'library/c/lasm_fastly.c'
+      - 'library/prebuilt/**'
+      - 'scripts/bindings/generate-fastly.mjs'
+      - 'scripts/bindings/witx.mjs'
+      - 'scripts/bindings/lean-names.mjs'
+      - 'scripts/fastly/**'
+      - 'examples/fastly/**'
+      - 'test/fixtures/fastly-abi/**'
+      - 'test/fastly-bindings.test.mjs'
+      - 'src/wasi/**'
+      - 'src/lasm-library.mjs'
+      - 'scripts/wasi/wasi-ci.mjs'
+      - '.github/workflows/fastly-bindings.yml'
+      - '.github/workflows/wasi.yml'
+  workflow_dispatch:
+permissions:
+  # wasi.yml's edge-runtime.yml reads the draft release holding the pinned runtime handoff.
+  contents: write
+  actions: read
+concurrency:
+  group: fastly-bindings-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  generated:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: The generated bindings are the generator's output
+        run: node scripts/bindings/generate-fastly.mjs --check
+      - run: node --test test/fastly-bindings.test.mjs test/wasi-link-plan.test.mjs
+  wasi:
+    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    uses: ./.github/workflows/wasi.yml
