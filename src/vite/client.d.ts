@@ -1,9 +1,9 @@
 // Types of `import app from './Main.lean?lasm'` (add "@lasm/cli/vite/client" to compilerOptions.types).
 declare module '*.lean?lasm' {
   export interface LasmMountOptions {
-    /** Any JSON-like value: Lasm.Web.App.flags. */
+    /** Any JSON-like value: Lasm.UI.Mount.flags. */
     flags?: unknown;
-    /** Adopt server-rendered content (Lasm.Web.App.hydrating). */
+    /** Adopt server-rendered content (Lasm.UI.Mount.hydrating). */
     hydrate?: boolean;
     /** Let blocking Lean waits suspend where the browser has JSPI. */
     jspi?: boolean;

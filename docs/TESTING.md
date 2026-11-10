@@ -33,7 +33,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) and [fuzzing](#differential-fuzzing) | Lasm-compiled programs (generated expressions, statements, and feature programs declaring classes, inductives, closures, loops, structures) behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
 | [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic equals Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs` | PR, nightly |
-| [Standard bindings](#standard-bindings) | Lasm.JS.Web is its generator's output, and behaves as the specs say on every JavaScript target: WPT's URL and urlencoded data, Lean's UTF-8 as the encoder's oracle, published Web Crypto vectors, generated round trips | `scripts/bindings/`, `test/fixtures/js-web/`, `web-bindings.yml` | PR (paths), main |
+| [Standard bindings](#standard-bindings) | Lasm.JS.Web is its generator's output, and behaves as the specs say on every JavaScript target: WPT's URL and urlencoded data, Lean's UTF-8 as the encoder's oracle, published Web Crypto vectors, generated round trips; its browser tier against Lean models on Chromium, Firefox and WebKit | `scripts/bindings/`, `test/fixtures/js-web/`, `test/browser/platform/Bindings.lean`, `web-bindings.yml`, `browser.yml` | PR (paths), main; browser.yml on dispatch and release |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
@@ -340,7 +340,7 @@ five. *Catches:* differences in the Bun entry (`bun/main.mjs`) and the browser
 loader, bundle and host (output streams, uncaught errors, panics), and engine
 behaviour of Chromium's V8, Firefox's SpiderMonkey and WebKit's JavaScriptCore
 with a real web host. *Cannot catch:* the exact non-zero exit status in a
-browser; `IO.sleep` in Firefox and WebKit; the DOM, events and `Lasm.Web`
+browser; `IO.sleep` in Firefox and WebKit; the DOM, events and `Lasm.JS.Web.Browser`
 (browser.yml's suites cover those).
 
 ### Target equivalence
@@ -469,6 +469,20 @@ generator's mapping is uniform, so a member is wrong only when its types are),
 behaviour beyond the checks, Firefox and WebKit (not run yet), and the Vercel,
 Netlify and Supabase edge runtimes (their APIs are those of Deno and workerd,
 which run).
+
+**The browser tier** (`Lasm.JS.Web.Browser`, 2026-11-10).
+[`test/browser/platform/Bindings.lean`](../test/browser/platform/Bindings.lean)
+runs inside the browser platform suite (`browser.yml`) on Chromium, Firefox and
+WebKit, each check reported as `bindings.<name>` and failing the engine's job.
+Each check's comment states its proposition, over generated inputs against a
+Lean model, for example `∀ op sequences, labels (p.childNodes) = model ops` (a
+list under insert, erase and set), `(Text.new s).length = utf16Length s`,
+`e.textContent := s → e.innerHTML = escapeText s`, or
+`∀ R p, isPointInPath (Path2D R) p ↔ p ∈ R`; the rest check the specs' stated
+behaviour (input value sanitization, ignored `lineWidth` and `globalAlpha`
+values, event dispatch and cancelling, a WebSocket echo). An availability probe
+records the generated members each engine lacks (`bindingsMissing` in the
+engine's report).
 
 ### Scenario matrix
 
@@ -1165,7 +1179,7 @@ run, except the static mode of `check-tutorials.mjs` (below). Verdicts:
 | `notices.test.mjs` (3 lines of the Apache 4(b) test; the rest is behavioural) | patch names regex-parsed from `build-application-runtime.mjs` | **Keep as a cross-reference lint** until the patch table moves into an importable module (the build script runs when imported) |
 | `notices.test.mjs`: Lasm's licence copy, Wasmtime licence copies, MIT everywhere, MIT-0 texts | file equality and headers; the MIT-0 test also checks eight phrases of the `LICENSE-MIT-0` grant | **Keep**: consistency guards; licence text is what must be shipped, and a change to the grant's scope should be deliberate |
 | 29 unit files (`compiler`, `conformance`, `io`, `runtime`, the `node-*` host files …, listed in `needsTools` in `scripts/ci/unit-tests.mjs`) | not static, but they build with the retired Lean 4.32 library pipeline (system `lean` 4.32 and Zig), so CI never ran them (their failures were reported, not fatal) | **Ported or retired** (2026-11-03). **Ported**: the ordinary-Lean fixtures of 24 files (conformance, finalizers, console buffering, cwd, permissions, environment and path bytes, getLine, platform, process cwd/exit/NUL/lifetime/spawn, realPath, system directories, temporary files, truncate, runtime metadata, standard IO and the forms of `main`, TCP, wall clock) run as 31 cases of `integration/host-fixtures.mjs`, a `differential.yml` job on pull requests and main: built with the installed candidate for Node and compared with upstream Lean 4.35.0's `lean --run` (it found the unsearchable-cwd worker bug fixed with it). **Kept in the unit suite**, without their Lean parts: the Node-host tests in `node-process`, `node-temporary-files`, `node-platform`, `node-environment-bytes` and `platform`. **Retired**: `compiler`, `io`, `lake` and `runtime` test the `lasm.json` library pipeline (`src/build.mjs`), which the published CLI refuses; the earlier runtime's platform emulation, its embedded `index.mjs` API and its wall-clock fault hook; `expr-conformance` became a check that the build is refused with the runtime-kernel diagnostic; `needsTools` is empty |
-| `browser.test.mjs`: every `lasm:web`/`lasm:app` binding names an export | `@[js …]` attributes in `library/Lasm/Web` cross-checked against real exports | **Keep**: a cheap cross-reference lint; a full behavioural check would link a program using every binding |
+| `browser.test.mjs`: every `lasm:app`/`lasm:ui-dom` binding names an export | `@[js …]` attributes in `library/Lasm/UI` cross-checked against real exports (`lasm:web` and `library/Lasm/Web` were removed with `Lasm.Web`, 2026-11-10) | **Keep**: a cheap cross-reference lint; a full behavioural check would link a program using every binding |
 | `scripts/content/check-tutorials.mjs --static` (found 2026-11-03) | tutorial pages against their `steps.json` and project files | **Keep as a doc lint**: the page must show what the tutorial runs; the non-static mode runs those steps against a packed CLI |
 
 ## Coverage baseline
@@ -1263,7 +1277,7 @@ kill survivors (CI's measurement on Node 26 is the recorded floor).
 | `cli` | `cli-arguments.mjs`, `posix-arguments.mjs`, `application-cli.mjs`, `launcher.mjs`, `process-launcher.mjs`, `elapsed-ticker.mjs`, `elapsed-ticker-worker.mjs`, `build-progress.mjs`, `test-switches.mjs`, `platform.mjs`, `output-directory.mjs`, `editor.mjs`, `application-signals.mjs` | 42.7 % | **95 %** | 95 % |
 | `init` | `init.mjs` | 53.6 % | **97.1 %** | 97 % |
 | `dev` | `dev.mjs`, `dev-proxy.mjs`, `dev-build-worker.mjs`, `application-build-worker.mjs`, `browser/browser-dev.mjs`, `browser/static-server.mjs` | 29.2 % | **91 %** | 91 % |
-| `browser` | `browser/browser-build.mjs`, `browser/browser-package.mjs`, `browser/bundle.mjs`, `browser/loader.mjs`, `lasm-modules/app.mjs`, `lasm-modules/web.mjs`, `vite/index.mjs` | 26.1 % | **96.6 %** | 96 % |
+| `browser` | `browser/browser-build.mjs`, `browser/browser-package.mjs`, `browser/bundle.mjs`, `browser/loader.mjs`, `lasm-modules/app.mjs`, `lasm-modules/web.mjs` (removed with `Lasm.Web`, 2026-11-10), `vite/index.mjs` | 26.1 % | **96.6 %** | 96 % |
 | `application-sources` | `application-sources.mjs`, `application-initialization.mjs`, `application-diagnosis.mjs`, `application-binding-check.mjs`, `application-reachability.mjs`, `application-symbols.mjs`, `application-live-members.mjs`, `application-policy.mjs`, `wasm-objects.mjs`, `lasm-library.mjs` | 44.5 % | **85.4 %** | 85 % |
 | `application-output` | `application-build.mjs`, `application-output.mjs`, `application-native.mjs`, `application-npm.mjs`, `application-runtime.mjs`, `application-support.mjs`, `application-lock.mjs`, `application-metadata.mjs`, `application-metadata-runtime.mjs`, `native-bundle.mjs`, `package.mjs`, `js-runtime.mjs` | 51.1 % | **92.5 %** | 92 % |
 | `edge-build` | `edge/edge-build.mjs`, `edge/builtin-modules.mjs`, `edge/edge-initializers.mjs`, `edge/edge-pre.js` | 31.5 % | **89.4 %** | 89 % |
@@ -1388,7 +1402,6 @@ stay, with the reason; they are not chased with tests that look at the code.
 | browser | the bundler's `^` anchors and `\s+` → `\s` in a replacement after the line's own `^import`/`^export` gate; `external` default `() => false` → `() => undefined`; `visiting.delete` removed; `id !== entry` → `true`; the `''` that removes `import.meta`/`import(` before the static-import check | Each line was already matched at its start; `undefined` is as false; a module is looked up in `transformed` before `visiting`; the entry is visited last, so its variable is never read; no glue spells `import` around those words |
 | browser | the loader's `detail === undefined`, `text === undefined`, `{ app: null }` → `{}`, `?? ''` fallbacks of the type and the user agent, `lean?.lasmDispose?.()` → `lean?.lasmDispose()` | `mark` is always called with a detail and `getAttribute` answers `null`, not `undefined`; `appOf` maps both to `null`; the fallback fails the same pattern; `lean` is unset whenever that `catch` runs |
 | browser | the loader's 20-line stderr bound (`> 20` → `>= 20`/`false`, `shift` removed) | Only the last line is read; the bound only limits memory |
-| browser | `lasm:web`: `getValue`'s and `messageData`'s `typeof … === 'string'` → `false`; `requestInit`'s non-object checks; `randomBytes`' `i < n` → `<=`; `'log'` → `''` in the level list; `frames.clear()`/`sockets.clear()` after an unmount | `String(s)` is `s` and a string is not an `ArrayBuffer`; a non-object has none of the fields read; the extra round fills an empty view; an unknown level logs with `log` anyway; cancelled frames and closed sockets are never looked up again |
 | browser | the Vite plugin: `command = 'serve'` default, `'serve'` checks in `generateBundle` (notices exist only after a build), `chunk.type !== 'chunk'` → `false`, `texts.length === 1` → `false`, `/\?.*$/` → `/\?.*/`, the banner pattern's `^`, `filter(Boolean)` before `trim()`, the `'error'` event of the spawned CLI, `replace(/^\n/, '')` → any `\n` | `configResolved` always sets the command; an asset has no module ids; one text joined is itself; ids have one line; the banner is the loader's first line; `trim` removes what `undefined` joins to; `process.execPath` always starts; the tail starts with the only newline it has |
 | browser (not equivalent) | the Vite plugin's default CLI path (`'../../bin/lasm.mjs'`), production builds with the plugin's own CLI (`command === 'serve'` → `true`), its CLI's `stdio`, and `/^\//` of the `/@fs/` URL | They run the real Lasm CLI (examples/vite, the browser workflow), or need Windows paths |
 | dev | loopback hosts `'127.0.0.1'` → `''` in `freePort`, `waitForPort` and the proxy's upstream request, the upstream `host` header → `''`, `waitForPort`'s `<` → `<=`, `socket.end()` removed, `'error'` → `''` on `freePort`'s server, the content type's `?? ''` | Node uses localhost (127.0.0.1) for an empty host and sets the Host header itself; a probe socket closes with the process; the fallback fails the same pattern |

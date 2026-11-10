@@ -25,7 +25,7 @@ in the current release on npm (`npm view @lasm/cli version`).
 | [Bun and Deno](BUN_DENO.md) | Run the compiler and your programs on Bun or Deno | 0.2.0 |
 | [HTTP in pure Lean (`Lasm.Fetch`)](FETCH.md) | One request handler for Node, the edge, Bun, Deno, Fastly, wasi-http and WASI; outbound `fetch`; streaming | 0.3.0 |
 | [WASI, wasi-http and Fastly Compute](WASI.md) | Standard WebAssembly with no JavaScript: wasmtime, wasmer, Spin, Fastly | 0.3.0 |
-| [Browser apps](BROWSER.md) | `--target browser`, the loader and mount API, `Lasm.Web` (DOM and web APIs), the Vite plugin | 0.3.0 |
+| [Browser apps](BROWSER.md) | `--target browser`, the loader and mount API, `Lasm.JS.Web.Browser` (DOM and web APIs, generated) and `Lasm.UI.Mount`, the Vite plugin | 0.3.0 |
 | [Frontends in Lean (`Lasm.UI`)](UI.md) | The Elm architecture, `html!` markup, commands, subscriptions, routing, SSR and hydration | 0.3.0 |
 | [The whole stack (`Lasm.RPC`)](RPC.md) | A server and a browser app sharing typed endpoints and validation, proved once for both sides | 0.3.0 |
 | Verification | What is proved and what is tested: [UI diff](UI.md#what-is-proved), [RPC](RPC.md#what-is-proved), [testing and proving your app](UI.md#testing-and-proving-your-app) | 0.3.0 |

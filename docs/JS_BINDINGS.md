@@ -654,7 +654,7 @@ def main : IO Unit := do
 | --- | --- | --- |
 | `Lasm.JS.Web.Geometry` | `DOMRectReadOnly`, `DOMRect`, `DOMRectList` | Geometry Interfaces |
 | `Lasm.JS.Web.Css` | `CSSStyleDeclaration`, `CSSStyleProperties`, `MediaQueryList`, `MediaQueryListEvent` | CSSOM, CSSOM View |
-| `Lasm.JS.Web.Html` | the tree: `Node`, `Document`, `DocumentType`, `DocumentFragment`, `ShadowRoot`, `Element`, `Attr`, `NamedNodeMap`, `CharacterData`, `Text`, `Comment`, `NodeList`, `HTMLCollection`, `DOMTokenList`, `DOMStringMap`, `MutationObserver`, `MutationRecord`; the elements: `HTMLElement`, `HTMLAnchorElement`, `HTMLButtonElement`, `HTMLDialogElement`, `HTMLDivElement`, `HTMLFormElement`, `HTMLImageElement`, `HTMLInputElement`, `HTMLLabelElement`, `HTMLOptionElement`, `HTMLSelectElement`, `HTMLTemplateElement`, `HTMLTextAreaElement`, `HTMLFormControlsCollection`, `HTMLOptionsCollection`, `RadioNodeList`, `ValidityState`, `FileList`; the window: `Window`, `Location`, `History`, `Storage`; the globals `window`, `document`, `location`, `history`, `localStorage`, `sessionStorage`, `requestAnimationFrame`, `cancelAnimationFrame`, `getComputedStyle`, `matchMedia` | DOM, HTML, CSSOM View, File API |
+| `Lasm.JS.Web.Html` | the tree: `Node`, `Document`, `DocumentType`, `DocumentFragment`, `ShadowRoot`, `Element`, `Attr`, `NamedNodeMap`, `CharacterData`, `Text`, `Comment`, `NodeList`, `HTMLCollection`, `DOMTokenList`, `DOMStringMap`, `MutationObserver`, `MutationRecord`; the elements: `HTMLElement`, `HTMLAnchorElement`, `HTMLButtonElement`, `HTMLDialogElement`, `HTMLDivElement`, `HTMLFormElement`, `HTMLHeadElement`, `HTMLImageElement`, `HTMLInputElement`, `HTMLLabelElement`, `HTMLOptionElement`, `HTMLSelectElement`, `HTMLTemplateElement`, `HTMLTextAreaElement`, `HTMLFormControlsCollection`, `HTMLOptionsCollection`, `RadioNodeList`, `ValidityState`, `FileList`; the window: `Window`, `Location`, `History`, `Storage`; the globals `window`, `document`, `location`, `history`, `localStorage`, `sessionStorage`, `requestAnimationFrame`, `cancelAnimationFrame`, `getComputedStyle`, `matchMedia` | DOM, HTML, CSSOM View, File API |
 | `Lasm.JS.Web.UiEvents` | `UIEvent`, `MouseEvent`, `WheelEvent`, `KeyboardEvent`, `InputEvent`, `FocusEvent`, `CompositionEvent`, `PointerEvent`, `SubmitEvent`, `HashChangeEvent`, `PopStateEvent`, `StorageEvent` | UI Events, Pointer Events, CSSOM View, HTML |
 | `Lasm.JS.Web.Canvas` | `HTMLCanvasElement`, `CanvasRenderingContext2D`, `CanvasGradient`, `CanvasPattern`, `Path2D`, `TextMetrics`, `ImageData` | HTML |
 | `Lasm.JS.Web.WebSocket` | `WebSocket`, `CloseEvent` | WebSockets |
@@ -682,16 +682,48 @@ imports a browser one).
   The common `Window` members are also globals (`document`, not
   `(← window).document`), as they are in JavaScript.
 - `WindowProxy` is `Window`.
+- `scroll`, `scrollTo`, `scrollBy` and `scrollIntoView` (of `Element` and
+  `Window`) are `Async Unit`: CSSOM View now types them as returning
+  `Promise<ScrollResult>`, but shipping browsers return `undefined`; an
+  `Async Unit` awaits either (`scripts/bindings/web-browser.mjs`,
+  `undefinedPromises`).
 - HTML elements have no `new` (their `[HTMLConstructor]` only builds custom
   elements); create them with `document.createElement` and make the handle
   of the element's interface from it, as above. The cast is not checked.
 - Listeners and other callbacks act on the page directly, with nothing removed
   for you: remove what an app adds (`removeEventListener`,
-  `cancelAnimationFrame`, `WebSocket.close`) when it no longer needs it.
+  `cancelAnimationFrame`, `WebSocket.close`) when it no longer needs it, in a
+  mounted app in `Lasm.UI.Mount.onUnmount` ([BROWSER.md](BROWSER.md)). The
+  mount glue (`Mount.root Element`, flags, ports) is `Lasm.UI.Mount`.
+- They replace the hand-written `Lasm.Web` (removed 2026-11-10);
+  [release/next-notes.md](release/next-notes.md) maps each of its functions.
 
-**Cost.** Wasm: nothing for what is not called (measured below). The compiled
-library grows by the `.olean` files and generated C of the six modules (see
-[Cost](#cost)); build time grows only for programs that import them.
+**Cost** (`web-bindings.yml --sizes`, run of 2026-11-10 on PR #193: the same
+program through `Lasm.JS` alone, `Lasm.JS.Web`, and `Lasm.JS.Web.Browser`).
+Wasm: nothing for what is not called: 463,710, 463,167 and 463,167 bytes for
+the browser; 560,999, 560,456 and 560,456 for the edge runtime; 739,755,
+685,060 and 685,520 for Node. Build time of a new project with warm tools: the
+browser tier's imports add about 7 seconds (browser 11.9 → 18.2 → 25.1 s, edge
+10.9 → 17.6 → 24.3 s, Node 15.6 → 20.5 → 26.4 s); a program that imports only
+the modules it uses pays less. The compiled library grows by 20.1 MB (see
+[Cost](#cost)).
+
+**Where each member exists (measured).** The platform suite's availability
+probe looked up every generated member on 2026-11-10 (`browser.yml` run
+42847975929: Chromium 153, Firefox 155, WebKit 26.6 of Playwright 1.63.0). All
+interfaces and globals exist everywhere except `CSSStyleProperties` in Chromium
+(its style objects are `CSSStyleDeclaration`s; the generated functions work on
+them). `Window`'s attributes and operations are properties of the global object
+itself, not of `Window.prototype`, so the probe lists them all (they work).
+Missing in all three, because the pinned specs are ahead of the engines: the
+HTML insertion methods `appendHTML`, `prependHTML`, `beforeHTML`, `afterHTML`,
+`replaceWithHTML` and their `…Unsafe` forms, `getBoxQuads` and the
+`convert…FromNode` methods, `HTMLElement.scrollParent`, `Window.fetchLater`;
+some members are missing in one or two engines (Chromium 8, Firefox 13, WebKit
+28: for example `moveBefore`, `setHTML`, `customElementRegistry`,
+`ImageData.pixelFormat`, `WheelEvent.momentum`; the full lists are each
+engine's `bindingsMissing` in the run's `browser-results-*` artifacts). Test a
+member on the engines you target.
 
 **Tests.** [`test/browser/platform/Bindings.lean`](../test/browser/platform/Bindings.lean)
 is part of the platform suite that `browser.yml` runs on Chromium, Firefox and

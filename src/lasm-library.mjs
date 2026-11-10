@@ -16,9 +16,6 @@ export const libraryLeanVersions = ['4.35.0'];
 export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
   // Lasm.Fetch (docs/FETCH.md): one HTTP handler for Node, WASI, Fastly and the edge.
   'Lasm.Fetch', 'Lasm.Fastly', 'Lasm.Fetch.Assets', 'Lasm.Fetch.Embed', 'Lasm.KV',
-  // Lasm.Web (docs/BROWSER.md): web-platform bindings on Lasm.JS.
-  'Lasm.Web.Types', 'Lasm.Web.Dom', 'Lasm.Web.Events', 'Lasm.Web.Timers', 'Lasm.Web.Fetch', 'Lasm.Web.Url', 'Lasm.Web.Storage',
-  'Lasm.Web.History', 'Lasm.Web.WebSocket', 'Lasm.Web.Crypto', 'Lasm.Web.Console', 'Lasm.Web.Canvas', 'Lasm.Web.App', 'Lasm.Web',
   // Lasm.JS.Web (docs/JS_BINDINGS.md, "Standard bindings"): the WinterTC Minimum Common Web API,
   // generated from WebIDL by scripts/bindings/generate-web.mjs.
   'Lasm.JS.Web.Support', 'Lasm.JS.Web.Dom', 'Lasm.JS.Web.Messaging', 'Lasm.JS.Web.Streams', 'Lasm.JS.Web.File',
@@ -29,7 +26,7 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   'Lasm.JS.Web.Browser',
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
-  'Lasm.UI.Url', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',
+  'Lasm.UI.Url', 'Lasm.UI.Mount', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',
   // Lasm.RPC (docs/RPC.md): typed endpoints shared by a Lasm.Fetch server and a Lasm.UI app.
   'Lasm.RPC.Core', 'Lasm.RPC.Server', 'Lasm.RPC.Client', 'Lasm.RPC'];
 // The proofs-only modules (library/Lasm/UI/Proofs*, each library's Spec.lean and Theorems.lean;

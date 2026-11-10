@@ -75,9 +75,9 @@
     },
     {
       "name": "browser",
-      "description": "Browser builds: the browser build and package, the bundler, the page loader, the lasm:app and lasm:web modules, the Vite plugin",
-      "mutate": ["src/browser/browser-build.mjs", "src/browser/browser-package.mjs", "src/browser/bundle.mjs", "src/browser/loader.mjs", "src/lasm-modules/app.mjs", "src/lasm-modules/web.mjs", "src/vite/index.mjs"],
-      "tests": ["test/browser.test.mjs", "test/browser-loader.test.mjs", "test/browser-output.test.mjs", "test/lasm-web.test.mjs", "test/vite-plugin.test.mjs", "test/notices.test.mjs"]
+      "description": "Browser builds: the browser build and package, the bundler, the page loader, the lasm:app module, the Vite plugin",
+      "mutate": ["src/browser/browser-build.mjs", "src/browser/browser-package.mjs", "src/browser/bundle.mjs", "src/browser/loader.mjs", "src/lasm-modules/app.mjs", "src/vite/index.mjs"],
+      "tests": ["test/browser.test.mjs", "test/browser-loader.test.mjs", "test/browser-output.test.mjs", "test/lasm-app.test.mjs", "test/vite-plugin.test.mjs", "test/notices.test.mjs"]
     },
     {
       "name": "application-sources",

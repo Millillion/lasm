@@ -1,25 +1,32 @@
 /-
-Lasm.Web app: what the browser loader's `mount(element, { flags })` gives the
+Lasm.UI.Mount: what the browser loader's `mount(element, { flags })` gives the
 Lean program (`lasm:app`, src/lasm-modules/app.mjs): its root element, the
 flags, whether it hydrates server-rendered content, ports (named channels to
-and from the page's JavaScript), messages from `app.send` and unmount handlers.
+and from the page's JavaScript), messages from `app.send`, unmount handlers and
+the state kept across a hot reload. `Lasm.UI.App.run` uses it; programs that
+draw the page themselves (with `Lasm.JS.Web.Browser`) use it directly.
+
+These are bindings of Lasm's own loader, not of a web standard, so they are
+written by hand (moved unchanged from `Lasm.Web.App` when the generated
+`Lasm.JS.Web.Browser` replaced `Lasm.Web`; docs/BROWSER.md).
 -/
 import Lasm.JS.Core
 import Lasm.JS.Meta
-import Lasm.Web.Types
 
-namespace Lasm.Web.App
+namespace Lasm.UI.Mount
 open Lasm.JS
-open Lasm.Web
 
 /-- A named channel between the app and the page's JavaScript
 (`app.ports.<name>` there). -/
 structure Port where
   val : Value
-instance : FromJS Port := handleFromJS "Lasm.Web.App.Port" (⟨·⟩)
+instance : FromJS Port where
+  fromJS d := (FromJS.fromJS d : Except String Value).map (⟨·⟩)
+  typeName := "Lasm.UI.Mount.Port"
+  mode := .reference
 
 namespace Raw
-@[js "lasm:app" "root"] opaque root : IO Element
+@[js "lasm:app" "root"] opaque root : IO Value
 @[js "lasm:app" "flags"] opaque flags : IO Data
 @[js "lasm:app" "hydrating"] opaque hydrating : IO Bool
 @[js "lasm:app" "target"] opaque target : IO String
@@ -30,10 +37,15 @@ namespace Raw
 @[js "lasm:app" "onHotSave"] opaque onHotSave : Value → IO Unit
 end Raw
 
-/-- The element the app is mounted on. -/
-def root : IO Element := Raw.root
+/-- A JavaScript function running `f` synchronously, its result ignored. -/
+private def callback (f : Array Data → IO Unit) : IO Value :=
+  Function.ofSyncFn fun args => do f args; pure .undefined
+
+/-- The element the app is mounted on, as `α`: `root Lasm.JS.Web.Element`
+(`import Lasm.JS.Web.Browser`), or a `Value`. -/
+def root (α : Type := Value) [FromJS α] : IO α := do decodeAs α "Lasm.UI.Mount.root" (.ref (← Raw.root) "")
 /-- The `flags` passed to `mount` (or `data-lasm-flags`), converted to `α`. -/
-def flags (α : Type := Data) [FromJS α] : IO α := do decodeAs α "Lasm.Web.App.flags" (← Raw.flags)
+def flags (α : Type := Data) [FromJS α] : IO α := do decodeAs α "Lasm.UI.Mount.flags" (← Raw.flags)
 /-- Whether `mount` was asked to adopt server-rendered content (`hydrate: true`, `data-lasm-hydrate`). -/
 def hydrating : IO Bool := Raw.hydrating
 /-- `browser` in a mounted app; `none` elsewhere. -/
@@ -61,11 +73,12 @@ def onMessage (f : Data → IO Unit) : IO Unit := do
 /-- `onMessage` with an `Async` handler; `app.send` resolves when it finishes. -/
 def onMessageAsync (f : Data → Async Unit) : IO Unit := do
   Raw.onMessage (← Function.ofFn fun args => do f (args[0]?.getD .undefined); pure .undefined)
-/-- Runs `f` when the app is unmounted (`app.unmount()`), before its listeners,
-timers and sockets are removed. -/
+/-- Runs `f` when the app is unmounted (`app.unmount()`), before the instance
+stops: the place to remove listeners, timers and sockets the app added to the
+page itself. -/
 def onUnmount (f : IO Unit) : IO Unit := do Raw.onUnmount (← callback fun _ => f)
 
-/-- During a hot reload (`@lasm/vite` in development), the state the previous
+/-- During a hot reload (`@lasm/cli/vite` in development), the state the previous
 version saved with `onHotSave`, converted to `α`; `none` otherwise or when it
 no longer converts (its type changed). -/
 def hotState (α : Type := Data) [FromJS α] : IO (Option α) := do
@@ -76,4 +89,4 @@ def hotState (α : Type := Data) [FromJS α] : IO (Option α) := do
 def onHotSave (f : IO Data) : IO Unit := do
   Raw.onHotSave (← Function.ofSyncFn fun _ => f)
 
-end Lasm.Web.App
+end Lasm.UI.Mount
