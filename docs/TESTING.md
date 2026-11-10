@@ -502,6 +502,7 @@ where they are; these cover the libraries and hosts every app shares.
 | `cli-arguments` | `src/cli-arguments.mjs` and the `init`, `dev`, `package` parsers | JavaScript | a parse names only targets, templates and deploy targets Lasm has (own keys, never `constructor`); every refusal is a plain `Error` with a readable message |
 | `serverless-http` | `src/serverless/lasm-lambda.mjs` (API Gateway REST and HTTP API, function URLs, ALB, CloudFront events) and `lasm-server.mjs`'s helpers (`outgoingHeaders`, cookies, `isTextual`, `azureReply`, `webReply`) | JavaScript | every well-formed event is answered; the forwarded target is one http.request accepts and starts with `/`, one Cookie and one plain Host header, query values as the platform gave them, the body round-trips byte for byte, each Set-Cookie once; and the request, the response, the Azure and Netlify replies and the parsed cookies are exactly what the Lean model says (`library/Lasm/Serverless/Proofs/Model.lean`, whose theorems are in [library/PROOFS.md](../library/PROOFS.md); run with `lean --run` by `test/fuzz/support/serverless-model.mjs`, required in CI) |
 | `ui-patch` | the Lasm.UI patch decoder (`src/lasm-modules/ui-dom.mjs`) on happy-dom, with hydration | JavaScript | a frame applies, or fails with a `Lasm.UI: …` error or a `DOMException`; never a `TypeError`, a hang, or an attribute from a reference past the name table |
+| `ui-decode` | the same applier's reading of a session's frames, on a recording DOM (the DOM's tree semantics, every slot kept), against Lean's reference decoder (`library/Lasm/UI/Proofs/Decode.lean`, which `Lasm.UI.Spec.frames_decode` proves reads every encoded frame as its patch) | JavaScript | frame by frame, the applier refuses exactly the frames the decoder refuses, and otherwise leaves exactly the DOM the decoder's operations make: every node, id, tag, namespace, text, attribute, property, style, and listener with its decoder's paths. The decoder runs with `lean --run` (`test/fuzz/support/ui-decode-model.mjs`, required in CI). Frames whose meaning depends on the DOM, not the bytes (an id not in the document, a move into its own subtree, an id in use, a property that is a DOM member), and numbers above 2^53, end a session without a verdict; a removed property reads as its type's empty value, so `""`, `false` and unset compare equal |
 | `lean-fetch-request` | `Lasm.Fetch`'s request parsing as Node's host builds requests (`nodeRequestUrl`, `path`, `segments`, `query`, `queryParams`, `header?`, `percentDecode`, `joinCookies`, `splitCookieCommas`) | libFuzzer, ASan | the path starts with `/` and holds no `?`, `#`, `\`; the Host header never moves the path; the target alone has the same path; resolving again changes nothing; no dot segments; one Cookie header |
 | `lean-rpc` | `Lasm.RPC`'s `decodeRequest` and `decodeResponse` for an endpoint with strings, Booleans, arrays, `Nat` and `Option` | libFuzzer, ASan | accepted only when `validate` passes, otherwise refused as invalid (400); request and response round trips; Lean's JSON printer's output parses and prints the same |
 | `wasi-cgi` | the WASI C host's CGI request and response (`src/wasi/lasm_fetch_wasi.c`), compiled natively | libFuzzer, ASan, UBSan | strings handed to Lean are valid UTF-8; the method is `REQUEST_METHOD`; the Host or `SERVER_NAME` never moves the path; the response head is one line per header, no CR, LF or NUL inside a line |
@@ -543,6 +544,7 @@ a fix, or an issue.
     node test/fuzz/run.mjs fuzz --seconds 30 ui-patch   # a campaign; --seed N replays one
     node test/fuzz/native/build.mjs                     # Linux, clang: the native targets
     node test/fuzz/support/serverless-model.mjs         # serverless-http's Lean model (used when prepared)
+    node test/fuzz/support/ui-decode-model.mjs          # ui-decode's Lean decoder (used when prepared)
 
 **CI** ([fuzz.yml](../.github/workflows/fuzz.yml)): every pull request and push
 to `main` replays the committed corpus and regressions of the JavaScript
@@ -587,6 +589,13 @@ failing input and uploads its new corpus entries and failing inputs (artifact
   body lost its accented letters (text only when valid UTF-8); and a reply
   field named `__proto__` or `constructor` was dropped or threw a
   `TypeError` (header maps without a prototype).
+- checked against Lean's reference decoder, the Lasm.UI applier read two
+  kinds of frame the decoder refuses: a listener naming a decoder the stream
+  never defined (an event on it would then have read no fields), and text
+  that is not UTF-8 (read with U+FFFD). Both are now refused
+  (`Lasm.UI: no decoder N`, `Lasm.UI: text that is not UTF-8`). A number
+  above 2^53 is refused instead of rounded, and padding zeros past it, which
+  Lean reads as nothing, no longer turn into `NaN`.
 
 **Cannot catch:** logic errors that produce well-formed wrong answers (the
 differential and equivalence oracles are for that); the Wasm builds'

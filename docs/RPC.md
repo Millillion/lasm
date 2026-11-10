@@ -131,6 +131,12 @@ npm start            # the release build on $PORT (3000)
 npm run build:workers && npx wrangler deploy   # Cloudflare Workers (workers/; dist/public as assets)
 ```
 
+`--deploy` takes the edge and WASI targets: `workers`, `vercel-edge`,
+`netlify-edge`, `deno-deploy`, `fastly`, `wasi-http` and `spin`. The function
+platforms (`lambda`, `lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure`,
+`gcf`) are refused for this template: `lasm init` would write no platform files
+for them (issue #168).
+
 | File | |
 | --- | --- |
 | `Shared.lean` | Data, endpoints, validation and its theorem (a Lake library: `lake build` checks it). |
