@@ -216,35 +216,64 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 
 ## Candidates not yet proved
 
-Guarantees worth proving that need more than a modest effort; each is
-covered by tests today.
+Guarantees worth proving that need more than a modest effort. Each is a
+proposition in its library's `Candidates.lean`, in the form of `Spec.lean`,
+that a test checks on generated inputs: the test cites it with a
+`Proposition:` line and evaluates its statement on every input
+([docs/TESTING_STRATEGY.md §4](../docs/TESTING_STRATEGY.md#4-property-testing-convention-propositions-that-carry-over-to-proofs)).
+Proving one means moving it to `Spec.lean` and adding its theorem.
+`node scripts/propositions.mjs` (a unit test) checks that every cited
+proposition exists with the statement cited, that every candidate's test
+exists and cites it, and that this list is current.
+
+<!-- BEGIN CANDIDATES -->
+<!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
+
+**10 candidates**, each a `def … : Prop` in its library's `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+
+### Lasm.Fetch (2)
+
+| Candidate | In plain English | Tested by |
+| --- | --- | --- |
+| [`segments_nonempty`](Lasm/Fetch/Candidates.lean#L19) | **No path segment is empty.** Whatever the request's URL (`//`, a trailing `/`, escapes that decode to nothing printable), no segment of `r.segments` is the empty string. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
+| [`percent_round_trip`](Lasm/Fetch/Candidates.lean#L26) | **A server decodes what a Lasm.UI page encodes.** For every string, `Lasm.Fetch.percentDecode` reads `Lasm.UI.Url.percentEncode`'s output back as that string: a path segment or query value a page builds reaches the server's handler unchanged. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
+
+### Lasm.RPC (4)
+
+| Candidate | In plain English | Tested by |
+| --- | --- | --- |
+| [`request_round_trip`](Lasm/RPC/Candidates.lean#L21) | **A valid request's encoding decodes to itself.** For a request type whose `ToJson` and `FromJson` round-trip, the body the client sends for a valid request is accepted by the server as exactly that request. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
+| [`response_round_trip`](Lasm/RPC/Candidates.lean#L29) | **A result crosses intact.** For a response type whose `ToJson` and `FromJson` round-trip, the client reads the server's 200 answer for the result `r` as exactly `r`. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
+| [`error_round_trip`](Lasm/RPC/Candidates.lean#L39) | **A validation error reaches the client as itself.** The server's 400 answer for a validation message `m` is read by the client as `Error.invalid m`, with the same message, and any other status as `Error.failed` with that status and message. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
+| [`json_print_normal_form`](Lasm/RPC/Candidates.lean#L47) | **Printed JSON is a normal form.** Whatever JSON `parseJson` accepts, its printed form parses again and prints the same. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
+
+### Lasm.UI (4)
+
+| Candidate | In plain English | Tested by |
+| --- | --- | --- |
+| [`diff_unchanged_empty`](Lasm/UI/Candidates.lean#L28) | **An unchanged view produces an empty patch.** For any well-formed rendered tree, diffing it against the view it already shows emits no operation at all: a frame whose view did not change touches no DOM node. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+| [`keyed_reorder_only_moves`](Lasm/UI/Candidates.lean#L36) | **Keyed reorders only move.** When every old child is keyed, with distinct keys, and the new children are a permutation of the old ones, the patch inserts, removes and clears nothing: every node is kept and only moved. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+| [`percent_round_trip`](Lasm/UI/Candidates.lean#L46) | **Percent-encoding round-trips.** Decoding what `percentEncode` writes gives back the text, for every string (any Unicode, `%` and `+` included). | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+| [`segments_round_trip`](Lasm/UI/Candidates.lean#L53) | **Encoded segments come back as the segments.** A path built from non-empty segments, each percent-encoded, reads back (`Url.segments`) as exactly those segments: a route matches the values a link was built from. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+<!-- END CANDIDATES -->
+
+### Tested, not yet stated in Lean
+
+These are about code Lean does not model yet, so they are not Lean
+propositions: each is the step "this JavaScript (or runtime) implements the
+Lean model" that §4 leaves to tests until a model exists.
 
 - **Lasm.UI: the JavaScript applier implements the decoder and the model.**
   That the encoding is read back exactly is proved (`frames_decode`, against
   the reference decoder Lasm/UI/Proofs/Decode.lean); that
   src/lasm-modules/ui-dom.mjs reads as that decoder does and changes the DOM
-  as `applyOps` says would need a model of JavaScript and the DOM (tested:
+  as `applyOps` says needs a model of JavaScript and the DOM (tested:
   test/ui-dom.test.mjs, the patch fixtures, the ui-patch fuzz target).
-- **Lasm.UI: an unchanged view produces an empty patch.** `diff old
-  (old.map Live.erase)` emits no operations (tested by the diff model checks).
-- **Lasm.UI: keyed reorders only move.** When the new children are a
-  permutation of the old keyed children, the patch inserts and removes
-  nothing.
 - **Lasm.UI: server rendering hydrates.** The HTML that `Lasm.UI.Render`
-  writes for a view is the DOM the first render would build.
-- **Lasm.UI and Lasm.Fetch: URL round trips.** `percentDecode
-  (percentEncode s) = some s` for every string, and `Url.build` then
-  `segments` gives back the segments.
-- **Lasm.RPC: the wire round trip.** `decodeResponse 200 (encodeResponse
-  (.ok r)) = .ok r`, and a validation error answered with status 400 reaches
-  the client as `Error.invalid` with the same message; both need Lean's JSON
-  printer and parser to round-trip (`Json.parse (j.compress) = .ok j`).
-- **Lasm.RPC: a valid request's encoding decodes to itself.** For types
-  whose `ToJson`/`FromJson` round-trip, the client's `encodeRequest` is
-  accepted by the server's `decodeRequest` as the same request.
+  writes for a view is the DOM the first render would build. Stating it needs
+  a model of the browser's HTML parser (tested: the hydration tests of
+  test/ui-dom.test.mjs and the Playwright suites).
 - **Lasm.KV: the stores behave as the table.** That `get`, `put` and
   `delete` of the memory store read and replace the table in its `IO.Ref`
   (Lean's runtime is not modelled), and that the platform stores agree
   (tested per platform in CI).
-- **Lasm.Fetch: no empty segments.** No segment of `r.segments` is empty
-  (needs a proof about `percentDecode`'s loop).

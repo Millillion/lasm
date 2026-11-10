@@ -184,9 +184,21 @@ export async function run(bytes) {
   catch (error) { fail(`the ${kind} event threw ${error?.name}: ${error?.message}`, e); }
   const sent = stub.last();
   if (!sent) fail('nothing forwarded', e);
+  // Proposition: Lasm.Serverless.Spec.target_valid
+  //   ∀ p q : String, ∀ c ∈ (requestTarget p q).toList, printable c = true ∧ c ≠ '#'
+  // Proposition: Lasm.Serverless.Spec.target_slash
+  //   ∀ p q : String, (p.isEmpty ∨ p.toList.head? = some '/') → (requestTarget p q).toList.head? = some '/'
   if (typeof sent.path !== 'string' || !sent.path.startsWith('/') || !validTarget(sent.path)) fail(`forwarded target ${sent.path}`, e);
   if (sent.headers.some(p => !Array.isArray(p) || typeof p[0] !== 'string' || typeof p[1] !== 'string')) fail('header pairs', sent.headers);
-  if (sent.headers.filter(([n]) => n.toLowerCase() === 'cookie').length > 1) fail('several cookie headers', sent.headers);
+  // Proposition: Lasm.Serverless.Spec.cookie_once
+  //   ∀ (hs : Headers) (d : String),
+  //     ((outgoing hs d).filter (isCookie ·.1)).length ≤ 1 ∧ ∀ x ∈ outgoing hs d, isCookie x.1 = true → x.2 ≠ ""
+  const cookies = sent.headers.filter(([n]) => n.toLowerCase() === 'cookie');
+  if (cookies.length > 1) fail('several cookie headers', sent.headers);
+  if (cookies.some(([, v]) => v === '')) fail('an empty cookie header', sent.headers);
+  // Proposition: Lasm.Serverless.Spec.host_once
+  //   ∀ (hs : Headers) (d : String), plainHost d = true →
+  //     ∃ n v, (outgoing hs d).filter (isHost ·.1) = [(n, v)] ∧ plainHost v = true
   const hosts = sent.headers.filter(([n]) => n.toLowerCase() === 'host');
   if (hosts.length !== 1 || !server.plainHost(hosts[0][1])) fail('not one plain Host', sent.headers);
   // API Gateway REST decodes query values; they must arrive as given.
