@@ -168,7 +168,7 @@ def deno (r : Checks) (live : Live) : Async Unit := do
     let onError ← Deno.ServeOptionsOnError.ofFn fun _ => App.text "handled" (status := 503)
     let ac ← AbortController.new
     let handler ← Deno.ServeHandler.ofFn fun req info => do
-      if (← URL.new (← req.url)).pathname == "/hello" && (← remote.get).isNone then
+      if (← (← URL.new (← req.url)).pathname) == "/hello" && (← remote.get).isNone then
         let a ← info.remoteAddr
         remote.set (some ((← a.hostname), (← a.port), (← a.transport) == .tcp))
         live.modify (·.push ("ServeHandlerInfo", info.val))
@@ -180,8 +180,9 @@ def deno (r : Checks) (live : Live) : Async Unit := do
             catch _ => pure false
           completed.set (some ok)
       App.handle req
-    let server ← Deno.serveWithOptions { port := some 0, hostname := some "127.0.0.1", signal := some (← ac.signal), onListen := some onListen,
-      onError := some onError } handler
+    let signal ← ac.signal
+    let options : Deno.ServeTcpOptions := { port := some 0, hostname := some "127.0.0.1", signal := some signal, onListen := some onListen, onError := some onError }
+    let server ← Deno.serveWithOptions options handler
     live.modify (·.push ("HttpServer", server.val))
     let addr ← server.addr
     let port ← addr.port
@@ -228,7 +229,7 @@ def bun (r : Checks) (live : Live) : Async Unit := do
   runSection r "bun.serve" do
     let seen ← IO.mkRef (none : Option (String × Nat × Lasm.JS.Bun.SocketAddressFamily × Nat))
     let fetch ← Bun.ServeOptionsFetch.ofFn fun req server => do
-      if (← URL.new (← req.url)).pathname == "/ip" then
+      if (← (← URL.new (← req.url)).pathname) == "/ip" then
         server.timeout req 30
         match ← server.requestIP req with
         | some a =>
@@ -254,8 +255,8 @@ def bun (r : Checks) (live : Live) : Async Unit := do
       expect r "pendingRequests" (pending ≥ 1) s!"{pending}"
     | none => expect r "requestIP" false "no address"
     -- server.fetch runs the handler without the network
-    let local ← server.fetch (.domString s!"http://127.0.0.1:{port}/hello")
-    expect r "server.fetch" ((← local.status) == 200 && (← local.text) == "hello from Lean") ""
+    let direct ← server.fetch (.domString s!"http://127.0.0.1:{port}/hello")
+    expect r "server.fetch" ((← direct.status) == 200 && (← direct.text) == "hello from Lean") ""
     -- reload replaces the handler for later requests
     let other ← Bun.ServeOptionsFetch.ofFn fun _ _ => App.text "reloaded"
     discard <| server.reload { fetch := other, port := some (.unsignedShort port), hostname := some "127.0.0.1" }
@@ -276,7 +277,7 @@ def node (r : Checks) : Async Unit := do
   runSection r "node.honoNodeServer" do
     let listened ← IO.mkRef (none : Option Nat)
     let onListen ← Function.ofFn fun args => do
-      match (args[0]?.getD .undefined).field "port" with
+      match (args[0]?.getD Data.undefined).field "port" with
       | .number n => listened.set (some n.toUInt64.toNat)
       | _ => pure ()
       return .undefined

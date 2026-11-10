@@ -904,7 +904,7 @@ open Lasm.JS Lasm.JS.Web
 def main : IO Unit := do
   let stopping : IO.Promise Unit ← IO.Promise.new
   let fetch ← Bun.ServeOptionsFetch.ofFn fun request _server => do
-    if (← URL.new (← request.url)).pathname == "/stop" then stopping.resolve ()
+    if (← (← URL.new (← request.url)).pathname) == "/stop" then stopping.resolve ()
     handle request
   let server ← Bun.serve { fetch, port := some (3000 : Nat), hostname := some "127.0.0.1" }
   IO.println s!"listening on {← (← server.url).href}"
@@ -993,6 +993,7 @@ npm install @hono/node-server hono    # hono is its peer dependency
 ```
 
 ```lean
+import Lasm.JS                -- the @[js] attribute
 import Lasm.JS.Web
 open Lasm.JS Lasm.JS.Web
 

@@ -29,7 +29,7 @@ def announce (line : String) : IO Unit := do
 
 /-- App.handle, with `/shutdown` answered by `stop` (run after the reply). -/
 def withShutdown (stop : IO Unit) (request : Request) : Async Response := do
-  if (← URL.new (← request.url)).pathname == "/shutdown" then
+  if (← (← URL.new (← request.url)).pathname) == "/shutdown" then
     stop
     App.text "stopping"
   else App.handle request
@@ -55,7 +55,7 @@ def main : IO UInt32 := do
       server.stop.block
     else
       let listening ← Function.ofFn fun args => do
-        match (args[0]?.getD .undefined).field "port" with
+        match (args[0]?.getD Data.undefined).field "port" with
         | .number n => announce s!"listening {n.toUInt64.toNat}"
         | _ => announce "listening ?"
         return .undefined
