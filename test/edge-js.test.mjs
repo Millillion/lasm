@@ -120,6 +120,14 @@ test('node: modules not in the static map come from process.getBuiltinModule whe
   // Node itself runs this test, so its getBuiltinModule answers.
   assert.equal(value(214, 0, 0, wire(['T.join', 'node:path', 'join', ['a', 'b']])), ['a', 'b'].join(process.platform === 'win32' ? '\\' : '/'));
   assert.throws(() => value(201, 0, 0, enc.encode('node:no-such-module')), /JavaScript module "node:no-such-module" is not in this edge build/);
+  // Only node: specifiers: a bare "os" is not a built-in here (getBuiltinModule would give it).
+  assert.throws(() => value(201, 0, 0, enc.encode('os')), /JavaScript module "os" is not in this edge build/);
+  // No process at all (a browser, a Worker without nodejs_compat): the usual error.
+  const processDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'process');
+  try {
+    Object.defineProperty(globalThis, 'process', { value: undefined, configurable: true, writable: true });
+    assert.throws(() => value(201, 0, 0, enc.encode('node:os')), /JavaScript module "node:os" is not in this edge build/);
+  } finally { Object.defineProperty(globalThis, 'process', processDescriptor); }
   const saved = Object.getOwnPropertyDescriptor(globalThis.process, 'getBuiltinModule');
   try {
     delete globalThis.process.getBuiltinModule;
