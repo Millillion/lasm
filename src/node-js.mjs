@@ -57,6 +57,26 @@ export function jsFailure(error) {
   return Object.assign(new Error(text), { leanUserError: true, code: 'EJS' });
 }
 const failure = message => jsFailure(new TypeError(message));
+// The value reader accepts exactly what Lean's reader (Wire.readAt in
+// library/Lasm/JS/Core.lean) accepts, so the two halves agree on every input
+// (test/fuzz/targets/lasm-js-wire.mjs checks them against each other):
+// strings must be valid UTF-8 (Lean's are; TextDecoder would replace the rest),
+// a bigint is String.toInt?'s text (an optional `-`, decimal digits, single `_`
+// between them; BigInt alone also takes '', spaces, `+` and 0x), and a field
+// named `__proto__` is an own property (assigning it sets the prototype).
+const strictDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+function utf8(bytes) {
+  try { return strictDecoder.decode(bytes); } catch { throw failure('Malformed Lasm.JS value (invalid UTF-8)'); }
+}
+function bigint(text) {
+  if (!/^-?\d+(?:_\d+)*$/.test(text)) throw failure('Malformed Lasm.JS value (bigint)');
+  return BigInt(text.replaceAll('_', ''));
+}
+function field(object, key, value) {
+  // Stryker disable next-line ConditionalExpression: defining any other key of a new plain object is the same as assigning it, only slower
+  if (key === '__proto__') Object.defineProperty(object, key, { value, writable: true, enumerable: true, configurable: true });
+  else object[key] = value;
+}
 
 /** A short description of a JavaScript value for Lean's error messages. */
 export function describe(value) {
@@ -131,10 +151,10 @@ class Reader {
     if (n <= shortString) {
       let text = '';
       // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
-      for (let i = start; i < end; i++) { const c = b[i]; if (c > 127) return decoder.decode(b.subarray(start, end)); text += String.fromCharCode(c); }
+      for (let i = start; i < end; i++) { const c = b[i]; if (c > 127) return utf8(b.subarray(start, end)); text += String.fromCharCode(c); }
       return text;
     }
-    return decoder.decode(b.subarray(start, end));
+    return utf8(b.subarray(start, end));
   }
   // An object key: short ASCII keys come from keyCache, so the same key is the
   // same (internalized) string on every call, which makes building the object
@@ -145,13 +165,13 @@ class Reader {
     this.need(n);
     const b = this.bytes, start = this.offset, end = start + n;
     // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
-    if (n > shortKey) { this.offset = end; return decoder.decode(b.subarray(start, end)); }
+    if (n > shortKey) { this.offset = end; return utf8(b.subarray(start, end)); }
     let hash = n;
     // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
     for (let i = start; i < end; i++) {
       const c = b[i];
       // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
-      if (c > 127) { this.offset = end; return decoder.decode(b.subarray(start, end)); }
+      if (c > 127) { this.offset = end; return utf8(b.subarray(start, end)); }
       hash = Math.imul(hash ^ c, 16777619);
     }
     this.offset = end;
@@ -224,10 +244,10 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
     case 3: return true;
     case 4: return r.f64();
     case 5: return r.string();
-    case 6: return BigInt(r.string());
+    case 6: return bigint(r.string());
     case 7: return new Uint8Array(r.raw());
     case 8: { const n = r.u32(), items = new Array(n); for (let i = 0; i < n; i++) items[i] = read(r); return items; }
-    case 9: { const n = r.u32(), object = {}; for (let i = 0; i < n; i++) { const key = r.key(); object[key] = read(r); } return object; }
+    case 9: { const n = r.u32(), object = {}; for (let i = 0; i < n; i++) { const key = r.key(); field(object, key, read(r)); } return object; }
     case 10: { const id = r.u32(); r.raw(); return lookup(id); }
     default: throw failure(`Malformed Lasm.JS value (tag ${tag})`);
     }

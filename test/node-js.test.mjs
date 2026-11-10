@@ -67,11 +67,13 @@ test('strings and keys encode as UTF-8 and decode as TextDecoder (keeping a lead
     // Twice: the second read of a key comes from the key cache.
     for (let round = 0; round < 2; round++) assert.deepEqual(Object.entries(js.decode(wire(object))), [[text, text], ['after', 1]], JSON.stringify(s));
   }
-  // Bytes that are not valid UTF-8 decode as TextDecoder replaces them, as values and keys.
-  for (const raw of [[0x61, 0xff], [0xc3], [0x80, 0x61], [0x7f, 0x80]]) {
-    const bytes = Buffer.concat([u32(raw.length), Buffer.from(raw)]), text = new TextDecoder('utf-8', { ignoreBOM: true }).decode(Buffer.from(raw));
-    assert.equal(js.decode(Buffer.concat([Buffer.from([5]), bytes])), text);
-    assert.deepEqual(Object.keys(js.decode(Buffer.concat([Buffer.from([9]), u32(1), bytes, Buffer.from([0])]))), [text]);
+  // Bytes that are not valid UTF-8 are refused, as values and keys, on every path, as Lean's reader refuses them.
+  const long = n => [...Array(n).fill(0x61), 0xff];
+  for (const raw of [[0x61, 0xff], [0xc3], [0x80, 0x61], [0x7f, 0x80], [0xed, 0xa0, 0x80], long(40), long(80)]) {
+    const bytes = Buffer.concat([u32(raw.length), Buffer.from(raw)]);
+    assert.throws(() => js.decode(Buffer.concat([Buffer.from([5]), bytes])), { message: 'TypeError: Malformed Lasm.JS value (invalid UTF-8)' });
+    assert.throws(() => js.decode(Buffer.concat([Buffer.from([9]), u32(1), bytes, Buffer.from([0])])), { message: 'TypeError: Malformed Lasm.JS value (invalid UTF-8)' });
+    assert.throws(() => js.decode(Buffer.concat([Buffer.from([6]), bytes])), { message: 'TypeError: Malformed Lasm.JS value (invalid UTF-8)' });
   }
   // Many strings in one value: the writer grows its buffer in the middle of the fast path.
   const many = Object.fromEntries(Array.from({ length: 300 }, (_, i) => [`key${i}`, i % 3 ? `value number ${i}` : i]));
@@ -84,6 +86,30 @@ test('strings and keys encode as UTF-8 and decode as TextDecoder (keeping a lead
   // A truncated string or key fails, as before.
   assert.throws(() => js.decode(Buffer.concat([Buffer.from([5]), u32(4), Buffer.from('ab')])), /truncated/);
   assert.throws(() => js.decode(Buffer.concat([Buffer.from([9]), u32(1), u32(4), Buffer.from('ab')])), /truncated/);
+});
+
+// The reader accepts exactly what Lean's reader accepts (Wire.readAt; the
+// lasm-js-wire fuzz target checks the two against each other).
+test('a bigint is read as Lean reads one (String.toInt?): a sign, decimal digits, single underscores between them', () => {
+  const js = createNodeJs();
+  const big = text => js.decode(Buffer.concat([Buffer.from([6]), u32(Buffer.byteLength(text)), Buffer.from(text)]));
+  for (const [text, value] of [['0', 0n], ['-0', 0n], ['007', 7n], ['-12', -12n], ['1_000', 1000n], ['-1_0', -10n], ['1_2_3', 123n],
+    ['123456789012345678901234567890', 123456789012345678901234567890n]]) assert.equal(big(text), value, text);
+  for (const text of ['', '-', '+5', ' 1', '1 ', '0x10', '0b1', '1e3', '1.0', '_1', '1_', '1__0', '-_1', '--1', '1-', '١'])
+    assert.throws(() => big(text), { message: 'TypeError: Malformed Lasm.JS value (bigint)' }, JSON.stringify(text));
+});
+
+test('a field named __proto__ is an own property, not the prototype', () => {
+  const js = createNodeJs();
+  const bytes = Buffer.concat([Buffer.from([9]), u32(2), str('__proto__'), wire({ polluted: true }), str('a'), Buffer.from([1])]);
+  const value = js.decode(bytes);
+  assert.equal(Object.getPrototypeOf(value), Object.prototype);
+  assert.deepEqual(Object.keys(value), ['__proto__', 'a']);
+  assert.deepEqual(Object.getOwnPropertyDescriptor(value, '__proto__'), { value: { polluted: true }, writable: true, enumerable: true, configurable: true });
+  assert.equal(value.polluted, undefined);
+  assert.equal(value.a, null);
+  // It crosses back as the same field.
+  assert.deepEqual(js.encode(value, 'data'), bytes);
 });
 
 // Lengths travel as u32: one of 2^32 or more fails with a clear error instead
