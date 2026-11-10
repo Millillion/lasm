@@ -1,5 +1,9 @@
 # Lean 4.34.1 refresh
 
+> Scripts this page names that are no longer in the repository were removed on
+> 2026-11-10 as unreferenced; they are in the git history at
+> [`590a923f`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1).
+
 The latest-release target is now 4.34.1. Its fresh
 [runtime build and inventory](../evidence/lean-4.34.1-runtime-build-2026-09-25.json)
 cover 2,516 modules, 72,985 declarations, 163 `IO.FS` declarations, 2,087

@@ -317,7 +317,6 @@ docstrings, the propositions and the names.
   - `js-crud`
   - `js-fetch`
   - `lean-server`
-  - `lean-server-latest`
   - `ui`
   - `wasi-cli`
 - [ ] The `lasm init` templates in [templates/](../templates):
