@@ -17,6 +17,9 @@ Fastly, wasmtime for WASI), never against real cloud accounts (Jordan,
 `Lasm.Fetch` is being removed (Jordan, 2026-11-10): Fastly and WASI programs
 move to these bindings now; its JavaScript-host parts move to `Lasm.JS.*` in a
 later step. Until then `Lasm.Fetch.serve` keeps working on every target.
+Nothing replaces it as a single cross-target handler (Jordan, 2026-11-10):
+each target's server is a small entry module on its own bindings, sharing
+pure Lean app logic.
 
 ## Lasm.Fastly
 

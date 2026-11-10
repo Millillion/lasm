@@ -115,12 +115,21 @@ decisions themselves are logged with their reasoning in
   - Names are the witx's own (`HttpReq.headerValuesGet`, `KvStore.lookupWaitV2`,
     `Backend.«exists»`), records keep their pointer field's name
     (`cacheOverridePtr`).
+- [x] **What replaces `Lasm.Fetch.serve` across targets — decided** (Jordan,
+  2026-11-10). `Lasm.Fetch` is deleted entirely. There is **no single handler
+  across JS and Fastly/WASI targets** (accepted trade-off): each target's
+  server is written against its own host interface's generated bindings —
+  JS targets serve a standard Web `Request → Async Response` through
+  `Lasm.JS.Web` (Workers `export default {fetch}`, `Deno.serve`, `Bun.serve`,
+  Node through an npm adapter binding); Fastly uses `Lasm.Fastly.*`; WASI
+  uses `Lasm.WASI.Http`. Multi-target templates and apps get a small
+  per-target entry module each, sharing pure Lean app logic.
 - [ ] **The Fastly and WASI examples and templates.** `examples/fastly` is new
   (Lasm.Fastly); `examples/fetch` drops its `/fastly/stores` route. The
   multi-target `lasm init --template fetch|fullstack` projects, Conduit and
-  Folio still serve one `Lasm.Fetch` handler on Fastly and wasi-http: moving
-  them needs the portable-handler question answered (what replaces
-  `Lasm.Fetch.serve` across targets once it is deleted).
+  Folio still serve one `Lasm.Fetch` handler on Fastly and wasi-http; they
+  move to per-target entry modules (decision above) once `Lasm.WASI.Http` and
+  the `Lasm.JS.*` serve path land.
 - [ ] **`Lasm.WASI.Http` is not generated yet** ([plan](WASI_FASTLY_BINDINGS.md#lasmwasihttp-not-yet-generated)):
   the component template must then come from a module that imports every
   bound wasi:http function.
