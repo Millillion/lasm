@@ -682,6 +682,11 @@ imports a browser one).
   The common `Window` members are also globals (`document`, not
   `(← window).document`), as they are in JavaScript.
 - `WindowProxy` is `Window`.
+- `scroll`, `scrollTo`, `scrollBy` and `scrollIntoView` (of `Element` and
+  `Window`) are `Async Unit`: CSSOM View now types them as returning
+  `Promise<ScrollResult>`, but shipping browsers return `undefined`; an
+  `Async Unit` awaits either (`scripts/bindings/web-browser.mjs`,
+  `undefinedPromises`).
 - HTML elements have no `new` (their `[HTMLConstructor]` only builds custom
   elements); create them with `document.createElement` and make the handle
   of the element's interface from it, as above. The cast is not checked.

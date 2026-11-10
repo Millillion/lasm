@@ -971,15 +971,6 @@ instance : ToJS BooleanOrScrollIntoViewOptions := ⟨fun
 instance : Coe Bool BooleanOrScrollIntoViewOptions := ⟨.boolean⟩
 instance : Coe ScrollIntoViewOptions BooleanOrScrollIntoViewOptions := ⟨.scrollIntoViewOptions⟩
 
-/-- `dictionary ScrollResult` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ScrollResult where
-  /-- `required boolean interrupted` -/
-  interrupted : Bool
-instance : FromJS ScrollResult where
-  fromJS d := do return {
-    interrupted := ← Lasm.JS.readField Bool d "interrupted" }
-  typeName := "Lasm.JS.Web.ScrollResult"
-
 /-- `dictionary ScrollToOptions : ScrollOptions` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ScrollToOptions where
   /-- `ScrollBehavior behavior = "auto"` -/
@@ -2222,33 +2213,33 @@ def Element.getBoundingClientRect (self : Element) : IO DOMRect := do
 def Element.checkVisibility (self : Element) (options : Option CheckVisibilityOptions := none) : IO Bool :=
   self.val.callMethod "checkVisibility" (Support.args #[Support.optional options]) Bool
 
-/-- `Promise<ScrollResult> scrollIntoView(optional (boolean or ScrollIntoViewOptions) arg)` -/
-def Element.scrollIntoView (self : Element) (arg : Option BooleanOrScrollIntoViewOptions := none) : Async ScrollResult :=
-  self.val.callMethodAwait "scrollIntoView" (Support.args #[Support.optional arg]) ScrollResult
+/-- `Promise<ScrollResult> scrollIntoView(optional (boolean or ScrollIntoViewOptions) arg)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Element.scrollIntoView (self : Element) (arg : Option BooleanOrScrollIntoViewOptions := none) : Async Unit :=
+  self.val.callMethodAwait "scrollIntoView" (Support.args #[Support.optional arg]) Unit
 
-/-- `Promise<ScrollResult> scroll(optional ScrollToOptions options)` -/
-def Element.scroll (self : Element) (options : Option ScrollToOptions := none) : Async ScrollResult :=
-  self.val.callMethodAwait "scroll" (Support.args #[Support.optional options]) ScrollResult
+/-- `Promise<ScrollResult> scroll(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Element.scroll (self : Element) (options : Option ScrollToOptions := none) : Async Unit :=
+  self.val.callMethodAwait "scroll" (Support.args #[Support.optional options]) Unit
 
-/-- `Promise<ScrollResult> scroll(unrestricted double x, unrestricted double y)` -/
-def Element.scrollWithX (self : Element) (x : Float) (y : Float) : Async ScrollResult :=
-  self.val.callMethodAwait "scroll" (Support.args #[toJS x, toJS y]) ScrollResult
+/-- `Promise<ScrollResult> scroll(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Element.scrollWithX (self : Element) (x : Float) (y : Float) : Async Unit :=
+  self.val.callMethodAwait "scroll" (Support.args #[toJS x, toJS y]) Unit
 
-/-- `Promise<ScrollResult> scrollTo(optional ScrollToOptions options)` -/
-def Element.scrollTo (self : Element) (options : Option ScrollToOptions := none) : Async ScrollResult :=
-  self.val.callMethodAwait "scrollTo" (Support.args #[Support.optional options]) ScrollResult
+/-- `Promise<ScrollResult> scrollTo(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Element.scrollTo (self : Element) (options : Option ScrollToOptions := none) : Async Unit :=
+  self.val.callMethodAwait "scrollTo" (Support.args #[Support.optional options]) Unit
 
-/-- `Promise<ScrollResult> scrollTo(unrestricted double x, unrestricted double y)` -/
-def Element.scrollToWithX (self : Element) (x : Float) (y : Float) : Async ScrollResult :=
-  self.val.callMethodAwait "scrollTo" (Support.args #[toJS x, toJS y]) ScrollResult
+/-- `Promise<ScrollResult> scrollTo(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Element.scrollToWithX (self : Element) (x : Float) (y : Float) : Async Unit :=
+  self.val.callMethodAwait "scrollTo" (Support.args #[toJS x, toJS y]) Unit
 
-/-- `Promise<ScrollResult> scrollBy(optional ScrollToOptions options)` -/
-def Element.scrollBy (self : Element) (options : Option ScrollToOptions := none) : Async ScrollResult :=
-  self.val.callMethodAwait "scrollBy" (Support.args #[Support.optional options]) ScrollResult
+/-- `Promise<ScrollResult> scrollBy(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Element.scrollBy (self : Element) (options : Option ScrollToOptions := none) : Async Unit :=
+  self.val.callMethodAwait "scrollBy" (Support.args #[Support.optional options]) Unit
 
-/-- `Promise<ScrollResult> scrollBy(unrestricted double x, unrestricted double y)` -/
-def Element.scrollByWithX (self : Element) (x : Float) (y : Float) : Async ScrollResult :=
-  self.val.callMethodAwait "scrollBy" (Support.args #[toJS x, toJS y]) ScrollResult
+/-- `Promise<ScrollResult> scrollBy(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Element.scrollByWithX (self : Element) (x : Float) (y : Float) : Async Unit :=
+  self.val.callMethodAwait "scrollBy" (Support.args #[toJS x, toJS y]) Unit
 
 /-- `undefined setPointerCapture(long pointerId)` -/
 def Element.setPointerCapture (self : Element) (pointerId : Int) : IO Unit :=
@@ -4580,29 +4571,29 @@ def Window.resizeTo (self : Window) (width : Int) (height : Int) : IO Unit :=
 def Window.resizeBy (self : Window) (x : Int) (y : Int) : IO Unit :=
   self.val.callMethod "resizeBy" (Support.args #[toJS x, toJS y]) Unit
 
-/-- `Promise<ScrollResult> scroll(optional ScrollToOptions options)` -/
-def Window.scroll (self : Window) (options : Option ScrollToOptions := none) : Async ScrollResult :=
-  self.val.callMethodAwait "scroll" (Support.args #[Support.optional options]) ScrollResult
+/-- `Promise<ScrollResult> scroll(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Window.scroll (self : Window) (options : Option ScrollToOptions := none) : Async Unit :=
+  self.val.callMethodAwait "scroll" (Support.args #[Support.optional options]) Unit
 
-/-- `Promise<ScrollResult> scroll(unrestricted double x, unrestricted double y)` -/
-def Window.scrollWithX (self : Window) (x : Float) (y : Float) : Async ScrollResult :=
-  self.val.callMethodAwait "scroll" (Support.args #[toJS x, toJS y]) ScrollResult
+/-- `Promise<ScrollResult> scroll(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Window.scrollWithX (self : Window) (x : Float) (y : Float) : Async Unit :=
+  self.val.callMethodAwait "scroll" (Support.args #[toJS x, toJS y]) Unit
 
-/-- `Promise<ScrollResult> scrollTo(optional ScrollToOptions options)` -/
-def Window.scrollTo (self : Window) (options : Option ScrollToOptions := none) : Async ScrollResult :=
-  self.val.callMethodAwait "scrollTo" (Support.args #[Support.optional options]) ScrollResult
+/-- `Promise<ScrollResult> scrollTo(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Window.scrollTo (self : Window) (options : Option ScrollToOptions := none) : Async Unit :=
+  self.val.callMethodAwait "scrollTo" (Support.args #[Support.optional options]) Unit
 
-/-- `Promise<ScrollResult> scrollTo(unrestricted double x, unrestricted double y)` -/
-def Window.scrollToWithX (self : Window) (x : Float) (y : Float) : Async ScrollResult :=
-  self.val.callMethodAwait "scrollTo" (Support.args #[toJS x, toJS y]) ScrollResult
+/-- `Promise<ScrollResult> scrollTo(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Window.scrollToWithX (self : Window) (x : Float) (y : Float) : Async Unit :=
+  self.val.callMethodAwait "scrollTo" (Support.args #[toJS x, toJS y]) Unit
 
-/-- `Promise<ScrollResult> scrollBy(optional ScrollToOptions options)` -/
-def Window.scrollBy (self : Window) (options : Option ScrollToOptions := none) : Async ScrollResult :=
-  self.val.callMethodAwait "scrollBy" (Support.args #[Support.optional options]) ScrollResult
+/-- `Promise<ScrollResult> scrollBy(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Window.scrollBy (self : Window) (options : Option ScrollToOptions := none) : Async Unit :=
+  self.val.callMethodAwait "scrollBy" (Support.args #[Support.optional options]) Unit
 
-/-- `Promise<ScrollResult> scrollBy(unrestricted double x, unrestricted double y)` -/
-def Window.scrollByWithX (self : Window) (x : Float) (y : Float) : Async ScrollResult :=
-  self.val.callMethodAwait "scrollBy" (Support.args #[toJS x, toJS y]) ScrollResult
+/-- `Promise<ScrollResult> scrollBy(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
+def Window.scrollByWithX (self : Window) (x : Float) (y : Float) : Async Unit :=
+  self.val.callMethodAwait "scrollBy" (Support.args #[toJS x, toJS y]) Unit
 
 /-- `unsigned long requestAnimationFrame(FrameRequestCallback callback)` -/
 def Window.requestAnimationFrame (self : Window) (callback : FrameRequestCallback) : IO Nat :=
