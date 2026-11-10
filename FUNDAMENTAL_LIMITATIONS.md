@@ -111,13 +111,13 @@ enough:
 | WASI on `node:wasi` (Node 26) | 3,914 | V8's stack |
 | Edge output on Deno 2.9.6 | 3,914 | V8's stack |
 | Edge output on Node's V8 (the engine of Workers, the Vercel and Netlify edge, Chromium) | 3,768 | V8's stack |
-| Edge output on Bun 1.4.4 | 4,254 | JavaScriptCore's stack |
+| Edge output on Bun 1.4.4 | 4,254 (varies between runs) | JavaScriptCore's stack |
 | Edge output on SpiderMonkey 158 (Firefox's engine) | 3,233 | SpiderMonkey's stack (`too much recursion`) |
 
 The C stack (1 MiB in linear memory on the edge, 8 MiB on WASI) is never what
 stops it: even an unoptimized build (`clang -O0`, which keeps every local on the
 C stack) stops on the engine's stack, at 3,460 elements on Deno, 3,315 on Node
-and 6,337 on Bun. So a larger C stack would cost memory per instance and change
+and 3,948 to 6,337 on Bun (JavaScriptCore's limit moves between runs). So a larger C stack would cost memory per instance and change
 nothing, and the engine's stack is the platform's: Lasm cannot raise it on
 Workers, the other edge platforms or a browser. On wasmtime it is the host's
 flag above. The recursion is in Lean's standard library and is the same

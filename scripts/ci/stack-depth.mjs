@@ -185,6 +185,14 @@ const arrayOk = mode => (target, n, options) => {
   return r.code === 0 && /^ok \d+\n$/.test(r.stdout);
 };
 const reprOk = arrayOk('repr'), toStringOk = arrayOk('toString');
+// The first run past a measured limit that fails: from n, doubling up to 8n. An
+// engine's limit can move between runs (Bun's JavaScriptCore by more than half),
+// so a size just past the bisected limit may pass the next time.
+function pastLimit(target, mode, n, timeout) {
+  let r;
+  for (let m = n; m <= 8 * n; m *= 2) { r = run(target, [mode, String(m)], { timeout }); r.n = m; if (r.code !== 0 || r.timedOut) break; }
+  return r;
+}
 // Which stack stopped a run: the engine's (V8, JavaScriptCore, SpiderMonkey,
 // wasmtime; Lean's own message under Node), or the edge output's C stack.
 const stackOf = r => r.stderr.includes(edgeOverflow) ? 'C stack'
@@ -240,8 +248,8 @@ for (const target of targets) {
     // Every run here ends in well under a second: 30 s is a hang (issue #126).
     for (const mode of ['sum', 'wide', 'deepSum', 'repr']) {
       const ok = (t, n) => { const r = run(t, [mode, String(n)], { timeout: 30_000 }); return r.code === 0 && (mode === 'repr' ? /^ok \d+\n$/ : /^\d+\n$/).test(r.stdout); };
-      const deepest = limit(target, 100, 50_000, undefined, ok), n = Math.ceil(deepest * 1.1) + 10;
-      const over = run(target, [mode, String(n)], { timeout: 30_000 });
+      const deepest = limit(target, 100, 50_000, undefined, ok);
+      const over = pastLimit(target, mode, Math.ceil(deepest * 1.1) + 10, 30_000), n = over.n;
       const named = over.stderr.includes(`[lasm] the Lean instance stopped: ${edgeOverflow}\n`);
       if (named) overflows.push(mode);
       (report.targets[target].limits ??= {})[mode] = { deepest, stop: named ? 'C stack' : over.stderr.split('\n')[0] };
@@ -262,9 +270,9 @@ for (const target of targets) {
     expect(target, 'repr of a 1,000-element Array', reprOk(target, 1000), '');
     expect(target, 'toString of a 100,000-element Array (iterative, no depth limit)', toStringOk(target, 100_000), '');
     const deepest = limit(target, 1000, 200_000, undefined, reprOk);
-    const past = run(target, ['repr', String(Math.ceil(deepest * 1.2) + 10)], { timeout: 60_000 });
+    const past = pastLimit(target, 'repr', Math.ceil(deepest * 1.2) + 10, 60_000);
     report.targets[target].repr = { deepest, stop: stackOf(past) };
-    expect(target, `repr past its limit (${deepest} elements) stops on the engine's stack, without hanging`,
+    expect(target, `repr of ${past.n} elements, past its limit (${deepest}), stops on the engine's stack, without hanging`,
       !past.timedOut && past.code !== 0 && past.stdout === '' && !/out of bounds/i.test(past.stderr) && report.targets[target].repr.stop === 'engine stack',
       JSON.stringify({ code: past.code, signal: past.signal, timedOut: past.timedOut, stderr: past.stderr.slice(0, 400) }));
     if (target === 'wasi') {
