@@ -498,13 +498,3 @@ void lasm_wasi_io_wait(uint64_t timeout_ns, bool bounded) {
     lasm_wasi_io_poll();
 }
 
-/* Lasm.Fastly (library/Lasm/Fastly.lean): only on --target fastly. */
-static lean_obj_res fastly_only(void) {
-    return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string(
-        "Lasm.Fastly: Fastly stores are available only in programs built with lasm build --target fastly")));
-}
-LEAN_EXPORT lean_obj_res lasm_fastly_config_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
-LEAN_EXPORT lean_obj_res lasm_fastly_secret_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
-LEAN_EXPORT lean_obj_res lasm_fastly_kv_get(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }
-LEAN_EXPORT lean_obj_res lasm_fastly_kv_put(b_lean_obj_arg store, b_lean_obj_arg key, b_lean_obj_arg value) { (void)store; (void)key; (void)value; return fastly_only(); }
-LEAN_EXPORT lean_obj_res lasm_fastly_kv_delete(b_lean_obj_arg store, b_lean_obj_arg key) { (void)store; (void)key; return fastly_only(); }

@@ -24,7 +24,8 @@ The Node build that the WASI link reuses stays in the build cache
 CI ([`wasi.yml`](../.github/workflows/wasi.yml),
 [`scripts/wasi/wasi-ci.mjs`](../scripts/wasi/wasi-ci.mjs)) builds
 [`examples/wasi-cli`](../examples/wasi-cli/Main.lean) and
-[`examples/fetch`](../examples/fetch/Main.lean) from source on every change
+[`examples/fetch`](../examples/fetch/Main.lean), [`examples/fastly`](../examples/fastly/Main.lean)
+(on [Lasm.Fastly](WASI_FASTLY_BINDINGS.md)) and Lasm.Fastly's conformance fixture from source on every change
 and checks them on pinned wasmtime 49.0.4 (`run` and `serve`), wasmer 7.4.2,
 Node 26.12.1's `node:wasi`, Spin 4.2.2 (HTTP trigger and wagi) and Viceroy
 0.21.1. The command-line program's output
@@ -238,7 +239,8 @@ of the reachable modules is cheap. Three concurrent outbound requests to a
 - **A wasi-http component with `wasi:cli` imports** (environment,
   arguments, files through `wasi:filesystem`): the component targets the
   proxy world, which has none.
-- **Fastly APIs beyond requests and stores**: cache, geolocation, device
-  detection, logging endpoints, rate limiting.
+- **`Lasm.WASI.Http`**, wasi:http generated from its WIT as `Lasm.Fastly` is
+  from Fastly's witx ([WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md#lasmwasihttp-not-yet-generated)).
+  Fastly's whole host ABI is bound: [`Lasm.Fastly`](WASI_FASTLY_BINDINGS.md#lasmfastly).
 - **Sockets in `--target wasi`**: preview 1 has none; `--target wasi-http`
   sends HTTP requests instead.

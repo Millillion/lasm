@@ -1,0 +1,5 @@
+{
+  "name": "lasm-fastly-abi-fixture",
+  "private": true,
+  "description": "Lasm.Fastly's conformance checks under Viceroy: lasm build Main.lean --target fastly"
+}

@@ -181,16 +181,19 @@ message: the adapters are part of Lasm's builds.
 
 ## Fastly's stores
 
-`import Lasm.Fastly` (`--target fastly` only; elsewhere the calls fail with a
-message):
+`import Lasm.Fastly`, Fastly's whole host ABI generated from its witx
+(`--target fastly` only; elsewhere each call fails with
+`FastlyStatus.unsupported`; [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)):
 
 ```lean
-Lasm.Fastly.configGet "settings" "color"   : IO (Option String)
-Lasm.Fastly.secretGet "secrets" "token"    : IO (Option ByteArray)   -- secretText: as UTF-8
-Lasm.Fastly.kvGet "kv" "key"               : IO (Option ByteArray)  -- kvGetText: as UTF-8
-Lasm.Fastly.kvPut "kv" "key" bytes         : IO Unit
-Lasm.Fastly.kvDelete "kv" "key"            : IO Unit
+open Lasm.Fastly
+found? (ConfigStore.get (← ConfigStore.open "settings") "color")     -- Option String
+SecretStore.plaintext (← SecretStore.get (← SecretStore.open "secrets") "token")
+KvStore.lookupWaitV2 (← KvStore.lookup (← KvStore.open "kv") "key" {} {})   -- body, metadata, generation, KvError
 ```
+
+The hand-written `configGet`, `secretGet`, `kvGet`, `kvPut` and `kvDelete` are
+gone; [the release notes](release/next-notes.md) map each to its replacement.
 
 The [Fastly guide](deploy/fastly.md#stores) shows the `fastly.toml` that
 Viceroy reads them from.
