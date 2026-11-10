@@ -2,13 +2,19 @@
 
 A Lean HTTP handler runs on Fastly Compute as a standard WebAssembly module:
 `lasm build Main.lean --target fastly` writes `bin/main.wasm` and the package
-`pkg/<name>.tar.gz` that `fastly compute deploy` uploads. The handler is
-[`Lasm.Fetch`](../FETCH.md); there is no JavaScript and no Fastly SDK.
+`pkg/<name>.tar.gz` that `fastly compute deploy` uploads. The program calls
+Fastly's host ABI through [`Lasm.Fastly`](../WASI_FASTLY_BINDINGS.md#lasmfastly),
+generated from Fastly's witx (every HTTP, backend, store, cache, geolocation
+and rate-limiting call), or serves a portable [`Lasm.Fetch`](../FETCH.md)
+handler; there is no JavaScript and no Fastly SDK.
 
-CI ([`wasi.yml`](../../.github/workflows/wasi.yml)) serves the
-[`examples/fetch`](../../examples/fetch/Main.lean) build with Viceroy 0.21.1,
-Fastly's local simulator (the program `fastly compute serve` runs), and checks
-every route: bodies, headers, statuses, `Std.Async` waits, errors. Nothing is
+CI ([`wasi.yml`](../../.github/workflows/wasi.yml)) serves
+[`examples/fastly`](../../examples/fastly/Main.lean) (Lasm.Fastly) and the
+[`examples/fetch`](../../examples/fetch/Main.lean) build (Lasm.Fetch) with
+Viceroy 0.21.1, Fastly's local simulator (the program `fastly compute serve`
+runs), and checks every route: bodies, headers, statuses, streaming, backend
+requests, stores, errors; it also runs Lasm.Fastly's conformance checks
+([`test/fixtures/fastly-abi`](../../test/fixtures/fastly-abi)). Nothing is
 deployed to a Fastly account by Lasm or its CI.
 
 ## Build and run
@@ -46,7 +52,7 @@ Viceroy can also run the module directly:
 
 | Path | Contents |
 | --- | --- |
-| `bin/main.wasm` | The program: a `wasi_snapshot_preview1` command that imports Fastly's `fastly_abi`, `fastly_http_req`, `fastly_http_body` and `fastly_http_resp` host calls. |
+| `bin/main.wasm` | The program: a `wasi_snapshot_preview1` command that imports the Fastly host calls it uses (`fastly_http_req`, `fastly_http_body`, `fastly_kv_store`, …). |
 | `bin/lasm-build-info.json`, `bin/THIRD_PARTY_NOTICES.txt` | Build record and the licences of the code in the module (also inside `main.wasm` and in the package: [LICENSING.md](../LICENSING.md)). |
 | `pkg/<name>.tar.gz` | `<name>/fastly.toml` and `<name>/bin/main.wasm`, the package `fastly compute deploy --package` uploads (`<name>` from `fastly.toml`). |
 | `fastly.toml` | Only when the project has none. |
@@ -57,7 +63,9 @@ refused) and `pkg/<name>.tar.gz`.
 ## How a request runs
 
 Fastly starts a fresh instance of the module for each request and runs
-`main`. `Lasm.Fetch.serve` reads the downstream request (method, URL, every
+`main`. With Lasm.Fastly, `main` reads the request with
+`HttpReq.bodyDownstreamGet` and answers with `HttpResp.sendDownstream`
+([examples/fastly](../../examples/fastly/Main.lean)). `Lasm.Fetch.serve` reads the downstream request (method, URL, every
 header value, the body), runs the handler, sends the response with
 `fastly_http_resp.send_downstream`, and returns; the instance then ends.
 Startup is Lean's module initializers plus `main`; the
@@ -71,6 +79,10 @@ Fastly's environment (`FASTLY_HOSTNAME`, `FASTLY_SERVICE_VERSION`, …).
 
 ## Backend requests
 
+With Lasm.Fastly: `HttpReq.send req body "origin"` (or `sendAsync`, then
+`pendingReqWait`, several in flight at once), to a backend the service defines
+or one registered with `HttpReq.registerDynamicBackend name "host:port" mask
+config` ([examples/fastly](../../examples/fastly/Main.lean) does both).
 `Lasm.Fetch.fetch` (and `get`, `post`) sends backend requests
 ([FETCH.md](../FETCH.md#outbound-requests)):
 
@@ -92,9 +104,20 @@ are read completely; redirects are not followed.
 
 ## Stores
 
-`import Lasm.Fastly` reads Config Stores and Secret Stores and reads, writes
-and deletes KV Store keys ([FETCH.md](../FETCH.md#fastlys-stores)). Viceroy
-reads local stores from `fastly.toml`:
+`import Lasm.Fastly` binds Config Stores (`ConfigStore.open`, `get`), Secret
+Stores (`SecretStore.open`, `get`, `plaintext`) and KV Stores (`KvStore.open`,
+`lookup`/`lookupWaitV2`, `insert`/`insertWait`, `delete`/`deleteWait`, `list`,
+with metadata, generations and TTLs), and `Lasm.KV.open` uses a KV Store
+([WASI_FASTLY_BINDINGS.md](../WASI_FASTLY_BINDINGS.md)):
+
+```lean
+let color ← found? (ConfigStore.get (← ConfigStore.open "settings") "color")   -- Option String
+let token ← SecretStore.plaintext (← SecretStore.get (← SecretStore.open "secrets") "token")
+let kv ← KvStore.open "kv"
+let (body, metadata, generation, error) ← KvStore.lookupWaitV2 (← KvStore.lookup kv "greeting" {} {})
+```
+
+Viceroy reads local stores from `fastly.toml`:
 
 ```toml
 [local_server.config_stores.settings]
@@ -118,7 +141,9 @@ On Fastly, link the stores to the service (`fastly config-store create`,
 
 - Fastly Compute's resource limits (memory, CPU time, package size) apply; a
   Lean module is about 0.8 MiB.
-- Bound: the downstream request and response (streamed or whole), backend
-  requests, and Config, Secret and KV Stores. Not yet: the cache APIs,
-  geolocation, device detection, logging endpoints, rate limiting and KV
-  metadata, generations and listing.
+- Lasm.Fastly binds 244 of the ABI's 252 functions (the cache APIs,
+  geolocation, device detection, logging endpoints, rate limiting, ACLs and
+  KV metadata, generations and listing included); the 8 left out are listed in
+  [WASI_FASTLY_BINDINGS.md](../WASI_FASTLY_BINDINGS.md#what-is-bound). Viceroy
+  implements some of them only partly; CI checks the ones its conformance
+  fixture uses.

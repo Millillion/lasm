@@ -649,6 +649,11 @@
         "reportValidity"
       ]
     },
+    "HTMLHeadElement": {
+      "module": "Html",
+      "static": [],
+      "prototype": []
+    },
     "HTMLImageElement": {
       "module": "Html",
       "static": [],

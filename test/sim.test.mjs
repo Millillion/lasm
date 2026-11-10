@@ -2,7 +2,7 @@
 // are deterministic given the seed, and its faults do what they say.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Rng, Scheduler, Clock, Network, Kv, SqlStore, SimFault, Trace, faultProfile, Checks } from '../scripts/sim/index.mjs';
+import { Rng, Scheduler, Clock, Network, Kv, SqlStore, SimFault, Trace, faultProfile, Checks, SeedLoop, options } from '../scripts/sim/index.mjs';
 
 test('Rng: the same seed gives the same numbers; streams are independent', () => {
   const a = new Rng(42), b = new Rng(42), c = new Rng(43);
@@ -101,6 +101,16 @@ test('SqlStore: batches are atomic; failed, ambiguous and crashed commits', () =
   db.heal();
   assert.equal(db.all('SELECT 1 AS one')[0].one, 1);
   db.close();
+});
+
+test('SeedLoop: one seed, a list of seeds (regression seeds), a range', () => {
+  const quiet = console.log; console.log = () => {};
+  try {
+    const seeds = argv => { const l = new SeedLoop({ name: 't', repro: s => `${s}`, opts: options(argv) }); const out = []; for (let s; (s = l.next()) !== null;) out.push(s); return out; };
+    assert.deepEqual(seeds(['--seed', '7']), [7]);
+    assert.deepEqual(seeds(['--seed', '1528071973,433344502,5']), [1528071973, 433344502, 5]);
+    assert.deepEqual(seeds(['--seeds', '3', '--first', '1001']), [1001, 1002, 1003]);
+  } finally { console.log = quiet; }
 });
 
 test('faultProfile and Trace: functions of the seed', () => {

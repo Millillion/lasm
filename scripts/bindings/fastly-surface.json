@@ -1,0 +1,456 @@
+{
+ "source": "Viceroy v0.21.1 `wasm_abi/compute-at-edge-abi` (https://github.com/fastly/Viceroy/tree/v0.21.1/wasm_abi/compute-at-edge-abi)",
+ "abiDigest": "e2bad2d66f1bd2b2",
+ "modules": [
+  {
+   "witx": "fastly_cache",
+   "lean": "Lasm.Fastly.Cache",
+   "bound": [
+    "lookup",
+    "insert",
+    "replace",
+    "replace_insert",
+    "replace_get_age_ns",
+    "replace_get_body",
+    "replace_get_hits",
+    "replace_get_length",
+    "replace_get_max_age_ns",
+    "replace_get_stale_while_revalidate_ns",
+    "replace_get_state",
+    "replace_get_user_metadata",
+    "transaction_lookup",
+    "transaction_lookup_async",
+    "cache_busy_handle_wait",
+    "transaction_insert",
+    "transaction_insert_and_stream_back",
+    "transaction_update",
+    "transaction_cancel",
+    "close_busy",
+    "close",
+    "get_state",
+    "get_user_metadata",
+    "get_body",
+    "get_length",
+    "get_max_age_ns",
+    "get_stale_while_revalidate_ns",
+    "get_age_ns",
+    "get_hits"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_config_store",
+   "lean": "Lasm.Fastly.ConfigStore",
+   "bound": [
+    "open",
+    "get"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_http_cache",
+   "lean": "Lasm.Fastly.HttpCache",
+   "bound": [
+    "is_request_cacheable",
+    "get_suggested_cache_key",
+    "lookup",
+    "transaction_lookup",
+    "transaction_insert",
+    "transaction_insert_and_stream_back",
+    "transaction_update",
+    "transaction_update_and_return_fresh",
+    "transaction_choose_stale",
+    "transaction_record_not_cacheable",
+    "transaction_abandon",
+    "close",
+    "get_suggested_backend_request",
+    "prepare_response_for_storage",
+    "get_found_response",
+    "get_state",
+    "get_length",
+    "get_max_age_ns",
+    "get_stale_while_revalidate_ns",
+    "get_stale_if_error_ns",
+    "get_age_ns",
+    "get_hits",
+    "get_sensitive_data",
+    "get_surrogate_keys",
+    "get_vary_rule"
+   ],
+   "unbound": [
+    {
+     "name": "get_suggested_cache_options",
+     "reason": "parameter options_out: an output record (http_cache_write_options)"
+    }
+   ]
+  },
+  {
+   "witx": "fastly_shielding",
+   "lean": "Lasm.Fastly.Shielding",
+   "bound": [
+    "shield_info",
+    "backend_for_shield"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_abi",
+   "lean": "Lasm.Fastly.Abi",
+   "bound": [
+    "init"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_uap",
+   "lean": "Lasm.Fastly.Uap",
+   "bound": [
+    "parse"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_http_body",
+   "lean": "Lasm.Fastly.HttpBody",
+   "bound": [
+    "append",
+    "new",
+    "read",
+    "write",
+    "close",
+    "abandon",
+    "trailer_append",
+    "trailer_names_get",
+    "trailer_value_get",
+    "trailer_values_get",
+    "known_length"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_log",
+   "lean": "Lasm.Fastly.Log",
+   "bound": [
+    "endpoint_get",
+    "write"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_http_req",
+   "lean": "Lasm.Fastly.HttpReq",
+   "bound": [
+    "body_downstream_get",
+    "cache_override_set",
+    "cache_override_v2_set",
+    "cache_override_v3_set",
+    "downstream_client_ip_addr",
+    "downstream_server_ip_addr",
+    "downstream_client_h2_fingerprint",
+    "downstream_client_request_id",
+    "downstream_client_oh_fingerprint",
+    "downstream_client_ddos_detected",
+    "downstream_tls_cipher_openssl_name",
+    "downstream_tls_protocol",
+    "downstream_tls_client_hello",
+    "downstream_tls_raw_client_certificate",
+    "downstream_tls_client_cert_verify_result",
+    "downstream_tls_ja3_md5",
+    "downstream_tls_ja4",
+    "downstream_compliance_region",
+    "new",
+    "header_names_get",
+    "original_header_names_get",
+    "original_header_count",
+    "header_value_get",
+    "header_values_get",
+    "header_values_set",
+    "header_insert",
+    "header_append",
+    "header_remove",
+    "method_get",
+    "method_set",
+    "uri_get",
+    "uri_set",
+    "version_get",
+    "version_set",
+    "send",
+    "send_async",
+    "send_async_v2",
+    "send_async_streaming",
+    "pending_req_header_insert",
+    "pending_req_header_append",
+    "pending_req_header_remove",
+    "pending_req_poll",
+    "pending_req_wait",
+    "pending_req_select",
+    "fastly_key_is_valid",
+    "close",
+    "auto_decompress_response_set",
+    "upgrade_websocket",
+    "redirect_to_websocket_proxy",
+    "redirect_to_grip_proxy",
+    "redirect_to_websocket_proxy_v2",
+    "redirect_to_grip_proxy_v2",
+    "framing_headers_mode_set",
+    "register_dynamic_backend",
+    "inspect",
+    "on_behalf_of"
+   ],
+   "unbound": [
+    {
+     "name": "send_v2",
+     "reason": "parameter error_detail: an output record (send_error_detail)"
+    },
+    {
+     "name": "send_v3",
+     "reason": "parameter error_detail: an output record (send_error_detail)"
+    },
+    {
+     "name": "pending_req_poll_v2",
+     "reason": "parameter error_detail: an output record (send_error_detail)"
+    },
+    {
+     "name": "pending_req_wait_v2",
+     "reason": "parameter error_detail: an output record (send_error_detail)"
+    },
+    {
+     "name": "pending_req_select_v2",
+     "reason": "parameter error_detail: an output record (send_error_detail)"
+    }
+   ]
+  },
+  {
+   "witx": "fastly_http_downstream",
+   "lean": "Lasm.Fastly.HttpDownstream",
+   "bound": [
+    "next_request",
+    "next_request_wait",
+    "next_request_abandon",
+    "downstream_original_header_names",
+    "downstream_original_header_count",
+    "downstream_client_ip_addr",
+    "downstream_server_ip_addr",
+    "downstream_client_h2_fingerprint",
+    "downstream_client_request_id",
+    "downstream_client_oh_fingerprint",
+    "downstream_client_ddos_detected",
+    "downstream_tls_cipher_openssl_name",
+    "downstream_tls_protocol",
+    "downstream_tls_client_hello",
+    "downstream_tls_raw_client_certificate",
+    "downstream_tls_client_cert_verify_result",
+    "downstream_tls_client_servername",
+    "downstream_tls_ja3_md5",
+    "downstream_tls_ja4",
+    "downstream_compliance_region",
+    "fastly_key_is_valid",
+    "downstream_bot_analyzed",
+    "downstream_bot_detected",
+    "downstream_bot_name",
+    "downstream_bot_category",
+    "downstream_bot_category_kind",
+    "downstream_bot_verified",
+    "downstream_resvpnproxy_is_anonymous",
+    "downstream_resvpnproxy_is_anonymous_vpn",
+    "downstream_resvpnproxy_is_hosting_provider",
+    "downstream_resvpnproxy_is_proxy_over_vpn",
+    "downstream_resvpnproxy_is_public_proxy",
+    "downstream_resvpnproxy_is_relay_proxy",
+    "downstream_resvpnproxy_is_residential_proxy",
+    "downstream_resvpnproxy_is_smart_dns_proxy",
+    "downstream_resvpnproxy_is_tor_exit_node",
+    "downstream_resvpnproxy_is_vpn_datacenter",
+    "downstream_resvpnproxy_vpn_service_name",
+    "downstream_visits_this_service",
+    "downstream_visits_this_pop"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_http_resp",
+   "lean": "Lasm.Fastly.HttpResp",
+   "bound": [
+    "new",
+    "header_names_get",
+    "header_value_get",
+    "header_values_get",
+    "header_values_set",
+    "header_insert",
+    "header_append",
+    "header_remove",
+    "version_get",
+    "version_set",
+    "send_downstream",
+    "send_downstream_pending",
+    "status_get",
+    "status_set",
+    "close",
+    "framing_headers_mode_set",
+    "http_keepalive_mode_set",
+    "get_addr_dest_ip",
+    "get_addr_dest_port"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_dictionary",
+   "lean": "Lasm.Fastly.Dictionary",
+   "bound": [
+    "open",
+    "get"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_geo",
+   "lean": "Lasm.Fastly.Geo",
+   "bound": [
+    "lookup"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_device_detection",
+   "lean": "Lasm.Fastly.DeviceDetection",
+   "bound": [
+    "lookup"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_erl",
+   "lean": "Lasm.Fastly.Erl",
+   "bound": [
+    "check_rate",
+    "ratecounter_increment",
+    "ratecounter_lookup_rate",
+    "ratecounter_lookup_count",
+    "penaltybox_add",
+    "penaltybox_has"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_object_store",
+   "lean": "Lasm.Fastly.ObjectStore",
+   "bound": [
+    "open",
+    "lookup",
+    "lookup_async",
+    "pending_lookup_wait",
+    "insert",
+    "insert_async",
+    "pending_insert_wait",
+    "delete_async",
+    "pending_delete_wait"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_image_optimizer",
+   "lean": "Lasm.Fastly.ImageOptimizer",
+   "bound": [],
+   "unbound": [
+    {
+     "name": "transform_image_optimizer_request",
+     "reason": "parameter io_error_detail: an output record (image_optimizer_error_detail)"
+    }
+   ]
+  },
+  {
+   "witx": "fastly_kv_store",
+   "lean": "Lasm.Fastly.KvStore",
+   "bound": [
+    "open",
+    "lookup",
+    "lookup_wait",
+    "lookup_wait_v2",
+    "insert",
+    "insert_wait",
+    "delete",
+    "delete_wait",
+    "list",
+    "list_wait"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_secret_store",
+   "lean": "Lasm.Fastly.SecretStore",
+   "bound": [
+    "open",
+    "get",
+    "plaintext",
+    "from_bytes"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_backend",
+   "lean": "Lasm.Fastly.Backend",
+   "bound": [
+    "exists",
+    "is_healthy",
+    "is_dynamic",
+    "get_host",
+    "get_override_host",
+    "get_port",
+    "get_connect_timeout_ms",
+    "get_first_byte_timeout_ms",
+    "get_between_bytes_timeout_ms",
+    "get_http_keepalive_time",
+    "get_tcp_keepalive_enable",
+    "get_tcp_keepalive_interval",
+    "get_tcp_keepalive_probes",
+    "get_tcp_keepalive_time",
+    "is_ssl",
+    "get_ssl_min_version",
+    "get_ssl_max_version"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_async_io",
+   "lean": "Lasm.Fastly.AsyncIo",
+   "bound": [
+    "select",
+    "is_ready"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_purge",
+   "lean": "Lasm.Fastly.Purge",
+   "bound": [],
+   "unbound": [
+    {
+     "name": "purge_surrogate_key",
+     "reason": "record purge_options: field ret_buf_nwritten_out is a pointer with no length (an output inside an input record)"
+    }
+   ]
+  },
+  {
+   "witx": "fastly_compute_runtime",
+   "lean": "Lasm.Fastly.ComputeRuntime",
+   "bound": [
+    "get_vcpu_ms",
+    "get_heap_mib"
+   ],
+   "unbound": []
+  },
+  {
+   "witx": "fastly_acl",
+   "lean": "Lasm.Fastly.Acl",
+   "bound": [
+    "open",
+    "lookup"
+   ],
+   "unbound": []
+  }
+ ],
+ "total": {
+  "functions": 252,
+  "bound": 244
+ }
+}

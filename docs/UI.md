@@ -420,7 +420,7 @@ await app.send('refresh');                                              // App.r
 ```
 
 Values cross as `Lasm.JS.Data` (plain JSON-like data). For anything else,
-`Cmd.io` and `Lasm.Web` give typed access to the web platform from Lean.
+`Cmd.io` and the generated `Lasm.JS.Web.Browser` ([JS_BINDINGS.md](JS_BINDINGS.md#the-browser-tier-lasmjswebbrowser)) give typed access to the web platform from Lean.
 
 ## Server-side rendering and hydration
 

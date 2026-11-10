@@ -13,7 +13,7 @@ import { linkWasiProgram, wasiLinkSettings, wasiSources, allowedImportModules, c
 import { moduleImports } from '../src/wasi/lower-atomics.mjs';
 import { extractCore } from '../src/wasi/wasi-component.mjs';
 import { responseFile } from '../src/platform.mjs';
-import { glueLinkFlags } from '../src/lasm-library.mjs';
+import { fastlyGlueSource, wasiHttpGlueSource, glueLinkFlags } from '../src/lasm-library.mjs';
 import { installTools, wasmObject, archive, temporaryDirectory, programModule } from './fixtures/link-stand-ins/toolchain.mjs';
 
 const posix = process.platform !== 'win32';
@@ -101,8 +101,11 @@ test('Fastly and wasi-http targets: their defines, sources, memory and allowed i
     imports: { new_fields: 'wasi:http/types@0.2.12', now: 'wasi:clocks/monotonic-clock@0.2.12' } }]] });
   const result = linkWasiProgram({ toolchain: h.toolchain, nodeRuntime: h.nodeRuntime, edge: h.edge, linkWork: h.linkWork, out: h.out, target: 'wasi-http' });
   const compiledHttp = h.tools.calls('clang');
-  assert.deepEqual(compiledHttp.map(args => args.at(-3)), ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_wasi_http.c'].map(name => join(here, name)));
+  // Every wasi-http program links Lasm.WASI.Http's glue with its host imports (all of them referenced).
+  assert.deepEqual(compiledHttp.map(args => args.at(-3)), [...['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_wasi_http.c'].map(name => join(here, name)),
+    join(here, '../../library/c/lasm_wasi_http_bindings.c')]);
   assert.equal(compiledHttp[2][9], '-DLASM_WASI_HTTP');
+  assert.ok(compiledHttp[3].includes('-DLASM_WASI_HTTP'));
   const core = join(h.out, 'core.wasm'), program = join(h.out, 'main.wasm');
   const component = readFileSync(program);
   assert.deepEqual(result, { program, core, bytes: component.length });
@@ -144,22 +147,102 @@ test('WASI link errors: unknown target, no system libraries, tool failures with 
   assert.throws(() => linkWasiProgram({ ...options, verbose: true }), error => error.stderr == null && error.status === 1);
 });
 
+test('Lasm.Fastly glue: --target fastly compiles it with its host imports in place of the Node build\'s copy; other targets keep that copy', { skip: !posix }, () => {
+  const glue = ['lasm-fastly.o', { functions: [{ name: 'lasm_fastly_bindings' }, { name: 'lasm_fastly_http_req_new' }] }];
+  const f = fixture({ objects: [glue] });
+  linkWasiProgram({ toolchain: f.toolchain, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, target: 'fastly' });
+  const compiled = f.tools.calls('clang');
+  const fastly = compiled.find(args => args.includes(fastlyGlueSource));
+  assert.ok(fastly && fastly.includes('-DLASM_WASI_FASTLY'), 'the glue is compiled with its host imports');
+  assert.equal(fastly[fastly.indexOf('-o') + 1], join(f.out, 'lasm_fastly.o'));
+  const [link] = f.tools.calls('wasm-ld');
+  assert.ok(!link.includes(f.objects.extras[0]), 'the Node build\'s copy is dropped');
+  assert.ok(link.includes(join(f.out, 'lasm_fastly.o')));
+  // Plain WASI keeps the Node build's copy (its calls fail with $unsupported) and compiles nothing more.
+  const g = fixture({ objects: [glue] });
+  linkWasiProgram({ toolchain: g.toolchain, nodeRuntime: g.nodeRuntime, edge: g.edge, linkWork: g.linkWork, out: g.out });
+  assert.ok(!g.tools.calls('clang').some(args => args.includes(fastlyGlueSource)));
+  assert.ok(g.tools.calls('wasm-ld')[0].includes(g.objects.extras[0]));
+  // A Fastly program without Lasm.Fastly compiles no glue.
+  const h = fixture();
+  linkWasiProgram({ toolchain: h.toolchain, nodeRuntime: h.nodeRuntime, edge: h.edge, linkWork: h.linkWork, out: h.out, target: 'fastly' });
+  assert.ok(!h.tools.calls('clang').some(args => args.includes(fastlyGlueSource)));
+});
+
+// The host glue's compile line, exactly: the target, the sysroot, its compat headers, the release
+// defines, the host's own define, sections for --gc-sections, the runtime's headers, one object.
+const glueCompile = (f, define, source, object) => ['-target', 'wasm64-unknown-emscripten', `--sysroot=${join(f.toolchain.cache, 'sysroot')}`,
+  '-Xclang', '-iwithsysroot/include/compat', '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', define, '-ffunction-sections', '-fdata-sections',
+  '-I', join(f.nodeRuntime.directory, 'include'), '-c', source, '-o', object];
+
+test('host glue: Lasm.Fastly and Lasm.WASI.Http are compiled with exactly their host build line', { skip: !posix }, () => {
+  const fastlyGlue = ['lasm-fastly.o', { functions: [{ name: 'lasm_fastly_bindings' }, { name: 'lasm_fastly_http_req_new' }] }];
+  const f = fixture({ objects: [fastlyGlue, ['prefixed.o', { functions: [{ name: 'my_lasm_fastly_bindings' }] }],
+    ['suffixed.o', { functions: [{ name: 'lasm_fastly_bindings_v2' }] }]] });
+  linkWasiProgram({ toolchain: f.toolchain, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, target: 'fastly' });
+  assert.deepEqual(f.tools.calls('clang').filter(args => args.includes(fastlyGlueSource)),
+    [glueCompile(f, '-DLASM_WASI_FASTLY', fastlyGlueSource, join(f.out, 'lasm_fastly.o'))]);
+  const [fastlyLink] = f.tools.calls('wasm-ld');
+  assert.ok(!fastlyLink.includes(f.objects.extras[0]), 'the Node build\'s copy is dropped');
+  for (const kept of [f.objects.main, ...f.objects.extras.slice(1)]) assert.ok(fastlyLink.includes(kept), kept);
+
+  // wasi-http: the Node build's copy of the glue is dropped, the program's other objects stay, and the
+  // glue is compiled from library/c with its host imports, even when the program never names it.
+  const httpGlue = ['lasm-wasi-http.o', { functions: [{ name: 'lasm_wasi_http_bindings' }, { name: 'lasm_wasi_http_types_new_fields' }] }];
+  // Only an object defining exactly `lasm_wasi_http_bindings` is the glue, not one whose names merely contain it.
+  const lookalikes = [['prefixed.o', { functions: [{ name: 'my_lasm_wasi_http_bindings' }] }],
+    ['suffixed.o', { functions: [{ name: 'lasm_wasi_http_bindings_v2' }] }]];
+  const h = fixture({ objects: [httpGlue, ...lookalikes] });
+  linkWasiProgram({ toolchain: h.toolchain, nodeRuntime: h.nodeRuntime, edge: h.edge, linkWork: h.linkWork, out: h.out, target: 'wasi-http' });
+  const object = join(h.out, 'lasm_wasi_http_bindings.o');
+  assert.deepEqual(h.tools.calls('clang').filter(args => args.includes(wasiHttpGlueSource)), [glueCompile(h, '-DLASM_WASI_HTTP', wasiHttpGlueSource, object)]);
+  const [httpLink] = h.tools.calls('wasm-ld');
+  assert.ok(!httpLink.includes(h.objects.extras[0]), 'the Node build\'s copy is dropped');
+  assert.ok(httpLink.includes(object), 'the host build of the glue is linked');
+  assert.ok(httpLink.includes(h.objects.main), 'the program\'s own objects stay');
+  for (const kept of h.objects.extras.slice(1)) assert.ok(httpLink.includes(kept), kept);
+  const k = fixture();
+  linkWasiProgram({ toolchain: k.toolchain, nodeRuntime: k.nodeRuntime, edge: k.edge, linkWork: k.linkWork, out: k.out, target: 'wasi-http' });
+  assert.deepEqual(k.tools.calls('clang').filter(args => args.includes(wasiHttpGlueSource)),
+    [glueCompile(k, '-DLASM_WASI_HTTP', wasiHttpGlueSource, join(k.out, 'lasm_wasi_http_bindings.o'))]);
+  // Other WASI targets never compile it, and keep whatever copy the program has.
+  for (const target of [undefined, 'fastly']) {
+    const g = fixture({ objects: [httpGlue] });
+    linkWasiProgram({ toolchain: g.toolchain, nodeRuntime: g.nodeRuntime, edge: g.edge, linkWork: g.linkWork, out: g.out, target });
+    assert.ok(!g.tools.calls('clang').some(args => args.includes(wasiHttpGlueSource)), String(target));
+    assert.ok(g.tools.calls('wasm-ld')[0].includes(g.objects.extras[0]), String(target));
+  }
+});
+
 test('WASI targets: settings, the sources of the cache identity, and the host interfaces each one may import', () => {
   const MiB = { stackMiB: 1, initialMiB: 4, maximumMiB: 2048, optimize: '-Oz' };
   assert.deepEqual(wasiLinkSettings, { wasi: { stackMiB: 8, initialMiB: 16, maximumMiB: 2048, optimize: '-Oz' }, fastly: MiB, 'wasi-http': MiB });
   // Every file the WASI link reads is part of the program's cache identity.
   assert.deepEqual(wasiSources, ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
-    'wasi-component.mjs', 'component/proxy-template.wasm']);
+    'wasi-component.mjs', 'component/proxy-template.wasm', 'lasm_wasi_http_imports.h', '../../library/c/lasm_fastly.c',
+    '../../library/c/lasm_wasi_http_bindings.c']);
   for (const name of wasiSources) assert.ok(existsSync(join(here, name)), name);
   const accepts = (target, module) => { try { checkWasiModule(programModule([[module, 'f']]), target); return true; } catch { return false; } };
+  // Lasm.Fastly binds every witx module (library/c/lasm_fastly.c).
   const fastly = ['wasi_snapshot_preview1', 'fastly_abi', 'fastly_http_req', 'fastly_http_body', 'fastly_http_resp', 'fastly_async_io',
-    'fastly_config_store', 'fastly_secret_store', 'fastly_kv_store'];
+    'fastly_config_store', 'fastly_secret_store', 'fastly_kv_store', 'fastly_geo', 'fastly_http_cache', 'fastly_acl'];
   const http = ['wasi_snapshot_preview1', 'wasi:http/types@0.2.12', 'wasi:http/outgoing-handler@0.2.12', 'wasi:io/poll@0.2.12',
     'wasi:io/streams@0.2.12', 'wasi:io/error@0.2.12', 'wasi:clocks/monotonic-clock@0.2.12'];
   for (const module of fastly) assert.ok(accepts('fastly', module), module);
   for (const module of http) assert.ok(accepts('wasi-http', module), module);
   for (const module of [...fastly, ...http].filter(module => module !== 'wasi_snapshot_preview1')) assert.ok(!accepts('wasi', module), module);
   assert.ok(accepts('wasi', 'wasi_snapshot_preview1') && !accepts('fastly', 'wasi:io/poll@0.2.12') && !accepts('wasi-http', 'fastly_abi'));
+  assert.ok(!accepts('fastly', 'env') && !accepts('fastly', 'fastly') && !accepts('fastly', 'xfastly_abi'));
+  // Every module the generated glue imports is one the fastly target accepts.
+  const glue = readFileSync(join(here, '../../library/c/lasm_fastly.c'), 'utf8');
+  const glueModules = new Set([...glue.matchAll(/import_module\("([^"]+)"\)/g)].map(m => m[1]));
+  assert.ok(glueModules.size > 20);
+  for (const module of glueModules) assert.ok(accepts('fastly', module), module);
+  // And every module Lasm.WASI.Http's glue imports is one the wasi-http target accepts.
+  const httpGlue = readFileSync(join(here, '../../library/c/lasm_wasi_http_bindings.c'), 'utf8');
+  const httpModules = new Set([...httpGlue.matchAll(/import_module\("([^"]+)"\)/g)].map(m => m[1]));
+  assert.equal(httpModules.size, 6);
+  for (const module of httpModules) assert.ok(accepts('wasi-http', module), module);
   assert.deepEqual(Object.keys(allowedImportModules), ['wasi', 'fastly', 'wasi-http']);
   assert.throws(() => checkWasiModule(programModule([['env', 'a'], ['env', 'b'], ['wasi_snapshot_preview1', 'c']]), 'wasi'),
     { message: 'The WASI link left imports no WASI host provides: env.a, env.b (internal error)' });

@@ -755,9 +755,20 @@ def run (record : Record) (rootValue : Value) : IO Unit := do
   canvasChecks record root
   availability record root
 
-/-- The checks that wait (animation frames, a WebSocket). -/
+/-- The checks that wait (animation frames, a WebSocket, a scroll). -/
 def runAsync (record : Record) : Async Unit := do
   frames record
   socket record
+  -- scrollIntoView settles (generated as Promise<undefined>: CSSOM View now returns Promise<ScrollResult>,
+  -- shipping browsers undefined), after which the attached element's box has the height given to it
+  checkAsync record "css.scroll-into-view" do
+    let e : HTMLElement := { val := (← make "div").val }
+    (← e.style).setProperty "height" "20px"
+    let some body ← (← document).body | return (false, "no body")
+    discard <| body.appendChild e
+    e.scrollIntoView
+    let h ← (← e.getBoundingClientRect).height
+    discard <| body.removeChild e
+    return (h == 20, s!"{h}")
 
 end Bindings

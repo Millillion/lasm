@@ -16,11 +16,11 @@ import { linkedLibraryModules, libraryModules } from '../src/lasm-library.mjs';
 
 test('builtin modules: lasm:<name> is src/lasm-modules/<name>.mjs', () => {
   const names = builtinModuleNames();
-  for (const name of ['app', 'web']) assert.ok(names.includes(name), name);
-  assert.match(builtinModuleFile('lasm:web'), /lasm-modules[\\/]web\.mjs$/);
-  assert.throws(() => builtinModuleFile('lasm:nope'), /Unknown Lasm builtin JavaScript module "lasm:nope". Builtin modules: .*lasm:web/);
+  for (const name of ['app', 'ui-dom']) assert.ok(names.includes(name), name);
+  assert.match(builtinModuleFile('lasm:ui-dom'), /lasm-modules[\\/]ui-dom\.mjs$/);
+  assert.throws(() => builtinModuleFile('lasm:nope'), /Unknown Lasm builtin JavaScript module "lasm:nope". Builtin modules: .*lasm:ui-dom/);
   assert.throws(() => builtinModuleFile('lasm:../x'), /Unknown Lasm builtin/);
-  assert.deepEqual(builtinModuleClosure(['hono', 'lasm:web', 'lasm:app']), ['lasm:web', 'lasm:app']);
+  assert.deepEqual(builtinModuleClosure(['hono', 'lasm:ui-dom', 'lasm:app']), ['lasm:ui-dom', 'lasm:app']);
 });
 
 test('builtin modules: relative imports between builtins are followed', () => {
@@ -39,11 +39,11 @@ test('builtin modules: every builtin module uses web-standard JavaScript only', 
 });
 
 test('edge entries import builtin modules from the output', () => {
-  assert.match(workersEntry(['hono', 'lasm:web']), /import \* as m1 from "\.\/lasm\/modules\/web\.mjs";/);
-  assert.match(workersEntry(['lasm:web']), /const modules = \{ "lasm:web": m0 \};/);
-  assert.match(vercelEdgeEntry(['lasm:web']), /from "\.\/_lasm\/lasm\/modules\/web\.mjs"/);
-  assert.match(netlifyEdgeEntry(['lasm:web']), /from "\.\.\/lasm\/lasm\/modules\/web\.mjs"/);
-  assert.match(portableEntry('deno', ['lasm:web']), /from "\.\/lasm\/modules\/web\.mjs"/);
+  assert.match(workersEntry(['hono', 'lasm:ui-dom']), /import \* as m1 from "\.\/lasm\/modules\/ui-dom\.mjs";/);
+  assert.match(workersEntry(['lasm:ui-dom']), /const modules = \{ "lasm:ui-dom": m0 \};/);
+  assert.match(vercelEdgeEntry(['lasm:ui-dom']), /from "\.\/_lasm\/lasm\/modules\/ui-dom\.mjs"/);
+  assert.match(netlifyEdgeEntry(['lasm:ui-dom']), /from "\.\.\/lasm\/lasm\/modules\/ui-dom\.mjs"/);
+  assert.match(portableEntry('deno', ['lasm:ui-dom']), /from "\.\/lasm\/modules\/ui-dom\.mjs"/);
 });
 
 test('library modules: only those a program initializes, and their imports', () => {
@@ -90,7 +90,7 @@ test('bundler: Emscripten glue has exactly one export', () => {
 
 test('loader bundle: one module with the app name, the hashed Wasm URL and the builtins', async () => {
   const glue = 'async function Module(moduleArg={}){return moduleArg}export default Module;';
-  const bundle = browserBundle({ programGlue: glue, name: 'demo', wasmFile: 'app.0123456789ab.wasm', modules: ['lasm:app', 'lasm:web'], suspend: 'none', autoMount: false });
+  const bundle = browserBundle({ programGlue: glue, name: 'demo', wasmFile: 'app.0123456789ab.wasm', modules: ['lasm:app', 'lasm:ui-dom'], suspend: 'none', autoMount: false });
   assert.match(bundle, /new URL\("\.\/app\.0123456789ab\.wasm", import\.meta\.url\)/);
   assert.doesNotMatch(bundle, /^import /m, 'no imports left');
   const directory = mkdtempSync(join(tmpdir(), 'lasm-loader-'));
@@ -100,8 +100,8 @@ test('loader bundle: one module with the app name, the hashed Wasm URL and the b
   for (const name of ['mount', 'mountAll', 'preload', 'appOf']) assert.equal(typeof loader[name], 'function', name);
   assert.equal(loader.default.mount, loader.mount);
   await assert.rejects(loader.mount(null), /mount needs an element/);
-  assert.match(browserConfigModule({ name: 'x', wasmFile: 'a.wasm', modules: ['lasm:web', 'https://esm.sh/x'], suspend: 'jspi' }),
-    /import \* as m0 from "\.\/modules\/web\.mjs";\nimport \* as m1 from "https:\/\/esm\.sh\/x";/);
+  assert.match(browserConfigModule({ name: 'x', wasmFile: 'a.wasm', modules: ['lasm:ui-dom', 'https://esm.sh/x'], suspend: 'jspi' }),
+    /import \* as m0 from "\.\/modules\/ui-dom\.mjs";\nimport \* as m1 from "https:\/\/esm\.sh\/x";/);
 });
 
 test('index.html: generated with preload hints, or the project page with the loader injected', () => {
@@ -171,43 +171,11 @@ test('lasm:app: ports, messages and unmount handlers per instance', async () => 
   await assert.rejects(context.app.deliver('after'), /unmounted/);
 });
 
-test('lasm:web: listeners and timers of an app are removed when it unmounts', async () => {
-  const web = await import('../src/lasm-modules/web.mjs');
-  const disposers = [];
-  const instance = web.lasmInstance({ onDispose: fn => disposers.push(fn) });
-  const target = new EventTarget();
-  let clicks = 0, fired = false;
-  instance.listen(target, 'click', () => { clicks++; });
-  const once = instance.listen(target, 'click', () => { clicks += 10; }, { once: true });
-  target.dispatchEvent(new Event('click'));
-  target.dispatchEvent(new Event('click'));
-  assert.equal(clicks, 12);
-  once.remove();
-  instance.setTimeout(() => { fired = true; }, 5);
-  for (const fn of disposers) fn();
-  target.dispatchEvent(new Event('click'));
-  assert.equal(clicks, 12, 'listener removed');
-  await new Promise(resolve => setTimeout(resolve, 20));
-  assert.equal(fired, false, 'timer cleared');
-  assert.equal(web.parseUrl('/x?a=1', 'https://example.com/base').href, 'https://example.com/x?a=1');
-  assert.equal(web.parseUrl('not a url'), null);
-  assert.throws(() => web.document(), /Lasm.Web: document needs a browser \(document is not defined here\)/);
-});
-
-test('lasm:web: an app instance has every export of the module', async () => {
-  const web = await import('../src/lasm-modules/web.mjs');
-  const instance = web.lasmInstance({ onDispose() {} });
-  assert.deepEqual(Object.keys(web).filter(name => name !== 'lasmInstance' && !(name in instance)), []);
-  const id = instance.setTimeout(() => {}, 1000);
-  assert.equal(typeof id, 'number', 'numeric timer ids on every host');
-  instance.clearTimeout(id);
-});
-
 // library/ is not copied into the mutation-testing sandbox (scripts/mutation/run.mjs).
-test('every lasm:web and lasm:app binding of Lasm.Web names an export', { skip: !existsSync(new URL('../library/Lasm/Web/', import.meta.url)) && 'library/ is not here (mutation sandbox)' }, async () => {
+test('every lasm:app and lasm:ui-dom binding of Lasm.UI names an export', { skip: !existsSync(new URL('../library/Lasm/UI/', import.meta.url)) && 'library/ is not here (mutation sandbox)' }, async () => {
   const { readdirSync } = await import('node:fs');
-  const exports = { 'lasm:web': await import('../src/lasm-modules/web.mjs'), 'lasm:app': await import('../src/lasm-modules/app.mjs') };
-  const directory = new URL('../library/Lasm/Web/', import.meta.url);
+  const exports = { 'lasm:app': await import('../src/lasm-modules/app.mjs'), 'lasm:ui-dom': await import('../src/lasm-modules/ui-dom.mjs') };
+  const directory = new URL('../library/Lasm/UI/', import.meta.url);
   let count = 0;
   for (const file of readdirSync(directory).filter(f => f.endsWith('.lean'))) {
     for (const [, module, name] of readFileSync(new URL(file, directory), 'utf8').matchAll(/@\[js "(lasm:[a-z-]+)" "([^"]+)"\]/g)) {
@@ -215,7 +183,7 @@ test('every lasm:web and lasm:app binding of Lasm.Web names an export', { skip: 
       assert.equal(typeof exports[module][name], 'function', `${file}: ${module} ${name}`);
     }
   }
-  assert.ok(count > 80, `${count} bindings`);
+  assert.ok(count > 20, `${count} bindings`);
 });
 
 test('compact initializers: kept units run once, in the original chain order', async () => {

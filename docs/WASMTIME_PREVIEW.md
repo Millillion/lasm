@@ -1,5 +1,11 @@
 # Standalone Wasmtime application preview
 
+> **Historical.** The standalone Wasmtime preview was removed on 2026-11-10: the
+> `lasm` CLI never reached it and its bundle list was empty. Its code (`src/wasmtime-*.mjs`,
+> `src/application-metadata*.mjs`, the `scripts/full-lean` packaging and probes) is in the
+> git history at [`590a923f`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1). WASI output is built by `--target wasi`
+> ([WASI.md](WASI.md)). Kept below as the record of the investigation.
+
 This investigation is paused under the [current Node milestone](PLAN.md).
 The [last bounded operation completed successfully](evidence/wasmtime-module-data-repair-2026-09-26.json):
 Node passes the unchanged isolated module import and seven runtime evaluations

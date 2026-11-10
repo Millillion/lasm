@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
-import { root } from '../src/toolchain.mjs';
+import { fileURLToPath } from 'node:url';
+const root = fileURLToPath(new URL('..', import.meta.url));
 
 test('Linux native spawn and each engine child reaper coexist',
   { skip: process.platform !== 'linux', timeout: 130_000 }, async t => {

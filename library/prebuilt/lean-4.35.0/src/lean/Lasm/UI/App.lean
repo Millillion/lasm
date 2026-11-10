@@ -11,7 +11,7 @@ here through the same module.
 import Std.Data.HashMap
 import Lasm.JS.Core
 import Lasm.JS.Meta
-import Lasm.Web.App
+import Lasm.UI.Mount
 import Lasm.UI.Diff
 import Lasm.UI.Encode
 import Lasm.UI.Cmd
@@ -267,7 +267,7 @@ partial def perform (c : Ctx Flags Model Msg) (e : Effect Msg) : IO Unit := do
   | .storageRemove st k => Dom.storageRemove (storageName st) k
   | .storageGet st k h => deliver c (h (← Dom.storageGet (storageName st) k))
   | .focus i blur => Dom.focus i blur
-  | .port name v => (← Lasm.Web.App.port name).send v
+  | .port name v => (← Lasm.UI.Mount.port name).send v
   | .title t => Dom.title t
   | .io run => run fun m => do deliver c m; requestFrame c
 
@@ -275,7 +275,7 @@ partial def perform (c : Ctx Flags Model Msg) (e : Effect Msg) : IO Unit := do
 to the current `Subs.port` handlers. -/
 partial def listenPort (c : Ctx Flags Model Msg) (name : String) : IO Unit := do
   c.ref.modify fun s => { s with ports := name :: s.ports }
-  (← Lasm.Web.App.port name).subscribe fun v => do
+  (← Lasm.UI.Mount.port name).subscribe fun v => do
     let s ← c.ref.get
     if let some sid := s.subs[SubSpec.port name]? then
       for h in s.handlers.getD sid [] do
@@ -360,7 +360,7 @@ def App.run [FromJS Flags] [hot : HotModel Model] (app : App Flags Model Msg) : 
   -- A hot reload restores the previous version's model (and skips init's command).
   let restored : Option Model ← match hot.load? with
     | some load => do
-      match ← Lasm.Web.App.Raw.hotState with
+      match ← Lasm.UI.Mount.Raw.hotState with
       | .undefined => pure none
       | d => pure (load d)
     | none => pure none
@@ -369,7 +369,7 @@ def App.run [FromJS Flags] [hot : HotModel Model] (app : App Flags Model Msg) : 
     | none => app.init flags url
   let c : Ctx Flags Model Msg := { app, ref := ← IO.mkRef ({ model := model } : State Model Msg) }
   if let some save := hot.save? then
-    Lasm.Web.App.onHotSave do return save (← c.ref.get).model
+    Lasm.UI.Mount.onHotSave do return save (← c.ref.get).model
   let frameFn ← Function.ofSyncFn fun _ => do return .bytes (← frame c)
   let eventFn ← Function.ofSyncFn (onEvent c)
   let subFn ← Function.ofSyncFn (onSub c)
@@ -378,7 +378,7 @@ def App.run [FromJS Flags] [hot : HotModel Model] (app : App Flags Model Msg) : 
       if let some u := Url.parse href then deliver c (f u)
     return .bool (← takeFrame c)
   if let some f := app.receive then
-    Lasm.Web.App.onMessage fun d => do
+    Lasm.UI.Mount.onMessage fun d => do
       if let some m := f d then deliver c m
       requestFrame c
   Dom.connect (obj [("frame", toJS frameFn), ("event", toJS eventFn), ("sub", toJS subFn),

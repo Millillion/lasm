@@ -1,10 +1,10 @@
-// lasm:app — the app instance a Lean program runs as (Lasm.Web.App). The
+// lasm:app — the app instance a Lean program runs as (Lasm.UI.Mount). The
 // browser loader (lasm build --target browser) gives every mounted app its own
 // instance (lasmInstance): the element it is mounted on, the flags passed to
 // mount, its ports and its message handler. Builds for other targets get one
 // instance with no element. Web-standard JavaScript only.
 
-const unavailable = what => () => { throw new Error(`Lasm.Web.App: ${what} is only available in an app mounted by the browser loader (lasm build --target browser)`); };
+const unavailable = what => () => { throw new Error(`Lasm.UI.Mount: ${what} is only available in an app mounted by the browser loader (lasm build --target browser)`); };
 // The stand-in that Lasm's binding check (and a direct import) sees: the same exports.
 export const root = unavailable('the root element');
 export const flags = () => undefined;
@@ -63,7 +63,7 @@ export function lasmInstance(context) {
   });
   const app = {
     // What mount() hands to JavaScript.
-    /** The state Lean saves for a hot reload (Lasm.Web.App.onHotSave), if any. */
+    /** The state Lean saves for a hot reload (Lasm.UI.Mount.onHotSave), if any. */
     hotSave() { return hotSave ? hotSave() : undefined; },
     deliver(message) {
       if (disposed) return Promise.reject(new Error('The Lasm app is unmounted'));
@@ -80,7 +80,7 @@ export function lasmInstance(context) {
   context.app = app;
   return {
     root: () => {
-      if (!context.root) throw new Error('Lasm.Web.App.root: this app has no root element (it was not started by mount in a browser)');
+      if (!context.root) throw new Error('Lasm.UI.Mount.root: this app has no root element (it was not started by mount in a browser)');
       return context.root;
     },
     flags: () => context.flags,

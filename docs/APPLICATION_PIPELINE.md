@@ -737,7 +737,8 @@ commit that is recorded in the original archive's PAX header. Neither checksum
 nor size verification is relaxed. All guards released without resource events;
 this is a preparation failure, and the runtime build remains unvalidated in CI.
 
-The [module-data file matrix](../.github/workflows/application-module-data-files.yml)
+The [module-data file matrix](https://github.com/Millillion/lasm/blob/590a923f25403040df064ad417719db130d02fa1/.github/workflows/application-module-data-files.yml)
+(removed 2026-11-10 with `src/application-metadata*.mjs`, which the CLI never used)
 prepares the nine small copying, search-order, linked-path and loader controls
 on all six native platforms, including Windows ARM64. The
 [local preparation run](evidence/application-module-data-matrix-preflight-2026-09-24.json)
