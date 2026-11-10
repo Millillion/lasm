@@ -154,7 +154,12 @@ class World {
       const item = this.sched.next();
       if (!item) return { k: 'end' };
       if (++this.events > 3_000_000) { this.checks.fail('more than 3,000,000 events: the run does not settle'); return { k: 'end' }; }
-      const out = this.handle(item.event);
+      let out;
+      try { out = this.handle(item.event); } catch (error) {
+        // A bug of the harness itself fails this seed (named, replayable), not the whole campaign.
+        this.checks.fail(`the harness threw: ${error?.stack ?? error}`);
+        return { k: 'end' };
+      }
       if (out) return out;
     }
   }
@@ -372,7 +377,10 @@ class World {
         this.families.set(`code:${code}`, { revoked: false, unsure: true });
       } else if (res.status === 400 && !res.duplicated && res.now < k.issued + TTL.code)
         this.checks.fail(`agent${ag.a}: a fresh code, redeemed once, ${res.now - k.issued} s after it was issued, was refused: ${res.body.slice(0, 100)}`);
-      if (ag.final && attempt === 0) this.checks.fail(`agent${ag.a}: after the heal, redeeming a fresh code failed: ${res.status} ${res.body.slice(0, 120)}`);
+      // (Unless it had expired on the answering instance's clock: racing instances stay skewed
+      // after the heal, so a code issued by one can be past its 60 s at another; the agent
+      // then signs in again.)
+      if (ag.final && attempt === 0 && !(k && res.now >= k.issued + TTL.code)) this.checks.fail(`agent${ag.a}: after the heal, redeeming a fresh code failed: ${res.status} ${res.body.slice(0, 120)}`);
       ag.busy = false;
       this.later(this.work.range(500, 3000), () => this.flow(ag));
     });
@@ -398,8 +406,13 @@ class World {
 
   useAccess(ag, final = false) {
     const t = ag.tokens;
+    if (!t) return;   // dropped meanwhile (a refused refresh), after this call was scheduled
     this.trace.log(`agent${ag.a}: userinfo with an access token of family ${t.family.slice(5, 13)}, issued at ${t.issued}`);
     const busyAtSend = this.busy(t.family);
+    // Revoked before this request was sent (the revoking answer had arrived): the server
+    // revoked before it served this one. A revocation learned only while this request
+    // was in flight may have landed after it was served.
+    const revokedAtSend = this.familyRevoked(t.family);
     this.get(ag, '/userinfo', { headers: [['authorization', `Bearer ${t.access}`]] }, res => {
       if (!res.ok || res.status === 503) { if (final) this.later(1000, () => this.useAccess(ag, true)); return; }
       const racing = busyAtSend || this.busy(t.family);
@@ -408,7 +421,7 @@ class World {
       const unsure = this.families.get(t.family)?.unsure ?? false;
       if (res.status === 200) {
         this.checks.that(live, () => `agent${ag.a}: an access token worked at ${res.now}, ${res.now - t.issued} s after it was issued (lifetime ${TTL.access} s)`);
-        this.checks.that(!revoked, () => `agent${ag.a}: an access token of a revoked family still works (Spec.reuse_revokes_family)`);
+        this.checks.that(!revokedAtSend, () => `agent${ag.a}: an access token of a revoked family still works (Spec.reuse_revokes_family)`);
         const u = JSON.parse(res.body);
         this.checks.that(u.sub === ag.user.sub, `agent${ag.a}: userinfo says sub ${u.sub}, not ${ag.user.sub}`);
       } else if (res.status === 401) {
@@ -423,6 +436,10 @@ class World {
     const { form, headers } = this.clientAuth(ag.client, { grant_type: 'refresh_token', refresh_token: old });
     ag.busy = true;
     const busyAtSend = this.busy(t.family);
+    // A refresh token that a lost answer may already have rotated: sending it again may be
+    // a reuse, which revokes the family.
+    const maybeReuse = !!this.refreshes.get(old)?.unsure;
+    const revokedAtSend = this.familyRevoked(t.family);   // as in `useAccess`
     const done = this.revoking(t.family);
     this.post(ag, '/token', { form, headers }, res => {
       ag.busy = false;
@@ -432,15 +449,17 @@ class World {
       const racing = busyAtSend || this.busy(t.family);
       const info = this.refreshes.get(old);
       if (!res.ok || res.status === 503) {
-        // The rotation may have happened: our refresh token is now possibly rotated.
+        // The rotation may have happened: our refresh token is now possibly rotated. And if
+        // it already was, this lost request may have been a reuse that revoked the family.
         if (info) info.unsure = true;
+        if (maybeReuse) this.families.get(t.family).unsure = true;
         return this.later(this.work.range(200, 20_000), () => this.act(ag));
       }
       if (res.duplicated) this.families.get(t.family).unsure = true;
       if (res.status === 200) {
         info.rotated++;
         this.checks.that(info.rotated === 1, () => `agent${ag.a}: a refresh token was rotated ${info.rotated} times (Spec.refresh_rotates)`);
-        this.checks.that(!this.familyRevoked(t.family), () => `agent${ag.a}: a refresh token of a revoked family still works (Spec.reuse_revokes_family)`);
+        this.checks.that(!revokedAtSend, () => `agent${ag.a}: a refresh token of a revoked family still works (Spec.reuse_revokes_family)`);
         const n = JSON.parse(res.body);
         if (n.id_token) this.checkIdToken(ag, n.id_token, res.now, null);
         ag.oldRefresh = { token: old, family: t.family };
@@ -505,8 +524,18 @@ class World {
     this.get(ag, '/logout', {}, res => {
       if (res.ok && res.status === 200) {
         const action = /<form method="post" action="([^"]+)"/.exec(res.body)?.[1]?.replaceAll('&amp;', '&');
-        if (action) this.post(ag, action, { form: Object.fromEntries([...res.body.matchAll(/name="([^"]+)" value="([^"]*)"/g)].map(m => [m[1], m[2]])) }, r => {
+        if (!action) return;
+        // From the moment the confirmation is sent, the session may end at any time: a sign-in
+        // racing it, a lost answer, or a duplicated copy that ended the session while the
+        // answer that arrived was the other copy's 503 (#189).
+        const s = ag.session, wasUnsure = s?.unsure ?? false;
+        if (s) s.unsure = true;
+        this.post(ag, action, { form: Object.fromEntries([...res.body.matchAll(/name="([^"]+)" value="([^"]*)"/g)].map(m => [m[1], m[2]])) }, r => {
+          // Its answer clears the session cookie, also one set by a sign-in that finished
+          // while the logout was in flight: no session is left either way.
           if (r.ok && r.status < 400) ag.session = null;
+          // Refused for sure (a 503 of the only copy): the session is as it was.
+          else if (r.ok && !r.duplicated && !r.ambiguous && ag.session === s && s) s.unsure = wasUnsure;
         });
       }
     });

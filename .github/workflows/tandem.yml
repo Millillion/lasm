@@ -168,6 +168,10 @@ jobs:
         if: ${{ !cancelled() }}
         working-directory: examples/tandem
         run: node test/dst.mjs --seeds 10 --first 1001 --faults heavy --keep-going
+      - name: The simulation, regression seeds (each once failed in the nightly; #190)
+        if: ${{ !cancelled() }}
+        working-directory: examples/tandem
+        run: node test/dst.mjs --keep-going --faults heavy --seed 1496820401
   e2e:
     name: The editor on ${{ matrix.server }}, ${{ matrix.browser }}
     runs-on: ubuntu-24.04

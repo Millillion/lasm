@@ -165,7 +165,7 @@ Jordan's direction: rock solid first, then the irreducible essence, then proposi
    - [ ] Fuzzing of the remaining boundaries (Fastly host, edge request mapping, the `lasm dev` proxy, project files); metamorphic compiler relations.
    - [ ] Target equivalence of Ledger's, Porter's and Tandem's recorded traffic.
    - [x] The proposition lint (every `Proposition:` and `Tested by:` reference exists, the cited statement is the definition's, and library/PROOFS.md's candidates list is generated): `scripts/propositions.mjs`, a unit test on every PR (2026-11-10). It also measures exit bar 7: fuzz oracles and `forAll` properties that name a proposition.
-   - [ ] 30 consecutive clean nightly campaigns (Sundays excluded).
+   - [ ] 30 consecutive clean nightly campaigns (Sundays excluded). The DST nightly's first failures are fixed (2026-11-10): Tandem's unpushed operations after an ambiguous commit (#190, a server bug) and Porter's (#189, all in the simulated world's oracle); their seeds are regression seeds in `tandem.yml` and `porter.yml`.
 3. Reduce ([docs/proposals/IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md), a proposal for Jordan; the removals change no API)
    - [x] M1, first part (2026-11-09): the unused dependencies `binaryen`, `@yarnpkg/cli-dist`, `pnpm` and `miniflare`; the Lean 4.32 `lean/` and unused `runtime/*.cpp`.
    - [ ] M1, rest: `vitest`'s one use, the wasmtime-preview cluster, `src/toolchain.mjs`, unreferenced integration programs, experiments and scripts, duplicate licence texts.

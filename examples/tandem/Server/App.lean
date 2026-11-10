@@ -85,19 +85,26 @@ def handleSync (env : Env) (doc : String) (body : String) : Async String := do
   | .error e => return Wire.encodeReply (.error e)
   | .ok req =>
     let (reply, n, added) ← exclusive env.writers (syncOnce env doc req 40)
-    if !added.isEmpty then
+    -- Some operations of the request were in the log already. Usually an
+    -- earlier request of this client appended and pushed them, but one whose
+    -- commit succeeded and then reported an error appended them without a
+    -- push (found by the deterministic simulation, test/dst.mjs; also when
+    -- the retry carries newly typed operations too, #190). So push the reply,
+    -- the log from the client's cursor, which holds them (within one chunk):
+    -- a tab that is not typing hears of them, one that has them ignores it,
+    -- one that is behind catches up.
+    let known := added.length < req.ops.length
+    let replyPushed ← if known then
+        match reply with
+        | .ops _ _ (_ :: _) => do env.push doc (Wire.encodeReply reply); pure true
+        | _ => pure false
+      else pure false
+    -- What this request appended, unless the reply just pushed holds it all.
+    let covered := match reply with
+      | .ops start stop _ => replyPushed && start ≤ n && n + added.length ≤ stop
+      | .error _ => false
+    if !added.isEmpty && !covered then
       env.push doc (Wire.encodeReply (.ops n (n + added.length) added))
-    else if !req.ops.isEmpty then
-      -- Every operation of the request was in the log already. Usually an
-      -- earlier request of this client appended and pushed them, but one whose
-      -- commit succeeded and then reported an error appended them without a
-      -- push (found by the deterministic simulation, test/dst.mjs). So push
-      -- the reply, the log from the client's cursor, which holds them (within
-      -- one chunk): a tab that is not typing hears of them, one that has them
-      -- ignores it, one that is behind catches up.
-      match reply with
-      | .ops _ _ (_ :: _) => env.push doc (Wire.encodeReply reply)
-      | _ => pure ()
     return Wire.encodeReply reply
 
 /-- Long-poll: the log from `cursor` as soon as it is longer, or nothing new. -/
