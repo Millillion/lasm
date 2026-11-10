@@ -415,6 +415,8 @@ test('Lambda refuses an event it does not know', async () => {
 // --- Properties of the forwarding ---------------------------------------
 
 // ∀ path query, requestTarget path query has only printable ASCII, no `#`, and decodes (as UTF-8) to the inputs
+// Proposition: Lasm.Serverless.Spec.target_valid
+//   ∀ p q : String, ∀ c ∈ (requestTarget p q).toList, printable c = true ∧ c ≠ '#'
 test('property: requestTarget percent-encodes exactly what a target cannot carry', async () => {
   const { requestTarget } = await import(shim('lasm-server.mjs'));
   const alphabet = ['a', 'Z', '0', '/', '?', '#', ' ', '%', '~', 'é', '\u{1F600}', '\x7f', '\x00', '=', '&', ':', '+'];
@@ -428,11 +430,15 @@ test('property: requestTarget percent-encodes exactly what a target cannot carry
   });
 });
 
-// ∀ target, isValidTarget target → requestTarget target "" = target
+// Proposition: Lasm.Serverless.Spec.target_unchanged
+//   ∀ p q : String, (∀ c ∈ p.toList, pathUnsafe c = false) → (∀ c ∈ q.toList, queryUnsafe c = false) →
+//     requestTarget p q = (if p.isEmpty then "/" else p) ++ (if q.isEmpty then "" else "?" ++ q)
 test('property: requestTarget leaves a valid target unchanged', async () => {
   const { requestTarget } = await import(shim('lasm-server.mjs'));
   const printable = Array.from({ length: 0x7e - 0x21 + 1 }, (_, i) => String.fromCharCode(0x21 + i)).filter(c => c !== '?' && c !== '#');
-  forAll(r => '/' + r.string(printable, 0, 20), target => assert.equal(requestTarget(target), target));
+  const query = Array.from({ length: 0x7e - 0x21 + 1 }, (_, i) => String.fromCharCode(0x21 + i)).filter(c => c !== '#');
+  forAll(r => ({ p: r.pick(['', '/']) + r.string(printable, 0, 20), q: r.string(query, 0, 12) }),
+    ({ p, q }) => assert.equal(requestTarget(p, q), (p === '' ? '/' : p) + (q === '' ? '' : '?' + q)));
 });
 
 // ∀ headers, (joinCookies headers).filter isCookie has length ≤ 1 ∧ non-cookie fields keep their order
