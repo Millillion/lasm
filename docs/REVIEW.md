@@ -13,8 +13,8 @@ decisions themselves are logged with their reasoning in
 
 ## 1. Decisions Claude made that Jordan may want to revisit
 
-### MAJOR: where the Lasm.* libraries live (Jordan's, to decide later)
-- [ ] **Major decision.** Today every `Lasm.*` library ships inside `@lasm/cli`
+### MAJOR: where the Lasm.* libraries live (deferred by Jordan, 2026-11-10)
+- [ ] **Major decision, deferred (not open).** Today every `Lasm.*` library ships inside `@lasm/cli`
   under the `Lasm` namespace, so there is nothing to install.
   - **The option:** bundle only the code tied to the compiler, and move or
     delete the rest.
@@ -30,10 +30,10 @@ decisions themselves are logged with their reasoning in
     - Lake builds against Lasm's managed Lean.
     - First-build time, because `library/prebuilt` caching no longer covers the moved packages.
     - New repositories need your OK.
-  - **Status:** decided by you on 2026-11-09. They stay under `Lasm` for now,
-    and the decision is yours to make later. Removal 16 of
+  - **Status: deferred** (Jordan, 2026-11-10). Keep everything inside `@lasm/cli` for now (the current setup). Jordan favours option D: platform-coupled code (`Lasm.JS` core, the generated standard bindings, the `Lasm.Fetch` server, platform glue) in the CLI; opinionated frameworks (`Lasm.UI`, `Lasm.RPC`, probably `Lasm.KV`) as separate lockstep-versioned `@lasm/*` npm packages from the same repository. He defers the decision until the `Lasm.*` rewrite is complete and the final APIs are decided and finished.
+    Removal 16 of
     [proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md#3-ranked-removal-list)
-    waits on it.
+    waits on it ([DECISIONS.md](DECISIONS.md), 2026-11-10).
 
 ### MAJOR: generated standard-library bindings (decided by Jordan, 2026-11-09)
 - [x] **Major decision, decided (A).** The bindings are generated from
@@ -62,8 +62,10 @@ decisions themselves are logged with their reasoning in
   version. Newer APIs are labelled with the version that added them.
 - npm libraries (for example bcrypt) stay ad hoc bindings.
 - The bindings are tested with web-platform-tests and official test vectors.
-- Today's hand-written `Lasm.Web` will be replaced by the generated
-  `Lasm.JS.Web`. That is a breaking rename, which is fine before 1.0.
+- The generated `Lasm.JS.Web` overlaps the hand-written `Lasm.Web` only in
+  part. Rule: a piece is retired only when a generated binding fully replaces it.
+  `Lasm.Web`'s browser features (document and DOM, Canvas, History, App) have
+  no replacement until browser DOM bindings exist.
 - The first piece of work is tier 1: the common web APIs (fetch,
   Request/Response, URL, `crypto.subtle`/`getRandomValues`,
   TextEncoder/TextDecoder, streams, AbortController, timers,
@@ -73,14 +75,17 @@ decisions themselves are logged with their reasoning in
   from Cloudflare's published workers-types: Workers KV, D1, R2, Durable
   Objects, env bindings and the rest. When it is done, it replaces the hand
   bindings in the example apps (Porter, Ledger).
-- **What becomes obsolete once `Lasm.JS.*` is complete**
+- **What `Lasm.JS.*` may replace, piece by piece**
   ([proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md#3-ranked-removal-list),
-  removal 17):
-  - All of `Lasm.Web`. `Lasm.Web.App`'s mount glue moves into `Lasm.UI`.
-  - From `Lasm.Fetch`: the outbound fetch and get, the URL and query helpers,
-    and the Node and edge plumbing on JavaScript hosts. `serve`'s portable
-    handler and Assets/`embed_dir!` stay, because WASI, Fastly and wasi-http
-    need them.
+  removal 17). Rule: a piece is retired only when a generated binding fully replaces it.
+  - `Lasm.Fetch` **stays**: it is the portable HTTP server (Node, the edge,
+    Bun and Deno, Fastly host calls, WASI CGI) and the pure-Lean `Request` and
+    `Response` with their proofs. Only its outgoing client (`fetch`, `get`,
+    `post`) overlaps `Lasm.JS.Web`; on JavaScript targets it may later become a
+    thin layer over `Lasm.JS.Web`, with no API change.
+  - `Lasm.Web`: only the parts a generated binding covers in full. Its browser
+    features (document and DOM, Canvas, History, App) stay until browser DOM
+    bindings exist.
   - From `Lasm.KV`: the Deno and Workers backends. The `Store` abstraction
     and the memory and Fastly backends remain, pending your KV review.
   - `Lasm.UI` and `Lasm.RPC` switch their browser side to `Lasm.JS.Web`,
