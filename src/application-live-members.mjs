@@ -137,4 +137,3 @@ export function wasmImports(file) {
   } catch { return undefined; }
 }
 
-export const isMemberFile = file => file.endsWith('.lasm-member.o');

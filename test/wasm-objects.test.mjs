@@ -8,7 +8,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { archiveMembers, parseWasmObject, wasmObjects } from '../src/wasm-objects.mjs';
-import { archiveIndex, isMemberFile, liveMembers, memberFiles, wasmImports } from '../src/application-live-members.mjs';
+import { archiveIndex, liveMembers, memberFiles, wasmImports } from '../src/application-live-members.mjs';
 import { archive, wasmObject } from './fixtures/link-stand-ins/toolchain.mjs';
 
 const leb = value => { const out = []; do { let byte = value & 0x7f; value >>>= 7; if (value) byte |= 0x80; out.push(byte); } while (value); return out; };
@@ -171,7 +171,7 @@ test('live members from a wasm-ld map: code and data sections by symbol, ambiguo
   writeFileSync(files[0], 'kept');
   memberFiles(live, join(directory, 'members'));
   assert.equal(readFileSync(files[0], 'utf8'), 'kept', 'an extracted member is not extracted again');
-  assert.ok(files.every(isMemberFile) && !isMemberFile(lib));
+  assert.ok(files.every(file => file.endsWith('.lasm-member.o')));
   assert.deepEqual(memberFiles({ [lib]: [] }, join(directory, 'none')), []);
   assert.ok(existsSync(join(directory, 'none')));
 });

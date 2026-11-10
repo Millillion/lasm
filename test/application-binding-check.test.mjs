@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { checkBindings, checkBindingsAsync, readBindings, readBindingsAsync, requireValidBindings } from '../src/application-binding-check.mjs';
+import { checkBindingsAsync, readBindingsAsync, requireValidBindings } from '../src/application-binding-check.mjs';
 
 const scratch = t => { const directory = mkdtempSync(join(tmpdir(), 'lasm-bindings-')); t.after(() => rmSync(directory, { recursive: true, force: true })); return directory; };
 const put = (file, text) => { mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, text); return file; };
@@ -35,17 +35,16 @@ test('bindings are read from the module files that exist, by Lean, once per unch
   const { lean, count } = standInLean(directory);
   const a = put(join(directory, 'A.olean'), 'a'), b = put(join(directory, 'B.olean'), 'b');
   const cache = join(directory, 'cache');
-  assert.deepEqual(readBindings(lean, process.env, [join(directory, 'missing.olean')]), []);
+  assert.deepEqual(await readBindingsAsync(lean, process.env, [join(directory, 'missing.olean')]), []);
   assert.deepEqual(await readBindingsAsync(lean, process.env, []), []);
   assert.equal(count().length, 0);
   const expected = [{ name: 'A.olean', module: 'm', path: 'f', arity: 1 }, { name: 'B.olean', module: 'm', path: 'f', arity: 1 }];
-  assert.deepEqual(readBindings(lean, process.env, [a, join(directory, 'missing.olean'), b], { cache }), expected);
+  assert.deepEqual(await readBindingsAsync(lean, process.env, [a, join(directory, 'missing.olean'), b], { cache }), expected);
   const [first] = count();
   assert.equal(first.run, '--run');
   assert.match(first.reader, /lasm-js-bindings\.lean$/);
   assert.deepEqual(first.files, [a, b]);
-  // Unchanged files: the recorded bindings, sync and async, without Lean.
-  assert.deepEqual(readBindings(lean, process.env, [a, b], { cache }), expected);
+  // Unchanged files: the recorded bindings, without Lean.
   assert.deepEqual(await readBindingsAsync(lean, process.env, [a, b], { cache }), expected);
   assert.equal(count().length, 1);
   assert.equal(readdirSync(cache).length, 1);
@@ -56,14 +55,14 @@ test('bindings are read from the module files that exist, by Lean, once per unch
   assert.equal(readdirSync(cache).length, 1);
   assert.match(readdirSync(cache)[0], /^bindings-[0-9a-f]{64}\.json$/);
   // Another Lean reads the same files again.
-  readBindings({ ...lean, identity: 'other' }, process.env, [a, b], { cache });
+  await readBindingsAsync({ ...lean, identity: 'other' }, process.env, [a, b], { cache });
   assert.equal(count().length, 3);
   // Without a cache every read runs Lean.
-  readBindings(lean, process.env, [a]); await readBindingsAsync(lean, process.env, [a]);
+  await readBindingsAsync(lean, process.env, [a]); await readBindingsAsync(lean, process.env, [a]);
   assert.equal(count().length, 5);
   // An unwritable cache only costs the next read.
   const blocked = put(join(directory, 'blocked'), '');
-  assert.deepEqual(readBindings(lean, process.env, [a], { cache: blocked }), [expected[0]]);
+  assert.deepEqual(await readBindingsAsync(lean, process.env, [a], { cache: blocked }), [expected[0]]);
 });
 
 test('a failing reader, or a missing Lean, is reported', { skip: process.platform === 'win32' }, async t => {
@@ -71,10 +70,8 @@ test('a failing reader, or a missing Lean, is reported', { skip: process.platfor
   const { lean } = standInLean(directory);
   const a = put(join(directory, 'A.olean'), 'a');
   const env = { ...process.env, STAND_IN_FAIL: '1' };
-  assert.throws(() => readBindings(lean, env, [a]), { message: 'Cannot read Lasm.JS bindings: reader failed' });
   await assert.rejects(readBindingsAsync(lean, env, [a]), { message: 'Cannot read Lasm.JS bindings: reader failed' });
   const missing = { lean: join(directory, 'no-lean') };
-  assert.throws(() => readBindings(missing, process.env, [a]), { code: 'ENOENT' });
   await assert.rejects(readBindingsAsync(missing, process.env, [a]), { code: 'ENOENT' });
 });
 
@@ -116,13 +113,11 @@ const cases = [
 test('each binding is checked against what the module exports, as the deployment will load it', async t => {
   const directory = project(t);
   const bindings = cases.map(([binding]) => binding);
-  const sync = checkBindings(directory, bindings), concurrent = await checkBindingsAsync(directory, bindings);
-  assert.deepEqual(concurrent, sync);
-  sync.forEach((result, index) => {
+  const results = await checkBindingsAsync(directory, bindings);
+  results.forEach((result, index) => {
     const [binding, expected] = cases[index];
     assert.deepEqual(result, { ...binding, ...expected }, binding.name);
   });
-  assert.deepEqual(checkBindings(directory, []), []);
   assert.deepEqual(await checkBindingsAsync(directory, []), []);
 });
 
@@ -156,12 +151,10 @@ test('a check that cannot run is an error with its output', async t => {
   put(join(directory, 'node_modules', 'exits', 'package.json'), JSON.stringify({ name: 'exits', main: 'index.js' }));
   put(join(directory, 'node_modules', 'exits', 'index.js'), 'process.stderr.write("gone"); process.exit(3);');
   const bindings = [{ name: 'X', module: 'exits', path: 'f', arity: 1 }];
-  assert.throws(() => checkBindings(directory, bindings), { message: 'The Lasm.JS binding check failed to run: gone' });
   await assert.rejects(checkBindingsAsync(directory, bindings), { message: 'The Lasm.JS binding check failed to run: gone' });
   put(join(directory, 'node_modules', 'exits', 'index.js'), 'process.stdout.write("not json"); process.exit(0);');
   await assert.rejects(checkBindingsAsync(directory, bindings), SyntaxError);
   await assert.rejects(checkBindingsAsync(join(directory, 'no-such-directory'), bindings), { code: 'ENOENT' });
-  assert.throws(() => checkBindings(join(directory, 'no-such-directory'), bindings), /failed to run/);
 });
 
 test('read bindings are recorded after an asynchronous read too; a record that is not a list is read again', { skip: process.platform === 'win32' }, async t => {
@@ -171,18 +164,18 @@ test('read bindings are recorded after an asynchronous read too; a record that i
   put(join(directory, 'deep', 'cache', 'keep.txt'), 'not a record');
   await readBindingsAsync(lean, process.env, [a], { cache });
   assert.equal(count().length, 1);
-  readBindings(lean, process.env, [a], { cache });
+  await readBindingsAsync(lean, process.env, [a], { cache });
   assert.equal(count().length, 1, 'the asynchronous read was recorded');
   const record = readdirSync(cache).find(name => name.startsWith('bindings-'));
   writeFileSync(join(cache, record), '{"not":"a list"}');
-  readBindings(lean, process.env, [a], { cache });
+  await readBindingsAsync(lean, process.env, [a], { cache });
   assert.equal(count().length, 2);
   writeFileSync(a, 'changed');
-  readBindings(lean, process.env, [a], { cache });
+  await readBindingsAsync(lean, process.env, [a], { cache });
   assert.deepEqual(readdirSync(cache).sort(), [readdirSync(cache).find(name => name.startsWith('bindings-')), 'keep.txt'].sort());
   // A fresh nested cache directory is created.
   const nested = join(directory, 'x', 'y', 'z');
-  readBindings(lean, process.env, [a], { cache: nested });
+  await readBindingsAsync(lean, process.env, [a], { cache: nested });
   assert.equal(readdirSync(nested).length, 1);
 });
 
