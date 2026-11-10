@@ -65,10 +65,16 @@ instance : ToJS ServeOptionsError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.ServeOptionsError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeOptionsError.ofFn (f : Data → Async Response) : IO ServeOptionsError := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeOptionsError.ofSyncFn (f : Data → IO Response) : IO ServeOptionsError := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
 
 /-- `(DOMString or unsigned short)`: one constructor per member type. -/
 inductive DOMStringOrUnsignedShort where
@@ -91,10 +97,16 @@ instance : ToJS ServeOptionsFetch := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.ServeOptionsFetch", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeOptionsFetch.ofFn (f : Request → Server → Async Response) : IO ServeOptionsFetch := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg Server args 1)) }
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg Server args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeOptionsFetch.ofSyncFn (f : Request → Server → IO Response) : IO ServeOptionsFetch := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg Server args 1)) }
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg Server args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
 
 /-- `dictionary ServeOptions` (Bun 1.4.4 type declarations, serve.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ServeOptions where
