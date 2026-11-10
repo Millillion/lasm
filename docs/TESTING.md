@@ -956,6 +956,21 @@ to `main`. Each section keeps two kinds of fact apart:
   fuzz targets and DST apps (the workflows' matrices), the equivalence targets
   and the latest benchmark table ([BENCHMARKS.md](BENCHMARKS.md)).
 
+The page opens with the [exit bar](TESTING_STRATEGY.md#7-exit-bar-rock-solid),
+item by item, computed from both kinds of fact: the platform levels, the
+latest nightly mutation run (every module of `scripts/mutation/modules.json`
+passed at 80 % or more), the unit suite's line coverage (the nightly run's
+`unit` job log), the consecutive clean nights of the differential, fuzzing and
+DST campaigns (`campaignStreak`: Sundays in New York are left out; a failed,
+cancelled or missing campaign ends the run), the quarantine list, the
+proposition lint's inventory (`scripts/propositions.mjs`) and the fuzz targets
+that run against Lean. An item reads "met", "partly met" (what is measured
+holds, the rest is not measured yet), "not met", "not measured" or "not read".
+`test/testing-docs.test.mjs` keeps the documents behind it in step with the
+repository: every path and workflow TESTING_STRATEGY.md and CI.md name exists,
+every workflow is in CI.md, and the fuzz table above lists exactly the targets
+`fuzz.yml` runs.
+
 The same facts are in [`docs/evidence/test-evidence.json`](evidence/test-evidence.json).
 A workflow with no scheduled run yet shows as "no run yet". `node
 scripts/evidence/page.mjs --offline` renders the page without the API.
