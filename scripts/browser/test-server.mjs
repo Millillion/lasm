@@ -1,6 +1,6 @@
 // The browser CI's server (.github/workflows/browser.yml): the browser builds
 // under test, served as a static host serves them (src/browser/static-server.mjs),
-// plus the routes the Lasm.Web platform suite calls (test/browser/platform):
+// plus the routes the browser platform suite calls (test/browser/platform):
 // fetch endpoints under /api/ and a WebSocket echo at /ws.
 //   import { startTestServer } from './test-server.mjs'; const s = await startTestServer(dir)
 import { createHash } from 'node:crypto';

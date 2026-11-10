@@ -22,8 +22,8 @@ counter.ports.saved.subscribe(value => console.log('Lean saved', value));
 
 - `vite` (development): `Main.lean` is built in the dev profile by one
   long-lived Lasm build worker. Saving any `.lean` file in its directory rebuilds
-  it (about 2 s per edit on the Linux CI runner) and remounts the app in place. State the app saves with `Lasm.Web.App.onHotSave` comes back
-  through `Lasm.Web.App.hotState` when its type still converts.
+  it (about 2 s per edit on the Linux CI runner) and remounts the app in place. State the app saves with `Lasm.UI.Mount.onHotSave` comes back
+  through `Lasm.UI.Mount.hotState` when its type still converts.
 - `vite build`: a release build. Vite bundles the loader with your code, emits
   the `.wasm` as a hashed asset, and resolves the npm modules your Lean bindings
   name (`@[js "date-fns" "format"]`).

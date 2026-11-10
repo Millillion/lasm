@@ -25,7 +25,7 @@ export const modules = [
     interfaces: ['Node', 'Document', 'DocumentType', 'DocumentFragment', 'ShadowRoot', 'Element', 'Attr', 'NamedNodeMap',
       'CharacterData', 'Text', 'Comment', 'NodeList', 'HTMLCollection', 'DOMTokenList', 'DOMStringMap',
       'MutationObserver', 'MutationRecord',
-      'HTMLElement', 'HTMLAnchorElement', 'HTMLButtonElement', 'HTMLDialogElement', 'HTMLDivElement', 'HTMLFormElement',
+      'HTMLElement', 'HTMLAnchorElement', 'HTMLButtonElement', 'HTMLDialogElement', 'HTMLDivElement', 'HTMLFormElement', 'HTMLHeadElement',
       'HTMLImageElement', 'HTMLInputElement', 'HTMLLabelElement', 'HTMLOptionElement', 'HTMLSelectElement',
       'HTMLTemplateElement', 'HTMLTextAreaElement', 'HTMLFormControlsCollection', 'HTMLOptionsCollection', 'RadioNodeList',
       'ValidityState', 'FileList',
@@ -49,3 +49,8 @@ export const aliases = { WindowProxy: 'Window' };
 
 /** Event handler IDL attributes (`onclick`, `onmessage`) are not generated in this tier: `addEventListener` does the same. */
 export const eventHandlerTypes = ['EventHandler', 'OnErrorEventHandler', 'OnBeforeUnloadEventHandler'];
+
+/** Operations the specs now type as returning a promise of a dictionary (CSSOM View's ScrollResult) that shipping
+ * browsers implement as returning undefined: read as Promise<undefined>, which awaits either. */
+export const undefinedPromises = ['Element.scroll', 'Element.scrollTo', 'Element.scrollBy', 'Element.scrollIntoView',
+  'Window.scroll', 'Window.scrollTo', 'Window.scrollBy'];

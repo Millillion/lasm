@@ -4,7 +4,7 @@
 // browser output with its lasm-manifest.json) served by scripts/browser/test-server.mjs:
 //   - counter (lasm init --template web): mount, clicks, start time cold and warm,
 //     bytes transferred;
-//   - platform (test/browser/platform): every automatic Lasm.Web check, the
+//   - platform (test/browser/platform): every automatic check (Lasm.JS.Web.Browser, Lasm.UI.Mount), the
 //     interactive ones (clicks, typing, keys, prevented defaults, pointer, forms),
 //     the console, ports and messages, a second app on the page, unmount, and a
 //     blocking wait stopping the instance;

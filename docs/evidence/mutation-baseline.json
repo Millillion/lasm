@@ -105,12 +105,6 @@
       "mutants": 1067,
       "threshold": 95
     },
-    "wasmtime": {
-      "initial": 32.4,
-      "score": 88,
-      "mutants": 2070,
-      "threshold": 88
-    },
     "node-host": {
       "initial": 42,
       "score": 86.2,

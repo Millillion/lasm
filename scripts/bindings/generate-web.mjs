@@ -258,6 +258,8 @@ for (const m of browser.modules) for (const n of m.interfaces) {
 /** Whether a member is an event handler IDL attribute (`onclick`), not generated in the browser tier. */
 const isEventHandler = m => m.type === 'attribute' && !m.idlType.union && !m.idlType.generic && browser.eventHandlerTypes.includes(m.idlType.idlType);
 
+const promiseOfUndefined = JSON.parse(JSON.stringify(webidl2.parse('interface X { Promise<undefined> f(); };')[0].members[0].idlType));
+
 /** Members of an interface: its own (and partials'), then its mixins'. */
 function membersOf(name) {
   const d = def(name);
@@ -271,6 +273,10 @@ function membersOf(name) {
   }
   members = members.filter(ctxTier >= 2 ? exposedToWindow : exposedToWorkers);
   if (ctxTier >= 2) members = members.filter(m => !isEventHandler(m));
+  // Operations the specs now type as returning a promise that shipping browsers do not return (scrollIntoView):
+  // read as Promise<undefined>, which awaits either (docs/JS_BINDINGS.md).
+  if (ctxTier >= 2) members = members.map(m => m.type === 'operation' && browser.undefinedPromises.includes(`${name}.${m.name}`)
+    ? { ...m, specIdlType: m.idlType, idlType: promiseOfUndefined } : m);
   const only = tier.memberFilter[name];
   if (only) members = members.filter(m => only.includes(m.name));
   return members;
@@ -624,7 +630,7 @@ const memberIdl = (m, owner) => {
   const args = a => a.map(x => `${x.optional ? 'optional ' : ''}${idlText(x.idlType)}${x.variadic ? '...' : ''} ${x.name}`).join(', ');
   switch (m.type) {
   case 'constructor': return `constructor(${args(m.arguments)})`;
-  case 'operation': return `${m.special ? m.special + ' ' : ''}${idlText(m.idlType)} ${memberName(m)}(${args(m.arguments)})`;
+  case 'operation': return `${m.special ? m.special + ' ' : ''}${idlText(m.specIdlType ?? m.idlType)} ${memberName(m)}(${args(m.arguments)})`;
   case 'attribute': return `${m.special ? m.special + ' ' : ''}${m.readonly ? 'readonly ' : ''}attribute ${idlText(m.idlType)} ${m.name}`;
   default: return `${m.type} ${owner}`;
   }
@@ -745,7 +751,8 @@ function emitInterface(module, name) {
   const staticNames = new Set(members.filter(m => m.special === 'static').map(memberName));
   const instanceNames = new Set(members.filter(m => m.special !== 'static' && m.name).map(memberName));
   const fns = [];
-  const doc = (m, extra = '') => `/-- ${nodeSignature(m)}\`${docText(memberIdl(m, name))}\`${extra} -/`;
+  const doc = (m, extra = '') => `/-- ${nodeSignature(m)}\`${docText(memberIdl(m, name))}\`${extra}${m.specIdlType
+    ? `: read as \`Promise<undefined>\`, since shipping browsers return \`undefined\` (awaited at once) where the spec now returns a promise` : ''} -/`;
   // Constructors.
   // [HTMLConstructor] constructors construct only custom elements (subclasses); for the element itself they throw.
   const ctors = members.filter(m => m.type === 'constructor' && !extAttr(m, 'HTMLConstructor'));

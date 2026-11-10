@@ -65,7 +65,7 @@ and the browser CI runs every engine against it.
 - **Node, Hono, Express, Fastify (full stack):** serve `dist/` with your framework's
   static middleware, for example `serveStatic({ root: './dist', precompressed: true })` in Hono.
 
-A single-page app with client-side routing (`Lasm.Web.History.pushState`)
+A single-page app with client-side routing (`Lasm.UI`'s `onUrlChange`, or `History.pushState` from `Lasm.JS.Web.Browser`)
 needs the host's fallback to `index.html` for unknown paths (`try_files … /index.html`,
 Netlify `/* /index.html 200`, Cloudflare Pages does it by default).
 
