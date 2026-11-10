@@ -121,7 +121,7 @@ test('edge output: Workers configuration when the project has none, and the hint
     assert.match(config, /^fallthrough = false$/m);
     assert.equal(readFileSync(join(out, 'worker.mjs'), 'utf8'), workersEntry([]));
     assert.match(f.lines[0], /for Cloudflare Workers: [^;]* \(program\.wasm \d+\.\d\d MiB\)$/, 'no hint without a project configuration');
-    // A project configuration: no generated one (also none left from the build before, docs/release/next-notes.md),
+    // A project configuration: no generated one (also none left from the build before, docs/release/0.6.1-notes.md),
     // and a hint about what it must contain.
     for (const [file, text, hint] of [['wrangler.toml', 'main = "workers/worker.mjs"\n[[rules]]\ntype = "CompiledWasm"\n', 'run it with npx wrangler dev (wrangler.toml)'],
       ['wrangler.json', '{"main":"workers/worker.mjs"}', 'your wrangler.json must use main = "workers/worker.mjs" and the CompiledWasm rule'],

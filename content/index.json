@@ -170,14 +170,14 @@
       ]
     },
     {
-      "slug": "release-0-6-0",
-      "title": "Lasm 0.6.0",
+      "slug": "release-0-6-1",
+      "title": "Lasm 0.6.1",
       "description": "A minor release with one small breaking change.",
-      "date": "2026-11-07",
+      "date": "2026-11-09",
       "kind": "release",
-      "path": "docs/release/0.6.0-notes.md",
+      "path": "docs/release/0.6.1-notes.md",
       "sources": [
-        "https://github.com/Millillion/lasm/releases/tag/v0.6.0"
+        "https://github.com/Millillion/lasm/releases/tag/v0.6.1"
       ]
     },
     {
