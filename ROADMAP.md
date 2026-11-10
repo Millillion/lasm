@@ -183,11 +183,11 @@ Jordan's direction: rock solid first, then the irreducible essence, then proposi
 
 Jordan decided the bindings ship inside `@lasm/cli`, with no optional download, under `Lasm.JS`, named for what they mirror: `Lasm.JS.Web`, `Lasm.JS.Node` (for example `Lasm.JS.Node.Fs`), `Lasm.JS.Deno` and `Lasm.JS.Bun`. They are generated from WebIDL (w3c/webref), `@types/node`, `lib.deno.d.ts` and `bun-types`. They are spec-faithful, with one surface per platform, generated against the oldest supported version and with newer APIs labelled by version. The details are in [docs/REVIEW.md](docs/REVIEW.md).
 - [ ] Tier 1, the first piece of work: the WinterTC common web APIs as `Lasm.JS.Web`, tested with web-platform-tests and official vectors, on every JavaScript target.
-- [ ] Replace the hand-written `Lasm.Web` with the generated `Lasm.JS.Web` (a breaking rename, in a minor release).
+- [ ] Retire the parts of the hand-written `Lasm.Web` that `Lasm.JS.Web` fully replaces (a breaking change, in a minor release). Its browser features (document and DOM, Canvas, History, App) stay until browser DOM bindings exist. Rule: a piece is retired only when a generated binding fully replaces it.
 - [ ] Tiers 2 and 3: the full web platform, then Node core, `Deno.*`, `Bun.*` and `Lasm.JS.Cloudflare` (from Cloudflare's workers-types: KV, D1, R2, Durable Objects, env bindings), pinned per supported version. `Lasm.JS.Cloudflare` replaces the example apps' hand bindings (Porter, Ledger).
-- [ ] Then remove what `Lasm.JS.*` makes obsolete ([IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md#3-ranked-removal-list), removal 17):
-  - all of `Lasm.Web` (its mount glue moves into `Lasm.UI`);
-  - `Lasm.Fetch`'s JavaScript-host parts (`serve`'s portable handler and Assets stay);
+- [ ] Then remove only what `Lasm.JS.*` fully replaces ([IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md#3-ranked-removal-list), removal 17):
+  - the parts of `Lasm.Web` a generated binding covers in full (not document/DOM, Canvas, History or App until browser DOM bindings exist);
+  - `Lasm.Fetch` stays (the portable HTTP server and the pure-Lean `Request`/`Response` with proofs); only its outgoing client may become a thin layer over `Lasm.JS.Web` on JavaScript targets, with no API change;
   - `Lasm.KV`'s Deno and Workers backends (pending Jordan's KV review).
 
 ## Next (December 2026 to January 2027)
