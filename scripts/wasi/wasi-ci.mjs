@@ -367,7 +367,7 @@ if (engines.has('wasmtime')) {
       if (performance.now() - started > 120_000) throw new Error(`wasmtime serve did not start:\n${log}`);
       try { await fetch('http://127.0.0.1:3112/', { signal: AbortSignal.timeout(2000) }); ready = true; } catch { await new Promise(r => setTimeout(r, 200)); }
     }
-    const response = await fetch(`http://127.0.0.1:3112/conformance?origin=${encodeURIComponent(origin.replace('http://', ''))}`, { headers: { 'x-lasm-conformance': 'yes' } });
+    const response = await fetch(`http://127.0.0.1:3112/conformance?origin=${origin.replace('http://', '')}`, { headers: { 'x-lasm-conformance': 'yes' } });
     const text = await response.text();
     let r;
     try { r = JSON.parse(text); } catch { throw new Error(`conformance answered ${response.status}: ${text.slice(0, 2000)}\n${log}`); }
