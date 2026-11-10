@@ -42,6 +42,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
 | [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
+| [Named propositions](#named-propositions) | Every test that names a Lean proposition names one that exists and states it verbatim; every candidate (tested, not yet proved) names a test that cites it | `scripts/propositions.mjs`, `library/Lasm/*/Candidates.lean`, `test/propositions.test.mjs` | PR (`unit.yml`) |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (`unit.yml`), nightly, release |
 | [Flaky tests](#flaky-tests) | A flaky test is quarantined at once, then fixed or deleted within a week | `test/quarantine.json`, `scripts/test/`, `scripts/ci/flaky-report.mjs` (`flaky.yml`) | nightly report; quarantine on every unit run |
 | [Coverage and mutation](#coverage-and-mutation-testing) | How much of the JavaScript the tests execute, and whether they would notice a change | `scripts/coverage/`, `scripts/mutation/` (`mutation.yml`) | PR, nightly and release (coverage); nightly and PR, changed modules only (mutation) |
@@ -837,6 +838,34 @@ a summary with c8, counting files that never loaded as 0 %.
 The [baseline](#coverage-baseline) is published below. Coverage says which lines
 ran, not that their results were checked; [mutation testing](#mutation-testing)
 says whether the tests would notice a change.
+
+### Named propositions
+
+A property test is a proposition not yet proved
+([TESTING_STRATEGY.md §4](TESTING_STRATEGY.md#4-property-testing-convention-propositions-that-carry-over-to-proofs)).
+Proved propositions are the `def … : Prop` of each `Spec.lean`; tested ones are
+the same kind of definition in the library's `Candidates.lean`, whose doc
+comment ends with `Tested by: <path>`. A test that checks a proposition cites it
+in a comment, with the statement on the comment lines after it, indented:
+
+```js
+// Proposition: Lasm.Serverless.Spec.target_valid
+//   ∀ p q : String, ∀ c ∈ (requestTarget p q).toList, printable c = true ∧ c ≠ '#'
+```
+
+and evaluates that statement on every input it draws (in Lean tests, the
+body itself through `decide`). `node scripts/propositions.mjs` (run by
+`test/propositions.test.mjs` on every pull request) fails when a cited name
+does not exist, when the cited statement is not the definition's (whitespace
+aside), when a candidate's `Tested by:` file is missing or does not cite it,
+or when [library/PROOFS.md](../library/PROOFS.md#candidates-not-yet-proved)'s
+candidates list (generated from the Candidates files; `--write` updates it) is
+stale. It also counts the fuzz oracles and the `forAll` properties that name
+a proposition (`--json` prints the inventory): exit bar 7 needs all of them.
+The Candidates files compile with the proofs (`scripts/library-proofs.mjs`).
+The Lean candidates are checked in `test/ui/DiffModel.lean` (`ui.yml`) and in
+the `lean-fetch-request` and `lean-rpc` fuzz targets
+(`test/fuzz/native/LasmFuzz.lean`, `fuzz.yml`).
 
 ## CI tiers
 
