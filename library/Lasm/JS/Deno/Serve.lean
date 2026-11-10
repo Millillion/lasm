@@ -14,6 +14,14 @@ import Lasm.JS.Web.Fetch
 namespace Lasm.JS.Deno
 open Lasm.JS Lasm.JS.Web
 
+/-- `interface Deno.ServeHandlerInfo` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts): a handle to the JavaScript object. -/
+structure ServeHandlerInfo where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty ServeHandlerInfo := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ServeHandlerInfo := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ServeHandlerInfo := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeHandlerInfo", .data⟩
+
 /-- `interface Deno.HttpServer` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts): a handle to the JavaScript object. -/
 structure HttpServer where
   /-- The JavaScript object. -/
@@ -79,18 +87,6 @@ instance : FromJS NetAddr where
     hostname := ← Lasm.JS.readField String d "hostname",
     port := ← Lasm.JS.readField Nat d "port" }
   typeName := "Lasm.JS.Deno.NetAddr"
-
-/-- `dictionary ServeHandlerInfo` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ServeHandlerInfo where
-  /-- `required NetAddr remoteAddr` -/
-  remoteAddr : NetAddr
-  /-- `required Promise<undefined> completed` -/
-  completed : Value
-instance : FromJS ServeHandlerInfo where
-  fromJS d := do return {
-    remoteAddr := ← Lasm.JS.readField NetAddr d "remoteAddr",
-    completed := ← Lasm.JS.readField Value d "completed" }
-  typeName := "Lasm.JS.Deno.ServeHandlerInfo"
 
 /-- `callback ServeHandler = Promise<Response> (Request request, ServeHandlerInfo info)` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ServeHandler where
@@ -220,6 +216,14 @@ instance : ToJS ServeTcpTlsOptions := ⟨fun d => Support.fields #[("signal", Su
     ("keyFormat", Support.optional d.keyFormat),
     ("key", toJS d.key),
     ("cert", toJS d.cert)]⟩
+
+/-- `remoteAddr: Addr`: `readonly attribute NetAddr remoteAddr` -/
+def ServeHandlerInfo.remoteAddr (self : ServeHandlerInfo) : IO NetAddr := self.val.get "remoteAddr" NetAddr
+
+/-- `completed: Promise<void>`: `readonly attribute Promise<undefined> completed` -/
+def ServeHandlerInfo.completed (self : ServeHandlerInfo) : Async Unit := do
+  let p ← self.val.get "completed" Value
+  p.await Unit
 
 /-- `finished: Promise<void>`: `readonly attribute Promise<undefined> finished` -/
 def HttpServer.finished (self : HttpServer) : Async Unit := do

@@ -138,10 +138,9 @@ decisions themselves are logged with their reasoning in
     (the TCP and `fetch` alternatives of its `XOR<…>` types); `port` is the declared
     `string | number` (`DOMStringOrUnsignedShort`, a `Nat` coerces).
   - **Plain-data results are structures, objects the runtime keeps are handles**:
-    `NetAddr`, `SocketAddress` and Deno's `ServeHandlerInfo` are copied structures
-    (`(← server.addr).port`, `info.remoteAddr.hostname`; `info.completed` is the
-    promise as a `Value`), `HttpServer` and `Server` handles. Callback arguments
-    arrive copied, so plain objects cannot be handles there. The choice is per
+    `NetAddr` and `SocketAddress` are copied structures (`(← server.addr).port`),
+    `HttpServer`, `Server` and `ServeHandlerInfo` handles. Plain objects reach a
+    callback copied, so they cannot be handles there. The choice is per
     declaration in `serve-tier2.mjs` (`as`), since TypeScript does not say which.
   - **Numbers the doc comments call ports, counts or sizes are `Nat`**, others
     `Float` (none in this cut).

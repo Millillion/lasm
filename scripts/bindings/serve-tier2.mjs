@@ -66,7 +66,7 @@ export const hosts = [
     },
     declarations: [
       { name: 'ServeHandler', as: 'callback', module: 'Serve' },
-      { name: 'ServeHandlerInfo', as: 'dictionary', module: 'Serve' },
+      { name: 'ServeHandlerInfo', as: 'interface', module: 'Serve' },
       { name: 'HttpServer', as: 'interface', module: 'Serve' },
       { name: 'ServeOptions', as: 'dictionary', module: 'Serve' },
       { name: 'ServeTcpOptions', as: 'dictionary', module: 'Serve' },

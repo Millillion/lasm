@@ -5,6 +5,6 @@ The generated surface (scripts/bindings/serve-surface.json), for the availabilit
 namespace Surface
 
 /-- `{runtime: {global, functions, interfaces: {name: [member]}}}` for Lasm.JS.Deno and Lasm.JS.Bun. -/
-def json : String := r#"{"Deno":{"global":"Deno","functions":["serve"],"interfaces":{"HttpServer":["finished","addr","ref","unref","shutdown"]}},"Bun":{"global":"Bun","functions":["serve"],"interfaces":{"Server":["stop","closeIdleConnections","reload","fetch","requestIP","timeout","ref","unref","pendingRequests","url","port","hostname","protocol","development","id"]}}}"#
+def json : String := r#"{"Deno":{"global":"Deno","functions":["serve"],"interfaces":{"ServeHandlerInfo":["remoteAddr","completed"],"HttpServer":["finished","addr","ref","unref","shutdown"]}},"Bun":{"global":"Bun","functions":["serve"],"interfaces":{"Server":["stop","closeIdleConnections","reload","fetch","requestIP","timeout","ref","unref","pendingRequests","url","port","hostname","protocol","development","id"]}}}"#
 
 end Surface

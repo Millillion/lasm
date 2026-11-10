@@ -29,13 +29,13 @@ namespace Deno {
   [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="Deno.serve(options: ServeTcpOptions | (ServeTcpOptions & TlsCertifiedKeyPem), handler: ServeHandler<Deno.NetAddr>): HttpServer<Deno.NetAddr>"] Deno_HttpServer serve(Deno_ServeTcpTlsOptions tlsOptions, Deno_ServeHandler handler);
 };
 
-// options Deno.ServeHandlerInfo
+// interface Deno.ServeHandlerInfo
 [LasmHost="Deno", LasmLeanModule="Serve", LasmFile="lib.deno.ns.d.ts", LasmName="ServeHandlerInfo", LasmPath="Deno.ServeHandlerInfo"]
-dictionary Deno_ServeHandlerInfo {
+interface Deno_ServeHandlerInfo {
   // remoteAddr: Addr
-  required Deno_NetAddr remoteAddr;
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="remoteAddr: Addr"] readonly attribute Deno_NetAddr remoteAddr;
   // completed: Promise<void>
-  required Promise<undefined> completed;
+  [LasmHost="Deno", LasmFile="lib.deno.ns.d.ts", LasmSignature="completed: Promise<void>"] readonly attribute Promise<undefined> completed;
 };
 
 // interface Deno.HttpServer
