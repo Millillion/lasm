@@ -158,7 +158,7 @@ Jordan's direction: rock solid first, then the irreducible essence, then proposi
 1. Strategy
    - [x] Adopt the testing strategy: [docs/TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md) (moved from proposals), with the method × component × tier matrix, the property-testing convention, the nine decisions (DECISIONS.md, 2026-11-09) and the measurable exit bar (§7).
 2. Close the gaps the exit bar needs ([§2 "Next gap"](docs/TESTING_STRATEGY.md#2-methods), [§7](docs/TESTING_STRATEGY.md#7-exit-bar-rock-solid))
-   - [ ] Differential fuzzing: coverage feedback for generated programs, and the generator features listed in §2; model differentials for the UI decoder and the Lasm.JS wire codec.
+   - [ ] Differential fuzzing: coverage feedback for generated programs, and the generator features listed in §2; model differentials for the UI decoder and the Lasm.JS wire codec. The Lasm.JS wire codec's is done (2026-11-10): the `lasm-js-wire` fuzz target checks `src/node-js.mjs`'s writer and reader against Lean's `Wire` on every PR (replay), nightly and weekly; it found three reader disagreements, fixed in both JavaScript copies (a `__proto__` field set the prototype; invalid UTF-8 read as U+FFFD; `BigInt`'s laxer grammar).
    - [ ] Mutation testing on the CLI argument and init modules, `src/serverless/` and the WASI JavaScript (80 %).
    - [ ] Unit-suite line coverage to 75 %; every 0 % file covered by a named integration workflow or removed.
    - [ ] Fuzzing of the remaining boundaries (Fastly host, edge request mapping, the `lasm dev` proxy, project files); metamorphic compiler relations.

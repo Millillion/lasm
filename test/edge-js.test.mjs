@@ -134,15 +134,15 @@ test('strings and keys encode as UTF-8 and decode as TextDecoder does, on every 
       assert.deepEqual(Object.entries(seen.pop()), [[text, text], ['after', 1]], JSON.stringify(s));
     }
   }
-  // Bytes that are not valid UTF-8 decode as TextDecoder replaces them, as values and keys.
-  for (const raw of [[0x61, 0xff], [0xc3], [0x80, 0x61], [0x7f, 0x80]]) {
-    const bytes = cat(u32(raw.length), Uint8Array.from(raw)), text = dec.decode(Uint8Array.from(raw));
+  // Bytes that are not valid UTF-8 are refused, as values and keys, on every path, as Lean's reader refuses them.
+  const long = n => [...Array(n).fill(0x61), 0xff];
+  for (const raw of [[0x61, 0xff], [0xc3], [0x80, 0x61], [0x7f, 0x80], [0xed, 0xa0, 0x80], long(40), long(80)]) {
+    const bytes = cat(u32(raw.length), Uint8Array.from(raw));
     const args = items => cat(Uint8Array.of(8), u32(4), wire('T.id'), wire('echo'), wire('id'), Uint8Array.of(8), u32(1), items);
-    call(214, 0, 0, args(cat(Uint8Array.of(5), bytes)));
-    assert.equal(seen.pop(), text);
-    call(214, 0, 0, args(cat(Uint8Array.of(9), u32(1), bytes, Uint8Array.of(0))));
-    assert.deepEqual(Object.keys(seen.pop()), [text]);
+    for (const value of [cat(Uint8Array.of(5), bytes), cat(Uint8Array.of(9), u32(1), bytes, Uint8Array.of(0)), cat(Uint8Array.of(6), bytes)])
+      assert.throws(() => call(214, 0, 0, args(value)), /Malformed Lasm\.JS value \(invalid UTF-8\)/);
   }
+  assert.equal(seen.length, 0);
   // Many strings in one value: the writer grows its buffer in the middle of the fast path.
   const many = Object.fromEntries(Array.from({ length: 300 }, (_, i) => [`key${i}`, i % 3 ? `value number ${i}` : i]));
   assert.deepEqual(echo(many), wire(many));
@@ -150,6 +150,26 @@ test('strings and keys encode as UTF-8 and decode as TextDecoder does, on every 
   const wide = Object.fromEntries(Array.from({ length: 3000 }, (_, i) => [`k${i}`, i]));
   for (let round = 0; round < 2; round++) { echo(wide); assert.deepEqual(seen.pop(), wide); }
   for (let round = 0; round < 2; round++) for (const k of ['ab', 'ba', 'ac', 'abc', 'ab']) { echo({ [k]: 0 }); assert.deepEqual(Object.keys(seen.pop()), [k]); }
+});
+
+// The reader accepts exactly what Lean's reader accepts (Wire.readAt; the
+// lasm-js-wire fuzz target checks Node's copy against it).
+test('bigints are read as Lean reads them, and a field named __proto__ is an own property', () => {
+  const seen = [];
+  const { call } = edge({ modules: { echo: { id: x => { seen.push(x); return x; } } } });
+  const args = item => cat(Uint8Array.of(8), u32(4), wire('T.id'), wire('echo'), wire('id'), Uint8Array.of(8), u32(1), item);
+  const big = text => { call(214, 0, 0, args(cat(Uint8Array.of(6), str(text)))); return seen.pop(); };
+  for (const [text, value] of [['0', 0n], ['-0', 0n], ['007', 7n], ['-12', -12n], ['1_000', 1000n], ['-1_0', -10n], ['1_2_3', 123n]])
+    assert.equal(big(text), value, text);
+  for (const text of ['', '-', '+5', ' 1', '1 ', '0x10', '0b1', '1e3', '1.0', '_1', '1_', '1__0', '-_1', '--1', '1-', '١'])
+    assert.throws(() => big(text), /Malformed Lasm\.JS value \(bigint\)/, JSON.stringify(text));
+  const object = cat(Uint8Array.of(9), u32(2), str('__proto__'), wire({ polluted: true }), str('a'), Uint8Array.of(1));
+  call(214, 0, 0, args(object));
+  const value = seen.pop();
+  assert.equal(Object.getPrototypeOf(value), Object.prototype);
+  assert.deepEqual(Object.keys(value), ['__proto__', 'a']);
+  assert.deepEqual(Object.getOwnPropertyDescriptor(value, '__proto__'), { value: { polluted: true }, writable: true, enumerable: true, configurable: true });
+  assert.equal(value.polluted, undefined);
 });
 
 test('values: every kind round-trips, including ones larger than the first buffer', () => {
