@@ -109,12 +109,16 @@ def checks (request : IncomingRequest) (origin : String) : Checks Unit := do
     ok! "append" (f.append "x-del" "1".toUTF8)
     ok! "delete" (f.delete "x-del")
     return !(← f.has "x-del")
-  -- ∀ es, (Fields.fromList es >>= entries) = pure es   (list<tuple<string, list<u8>>> in and out)
+  -- ∀ es n, ((Fields.fromList es >>= entries).filter (·.1 = n)) = pure (es.filter (·.1 = n)), with as many entries as es
+  -- (each name keeps its values in order; the order across names is the host's serialization
+  -- order, which wasi:http leaves to the host: wasmtime groups a name's values together)
   check "from-list then entries" do
     let es : Array (String × ByteArray) := #[("x-a", "1".toUTF8), ("x-b", "two".toUTF8), ("x-a", "3".toUTF8)]
     let f ← ok! "from-list" (Fields.fromList es)
-    let got ← f.entries
-    return got.map (fun (n, v) => (n, (String.fromUTF8? v).getD "")) == #[("x-a", "1"), ("x-b", "two"), ("x-a", "3")]
+    let got := (← f.entries).map fun (n, v) => (n, (String.fromUTF8? v).getD "")
+    let want := es.map fun (n, v) => (n, (String.fromUTF8? v).getD "")
+    let same := got.size == want.size && ["x-a", "x-b"].all fun n => got.filter (·.1 == n) == want.filter (·.1 == n)
+    if same then return true else throw (IO.userError s!"got {got}")
   -- Fields.fromList [("bad name", v)] = pure (.error .invalidSyntax)   (a payload-free variant in a result)
   check "from-list rejects an invalid name: invalid-syntax" do
     match ← Fields.fromList #[("bad name", "v".toUTF8)] with
@@ -248,8 +252,11 @@ def checks (request : IncomingRequest) (origin : String) : Checks Unit := do
     match ← settle future with
     | some (.ok (.ok response)) =>
       let s ← ok! "stream" (← ok! "consume" response.consume).stream
-      return (← readAll s) == "POST:".toUTF8 ++ big
-    | _ => return false
+      let got ← readAll s
+      if got == "POST:".toUTF8 ++ big then return true
+      throw (IO.userError s!"got {got.size} bytes back, expected {big.size + 5}")
+    | some (.ok (.error e)) => throw (IO.userError s!"got {repr e}")
+    | _ => throw (IO.userError "no response")
   -- a closed port: the exchange fails with error-code connection-refused   (a variant error out of a nested result)
   check "a refused connection is connection-refused" do
     match ← sendToOrigin "127.0.0.1:9" "x".toUTF8 with

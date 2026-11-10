@@ -172,7 +172,7 @@ const originServer = http.createServer(async (req, res) => {
   const chunks = []; for await (const c of req) chunks.push(c);
   if (req.url.startsWith('/origin/slow')) { await new Promise(r => setTimeout(r, 150)); res.writeHead(200, { 'content-type': 'text/plain' }); res.end('slow'); return; }
   res.writeHead(200, { 'content-type': 'text/plain', 'x-echo-method': req.method });
-  res.end(`${req.method}:${Buffer.concat(chunks).toString()}`);
+  res.end(Buffer.concat([Buffer.from(`${req.method}:`), ...chunks])); // byte for byte: binary bodies round-trip
 });
 await new Promise(r => originServer.listen(3110, '127.0.0.1', r));
 const origin = 'http://127.0.0.1:3110';
