@@ -31,6 +31,7 @@ inductive DOMStringOrSymbol where
 instance : ToJS DOMStringOrSymbol := ⟨fun
   | .domString v => toJS v
   | .symbol v => toJS v⟩
+instance : Coe String DOMStringOrSymbol := ⟨.domString⟩
 
 /-- `dictionary events.OnceOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure events.OnceOptions where

@@ -720,13 +720,12 @@ import Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
 
 def run : Async Unit := do
-  let dir ← os.tmpdir
-  let file ← path.join #[dir, "hello.txt"]
-  fsPromises.writeFile (.domString file) (.domString "hi")
-  match ← fsPromises.readFile (.domString file) (some (.domString "utf8")) with
+  let file ← path.join #[← os.tmpdir, "hello.txt"]
+  fsPromises.writeFile file "hi"                       -- a String coerces to the path and data unions
+  match ← fsPromises.readFile file (some "utf8") with
   | .domString text => IO.println text                        -- hi
   | .uint8Array _ => pure ()
-  let key ← crypto.scrypt (.domString "password") (.domString "salt") 32
+  let key ← crypto.scrypt "password" "salt" 32
   IO.println (← Buffer.toString key (some "hex"))
   let out ← child_process.execFile "git" (some #["--version"])
   IO.println (match out.stdout with | .domString s => s | _ => "")
@@ -785,7 +784,7 @@ rules as Lasm.JS.Web ([above](#how-a-webidl-declaration-becomes-lean)):
 | `fsPromises.readFile(path[, options])` | `readFile(… path, optional … options)` in `namespace fsPromises` | `fsPromises.readFile (path) (options := none)` |
 | `{string}`, `{integer}`, `{number}`, `{boolean}`, `{bigint}` | `DOMString`, `long long`, `double`, `boolean`, `bigint` | `String`, `Int`, `Float`, `Bool`, `Int` |
 | `{Buffer}`, `{TypedArray}`, `{DataView}`, `{Uint8Array}` | `Uint8Array` | `ByteArray` (a copy) |
-| `{string\|Buffer\|URL}` | `(DOMString or Uint8Array or URL)` | `DOMStringOrUint8ArrayOrURL`: `.domString "a.txt"`, `.uint8Array b`, `.url u` |
+| `{string\|Buffer\|URL}` | `(DOMString or Uint8Array or URL)` | `DOMStringOrUint8ArrayOrURL`: `.domString "a.txt"`, `.uint8Array b`, `.url u`, or the value itself through tier 1's `Coe` instances (`fsPromises.readFile "a.txt"`) |
 | `{null}`, `{undefined}` in a type | nullable | `Option` |
 | `{Object}` with documented members (`options`) | `dictionary` | a structure, named after the method and parameter (`fsPromises.ReadFileOptions`) |
 | `{Object}` without them, and classes outside this cut (`KeyObject`, `Date`, `fs.ReadStream`) | `object` | `Data` |

@@ -66,6 +66,8 @@ instance : ToJS DOMStringOrUint8ArrayOrObject := ⟨fun
   | .domString v => toJS v
   | .uint8Array v => toJS v
   | .object v => toJS v⟩
+instance : Coe String DOMStringOrUint8ArrayOrObject := ⟨.domString⟩
+instance : Coe ByteArray DOMStringOrUint8ArrayOrObject := ⟨.uint8Array⟩
 
 /-- `dictionary FileHandle.AppendFileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileHandle.AppendFileOptions where
@@ -85,6 +87,8 @@ inductive FileHandle.AppendFileOptionsOrDOMString where
 instance : ToJS FileHandle.AppendFileOptionsOrDOMString := ⟨fun
   | .appendFileOptions v => toJS v
   | .domString v => toJS v⟩
+instance : Coe FileHandle.AppendFileOptions FileHandle.AppendFileOptionsOrDOMString := ⟨.appendFileOptions⟩
+instance : Coe String FileHandle.AppendFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `(long long or bigint)`: one constructor per member type. -/
 inductive LongLongOrBigint where
@@ -150,6 +154,8 @@ inductive Uint8ArrayOrJSFunction where
 instance : ToJS Uint8ArrayOrJSFunction := ⟨fun
   | .uint8Array v => toJS v
   | .jsFunction v => toJS v⟩
+instance : Coe ByteArray Uint8ArrayOrJSFunction := ⟨.uint8Array⟩
+instance : Coe JSFunction Uint8ArrayOrJSFunction := ⟨.jsFunction⟩
 
 /-- `dictionary FileHandle.ReadFileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileHandle.ReadFileOptions where
@@ -172,6 +178,8 @@ inductive FileHandle.ReadFileOptionsOrDOMString where
 instance : ToJS FileHandle.ReadFileOptionsOrDOMString := ⟨fun
   | .readFileOptions v => toJS v
   | .domString v => toJS v⟩
+instance : Coe FileHandle.ReadFileOptions FileHandle.ReadFileOptionsOrDOMString := ⟨.readFileOptions⟩
+instance : Coe String FileHandle.ReadFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `(Uint8Array or DOMString)`: one constructor per member type. -/
 inductive Uint8ArrayOrDOMString where
@@ -207,6 +215,8 @@ instance : ToJS DoubleOrDOMStringOrObject := ⟨fun
   | .double v => toJS v
   | .domString v => toJS v
   | .object v => toJS v⟩
+instance : Coe Float DoubleOrDOMStringOrObject := ⟨.double⟩
+instance : Coe String DoubleOrDOMStringOrObject := ⟨.domString⟩
 
 /-- `dictionary FileHandle.WriteResult` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileHandle.WriteResult where
@@ -262,6 +272,8 @@ inductive FileHandle.WriteFileOptionsOrDOMString where
 instance : ToJS FileHandle.WriteFileOptionsOrDOMString := ⟨fun
   | .writeFileOptions v => toJS v
   | .domString v => toJS v⟩
+instance : Coe FileHandle.WriteFileOptions FileHandle.WriteFileOptionsOrDOMString := ⟨.writeFileOptions⟩
+instance : Coe String FileHandle.WriteFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `(DOMString or Uint8Array or URL)`: one constructor per member type. -/
 inductive DOMStringOrUint8ArrayOrURL where
@@ -275,6 +287,9 @@ instance : ToJS DOMStringOrUint8ArrayOrURL := ⟨fun
   | .domString v => toJS v
   | .uint8Array v => toJS v
   | .url v => toJS v⟩
+instance : Coe String DOMStringOrUint8ArrayOrURL := ⟨.domString⟩
+instance : Coe ByteArray DOMStringOrUint8ArrayOrURL := ⟨.uint8Array⟩
+instance : Coe URL DOMStringOrUint8ArrayOrURL := ⟨.url⟩
 
 /-- `(DOMString or Uint8Array or URL or FileHandle)`: one constructor per member type. -/
 inductive DOMStringOrUint8ArrayOrURLOrFileHandle where
@@ -291,6 +306,10 @@ instance : ToJS DOMStringOrUint8ArrayOrURLOrFileHandle := ⟨fun
   | .uint8Array v => toJS v
   | .url v => toJS v
   | .fileHandle v => toJS v⟩
+instance : Coe String DOMStringOrUint8ArrayOrURLOrFileHandle := ⟨.domString⟩
+instance : Coe ByteArray DOMStringOrUint8ArrayOrURLOrFileHandle := ⟨.uint8Array⟩
+instance : Coe URL DOMStringOrUint8ArrayOrURLOrFileHandle := ⟨.url⟩
+instance : Coe FileHandle DOMStringOrUint8ArrayOrURLOrFileHandle := ⟨.fileHandle⟩
 
 /-- `dictionary fsPromises.AppendFileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.AppendFileOptions where
@@ -316,6 +335,8 @@ inductive fsPromises.AppendFileOptionsOrDOMString where
 instance : ToJS fsPromises.AppendFileOptionsOrDOMString := ⟨fun
   | .appendFileOptions v => toJS v
   | .domString v => toJS v⟩
+instance : Coe fsPromises.AppendFileOptions fsPromises.AppendFileOptionsOrDOMString := ⟨.appendFileOptions⟩
+instance : Coe String fsPromises.AppendFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `(DOMString or long long)`: one constructor per member type. -/
 inductive DOMStringOrLongLong where
@@ -326,6 +347,8 @@ inductive DOMStringOrLongLong where
 instance : ToJS DOMStringOrLongLong := ⟨fun
   | .domString v => toJS v
   | .longLong v => toJS v⟩
+instance : Coe String DOMStringOrLongLong := ⟨.domString⟩
+instance : Coe Int DOMStringOrLongLong := ⟨.longLong⟩
 
 /-- `(DOMString or URL)`: one constructor per member type. -/
 inductive DOMStringOrURL where
@@ -336,6 +359,8 @@ inductive DOMStringOrURL where
 instance : ToJS DOMStringOrURL := ⟨fun
   | .domString v => toJS v
   | .url v => toJS v⟩
+instance : Coe String DOMStringOrURL := ⟨.domString⟩
+instance : Coe URL DOMStringOrURL := ⟨.url⟩
 
 /-- `dictionary fsPromises.CpOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.CpOptions where
@@ -388,6 +413,8 @@ inductive fsPromises.MkdirOptionsOrLongLong where
 instance : ToJS fsPromises.MkdirOptionsOrLongLong := ⟨fun
   | .mkdirOptions v => toJS v
   | .longLong v => toJS v⟩
+instance : Coe fsPromises.MkdirOptions fsPromises.MkdirOptionsOrLongLong := ⟨.mkdirOptions⟩
+instance : Coe Int fsPromises.MkdirOptionsOrLongLong := ⟨.longLong⟩
 
 /-- `dictionary fsPromises.MkdtempOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.MkdtempOptions where
@@ -404,6 +431,8 @@ inductive fsPromises.DOMStringOrMkdtempOptions where
 instance : ToJS fsPromises.DOMStringOrMkdtempOptions := ⟨fun
   | .domString v => toJS v
   | .mkdtempOptions v => toJS v⟩
+instance : Coe String fsPromises.DOMStringOrMkdtempOptions := ⟨.domString⟩
+instance : Coe fsPromises.MkdtempOptions fsPromises.DOMStringOrMkdtempOptions := ⟨.mkdtempOptions⟩
 
 /-- `dictionary fsPromises.ReaddirOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.ReaddirOptions where
@@ -426,6 +455,8 @@ inductive fsPromises.DOMStringOrReaddirOptions where
 instance : ToJS fsPromises.DOMStringOrReaddirOptions := ⟨fun
   | .domString v => toJS v
   | .readdirOptions v => toJS v⟩
+instance : Coe String fsPromises.DOMStringOrReaddirOptions := ⟨.domString⟩
+instance : Coe fsPromises.ReaddirOptions fsPromises.DOMStringOrReaddirOptions := ⟨.readdirOptions⟩
 
 /-- `(DOMString or Uint8Array or fs.Dirent)`: one constructor per member type. -/
 inductive fs.DOMStringOrUint8ArrayOrDirent where
@@ -467,6 +498,8 @@ inductive fsPromises.ReadFileOptionsOrDOMString where
 instance : ToJS fsPromises.ReadFileOptionsOrDOMString := ⟨fun
   | .readFileOptions v => toJS v
   | .domString v => toJS v⟩
+instance : Coe fsPromises.ReadFileOptions fsPromises.ReadFileOptionsOrDOMString := ⟨.readFileOptions⟩
+instance : Coe String fsPromises.ReadFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `dictionary fsPromises.ReadlinkOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.ReadlinkOptions where
@@ -483,6 +516,8 @@ inductive fsPromises.DOMStringOrReadlinkOptions where
 instance : ToJS fsPromises.DOMStringOrReadlinkOptions := ⟨fun
   | .domString v => toJS v
   | .readlinkOptions v => toJS v⟩
+instance : Coe String fsPromises.DOMStringOrReadlinkOptions := ⟨.domString⟩
+instance : Coe fsPromises.ReadlinkOptions fsPromises.DOMStringOrReadlinkOptions := ⟨.readlinkOptions⟩
 
 /-- `dictionary fsPromises.RealpathOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.RealpathOptions where
@@ -499,6 +534,8 @@ inductive fsPromises.DOMStringOrRealpathOptions where
 instance : ToJS fsPromises.DOMStringOrRealpathOptions := ⟨fun
   | .domString v => toJS v
   | .realpathOptions v => toJS v⟩
+instance : Coe String fsPromises.DOMStringOrRealpathOptions := ⟨.domString⟩
+instance : Coe fsPromises.RealpathOptions fsPromises.DOMStringOrRealpathOptions := ⟨.realpathOptions⟩
 
 /-- `dictionary fsPromises.RmdirOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.RmdirOptions where
@@ -563,6 +600,8 @@ inductive fsPromises.WriteFileOptionsOrDOMString where
 instance : ToJS fsPromises.WriteFileOptionsOrDOMString := ⟨fun
   | .writeFileOptions v => toJS v
   | .domString v => toJS v⟩
+instance : Coe fsPromises.WriteFileOptions fsPromises.WriteFileOptionsOrDOMString := ⟨.writeFileOptions⟩
+instance : Coe String fsPromises.WriteFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `stats.dev`: `readonly attribute (double or bigint) dev` -/
 def fs.Stats.dev (self : fs.Stats) : IO DoubleOrBigint := self.val.get "dev" DoubleOrBigint

@@ -21,6 +21,8 @@ inductive LongLongOrDOMString where
 instance : ToJS LongLongOrDOMString := ⟨fun
   | .longLong v => toJS v
   | .domString v => toJS v⟩
+instance : Coe Int LongLongOrDOMString := ⟨.longLong⟩
+instance : Coe String LongLongOrDOMString := ⟨.domString⟩
 instance : FromJS LongLongOrDOMString where
   fromJS
     | d@(.number _) => (FromJS.fromJS d : Except String Int).map .longLong
@@ -37,6 +39,8 @@ inductive DOMStringOrDouble where
 instance : ToJS DOMStringOrDouble := ⟨fun
   | .domString v => toJS v
   | .double v => toJS v⟩
+instance : Coe String DOMStringOrDouble := ⟨.domString⟩
+instance : Coe Float DOMStringOrDouble := ⟨.double⟩
 
 /-- `process.arch` (added in Node.js v0.5.0): `readonly attribute DOMString arch` (Node.js 24.22.2 documentation, process.md) -/
 def process.arch : IO String := Support.getExport "node:process" ["arch"] String

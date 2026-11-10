@@ -22,6 +22,7 @@ structure ChildProcess extends EventEmitter
 instance : Nonempty ChildProcess := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS ChildProcess := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ChildProcess := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ChildProcess", .data⟩
+instance : Coe ChildProcess EventEmitter := ⟨ChildProcess.toEventEmitter⟩
 
 /-- `(double or DOMString)`: one constructor per member type. -/
 inductive DoubleOrDOMString where
@@ -32,6 +33,8 @@ inductive DoubleOrDOMString where
 instance : ToJS DoubleOrDOMString := ⟨fun
   | .double v => toJS v
   | .domString v => toJS v⟩
+instance : Coe Float DoubleOrDOMString := ⟨.double⟩
+instance : Coe String DoubleOrDOMString := ⟨.domString⟩
 
 /-- `(boolean or DOMString)`: one constructor per member type. -/
 inductive BooleanOrDOMString where
@@ -42,6 +45,8 @@ inductive BooleanOrDOMString where
 instance : ToJS BooleanOrDOMString := ⟨fun
   | .boolean v => toJS v
   | .domString v => toJS v⟩
+instance : Coe Bool BooleanOrDOMString := ⟨.boolean⟩
+instance : Coe String BooleanOrDOMString := ⟨.domString⟩
 
 /-- `dictionary child_process.ExecFileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure child_process.ExecFileOptions where
@@ -103,6 +108,8 @@ inductive SequenceOfAnyOrDOMString where
 instance : ToJS SequenceOfAnyOrDOMString := ⟨fun
   | .sequence v => toJS v
   | .domString v => toJS v⟩
+instance : Coe (Array Data) SequenceOfAnyOrDOMString := ⟨.sequence⟩
+instance : Coe String SequenceOfAnyOrDOMString := ⟨.domString⟩
 
 /-- `dictionary child_process.SpawnOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure child_process.SpawnOptions where

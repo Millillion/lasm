@@ -24,6 +24,9 @@ instance : ToJS DOMStringOrUint8ArrayOrLongLong := ⟨fun
   | .domString v => toJS v
   | .uint8Array v => toJS v
   | .longLong v => toJS v⟩
+instance : Coe String DOMStringOrUint8ArrayOrLongLong := ⟨.domString⟩
+instance : Coe ByteArray DOMStringOrUint8ArrayOrLongLong := ⟨.uint8Array⟩
+instance : Coe Int DOMStringOrUint8ArrayOrLongLong := ⟨.longLong⟩
 
 /-- `(DOMString or Uint8Array)`: one constructor per member type. -/
 inductive DOMStringOrUint8Array where
@@ -34,6 +37,8 @@ inductive DOMStringOrUint8Array where
 instance : ToJS DOMStringOrUint8Array := ⟨fun
   | .domString v => toJS v
   | .uint8Array v => toJS v⟩
+instance : Coe String DOMStringOrUint8Array := ⟨.domString⟩
+instance : Coe ByteArray DOMStringOrUint8Array := ⟨.uint8Array⟩
 instance : FromJS DOMStringOrUint8Array where
   fromJS
     | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString

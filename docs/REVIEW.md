@@ -103,11 +103,9 @@ decisions themselves are logged with their reasoning in
     `child_process.spawn`, `crypto.createHash`, `Buffer.from`. Namespaces are
     lowercase as in the docs (`fs.Stats`, `stream.Readable`), not
     `Lasm.JS.Node.Fs.readFile`.
-  - **Unions need a constructor**: `fsPromises.readFile (.domString "a.txt")`,
-    as tier 1 needs `fetch (.usvString url)`. Proposal for both tiers: generate
-    `Coe String U` (and `Coe ByteArray U`) for every union with exactly one
-    string (bytes) member, so `fsPromises.readFile "a.txt"` and
-    `fetch "https://…"` work. Not done: it changes tier 1's API.
+  - **Unions take their members directly**: with the `Coe` instances the
+    browser tier added to the generator, `fsPromises.readFile "a.txt"` works
+    (`.domString "a.txt"` still does).
   - **Encoding-dependent results are unions**: `readFile` gives
     `Uint8ArrayOrDOMString` (bytes, or a string when an encoding is passed),
     as the docs say, not two functions.

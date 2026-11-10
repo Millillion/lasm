@@ -58,6 +58,9 @@ instance : ToJS DOMStringOrUint8ArrayOrObjectOrCryptoKey := ⟨fun
   | .uint8Array v => toJS v
   | .object v => toJS v
   | .cryptoKey v => toJS v⟩
+instance : Coe String DOMStringOrUint8ArrayOrObjectOrCryptoKey := ⟨.domString⟩
+instance : Coe ByteArray DOMStringOrUint8ArrayOrObjectOrCryptoKey := ⟨.uint8Array⟩
+instance : Coe CryptoKey DOMStringOrUint8ArrayOrObjectOrCryptoKey := ⟨.cryptoKey⟩
 
 /-- `dictionary crypto.CreateHmacOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.CreateHmacOptions where
@@ -89,6 +92,8 @@ inductive crypto.HashOptionsOrDOMString where
 instance : ToJS crypto.HashOptionsOrDOMString := ⟨fun
   | .hashOptions v => toJS v
   | .domString v => toJS v⟩
+instance : Coe crypto.HashOptions crypto.HashOptionsOrDOMString := ⟨.hashOptions⟩
+instance : Coe String crypto.HashOptionsOrDOMString := ⟨.domString⟩
 
 /-- `dictionary crypto.RandomUUIDOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.RandomUUIDOptions where
