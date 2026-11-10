@@ -112,11 +112,11 @@ partial def writeAll (body : BodyHandle) (bytes : ByteArray) : EIO FastlyStatus 
 
 def get (name key : String) : IO (Option String) := do
   let store ← KvStore.open name
-  let (body, _, _, error) ← KvStore.lookupWaitV2 (← KvStore.lookup store key {} {})
-  match error with
-  | .ok => return String.fromUTF8? (← readAll body)
-  | .notFound => return none
-  | e => throw (IO.userError s!"Lasm.KV: Fastly KV Store {name}: lookup of {key}: {e}")
+  -- A missing key: KvError.notFound (or the status $none).
+  match ← found? (KvStore.lookupWaitV2 (← KvStore.lookup store key {} {})) with
+  | some (body, _, _, .ok) => return String.fromUTF8? (← readAll body)
+  | some (_, _, _, .notFound) | none => return none
+  | some (_, _, _, e) => throw (IO.userError s!"Lasm.KV: Fastly KV Store {name}: lookup of {key}: {e}")
 
 def put (name key value : String) : IO Unit := do
   let store ← KvStore.open name

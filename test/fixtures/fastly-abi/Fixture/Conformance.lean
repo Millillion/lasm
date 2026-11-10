@@ -38,9 +38,11 @@ def bodyOf (bytes : ByteArray) : EIO FastlyStatus BodyHandle := do
   return b
 
 def kvLookup (kv : KvStoreHandle) (key : String) : IO (KvError × String) := do
-  let (body, _, _, error) ← KvStore.lookupWaitV2 (← KvStore.lookup kv key {} {})
-  if error == .ok then return (error, (String.fromUTF8? (← readAll body)).getD "")
-  return (error, "")
+  -- A missing key is KvError.notFound; a host that answers $none instead counts as notFound too.
+  match ← found? (KvStore.lookupWaitV2 (← KvStore.lookup kv key {} {})) with
+  | some (body, _, _, .ok) => return (.ok, (String.fromUTF8? (← readAll body)).getD "")
+  | some (_, _, _, error) => return (error, "")
+  | none => return (.notFound, "")
 
 def checks (downstream : RequestHandle) : Checks Unit := do
   -- ∀ m, (HttpReq.methodSet r m *> HttpReq.methodGet r) = pure m

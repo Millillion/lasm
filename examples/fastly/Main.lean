@@ -203,8 +203,10 @@ def route (req : Request) : IO Outcome := do
       | none => pure none
     let kv ← KvStore.open "kv"
     let lookup (key : String) : IO (Option String) := do
-      let (body, _, _, error) ← KvStore.lookupWaitV2 (← KvStore.lookup kv key {} {})
-      if error == .ok then return String.fromUTF8? (← readAll body) else return none
+      -- A missing key: KvError.notFound (Viceroy may also answer $none).
+      match ← found? (KvStore.lookupWaitV2 (← KvStore.lookup kv key {} {})) with
+      | some (body, _, _, .ok) => return String.fromUTF8? (← readAll body)
+      | _ => return none
     let greeting ← lookup "greeting"
     let value ← HttpBody.new
     writeAll value "41".toUTF8
