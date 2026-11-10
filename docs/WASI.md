@@ -94,7 +94,7 @@ this script.)
 | HTTP serving | ✓ | [`Lasm.Fetch`](FETCH.md) |
 | Sockets, DNS (`Std.Net`, `Std.Http` server), processes, signals | — | Not in WASI preview 1: clear `unsupportedOperation` errors |
 | `Lasm.JS` | — | No JavaScript: `Lasm.JS.isAvailable` is false and calls fail clearly |
-| Deep recursion | Bounded | By the engine's Wasm stack and an 8 MiB C stack (1 MiB on Fastly). With default settings, a small non-tail recursive function (`deepSum n = (n + 1) + deepSum n`) passes 10,910 frames on wasmtime 49.0.4, 8,177 on wasmtime 30.0.2 and 9,651 on `node:wasi` (Node 24.22.1), measured 2026-10-31; larger frames get less. `wasmtime run -W max-wasm-stack=4194304` (4 MiB) passes 50,000 frames of it, 8 MiB 100,000 |
+| Deep recursion | Bounded | By the engine's Wasm stack and an 8 MiB C stack (1 MiB on Fastly). With default settings, a small non-tail recursive function (`deepSum n = (n + 1) + deepSum n`) passes 10,910 frames on wasmtime 49.0.4, 8,177 on wasmtime 30.0.2 and 9,651 on `node:wasi` (Node 24.22.1), measured 2026-10-31; larger frames get less. `wasmtime run -W max-wasm-stack=4194304` (4 MiB) passes 50,000 frames of it, 8 MiB 100,000. Lean's formatter recurses about twice per element, so `repr` of an Array prints at most 1,801 elements on wasmtime 49.0.4 and 3,914 on `node:wasi` (measured 2026-11-10); `toString` has no such limit, and `-W max-wasm-stack=1073741824` prints 100,000 ([FUNDAMENTAL_LIMITATIONS.md](../FUNDAMENTAL_LIMITATIONS.md#printing-a-large-value-with-repr-issue-179)) |
 
 ### Concurrency
 

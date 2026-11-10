@@ -339,6 +339,13 @@ empty.
 - **Recursion depth** is bounded by the engine's Wasm stack, not by Lean's 64 MiB
   stack: just under 10,000 frames of a small function (table above). Workers
   cannot raise it.
+- **`repr` of a large value** reaches that limit first: Lean's formatter
+  recurses about twice per element, so `repr` of an `Array Int` prints at most
+  3,768 elements on V8 (Workers, Vercel, Netlify, Chromium), 3,914 on Deno,
+  4,254 on Bun and 3,233 on SpiderMonkey (Firefox), measured 2026-11-10. The
+  engine's stack stops it, not the 1 MiB C stack, so a larger C stack would not
+  help. `toString` is iterative and prints 100,000 elements
+  ([FUNDAMENTAL_LIMITATIONS.md](../FUNDAMENTAL_LIMITATIONS.md#printing-a-large-value-with-repr-issue-179)).
 - <a id="stack"></a>**The C stack is 1 MiB** (in linear memory, `src/edge/edge-link.mjs`). Code
   with large frames (unoptimized code keeps every local there) can exhaust it
   before the engine's stack. The instance then stops with

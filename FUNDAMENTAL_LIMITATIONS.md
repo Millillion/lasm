@@ -92,6 +92,47 @@ Linux, macOS and Windows; WASI on wasmtime and `node:wasi`; the edge output on
 Deno, Node, Bun and SpiderMonkey); the browser suite and the Workers checks
 recurse 5,000 frames.
 
+### Printing a large value with `repr` (issue #179)
+
+`repr` of a large collection (an Array or List, or a structure with
+`deriving Repr` that holds one) reaches the recursion limit long before user
+code does. Lean's formatter joins an
+Array's or List's elements into a left-nested chain of `Format.append`s and
+measures it with a non-tail recursive function (`spaceUptoLine`), about two
+large frames per element. So the depth grows with the number of elements, and on
+every target whose stack is the engine's default, a few thousand elements are
+enough:
+
+| Target | Largest `repr` of an `Array Int` that prints (Linux x64, CI, measured 2026-11-10) | The stack that stops it |
+| --- | --- | --- |
+| Native Lean, Node (`lasm build` and the function platforms) | millions of elements (100,000 checked on Linux, macOS and Windows) | — |
+| WASI on wasmtime 49.0.4 (default 512 KiB `max-wasm-stack`) | **1,801** | wasmtime's Wasm stack (`call stack exhausted`) |
+| WASI on wasmtime with `-W max-wasm-stack=1073741824` | 100,000 checked | — |
+| WASI on `node:wasi` (Node 26) | 3,914 | V8's stack |
+| Edge output on Deno 2.9.6 | 3,914 | V8's stack |
+| Edge output on Node's V8 (the engine of Workers, the Vercel and Netlify edge, Chromium) | 3,768 | V8's stack |
+| Edge output on Bun 1.4.4 | 4,254 | JavaScriptCore's stack |
+| Edge output on SpiderMonkey 158 (Firefox's engine) | 3,233 | SpiderMonkey's stack (`too much recursion`) |
+
+The C stack (1 MiB in linear memory on the edge, 8 MiB on WASI) is never what
+stops it: even an unoptimized build (`clang -O0`, which keeps every local on the
+C stack) stops on the engine's stack, at 3,460 elements on Deno, 3,315 on Node
+and 6,337 on Bun. So a larger C stack would cost memory per instance and change
+nothing, and the engine's stack is the platform's: Lasm cannot raise it on
+Workers, the other edge platforms or a browser. On wasmtime it is the host's
+flag above. The recursion is in Lean's standard library and is the same
+natively, where the stack is deep enough to hide it.
+
+**What to do instead.** `toString` of an Array or List is iterative and prints
+100,000 elements on every target (checked in CI), as does a loop that prints
+each element. Use `repr` for small values, as in tests
+and logs, and `toString` or your own loop for large ones.
+
+`scripts/ci/stack-depth.mjs` measures each of these limits, checks that the
+engine's stack (not the C stack, and never a trap such as "out of bounds") is
+what stops `repr`, and checks the `toString` and wasmtime remedies, on every
+pull request and nightly.
+
 ### Async loops on the portable runtime (no longer a limit)
 
 An `Async` loop of steps that complete at once (synchronous host calls, `IO`
