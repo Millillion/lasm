@@ -167,13 +167,13 @@ def deno (r : Checks) (live : Live) : Async Unit := do
     let remote ← IO.mkRef (none : Option (String × Nat × Bool))
     let completed ← IO.mkRef (none : Option Bool)
     let onListen ← Deno.ServeOptionsOnListen.ofFn fun addr => do
-      listened.set (some (← addr.port)); live.modify (·.push ("NetAddr", addr.val))
+      listened.set (some addr.port)
     let onError ← Deno.ServeOptionsOnError.ofFn fun _ => App.text "handled" (status := 503)
     let ac ← AbortController.new
     let handler ← Deno.ServeHandler.ofFn fun req info => do
       if (← (← URL.new (← req.url)).pathname) == "/hello" && (← remote.get).isNone then
         let a ← info.remoteAddr
-        remote.set (some ((← a.hostname), (← a.port), (← a.transport) == .tcp))
+        remote.set (some (a.hostname, a.port, a.transport == .tcp))
         live.modify (·.push ("ServeHandlerInfo", info.val))
         -- info.completed settles once the response has been sent.
         Std.Async.background do
@@ -188,9 +188,9 @@ def deno (r : Checks) (live : Live) : Async Unit := do
     let server ← Deno.serveWithOptions options handler
     live.modify (·.push ("HttpServer", server.val))
     let addr ← server.addr
-    let port ← addr.port
+    let port := addr.port
     -- addr is the address listened on: 127.0.0.1, TCP, the port chosen for port 0
-    expect r "addr" (port > 0 && (← addr.hostname) == "127.0.0.1" && (← addr.transport) == .tcp) s!"{port}"
+    expect r "addr" (port > 0 && addr.hostname == "127.0.0.1" && addr.transport == .tcp) s!"{port}"
     -- onListen receives the same address
     expect r "onListen" ((← waitFor listened) == some port) s!"{← listened.get}"
     served r "deno" s!"http://127.0.0.1:{port}" 503
@@ -207,7 +207,7 @@ def deno (r : Checks) (live : Live) : Async Unit := do
     -- serve(handler): the defaults, port 8000 on 0.0.0.0; the runtime's default error answer is 500.
     let handler ← Deno.ServeHandler.ofFn fun req _ => App.handle req
     let server ← Deno.serve handler
-    expect r "default port" ((← (← server.addr).port) == 8000) s!"{← (← server.addr).port}"
+    expect r "default port" ((← server.addr).port == 8000) s!"{(← server.addr).port}"
     served r "deno default" "http://127.0.0.1:8000" 500
     -- shutdown resolves, then finished, and the port is closed.
     server.shutdown
@@ -216,7 +216,7 @@ def deno (r : Checks) (live : Live) : Async Unit := do
   runSection r "deno.serveWithTlsOptions" do
     let handler ← Deno.ServeHandler.ofFn fun req _ => App.handle req
     let server ← Deno.serveWithTlsOptions { port := some 0, hostname := some "127.0.0.1", cert := Tls.cert, key := Tls.key } handler
-    let port ← (← server.addr).port
+    let port := (← server.addr).port
     -- An HTTPS request with the test CA trusted (Deno.createHttpClient, outside this binding).
     let client ← denoHttpClient (obj [("caCerts", .array #[toJS Tls.ca])])
     let res ← fetchWith s!"https://localhost:{port}/hello" (obj [("client", toJS client)])
@@ -236,8 +236,7 @@ def bun (r : Checks) (live : Live) : Async Unit := do
         server.timeout req 30
         match ← server.requestIP req with
         | some a =>
-          live.modify (·.push ("SocketAddress", a.val))
-          seen.set (some ((← a.address), (← a.port), (← a.family), (← server.pendingRequests)))
+          seen.set (some (a.address, a.port, a.family, (← server.pendingRequests)))
         | none => pure ()
       App.handle req
     let error ← Bun.ServeOptionsError.ofFn fun _ => App.text "handled" (status := 503)
@@ -258,8 +257,10 @@ def bun (r : Checks) (live : Live) : Async Unit := do
       expect r "pendingRequests" (pending ≥ 1) s!"{pending}"
     | none => expect r "requestIP" false "no address"
     -- server.fetch runs the handler without the network
-    let direct ← server.fetch (.domString s!"http://127.0.0.1:{port}/hello")
-    expect r "server.fetch" ((← direct.status) == 200 && (← direct.text) == "hello from Lean") ""
+    try
+      let direct ← server.fetch (.domString s!"http://127.0.0.1:{port}/hello")
+      expect r "server.fetch" ((← direct.status) == 200 && (← direct.text) == "hello from Lean") ""
+    catch e => expect r "server.fetch" false s!"threw {e}"
     -- reload replaces the handler for later requests
     let other ← Bun.ServeOptionsFetch.ofFn fun _ _ => App.text "reloaded"
     discard <| server.reload { fetch := other, port := some (.unsignedShort port), hostname := some "127.0.0.1" }

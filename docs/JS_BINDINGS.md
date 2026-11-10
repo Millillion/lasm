@@ -922,8 +922,8 @@ path resolves.
 
 | Module | Members | Declared in |
 | --- | --- | --- |
-| `Lasm.JS.Deno.Serve` | `Deno.serve(handler)` as `serve`; `Deno.serve(options, handler)` as `serveWithOptions` (`ServeTcpOptions`: `port`, `hostname`, `signal`, `onListen`, `onError`, `reusePort`, `tcpBacklog`, `automaticCompression`, `transport`) and, with `cert` and `key`, `serveWithTlsOptions` (`ServeTcpTlsOptions`); `ServeHandler` (`Request → ServeHandlerInfo → Async Response`); `HttpServer` (`finished`, `shutdown`, `addr`, `ref`, `unref`); `ServeHandlerInfo` (`remoteAddr`, `completed`); `NetAddr` (`transport`, `hostname`, `port`) | Deno 2.9.6, `cli/tsc/dts/lib.deno.ns.d.ts`, `lib.deno_net.d.ts` |
-| `Lasm.JS.Bun.Serve` | `Bun.serve(options)` as `serve`; `ServeOptions` (`fetch`, `port`, `hostname`, `error`, `idleTimeout`, `maxRequestBodySize`, `reusePort`, `ipv6Only`, `id`); `ServeOptionsFetch` (`Request → Server → Async Response`); `Server` (`stop`, `url`, `port`, `hostname`, `protocol`, `requestIP`, `timeout`, `fetch`, `reload`, `pendingRequests`, `closeIdleConnections`, `ref`, `unref`, `development`, `id`); `SocketAddress` (`address`, `port`, `family`) | Bun 1.4.4, `packages/bun-types/serve.d.ts`, `bun.d.ts` |
+| `Lasm.JS.Deno.Serve` | `Deno.serve(handler)` as `serve`; `Deno.serve(options, handler)` as `serveWithOptions` (`ServeTcpOptions`: `port`, `hostname`, `signal`, `onListen`, `onError`, `reusePort`, `tcpBacklog`, `automaticCompression`, `transport`) and, with `cert` and `key`, `serveWithTlsOptions` (`ServeTcpTlsOptions`); `ServeHandler` (`Request → ServeHandlerInfo → Async Response`); `HttpServer` (`finished`, `shutdown`, `addr`, `ref`, `unref`); `ServeHandlerInfo` (`remoteAddr`, `completed`); the structure `NetAddr` (`transport`, `hostname`, `port`) | Deno 2.9.6, `cli/tsc/dts/lib.deno.ns.d.ts`, `lib.deno_net.d.ts` |
+| `Lasm.JS.Bun.Serve` | `Bun.serve(options)` as `serve`; `ServeOptions` (`fetch`, `port`, `hostname`, `error`, `idleTimeout`, `maxRequestBodySize`, `reusePort`, `ipv6Only`, `id`); `ServeOptionsFetch` (`Request → Server → Async Response`); `Server` (`stop`, `url`, `port`, `hostname`, `protocol`, `requestIP`, `timeout`, `fetch`, `reload`, `pendingRequests`, `closeIdleConnections`, `ref`, `unref`, `development`, `id`); the structure `SocketAddress` (`address`, `port`, `family`) | Bun 1.4.4, `packages/bun-types/serve.d.ts`, `bun.d.ts` |
 
 `import Lasm.JS.Deno` and `import Lasm.JS.Bun` import their module (and the
 Lasm.JS.Web modules it uses: `Dom`, `Fetch`, `Url`).
@@ -960,7 +960,8 @@ fails on one that is neither, so a new version's additions get a decision.
 
 | TypeScript | WebIDL | Lean |
 | --- | --- | --- |
-| an interface the runtime returns (`HttpServer`, `Server`, `NetAddr`) | `interface`, its properties `readonly attribute`s | a handle type; `server.addr : IO NetAddr`, `server.finished : Async Unit` |
+| an interface of an object the runtime keeps (`HttpServer`, `Server`, `ServeHandlerInfo`) | `interface`, its properties `readonly attribute`s | a handle type; `server.finished : Async Unit`, `server.shutdown : Async Unit` |
+| an interface of plain data the runtime hands over (`NetAddr`, `SocketAddress`) | `dictionary` | a structure, copied: `(← server.addr).port : Nat` |
 | an interface Lean passes (options) | `dictionary`; a property without `?` is `required` | a structure; `none` leaves a member out |
 | a method of an options object (`fetch(req, server)`) | a callback member | `ServeOptionsFetch.ofFn (f : Request → Server → Async Response)` |
 | a function type (`type ServeHandler = (request, info) => …`) | `callback` named after the alias, or the member (`ServeOptionsOnError`) | `.ofFn` (asynchronous) and `.ofSyncFn` |

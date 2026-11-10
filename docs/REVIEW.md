@@ -137,6 +137,10 @@ decisions themselves are logged with their reasoning in
   - **Bun's `Serve.Options` is one structure `ServeOptions`** with `fetch` required
     (the TCP and `fetch` alternatives of its `XOR<…>` types); `port` is the declared
     `string | number` (`DOMStringOrUnsignedShort`, a `Nat` coerces).
+  - **Plain-data results are structures, objects the runtime keeps are handles**:
+    `NetAddr` and `SocketAddress` are copied structures (`(← server.addr).port`),
+    `HttpServer`, `Server` and `ServeHandlerInfo` handles. The choice is per
+    declaration in `serve-tier2.mjs` (`as`), since TypeScript does not say which.
   - **Numbers the doc comments call ports, counts or sizes are `Nat`**, others
     `Float` (none in this cut).
   - **Left out**: Unix sockets, WebSockets (Tandem's proposal), Bun's `routes`,

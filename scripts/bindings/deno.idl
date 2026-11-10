@@ -92,15 +92,15 @@ dictionary Deno_TlsCertifiedKeyPem {
   required DOMString cert;
 };
 
-// interface Deno.NetAddr
+// options Deno.NetAddr
 [LasmHost="Deno", LasmLeanModule="Serve", LasmFile="lib.deno_net.d.ts", LasmName="NetAddr", LasmPath="Deno.NetAddr"]
-interface Deno_NetAddr {
+dictionary Deno_NetAddr {
   // transport: "tcp" | "udp"
-  [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="transport: 'tcp' | 'udp'"] readonly attribute Deno_NetAddrTransport transport;
+  required Deno_NetAddrTransport transport;
   // hostname: string
-  [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="hostname: string"] readonly attribute DOMString hostname;
+  required DOMString hostname;
   // port: number
-  [LasmHost="Deno", LasmFile="lib.deno_net.d.ts", LasmSignature="port: number"] readonly attribute unsigned short port;
+  required unsigned short port;
 };
 
 // options ServeTcpOptions & TlsCertifiedKeyPem

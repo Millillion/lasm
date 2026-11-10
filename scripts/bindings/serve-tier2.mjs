@@ -17,6 +17,10 @@
 // into library/Lasm/JS/{Deno,Bun}/*.lean with Lasm.JS.Web's mapping rules
 // (docs/JS_BINDINGS.md, "Lasm.JS.Deno and Lasm.JS.Bun").
 //
+// Declarations are lowered `as` an interface (a handle to an object the runtime
+// keeps: a server, a request's info), a dictionary (plain data, copied: options,
+// an address) or a callback (a function type).
+//
 // Selection. Every member of a selected declaration, and every overload of a
 // selected function, is either lowered or listed in `exclude` with the reason; the
 // lowering fails on a member that is neither, so a new version's additions are
@@ -67,7 +71,7 @@ export const hosts = [
       { name: 'ServeOptions', as: 'dictionary', module: 'Serve' },
       { name: 'ServeTcpOptions', as: 'dictionary', module: 'Serve' },
       { name: 'TlsCertifiedKeyPem', as: 'dictionary', module: 'Serve' },
-      { name: 'NetAddr', as: 'interface', module: 'Serve' },
+      { name: 'NetAddr', as: 'dictionary', module: 'Serve' },
     ],
     /** Intersections of selected object types, lowered to a dictionary inheriting the first. */
     intersections: { 'ServeTcpOptions & TlsCertifiedKeyPem': 'ServeTcpTlsOptions' },
@@ -106,7 +110,7 @@ export const hosts = [
           upgrade: 'WebSockets: outside the HTTP entry-point cut (the options have no websocket handlers; ROADMAP: Tandem\'s WebSocket proposal)',
           publish: 'WebSockets (as upgrade)', subscriberCount: 'WebSockets (as upgrade)', pendingWebSockets: 'WebSockets (as upgrade)',
         } },
-      { name: 'SocketAddress', as: 'interface', module: 'Serve' },
+      { name: 'SocketAddress', as: 'dictionary', module: 'Serve' },
       // Serve.Options is XOR<HostnamePortServeOptions, UnixServeOptions> & XOR<FetchOrRoutes,
       // FetchOrRoutesWithWebSocket> (types the Lean side cannot state): lowered as one dictionary of
       // the TCP alternative's members and FetchOrRoutes' second alternative's `fetch` (required there).

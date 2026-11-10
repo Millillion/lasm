@@ -11,10 +11,11 @@
 //   node scripts/bindings/serve-api.mjs --update-lock  # record the files' hashes (after a version bump)
 //
 // Lowering rules (each documented in docs/JS_BINDINGS.md):
-//   - a declared interface the runtime hands to Lean (a server, a request's info,
-//     an address) is a WebIDL interface, its properties readonly attributes; one
-//     Lean passes to the runtime (options) is a dictionary, a property without `?`
-//     `required`, a method of it a callback member;
+//   - a declared interface of an object the runtime hands to Lean and keeps (a
+//     server, a request's info) is a WebIDL interface, its properties readonly
+//     attributes; one of plain data (an address: copied into Lean) or that Lean
+//     passes to the runtime (options) is a dictionary, a property without `?`
+//     `required`, a method of it a callback member (serve-tier2.mjs's `as`);
 //   - `string` → DOMString, `boolean` → boolean, `number` → double unless
 //     serve-tier2.mjs's `integers` narrows it (quoting the doc comment), `void` →
 //     undefined, `unknown` → any; `null` and `undefined` alternatives make a type

@@ -65,15 +65,15 @@ interface Bun_Server {
   [LasmHost="Bun", LasmFile="serve.d.ts", LasmSignature="readonly id: string"] readonly attribute DOMString id;
 };
 
-// interface Bun.SocketAddress
+// options Bun.SocketAddress
 [LasmHost="Bun", LasmLeanModule="Serve", LasmFile="bun.d.ts", LasmName="SocketAddress", LasmPath="Bun.SocketAddress"]
-interface Bun_SocketAddress {
+dictionary Bun_SocketAddress {
   // address: string
-  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="address: string"] readonly attribute DOMString address;
+  required DOMString address;
   // port: number
-  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="port: number"] readonly attribute unsigned short port;
+  required unsigned short port;
   // family: "IPv4" | "IPv6"
-  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="family: 'IPv4' | 'IPv6'"] readonly attribute Bun_SocketAddressFamily family;
+  required Bun_SocketAddressFamily family;
 };
 
 // options Bun.Serve.Options

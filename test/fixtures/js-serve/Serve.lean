@@ -39,7 +39,7 @@ def main : IO UInt32 := do
   let g ← Lasm.JS.global
   if ← reflectHas g "Deno" then
     let ac ← AbortController.new
-    let onListen ← Deno.ServeOptionsOnListen.ofFn fun addr => do announce s!"listening {← addr.port}"
+    let onListen ← Deno.ServeOptionsOnListen.ofFn fun addr => do announce s!"listening {addr.port}"
     let handler ← Deno.ServeHandler.ofFn fun req _ => withShutdown ac.abort req
     let server ← Deno.serveWithOptions { port := some port, hostname := some "127.0.0.1", signal := some (← ac.signal), onListen := some onListen } handler
     server.finished.block

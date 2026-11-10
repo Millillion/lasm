@@ -22,13 +22,22 @@ instance : Nonempty Server := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS Server := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Server := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.Server", .data⟩
 
-/-- `interface Bun.SocketAddress` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
-structure SocketAddress where
-  /-- The JavaScript object. -/
-  val : Value
-instance : Nonempty SocketAddress := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS SocketAddress := ⟨fun x => .ref x.val ""⟩
-instance : FromJS SocketAddress := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketAddress", .data⟩
+/-- `enum SocketAddressFamily` (Bun 1.4.4 type declarations): "IPv4", "IPv6". -/
+inductive SocketAddressFamily where
+  /-- "IPv4" -/
+  | iPv4
+  /-- "IPv6" -/
+  | iPv6
+  deriving BEq, Repr, Inhabited
+instance : ToJS SocketAddressFamily := ⟨fun
+  | .iPv4 => .string "IPv4"
+  | .iPv6 => .string "IPv6"⟩
+instance : FromJS SocketAddressFamily where
+  fromJS
+    | .string "IPv4" => .ok .iPv4
+    | .string "IPv6" => .ok .iPv6
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.SocketAddressFamily"
 
 /-- `enum ServerProtocol` (Bun 1.4.4 type declarations): "http", "https". -/
 inductive ServerProtocol where
@@ -46,23 +55,6 @@ instance : FromJS ServerProtocol where
     | .string "https" => .ok .https
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Bun.ServerProtocol"
-
-/-- `enum SocketAddressFamily` (Bun 1.4.4 type declarations): "IPv4", "IPv6". -/
-inductive SocketAddressFamily where
-  /-- "IPv4" -/
-  | iPv4
-  /-- "IPv6" -/
-  | iPv6
-  deriving BEq, Repr, Inhabited
-instance : ToJS SocketAddressFamily := ⟨fun
-  | .iPv4 => .string "IPv4"
-  | .iPv6 => .string "IPv6"⟩
-instance : FromJS SocketAddressFamily where
-  fromJS
-    | .string "IPv4" => .ok .iPv4
-    | .string "IPv6" => .ok .iPv6
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Bun.SocketAddressFamily"
 
 /-- `callback ServeOptionsError = Promise<Response> (any error)` (Bun 1.4.4 type declarations, serve.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ServeOptionsError where
@@ -146,6 +138,21 @@ instance : ToJS RequestOrDOMString := ⟨fun
 instance : Coe Request RequestOrDOMString := ⟨.request⟩
 instance : Coe String RequestOrDOMString := ⟨.domString⟩
 
+/-- `dictionary SocketAddress` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure SocketAddress where
+  /-- `required DOMString address` -/
+  address : String
+  /-- `required unsigned short port` -/
+  port : Nat
+  /-- `required SocketAddressFamily family` -/
+  family : SocketAddressFamily
+instance : FromJS SocketAddress where
+  fromJS d := do return {
+    address := ← Lasm.JS.readField String d "address",
+    port := ← Lasm.JS.readField Nat d "port",
+    family := ← Lasm.JS.readField SocketAddressFamily d "family" }
+  typeName := "Lasm.JS.Bun.SocketAddress"
+
 /-- `readonly pendingRequests: number`: `readonly attribute unsigned long pendingRequests` -/
 def Server.pendingRequests (self : Server) : IO Nat := self.val.get "pendingRequests" Nat
 
@@ -202,15 +209,6 @@ def Server.ref (self : Server) : IO Unit :=
 /-- `unref(): void`: `undefined unref()` -/
 def Server.unref (self : Server) : IO Unit :=
   self.val.callMethod "unref" (Support.args #[]) Unit
-
-/-- `address: string`: `readonly attribute DOMString address` -/
-def SocketAddress.address (self : SocketAddress) : IO String := self.val.get "address" String
-
-/-- `port: number`: `readonly attribute unsigned short port` -/
-def SocketAddress.port (self : SocketAddress) : IO Nat := self.val.get "port" Nat
-
-/-- `family: 'IPv4' | 'IPv6'`: `readonly attribute SocketAddressFamily family` -/
-def SocketAddress.family (self : SocketAddress) : IO SocketAddressFamily := self.val.get "family" SocketAddressFamily
 
 /-- `Bun.serve(options: Serve.Options<WebSocketData, R>): Server<WebSocketData>`: `Server serve(ServeOptions options)` (Bun 1.4.4 type declarations) -/
 def serve (options : ServeOptions) : IO Server := do

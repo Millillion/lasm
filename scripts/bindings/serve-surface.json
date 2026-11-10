@@ -17,11 +17,6 @@
           "ref",
           "unref",
           "shutdown"
-        ],
-        "NetAddr": [
-          "transport",
-          "hostname",
-          "port"
         ]
       }
     },
@@ -47,11 +42,6 @@
           "protocol",
           "development",
           "id"
-        ],
-        "SocketAddress": [
-          "address",
-          "port",
-          "family"
         ]
       }
     }
