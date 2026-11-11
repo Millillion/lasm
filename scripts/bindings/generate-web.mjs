@@ -735,7 +735,10 @@ function resultOf(idlType, member = null) {
   if (dict.k === 'dict' && dictReadable(dict.name) && holdsRecord(dict)) return { async, t, lean, req: 'Value', post: `Support.cloneAs ${paren(lean)}` };
   // A record result is read through Object.entries (Lasm.JS.Node.Support.recordOf): Node's
   // process.env is not a plain object, and Deno's is a Proxy that structuredClone rejects.
-  if (dict.k === 'record' && !needsPost(dict.inner)) return { async, t, lean, req: 'Value', post: `Support.recordOf ${paren(retType(dict.inner))}` };
+  // A nullable record (D1's first(), R2's customMetadata) is none for null or undefined.
+  if (dict.k === 'record' && !needsPost(dict.inner)) return t.k === 'nullable'
+    ? { async, t, lean, req: '(Option Value)', post: `(fun r => r.mapM (Support.recordOf ${paren(retType(dict.inner))}))` }
+    : { async, t, lean, req: 'Value', post: `Support.recordOf ${paren(retType(dict.inner))}` };
   return { async, t, lean, req: paren(reqType(t)), post: postFn(t) };
 }
 function holdsRecord(t, seen = new Set()) {
