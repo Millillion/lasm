@@ -25,6 +25,12 @@ name: Differential testing
 # exceptions, signed and Float32 arithmetic, ByteArray, HashSet, TreeMap,
 # panics), 80 cases each, on every target: on pull requests and pushes the fixed
 # seeds of DIFF_FEATURE_SEEDS_PR, replayed; in campaigns one per fresh seed.
+# Coverage feedback (docs/TESTING.md#coverage-feedback), campaigns only: each
+# program's runtime-C reach and the node target's glue coverage are measured,
+# cases that reach something new join a corpus, and a quarter of each later core
+# program is mutants of it; the features and the corpus carry over from night to
+# night in the Actions cache (differential-coverage-<profile>-*). Pull requests
+# and pushes stay unguided, so their seeds alone reproduce them.
 on:
   pull_request:
     branches: [main]
@@ -216,6 +222,14 @@ jobs:
           version: ${{ env.PLAYWRIGHT }}
           browsers: ${{ steps.plan.outputs.browsers }}
           cache-key: playwright-${{ env.PLAYWRIGHT }}-differential-${{ steps.plan.outputs.browsers-key }}-ubuntu-24.04
+      # Campaigns: the coverage state of the latest campaign of this profile.
+      - name: Coverage state of earlier campaigns
+        if: steps.plan.outputs.budget != '0'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ github.workspace }}/.work/coverage-state.json
+          key: differential-coverage-${{ matrix.profile }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: differential-coverage-${{ matrix.profile }}-
       - name: Differential run
         id: run
         run: |
@@ -228,7 +242,8 @@ jobs:
           echo "seed $SEED, budget $BUDGET min"
           # Pull requests: the cheap subset of the extra oracles; campaigns: all of them.
           # Feature programs: the fixed seeds on pull requests, one per seed in campaigns.
-          if [ "$BUDGET" = 0 ]; then AMOUNT="--programs 3 --feat-seeds $DIFF_FEATURE_SEEDS_PR --feat-random 0"; TARGETS="$DIFF_TARGETS_PR"; else AMOUNT="--budget-min $BUDGET"; TARGETS="$DIFF_TARGETS_FULL"; fi
+          # Campaigns are coverage-guided (--guided 1), with the state carried over in the cache.
+          if [ "$BUDGET" = 0 ]; then AMOUNT="--programs 3 --feat-seeds $DIFF_FEATURE_SEEDS_PR --feat-random 0"; TARGETS="$DIFF_TARGETS_PR"; else AMOUNT="--budget-min $BUDGET --guided 1 --coverage-state $GITHUB_WORKSPACE/.work/coverage-state.json"; TARGETS="$DIFF_TARGETS_FULL"; fi
           SIZES="--cases 150 --fs-cases 25 --feat-cases 80"
           if [ "${{ inputs.feature-only || 'false' }}" = true ]; then SIZES="--cases 0 --fs-cases 0 --feat-cases 200"; fi
           T="$RUNNER_TEMP/tools"
@@ -237,6 +252,12 @@ jobs:
             --seed "$SEED" $AMOUNT $SIZES --targets "$TARGETS" \
             --profile "${{ matrix.profile }}" --regressions test/differential/regressions \
             --wasmtime "$T/wasmtime/wasmtime" --deno "$T/node_modules/.bin/deno" --bun "$T/bun-linux-x64/bun" --sm "$T/jsshell/js" --playwright "$GITHUB_WORKSPACE/.work/pw" 2>&1 | tee "$RUNNER_TEMP/difftest.log"
+      - name: Keep the coverage state for the next campaign
+        if: always() && steps.plan.outputs.budget != '0' && hashFiles('.work/coverage-state.json') != ''
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ github.workspace }}/.work/coverage-state.json
+          key: differential-coverage-${{ matrix.profile }}-${{ github.run_id }}-${{ github.run_attempt }}
       # The regression corpus in the dev profile too (node, then the other targets,
       # in one project: how a Node dev build followed by a WASI dev build failed).
       - name: Regressions in the dev profile
@@ -271,6 +292,8 @@ jobs:
           md += '\n\n**' + up.length + ' upstream suspects** (native Lean and its interpreter disagree: an upstream Lean question, not a Lasm failure).\n';
           for (const d of up) md += '\n- seed ' + (d.seed ?? 'regressions') + ' case ' + (d.case ?? d.cases ?? '') + ': ' + (d.what ?? 'output differs') + (d.regression ? ' (reproducer ' + d.regression + ')' : '');
           for (const k of s.knownDivergences ?? []) if (k.applied) md += '\n- known: ' + k.what + ' (' + k.issue + '), applied ' + k.applied + ' times';
+          const c = s.coverage;
+          if (c) md += '\n\n**Coverage feedback:** ' + c.features + ' features reached (' + c.runtimeC + ' runtime C, ' + c.glue + ' glue), **' + c.new + ' new** (' + c.newFrom.mutant + ' found by mutants of the corpus, ' + c.newFrom.generated + ' by generated cases), ' + c.cumulative + ' in all campaigns; corpus ' + c.corpus + ' cases, ' + c.mutants + ' mutants run.\n';
           require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY, md + '\n');
           " || true
       - name: Preserve reproducers and the summary
@@ -282,6 +305,7 @@ jobs:
             ${{ runner.temp }}/difftest.log
             ${{ runner.temp }}/difftest/summary.json
             ${{ runner.temp }}/difftest/repros
+            ${{ github.workspace }}/.work/coverage-state.json
             ${{ runner.temp }}/stack-depth.json
           retention-days: 30
           if-no-files-found: ignore

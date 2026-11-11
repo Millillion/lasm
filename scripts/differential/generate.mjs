@@ -581,6 +581,8 @@ function genStmts(r, kind, n, depth) {
   }
   return out;
 }
+// One fresh statement of a statement case's kind (coverage.mjs mutates with it).
+export const regenStatement = (r, kind, depth) => genStmts(r, kind, 1, depth)[0];
 const ind = n => '  '.repeat(n);
 function renderStateStmts(ss, d) {
   const lines = [];
@@ -658,6 +660,8 @@ const DEEP = [
   n => `((Array.range ${n}).foldl (fun (m : HashMap Nat Nat) i => m.insert (i * 7919 % ${n}) i) {}).size`,
   n => `(Nat.repr ((10 : Nat) ^ ${n} - 1)).length`,
 ];
+export const DEEP_COUNT = DEEP.length;
+export const DEEP_SIZES = [100, 1000, 3000, 5000];
 export function genCase(seed, index, { kinds = ['expr', 'state', 'io', 'task', 'deep'], depth = 4 } = {}) {
   const r = rng(seed, index);
   uniq = index * 1000;
@@ -665,7 +669,7 @@ export function genCase(seed, index, { kinds = ['expr', 'state', 'io', 'task', '
   // At most 5,000 frames of non-tail recursion: the edge profile and WASI are
   // bounded by the engine's Wasm stack (docs/EDGE.md, docs/WASI.md), about 9,000
   // frames of a small function (issue #30). Deeper recursion is a known difference.
-  if (kind === 'deep') return { kind, f: r.int(0, DEEP.length - 1), n: r.pick([100, 1000, 3000, 5000]) };
+  if (kind === 'deep') return { kind, f: r.int(0, DEEP.length - 1), n: r.pick(DEEP_SIZES) };
   if (kind === 'expr') {
     const t = r.weighted(TYPES.map(t => ({ t, w: ['Nat', 'Int', 'String', 'Float', 'UInt64'].includes(t) ? 3 : 1 }))).t;
     return { kind, t, e: genExpr(r, t, r.int(1, depth), [], {}) };
