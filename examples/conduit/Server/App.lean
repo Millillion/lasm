@@ -5,8 +5,8 @@ and tokens from Web Crypto, on a SQLite connection from one of the binding
 modules, or on a key-value store (`Server/Kv.lean`). The same code runs on
 every platform; only the store it is given differs.
 -/
-import Lasm.Fetch
 import Lasm.JS
+import Server.JsServe
 import Conduit.Api
 import Server.Sql
 import Server.Crypto
@@ -19,7 +19,7 @@ namespace Conduit.Server
 (Cloudflare Workers `[vars]` and secrets). -/
 def setting (name : String) : IO (Option String) := do
   if let some v ← IO.getEnv name then return some v
-  match ← Lasm.Fetch.platformEnv.get with
+  match ← JsServe.platformEnv.get with
   | .ref env _ => match ← (try env.get name Data catch _ => pure .undefined) with
     | .string s => return some s
     | _ => return none
@@ -43,16 +43,17 @@ def services : Services Async where
   issueToken id := do Crypto.issueToken (← secret) id ((← nowMs) / 1000)
   readToken token := do Crypto.readToken (← secret) token ((← nowMs) / 1000)
 
-/-- Serves Conduit on a store, with the browser app's files (`assets`:
-`embed_dir! "dist/public"` in the entry file). -/
-def serveStore (store : Store Async) (assets : Lasm.Fetch.Assets) : IO Unit :=
-  serveWith store services assets
+/-- Conduit on a store, with the browser app's files (`assets`:
+`embed_dir! "dist/public"` in the entry file), as the handler the entry file
+serves. -/
+def storeHandler (store : Store Async) (assets : Web.Assets) : IO Web.Handler :=
+  handlerWith store services assets
 
-/-- Serves Conduit on a SQL database (whose binding module created the
-tables). `isolate`: run writes alone in this process (`Isolation` in
+/-- Conduit on a SQL database (whose binding module created the tables).
+`isolate`: run writes alone in this process (`Isolation` in
 `Server/Http.lean`); off on Cloudflare Workers, which cancels a request that
 waits on another request's promise. -/
-def run (db : Sql) (assets : Lasm.Fetch.Assets) (isolate := true) : IO Unit :=
-  serveWith (store db) services assets isolate
+def sqlHandler (db : Sql) (assets : Web.Assets) (isolate := true) : IO Web.Handler :=
+  handlerWith (store db) services assets isolate
 
 end Conduit.Server

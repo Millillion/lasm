@@ -19,8 +19,9 @@ name = "Proofs"
 [[lean_lib]]
 name = "Frontend"
 
-# The server's modules (Lasm.Fetch, Lasm.JS): the SQL layer, Web Crypto,
-# the HTTP glue, and one SQLite binding module per target.
+# The server's modules (Lasm.JS, Lasm.Fastly, Lasm.WASI.Http): the HTTP
+# layer and each platform's server, the SQL layer, Web Crypto, and one
+# SQLite binding module per target.
 [[lean_lib]]
 name = "Server"
 
