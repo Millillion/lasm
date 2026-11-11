@@ -129,8 +129,14 @@ Frontend/             the browser app (Lasm.UI), also rendered by the server
   Model.lean          the app's state and messages; the flags the server hands over
   View.lean           every page, with the templates' markup
   Update.lean         what the app does: API calls, forms (validated as the server validates)
-Server/               the server (Lasm.Fetch; Lasm.JS where there is JavaScript)
+Server/               the server (Lasm.JS, Lasm.Fastly or Lasm.WASI.Http, per platform)
+  Web.lean            requests and responses in pure Lean, the path read as a browser reads it
+  Assets.lean         the browser app's files, embedded (Embed.lean: embed_dir!) and served
   Http.lean           HTTP: /api/… → Conduit.Api.handle, other URLs → their page (no JavaScript)
+  JsServe.lean        the JavaScript servers: the edge's default export, Deno.serve, Bun.serve
+  NodeServe.lean      Node's server: @hono/node-server (an npm package, bound with @[js])
+  FastlyServe.lean    Fastly Compute's server, on its host calls (Lasm.Fastly)
+  WasiHttpServe.lean  the wasi:http server and outgoing requests (Lasm.WASI.Http)
   Pages.lean          server rendering: a URL's data from the API, `view` to HTML, flags
   Sql.lean            every SQL statement; Conduit's Store on a SQLite connection
   Kv.lean             Conduit's Store on a key-value store (Lasm.KV.Store), the same rows as keys
@@ -216,7 +222,7 @@ It returns a `Sql` (three functions: `all`, `run`, `batch`), and `Server/Sql.lea
 Conduit's `Store` from it, so another SQLite is another `Sql`:
 
 - `Server/D1.lean` imports nothing: D1 is an object in the Worker's `env`
-  (`Lasm.Fetch.platformEnv`), its methods return promises that `callMethodAwait` awaits in
+  (`JsServe.platformEnv`, kept from each request), its methods return promises that `callMethodAwait` awaits in
   `Async` (no Lean thread held), and `batch` is D1's `db.batch` (one transaction).
 - `Server/BunSqlite.lean` binds `@[js "bun:sqlite" "new Database"]`. Lasm checks every binding
   against the real module at build time, so this one is built with Lasm running on Bun
@@ -231,8 +237,9 @@ Where there is no SQL, the store is `Server/Kv.lean` on a `Lasm.KV.Store` (get, 
   memory elsewhere (Vercel Edge): no binding at all.
 - `Server/NetlifyBlobs.lean` binds `@[js "@netlify/blobs" "getStore"]` and calls `get`, `set`
   and `delete` on the store.
-- `Server/Postgrest.lean` is plain HTTP (`Lasm.Fetch.fetch`) to PostgREST, so it also works where
-  there is no JavaScript (wasi-http).
+- `Server/Postgrest.lean` is plain HTTP to PostgREST, sent with the entry file's `send`:
+  Lasm.JS.Web's `fetch` on Supabase, wasi:http's outgoing-handler where there is no JavaScript
+  (wasi-http).
 
 Each target has its own entry file because Lasm bundles a program's bound modules: the Workers
 build must not mention `node:sqlite`. The full guide is [docs/JS_BINDINGS.md](../../docs/JS_BINDINGS.md).

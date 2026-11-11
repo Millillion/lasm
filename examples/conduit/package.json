@@ -41,10 +41,19 @@
   "engines": {
     "node": ">=24"
   },
+  "dependencies": {
+    "@hono/node-server": "2.1.3",
+    "hono": "4.13.13"
+  },
   "devDependencies": {
-    "@lasm/cli": "0.5.1",
+    "@lasm/cli": "0.7.0",
     "@netlify/blobs": "11.1.7",
     "@orangeopensource/hurl": "8.0.4",
     "@playwright/test": "1.63.0"
+  },
+  "lasm": {
+    "edge": {
+      "exclude": ["@hono/node-server"]
+    }
   }
 }

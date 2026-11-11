@@ -111,7 +111,8 @@ elements directly, one element per tree element, so the browser's HTML parser ne
 from the Markdown; `preview_safe` proves that whatever is typed, the preview creates only Folio's
 elements and attributes, never an event handler or an unsafe URL.
 [`PreviewServer.lean`](PreviewServer.lean) serves the page and `POST /api/render` (the same
-function on the server's runtime).
+function on the server's runtime), with each runtime's own server: `@hono/node-server` on Node,
+`Bun.serve` and `Deno.serve` ([`Server/`](Server)).
 
 | Server | Build | Run | Checked in CI by |
 | --- | --- | --- | --- |
@@ -132,7 +133,8 @@ function `folio build` runs, and answers with the page it asks for. `GET /` serv
 `/feed.xml` the feed and `/SLUG/` a page (`/SLUG` redirects there). `POST /api/render` renders the
 request's body: by default with the safe defaults, as HTML; with `?raw_html=1` with raw HTML
 enabled, as text. No request writes to the store. The site changes when its files in the store
-change.
+change. Workers and Deno Deploy run it as the program's default export (`export default {fetch}`),
+Fastly on its own host calls ([`Server/`](Server)).
 
 The store holds each file of the site's directory under its path (`index.md`, `content/hello.md`,
 `layouts/page.html`), and `files`, the list of those paths, one per line.
@@ -226,6 +228,7 @@ fuzzing and twenty differential seeds of larger documents.
 | [`Cli.lean`](Cli.lean), [`site/`](site) | The `folio` command, and an example site |
 | [`Preview/Page.lean`](Preview/Page.lean), [`PreviewClient.lean`](PreviewClient.lean), [`PreviewServer.lean`](PreviewServer.lean) | The live preview and its server |
 | [`ServerEdge.lean`](ServerEdge.lean), [`tools/kv.mjs`](tools/kv.mjs) | The site server for Fastly, Workers and Deno Deploy, and the store's entries for a site |
+| [`Server/`](Server) | The servers' HTTP layer: requests and responses, the embedded page files, and each platform's server (Lasm.JS.Web with `@hono/node-server`, `Bun.serve`, `Deno.serve` and the edge's default export; Lasm.Fastly) |
 | [`Batch.lean`](Batch.lean), [`BatchBrowser.lean`](BatchBrowser.lean), [`Folio/Batch.lean`](Folio/Batch.lean) | Renders many documents in one run (Node, WASI, the browser), for the tests |
 | [`test/`](test) | The specification's examples, the edge platforms' tests, the differential test, the pathological inputs and the fuzzer, the command's checks, the proof checks |
 
