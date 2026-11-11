@@ -762,13 +762,18 @@ function emitInterface(module, name) {
     : `/-- \`interface ${jsPath(name)}${d.inheritance ? ' : ' + d.inheritance : ''}\` (${specOf(d.spec)}): a handle to the JavaScript object. -/`;
   // LasmNoHandle (Node's Buffer): no handle type, a Lean ByteArray stands for the object.
   if (!extAttr(d, 'LasmNoHandle')) {
-    if (parent) decls.push(`${header}\nstructure ${T} extends ${parent}`);
+    // The parent projection is `to<Parent>` (`toEventEmitter`), or, where an ancestor's projection has that name
+    // (https.Server → http.Server → net.Server), `to` and every component of the parent's name (`toHttpServer`).
+    const ancestorsLast = [];
+    for (let a = parent ? def(d.inheritance).inheritance : null; a && selectedInterfaces.has(a); a = def(a).inheritance) ancestorsLast.push(leanTypeName(a).split('.').at(-1));
+    const projection = parent && ancestorsLast.includes(parent.split('.').at(-1) ?? '') ? 'to' + parent.split('.').map(capital).join('') : null;
+    if (parent) decls.push(`${header}\nstructure ${T} extends ${projection ? projection + ' : ' : ''}${parent}`);
     else decls.push(`${header}\nstructure ${T} where\n  /-- The JavaScript object. -/\n  val : Value`);
     decls.push(`instance : Nonempty ${T} := ⟨{ val := Classical.ofNonempty }⟩`);
     decls.push(`instance : ToJS ${T} := ⟨fun x => .ref x.val ""⟩`);
     decls.push(`instance : FromJS ${T} := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "${ns}.${T}", .data⟩`);
     // An instance where its parent is expected (an HTMLElement for a Node argument).
-    if (parent) decls.push(`instance : Coe ${T} ${parent} := ⟨${T}.to${parent.split('.').at(-1)}⟩`);
+    if (parent) decls.push(`instance : Coe ${T} ${parent} := ⟨${T}.${projection ?? 'to' + parent.split('.').at(-1)}⟩`);
     o.types.push(decls.join('\n'));
   }
 
@@ -852,8 +857,18 @@ function emitInterface(module, name) {
         if (res.async) fail(`${T}.${n}: an asynchronous method on bytes`);
         body = `Support.callOnBytes "${jsModule}" "${jsPath(name)}.prototype.${op.name}" self ${al.args} ${res.req}`;
         fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'operation'))} (self : ByteArray)${al.binders ? ' ' + al.binders : ''} : IO ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`);
+      } else if (extAttr(op, 'LasmEvent')) {
+        // Lasm.JS.Node's events: `on<Event>` / `once<Event>` call emitter.on / emitter.once with the event's name.
+        const args = al.args.replace('(Support.args #[', `(Support.args #[toJS ${JSON.stringify(extValue(extAttr(op, 'LasmEvent')))}, `);
+        body = `self.val.callMethod "${extAttr(op, 'LasmOnce') ? 'once' : 'on'}" ${args} ${res.req}`;
+        fns.push(`${doc(op, `: calls \`${extAttr(op, 'LasmOnce') ? 'once' : 'on'}(${JSON.stringify(extValue(extAttr(op, 'LasmEvent')))}, listener)\``)}\ndef ${T}.${id(take(n, 'event'))} (self : ${T})${al.binders ? ' ' + al.binders : ''} : IO ${paren(res.lean)} :=${res.post ? ' ' + finish(body, res) : '\n  ' + body}`);
       } else {
         body = res.async ? `self.val.callMethodAwait "${op.name}" ${al.args} ${res.req}` : `self.val.callMethod "${op.name}" ${al.args} ${res.req}`;
+        // LasmPromisify on a method (`server.getConnections(callback)`): the bound method through util.promisify.
+        if (extAttr(op, 'LasmPromisify')) {
+          if (!res.async) fail(`${T}.${n}: LasmPromisify without a Promise result`);
+          body = `Support.promisifiedMethod ${res.req} self.val "${op.name}" ${al.args}`;
+        }
         fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'operation'))} (self : ${T})${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`);
       }
     });
@@ -1102,6 +1117,15 @@ lowered to WebIDL by scripts/bindings/serve-api.mjs (webidl2 ${webidl2Version});
 docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote each member's TypeScript
 declaration and its lowered WebIDL.`;
 const files = new Map();
+/** Lasm.JS.Node: an instance on a type with a namespaced name (`stream.Readable.CloseListener`, `FileHandle.CloseListener`)
+ * is named after every component of it (`instFromJSStreamReadableCloseListener`): Lean's automatic name keeps only the
+ * last (`instFromJSCloseListener`), which two such types share. */
+const nameInstances = text => text.replace(/^instance : (\w+) ((?:[\w.]+|\([^()]*\))(?: (?:[\w.]+|\([^()]*\)))*)( :=| where)$|^instance : (\w+) ((?:[\w.]+|\([^()]*\))(?: (?:[\w.]+|\([^()]*\)))*) :=/gm, (all, c1, a1, end, c2, a2) => {
+  const cls = c1 ?? c2, args = a1 ?? a2;
+  if (!/[A-Za-z]\w*\.[A-Za-z]/.test(args)) return all;
+  const flat = args.replace(/[()]/g, ' ').split(/\s+/).filter(Boolean).map(a => a.split('.').map(capital).join('')).join('');
+  return `instance inst${cls}${flat} : ${cls} ${args}${end ?? ' :='}`;
+});
 const moduleFile = key => join(root, 'library', ...key.split('.')) + '.lean';
 for (const m of plan) {
   const o = out.get(m.key);
@@ -1113,7 +1137,7 @@ ${m.key}: ${m.title} (${m.specs}).
 ${isNode ? nodeGeneratedBy : m.host ? hostGeneratedBy(m.host) : generatedBy}
 -/`, ...imports.map(i => `import ${i}`), '', `namespace ${m.ns}`, isNode || m.host ? 'open Lasm.JS Lasm.JS.Web' : 'open Lasm.JS', '',
   ...o.types.flatMap(t => [t, '']), ...o.support.flatMap(t => [t, '']), ...o.decls.flatMap(t => [t, '']), `end ${m.ns}`, ''].join('\n');
-  files.set(moduleFile(m.key), text);
+  files.set(moduleFile(m.key), isNode ? nameInstances(text) : text);
 }
 files.set(join(root, 'library', 'Lasm', 'JS', 'Web.lean'), [`/-
 ${NS}: the WinterTC Minimum Common Web API (https://min-common-api.proposal.wintertc.org/),
@@ -1206,7 +1230,9 @@ for (const m of plan.filter(m => m.ns === NODE_NS)) {
     const members = membersOf(i);
     nodeSurface.push({ lean: leanTypeName(i), module: jsModuleOf(i), path: extValue(extAttr(def(i), 'LasmPath')) ?? null, leanModule: m.name,
       static: [...new Set(members.filter(x => x.special === 'static').map(memberName))],
-      prototype: [...new Set(members.filter(x => x.special !== 'static' && x.type === 'operation').map(memberName))],
+      prototype: [...new Set(members.filter(x => x.special !== 'static' && x.type === 'operation' && !extAttr(x, 'LasmEvent')).map(memberName))],
+      // Documented events (`on<Event>` / `once<Event>` call emitter.on / emitter.once: not members of the object).
+      ...(members.some(x => extAttr(x, 'LasmEvent')) ? { events: [...new Set(members.filter(x => extAttr(x, 'LasmEvent')).map(x => extValue(extAttr(x, 'LasmEvent'))))] } : {}),
       instance: [...new Set(members.filter(x => x.special !== 'static' && x.type === 'attribute').map(memberName))] });
   }
 }

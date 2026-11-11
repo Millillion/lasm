@@ -24,7 +24,7 @@ export const version = '24.22.2';
 export const compareVersion = '26.13.0';
 
 /** The doc/api files read. */
-export const docs = ['fs', 'path', 'os', 'process', 'buffer', 'crypto', 'child_process', 'events', 'stream'];
+export const docs = ['fs', 'path', 'os', 'process', 'buffer', 'crypto', 'child_process', 'events', 'stream', 'net', 'http', 'https'];
 
 /**
  * Lean modules (Lasm.JS.Node.<name>), in import order. A container is
@@ -41,10 +41,18 @@ export const modules = [
       only: ['emit', 'eventNames', 'listenerCount', 'off', 'on', 'once', 'removeAllListeners'] },
   ] },
   { name: 'Stream', title: 'Node streams, as handles converted to and from web streams', doc: 'stream', containers: [
-    { kind: 'class', heading: null, name: 'stream.Readable', jsModule: 'node:stream', path: 'Readable', prefix: null,
-      statics: { heading: 'Stream', prefix: 'stream.Readable.' }, only: ['toWeb', 'fromWeb'] },
-    { kind: 'class', heading: null, name: 'stream.Writable', jsModule: 'node:stream', path: 'Writable', prefix: null,
-      statics: { heading: 'Stream', prefix: 'stream.Writable.' }, only: ['toWeb', 'fromWeb'] },
+    // The stream classes' events (`'data'`, `'end'`) are the docs' `Class: stream.Readable`'s; every stream is an
+    // EventEmitter ("All streams are instances of EventEmitter", stream.md: extendsQuote).
+    { kind: 'class', heading: 'Class: `stream.Readable`', name: 'stream.Readable', jsModule: 'node:stream', path: 'Readable', prefix: 'readable.',
+      extends: 'EventEmitter', extendsQuote: { doc: 'stream', quote: 'All streams are instances of EventEmitter.' },
+      statics: { heading: 'Stream', prefix: 'stream.Readable.' }, only: ['toWeb', 'fromWeb', 'pause', 'resume', 'isPaused', 'destroy', 'setEncoding'] },
+    { kind: 'class', heading: 'Class: `stream.Writable`', name: 'stream.Writable', jsModule: 'node:stream', path: 'Writable', prefix: 'writable.',
+      extends: 'EventEmitter', extendsQuote: { doc: 'stream', quote: 'All streams are instances of EventEmitter.' },
+      statics: { heading: 'Stream', prefix: 'stream.Writable.' }, only: ['toWeb', 'fromWeb', 'write', 'end', 'destroy'] },
+    // A Duplex is both; a Lean structure has one parent, its Readable side (stream.Readable.toWeb takes it).
+    { kind: 'class', heading: 'Class: `stream.Duplex`', name: 'stream.Duplex', jsModule: 'node:stream', path: 'Duplex', prefix: 'duplex.',
+      extends: 'stream.Readable', extendsQuote: { doc: 'stream', quote: 'Duplex streams are streams that implement both the Readable and Writable interfaces.' },
+      statics: { heading: 'Stream', prefix: 'stream.Duplex.' }, only: ['toWeb', 'fromWeb'] },
   ] },
   { name: 'Buffer', title: 'character encodings of bytes', doc: 'buffer', containers: [
     // A Buffer is a ByteArray in Lean (a copy, as every Uint8Array): the static
@@ -99,6 +107,50 @@ export const modules = [
     { kind: 'namespace', heading: 'Asynchronous process creation', name: 'child_process', jsModule: 'node:child_process', prefix: 'child_process.',
       only: ['execFile', 'spawn'] },
   ] },
+  // node:net, node:http and node:https (added 2026-11-11; DECISIONS.md). Servers, sockets and requests are event
+  // emitters: their documented events are typed listeners (`server.onRequest`, docs/JS_BINDINGS.md "Events").
+  // A constructor the docs show only as a heading (`new net.Socket([options])`, lost in the JSON) is stated in `ctor`
+  // and checked against the class's documented parameters.
+  { name: 'Net', title: 'TCP servers and sockets', doc: 'net', containers: [
+    { kind: 'class', heading: 'Class: `net.SocketAddress`', name: 'net.SocketAddress', jsModule: 'node:net', path: 'SocketAddress', prefix: 'socketaddress.',
+      ctor: 'new net.SocketAddress([options])', exclude: {} },
+    { kind: 'class', heading: 'Class: `net.BlockList`', name: 'net.BlockList', jsModule: 'node:net', path: 'BlockList', prefix: 'blockList.',
+      ctor: 'new net.BlockList()', exclude: {} },
+    { kind: 'class', heading: 'Class: `net.BoundSocket`', name: 'net.BoundSocket', jsModule: 'node:net', path: 'BoundSocket', prefix: 'boundSocket.',
+      ctor: 'new net.BoundSocket([options])', exclude: {} },
+    { kind: 'class', heading: 'Class: `net.Server`', name: 'net.Server', jsModule: 'node:net', path: 'Server', prefix: 'server.', extends: 'EventEmitter',
+      ctor: 'new net.Server([options][, connectionListener])',
+      exclude: { 'listen(handle[, backlog][, callback])': 'listens on a libuv handle or file descriptor object ({Object}): the options, path and port forms cover TCP and IPC' } },
+    { kind: 'class', heading: 'Class: `net.Socket`', name: 'net.Socket', jsModule: 'node:net', path: 'Socket', prefix: 'socket.', extends: 'stream.Duplex',
+      ctor: 'new net.Socket([options])', exclude: {} },
+    { kind: 'namespace', heading: 'Net', name: 'net', jsModule: 'node:net', prefix: 'net.', exclude: {} },
+  ] },
+  { name: 'Http', title: 'HTTP servers and clients', doc: 'http', containers: [
+    { kind: 'class', heading: 'Class: `http.Agent`', name: 'http.Agent', jsModule: 'node:http', path: 'Agent', prefix: 'agent.', ctor: 'new Agent([options])', exclude: {} },
+    // OutgoingMessage extends the legacy Stream (outside this cut), an EventEmitter; it is not a stream.Writable.
+    { kind: 'class', heading: 'Class: `http.OutgoingMessage`', name: 'http.OutgoingMessage', jsModule: 'node:http', path: 'OutgoingMessage', prefix: 'outgoingMessage.',
+      extends: 'EventEmitter', extendsQuote: { doc: 'stream', quote: 'All streams are instances of EventEmitter.' },
+      exclude: { pipe: 'documented to throw (an OutgoingMessage is write-only)' } },
+    { kind: 'class', heading: 'Class: `http.ClientRequest`', name: 'http.ClientRequest', jsModule: 'node:http', path: 'ClientRequest', prefix: 'request.',
+      extends: 'http.OutgoingMessage', exclude: {} },
+    { kind: 'class', heading: 'Class: `http.ServerResponse`', name: 'http.ServerResponse', jsModule: 'node:http', path: 'ServerResponse', prefix: 'response.',
+      extends: 'http.OutgoingMessage', exclude: {} },
+    { kind: 'class', heading: 'Class: `http.IncomingMessage`', name: 'http.IncomingMessage', jsModule: 'node:http', path: 'IncomingMessage', prefix: 'message.',
+      extends: 'stream.Readable', exclude: {} },
+    { kind: 'class', heading: 'Class: `http.Server`', name: 'http.Server', jsModule: 'node:http', path: 'Server', prefix: 'server.', extends: 'net.Server',
+      exclude: { listen: 'documented as identical to net.Server\'s server.listen(), whose typed forms http.Server inherits' } },
+    { kind: 'namespace', heading: 'HTTP', name: 'http', jsModule: 'node:http', prefix: 'http.', exclude: {} },
+  ] },
+  { name: 'Https', title: 'HTTPS servers and clients', doc: 'https', containers: [
+    { kind: 'class', heading: 'Class: `https.Agent`', name: 'https.Agent', jsModule: 'node:https', path: 'Agent', prefix: 'agent.', ctor: 'new Agent([options])',
+      extends: 'http.Agent', extendsQuote: { doc: 'https', quote: 'An Agent object for HTTPS similar to http.Agent.' }, exclude: {} },
+    // https.Server extends tls.Server (outside this cut), which extends net.Server; the docs give it http.Server's API
+    // ("See http.Server for more information"): its parent here is http.Server, so it has the request events.
+    { kind: 'class', heading: 'Class: `https.Server`', name: 'https.Server', jsModule: 'node:https', path: 'Server', prefix: 'server.',
+      extends: 'http.Server', extendsQuote: { doc: 'https', quote: 'See http.Server for more information.' },
+      exclude: { listen: 'documented as the same as http.Server\'s server.listen(), net.Server\'s typed forms, inherited' } },
+    { kind: 'namespace', heading: 'HTTPS', name: 'https', jsModule: 'node:https', prefix: 'https.', exclude: {} },
+  ] },
 ];
 
 /**
@@ -111,9 +163,13 @@ export const typeNames = {
   string: 'DOMString', integer: 'long long', number: 'double', boolean: 'boolean', bigint: 'bigint', any: 'any', symbol: 'symbol',
   Buffer: 'bytes', TypedArray: 'bytes', DataView: 'bytes', Uint8Array: 'bytes', SharedArrayBuffer: 'bytes', ArrayBuffer: 'ArrayBuffer',
   Function: 'Function', URL: 'URL', AbortSignal: 'AbortSignal', ReadableStream: 'ReadableStream', WritableStream: 'WritableStream',
-  CryptoKey: 'CryptoKey', Blob: 'Blob',
+  CryptoKey: 'CryptoKey', Blob: 'Blob', Headers: 'Headers', Map: 'object',
   FileHandle: 'FileHandle', 'fs.Stats': 'fs.Stats', 'fs.Dirent': 'fs.Dirent', Hash: 'Hash', Hmac: 'Hmac', ChildProcess: 'ChildProcess',
-  EventEmitter: 'EventEmitter', 'stream.Readable': 'stream.Readable', 'stream.Writable': 'stream.Writable',
+  EventEmitter: 'EventEmitter', 'stream.Readable': 'stream.Readable', 'stream.Writable': 'stream.Writable', 'stream.Duplex': 'stream.Duplex',
+  'net.Server': 'net.Server', 'net.Socket': 'net.Socket', 'net.BlockList': 'net.BlockList', 'net.SocketAddress': 'net.SocketAddress', 'net.BoundSocket': 'net.BoundSocket',
+  'http.Agent': 'http.Agent', 'http.ClientRequest': 'http.ClientRequest', 'http.IncomingMessage': 'http.IncomingMessage',
+  'http.OutgoingMessage': 'http.OutgoingMessage', 'http.ServerResponse': 'http.ServerResponse', 'http.Server': 'http.Server',
+  'https.Agent': 'https.Agent', 'https.Server': 'https.Server', Handle: 'object', 'tls.Server': 'object', 'tls.TLSSocket': 'object',
   Object: 'object', Array: 'sequence<any>', Error: 'any', Date: 'object', RegExp: 'object', Iterable: 'object', AsyncIterable: 'object',
   KeyObject: 'object', Stream: 'object', 'fs.ReadStream': 'object', 'fs.WriteStream': 'object', 'fs.Dir': 'object', 'fs.StatFs': 'object',
 };
@@ -151,6 +207,22 @@ export const prose = {
   'crypto.randomInt': { returns: 'long long', quote: 'Return a random integer n such that min <= n < max.' },
   'child_process.execFile': { promisify: true, returns: 'Promise<child_process.ExecFileResult>',
     quote: 'returns a Promise for an Object with stdout and stderr properties.' },
+  'net.setDefaultAutoSelectFamily': { params: { value: 'boolean' }, quote: 'value <boolean> The new default value.' },
+  'net.setDefaultAutoSelectFamilyAttemptTimeout': { params: { value: 'double' }, quote: 'value <number> The new default value, which must be a positive number.' },
+  'http.createServer': { params: { requestListener: 'http.Server.RequestListener' },
+    quote: 'The requestListener is a function which is automatically added to the \'request\' event.' },
+  'https.createServer': { params: { requestListener: 'http.Server.RequestListener' }, quote: 'A listener to be added to the \'request\' event.' },
+  'net.createServer': { params: { connectionListener: 'net.Server.ConnectionListener' }, quote: 'Automatically set as a listener for the [\'connection\'][] event.' },
+  'net.Server.constructor': { params: { connectionListener: 'net.Server.ConnectionListener' }, quote: 'Automatically set as a listener for the [\'connection\'][] event.' },
+  'socket.connect': { params: { connectListener: 'net.Socket.ConnectListener' }, quote: 'will be added as a listener for the \'connect\' event once.' },
+  'net.createConnection': { params: { connectListener: 'net.Socket.ConnectListener' }, quote: 'will be added as a listener for the \'connect\' event once.' },
+  'net.connect': { params: { connectListener: 'net.Socket.ConnectListener' }, quoteDoc: true,
+    quote: 'If supplied, will be added as a listener for the [\'connect\'][] event on the returned socket once.' },
+  'server.address': { returns: '(net.AddressInfo or DOMString)?', quote: 'Returns the bound address, the address family name, and port of the server' },
+  'socket.address': { returns: 'net.AddressInfo', quote: 'Returns the bound address, the address family name and port of the socket' },
+  'BlockList.isBlockList': { returns: 'boolean', quote: 'Returns true if the value is a net.BlockList.' },
+  'https.globalAgent': { returns: 'https.Agent', quote: 'Global instance of https.Agent for all HTTPS client requests.' },
+  'server.getConnections': { returns: 'Promise<long long>', quote: 'Callback should take two arguments err and count.' },
   'child_process.spawn': { params: { 'options.env': 'record<DOMString, DOMString>' }, quote: 'Environment key-value pairs.' },
 };
 /**
@@ -177,4 +249,23 @@ export const proseIdl = [
     idl: '[LasmNamespace="FileHandle"] dictionary WriteStringResult { required long long bytesWritten; required DOMString buffer; };' },
   { doc: 'child_process', quote: 'returns a Promise for an Object with stdout and stderr properties.',
     idl: '[LasmNamespace="child_process"] dictionary ExecFileResult { required (DOMString or bytes) stdout; required (DOMString or bytes) stderr; };' },
+  { doc: 'net', quote: "{ port: 12346, family: 'IPv4', address: '127.0.0.1' }",
+    idl: '[LasmNamespace="net"] dictionary AddressInfo { required long long port; required DOMString family; required DOMString address; };' },
+  { doc: 'net', quote: 'data <Object> The argument passed to event listener. localAddress <string> Local address.',
+    idl: '[LasmNamespace="net.Server"] dictionary DropData { DOMString localAddress; double localPort; DOMString localFamily; DOMString remoteAddress; double remotePort; DOMString remoteFamily; };' },
 ];
+
+/**
+ * Events whose arguments the docs list only in prose (`Event: 'lookup'`: "err <Error> | <null> The error object…"),
+ * in WebIDL, keyed `<class>#<event>`, with a sentence of the event's documentation (the lowering fails without it).
+ */
+export const eventProse = {
+  'ChildProcess#close': { args: [{ type: 'long long?', name: 'code' }, { type: 'DOMString?', name: 'signal' }],
+    quote: 'or null if the child process terminated due to a signal.' },
+  'ChildProcess#exit': { args: [{ type: 'long long?', name: 'code' }, { type: 'DOMString?', name: 'signal' }],
+    quote: 'or null if the child process terminated due to a signal.' },
+  'net.Server#drop': { args: [{ type: 'net.Server.DropData?', name: 'data' }],
+    quote: 'If it is a TCP server, the argument is as follows, otherwise the argument is undefined.' },
+  'net.Socket#lookup': { args: [{ type: 'any', name: 'err' }, { type: 'DOMString', name: 'address' }, { type: 'double?', name: 'family' }, { type: 'DOMString', name: 'host' }],
+    quote: 'Emitted after resolving the host name but before connecting.' },
+};

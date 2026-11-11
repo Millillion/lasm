@@ -13,6 +13,12 @@ namespace events {
 // Class: `EventEmitter` (events.md), node:events
 [LasmModule="node:events", LasmPath="EventEmitter", LasmLeanModule="Events", LasmDoc="events", LasmName="EventEmitter"]
 interface Node_EventEmitter {
+  // Event: 'newListener' [events.md]
+  [LasmEvent="newListener", LasmSignature="Event: 'newListener'", LasmAdded="v0.1.26"] Node_EventEmitter onNewListener(Node_EventEmitter_NewListenerListener listener);
+  [LasmEvent="newListener", LasmSignature="Event: 'newListener'", LasmAdded="v0.1.26", LasmOnce] Node_EventEmitter onceNewListener(Node_EventEmitter_NewListenerListener listener);
+  // Event: 'removeListener' [events.md]
+  [LasmEvent="removeListener", LasmSignature="Event: 'removeListener'", LasmAdded="v0.9.3"] Node_EventEmitter onRemoveListener(Node_EventEmitter_RemoveListenerListener listener);
+  [LasmEvent="removeListener", LasmSignature="Event: 'removeListener'", LasmAdded="v0.9.3", LasmOnce] Node_EventEmitter onceRemoveListener(Node_EventEmitter_RemoveListenerListener listener);
   // `emitter.emit(eventName[, ...args])` [events.md]
   [LasmSignature="emitter.emit(eventName[, ...args])", LasmAdded="v0.1.26"] boolean emit((DOMString or symbol) eventName, any... args);
   // `emitter.eventNames()` [events.md]
@@ -29,22 +35,86 @@ interface Node_EventEmitter {
   [LasmSignature="emitter.removeAllListeners([eventName])", LasmAdded="v0.1.26"] Node_EventEmitter removeAllListeners(optional (DOMString or symbol) eventName);
 };
 
-// Stream (stream.md), node:stream
+// Class: `stream.Readable` (stream.md), node:stream
 [LasmModule="node:stream", LasmPath="Readable", LasmLeanModule="Stream", LasmDoc="stream", LasmNamespace="stream", LasmName="Readable"]
-interface Node_stream_Readable {
+interface Node_stream_Readable : Node_EventEmitter {
+  // Event: 'close' [stream.md]
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.9.4"] Node_stream_Readable onClose(Node_stream_Readable_CloseListener listener);
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Readable onceClose(Node_stream_Readable_CloseListener listener);
+  // Event: 'data' [stream.md]
+  [LasmEvent="data", LasmSignature="Event: 'data'", LasmAdded="v0.9.4"] Node_stream_Readable onData(Node_stream_Readable_DataListener listener);
+  [LasmEvent="data", LasmSignature="Event: 'data'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Readable onceData(Node_stream_Readable_DataListener listener);
+  // Event: 'end' [stream.md]
+  [LasmEvent="end", LasmSignature="Event: 'end'", LasmAdded="v0.9.4"] Node_stream_Readable onEnd(Node_stream_Readable_EndListener listener);
+  [LasmEvent="end", LasmSignature="Event: 'end'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Readable onceEnd(Node_stream_Readable_EndListener listener);
+  // Event: 'error' [stream.md]
+  [LasmEvent="error", LasmSignature="Event: 'error'", LasmAdded="v0.9.4"] Node_stream_Readable onError(Node_stream_Readable_ErrorListener listener);
+  [LasmEvent="error", LasmSignature="Event: 'error'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Readable onceError(Node_stream_Readable_ErrorListener listener);
+  // Event: 'pause' [stream.md]
+  [LasmEvent="pause", LasmSignature="Event: 'pause'", LasmAdded="v0.9.4"] Node_stream_Readable onPause(Node_stream_Readable_PauseListener listener);
+  [LasmEvent="pause", LasmSignature="Event: 'pause'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Readable oncePause(Node_stream_Readable_PauseListener listener);
+  // Event: 'readable' [stream.md]
+  [LasmEvent="readable", LasmSignature="Event: 'readable'", LasmAdded="v0.9.4"] Node_stream_Readable onReadable(Node_stream_Readable_ReadableListener listener);
+  [LasmEvent="readable", LasmSignature="Event: 'readable'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Readable onceReadable(Node_stream_Readable_ReadableListener listener);
+  // Event: 'resume' [stream.md]
+  [LasmEvent="resume", LasmSignature="Event: 'resume'", LasmAdded="v0.9.4"] Node_stream_Readable onResume(Node_stream_Readable_ResumeListener listener);
+  [LasmEvent="resume", LasmSignature="Event: 'resume'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Readable onceResume(Node_stream_Readable_ResumeListener listener);
+  // `readable.destroy([error])` [stream.md]
+  [LasmSignature="readable.destroy([error])", LasmAdded="v8.0.0"] Node_stream_Readable destroy(optional any error);
+  // `readable.isPaused()` [stream.md]
+  [LasmSignature="readable.isPaused()", LasmAdded="v0.11.14"] boolean isPaused();
+  // `readable.pause()` [stream.md]
+  [LasmSignature="readable.pause()", LasmAdded="v0.9.4"] Node_stream_Readable pause();
+  // `readable.resume()` [stream.md]
+  [LasmSignature="readable.resume()", LasmAdded="v0.9.4"] Node_stream_Readable resume();
+  // `readable.setEncoding(encoding)` [stream.md]
+  [LasmSignature="readable.setEncoding(encoding)", LasmAdded="v0.9.4"] Node_stream_Readable setEncoding(DOMString encoding);
   // `stream.Readable.fromWeb(readableStream[, options])` [stream.md]
   [LasmSignature="stream.Readable.fromWeb(readableStream[, options])", LasmAdded="v17.0.0"] static Node_stream_Readable fromWeb(ReadableStream readableStream, optional Node_stream_Readable_FromWebOptions options);
   // `stream.Readable.toWeb(streamReadable[, options])` [stream.md]
   [LasmSignature="stream.Readable.toWeb(streamReadable[, options])", LasmAdded="v17.0.0"] static ReadableStream toWeb(Node_stream_Readable streamReadable, optional Node_stream_Readable_ToWebOptions options);
 };
 
-// Stream (stream.md), node:stream
+// Class: `stream.Writable` (stream.md), node:stream
 [LasmModule="node:stream", LasmPath="Writable", LasmLeanModule="Stream", LasmDoc="stream", LasmNamespace="stream", LasmName="Writable"]
-interface Node_stream_Writable {
+interface Node_stream_Writable : Node_EventEmitter {
+  // Event: 'close' [stream.md]
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.9.4"] Node_stream_Writable onClose(Node_stream_Writable_CloseListener listener);
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Writable onceClose(Node_stream_Writable_CloseListener listener);
+  // Event: 'drain' [stream.md]
+  [LasmEvent="drain", LasmSignature="Event: 'drain'", LasmAdded="v0.9.4"] Node_stream_Writable onDrain(Node_stream_Writable_DrainListener listener);
+  [LasmEvent="drain", LasmSignature="Event: 'drain'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Writable onceDrain(Node_stream_Writable_DrainListener listener);
+  // Event: 'error' [stream.md]
+  [LasmEvent="error", LasmSignature="Event: 'error'", LasmAdded="v0.9.4"] Node_stream_Writable onError(Node_stream_Writable_ErrorListener listener);
+  [LasmEvent="error", LasmSignature="Event: 'error'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Writable onceError(Node_stream_Writable_ErrorListener listener);
+  // Event: 'finish' [stream.md]
+  [LasmEvent="finish", LasmSignature="Event: 'finish'", LasmAdded="v0.9.4"] Node_stream_Writable onFinish(Node_stream_Writable_FinishListener listener);
+  [LasmEvent="finish", LasmSignature="Event: 'finish'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Writable onceFinish(Node_stream_Writable_FinishListener listener);
+  // Event: 'pipe' [stream.md]
+  [LasmEvent="pipe", LasmSignature="Event: 'pipe'", LasmAdded="v0.9.4"] Node_stream_Writable onPipe(Node_stream_Writable_PipeListener listener);
+  [LasmEvent="pipe", LasmSignature="Event: 'pipe'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Writable oncePipe(Node_stream_Writable_PipeListener listener);
+  // Event: 'unpipe' [stream.md]
+  [LasmEvent="unpipe", LasmSignature="Event: 'unpipe'", LasmAdded="v0.9.4"] Node_stream_Writable onUnpipe(Node_stream_Writable_UnpipeListener listener);
+  [LasmEvent="unpipe", LasmSignature="Event: 'unpipe'", LasmAdded="v0.9.4", LasmOnce] Node_stream_Writable onceUnpipe(Node_stream_Writable_UnpipeListener listener);
+  // `writable.destroy([error])` [stream.md]
+  [LasmSignature="writable.destroy([error])", LasmAdded="v8.0.0"] Node_stream_Writable destroy(optional any error);
+  // `writable.end([chunk[, encoding]][, callback])` [stream.md]
+  [LasmSignature="writable.end([chunk[, encoding]][, callback])", LasmAdded="v0.9.4"] Node_stream_Writable end(optional any chunk, optional DOMString encoding);
+  // `writable.write(chunk[, encoding][, callback])` [stream.md]
+  [LasmSignature="writable.write(chunk[, encoding][, callback])", LasmAdded="v0.9.4"] boolean write(any chunk, optional DOMString encoding);
   // `stream.Writable.fromWeb(writableStream[, options])` [stream.md]
   [LasmSignature="stream.Writable.fromWeb(writableStream[, options])", LasmAdded="v17.0.0"] static Node_stream_Writable fromWeb(WritableStream writableStream, optional Node_stream_Writable_FromWebOptions options);
   // `stream.Writable.toWeb(streamWritable)` [stream.md]
   [LasmSignature="stream.Writable.toWeb(streamWritable)", LasmAdded="v17.0.0"] static WritableStream toWeb(Node_stream_Writable streamWritable);
+};
+
+// Class: `stream.Duplex` (stream.md), node:stream
+[LasmModule="node:stream", LasmPath="Duplex", LasmLeanModule="Stream", LasmDoc="stream", LasmNamespace="stream", LasmName="Duplex"]
+interface Node_stream_Duplex : Node_stream_Readable {
+  // `stream.Duplex.fromWeb(pair[, options])` [stream.md]
+  [LasmSignature="stream.Duplex.fromWeb(pair[, options])", LasmAdded="v17.0.0"] static Node_stream_Duplex fromWeb(Node_stream_Duplex_FromWebPair pair, optional Node_stream_Duplex_FromWebOptions options);
+  // `stream.Duplex.toWeb(streamDuplex[, options])` [stream.md]
+  [LasmSignature="stream.Duplex.toWeb(streamDuplex[, options])", LasmAdded="v17.0.0"] static object toWeb(Node_stream_Duplex streamDuplex, optional Node_stream_Duplex_ToWebOptions options);
 };
 
 // Class: `Buffer` (buffer.md), node:buffer
@@ -301,6 +371,9 @@ interface Node_fs_Dirent {
 // Class: `FileHandle` (fs.md), node:fs/promises
 [LasmModule="node:fs/promises", LasmLeanModule="Fs", LasmDoc="fs", LasmName="FileHandle"]
 interface Node_FileHandle {
+  // Event: 'close' [fs.md]
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v15.4.0"] Node_FileHandle onClose(Node_FileHandle_CloseListener listener);
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v15.4.0", LasmOnce] Node_FileHandle onceClose(Node_FileHandle_CloseListener listener);
   // `filehandle.appendFile(data[, options])` [fs.md]
   [LasmSignature="filehandle.appendFile(data[, options])", LasmAdded="v10.0.0"] Promise<undefined> appendFile((DOMString or Uint8Array or object) data, optional (Node_FileHandle_AppendFileOptions or DOMString) options);
   // `filehandle.chmod(mode)` [fs.md]
@@ -452,6 +525,24 @@ namespace crypto {
 // Class: `ChildProcess` (child_process.md), node:child_process
 [LasmModule="node:child_process", LasmPath="ChildProcess", LasmLeanModule="ChildProcess", LasmDoc="child_process", LasmName="ChildProcess"]
 interface Node_ChildProcess : Node_EventEmitter {
+  // Event: 'close' [child_process.md]
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.7.7"] Node_ChildProcess onClose(Node_ChildProcess_CloseListener listener);
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.7.7", LasmOnce] Node_ChildProcess onceClose(Node_ChildProcess_CloseListener listener);
+  // Event: 'disconnect' [child_process.md]
+  [LasmEvent="disconnect", LasmSignature="Event: 'disconnect'", LasmAdded="v0.7.2"] Node_ChildProcess onDisconnect(Node_ChildProcess_DisconnectListener listener);
+  [LasmEvent="disconnect", LasmSignature="Event: 'disconnect'", LasmAdded="v0.7.2", LasmOnce] Node_ChildProcess onceDisconnect(Node_ChildProcess_DisconnectListener listener);
+  // Event: 'error' [child_process.md]
+  [LasmEvent="error", LasmSignature="Event: 'error'"] Node_ChildProcess onError(Node_ChildProcess_ErrorListener listener);
+  [LasmEvent="error", LasmSignature="Event: 'error'", LasmOnce] Node_ChildProcess onceError(Node_ChildProcess_ErrorListener listener);
+  // Event: 'exit' [child_process.md]
+  [LasmEvent="exit", LasmSignature="Event: 'exit'", LasmAdded="v0.1.90"] Node_ChildProcess onExit(Node_ChildProcess_ExitListener listener);
+  [LasmEvent="exit", LasmSignature="Event: 'exit'", LasmAdded="v0.1.90", LasmOnce] Node_ChildProcess onceExit(Node_ChildProcess_ExitListener listener);
+  // Event: 'message' [child_process.md]
+  [LasmEvent="message", LasmSignature="Event: 'message'", LasmAdded="v0.5.9"] Node_ChildProcess onMessage(Node_ChildProcess_MessageListener listener);
+  [LasmEvent="message", LasmSignature="Event: 'message'", LasmAdded="v0.5.9", LasmOnce] Node_ChildProcess onceMessage(Node_ChildProcess_MessageListener listener);
+  // Event: 'spawn' [child_process.md]
+  [LasmEvent="spawn", LasmSignature="Event: 'spawn'", LasmAdded="v15.1.0, v14.17.0"] Node_ChildProcess onSpawn(Node_ChildProcess_SpawnListener listener);
+  [LasmEvent="spawn", LasmSignature="Event: 'spawn'", LasmAdded="v15.1.0, v14.17.0", LasmOnce] Node_ChildProcess onceSpawn(Node_ChildProcess_SpawnListener listener);
   // `subprocess.kill([signal])` [child_process.md]
   [LasmSignature="subprocess.kill([signal])", LasmAdded="v0.1.90"] boolean kill(optional (double or DOMString) signal);
   // `exitCode` Type: {integer} [child_process.md]
@@ -479,6 +570,679 @@ namespace child_process {
   [LasmSignature="child_process.spawn(command[, args][, options])", LasmAdded="v0.1.90"] Node_ChildProcess spawn(DOMString command, optional sequence<DOMString> args, optional Node_child_process_SpawnOptions options);
 };
 
+// Class: `net.SocketAddress` (net.md), node:net
+[LasmModule="node:net", LasmPath="SocketAddress", LasmLeanModule="Net", LasmDoc="net", LasmNamespace="net", LasmName="SocketAddress"]
+interface Node_net_SocketAddress {
+  // new net.SocketAddress([options]) [net.md]
+  [LasmSignature="new net.SocketAddress([options])", LasmAdded="v15.14.0, v14.18.0"] constructor(optional Node_net_SocketAddress_NewOptions options);
+  // `SocketAddress.parse(input)` [net.md]
+  [LasmSignature="SocketAddress.parse(input)", LasmAdded="v23.4.0, v22.13.0"] static Node_net_SocketAddress parse(DOMString input);
+  // `address` Type: {string} [net.md]
+  [LasmSignature="socketaddress.address", LasmAdded="v15.14.0, v14.18.0"] readonly attribute DOMString address;
+  // `family` Type: {string} Either `'ipv4'` or `'ipv6'`. [net.md]
+  [LasmSignature="socketaddress.family", LasmAdded="v15.14.0, v14.18.0"] readonly attribute DOMString family;
+  // `flowlabel` Type: {number} [net.md]
+  [LasmSignature="socketaddress.flowlabel", LasmAdded="v15.14.0, v14.18.0"] readonly attribute double flowlabel;
+  // `port` Type: {number} [net.md]
+  [LasmSignature="socketaddress.port", LasmAdded="v15.14.0, v14.18.0"] readonly attribute double port;
+};
+
+// Class: `net.BlockList` (net.md), node:net
+[LasmModule="node:net", LasmPath="BlockList", LasmLeanModule="Net", LasmDoc="net", LasmNamespace="net", LasmName="BlockList"]
+interface Node_net_BlockList {
+  // new net.BlockList() [net.md]
+  [LasmSignature="new net.BlockList()", LasmAdded="v15.0.0, v14.18.0"] constructor();
+  // `blockList.addAddress(address[, type])` [net.md]
+  [LasmSignature="blockList.addAddress(address[, type])", LasmAdded="v15.0.0, v14.18.0"] undefined addAddress((DOMString or Node_net_SocketAddress) address, optional DOMString type);
+  // `blockList.addAddresses(addresses[, type])` [net.md]
+  [LasmSignature="blockList.addAddresses(addresses[, type])", LasmAdded="v24.21.0"] undefined addAddresses((sequence<DOMString> or sequence<Node_net_SocketAddress>) addresses, optional DOMString type);
+  // `blockList.addCIDR(cidr)` [net.md]
+  [LasmSignature="blockList.addCIDR(cidr)", LasmAdded="v24.21.0"] undefined addCIDR(DOMString cidr);
+  // `blockList.addCIDRs(cidrs)` [net.md]
+  [LasmSignature="blockList.addCIDRs(cidrs)", LasmAdded="v24.21.0"] undefined addCIDRs(sequence<DOMString> cidrs);
+  // `blockList.addRange(start, end[, type])` [net.md]
+  [LasmSignature="blockList.addRange(start, end[, type])", LasmAdded="v15.0.0, v14.18.0"] undefined addRange((DOMString or Node_net_SocketAddress) start, (DOMString or Node_net_SocketAddress) end, optional DOMString type);
+  // `blockList.addSubnet(net, prefix[, type])` [net.md]
+  [LasmSignature="blockList.addSubnet(net, prefix[, type])", LasmAdded="v15.0.0, v14.18.0"] undefined addSubnet((DOMString or Node_net_SocketAddress) net, double prefix, optional DOMString type);
+  // `blockList.check(address[, type])` [net.md]
+  [LasmSignature="blockList.check(address[, type])", LasmAdded="v15.0.0, v14.18.0"] boolean check((DOMString or Node_net_SocketAddress) address, optional DOMString type);
+  // `blockList.clear()` [net.md]
+  [LasmSignature="blockList.clear()"] undefined clear();
+  // `BlockList.isBlockList(value)` [net.md]
+  [LasmSignature="BlockList.isBlockList(value)", LasmAdded="v23.4.0, v22.13.0"] static boolean isBlockList(any value);
+  // `blockList.removeAddress(address[, type])` [net.md]
+  [LasmSignature="blockList.removeAddress(address[, type])", LasmAdded="v24.21.0"] undefined removeAddress((DOMString or Node_net_SocketAddress) address, optional DOMString type);
+  // `blockList.removeCIDR(cidr)` [net.md]
+  [LasmSignature="blockList.removeCIDR(cidr)", LasmAdded="v24.21.0"] undefined removeCIDR(DOMString cidr);
+  // `blockList.removeRange(start, end[, type])` [net.md]
+  [LasmSignature="blockList.removeRange(start, end[, type])", LasmAdded="v24.21.0"] undefined removeRange((DOMString or Node_net_SocketAddress) start, (DOMString or Node_net_SocketAddress) end, optional DOMString type);
+  // `blockList.removeSubnet(net, prefix[, type])` [net.md]
+  [LasmSignature="blockList.removeSubnet(net, prefix[, type])", LasmAdded="v24.21.0"] undefined removeSubnet((DOMString or Node_net_SocketAddress) net, double prefix, optional DOMString type);
+  // `PRIVATE_RANGES` Type: {string\[]} [net.md]
+  [LasmSignature="blockList.PRIVATE_RANGES", LasmAdded="v24.21.0"] readonly attribute sequence<DOMString> PRIVATE_RANGES;
+  // `rules` Type: {string\[]} [net.md]
+  [LasmSignature="blockList.rules", LasmAdded="v15.0.0, v14.18.0"] readonly attribute sequence<DOMString> rules;
+  // `size` Type: {number} [net.md]
+  [LasmSignature="blockList.size", LasmAdded="v24.21.0"] readonly attribute double size;
+};
+
+// Class: `net.BoundSocket` (net.md), node:net
+[LasmModule="node:net", LasmPath="BoundSocket", LasmLeanModule="Net", LasmDoc="net", LasmNamespace="net", LasmName="BoundSocket"]
+interface Node_net_BoundSocket {
+  // new net.BoundSocket([options]) [net.md]
+  [LasmSignature="new net.BoundSocket([options])", LasmAdded="v24.19.0"] constructor(optional Node_net_BoundSocket_NewOptions options);
+  // `boundSocket.address()` [net.md]
+  [LasmSignature="boundSocket.address()", LasmAdded="v24.19.0"] (object or DOMString) address();
+  // `boundSocket.fd()` [net.md]
+  [LasmSignature="boundSocket.fd()", LasmAdded="v24.19.0"] long long fd();
+  // `boundSocket.close()` [net.md]
+  [LasmSignature="boundSocket.close()", LasmAdded="v24.19.0"] undefined close();
+  // `isPipe` {boolean} [net.md]
+  [LasmSignature="boundSocket.isPipe", LasmAdded="v24.20.0"] readonly attribute boolean isPipe;
+};
+
+// Class: `net.Server` (net.md), node:net
+[LasmModule="node:net", LasmPath="Server", LasmLeanModule="Net", LasmDoc="net", LasmNamespace="net", LasmName="Server"]
+interface Node_net_Server : Node_EventEmitter {
+  // Event: 'close' [net.md]
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.5.0"] Node_net_Server onClose(Node_net_Server_CloseListener listener);
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.5.0", LasmOnce] Node_net_Server onceClose(Node_net_Server_CloseListener listener);
+  // Event: 'connection' [net.md]
+  [LasmEvent="connection", LasmSignature="Event: 'connection'", LasmAdded="v0.1.90"] Node_net_Server onConnection(Node_net_Server_ConnectionListener listener);
+  [LasmEvent="connection", LasmSignature="Event: 'connection'", LasmAdded="v0.1.90", LasmOnce] Node_net_Server onceConnection(Node_net_Server_ConnectionListener listener);
+  // Event: 'error' [net.md]
+  [LasmEvent="error", LasmSignature="Event: 'error'", LasmAdded="v0.1.90"] Node_net_Server onError(Node_net_Server_ErrorListener listener);
+  [LasmEvent="error", LasmSignature="Event: 'error'", LasmAdded="v0.1.90", LasmOnce] Node_net_Server onceError(Node_net_Server_ErrorListener listener);
+  // Event: 'listening' [net.md]
+  [LasmEvent="listening", LasmSignature="Event: 'listening'", LasmAdded="v0.1.90"] Node_net_Server onListening(Node_net_Server_ListeningListener listener);
+  [LasmEvent="listening", LasmSignature="Event: 'listening'", LasmAdded="v0.1.90", LasmOnce] Node_net_Server onceListening(Node_net_Server_ListeningListener listener);
+  // Event: 'drop' [net.md]
+  [LasmEvent="drop", LasmSignature="Event: 'drop'", LasmAdded="v18.6.0, v16.17.0"] Node_net_Server onDrop(Node_net_Server_DropListener listener);
+  [LasmEvent="drop", LasmSignature="Event: 'drop'", LasmAdded="v18.6.0, v16.17.0", LasmOnce] Node_net_Server onceDrop(Node_net_Server_DropListener listener);
+  // new net.Server([options][, connectionListener]) [net.md]
+  [LasmSignature="new net.Server([options][, connectionListener])", LasmAdded="v0.1.90"] constructor(optional object options, optional Node_net_Server_ConnectionListener connectionListener);
+  // `server.address()` [net.md]
+  [LasmSignature="server.address()", LasmAdded="v0.1.90"] (Node_net_AddressInfo or DOMString)? address();
+  // `server.close([callback])` [net.md]
+  [LasmSignature="server.close([callback])", LasmAdded="v0.1.90"] Node_net_Server close();
+  // `server.getConnections(callback)` [net.md]
+  [LasmPromisify, LasmSignature="server.getConnections(callback)", LasmAdded="v0.9.7"] Promise<long long> getConnections();
+  // `server.listen(options[, callback])` [net.md]
+  [LasmSignature="server.listen(options[, callback])", LasmAdded="v0.11.14"] Node_net_Server listen(Node_net_Server_ListenOptions options);
+  // `server.listen(path[, backlog][, callback])` [net.md]
+  [LasmSignature="server.listen(path[, backlog][, callback])", LasmAdded="v0.1.90"] Node_net_Server listen(DOMString path, optional double backlog);
+  // `server.listen([port[, host[, backlog]]][, callback])` [net.md]
+  [LasmSignature="server.listen([port[, host[, backlog]]][, callback])", LasmAdded="v0.1.90"] Node_net_Server listen(optional double port, optional DOMString host, optional double backlog);
+  // `server.ref()` [net.md]
+  [LasmSignature="server.ref()", LasmAdded="v0.9.1"] Node_net_Server ref();
+  // `server.unref()` [net.md]
+  [LasmSignature="server.unref()", LasmAdded="v0.9.1"] Node_net_Server unref();
+  // `listening` Type: {boolean} Indicates whether or not the server is listening for connections. [net.md]
+  [LasmSignature="server.listening", LasmAdded="v5.7.0"] readonly attribute boolean listening;
+  // `maxConnections` Type: {integer} [net.md]
+  [LasmSignature="server.maxConnections", LasmAdded="v0.2.0"] readonly attribute long long maxConnections;
+  // `dropMaxConnection` Type: {boolean} [net.md]
+  [LasmSignature="server.dropMaxConnection", LasmAdded="v23.1.0, v22.12.0"] readonly attribute boolean dropMaxConnection;
+};
+
+// Class: `net.Socket` (net.md), node:net
+[LasmModule="node:net", LasmPath="Socket", LasmLeanModule="Net", LasmDoc="net", LasmNamespace="net", LasmName="Socket"]
+interface Node_net_Socket : Node_stream_Duplex {
+  // Event: 'close' [net.md]
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.1.90"] Node_net_Socket onClose(Node_net_Socket_CloseListener listener);
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.1.90", LasmOnce] Node_net_Socket onceClose(Node_net_Socket_CloseListener listener);
+  // Event: 'connect' [net.md]
+  [LasmEvent="connect", LasmSignature="Event: 'connect'", LasmAdded="v0.1.90"] Node_net_Socket onConnect(Node_net_Socket_ConnectListener listener);
+  [LasmEvent="connect", LasmSignature="Event: 'connect'", LasmAdded="v0.1.90", LasmOnce] Node_net_Socket onceConnect(Node_net_Socket_ConnectListener listener);
+  // Event: 'connectionAttempt' [net.md]
+  [LasmEvent="connectionAttempt", LasmSignature="Event: 'connectionAttempt'", LasmAdded="v21.6.0, v20.12.0"] Node_net_Socket onConnectionAttempt(Node_net_Socket_ConnectionAttemptListener listener);
+  [LasmEvent="connectionAttempt", LasmSignature="Event: 'connectionAttempt'", LasmAdded="v21.6.0, v20.12.0", LasmOnce] Node_net_Socket onceConnectionAttempt(Node_net_Socket_ConnectionAttemptListener listener);
+  // Event: 'connectionAttemptFailed' [net.md]
+  [LasmEvent="connectionAttemptFailed", LasmSignature="Event: 'connectionAttemptFailed'", LasmAdded="v21.6.0, v20.12.0"] Node_net_Socket onConnectionAttemptFailed(Node_net_Socket_ConnectionAttemptFailedListener listener);
+  [LasmEvent="connectionAttemptFailed", LasmSignature="Event: 'connectionAttemptFailed'", LasmAdded="v21.6.0, v20.12.0", LasmOnce] Node_net_Socket onceConnectionAttemptFailed(Node_net_Socket_ConnectionAttemptFailedListener listener);
+  // Event: 'connectionAttemptTimeout' [net.md]
+  [LasmEvent="connectionAttemptTimeout", LasmSignature="Event: 'connectionAttemptTimeout'", LasmAdded="v21.6.0, v20.12.0"] Node_net_Socket onConnectionAttemptTimeout(Node_net_Socket_ConnectionAttemptTimeoutListener listener);
+  [LasmEvent="connectionAttemptTimeout", LasmSignature="Event: 'connectionAttemptTimeout'", LasmAdded="v21.6.0, v20.12.0", LasmOnce] Node_net_Socket onceConnectionAttemptTimeout(Node_net_Socket_ConnectionAttemptTimeoutListener listener);
+  // Event: 'data' [net.md]
+  [LasmEvent="data", LasmSignature="Event: 'data'", LasmAdded="v0.1.90"] Node_net_Socket onData(Node_net_Socket_DataListener listener);
+  [LasmEvent="data", LasmSignature="Event: 'data'", LasmAdded="v0.1.90", LasmOnce] Node_net_Socket onceData(Node_net_Socket_DataListener listener);
+  // Event: 'drain' [net.md]
+  [LasmEvent="drain", LasmSignature="Event: 'drain'", LasmAdded="v0.1.90"] Node_net_Socket onDrain(Node_net_Socket_DrainListener listener);
+  [LasmEvent="drain", LasmSignature="Event: 'drain'", LasmAdded="v0.1.90", LasmOnce] Node_net_Socket onceDrain(Node_net_Socket_DrainListener listener);
+  // Event: 'end' [net.md]
+  [LasmEvent="end", LasmSignature="Event: 'end'", LasmAdded="v0.1.90"] Node_net_Socket onEnd(Node_net_Socket_EndListener listener);
+  [LasmEvent="end", LasmSignature="Event: 'end'", LasmAdded="v0.1.90", LasmOnce] Node_net_Socket onceEnd(Node_net_Socket_EndListener listener);
+  // Event: 'error' [net.md]
+  [LasmEvent="error", LasmSignature="Event: 'error'", LasmAdded="v0.1.90"] Node_net_Socket onError(Node_net_Socket_ErrorListener listener);
+  [LasmEvent="error", LasmSignature="Event: 'error'", LasmAdded="v0.1.90", LasmOnce] Node_net_Socket onceError(Node_net_Socket_ErrorListener listener);
+  // Event: 'lookup' [net.md]
+  [LasmEvent="lookup", LasmSignature="Event: 'lookup'", LasmAdded="v0.11.3"] Node_net_Socket onLookup(Node_net_Socket_LookupListener listener);
+  [LasmEvent="lookup", LasmSignature="Event: 'lookup'", LasmAdded="v0.11.3", LasmOnce] Node_net_Socket onceLookup(Node_net_Socket_LookupListener listener);
+  // Event: 'ready' [net.md]
+  [LasmEvent="ready", LasmSignature="Event: 'ready'", LasmAdded="v9.11.0"] Node_net_Socket onReady(Node_net_Socket_ReadyListener listener);
+  [LasmEvent="ready", LasmSignature="Event: 'ready'", LasmAdded="v9.11.0", LasmOnce] Node_net_Socket onceReady(Node_net_Socket_ReadyListener listener);
+  // Event: 'timeout' [net.md]
+  [LasmEvent="timeout", LasmSignature="Event: 'timeout'", LasmAdded="v0.1.90"] Node_net_Socket onTimeout(Node_net_Socket_TimeoutListener listener);
+  [LasmEvent="timeout", LasmSignature="Event: 'timeout'", LasmAdded="v0.1.90", LasmOnce] Node_net_Socket onceTimeout(Node_net_Socket_TimeoutListener listener);
+  // new net.Socket([options]) [net.md]
+  [LasmSignature="new net.Socket([options])", LasmAdded="v0.3.4"] constructor(optional Node_net_Socket_NewOptions options);
+  // `socket.address()` [net.md]
+  [LasmSignature="socket.address()", LasmAdded="v0.1.90"] Node_net_AddressInfo address();
+  // `socket.connect(options[, connectListener])` [net.md]
+  [LasmSignature="socket.connect(options[, connectListener])", LasmAdded="v0.1.90"] Node_net_Socket connect(object options, optional Node_net_Socket_ConnectListener connectListener);
+  // `socket.connect(path[, connectListener])` [net.md]
+  [LasmSignature="socket.connect(path[, connectListener])"] Node_net_Socket connect(DOMString path, optional Node_net_Socket_ConnectListener connectListener);
+  // `socket.connect(port[, host][, connectListener])` [net.md]
+  [LasmSignature="socket.connect(port[, host][, connectListener])", LasmAdded="v0.1.90"] Node_net_Socket connect(double port, optional DOMString host, optional Node_net_Socket_ConnectListener connectListener);
+  // `socket.destroy([error])` [net.md]
+  [LasmSignature="socket.destroy([error])", LasmAdded="v0.1.90"] Node_net_Socket destroy(optional object error);
+  // `socket.destroySoon()` [net.md]
+  [LasmSignature="socket.destroySoon()", LasmAdded="v0.3.4"] undefined destroySoon();
+  // `socket.end([data[, encoding]][, callback])` [net.md]
+  [LasmSignature="socket.end([data[, encoding]][, callback])", LasmAdded="v0.1.90"] Node_net_Socket end(optional (DOMString or Uint8Array) data, optional DOMString encoding);
+  // `socket.pause()` [net.md]
+  [LasmSignature="socket.pause()"] Node_net_Socket pause();
+  // `socket.ref()` [net.md]
+  [LasmSignature="socket.ref()", LasmAdded="v0.9.1"] Node_net_Socket ref();
+  // `socket.resetAndDestroy()` [net.md]
+  [LasmSignature="socket.resetAndDestroy()", LasmAdded="v18.3.0, v16.17.0"] Node_net_Socket resetAndDestroy();
+  // `socket.resume()` [net.md]
+  [LasmSignature="socket.resume()"] Node_net_Socket resume();
+  // `socket.setEncoding([encoding])` [net.md]
+  [LasmSignature="socket.setEncoding([encoding])", LasmAdded="v0.1.90"] Node_net_Socket setEncoding(optional DOMString encoding);
+  // `socket.setKeepAlive([options])` [net.md]
+  [LasmSignature="socket.setKeepAlive([options])", LasmAdded="v24.19.0"] Node_net_Socket setKeepAlive(optional Node_net_Socket_SetKeepAliveOptions options);
+  // `socket.setKeepAlive([enable][, initialDelay][, interval][, count])` [net.md]
+  [LasmSignature="socket.setKeepAlive([enable][, initialDelay][, interval][, count])", LasmAdded="v0.1.92"] Node_net_Socket setKeepAlive(optional boolean enable, optional double initialDelay, optional double interval, optional double count);
+  // `socket.setNoDelay([noDelay])` [net.md]
+  [LasmSignature="socket.setNoDelay([noDelay])", LasmAdded="v0.1.90"] Node_net_Socket setNoDelay(optional boolean noDelay);
+  // `socket.setTimeout(timeout[, callback])` [net.md]
+  [LasmSignature="socket.setTimeout(timeout[, callback])", LasmAdded="v0.1.90"] Node_net_Socket setTimeout(double timeout);
+  // `socket.getTypeOfService()` [net.md]
+  [LasmSignature="socket.getTypeOfService()", LasmAdded="v24.15.0"] long long getTypeOfService();
+  // `socket.setTypeOfService(tos)` [net.md]
+  [LasmSignature="socket.setTypeOfService(tos)", LasmAdded="v24.15.0"] Node_net_Socket setTypeOfService(long long tos);
+  // `socket.unref()` [net.md]
+  [LasmSignature="socket.unref()", LasmAdded="v0.9.1"] Node_net_Socket unref();
+  // `socket.write(data[, encoding][, callback])` [net.md]
+  [LasmSignature="socket.write(data[, encoding][, callback])", LasmAdded="v0.1.90"] boolean write((DOMString or Uint8Array) data, optional DOMString encoding);
+  // `autoSelectFamilyAttemptedAddresses` Type: {string\[]} [net.md]
+  [LasmSignature="socket.autoSelectFamilyAttemptedAddresses", LasmAdded="v19.4.0, v18.18.0"] readonly attribute sequence<DOMString> autoSelectFamilyAttemptedAddresses;
+  // `bytesRead` Type: {integer} [net.md]
+  [LasmSignature="socket.bytesRead", LasmAdded="v0.5.3"] readonly attribute long long bytesRead;
+  // `bytesWritten` Type: {integer} [net.md]
+  [LasmSignature="socket.bytesWritten", LasmAdded="v0.5.3"] readonly attribute long long bytesWritten;
+  // `connecting` Type: {boolean} [net.md]
+  [LasmSignature="socket.connecting", LasmAdded="v6.1.0"] readonly attribute boolean connecting;
+  // `destroyed` Type: {boolean} Indicates if the connection is destroyed or not. No further data can be transferred using a destroyed connection. [net.md]
+  [LasmSignature="socket.destroyed"] readonly attribute boolean destroyed;
+  // `localAddress` Type: {string} [net.md]
+  [LasmSignature="socket.localAddress", LasmAdded="v0.9.6"] readonly attribute DOMString localAddress;
+  // `localPort` Type: {integer} [net.md]
+  [LasmSignature="socket.localPort", LasmAdded="v0.9.6"] readonly attribute long long localPort;
+  // `localFamily` Type: {string} [net.md]
+  [LasmSignature="socket.localFamily", LasmAdded="v18.8.0, v16.18.0"] readonly attribute DOMString localFamily;
+  // `pending` Type: {boolean} [net.md]
+  [LasmSignature="socket.pending", LasmAdded="v11.2.0, v10.16.0"] readonly attribute boolean pending;
+  // `remoteAddress` Type: {string} [net.md]
+  [LasmSignature="socket.remoteAddress", LasmAdded="v0.5.10"] readonly attribute DOMString remoteAddress;
+  // `remoteFamily` Type: {string} [net.md]
+  [LasmSignature="socket.remoteFamily", LasmAdded="v0.11.14"] readonly attribute DOMString remoteFamily;
+  // `remotePort` Type: {integer} [net.md]
+  [LasmSignature="socket.remotePort", LasmAdded="v0.5.10"] readonly attribute long long remotePort;
+  // `server` Type: {net.Server|null} [net.md]
+  [LasmSignature="socket.server", LasmAdded="v0.3.4"] readonly attribute Node_net_Server? server;
+  // `timeout` Type: {number|undefined} [net.md]
+  [LasmSignature="socket.timeout", LasmAdded="v10.7.0"] readonly attribute double? timeout;
+  // `readyState` Type: {string} [net.md]
+  [LasmSignature="socket.readyState", LasmAdded="v0.5.0"] readonly attribute DOMString readyState;
+};
+
+// Net (net.md), node:net
+[LasmModule="node:net", LasmLeanModule="Net", LasmDoc="net", LasmName="net"]
+namespace net {
+  // `net.connect(options[, connectListener])` [net.md]
+  [LasmSignature="net.connect(options[, connectListener])", LasmAdded="v0.7.0"] Node_net_Socket connect(object options, optional Node_net_Socket_ConnectListener connectListener);
+  // `net.connect(path[, connectListener])` [net.md]
+  [LasmSignature="net.connect(path[, connectListener])", LasmAdded="v0.1.90"] Node_net_Socket connect(DOMString path, optional Node_net_Socket_ConnectListener connectListener);
+  // `net.connect(port[, host][, connectListener])` [net.md]
+  [LasmSignature="net.connect(port[, host][, connectListener])", LasmAdded="v0.1.90"] Node_net_Socket connect(double port, optional DOMString host, optional Node_net_Socket_ConnectListener connectListener);
+  // `net.createConnection(options[, connectListener])` [net.md]
+  [LasmSignature="net.createConnection(options[, connectListener])", LasmAdded="v0.1.90"] Node_net_Socket createConnection(object options, optional Node_net_Socket_ConnectListener connectListener);
+  // `net.createConnection(path[, connectListener])` [net.md]
+  [LasmSignature="net.createConnection(path[, connectListener])", LasmAdded="v0.1.90"] Node_net_Socket createConnection(DOMString path, optional Node_net_Socket_ConnectListener connectListener);
+  // `net.createConnection(port[, host][, connectListener])` [net.md]
+  [LasmSignature="net.createConnection(port[, host][, connectListener])", LasmAdded="v0.1.90"] Node_net_Socket createConnection(double port, optional DOMString host, optional Node_net_Socket_ConnectListener connectListener);
+  // `net.createServer([options][, connectionListener])` [net.md]
+  [LasmSignature="net.createServer([options][, connectionListener])", LasmAdded="v0.5.0"] Node_net_Server createServer(optional Node_net_CreateServerOptions options, optional Node_net_Server_ConnectionListener connectionListener);
+  // `net.getDefaultAutoSelectFamily()` [net.md]
+  [LasmSignature="net.getDefaultAutoSelectFamily()", LasmAdded="v19.4.0"] boolean getDefaultAutoSelectFamily();
+  // `net.setDefaultAutoSelectFamily(value)` [net.md]
+  [LasmSignature="net.setDefaultAutoSelectFamily(value)", LasmAdded="v19.4.0"] undefined setDefaultAutoSelectFamily(boolean value);
+  // `net.getDefaultAutoSelectFamilyAttemptTimeout()` [net.md]
+  [LasmSignature="net.getDefaultAutoSelectFamilyAttemptTimeout()", LasmAdded="v19.8.0, v18.18.0"] double getDefaultAutoSelectFamilyAttemptTimeout();
+  // `net.setDefaultAutoSelectFamilyAttemptTimeout(value)` [net.md]
+  [LasmSignature="net.setDefaultAutoSelectFamilyAttemptTimeout(value)", LasmAdded="v19.8.0, v18.18.0"] undefined setDefaultAutoSelectFamilyAttemptTimeout(double value);
+  // `net.isIP(input)` [net.md]
+  [LasmSignature="net.isIP(input)", LasmAdded="v0.3.0"] long long isIP(DOMString input);
+  // `net.isIPv4(input)` [net.md]
+  [LasmSignature="net.isIPv4(input)", LasmAdded="v0.3.0"] boolean isIPv4(DOMString input);
+  // `net.isIPv6(input)` [net.md]
+  [LasmSignature="net.isIPv6(input)", LasmAdded="v0.3.0"] boolean isIPv6(DOMString input);
+};
+
+// Class: `http.Agent` (http.md), node:http
+[LasmModule="node:http", LasmPath="Agent", LasmLeanModule="Http", LasmDoc="http", LasmNamespace="http", LasmName="Agent"]
+interface Node_http_Agent {
+  // new Agent([options]) [http.md]
+  [LasmSignature="new Agent([options])", LasmAdded="v0.3.4"] constructor(optional Node_http_Agent_NewOptions options);
+  // `agent.createConnection(options[, callback])` [http.md]
+  [LasmSignature="agent.createConnection(options[, callback])", LasmAdded="v0.11.4"] Node_stream_Duplex createConnection(object options);
+  // `agent.keepSocketAlive(socket)` [http.md]
+  [LasmSignature="agent.keepSocketAlive(socket)", LasmAdded="v8.1.0"] undefined keepSocketAlive(Node_stream_Duplex socket);
+  // `agent.reuseSocket(socket, request)` [http.md]
+  [LasmSignature="agent.reuseSocket(socket, request)", LasmAdded="v8.1.0"] undefined reuseSocket(Node_stream_Duplex socket, Node_http_ClientRequest request);
+  // `agent.destroy()` [http.md]
+  [LasmSignature="agent.destroy()", LasmAdded="v0.11.4"] undefined destroy();
+  // `agent.getName([options])` [http.md]
+  [LasmSignature="agent.getName([options])", LasmAdded="v0.11.4"] DOMString getName(optional Node_http_Agent_GetNameOptions options);
+  // `freeSockets` Type: {Object} [http.md]
+  [LasmSignature="agent.freeSockets", LasmAdded="v0.11.4"] readonly attribute object freeSockets;
+  // `maxFreeSockets` Type: {number} [http.md]
+  [LasmSignature="agent.maxFreeSockets", LasmAdded="v0.11.7"] readonly attribute double maxFreeSockets;
+  // `maxSockets` Type: {number} [http.md]
+  [LasmSignature="agent.maxSockets", LasmAdded="v0.3.6"] readonly attribute double maxSockets;
+  // `maxTotalSockets` Type: {number} [http.md]
+  [LasmSignature="agent.maxTotalSockets", LasmAdded="v14.5.0, v12.19.0"] readonly attribute double maxTotalSockets;
+  // `requests` Type: {Object} [http.md]
+  [LasmSignature="agent.requests", LasmAdded="v0.5.9"] readonly attribute object requests;
+  // `sockets` Type: {Object} [http.md]
+  [LasmSignature="agent.sockets", LasmAdded="v0.3.6"] readonly attribute object sockets;
+};
+
+// Class: `http.OutgoingMessage` (http.md), node:http
+[LasmModule="node:http", LasmPath="OutgoingMessage", LasmLeanModule="Http", LasmDoc="http", LasmNamespace="http", LasmName="OutgoingMessage"]
+interface Node_http_OutgoingMessage : Node_EventEmitter {
+  // Event: 'drain' [http.md]
+  [LasmEvent="drain", LasmSignature="Event: 'drain'", LasmAdded="v0.3.6"] Node_http_OutgoingMessage onDrain(Node_http_OutgoingMessage_DrainListener listener);
+  [LasmEvent="drain", LasmSignature="Event: 'drain'", LasmAdded="v0.3.6", LasmOnce] Node_http_OutgoingMessage onceDrain(Node_http_OutgoingMessage_DrainListener listener);
+  // Event: 'finish' [http.md]
+  [LasmEvent="finish", LasmSignature="Event: 'finish'", LasmAdded="v0.1.17"] Node_http_OutgoingMessage onFinish(Node_http_OutgoingMessage_FinishListener listener);
+  [LasmEvent="finish", LasmSignature="Event: 'finish'", LasmAdded="v0.1.17", LasmOnce] Node_http_OutgoingMessage onceFinish(Node_http_OutgoingMessage_FinishListener listener);
+  // Event: 'prefinish' [http.md]
+  [LasmEvent="prefinish", LasmSignature="Event: 'prefinish'", LasmAdded="v0.11.6"] Node_http_OutgoingMessage onPrefinish(Node_http_OutgoingMessage_PrefinishListener listener);
+  [LasmEvent="prefinish", LasmSignature="Event: 'prefinish'", LasmAdded="v0.11.6", LasmOnce] Node_http_OutgoingMessage oncePrefinish(Node_http_OutgoingMessage_PrefinishListener listener);
+  // `outgoingMessage.addTrailers(headers)` [http.md]
+  [LasmSignature="outgoingMessage.addTrailers(headers)", LasmAdded="v0.3.0"] undefined addTrailers(object headers);
+  // `outgoingMessage.appendHeader(name, value)` [http.md]
+  [LasmSignature="outgoingMessage.appendHeader(name, value)", LasmAdded="v18.3.0, v16.17.0"] Node_http_OutgoingMessage appendHeader(DOMString name, (DOMString or sequence<DOMString>) value);
+  // `outgoingMessage.cork()` [http.md]
+  [LasmSignature="outgoingMessage.cork()", LasmAdded="v13.2.0, v12.16.0"] undefined cork();
+  // `outgoingMessage.destroy([error])` [http.md]
+  [LasmSignature="outgoingMessage.destroy([error])", LasmAdded="v0.3.0"] Node_http_OutgoingMessage destroy(optional any error);
+  // `outgoingMessage.end(chunk[, encoding][, callback])` [http.md]
+  [LasmSignature="outgoingMessage.end(chunk[, encoding][, callback])", LasmAdded="v0.1.90"] Node_http_OutgoingMessage end((DOMString or Uint8Array) chunk, optional DOMString encoding);
+  // `outgoingMessage.flushHeaders()` [http.md]
+  [LasmSignature="outgoingMessage.flushHeaders()", LasmAdded="v1.6.0"] undefined flushHeaders();
+  // `outgoingMessage.getHeader(name)` [http.md]
+  [LasmSignature="outgoingMessage.getHeader(name)", LasmAdded="v0.4.0"] (double or DOMString or sequence<DOMString>)? getHeader(DOMString name);
+  // `outgoingMessage.getHeaderNames()` [http.md]
+  [LasmSignature="outgoingMessage.getHeaderNames()", LasmAdded="v7.7.0"] sequence<DOMString> getHeaderNames();
+  // `outgoingMessage.getHeaders()` [http.md]
+  [LasmSignature="outgoingMessage.getHeaders()", LasmAdded="v7.7.0"] object getHeaders();
+  // `outgoingMessage.hasHeader(name)` [http.md]
+  [LasmSignature="outgoingMessage.hasHeader(name)", LasmAdded="v7.7.0"] boolean hasHeader(DOMString name);
+  // `outgoingMessage.removeHeader(name)` [http.md]
+  [LasmSignature="outgoingMessage.removeHeader(name)", LasmAdded="v0.4.0"] undefined removeHeader(DOMString name);
+  // `outgoingMessage.setHeader(name, value)` [http.md]
+  [LasmSignature="outgoingMessage.setHeader(name, value)", LasmAdded="v0.4.0"] Node_http_OutgoingMessage setHeader(DOMString name, (double or DOMString or sequence<DOMString>) value);
+  // `outgoingMessage.setHeaders(headers)` [http.md]
+  [LasmSignature="outgoingMessage.setHeaders(headers)", LasmAdded="v19.6.0, v18.15.0"] Node_http_OutgoingMessage setHeaders((Headers or object) headers);
+  // `outgoingMessage.setTimeout(msecs[, callback])` [http.md]
+  [LasmSignature="outgoingMessage.setTimeout(msecs[, callback])", LasmAdded="v0.9.12"] Node_http_OutgoingMessage setTimeout(double msecs);
+  // `outgoingMessage.uncork()` [http.md]
+  [LasmSignature="outgoingMessage.uncork()", LasmAdded="v13.2.0, v12.16.0"] undefined uncork();
+  // `outgoingMessage.write(chunk[, encoding][, callback])` [http.md]
+  [LasmSignature="outgoingMessage.write(chunk[, encoding][, callback])", LasmAdded="v0.1.29"] boolean write((DOMString or Uint8Array) chunk, optional DOMString encoding);
+  // `headersSent` Type: {boolean} [http.md]
+  [LasmSignature="outgoingMessage.headersSent", LasmAdded="v0.9.3"] readonly attribute boolean headersSent;
+  // `socket` Type: {stream.Duplex} [http.md]
+  [LasmSignature="outgoingMessage.socket", LasmAdded="v0.3.0"] readonly attribute Node_stream_Duplex socket;
+  // `writableCorked` Type: {number} [http.md]
+  [LasmSignature="outgoingMessage.writableCorked", LasmAdded="v13.2.0, v12.16.0"] readonly attribute double writableCorked;
+  // `writableEnded` Type: {boolean} [http.md]
+  [LasmSignature="outgoingMessage.writableEnded", LasmAdded="v12.9.0"] readonly attribute boolean writableEnded;
+  // `writableFinished` Type: {boolean} [http.md]
+  [LasmSignature="outgoingMessage.writableFinished", LasmAdded="v12.7.0"] readonly attribute boolean writableFinished;
+  // `writableHighWaterMark` Type: {number} [http.md]
+  [LasmSignature="outgoingMessage.writableHighWaterMark", LasmAdded="v12.9.0"] readonly attribute double writableHighWaterMark;
+  // `writableLength` Type: {number} [http.md]
+  [LasmSignature="outgoingMessage.writableLength", LasmAdded="v12.9.0"] readonly attribute double writableLength;
+  // `writableObjectMode` Type: {boolean} [http.md]
+  [LasmSignature="outgoingMessage.writableObjectMode", LasmAdded="v12.9.0"] readonly attribute boolean writableObjectMode;
+};
+
+// Class: `http.ClientRequest` (http.md), node:http
+[LasmModule="node:http", LasmPath="ClientRequest", LasmLeanModule="Http", LasmDoc="http", LasmNamespace="http", LasmName="ClientRequest"]
+interface Node_http_ClientRequest : Node_http_OutgoingMessage {
+  // Event: 'close' [http.md]
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.5.4"] Node_http_ClientRequest onClose(Node_http_ClientRequest_CloseListener listener);
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.5.4", LasmOnce] Node_http_ClientRequest onceClose(Node_http_ClientRequest_CloseListener listener);
+  // Event: 'connect' [http.md]
+  [LasmEvent="connect", LasmSignature="Event: 'connect'", LasmAdded="v0.7.0"] Node_http_ClientRequest onConnect(Node_http_ClientRequest_ConnectListener listener);
+  [LasmEvent="connect", LasmSignature="Event: 'connect'", LasmAdded="v0.7.0", LasmOnce] Node_http_ClientRequest onceConnect(Node_http_ClientRequest_ConnectListener listener);
+  // Event: 'continue' [http.md]
+  [LasmEvent="continue", LasmSignature="Event: 'continue'", LasmAdded="v0.3.2"] Node_http_ClientRequest onContinue(Node_http_ClientRequest_ContinueListener listener);
+  [LasmEvent="continue", LasmSignature="Event: 'continue'", LasmAdded="v0.3.2", LasmOnce] Node_http_ClientRequest onceContinue(Node_http_ClientRequest_ContinueListener listener);
+  // Event: 'finish' [http.md]
+  [LasmEvent="finish", LasmSignature="Event: 'finish'", LasmAdded="v0.3.6"] Node_http_ClientRequest onFinish(Node_http_ClientRequest_FinishListener listener);
+  [LasmEvent="finish", LasmSignature="Event: 'finish'", LasmAdded="v0.3.6", LasmOnce] Node_http_ClientRequest onceFinish(Node_http_ClientRequest_FinishListener listener);
+  // Event: 'information' [http.md]
+  [LasmEvent="information", LasmSignature="Event: 'information'", LasmAdded="v10.0.0"] Node_http_ClientRequest onInformation(Node_http_ClientRequest_InformationListener listener);
+  [LasmEvent="information", LasmSignature="Event: 'information'", LasmAdded="v10.0.0", LasmOnce] Node_http_ClientRequest onceInformation(Node_http_ClientRequest_InformationListener listener);
+  // Event: 'response' [http.md]
+  [LasmEvent="response", LasmSignature="Event: 'response'", LasmAdded="v0.1.0"] Node_http_ClientRequest onResponse(Node_http_ClientRequest_ResponseListener listener);
+  [LasmEvent="response", LasmSignature="Event: 'response'", LasmAdded="v0.1.0", LasmOnce] Node_http_ClientRequest onceResponse(Node_http_ClientRequest_ResponseListener listener);
+  // Event: 'socket' [http.md]
+  [LasmEvent="socket", LasmSignature="Event: 'socket'", LasmAdded="v0.5.3"] Node_http_ClientRequest onSocket(Node_http_ClientRequest_SocketListener listener);
+  [LasmEvent="socket", LasmSignature="Event: 'socket'", LasmAdded="v0.5.3", LasmOnce] Node_http_ClientRequest onceSocket(Node_http_ClientRequest_SocketListener listener);
+  // Event: 'timeout' [http.md]
+  [LasmEvent="timeout", LasmSignature="Event: 'timeout'", LasmAdded="v0.7.8"] Node_http_ClientRequest onTimeout(Node_http_ClientRequest_TimeoutListener listener);
+  [LasmEvent="timeout", LasmSignature="Event: 'timeout'", LasmAdded="v0.7.8", LasmOnce] Node_http_ClientRequest onceTimeout(Node_http_ClientRequest_TimeoutListener listener);
+  // Event: 'upgrade' [http.md]
+  [LasmEvent="upgrade", LasmSignature="Event: 'upgrade'", LasmAdded="v0.1.94"] Node_http_ClientRequest onUpgrade(Node_http_ClientRequest_UpgradeListener listener);
+  [LasmEvent="upgrade", LasmSignature="Event: 'upgrade'", LasmAdded="v0.1.94", LasmOnce] Node_http_ClientRequest onceUpgrade(Node_http_ClientRequest_UpgradeListener listener);
+  // `request.cork()` [http.md]
+  [LasmSignature="request.cork()", LasmAdded="v13.2.0, v12.16.0"] undefined cork();
+  // `request.end([data[, encoding]][, callback])` [http.md]
+  [LasmSignature="request.end([data[, encoding]][, callback])", LasmAdded="v0.1.90"] Node_http_ClientRequest end(optional (DOMString or Uint8Array) data, optional DOMString encoding);
+  // `request.destroy([error])` [http.md]
+  [LasmSignature="request.destroy([error])", LasmAdded="v0.3.0"] Node_http_ClientRequest destroy(optional any error);
+  // `request.flushHeaders()` [http.md]
+  [LasmSignature="request.flushHeaders()", LasmAdded="v1.6.0"] undefined flushHeaders();
+  // `request.getHeader(name)` [http.md]
+  [LasmSignature="request.getHeader(name)", LasmAdded="v1.6.0"] any getHeader(DOMString name);
+  // `request.getHeaderNames()` [http.md]
+  [LasmSignature="request.getHeaderNames()", LasmAdded="v7.7.0"] sequence<DOMString> getHeaderNames();
+  // `request.getHeaders()` [http.md]
+  [LasmSignature="request.getHeaders()", LasmAdded="v7.7.0"] object getHeaders();
+  // `request.getRawHeaderNames()` [http.md]
+  [LasmSignature="request.getRawHeaderNames()", LasmAdded="v15.13.0, v14.17.0"] sequence<DOMString> getRawHeaderNames();
+  // `request.hasHeader(name)` [http.md]
+  [LasmSignature="request.hasHeader(name)", LasmAdded="v7.7.0"] boolean hasHeader(DOMString name);
+  // `request.removeHeader(name)` [http.md]
+  [LasmSignature="request.removeHeader(name)", LasmAdded="v1.6.0"] undefined removeHeader(DOMString name);
+  // `request.setHeader(name, value)` [http.md]
+  [LasmSignature="request.setHeader(name, value)", LasmAdded="v1.6.0"] undefined setHeader(DOMString name, any value);
+  // `request.setNoDelay([noDelay])` [http.md]
+  [LasmSignature="request.setNoDelay([noDelay])", LasmAdded="v0.5.9"] undefined setNoDelay(optional boolean noDelay);
+  // `request.setSocketKeepAlive([enable][, initialDelay])` [http.md]
+  [LasmSignature="request.setSocketKeepAlive([enable][, initialDelay])", LasmAdded="v0.5.9"] undefined setSocketKeepAlive(optional boolean enable, optional double initialDelay);
+  // `request.setTimeout(timeout[, callback])` [http.md]
+  [LasmSignature="request.setTimeout(timeout[, callback])", LasmAdded="v0.5.9"] Node_http_ClientRequest setTimeout(double timeout);
+  // `request.uncork()` [http.md]
+  [LasmSignature="request.uncork()", LasmAdded="v13.2.0, v12.16.0"] undefined uncork();
+  // `request.write(chunk[, encoding][, callback])` [http.md]
+  [LasmSignature="request.write(chunk[, encoding][, callback])", LasmAdded="v0.1.29"] boolean write((DOMString or Uint8Array) chunk, optional DOMString encoding);
+  // `maxHeadersCount` Type: {number} **Default:** `1000` [http.md]
+  [LasmSignature="request.maxHeadersCount"] readonly attribute double maxHeadersCount;
+  // `path` Type: {string} The request path. [http.md]
+  [LasmSignature="request.path", LasmAdded="v0.4.0"] readonly attribute DOMString path;
+  // `method` Type: {string} The request method. [http.md]
+  [LasmSignature="request.method", LasmAdded="v0.1.97"] readonly attribute DOMString method;
+  // `host` Type: {string} The request host. [http.md]
+  [LasmSignature="request.host", LasmAdded="v14.5.0, v12.19.0"] readonly attribute DOMString host;
+  // `protocol` Type: {string} The request protocol. [http.md]
+  [LasmSignature="request.protocol", LasmAdded="v14.5.0, v12.19.0"] readonly attribute DOMString protocol;
+  // `reusedSocket` Type: {boolean} Whether the request is sent through a reused socket. [http.md]
+  [LasmSignature="request.reusedSocket", LasmAdded="v13.0.0, v12.16.0"] readonly attribute boolean reusedSocket;
+  // `socket` Type: {stream.Duplex} [http.md]
+  [LasmSignature="request.socket", LasmAdded="v0.3.0"] readonly attribute Node_stream_Duplex socket;
+  // `writableEnded` Type: {boolean} [http.md]
+  [LasmSignature="request.writableEnded", LasmAdded="v12.9.0"] readonly attribute boolean writableEnded;
+  // `writableFinished` Type: {boolean} [http.md]
+  [LasmSignature="request.writableFinished", LasmAdded="v12.7.0"] readonly attribute boolean writableFinished;
+};
+
+// Class: `http.ServerResponse` (http.md), node:http
+[LasmModule="node:http", LasmPath="ServerResponse", LasmLeanModule="Http", LasmDoc="http", LasmNamespace="http", LasmName="ServerResponse"]
+interface Node_http_ServerResponse : Node_http_OutgoingMessage {
+  // Event: 'close' [http.md]
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.6.7"] Node_http_ServerResponse onClose(Node_http_ServerResponse_CloseListener listener);
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.6.7", LasmOnce] Node_http_ServerResponse onceClose(Node_http_ServerResponse_CloseListener listener);
+  // Event: 'finish' [http.md]
+  [LasmEvent="finish", LasmSignature="Event: 'finish'", LasmAdded="v0.3.6"] Node_http_ServerResponse onFinish(Node_http_ServerResponse_FinishListener listener);
+  [LasmEvent="finish", LasmSignature="Event: 'finish'", LasmAdded="v0.3.6", LasmOnce] Node_http_ServerResponse onceFinish(Node_http_ServerResponse_FinishListener listener);
+  // `response.addTrailers(headers)` [http.md]
+  [LasmSignature="response.addTrailers(headers)", LasmAdded="v0.3.0"] undefined addTrailers(object headers);
+  // `response.cork()` [http.md]
+  [LasmSignature="response.cork()", LasmAdded="v13.2.0, v12.16.0"] undefined cork();
+  // `response.end([data[, encoding]][, callback])` [http.md]
+  [LasmSignature="response.end([data[, encoding]][, callback])", LasmAdded="v0.1.90"] Node_http_ServerResponse end(optional (DOMString or Uint8Array) data, optional DOMString encoding);
+  // `response.flushHeaders()` [http.md]
+  [LasmSignature="response.flushHeaders()", LasmAdded="v1.6.0"] undefined flushHeaders();
+  // `response.getHeader(name)` [http.md]
+  [LasmSignature="response.getHeader(name)", LasmAdded="v0.4.0"] (double or DOMString or sequence<DOMString>)? getHeader(DOMString name);
+  // `response.getHeaderNames()` [http.md]
+  [LasmSignature="response.getHeaderNames()", LasmAdded="v7.7.0"] sequence<DOMString> getHeaderNames();
+  // `response.getHeaders()` [http.md]
+  [LasmSignature="response.getHeaders()", LasmAdded="v7.7.0"] object getHeaders();
+  // `response.hasHeader(name)` [http.md]
+  [LasmSignature="response.hasHeader(name)", LasmAdded="v7.7.0"] boolean hasHeader(DOMString name);
+  // `response.removeHeader(name)` [http.md]
+  [LasmSignature="response.removeHeader(name)", LasmAdded="v0.4.0"] undefined removeHeader(DOMString name);
+  // `response.setHeader(name, value)` [http.md]
+  [LasmSignature="response.setHeader(name, value)", LasmAdded="v0.4.0"] Node_http_ServerResponse setHeader(DOMString name, (double or DOMString or sequence<DOMString>) value);
+  // `response.setTimeout(msecs[, callback])` [http.md]
+  [LasmSignature="response.setTimeout(msecs[, callback])", LasmAdded="v0.9.12"] Node_http_ServerResponse setTimeout(double msecs);
+  // `response.uncork()` [http.md]
+  [LasmSignature="response.uncork()", LasmAdded="v13.2.0, v12.16.0"] undefined uncork();
+  // `response.write(chunk[, encoding][, callback])` [http.md]
+  [LasmSignature="response.write(chunk[, encoding][, callback])", LasmAdded="v0.1.29"] boolean write((DOMString or Uint8Array) chunk, optional DOMString encoding);
+  // `response.writeContinue()` [http.md]
+  [LasmSignature="response.writeContinue()", LasmAdded="v0.3.0"] undefined writeContinue();
+  // `response.writeEarlyHints(hints[, callback])` [http.md]
+  [LasmSignature="response.writeEarlyHints(hints[, callback])", LasmAdded="v18.11.0"] undefined writeEarlyHints(object hints);
+  // `response.writeHead(statusCode[, statusMessage][, headers])` [http.md]
+  [LasmSignature="response.writeHead(statusCode[, statusMessage][, headers])", LasmAdded="v0.1.30"] Node_http_ServerResponse writeHead(double statusCode, optional DOMString statusMessage, optional (object or sequence<any>) headers);
+  // `response.writeInformation(statusCode[, headers][, callback])` [http.md]
+  [LasmSignature="response.writeInformation(statusCode[, headers][, callback])", LasmAdded="v24.18.0"] undefined writeInformation(double statusCode, optional (object or sequence<any>) headers);
+  // `response.writeProcessing()` [http.md]
+  [LasmSignature="response.writeProcessing()", LasmAdded="v10.0.0"] undefined writeProcessing();
+  // `headersSent` Type: {boolean} [http.md]
+  [LasmSignature="response.headersSent", LasmAdded="v0.9.3"] readonly attribute boolean headersSent;
+  // `req` Type: {http.IncomingMessage} [http.md]
+  [LasmSignature="response.req", LasmAdded="v15.7.0"] readonly attribute Node_http_IncomingMessage req;
+  // `sendDate` Type: {boolean} [http.md]
+  [LasmSignature="response.sendDate", LasmAdded="v0.7.5"] readonly attribute boolean sendDate;
+  // `socket` Type: {stream.Duplex} [http.md]
+  [LasmSignature="response.socket", LasmAdded="v0.3.0"] readonly attribute Node_stream_Duplex socket;
+  // `statusCode` Type: {number} **Default:** `200` [http.md]
+  [LasmSignature="response.statusCode", LasmAdded="v0.4.0"] readonly attribute double statusCode;
+  // `statusMessage` Type: {string} [http.md]
+  [LasmSignature="response.statusMessage", LasmAdded="v0.11.8"] readonly attribute DOMString statusMessage;
+  // `strictContentLength` Type: {boolean} **Default:** `false` [http.md]
+  [LasmSignature="response.strictContentLength", LasmAdded="v18.10.0, v16.18.0"] readonly attribute boolean strictContentLength;
+  // `writableEnded` Type: {boolean} [http.md]
+  [LasmSignature="response.writableEnded", LasmAdded="v12.9.0"] readonly attribute boolean writableEnded;
+  // `writableFinished` Type: {boolean} [http.md]
+  [LasmSignature="response.writableFinished", LasmAdded="v12.7.0"] readonly attribute boolean writableFinished;
+};
+
+// Class: `http.IncomingMessage` (http.md), node:http
+[LasmModule="node:http", LasmPath="IncomingMessage", LasmLeanModule="Http", LasmDoc="http", LasmNamespace="http", LasmName="IncomingMessage"]
+interface Node_http_IncomingMessage : Node_stream_Readable {
+  // Event: 'close' [http.md]
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.4.2"] Node_http_IncomingMessage onClose(Node_http_IncomingMessage_CloseListener listener);
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.4.2", LasmOnce] Node_http_IncomingMessage onceClose(Node_http_IncomingMessage_CloseListener listener);
+  // `message.destroy([error])` [http.md]
+  [LasmSignature="message.destroy([error])", LasmAdded="v0.3.0"] Node_http_IncomingMessage destroy(optional any error);
+  // `message.setTimeout(msecs[, callback])` [http.md]
+  [LasmSignature="message.setTimeout(msecs[, callback])", LasmAdded="v0.5.9"] Node_http_IncomingMessage setTimeout(double msecs);
+  // `complete` Type: {boolean} [http.md]
+  [LasmSignature="message.complete", LasmAdded="v0.3.0"] readonly attribute boolean complete;
+  // `headers` Type: {Object} [http.md]
+  [LasmSignature="message.headers", LasmAdded="v0.1.5"] readonly attribute object headers;
+  // `headersDistinct` Type: {Object} [http.md]
+  [LasmSignature="message.headersDistinct", LasmAdded="v18.3.0, v16.17.0"] readonly attribute object headersDistinct;
+  // `httpVersion` Type: {string} [http.md]
+  [LasmSignature="message.httpVersion", LasmAdded="v0.1.1"] readonly attribute DOMString httpVersion;
+  // `method` Type: {string} [http.md]
+  [LasmSignature="message.method", LasmAdded="v0.1.1"] readonly attribute DOMString method;
+  // `rawHeaders` Type: {string\[]} [http.md]
+  [LasmSignature="message.rawHeaders", LasmAdded="v0.11.6"] readonly attribute sequence<DOMString> rawHeaders;
+  // `rawTrailers` Type: {string\[]} [http.md]
+  [LasmSignature="message.rawTrailers", LasmAdded="v0.11.6"] readonly attribute sequence<DOMString> rawTrailers;
+  // `signal` Type: {AbortSignal} [http.md]
+  [LasmSignature="message.signal", LasmAdded="v24.16.0"] readonly attribute AbortSignal signal;
+  // `socket` Type: {stream.Duplex} [http.md]
+  [LasmSignature="message.socket", LasmAdded="v0.3.0"] readonly attribute Node_stream_Duplex socket;
+  // `statusCode` Type: {number} [http.md]
+  [LasmSignature="message.statusCode", LasmAdded="v0.1.1"] readonly attribute double statusCode;
+  // `statusMessage` Type: {string} [http.md]
+  [LasmSignature="message.statusMessage", LasmAdded="v0.11.10"] readonly attribute DOMString statusMessage;
+  // `trailers` Type: {Object} [http.md]
+  [LasmSignature="message.trailers", LasmAdded="v0.3.0"] readonly attribute object trailers;
+  // `trailersDistinct` Type: {Object} [http.md]
+  [LasmSignature="message.trailersDistinct", LasmAdded="v18.3.0, v16.17.0"] readonly attribute object trailersDistinct;
+  // `url` Type: {string} [http.md]
+  [LasmSignature="message.url", LasmAdded="v0.1.90"] readonly attribute DOMString url;
+};
+
+// Class: `http.Server` (http.md), node:http
+[LasmModule="node:http", LasmPath="Server", LasmLeanModule="Http", LasmDoc="http", LasmNamespace="http", LasmName="Server"]
+interface Node_http_Server : Node_net_Server {
+  // Event: 'checkContinue' [http.md]
+  [LasmEvent="checkContinue", LasmSignature="Event: 'checkContinue'", LasmAdded="v0.3.0"] Node_http_Server onCheckContinue(Node_http_Server_CheckContinueListener listener);
+  [LasmEvent="checkContinue", LasmSignature="Event: 'checkContinue'", LasmAdded="v0.3.0", LasmOnce] Node_http_Server onceCheckContinue(Node_http_Server_CheckContinueListener listener);
+  // Event: 'checkExpectation' [http.md]
+  [LasmEvent="checkExpectation", LasmSignature="Event: 'checkExpectation'", LasmAdded="v5.5.0"] Node_http_Server onCheckExpectation(Node_http_Server_CheckExpectationListener listener);
+  [LasmEvent="checkExpectation", LasmSignature="Event: 'checkExpectation'", LasmAdded="v5.5.0", LasmOnce] Node_http_Server onceCheckExpectation(Node_http_Server_CheckExpectationListener listener);
+  // Event: 'clientError' [http.md]
+  [LasmEvent="clientError", LasmSignature="Event: 'clientError'", LasmAdded="v0.1.94"] Node_http_Server onClientError(Node_http_Server_ClientErrorListener listener);
+  [LasmEvent="clientError", LasmSignature="Event: 'clientError'", LasmAdded="v0.1.94", LasmOnce] Node_http_Server onceClientError(Node_http_Server_ClientErrorListener listener);
+  // Event: 'close' [http.md]
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.1.4"] Node_http_Server onClose(Node_http_Server_CloseListener listener);
+  [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.1.4", LasmOnce] Node_http_Server onceClose(Node_http_Server_CloseListener listener);
+  // Event: 'connect' [http.md]
+  [LasmEvent="connect", LasmSignature="Event: 'connect'", LasmAdded="v0.7.0"] Node_http_Server onConnect(Node_http_Server_ConnectListener listener);
+  [LasmEvent="connect", LasmSignature="Event: 'connect'", LasmAdded="v0.7.0", LasmOnce] Node_http_Server onceConnect(Node_http_Server_ConnectListener listener);
+  // Event: 'connection' [http.md]
+  [LasmEvent="connection", LasmSignature="Event: 'connection'", LasmAdded="v0.1.0"] Node_http_Server onConnection(Node_http_Server_ConnectionListener listener);
+  [LasmEvent="connection", LasmSignature="Event: 'connection'", LasmAdded="v0.1.0", LasmOnce] Node_http_Server onceConnection(Node_http_Server_ConnectionListener listener);
+  // Event: 'dropRequest' [http.md]
+  [LasmEvent="dropRequest", LasmSignature="Event: 'dropRequest'", LasmAdded="v18.7.0, v16.17.0"] Node_http_Server onDropRequest(Node_http_Server_DropRequestListener listener);
+  [LasmEvent="dropRequest", LasmSignature="Event: 'dropRequest'", LasmAdded="v18.7.0, v16.17.0", LasmOnce] Node_http_Server onceDropRequest(Node_http_Server_DropRequestListener listener);
+  // Event: 'request' [http.md]
+  [LasmEvent="request", LasmSignature="Event: 'request'", LasmAdded="v0.1.0"] Node_http_Server onRequest(Node_http_Server_RequestListener listener);
+  [LasmEvent="request", LasmSignature="Event: 'request'", LasmAdded="v0.1.0", LasmOnce] Node_http_Server onceRequest(Node_http_Server_RequestListener listener);
+  // Event: 'upgrade' [http.md]
+  [LasmEvent="upgrade", LasmSignature="Event: 'upgrade'", LasmAdded="v0.1.94"] Node_http_Server onUpgrade(Node_http_Server_UpgradeListener listener);
+  [LasmEvent="upgrade", LasmSignature="Event: 'upgrade'", LasmAdded="v0.1.94", LasmOnce] Node_http_Server onceUpgrade(Node_http_Server_UpgradeListener listener);
+  // `server.close([callback])` [http.md]
+  [LasmSignature="server.close([callback])", LasmAdded="v0.1.90"] undefined close();
+  // `server.closeAllConnections()` [http.md]
+  [LasmSignature="server.closeAllConnections()", LasmAdded="v18.2.0"] undefined closeAllConnections();
+  // `server.closeIdleConnections()` [http.md]
+  [LasmSignature="server.closeIdleConnections()", LasmAdded="v18.2.0"] undefined closeIdleConnections();
+  // `server.setTimeout([msecs][, callback])` [http.md]
+  [LasmSignature="server.setTimeout([msecs][, callback])", LasmAdded="v0.9.12"] Node_http_Server setTimeout(optional double msecs);
+  // `headersTimeout` Type: {number} **Default:** The minimum between [`server.requestTimeout`][] or `60000`. [http.md]
+  [LasmSignature="server.headersTimeout", LasmAdded="v11.3.0, v10.14.0"] readonly attribute double headersTimeout;
+  // `listening` Type: {boolean} Indicates whether or not the server is listening for connections. [http.md]
+  [LasmSignature="server.listening", LasmAdded="v5.7.0"] readonly attribute boolean listening;
+  // `maxHeadersCount` Type: {number} **Default:** `1000` [http.md]
+  [LasmSignature="server.maxHeadersCount", LasmAdded="v0.7.0"] readonly attribute double maxHeadersCount;
+  // `requestTimeout` Type: {number} **Default:** `300000` [http.md]
+  [LasmSignature="server.requestTimeout", LasmAdded="v14.11.0"] readonly attribute double requestTimeout;
+  // `maxRequestsPerSocket` Type: {number} Requests per socket. **Default:** 0 (no limit) [http.md]
+  [LasmSignature="server.maxRequestsPerSocket", LasmAdded="v16.10.0"] readonly attribute double maxRequestsPerSocket;
+  // `timeout` Type: {number} Timeout in milliseconds. **Default:** 0 (no timeout) [http.md]
+  [LasmSignature="server.timeout", LasmAdded="v0.9.12"] readonly attribute double timeout;
+  // `keepAliveTimeout` Type: {number} Timeout in milliseconds. **Default:** `5000` (5 seconds). [http.md]
+  [LasmSignature="server.keepAliveTimeout", LasmAdded="v8.0.0"] readonly attribute double keepAliveTimeout;
+  // `keepAliveTimeoutBuffer` Type: {number} Timeout in milliseconds. **Default:** `1000` (1 second). [http.md]
+  [LasmSignature="server.keepAliveTimeoutBuffer", LasmAdded="v24.6.0"] readonly attribute double keepAliveTimeoutBuffer;
+};
+
+// HTTP (http.md), node:http
+[LasmModule="node:http", LasmLeanModule="Http", LasmDoc="http", LasmName="http"]
+namespace http {
+  // `http.createServer([options][, requestListener])` [http.md]
+  [LasmSignature="http.createServer([options][, requestListener])", LasmAdded="v0.1.13"] Node_http_Server createServer(optional Node_http_CreateServerOptions options, optional Node_http_Server_RequestListener requestListener);
+  // `http.get(options[, callback])` [http.md]
+  [LasmSignature="http.get(options[, callback])", LasmAdded="v0.3.6"] Node_http_ClientRequest get(object options);
+  // `http.get(url[, options][, callback])` [http.md]
+  [LasmSignature="http.get(url[, options][, callback])", LasmAdded="v0.3.6"] Node_http_ClientRequest get((DOMString or URL) url, optional object options);
+  // `http.request(options[, callback])` [http.md]
+  [LasmSignature="http.request(options[, callback])", LasmAdded="v0.3.6"] Node_http_ClientRequest request(Node_http_RequestOptions options);
+  // `http.request(url[, options][, callback])` [http.md]
+  [LasmSignature="http.request(url[, options][, callback])", LasmAdded="v0.3.6"] Node_http_ClientRequest request((DOMString or URL) url, optional Node_http_RequestOptions options);
+  // `http.validateHeaderName(name[, label])` [http.md]
+  [LasmSignature="http.validateHeaderName(name[, label])", LasmAdded="v14.3.0"] undefined validateHeaderName(DOMString name, optional DOMString label);
+  // `http.validateHeaderValue(name, value)` [http.md]
+  [LasmSignature="http.validateHeaderValue(name, value)", LasmAdded="v14.3.0"] undefined validateHeaderValue(DOMString name, any value);
+  // `http.setMaxIdleHTTPParsers(max)` [http.md]
+  [LasmSignature="http.setMaxIdleHTTPParsers(max)", LasmAdded="v18.8.0, v16.18.0"] undefined setMaxIdleHTTPParsers(double max);
+  // `http.setGlobalProxyFromEnv([proxyEnv])` [http.md]
+  [LasmSignature="http.setGlobalProxyFromEnv([proxyEnv])", LasmAdded="v24.14.0"] Function setGlobalProxyFromEnv(optional object proxyEnv);
+  // `METHODS` Type: {string\[]} [http.md]
+  [LasmSignature="http.METHODS", LasmAdded="v0.11.8"] readonly attribute sequence<DOMString> METHODS;
+  // `STATUS_CODES` Type: {Object} [http.md]
+  [LasmSignature="http.STATUS_CODES", LasmAdded="v0.1.22"] readonly attribute object STATUS_CODES;
+  // `globalAgent` Type: {http.Agent} [http.md]
+  [LasmSignature="http.globalAgent", LasmAdded="v0.5.9"] readonly attribute Node_http_Agent globalAgent;
+  // `maxHeaderSize` Type: {number} [http.md]
+  [LasmSignature="http.maxHeaderSize", LasmAdded="v11.6.0, v10.15.0"] readonly attribute double maxHeaderSize;
+};
+
+// Class: `https.Agent` (https.md), node:https
+[LasmModule="node:https", LasmPath="Agent", LasmLeanModule="Https", LasmDoc="https", LasmNamespace="https", LasmName="Agent"]
+interface Node_https_Agent : Node_http_Agent {
+  // new Agent([options]) [https.md]
+  [LasmSignature="new Agent([options])", LasmAdded="v0.4.5"] constructor(optional Node_https_Agent_NewOptions options);
+};
+
+// Class: `https.Server` (https.md), node:https
+[LasmModule="node:https", LasmPath="Server", LasmLeanModule="Https", LasmDoc="https", LasmNamespace="https", LasmName="Server"]
+interface Node_https_Server : Node_http_Server {
+  // `server.close([callback])` [https.md]
+  [LasmSignature="server.close([callback])", LasmAdded="v0.1.90"] Node_https_Server close();
+  // `server.closeAllConnections()` [https.md]
+  [LasmSignature="server.closeAllConnections()", LasmAdded="v18.2.0"] undefined closeAllConnections();
+  // `server.closeIdleConnections()` [https.md]
+  [LasmSignature="server.closeIdleConnections()", LasmAdded="v18.2.0"] undefined closeIdleConnections();
+  // `server.setTimeout([msecs][, callback])` [https.md]
+  [LasmSignature="server.setTimeout([msecs][, callback])", LasmAdded="v0.11.2"] Node_https_Server setTimeout(optional double msecs);
+  // `headersTimeout` Type: {number} **Default:** `60000` [https.md]
+  [LasmSignature="server.headersTimeout", LasmAdded="v11.3.0"] readonly attribute double headersTimeout;
+  // `maxHeadersCount` Type: {number} **Default:** `1000` [https.md]
+  [LasmSignature="server.maxHeadersCount"] readonly attribute double maxHeadersCount;
+  // `requestTimeout` Type: {number} **Default:** `300000` [https.md]
+  [LasmSignature="server.requestTimeout", LasmAdded="v14.11.0"] readonly attribute double requestTimeout;
+  // `timeout` Type: {number} **Default:** 0 (no timeout) [https.md]
+  [LasmSignature="server.timeout", LasmAdded="v0.11.2"] readonly attribute double timeout;
+  // `keepAliveTimeout` Type: {number} **Default:** `5000` (5 seconds) [https.md]
+  [LasmSignature="server.keepAliveTimeout", LasmAdded="v8.0.0"] readonly attribute double keepAliveTimeout;
+};
+
+// HTTPS (https.md), node:https
+[LasmModule="node:https", LasmLeanModule="Https", LasmDoc="https", LasmName="https"]
+namespace https {
+  // `https.createServer([options][, requestListener])` [https.md]
+  [LasmSignature="https.createServer([options][, requestListener])", LasmAdded="v0.3.4"] Node_https_Server createServer(optional object options, optional Node_http_Server_RequestListener requestListener);
+  // `https.get(options[, callback])` [https.md]
+  [LasmSignature="https.get(options[, callback])", LasmAdded="v0.3.6"] Node_http_ClientRequest get((object or DOMString or URL) options);
+  // `https.get(url[, options][, callback])` [https.md]
+  [LasmSignature="https.get(url[, options][, callback])", LasmAdded="v0.3.6"] Node_http_ClientRequest get((DOMString or URL) url, optional (object or DOMString or URL) options);
+  // `https.request(options[, callback])` [https.md]
+  [LasmSignature="https.request(options[, callback])", LasmAdded="v0.3.6"] Node_http_ClientRequest request((Node_https_RequestOptions or DOMString or URL) options);
+  // `https.request(url[, options][, callback])` [https.md]
+  [LasmSignature="https.request(url[, options][, callback])", LasmAdded="v0.3.6"] Node_http_ClientRequest request((DOMString or URL) url, optional (Node_https_RequestOptions or DOMString or URL) options);
+  // `https.globalAgent` [https.md]
+  [LasmSignature="https.globalAgent", LasmAdded="v0.5.9"] readonly attribute Node_https_Agent globalAgent;
+};
+
 [LasmNamespace="FileHandle", LasmName="ReadResult"]
 dictionary Node_FileHandle_ReadResult {
   required long long bytesRead;
@@ -503,10 +1267,54 @@ dictionary Node_child_process_ExecFileResult {
   required (DOMString or Uint8Array) stderr;
 };
 
+[LasmNamespace="net", LasmName="AddressInfo"]
+dictionary Node_net_AddressInfo {
+  required long long port;
+  required DOMString family;
+  required DOMString address;
+};
+
+[LasmNamespace="net.Server", LasmName="DropData"]
+dictionary Node_net_Server_DropData {
+  DOMString localAddress;
+  double localPort;
+  DOMString localFamily;
+  DOMString remoteAddress;
+  double remotePort;
+  DOMString remoteFamily;
+};
+
 [LasmNamespace="events", LasmName="OnceOptions"]
 dictionary Node_events_OnceOptions {
   AbortSignal signal;
 };
+
+[LasmNamespace="EventEmitter", LasmName="NewListenerListener"]
+callback Node_EventEmitter_NewListenerListener = undefined ((DOMString or symbol) eventName, Function listener);
+
+[LasmNamespace="EventEmitter", LasmName="RemoveListenerListener"]
+callback Node_EventEmitter_RemoveListenerListener = undefined ((DOMString or symbol) eventName, Function listener);
+
+[LasmNamespace="stream.Readable", LasmName="CloseListener"]
+callback Node_stream_Readable_CloseListener = undefined ();
+
+[LasmNamespace="stream.Readable", LasmName="DataListener"]
+callback Node_stream_Readable_DataListener = undefined (any chunk);
+
+[LasmNamespace="stream.Readable", LasmName="EndListener"]
+callback Node_stream_Readable_EndListener = undefined ();
+
+[LasmNamespace="stream.Readable", LasmName="ErrorListener"]
+callback Node_stream_Readable_ErrorListener = undefined (any value);
+
+[LasmNamespace="stream.Readable", LasmName="PauseListener"]
+callback Node_stream_Readable_PauseListener = undefined ();
+
+[LasmNamespace="stream.Readable", LasmName="ReadableListener"]
+callback Node_stream_Readable_ReadableListener = undefined ();
+
+[LasmNamespace="stream.Readable", LasmName="ResumeListener"]
+callback Node_stream_Readable_ResumeListener = undefined ();
 
 [LasmNamespace="stream.Readable", LasmName="FromWebOptions"]
 dictionary Node_stream_Readable_FromWebOptions {
@@ -528,12 +1336,51 @@ dictionary Node_stream_Readable_ToWebOptions {
   DOMString type;
 };
 
+[LasmNamespace="stream.Writable", LasmName="CloseListener"]
+callback Node_stream_Writable_CloseListener = undefined ();
+
+[LasmNamespace="stream.Writable", LasmName="DrainListener"]
+callback Node_stream_Writable_DrainListener = undefined ();
+
+[LasmNamespace="stream.Writable", LasmName="ErrorListener"]
+callback Node_stream_Writable_ErrorListener = undefined (any value);
+
+[LasmNamespace="stream.Writable", LasmName="FinishListener"]
+callback Node_stream_Writable_FinishListener = undefined ();
+
+[LasmNamespace="stream.Writable", LasmName="PipeListener"]
+callback Node_stream_Writable_PipeListener = undefined (Node_stream_Readable src);
+
+[LasmNamespace="stream.Writable", LasmName="UnpipeListener"]
+callback Node_stream_Writable_UnpipeListener = undefined (Node_stream_Readable src);
+
 [LasmNamespace="stream.Writable", LasmName="FromWebOptions"]
 dictionary Node_stream_Writable_FromWebOptions {
   boolean decodeStrings;
   double highWaterMark;
   boolean objectMode;
   AbortSignal signal;
+};
+
+[LasmNamespace="stream.Duplex", LasmName="FromWebPair"]
+dictionary Node_stream_Duplex_FromWebPair {
+  ReadableStream readable;
+  WritableStream writable;
+};
+
+[LasmNamespace="stream.Duplex", LasmName="FromWebOptions"]
+dictionary Node_stream_Duplex_FromWebOptions {
+  boolean allowHalfOpen;
+  boolean decodeStrings;
+  DOMString encoding;
+  double highWaterMark;
+  boolean objectMode;
+  AbortSignal signal;
+};
+
+[LasmNamespace="stream.Duplex", LasmName="ToWebOptions"]
+dictionary Node_stream_Duplex_ToWebOptions {
+  DOMString readableType;
 };
 
 [LasmNamespace="path", LasmName="PathObject"]
@@ -549,6 +1396,9 @@ dictionary Node_path_PathObject {
 dictionary Node_os_UserInfoOptions {
   DOMString encoding = "utf8";
 };
+
+[LasmNamespace="FileHandle", LasmName="CloseListener"]
+callback Node_FileHandle_CloseListener = undefined ();
 
 [LasmNamespace="FileHandle", LasmName="AppendFileOptions"]
 dictionary Node_FileHandle_AppendFileOptions {
@@ -729,6 +1579,24 @@ dictionary Node_crypto_ScryptOptions {
   double maxmem;
 };
 
+[LasmNamespace="ChildProcess", LasmName="CloseListener"]
+callback Node_ChildProcess_CloseListener = undefined (long long? code, DOMString? signal);
+
+[LasmNamespace="ChildProcess", LasmName="DisconnectListener"]
+callback Node_ChildProcess_DisconnectListener = undefined ();
+
+[LasmNamespace="ChildProcess", LasmName="ErrorListener"]
+callback Node_ChildProcess_ErrorListener = undefined (any err);
+
+[LasmNamespace="ChildProcess", LasmName="ExitListener"]
+callback Node_ChildProcess_ExitListener = undefined (long long? code, DOMString? signal);
+
+[LasmNamespace="ChildProcess", LasmName="MessageListener"]
+callback Node_ChildProcess_MessageListener = undefined (object message, object? sendHandle);
+
+[LasmNamespace="ChildProcess", LasmName="SpawnListener"]
+callback Node_ChildProcess_SpawnListener = undefined ();
+
 [LasmNamespace="child_process", LasmName="ExecFileOptions"]
 dictionary Node_child_process_ExecFileOptions {
   (DOMString or URL) cwd;
@@ -761,4 +1629,309 @@ dictionary Node_child_process_SpawnOptions {
   AbortSignal signal;
   double timeout;
   (DOMString or long long) killSignal = "SIGTERM";
+};
+
+[LasmNamespace="net.SocketAddress", LasmName="NewOptions"]
+dictionary Node_net_SocketAddress_NewOptions {
+  DOMString address;
+  DOMString family;
+  double flowlabel;
+  double port;
+};
+
+[LasmNamespace="net.BoundSocket", LasmName="NewOptions"]
+dictionary Node_net_BoundSocket_NewOptions {
+  DOMString host;
+  double port = 0;
+  boolean ipv6Only = false;
+  boolean reusePort = false;
+  DOMString path;
+};
+
+[LasmNamespace="net.Server", LasmName="CloseListener"]
+callback Node_net_Server_CloseListener = undefined ();
+
+[LasmNamespace="net.Server", LasmName="ConnectionListener"]
+callback Node_net_Server_ConnectionListener = undefined (Node_net_Socket value);
+
+[LasmNamespace="net.Server", LasmName="ErrorListener"]
+callback Node_net_Server_ErrorListener = undefined (any value);
+
+[LasmNamespace="net.Server", LasmName="ListeningListener"]
+callback Node_net_Server_ListeningListener = undefined ();
+
+[LasmNamespace="net.Server", LasmName="DropListener"]
+callback Node_net_Server_DropListener = undefined (Node_net_Server_DropData? data);
+
+[LasmNamespace="net.Server", LasmName="ListenOptions"]
+dictionary Node_net_Server_ListenOptions {
+  double backlog;
+  boolean exclusive = false;
+  Node_net_BoundSocket handle;
+  DOMString host;
+  boolean ipv6Only = false;
+  boolean reusePort = false;
+  DOMString path;
+  double port;
+  boolean readableAll = false;
+  AbortSignal signal;
+  boolean writableAll = false;
+};
+
+[LasmNamespace="net.Socket", LasmName="CloseListener"]
+callback Node_net_Socket_CloseListener = undefined (boolean hadError);
+
+[LasmNamespace="net.Socket", LasmName="ConnectListener"]
+callback Node_net_Socket_ConnectListener = undefined ();
+
+[LasmNamespace="net.Socket", LasmName="ConnectionAttemptListener"]
+callback Node_net_Socket_ConnectionAttemptListener = undefined (DOMString ip, double port, double family);
+
+[LasmNamespace="net.Socket", LasmName="ConnectionAttemptFailedListener"]
+callback Node_net_Socket_ConnectionAttemptFailedListener = undefined (DOMString ip, double port, double family, any error);
+
+[LasmNamespace="net.Socket", LasmName="ConnectionAttemptTimeoutListener"]
+callback Node_net_Socket_ConnectionAttemptTimeoutListener = undefined (DOMString ip, double port, double family);
+
+[LasmNamespace="net.Socket", LasmName="DataListener"]
+callback Node_net_Socket_DataListener = undefined ((Uint8Array or DOMString) value);
+
+[LasmNamespace="net.Socket", LasmName="DrainListener"]
+callback Node_net_Socket_DrainListener = undefined ();
+
+[LasmNamespace="net.Socket", LasmName="EndListener"]
+callback Node_net_Socket_EndListener = undefined ();
+
+[LasmNamespace="net.Socket", LasmName="ErrorListener"]
+callback Node_net_Socket_ErrorListener = undefined (any value);
+
+[LasmNamespace="net.Socket", LasmName="LookupListener"]
+callback Node_net_Socket_LookupListener = undefined (any err, DOMString address, double? family, DOMString host);
+
+[LasmNamespace="net.Socket", LasmName="ReadyListener"]
+callback Node_net_Socket_ReadyListener = undefined ();
+
+[LasmNamespace="net.Socket", LasmName="TimeoutListener"]
+callback Node_net_Socket_TimeoutListener = undefined ();
+
+[LasmNamespace="net.Socket", LasmName="NewOptionsOnread"]
+dictionary Node_net_Socket_NewOptionsOnread {
+  (Uint8Array or Function) buffer;
+  Function _callback;
+};
+
+[LasmNamespace="net.Socket", LasmName="NewOptions"]
+dictionary Node_net_Socket_NewOptions {
+  boolean allowHalfOpen = false;
+  Node_net_BlockList blockList;
+  double fd;
+  Node_net_BoundSocket handle;
+  boolean keepAlive = false;
+  double keepAliveInitialDelay = 0;
+  boolean noDelay = false;
+  Node_net_Socket_NewOptionsOnread onread;
+  boolean readable = false;
+  AbortSignal signal;
+  double typeOfService;
+  boolean writable = false;
+};
+
+[LasmNamespace="net.Socket", LasmName="SetKeepAliveOptions"]
+dictionary Node_net_Socket_SetKeepAliveOptions {
+  boolean enable = false;
+  double initialDelay = 0;
+  double interval = 1000;
+  double count = 10;
+};
+
+[LasmNamespace="net", LasmName="CreateServerOptions"]
+dictionary Node_net_CreateServerOptions {
+  boolean allowHalfOpen = false;
+  double highWaterMark;
+  boolean keepAlive = false;
+  double keepAliveInitialDelay = 0;
+  boolean noDelay = false;
+  boolean pauseOnConnect = false;
+  Node_net_BlockList blockList;
+};
+
+[LasmNamespace="http.Agent", LasmName="NewOptionsProxyEnv"]
+dictionary Node_http_Agent_NewOptionsProxyEnv {
+  DOMString? HTTP_PROXY;
+  DOMString? HTTPS_PROXY;
+  DOMString? NO_PROXY;
+  DOMString? http_proxy;
+  DOMString? https_proxy;
+  DOMString? no_proxy;
+};
+
+[LasmNamespace="http.Agent", LasmName="NewOptions"]
+dictionary Node_http_Agent_NewOptions {
+  boolean keepAlive = false;
+  double keepAliveMsecs = 1000;
+  double agentKeepAliveTimeoutBuffer = 1000;
+  double maxSockets;
+  double maxTotalSockets;
+  double maxFreeSockets = 256;
+  DOMString scheduling = "lifo";
+  double timeout;
+  Node_http_Agent_NewOptionsProxyEnv? proxyEnv;
+  double defaultPort = 80;
+  DOMString protocol = "http:";
+};
+
+[LasmNamespace="http.Agent", LasmName="GetNameOptions"]
+dictionary Node_http_Agent_GetNameOptions {
+  DOMString host;
+  double port;
+  DOMString localAddress;
+  long long family;
+};
+
+[LasmNamespace="http.OutgoingMessage", LasmName="DrainListener"]
+callback Node_http_OutgoingMessage_DrainListener = undefined ();
+
+[LasmNamespace="http.OutgoingMessage", LasmName="FinishListener"]
+callback Node_http_OutgoingMessage_FinishListener = undefined ();
+
+[LasmNamespace="http.OutgoingMessage", LasmName="PrefinishListener"]
+callback Node_http_OutgoingMessage_PrefinishListener = undefined ();
+
+[LasmNamespace="http.ClientRequest", LasmName="CloseListener"]
+callback Node_http_ClientRequest_CloseListener = undefined ();
+
+[LasmNamespace="http.ClientRequest", LasmName="ConnectListener"]
+callback Node_http_ClientRequest_ConnectListener = undefined (Node_http_IncomingMessage response, Node_stream_Duplex socket, Uint8Array head);
+
+[LasmNamespace="http.ClientRequest", LasmName="ContinueListener"]
+callback Node_http_ClientRequest_ContinueListener = undefined ();
+
+[LasmNamespace="http.ClientRequest", LasmName="FinishListener"]
+callback Node_http_ClientRequest_FinishListener = undefined ();
+
+[LasmNamespace="http.ClientRequest", LasmName="InformationInfo"]
+dictionary Node_http_ClientRequest_InformationInfo {
+  DOMString httpVersion;
+  long long httpVersionMajor;
+  long long httpVersionMinor;
+  long long statusCode;
+  DOMString statusMessage;
+  object headers;
+  sequence<DOMString> rawHeaders;
+};
+
+[LasmNamespace="http.ClientRequest", LasmName="InformationListener"]
+callback Node_http_ClientRequest_InformationListener = undefined (Node_http_ClientRequest_InformationInfo info);
+
+[LasmNamespace="http.ClientRequest", LasmName="ResponseListener"]
+callback Node_http_ClientRequest_ResponseListener = undefined (Node_http_IncomingMessage response);
+
+[LasmNamespace="http.ClientRequest", LasmName="SocketListener"]
+callback Node_http_ClientRequest_SocketListener = undefined (Node_stream_Duplex socket);
+
+[LasmNamespace="http.ClientRequest", LasmName="TimeoutListener"]
+callback Node_http_ClientRequest_TimeoutListener = undefined ();
+
+[LasmNamespace="http.ClientRequest", LasmName="UpgradeListener"]
+callback Node_http_ClientRequest_UpgradeListener = undefined (Node_http_IncomingMessage response, Node_stream_Duplex socket, Uint8Array head);
+
+[LasmNamespace="http.ServerResponse", LasmName="CloseListener"]
+callback Node_http_ServerResponse_CloseListener = undefined ();
+
+[LasmNamespace="http.ServerResponse", LasmName="FinishListener"]
+callback Node_http_ServerResponse_FinishListener = undefined ();
+
+[LasmNamespace="http.IncomingMessage", LasmName="CloseListener"]
+callback Node_http_IncomingMessage_CloseListener = undefined ();
+
+[LasmNamespace="http.Server", LasmName="CheckContinueListener"]
+callback Node_http_Server_CheckContinueListener = undefined (Node_http_IncomingMessage request, Node_http_ServerResponse response);
+
+[LasmNamespace="http.Server", LasmName="CheckExpectationListener"]
+callback Node_http_Server_CheckExpectationListener = undefined (Node_http_IncomingMessage request, Node_http_ServerResponse response);
+
+[LasmNamespace="http.Server", LasmName="ClientErrorListener"]
+callback Node_http_Server_ClientErrorListener = undefined (any exception, Node_stream_Duplex socket);
+
+[LasmNamespace="http.Server", LasmName="CloseListener"]
+callback Node_http_Server_CloseListener = undefined ();
+
+[LasmNamespace="http.Server", LasmName="ConnectListener"]
+callback Node_http_Server_ConnectListener = undefined (Node_http_IncomingMessage request, Node_stream_Duplex socket, Uint8Array head);
+
+[LasmNamespace="http.Server", LasmName="ConnectionListener"]
+callback Node_http_Server_ConnectionListener = undefined (Node_stream_Duplex socket);
+
+[LasmNamespace="http.Server", LasmName="DropRequestListener"]
+callback Node_http_Server_DropRequestListener = undefined (Node_http_IncomingMessage request, Node_stream_Duplex socket);
+
+[LasmNamespace="http.Server", LasmName="RequestListener"]
+callback Node_http_Server_RequestListener = undefined (Node_http_IncomingMessage request, Node_http_ServerResponse response);
+
+[LasmNamespace="http.Server", LasmName="UpgradeListener"]
+callback Node_http_Server_UpgradeListener = undefined (Node_http_IncomingMessage request, Node_stream_Duplex socket, Uint8Array head);
+
+[LasmNamespace="http", LasmName="CreateServerOptions"]
+dictionary Node_http_CreateServerOptions {
+  undefined connectionsCheckingInterval = 30000;
+  undefined headersTimeout = 60000;
+  double highWaterMark;
+  DOMString httpValidation;
+  boolean insecureHTTPParser = false;
+  Node_http_IncomingMessage IncomingMessage;
+  boolean joinDuplicateHeaders = false;
+  boolean keepAlive = false;
+  double keepAliveInitialDelay = 0;
+  undefined keepAliveTimeout = 65000;
+  double maxHeaderSize;
+  boolean noDelay = true;
+  undefined requestTimeout = 300000;
+  boolean requireHostHeader = true;
+  Node_http_ServerResponse ServerResponse;
+  sequence<any> uniqueHeaders;
+  boolean rejectNonStandardBodyWrites = false;
+  boolean optimizeEmptyRequests = false;
+};
+
+[LasmNamespace="http", LasmName="RequestOptions"]
+dictionary Node_http_RequestOptions {
+  (Node_http_Agent or boolean) agent;
+  DOMString auth;
+  Function createConnection;
+  double defaultPort;
+  double family;
+  (object or sequence<any>) headers;
+  double hints;
+  DOMString host = "localhost";
+  DOMString hostname;
+  DOMString httpValidation;
+  boolean insecureHTTPParser = false;
+  boolean joinDuplicateHeaders = false;
+  DOMString localAddress;
+  double localPort;
+  Function lookup;
+  double maxHeaderSize;
+  DOMString method = "GET";
+  DOMString path;
+  double port;
+  DOMString protocol = "http:";
+  boolean setDefaultHeaders;
+  boolean setHost;
+  AbortSignal signal;
+  DOMString socketPath;
+  double timeout;
+  sequence<any> uniqueHeaders;
+};
+
+[LasmNamespace="https.Agent", LasmName="NewOptions"]
+dictionary Node_https_Agent_NewOptions {
+  double maxCachedSessions = 100;
+  DOMString servername;
+};
+
+[LasmNamespace="https", LasmName="RequestOptions"]
+dictionary Node_https_RequestOptions {
+  undefined protocol = "https:";
+  undefined port = 443;
+  undefined agent;
 };

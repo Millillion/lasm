@@ -123,7 +123,7 @@ function parseSignature(textRaw) {
 const idlName = name => 'Node_' + name.replace(/\./g, '_');
 /** Every Node-side name the IDL defines (classes, namespaces' dictionaries). */
 const defined = new Map(); // doc/Lean name (fs.Stats, FileHandle.ReadResult) → IDL name
-const webNames = new Set(['URL', 'AbortSignal', 'ReadableStream', 'WritableStream', 'CryptoKey', 'Blob', 'Function', 'ArrayBuffer']);
+const webNames = new Set(['URL', 'AbortSignal', 'ReadableStream', 'WritableStream', 'CryptoKey', 'Blob', 'Function', 'ArrayBuffer', 'Headers']);
 function namedType(n, where) {
   const mapped = tier.typeNames[n];
   if (mapped === undefined) fail(`${where}: the docs' type ${JSON.stringify(n)} is not in node-tier2.mjs typeNames`);
@@ -145,6 +145,8 @@ function lowerType(typeText, ctx) {
     const seq = /^(.*)\[\]$/.exec(tok);
     if (seq) { alts.push(`sequence<${lowerType(seq[1], { ...ctx, options: null })}>`); continue; }
     if (tok === 'Object' && ctx.options?.length) { alts.push(ctx.makeDict(ctx.options)); continue; }
+    // `{this}`: the object the method is called on, as the class's own type.
+    if (tok === 'this') { alts.push(currentSelf ? defined.get(currentSelf) ?? fail(`${ctx.where}: {this} of ${currentSelf}`) : fail(`${ctx.where}: {this} outside a class`)); continue; }
     alts.push(namedType(tok, ctx.where));
   }
   // Bytes: one alternative (a Uint8Array is accepted wherever the docs list ArrayBuffer beside typed arrays).
@@ -170,6 +172,8 @@ const idlKeywords = new Set(['any', 'async', 'attribute', 'bigint', 'boolean', '
   'typedef', 'undefined', 'unrestricted', 'unsigned', 'true', 'false', 'null', 'Infinity', 'NaN']);
 const escapeName = n => idlKeywords.has(n) ? '_' + n : n;
 const dicts = []; // IDL text
+/** The class being lowered (`{this}` is its type). */
+let currentSelf = null;
 const dictNames = new Set();
 /** A dictionary of documented option members (`fsPromises.ReadFileOptions`); nested ones are named after their member. */
 function makeDictionary(ns, base, options, where, overrides, path) {
@@ -178,6 +182,7 @@ function makeDictionary(ns, base, options, where, overrides, path) {
   dictNames.add(`${ns}.${lean}`);
   const name = idlName(`${ns}.${lean}`);
   defined.set(`${ns}.${lean}`, name);
+  const mark = dicts.length;
   const members = [];
   for (const o of options) {
     if (!/^[A-Za-z_$][\w$]*$/.test(o.name)) continue; // `fs.constants.COPYFILE_EXCL` and the like: values, not members
@@ -187,7 +192,11 @@ function makeDictionary(ns, base, options, where, overrides, path) {
     const def = defaultLiteral(o.default);
     members.push(`  ${type} ${escapeName(o.name)}${def !== undefined ? ' = ' + def : ''};`);
   }
-  dicts.push(`[LasmNamespace="${ns}", LasmName="${lean}"]\ndictionary ${name} {\n${members.join('\n')}\n};`);
+  // The same options documented again for another overload (`http.request(options)` and `http.request(url, options)`): one dictionary.
+  const body = members.join('\n');
+  const same = lean !== base && dicts.slice(0, mark).find(d => d.startsWith(`[LasmNamespace="${ns}", LasmName="${base}"]\n`) && d.endsWith(`{\n${body}\n};`));
+  if (same && dicts.length === mark) { dictNames.delete(`${ns}.${lean}`); defined.delete(`${ns}.${lean}`); return idlName(`${ns}.${base}`); }
+  dicts.push(`[LasmNamespace="${ns}", LasmName="${lean}"]\ndictionary ${name} {\n${body}\n};`);
   return name;
 }
 /** A documented default that is a JavaScript literal, as a WebIDL default. */
@@ -205,20 +214,32 @@ function lowerContainer(doc, all, mod, c, out) {
   const where = `${doc} ${c.heading ?? c.statics?.heading}`;
   const members = [];
   const take = (section, prefix, isStatic) => {
-    for (const k of ['methods', 'classMethods', 'properties', 'ctors']) for (const node of section.node[k] ?? []) {
+    const parents = [...section.parents, section.node];
+    for (const k of ['methods', 'classMethods', 'properties', 'ctors']) for (const node0 of section.node[k] ?? []) {
+      // Overloads documented as sections of one heading (`server.listen()` with `server.listen(options[, callback])`, …):
+      // each is a member, the heading itself is not.
+      const sig0 = parseSignature(node0.textRaw);
+      const nested = k === 'methods' && sig0 && (node0.methods ?? []).filter(n => parseSignature(n.textRaw)?.name === sig0.name);
+      for (const node of nested?.length ? nested : [node0]) {
       const sig = parseSignature(node.textRaw);
-      let name;
-      if (k === 'properties') { name = /^`([^`]+)`/.exec(node.textRaw)?.[1] ?? (/^Type:/.test(node.textRaw) ? node.name : null); if (!name) continue; }
+      let name, classStatic = false;
+      if (k === 'properties') {
+        name = /^`([^`]+)`/.exec(node.textRaw)?.[1] ?? (/^Type:/.test(node.textRaw) ? node.name : null); if (!name) continue;
+        if (prefix && name.startsWith(prefix) && !name.slice(prefix.length).includes('.')) name = name.slice(prefix.length);
+      }
       else if (!sig) continue;
       else {
         name = sig.name;
         if (prefix && name.startsWith(prefix)) name = name.slice(prefix.length);
-        else if (k === 'classMethods' && name.startsWith(c.path + '.')) name = name.slice(c.path.length + 1);
+        // A static method documented beside the instance methods (`SocketAddress.parse(input)`, `BlockList.isBlockList(value)`).
+        else if (c.path && name.startsWith(c.path + '.')) { name = name.slice(c.path.length + 1); classStatic = true; }
         else if (prefix) continue;
         if (name.includes('.') || name.includes('[')) name = name.includes('[') ? name.slice(name.indexOf('[')) : name;
       }
       if (name.includes('.') && !(c.statics && isStatic)) continue;
-      members.push({ node, kind: k, name, sig, stability: stabilityOf(node, [...section.parents, section.node]), isStatic: isStatic || k === 'classMethods' });
+      const pars = node === node0 ? parents : [...parents, node0];
+      members.push({ node, kind: k, name, sig, stability: stabilityOf(node, pars), isStatic: isStatic || classStatic || k === 'classMethods' });
+      }
     }
   };
   if (c.heading) take(findSection(all, c.heading), c.prefix, false);
@@ -226,12 +247,73 @@ function lowerContainer(doc, all, mod, c, out) {
   const keyOf = m => m.sig ? `${m.name}(${m.node.textRaw.match(/\(([^)]*)\)/)[1]})` : m.name;
   const selected = members.filter(m => {
     if (c.only) return c.only.includes(m.name) || c.only.includes(keyOf(m));
-    return !(c.exclude && (m.name in c.exclude));
+    return !(c.exclude && (m.name in c.exclude || keyOf(m) in c.exclude));
   });
   const absent = what => strict ? fail(`${where}: ${what} is not documented`) : out.absent.push(`${where}: ${what}`);
   for (const o of c.only ?? []) if (!members.some(m => m.name === o || keyOf(m) === o)) absent(o);
-  for (const e of Object.keys(c.exclude ?? {})) if (!members.some(m => m.name === e)) absent(`excluded ${e}`);
+  for (const e of Object.keys(c.exclude ?? {})) if (!members.some(m => m.name === e || keyOf(m) === e)) absent(`excluded ${e}`);
+  const self = c.kind === 'namespace' ? null : c.name;
+  currentSelf = self;
+  // `Extends:` as documented, or the stated parent with the sentence that gives it (extendsQuote).
+  if (c.heading && c.kind === 'class') {
+    const sec = findSection(all, c.heading);
+    const documented = /Extends: <a[^>]*>&lt;([^&]*)&gt;/.exec(sec.node.desc ?? '')?.[1] ?? null;
+    if (c.extendsQuote) {
+      if (!docText(out.trees[c.extendsQuote.doc]).includes(c.extendsQuote.quote)) fail(`${where}: the ${c.extendsQuote.doc} docs no longer say ${JSON.stringify(c.extendsQuote.quote)} (extendsQuote)`);
+    } else if (c.extends && c.extends !== documented) absent(`Extends: ${c.extends} (the docs say ${documented})`);
+  }
   const lines = [];
+  // Events: a typed listener (a callback of the documented arguments) and `on<Event>` / `once<Event>`, which call
+  // emitter.on / emitter.once with the event's name and return the emitter (as those do).
+  if (c.heading && c.kind === 'class') {
+    const sec = findSection(all, c.heading);
+    for (const e of sec.node.events ?? []) {
+      const stability = stabilityOf(e, [...sec.parents, sec.node]);
+      const key = `${c.name}#${e.name}`;
+      if (c.events && !c.events.includes(e.name)) continue;
+      if (stability !== 2) { out.skipped.push(`${key}: stability ${stability}`); continue; }
+      const p = tier.eventProse[key];
+      let params = e.params ?? [];
+      if (p) {
+        out.proseUsed.add(key);
+        if (!plainText([e.desc, ...params.map(x => x.textRaw)].join(' ')).includes(p.quote)) absent(`${key}: eventProse ${JSON.stringify(p.quote)}`);
+      } else if (!params.length && /<li><code>[A-Za-z_]\w*<\/code>/.test(e.desc ?? '')) fail(`${key}: the event's arguments are listed in prose only: state them in node-tier2.mjs eventProse`);
+      const args = p ? p.args.map(a => `${proseType(a.type)} ${a.name}`) : params.map((x, i) => {
+        // `Type: {net.Socket}` (an argument documented without a name) is `value` (`value2`, …).
+        const n = x.name === 'Type' ? (params.length === 1 ? 'value' : `value${i + 1}`) : x.name;
+        return `${lowerType(docType(x), { where: `${key} ${n}`, options: x.options,
+          makeDict: opts => makeDictionary(c.name, `${capital(e.name)}${capital(n)}`, opts, key, {}, n) })} ${escapeName(n)}`;
+      });
+      const cb = `${capital(e.name)}Listener`;
+      const cbIdl = idlName(`${c.name}.${cb}`);
+      defined.set(`${c.name}.${cb}`, cbIdl);
+      dicts.push(`[LasmNamespace="${c.name}", LasmName="${cb}"]\ncallback ${cbIdl} = undefined (${args.join(', ')});`);
+      const evAttrs = [`LasmEvent="${e.name}"`, `LasmSignature="Event: '${e.name}'"`, addedOf(e)].filter(Boolean).join(', ');
+      lines.push(`  // Event: '${e.name}' [${doc}.md]`,
+        `  [${evAttrs}] ${idlName(c.name)} on${capital(e.name)}(${cbIdl} listener);`,
+        `  [${evAttrs}, LasmOnce] ${idlName(c.name)} once${capital(e.name)}(${cbIdl} listener);`);
+    }
+  }
+  // A constructor the docs give as a heading only (`new Agent([options])`): the stated signature, checked against the
+  // class's documented parameters.
+  if (c.ctor) {
+    const sec = findSection(all, c.heading);
+    const sigs = sec.node.signatures ?? [];
+    const parsed = parseSignature('`' + c.ctor.replace(/^new /, '') + '`');
+    if (sigs.length !== 1 && !(sigs.length === 0 && !parsed.params.length)) fail(`${where}: ${sigs.length} documented constructor signatures`);
+    if (!sigs.length && !docText(sec.node).includes(c.ctor.replace(/\(\)$/, ''))) fail(`${where}: the docs do not mention ${c.ctor}`);
+    const typed = new Map((sigs[0]?.params ?? []).map(x => [x.name, x]));
+    if (parsed.params.map(x => x.name).join() !== [...typed.keys()].join()) fail(`${where}: ${c.ctor} has parameters ${[...typed.keys()].join(', ')} in the docs`);
+    const idlArgs = parsed.params.map(x => {
+      const cp = tier.prose[`${c.name}.constructor`];
+      if (cp) { out.proseUsed.add(`${c.name}.constructor`); if (!docText(sec.node).includes(cp.quote)) absent(`${c.ctor}: prose ${JSON.stringify(cp.quote)}`); }
+      const override = cp?.params?.[x.name];
+      const t = override ? proseType(override) : lowerType(docType(typed.get(x.name)), { where: `${where} ${c.ctor} ${x.name}`, options: typed.get(x.name).options,
+        makeDict: opts => makeDictionary(c.name, `New${capital(x.name)}`, opts, c.ctor, {}, x.name), self });
+      return `${x.optional ? 'optional ' : ''}${x.optional ? t.replace(/\?$/, '') : t} ${x.name}`;
+    });
+    lines.push(`  // ${c.ctor} [${doc}.md]`, `  [${[`LasmSignature="${c.ctor}"`, addedOf(sec.node)].filter(Boolean).join(', ')}] constructor(${idlArgs.join(', ')});`);
+  }
   for (const m of selected) {
     if (m.stability !== 2) {
       if (c.only?.includes(m.name)) fail(`${where}: ${m.name} has stability ${m.stability}, not 2 (Stable)`);
@@ -243,12 +325,15 @@ function lowerContainer(doc, all, mod, c, out) {
     const p = proseKey ? tier.prose[proseKey] : null;
     if (p) {
       out.proseUsed.add(proseKey);
-      const text = memberText(m.node) + ' ' + plainText(section(all, m).desc ?? '');
-      if (!text.includes(p.quote)) fail(`${docName}: the docs no longer say ${JSON.stringify(p.quote)} (node-tier2.mjs prose)`);
+      // quoteDoc: the sentence is elsewhere in the module's docs (`net.connect()`: "Aliases to net.createConnection()").
+      const text = p.quoteDoc ? docText(out.trees[doc]) : memberText(m.node) + ' ' + plainText(section(all, m).desc ?? '');
+      if (!text.includes(p.quote)) absent(`${docName}: prose ${JSON.stringify(p.quote)} (node-tier2.mjs prose)`);
     }
     const comment = `  // ${m.node.textRaw.replace(/\s+/g, ' ').slice(0, 200)} [${doc}.md]`;
     if (m.kind === 'properties') {
-      const type = p?.returns ? proseType(p.returns) : lowerType(docType(m.node), { where: `${where} ${m.name}` });
+      const dt = docType(m.node);
+      if (!p?.returns && (!dt || dt === 'property')) fail(`${docName}: the property's type is prose only: state it in node-tier2.mjs prose`);
+      const type = p?.returns ? proseType(p.returns) : lowerType(dt, { where: `${where} ${m.name}` });
       lines.push(comment, `  [${[`LasmSignature="${docName}"`, addedOf(m.node)].filter(Boolean).join(', ')}] ${c.kind === 'namespace' ? '' : m.isStatic ? 'static ' : ''}readonly attribute ${type} ${escapeName(m.name)};`);
       continue;
     }
@@ -256,7 +341,7 @@ function lowerContainer(doc, all, mod, c, out) {
     if (!s) fail(`${docName}: no signature`);
     const typed = new Map((s.params ?? []).map(x => [x.name.replace(/^\.\.\./, ''), x]));
     let params = m.sig.params.map(x => {
-      const d = typed.get(x.name);
+      const d = typed.get(x.name) ?? (p?.params?.[x.name] ? { name: x.name } : null);
       if (!d) fail(`${docName}: parameter ${x.name} has no documented type`);
       return { ...x, doc: d };
     });
@@ -281,7 +366,11 @@ function lowerContainer(doc, all, mod, c, out) {
     }
     if (!ret) {
       const r = s.return;
-      if (!r) ret = 'undefined';
+      // `Returns: {T}` written in the description instead of the signature (`net.getDefaultAutoSelectFamily()`).
+      const inDesc = /Returns: <([^>]+)>/.exec(plainText(m.node.desc));
+      if (!r && inDesc) ret = lowerType(inDesc[1], { where: `${docName} result` });
+      else if (!r) ret = 'undefined';
+      else if (!docType(r) && r.type !== 'Promise') fail(`${docName}: the result's type is prose only (${JSON.stringify(r.textRaw)}): state it in node-tier2.mjs prose`);
       else if (/^Promise$/.test(r.type)) {
         const desc = plainText(r.desc ?? '');
         const t = /\{([^}]+)\}/.exec(r.desc ?? '') ?? /Fulfills with (?:an? |the )?\{([^}]+)\}/.exec(r.textRaw);
@@ -330,25 +419,28 @@ async function lower(version) {
   defined.clear(); dicts.length = 0; dictNames.clear();
   for (const m of tier.modules) for (const c of m.containers) if (c.kind !== 'namespace') defined.set(c.name, idlName(c.name));
   for (const x of tier.proseIdl) {
-    const m = /LasmNamespace="(\w+)"\]\s*dictionary (\w+)/.exec(x.idl);
+    const m = /LasmNamespace="([\w.]+)"\]\s*dictionary (\w+)/.exec(x.idl);
     defined.set(`${m[1]}.${m[2]}`, idlName(`${m[1]}.${m[2]}`));
     dictNames.add(`${m[1]}.${m[2]}`);
   }
   defined.set('path.PathObject', idlName('path.PathObject'));
-  const out = { defs: [], skipped: [], proseUsed: new Set(), absent: [] };
   const trees = {};
+  const out = { defs: [], skipped: [], proseUsed: new Set(), absent: [], trees };
   for (const doc of tier.docs) trees[doc] = await loadDoc(version, doc);
   for (const x of tier.proseIdl) {
     const text = docText(trees[x.doc]);
-    if (!text.includes(x.quote)) fail(`${x.doc}: the docs no longer say ${JSON.stringify(x.quote)} (node-tier2.mjs proseIdl)`);
-    const m = /LasmNamespace="(\w+)"\]\s*dictionary (\w+) \{(.*)\};/.exec(x.idl);
+    if (!text.includes(x.quote)) {
+      if (strict) fail(`${x.doc}: the docs no longer say ${JSON.stringify(x.quote)} (node-tier2.mjs proseIdl)`);
+      out.absent.push(`${x.doc}: proseIdl ${JSON.stringify(x.quote)}`);
+    }
+    const m = /LasmNamespace="([\w.]+)"\]\s*dictionary (\w+) \{(.*)\};/.exec(x.idl);
     dicts.push(`[LasmNamespace="${m[1]}", LasmName="${m[2]}"]\ndictionary ${idlName(`${m[1]}.${m[2]}`)} {\n${m[3].trim().split(';').filter(s => s.trim()).map(s => `  ${proseType(s.trim())};`).join('\n')}\n};`);
   }
   for (const mod of tier.modules) {
     const all = sections(trees[mod.doc]);
     for (const c of mod.containers) lowerContainer(mod.doc, all, mod, c, out);
   }
-  if (strict) for (const k of [...Object.keys(tier.prose), ...Object.keys(tier.corrections)]) if (!out.proseUsed.has(k)) fail(`prose or correction ${k} matches no selected member`);
+  if (strict) for (const k of [...Object.keys(tier.prose), ...Object.keys(tier.corrections), ...Object.keys(tier.eventProse)]) if (!out.proseUsed.has(k)) fail(`prose or correction ${k} matches no selected member`);
   return { idl: [...out.defs, ...dicts].join('\n\n') + '\n', skipped: out.skipped, absent: out.absent };
 }
 

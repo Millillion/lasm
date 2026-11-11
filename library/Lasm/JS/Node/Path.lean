@@ -24,12 +24,12 @@ structure path.PathObject where
   name : Option String := none
   /-- `DOMString ext` -/
   ext : Option String := none
-instance : ToJS path.PathObject := ⟨fun d => Support.fields #[("dir", Support.optional d.dir),
+instance instToJSPathPathObject : ToJS path.PathObject := ⟨fun d => Support.fields #[("dir", Support.optional d.dir),
     ("root", Support.optional d.root),
     ("base", Support.optional d.base),
     ("name", Support.optional d.name),
     ("ext", Support.optional d.ext)]⟩
-instance : FromJS path.PathObject where
+instance instFromJSPathPathObject : FromJS path.PathObject where
   fromJS d := do return {
     dir := ← Lasm.JS.readField (Option String) d "dir",
     root := ← Lasm.JS.readField (Option String) d "root",
