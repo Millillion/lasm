@@ -9,7 +9,7 @@ open Lasm.JS Lasm.JS.Web
 def main : IO Unit := do
   let handler ← Function.ofFn fun args => do
     let .object fields := args[1]?.getD .undefined | return .undefined
-    let some (.ref kv _) := fields.find? (·.1 == "KV") |>.map (·.2) | return .undefined
+    let some (Data.ref kv _) := (fields.find? (·.1 == "KV")).map (·.2) | return .undefined
     let value ← kv.callMethodAwait "get" #[toJS "greeting"] (Option String)
     return toJS (← Response.new (some (.usvString (value.getD "hello"))) none)
   exportDefault handler
