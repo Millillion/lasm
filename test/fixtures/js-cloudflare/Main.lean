@@ -684,8 +684,8 @@ def context (r : Checks) (live : Live) (env : Data) (ctx : ExecutionContext) : A
     sleep 100
   expect r "ctx.waitUntil" (landed == some "landed") s!"{landed}"
   -- env of cloudflare:workers is the same bindings: a key written through one is read through the other
-  let global ← Lasm.JS.Cloudflare.env
-  let other ← bindingOf KVNamespace global "KV"
+  let exported ← Lasm.JS.Cloudflare.env
+  let other ← bindingOf KVNamespace exported "KV"
   ns.put "env-export" (.domString "same")
   expect r "env of cloudflare:workers" ((← other.get "env-export") == some "same") ""
 
