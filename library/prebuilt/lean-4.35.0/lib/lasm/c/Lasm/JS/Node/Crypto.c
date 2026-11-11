@@ -19,31 +19,31 @@ lean_object* lean_array_push(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Web_Support_fields(lean_object*);
 lean_object* l_Lasm_JS_Web_Support_args(lean_object*);
 lean_object* l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_Support_typedArray_spec__0(lean_object*, lean_object*, uint8_t);
-lean_object* l_Lasm_JS_instToJSFloat___lam__0___boxed(lean_object*);
-lean_object* l_Lasm_JS_Web_Support_optional___redArg(lean_object*, lean_object*);
+lean_object* l_Lasm_JS_Node_instToJSDOMStringOrUint8Array___lam__0(lean_object*);
 lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(lean_object*);
 uint64_t l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_bytes_spec__0_spec__0(uint8_t, uint64_t);
 lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_bytes_spec__0_spec__1(lean_object*, uint32_t, uint64_t, lean_object*, lean_object*);
 lean_object* l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(lean_object*, uint8_t, lean_object*, lean_object*);
 lean_object* l_String_splitOnAux(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Node_Support_getExport___at___00Lasm_JS_Node_process_env_spec__0(lean_object*, lean_object*);
-lean_object* l_Lasm_JS_instToJSBool___lam__0___boxed(lean_object*);
+lean_object* l_Lasm_JS_instToJSFloat___lam__0___boxed(lean_object*);
+lean_object* l_Lasm_JS_Web_Support_optional___redArg(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(lean_object*);
 lean_object* l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Node_FileHandle_readFile_spec__0_spec__1_spec__3(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__1(lean_object*, lean_object*, lean_object*);
+lean_object* l_Lasm_JS_instToJSString___lam__0(lean_object*);
 lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(lean_object*);
-lean_object* l_Lasm_JS_Node_instToJSDOMStringOrUint8Array___lam__0(lean_object*);
 lean_object* l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Node_Buffer_byteLength_spec__0(lean_object*, lean_object*, uint8_t);
 lean_object* lean_nat_abs(lean_object*);
 uint8_t lean_nat_dec_le(lean_object*, lean_object*);
 double l_Float_ofInt(lean_object*);
 uint64_t l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Node_FileHandle_readFile_spec__0_spec__0(uint8_t, uint64_t);
-lean_object* l_Lasm_JS_instToJSString___lam__0(lean_object*);
 lean_object* l_Lasm_JS_Value_invokeRaw(lean_object*, lean_object*, lean_object*, uint64_t);
 lean_object* lean_string_append(lean_object*, lean_object*);
 uint64_t l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1_spec__2(uint8_t, uint64_t);
 lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0_spec__0(lean_object*, uint32_t, uint64_t, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(lean_object*, lean_object*, lean_object*);
+lean_object* l_Lasm_JS_instToJSBool___lam__0___boxed(lean_object*);
 lean_object* l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Node_process_cwd_spec__0(lean_object*, lean_object*, uint8_t);
 uint64_t lean_uint64_lor(uint64_t, uint64_t);
 lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_Binding_payload(lean_object*, lean_object*);
@@ -79,20 +79,20 @@ static const lean_object* l_Lasm_JS_Node_instFromJSHmac___closed__0 = (const lea
 static const lean_ctor_object l_Lasm_JS_Node_instFromJSHmac___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_ctor_object) + sizeof(void*)*2 + 8, .m_other = 2, .m_tag = 0}, .m_objs = {((lean_object*)&l_Lasm_JS_Node_instFromJSHash___closed__0_value),((lean_object*)&l_Lasm_JS_Node_instFromJSHmac___closed__0_value),LEAN_SCALAR_PTR_LITERAL(0, 0, 0, 0, 0, 0, 0, 0)}};
 static const lean_object* l_Lasm_JS_Node_instFromJSHmac___closed__1 = (const lean_object*)&l_Lasm_JS_Node_instFromJSHmac___closed__1_value;
 LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instFromJSHmac = (const lean_object*)&l_Lasm_JS_Node_instFromJSHmac___closed__1_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 14, .m_capacity = 14, .m_length = 13, .m_data = "customization"};
-static const lean_object* l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__0_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 13, .m_capacity = 13, .m_length = 12, .m_data = "functionName"};
-static const lean_object* l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__1 = (const lean_object*)&l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__1_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__2_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 13, .m_capacity = 13, .m_length = 12, .m_data = "outputLength"};
-static const lean_object* l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__2 = (const lean_object*)&l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__2_value;
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0(lean_object*, lean_object*, lean_object*);
-static const lean_closure_object l_Lasm_JS_Node_instToJSCreateHashOptions___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSDOMStringOrUint8Array___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
-static const lean_object* l_Lasm_JS_Node_instToJSCreateHashOptions___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCreateHashOptions___closed__0_value;
-static const lean_closure_object l_Lasm_JS_Node_instToJSCreateHashOptions___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSFloat___lam__0___boxed, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
-static const lean_object* l_Lasm_JS_Node_instToJSCreateHashOptions___closed__1 = (const lean_object*)&l_Lasm_JS_Node_instToJSCreateHashOptions___closed__1_value;
-static const lean_closure_object l_Lasm_JS_Node_instToJSCreateHashOptions___closed__2_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*2, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0, .m_arity = 3, .m_num_fixed = 2, .m_objs = {((lean_object*)&l_Lasm_JS_Node_instToJSCreateHashOptions___closed__0_value),((lean_object*)&l_Lasm_JS_Node_instToJSCreateHashOptions___closed__1_value)} };
-static const lean_object* l_Lasm_JS_Node_instToJSCreateHashOptions___closed__2 = (const lean_object*)&l_Lasm_JS_Node_instToJSCreateHashOptions___closed__2_value;
-LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instToJSCreateHashOptions = (const lean_object*)&l_Lasm_JS_Node_instToJSCreateHashOptions___closed__2_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 14, .m_capacity = 14, .m_length = 13, .m_data = "customization"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__0_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 13, .m_capacity = 13, .m_length = 12, .m_data = "functionName"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__1 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__1_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__2_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 13, .m_capacity = 13, .m_length = 12, .m_data = "outputLength"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__2 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__2_value;
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0(lean_object*, lean_object*, lean_object*);
+static const lean_closure_object l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSDOMStringOrUint8Array___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__0_value;
+static const lean_closure_object l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSFloat___lam__0___boxed, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__1 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__1_value;
+static const lean_closure_object l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__2_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*2, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0, .m_arity = 3, .m_num_fixed = 2, .m_objs = {((lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__0_value),((lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__1_value)} };
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__2 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__2_value;
+LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHashOptions = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__2_value;
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_DOMStringOrUint8ArrayOrObjectOrCryptoKey_ctorIdx(lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_DOMStringOrUint8ArrayOrObjectOrCryptoKey_ctorIdx___boxed(lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_DOMStringOrUint8ArrayOrObjectOrCryptoKey_ctorElim___redArg(lean_object*, lean_object*);
@@ -122,20 +122,20 @@ LEAN_EXPORT lean_object* l_Lasm_JS_Node_instCoeCryptoKeyDOMStringOrUint8ArrayOrO
 static const lean_closure_object l_Lasm_JS_Node_instCoeCryptoKeyDOMStringOrUint8ArrayOrObjectOrCryptoKey___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instCoeCryptoKeyDOMStringOrUint8ArrayOrObjectOrCryptoKey___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
 static const lean_object* l_Lasm_JS_Node_instCoeCryptoKeyDOMStringOrUint8ArrayOrObjectOrCryptoKey___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instCoeCryptoKeyDOMStringOrUint8ArrayOrObjectOrCryptoKey___closed__0_value;
 LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instCoeCryptoKeyDOMStringOrUint8ArrayOrObjectOrCryptoKey = (const lean_object*)&l_Lasm_JS_Node_instCoeCryptoKeyDOMStringOrUint8ArrayOrObjectOrCryptoKey___closed__0_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSCreateHmacOptions___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 9, .m_capacity = 9, .m_length = 8, .m_data = "encoding"};
-static const lean_object* l_Lasm_JS_Node_instToJSCreateHmacOptions___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCreateHmacOptions___lam__0___closed__0_value;
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCreateHmacOptions___lam__0(lean_object*, lean_object*);
-static const lean_closure_object l_Lasm_JS_Node_instToJSCreateHmacOptions___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSString___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
-static const lean_object* l_Lasm_JS_Node_instToJSCreateHmacOptions___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCreateHmacOptions___closed__0_value;
-static const lean_closure_object l_Lasm_JS_Node_instToJSCreateHmacOptions___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*1, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSCreateHmacOptions___lam__0, .m_arity = 2, .m_num_fixed = 1, .m_objs = {((lean_object*)&l_Lasm_JS_Node_instToJSCreateHmacOptions___closed__0_value)} };
-static const lean_object* l_Lasm_JS_Node_instToJSCreateHmacOptions___closed__1 = (const lean_object*)&l_Lasm_JS_Node_instToJSCreateHmacOptions___closed__1_value;
-LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instToJSCreateHmacOptions = (const lean_object*)&l_Lasm_JS_Node_instToJSCreateHmacOptions___closed__1_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSHashOptions___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 15, .m_capacity = 15, .m_length = 14, .m_data = "outputEncoding"};
-static const lean_object* l_Lasm_JS_Node_instToJSHashOptions___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSHashOptions___lam__0___closed__0_value;
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSHashOptions___lam__0(lean_object*, lean_object*, lean_object*, lean_object*);
-static const lean_closure_object l_Lasm_JS_Node_instToJSHashOptions___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*3, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSHashOptions___lam__0, .m_arity = 4, .m_num_fixed = 3, .m_objs = {((lean_object*)&l_Lasm_JS_Node_instToJSCreateHashOptions___closed__0_value),((lean_object*)&l_Lasm_JS_Node_instToJSCreateHmacOptions___closed__0_value),((lean_object*)&l_Lasm_JS_Node_instToJSCreateHashOptions___closed__1_value)} };
-static const lean_object* l_Lasm_JS_Node_instToJSHashOptions___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSHashOptions___closed__0_value;
-LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instToJSHashOptions = (const lean_object*)&l_Lasm_JS_Node_instToJSHashOptions___closed__0_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 9, .m_capacity = 9, .m_length = 8, .m_data = "encoding"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___lam__0___closed__0_value;
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___lam__0(lean_object*, lean_object*);
+static const lean_closure_object l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSString___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___closed__0_value;
+static const lean_closure_object l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*1, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___lam__0, .m_arity = 2, .m_num_fixed = 1, .m_objs = {((lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___closed__0_value)} };
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___closed__1 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___closed__1_value;
+LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___closed__1_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoHashOptions___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 15, .m_capacity = 15, .m_length = 14, .m_data = "outputEncoding"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoHashOptions___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoHashOptions___lam__0___closed__0_value;
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCryptoHashOptions___lam__0(lean_object*, lean_object*, lean_object*, lean_object*);
+static const lean_closure_object l_Lasm_JS_Node_instToJSCryptoHashOptions___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*3, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSCryptoHashOptions___lam__0, .m_arity = 4, .m_num_fixed = 3, .m_objs = {((lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__0_value),((lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___closed__0_value),((lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__1_value)} };
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoHashOptions___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoHashOptions___closed__0_value;
+LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instToJSCryptoHashOptions = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoHashOptions___closed__0_value;
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_crypto_HashOptionsOrDOMString_ctorIdx(lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_crypto_HashOptionsOrDOMString_ctorIdx___boxed(lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_crypto_HashOptionsOrDOMString_ctorElim___redArg(lean_object*, lean_object*);
@@ -145,44 +145,44 @@ LEAN_EXPORT lean_object* l_Lasm_JS_Node_crypto_HashOptionsOrDOMString_hashOption
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_crypto_HashOptionsOrDOMString_hashOptions_elim(lean_object*, lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_crypto_HashOptionsOrDOMString_domString_elim___redArg(lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_crypto_HashOptionsOrDOMString_domString_elim(lean_object*, lean_object*, lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSHashOptionsOrDOMString___lam__0(lean_object*);
-static const lean_closure_object l_Lasm_JS_Node_instToJSHashOptionsOrDOMString___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSHashOptionsOrDOMString___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
-static const lean_object* l_Lasm_JS_Node_instToJSHashOptionsOrDOMString___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSHashOptionsOrDOMString___closed__0_value;
-LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instToJSHashOptionsOrDOMString = (const lean_object*)&l_Lasm_JS_Node_instToJSHashOptionsOrDOMString___closed__0_value;
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instCoeHashOptionsHashOptionsOrDOMString___lam__0(lean_object*);
-static const lean_closure_object l_Lasm_JS_Node_instCoeHashOptionsHashOptionsOrDOMString___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instCoeHashOptionsHashOptionsOrDOMString___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
-static const lean_object* l_Lasm_JS_Node_instCoeHashOptionsHashOptionsOrDOMString___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instCoeHashOptionsHashOptionsOrDOMString___closed__0_value;
-LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instCoeHashOptionsHashOptionsOrDOMString = (const lean_object*)&l_Lasm_JS_Node_instCoeHashOptionsHashOptionsOrDOMString___closed__0_value;
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instCoeStringHashOptionsOrDOMString___lam__0(lean_object*);
-static const lean_closure_object l_Lasm_JS_Node_instCoeStringHashOptionsOrDOMString___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instCoeStringHashOptionsOrDOMString___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
-static const lean_object* l_Lasm_JS_Node_instCoeStringHashOptionsOrDOMString___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instCoeStringHashOptionsOrDOMString___closed__0_value;
-LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instCoeStringHashOptionsOrDOMString = (const lean_object*)&l_Lasm_JS_Node_instCoeStringHashOptionsOrDOMString___closed__0_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSRandomUUIDOptions___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 20, .m_capacity = 20, .m_length = 19, .m_data = "disableEntropyCache"};
-static const lean_object* l_Lasm_JS_Node_instToJSRandomUUIDOptions___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSRandomUUIDOptions___lam__0___closed__0_value;
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSRandomUUIDOptions___lam__0(lean_object*, lean_object*);
-static const lean_closure_object l_Lasm_JS_Node_instToJSRandomUUIDOptions___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSBool___lam__0___boxed, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
-static const lean_object* l_Lasm_JS_Node_instToJSRandomUUIDOptions___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSRandomUUIDOptions___closed__0_value;
-static const lean_closure_object l_Lasm_JS_Node_instToJSRandomUUIDOptions___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*1, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSRandomUUIDOptions___lam__0, .m_arity = 2, .m_num_fixed = 1, .m_objs = {((lean_object*)&l_Lasm_JS_Node_instToJSRandomUUIDOptions___closed__0_value)} };
-static const lean_object* l_Lasm_JS_Node_instToJSRandomUUIDOptions___closed__1 = (const lean_object*)&l_Lasm_JS_Node_instToJSRandomUUIDOptions___closed__1_value;
-LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instToJSRandomUUIDOptions = (const lean_object*)&l_Lasm_JS_Node_instToJSRandomUUIDOptions___closed__1_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 5, .m_capacity = 5, .m_length = 4, .m_data = "cost"};
-static const lean_object* l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__0_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 10, .m_capacity = 10, .m_length = 9, .m_data = "blockSize"};
-static const lean_object* l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__1 = (const lean_object*)&l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__1_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__2_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 16, .m_capacity = 16, .m_length = 15, .m_data = "parallelization"};
-static const lean_object* l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__2 = (const lean_object*)&l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__2_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__3_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 2, .m_capacity = 2, .m_length = 1, .m_data = "N"};
-static const lean_object* l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__3 = (const lean_object*)&l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__3_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__4_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 2, .m_capacity = 2, .m_length = 1, .m_data = "r"};
-static const lean_object* l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__4 = (const lean_object*)&l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__4_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__5_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 2, .m_capacity = 2, .m_length = 1, .m_data = "p"};
-static const lean_object* l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__5 = (const lean_object*)&l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__5_value;
-static const lean_string_object l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__6_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 7, .m_capacity = 7, .m_length = 6, .m_data = "maxmem"};
-static const lean_object* l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__6 = (const lean_object*)&l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__6_value;
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSScryptOptions___lam__0(lean_object*, lean_object*);
-static const lean_closure_object l_Lasm_JS_Node_instToJSScryptOptions___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*1, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSScryptOptions___lam__0, .m_arity = 2, .m_num_fixed = 1, .m_objs = {((lean_object*)&l_Lasm_JS_Node_instToJSCreateHashOptions___closed__1_value)} };
-static const lean_object* l_Lasm_JS_Node_instToJSScryptOptions___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSScryptOptions___closed__0_value;
-LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instToJSScryptOptions = (const lean_object*)&l_Lasm_JS_Node_instToJSScryptOptions___closed__0_value;
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCryptoHashOptionsOrDOMString___lam__0(lean_object*);
+static const lean_closure_object l_Lasm_JS_Node_instToJSCryptoHashOptionsOrDOMString___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSCryptoHashOptionsOrDOMString___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoHashOptionsOrDOMString___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoHashOptionsOrDOMString___closed__0_value;
+LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instToJSCryptoHashOptionsOrDOMString = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoHashOptionsOrDOMString___closed__0_value;
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instCoeCryptoHashOptionsCryptoHashOptionsOrDOMString___lam__0(lean_object*);
+static const lean_closure_object l_Lasm_JS_Node_instCoeCryptoHashOptionsCryptoHashOptionsOrDOMString___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instCoeCryptoHashOptionsCryptoHashOptionsOrDOMString___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
+static const lean_object* l_Lasm_JS_Node_instCoeCryptoHashOptionsCryptoHashOptionsOrDOMString___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instCoeCryptoHashOptionsCryptoHashOptionsOrDOMString___closed__0_value;
+LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instCoeCryptoHashOptionsCryptoHashOptionsOrDOMString = (const lean_object*)&l_Lasm_JS_Node_instCoeCryptoHashOptionsCryptoHashOptionsOrDOMString___closed__0_value;
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instCoeStringCryptoHashOptionsOrDOMString___lam__0(lean_object*);
+static const lean_closure_object l_Lasm_JS_Node_instCoeStringCryptoHashOptionsOrDOMString___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instCoeStringCryptoHashOptionsOrDOMString___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
+static const lean_object* l_Lasm_JS_Node_instCoeStringCryptoHashOptionsOrDOMString___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instCoeStringCryptoHashOptionsOrDOMString___closed__0_value;
+LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instCoeStringCryptoHashOptionsOrDOMString = (const lean_object*)&l_Lasm_JS_Node_instCoeStringCryptoHashOptionsOrDOMString___closed__0_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 20, .m_capacity = 20, .m_length = 19, .m_data = "disableEntropyCache"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___lam__0___closed__0_value;
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___lam__0(lean_object*, lean_object*);
+static const lean_closure_object l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSBool___lam__0___boxed, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___closed__0_value;
+static const lean_closure_object l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*1, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___lam__0, .m_arity = 2, .m_num_fixed = 1, .m_objs = {((lean_object*)&l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___closed__0_value)} };
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___closed__1 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___closed__1_value;
+LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___closed__1_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 5, .m_capacity = 5, .m_length = 4, .m_data = "cost"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__0_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 10, .m_capacity = 10, .m_length = 9, .m_data = "blockSize"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__1 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__1_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__2_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 16, .m_capacity = 16, .m_length = 15, .m_data = "parallelization"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__2 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__2_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__3_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 2, .m_capacity = 2, .m_length = 1, .m_data = "N"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__3 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__3_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__4_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 2, .m_capacity = 2, .m_length = 1, .m_data = "r"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__4 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__4_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__5_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 2, .m_capacity = 2, .m_length = 1, .m_data = "p"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__5 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__5_value;
+static const lean_string_object l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__6_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 7, .m_capacity = 7, .m_length = 6, .m_data = "maxmem"};
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__6 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__6_value;
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0(lean_object*, lean_object*);
+static const lean_closure_object l_Lasm_JS_Node_instToJSCryptoScryptOptions___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*1, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0, .m_arity = 2, .m_num_fixed = 1, .m_objs = {((lean_object*)&l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__1_value)} };
+static const lean_object* l_Lasm_JS_Node_instToJSCryptoScryptOptions___closed__0 = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoScryptOptions___closed__0_value;
+LEAN_EXPORT const lean_object* l_Lasm_JS_Node_instToJSCryptoScryptOptions = (const lean_object*)&l_Lasm_JS_Node_instToJSCryptoScryptOptions___closed__0_value;
 static const lean_string_object l_Lasm_JS_Node_Hash_copy___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 5, .m_capacity = 5, .m_length = 4, .m_data = "copy"};
 static const lean_object* l_Lasm_JS_Node_Hash_copy___closed__0 = (const lean_object*)&l_Lasm_JS_Node_Hash_copy___closed__0_value;
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_Hash_copy(lean_object*, lean_object*);
@@ -387,7 +387,7 @@ lean_dec(v_x_13_);
 return v_res_14_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0(lean_object* v___f_32_, lean_object* v___f_33_, lean_object* v_d_34_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0(lean_object* v___f_32_, lean_object* v___f_33_, lean_object* v_d_34_){
 _start:
 {
 lean_object* v_customization_35_; lean_object* v_functionName_36_; lean_object* v_outputLength_37_; lean_object* v___x_38_; lean_object* v___x_39_; lean_object* v___x_40_; lean_object* v___x_41_; lean_object* v___x_42_; lean_object* v___x_43_; lean_object* v___x_44_; lean_object* v___x_45_; lean_object* v___x_46_; lean_object* v___x_47_; lean_object* v___x_48_; lean_object* v___x_49_; lean_object* v___x_50_; lean_object* v___x_51_; lean_object* v___x_52_; 
@@ -398,18 +398,18 @@ lean_inc(v_functionName_36_);
 v_outputLength_37_ = lean_ctor_get(v_d_34_, 2);
 lean_inc(v_outputLength_37_);
 lean_dec_ref(v_d_34_);
-v___x_38_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__0));
+v___x_38_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__0));
 lean_inc_ref(v___f_32_);
 v___x_39_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_32_, v_customization_35_);
 v___x_40_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_40_, 0, v___x_38_);
 lean_ctor_set(v___x_40_, 1, v___x_39_);
-v___x_41_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__1));
+v___x_41_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__1));
 v___x_42_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_32_, v_functionName_36_);
 v___x_43_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_43_, 0, v___x_41_);
 lean_ctor_set(v___x_43_, 1, v___x_42_);
-v___x_44_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__2));
+v___x_44_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__2));
 v___x_45_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_33_, v_outputLength_37_);
 v___x_46_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_46_, 0, v___x_44_);
@@ -720,11 +720,11 @@ lean_ctor_set(v___x_150_, 0, v_value_149_);
 return v___x_150_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCreateHmacOptions___lam__0(lean_object* v___f_154_, lean_object* v_d_155_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___lam__0(lean_object* v___f_154_, lean_object* v_d_155_){
 _start:
 {
 lean_object* v___x_156_; lean_object* v___x_157_; lean_object* v___x_158_; lean_object* v___x_159_; lean_object* v___x_160_; lean_object* v___x_161_; lean_object* v___x_162_; 
-v___x_156_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHmacOptions___lam__0___closed__0));
+v___x_156_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___lam__0___closed__0));
 v___x_157_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_154_, v_d_155_);
 v___x_158_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_158_, 0, v___x_156_);
@@ -737,7 +737,7 @@ lean_dec_ref(v___x_161_);
 return v___x_162_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSHashOptions___lam__0(lean_object* v___f_168_, lean_object* v___f_169_, lean_object* v___f_170_, lean_object* v_d_171_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCryptoHashOptions___lam__0(lean_object* v___f_168_, lean_object* v___f_169_, lean_object* v___f_170_, lean_object* v_d_171_){
 _start:
 {
 lean_object* v_customization_172_; lean_object* v_functionName_173_; lean_object* v_outputEncoding_174_; lean_object* v_outputLength_175_; lean_object* v___x_176_; lean_object* v___x_177_; lean_object* v___x_178_; lean_object* v___x_179_; lean_object* v___x_180_; lean_object* v___x_181_; lean_object* v___x_182_; lean_object* v___x_183_; lean_object* v___x_184_; lean_object* v___x_185_; lean_object* v___x_186_; lean_object* v___x_187_; lean_object* v___x_188_; lean_object* v___x_189_; lean_object* v___x_190_; lean_object* v___x_191_; lean_object* v___x_192_; lean_object* v___x_193_; lean_object* v___x_194_; 
@@ -750,23 +750,23 @@ lean_inc(v_outputEncoding_174_);
 v_outputLength_175_ = lean_ctor_get(v_d_171_, 3);
 lean_inc(v_outputLength_175_);
 lean_dec_ref(v_d_171_);
-v___x_176_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__0));
+v___x_176_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__0));
 lean_inc_ref(v___f_168_);
 v___x_177_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_168_, v_customization_172_);
 v___x_178_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_178_, 0, v___x_176_);
 lean_ctor_set(v___x_178_, 1, v___x_177_);
-v___x_179_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__1));
+v___x_179_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__1));
 v___x_180_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_168_, v_functionName_173_);
 v___x_181_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_181_, 0, v___x_179_);
 lean_ctor_set(v___x_181_, 1, v___x_180_);
-v___x_182_ = ((lean_object*)(l_Lasm_JS_Node_instToJSHashOptions___lam__0___closed__0));
+v___x_182_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoHashOptions___lam__0___closed__0));
 v___x_183_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_169_, v_outputEncoding_174_);
 v___x_184_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_184_, 0, v___x_182_);
 lean_ctor_set(v___x_184_, 1, v___x_183_);
-v___x_185_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__2));
+v___x_185_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__2));
 v___x_186_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_170_, v_outputLength_175_);
 v___x_187_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_187_, 0, v___x_185_);
@@ -868,7 +868,7 @@ v___x_236_ = l_Lasm_JS_Node_crypto_HashOptionsOrDOMString_ctorElim___redArg(v_t_
 return v___x_236_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSHashOptionsOrDOMString___lam__0(lean_object* v_x_237_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCryptoHashOptionsOrDOMString___lam__0(lean_object* v_x_237_){
 _start:
 {
 if (lean_obj_tag(v_x_237_) == 0)
@@ -886,25 +886,25 @@ lean_inc(v_outputEncoding_241_);
 v_outputLength_242_ = lean_ctor_get(v_value_238_, 3);
 lean_inc(v_outputLength_242_);
 lean_dec_ref(v_value_238_);
-v___f_243_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___closed__0));
-v___f_244_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHmacOptions___closed__0));
-v___f_245_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___closed__1));
-v___x_246_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__0));
+v___f_243_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__0));
+v___f_244_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___closed__0));
+v___f_245_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___closed__1));
+v___x_246_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__0));
 v___x_247_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_243_, v_customization_239_);
 v___x_248_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_248_, 0, v___x_246_);
 lean_ctor_set(v___x_248_, 1, v___x_247_);
-v___x_249_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__1));
+v___x_249_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__1));
 v___x_250_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_243_, v_functionName_240_);
 v___x_251_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_251_, 0, v___x_249_);
 lean_ctor_set(v___x_251_, 1, v___x_250_);
-v___x_252_ = ((lean_object*)(l_Lasm_JS_Node_instToJSHashOptions___lam__0___closed__0));
+v___x_252_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoHashOptions___lam__0___closed__0));
 v___x_253_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_244_, v_outputEncoding_241_);
 v___x_254_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_254_, 0, v___x_252_);
 lean_ctor_set(v___x_254_, 1, v___x_253_);
-v___x_255_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__2));
+v___x_255_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__2));
 v___x_256_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_245_, v_outputLength_242_);
 v___x_257_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_257_, 0, v___x_255_);
@@ -963,7 +963,7 @@ return v___x_270_;
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instCoeHashOptionsHashOptionsOrDOMString___lam__0(lean_object* v_value_275_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instCoeCryptoHashOptionsCryptoHashOptionsOrDOMString___lam__0(lean_object* v_value_275_){
 _start:
 {
 lean_object* v___x_276_; 
@@ -972,7 +972,7 @@ lean_ctor_set(v___x_276_, 0, v_value_275_);
 return v___x_276_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instCoeStringHashOptionsOrDOMString___lam__0(lean_object* v_value_279_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instCoeStringCryptoHashOptionsOrDOMString___lam__0(lean_object* v_value_279_){
 _start:
 {
 lean_object* v___x_280_; 
@@ -981,11 +981,11 @@ lean_ctor_set(v___x_280_, 0, v_value_279_);
 return v___x_280_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSRandomUUIDOptions___lam__0(lean_object* v___f_284_, lean_object* v_d_285_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___lam__0(lean_object* v___f_284_, lean_object* v_d_285_){
 _start:
 {
 lean_object* v___x_286_; lean_object* v___x_287_; lean_object* v___x_288_; lean_object* v___x_289_; lean_object* v___x_290_; lean_object* v___x_291_; lean_object* v___x_292_; 
-v___x_286_ = ((lean_object*)(l_Lasm_JS_Node_instToJSRandomUUIDOptions___lam__0___closed__0));
+v___x_286_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___lam__0___closed__0));
 v___x_287_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_284_, v_d_285_);
 v___x_288_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_288_, 0, v___x_286_);
@@ -998,7 +998,7 @@ lean_dec_ref(v___x_291_);
 return v___x_292_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSScryptOptions___lam__0(lean_object* v___f_304_, lean_object* v_d_305_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0(lean_object* v___f_304_, lean_object* v_d_305_){
 _start:
 {
 lean_object* v_cost_306_; lean_object* v_blockSize_307_; lean_object* v_parallelization_308_; lean_object* v_N_309_; lean_object* v_r_310_; lean_object* v_p_311_; lean_object* v_maxmem_312_; lean_object* v___x_313_; lean_object* v___x_314_; lean_object* v___x_315_; lean_object* v___x_316_; lean_object* v___x_317_; lean_object* v___x_318_; lean_object* v___x_319_; lean_object* v___x_320_; lean_object* v___x_321_; lean_object* v___x_322_; lean_object* v___x_323_; lean_object* v___x_324_; lean_object* v___x_325_; lean_object* v___x_326_; lean_object* v___x_327_; lean_object* v___x_328_; lean_object* v___x_329_; lean_object* v___x_330_; lean_object* v___x_331_; lean_object* v___x_332_; lean_object* v___x_333_; lean_object* v___x_334_; lean_object* v___x_335_; lean_object* v___x_336_; lean_object* v___x_337_; lean_object* v___x_338_; lean_object* v___x_339_; lean_object* v___x_340_; lean_object* v___x_341_; lean_object* v___x_342_; lean_object* v___x_343_; 
@@ -1017,38 +1017,38 @@ lean_inc(v_p_311_);
 v_maxmem_312_ = lean_ctor_get(v_d_305_, 6);
 lean_inc(v_maxmem_312_);
 lean_dec_ref(v_d_305_);
-v___x_313_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__0));
+v___x_313_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__0));
 lean_inc_ref_n(v___f_304_, 6);
 v___x_314_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_304_, v_cost_306_);
 v___x_315_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_315_, 0, v___x_313_);
 lean_ctor_set(v___x_315_, 1, v___x_314_);
-v___x_316_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__1));
+v___x_316_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__1));
 v___x_317_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_304_, v_blockSize_307_);
 v___x_318_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_318_, 0, v___x_316_);
 lean_ctor_set(v___x_318_, 1, v___x_317_);
-v___x_319_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__2));
+v___x_319_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__2));
 v___x_320_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_304_, v_parallelization_308_);
 v___x_321_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_321_, 0, v___x_319_);
 lean_ctor_set(v___x_321_, 1, v___x_320_);
-v___x_322_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__3));
+v___x_322_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__3));
 v___x_323_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_304_, v_N_309_);
 v___x_324_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_324_, 0, v___x_322_);
 lean_ctor_set(v___x_324_, 1, v___x_323_);
-v___x_325_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__4));
+v___x_325_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__4));
 v___x_326_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_304_, v_r_310_);
 v___x_327_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_327_, 0, v___x_325_);
 lean_ctor_set(v___x_327_, 1, v___x_326_);
-v___x_328_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__5));
+v___x_328_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__5));
 v___x_329_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_304_, v_p_311_);
 v___x_330_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_330_, 0, v___x_328_);
 lean_ctor_set(v___x_330_, 1, v___x_329_);
-v___x_331_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__6));
+v___x_331_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__6));
 v___x_332_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_304_, v_maxmem_312_);
 v___x_333_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_333_, 0, v___x_331_);
@@ -1719,17 +1719,17 @@ lean_inc(v_functionName_548_);
 v_outputLength_549_ = lean_ctor_get(v_val_546_, 2);
 lean_inc(v_outputLength_549_);
 lean_dec(v_val_546_);
-v___x_550_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__0));
+v___x_550_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__0));
 v___x_551_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Node_crypto_createHash_spec__0_spec__0(v_customization_547_);
 v___x_552_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_552_, 0, v___x_550_);
 lean_ctor_set(v___x_552_, 1, v___x_551_);
-v___x_553_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__1));
+v___x_553_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__1));
 v___x_554_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Node_crypto_createHash_spec__0_spec__0(v_functionName_548_);
 v___x_555_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_555_, 0, v___x_553_);
 lean_ctor_set(v___x_555_, 1, v___x_554_);
-v___x_556_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__2));
+v___x_556_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__2));
 v___x_557_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(v_outputLength_549_);
 lean_dec(v_outputLength_549_);
 v___x_558_ = lean_alloc_ctor(0, 2, 0);
@@ -1868,7 +1868,7 @@ lean_object* v_val_609_; lean_object* v___x_610_; lean_object* v___x_611_; lean_
 v_val_609_ = lean_ctor_get(v_x_607_, 0);
 lean_inc(v_val_609_);
 lean_dec_ref_known(v_x_607_, 1);
-v___x_610_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHmacOptions___lam__0___closed__0));
+v___x_610_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHmacOptions___lam__0___closed__0));
 v___x_611_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(v_val_609_);
 v___x_612_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_612_, 0, v___x_610_);
@@ -2394,22 +2394,22 @@ lean_inc(v_outputEncoding_776_);
 v_outputLength_777_ = lean_ctor_get(v_value_773_, 3);
 lean_inc(v_outputLength_777_);
 lean_dec_ref(v_value_773_);
-v___x_778_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__0));
+v___x_778_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__0));
 v___x_779_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Node_crypto_createHash_spec__0_spec__0(v_customization_774_);
 v___x_780_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_780_, 0, v___x_778_);
 lean_ctor_set(v___x_780_, 1, v___x_779_);
-v___x_781_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__1));
+v___x_781_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__1));
 v___x_782_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Node_crypto_createHash_spec__0_spec__0(v_functionName_775_);
 v___x_783_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_783_, 0, v___x_781_);
 lean_ctor_set(v___x_783_, 1, v___x_782_);
-v___x_784_ = ((lean_object*)(l_Lasm_JS_Node_instToJSHashOptions___lam__0___closed__0));
+v___x_784_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoHashOptions___lam__0___closed__0));
 v___x_785_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(v_outputEncoding_776_);
 v___x_786_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_786_, 0, v___x_784_);
 lean_ctor_set(v___x_786_, 1, v___x_785_);
-v___x_787_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCreateHashOptions___lam__0___closed__2));
+v___x_787_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoCreateHashOptions___lam__0___closed__2));
 v___x_788_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(v_outputLength_777_);
 lean_dec(v_outputLength_777_);
 v___x_789_ = lean_alloc_ctor(0, 2, 0);
@@ -4178,7 +4178,7 @@ else
 {
 lean_object* v_val_1383_; lean_object* v___x_1384_; lean_object* v___x_1385_; lean_object* v___x_1386_; lean_object* v___x_1387_; lean_object* v___x_1388_; lean_object* v___x_1389_; lean_object* v___x_1390_; 
 v_val_1383_ = lean_ctor_get(v_x_1381_, 0);
-v___x_1384_ = ((lean_object*)(l_Lasm_JS_Node_instToJSRandomUUIDOptions___lam__0___closed__0));
+v___x_1384_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoRandomUUIDOptions___lam__0___closed__0));
 v___x_1385_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_val_1383_);
 v___x_1386_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_1386_, 0, v___x_1384_);
@@ -4245,37 +4245,37 @@ v_N_1420_ = lean_ctor_get(v_val_1416_, 3);
 v_r_1421_ = lean_ctor_get(v_val_1416_, 4);
 v_p_1422_ = lean_ctor_get(v_val_1416_, 5);
 v_maxmem_1423_ = lean_ctor_get(v_val_1416_, 6);
-v___x_1424_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__0));
+v___x_1424_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__0));
 v___x_1425_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(v_cost_1417_);
 v___x_1426_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_1426_, 0, v___x_1424_);
 lean_ctor_set(v___x_1426_, 1, v___x_1425_);
-v___x_1427_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__1));
+v___x_1427_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__1));
 v___x_1428_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(v_blockSize_1418_);
 v___x_1429_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_1429_, 0, v___x_1427_);
 lean_ctor_set(v___x_1429_, 1, v___x_1428_);
-v___x_1430_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__2));
+v___x_1430_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__2));
 v___x_1431_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(v_parallelization_1419_);
 v___x_1432_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_1432_, 0, v___x_1430_);
 lean_ctor_set(v___x_1432_, 1, v___x_1431_);
-v___x_1433_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__3));
+v___x_1433_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__3));
 v___x_1434_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(v_N_1420_);
 v___x_1435_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_1435_, 0, v___x_1433_);
 lean_ctor_set(v___x_1435_, 1, v___x_1434_);
-v___x_1436_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__4));
+v___x_1436_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__4));
 v___x_1437_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(v_r_1421_);
 v___x_1438_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_1438_, 0, v___x_1436_);
 lean_ctor_set(v___x_1438_, 1, v___x_1437_);
-v___x_1439_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__5));
+v___x_1439_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__5));
 v___x_1440_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(v_p_1422_);
 v___x_1441_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_1441_, 0, v___x_1439_);
 lean_ctor_set(v___x_1441_, 1, v___x_1440_);
-v___x_1442_ = ((lean_object*)(l_Lasm_JS_Node_instToJSScryptOptions___lam__0___closed__6));
+v___x_1442_ = ((lean_object*)(l_Lasm_JS_Node_instToJSCryptoScryptOptions___lam__0___closed__6));
 v___x_1443_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(v_maxmem_1423_);
 v___x_1444_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_1444_, 0, v___x_1442_);

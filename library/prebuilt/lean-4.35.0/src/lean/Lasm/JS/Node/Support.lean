@@ -31,6 +31,16 @@ def promisified (α : Type) [FromJS α] (module path : String) (args : Array Dat
     #[.ref f ""] (await := false)
   p.callAwait args α
 
+/-- `util.promisify(self[name].bind(self))(...args)`, awaited without holding a Lean
+thread: a method whose last parameter is a callback `(err, value)`
+(`server.getConnections`), as a promise of its value. -/
+def promisifiedMethod (α : Type) [FromJS α] (self : Value) (name : String) (args : Array Data) : Async α := do
+  let m ← self.get name Value
+  let f ← m.callMethod "bind" #[.ref self ""] Value
+  let p ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.Support.promisifiedMethod", module := "node:util", path := "promisify", construct := false, arity := 1 }
+    #[.ref f ""] (await := false)
+  p.callAwait args α
+
 /-- `require(module)[path].call(bytes, ...args)`, read as `α`: a method of a prototype
 called with a `Uint8Array` of `self` as `this` (the Node docs: "All methods on the
 Buffer prototype are callable with a Uint8Array instance"). -/

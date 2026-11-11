@@ -16,7 +16,7 @@ open Lasm.JS Lasm.JS.Web
 structure os.UserInfoOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance : ToJS os.UserInfoOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSOsUserInfoOptions : ToJS os.UserInfoOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
 
 /-- `os.EOL` (added in Node.js v0.7.8): `readonly attribute DOMString EOL` (Node.js 24.22.2 documentation, os.md) -/
 def os.EOL : IO String := Support.getExport "node:os" ["EOL"] String
