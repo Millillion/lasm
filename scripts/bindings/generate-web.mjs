@@ -746,7 +746,9 @@ function holdsRecord(t, seen = new Set()) {
   return false;
 }
 const applyPost = (post, x) => post === 'wrap' ? `pure { val := ${x} }` : `${post} ${x}`;
-const finish = (call, res) => res.post ? `do\n  let r ← ${call}\n  ${applyPost(res.post, 'r')}` : call;
+// In an Async result, a decoding lambda (`fun x => x.mapM …` of an optional ArrayBuffer) is an IO action, lifted.
+const asyncPost = (post, x) => post.startsWith('(fun ') ? `(${applyPost(post, x)} : IO _)` : applyPost(post, x);
+const finish = (call, res) => res.post ? `do\n  let r ← ${call}\n  ${res.async ? asyncPost(res.post, 'r') : applyPost(res.post, 'r')}` : call;
 const monad = res => res.async ? 'Async' : 'IO';
 const binding = (name, path, construct, arity, ns = NS, module = 'globalThis') =>
   `{ name := "${ns}.${name}", module := "${module}", path := "${path}", construct := ${construct}, arity := ${arity} }`;
@@ -827,7 +829,7 @@ function emitInterface(module, name) {
       const call = isNode ? `Support.getExport "${jsModule}" ${path} ${res.async ? 'Value' : res.req}` : `Support.getGlobal ${path} ${res.async ? 'Value' : res.req}`;
       fns.push(`${doc(a)}\ndef ${T}.${id(getName)} : ${monad(res)} ${paren(res.lean)} := ${res.async ? `do\n  let p ← ${call}\n  ${finish(`p.await ${res.req}`, res).replace(/^do\n {2}/, '')}` : finish(call, res)}`);
     } else if (res.async) {
-      fns.push(`${doc(a)}\ndef ${T}.${id(getName)} (self : ${T}) : Async ${paren(res.lean)} := do\n  let p ← self.val.get "${a.name}" Value\n  ${res.post ? `let r ← p.await ${res.req}\n  ${applyPost(res.post, 'r')}` : `p.await ${res.req}`}`);
+      fns.push(`${doc(a)}\ndef ${T}.${id(getName)} (self : ${T}) : Async ${paren(res.lean)} := do\n  let p ← self.val.get "${a.name}" Value\n  ${res.post ? `let r ← p.await ${res.req}\n  ${asyncPost(res.post, 'r')}` : `p.await ${res.req}`}`);
     } else {
       fns.push(`${doc(a)}\ndef ${T}.${id(getName)} (self : ${T}) : IO ${paren(res.lean)} := ${finish(`self.val.get "${a.name}" ${res.req}`, res)}`);
     }

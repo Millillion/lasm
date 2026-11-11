@@ -1,0 +1,48 @@
+# The Worker of the Lasm.JS.Cloudflare conformance program (scripts/bindings/test-web.mjs
+# --fixture js-cloudflare), served by wrangler dev with local emulation only: Workers KV,
+# D1, R2, a Durable Object, a queue (producer and consumer) and cron triggers, all local
+# (Miniflare's storage under .wrangler/). Never deployed; no account is used. The ids
+# are placeholders that local mode accepts.
+name = "lasm-js-cloudflare"
+main = "index.mjs"
+compatibility_date = "2026-10-01"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "00000000000000000000000000000000"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "lasm-js-cloudflare"
+database_id = "00000000-0000-4000-8000-000000000000"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "lasm-js-cloudflare"
+
+[[durable_objects.bindings]]
+name = "OBJECTS"
+class_name = "LeanObject"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["LeanObject"]
+
+[[queues.producers]]
+binding = "QUEUE"
+queue = "lasm-js-cloudflare"
+
+[[queues.consumers]]
+queue = "lasm-js-cloudflare"
+max_batch_size = 10
+max_batch_timeout = 1
+max_retries = 3
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+# Lasm's program.wasm is imported as a precompiled module.
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = false

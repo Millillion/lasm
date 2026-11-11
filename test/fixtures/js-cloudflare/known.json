@@ -1,0 +1,4 @@
+{
+  "$comment": "Checks of test/fixtures/js-cloudflare that fail on a target because of the runtime itself (here: wrangler dev's local emulation of Workers, workerd and Miniflare), never the binding, with the reason (scripts/bindings/test-web.mjs). A name ending in * matches every check it prefixes.",
+  "workers": {}
+}
