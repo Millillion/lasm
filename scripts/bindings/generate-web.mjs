@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import * as tier from './web-tier1.mjs';
 import * as nodeTier from './node-tier2.mjs';
 import * as serveTier from './serve-tier2.mjs';
+import * as cloudflareTier from './cloudflare-tier3.mjs';
 import * as browser from './web-browser.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -43,6 +44,11 @@ const NODE_NS = 'Lasm.JS.Node';
 const nodeIdlFile = join(root, 'scripts', 'bindings', 'node.idl');
 
 const fail = message => { throw new Error(`generate-web: ${message}`); };
+// The runtimes generated from TypeScript declarations: Lasm.JS.Deno and Lasm.JS.Bun (serve-tier2.mjs),
+// Lasm.JS.Cloudflare (cloudflare-tier3.mjs).
+const hosts = [...serveTier.hosts, ...cloudflareTier.hosts];
+/** What a host's declarations are, for doc comments: `Deno 2.9.6`, `@cloudflare/workers-types 5.20261019.1`. */
+const hostSource = h => `${h.npm ?? h.name} ${h.version}`;
 
 // ---------- reading the IDL ----------
 
@@ -91,12 +97,12 @@ for (const d of webidl2.parse(nodeIdl)) {
 // WebIDL by serve-api.mjs (deno.idl, bun.idl). Their definitions carry their runtime
 // (LasmHost), Lean module (LasmLeanModule), Lean name (LasmName), TypeScript name
 // (LasmPath) and declaration file (LasmFile) as extended attributes.
-for (const host of serveTier.hosts) {
+for (const host of hosts) {
   for (const d of webidl2.parse(readFileSync(join(root, 'scripts', 'bindings', `${host.name.toLowerCase()}.idl`), 'utf8'))) {
     if (d.type === 'eof') continue;
     const file = (d.extAttrs ?? []).find(a => a.name === 'LasmFile')?.rhs.value.slice(1, -1);
     const spec = `${host.name.toLowerCase()}-${file ?? 'api'}`;
-    specTitles[spec] = `${host.name} ${host.version} type declarations${file ? `, ${file}` : ''}`;
+    specTitles[spec] = `${hostSource(host)} type declarations${file ? `, ${file}` : ''}`;
     if (defs_reserved.has(d.name)) fail(`${host.name.toLowerCase()}.idl defines ${d.name}, which a web specification defines too`);
     asts.push({ spec, d: JSON.parse(JSON.stringify(d)) });
   }
@@ -244,10 +250,13 @@ const nodeModules = nodeTier.modules.map(m => {
 // Lasm.JS.Deno and Lasm.JS.Bun (serve-tier2.mjs), generated in tier 1's context too: their
 // members are their IDL's definitions marked with their LasmHost and LasmLeanModule.
 const hostOf = d => extValue(extAttr(d, 'LasmHost'));
-const hostModules = serveTier.hosts.flatMap(h => h.modules.map(m => {
+const hostModules = hosts.flatMap(h => h.modules.map(m => {
   const mine = [...defs.values()].filter(d => hostOf(d) === h.name && extValue(extAttr(d, 'LasmLeanModule')) === m.name);
-  return { name: m.name, title: m.title, specs: `${h.name} ${h.version} type declarations`, tier: 1, ns: `Lasm.JS.${h.name}`, key: `Lasm.JS.${h.name}.${m.name}`,
-    host: h, interfaces: mine.filter(d => d.type === 'interface').map(d => d.name), namespaces: mine.filter(d => d.type === 'namespace').map(d => d.name) };
+  return { name: m.name, title: m.title, specs: `${hostSource(h)} type declarations`, tier: 1, ns: `Lasm.JS.${h.name}`, key: `Lasm.JS.${h.name}.${m.name}`,
+    host: h, interfaces: mine.filter(d => d.type === 'interface').map(d => d.name), namespaces: mine.filter(d => d.type === 'namespace').map(d => d.name),
+    // Lasm.JS.Cloudflare: every selected dictionary, callback and enum is generated, also one no member names
+    // (ExportedHandler and its handlers, which a program passes to Lasm.JS.exportDefault).
+    extraTypes: h.rich ? mine.filter(d => ['dictionary', 'callback', 'enum'].includes(d.type)).map(d => d.name) : undefined };
 }));
 const allModules = [...tier.modules.map(m => ({ ...m, tier: 1, ns: NS, key: `${NS}.${m.name}` })),
   ...browser.modules.map(m => ({ ...m, tier: 2, ns: NS, key: `${NS}.${m.name}` })), ...nodeModules, ...hostModules];
@@ -415,13 +424,15 @@ function makeUnion(types, typedefName, outerNullable = false) {
     const browserOnly = ctxTier >= 2 && resolved.some(namesBrowserInterface);
     const key = (browserOnly ? 'browser:' : '') + (typedefName ?? flat.alts.map(idlText).join('|'));
     if (!unions.has(key)) {
-      let name = typedefName ? (tier.renames[typedefName] ?? typedefName) : flat.alts.map(typeKeyName).join('Or');
+      // A host's union typedef (Lasm.JS.Cloudflare's) is named by LasmName, in the host's namespace.
+      const hostTypedef = typedefName && def(typedefName) && hostOf(def(typedefName));
+      let name = typedefName ? (tier.renames[typedefName] ?? (hostTypedef ? displayName(typedefName) : typedefName)) : flat.alts.map(typeKeyName).join('Or');
       // A union of a Lasm.JS.Node dictionary or class in a namespace lives in that namespace
       // (`fsPromises.ReadFileOptionsOrDOMString` beside `FileHandle.ReadFileOptionsOrDOMString`).
       const home = flat.alts.map(t => !t.union && !t.generic && def(t.idlType) && extValue(extAttr(def(t.idlType), 'LasmNamespace'))).find(Boolean);
       if (home) name = `${home}.${name}`;
-      if ([...unions.values()].some(o => o.name === name)) fail(`two unions are named ${name} (one in each tier)`);
-      const u = { key, name, alts: [], typedef: typedefName };
+      if ([...unions.values()].some(o => o.name === name && !!o.host === !!hostTypedef)) fail(`two unions are named ${name} (one in each tier)`);
+      const u = { key, name, alts: [], typedef: typedefName, host: hostTypedef };
       unions.set(key, u);
       const used = new Set();
       flat.alts.forEach((t, i) => {
@@ -626,6 +637,7 @@ for (const m of plan) inTier(m.tier, () => {
   for (const x of m.extraTypes ?? []) {
     const d = def(x);
     if (!d) fail(`extra type ${x} not found`);
+    if (m.host && moduleOfType.has(x)) continue;
     visit(resolveName(x), 'to', m.key);
   }
 });
@@ -649,8 +661,8 @@ function requireType(module, t) {
 }
 
 /** Lasm.JS.Deno's and Lasm.JS.Bun's IDL names (`Deno_HttpServer`) as their Lean names, in doc comments. */
-const hostDoc = s => s.replace(/\b(?:Deno|Bun)_[A-Za-z0-9_]+/g, n => def(n) ? leanTypeName(n) : n);
-const docText = s => s.replace(/-\//g, '- /').replace(/\b(?:Node|Deno|Bun)_[A-Za-z0-9_]+/g, n => def(n) ? leanTypeName(n) : n);
+const hostDoc = s => s.replace(/\b(?:Deno|Bun|Cloudflare)_[A-Za-z0-9_]+/g, n => def(n) ? leanTypeName(n) : n);
+const docText = s => s.replace(/-\//g, '- /').replace(/\b(?:Node|Deno|Bun|Cloudflare)_[A-Za-z0-9_]+/g, n => def(n) ? leanTypeName(n) : n);
 const memberIdl = (m, owner) => {
   const args = a => a.map(x => `${x.optional ? 'optional ' : ''}${idlText(x.idlType)}${x.variadic ? '...' : ''} ${x.name}`).join(', ');
   switch (m.type) {
@@ -674,6 +686,9 @@ function argumentList(args, module = null) {
   // In Lasm.JS.Node, an argument named like a namespace (`path`, `crypto`) would hide it in the signature.
   const names = new Set(['self', ...(module && nsOf(module) === NODE_NS ? nodeNamespaces : [])]);
   for (const a of args) {
+    // LasmConstant (Lasm.JS.Cloudflare): an argument of one string literal type, passed as that string.
+    const constant = extValue(extAttr(a, 'LasmConstant'));
+    if (constant !== undefined) { values.push(`toJS ${JSON.stringify(constant)}`); continue; }
     let name = a.name;
     while (names.has(name)) name += '_';
     names.add(name);
@@ -701,11 +716,16 @@ function withPre(al, rhs) {
 }
 
 /** The result: Lean type, and how to finish a host call that requested reqType. */
-function resultOf(idlType) {
+function resultOf(idlType, member = null) {
   const r = resolve(idlType);
   const async = promiseRet(r);
   const t = async ? r.inner : r;
   const lean = retType(t);
+  // LasmMap (Lasm.JS.Cloudflare): a JavaScript Map, read as a record (Lasm.JS.Cloudflare.Support.mapOf).
+  if (member && extAttr(member, 'LasmMap')) {
+    if (t.k !== 'record' || needsPost(t.inner)) fail(`${member.name}: LasmMap on a result that is not a record`);
+    return { async, t, lean, req: 'Value', post: `Support.mapOf ${paren(retType(t.inner))}` };
+  }
   // An interface result is read as a reference and wrapped: some runtimes return
   // plain objects for interface instances (Bun's navigator), which data would copy.
   if (t.k === 'iface') return { async, t, lean, req: 'Value', post: 'wrap' };
@@ -799,7 +819,7 @@ function emitInterface(module, name) {
   for (const a of members.filter(m => m.type === 'attribute')) {
     const r = resolve(a.idlType);
     requireType(module, r);
-    const res = resultOf(a.idlType);
+    const res = resultOf(a.idlType, a);
     const isStatic = a.special === 'static';
     const getName = take(isStatic && instanceNames.has(a.name) ? 'static' + capital(a.name) : a.name, 'attribute');
     if (isStatic) {
@@ -829,19 +849,23 @@ function emitInterface(module, name) {
     }
     // Unnamed getters, setters and deleters (DOMStringMap's properties, Window's named elements) have no method to call.
     if (!op.name) continue;
-    const key = (op.special === 'static' ? 'static ' : '') + op.name;
+    // LasmOverloadName (Lasm.JS.Cloudflare): an overload named by its string literal argument (`getJson`).
+    const fixed = extValue(extAttr(op, 'LasmOverloadName'));
+    const key = fixed ? `fixed ${fixed}` : (op.special === 'static' ? 'static ' : '') + op.name;
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(op);
   }
   for (const group of groups.values()) {
-    overloadNames(group).forEach((n0, i) => {
+    const fixed = extValue(extAttr(group[0], 'LasmOverloadName'));
+    if (fixed && group.length > 1) fail(`${T}.${fixed}: two overloads with one LasmOverloadName`);
+    (fixed ? [fixed] : overloadNames(group)).forEach((n0, i) => {
       const op = group[i];
       const isStatic = op.special === 'static';
       const n = isStatic && instanceNames.has(op.name) ? 'static' + capital(n0) : n0;
       for (const a of op.arguments) requireType(module, resolve(a.idlType));
       requireType(module, resolve(op.idlType));
       const al = argumentList(op.arguments, module);
-      const res = resultOf(op.idlType);
+      const res = resultOf(op.idlType, op);
       let body;
       if (isStatic) {
         const b = binding(`${T}.${n}`, `${jsPath(name)}.${op.name}`, false, al.arity, ns, jsModule);
@@ -1039,8 +1063,12 @@ for (const m of plan) inTier(m.tier, () => {
   emitNamespaceOrGlobal(m.key, 'WindowOrWorkerGlobalScope', m.globals.flatMap(globalMember), [], '');
   for (const n of m.namespaces) {
     const jsModule = jsModuleOf(n);
-    // Lasm.JS.Deno and Lasm.JS.Bun: the runtime's global object's functions, at the top of the module's namespace (`Lasm.JS.Deno.serve`).
-    if (hostOf(def(n))) emitNamespaceOrGlobal(m.key, n, def(n).members, [extValue(extAttr(def(n), 'LasmPath'))], '');
+    // Lasm.JS.Deno and Lasm.JS.Bun: the runtime's global object's functions, at the top of the module's namespace (`Lasm.JS.Deno.serve`);
+    // Lasm.JS.Cloudflare: globals (LasmPath "") and a module's exports (LasmModule `cloudflare:sockets`), likewise.
+    if (hostOf(def(n))) {
+      const path = extValue(extAttr(def(n), 'LasmPath'));
+      emitNamespaceOrGlobal(m.key, n, def(n).members.map(x => ({ ...x, name: memberName(x) })), path ? [path] : [], '', extValue(extAttr(def(n), 'LasmModule')) ?? 'globalThis');
+    }
     else if (jsModule === 'globalThis') emitNamespaceOrGlobal(m.key, n, def(n).members.filter(exposedToWorkers), [n], `${n}.`);
     else emitNamespaceOrGlobal(m.key, n, def(n).members.map(x => ({ ...x, name: memberName(x) })), [], `${leanTypeName(n)}.`, jsModule);
   }
@@ -1095,7 +1123,12 @@ scripts/bindings/node-api.mjs (webidl2 ${webidl2Version}); do not edit. Regenera
 \`node scripts/bindings/node-api.mjs && node scripts/bindings/generate-web.mjs\`; the mapping is in
 docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's documented signature
 and its lowered WebIDL.`;
-const hostGeneratedBy = h => `GENERATED by scripts/bindings/generate-web.mjs from scripts/bindings/${h.name.toLowerCase()}.idl, the ${h.name} ${h.version}
+const hostGeneratedBy = h => h.npm ? `GENERATED by scripts/bindings/generate-web.mjs from scripts/bindings/${h.name.toLowerCase()}.idl, the TypeScript
+declarations of ${h.npm} ${h.version} (${h.files.join(', ')}; ${h.license})
+lowered to WebIDL by scripts/bindings/${h.generator} (webidl2 ${webidl2Version}); do not edit. Regenerate with
+\`node scripts/bindings/${h.generator} && node scripts/bindings/generate-web.mjs\`; the mapping is in
+docs/JS_BINDINGS.md ("Cloudflare Workers: Lasm.JS.Cloudflare"). The doc comments quote each member's TypeScript
+declaration and its lowered WebIDL.` : `GENERATED by scripts/bindings/generate-web.mjs from scripts/bindings/${h.name.toLowerCase()}.idl, the ${h.name} ${h.version}
 TypeScript declarations (${h.files.join(', ')} of ${h.repo} at ${h.tag}; ${h.license})
 lowered to WebIDL by scripts/bindings/serve-api.mjs (webidl2 ${webidl2Version}); do not edit. Regenerate with
 \`node scripts/bindings/serve-api.mjs && node scripts/bindings/generate-web.mjs\`; the mapping is in
@@ -1106,7 +1139,7 @@ const moduleFile = key => join(root, 'library', ...key.split('.')) + '.lean';
 for (const m of plan) {
   const o = out.get(m.key);
   const isNode = m.ns === NODE_NS;
-  const support = isNode ? 'Lasm.JS.Node.Support' : 'Lasm.JS.Web.Support';
+  const support = isNode ? 'Lasm.JS.Node.Support' : m.host?.support ?? 'Lasm.JS.Web.Support';
   const imports = [support, ...order.filter(n => o.imports.has(n))];
   const text = [`/-
 ${m.key}: ${m.title} (${m.specs}).
@@ -1139,6 +1172,14 @@ options objects dictionaries (docs/JS_BINDINGS.md, "Lasm.JS.Node").
 ${nodeGeneratedBy}
 -/`, ...order.filter(n => n.startsWith(NODE_NS + '.')).map(n => `import ${n}`), ''].join('\n'));
 
+files.set(join(root, 'library', 'Lasm', 'JS', 'Cloudflare.lean'), [`/-
+Lasm.JS.Cloudflare: the runtime APIs of Cloudflare Workers as declared by ${hostSource(cloudflareTier.hosts[0])}: the
+bindings of a Worker's env (Workers KV, D1, R2, Durable Objects, Queues), the handlers (fetch, scheduled, queue) and
+their ExecutionContext, the Cache API and TCP sockets, with Lasm.JS.Web's Request, Response and streams as their web
+types. The same mapping as Lasm.JS.Web: bindings are handle types, Promise results are \`Async\`, options
+dictionaries, handlers callbacks made from Lean functions (docs/JS_BINDINGS.md, "Cloudflare Workers: Lasm.JS.Cloudflare").
+${hostGeneratedBy(cloudflareTier.hosts[0])}
+-/`, ...order.filter(n => n.startsWith('Lasm.JS.Cloudflare.')).map(n => `import ${n}`), ''].join('\n'));
 for (const h of serveTier.hosts) files.set(join(root, 'library', 'Lasm', 'JS', `${h.name}.lean`), [`/-
 Lasm.JS.${h.name}: ${h.name}'s HTTP server (\`${h.global}.serve\`) as declared for ${h.name} ${h.version}, with Lasm.JS.Web's
 Request and Response as the handler's types. The same mapping as Lasm.JS.Web: the server is a handle type,
@@ -1227,7 +1268,7 @@ end Surface
 // the members of each interface, for the availability probe of test/fixtures/js-serve
 // (the interfaces have no global constructor: they are probed on live objects).
 const serveSurface = {};
-for (const m of plan.filter(m => m.host)) {
+for (const m of plan.filter(m => m.host && serveTier.hosts.includes(m.host))) {
   const h = (serveSurface[m.host.name] ??= { global: m.host.global, functions: [], interfaces: {} });
   for (const n of m.namespaces) h.functions.push(...new Set(def(n).members.map(x => x.name)));
   for (const i of m.ifaces) h.interfaces[displayName(i)] = [...new Set(membersOf(i).map(x => x.name))];
@@ -1245,6 +1286,30 @@ def json : String := r#"${JSON.stringify(serveSurface)}"#
 end Surface
 `);
 
+// Lasm.JS.Cloudflare's surface: the globals and module exports, and the members of each
+// interface, for the availability probe of test/fixtures/js-cloudflare (on live objects: the
+// bindings of env, a handler's context, a stub).
+const cloudflareSurface = { globals: {}, interfaces: {} };
+for (const m of plan.filter(m => m.host && cloudflareTier.hosts.includes(m.host))) {
+  for (const n of m.namespaces) {
+    const module = extValue(extAttr(def(n), 'LasmModule')) ?? 'globalThis';
+    (cloudflareSurface.globals[module] ??= []).push(...new Set(def(n).members.map(memberName)));
+  }
+  for (const i of m.ifaces) cloudflareSurface.interfaces[displayName(i)] = [...new Set(membersOf(i).map(memberName))];
+}
+files.set(join(root, 'scripts', 'bindings', 'cloudflare-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (${cloudflareTier.hosts.map(hostSource).join(', ')} declarations)`, surface: cloudflareSurface }, null, 2) + '\n');
+files.set(join(root, 'test', 'fixtures', 'js-cloudflare', 'Surface.lean'), `/-
+GENERATED by scripts/bindings/generate-web.mjs from scripts/bindings/cloudflare.idl; do not edit.
+The generated surface (scripts/bindings/cloudflare-surface.json), for the availability probe of Main.lean.
+-/
+namespace Surface
+
+/-- \`{globals: {module: [name]}, interfaces: {name: [member]}}\` for Lasm.JS.Cloudflare. -/
+def json : String := r#"${JSON.stringify(cloudflareSurface)}"#
+
+end Surface
+`);
+
 let stale = [];
 for (const [file, text] of files) {
   const current = existsSync(file) ? readFileSync(file, 'utf8') : null;
@@ -1256,7 +1321,7 @@ for (const [file, text] of files) {
 }
 if (check) {
   const known = new Set([...files.keys()].map(f => f.slice(root.length)));
-  for (const [dir, tierName] of [[outDir, 'Web'], [nodeOutDir, 'Node'], ...serveTier.hosts.map(h => [join(root, 'library', 'Lasm', 'JS', h.name), h.name])]) for (const name of existsSync(dir) ? readdirSync(dir) : []) {
+  for (const [dir, tierName] of [[outDir, 'Web'], [nodeOutDir, 'Node'], ...hosts.map(h => [join(root, 'library', 'Lasm', 'JS', h.name), h.name])]) for (const name of existsSync(dir) ? readdirSync(dir) : []) {
     const rel = join('library', 'Lasm', 'JS', tierName, name);
     if (name !== 'Support.lean' && !known.has(rel)) stale.push(rel + ' (not generated)');
   }
@@ -1264,5 +1329,5 @@ if (check) {
     console.error(`The standard bindings are stale: ${stale.join(', ')}. Run node scripts/bindings/generate-web.mjs and commit the result.`);
     process.exit(1);
   }
-  console.log(`Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun are up to date (@webref/idl ${webrefVersion}, Node.js ${nodeTier.version} docs, ${serveTier.hosts.map(h => `${h.name} ${h.version}`).join(', ')} declarations).`);
+  console.log(`Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun and Lasm.JS.Cloudflare are up to date (@webref/idl ${webrefVersion}, Node.js ${nodeTier.version} docs, ${hosts.map(hostSource).join(', ')} declarations).`);
 }

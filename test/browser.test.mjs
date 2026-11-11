@@ -40,7 +40,7 @@ test('builtin modules: every builtin module uses web-standard JavaScript only', 
 
 test('edge entries import builtin modules from the output', () => {
   assert.match(workersEntry(['hono', 'lasm:ui-dom']), /import \* as m1 from "\.\/lasm\/modules\/ui-dom\.mjs";/);
-  assert.match(workersEntry(['lasm:ui-dom']), /const modules = \{ "lasm:ui-dom": m0 \};/);
+  assert.match(workersEntry(['lasm:ui-dom']), /const modules = \{ 'cloudflare:workers': workersModule, 'cloudflare:sockets': socketsModule, "lasm:ui-dom": m0 \};/);
   assert.match(vercelEdgeEntry(['lasm:ui-dom']), /from "\.\/_lasm\/lasm\/modules\/ui-dom\.mjs"/);
   assert.match(netlifyEdgeEntry(['lasm:ui-dom']), /from "\.\.\/lasm\/lasm\/modules\/ui-dom\.mjs"/);
   assert.match(portableEntry('deno', ['lasm:ui-dom']), /from "\.\/lasm\/modules\/ui-dom\.mjs"/);
@@ -51,7 +51,7 @@ test('library modules: only those a program initializes, and their imports', () 
     'Lasm.JS': 'initialize_Lasm_JS_Core( initialize_Lasm_JS_Json( initialize_Lasm_JS_Meta(' };
   const libraryText = module => library[module] ?? '';
   const read = text => text;
-  assert.deepEqual(linkedLibraryModules(['initialize_Lasm_JS('], { read, libraryText }), libraryModules.filter(m => m.startsWith('Lasm.JS') && !m.startsWith('Lasm.JS.Web') && !m.startsWith('Lasm.JS.Node') && !m.startsWith('Lasm.JS.Deno') && !m.startsWith('Lasm.JS.Bun')));
+  assert.deepEqual(linkedLibraryModules(['initialize_Lasm_JS('], { read, libraryText }), libraryModules.filter(m => m.startsWith('Lasm.JS') && !m.startsWith('Lasm.JS.Web') && !m.startsWith('Lasm.JS.Node') && !m.startsWith('Lasm.JS.Deno') && !m.startsWith('Lasm.JS.Bun') && !m.startsWith('Lasm.JS.Cloudflare')));
   assert.deepEqual(linkedLibraryModules(['initialize_Lasm_JS_Core('], { read, libraryText }), ['Lasm.JS.Core']);
   assert.deepEqual(linkedLibraryModules(['nothing'], { read, libraryText }), []);
 });
