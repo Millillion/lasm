@@ -1076,8 +1076,10 @@ then proved of the model and moves to `verification/cli/Lasm/Cli/Spec.lean`
 with its theorem in `Theorems.lean`, checked by `scripts/library-proofs.mjs`
 like the library's, and its test cites `Lasm.Cli.Spec.…`. Since 2026-11-11:
 `numbers` (src/node-host.mjs), `changedFiles` (src/dev.mjs),
-`responseFile` (src/platform.mjs), and `replaceCoreModule` and
-`withoutComponentType` (src/wasi/wasi-component.mjs), with `numbers_le64`,
+`responseFile` (src/platform.mjs), `replaceCoreModule` and
+`withoutComponentType` (src/wasi/wasi-component.mjs), and
+`initializationSchedule` and `compactInitializerWrappers`
+(src/edge/edge-initializers.mjs; not yet proved), with `numbers_le64`,
 `changed_files_exact`, `response_file_round_trip`,
 `replace_one_core_module` and `drops_only_component_type` proved. The
 differential of `replaceCoreModule` found its first bug: a section whose size

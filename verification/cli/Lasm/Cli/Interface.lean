@@ -28,6 +28,7 @@ the vocabulary the statements share, exact and complete.
 -/
 import Lean.Data.Json
 import Lasm.Cli.Model.Dev
+import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.WasiComponent
@@ -225,18 +226,12 @@ def wellFormedName (n : String) : Bool :=
 `imports s` the builtin specifiers (`lasm:…`) builtin `s`'s file imports. -/
 opaque builtinModuleClosure : (String → List String) → List String → List String
 
-/-- An initialization plan (src/edge/edge-initializers.mjs): every
-initializer of the link, those kept, and the initializers each one calls. -/
-structure Plan where
-  closure : List String
-  keep : List String
-  calls : String → List String
-
-/-- `initializationSchedule(name, calls, keep)`. -/
-opaque initializationSchedule : String → (String → List String) → List String → List String
-
-/-- `compactInitializerWrappers(plan)`: C source. -/
-opaque compactInitializerWrappers : Plan → String
+-- An initialization plan (`Plan`: every initializer of the link, those kept,
+-- and the initializers each one calls, `calls` as the entries of the
+-- JavaScript object and `Plan.edges` as a function),
+-- `initializationSchedule(name, calls, keep)` and
+-- `compactInitializerWrappers(plan)` (src/edge/edge-initializers.mjs):
+-- modelled in Model/EdgeInitializers.lean.
 
 /-- Not Lasm's JavaScript: what running the C source records when the
 wrappers of `entries` are called in turn, each kept unit's real initializer
@@ -258,7 +253,7 @@ def chainsStep (calls : String → List String) (keep : List String) :
 /-- The kept initializers the Node build's chains run, in order, when
 `entries` are called in turn. -/
 def chains (p : Plan) (entries : List String) : List String :=
-  (entries.foldl (chainsStep p.calls p.keep (p.closure.length + 1)) ([], [])).2
+  (entries.foldl (chainsStep p.edges p.keep (p.closure.length + 1)) ([], [])).2
 
 /-- A C initializer name the wrappers accept. -/
 def initializerName (n : String) : Bool :=
