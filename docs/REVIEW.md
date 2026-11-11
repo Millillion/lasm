@@ -157,9 +157,89 @@ decisions themselves are logged with their reasoning in
   - **Bun deviates from its declaration**: `server.fetch(request)` calls the handler
     without the `server` argument, so a generated handler rejects there
     (`known.json`).
-  - **Node**: no Lasm API; `@hono/node-server`'s `serve({fetch})` bound with
-    `@[js]` in the user's program, documented in JS_BINDINGS.md and exercised in
-    CI. A user-facing helper (or a template change) is yours to decide.
+  - **Node**: superseded 2026-11-11 by `Node.serve` (Lasm provides it; see
+    "Node.serve and function-platform handlers" below). `@hono/node-server`
+    through `@[js]` still works and stays exercised in CI.
+
+### Node.serve and function-platform handlers (decided by Jordan 2026-11-11; the shapes are for review)
+- [ ] **Review the exact shapes.** These are in PR "Node.serve and direct function-platform
+  handlers", which stays unmerged until you approve them.
+  [JS_BINDINGS.md](JS_BINDINGS.md#serving-http-on-node-nodeserve) has the details.
+  - **`Node.serve`** (`import Lasm.JS.Node.Serve`; namespace `Lasm.JS.Node`).
+    It is provided by Lasm, hand-written, and is not a Node API. It is shaped
+    like `Bun.serve`.
+    ```lean
+    def Lasm.JS.Node.serve (options : ServeOptions) : IO Unit
+    structure ServeOptions where
+      fetch : Request → Async Response             -- required, a Lean function (no ofFn)
+      port : Option Nat := none                    -- $PORT, else 3000 (Bun)
+      hostname : Option String := none             -- "0.0.0.0" (Bun)
+      signal : Option AbortSignal := none          -- Deno.serve's
+      onListen : Option (Server → IO Unit) := none -- Deno.serve's; default prints "Listening on <url>"
+      error : Option (IO.Error → Async Response) := none  -- Bun's name (not onError); default 500
+    structure Server where hostname : String; port : Nat; url : String; val : Value
+    def Server.stop (server : Server) (closeActiveConnections : Bool := false) : Async Unit  -- Bun's
+    def Server.finished (server : Server) : Async Unit                                       -- Deno's
+    ```
+    - **Blocking.** `Node.serve` returns only after the server stops (stop,
+      `signal`, SIGTERM or SIGINT; a second signal closes open connections).
+      The handle reaches you through `onListen`. The Lean runtime ends when
+      `main` returns, so a non-blocking `serve : … → IO Server`, as in Bun,
+      would make every program end with `server.finished.block`. The blocking
+      form makes the one-liner work: `def main := Node.serve { fetch := handle }`.
+      Your call: blocking (as built), or Bun's non-blocking return.
+    - **Names.** I used Bun's `error`, not `onError`, as you asked ("keep
+      Bun's names"). Bun has no `signal` or `onListen`, so those come from
+      Deno. `url` is a `String`, not Bun's `URL`. Defaults follow Bun: `$PORT`
+      else 3000, and `0.0.0.0`; `$HOST` is not read, which differs from
+      today's templates.
+    - **Signals.** `Node.serve` installs its own SIGTERM and SIGINT handlers
+      (a graceful stop). Bun installs none.
+    - **Not in `import Lasm.JS.Node`.** `Lasm.JS.Node` is generated, so you
+      import `Lasm.JS.Node.Serve` explicitly. Adding it to the umbrella module
+      would be a generator change.
+  - **Typed `exportDefault`.** It is one function with a class, not an overload:
+    ```lean
+    class DefaultExport (α : Type) where toDefaultExport : α → IO Value
+    instance : DefaultExport Value
+    instance [FromJS α] [ToJS β] : DefaultExport (α → Async β)   -- Function.ofFn1
+    def Lasm.JS.exportDefault [DefaultExport α] (x : α) : IO Unit
+    ```
+    A program writes `def main : IO Unit := exportDefault handle`, where
+    `handle : Request → Async Response`. Existing calls such as `exportDefault
+    (v : Value)` still work. The function form gets only the request:
+    Workers' `env` and `ctx` and Netlify's `context` need the `Value` form. A
+    two-argument instance (`Request → Data → Async Response`) is a possible
+    addition.
+  - **What serverless programs write.** `main` calls `exportDefault handle`
+    and nothing else. Under the platform's entry, `exportDefault` does not
+    return. The Lean runtime ends with `main`, so `main` stays there and
+    serves the calls. Keeping the runtime alive after `main` returns turned out
+    not to be clean (see DECISIONS.md, 2026-11-11). `lasm package` writes, per
+    target:
+    - Netlify: `export default async (request, context) => …`, which calls
+      `handler(request, context)`.
+    - Vercel and GCF: the Node `(req, res)` pair as a web Request, with the
+      Response streamed back.
+    - Lambda and Lambda@Edge: each event mapped to a Request and the Response
+      mapped back.
+    - Azure: the Request, with the Response as `HttpResponseInit`.
+
+    None of them starts an HTTP server, binds a port or forwards over loopback.
+  - **The loopback adapter is deleted** (`lasm-server.mjs` is now
+    `lasm-function.mjs`, with no server). A program that brings its own HTTP
+    server (Express, Fastify, `Std.Http`, or `Node.serve`) can no longer run
+    on the function platforms. It has to publish a handler. Today's `express`,
+    `fastify` and `std-http` templates use `--deploy lambda-zip|vercel|…`, so
+    they need a decision: drop those deploy targets, or port the templates to
+    `exportDefault` (hono can use `exportDefault app`). The templates are
+    unchanged in this PR. Until they move, `serverless.yml` (dispatch only)
+    fails on them.
+  - **Smaller points.** A handler that throws gets a 500 everywhere. A request
+    the Fetch standard cannot hold (TRACE, CONNECT, the target `*`) gets a 400.
+    On Lambda, the scheme comes from `x-forwarded-proto` (https when it says so).
+    A Response joins repeated fields other than Set-Cookie (`x: p, q`), so
+    REST and ALB multi-value replies carry them joined.
 
 ### Host bindings: `Lasm.Fastly` generated, `Lasm.WASI.*` next (decided by Jordan, 2026-11-10)
 - [x] **Decided.** `Lasm.Fetch` is deleted entirely. Bindings are named for

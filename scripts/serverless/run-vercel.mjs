@@ -63,7 +63,7 @@ for (const app of apps.filter(app => app.packages.vercel)) {
     assert.equal(JSON.parse(readFileSync(join(output, 'config.json'), 'utf8')).version, 3);
     const config = JSON.parse(readFileSync(join(func, '.vc-config.json'), 'utf8'));
     assert.deepEqual([config.runtime, config.handler, config.launcherType], ['nodejs24.x', 'lasm-vercel.mjs', 'Nodejs']);
-    for (const file of ['lasm-vercel.mjs', 'lasm-server.mjs', 'main.mjs', 'program.cjs', 'program.wasm', 'host/node-host.mjs', 'host/native/manifest.json'])
+    for (const file of ['lasm-vercel.mjs', 'lasm-function.mjs', 'main.mjs', 'program.cjs', 'program.wasm', 'host/node-host.mjs', 'host/native/manifest.json'])
       assert.ok(existsSync(join(func, file)), file);
     assert.equal(statSync(join(func, 'host/native/process/linux-x64-gnu')).mode & 0o777, 0o755);
     run.functionBytes = size(func);

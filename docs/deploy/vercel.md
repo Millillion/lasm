@@ -33,10 +33,10 @@ Lean and Lasm's tools, a few hundred MB, and takes a few minutes) and deploys th
 zero-config routes to `config.json`; the `routes` entry keeps the function first
 for every path.
 
-- **Handler:** Node's `(req, res)`; the Lean server starts on the first request
-  (Vercel's launcher intercepts `http.Server#listen` while it imports the
-  function, so it cannot start earlier). Each request is piped to the server
-  over loopback; Vercel's request helpers may be on or off.
+- **Handler:** Node's `(req, res)`. The Lean program starts when the
+  function loads. Each request becomes a web `Request` for the handler that
+  `main` publishes (`Lasm.JS.exportDefault handle`), called directly, and the
+  `Response` streams back. Vercel's request helpers may be on or off.
 - **Limits:** the function is 5.3–6.5 MB for the templates; packaging fails
   above Vercel's 250 MB uncompressed limit. Request and response bodies up to
   4.5 MB (Vercel's limit). Set the memory to at least 512 MB (Hobby: 2 GB

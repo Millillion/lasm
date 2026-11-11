@@ -4,8 +4,8 @@ program runs on, with its own server API:
 
 - Deno: `Deno.serveWithOptions` (Lasm.JS.Deno), closed by aborting its signal;
 - Bun: `Bun.serve` (Lasm.JS.Bun), closed with `stop`;
-- Node: @hono/node-server's `serve({fetch})`, an `@[js]` binding to the npm package
-  (Node has no fetch-style server of its own), closed with `close`.
+- Node: `Node.serve` (Lasm.JS.Node.Serve, provided by Lasm: Node has no fetch-style
+  server of its own), stopped with `Server.stop`.
 
 It listens on 127.0.0.1:$PORT, prints `listening <port>`, and serves until a
 request for `/shutdown`; then it closes the server, waits for open requests, prints
@@ -16,12 +16,11 @@ import Lasm.JS
 import Lasm.JS.Web
 import Lasm.JS.Deno
 import Lasm.JS.Bun
+import Lasm.JS.Node.Serve
 import App
 open Lasm.JS Lasm.JS.Web
 
 @[js "globalThis" "Reflect.has"] opaque reflectHas : Value → String → IO Bool
-/-- `serve(options, listeningListener)` of @hono/node-server; returns the Node server. -/
-@[js "@hono/node-server" "serve"] opaque nodeServe : Data → Value → IO Value
 
 def announce (line : String) : IO Unit := do
   IO.println line
@@ -43,28 +42,24 @@ def main : IO UInt32 := do
     let handler ← Deno.ServeHandler.ofFn fun req _ => withShutdown ac.abort req
     let server ← Deno.serveWithOptions { port := some port, hostname := some "127.0.0.1", signal := some (← ac.signal), onListen := some onListen } handler
     server.finished.block
-  else
-    -- Bun and Node: the /shutdown handler resolves `stopping`; main then closes the server.
+  else if ← reflectHas g "Bun" then
+    -- The /shutdown handler resolves `stopping`; main then closes the server.
     let stopping : IO.Promise Unit ← IO.Promise.new
     let stop : IO Unit := stopping.resolve ()
-    if ← reflectHas g "Bun" then
-      let fetch ← Bun.ServeOptionsFetch.ofFn fun req _ => withShutdown stop req
-      let server ← Bun.serve { fetch, port := some (.unsignedShort port), hostname := some "127.0.0.1" }
-      announce s!"listening {(← server.port).getD 0}"
-      (Std.Async.await stopping : Async Unit).block
-      server.stop.block
-    else
-      let listening ← Function.ofFn fun args => do
-        match (args[0]?.getD Data.undefined).field "port" with
-        | .number n => announce s!"listening {n.toUInt64.toNat}"
-        | _ => announce "listening ?"
-        return .undefined
-      let fetch ← Function.ofFn1 (withShutdown stop)
-      let server ← nodeServe (obj [("fetch", toJS fetch), ("port", toJS port), ("hostname", toJS "127.0.0.1")]) listening
-      (Std.Async.await stopping : Async Unit).block
-      let closed : IO.Promise Unit ← IO.Promise.new
-      let done ← Function.ofFn fun _ => do closed.resolve (); return .undefined
-      let _ : Value ← server.callMethod "close" #[toJS done]
-      (Std.Async.await closed : Async Unit).block
+    let fetch ← Bun.ServeOptionsFetch.ofFn fun req _ => withShutdown stop req
+    let server ← Bun.serve { fetch, port := some (.unsignedShort port), hostname := some "127.0.0.1" }
+    announce s!"listening {(← server.port).getD 0}"
+    (Std.Async.await stopping : Async Unit).block
+    server.stop.block
+  else
+    -- Node.serve returns once the server has stopped: the /shutdown handler starts
+    -- a graceful stop, which finishes its own request first.
+    let handle ← IO.mkRef (none : Option Node.Server)
+    let stop : IO Unit := do
+      if let some server ← handle.get then
+        let _ : Value ← server.val.callMethod "stop" #[]
+        pure ()
+    Node.serve { fetch := withShutdown stop, port := some port, hostname := some "127.0.0.1",
+      onListen := some fun server => do handle.set (some server); announce s!"listening {server.port}" }
   announce "stopped"
   return 0

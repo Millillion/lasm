@@ -2,20 +2,20 @@
 # The function platforms' HTTP mapping, in Lean
 
 A model of src/serverless/: how each function platform's request becomes the
-HTTP request that the platform shim forwards to the program's server over
-loopback, and how the server's reply becomes the platform's response. It is
+web Request that the platform shim hands to the fetch handler the program
+publishes, and how the handler's reply becomes the platform's response. It is
 written to mirror the JavaScript function for function:
 
 | src/serverless/                              | here                                   |
 | -------------------------------------------- | -------------------------------------- |
-| lasm-server.mjs `requestTarget`              | `requestTarget`, `escape`              |
-| lasm-server.mjs `plainHost`                  | `plainHost`                            |
-| lasm-server.mjs `joinCookies`, `cookieComma` | `joinCookies`, `commas`                |
-| lasm-server.mjs `outgoingHeaders`            | `outgoing`, `keep`                     |
-| lasm-server.mjs `isTextual`                  | `textualType`, `body`                  |
-| lasm-server.mjs `webReply` (Netlify)         | `webNullBody`                          |
-| lasm-server.mjs `parseSetCookie`             | `parseSetCookie`, `applyAttribute`     |
-| lasm-server.mjs `azureReply` (Azure)         | `azureReply`                           |
+| lasm-function.mjs `requestTarget`              | `requestTarget`, `escape`              |
+| lasm-function.mjs `plainHost`                  | `plainHost`                            |
+| lasm-function.mjs `joinCookies`, `cookieComma` | `joinCookies`, `commas`                |
+| lasm-function.mjs `outgoingHeaders`            | `outgoing`, `keep`                     |
+| lasm-function.mjs `isTextual`                  | `textualType`, `body`                  |
+| lasm-function.mjs `webResponse` (Netlify)    | `webNullBody`                          |
+| lasm-function.mjs `parseSetCookie`             | `parseSetCookie`, `applyAttribute`     |
+| lasm-function.mjs `azureReply` (Azure)         | `azureReply`                           |
 | lasm-lambda.mjs `query` (URLSearchParams)    | `formEncode`                           |
 | lasm-lambda.mjs `rawQuery`, `headerPairs`    | `rawQuery`, `pairsOf`                  |
 | lasm-lambda.mjs `decode`                     | `bodyIn`                               |
@@ -23,9 +23,9 @@ written to mirror the JavaScript function for function:
 | lasm-lambda.mjs `handler`, payload 2.0       | `v2Request`, `v2Response`              |
 | lasm-lambda.mjs `cloudFront`                 | `cloudFrontRequest`, `cloudFrontResponse` |
 
-Vercel and Google Cloud Functions (`pipe`) and Netlify and Azure Functions
-(`fetchLean`, the Azure handler) forward the platform's own request target
-and send `outgoing` of its headers; Lambda's events are mapped here first.
+Vercel and Google Cloud Functions (`pipe`, node-serve.mjs `toRequest`) and
+Netlify and Azure Functions (`fetchLean`, the Azure handler) keep the
+platform's own request target; Lambda's events are mapped here first.
 
 What is left to the platform, as the JavaScript leaves it: Node's base64
 codec (a body the model marks `base64` travels as Node's base64 of those
@@ -471,7 +471,7 @@ def cloudFrontResponse (r : Reply) : CloudFrontResponse :=
   { status := toString r.status, statusDescription := r.statusText,
     headers := group (r.headers.filter (!cloudFrontRefused ·.1)), body := body r.headers r.body }
 
-/-! ## Netlify (`webReply`) -/
+/-! ## Netlify (`webResponse`) -/
 
 /-- Whether the WHATWG Response has no body: a null-body status, a HEAD, or nothing to send. -/
 def webNullBody (status : Nat) (method : String) (length : Nat) : Bool :=

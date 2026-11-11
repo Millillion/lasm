@@ -719,13 +719,6 @@ def onEdge : IO Bool := do
   let reply ← hostCall 200 0 0 .empty
   return reply.size ≥ 8 && reply.get! 4 == 1
 
-/-- Publishes `v` as the program's default export. In an edge build
-(`lasm build --target workers`) the Worker's requests go to it: a Hono app (or
-any object with a `fetch` method), or a function `(request, env, ctx) => Response`.
-On Node it only records the value (`globalThis.__lasmDefaultExport`). -/
-def exportDefault (v : Value) : IO Unit := do
-  (← global).set "__lasmDefaultExport" v
-
 /-- Blocks the calling thread forever, for servers whose work happens in
 JavaScript callbacks (stop them with `IO.Process.exit` from a callback, or a signal).
 In an edge build it returns at once: the platform owns the isolate's lifetime,
@@ -741,6 +734,44 @@ def waitForever : IO Unit := do
   let r ← IO.mkRef (some p)
   discard <| IO.wait p.result?
   discard <| r.get
+
+/-- What `exportDefault` publishes: a JavaScript value as it is, or a Lean
+function `α → Async β` (a fetch handler `Request → Async Response`) as a
+JavaScript function made with `Function.ofFn1`. -/
+class DefaultExport (α : Type) where
+  /-- The JavaScript value published for `x`. -/
+  toDefaultExport : α → IO Value
+
+instance : DefaultExport Value := ⟨pure⟩
+instance [FromJS α] [ToJS β] : DefaultExport (α → Async β) := ⟨Function.ofFn1⟩
+
+/-- Publishes `x` as the program's default export, as `export default` would in
+a JavaScript module: a fetch handler `Request → Async Response` (Lasm.JS.Web's
+types, `exportDefault handle`), or any JavaScript value (`Value`): an object with
+a `fetch` method such as a Hono app, or a function `(request, env, ctx) => Response`.
+
+- Edge builds (`lasm build --target workers`, Bun, Deno and the other edge
+  targets): the platform's requests go to it, after `main` returns.
+- Function platforms on Node (`lasm package` / `lasm build --target netlify`,
+  `vercel`, `lambda`, `lambda-edge`, `azure`, `gcf`): the platform's handler calls
+  it directly (no HTTP server, no port). `exportDefault` then does not return:
+  the Lean runtime ends with `main`, so `main` stays here and serves the calls.
+- Elsewhere on Node (`lasm run`, `node dist/main.mjs`) it only records the value
+  (`globalThis.__lasmDefaultExport`) and returns; to serve HTTP on Node, use
+  `Lasm.JS.Node.serve` (`import Lasm.JS.Node.Serve`). -/
+def exportDefault [DefaultExport α] (x : α) : IO Unit := do
+  let v ← DefaultExport.toDefaultExport x
+  let g ← global
+  g.set "__lasmDefaultExport" v
+  if ← onEdge then return
+  -- The function platforms' entry (src/serverless/lasm-function.mjs) sets
+  -- `globalThis.__lasmFunctionHost`, a function that receives the handler, and
+  -- takes requests once it has it.
+  match ← g.get "__lasmFunctionHost" Data with
+  | .ref publish _ =>
+    let _ : Data ← publish.call #[.ref v ""] Data
+    waitForever
+  | _ => pure ()
 
 /-- Host statistics (handles held, pending callbacks, …), for tests. -/
 def stats : IO String := do return String.fromUTF8! (← hostCall 213 0 0 .empty)

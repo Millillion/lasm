@@ -1,12 +1,13 @@
 // The function-platform shims of src/serverless/ in this process (so that
 // mutation testing sees them run; test/serverless.test.mjs runs the packaged
-// copies in child processes). A programmable stand-in server takes the Lean
-// program's place: it echoes each request as JSON, or answers with the reply
-// a request's `x-reply` header describes. The platform packages
-// (@azure/functions, @google-cloud/functions-framework) are stand-ins that
-// record the handler a shim registers.
+// copies in child processes). A programmable stand-in program takes the Lean
+// program's place: it publishes a fetch handler as Lasm.JS.exportDefault does,
+// which echoes each request as JSON, or answers with the reply a request's
+// `x-reply` header describes. The shims call it directly: no server, no port.
+// The platform packages (@azure/functions, @google-cloud/functions-framework)
+// are stand-ins that record the handler a shim registers.
 import assert from 'node:assert/strict';
-import { after, before, test } from 'node:test';
+import { before, test } from 'node:test';
 import http from 'node:http';
 import { registerHooks } from 'node:module';
 import { mkdtempSync, writeFileSync } from 'node:fs';
@@ -18,25 +19,29 @@ import { forAll } from './helpers/property.mjs';
 const shim = name => new URL(`../src/serverless/${name}`, import.meta.url).href;
 const directory = mkdtempSync(join(tmpdir(), 'lasm-shims-'));
 
-// The stand-in program: started by startLeanServer as main.mjs would be.
-const standIn = `import http from 'node:http';
-globalThis.standIn = { argv: process.argv.slice(), env: { PORT: process.env.PORT, HOST: process.env.HOST, LASM_THREAD_POOL: process.env.LASM_THREAD_POOL } };
-const server = http.createServer((req, res) => {
-  const chunks = [];
-  req.on('data', c => chunks.push(c)).on('end', () => {
-    const spec = req.headers['x-reply'];
-    if (spec === 'abort') { res.writeHead(200, { 'content-type': 'text/plain' }); res.write('part'); return setTimeout(() => res.socket.destroy(), 20); }
-    if (spec) {
-      const { status = 200, statusText, headers = [], body = '' } = JSON.parse(spec);
-      res.writeHead(status, statusText, headers.flat());
-      return res.end(Buffer.from(body, 'base64'));
-    }
-    res.writeHead(200, { 'content-type': 'application/json' });
-    res.end(JSON.stringify({ method: req.method, url: req.url, headers: req.rawHeaders, body: Buffer.concat(chunks).toString('base64') }));
-  });
-});
-globalThis.standIn.server = server;
-server.listen(Number(process.env.PORT), process.env.HOST);
+// The stand-in program: started by loadHandler as main.mjs would be.
+const standIn = `globalThis.standIn = { argv: process.argv.slice(), env: { LASM_THREAD_POOL: process.env.LASM_THREAD_POOL }, calls: [] };
+const handler = async (request, ...extra) => {
+  globalThis.standIn.calls.push(extra);
+  const spec = request.headers.get('x-reply');
+  if (spec === 'abort') {
+    let sent = false;
+    return new Response(new ReadableStream({ async pull(c) {
+      if (sent) { await new Promise(r => setTimeout(r, 20)); c.error(new Error('broken off')); return; }
+      sent = true; c.enqueue(new TextEncoder().encode('part'));
+    } }), { headers: { 'content-type': 'text/plain' } });
+  }
+  if (spec === 'throw') throw new Error('the handler threw');
+  if (spec) {
+    const { status = 200, statusText, headers = [], body = '' } = JSON.parse(spec);
+    const bytes = Buffer.from(body, 'base64');
+    return new Response([101, 204, 205, 304].includes(status) ? null : bytes, { status, statusText, headers });
+  }
+  const url = new URL(request.url);
+  return new Response(JSON.stringify({ method: request.method, url: url.pathname + url.search, href: request.url, headers: [...request.headers],
+    body: request.body ? Buffer.from(await request.arrayBuffer()).toString('base64') : '' }), { headers: { 'content-type': 'application/json' } });
+};
+globalThis.__lasmFunctionHost(handler);
 `;
 writeFileSync(join(directory, 'main.mjs'), standIn);
 
@@ -54,125 +59,116 @@ registerHooks({
   },
 });
 
-let server;
 const reply = (status, headers = [], body = '', statusText) =>
   JSON.stringify({ status, statusText, headers, body: Buffer.from(body).toString('base64') });
 const echoed = result => JSON.parse(Buffer.isBuffer(result) ? result.toString() : result);
+const named = (headers, name) => headers.filter(([n]) => n.toLowerCase() === name).map(([, v]) => v);
 const fields = rawHeaders => { const out = []; for (let i = 0; i < rawHeaders.length; i += 2) out.push([rawHeaders[i], rawHeaders[i + 1]]); return out; };
-const named = (rawHeaders, name) => fields(rawHeaders).filter(([n]) => n.toLowerCase() === name).map(([, v]) => v);
+const main = pathToFileURL(join(directory, 'main.mjs'));
 
+const argv = process.argv.slice();
+let first;
 before(async () => {
-  delete process.env.LASM_SERVER_PORT;
   delete process.env.LASM_THREAD_POOL;
-  const { startLeanServer } = await import(shim('lasm-server.mjs'));
-  const argv = process.argv.slice();
-  const port = await startLeanServer({ main: pathToFileURL(join(directory, 'main.mjs')) });
+  first = await (await import(shim('lasm-function.mjs'))).loadHandler({ main });
+});
+
+test('loadHandler: one start, the program sees one Lean thread and only its own path as arguments', async () => {
+  const { loadHandler } = await import(shim('lasm-function.mjs'));
   assert.deepEqual(process.argv, argv, 'the arguments are restored after start-up');
-  server = globalThis.standIn.server;
-  assert.equal(server.address().port, port);
-});
-
-after(() => {
-  server?.closeAllConnections();
-  server?.close();
-});
-
-test('startLeanServer: one start, the program sees PORT, HOST, one Lean thread and only its own path as arguments', async () => {
-  const { startLeanServer } = await import(shim('lasm-server.mjs'));
-  const port = server.address().port;
-  assert.equal(await startLeanServer(), port, 'a second call returns the same server');
-  assert.equal(startLeanServer(), startLeanServer());
-  assert.deepEqual(globalThis.standIn.env, { PORT: String(port), HOST: '127.0.0.1', LASM_THREAD_POOL: '1' });
+  const handler = await loadHandler({ main });
+  assert.equal(handler, first);
+  assert.equal(typeof handler, 'function');
+  assert.equal(await loadHandler(), handler, 'a second call returns the same handler');
+  assert.equal(loadHandler(), loadHandler());
+  assert.deepEqual(globalThis.standIn.env, { LASM_THREAD_POOL: '1' });
   assert.deepEqual(globalThis.standIn.argv, [process.execPath, join(directory, 'main.mjs')]);
-  assert.equal(server.address().address, '127.0.0.1');
   assert.ok(Number.isInteger(globalThis.__lasmColdStartMs) && globalThis.__lasmColdStartMs >= 0);
 });
 
-// A fresh instance of lasm-server.mjs (its own start-up state) per case.
+// A fresh instance of lasm-function.mjs (its own start-up state) per case.
 let instances = 0;
-const fresh = async () => import(shim('lasm-server.mjs') + `?instance=${++instances}`);
+const fresh = async () => import(shim('lasm-function.mjs') + `?instance=${++instances}`);
 const program = (name, text) => { const file = join(directory, name); writeFileSync(file, text); return pathToFileURL(file); };
 
-test('startLeanServer keeps an explicit LASM_SERVER_PORT and LASM_THREAD_POOL', async t => {
-  const { startLeanServer } = await fresh();
-  const free = await new Promise(resolve => { const s = http.createServer().listen(0, '127.0.0.1', () => { const { port } = s.address(); s.close(() => resolve(port)); }); });
-  const saved = { ...process.env };
-  t.after(() => { for (const name of ['LASM_SERVER_PORT', 'LASM_THREAD_POOL', 'PORT', 'HOST']) if (saved[name] === undefined) delete process.env[name]; else process.env[name] = saved[name]; });
-  process.env.LASM_SERVER_PORT = String(free);
+test('loadHandler keeps an explicit LASM_THREAD_POOL; a handler object with fetch is called as such', async t => {
+  const { loadHandler, callHandler } = await fresh();
+  const saved = process.env.LASM_THREAD_POOL;
+  t.after(() => { if (saved === undefined) delete process.env.LASM_THREAD_POOL; else process.env.LASM_THREAD_POOL = saved; });
   process.env.LASM_THREAD_POOL = '3';
-  const main = program('fixed.mjs', `import http from 'node:http';
-globalThis.fixed = { pool: process.env.LASM_THREAD_POOL, server: http.createServer((q, s) => s.end('fixed')).listen(Number(process.env.PORT), process.env.HOST) };`);
-  assert.equal(await startLeanServer({ main }), free);
-  t.after(() => globalThis.fixed.server.close());
-  assert.equal(globalThis.fixed.pool, '3');
-  assert.equal(process.env.PORT, String(free));
+  const main = program('object.mjs', `globalThis.pool = process.env.LASM_THREAD_POOL;
+globalThis.__lasmFunctionHost({ name: 'app', fetch(request, context) { return new Response(this.name + ' ' + request.method + ' ' + context); } });`);
+  await loadHandler({ main });
+  assert.equal(globalThis.pool, '3');
+  assert.equal(await (await callHandler(new Request('http://h/'), 'ctx')).text(), 'app GET ctx');
 });
 
-test('startLeanServer: a program that stops with an exit code or never listens fails with the reason', async t => {
+test('loadHandler: a program that ends, never publishes, throws or publishes something else fails with the reason', async t => {
   const exitCode = process.exitCode;
   t.after(() => { process.exitCode = exitCode; });
   const stopped = await fresh();
-  await assert.rejects(stopped.startLeanServer({ main: program('stops.mjs', 'process.exitCode = 3;') }),
-    { message: 'The Lean application stopped during start-up (exit code 3); see the log above.' });
+  await assert.rejects(stopped.loadHandler({ main: program('stops.mjs', 'process.exitCode = 3;') }),
+    { message: /^The Lean program ended \(exit code 3\) without publishing a fetch handler\. On a function platform, main calls Lasm\.JS\.exportDefault/ });
+  process.exitCode = undefined;
+  const ended = await fresh();
+  await assert.rejects(ended.loadHandler({ main: program('ends.mjs', 'process.exitCode = 0;') }), { message: /ended \(exit code 0\)/ });
   process.exitCode = 0;
   const quiet = await fresh();
   const started = performance.now();
-  await assert.rejects(quiet.startLeanServer({ main: program('quiet.mjs', ''), timeoutMs: 60 }),
-    { message: /^The Lean application did not listen on \$PORT \(\d+\) within 60 ms\. Function platforms need a server that listens on \$HOST:\$PORT\.$/ });
+  await assert.rejects(quiet.loadHandler({ main: program('quiet.mjs', ''), timeoutMs: 60 }),
+    { message: 'The Lean program did not publish a fetch handler (Lasm.JS.exportDefault) within 60 ms.' });
   assert.ok(performance.now() - started >= 55, 'it waits for the timeout');
   // The timeout's default comes from LASM_START_TIMEOUT_MS.
   const saved = process.env.LASM_START_TIMEOUT_MS;
   t.after(() => { if (saved === undefined) delete process.env.LASM_START_TIMEOUT_MS; else process.env.LASM_START_TIMEOUT_MS = saved; });
   process.env.LASM_START_TIMEOUT_MS = '40';
   const configured = await fresh();
-  await assert.rejects(configured.startLeanServer({ main: program('quiet2.mjs', '') }), { message: /within 40 ms/ });
+  await assert.rejects(configured.loadHandler({ main: program('quiet2.mjs', '') }), { message: /within 40 ms/ });
   // A program that throws while it loads: the error, and the arguments restored.
   const argv = process.argv.slice();
   const throwing = await fresh();
-  await assert.rejects(throwing.startLeanServer({ main: program('throws.mjs', 'throw new Error("boom at load");') }), { message: 'boom at load' });
+  await assert.rejects(throwing.loadHandler({ main: program('throws.mjs', 'throw new Error("boom at load");') }), { message: 'boom at load' });
   assert.deepEqual(process.argv, argv);
+  const other = await fresh();
+  await assert.rejects(other.loadHandler({ main: program('other.mjs', 'globalThis.__lasmFunctionHost({ get: 1 });') }),
+    { message: 'The Lean program published a default export that is neither a function nor an object with a fetch method.' });
 });
 
-test('forward: method, target, fields and body reach the server; its status, fields and body come back', async () => {
-  const { forward } = await import(shim('lasm-server.mjs'));
-  const port = server.address().port;
+test('forward: method, target, fields and body reach the handler; its status, fields and body come back', async () => {
+  const { forward } = await import(shim('lasm-function.mjs'));
   const got = await forward({ method: 'POST', path: '/echo?a=1', headers: [['Content-Type', 'text/plain'], ['Content-Length', '99'],
     ['Connection', 'keep-alive'], ['Cookie', 'a=1'], ['cookie', 'b=2'], ['x-many', '1'], ['x-many', '2']], body: Buffer.from('héllo') });
   assert.equal(got.status, 200);
   assert.equal(got.statusText, 'OK');
   const request = echoed(got.body);
-  assert.deepEqual([request.method, request.url, Buffer.from(request.body, 'base64').toString()], ['POST', '/echo?a=1', 'héllo']);
+  assert.deepEqual([request.method, request.url, request.href, Buffer.from(request.body, 'base64').toString()], ['POST', '/echo?a=1', 'http://localhost/echo?a=1', 'héllo']);
   assert.deepEqual(named(request.headers, 'content-length'), [String(Buffer.byteLength('héllo'))], 'the body sets Content-Length');
-  assert.deepEqual(named(request.headers, 'host'), [`127.0.0.1:${port}`]);
+  assert.deepEqual(named(request.headers, 'host'), ['localhost']);
   assert.deepEqual(named(request.headers, 'cookie'), ['a=1; b=2']);
-  assert.deepEqual(named(request.headers, 'x-many'), ['1', '2']);
-  assert.deepEqual(named(request.headers, 'connection'), ['keep-alive'], "the agent's own Connection, not the event's");
+  assert.deepEqual(named(request.headers, 'x-many'), ['1, 2']);
+  assert.deepEqual(named(request.headers, 'connection'), [], 'no hop-by-hop field');
   assert.deepEqual(got.headers.find(([name]) => name === 'content-type'), ['content-type', 'application/json']);
   // No body: no Content-Length, and an empty path is `/`.
   const bare = echoed((await forward({ method: 'GET', path: '', headers: [], body: undefined })).body);
   assert.deepEqual([bare.url, named(bare.headers, 'content-length'), named(bare.headers, 'transfer-encoding'), bare.body], ['/', [], [], '']);
   const empty = echoed((await forward({ method: 'POST', path: '/x', headers: [], body: Buffer.alloc(0) })).body);
-  assert.deepEqual(named(empty.headers, 'content-length'), []);
-  // The reply's fields keep their order and repeats (Set-Cookie), names in lower case, without hop-by-hop fields.
+  assert.deepEqual([named(empty.headers, 'content-length'), empty.body], [[], '']);
+  // The reply's fields: names in lower case, each Set-Cookie on its own, without hop-by-hop fields.
   const answer = await forward({ method: 'GET', path: '/r', headers: [['x-reply', reply(201, [['Set-Cookie', 'a=1'], ['set-cookie', 'b=2'],
     ['X-Y', 'z'], ['Keep-Alive', 'timeout=5'], ['Trailer', 'x'], ['Upgrade', 'h2c']], 'made', 'Made It')]], body: undefined });
   assert.deepEqual([answer.status, answer.statusText, answer.body.toString()], [201, 'Made It', 'made']);
-  assert.deepEqual(answer.headers.filter(([name]) => name !== 'date' && name !== 'content-length' && name !== 'connection'),
-    [['set-cookie', 'a=1'], ['set-cookie', 'b=2'], ['x-y', 'z']]);
-});
-
-test('forward fails when the server is unreachable', async t => {
-  const { forward, startLeanServer } = await fresh();
-  const closed = await new Promise(resolve => { const s = http.createServer().listen(0, '127.0.0.1', () => { const { port } = s.address(); s.close(() => resolve(port)); }); });
-  const saved = process.env.LASM_SERVER_PORT;
-  t.after(() => { if (saved === undefined) delete process.env.LASM_SERVER_PORT; else process.env.LASM_SERVER_PORT = saved; });
-  process.env.LASM_SERVER_PORT = String(closed);
-  // A program that listens only long enough for start-up to succeed.
-  const main = program('brief.mjs', `import http from 'node:http';
-const s = http.createServer().listen(Number(process.env.PORT), process.env.HOST, () => setTimeout(() => s.close(), 50));`);
-  await startLeanServer({ main });
-  await new Promise(resolve => setTimeout(resolve, 150));
-  await assert.rejects(forward({ method: 'GET', path: '/', headers: [], body: undefined }), { code: 'ECONNREFUSED' });
+  assert.deepEqual(answer.headers, [['set-cookie', 'a=1'], ['set-cookie', 'b=2'], ['x-y', 'z']]);
+  // A handler that throws is a 500; a request no Request can hold a 400.
+  const errors = [];
+  const error = console.error;
+  console.error = message => errors.push(message);
+  try {
+    const thrown = await forward({ method: 'GET', path: '/t', headers: [['x-reply', 'throw']] });
+    assert.deepEqual([thrown.status, thrown.body.toString()], [500, 'Internal Server Error']);
+  } finally { console.error = error; }
+  assert.equal(errors.length, 1);
+  const trace = await forward({ method: 'TRACE', path: '/', headers: [] });
+  assert.deepEqual([trace.status, trace.statusText, trace.body.toString()], [400, 'Bad Request', 'Bad Request\n']);
 });
 
 /** A Node (req, res) server around `handler`; returns { base, request(path, options) → { status, statusText, headers, body } }. */
@@ -185,31 +181,32 @@ async function nodeServer(t, handler) {
     http.request({ host: '127.0.0.1', port, method, path, headers: ['host', `127.0.0.1:${port}`, ...headers.flat()], agent: false }, res => {
       const chunks = [];
       res.on('data', c => chunks.push(c));
-      res.on('end', () => resolve({ status: res.statusCode, statusText: res.statusMessage, headers: res.rawHeaders, body: Buffer.concat(chunks), complete: res.complete }));
+      res.on('end', () => resolve({ status: res.statusCode, statusText: res.statusMessage, headers: fields(res.rawHeaders), body: Buffer.concat(chunks), complete: res.complete }));
       res.on('error', error => resolve({ status: res.statusCode, error, body: Buffer.concat(chunks) }));
     }).on('error', reject).end(body);
   });
   return { port, request };
 }
 
-test('Vercel: the request is piped to the server and its reply back', async t => {
+test('Vercel: the request goes to the handler and its Response back', async t => {
   const { default: handler } = await import(shim('lasm-vercel.mjs'));
   const { port, request } = await nodeServer(t, handler);
-  const post = await request('/echo?x=1', { method: 'PUT', headers: [['content-type', 'text/plain'], ['cookie', 'a=1'], ['cookie', 'b=2']], body: 'hi' });
+  const post = await request('/echo?x=1', { method: 'PUT', headers: [['content-type', 'text/plain'], ['cookie', 'a=1'], ['cookie', 'b=2'], ['x-forwarded-proto', 'https']], body: 'hi' });
   assert.equal(post.status, 200);
   const seen = echoed(post.body);
-  assert.deepEqual([seen.method, seen.url, Buffer.from(seen.body, 'base64').toString()], ['PUT', '/echo?x=1', 'hi']);
+  assert.deepEqual([seen.method, seen.url, seen.href, Buffer.from(seen.body, 'base64').toString()], ['PUT', '/echo?x=1', `https://127.0.0.1:${port}/echo?x=1`, 'hi']);
   assert.deepEqual(named(seen.headers, 'cookie'), ['a=1; b=2']);
   assert.deepEqual(named(seen.headers, 'host'), [`127.0.0.1:${port}`], "a plain Host is the client's");
   assert.deepEqual(named(seen.headers, 'content-length'), ['2']);
-  const answer = await request('/r', { headers: [['x-reply', reply(303, [['Location', '/there'], ['Set-Cookie', 'a=1'], ['Set-Cookie', 'b=2'], ['Keep-Alive', 'timeout=1']], '', 'See It')]] });
+  const answer = await request('/r', { headers: [['x-reply', reply(303, [['Location', '/there'], ['Set-Cookie', 'a=1'], ['Set-Cookie', 'b=2']], '', 'See It')]] });
   assert.deepEqual([answer.status, answer.statusText, answer.body.length], [303, 'See It', 0]);
   assert.deepEqual(named(answer.headers, 'location'), ['/there']);
   assert.deepEqual(named(answer.headers, 'set-cookie'), ['a=1', 'b=2']);
-  assert.deepEqual(named(answer.headers, 'keep-alive').filter(value => value === 'timeout=1'), [], 'no hop-by-hop field of the server');
+  assert.deepEqual(named(answer.headers, 'content-length'), ['0'], 'an empty body is no chunked body');
+  assert.deepEqual(named(answer.headers, 'content-type'), [], 'and gets no content type');
 });
 
-test('Vercel: a server that breaks off mid-reply leaves the response incomplete', async t => {
+test('Vercel: a body that breaks off mid-reply leaves the response incomplete', async t => {
   const { default: handler } = await import(shim('lasm-vercel.mjs'));
   const { request } = await nodeServer(t, handler);
   const errors = [];
@@ -221,11 +218,12 @@ test('Vercel: a server that breaks off mid-reply leaves the response incomplete'
 });
 
 test('Vercel: a request body the platform already read (rawBody) or consumed', async t => {
-  const { pipe } = await import(shim('lasm-server.mjs'));
+  const { pipe } = await import(shim('lasm-function.mjs'));
   const { request } = await nodeServer(t, async (req, res) => {
     if (req.url.startsWith('/raw')) { req.rawBody = Buffer.from('from rawBody'); req.resume(); await new Promise(r => req.on('end', r)); }
     if (req.url.startsWith('/consumed')) { req.resume(); await new Promise(r => req.on('end', r)); }
     if (req.url.startsWith('/original')) req.originalUrl = '/the/original?q=1';
+    if (req.url.startsWith('/star')) req.originalUrl = '*';
     await pipe(req, res);
   });
   const raw = echoed((await request('/raw', { method: 'POST', body: 'ignored body' })).body);
@@ -235,53 +233,60 @@ test('Vercel: a request body the platform already read (rawBody) or consumed', a
   assert.deepEqual([consumed.body, named(consumed.headers, 'content-length')], ['', []]);
   const original = echoed((await request('/original')).body);
   assert.equal(original.url, '/the/original?q=1');
+  const star = await request('/star', { method: 'OPTIONS' });
+  assert.deepEqual([star.status, star.body.toString()], [400, 'Bad Request\n']);
 });
 
-test('Netlify: a WHATWG Request reaches the server; null-body replies; a request that cannot be forwarded is a 502', async t => {
+test('Netlify: the platform Request reaches the handler with its context; null-body and empty replies have no body; a failure is a 502', async t => {
   const netlify = await import(shim('lasm-netlify.mjs'));
   assert.deepEqual(netlify.config, { path: '/*', preferStatic: true });
-  const post = await netlify.default(new Request('https://site.example/echo?x=1', { method: 'POST', body: 'hi', headers: [['cookie', 'a=1'], ['x-t', 'v']] }));
+  const context = { site: 'x' };
+  const post = await netlify.default(new Request('https://site.example/echo?x=1', { method: 'POST', body: 'hi', headers: [['cookie', 'a=1'], ['cookie', 'b=2'], ['x-t', 'v']] }), context);
   const seen = await post.json();
-  assert.deepEqual([post.status, seen.method, seen.url, Buffer.from(seen.body, 'base64').toString()], [200, 'POST', '/echo?x=1', 'hi']);
-  assert.deepEqual([named(seen.headers, 'cookie'), named(seen.headers, 'x-t')], [['a=1'], ['v']]);
-  const get = echoed(Buffer.from(await (await netlify.default(new Request('https://site.example/g'))).arrayBuffer()));
-  assert.deepEqual([get.method, get.body, named(get.headers, 'content-length')], ['GET', '', []]);
+  assert.deepEqual([post.status, seen.method, seen.url, seen.href, Buffer.from(seen.body, 'base64').toString()], [200, 'POST', '/echo?x=1', 'https://site.example/echo?x=1', 'hi']);
+  assert.deepEqual([named(seen.headers, 'cookie'), named(seen.headers, 'x-t')], [['a=1; b=2'], ['v']]);
+  assert.equal(globalThis.standIn.calls.at(-1)[0], context, "Netlify's context follows the request");
   const head = await netlify.default(new Request('https://site.example/h', { method: 'HEAD' }));
   assert.deepEqual([head.status, head.body], [200, null]);
   const binary = await netlify.default(new Request('https://site.example/b', { headers: { 'x-reply': reply(200, [['content-type', 'application/octet-stream']], '\u0000ÿ') } }));
   assert.deepEqual([...new Uint8Array(await binary.arrayBuffer())], [0, 0xc3, 0xbf]);
   const cookies = await netlify.default(new Request('https://site.example/c', { headers: { 'x-reply': reply(201, [['set-cookie', 'a=1'], ['set-cookie', 'b=2']], 'x', 'Made') } }));
   assert.deepEqual([cookies.status, cookies.statusText, cookies.headers.getSetCookie()], [201, 'Made', ['a=1', 'b=2']]);
+  const seeOther = await netlify.default(new Request('https://site.example/s', { headers: { 'x-reply': reply(303, [['location', '/there']]) } }));
+  assert.deepEqual([seeOther.status, seeOther.headers.get('location'), seeOther.body], [303, '/there', null]);
   const errors = [];
   t.mock.method(console, 'error', error => errors.push(error));
-  const bad = await netlify.default({ url: 'not a url', method: 'GET', headers: new Headers() });
-  assert.deepEqual([bad.status, await bad.text(), errors.length], [502, 'Lean server unavailable\n', 1]);
+  const bad = await netlify.default({ url: 'https://site.example/', method: 'GET' });
+  assert.deepEqual([bad.status, await bad.text(), errors.length], [502, 'Lean program unavailable\n', 1]);
 });
 
-test('Azure Functions: the registered function forwards the request and returns HttpResponseInit', async t => {
+test('Azure Functions: the registered function calls the handler and returns HttpResponseInit', async t => {
   await import(shim('lasm-azure.mjs'));
   const { name, options } = registered.azure;
   assert.deepEqual([name, options.route, options.authLevel, options.methods],
     ['lasm', '{*path}', 'anonymous', ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']]);
-  const post = await options.handler(new Request('http://localhost:7071/echo?x=1', { method: 'POST', body: 'hi', headers: { 'x-t': 'v' } }));
+  const post = await options.handler(new Request('http://localhost:7071/echo?x=1', { method: 'POST', body: 'hi', headers: { 'x-t': 'v', host: 'app.example' } }));
   const seen = echoed(Buffer.from(post.body));
-  assert.deepEqual([post.status, seen.method, seen.url, Buffer.from(seen.body, 'base64').toString(), named(seen.headers, 'x-t')],
-    [200, 'POST', '/echo?x=1', 'hi', ['v']]);
+  assert.deepEqual([post.status, seen.method, seen.url, seen.href, Buffer.from(seen.body, 'base64').toString(), named(seen.headers, 'x-t')],
+    [200, 'POST', '/echo?x=1', 'http://app.example/echo?x=1', 'hi', ['v']]);
   const get = echoed(Buffer.from((await options.handler(new Request('http://localhost:7071/g'))).body));
   assert.deepEqual([get.method, get.body, named(get.headers, 'content-length')], ['GET', '', []]);
   const head = await options.handler(new Request('http://localhost:7071/h', { method: 'HEAD' }));
-  assert.equal(head.status, 200);
+  assert.deepEqual([head.status, head.body], [200, undefined]);
   const cookies = await options.handler(new Request('http://localhost:7071/c', { headers: { 'x-reply': reply(200, [['set-cookie', 'a=1'], ['set-cookie', 'b=2; Path=/']], 'ok') } }));
   assert.deepEqual([cookies.headers.getSetCookie(), cookies.cookies], [['a=1'], [{ name: 'b', value: '2', path: '/' }]]);
   // A request that cannot be forwarded is a 502.
   const errors = [];
   t.mock.method(console, 'error', error => errors.push(error));
   const bad = await options.handler({ url: 'not a url', method: 'GET', headers: new Headers() });
-  assert.deepEqual([bad.status, bad.body], [502, 'Lean server unavailable\n']);
+  assert.deepEqual([bad.status, bad.body], [502, 'Lean program unavailable\n']);
   assert.equal(errors.length, 1);
 });
 
-test('Google Cloud Functions: the registered function pipes the request; a failure is a 502', async t => {
+/** A req whose rawHeaders cannot be read: the shim fails before the reply starts. */
+const unreadable = req => Object.defineProperty(req, 'rawHeaders', { get() { throw new Error('unreadable'); } });
+
+test('Google Cloud Functions: the registered function serves the request; a failure is a 502', async t => {
   await import(shim('lasm-gcf.mjs'));
   const { name, fn } = registered.gcf;
   assert.equal(name, 'lasm');
@@ -289,7 +294,7 @@ test('Google Cloud Functions: the registered function pipes the request; a failu
     // The Functions Framework's Express response.
     res.status = code => { res.statusCode = code; return res; };
     res.send = text => res.end(text);
-    if (req.url === '/fails') req.rawHeaders = null;
+    if (req.url === '/fails') unreadable(req);
     return fn(Object.assign(req, { originalUrl: req.url }), res);
   });
   const put = echoed((await request('/echo?x=1', { method: 'PUT', body: 'hi' })).body);
@@ -297,7 +302,7 @@ test('Google Cloud Functions: the registered function pipes the request; a failu
   const errors = [];
   t.mock.method(console, 'error', error => errors.push(error));
   const failed = await request('/fails');
-  assert.deepEqual([failed.status, failed.body.toString()], [502, 'Lean server unavailable\n']);
+  assert.deepEqual([failed.status, failed.body.toString()], [502, 'Lean program unavailable\n']);
   assert.equal(errors.length, 1);
   const broken = await request('/abort', { headers: [['x-reply', 'abort']] });
   assert.ok(broken.error || broken.complete === false);
@@ -307,9 +312,9 @@ test('Vercel: a failure before the reply starts is a 502', async t => {
   const { default: handler } = await import(shim('lasm-vercel.mjs'));
   const errors = [];
   t.mock.method(console, 'error', error => errors.push(error));
-  const { request } = await nodeServer(t, (req, res) => { req.rawHeaders = null; return handler(req, res); });
+  const { request } = await nodeServer(t, (req, res) => handler(unreadable(req), res));
   const failed = await request('/x');
-  assert.deepEqual([failed.status, failed.body.toString()], [502, 'Lean server unavailable\n']);
+  assert.deepEqual([failed.status, failed.body.toString()], [502, 'Lean program unavailable\n']);
   assert.equal(errors.length, 1);
 });
 
@@ -355,12 +360,12 @@ test('Lambda, API Gateway REST (payload 1.0): decoded queries, multi-value forms
   const multi = await handler({ httpMethod: 'POST', path: '/m', queryStringParameters: { a: 'last' }, multiValueQueryStringParameters: { a: ['1', '2'], e: null },
     headers: { 'x-t': 'single' }, multiValueHeaders: { 'x-t': ['1', '2'], 'x-none': null }, body: 'b', isBase64Encoded: false });
   const multiSeen = echoed(bodyOf(multi));
-  assert.deepEqual([multiSeen.url, named(multiSeen.headers, 'x-t'), Buffer.from(multiSeen.body, 'base64').toString()], ['/m?a=1&a=2', ['1', '2'], 'b']);
+  assert.deepEqual([multiSeen.url, named(multiSeen.headers, 'x-t'), Buffer.from(multiSeen.body, 'base64').toString()], ['/m?a=1&a=2', ['1, 2'], 'b']);
   const none = echoed(bodyOf(await handler({ httpMethod: 'GET', path: '/n' })));
   assert.equal(none.url, '/n');
   const answer = await handler({ httpMethod: 'GET', path: '/r', headers: { 'x-reply': reply(404, [['set-cookie', 'a=1'], ['set-cookie', 'b=2'], ['x-m', 'p'], ['x-m', 'q']], 'nope', 'Gone') } });
   assert.deepEqual([answer.statusCode, answer.body, answer.multiValueHeaders['set-cookie'], answer.multiValueHeaders['x-m'], answer.statusDescription],
-    [404, 'nope', ['a=1', 'b=2'], ['p', 'q'], undefined]);
+    [404, 'nope', ['a=1', 'b=2'], ['p, q'], undefined]);
 });
 
 test('Lambda, Application Load Balancer: raw query values, statusDescription, single- and multi-value headers', async () => {
@@ -375,7 +380,8 @@ test('Lambda, Application Load Balancer: raw query values, statusDescription, si
   assert.equal(echo.url, '/s?q=%E0&r=a%20b', 'query values are forwarded as the client sent them');
   const multi = await handler({ httpMethod: 'GET', path: '/m', requestContext: elb, multiValueQueryStringParameters: { q: ['1', '%41'], e: null },
     multiValueHeaders: { 'x-reply': [spec] } });
-  assert.deepEqual([multi.statusDescription, multi.multiValueHeaders['set-cookie'], multi.multiValueHeaders['x-m'], multi.headers], ['200 Fine', ['a=1', 'b=2'], ['p', 'q'], undefined]);
+  // A web Response joins repeated fields other than Set-Cookie (Fetch standard, "get").
+  assert.deepEqual([multi.statusDescription, multi.multiValueHeaders['set-cookie'], multi.multiValueHeaders['x-m'], multi.headers], ['200 Fine', ['a=1', 'b=2'], ['p, q'], undefined]);
   const multiEcho = echoed(bodyOf(await handler({ httpMethod: 'GET', path: '/m', requestContext: elb, multiValueQueryStringParameters: { q: ['1', '%41'], e: null }, multiValueHeaders: {} })));
   assert.equal(multiEcho.url, '/m?q=1&q=%41');
   const bare = echoed(bodyOf(await handler({ httpMethod: 'GET', path: '/b', requestContext: elb, headers: {} })));
@@ -418,7 +424,7 @@ test('Lambda refuses an event it does not know', async () => {
 // Proposition: Lasm.Serverless.Spec.target_valid
 //   ∀ p q : String, ∀ c ∈ (requestTarget p q).toList, printable c = true ∧ c ≠ '#'
 test('property: requestTarget percent-encodes exactly what a target cannot carry', async () => {
-  const { requestTarget } = await import(shim('lasm-server.mjs'));
+  const { requestTarget } = await import(shim('lasm-function.mjs'));
   const alphabet = ['a', 'Z', '0', '/', '?', '#', ' ', '%', '~', 'é', '\u{1F600}', '\x7f', '\x00', '=', '&', ':', '+'];
   forAll(r => ({ path: '/' + r.string(alphabet.filter(c => c !== '%')), query: r.string(alphabet.filter(c => c !== '%')) }), ({ path, query }) => {
     const target = requestTarget(path, query);
@@ -434,7 +440,7 @@ test('property: requestTarget percent-encodes exactly what a target cannot carry
 //   ∀ p q : String, (∀ c ∈ p.toList, pathUnsafe c = false) → (∀ c ∈ q.toList, queryUnsafe c = false) →
 //     requestTarget p q = (if p.isEmpty then "/" else p) ++ (if q.isEmpty then "" else "?" ++ q)
 test('property: requestTarget leaves a valid target unchanged', async () => {
-  const { requestTarget } = await import(shim('lasm-server.mjs'));
+  const { requestTarget } = await import(shim('lasm-function.mjs'));
   const printable = Array.from({ length: 0x7e - 0x21 + 1 }, (_, i) => String.fromCharCode(0x21 + i)).filter(c => c !== '?' && c !== '#');
   const query = Array.from({ length: 0x7e - 0x21 + 1 }, (_, i) => String.fromCharCode(0x21 + i)).filter(c => c !== '#');
   forAll(r => ({ p: r.pick(['', '/']) + r.string(printable, 0, 20), q: r.string(query, 0, 12) }),
@@ -443,7 +449,7 @@ test('property: requestTarget leaves a valid target unchanged', async () => {
 
 // ∀ headers, (joinCookies headers).filter isCookie has length ≤ 1 ∧ non-cookie fields keep their order
 test('property: joinCookies leaves at most one Cookie field and every other field in order', async () => {
-  const { joinCookies } = await import(shim('lasm-server.mjs'));
+  const { joinCookies } = await import(shim('lasm-function.mjs'));
   const names = ['cookie', 'Cookie', 'x', 'host', 'accept'];
   forAll(r => r.array(r.int(0, 6), () => [r.pick(names), r.pick(['a=1', '', 'b=2, c=3', 'd=4; e=5'])]), headers => {
     const out = joinCookies(headers);
@@ -456,7 +462,7 @@ test('property: joinCookies leaves at most one Cookie field and every other fiel
 });
 
 test('parseSetCookie: spaces around names, values and attributes; invalid Max-Age and SameSite are dropped attributes', async () => {
-  const { parseSetCookie, isTextual } = await import(shim('lasm-server.mjs'));
+  const { parseSetCookie, isTextual } = await import(shim('lasm-function.mjs'));
   assert.deepEqual(parseSetCookie(' a = 1 ; Path = /p ; Max-Age = 5 ; SameSite = Strict ; ; Secure'),
     { name: 'a', value: '1', path: '/p', maxAge: 5, sameSite: 'Strict', secure: true, dropped: [] });
   assert.deepEqual(parseSetCookie('a=1; Max-Age=5s; Max-Age=x5; SameSite=lazy; Expires=never; Domain=; Path='),

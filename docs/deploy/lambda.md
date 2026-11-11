@@ -18,19 +18,30 @@ With `lasm init my-app --template hono --deploy lambda-zip` the project has
 `npm run build:lambda` for the first step. `npx lasm package --target lambda`
 packages an existing `dist/` without rebuilding.
 
-**How it works.** `lambda.zip` is `dist/` plus two small files: `lasm-server.mjs`
-and the handler `lasm-lambda.mjs`. During Lambda's init phase the handler starts
-the Lean program in the function's own Node process with `HOST=127.0.0.1` and
-`PORT` set to a free loopback port, and waits until the port accepts
-connections. Each invocation becomes one HTTP request to that server, and the
-response goes back in the event's own shape. Supported events: API Gateway REST
-API (payload 1.0), API Gateway HTTP API (payload 2.0), Lambda function URLs,
-Application Load Balancer (single- and multi-value headers) and CloudFront
-(Lambda@Edge). Bodies are base64 when they are not text. Lambda's Node runtime
-starts Node with V8 flags (`--max-old-space-size=…` and others) that worker
-threads refuse; the Lean runtime's threads leave them out (as for
-`node --max-old-space-size=… dist/main.mjs`). Any server works: Express,
-Hono on `@hono/node-server` and pure-Lean `Std.Http` are tested.
+**How it works.** `lambda.zip` is `dist/` plus three small files:
+`lasm-function.mjs`, `lasm-node-serve.mjs`, and the handler `lasm-lambda.mjs`.
+The program's `main` publishes a fetch handler with
+`Lasm.JS.exportDefault handle`, where `handle : Request → Async Response`.
+
+During Lambda's init phase, the handler starts the Lean program in the
+function's own Node process and waits for that handler. Each invocation then
+becomes a web `Request` for the handler, called directly. The `Response` goes
+back in the event's own shape. There is no HTTP server and no port.
+
+Supported events:
+- API Gateway REST API (payload 1.0)
+- API Gateway HTTP API (payload 2.0)
+- Lambda function URLs
+- Application Load Balancer (single- and multi-value headers)
+- CloudFront (Lambda@Edge)
+
+Bodies are base64 when they are not text. The request's scheme comes from
+`x-forwarded-proto`. Lambda's Node runtime starts Node with V8 flags
+(`--max-old-space-size=…` and others) that worker threads refuse; the Lean
+runtime's threads leave them out, as for `node --max-old-space-size=… dist/main.mjs`.
+
+A program that runs its own HTTP server (Express, or `Std.Http`) is not
+supported here: it has to publish a handler.
 
 - **Both architectures in one zip:** every build carries the Linux x64 and arm64
   native pieces; set `--architectures` to either.
@@ -43,11 +54,11 @@ Hono on `@hono/node-server` and pure-Lean `Std.Http` are tested.
 - **ALB:** a single-value target group can return only one `Set-Cookie`; enable
   multi-value headers on the target group for more. Every other event type
   returns each `Set-Cookie` (payload 2.0 in `cookies`).
-- **Cookies:** the Lean server sees one `Cookie` header, joined with `; `,
+- **Cookies:** the handler sees one `Cookie` header, joined with `; `,
   however the event carried it (payload 2.0's `cookies` win over a
   `headers.cookie`, as `sam local start-api` sends both).
-- **Not supported:** response streaming and WebSockets; a program that does not
-  listen on `$PORT` fails the init phase with a message saying so.
+- **Not supported:** response streaming and WebSockets. A program that ends
+  without publishing a handler fails the init phase, with a message that says so.
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64 and arm64 runners;
 no AWS account): every server template's zip, extracted with Info-ZIP `unzip` and
