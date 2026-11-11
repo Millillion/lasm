@@ -145,18 +145,6 @@ def compact_wrappers_as_chains : Prop :=
     (∀ e ∈ entries, e ∈ p.keep) → (∀ k ∈ p.keep, k ∈ p.closure) →
     ∃ source, compactInitializerWrappers p = .ok source ∧ runInitializers source p.edges entries = chains p entries
 
-/-- **A unit's schedule is the kept units it reaches, dependencies first.**
-For an acyclic call graph (the entries of the JavaScript object `calls`), the schedule of `n` holds each kept unit other
-than `n` that `n` reaches, exactly once, and every one after the kept units
-it reaches.
-Tested by: test/edge-initializers.test.mjs -/
-def schedule_reached_kept_first : Prop :=
-  ∀ (calls : List (String × List String)) (keep : List String) (n : String), Acyclic (edgesOf calls) →
-    (initializationSchedule n calls keep).Nodup ∧
-    (∀ y, y ∈ initializationSchedule n calls keep ↔ y ∈ keep ∧ y ≠ n ∧ Reaches (edgesOf calls) n y) ∧
-    ∀ x ∈ initializationSchedule n calls keep, ∀ y, y ∈ keep → y ≠ n → Reaches (edgesOf calls) x y →
-      (initializationSchedule n calls keep).idxOf y < (initializationSchedule n calls keep).idxOf x
-
 /-! ## `lasm init` names -/
 
 /-- **Generated names are valid npm, Lake and Supabase names.** Whatever the

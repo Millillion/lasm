@@ -1079,9 +1079,11 @@ like the library's, and its test cites `Lasm.Cli.Spec.…`. Since 2026-11-11:
 `responseFile` (src/platform.mjs), `replaceCoreModule` and
 `withoutComponentType` (src/wasi/wasi-component.mjs), and
 `initializationSchedule` and `compactInitializerWrappers`
-(src/edge/edge-initializers.mjs; not yet proved), with `numbers_le64`,
+(src/edge/edge-initializers.mjs), with `numbers_le64`,
 `changed_files_exact`, `response_file_round_trip`,
-`replace_one_core_module` and `drops_only_component_type` proved. The
+`replace_one_core_module`, `drops_only_component_type` and
+`schedule_reached_kept_first` (the depth-first walk is correct on acyclic
+call graphs) proved. The
 differential of `replaceCoreModule` found its first bug: a section whose size
 was a padded LEB128 was spliced at the wrong offset. The fuzz
 targets `serverless-http`, `lasm-js-wire` and `ui-decode` are the model

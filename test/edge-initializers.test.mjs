@@ -99,7 +99,7 @@ test('compact wrappers run the kept initializers exactly as the chains do', () =
   }, { runs: 300 });
 });
 
-// Proposition: Lasm.Cli.Candidates.schedule_reached_kept_first
+// Proposition: Lasm.Cli.Spec.schedule_reached_kept_first
 //  ∀ (calls : List (String × List String)) (keep : List String) (n : String), Acyclic (edgesOf calls) →
 //    (initializationSchedule n calls keep).Nodup ∧
 //    (∀ y, y ∈ initializationSchedule n calls keep ↔ y ∈ keep ∧ y ≠ n ∧ Reaches (edgesOf calls) n y) ∧

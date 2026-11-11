@@ -388,4 +388,305 @@ theorem drops_only_component_type : Spec.drops_only_component_type := by
   have ht : (moduleHeader ++ ss.flatMap Sec.encoding).take 8 = moduleHeader := by simp [moduleHeader]
   rw [hd, ht, key ss hss]
 
+/-! ## The initialization schedule -/
+
+theorem reaches_snoc {e : String → List String} {a b c : String} (h : Reaches e a b) (hc : c ∈ e b) :
+    Reaches e a c := by
+  induction h with
+  | edge hb => exact .trans hb (.edge hc)
+  | trans hb _ ih => exact .trans hb (ih hc)
+
+/-- The keys of `calls` not yet seen: what bounds the depth of nested visits. -/
+def unseen (calls : List (String × List String)) (S : List String) : Nat :=
+  ((calls.map (·.1)).filter fun k => decide (k ∉ S)).length
+
+theorem filter_cons_len (K : List String) (k : String) (S : List String) :
+    ((k :: K).filter fun k => decide (k ∉ S)).length =
+      (K.filter fun k => decide (k ∉ S)).length + if k ∈ S then 0 else 1 := by
+  by_cases h : k ∈ S
+  · simp only [List.filter_cons, h, not_true_eq_false, decide_false, Bool.false_eq_true, ↓reduceIte, Nat.add_zero]
+  · simp only [List.filter_cons, h, not_false_eq_true, decide_true, ↓reduceIte, List.length_cons]
+
+theorem unseen_mono (K : List String) {S S' : List String} (h : ∀ s ∈ S, s ∈ S') :
+    (K.filter fun k => decide (k ∉ S')).length ≤ (K.filter fun k => decide (k ∉ S)).length := by
+  induction K with
+  | nil => simp
+  | cons k K ih =>
+    rw [filter_cons_len, filter_cons_len]
+    by_cases h1 : k ∈ S' <;> by_cases h2 : k ∈ S
+    · simp only [h1, h2, ↓reduceIte]; omega
+    · simp only [h1, h2, ↓reduceIte]; omega
+    · exact absurd (h k h2) h1
+    · simp only [h1, h2, ↓reduceIte]; omega
+
+theorem unseen_lt (K : List String) {u : String} {S : List String} (hu : u ∈ K) (hS : u ∉ S) :
+    (K.filter fun k => decide (k ∉ u :: S)).length < (K.filter fun k => decide (k ∉ S)).length := by
+  induction K with
+  | nil => simp at hu
+  | cons k K ih =>
+    rw [filter_cons_len, filter_cons_len]
+    have hm := unseen_mono K (S := S) (S' := u :: S) (fun s hs => List.mem_cons_of_mem _ hs)
+    by_cases hk : k = u
+    · subst hk
+      rw [ite_eq_left List.mem_cons_self, ite_eq_right hS]; omega
+    · have hu' : u ∈ K := by
+        rcases List.mem_cons.mp hu with h | h
+        · exact absurd h.symm hk
+        · exact h
+      have := ih hu'
+      by_cases h2 : k ∈ S
+      · rw [ite_eq_left (List.mem_cons_of_mem _ h2), ite_eq_left h2]; omega
+      · have : k ∉ u :: S := by
+          intro h; rcases List.mem_cons.mp h with h | h
+          · exact hk h
+          · exact h2 h
+        rw [ite_eq_right this, ite_eq_right h2]; omega
+
+theorem mem_keys_of_edges {calls : List (String × List String)} {u : String} (h : edgesOf calls u ≠ []) :
+    u ∈ calls.map (·.1) := by
+  unfold edgesOf at h
+  cases hl : calls.lookup u with
+  | none => simp [hl] at h
+  | some l =>
+    have : (calls.lookup u).isSome := by simp [hl]
+    obtain ⟨p, hp, he⟩ := List.lookup_isSome_iff.mp this
+    exact List.mem_map.mpr ⟨p, hp, (beq_iff_eq.mp he).symm⟩
+
+section
+variable (calls : List (String × List String)) (keep : List String) (name : String)
+
+/-- What holds of the walk's state (`seen`, `order`) between visits, with `T`
+the units whose visit is in progress (`name` and the stack). -/
+structure Inv (T : List String) (st : List String × List String) : Prop where
+  closed : ∀ x ∈ st.1, x ∉ T → ∀ y ∈ edgesOf calls x, y ∈ st.1
+  stack : ∀ t ∈ T, t ∈ st.1
+  reach : ∀ s ∈ st.1, s = name ∨ Reaches (edgesOf calls) name s
+  out : ∀ y, y ∈ st.2 ↔ y ∈ st.1 ∧ y ∉ T ∧ y ∈ keep
+  nodup : st.2.Nodup
+  order : ∀ x ∈ st.2, ∀ y ∈ st.2, Reaches (edgesOf calls) x y → st.2.idxOf y < st.2.idxOf x
+  noback : ∀ s ∈ st.1, s ∉ T → ∀ t ∈ T, ¬ Reaches (edgesOf calls) s t
+
+/-- From a finished unit, the walk has seen everything reachable, none of it in progress. -/
+theorem Inv.reached {calls keep name T st} (h : Inv calls keep name T st) {s z : String}
+    (hs : s ∈ st.1) (hsT : s ∉ T) (hr : Reaches (edgesOf calls) s z) : z ∈ st.1 ∧ z ∉ T := by
+  induction hr with
+  | @edge a b hb =>
+    exact ⟨h.closed a hs hsT b hb, fun hbT => h.noback a hs hsT b hbT (.edge hb)⟩
+  | @trans a b c hb _ ih =>
+    have hbS := h.closed a hs hsT b hb
+    have hbT : b ∉ T := fun hbT => h.noback a hs hsT b hbT (.edge hb)
+    exact ih hbS hbT
+
+/-- The conditions under which `visit` of `u` keeps the invariant. -/
+def Pre (T : List String) (u : String) : Prop :=
+  (u = name ∨ Reaches (edgesOf calls) name u) ∧ ∀ t ∈ T, t ≠ u ∧ ¬ Reaches (edgesOf calls) u t
+
+/-- What `visit` of `u` with fuel `F` guarantees. -/
+def VisitSpec (F : Nat) : Prop :=
+  ∀ (T : List String) (st : List String × List String) (u : String),
+    Inv calls keep name T st → Pre calls name T u → unseen calls st.1 + 1 ≤ F → name ∈ T →
+    Inv calls keep name T (visit calls keep F st u) ∧ u ∈ (visit calls keep F st u).1 ∧
+      ∀ s ∈ st.1, s ∈ (visit calls keep F st u).1
+
+theorem fold_spec {F : Nat} (hF : VisitSpec calls keep name F) (T : List String) :
+    ∀ (vs : List String) (st : List String × List String),
+      Inv calls keep name T st → (∀ v ∈ vs, Pre calls name T v) → unseen calls st.1 + 1 ≤ F → name ∈ T →
+      Inv calls keep name T (vs.foldl (visit calls keep F) st) ∧ (∀ v ∈ vs, v ∈ (vs.foldl (visit calls keep F) st).1) ∧
+        ∀ s ∈ st.1, s ∈ (vs.foldl (visit calls keep F) st).1
+  | [], st, hi, _, _, _ => ⟨hi, by simp, fun _ h => h⟩
+  | v :: vs, st, hi, hp, hu, hn => by
+    obtain ⟨hi1, hv1, hm1⟩ := hF T st v hi (hp v (by simp)) hu hn
+    have hu1 : unseen calls (visit calls keep F st v).1 + 1 ≤ F :=
+      Nat.le_trans (Nat.succ_le_succ (unseen_mono _ hm1)) hu
+    obtain ⟨hi2, hv2, hm2⟩ := fold_spec hF T vs _ hi1 (fun w hw => hp w (by simp [hw])) hu1 hn
+    refine ⟨hi2, ?_, fun s hs => hm2 s (hm1 s hs)⟩
+    intro w hw
+    rcases List.mem_cons.mp hw with rfl | hw
+    · exact hm2 _ hv1
+    · exact hv2 w hw
+
+theorem visit_spec (hac : Acyclic (edgesOf calls)) : ∀ F, VisitSpec calls keep name F := by
+  intro F
+  induction F with
+  | zero => intro T st u _ _ hF _; omega
+  | succ F ih =>
+    intro T st u hi hp hF hn
+    obtain ⟨S, O⟩ := st
+    by_cases huS : u ∈ S
+    · rw [show visit calls keep (F + 1) (S, O) u = (S, O) by simp [visit, huS]]
+      exact ⟨hi, huS, fun _ h => h⟩
+    simp only [visit, huS, ↓reduceIte]
+    obtain ⟨hreach, hT⟩ := hp
+    -- Entering u: u joins the stack.
+    have hi1 : Inv calls keep name (u :: T) (u :: S, O) := by
+      refine ⟨?_, ?_, ?_, ?_, hi.nodup, hi.order, ?_⟩
+      · intro x hx hxT y hy
+        have hxS : x ∈ S := by
+          rcases List.mem_cons.mp hx with rfl | h
+          · exact absurd List.mem_cons_self hxT
+          · exact h
+        exact List.mem_cons_of_mem _ (hi.closed x hxS (fun h => hxT (List.mem_cons_of_mem _ h)) y hy)
+      · intro t ht
+        rcases List.mem_cons.mp ht with rfl | h
+        · exact List.mem_cons_self
+        · exact List.mem_cons_of_mem _ (hi.stack t h)
+      · intro s hs
+        rcases List.mem_cons.mp hs with rfl | h
+        · exact hreach
+        · exact hi.reach s h
+      · intro y
+        rw [hi.out y]
+        constructor
+        · rintro ⟨hyS, hyT, hk⟩
+          refine ⟨List.mem_cons_of_mem _ hyS, ?_, hk⟩
+          intro h; rcases List.mem_cons.mp h with rfl | h
+          · exact huS hyS
+          · exact hyT h
+        · rintro ⟨hyS, hyT, hk⟩
+          refine ⟨?_, fun h => hyT (List.mem_cons_of_mem _ h), hk⟩
+          rcases List.mem_cons.mp hyS with rfl | h
+          · exact absurd List.mem_cons_self hyT
+          · exact h
+      · intro s hs hsT t ht hr
+        have hsS : s ∈ S := by
+          rcases List.mem_cons.mp hs with rfl | h
+          · exact absurd List.mem_cons_self hsT
+          · exact h
+        have hsT' : s ∉ T := fun h => hsT (List.mem_cons_of_mem _ h)
+        rcases List.mem_cons.mp ht with rfl | h
+        · exact huS (hi.reached hsS hsT' hr).1
+        · exact hi.noback s hsS hsT' t h hr
+    -- Its calls satisfy the conditions of a visit.
+    have hpre : ∀ v ∈ edgesOf calls u, Pre calls name (u :: T) v := by
+      intro v hv
+      refine ⟨?_, ?_⟩
+      · rcases hreach with rfl | h
+        · exact Or.inr (.edge hv)
+        · exact Or.inr (reaches_snoc h hv)
+      · intro t ht
+        rcases List.mem_cons.mp ht with rfl | h
+        · exact ⟨fun e => by subst e; exact hac _ (.edge hv), fun r => hac _ (.trans hv r)⟩
+        · obtain ⟨htu, hnr⟩ := hT t h
+          exact ⟨fun e => by subst e; exact hnr (.edge hv), fun r => hnr (.trans hv r)⟩
+    have hn1 : name ∈ u :: T := List.mem_cons_of_mem _ hn
+    -- The calls, visited in turn.
+    have hfold : Inv calls keep name (u :: T) ((edgesOf calls u).foldl (visit calls keep F) (u :: S, O)) ∧
+        (∀ v ∈ edgesOf calls u, v ∈ ((edgesOf calls u).foldl (visit calls keep F) (u :: S, O)).1) ∧
+        ∀ s ∈ u :: S, s ∈ ((edgesOf calls u).foldl (visit calls keep F) (u :: S, O)).1 := by
+      by_cases hnil : edgesOf calls u = []
+      · rw [hnil]; exact ⟨hi1, by simp, fun _ h => h⟩
+      · have hlt := unseen_lt (calls.map (·.1)) (mem_keys_of_edges hnil) huS
+        exact fold_spec calls keep name ih (u :: T) _ _ hi1 hpre (by unfold unseen at hF ⊢; dsimp only at hF ⊢; omega) hn1
+    obtain ⟨hi2, hv2, hm2⟩ := hfold
+    generalize hst : (edgesOf calls u).foldl (visit calls keep F) (u :: S, O) = st2 at hi2 hv2 hm2
+    obtain ⟨S2, O2⟩ := st2
+    simp only at hi2 hv2 hm2 ⊢
+    have huS2 : u ∈ S2 := hm2 u List.mem_cons_self
+    have huO2 : u ∉ O2 := fun h => ((hi2.out u).mp h).2.1 List.mem_cons_self
+    have huT : u ∉ T := fun h => (hT u h).1 rfl
+    -- Leaving u.
+    refine ⟨⟨?_, ?_, hi2.reach, ?_, ?_, ?_, ?_⟩, huS2, fun s hs => hm2 s (List.mem_cons_of_mem _ hs)⟩
+    · intro x hx hxT y hy
+      by_cases hxu : x = u
+      · subst hxu; exact hv2 y hy
+      · exact hi2.closed x hx (fun h => by rcases List.mem_cons.mp h with h | h; exact hxu h; exact hxT h) y hy
+    · intro t ht; exact hi2.stack t (List.mem_cons_of_mem _ ht)
+    · intro y
+      by_cases hk : u ∈ keep
+      · simp only [hk, ↓reduceIte, List.mem_append, List.mem_singleton, hi2.out y]
+        constructor
+        · rintro (⟨hyS, hyT, hyk⟩ | rfl)
+          · exact ⟨hyS, fun h => hyT (List.mem_cons_of_mem _ h), hyk⟩
+          · exact ⟨huS2, huT, hk⟩
+        · rintro ⟨hyS, hyT, hyk⟩
+          by_cases hyu : y = u
+          · exact Or.inr hyu
+          · exact Or.inl ⟨hyS, fun h => by rcases List.mem_cons.mp h with h | h; exact hyu h; exact hyT h, hyk⟩
+      · simp only [hk, ↓reduceIte, hi2.out y]
+        constructor
+        · rintro ⟨hyS, hyT, hyk⟩
+          exact ⟨hyS, fun h => hyT (List.mem_cons_of_mem _ h), hyk⟩
+        · rintro ⟨hyS, hyT, hyk⟩
+          have hyu : y ≠ u := by rintro rfl; exact hk hyk
+          exact ⟨hyS, fun h => by rcases List.mem_cons.mp h with h | h; exact hyu h; exact hyT h, hyk⟩
+    · by_cases hk : u ∈ keep
+      · simp only [hk, ↓reduceIte]
+        exact List.nodup_append.mpr ⟨hi2.nodup, by simp, by simp only [List.mem_singleton]; rintro a ha b rfl rfl; exact huO2 ha⟩
+      · simp only [hk, ↓reduceIte]; exact hi2.nodup
+    · by_cases hk : u ∈ keep
+      · simp only [hk, ↓reduceIte]
+        intro x hx y hy hr
+        have hidx : ∀ z ∈ O2, (O2 ++ [u]).idxOf z = O2.idxOf z := fun z hz => by
+          rw [List.idxOf_append, ite_eq_left hz]
+        have hidxu : (O2 ++ [u]).idxOf u = O2.length := by
+          rw [List.idxOf_append, ite_eq_right huO2]; simp
+        rcases List.mem_append.mp hx with hx1 | hx1 <;> rcases List.mem_append.mp hy with hy1 | hy1
+        · rw [hidx x hx1, hidx y hy1]; exact hi2.order x hx1 y hy1 hr
+        · have hyu : y = u := List.mem_singleton.mp hy1
+          have hxS := (hi2.out x).mp hx1
+          exact absurd (hyu ▸ hr) (hi2.noback x hxS.1 hxS.2.1 u List.mem_cons_self)
+        · have hxu : x = u := List.mem_singleton.mp hx1
+          rw [hidx y hy1, hxu, hidxu]; exact List.idxOf_lt_length_of_mem hy1
+        · have hxu : x = u := List.mem_singleton.mp hx1
+          have hyu : y = u := List.mem_singleton.mp hy1
+          rw [hxu, hyu] at hr; exact absurd hr (hac _)
+      · simp only [hk, ↓reduceIte]; exact hi2.order
+    · intro s hs hsT t ht hr
+      by_cases hsu : s = u
+      · subst hsu; exact (hT t ht).2 hr
+      · exact hi2.noback s hs (fun h => by rcases List.mem_cons.mp h with h | h; exact hsu h; exact hsT h) t
+          (List.mem_cons_of_mem _ ht) hr
+
+end
+
+theorem schedule_reached_kept_first : Spec.schedule_reached_kept_first := by
+  intro calls keep n hac
+  -- The start: `n` seen and in progress, nothing scheduled.
+  have hi0 : Inv calls keep n [n] ([n], []) := by
+    refine ⟨?_, by simp, by simp, ?_, by simp, by simp, ?_⟩
+    · intro x hx hxT; exact absurd hx hxT
+    · intro y; simp only [List.not_mem_nil, false_iff, not_and]; intro h1 h2; exact absurd h1 h2
+    · intro s hs hsT; exact absurd hs hsT
+  have hpre : ∀ v ∈ edgesOf calls n, Pre calls n [n] v := by
+    intro v hv
+    refine ⟨Or.inr (.edge hv), ?_⟩
+    intro t ht
+    simp only [List.mem_singleton] at ht; subst ht
+    exact ⟨fun e => by subst e; exact hac _ (.edge hv), fun r => hac _ (.trans hv r)⟩
+  have hF : unseen calls [n] + 1 ≤ calls.length + 1 := by
+    unfold unseen
+    have := List.length_filter_le (fun k => decide (k ∉ [n])) (calls.map (·.1))
+    simp only [List.length_map] at this; omega
+  obtain ⟨hi, hv, -⟩ := fold_spec calls keep n (visit_spec calls keep n hac _) [n] _ _ hi0 hpre hF List.mem_cons_self
+  unfold initializationSchedule
+  generalize (edgesOf calls n).foldl (visit calls keep (calls.length + 1)) ([n], []) = st at hi hv
+  obtain ⟨S, O⟩ := st
+  simp only at hi hv ⊢
+  -- Everything reachable from `n` has been seen.
+  have hall : ∀ x ∈ S, ∀ y ∈ edgesOf calls x, y ∈ S := by
+    intro x hx y hy
+    by_cases hxn : x = n
+    · subst hxn; exact hv y hy
+    · exact hi.closed x hx (by simpa using hxn) y hy
+  have hreach : ∀ x y, Reaches (edgesOf calls) x y → x ∈ S → y ∈ S := by
+    intro x y hr
+    induction hr with
+    | edge hb => exact fun hx => hall _ hx _ hb
+    | trans hb _ ih => exact fun hx => ih (hall _ hx _ hb)
+  have hnS : n ∈ S := hi.stack n List.mem_cons_self
+  have hmem : ∀ y, y ∈ O ↔ y ∈ keep ∧ y ≠ n ∧ Reaches (edgesOf calls) n y := by
+    intro y
+    rw [hi.out y]
+    simp only [List.mem_singleton]
+    constructor
+    · rintro ⟨hyS, hyn, hk⟩
+      exact ⟨hk, hyn, (hi.reach y hyS).resolve_left hyn⟩
+    · rintro ⟨hk, hyn, hr⟩
+      exact ⟨hreach _ _ hr hnS, hyn, hk⟩
+  refine ⟨hi.nodup, hmem, ?_⟩
+  intro x hx y hk hyn hr
+  have hxS := ((hi.out x).mp hx).1
+  have hy : y ∈ O := (hi.out y).mpr ⟨hreach _ _ hr hxS, by simpa using hyn, hk⟩
+  exact hi.order x hx y hy hr
+
 end Lasm.Cli.Theorems
