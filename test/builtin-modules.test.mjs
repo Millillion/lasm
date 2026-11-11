@@ -42,7 +42,7 @@ test('builtinModuleFile: the file of a builtin; anything else fails naming the b
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
-// Proposition: Lasm.Cli.Candidates.builtin_closure
+// Proposition: Lasm.Cli.Spec.builtin_closure
 //   ∀ (imports : List (String × List String)) (requested : List String), Acyclic (edgesOf imports) →
 //     (builtinModuleClosure imports requested).Nodup ∧
 //     (∀ m, m ∈ builtinModuleClosure imports requested ↔

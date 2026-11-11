@@ -689,4 +689,220 @@ theorem schedule_reached_kept_first : Spec.schedule_reached_kept_first := by
   have hy : y ∈ O := (hi.out y).mpr ⟨hreach _ _ hr hxS, by simpa using hyn, hk⟩
   exact hi.order x hx y hy hr
 
+/-! ## The builtin module closure -/
+
+section
+variable (calls : List (String × List String)) (R : String → Prop)
+
+/-- What holds of the walk's state (`seen`, `order`) between visits, with `T`
+the specifiers whose visit is in progress. -/
+structure CInv (T : List String) (st : List String × List String) : Prop where
+  closed : ∀ x ∈ st.1, x ∉ T → ∀ y ∈ edgesOf calls x, y ∈ st.1
+  stack : ∀ t ∈ T, t ∈ st.1
+  reach : ∀ s ∈ st.1, R s
+  out : ∀ y, y ∈ st.2 ↔ y ∈ st.1 ∧ y ∉ T
+  nodup : st.2.Nodup
+  order : ∀ x ∈ st.2, ∀ y ∈ st.2, Reaches (edgesOf calls) x y → st.2.idxOf y < st.2.idxOf x
+  noback : ∀ s ∈ st.1, s ∉ T → ∀ t ∈ T, ¬ Reaches (edgesOf calls) s t
+
+/-- From a finished unit, the walk has seen everything reachable, none of it in progress. -/
+theorem CInv.reached {calls R T st} (h : CInv calls R T st) {s z : String}
+    (hs : s ∈ st.1) (hsT : s ∉ T) (hr : Reaches (edgesOf calls) s z) : z ∈ st.1 ∧ z ∉ T := by
+  induction hr with
+  | @edge a b hb =>
+    exact ⟨h.closed a hs hsT b hb, fun hbT => h.noback a hs hsT b hbT (.edge hb)⟩
+  | @trans a b c hb _ ih =>
+    have hbS := h.closed a hs hsT b hb
+    have hbT : b ∉ T := fun hbT => h.noback a hs hsT b hbT (.edge hb)
+    exact ih hbS hbT
+
+/-- The conditions under which `visit` of `u` keeps the invariant. -/
+def CPre (T : List String) (u : String) : Prop :=
+  R u ∧ ∀ t ∈ T, t ≠ u ∧ ¬ Reaches (edgesOf calls) u t
+
+/-- What `visit` of `u` with fuel `F` guarantees. -/
+def CVisitSpec (F : Nat) : Prop :=
+  ∀ (T : List String) (st : List String × List String) (u : String),
+    CInv calls R T st → CPre calls R T u → unseen calls st.1 + 1 ≤ F →
+    CInv calls R T (closureVisit calls F st u) ∧ u ∈ (closureVisit calls F st u).1 ∧
+      ∀ s ∈ st.1, s ∈ (closureVisit calls F st u).1
+
+theorem cfold_spec {F : Nat} (hF : CVisitSpec calls R F) (T : List String) :
+    ∀ (vs : List String) (st : List String × List String),
+      CInv calls R T st → (∀ v ∈ vs, CPre calls R T v) → unseen calls st.1 + 1 ≤ F →
+      CInv calls R T (vs.foldl (closureVisit calls F) st) ∧ (∀ v ∈ vs, v ∈ (vs.foldl (closureVisit calls F) st).1) ∧
+        ∀ s ∈ st.1, s ∈ (vs.foldl (closureVisit calls F) st).1
+  | [], st, hi, _, _ => ⟨hi, by simp, fun _ h => h⟩
+  | v :: vs, st, hi, hp, hu => by
+    obtain ⟨hi1, hv1, hm1⟩ := hF T st v hi (hp v (by simp)) hu
+    have hu1 : unseen calls (closureVisit calls F st v).1 + 1 ≤ F :=
+      Nat.le_trans (Nat.succ_le_succ (unseen_mono _ hm1)) hu
+    obtain ⟨hi2, hv2, hm2⟩ := cfold_spec hF T vs _ hi1 (fun w hw => hp w (by simp [hw])) hu1
+    refine ⟨hi2, ?_, fun s hs => hm2 s (hm1 s hs)⟩
+    intro w hw
+    rcases List.mem_cons.mp hw with rfl | hw
+    · exact hm2 _ hv1
+    · exact hv2 w hw
+
+theorem cvisit_spec (hR : ∀ x y, R x → y ∈ edgesOf calls x → R y) (hac : Acyclic (edgesOf calls)) : ∀ F, CVisitSpec calls R F := by
+  intro F
+  induction F with
+  | zero => intro T st u _ _ hF; omega
+  | succ F ih =>
+    intro T st u hi hp hF
+    obtain ⟨S, O⟩ := st
+    by_cases huS : u ∈ S
+    · rw [show closureVisit calls (F + 1) (S, O) u = (S, O) by simp [closureVisit, huS]]
+      exact ⟨hi, huS, fun _ h => h⟩
+    simp only [closureVisit, huS, ↓reduceIte]
+    obtain ⟨hreach, hT⟩ := hp
+    -- Entering u: u joins the stack.
+    have hi1 : CInv calls R (u :: T) (u :: S, O) := by
+      refine ⟨?_, ?_, ?_, ?_, hi.nodup, hi.order, ?_⟩
+      · intro x hx hxT y hy
+        have hxS : x ∈ S := by
+          rcases List.mem_cons.mp hx with rfl | h
+          · exact absurd List.mem_cons_self hxT
+          · exact h
+        exact List.mem_cons_of_mem _ (hi.closed x hxS (fun h => hxT (List.mem_cons_of_mem _ h)) y hy)
+      · intro t ht
+        rcases List.mem_cons.mp ht with rfl | h
+        · exact List.mem_cons_self
+        · exact List.mem_cons_of_mem _ (hi.stack t h)
+      · intro s hs
+        rcases List.mem_cons.mp hs with rfl | h
+        · exact hreach
+        · exact hi.reach s h
+      · intro y
+        rw [hi.out y]
+        constructor
+        · rintro ⟨hyS, hyT⟩
+          refine ⟨List.mem_cons_of_mem _ hyS, ?_⟩
+          intro h; rcases List.mem_cons.mp h with rfl | h
+          · exact huS hyS
+          · exact hyT h
+        · rintro ⟨hyS, hyT⟩
+          refine ⟨?_, fun h => hyT (List.mem_cons_of_mem _ h)⟩
+          rcases List.mem_cons.mp hyS with rfl | h
+          · exact absurd List.mem_cons_self hyT
+          · exact h
+      · intro s hs hsT t ht hr
+        have hsS : s ∈ S := by
+          rcases List.mem_cons.mp hs with rfl | h
+          · exact absurd List.mem_cons_self hsT
+          · exact h
+        have hsT' : s ∉ T := fun h => hsT (List.mem_cons_of_mem _ h)
+        rcases List.mem_cons.mp ht with rfl | h
+        · exact huS (hi.reached hsS hsT' hr).1
+        · exact hi.noback s hsS hsT' t h hr
+    -- Its calls satisfy the conditions of a visit.
+    have hpre : ∀ v ∈ edgesOf calls u, CPre calls R (u :: T) v := by
+      intro v hv
+      refine ⟨?_, ?_⟩
+      · exact hR u v hreach hv
+      · intro t ht
+        rcases List.mem_cons.mp ht with rfl | h
+        · exact ⟨fun e => by subst e; exact hac _ (.edge hv), fun r => hac _ (.trans hv r)⟩
+        · obtain ⟨htu, hnr⟩ := hT t h
+          exact ⟨fun e => by subst e; exact hnr (.edge hv), fun r => hnr (.trans hv r)⟩
+    -- The calls, visited in turn.
+    have hfold : CInv calls R (u :: T) ((edgesOf calls u).foldl (closureVisit calls F) (u :: S, O)) ∧
+        (∀ v ∈ edgesOf calls u, v ∈ ((edgesOf calls u).foldl (closureVisit calls F) (u :: S, O)).1) ∧
+        ∀ s ∈ u :: S, s ∈ ((edgesOf calls u).foldl (closureVisit calls F) (u :: S, O)).1 := by
+      by_cases hnil : edgesOf calls u = []
+      · rw [hnil]; exact ⟨hi1, by simp, fun _ h => h⟩
+      · have hlt := unseen_lt (calls.map (·.1)) (mem_keys_of_edges hnil) huS
+        exact cfold_spec calls R ih (u :: T) _ _ hi1 hpre (by unfold unseen at hF ⊢; dsimp only at hF ⊢; omega)
+    obtain ⟨hi2, hv2, hm2⟩ := hfold
+    generalize hst : (edgesOf calls u).foldl (closureVisit calls F) (u :: S, O) = st2 at hi2 hv2 hm2
+    obtain ⟨S2, O2⟩ := st2
+    simp only at hi2 hv2 hm2 ⊢
+    have huS2 : u ∈ S2 := hm2 u List.mem_cons_self
+    have huO2 : u ∉ O2 := fun h => ((hi2.out u).mp h).2 List.mem_cons_self
+    have huT : u ∉ T := fun h => (hT u h).1 rfl
+    -- Leaving u.
+    refine ⟨⟨?_, ?_, hi2.reach, ?_, ?_, ?_, ?_⟩, huS2, fun s hs => hm2 s (List.mem_cons_of_mem _ hs)⟩
+    · intro x hx hxT y hy
+      by_cases hxu : x = u
+      · subst hxu; exact hv2 y hy
+      · exact hi2.closed x hx (fun h => by rcases List.mem_cons.mp h with h | h; exact hxu h; exact hxT h) y hy
+    · intro t ht; exact hi2.stack t (List.mem_cons_of_mem _ ht)
+    · intro y
+      simp only [List.mem_append, List.mem_singleton, hi2.out y]
+      constructor
+      · rintro (⟨hyS, hyT⟩ | rfl)
+        · exact ⟨hyS, fun h => hyT (List.mem_cons_of_mem _ h)⟩
+        · exact ⟨huS2, huT⟩
+      · rintro ⟨hyS, hyT⟩
+        by_cases hyu : y = u
+        · exact Or.inr hyu
+        · exact Or.inl ⟨hyS, fun h => by rcases List.mem_cons.mp h with h | h; exact hyu h; exact hyT h⟩
+    · exact List.nodup_append.mpr ⟨hi2.nodup, by simp, by simp only [List.mem_singleton]; rintro a ha b rfl rfl; exact huO2 ha⟩
+    · intro x hx y hy hr
+      have hidx : ∀ z ∈ O2, (O2 ++ [u]).idxOf z = O2.idxOf z := fun z hz => by
+        rw [List.idxOf_append, ite_eq_left hz]
+      have hidxu : (O2 ++ [u]).idxOf u = O2.length := by
+        rw [List.idxOf_append, ite_eq_right huO2]; simp
+      rcases List.mem_append.mp hx with hx1 | hx1 <;> rcases List.mem_append.mp hy with hy1 | hy1
+      · rw [hidx x hx1, hidx y hy1]; exact hi2.order x hx1 y hy1 hr
+      · have hyu : y = u := List.mem_singleton.mp hy1
+        have hxS := (hi2.out x).mp hx1
+        exact absurd (hyu ▸ hr) (hi2.noback x hxS.1 hxS.2 u List.mem_cons_self)
+      · have hxu : x = u := List.mem_singleton.mp hx1
+        rw [hidx y hy1, hxu, hidxu]; exact List.idxOf_lt_length_of_mem hy1
+      · have hxu : x = u := List.mem_singleton.mp hx1
+        have hyu : y = u := List.mem_singleton.mp hy1
+        rw [hxu, hyu] at hr; exact absurd hr (hac _)
+    · intro s hs hsT t ht hr
+      by_cases hsu : s = u
+      · subst hsu; exact (hT t ht).2 hr
+      · exact hi2.noback s hs (fun h => by rcases List.mem_cons.mp h with h | h; exact hsu h; exact hsT h) t
+          (List.mem_cons_of_mem _ ht) hr
+
+end
+
+theorem builtin_closure : Spec.builtin_closure := by
+  intro imports requested hac
+  let roots := requested.filter isBuiltinModule
+  let R := fun s => ∃ r ∈ requested, r.startsWith "lasm:" ∧ (s = r ∨ Reaches (edgesOf imports) r s)
+  have hR : ∀ x y, R x → y ∈ edgesOf imports x → R y := by
+    rintro x y ⟨r, hr, hb, hx⟩ hy
+    refine ⟨r, hr, hb, Or.inr ?_⟩
+    rcases hx with rfl | hx
+    · exact .edge hy
+    · exact reaches_snoc hx hy
+  have hi0 : CInv imports R [] ([], []) := ⟨by simp, by simp, by simp, by simp, by simp, by simp, by simp⟩
+  have hpre : ∀ v ∈ roots, CPre imports R [] v := by
+    intro v hv
+    have := List.mem_filter.mp hv
+    exact ⟨⟨v, this.1, this.2, Or.inl rfl⟩, by simp⟩
+  have hF : unseen imports [] + 1 ≤ imports.length + 1 := by
+    unfold unseen
+    have := List.length_filter_le (fun k => decide (k ∉ ([] : List String))) (imports.map (·.1))
+    simp only [List.length_map] at this; omega
+  obtain ⟨hi, hv, -⟩ := cfold_spec imports R (cvisit_spec imports R hR hac _) [] roots _ hi0 hpre hF
+  unfold builtinModuleClosure
+  generalize roots.foldl (closureVisit imports (imports.length + 1)) ([], []) = st at hi hv
+  obtain ⟨S, O⟩ := st
+  simp only at hi hv ⊢
+  have hall : ∀ x ∈ S, ∀ y ∈ edgesOf imports x, y ∈ S := fun x hx => hi.closed x hx (by simp)
+  have hreach : ∀ x y, Reaches (edgesOf imports) x y → x ∈ S → y ∈ S := by
+    intro x y hr
+    induction hr with
+    | edge hb => exact fun hx => hall _ hx _ hb
+    | trans hb _ ih => exact fun hx => ih (hall _ hx _ hb)
+  have hOS : ∀ y, y ∈ O ↔ y ∈ S := fun y => by simpa using hi.out y
+  refine ⟨hi.nodup, ?_, ?_⟩
+  · intro m
+    rw [hOS m]
+    constructor
+    · exact hi.reach m
+    · rintro ⟨r, hr, hb, hm⟩
+      have hrS : r ∈ S := hv r (List.mem_filter.mpr ⟨hr, hb⟩)
+      rcases hm with rfl | hm
+      · exact hrS
+      · exact hreach _ _ hm hrS
+  · intro x hx y hy hyO
+    exact hi.order x hx y hyO (.edge hy)
+
 end Lasm.Cli.Theorems

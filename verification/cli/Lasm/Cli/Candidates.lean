@@ -122,18 +122,6 @@ def mangle_round_trip : Prop :=
     initializerModule ("runtime_initialize_" ++ mangleName n) = some n ∧
     mangleName n ≠ "" ∧ (mangleName n).all fun c => c.isAlphanum || c = '_'
 
-/-- **The builtin closure is the reachable builtins, dependencies first.**
-For an acyclic import graph, the closure of the requested specifiers holds
-each builtin reachable from a requested builtin exactly once, nothing else
-(other specifiers are dropped), and every builtin after those it imports.
-Tested by: test/builtin-modules.test.mjs -/
-def builtin_closure : Prop :=
-  ∀ (imports : List (String × List String)) (requested : List String), Acyclic (edgesOf imports) →
-    (builtinModuleClosure imports requested).Nodup ∧
-    (∀ m, m ∈ builtinModuleClosure imports requested ↔
-      ∃ r ∈ requested, r.startsWith "lasm:" ∧ (m = r ∨ Reaches (edgesOf imports) r m)) ∧
-    DependenciesFirst (edgesOf imports) (builtinModuleClosure imports requested)
-
 /-- **The compact wrappers run the kept initializers as the chains do.** For
 an acyclic plan of valid initializer names, the wrappers are generated, and
 calling kept initializers' wrappers runs exactly the kept initializers the Node build's chains run, in

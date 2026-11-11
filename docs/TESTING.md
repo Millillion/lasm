@@ -1084,8 +1084,8 @@ like the library's, and its test cites `Lasm.Cli.Spec.…`. Since 2026-11-11:
 every import form, with decoys), with `numbers_le64`,
 `changed_files_exact`, `response_file_round_trip`,
 `replace_one_core_module`, `drops_only_component_type` and
-`schedule_reached_kept_first` (the depth-first walk is correct on acyclic
-call graphs) proved. The
+`schedule_reached_kept_first` and `builtin_closure` (the depth-first walks
+are correct on acyclic graphs) proved. The
 differentials have found three bugs: `replaceCoreModule` spliced a section
 whose size was a padded LEB128 at the wrong offset, and
 `builtinModuleClosure` missed side-effect imports (`import './x.mjs'`) and
