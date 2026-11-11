@@ -11,12 +11,14 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { modules } from '../scripts/bindings/web-tier1.mjs';
 import * as nodeTier from '../scripts/bindings/node-tier2.mjs';
+import * as serveTier from '../scripts/bindings/serve-tier2.mjs';
+import { declarations, lowerHost, parseType, typeText } from '../scripts/bindings/serve-api.mjs';
 import { modules as browserModules } from '../scripts/bindings/web-browser.mjs';
 import { libraryModules } from '../src/lasm-library.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
-test('the committed Lasm.JS.Web and Lasm.JS.Node modules are the generator output', () => {
+test('the committed Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun modules are the generator output', () => {
   const r = spawnSync(process.execPath, [fileURLToPath(new URL('../scripts/bindings/generate-web.mjs', import.meta.url)), '--check'], { encoding: 'utf8' });
   assert.equal(r.status, 0, r.stdout + r.stderr);
 });
@@ -45,7 +47,7 @@ test('every Lasm.JS.Node container is generated in its module, with the members 
 });
 
 test('the generated modules are shipped library modules, in import order', () => {
-  for (const tier of ['Web', 'Node']) {
+  for (const tier of ['Web', 'Node', 'Deno', 'Bun']) {
     const generated = readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url)).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`);
     for (const m of [...generated, `Lasm.JS.${tier}`]) assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
     for (const m of generated) {
@@ -72,4 +74,145 @@ test('tier 1 never imports the browser tier (a server program links nothing of t
     const source = readFileSync(`${root}library/${m.replaceAll('.', '/')}.lean`, 'utf8');
     for (const [, imported] of source.matchAll(/^import (Lasm\.\S+)$/gm)) assert.ok(!browser.has(imported), `${m} imports ${imported}`);
   }
+});
+
+// Lasm.JS.Deno and Lasm.JS.Bun (scripts/bindings/serve-api.mjs lowers the runtimes'
+// TypeScript declarations; its --check needs the network and runs in web-bindings.yml).
+test('every Lasm.JS.Deno and Lasm.JS.Bun selection is generated, and no exclusion is', () => {
+  const { surface } = JSON.parse(readFileSync(new URL('../scripts/bindings/serve-surface.json', import.meta.url), 'utf8'));
+  for (const h of serveTier.hosts) {
+    const s = surface[h.name];
+    assert.ok(s, `${h.name} is missing from the generated surface`);
+    assert.equal(s.global, h.global);
+    for (const f of Object.keys(h.functions)) assert.ok(s.functions.includes(f), `${h.global}.${f} is not generated`);
+    for (const d of h.declarations.filter(d => d.as === 'interface')) {
+      const members = s.interfaces[d.lean ?? d.name.split('.').at(-1)];
+      assert.ok(members, `${d.name} is not generated`);
+      for (const e of Object.keys(d.exclude ?? {})) assert.ok(!members.includes(e), `${d.name}.${e} is excluded but generated`);
+    }
+  }
+  const idl = readFileSync(new URL('../scripts/bindings/deno.idl', import.meta.url), 'utf8');
+  assert.match(idl, /Deno\.serve\(options: ServeVsockOptions, handler: ServeHandler<Deno\.VsockAddr>\): @experimental in its declaration/);
+});
+
+/** A host of serve-tier2.mjs's shape over one synthetic declaration file. */
+const host = (extra = {}) => ({
+  name: 'Rt', global: 'Rt', files: ['rt.d.ts'], instantiate: { A: 'Addr' }, notSelected: { Disposable: 'not needed' },
+  functions: { serve: { module: 'Serve', overloads: {
+    'handler: Handler<Rt.Addr>': { lower: true },
+    'options: Opts | (Opts & Tls), handler: Handler<Rt.Addr>': { lower: true, split: { options: ['options', 'tlsOptions'] } },
+    'path: string': { exclude: 'outside the cut' } } } },
+  declarations: [
+    { name: 'Handler', as: 'callback', module: 'Serve' },
+    { name: 'Server', as: 'interface', module: 'Serve', exclude: { secret: 'not public' } },
+    { name: 'Opts', as: 'dictionary', module: 'Serve' },
+    { name: 'Tls', as: 'dictionary', module: 'Serve' },
+    { name: 'Addr', as: 'interface', module: 'Serve' },
+  ],
+  intersections: { 'Opts & Tls': 'TlsOpts' },
+  integers: { 'Opts.port': { type: 'unsigned short', quote: 'The port to listen on.' } },
+  typeNames: { Request: 'Request', Response: 'Response', unknown: 'any' },
+  ...extra,
+});
+const source = `
+declare namespace Rt {
+  /** A handler. */
+  export type Handler<A extends Rt.Addr = Rt.Addr> = (
+    request: Request,
+    info: A,
+  ) => Response | Promise<Response>;
+  export interface Server<A = Addr> extends Disposable {
+    /** Settles when closed. */
+    finished: Promise<void>;
+    readonly port: number | undefined;
+    stop(force?: boolean): Promise<void>;
+    secret(): string;
+    /** @experimental */
+    beta(): void;
+  }
+  export interface Opts {
+    /** The port to listen on. */
+    port?: number;
+    hostname?: "0.0.0.0" | "localhost" | (string & {});
+    mode?: "fast" | "slow";
+    onError?: (this: Server, error: unknown) => Response | Promise<Response> | void;
+    id?: string | null;
+  }
+  export interface Tls { cert: string; key: string; }
+  export interface Addr { transport: "tcp" | "udp"; hostname: string; }
+  /** Serves. */
+  export function serve(handler: Handler<Rt.Addr>): Server<Rt.Addr>;
+  export function serve(
+    options: Opts | (Opts & Tls),
+    handler: Handler<Rt.Addr>,
+  ): Server<Rt.Addr>;
+  export function serve(path: string): Server;
+  /** @experimental **UNSTABLE** */
+  export function serve(sock: number): Server;
+}
+`;
+const lower = (h = host(), text = source) => lowerHost(h, [{ file: 'rt.d.ts', text }]);
+
+test('serve-api reads declarations: namespaces, interfaces, type aliases and function overloads', () => {
+  const d = declarations(source, 'rt.d.ts');
+  assert.deepEqual(d.map(x => `${x.kind} ${x.name}`), ['type Rt.Handler', 'interface Rt.Server', 'interface Rt.Opts', 'interface Rt.Tls',
+    'interface Rt.Addr', 'function Rt.serve', 'function Rt.serve', 'function Rt.serve', 'function Rt.serve']);
+  assert.match(d[0].doc, /A handler/);
+  assert.equal(typeText(parseType('"a" | (string & {}) | Promise<Response[]> | ((x: number) => void)')),
+    '"a" | string & {} | Promise<Response[]> | ((x: number) => void)');
+  assert.throws(() => parseType('T extends U ? A : B'), /conditional types are not lowered/);
+});
+
+test('serve-api lowers by its rules', () => {
+  const { idl, excluded } = lower();
+  // Functions: one overload per union alternative of a split parameter, named for it.
+  assert.match(idl, /Rt_Server serve\(Rt_Handler handler\);/);
+  assert.match(idl, /Rt_Server serve\(Rt_Opts options, Rt_Handler handler\);/);
+  assert.match(idl, /Rt_Server serve\(Rt_TlsOpts tlsOptions, Rt_Handler handler\);/);
+  // A callback: T | Promise<T> is Promise<T>; the generic parameter is its instantiation.
+  assert.match(idl, /callback Rt_Handler = Promise<Response> \(Request request, Rt_Addr info\);/);
+  // Handles: readonly attributes, nullable from undefined, the experimental member left out.
+  assert.match(idl, /readonly attribute Promise<undefined> finished;/);
+  assert.match(idl, /readonly attribute double\? port;/);
+  assert.match(idl, /Promise<undefined> stop\(optional boolean force\);/);
+  assert.doesNotMatch(idl, /secret\(|beta\(/);
+  // Dictionaries: integers narrowed, literal unions enums, literals with any string DOMString,
+  // `this` dropped and void dropped from a callback's result, an optional member's undefined dropped.
+  assert.match(idl, /unsigned short port;/);
+  assert.match(idl, /DOMString hostname;/);
+  assert.match(idl, /Rt_OptsMode mode;/);
+  assert.match(idl, /enum Rt_OptsMode \{ "fast", "slow" \};/);
+  assert.match(idl, /callback Rt_OptsOnError = Promise<Response> \(any error\);/);
+  assert.match(idl, /void alternatives dropped/);
+  assert.match(idl, /DOMString\? id;/);
+  assert.match(idl, /dictionary Rt_TlsOpts : Rt_Opts \{[^}]*required DOMString cert;[^}]*required DOMString key;/);
+  assert.deepEqual(excluded.map(([w]) => w).sort(), ['Rt.serve(path: string)', 'Rt.serve(sock: number)', 'Server.beta', 'Server.secret']);
+});
+
+test('serve-api fails on what its selection does not decide', () => {
+  // An overload neither lowered nor excluded.
+  const h1 = host();
+  delete h1.functions.serve.overloads['path: string'];
+  assert.throws(() => lower(h1), /neither lowers nor excludes/);
+  // A member neither lowered nor excluded, where the selection names only some.
+  const h2 = host();
+  h2.declarations = h2.declarations.map(d => d.name === 'Opts' ? { ...d, compose: [{ from: 'Opts', only: ['port'] }] } : d);
+  assert.throws(() => lower(h2), /not in `only` and not excluded/);
+  // An exclusion of a member that does not exist.
+  const h3 = host();
+  h3.declarations = h3.declarations.map(d => d.name === 'Server' ? { ...d, exclude: { ...d.exclude, gone: 'x' } } : d);
+  assert.throws(() => lower(h3), /Server\.gone is excluded but not a member/);
+  // An integer whose doc comment no longer says what the narrowing quotes.
+  assert.throws(() => lower(host(), source.replace('The port to listen on.', 'A port.')), /no longer says/);
+  // A second instantiation of a generic.
+  const h4 = host();
+  h4.functions.serve.overloads = { ...h4.functions.serve.overloads, 'handler: Handler<Rt.Other>': { lower: true } };
+  delete h4.functions.serve.overloads['handler: Handler<Rt.Addr>'];
+  assert.throws(() => lower(h4, source.replace('serve(handler: Handler<Rt.Addr>)', 'serve(handler: Handler<Rt.Other>)')), /second instantiation/);
+  // A type that is neither selected nor named.
+  assert.throws(() => lower(host(), source.replace('request: Request,', 'request: Bogus,')), /neither selected nor in serve-tier2.mjs typeNames/);
+  // A selected overload that is experimental.
+  const h5 = host();
+  h5.functions.serve.overloads['sock: number'] = { lower: true };
+  assert.throws(() => lower(h5), /@experimental, but serve-tier2.mjs selects it/);
 });

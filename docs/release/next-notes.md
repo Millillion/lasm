@@ -81,6 +81,16 @@ Notes for the next release, collected as changes land. They move to
   Bun and Deno where their Node compatibility implements them
   ([JS_BINDINGS.md](../JS_BINDINGS.md#standard-bindings-for-node-lasmjsnode)).
   `node:http` and `node:net` are not bound: Node servers go through an npm adapter.
+- **Servers on Deno and Bun from Lean: `Lasm.JS.Deno` and `Lasm.JS.Bun`.**
+  `Deno.serve` (with its options, TLS, `shutdown` and `finished`) and `Bun.serve`
+  (with `fetch`, `port`, `hostname`, `stop`, `requestIP`, `reload`, …) take a Lean
+  handler from a Lasm.JS.Web `Request` to a `Response`:
+  `Deno.serveWithOptions { port := some 8000 } (← Deno.ServeHandler.ofFn fun request _ => handle request)`.
+  They are generated from Deno's and Bun's own TypeScript declarations (Deno
+  2.9.6, Bun 1.4.4) with the same rules as `Lasm.JS.Web`; experimental members
+  are left out. On Node, serve the same handler through an npm adapter such as
+  `@hono/node-server`, bound with `@[js]`
+  ([JS_BINDINGS.md](../JS_BINDINGS.md#servers-on-javascript-runtimes-lasmjsdeno-lasmjsbun-and-node)).
 - Bun and Deno builds load Node's built-in modules (`Lasm.JS.require "node:os"`)
   without listing them in `package.json`'s `lasm.edge.modules`.
 

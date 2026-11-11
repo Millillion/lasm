@@ -1,0 +1,6 @@
+{
+  "$comment": "Checks of test/fixtures/js-serve that fail on a target because of the runtime itself, never the binding, with the reason (scripts/bindings/test-web.mjs). A name ending in * matches every check it prefixes.",
+  "bun": {
+    "server.fetch": "Bun 1.4.4's server.fetch(request) calls the fetch handler with the request only; its declaration (and Bun.serve's own calls) pass (req, server), so the generated handler, which reads both, rejects"
+  }
+}

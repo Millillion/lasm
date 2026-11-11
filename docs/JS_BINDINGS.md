@@ -901,6 +901,208 @@ vectors (FIPS 180, RFC 1321, RFC 4231, RFC 6070, RFC 7914, RFC 5869); files in a
 fresh temporary directory; child processes, events and stream conversion.
 `web-bindings.yml` runs it on Node 26 and 24, Bun and Deno.
 
+## Servers on JavaScript runtimes: `Lasm.JS.Deno`, `Lasm.JS.Bun` and Node
+
+A server on a JavaScript runtime is one Lean function from a web `Request` to a
+`Response` (Lasm.JS.Web's types), handed to the runtime's own server:
+
+| Runtime | Server | Lean |
+| --- | --- | --- |
+| Cloudflare Workers and the edge platforms | `export default {fetch}` | `Lasm.JS.exportDefault` |
+| Deno | `Deno.serve` | `import Lasm.JS.Deno` (generated, below) |
+| Bun | `Bun.serve` | `import Lasm.JS.Bun` (generated, below) |
+| Node | none of its own takes a `Request`: an npm adapter, such as `@hono/node-server`'s `serve({fetch})` | an `@[js]` binding to the package ([Node](#node-an-npm-adapter)) |
+
+Outbound HTTP is Lasm.JS.Web's `fetch` everywhere. Status: **current source, not
+yet released** (tier 2 of the standard bindings, second part).
+
+```lean
+import Lasm.JS.Deno
+open Lasm.JS Lasm.JS.Web
+
+def handle (request : Request) : Async Response := do
+  Response.new (some (.usvString s!"{← request.method} {← request.url}")) none
+
+def main : IO Unit := do
+  let handler ← Deno.ServeHandler.ofFn fun request _info => handle request
+  let server ← Deno.serveWithOptions { port := some 8000, hostname := some "127.0.0.1" } handler
+  server.finished.block       -- main returns (and Deno exits) when the server closes
+```
+
+```lean
+import Lasm.JS.Bun
+open Lasm.JS Lasm.JS.Web
+
+def main : IO Unit := do
+  let stopping : IO.Promise Unit ← IO.Promise.new
+  let fetch ← Bun.ServeOptionsFetch.ofFn fun request _server => do
+    if (← (← URL.new (← request.url)).pathname) == "/stop" then stopping.resolve ()
+    handle request
+  let server ← Bun.serve { fetch, port := some (3000 : Nat), hostname := some "127.0.0.1" }
+  IO.println s!"listening on {← (← server.url).href}"
+  (Std.Async.await stopping : Async Unit).block   -- serve until a request for /stop
+  server.stop.block                               -- then let open requests finish
+```
+
+On Deno and Bun, `main` must not return while the server runs: Lasm's Deno and
+Bun entries exit with `main`'s result when it returns (unless the program
+published a handler with `exportDefault`, which those entries serve on `PORT`
+themselves). Wait for `server.finished` (Deno), or for a promise your shutdown
+path resolves.
+
+### What is covered
+
+| Module | Members | Declared in |
+| --- | --- | --- |
+| `Lasm.JS.Deno.Serve` | `Deno.serve(handler)` as `serve`; `Deno.serve(options, handler)` as `serveWithOptions` (`ServeTcpOptions`: `port`, `hostname`, `signal`, `onListen`, `onError`, `reusePort`, `tcpBacklog`, `automaticCompression`, `transport`) and, with `cert` and `key`, `serveWithTlsOptions` (`ServeTcpTlsOptions`); `ServeHandler` (`Request → ServeHandlerInfo → Async Response`); `HttpServer` (`finished`, `shutdown`, `addr`, `ref`, `unref`); `ServeHandlerInfo` (`remoteAddr`, `completed`); the structure `NetAddr` (`transport`, `hostname`, `port`) | Deno 2.9.6, `cli/tsc/dts/lib.deno.ns.d.ts`, `lib.deno_net.d.ts` |
+| `Lasm.JS.Bun.Serve` | `Bun.serve(options)` as `serve`; `ServeOptions` (`fetch`, `port`, `hostname`, `error`, `idleTimeout`, `maxRequestBodySize`, `reusePort`, `ipv6Only`, `id`); `ServeOptionsFetch` (`Request → Server → Async Response`); `Server` (`stop`, `url`, `port`, `hostname`, `protocol`, `requestIP`, `timeout`, `fetch`, `reload`, `pendingRequests`, `closeIdleConnections`, `ref`, `unref`, `development`, `id`); the structure `SocketAddress` (`address`, `port`, `family`) | Bun 1.4.4, `packages/bun-types/serve.d.ts`, `bun.d.ts` |
+
+`import Lasm.JS.Deno` and `import Lasm.JS.Bun` import their module (and the
+Lasm.JS.Web modules it uses: `Dom`, `Fetch`, `Url`).
+
+Not generated, with the reason (each listed in
+[`serve-tier2.mjs`](../scripts/bindings/serve-tier2.mjs) and at the top of
+[`deno.idl`](../scripts/bindings/deno.idl) and [`bun.idl`](../scripts/bindings/bun.idl)):
+
+- **Experimental or unstable** (the declaration says `@experimental` or
+  `UNSTABLE`; never generated): Deno's VSOCK overloads (`ServeVsockOptions`),
+  Bun's `http1`, `http2` and `http3` options.
+- **Outside the server entry points:** Unix domain sockets (Deno's
+  `ServeUnixOptions` overloads, Bun's `unix`); WebSockets (`Server.upgrade`,
+  `publish`, `subscriberCount`, `pendingWebSockets`, the `websocket` handlers);
+  Bun's `routes` (a Lean handler routes in Lean), `tls` (it takes Bun's file
+  objects) and `development` (Bun's dev server for HTML bundles).
+- **Another form of a generated operation:** Deno's overloads that take the
+  handler inside the options (`ServeInit`), and `[Symbol.asyncDispose]` /
+  `[Symbol.dispose]` (`await using`, which Lean does not have: `shutdown`,
+  `stop`).
+- `ServeDefaultExport` (`export default {fetch}`): Lasm's Deno and Bun entries
+  already serve `Lasm.JS.exportDefault`.
+
+### How the declarations become Lean
+
+[`serve-api.mjs`](../scripts/bindings/serve-api.mjs) reads the declaration
+files (a small reader of TypeScript's declaration syntax: namespaces,
+interfaces, type aliases, function overloads, and the types below) and lowers
+what `serve-tier2.mjs` selects to WebIDL; `generate-web.mjs` then generates Lean
+with Lasm.JS.Web's rules ([above](#how-a-webidl-declaration-becomes-lean)), as for
+Lasm.JS.Node. Every member of a selected declaration and every overload of a
+selected function is either lowered or excluded with a reason: the lowering
+fails on one that is neither, so a new version's additions get a decision.
+
+| TypeScript | WebIDL | Lean |
+| --- | --- | --- |
+| an interface of an object the runtime keeps (`HttpServer`, `Server`, `ServeHandlerInfo`) | `interface`, its properties `readonly attribute`s | a handle type; `server.finished : Async Unit`, `server.shutdown : Async Unit` |
+| an interface of plain data the runtime hands over (`NetAddr`, `SocketAddress`) | `dictionary` | a structure, copied: `(← server.addr).port : Nat`. Plain objects reach a callback copied, so a handle type could not hold them |
+| an interface Lean passes (options) | `dictionary`; a property without `?` is `required` | a structure; `none` leaves a member out |
+| a method of an options object (`fetch(req, server)`) | a callback member | `ServeOptionsFetch.ofFn (f : Request → Server → Async Response)` |
+| a function type (`type ServeHandler = (request, info) => …`) | `callback` named after the alias, or the member (`ServeOptionsOnError`) | `.ofFn` (asynchronous) and `.ofSyncFn` |
+| a `this` parameter | left out | — |
+| a callback's parameters | its arity is the JavaScript function's `length` (Lasm.JS's own functions have length 0, and `Deno.serve` calls a handler of length 0 without its request) | `ServeHandler.ofFn` sets it |
+| `Response \| Promise<Response>`, `MaybePromise<Response>` | `Promise<Response>` | the handler is `Async`; it returns a promise |
+| `void` beside a value in a callback's result (Bun's `error`) | left out | return a `Response` |
+| `string`, `boolean`, `number`, `void`, `unknown` | `DOMString`, `boolean`, `double`, `undefined`, `any` | `String`, `Bool`, `Float`, `Unit`, `Data` |
+| `number` that the doc comment calls a port, count or size | `unsigned short`, `unsigned long`, `unsigned long long` (quoting the doc comment; the lowering fails if the words go) | `Nat` |
+| `T \| undefined`, `T \| null` | `T?` (an optional member drops `undefined`) | `Option T` |
+| `"tcp" \| "udp"` | `enum NetAddrTransport` | `inductive NetAddrTransport \| tcp \| udp` |
+| `"0.0.0.0" \| "localhost" \| (string & {})` | `DOMString` | `String` |
+| `string \| number` (Bun's `port`) | `(DOMString or unsigned short)` | `DOMStringOrUnsignedShort`, or a `String` or `Nat` through its `Coe` instances |
+| a generic parameter (`Addr`, `WebSocketData`) | its one instantiation (`Addr` = `NetAddr`; a second fails the lowering) | — |
+| `ServeTcpOptions \| (ServeTcpOptions & TlsCertifiedKeyPem)` as a parameter | one overload per alternative; the intersection a dictionary inheriting the first | `serveWithOptions`, `serveWithTlsOptions` |
+| overloads of one function | Lasm.JS.Web's overload naming: the first keeps the name, the others add their first differing argument | `serve`, `serveWithOptions`, `serveWithTlsOptions` |
+
+The generated functions look the runtime's global up when called, so a program
+that imports `Lasm.JS.Deno` still builds (and runs its other code) on Node. A
+hand-written `@[js "globalThis" "Deno.serve"]` binding would not: `lasm build`
+checks every `@[js]` export on Node, where `Deno` does not exist.
+
+The functions of the runtime's global object are at the top of the module's
+namespace (`Lasm.JS.Deno.serve`, called as `Deno.serve` after `open Lasm.JS`), and
+every doc comment quotes the member's TypeScript declaration before its WebIDL.
+
+### Node: an npm adapter
+
+Node has no server that takes a web `Request`, and Lasm adds no API for one:
+install an adapter and bind it with `@[js]`. `@hono/node-server` (MIT) is one:
+its `serve({fetch, port, hostname}, listening)` calls `fetch` with a `Request`
+and sends the `Response` it resolves to.
+
+```sh
+npm install @hono/node-server hono    # hono is its peer dependency
+```
+
+```lean
+import Lasm.JS                -- the @[js] attribute
+import Lasm.JS.Web
+open Lasm.JS Lasm.JS.Web
+
+/-- `serve(options, listeningListener)` of @hono/node-server; returns the Node server. -/
+@[js "@hono/node-server" "serve"] opaque nodeServe : Data → Value → IO Value
+
+def main : IO Unit := do
+  let fetch ← Function.ofFn1 handle                     -- Request → Async Response, as above
+  let listening ← Function.ofFn fun _ => do IO.println "listening on 3000"; return .undefined
+  let _server ← nodeServe (obj [("fetch", toJS fetch), ("port", toJS 3000)]) listening
+  waitForever
+```
+
+The same `handle` then runs on Node, Deno (`Deno.serve`), Bun (`Bun.serve`) and
+Workers (`exportDefault`). A program built for several targets lists the adapter
+in `package.json`'s `"lasm": {"edge": {"exclude": ["@hono/node-server"]}}`, so
+that the Deno, Bun and edge builds leave it out (as the `hono` template does).
+
+### Where it runs, tests and cost
+
+[`test/fixtures/js-serve`](../test/fixtures/js-serve) is one program run on Node,
+Bun and Deno: each serves `App.handle` with its own server (Deno.serve with
+options, the defaults and TLS; Bun.serve; @hono/node-server on Node) on
+127.0.0.1, and requests it with Lasm.JS.Web's `fetch`. Its properties: an echo of
+generated Unicode bodies returns them with their content type; a computed JSON
+answer for generated inputs; status codes for unknown paths, bad input and a
+throwing handler (the server's error handler, or the runtime's 500); ten
+concurrent slow requests finish together (`Async` handlers hold no thread); the
+address, `onListen`, `info.remoteAddr`, `info.completed`, `requestIP`,
+`pendingRequests`, `server.fetch`, `reload`, the signal, `shutdown` and `stop` do
+what their declarations say; and every generated member exists on the live
+objects. Then [`test-serve.mjs`](../scripts/bindings/test-serve.mjs) builds
+[`Serve.lean`](../test/fixtures/js-serve/Serve.lean) for each runtime, starts it
+on a free port, requests it from another process and shuts it down through
+`/shutdown` (exit status 0). `web-bindings.yml` runs both.
+
+On 2026-11-10 (`web-bindings.yml` run 42918093803: Node 26.13.0, Bun 1.4.4,
+Deno 2.9.6, Linux x64) every check passed on Node (30) and Deno (75), and on Bun
+all but one of 51: `server.fetch(request)` calls the handler without its server
+argument, which the declaration says it passes
+([`known.json`](../test/fixtures/js-serve/known.json)). Every generated member
+exists on the live objects of both runtimes. End to end, all 9 checks passed on
+each of the three servers.
+
+- **Wasm size: about the same.** A one-route server through `Lasm.JS.Deno` or
+  `Lasm.JS.Bun`, against the same server with a hand-written call of
+  `Deno.serve` (the Lasm.JS.Web modules they import in both): 722,930 and
+  721,381 bytes of Wasm against 763,171 on Node; 601,746 and 600,131 against
+  585,764 on the edge runtime (`--target deno`), 2.7% more.
+- **Build time: no measurable change** for a new project with warm tools
+  (Node 21.1 s for the baseline, 18.2 and 19.8 s; the edge runtime 17.9 s, 16.4
+  and 16.7 s).
+- **Package size:** the compiled library (`library/prebuilt`) grows by 2.6 MB
+  (1.9 MB of `.olean` files), 0.6 MB compressed.
+
+### Pinned versions and drift
+
+The declaration files are fetched from `raw.githubusercontent.com` at the
+release tags (`denoland/deno` `v2.9.6`; `oven-sh/bun` `bun-v1.4.4`, whose
+`packages/bun-types` files are byte-identical to the npm package `bun-types`
+1.4.4) and checked against SHA-256 hashes in
+[`serve-api.lock.json`](../scripts/bindings/serve-api.lock.json). They are the
+versions of Deno and Bun that CI runs. `web-bindings.yml` fails when
+`deno.idl`, `bun.idl` or the generated modules differ from what the pinned files
+give. To move to newer versions: change `version` and `tag` in
+`serve-tier2.mjs`, run `node scripts/bindings/serve-api.mjs --update-lock`, then
+`node scripts/bindings/generate-web.mjs`; decide every new member or overload
+the lowering reports, regenerate `library/prebuilt` (`library-prebuilt.yml`) and
+review the diff of the IDL files.
+
 ## Worked examples (all built and run by CI)
 
 - [examples/js-crud](../examples/js-crud) is one Lean API on **Express**

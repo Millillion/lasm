@@ -120,6 +120,47 @@ decisions themselves are logged with their reasoning in
     npm adapter, per your 2026-11-10 direction), and async iteration (`glob`,
     `watch`, `opendir`).
 
+- [ ] **`Lasm.JS.Deno` and `Lasm.JS.Bun` (tier 2, second part; 2026-11-10) are
+  generated from the runtimes' own TypeScript declarations** (Deno 2.9.6's
+  `lib.deno.ns.d.ts`/`lib.deno_net.d.ts`, Bun 1.4.4's `bun-types`), pinned by hash
+  ([DECISIONS.md](DECISIONS.md), 2026-11-10;
+  [JS_BINDINGS.md](JS_BINDINGS.md#servers-on-javascript-runtimes-lasmjsdeno-lasmjsbun-and-node)).
+  API-shape choices to review:
+  - **Overload names follow Lasm.JS.Web's rule**: `Deno.serve handler`,
+    `Deno.serveWithOptions options handler`, `Deno.serveWithTlsOptions tlsOptions handler`
+    (the TLS form is the `ServeTcpOptions & TlsCertifiedKeyPem` alternative, split
+    into its own function and structure `ServeTcpTlsOptions`).
+  - **Callback types are named after the member** where the declaration has no
+    alias: Deno's `ServeHandler` (an alias), but `ServeOptionsOnListen`,
+    `ServeOptionsOnError`, and Bun's `ServeOptionsFetch`, `ServeOptionsError`.
+    A hand-picked name (`Bun.FetchHandler`) would be nicer and less mechanical.
+  - **Bun's `Serve.Options` is one structure `ServeOptions`** with `fetch` required
+    (the TCP and `fetch` alternatives of its `XOR<…>` types); `port` is the declared
+    `string | number` (`DOMStringOrUnsignedShort`, a `Nat` coerces).
+  - **Plain-data results are structures, objects the runtime keeps are handles**:
+    `NetAddr` and `SocketAddress` are copied structures (`(← server.addr).port`),
+    `HttpServer`, `Server` and `ServeHandlerInfo` handles. Plain objects reach a
+    callback copied, so they cannot be handles there. The choice is per
+    declaration in `serve-tier2.mjs` (`as`), since TypeScript does not say which.
+  - **Numbers the doc comments call ports, counts or sizes are `Nat`**, others
+    `Float` (none in this cut).
+  - **Left out**: Unix sockets, WebSockets (Tandem's proposal), Bun's `routes`,
+    `tls`, `development`, the handler-inside-options overloads; experimental
+    members never (Bun's `http2`/`http3`, Deno's VSOCK).
+  - **Two Lasm.JS findings, not changed here**: Lasm.JS's functions are variadic
+    (`length` 0), and `Deno.serve` calls a zero-length handler without its
+    request, so the generated callbacks set `length` to their arity; a general
+    `Function.ofFn` arity would fix it for hand-written handlers too. And
+    `lasm build` checks `@[js "globalThis" "Deno.…"]` bindings on Node, where
+    `Deno` does not exist, so a hand-written binding of a Deno- or Bun-only global
+    fails the build (the generated ones look the global up at run time).
+  - **Bun deviates from its declaration**: `server.fetch(request)` calls the handler
+    without the `server` argument, so a generated handler rejects there
+    (`known.json`).
+  - **Node**: no Lasm API; `@hono/node-server`'s `serve({fetch})` bound with
+    `@[js]` in the user's program, documented in JS_BINDINGS.md and exercised in
+    CI. A user-facing helper (or a template change) is yours to decide.
+
 ### Host bindings: `Lasm.Fastly` generated, `Lasm.WASI.*` next (decided by Jordan, 2026-11-10)
 - [x] **Decided.** `Lasm.Fetch` is deleted entirely. Bindings are named for
   the host interface: `Lasm.JS.*`, `Lasm.WASI.*` (generated from the official
