@@ -1079,13 +1079,17 @@ like the library's, and its test cites `Lasm.Cli.Spec.…`. Since 2026-11-11:
 `responseFile` (src/platform.mjs), `replaceCoreModule` and
 `withoutComponentType` (src/wasi/wasi-component.mjs), and
 `initializationSchedule` and `compactInitializerWrappers`
-(src/edge/edge-initializers.mjs), with `numbers_le64`,
+(src/edge/edge-initializers.mjs), and `builtinModuleClosure`
+(src/edge/builtin-modules.mjs; the differential writes the builtin files in
+every import form, with decoys), with `numbers_le64`,
 `changed_files_exact`, `response_file_round_trip`,
 `replace_one_core_module`, `drops_only_component_type` and
 `schedule_reached_kept_first` (the depth-first walk is correct on acyclic
 call graphs) proved. The
-differential of `replaceCoreModule` found its first bug: a section whose size
-was a padded LEB128 was spliced at the wrong offset. The fuzz
+differentials have found three bugs: `replaceCoreModule` spliced a section
+whose size was a padded LEB128 at the wrong offset, and
+`builtinModuleClosure` missed side-effect imports (`import './x.mjs'`) and
+read an import commented out after a statement as real. The fuzz
 targets `serverless-http`, `lasm-js-wire` and `ui-decode` are the model
 differentials of src/serverless/, the Lasm.JS codec and the UI applier's
 reading.

@@ -24,6 +24,7 @@ import { numbers } from '../../src/node-host.mjs';
 import { responseFile } from '../../src/platform.mjs';
 import { replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 import { compactInitializerWrappers, initializationSchedule } from '../../src/edge/edge-initializers.mjs';
+import { builtinModuleClosure } from '../../src/edge/builtin-modules.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const cliRoot = join(root, 'verification', 'cli');
@@ -74,6 +75,25 @@ function plan(r) {
   return { schema: 1, closure: [...new Set(names)], keep: names.filter(() => r.next() < 0.5), calls };
 }
 const callsEntries = calls => Object.entries(calls);
+
+/** Every way a builtin module may import another (relativeImport's forms),
+ * and lines that import nothing builtin. */
+const importForms = [n => `import { x } from './${n}.mjs';`, n => `import * as m from "./${n}.mjs"`, n => `  export { y } from './${n}.mjs';  `,
+  n => `export * from "./${n}.mjs";`, n => `import d, { e as f } from './${n}.mjs';`, n => `import g from'./${n}.mjs'`,
+  n => `import {\n  a,\n  b,\n} from './${n}.mjs';`, n => `import './${n}.mjs';`, n => `import"./${n}.mjs"`];
+const decoys = ["import { z } from 'node:fs';", "// import { x } from './a.mjs';", "const m = await import('./b.mjs');", 'export const v = 1;',
+  'export const w = 2', "/* import './c.mjs' */"];
+
+/** A directory of builtin modules with random imports (cycles included),
+ * the import relation it encodes, and requested specifiers. */
+function builtins(r) {
+  const names = [...new Set(r.array(r.int(1, 8), (_, i) => `m${i}${r.pick(['', '-x', 'b'])}`))];
+  const imports = names.map(() => r.array(r.int(0, 3), () => r.pick(names)));
+  const files = Object.fromEntries(names.map((name, i) => [name + '.mjs',
+    [...(r.next() < 0.5 ? [r.pick(decoys)] : []), ...imports[i].map(j => r.pick(importForms)(j)), r.pick(decoys)].join('\n') + '\n']));
+  const specifiers = [...r.array(r.int(0, 4), () => 'lasm:' + r.pick(names)), ...r.array(r.int(0, 2), () => r.pick(['hono', 'node:fs', './local.mjs']))];
+  return { files, imports: names.map((name, i) => ['lasm:' + name, imports[i].map(j => 'lasm:' + j)]), specifiers: r.next() < 0.5 ? specifiers.reverse() : specifiers };
+}
 
 /** Each model: the JavaScript module and function it mirrors, the Lean
  * module, a generator, the JavaScript's answer and the request's input,
@@ -152,6 +172,20 @@ export const models = [
     input: p => ({ closure: p.closure, keep: p.keep, calls: callsEntries(p.calls) }),
     js: p => {
       try { return { source: compactInitializerWrappers(p) }; } catch (error) { return { error: error.message }; }
+    },
+  },
+  {
+    name: 'builtinModuleClosure', source: 'src/edge/builtin-modules.mjs', lean: 'Lasm.Cli.Model.BuiltinModules',
+    generate: builtins,
+    input: ({ imports, specifiers }) => ({ imports, specifiers }),
+    js: ({ files, specifiers }) => {
+      const directory = mkdtempSync(join(tmpdir(), 'lasm-builtins-'));
+      try {
+        for (const [name, text] of Object.entries(files)) writeFileSync(join(directory, name), text);
+        return builtinModuleClosure(specifiers, directory);
+      } finally {
+        rmSync(directory, { recursive: true, force: true });
+      }
     },
   },
 ];
