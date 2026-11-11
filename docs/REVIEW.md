@@ -331,6 +331,12 @@ decisions themselves are logged with their reasoning in
     stand-ins for the JavaScript functions until each has a Lean model; two
     more library candidates (Lasm.Serverless, Lasm.UI) bring the library to 12.
 - [ ] The exit bar for "rock solid" ([§7](TESTING_STRATEGY.md#7-exit-bar-rock-solid)): eight measurable conditions.
+  - How items 3, 5 and 6 are measured (2026-11-11, DECISIONS.md): a 0 % file
+    fails the unit suite unless the coverage baseline names the workflows that
+    run it (the baseline is now 98.05 %); the 14-day quarantine window comes
+    from `test/quarantine.json`'s git history; "every platform it claims" is
+    the platform tables of the five flagship apps' READMEs, each row with the
+    CI jobs that run the app's outside oracle (`scripts/evidence/apps.json`).
 - [ ] The reduction and verification path ([proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md)):
   - Lean is recommended over Rust for the rewrite.
   - Translation validation for wasm-ld and Binaryen.
