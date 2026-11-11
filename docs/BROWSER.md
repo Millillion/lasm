@@ -257,7 +257,7 @@ it directly. It is Lasm's own loader, not a web standard, so it is written by
 hand (it was `Lasm.Web.App`).
 
 The hand-written `Lasm.Web` and its JavaScript side `lasm:web` were removed on
-2026-11-10; [the release notes](release/next-notes.md) map each of its functions
+2026-11-10; [the release notes](release/0.7.0-notes.md) map each of its functions
 to the generated binding.
 
 ## Vite (`@lasm/cli/vite`, measured in CI)

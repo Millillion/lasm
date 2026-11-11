@@ -250,7 +250,7 @@ decisions themselves are logged with their reasoning in
   - *Spec ahead of browsers:* CSSOM View now types `scrollIntoView` and `scroll`
     as returning `Promise<ScrollResult>`; browsers return `undefined`, which the
     generated `Async` accepts (checked in CI).
-- The old-to-new table is in [release/next-notes.md](release/next-notes.md).
+- The old-to-new table is in [release/0.7.0-notes.md](release/0.7.0-notes.md).
 - Tandem still uses `Lasm.Web.WebSocket`: it pins the published `@lasm/cli`
   0.5.1, so it migrates when it moves to the release with the browser tier
   (ROADMAP.md).
@@ -348,6 +348,11 @@ decisions themselves are logged with their reasoning in
 - [ ] **0.6.1's breaking change** (from the unpublished 0.6.0): `Lasm.JS.Wire.encode` returns `Except String ByteArray`
   instead of `ByteArray`, so a length that does not fit 32 bits fails instead
   of being misread (#154; [0.6.1-notes.md](release/0.6.1-notes.md)).
+- [ ] **0.7.0's breaking changes:** `Lasm.Web` is deleted (replaced by the
+  generated `Lasm.JS.Web.Browser`; its mount glue is `Lasm.UI.Mount`), and
+  `Lasm.Fastly`'s five hand-written store calls give way to the generated host
+  ABI. `Lasm.Fetch` still ships and is scheduled for removal in a later
+  release ([0.7.0-notes.md](release/0.7.0-notes.md)).
 
 ### Process
 - [ ] **The browser dev-rebuild budget is 2.5 s, was 2 s (2026-11-09).** It

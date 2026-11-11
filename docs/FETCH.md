@@ -193,7 +193,7 @@ KvStore.lookupWaitV2 (← KvStore.lookup (← KvStore.open "kv") "key" {} {})   
 ```
 
 The hand-written `configGet`, `secretGet`, `kvGet`, `kvPut` and `kvDelete` are
-gone; [the release notes](release/next-notes.md) map each to its replacement.
+gone; [the release notes](release/0.7.0-notes.md) map each to its replacement.
 
 The [Fastly guide](deploy/fastly.md#stores) shows the `fastly.toml` that
 Viceroy reads them from.

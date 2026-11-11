@@ -697,7 +697,7 @@ imports a browser one).
   mounted app in `Lasm.UI.Mount.onUnmount` ([BROWSER.md](BROWSER.md)). The
   mount glue (`Mount.root Element`, flags, ports) is `Lasm.UI.Mount`.
 - They replace the hand-written `Lasm.Web` (removed 2026-11-10);
-  [release/next-notes.md](release/next-notes.md) maps each of its functions.
+  [release/0.7.0-notes.md](release/0.7.0-notes.md) maps each of its functions.
 
 **Cost** (`web-bindings.yml --sizes`, run of 2026-11-10 on PR #193: the same
 program through `Lasm.JS` alone, `Lasm.JS.Web`, and `Lasm.JS.Web.Browser`).
