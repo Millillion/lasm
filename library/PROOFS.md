@@ -123,18 +123,18 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 
 | Proposition | In plain English |
 | --- | --- |
-| [`dispatch_other`](Lasm/RPC/Spec.lean#L91) | **Other paths are left to the program.** For a request whose path is not `/rpc/<name>` (one segment after `rpc`), `dispatch` gives no answer, whatever its method and body: the program answers it. |
-| [`dispatch_route`](Lasm/RPC/Spec.lean#L98) | **`POST /rpc/<name>` runs the route of that name.** For a `POST` to `/rpc/<name>`, `dispatch` runs the first route named `name` on the request body and answers its status and JSON body, never cached. |
-| [`dispatch_unknown`](Lasm/RPC/Spec.lean#L105) | **An unknown endpoint answers 404.** A `POST` to `/rpc/<name>` when no route has that name answers status 404, and runs no route. |
-| [`dispatch_method`](Lasm/RPC/Spec.lean#L112) | **Only `POST` reaches an endpoint.** Any other method on `/rpc/<name>` answers 405 with `allow: POST`, and runs no route. |
+| [`dispatch_other`](Lasm/RPC/Spec.lean#L88) | **Other paths are left to the program.** A request whose path is not `/rpc/<name>` (one segment after `rpc`) gets no answer from `dispatch`, whatever its method and body: the program answers it. |
+| [`dispatch_route`](Lasm/RPC/Spec.lean#L95) | **`POST /rpc/<name>` runs the route of that name.** For a `POST` to `/rpc/<name>`, `dispatch` runs the first route named `name` on the request body and answers its status and JSON body, never cached. |
+| [`dispatch_unknown`](Lasm/RPC/Spec.lean#L103) | **An unknown endpoint answers 404.** A `POST` to `/rpc/<name>` when no route has that name answers status 404, and runs no route. |
+| [`dispatch_method`](Lasm/RPC/Spec.lean#L110) | **Only `POST` reaches an endpoint.** Any other method on `/rpc/<name>` answers 405 with `allow: POST`, and runs no route. |
 
 ### The client
 
 | Proposition | In plain English |
 | --- | --- |
-| [`call_invalid`](Lasm/RPC/Spec.lean#L122) | **An invalid request is never sent.** When `validate` refuses a request with message `m`, the command `call` performs no HTTP request: its only effect delivers `Error.invalid m` to the app. |
-| [`call_valid`](Lasm/RPC/Spec.lean#L130) | **A valid request is sent once, as JSON, to its endpoint.** When `validate` accepts a request, the command `call` performs exactly one effect: a `POST` of the encoded request to `base ++ e.path` (`base` followed by `/rpc/<name>`) with a JSON content type. A network failure reaches the app as `Error.network`, and any answer as the endpoint's reading of its status and body (`decodeResponse`). |
-| [`decodeResponse_not_network`](Lasm/RPC/Spec.lean#L146) | **Reading an answer never claims a network failure.** Whatever status and body the server answers, `decodeResponse` never reports `Error.network`: that error means only that no answer arrived. |
+| [`call_invalid`](Lasm/RPC/Spec.lean#L119) | **An invalid request is never sent.** When `validate` refuses a request with message `m`, the command `call` performs no HTTP request: its only effect delivers `Error.invalid m` to the app. |
+| [`call_valid`](Lasm/RPC/Spec.lean#L127) | **A valid request is sent once, as JSON, to its endpoint.** When `validate` accepts a request, the command `call` performs exactly one effect: a `POST` of the encoded request to `base ++ e.path` (`base` followed by `/rpc/<name>`) with a JSON content type. A network failure reaches the app as `Error.network`, and any answer as the endpoint's reading of its status and body (`decodeResponse`). |
+| [`decodeResponse_not_network`](Lasm/RPC/Spec.lean#L143) | **Reading an answer never claims a network failure.** Whatever status and body the server answers, `decodeResponse` never reports `Error.network`: that error means only that no answer arrived. |
 
 ## Lasm.KV (6)
 
