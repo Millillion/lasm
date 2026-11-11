@@ -428,8 +428,8 @@ def R2Object.httpMetadata (self : R2Object) : IO (Option R2HTTPMetadata) := self
 
 /-- `readonly customMetadata?: Record<string, string>`: `readonly attribute record<DOMString, DOMString>? customMetadata` -/
 def R2Object.customMetadata (self : R2Object) : IO (Option (Record String)) := do
-  let r ← self.val.get "customMetadata" (Option Value)
-  (fun r => r.mapM (Support.recordOf String)) r
+  let r ← self.val.get "customMetadata" Data
+  Support.optionalRecordOf String r
 
 /-- `readonly range?: R2Range`: `readonly attribute R2Range? range` -/
 def R2Object.range (self : R2Object) : IO (Option R2Range) := self.val.get "range" (Option R2Range)
@@ -476,28 +476,28 @@ def R2ObjectBody.blob (self : R2ObjectBody) : Async Blob := do
 
 /-- `readonly md5?: ArrayBuffer`: `readonly attribute ArrayBuffer? md5` -/
 def R2Checksums.md5 (self : R2Checksums) : IO (Option ByteArray) := do
-  let r ← self.val.get "md5" (Option Value)
-  (fun x => x.mapM Support.arrayBufferBytes) r
+  let r ← self.val.get "md5" Data
+  Support.nullableArrayBufferBytes r
 
 /-- `readonly sha1?: ArrayBuffer`: `readonly attribute ArrayBuffer? sha1` -/
 def R2Checksums.sha1 (self : R2Checksums) : IO (Option ByteArray) := do
-  let r ← self.val.get "sha1" (Option Value)
-  (fun x => x.mapM Support.arrayBufferBytes) r
+  let r ← self.val.get "sha1" Data
+  Support.nullableArrayBufferBytes r
 
 /-- `readonly sha256?: ArrayBuffer`: `readonly attribute ArrayBuffer? sha256` -/
 def R2Checksums.sha256 (self : R2Checksums) : IO (Option ByteArray) := do
-  let r ← self.val.get "sha256" (Option Value)
-  (fun x => x.mapM Support.arrayBufferBytes) r
+  let r ← self.val.get "sha256" Data
+  Support.nullableArrayBufferBytes r
 
 /-- `readonly sha384?: ArrayBuffer`: `readonly attribute ArrayBuffer? sha384` -/
 def R2Checksums.sha384 (self : R2Checksums) : IO (Option ByteArray) := do
-  let r ← self.val.get "sha384" (Option Value)
-  (fun x => x.mapM Support.arrayBufferBytes) r
+  let r ← self.val.get "sha384" Data
+  Support.nullableArrayBufferBytes r
 
 /-- `readonly sha512?: ArrayBuffer`: `readonly attribute ArrayBuffer? sha512` -/
 def R2Checksums.sha512 (self : R2Checksums) : IO (Option ByteArray) := do
-  let r ← self.val.get "sha512" (Option Value)
-  (fun x => x.mapM Support.arrayBufferBytes) r
+  let r ← self.val.get "sha512" Data
+  Support.nullableArrayBufferBytes r
 
 /-- `toJSON(): R2StringChecksums`: `R2StringChecksums toJSON()` -/
 def R2Checksums.toJSON (self : R2Checksums) : IO R2StringChecksums :=

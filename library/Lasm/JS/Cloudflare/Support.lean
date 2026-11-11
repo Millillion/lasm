@@ -30,6 +30,19 @@ def recordOf (α : Type) [FromJS α] (v : Value) : IO (Lasm.JS.Web.Record α) :=
     #[.ref v ""] (await := false)
   return ⟨entries⟩
 
+/-- A nullable record result, read as data: `none` for null or undefined, a plain object's
+fields, or `Object.entries` of an object that is not plain (`recordOf`). -/
+def optionalRecordOf (α : Type) [FromJS α] : Data → IO (Option (Lasm.JS.Web.Record α))
+  | .null | .undefined => pure none
+  | .ref v _ => some <$> recordOf α v
+  | .object fields => do
+    let entries ← fields.mapM fun (k, d) => do
+      match (FromJS.fromJS d : Except String α) with
+      | .ok x => pure (k, x)
+      | .error e => throw (IO.userError s!"record field {k}: expected {FromJS.typeName α}, got {d.describe}{if e.isEmpty then "" else s!" ({e})"}")
+    return some ⟨entries⟩
+  | d => throw (IO.userError s!"expected an object or null, got {d.describe}")
+
 /-- `Array.from(map)`, read as a record of `α`: a JavaScript `Map` with string keys
 (`DurableObjectStorage.list`, `get` of several keys), in its iteration order (Durable
 Object storage returns keys in sorted order). -/

@@ -543,7 +543,9 @@ function reqType(t) {
   if (otherView(t)) return 'Data';
   switch (t.k) {
   case 'arraybuffer': return 'Value';
-  case 'nullable': return needsPost(t.inner) ? `Option ${paren(reqType(t.inner))}` : retType(t);
+  // A nullable ArrayBuffer is read as data: a reference-mode result (Value) is a reference
+  // for null too, so Option Value is never none.
+  case 'nullable': return t.inner.k === 'arraybuffer' ? 'Data' : needsPost(t.inner) ? `Option ${paren(reqType(t.inner))}` : retType(t);
   case 'seq': return needsPost(t.inner) ? `Array ${paren(reqType(t.inner))}` : retType(t);
   case 'union': return unionRead(unions.get(t.key)) === 'decode' ? 'Data' : retType(t);
   default: return retType(t);
@@ -555,7 +557,9 @@ function postFn(t) {
   if (otherView(t)) return 'Support.viewBytes';
   switch (t.k) {
   case 'arraybuffer': return 'Support.arrayBufferBytes';
-  case 'nullable': case 'seq': return `(fun x => x.mapM ${postFn(t.inner)})`;
+  case 'nullable': if (t.inner.k === 'arraybuffer') return 'Support.nullableArrayBufferBytes';
+    return `(fun x => x.mapM ${postFn(t.inner)})`;
+  case 'seq': return `(fun x => x.mapM ${postFn(t.inner)})`;
   case 'union': return `${unions.get(t.key).name}.decode`;
   }
 }
@@ -735,9 +739,10 @@ function resultOf(idlType, member = null) {
   if (dict.k === 'dict' && dictReadable(dict.name) && holdsRecord(dict)) return { async, t, lean, req: 'Value', post: `Support.cloneAs ${paren(lean)}` };
   // A record result is read through Object.entries (Lasm.JS.Node.Support.recordOf): Node's
   // process.env is not a plain object, and Deno's is a Proxy that structuredClone rejects.
-  // A nullable record (D1's first(), R2's customMetadata) is none for null or undefined.
+  // A nullable record (D1's first(), R2's customMetadata) is read as data, none for null or
+  // undefined (Option Value would be a reference to null).
   if (dict.k === 'record' && !needsPost(dict.inner)) return t.k === 'nullable'
-    ? { async, t, lean, req: '(Option Value)', post: `(fun r => r.mapM (Support.recordOf ${paren(retType(dict.inner))}))` }
+    ? { async, t, lean, req: 'Data', post: `Support.optionalRecordOf ${paren(retType(dict.inner))}` }
     : { async, t, lean, req: 'Value', post: `Support.recordOf ${paren(retType(dict.inner))}` };
   return { async, t, lean, req: paren(reqType(t)), post: postFn(t) };
 }

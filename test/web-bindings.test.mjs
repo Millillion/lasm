@@ -240,10 +240,13 @@ test('every Lasm.JS.Cloudflare selection is generated, and no exclusion is', () 
     for (const [, imported] of text.matchAll(/^import (Lasm\.\S+)$/gm))
       assert.match(imported, /^Lasm\.JS\.(Cloudflare\.|Web\.(Support|Dom|Streams|File|Url|Fetch)$)/, `${f} imports ${imported}`);
   }
-  // A nullable record result (D1's first() of no row is null) is read as an optional
-  // reference before Object.entries, which throws on null.
+  // Nullable record and ArrayBuffer results (D1's first() of no row, KV's get of a missing
+  // key: null) are read as data: Option Value would be a reference to null, never none.
   const d1 = readFileSync(new URL('../library/Lasm/JS/Cloudflare/D1.lean', import.meta.url), 'utf8');
-  assert.match(d1, /callMethodAwait "first" \(Support\.args #\[\]\) \(Option Value\)\n {2}\(\(fun r => r\.mapM \(Support\.recordOf Data\)\) r : IO _\)/);
+  assert.match(d1, /callMethodAwait "first" \(Support\.args #\[\]\) Data\n {2}Support\.optionalRecordOf Data r/);
+  const kv = readFileSync(new URL('../library/Lasm/JS/Cloudflare/Kv.lean', import.meta.url), 'utf8');
+  assert.match(kv, /toJS "arrayBuffer"\]\) Data\n {2}Support\.nullableArrayBufferBytes r/);
+  for (const text of [d1, kv]) assert.doesNotMatch(text, /\(Option Value\)/);
   const idl = readFileSync(new URL('../scripts/bindings/cloudflare.idl', import.meta.url), 'utf8');
   assert.match(idl, /D1Database\.dump: @deprecated in its declaration/);
   assert.match(idl, /\[LasmHost="Cloudflare", LasmLeanModule="Sockets", LasmModule="cloudflare:sockets", LasmPath=""\]\nnamespace Cloudflare_cloudflare_sockets/);

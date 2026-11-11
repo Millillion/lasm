@@ -192,6 +192,11 @@ def kv (r : Checks) (live : Live) (env : Data) : Async Unit := do
       let read ← readAll s
       expect r s!"kv getStream [{i}]" (bytesEq read b) s!"{read.size} bytes (wrote {b.size})"
     | none => expect r s!"kv getStream [{i}]" false "none"
+  -- A key never written: getArrayBuffer and getStream answer null (none)
+  let absentBytes ← ns.getArrayBuffer "bytes/absent"
+  expect r "kv getArrayBuffer of a missing key" absentBytes.isNone s!"{absentBytes.map ByteArray.size}"
+  let absentStream ← ns.getStream "bytes/absent"
+  expect r "kv getStream of a missing key" absentStream.isNone ""
   -- getJson parses the stored JSON text
   ns.put "json" (.domString "{\"a\":[1,\"x\"],\"b\":null}")
   let j ← ns.getJson "json"

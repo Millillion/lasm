@@ -125,8 +125,8 @@ def KVNamespace.getJson (self : KVNamespace) (key : String) : Async Data :=
 
 /-- `get(key: Key, type: 'arrayBuffer'): Promise<ArrayBuffer | null>`: `Promise<ArrayBuffer?> get(DOMString key, DOMString type)` -/
 def KVNamespace.getArrayBuffer (self : KVNamespace) (key : String) : Async (Option ByteArray) := do
-  let r ← self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "arrayBuffer"]) (Option Value)
-  ((fun x => x.mapM Support.arrayBufferBytes) r : IO _)
+  let r ← self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "arrayBuffer"]) Data
+  Support.nullableArrayBufferBytes r
 
 /-- `get(key: Key, type: 'stream'): Promise<ReadableStream | null>`: `Promise<ReadableStream?> get(DOMString key, DOMString type)` -/
 def KVNamespace.getStream (self : KVNamespace) (key : String) : Async (Option ReadableStream) :=
