@@ -94,6 +94,18 @@ class World {
         throw error;
       }
     };
+    // DEBUG #206 (temporary)
+    const dbgAll = this.store.all.bind(this.store);
+    this.store.all = (sql, params) => {
+      const rows = dbgAll(sql, params);
+      if (/FROM (access_tokens|revoked_families|refresh_tokens|commits)\b/.test(sql)) this.trace.log(`DBG read ${/FROM (\w+)/.exec(sql)[1]} ${String(params?.[0]).slice(0, 10)} -> ${rows.length} ${rows.length ? JSON.stringify(rows[0]).slice(0, 200) : ''}`);
+      return rows;
+    };
+    const dbgBatch = this.store.batch.bind(this.store);
+    this.store.batch = stmts => {
+      this.trace.log(`DBG batch ${stmts.slice(5).map(([q, p]) => `${/^\s*(\w+(?: OR IGNORE)? \w+ \w+)/.exec(q)?.[1]} ${String(p?.[0]).slice(0, 10)}${/revoked_families|access_tokens|refresh_tokens/.test(q) ? ` fam=${String(p?.[1]).slice(0, 10)}` : ''}`).join('; ')}`);
+      return dbgBatch(stmts);
+    };
     // Seconds of offset of the server's clock (jumps), and of each racing instance.
     this.offset = 0;
     this.instanceSkew = [0, 1, 2, 3].map(() => (p.skew ? this.chaos.range(-30, 30) : 0));
