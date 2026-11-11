@@ -149,6 +149,11 @@ install through `scripts/ci/apt-cache.sh`:
   `.deb` files are copied and saved. If any installed package's `.deb` is
   missing, nothing is saved and the next run uses the mirror again.
 - If installing cached files fails, the script falls back to the mirror.
+- Before a miss uses the mirror, the script checks that the image's mirror
+  host (`azure.archive.ubuntu.com`, through `/etc/apt/apt-mirrors.txt`)
+  resolves; when it does not, or an install attempt fails, apt is pointed at
+  `archive.ubuntu.com` and `security.ubuntu.com` directly, so a cache can be
+  populated during an Azure mirror outage.
 
 The packages installed are the same as before; only where they come from
 changes, so no test loses coverage. `scripts/fuzz/ensure-libfuzzer.sh` still

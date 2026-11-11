@@ -9,7 +9,9 @@
 # is skipped. Otherwise (or when dpkg fails) COMMAND runs, up to ATTEMPTS
 # times, with apt keeping what it downloads; the .deb files of every package it
 # installed or upgraded are then copied into DIR and `save=true` is written to
-# GITHUB_OUTPUT so the action saves DIR. Not Linux: COMMAND runs as is.
+# GITHUB_OUTPUT so the action saves DIR. When the image's Azure apt mirror
+# does not resolve, or an attempt fails, apt is pointed at archive.ubuntu.com
+# and security.ubuntu.com directly. Not Linux: COMMAND runs as is.
 set -euo pipefail
 dir="$1"; attempts="$2"; shift 2; [ "${1:-}" = -- ] && shift
 out="${GITHUB_OUTPUT:-/dev/null}"
@@ -43,6 +45,26 @@ if [ -f "$dir/manifest" ]; then
 fi
 rm -rf "$dir"; mkdir -p "$dir"
 
+# The runner image points apt at azure.archive.ubuntu.com (through
+# /etc/apt/apt-mirrors.txt). When that host does not resolve (2026-11-11),
+# point apt at archive.ubuntu.com and security.ubuntu.com directly.
+direct_mirrors() {
+  echo "apt-cache: using archive.ubuntu.com and security.ubuntu.com directly"
+  printf 'http://archive.ubuntu.com/ubuntu/\tpriority:1\nhttp://security.ubuntu.com/ubuntu/\tpriority:2\n' | sudo tee /etc/apt/apt-mirrors.txt >/dev/null
+  for f in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do
+    [ -f "$f" ] || continue
+    sudo sed -i -E 's#mirror\+file:/etc/apt/apt-mirrors\.txt/?#http://archive.ubuntu.com/ubuntu/#g; s#https?://azure\.archive\.ubuntu\.com/ubuntu/?#http://archive.ubuntu.com/ubuntu/#g' "$f"
+  done
+  grep -rh '^URIs:\|^deb ' /etc/apt/sources.list /etc/apt/sources.list.d/ 2>/dev/null | sort | uniq -c || true
+  sudo apt-get update || true
+  mirrors_switched=1
+}
+mirrors_switched=0
+for host in azure.archive.ubuntu.com archive.ubuntu.com security.ubuntu.com; do
+  echo "apt-cache: $host -> $(getent ahosts "$host" | awk 'NR==1 { print $1 }' || true)"
+done
+getent hosts azure.archive.ubuntu.com >/dev/null || direct_mirrors
+
 before=$(installed)
 sudo apt-get clean
 printf 'APT::Keep-Downloaded-Packages "true";\nBinary::apt::APT::Keep-Downloaded-Packages "true";\nAcquire::Retries "5";\n' | sudo tee /etc/apt/apt.conf.d/81-lasm-apt-cache >/dev/null
@@ -51,7 +73,7 @@ for attempt in $(seq 1 "$attempts"); do
   [ "$attempt" = "$attempts" ] && { echo "::error::apt-cache: the install failed $attempts times and no cached .deb files exist for this runner image"; exit 1; }
   echo "::warning::apt-cache: install attempt $attempt of $attempts failed; retrying"
   sleep $((attempt * 20))
-  sudo apt-get update || true
+  if [ "$mirrors_switched" = 0 ]; then direct_mirrors; else sudo apt-get update || true; fi
 done
 
 new=$(comm -13 <(echo "$before") <(installed))
