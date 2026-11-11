@@ -59,7 +59,8 @@ def main : IO UInt32 := do
       if let some server ← handle.get then
         let _ : Value ← server.val.callMethod "stop" #[]
         pure ()
-    Node.serve { fetch := withShutdown stop, port := some port, hostname := some "127.0.0.1",
+    Node.serve {
+      fetch := withShutdown stop, port := some port, hostname := some "127.0.0.1",
       onListen := some fun server => do handle.set (some server); announce s!"listening {server.port}" }
   announce "stopped"
   return 0

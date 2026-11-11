@@ -296,7 +296,8 @@ def startNode (options : Node.ServeOptions) : Async (Node.Server × Task (Except
 
 def nodeServe (r : Checks) : Async Unit := do
   runSection r "node.serve" do
-    let (server, task) ← startNode { fetch := nodeExtras, port := some 0, hostname := some "127.0.0.1",
+    let (server, task) ← startNode {
+      fetch := nodeExtras, port := some 0, hostname := some "127.0.0.1",
       error := some fun e => App.text s!"handled: {e}" (status := 503) }
     let port := server.port
     -- The handle: the address listened on, the port chosen for port 0, its URL.
@@ -350,7 +351,7 @@ def typedExport (r : Checks) : Async Unit := do
 /-! Node: @hono/node-server's serve({fetch}) (an npm package the program installs) -/
 
 /-- `serve(options, listeningListener)` of @hono/node-server; returns the Node server. -/
-@[js "@hono/node-server" "serve"] opaque nodeServe : Data → Value → IO Value
+@[js "@hono/node-server" "serve"] opaque honoServe : Data → Value → IO Value
 
 def node (r : Checks) : Async Unit := do
   runSection r "node.honoNodeServer" do
@@ -362,7 +363,7 @@ def node (r : Checks) : Async Unit := do
       return .undefined
     -- The same App.handle, as the fetch function (Request → Promise<Response>).
     let fetch ← Function.ofFn1 App.handle
-    let server ← nodeServe (obj [("fetch", toJS fetch), ("port", toJS 0), ("hostname", toJS "127.0.0.1")]) onListen
+    let server ← honoServe (obj [("fetch", toJS fetch), ("port", toJS 0), ("hostname", toJS "127.0.0.1")]) onListen
     let some port ← waitFor listened | throw (IO.userError "not listening")
     served r "node" s!"http://127.0.0.1:{port}" 500
     let closed : IO.Promise Unit ← IO.Promise.new
