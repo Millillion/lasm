@@ -21,20 +21,37 @@ export function planCacheUpload(payloadBytes, reportedBytes, listedBytes) {
     includedAllowanceBytes: 10 * GiB, maximumAfterUpload: usedBytes + uploadUpperBound };
 }
 
-// Before an upload would cross the ceiling, the writer may evict its own
-// workflow's oldest caches (LASM_CACHE_EVICT_PREFIX, e.g. `node-candidate-`):
-// oldest last access first, never one accessed in the last `keepHours` (an
-// in-flight run may still restore it), until the upload fits. Returns the
-// caches to delete, or null when evicting every eligible one is not enough.
+// apt-debs-* caches (.github/actions/apt-cache) are saved on main only and
+// are regenerable; one is stale when it belongs to another ref (a pull
+// request's copy, readable by that pull request alone) or a newer main cache
+// of the same package set and runner image exists (a superseded ImageVersion).
+export function staleAptCaches(caches) {
+  const stem = key => key.replace(/-[^-]+$/, '');
+  const newest = new Map();
+  for (const c of caches)
+    if (c.key.startsWith('apt-debs-') && c.ref === 'refs/heads/main') {
+      const t = Date.parse(c.created_at ?? c.last_accessed_at), seen = newest.get(stem(c.key));
+      if (seen === undefined || t > seen) newest.set(stem(c.key), t);
+    }
+  return caches.filter(c => c.key.startsWith('apt-debs-') && (c.ref !== 'refs/heads/main'
+    || Date.parse(c.created_at ?? c.last_accessed_at) < newest.get(stem(c.key))));
+}
+
+// Before an upload would cross the ceiling, the writer may evict stale apt
+// caches (staleAptCaches) and then its own workflow's oldest caches
+// (LASM_CACHE_EVICT_PREFIX, e.g. `node-candidate-`): oldest last access first,
+// never one accessed in the last `keepHours` (an in-flight run may still
+// restore it), until the upload fits. Returns the caches to delete, or null
+// when evicting every eligible one is not enough.
 export function planEviction(caches, { payloadBytes, usedBytes, prefix, now = Date.now(), keepHours = 24, ceilingBytes = 8 * GiB }) {
-  if (!prefix) return null;
   const uploadUpperBound = Math.ceil(payloadBytes * 1.02) + 16 * 1024 ** 2;
-  const eligible = caches
-    .filter(c => c.key.startsWith(prefix) && now - Date.parse(c.last_accessed_at) > keepHours * 3600_000)
-    .sort((a, b) => Date.parse(a.last_accessed_at) - Date.parse(b.last_accessed_at) || a.id - b.id);
+  const old = c => now - Date.parse(c.last_accessed_at) > keepHours * 3600_000;
+  const byAccess = (a, b) => Date.parse(a.last_accessed_at) - Date.parse(b.last_accessed_at) || a.id - b.id;
+  const stale = staleAptCaches(caches).filter(old).sort(byAccess);
+  const own = prefix ? caches.filter(c => c.key.startsWith(prefix) && old(c)).sort(byAccess) : [];
   const evict = [];
   let used = usedBytes;
-  for (const cache of eligible) {
+  for (const cache of [...stale, ...own]) {
     if (used + uploadUpperBound <= ceilingBytes) break;
     evict.push(cache); used -= cache.size_in_bytes;
   }

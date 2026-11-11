@@ -6,6 +6,12 @@
 // Error, or a DOMException: the DOM refused a name or a move); never a TypeError or
 // RangeError, never a hang, and never an attribute named or valued
 // "undefined" that the input did not spell (a reference past the name table).
+// That last check is the proposition below, for the name `undefined`, of the
+// JavaScript decoder; the ui-decode target checks that decoder against the
+// Lean reference decoder (Lasm.UI.Decode) the proposition is about.
+// Proposition: Lasm.UI.Candidates.interned_from_table_or_bytes
+//   ∀ (table : List String) (bs : Decode.Bytes), ∀ x ∈ Decode.intern table bs,
+//     (x.1 ∈ table ∨ x.1.toUTF8.data.toList <:+: bs) ∧ (x.2.1 = table ∨ x.2.1 = table ++ [x.1])
 import { readFileSync } from 'node:fs';
 import { Window } from 'happy-dom';
 import { createUi } from '../../../src/lasm-modules/ui-dom.mjs';
