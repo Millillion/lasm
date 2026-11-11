@@ -40,7 +40,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | [Dependable tooling](#dependable-tooling) | Every user-triggerable error prints a clear message (error corpus); incremental, repeated, renamed and touched builds give the clean build's bytes (metamorphic); killed, offline, full-disk, read-only and corrupted runs end in success or a clear error (fault injection) | `scripts/tooling/`, `tooling.yml` | PR (corpus), nightly (all) |
 | [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage: the CLI's arguments, the function platforms' HTTP mapping, the Lasm.UI patch decoder, Lasm.Fetch's request parsing, Lasm.RPC's decoding, the WASI C host's CGI request | `test/fuzz/`, `fuzz.yml` | PR (replay), nightly, weekly |
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
-| [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
+| [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `examples/*/test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
 | [Named propositions](#named-propositions) | Every test that names a Lean proposition names one that exists and states it verbatim; every candidate (tested, not yet proved) names a test that cites it; every `forAll` property names one | `scripts/propositions.mjs`, `library/Lasm/*/Candidates.lean`, `verification/cli/`, `test/propositions.test.mjs` | PR (`unit.yml`) |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (`unit.yml`), nightly, release |
@@ -376,11 +376,11 @@ Node: equal statuses, equal response headers (apart from a documented list) and
 byte-equal bodies, once tokens and timestamps are normalized.
 
 `node test/api.mjs --equivalence` (in `examples/conduit`) puts a recording proxy
-([`test/equivalence.mjs`](../examples/conduit/test/equivalence.mjs)) between
+([`examples/conduit/test/equivalence.mjs`](../examples/conduit/test/equivalence.mjs)) between
 hurl and the server and fixes the suite's `UID_VAL`, so that on an empty store
 the names, slugs and ids are the same everywhere. `node test/equivalence.mjs
 compare NAME` then compares the normalized traffic with Node's, committed as
-[`test/equivalence/realworld.json`](../examples/conduit/test/equivalence/realworld.json).
+[`examples/conduit/test/equivalence/realworld.json`](../examples/conduit/test/equivalence/realworld.json).
 It aligns the two sequences by method and path (a hurl file stops at its first
 failed assertion, which must not shift every later comparison) and prints a
 line diff of each differing header block or pretty-printed body. Every Conduit
@@ -403,7 +403,7 @@ What is normalized, and why that is legitimate:
 
 Slugs, names and emails are **not** normalized: each run starts on an empty
 store with the same `UID_VAL`, so a different one is a real difference. Known differences, each with an open issue,
-go in [`test/equivalence/known.json`](../examples/conduit/test/equivalence/known.json)
+go in [`examples/conduit/test/equivalence/known.json`](../examples/conduit/test/equivalence/known.json)
 and are reported, not failed. `test/equivalence.mjs self-test` (in the
 `pinned` job) checks the normalizer and the diff on made-up traffic.
 
@@ -422,7 +422,7 @@ from the `api-node` job's artifact over the golden file.
 suite's traffic: a status, a header the app or the platform adapter sets, a
 body byte (key order, escaping, number formatting, error bodies), which user a
 token belongs to, a write a store lost. **What it cannot catch:** requests the
-suite does not send; behaviour under concurrency (`test/concurrency.mjs`);
+suite does not send; behaviour under concurrency (`examples/conduit/test/concurrency.mjs`);
 bugs that are the same on every target, Node included; timing.
 
 ### Standard bindings
@@ -943,7 +943,7 @@ for Node like the app (`npm run build:sim`), that runs the app's own code:
 the server's HTTP handler or its request pipeline on the simulated `Sql`, and
 for Tandem the browser editor's `update` too (a `Lasm.UI` command is data, so
 the driver performs each one in the world: timers, HTTP requests, storage,
-random bytes). The driver asks the world (`test/dst/world.mjs`, loaded with
+random bytes). The driver asks the world (`examples/*/test/dst/world.mjs`, loaded with
 Lasm.JS's `require`) for the next event, runs the code it reaches, and hands
 back what that code asked for. Everything else (users, relying parties,
 network, database faults, crashes) is JavaScript in the world, which also
@@ -1156,15 +1156,27 @@ to `main`. Each section keeps two kinds of fact apart:
 The page opens with the [exit bar](TESTING_STRATEGY.md#7-exit-bar-rock-solid),
 item by item, computed from both kinds of fact: the platform levels, the
 latest nightly mutation run (every module of `scripts/mutation/modules.json`
-passed at 80 % or more), the unit suite's line coverage (the nightly run's
-`unit` job log), the consecutive clean nights of the differential, fuzzing and
-DST campaigns (`campaignStreak`: Sundays in New York are left out; a failed,
-cancelled or missing campaign ends the run), the quarantine list, the
-proposition lint's inventory (`scripts/propositions.mjs`) and the fuzz targets
-that run against Lean. An item reads "met", "partly met" (what is measured
+passed at 80 % or more), the unit suite's line coverage and its 0 % files (the
+nightly run's `unit` job log: `scripts/coverage/report.mjs` prints how many
+files are at 0 % and which of them the baseline does not name, see
+[Coverage baseline](#coverage-baseline)), the consecutive clean nights of the
+differential, fuzzing and DST campaigns (`campaignStreak`: Sundays in New York
+are left out; a failed, cancelled or missing campaign ends the run; the page,
+committed every night, is where the count is recorded), the quarantine list
+and every entry it had in the last 14 days (`quarantineHistory`, from the
+file's git history: the version in force when the window opened and every
+commit since), each example app's claims
+([`scripts/evidence/apps.json`](../scripts/evidence/apps.json): the rows of
+the platform tables in its README, each with the CI jobs that run the app's
+outside oracle on that platform, read as [evidence levels](#evidence-levels)
+read `platforms.json`: the newest `main` or `release-*` run with a matching job
+decides, and it must have passed within 30 days; `test/evidence-page.test.mjs`
+fails when a README table and the file differ), the proposition lint's
+inventory (`scripts/propositions.mjs`) and the fuzz targets that run against
+Lean. An item reads "met", "partly met" (what is measured
 holds, the rest is not measured yet), "not met", "not measured" or "not read".
 `test/testing-docs.test.mjs` keeps the documents behind it in step with the
-repository: every path and workflow TESTING_STRATEGY.md and CI.md name exists,
+repository: every path and workflow TESTING_STRATEGY.md, CI.md and this page name exists (here, except on a line that says the file was deleted or removed),
 every workflow is in CI.md, and the fuzz table above lists exactly the targets
 `fuzz.yml` runs.
 
@@ -1227,49 +1239,51 @@ run, except the static mode of `check-tutorials.mjs` (below). Verdicts:
 | Test | What it read | Verdict |
 | --- | --- | --- |
 | `application-output.test.mjs`: host support files exist with their dependencies | regex import scan of `src/` | **Replaced**: the shipped host files are copied alone into an empty directory and imported by Node's loader in a fresh process (`test/helpers/isolated-import.mjs`); a missing dependency fails to resolve; the test also checks that removing one is noticed |
-| `wasmtime-artifact.test.mjs`: standalone deployment carries every local dependency | regex import scan | **Replaced** the same way (a `new URL('./x')` asset that is not imported is still not covered) |
+| `wasmtime-artifact.test.mjs`: standalone deployment carries every local dependency | regex import scan | **Replaced** the same way (a `new URL('./x')` asset that is not imported is still not covered). The test and the standalone Wasmtime preview it covered were deleted on 2026-11-10 (IRREDUCIBLE.md M1) |
 | `candidate-readme.test.mjs`: a packed README installs its own archive | the real README's headings (failed after the README was reworded, PR #22) | **Replaced**: the transformation is tested on a fixed README; the real README is only required to pack (one install line, no unpinned links) |
-| `application-output.test.mjs`: retained callable and frozen outputs include transitive dependencies | file lists regex-parsed out of `src/build.mjs`, `src/main.mjs`, two scripts | **Retired** (2026-11-03): all four lists belong to the retired Lean 4.32 library pipeline (`src/build.mjs`, `src/main.mjs`, `scripts/full-lean/freeze-build.mjs`, `derive-host-files.mjs`), which the published CLI refuses and CI cannot run; the shipped list, `applicationHostFiles`, is import-tested above |
+| `application-output.test.mjs`: retained callable and frozen outputs include transitive dependencies | file lists regex-parsed out of `src/build.mjs`, `src/main.mjs`, two scripts | **Retired** (2026-11-03): all four lists belong to the retired Lean 4.32 library pipeline (`src/build.mjs`, `src/main.mjs`, `scripts/full-lean/freeze-build.mjs`, `derive-host-files.mjs`; all four files deleted since, 2026-11-03 to 2026-11-10), which the published CLI refused and CI could not run; the shipped list, `applicationHostFiles`, is import-tested above |
 | `browser.test.mjs`: builtin modules use web-standard JavaScript only | `node:`/`process`/`Buffer` in `src/lasm-modules/*.mjs` | **Keep as a lint**: a grep finds uses inside functions that loading never runs; the behaviour is covered by `workers.yml` (workerd), Deno and the browser |
 | `release.test.mjs`: release.yml is the trusted publisher | regexes over four workflow files | **Replaced** (2026-11-03): the release-checks verdict and manifest moved from inline `node -e` into `scripts/release/checks-manifest.mjs`, tested on job results (every gate failing, cancelled or skipped, a reused candidate, an overlay) and through `manifestProblems`; the workflow check is now a cross-reference (the job's `needs`, its env and the workflow's jobs equal the module's `checksJobs`; every called workflow declares `workflow_call`). **Kept as a lint**: OIDC, no stored tokens, serialized publishing, and npm-dist's `LASM_PUBLISHED_REQUIRE`, since only a real release runs them |
 | `nightly.test.mjs`: nightly.yml is scheduled, serialized, never a release dependency | regexes over workflows | **Kept as a lint, widened** (2026-11-03): triggers and concurrency are configuration only GitHub runs (the deferral logic is tested through `nextStep`); "never a release dependency" now covers every workflow a release calls, transitively, ignoring comments |
 | `notices.test.mjs`: the edge runtime archive carries the MIT text and its change list | the packager's source | **Replaced** (2026-11-03): `scripts/edge/package-edge-runtime.mjs` runs on a stand-in edge runtime and its `THIRD_PARTY_NOTICES.txt` is read back (the Lasm MIT text, the shared patches plus `edge` and never `node-threads`, the Node notices appended); a patch without notice text is refused |
 | `notices.test.mjs` (3 lines of the Apache 4(b) test; the rest is behavioural) | patch names regex-parsed from `build-application-runtime.mjs` | **Keep as a cross-reference lint** until the patch table moves into an importable module (the build script runs when imported) |
 | `notices.test.mjs`: Lasm's licence copy, Wasmtime licence copies, MIT everywhere, MIT-0 texts | file equality and headers; the MIT-0 test also checks eight phrases of the `LICENSE-MIT-0` grant | **Keep**: consistency guards; licence text is what must be shipped, and a change to the grant's scope should be deliberate |
-| 29 unit files (`compiler`, `conformance`, `io`, `runtime`, the `node-*` host files …, listed in `needsTools` in `scripts/ci/unit-tests.mjs`) | not static, but they build with the retired Lean 4.32 library pipeline (system `lean` 4.32 and Zig), so CI never ran them (their failures were reported, not fatal) | **Ported or retired** (2026-11-03). **Ported**: the ordinary-Lean fixtures of 24 files (conformance, finalizers, console buffering, cwd, permissions, environment and path bytes, getLine, platform, process cwd/exit/NUL/lifetime/spawn, realPath, system directories, temporary files, truncate, runtime metadata, standard IO and the forms of `main`, TCP, wall clock) run as 31 cases of `integration/host-fixtures.mjs`, a `differential.yml` job on pull requests and main: built with the installed candidate for Node and compared with upstream Lean 4.35.0's `lean --run` (it found the unsearchable-cwd worker bug fixed with it). **Kept in the unit suite**, without their Lean parts: the Node-host tests in `node-process`, `node-temporary-files`, `node-platform`, `node-environment-bytes` and `platform`. **Retired**: `compiler`, `io`, `lake` and `runtime` test the `lasm.json` library pipeline (`src/build.mjs`), which the published CLI refuses; the earlier runtime's platform emulation, its embedded `index.mjs` API and its wall-clock fault hook; `expr-conformance` became a check that the build is refused with the runtime-kernel diagnostic; `needsTools` is empty |
+| 29 unit files (`compiler`, `conformance`, `io`, `runtime`, the `node-*` host files …, listed in `needsTools` in `scripts/ci/unit-tests.mjs`) | not static, but they build with the retired Lean 4.32 library pipeline (system `lean` 4.32 and Zig), so CI never ran them (their failures were reported, not fatal) | **Ported or retired** (2026-11-03). **Ported**: the ordinary-Lean fixtures of 24 files (conformance, finalizers, console buffering, cwd, permissions, environment and path bytes, getLine, platform, process cwd/exit/NUL/lifetime/spawn, realPath, system directories, temporary files, truncate, runtime metadata, standard IO and the forms of `main`, TCP, wall clock) run as 31 cases of `integration/host-fixtures.mjs`, a `differential.yml` job on pull requests and main: built with the installed candidate for Node and compared with upstream Lean 4.35.0's `lean --run` (it found the unsearchable-cwd worker bug fixed with it). **Kept in the unit suite**, without their Lean parts: the Node-host tests in `node-process`, `node-temporary-files`, `node-platform`, `node-environment-bytes` and `platform`. **Retired**: `compiler`, `io`, `lake` and `runtime` test the `lasm.json` library pipeline (`src/build.mjs`, deleted with it on 2026-11-03), which the published CLI refused; the earlier runtime's platform emulation, its embedded `index.mjs` API and its wall-clock fault hook; `expr-conformance` became a check that the build is refused with the runtime-kernel diagnostic; `needsTools` is empty |
 | `browser.test.mjs`: every `lasm:app`/`lasm:ui-dom` binding names an export | `@[js …]` attributes in `library/Lasm/UI` cross-checked against real exports (`lasm:web` and `library/Lasm/Web` were removed with `Lasm.Web`, 2026-11-10) | **Keep**: a cheap cross-reference lint; a full behavioural check would link a program using every binding |
 | `scripts/content/check-tutorials.mjs --static` (found 2026-11-03) | tutorial pages against their `steps.json` and project files | **Keep as a doc lint**: the page must show what the tutorial runs; the non-static mode runs those steps against a packed CLI |
 
 ## Coverage baseline
 
-Measured by `unit.yml` run [41234188450](https://github.com/Millillion/lasm/actions/runs/41234188450)
-(commit `b2768b5`, Node 26.12.1, Linux x64), 148 JavaScript files under `src/`,
+Measured by the nightly `unit` job of `ci-nightly.yml` run
+[42981300311](https://github.com/Millillion/lasm/actions/runs/42981300311)
+(2026-11-11, commit `2897519`, Linux x64), 125 JavaScript files under `src/`,
 `bin/` and `packages/`; per-file numbers in
 [evidence/coverage-baseline.json](evidence/coverage-baseline.json).
 
 | Scope | Lines | Branches | Functions |
 | --- | ---: | ---: | ---: |
-| **Total** | **67.5 %** (14,151 / 20,968) | 78.5 % | 70.3 % |
-| `src/` (CLI, build, Node host) | 69.3 % | | |
-| `src/link-driver` | 82.3 % | | |
-| `src/lasm-modules` (builtin `lasm:` modules) | 91.1 % | | |
-| `src/wasi` | 70.6 % | | |
-| `src/edge` | 48.2 % | | |
-| `src/browser` | 53.3 % | | |
-| `src/serverless` | 13.3 % | | |
-| `src/vite` | 0 % | | |
+| **Total** | **98.05 %** (18,816 / 19,191) | 97.2 % | 98.4 % |
 
-The host bridge is well covered (`src/node-js.mjs` 91.5 %, `src/node-host.mjs`
-95.0 %); `src/dev.mjs` (`lasm dev`) is at 43 %. The 0 % files fall in two
-groups. Some run only inside built outputs (`src/edge/edge-pre.js`,
-`src/browser/loader.mjs`, `src/serverless/lasm-*.mjs`):
-they are copied into `dist/` and executed there by the integration workflows, and
-this measurement only counts files at their `src/` path. The others are simply
-not unit-tested (`src/vite/index.mjs`, `src/application-binding-check.mjs`,
-`src/application-build.mjs`). The 29 legacy files of the [audit](#test-quality-audit)
-contributed nothing (they are now ported or retired). `unit.yml` (a release gate) fails when the total line
-coverage falls more than one point below this baseline; raise the baseline file
-when coverage improves.
+The first baseline (2026-10-31, run 41234188450) was 67.5 % of 148 files.
+Since then, unit tests were added and the removals of IRREDUCIBLE.md M1
+deleted unreferenced files, which are no longer counted.
+
+Three files were at 0 % in that run. `packages/create-lasm/bin.mjs` is unit-tested
+since (`test/create-lasm.test.mjs` runs it against a stand-in `@lasm/cli`). The
+other two are Emscripten inputs that run only inside edge builds:
+`src/edge/edge-pre.js` (a `--pre-js`, copied into every edge program; its unit
+tests evaluate its text in a `vm` context, which V8 records under no file path)
+and `src/edge/edge-library.js` (a `--js-library` of `$`-preprocessed
+functions). The baseline's `integration` list names, for each such file, the
+workflows that run it (`workers.yml`, `browser.yml`) and how. Exit bar 3 asks
+that every 0 % file be either named there or removed, so
+[`report.mjs`](../scripts/coverage/report.mjs) (`--check`, with
+[`zero-files.mjs`](../scripts/coverage/zero-files.mjs)) fails the unit suite
+on a 0 % file the list does not name, or on a named workflow that does not
+exist, and prints `0 % files: N, named in the baseline: K, not named: …`,
+which the [evidence page](#the-test-evidence-page) reads. `unit.yml` (a release
+gate) also fails when the total line coverage falls more than one point below
+this baseline; raise the baseline file when coverage improves.
 
 ## Mutation testing
 
@@ -1311,13 +1325,13 @@ whole percent.
 
 ### Scores
 
-Every JavaScript file under `src/` is in one of the 21 modules except
+Every JavaScript file under `src/` is in one of the 20 modules except
 `src/edge/edge-library.js` (an Emscripten library with preprocessor lines, which
 Stryker cannot parse). The first seven modules were measured 2026-11-03 (mutation.yml
 run 41749603692); the fourteen others, which cover the rest of `src/`, were added
 2026-11-09: their *initial* scores are from mutation.yml run 42571078799 (the run
 that added them) or from each group's first run where that run could not score
-them, and *now* from mutation.yml run 42615928074 on #165, which measured all 21 modules together (Node 26, Linux x64; 1 to 73 minutes a module, `dev` the longest). *Initial*: with
+them, and *now* from mutation.yml run 42615928074 on #165, which measured all 21 modules of the time together (Node 26, Linux x64; 1 to 73 minutes a module, `dev` the longest). The 21st, `wasmtime`, was removed with the standalone Wasmtime preview it mutated (2026-11-10), and its surviving mutants with it. *Initial*: with
 the tests that existed before mutation testing; *now*: with the tests written to
 kill survivors (CI's measurement on Node 26 is the recorded floor).
 
@@ -1331,7 +1345,7 @@ kill survivors (CI's measurement on Node 26 is the recorded floor).
 | `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **97.1 %** | 97 % |
 | `notices` | `notices.mjs` | 62.5 % | **91.5 %** | 91 % |
 | `downloads` | `managed-download.mjs`, `managed-artifacts.mjs`, `managed-lean.mjs`, `npm-artifacts.mjs`, `cache-repair.mjs` | 59.3 % | **89.7 %** | 89 % |
-| `toolchains` | `managed-sdk.mjs`, `managed-python.mjs`, `managed-link-toolchain.mjs`, `sdk-repairs.mjs`, `toolchain.mjs`, `system-git.mjs`, `windows-tool-paths.mjs`, `macos-tbd.mjs`, `link-driver/python.mjs` | 58.9 % | **89.7 %** | 89 % |
+| `toolchains` | `managed-sdk.mjs`, `managed-python.mjs`, `managed-link-toolchain.mjs`, `sdk-repairs.mjs`, `system-git.mjs`, `windows-tool-paths.mjs`, `macos-tbd.mjs`, `link-driver/python.mjs` | 58.9 % | **89.7 %** | 89 % |
 | `cli` | `cli-arguments.mjs`, `posix-arguments.mjs`, `application-cli.mjs`, `launcher.mjs`, `process-launcher.mjs`, `elapsed-ticker.mjs`, `elapsed-ticker-worker.mjs`, `build-progress.mjs`, `test-switches.mjs`, `platform.mjs`, `output-directory.mjs`, `editor.mjs`, `application-signals.mjs` | 42.7 % | **95 %** | 95 % |
 | `init` | `init.mjs` | 53.6 % | **97.1 %** | 97 % |
 | `dev` | `dev.mjs`, `dev-proxy.mjs`, `dev-build-worker.mjs`, `application-build-worker.mjs`, `browser/browser-dev.mjs`, `browser/static-server.mjs` | 29.2 % | **91 %** | 91 % |
@@ -1532,8 +1546,6 @@ stay, with the reason; they are not chased with tests that look at the code.
 | edge build (not equivalent) | `edgeStepCache`, `edgeMembers` and the dev profile's two retained programs in `linkCachedEdgeProgram`; `findEdgeProgram` and `cachedProgram` | They run with the Node link driver's recorded replay (dev edge links) or a provisioned edge runtime; `test/edge-link-plan.test.mjs` (module `target-link`) tests the dev link itself |
 | WASI build | `lower-atomics.mjs`: `s64`'s negative branch; `Bytes.push`'s `values.length` → `true`; the helper type key `join(',')` → `join('')` and `'notify'` → `''`; single-byte value, block and heap types read as LEBs (and the reverse); `limits`' maximum read as u32 or u64; empty `case 0x40`/`case 0x41` bodies; `sub >= 15` → `true` | Only non-negative offsets and masks are encoded; an empty part adds no bytes; the keys of the helpers' signatures do not collide, and no other helper has an empty key; those bytes are below 0x80, so either read takes one byte; both read the same LEB; they fall through to a case that skips the same LEB; the subopcodes below 15 that reach it are 9, 11 and 13 |
 | WASI build | `wasi-build.mjs`: `'utf8'` → `''`; `force`/`recursive` of staging removals; `entry !== key` → `true`; `{ level: 9 }` → `{}` for the Fastly package; `let note = ''` → another string. `wasi-component.mjs`: the section list's `[]` → `['Stryker was here']`, `at < length` → `<=` in both section walks, `startsWith`'s length check → `true` | As for the edge build; the compression level changes only the package's size; every branch assigns the note; strings have no section id, an extra pass at the end adds an empty piece, and `every` fails on the missing bytes |
-| Wasmtime | `'utf8'` → `''` before `JSON.parse`; the hex form of file hashes and `!item` checks in the bundle, artifact and module-data checks; the Buffer-capacity bounds (`bufferConstants.MAX_LENGTH`, `Math.min` → `Math.max`) in the console, guest-memory and WASI code; the console's `remaining < 65536n` and trailing-byte bounds → `<=`/`true`; the `>= 0n` halves of guest range checks; `if (count) write(...)` | A Buffer parses the same; the inventory hash compared next rejects the same records, and the key-set check before guarantees each record; on 64-bit Node `MAX_LENGTH` equals `Number.MAX_SAFE_INTEGER`, checked first; the same bytes are decoded; guest offsets and lengths are uint64 values; an empty write writes nothing |
-| Wasmtime (not equivalent) | the runtime's checks of what the native instance reports (stack bounds, mailbox registration, function globals' pointers), diagnostic RPC deadlines, failure reports written to stderr on the main thread, Workers terminated at shutdown; the standalone supervisor's `prepareApplicationSignals`, `prepareApplicationMetadata` and `forwardWorkerStdio` calls; a failing native descriptor write; the process host's `applicationCommand` and console write failure | They need the real Wasmtime instance and native helpers, a real process, or a failing descriptor: `wasmtime.yml` runs standalone outputs, and those functions have their own tests |
 | node host, native files | `fd < 0` → `<= 0` (and `>= 0` → `> 0`) for descriptors and counts the C library returns | Descriptor 0 is the process's stdin and is never returned by `open`, `dup`, `socket` or `mkstemp`; a zero count reaches the same branch either way |
 | node host | `leanAtLeast`'s `i < 3` → `<=`, `a[i] > b[i]` → `>=`; the Windows case list's `trim()` and `/\s+/` → `/\s/` | Index 3 is undefined in both versions, so the loop still ends equal; the comparison runs only when the parts differ; an empty name is never an error code |
 | native files | the pooled wrappers (`flushAll`, `checkDirectorySearch`, `flush`/`rewind`/`truncate`, `read`/`write`/`closeAsync` guards) removed or emptied | The synchronous adapter underneath does the same thing on the calling thread: only which thread blocks differs |

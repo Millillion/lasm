@@ -295,15 +295,15 @@ tests come from bugs, new features and the propositions of §4.
 The [evidence page](../content/learn/test-evidence.md) computes this from CI
 and the repository every time it is regenerated (its first section, "The exit
 bar"; [TESTING.md](TESTING.md#the-test-evidence-page) says how each item is
-measured). Snapshot of 2026-11-10, item 7 of 2026-11-11:
+measured). Snapshot of 2026-11-10, with items 3, 5, 6 and 7 as of 2026-11-11:
 
 | # | Item | Status | What is missing |
 | --- | --- | --- | --- |
 | 1 | Platforms | Not met | All 13 platforms are at L2 or higher; Node.js is at L3, Workers and the browser at L2 |
 | 2 | Mutation | Not met | 19 of 21 modules passed in the last nightly run; `application-sources` and `node-host` failed in setup (no score). Every threshold is 85–97 % |
-| 3 | Coverage | Partly met | 98.1 % of lines (143 files; baseline 67.5 %); the 0 % files are not yet checked against the integration workflows |
-| 4 | Campaigns | Not met | 0 of 30: the DST campaign failed on 2026-11-08 and 2026-11-10 (Porter #189, Tandem #190; both fixed, the count starts again with the next clean night), and the nightly fuzzing campaign has no run on `main` yet |
-| 5 | Flakes | Partly met | `test/quarantine.json` is empty and has had no entry since it was created (2026-11-03); the 14-day window is not computed yet |
-| 6 | Apps | Not measured | Each app's platform workflows pass; no single check yet compares them with "every platform it claims" |
+| 3 | Coverage | Met | 98.05 % of lines (125 files; the baseline, raised to that nightly run on 2026-11-11, was 67.5 %). Of the three 0 % files, `packages/create-lasm/bin.mjs` is now unit-tested and `src/edge/edge-pre.js` and `src/edge/edge-library.js` (Emscripten inputs that run only inside edge builds) are named with `workers.yml` and `browser.yml` in `docs/evidence/coverage-baseline.json`; `scripts/coverage/report.mjs` fails the unit suite on a 0 % file nobody names |
+| 4 | Campaigns | Not met | 0 of 30: the DST campaign failed on 2026-11-08 and 2026-11-10 (Porter #189, Tandem #190; both fixed) and again on 2026-11-11 (Porter, #206); the differential and fuzzing campaigns were clean on 2026-11-10 and 2026-11-11. The count is `campaignStreak` in `scripts/evidence/page.mjs`, recomputed from the scheduled runs and committed with the page by `evidence-page.yml` every night |
+| 5 | Flakes | Met | `test/quarantine.json` is empty, and its git history shows no entry in the last 14 days (it never had one since it was created on 2026-11-03); the page reads the history every night |
+| 6 | Apps | Met | 50 of 50 claimed platforms of Conduit, Porter, Tandem, Ledger and Folio pass the app's outside oracle in the newest `main` run. The claims are the rows of each README's platform tables, listed with the CI jobs that run the oracle in `scripts/evidence/apps.json`; a unit test keeps the two in step |
 | 7 | Propositions | Not met | The lint is green; 41 candidates (12 in the library, 29 about the CLI's JavaScript in verification/cli); every `forAll` property (31) and 7 of 8 fuzz oracles name a proposition, and `test/propositions.test.mjs` holds that; `wasi-cgi` (the WASI C host's CGI boundary, `src/wasi/lasm_fetch_wasi.c`) does not, and goes with Lasm.Fetch (removal 18); three PROOFS.md items need a model before they can be stated (JavaScript applier, hydration, KV stores) |
 | 8 | Differential fuzzing | Partly met | Both model differentials run in CI: `ui-decode` (#188) and `lasm-js-wire` (#187). The feature programs landed with #167; coverage feedback for generated programs is not done yet |
