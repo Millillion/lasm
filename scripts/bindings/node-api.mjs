@@ -257,7 +257,7 @@ function lowerContainer(doc, all, mod, c, out) {
   // `Extends:` as documented, or the stated parent with the sentence that gives it (extendsQuote).
   if (c.heading && c.kind === 'class') {
     const sec = findSection(all, c.heading);
-    const documented = /Extends: <a[^>]*>&lt;([^&]*)&gt;/.exec(sec.node.desc ?? '')?.[1] ?? null;
+    const documented = /Extends: <([^>]+)>/.exec(plainText(sec.node.desc))?.[1] ?? null;
     if (c.extendsQuote) {
       if (!docText(out.trees[c.extendsQuote.doc]).includes(c.extendsQuote.quote)) fail(`${where}: the ${c.extendsQuote.doc} docs no longer say ${JSON.stringify(c.extendsQuote.quote)} (extendsQuote)`);
     } else if (c.extends && c.extends !== documented) absent(`Extends: ${c.extends} (the docs say ${documented})`);

@@ -771,6 +771,8 @@ Names are Node's own, as its docs write them: `fsPromises.readFile`,
 types (`FileHandle`, `fs.Stats`, `fs.Dirent`, `Hash`, `Hmac`, `ChildProcess`,
 `EventEmitter`, `stream.Readable`, `stream.Writable`), and options objects are
 structures (`fsPromises.ReadFileOptions`, `child_process.SpawnOptions`).
+Documented events are typed listeners: `server.onRequest`, `socket.onData`,
+`child.onceExit` ([Events](#events-typed-listeners)).
 
 ### What is covered
 
@@ -784,19 +786,21 @@ structures (`fsPromises.ReadFileOptions`, `child_process.SpawnOptions`).
 | `Lasm.JS.Node.Crypto` | `crypto.createHash`, `createHmac`, `hash`, `randomBytes`, `randomInt`, `randomUUID`, `timingSafeEqual`, `getHashes`, and `scrypt`, `pbkdf2`, `hkdf` as `Async` (through `util.promisify`); `Hash`, `Hmac` | `node:crypto` |
 | `Lasm.JS.Node.ChildProcess` | `child_process.spawn`, `child_process.execFile` (as `Async`, its documented promisified form: `{stdout, stderr}`), `ChildProcess` (`pid`, `exitCode`, `signalCode`, `killed`, `kill`, `stdin`, `stdout`, `stderr`) | `node:child_process` |
 | `Lasm.JS.Node.Events` | `EventEmitter` (`on`, `once`, `off`, `emit`, `listenerCount`, `eventNames`, `removeAllListeners`), `events.once` (`Async`) | `node:events` |
-| `Lasm.JS.Node.Stream` | `stream.Readable.toWeb`, `fromWeb`, `stream.Writable.toWeb`, `fromWeb`: a child's `stdout` becomes a web `ReadableStream` (read with Lasm.JS.Web) | `node:stream` |
+| `Lasm.JS.Node.Stream` | `stream.Readable.toWeb`, `fromWeb`, `stream.Writable.toWeb`, `fromWeb`, `stream.Duplex.toWeb`, `fromWeb`: a child's `stdout` or a request body becomes a web `ReadableStream` (read with Lasm.JS.Web); `readable.pause`, `resume`, `isPaused`, `setEncoding`, `destroy`, `writable.write`, `end`, `destroy`; the streams' events (`'data'`, `'end'`, `'error'`, `'drain'`, `'finish'`, …) | `node:stream` |
+| `Lasm.JS.Node.Net` | every stable member of `net` (`net.createServer`, `connect` and `createConnection` in their options, path and port forms, `isIP`, the autoselection defaults), `net.Server` (`listen` with options, a path or a port; `address`, `close`, `getConnections` as `Async`, `ref`, `unref`, events `'connection'`, `'listening'`, `'close'`, `'error'`, `'drop'`), `net.Socket` (constructor, `connect`, `write`, `end`, `destroy`, `setEncoding`, `setKeepAlive`, `setNoDelay`, `setTimeout`, addresses and counters, twelve events), `net.BlockList`, `net.SocketAddress`, `net.BoundSocket` | `node:net` |
+| `Lasm.JS.Node.Http` | every stable member of `http` (`http.createServer`, `request` and `get` with options or a URL, `METHODS`, `STATUS_CODES`, `globalAgent`, `validateHeaderName`, …), `http.Server`, `http.IncomingMessage`, `http.ServerResponse`, `http.ClientRequest`, `http.OutgoingMessage`, `http.Agent`, with their stable events | `node:http` |
+| `Lasm.JS.Node.Https` | `https.createServer`, `request`, `get`, `globalAgent`, `https.Server` (with `http.Server`'s members and events), `https.Agent` | `node:https` |
 
 Not generated, with the reason (each listed in
 [`node-tier2.mjs`](../scripts/bindings/node-tier2.mjs)):
 
-- **`node:http`, `node:net`: not generated.** A server is a request listener
-  called for each request with an `IncomingMessage` (a Node `Readable`) and a
-  `ServerResponse` (a `Writable`) whose methods are called many times per
-  request, and the docs type the listener's arguments, the events and their
-  arguments in prose. Servers on JavaScript targets are Lasm.JS.Web
-  `Request → Async Response` handlers; on Node they are served through an npm
-  adapter bound with `@[js]` (`@hono/node-server`), and outbound HTTP is
-  Lasm.JS.Web's `fetch` on every target.
+- `net.Server`'s `listen(handle)` form (a libuv handle or file descriptor
+  object; the options, path and port forms are generated); `http.Server`'s and
+  `https.Server`'s own `listen()` entries, which the docs give as identical to
+  `net.Server`'s (inherited); `outgoingMessage.pipe()` (documented to throw);
+  the `[Symbol.asyncDispose]` methods (`await using`: `close`); `http`'s
+  `WebSocket` class (the global, `Lasm.JS.Web.WebSocket`); the `tls` module
+  (`https.createServer` takes TLS options as `Data`).
 - `fsPromises.glob`, `watch` and `opendir` (async iteration, as in Lasm.JS.Web),
   `statfs`, `mkdtempDisposable` (explicit resource management); `FileHandle`'s
   `createReadStream`, `createWriteStream` (Node stream classes: use
@@ -829,6 +833,11 @@ rules as Lasm.JS.Web ([above](#how-a-webidl-declaration-becomes-lean)):
 | `[min, ]max` (an optional parameter before a required one) | two overloads | `crypto.randomInt max`, `crypto.randomIntWithMin min max` |
 | `buf.toString([encoding])` (a Buffer method) | an operation on bytes | `Buffer.toString (bytes) (encoding := none)`, called with the bytes as `this` |
 | a `Buffer` result | `Uint8Array` | `ByteArray` |
+| `Event: 'request'` with `request {http.IncomingMessage}`, `response {http.ServerResponse}` | `callback http.Server.RequestListener = undefined (…)` and `onRequest`, `onceRequest` | `server.onRequest (← http.Server.RequestListener.ofFn fun req res => …)` ([Events](#events-typed-listeners)) |
+| a listener parameter the docs add to an event (`requestListener`, `connectListener`) | that event's callback | `http.createServer none (some listener)` |
+| `new net.Socket([options])` (a heading only in the JSON) | `constructor(…)`, checked against the documented parameters | `net.Socket.new (options := none)` |
+| overloads documented under one heading (`server.listen()`: `listen(options)`, `listen(path)`, `listen([port[, host]])`) | one operation each | `listen options`, `listenWithPath`, `listenWithPort (some 0) (some "127.0.0.1")` |
+| `Returns: {this}` | the class | `IO net.Socket` (the object itself) |
 
 Where the docs give a type only in prose, [`node-tier2.mjs`](../scripts/bindings/node-tier2.mjs)
 states it in WebIDL and quotes the sentence (the lowering fails if the sentence
@@ -846,6 +855,49 @@ still names the namespace), and a union of a namespaced type lives in that
 namespace (`fsPromises.ReadFileOptionsOrDOMString`). A `record` result (`process.env`) is read through `Object.entries`, one more host call: Node's `process.env` is not a plain object and Deno's is a Proxy. Overloads that would get
 one name each add all their argument names (`FileHandle.readWithOptions`,
 `FileHandle.readWithBufferOptions`).
+
+### Events: typed listeners
+
+Every stable event a selected class documents (`Event: 'request'`, with its
+arguments' types) becomes a callback type named after it in the class's
+namespace, `http.Server.RequestListener`, made from a Lean function with
+`ofFn` (asynchronous) or `ofSyncFn`, and two methods, `onRequest` and
+`onceRequest`, which call `emitter.on('request', listener)` and
+`emitter.once(…)` and return the emitter, as those do. Subclasses have their
+parents' events through the structure's `extends` (`http.IncomingMessage` has
+`stream.Readable`'s `onData`, `onEnd`, `onError`). An argument the docs list
+without a name (`net.Server`'s `'connection'`: `{net.Socket}`) is `value`;
+arguments the docs give only in prose are stated in `node-tier2.mjs`
+(`eventProse`, with a quoted sentence: `net.Socket`'s `'lookup'`,
+`net.Server`'s `'drop'`; `ChildProcess`'s `'exit'` and `'close'` give `code`
+and `signal` as `Option`s, since the docs say each is `null` in one case). The
+untyped `EventEmitter.on (name) (JSFunction)` stays for anything else.
+
+```lean
+import Lasm.JS.Node
+open Lasm.JS Lasm.JS.Web Lasm.JS.Node
+
+def main : IO Unit := do
+  -- a TCP echo server: every socket writes back what it reads
+  let onConnection ← net.Server.ConnectionListener.ofSyncFn fun sock => do
+    discard <| sock.onData (← net.Socket.DataListener.ofSyncFn fun d => do
+      discard <| sock.write (match d with | .uint8Array b => .uint8Array b | .domString s => .domString s))
+    discard <| sock.onEnd (← net.Socket.EndListener.ofSyncFn (do discard <| sock.«end»))
+  let server ← net.createServer none (some onConnection)
+  discard <| server.listenWithPort (some 7000) (some "127.0.0.1")
+  waitForever
+```
+
+- **Order.** An asynchronous listener (`ofFn`) runs as a Lean task, so two
+  calls of it may run concurrently: use `ofSyncFn` where the order of events
+  matters (a socket's `'data'` chunks), as above.
+- **Errors.** A listener made with `ofFn` that throws rejects its promise,
+  which Node reports as an unhandled rejection (by default the process exits).
+  An `'error'` event with no listener throws, as in JavaScript.
+- **`end` is a Lean keyword**: the methods are written `sock.«end»`,
+  `res.«end» (some body)`.
+- Event names are not members of the object, so the availability probe does
+  not look for them; `node-surface.json` lists them per class (`events`).
 
 ### Where it runs
 
@@ -898,7 +950,14 @@ property checks: Lean as the oracle of hex, base64 (RFC 4648), Latin-1, UTF-8
 encoding and validation (`ByteArray.validateUTF8` for `buffer.isUtf8`), byte
 order (`Buffer.compare`) and path operations over generated inputs; published
 vectors (FIPS 180, RFC 1321, RFC 4231, RFC 6070, RFC 7914, RFC 5869); files in a
-fresh temporary directory; child processes, events and stream conversion.
+fresh temporary directory; child processes, events and stream conversion;
+and on 127.0.0.1: an HTTP echo server (`http.createServer`) requested with
+`http.request` over generated bodies (up to 200 kB), methods, paths and headers,
+ten concurrent requests, `http.get`, a 404 from `writeHead`; a web `Request`
+built from an `IncomingMessage` and a `Response` written to a `ServerResponse`
+(requested with `fetch`); and a TCP echo server (`net.createServer`,
+`net.connect`) round-tripping generated chunks (up to six of 64 kB), with
+addresses, `getConnections`, `setEncoding`, `net.isIP` and `BlockList`.
 `web-bindings.yml` runs it on Node 26 and 24, Bun and Deno.
 
 ## Servers on JavaScript runtimes: `Lasm.JS.Deno`, `Lasm.JS.Bun` and Node

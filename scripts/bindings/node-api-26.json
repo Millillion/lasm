@@ -120,21 +120,14 @@
  ],
  "notDocumentedIn26": [
   "net: proseIdl \"data <Object> The argument passed to event listener. localAddress <string> Local address.\"",
-  "child_process Class: `ChildProcess`: Extends: EventEmitter (the docs say null)",
   "net Class: `net.BlockList`: BlockList.isBlockList: prose \"Returns true if the value is a net.BlockList.\" (node-tier2.mjs prose)",
-  "net Class: `net.Server`: Extends: EventEmitter (the docs say null)",
   "net Class: `net.Server`: new net.Server([options][, connectionListener]): prose \"Automatically set as a listener for the ['connection'][] event.\"",
   "net Class: `net.Server`: new net.Server([options][, connectionListener]): prose \"Automatically set as a listener for the ['connection'][] event.\"",
-  "net Class: `net.Socket`: Extends: stream.Duplex (the docs say null)",
   "net Net: net.connect: prose \"If supplied, will be added as a listener for the ['connect'][] event on the returned socket once.\" (node-tier2.mjs prose)",
   "net Net: net.connect: prose \"If supplied, will be added as a listener for the ['connect'][] event on the returned socket once.\" (node-tier2.mjs prose)",
   "net Net: net.connect: prose \"If supplied, will be added as a listener for the ['connect'][] event on the returned socket once.\" (node-tier2.mjs prose)",
   "net Net: net.createServer: prose \"Automatically set as a listener for the ['connection'][] event.\" (node-tier2.mjs prose)",
   "net Net: net.setDefaultAutoSelectFamily: prose \"value <boolean> The new default value.\" (node-tier2.mjs prose)",
-  "net Net: net.setDefaultAutoSelectFamilyAttemptTimeout: prose \"value <number> The new default value, which must be a positive number.\" (node-tier2.mjs prose)",
-  "http Class: `http.ClientRequest`: Extends: http.OutgoingMessage (the docs say null)",
-  "http Class: `http.ServerResponse`: Extends: http.OutgoingMessage (the docs say null)",
-  "http Class: `http.IncomingMessage`: Extends: stream.Readable (the docs say null)",
-  "http Class: `http.Server`: Extends: net.Server (the docs say null)"
+  "net Net: net.setDefaultAutoSelectFamilyAttemptTimeout: prose \"value <number> The new default value, which must be a positive number.\" (node-tier2.mjs prose)"
  ]
 }
