@@ -4,12 +4,16 @@
 // coverage; this turns those records into a summary with c8 (devDependency).
 //   node scripts/coverage/report.mjs V8_COVERAGE_DIR OUT.json [--check docs/evidence/coverage-baseline.json] [--tolerance 1]
 // Files never loaded count as 0 % (--all). With --check, a drop of the total line
-// coverage by more than the tolerance (percentage points) below the baseline fails.
+// coverage by more than the tolerance (percentage points) below the baseline fails,
+// and so does a 0 % file the baseline's `integration` list does not name (with
+// the workflows that run it), or a named workflow that does not exist
+// (zero-files.mjs; exit bar 3).
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { zeroCoverage, zeroCoverageLine } from './zero-files.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const args = process.argv.slice(2);
@@ -48,6 +52,16 @@ if (check && existsSync(check)) {
   const base = JSON.parse(readFileSync(check, 'utf8'));
   const tolerance = Number(opt('--tolerance', '1'));
   const drop = base.total.lines.pct - result.total.lines.pct;
-  if (drop > tolerance) { console.error(`Line coverage fell from ${base.total.lines.pct} % to ${result.total.lines.pct} % (more than ${tolerance} points)`); process.exit(1); }
   console.log(`baseline ${base.total.lines.pct} %: ${drop > 0 ? `down ${drop.toFixed(2)}` : `up ${(-drop).toFixed(2)}`} points`);
+  const zero = zeroCoverage(files, base.integration, { workflowsDir: join(root, '.github/workflows') });
+  console.log(zeroCoverageLine(zero));
+  for (const file of zero.stale) console.log(`${file} is no longer at 0 %: its integration entry in ${check} can go`);
+  let failed = false;
+  if (drop > tolerance) { console.error(`Line coverage fell from ${base.total.lines.pct} % to ${result.total.lines.pct} % (more than ${tolerance} points)`); failed = true; }
+  for (const file of zero.unnamed) {
+    console.error(`${file}: 0 % of its lines run in the unit suite. Test it, remove it, or name the integration workflows that run it in ${check} ("integration": [{ "file", "workflows", "how" }]).`);
+    failed = true;
+  }
+  for (const missing of zero.missingWorkflows) { console.error(`${check}: integration workflow missing for ${missing}`); failed = true; }
+  if (failed) process.exit(1);
 }

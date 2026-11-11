@@ -44,3 +44,32 @@ test('the interactive prompt asks for the directory and a template', async () =>
   await new Promise(resolve => setImmediate(resolve)); second.write('x\n');
   assert.deepEqual(await keptAgain, ['x', '-t', 'express']);
 });
+
+// The published bin, as `npm create @lasm` runs it: a stand-in @lasm/cli (found
+// through NODE_PATH) records the arguments and exits with its own status.
+test('bin.mjs runs the pinned CLI with the arguments and forwards its exit status', async () => {
+  const { spawnSync } = await import('node:child_process');
+  const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const bin = fileURLToPath(new URL('../packages/create-lasm/bin.mjs', import.meta.url));
+  const modules = mkdtempSync(join(tmpdir(), 'create-lasm-bin-'));
+  try {
+    const stub = join(modules, '@lasm', 'cli');
+    mkdirSync(stub, { recursive: true });
+    writeFileSync(join(stub, 'package.json'), JSON.stringify({ name: '@lasm/cli', version: '0.0.0', bin: { lasm: 'lasm.mjs' } }));
+    writeFileSync(join(stub, 'lasm.mjs'), 'process.stdout.write(JSON.stringify(process.argv.slice(2))); process.exitCode = 7;\n');
+    const env = { ...process.env, NODE_PATH: modules };
+    const ran = spawnSync(process.execPath, [bin, 'my app', '-t', 'hono'], { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    assert.equal(ran.status, 7, ran.stderr);
+    assert.deepEqual(JSON.parse(ran.stdout), ['init', 'my app', '-t', 'hono']);
+    const bare = spawnSync(process.execPath, [bin], { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    assert.equal(bare.status, 1);
+    assert.equal(bare.stderr, usage + '\n');
+    // Without @lasm/cli: one line naming it, status 1, no stack trace.
+    const missing = spawnSync(process.execPath, [bin, 'x'], { env: { ...process.env, NODE_PATH: '' }, cwd: modules, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    assert.equal(missing.status, 1);
+    assert.match(missing.stderr, /@lasm\/cli/);
+    assert.doesNotMatch(missing.stderr, /^\s+at /m);
+  } finally { rmSync(modules, { recursive: true, force: true }); }
+});
