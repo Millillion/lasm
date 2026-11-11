@@ -11,8 +11,8 @@ is generated from this file.
 Reading guide. An endpoint `e : Endpoint Req Res` has a name and a
 `validate` function. On the server, `e.decodeRequest body` reads a request
 body (JSON, then the request type, then `validate`), `e.serve handler` is
-the route that answers `POST /rpc/<name>`, and `handler routes fallback` is
-the `Lasm.Fetch` handler that dispatches to the routes. In the browser,
+the route that answers `POST /rpc/<name>`, and `dispatch routes method
+segments body` answers an HTTP request for `/rpc/<name>` with the routes. In the browser,
 `e.call req handle` is the Lasm.UI command that sends the request. Every
 proposition holds for every endpoint, every request type and every
 `validate`. Lean's JSON parser and printer (`Json.parse`, `Json.compress`)
@@ -22,7 +22,7 @@ hypothesis.
 import Lasm.RPC
 
 namespace Lasm.RPC.Spec
-open Lean Lasm.RPC Lasm.Fetch Lasm.UI
+open Lean Lasm.RPC Lasm.UI Std.Async
 
 /-! ## The server only runs handlers on valid requests -/
 
@@ -85,37 +85,34 @@ def serve_valid : Prop :=
 
 /-! ## Dispatch: `POST /rpc/<name>` and nothing else -/
 
-/-- **Other paths reach the fallback.** A request whose path is not
-`/rpc/<name>` (one segment after `rpc`) is passed to the fallback handler
-unchanged, whatever its method. -/
-def handler_fallback : Prop :=
-  ∀ (routes : List Route) (fallback : Handler) (req : Request),
-    (∀ name, req.segments ≠ ["rpc", name]) → handler routes fallback req = fallback req
+/-- **Other paths are left to the program.** A request whose path is not
+`/rpc/<name>` (one segment after `rpc`) gets no answer from `dispatch`,
+whatever its method and body: the program answers it. -/
+def dispatch_other : Prop :=
+  ∀ (routes : List Route) (method : String) (segments : List String) (body : String),
+    (∀ name, segments ≠ ["rpc", name]) → dispatch routes method segments body = none
 
 /-- **`POST /rpc/<name>` runs the route of that name.** For a `POST` to
-`/rpc/<name>`, the handler runs the first route named `name` on the request
+`/rpc/<name>`, `dispatch` runs the first route named `name` on the request
 body and answers its status and JSON body, never cached. -/
-def handler_route : Prop :=
-  ∀ (routes : List Route) (fallback : Handler) (req : Request) (name : String) (route : Route),
-    req.method = "POST" → req.segments = ["rpc", name] → routes.find? (·.name == name) = some route →
-      handler routes fallback req = (route.run req.text >>= fun answer =>
-        pure ((Response.json answer.2 answer.1).withHeader "cache-control" "no-store"))
+def dispatch_route : Prop :=
+  ∀ (routes : List Route) (body name : String) (route : Route),
+    routes.find? (·.name == name) = some route →
+      dispatch routes "POST" ["rpc", name] body = some (Answer.ofRoute <$> route.run body)
 
 /-- **An unknown endpoint answers 404.** A `POST` to `/rpc/<name>` when no
-route has that name answers status 404, and runs no route and not the
-fallback. -/
-def handler_unknown : Prop :=
-  ∀ (routes : List Route) (fallback : Handler) (req : Request) (name : String),
-    req.method = "POST" → req.segments = ["rpc", name] → routes.find? (·.name == name) = none →
-      handler routes fallback req =
-        pure (Response.json (Json.mkObj [("error", Json.str s!"no endpoint {name}")]).compress 404)
+route has that name answers status 404, and runs no route. -/
+def dispatch_unknown : Prop :=
+  ∀ (routes : List Route) (body name : String),
+    routes.find? (·.name == name) = none →
+      dispatch routes "POST" ["rpc", name] body = some (pure (Answer.unknown name))
 
 /-- **Only `POST` reaches an endpoint.** Any other method on `/rpc/<name>`
-answers 405 with `allow: POST`, and runs no route and not the fallback. -/
-def handler_method : Prop :=
-  ∀ (routes : List Route) (fallback : Handler) (req : Request) (name : String),
-    req.method ≠ "POST" → req.segments = ["rpc", name] →
-      handler routes fallback req = pure ((Response.text "Use POST\n" 405).withHeader "allow" "POST")
+answers 405 with `allow: POST`, and runs no route. -/
+def dispatch_method : Prop :=
+  ∀ (routes : List Route) (method body name : String),
+    method ≠ "POST" →
+      dispatch routes method ["rpc", name] body = some (pure Answer.wrongMethod)
 
 /-! ## The client -/
 

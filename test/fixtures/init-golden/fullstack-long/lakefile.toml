@@ -11,4 +11,6 @@ name = "Shared"
 name = "View"
 
 # Server.lean and Client.lean are the two programs: lasm builds them
-# (npm run build). They are not Lake targets.
+# (npm run build). They, the site they serve (Site.lean, Http.lean, Embed.lean,
+# NodeServer.lean) and the other server programs (ServerFastly.lean,
+# ServerWasiHttp.lean) import Lasm's library, so they are not Lake targets.

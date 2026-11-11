@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A full-stack Lean app (Lasm.RPC, Lasm.Fetch, Lasm.UI), compiled to WebAssembly by Lasm",
+  "description": "A full-stack Lean app (Lasm.RPC, Lasm.UI, Lasm.JS.Web), compiled to WebAssembly by Lasm",
   "scripts": {
     "dev": "lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client",
     "build": "npm run build:client && npm run build:server",
@@ -18,14 +18,25 @@
     "build:vercel-edge": "npm run build:client && lasm build Server.lean --target vercel-edge",
     "build:netlify-edge": "npm run build:client && lasm build Server.lean --target netlify-edge",
     "build:deno-deploy": "npm run build:client && lasm build Server.lean --target deno-deploy",
-    "build:fastly": "npm run build:client && lasm build Server.lean --target fastly",
-    "build:wasi-http": "npm run build:client && lasm build Server.lean --target wasi-http",
+    "build:fastly": "npm run build:client && lasm build ServerFastly.lean --target fastly",
+    "build:wasi-http": "npm run build:client && lasm build ServerWasiHttp.lean --target wasi-http",
     "start:fastly": "fastly compute serve",
     "start:spin": "spin up",
     "start:wasi-http": "wasmtime serve wasi-http/main.wasm"
   },
   "engines": {
     "node": ">=24"
+  },
+  "lasm": {
+    "edge": {
+      "exclude": [
+        "@hono/node-server"
+      ]
+    }
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.3",
+    "hono": "4.13.13"
   },
   "devDependencies": {
     "@lasm/compiler": "<LASM_VERSION>"

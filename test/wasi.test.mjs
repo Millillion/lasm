@@ -3,7 +3,7 @@
 // themselves are checked by .github/workflows/wasi.yml (scripts/wasi/wasi-ci.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { lowerAtomics, moduleImports } from '../src/wasi/lower-atomics.mjs';
@@ -110,21 +110,26 @@ test('lasm init --template fetch --deploy fastly|wasi|spin', () => {
   try {
     const options = parseInitArguments([join(parent, 'app'), '--template', 'fetch', '--deploy', 'fastly', '--deploy', 'wasi', '--deploy', 'spin', '--deploy', 'workers']);
     const result = initProject(options);
-    for (const file of ['fastly.toml', 'spin.toml', 'wrangler.toml', 'Main.lean']) assert.ok(result.files.includes(file), file);
+    for (const file of ['fastly.toml', 'spin.toml', 'wrangler.toml', 'Main.lean', 'Fastly.lean', 'Cgi.lean', 'WasiHttp.lean']) assert.ok(result.files.includes(file), file);
     const pkg = JSON.parse(readFileSync(join(parent, 'app/package.json'), 'utf8'));
-    assert.equal(pkg.scripts['build:fastly'], 'lasm build Main.lean --target fastly');
-    assert.equal(pkg.scripts['build:wasi'], 'lasm build Main.lean --target wasi');
+    // Fastly, WASI (CGI) and wasi:http each have their own program; the other targets build Main.lean.
+    assert.equal(pkg.scripts['build:fastly'], 'lasm build Fastly.lean --target fastly');
+    assert.equal(pkg.scripts['build:wasi'], 'lasm build Cgi.lean --target wasi');
+    assert.equal(pkg.scripts['build:workers'], 'lasm build Main.lean --target workers');
     assert.equal(pkg.scripts['start:spin'], 'spin up');
-    assert.equal(pkg.dependencies, undefined);
-    assert.match(readFileSync(join(parent, 'app/Main.lean'), 'utf8'), /import Lasm\.Fetch/);
+    assert.deepEqual(Object.keys(pkg.dependencies), ['@hono/node-server', 'hono']);
+    assert.match(readFileSync(join(parent, 'app/Main.lean'), 'utf8'), /import NodeServer/);
+    assert.match(readFileSync(join(parent, 'app/Fastly.lean'), 'utf8'), /import Lasm\.Fastly/);
+    assert.match(readFileSync(join(parent, 'app/WasiHttp.lean'), 'utf8'), /import Lasm\.WASI\.Http/);
     assert.match(readFileSync(join(parent, 'app/spin.toml'), 'utf8'), /source = "wasi-http\/main.wasm"/);
-    assert.equal(pkg.scripts['build:wasi-http'], 'lasm build Main.lean --target wasi-http');
+    assert.equal(pkg.scripts['build:wasi-http'], 'lasm build WasiHttp.lean --target wasi-http');
     assert.match(readFileSync(join(parent, 'app/fastly.toml'), 'utf8'), /^name = "app"$/m);
     assert.match(readFileSync(join(parent, 'app/.gitignore'), 'utf8'), /^pkg\/$/m);
     assert.match(readFileSync(join(parent, 'app/README.md'), 'utf8'), /Fastly Compute/);
     // A WASI command-line program from the plain template.
     initProject(parseInitArguments([join(parent, 'cli'), '--deploy', 'wasi']));
     assert.equal(JSON.parse(readFileSync(join(parent, 'cli/package.json'), 'utf8')).scripts['build:wasi'], 'lasm build Main.lean --target wasi');
+    assert.ok(!readdirSync(join(parent, 'cli')).includes('Cgi.lean'));
   } finally { rmSync(parent, { recursive: true, force: true }); }
   assert.throws(() => parseInitArguments(['x', '--template', 'hono', '--deploy', 'fastly']), /supports the fetch and fullstack templates, not hono/);
   assert.throws(() => parseInitArguments(['x', '--deploy', 'fastly']), /needs a server template/);

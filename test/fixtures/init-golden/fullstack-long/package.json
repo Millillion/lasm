@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A full-stack Lean app (Lasm.RPC, Lasm.Fetch, Lasm.UI), compiled to WebAssembly by Lasm",
+  "description": "A full-stack Lean app (Lasm.RPC, Lasm.UI, Lasm.JS.Web), compiled to WebAssembly by Lasm",
   "scripts": {
     "dev": "lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client",
     "build": "npm run build:client && npm run build:server",
@@ -18,6 +18,17 @@
   },
   "engines": {
     "node": ">=24"
+  },
+  "lasm": {
+    "edge": {
+      "exclude": [
+        "@hono/node-server"
+      ]
+    }
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.3",
+    "hono": "4.13.13"
   },
   "devDependencies": {
     "@lasm/compiler": "<LASM_VERSION>"

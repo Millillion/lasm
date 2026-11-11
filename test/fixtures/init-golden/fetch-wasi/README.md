@@ -1,6 +1,6 @@
 # fetch.app
 
-An HTTP handler in pure Lean (Lasm.Fetch) for Node, Fastly Compute, WASI, Spin and the edge, compiled ahead of time to WebAssembly by
+An HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces, compiled ahead of time to WebAssembly by
 [Lasm](https://github.com/Millillion/lasm). It runs on Node.js, and also on Bun and Deno.
 
 ## Requirements
@@ -33,14 +33,17 @@ Files:
 
 | File | What it is |
 | --- | --- |
-| `Main.lean` | The program. |
+| `Main.lean` | The program: routes and Lean request handlers. |
 | `App.lean` | Pure Lean logic used by `Main.lean`. |
+| `Fastly.lean` | The same routes on Fastly Compute's own host calls (`Lasm.Fastly`): `npm run build:fastly`. |
+| `Cgi.lean` | The same routes as a CGI program in plain Lean IO (WASI): `npm run build:wasi`. |
+| `WasiHttp.lean` | The same routes as a wasi:http component (`Lasm.WASI.Http`): `npm run build:wasi-http`. |
 | `lakefile.toml`, `lean-toolchain` | The Lake project, pinned to Lean <LEAN_VERSION>. |
-| `package.json` | npm scripts and Lasm (`@lasm/compiler`) as a dev dependency. |
+| `package.json` | npm scripts, the npm packages Lean calls and Lasm (`@lasm/compiler`) as a dev dependency. |
 | `Dockerfile` | Builds with Lasm, runs on `node:24-bookworm-slim`. |
 
 `App.lean` is pure Lean: `lake build App` checks it natively. `Main.lean` imports
-`Lasm.Fetch`, which ships with Lasm, so it builds and runs only with Lasm. `npx lasm editor`
+`Lasm.JS.Web`, which ships with Lasm, so it builds and runs only with Lasm. `npx lasm editor`
 (also run by `npm run dev`) makes the Lean editor resolve it
 ([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
 
@@ -61,7 +64,7 @@ See [Bun and Deno](https://github.com/Millillion/lasm/blob/main/docs/BUN_DENO.md
 
 ## Deploy
 
-`dist/` is the whole deployment: copy it to a machine
+`dist/` is the whole deployment, including the production `node_modules`: copy it to a machine
 with Node 24+ (Linux x64 or arm64 from a build on any platform, or the build machine's
 own OS and architecture) and run `node dist/main.mjs`.
 
@@ -84,7 +87,7 @@ with `fastly compute deploy`. See the [Fastly guide](https://github.com/Millilli
 
 **WASI:** `npm run build:wasi` writes `wasi/main.wasm`, a standard WASI (preview 1)
 module with no JavaScript: `wasmtime run --dir . wasi/main.wasm`, `wasmer run`, or Node's `node:wasi`.
-A Lasm.Fetch handler answers one CGI request per run. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+`Cgi.lean` answers one CGI request per run (WAGI). See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
 
 **wasi-http:** `npm run build:wasi-http` writes `wasi-http/main.wasm`, a
 wasi:http/proxy component: `wasmtime serve wasi-http/main.wasm` serves it on port 8080, and any
@@ -92,7 +95,7 @@ wasi-http host (Spin, wasmCloud, …) runs it. See [WASI](https://github.com/Mil
 
 **Fermyon Spin:** `spin.toml` serves the wasi-http component `wasi-http/main.wasm`
 with Spin's HTTP trigger; `spin build` runs `npm run build:wasi-http`, then `spin up` serves on
-port 3000. List the hosts `Lasm.Fetch.fetch` reaches in `allowed_outbound_hosts`. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+port 3000. List the hosts the component's outgoing requests reach in `allowed_outbound_hosts`. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
 
 **Cloudflare Workers:** `npm run build:workers` writes
 `workers/` (the Worker entry, the Lean program and its host); `wrangler.toml` points at it.

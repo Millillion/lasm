@@ -6,7 +6,7 @@ in the library itself (Core.lean, Client.lean), where `serve` uses the first.
 import Lasm.RPC.Spec
 
 namespace Lasm.RPC.Theorems
-open Lean Lasm.RPC Lasm.Fetch Lasm.UI
+open Lean Lasm.RPC Lasm.UI Std.Async
 
 theorem decodeRequest_valid : Spec.decodeRequest_valid :=
   fun _ _ _ e _ _ h => Endpoint.decodeRequest_valid e h
@@ -67,22 +67,22 @@ theorem serve_valid : Spec.serve_valid := by
     funext result
     cases result <;> rfl
 
-theorem handler_fallback : Spec.handler_fallback := by
-  intro routes fallback req h
-  simp only [handler]
+theorem dispatch_other : Spec.dispatch_other := by
+  intro routes method segments body h
+  simp only [dispatch]
   split <;> (try rfl) <;> simp_all
 
-theorem handler_route : Spec.handler_route := by
-  intro routes fallback req name route hm hs hf
-  simp only [handler, hm, hs, hf]
+theorem dispatch_route : Spec.dispatch_route := by
+  intro routes body name route hf
+  simp only [dispatch, hf]
 
-theorem handler_unknown : Spec.handler_unknown := by
-  intro routes fallback req name hm hs hf
-  simp only [handler, hm, hs, hf]
+theorem dispatch_unknown : Spec.dispatch_unknown := by
+  intro routes body name hf
+  simp only [dispatch, hf]
 
-theorem handler_method : Spec.handler_method := by
-  intro routes fallback req name hm hs
-  simp only [handler, hs]
+theorem dispatch_method : Spec.dispatch_method := by
+  intro routes method body name hm
+  simp only [dispatch]
 
 theorem call_invalid : Spec.call_invalid :=
   fun _ _ _ _ _ e req handle base m h => Endpoint.call_invalid e req handle base m h
