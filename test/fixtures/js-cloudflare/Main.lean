@@ -143,12 +143,12 @@ def isStr (d : Data) (s : String) : Bool := match d with | .string t => t == s |
 def isNum (d : Data) (x : Float) : Bool := match d with | .number y => y == x | _ => false
 def isUndef (d : Data) : Bool := match d with | .undefined => true | _ => false
 def isNull (d : Data) : Bool := match d with | .null => true | _ => false
-def isTrue (d : Data) : Bool := match d with | .bool true => true | _ => false
+def isTrueData (d : Data) : Bool := match d with | .bool true => true | _ => false
 
 /-- The generated members of `iface` (Surface.lean) that `v` lacks: lines for `merge`. -/
 def probe (iface : String) (v : Value) : IO (Array String) := do
   let .object ifaces := (← jsonParse Surface.json).field "interfaces" | throw (IO.userError "no interfaces in the surface")
-  let some (.array members) := ifaces.find? (·.1 == iface) |>.map (·.2) | throw (IO.userError s!"{iface} is not in the surface")
+  let some (Data.array members) := (ifaces.find? (·.1 == iface)).map (·.2) | throw (IO.userError s!"{iface} is not in the surface")
   let mut lines := #[]
   for m in members do
     if let .string name := m then
@@ -412,7 +412,7 @@ def consume (batch : MessageBatch) (env : Data) (_ctx : ExecutionContext) : Asyn
   for m in messages do
     let body ← m.body
     let attempts ← m.attempts
-    if isTrue (body.field "retry") then
+    if isTrueData (body.field "retry") then
       if attempts < 2 then
         m.retry
         continue
@@ -450,12 +450,12 @@ def queues (r : Checks) (live : Live) (env : Data) : Async Unit := do
       break
     sleep 500
   let bodies ← records.filterMapM fun d => do
-    if isTrue ((d.field "body").field "retry") then return none
+    if isTrueData ((d.field "body").field "retry") then return none
     return some (← jsonStringify (d.field "body"))
   expect r "queues delivered" (bodies.qsort (· < ·) == sent.qsort (· < ·)) s!"{bodies.size} of {sent.size} delivered"
   expect r "queues batch.queue" (records.all fun d => isStr (d.field "queue") "lasm-js-cloudflare") ""
   -- retry(): the message comes back, with attempts counting the delivery
-  let retried := records.find? fun d => isTrue ((d.field "body").field "retry")
+  let retried := records.find? fun d => isTrueData ((d.field "body").field "retry")
   expect r "queues retry" (match retried with | some d => isNum (d.field "attempts") 2 | none => false) s!"{retried.map Data.describe}"
   try
     let m ← queue.metrics
@@ -558,7 +558,7 @@ def durableFetch (request : Request) (state : DurableObjectState) : Async Respon
   let storage ← state.storage
   match ← (← URL.new (← request.url)).pathname with
   | "/count" =>
-    let n := match (← storage.get "count") with | .number x => x | _ => 0
+    let n : Float := match (← storage.get "count") with | .number x => x | _ => 0
     storage.put "count" (toJS (n + 1))
     text s!"{(n + 1).toUInt64}"
   | "/id" => text (← (← state.id).toString)
