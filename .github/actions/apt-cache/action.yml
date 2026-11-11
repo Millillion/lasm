@@ -6,7 +6,8 @@ description: >-
   scripts/ci/apt-cache.sh, and later runs install them with dpkg without the
   network. Only a cache miss uses the mirror (with retries). A cache from an
   older image version is tried first and kept when dpkg accepts it. Not Linux:
-  the command runs as is. The calling step sets timeout-minutes.
+  the command runs as is. Caches are saved on main only. The calling step
+  sets timeout-minutes.
   docs/CI.md#apt-packages.
 inputs:
   name:
@@ -49,8 +50,11 @@ runs:
         CACHE_HIT: ${{ steps.restore.outputs.cache-hit }}
         RUN: ${{ inputs.run }}
       run: bash "$GITHUB_WORKSPACE/scripts/ci/apt-cache.sh" "${{ steps.key.outputs.dir }}" "${{ inputs.attempts }}" -- bash -eo pipefail -c "$RUN"
+    # Saved on main only: a pull request's cache is readable by that pull
+    # request alone, so it would only take room in the cache budget
+    # (scripts/ci/cache-budget.mjs). Pull requests restore main's caches.
     - name: Save the .deb files
-      if: runner.os == 'Linux' && steps.install.outputs.save == 'true'
+      if: runner.os == 'Linux' && steps.install.outputs.save == 'true' && github.ref == 'refs/heads/main'
       continue-on-error: true
       uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:

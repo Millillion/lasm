@@ -149,6 +149,13 @@ install through `scripts/ci/apt-cache.sh`:
   `.deb` files are copied and saved. If any installed package's `.deb` is
   missing, nothing is saved and the next run uses the mirror again.
 - If installing cached files fails, the script falls back to the mirror.
+- Caches are saved on `main` only (pull requests restore them but do not save:
+  a pull request's cache is readable by that pull request alone). A set is
+  about 20 MB (chromium) to 110 MB (webkit); bubblewrap is 50 KB. They count
+  toward the 8 GiB ceiling in `scripts/ci/cache-budget.mjs`, which, before an
+  upload would cross it, first evicts stale `apt-debs-*` caches (another ref's,
+  or one superseded by a newer `main` cache for the same package set and
+  runner image) not used in the last 24 hours.
 - Before a miss uses the mirror, the script checks that the image's mirror
   host (`azure.archive.ubuntu.com`, through `/etc/apt/apt-mirrors.txt`)
   resolves; when it does not, or an install attempt fails, apt is pointed at
