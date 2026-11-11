@@ -1,9 +1,12 @@
 [
   ".gitignore",
   "Client.lean",
+  "Embed.lean",
+  "Http.lean",
   "README.md",
   "Server.lean",
   "Shared.lean",
+  "Site.lean",
   "View.lean",
   "lakefile.toml",
   "lean-toolchain",

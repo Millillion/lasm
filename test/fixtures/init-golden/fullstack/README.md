@@ -8,7 +8,9 @@ the API between them, whose types and validation are written once.
 | --- | --- |
 | `Shared.lean` | The data (`Todo`), the API (`Lasm.RPC` endpoints) and its validation, with a theorem about it. Imported by both sides. |
 | `View.lean` | The page (`Lasm.UI`): rendered to HTML by the server for the first visit, kept up to date by the browser. |
-| `Server.lean` | The server (`Lasm.Fetch`): serves the API and the first page. Its `addTodo` handler can only store titles that passed the shared check: the type asks for the proof. |
+| `Site.lean` | The site: the API and the first page, for every server program. Its `addTodo` handler can only store titles that passed the shared check: the type asks for the proof. |
+| `Http.lean`, `Embed.lean` | Requests and responses as plain Lean data, and the browser app's files embedded in the server (`embed_dir!`). |
+| `Server.lean` | The server on Node, Bun, Deno and the edge, through the web's `Request` and `Response` (`Lasm.JS.Web`). |
 | `Client.lean` | The browser app (`Lasm.UI`): hydrates the server's page and calls the API. A theorem shows it never sends an invalid title. |
 | `public/style.css` | Copied next to the browser app. |
 | `wrangler.toml` | Cloudflare Workers: the server as a Worker, the browser app as static assets. |
@@ -51,4 +53,4 @@ has linked Lasm's Lean for this directory; restart the Lean server in your edito
 
 Guides: [Lasm.RPC](https://github.com/Millillion/lasm/blob/main/docs/RPC.md),
 [Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md),
-[Lasm.Fetch](https://github.com/Millillion/lasm/blob/main/docs/FETCH.md).
+[Lasm.JS.Web](https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md).

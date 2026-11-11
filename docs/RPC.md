@@ -1,6 +1,6 @@
 # Lasm.RPC: the whole stack in Lean
 
-`Lasm.RPC` connects a Lean server ([Lasm.Fetch](FETCH.md)) and a Lean browser
+`Lasm.RPC` connects a Lean server (on any server target) and a Lean browser
 app ([Lasm.UI](UI.md)) through typed endpoints declared once, in a module both
 import. The request and response types, and the rules a request must satisfy,
 exist in one place. A theorem about those rules holds on both sides:
@@ -67,21 +67,23 @@ handler work with it by name.
 ## Server
 
 ```lean
--- Server.lean
-import Lasm.Fetch
+-- Site.lean
 import Lasm.RPC.Server
 import Shared
-open Lasm.Fetch Lasm.RPC
+open Lasm.RPC
 
 def store (title : String) (_ : checkTitle title = .ok ()) : Todo := …   -- only validated titles
 
-def main : IO Unit := do
-  let routes := [
-    addTodo.serve fun req ok => do            -- ok : addTodo.validate req = .ok ()
-      return .ok (store req.title ok),
-    listTodos.serve' fun _ => do return .ok #[] ]
-  serve <| handler routes fun req => do       -- every other request
-    return .notFound
+def routes : List Route := [
+  addTodo.serve fun req ok => do            -- ok : addTodo.validate req = .ok ()
+    return .ok (store req.title ok),
+  listTodos.serve' fun _ => do return .ok #[] ]
+
+-- In the server's request handler: the method, the path's decoded segments
+-- and the body, from whatever serves the request.
+match dispatch routes method segments body with
+| some answer => …                          -- (← answer).status, .headers, .body
+| none => …                                 -- every other request: pages, files
 ```
 
 - `Endpoint.serve e (fun req ok => …)`: the handler runs in `Async` (it can
@@ -89,12 +91,14 @@ def main : IO Unit := do
   `.error message` (status 500). A body that is not JSON, does not decode, or
   fails `validate` answers status 400 without running it.
 - `Endpoint.serve'`: the same, for handlers that do not need the proof.
-- `handler routes fallback` is a `Lasm.Fetch` handler: `POST /rpc/<name>` goes
-  to the route, `GET /rpc/…` answers 405, everything else to `fallback` (your
-  pages, static files).
-- `Lasm.Fetch.serve` runs it on every server target: Node (`lasm build`), the
-  edge platforms (`--target workers`, `vercel-edge`, `netlify-edge`,
-  `deno-deploy`), Bun and Deno, WASI and Fastly Compute ([FETCH.md](FETCH.md)).
+- `dispatch routes method segments body` answers a request for `/rpc/<name>`:
+  `POST` runs the route (an `Answer`: status, headers, JSON body, never
+  cached), an unknown name answers 404, any other method 405 (`allow: POST`).
+  It is `none` for every other path, which the program answers itself (its
+  pages, static files). It knows no server, so the same routes run on every
+  server target: the fullstack template passes it the requests of
+  Lasm.JS.Web (Node, the edge platforms, Bun, Deno), Lasm.Fastly and
+  Lasm.WASI.Http.
 
 ## Client
 
@@ -141,7 +145,10 @@ for them (issue #168).
 | --- | --- |
 | `Shared.lean` | Data, endpoints, validation and its theorem (a Lake library: `lake build` checks it). |
 | `View.lean` | The page (`Lasm.UI`), shared: the server renders it to HTML, the browser keeps it up to date. |
-| `Server.lean` | `Lasm.Fetch.serve`: the endpoints, `GET /` rendering the view with the todos embedded as the app's flags (`data-lasm-flags`, `data-lasm-hydrate`), and `dist/public` (the browser app and `public/`) embedded with `embed_dir!`. The todos are kept with `Lasm.KV`. |
+| `Site.lean` | The site: the endpoints (`dispatch`), `GET /` rendering the view with the todos embedded as the app's flags (`data-lasm-flags`, `data-lasm-hydrate`), and the files of `dist/public` (the browser app and `public/`). The todos are kept with `Lasm.KV`. |
+| `Http.lean`, `Embed.lean` | Requests and responses as plain Lean data, and `embed_dir!`, which embeds `dist/public` in the server program. |
+| `Server.lean` | The server on the JavaScript runtimes (the web's `Request` and `Response`, Lasm.JS.Web): the edge platforms, Bun and Deno serve its default export; Node uses Lasm.Fetch's Node server until how Lean servers run on Node is decided. |
+| `ServerFastly.lean`, `ServerWasiHttp.lean` | With `--deploy fastly` and `--deploy wasi-http`/`spin`: the server on Lasm.Fastly and Lasm.WASI.Http. |
 | `Client.lean` | The `Lasm.UI` app. It mounts on the server's markup and hydrates it (keeping its nodes), then calls the endpoints. |
 | `wrangler.toml` | Workers: the server as a Worker (`workers/worker.mjs`), `dist/public` as static assets (served before the Worker), and a commented-out `TODOS` KV binding. |
 
@@ -168,19 +175,17 @@ worker each; `LASM_DEV_WORKERS=1` builds them one after the other, 6.2 s).
 ### Static files on every target
 
 ```lean
-def assets : Assets := embed_dir! "dist/public"   -- Lasm.Fetch.Embed
-
-def main : IO Unit := serve <| assets.wrap <| handler routes fallback
+def assets : Http.Assets := embed_dir! "dist/public"   -- Embed.lean
+-- Site.respond: `assets.serve req` first, then `dispatch`, then the page.
 ```
 
 `embed_dir! "dir"` (relative to the Lean file) reads the directory when the
 server is compiled and puts every file in the program, with its content type
 and its `.br` copy when the browser build wrote one (sent to clients that
 accept Brotli). Hashed names (`app.1a2b3c4d5e6f.js`) are served as immutable,
-the rest with `cache-control: no-cache`. `Assets.wrap` answers `GET`/`HEAD`
-for those paths and passes everything else to the handler; `..` and dotfiles
-are refused. So one server build serves the whole app on every `Lasm.Fetch`
-target, including those without an asset mechanism (Fastly, wasi-http, Deno,
+the rest with `cache-control: no-cache`. `Assets.serve` answers `GET`/`HEAD`
+for those paths; `..` and dotfiles are refused. So each server program serves
+the whole app on its targets, including those without an asset mechanism (Fastly, wasi-http, Deno,
 Bun). Workers also serve `dist/public` through `[assets]`, before the Worker
 runs. Under `lasm dev` (`LASM_DEV_SERVER` set) nothing is embedded and the
 files are read from disk on each request. Build the browser app first (`npm
@@ -258,11 +263,10 @@ CI tests them end to end.
 | Module | |
 | --- | --- |
 | `Lasm.RPC.Core` | `Endpoint` (`name`, `validate`, `path`, `encodeRequest`, `decodeRequest`, `encodeResponse`, `decodeResponse`), `Error`, `decodeRequest_valid` |
-| `Lasm.RPC.Server` | `Endpoint.serve`, `Endpoint.serve'`, `Route`, `handler` |
+| `Lasm.RPC.Server` | `Endpoint.serve`, `Endpoint.serve'`, `Route`, `dispatch`, `Answer` |
 | `Lasm.RPC.Client` | `Endpoint.call`, `call_invalid` |
 | `Lasm.RPC` | all three |
-| `Lasm.Fetch.Assets`, `Lasm.Fetch.Embed` | `Assets`, `Assets.serve`, `Assets.wrap`; `embed_dir!` |
-| `Lasm.KV` | `Store`, `memory`, `workers`, `deno`, `fastly`, `open` |
+| `Lasm.KV` | `Store`, `memory`, `workers`, `deno`, `fastly`, `open`, `setWorkersEnv` |
 
 CI: [`fullstack.yml`](../.github/workflows/fullstack.yml) builds the template
 as `lasm init` writes it, for Node, Workers, Bun, Deno, Fastly and wasi-http,

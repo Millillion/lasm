@@ -1,10 +1,10 @@
 /-
-Lasm.KV: a small key-value store for Lasm.Fetch servers, with one interface
-over the platform's own stores:
+Lasm.KV: a small key-value store for servers, with one interface over the
+platform's own stores:
 
 | `Lasm.KV.open name` on | uses |
 | --- | --- |
-| Cloudflare Workers with a KV binding `name` (wrangler.toml `[[kv_namespaces]]`) | Workers KV |
+| Cloudflare Workers with a KV binding `name` (wrangler.toml `[[kv_namespaces]]`), once the fetch handler passed its `env` to `setWorkersEnv` | Workers KV |
 | Deno, Deno Deploy (where `Deno.openKv` exists: Deploy, `deno run --unstable-kv`) | Deno KV |
 | Fastly Compute with a KV Store `name` (Viceroy: `fastly.toml`'s `[local_server.kv_stores]`) | Fastly KV |
 | anywhere else (Node, Bun, WASI, wasi-http; or no such store) | memory: one copy per process, isolate or instance |
@@ -17,7 +17,6 @@ Values are strings (JSON, for structured data). Guide: docs/RPC.md.
 -/
 import Std.Data.HashMap
 import Lasm.JS.Core
-import Lasm.Fetch
 import Lasm.Fastly
 
 namespace Lasm.KV
@@ -53,9 +52,22 @@ def memory : IO Store := do
            put := fun k v => table.modify (Table.write · k v),
            delete := fun k => table.modify (Table.remove · k) }
 
-/-- The binding `name` of the edge platform's `env` (Workers), if it is an object. -/
+/-- Cloudflare Workers' `env` (its bindings: KV namespaces, D1, variables), as
+the last request brought it; `.undefined` until then and elsewhere. -/
+initialize workersEnv : IO.Ref Data ← IO.mkRef .undefined
+
+/-- Records the `env` that Workers passed to the fetch handler
+(`(request, env, ctx) => …`), so that the stores `open` made find their
+bindings. Call it at the start of every request: Workers may pass a new
+`env` with each. -/
+def setWorkersEnv (env : Data) : IO Unit := do
+  match env with
+  | .ref _ _ | .object _ => workersEnv.set env
+  | _ => pure ()
+
+/-- The binding `name` of Workers' `env` (`setWorkersEnv`), if it is an object. -/
 def binding (name : String) : IO (Option Value) := do
-  let found : Data ← match ← Lasm.Fetch.platformEnv.get with
+  let found : Data ← match ← workersEnv.get with
     | .ref env _ => (try env.get name Data catch _ => pure .undefined)
     | env@(.object _) => pure (env.field name)
     | _ => pure .undefined
@@ -145,33 +157,33 @@ def fastly (name : String) : Store :=
 documentation), else memory. On Workers the binding is looked up per request:
 when the Worker has no binding `name`, the store falls back to memory then. -/
 def «open» (name : String) : IO Store := do
-  match Lasm.Fetch.platformCode () with
-  | 2 =>
-    -- Fastly: the store must exist (Viceroy: fastly.toml); otherwise memory.
-    try
+  -- Fastly: the store must exist (Viceroy: fastly.toml). Elsewhere every
+  -- Lasm.Fastly call fails (`unsupported`), so this finds no store.
+  let onFastly ← try
       discard <| (Lasm.Fastly.KvStore.open name : IO _)
-      return fastly name
-    catch _ => memory
-  | 0 =>
-    let g ← global
-    -- `Deno` is a plain object: read it as a reference (reading a field of
-    -- undefined throws elsewhere), then look for openKv.
-    let hasDenoKv ← try
-        let denoNs ← g.get "Deno" Value
-        let f ← denoNs.get "openKv" Data
-        pure (f matches .ref _ _)
-      catch _ => pure false
-    if hasDenoKv then
-      try return ← deno name catch _ => memory
-    else if ← Lasm.JS.onEdge then
-      let mem ← memory
-      let w := workers name
-      let bound : IO Bool := return (← binding name).isSome
-      let get (k : String) : Async (Option String) := do if ← bound then w.get k else mem.get k
-      let put (k v : String) : Async Unit := do if ← bound then w.put k v else mem.put k v
-      let delete (k : String) : Async Unit := do if ← bound then w.delete k else mem.delete k
-      return { kind := "workers or memory", get, put, delete }
-    else memory
-  | _ => memory
+      pure true
+    catch _ => pure false
+  if onFastly then return fastly name
+  -- WASI, wasi-http, Fastly without the store, native Lean: memory.
+  if !Lasm.JS.isAvailable then return ← memory
+  let g ← global
+  -- `Deno` is a plain object: read it as a reference (reading a field of
+  -- undefined throws elsewhere), then look for openKv.
+  let hasDenoKv ← try
+      let denoNs ← g.get "Deno" Value
+      let f ← denoNs.get "openKv" Data
+      pure (f matches .ref _ _)
+    catch _ => pure false
+  if hasDenoKv then
+    try return ← deno name catch _ => memory
+  else if ← Lasm.JS.onEdge then
+    let mem ← memory
+    let w := workers name
+    let bound : IO Bool := return (← binding name).isSome
+    let get (k : String) : Async (Option String) := do if ← bound then w.get k else mem.get k
+    let put (k v : String) : Async Unit := do if ← bound then w.put k v else mem.put k v
+    let delete (k : String) : Async Unit := do if ← bound then w.delete k else mem.delete k
+    return { kind := "workers or memory", get, put, delete }
+  else memory
 
 end Lasm.KV

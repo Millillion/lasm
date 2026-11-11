@@ -1,12 +1,16 @@
 /-
-Lasm.RPC on the server: endpoints served by a `Lasm.Fetch` handler, so the
-same code runs on Node, the edge platforms, Bun, Deno, WASI and Fastly.
+Lasm.RPC on the server: the routes that answer the endpoints, and `dispatch`,
+which answers an HTTP request for `/rpc/<name>` from its method, path and
+body. It knows no server: a program passes each request's method, path
+segments and body from whatever serves it (Lasm.JS.Web's `Request` on Node,
+Bun, Deno and the edge; Lasm.Fastly; Lasm.WASI.Http) and sends the `Answer`
+back the same way.
 -/
 import Lasm.RPC.Core
-import Lasm.Fetch
+import Std.Async.Basic
 
 namespace Lasm.RPC
-open Lean Lasm.Fetch
+open Lean Std.Async
 
 /-- A served endpoint: its name and what answers a request body. -/
 structure Route where
@@ -35,17 +39,39 @@ def serve' [FromJson Req] [ToJson Res] (e : Endpoint Req Res) (handler : Req →
 
 end Endpoint
 
-/-- A `Lasm.Fetch` handler that answers `POST /rpc/<name>` with the routes and
-passes every other request to `fallback`. -/
-def handler (routes : List Route) (fallback : Handler) : Handler := fun req => do
-  match req.method, req.segments with
+/-- An HTTP response to an endpoint request: status, headers and body. -/
+structure Answer where
+  status : UInt16
+  headers : Array (String × String)
+  body : String
+  deriving Inhabited
+
+/-- The answer of a route: its status and JSON body, never cached. -/
+def Answer.ofRoute (r : UInt16 × String) : Answer :=
+  { status := r.1, headers := #[("content-type", "application/json"), ("cache-control", "no-store")], body := r.2 }
+
+/-- 404: no endpoint is named `name`. -/
+def Answer.unknown (name : String) : Answer :=
+  { status := 404, headers := #[("content-type", "application/json")],
+    body := (Json.mkObj [("error", Json.str s!"no endpoint {name}")]).compress }
+
+/-- 405: an endpoint takes only `POST`. -/
+def Answer.wrongMethod : Answer :=
+  { status := 405, headers := #[("content-type", "text/plain; charset=utf-8"), ("allow", "POST")], body := "Use POST\n" }
+
+/-- The answer to an HTTP request with `method`, the path's decoded segments
+(`/rpc/addTodo` → `["rpc", "addTodo"]`) and `body`, when the path names an
+endpoint (`/rpc/<name>`): `POST` runs the first route named `name` on the body;
+an unknown name answers 404 and any other method 405 (`allow: POST`). `none`
+for every other path: the program answers those itself. -/
+def dispatch (routes : List Route) (method : String) (segments : List String) (body : String) :
+    Option (Async Answer) :=
+  match method, segments with
   | "POST", ["rpc", name] =>
     match routes.find? (·.name == name) with
-    | some route =>
-      let (status, body) ← route.run req.text
-      return Response.json body status |>.withHeader "cache-control" "no-store"
-    | none => return Response.json (Json.mkObj [("error", Json.str s!"no endpoint {name}")]).compress 404
-  | _, ["rpc", _] => return Response.text "Use POST\n" 405 |>.withHeader "allow" "POST"
-  | _, _ => fallback req
+    | some route => some (Answer.ofRoute <$> route.run body)
+    | none => some (pure (Answer.unknown name))
+  | _, ["rpc", _] => some (pure Answer.wrongMethod)
+  | _, _ => none
 
 end Lasm.RPC

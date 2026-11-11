@@ -61,11 +61,13 @@ export const templates = {
   'std-http': { summary: "an HTTP server in pure Lean (Std.Http)", server: true, interop: false },
   // The browser (docs/BROWSER.md): a static web app, built with --target browser.
   web: { summary: 'a browser app in Lean (Lasm.UI): a counter', server: false, interop: true, browser: true },
-  // Lasm.Fetch (docs/FETCH.md): one handler for Node, WASI, Fastly, Spin, the edge, Bun and Deno.
-  fetch: { summary: 'an HTTP handler in pure Lean (Lasm.Fetch) for Node, Fastly Compute, WASI, Spin and the edge', server: true, interop: false, library: 'Lasm.Fetch', portable: true },
+  // A web fetch handler (Lasm.JS.Web) for Node, the edge, Bun and Deno; with
+  // --deploy, the same routes on Fastly's (Lasm.Fastly) and wasi:http's
+  // (Lasm.WASI.Http) own interfaces and as a CGI program (WASI).
+  fetch: { summary: 'an HTTP handler on the web\'s Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces', server: true, interop: false, library: 'Lasm.JS.Web', portable: true },
   // The whole stack in Lean (docs/RPC.md): shared types, API and validation; a
-  // Lasm.Fetch server with server-side rendering; a Lasm.UI app that hydrates it.
-  fullstack: { summary: 'a full-stack Lean app: shared API and validation (Lasm.RPC), a server (Lasm.Fetch) that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target', server: true, interop: false, fullstack: true },
+  // A server (Lasm.JS.Web, Lasm.Fastly, Lasm.WASI.Http) with server-side rendering; a Lasm.UI app that hydrates it.
+  fullstack: { summary: 'a full-stack Lean app: shared API and validation (Lasm.RPC), a server that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target', server: true, interop: false, fullstack: true },
 };
 
 export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys(templates).join('|')}] [--deploy TARGET]…
@@ -250,6 +252,14 @@ cached forever. See the [browser deployment guide](https://github.com/Millillion
 `;
 }
 
+/** The fetch template's program for a WASI target: Fastly, wasi:http and CGI
+ * each have their own interface (templates/fetch/Fastly.lean, WasiHttp.lean,
+ * Cgi.lean); every other target builds Main.lean. */
+const wasiEntries = { fastly: 'Fastly.lean', 'wasi-http': 'WasiHttp.lean', wasi: 'Cgi.lean' };
+export function entryFile(template, platform) {
+  return template === 'fetch' && wasiEntries[platform] ? wasiEntries[platform] : 'Main.lean';
+}
+
 function packageJson(name, template, deploy = []) {
   if (templates[template].browser) return browserPackageJson(name, template);
   const lasm = lasmPackage();
@@ -268,7 +278,7 @@ function packageJson(name, template, deploy = []) {
   for (const target of deploy) {
     const { package: platform } = deployTargets[target];
     // Build and package in one step; Vercel's and Netlify's builds run these too.
-    if (platform) pkg.scripts[`build:${platform}`] = `lasm build Main.lean --target ${platform}`;
+    if (platform) pkg.scripts[`build:${platform}`] = `lasm build ${entryFile(template, platform)} --target ${platform}`;
   }
   if (deploy.includes('spin')) pkg.scripts['start:spin'] = 'spin up';
   if (deploy.includes('fastly')) pkg.scripts['start:fastly'] = 'fastly compute serve';
@@ -412,7 +422,7 @@ component = "${name}"
 
 [component.${name}]
 source = "wasi-http/main.wasm"
-# Hosts Lasm.Fetch.fetch may reach, for example ["https://api.example.com"].
+# Hosts the component's outgoing requests may reach, for example ["https://api.example.com"].
 allowed_outbound_hosts = []
 
 [component.${name}.build]
@@ -505,7 +515,7 @@ Files:
 | --- | --- |
 | \`Main.lean\` | The program${t.interop ? ': routes and Lean request handlers' : ''}. |
 | \`App.lean\` | Pure Lean logic used by \`Main.lean\`. |
-| \`lakefile.toml\`, \`lean-toolchain\` | The Lake project, pinned to Lean ${defaultLean()}. |
+${entryRows(template, deploy)}| \`lakefile.toml\`, \`lean-toolchain\` | The Lake project, pinned to Lean ${defaultLean()}. |
 | \`package.json\` | npm scripts${t.interop ? ', the npm packages Lean calls' : ''} and Lasm (\`${lasm.name}\`) as a dev dependency. |
 | \`Dockerfile\` | Builds with Lasm, runs on \`node:24-bookworm-slim\`. |
 
@@ -543,7 +553,7 @@ The image sets \`PORT=8080\`; platforms that assign a port override it.` : ''}
 ${deploy.some(target => deployTargets[target].package) ? `Lasm builds for each platform; it does not install or start the platform's tools. Test and deploy
 with your platform's own CLI (\`vercel\`, \`netlify\`, \`func\`, \`gcloud\`, \`aws\` or \`sam\`), installed as its docs say.
 
-` : ''}${deploy.filter(target => target !== 'lambda').map(target => deployReadme[target](name) + '\n').join('')}${deploy.includes('lambda') ? `\`Dockerfile.lambda\` builds an AWS Lambda container image (Lambda's Node 24 image behind the
+` : ''}${deploy.filter(target => target !== 'lambda').map(target => deployReadme[target](name, template) + '\n').join('')}${deploy.includes('lambda') ? `\`Dockerfile.lambda\` builds an AWS Lambda container image (Lambda's Node 24 image behind the
 AWS Lambda Web Adapter): \`docker build -f Dockerfile.lambda -t ${name}-lambda .\`; see the
 [Lambda guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md).
 
@@ -552,6 +562,15 @@ Railway, Render, Heroku); give it at least 512 MB of memory. Build on the
 platform's architecture (\`docker build --platform linux/amd64\` for amd64-only
 platforms). Platform recipes: [Lasm deployment guides](https://github.com/Millillion/lasm/blob/main/docs/deploy/README.md).
 `;
+}
+
+/** README rows for the fetch template's WASI programs (entryFile). */
+function entryRows(template, deploy) {
+  const what = { 'Fastly.lean': 'The same routes on Fastly Compute\'s own host calls (\`Lasm.Fastly\`): \`npm run build:fastly\`.',
+    'WasiHttp.lean': 'The same routes as a wasi:http component (\`Lasm.WASI.Http\`): \`npm run build:wasi-http\`.',
+    'Cgi.lean': 'The same routes as a CGI program in plain Lean IO (WASI): \`npm run build:wasi\`.' };
+  const files = [...new Set(deploy.map(target => entryFile(template, deployTargets[target].package)))].filter(file => file !== 'Main.lean');
+  return files.map(file => `| \`${file}\` | ${what[file]} |\n`).join('');
 }
 
 const guide = page => `https://github.com/Millillion/lasm/blob/main/docs/deploy/${page}.md`;
@@ -594,9 +613,9 @@ which writes the edge function \`netlify/edge-functions/lasm.mjs\` (and \`netlif
 \`serve\` and \`deploy\` run it. Test locally with \`fastly compute serve\` (Fastly's Viceroy) and deploy
 with \`fastly compute deploy\`. See the [Fastly guide](${guide('fastly')}).
 `,
-  wasi: () => `**WASI:** \`npm run build:wasi\` writes \`wasi/main.wasm\`, a standard WASI (preview 1)
+  wasi: (name, template) => `**WASI:** \`npm run build:wasi\` writes \`wasi/main.wasm\`, a standard WASI (preview 1)
 module with no JavaScript: \`wasmtime run --dir . wasi/main.wasm\`, \`wasmer run\`, or Node's \`node:wasi\`.
-A Lasm.Fetch handler answers one CGI request per run. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+${template === 'fetch' ? '\`Cgi.lean\` answers one CGI request per run (WAGI). ' : ''}See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
 `,
   'wasi-http': () => `**wasi-http:** \`npm run build:wasi-http\` writes \`wasi-http/main.wasm\`, a
 wasi:http/proxy component: \`wasmtime serve wasi-http/main.wasm\` serves it on port 8080, and any
@@ -604,7 +623,7 @@ wasi-http host (Spin, wasmCloud, …) runs it. See [WASI](https://github.com/Mil
 `,
   spin: () => `**Fermyon Spin:** \`spin.toml\` serves the wasi-http component \`wasi-http/main.wasm\`
 with Spin's HTTP trigger; \`spin build\` runs \`npm run build:wasi-http\`, then \`spin up\` serves on
-port 3000. List the hosts \`Lasm.Fetch.fetch\` reaches in \`allowed_outbound_hosts\`. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+port 3000. List the hosts the component's outgoing requests reach in \`allowed_outbound_hosts\`. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
 `,
   'deno-deploy': () => `**Deno Deploy:** \`npm run build:deno-deploy\` writes \`deno/\` (the
 entrypoint \`deno/main.mjs\`, the Lean program and its host); test with \`deno task start:deno\`
@@ -682,6 +701,10 @@ export function initProject({ directory, template, deploy = [] }) {
   if (deploy.includes('supabase-edge')) files['supabase/config.toml'] = supabaseConfig(supabaseFunctionNameOf(name));
   if (deploy.includes('fastly')) files['fastly.toml'] = fastlyToml(fastlyName(target));
   if (deploy.includes('spin')) files['spin.toml'] = spinToml(spinName(name));
+  // The fetch template's programs for the WASI targets (entryFile).
+  if (template === 'fetch')
+    for (const platform of new Set(deploy.map(target => deployTargets[target].package)))
+      if (wasiEntries[platform]) files[wasiEntries[platform]] = readFileSync(join(templateRoot, 'fetch', wasiEntries[platform]), 'utf8');
   return writeFiles(target, name, files);
 }
 
@@ -693,6 +716,11 @@ function writeFiles(target, name, files) {
   }
   return { directory: target, name, files: Object.keys(files) };
 }
+
+/** The fullstack server program for a platform: Fastly and wasi:http have
+ * their own (ServerFastly.lean, ServerWasiHttp.lean); every other target
+ * builds Server.lean. */
+const fullstackEntry = platform => platform === 'fastly' ? 'ServerFastly.lean' : platform === 'wasi-http' ? 'ServerWasiHttp.lean' : 'Server.lean';
 
 /** The fullstack template (docs/RPC.md): one Lake project with shared, server
  * and client modules; the client is built for the browser into
@@ -717,11 +745,13 @@ name = "Shared"
 name = "View"
 
 # Server.lean and Client.lean are the two programs: lasm builds them
-# (npm run build). They are not Lake targets.
+# (npm run build). They, the site they serve (Site.lean, Http.lean, Embed.lean)
+# and the other server programs (ServerFastly.lean,
+# ServerWasiHttp.lean) import Lasm's library, so they are not Lake targets.
 `,
     'package.json': JSON.stringify({
       name, version: '0.1.0', private: true, type: 'module',
-      description: 'A full-stack Lean app (Lasm.RPC, Lasm.Fetch, Lasm.UI), compiled to WebAssembly by Lasm',
+      description: 'A full-stack Lean app (Lasm.RPC, Lasm.UI, Lasm.JS.Web), compiled to WebAssembly by Lasm',
       scripts: {
         // The server on http://localhost:3000, rebuilt with the browser app on every change.
         dev: 'lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client',
@@ -730,7 +760,7 @@ name = "View"
         'build:server': 'lasm build Server.lean --output dist/server',
         start: 'node dist/server/main.mjs',
         // Every other target: the browser app is embedded in the server program
-        // (embed_dir! in Server.lean), so the same build serves everything.
+        // (embed_dir!, Embed.lean), so each build serves everything.
         // Cloudflare Workers (wrangler.toml; Workers also serve dist/public as static assets).
         'build:workers': 'npm run build:client && lasm build Server.lean --target workers',
         // Bun and Deno: bun bun/main.mjs, deno run -A --unstable-kv deno/main.mjs (on $PORT; Deno KV keeps the todos).
@@ -741,7 +771,7 @@ name = "View"
         ...Object.fromEntries(deploy.filter(t => !['workers'].includes(t)).map(t => [`build:${deployTargets[t].package}`,
           // A function platform packages the Node server in dist/server; a
           // platform target writes its own directory (bin/, wasi-http/, …).
-          `npm run build:client && lasm build Server.lean --target ${deployTargets[t].package}${packageTargets[deployTargets[t].package] ? ' --output dist/server' : ''}`])),
+          `npm run build:client && lasm build ${fullstackEntry(deployTargets[t].package)} --target ${deployTargets[t].package}${packageTargets[deployTargets[t].package] ? ' --output dist/server' : ''}`])),
         ...(deploy.includes('fastly') ? { 'start:fastly': 'fastly compute serve' } : {}),
         ...(deploy.includes('spin') ? { 'start:spin': 'spin up' } : {}),
         ...(deploy.includes('wasi-http') ? { 'start:wasi-http': 'wasmtime serve wasi-http/main.wasm' } : {}),
@@ -751,7 +781,12 @@ name = "View"
     }, null, 2) + '\n',
     'Shared.lean': read('Shared.lean'),
     'View.lean': read('View.lean'),
+    'Http.lean': read('Http.lean'),
+    'Embed.lean': read('Embed.lean'),
+    'Site.lean': read('Site.lean'),
     'Server.lean': read('Server.lean'),
+    ...(deploy.includes('fastly') ? { 'ServerFastly.lean': read('ServerFastly.lean') } : {}),
+    ...(deploy.some(t => deployTargets[t].package === 'wasi-http') ? { 'ServerWasiHttp.lean': read('ServerWasiHttp.lean') } : {}),
     'Client.lean': read('Client.lean'),
     'public/style.css': read('public/style.css'),
     'wrangler.toml': `# Cloudflare Workers: npm run build:workers writes workers/ (the server) and
@@ -777,12 +812,12 @@ type = "CompiledWasm"
 globs = ["**/*.wasm"]
 fallthrough = false
 `,
-    'README.md': fullstackReadme(name),
+    'README.md': fullstackReadme(name, deploy),
     '.gitignore': gitignore + 'workers/\n.wrangler/\nbun/\ndeno/\nbin/\npkg/\nwasi-http/\napi/\nnetlify/\n',
   };
 }
 
-function fullstackReadme(name) {
+function fullstackReadme(name, deploy) {
   return `# ${name}
 
 A full-stack app written entirely in Lean and compiled to WebAssembly by
@@ -793,8 +828,10 @@ the API between them, whose types and validation are written once.
 | --- | --- |
 | \`Shared.lean\` | The data (\`Todo\`), the API (\`Lasm.RPC\` endpoints) and its validation, with a theorem about it. Imported by both sides. |
 | \`View.lean\` | The page (\`Lasm.UI\`): rendered to HTML by the server for the first visit, kept up to date by the browser. |
-| \`Server.lean\` | The server (\`Lasm.Fetch\`): serves the API and the first page. Its \`addTodo\` handler can only store titles that passed the shared check: the type asks for the proof. |
-| \`Client.lean\` | The browser app (\`Lasm.UI\`): hydrates the server's page and calls the API. A theorem shows it never sends an invalid title. |
+| \`Site.lean\` | The site: the API and the first page, for every server program. Its \`addTodo\` handler can only store titles that passed the shared check: the type asks for the proof. |
+| \`Http.lean\`, \`Embed.lean\` | Requests and responses as plain Lean data, and the browser app's files embedded in the server (\`embed_dir!\`). |
+| \`Server.lean\` | The server on Node, Bun, Deno and the edge, through the web's \`Request\` and \`Response\` (\`Lasm.JS.Web\`). |
+${deploy.includes('fastly') ? '| \`ServerFastly.lean\` | The server on Fastly Compute\'s own host calls (\`Lasm.Fastly\`). |\n' : ''}${deploy.some(t => deployTargets[t].package === 'wasi-http') ? '| \`ServerWasiHttp.lean\` | The server as a wasi:http component (\`Lasm.WASI.Http\`). |\n' : ''}| \`Client.lean\` | The browser app (\`Lasm.UI\`): hydrates the server's page and calls the API. A theorem shows it never sends an invalid title. |
 | \`public/style.css\` | Copied next to the browser app. |
 | \`wrangler.toml\` | Cloudflare Workers: the server as a Worker, the browser app as static assets. |
 
@@ -836,7 +873,7 @@ has linked Lasm's Lean for this directory; restart the Lean server in your edito
 
 Guides: [Lasm.RPC](https://github.com/Millillion/lasm/blob/main/docs/RPC.md),
 [Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md),
-[Lasm.Fetch](https://github.com/Millillion/lasm/blob/main/docs/FETCH.md).
+[Lasm.JS.Web](https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md).
 `;
 }
 
