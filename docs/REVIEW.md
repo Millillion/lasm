@@ -325,6 +325,11 @@ decisions themselves are logged with their reasoning in
     for your review with the proved ones. Three earlier prose candidates are
     listed there as "not yet stated in Lean": they need a model of JavaScript,
     the HTML parser or Lean's runtime first.
+  - Since 2026-11-11: every JavaScript property test and every fuzz oracle
+    but `wasi-cgi` names its proposition. The CLI's 29 are in
+    [verification/cli](../verification/cli/README.md), stated about `opaque`
+    stand-ins for the JavaScript functions until each has a Lean model; two
+    more library candidates (Lasm.Serverless, Lasm.UI) bring the library to 12.
 - [ ] The exit bar for "rock solid" ([§7](TESTING_STRATEGY.md#7-exit-bar-rock-solid)): eight measurable conditions.
 - [ ] The reduction and verification path ([proposals/IRREDUCIBLE.md](proposals/IRREDUCIBLE.md)):
   - Lean is recommended over Rust for the rewrite.

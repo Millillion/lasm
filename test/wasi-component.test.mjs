@@ -19,7 +19,9 @@ const moduleHeader = [0, 0x61, 0x73, 0x6d, 1, 0, 0, 0];
 const coreOf = (g, size = g.pick([0, 1, 100, 115, 116, 117, 127, 128, 129, 16370, 16383, 16384, 20000])) =>
   Uint8Array.from([...moduleHeader, ...section(0, [...name('p'), ...Array.from({ length: size }, () => g.int(0, 255))])]);
 
-// ∀ core, extractCore (componentize core) = core ∧ makeTemplate (componentize core) core = template
+// Proposition: Lasm.Cli.Candidates.componentize_inverse
+//   ∀ core : ByteArray, core.data.toList.take 8 = moduleHeader →
+//     extractCore (componentize core) = some core ∧ makeTemplate (componentize core) core = some proxyTemplate
 test('componentize and extractCore are inverse, and the template is made back', () => {
   forAll(g => coreOf(g), core => {
     const component = componentize(core);
@@ -62,7 +64,15 @@ test('the placeholder is an empty module with one custom section naming it', () 
   assert.equal(httpHandlerExport, 'wasi:http/incoming-handler@0.2.12#handle');
 });
 
-// ∀ parts p, replaceCoreModule (component p ++ [prefix ++ s] ++ q) prefix to = component p ++ [to ++ s] ++ q
+// Proposition: Lasm.Cli.Candidates.replace_one_core_module
+//   ∀ (before after : List (UInt8 × List UInt8)) (unrelated : List (List UInt8)) (pfx tail to : List UInt8),
+//     (∀ s ∈ before ++ after, s.1 ≠ 1) → (∀ u ∈ unrelated, ¬ pfx <+: u) →
+//     replaceCoreModule
+//       (bytes (componentHeader ++ before.flatMap (fun s => sectionOf s.1 s.2) ++ unrelated.flatMap (sectionOf 1) ++
+//         sectionOf 1 (pfx ++ tail) ++ after.flatMap (fun s => sectionOf s.1 s.2)))
+//       (bytes pfx) (bytes to) =
+//     .ok (bytes (componentHeader ++ before.flatMap (fun s => sectionOf s.1 s.2) ++ unrelated.flatMap (sectionOf 1) ++
+//         sectionOf 1 (to ++ tail) ++ after.flatMap (fun s => sectionOf s.1 s.2)))
 test('replaceCoreModule replaces exactly the one matching module section, keeping its suffix and every other section', () => {
   forAll(g => {
     const other = () => [g.pick([0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]), ...Array.from({ length: g.int(0, 200) }, () => g.int(0, 255))];
@@ -100,7 +110,10 @@ test('replaceCoreModule needs exactly one matching core module and a component h
   assert.equal(replaceCoreModule(version, prefix, prefix).length, one.length);
 });
 
-// ∀ m, withoutComponentType m = m without its custom sections named component-type*
+// Proposition: Lasm.Cli.Candidates.drops_only_component_type
+//   ∀ ss : List Sec, (∀ s ∈ ss, ∀ id b, s = .other id b → id ≠ 0) →
+//     withoutComponentType (bytes (moduleHeader ++ ss.flatMap Sec.encoding)) =
+//       bytes (moduleHeader ++ (ss.filter (!·.componentType)).flatMap Sec.encoding)
 test('withoutComponentType drops only the component-type custom sections', () => {
   forAll(g => g.array(g.int(0, 6), () => g.next() < 0.5
     ? { custom: g.pick(['component-type', 'component-type:proxy', 'component-typ', 'name', 'producers', 'xcomponent-type']), bytes: g.array(g.int(0, 200), () => g.int(0, 255)) }

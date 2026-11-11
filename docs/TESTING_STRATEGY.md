@@ -50,7 +50,7 @@ Each method below says what it is, what Lasm has today, and the next gap.
 | **Target equivalence** | One server or app, the same traffic, every platform; only documented normalizations | `scripts/equivalence/` (fetch template and `examples/fetch` on 5 targets); Conduit's 154 RealWorld exchanges on 18 platforms | Recorded traffic of Ledger, Porter and Tandem; browser DOM traces |
 | **Differential fuzzing** | Generated inputs with a second implementation as the oracle. (a) Generated Lean programs, compiled by Lasm vs native Lean. (b) JavaScript glue vs its Lean model, run with `lean --run` | (a) The differential generator: typed expression trees, statements, tasks, files; campaigns of 60 minutes nightly and 100 minutes weekly. (b) `serverless-http` against `Lasm/Serverless/Proofs/Model.lean`; `ui-decode`, the Lasm.UI applier's reading against the reference decoder `Lasm/UI/Proofs/Decode.lean`; `lasm-js-wire`, the Lasm.JS value codec's JavaScript half against Lean's (`Wire` in `Lasm/JS/Core.lean`, the code Lasm programs run) | (a) Coverage feedback (keep programs that reach new runtime C or new Lasm glue) and more language features: type classes, `partial`, `Thunk`, `ST`, structures with many fields, `ByteArray`/`FloatArray`. (b) The same for the edge copy of the Lasm.JS codec (`src/edge/edge-js.mjs`, or one copy after M3) |
 | **Coverage-guided fuzzing** | Mutated inputs at every input boundary, guided by coverage; no crash, hang or garbage accepted | `test/fuzz/`: 8 targets (V8 block coverage for JavaScript; libFuzzer with ASan/UBSan for Lean's C and the WASI C host); the apps' fuzzers | The Fastly host, the edge host's request mapping, the `lasm dev` proxy, project-file parsing (`lakefile.toml`, `lakefile.lean` options, `package.json`) |
-| **Property testing with transferable propositions** | A named proposition (§4), checked on generated inputs until it is proved | Lean libraries: 53 propositions in `library/Lasm/*/Spec.lean`, all proved; 10 candidates in `Candidates.lean` (Lasm.UI, Lasm.Fetch, Lasm.RPC), each evaluated on generated inputs (`test/ui/DiffModel.lean`, the `lean-fetch-request` and `lean-rpc` fuzz targets). Apps: `examples/*/Proofs/Spec.lean`. The proposition lint (`scripts/propositions.mjs`, PR tier) | Every fuzz oracle and JS property names its Lean proposition (§4; on 2026-11-10: 5 of 8 oracles, 2 of 34 `forAll` properties) |
+| **Property testing with transferable propositions** | A named proposition (§4), checked on generated inputs until it is proved | Lean libraries: 53 propositions in `library/Lasm/*/Spec.lean`, all proved; 12 candidates in `Candidates.lean` (Lasm.UI, Lasm.Fetch, Lasm.RPC, Lasm.Serverless), each evaluated on generated inputs (`test/ui/DiffModel.lean`, the `lean-fetch-request` and `lean-rpc` fuzz targets) or of the JavaScript (`ui-patch`, `test/serverless-shims.test.mjs`). The CLI's JavaScript: 29 candidates in [verification/cli](../verification/cli/README.md), about `opaque` stand-ins for the JavaScript functions, each cited and checked by its property test or fuzz oracle. Apps: `examples/*/Proofs/Spec.lean`. The proposition lint (`scripts/propositions.mjs`, PR tier) | On 2026-11-11 every `forAll` property (31) and 7 of 8 fuzz oracles name their proposition (not `wasi-cgi`, which goes with Lasm.Fetch). Next: Lean models in place of the `opaque` stand-ins, with model differentials (proposals/IRREDUCIBLE.md M4) |
 | **Metamorphic testing** | A relation between two runs, e.g. an incremental build equals a clean one | `scripts/tooling/metamorphic.mjs` (`lasm build`, `lasm dev`) | Compiler relations: renaming a definition, adding an unused import, or reordering independent definitions changes no output |
 | **Fault injection** | Killed processes, a full disk, a dropped network, corrupt caches, platform limits | `scripts/tooling/faults.mjs`; installer faults on 5 OSes; DST faults in the apps | Memory and CPU limits of the function platforms; host-call failures inside the Lasm.JS bridge |
 | **Deterministic simulation** | Seeded simulated clock, scheduler, network and storage; every failure replays from its seed | `scripts/sim/` with Tandem, Ledger and Porter; host-bridge schedule fuzzing (`scripts/bridge-fuzz/`) | Conduit and Folio's edge server; `lasm dev`'s rebuild loop |
@@ -78,7 +78,7 @@ How to read a cell:
 | Target equivalence | E: PR (through the outputs) | E: PR, N | E: PR (through the apps) | P: N (`lasm build` bytes across OSes) | E: PR (Conduit, 18 platforms); P: N (the other four) |
 | Differential fuzzing | E: N, W (generated programs); P: coverage feedback | E: PR, N (`serverless-http` vs its Lean model; `ui-decode` vs the reference decoder; `lasm-js-wire` vs Lean's codec) | P: N (encoders vs their Lean decoders) | — | E: N (Folio, Tandem vs their references) |
 | Coverage-guided fuzzing | P: W (the link driver's inputs: recipes, maps) | E: PR (replay), N, W | E: PR, N, W (Fetch, RPC) | E: PR, N (CLI arguments); P: project files | E: PR, N (Porter, Folio, Tandem) |
-| Property tests, named propositions | P: N (generator properties named) | E: PR, N (`serverless-http` names 4, two serverless properties); P: PR (the other JS oracles and properties) | E: PR (Spec files, proved); E: PR, N (Candidates: `DiffModel.lean`, native fuzz targets) | P: PR (error-corpus properties named) | E: PR (Spec files) |
+| Property tests, named propositions | E: PR (the link driver's, `lower-atomics`' and the WASI component's properties name `Lasm.Cli` candidates); P: N (generator properties named) | E: PR, N (`serverless-http` names 4; `ui-patch`; the serverless, initializer and static-server properties); P: `wasi-cgi` (goes with Lasm.Fetch) | E: PR (Spec files, proved); E: PR, N (Candidates: `DiffModel.lean`, native fuzz targets) | E: PR, N (the CLI's properties and the `cli-arguments` oracle name `Lasm.Cli` candidates); P: PR (error-corpus properties named) | E: PR (Spec files) |
 | Metamorphic | P: N (renames, reorders) | — | — | E: N, PR (on harness change) | — |
 | Fault injection | — | E: N (bridge schedules); P: host-call faults | — | E: PR (Linux, Windows), N, R (5 OSes) | E: PR, N (DST) |
 | Deterministic simulation | — | E: PR, N (host bridge model and schedule fuzzing) | — | P: N (`lasm dev` loop) | E: PR (30 seeds), N (random seeds) |
@@ -129,6 +129,14 @@ so that proving it later is a mechanical step:
   what makes the transfer mechanical.
 
 **Where the code is JavaScript or C.**
+- Until a module has a Lean model, its functions are `opaque` constants of
+  the JavaScript's types, and the propositions are stated about them: for the
+  CLI's JavaScript, [verification/cli/Lasm/Cli/Interface.lean](../verification/cli/Lasm/Cli/Interface.lean)
+  and [Candidates.lean](../verification/cli/Lasm/Cli/Candidates.lean)
+  (namespace `Lasm.Cli`). A test can check such a proposition but no theorem
+  can prove it; replacing the `opaque` by a model makes the statement,
+  unchanged, provable. Outside semantics a test uses as its oracle (Wasm
+  validation and execution, a ZIP reader) are `opaque` too, and say so.
 - A JavaScript property, or a fuzz oracle, starts with a doc comment carrying
   two lines:
   - `Proposition: Lasm.<Lib>.Spec.<name>` (or `Candidates.<name>`);
@@ -287,7 +295,7 @@ tests come from bugs, new features and the propositions of §4.
 The [evidence page](../content/learn/test-evidence.md) computes this from CI
 and the repository every time it is regenerated (its first section, "The exit
 bar"; [TESTING.md](TESTING.md#the-test-evidence-page) says how each item is
-measured). Snapshot of 2026-11-10:
+measured). Snapshot of 2026-11-10, item 7 of 2026-11-11:
 
 | # | Item | Status | What is missing |
 | --- | --- | --- | --- |
@@ -297,5 +305,5 @@ measured). Snapshot of 2026-11-10:
 | 4 | Campaigns | Not met | 0 of 30: the DST campaign failed on 2026-11-08 and 2026-11-10 (Porter #189, Tandem #190; both fixed, the count starts again with the next clean night), and the nightly fuzzing campaign has no run on `main` yet |
 | 5 | Flakes | Partly met | `test/quarantine.json` is empty and has had no entry since it was created (2026-11-03); the 14-day window is not computed yet |
 | 6 | Apps | Not measured | Each app's platform workflows pass; no single check yet compares them with "every platform it claims" |
-| 7 | Propositions | Not met | The lint is green; 10 candidates; 5 of 8 fuzz oracles (not `cli-arguments`, `ui-patch`, `wasi-cgi`) and 2 of 34 `forAll` properties name a proposition; three PROOFS.md items need a model before they can be stated (JavaScript applier, hydration, KV stores) |
+| 7 | Propositions | Not met | The lint is green; 41 candidates (12 in the library, 29 about the CLI's JavaScript in verification/cli); every `forAll` property (31) and 7 of 8 fuzz oracles name a proposition, and `test/propositions.test.mjs` holds that; `wasi-cgi` (the WASI C host's CGI boundary, `src/wasi/lasm_fetch_wasi.c`) does not, and goes with Lasm.Fetch (removal 18); three PROOFS.md items need a model before they can be stated (JavaScript applier, hydration, KV stores) |
 | 8 | Differential fuzzing | Partly met | Both model differentials run in CI: `ui-decode` (#188) and `lasm-js-wire` (#187). The feature programs landed with #167; coverage feedback for generated programs is not done yet |
