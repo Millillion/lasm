@@ -324,7 +324,7 @@ def nodeServe (r : Checks) : Async Unit := do
     -- stop: the server closes, finished settles and Node.serve returns.
     server.stop
     server.finished
-    let returned ← IO.wait task
+    let returned ← (IO.wait task : BaseIO (Except IO.Error Unit))
     expect r "Node.serve returns after stop" (match returned with | .ok _ => true | .error _ => false) ""
     expect r "stop closes the server" (← throws (request s!"http://127.0.0.1:{port}/hello")) ""
   runSection r "node.serve signal" do
@@ -333,7 +333,7 @@ def nodeServe (r : Checks) : Async Unit := do
     let (server, task) ← startNode { fetch := App.handle, port := some 0, hostname := some "127.0.0.1", signal := some (← ac.signal) }
     served r "node.serve default" s!"http://127.0.0.1:{server.port}" 500
     ac.abort
-    discard <| IO.wait task
+    discard (IO.wait task : BaseIO (Except IO.Error Unit))
     expect r "signal closes the server" (← throws (request s!"http://127.0.0.1:{server.port}/hello")) ""
 
 /-! `exportDefault`'s typed form (Node only: on Bun and Deno a published handler is served after main) -/
