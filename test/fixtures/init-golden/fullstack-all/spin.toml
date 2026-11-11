@@ -11,7 +11,7 @@ component = "app-1st-stack"
 
 [component.app-1st-stack]
 source = "wasi-http/main.wasm"
-# Hosts Lasm.Fetch.fetch may reach, for example ["https://api.example.com"].
+# Hosts the component's outgoing requests may reach, for example ["https://api.example.com"].
 allowed_outbound_hosts = []
 
 [component.app-1st-stack.build]
