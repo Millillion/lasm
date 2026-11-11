@@ -261,6 +261,10 @@ argument union's other member types likewise.
   which checks the JavaScript codec against Lean's on every input
   (docs/TESTING.md, "Fuzzing at the boundaries").
 
+## Documentation
+
+- **`repr` of a large value on WASI, the edge and the browser (#179).** Lean's formatter recurses about twice per element, so `repr` of an Array prints at most 1,801 elements on wasmtime's default stack, 3,233 to 4,254 on the edge engines (V8, as in Chromium; SpiderMonkey, as in Firefox; Bun; WebKit was not measured), and 3,914 on `node:wasi`; Node and native Lean print millions. The engine's stack is what stops it, never the C stack, so Lasm cannot raise it on those platforms (on wasmtime, `-W max-wasm-stack` does). `toString` is iterative and prints 100,000 elements everywhere. [FUNDAMENTAL_LIMITATIONS.md](../../FUNDAMENTAL_LIMITATIONS.md#printing-a-large-value-with-repr-issue-179) has the numbers, and `scripts/ci/stack-depth.mjs` measures them on every target.
+
 ## Repository
 
 - **Housekeeping (no behaviour change).** The repository's root `lean-toolchain` names Lean 4.35.0 instead of the retired 4.32.0 (it is read only by editors and by pin-less fixtures; the published `@lasm/cli` is unchanged), eight Node diagnostic reports committed by accident are deleted (and ignored from now on), and docs/RELEASE.md no longer describes the removed `npm run test:release`.

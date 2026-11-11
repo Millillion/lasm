@@ -14,6 +14,11 @@
 //              clang -O0 keeps every local on the 1 MiB C stack) on Deno, Node
 //              and Bun: the first depth past the limit overflows the C stack, and the instance
 //              stops with a stack overflow, not the trap that follows it.
+// And `repr` of a large Array (issue #179): Lean's formatter recurses about twice
+// per element, so every target with a small engine stack stops at a few thousand
+// elements. Each target's deepest repr is measured, the stack that stops it is
+// named (the engine's, never the C stack nor a trap), and toString (iterative)
+// prints 100,000 elements everywhere.
 // Every target's limit is measured by bisection and written to OUT (JSON).
 //   node scripts/ci/stack-depth.mjs --lasm PATH/bin/lasm.mjs --work DIR [--out FILE.json]
 //     [--targets node,wasi,wasi-node,deno,edge-node,edge-bun,edge-sm,edge-O0,edge-O0-node,edge-O0-bun]
@@ -79,10 +84,23 @@ def wide : Nat → Nat
 
 def deepSum : Nat → Nat | 0 => 0 | n + 1 => (n + 1) + deepSum n
 
+-- Issue #179: \`repr\` of an n-element Array (Lean's formatter recurses about twice
+-- per element), checked against toString; and toString alone, which is iterative.
+def ints (n : Nat) : Array Int := (Array.range n).map Int.ofNat
+def squeeze (s : String) : String := (s.replace "\\n" "").replace " " ""
+def reprArray (n : Nat) : String :=
+  let s := (repr (ints n)).pretty
+  if squeeze s == squeeze (toString (ints n)) then s!"ok {s.length}" else "wrong"
+def toStringArray (n : Nat) : String :=
+  let s := toString (ints n)
+  if s.endsWith s!", {n - 1}]" then s!"ok {s.length}" else "wrong"
+
 def main (args : List String) : IO Unit := do
   let n := (args.getD 1 "1000").toNat!
   match args.headD "sum" with
   | "sum" => IO.println (sumTo (List.range n))
+  | "repr" => IO.println (reprArray n)
+  | "toString" => IO.println (toStringArray n)
   | "wide" => IO.println (wide n)
   | "deepSum" => IO.println (deepSum n)
   | _ => IO.println (depth n)
@@ -161,6 +179,26 @@ const advice = mib => new RegExp(`^Lasm: a Lean thread exhausted its ${mib} MiB 
 // The edge's C-stack overflow (src/edge/edge-start.mjs stackOverflowCause).
 const edgeOverflow = "Stack overflow: the program used all of its 1 MiB C stack (deep recursion?). See https://github.com/Millillion/lasm/blob/main/docs/EDGE.md#stack";
 
+// Issue #179: repr and toString of an n-element Array print "ok <length>".
+const arrayOk = mode => (target, n, options) => {
+  const r = run(target, [mode, String(n)], { timeout: 60_000, ...options });
+  return r.code === 0 && /^ok \d+\n$/.test(r.stdout);
+};
+const reprOk = arrayOk('repr'), toStringOk = arrayOk('toString');
+// The first run past a measured limit that fails: from n, doubling up to 8n. An
+// engine's limit can move between runs (Bun's JavaScriptCore by more than half),
+// so a size just past the bisected limit may pass the next time.
+function pastLimit(target, mode, n, timeout) {
+  let r;
+  for (let m = n; m <= 8 * n; m *= 2) { r = run(target, [mode, String(m)], { timeout }); r.n = m; if (r.code !== 0 || r.timedOut) break; }
+  return r;
+}
+// Which stack stopped a run: the engine's (V8, JavaScriptCore, SpiderMonkey,
+// wasmtime; Lean's own message under Node), or the edge output's C stack.
+const stackOf = r => r.stderr.includes(edgeOverflow) ? 'C stack'
+  : /Maximum call stack size exceeded|too much recursion|call stack exhausted|^Stack overflow detected/m.test(r.stderr) ? 'engine stack'
+  : `other: ${r.stderr.split('\n')[0].slice(0, 200)}`;
+
 const built = new Set();
 for (const target of targets) {
   report.targets[target] = {};
@@ -186,6 +224,8 @@ for (const target of targets) {
     expect(target, 'a runaway recursion: native diagnostic, status 134 and advice',
       runaway.code === 134 && runaway.stdout === '' && runaway.stderr.startsWith(overflowHead) && advice(mib).test(runaway.stderr.slice(overflowHead.length)),
       JSON.stringify({ code: runaway.code, signal: runaway.signal, stderr: runaway.stderr.slice(0, 600) }));
+    // Issue #179: native Lean prints millions of elements; 100,000 fits every default.
+    expect(target, 'repr of a 100,000-element Array', reprOk(target, 100_000), '');
     const pinned = run(target, ['sum', '1000000'], { extra: { LASM_VM_STACK_MB: '64' } });
     expect(target, 'LASM_VM_STACK_MB=64 overrides the default (sumTo of 1,000,000 overflows)',
       pinned.code === 134 && pinned.stderr.startsWith(overflowHead) && advice(64).test(pinned.stderr.slice(overflowHead.length)) && !pinned.stderr.includes('default'),
@@ -206,10 +246,10 @@ for (const target of targets) {
     // named, never left as the trap that follows it ("memory access out of bounds").
     const overflows = [];
     // Every run here ends in well under a second: 30 s is a hang (issue #126).
-    for (const mode of ['sum', 'wide', 'deepSum']) {
-      const ok = (t, n) => { const r = run(t, [mode, String(n)], { timeout: 30_000 }); return r.code === 0 && /^\d+\n$/.test(r.stdout); };
-      const deepest = limit(target, 100, 50_000, undefined, ok), n = Math.ceil(deepest * 1.1) + 10;
-      const over = run(target, [mode, String(n)], { timeout: 30_000 });
+    for (const mode of ['sum', 'wide', 'deepSum', 'repr']) {
+      const ok = (t, n) => { const r = run(t, [mode, String(n)], { timeout: 30_000 }); return r.code === 0 && (mode === 'repr' ? /^ok \d+\n$/ : /^\d+\n$/).test(r.stdout); };
+      const deepest = limit(target, 100, 50_000, undefined, ok);
+      const over = pastLimit(target, mode, Math.ceil(deepest * 1.1) + 10, 30_000), n = over.n;
       const named = over.stderr.includes(`[lasm] the Lean instance stopped: ${edgeOverflow}\n`);
       if (named) overflows.push(mode);
       (report.targets[target].limits ??= {})[mode] = { deepest, stop: named ? 'C stack' : over.stderr.split('\n')[0] };
@@ -226,21 +266,32 @@ for (const target of targets) {
     expect(target, 'an overflow fails without hanging', !over.timedOut && over.code !== 0 && over.stdout === '',
       JSON.stringify({ code: over.code, signal: over.signal, stderr: over.stderr.slice(0, 300) }));
     report.targets[target].limit = limit(target, 1000, 1_000_000);
+    // Issue #179: repr of an Array, against the same stack.
+    expect(target, 'repr of a 1,000-element Array', reprOk(target, 1000), '');
+    expect(target, 'toString of a 100,000-element Array (iterative, no depth limit)', toStringOk(target, 100_000), '');
+    const deepest = limit(target, 1000, 200_000, undefined, reprOk);
+    const past = pastLimit(target, 'repr', Math.ceil(deepest * 1.2) + 10, 60_000);
+    report.targets[target].repr = { deepest, stop: stackOf(past) };
+    expect(target, `repr of ${past.n} elements, past its limit (${deepest}), stops on the engine's stack, without hanging`,
+      !past.timedOut && past.code !== 0 && past.stdout === '' && !/out of bounds/i.test(past.stderr) && report.targets[target].repr.stop === 'engine stack',
+      JSON.stringify({ code: past.code, signal: past.signal, timedOut: past.timedOut, stderr: past.stderr.slice(0, 400) }));
     if (target === 'wasi') {
       // docs/WASI.md: wasmtime's limit is the host's; this flag raises it.
       const flags = ['-W', 'max-wasm-stack=1073741824'];
       expect(target, 'wasmtime -W max-wasm-stack=1073741824: sumTo of 5,000,000 elements', passes(target, 5_000_000, { flags }), '');
       report.targets.wasi.limit1GiB = limit(target, 1_000_000, 30_000_000, { flags });
+      expect(target, 'wasmtime -W max-wasm-stack=1073741824: repr of a 100,000-element Array', reprOk(target, 100_000, { flags }), '');
     }
   }
-  console.log(`${target}: deepest sumTo ${JSON.stringify(report.targets[target].limit)}`);
+  console.log(`${target}: deepest sumTo ${JSON.stringify(report.targets[target].limit)}${report.targets[target].repr ? `, deepest repr ${JSON.stringify(report.targets[target].repr)}` : ''}`);
 }
 report.failures = failures;
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, JSON.stringify(report, null, 2) + '\n');
-console.log(`\n| Target | Deepest sumTo |\n| --- | --- |\n${Object.entries(report.targets).map(([t, r]) => `| ${t} | ${r.limit ?? '—'}${r.limit1GiB ? ` (${r.limit1GiB} with -W max-wasm-stack=1073741824)` : ''}${r.limit64 ? ` (${r.limit64} with LASM_VM_STACK_MB=64)` : ''} |`).join('\n')}`);
+const reprCell = r => r.repr ? `${r.repr.deepest} (${r.repr.stop})` : r.limits?.repr ? `${r.limits.repr.deepest} (${r.limits.repr.stop})` : '—';
+const table = `| Target | Deepest sumTo | Deepest repr of an Array (stack that stops it) |\n| --- | --- | --- |\n${Object.entries(report.targets).map(([t, r]) => `| ${t} | ${r.limit ?? '—'}${r.limit1GiB ? ` (${r.limit1GiB} with -W max-wasm-stack=1073741824)` : ''}${r.limit64 ? ` (${r.limit64} with LASM_VM_STACK_MB=64)` : ''} | ${reprCell(r)} |`).join('\n')}`;
+console.log(`\n${table}`);
 if (process.env.GITHUB_STEP_SUMMARY) {
-  writeFileSync(process.env.GITHUB_STEP_SUMMARY, `### Recursion depth (issue #66)\n\n| Target | Deepest sumTo |\n| --- | --- |\n${Object.entries(report.targets)
-    .map(([t, r]) => `| ${t} | ${r.limit ?? '—'}${r.limit1GiB ? ` (${r.limit1GiB} with -W max-wasm-stack=1073741824)` : ''}${r.limit64 ? ` (${r.limit64} with LASM_VM_STACK_MB=64)` : ''} |`).join('\n')}\n\n${failures.length} failures.\n`, { flag: 'a' });
+  writeFileSync(process.env.GITHUB_STEP_SUMMARY, `### Recursion depth (issues #66, #179)\n\n${table}\n\n${failures.length} failures.\n`, { flag: 'a' });
 }
 process.exit(failures.length ? 1 : 0);
