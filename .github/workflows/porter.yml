@@ -67,11 +67,16 @@ jobs:
         run: |
           if grep -rnw 'sorry\|native_decide' Porter Proofs; then echo "::error::sorry or native_decide in the sources"; exit 1; fi
           npm run proofs
+      - name: bubblewrap for Lake's sandbox (cached .deb files, else the apt mirror)
+        timeout-minutes: 10
+        uses: ./.github/actions/apt-cache
+        with:
+          name: bubblewrap
+          run: command -v bwrap || sudo apt-get install -y --no-install-recommends bubblewrap
       - name: lake check --paranoid (Lean's kernel and the external checkers)
         working-directory: examples/porter
         run: |
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-          command -v bwrap || sudo apt-get install -y --no-install-recommends bubblewrap
           npm run proofs:paranoid
   node:
     name: Oracles and attacks on Node ${{ matrix.node }}
