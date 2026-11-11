@@ -20,6 +20,7 @@
 // fails when the page's front matter or links are invalid. Needs GITHUB_TOKEN
 // or GH_TOKEN unless --offline; GITHUB_REPOSITORY defaults to Millillion/lasm.
 // Run nightly by .github/workflows/evidence-page.yml.
+import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -119,12 +120,60 @@ function modelDifferentials(targets) {
   return targets.filter(t => { const file = `test/fuzz/targets/${t.name}.mjs`; return existsSync(join(root, file)) && /\bmodelDirectory\(/.test(read(file)); }).map(t => t.name);
 }
 
+const gitText = args => {
+  const r = spawnSync('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 1 << 26 });
+  if (r.status !== 0) throw new Error(`git ${args[0]}: ${(r.stderr || r.error?.message || '').trim()}`);
+  return r.stdout;
+};
+
+/** Exit bar 5: every test that was in test/quarantine.json at any time in the last `days` days, read from
+ * the file's git history (the version in force when the window opened and every commit since). null when
+ * the history cannot be read (no git, or a shallow clone: evidence-page.yml fetches all of it). */
+export function quarantineHistory({ now = Date.now(), days = 14, git = gitText } = {}) {
+  const since = now - days * 86_400_000;
+  let commits;
+  try {
+    if (git(['rev-parse', '--is-shallow-repository']).trim() !== 'false') return null;
+    commits = git(['log', '--format=%H %ct', '--', 'test/quarantine.json']).trim().split('\n').filter(Boolean)
+      .map(line => { const [sha, seconds] = line.split(' '); return { sha, at: Number(seconds) * 1000 }; });
+  } catch { return null; }
+  const inWindow = commits.filter(c => c.at >= since);
+  const before = commits.find(c => c.at < since);
+  const entries = new Map();
+  for (const c of [...inWindow, ...(before ? [before] : [])]) {
+    let tests;
+    try { tests = JSON.parse(git(['show', `${c.sha}:test/quarantine.json`])).tests ?? []; } catch { continue; }
+    for (const t of tests) entries.set(`${t.file}\u0000${t.name}`, { file: t.file, name: t.name, since: t.since ?? null, issue: t.issue ?? null });
+  }
+  return { days, since: new Date(since).toISOString().slice(0, 10), commits: inWindow.length, entries: [...entries.values()] };
+}
+
+/** scripts/evidence/apps.json's claims as levels.mjs platforms: one per claim, whose L0 is the claim's jobs. */
+export function appPlatforms(config) {
+  return { maxAgeDays: config.maxAgeDays, platforms: config.apps.flatMap(a => a.claims.map(c => ({ id: `${a.app}: ${c.row}`, row: c.row, L0: c.jobs, L1: null, L2: null, L3: null }))) };
+}
+
+/** Exit bar 6, per app, from levels.mjs's evaluation of appPlatforms: the claims that hold and those that do not, with why. */
+export function appResults(config, evaluated) {
+  const byId = new Map(evaluated.map(e => [e.id, e]));
+  return config.apps.map(a => {
+    const claims = a.claims.map(c => {
+      const e = byId.get(`${a.app}: ${c.row}`);
+      const unmet = (e?.levels?.L0?.requirements ?? []).filter(r => !r.ok).map(r => `${r.workflow} /${r.job}/: ${r.missing ? 'no main-branch run has this job' : r.stale ? `newest run is ${r.ageDays} days old` : (r.failed ?? []).join('; ')}`);
+      return { row: c.row, ok: Boolean(e && e.level >= 0), ...(unmet.length ? { unmet } : {}) };
+    });
+    return { app: a.app, oracle: a.oracle, claims };
+  });
+}
+
 /** Everything the page says that comes from files in the repository. */
-export function repositoryFacts() {
+export function repositoryFacts({ now = Date.now() } = {}) {
   const targets = fuzzTargets();
   return {
     propositions: propositionSummary(checkPropositions({ root })),
     quarantine: JSON.parse(read('test/quarantine.json')).tests,
+    quarantineHistory: quarantineHistory({ now }),
+    apps: JSON.parse(read('scripts/evidence/apps.json')),
     mutationModules: JSON.parse(read('scripts/mutation/modules.json')).modules.map(m => m.name),
     modelDifferentials: modelDifferentials(targets),
     featureGenerator: existsSync(join(root, 'scripts/differential/features.mjs')),
@@ -160,7 +209,11 @@ export const parse = {
   },
   coverage(log) {
     const m = /lines ([\d.]+) %, branches ([\d.]+) %, functions ([\d.]+) % \((\d+) files\)/.exec(log);
-    return m ? { lines: Number(m[1]), branches: Number(m[2]), functions: Number(m[3]), files: Number(m[4]) } : null;
+    if (!m) return null;
+    // scripts/coverage/zero-files.mjs: the 0 % files and whether the baseline names their integration workflows.
+    const z = /0 % files: (\d+), named in the baseline: (\d+), not named: ([^\n]*)/.exec(log);
+    return { lines: Number(m[1]), branches: Number(m[2]), functions: Number(m[3]), files: Number(m[4]),
+      ...(z ? { zeroFiles: Number(z[1]), zeroNamed: Number(z[2]), zeroUnnamed: z[3].trim() === 'none' ? [] : z[3].trim().split(/\s+/) } : {}) };
   },
   differential(log) {
     const lines = [...log.matchAll(/ (\d+) programs, (\d+) cases, (\d+) divergences, (\d+) upstream suspects[^\n]*?, (\d+) harness errors/g)];
@@ -232,6 +285,9 @@ async function ciFacts(repo, { api, logOf, now }) {
   const config = repo.platforms;
   const { runs, jobs } = await collect(config, { api, now });
   const platforms = evaluate(config, runs, jobs, now);
+  const claims = appPlatforms(repo.apps);
+  const appRuns = await collect(claims, { api, now });
+  const apps = appResults(repo.apps, evaluate(claims, appRuns.runs, appRuns.jobs, now));
 
   const tiers = [];
   for (const t of TIERS) {
@@ -259,6 +315,7 @@ async function ciFacts(repo, { api, logOf, now }) {
     coverage: { run: runFact(nightlyRun), jobs: await jobFacts(nightlyRun, /^unit\b/, parse.coverage) },
     campaigns: campaignStreak(campaignRuns),
     platforms,
+    apps,
     tiers,
     mutation: { run: runFact(mutationRun), modules: await jobFacts(mutationRun, /^module \(/, parse.mutation) },
     fuzz: { run: runFact(fuzzRun), targets: await jobFacts(fuzzRun, /^Fuzz /, parse.fuzz) },
@@ -319,8 +376,14 @@ export function exitBar(repo, ci) {
   const lines = ci?.coverage?.jobs?.find(j => typeof j.lines === 'number');
   if (!ci) out.push(row(3, 'Coverage', 'not read', notRead));
   else if (!lines) out.push(row(3, 'Coverage', 'not measured', 'no unit-suite coverage in the latest nightly run'));
-  else out.push(row(3, 'Coverage', lines.lines >= 75 ? 'partly met' : 'not met',
-    `${lines.lines} % of lines (${lines.files} files; the goal is 75 %); the 0 % files are not yet checked against the integration workflows`));
+  else {
+    const zero = typeof lines.zeroFiles !== 'number' ? 'the 0 % files were not reported'
+      : lines.zeroUnnamed.length ? `${lines.zeroUnnamed.length} of ${lines.zeroFiles} files at 0 % are not named with an integration workflow (${lines.zeroUnnamed.join(', ')})`
+      : `all ${lines.zeroFiles} files at 0 % are named with the integration workflows that run them (docs/evidence/coverage-baseline.json)`;
+    const met = lines.lines >= 75 && lines.zeroUnnamed?.length === 0;
+    out.push(row(3, 'Coverage', met ? 'met' : lines.lines >= 75 && typeof lines.zeroFiles !== 'number' ? 'partly met' : 'not met',
+      `${lines.lines} % of lines (${lines.files} files; the goal is 75 %); ${zero}`));
+  }
   // 4. Campaigns
   if (!ci) out.push(row(4, 'Campaigns', 'not read', notRead));
   else {
@@ -330,10 +393,22 @@ export function exitBar(repo, ci) {
   }
   // 5. Flakes
   const newest = repo.quarantine.map(t => t.since).filter(Boolean).sort().at(-1);
-  out.push(row(5, 'Flakes', repo.quarantine.length ? 'not met' : 'partly met',
-    repo.quarantine.length ? `${repo.quarantine.length} quarantined (newest since ${newest ?? '?'})` : 'no test is quarantined; quarantines in the last 14 days are not yet counted'));
+  const history = repo.quarantineHistory;
+  if (repo.quarantine.length) out.push(row(5, 'Flakes', 'not met', `${repo.quarantine.length} quarantined (newest since ${newest ?? '?'})`));
+  else if (!history) out.push(row(5, 'Flakes', 'partly met', 'no test is quarantined; the last 14 days were not read (no git history of test/quarantine.json)'));
+  else if (history.entries.length) out.push(row(5, 'Flakes', 'not met',
+    `no test is quarantined now; ${history.entries.length} ${history.entries.length === 1 ? 'was' : 'were'} in the last ${history.days} days (${history.entries.map(t => `${t.file} › ${t.name}`).join('; ')})`));
+  else out.push(row(5, 'Flakes', 'met', `no test is quarantined, and none was since ${history.since} (test/quarantine.json's git history)`));
   // 6. Apps
-  out.push(row(6, 'Apps', 'not measured', 'each app\'s workflows run its outside oracle; no check yet compares them with the platforms each app claims'));
+  if (!ci) out.push(row(6, 'Apps', 'not read', notRead));
+  else if (!ci.apps?.length) out.push(row(6, 'Apps', 'not measured', 'no app claims read (scripts/evidence/apps.json)'));
+  else {
+    const claims = ci.apps.flatMap(a => a.claims.map(c => ({ ...c, app: a.app })));
+    const failing = claims.filter(c => !c.ok);
+    out.push(row(6, 'Apps', failing.length ? 'not met' : 'met',
+      `${claims.length - failing.length} of ${claims.length} claimed platforms of ${ci.apps.length} apps pass the app's outside oracle in CI` +
+      (failing.length ? ` (not: ${failing.map(c => `${c.app} on ${c.row}`).join('; ')})` : '')));
+  }
   // 7. Propositions
   const pr = repo.propositions;
   out.push(row(7, 'Propositions', !pr.problems && pr.oracles.named === pr.oracles.total && pr.properties.named === pr.properties.total ? 'met' : 'not met',
@@ -365,6 +440,7 @@ export function summarize(repo, ci, { generatedAt, repository, commit }) {
       benchmarks: repo.benchmarks && { ...repo.benchmarks, page: 'docs/BENCHMARKS.md' },
       propositions: repo.propositions,
       quarantine: repo.quarantine,
+      quarantineHistory: repo.quarantineHistory,
       mutationModules: repo.mutationModules,
       modelDifferentials: repo.modelDifferentials,
       featureGenerator: repo.featureGenerator,
@@ -375,7 +451,7 @@ export function summarize(repo, ci, { generatedAt, repository, commit }) {
         unmet: LEVELS.flatMap(name => (p.levels[name].requirements ?? []).filter(r => !r.ok).map(r => ({ level: name, workflow: r.workflow, job: r.job,
           why: r.missing ? 'no main-branch run has this job' : r.stale ? `newest run is ${r.ageDays} days old` : (r.failed ?? []).join('; '), run: r.run ?? null }))) })),
       tiers: ci.tiers, mutation: ci.mutation, fuzz: ci.fuzz, dst: ci.dst, differential: ci.differential, equivalence: ci.equivalence,
-      coverage: ci.coverage ?? null, campaigns: ci.campaigns ?? null,
+      coverage: ci.coverage ?? null, campaigns: ci.campaigns ?? null, apps: ci.apps ?? null,
     },
     exitBar: exitBar(repo, ci),
   };
@@ -422,7 +498,7 @@ export function renderPage(summary) {
   p('### Measured by CI and the repository');
   p(table(['#', 'Item', 'Status', 'Measured'], summary.exitBar.map(x => [String(x.item), x.name, `**${x.status}**`, x.measured])));
   p('### About');
-  p('Lasm is "rock solid", and its code can be reduced freely, when all eight items of the [exit bar](../../docs/TESTING_STRATEGY.md#7-exit-bar-rock-solid) hold at once. Each row is computed when the page is generated: from CI runs (platform levels, the nightly mutation run and unit-suite coverage, the scheduled campaigns) and from the repository (the quarantine list, the proposition lint\'s inventory, the fuzz targets that run against Lean). "Partly met" means the measured part holds and the rest is not measured yet; "not measured" means nothing measures it yet.');
+  p('Lasm is "rock solid", and its code can be reduced freely, when all eight items of the [exit bar](../../docs/TESTING_STRATEGY.md#7-exit-bar-rock-solid) hold at once. Each row is computed when the page is generated: from CI runs (platform levels, the nightly mutation run, unit-suite coverage and its 0 % files, the scheduled campaigns, each example app\'s oracle jobs on the platforms it claims) and from the repository (the quarantine list and its git history, the proposition lint\'s inventory, the fuzz targets that run against Lean). "Partly met" means the measured part holds and the rest is not measured yet; "not measured" means nothing measures it yet.');
 
   // Platforms
   p('## Platforms: how well tested');
@@ -549,7 +625,7 @@ async function main() {
   const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
   if (!offline && !token) throw new Error('GITHUB_TOKEN or GH_TOKEN is required (or --offline)');
   const now = Date.now();
-  const repo = repositoryFacts();
+  const repo = repositoryFacts({ now });
   const ci = offline ? null : await ciFacts(repo, { api: githubApi(repository, token, 'lasm-evidence-page'), logOf: logReader(repository, token), now });
   const commit = process.env.GITHUB_SHA ?? null;
   const summary = summarize(repo, ci, { generatedAt: new Date(now).toISOString(), repository, commit });
