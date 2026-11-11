@@ -42,6 +42,10 @@ test('job logs: the line each tool prints', () => {
   assert.deepEqual(parse.mutation(`${t}ui-dom: 93.6 % of 758 mutants (threshold 92 %) {"Killed":689}`), { module: 'ui-dom', score: 93.6, mutants: 758, threshold: 92 });
   assert.deepEqual(parse.differential(`${t}80 programs, 9500 cases, 0 divergences, 0 upstream suspects (native vs interpreter, not Lasm), 0 harness errors (summary: x)\n${t}0 programs, 0 cases, 1 divergences, 0 upstream suspects (native vs interpreter, not Lasm), 0 harness errors`),
     { programs: 80, cases: 9500, divergences: 1, harnessErrors: 0 });
+  // A guided campaign (scripts/differential/run.mjs --guided 1) adds its coverage lines.
+  assert.deepEqual(parse.differential(`${t}coverage growth by campaign: 2026-11-10 +900 (900), 2026-11-11 +120 (1020)\n${t}coverage: 2400 features (2300 runtime C, 100 glue), 120 new (110 runtime C, 10 glue; 70 from mutants, 50 from generated cases), 1020 in all campaigns, corpus 300 cases, 400 mutants run\n${t}50 programs, 6000 cases, 0 divergences, 0 upstream suspects (x), 0 harness errors`).coverage,
+    { features: 2400, runtimeC: 2300, glue: 100, new: 120, newRuntimeC: 110, newGlue: 10, newFromMutants: 70, newFromGenerated: 50, cumulative: 1020, corpus: 300, mutants: 400,
+      nights: [{ date: '2026-11-10', new: 900, cumulative: 900 }, { date: '2026-11-11', new: 120, cumulative: 1020 }] });
   assert.deepEqual(parse.fuzz(`${t}fuzz lean-rpc (600 s, seed 42)\n${t}ok   lean-rpc: 123456 runs, 900 edges`), { seconds: 600, seed: 42, runs: 123456, ok: true });
   assert.equal(parse.fuzz(`${t}FAIL ui-patch: 77 runs, 1/2 blocks`).ok, false);
   assert.deepEqual(parse.dst(`${t}tandem: 812 seeds, all passed (1200.1 s)\n${t}tandem: 2 failing seed(s) of 301: 5, 9 (600.0 s)`),
@@ -70,7 +74,7 @@ test('with CI results, each measured fact links its run, and failures show', () 
     mutation: { run: run(5, 'failure'), modules: [job('module (ui-dom)', 'failure', { module: 'ui-dom', score: 80.5, mutants: 700, threshold: 92 })] },
     fuzz: { run: run(6), targets: [job('Fuzz lean-rpc', 'success', { seconds: 600, runs: 1234567, seed: 7 })] },
     dst: { run: run(7), apps: [job('tandem, random seeds', 'success', { seeds: 900, failing: 0 })] },
-    differential: { run: run(8), jobs: [job('differential (release)', 'success', { programs: 80, cases: 9500, divergences: 0 })] },
+    differential: { run: run(8), jobs: [job('differential (release)', 'success', { programs: 80, cases: 9500, divergences: 0, coverage: { features: 2400, new: 120, newFromMutants: 70, nights: [{ date: '2026-11-11', new: 120, cumulative: 1020 }] } })] },
     equivalence: { fetch: { run: run(9), jobs: [job('equivalence (fetch-example)')] }, conduit: { run: run(10), jobs: [job('API on Node 24')] }, conduitPlatforms: { run: null, jobs: [] } },
   };
   const summary = summarize(repo, ci, at);
@@ -82,7 +86,9 @@ test('with CI results, each measured fact links its run, and failures show', () 
   assert.match(page, /\| \[`ci-weekly\.yml`\]\(\.\.\/\.\.\/\.github\/workflows\/ci-weekly\.yml\) \| soak \| no run yet \| — \|/);
   assert.match(page, /\| lean-rpc \| 600 \| 1,234,567 \| 7 \| \[passed\]\(/);
   assert.match(page, /\| tandem \| 900 \| 0 \| \[passed\]\(/);
-  assert.match(page, /\| differential \(release\) \| 80 \| 9,500 \| 0 \|/);
+  assert.match(page, /\| differential \(release\) \| 80 \| 9,500 \| 0 \| 2,400 \(\+120\) \|/);
+  assert.match(page, /Coverage growth by campaign .*\(release\): 2026-11-11 \+120 \(1,020\)/);
+  assert.match(summary.exitBar[7].measured, /coverage feedback: the latest nightly campaign reached 2,400 features in \(release\) \(120 new, 70 of them by mutants of the corpus\)/);
   assert.match(page, /Latest nightly run: \[2026-11-07\]\(https:\/\/github\.com\/Millillion\/lasm\/actions\/runs\/5\), failed\./);
   assert.doesNotMatch(page, /CI results were not read/);
 });

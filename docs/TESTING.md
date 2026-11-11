@@ -119,6 +119,7 @@ seed derived from the commit, on the base targets, the cheap extra oracles
 target (also `wasi-O0`, `deno-O0`, `bun-O0`, `browser-firefox` and
 `browser-webkit`). A divergence fails the job and the reproducers are in the run's
 artifact; upstream suspects are listed in the job summary and never fail it.
+Campaigns are [coverage-guided](#coverage-feedback).
 Known divergences (an open issue or a documented host limit) are listed in
 `KNOWN` in `run.mjs`, applied before the comparison and counted in the summary.
 
@@ -269,8 +270,8 @@ programs (the PR tier's fixed set). `--cases 0 --fs-cases 0 --feat-cases 200` ru
 | Tier | Feature programs |
 | --- | --- |
 | PR and push to `main` | the fixed seeds of `DIFF_FEATURE_SEEDS_PR` (1 and 2), 80 cases each, on the PR targets |
-| Nightly | one per fresh seed of the 60-minute campaigns (release and dev profile), every target |
-| Weekly | one per fresh seed of the 100-minute campaigns (`ci-weekly.yml`), every target |
+| Nightly | one per fresh seed of the 60-minute campaigns (release and dev profile), every target; the campaigns are [coverage-guided](#coverage-feedback) |
+| Weekly | one per fresh seed of the 100-minute campaigns (`ci-weekly.yml`), every target, coverage-guided |
 
 The job summary counts programs and cases per kind (`core`, `fs`, `feat`, …)
 and the throughput.
@@ -302,6 +303,86 @@ without what native Lean printed before the first case. Each generator fix is
 in `features.mjs` with the run that found it. A native run that takes a tenth
 of the run timeout is now a generator error naming its last case, not a
 divergence of every target.
+
+### Coverage feedback
+
+**Property.** The same as [differential testing](#differential-testing); this
+changes which programs are generated, not what is compared.
+
+**Why.** Blind generation draws every case from the same distribution, so a
+campaign keeps reaching the runtime functions and library code it reached the
+night before. Coverage feedback keeps the cases that reached something no
+earlier case did and spends part of each later program on variations of them.
+
+**What is measured** ([`scripts/differential/coverage.mjs`](../scripts/differential/coverage.mjs)),
+with no extra build and no extra run:
+
+- **Runtime C**, per case: the C that native Lean emits for the program
+  (`lean -c`, the oracle's own first step) is read as a call graph, from each
+  case's definition (`l_cN`) through the program's own functions, closed terms
+  and their initializers. Its features are the runtime functions and library
+  declarations it reaches (`c:lean_nat_big_add`, `c:l_Nat_reprFast`), each
+  library function the compiler specialized for it (`spec:l_List_foldl`) and
+  each call edge from the program's code into them (`e:l_List_foldl>lean_nat_add`:
+  from a specialization, the case itself or a preamble definition). This is the
+  code Lasm compiles into Wasm for that case. It is static reach: a branch the
+  case never takes still counts.
+- **Lasm glue**, per program: the node target's run has `NODE_V8_COVERAGE` set
+  (the output is unchanged), and every function of `dist/main.mjs`,
+  `program.cjs` and the host modules that ran is a feature, named by a hash of
+  its source text, plus each block V8 lists inside it, taken or skipped (a
+  branch direction). Glue features are counted, but a program's glue cannot be
+  attributed to one of its cases, so they do not admit cases to the corpus.
+
+**Corpus and mutation.** With `--guided 1` the harness records each core,
+file-system and feature program's features. A case that adds a runtime-C
+feature that no earlier case had joins the corpus (core kinds only: expression,
+state, IO, task and deep cases; at most 400, the smallest gain dropped first).
+Each later core program replaces its last quarter (`--mutant-share 0.25`) with
+mutants of corpus entries, picked with weight √(features the entry added). A
+mutant replaces one subexpression by a fresh closed one of the same type, drawn
+from the same operation table, never deeper than the tree was and without libm
+operations under an operation that needs exact arguments; or regenerates one
+statement, or changes a `deep` case's workload within the generator's bounds.
+So every mutant is a program the generator's own bounds allow, and terminates
+for the same reasons. The program's variants (without `IO.sleep`, shallow) are
+made from the guided program. Mutants are drawn from `rng(seed, 'mutants')`, so
+a campaign replayed with the same starting state and seed makes the same
+programs; a divergence's reproducer is its own `Main.lean` and `case.json`
+(which names the corpus entry it came from, `mutantOf`).
+
+**From night to night.** `--coverage-state FILE` reads the features and corpus
+of earlier campaigns and writes them back. `differential.yml` keeps the file in
+the Actions cache per profile (`differential-coverage-<profile>-<run>`,
+restored by prefix), so each night starts where the last one stopped. A corpus
+written by a different generator (a hash of `generate.mjs`, `features.mjs` and
+`coverage.mjs`) is dropped; its features are kept.
+
+**What it reports.** The job log and summary print the night's features, the
+features no earlier campaign reached (and how many mutants found), the corpus
+size, and the growth of the last 14 campaigns:
+
+```
+coverage growth by campaign: 2026-11-11 +2723 (2723), …
+coverage: 3410 features (3120 runtime C, 290 glue), 2723 new (2433 runtime C, 290 glue; 793 from mutants, 1640 from generated cases), 2723 in all campaigns, corpus 284 cases, 250 mutants run
+```
+
+The [test-evidence page](#the-test-evidence-page) reads these lines from the
+nightly jobs, shows features and new features per job and the growth by
+campaign, and states them in exit bar item 8; `docs/evidence/test-evidence.json`
+records them every night.
+
+**Tiers.** Campaigns only (nightly, weekly, dispatched with a budget). Pull
+requests and pushes to `main` stay unguided: their programs follow from the
+commit's seed alone.
+
+**Measured** (COVMEASURED)
+
+**What it cannot catch:** a path only one input value reaches (the features are
+the code a case can reach, not the values it computes); glue paths are measured
+per program, not per case; runtime C inside Lasm's own Wasm (the Emscripten
+libc, Lasm's patches) is not read from Lean's C, only through the glue it
+calls.
 
 ### Bun and browser targets
 
