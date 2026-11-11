@@ -1,41 +1,27 @@
 /-
-Serving Conduit on Node. Node has no server that takes a web `Request`, so it
-goes through the npm package `@hono/node-server` (an `@[js]` binding;
-docs/JS_BINDINGS.md, "Node: an npm adapter"). The same build runs on Deno
-(`npm run build:deno`), where it serves with `Deno.serve` instead; package.json
-leaves the Node adapter out of the Deno build (`lasm.edge.exclude`).
+Serving Conduit on Node.
+
+**Node still runs on `Lasm.Fetch`'s server, on purpose and only here.** How a
+Lean server runs on Node without `Lasm.Fetch` is being decided (Lasm's Node
+entry serving `Lasm.JS.exportDefault`, an npm adapter such as
+`@hono/node-server`, generated `node:http`, or a helper API; docs/REVIEW.md),
+so the app's handler is handed to `Lasm.Fetch.serveNode` (Node's `node:http`
+on $HOST:$PORT, as before) through a conversion of the request and response.
+This is the apps' one import of `Lasm.Fetch`; it moves when that is decided.
+Every other platform already serves with its own bindings
+(`Server/JsServe.lean`, `Server/FastlyServe.lean`, `Server/WasiHttpServe.lean`).
 -/
-import Lasm.JS
+import Lasm.Fetch
 import Server.JsServe
-open Lasm.JS
 
 namespace Conduit.Server.NodeServe
 
-/-- `serve(options, listeningListener)` of @hono/node-server; returns the Node server. -/
-@[js "@hono/node-server" "serve"] opaque nodeServe : Data → Value → IO Value
-
-/-- Node: an HTTP server on $HOST:$PORT (default 0.0.0.0:3000) that runs
-`handler`. SIGTERM and SIGINT close it (open requests finish), then the
-process exits. Never returns. -/
-def serveNode (handler : Web.Handler) : IO Unit := do
-  let (port, host) ← JsServe.address 3000
-  let fetch ← Function.ofFn1 (JsServe.webHandler handler)
-  let listening ← Function.ofFn fun _ => do
-    IO.println s!"Listening on http://{host}:{port}"
-    (← IO.getStdout).flush
-    return .undefined
-  let server ← nodeServe (obj [("fetch", toJS fetch), ("port", toJS port), ("hostname", toJS host)]) listening
-  -- Containers and platforms stop the server with SIGTERM: finish open requests, then exit.
-  let process ← require "node:process"
-  let exit ← Function.ofFn fun _ => do
-    let _ : Value ← process.callMethod "exit" #[toJS 0]
-    return .undefined
-  let stop ← Function.ofFn fun _ => do
-    let _ : Value ← server.callMethod "close" #[.ref exit ""]
-    return .undefined
-  for signal in ["SIGTERM", "SIGINT"] do
-    let _ : Value ← process.callMethod "once" #[toJS signal, .ref stop ""]
-  waitForever
+/-- Node: `handler` on Lasm.Fetch's Node server (HEAD as GET, a thrown handler
+answered 500, SIGTERM closes the server). Never returns. -/
+def serveNode (handler : Web.Handler) : IO Unit :=
+  Lasm.Fetch.serveNode fun req => do
+    let r ← handler { method := req.method, url := req.url, headers := req.headers, body := req.body }
+    return { status := r.status, headers := r.headers, body := r.body }
 
 /-- Node, or Deno when the same build runs there. -/
 def serve (handler : Web.Handler) : IO Unit := do

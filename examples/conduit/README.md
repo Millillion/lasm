@@ -134,7 +134,7 @@ Server/               the server (Lasm.JS, Lasm.Fastly or Lasm.WASI.Http, per pl
   Assets.lean         the browser app's files, embedded (Embed.lean: embed_dir!) and served
   Http.lean           HTTP: /api/… → Conduit.Api.handle, other URLs → their page (no JavaScript)
   JsServe.lean        the JavaScript servers: the edge's default export, Deno.serve, Bun.serve
-  NodeServe.lean      Node's server: @hono/node-server (an npm package, bound with @[js])
+  NodeServe.lean      Node's server: still Lasm.Fetch's, until Node serving is decided; Deno.serve on Deno
   FastlyServe.lean    Fastly Compute's server, on its host calls (Lasm.Fastly)
   WasiHttpServe.lean  the wasi:http server and outgoing requests (Lasm.WASI.Http)
   Pages.lean          server rendering: a URL's data from the API, `view` to HTML, flags

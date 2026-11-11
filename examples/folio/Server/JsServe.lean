@@ -7,8 +7,8 @@ on JavaScript runtimes"):
   export, `export default {fetch}` (`Lasm.JS.exportDefault`), which Lasm's
   generated entry serves;
 - Deno: `Deno.serve` (Lasm.JS.Deno); Bun: `Bun.serve` (Lasm.JS.Bun);
-- Node: `@hono/node-server` (`Server/NodeServe.lean`), which has its own
-  module because only the Node build may load that package.
+- Node: `Server/NodeServe.lean` (still Lasm.Fetch's server, until how Lean
+  servers run on Node is decided).
 -/
 import Lasm.JS
 import Lasm.JS.Web

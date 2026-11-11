@@ -257,11 +257,14 @@ decisions themselves are logged with their reasoning in
 
 ### Conduit and Folio moved off `Lasm.Fetch` (2026-11-11; what had no replacement)
 
-Conduit and Folio pin `@lasm/cli` 0.7.0 and import neither `Lasm.Fetch` nor
-`Lasm.Web`: each platform runs the app's handler with its own server
-(Workers and the edge: `Lasm.JS.exportDefault`; Deno: `Deno.serve`; Bun:
-`Bun.serve`; Node: `@hono/node-server` through `@[js]`; Fastly: `Lasm.Fastly`;
-wasi-http: `Lasm.WASI.Http`). What `Lasm.Fetch` gave them that no 0.7.0 library
+Conduit and Folio pin `@lasm/cli` 0.7.0 and no longer use `Lasm.Web`; each
+platform runs the app's handler with its own server (Workers and the edge:
+`Lasm.JS.exportDefault`; Deno: `Deno.serve`; Bun: `Bun.serve`; Fastly:
+`Lasm.Fastly`; wasi-http: `Lasm.WASI.Http`) **except Node**, which stays on
+`Lasm.Fetch.serveNode` (one module per app, `Server/NodeServe.lean`, the apps'
+only `Lasm.Fetch` import) until Jordan decides how Lean servers run on Node
+(Lasm's Node entry serving `Lasm.JS.exportDefault`, an npm adapter such as
+`@hono/node-server`, generated `node:http`, or a helper API). What `Lasm.Fetch` gave them that no 0.7.0 library
 does was written inside each app, as the rule says (no new public API):
 
 - *Static files embedded in the program* (`Lasm.Fetch.Assets`, `embed_dir!`):
@@ -276,10 +279,8 @@ does was written inside each app, as the rule says (no new public API):
   moved with it, proved in the app's module.
 - *One handler served on every platform* (`Lasm.Fetch.serve`): four small
   adapters per app (`Server/JsServe.lean`, `NodeServe.lean`, `FastlyServe.lean`,
-  `WasiHttpServe.lean`). Node now needs an npm package (`@hono/node-server`,
-  with `hono`), so both apps have runtime `dependencies` and package.json's
-  `lasm.edge.exclude`; Conduit's Azure and Google Cloud Functions packaging
-  installs them with the platform's package.
+  `WasiHttpServe.lean`). On Node the handler goes through
+  `Lasm.Fetch.serveNode` for now (above).
 - *The Worker's `env`* (`Lasm.Fetch.platformEnv`): D1 and KV bindings arrive as
   the default export's second argument; each app keeps the latest in its own
   `JsServe.platformEnv`.

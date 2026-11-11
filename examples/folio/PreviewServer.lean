@@ -2,8 +2,8 @@
 `build:bun`, `build:deno`): the browser page (dist/public, embedded), and
 `POST /api/render`, which renders the request's body with the same function
 the page runs (safe defaults), so a test can compare the two. PORT, HOST.
-Node serves it through @hono/node-server, Bun with `Bun.serve`, Deno with
-`Deno.serve` (`Server/NodeServe.lean`). -/
+Bun serves it with `Bun.serve`, Deno with `Deno.serve`, Node (for now) with
+Lasm.Fetch's Node server (`Server/NodeServe.lean`). -/
 import Server.Assets
 import Server.Embed
 import Server.NodeServe
