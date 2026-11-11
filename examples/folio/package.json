@@ -34,7 +34,7 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.5.1",
+    "@lasm/cli": "0.7.0",
     "commonmark": "0.31.2",
     "@playwright/test": "1.63.0"
   }

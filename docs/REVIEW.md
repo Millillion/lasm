@@ -335,6 +335,47 @@ decisions themselves are logged with their reasoning in
   0.5.1, so it migrates when it moves to the release with the browser tier
   (ROADMAP.md).
 
+### Conduit and Folio moved off `Lasm.Fetch` (2026-11-11; what had no replacement)
+
+Conduit and Folio pin `@lasm/cli` 0.7.0 and no longer use `Lasm.Web`; each
+platform runs the app's handler with its own server (Workers and the edge:
+`Lasm.JS.exportDefault`; Deno: `Deno.serve`; Bun: `Bun.serve`; Fastly:
+`Lasm.Fastly`; wasi-http: `Lasm.WASI.Http`) **except Node**, which stays on
+`Lasm.Fetch.serveNode` (one module per app, `Server/NodeServe.lean`, the apps'
+only `Lasm.Fetch` import) until Jordan decides how Lean servers run on Node
+(Lasm's Node entry serving `Lasm.JS.exportDefault`, an npm adapter such as
+`@hono/node-server`, generated `node:http`, or a helper API). What `Lasm.Fetch` gave them that no 0.7.0 library
+does was written inside each app, as the rule says (no new public API):
+
+- *Static files embedded in the program* (`Lasm.Fetch.Assets`, `embed_dir!`):
+  `Server/Assets.lean` and `Server/Embed.lean` in both apps, the same code.
+  Every target without a file system (Workers, the edge, Fastly, wasi-http)
+  needs this; it is the largest piece an app now carries.
+- *One request type for every platform, and its routing helpers*: the URL path
+  read as a browser reads it (dot segments, `\`), `segments`, `queryParams`,
+  `header?`, the response helpers, HEAD answered as GET and a thrown handler
+  answered 500 (`Lasm.Fetch.respond`): `Server/Web.lean` in both apps. The
+  theorem that no segment is `.` or `..` (`Lasm.Fetch.Spec.segments_no_dot_segments`)
+  moved with it, proved in the app's module.
+- *One handler served on every platform* (`Lasm.Fetch.serve`): four small
+  adapters per app (`Server/JsServe.lean`, `NodeServe.lean`, `FastlyServe.lean`,
+  `WasiHttpServe.lean`). On Node the handler goes through
+  `Lasm.Fetch.serveNode` for now (above).
+- *The Worker's `env`* (`Lasm.Fetch.platformEnv`): D1 and KV bindings arrive as
+  the default export's second argument; each app keeps the latest in its own
+  `JsServe.platformEnv`.
+- **`Lasm.KV` on Workers depends on `Lasm.Fetch`.** `Lasm.KV.open` reads
+  Workers KV bindings from `Lasm.Fetch.platformEnv`, which only
+  `Lasm.Fetch.serve` sets, and `Lasm.KV` imports `Lasm.Fetch` (also for
+  `platformCode`). Without `Lasm.Fetch.serve` a Workers KV binding is never
+  found and the store is memory, so Folio has its own Workers KV store
+  (`workersStore` in `ServerEdge.lean`). Deleting `Lasm.Fetch` needs a decision
+  for `Lasm.KV` first (yours: for example a `Lasm.KV.workers` that takes the
+  binding, or dropping Workers from `Lasm.KV.open`).
+- *Outbound HTTP on JavaScript and wasi-http alike* (`Lasm.Fetch.fetch`):
+  Conduit's PostgREST store takes a `send` function: `Lasm.JS.Web.fetch` on
+  Supabase, `wasi:http/outgoing-handler` on wasi-http (`WasiHttpServe.fetch`).
+
 ### High-priority work to define with Jordan
 - [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,
   2026-11-09). The known weaknesses:
