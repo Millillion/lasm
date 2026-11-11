@@ -40,9 +40,8 @@ test('every template creates a complete project', () => {
     for (const template of Object.keys(templates).filter(name => !templates[name].browser && !templates[name].fullstack)) {
       const directory = join(root, `app ${template}`);
       const result = initProject({ directory, template });
-      // The fetch template serves on Node through NodeServer.lean (@hono/node-server).
-      assert.deepEqual(result.files.sort(), ['.dockerignore', '.gitignore', 'App.lean', 'Dockerfile', 'Main.lean',
-        ...(template === 'fetch' ? ['NodeServer.lean'] : []), 'README.md', 'lakefile.toml', 'lean-toolchain', 'package.json']);
+      assert.deepEqual(result.files.sort(), ['.dockerignore', '.gitignore', 'App.lean', 'Dockerfile', 'Main.lean', 'README.md',
+        'lakefile.toml', 'lean-toolchain', 'package.json']);
       const read = file => readFileSync(join(directory, file), 'utf8');
       assert.match(read('lean-toolchain'), /^leanprover\/lean4:v4\.\d+\.\d+\n$/);
       assert.match(read('lakefile.toml'), /root = "Main"/);
@@ -57,7 +56,7 @@ test('every template creates a complete project', () => {
       assert.match(dockerfile, /^FROM node:24-bookworm-slim$/m);
       assert.match(dockerfile, /npx lasm build Main\.lean --output dist/);
       assert.equal(/PORT=8080/.test(dockerfile), templates[template].server);
-      assert.equal(read('Main.lean').includes('import Lasm.JS') || read('Main.lean').includes('import NodeServer'), templates[template].interop);
+      assert.equal(/^import Lasm\.JS$/m.test(read('Main.lean')), templates[template].interop);
       assert.match(read('.gitignore'), /^dist\/$/m);
     }
     const lambda = join(root, 'lambda');
@@ -151,7 +150,7 @@ test('the fullstack template: shared, server and client modules; Node and Worker
   try {
     const directory = join(root, 'todos');
     const result = initProject({ directory, template: 'fullstack' });
-    assert.deepEqual(result.files.sort(), ['.gitignore', 'Client.lean', 'Embed.lean', 'Http.lean', 'NodeServer.lean', 'README.md', 'Server.lean',
+    assert.deepEqual(result.files.sort(), ['.gitignore', 'Client.lean', 'Embed.lean', 'Http.lean', 'README.md', 'Server.lean',
       'Shared.lean', 'Site.lean', 'View.lean', 'lakefile.toml', 'lean-toolchain', 'package.json', 'public/style.css', 'wrangler.toml']);
     const read = file => readFileSync(join(directory, file), 'utf8');
     const pkg = JSON.parse(read('package.json'));
@@ -180,6 +179,6 @@ test('the fullstack template: shared, server and client modules; Node and Worker
     assert.match(readFileSync(join(root, 'all', 'fastly.toml'), 'utf8'), /\[local_server\.kv_stores\]\n  TODOS = \[\]/);
     assert.match(read('Server.lean'), /Lasm\.KV\.open "TODOS"/);
     assert.match(read('Server.lean'), /Lasm\.KV\.setWorkersEnv/);
-    assert.deepEqual(pkg.lasm, { edge: { exclude: ['@hono/node-server'] } });
+    assert.equal(pkg.dependencies, undefined);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

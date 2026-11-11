@@ -3,7 +3,6 @@
   "Client.lean",
   "Embed.lean",
   "Http.lean",
-  "NodeServer.lean",
   "README.md",
   "Server.lean",
   "ServerFastly.lean",

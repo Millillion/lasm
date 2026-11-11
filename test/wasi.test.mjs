@@ -117,8 +117,8 @@ test('lasm init --template fetch --deploy fastly|wasi|spin', () => {
     assert.equal(pkg.scripts['build:wasi'], 'lasm build Cgi.lean --target wasi');
     assert.equal(pkg.scripts['build:workers'], 'lasm build Main.lean --target workers');
     assert.equal(pkg.scripts['start:spin'], 'spin up');
-    assert.deepEqual(Object.keys(pkg.dependencies), ['@hono/node-server', 'hono']);
-    assert.match(readFileSync(join(parent, 'app/Main.lean'), 'utf8'), /import NodeServer/);
+    assert.equal(pkg.dependencies, undefined);
+    assert.match(readFileSync(join(parent, 'app/Main.lean'), 'utf8'), /import Lasm\.JS\.Web/);
     assert.match(readFileSync(join(parent, 'app/Fastly.lean'), 'utf8'), /import Lasm\.Fastly/);
     assert.match(readFileSync(join(parent, 'app/WasiHttp.lean'), 'utf8'), /import Lasm\.WASI\.Http/);
     assert.match(readFileSync(join(parent, 'app/spin.toml'), 'utf8'), /source = "wasi-http\/main.wasm"/);

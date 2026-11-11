@@ -11,7 +11,6 @@ the API between them, whose types and validation are written once.
 | `Site.lean` | The site: the API and the first page, for every server program. Its `addTodo` handler can only store titles that passed the shared check: the type asks for the proof. |
 | `Http.lean`, `Embed.lean` | Requests and responses as plain Lean data, and the browser app's files embedded in the server (`embed_dir!`). |
 | `Server.lean` | The server on Node, Bun, Deno and the edge, through the web's `Request` and `Response` (`Lasm.JS.Web`). |
-| `NodeServer.lean` | Node's server for it: a typed binding of the npm package `@hono/node-server`. |
 | `Client.lean` | The browser app (`Lasm.UI`): hydrates the server's page and calls the API. A theorem shows it never sends an invalid title. |
 | `public/style.css` | Copied next to the browser app. |
 | `wrangler.toml` | Cloudflare Workers: the server as a Worker, the browser app as static assets. |

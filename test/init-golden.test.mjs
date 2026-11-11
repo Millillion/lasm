@@ -60,8 +60,7 @@ const listFiles = (directory, base = directory) => readdirSync(directory).flatMa
 }).sort();
 // Files lasm init copies from templates/: their source.
 const copied = (template, file) => {
-  const source = file === 'NodeServer.lean' ? join(repository, 'templates/common/NodeServer.lean')
-    : template === 'fullstack' ? join(repository, 'templates/fullstack', file)
+  const source = template === 'fullstack' ? join(repository, 'templates/fullstack', file)
     : file === 'App.lean' ? join(repository, 'templates/common/App.lean')
     : file.endsWith('.lean') ? join(repository, 'templates', template, file) : undefined;
   return source && existsSync(source) && !file.endsWith('.toml') ? source : undefined;

@@ -123,10 +123,10 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 
 | Proposition | In plain English |
 | --- | --- |
-| [`handler_fallback`](Lasm/RPC/Spec.lean#L88) | **Other paths reach the fallback.** A request whose path is not `/rpc/<name>` (one segment after `rpc`) is passed to the fallback handler unchanged, whatever its method. |
-| [`handler_route`](Lasm/RPC/Spec.lean#L95) | **`POST /rpc/<name>` runs the route of that name.** For a `POST` to `/rpc/<name>`, the handler runs the first route named `name` on the request body and answers its status and JSON body, never cached. |
-| [`handler_unknown`](Lasm/RPC/Spec.lean#L104) | **An unknown endpoint answers 404.** A `POST` to `/rpc/<name>` when no route has that name answers status 404, and runs no route and not the fallback. |
-| [`handler_method`](Lasm/RPC/Spec.lean#L113) | **Only `POST` reaches an endpoint.** Any other method on `/rpc/<name>` answers 405 with `allow: POST`, and runs no route and not the fallback. |
+| [`dispatch_other`](Lasm/RPC/Spec.lean#L91) | **Other paths are left to the program.** For a request whose path is not `/rpc/<name>` (one segment after `rpc`), `dispatch` gives no answer, whatever its method and body: the program answers it. |
+| [`dispatch_route`](Lasm/RPC/Spec.lean#L98) | **`POST /rpc/<name>` runs the route of that name.** For a `POST` to `/rpc/<name>`, `dispatch` runs the first route named `name` on the request body and answers its status and JSON body, never cached. |
+| [`dispatch_unknown`](Lasm/RPC/Spec.lean#L105) | **An unknown endpoint answers 404.** A `POST` to `/rpc/<name>` when no route has that name answers status 404, and runs no route. |
+| [`dispatch_method`](Lasm/RPC/Spec.lean#L112) | **Only `POST` reaches an endpoint.** Any other method on `/rpc/<name>` answers 405 with `allow: POST`, and runs no route. |
 
 ### The client
 

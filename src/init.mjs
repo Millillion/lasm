@@ -14,8 +14,6 @@ const templateRoot = join(root, 'templates');
 const npm = {
   express: { express: '5.2.1' },
   hono: { '@hono/node-server': '2.1.3', hono: '4.13.13' },
-  // The fetch template's Node server: @hono/node-server (hono is its peer dependency).
-  fetch: { '@hono/node-server': '2.1.3', hono: '4.13.13' },
   fastify: { fastify: '5.12.7' },
 };
 export const templateDependencies = npm;
@@ -66,7 +64,7 @@ export const templates = {
   // A web fetch handler (Lasm.JS.Web) for Node, the edge, Bun and Deno; with
   // --deploy, the same routes on Fastly's (Lasm.Fastly) and wasi:http's
   // (Lasm.WASI.Http) own interfaces and as a CGI program (WASI).
-  fetch: { summary: 'an HTTP handler on the web\'s Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces', server: true, interop: true, library: 'Lasm.JS.Web', portable: true },
+  fetch: { summary: 'an HTTP handler on the web\'s Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces', server: true, interop: false, library: 'Lasm.JS.Web', portable: true },
   // The whole stack in Lean (docs/RPC.md): shared types, API and validation; a
   // A server (Lasm.JS.Web, Lasm.Fastly, Lasm.WASI.Http) with server-side rendering; a Lasm.UI app that hydrates it.
   fullstack: { summary: 'a full-stack Lean app: shared API and validation (Lasm.RPC), a server that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target', server: true, interop: false, fullstack: true },
@@ -291,7 +289,7 @@ function packageJson(name, template, deploy = []) {
     'dev:bun': templates[template].server ? 'bun x --bun lasm dev Main.lean' : 'bun x --bun lasm Main.lean --', 'build:bun': 'bun x --bun lasm build Main.lean --target bun', 'start:bun': 'bun bun/main.mjs',
     'build:deno': 'lasm build Main.lean --target deno', 'start:deno': 'deno run -A deno/main.mjs' });
   // Edge and portable builds import the npm modules Lean binds; the Node server stays out.
-  if (template === 'hono' || template === 'fetch') pkg.lasm = { edge: { exclude: ['@hono/node-server'] } };
+  if (template === 'hono') pkg.lasm = { edge: { exclude: ['@hono/node-server'] } };
   const dependencies = Object.assign({}, npm[template], ...deploy.map(target => deployTargets[target].dependencies));
   if (Object.keys(dependencies).length) pkg.dependencies = Object.fromEntries(Object.entries(dependencies).sort(([a], [b]) => a < b ? -1 : 1));
   pkg.devDependencies = { [lasm.name]: lasm.version };
@@ -688,7 +686,6 @@ export function initProject({ directory, template, deploy = [] }) {
     'package.json': packageJson(name, template, deploy),
     'App.lean': readFileSync(join(templateRoot, 'common/App.lean'), 'utf8'),
     'Main.lean': readFileSync(join(templateRoot, template, 'Main.lean'), 'utf8'),
-    ...(template === 'fetch' ? { 'NodeServer.lean': readFileSync(join(templateRoot, 'common/NodeServer.lean'), 'utf8') } : {}),
     'README.md': readme(name, template, deploy),
     'Dockerfile': dockerfile(template),
     '.dockerignore': dockerignore,
@@ -748,8 +745,8 @@ name = "Shared"
 name = "View"
 
 # Server.lean and Client.lean are the two programs: lasm builds them
-# (npm run build). They, the site they serve (Site.lean, Http.lean, Embed.lean,
-# NodeServer.lean) and the other server programs (ServerFastly.lean,
+# (npm run build). They, the site they serve (Site.lean, Http.lean, Embed.lean)
+# and the other server programs (ServerFastly.lean,
 # ServerWasiHttp.lean) import Lasm's library, so they are not Lake targets.
 `,
     'package.json': JSON.stringify({
@@ -780,9 +777,6 @@ name = "View"
         ...(deploy.includes('wasi-http') ? { 'start:wasi-http': 'wasmtime serve wasi-http/main.wasm' } : {}),
       },
       engines: { node: '>=24' },
-      // The Bun, Deno and edge builds serve the default export; the Node server stays out.
-      lasm: { edge: { exclude: ['@hono/node-server'] } },
-      dependencies: { ...npm.fetch },
       devDependencies: { [lasm.name]: lasm.version },
     }, null, 2) + '\n',
     'Shared.lean': read('Shared.lean'),
@@ -791,7 +785,6 @@ name = "View"
     'Embed.lean': read('Embed.lean'),
     'Site.lean': read('Site.lean'),
     'Server.lean': read('Server.lean'),
-    'NodeServer.lean': readFileSync(join(templateRoot, 'common/NodeServer.lean'), 'utf8'),
     ...(deploy.includes('fastly') ? { 'ServerFastly.lean': read('ServerFastly.lean') } : {}),
     ...(deploy.some(t => deployTargets[t].package === 'wasi-http') ? { 'ServerWasiHttp.lean': read('ServerWasiHttp.lean') } : {}),
     'Client.lean': read('Client.lean'),
@@ -838,7 +831,6 @@ the API between them, whose types and validation are written once.
 | \`Site.lean\` | The site: the API and the first page, for every server program. Its \`addTodo\` handler can only store titles that passed the shared check: the type asks for the proof. |
 | \`Http.lean\`, \`Embed.lean\` | Requests and responses as plain Lean data, and the browser app's files embedded in the server (\`embed_dir!\`). |
 | \`Server.lean\` | The server on Node, Bun, Deno and the edge, through the web's \`Request\` and \`Response\` (\`Lasm.JS.Web\`). |
-| \`NodeServer.lean\` | Node's server for it: a typed binding of the npm package \`@hono/node-server\`. |
 ${deploy.includes('fastly') ? '| \`ServerFastly.lean\` | The server on Fastly Compute\'s own host calls (\`Lasm.Fastly\`). |\n' : ''}${deploy.some(t => deployTargets[t].package === 'wasi-http') ? '| \`ServerWasiHttp.lean\` | The server as a wasi:http component (\`Lasm.WASI.Http\`). |\n' : ''}| \`Client.lean\` | The browser app (\`Lasm.UI\`): hydrates the server's page and calls the API. A theorem shows it never sends an invalid title. |
 | \`public/style.css\` | Copied next to the browser app. |
 | \`wrangler.toml\` | Cloudflare Workers: the server as a Worker, the browser app as static assets. |

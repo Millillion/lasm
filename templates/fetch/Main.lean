@@ -1,7 +1,7 @@
 /-
 An HTTP handler in Lean on the web's own `Request` and `Response`
-(Lasm.JS.Web): the same Main.lean serves Node (through the npm package
-@hono/node-server), Bun, Deno, Cloudflare Workers and the other edge targets.
+(Lasm.JS.Web): the same Main.lean serves Bun, Deno, Cloudflare Workers and the
+other edge targets, and Node (through Lasm.Fetch's Node server, for now).
   GET  /             {"message": "Hello from Lean!"}
   GET  /hello/NAME   {"message": "Hello, NAME, from Lean!"}
   POST /echo         the request body, with its content type
@@ -9,7 +9,8 @@ An HTTP handler in Lean on the web's own `Request` and `Response`
 On Node it listens on $HOST (default 0.0.0.0) and $PORT (default 3000).
 -/
 import App
-import NodeServer
+import Lasm.JS.Web
+import Lasm.Fetch
 import Lean.Data.Json
 open Lasm.JS Lasm.JS.Web Lean
 
@@ -52,17 +53,19 @@ def handle (request : Request) : Async Response := do
   | "GET", ["health"] => json [("ok", true)]
   | _, _ => reply 404 "text/plain; charset=utf-8" "Not Found\n".toUTF8
 
+/-- Node: `handle` on Lasm.Fetch's Node server ($HOST:$PORT, SIGTERM closes it).
+How Lean servers run on Node without Lasm.Fetch is still being decided, so
+this is the program's one use of Lasm.Fetch; each request and response is
+converted to and from the web's own. -/
+def serveNode : IO Unit := Lasm.Fetch.serveNode fun req => do
+  let headers : HeadersInit := .sequence (req.headers.map fun (k, v) => #[k, v])
+  let body : Option BodyInit := if req.body.isEmpty then none else some (.bufferSource req.body)
+  let r ← handle (← Request.new (.usvString req.url) (some { method := some req.method, headers := some headers, body }))
+  return { status := (← r.status).toUInt16, headers := ← (← r.headers).entries, body := ← r.arrayBuffer }
+
 def main : IO Unit := do
   -- Bun, Deno, Cloudflare Workers and the other edge targets serve the
   -- program's default export (Workers' `export default {fetch}`).
   if ← onEdge then
     exportDefault (← Function.ofFn1 handle)
-    return
-  -- Node: NodeServer.lean (@hono/node-server).
-  let host := (← IO.getEnv "HOST").getD "0.0.0.0"
-  let port := ((← IO.getEnv "PORT").bind String.toNat?).getD 3000
-  let server ← NodeServer.serve { port, hostname := host } handle do
-    IO.println s!"Listening on http://{host}:{port}"
-    (← IO.getStdout).flush
-  server.closeOnSignals
-  waitForever
+  else serveNode

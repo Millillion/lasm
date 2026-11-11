@@ -4,7 +4,6 @@
   "App.lean",
   "Dockerfile",
   "Main.lean",
-  "NodeServer.lean",
   "README.md",
   "lakefile.toml",
   "lean-toolchain",

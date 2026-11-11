@@ -5,7 +5,6 @@
   "Dockerfile",
   "Fastly.lean",
   "Main.lean",
-  "NodeServer.lean",
   "README.md",
   "WasiHttp.lean",
   "fastly.toml",

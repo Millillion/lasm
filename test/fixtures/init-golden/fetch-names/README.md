@@ -33,12 +33,12 @@ Files:
 
 | File | What it is |
 | --- | --- |
-| `Main.lean` | The program: routes and Lean request handlers. |
+| `Main.lean` | The program. |
 | `App.lean` | Pure Lean logic used by `Main.lean`. |
 | `Fastly.lean` | The same routes on Fastly Compute's own host calls (`Lasm.Fastly`): `npm run build:fastly`. |
 | `WasiHttp.lean` | The same routes as a wasi:http component (`Lasm.WASI.Http`): `npm run build:wasi-http`. |
 | `lakefile.toml`, `lean-toolchain` | The Lake project, pinned to Lean <LEAN_VERSION>. |
-| `package.json` | npm scripts, the npm packages Lean calls and Lasm (`@lasm/compiler`) as a dev dependency. |
+| `package.json` | npm scripts and Lasm (`@lasm/compiler`) as a dev dependency. |
 | `Dockerfile` | Builds with Lasm, runs on `node:24-bookworm-slim`. |
 
 `App.lean` is pure Lean: `lake build App` checks it natively. `Main.lean` imports
@@ -63,7 +63,7 @@ See [Bun and Deno](https://github.com/Millillion/lasm/blob/main/docs/BUN_DENO.md
 
 ## Deploy
 
-`dist/` is the whole deployment, including the production `node_modules`: copy it to a machine
+`dist/` is the whole deployment: copy it to a machine
 with Node 24+ (Linux x64 or arm64 from a build on any platform, or the build machine's
 own OS and architecture) and run `node dist/main.mjs`.
 
