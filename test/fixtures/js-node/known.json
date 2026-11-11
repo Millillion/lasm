@@ -1,0 +1,6 @@
+{
+  "$comment": "Checks of test/fixtures/js-node that fail on a target because of the runtime itself (its node: compatibility, or Node's behaviour against its own docs), never the binding, with the reason (scripts/bindings/test-web.mjs). A name ending in * matches every check it prefixes.",
+  "deno": {
+    "FileHandle.write string": "Deno 2.9.6's filehandle.write(string) fulfills with buffer as a Uint8Array of the bytes written; Node's docs (and Node, Bun) give the string written"
+  }
+}

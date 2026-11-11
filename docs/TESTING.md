@@ -33,7 +33,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) and [fuzzing](#differential-fuzzing) | Lasm-compiled programs (generated expressions, statements, and feature programs declaring classes, inductives, closures, loops, structures) behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
 | [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic equals Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs` | PR, nightly |
-| [Standard bindings](#standard-bindings) | Lasm.JS.Web is its generator's output, and behaves as the specs say on every JavaScript target: WPT's URL and urlencoded data, Lean's UTF-8 as the encoder's oracle, published Web Crypto vectors, generated round trips; its browser tier against Lean models on Chromium, Firefox and WebKit | `scripts/bindings/`, `test/fixtures/js-web/`, `test/browser/platform/Bindings.lean`, `web-bindings.yml`, `browser.yml` | PR (paths), main; browser.yml on dispatch and release |
+| [Standard bindings](#standard-bindings) | Lasm.JS.Web and Lasm.JS.Node are their generator's output (Lasm.JS.Node's lowering is that of the pinned Node docs), and behave as the specs and Node's docs say on every target: WPT's URL and urlencoded data, Lean's UTF-8, hex, base64 and path operations as oracles, published crypto vectors, generated round trips, files and child processes | `scripts/bindings/`, `test/fixtures/js-web/`, `test/fixtures/js-node/`, `web-bindings.yml` | PR (paths), main |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
@@ -333,7 +333,7 @@ run without JSPI (Firefox's JSPI is disabled by the loader, WebKit has none), an
 there a blocking wait on a host timer (`IO.sleep`) stops the instance by design
 ([BROWSER.md](BROWSER.md#decisions)). They therefore run a third program per
 seed: the core program with every `IO.sleep` removed (`withoutSleep` in
-`generate.mjs`; indices and all other statements kept), and the regressions that
+`generate-web.mjs`; indices and all other statements kept), and the regressions that
 do not sleep. Browsers skip the regressions that read the environment (a page
 has none). Pull requests run `bun` and `browser-chromium`; campaigns run all
 five. *Catches:* differences in the Bun entry (`bun/main.mjs`) and the browser
@@ -483,6 +483,22 @@ behaviour (input value sanitization, ignored `lineWidth` and `globalAlpha`
 values, event dispatch and cancelling, a WebSocket echo). An availability probe
 records the generated members each engine lacks (`bindingsMissing` in the
 engine's report).
+
+**Lasm.JS.Node.** For every check *c* of
+[`test/fixtures/js-node/Main.lean`](../test/fixtures/js-node/Main.lean) and every
+target *t* (Node 26 and 24, Bun, Deno): *c* holds on *t*, unless *t* itself
+deviates from Node's docs there ([`known.json`](../test/fixtures/js-node/known.json),
+with the reason). Oracles: Lean's own hex, base64 (RFC 4648), Latin-1, UTF-8
+(`String.toUTF8`, `ByteArray.validateUTF8` for `buffer.isUtf8`), byte order and
+string operations (`path.join`, `basename`, `dirname`, `extname` by the docs' rule,
+`normalize`, `relative`/`resolve`, `parse`/`format`) over seeded generated inputs;
+published vectors (FIPS 180, RFC 1321, RFC 4231 HMAC, RFC 6070 PBKDF2, RFC 7914
+scrypt, RFC 5869 HKDF); file operations in a fresh temporary directory checked
+against what was written; child processes (`execFile` output and exit status,
+`spawn` with stdin and stdout through web streams, `kill`), `EventEmitter` and
+`events.once`. The same harness runs it: `test-web.mjs --fixture js-node`
+(`node-conformance` in `web-bindings.yml`), and `--sizes` builds
+`test/fixtures/js-node-size` with and without Lasm.JS.Node.
 
 ### Scenario matrix
 

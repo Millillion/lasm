@@ -37,6 +37,10 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   // Its browser tier (docs/JS_BINDINGS.md, "The browser tier"; scripts/bindings/web-browser.mjs).
   'Lasm.JS.Web.Geometry', 'Lasm.JS.Web.Css', 'Lasm.JS.Web.Html', 'Lasm.JS.Web.UiEvents', 'Lasm.JS.Web.Canvas', 'Lasm.JS.Web.WebSocket',
   'Lasm.JS.Web.Browser',
+  // Lasm.JS.Node (docs/JS_BINDINGS.md, "Lasm.JS.Node"): Node's server-essential modules, generated from
+  // Node's API docs (scripts/bindings/node-api.mjs, generate-web.mjs).
+  'Lasm.JS.Node.Support', 'Lasm.JS.Node.Events', 'Lasm.JS.Node.Stream', 'Lasm.JS.Node.Buffer', 'Lasm.JS.Node.Path',
+  'Lasm.JS.Node.Os', 'Lasm.JS.Node.Process', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.ChildProcess', 'Lasm.JS.Node',
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
   'Lasm.UI.Url', 'Lasm.UI.Mount', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',

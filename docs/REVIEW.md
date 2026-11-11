@@ -92,6 +92,33 @@ decisions themselves are logged with their reasoning in
     glue; `Lasm.RPC` never used `Lasm.Web`).
 - Still for Jordan to review when it lands: the generated surface and its
   naming details.
+- [ ] **`Lasm.JS.Node` (tier 2, first part; 2026-11-10) is generated from
+  Node's own docs, not `@types/node`.** The list above names `@types/node`;
+  Claude chose Node's machine-readable docs (`doc/api/*.json`), which the Node
+  project releases with each version, and lowered them to WebIDL so the tier-1
+  generator and mapping serve both ([DECISIONS.md](DECISIONS.md), 2026-11-10;
+  [JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-for-node-lasmjsnode)).
+  API-shape choices to review:
+  - **Names are the docs' own**: `fsPromises.readFile`, `path.join`,
+    `child_process.spawn`, `crypto.createHash`, `Buffer.from`. Namespaces are
+    lowercase as in the docs (`fs.Stats`, `stream.Readable`), not
+    `Lasm.JS.Node.Fs.readFile`.
+  - **Unions take their members directly**: with the `Coe` instances the
+    browser tier added to the generator, `fsPromises.readFile "a.txt"` works
+    (`.domString "a.txt"` still does).
+  - **Encoding-dependent results are unions**: `readFile` gives
+    `Uint8ArrayOrDOMString` (bytes, or a string when an encoding is passed),
+    as the docs say, not two functions.
+  - **Callbacks become promises**: `crypto.scrypt`, `pbkdf2`, `hkdf` are
+    `Async` (through `util.promisify`); `child_process.execFile` is its
+    documented promisified form (`{stdout, stderr}`), so the `ChildProcess`
+    it otherwise returns comes from `spawn`.
+  - **Numbers follow the docs**: `{number}` is `Float` (`crypto.randomBytes 32`,
+    `FileHandle.fd`), `{integer}` is `Int`; `os.uptime` is corrected to `Float`
+    because Node returns fractions.
+  - **Not generated**: `node:http`/`node:net` (Node serving goes through an
+    npm adapter, per your 2026-11-10 direction), and async iteration (`glob`,
+    `watch`, `opendir`).
 
 ### Host bindings: `Lasm.Fastly` generated, `Lasm.WASI.*` next (decided by Jordan, 2026-11-10)
 - [x] **Decided.** `Lasm.Fetch` is deleted entirely. Bindings are named for
