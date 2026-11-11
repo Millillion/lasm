@@ -6,7 +6,7 @@ rendered to HTML, and the data goes along as the app's flags so the app
 hydrates exactly this HTML. The same functions build the model on both
 sides (`Model.ofFlags`).
 -/
-import Lasm.Fetch
+import Server.Web
 import Lasm.UI.Render
 import Conduit.Api
 import Frontend.View
@@ -68,8 +68,8 @@ def page (route : Route) (flags : Json) : String :=
   render (view model) ++ "</div></body></html>"
 
 /-- Any URL outside `/api`: its page (404 for unknown paths). -/
-def pageResponse {m : Type → Type} [Monad m] (store : Store m) (svc : Services m) (req : Lasm.Fetch.Request) :
-    m Lasm.Fetch.Response := do
+def pageResponse {m : Type → Type} [Monad m] (store : Store m) (svc : Services m) (req : Web.Request) :
+    m Web.Response := do
   let route := Route.parse req.segments req.queryParams
   let html := page route (← flagsFor store svc route)
   return .html html (if route == .notFound then 404 else 200)
