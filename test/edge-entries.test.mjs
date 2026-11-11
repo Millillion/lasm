@@ -79,8 +79,8 @@ test('workers: Lean starts once per isolate with the string bindings, and the ha
   assert.deepEqual(seen, [['http://x/a', env, ctx]]);
   assert.equal(starts.length, 1);
   // A function handler has no scheduled or queue method: those events fail, saying why.
-  await assert.rejects(worker.scheduled({ cron: '* * * * *' }, env, ctx), { message: 'The Lean program\'s handler (Lasm.JS.exportDefault) has no scheduled method' });
-  await assert.rejects(worker.queue({ messages: [] }, env, ctx), { message: 'The Lean program\'s handler (Lasm.JS.exportDefault) has no queue method' });
+  await assert.rejects(worker.scheduled({ cron: '* * * * *' }, env, ctx), { message: 'The handler of the Lean program (Lasm.JS.exportDefault) has no scheduled method' });
+  await assert.rejects(worker.queue({ messages: [] }, env, ctx), { message: 'The handler of the Lean program (Lasm.JS.exportDefault) has no queue method' });
 });
 
 test('workers: an object handler\'s scheduled and queue methods receive cron triggers and queue batches', async () => {

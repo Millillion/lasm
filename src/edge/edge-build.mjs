@@ -358,7 +358,7 @@ const ready = async () => {
 /** A handler method other than fetch (scheduled, queue): the published object's, if it has one. */
 const forward = name => async (event, env, ctx) => {
   const handler = await ready();
-  if (typeof handler?.[name] !== 'function') throw new Error(\`The Lean program's handler (Lasm.JS.exportDefault) has no \${name} method\`);
+  if (typeof handler?.[name] !== 'function') throw new Error('The handler of the Lean program (Lasm.JS.exportDefault) has no ' + name + ' method');
   return handler[name](event, env, ctx);
 };
 
