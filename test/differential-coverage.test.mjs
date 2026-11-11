@@ -10,7 +10,8 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { callGraph, cFeatures, cName, glueFeatures, Coverage, mutate, mutants, loadState, MUTABLE, MAX_CORPUS } from '../scripts/differential/coverage.mjs';
+import { callGraph, cFeatures, cName, glueFeatures, Coverage, mutate, mutants, loadState, MUTABLE, isMutable, MAX_CORPUS } from '../scripts/differential/coverage.mjs';
+import { genFeatureCase, MUTABLE_FAMILIES } from '../scripts/differential/features.mjs';
 import { genProgram, genCase, renderCase, renderProgram, rng, OPS } from '../scripts/differential/generate.mjs';
 
 // The shape of what `lean -c` emits (Lean 4.35.0): declarations, globals with
@@ -121,6 +122,11 @@ test('the corpus keeps the cases that reach something new, and only mutable kind
   cov.add(new Set(['glue:main.mjs', 'e:case>lean_box']), null);
   assert.deepEqual([cov.summary().runtimeC, cov.summary().glue, cov.summary().features], [6, 1, 7]);
   assert.ok(MUTABLE.has('expr') && !MUTABLE.has('feat') && !MUTABLE.has('fs'));
+  // Feature cases of the families with independent checks are mutable too.
+  assert.ok(['ext', 'lazy', 'st', 'wide'].every(fam => isMutable({ kind: 'feat', fam })) && !isMutable({ kind: 'feat', fam: 'class' }));
+  assert.deepEqual(cov.add(new Set(['c:w']), { seed: 1, index: 3, kind: 'feat', c: { kind: 'feat', fam: 'wide', chk: [] } }), ['c:w']);
+  assert.equal(cov.corpus.length, 3);
+  cov.corpus.pop();
   // Bounded: the entry that added least goes first.
   for (let i = 0; i < MAX_CORPUS + 5; i++) cov.add(new Set([`c:x${i}`]), { seed: 3, index: i, kind: 'core', c: expr });
   assert.equal(cov.corpus.length, MAX_CORPUS);
@@ -207,4 +213,37 @@ test('mutants of a corpus are reproducible from (seed, corpus), and a guided pro
   const list = genProgram(99, { cases: 40 });
   a.forEach((m, j) => { list[30 + j] = { index: 30 + j, c: m.c, from: m.from }; });
   assert.match(renderProgram(list), /def c39 : IO Unit/);
+});
+
+// A feature case of a mutable family with the given family, drawn from seed 23 on.
+function featCases(fam, count) {
+  const out = [];
+  for (let i = 0; out.length < count && i < 5000; i++) { const c = genFeatureCase(23, i); if (c.fam === fam) out.push(c); }
+  return out;
+}
+test('mutants of feature cases keep their family and declarations, replace one check by one of the same family, and render', () => {
+  for (const fam of MUTABLE_FAMILIES) {
+    let changed = 0;
+    featCases(fam, 40).forEach((c, i) => {
+      const m = mutate(rng('f', fam, i), c);
+      if (!m) return;
+      assert.equal(m.kind, 'feat');
+      assert.equal(m.fam, fam);
+      assert.equal(m.chk.length, c.chk.length);
+      // The declarations stay: a wide case's fields and values, an ext case's type and panic flag.
+      for (const key of ['fs', 'vals', 'float', 't', 'panic']) assert.deepEqual(m[key], c[key], key);
+      if (JSON.stringify(m) !== JSON.stringify(c)) changed++;
+      assert.ok(m.chk.filter((k, j) => JSON.stringify(k) !== JSON.stringify(c.chk[j])).length <= 1);
+      if (fam === 'ext') for (const k of m.chk) {
+        assert.equal(k.t, c.t);
+        assert.ok(typed(k.e[0], k.t));
+        // A panicking operation only where the case allowed one.
+        if (!c.panic) assert.ok(!(JSON.stringify(k.e[0]).match(/"op":(\d+)/g) ?? []).some(x => OPS[Number(x.slice(5))].panic));
+      }
+      const text = renderCase(m, `c${i}`);
+      for (const [, line] of text.matchAll(/IO\.println (?:s!)?\(?"([^"]*)/g)) assert.match(line, new RegExp(`^c${i} `));
+    });
+    assert.ok(changed > 20, `${fam}: ${changed} of 40 mutated`);
+  }
+  assert.equal(mutate(rng('f'), { kind: 'feat', fam: 'class', chk: [] }), null);
 });

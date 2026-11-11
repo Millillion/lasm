@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { appPlatforms, appResults, benchmarks, campaignStreak, exitBar, matrixList, PAGE, parse, proofCounts, quarantineHistory, renderPage, repositoryFacts, summarize } from '../scripts/evidence/page.mjs';
+import { appPlatforms, appResults, benchmarks, campaignStreak, exitBar, generatorGaps, matrixList, PAGE, parse, proofCounts, quarantineHistory, renderPage, repositoryFacts, summarize } from '../scripts/evidence/page.mjs';
 import { evaluate } from '../scripts/evidence/levels.mjs';
 import { checkPage } from '../scripts/content/index.mjs';
 import { splitFrontMatter } from '../scripts/content/frontmatter.mjs';
@@ -135,7 +135,13 @@ test('the exit bar: each of the eight items from the repository and CI, met only
     apps: [{ app: 'conduit', oracle: 'RealWorld', claims: [{ row: 'Node', ok: true }, { row: 'Bun', ok: true }] }],
   };
   const status = (r, c) => exitBar(r, c).map(x => x.status);
-  assert.deepEqual(status(repo, ci), ['met', 'met', 'met', 'met', 'met', 'met', 'met', 'partly met']);
+  assert.deepEqual(status(repo, ci), ['met', 'met', 'met', 'met', 'met', 'met', 'met', 'met']);
+  // 8: the generator generates every feature the bar names (TESTING_STRATEGY.md §2), else only partly.
+  assert.deepEqual(repo.generatorGaps, []);
+  assert.equal(status({ ...repo, generatorGaps: ['Thunk'] }, ci)[7], 'partly met');
+  assert.match(exitBar({ ...repo, generatorGaps: ['ST', 'structures with many fields'] }, ci)[7].measured, /not generated yet: `ST`, structures with many fields$/);
+  assert.match(exitBar(repo, ci)[7].measured, /generated: `Thunk`, `ST`, `FloatArray`, structures with many fields$/);
+  assert.deepEqual(generatorGaps('structure A where\n  f0 : Nat\ndef x := Thunk.mk'), ['ST', 'FloatArray', 'structures with many fields']);
   assert.deepEqual(exitBar(repo, ci).map(x => x.item), [1, 2, 3, 4, 5, 6, 7, 8]);
   // Each item fails on its own.
   const worse = status({ ...repo, quarantine: [{ since: '2026-11-09' }], modelDifferentials: ['serverless-http'],

@@ -27,6 +27,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { collect, evaluate, githubApi, LEVELS, levelText } from './levels.mjs';
 import { sundayGuarded } from '../ci/sunday-guard.mjs';
 import { check as checkPropositions, summary as propositionSummary } from '../propositions.mjs';
+import { renderProgram } from '../differential/generate.mjs';
+import { genFeatureProgram } from '../differential/features.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 export const PAGE = 'content/learn/test-evidence.md';
@@ -178,6 +180,7 @@ export function repositoryFacts({ now = Date.now() } = {}) {
     modelDifferentials: modelDifferentials(targets),
     featureGenerator: existsSync(join(root, 'scripts/differential/features.mjs')),
     coverageFeedback: existsSync(join(root, 'scripts/differential/coverage.mjs')),
+    generatorGaps: generatorGaps(),
     platforms: JSON.parse(read('scripts/evidence/platforms.json')),
     mutation: JSON.parse(read('docs/evidence/mutation-baseline.json')),
     proofs: proofs(),
@@ -354,6 +357,18 @@ function logReader(repository, token) {
 export const L3_PLATFORMS = ['node', 'workers', 'browser'];
 /** The model differentials exit bar 8 names (the UI decoder, the Lasm.JS wire codec). */
 export const BAR_DIFFERENTIALS = ['ui-decode', 'lasm-js-wire'];
+/** The language features exit bar 8 asks the differential generator for (TESTING_STRATEGY.md §2,
+ * "Next gap"), each with what a generated feature program contains when it generates it. */
+export const BAR_GENERATED = [
+  ['Thunk', text => /Thunk\.mk/.test(text)],
+  ['ST', text => /runST fun σ/.test(text)],
+  ['FloatArray', text => /FloatArray\.mk/.test(text)],
+  ['structures with many fields', text => [...text.matchAll(/^structure \S+ where\n((?: {2}\S+ : .*\n)+)/gm)].some(m => m[1].split('\n').length - 1 >= 17)],
+];
+/** The features of BAR_GENERATED that 400 generated feature cases (seed 1) do not contain. */
+export function generatorGaps(text = renderProgram(genFeatureProgram(1, { cases: 400 }))) {
+  return BAR_GENERATED.filter(([, has]) => !has(text)).map(([name]) => name);
+}
 
 /** Each item of docs/TESTING_STRATEGY.md §7, as far as the repository and CI measure it:
  * { item, name, status: met | partly met | not met | not measured | not read, measured }. */
@@ -427,9 +442,11 @@ export function exitBar(repo, ci) {
   const feedback = guided.length
     ? `coverage feedback: the latest nightly campaign reached ${guided.map(j => `${j.coverage.features.toLocaleString('en-US')} features in ${j.name.replace(/^differential /, '')} (${j.coverage.new.toLocaleString('en-US')} new, ${j.coverage.newFromMutants.toLocaleString('en-US')} of them by mutants of the corpus)`).join(' and ')}`
     : `coverage feedback for generated programs: ${repo.coverageFeedback ? 'in the repository, no guided nightly campaign read yet' : 'not yet'}`;
-  out.push(row(8, 'Differential fuzzing', missing.length ? 'not met' : repo.featureGenerator ? 'partly met' : 'not met',
+  const gaps = repo.generatorGaps ?? BAR_GENERATED.map(([name]) => name);
+  out.push(row(8, 'Differential fuzzing', missing.length || !repo.featureGenerator ? 'not met' : gaps.length || !repo.coverageFeedback ? 'partly met' : 'met',
     `model differentials in CI: ${repo.modelDifferentials.map(t => `\`${t}\``).join(', ') || 'none'}${missing.length ? ` (missing: ${missing.join(', ')})` : ''}; ` +
-    `generated feature programs: ${repo.featureGenerator ? 'yes' : 'no'}; ${feedback}; not generated yet: \`Thunk\`, \`ST\`, \`FloatArray\`, structures with many fields`));
+    `generated feature programs: ${repo.featureGenerator ? 'yes' : 'no'}; ${feedback}; ` +
+    (gaps.length ? `not generated yet: ${gaps.map(g => /^[A-Z]/.test(g) ? `\`${g}\`` : g).join(', ')}` : `generated: ${BAR_GENERATED.map(([g]) => /^[A-Z]/.test(g) ? `\`${g}\`` : g).join(', ')}`)));
   return out;
 }
 
@@ -457,6 +474,7 @@ export function summarize(repo, ci, { generatedAt, repository, commit }) {
       modelDifferentials: repo.modelDifferentials,
       featureGenerator: repo.featureGenerator,
       coverageFeedback: repo.coverageFeedback,
+      generatorGaps: repo.generatorGaps,
     },
     ci: ci && {
       platforms: ci.platforms.map(p => ({ id: p.id, row: p.row, level: levelText(p.level),

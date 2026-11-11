@@ -25,12 +25,14 @@
 // The corpus (run.mjs --guided) keeps the cases that add a feature nobody had,
 // and later programs replace a share of their cases with mutants of corpus
 // entries (mutate below): a well-typed subexpression replaced by a fresh one of
-// the same type and no deeper, a statement regenerated, a workload changed.
+// the same type and no deeper, a statement regenerated, a workload changed, a
+// feature case's check regenerated (the families of MUTABLE_FAMILIES).
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { join, resolve, relative, sep } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { rng, genExpr, exprType, OPS, regenStatement, setNameBase, DEEP_COUNT, DEEP_SIZES } from './generate.mjs';
+import { MUTABLE_FAMILIES, regenCheck } from './features.mjs';
 
 // ---------- runtime C: a call graph of the C that `lean -c` emits ----------
 // Strips string and character literals (they may hold braces) and comments.
@@ -184,7 +186,7 @@ export class Coverage {
     if (fresh.length && entry) {
       const origin = entry.from ? 'mutant' : 'generated';
       this.found[origin] += fresh.length;
-      if (entry.c && MUTABLE.has(entry.c.kind)) {
+      if (entry.c && isMutable(entry.c)) {
         this.admitted[origin]++;
         this.corpus.push({ ...entry, gain: fresh.length });
         if (this.corpus.length > MAX_CORPUS) {
@@ -219,9 +221,11 @@ export class Coverage {
 }
 
 // ---------- mutation ----------
-// Only the core kinds (expression trees and statement lists over the preamble)
-// are mutated; feature and file-system cases are measured but not mutated.
+// The core kinds (expression trees and statement lists over the preamble) and
+// the feature families whose checks are independent (ext, lazy, st, wide) are
+// mutated; file-system cases and the other families are measured but not mutated.
 export const MUTABLE = new Set(['expr', 'state', 'io', 'task', 'deep']);
+export const isMutable = c => MUTABLE.has(c.kind) || (c.kind === 'feat' && MUTABLE_FAMILIES.has(c.fam));
 const height = e => e.var || e.v !== undefined ? 1 : 1 + Math.max(0, ...e.k.map(height));
 // Every subexpression with its path, its height from the root and whether an
 // ancestor asks for exact (no libm) arguments.
@@ -235,15 +239,16 @@ function nodes(e, depth = 0, exact = false, path = [], out = []) {
   return out;
 }
 const replaceAt = (e, path, sub) => path.length ? { ...e, k: e.k.map((k, i) => i === path[0] ? replaceAt(k, path.slice(1), sub) : k) } : sub;
-/** A same-typed, closed subexpression replaced by a fresh one, without making the tree deeper. */
-export function mutateExpr(r, e) {
+/** A same-typed, closed subexpression replaced by a fresh one, without making the tree deeper.
+ * flags: the generator's flags the tree was drawn with (ext, panic). */
+export function mutateExpr(r, e, flags = {}) {
   const max = height(e);
   const all = nodes(e);
   for (let tries = 0; tries < 8; tries++) {
     const n = r.pick(all);
     const room = max - n.depth;
     if (room < 1) continue;
-    const sub = genExpr(r, exprType(n.e), Math.max(0, room - 2), [], n.exact ? { exact: true } : {});
+    const sub = genExpr(r, exprType(n.e), Math.max(0, room - 2), [], n.exact ? { ...flags, exact: true } : flags);
     const out = replaceAt(e, n.path, sub);
     if (height(out) <= max && JSON.stringify(out) !== JSON.stringify(e)) return out;
   }
@@ -264,6 +269,16 @@ function setStmt(ss, path, f) {
 /** One mutant of a core case, or null. Deterministic in r. */
 export function mutate(r, c) {
   if (c.kind === 'expr') { const e = mutateExpr(r, c.e); return e && { ...c, e }; }
+  if (c.kind === 'feat') {
+    if (!MUTABLE_FAMILIES.has(c.fam)) return null;
+    // An ext check's expression mutated in place (extension operations, and
+    // panicking ones only if the case allowed them), or one check regenerated.
+    if (c.fam === 'ext' && c.chk.length && r.chance(0.6)) {
+      const at = r.int(0, c.chk.length - 1), e = mutateExpr(r, c.chk[at].e[0], { ext: true, panic: !!c.panic });
+      if (e) return { ...c, chk: c.chk.map((k, i) => i === at ? { ...k, e: [e] } : k) };
+    }
+    return regenCheck(r, c);
+  }
   if (c.kind === 'deep') {
     const n = r.chance(0.5) ? r.pick(DEEP_SIZES) : c.n, f = n === c.n ? (c.f + r.int(1, DEEP_COUNT - 1)) % DEEP_COUNT : c.f;
     return { ...c, f, n };
