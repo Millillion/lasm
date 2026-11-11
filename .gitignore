@@ -15,3 +15,6 @@ dist/
 
 # Node diagnostic reports (process.report)
 report.[0-9]*.json
+
+# Node diagnostic reports (--report-signal, --report-on-fatalerror): they contain the environment, secrets included.
+report.*.json
