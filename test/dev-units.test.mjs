@@ -73,7 +73,10 @@ test('the files lasm dev watches: Lean sources and Lake/npm configuration, outsi
   } finally { rmSync(project, { recursive: true, force: true }); }
 });
 
-// ∀ a b, changedFiles a b = [] ↔ a = b (as maps), and every reported file differs.
+// Proposition: Lasm.Cli.Candidates.changed_files_exact
+//   ∀ a b : List (String × Option String), (a.map (·.1)).Nodup → (b.map (·.1)).Nodup →
+//     (changedFiles a b).Nodup ∧
+//     ∀ k, k ∈ changedFiles a b ↔ (k ∈ a.map (·.1) ∨ k ∈ b.map (·.1)) ∧ a.lookup k ≠ b.lookup k
 test('changedFiles reports exactly the files that differ', () => {
   forAll(gen => {
     const map = () => new Map(gen.array(gen.int(0, 5), () => [gen.pick(['a', 'b', 'c', 'd', 'e']), gen.pick(['1', '2', null])]));

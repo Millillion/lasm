@@ -534,7 +534,9 @@ test('diagnostics walk causes and aggregates once, bounded, without duplicates',
     'see http://proxy.invalid:8080/a and [redacted URL] then');
 });
 
-// ∀ attempt ≥ 1, ∀ r ∈ [0, 1], let b := min 60000 (2000 * 2 ^ (attempt - 1)); 3b/4 ≤ retryDelay attempt r ≤ b
+// Proposition: Lasm.Cli.Candidates.retry_delay_bounded
+//   ∀ (attempt : Nat) (r : Float), 1 ≤ attempt → 0 ≤ r → r ≤ 1 →
+//     3 * backoff attempt / 4 ≤ retryDelay attempt r ∧ retryDelay attempt r ≤ backoff attempt
 test('retry delays stay within 75-100 % of the capped doubling backoff', async () => {
   const { forAll } = await import('./helpers/property.mjs');
   forAll(g => ({ attempt: g.int(1, 20), r: g.next() }), ({ attempt, r }) => {

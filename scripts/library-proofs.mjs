@@ -6,7 +6,8 @@
 //    (the model of src/serverless/), and each library's
 //    Spec.lean, Theorems.lean and Candidates.lean (the propositions tested,
 //    not yet proved: they must elaborate; scripts/propositions.mjs checks their
-//    tests)) against Lasm's compiled library with the
+//    tests), and verification/cli's Interface.lean and Candidates.lean (the
+//    propositions about the CLI's JavaScript) against Lasm's compiled library with the
 //    managed Lean 4.35.0, then runs test/library-proofs/Axioms.lean, which
 //    fails unless every proposition of a Spec.lean has its theorem (of
 //    exactly that type) and every theorem uses only propext, Classical.choice
@@ -43,9 +44,14 @@ const proofModules = ['Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.P
   'Lasm.UI.Candidates', 'Lasm.RPC.Spec', 'Lasm.RPC.Theorems', 'Lasm.RPC.Candidates', 'Lasm.KV.Spec', 'Lasm.KV.Theorems',
   'Lasm.Fetch.Spec', 'Lasm.Fetch.Theorems', 'Lasm.Fetch.Candidates',
   'Lasm.JS.Proofs.Wire', 'Lasm.JS.Spec', 'Lasm.JS.Theorems',
-  'Lasm.Serverless.Proofs.Model', 'Lasm.Serverless.Proofs.Mapping', 'Lasm.Serverless.Spec', 'Lasm.Serverless.Theorems'];
+  'Lasm.Serverless.Proofs.Model', 'Lasm.Serverless.Proofs.Mapping', 'Lasm.Serverless.Spec', 'Lasm.Serverless.Theorems',
+  'Lasm.Serverless.Candidates'];
+// The propositions about the CLI's JavaScript (verification/cli): they must
+// elaborate; scripts/propositions.mjs checks their tests.
+const cliModules = ['Lasm.Cli.Interface', 'Lasm.Cli.Candidates'];
+const cliRoot = join(root, 'verification', 'cli');
 const libraries = ['Lasm.UI', 'Lasm.RPC', 'Lasm.KV', 'Lasm.Fetch', 'Lasm.JS', 'Lasm.Serverless'];
-const sourceOf = module => join(library, ...module.split('.')) + '.lean';
+const sourceOf = (module, base = library) => join(base, ...module.split('.')) + '.lean';
 
 async function check() {
   const { provisionLean } = await import('../src/managed-lean.mjs');
@@ -62,11 +68,11 @@ async function check() {
   env.LEAN_PATH = [out, join(lean.prefix, 'lib', 'lean')].join(process.platform === 'win32' ? ';' : ':');
   const run = args => execFileSync(lean.lean, args, { cwd: root, env, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024,
     stdio: ['ignore', 'pipe', 'pipe'], timeout: 900_000 });
-  for (const module of proofModules) {
+  for (const [module, base] of [...proofModules.map(m => [m, library]), ...cliModules.map(m => [m, cliRoot])]) {
     const olean = join(out, ...module.split('.')) + '.olean';
     mkdirSync(dirname(olean), { recursive: true });
     const started = Date.now();
-    const log = run(['-R', library, '-o', olean, sourceOf(module)]);
+    const log = run(['-R', base, '-o', olean, sourceOf(module, base)]);
     process.stdout.write(log);
     if (/declaration uses `sorry`|error:/.test(log)) throw new Error(`${module}: sorry or error`);
     console.log(`ok   ${module} (${((Date.now() - started) / 1000).toFixed(1)} s)`);

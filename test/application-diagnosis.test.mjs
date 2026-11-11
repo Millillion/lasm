@@ -114,7 +114,12 @@ test('the policy message carries the explanation and the README pointer', () => 
 const leanName = random => random.array(random.int(1, 4), () => random.pick(['A', 'b', 'Z'])
   + random.string(['a', 'B', '0', '9', '!', 'α', '𝔸', "'", '_'], 0, 6) + random.pick(['a', '0', '!', 'α'])).join('.');
 
-// ∀ n, wellFormed n → demangle (mangle n) = n ∧ initializerModule ("initialize_" ++ mangle n) = some n
+// Proposition: Lasm.Cli.Candidates.mangle_round_trip
+//   ∀ n : String, wellFormedName n = true →
+//     demangleName (mangleName n) = n ∧
+//     initializerModule ("initialize_" ++ mangleName n) = some n ∧
+//     initializerModule ("runtime_initialize_" ++ mangleName n) = some n ∧
+//     mangleName n ≠ "" ∧ (mangleName n).all fun c => c.isAlphanum || c = '_'
 test('mangling round-trips through demangling and module initializers', () => {
   forAll(leanName, name => {
     assert.equal(demangleName(mangleName(name)), name);
