@@ -1,26 +1,44 @@
 {
- "measuredAt": "2026-10-31T19:29:30.539Z",
- "node": "v26.12.1",
- "commit": "b2768b549908c4334951209ae0c20da4f7f482ca",
- "run": "41234188450",
+ "measuredAt": "2026-11-11T07:47:28.931Z",
+ "node": "v26.13.0",
+ "commit": "2897519983518b6dfe3a3b284c409d6140bac7e8",
+ "run": "42981300311",
  "tool": "c8 12.0.0 over NODE_V8_COVERAGE of scripts/ci/unit-tests.mjs (unit.yml)",
  "total": {
   "lines": {
-   "covered": 14151,
-   "total": 20968,
-   "pct": 67.49
+   "covered": 18816,
+   "total": 19191,
+   "pct": 98.05
   },
   "branches": {
-   "covered": 5562,
-   "total": 7085,
-   "pct": 78.5
+   "covered": 11966,
+   "total": 12316,
+   "pct": 97.16
   },
   "functions": {
-   "covered": 1067,
-   "total": 1517,
-   "pct": 70.34
+   "covered": 1529,
+   "total": 1554,
+   "pct": 98.39
   }
  },
+ "integration": [
+  {
+   "file": "src/edge/edge-library.js",
+   "workflows": [
+    "workers.yml",
+    "browser.yml"
+   ],
+   "how": "An Emscripten --js-library (edge-link.mjs): its $-preprocessed functions are linked into every edge build, so they run only inside built Workers, browser and Bun/Deno outputs; Stryker and V8 cannot load the source file itself."
+  },
+  {
+   "file": "src/edge/edge-pre.js",
+   "workflows": [
+    "workers.yml",
+    "browser.yml"
+   ],
+   "how": "An Emscripten --pre-js (edge-link.mjs) copied into every edge build's program; test/edge-pre.test.mjs and test/edge-js.test.mjs evaluate its text in a vm context, which V8 records under no file path."
+  }
+ ],
  "areas": {
   "bin": {
    "covered": 7,
@@ -33,44 +51,44 @@
    "pct": 72.09
   },
   "src": {
-   "covered": 10191,
-   "total": 14705,
-   "pct": 69.3
+   "covered": 12656,
+   "total": 12718,
+   "pct": 99.51
   },
   "src/browser": {
-   "covered": 363,
-   "total": 681,
-   "pct": 53.3
+   "covered": 671,
+   "total": 671,
+   "pct": 100
   },
   "src/edge": {
-   "covered": 781,
-   "total": 1619,
-   "pct": 48.24
+   "covered": 1570,
+   "total": 1849,
+   "pct": 84.91
   },
   "src/lasm-modules": {
-   "covered": 695,
-   "total": 763,
-   "pct": 91.09
+   "covered": 546,
+   "total": 546,
+   "pct": 100
   },
   "src/link-driver": {
-   "covered": 1526,
+   "covered": 1852,
    "total": 1855,
-   "pct": 82.26
+   "pct": 99.84
   },
   "src/serverless": {
-   "covered": 52,
-   "total": 392,
-   "pct": 13.27
+   "covered": 559,
+   "total": 562,
+   "pct": 99.47
   },
   "src/vite": {
-   "covered": 0,
+   "covered": 185,
    "total": 185,
-   "pct": 0
+   "pct": 100
   },
   "src/wasi": {
-   "covered": 474,
-   "total": 671,
-   "pct": 70.64
+   "covered": 708,
+   "total": 708,
+   "pct": 100
   }
  },
  "files": [
@@ -131,19 +149,19 @@
   {
    "file": "src/application-binding-check.mjs",
    "lines": {
-    "covered": 0,
-    "total": 156,
-    "pct": 0
+    "covered": 132,
+    "total": 132,
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 56,
+    "total": 60,
+    "pct": 93.33
    },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 5,
+    "total": 5,
+    "pct": 100
    }
   },
   {
@@ -154,8 +172,8 @@
     "pct": 100
    },
    "branches": {
-    "covered": 22,
-    "total": 22,
+    "covered": 23,
+    "total": 23,
     "pct": 100
    },
    "functions": {
@@ -167,86 +185,86 @@
   {
    "file": "src/application-build-worker.mjs",
    "lines": {
-    "covered": 0,
+    "covered": 18,
     "total": 18,
-    "pct": 0
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 8,
+    "total": 8,
+    "pct": 100
    },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 2,
+    "total": 2,
+    "pct": 100
    }
   },
   {
    "file": "src/application-build.mjs",
    "lines": {
-    "covered": 0,
-    "total": 228,
-    "pct": 0
+    "covered": 230,
+    "total": 230,
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 142,
+    "total": 150,
+    "pct": 94.67
    },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 8,
+    "total": 11,
+    "pct": 72.73
    }
   },
   {
    "file": "src/application-cli.mjs",
    "lines": {
-    "covered": 127,
-    "total": 268,
-    "pct": 47.39
+    "covered": 292,
+    "total": 292,
+    "pct": 100
    },
    "branches": {
-    "covered": 36,
-    "total": 69,
-    "pct": 52.17
+    "covered": 190,
+    "total": 195,
+    "pct": 97.44
    },
    "functions": {
-    "covered": 6,
-    "total": 11,
-    "pct": 54.55
+    "covered": 14,
+    "total": 15,
+    "pct": 93.33
    }
   },
   {
    "file": "src/application-diagnosis.mjs",
    "lines": {
-    "covered": 184,
+    "covered": 190,
     "total": 190,
-    "pct": 96.84
+    "pct": 100
    },
    "branches": {
-    "covered": 95,
-    "total": 110,
-    "pct": 86.36
+    "covered": 138,
+    "total": 140,
+    "pct": 98.57
    },
    "functions": {
-    "covered": 15,
-    "total": 15,
+    "covered": 17,
+    "total": 17,
     "pct": 100
    }
   },
   {
    "file": "src/application-files.mjs",
    "lines": {
-    "covered": 102,
-    "total": 104,
-    "pct": 98.08
+    "covered": 105,
+    "total": 105,
+    "pct": 100
    },
    "branches": {
-    "covered": 65,
-    "total": 72,
-    "pct": 90.28
+    "covered": 113,
+    "total": 113,
+    "pct": 100
    },
    "functions": {
     "covered": 7,
@@ -257,68 +275,68 @@
   {
    "file": "src/application-initialization.mjs",
    "lines": {
-    "covered": 243,
+    "covered": 339,
     "total": 343,
-    "pct": 70.85
+    "pct": 98.83
    },
    "branches": {
-    "covered": 64,
-    "total": 88,
-    "pct": 72.73
+    "covered": 236,
+    "total": 241,
+    "pct": 97.93
    },
    "functions": {
-    "covered": 16,
-    "total": 18,
-    "pct": 88.89
+    "covered": 22,
+    "total": 22,
+    "pct": 100
    }
   },
   {
    "file": "src/application-link.mjs",
    "lines": {
-    "covered": 136,
-    "total": 702,
-    "pct": 19.37
+    "covered": 710,
+    "total": 710,
+    "pct": 100
    },
    "branches": {
-    "covered": 38,
-    "total": 42,
-    "pct": 90.48
+    "covered": 495,
+    "total": 510,
+    "pct": 97.06
    },
    "functions": {
-    "covered": 6,
-    "total": 16,
-    "pct": 37.5
+    "covered": 53,
+    "total": 53,
+    "pct": 100
    }
   },
   {
    "file": "src/application-live-members.mjs",
    "lines": {
-    "covered": 90,
-    "total": 140,
-    "pct": 64.29
+    "covered": 138,
+    "total": 138,
+    "pct": 100
    },
    "branches": {
-    "covered": 21,
-    "total": 35,
-    "pct": 60
+    "covered": 92,
+    "total": 93,
+    "pct": 98.92
    },
    "functions": {
-    "covered": 4,
-    "total": 7,
-    "pct": 57.14
+    "covered": 8,
+    "total": 8,
+    "pct": 100
    }
   },
   {
    "file": "src/application-lock.mjs",
    "lines": {
-    "covered": 32,
-    "total": 32,
+    "covered": 36,
+    "total": 36,
     "pct": 100
    },
    "branches": {
-    "covered": 17,
-    "total": 20,
-    "pct": 85
+    "covered": 28,
+    "total": 29,
+    "pct": 96.55
    },
    "functions": {
     "covered": 2,
@@ -327,88 +345,52 @@
    }
   },
   {
-   "file": "src/application-metadata-runtime.mjs",
-   "lines": {
-    "covered": 16,
-    "total": 16,
-    "pct": 100
-   },
-   "branches": {
-    "covered": 9,
-    "total": 10,
-    "pct": 90
-   },
-   "functions": {
-    "covered": 1,
-    "total": 1,
-    "pct": 100
-   }
-  },
-  {
-   "file": "src/application-metadata.mjs",
-   "lines": {
-    "covered": 73,
-    "total": 73,
-    "pct": 100
-   },
-   "branches": {
-    "covered": 37,
-    "total": 41,
-    "pct": 90.24
-   },
-   "functions": {
-    "covered": 4,
-    "total": 4,
-    "pct": 100
-   }
-  },
-  {
    "file": "src/application-native.mjs",
    "lines": {
-    "covered": 235,
+    "covered": 236,
     "total": 236,
-    "pct": 99.58
+    "pct": 100
    },
    "branches": {
-    "covered": 105,
-    "total": 137,
-    "pct": 76.64
+    "covered": 166,
+    "total": 168,
+    "pct": 98.81
    },
    "functions": {
-    "covered": 13,
+    "covered": 14,
     "total": 14,
-    "pct": 92.86
+    "pct": 100
    }
   },
   {
    "file": "src/application-npm.mjs",
    "lines": {
-    "covered": 92,
+    "covered": 99,
     "total": 99,
-    "pct": 92.93
+    "pct": 100
    },
    "branches": {
-    "covered": 50,
-    "total": 60,
-    "pct": 83.33
+    "covered": 64,
+    "total": 68,
+    "pct": 94.12
    },
    "functions": {
-    "covered": 5,
+    "covered": 6,
     "total": 6,
-    "pct": 83.33
+    "pct": 100
    }
   },
   {
    "file": "src/application-output.mjs",
    "lines": {
-    "covered": 92,
+    "covered": 93,
     "total": 93,
-    "pct": 98.92
+    "pct": 100
    },
    "branches": {
-    "covered": 7,
-    "total": 13,
-    "pct": 53.85
+    "covered": 15,
+    "total": 17,
+    "pct": 88.24
    },
    "functions": {
     "covered": 3,
@@ -424,8 +406,8 @@
     "pct": 100
    },
    "branches": {
-    "covered": 28,
-    "total": 28,
+    "covered": 29,
+    "total": 29,
     "pct": 100
    },
    "functions": {
@@ -437,14 +419,14 @@
   {
    "file": "src/application-reachability.mjs",
    "lines": {
-    "covered": 156,
+    "covered": 158,
     "total": 158,
-    "pct": 98.73
+    "pct": 100
    },
    "branches": {
-    "covered": 43,
+    "covered": 44,
     "total": 45,
-    "pct": 95.56
+    "pct": 97.78
    },
    "functions": {
     "covered": 6,
@@ -455,19 +437,19 @@
   {
    "file": "src/application-runtime.mjs",
    "lines": {
-    "covered": 48,
+    "covered": 61,
     "total": 61,
-    "pct": 78.69
+    "pct": 100
    },
    "branches": {
-    "covered": 31,
-    "total": 35,
-    "pct": 88.57
+    "covered": 56,
+    "total": 57,
+    "pct": 98.25
    },
    "functions": {
-    "covered": 2,
+    "covered": 3,
     "total": 3,
-    "pct": 66.67
+    "pct": 100
    }
   },
   {
@@ -478,9 +460,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 8,
-    "total": 9,
-    "pct": 88.89
+    "covered": 12,
+    "total": 12,
+    "pct": 100
    },
    "functions": {
     "covered": 1,
@@ -491,19 +473,19 @@
   {
    "file": "src/application-sources.mjs",
    "lines": {
-    "covered": 191,
-    "total": 399,
-    "pct": 47.87
+    "covered": 437,
+    "total": 441,
+    "pct": 99.09
    },
    "branches": {
-    "covered": 72,
-    "total": 98,
-    "pct": 73.47
+    "covered": 282,
+    "total": 308,
+    "pct": 91.56
    },
    "functions": {
-    "covered": 12,
-    "total": 19,
-    "pct": 63.16
+    "covered": 33,
+    "total": 33,
+    "pct": 100
    }
   },
   {
@@ -514,9 +496,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 36,
-    "total": 38,
-    "pct": 94.74
+    "covered": 41,
+    "total": 42,
+    "pct": 97.62
    },
    "functions": {
     "covered": 5,
@@ -527,55 +509,55 @@
   {
    "file": "src/application-symbols.mjs",
    "lines": {
-    "covered": 67,
-    "total": 74,
-    "pct": 90.54
+    "covered": 75,
+    "total": 75,
+    "pct": 100
    },
    "branches": {
-    "covered": 33,
-    "total": 34,
-    "pct": 97.06
+    "covered": 46,
+    "total": 46,
+    "pct": 100
    },
    "functions": {
-    "covered": 4,
+    "covered": 6,
     "total": 6,
-    "pct": 66.67
+    "pct": 100
    }
   },
   {
    "file": "src/browser/browser-build.mjs",
    "lines": {
-    "covered": 112,
-    "total": 184,
-    "pct": 60.87
+    "covered": 182,
+    "total": 182,
+    "pct": 100
    },
    "branches": {
-    "covered": 23,
-    "total": 28,
-    "pct": 82.14
+    "covered": 80,
+    "total": 83,
+    "pct": 96.39
    },
    "functions": {
-    "covered": 9,
-    "total": 15,
-    "pct": 60
+    "covered": 17,
+    "total": 17,
+    "pct": 100
    }
   },
   {
    "file": "src/browser/browser-dev.mjs",
    "lines": {
-    "covered": 0,
-    "total": 88,
-    "pct": 0
+    "covered": 67,
+    "total": 67,
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 39,
+    "total": 40,
+    "pct": 97.5
    },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 6,
+    "total": 6,
+    "pct": 100
    }
   },
   {
@@ -586,9 +568,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 13,
-    "total": 21,
-    "pct": 61.9
+    "covered": 35,
+    "total": 36,
+    "pct": 97.22
    },
    "functions": {
     "covered": 3,
@@ -604,9 +586,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 79,
-    "total": 88,
-    "pct": 89.77
+    "covered": 95,
+    "total": 95,
+    "pct": 100
    },
    "functions": {
     "covered": 9,
@@ -617,37 +599,37 @@
   {
    "file": "src/browser/loader.mjs",
    "lines": {
-    "covered": 0,
-    "total": 149,
-    "pct": 0
+    "covered": 150,
+    "total": 150,
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 89,
+    "total": 92,
+    "pct": 96.74
    },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 16,
+    "total": 16,
+    "pct": 100
    }
   },
   {
    "file": "src/browser/static-server.mjs",
    "lines": {
-    "covered": 87,
-    "total": 96,
-    "pct": 90.63
+    "covered": 108,
+    "total": 108,
+    "pct": 100
    },
    "branches": {
-    "covered": 16,
-    "total": 34,
-    "pct": 47.06
+    "covered": 72,
+    "total": 72,
+    "pct": 100
    },
    "functions": {
-    "covered": 3,
-    "total": 6,
-    "pct": 50
+    "covered": 7,
+    "total": 7,
+    "pct": 100
    }
   },
   {
@@ -658,9 +640,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 41,
-    "total": 46,
-    "pct": 89.13
+    "covered": 51,
+    "total": 51,
+    "pct": 100
    },
    "functions": {
     "covered": 9,
@@ -669,34 +651,16 @@
    }
   },
   {
-   "file": "src/build.mjs",
-   "lines": {
-    "covered": 132,
-    "total": 276,
-    "pct": 47.83
-   },
-   "branches": {
-    "covered": 6,
-    "total": 37,
-    "pct": 16.22
-   },
-   "functions": {
-    "covered": 2,
-    "total": 6,
-    "pct": 33.33
-   }
-  },
-  {
    "file": "src/cache-lifecycle.mjs",
    "lines": {
-    "covered": 78,
+    "covered": 81,
     "total": 81,
-    "pct": 96.3
+    "pct": 100
    },
    "branches": {
-    "covered": 32,
-    "total": 36,
-    "pct": 88.89
+    "covered": 45,
+    "total": 46,
+    "pct": 97.83
    },
    "functions": {
     "covered": 7,
@@ -707,14 +671,14 @@
   {
    "file": "src/cache-repair.mjs",
    "lines": {
-    "covered": 56,
+    "covered": 57,
     "total": 57,
-    "pct": 98.25
+    "pct": 100
    },
    "branches": {
-    "covered": 26,
-    "total": 36,
-    "pct": 72.22
+    "covered": 38,
+    "total": 43,
+    "pct": 88.37
    },
    "functions": {
     "covered": 3,
@@ -725,14 +689,14 @@
   {
    "file": "src/cli-arguments.mjs",
    "lines": {
-    "covered": 156,
-    "total": 163,
-    "pct": 95.71
+    "covered": 174,
+    "total": 174,
+    "pct": 100
    },
    "branches": {
-    "covered": 134,
-    "total": 147,
-    "pct": 91.16
+    "covered": 178,
+    "total": 180,
+    "pct": 98.89
    },
    "functions": {
     "covered": 4,
@@ -743,73 +707,73 @@
   {
    "file": "src/dev-build-service.mjs",
    "lines": {
-    "covered": 0,
-    "total": 52,
-    "pct": 0
+    "covered": 55,
+    "total": 55,
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 28,
+    "total": 28,
+    "pct": 100
    },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 5,
+    "total": 5,
+    "pct": 100
    }
   },
   {
    "file": "src/dev-build-worker.mjs",
    "lines": {
-    "covered": 0,
+    "covered": 31,
     "total": 31,
-    "pct": 0
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 13,
+    "total": 13,
+    "pct": 100
    },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 4,
+    "total": 4,
+    "pct": 100
    }
   },
   {
    "file": "src/dev-proxy.mjs",
    "lines": {
-    "covered": 111,
-    "total": 127,
-    "pct": 87.4
+    "covered": 126,
+    "total": 128,
+    "pct": 98.44
    },
    "branches": {
-    "covered": 49,
-    "total": 52,
-    "pct": 94.23
+    "covered": 72,
+    "total": 73,
+    "pct": 98.63
    },
    "functions": {
-    "covered": 9,
-    "total": 11,
-    "pct": 81.82
+    "covered": 12,
+    "total": 12,
+    "pct": 100
    }
   },
   {
    "file": "src/dev.mjs",
    "lines": {
-    "covered": 198,
-    "total": 458,
-    "pct": 43.23
+    "covered": 481,
+    "total": 481,
+    "pct": 100
    },
    "branches": {
-    "covered": 103,
-    "total": 130,
-    "pct": 79.23
+    "covered": 376,
+    "total": 389,
+    "pct": 96.66
    },
    "functions": {
-    "covered": 12,
-    "total": 21,
-    "pct": 57.14
+    "covered": 38,
+    "total": 39,
+    "pct": 97.44
    }
   },
   {
@@ -820,9 +784,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 15,
-    "total": 17,
-    "pct": 88.24
+    "covered": 22,
+    "total": 22,
+    "pct": 100
    },
    "functions": {
     "covered": 5,
@@ -833,37 +797,37 @@
   {
    "file": "src/edge/edge-build.mjs",
    "lines": {
-    "covered": 339,
-    "total": 467,
-    "pct": 72.59
+    "covered": 497,
+    "total": 510,
+    "pct": 97.45
    },
    "branches": {
-    "covered": 55,
-    "total": 61,
-    "pct": 90.16
+    "covered": 163,
+    "total": 171,
+    "pct": 95.32
    },
    "functions": {
-    "covered": 20,
-    "total": 36,
-    "pct": 55.56
+    "covered": 44,
+    "total": 49,
+    "pct": 89.8
    }
   },
   {
    "file": "src/edge/edge-host.mjs",
    "lines": {
-    "covered": 148,
-    "total": 213,
-    "pct": 69.48
+    "covered": 218,
+    "total": 218,
+    "pct": 100
    },
    "branches": {
-    "covered": 63,
-    "total": 108,
-    "pct": 58.33
+    "covered": 209,
+    "total": 211,
+    "pct": 99.05
    },
    "functions": {
-    "covered": 15,
-    "total": 25,
-    "pct": 60
+    "covered": 31,
+    "total": 31,
+    "pct": 100
    }
   },
   {
@@ -874,9 +838,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 22,
-    "total": 25,
-    "pct": 88
+    "covered": 31,
+    "total": 31,
+    "pct": 100
    },
    "functions": {
     "covered": 4,
@@ -887,26 +851,26 @@
   {
    "file": "src/edge/edge-js.mjs",
    "lines": {
-    "covered": 104,
-    "total": 301,
-    "pct": 34.55
+    "covered": 398,
+    "total": 398,
+    "pct": 100
    },
    "branches": {
-    "covered": 3,
-    "total": 22,
-    "pct": 13.64
+    "covered": 316,
+    "total": 317,
+    "pct": 99.68
    },
    "functions": {
-    "covered": 2,
-    "total": 46,
-    "pct": 4.35
+    "covered": 52,
+    "total": 53,
+    "pct": 98.11
    }
   },
   {
    "file": "src/edge/edge-library.js",
    "lines": {
     "covered": 0,
-    "total": 72,
+    "total": 80,
     "pct": 0
    },
    "branches": {
@@ -923,26 +887,26 @@
   {
    "file": "src/edge/edge-link.mjs",
    "lines": {
-    "covered": 60,
-    "total": 187,
-    "pct": 32.09
+    "covered": 206,
+    "total": 206,
+    "pct": 100
    },
    "branches": {
-    "covered": 3,
-    "total": 3,
+    "covered": 99,
+    "total": 99,
     "pct": 100
    },
    "functions": {
-    "covered": 2,
-    "total": 6,
-    "pct": 33.33
+    "covered": 10,
+    "total": 10,
+    "pct": 100
    }
   },
   {
    "file": "src/edge/edge-pre.js",
    "lines": {
     "covered": 0,
-    "total": 158,
+    "total": 186,
     "pct": 0
    },
    "branches": {
@@ -959,91 +923,91 @@
   {
    "file": "src/edge/edge-runtime.mjs",
    "lines": {
-    "covered": 24,
+    "covered": 62,
     "total": 62,
-    "pct": 38.71
+    "pct": 100
    },
    "branches": {
-    "covered": 1,
-    "total": 1,
+    "covered": 38,
+    "total": 38,
     "pct": 100
    },
    "functions": {
-    "covered": 0,
+    "covered": 1,
     "total": 1,
-    "pct": 0
+    "pct": 100
    }
   },
   {
    "file": "src/edge/edge-start.mjs",
    "lines": {
-    "covered": 0,
-    "total": 53,
-    "pct": 0
+    "covered": 83,
+    "total": 83,
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 41,
+    "total": 41,
+    "pct": 100
    },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 9,
+    "total": 9,
+    "pct": 100
    }
   },
   {
    "file": "src/editor.mjs",
    "lines": {
-    "covered": 75,
-    "total": 109,
-    "pct": 68.81
+    "covered": 134,
+    "total": 134,
+    "pct": 100
    },
    "branches": {
-    "covered": 25,
-    "total": 33,
-    "pct": 75.76
+    "covered": 81,
+    "total": 81,
+    "pct": 100
    },
    "functions": {
-    "covered": 7,
-    "total": 9,
-    "pct": 77.78
+    "covered": 11,
+    "total": 12,
+    "pct": 91.67
    }
   },
   {
    "file": "src/elapsed-ticker-worker.mjs",
    "lines": {
-    "covered": 0,
+    "covered": 9,
     "total": 9,
-    "pct": 0
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 5,
+    "total": 5,
+    "pct": 100
    },
    "functions": {
     "covered": 0,
-    "total": 1,
-    "pct": 0
+    "total": 0,
+    "pct": 100
    }
   },
   {
    "file": "src/elapsed-ticker.mjs",
    "lines": {
-    "covered": 0,
+    "covered": 17,
     "total": 17,
-    "pct": 0
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 8,
+    "total": 8,
+    "pct": 100
    },
    "functions": {
-    "covered": 0,
+    "covered": 1,
     "total": 1,
-    "pct": 0
+    "pct": 100
    }
   },
   {
@@ -1054,9 +1018,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 9,
-    "total": 10,
-    "pct": 90
+    "covered": 15,
+    "total": 15,
+    "pct": 100
    },
    "functions": {
     "covered": 3,
@@ -1065,160 +1029,106 @@
    }
   },
   {
-   "file": "src/host.mjs",
-   "lines": {
-    "covered": 7,
-    "total": 101,
-    "pct": 6.93
-   },
-   "branches": {
-    "covered": 1,
-    "total": 1,
-    "pct": 100
-   },
-   "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
-   }
-  },
-  {
    "file": "src/init.mjs",
    "lines": {
-    "covered": 838,
-    "total": 859,
-    "pct": 97.56
+    "covered": 867,
+    "total": 867,
+    "pct": 100
    },
    "branches": {
-    "covered": 202,
-    "total": 208,
-    "pct": 97.12
+    "covered": 242,
+    "total": 243,
+    "pct": 99.59
    },
    "functions": {
-    "covered": 41,
+    "covered": 43,
     "total": 43,
-    "pct": 95.35
+    "pct": 100
    }
   },
   {
    "file": "src/js-runtime.mjs",
    "lines": {
-    "covered": 42,
-    "total": 49,
-    "pct": 85.71
+    "covered": 44,
+    "total": 44,
+    "pct": 100
    },
    "branches": {
-    "covered": 13,
-    "total": 18,
-    "pct": 72.22
-   },
-   "functions": {
-    "covered": 1,
-    "total": 4,
-    "pct": 25
-   }
-  },
-  {
-   "file": "src/lake.mjs",
-   "lines": {
     "covered": 19,
-    "total": 47,
-    "pct": 40.43
-   },
-   "branches": {
-    "covered": 9,
-    "total": 13,
-    "pct": 69.23
+    "total": 24,
+    "pct": 79.17
    },
    "functions": {
-    "covered": 1,
-    "total": 2,
-    "pct": 50
+    "covered": 3,
+    "total": 3,
+    "pct": 100
    }
   },
   {
    "file": "src/lasm-library.mjs",
    "lines": {
-    "covered": 110,
-    "total": 156,
-    "pct": 70.51
+    "covered": 193,
+    "total": 199,
+    "pct": 96.98
    },
    "branches": {
-    "covered": 29,
-    "total": 35,
-    "pct": 82.86
+    "covered": 67,
+    "total": 73,
+    "pct": 91.78
    },
    "functions": {
-    "covered": 9,
-    "total": 14,
-    "pct": 64.29
+    "covered": 15,
+    "total": 15,
+    "pct": 100
    }
   },
   {
    "file": "src/lasm-modules/app.mjs",
    "lines": {
-    "covered": 98,
-    "total": 98,
+    "covered": 100,
+    "total": 100,
     "pct": 100
    },
    "branches": {
-    "covered": 36,
-    "total": 43,
-    "pct": 83.72
+    "covered": 71,
+    "total": 71,
+    "pct": 100
    },
    "functions": {
-    "covered": 20,
-    "total": 33,
-    "pct": 60.61
+    "covered": 34,
+    "total": 34,
+    "pct": 100
    }
   },
   {
    "file": "src/lasm-modules/ui-dom.mjs",
    "lines": {
-    "covered": 362,
-    "total": 377,
-    "pct": 96.02
+    "covered": 446,
+    "total": 446,
+    "pct": 100
    },
    "branches": {
-    "covered": 145,
-    "total": 187,
-    "pct": 77.54
+    "covered": 332,
+    "total": 337,
+    "pct": 98.52
    },
    "functions": {
-    "covered": 38,
-    "total": 55,
-    "pct": 69.09
-   }
-  },
-  {
-   "file": "src/lasm-modules/web.mjs",
-   "lines": {
-    "covered": 235,
-    "total": 288,
-    "pct": 81.6
-   },
-   "branches": {
-    "covered": 23,
-    "total": 32,
-    "pct": 71.88
-   },
-   "functions": {
-    "covered": 11,
-    "total": 152,
-    "pct": 7.24
+    "covered": 61,
+    "total": 62,
+    "pct": 98.39
    }
   },
   {
    "file": "src/launcher.mjs",
    "lines": {
-    "covered": 21,
+    "covered": 22,
     "total": 22,
-    "pct": 95.45
+    "pct": 100
    },
    "branches": {
-    "covered": 12,
-    "total": 13,
-    "pct": 92.31
+    "covered": 18,
+    "total": 19,
+    "pct": 94.74
    },
    "functions": {
     "covered": 2,
@@ -1234,9 +1144,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 32,
-    "total": 39,
-    "pct": 82.05
+    "covered": 43,
+    "total": 43,
+    "pct": 100
    },
    "functions": {
     "covered": 5,
@@ -1252,9 +1162,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 128,
-    "total": 159,
-    "pct": 80.5
+    "covered": 213,
+    "total": 213,
+    "pct": 100
    },
    "functions": {
     "covered": 15,
@@ -1265,14 +1175,14 @@
   {
    "file": "src/link-driver/glue.mjs",
    "lines": {
-    "covered": 370,
+    "covered": 388,
     "total": 388,
-    "pct": 95.36
+    "pct": 100
    },
    "branches": {
-    "covered": 140,
-    "total": 195,
-    "pct": 71.79
+    "covered": 303,
+    "total": 304,
+    "pct": 99.67
    },
    "functions": {
     "covered": 27,
@@ -1283,50 +1193,50 @@
   {
    "file": "src/link-driver/link.mjs",
    "lines": {
-    "covered": 257,
+    "covered": 514,
     "total": 516,
-    "pct": 49.81
+    "pct": 99.61
    },
    "branches": {
-    "covered": 119,
-    "total": 137,
-    "pct": 86.86
+    "covered": 299,
+    "total": 309,
+    "pct": 96.76
    },
    "functions": {
-    "covered": 20,
-    "total": 26,
-    "pct": 76.92
+    "covered": 37,
+    "total": 37,
+    "pct": 100
    }
   },
   {
    "file": "src/link-driver/metadata.mjs",
    "lines": {
-    "covered": 207,
+    "covered": 224,
     "total": 225,
-    "pct": 92
+    "pct": 99.56
    },
    "branches": {
-    "covered": 78,
-    "total": 107,
-    "pct": 72.9
+    "covered": 140,
+    "total": 142,
+    "pct": 98.59
    },
    "functions": {
-    "covered": 19,
+    "covered": 21,
     "total": 21,
-    "pct": 90.48
+    "pct": 100
    }
   },
   {
    "file": "src/link-driver/python.mjs",
    "lines": {
-    "covered": 104,
+    "covered": 109,
     "total": 109,
-    "pct": 95.41
+    "pct": 100
    },
    "branches": {
-    "covered": 56,
-    "total": 70,
-    "pct": 80
+    "covered": 88,
+    "total": 88,
+    "pct": 100
    },
    "functions": {
     "covered": 13,
@@ -1337,37 +1247,37 @@
   {
    "file": "src/link-driver/settings.mjs",
    "lines": {
-    "covered": 80,
+    "covered": 92,
     "total": 92,
-    "pct": 86.96
+    "pct": 100
    },
    "branches": {
-    "covered": 25,
-    "total": 32,
-    "pct": 78.13
+    "covered": 53,
+    "total": 53,
+    "pct": 100
    },
    "functions": {
-    "covered": 7,
+    "covered": 9,
     "total": 9,
-    "pct": 77.78
+    "pct": 100
    }
   },
   {
    "file": "src/link-driver/wasm.mjs",
    "lines": {
-    "covered": 314,
+    "covered": 331,
     "total": 331,
-    "pct": 94.86
+    "pct": 100
    },
    "branches": {
-    "covered": 92,
-    "total": 126,
-    "pct": 73.02
+    "covered": 192,
+    "total": 193,
+    "pct": 99.48
    },
    "functions": {
-    "covered": 33,
+    "covered": 35,
     "total": 35,
-    "pct": 94.29
+    "pct": 100
    }
   },
   {
@@ -1389,52 +1299,16 @@
    }
   },
   {
-   "file": "src/main.mjs",
+   "file": "src/macos-tbd.mjs",
    "lines": {
-    "covered": 62,
-    "total": 124,
-    "pct": 50
+    "covered": 201,
+    "total": 201,
+    "pct": 100
    },
    "branches": {
-    "covered": 18,
-    "total": 29,
-    "pct": 62.07
-   },
-   "functions": {
-    "covered": 4,
-    "total": 7,
-    "pct": 57.14
-   }
-  },
-  {
-   "file": "src/managed-artifacts.mjs",
-   "lines": {
-    "covered": 456,
-    "total": 471,
-    "pct": 96.82
-   },
-   "branches": {
-    "covered": 256,
-    "total": 303,
-    "pct": 84.49
-   },
-   "functions": {
-    "covered": 37,
-    "total": 39,
-    "pct": 94.87
-   }
-  },
-  {
-   "file": "src/managed-download.mjs",
-   "lines": {
-    "covered": 186,
-    "total": 187,
-    "pct": 99.47
-   },
-   "branches": {
-    "covered": 137,
-    "total": 149,
-    "pct": 91.95
+    "covered": 127,
+    "total": 127,
+    "pct": 100
    },
    "functions": {
     "covered": 13,
@@ -1443,21 +1317,57 @@
    }
   },
   {
-   "file": "src/managed-lean.mjs",
+   "file": "src/managed-artifacts.mjs",
    "lines": {
-    "covered": 107,
-    "total": 166,
-    "pct": 64.46
+    "covered": 472,
+    "total": 477,
+    "pct": 98.95
    },
    "branches": {
-    "covered": 49,
-    "total": 65,
-    "pct": 75.38
+    "covered": 341,
+    "total": 362,
+    "pct": 94.2
    },
    "functions": {
-    "covered": 5,
-    "total": 8,
-    "pct": 62.5
+    "covered": 39,
+    "total": 39,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/managed-download.mjs",
+   "lines": {
+    "covered": 215,
+    "total": 215,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 187,
+    "total": 187,
+    "pct": 100
+   },
+   "functions": {
+    "covered": 15,
+    "total": 15,
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/managed-lean.mjs",
+   "lines": {
+    "covered": 182,
+    "total": 182,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 126,
+    "total": 132,
+    "pct": 95.45
+   },
+   "functions": {
+    "covered": 10,
+    "total": 10,
+    "pct": 100
    }
   },
   {
@@ -1468,9 +1378,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 73,
-    "total": 82,
-    "pct": 89.02
+    "covered": 101,
+    "total": 103,
+    "pct": 98.06
    },
    "functions": {
     "covered": 13,
@@ -1486,9 +1396,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 2,
-    "total": 6,
-    "pct": 33.33
+    "covered": 14,
+    "total": 14,
+    "pct": 100
    },
    "functions": {
     "covered": 1,
@@ -1499,104 +1409,104 @@
   {
    "file": "src/managed-sdk.mjs",
    "lines": {
-    "covered": 14,
+    "covered": 60,
     "total": 60,
-    "pct": 23.33
-   },
-   "branches": {
-    "covered": 1,
-    "total": 1,
     "pct": 100
    },
+   "branches": {
+    "covered": 31,
+    "total": 35,
+    "pct": 88.57
+   },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 2,
+    "total": 2,
+    "pct": 100
    }
   },
   {
    "file": "src/native-abort.cjs",
    "lines": {
-    "covered": 0,
+    "covered": 19,
     "total": 19,
-    "pct": 0
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 8,
+    "total": 9,
+    "pct": 88.89
    },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 2,
+    "total": 2,
+    "pct": 100
    }
   },
   {
    "file": "src/native-bundle.mjs",
    "lines": {
-    "covered": 81,
+    "covered": 94,
     "total": 94,
-    "pct": 86.17
+    "pct": 100
    },
    "branches": {
-    "covered": 41,
-    "total": 44,
-    "pct": 93.18
+    "covered": 60,
+    "total": 61,
+    "pct": 98.36
    },
    "functions": {
-    "covered": 5,
+    "covered": 7,
     "total": 7,
-    "pct": 71.43
+    "pct": 100
    }
   },
   {
    "file": "src/native-clock.mjs",
    "lines": {
-    "covered": 37,
+    "covered": 47,
     "total": 47,
-    "pct": 78.72
+    "pct": 100
    },
    "branches": {
-    "covered": 10,
-    "total": 14,
-    "pct": 71.43
+    "covered": 18,
+    "total": 19,
+    "pct": 94.74
    },
    "functions": {
-    "covered": 4,
+    "covered": 5,
     "total": 5,
-    "pct": 80
+    "pct": 100
    }
   },
   {
    "file": "src/native-dns.mjs",
    "lines": {
-    "covered": 87,
+    "covered": 91,
     "total": 91,
-    "pct": 95.6
+    "pct": 100
    },
    "branches": {
-    "covered": 32,
-    "total": 53,
-    "pct": 60.38
+    "covered": 81,
+    "total": 83,
+    "pct": 97.59
    },
    "functions": {
-    "covered": 6,
+    "covered": 7,
     "total": 7,
-    "pct": 85.71
+    "pct": 100
    }
   },
   {
    "file": "src/native-file-message.mjs",
    "lines": {
-    "covered": 34,
+    "covered": 35,
     "total": 35,
-    "pct": 97.14
+    "pct": 100
    },
    "branches": {
-    "covered": 37,
-    "total": 38,
-    "pct": 97.37
+    "covered": 40,
+    "total": 40,
+    "pct": 100
    },
    "functions": {
     "covered": 3,
@@ -1607,91 +1517,91 @@
   {
    "file": "src/native-file-worker-pool.mjs",
    "lines": {
-    "covered": 56,
-    "total": 76,
-    "pct": 73.68
+    "covered": 89,
+    "total": 89,
+    "pct": 100
    },
    "branches": {
-    "covered": 8,
-    "total": 12,
-    "pct": 66.67
+    "covered": 34,
+    "total": 35,
+    "pct": 97.14
    },
    "functions": {
-    "covered": 3,
-    "total": 6,
-    "pct": 50
+    "covered": 7,
+    "total": 7,
+    "pct": 100
    }
   },
   {
    "file": "src/native-file-worker.mjs",
    "lines": {
-    "covered": 31,
+    "covered": 33,
     "total": 33,
-    "pct": 93.94
+    "pct": 100
    },
    "branches": {
-    "covered": 12,
-    "total": 14,
-    "pct": 85.71
+    "covered": 18,
+    "total": 18,
+    "pct": 100
    },
    "functions": {
-    "covered": 1,
+    "covered": 3,
     "total": 3,
-    "pct": 33.33
+    "pct": 100
    }
   },
   {
    "file": "src/native-files.mjs",
    "lines": {
-    "covered": 552,
+    "covered": 648,
     "total": 656,
-    "pct": 84.15
+    "pct": 98.78
    },
    "branches": {
-    "covered": 212,
-    "total": 345,
-    "pct": 61.45
+    "covered": 505,
+    "total": 523,
+    "pct": 96.56
    },
    "functions": {
-    "covered": 63,
+    "covered": 72,
     "total": 73,
-    "pct": 86.3
+    "pct": 98.63
    }
   },
   {
    "file": "src/native-interfaces.mjs",
    "lines": {
-    "covered": 10,
-    "total": 65,
-    "pct": 15.38
-   },
-   "branches": {
-    "covered": 1,
-    "total": 1,
+    "covered": 67,
+    "total": 67,
     "pct": 100
    },
+   "branches": {
+    "covered": 62,
+    "total": 63,
+    "pct": 98.41
+   },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 5,
+    "total": 5,
+    "pct": 100
    }
   },
   {
    "file": "src/native-process.mjs",
    "lines": {
-    "covered": 127,
+    "covered": 130,
     "total": 130,
-    "pct": 97.69
+    "pct": 100
    },
    "branches": {
-    "covered": 24,
-    "total": 43,
-    "pct": 55.81
+    "covered": 70,
+    "total": 74,
+    "pct": 94.59
    },
    "functions": {
-    "covered": 4,
+    "covered": 5,
     "total": 5,
-    "pct": 80
+    "pct": 100
    }
   },
   {
@@ -1702,32 +1612,14 @@
     "pct": 100
    },
    "branches": {
-    "covered": 24,
-    "total": 26,
-    "pct": 92.31
+    "covered": 31,
+    "total": 31,
+    "pct": 100
    },
    "functions": {
     "covered": 3,
     "total": 3,
     "pct": 100
-   }
-  },
-  {
-   "file": "src/native-pthread-factory.cjs",
-   "lines": {
-    "covered": 108,
-    "total": 136,
-    "pct": 79.41
-   },
-   "branches": {
-    "covered": 35,
-    "total": 57,
-    "pct": 61.4
-   },
-   "functions": {
-    "covered": 10,
-    "total": 13,
-    "pct": 76.92
    }
   },
   {
@@ -1751,50 +1643,50 @@
   {
    "file": "src/native-tcp.mjs",
    "lines": {
-    "covered": 134,
+    "covered": 147,
     "total": 147,
-    "pct": 91.16
+    "pct": 100
    },
    "branches": {
-    "covered": 43,
-    "total": 76,
-    "pct": 56.58
+    "covered": 126,
+    "total": 127,
+    "pct": 99.21
    },
    "functions": {
-    "covered": 18,
+    "covered": 21,
     "total": 21,
-    "pct": 85.71
+    "pct": 100
    }
   },
   {
    "file": "src/native-windows-timezone.mjs",
    "lines": {
-    "covered": 29,
+    "covered": 100,
     "total": 101,
-    "pct": 28.71
+    "pct": 99.01
    },
    "branches": {
-    "covered": 7,
-    "total": 9,
-    "pct": 77.78
+    "covered": 27,
+    "total": 29,
+    "pct": 93.1
    },
    "functions": {
-    "covered": 4,
-    "total": 5,
-    "pct": 80
+    "covered": 11,
+    "total": 11,
+    "pct": 100
    }
   },
   {
    "file": "src/native-worker-cwd.cjs",
    "lines": {
-    "covered": 9,
+    "covered": 12,
     "total": 12,
-    "pct": 75
+    "pct": 100
    },
    "branches": {
-    "covered": 2,
-    "total": 3,
-    "pct": 66.67
+    "covered": 4,
+    "total": 4,
+    "pct": 100
    },
    "functions": {
     "covered": 1,
@@ -1805,86 +1697,86 @@
   {
    "file": "src/node-fetch.mjs",
    "lines": {
-    "covered": 25,
+    "covered": 81,
     "total": 81,
-    "pct": 30.86
-   },
-   "branches": {
-    "covered": 2,
-    "total": 2,
     "pct": 100
    },
+   "branches": {
+    "covered": 65,
+    "total": 67,
+    "pct": 97.01
+   },
    "functions": {
-    "covered": 1,
-    "total": 6,
-    "pct": 16.67
+    "covered": 7,
+    "total": 7,
+    "pct": 100
    }
   },
   {
    "file": "src/node-host.mjs",
    "lines": {
-    "covered": 414,
-    "total": 436,
-    "pct": 94.95
+    "covered": 430,
+    "total": 437,
+    "pct": 98.4
    },
    "branches": {
-    "covered": 258,
-    "total": 310,
-    "pct": 83.23
+    "covered": 352,
+    "total": 369,
+    "pct": 95.39
    },
    "functions": {
-    "covered": 35,
-    "total": 37,
-    "pct": 94.59
+    "covered": 37,
+    "total": 38,
+    "pct": 97.37
    }
   },
   {
    "file": "src/node-js.mjs",
    "lines": {
-    "covered": 409,
-    "total": 447,
-    "pct": 91.5
+    "covered": 607,
+    "total": 609,
+    "pct": 99.67
    },
    "branches": {
-    "covered": 164,
-    "total": 218,
-    "pct": 75.23
+    "covered": 391,
+    "total": 396,
+    "pct": 98.74
    },
    "functions": {
-    "covered": 46,
-    "total": 49,
-    "pct": 93.88
+    "covered": 57,
+    "total": 57,
+    "pct": 100
    }
   },
   {
    "file": "src/node-network.mjs",
    "lines": {
-    "covered": 281,
+    "covered": 327,
     "total": 330,
-    "pct": 85.15
+    "pct": 99.09
    },
    "branches": {
-    "covered": 136,
-    "total": 190,
-    "pct": 71.58
+    "covered": 247,
+    "total": 273,
+    "pct": 90.48
    },
    "functions": {
-    "covered": 27,
-    "total": 31,
-    "pct": 87.1
+    "covered": 33,
+    "total": 34,
+    "pct": 97.06
    }
   },
   {
    "file": "src/node-process.mjs",
    "lines": {
-    "covered": 133,
+    "covered": 146,
     "total": 155,
-    "pct": 85.81
+    "pct": 94.19
    },
    "branches": {
-    "covered": 57,
-    "total": 81,
-    "pct": 70.37
+    "covered": 88,
+    "total": 99,
+    "pct": 88.89
    },
    "functions": {
     "covered": 10,
@@ -1900,9 +1792,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 45,
-    "total": 52,
-    "pct": 86.54
+    "covered": 65,
+    "total": 65,
+    "pct": 100
    },
    "functions": {
     "covered": 11,
@@ -1913,145 +1805,163 @@
   {
    "file": "src/node-system.mjs",
    "lines": {
-    "covered": 64,
+    "covered": 79,
     "total": 79,
-    "pct": 81.01
+    "pct": 100
    },
    "branches": {
-    "covered": 24,
-    "total": 41,
-    "pct": 58.54
+    "covered": 48,
+    "total": 55,
+    "pct": 87.27
    },
    "functions": {
-    "covered": 5,
+    "covered": 6,
     "total": 6,
-    "pct": 83.33
+    "pct": 100
    }
   },
   {
    "file": "src/node-udp.mjs",
    "lines": {
-    "covered": 131,
+    "covered": 150,
     "total": 150,
-    "pct": 87.33
+    "pct": 100
    },
    "branches": {
-    "covered": 63,
-    "total": 86,
-    "pct": 73.26
+    "covered": 107,
+    "total": 114,
+    "pct": 93.86
    },
    "functions": {
-    "covered": 14,
+    "covered": 16,
     "total": 16,
-    "pct": 87.5
+    "pct": 100
    }
   },
   {
    "file": "src/notices.mjs",
    "lines": {
-    "covered": 356,
+    "covered": 370,
     "total": 370,
-    "pct": 96.22
+    "pct": 100
    },
    "branches": {
-    "covered": 98,
-    "total": 109,
-    "pct": 89.91
+    "covered": 132,
+    "total": 134,
+    "pct": 98.51
    },
    "functions": {
-    "covered": 29,
+    "covered": 30,
     "total": 30,
-    "pct": 96.67
+    "pct": 100
    }
   },
   {
    "file": "src/npm-artifacts.mjs",
    "lines": {
-    "covered": 256,
+    "covered": 271,
     "total": 271,
-    "pct": 94.46
+    "pct": 100
    },
    "branches": {
-    "covered": 133,
-    "total": 157,
-    "pct": 84.71
+    "covered": 217,
+    "total": 221,
+    "pct": 98.19
    },
    "functions": {
-    "covered": 20,
+    "covered": 21,
     "total": 21,
-    "pct": 95.24
+    "pct": 100
+   }
+  },
+  {
+   "file": "src/output-directory.mjs",
+   "lines": {
+    "covered": 54,
+    "total": 54,
+    "pct": 100
+   },
+   "branches": {
+    "covered": 41,
+    "total": 42,
+    "pct": 97.62
+   },
+   "functions": {
+    "covered": 6,
+    "total": 6,
+    "pct": 100
    }
   },
   {
    "file": "src/package.mjs",
    "lines": {
-    "covered": 245,
+    "covered": 269,
     "total": 269,
-    "pct": 91.08
+    "pct": 100
    },
    "branches": {
-    "covered": 108,
-    "total": 125,
-    "pct": 86.4
+    "covered": 152,
+    "total": 156,
+    "pct": 97.44
    },
    "functions": {
-    "covered": 12,
+    "covered": 15,
     "total": 15,
-    "pct": 80
+    "pct": 100
    }
   },
   {
    "file": "src/platform.mjs",
    "lines": {
-    "covered": 37,
-    "total": 42,
-    "pct": 88.1
+    "covered": 29,
+    "total": 29,
+    "pct": 100
    },
    "branches": {
-    "covered": 18,
-    "total": 18,
+    "covered": 17,
+    "total": 17,
     "pct": 100
    },
    "functions": {
-    "covered": 5,
-    "total": 6,
-    "pct": 83.33
+    "covered": 4,
+    "total": 4,
+    "pct": 100
    }
   },
   {
    "file": "src/posix-arguments.mjs",
    "lines": {
-    "covered": 0,
+    "covered": 34,
     "total": 34,
-    "pct": 0
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 23,
+    "total": 23,
+    "pct": 100
    },
    "functions": {
-    "covered": 0,
+    "covered": 1,
     "total": 1,
-    "pct": 0
+    "pct": 100
    }
   },
   {
    "file": "src/process-exec.mjs",
    "lines": {
-    "covered": 0,
+    "covered": 91,
     "total": 91,
-    "pct": 0
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 60,
+    "total": 62,
+    "pct": 96.77
    },
    "functions": {
-    "covered": 0,
+    "covered": 1,
     "total": 1,
-    "pct": 0
+    "pct": 100
    }
   },
   {
@@ -2062,9 +1972,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 22,
-    "total": 28,
-    "pct": 78.57
+    "covered": 31,
+    "total": 34,
+    "pct": 91.18
    },
    "functions": {
     "covered": 4,
@@ -2073,178 +1983,142 @@
    }
   },
   {
-   "file": "src/runtime.mjs",
-   "lines": {
-    "covered": 11,
-    "total": 269,
-    "pct": 4.09
-   },
-   "branches": {
-    "covered": 1,
-    "total": 2,
-    "pct": 50
-   },
-   "functions": {
-    "covered": 0,
-    "total": 2,
-    "pct": 0
-   }
-  },
-  {
-   "file": "src/scheduler.mjs",
-   "lines": {
-    "covered": 3,
-    "total": 192,
-    "pct": 1.56
-   },
-   "branches": {
-    "covered": 1,
-    "total": 1,
-    "pct": 100
-   },
-   "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
-   }
-  },
-  {
    "file": "src/sdk-repairs.mjs",
    "lines": {
-    "covered": 21,
+    "covered": 34,
     "total": 36,
-    "pct": 58.33
+    "pct": 94.44
    },
    "branches": {
-    "covered": 7,
-    "total": 8,
-    "pct": 87.5
+    "covered": 17,
+    "total": 18,
+    "pct": 94.44
    },
    "functions": {
-    "covered": 2,
+    "covered": 3,
     "total": 3,
-    "pct": 66.67
+    "pct": 100
    }
   },
   {
    "file": "src/serverless/lasm-azure.mjs",
    "lines": {
-    "covered": 0,
-    "total": 27,
-    "pct": 0
+    "covered": 24,
+    "total": 24,
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 6,
+    "total": 6,
+    "pct": 100
    },
    "functions": {
-    "covered": 0,
+    "covered": 1,
     "total": 1,
-    "pct": 0
+    "pct": 100
    }
   },
   {
    "file": "src/serverless/lasm-gcf.mjs",
    "lines": {
-    "covered": 0,
+    "covered": 17,
     "total": 17,
-    "pct": 0
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 5,
+    "total": 5,
+    "pct": 100
    },
    "functions": {
     "covered": 0,
-    "total": 1,
-    "pct": 0
+    "total": 0,
+    "pct": 100
    }
   },
   {
    "file": "src/serverless/lasm-lambda.mjs",
    "lines": {
-    "covered": 0,
-    "total": 95,
-    "pct": 0
+    "covered": 113,
+    "total": 113,
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 89,
+    "total": 90,
+    "pct": 98.89
    },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 8,
+    "total": 8,
+    "pct": 100
    }
   },
   {
    "file": "src/serverless/lasm-netlify.mjs",
    "lines": {
-    "covered": 0,
+    "covered": 14,
     "total": 14,
-    "pct": 0
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 3,
+    "total": 3,
+    "pct": 100
    },
    "functions": {
-    "covered": 0,
+    "covered": 1,
     "total": 1,
-    "pct": 0
+    "pct": 100
    }
   },
   {
    "file": "src/serverless/lasm-server.mjs",
    "lines": {
-    "covered": 0,
-    "total": 173,
-    "pct": 0
+    "covered": 324,
+    "total": 327,
+    "pct": 99.08
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 171,
+    "total": 173,
+    "pct": 98.84
    },
    "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 21,
+    "total": 21,
+    "pct": 100
    }
   },
   {
    "file": "src/serverless/lasm-vercel.mjs",
    "lines": {
-    "covered": 0,
+    "covered": 14,
     "total": 14,
-    "pct": 0
+    "pct": 100
    },
    "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
+    "covered": 4,
+    "total": 4,
+    "pct": 100
    },
    "functions": {
-    "covered": 0,
+    "covered": 1,
     "total": 1,
-    "pct": 0
+    "pct": 100
    }
   },
   {
    "file": "src/serverless/zip.mjs",
    "lines": {
-    "covered": 52,
-    "total": 52,
+    "covered": 53,
+    "total": 53,
     "pct": 100
    },
    "branches": {
-    "covered": 16,
-    "total": 20,
-    "pct": 80
+    "covered": 23,
+    "total": 24,
+    "pct": 95.83
    },
    "functions": {
     "covered": 1,
@@ -2260,9 +2134,9 @@
     "pct": 100
    },
    "branches": {
-    "covered": 50,
-    "total": 63,
-    "pct": 79.37
+    "covered": 80,
+    "total": 80,
+    "pct": 100
    },
    "functions": {
     "covered": 6,
@@ -2271,417 +2145,147 @@
    }
   },
   {
-   "file": "src/thread-id.cjs",
+   "file": "src/test-switches.mjs",
    "lines": {
-    "covered": 21,
-    "total": 34,
-    "pct": 61.76
+    "covered": 12,
+    "total": 12,
+    "pct": 100
    },
    "branches": {
-    "covered": 4,
-    "total": 8,
-    "pct": 50
+    "covered": 2,
+    "total": 2,
+    "pct": 100
    },
    "functions": {
-    "covered": 2,
-    "total": 5,
-    "pct": 40
+    "covered": 1,
+    "total": 1,
+    "pct": 100
    }
   },
   {
-   "file": "src/toolchain.mjs",
+   "file": "src/thread-id.cjs",
    "lines": {
-    "covered": 73,
-    "total": 132,
-    "pct": 55.3
+    "covered": 34,
+    "total": 34,
+    "pct": 100
    },
    "branches": {
-    "covered": 29,
-    "total": 36,
-    "pct": 80.56
+    "covered": 16,
+    "total": 17,
+    "pct": 94.12
    },
    "functions": {
-    "covered": 7,
-    "total": 12,
-    "pct": 58.33
+    "covered": 5,
+    "total": 5,
+    "pct": 100
    }
   },
   {
    "file": "src/vite/index.mjs",
    "lines": {
-    "covered": 0,
+    "covered": 185,
     "total": 185,
-    "pct": 0
-   },
-   "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
-   },
-   "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
-   }
-  },
-  {
-   "file": "src/wasi.mjs",
-   "lines": {
-    "covered": 65,
-    "total": 65,
     "pct": 100
    },
    "branches": {
-    "covered": 26,
-    "total": 37,
-    "pct": 70.27
+    "covered": 105,
+    "total": 106,
+    "pct": 99.06
    },
    "functions": {
-    "covered": 11,
-    "total": 11,
+    "covered": 17,
+    "total": 17,
     "pct": 100
    }
   },
   {
    "file": "src/wasi/lower-atomics.mjs",
    "lines": {
-    "covered": 247,
+    "covered": 275,
     "total": 275,
-    "pct": 89.82
+    "pct": 100
    },
    "branches": {
-    "covered": 115,
-    "total": 167,
-    "pct": 68.86
+    "covered": 265,
+    "total": 266,
+    "pct": 99.62
    },
    "functions": {
-    "covered": 27,
+    "covered": 28,
     "total": 28,
-    "pct": 96.43
+    "pct": 100
    }
   },
   {
    "file": "src/wasi/wasi-build.mjs",
    "lines": {
-    "covered": 66,
-    "total": 152,
-    "pct": 43.42
+    "covered": 150,
+    "total": 150,
+    "pct": 100
    },
    "branches": {
-    "covered": 3,
-    "total": 6,
-    "pct": 50
+    "covered": 53,
+    "total": 56,
+    "pct": 94.64
    },
    "functions": {
-    "covered": 2,
+    "covered": 9,
     "total": 9,
-    "pct": 22.22
+    "pct": 100
    }
   },
   {
    "file": "src/wasi/wasi-component.mjs",
    "lines": {
-    "covered": 89,
+    "covered": 104,
     "total": 104,
-    "pct": 85.58
+    "pct": 100
    },
    "branches": {
-    "covered": 21,
-    "total": 24,
-    "pct": 87.5
+    "covered": 41,
+    "total": 41,
+    "pct": 100
    },
    "functions": {
-    "covered": 8,
+    "covered": 10,
     "total": 10,
-    "pct": 80
+    "pct": 100
    }
   },
   {
    "file": "src/wasi/wasi-link.mjs",
    "lines": {
-    "covered": 72,
-    "total": 140,
-    "pct": 51.43
+    "covered": 179,
+    "total": 179,
+    "pct": 100
    },
    "branches": {
-    "covered": 5,
-    "total": 5,
+    "covered": 59,
+    "total": 59,
     "pct": 100
    },
    "functions": {
-    "covered": 1,
-    "total": 3,
-    "pct": 33.33
+    "covered": 8,
+    "total": 8,
+    "pct": 100
    }
   },
   {
    "file": "src/wasm-objects.mjs",
    "lines": {
-    "covered": 133,
+    "covered": 143,
     "total": 143,
-    "pct": 93.01
-   },
-   "branches": {
-    "covered": 37,
-    "total": 52,
-    "pct": 71.15
-   },
-   "functions": {
-    "covered": 9,
-    "total": 10,
-    "pct": 90
-   }
-  },
-  {
-   "file": "src/wasmtime-artifact.mjs",
-   "lines": {
-    "covered": 40,
-    "total": 40,
     "pct": 100
    },
    "branches": {
-    "covered": 25,
-    "total": 25,
-    "pct": 100
+    "covered": 109,
+    "total": 111,
+    "pct": 98.2
    },
    "functions": {
-    "covered": 2,
-    "total": 2,
-    "pct": 100
-   }
-  },
-  {
-   "file": "src/wasmtime-bundle.mjs",
-   "lines": {
-    "covered": 51,
-    "total": 51,
-    "pct": 100
-   },
-   "branches": {
-    "covered": 32,
-    "total": 36,
-    "pct": 88.89
-   },
-   "functions": {
-    "covered": 2,
-    "total": 2,
-    "pct": 100
-   }
-  },
-  {
-   "file": "src/wasmtime-console.mjs",
-   "lines": {
-    "covered": 63,
-    "total": 63,
-    "pct": 100
-   },
-   "branches": {
-    "covered": 32,
-    "total": 32,
-    "pct": 100
-   },
-   "functions": {
-    "covered": 4,
-    "total": 4,
-    "pct": 100
-   }
-  },
-  {
-   "file": "src/wasmtime-file-host.mjs",
-   "lines": {
     "covered": 10,
-    "total": 66,
-    "pct": 15.15
-   },
-   "branches": {
-    "covered": 1,
-    "total": 1,
+    "total": 10,
     "pct": 100
-   },
-   "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
-   }
-  },
-  {
-   "file": "src/wasmtime-file-imports.mjs",
-   "lines": {
-    "covered": 65,
-    "total": 66,
-    "pct": 98.48
-   },
-   "branches": {
-    "covered": 51,
-    "total": 53,
-    "pct": 96.23
-   },
-   "functions": {
-    "covered": 2,
-    "total": 2,
-    "pct": 100
-   }
-  },
-  {
-   "file": "src/wasmtime-guest-memory.mjs",
-   "lines": {
-    "covered": 50,
-    "total": 50,
-    "pct": 100
-   },
-   "branches": {
-    "covered": 13,
-    "total": 13,
-    "pct": 100
-   },
-   "functions": {
-    "covered": 5,
-    "total": 5,
-    "pct": 100
-   }
-  },
-  {
-   "file": "src/wasmtime-module-data.mjs",
-   "lines": {
-    "covered": 52,
-    "total": 52,
-    "pct": 100
-   },
-   "branches": {
-    "covered": 22,
-    "total": 22,
-    "pct": 100
-   },
-   "functions": {
-    "covered": 1,
-    "total": 1,
-    "pct": 100
-   }
-  },
-  {
-   "file": "src/wasmtime-native-stdio.mjs",
-   "lines": {
-    "covered": 23,
-    "total": 33,
-    "pct": 69.7
-   },
-   "branches": {
-    "covered": 2,
-    "total": 2,
-    "pct": 100
-   },
-   "functions": {
-    "covered": 0,
-    "total": 2,
-    "pct": 0
-   }
-  },
-  {
-   "file": "src/wasmtime-process-host.mjs",
-   "lines": {
-    "covered": 62,
-    "total": 79,
-    "pct": 78.48
-   },
-   "branches": {
-    "covered": 18,
-    "total": 24,
-    "pct": 75
-   },
-   "functions": {
-    "covered": 5,
-    "total": 6,
-    "pct": 83.33
-   }
-  },
-  {
-   "file": "src/wasmtime-runtime.mjs",
-   "lines": {
-    "covered": 0,
-    "total": 477,
-    "pct": 0
-   },
-   "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
-   },
-   "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
-   }
-  },
-  {
-   "file": "src/wasmtime-standalone.mjs",
-   "lines": {
-    "covered": 0,
-    "total": 63,
-    "pct": 0
-   },
-   "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
-   },
-   "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
-   }
-  },
-  {
-   "file": "src/wasmtime-wasi-stdio.mjs",
-   "lines": {
-    "covered": 45,
-    "total": 45,
-    "pct": 100
-   },
-   "branches": {
-    "covered": 20,
-    "total": 22,
-    "pct": 90.91
-   },
-   "functions": {
-    "covered": 2,
-    "total": 2,
-    "pct": 100
-   }
-  },
-  {
-   "file": "src/wasmtime-worker.mjs",
-   "lines": {
-    "covered": 0,
-    "total": 4,
-    "pct": 0
-   },
-   "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
-   },
-   "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
-   }
-  },
-  {
-   "file": "src/web-host.mjs",
-   "lines": {
-    "covered": 0,
-    "total": 114,
-    "pct": 0
-   },
-   "branches": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
-   },
-   "functions": {
-    "covered": 0,
-    "total": 1,
-    "pct": 0
    }
   },
   {
@@ -2692,9 +2296,9 @@
     "pct": 94.96
    },
    "branches": {
-    "covered": 47,
-    "total": 67,
-    "pct": 70.15
+    "covered": 83,
+    "total": 87,
+    "pct": 95.4
    },
    "functions": {
     "covered": 7,
@@ -2705,14 +2309,14 @@
   {
    "file": "src/worker-stdio.cjs",
    "lines": {
-    "covered": 23,
+    "covered": 26,
     "total": 26,
-    "pct": 88.46
+    "pct": 100
    },
    "branches": {
-    "covered": 6,
-    "total": 7,
-    "pct": 85.71
+    "covered": 13,
+    "total": 13,
+    "pct": 100
    },
    "functions": {
     "covered": 1,
@@ -2723,14 +2327,14 @@
   {
    "file": "src/working-directory.mjs",
    "lines": {
-    "covered": 84,
+    "covered": 89,
     "total": 89,
-    "pct": 94.38
+    "pct": 100
    },
    "branches": {
-    "covered": 39,
-    "total": 50,
-    "pct": 78
+    "covered": 68,
+    "total": 71,
+    "pct": 95.77
    },
    "functions": {
     "covered": 12,
