@@ -118,6 +118,8 @@ test('the corpus keeps the cases that reach something new, and only mutable kind
   assert.deepEqual(cov.add(new Set(['c:c', 'c:d']), { seed: 2, index: 0, kind: 'core', c: expr, from: { seed: 1, index: 0 } }), ['c:c', 'c:d']);
   const s = cov.summary();
   assert.deepEqual([s.features, s.new, s.cumulative, s.before, s.corpus, s.newFrom.mutant, s.newFrom.generated], [5, 4, 5, 1, 2, 2, 2]);
+  cov.add(new Set(['glue:main.mjs', 'e:case>lean_box']), null);
+  assert.deepEqual([cov.summary().runtimeC, cov.summary().glue, cov.summary().features], [6, 1, 7]);
   assert.ok(MUTABLE.has('expr') && !MUTABLE.has('feat') && !MUTABLE.has('fs'));
   // Bounded: the entry that added least goes first.
   for (let i = 0; i < MAX_CORPUS + 5; i++) cov.add(new Set([`c:x${i}`]), { seed: 3, index: i, kind: 'core', c: expr });

@@ -150,9 +150,9 @@ export function glueFeatures(dir, root) {
 
 // ---------- the corpus and the state kept between nights ----------
 const here = fileURLToPath(new URL('.', import.meta.url));
-/** A hash of the generator's source: a corpus written by another generator is dropped (its operation ids may differ). */
+/** A hash of the generator's source (what a corpus case means): a corpus written by another generator is dropped (its operation ids may differ). */
 export function generatorVersion() {
-  return hash(['generate.mjs', 'features.mjs', 'coverage.mjs'].map(f => readFileSync(join(here, f), 'utf8')).join('\0'));
+  return hash(['generate.mjs', 'features.mjs'].map(f => readFileSync(join(here, f), 'utf8')).join('\0'));
 }
 export const MAX_CORPUS = 400;
 /** The state of earlier campaigns (or a fresh one). Features persist across generator changes; the corpus does not. */
@@ -206,7 +206,7 @@ export class Coverage {
     const count = prefix => [...this.tonight].filter(f => f.startsWith(prefix)).length;
     const fresh = [...this.all].filter(f => !this.before.has(f));
     return {
-      features: this.tonight.size, runtimeC: count('c:') + count('spec:'), glue: count('glue:'),
+      features: this.tonight.size, runtimeC: this.tonight.size - count('glue:'), glue: count('glue:'),
       new: fresh.length, newRuntimeC: fresh.filter(f => !f.startsWith('glue:')).length, newGlue: fresh.filter(f => f.startsWith('glue:')).length,
       cumulative: this.all.size, before: this.before.size,
       newFrom: { ...this.found }, admitted: { ...this.admitted }, mutants: this.mutants, corpus: this.corpus.length,

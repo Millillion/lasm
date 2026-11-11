@@ -355,8 +355,7 @@ programs; a divergence's reproducer is its own `Main.lean` and `case.json`
 of earlier campaigns and writes them back. `differential.yml` keeps the file in
 the Actions cache per profile (`differential-coverage-<profile>-<run>`,
 restored by prefix), so each night starts where the last one stopped. A corpus
-written by a different generator (a hash of `generate.mjs`, `features.mjs` and
-`coverage.mjs`) is dropped; its features are kept.
+written by a different generator (a hash of `generate.mjs` and `features.mjs`) is dropped; its features are kept.
 
 **What it reports.** The job log and summary print the night's features, the
 features no earlier campaign reached (and how many mutants found), the corpus
