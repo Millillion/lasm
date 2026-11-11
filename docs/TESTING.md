@@ -362,8 +362,8 @@ features no earlier campaign reached (and how many mutants found), the corpus
 size, and the growth of the last 14 campaigns:
 
 ```
-coverage growth by campaign: 2026-11-11 +2723 (2723), …
-coverage: 3410 features (3120 runtime C, 290 glue), 2723 new (2433 runtime C, 290 glue; 793 from mutants, 1640 from generated cases), 2723 in all campaigns, corpus 284 cases, 250 mutants run
+coverage growth by campaign: 2026-11-11 +9171 (9171), 2026-11-11 +4518 (13689)
+coverage: 9383 features (8158 runtime C, 1225 glue), 4518 new (4518 runtime C, 0 glue; 503 from mutants, 4015 from generated cases), 13689 in all campaigns, corpus 400 cases, 266 mutants run
 ```
 
 The [test-evidence page](#the-test-evidence-page) reads these lines from the
@@ -375,7 +375,21 @@ records them every night.
 requests and pushes to `main` stay unguided: their programs follow from the
 commit's seed alone.
 
-**Measured** (COVMEASURED)
+**Measured.** Two consecutive 30-minute release-profile campaigns on every
+target, dispatched on the branch of #226 (35 programs and 3,885 cases each, no
+divergence, no harness error):
+
+| Run | Started from | Features reached | New | New by mutants | All campaigns | Corpus |
+| --- | --- | --- | --- | --- | --- | --- |
+| 43100578679 | nothing | 9,171 (7,945 runtime C, 1,226 glue) | 9,171 | 689 | 9,171 | 256 |
+| 43108070920 | the first's state, from the cache | 9,383 (8,158 runtime C, 1,225 glue) | 4,518 | 503 | 13,689 | 400 |
+
+The second night still found half as many runtime-C features again as the
+first, 11 % of them by the mutants (a quarter of its core cases). Glue
+saturates within one campaign: the node target's glue is the same for every
+program, and the second campaign found no new glue feature. In a local trial
+before (10 programs of 100 cases, native `lean -c` only), the guided loop
+reached 2,723 runtime-C features and the blind one 2,192.
 
 **What it cannot catch:** a path only one input value reaches (the features are
 the code a case can reach, not the values it computes); glue paths are measured
