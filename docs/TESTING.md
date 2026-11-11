@@ -33,7 +33,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) and [fuzzing](#differential-fuzzing) | Lasm-compiled programs (generated expressions, statements, and feature programs declaring classes, inductives, closures, loops, structures) behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
 | [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic equals Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs` | PR, nightly |
-| [Standard bindings](#standard-bindings) | Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun are their generator's output (Lasm.JS.Node's lowering is that of the pinned Node docs, Lasm.JS.Deno's and Lasm.JS.Bun's that of the pinned TypeScript declarations), and behave as the specs, Node's docs and the declarations say on every target: WPT's URL and urlencoded data, Lean's UTF-8, hex, base64 and path operations as oracles, published crypto vectors, generated round trips, files and child processes, a Lean handler served by Deno.serve, Bun.serve and @hono/node-server and requested over HTTP | `scripts/bindings/`, `test/fixtures/js-web/`, `test/fixtures/js-node/`, `test/fixtures/js-serve/`, `web-bindings.yml` | PR (paths), main |
+| [Standard bindings](#standard-bindings) | Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun and Lasm.JS.Cloudflare are their generator's output (Lasm.JS.Node's lowering is that of the pinned Node docs, Lasm.JS.Deno's, Lasm.JS.Bun's and Lasm.JS.Cloudflare's that of the pinned TypeScript declarations), and behave as the specs, Node's docs and the declarations say on every target: WPT's URL and urlencoded data, Lean's UTF-8, hex, base64 and path operations as oracles, published crypto vectors, generated round trips, files and child processes, a Lean handler served by Deno.serve, Bun.serve and @hono/node-server and requested over HTTP, and Workers' KV, D1, R2, Durable Objects, Queues, cron, Cache API and sockets under wrangler dev's local emulation | `scripts/bindings/`, `test/fixtures/js-web/`, `test/fixtures/js-node/`, `test/fixtures/js-serve/`, `test/fixtures/js-cloudflare/`, `web-bindings.yml` | PR (paths), main |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
@@ -527,6 +527,38 @@ synthetic declaration file. **What it cannot catch:** members the programs do no
 call, TLS on Bun (not generated), Deno's and Bun's behaviour on other operating
 systems (Linux only), and declarations that misstate their runtime where no check
 looks.
+
+**Lasm.JS.Cloudflare** ([`test/fixtures/js-cloudflare`](../test/fixtures/js-cloudflare)).
+Claim: ∀ check *c* of the program, *c* holds on Workers as `wrangler dev` emulates
+them locally (workerd, and Miniflare's KV, D1, R2, Durable Objects and Queues; no
+Cloudflare account), unless the local emulation itself deviates
+([`known.json`](../test/fixtures/js-cloudflare/known.json), with the reason). The
+fixture is one Worker: Lasm's entry and a Durable Object class (`index.mjs`, whose
+methods call Lean), and every binding in its `wrangler.toml`. The runner triggers
+the cron handler (`/__scheduled`, `--test-scheduled`), starts a TCP echo server
+(its port is the variable `ECHO_PORT`), then requests `/`. Oracles, over seeded
+inputs: the input itself for store round trips (∀ generated *k*, *v*: KV `get` after
+`put` = *v*, as text, JSON, bytes and a stream; R2 `get` = the bytes, `get` with a
+range (*o*, *l*) = `bytes[o, o+l)`; a Durable Object's `get` after `put` = the
+value's JSON; a TCP echo = the bytes written); sorted inputs for listings (KV
+`list` pages through exactly the keys under a prefix in key order, Durable Object
+`list` the same); SQLite for D1 (rows read back by `all`, `first` and `raw` as
+inserted, a failing `batch` rolled back); the runtime's own MD5 for R2's checksum;
+counting for Durable Objects (n requests to one object count 1 to n, through
+`getByName` and `get(idFromName)`); delivery for Queues (every message sent, one
+at a time and in a batch, reaches the queue handler once; a retried one comes back
+with `attempts` 2); and what the declarations say of the cron controller,
+`waitUntil`, the Cache API, transactions, alarms and `env` of `cloudflare:workers`.
+Every generated member is looked up on the live objects (handlers' arguments and
+the Durable Object's state are probed where they live). Run by `test-web.mjs
+--fixture js-cloudflare` (`cloudflare-conformance` in `web-bindings.yml`, with
+`--sizes` over `test/fixtures/js-cloudflare-size`). Unit tests hold the rich
+lowering rules (classes, getters, generic defaults, decided overloads, literal
+parameters, `Map`, `Partial`, object literal types, merged unions) and their
+refusals on a synthetic declaration file, and the Workers entry's `scheduled` and
+`queue` forwarding (`test/edge-entries.test.mjs`). **What it cannot catch:** the
+real Cloudflare platform (consistency, limits, jurisdictions, replicas), which the
+local emulation simplifies, and members the program does not call.
 
 ### Scenario matrix
 

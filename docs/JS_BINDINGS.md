@@ -384,7 +384,7 @@ draft of 31 July 2026), the web APIs that every JavaScript target Lasm supports
 has: Node 24 and 26, Bun, Deno, Cloudflare Workers, the Vercel, Netlify and
 Supabase edge functions, and browsers. Status: **current source, not yet
 released** (tier 1 of the standard bindings; later tiers are `Lasm.JS.Node`,
-`Lasm.JS.Deno`, `Lasm.JS.Bun` and `Lasm.JS.Cloudflare`, one surface per platform).
+`Lasm.JS.Deno`, `Lasm.JS.Bun` and [`Lasm.JS.Cloudflare`](#cloudflare-workers-lasmjscloudflare), one surface per platform).
 
 ```lean
 import Lasm.JS.Web
@@ -1102,6 +1102,197 @@ give. To move to newer versions: change `version` and `tag` in
 `node scripts/bindings/generate-web.mjs`; decide every new member or overload
 the lowering reports, regenerate `library/prebuilt` (`library-prebuilt.yml`) and
 review the diff of the IDL files.
+
+## Cloudflare Workers: `Lasm.JS.Cloudflare`
+
+`import Lasm.JS.Cloudflare` gives typed bindings of the runtime APIs of
+Cloudflare Workers, **generated from Cloudflare's own TypeScript declarations**
+(`@cloudflare/workers-types` 5.20261019.1, the declarations of the workerd that
+CI's wrangler 4.152.0 runs). Status: **current source, not yet released** (tier
+3 of the standard bindings). It covers what a Worker's `env` holds and what its
+handlers receive:
+
+- the bindings: Workers KV, D1, R2, Durable Objects, Queues;
+- the handlers beside `fetch`: `scheduled` (cron triggers) and `queue` (queue
+  batches), and their `ExecutionContext` (`waitUntil`, `passThroughOnException`);
+- the Cache API (`caches`) and TCP sockets (`connect` of `cloudflare:sockets`);
+- `env` of `cloudflare:workers` (the bindings outside a handler).
+
+Lasm.JS.Web's `Request`, `Response`, `Headers` and streams are their web types.
+
+```lean
+import Lasm.JS.Cloudflare
+open Lasm.JS Lasm.JS.Web Lasm.JS.Cloudflare
+
+def main : IO Unit := do
+  let fetch ← ExportedHandlerFetchHandler.ofFn fun request env ctx => do
+    let kv ← IO.ofExcept (readField KVNamespace env "KV")      -- wrangler.toml: [[kv_namespaces]] binding = "KV"
+    let db ← IO.ofExcept (readField D1Database env "DB")       -- [[d1_databases]] binding = "DB"
+    let path ← (← URL.new (← request.url)).pathname
+    let hits := ((← kv.get path).bind String.toNat?).getD 0
+    kv.put path (.domString (toString (hits + 1)))
+    let rows ← (← (← db.prepare "SELECT name FROM people WHERE id = ?").bind #[toJS (1 : Nat)]).all
+    ctx.passThroughOnException
+    Response.new (some (.usvString s!"{hits + 1} visits; {rows.results.size} rows")) none
+  let scheduled ← ExportedHandlerScheduledHandler.ofFn fun controller env _ => do
+    let kv ← IO.ofExcept (readField KVNamespace env "KV")
+    kv.put "last-cron" (.domString (← controller.cron))
+  exportDefault ({ fetch := some fetch, scheduled := some scheduled } : ExportedHandler)
+```
+
+Build with `lasm build Main.lean --target workers`. The generated
+`workers/worker.mjs` forwards `fetch`, `scheduled` and `queue` to the object
+`exportDefault` published (a handler without `scheduled` or `queue` fails those
+events, saying so). `env` is `Data`, as its declaration is `unknown` (the
+program declares its own `Env`): its fields are the bindings, read with
+`Lasm.JS.readField`.
+
+### What is covered
+
+| Module | Members | Declared in |
+| --- | --- | --- |
+| `Lasm.JS.Cloudflare.Kv` | `KVNamespace`: `get` (text), `getJson`, `getArrayBuffer`, `getStream`, `getWithMetadata`, `put` (string, bytes or stream; `expiration`, `expirationTtl`, `metadata`), `list` (`prefix`, `limit`, `cursor`; `KVNamespaceListResult`), `delete` | `@cloudflare/workers-types` 5.20261019.1, `index.d.ts` |
+| `Lasm.JS.Cloudflare.D1` | `D1Database` (`prepare`, `batch`, `exec`, `withSession`), `D1DatabaseSession`, `D1PreparedStatement` (`bind`, `first`, `first0`, `run`, `all`, `raw`), `D1Result` with `D1Meta`, `D1ExecResult` | same |
+| `Lasm.JS.Cloudflare.R2` | `R2Bucket` (`head`, `get` with ranges and conditions, `put` with HTTP and custom metadata and checksums, `list`, `delete`, multipart uploads), `R2Object`, `R2ObjectBody` (`body`, `bytes`, `text`, `json`, `blob`, `arrayBuffer`), `R2Checksums`, `R2MultipartUpload` and every options dictionary | same |
+| `Lasm.JS.Cloudflare.Queues` | `Queue` (`send`, `sendBatch`, `metrics`), `MessageBatch` (`messages`, `queue`, `metadata`, `ackAll`, `retryAll`), `Message` (`id`, `timestamp`, `body`, `attempts`, `ack`, `retry`) | same |
+| `Lasm.JS.Cloudflare.Cache` | `caches` (`CacheStorage`: `default`, `open`), `Cache` (`match`, `put`, `delete`) | same |
+| `Lasm.JS.Cloudflare.Sockets` | `connect` (of `cloudflare:sockets`), `Socket` (`readable`, `writable`, `opened`, `closed`, `close`, `startTls`, `secureTransport`, `upgraded`) | same |
+| `Lasm.JS.Cloudflare.DurableObjects` | `DurableObjectNamespace` (`idFromName`, `idFromString`, `newUniqueId`, `get`, `getByName`, `jurisdiction`), `DurableObjectId`, `DurableObjectStub` (`fetch`, `connect`, `id`, `name`), `DurableObjectState` (`storage`, `id`, `waitUntil`, `blockConcurrencyWhile`, `abort`, `props`), `DurableObjectStorage` and `DurableObjectTransaction` (`get`, `put`, `delete`, `list`, `deleteAll`, `transaction`, alarms, `sync`, bookmarks) | same |
+| `Lasm.JS.Cloudflare.Workers` | `ExportedHandler` (`fetch`, `scheduled`, `queue`) and its handler types `ExportedHandlerFetchHandler`, `ExportedHandlerScheduledHandler`, `ExportedHandlerQueueHandler`; `ExecutionContext` (`waitUntil`, `passThroughOnException`, `abort`, `props`, `cache`), `CacheContext`, `ScheduledController` (`cron`, `scheduledTime`, `noRetry`); `env` (of `cloudflare:workers`) | same |
+
+Not generated, with the reason (each listed in
+[`cloudflare-tier3.mjs`](../scripts/bindings/cloudflare-tier3.mjs) and at the
+top of [`cloudflare.idl`](../scripts/bindings/cloudflare.idl)):
+
+- **Overloads another overload already covers:** KV's `get(key, "text")` (that
+  is `get`), the `get(key, options)` forms that pair a type with `cacheTtl`
+  (`get` takes `cacheTtl`), and R2's `get` and `put` forms with `onlyIf`
+  required (the options have `onlyIf`).
+- **Not expressible yet:** KV's batch reads (an `Array<Key>` key: the same
+  parameter names as the one-key overloads, so the overload naming cannot tell
+  them apart), `getWithMetadata` of JSON, bytes or a stream (a second
+  instantiation of `KVNamespaceGetWithMetadataResult`), D1's
+  `raw({columnNames: true})` (a tuple result).
+- **Outside this tier:** the RPC methods of a Durable Object stub (they are the
+  class's own: call them with `Value.callMethodAwait`), WebSocket hibernation
+  (WebSocket is the browser tier's), SQLite storage (`storage.sql`, `kv`,
+  `transactionSync`), containers and facets, `ctx.exports`, Access identity,
+  tracing, and the `connect`, `tail`, `trace`, `tailStream`, `test` and
+  `email` handlers.
+- **Deprecated:** `D1Database.dump`.
+
+### How the declarations become Lean
+
+[`cloudflare-api.mjs`](../scripts/bindings/cloudflare-api.mjs) fetches the npm
+package, checks `index.d.ts` against its SHA-256 hash, and lowers what
+`cloudflare-tier3.mjs` selects to WebIDL with `serve-api.mjs`'s lowering
+(Lasm.JS.Deno's rules, above) and these rules for richer declarations;
+`generate-web.mjs` then generates Lean with Lasm.JS.Web's rules. Every member
+and overload of a selected declaration is lowered or excluded with a reason,
+or the lowering fails.
+
+| TypeScript | WebIDL | Lean |
+| --- | --- | --- |
+| `declare abstract class D1Database` | `interface` (its constructor and statics are not lowered) | a handle type |
+| `get body(): ReadableStream` (a getter) | `readonly attribute` | `body.body : IO ReadableStream` |
+| `readonly httpMetadata?: R2HTTPMetadata` | a nullable attribute | `IO (Option R2HTTPMetadata)` |
+| a generic parameter (`Key extends string = string`, `Env = unknown`) | its default (`unknown` when it has none), or the tier's `typeArgs` | `String`; `Data` |
+| overloads of a method | each lowered or excluded by its parameter list | Lasm.JS.Web's overload naming |
+| a parameter of one string literal type (`get(key, type: "json")`) | the string passed as a constant (`[LasmConstant]`), the overload named with it (`[LasmOverloadName]`) | `KVNamespace.getJson kv key` |
+| `Map<string, V>` | `record<DOMString, V>`, the member marked `[LasmMap]` | `Record V`, read with `Array.from` |
+| `Record<string, V>` | `record<DOMString, V>` | `Record V` |
+| `Partial<D>` of an options type whose members are all optional | `D` | `D` |
+| `{ columnNames?: false }` (an object literal type) | a dictionary named after its owner, member and parameter | `D1PreparedStatementRawOptions` |
+| `{…} \| {…}` and `A & ({…} \| {…})` (`KVNamespaceListResult`, `R2Objects`, `R2Range`) | one dictionary: a member in every alternative keeps its optionality, the others are optional | a structure |
+| `T & Record<string, unknown>` | `T` | — |
+| `ArrayBuffer \| ArrayBufferView` | `BufferSource` | `ByteArray` |
+| a union | a typedef of the host (`Cloudflare_DOMStringOrBufferSource`) | an inductive in `Lasm.JS.Cloudflare`, with `Coe` from each member |
+| `"a" \| "b"` (an alias, or inline) | an enum named after its alias (`QueueContentType`) or member | an inductive |
+| a type alias not selected (`D1SessionBookmark`) | its definition | — |
+| `Date`, `unknown`, and a union holding them | `any` | `Data` (a `Date` is a reference) |
+| `never`, or `undefined` as a member's type | the member left out | — |
+| `...values: unknown[]` | `any... values` | `(values : Array Data := #[])` |
+| `toString()`, `toJSON()` | `toString_` with `[LasmName]` | `DurableObjectId.toString` |
+| `declare const caches`, `export const env` (of `cloudflare:workers`), `connect` (of `cloudflare:sockets`) | a namespace per module (`[LasmModule]`) | `Lasm.JS.Cloudflare.caches`, `env`, `connect` |
+
+Numbers stay `Float`: workers-types has no doc comments that say a `number` is
+an integer, which Lasm.JS.Deno's narrowing quotes (`limit := some 10` works).
+
+### Durable Objects: a class in JavaScript
+
+Lean does not define JavaScript classes, so a Durable Object's class is a few
+lines of JavaScript in the project, whose methods call Lean functions the
+program publishes (the program's `main` runs in the same isolate first). The
+project's own `wrangler.toml` names a main module that re-exports Lasm's entry:
+
+```js
+// index.mjs (wrangler.toml: main = "index.mjs", [[durable_objects.bindings]] class_name = "Counter")
+import { DurableObject } from 'cloudflare:workers';
+import worker from './workers/worker.mjs';
+export default worker;
+export class Counter extends DurableObject {
+  fetch(request) { return globalThis.counterFetch(request, this.ctx, this.env); }
+}
+```
+
+```lean
+let counter ← Function.ofFn fun args => do
+  let request ← decodeAs Request "request" (args[0]?.getD .undefined)
+  let state ← decodeAs DurableObjectState "state" (args[1]?.getD .undefined)
+  let storage ← state.storage
+  let n := match (← storage.get "n") with | .number x => x | _ => 0
+  storage.put "n" (toJS (n + 1))
+  return toJS (← Response.new (some (.usvString s!"{n + 1}")) none)
+(← Lasm.JS.global).set "counterFetch" counter
+```
+
+A Worker reaches it through its namespace binding:
+`(← (← IO.ofExcept (readField DurableObjectNamespace env "COUNTER")).getByName "a").fetch (.usvString "https://do/")`.
+
+### Where it runs, tests and cost
+
+Only on Workers (`--target workers`): the bindings are looked up on the objects
+the runtime hands over, so a program that imports `Lasm.JS.Cloudflare` builds
+for any target, but the calls work only in a Worker.
+
+[`test/fixtures/js-cloudflare`](../test/fixtures/js-cloudflare) is one Worker
+(with a Durable Object class in `index.mjs` and every binding in its
+`wrangler.toml`) built with a packed candidate and served by `wrangler dev`
+with **local emulation only**: workerd, and Miniflare's local KV, D1, R2,
+Durable Objects and Queues. No Cloudflare account is used. The runner triggers
+its cron handler (`wrangler dev --test-scheduled`), starts a TCP echo server
+for the sockets, then requests `/`, which runs the checks. Its properties: KV
+round trips of generated strings and bytes (text, JSON, `ArrayBuffer`, stream),
+metadata, `list` paging through exactly the keys under a prefix in key order,
+`expirationTtl`; D1 inserts read back by `all`, `first` and `raw`, a failing
+`batch` rolled back; R2 objects read back whole and by generated ranges, their
+MD5 checksum the bytes' MD5, a wrong SHA-256 rejected, a failed condition
+answered without a body, `list` with a delimiter and pages, multipart uploads
+whose result is the parts' concatenation; every queued message (one at a time
+and in a batch) delivered once to the queue handler, a retried one with
+`attempts` 2; the cron handler's `cron` and time, and its `waitUntil` work;
+Cache API `match` after `put` and nothing after `delete`; a TCP echo of
+generated bytes; a Durable Object counter that counts 1 to n through
+`getByName` and `get(idFromName)`, and its storage (round trips, `list` order,
+transactions committed and rolled back, alarms, `blockConcurrencyWhile`);
+`env` of `cloudflare:workers` the handler's bindings; and every generated member
+present on the live objects. `web-bindings.yml` runs it (`cloudflare-conformance`).
+
+CLOUDFLARE_RESULTS
+
+### Pinned version and drift
+
+`index.d.ts` of `@cloudflare/workers-types` is fetched from the npm registry at
+the pinned version and checked against its SHA-256 hash in
+[`cloudflare-api.lock.json`](../scripts/bindings/cloudflare-api.lock.json).
+The version is the one generated from the workerd that CI's wrangler runs.
+`web-bindings.yml` fails when `cloudflare.idl` or the generated modules differ
+from what the pinned file gives. To move to a newer version: change `version`
+(and `workerd`, `wrangler`) in `cloudflare-tier3.mjs` and `WRANGLER_VERSION`
+in `web-bindings.yml`, run `node scripts/bindings/cloudflare-api.mjs
+--update-lock`, then `node scripts/bindings/generate-web.mjs`; decide every new
+member or overload the lowering reports, regenerate `library/prebuilt`
+(`library-prebuilt.yml`) and review the diff of `cloudflare.idl`.
 
 ## Worked examples (all built and run by CI)
 
