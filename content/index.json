@@ -170,6 +170,17 @@
       ]
     },
     {
+      "slug": "release-0-7-0",
+      "title": "Lasm 0.7.0",
+      "description": "A minor release with breaking changes: Lasm.Web is replaced by the generated browser bindings, and Lasm.Fastly, Lasm.WASI.Http, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun are generated from each platform's own definitions.",
+      "date": "2026-11-10",
+      "kind": "release",
+      "path": "docs/release/0.7.0-notes.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/releases/tag/v0.7.0"
+      ]
+    },
+    {
       "slug": "release-0-6-1",
       "title": "Lasm 0.6.1",
       "description": "A minor release with one small breaking change.",
