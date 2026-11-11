@@ -115,13 +115,57 @@ many files:
 
 | Action | Replaces | Used by |
 | --- | --- | --- |
-| `playwright` | `npm install playwright-core@1.63.0` plus `scripts/ci/playwright-install.sh` per browser, and the browser-build cache (same keys as before) | browser, fullstack, differential, conduit, conduit-platforms, folio, ledger, porter, tandem |
+| `playwright` | `npm install playwright-core@1.63.0` plus `scripts/ci/playwright-install.sh` per browser, and the browser-build cache (same keys as before); the browsers' system packages go through `apt-cache` | browser, fullstack, differential, conduit, conduit-platforms, folio, ledger, porter, tandem |
+| `apt-cache` | a bare `sudo apt-get install` (bubblewrap) or Playwright's `install-deps`: the installed `.deb` files are cached per runner image ([apt packages](#apt-packages)) | `playwright`; conduit, folio, ledger, porter, tandem (bubblewrap for `lake check --paranoid`) |
 | `upstream-lean` | the pinned upstream Lean 4.35.0 archive (the differential oracle and the bridge model checker), with its digest check and cache | differential, bridge-verification |
 | `install-candidate` | download the packed candidate artifact and `npm install` it into a fresh directory, as a user does | differential, tooling |
 | `process-guard` | `loginctl enable-linger` plus `XDG_RUNTIME_DIR` and `DBUS_SESSION_BUS_ADDRESS` for `run-bounded.mjs` | the workflows above that use it |
 
 The tier orchestrators (`ci-nightly.yml`, `ci-weekly.yml`) call the existing
 workflows through `workflow_call` instead of copying their jobs.
+
+### apt packages
+
+No job needs an apt mirror once its packages are cached. On 2026-11-11 the
+hosted Ubuntu runners could not resolve `azure.archive.ubuntu.com` for hours,
+and every job that installed a system package failed: Playwright's
+`install-deps` (fonts, Xvfb and media libraries for the browsers) in the
+browser, platform and example-app end-to-end jobs, and bubblewrap for the
+example apps' `lake check --paranoid`. `.github/actions/apt-cache` runs such an
+install through `scripts/ci/apt-cache.sh`:
+
+- The cache key is the runner image (`ImageOS`, `RUNNER_ARCH`,
+  `ImageVersion`), the package set's name and a hash of the install command and
+  the script. The cached directory holds the `.deb` file of every package the
+  command installed or upgraded, and a `manifest` of them.
+- On a hit the `.deb` files are installed with `dpkg -i` and the command does
+  not run, so no apt mirror is contacted. A package the image already has at
+  that version or newer is skipped.
+- On a miss a cache from an earlier image version (same prefix) is tried first;
+  when `dpkg` accepts it, it is saved under the new image's key. Otherwise the
+  command runs against the mirror (with apt's own retries, and up to
+  `attempts` runs; Playwright keeps its own bounded retries in
+  `scripts/ci/playwright-install.sh`), apt keeps what it downloads, and the
+  `.deb` files are copied and saved. If any installed package's `.deb` is
+  missing, nothing is saved and the next run uses the mirror again.
+- If installing cached files fails, the script falls back to the mirror.
+- Caches are saved on `main` only (pull requests restore them but do not save:
+  a pull request's cache is readable by that pull request alone). A set is
+  about 20 MB (chromium) to 110 MB (webkit); bubblewrap is 50 KB. They count
+  toward the 8 GiB ceiling in `scripts/ci/cache-budget.mjs`, which, before an
+  upload would cross it, first evicts stale `apt-debs-*` caches (another ref's,
+  or one superseded by a newer `main` cache for the same package set and
+  runner image) not used in the last 24 hours.
+- Before a miss uses the mirror, the script checks that the image's mirror
+  host (`azure.archive.ubuntu.com`, through `/etc/apt/apt-mirrors.txt`)
+  resolves; when it does not, or an install attempt fails, apt is pointed at
+  `archive.ubuntu.com` and `security.ubuntu.com` directly, so a cache can be
+  populated during an Azure mirror outage.
+
+The packages installed are the same as before; only where they come from
+changes, so no test loses coverage. `scripts/fuzz/ensure-libfuzzer.sh` still
+calls apt-get directly: the images already have the libFuzzer runtimes, so it
+installs nothing.
 
 ## Inventory
 
