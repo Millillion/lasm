@@ -73,7 +73,7 @@ test('the files lasm dev watches: Lean sources and Lake/npm configuration, outsi
   } finally { rmSync(project, { recursive: true, force: true }); }
 });
 
-// Proposition: Lasm.Cli.Candidates.changed_files_exact
+// Proposition: Lasm.Cli.Spec.changed_files_exact
 //   ∀ a b : List (String × Option String), (a.map (·.1)).Nodup → (b.map (·.1)).Nodup →
 //     (changedFiles a b).Nodup ∧
 //     ∀ k, k ∈ changedFiles a b ↔ (k ∈ a.map (·.1) ∨ k ∈ b.map (·.1)) ∧ a.lookup k ≠ b.lookup k
