@@ -162,8 +162,8 @@ def D1PreparedStatement.first (self : D1PreparedStatement) (colName : String) : 
 
 /-- `first<T = Record<string, unknown>>(): Promise<T | null>`: `Promise<record<DOMString, any>?> first()` -/
 def D1PreparedStatement.first0 (self : D1PreparedStatement) : Async (Option (Record Data)) := do
-  let r ← self.val.callMethodAwait "first" (Support.args #[]) (Option Value)
-  ((fun r => r.mapM (Support.recordOf Data)) r : IO _)
+  let r ← self.val.callMethodAwait "first" (Support.args #[]) Data
+  Support.optionalRecordOf Data r
 
 /-- `run<T = Record<string, unknown>>(): Promise<D1Result<T>>`: `Promise<D1Result> run()` -/
 def D1PreparedStatement.run (self : D1PreparedStatement) : Async D1Result :=
