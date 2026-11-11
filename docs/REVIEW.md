@@ -256,18 +256,27 @@ decisions themselves are logged with their reasoning in
   `Lasm.JS.Web.WebSocket.new` and three `addEventListener` calls (`open`,
   `message`, `close`). Porter, Ledger and Tandem pin 0.7.0.
 
-### Moving the templates and examples off Lasm.Fetch (2026-11-11; waiting on Jordan's Node serving decision)
-- [ ] **How a template or example serves on Node.** Every server template and
-  example serves on Node, and Lasm has no Node server for a web `Request`
-  handler. Held until Jordan decides; the rest of the move is ready on the
-  branch `migrate-templates` (the `fetch` and `fullstack` templates on
-  Lasm.JS.Web, Lasm.Fastly and Lasm.WASI.Http). Its candidate for Node is a
-  project-local `NodeServer.lean` (a typed `@[js]` binding of
-  `@hono/node-server`'s `serve`: `NodeServer.serve { port := 3000 } handle`),
-  copied by `lasm init`, no new `@lasm/cli` API. Porter, Ledger, Tandem,
+### Moving the templates and examples off Lasm.Fetch (2026-11-11)
+- [x] **How a template or example serves on Node:** decided by Jordan
+  (2026-11-11): `Node.serve` (Bun's shape, `Lasm.JS.Node.Serve`, branch
+  `node-serve`) for Node servers, `exportDefault` on serverless platforms.
+  Until it lands, Node stays on `Lasm.Fetch.serveNode` in the `fetch`
+  template (#218), Conduit and Folio (#210). Porter, Ledger, Tandem,
   `examples/fetch` and the two Lasm.Fetch tutorials in `content/` keep their
-  Lasm.Fetch servers until then (their HTTP layer is shared by Node and the
+  Lasm.Fetch servers for now (their HTTP layer is shared by Node and the
   other runtimes).
+- [ ] **New API shapes, waiting for approval (#213, not merged):**
+  - `Lasm.RPC.dispatch (routes : List Route) (method : String) (segments :
+    List String) (body : String) : Option (Async Answer)`, with `Answer`
+    (`status`, `headers`, `body`), replacing `Lasm.RPC.handler` (a Lasm.Fetch
+    handler). Its four propositions become `dispatch_other`,
+    `dispatch_route`, `dispatch_unknown`, `dispatch_method` (proved).
+  - `Lasm.KV.setWorkersEnv (env : Lasm.JS.Data) : IO Unit`: a Workers fetch
+    handler passes its `env`, so `Lasm.KV.open` finds a namespace bound as
+    the store's name (replaces reading `Lasm.Fetch.platformEnv`). `Lasm.KV`
+    then no longer imports Lasm.Fetch; Fastly is detected by its KV Store call.
+  - The fullstack template moves with them (its `Site.lean` uses `dispatch`,
+    its Workers handler `setWorkersEnv`).
 - [ ] **Lasm.Fetch features with no replacement** (written into the template
   or example itself, no new public API):
   - *Embedded static files* (`embed_dir!`, `Assets.serve`: Brotli copies,
@@ -280,12 +289,8 @@ decisions themselves are logged with their reasoning in
     itself; the proof has no counterpart outside Lasm.Fetch.
   - *WASI CGI serving* (`--target wasi`): the fetch template's `Cgi.lean`
     reads the CGI variables and standard input with Lean's `IO`.
-  - *Workers' `env` for Lasm.KV*: `Lasm.KV.setWorkersEnv env` (on the
-    `migrate-templates` branch) replaces `Lasm.Fetch.platformEnv`, which the
-    Workers fetch handler of the program must now call.
-  - *`Lasm.RPC.handler`* (a Lasm.Fetch handler) becomes `Lasm.RPC.dispatch
-    routes method segments body : Option (Async Answer)`, for any server; its
-    four propositions are restated as `dispatch_*` (same branch).
+  - *Workers' `env` for Lasm.KV* and *`Lasm.RPC.handler`*: the two API
+    shapes above.
 
 ### High-priority work to define with Jordan
 - [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,
