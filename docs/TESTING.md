@@ -227,16 +227,21 @@ case, then `def cN : IO Unit` printing one line per check. Families:
 
 | Family | What it declares and checks |
 | --- | --- |
-| `ext` | expressions over the core types plus the extension types: `Int8`–`Int64` (overflow, `INT_MIN / -1`, shifts past the width, conversions), `Float32` (IEEE-exact operations and its bits), `ByteArray` (UTF-8 validation of arbitrary bytes, `hash`), `Std.HashSet`, `Std.TreeMap`; with a 35 % chance, operations that panic (`xs[i]!`, `get!`, `head!`, `back!`, `toNat!`), whose message goes to stderr before the default value is used |
+| `ext` | expressions over the core types plus the extension types: `Int8`–`Int64` (overflow, `INT_MIN / -1`, shifts past the width, conversions), `Float32` (IEEE-exact operations and its bits), `ByteArray` (UTF-8 validation of arbitrary bytes, `hash`), `Std.HashSet`, `Std.TreeMap`, `FloatArray` (push, `set!`, `get?`, `foldl`, `for`, its doubles' bits, mapped through `data`), `Thunk Nat` (`Thunk.pure`, `Thunk.mk`, `map`, `bind`, forced once or twice); with a 35 % chance, operations that panic (`xs[i]!`, `get!`, `head!`, `back!`, `toNat!`), whose message goes to stderr before the default value is used |
 | `class` | a class with a default field and a default method; instances for random types whose operation is a random expression over its two arguments; instances derived for products and `Option`; polymorphic functions over the class (`mconcat`, `pow`, `combine3`, an `==` check) |
 | `adt` | an expression language (`lit`, `var`, `add`, `mul`, `neg`, `ite`, de Bruijn `letE`, deriving `Repr`, `BEq`, `Hashable`), an evaluator with an environment, and a simplifier whose alternatives are a random subset of 13 nested, overlapping rules over `Int` literals plus random congruence rules; random terms with bignum literals |
 | `closure` | functions of arity 1 to 18 applied fully and partially (each partial application forced through the `@[noinline]` identity `bb`, then applied in random chunks of 1 to 6 arguments), closures capturing values, arrays of closures folded, composition, functions returning closures |
 | `loop` | self tail recursion up to 200,000 iterations, `Nat.fold`, mutual recursion (at most 500 frames), `partial def` with fuel, well-founded recursion (`termination_by`/`decreasing_by`: a binary search up to 2¹²⁸), `while` with `continue` and `break` in `Id.run` |
 | `struct` | a structure with default fields and one that `extends` it, deriving `Repr`, `BEq`, `Hashable`, `Ord`: values with defaults left out, `compare`, sorting, `with` updates, the parent projection |
 | `exc` | `ExceptT` with a custom error inductive over `StateT Nat IO`: conditional `throw`, `try`/`catch` with a `match` on the error, `try`/`finally`, `for` with `break`, early `return`, an `IO.Ref` |
+| `lazy` | `Thunk` of random types: built with `Thunk.mk` around `dbgTrace` (on stderr, so the output shows how often each body runs) and forced twice, forced only under a random condition, `Thunk.map` and `Thunk.bind` forced around their source, arrays of thunks forced by random (repeated, out-of-range) indices, a top-level thunk (a closed term, built at initialization), a `@[noinline]` function returning a thunk over its argument |
+| `st` | `runST` and `runEST` (`EST String σ`): an `ST.Ref` accumulator of a fixed-width or bignum type (reduced modulo a prime) and an `ST.Ref (Array Nat)` buffer, `modify`, `modifyGet`, `swap`, a helper generic in the monad (`[MonadLiftT (ST σ) m]`, called from both), nested `for` loops of at most 12 iterations with `break`, and in `EST` conditional `throw` and `try`/`catch` |
+| `wide` | a structure of 8 to 40 fields drawn from 17 types, scalars (`UInt8`–`UInt64`, `Int8`–`Int64`, `Float`, `Float32`, `Bool`, `Char`) mixed with boxed ones (`Nat`, `Int`, `String`, `List Nat`, `Option Nat`), so the constructor's scalar area holds fields of every size; deriving `Repr`, `BEq`, and `Hashable` and `Ord` when no field is a float; values with defaults left out, `with` updates of up to four fields, projections, structure-instance patterns (`{ f3 := y0, .. }`), the constructor applied fully and partially (forced through `bb`, then the rest of its up to 40 arguments: `lean_apply_m`), a closure that updates one field from its old value |
 
 Holes are expressions from the core generator's operation table (with the
 extension operations enabled), drawn so that they use the variables in scope.
+Expressions inside the `st` family's loops are cheap (no bignum towers, floats
+or panics), as in the `loop` family.
 Everything terminates by construction (bounded counts, fuel, measures that Lean
 checks) and needs no file system, sleep or environment, so a feature program
 runs on **every** target, the browsers and the `-O0` edge builds included (no
@@ -278,9 +283,10 @@ and the throughput.
 
 **What it cannot catch:** the same blind spots as differential testing, less the
 ones it covers (type classes, inductives and pattern matching, closures,
-loops): still no `Std.Http`, sockets, processes, `Std.Time`,
-universe-polymorphic code, libm results of `Float32`, or concurrency (tasks stay
-in the core generator).
+loops, thunks, `ST`, `FloatArray`, structures of up to 40 fields): still no
+`Std.Http`, sockets, processes, `Std.Time`, universe-polymorphic code, libm
+results of `Float32`, or concurrency (tasks stay in the core generator; no
+thunk is forced from two tasks).
 
 **First campaigns** (2026-11-09, PR #167; release and dev profiles, all 16
 targets of `DIFF_TARGETS_FULL`, upstream Lean 4.35.0 as the oracle):
@@ -336,14 +342,21 @@ with no extra build and no extra run:
 
 **Corpus and mutation.** With `--guided 1` the harness records each core,
 file-system and feature program's features. A case that adds a runtime-C
-feature that no earlier case had joins the corpus (core kinds only: expression,
-state, IO, task and deep cases; at most 400, the smallest gain dropped first).
+feature that no earlier case had joins the corpus (the mutable kinds:
+expression, state, IO, task and deep cases, and the feature families whose
+checks are independent of each other, `ext`, `lazy`, `st` and `wide`; at most
+400, the smallest gain dropped first).
 Each later core program replaces its last quarter (`--mutant-share 0.25`) with
 mutants of corpus entries, picked with weight √(features the entry added). A
 mutant replaces one subexpression by a fresh closed one of the same type, drawn
 from the same operation table, never deeper than the tree was and without libm
 operations under an operation that needs exact arguments; or regenerates one
 statement, or changes a `deep` case's workload within the generator's bounds.
+A feature mutant keeps the case's declarations (a `wide` case's fields and
+values, an `ext` case's type and whether it may panic) and replaces one check
+by a fresh one its family draws, or (`ext`) one subexpression of a check by a
+fresh one from the extension operations, panicking ones only if the case
+allowed them; it runs among the core program's mutants, named `cN` like them.
 So every mutant is a program the generator's own bounds allow, and terminates
 for the same reasons. The program's variants (without `IO.sleep`, shallow) are
 made from the guided program. Mutants are drawn from `rng(seed, 'mutants')`, so
