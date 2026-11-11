@@ -1317,31 +1317,31 @@ Stryker cannot parse). The first seven modules were measured 2026-11-03 (mutatio
 run 41749603692); the fourteen others, which cover the rest of `src/`, were added
 2026-11-09: their *initial* scores are from mutation.yml run 42571078799 (the run
 that added them) or from each group's first run where that run could not score
-them, and *now* from mutation.yml run 42615928074 on #165, which measured all 21 modules of the time together (Node 26, Linux x64; 1 to 73 minutes a module, `dev` the longest). The 21st, `wasmtime`, was removed with the standalone Wasmtime preview it mutated (2026-11-10), and its surviving mutants with it. *Initial*: with
+them, and *now* from the nightly mutation.yml run 43024598393 on `main` (2026-11-11), which measured all 20 modules together (Node 26, Linux x64; 1 to 72 minutes a module, `dev` the longest); before that, run 42615928074 on #165 measured the 21 modules of 2026-11-09. The 21st, `wasmtime`, was removed with the standalone Wasmtime preview it mutated (2026-11-10), and its surviving mutants with it. *Initial*: with
 the tests that existed before mutation testing; *now*: with the tests written to
 kill survivors (CI's measurement on Node 26 is the recorded floor).
 
 | Module | Files | Initial | Now | Threshold |
 | --- | --- | ---: | ---: | ---: |
-| `host-bridge` | `node-js.mjs` | 56.5 % | **96.4 %** | 96 % |
-| `ui-dom` | `lasm-modules/ui-dom.mjs` | 55.1 % | **93.6 %** | 93 % |
-| `build-service` | `dev-build-service.mjs`, `application-build-client.mjs`, `application-files.mjs`, `cache-lifecycle.mjs` | 52.4 % | **94.3 %** | 94 % |
+| `host-bridge` | `node-js.mjs` | 56.5 % | **96.3 %** | 96 % |
+| `ui-dom` | `lasm-modules/ui-dom.mjs` | 55.1 % | **93.9 %** | 93 % |
+| `build-service` | `dev-build-service.mjs`, `application-build-client.mjs`, `application-files.mjs`, `cache-lifecycle.mjs` | 52.4 % | **94.6 %** | 94 % |
 | `link-driver` | `link-driver/link.mjs`, `link-driver/glue.mjs`, `link-driver/wasm.mjs`, `link-driver/metadata.mjs`, `link-driver/settings.mjs`, `link-driver/compile.mjs` | 53.9 % | **93 %** | 93 % |
-| `target-link` | `application-link.mjs`, `edge/edge-link.mjs`, `wasi/wasi-link.mjs` | 5.9 % | **90.6 %** | 90 % |
+| `target-link` | `application-link.mjs`, `edge/edge-link.mjs`, `wasi/wasi-link.mjs` | 5.9 % | **91.2 %** | 91 % |
 | `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **97.1 %** | 97 % |
 | `notices` | `notices.mjs` | 62.5 % | **91.5 %** | 91 % |
 | `downloads` | `managed-download.mjs`, `managed-artifacts.mjs`, `managed-lean.mjs`, `npm-artifacts.mjs`, `cache-repair.mjs` | 59.3 % | **89.7 %** | 89 % |
-| `toolchains` | `managed-sdk.mjs`, `managed-python.mjs`, `managed-link-toolchain.mjs`, `sdk-repairs.mjs`, `system-git.mjs`, `windows-tool-paths.mjs`, `macos-tbd.mjs`, `link-driver/python.mjs` | 58.9 % | **89.7 %** | 89 % |
+| `toolchains` | `managed-sdk.mjs`, `managed-python.mjs`, `managed-link-toolchain.mjs`, `sdk-repairs.mjs`, `system-git.mjs`, `windows-tool-paths.mjs`, `macos-tbd.mjs`, `link-driver/python.mjs` | 58.9 % | **89.3 %** | 89 % |
 | `cli` | `cli-arguments.mjs`, `posix-arguments.mjs`, `application-cli.mjs`, `launcher.mjs`, `process-launcher.mjs`, `elapsed-ticker.mjs`, `elapsed-ticker-worker.mjs`, `build-progress.mjs`, `test-switches.mjs`, `platform.mjs`, `output-directory.mjs`, `editor.mjs`, `application-signals.mjs` | 42.7 % | **95 %** | 95 % |
 | `init` | `init.mjs` | 53.6 % | **97.1 %** | 97 % |
-| `dev` | `dev.mjs`, `dev-proxy.mjs`, `dev-build-worker.mjs`, `application-build-worker.mjs`, `browser/browser-dev.mjs`, `browser/static-server.mjs` | 29.2 % | **91 %** | 91 % |
-| `browser` | `browser/browser-build.mjs`, `browser/browser-package.mjs`, `browser/bundle.mjs`, `browser/loader.mjs`, `lasm-modules/app.mjs`, `lasm-modules/web.mjs` (removed with `Lasm.Web`, 2026-11-10), `vite/index.mjs` | 26.1 % | **96.6 %** | 96 % |
-| `application-sources` | `application-sources.mjs`, `application-initialization.mjs`, `application-diagnosis.mjs`, `application-binding-check.mjs`, `application-reachability.mjs`, `application-symbols.mjs`, `application-live-members.mjs`, `application-policy.mjs`, `wasm-objects.mjs`, `lasm-library.mjs` | 44.5 % | **85.4 %** | 85 % |
-| `application-output` | `application-build.mjs`, `application-output.mjs`, `application-native.mjs`, `application-npm.mjs`, `application-runtime.mjs`, `application-support.mjs`, `application-lock.mjs`, `native-bundle.mjs`, `package.mjs`, `js-runtime.mjs` | 51.1 % | **92.5 %** | 92 % |
-| `edge-build` | `edge/edge-build.mjs`, `edge/builtin-modules.mjs`, `edge/edge-initializers.mjs`, `edge/edge-pre.js` | 31.5 % | **89.4 %** | 89 % |
+| `dev` | `dev.mjs`, `dev-proxy.mjs`, `dev-build-worker.mjs`, `application-build-worker.mjs`, `browser/browser-dev.mjs`, `browser/static-server.mjs` | 29.2 % | **91.8 %** | 91 % |
+| `browser` | `browser/browser-build.mjs`, `browser/browser-package.mjs`, `browser/bundle.mjs`, `browser/loader.mjs`, `lasm-modules/app.mjs`, `lasm-modules/web.mjs` (removed with `Lasm.Web`, 2026-11-10), `vite/index.mjs` | 26.1 % | **96.1 %** | 96 % |
+| `application-sources` | `application-sources.mjs`, `application-initialization.mjs`, `application-diagnosis.mjs`, `application-binding-check.mjs`, `application-reachability.mjs`, `application-symbols.mjs`, `application-live-members.mjs`, `application-policy.mjs`, `wasm-objects.mjs`, `lasm-library.mjs` | 44.5 % | **85.3 %** | 85 % |
+| `application-output` | `application-build.mjs`, `application-output.mjs`, `application-native.mjs`, `application-npm.mjs`, `application-runtime.mjs`, `application-support.mjs`, `application-lock.mjs`, `native-bundle.mjs`, `package.mjs`, `js-runtime.mjs` | 51.1 % | **92.4 %** | 92 % |
+| `edge-build` | `edge/edge-build.mjs`, `edge/builtin-modules.mjs`, `edge/edge-initializers.mjs`, `edge/edge-pre.js` | 31.5 % | **89.6 %** | 89 % |
 | `wasi-build` | `wasi/wasi-build.mjs`, `wasi/wasi-component.mjs`, `wasi/lower-atomics.mjs` | 45.8 % | **95.6 %** | 95 % |
 | `node-host` | `node-host.mjs`, `node-network.mjs`, `node-process.mjs`, `node-signal.mjs`, `node-system.mjs`, `node-udp.mjs`, `node-fetch.mjs`, `lean-io-errors.mjs`, `handle-table.mjs`, `process-exec.mjs`, `working-directory.mjs`, `linux-memory.mjs`, `thread-id.cjs`, `native-clock.mjs`, `native-dns.mjs`, `native-interfaces.mjs`, `native-windows-timezone.mjs`, `native-tcp.mjs` | 42 % | **86.2 %** | 86 % |
-| `native-files` | `native-files.mjs`, `native-file-message.mjs`, `native-file-worker.mjs`, `native-file-worker-pool.mjs`, `native-worker-cwd.cjs`, `worker-stdio.cjs`, `native-process.mjs`, `native-signals.mjs`, `native-program.mjs`, `native-abort.cjs` | 29.4 % | **86.4 %** | 86 % |
+| `native-files` | `native-files.mjs`, `native-file-message.mjs`, `native-file-worker.mjs`, `native-file-worker-pool.mjs`, `native-worker-cwd.cjs`, `worker-stdio.cjs`, `native-process.mjs`, `native-signals.mjs`, `native-program.mjs`, `native-abort.cjs` | 29.4 % | **88.5 %** | 88 % |
 | `serverless` | `serverless/lasm-server.mjs`, `serverless/lasm-lambda.mjs`, `serverless/lasm-vercel.mjs`, `serverless/lasm-netlify.mjs`, `serverless/lasm-azure.mjs`, `serverless/lasm-gcf.mjs`, `serverless/zip.mjs` | 40.5 % | **88.5 %** | 88 % |
 
 `edge-build` and `wasi-build` were measured 2026-11-09 (run 42581537537; initial scores in runs
