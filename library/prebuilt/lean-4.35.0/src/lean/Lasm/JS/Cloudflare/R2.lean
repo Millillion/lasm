@@ -428,8 +428,8 @@ def R2Object.httpMetadata (self : R2Object) : IO (Option R2HTTPMetadata) := self
 
 /-- `readonly customMetadata?: Record<string, string>`: `readonly attribute record<DOMString, DOMString>? customMetadata` -/
 def R2Object.customMetadata (self : R2Object) : IO (Option (Record String)) := do
-  let r ← self.val.get "customMetadata" Value
-  Support.recordOf String r
+  let r ← self.val.get "customMetadata" (Option Value)
+  (fun r => r.mapM (Support.recordOf String)) r
 
 /-- `readonly range?: R2Range`: `readonly attribute R2Range? range` -/
 def R2Object.range (self : R2Object) : IO (Option R2Range) := self.val.get "range" (Option R2Range)
