@@ -1256,9 +1256,12 @@ for (const [file, text] of files) {
 }
 if (check) {
   const known = new Set([...files.keys()].map(f => f.slice(root.length)));
+  // Hand-written modules beside the generated ones: every tier's Support.lean, and
+  // Lasm.JS.Node.Serve (Node.serve, which Lasm provides on lasm:node-serve: not a Node API).
+  const handWritten = new Set([join('library', 'Lasm', 'JS', 'Node', 'Serve.lean')]);
   for (const [dir, tierName] of [[outDir, 'Web'], [nodeOutDir, 'Node'], ...serveTier.hosts.map(h => [join(root, 'library', 'Lasm', 'JS', h.name), h.name])]) for (const name of existsSync(dir) ? readdirSync(dir) : []) {
     const rel = join('library', 'Lasm', 'JS', tierName, name);
-    if (name !== 'Support.lean' && !known.has(rel)) stale.push(rel + ' (not generated)');
+    if (name !== 'Support.lean' && !handWritten.has(rel) && !known.has(rel)) stale.push(rel + ' (not generated)');
   }
   if (stale.length) {
     console.error(`The standard bindings are stale: ${stale.join(', ')}. Run node scripts/bindings/generate-web.mjs and commit the result.`);
