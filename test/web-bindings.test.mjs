@@ -240,6 +240,10 @@ test('every Lasm.JS.Cloudflare selection is generated, and no exclusion is', () 
     for (const [, imported] of text.matchAll(/^import (Lasm\.\S+)$/gm))
       assert.match(imported, /^Lasm\.JS\.(Cloudflare\.|Web\.(Support|Dom|Streams|File|Url|Fetch)$)/, `${f} imports ${imported}`);
   }
+  // A nullable record result (D1's first() of no row is null) is read as an optional
+  // reference before Object.entries, which throws on null.
+  const d1 = readFileSync(new URL('../library/Lasm/JS/Cloudflare/D1.lean', import.meta.url), 'utf8');
+  assert.match(d1, /callMethodAwait "first" \(Support\.args #\[\]\) \(Option Value\)\n {2}\(\(fun r => r\.mapM \(Support\.recordOf Data\)\) r : IO _\)/);
   const idl = readFileSync(new URL('../scripts/bindings/cloudflare.idl', import.meta.url), 'utf8');
   assert.match(idl, /D1Database\.dump: @deprecated in its declaration/);
   assert.match(idl, /\[LasmHost="Cloudflare", LasmLeanModule="Sockets", LasmModule="cloudflare:sockets", LasmPath=""\]\nnamespace Cloudflare_cloudflare_sockets/);
