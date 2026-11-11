@@ -1,0 +1,548 @@
+{
+ "about": "Exit bar 6 (docs/TESTING_STRATEGY.md §7): each example app passes its outside oracle on every platform it claims. Each app's claims are the rows of the platform tables in its README (tables whose first column is Platform; test/evidence-apps.test.mjs keeps the two in step), plus any claim made outside a table (outsideTable says where). Each claim names the CI jobs that run the app's oracle on that platform, as a workflow file and a job-name pattern; scripts/evidence/page.mjs reads them as scripts/evidence/levels.mjs reads platforms.json: the newest main or release-* run with a matching job decides, and it must have passed within maxAgeDays.",
+ "maxAgeDays": 30,
+ "apps": [
+  {
+   "app": "conduit",
+   "readme": "examples/conduit/README.md",
+   "oracle": "RealWorld's official API suite (Postman collection, run unmodified) and its official Playwright end-to-end suite",
+   "claims": [
+    {
+     "row": "Node 24 and 26",
+     "jobs": [
+      {
+       "workflow": "conduit.yml",
+       "job": "^API on Node 24$"
+      },
+      {
+       "workflow": "conduit.yml",
+       "job": "^API on Node 26\\."
+      },
+      {
+       "workflow": "conduit.yml",
+       "job": "^E2E on Node, "
+      }
+     ]
+    },
+    {
+     "row": "Bun 1.4.4",
+     "jobs": [
+      {
+       "workflow": "conduit.yml",
+       "job": "^API on Bun "
+      },
+      {
+       "workflow": "conduit.yml",
+       "job": "^E2E on Bun "
+      }
+     ]
+    },
+    {
+     "row": "Deno 2.9.6",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^Deno 2\\."
+      }
+     ]
+    },
+    {
+     "row": "Docker",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^Docker "
+      }
+     ]
+    },
+    {
+     "row": "AWS Lambda (.zip, `nodejs24.x`)",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^AWS Lambda \\.zip "
+      }
+     ]
+    },
+    {
+     "row": "AWS Lambda (container image)",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^AWS Lambda container image "
+      }
+     ]
+    },
+    {
+     "row": "Vercel Functions",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^Vercel Functions "
+      }
+     ]
+    },
+    {
+     "row": "Netlify Functions",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^Netlify Functions "
+      }
+     ]
+    },
+    {
+     "row": "Azure Functions",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^Azure Functions "
+      }
+     ]
+    },
+    {
+     "row": "Google Cloud Functions",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^Google Cloud Functions "
+      }
+     ]
+    },
+    {
+     "row": "Cloudflare Workers",
+     "jobs": [
+      {
+       "workflow": "conduit.yml",
+       "job": "^API on Cloudflare Workers "
+      },
+      {
+       "workflow": "conduit.yml",
+       "job": "^E2E on Cloudflare Workers "
+      }
+     ]
+    },
+    {
+     "row": "Vercel Edge",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^Vercel Edge "
+      }
+     ]
+    },
+    {
+     "row": "Netlify Edge",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^Netlify Edge "
+      }
+     ]
+    },
+    {
+     "row": "Deno Deploy",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^Deno Deploy "
+      }
+     ]
+    },
+    {
+     "row": "Supabase Edge Functions",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^Supabase Edge Functions "
+      }
+     ]
+    },
+    {
+     "row": "Fastly Compute",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^Fastly Compute "
+      }
+     ]
+    },
+    {
+     "row": "wasi-http: wasmtime",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^wasi-http \\(wasmtime "
+      }
+     ]
+    },
+    {
+     "row": "wasi-http: Spin",
+     "jobs": [
+      {
+       "workflow": "conduit-platforms.yml",
+       "job": "^Spin "
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "app": "porter",
+   "readme": "examples/porter/README.md",
+   "oracle": "openid-client and oauth4webapi, two independent OpenID Connect client libraries, run against a fresh server (test/oracles.mjs), with the adversarial suite",
+   "claims": [
+    {
+     "row": "Node 24 and 26",
+     "jobs": [
+      {
+       "workflow": "porter.yml",
+       "job": "^Oracles and attacks on Node 24$"
+      },
+      {
+       "workflow": "porter.yml",
+       "job": "^Oracles and attacks on Node 26\\."
+      }
+     ]
+    },
+    {
+     "row": "Bun 1.4.4",
+     "jobs": [
+      {
+       "workflow": "porter-platforms.yml",
+       "job": "^Bun 1\\."
+      }
+     ]
+    },
+    {
+     "row": "Deno 2.9.6",
+     "jobs": [
+      {
+       "workflow": "porter-platforms.yml",
+       "job": "^Deno 2\\."
+      }
+     ]
+    },
+    {
+     "row": "Cloudflare Workers",
+     "jobs": [
+      {
+       "workflow": "porter-platforms.yml",
+       "job": "^Cloudflare Workers "
+      }
+     ]
+    },
+    {
+     "row": "Docker",
+     "jobs": [
+      {
+       "workflow": "porter-platforms.yml",
+       "job": "^Docker "
+      }
+     ]
+    },
+    {
+     "row": "AWS Lambda (.zip and container image)",
+     "jobs": [
+      {
+       "workflow": "porter-platforms.yml",
+       "job": "^AWS Lambda \\.zip "
+      },
+      {
+       "workflow": "porter-platforms.yml",
+       "job": "^AWS Lambda container image "
+      }
+     ]
+    },
+    {
+     "row": "Vercel Functions",
+     "jobs": [
+      {
+       "workflow": "porter-platforms.yml",
+       "job": "^Vercel Functions "
+      }
+     ]
+    },
+    {
+     "row": "Netlify Functions",
+     "jobs": [
+      {
+       "workflow": "porter-platforms.yml",
+       "job": "^Netlify Functions "
+      }
+     ]
+    },
+    {
+     "row": "Azure Functions",
+     "jobs": [
+      {
+       "workflow": "porter-platforms.yml",
+       "job": "^Azure Functions "
+      }
+     ]
+    },
+    {
+     "row": "Google Cloud Functions",
+     "jobs": [
+      {
+       "workflow": "porter-platforms.yml",
+       "job": "^Google Cloud Functions "
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "app": "tandem",
+   "readme": "examples/tandem/README.md",
+   "oracle": "Yjs, the most widely used CRDT, on the same editing histories (test/differential.mjs, on Node); on every platform the protocol tests, the live simulation and a minute of fuzzing",
+   "claims": [
+    {
+     "row": "Node 24 and 26",
+     "jobs": [
+      {
+       "workflow": "tandem.yml",
+       "job": "^Protocol, Yjs and simulation on Node 24$"
+      },
+      {
+       "workflow": "tandem.yml",
+       "job": "^Protocol, Yjs and simulation on Node 26\\."
+      }
+     ]
+    },
+    {
+     "row": "Bun 1.4.4",
+     "jobs": [
+      {
+       "workflow": "tandem-platforms.yml",
+       "job": "^Bun 1\\."
+      }
+     ]
+    },
+    {
+     "row": "Deno 2.9.6",
+     "jobs": [
+      {
+       "workflow": "tandem-platforms.yml",
+       "job": "^Deno 2\\."
+      }
+     ]
+    },
+    {
+     "row": "Cloudflare Workers",
+     "jobs": [
+      {
+       "workflow": "tandem-platforms.yml",
+       "job": "^Cloudflare Workers "
+      }
+     ]
+    },
+    {
+     "row": "Docker",
+     "jobs": [
+      {
+       "workflow": "tandem-platforms.yml",
+       "job": "^Docker "
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "app": "ledger",
+   "readme": "examples/ledger/README.md",
+   "oracle": "TigerBeetle 0.17.9 itself on seeded workloads (test/tigerbeetle.mjs, on Node), and a Jepsen-style bank workload (test/bank.mjs) on every platform",
+   "claims": [
+    {
+     "row": "Node 24 and 26",
+     "jobs": [
+      {
+       "workflow": "ledger.yml",
+       "job": "^API and bank workload on Node 24$"
+      },
+      {
+       "workflow": "ledger.yml",
+       "job": "^API and bank workload on Node 26\\."
+      },
+      {
+       "workflow": "ledger.yml",
+       "job": "^Differential test against TigerBeetle "
+      }
+     ]
+    },
+    {
+     "row": "Bun 1.4.4",
+     "jobs": [
+      {
+       "workflow": "ledger-platforms.yml",
+       "job": "^Bun 1\\."
+      }
+     ]
+    },
+    {
+     "row": "Deno 2.9.6",
+     "jobs": [
+      {
+       "workflow": "ledger-platforms.yml",
+       "job": "^Deno 2\\."
+      }
+     ]
+    },
+    {
+     "row": "Cloudflare Workers",
+     "jobs": [
+      {
+       "workflow": "ledger-platforms.yml",
+       "job": "^Cloudflare Workers "
+      }
+     ]
+    },
+    {
+     "row": "Docker",
+     "jobs": [
+      {
+       "workflow": "ledger-platforms.yml",
+       "job": "^Docker "
+      }
+     ]
+    },
+    {
+     "row": "AWS Lambda (.zip and container image)",
+     "jobs": [
+      {
+       "workflow": "ledger-platforms.yml",
+       "job": "^AWS Lambda \\.zip "
+      },
+      {
+       "workflow": "ledger-platforms.yml",
+       "job": "^AWS Lambda container image "
+      }
+     ]
+    },
+    {
+     "row": "Vercel Functions",
+     "jobs": [
+      {
+       "workflow": "ledger-platforms.yml",
+       "job": "^Vercel Functions "
+      }
+     ]
+    },
+    {
+     "row": "Netlify Functions",
+     "jobs": [
+      {
+       "workflow": "ledger-platforms.yml",
+       "job": "^Netlify Functions "
+      }
+     ]
+    },
+    {
+     "row": "Azure Functions",
+     "jobs": [
+      {
+       "workflow": "ledger-platforms.yml",
+       "job": "^Azure Functions "
+      }
+     ]
+    },
+    {
+     "row": "Google Cloud Functions",
+     "jobs": [
+      {
+       "workflow": "ledger-platforms.yml",
+       "job": "^Google Cloud Functions "
+      }
+     ]
+    },
+    {
+     "row": "WASI (the auditor)",
+     "jobs": [
+      {
+       "workflow": "ledger-platforms.yml",
+       "job": "^The journal auditor on WASI "
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "app": "folio",
+   "readme": "examples/folio/README.md",
+   "oracle": "The CommonMark specification's 652 examples and the reference implementation commonmark.js",
+   "claims": [
+    {
+     "row": "Node 24 and 26",
+     "jobs": [
+      {
+       "workflow": "folio.yml",
+       "job": "^The folio command on Node 24$"
+      },
+      {
+       "workflow": "folio.yml",
+       "job": "^The folio command on Node 26\\."
+      },
+      {
+       "workflow": "folio.yml",
+       "job": "^CommonMark examples and commonmark\\.js on Node 24$"
+      },
+      {
+       "workflow": "folio.yml",
+       "job": "^CommonMark examples and commonmark\\.js on Node 26\\."
+      }
+     ]
+    },
+    {
+     "row": "WASI: wasmtime 49.0.4, wasmer 7.4.2, `node:wasi`",
+     "jobs": [
+      {
+       "workflow": "folio.yml",
+       "job": "^The folio command on WASI "
+      },
+      {
+       "workflow": "folio-platforms.yml",
+       "job": "^The 652 CommonMark examples on WASI "
+      }
+     ]
+    },
+    {
+     "row": "Fastly Compute",
+     "jobs": [
+      {
+       "workflow": "folio-platforms.yml",
+       "job": "^Fastly Compute "
+      }
+     ]
+    },
+    {
+     "row": "Cloudflare Workers",
+     "jobs": [
+      {
+       "workflow": "folio-platforms.yml",
+       "job": "^Cloudflare Workers "
+      }
+     ]
+    },
+    {
+     "row": "Deno Deploy",
+     "jobs": [
+      {
+       "workflow": "folio-platforms.yml",
+       "job": "^Deno Deploy's build "
+      }
+     ]
+    },
+    {
+     "row": "Browsers: Chromium, Firefox, WebKit",
+     "outsideTable": "the renderer's browser build (README, The oracle)",
+     "jobs": [
+      {
+       "workflow": "folio-platforms.yml",
+       "job": "^The 652 CommonMark examples in headless "
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
