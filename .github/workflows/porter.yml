@@ -120,9 +120,6 @@ jobs:
       - name: npm run build:sim
         working-directory: examples/porter
         run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:sim
-      - name: DEBUG 206
-        working-directory: examples/porter
-        run: node test/dst.mjs --seed 576844122 --faults heavy --verbose 2>&1 | grep -n "" | sed -n '1,100000p' | grep -E "agent0|#9[0-5]|#8[0-9]|DBG|crash|clock|heal|ambig" | head -600 || true
       - name: The simulation, 30 fixed seeds, each replayed (a failure prints its seed and a repro command)
         working-directory: examples/porter
         run: node test/dst.mjs --seeds 30 --check-determinism --keep-going
@@ -130,12 +127,12 @@ jobs:
         if: ${{ !cancelled() }}
         working-directory: examples/porter
         run: node test/dst.mjs --seeds 10 --first 1001 --faults heavy --keep-going
-      - name: The simulation, regression seeds (each once failed in the nightly; #189)
+      - name: The simulation, regression seeds (each once failed in the nightly; #189, #206)
         if: ${{ !cancelled() }}
         working-directory: examples/porter
         run: |
           node test/dst.mjs --keep-going --seed 1528071973,1358169986,1273593965,433344502,1287624253,1696938769
-          node test/dst.mjs --keep-going --faults heavy --seed 2086774936,1937215545,1146142112,1100547003,1350821037,195556921,1412830265,1573015930,536276597,393677740
+          node test/dst.mjs --keep-going --faults heavy --seed 2086774936,1937215545,1146142112,1100547003,1350821037,195556921,1412830265,1573015930,536276597,393677740,576844122
   fuzz:
     name: The endpoint fuzzer (3 minutes)
     runs-on: ubuntu-24.04
