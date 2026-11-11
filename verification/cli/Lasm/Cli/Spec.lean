@@ -54,4 +54,30 @@ Tested by: test/lean-io-error-policy.test.mjs -/
 def numbers_le64 : Prop :=
   ∀ values : List Int, (numbers values).data.toList = values.flatMap le64
 
+/-! ## WebAssembly -/
+
+/-- **`replaceCoreModule` replaces exactly the one matching module.** In a
+component whose only core module section that starts with `pfx` is
+`pfx ++ tail`, that section becomes `to ++ tail`, and every other section,
+before or after it, is kept as it was.
+Tested by: test/wasi-component.test.mjs -/
+def replace_one_core_module : Prop :=
+  ∀ (before after : List (UInt8 × List UInt8)) (unrelated : List (List UInt8)) (pfx tail to : List UInt8),
+    (∀ s ∈ before ++ after, s.1 ≠ 1) → (∀ u ∈ unrelated, ¬ pfx <+: u) →
+    replaceCoreModule
+      (bytes (componentHeader ++ before.flatMap (fun s => sectionOf s.1 s.2) ++ unrelated.flatMap (sectionOf 1) ++
+        sectionOf 1 (pfx ++ tail) ++ after.flatMap (fun s => sectionOf s.1 s.2)))
+      (bytes pfx) (bytes to) =
+    .ok (bytes (componentHeader ++ before.flatMap (fun s => sectionOf s.1 s.2) ++ unrelated.flatMap (sectionOf 1) ++
+        sectionOf 1 (to ++ tail) ++ after.flatMap (fun s => sectionOf s.1 s.2)))
+
+/-- **`withoutComponentType` drops only component-type custom sections.** A
+module's custom sections named `component-type…` go; every other section,
+custom or not, stays, in order.
+Tested by: test/wasi-component.test.mjs -/
+def drops_only_component_type : Prop :=
+  ∀ ss : List Sec, (∀ s ∈ ss, ∀ id b, s = .other id b → id ≠ 0) →
+    withoutComponentType (bytes (moduleHeader ++ ss.flatMap Sec.encoding)) =
+      bytes (moduleHeader ++ (ss.filter (!·.componentType)).flatMap Sec.encoding)
+
 end Lasm.Cli.Spec

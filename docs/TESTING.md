@@ -1075,9 +1075,13 @@ a second after Lean is provisioned). A candidate about modelled functions is
 then proved of the model and moves to `verification/cli/Lasm/Cli/Spec.lean`
 with its theorem in `Theorems.lean`, checked by `scripts/library-proofs.mjs`
 like the library's, and its test cites `Lasm.Cli.Spec.…`. Since 2026-11-11:
-`numbers` (src/node-host.mjs), `changedFiles` (src/dev.mjs) and
-`responseFile` (src/platform.mjs), with `numbers_le64`,
-`changed_files_exact` and `response_file_round_trip` proved. The fuzz
+`numbers` (src/node-host.mjs), `changedFiles` (src/dev.mjs),
+`responseFile` (src/platform.mjs), and `replaceCoreModule` and
+`withoutComponentType` (src/wasi/wasi-component.mjs), with `numbers_le64`,
+`changed_files_exact`, `response_file_round_trip`,
+`replace_one_core_module` and `drops_only_component_type` proved. The
+differential of `replaceCoreModule` found its first bug: a section whose size
+was a padded LEB128 was spliced at the wrong offset. The fuzz
 targets `serverless-http`, `lasm-js-wire` and `ui-decode` are the model
 differentials of src/serverless/, the Lasm.JS codec and the UI applier's
 reading.

@@ -22,6 +22,7 @@ import { random } from '../helpers/property.mjs';
 import { changedFiles } from '../../src/dev.mjs';
 import { numbers } from '../../src/node-host.mjs';
 import { responseFile } from '../../src/platform.mjs';
+import { replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const cliRoot = join(root, 'verification', 'cli');
@@ -31,6 +32,32 @@ const hex = text => Buffer.from(text, 'utf8').toString('hex');
 /** Text with the characters a property is most likely to break on: escapes,
  * quotes, line ends, NUL, non-ASCII and astral characters. */
 const tricky = ['a', 'b', ' ', '\\', '"', "'", '\n', '\r', '\0', '\t', 'λ', '€', '😀', '$', '-', '='];
+
+/** Unsigned LEB128, padded with `extra` continuation bytes (a valid,
+ * non-minimal encoding, as LLVM writes in object files). */
+const leb = (value, extra = 0) => {
+  const out = [];
+  do { let b = value & 0x7f; value = Math.floor(value / 128); if (value || extra) b |= 0x80; out.push(b); } while (value);
+  for (let i = 0; i < extra; i++) out.push(i === extra - 1 ? 0 : 0x80);
+  return out;
+};
+const utf8 = text => [...Buffer.from(text, 'utf8')];
+const hexOf = bytes => Buffer.from(bytes).toString('hex');
+
+/** Sections of a module or component: well-framed (sizes sometimes padded),
+ * then sometimes broken (a byte changed, cut short, or random bytes). */
+function wasmBytes(r, header, section) {
+  const sections = r.array(r.int(0, 5), () => section(r));
+  let bytes = [...header, ...sections.flatMap(({ id, body }) => [id, ...leb(body.length, r.next() < 0.2 ? r.int(1, 4) : 0), ...body])];
+  const roll = r.next();
+  if (roll < 0.1 && bytes.length) bytes[r.int(0, bytes.length - 1)] = r.int(0, 255);
+  else if (roll < 0.2) bytes = bytes.slice(0, r.int(0, bytes.length));
+  else if (roll < 0.23) bytes = [...header.slice(0, r.int(0, 8)), ...Array.from({ length: r.int(0, 30) }, () => r.int(0, 255))];
+  return { bytes, sections };
+}
+const randomBytes = (r, high) => Array.from({ length: r.int(0, high) }, () => r.int(0, 255));
+const coreHeader = [0, 0x61, 0x73, 0x6d, 1, 0, 0, 0];
+const componentHeader = [0, 0x61, 0x73, 0x6d, 0x0d, 0, 1, 0];
 
 /** Each model: the JavaScript module and function it mirrors, the Lean
  * module, a generator, the JavaScript's answer and the request's input,
@@ -68,6 +95,34 @@ export const models = [
     js: args => {
       try { return { text: hex(responseFile(args)) }; } catch (error) { return { error: error.message }; }
     },
+  },
+  {
+    name: 'replaceCoreModule', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',
+    generate: r => {
+      const prefix = [...coreHeader, ...randomBytes(r, 6)];
+      const { bytes, sections } = wasmBytes(r, componentHeader, g => {
+        const id = g.pick([0, 1, 1, 1, 2, 7]);
+        return { id, body: id === 1 && g.next() < 0.6 ? [...prefix.slice(0, g.next() < 0.8 ? prefix.length : g.int(0, prefix.length)), ...randomBytes(g, 20)] : randomBytes(g, 20) };
+      });
+      const modules = sections.filter(s => s.id === 1);
+      const pick = r.next() < 0.3 && modules.length ? r.pick(modules).body.slice(0, r.int(0, 12)) : prefix;
+      return { component: bytes, prefix: pick, to: randomBytes(r, r.pick([0, 5, 200])) };
+    },
+    input: ({ component, prefix, to }) => ({ component: hexOf(component), prefix: hexOf(prefix), to: hexOf(to) }),
+    js: ({ component, prefix, to }) => {
+      try { return { bytes: hexOf(replaceCoreModule(Uint8Array.from(component), Uint8Array.from(prefix), Uint8Array.from(to))) }; }
+      catch (error) { return { error: error.message }; }
+    },
+  },
+  {
+    name: 'withoutComponentType', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',
+    generate: r => wasmBytes(r, coreHeader, g => {
+      if (g.next() < 0.5) return { id: g.pick([1, 3, 7, 10]), body: randomBytes(g, 20) };
+      const name = g.next() < 0.15 ? [...utf8('component-typ'), g.pick([0x65, 0xc3, 0xff, 0x80])] : utf8(g.pick(['component-type', 'component-type:proxy', 'component-typ', 'name', 'xcomponent-type', 'component-typeλ', '']));
+      return { id: 0, body: [...leb(name.length, g.next() < 0.2 ? 1 : 0), ...name, ...randomBytes(g, 10)] };
+    }).bytes,
+    input: bytes => hexOf(bytes),
+    js: bytes => hexOf(withoutComponentType(Uint8Array.from(bytes))),
   },
 ];
 

@@ -15,11 +15,15 @@ answer are the JavaScript's, read as the model's types:
   changedFiles   {"before": [["<hex>", "<hex>" | null], …], "after": …}
                                                     → ["<hex>", …]
   responseFile   ["<hex>", …]                       → {"text": "<hex>"} | {"error": "…"}
+  replaceCoreModule  {"component": "<hex>", "prefix": "<hex>", "to": "<hex>"}
+                                                    → {"bytes": "<hex>"} | {"error": "…"}
+  withoutComponentType  "<hex>"                     → "<hex>"
 -/
 import Lean.Data.Json
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Platform
+import Lasm.Cli.Model.WasiComponent
 
 open Lean Lasm.Cli
 
@@ -70,6 +74,12 @@ def answer (j : Json) : Except String Json := do
     return match responseFile (← (← input.getArr?).toList.mapM text) with
       | .ok t => Json.mkObj [("text", ofText t)]
       | .error e => Json.mkObj [("error", toJson e)]
+  | "replaceCoreModule" =>
+    let field := fun (k : String) => do unhex (← (← input.getObjVal? k).getStr?)
+    return match replaceCoreModule (← field "component") (← field "prefix") (← field "to") with
+      | .ok b => Json.mkObj [("bytes", toJson (hex b))]
+      | .error e => Json.mkObj [("error", toJson e)]
+  | "withoutComponentType" => return toJson (hex (withoutComponentType (← unhex (← input.getStr?))))
   | m => throw s!"no model {m}"
 
 def main : IO Unit := do
