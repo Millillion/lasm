@@ -1,5 +1,5 @@
 // The testing documents stay in step with the repository: every file, script
-// and workflow docs/TESTING_STRATEGY.md and docs/CI.md name exists, every
+// and workflow docs/TESTING_STRATEGY.md, docs/CI.md and docs/TESTING.md name exists, every
 // workflow is in CI.md's inventory, and TESTING.md's fuzz table lists exactly
 // the targets fuzz.yml runs (the evidence page reads the same list).
 import test from 'node:test';
@@ -32,6 +32,20 @@ for (const file of ['docs/TESTING_STRATEGY.md', 'docs/CI.md']) {
     assert.deepEqual(paths.filter(p => !existsSync(join(root, p))), []);
   });
 }
+
+// TESTING.md also keeps the history of its audits and survivors: a file named on
+// a line that says it was deleted or removed is a record, not a reference.
+test('every path and workflow docs/TESTING.md names exists, unless the line says it was deleted', () => {
+  const lines = read('docs/TESTING.md').split('\n');
+  const missing = [];
+  let count = 0;
+  lines.forEach((line, i) => {
+    if (/\b(deleted|removed)\b/i.test(line)) return;
+    for (const path of namedPaths('docs/TESTING.md', line)) { count++; if (!existsSync(join(root, path))) missing.push(`line ${i + 1}: ${path}`); }
+  });
+  assert.ok(count > 100, `${count} paths`);
+  assert.deepEqual(missing, []);
+});
 
 test('every workflow is in docs/CI.md', () => {
   const ci = read('docs/CI.md');
