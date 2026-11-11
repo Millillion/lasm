@@ -219,7 +219,13 @@ test('a bare word that names a Lean file beside it suggests the file', t => {
 });
 
 const words = ['Main.lean', 'App/Main.lean', 'x y.lean', 'λ.lean', 'a', '', '-', 'b c', '--x', '-h', '--help', '--', '--version'];
-// ∀ src flags args, src.endsWith ".lean" → parse ([src] ++ flags ++ ["--"] ++ args) = some { input := src, args := args, … }
+// Proposition: Lasm.Cli.Candidates.run_args_kept
+//   ∀ (src : String) (flags args : List String), src.endsWith ".lean" → ¬ src.startsWith "-" →
+//     (∀ f ∈ flags, f ∈ ["--rebuild", "--verbose", "--release"]) →
+//     ∃ p, parseLasmArguments (flags ++ [src, "--"] ++ args) = .ok p ∧
+//       p.command = "run" ∧ p.input = src ∧ p.args = args ∧
+//       p.rebuild = flags.contains "--rebuild" ∧ p.verbose = flags.contains "--verbose" ∧
+//       p.profile = (if flags.contains "--release" then "release" else "dev")
 test('run: any application arguments after -- come back unchanged, whatever the options before it', () => {
   forAll(r => ({
     source: r.pick(['Main.lean', 'App/Main.lean', 'dir with space/Main.lean', 'λ/Main.lean']),
@@ -236,7 +242,12 @@ test('run: any application arguments after -- come back unchanged, whatever the 
   });
 });
 
-// ∀ permutation p of build options, parse (build :: p) = parse (build :: options)
+// Proposition: Lasm.Cli.Candidates.build_options_commute
+//   ∀ (opts opts' : List (List String)) (forms : List Bool), (∀ o ∈ opts, OptionGroup o) →
+//     (opts.map List.head?).Nodup → opts.Perm opts' → forms.length = opts'.length →
+//     (parseLasmArguments ("build" :: opts.flatten)).isOk = true →
+//     parseLasmArguments ("build" :: ((opts'.zip forms).map fun (o, j) => if j then joined o else o).flatten) =
+//       parseLasmArguments ("build" :: opts.flatten)
 test('build: options mean the same in any order and in either --flag value or --flag=value form', () => {
   forAll(r => {
     const target = r.pick(buildTargets);
@@ -260,7 +271,10 @@ test('build: options mean the same in any order and in either --flag value or --
   });
 });
 
-// ∀ flag, flag.startsWith "-" ∧ flag ∉ lasmOptions → parse ["Main.lean", flag] = error ("Unknown Lasm option: " ++ flag ++ …)
+// Proposition: Lasm.Cli.Candidates.unknown_flag_refused
+//   ∀ flag : String, flag.startsWith "-" → flag ∉ knownFlags → valuedForm flag = false →
+//     parseLasmArguments ["Main.lean", flag] = .error ("Unknown Lasm option: " ++ flag ++ ". Application arguments must follow --.") ∧
+//     parseLasmArguments ["build", flag, "Main.lean"] = .error ("Unknown Lasm option: " ++ flag ++ ". Application arguments must follow --.")
 test('every unknown flag is refused by name', () => {
   const known = new Set(['--', '--help', '-h', '--rebuild', '--verbose', '--dev', '--release', '--allow-dev', '--bundler', '--target', '--suspend', '--output']);
   forAll(r => r.pick(['-', '--']) + r.string('abcdefghijklmnopqrstuvwxyz-=0123456789'.split(''), 1, 14), flag => {
@@ -270,7 +284,12 @@ test('every unknown flag is refused by name', () => {
   }, { runs: 300 });
 });
 
-// ∀ a b c, d a a = 0 ∧ d a b = d b a ∧ d a "" = |a| ∧ d a c ≤ d a b + d b c ∧ |(|a| - |b|)| ≤ d a b ≤ max |a| |b|
+// Proposition: Lasm.Cli.Candidates.edit_distance_metric
+//   ∀ a b c : String,
+//     editDistance a a = 0 ∧ editDistance a "" = a.length ∧ editDistance "" a = a.length ∧
+//     editDistance a b = editDistance b a ∧ editDistance a c ≤ editDistance a b + editDistance b c ∧
+//     a.length - b.length ≤ editDistance a b ∧ b.length - a.length ≤ editDistance a b ∧
+//     editDistance a b ≤ max a.length b.length ∧ (a ≠ b → 0 < editDistance a b)
 test('edit distance is a metric bounded by the lengths', () => {
   const alphabet = 'abcde'.split('');
   forAll(r => [r.string(alphabet, 0, 8), r.string(alphabet, 0, 8), r.string(alphabet, 0, 8)], ([a, b, c]) => {
@@ -303,7 +322,9 @@ test('closest: the nearest candidate within max(2, ⌊length/3⌋) edits, ignori
   assert.equal(closest('anything', []), undefined);
 });
 
-// ∀ word candidates, closest word candidates = some c → c ∈ candidates ∧ d word c ≤ max 2 (|c| / 3) ∧ ∀ c' ∈ candidates, d word c ≤ d word c'
+// Proposition: Lasm.Cli.Candidates.closest_nearest_first
+//   ∀ (word : String) (cs : List String), word.all Char.isLower → (∀ c ∈ cs, c.all Char.isLower) →
+//     closest word cs = (nearestFirst (editDistance word) cs).filter fun c => editDistance word c ≤ threshold c
 test('closest picks a candidate no farther than any other, within the threshold', () => {
   const alphabet = 'abcd'.split('');
   forAll(r => ({ word: r.string(alphabet, 0, 7), candidates: r.array(r.int(0, 5), () => r.string(alphabet, 1, 7)) }), ({ word, candidates }) => {
@@ -429,7 +450,10 @@ test('executable names and directory containment', () => {
   assert.equal(insideDirectory('C:\\a', 'D:\\a\\b', path.win32), false);
 });
 
-// ∀ args, (∀ a ∈ args, no NUL or newline) → unquote (lines (responseFile args)) = args
+// Proposition: Lasm.Cli.Candidates.response_file_round_trip
+//   ∀ args : List String, (∀ a ∈ args, '\n' ∉ a.toList ∧ '\x00' ∉ a.toList) →
+//     ∃ lines : List String, (responseFile args).splitOn "\n" = lines ++ [""] ∧
+//       if args = [] then lines = [""] else lines.map unquote = args.map some
 test('response files round-trip any argument without NUL or newlines', () => {
   const unquote = line => { assert.ok(line.startsWith('"') && line.endsWith('"'), line); return line.slice(1, -1).replace(/\\(.)/g, '$1'); };
   forAll(r => r.array(r.int(0, 6), () => r.string(['a', ' ', '\\', '"', 'λ', "'", '$', '\t'], 0, 10)), args => {

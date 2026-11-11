@@ -250,7 +250,11 @@ test('the process launcher configuration: header, flags, strings and environment
     assert.throws(() => encodeProcessConfiguration({ env: {}, stdioFlags: [0, 0, 0], ...options }), { message: 'NUL in private process configuration' });
 });
 
-// ∀ c args env, decode (encode c args env) = (c :: args, env)
+// Proposition: Lasm.Cli.Candidates.launcher_config_round_trip
+//   ∀ o : LaunchOptions,
+//     (∀ s ∈ o.command :: o.args ++ o.env.flatMap (fun (k, v) => [k, v]) ++ o.directory.toList ++ o.requestedCwd.toList, '\x00' ∉ s.toList) →
+//     (o.env.map (·.1)).Nodup → o.stdio.length = 3 →
+//     launcherReads (encodeProcessConfiguration o) = some (o.command :: o.args, o.env, o.directory, o.requestedCwd, o.stdio)
 test('the process launcher configuration round-trips any command, arguments and environment', async () => {
   const { encodeProcessConfiguration } = await import('../src/process-launcher.mjs');
   const alphabet = ['a', 'Z', ' ', '=', 'λ', '/', '\n', '日'];
