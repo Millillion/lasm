@@ -233,12 +233,6 @@ the CLI's JavaScript (`Lasm.Cli`) are listed in
 
 **12 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
-### Lasm.Serverless (1)
-
-| Candidate | In plain English | Tested by |
-| --- | --- | --- |
-| [`join_cookies_once`](Lasm/Serverless/Candidates.lean#L23) | **`joinCookies` leaves at most one Cookie field and the others in order.** Whatever Cookie fields a request has, at most one remains, and the fields other than Cookie are exactly the request's, in their order. | [test/serverless-shims.test.mjs](../test/serverless-shims.test.mjs) |
-
 ### Lasm.Fetch (2)
 
 | Candidate | In plain English | Tested by |
@@ -254,6 +248,12 @@ the CLI's JavaScript (`Lasm.Cli`) are listed in
 | [`response_round_trip`](Lasm/RPC/Candidates.lean#L29) | **A result crosses intact.** For a response type whose `ToJson` and `FromJson` round-trip, the client reads the server's 200 answer for the result `r` as exactly `r`. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
 | [`error_round_trip`](Lasm/RPC/Candidates.lean#L39) | **A validation error reaches the client as itself.** The server's 400 answer for a validation message `m` is read by the client as `Error.invalid m`, with the same message, and any other status as `Error.failed` with that status and message. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
 | [`json_print_normal_form`](Lasm/RPC/Candidates.lean#L47) | **Printed JSON is a normal form.** Whatever JSON `parseJson` accepts, its printed form parses again and prints the same. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
+
+### Lasm.Serverless (1)
+
+| Candidate | In plain English | Tested by |
+| --- | --- | --- |
+| [`join_cookies_once`](Lasm/Serverless/Candidates.lean#L23) | **`joinCookies` leaves at most one Cookie field and the others in order.** Whatever Cookie fields a request has, at most one remains, and the fields other than Cookie are exactly the request's, in their order. | [test/serverless-shims.test.mjs](../test/serverless-shims.test.mjs) |
 
 ### Lasm.UI (5)
 
