@@ -12,9 +12,9 @@ editing), then the program prints one line per replica, `text <hex>`, and
 server, kills and restarts the server in the middle, and checks that every
 replica, in every process, ends with the server's text. -/
 import Tandem
-import Lasm.Fetch
+import Lasm.JS.Web
 import Std.Async
-open Tandem Lasm.Fetch
+open Tandem Lasm.JS Lasm.JS.Web
 
 /-- A 64-bit linear congruential generator. -/
 structure Rng where
@@ -31,25 +31,27 @@ def hex (s : String) : String :=
     let d := "0123456789abcdef".toList
     String.ofList [d[(b / 16).toNat]!, d[(b % 16).toNat]!])
 
+/-- `POST url` with a text body (Lasm.JS.Web's `fetch`); the response's body. -/
+def post (url body : String) : Async String := do
+  let headers : HeadersInit := .record ⟨#[("content-type", "text/plain")]⟩
+  let init : RequestInit := { method := some "POST", body := some (.usvString body), headers := some headers }
+  let response ← fetch (.usvString url) (some init)
+  response.text
+
 /-- One sync: `none` if the network failed. -/
 def syncOnce (url : String) (rp : Replica) : Async (Option (Nat × Wire.Reply)) := do
   let req := rp.request
   try
-    let r ← post url (Wire.encodeRequest req).toUTF8 "text/plain"
-    match r.text? with
-    | some body =>
-      match Wire.decodeReply body with
-      | .ok reply => return some (req.ops.length, reply)
-      | .error _ => return none
-    | none => return none
+    match Wire.decodeReply (← post url (Wire.encodeRequest req)) with
+    | .ok reply => return some (req.ops.length, reply)
+    | .error _ => return none
   catch _ => return none
 
 def count (base doc : String) : Async (Option Nat) := do
   try
     let body := Wire.encodeRequest { cursor := 999999999999, ops := [] }
-    let r ← post s!"{base}/doc/{doc}/sync" body.toUTF8 "text/plain"
-    match r.text?.map Wire.decodeReply with
-    | some (.ok (.ops a _ _)) => return some a
+    match Wire.decodeReply (← post s!"{base}/doc/{doc}/sync" body) with
+    | .ok (.ops a _ _) => return some a
     | _ => return none
   catch _ => return none
 

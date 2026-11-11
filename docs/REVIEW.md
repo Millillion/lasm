@@ -251,9 +251,41 @@ decisions themselves are logged with their reasoning in
     as returning `Promise<ScrollResult>`; browsers return `undefined`, which the
     generated `Async` accepts (checked in CI).
 - The old-to-new table is in [release/0.7.0-notes.md](release/0.7.0-notes.md).
-- Tandem still uses `Lasm.Web.WebSocket`: it pins the published `@lasm/cli`
-  0.5.1, so it migrates when it moves to the release with the browser tier
-  (ROADMAP.md).
+- Tandem moved off `Lasm.Web.WebSocket` with its move to `@lasm/cli` 0.7.0
+  (2026-11-11): its editor opens the socket with the generated
+  `Lasm.JS.Web.WebSocket.new` and three `addEventListener` calls (`open`,
+  `message`, `close`). Porter, Ledger and Tandem pin 0.7.0.
+
+### Moving the templates and examples off Lasm.Fetch (2026-11-11; waiting on Jordan's Node serving decision)
+- [ ] **How a template or example serves on Node.** Every server template and
+  example serves on Node, and Lasm has no Node server for a web `Request`
+  handler. Held until Jordan decides; the rest of the move is ready on the
+  branch `migrate-templates` (the `fetch` and `fullstack` templates on
+  Lasm.JS.Web, Lasm.Fastly and Lasm.WASI.Http). Its candidate for Node is a
+  project-local `NodeServer.lean` (a typed `@[js]` binding of
+  `@hono/node-server`'s `serve`: `NodeServer.serve { port := 3000 } handle`),
+  copied by `lasm init`, no new `@lasm/cli` API. Porter, Ledger, Tandem,
+  `examples/fetch` and the two Lasm.Fetch tutorials in `content/` keep their
+  Lasm.Fetch servers until then (their HTTP layer is shared by Node and the
+  other runtimes).
+- [ ] **Lasm.Fetch features with no replacement** (written into the template
+  or example itself, no new public API):
+  - *Embedded static files* (`embed_dir!`, `Assets.serve`: Brotli copies,
+    immutable hashed names, `lasm dev` reading the directory): the fullstack
+    template carries its own `Embed.lean` and `Http.lean` (about 230 lines).
+    Porter, Ledger and Tandem will need the same.
+  - *One request model for every target* (`Request.segments` with WHATWG
+    dot-segment resolution and its proof `segments_no_dot_segments`, cookie
+    joining, `respond`'s 500 on a throw): each program parses the path
+    itself; the proof has no counterpart outside Lasm.Fetch.
+  - *WASI CGI serving* (`--target wasi`): the fetch template's `Cgi.lean`
+    reads the CGI variables and standard input with Lean's `IO`.
+  - *Workers' `env` for Lasm.KV*: `Lasm.KV.setWorkersEnv env` (on the
+    `migrate-templates` branch) replaces `Lasm.Fetch.platformEnv`, which the
+    Workers fetch handler of the program must now call.
+  - *`Lasm.RPC.handler`* (a Lasm.Fetch handler) becomes `Lasm.RPC.dispatch
+    routes method segments body : Option (Async Answer)`, for any server; its
+    four propositions are restated as `dispatch_*` (same branch).
 
 ### High-priority work to define with Jordan
 - [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,
