@@ -53,10 +53,9 @@ def handle (request : Request) : Async Response := do
   | "GET", ["health"] => json [("ok", true)]
   | _, _ => reply 404 "text/plain; charset=utf-8" "Not Found\n".toUTF8
 
-/-- Node: `handle` on Lasm.Fetch's Node server ($HOST:$PORT, SIGTERM closes it).
-How Lean servers run on Node without Lasm.Fetch is still being decided, so
-this is the program's one use of Lasm.Fetch; each request and response is
-converted to and from the web's own. -/
+/-- Node: `handle` on Lasm.Fetch's Node server ($HOST:$PORT, SIGTERM closes it),
+until Lasm's own Node server (`Node.serve`) ships: the program's one use of
+Lasm.Fetch. Each request and response is converted to and from the web's own. -/
 def serveNode : IO Unit := Lasm.Fetch.serveNode fun req => do
   let headers : HeadersInit := .sequence (req.headers.map fun (k, v) => #[k, v])
   let body : Option BodyInit := if req.body.isEmpty then none else some (.bufferSource req.body)
