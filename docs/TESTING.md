@@ -1142,12 +1142,24 @@ to `main`. Each section keeps two kinds of fact apart:
 The page opens with the [exit bar](TESTING_STRATEGY.md#7-exit-bar-rock-solid),
 item by item, computed from both kinds of fact: the platform levels, the
 latest nightly mutation run (every module of `scripts/mutation/modules.json`
-passed at 80 % or more), the unit suite's line coverage (the nightly run's
-`unit` job log), the consecutive clean nights of the differential, fuzzing and
-DST campaigns (`campaignStreak`: Sundays in New York are left out; a failed,
-cancelled or missing campaign ends the run), the quarantine list, the
-proposition lint's inventory (`scripts/propositions.mjs`) and the fuzz targets
-that run against Lean. An item reads "met", "partly met" (what is measured
+passed at 80 % or more), the unit suite's line coverage and its 0 % files (the
+nightly run's `unit` job log: `scripts/coverage/report.mjs` prints how many
+files are at 0 % and which of them the baseline does not name, see
+[Coverage baseline](#coverage-baseline)), the consecutive clean nights of the
+differential, fuzzing and DST campaigns (`campaignStreak`: Sundays in New York
+are left out; a failed, cancelled or missing campaign ends the run; the page,
+committed every night, is where the count is recorded), the quarantine list
+and every entry it had in the last 14 days (`quarantineHistory`, from the
+file's git history: the version in force when the window opened and every
+commit since), each example app's claims
+([`scripts/evidence/apps.json`](../scripts/evidence/apps.json): the rows of
+the platform tables in its README, each with the CI jobs that run the app's
+outside oracle on that platform, read as [evidence levels](#evidence-levels)
+read `platforms.json`: the newest `main` or `release-*` run with a matching job
+decides, and it must have passed within 30 days; `test/evidence-page.test.mjs`
+fails when a README table and the file differ), the proposition lint's
+inventory (`scripts/propositions.mjs`) and the fuzz targets that run against
+Lean. An item reads "met", "partly met" (what is measured
 holds, the rest is not measured yet), "not met", "not measured" or "not read".
 `test/testing-docs.test.mjs` keeps the documents behind it in step with the
 repository: every path and workflow TESTING_STRATEGY.md and CI.md name exists,
@@ -1228,34 +1240,36 @@ run, except the static mode of `check-tutorials.mjs` (below). Verdicts:
 
 ## Coverage baseline
 
-Measured by `unit.yml` run [41234188450](https://github.com/Millillion/lasm/actions/runs/41234188450)
-(commit `b2768b5`, Node 26.12.1, Linux x64), 148 JavaScript files under `src/`,
+Measured by the nightly `unit` job of `ci-nightly.yml` run
+[42981300311](https://github.com/Millillion/lasm/actions/runs/42981300311)
+(2026-11-11, commit `2897519`, Linux x64), 125 JavaScript files under `src/`,
 `bin/` and `packages/`; per-file numbers in
 [evidence/coverage-baseline.json](evidence/coverage-baseline.json).
 
 | Scope | Lines | Branches | Functions |
 | --- | ---: | ---: | ---: |
-| **Total** | **67.5 %** (14,151 / 20,968) | 78.5 % | 70.3 % |
-| `src/` (CLI, build, Node host) | 69.3 % | | |
-| `src/link-driver` | 82.3 % | | |
-| `src/lasm-modules` (builtin `lasm:` modules) | 91.1 % | | |
-| `src/wasi` | 70.6 % | | |
-| `src/edge` | 48.2 % | | |
-| `src/browser` | 53.3 % | | |
-| `src/serverless` | 13.3 % | | |
-| `src/vite` | 0 % | | |
+| **Total** | **98.05 %** (18,816 / 19,191) | 97.2 % | 98.4 % |
 
-The host bridge is well covered (`src/node-js.mjs` 91.5 %, `src/node-host.mjs`
-95.0 %); `src/dev.mjs` (`lasm dev`) is at 43 %. The 0 % files fall in two
-groups. Some run only inside built outputs (`src/edge/edge-pre.js`,
-`src/browser/loader.mjs`, `src/serverless/lasm-*.mjs`):
-they are copied into `dist/` and executed there by the integration workflows, and
-this measurement only counts files at their `src/` path. The others are simply
-not unit-tested (`src/vite/index.mjs`, `src/application-binding-check.mjs`,
-`src/application-build.mjs`). The 29 legacy files of the [audit](#test-quality-audit)
-contributed nothing (they are now ported or retired). `unit.yml` (a release gate) fails when the total line
-coverage falls more than one point below this baseline; raise the baseline file
-when coverage improves.
+The first baseline (2026-10-31, run 41234188450) was 67.5 % of 148 files.
+Since then, unit tests were added and the removals of IRREDUCIBLE.md M1
+deleted unreferenced files, which are no longer counted.
+
+Three files were at 0 % in that run. `packages/create-lasm/bin.mjs` is unit-tested
+since (`test/create-lasm.test.mjs` runs it against a stand-in `@lasm/cli`). The
+other two are Emscripten inputs that run only inside edge builds:
+`src/edge/edge-pre.js` (a `--pre-js`, copied into every edge program; its unit
+tests evaluate its text in a `vm` context, which V8 records under no file path)
+and `src/edge/edge-library.js` (a `--js-library` of `$`-preprocessed
+functions). The baseline's `integration` list names, for each such file, the
+workflows that run it (`workers.yml`, `browser.yml`) and how. Exit bar 3 asks
+that every 0 % file be either named there or removed, so
+[`report.mjs`](../scripts/coverage/report.mjs) (`--check`, with
+[`zero-files.mjs`](../scripts/coverage/zero-files.mjs)) fails the unit suite
+on a 0 % file the list does not name, or on a named workflow that does not
+exist, and prints `0 % files: N, named in the baseline: K, not named: …`,
+which the [evidence page](#the-test-evidence-page) reads. `unit.yml` (a release
+gate) also fails when the total line coverage falls more than one point below
+this baseline; raise the baseline file when coverage improves.
 
 ## Mutation testing
 
