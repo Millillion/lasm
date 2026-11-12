@@ -8,7 +8,13 @@ name: Folio nightly
 #   huge repetitions of syntax, deep nesting, random characters; every
 #   document must render within a time budget linear in its length, and the
 #   safe output must pass the strict tokenizer; failing documents uploaded;
-# - pathological: cmark 0.31.1's pathological inputs (test/pathological.mjs).
+# - pathological: cmark 0.31.1's pathological inputs (test/pathological.mjs);
+# - fuzz-chromium, fuzz-firefox, fuzz-webkit: the same fuzzer for 20 minutes
+#   on the browser build (dist/batch-browser) in that headless browser
+#   (the pinned Playwright's);
+# - fuzz-workers: the same fuzzer for 20 minutes on the site server built for
+#   Cloudflare Workers, served by wrangler dev (local workerd, no account),
+#   through POST /api/render.
 # Runs when main changed since the previous scheduled run (74 hours covers
 # Friday to Monday, as there is no run on a weekend), or on demand. Not a release gate.
 on:
@@ -55,7 +61,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        campaign: [differential, fuzz, pathological]
+        include:
+          - { campaign: differential, build: 'build:batch' }
+          - { campaign: fuzz, build: 'build:batch' }
+          - { campaign: pathological, build: 'build:batch' }
+          - { campaign: fuzz-chromium, build: 'build:batch-browser', browser: chromium }
+          - { campaign: fuzz-firefox, build: 'build:batch-browser', browser: firefox }
+          - { campaign: fuzz-webkit, build: 'build:batch-browser', browser: webkit }
+          - { campaign: fuzz-workers, build: 'build:workers' }
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+      DO_NOT_TRACK: '1'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -68,9 +84,20 @@ jobs:
       - name: npm ci
         working-directory: examples/folio
         run: npm ci --no-audit --no-fund
-      - name: npm run build:batch
+      - name: npm run ${{ matrix.build }}
         working-directory: examples/folio
-        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:batch
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run ${{ matrix.build }}
+      - name: The pinned Playwright's ${{ matrix.browser }}, with its system packages
+        if: matrix.browser
+        timeout-minutes: 30
+        uses: ./.github/actions/playwright
+        with:
+          browsers: ${{ matrix.browser }}
+      - name: wrangler 4.152.0 (wrangler dev runs workerd locally)
+        if: matrix.campaign == 'fuzz-workers'
+        run: |
+          npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund wrangler@4.152.0
+          echo "$RUNNER_TEMP/tools/node_modules/.bin" >> "$GITHUB_PATH"
       - name: The campaign
         working-directory: examples/folio
         env:
@@ -83,6 +110,8 @@ jobs:
               exit $status ;;
             fuzz) node test/fuzz.mjs --minutes 40 ;;
             pathological) node test/pathological.mjs ;;
+            fuzz-chromium|fuzz-firefox|fuzz-webkit) node test/fuzz.mjs --minutes 20 --engine "${CAMPAIGN#fuzz-}" ;;
+            fuzz-workers) node test/fuzz.mjs --minutes 20 --platform workers ;;
           esac
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()

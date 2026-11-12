@@ -6,11 +6,19 @@ name: Folio on every platform
 #   example site is put in the store, and every page served must be byte for
 #   byte what `folio build` writes; a changed site in a new store must be
 #   served the same way; then the CommonMark specification's 652 examples
-#   run on the server through POST /api/render (test/edge.mjs --spec).
-# - wasi: the 652 examples on the WASI build of the batch renderer
-#   (dist/batch-wasi) on wasmtime 49.0.4, wasmer 7.4.2 and node:wasi.
-# - browser: the 652 examples on the browser build (dist/batch-browser) in
-#   headless Chromium, Firefox and WebKit.
+#   run on the server through POST /api/render (test/edge.mjs --spec), and
+#   CommonMark's pathological inputs with nesting far deeper than the
+#   engine's stack (issue #231; test/edge.mjs --pathological; not yet on
+#   Fastly, where bodies over about 1 MB stop the instance, #234).
+# - wasi: the 652 examples and the pathological inputs on the WASI build of
+#   the batch renderer (dist/batch-wasi) on wasmtime 49.0.4, wasmer 7.4.2
+#   and node:wasi.
+# - browser: the 652 examples and the pathological inputs on the browser
+#   build (dist/batch-browser) in headless Chromium, Firefox and WebKit, then
+#   a minute of the crash and timeout fuzzer (test/fuzz.mjs) in each; the
+#   Workers job also fuzzes its server for two minutes (folio-nightly.yml
+#   runs both for 20 minutes). Both replay the first 240 documents of seed
+#   911870982, the Workers fuzz run that found issue #231.
 # Every engine must pass all 652 with raw HTML enabled, and with the safe
 # defaults differ only where raw HTML or an unsafe URL is (test/spec.mjs).
 # Local tooling only: no account, nothing deployed, CI=1. Free runners only.
@@ -94,9 +102,16 @@ jobs:
         if: matrix.platform == 'fastly'
         working-directory: ${{ env.FOLIO }}
         run: node tools/kv.mjs fastly | diff fastly.toml -
-      - name: The site from the store, a changed site, and the 652 CommonMark examples on the server
+      - name: The site from the store, a changed site, the 652 CommonMark examples and the pathological inputs on the server
         working-directory: ${{ env.FOLIO }}
-        run: node test/edge.mjs --platform ${{ matrix.platform }} --spec
+        # Fastly: bodies over about 1 MB stop the instance (#234), so not the pathological inputs there yet
+        run: node test/edge.mjs --platform ${{ matrix.platform }} --spec ${{ matrix.platform != 'fastly' && '--pathological' || '' }}
+      - name: Two minutes of fuzzing on the server (seeded; the seed is printed first), and the seed that found issue #231
+        if: matrix.platform == 'workers'
+        working-directory: ${{ env.FOLIO }}
+        run: |
+          node test/fuzz.mjs --seed 911870982 --documents 240 --platform workers
+          node test/fuzz.mjs --minutes 2 --platform workers
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -139,6 +154,12 @@ jobs:
           for engine in wasmtime wasmer node-wasi; do
             node test/spec.mjs --engine "$engine" --json "test-results/spec-$engine.json"
           done
+      - name: CommonMark's pathological inputs and deep nesting (issue #231) on each engine
+        working-directory: examples/folio
+        run: |
+          for engine in wasmtime wasmer node-wasi; do
+            node test/pathological.mjs --engine "$engine"
+          done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -176,6 +197,21 @@ jobs:
           for engine in chromium firefox webkit; do
             node test/spec.mjs --engine "$engine" --json "test-results/spec-$engine.json"
           done
+      - name: CommonMark's pathological inputs and deep nesting (issue #231) in each browser
+        working-directory: examples/folio
+        run: |
+          for engine in chromium firefox webkit; do
+            node test/pathological.mjs --engine "$engine"
+          done
+      - name: A minute of fuzzing in each browser (seeded; each seed is printed first), and the seed that found issue #231
+        working-directory: examples/folio
+        run: |
+          status=0
+          for engine in chromium firefox webkit; do
+            node test/fuzz.mjs --seed 911870982 --documents 240 --engine "$engine" || status=1
+            node test/fuzz.mjs --minutes 1 --engine "$engine" || status=1
+          done
+          exit $status
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:

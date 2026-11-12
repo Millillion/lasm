@@ -15,6 +15,22 @@ const engines = [
   ['node', process.execPath, []],
 ];
 
+// The returned PID is the POSIX launcher (src/process-exec.mjs), which closes
+// its configuration pipe and then execs the command, as native Lean's
+// fork-then-exec child does. The host may exit (it waits only for that pipe)
+// while the exec is still in progress: /proc/PID/cmdline is then briefly the
+// launcher's, or empty while the kernel replaces the image. Wait, briefly, for
+// the exec to finish. A child that died with its host has no /proc entry
+// (ENOENT) or stays a zombie (empty cmdline), and fails here.
+function execedCommandLine(pid, deadline = Date.now() + 5_000) {
+  for (;;) {
+    const commandLine = readFileSync(`/proc/${pid}/cmdline`, 'utf8');
+    const launcher = commandLine === '' || commandLine.split('\0')[1]?.endsWith('/process-exec.mjs');
+    if (!launcher || Date.now() > deadline) return commandLine;
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
+  }
+}
+
 function droppedChild(executable, args, label) {
   // Generous: under mutation testing the host runs instrumented and the runner is loaded.
   const result = spawnSync(executable, args, { encoding: 'utf8', timeout: 10_000, killSignal: 'SIGKILL' });
@@ -23,7 +39,7 @@ function droppedChild(executable, args, label) {
     assert.equal(result.status, 0, `${label}: ${result.error?.message ?? result.stdout + result.stderr}`);
     assert.equal(result.stderr, '');
     assert.ok(Number.isInteger(pid) && pid > 0);
-    assert.match(readFileSync(`/proc/${pid}/cmdline`, 'utf8'), /^\/bin\/sleep\u000010\u0000$/);
+    assert.equal(execedCommandLine(pid), '/bin/sleep\0' + '10\0', `${label}: the dropped child did not survive its host`);
   } finally {
     // Clean up only the exact child created by this fixture, including when
     // the old host stays alive and the external deadline stops its parent.

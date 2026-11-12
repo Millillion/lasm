@@ -8,7 +8,11 @@ The proof check behind `npm run proofs`:
   the axiom `sorryAx`, a `native_decide` as `Lean.ofReduceBool`;
 - every definition of Folio that `Folio.render` and `Folio.Site.build` use
   is total: none is `partial`, `unsafe` or opaque, so Lean has checked that
-  each terminates on every input.
+  each terminates on every input. Where an `@[csimp]` theorem makes compiled
+  code run another definition in place of one of them (the stack-safe
+  versions of the tree walks, issue #231), that definition counts as used
+  too, and the theorem must use only the standard axioms: the program runs
+  what the proofs talk about.
 
 It writes what it checked (each proposition, its doc comment, its theorem's
 axioms, and the counts) as JSON to the file named by `FOLIO_PROOFS_JSON`,
@@ -19,11 +23,14 @@ import Proofs
 open Lean Elab Command
 
 /-- The definitions of Folio (names under `Folio`) that `roots` use, directly
-or through each other. -/
-def folioClosure (env : Environment) (roots : List Name) : Array Name := Id.run do
+or through each other, or that an `@[csimp]` theorem runs in place of one of
+them; and those theorems. -/
+def folioClosure (env : Environment) (roots : List Name) : Array Name × Array Name := Id.run do
+  let csimp := (Compiler.CSimp.ext.getState env).map
   let mut seen : NameSet := {}
   let mut todo := roots
   let mut out := #[]
+  let mut thms := #[]
   for _ in [0:100000] do
     match todo with
     | [] => break
@@ -33,9 +40,12 @@ def folioClosure (env : Environment) (roots : List Name) : Array Name := Id.run 
       seen := seen.insert n
       let some info := env.find? n | continue
       out := out.push n
+      if let some e := csimp.find? n then
+        thms := thms.push e.thmName
+        if !seen.contains e.toDeclName then todo := e.toDeclName :: todo
       for m in info.getUsedConstantsAsSet do
         if (`Folio).isPrefixOf m && !seen.contains m then todo := m :: todo
-  return out
+  return (out, thms)
 
 elab "#check_folio_proofs" : command => do
   let env ← getEnv
@@ -67,7 +77,10 @@ elab "#check_folio_proofs" : command => do
           props := props.push (Json.mkObj [("name", toString short), ("doc", doc.trimAscii.toString), ("line", line),
             ("theorem", toString thm), ("axioms", Json.arr (axioms.map (Json.str ∘ toString)))])
   -- Totality: no partial, unsafe or opaque definition behind the program.
-  let closure := folioClosure env [``Folio.render, ``Folio.Site.build]
+  let (closure, csimps) := folioClosure env [``Folio.render, ``Folio.Site.build]
+  for thm in csimps do
+    for a in ← liftCoreM (collectAxioms thm) do
+      unless allowed.contains a do throwError "{thm} (@[csimp]) depends on {a}"
   for n in closure do
     match env.find? n with
     | some (.defnInfo d) =>
@@ -76,10 +89,10 @@ elab "#check_folio_proofs" : command => do
     | some info => if info.isUnsafe then throwError "{n} is unsafe"
     | none => pure ()
   let json := Json.mkObj [("propositions", Json.arr props), ("theorems", theorems.size),
-    ("totalDefinitions", closure.size),
+    ("totalDefinitions", closure.size), ("csimp", Json.arr ((csimps.qsort (·.toString < ·.toString)).map (Json.str ∘ toString))),
     ("theoremNames", Json.arr ((theorems.qsort (·.toString < ·.toString)).map (Json.str ∘ toString)))]
   if let some path ← (IO.getEnv "FOLIO_PROOFS_JSON" : IO _) then
     IO.FS.writeFile path json.pretty
-  logInfo m!"{props.size} propositions, each proved by its theorem; {theorems.size} theorems in Proofs/, all using only propext, Classical.choice and Quot.sound; {closure.size} definitions behind render and Site.build, none partial, unsafe or opaque."
+  logInfo m!"{props.size} propositions, each proved by its theorem; {theorems.size} theorems in Proofs/, all using only propext, Classical.choice and Quot.sound; {closure.size} definitions behind render and Site.build, none partial, unsafe or opaque; {csimps.size} of them run in place of others by @[csimp] theorems ({", ".intercalate (csimps.toList.map toString)}), each using only the standard axioms."
 
 #check_folio_proofs
