@@ -14,6 +14,7 @@ reference and generates the candidates list of library/PROOFS.md from this
 file.
 -/
 import Lasm.UI.Proofs.Basic
+import Lasm.UI.Proofs.Decode
 import Lasm.UI.Url
 
 namespace Lasm.UI.Candidates
@@ -53,5 +54,17 @@ Tested by: test/ui/DiffModel.lean -/
 def segments_round_trip : Prop :=
   ∀ segs : List String, (∀ s ∈ segs, s ≠ "") →
     Url.segments { path := String.join (segs.map fun s => "/" ++ Url.percentEncode s) } = segs
+
+/-! ## The patch stream -/
+
+/-- **An interned name or value is the table's or spelled in the frame.**
+Reading an interned string (an attribute name or value, an event, a tag)
+gives a string already in the table or one whose UTF-8 bytes are among the
+bytes read, and the table grows by at most that string: a reference past the
+table is a malformed frame, never a made-up name such as `undefined`.
+Tested by: test/fuzz/targets/ui-patch.mjs -/
+def interned_from_table_or_bytes : Prop :=
+  ∀ (table : List String) (bs : Decode.Bytes), ∀ x ∈ Decode.intern table bs,
+    (x.1 ∈ table ∨ x.1.toUTF8.data.toList <:+: bs) ∧ (x.2.1 = table ∨ x.2.1 = table ++ [x.1])
 
 end Lasm.UI.Candidates

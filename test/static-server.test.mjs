@@ -143,7 +143,10 @@ test('static server: paths outside the root are refused; directories, fallback a
   } finally { await empty.close(); rmSync(parent, { recursive: true, force: true }); }
 });
 
-// ∀ segments, the file served for a request path is under the root, or the answer is 403/404.
+// Proposition: Lasm.Cli.Candidates.static_inside_root
+//   ∀ root path : String,
+//     (staticServe root path).1 ∈ [200, 403, 404] ∧
+//     ∀ f, (staticServe root path).2 = some f → f.startsWith (root ++ "/")
 test('static server: no request path reaches a file outside the root', async () => {
   const { parent, root } = site();
   const server = await startStaticServer(root, { fallback: null });

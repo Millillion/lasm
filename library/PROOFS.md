@@ -224,12 +224,14 @@ that a test checks on generated inputs: the test cites it with a
 Proving one means moving it to `Spec.lean` and adding its theorem.
 `node scripts/propositions.mjs` (a unit test) checks that every cited
 proposition exists with the statement cited, that every candidate's test
-exists and cites it, and that this list is current.
+exists and cites it, and that this list is current. The propositions about
+the CLI's JavaScript (`Lasm.Cli`) are listed in
+[verification/cli/README.md](../verification/cli/README.md).
 
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**10 candidates**, each a `def … : Prop` in its library's `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+**12 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
 ### Lasm.Fetch (2)
 
@@ -247,14 +249,21 @@ exists and cites it, and that this list is current.
 | [`error_round_trip`](Lasm/RPC/Candidates.lean#L39) | **A validation error reaches the client as itself.** The server's 400 answer for a validation message `m` is read by the client as `Error.invalid m`, with the same message, and any other status as `Error.failed` with that status and message. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
 | [`json_print_normal_form`](Lasm/RPC/Candidates.lean#L47) | **Printed JSON is a normal form.** Whatever JSON `parseJson` accepts, its printed form parses again and prints the same. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
 
-### Lasm.UI (4)
+### Lasm.Serverless (1)
 
 | Candidate | In plain English | Tested by |
 | --- | --- | --- |
-| [`diff_unchanged_empty`](Lasm/UI/Candidates.lean#L28) | **An unchanged view produces an empty patch.** For any well-formed rendered tree, diffing it against the view it already shows emits no operation at all: a frame whose view did not change touches no DOM node. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
-| [`keyed_reorder_only_moves`](Lasm/UI/Candidates.lean#L36) | **Keyed reorders only move.** When every old child is keyed, with distinct keys, and the new children are a permutation of the old ones, the patch inserts, removes and clears nothing: every node is kept and only moved. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
-| [`percent_round_trip`](Lasm/UI/Candidates.lean#L46) | **Percent-encoding round-trips.** Decoding what `percentEncode` writes gives back the text, for every string (any Unicode, `%` and `+` included). | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
-| [`segments_round_trip`](Lasm/UI/Candidates.lean#L53) | **Encoded segments come back as the segments.** A path built from non-empty segments, each percent-encoded, reads back (`Url.segments`) as exactly those segments: a route matches the values a link was built from. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+| [`join_cookies_once`](Lasm/Serverless/Candidates.lean#L23) | **`joinCookies` leaves at most one Cookie field and the others in order.** Whatever Cookie fields a request has, at most one remains, and the fields other than Cookie are exactly the request's, in their order. | [test/serverless-shims.test.mjs](../test/serverless-shims.test.mjs) |
+
+### Lasm.UI (5)
+
+| Candidate | In plain English | Tested by |
+| --- | --- | --- |
+| [`diff_unchanged_empty`](Lasm/UI/Candidates.lean#L29) | **An unchanged view produces an empty patch.** For any well-formed rendered tree, diffing it against the view it already shows emits no operation at all: a frame whose view did not change touches no DOM node. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+| [`keyed_reorder_only_moves`](Lasm/UI/Candidates.lean#L37) | **Keyed reorders only move.** When every old child is keyed, with distinct keys, and the new children are a permutation of the old ones, the patch inserts, removes and clears nothing: every node is kept and only moved. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+| [`percent_round_trip`](Lasm/UI/Candidates.lean#L47) | **Percent-encoding round-trips.** Decoding what `percentEncode` writes gives back the text, for every string (any Unicode, `%` and `+` included). | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+| [`segments_round_trip`](Lasm/UI/Candidates.lean#L54) | **Encoded segments come back as the segments.** A path built from non-empty segments, each percent-encoded, reads back (`Url.segments`) as exactly those segments: a route matches the values a link was built from. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+| [`interned_from_table_or_bytes`](Lasm/UI/Candidates.lean#L66) | **An interned name or value is the table's or spelled in the frame.** Reading an interned string (an attribute name or value, an event, a tag) gives a string already in the table or one whose UTF-8 bytes are among the bytes read, and the table grows by at most that string: a reference past the table is a malformed frame, never a made-up name such as `undefined`. | [test/fuzz/targets/ui-patch.mjs](../test/fuzz/targets/ui-patch.mjs) |
 <!-- END CANDIDATES -->
 
 ### Tested, not yet stated in Lean

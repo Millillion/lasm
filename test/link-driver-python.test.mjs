@@ -19,7 +19,9 @@ test('json.dumps string escaping with ensure_ascii', () => {
 });
 
 const unicode = ['a', 'Z', ' ', '~', '"', '\\', '\n', '\r', '\t', '\b', '\f', '\x00', '\x1f', '\x7f', 'é', ' ', '￿', '😀', '𝔸'];
-// ∀ s, JSON.parse (pythonJsonString s) = s ∧ ∀ c ∈ pythonJsonString s, ' ' ≤ c ≤ '~'
+// Proposition: Lasm.Cli.Candidates.json_string_ascii
+//   ∀ s : String, Lean.Json.parse (pythonJsonString s) = .ok (.str s) ∧
+//     (pythonJsonString s).all fun c => ' ' ≤ c && c ≤ '~'
 test('escaped strings are printable ASCII JSON that decodes to the input', () => {
   forAll(g => g.string(unicode, 0, 16), s => {
     const encoded = pythonJsonString(s);
@@ -58,7 +60,10 @@ const jsonValue = (g, depth = 0) => {
   if (kind === 4) return g.array(g.int(0, 3), () => jsonValue(g, depth + 1));
   return Object.fromEntries(g.array(g.int(0, 3), () => [g.string(unicode, 0, 4), jsonValue(g, depth + 1)]));
 };
-// ∀ v, JSON.parse (pythonJsonDumps v {indent, sortKeys}) = v
+// Proposition: Lasm.Cli.Candidates.json_dumps_parse_back
+//   ∀ (v : Lean.Json) (indent : Option Nat) (sortKeys : Bool) (text : String),
+//     pythonJsonDumps v indent sortKeys = .ok text →
+//       ((Lean.Json.parse text).toOption.any (· == v)) = true ∧ (indent = none → '\n' ∉ text.toList)
 test('every layout is JSON for the same value', () => {
   forAll(g => ({ value: jsonValue(g), indent: g.pick([null, 0, 1, 2, 4]), sortKeys: g.next() < 0.5 }), ({ value, indent, sortKeys }) => {
     const text = pythonJsonDumps(value, { indent, sortKeys });
@@ -79,7 +84,8 @@ test('strings sort by code point, as Python sorts str', () => {
   const input = ['b', 'a']; pythonSorted(input); assert.deepEqual(input, ['b', 'a'], 'sorted() does not change its argument');
 });
 
-// ∀ a b, sign (comparePythonStrings a b) = sign (compare (codePoints a) (codePoints b))
+// Proposition: Lasm.Cli.Candidates.python_order_code_points
+//   ∀ a b : String, (comparePythonStrings a b).sign = if a < b then -1 else if a = b then 0 else 1
 test('the order is the lexicographic order of code points', () => {
   const lexicographic = (a, b) => {
     const x = [...a].map(c => c.codePointAt(0)), y = [...b].map(c => c.codePointAt(0));

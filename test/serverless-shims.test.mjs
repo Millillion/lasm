@@ -447,7 +447,10 @@ test('property: requestTarget leaves a valid target unchanged', async () => {
     ({ p, q }) => assert.equal(requestTarget(p, q), (p === '' ? '/' : p) + (q === '' ? '' : '?' + q)));
 });
 
-// ∀ headers, (joinCookies headers).filter isCookie has length ≤ 1 ∧ non-cookie fields keep their order
+// Proposition: Lasm.Serverless.Candidates.join_cookies_once
+//   ∀ hs : Headers,
+//     ((joinCookies hs).filter (isCookie ·.1)).length ≤ 1 ∧
+//     (joinCookies hs).filter (!isCookie ·.1) = hs.filter (!isCookie ·.1)
 test('property: joinCookies leaves at most one Cookie field and every other field in order', async () => {
   const { joinCookies } = await import(shim('lasm-function.mjs'));
   const names = ['cookie', 'Cookie', 'x', 'host', 'accept'];
