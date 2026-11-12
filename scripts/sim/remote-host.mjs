@@ -83,10 +83,11 @@ async function runBrowser() {
   const server = createServer((req, res) => {
     const path = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/^([/\\])+/, '');
     if (path.startsWith('..')) { res.writeHead(403).end(); return; }
-    try {
-      const file = path || 'index.html';
-      res.writeHead(200, { 'content-type': types[extname(file)] ?? 'application/octet-stream' }).end(readFileSync(join(root, file)));
-    } catch { res.writeHead(404).end(); }
+    const file = path || 'index.html';
+    let body;
+    // read first: a missing file (Firefox asks for /favicon.ico) is a 404, not a second writeHead
+    try { body = readFileSync(join(root, file)); } catch { res.writeHead(404).end(); return; }
+    res.writeHead(200, { 'content-type': types[extname(file)] ?? 'application/octet-stream' }).end(body);
   });
   await new Promise(r => server.listen(0, '127.0.0.1', r));
   const browser = await playwright[target].launch({ headless: true });
