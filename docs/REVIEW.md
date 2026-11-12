@@ -333,6 +333,24 @@ does was written inside each app, as the rule says (no new public API):
   Conduit's PostgREST store takes a `send` function: `Lasm.JS.Web.fetch` on
   Supabase, `wasi:http/outgoing-handler` on wasi-http (`WasiHttpServe.fetch`).
 
+### Porter moved off `Lasm.Fetch` (2026-11-12; what had no replacement)
+
+Porter serves with Cloudflare Workers' default export
+(`Lasm.JS.exportDefault`), `Deno.serve` and `Bun.serve`, and on Node (and
+the Node function platforms and Docker) still with `Lasm.Fetch.serveNode`,
+in `Server/NodeServe.lean`, its only `Lasm.Fetch` import. What had no
+replacement is in `examples/porter/Server/`, copied from Conduit (the same
+code, under Porter's namespace): `Web.lean` (the request type, WHATWG path
+parsing with `segments_no_dot_segments`, HEAD as GET, 500 on a throw),
+`Assets.lean` and `Embed.lean` (the embedded sign-in pages), `JsServe.lean`
+(the Worker's `env` for D1 and the variables). One piece Conduit does not
+need was added to Porter's `Web.respond`: **cookie joining**
+(`joinCookies`, `splitCookieCommas`, from `Lasm.Fetch.respond`), since
+Porter reads its session from one `Cookie` header and the web `Headers`
+class joins repeated `Cookie` fields with `, `. The apps now carry the same
+~500 lines of HTTP glue each (Conduit, Folio, Porter, Ledger); a shared answer
+(a library, or the `Node.serve` work) is yours to decide when `Lasm.Fetch`
+is deleted.
 ### Ledger moved off `Lasm.Fetch` (2026-11-12; what had no replacement)
 
 Ledger serves with Cloudflare Workers' default export

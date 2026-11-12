@@ -13,8 +13,10 @@ name = "Porter"
 [[lean_lib]]
 name = "Proofs"
 
-# The server's modules (Lasm.Fetch, Lasm.JS): the SQL layer, Web Crypto, the
-# configuration, the HTTP glue, and one SQLite binding module per target.
+# The server's modules (Lasm.JS; Lasm.Fetch only for Node's server): the SQL
+# layer, Web Crypto, the configuration, the HTTP glue (requests, responses,
+# embedded files, each platform's server), and one SQLite binding module per
+# target.
 # ServerNode.lean is the program: lasm builds it (npm run build); it is not
 # a Lake target.
 [[lean_lib]]
