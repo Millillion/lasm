@@ -1187,10 +1187,14 @@ then proved of the model and moves to `verification/cli/Lasm/Cli/Spec.lean`
 with its theorem in `Theorems.lean`, checked by `scripts/library-proofs.mjs`
 like the library's, and its test cites `Lasm.Cli.Spec.…`. Since 2026-11-11:
 `numbers` (src/node-host.mjs), `changedFiles` (src/dev.mjs),
-`responseFile` (src/platform.mjs), and `replaceCoreModule` and
-`withoutComponentType` (src/wasi/wasi-component.mjs), with `numbers_le64`,
+`responseFile` (src/platform.mjs), `replaceCoreModule` and
+`withoutComponentType` (src/wasi/wasi-component.mjs), and
+`initializationSchedule` and `compactInitializerWrappers`
+(src/edge/edge-initializers.mjs), with `numbers_le64`,
 `changed_files_exact`, `response_file_round_trip`,
-`replace_one_core_module` and `drops_only_component_type` proved. The
+`replace_one_core_module`, `drops_only_component_type` and
+`schedule_reached_kept_first` (the depth-first walk is correct on acyclic
+call graphs) proved. The
 differential of `replaceCoreModule` found its first bug: a section whose size
 was a padded LEB128 was spliced at the wrong offset. The fuzz
 targets `serverless-http`, `lasm-js-wire` and `ui-decode` are the model
@@ -1275,6 +1279,19 @@ at L1: the browser has no differential tests yet (a ROADMAP item). Node was one
 requirement short of L3: the Porter nightly fuzzer had found a failing request.
 No platform but Node has fuzzing or simulation in CI yet, so no other platform
 can reach L3.
+
+On 2026-11-12 Cloudflare Workers and the browser joined Node at L3. Their L3
+requirements are an outside oracle (Conduit's RealWorld API suite and its own
+browser tests on Workers; Conduit's browser tests of the browser build in
+Chromium, Firefox and WebKit), fuzzing on the platform itself (Folio's
+20-minute campaigns `fuzz-workers` and `fuzz-chromium`/`-firefox`/`-webkit` in
+`folio-nightly.yml`; Porter's 40-minute endpoint fuzzing of the Workers build in
+`porter-nightly.yml`) and simulation on the platform itself (Ledger's
+deterministic simulation with its server code built for Workers or the
+browser, every seed's result and trace digest checked against Node's, in
+`dst-nightly.yml`). The Folio campaigns could only pass once Folio's tree walks
+stopped recursing once per level of nesting (#231): the edge and browser
+engines allow just under 10,000 stack frames.
 
 ## The test-evidence page
 
