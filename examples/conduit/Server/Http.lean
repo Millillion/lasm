@@ -1,12 +1,13 @@
 /-
 HTTP: `Conduit.Api.handle` (pure Lean, written against `Store` and
-`Services`) and the server-rendered pages, served with `Lasm.Fetch`. No
-JavaScript here: every target uses it, with the store and the services its
-entry file gives (Web Crypto in `Server/App.lean`; pure Lean in
-`Server/LeanCrypto.lean` for Fastly and wasi-http).
+`Services`) and the server-rendered pages, as one handler (`Server/Web.lean`)
+that each platform's server runs (`Server/JsServe.lean`, `Server/NodeServe.lean`,
+`Server/FastlyServe.lean`, `Server/WasiHttpServe.lean`). No JavaScript here:
+every target uses it, with the store and the services its entry file gives
+(Web Crypto in `Server/App.lean`; pure Lean in `Server/LeanCrypto.lean` for
+Fastly and wasi-http).
 -/
-import Lasm.Fetch
-import Lasm.Fetch.Assets
+import Server.Assets
 import Std.Async.Basic
 import Std.Sync.Semaphore
 import Conduit.Api
@@ -26,20 +27,20 @@ def cors : Array (String × String) := #[
   ("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS")]
 
 /-- `/api/…`: the RealWorld API. -/
-def api (store : Store Async) (services : Services Async) (req : Lasm.Fetch.Request) (path : List String) :
-    Async Lasm.Fetch.Response := do
+def api (store : Store Async) (services : Services Async) (req : Web.Request) (path : List String) :
+    Async Web.Response := do
   if req.method == "OPTIONS" then return { status := 204, headers := cors }
   let r : Request := { method := if req.method == "HEAD" then "GET" else req.method, path,
                        query := req.queryParams, authorization := req.header? "authorization", body := req.text }
   let reply ← Api.handle store services r
-  let response : Lasm.Fetch.Response := match reply.body with
+  let response : Web.Response := match reply.body with
     | some j => .json j.compress reply.status.toUInt16
     | none => .empty reply.status.toUInt16
   return { response with headers := response.headers ++ cors }
 
 /-- The whole site: the API under `/api`, and every other URL's page,
 server-rendered (the browser app's files are served before this). -/
-def site (store : Store Async) (services : Services Async) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
+def site (store : Store Async) (services : Services Async) (req : Web.Request) : Async Web.Response := do
   match req.segments with
   | "api" :: path => api store services req path
   | _ =>
@@ -89,18 +90,18 @@ def Isolation.write {α : Type} (iso : Isolation) (act : Async α) : Async α :=
   try act finally iso.room.release
 
 /-- Whether a request may write. -/
-def mayWrite (req : Lasm.Fetch.Request) : Bool :=
+def mayWrite (req : Web.Request) : Bool :=
   !(req.method == "GET" || req.method == "HEAD" || req.method == "OPTIONS")
 
-/-- Serves Conduit on a store with services, and the browser app's files
-(`assets`: `embed_dir! "dist/public"` in the entry file). `isolate`: run
-writes alone in this process (`Isolation`); off where one request may not
-wait on another's promise (Cloudflare Workers cancels it) or where every
-request has its own instance. -/
-def serveWith (store : Store Async) (services : Services Async) (assets : Lasm.Fetch.Assets)
-    (isolate := false) : IO Unit := do
+/-- Conduit on a store with services, and the browser app's files
+(`assets`: `embed_dir! "dist/public"` in the entry file), as the handler the
+platform's server runs. `isolate`: run writes alone in this process
+(`Isolation`); off where one request may not wait on another's promise
+(Cloudflare Workers cancels it) or where every request has its own instance. -/
+def handlerWith (store : Store Async) (services : Services Async) (assets : Web.Assets)
+    (isolate := false) : IO Web.Handler := do
   let iso ← if isolate then some <$> Isolation.new else pure none
-  Lasm.Fetch.serve (assets.wrap fun req =>
+  return (assets.wrap fun req =>
     match iso with
     | none => site store services req
     | some iso => if mayWrite req then iso.write (site store services req) else iso.read (site store services req))

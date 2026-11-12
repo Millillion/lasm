@@ -7,14 +7,19 @@
 # keeps running and holds /var/lib/apt/lists/lock, which DPkg::Lock::Timeout
 # does not cover (#129). So before the next attempt the leftover apt-get is
 # stopped, its stale lists lock removed, and an interrupted dpkg finished.
-# The browser download itself is retried up to three times.
+# The browser download itself is retried up to three times. --deps-only
+# installs only the system packages and --no-deps only the browser: the
+# playwright action runs the first through .github/actions/apt-cache, which
+# installs cached .deb files instead when it has them.
 # Every attempt is bounded by what remains of one overall budget
 # (PLAYWRIGHT_INSTALL_BUDGET seconds, default 1500 = 25 min), which fits
 # inside the workflows' 30-minute step timeout with room for the step's other
 # downloads: the script fails with a clear
 # message instead of the step being killed mid-attempt.
-#   bash scripts/ci/playwright-install.sh BROWSER
+#   bash scripts/ci/playwright-install.sh [--deps-only | --no-deps] BROWSER
 set -euo pipefail
+mode=all
+case "$1" in --deps-only) mode=deps; shift ;; --no-deps) mode=browser; shift ;; esac
 browser="$1"
 cli=.work/pw/node_modules/playwright-core/cli.js
 budget="${PLAYWRIGHT_INSTALL_BUDGET:-1500}"
@@ -32,7 +37,7 @@ apt_cleanup() {
   sudo dpkg --configure -a || true
 }
 out_of_time() { echo "::error::Playwright install of $browser ran out of its ${budget}s budget ($1)"; exit 1; }
-if [ "$(uname -s)" = Linux ]; then
+if [ "$(uname -s)" = Linux ] && [ "$mode" != browser ]; then
   printf 'Acquire::Retries "5";\nAcquire::http::Timeout "60";\nAcquire::https::Timeout "60";\nDPkg::Lock::Timeout "900";\n' | sudo tee /etc/apt/apt.conf.d/80-lasm-retries >/dev/null
   for attempt in 1 2; do
     # Leave at least 5 minutes of the budget for the browser download.
@@ -44,6 +49,7 @@ if [ "$(uname -s)" = Linux ]; then
     sleep 15
   done
 fi
+[ "$mode" = deps ] && exit 0
 for attempt in 1 2 3; do
   s=$(slot 420); [ "$s" -gt 30 ] || out_of_time "browser download"
   if bound "$s" node "$cli" install "$browser"; then exit 0; fi

@@ -40,7 +40,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | [Dependable tooling](#dependable-tooling) | Every user-triggerable error prints a clear message (error corpus); incremental, repeated, renamed and touched builds give the clean build's bytes (metamorphic); killed, offline, full-disk, read-only and corrupted runs end in success or a clear error (fault injection) | `scripts/tooling/`, `tooling.yml` | PR (corpus), nightly (all) |
 | [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage: the CLI's arguments, the function platforms' HTTP mapping, the Lasm.UI patch decoder, Lasm.Fetch's request parsing, Lasm.RPC's decoding, the WASI C host's CGI request | `test/fuzz/`, `fuzz.yml` | PR (replay), nightly, weekly |
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
-| [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
+| [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `examples/*/test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
 | [Named propositions](#named-propositions) | Every test that names a Lean proposition names one that exists and states it verbatim; every candidate (tested, not yet proved) names a test that cites it; every `forAll` property names one | `scripts/propositions.mjs`, `library/Lasm/*/Candidates.lean`, `verification/cli/`, `test/propositions.test.mjs` | PR (`unit.yml`) |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (`unit.yml`), nightly, release |
@@ -119,6 +119,7 @@ seed derived from the commit, on the base targets, the cheap extra oracles
 target (also `wasi-O0`, `deno-O0`, `bun-O0`, `browser-firefox` and
 `browser-webkit`). A divergence fails the job and the reproducers are in the run's
 artifact; upstream suspects are listed in the job summary and never fail it.
+Campaigns are [coverage-guided](#coverage-feedback).
 Known divergences (an open issue or a documented host limit) are listed in
 `KNOWN` in `run.mjs`, applied before the comparison and counted in the summary.
 
@@ -226,16 +227,21 @@ case, then `def cN : IO Unit` printing one line per check. Families:
 
 | Family | What it declares and checks |
 | --- | --- |
-| `ext` | expressions over the core types plus the extension types: `Int8`–`Int64` (overflow, `INT_MIN / -1`, shifts past the width, conversions), `Float32` (IEEE-exact operations and its bits), `ByteArray` (UTF-8 validation of arbitrary bytes, `hash`), `Std.HashSet`, `Std.TreeMap`; with a 35 % chance, operations that panic (`xs[i]!`, `get!`, `head!`, `back!`, `toNat!`), whose message goes to stderr before the default value is used |
+| `ext` | expressions over the core types plus the extension types: `Int8`–`Int64` (overflow, `INT_MIN / -1`, shifts past the width, conversions), `Float32` (IEEE-exact operations and its bits), `ByteArray` (UTF-8 validation of arbitrary bytes, `hash`), `Std.HashSet`, `Std.TreeMap`, `FloatArray` (push, `set!`, `get?`, `foldl`, `for`, its doubles' bits, mapped through `data`), `Thunk Nat` (`Thunk.pure`, `Thunk.mk`, `map`, `bind`, forced once or twice); with a 35 % chance, operations that panic (`xs[i]!`, `get!`, `head!`, `back!`, `toNat!`), whose message goes to stderr before the default value is used |
 | `class` | a class with a default field and a default method; instances for random types whose operation is a random expression over its two arguments; instances derived for products and `Option`; polymorphic functions over the class (`mconcat`, `pow`, `combine3`, an `==` check) |
 | `adt` | an expression language (`lit`, `var`, `add`, `mul`, `neg`, `ite`, de Bruijn `letE`, deriving `Repr`, `BEq`, `Hashable`), an evaluator with an environment, and a simplifier whose alternatives are a random subset of 13 nested, overlapping rules over `Int` literals plus random congruence rules; random terms with bignum literals |
 | `closure` | functions of arity 1 to 18 applied fully and partially (each partial application forced through the `@[noinline]` identity `bb`, then applied in random chunks of 1 to 6 arguments), closures capturing values, arrays of closures folded, composition, functions returning closures |
 | `loop` | self tail recursion up to 200,000 iterations, `Nat.fold`, mutual recursion (at most 500 frames), `partial def` with fuel, well-founded recursion (`termination_by`/`decreasing_by`: a binary search up to 2¹²⁸), `while` with `continue` and `break` in `Id.run` |
 | `struct` | a structure with default fields and one that `extends` it, deriving `Repr`, `BEq`, `Hashable`, `Ord`: values with defaults left out, `compare`, sorting, `with` updates, the parent projection |
 | `exc` | `ExceptT` with a custom error inductive over `StateT Nat IO`: conditional `throw`, `try`/`catch` with a `match` on the error, `try`/`finally`, `for` with `break`, early `return`, an `IO.Ref` |
+| `lazy` | `Thunk` of random types: built with `Thunk.mk` around `dbgTrace` (on stderr, so the output shows how often each body runs) and forced twice, forced only under a random condition, `Thunk.map` and `Thunk.bind` forced around their source, arrays of thunks forced by random (repeated, out-of-range) indices, a top-level thunk (a closed term, built at initialization), a `@[noinline]` function returning a thunk over its argument |
+| `st` | `runST` and `runEST` (`EST String σ`): an `ST.Ref` accumulator of a fixed-width or bignum type (reduced modulo a prime) and an `ST.Ref (Array Nat)` buffer, `modify`, `modifyGet`, `swap`, a helper generic in the monad (`[MonadLiftT (ST σ) m]`, called from both), nested `for` loops of at most 12 iterations with `break`, and in `EST` conditional `throw` and `try`/`catch` |
+| `wide` | a structure of 8 to 40 fields drawn from 17 types, scalars (`UInt8`–`UInt64`, `Int8`–`Int64`, `Float`, `Float32`, `Bool`, `Char`) mixed with boxed ones (`Nat`, `Int`, `String`, `List Nat`, `Option Nat`), so the constructor's scalar area holds fields of every size; deriving `Repr`, `BEq`, and `Hashable` and `Ord` when no field is a float; values with defaults left out, `with` updates of up to four fields, projections, structure-instance patterns (`{ f3 := y0, .. }`), the constructor applied fully and partially (forced through `bb`, then the rest of its up to 40 arguments: `lean_apply_m`), a closure that updates one field from its old value |
 
 Holes are expressions from the core generator's operation table (with the
 extension operations enabled), drawn so that they use the variables in scope.
+Expressions inside the `st` family's loops are cheap (no bignum towers, floats
+or panics), as in the `loop` family.
 Everything terminates by construction (bounded counts, fuel, measures that Lean
 checks) and needs no file system, sleep or environment, so a feature program
 runs on **every** target, the browsers and the `-O0` edge builds included (no
@@ -269,17 +275,18 @@ programs (the PR tier's fixed set). `--cases 0 --fs-cases 0 --feat-cases 200` ru
 | Tier | Feature programs |
 | --- | --- |
 | PR and push to `main` | the fixed seeds of `DIFF_FEATURE_SEEDS_PR` (1 and 2), 80 cases each, on the PR targets |
-| Nightly | one per fresh seed of the 60-minute campaigns (release and dev profile), every target |
-| Weekly | one per fresh seed of the 100-minute campaigns (`ci-weekly.yml`), every target |
+| Nightly | one per fresh seed of the 60-minute campaigns (release and dev profile), every target; the campaigns are [coverage-guided](#coverage-feedback) |
+| Weekly | one per fresh seed of the 100-minute campaigns (`ci-weekly.yml`), every target, coverage-guided |
 
 The job summary counts programs and cases per kind (`core`, `fs`, `feat`, …)
 and the throughput.
 
 **What it cannot catch:** the same blind spots as differential testing, less the
 ones it covers (type classes, inductives and pattern matching, closures,
-loops): still no `Std.Http`, sockets, processes, `Std.Time`,
-universe-polymorphic code, libm results of `Float32`, or concurrency (tasks stay
-in the core generator).
+loops, thunks, `ST`, `FloatArray`, structures of up to 40 fields): still no
+`Std.Http`, sockets, processes, `Std.Time`, universe-polymorphic code, libm
+results of `Float32`, or concurrency (tasks stay in the core generator; no
+thunk is forced from two tasks).
 
 **First campaigns** (2026-11-09, PR #167; release and dev profiles, all 16
 targets of `DIFF_TARGETS_FULL`, upstream Lean 4.35.0 as the oracle):
@@ -293,6 +300,9 @@ targets of `DIFF_TARGETS_FULL`, upstream Lean 4.35.0 as the oracle):
 | 42646321682, feature only, release | 13 | 2,600 | 60.7 min | 0.21 programs per minute, 0.71 cases per second (11.4 case-target comparisons per second) | no divergence |
 | 42646328709, feature only, dev | 17 | 3,400 | 60 min | 0.28 programs per minute, 0.94 cases per second | no divergence |
 
+| 43117871350, mixed, release, guided (#227: `lazy`, `st`, `wide`, `FloatArray`, `Thunk Nat`) | 30 (6 feature) | 3,330 (480 feature) | 40 min | 0.71 programs per minute | no divergence, no harness error; 11,062 runtime-C and glue features, corpus 387 (201 of the new families, 66 from feature mutants) |
+| 43117883485, feature only, release, guided from the previous state | 11 | 2,200 | 40 min | 0.26 programs per minute | no divergence, no harness error; 22,985 features, 17,586 new |
+
 In all, 12,080 feature cases on 16 targets (about 190,000 case runs) and the
 PR tier's 160. The interpreter differed from native Lean only where compiled
 code evaluates a panicking closed term at initialization (before the first
@@ -302,6 +312,106 @@ without what native Lean printed before the first case. Each generator fix is
 in `features.mjs` with the run that found it. A native run that takes a tenth
 of the run timeout is now a generator error naming its last case, not a
 divergence of every target.
+
+### Coverage feedback
+
+**Property.** The same as [differential testing](#differential-testing); this
+changes which programs are generated, not what is compared.
+
+**Why.** Blind generation draws every case from the same distribution, so a
+campaign keeps reaching the runtime functions and library code it reached the
+night before. Coverage feedback keeps the cases that reached something no
+earlier case did and spends part of each later program on variations of them.
+
+**What is measured** ([`scripts/differential/coverage.mjs`](../scripts/differential/coverage.mjs)),
+with no extra build and no extra run:
+
+- **Runtime C**, per case: the C that native Lean emits for the program
+  (`lean -c`, the oracle's own first step) is read as a call graph, from each
+  case's definition (`l_cN`) through the program's own functions, closed terms
+  and their initializers. Its features are the runtime functions and library
+  declarations it reaches (`c:lean_nat_big_add`, `c:l_Nat_reprFast`), each
+  library function the compiler specialized for it (`spec:l_List_foldl`) and
+  each call edge from the program's code into them (`e:l_List_foldl>lean_nat_add`:
+  from a specialization, the case itself or a preamble definition). This is the
+  code Lasm compiles into Wasm for that case. It is static reach: a branch the
+  case never takes still counts.
+- **Lasm glue**, per program: the node target's run has `NODE_V8_COVERAGE` set
+  (the output is unchanged), and every function of `dist/main.mjs`,
+  `program.cjs` and the host modules that ran is a feature, named by a hash of
+  its source text, plus each block V8 lists inside it, taken or skipped (a
+  branch direction). Glue features are counted, but a program's glue cannot be
+  attributed to one of its cases, so they do not admit cases to the corpus.
+
+**Corpus and mutation.** With `--guided 1` the harness records each core,
+file-system and feature program's features. A case that adds a runtime-C
+feature that no earlier case had joins the corpus (the mutable kinds:
+expression, state, IO, task and deep cases, and the feature families whose
+checks are independent of each other, `ext`, `lazy`, `st` and `wide`; at most
+400, the smallest gain dropped first).
+Each later core program replaces its last quarter (`--mutant-share 0.25`) with
+mutants of corpus entries, picked with weight √(features the entry added). A
+mutant replaces one subexpression by a fresh closed one of the same type, drawn
+from the same operation table, never deeper than the tree was and without libm
+operations under an operation that needs exact arguments; or regenerates one
+statement, or changes a `deep` case's workload within the generator's bounds.
+A feature mutant keeps the case's declarations (a `wide` case's fields and
+values, an `ext` case's type and whether it may panic) and replaces one check
+by a fresh one its family draws, or (`ext`) one subexpression of a check by a
+fresh one from the extension operations, panicking ones only if the case
+allowed them; it runs among the core program's mutants, named `cN` like them.
+So every mutant is a program the generator's own bounds allow, and terminates
+for the same reasons. The program's variants (without `IO.sleep`, shallow) are
+made from the guided program. Mutants are drawn from `rng(seed, 'mutants')`, so
+a campaign replayed with the same starting state and seed makes the same
+programs; a divergence's reproducer is its own `Main.lean` and `case.json`
+(which names the corpus entry it came from, `mutantOf`).
+
+**From night to night.** `--coverage-state FILE` reads the features and corpus
+of earlier campaigns and writes them back. `differential.yml` keeps the file in
+the Actions cache per profile (`differential-coverage-<profile>-<run>`,
+restored by prefix), so each night starts where the last one stopped. A corpus
+written by a different generator (a hash of `generate.mjs` and `features.mjs`) is dropped; its features are kept.
+
+**What it reports.** The job log and summary print the night's features, the
+features no earlier campaign reached (and how many mutants found), the corpus
+size, and the growth of the last 14 campaigns:
+
+```
+coverage growth by campaign: 2026-11-11 +9171 (9171), 2026-11-11 +4518 (13689)
+coverage: 9383 features (8158 runtime C, 1225 glue), 4518 new (4518 runtime C, 0 glue; 503 from mutants, 4015 from generated cases), 13689 in all campaigns, corpus 400 cases, 266 mutants run
+```
+
+The [test-evidence page](#the-test-evidence-page) reads these lines from the
+nightly jobs, shows features and new features per job and the growth by
+campaign, and states them in exit bar item 8; `docs/evidence/test-evidence.json`
+records them every night.
+
+**Tiers.** Campaigns only (nightly, weekly, dispatched with a budget). Pull
+requests and pushes to `main` stay unguided: their programs follow from the
+commit's seed alone.
+
+**Measured.** Two consecutive 30-minute release-profile campaigns on every
+target, dispatched on the branch of #226 (35 programs and 3,885 cases each, no
+divergence, no harness error):
+
+| Run | Started from | Features reached | New | New by mutants | All campaigns | Corpus |
+| --- | --- | --- | --- | --- | --- | --- |
+| 43100578679 | nothing | 9,171 (7,945 runtime C, 1,226 glue) | 9,171 | 689 | 9,171 | 256 |
+| 43108070920 | the first's state, from the cache | 9,383 (8,158 runtime C, 1,225 glue) | 4,518 | 503 | 13,689 | 400 |
+
+The second night still found half as many runtime-C features again as the
+first, 11 % of them by the mutants (a quarter of its core cases). Glue
+saturates within one campaign: the node target's glue is the same for every
+program, and the second campaign found no new glue feature. In a local trial
+before (10 programs of 100 cases, native `lean -c` only), the guided loop
+reached 2,723 runtime-C features and the blind one 2,192.
+
+**What it cannot catch:** a path only one input value reaches (the features are
+the code a case can reach, not the values it computes); glue paths are measured
+per program, not per case; runtime C inside Lasm's own Wasm (the Emscripten
+libc, Lasm's patches) is not read from Lean's C, only through the glue it
+calls.
 
 ### Bun and browser targets
 
@@ -376,11 +486,11 @@ Node: equal statuses, equal response headers (apart from a documented list) and
 byte-equal bodies, once tokens and timestamps are normalized.
 
 `node test/api.mjs --equivalence` (in `examples/conduit`) puts a recording proxy
-([`test/equivalence.mjs`](../examples/conduit/test/equivalence.mjs)) between
+([`examples/conduit/test/equivalence.mjs`](../examples/conduit/test/equivalence.mjs)) between
 hurl and the server and fixes the suite's `UID_VAL`, so that on an empty store
 the names, slugs and ids are the same everywhere. `node test/equivalence.mjs
 compare NAME` then compares the normalized traffic with Node's, committed as
-[`test/equivalence/realworld.json`](../examples/conduit/test/equivalence/realworld.json).
+[`examples/conduit/test/equivalence/realworld.json`](../examples/conduit/test/equivalence/realworld.json).
 It aligns the two sequences by method and path (a hurl file stops at its first
 failed assertion, which must not shift every later comparison) and prints a
 line diff of each differing header block or pretty-printed body. Every Conduit
@@ -403,7 +513,7 @@ What is normalized, and why that is legitimate:
 
 Slugs, names and emails are **not** normalized: each run starts on an empty
 store with the same `UID_VAL`, so a different one is a real difference. Known differences, each with an open issue,
-go in [`test/equivalence/known.json`](../examples/conduit/test/equivalence/known.json)
+go in [`examples/conduit/test/equivalence/known.json`](../examples/conduit/test/equivalence/known.json)
 and are reported, not failed. `test/equivalence.mjs self-test` (in the
 `pinned` job) checks the normalizer and the diff on made-up traffic.
 
@@ -422,7 +532,7 @@ from the `api-node` job's artifact over the golden file.
 suite's traffic: a status, a header the app or the platform adapter sets, a
 body byte (key order, escaping, number formatting, error bodies), which user a
 token belongs to, a write a store lost. **What it cannot catch:** requests the
-suite does not send; behaviour under concurrency (`test/concurrency.mjs`);
+suite does not send; behaviour under concurrency (`examples/conduit/test/concurrency.mjs`);
 bugs that are the same on every target, Node included; timing.
 
 ### Standard bindings
@@ -943,7 +1053,7 @@ for Node like the app (`npm run build:sim`), that runs the app's own code:
 the server's HTTP handler or its request pipeline on the simulated `Sql`, and
 for Tandem the browser editor's `update` too (a `Lasm.UI` command is data, so
 the driver performs each one in the world: timers, HTTP requests, storage,
-random bytes). The driver asks the world (`test/dst/world.mjs`, loaded with
+random bytes). The driver asks the world (`examples/*/test/dst/world.mjs`, loaded with
 Lasm.JS's `require`) for the next event, runs the code it reaches, and hands
 back what that code asked for. Everything else (users, relying parties,
 network, database faults, crashes) is JavaScript in the world, which also
@@ -1202,7 +1312,7 @@ inventory (`scripts/propositions.mjs`) and the fuzz targets that run against
 Lean. An item reads "met", "partly met" (what is measured
 holds, the rest is not measured yet), "not met", "not measured" or "not read".
 `test/testing-docs.test.mjs` keeps the documents behind it in step with the
-repository: every path and workflow TESTING_STRATEGY.md and CI.md name exists,
+repository: every path and workflow TESTING_STRATEGY.md, CI.md and this page name exists (here, except on a line that says the file was deleted or removed),
 every workflow is in CI.md, and the fuzz table above lists exactly the targets
 `fuzz.yml` runs.
 
@@ -1265,16 +1375,16 @@ run, except the static mode of `check-tutorials.mjs` (below). Verdicts:
 | Test | What it read | Verdict |
 | --- | --- | --- |
 | `application-output.test.mjs`: host support files exist with their dependencies | regex import scan of `src/` | **Replaced**: the shipped host files are copied alone into an empty directory and imported by Node's loader in a fresh process (`test/helpers/isolated-import.mjs`); a missing dependency fails to resolve; the test also checks that removing one is noticed |
-| `wasmtime-artifact.test.mjs`: standalone deployment carries every local dependency | regex import scan | **Replaced** the same way (a `new URL('./x')` asset that is not imported is still not covered) |
+| `wasmtime-artifact.test.mjs`: standalone deployment carries every local dependency | regex import scan | **Replaced** the same way (a `new URL('./x')` asset that is not imported is still not covered). The test and the standalone Wasmtime preview it covered were deleted on 2026-11-10 (IRREDUCIBLE.md M1) |
 | `candidate-readme.test.mjs`: a packed README installs its own archive | the real README's headings (failed after the README was reworded, PR #22) | **Replaced**: the transformation is tested on a fixed README; the real README is only required to pack (one install line, no unpinned links) |
-| `application-output.test.mjs`: retained callable and frozen outputs include transitive dependencies | file lists regex-parsed out of `src/build.mjs`, `src/main.mjs`, two scripts | **Retired** (2026-11-03): all four lists belong to the retired Lean 4.32 library pipeline (`src/build.mjs`, `src/main.mjs`, `scripts/full-lean/freeze-build.mjs`, `derive-host-files.mjs`), which the published CLI refuses and CI cannot run; the shipped list, `applicationHostFiles`, is import-tested above |
+| `application-output.test.mjs`: retained callable and frozen outputs include transitive dependencies | file lists regex-parsed out of `src/build.mjs`, `src/main.mjs`, two scripts | **Retired** (2026-11-03): all four lists belong to the retired Lean 4.32 library pipeline (`src/build.mjs`, `src/main.mjs`, `scripts/full-lean/freeze-build.mjs`, `derive-host-files.mjs`; all four files deleted since, 2026-11-03 to 2026-11-10), which the published CLI refused and CI could not run; the shipped list, `applicationHostFiles`, is import-tested above |
 | `browser.test.mjs`: builtin modules use web-standard JavaScript only | `node:`/`process`/`Buffer` in `src/lasm-modules/*.mjs` | **Keep as a lint**: a grep finds uses inside functions that loading never runs; the behaviour is covered by `workers.yml` (workerd), Deno and the browser |
 | `release.test.mjs`: release.yml is the trusted publisher | regexes over four workflow files | **Replaced** (2026-11-03): the release-checks verdict and manifest moved from inline `node -e` into `scripts/release/checks-manifest.mjs`, tested on job results (every gate failing, cancelled or skipped, a reused candidate, an overlay) and through `manifestProblems`; the workflow check is now a cross-reference (the job's `needs`, its env and the workflow's jobs equal the module's `checksJobs`; every called workflow declares `workflow_call`). **Kept as a lint**: OIDC, no stored tokens, serialized publishing, and npm-dist's `LASM_PUBLISHED_REQUIRE`, since only a real release runs them |
 | `nightly.test.mjs`: nightly.yml is scheduled, serialized, never a release dependency | regexes over workflows | **Kept as a lint, widened** (2026-11-03): triggers and concurrency are configuration only GitHub runs (the deferral logic is tested through `nextStep`); "never a release dependency" now covers every workflow a release calls, transitively, ignoring comments |
 | `notices.test.mjs`: the edge runtime archive carries the MIT text and its change list | the packager's source | **Replaced** (2026-11-03): `scripts/edge/package-edge-runtime.mjs` runs on a stand-in edge runtime and its `THIRD_PARTY_NOTICES.txt` is read back (the Lasm MIT text, the shared patches plus `edge` and never `node-threads`, the Node notices appended); a patch without notice text is refused |
 | `notices.test.mjs` (3 lines of the Apache 4(b) test; the rest is behavioural) | patch names regex-parsed from `build-application-runtime.mjs` | **Keep as a cross-reference lint** until the patch table moves into an importable module (the build script runs when imported) |
 | `notices.test.mjs`: Lasm's licence copy, Wasmtime licence copies, MIT everywhere, MIT-0 texts | file equality and headers; the MIT-0 test also checks eight phrases of the `LICENSE-MIT-0` grant | **Keep**: consistency guards; licence text is what must be shipped, and a change to the grant's scope should be deliberate |
-| 29 unit files (`compiler`, `conformance`, `io`, `runtime`, the `node-*` host files …, listed in `needsTools` in `scripts/ci/unit-tests.mjs`) | not static, but they build with the retired Lean 4.32 library pipeline (system `lean` 4.32 and Zig), so CI never ran them (their failures were reported, not fatal) | **Ported or retired** (2026-11-03). **Ported**: the ordinary-Lean fixtures of 24 files (conformance, finalizers, console buffering, cwd, permissions, environment and path bytes, getLine, platform, process cwd/exit/NUL/lifetime/spawn, realPath, system directories, temporary files, truncate, runtime metadata, standard IO and the forms of `main`, TCP, wall clock) run as 31 cases of `integration/host-fixtures.mjs`, a `differential.yml` job on pull requests and main: built with the installed candidate for Node and compared with upstream Lean 4.35.0's `lean --run` (it found the unsearchable-cwd worker bug fixed with it). **Kept in the unit suite**, without their Lean parts: the Node-host tests in `node-process`, `node-temporary-files`, `node-platform`, `node-environment-bytes` and `platform`. **Retired**: `compiler`, `io`, `lake` and `runtime` test the `lasm.json` library pipeline (`src/build.mjs`), which the published CLI refuses; the earlier runtime's platform emulation, its embedded `index.mjs` API and its wall-clock fault hook; `expr-conformance` became a check that the build is refused with the runtime-kernel diagnostic; `needsTools` is empty |
+| 29 unit files (`compiler`, `conformance`, `io`, `runtime`, the `node-*` host files …, listed in `needsTools` in `scripts/ci/unit-tests.mjs`) | not static, but they build with the retired Lean 4.32 library pipeline (system `lean` 4.32 and Zig), so CI never ran them (their failures were reported, not fatal) | **Ported or retired** (2026-11-03). **Ported**: the ordinary-Lean fixtures of 24 files (conformance, finalizers, console buffering, cwd, permissions, environment and path bytes, getLine, platform, process cwd/exit/NUL/lifetime/spawn, realPath, system directories, temporary files, truncate, runtime metadata, standard IO and the forms of `main`, TCP, wall clock) run as 31 cases of `integration/host-fixtures.mjs`, a `differential.yml` job on pull requests and main: built with the installed candidate for Node and compared with upstream Lean 4.35.0's `lean --run` (it found the unsearchable-cwd worker bug fixed with it). **Kept in the unit suite**, without their Lean parts: the Node-host tests in `node-process`, `node-temporary-files`, `node-platform`, `node-environment-bytes` and `platform`. **Retired**: `compiler`, `io`, `lake` and `runtime` test the `lasm.json` library pipeline (`src/build.mjs`, deleted with it on 2026-11-03), which the published CLI refused; the earlier runtime's platform emulation, its embedded `index.mjs` API and its wall-clock fault hook; `expr-conformance` became a check that the build is refused with the runtime-kernel diagnostic; `needsTools` is empty |
 | `browser.test.mjs`: every `lasm:app`/`lasm:ui-dom` binding names an export | `@[js …]` attributes in `library/Lasm/UI` cross-checked against real exports (`lasm:web` and `library/Lasm/Web` were removed with `Lasm.Web`, 2026-11-10) | **Keep**: a cheap cross-reference lint; a full behavioural check would link a program using every binding |
 | `scripts/content/check-tutorials.mjs --static` (found 2026-11-03) | tutorial pages against their `steps.json` and project files | **Keep as a doc lint**: the page must show what the tutorial runs; the non-static mode runs those steps against a packed CLI |
 
@@ -1351,13 +1461,13 @@ whole percent.
 
 ### Scores
 
-Every JavaScript file under `src/` is in one of the 21 modules except
+Every JavaScript file under `src/` is in one of the 20 modules except
 `src/edge/edge-library.js` (an Emscripten library with preprocessor lines, which
 Stryker cannot parse). The first seven modules were measured 2026-11-03 (mutation.yml
 run 41749603692); the fourteen others, which cover the rest of `src/`, were added
 2026-11-09: their *initial* scores are from mutation.yml run 42571078799 (the run
 that added them) or from each group's first run where that run could not score
-them, and *now* from mutation.yml run 42615928074 on #165, which measured all 21 modules together (Node 26, Linux x64; 1 to 73 minutes a module, `dev` the longest). *Initial*: with
+them, and *now* from mutation.yml run 42615928074 on #165, which measured all 21 modules of the time together (Node 26, Linux x64; 1 to 73 minutes a module, `dev` the longest). The 21st, `wasmtime`, was removed with the standalone Wasmtime preview it mutated (2026-11-10), and its surviving mutants with it. *Initial*: with
 the tests that existed before mutation testing; *now*: with the tests written to
 kill survivors (CI's measurement on Node 26 is the recorded floor).
 
@@ -1371,7 +1481,7 @@ kill survivors (CI's measurement on Node 26 is the recorded floor).
 | `edge-glue` | `edge/edge-host.mjs`, `edge/edge-js.mjs`, `edge/edge-runtime.mjs`, `edge/edge-start.mjs` | 15.2 % | **97.1 %** | 97 % |
 | `notices` | `notices.mjs` | 62.5 % | **91.5 %** | 91 % |
 | `downloads` | `managed-download.mjs`, `managed-artifacts.mjs`, `managed-lean.mjs`, `npm-artifacts.mjs`, `cache-repair.mjs` | 59.3 % | **89.7 %** | 89 % |
-| `toolchains` | `managed-sdk.mjs`, `managed-python.mjs`, `managed-link-toolchain.mjs`, `sdk-repairs.mjs`, `toolchain.mjs`, `system-git.mjs`, `windows-tool-paths.mjs`, `macos-tbd.mjs`, `link-driver/python.mjs` | 58.9 % | **89.7 %** | 89 % |
+| `toolchains` | `managed-sdk.mjs`, `managed-python.mjs`, `managed-link-toolchain.mjs`, `sdk-repairs.mjs`, `system-git.mjs`, `windows-tool-paths.mjs`, `macos-tbd.mjs`, `link-driver/python.mjs` | 58.9 % | **89.7 %** | 89 % |
 | `cli` | `cli-arguments.mjs`, `posix-arguments.mjs`, `application-cli.mjs`, `launcher.mjs`, `process-launcher.mjs`, `elapsed-ticker.mjs`, `elapsed-ticker-worker.mjs`, `build-progress.mjs`, `test-switches.mjs`, `platform.mjs`, `output-directory.mjs`, `editor.mjs`, `application-signals.mjs` | 42.7 % | **95 %** | 95 % |
 | `init` | `init.mjs` | 53.6 % | **97.1 %** | 97 % |
 | `dev` | `dev.mjs`, `dev-proxy.mjs`, `dev-build-worker.mjs`, `application-build-worker.mjs`, `browser/browser-dev.mjs`, `browser/static-server.mjs` | 29.2 % | **91 %** | 91 % |
@@ -1572,8 +1682,6 @@ stay, with the reason; they are not chased with tests that look at the code.
 | edge build (not equivalent) | `edgeStepCache`, `edgeMembers` and the dev profile's two retained programs in `linkCachedEdgeProgram`; `findEdgeProgram` and `cachedProgram` | They run with the Node link driver's recorded replay (dev edge links) or a provisioned edge runtime; `test/edge-link-plan.test.mjs` (module `target-link`) tests the dev link itself |
 | WASI build | `lower-atomics.mjs`: `s64`'s negative branch; `Bytes.push`'s `values.length` → `true`; the helper type key `join(',')` → `join('')` and `'notify'` → `''`; single-byte value, block and heap types read as LEBs (and the reverse); `limits`' maximum read as u32 or u64; empty `case 0x40`/`case 0x41` bodies; `sub >= 15` → `true` | Only non-negative offsets and masks are encoded; an empty part adds no bytes; the keys of the helpers' signatures do not collide, and no other helper has an empty key; those bytes are below 0x80, so either read takes one byte; both read the same LEB; they fall through to a case that skips the same LEB; the subopcodes below 15 that reach it are 9, 11 and 13 |
 | WASI build | `wasi-build.mjs`: `'utf8'` → `''`; `force`/`recursive` of staging removals; `entry !== key` → `true`; `{ level: 9 }` → `{}` for the Fastly package; `let note = ''` → another string. `wasi-component.mjs`: the section list's `[]` → `['Stryker was here']`, `at < length` → `<=` in both section walks, `startsWith`'s length check → `true` | As for the edge build; the compression level changes only the package's size; every branch assigns the note; strings have no section id, an extra pass at the end adds an empty piece, and `every` fails on the missing bytes |
-| Wasmtime | `'utf8'` → `''` before `JSON.parse`; the hex form of file hashes and `!item` checks in the bundle, artifact and module-data checks; the Buffer-capacity bounds (`bufferConstants.MAX_LENGTH`, `Math.min` → `Math.max`) in the console, guest-memory and WASI code; the console's `remaining < 65536n` and trailing-byte bounds → `<=`/`true`; the `>= 0n` halves of guest range checks; `if (count) write(...)` | A Buffer parses the same; the inventory hash compared next rejects the same records, and the key-set check before guarantees each record; on 64-bit Node `MAX_LENGTH` equals `Number.MAX_SAFE_INTEGER`, checked first; the same bytes are decoded; guest offsets and lengths are uint64 values; an empty write writes nothing |
-| Wasmtime (not equivalent) | the runtime's checks of what the native instance reports (stack bounds, mailbox registration, function globals' pointers), diagnostic RPC deadlines, failure reports written to stderr on the main thread, Workers terminated at shutdown; the standalone supervisor's `prepareApplicationSignals`, `prepareApplicationMetadata` and `forwardWorkerStdio` calls; a failing native descriptor write; the process host's `applicationCommand` and console write failure | They need the real Wasmtime instance and native helpers, a real process, or a failing descriptor: `wasmtime.yml` runs standalone outputs, and those functions have their own tests |
 | node host, native files | `fd < 0` → `<= 0` (and `>= 0` → `> 0`) for descriptors and counts the C library returns | Descriptor 0 is the process's stdin and is never returned by `open`, `dup`, `socket` or `mkstemp`; a zero count reaches the same branch either way |
 | node host | `leanAtLeast`'s `i < 3` → `<=`, `a[i] > b[i]` → `>=`; the Windows case list's `trim()` and `/\s+/` → `/\s/` | Index 3 is undefined in both versions, so the loop still ends equal; the comparison runs only when the parts differ; an empty name is never an error code |
 | native files | the pooled wrappers (`flushAll`, `checkDirectorySearch`, `flush`/`rewind`/`truncate`, `read`/`write`/`closeAsync` guards) removed or emptied | The synchronous adapter underneath does the same thing on the calling thread: only which thread blocks differs |
@@ -1622,6 +1730,7 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Deterministic simulation of Tandem (third CI run, most seeds with an ambiguous commit) | A commit that succeeded and then reported an error (D1's lost reply, a timeout after `COMMIT`): `syncOnce` ran the sync again, found the operations known and appended and pushed nothing, so tabs that were not typing never heard of them | Fixed: a failed commit checks whether the log holds exactly its operations at its position, and if so answers and pushes them; and a sync whose operations were all in the log already pushes its reply, which holds them (`Server/App.lean`; the second part was found by the heavy-fault seeds, when that check could not read the log) |
 | DST nightly, heavy faults (42807003871, seed 1496820401) | The same family ([#190](https://github.com/Millillion/lasm/issues/190)): a sync whose commit landed and then reported an error, and whose check could not read the log, answered 503; the tab's retry carried those operations and newly typed ones, so the server appended only the new ones and pushed only them. The earlier operations were never pushed | Fixed: a sync with any operation already in the log pushes its reply, and pushes what it appended separately unless the reply holds it (`Server/App.lean`); regression seed in `tandem.yml` |
 | DST nightly (42807003871 and 42471623224, 17 seeds) | Porter: "asked for the password with a live session", "an access token of a revoked family still works", "a live access token was refused", a refused code after the heal, and an uncaught `TypeError` that ended the campaign ([#189](https://github.com/Millillion/lasm/issues/189)). None was Porter's: the world kept a session alive after a logout whose answer was lost or duplicated (one copy ended it, the other's 503 arrived) or that cleared the cookie of a sign-in finished meanwhile; it counted a revocation learned while a request was in flight as one the request must have seen; it did not count a lost refresh of a possibly rotated token as a possible reuse; it expected a code to redeem after the heal when it had expired on a skewed racing instance; and it read the tokens of an agent that had dropped them | World fixes (`examples/porter/test/dst/world.mjs`); a harness exception now fails its seed instead of the campaign; 16 regression seeds in `porter.yml` |
+| DST nightly (43009576149, seed 576844122, heavy faults) | Porter: "a live access token was refused" ([#206](https://github.com/Millillion/lasm/issues/206)). Not Porter's: a refresh request was duplicated by the network; the first copy rotated the token (an ambiguous commit whose receipt stood), the second was a reuse of the rotated token and revoked the family, as `Spec.reuse_revokes_family` requires, and a crash then lost both answers. The world counted a duplicated request only when an answer arrived, so it did not count the lost duplicated refresh as a possible reuse | World fix (`examples/porter/test/dst/world.mjs`); regression seed in `porter.yml` |
 | Deterministic simulation of Porter (4 of 30 seeds) | A token request whose commit succeeded and then reported an error is run again by `runRequest`, finds its own code used or its refresh token rotated, answers `invalid_grant` and revokes the family it just issued: one transient database error signs a user out | Fixed (#138, Jordan's choice of a commit receipt): each commit inserts a row keyed by an id from the request's random values (the same on a rerun), and a failed commit whose receipt is there keeps its reply (`Server/App.lean`, `Spec.landed_commit_stands`); the simulation no longer tolerates the refusal |
 | Mutation testing (`downloads`, 2026-11-09) | **A failing SDK archive decoder was reported as the tar parser's error**: when the managed Python's decoder for `.tar.xz`/`.zip` SDK archives (`src/archive-stream.py`) failed, could not start or was killed, `extract` reported `TAR_BAD_ARCHIVE: Unrecognized archive format` for the empty or truncated stream it left, not the decoder's exit status and messages | Fixed in `src/managed-artifacts.mjs` (the decoder's result is preferred after a broken stream); regressions in `test/managed-artifacts-decoder.test.mjs`; `docs/release/0.6.1-notes.md` |
 | Differential fuzzing, feature programs (campaign 42620999209, seed 620999216, case 132; `wasi`, `wasi-node`, `deno`, the edge engines, browsers, both profiles) | `(repr a).pretty` of an `Array Int` of 5,120 elements stops with "call stack exhausted" / "Maximum call stack size exceeded": Lean's formatter recurses with the number of elements, and the WASI and edge stacks hold about 9,000–11,000 frames. Native Lean and the Node target print it | Open: [#179](https://github.com/Millillion/lasm/issues/179) (the documented recursion-depth limit, reached through the standard library); the generator keeps printed arrays below that size |
