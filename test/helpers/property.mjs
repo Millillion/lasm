@@ -1,8 +1,9 @@
 // Property checks without a dependency: `forAll` draws `runs` inputs from a
 // seeded generator and checks each one, reporting the seed and the input of
-// the first failure. Each property's comment states the proposition it checks
-// in Lean notation (docs/TESTING.md#mutation-testing), so that it can later
-// become a theorem about a Lean model of the same code.
+// the first failure. Each property's comment names the Lean proposition it
+// checks and states it verbatim (`// Proposition: Lasm.<…>.Candidates.<name>`,
+// docs/TESTING.md#named-propositions), so that it can later become a theorem
+// about a Lean model of the same code; scripts/propositions.mjs checks that.
 import assert from 'node:assert/strict';
 
 /** A small deterministic generator (mulberry32) with helpers for test inputs. */

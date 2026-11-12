@@ -86,7 +86,13 @@ test('zip: names are UTF-8; duplicates and too many files are refused', () => {
   assert.throws(() => zip(many), { message: 'Function package has more than 65535 files' });
 });
 
-// ∀ entries, distinct names → unzip (zip entries) = parents entries ++ entries (with modes)
+// Proposition: Lasm.Cli.Candidates.zip_reads_back
+//   ∀ (entries : List ZipEntry) (archive : ByteArray), zip entries = .ok archive →
+//     ∃ read, unzip archive = some read ∧
+//       read.map (·.name) = directoriesOf entries ++ entries.map (·.name) ∧
+//       (∀ d ∈ read.take (directoriesOf entries).length, d.mode = 0o40755 ∧ d.data.size = 0 ∧ d.method = 0) ∧
+//       ∀ x ∈ (read.drop (directoriesOf entries).length).zip entries,
+//         x.1.data = x.2.data ∧ x.1.mode = 0o100000 ||| x.2.mode.getD 0o644
 test('property: what zip writes, a ZIP reader reads back', () => {
   const segments = ['a', 'b', 'lib', 'é', 'x.y'];
   forAll(r => {
@@ -113,7 +119,8 @@ test('property: what zip writes, a ZIP reader reads back', () => {
   }, { runs: 150 });
 });
 
-// ∀ entries, zip entries = zip entries (byte for byte: no time, no host state)
+// Proposition: Lasm.Cli.Candidates.zip_deterministic
+//   ∀ entries : List ZipEntry, zip entries = zip entries
 test('property: zip is deterministic', () => {
   forAll(r => r.array(r.int(0, 4), (_, i) => ({ name: `d${r.int(0, 2)}/f${i}`, data: r.bytes(0, 200) })), entries => {
     assert.deepEqual(zip(entries), zip(entries));

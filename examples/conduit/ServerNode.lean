@@ -2,12 +2,13 @@
 The same file is the Deno build (`npm run build:deno`) and, packaged, the Node function platforms
 (Lambda, Vercel, Netlify, Azure Functions, Google Cloud Functions: `npm run build:<platform>`). -/
 import Server.App
-import Lasm.Fetch.Embed
+import Server.Embed
+import Server.NodeServe
 import Server.NodeSqlite
 
 /-- The browser app and its files (dist/public, from npm run build:client),
 embedded in the program so every target serves them. -/
-def assets : Lasm.Fetch.Assets := embed_dir! "dist/public"
+def assets : Conduit.Server.Web.Assets := embed_dir! "dist/public"
 
 /-- `DATABASE_PATH`, else `conduit.db` in the working directory, else (where
 that directory is read-only, as on function platforms) `conduit.db` in the
@@ -21,4 +22,4 @@ def database : IO Conduit.Server.Sql := do
     Conduit.Server.NodeSqlite.open s!"{tmp}/conduit.db"
 
 def main : IO Unit := do
-  Conduit.Server.run (← database) assets
+  Conduit.Server.NodeServe.serve (← Conduit.Server.sqlHandler (← database) assets)

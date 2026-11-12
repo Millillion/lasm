@@ -21,7 +21,7 @@ for an hour or more.
 | Tier | When | What runs | Budget |
 | --- | --- | --- | --- |
 | **PR** | every pull request; the same workflows again on the push to `main` (except the unit suite, which runs nightly on `main`) | Linux-first checks that must pass before merge, filtered by path. The unit suite; differential testing (regressions, three seeded program pairs and two fixed-seed feature programs, docs/TESTING.md#differential-fuzzing), host fixtures, target equivalence, Async depth and Windows recursion depth; boundary-fuzzing corpus replay; the tooling error corpus; installer faults on Linux and Windows; the example apps whose files changed; bridge verification, mutation, content, evidence and flaky-report checks when their files change; `release-checks` (`detect` only, unless the version changes). No macOS job unless the change touches macOS-specific code. | about 20 minutes of wall clock; no macOS runner for a typical change |
-| **Nightly** | 01:07 to 09:17 UTC, on `main` | Everything the PR tier leaves out, plus campaigns. `ci-nightly.yml` runs the release suites, which until now ran only for a release: the unit suite, browser (with WebKit on macOS), edge and Bun/Deno on five platforms, WASI/Fastly, Lasm.UI, fullstack, the dev loop and the Lasm.JS stress test. The workflows' own schedules add: differential 60-minute campaigns (release and dev profiles, a feature program per seed) and the macOS jobs (recursion depth on macOS, the macOS C tier on three macOS runners); 10-minute fuzzing per target; tooling metamorphic builds and fault injection; mutation on every module; host-bridge schedule fuzzing on four platforms; example-app DST with random seeds; the Folio, Porter and Tandem campaigns; cold installation confidence; the upstream suite and ecosystem (`nightly.yml`); content sources; published Bun/Deno; evidence levels; the test-evidence page; the flaky report. | about 2 hours, at night |
+| **Nightly** | 01:07 to 09:17 UTC, on `main` | Everything the PR tier leaves out, plus campaigns. `ci-nightly.yml` runs the release suites, which until now ran only for a release: the unit suite, browser (with WebKit on macOS), edge and Bun/Deno on five platforms, WASI/Fastly, Lasm.UI, fullstack, the dev loop and the Lasm.JS stress test. The workflows' own schedules add: differential 60-minute campaigns (release and dev profiles, a feature program per seed, coverage-guided) and the macOS jobs (recursion depth on macOS, the macOS C tier on three macOS runners); 10-minute fuzzing per target; tooling metamorphic builds and fault injection; mutation on every module; host-bridge schedule fuzzing on four platforms; example-app DST with random seeds; the Folio, Porter and Tandem campaigns; cold installation confidence; the upstream suite and ecosystem (`nightly.yml`); content sources; published Bun/Deno; evidence levels; the test-evidence page; the flaky report. | about 2 hours, at night |
 | **Weekly** | Saturday 12:07 UTC (`ci-weekly.yml`); Saturday 06:41 UTC (`fuzz.yml`); Monday 06:17 UTC (`image-pins.yml`) | Long campaigns: a 100-minute differential campaign in each profile (core, file-system and feature programs from fresh seeds), the Lasm.JS soak (200 runs per program on four platforms), 60 minutes of fuzzing per target, and the image re-pin. | about 6 runner-hours |
 | **Release** | every pull request and push to `main` whose root `version` changes (`release-checks.yml`) | Unchanged: the candidate build and five-platform installed acceptance (with installer faults, templates, js-interop, platform support and benchmarks), the npm loopback rehearsal, browser, edge, WASI, UI, fullstack, unit, dev loop and Lasm.JS stress. `release.yml` publishes only after a full `release-checks` run on the push to `main`. After publishing: `published-templates.yml` and `bun-deno-published.yml`. | as before |
 
@@ -115,13 +115,57 @@ many files:
 
 | Action | Replaces | Used by |
 | --- | --- | --- |
-| `playwright` | `npm install playwright-core@1.63.0` plus `scripts/ci/playwright-install.sh` per browser, and the browser-build cache (same keys as before) | browser, fullstack, differential, conduit, conduit-platforms, folio, ledger, porter, tandem |
+| `playwright` | `npm install playwright-core@1.63.0` plus `scripts/ci/playwright-install.sh` per browser, and the browser-build cache (same keys as before); the browsers' system packages go through `apt-cache` | browser, fullstack, differential, conduit, conduit-platforms, folio, ledger, porter, tandem |
+| `apt-cache` | a bare `sudo apt-get install` (bubblewrap) or Playwright's `install-deps`: the installed `.deb` files are cached per runner image ([apt packages](#apt-packages)) | `playwright`; conduit, folio, ledger, porter, tandem (bubblewrap for `lake check --paranoid`) |
 | `upstream-lean` | the pinned upstream Lean 4.35.0 archive (the differential oracle and the bridge model checker), with its digest check and cache | differential, bridge-verification |
 | `install-candidate` | download the packed candidate artifact and `npm install` it into a fresh directory, as a user does | differential, tooling |
 | `process-guard` | `loginctl enable-linger` plus `XDG_RUNTIME_DIR` and `DBUS_SESSION_BUS_ADDRESS` for `run-bounded.mjs` | the workflows above that use it |
 
 The tier orchestrators (`ci-nightly.yml`, `ci-weekly.yml`) call the existing
 workflows through `workflow_call` instead of copying their jobs.
+
+### apt packages
+
+No job needs an apt mirror once its packages are cached. On 2026-11-11 the
+hosted Ubuntu runners could not resolve `azure.archive.ubuntu.com` for hours,
+and every job that installed a system package failed: Playwright's
+`install-deps` (fonts, Xvfb and media libraries for the browsers) in the
+browser, platform and example-app end-to-end jobs, and bubblewrap for the
+example apps' `lake check --paranoid`. `.github/actions/apt-cache` runs such an
+install through `scripts/ci/apt-cache.sh`:
+
+- The cache key is the runner image (`ImageOS`, `RUNNER_ARCH`,
+  `ImageVersion`), the package set's name and a hash of the install command and
+  the script. The cached directory holds the `.deb` file of every package the
+  command installed or upgraded, and a `manifest` of them.
+- On a hit the `.deb` files are installed with `dpkg -i` and the command does
+  not run, so no apt mirror is contacted. A package the image already has at
+  that version or newer is skipped.
+- On a miss a cache from an earlier image version (same prefix) is tried first;
+  when `dpkg` accepts it, it is saved under the new image's key. Otherwise the
+  command runs against the mirror (with apt's own retries, and up to
+  `attempts` runs; Playwright keeps its own bounded retries in
+  `scripts/ci/playwright-install.sh`), apt keeps what it downloads, and the
+  `.deb` files are copied and saved. If any installed package's `.deb` is
+  missing, nothing is saved and the next run uses the mirror again.
+- If installing cached files fails, the script falls back to the mirror.
+- Caches are saved on `main` only (pull requests restore them but do not save:
+  a pull request's cache is readable by that pull request alone). A set is
+  about 20 MB (chromium) to 110 MB (webkit); bubblewrap is 50 KB. They count
+  toward the 8 GiB ceiling in `scripts/ci/cache-budget.mjs`, which, before an
+  upload would cross it, first evicts stale `apt-debs-*` caches (another ref's,
+  or one superseded by a newer `main` cache for the same package set and
+  runner image) not used in the last 24 hours.
+- Before a miss uses the mirror, the script checks that the image's mirror
+  host (`azure.archive.ubuntu.com`, through `/etc/apt/apt-mirrors.txt`)
+  resolves; when it does not, or an install attempt fails, apt is pointed at
+  `archive.ubuntu.com` and `security.ubuntu.com` directly, so a cache can be
+  populated during an Azure mirror outage.
+
+The packages installed are the same as before; only where they come from
+changes, so no test loses coverage. `scripts/fuzz/ensure-libfuzzer.sh` still
+calls apt-get directly: the images already have the libFuzzer runtimes, so it
+installs nothing.
 
 ## Inventory
 
@@ -144,7 +188,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `conduit-platforms.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 35 min (max 103) | examples/conduit on 15 non-Node platforms, RealWorld traffic equivalence | PR (paths), main |
 | `conduit.yml` | dispatch, call, PR (paths), push main,conduit (paths) | Linux | 24 min (max 107) | examples/conduit: proofs, API on Node/Workers/Bun, RealWorld E2E in three browsers | PR (paths), main |
 | `content.yml` | PR (paths), cron 23 5 * * 1-6, dispatch | Linux | 12 min (max 85) | content/ pages and runnable tutorials | PR (paths), nightly |
-| `differential.yml` | PR (paths-ignore), push main, cron 47 3 * * 2-6, call, dispatch | Linux, macOS, Windows | 35 min (max 110) | Compiler output vs native Lean on every target (generated core, file-system and feature programs), host fixtures, target equivalence, recursion and Async depth, macOS C tier | PR, main, nightly (campaign), weekly (long campaign) |
+| `differential.yml` | PR (paths-ignore), push main, cron 47 3 * * 2-6, call, dispatch | Linux, macOS, Windows | 35 min (max 110) | Compiler output vs native Lean on every target (generated core, file-system and feature programs), host fixtures, target equivalence, recursion and Async depth, macOS C tier; campaigns are coverage-guided (corpus and features kept in the Actions cache, `differential-coverage-<profile>-*`) | PR, main, nightly (campaign), weekly (long campaign) |
 | `dst-nightly.yml` | cron 23 3 * * 2-6, dispatch | Linux | — | Example-app deterministic simulation with random seeds | Nightly |
 | `dx-dev-loop.yml` | dispatch, call | Linux | 7 min (max 48) | Template dev loop, editor support, cold start | Release, nightly |
 | `ecosystem.yml` | dispatch | Linux, macOS | 93 min (max 586) | Lake projects of the ecosystem built on five targets | Nightly (dispatched by nightly.yml), on demand |
@@ -171,7 +215,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `ledger-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 47 min (max 104) | examples/ledger on Bun, Deno, Docker, Workers, WASI auditor | PR (paths), main |
 | `ledger.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 25 min (max 88) | examples/ledger: proofs, API, DST fixed seeds, TigerBeetle differential, E2E | PR (paths), main |
 | `library-prebuilt.yml` | push prebuilt/**, dispatch | Linux | 3 min (max 16) | Regenerates library/prebuilt (maintainer) | On demand |
-| `library-proofs.yml` | dispatch, call, PR (paths), push main (paths) | Linux | — | Proofs of Lasm's library: theorems match Spec.lean, standard axioms only, library/PROOFS.md current | PR (paths), main |
+| `library-proofs.yml` | dispatch, call, PR (paths), push main (paths) | Linux | — | Proofs of Lasm's library: theorems match Spec.lean, standard axioms only, library/PROOFS.md current; the Candidates files and verification/cli's propositions elaborate | PR (paths), main |
 | `link-toolchain-fixtures.yml` | dispatch | Linux, macOS, Windows | 12 min | Link toolchain fixtures (maintainer) | On demand |
 | `link-toolchain.yml` | dispatch | Linux, macOS, Windows | 11 min | Builds the link toolchain distribution (maintainer) | On demand |
 | `managed-sdk.yml` | dispatch | Linux, macOS, Windows | 7 min | Managed compiler SDK provisioning | On demand |

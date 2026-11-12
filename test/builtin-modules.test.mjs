@@ -42,8 +42,12 @@ test('builtinModuleFile: the file of a builtin; anything else fails naming the b
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
-// ∀ acyclic import graph g, ∀ requested r, closure r = the builtins reachable from r,
-//   each once, every one after the builtins it imports, non-builtins dropped
+// Proposition: Lasm.Cli.Candidates.builtin_closure
+//   ∀ (imports : String → List String) (requested : List String), Acyclic imports →
+//     (builtinModuleClosure imports requested).Nodup ∧
+//     (∀ m, m ∈ builtinModuleClosure imports requested ↔
+//       ∃ r ∈ requested, r.startsWith "lasm:" ∧ (m = r ∨ Reaches imports r m)) ∧
+//     DependenciesFirst imports (builtinModuleClosure imports requested)
 test('builtinModuleClosure: the requested builtins and those they import, dependencies first', () => {
   const styles = [n => `import { x } from './${n}.mjs';`, n => `import * as m from "./${n}.mjs"`, n => `  export { y } from './${n}.mjs';  `,
     n => `export * from "./${n}.mjs";`, n => `import d, { e as f } from './${n}.mjs';`, n => `import g from'./${n}.mjs'`];
