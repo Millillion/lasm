@@ -1262,6 +1262,19 @@ requirement short of L3: the Porter nightly fuzzer had found a failing request.
 No platform but Node has fuzzing or simulation in CI yet, so no other platform
 can reach L3.
 
+On 2026-11-12 Cloudflare Workers and the browser joined Node at L3. Their L3
+requirements are an outside oracle (Conduit's RealWorld API suite and its own
+browser tests on Workers; Conduit's browser tests of the browser build in
+Chromium, Firefox and WebKit), fuzzing on the platform itself (Folio's
+20-minute campaigns `fuzz-workers` and `fuzz-chromium`/`-firefox`/`-webkit` in
+`folio-nightly.yml`; Porter's 40-minute endpoint fuzzing of the Workers build in
+`porter-nightly.yml`) and simulation on the platform itself (Ledger's
+deterministic simulation with its server code built for Workers or the
+browser, every seed's result and trace digest checked against Node's, in
+`dst-nightly.yml`). The Folio campaigns could only pass once Folio's tree walks
+stopped recursing once per level of nesting (#231): the edge and browser
+engines allow just under 10,000 stack frames.
+
 ## The test-evidence page
 
 [`content/learn/test-evidence.md`](../content/learn/test-evidence.md) is the
