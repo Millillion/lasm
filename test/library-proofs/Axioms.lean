@@ -3,7 +3,8 @@ The proof check behind `node scripts/library-proofs.mjs`, for Lasm's own
 library (library/PROOFS.md):
 
 - every proposition of a library's `Spec.lean` (each `Lasm.L.Spec.x : Prop`,
-  for L = UI, RPC, KV, Fetch, JS, Serverless) has a theorem `Lasm.L.Theorems.x` whose type
+  for L = UI, RPC, KV, Fetch, JS, Serverless, and Lasm.Cli.Spec.x about the
+  models of the CLI's JavaScript in verification/cli) has a theorem `Lasm.L.Theorems.x` whose type
   is exactly `Lasm.L.Spec.x`, and a doc comment;
 - every theorem written in Lasm's library and its proofs uses only Lean's
   standard axioms (`propext`, `Classical.choice`, `Quot.sound`): a `sorry`
@@ -20,6 +21,7 @@ import Lasm.KV.Theorems
 import Lasm.Fetch.Theorems
 import Lasm.JS.Theorems
 import Lasm.Serverless.Theorems
+import Lasm.Cli.Theorems
 open Lean Elab Command
 
 elab "#check_library_proofs" : command => do
