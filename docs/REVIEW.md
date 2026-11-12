@@ -333,6 +333,17 @@ does was written inside each app, as the rule says (no new public API):
   Conduit's PostgREST store takes a `send` function: `Lasm.JS.Web.fetch` on
   Supabase, `wasi:http/outgoing-handler` on wasi-http (`WasiHttpServe.fetch`).
 
+### Ledger moved off `Lasm.Fetch` (2026-11-12; what had no replacement)
+
+Ledger serves with Cloudflare Workers' default export
+(`Lasm.JS.exportDefault`, D1 from the `env` argument), `Deno.serve` and
+`Bun.serve`, and on Node (and the Node function platforms and Docker) still
+with `Lasm.Fetch.serveNode`, in `Server/NodeServe.lean`, its only
+`Lasm.Fetch` import. What had no replacement is in
+`examples/ledger/Server/` (`Web.lean`, `Assets.lean`, `Embed.lean`,
+`JsServe.lean`), the same code as Conduit's under Ledger's namespace; the
+simulation (`Sim.lean`) parses requests with the app's `Web.Request`.
+
 ### Tandem moved off `Lasm.Fetch` (2026-11-12; what had no replacement)
 
 Tandem no longer imports `Lasm.Fetch` anywhere. Its Node server was already
