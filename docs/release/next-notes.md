@@ -38,6 +38,21 @@
   `SecretStore` calls. Every platform each app ran on before is still checked
   in CI, with the same suites and thresholds.
 
+- **Porter builds with 0.7.0 and uses `Lasm.Fetch` only for Node**, as
+  Conduit and Folio do: Workers through the default export, Deno with
+  `Deno.serve`, Bun with `Bun.serve`. Its request type, embedded files and
+  cookie joining are code inside the app (`examples/porter/Server/`).
+
+- **Ledger builds with 0.7.0 and uses `Lasm.Fetch` only for Node**, as
+  Conduit and Folio do: Workers through the default export, Deno with
+  `Deno.serve`, Bun with `Bun.serve`. Its request type and embedded files are
+  code inside the app (`examples/ledger/Server/`).
+- **Tandem builds with 0.7.0 and no longer uses `Lasm.Fetch`.** Workers serves
+  through the default export, Deno with `Deno.serve` and `Deno.upgradeWebSocket`,
+  Bun with `Bun.serve` and its WebSocket handlers, Node with Tandem's own
+  `node:http` server and the `ws` package, as before. Its request type and
+  embedded files are code inside the app (`examples/tandem/Server/`).
+
 ## Fixes
 
 - **`HTMLCanvasElement.getContext`, `Document.currentScript` and

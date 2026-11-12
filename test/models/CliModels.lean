@@ -22,9 +22,12 @@ answer are the JavaScript's, read as the model's types:
                                                     → ["…", …]
   compactInitializerWrappers  {"closure": […], "keep": […], "calls": […]}
                                                     → {"source": "…"} | {"error": "…"}
+  builtinModuleClosure  {"imports": [["lasm:…", ["lasm:…", …]], …], "specifiers": […]}
+                                                    → ["lasm:…", …]
 (initializer names are C identifiers, sent as JSON strings)
 -/
 import Lean.Data.Json
+import Lasm.Cli.Model.BuiltinModules
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.NodeHost
@@ -104,6 +107,8 @@ def answer (j : Json) : Except String Json := do
     return match compactInitializerWrappers p with
       | .ok s => Json.mkObj [("source", toJson s)]
       | .error e => Json.mkObj [("error", toJson e)]
+  | "builtinModuleClosure" =>
+    return toJson (builtinModuleClosure (← callsOf (← input.getObjVal? "imports")) (← strings (← input.getObjVal? "specifiers")))
   | m => throw s!"no model {m}"
 
 def main : IO Unit := do

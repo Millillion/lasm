@@ -56,6 +56,18 @@ def numbers_le64 : Prop :=
 
 /-! ## Builds -/
 
+/-- **The builtin closure is the reachable builtins, dependencies first.**
+For an acyclic import graph, the closure of the requested specifiers holds
+each builtin reachable from a requested builtin exactly once, nothing else
+(other specifiers are dropped), and every builtin after those it imports.
+Tested by: test/builtin-modules.test.mjs -/
+def builtin_closure : Prop :=
+  ∀ (imports : List (String × List String)) (requested : List String), Acyclic (edgesOf imports) →
+    (builtinModuleClosure imports requested).Nodup ∧
+    (∀ m, m ∈ builtinModuleClosure imports requested ↔
+      ∃ r ∈ requested, r.startsWith "lasm:" ∧ (m = r ∨ Reaches (edgesOf imports) r m)) ∧
+    DependenciesFirst (edgesOf imports) (builtinModuleClosure imports requested)
+
 /-- **A unit's schedule is the kept units it reaches, dependencies first.**
 For an acyclic call graph (the entries of the JavaScript object `calls`), the schedule of `n` holds each kept unit other
 than `n` that `n` reaches, exactly once, and every one after the kept units

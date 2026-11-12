@@ -65,7 +65,7 @@ def headers (d : Data) : List (String × String) :=
 
 /-- Porter's view of a request, as `serveRequest` builds it. -/
 def request (d : Data) : Porter.Request :=
-  let fr : Lasm.Fetch.Request := { method := str d "method", url := str d "url", body := (str d "body").toUTF8 }
+  let fr : Porter.Server.Web.Request := { method := str d "method", url := str d "url", body := (str d "body").toUTF8 }
   { method := fr.method, path := fr.segments, query := fr.query, headers := headers d, body := fr.text }
 
 /-- The clock reading and fresh values the world chose for a request. -/

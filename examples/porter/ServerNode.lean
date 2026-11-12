@@ -3,11 +3,12 @@
 build (`npm run build:deno`) and, packaged, the Node function platforms. -/
 import Server.App
 import Server.NodeSqlite
-import Lasm.Fetch.Embed
+import Server.Embed
+import Server.NodeServe
 
 /-- The sign-in and consent pages' browser app (dist/public/ui, from npm run
 build:client), embedded in the program so every target serves it. -/
-def assets : Lasm.Fetch.Assets := embed_dir! "dist/public"
+def assets : Porter.Server.Web.Assets := embed_dir! "dist/public"
 
 /-- `DATABASE_PATH`, else `porter.db` in the working directory, else (where
 that directory is read-only, as on function platforms) `porter.db` in the
@@ -21,4 +22,4 @@ def database : IO Porter.Server.Sql := do
     Porter.Server.NodeSqlite.open s!"{tmp}/porter.db"
 
 def main : IO Unit := do
-  Porter.Server.run (← database) assets
+  Porter.Server.NodeServe.serve (← Porter.Server.handler (← database) assets)
