@@ -43,6 +43,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `examples/*/test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
 | [Named propositions](#named-propositions) | Every test that names a Lean proposition names one that exists and states it verbatim; every candidate (tested, not yet proved) names a test that cites it; every `forAll` property names one | `scripts/propositions.mjs`, `library/Lasm/*/Candidates.lean`, `verification/cli/`, `test/propositions.test.mjs` | PR (`unit.yml`) |
+| [Model differentials](#model-differentials) | Each Lean model of the CLI's JavaScript agrees with it on generated inputs; every shipped JavaScript and C module has a Lean model or a stated reason (the M4 inventory) | `verification/cli/Lasm/Cli/Model/`, `test/models/`, `cli-models.yml`; `verification/models.json`, `verification/MODELS.md`, `scripts/models.mjs`, `test/models-inventory.test.mjs` | PR (paths; the inventory in `unit.yml`) |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (`unit.yml`), nightly, release |
 | [Flaky tests](#flaky-tests) | A flaky test is quarantined at once, then fixed or deleted within a week | `test/quarantine.json`, `scripts/test/`, `scripts/ci/flaky-report.mjs` (`flaky.yml`) | nightly report; quarantine on every unit run |
 | [Coverage and mutation](#coverage-and-mutation-testing) | How much of the JavaScript the tests execute, and whether they would notice a change | `scripts/coverage/`, `scripts/mutation/` (`mutation.yml`) | PR, nightly and release (coverage); nightly and PR, changed modules only (mutation) |
@@ -1191,6 +1192,15 @@ like the library's, and its test cites `Lasm.Cli.Spec.…`. Since 2026-11-11:
 targets `serverless-http`, `lasm-js-wire` and `ui-decode` are the model
 differentials of src/serverless/, the Lasm.JS codec and the UI applier's
 reading.
+
+Which modules have a model, and why the others need none or are still due
+one, is the inventory [verification/MODELS.md](../verification/MODELS.md),
+generated from `verification/models.json` by `node scripts/models.mjs` and
+checked on every pull request (`test/models-inventory.test.mjs`): every
+tracked file under `bin/`, `native/`, `src/` and `library/c/` has an entry
+(`modelled`, `pending`, or `exempt` with a kind: `runtime`, `io`,
+`generated`, `data`, `deleting`), and every model and differential it names
+exists and names the module. M4's exit check is met when none is pending.
 
 The Lean candidates are checked in `test/ui/DiffModel.lean` (`ui.yml`) and in
 the `lean-fetch-request` and `lean-rpc` fuzz targets
