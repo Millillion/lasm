@@ -97,8 +97,8 @@ function builtins(r) {
 
 /** Each model: the JavaScript module and function it mirrors, the Lean
  * module, a generator, the JavaScript's answer and the request's input,
- * both in the runner's encoding. scripts/models.mjs reads `source` and
- * `lean` to check the inventory (verification/MODELS.md). */
+ * both in the runner's encoding. Each module's entry in
+ * verification/models.json names its model and this differential. */
 export const models = [
   {
     name: 'numbers', source: 'src/node-host.mjs', lean: 'Lasm.Cli.Model.NodeHost',

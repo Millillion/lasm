@@ -58,6 +58,17 @@ test('the generated modules are shipped library modules, in import order', () =>
   }
 });
 
+test('a nullable Value result is requested as data, so that null is none', () => {
+  // A reference-mode result is a reference for null too: getContext of an unsupported
+  // context id would be some (a reference to null) if it were requested as Option Value.
+  const canvas = readFileSync(new URL('../library/Lasm/JS/Web/Canvas.lean', import.meta.url), 'utf8');
+  assert.match(canvas, /def HTMLCanvasElement\.getContext [^\n]*: IO \(Option Value\) := do\n {2}let r ← self\.val\.callMethod "getContext" \(Support\.args #\[toJS contextId, options\]\) Data\n {2}Support\.optionalValue r/);
+  for (const f of ['Canvas', 'Html']) {
+    const text = readFileSync(new URL(`../library/Lasm/JS/Web/${f}.lean`, import.meta.url), 'utf8');
+    assert.doesNotMatch(text, /\) \(Option Value\)$/m, `${f}.lean requests a result as Option Value`);
+  }
+});
+
 test('every browser-tier interface and window global is generated', () => {
   const { surface } = JSON.parse(readFileSync(new URL('../scripts/bindings/browser-surface.json', import.meta.url), 'utf8'));
   for (const m of browserModules) {

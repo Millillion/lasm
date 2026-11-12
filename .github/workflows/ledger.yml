@@ -22,6 +22,11 @@ name: Ledger
 #   retried batches, crashes, database faults and clock jumps, decided by one
 #   seed; 30 fixed seeds, each run twice to check it replays exactly (the
 #   nightly runs random seeds for 30 minutes);
+# - dst-remote: the same simulation with the server's code built for
+#   Cloudflare Workers (wrangler dev, local workerd) and for the browser
+#   (headless Chromium, Firefox, WebKit), the world in Node
+#   (scripts/sim/remote-host.mjs): 15 fixed seeds each, every result and
+#   trace digest equal to Node's;
 # - e2e: the browser page's end-to-end tests (test/e2e, Playwright) against
 #   the Node build, on Chromium, Firefox and WebKit, no retries.
 # Local runtimes only: no account, nothing deployed, CI=1. Free runners only.
@@ -141,6 +146,75 @@ jobs:
         if: ${{ !cancelled() }}
         working-directory: examples/ledger
         run: node test/dst.mjs --seeds 10 --first 1001 --faults heavy --keep-going
+  dst-remote:
+    # The same simulation with the server's code as built for Workers (under
+    # wrangler dev: local workerd) and for the browser (headless, the pinned
+    # Playwright), the world in Node (scripts/sim/remote-host.mjs); every
+    # seed's result and trace digest must equal Node's.
+    name: Deterministic simulation on ${{ matrix.title }} (fixed seeds)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: workers, build: 'build:sim-workers', title: 'Cloudflare Workers (wrangler dev)' }
+          - { target: chromium, build: 'build:sim-browser', title: 'headless Chromium' }
+          - { target: firefox, build: 'build:sim-browser', title: 'headless Firefox' }
+          - { target: webkit, build: 'build:sim-browser', title: 'headless WebKit' }
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+      DO_NOT_TRACK: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - uses: ./.github/actions/process-guard
+      - name: npm ci
+        working-directory: examples/ledger
+        run: npm ci --no-audit --no-fund
+      - name: wrangler 4.152.0 (wrangler dev runs workerd locally)
+        if: matrix.target == 'workers'
+        run: |
+          npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund wrangler@4.152.0
+          echo "$RUNNER_TEMP/tools/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: The pinned Playwright's ${{ matrix.target }}, with its system packages
+        if: matrix.target != 'workers'
+        timeout-minutes: 30
+        uses: ./.github/actions/playwright
+        with:
+          browsers: ${{ matrix.target }}
+      - name: npm run build:sim and npm run ${{ matrix.build }}
+        working-directory: examples/ledger
+        run: |
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:sim
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run ${{ matrix.build }}
+      - name: 10 fixed seeds and 5 with heavy faults on ${{ matrix.target }}, each the same as on Node
+        working-directory: examples/ledger
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -o pipefail
+          mkdir -p test-results
+          status=0
+          node test/dst.mjs --target "$TARGET" --seeds 10 --keep-going | tee test-results/dst-$TARGET.log || status=1
+          node test/dst.mjs --target "$TARGET" --seeds 5 --first 1001 --faults heavy --keep-going | tee test-results/dst-$TARGET-heavy.log || status=1
+          node test/dst.mjs --seeds 10 --keep-going > test-results/dst-node.log || true
+          node test/dst.mjs --seeds 5 --first 1001 --faults heavy --keep-going > test-results/dst-node-heavy.log || true
+          node ../../scripts/sim/compare-runs.mjs test-results/dst-$TARGET.log test-results/dst-node.log || status=1
+          node ../../scripts/sim/compare-runs.mjs test-results/dst-$TARGET-heavy.log test-results/dst-node-heavy.log || status=1
+          exit $status
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: ledger-dst-${{ matrix.target }}
+          path: examples/ledger/test-results/
+          retention-days: 14
+          if-no-files-found: ignore
   tigerbeetle:
     name: Differential test against TigerBeetle 0.17.9
     runs-on: ubuntu-24.04
