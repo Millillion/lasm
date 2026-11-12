@@ -185,6 +185,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `bun-deno-published.yml` | dispatch, after release, cron 17 9 * * 1-6 | Linux, macOS, Windows | 19 min (max 39) | Published @lasm/cli with Bun and Deno only, five platforms | After release, nightly |
 | `ci-nightly.yml` | cron 7 1 * * 2-6, dispatch | Linux + called workflows | — | Nightly tier: the release suites on main | Nightly |
 | `ci-weekly.yml` | cron 7 12 * * 6, dispatch | called workflows | — | Weekly tier: long campaigns | Weekly |
+| `cli-models.yml` | dispatch, PR (paths), push main (paths) | Linux | new | Model differential of the CLI's JavaScript: each function with a Lean model (verification/cli/Lasm/Cli/Model/) agrees with it on 2000 generated inputs | PR (paths), main |
 | `conduit-platforms.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 35 min (max 103) | examples/conduit on 15 non-Node platforms, RealWorld traffic equivalence | PR (paths), main |
 | `conduit.yml` | dispatch, call, PR (paths), push main,conduit (paths) | Linux | 24 min (max 107) | examples/conduit: proofs, API on Node/Workers/Bun, RealWorld E2E in three browsers | PR (paths), main |
 | `content.yml` | PR (paths), cron 23 5 * * 1-6, dispatch | Linux | 12 min (max 85) | content/ pages and runnable tutorials | PR (paths), nightly |
@@ -215,7 +216,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `ledger-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 47 min (max 104) | examples/ledger on Bun, Deno, Docker, Workers, WASI auditor | PR (paths), main |
 | `ledger.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 25 min (max 88) | examples/ledger: proofs, API, DST fixed seeds (also on Workers and in three headless browsers, against Node's traces), TigerBeetle differential, E2E | PR (paths), main |
 | `library-prebuilt.yml` | push prebuilt/**, dispatch | Linux | 3 min (max 16) | Regenerates library/prebuilt (maintainer) | On demand |
-| `library-proofs.yml` | dispatch, call, PR (paths), push main (paths) | Linux | — | Proofs of Lasm's library: theorems match Spec.lean, standard axioms only, library/PROOFS.md current; the Candidates files and verification/cli's propositions elaborate | PR (paths), main |
+| `library-proofs.yml` | dispatch, call, PR (paths), push main (paths) | Linux | — | Proofs of Lasm's library: theorems match Spec.lean, standard axioms only, library/PROOFS.md current; the Candidates files and verification/cli's propositions elaborate, and its Spec.lean is proved of its models (README current) | PR (paths), main |
 | `link-toolchain-fixtures.yml` | dispatch | Linux, macOS, Windows | 12 min | Link toolchain fixtures (maintainer) | On demand |
 | `link-toolchain.yml` | dispatch | Linux, macOS, Windows | 11 min | Builds the link toolchain distribution (maintainer) | On demand |
 | `managed-sdk.yml` | dispatch | Linux, macOS, Windows | 7 min | Managed compiler SDK provisioning | On demand |

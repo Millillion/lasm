@@ -450,10 +450,13 @@ test('executable names and directory containment', () => {
   assert.equal(insideDirectory('C:\\a', 'D:\\a\\b', path.win32), false);
 });
 
-// Proposition: Lasm.Cli.Candidates.response_file_round_trip
-//   ∀ args : List String, (∀ a ∈ args, '\n' ∉ a.toList ∧ '\x00' ∉ a.toList) →
-//     ∃ lines : List String, (responseFile args).splitOn "\n" = lines ++ [""] ∧
+// Proposition: Lasm.Cli.Spec.response_file_round_trip
+//   ∀ args : List String, (∀ a ∈ args, '\n' ∉ a.toList ∧ '\r' ∉ a.toList ∧ '\x00' ∉ a.toList) →
+//     ∃ (text : String) (lines : List String), responseFile args = .ok text ∧
+//       (text.toList.splitOn '\n').map String.ofList = lines ++ [""] ∧
 //       if args = [] then lines = [""] else lines.map unquote = args.map some
+// (Proved of the model in verification/cli/Lasm/Cli/Model/Platform.lean,
+// which test/models/cli-differential.mjs checks against this function.)
 test('response files round-trip any argument without NUL or newlines', () => {
   const unquote = line => { assert.ok(line.startsWith('"') && line.endsWith('"'), line); return line.slice(1, -1).replace(/\\(.)/g, '$1'); };
   forAll(r => r.array(r.int(0, 6), () => r.string(['a', ' ', '\\', '"', 'λ', "'", '$', '\t'], 0, 10)), args => {
