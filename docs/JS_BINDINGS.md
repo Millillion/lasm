@@ -1278,7 +1278,15 @@ transactions committed and rolled back, alarms, `blockConcurrencyWhile`);
 `env` of `cloudflare:workers` the handler's bindings; and every generated member
 present on the live objects. `web-bindings.yml` runs it (`cloudflare-conformance`).
 
-CLOUDFLARE_RESULTS
+Measured (web-bindings run 43215378780, `cloudflare-conformance`, wrangler
+4.152.0's local workerd 1.20261019.1): 321 checks pass and one fails as a
+known emulation gap (`available CacheContext`: local `wrangler dev` leaves
+`ExecutionContext.cache` undefined, since the cache purge context is a
+deployed zone's; `test/fixtures/js-cloudflare/known.json`). No generated
+member is missing on the live objects. Size (`test/fixtures/js-cloudflare-size`): a Worker
+that reads a KV key through `Lasm.JS.Cloudflare` builds a 610,093-byte
+WebAssembly module (776,809 bytes of output), 13,625 bytes more than the same
+Worker written with hand-written `Lasm.JS` calls (596,468; 763,178).
 
 ### Pinned version and drift
 
