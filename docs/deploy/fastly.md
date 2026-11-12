@@ -5,12 +5,12 @@ A Lean HTTP handler runs on Fastly Compute as a standard WebAssembly module:
 `pkg/<name>.tar.gz` that `fastly compute deploy` uploads. The program calls
 Fastly's host ABI through [`Lasm.Fastly`](../WASI_FASTLY_BINDINGS.md#lasmfastly),
 generated from Fastly's witx (every HTTP, backend, store, cache, geolocation
-and rate-limiting call), or serves a portable [`Lasm.Fetch`](../FETCH.md)
-handler; there is no JavaScript and no Fastly SDK.
+and rate-limiting call); there is no JavaScript and no Fastly SDK. (A
+[`Lasm.Fetch`](../FETCH.md) handler still runs here until Lasm.Fetch is
+removed; new programs use Lasm.Fastly.)
 
 CI ([`wasi.yml`](../../.github/workflows/wasi.yml)) serves
-[`examples/fastly`](../../examples/fastly/Main.lean) (Lasm.Fastly) and the
-[`examples/fetch`](../../examples/fetch/Main.lean) build (Lasm.Fetch) with
+[`examples/fastly`](../../examples/fastly/Main.lean) (Lasm.Fastly) with
 Viceroy 0.21.1, Fastly's local simulator (the program `fastly compute serve`
 runs), and checks every route: bodies, headers, statuses, streaming, backend
 requests, stores, errors; it also runs Lasm.Fastly's conformance checks
@@ -65,9 +65,8 @@ refused) and `pkg/<name>.tar.gz`.
 Fastly starts a fresh instance of the module for each request and runs
 `main`. With Lasm.Fastly, `main` reads the request with
 `HttpReq.bodyDownstreamGet` and answers with `HttpResp.sendDownstream`
-([examples/fastly](../../examples/fastly/Main.lean)). `Lasm.Fetch.serve` reads the downstream request (method, URL, every
-header value, the body), runs the handler, sends the response with
-`fastly_http_resp.send_downstream`, and returns; the instance then ends.
+([examples/fastly](../../examples/fastly/Main.lean)); `main` returns and
+the instance ends.
 Startup is Lean's module initializers plus `main`; the
 [measurements](../WASI.md#measurements) show what it costs per request.
 Lean's standard output and standard error are the service's logs.
@@ -83,24 +82,15 @@ With Lasm.Fastly: `HttpReq.send req body "origin"` (or `sendAsync`, then
 `pendingReqWait`, several in flight at once), to a backend the service defines
 or one registered with `HttpReq.registerDynamicBackend name "host:port" mask
 config` ([examples/fastly](../../examples/fastly/Main.lean) does both).
-`Lasm.Fetch.fetch` (and `get`, `post`) sends backend requests
-([FETCH.md](../FETCH.md#outbound-requests)):
+A backend the service defines is named in `fastly.toml` for Viceroy:
 
-- `fetch req { backend := some "origin" }` uses a backend the service
-  defines. For Viceroy, define it in `fastly.toml`:
+```toml
+[local_server.backends.origin]
+  url = "https://api.example.com"
+```
 
-  ```toml
-  [local_server.backends.origin]
-    url = "https://api.example.com"
-  ```
-
-- Without `backend`, Lasm registers a dynamic backend for the URL's scheme,
-  host and port (TLS with SNI and the certificate host for `https`). Fastly
-  enables dynamic backends per service; Viceroy always allows them.
-
-Requests are sent with `send_async` and completed by the event loop
-(`fastly_async_io.select`), so several can be in flight at once. Responses
-are read completely; redirects are not followed.
+Fastly enables dynamic backends (`registerDynamicBackend`) per service;
+Viceroy always allows them.
 
 ## Stores
 

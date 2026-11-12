@@ -237,7 +237,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `node-windows-controls.yml` | dispatch | Windows | 2 min (max 12) | Windows resource and isolation controls | On demand |
 | `npm-dist.yml` | call, dispatch | Linux, macOS, Windows | 43 min | npm packages of the candidate through a loopback registry; Bun/Deno installs | Release (rehearsal) |
 | `platform-support.yml` | call, dispatch, push main (paths) | Linux, macOS, Windows | 12 min (max 196) | Launch platform claims: builds, containers, Lambda, native hosts | Release (called), main (paths) |
-| `porter-nightly.yml` | cron 41 3 * * 2-6, dispatch | Linux | 43 min | Porter: 40-minute endpoint fuzzing | Nightly |
+| `porter-nightly.yml` | cron 41 3 * * 2-6, dispatch | Linux | 43 min | Porter: 40-minute endpoint fuzzing of the Node build and of the Workers build under wrangler dev | Nightly |
 | `porter-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 32 min (max 101) | examples/porter on Bun, Deno, Docker, Workers | PR (paths), main |
 | `porter.yml` | dispatch, PR (paths), push main (paths) | Linux | 18 min (max 86) | examples/porter: proofs, oracles, DST, fuzzer, E2E | PR (paths), main |
 | `published-templates.yml` | dispatch, after release | Linux | 0 min (max 30) | npm create @lasm from the registry after a release | After release |
