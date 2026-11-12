@@ -33,6 +33,7 @@ import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Platform
+import Lasm.Cli.Model.ProcessLauncher
 import Lasm.Cli.Model.WasiComponent
 import Lasm.Cli.Model.Zip
 
@@ -200,23 +201,9 @@ def unquote (line : String) : Option String :=
 
 /-! ## The process launcher (src/process-launcher.mjs) -/
 
-/-- The options of `encodeProcessConfiguration` (command, arguments,
-environment in order, working directories, the three stdio flags). -/
-structure LaunchOptions where
-  command : String
-  args : List String
-  env : List (String × String)
-  directory : Option String
-  requestedCwd : Option String
-  stdio : List UInt32
-
-/-- `encodeProcessConfiguration(options)`. -/
-opaque encodeProcessConfiguration : LaunchOptions → ByteArray
-
-/-- Not Lasm's JavaScript: how the native launcher (native/process-launcher.c)
-reads a configuration, as the test transcribes it (`decode`): the argument
-vector, the environment, the two directories and the stdio flags. -/
-opaque launcherReads : ByteArray → Option (List String × List (String × String) × Option String × Option String × List UInt32)
+-- `encodeProcessConfiguration(options)` (src/process-launcher.mjs) and the
+-- launcher's reading of it (native/process-launcher.c): modelled in
+-- Model/ProcessLauncher.lean.
 
 /-! ## Builds: names, initializers, builtin modules -/
 

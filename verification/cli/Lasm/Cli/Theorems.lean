@@ -1367,6 +1367,151 @@ theorem run_args_kept : Spec.run_args_kept := by
   · simp only [Parsed.verbose, f10]; split <;> simp_all [parseLasmArgumentsWith.start]
   · simp only [Parsed.profile, f11]; split <;> simp_all [parseLasmArgumentsWith.start]
 
+/-! ## The process launcher -/
+
+theorem readNumber_le32 {n : Nat} (h : n < 4294967296) (r : List UInt8) : readNumber (le32 n ++ r) = some (n, r) := by
+  simp only [le32, List.cons_append, List.nil_append, readNumber, Option.some.injEq, Prod.mk.injEq, and_true]
+  simp only [Nat.toUInt8_eq, UInt8.toNat_ofNat']
+  omega
+
+theorem readString_some {b : List UInt8} (h0 : 0 ∉ b) (hl : b.length < 0xffffffff) (opt : Bool) (r : List UInt8) :
+    readString opt (le32 b.length ++ b ++ r) = some (some b, r) := by
+  rw [readString, List.append_assoc, readNumber_le32 (by omega)]
+  simp [Nat.ne_of_lt hl, h0]
+
+theorem readString_none (r : List UInt8) : readString true (le32 0xffffffff ++ r) = some (none, r) := by
+  rw [readString, readNumber_le32 (by omega)]
+  simp
+
+theorem encodeString_some {b : List UInt8} (h0 : 0 ∉ b) : encodeString (some b) = .ok (le32 b.length ++ b) := by
+  simp [encodeString, h0]
+
+/-- Text whose UTF-8 has no NUL byte and fits the format. -/
+def Fits (b : List UInt8) : Prop := 0 ∉ b ∧ b.length < 0xffffffff
+
+theorem readStrings_encoded : ∀ (vs : List (List UInt8)) (r : List UInt8), (∀ v ∈ vs, Fits v) →
+    readStrings vs.length ((vs.map fun v => le32 v.length ++ v).flatten ++ r) = some (vs, r)
+  | [], r, _ => by simp [readStrings]
+  | v :: vs, r, h => by
+    have hv := h v (by simp)
+    simp only [List.length_cons, List.map_cons, List.flatten_cons, List.append_assoc, readStrings]
+    rw [← List.append_assoc, readString_some hv.1 hv.2]
+    simp only [bind, Option.bind]
+    rw [readStrings_encoded vs r fun w hw => h w (by simp [hw])]
+    rfl
+
+theorem readPairs_encoded : ∀ (ps : List (List UInt8 × List UInt8)) (r : List UInt8), (∀ p ∈ ps, Fits p.1 ∧ Fits p.2) →
+    readPairs ps.length ((ps.map fun p => le32 p.1.length ++ (p.1 ++ (le32 p.2.length ++ p.2))).flatten ++ r) = some (ps, r)
+  | [], r, _ => by simp [readPairs]
+  | p :: ps, r, h => by
+    have hp := h p (by simp)
+    simp only [List.length_cons, List.map_cons, List.flatten_cons, List.append_assoc, readPairs]
+    rw [← List.append_assoc, readString_some hp.1.1 hp.1.2]
+    simp only [bind, Option.bind]
+    rw [← List.append_assoc, readString_some hp.2.1 hp.2.2]
+    dsimp only
+    rw [readPairs_encoded ps r fun w hw => h w (by simp [hw])]
+    rfl
+
+theorem mapM_encodeString : ∀ (vs : List (List UInt8)), (∀ v ∈ vs, 0 ∉ v) →
+    vs.mapM (fun v => encodeString (some v)) = .ok (vs.map fun v => le32 v.length ++ v)
+  | [], _ => rfl
+  | v :: vs, h => by
+    rw [List.mapM_cons, encodeString_some (h v (by simp)), mapM_encodeString vs fun w hw => h w (by simp [hw])]
+    rfl
+
+/-- An optional string as `string` writes it. -/
+def encOpt : Option (List UInt8) → List UInt8
+  | none => le32 0xffffffff
+  | some b => le32 b.length ++ b
+
+theorem encodeString_opt {x : Option (List UInt8)} (h : ∀ b ∈ x, 0 ∉ b) : encodeString x = .ok (encOpt x) := by
+  cases x with
+  | none => rfl
+  | some b => exact encodeString_some (h b rfl)
+
+theorem readString_opt {x : Option (List UInt8)} (h : ∀ b ∈ x, Fits b) (r : List UInt8) :
+    readString true (encOpt x ++ r) = some (x, r) := by
+  cases x with
+  | none => exact readString_none r
+  | some b => exact readString_some (h b rfl).1 (h b rfl).2 true r
+
+theorem mapM_pairs : ∀ (ps : List (List UInt8 × List UInt8)), (∀ p ∈ ps, 0 ∉ p.1 ∧ 0 ∉ p.2) →
+    ps.mapM (fun (p : List UInt8 × List UInt8) => do return (← encodeString (some p.1)) ++ (← encodeString (some p.2))) =
+      .ok (ps.map fun p => le32 p.1.length ++ (p.1 ++ (le32 p.2.length ++ p.2)))
+  | [], _ => rfl
+  | p :: ps, h => by
+    rw [List.mapM_cons, encodeString_some (h p (by simp)).1, encodeString_some (h p (by simp)).2,
+      mapM_pairs ps fun w hw => h w (by simp [hw])]
+    simp [bind, pure, Except.bind, Except.pure]
+
+theorem launcher_config_round_trip : Spec.launcher_config_round_trip := by
+  intro o hbytes h3 htexts hargs henv
+  obtain ⟨command, args, env, directory, requestedCwd, stdioFlags, directoryFd, inh, setsid, envBytes⟩ := o
+  simp only at hbytes h3 htexts hargs henv ⊢
+  subst hbytes
+  match stdioFlags, h3 with
+  | [a, b, c], _ =>
+  have fits : ∀ s ∈ command :: args ++ env.flatMap (fun (k, v) => [k, v]) ++ directory.toList ++ requestedCwd.toList, Fits (utf8Bytes s) := htexts
+  have hdir : ∀ x ∈ directory.map utf8Bytes, Fits x := by
+    intro x hx; simp only [Option.mem_def, Option.map_eq_some_iff] at hx; obtain ⟨d, rfl, rfl⟩ := hx; exact fits _ (by simp)
+  have hreq : ∀ x ∈ requestedCwd.map utf8Bytes, Fits x := by
+    intro x hx; simp only [Option.mem_def, Option.map_eq_some_iff] at hx; obtain ⟨d, rfl, rfl⟩ := hx; exact fits _ (by simp)
+  have hargv : ∀ x ∈ (command :: args).map utf8Bytes, Fits x := by
+    intro x hx; simp only [List.mem_map] at hx; obtain ⟨d, hd, rfl⟩ := hx; exact fits _ (by simp at hd ⊢; rcases hd with h | h <;> simp [h])
+  have henv' : ∀ p ∈ env.map (fun (k, v) => (utf8Bytes k, utf8Bytes v)), Fits p.1 ∧ Fits p.2 := by
+    intro p hp; simp only [List.mem_map] at hp; obtain ⟨⟨k, v⟩, hkv, rfl⟩ := hp
+    have hk : k ∈ env.flatMap (fun (k, v) => [k, v]) := List.mem_flatMap.mpr ⟨(k, v), hkv, by simp⟩
+    have hv : v ∈ env.flatMap (fun (k, v) => [k, v]) := List.mem_flatMap.mpr ⟨(k, v), hkv, by simp⟩
+    exact ⟨fits _ (by simp only [List.mem_append]; exact Or.inl (Or.inl (Or.inr hk))),
+      fits _ (by simp only [List.mem_append]; exact Or.inl (Or.inl (Or.inr hv)))⟩
+  have nul : ∀ {x : Option (List UInt8)}, (∀ b ∈ x, Fits b) → ∀ b ∈ x, 0 ∉ b := fun h b hb => (h b hb).1
+  have henc : encodeProcessConfiguration (LaunchOptions.mk command args env directory requestedCwd [a, b, c] directoryFd inh setsid none) = .ok ⟨(launcherMagic ++
+        le32 ((if directoryFd.isNone then 0 else 1) + (if inh then 2 else 0) + (if setsid then 4 else 0)) ++
+        (le32 (uint32Of a) ++ le32 (uint32Of b) ++ le32 (uint32Of c)) ++ encOpt (directory.map utf8Bytes) ++
+        encOpt (requestedCwd.map utf8Bytes) ++ le32 (args.length + 1) ++
+        (((command :: args).map utf8Bytes).map fun v => le32 v.length ++ v).flatten ++ le32 env.length ++
+        ((env.map fun (k, v) => (utf8Bytes k, utf8Bytes v)).map fun p => le32 p.1.length ++ (p.1 ++ (le32 p.2.length ++ p.2))).flatten).toArray⟩ := by
+    have e1 := encodeString_opt (nul hdir)
+    have e2 := encodeString_opt (nul hreq)
+    have e3 := mapM_encodeString ((command :: args).map utf8Bytes) fun v hv => (hargv v hv).1
+    have e4 := mapM_pairs (env.map fun (k, v) => (utf8Bytes k, utf8Bytes v)) fun p hp => ⟨(henv' p hp).1.1, (henv' p hp).2.1⟩
+    rw [List.mapM_map] at e3
+    simp only [encodeProcessConfiguration, Option.getD_none, e1, e2]
+    erw [e3, e4]
+    simp [bind, Except.bind, pure, Except.pure, List.append_assoc]
+  refine ⟨_, henc, ?_⟩
+  have u32 : ∀ x : Int, uint32Of x < 4294967296 := fun x => by unfold uint32Of; omega
+  have hflags : ((if directoryFd.isNone = true then 0 else 1) + (if inh = true then 2 else 0) + (if setsid = true then 4 else 0)) < 8 := by
+    split <;> split <;> split <;> omega
+  have rf := readNumber_le32 (Nat.lt_trans hflags (by omega))
+  have ra := readNumber_le32 (u32 a)
+  have rb := readNumber_le32 (u32 b)
+  have rc := readNumber_le32 (u32 c)
+  have rn := readNumber_le32 hargs
+  have re := readNumber_le32 (n := env.length) henv
+  have rd := readString_opt hdir
+  have rr := readString_opt hreq
+  have rs := readStrings_encoded ((command :: args).map utf8Bytes)
+  have rp := readPairs_encoded (env.map fun (k, v) => (utf8Bytes k, utf8Bytes v))
+  simp only [List.length_map, List.length_cons] at rs rp
+  have hm1 : ∀ r : List UInt8, (decide ((launcherMagic ++ r).length < 8) || (launcherMagic ++ r).take 8 != launcherMagic) = false := by
+    intro r
+    rw [Bool.or_eq_false_iff]
+    constructor
+    · apply decide_eq_false; simp only [launcherMagic, List.length_append, List.length_cons, List.length_nil]; omega
+    · simp [launcherMagic]
+  have hm2 : ∀ r : List UInt8, (launcherMagic ++ r).drop 8 = r := by intro r; simp [launcherMagic]
+  simp only [List.append_assoc] at rs rp ⊢
+  have hf' : ¬ ((if directoryFd.isNone = true then 0 else 1) + (if inh = true then 2 else 0) + (if setsid = true then 4 else 0)) ≥ 8 := by omega
+  have hn' : ¬ args.length + 1 = 0 := by omega
+  simp only [launcherRead, hm1, hm2, rf, Option.bind_eq_bind, Option.bind_some, hf', ↓reduceIte, ra, rb, rc, rd, rr, rn, hn', re,
+    rs _ hargv, Bool.false_eq_true]
+  have rp' := rp [] henv'
+  simp only [List.append_nil] at rp'
+  rw [rp']
+  simp [pure]
+
 /-! ## Function packages -/
 
 theorem zip_deterministic : Spec.zip_deterministic := fun _ => rfl

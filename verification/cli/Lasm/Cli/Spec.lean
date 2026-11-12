@@ -163,6 +163,24 @@ def drops_only_component_type : Prop :=
     withoutComponentType (bytes (moduleHeader ++ ss.flatMap Sec.encoding)) =
       bytes (moduleHeader ++ (ss.filter (!·.componentType)).flatMap Sec.encoding)
 
+/-! ## The process launcher -/
+
+/-- **The launcher configuration round-trips.** For options whose texts
+have no NUL byte and fit the format (under 4 GiB), `encodeProcessConfiguration`
+succeeds and the native launcher reads back exactly the flags, the three
+stdio flags, both directories, the command and arguments as its argument
+vector, and the environment's pairs in order (as UTF-8 bytes).
+Tested by: test/cli-helpers.test.mjs -/
+def launcher_config_round_trip : Prop :=
+  ∀ o : LaunchOptions, o.envBytes = none → o.stdioFlags.length = 3 →
+    (∀ s ∈ o.command :: o.args ++ o.env.flatMap (fun (k, v) => [k, v]) ++ o.directory.toList ++ o.requestedCwd.toList,
+      0 ∉ utf8Bytes s ∧ (utf8Bytes s).length < 0xffffffff) →
+    o.args.length + 1 < 4294967296 → o.env.length < 4294967296 →
+    ∃ b, encodeProcessConfiguration o = .ok b ∧ launcherRead b.data.toList = some
+      { flags := (if o.directoryFd.isNone then 0 else 1) + (if o.inheritProcessCwd then 2 else 0) + (if o.setsid then 4 else 0),
+        stdio := o.stdioFlags.map uint32Of, directory := o.directory.map utf8Bytes, requestedCwd := o.requestedCwd.map utf8Bytes,
+        argv := (o.command :: o.args).map utf8Bytes, env := o.env.map fun (k, v) => (utf8Bytes k, utf8Bytes v) }
+
 /-! ## Function packages -/
 
 /-- **`zip` is deterministic.** The archive depends on the entries alone (no

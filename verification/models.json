@@ -48,8 +48,17 @@
       "reason": "POSIX signal delivery through a pipe; tested by the signal tests on Linux and macOS"
     },
     "native/process-launcher.c": {
-      "status": "pending",
-      "reason": "reads the launcher configuration that src/process-launcher.mjs writes: model the format (candidate launcher_config_round_trip)"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/ProcessLauncher.lean",
+          "differential": "test/models/cli-differential.mjs",
+          "functions": [
+            "main's reading of the configuration (number, string, read_exact)"
+          ]
+        }
+      ],
+      "reason": "its reading of the configuration is modelled, and the differential runs the compiled C (effects reported instead of performed, test/models/process-launcher-harness.c); what it then does (stdio flags, chdir, setsid, execvp) is I/O, tested end to end by test/process-launcher.test.mjs"
     },
     "src/application-binding-check.mjs": {
       "status": "pending",
@@ -612,8 +621,17 @@
       "reason": "Lean's runtime primitives on this host: their meaning is native Lean's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md)"
     },
     "src/process-launcher.mjs": {
-      "status": "pending",
-      "reason": "the launcher's configuration format: pure (candidate launcher_config_round_trip)"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/ProcessLauncher.lean",
+          "differential": "test/models/cli-differential.mjs",
+          "functions": [
+            "encodeProcessConfiguration"
+          ]
+        }
+      ],
+      "reason": "the configuration writer is modelled (launcher_config_round_trip proved with the reader's model); nativeProcessLauncher finds and verifies the shipped binary (files and hashes, test/cli-helpers.test.mjs)"
     },
     "src/sdk-repairs.mjs": {
       "status": "exempt",

@@ -25,6 +25,13 @@ answer are the JavaScript's, read as the model's types:
                   "deflate": [["<hex>", "<hex>"], …], "crc32": [["<hex>", <n>], …]}
                                                     → {"bytes": "<hex>"} | {"error": "…"}
 (`deflate` and `crc32` are node:zlib's answers for each entry's bytes)
+  encodeProcessConfiguration  {"command": "<hex>", "args": [...], "env": [["<hex>", "<hex>"], …],
+                  "directory": "<hex>" | null, "requestedCwd": …, "stdioFlags": ["<int>", …], "directoryFd": n | null,
+                  "inheritProcessCwd": b, "setsid": b, "envBytes": [["<hex>", "<hex>"], …] | null}
+                                                    → {"bytes": "<hex>"} | {"error": "…"}
+  launcherRead   "<hex>"  → null (refused) | {"stdio": [n, n, n], "argv": ["<hex>", …], "environ": ["<hex of k=v>", …]}
+(the environment as `setenv` builds it from the pairs read, after `clearenv`:
+a name that is empty or holds `=` is refused, a repeated name is replaced in place)
   initializationSchedule  {"name": "…", "calls": [["…", ["…", …]], …], "keep": ["…", …]}
                                                     → ["…", …]
   compactInitializerWrappers  {"closure": […], "keep": […], "calls": […]}
@@ -48,6 +55,7 @@ import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Platform
+import Lasm.Cli.Model.ProcessLauncher
 import Lasm.Cli.Model.WasiComponent
 import Lasm.Cli.Model.Zip
 
@@ -119,6 +127,14 @@ def ofBytes : Except String ByteArray → Json
   | .ok b => Json.mkObj [("bytes", toJson (hex b))]
   | .error e => Json.mkObj [("error", toJson e)]
 
+/-- `setenv(key, value, 1)` for each pair after `clearenv()` (libc's, not
+the launcher's: what the differential observes is the environment it builds). -/
+def setenvAll (pairs : List (List UInt8 × List UInt8)) : List (List UInt8 × List UInt8) :=
+  pairs.foldl (init := []) fun env (k, v) =>
+    if k = [] || k.contains 61 then env
+    else if env.any (·.1 == k) then env.map fun (k', v') => if k' == k then (k, v) else (k', v')
+    else env ++ [(k, v)]
+
 def answer (j : Json) : Except String Json := do
   let input ← j.getObjVal? "input"
   match ← j.getObjValAs? String "model" with
@@ -153,6 +169,33 @@ def answer (j : Json) : Except String Json := do
         | some j => (j.getNat?.toOption.getD 0).toUInt32
         | none => 0 }
     return ofBytes (zipWith codec entries)
+  | "encodeProcessConfiguration" =>
+    let opt := fun (k : String) => do
+      let j ← input.getObjVal? k
+      if j.isNull then pure none else some <$> text j
+    let pairsOf := fun (j : Json) => do
+      (← j.getArr?).toList.mapM fun e => return ((← unhex (← (← e.getArrVal? 0).getStr?)).data.toList, (← unhex (← (← e.getArrVal? 1).getStr?)).data.toList)
+    let command ← text (← input.getObjVal? "command")
+    let args ← texts (← input.getObjVal? "args")
+    let env ← (← (← input.getObjVal? "env").getArr?).toList.mapM fun e => return (← text (← e.getArrVal? 0), ← text (← e.getArrVal? 1))
+    let directory ← opt "directory"
+    let requestedCwd ← opt "requestedCwd"
+    let stdioFlags ← (← (← input.getObjVal? "stdioFlags").getArr?).toList.mapM integer
+    let fdJ ← input.getObjVal? "directoryFd"
+    let directoryFd ← if fdJ.isNull then pure none else some <$> fdJ.getNat?
+    let inheritProcessCwd ← (← input.getObjVal? "inheritProcessCwd").getBool?
+    let setsid ← (← input.getObjVal? "setsid").getBool?
+    let ebJ ← input.getObjVal? "envBytes"
+    let envBytes ← if ebJ.isNull then pure none else some <$> pairsOf ebJ
+    return ofBytes (encodeProcessConfiguration
+      { command, args, env, directory, requestedCwd, stdioFlags, directoryFd, inheritProcessCwd, setsid, envBytes })
+  | "launcherRead" =>
+    return match launcherRead (← unhex (← input.getStr?)).data.toList with
+      | none => Json.null
+      | some c =>
+        let hexL := fun (l : List UInt8) => toJson (hex ⟨l.toArray⟩)
+        Json.mkObj [("stdio", toJson c.stdio), ("argv", toJson (c.argv.map hexL)),
+          ("environ", toJson ((setenvAll c.env).map fun (k, v) => hexL (k ++ [61] ++ v)))]
   | "componentize" =>
     let field := fun (k : String) => do unhex (← (← input.getObjVal? k).getStr?)
     return ofBytes (componentize (← field "core") (← field "template"))

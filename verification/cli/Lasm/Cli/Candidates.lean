@@ -56,18 +56,6 @@ def parse_known_or_refused : Prop :=
         (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
     | .error m => m.trimAscii.toString ≠ ""
 
-/-! ## The process launcher -/
-
-/-- **The launcher configuration round-trips.** The native launcher reads
-back the command and arguments as its argument vector, the environment in
-order, both directories and the stdio flags, for any text without NUL.
-Tested by: test/cli-helpers.test.mjs -/
-def launcher_config_round_trip : Prop :=
-  ∀ o : LaunchOptions,
-    (∀ s ∈ o.command :: o.args ++ o.env.flatMap (fun (k, v) => [k, v]) ++ o.directory.toList ++ o.requestedCwd.toList, '\x00' ∉ s.toList) →
-    (o.env.map (·.1)).Nodup → o.stdio.length = 3 →
-    launcherReads (encodeProcessConfiguration o) = some (o.command :: o.args, o.env, o.directory, o.requestedCwd, o.stdio)
-
 /-! ## Builds -/
 
 /-- **Mangling round-trips.** For a dotted name Lean mangles unambiguously,

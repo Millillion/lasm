@@ -13,8 +13,8 @@
 // the model modules into a temporary directory and checks each model `runs`
 // times (default 2000). Run by the cli-models workflow (docs/CI.md).
 import assert from 'node:assert/strict';
-import { execFileSync, spawn } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
+import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -28,6 +28,7 @@ import { numbers } from '../../src/node-host.mjs';
 import { responseFile } from '../../src/platform.mjs';
 import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 import { zip } from '../../src/serverless/zip.mjs';
+import { encodeProcessConfiguration } from '../../src/process-launcher.mjs';
 import { deflateRawSync, crc32 } from 'node:zlib';
 import { compactInitializerWrappers, initializationSchedule } from '../../src/edge/edge-initializers.mjs';
 import { builtinModuleClosure } from '../../src/edge/builtin-modules.mjs';
@@ -164,6 +165,58 @@ const parsedJson = parsed => Object.fromEntries(Object.entries(parsed).map(([k, 
   [k, k === 'args' ? v.map(hex) : hexFields.includes(k) ? hex(v) : v]));
 const delegates = { init: parseInitArguments, dev: parseDevArguments, package: parsePackageArguments };
 
+/** Launcher options: texts with the characters that matter to the format
+ * and to `setenv` (`=` in names, empty names, repeated names). */
+const launchText = r => r.string(['a', 'Z', ' ', '=', 'λ', '/', '\n', '日', '😀'], 0, 6);
+function launchOptions(r) {
+  const env = r.array(r.int(0, 4), () => [r.pick(['A', 'B', 'A=B', '', 'PATH', launchText(r)]), launchText(r)]);
+  return {
+    command: r.next() < 0.05 ? 'a\0b' : launchText(r) || 'c', args: r.array(r.int(0, 4), () => r.next() < 0.03 ? '\0' : launchText(r)),
+    env: Object.fromEntries(env), directory: r.next() < 0.5 ? launchText(r) : undefined, requestedCwd: r.next() < 0.5 ? launchText(r) : undefined,
+    stdioFlags: [r.int(-2, 9), r.int(0, 2 ** 31), r.int(0, 3)], ...(r.next() < 0.5 ? { directoryFd: r.int(0, 5) } : {}),
+    inheritProcessCwd: r.next() < 0.5, setsid: r.next() < 0.5,
+    ...(r.next() < 0.2 ? { envBytes: env.map(([k, v]) => [Buffer.from(k).toString('base64'), Buffer.from([...Buffer.from(v), r.int(1, 255)]).toString('base64')]) } : {}),
+  };
+}
+/** A configuration for the launcher: an encoding, often corrupted. */
+function launcherConfig(r) {
+  let bytes;
+  try { bytes = [...encodeProcessConfiguration(launchOptions(r))]; } catch { bytes = [...Buffer.from('LASMEX01'), ...randomBytes(r, 30)]; }
+  const roll = r.next(), at = () => r.int(0, bytes.length - 1);
+  if (roll < 0.1) bytes = bytes.slice(0, r.int(0, bytes.length));
+  else if (roll < 0.15) bytes.push(r.int(0, 255));
+  else if (roll < 0.25) bytes[at()] = r.pick([0, 1, 7, 8, 0xff, r.int(0, 255)]);
+  else if (roll < 0.3) bytes[8] = r.int(8, 255);
+  else if (roll < 0.33) bytes[r.int(0, 7)] ^= 1;
+  return bytes;
+}
+/** native/process-launcher.c, compiled with its effects reported
+ * (test/models/process-launcher-harness.c), and run on a configuration:
+ * `null` where it refuses it (exit status 125), else what it would use. */
+let harness;
+function runLauncher(bytes) {
+  if (!harness) {
+    const dir = mkdtempSync(join(tmpdir(), 'lasm-launcher-harness-'));
+    harness = { dir, path: join(dir, 'launcher') };
+    execFileSync(process.env.CC || 'cc', ['-O1', '-w', '-o', harness.path, fileURLToPath(new URL('./process-launcher-harness.c', import.meta.url))],
+      { stdio: ['ignore', 'inherit', 'inherit'] });
+  }
+  const file = join(harness.dir, 'config');
+  writeFileSync(file, Uint8Array.from(bytes));
+  const fd = openSync(file, 'r');
+  try {
+    const run = spawnSync(harness.path, [], { stdio: ['ignore', 'pipe', 'pipe', fd], env: { KEPT: 'cleared' }, timeout: 10_000 });
+    if (run.status === 125) return null;
+    if (run.status !== 0) throw new Error(`the launcher harness exited ${run.status ?? run.signal}: ${run.stderr}`);
+    const out = { stdio: [], argv: [], environ: [] };
+    for (const line of run.stdout.toString().split('\n').filter(Boolean)) {
+      const [kind, value = ''] = line.split(' ');
+      if (kind === 'stdio') out.stdio.push(Number(value)); else out[kind === 'arg' ? 'argv' : 'environ'].push(value);
+    }
+    return out;
+  } finally { closeSync(fd); }
+}
+
 /** Each model: the JavaScript module and function it mirrors, the Lean
  * module, a generator, the JavaScript's answer and the request's input,
  * both in the runner's encoding. Each module's entry in
@@ -286,6 +339,21 @@ export const models = [
     js: entries => attempt(() => zip(entries)),
   },
   {
+    name: 'encodeProcessConfiguration', source: 'src/process-launcher.mjs', lean: 'Lasm.Cli.Model.ProcessLauncher',
+    generate: launchOptions,
+    input: o => ({ command: hex(o.command), args: o.args.map(hex), env: Object.entries(o.env).map(([k, v]) => [hex(k), hex(v)]),
+      directory: o.directory === undefined ? null : hex(o.directory), requestedCwd: o.requestedCwd === undefined ? null : hex(o.requestedCwd),
+      stdioFlags: o.stdioFlags.map(String), directoryFd: o.directoryFd ?? null, inheritProcessCwd: o.inheritProcessCwd, setsid: o.setsid,
+      envBytes: o.envBytes ? o.envBytes.map(pair => pair.map(v => Buffer.from(v, 'base64').toString('hex'))) : null }),
+    js: o => attempt(() => encodeProcessConfiguration(o)),
+  },
+  {
+    name: 'launcherRead', source: 'native/process-launcher.c', lean: 'Lasm.Cli.Model.ProcessLauncher',
+    generate: launcherConfig,
+    input: bytes => hexOf(bytes),
+    js: runLauncher,
+  },
+  {
     name: 'withoutComponentType', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',
     generate: r => wasmBytes(r, coreHeader, g => {
       if (g.next() < 0.5) return { id: g.pick([1, 3, 7, 10]), body: randomBytes(g, 20) };
@@ -375,7 +443,8 @@ async function start(leanPath) {
       waiting.push({ resolve, reject });
       child.stdin.write(JSON.stringify(request) + '\n');
     }),
-    stop: () => { child.stdin.end(); rmSync(out, { recursive: true, force: true }); if (parseDirectory) rmSync(parseDirectory, { recursive: true, force: true }); parseDirectory = undefined; },
+    stop: () => { child.stdin.end(); rmSync(out, { recursive: true, force: true }); if (parseDirectory) rmSync(parseDirectory, { recursive: true, force: true }); parseDirectory = undefined;
+      if (harness) rmSync(harness.dir, { recursive: true, force: true }); harness = undefined; },
   };
 }
 
