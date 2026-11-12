@@ -11,21 +11,32 @@
 //   `>` or `"` and no `&` but the four references (the run-time check of the
 //   proposition `output_reads_back`).
 //
-//   node test/fuzz.mjs [--seed N] [--minutes M] [--engine lasm|native]
+//   node test/fuzz.mjs [--seed N] [--minutes M] [--engine lasm|native|chromium|firefox|webkit|URL]
+//                      [--platform workers|fastly|deno-deploy]
+//
+// The engine is a build of the renderer (test/batch.mjs): `lasm` (the
+// default, the Node build), `native`, the browser build in a headless
+// browser, or a running site server (`POST URL/api/render`). `--platform`
+// builds nothing: it serves the site server already built for that edge
+// platform (`npm run build:workers`, …) with the platform's own local tooling
+// (test/platforms.mjs: wrangler dev, Viceroy, the Deno CLI), fuzzes it over
+// HTTP and stops it. The time budget is the same on every engine.
 //
 // The seed is printed first; a run replays from it. A failing document is
 // written to test-results/fuzz-SEED-N.md.
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { renderAll } from './batch.mjs';
+import { renderAllAsync } from './batch.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const arg = (n, d) => process.argv.includes(n) ? process.argv[process.argv.indexOf(n) + 1] : d;
 const seed = Number(arg('--seed', Math.floor(Math.random() * 2 ** 31)));
 const minutes = Number(arg('--minutes', 5));
-if (arg('--engine', null) === 'native') process.env.FOLIO_BATCH = 'native';
-console.log(`seed ${seed} (replay: node test/fuzz.mjs --seed ${seed} --minutes ${minutes})`);
+const platform = arg('--platform', null);
+let engine = { lasm: 'node', native: 'native' }[arg('--engine', 'lasm')] ?? arg('--engine', 'lasm');
+const where = platform ? ` --platform ${platform}` : engine !== 'node' ? ` --engine ${arg('--engine')}` : '';
+console.log(`seed ${seed} (replay: node test/fuzz.mjs --seed ${seed} --minutes ${minutes}${where})`);
 
 function rng(s) {
   return () => {
@@ -100,6 +111,28 @@ export function strictlyValid(html) {
   return stack.length ? `unclosed ${stack.join(',')}` : null;
 }
 
+// An edge platform's site server, served locally for the run.
+let server = null;
+if (platform) {
+  const { platforms, removeRunDirectory, runDirectory, seed: seedStore, startServer } = await import('./platforms.mjs');
+  if (!platforms[platform]) { console.error(`unknown platform ${platform}; one of ${Object.keys(platforms).join(', ')}`); process.exit(2); }
+  const port = Number(arg('--port', 8790));
+  const data = runDirectory(platform);
+  cpSync(join(root, 'site'), join(data, 'site'), { recursive: true });
+  seedStore(platform, data);
+  const s = startServer(platform, port, data);
+  server = { stop: async () => { await s.stop(); removeRunDirectory(data); } };
+  engine = `http://127.0.0.1:${port}/`;
+  const started = Date.now();
+  for (;;) {
+    if (s.child.exitCode !== null) { await server.stop(); throw new Error(`the ${platform} server exited (${s.child.exitCode})`); }
+    try { await (await fetch(engine, { signal: AbortSignal.timeout(10_000) })).arrayBuffer(); break; } catch {}
+    if (Date.now() - started > 180_000) { await server.stop(); throw new Error(`the ${platform} server did not answer within 3 minutes`); }
+    await new Promise(r => setTimeout(r, 500));
+  }
+}
+const render = (cases, timeout) => renderAllAsync(cases, { timeout, engine });
+
 const budget = md => 10_000 + Math.ceil(md.length / 100_000) * 4_000;
 const deadline = Date.now() + minutes * 60_000;
 let docs = 0, chars = 0, failures = 0;
@@ -119,13 +152,13 @@ while (Date.now() < deadline && failures < 5) {
   const cases = batch.flatMap(md => [{ markdown: md, unsafe: false }, { markdown: md, unsafe: true }]);
   let results;
   try {
-    results = renderAll(cases, { timeout: batch.reduce((t, md) => t + budget(md), 0) });
+    results = await render(cases, batch.reduce((t, md) => t + budget(md), 0));
   } catch {
     // isolate the document that crashed or ran out of time
     for (const md of batch) {
       const started = Date.now();
-      try { renderAll([{ markdown: md, unsafe: false }, { markdown: md, unsafe: true }], { timeout: budget(md) * 2 }); }
-      catch (e) { fail(md, e.signal ? `killed by ${e.signal} after ${Date.now() - started} ms` : `exit ${e.status}`); }
+      try { await render([{ markdown: md, unsafe: false }, { markdown: md, unsafe: true }], budget(md) * 2); }
+      catch (e) { fail(md, e.signal ? `killed by ${e.signal} after ${Date.now() - started} ms` : e.status !== undefined ? `exit ${e.status}` : `${e.message} after ${Date.now() - started} ms`); }
     }
     continue;
   }
@@ -136,5 +169,6 @@ while (Date.now() < deadline && failures < 5) {
   docs += batch.length;
   chars += size;
 }
-console.log(`${docs} documents (${(chars / 1e6).toFixed(1)} million characters) rendered twice each; ${failures} failures (seed ${seed}).`);
+await server?.stop();
+console.log(`${docs} documents (${(chars / 1e6).toFixed(1)} million characters) rendered twice each on ${platform ?? engine}; ${failures} failures (seed ${seed}).`);
 process.exitCode = failures ? 1 : 0;
