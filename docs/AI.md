@@ -41,13 +41,15 @@ deploys Lean with Lasm. The [README](../README.md) has the complete reference;
 4. **Minimize JS calls.** Each one costs about 24 µs. Read many fields at once
    (`getFields`) and return replies with `Function.Reply` rather than calling back.
 5. **Pick the HTTP layer by target.** For Node in production, use Hono, Express or
-   Fastify with Lean handlers, or `Lasm.Fetch`. For Fastly Compute, use `Lasm.Fastly`
-   (Fastly's host ABI, generated: `HttpReq.bodyDownstreamGet`, `HttpResp.sendDownstream`,
-   the stores; [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)) or `Lasm.Fetch`. For
-   wasi-http (wasmtime serve, Spin), use `Lasm.WASI.Http` (the WIT's own interfaces,
-   generated: `IncomingHandler.serve`, `OutgoingResponse`, `ResponseOutparam.set`) or
-   `Lasm.Fetch`. For edge and WASI, use `Lasm.Fetch` (or Hono with `--deploy workers`). `Std.Http`
-   works on Node only and is slow.
+   Fastify with Lean handlers, or `Lasm.Fetch` (scheduled for removal). For Fastly Compute,
+   use `Lasm.Fastly` (Fastly's host ABI, generated: `HttpReq.bodyDownstreamGet`,
+   `HttpResp.sendDownstream`, the stores; [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)).
+   For wasi-http (wasmtime serve, Spin), use `Lasm.WASI.Http` (the WIT's own interfaces,
+   generated: `IncomingHandler.serve`, `OutgoingResponse`, `ResponseOutparam.set`). For
+   Bun, Deno and the edge, a `Request → Async Response` handler on `Lasm.JS.Web`, served
+   by `Deno.serve` (`Lasm.JS.Deno`), `Bun.serve` (`Lasm.JS.Bun`) or `exportDefault`
+   (Workers and the edge), or Hono with `--deploy workers`. Outbound HTTP on JavaScript
+   targets is `Lasm.JS.Web`'s `fetch`. `Std.Http` works on Node only and is slow.
 6. **Single-threaded targets** (edge, Bun/Deno, WASI, browser) have no sockets,
    processes or signals, and no files except on WASI. Tasks are cooperative. In the
    browser, blocking waits stop the app unless it is built with `--suspend jspi`;

@@ -283,9 +283,46 @@ decisions themselves are logged with their reasoning in
     as returning `Promise<ScrollResult>`; browsers return `undefined`, which the
     generated `Async` accepts (checked in CI).
 - The old-to-new table is in [release/0.7.0-notes.md](release/0.7.0-notes.md).
-- Tandem still uses `Lasm.Web.WebSocket`: it pins the published `@lasm/cli`
-  0.5.1, so it migrates when it moves to the release with the browser tier
-  (ROADMAP.md).
+- Tandem moved off `Lasm.Web.WebSocket` with its move to `@lasm/cli` 0.7.0
+  (2026-11-11): its editor opens the socket with the generated
+  `Lasm.JS.Web.WebSocket.new` and three `addEventListener` calls (`open`,
+  `message`, `close`). Porter, Ledger and Tandem pin 0.7.0.
+
+### Moving the templates and examples off Lasm.Fetch (2026-11-11)
+- [x] **How a template or example serves on Node:** decided by Jordan
+  (2026-11-11): `Node.serve` (Bun's shape, `Lasm.JS.Node.Serve`, branch
+  `node-serve`) for Node servers, `exportDefault` on serverless platforms.
+  Until it lands, Node stays on `Lasm.Fetch.serveNode` in the `fetch`
+  template (#218), Conduit and Folio (#210). Porter, Ledger, Tandem,
+  `examples/fetch` and the two Lasm.Fetch tutorials in `content/` keep their
+  Lasm.Fetch servers for now (their HTTP layer is shared by Node and the
+  other runtimes).
+- [ ] **New API shapes, waiting for approval (#213, not merged):**
+  - `Lasm.RPC.dispatch (routes : List Route) (method : String) (segments :
+    List String) (body : String) : Option (Async Answer)`, with `Answer`
+    (`status`, `headers`, `body`), replacing `Lasm.RPC.handler` (a Lasm.Fetch
+    handler). Its four propositions become `dispatch_other`,
+    `dispatch_route`, `dispatch_unknown`, `dispatch_method` (proved).
+  - `Lasm.KV.setWorkersEnv (env : Lasm.JS.Data) : IO Unit`: a Workers fetch
+    handler passes its `env`, so `Lasm.KV.open` finds a namespace bound as
+    the store's name (replaces reading `Lasm.Fetch.platformEnv`). `Lasm.KV`
+    then no longer imports Lasm.Fetch; Fastly is detected by its KV Store call.
+  - The fullstack template moves with them (its `Site.lean` uses `dispatch`,
+    its Workers handler `setWorkersEnv`).
+- [ ] **Lasm.Fetch features with no replacement** (written into the template
+  or example itself, no new public API):
+  - *Embedded static files* (`embed_dir!`, `Assets.serve`: Brotli copies,
+    immutable hashed names, `lasm dev` reading the directory): the fullstack
+    template carries its own `Embed.lean` and `Http.lean` (about 230 lines).
+    Porter, Ledger and Tandem will need the same.
+  - *One request model for every target* (`Request.segments` with WHATWG
+    dot-segment resolution and its proof `segments_no_dot_segments`, cookie
+    joining, `respond`'s 500 on a throw): each program parses the path
+    itself; the proof has no counterpart outside Lasm.Fetch.
+  - *WASI CGI serving* (`--target wasi`): the fetch template's `Cgi.lean`
+    reads the CGI variables and standard input with Lean's `IO`.
+  - *Workers' `env` for Lasm.KV* and *`Lasm.RPC.handler`*: the two API
+    shapes above.
 
 ### Conduit and Folio moved off `Lasm.Fetch` (2026-11-11; what had no replacement)
 

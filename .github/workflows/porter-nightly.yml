@@ -3,7 +3,8 @@ name: Porter nightly
 # the endpoint fuzzer (test/fuzz.mjs) for 40 minutes against the Node build,
 # in four seeded runs of ten minutes (each seed printed; replay with --seed),
 # failing requests uploaded; then the oracle tests and the adversarial suite
-# on the same build. Runs when main changed examples/porter since the previous
+# on the same build; and the same on the Workers build under wrangler dev
+# (local workerd and D1). Runs when main changed examples/porter since the previous
 # scheduled run (74 hours covers Friday to Monday), or on demand. Not a release gate.
 on:
   schedule:
@@ -76,6 +77,53 @@ jobs:
         if: always()
         with:
           name: porter-nightly-fuzz
+          path: examples/porter/test-results/
+          retention-days: 14
+          if-no-files-found: ignore
+  fuzz-workers:
+    # The same campaign on the Workers build, served by wrangler dev (local
+    # workerd and a local D1 database; no account, nothing deployed).
+    needs: [sunday, changed]
+    if: needs.sunday.outputs.skip != 'true' && (needs.changed.outputs.run == 'true')
+    name: 40 minutes of fuzzing on Cloudflare Workers
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+      DO_NOT_TRACK: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - uses: ./.github/actions/process-guard
+      - name: npm ci, and wrangler 4.152.0
+        working-directory: examples/porter
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund wrangler@4.152.0
+          echo "$RUNNER_TEMP/tools/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: npm run build:workers
+        working-directory: examples/porter
+        run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:workers
+      - name: The fuzzer, four seeds of ten minutes
+        working-directory: examples/porter
+        run: |
+          status=0
+          for i in 1 2 3 4; do node test/fuzz.mjs --platform workers --seconds 600 || status=1; done
+          exit $status
+      - name: The oracle tests and the adversarial suite, after the campaign
+        working-directory: examples/porter
+        run: |
+          node test/oracles.mjs --platform workers --name nightly-workers
+          node test/attacks.mjs --platform workers --name nightly-workers
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: porter-nightly-fuzz-workers
           path: examples/porter/test-results/
           retention-days: 14
           if-no-files-found: ignore

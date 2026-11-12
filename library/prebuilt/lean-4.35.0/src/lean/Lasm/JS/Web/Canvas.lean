@@ -598,8 +598,9 @@ def HTMLCanvasElement.setHeight (self : HTMLCanvasElement) (value : Nat) : IO Un
   self.val.set "height" (toJS value)
 
 /-- `RenderingContext? getContext(DOMString contextId, optional any options)` -/
-def HTMLCanvasElement.getContext (self : HTMLCanvasElement) (contextId : String) (options : Data := .undefined) : IO (Option Value) :=
-  self.val.callMethod "getContext" (Support.args #[toJS contextId, options]) (Option Value)
+def HTMLCanvasElement.getContext (self : HTMLCanvasElement) (contextId : String) (options : Data := .undefined) : IO (Option Value) := do
+  let r ← self.val.callMethod "getContext" (Support.args #[toJS contextId, options]) Data
+  Support.optionalValue r
 
 /-- `USVString toDataURL(optional DOMString type, optional any quality)` -/
 def HTMLCanvasElement.toDataURL (self : HTMLCanvasElement) (type : Option String := none) (quality : Data := .undefined) : IO String :=
