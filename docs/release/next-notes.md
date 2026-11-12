@@ -16,6 +16,11 @@
   `SecretStore` calls. Every platform each app ran on before is still checked
   in CI, with the same suites and thresholds.
 
+- **Ledger builds with 0.7.0 and uses `Lasm.Fetch` only for Node**, as
+  Conduit and Folio do: Workers through the default export, Deno with
+  `Deno.serve`, Bun with `Bun.serve`. Its request type and embedded files are
+  code inside the app (`examples/ledger/Server/`).
+
 ## New: `Lasm.JS.Cloudflare`, Cloudflare Workers' runtime APIs
 
 - **`import Lasm.JS.Cloudflare`** binds the runtime APIs of Cloudflare
