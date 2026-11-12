@@ -301,14 +301,25 @@ test('adapter helpers: one Cookie header, Set-Cookie as cookie objects, Azure re
   assert.equal(parseSetCookie('=x'), null);
 
   const reply = (headers, body = '') => ({ status: 200, statusText: 'OK', headers, body: Buffer.from(body) });
-  const single = azureReply(reply([['set-cookie', 'a=1; Path=/'], ['content-type', 'text/plain']], 'hi'));
-  assert.deepEqual([single.cookies, single.headers.getSetCookie(), String(single.body)], [undefined, ['a=1; Path=/'], 'hi'], 'one Set-Cookie stays a header');
-  // The first cookie stays a header unless another would change in cookies (its value percent-encoded, an attribute dropped).
-  const many = azureReply(reply([['set-cookie', 'a=1; Path=/; HttpOnly'], ['set-cookie', 'b=; Max-Age=0'], ['set-cookie', 'c=x+y=; Path=/'], ['location', '/x']]));
-  assert.deepEqual(many.cookies, [{ name: 'a', value: '1', path: '/', httpOnly: true }, { name: 'b', value: '', maxAge: 0 }]);
-  assert.deepEqual([many.headers.getSetCookie(), many.headers.get('location'), many.body], [['c=x+y=; Path=/'], '/x', undefined]);
-  const plain = azureReply(reply([['set-cookie', 'a=1'], ['set-cookie', 'b=2; Partitioned; Secure']]));
-  assert.deepEqual([plain.cookies, plain.headers.getSetCookie()], [[{ name: 'a', value: '1' }], ['b=2; Partitioned; Secure']]);
+  const warnings = [];
+  const warn = console.warn;
+  console.warn = message => { warnings.push(message); };
+  try {
+    const single = azureReply(reply([['set-cookie', 'a=1; Path=/'], ['content-type', 'text/plain']], 'hi'));
+    assert.deepEqual([single.cookies, single.headers.getSetCookie(), String(single.body)], [undefined, ['a=1; Path=/'], 'hi'], 'one Set-Cookie stays a header');
+    // The first cookie stays a header unless another would change in cookies (its value percent-encoded, an attribute dropped).
+    const many = azureReply(reply([['set-cookie', 'a=1; Path=/; HttpOnly'], ['set-cookie', 'b=; Max-Age=0'], ['set-cookie', 'c=x+y=; Path=/'], ['location', '/x']]));
+    assert.deepEqual(many.cookies, [{ name: 'a', value: '1', path: '/', httpOnly: true }, { name: 'b', value: '', maxAge: 0 }]);
+    assert.deepEqual([many.headers.getSetCookie(), many.headers.get('location'), many.body], [['c=x+y=; Path=/'], '/x', undefined]);
+    const plain = azureReply(reply([['set-cookie', 'a=1'], ['set-cookie', 'b=2; Partitioned; Secure']]));
+    assert.deepEqual([plain.cookies, plain.headers.getSetCookie()], [[{ name: 'a', value: '1' }], ['b=2; Partitioned; Secure']]);
+    assert.deepEqual(warnings, [], 'cookies that arrive unchanged warn of nothing');
+    // A second cookie that cookies would change: one warning (the first such cookie, once per process); an unparsable Set-Cookie is left out.
+    const changed = azureReply(reply([['set-cookie', 'x=a b'], ['set-cookie', 'novalue'], ['set-cookie', 'y=1'], ['set-cookie', 'z=c d; Partitioned'], ['set-cookie', 'w=e f']]));
+    assert.deepEqual([changed.cookies, changed.headers.getSetCookie()],
+      [[{ name: 'y', value: '1' }, { name: 'z', value: 'c d' }, { name: 'w', value: 'e f' }], ['x=a b']]);
+    assert.deepEqual(warnings, ['Lasm: Azure Functions sends a single Set-Cookie per reply unchanged; cookie z goes through its cookies list, which percent-encodes the value and has no field for Partitioned.']);
+  } finally { console.warn = warn; }
 });
 
 test('adapter helpers: request targets, outgoing fields, textual bodies, web responses (the Lean model, library/Lasm/Serverless)', async () => {
