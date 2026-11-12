@@ -129,8 +129,17 @@ On Fastly, link the stores to the service (`fastly config-store create`,
 
 ## Limits and what is not bound
 
-- Fastly Compute's resource limits (memory, CPU time, package size) apply; a
-  Lean module is about 0.8 MiB.
+- Fastly Compute's [resource limits](https://docs.fastly.com/products/compute-resource-limits)
+  (memory, CPU time, package size) apply; a Lean module is about 0.8 MiB. The
+  memory limit is "1M bytes stack, 128MB heap" per execution; Lasm's Fastly
+  link uses a 1 MiB C stack to match. Viceroy enforces the same 128 MiB heap
+  locally. A program that needs more stops with `INTERNAL PANIC: out of
+  memory` (exit status 1) and the request gets a 500; it cannot be caught.
+  A Lean program's heap on Viceroy starts at about 28 MB (Folio's site
+  server, a small request). The size of the request body is not limited
+  separately: Folio renders a 960,000-character body in 112 MB, but needs 192
+  to 384 MiB for cmark's two largest pathological inputs, so those are not
+  run on Fastly (issue #234, [Folio's README](../../examples/folio/README.md#at-the-edge)).
 - Lasm.Fastly binds 244 of the ABI's 252 functions (the cache APIs,
   geolocation, device detection, logging endpoints, rate limiting, ACLs and
   KV metadata, generations and listing included); the 8 left out are listed in
