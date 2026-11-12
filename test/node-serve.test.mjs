@@ -282,21 +282,25 @@ test('serve: the signal, SIGTERM and SIGINT stop the server; a second signal clo
   const already = await serve({ port: 0, hostname: '127.0.0.1', signal: AbortSignal.abort(), fetch: () => new Response('x') });
   await already.finished;
 
-  const before = process.listenerCount('SIGTERM');
+  // The signals are delivered to the listeners serve adds, not with process.emit: a
+  // test process may have listeners of its own (node:test run directly, as Stryker's
+  // tap runner does, ends the run on SIGINT and SIGTERM).
+  const before = { SIGTERM: process.listeners('SIGTERM'), SIGINT: process.listeners('SIGINT') };
   const server = await serve({ port: 0, hostname: '127.0.0.1', fetch: () => new Promise(() => {}) });
-  assert.equal(process.listenerCount('SIGTERM'), before + 1);
+  assert.equal(process.listenerCount('SIGTERM'), before.SIGTERM.length + 1);
+  const deliver = name => { for (const listener of process.listeners(name).filter(l => !before[name].includes(l))) listener(name); };
   const hanging = request(server.port, '/');
   await new Promise(resolve => setTimeout(resolve, 50));
-  process.emit('SIGTERM');
+  deliver('SIGTERM');
   let finished = false;
   server.finished.then(() => { finished = true; });
   await new Promise(resolve => setTimeout(resolve, 50));
   assert.equal(finished, false, 'the first signal waits for the request');
-  process.emit('SIGINT');
+  deliver('SIGINT');
   await server.finished;
   await assert.rejects(hanging);
-  assert.equal(process.listenerCount('SIGTERM'), before, 'the listeners go with the server');
-  assert.equal(process.listenerCount('SIGINT'), process.listenerCount('SIGINT'));
+  assert.equal(process.listenerCount('SIGTERM'), before.SIGTERM.length, 'the listeners go with the server');
+  assert.equal(process.listenerCount('SIGINT'), before.SIGINT.length);
 });
 
 test('serve: the defaults (port $PORT else 3000, every IPv4 address), and the failures', async t => {
