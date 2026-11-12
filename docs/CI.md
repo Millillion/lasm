@@ -185,11 +185,12 @@ it), and "dispatch" means `workflow_dispatch`.
 | `bun-deno-published.yml` | dispatch, after release, cron 17 9 * * 1-6 | Linux, macOS, Windows | 19 min (max 39) | Published @lasm/cli with Bun and Deno only, five platforms | After release, nightly |
 | `ci-nightly.yml` | cron 7 1 * * 2-6, dispatch | Linux + called workflows | — | Nightly tier: the release suites on main | Nightly |
 | `ci-weekly.yml` | cron 7 12 * * 6, dispatch | called workflows | — | Weekly tier: long campaigns | Weekly |
+| `cli-models.yml` | dispatch, PR (paths), push main (paths) | Linux | new | Model differential of the CLI's JavaScript: each function with a Lean model (verification/cli/Lasm/Cli/Model/) agrees with it on 2000 generated inputs | PR (paths), main |
 | `conduit-platforms.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 35 min (max 103) | examples/conduit on 15 non-Node platforms, RealWorld traffic equivalence | PR (paths), main |
 | `conduit.yml` | dispatch, call, PR (paths), push main,conduit (paths) | Linux | 24 min (max 107) | examples/conduit: proofs, API on Node/Workers/Bun, RealWorld E2E in three browsers | PR (paths), main |
 | `content.yml` | PR (paths), cron 23 5 * * 1-6, dispatch | Linux | 12 min (max 85) | content/ pages and runnable tutorials | PR (paths), nightly |
 | `differential.yml` | PR (paths-ignore), push main, cron 47 3 * * 2-6, call, dispatch | Linux, macOS, Windows | 35 min (max 110) | Compiler output vs native Lean on every target (generated core, file-system and feature programs), host fixtures, target equivalence, recursion and Async depth, macOS C tier; campaigns are coverage-guided (corpus and features kept in the Actions cache, `differential-coverage-<profile>-*`) | PR, main, nightly (campaign), weekly (long campaign) |
-| `dst-nightly.yml` | cron 23 3 * * 2-6, dispatch | Linux | — | Example-app deterministic simulation with random seeds | Nightly |
+| `dst-nightly.yml` | cron 23 3 * * 2-6, dispatch | Linux | — | Example-app deterministic simulation with random seeds; Ledger's also with its server code built for Workers (wrangler dev) and headless Chromium, Firefox and WebKit, each seed checked against Node | Nightly |
 | `dx-dev-loop.yml` | dispatch, call | Linux | 7 min (max 48) | Template dev loop, editor support, cold start | Release, nightly |
 | `ecosystem.yml` | dispatch | Linux, macOS | 93 min (max 586) | Lake projects of the ecosystem built on five targets | Nightly (dispatched by nightly.yml), on demand |
 | `edge-runtime.yml` | dispatch, call | Linux | 10 min (max 59) | Single-threaded edge runtime build (called by workers/wasi/browser) | Called |
@@ -197,9 +198,9 @@ it), and "dispatch" means `workflow_dispatch`.
 | `evidence-page.yml` | cron 41 10 * * 1-6, dispatch, PR (paths) | Linux | new | the public test-evidence page (`content/learn/test-evidence.md`) from the repository and the latest CI results, committed to `main` | PR (paths), nightly |
 | `extract-bench.yml` | dispatch | Linux, macOS, Windows | 35 min | Tier-archive extraction speed per platform | On demand |
 | `flaky.yml` | cron 53 7 * * 1-6, dispatch, PR (paths) | Linux | 12 min (max 40) | Flaky-test report of the last 24 h (issue `flaky`) | PR (paths), nightly |
-| `folio-nightly.yml` | cron 53 3 * * 2-6, dispatch | Linux | 41 min | Folio: CommonMark differential and 40-minute fuzzing | Nightly |
+| `folio-nightly.yml` | cron 53 3 * * 2-6, dispatch | Linux | 41 min | Folio: CommonMark differential and 40-minute fuzzing; 20-minute fuzzing of the browser build in headless Chromium, Firefox and WebKit and of the Workers build under wrangler dev | Nightly |
 | `folio.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 16 min (max 96) | examples/folio: proofs, CommonMark examples, CLI, WASI, live preview | PR (paths), main |
-| `folio-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 7 min | examples/folio: the site server on Fastly (Viceroy), Workers and Deno Deploy with KV; the 652 CommonMark examples on WASI, three browsers and the edge | PR (paths), main |
+| `folio-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 7 min | examples/folio: the site server on Fastly (Viceroy), Workers and Deno Deploy with KV; the 652 CommonMark examples on WASI, three browsers and the edge; cmark's pathological inputs and nesting deeper than the engines' stacks (#231) on WASI, the browsers, Workers and Deno Deploy's build; seed 911870982's first 240 fuzz documents, then a minute of fuzzing in each browser and two on Workers | PR (paths), main |
 | `fullstack.yml` | dispatch, call | Linux | 27 min (max 79) | Fullstack template on Node, Workers, Bun, Deno, Fastly, wasmtime serve; npm run dev | Release, nightly |
 | `fuzz.yml` | PR (paths-ignore), push main, cron 23 2 * * 2-6; 41 6 * * 6, dispatch | Linux | 8 min (max 18) | Boundary fuzzing: corpus replay; 10-minute campaigns; 60-minute campaigns | PR, main, nightly, weekly |
 | `image-pins.yml` | cron 17 6 * * 1, dispatch | Linux | 0 min (max 3) | Re-pins cached CI images to upstream digests (opens a PR) | Weekly |
@@ -213,9 +214,9 @@ it), and "dispatch" means `workflow_dispatch`.
 | `lasm-js-stress.yml` | push hang-stress, call, dispatch | Linux, macOS, Windows | 41 min (max 115) | Lasm.JS hang stress on four platforms | Release, nightly, weekly (soak), called by bridge-verification |
 | `lean-tiers.yml` | dispatch | Linux, macOS, Windows | 42 min (max 160) | Repackages pinned Lean archives into tiers (maintainer) | On demand |
 | `ledger-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 47 min (max 104) | examples/ledger on Bun, Deno, Docker, Workers, WASI auditor | PR (paths), main |
-| `ledger.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 25 min (max 88) | examples/ledger: proofs, API, DST fixed seeds, TigerBeetle differential, E2E | PR (paths), main |
+| `ledger.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 25 min (max 88) | examples/ledger: proofs, API, DST fixed seeds (also on Workers and in three headless browsers, against Node's traces), TigerBeetle differential, E2E | PR (paths), main |
 | `library-prebuilt.yml` | push prebuilt/**, dispatch | Linux | 3 min (max 16) | Regenerates library/prebuilt (maintainer) | On demand |
-| `library-proofs.yml` | dispatch, call, PR (paths), push main (paths) | Linux | — | Proofs of Lasm's library: theorems match Spec.lean, standard axioms only, library/PROOFS.md current; the Candidates files and verification/cli's propositions elaborate | PR (paths), main |
+| `library-proofs.yml` | dispatch, call, PR (paths), push main (paths) | Linux | — | Proofs of Lasm's library: theorems match Spec.lean, standard axioms only, library/PROOFS.md current; the Candidates files and verification/cli's propositions elaborate, and its Spec.lean is proved of its models (README current) | PR (paths), main |
 | `link-toolchain-fixtures.yml` | dispatch | Linux, macOS, Windows | 12 min | Link toolchain fixtures (maintainer) | On demand |
 | `link-toolchain.yml` | dispatch | Linux, macOS, Windows | 11 min | Builds the link toolchain distribution (maintainer) | On demand |
 | `managed-sdk.yml` | dispatch | Linux, macOS, Windows | 7 min | Managed compiler SDK provisioning | On demand |

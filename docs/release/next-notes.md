@@ -29,3 +29,11 @@
   (`Lasm.WASI.Http`), and `--deploy wasi` adds `Cgi.lean` (a CGI program in
   Lean's `IO`); their `build:<target>` scripts build them. Existing projects
   keep building: `Lasm.Fetch` still ships.
+
+## Fixes
+
+- **`HTMLCanvasElement.getContext`, `Document.currentScript` and
+  `HTMLFormControlsCollection.namedItem` return `none` for `null`.** They were
+  `some` of a reference to `null` (an unsupported context id, no current
+  script, no such control). The generator now requests a nullable `Value`
+  result as data (`Lasm.JS.Web.Support.optionalValue`). Types are unchanged.

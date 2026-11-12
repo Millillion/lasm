@@ -4,19 +4,30 @@
 // and checked against the same expected-output pattern as cmark's test.
 // They are the known ways to make a CommonMark parser quadratic or
 // exponential, or to exhaust its stack: deep nesting, runs of unmatched
-// delimiters and brackets, unclosed constructs.
+// delimiters and brackets, unclosed constructs. After them, deeper nesting
+// of every kind of container (issue #231: a list 2,685 deep and block quotes
+// 36,742 deep exhausted the stack on Cloudflare Workers, whose engine allows
+// just under 10,000 frames, as browsers do).
 //
-//   node test/pathological.mjs [--timeout SECONDS] [--only NAME] [--engine lasm|native]
+//   node test/pathological.mjs [--timeout SECONDS] [--only NAME] [--engine ENGINE]
+//
+// ENGINE is any engine of test/batch.mjs: lasm or node (the default, the
+// Node build), native, wasmtime, wasmer, node-wasi, chromium, firefox,
+// webkit, or the URL of a running site server (POST /api/render; test/edge.mjs
+// --pathological serves one on each edge platform's local tooling).
 //
 // Fails if any case errors, times out or produces other output. cmark's
 // own limit is 5 s per case; the default here is 20 s, since Folio runs
-// as WebAssembly in a fresh process (startup included).
-import { renderAll } from './batch.mjs';
+// as WebAssembly in a fresh process (startup included), and 60 s in a
+// browser or over HTTP (a browser starts for every case; the edge
+// platforms' local tools are slower).
+import { renderAllAsync } from './batch.mjs';
 
 const arg = (n, d) => process.argv.includes(n) ? process.argv[process.argv.indexOf(n) + 1] : d;
-const timeout = Number(arg('--timeout', 20)) * 1000;
+const engine = { lasm: 'node', native: 'native' }[arg('--engine', 'lasm')] ?? arg('--engine', 'lasm');
+const remote = /^https?:\/\//.test(engine) || ['chromium', 'firefox', 'webkit'].includes(engine);
+const timeout = Number(arg('--timeout', remote ? 60 : 20)) * 1000;
 const only = arg('--only', null);
-if (arg('--engine', null) === 'native') process.env.FOLIO_BATCH = 'native';
 
 const rep = (s, n) => s.repeat(n);
 const range = (a, b) => Array.from({ length: b - a }, (_, i) => a + i);
@@ -62,6 +73,16 @@ const cases = {
     /^(<\w+>\n?)+x(<\/\w+>\n)+$/],
   'emph in deep blockquote': [rep('>', 100000) + rep('a*', 100000), /^(<\w+>\n)+<p>.*<\/p>\n(<\/\w+>\n)+$/s],
   'reference collisions': hashCollisions(),
+  // Deeper than any engine's stack allows recursion (issue #231).
+  'issue #231: a list nested 2,685 deep': [rep('+ ', 2685),
+    /^(<ul>\n<li>\n){2684}<ul>\n<li><\/li>\n(<\/ul>\n<\/li>\n){2684}<\/ul>\n$/],
+  'issue #231: block quotes nested 36,742 deep': [rep('>', 36742) + ' a',
+    /^(<blockquote>\n){36742}<p>a<\/p>\n(<\/blockquote>\n){36742}$/],
+  'ordered lists nested 20,000 deep': [rep('1. ', 20000) + 'x',
+    /^(<ol>\n<li>\n){19999}<ol>\n<li>x<\/li>\n<\/ol>\n(<\/li>\n<\/ol>\n){19999}$/],
+  'lists in block quotes in lists, 30,000 deep': [rep('> - 1. ', 10000) + 'x',
+    /^(<blockquote>\n<ul>\n<li>\n<ol>\n<li>\n){9999}<blockquote>\n<ul>\n<li>\n<ol>\n<li>x<\/li>\n<\/ol>\n<\/li>\n<\/ul>\n<\/blockquote>\n(<\/li>\n<\/ol>\n<\/li>\n<\/ul>\n<\/blockquote>\n){9999}$/],
+  'images nested 30,000 deep': [rep('![a', 30000) + rep('](u)', 30000), /^<p><img src="u" alt="a{30000}" \/><\/p>\n$/],
 };
 
 let failed = 0;
@@ -71,14 +92,14 @@ for (const [name, [input, re]] of Object.entries(cases)) {
   let status;
   try {
     // cmark's test renders with raw HTML allowed (its default)
-    const [html] = renderAll([{ markdown: input, unsafe: true }], { timeout });
+    const [html] = await renderAllAsync([{ markdown: input, unsafe: true }], { timeout, engine });
     status = re.test(html) ? 'passed' : `FAILED: ${JSON.stringify(html.slice(0, 80))}`;
   } catch (e) {
-    status = e.code === 'ETIMEDOUT' || e.signal === 'SIGTERM' ? 'TIMEOUT' : `ERRORED: ${String(e.message).split('\n')[0]}`;
+    status = e.code === 'ETIMEDOUT' || e.signal === 'SIGTERM' || e.name === 'TimeoutError' ? 'TIMEOUT' : `ERRORED: ${String(e.message).split('\n')[0]}`;
   }
   const seconds = ((Date.now() - started) / 1000).toFixed(2);
   if (status !== 'passed') failed++;
   console.log(`${status === 'passed' ? 'ok  ' : 'FAIL'} ${name}: ${status} (${seconds} s, ${input.length} characters)`);
 }
-console.log(failed ? `${failed} pathological cases failed` : 'every pathological case passed');
+console.log(failed ? `${failed} pathological cases failed on ${engine}` : `every pathological case passed on ${engine}`);
 if (failed) process.exitCode = 1;

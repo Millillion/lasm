@@ -30,7 +30,9 @@ function readLeb(bytes, at) {
   do { b = bytes[at++]; result += (b & 0x7f) * 2 ** shift; shift += 7; } while (b & 0x80);
   return [result, at];
 }
-/** A component's top-level sections: [{ id, start, end }] (payload offsets). */
+/** A component's top-level sections: [{ id, at, start, end }] (the section's
+ * offset, then its payload's). A section that runs past the end is refused
+ * (verification/cli/Lasm/Cli/Model/WasiComponent.lean models this). */
 function sections(bytes) {
   if (bytes[0] !== 0 || bytes[1] !== 0x61 || bytes[2] !== 0x73 || bytes[3] !== 0x6d || bytes[6] !== 1 || bytes[7] !== 0)
     throw new Error('Not a WebAssembly component');
@@ -38,7 +40,8 @@ function sections(bytes) {
   for (let at = 8; at < bytes.length;) {
     const id = bytes[at];
     const [size, start] = readLeb(bytes, at + 1);
-    list.push({ id, start, end: start + size });
+    if (!(start + size <= bytes.length)) throw new Error('Not a WebAssembly component');
+    list.push({ id, at, start, end: start + size });
     at = start + size;
   }
   return list;
@@ -56,7 +59,8 @@ export function replaceCoreModule(component, prefix, to) {
   const module = new Uint8Array(to.length + suffix.length);
   module.set(to, 0); module.set(suffix, to.length);
   const header = [1, ...leb(module.length)];
-  const headerStart = s.start - leb(s.end - s.start).length - 1;
+  // The section's own offset: its size may be a padded (non-minimal) LEB128.
+  const headerStart = s.at;
   const out = new Uint8Array(headerStart + header.length + module.length + component.length - s.end);
   out.set(component.subarray(0, headerStart), 0);
   out.set(header, headerStart);

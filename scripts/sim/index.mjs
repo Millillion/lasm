@@ -403,6 +403,8 @@ export function options(argv = process.argv.slice(2)) {
     minutes: num('--minutes', undefined),
     level: get('--faults') ?? 'normal',
     verbose: argv.includes('--verbose'),
+    // Every seed's result line, without the trace (scripts/sim/compare-runs.mjs).
+    printSeeds: argv.includes('--print-seeds'),
     determinism: argv.includes('--check-determinism'),
     keepGoing: argv.includes('--keep-going'),
   };
@@ -441,7 +443,7 @@ export class SeedLoop {
   report(seed, { failures = [], trace = null, summary = '', context = null }) {
     this.done++;
     if (failures.length === 0) {
-      if (this.opts.verbose || this.opts.seed !== undefined || this.done % 25 === 0 || this.queue) console.log(`  seed ${seed}: ok ${summary}${trace ? ` [trace ${trace.digest}, ${trace.count} events]` : ''}`);
+      if (this.opts.verbose || this.opts.printSeeds || this.opts.seed !== undefined || this.done % 25 === 0 || this.queue) console.log(`  seed ${seed}: ok ${summary}${trace ? ` [trace ${trace.digest}, ${trace.count} events]` : ''}`);
       return;
     }
     this.failed.push(seed);

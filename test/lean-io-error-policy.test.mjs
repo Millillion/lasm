@@ -153,7 +153,7 @@ test('node:os SystemErrors are classified by their underlying libuv error', () =
   assert.equal(fields(encodeError({ ...wrapped, info: { errno: -20 } }, '4.34.1')).kind, 0);
 });
 
-// Proposition: Lasm.Cli.Candidates.numbers_le64
+// Proposition: Lasm.Cli.Spec.numbers_le64
 //   ∀ values : List Int, (numbers values).data.toList = values.flatMap le64
 test('numbers encodes each value as a little-endian UInt64, wrapping negatives', () => {
   forAll(r => r.array(r.int(0, 6), () => BigInt(r.int(-(2 ** 31), 2 ** 31)) * BigInt(r.int(1, 2 ** 20))), values => {
