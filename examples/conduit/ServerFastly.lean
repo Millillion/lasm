@@ -5,17 +5,23 @@ import Server.Http
 import Server.Kv
 import Server.LeanCrypto
 import Lasm.Fastly
-import Lasm.Fetch.Embed
+import Server.Embed
+import Server.FastlyServe
 
 /-- The browser app and its files (dist/public, from npm run build:client),
 embedded in the program so every target serves them. -/
-def assets : Lasm.Fetch.Assets := embed_dir! "dist/public"
+def assets : Conduit.Server.Web.Assets := embed_dir! "dist/public"
 
+open Lasm.Fastly in
 /-- `JWT_SECRET` from the secret store `conduit`, else the development secret. -/
 def secret : IO String := do
-  try return (← Lasm.Fastly.secretText "conduit" "JWT_SECRET").getD Conduit.Server.developmentSecret
+  try
+    match ← (found? (SecretStore.get (← SecretStore.open "conduit") "JWT_SECRET") : IO _) with
+    | some s => return ← (SecretStore.plaintext s : IO _)
+    | none => return Conduit.Server.developmentSecret
   catch _ => return Conduit.Server.developmentSecret
 
 def main : IO Unit := do
   let kv ← Lasm.KV.open "conduit"
-  Conduit.Server.serveWith (Conduit.Server.Kv.store kv) (Conduit.Server.LeanCrypto.services secret) assets
+  Conduit.Server.FastlyServe.serve
+    (← Conduit.Server.handlerWith (Conduit.Server.Kv.store kv) (Conduit.Server.LeanCrypto.services secret) assets)
