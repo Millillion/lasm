@@ -141,6 +141,19 @@ def replace_one_core_module : Prop :=
     .ok (bytes (componentHeader ++ before.flatMap (fun s => sectionOf s.1 s.2) ++ unrelated.flatMap (sectionOf 1) ++
         sectionOf 1 (to ++ tail) ++ after.flatMap (fun s => sectionOf s.1 s.2)))
 
+/-- **A component splices the core module and gives it back.** In a
+template whose one core module that starts with the placeholder is the
+placeholder followed by `tail` (as the shipped template is: the test checks
+it), `componentize` splices in any core that begins no other core module;
+`extractCore` gives the core back, and `makeTemplate` the template.
+Tested by: test/wasi-component.test.mjs -/
+def componentize_inverse : Prop :=
+  ∀ (before after : List (UInt8 × List UInt8)) (tail core : List UInt8),
+    (∀ s ∈ before ++ after, s.1 = 1 → ¬ placeholderModule <+: s.2 ∧ ¬ core <+: s.2) →
+    let template := bytes (componentHeader ++ (before ++ (1, placeholderModule ++ tail) :: after).flatMap fun s => sectionOf s.1 s.2)
+    ∃ component, componentize (bytes core) template = .ok component ∧
+      extractCore component template = .ok (bytes core) ∧ makeTemplate component (bytes core) = .ok template
+
 /-- **`withoutComponentType` drops only component-type custom sections.** A
 module's custom sections named `component-type…` go; every other section,
 custom or not, stays, in order.

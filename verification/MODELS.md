@@ -34,9 +34,9 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**137 shipped modules**: 5 modelled, 33 pending, 99 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 33 modules still need a model.
+**137 shipped modules**: 6 modelled, 32 pending, 99 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 32 modules still need a model.
 
-### Modelled (5)
+### Modelled (6)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -45,8 +45,9 @@ How a module moves from pending to modelled:
 | [`src/edge/edge-initializers.mjs`](../src/edge/edge-initializers.mjs) | [EdgeInitializers.lean](../verification/cli/Lasm/Cli/Model/EdgeInitializers.lean) (`initializationSchedule`, `compactInitializerWrappers`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | both of its functions are modelled; the module does nothing else |
 | [`src/serverless/lasm-lambda.mjs`](../src/serverless/lasm-lambda.mjs) | [Model.lean](../library/Lasm/Serverless/Proofs/Model.lean) (`query`, `rawQuery`, `headerPairs`, `decode`, `handler`, `cloudFront`; [serverless-http.mjs](../test/fuzz/targets/serverless-http.mjs)) | the request and response mapping is modelled; the rest forwards over loopback |
 | [`src/serverless/lasm-server.mjs`](../src/serverless/lasm-server.mjs) | [Model.lean](../library/Lasm/Serverless/Proofs/Model.lean) (`requestTarget`, `plainHost`, `joinCookies`, `outgoingHeaders`, `isTextual`, `webReply`, `parseSetCookie`, `azureReply`; [serverless-http.mjs](../test/fuzz/targets/serverless-http.mjs)) | the HTTP mapping is modelled; the rest starts the program and forwards over loopback |
+| [`src/wasi/wasi-component.mjs`](../src/wasi/wasi-component.mjs) | [WasiComponent.lean](../verification/cli/Lasm/Cli/Model/WasiComponent.lean) (`replaceCoreModule`, `placeholderModule`, `componentize`, `makeTemplate`, `extractCore`, `withoutComponentType`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | every function is modelled (the template, read from component/proxy-template.wasm by default, is an argument); replace_one_core_module, drops_only_component_type and componentize_inverse proved |
 
-### Pending (33)
+### Pending (32)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -81,7 +82,6 @@ How a module moves from pending to modelled:
 | [`src/serverless/zip.mjs`](../src/serverless/zip.mjs) | — | a deterministic ZIP writer: pure (candidates zip_reads_back, zip_deterministic) |
 | [`src/wasi/lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c) | — | the wasi-http request and response mapping (edge request mapping, IRREDUCIBLE.md M4) |
 | [`src/wasi/lower-atomics.mjs`](../src/wasi/lower-atomics.mjs) | — | lowers atomic instructions: pure over Wasm bytes (candidates lowering_rewrites_atomics, lowering_leaves_no_atomics, lowering_keeps_runs) |
-| [`src/wasi/wasi-component.mjs`](../src/wasi/wasi-component.mjs) | [WasiComponent.lean](../verification/cli/Lasm/Cli/Model/WasiComponent.lean) (`replaceCoreModule`, `withoutComponentType`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | `replaceCoreModule` and `withoutComponentType` are modelled (`componentize` and `makeTemplate` are `replaceCoreModule` applied to the template and the placeholder); `extractCore`, the inverse, is not yet (candidate componentize_inverse) |
 | [`src/wasm-objects.mjs`](../src/wasm-objects.mjs) | — | a reader of relocatable Wasm objects: pure |
 
 ### Exempt (99)

@@ -270,6 +270,110 @@ theorem replace_one_core_module : Spec.replace_one_core_module := by
   erw [hrepl']
   rfl
 
+/-! ## Splicing a program into the component template -/
+
+/-- `replaceCoreModule` on a component of encoded sections whose one core
+module starting with `pfx` is `pfx ++ tail`: that section becomes
+`to ++ tail`. -/
+theorem replaceCoreModuleL_sections (before after : List (UInt8 × List UInt8)) (pfx tail to : List UInt8)
+    (h : ∀ s ∈ before ++ after, s.1 = 1 → ¬ pfx <+: s.2) :
+    replaceCoreModuleL (componentHeader ++ (before ++ (1, pfx ++ tail) :: after).flatMap fun s => sectionOf s.1 s.2) pfx to =
+      .ok (componentHeader ++ (before ++ (1, to ++ tail) :: after).flatMap fun s => sectionOf s.1 s.2) := by
+  let f := fun (s : UInt8 × List UInt8) => sectionOf s.1 s.2
+  let L := before ++ (1, pfx ++ tail) :: after
+  let m := fun (s : Section) => s.id == 1 && pfx.isPrefixOf s.body
+  have hm : ∀ s ∈ before ++ after, m (sec s) = false := by
+    intro s hs
+    simp only [m, sec, Bool.and_eq_false_iff, beq_eq_false_iff_ne]
+    by_cases h1 : s.1 = 1
+    · right; exact Bool.eq_false_iff.mpr fun h' => h s hs h1 (List.isPrefixOf_iff_prefix.mp h')
+    · left; exact h1
+  have hfound : (L.map sec).filter m = [sec (1, pfx ++ tail)] := by
+    simp only [L, List.map_append, List.map_cons, List.filter_append, List.filter_cons]
+    have hb : (before.map sec).filter m = [] := by
+      simp only [List.filter_eq_nil_iff, List.mem_map]
+      rintro _ ⟨s, hs, rfl⟩; simp [hm s (List.mem_append_left _ hs)]
+    have ha : (after.map sec).filter m = [] := by
+      simp only [List.filter_eq_nil_iff, List.mem_map]
+      rintro _ ⟨s, hs, rfl⟩; simp [hm s (List.mem_append_right _ hs)]
+    rw [hb, ha]
+    simp [m, sec, List.isPrefixOf_iff_prefix]
+  have hrepl : (L.map sec).flatMap (fun s => if m s = true then
+        1 :: lebJS (to ++ s.body.drop pfx.length).length ++ (to ++ s.body.drop pfx.length) else s.raw) =
+      (before ++ (1, to ++ tail) :: after).flatMap f := by
+    simp only [L, List.map_append, List.map_cons, List.flatMap_append, List.flatMap_cons, List.flatMap_map]
+    congr 1
+    · apply flatMap_congr'
+      intro s hs
+      have := hm s (List.mem_append_left _ hs)
+      simp only [sec] at this
+      simp [this, sec, f]
+    · congr 1
+      · simp [m, sec, f, sectionOf, lebJS_eq_leb, List.isPrefixOf_iff_prefix]
+      · apply flatMap_congr'
+        intro s hs
+        have := hm s (List.mem_append_right _ hs)
+        simp only [sec] at this
+        simp [this, sec, f]
+  have hparse : parseSections (L.flatMap f) = some (L.map sec) := by
+    have := parseSections_flatMap L []
+    simpa [f, parseSections_nil] using this
+  show replaceCoreModuleL (componentHeader ++ L.flatMap f) pfx to = .ok (componentHeader ++ (before ++ (1, to ++ tail) :: after).flatMap f)
+  simp only [replaceCoreModuleL]
+  have hhead : isComponentHeader (componentHeader ++ L.flatMap f) = true := by
+    simp [isComponentHeader, componentHeader]
+  have hd : (componentHeader ++ L.flatMap f).drop 8 = L.flatMap f := by simp [componentHeader]
+  have ht : (componentHeader ++ L.flatMap f).take 8 = componentHeader := by simp [componentHeader]
+  simp only [hhead, Bool.not_true, Bool.false_eq_true, ↓reduceIte, hd, hparse]
+  change (if ((L.map sec).filter m).length = 1 then _ else _) = _
+  rw [hfound]
+  simp only [List.length_singleton, ↓reduceIte, ht]
+  erw [hrepl]
+
+theorem sectionsOf_sections (L : List (UInt8 × List UInt8)) :
+    sectionsOf (componentHeader ++ L.flatMap fun s => sectionOf s.1 s.2) = .ok (L.map sec) := by
+  have hparse := parseSections_flatMap L []
+  simp only [List.append_nil, parseSections_nil, Option.map_some, List.append_nil] at hparse
+  have hd : (componentHeader ++ L.flatMap fun s => sectionOf s.1 s.2).drop 8 = L.flatMap fun s => sectionOf s.1 s.2 := by
+    simp [componentHeader]
+  have hhead : isComponentHeader (componentHeader ++ L.flatMap fun s => sectionOf s.1 s.2) = true := by
+    simp [isComponentHeader, componentHeader]
+  simp only [sectionsOf, hhead, Bool.not_true, Bool.false_eq_true, ↓reduceIte, hd, hparse]
+
+/-- The core modules of encoded sections, around one module `body`. -/
+theorem modules_around (before after : List (UInt8 × List UInt8)) (body : List UInt8) :
+    ((before ++ (1, body) :: after).map sec).filter (·.id == 1) =
+      (before.map sec).filter (·.id == 1) ++ sec (1, body) :: (after.map sec).filter (·.id == 1) := by
+  simp [List.filter_append, sec]
+
+theorem bytes_toList (l : List UInt8) : (bytes l).data.toList = l := by simp [bytes]
+
+theorem componentize_inverse : Spec.componentize_inverse := by
+  intro before after tail core h
+  have hc := replaceCoreModuleL_sections before after placeholderModule tail core (fun s hs h1 => (h s hs h1).1)
+  have ht := replaceCoreModuleL_sections before after core tail placeholderModule (fun s hs h1 => (h s hs h1).2)
+  refine ⟨bytes (componentHeader ++ (before ++ (1, core ++ tail) :: after).flatMap fun s => sectionOf s.1 s.2), ?_, ?_, ?_⟩
+  · simp only [componentize, replaceCoreModule, bytes_toList]
+    erw [hc]; rfl
+  · simp only [extractCore, extractCoreL, bytes_toList, sectionsOf_sections]
+    simp only [bind, Except.bind, modules_around]
+    have hnone : List.findIdx? (fun s => placeholderModule.isPrefixOf s.body) ((before.map sec).filter (·.id == 1)) = none := by
+      rw [List.findIdx?_eq_none_iff]
+      intro x hx
+      simp only [List.mem_filter, List.mem_map] at hx
+      obtain ⟨⟨s, hs, rfl⟩, hid⟩ := hx
+      have := (h s (List.mem_append_left _ hs) (by simpa [sec] using hid)).1
+      exact Bool.eq_false_iff.mpr fun h' => this (List.isPrefixOf_iff_prefix.mp h')
+    rw [List.findIdx?_append, hnone, List.findIdx?_cons]
+    have hp : placeholderModule.isPrefixOf (sec (1, placeholderModule ++ tail)).body = true := by
+      simp [sec, List.isPrefixOf_iff_prefix]
+    simp only [hp, ↓reduceIte, Option.map_some, Nat.zero_add, Option.none_or]
+    rw [List.getD_eq_getElem?_getD, List.getElem?_append_right (Nat.le_refl _), Nat.sub_self,
+      List.getElem?_append_right (by simp), Nat.sub_self]
+    simp [sec, Except.map, bytes]
+  · simp only [makeTemplate, replaceCoreModule, bytes_toList]
+    erw [ht]; rfl
+
 /-! ## Custom section names -/
 
 /-- The first byte of a character's UTF-8 encoding: the character itself

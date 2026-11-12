@@ -209,14 +209,6 @@ def lowering_rewrites_atomics : Prop :=
       out.length = bodies.length + keys.length ∧
       out.take bodies.length = bodies.map fun (locals, is) => locals ++ is.flatMap (Instr.lowered memory64 index) ++ [0x0b]
 
-/-- **A component splices the core module and gives it back.** For a core
-module, extracting the core of its component gives the module, and making
-the template from the component and the module gives the shipped template.
-Tested by: test/wasi-component.test.mjs -/
-def componentize_inverse : Prop :=
-  ∀ core : ByteArray, core.data.toList.take 8 = moduleHeader →
-    extractCore (componentize core) = some core ∧ makeTemplate (componentize core) core = some proxyTemplate
-
 /-! ## Function packages -/
 
 /-- **What `zip` writes, a ZIP reader reads back.** Whenever `zip` succeeds,

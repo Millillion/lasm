@@ -448,17 +448,9 @@ def codeBodies (m : ByteArray) : Option (List (List UInt8)) := do
   let (n, r) ← readLeb body
   readSized n r
 
-/-- `componentize(core)`: the wasi-http component of a core module, made from
-the shipped template. -/
-opaque componentize : ByteArray → ByteArray
-/-- `extractCore(component)`, or `none` where it throws. -/
-opaque extractCore : ByteArray → Option ByteArray
-/-- `makeTemplate(component, core)`, or `none` where it throws. -/
-opaque makeTemplate : ByteArray → ByteArray → Option ByteArray
-/-- The shipped template, src/wasi/component/proxy-template.wasm. -/
-opaque proxyTemplate : ByteArray
--- `replaceCoreModule(component, prefix, to)` and `withoutComponentType(module)`:
--- modelled in Model/WasiComponent.lean.
+-- `replaceCoreModule(component, prefix, to)`, `componentize(core, template)`,
+-- `makeTemplate(component, core)`, `extractCore(component, template)` and
+-- `withoutComponentType(module)`: modelled in Model/WasiComponent.lean.
 
 /-- A section of a core module: a custom section (its name and contents) or
 any other (its id and body). -/

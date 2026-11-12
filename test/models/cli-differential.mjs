@@ -26,7 +26,7 @@ import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
 import { responseFile } from '../../src/platform.mjs';
-import { replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
+import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 import { compactInitializerWrappers, initializationSchedule } from '../../src/edge/edge-initializers.mjs';
 import { builtinModuleClosure } from '../../src/edge/builtin-modules.mjs';
 
@@ -79,6 +79,23 @@ function plan(r) {
   return { schema: 1, closure: [...new Set(names)], keep: names.filter(() => r.next() < 0.5), calls };
 }
 const callsEntries = calls => Object.entries(calls);
+
+/** A component template: sections, some core modules starting with the
+ * placeholder (or a cut of it), sometimes broken (wasmBytes). */
+const placeholder = [...placeholderModule()];
+const templateOf = r => wasmBytes(r, componentHeader, g => {
+  const id = g.pick([0, 1, 1, 1, 6, 7]);
+  if (id !== 1) return { id, body: randomBytes(g, 12) };
+  const roll = g.next();
+  return { id, body: roll < 0.4 ? [...placeholder, ...randomBytes(g, 8)] : roll < 0.5 ? placeholder.slice(0, g.int(0, placeholder.length)) : [...coreHeader, ...randomBytes(g, 10)] };
+}).bytes;
+const coreOf = r => r.next() < 0.8 ? [...coreHeader, ...randomBytes(r, 12)] : randomBytes(r, 10);
+const attempt = fn => { try { return { bytes: hexOf(fn()) }; } catch (error) { return { error: error.message }; } };
+/** A component: a template with a core spliced in, or another template. */
+const componentOf = (r, template, core = coreOf(r)) => {
+  if (r.next() < 0.7) { try { return [...componentize(Uint8Array.from(core), Uint8Array.from(template))]; } catch {} }
+  return templateOf(r);
+};
 
 /** Every way a builtin module may import another (relativeImport's forms),
  * and lines that import nothing builtin. */
@@ -232,6 +249,24 @@ export const models = [
       try { return { bytes: hexOf(replaceCoreModule(Uint8Array.from(component), Uint8Array.from(prefix), Uint8Array.from(to))) }; }
       catch (error) { return { error: error.message }; }
     },
+  },
+  {
+    name: 'componentize', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',
+    generate: r => ({ core: coreOf(r), template: templateOf(r) }),
+    input: ({ core, template }) => ({ core: hexOf(core), template: hexOf(template) }),
+    js: ({ core, template }) => attempt(() => componentize(Uint8Array.from(core), Uint8Array.from(template))),
+  },
+  {
+    name: 'makeTemplate', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',
+    generate: r => { const template = templateOf(r), core = coreOf(r); return { core, component: r.next() < 0.7 ? componentOf(r, template, core) : template }; },
+    input: ({ core, component }) => ({ core: hexOf(core), component: hexOf(component) }),
+    js: ({ core, component }) => attempt(() => makeTemplate(Uint8Array.from(component), Uint8Array.from(core))),
+  },
+  {
+    name: 'extractCore', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',
+    generate: r => { const template = templateOf(r); return { template, component: componentOf(r, template) }; },
+    input: ({ component, template }) => ({ component: hexOf(component), template: hexOf(template) }),
+    js: ({ component, template }) => attempt(() => extractCore(Uint8Array.from(component), Uint8Array.from(template))),
   },
   {
     name: 'withoutComponentType', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',

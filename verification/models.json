@@ -741,18 +741,22 @@
       "reason": "WASI builds; orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
     },
     "src/wasi/wasi-component.mjs": {
-      "status": "pending",
+      "status": "modelled",
       "models": [
         {
           "lean": "verification/cli/Lasm/Cli/Model/WasiComponent.lean",
           "functions": [
             "replaceCoreModule",
+            "placeholderModule",
+            "componentize",
+            "makeTemplate",
+            "extractCore",
             "withoutComponentType"
           ],
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "`replaceCoreModule` and `withoutComponentType` are modelled (`componentize` and `makeTemplate` are `replaceCoreModule` applied to the template and the placeholder); `extractCore`, the inverse, is not yet (candidate componentize_inverse)"
+      "reason": "every function is modelled (the template, read from component/proxy-template.wasm by default, is an argument); replace_one_core_module, drops_only_component_type and componentize_inverse proved"
     },
     "src/wasi/wasi-link.mjs": {
       "status": "exempt",

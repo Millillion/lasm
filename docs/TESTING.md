@@ -1187,8 +1187,10 @@ then proved of the model and moves to `verification/cli/Lasm/Cli/Spec.lean`
 with its theorem in `Theorems.lean`, checked by `scripts/library-proofs.mjs`
 like the library's, and its test cites `Lasm.Cli.Spec.…`. Since 2026-11-11:
 `numbers` (src/node-host.mjs), `changedFiles` (src/dev.mjs),
-`responseFile` (src/platform.mjs), `replaceCoreModule` and
-`withoutComponentType` (src/wasi/wasi-component.mjs), and
+`responseFile` (src/platform.mjs), `replaceCoreModule`,
+`withoutComponentType` and since 2026-11-12 `componentize`, `makeTemplate`
+and `extractCore` (src/wasi/wasi-component.mjs, the template an argument),
+and
 `initializationSchedule` and `compactInitializerWrappers`
 (src/edge/edge-initializers.mjs), and `builtinModuleClosure`
 (src/edge/builtin-modules.mjs; the differential writes the builtin files in
@@ -1201,7 +1203,8 @@ with `numbers_le64`,
 `replace_one_core_module`, `drops_only_component_type` and
 `schedule_reached_kept_first` and `builtin_closure` (the depth-first walks
 are correct on acyclic graphs), `run_args_kept`, `unknown_flag_refused`,
-`edit_distance_metric` and `closest_nearest_first` proved. The
+`edit_distance_metric`, `closest_nearest_first` and `componentize_inverse`
+(for any template of the shipped one's shape, which the test checks) proved. The
 differentials have found three bugs: `replaceCoreModule` spliced a section
 whose size was a padded LEB128 at the wrong offset, and
 `builtinModuleClosure` missed side-effect imports (`import './x.mjs'`) and

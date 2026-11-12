@@ -18,6 +18,9 @@ answer are the JavaScript's, read as the model's types:
   replaceCoreModule  {"component": "<hex>", "prefix": "<hex>", "to": "<hex>"}
                                                     → {"bytes": "<hex>"} | {"error": "…"}
   withoutComponentType  "<hex>"                     → "<hex>"
+  componentize   {"core": "<hex>", "template": "<hex>"}    → {"bytes": "<hex>"} | {"error": "…"}
+  makeTemplate   {"component": "<hex>", "core": "<hex>"}   → (the same)
+  extractCore    {"component": "<hex>", "template": "<hex>"} → (the same)
   initializationSchedule  {"name": "…", "calls": [["…", ["…", …]], …], "keep": ["…", …]}
                                                     → ["…", …]
   compactInitializerWrappers  {"closure": […], "keep": […], "calls": […]}
@@ -106,6 +109,11 @@ def ofResult : Except String Parsed → Json
 def texts (j : Json) : Except String (List String) := do
   (← j.getArr?).toList.mapM text
 
+/-- Bytes, or the message thrown. -/
+def ofBytes : Except String ByteArray → Json
+  | .ok b => Json.mkObj [("bytes", toJson (hex b))]
+  | .error e => Json.mkObj [("error", toJson e)]
+
 def answer (j : Json) : Except String Json := do
   let input ← j.getObjVal? "input"
   match ← j.getObjValAs? String "model" with
@@ -121,6 +129,15 @@ def answer (j : Json) : Except String Json := do
     return match replaceCoreModule (← field "component") (← field "prefix") (← field "to") with
       | .ok b => Json.mkObj [("bytes", toJson (hex b))]
       | .error e => Json.mkObj [("error", toJson e)]
+  | "componentize" =>
+    let field := fun (k : String) => do unhex (← (← input.getObjVal? k).getStr?)
+    return ofBytes (componentize (← field "core") (← field "template"))
+  | "makeTemplate" =>
+    let field := fun (k : String) => do unhex (← (← input.getObjVal? k).getStr?)
+    return ofBytes (makeTemplate (← field "component") (← field "core"))
+  | "extractCore" =>
+    let field := fun (k : String) => do unhex (← (← input.getObjVal? k).getStr?)
+    return ofBytes (extractCore (← field "component") (← field "template"))
   | "withoutComponentType" => return toJson (hex (withoutComponentType (← unhex (← input.getStr?))))
   | "initializationSchedule" =>
     return toJson (initializationSchedule (← (← input.getObjVal? "name").getStr?) (← callsOf (← input.getObjVal? "calls"))
