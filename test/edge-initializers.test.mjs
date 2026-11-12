@@ -86,8 +86,11 @@ function interpret(source, p, entries) {
   return ran;
 }
 
-// ∀ plan p, ∀ entries e ⊆ keep p, run (compact p) e = chains p e
-// for acyclic import graphs (Lean's), entered through kept initializers (a skipped one's wrapper is a no-op)
+// Proposition: Lasm.Cli.Candidates.compact_wrappers_as_chains
+//   ∀ (p : Plan) (entries : List String), Acyclic p.calls →
+//     (∀ x ∈ p.closure, initializerName x = true) → (∀ x, ∀ y ∈ p.calls x, y ∈ p.closure) →
+//     (∀ e ∈ entries, e ∈ p.keep) → (∀ k ∈ p.keep, k ∈ p.closure) →
+//     runInitializers (compactInitializerWrappers p) p.calls entries = chains p entries
 test('compact wrappers run the kept initializers exactly as the chains do', () => {
   forAll(g => { const p = plan(g, { acyclic: true }); return { p, entries: p.keep.length ? g.array(g.int(1, 3), () => g.pick(p.keep)) : [] }; }, ({ p, entries }) => {
     const ran = interpret(compactInitializerWrappers(p), p, entries);
@@ -96,7 +99,12 @@ test('compact wrappers run the kept initializers exactly as the chains do', () =
   }, { runs: 300 });
 });
 
-// ∀ acyclic graph, ∀ x ∈ schedule n, ∀ kept y reachable from x, y ≠ n → y precedes x
+// Proposition: Lasm.Cli.Candidates.schedule_reached_kept_first
+//   ∀ (calls : String → List String) (keep : List String) (n : String), Acyclic calls →
+//     (initializationSchedule n calls keep).Nodup ∧
+//     (∀ y, y ∈ initializationSchedule n calls keep ↔ y ∈ keep ∧ y ≠ n ∧ Reaches calls n y) ∧
+//     ∀ x ∈ initializationSchedule n calls keep, ∀ y, y ∈ keep → y ≠ n → Reaches calls x y →
+//       (initializationSchedule n calls keep).idxOf y < (initializationSchedule n calls keep).idxOf x
 test('initializationSchedule: the kept initializers a unit reaches, each once, those it depends on first', () => {
   forAll(g => plan(g, { acyclic: true }), p => {
     const keep = new Set(p.keep);

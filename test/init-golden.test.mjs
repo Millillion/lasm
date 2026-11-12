@@ -215,8 +215,16 @@ test('project names', () => {
     assert.equal(supabaseFunctionNameOf(input), name, input);
 });
 
-// ∀ s, let n := packageName s; n ≠ "" ∧ n matches [a-z0-9._-]* ∧ ¬ n.startsWith [._-] ∧ ¬ n.endsWith "-"
-// ∀ s, lakeName s matches [A-Za-z][A-Za-z0-9_]* ; ∀ s, supabaseFunctionNameOf s matches [a-z][a-z0-9-]{0,53}
+// Proposition: Lasm.Cli.Candidates.generated_names_valid
+//   ∀ dir s : String,
+//     ((packageName dir).toList.head?.map fun c => c.isLower || c.isDigit) = some true ∧
+//     (packageName dir).all (fun c => c.isLower || c.isDigit || c = '.' || c = '_' || c = '-') ∧
+//     ¬ (packageName dir).endsWith "-" ∧
+//     ((lakeName s).toList.head?.map Char.isAlpha) = some true ∧
+//     (lakeName s).all (fun c => c.isAlphanum || c = '_') ∧ ¬ (lakeName s).endsWith "_" ∧
+//     ((supabaseFunctionNameOf s).toList.head?.map Char.isLower) = some true ∧
+//     (supabaseFunctionNameOf s).all (fun c => c.isLower || c.isDigit || c = '-') ∧
+//     (supabaseFunctionNameOf s).length ≤ 54
 test('generated names are always valid npm, Lake and Supabase names', () => {
   const alphabet = ['a', 'Z', '0', '9', '.', '_', '-', ' ', 'λ', '@', '/', '!'];
   forAll(r => r.string(alphabet, 0, 70), text => {
