@@ -56,3 +56,75 @@ jobs:
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         working-directory: examples/${{ matrix.app }}
         run: node test/dst.mjs --minutes 10 --faults heavy --keep-going
+
+  remote:
+    # Ledger's simulation with the server's code as built for Cloudflare
+    # Workers (wrangler dev: local workerd, no account) and for the browser
+    # (headless, the pinned Playwright), the world in Node
+    # (scripts/sim/remote-host.mjs): 20 minutes of random seeds, every seed
+    # printed; then Node runs the same seeds, and every seed's result and
+    # trace digest must be the same (scripts/sim/compare-runs.mjs).
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true'
+    name: ledger on ${{ matrix.title }}, random seeds
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: workers, build: 'build:sim-workers', title: 'Cloudflare Workers (wrangler dev)' }
+          - { target: chromium, build: 'build:sim-browser', title: 'headless Chromium' }
+          - { target: firefox, build: 'build:sim-browser', title: 'headless Firefox' }
+          - { target: webkit, build: 'build:sim-browser', title: 'headless WebKit' }
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+      DO_NOT_TRACK: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - uses: ./.github/actions/process-guard
+      - name: npm ci
+        working-directory: examples/ledger
+        run: npm ci --no-audit --no-fund
+      - name: wrangler 4.152.0 (wrangler dev runs workerd locally)
+        if: matrix.target == 'workers'
+        run: |
+          npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund wrangler@4.152.0
+          echo "$RUNNER_TEMP/tools/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: The pinned Playwright's ${{ matrix.target }}, with its system packages
+        if: matrix.target != 'workers'
+        timeout-minutes: 30
+        uses: ./.github/actions/playwright
+        with:
+          browsers: ${{ matrix.target }}
+      - name: npm run build:sim and npm run ${{ matrix.build }}
+        working-directory: examples/ledger
+        run: |
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build:sim
+          node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run ${{ matrix.build }}
+      - name: 20 minutes of random seeds on ${{ matrix.target }}, then the same seeds on Node
+        working-directory: examples/ledger
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -o pipefail
+          mkdir -p test-results
+          status=0
+          node test/dst.mjs --target "$TARGET" --minutes 20 --keep-going --print-seeds | tee test-results/dst-$TARGET.log || status=1
+          seeds=$(node ../../scripts/sim/compare-runs.mjs --seeds test-results/dst-$TARGET.log) || exit 1
+          node test/dst.mjs --seed "$seeds" --keep-going > test-results/dst-node.log || true
+          node ../../scripts/sim/compare-runs.mjs test-results/dst-$TARGET.log test-results/dst-node.log || status=1
+          exit $status
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: dst-nightly-ledger-${{ matrix.target }}
+          path: examples/ledger/test-results/
+          retention-days: 30
+          if-no-files-found: ignore

@@ -22,7 +22,8 @@ set in the same step as the text.
 -/
 import Lasm.UI
 import Lasm.JS.Json
-import Lasm.Web.WebSocket
+import Lasm.JS.Web.WebSocket
+import Lasm.JS.Web.Messaging
 import Tandem
 open Lean Lasm.UI Lasm.JS Tandem
 
@@ -144,12 +145,14 @@ def connectSocket (doc : String) : Cmd Msg :=
     let scheme := if protocol == "https:" then "wss:" else "ws:"
     let opened ← IO.mkRef false
     try
-      let ws ← Lasm.Web.WebSocket.connect s!"{scheme}//{host}/doc/{doc}/ws"
-      let _ ← ws.onOpen (do opened.set true; dispatch .wsOpen)
-      let _ ← ws.onMessage fun
-        | .text t => dispatch (.pushed t)
-        | .bytes _ => pure ()
-      let _ ← ws.onClose fun _ => do dispatch (.wsClosed (← opened.get))
+      let ws ← Lasm.JS.Web.WebSocket.new s!"{scheme}//{host}/doc/{doc}/ws"
+      let on (type : String) (f : Lasm.JS.Web.Event → IO Unit) : IO Unit := do
+        ws.addEventListener type (some (← Lasm.JS.Web.EventListener.ofSyncFn f))
+      on "open" fun _ => do opened.set true; dispatch .wsOpen
+      on "message" fun e => do
+        -- Text frames arrive as strings (the server sends no binary frames).
+        if let .string t ← ({ val := e.val } : Lasm.JS.Web.MessageEvent).data then dispatch (.pushed t)
+      on "close" fun _ => do dispatch (.wsClosed (← opened.get))
     catch _ => dispatch (.wsClosed false)
 
 def syncCmd (m : Model) : Model × Cmd Msg :=

@@ -157,3 +157,66 @@ test('the harness finds the toy counter\'s lost increments, and the seed replays
   assert.notEqual(failing, null);
   assert.deepEqual(toy(failing), toy(failing));
 });
+
+test('remote world: calls, stand-ins, values, faults and the clock cross the transport unchanged', async () => {
+  const { installRemoteWorld, worldHost } = await import('../scripts/sim/remote.mjs');
+  const db = new SqlStore({ rng: new Rng(1) });
+  db.run('CREATE TABLE t (k INTEGER PRIMARY KEY, v BLOB, n TEXT)');
+  let now = 1000;
+  const world = { store: () => db, tick: () => { now += 5; return now; }, exitCode: () => 3 };
+  const host = worldHost(world);
+  const sent = [];
+  const realNow = Date.now;
+  const before = globalThis.lasmSimWorld;
+  try {
+    installRemoteWorld(text => { sent.push(text); return host.answer(text).then(r => { Date.now = realNow; return r.replace(/"now":\d+/, `"now":${now}`); }); });
+    const w = globalThis.lasmSimWorld;
+    assert.equal(w.then, undefined, 'a stand-in is not a thenable');
+    const store = await w.store();
+    assert.equal(await w.store(), store, 'the same object is the same stand-in');
+    await store.run('INSERT INTO t VALUES (?, ?, ?)', [5n, new Uint8Array([0, 255]), null]);
+    const [row] = await store.all('SELECT k, v, n FROM t');
+    assert.equal(row.k, 5);
+    assert.deepEqual([...row.v], [0, 255]);
+    assert.equal(row.n, null);
+    assert.equal(await w.tick(), 1005);
+    assert.equal(Date.now(), 1005, "Date.now is the world's clock after each call");
+    db.readFail = 1;
+    await assert.rejects(store.all('SELECT 1'), e => e.name === new SimFault('x').name);
+    db.heal();
+    await assert.rejects(w.missing(), /the world has no method missing/);
+    assert.equal(await w.exitCode(), 3);
+    assert.equal(host.exitCode, 3);
+    assert.deepEqual(JSON.parse(sent[2]).a[1][0], { $: 'b', v: '5' });
+  } finally {
+    Date.now = realNow;
+    globalThis.lasmSimWorld = before;
+    db.close();
+  }
+});
+
+test('compare-runs: a target run must give every seed the result and trace digest of Node', async () => {
+  const { mkdtempSync, writeFileSync, rmSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const { tmpdir } = await import('node:os');
+  const { spawnSync } = await import('node:child_process');
+  const dir = mkdtempSync(join(tmpdir(), 'compare-runs-'));
+  const script = new URL('../scripts/sim/compare-runs.mjs', import.meta.url).pathname;
+  const run = (...a) => spawnSync(process.execPath, [script, ...a.map(f => join(dir, f))], { encoding: 'utf8' });
+  try {
+    writeFileSync(join(dir, 't.log'), 'x: seeds\n  seed 4: ok (2 writers) [trace 1a, 9 events]\n\n  seed 7: FAILED (1 writer)\n    - lost\n');
+    writeFileSync(join(dir, 'same.log'), '  seed 7: FAILED (1 writer)\n  seed 4: ok (2 writers) [trace 1a, 9 events]\n  seed 5: ok (x)\n');
+    writeFileSync(join(dir, 'other.log'), '  seed 4: ok (2 writers) [trace 1b, 9 events]\n  seed 7: FAILED (1 writer)\n');
+    writeFileSync(join(dir, 'empty.log'), 'nothing\n');
+    const seeds = spawnSync(process.execPath, [script, '--seeds', join(dir, 't.log')], { encoding: 'utf8' });
+    assert.equal(seeds.stdout.trim(), '4,7');
+    assert.equal(run('t.log', 'same.log').status, 0);
+    const differs = run('t.log', 'other.log');
+    assert.equal(differs.status, 1);
+    assert.match(differs.stdout, /seed 4 differs/);
+    assert.equal(run('empty.log', 'same.log').status, 1, 'a run with no seeds is a failure');
+    assert.match(run('t.log', 'empty.log').stdout, /\(not run\)/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

@@ -26,10 +26,12 @@ read that one file and ignore the proofs: `npm run proofs` fails unless
   `Classical.choice`, `Quot.sound`): a `sorry` would show up as the axiom
   `sorryAx` and a `native_decide` as `Lean.ofReduceBool`, and CI also rejects
   both words in the sources;
-- every definition of Folio that `render` and `Site.build` use (about 580 of
+- every definition of Folio that `render` and `Site.build` use (about 750 of
   them, found by following the definitions from those two) is total: none is
   `partial`, `unsafe` or opaque, so Lean has checked that each one terminates
-  on every input;
+  on every input (including the stack-safe versions compiled code runs in
+  place of the recursive tree walks, below, and the `@[csimp]` theorems that
+  put them there use only the standard axioms);
 - the tables below match the doc comments in `Proofs/Spec.lean`, every
   `Spec.x` that SPEC.md names exists and is proved, and every proposition is
   named in SPEC.md;
@@ -52,6 +54,25 @@ reads HTML the way an HTML tokenizer does, but only knows the renderer's
 own tags and attributes and rejects everything else, so "reads back as the
 tree" means no Markdown text can make the output contain anything the
 renderer did not put there itself.
+
+The tree walks the propositions are about (`Blocks.takeAllRefs`,
+`Blocks.toBlocks`, `blocks`, `inlines`, `altParts`, `Html.writeList`) are
+recursive, one call per level of nesting, which is the clearest way to state
+them but not what the programs can run: CommonMark allows any nesting
+depth, and the engines Folio runs on at the edge and in browsers allow
+just under 10,000 stack frames (issue #231: a list nested 2,685 deep failed
+on Cloudflare Workers). Each one has a version with an explicit stack
+(`refsLoop`, `toBlocksLoop`, `blockLoop`, `inlineLoop`, `altLoop`,
+`writeLoop`, next to its definition in `Folio/`), a theorem that it equals
+the recursive definition (`Blocks.takeAllRefs_eq_fast`,
+`Blocks.toBlocks_eq_fast`, `blocks_eq_fast`, `inlines_eq_fast`,
+`altParts_eq_fast`, `Html.writeList_eq_fast`), and that theorem is marked
+`@[csimp]`, so Lean's compiler runs the stack-safe version wherever the
+program calls the recursive one. The propositions stay about the recursive
+definitions, and hold of what runs because the two are equal.
+`npm run proofs` follows the `@[csimp]` replacements: the stack-safe
+versions count among the definitions that must be total, and the six
+theorems must use only the standard axioms.
 
 ## The propositions
 

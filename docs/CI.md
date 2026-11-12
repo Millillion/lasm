@@ -190,7 +190,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `conduit.yml` | dispatch, call, PR (paths), push main,conduit (paths) | Linux | 24 min (max 107) | examples/conduit: proofs, API on Node/Workers/Bun, RealWorld E2E in three browsers | PR (paths), main |
 | `content.yml` | PR (paths), cron 23 5 * * 1-6, dispatch | Linux | 12 min (max 85) | content/ pages and runnable tutorials | PR (paths), nightly |
 | `differential.yml` | PR (paths-ignore), push main, cron 47 3 * * 2-6, call, dispatch | Linux, macOS, Windows | 35 min (max 110) | Compiler output vs native Lean on every target (generated core, file-system and feature programs), host fixtures, target equivalence, recursion and Async depth, macOS C tier; campaigns are coverage-guided (corpus and features kept in the Actions cache, `differential-coverage-<profile>-*`) | PR, main, nightly (campaign), weekly (long campaign) |
-| `dst-nightly.yml` | cron 23 3 * * 2-6, dispatch | Linux | — | Example-app deterministic simulation with random seeds | Nightly |
+| `dst-nightly.yml` | cron 23 3 * * 2-6, dispatch | Linux | — | Example-app deterministic simulation with random seeds; Ledger's also with its server code built for Workers (wrangler dev) and headless Chromium, Firefox and WebKit, each seed checked against Node | Nightly |
 | `dx-dev-loop.yml` | dispatch, call | Linux | 7 min (max 48) | Template dev loop, editor support, cold start | Release, nightly |
 | `ecosystem.yml` | dispatch | Linux, macOS | 93 min (max 586) | Lake projects of the ecosystem built on five targets | Nightly (dispatched by nightly.yml), on demand |
 | `edge-runtime.yml` | dispatch, call | Linux | 10 min (max 59) | Single-threaded edge runtime build (called by workers/wasi/browser) | Called |
@@ -214,7 +214,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `lasm-js-stress.yml` | push hang-stress, call, dispatch | Linux, macOS, Windows | 41 min (max 115) | Lasm.JS hang stress on four platforms | Release, nightly, weekly (soak), called by bridge-verification |
 | `lean-tiers.yml` | dispatch | Linux, macOS, Windows | 42 min (max 160) | Repackages pinned Lean archives into tiers (maintainer) | On demand |
 | `ledger-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 47 min (max 104) | examples/ledger on Bun, Deno, Docker, Workers, WASI auditor | PR (paths), main |
-| `ledger.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 25 min (max 88) | examples/ledger: proofs, API, DST fixed seeds, TigerBeetle differential, E2E | PR (paths), main |
+| `ledger.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 25 min (max 88) | examples/ledger: proofs, API, DST fixed seeds (also on Workers and in three headless browsers, against Node's traces), TigerBeetle differential, E2E | PR (paths), main |
 | `library-prebuilt.yml` | push prebuilt/**, dispatch | Linux | 3 min (max 16) | Regenerates library/prebuilt (maintainer) | On demand |
 | `library-proofs.yml` | dispatch, call, PR (paths), push main (paths) | Linux | — | Proofs of Lasm's library: theorems match Spec.lean, standard axioms only, library/PROOFS.md current; the Candidates files and verification/cli's propositions elaborate, and its Spec.lean is proved of its models (README current) | PR (paths), main |
 | `link-toolchain-fixtures.yml` | dispatch | Linux, macOS, Windows | 12 min | Link toolchain fixtures (maintainer) | On demand |
@@ -238,7 +238,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `node-windows-controls.yml` | dispatch | Windows | 2 min (max 12) | Windows resource and isolation controls | On demand |
 | `npm-dist.yml` | call, dispatch | Linux, macOS, Windows | 43 min | npm packages of the candidate through a loopback registry; Bun/Deno installs | Release (rehearsal) |
 | `platform-support.yml` | call, dispatch, push main (paths) | Linux, macOS, Windows | 12 min (max 196) | Launch platform claims: builds, containers, Lambda, native hosts | Release (called), main (paths) |
-| `porter-nightly.yml` | cron 41 3 * * 2-6, dispatch | Linux | 43 min | Porter: 40-minute endpoint fuzzing | Nightly |
+| `porter-nightly.yml` | cron 41 3 * * 2-6, dispatch | Linux | 43 min | Porter: 40-minute endpoint fuzzing of the Node build and of the Workers build under wrangler dev | Nightly |
 | `porter-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 32 min (max 101) | examples/porter on Bun, Deno, Docker, Workers | PR (paths), main |
 | `porter.yml` | dispatch, PR (paths), push main (paths) | Linux | 18 min (max 86) | examples/porter: proofs, oracles, DST, fuzzer, E2E | PR (paths), main |
 | `published-templates.yml` | dispatch, after release | Linux | 0 min (max 30) | npm create @lasm from the registry after a release | After release |
