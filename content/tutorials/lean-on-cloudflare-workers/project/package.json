@@ -2,7 +2,7 @@
   "name": "hello-workers",
   "version": "0.1.0",
   "private": true,
-  "description": "an HTTP handler in pure Lean (Lasm.Fetch) for Node, Fastly Compute, WASI, Spin and the edge, compiled to WebAssembly by Lasm",
+  "description": "an HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces, compiled to WebAssembly by Lasm",
   "scripts": {
     "dev": "lasm dev Main.lean",
     "build": "lasm build Main.lean",

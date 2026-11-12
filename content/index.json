@@ -27,7 +27,7 @@
       "sources": [
         "https://github.com/Millillion/lasm/blob/main/README.md",
         "https://github.com/Millillion/lasm/blob/main/docs/EDGE.md",
-        "https://github.com/Millillion/lasm/blob/main/docs/FETCH.md",
+        "https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md",
         "https://github.com/Millillion/lasm/blob/main/templates/fetch/Main.lean",
         "https://github.com/Millillion/lasm/blob/main/.github/workflows/content.yml"
       ]
