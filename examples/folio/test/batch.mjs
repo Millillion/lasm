@@ -50,7 +50,7 @@ function command(engine, dir) {
   switch (engine) {
     case 'node': return [process.execPath, [join(root, 'dist', 'batch', 'main.mjs'), join(dir, 'in'), join(dir, 'out')]];
     case 'native': return [join(root, '.lake', 'build', 'bin', 'folio-batch'), [join(dir, 'in'), join(dir, 'out')]];
-    case 'wasmtime': return ['wasmtime', ['run', '--dir', `${dir}::/w`, wasm, '/w/in', '/w/out']];
+    case 'wasmtime': return ['wasmtime', ['run', ...(process.env.FOLIO_WASMTIME_ARGS ? process.env.FOLIO_WASMTIME_ARGS.split(' ') : []), '--dir', `${dir}::/w`, wasm, '/w/in', '/w/out']];
     case 'wasmer': return ['wasmer', ['run', `--volume=${dir}:/w`, wasm, '--', '/w/in', '/w/out']];
     case 'node-wasi': return [process.execPath, ['--no-warnings', '--input-type=module', '-e', `
       import { WASI } from 'node:wasi'; import { readFile } from 'node:fs/promises';

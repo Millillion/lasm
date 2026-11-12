@@ -105,7 +105,9 @@ jobs:
       - name: The site from the store, a changed site, the 652 CommonMark examples and the pathological inputs on the server
         working-directory: ${{ env.FOLIO }}
         # Fastly: bodies over about 1 MB stop the instance (#234), so not the pathological inputs there yet
-        run: node test/edge.mjs --platform ${{ matrix.platform }} --spec ${{ matrix.platform != 'fastly' && '--pathological' || '' }}
+        env:
+          RUST_LOG: ${{ matrix.platform == 'fastly' && 'viceroy=error,viceroy_lib=error,viceroy_lib::execute=info' || '' }}
+        run: node test/edge.mjs --platform ${{ matrix.platform }} --spec --pathological
       - name: Two minutes of fuzzing on the server (seeded; the seed is printed first), and the seed that found issue #231
         if: matrix.platform == 'workers'
         working-directory: ${{ env.FOLIO }}
@@ -159,6 +161,14 @@ jobs:
         run: |
           for engine in wasmtime wasmer node-wasi; do
             node test/pathological.mjs --engine "$engine"
+          done
+      - name: EVIDENCE (#234, temporary) pathological inputs on wasmtime under a 128 MiB and a 256 MiB memory cap
+        if: always()
+        working-directory: examples/folio
+        run: |
+          for mib in 128 192 256 384; do
+            echo "=== max-memory-size ${mib} MiB"
+            FOLIO_WASMTIME_ARGS="-W max-memory-size=$((mib * 1048576))" node test/pathological.mjs --engine wasmtime || true
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
