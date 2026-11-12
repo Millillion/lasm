@@ -50,6 +50,14 @@ def fields (fs : Array (String × Data)) : Data :=
 def arg (α : Type) [FromJS α] (args : Array Data) (i : Nat) : IO α :=
   decodeAs α s!"callback argument {i + 1}" (args[i]?.getD .undefined)
 
+/-- A nullable object result requested as data (`getContext`'s `RenderingContext?`): `null` and
+`undefined` are `none`, an object (data mode makes it a reference) is `some`. A reference-mode
+result could not be `none`: the host makes a reference of `null` too. -/
+def optionalValue : Data → IO (Option Value)
+  | .null | .undefined => pure none
+  | .ref v _ => pure (some v)
+  | _ => throw (IO.userError "expected an object, null or undefined, got a primitive or plain data")
+
 /-- The bytes of an `ArrayBuffer` (copied through `new Uint8Array(buffer)`). -/
 def arrayBufferBytes (buffer : Value) : IO ByteArray :=
   Binding.invoke ByteArray { name := "Lasm.JS.Web.Support.arrayBufferBytes", module := "globalThis", path := "Uint8Array", construct := true, arity := 1 } #[.ref buffer ""] (await := false)

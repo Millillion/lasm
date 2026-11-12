@@ -503,7 +503,7 @@ and content types, workerd's urlencoded form decoding).
 | overloads | the first in IDL order keeps the name; each other adds `With` and its first argument that differs by name: `FormData.append` (string) and `FormData.appendWithBlobValue`, `URLPattern.new` and `URLPattern.newWithOptions`, `WebAssembly.instantiate` and `WebAssembly.instantiateWithModuleObject` |
 | `optional T x` | `(x : Option T := none)`; `none` passes nothing (`undefined`), so the spec's default applies. `optional any x` is `(x : Data := .undefined)`. |
 | `T... xs` (variadic) | `(xs : Array T := #[])` |
-| `T?` (nullable) | `Option T`; `none` is `null` |
+| `T?` (nullable) | `Option T`; `none` is `null` (or `undefined`). A nullable result that is a `Value` (`getContext`'s `RenderingContext?`) is requested as data, so that `null` is `none`: a reference-mode result would be a reference to `null` (`Support.optionalValue`). |
 | `DOMString`, `USVString`, `ByteString`, `CSSOMString` | `String` |
 | `boolean`; `byte`, `short`, `long`, `long long`, `bigint`; `octet`, `unsigned …`; `float`, `double` (also `unrestricted`) | `Bool`; `Int`; `Nat`; `Float` |
 | `BufferSource`, `ArrayBufferView`, typed arrays, `ArrayBuffer` | `ByteArray` (a copy; see limits). A union of typed arrays (`ImageDataArray`) too. A result that may be a typed array other than `Uint8Array` (`ImageData.data`, a `Uint8ClampedArray`) is copied as its bytes with up to four more host calls; an argument of such a type (`new ImageData(data, …)`'s `Uint8ClampedArray`) is made from the bytes in JavaScript, three more host calls. |

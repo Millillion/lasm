@@ -60,3 +60,11 @@
   `fetch`, calling the published object's methods of those names (a handler
   without them fails those events with a message saying so), and imports
   `cloudflare:workers` and `cloudflare:sockets` for `Lasm.JS.Cloudflare`.
+
+## Fixes
+
+- **`HTMLCanvasElement.getContext`, `Document.currentScript` and
+  `HTMLFormControlsCollection.namedItem` return `none` for `null`.** They were
+  `some` of a reference to `null` (an unsupported context id, no current
+  script, no such control). The generator now requests a nullable `Value`
+  result as data (`Lasm.JS.Web.Support.optionalValue`). Types are unchanged.

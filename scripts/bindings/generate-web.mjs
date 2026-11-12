@@ -733,6 +733,10 @@ function resultOf(idlType, member = null) {
   // An interface result is read as a reference and wrapped: some runtimes return
   // plain objects for interface instances (Bun's navigator), which data would copy.
   if (t.k === 'iface') return { async, t, lean, req: 'Value', post: 'wrap' };
+  // A nullable result read as a Value (getContext's RenderingContext?, a union of interfaces)
+  // is requested as data: a reference-mode result is a reference for null too, so
+  // Option Value would never be none. Data mode makes an object a reference and null null.
+  if (t.k === 'nullable' && retType(t.inner) === 'Value') return { async, t, lean, req: 'Data', post: 'Support.optionalValue' };
   // A dictionary holding a record is read through structuredClone: Node's
   // URLPattern returns its groups as objects that are not plain.
   const dict = t.k === 'nullable' ? t.inner : t;
