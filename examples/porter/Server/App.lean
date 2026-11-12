@@ -1,7 +1,9 @@
 /-
 The server on every JavaScript target: `Porter.handle` (pure Lean, written
-against `Reads` and `Crypto`) served with `Lasm.Fetch`, on a SQL database
-from one of the binding modules, with Web Crypto.
+against `Reads` and `Crypto`) as an HTTP handler (`Server/Web.lean`), on a
+SQL database from one of the binding modules, with Web Crypto. The entry
+files serve it with each platform's own server (`Server/JsServe.lean`,
+`Server/NodeServe.lean`).
 
 Each request draws its clock reading and four random values, runs
 `Porter.handle` on the database's queries, then commits its writes with a
@@ -12,9 +14,8 @@ as it was when it committed. Each commit also inserts a receipt, an id from
 the request's random values, so a commit that landed but reported an error is
 recognised and not run again (issue #138).
 -/
-import Lasm.Fetch
-import Lasm.Fetch.Assets
 import Lasm.JS
+import Server.Assets
 import Porter.Render
 import Server.Sql
 import Server.Crypto
@@ -127,11 +128,11 @@ def exclusive {α : Type} (writers : Option Std.Semaphore) (act : Async α) : As
     let _ ← await (← w.acquire).result?
     try act finally w.release
 
-def toResponse (w : Wire) (head : Bool) : Lasm.Fetch.Response :=
+def toResponse (w : Wire) (head : Bool) : Web.Response :=
   { status := w.status.toUInt16, headers := w.headers.toArray, body := if head then .empty else w.body.toUTF8 }
 
 /-- One HTTP request. -/
-def serveRequest (env : Env) (writers : Option Std.Semaphore) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
+def serveRequest (env : Env) (writers : Option Std.Semaphore) (req : Web.Request) : Async Web.Response := do
   let head := req.method == "HEAD"
   let r : Porter.Request := { method := if head then "GET" else req.method, path := req.segments,
                               query := req.query, headers := req.headers.toList, body := req.text }
@@ -146,7 +147,7 @@ def serveRequest (env : Env) (writers : Option Std.Semaphore) (req : Lasm.Fetch.
       return { status := 503, body := .empty }
   return toResponse (reply.render env.cfg) head
 
-/-- Serves Porter on a SQL database (whose binding module created the
+/-- Porter's HTTP handler on a SQL database (whose binding module created the
 tables), with the browser app's files (`assets`: `embed_dir! "dist/public"`
 in the entry file, served under `/ui/`). The configuration and the keys are read on the first request (on
 Workers, the environment and the database exist only during a request), then
@@ -154,11 +155,11 @@ kept. `getEnv`: the environment variables (Workers passes them with each
 request). `serializeWriters`: off on Cloudflare Workers, which does not let
 one request wait on another's promise; the version check alone keeps commits
 consistent there. -/
-def run (db : Sql) (assets : Lasm.Fetch.Assets) (getEnv : String → IO (Option String) := fun k => IO.getEnv k)
-    (serializeWriters := true) : IO Unit := do
+def handler (db : Sql) (assets : Web.Assets) (getEnv : String → IO (Option String) := fun k => IO.getEnv k)
+    (serializeWriters := true) : IO Web.Handler := do
   let ready ← IO.mkRef (none : Option Env)
   let writers ← if serializeWriters then some <$> Std.Semaphore.new 1 else pure none
-  Lasm.Fetch.serve <| assets.wrap fun req => do
+  return assets.wrap fun req => do
     let env ← match ← ready.get with
       | some env => pure env
       | none => do

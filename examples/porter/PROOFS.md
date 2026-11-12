@@ -148,8 +148,9 @@ Totality (checked by test/Axioms.lean, not a theorem): the request handlers reac
   bytes; that rendering is total (the totality check covers it) and that it
   is what clients expect is tested by the oracles (openid-client,
   oauth4webapi and jose parse every response), not proved.
-- **The HTTP layer.** That `Lasm.Fetch` and the platform give Porter the
-  request's method, path segments, query, headers and body as sent.
+- **The HTTP layer.** That the platform's server (`Server/JsServe.lean`,
+  `Server/NodeServe.lean`) and `Server/Web.lean` give Porter the request's
+  method, path segments, query, headers and body as sent.
 - **Lean, Lasm and the JavaScript runtime**: that Lean's kernel is sound, that
   Lasm compiles the Lean faithfully to WebAssembly, and that SQLite, D1 and
   the HTTP layer behave as documented. The externally implemented primitives

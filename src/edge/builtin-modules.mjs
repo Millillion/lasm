@@ -40,7 +40,12 @@ export function builtinModuleFile(specifier, directory = builtinDirectory) {
   return file;
 }
 
-const relativeImport = /^\s*(?:import|export)\s[^'"]*?from\s*['"](\.\/[a-z][a-z0-9-]*\.mjs)['"];?\s*$/gm;
+// `import … from './x.mjs'` (its clause may span lines), `export … from
+// './x.mjs'` and the side-effect `import './x.mjs'`. A clause never holds a
+// `;` or a `//` comment, so a statement before a commented-out import does not
+// run into it. (The model differential found both the missing side-effect
+// form and the commented-out import read as real.)
+const relativeImport = /^\s*(?:(?:import|export)\s(?:(?!\/\/)[^'";])*?from\s*|import\s*)['"](\.\/[a-z][a-z0-9-]*\.mjs)['"];?\s*$/gm;
 /** The builtin modules `specifiers` need, with the builtins they import, in dependency order. */
 export function builtinModuleClosure(specifiers, directory = builtinDirectory) {
   const order = [], seen = new Set();

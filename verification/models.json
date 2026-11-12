@@ -226,8 +226,18 @@
       ]
     },
     "src/edge/builtin-modules.mjs": {
-      "status": "pending",
-      "reason": "the closure of builtin modules: reachability over imports (candidate builtin_closure)"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/BuiltinModules.lean",
+          "functions": [
+            "isBuiltinModule",
+            "builtinModuleClosure"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "the closure is modelled, with the import forms it reads checked by the differential; `builtinModuleNames` and `builtinModuleFile` look a name up in the builtin directory (test/builtin-modules.test.mjs)"
     },
     "src/edge/edge-build.mjs": {
       "status": "exempt",
@@ -240,8 +250,18 @@
       "reason": "Lean's runtime primitives on this host: their meaning is native Lean's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md)"
     },
     "src/edge/edge-initializers.mjs": {
-      "status": "pending",
-      "reason": "initialization schedules and wrappers: reachability over calls (candidates schedule_reached_kept_first, compact_wrappers_as_chains)"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/EdgeInitializers.lean",
+          "functions": [
+            "initializationSchedule",
+            "compactInitializerWrappers"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "both of its functions are modelled; the module does nothing else"
     },
     "src/edge/edge-js.mjs": {
       "status": "pending",
@@ -718,7 +738,17 @@
     },
     "src/wasi/wasi-component.mjs": {
       "status": "pending",
-      "reason": "splices a core module into the component template: pure over Wasm sections (candidates replace_one_core_module, drops_only_component_type, componentize_inverse)"
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/WasiComponent.lean",
+          "functions": [
+            "replaceCoreModule",
+            "withoutComponentType"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "`replaceCoreModule` and `withoutComponentType` are modelled (`componentize` and `makeTemplate` are `replaceCoreModule` applied to the template and the placeholder); `extractCore`, the inverse, is not yet (candidate componentize_inverse)"
     },
     "src/wasi/wasi-link.mjs": {
       "status": "exempt",

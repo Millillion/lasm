@@ -27,6 +27,7 @@ comments say so. The plain definitions (`leb`, `sectionOf`, `Reaches`, …) are
 the vocabulary the statements share, exact and complete.
 -/
 import Lean.Data.Json
+import Lasm.Cli.Model.BuiltinModules
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.NodeHost
@@ -222,9 +223,9 @@ end with `_`, where Lean's mangling is unambiguous. -/
 def wellFormedName (n : String) : Bool :=
   (n.splitOn ".").all fun c => (c.toList.head?.map Char.isAlpha).getD false && !c.endsWith "_"
 
-/-- `builtinModuleClosure(specifiers)` (src/edge/builtin-modules.mjs), with
-`imports s` the builtin specifiers (`lasm:…`) builtin `s`'s file imports. -/
-opaque builtinModuleClosure : (String → List String) → List String → List String
+-- `builtinModuleClosure(specifiers)` (src/edge/builtin-modules.mjs), with
+-- `imports` the builtin specifiers (`lasm:…`) each builtin's file imports:
+-- modelled in Model/BuiltinModules.lean.
 
 -- An initialization plan (`Plan`: every initializer of the link, those kept,
 -- and the initializers each one calls, `calls` as the entries of the
