@@ -8,8 +8,9 @@ name: Folio on every platform
 #   served the same way; then the CommonMark specification's 652 examples
 #   run on the server through POST /api/render (test/edge.mjs --spec), and
 #   CommonMark's pathological inputs with nesting far deeper than the
-#   engine's stack (issue #231; test/edge.mjs --pathological; not yet on
-#   Fastly, where bodies over about 1 MB stop the instance, #234).
+#   engine's stack (issue #231; test/edge.mjs --pathological). On Fastly
+#   the two cases that need more than Compute's 128 MB heap per request
+#   (backticks, unclosed <!--) are skipped with that reason (#234).
 # - wasi: the 652 examples and the pathological inputs on the WASI build of
 #   the batch renderer (dist/batch-wasi) on wasmtime 49.0.4, wasmer 7.4.2
 #   and node:wasi.
@@ -104,9 +105,7 @@ jobs:
         run: node tools/kv.mjs fastly | diff fastly.toml -
       - name: The site from the store, a changed site, the 652 CommonMark examples and the pathological inputs on the server
         working-directory: ${{ env.FOLIO }}
-        # Fastly: bodies over about 1 MB stop the instance (#234), so not the pathological inputs there yet
-        env:
-          RUST_LOG: ${{ matrix.platform == 'fastly' && 'viceroy=error,viceroy_lib=error,viceroy_lib::execute=info' || '' }}
+        # Fastly: all but the two cases that need more than Compute's 128 MB heap (test/platforms.mjs, #234)
         run: node test/edge.mjs --platform ${{ matrix.platform }} --spec --pathological
       - name: Two minutes of fuzzing on the server (seeded; the seed is printed first), and the seed that found issue #231
         if: matrix.platform == 'workers'
@@ -161,14 +160,6 @@ jobs:
         run: |
           for engine in wasmtime wasmer node-wasi; do
             node test/pathological.mjs --engine "$engine"
-          done
-      - name: EVIDENCE (#234, temporary) pathological inputs on wasmtime under a 128 MiB and a 256 MiB memory cap
-        if: always()
-        working-directory: examples/folio
-        run: |
-          for mib in 128 192 256 384; do
-            echo "=== max-memory-size ${mib} MiB"
-            FOLIO_WASMTIME_ARGS="-W max-memory-size=$((mib * 1048576))" node test/pathological.mjs --engine wasmtime || true
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()

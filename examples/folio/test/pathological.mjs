@@ -9,12 +9,16 @@
 // 36,742 deep exhausted the stack on Cloudflare Workers, whose engine allows
 // just under 10,000 frames, as browsers do).
 //
-//   node test/pathological.mjs [--timeout SECONDS] [--only NAME] [--engine ENGINE]
+//   node test/pathological.mjs [--timeout SECONDS] [--only NAME] [--engine ENGINE] [--skip JSON]
 //
 // ENGINE is any engine of test/batch.mjs: lasm or node (the default, the
 // Node build), native, wasmtime, wasmer, node-wasi, chromium, firefox,
 // webkit, or the URL of a running site server (POST /api/render; test/edge.mjs
 // --pathological serves one on each edge platform's local tooling).
+//
+// --skip takes a JSON object from case names to the reason each is not run
+// on this engine (test/platforms.mjs: Fastly's 128 MB heap, issue #234);
+// every name must be a case here, and the reason is printed.
 //
 // Fails if any case errors, times out or produces other output. cmark's
 // own limit is 5 s per case; the default here is 20 s, since Folio runs
@@ -28,6 +32,7 @@ const engine = { lasm: 'node', native: 'native' }[arg('--engine', 'lasm')] ?? ar
 const remote = /^https?:\/\//.test(engine) || ['chromium', 'firefox', 'webkit'].includes(engine);
 const timeout = Number(arg('--timeout', remote ? 60 : 20)) * 1000;
 const only = arg('--only', null);
+const skip = JSON.parse(arg('--skip', '{}'));
 
 const rep = (s, n) => s.repeat(n);
 const range = (a, b) => Array.from({ length: b - a }, (_, i) => a + i);
@@ -85,9 +90,12 @@ const cases = {
   'images nested 30,000 deep': [rep('![a', 30000) + rep('](u)', 30000), /^<p><img src="u" alt="a{30000}" \/><\/p>\n$/],
 };
 
+for (const name of Object.keys(skip)) if (!(name in cases)) throw new Error(`--skip: no pathological case ${JSON.stringify(name)}`);
+
 let failed = 0;
 for (const [name, [input, re]] of Object.entries(cases)) {
   if (only && name !== only) continue;
+  if (name in skip) { console.log(`skip ${name}: ${skip[name]} (${input.length} characters)`); continue; }
   const started = Date.now();
   let status;
   try {
@@ -101,5 +109,7 @@ for (const [name, [input, re]] of Object.entries(cases)) {
   if (status !== 'passed') failed++;
   console.log(`${status === 'passed' ? 'ok  ' : 'FAIL'} ${name}: ${status} (${seconds} s, ${input.length} characters)`);
 }
-console.log(failed ? `${failed} pathological cases failed on ${engine}` : `every pathological case passed on ${engine}`);
+const skipped = Object.keys(skip).filter(n => !only || n === only).length;
+console.log(failed ? `${failed} pathological cases failed on ${engine}`
+  : `every pathological case ${skipped ? `but the ${skipped} skipped ` : ''}passed on ${engine}`);
 if (failed) process.exitCode = 1;
