@@ -24,7 +24,10 @@ test('only the reviewed Lean releases have an IO error policy', () => {
   assert.throws(() => encodeError({ code: 'EIO' }, '4.36.0'), /No verified IO error policy for Lean 4\.36\.0/);
 });
 
-// ∀ a b, leanAtLeast a b = (parts a ≥ parts b) under lexicographic order, prereleases as their release
+// Proposition: Lasm.Cli.Candidates.lean_at_least_lexicographic
+//   ∀ (a b : Nat × Nat × Nat) (rc : Option Nat),
+//     (leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText b) = true ↔ LexGe a b) ∧
+//     leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText a) = true
 test('Lean version comparison is lexicographic on major.minor.patch and ignores a prerelease tag', () => {
   forAll(r => ({ a: [r.int(0, 5), r.int(0, 40), r.int(0, 3)], b: [r.int(0, 5), r.int(0, 40), r.int(0, 3)], rc: r.int(0, 2) }), ({ a, b, rc }) => {
     const expected = a[0] !== b[0] ? a[0] > b[0] : a[1] !== b[1] ? a[1] > b[1] : a[2] >= b[2];
@@ -150,7 +153,8 @@ test('node:os SystemErrors are classified by their underlying libuv error', () =
   assert.equal(fields(encodeError({ ...wrapped, info: { errno: -20 } }, '4.34.1')).kind, 0);
 });
 
-// ∀ values, decode (numbers values) = map (UInt64.ofInt) values
+// Proposition: Lasm.Cli.Candidates.numbers_le64
+//   ∀ values : List Int, (numbers values).data.toList = values.flatMap le64
 test('numbers encodes each value as a little-endian UInt64, wrapping negatives', () => {
   forAll(r => r.array(r.int(0, 6), () => BigInt(r.int(-(2 ** 31), 2 ** 31)) * BigInt(r.int(1, 2 ** 20))), values => {
     const bytes = numbers(...values);

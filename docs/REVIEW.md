@@ -403,6 +403,11 @@ does was written inside each app, as the rule says (no new public API):
     for your review with the proved ones. Three earlier prose candidates are
     listed there as "not yet stated in Lean": they need a model of JavaScript,
     the HTML parser or Lean's runtime first.
+  - Since 2026-11-11: every JavaScript property test and every fuzz oracle
+    but `wasi-cgi` names its proposition. The CLI's 29 are in
+    [verification/cli](../verification/cli/README.md), stated about `opaque`
+    stand-ins for the JavaScript functions until each has a Lean model; two
+    more library candidates (Lasm.Serverless, Lasm.UI) bring the library to 12.
 - [ ] The exit bar for "rock solid" ([§7](TESTING_STRATEGY.md#7-exit-bar-rock-solid)): eight measurable conditions.
   - How items 3, 5 and 6 are measured (2026-11-11, DECISIONS.md): a 0 % file
     fails the unit suite unless the coverage baseline names the workflows that

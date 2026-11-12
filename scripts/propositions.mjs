@@ -3,8 +3,10 @@
 // candidate names a test that exists and cites it.
 //
 // 1. Reads the propositions: each `def name … : Prop :=` of a library's or an
-//    app's Spec.lean (proved) or Candidates.lean (tested, not yet proved),
-//    with its namespace, statement and doc comment.
+//    app's Spec.lean (proved) or Candidates.lean (tested, not yet proved), or
+//    of a Candidates.lean under verification/ (propositions about the CLI's
+//    JavaScript, verification/cli), with its namespace, statement and doc
+//    comment.
 // 2. Reads every citation in the tests, scripts and sources: a comment line
 //    `Proposition: Lasm.<Lib>.Spec.<name>` (or `Candidates.<name>`), followed
 //    by the statement, verbatim, on comment lines indented by at least two
@@ -12,15 +14,16 @@
 //    definition's (whitespace aside).
 // 3. Every candidate's doc comment has a `Tested by:` line naming files that
 //    exist, and each of them cites the candidate.
-// 4. Regenerates the candidates list of library/PROOFS.md from the
-//    Candidates.lean files and fails if it is out of date.
+// 4. Regenerates the candidates list of library/PROOFS.md from the library's
+//    Candidates.lean files, and that of verification/<package>/README.md from
+//    the package's, and fails if one is out of date.
 // 5. Counts the fuzz oracles (test/fuzz) and the JavaScript properties
 //    (`forAll` in test/) that name a proposition: exit bar 7 of
 //    docs/TESTING_STRATEGY.md needs all of them. An unnamed one is reported,
 //    not an error, until the bar is met.
 //
 //   node scripts/propositions.mjs            # check
-//   node scripts/propositions.mjs --write    # also rewrite library/PROOFS.md's candidates
+//   node scripts/propositions.mjs --write    # also rewrite the generated candidates lists
 //   node scripts/propositions.mjs --json     # the inventory as JSON (for the evidence page)
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -82,21 +85,24 @@ export function testedBy(doc) {
 const tracked = (root, ...paths) => execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', ...paths], { cwd: root, encoding: 'utf8' })
   .split('\0').filter(Boolean);
 
-/** Where propositions live: Spec.lean and Candidates.lean of the library and the apps. */
+/** Where propositions live: Spec.lean and Candidates.lean of the library and the apps, and of verification/. */
 export function propositionFiles(root) {
-  return tracked(root, 'library/Lasm', 'examples').filter(f =>
-    /^library\/Lasm\/[^/]+\/(?:Spec|Candidates)\.lean$/.test(f) || /^examples\/[^/]+\/Proofs\/(?:Spec|Candidates)\.lean$/.test(f));
+  return tracked(root, 'library/Lasm', 'examples', 'verification').filter(f =>
+    /^library\/Lasm\/[^/]+\/(?:Spec|Candidates)\.lean$/.test(f) || /^examples\/[^/]+\/Proofs\/(?:Spec|Candidates)\.lean$/.test(f)
+    || /^verification\/[^/]+\/(?:[^/]+\/)*(?:Spec|Candidates)\.lean$/.test(f));
 }
 
 /** Files that may cite propositions: tests, scripts, sources and Lean code outside the Spec files. */
 export function citingFiles(root) {
   const self = new Set(['scripts/propositions.mjs', 'test/propositions.test.mjs']);
-  return tracked(root, 'test', 'scripts', 'src', 'examples', 'library')
+  return tracked(root, 'test', 'scripts', 'src', 'examples', 'library', 'verification')
     .filter(f => /\.(?:mjs|js|cjs|ts|lean|c|h)$/.test(f) && !self.has(f) && !f.includes('/prebuilt/') && !f.includes('node_modules/'));
 }
 
 /** The fuzz oracles and JavaScript properties, and whether each names a proposition. */
 export function inventory(root, read) {
+  // This lint's own test writes `forAll` inside its fixtures; it has no property.
+  const fixtures = new Set(['test/propositions.test.mjs']);
   const oracles = [];
   for (const f of tracked(root, 'test/fuzz/targets').filter(f => f.endsWith('.mjs')))
     oracles.push({ id: f.replace(/^test\/fuzz\/targets\/|\.mjs$/g, ''), file: f, named: readCitations(read(f)).length > 0 });
@@ -116,7 +122,7 @@ export function inventory(root, read) {
     }
   }
   const properties = [];
-  for (const f of tracked(root, 'test').filter(f => f.endsWith('.test.mjs'))) {
+  for (const f of tracked(root, 'test').filter(f => f.endsWith('.test.mjs') && !fixtures.has(f))) {
     const lines = read(f).split('\n');
     lines.forEach((line, i) => {
       if (!/\bforAll\(/.test(line) || /^\s*(?:import|export)\b/.test(line)) return;
@@ -138,18 +144,19 @@ const BEGIN = '<!-- BEGIN CANDIDATES -->';
 const END = '<!-- END CANDIDATES -->';
 const cell = s => normalize(s).replace(/\|/g, '\\|');
 
-/** The generated candidates list of library/PROOFS.md. */
-export function candidatesMarkdown(candidates) {
+/** The generated candidates list of a document in `base` (library/PROOFS.md, verification/<package>/README.md). */
+export function candidatesMarkdown(candidates, base = 'library') {
+  const up = '../'.repeat(base.split('/').length);
   let out = `<!-- Generated from the Candidates.lean files by \`node scripts/propositions.mjs --write\`; do not edit by hand. -->\n\n`;
-  out += `**${candidates.length} candidates**, each a \`def … : Prop\` in its library's \`Candidates.lean\`, checked on generated inputs by the test its \`Tested by:\` line names (which cites it with a \`Proposition:\` line), not yet proved.\n`;
+  out += `**${candidates.length} candidates**, each a \`def … : Prop\` in a \`Candidates.lean\`, checked on generated inputs by the test its \`Tested by:\` line names (which cites it with a \`Proposition:\` line), not yet proved.\n`;
   const libraries = [...new Set(candidates.map(c => c.name.split('.').slice(0, -2).join('.')))];
   for (const lib of libraries) {
     const mine = candidates.filter(c => c.name.startsWith(lib + '.Candidates.'));
-    const path = mine[0].file.replace(/^library\//, '');
+    const path = mine[0].file.slice(base.length + 1);
     out += `\n### ${lib} (${mine.length})\n\n| Candidate | In plain English | Tested by |\n| --- | --- | --- |\n`;
     for (const c of mine) {
       const english = c.doc.replace(/Tested by:[\s\S]*$/, '');
-      out += `| [\`${c.short}\`](${path}#L${c.line}) | ${cell(english)} | ${testedBy(c.doc).map(p => `[${p}](../${p})`).join(', ')} |\n`;
+      out += `| [\`${c.short}\`](${path}#L${c.line}) | ${cell(english)} | ${testedBy(c.doc).map(p => `[${p}](${up}${p})`).join(', ')} |\n`;
     }
   }
   return out;
@@ -186,16 +193,22 @@ export function check({ root = defaultRoot, write = false } = {}) {
         problems.push(`${c.file}:${c.line}: ${c.name} is tested by ${path}, which does not cite it (a \`Proposition: ${c.name}\` line)`);
     }
   }
-  const proofsMd = join(root, 'library', 'PROOFS.md');
-  const text = readFileSync(proofsMd, 'utf8');
-  const i = text.indexOf(BEGIN), j = text.indexOf(END);
-  if (i < 0 || j < 0) problems.push(`library/PROOFS.md has no ${BEGIN} … ${END} block`);
-  else {
-    const library = candidates.filter(c => c.file.startsWith('library/'));
-    const updated = text.slice(0, i + BEGIN.length) + '\n' + candidatesMarkdown(library) + text.slice(j);
+  // library/PROOFS.md lists the library's candidates; verification/<package>/README.md its package's.
+  const documents = new Map([['library', 'library/PROOFS.md']]);
+  for (const c of candidates) {
+    const m = /^verification\/[^/]+/.exec(c.file);
+    if (m) documents.set(m[0], `${m[0]}/README.md`);
+  }
+  for (const [base, document] of documents) {
+    const path = join(root, document);
+    const text = existsSync(path) ? readFileSync(path, 'utf8') : '';
+    const i = text.indexOf(BEGIN), j = text.indexOf(END);
+    if (i < 0 || j < 0) { problems.push(`${document} has no ${BEGIN} … ${END} block`); continue; }
+    const mine = candidates.filter(c => c.file.startsWith(base + '/'));
+    const updated = text.slice(0, i + BEGIN.length) + '\n' + candidatesMarkdown(mine, base) + text.slice(j);
     if (updated !== text) {
-      if (write) writeFileSync(proofsMd, updated);
-      else problems.push('library/PROOFS.md\'s candidates are out of date with the Candidates.lean files (run `node scripts/propositions.mjs --write`)');
+      if (write) writeFileSync(path, updated);
+      else problems.push(`${document}'s candidates are out of date with the Candidates.lean files (run \`node scripts/propositions.mjs --write\`)`);
     }
   }
   return { problems, propositions, citations, inventory: inventory(root, read) };
