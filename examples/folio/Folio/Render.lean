@@ -68,6 +68,57 @@ def altParts (nl : Bool) (acc : Array (Bool × String)) : List Inline → Array 
       | .emph cs | .strong cs | .link _ _ cs | .image _ _ cs => altParts nl acc cs
     altParts nl acc is
 
+/-! ### Without recursion
+
+`altParts`, `inlines` and `blocks` recurse once per level of nesting (an image
+in a link in emphasis, a list in a block quote in a list item, …), and so
+does `Html.write`. CommonMark allows any depth, and an engine's stack can be
+small (just under 10,000 frames on the edge and in browsers). Each one has a
+version with an explicit stack (`altLoop`, `inlineLoop`, `blockLoop`), proved
+equal to it; an `@[csimp]` theorem makes compiled code run that version in
+its place, and the proofs keep talking about the recursive definitions. -/
+
+/-- The size of the lists of inlines left on a stack. -/
+noncomputable def inlineListsSize : List (List Inline) → Nat
+  | [] => 0
+  | is :: st => sizeOf is + inlineListsSize st
+
+/-- `altParts` of `is`, then of each list on `st`. -/
+def altLoop (nl : Bool) (acc : Array (Bool × String)) : List Inline → List (List Inline) → Array (Bool × String) × Bool
+  | [], [] => (acc, nl)
+  | [], is :: st => altLoop nl acc is st
+  | .text t :: is, st => altLoop (t == "\n") (acc.push (false, t)) is st
+  | .code t :: is, st => altLoop (t == "\n") (acc.push (false, t)) is st
+  | .html t :: is, st => altLoop (t == "\n") (acc.push (true, t)) is st
+  | .softbreak :: is, st => altLoop true (acc.push (false, "\n")) is st
+  | .linebreak :: is, st => altLoop true (acc.push (false, if nl then "" else "\n")) is st
+  | .emph cs :: is, st => altLoop nl acc cs (is :: st)
+  | .strong cs :: is, st => altLoop nl acc cs (is :: st)
+  | .link _ _ cs :: is, st => altLoop nl acc cs (is :: st)
+  | .image _ _ cs :: is, st => altLoop nl acc cs (is :: st)
+termination_by is st => sizeOf is + inlineListsSize st
+decreasing_by
+  all_goals simp only [inlineListsSize, List.cons.sizeOf_spec, List.nil.sizeOf_spec, Inline.emph.sizeOf_spec,
+    Inline.strong.sizeOf_spec, Inline.link.sizeOf_spec, Inline.image.sizeOf_spec, Inline.text.sizeOf_spec,
+    Inline.code.sizeOf_spec, Inline.html.sizeOf_spec, Inline.softbreak.sizeOf_spec, Inline.linebreak.sizeOf_spec]
+  all_goals omega
+
+/-- `altParts` of each list on the stack, in order. -/
+def altUnwind : Array (Bool × String) × Bool → List (List Inline) → Array (Bool × String) × Bool
+  | r, [] => r
+  | r, is :: st => altUnwind (altParts r.2 r.1 is) st
+
+theorem altLoop_eq (nl : Bool) (acc : Array (Bool × String)) (is : List Inline) (st : List (List Inline)) :
+    altLoop nl acc is st = altUnwind (altParts nl acc is) st := by
+  induction nl, acc, is, st using altLoop.induct <;> simp_all [altLoop, altUnwind, altParts]
+
+/-- `altParts`, with an explicit stack. -/
+def altPartsFast (nl : Bool) (acc : Array (Bool × String)) (is : List Inline) : Array (Bool × String) × Bool :=
+  altLoop nl acc is []
+
+@[csimp] theorem altParts_eq_fast : @altParts = @altPartsFast := by
+  funext nl acc is; simp [altPartsFast, altLoop_eq, altUnwind]
+
 /-- An image. Its description's text becomes the `alt` attribute. When raw
 HTML is enabled and the description holds some, commonmark.js writes that
 HTML into the attribute unescaped; the image is then raw HTML too. -/
@@ -107,6 +158,60 @@ end
 def inlines (o : Options) (nl : Bool) (is : List Inline) : List Html × Bool :=
   let (a, nl) := inlinesAux o nl #[] is
   (a.toList, nl)
+
+/-- An element `inlineLoop` is inside: its tag and attributes, the nodes
+before it, and the inlines after it. -/
+structure IFrame where
+  tag : Tag
+  attrs : List (Attr × String)
+  acc : Array Html
+  rest : List Inline
+
+/-- The size of the inlines left in the frames. -/
+noncomputable def iframesSize : List IFrame → Nat
+  | [] => 0
+  | f :: st => sizeOf f.rest + iframesSize st
+
+/-- `inlinesAux` of `is`, then, for each frame, the element around what was
+built and the inlines after it. -/
+def inlineLoop (o : Options) (nl : Bool) (acc : Array Html) : List Inline → List IFrame → Array Html × Bool
+  | [], [] => (acc, nl)
+  | [], f :: st => inlineLoop o false (f.acc.appendList [.elem f.tag f.attrs acc.toList]) f.rest st
+  | .text s :: is, st => inlineLoop o (s == "\n") (acc.appendList [.text s]) is st
+  | .softbreak :: is, st => inlineLoop o true (acc.appendList [.text "\n"]) is st
+  | .linebreak :: is, st => inlineLoop o true (acc.appendList [.void .br [], .text "\n"]) is st
+  | .code s :: is, st => inlineLoop o false (acc.appendList [.elem .code [] [.text s]]) is st
+  | .html s :: is, st => inlineLoop o (s == "\n") (acc.appendList [rawOr o s]) is st
+  | .image d t cs :: is, st => inlineLoop o false (acc.appendList [image o d t cs]) is st
+  | .emph cs :: is, st => inlineLoop o false #[] cs (⟨.em, [], acc, is⟩ :: st)
+  | .strong cs :: is, st => inlineLoop o false #[] cs (⟨.strong, [], acc, is⟩ :: st)
+  | .link d t cs :: is, st =>
+    inlineLoop o false #[] cs
+      (⟨.a, (if !o.anyUrl && unsafeUrl d then [] else [(Attr.href, d)]) ++ (if t.isEmpty then [] else [(Attr.title, t)]), acc, is⟩ :: st)
+termination_by is st => sizeOf is + iframesSize st
+decreasing_by
+  all_goals simp only [iframesSize, List.cons.sizeOf_spec, List.nil.sizeOf_spec, Inline.emph.sizeOf_spec,
+    Inline.strong.sizeOf_spec, Inline.link.sizeOf_spec, Inline.image.sizeOf_spec, Inline.text.sizeOf_spec,
+    Inline.code.sizeOf_spec, Inline.html.sizeOf_spec, Inline.softbreak.sizeOf_spec, Inline.linebreak.sizeOf_spec]
+  all_goals omega
+
+/-- What `inlineLoop` builds after a list: each frame's element and the
+inlines after it. -/
+def inlineUnwind (o : Options) : Array Html × Bool → List IFrame → Array Html × Bool
+  | r, [] => r
+  | r, f :: st => inlineUnwind o (inlinesAux o false (f.acc.appendList [.elem f.tag f.attrs r.1.toList]) f.rest) st
+
+theorem inlineLoop_eq (o : Options) (nl : Bool) (acc : Array Html) (is : List Inline) (st : List IFrame) :
+    inlineLoop o nl acc is st = inlineUnwind o (inlinesAux o nl acc is) st := by
+  induction nl, acc, is, st using inlineLoop.induct o <;> simp_all [inlineLoop, inlineUnwind, inlinesAux, inline]
+
+/-- `inlines`, with an explicit stack. -/
+def inlinesFast (o : Options) (nl : Bool) (is : List Inline) : List Html × Bool :=
+  let (a, nl) := inlineLoop o nl #[] is []
+  (a.toList, nl)
+
+@[csimp] theorem inlines_eq_fast : @inlines = @inlinesFast := by
+  funext o nl is; simp [inlines, inlinesFast, inlineLoop_eq, inlineUnwind]
 
 /-- The `class` of a code block: `language-` and the first word of its info
 string. -/
@@ -151,6 +256,105 @@ end
 def blocks (o : Options) (tight nl : Bool) (bs : List Block) : List Html × Bool :=
   let (a, nl) := blocksAux o tight nl #[] bs
   (a.toList, nl)
+
+/-- What `blockLoop` is working through: a list's blocks or a list's items,
+with its `tight` and `nl` and the nodes built so far (as `blocksAux` and
+`itemsAux` take them). -/
+inductive RRun where
+  | blocks (tight nl : Bool) (acc : Array Html) (bs : List Block)
+  | items (tight nl : Bool) (acc : Array Html) (items : List (List Block))
+
+/-- A block or item `blockLoop` is inside, and the run it continues. -/
+inductive RFrame where
+  /-- A block quote, in a run of blocks (`tight`, `nl`, `acc`, `rest`). -/
+  | quote (tight nl : Bool) (acc : Array Html) (rest : List Block)
+  /-- A list (`tag`, `attrs`), in a run of blocks. -/
+  | list (tag : Tag) (attrs : List (Attr × String)) (tight nl : Bool) (acc : Array Html) (rest : List Block)
+  /-- A list item, in a run of items. -/
+  | item (tight : Bool) (acc : Array Html) (rest : List (List Block))
+
+/-- The run a frame continues, once its block's or item's nodes are built
+(`inner`, ending with exactly "\n" when `nl'`). -/
+def RFrame.resume (inner : Array Html) (nl' : Bool) : RFrame → RRun
+  | .quote tight nl acc rest =>
+    .blocks tight true (acc.appendList (cr nl ++ [.elem .blockquote [] (.text "\n" :: inner.toList ++ cr nl'), .text "\n"])) rest
+  | .list tag attrs tight nl acc rest =>
+    .blocks tight true (acc.appendList (cr nl ++ [.elem tag attrs (.text "\n" :: inner.toList ++ cr nl'), .text "\n"])) rest
+  | .item tight acc rest => .items tight true (acc.appendList [.elem .li [] inner.toList, .text "\n"]) rest
+
+/-- The size of what a run has left. -/
+noncomputable def RRun.size : RRun → Nat
+  | .blocks _ _ _ bs => sizeOf bs
+  | .items _ _ _ its => sizeOf its
+
+/-- The size of what a frame's run has left. -/
+noncomputable def RFrame.size : RFrame → Nat
+  | .quote _ _ _ rest => sizeOf rest
+  | .list _ _ _ _ _ rest => sizeOf rest
+  | .item _ _ rest => sizeOf rest
+
+theorem RFrame.resume_size (inner : Array Html) (nl' : Bool) (f : RFrame) : (f.resume inner nl').size = f.size := by
+  cases f <;> rfl
+
+/-- The size of what the frames' runs have left. -/
+noncomputable def rframesSize : List RFrame → Nat
+  | [] => 0
+  | f :: st => f.size + rframesSize st
+
+/-- `blocksAux` or `itemsAux` of the run, then each frame's run, resumed
+with what was built. A block quote or list pushes a frame and starts the run
+inside it, a list item the same; the other blocks (`block` does not recurse
+on them) are added as `block` renders them. -/
+def blockLoop (o : Options) : RRun → List RFrame → Array Html × Bool
+  | .blocks _ nl acc [], [] => (acc, nl)
+  | .items _ nl acc [], [] => (acc, nl)
+  | .blocks _ nl acc [], f :: st => blockLoop o (f.resume acc nl) st
+  | .items _ nl acc [], f :: st => blockLoop o (f.resume acc nl) st
+  | .blocks tight nl acc (.quote bs :: rest), st => blockLoop o (.blocks false true #[] bs) (.quote tight nl acc rest :: st)
+  | .blocks tight nl acc (.list ordered start tight' items :: rest), st =>
+    blockLoop o (.items tight' true #[] items)
+      (.list (if ordered then Tag.ol else .ul) (if ordered && start != 1 then [(Attr.start, toString start)] else [])
+        tight nl acc rest :: st)
+  | .blocks tight nl acc (.para cs :: rest), st =>
+    blockLoop o (.blocks tight (block o tight nl (.para cs)).2 (acc.appendList (block o tight nl (.para cs)).1) rest) st
+  | .blocks tight nl acc (.heading n cs :: rest), st =>
+    blockLoop o (.blocks tight (block o tight nl (.heading n cs)).2 (acc.appendList (block o tight nl (.heading n cs)).1) rest) st
+  | .blocks tight nl acc (.thematic :: rest), st =>
+    blockLoop o (.blocks tight (block o tight nl .thematic).2 (acc.appendList (block o tight nl .thematic).1) rest) st
+  | .blocks tight nl acc (.code info lit :: rest), st =>
+    blockLoop o (.blocks tight (block o tight nl (.code info lit)).2 (acc.appendList (block o tight nl (.code info lit)).1) rest) st
+  | .blocks tight nl acc (.html lit :: rest), st =>
+    blockLoop o (.blocks tight (block o tight nl (.html lit)).2 (acc.appendList (block o tight nl (.html lit)).1) rest) st
+  | .items tight _ acc (item :: rest), st => blockLoop o (.blocks tight false #[] item) (.item tight acc rest :: st)
+termination_by r st => r.size + rframesSize st
+decreasing_by
+  all_goals try simp only [RFrame.resume_size]
+  all_goals simp only [RRun.size, RFrame.size, rframesSize, List.cons.sizeOf_spec,
+    List.nil.sizeOf_spec, Block.quote.sizeOf_spec, Block.list.sizeOf_spec, Block.para.sizeOf_spec,
+    Block.heading.sizeOf_spec, Block.thematic.sizeOf_spec, Block.code.sizeOf_spec, Block.html.sizeOf_spec]
+  all_goals omega
+
+/-- What a run builds, by `blocksAux` or `itemsAux`. -/
+def RRun.spec (o : Options) : RRun → Array Html × Bool
+  | .blocks tight nl acc bs => blocksAux o tight nl acc bs
+  | .items tight nl acc its => itemsAux o tight nl acc its
+
+/-- What `blockLoop` builds after a run: each frame's run, resumed. -/
+def blockUnwind (o : Options) : Array Html × Bool → List RFrame → Array Html × Bool
+  | r, [] => r
+  | r, f :: st => blockUnwind o ((f.resume r.1 r.2).spec o) st
+
+theorem blockLoop_eq (o : Options) (r : RRun) (st : List RFrame) :
+    blockLoop o r st = blockUnwind o (r.spec o) st := by
+  induction r, st using blockLoop.induct o <;> simp_all [blockLoop, blockUnwind, RRun.spec, RFrame.resume, blocksAux, itemsAux, block]
+
+/-- `blocks`, with an explicit stack. -/
+def blocksFast (o : Options) (tight nl : Bool) (bs : List Block) : List Html × Bool :=
+  let (a, nl) := blockLoop o (.blocks tight nl #[] bs) []
+  (a.toList, nl)
+
+@[csimp] theorem blocks_eq_fast : @blocks = @blocksFast := by
+  funext o tight nl bs; simp [blocks, blocksFast, blockLoop_eq, blockUnwind, RRun.spec]
 
 /-- The HTML tree of a Markdown document. -/
 def toHtml (o : Options) (bs : List Block) : List Html := (blocks o false true bs).1
