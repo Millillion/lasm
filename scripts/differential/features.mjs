@@ -31,6 +31,19 @@
 //   exc      ExceptT with a custom error inductive over StateT Nat IO:
 //            throw, try/catch with a match on the error, try/finally, break,
 //            early return, IO.Ref
+//   lazy     Thunk: forced twice (dbgTrace on stderr shows it runs once),
+//            forced only under a condition, map, bind, arrays of thunks
+//            forced by index, a top-level thunk, a function returning one
+//   st       runST / runEST: ST.Ref of a fixed-width or bignum accumulator
+//            and of an Array, modify, modifyGet, swap, nested bounded `for`
+//            with `break`, `throw` and try/catch in EST, a helper generic in
+//            the monad (MonadLiftT (ST σ) m)
+//   wide     a structure of 8 to 40 fields of mixed boxed and scalar types
+//            (UInt8–UInt64, Int8–Int64, Float, Float32, Bool, Char next to
+//            Nat, String, lists: the scalar area's offsets), deriving Repr and
+//            BEq (Hashable and Ord without floats): defaults, `with` updates
+//            of several fields, projections, structure-instance patterns, the
+//            constructor applied fully and partially (past 16 arguments)
 //
 // Everything terminates by construction (bounded iteration counts, fuel,
 // decreasing measures checked by Lean) and prints only deterministic values.
@@ -47,8 +60,12 @@
 // imports it back for renderCase, caseSize and shrinkCandidates).
 import { rng, genExpr, renderExpr, exprShrinks, exprSize, exprType, show, lt, leanString, natLit, stringLit, setNameBase } from './generate.mjs';
 
-export const FAMILIES = ['ext', 'class', 'adt', 'closure', 'loop', 'struct', 'exc'];
-const WEIGHT = { ext: 4, class: 2, adt: 2, closure: 2, loop: 2, struct: 1, exc: 1 };
+export const FAMILIES = ['ext', 'class', 'adt', 'closure', 'loop', 'struct', 'exc', 'lazy', 'st', 'wide'];
+const WEIGHT = { ext: 4, class: 2, adt: 2, closure: 2, loop: 2, struct: 1, exc: 1, lazy: 2, st: 2, wide: 2 };
+// The families whose checks are independent of each other given the case's
+// declarations: coverage-guided campaigns mutate them (coverage.mjs) by
+// regenerating one check (regenCheck) or one expression of an `ext` check.
+export const MUTABLE_FAMILIES = new Set(['ext', 'lazy', 'st', 'wide']);
 
 // Operations whose cost grows with their arguments (or that recurse), that
 // panic (`set!` out of bounds: 200,000 panic messages, campaign 42620999209),
@@ -57,7 +74,7 @@ const WEIGHT = { ext: 4, class: 2, adt: 2, closure: 2, loop: 2, struct: 1, exc: 
 // 200,000 iterations, campaign 42621004028): kept out of loop bodies run up to
 // 200,000 times and out of class operations that are iterated.
 const HEAVY = /fibL|collatz|ack|digitSum|\^ \(|Tree|hm|wordCount|replicate|range|pushn|Superscript|toDigits|<<< \(|repr|qsort|mergeSort|insertionSort|eraseDups|splitOn|intercalate|join|replace|toString|insertMany|ofScientific|!/;
-const cheap = o => !o.bind && !o.panic && ![o.t, ...o.args].some(t => t === 'Float' || t === 'Float32') && !(o.r && HEAVY.test(o.r.toString()));
+const cheap = o => !o.bind && !o.panic && ![o.t, ...o.args].some(t => t === 'Float' || t === 'Float32' || t === 'FArr') && !(o.r && HEAVY.test(o.r.toString()));
 
 const SIMPLE = ['Nat', 'Int', 'UInt8', 'UInt64', 'String', 'Bool', 'ListNat', 'Int32', 'Char'];
 const ex = (r, t, depth, env = [], flags = {}) => genExpr(r, t, depth, env, { ext: true, ...flags });
@@ -80,10 +97,11 @@ const reprOf = x => `(repr (${x})).pretty`;
 const GEN = {
   ext(r) {
     const panic = r.chance(0.35);
-    const pool = ['Int8', 'Int16', 'Int32', 'Int64', 'Float32', 'ByteArray', 'HSet', 'TMap', 'Nat', 'Int', 'String', 'UInt64', 'Bool'];
+    const pool = ['Int8', 'Int16', 'Int32', 'Int64', 'Float32', 'ByteArray', 'HSet', 'TMap', 'Nat', 'Int', 'String', 'UInt64', 'Bool', 'FArr', 'ThNat'];
     const t = r.pick(pool);
-    const chk = Array.from({ length: r.int(1, 3) }, () => ({ t, e: [ex(r, t, r.int(1, 4), [], { panic })] }));
-    return { fam: 'ext', chk };
+    const c = { fam: 'ext', panic, t };
+    c.chk = Array.from({ length: r.int(1, 3) }, () => CHECK.ext(r, c));
+    return c;
   },
   class(r) {
     const types = [];
@@ -177,7 +195,115 @@ const GEN = {
   exc(r) {
     return { fam: 'exc', s: genExcStmts(r, r.int(2, 6), 2, []) };
   },
+  lazy(r) {
+    const c = { fam: 'lazy' };
+    c.chk = Array.from({ length: r.int(2, 5) }, () => CHECK.lazy(r, c));
+    return c;
+  },
+  st(r) {
+    const c = { fam: 'st' };
+    c.chk = Array.from({ length: r.int(1, 3) }, () => CHECK.st(r, c));
+    return c;
+  },
+  wide(r) {
+    const count = r.pick([8, 10, 12, 15, 16, 17, 20, 24, 31, 33, 40]);
+    const fs = Array.from({ length: count }, () => ({ t: r.pick(WIDE_POOL), def: r.chance(0.25) }));
+    fs.forEach(f => { if (f.def) f.e = [ex(r, f.t, 1)]; });
+    const float = fs.some(f => f.t === 'Float' || f.t === 'Float32');
+    const vals = Array.from({ length: r.int(2, 3) }, () => ({ give: fs.map(f => !f.def || r.chance(0.6)), e: fs.map(f => ex(r, f.t, 1)) }));
+    const c = { fam: 'wide', fs, float, vals };
+    c.chk = Array.from({ length: r.int(2, 6) }, () => CHECK.wide(r, c));
+    return c;
+  },
 };
+
+// ---------- checks of the mutable families ----------
+// One check, drawn given the case's declarations (c); regenCheck replaces one.
+const LAZY_TYPES = ['Nat', 'Int', 'String', 'UInt64', 'ListNat', 'Int32', 'Bool', 'Char', 'FArr'];
+const ST_TYPES = ['Nat', 'Int', 'UInt64', 'UInt32', 'UInt8', 'Int64', 'Int16'];
+const WIDE_POOL = ['Nat', 'Int', 'String', 'Bool', 'UInt8', 'UInt16', 'UInt32', 'UInt64', 'Float', 'Float32', 'Char', 'Int8', 'Int16', 'Int32', 'Int64', 'ListNat', 'OptNat'];
+const CHECK = {
+  ext(r, c) {
+    const t = c.t ?? c.chk?.[0]?.t ?? 'Nat';
+    return { t, e: [ex(r, t, r.int(1, 4), [], { panic: !!c.panic })] };
+  },
+  lazy(r) {
+    const k = r.pick(['twice', 'cond', 'map', 'bind', 'arr', 'top', 'fn']);
+    const t = r.pick(LAZY_TYPES), u = r.pick(LAZY_TYPES);
+    if (k === 'twice' || k === 'top') return { k, t, e: [ex(r, t, r.int(1, 3))] };
+    if (k === 'cond') return { k, t, e: [ex(r, 'Bool', 2), ex(r, t, 1), ex(r, t, r.int(1, 3))] };
+    if (k === 'map' || k === 'bind') return { k, t, u, e: [ex(r, t, 2), exv(r, u, 2, [{ name: 'x', t }])] };
+    if (k === 'arr') {
+      const m = r.int(1, 4);
+      return { k, t, e: Array.from({ length: m }, () => ex(r, t, 2)), pick: Array.from({ length: r.int(1, 6) }, () => r.int(0, m)) };
+    }
+    return { k, t, u, e: [exv(r, u, 2, [{ name: 'c', t }]), ex(r, t, 1)] };
+  },
+  st(r) {
+    const t = r.pick(ST_TYPES), est = r.chance(0.35);
+    return { k: 'run', t, est, b: genStStmts(r, r.int(1, 5), 2, [], t, est), e: [ex(r, t, 1)] };
+  },
+  wide(r, c) {
+    const kinds = ['repr', 'beq', 'update', 'update', 'proj', 'ctor', 'pap', 'match', 'touch', ...(c.float ? [] : ['hash', 'compare', 'sort'])];
+    const k = r.pick(kinds), n = c.fs.length;
+    const i = r.int(0, c.vals.length - 1), j = r.int(0, c.vals.length - 1);
+    const field = () => r.int(0, n - 1);
+    if (k === 'update') {
+      const fs = [...new Set(Array.from({ length: r.int(1, 4) }, field))];
+      return { k, i, upd: fs.map(f => ({ f, e: [ex(r, c.fs[f].t, 1)] })) };
+    }
+    if (k === 'proj') return { k, i, f: field() };
+    if (k === 'ctor' || k === 'pap') return { k, at: r.int(1, n - 1), e: c.fs.map(f => ex(r, f.t, 1)) };
+    if (k === 'match') return { k, i, fl: [...new Set([field(), field()])] };
+    if (k === 'touch') { const f = field(); return { k, i, f, e: [exv(r, c.fs[f].t, 2, [{ name: 'x', t: c.fs[f].t }])] }; }
+    return { k, i, j };
+  },
+};
+/** The case with one check replaced by a fresh one of its family (same declarations), or null. */
+export function regenCheck(r, c) {
+  if (!MUTABLE_FAMILIES.has(c.fam) || !c.chk?.length) return null;
+  const at = r.int(0, c.chk.length - 1);
+  return { ...c, chk: c.chk.map((k, i) => i === at ? CHECK[c.fam](r, c) : k) };
+}
+
+// ---------- st: statements over the accumulator `acc` and the buffer `buf` ----------
+// Loops are at most 12 iterations, nested at most twice; expressions are
+// cheap (no bignum towers) and Nat/Int accumulators are reduced modulo a prime.
+function genStStmts(r, n, depth, env, t, est) {
+  const out = [];
+  const fl = { allow: cheap };
+  const withV = [...env, { name: 'v', t }];
+  for (let i = 0; i < n; i++) {
+    const roll = r.next();
+    if (roll < 0.25) out.push({ s: 'mod', e: [exv(r, t, 2, withV, fl)] });
+    else if (roll < 0.4) out.push({ s: 'push', e: [ex(r, 'Nat', 2, env, { varP: 0.45, ...fl })] });
+    else if (roll < 0.5) out.push({ s: 'get', e: [exv(r, 'Nat', 2, withV, fl), exv(r, t, 2, withV, fl)] });
+    else if (roll < 0.58) out.push({ s: 'swap', e: [ex(r, t, 1, env, { varP: 0.45, ...fl })] });
+    else if (roll < 0.65) out.push({ s: 'step', e: [ex(r, 'Nat', 1, env, { varP: 0.45, ...fl })] });
+    else if (roll < 0.72 && est) out.push({ s: 'throw', e: [exv(r, 'Bool', 2, withV, fl)], v: stringLit(r) });
+    else if (roll < 0.8 && est && depth > 0) out.push({ s: 'try', b: genStStmts(r, r.int(1, 3), depth - 1, env, t, est), c: genStStmts(r, r.int(0, 2), depth - 1, env, t, est) });
+    else if (roll < 0.95 && depth > 0) {
+      const e2 = [...env, { name: `i${depth}`, t: 'Nat' }];
+      out.push({ s: 'for', n: r.int(0, 12), d: depth, e: [exv(r, 'Bool', 1, e2, fl)], brk: r.chance(0.4), b: genStStmts(r, r.int(1, 3), depth - 1, e2, t, est) });
+    } else out.push({ s: 'mod', e: [exv(r, t, 2, withV, fl)] });
+  }
+  return out;
+}
+function renderStStmts(ss, d, t, m, p) {
+  const ind = '  '.repeat(d), lines = [];
+  for (const st of ss) {
+    const e = st.e?.map(R);
+    if (st.s === 'mod') lines.push(`${ind}acc.modify (fun (v : ${lt(t)}) => (${e[0]})${m})`);
+    else if (st.s === 'push') lines.push(`${ind}buf.modify (·.push ((${e[0]}) % 1000))`);
+    else if (st.s === 'get') lines.push(`${ind}let w ← acc.modifyGet (fun (v : ${lt(t)}) => (((${e[0]}) % 1000 : Nat), (${e[1]})${m}))`, `${ind}buf.modify (·.push w)`);
+    else if (st.s === 'swap') lines.push(`${ind}let old ← acc.swap (${e[0]})`, `${ind}buf.modify (·.push ((hash old).toNat % 1000))`);
+    else if (st.s === 'step') lines.push(`${ind}${p}_step buf (${e[0]})`);
+    else if (st.s === 'throw') lines.push(`${ind}if (fun (v : ${lt(t)}) => ${e[0]}) (← acc.get) then throw ${leanString(st.v)}`);
+    else if (st.s === 'try') lines.push(`${ind}try`, ...renderStStmts(st.b, d + 1, t, m, p), `${ind}  pure ()`, `${ind}catch err =>`, `${ind}  buf.modify (·.push err.length)`, ...renderStStmts(st.c, d + 1, t, m, p));
+    else if (st.s === 'for') lines.push(`${ind}for i${st.d} in [0:${st.n}] do`, ...(st.brk ? [`${ind}  if ${e[0]} then break`] : []), ...renderStStmts(st.b, d + 1, t, m, p));
+  }
+  return lines;
+}
 
 // ---------- adt: terms of the expression language ----------
 // A term: { c: constructor, k: [subterms], v?: Int literal text or de Bruijn index }.
@@ -386,6 +512,70 @@ const RENDER = {
       `def ${p} : IO Unit := do\n  let r ← IO.mkRef (0 : Nat)\n  let (res, s) ← ((${p}_body r).run).run 0\n  match res with\n  | .ok v => IO.println s!"${p} ok {v} {s} {← r.get}"\n  | .error e => IO.println s!"${p} error {(repr e).pretty} {s} {← r.get}"\n`;
   },
 };
+Object.assign(RENDER, {
+  lazy(c, p) {
+    let s = '';
+    const traced = (label, x) => `Thunk.mk (fun _ => dbgTrace ${leanString(`${p} ${label} forced`)} (fun _ => ${x}))`;
+    const body = c.chk.map((k, i) => {
+      const e = k.e.map(R), T = lt(k.t), U = k.u && lt(k.u);
+      if (k.k === 'twice') return pr(p, i, `(let th : Thunk (${T}) := ${traced(i, e[0])}; ${reprOf(`(${show(k.t, 'th.get')}, ${show(k.t, 'th.get')})`)})`);
+      if (k.k === 'cond') return pr(p, i, `(let th : Thunk (${T}) := ${traced(i, e[2])}; ${show(k.t, `(if ${e[0]} then th.get else ${e[1]})`)})`);
+      if (k.k === 'map') return pr(p, i, `(let th : Thunk (${T}) := ${traced(i, e[0])}; let m : Thunk (${U}) := Thunk.map (fun (x : ${T}) => ${e[1]}) th; ${reprOf(`(${show(k.u, 'm.get')}, ${show(k.t, 'th.get')}, ${show(k.u, 'm.get')})`)})`);
+      if (k.k === 'bind') return pr(p, i, `(let th : Thunk (${T}) := ${traced(i, e[0])}; let m : Thunk (${U}) := th.bind (fun (x : ${T}) => ${traced(`${i}b`, e[1])}); ${reprOf(`(${show(k.u, 'm.get')}, ${show(k.u, 'm.get')})`)})`);
+      if (k.k === 'arr') return pr(p, i, `(let ts : Array (Thunk (${T})) := #[${e.map((x, j) => traced(`${i}.${j}`, x)).join(', ')}]; ${reprOf(`([${k.pick.join(', ')}] : List Nat).map (fun (j : Nat) => ${show(k.t, '(ts.getD j (Thunk.pure default)).get')})`)})`);
+      if (k.k === 'top') {
+        s += `def ${p}_t${i} : Thunk (${T}) := ${traced(`${i} top`, e[0])}\n`;
+        return pr(p, i, reprOf(`(${show(k.t, `${p}_t${i}.get`)}, ${show(k.t, `${p}_t${i}.get`)})`));
+      }
+      s += `@[noinline] def ${p}_mk${i} (c : ${T}) : Thunk (${U}) := ${traced(`${i} mk`, e[0])}\n`;
+      return pr(p, i, `(let th := ${p}_mk${i} ${e[1]}; ${reprOf(`(${show(k.u, 'th.get')}, ${show(k.u, 'th.get')})`)})`);
+    });
+    return `${s}def ${p} : IO Unit := do\n${body.join('\n')}\n  pure ()\n`;
+  },
+  st(c, p) {
+    // A helper generic in the monad: called from ST σ and from EST String σ.
+    let s = `def ${p}_step {σ : Type} {m : Type → Type} [Monad m] [MonadLiftT (ST σ) m] (buf : ST.Ref σ (Array Nat)) (k : Nat) : m Unit :=\n  buf.modify (·.push (k % 1000))\n`;
+    const body = c.chk.map((k, i) => {
+      const q = `${p}_${i}`, T = lt(k.t), M = k.est ? `EST String σ` : `ST σ`, m = ITER_MOD[k.t] ?? '';
+      const res = `${T} × Nat × Nat`;
+      s += `def ${q} (x0 : ${T}) : ${k.est ? `Except String (${res})` : res} := ${k.est ? 'runEST' : 'runST'} fun σ => do\n` +
+        `  let acc ← (ST.mkRef x0 : ${M} (ST.Ref σ (${T})))\n  let buf ← (ST.mkRef (#[] : Array Nat) : ${M} (ST.Ref σ (Array Nat)))\n` +
+        renderStStmts(k.b, 1, k.t, m, p).map(l => l + '\n').join('') +
+        `  let b ← buf.get\n  return (← acc.get, b.size, b.foldl (fun (h x : Nat) => (h * 31 + x) % 1000000007) 7)\n`;
+      return pr(p, i, reprOf(`${q} ${e0(k)}`));
+    });
+    return `${s}def ${p} : IO Unit := do\n${body.join('\n')}\n  pure ()\n`;
+  },
+  wide(c, p) {
+    const S = `${p}_S`, n = c.fs.length;
+    let s = `structure ${S} where\n${c.fs.map((f, j) => `  f${j} : ${lt(f.t)}${f.def ? ` := ${R(f.e[0])}` : ''}\n`).join('')}deriving Repr, BEq, Inhabited${c.float ? '' : ', Hashable, Ord'}\n`;
+    c.vals.forEach((v, k) => {
+      const fs = c.fs.map((f, j) => v.give[j] ? `f${j} := ${R(v.e[j])}` : null).filter(Boolean);
+      s += `def ${p}_v${k} : ${S} := { ${fs.join(', ')} }\n`;
+    });
+    const body = c.chk.map((k, i) => {
+      const a = `${p}_v${k.i}`, b = `${p}_v${k.j}`;
+      if (k.k === 'repr') return pr(p, i, reprOf(a));
+      if (k.k === 'beq') return pr(p, i, `toString (${a} == ${b})`);
+      if (k.k === 'hash') return pr(p, i, `toString (hash ${a})`);
+      if (k.k === 'compare') return pr(p, i, reprOf(`compare ${a} ${b}`));
+      if (k.k === 'sort') return pr(p, i, reprOf(`[${c.vals.map((_, v) => `${p}_v${v}`).join(', ')}].mergeSort (fun x y => compare x y != .gt)`));
+      if (k.k === 'update') return pr(p, i, reprOf(`({ ${a} with ${k.upd.map(u => `f${u.f} := ${R(u.e[0])}`).join(', ')} } : ${S})`));
+      if (k.k === 'proj') return pr(p, i, show(c.fs[k.f].t, `${a}.f${k.f}`));
+      if (k.k === 'ctor') return pr(p, i, reprOf(`(${S}.mk ${k.e.map(R).join(' ')} : ${S})`));
+      if (k.k === 'pap') {
+        const e = k.e.map(R), rest = c.fs.slice(k.at).map(f => lt(f.t));
+        return pr(p, i, reprOf(`((bb (${S}.mk ${e.slice(0, k.at).join(' ')} : ${rest.map(t => `(${t})`).join(' → ')} → ${S})) ${e.slice(k.at).join(' ')} : ${S})`));
+      }
+      if (k.k === 'match') return pr(p, i, `(match ${a} with | { ${k.fl.map((f, j) => `f${f} := y${j}`).join(', ')}, .. } => ${reprOf(`(${k.fl.map((_, j) => `y${j}`).join(', ')}${k.fl.length === 1 ? ', ()' : ''})`)})`);
+      // touch: a @[noinline] function updating one field from its old value
+      const f = c.fs[k.f];
+      return pr(p, i, `(let g : ${S} → ${S} := bb (fun (s : ${S}) => { s with f${k.f} := (fun (x : ${lt(f.t)}) => ${R(k.e[0])}) s.f${k.f} }); ${reprOf(`g (g ${a})`)})`);
+    });
+    return `${s}def ${p} : IO Unit := do\n${body.join('\n')}\n  pure ()\n`;
+  },
+});
+const e0 = k => R(k.e[0]);
 export function renderFeature(c, name) { return RENDER[c.fam](c, name); }
 
 export function genFeatureCase(seed, index, { families = FAMILIES } = {}) {
