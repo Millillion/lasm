@@ -21,7 +21,15 @@ Two ways a request is served:
   chooses, with Ledger's own reads, rules and commit statements.
 
 `audit`: the auditor (`Audit.verify`) on a snapshot of the database: every
-balance is the journal's replay, every ledger balances. -/
+balance is the journal's replay, every ledger balances.
+
+Where it runs: with the world's path as its argument, on Node (`npm run
+build:sim`), the world is `require`d into the same process and every call to
+it is synchronous. Built for Workers or a browser (`npm run build:sim-workers`,
+`build:sim-browser`; test/dst.mjs --target), the program publishes a handler
+(`exportDefault`); scripts/sim/remote.mjs connects it to the world running in
+Node and calls it, and every call to the world is awaited. The world and the
+seeds are the same, so a seed's trace is the same on every target. -/
 import Ledger
 import Server.App
 import Lasm.JS
@@ -47,18 +55,32 @@ def nats (d : Data) (k : String) : Array Nat :=
     | _ => 0
   | _ => #[]
 
-def call (w : Value) (name : String) (args : Array Data) : IO Unit := do
-  let _ ← w.callMethod name args Data
+/-- A JavaScript object of the world: in this process (`remote := false`) or
+a stand-in for one in the Node process (scripts/sim/remote.mjs), whose
+methods return promises. -/
+structure Obj where
+  v : Value
+  remote : Bool
+
+/-- `o.name(...args)`, awaited when the object is remote. -/
+def Obj.call (o : Obj) (name : String) (args : Array Data) (α : Type := Data) [FromJS α] : Async α :=
+  if o.remote then o.v.callMethodAwait name args α
+  else do
+    let x ← o.v.callMethod name args α
+    pure x
+
+def call (w : Obj) (name : String) (args : Array Data) : Async Unit := do
+  let _ ← w.call name args Data
 
 /-- The world's simulated SQLite, as `Sql`. -/
-def simSql (s : Value) : Ledger.Server.Sql where
+def simSql (s : Obj) : Ledger.Server.Sql where
   all sql params := do
-    let rows ← s.callMethod "all" #[toJS sql, .array params] (Array Data)
+    let rows ← s.call "all" #[toJS sql, .array params] (Array Data)
     return rows
   run sql params := do
-    let _ ← s.callMethod "run" #[toJS sql, .array params] Data
+    let _ ← s.call "run" #[toJS sql, .array params] Data
   batch stmts := do
-    let _ ← s.callMethod "batch" #[.array (stmts.map fun (q, p) => Data.array #[toJS q, .array p])] Data
+    let _ ← s.call "batch" #[.array (stmts.map fun (q, p) => Data.array #[toJS q, .array p])] Data
 
 def fetchRequest (d : Data) : Lasm.Fetch.Request :=
   { method := str d "method", url := str d "url", body := (str d "body").toUTF8 }
@@ -69,7 +91,7 @@ def apiRequest (r : Lasm.Fetch.Request) : Option Ledger.Request :=
   | "api" :: path => some { method := r.method, path, query := r.queryParams, body := r.text }
   | _ => none
 
-def answer (w : Value) (d : Data) (status : Nat) (body : String) : IO Unit :=
+def answer (w : Obj) (d : Data) (status : Nat) (body : String) : Async Unit :=
   call w "reply" #[toJS (nat d "id"), toJS status, toJS body]
 
 /-- What one request read before committing (`race`). -/
@@ -88,7 +110,7 @@ def commitRead (db : Ledger.Server.Sql) (r : Read) : Async Ledger.Reply := do
   if (← Ledger.Server.version db) != r.version then Ledger.Server.runRequest db r.req 50
   else return Ledger.Reply.error 500 "the database rejected the writes"
 
-def handle (w : Value) (db : Ledger.Server.Sql) (k : String) (ev : Data) : Async Unit := do
+def handle (w : Obj) (db : Ledger.Server.Sql) (k : String) (ev : Data) : Async Unit := do
   match k with
   | "request" =>
     let resp ← try Ledger.Server.site none db (fetchRequest ev) catch e => pure ({ status := 500, body := s!"\{\"error\":\"{e}\"}".toUTF8 } : Lasm.Fetch.Response)
@@ -123,27 +145,39 @@ def handle (w : Value) (db : Ledger.Server.Sql) (k : String) (ev : Data) : Async
     call w "audit" #[toJS problems, toJS accounts.length, toJS transfers.length]
   | _ => call w "fail" #[toJS s!"unknown event {k}"]
 
-def runSeed (w : Value) : Async Unit := do
-  let db := simSql (← w.callMethod "store" #[] Value)
+def runSeed (w : Obj) : Async Unit := do
+  let db := simSql { v := ← w.call "store" #[] Value, remote := w.remote }
   Ledger.Server.migrate db
   repeat
-    let ev ← w.callMethod "next" #[] Data
+    let ev ← w.call "next" #[] Data
     let k := str ev "k"
     if k == "end" then break
     try handle w db k ev
     catch e => call w "fail" #[toJS s!"{k}: the Lean side threw: {e}"]
 
+/-- Every seed the world gives, then its exit status. -/
+def runAll (w : Obj) : Async Nat := do
+  repeat
+    let cfg ← w.call "begin" #[] Data
+    match cfg with
+    | .object _ => runSeed w
+    | _ => break
+  w.call "exitCode" #[] Nat
+
 end Ledger.Sim
 
 def main (args : List String) : IO UInt32 := do
-  let some path := args.head? | IO.eprintln "usage: sim WORLD.mjs [options]"; return 2
-  let w ← require path
-  let go : Async Unit := do
-    repeat
-      let cfg ← w.callMethod "begin" #[] Data
-      match cfg with
-      | .object _ => Ledger.Sim.runSeed w
-      | _ => break
-  go.block
-  let code ← w.callMethod "exitCode" #[] Nat
-  return code.toUInt32
+  match args.head? with
+  | some path =>
+    let code ← (Ledger.Sim.runAll { v := ← require path, remote := false }).block
+    return code.toUInt32
+  | none =>
+    unless ← onEdge do
+      IO.eprintln "usage: sim WORLD.mjs [options]"
+      return 2
+    -- Workers and browsers: scripts/sim/remote.mjs calls this handler once the
+    -- world in Node is connected, and waits for its exit status.
+    exportDefault (← ofFn fun _ => do
+      let code ← Ledger.Sim.runAll { v := ← (← global).get "lasmSimWorld", remote := true }
+      return toJS code)
+    return 0

@@ -8,6 +8,8 @@
     "build": "npm run build:client && lasm build ServerNode.lean --output dist/server",
     "build:client": "lasm build Client.lean --target browser --output dist/public",
     "build:sim": "lasm build Sim.lean --output dist/sim",
+    "build:sim-workers": "lasm build Sim.lean --target workers --output dist/sim-workers",
+    "build:sim-browser": "lasm build Sim.lean --target browser --output dist/sim-browser",
     "start": "node dist/server/main.mjs",
     "test": "node test/api.mjs",
     "test:bank": "node test/bank.mjs",
