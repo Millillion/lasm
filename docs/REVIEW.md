@@ -333,6 +333,28 @@ does was written inside each app, as the rule says (no new public API):
   Conduit's PostgREST store takes a `send` function: `Lasm.JS.Web.fetch` on
   Supabase, `wasi:http/outgoing-handler` on wasi-http (`WasiHttpServe.fetch`).
 
+### Tandem moved off `Lasm.Fetch` (2026-11-12; what had no replacement)
+
+Tandem no longer imports `Lasm.Fetch` anywhere. Its Node server was already
+its own `node:http` server (for the `ws` upgrade hook) and only borrowed
+`Lasm.Fetch.respond` and the request type, so it keeps serving exactly as
+before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
+`env`), Deno `Deno.serve` and Bun `Bun.serve`. In `examples/tandem/Server/`:
+`Web.lean`, `Assets.lean`, `Embed.lean` (Conduit's code, plus `queryParam?`),
+`JsServe.lean` (the conversions and Workers' export), `EdgeWs.lean`.
+
+- **WebSockets on Deno and Bun are not in the 0.7.0 bindings.**
+  `Deno.upgradeWebSocket`, Bun's `server.upgrade` and `Bun.serve`'s
+  `websocket` option are not in Lasm.JS.Deno / Lasm.JS.Bun (generated from
+  the HTTP-server declarations only), so `EdgeWs.lean` makes those calls with
+  Lasm.JS's dynamic calls, as it did before. Bun's `websocket` handlers are
+  installed with `server.reload` right after `Bun.serve` (no longer on the
+  first request, so the first upgrade is no longer refused once). Generating
+  these from Deno's and Bun's declarations is a candidate for the bindings.
+- Lasm's Bun/Deno entry restarted a stopped Lean instance on the next request;
+  a program that calls `Bun.serve`/`Deno.serve` itself has no such restart
+  (as for Conduit and Folio).
+
 ### High-priority work to define with Jordan
 - [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,
   2026-11-09). The known weaknesses:

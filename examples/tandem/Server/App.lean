@@ -1,8 +1,8 @@
 /-
 The sync server on every JavaScript target: `Sync.sync` (pure Lean, written
-against `Sync.Reads`) on a SQL store, served over HTTP with `Lasm.Fetch`,
-and over WebSockets where the platform has them (Server/NodeWs.lean,
-Server/BunWs.lean, Server/DenoWs.lean).
+against `Sync.Reads`) on a SQL store, served over HTTP (`Server/Web.lean`,
+with each platform's own server) and over WebSockets where the platform has
+them (Server/NodeWs.lean, Server/EdgeWs.lean).
 
 A sync reads the document's log, computes what to append and the reply,
 commits the appended operations in one transaction, and only then sends the
@@ -20,9 +20,8 @@ HTTP:
   each entry file); `GET /` opens the document `welcome`;
 - `GET /health`.
 -/
-import Lasm.Fetch
-import Lasm.Fetch.Assets
 import Lasm.JS
+import Server.Assets
 import Tandem
 import Server.Sql
 import Std.Sync.Semaphore
@@ -129,7 +128,7 @@ def textOf (env : Env) (doc : String) : Async String := do
     if ops.length < Sync.chunk then break
   return (Doc.empty.applyMany all.toList).text
 
-def textReply (status : UInt16) (body : String) : Lasm.Fetch.Response :=
+def textReply (status : UInt16) (body : String) : Web.Response :=
   { status, headers := #[("content-type", "text/plain; charset=utf-8"), ("cache-control", "no-store")],
     body := body.toUTF8 }
 
@@ -158,7 +157,7 @@ def page (name : String) : String :=
   html name ++ "/text</a>.</p></noscript>" ++
   "<script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
 
-def pageReply (name : String) : Lasm.Fetch.Response :=
+def pageReply (name : String) : Web.Response :=
   { status := 200, body := (page name).toUTF8,
     headers := #[("content-type", "text/html; charset=utf-8"), ("cache-control", "no-store"),
       ("content-security-policy", "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; " ++
@@ -166,7 +165,7 @@ def pageReply (name : String) : Lasm.Fetch.Response :=
       ("x-content-type-options", "nosniff")] }
 
 /-- One HTTP request. -/
-def serveRequest (env : Env) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
+def serveRequest (env : Env) (req : Web.Request) : Async Web.Response := do
   match req.method, req.segments with
   | "GET", ["health"] => return textReply 200 "ok\n"
   | "POST", ["doc", name, "sync"] =>
@@ -190,7 +189,7 @@ def serveRequest (env : Env) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Respo
   | _, _ => return textReply 404 "not found\n"
 
 /-- The handler, with errors answered (and logged) instead of thrown. -/
-def handler (env : Env) (req : Lasm.Fetch.Request) : Async Lasm.Fetch.Response := do
+def handler (env : Env) (req : Web.Request) : Async Web.Response := do
   try serveRequest env req
   catch e =>
     IO.eprintln s!"tandem: {e}"
@@ -242,7 +241,7 @@ where
 
 /-- The document a WebSocket upgrade asks for: `/doc/<name>/ws`. -/
 def wsDoc (url : String) : Option String :=
-  match ({ method := "GET", url : Lasm.Fetch.Request }).segments with
+  match ({ method := "GET", url : Web.Request }).segments with
   | ["doc", name, "ws"] => if validName name then some name else none
   | _ => none
 

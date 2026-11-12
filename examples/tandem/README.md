@@ -119,9 +119,10 @@ loser runs again on the longer log.
 | `GET /doc/<name>/text` | The document's text |
 
 On Node the WebSockets come from the `ws` package
-([`Server/NodeWs.lean`](Server/NodeWs.lean)): `Lasm.Fetch.serve` owns its
-HTTP server and has no upgrade hook, so Tandem runs its own `node:http`
-server around the same handler.
+([`Server/NodeWs.lean`](Server/NodeWs.lean)), with Tandem's own `node:http`
+server around the same handler; on Deno and Bun from `Deno.upgradeWebSocket`
+and `Bun.serve`'s `websocket` handlers
+([`Server/EdgeWs.lean`](Server/EdgeWs.lean)).
 
 A replica ([`Tandem/Client.lean`](Tandem/Client.lean), what the browser
 runs) keeps its document, the operations not yet acknowledged and its
