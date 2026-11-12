@@ -25,8 +25,9 @@ def maxBody : Nat := 16384
 
 def Request.header? (r : Request) (name : String) : Option String := Text.header? r.headers name
 
-/-- A cookie of the request. Lasm.Fetch delivers the request's cookies as one
-`Cookie` header, joined with `; `, on every target. -/
+/-- A cookie of the request. The server (`Server/Web.lean`, `joinCookies`)
+delivers the request's cookies as one `Cookie` header, joined with `; `, on
+every target. -/
 def Request.cookie? (r : Request) (name : String) : Option String :=
   (r.header? "cookie").bind (Text.cookie? · name)
 

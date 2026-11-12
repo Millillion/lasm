@@ -42,15 +42,16 @@ test('builtinModuleFile: the file of a builtin; anything else fails naming the b
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
 
-// Proposition: Lasm.Cli.Candidates.builtin_closure
-//   ∀ (imports : String → List String) (requested : List String), Acyclic imports →
+// Proposition: Lasm.Cli.Spec.builtin_closure
+//   ∀ (imports : List (String × List String)) (requested : List String), Acyclic (edgesOf imports) →
 //     (builtinModuleClosure imports requested).Nodup ∧
 //     (∀ m, m ∈ builtinModuleClosure imports requested ↔
-//       ∃ r ∈ requested, r.startsWith "lasm:" ∧ (m = r ∨ Reaches imports r m)) ∧
-//     DependenciesFirst imports (builtinModuleClosure imports requested)
+//       ∃ r ∈ requested, r.startsWith "lasm:" ∧ (m = r ∨ Reaches (edgesOf imports) r m)) ∧
+//     DependenciesFirst (edgesOf imports) (builtinModuleClosure imports requested)
 test('builtinModuleClosure: the requested builtins and those they import, dependencies first', () => {
   const styles = [n => `import { x } from './${n}.mjs';`, n => `import * as m from "./${n}.mjs"`, n => `  export { y } from './${n}.mjs';  `,
-    n => `export * from "./${n}.mjs";`, n => `import d, { e as f } from './${n}.mjs';`, n => `import g from'./${n}.mjs'`];
+    n => `export * from "./${n}.mjs";`, n => `import d, { e as f } from './${n}.mjs';`, n => `import g from'./${n}.mjs'`,
+    n => `import './${n}.mjs';`, n => `import"./${n}.mjs"`];
   forAll(g => {
     const names = g.array(g.int(1, 8), (_, i) => `m${i}${g.pick(['', '-x', 'b'])}`);
     const imports = names.map((_, i) => [...new Set(g.array(g.int(0, 3), () => g.int(i + 1, names.length)).filter(j => j < names.length))]);
@@ -86,4 +87,14 @@ test('builtinModuleClosure follows only relative imports of builtins; an unknown
   } finally { rmSync(directory, { recursive: true, force: true }); }
   // The shipped builtins.
   assert.deepEqual(builtinModuleClosure(['lasm:app']), ['lasm:app']);
+});
+
+test('builtinModuleClosure reads side-effect imports, and not a commented-out import after a statement', () => {
+  // Both found by the model differential (test/models/cli-differential.mjs).
+  const directory = directoryOf({
+    'a.mjs': "import './b.mjs';\nimport\"./c.mjs\"\nexport const v = 1;\n// import { x } from './d.mjs';\nexport const w = 2\n// export { y } from './d.mjs';\n",
+    'b.mjs': '', 'c.mjs': '', 'd.mjs': '',
+  });
+  try { assert.deepEqual(builtinModuleClosure(['lasm:a'], directory), ['lasm:b', 'lasm:c', 'lasm:a']); }
+  finally { rmSync(directory, { recursive: true, force: true }); }
 });

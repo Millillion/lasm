@@ -381,6 +381,24 @@ does was written inside each app, as the rule says (no new public API):
   Conduit's PostgREST store takes a `send` function: `Lasm.JS.Web.fetch` on
   Supabase, `wasi:http/outgoing-handler` on wasi-http (`WasiHttpServe.fetch`).
 
+### Porter moved off `Lasm.Fetch` (2026-11-12; what had no replacement)
+
+Porter serves with Cloudflare Workers' default export
+(`Lasm.JS.exportDefault`), `Deno.serve` and `Bun.serve`, and on Node (and
+the Node function platforms and Docker) still with `Lasm.Fetch.serveNode`,
+in `Server/NodeServe.lean`, its only `Lasm.Fetch` import. What had no
+replacement is in `examples/porter/Server/`, copied from Conduit (the same
+code, under Porter's namespace): `Web.lean` (the request type, WHATWG path
+parsing with `segments_no_dot_segments`, HEAD as GET, 500 on a throw),
+`Assets.lean` and `Embed.lean` (the embedded sign-in pages), `JsServe.lean`
+(the Worker's `env` for D1 and the variables). One piece Conduit does not
+need was added to Porter's `Web.respond`: **cookie joining**
+(`joinCookies`, `splitCookieCommas`, from `Lasm.Fetch.respond`), since
+Porter reads its session from one `Cookie` header and the web `Headers`
+class joins repeated `Cookie` fields with `, `. The apps now carry the same
+~500 lines of HTTP glue each (Conduit, Folio, Porter, Ledger); a shared answer
+(a library, or the `Node.serve` work) is yours to decide when `Lasm.Fetch`
+is deleted.
 ### Ledger moved off `Lasm.Fetch` (2026-11-12; what had no replacement)
 
 Ledger serves with Cloudflare Workers' default export
@@ -391,6 +409,28 @@ with `Lasm.Fetch.serveNode`, in `Server/NodeServe.lean`, its only
 `examples/ledger/Server/` (`Web.lean`, `Assets.lean`, `Embed.lean`,
 `JsServe.lean`), the same code as Conduit's under Ledger's namespace; the
 simulation (`Sim.lean`) parses requests with the app's `Web.Request`.
+
+### Tandem moved off `Lasm.Fetch` (2026-11-12; what had no replacement)
+
+Tandem no longer imports `Lasm.Fetch` anywhere. Its Node server was already
+its own `node:http` server (for the `ws` upgrade hook) and only borrowed
+`Lasm.Fetch.respond` and the request type, so it keeps serving exactly as
+before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
+`env`), Deno `Deno.serve` and Bun `Bun.serve`. In `examples/tandem/Server/`:
+`Web.lean`, `Assets.lean`, `Embed.lean` (Conduit's code, plus `queryParam?`),
+`JsServe.lean` (the conversions and Workers' export), `EdgeWs.lean`.
+
+- **WebSockets on Deno and Bun are not in the 0.7.0 bindings.**
+  `Deno.upgradeWebSocket`, Bun's `server.upgrade` and `Bun.serve`'s
+  `websocket` option are not in Lasm.JS.Deno / Lasm.JS.Bun (generated from
+  the HTTP-server declarations only), so `EdgeWs.lean` makes those calls with
+  Lasm.JS's dynamic calls, as it did before. Bun's `websocket` handlers are
+  installed with `server.reload` right after `Bun.serve` (no longer on the
+  first request, so the first upgrade is no longer refused once). Generating
+  these from Deno's and Bun's declarations is a candidate for the bindings.
+- Lasm's Bun/Deno entry restarted a stopped Lean instance on the next request;
+  a program that calls `Bun.serve`/`Deno.serve` itself has no such restart
+  (as for Conduit and Folio).
 
 ### High-priority work to define with Jordan
 - [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,

@@ -1,11 +1,11 @@
 /-
-Node: an HTTP server (node:http) that runs a `Lasm.Fetch` handler, and
-accepts WebSocket upgrades on `/doc/<name>/ws` with the `ws` package (Node
-has a WebSocket client, not a server). `Lasm.Fetch.serve` owns its server and
-has no upgrade hook, so this module runs its own: the request handling is
-`Lasm.Fetch.serveNode`'s, without streamed bodies.
+Node: an HTTP server (node:http) that runs Tandem's handler
+(`Server/Web.lean`), and accepts WebSocket upgrades on `/doc/<name>/ws` with
+the `ws` package (Node has a WebSocket client, not a server). Tandem has run
+its own `node:http` server since its first version (`Lasm.Fetch.serve` had
+no upgrade hook); the request handling is what `Lasm.Fetch.serveNode` did,
+without streamed bodies, and it no longer uses `Lasm.Fetch` at all.
 -/
-import Lasm.Fetch
 import Lasm.JS
 import Server.App
 open Lasm.JS
@@ -18,7 +18,7 @@ namespace Tandem.Server.NodeWs
 private def lower (s : String) : String := s.map Char.toLower
 
 /-- Serves `env`'s handler and its WebSockets on $HOST:$PORT. Does not return. -/
-def serve (env : Env) (hub : Hub) (handle : Lasm.Fetch.Handler) : IO Unit := do
+def serve (env : Env) (hub : Hub) (handle : Web.Handler) : IO Unit := do
   let http ← require "node:http"
   let bufferClass ← (← global).get "Buffer"
   let host := (← IO.getEnv "HOST").getD "0.0.0.0"
@@ -43,10 +43,10 @@ def serve (env : Env) (hub : Hub) (handle : Lasm.Fetch.Handler) : IO Unit := do
     let url := if target.startsWith "/" then s!"http://{hostHeader}{target}" else target
     let chunks ← req.callMethodAwait "toArray" #[] Value
     let body ← bufferClass.callMethod "concat" #[.ref chunks ""] ByteArray
-    let r ← Lasm.Fetch.respond handle { method, url, headers, body }
+    let r ← Web.respond handle { method, url, headers, body }
     let flat : Array Data := r.headers.foldl (fun acc (k, v) => acc.push (toJS k) |>.push (toJS v)) #[]
     let _ : Value ← res.callMethod "writeHead" #[toJS r.status, .array flat]
-    return .callMethod res "end" #[if Lasm.Fetch.bodyless method r.status then .undefined else .bytes r.body]
+    return .callMethod res "end" #[if Web.bodyless method r.status then .undefined else .bytes r.body]
   let server ← http.callMethod "createServer" #[.ref onRequest ""]
   let onUpgrade ← Function.ofFn fun args => do
     let (req, socket) ← match args[0]?.getD .undefined, args[1]?.getD .undefined with
