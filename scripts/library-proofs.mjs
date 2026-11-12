@@ -46,9 +46,13 @@ const proofModules = ['Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.P
   'Lasm.JS.Proofs.Wire', 'Lasm.JS.Spec', 'Lasm.JS.Theorems',
   'Lasm.Serverless.Proofs.Model', 'Lasm.Serverless.Proofs.Mapping', 'Lasm.Serverless.Spec', 'Lasm.Serverless.Theorems',
   'Lasm.Serverless.Candidates'];
-// The propositions about the CLI's JavaScript (verification/cli): they must
-// elaborate; scripts/propositions.mjs checks their tests.
-const cliModules = ['Lasm.Cli.Interface', 'Lasm.Cli.Candidates'];
+// The propositions about the CLI's JavaScript (verification/cli): the Lean
+// models of its modules (Lasm/Cli/Model/, checked against the JavaScript by
+// test/models/cli-differential.mjs), the candidates (they must elaborate;
+// scripts/propositions.mjs checks their tests) and the proved propositions
+// (Spec.lean, each with its theorem in Theorems.lean, as a library's).
+const cliModules = ['Lasm.Cli.Model.Dev', 'Lasm.Cli.Model.NodeHost', 'Lasm.Cli.Model.Platform',
+  'Lasm.Cli.Interface', 'Lasm.Cli.Candidates', 'Lasm.Cli.Spec', 'Lasm.Cli.Theorems'];
 const cliRoot = join(root, 'verification', 'cli');
 const libraries = ['Lasm.UI', 'Lasm.RPC', 'Lasm.KV', 'Lasm.Fetch', 'Lasm.JS', 'Lasm.Serverless'];
 const sourceOf = (module, base = library) => join(base, ...module.split('.')) + '.lean';
@@ -94,20 +98,23 @@ function sections(file) {
 
 const cell = s => s.replace(/\s+/g, ' ').replace(/\|/g, '\\|').trim();
 
-/** The generated part of PROOFS.md. */
-function generated(data) {
-  const props = data.propositions;
+/** The generated part of PROOFS.md (`libs`, from `base`), or of verification/cli/README.md. */
+function generated(data, libs = libraries, base = library) {
+  const props = data.propositions.filter(p => libs.includes(p.library));
+  // The theorems of these libraries: the CLI's (Lasm.Cli.…) or all the others.
+  const cli = libs.includes('Lasm.Cli');
+  const theorems = data.theoremNames.filter(n => n.startsWith('Lasm.Cli.') === cli).length;
   let out = `<!-- Generated from the Spec.lean files by \`node scripts/library-proofs.mjs --write\`; do not edit by hand. -->\n\n`;
-  out += `**${props.length} proved propositions (${data.theorems} theorems)**: each proposition below is proved by the `;
+  out += `**${props.length} proved propositions (${theorems} theorems)**: each proposition below is proved by the `;
   out += `theorem of the same name in its library's \`Theorems.lean\`, and the other theorems are the lemmas their `;
   out += `proofs are built from. Every one uses only Lean's standard axioms.\n`;
-  for (const lib of libraries) {
+  for (const lib of libs) {
     const mine = props.filter(p => p.library === lib).sort((a, b) => a.line - b.line);
     if (mine.length === 0) { problems.push(`${lib} has no propositions`); continue; }
     const module = `${lib}.Spec`;
     const path = module.split('.').join('/') + '.lean';
     out += `\n## ${lib} (${mine.length})\n`;
-    const secs = sections(join(library, path));
+    const secs = sections(join(base, path));
     secs.forEach((sec, i) => {
       const next = secs[i + 1]?.line ?? Infinity;
       const inSec = mine.filter(p => p.line > sec.line && p.line < next);
@@ -124,14 +131,17 @@ const END = '<!-- END PROPOSITIONS -->';
 const problems = [];
 
 function syncProofsMd(data) {
-  const path = join(library, 'PROOFS.md');
-  const text = readFileSync(path, 'utf8');
-  const i = text.indexOf(BEGIN), j = text.indexOf(END);
-  if (i < 0 || j < 0) { problems.push(`library/PROOFS.md has no ${BEGIN} … ${END} block`); return; }
-  const updated = text.slice(0, i + BEGIN.length) + '\n' + generated(data) + text.slice(j);
-  if (updated !== text) {
-    if (write) writeFileSync(path, updated);
-    else problems.push('library/PROOFS.md is out of date with the Spec.lean files (run `node scripts/library-proofs.mjs --write`)');
+  for (const [document, text] of [['library/PROOFS.md', generated(data)],
+    ['verification/cli/README.md', generated(data, ['Lasm.Cli'], cliRoot)]]) {
+    const path = join(root, document);
+    const old = readFileSync(path, 'utf8');
+    const i = old.indexOf(BEGIN), j = old.indexOf(END);
+    if (i < 0 || j < 0) { problems.push(`${document} has no ${BEGIN} … ${END} block`); continue; }
+    const updated = old.slice(0, i + BEGIN.length) + '\n' + text + old.slice(j);
+    if (updated !== old) {
+      if (write) writeFileSync(path, updated);
+      else problems.push(`${document} is out of date with the Spec.lean files (run \`node scripts/library-proofs.mjs --write\`)`);
+    }
   }
 }
 

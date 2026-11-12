@@ -96,15 +96,6 @@ def closest_nearest_first : Prop :=
   ∀ (word : String) (cs : List String), word.all Char.isLower → (∀ c ∈ cs, c.all Char.isLower) →
     closest word cs = (nearestFirst (editDistance word) cs).filter fun c => editDistance word c ≤ threshold c
 
-/-- **Response files round-trip.** Every linker argument without a newline or
-NUL is one line of the response file, read back exactly by unquoting it; no
-arguments make a file of one empty line.
-Tested by: test/cli-parse.test.mjs -/
-def response_file_round_trip : Prop :=
-  ∀ args : List String, (∀ a ∈ args, '\n' ∉ a.toList ∧ '\x00' ∉ a.toList) →
-    ∃ lines : List String, (responseFile args).splitOn "\n" = lines ++ [""] ∧
-      if args = [] then lines = [""] else lines.map unquote = args.map some
-
 /-! ## The process launcher -/
 
 /-- **The launcher configuration round-trips.** The native launcher reads
@@ -188,15 +179,6 @@ def generated_names_valid : Prop :=
 
 /-! ## Development server -/
 
-/-- **`changedFiles` reports exactly the files that differ.** Between two
-snapshots, it names each file present in only one, or with different hashes,
-once, and no other.
-Tested by: test/dev-units.test.mjs -/
-def changed_files_exact : Prop :=
-  ∀ a b : List (String × Option String), (a.map (·.1)).Nodup → (b.map (·.1)).Nodup →
-    (changedFiles a b).Nodup ∧
-    ∀ k, k ∈ changedFiles a b ↔ (k ∈ a.map (·.1) ∨ k ∈ b.map (·.1)) ∧ a.lookup k ≠ b.lookup k
-
 /-- **No request path reaches a file outside the root.** Whatever the path
 (`..`, encoded dots and slashes, sibling directories that share the root's
 name as a prefix), the static server answers 200, 403 or 404, and a file it
@@ -217,13 +199,6 @@ def lean_at_least_lexicographic : Prop :=
   ∀ (a b : Nat × Nat × Nat) (rc : Option Nat),
     (leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText b) = true ↔ LexGe a b) ∧
     leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText a) = true
-
-/-- **`numbers` writes little-endian `UInt64`s.** Each value becomes eight
-bytes, low byte first, wrapped modulo 2⁶⁴ (a negative value as its two's
-complement), in order.
-Tested by: test/lean-io-error-policy.test.mjs -/
-def numbers_le64 : Prop :=
-  ∀ values : List Int, (numbers values).data.toList = values.flatMap le64
 
 /-! ## Downloads -/
 

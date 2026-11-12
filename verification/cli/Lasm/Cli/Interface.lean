@@ -8,16 +8,17 @@ JavaScript's types read as Lean types (`undefined` and a thrown error as
 `none` or `.error`, a `Buffer` or `Uint8Array` as `ByteArray`, an object as a
 structure of the fields a proposition reads).
 
-Reading guide. Each function is an `opaque` constant: Lean knows its type and
-nothing else, so a candidate about it can be tested (the test that cites it
-runs the JavaScript on generated inputs and checks the statement) but not
-proved. The step that proves one is the one docs/TESTING_STRATEGY.md §6
-decision 7 and docs/proposals/IRREDUCIBLE.md M4 and M6 lay out: replace the
-`opaque` by a Lean model of the JavaScript, function for function (as
-`library/Lasm/Serverless/Proofs/Model.lean` does for `src/serverless/`), with
-a model differential in CI; then the statement, unchanged, becomes a theorem
-about the model. What stays unproved is exactly "this JavaScript implements
-the model".
+Reading guide. A function not yet modelled is an `opaque` constant: Lean
+knows its type and nothing else, so a candidate about it can be tested (the
+test that cites it runs the JavaScript on generated inputs and checks the
+statement) but not proved. The step that proves one is the one
+docs/TESTING_STRATEGY.md §6 decision 7 and docs/proposals/IRREDUCIBLE.md M4
+and M6 lay out: replace the `opaque` by a Lean model of the JavaScript,
+function for function, in `Lasm/Cli/Model/` (imported here), checked against
+the JavaScript by test/models/cli-differential.mjs; then the statement
+becomes a theorem about the model (Spec.lean, Theorems.lean). What stays
+unproved is exactly "this JavaScript implements the model", which the
+differential tests.
 
 A few constants stand for something that is not Lasm's JavaScript but an
 outside semantics the tests use as their oracle (WebAssembly validation and
@@ -26,6 +27,9 @@ comments say so. The plain definitions (`leb`, `sectionOf`, `Reaches`, …) are
 the vocabulary the statements share, exact and complete.
 -/
 import Lean.Data.Json
+import Lasm.Cli.Model.Dev
+import Lasm.Cli.Model.NodeHost
+import Lasm.Cli.Model.Platform
 
 namespace Lasm.Cli
 
@@ -166,8 +170,8 @@ def nearestFirst (d : String → Nat) : List String → Option String
     | some c' => if d c' < d c then some c' else some c
     | none => some c
 
-/-- `responseFile(arguments)` (src/platform.mjs): the linker's response file. -/
-opaque responseFile : List String → String
+-- `responseFile(arguments)` (src/platform.mjs), the linker's response file:
+-- modelled in Model/Platform.lean.
 
 /-- Backslash escapes undone: `\x` is `x`. -/
 def unescape : List Char → List Char
@@ -272,9 +276,7 @@ opaque supabaseFunctionNameOf : String → String
 
 /-! ## Development server (src/dev.mjs, src/browser/static-server.mjs) -/
 
-/-- `changedFiles(before, after)`, with each snapshot a map from a file to its
-hash (`null`, `none` here, for a file that could not be read). -/
-opaque changedFiles : List (String × Option String) → List (String × Option String) → List String
+-- `changedFiles(before, after)` (src/dev.mjs): modelled in Model/Dev.lean.
 
 /-- The static server (`startStaticServer(root)` without a fallback page)
 answering a GET of a request path: the status, and the file (an absolute
@@ -293,8 +295,7 @@ def versionText (v : Nat × Nat × Nat) : String := s!"{v.1}.{v.2.1}.{v.2.2}"
 def LexGe (a b : Nat × Nat × Nat) : Prop :=
   a.1 > b.1 ∨ a.1 = b.1 ∧ (a.2.1 > b.2.1 ∨ a.2.1 = b.2.1 ∧ a.2.2 ≥ b.2.2)
 
-/-- `numbers(...values)` (src/node-host.mjs). -/
-opaque numbers : List Int → ByteArray
+-- `numbers(...values)` (src/node-host.mjs): modelled in Model/NodeHost.lean.
 
 /-- A value as a little-endian unsigned 64-bit integer, wrapped modulo 2⁶⁴. -/
 def le64 (n : Int) : List UInt8 :=
