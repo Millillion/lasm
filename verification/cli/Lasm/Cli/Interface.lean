@@ -30,6 +30,7 @@ import Lean.Data.Json
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Platform
+import Lasm.Cli.Model.WasiComponent
 
 namespace Lasm.Cli
 
@@ -451,10 +452,8 @@ opaque extractCore : ByteArray → Option ByteArray
 opaque makeTemplate : ByteArray → ByteArray → Option ByteArray
 /-- The shipped template, src/wasi/component/proxy-template.wasm. -/
 opaque proxyTemplate : ByteArray
-/-- `replaceCoreModule(component, prefix, to)`, or the message it throws. -/
-opaque replaceCoreModule : ByteArray → ByteArray → ByteArray → Except String ByteArray
-/-- `withoutComponentType(module)`. -/
-opaque withoutComponentType : ByteArray → ByteArray
+-- `replaceCoreModule(component, prefix, to)` and `withoutComponentType(module)`:
+-- modelled in Model/WasiComponent.lean.
 
 /-- A section of a core module: a custom section (its name and contents) or
 any other (its id and body). -/

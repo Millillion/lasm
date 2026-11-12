@@ -64,7 +64,7 @@ test('the placeholder is an empty module with one custom section naming it', () 
   assert.equal(httpHandlerExport, 'wasi:http/incoming-handler@0.2.12#handle');
 });
 
-// Proposition: Lasm.Cli.Candidates.replace_one_core_module
+// Proposition: Lasm.Cli.Spec.replace_one_core_module
 //   ∀ (before after : List (UInt8 × List UInt8)) (unrelated : List (List UInt8)) (pfx tail to : List UInt8),
 //     (∀ s ∈ before ++ after, s.1 ≠ 1) → (∀ u ∈ unrelated, ¬ pfx <+: u) →
 //     replaceCoreModule
@@ -110,7 +110,21 @@ test('replaceCoreModule needs exactly one matching core module and a component h
   assert.equal(replaceCoreModule(version, prefix, prefix).length, one.length);
 });
 
-// Proposition: Lasm.Cli.Candidates.drops_only_component_type
+test('replaceCoreModule keeps a padded section size before the module and refuses a section past the end', () => {
+  // The model differential (test/models/cli-differential.mjs) found that a
+  // section size written as a padded LEB128 (here 0x84 0x80 0x00 for 4) was
+  // spliced at the wrong offset, keeping padding bytes.
+  const prefix = Uint8Array.from([...moduleHeader, 7]);
+  const padded = [0, 0x84, 0x80, 0x00, 1, 2, 3, 4];
+  const component = Uint8Array.from([...componentHeader, ...padded, 1, ...leb(9), ...moduleHeader, 7]);
+  assert.deepEqual(replaceCoreModule(component, prefix, Uint8Array.of(5)), Uint8Array.from([...componentHeader, ...padded, 1, 1, 5]));
+  const paddedModule = Uint8Array.from([...componentHeader, 1, 0x89, 0x00, ...moduleHeader, 7]);
+  assert.deepEqual(replaceCoreModule(paddedModule, prefix, Uint8Array.of(5)), Uint8Array.from([...componentHeader, 1, 1, 5]));
+  for (const cut of [1, 2, 5])
+    assert.throws(() => replaceCoreModule(component.subarray(0, component.length - cut), prefix, prefix), /Not a WebAssembly component/);
+});
+
+// Proposition: Lasm.Cli.Spec.drops_only_component_type
 //   ∀ ss : List Sec, (∀ s ∈ ss, ∀ id b, s = .other id b → id ≠ 0) →
 //     withoutComponentType (bytes (moduleHeader ++ ss.flatMap Sec.encoding)) =
 //       bytes (moduleHeader ++ (ss.filter (!·.componentType)).flatMap Sec.encoding)
