@@ -124,9 +124,9 @@
       "threshold": 88
     },
     "node-serve": {
-      "initial": null,
-      "score": null,
-      "mutants": null,
+      "initial": 80.6,
+      "score": 80.6,
+      "mutants": 392,
       "threshold": 80
     }
   },

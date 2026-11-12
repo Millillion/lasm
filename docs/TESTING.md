@@ -1443,7 +1443,7 @@ run 41749603692); the fourteen others, which cover the rest of `src/`, were adde
 that added them) or from each group's first run where that run could not score
 them, and *now* from the nightly mutation.yml run 43024598393 on `main` (2026-11-11), which measured all 20 modules together (Node 26, Linux x64; 1 to 72 minutes a module, `dev` the longest); before that, run 42615928074 on #165 measured the 21 modules of 2026-11-09. The 21st, `wasmtime`, was removed with the standalone Wasmtime preview it mutated (2026-11-10), and its surviving mutants with it. *Initial*: with
 the tests that existed before mutation testing; *now*: with the tests written to
-kill survivors (CI's measurement on Node 26 is the recorded floor).
+kill survivors (CI's measurement on Node 26 is the recorded floor). `node-serve` (`Node.serve`, 2026-11-12) was first measured by mutation.yml run 43236872547 on its branch: 80.6 % of 392 mutants, written with its tests, so *initial* and *now* are the same.
 
 | Module | Files | Initial | Now | Threshold |
 | --- | --- | ---: | ---: | ---: |
@@ -1467,6 +1467,7 @@ kill survivors (CI's measurement on Node 26 is the recorded floor).
 | `node-host` | `node-host.mjs`, `node-network.mjs`, `node-process.mjs`, `node-signal.mjs`, `node-system.mjs`, `node-udp.mjs`, `node-fetch.mjs`, `lean-io-errors.mjs`, `handle-table.mjs`, `process-exec.mjs`, `working-directory.mjs`, `linux-memory.mjs`, `thread-id.cjs`, `native-clock.mjs`, `native-dns.mjs`, `native-interfaces.mjs`, `native-windows-timezone.mjs`, `native-tcp.mjs` | 42 % | **86.2 %** | 86 % |
 | `native-files` | `native-files.mjs`, `native-file-message.mjs`, `native-file-worker.mjs`, `native-file-worker-pool.mjs`, `native-worker-cwd.cjs`, `worker-stdio.cjs`, `native-process.mjs`, `native-signals.mjs`, `native-program.mjs`, `native-abort.cjs` | 29.4 % | **88.5 %** | 88 % |
 | `serverless` | `serverless/lasm-function.mjs`, `serverless/lasm-lambda.mjs`, `serverless/lasm-vercel.mjs`, `serverless/lasm-netlify.mjs`, `serverless/lasm-azure.mjs`, `serverless/lasm-gcf.mjs`, `serverless/zip.mjs` | 40.5 % | **88.5 %** | 88 % |
+| `node-serve` | `lasm-modules/node-serve.mjs` | 80.6 % | **80.6 %** | 80 % |
 
 `edge-build` and `wasi-build` were measured 2026-11-09 (run 42581537537; initial scores in runs
 42571769129 and, for `edge-build` without `edge-library.js`, 42579064935). `src/edge/edge-library.js` is not
