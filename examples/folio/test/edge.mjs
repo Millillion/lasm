@@ -5,9 +5,11 @@
 // Then a changed site (a new page, an edited page, a page made a draft, a
 // new layout) is put in a new store and checked the same way, so the pages
 // come from the store; then, with --spec, the CommonMark specification's
-// 652 examples run on the server (test/spec.mjs over POST /api/render).
+// 652 examples run on the server (test/spec.mjs over POST /api/render), and
+// with --pathological, CommonMark's pathological inputs and the deep nesting
+// of issue #231 (test/pathological.mjs over POST /api/render).
 //
-//   node test/edge.mjs --platform fastly|workers|deno-deploy [--spec] [--port N]
+//   node test/edge.mjs --platform fastly|workers|deno-deploy [--spec] [--pathological] [--port N]
 import { spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -18,7 +20,7 @@ import { platforms, removeRunDirectory, runDirectory, seed, startServer } from '
 const root = fileURLToPath(new URL('..', import.meta.url));
 const option = name => process.argv.includes(name) ? process.argv[process.argv.indexOf(name) + 1] : null;
 const name = option('--platform');
-if (!platforms[name]) { console.error(`usage: node test/edge.mjs --platform ${Object.keys(platforms).join('|')} [--spec]`); process.exit(2); }
+if (!platforms[name]) { console.error(`usage: node test/edge.mjs --platform ${Object.keys(platforms).join('|')} [--spec] [--pathological]`); process.exit(2); }
 const port = Number(option('--port') ?? 8788);
 const base = `http://127.0.0.1:${port}`;
 
@@ -117,6 +119,10 @@ if (process.argv.includes('--spec')) {
   mkdirSync(join(root, 'test-results'), { recursive: true });
   const r = spawnSync(process.execPath, [join(root, 'test', 'spec.mjs'), '--engine', base, '--json', join(root, 'test-results', `spec-${name}.json`)], { stdio: 'inherit' });
   check(r.status === 0, 'the CommonMark 0.31.2 specification\'s 652 examples');
+}
+if (process.argv.includes('--pathological')) {
+  const r = spawnSync(process.execPath, [join(root, 'test', 'pathological.mjs'), '--engine', base], { stdio: 'inherit' });
+  check(r.status === 0, 'CommonMark\'s pathological inputs and deep nesting');
 }
 await run.server.stop();
 removeRunDirectory(run.data);
