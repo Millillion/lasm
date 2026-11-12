@@ -353,4 +353,20 @@ Tested by: test/serverless-zip.test.mjs -/
 def zip_deterministic : Prop :=
   ∀ entries : List ZipEntry, zip entries = zip entries
 
+/-! ## Node.serve -/
+
+/-- **An origin-form target is the URL's path and query; only a plain Host is
+its authority.** For a target that starts with `/` (printable ASCII without
+`#`, space or backslash), `requestUrl` answers a URL that ends with the
+target, whose host is the Host field's when that is plain and parses as an
+authority, and the fallback's otherwise.
+Tested by: test/node-serve.test.mjs -/
+def origin_form_url : Prop :=
+  ∀ target host : String, target.startsWith "/" →
+    (∀ c ∈ target.toList, 32 < c.toNat ∧ c.toNat < 127 ∧ c ≠ '#' ∧ c ≠ '\\') →
+    ∃ url, requestUrl target host "fallback:9" = some url ∧ url.endsWith target ∧
+      urlHost url = some (match plainHost host, urlHost ("http://" ++ host ++ "/") with
+        | true, some h => h
+        | _, _ => "fallback:9")
+
 end Lasm.Cli.Candidates

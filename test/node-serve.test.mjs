@@ -335,7 +335,13 @@ test('requestUrl, plainHost and hostPort', () => {
   assert.deepEqual([hostPort('127.0.0.1', 1), hostPort('::1', 2), hostPort('localhost', 3)], ['127.0.0.1:1', '[::1]:2', 'localhost:3']);
 });
 
-// ∀ target host, requestUrl keeps the origin-form target as the URL's path and query, under host only when it is plain
+// Proposition: Lasm.Cli.Candidates.origin_form_url
+//   ∀ target host : String, target.startsWith "/" →
+//     (∀ c ∈ target.toList, 32 < c.toNat ∧ c.toNat < 127 ∧ c ≠ '#' ∧ c ≠ '\\') →
+//     ∃ url, requestUrl target host "fallback:9" = some url ∧ url.endsWith target ∧
+//       urlHost url = some (match plainHost host, urlHost ("http://" ++ host ++ "/") with
+//         | true, some h => h
+//         | _, _ => "fallback:9")
 test('property: an origin-form target is the URL\'s path and query; only a plain Host is its authority', () => {
   const alphabet = ['a', 'Z', '0', '/', '?', '%2F', '#', '@', '\\', ':', ' ', '.', '..', '=', '&', 'é'];
   forAll(r => ({ target: '/' + r.string(alphabet.filter(c => c !== '#' && c !== ' ' && c !== 'é' && c !== '\\')), host: r.string(alphabet, 0, 12) }), ({ target, host }) => {

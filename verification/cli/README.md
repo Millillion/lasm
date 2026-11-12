@@ -39,9 +39,9 @@ current (`--write` rewrites it). `node scripts/library-proofs.mjs`
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**29 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+**30 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
-### Lasm.Cli (29)
+### Lasm.Cli (30)
 
 | Candidate | In plain English | Tested by |
 | --- | --- | --- |
@@ -74,4 +74,5 @@ current (`--write` rewrites it). `node scripts/library-proofs.mjs`
 | [`drops_only_component_type`](Lasm/Cli/Candidates.lean#L328) | **`withoutComponentType` drops only component-type custom sections.** A module's custom sections named `component-type…` go; every other section, custom or not, stays, in order. | [test/wasi-component.test.mjs](../../test/wasi-component.test.mjs) |
 | [`zip_reads_back`](Lasm/Cli/Candidates.lean#L340) | **What `zip` writes, a ZIP reader reads back.** Whenever `zip` succeeds, a reader finds the parent directories first (sorted, mode `0o40755`, empty, stored), then every entry in order, with its bytes and its permissions as a regular file (`0o644` unless given). | [test/serverless-zip.test.mjs](../../test/serverless-zip.test.mjs) |
 | [`zip_deterministic`](Lasm/Cli/Candidates.lean#L353) | **`zip` is deterministic.** The archive depends on the entries alone (no clock, no host state). Stated of a Lean function this holds by `rfl`; it is the assumption a model of `zip` makes, which the test checks of the JavaScript. | [test/serverless-zip.test.mjs](../../test/serverless-zip.test.mjs) |
+| [`origin_form_url`](Lasm/Cli/Candidates.lean#L364) | **An origin-form target is the URL's path and query; only a plain Host is its authority.** For a target that starts with `/` (printable ASCII without `#`, space or backslash), `requestUrl` answers a URL that ends with the target, whose host is the Host field's when that is plain and parses as an authority, and the fallback's otherwise. | [test/node-serve.test.mjs](../../test/node-serve.test.mjs) |
 <!-- END CANDIDATES -->
