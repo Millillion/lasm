@@ -905,4 +905,362 @@ theorem builtin_closure : Spec.builtin_closure := by
   · intro x hx y hy hyO
     exact hi.order x hx y hyO (.edge hy)
 
+/-! ## The command line: suggestions and the parser -/
+
+/-- The Levenshtein distance, by its recurrence on the last characters (the
+lists are words reversed). -/
+def lev : List Char → List Char → Nat
+  | [], ys => ys.length
+  | _ :: xs, [] => xs.length + 1
+  | x :: xs, y :: ys => min (min (lev xs (y :: ys) + 1) (lev (x :: xs) ys + 1)) (lev xs ys + if x = y then 0 else 1)
+
+theorem lev_nil_left (ys : List Char) : lev [] ys = ys.length := by cases ys <;> simp [lev]
+theorem lev_nil_right (xs : List Char) : lev xs [] = xs.length := by cases xs <;> simp [lev]
+theorem lev_cons_cons (x y : Char) (xs ys : List Char) :
+    lev (x :: xs) (y :: ys) = min (min (lev xs (y :: ys) + 1) (lev (x :: xs) ys + 1)) (lev xs ys + if x = y then 0 else 1) := by
+  simp [lev]
+
+/-- The cells of a row after the first column: for the reversed prefix `r`
+of `a`, `p` the reversed prefix of `b` filled so far and `ys` the rest of `b`. -/
+def cols (r : List Char) : List Char → List Char → List Nat
+  | _, [] => []
+  | p, y :: ys => lev r (y :: p) :: cols r (y :: p) ys
+
+theorem nextCells_cols (x : Char) (r : List Char) : ∀ (p ys : List Char),
+    nextCells x ys (cols r p ys) (lev r p) (lev (x :: r) p) = cols (x :: r) p ys
+  | _, [] => by simp [cols, nextCells]
+  | p, y :: ys => by
+    simp only [cols, nextCells]
+    rw [← lev_cons_cons, nextCells_cols x r (y :: p) ys]
+
+theorem cols_nil (p : List Char) : ∀ ys : List Char, cols [] p ys = List.range' (p.length + 1) ys.length
+  | [] => rfl
+  | y :: ys => by simp [cols, lev_nil_left, cols_nil (y :: p) ys, List.range'_succ]
+
+theorem getLastD_cols (r : List Char) : ∀ (d : Nat) (p ys : List Char),
+    (lev r p :: cols r p ys).getLastD d = lev r (ys.reverse ++ p)
+  | _, p, [] => by simp [cols]
+  | d, p, y :: ys => by
+    rw [cols, List.getLastD_cons, getLastD_cols r _ (y :: p) ys]
+    simp
+
+theorem editDistance_lev (a b : String) : editDistance a b = lev a.toList.reverse b.toList.reverse := by
+  unfold editDistance
+  have fold : ∀ (l r : List Char), l.foldl (fun (s : Nat × List Nat) x => (s.1 + 1, (s.1 + 1) :: nextCells x b.toList s.2.tail (s.2.headD 0) (s.1 + 1)))
+      (r.length, lev r [] :: cols r [] b.toList) = (r.length + l.length, lev (l.reverse ++ r) [] :: cols (l.reverse ++ r) [] b.toList) := by
+    intro l
+    induction l with
+    | nil => intro r; simp
+    | cons x l ih =>
+      intro r
+      rw [List.foldl_cons]
+      have h : nextCells x b.toList (cols r [] b.toList) (lev r []) (r.length + 1) = cols (x :: r) [] b.toList := by
+        rw [← nextCells_cols x r [] b.toList, lev_nil_right, lev_nil_right]; rfl
+      simp only [List.tail_cons, List.headD_cons]
+      rw [h, show (r.length + 1, (r.length + 1) :: cols (x :: r) [] b.toList) = ((x :: r).length, lev (x :: r) [] :: cols (x :: r) [] b.toList) by
+        simp [lev_nil_right], ih (x :: r)]
+      simp; omega
+  have first : List.range (b.toList.length + 1) = lev [] [] :: cols [] [] b.toList := by
+    rw [cols_nil, lev_nil_left, List.range_eq_range', List.range'_succ]; simp
+  have := fold a.toList []
+  simp only [List.length_nil, List.append_nil, Nat.zero_add] at this
+  show (List.foldl (fun (s : Nat × List Nat) x => (s.1 + 1, (s.1 + 1) :: nextCells x b.toList s.2.tail (s.2.headD 0) (s.1 + 1)))
+    (0, List.range (b.toList.length + 1)) a.toList).2.getLastD 0 = _
+  rw [first, this, getLastD_cols]
+  simp
+
+theorem lev_self : ∀ l : List Char, lev l l = 0
+  | [] => lev_nil_left []
+  | x :: l => by rw [lev_cons_cons, lev_self l]; simp
+
+theorem cost_comm (x y : Char) : (if x = y then 0 else 1) = (if y = x then 0 else 1) := by
+  by_cases h : x = y <;> simp [h, Ne.symm]
+
+theorem cost_le (x y : Char) : (if x = y then 0 else 1) ≤ 1 := by split <;> simp
+
+theorem cost_triangle (x y z : Char) : (if x = z then 0 else 1) ≤ (if x = y then 0 else 1) + (if y = z then 0 else 1) := by
+  by_cases h1 : x = y <;> by_cases h2 : y = z <;> simp_all <;> split <;> simp
+
+theorem cost_zero {x y : Char} (h : (if x = y then 0 else 1) = 0) : x = y := by
+  by_cases h' : x = y
+  · exact h'
+  · simp [h'] at h
+
+theorem lev_comm : ∀ a b : List Char, lev a b = lev b a
+  | [], b => by rw [lev_nil_left, lev_nil_right]
+  | x :: a, [] => by rw [lev_nil_left, lev_nil_right]
+  | x :: a, y :: b => by
+    rw [lev_cons_cons, lev_cons_cons, lev_comm a (y :: b), lev_comm (x :: a) b, lev_comm a b, cost_comm x y]
+    omega
+termination_by a b => a.length + b.length
+
+theorem lev_ge : ∀ a b : List Char, a.length ≤ lev a b + b.length ∧ b.length ≤ lev a b + a.length
+  | [], b => by rw [lev_nil_left]; simp
+  | x :: a, [] => by rw [lev_nil_right]; simp
+  | x :: a, y :: b => by
+    have h1 := lev_ge a (y :: b)
+    have h2 := lev_ge (x :: a) b
+    have h3 := lev_ge a b
+    simp only [List.length_cons] at *
+    rw [lev_cons_cons]
+    omega
+termination_by a b => a.length + b.length
+
+theorem lev_le_max : ∀ a b : List Char, lev a b ≤ max a.length b.length
+  | [], b => by rw [lev_nil_left]; simp
+  | x :: a, [] => by rw [lev_nil_right]; simp
+  | x :: a, y :: b => by
+    have h := lev_le_max a b
+    have := cost_le x y
+    simp only [List.length_cons]
+    rw [lev_cons_cons]
+    omega
+
+theorem lev_eq_zero : ∀ a b : List Char, lev a b = 0 → a = b
+  | [], b, h => by rw [lev_nil_left] at h; exact (List.length_eq_zero_iff.mp h).symm
+  | x :: a, [], h => by rw [lev_nil_right] at h; simp at h
+  | x :: a, y :: b, h => by
+    rw [lev_cons_cons] at h
+    have h' : lev a b + (if x = y then 0 else 1) = 0 := by omega
+    have hxy : x = y := cost_zero (by omega)
+    rw [hxy, lev_eq_zero a b (by omega)]
+
+theorem lev_triangle : ∀ a b c : List Char, lev a c ≤ lev a b + lev b c
+  | [], b, c => by have := (lev_ge b c).2; rw [lev_nil_left, lev_nil_left]; omega
+  | x :: a, b, [] => by have := (lev_ge (x :: a) b).1; rw [lev_nil_right, lev_nil_right]; omega
+  | x :: a, [], z :: c => by
+    have := lev_le_max (x :: a) (z :: c)
+    rw [lev_nil_right, lev_nil_left]
+    omega
+  | x :: a, y :: b, z :: c => by
+    have t1 := lev_triangle a (y :: b) (z :: c)
+    have t2 := lev_triangle (x :: a) (y :: b) c
+    have t3 := lev_triangle (x :: a) b (z :: c)
+    have t4 := lev_triangle (x :: a) b c
+    have t5 := lev_triangle a b (z :: c)
+    have t6 := lev_triangle a b c
+    have := cost_triangle x y z
+    have e1 := lev_cons_cons x y a b
+    have e2 := lev_cons_cons y z b c
+    have e3 := lev_cons_cons x z a c
+    omega
+termination_by a b c => a.length + b.length + c.length
+
+theorem edit_distance_metric : Spec.edit_distance_metric := by
+  intro a b c
+  have len : ∀ s : String, s.toList.reverse.length = s.length := fun s => by
+    rw [List.length_reverse, String.length_toList]
+  have inj : ∀ s t : String, s ≠ t → s.toList.reverse ≠ t.toList.reverse := by
+    intro s t h h'
+    exact h (String.toList_inj.mp (List.reverse_inj.mp h'))
+  simp only [editDistance_lev, ← len, String.toList_empty, List.reverse_nil]
+  refine ⟨lev_self _, lev_nil_right _, lev_nil_left _, lev_comm _ _, lev_triangle _ _ _, ?_, ?_, lev_le_max _ _, ?_⟩
+  · have := (lev_ge a.toList.reverse b.toList.reverse).1; omega
+  · have := (lev_ge a.toList.reverse b.toList.reverse).2; omega
+  · intro h
+    have := inj a b h
+    exact Nat.pos_of_ne_zero fun h0 => this (lev_eq_zero _ _ h0)
+
+/-- One step of `closest`'s loop, with the distance `D`. -/
+def closestStep (D : String → Nat) (s : Option String × Option Nat) (c : String) : Option String × Option Nat :=
+  if s.2.all (D c < ·) then (some c, some (D c)) else s
+
+theorem closest_fold (D : String → Nat) : ∀ (cs : List String) (s : Option String × Option Nat),
+    cs.foldl (closestStep D) s = match nearestFirst D cs with
+      | some c => if s.2.all (D c < ·) then (some c, some (D c)) else s
+      | none => s
+  | [], s => rfl
+  | c :: cs, (best, dist) => by
+    rw [List.foldl_cons, closest_fold D cs, nearestFirst]
+    cases h : nearestFirst D cs with
+    | none => rfl
+    | some c' =>
+      simp only [closestStep]
+      by_cases h1 : D c' < D c
+      · simp only [h1, ↓reduceIte]
+        cases dist with
+        | none => simp [h1]
+        | some d =>
+          by_cases h2 : D c < d
+          · simp [h1, h2]; omega
+          · simp [h2]
+      · simp only [h1, ↓reduceIte]
+        cases dist with
+        | none => simp [h1]
+        | some d =>
+          by_cases h2 : D c < d
+          · simp [h1, h2]
+          · simp [h2]; omega
+
+theorem toLower_of_isLower {c : Char} (h : c.isLower = true) : c.toLower = c := by
+  unfold Char.toLower
+  apply dite_eq_right_iff.mpr
+  intro hu
+  exfalso
+  unfold Char.isLower at h
+  have h1 : 'a'.val ≤ c.val := by simp_all
+  have h2 := hu.2
+  rw [UInt32.le_iff_toNat_le] at h1 h2
+  simp at h1 h2
+  omega
+
+theorem asciiLower_lower {s : String} (h : s.all Char.isLower) : asciiLower s = s := by
+  apply String.ext
+  rw [asciiLower, String.toList_map]
+  rw [String.all_bool_eq] at h
+  conv => rhs; rw [← List.map_id s.toList]
+  apply List.map_congr_left
+  intro c hc
+  exact toLower_of_isLower (List.all_eq_true.mp h c hc)
+
+theorem closest_nearest_first : Spec.closest_nearest_first := by
+  intro word cs hw hcs
+  have step : cs.foldl (init := ((none : Option String), (none : Option Nat)))
+      (fun (s : Option String × Option Nat) c =>
+        if s.2.all (editDistance (asciiLower word) (asciiLower c) < ·) then (some c, some (editDistance (asciiLower word) (asciiLower c))) else s) =
+      cs.foldl (closestStep (editDistance word)) (none, none) := by
+    have congr : ∀ (l : List String) (s : Option String × Option Nat), (∀ c ∈ l, c.all Char.isLower) →
+        l.foldl (fun (s : Option String × Option Nat) c =>
+          if s.2.all (editDistance (asciiLower word) (asciiLower c) < ·) then (some c, some (editDistance (asciiLower word) (asciiLower c))) else s) s =
+        l.foldl (closestStep (editDistance word)) s := by
+      intro l
+      induction l with
+      | nil => intro s _; rfl
+      | cons c l ih =>
+        intro s hl
+        have e : (if s.2.all (editDistance (asciiLower word) (asciiLower c) < ·) then (some c, some (editDistance (asciiLower word) (asciiLower c)))
+            else s) = closestStep (editDistance word) s c := by
+          rw [asciiLower_lower hw, asciiLower_lower (hl c (by simp))]; rfl
+        simp only [List.foldl_cons]
+        rw [e]
+        exact ih _ fun c' h' => hl c' (by simp [h'])
+    exact congr cs _ hcs
+  show (match cs.foldl (init := ((none : Option String), (none : Option Nat))) (fun (s : Option String × Option Nat) c =>
+        if s.2.all (editDistance (asciiLower word) (asciiLower c) < ·) then (some c, some (editDistance (asciiLower word) (asciiLower c))) else s) with
+      | (best, distance) => if distance.any (· ≤ max 2 ((best.map String.length).getD 0 / 3)) then best else none) = _
+  rw [step, closest_fold]
+  cases nearestFirst (editDistance word) cs with
+  | none => rfl
+  | some c => simp only [Option.all, Option.any, Option.filter, threshold]; split <;> simp_all
+
+theorem unknown_flag_refused : Spec.unknown_flag_refused := by
+  intro flag hdash hknown hvalued
+  simp only [knownFlags, List.mem_cons, List.not_mem_nil, or_false, not_or] at hknown
+  simp only [valuedForm, valuedFlags, List.any_cons, List.any_nil, Bool.or_false, Bool.or_eq_false_iff] at hvalued
+  obtain ⟨h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12⟩ := hknown
+  obtain ⟨v1, v2, v3⟩ := hvalued
+  have hv : valuedOf flag = none := by
+    simp at v1 v2 v3
+    simp [valuedOf, valuedOption, h10, h11, h12, v1, v2, v3]
+  have hm : valuedOf "Main.lean" = none := by simp [valuedOf, valuedOption]
+  constructor
+  · simp [parseLasmArguments, parseLasmArgumentsWith, parseLasmArgumentsWith.rest, parseLasmArgumentsWith.program, optionLoop, hm,
+      h1, h2, h3, h4, h5, h6, h7, h8, h9, hv, hdash]
+  · simp [parseLasmArguments, parseLasmArgumentsWith, parseLasmArgumentsWith.rest, parseLasmArgumentsWith.program, optionLoop,
+      h1, h2, h3, h4, h5, h6, h7, h8, h9, hv, hdash]
+
+theorem endsWith_iff {s t : String} : s.endsWith t = true ↔ t.toList <:+ s.toList := by
+  rw [← String.endsWith_toSlice, String.Slice.endsWith_string_iff, String.copy_toSlice]
+
+/-- The options of running a program that take no value, applied in order. -/
+def runFlags (r : Parsed) : List String → Parsed
+  | [] => r
+  | f :: fs => runFlags (if f = "--rebuild" then { r with rebuild? := some true }
+      else if f = "--verbose" then { r with verbose? := some true } else if f = "--release" then { r with profile? := some "release" } else r) fs
+
+theorem optionLoop_runFlags (pos sup rest : List String) : ∀ (flags : List String) (r : Parsed),
+    (∀ f ∈ flags, f ∈ ["--rebuild", "--verbose", "--release"]) → r.profile? = none ∨ r.profile? = some "release" →
+    optionLoop r pos sup (flags ++ rest) = optionLoop (runFlags r flags) pos sup rest
+  | [], r, _, _ => rfl
+  | f :: fs, r, hf, hp => by
+    have hf' : f = "--rebuild" ∨ f = "--verbose" ∨ f = "--release" := by simpa using hf f (by simp)
+    have hfs : ∀ f ∈ fs, f ∈ ["--rebuild", "--verbose", "--release"] := fun g hg => hf g (by simp [hg])
+    rw [List.cons_append, optionLoop, runFlags]
+    rcases hf' with rfl | rfl | rfl
+    · simp; exact optionLoop_runFlags pos sup rest fs _ hfs hp
+    · simp; exact optionLoop_runFlags pos sup rest fs _ hfs hp
+    · have hd : ("--release".drop 2).copy = "release" := by decide
+      rcases hp with hp | hp <;> simp [hd, hp] <;> exact optionLoop_runFlags pos sup rest fs _ hfs (Or.inr rfl)
+
+theorem runFlags_fields : ∀ (flags : List String) (r : Parsed),
+    (runFlags r flags).command = r.command ∧ (runFlags r flags).args? = r.args? ∧ (runFlags r flags).input? = r.input? ∧
+    (runFlags r flags).output? = r.output? ∧ (runFlags r flags).allowDev? = r.allowDev? ∧
+    (runFlags r flags).suspend? = r.suspend? ∧ (runFlags r flags).bundler? = r.bundler? ∧
+    (runFlags r flags).target? = r.target? ∧
+    (runFlags r flags).rebuild? = (if flags.contains "--rebuild" then some true else r.rebuild?) ∧
+    (runFlags r flags).verbose? = (if flags.contains "--verbose" then some true else r.verbose?) ∧
+    (runFlags r flags).profile? = (if flags.contains "--release" then some "release" else r.profile?)
+  | [], r => by simp [runFlags]
+  | f :: fs, r => by
+    rw [runFlags]
+    have := runFlags_fields fs (if f = "--rebuild" then { r with rebuild? := some true }
+      else if f = "--verbose" then { r with verbose? := some true } else if f = "--release" then { r with profile? := some "release" } else r)
+    by_cases h1 : f = "--rebuild"
+    · subst h1; simp_all
+    · by_cases h2 : f = "--verbose"
+      · subst h2; simp_all
+      · by_cases h3 : f = "--release"
+        · subst h3; simp_all
+        · simp only [h1, h2, h3, ite_false] at this ⊢
+          simp_all [eq_comm]
+
+/-- A word that does not start with `-` is no option: the loop takes it as
+the input, and then `--` ends it, keeping what follows. -/
+theorem optionLoop_source {src : String} (hdash : ¬ src.startsWith "-") (r : Parsed) (args : List String) (hr : r.command = "run") :
+    optionLoop r [] [] (src :: "--" :: args) = .ok (some ({ r with args? := some args }, [src])) := by
+  have hd : ¬ ['-'] <+: src.toList := by simpa using hdash
+  have pfx : ∀ l : List Char, ¬ ('-' :: l) <+: src.toList := fun l h =>
+    hd ((List.cons_prefix_cons.mpr ⟨rfl, List.nil_prefix⟩).trans h)
+  have ne : ∀ lit : String, lit.startsWith "-" = true → src ≠ lit := by rintro lit h rfl; exact hdash h
+  have hv : valuedOf src = none := by
+    simp [valuedOf, valuedOption, pfx, ne "--target" (by simp), ne "--suspend" (by simp), ne "--output" (by simp)]
+  rw [optionLoop]
+  simp [ne "--" (by simp), ne "--help" (by simp), ne "-h" (by simp), ne "--rebuild" (by simp), ne "--verbose" (by simp),
+    ne "--dev" (by simp), ne "--release" (by simp), ne "--allow-dev" (by simp), ne "--bundler" (by simp), hv, hd]
+  rw [optionLoop]
+  simp [hr]
+
+theorem finish_run (env : ArgumentsEnv) {src : String} (r : Parsed) (hc : r.command = "run") (ho : r.output? = none)
+    (ha : r.allowDev? = none) (hs : r.suspend? = none) (hb : r.bundler? = none) (ht : r.target? = none)
+    (hpath : pathLike src = true) (hlean : src.endsWith ".lean" = true) (hjson : src.endsWith ".json" = false) :
+    finish env r [src] = .ok { r with input? := some src, profile? := some (r.profile?.getD "dev") } := by
+  unfold finish
+  cases r.profile? <;> simp [hc, ho, ha, hs, hb, ht, hpath, hlean, hjson]
+
+theorem run_args_kept : Spec.run_args_kept := by
+  intro src flags args hlean hdash hflags
+  have suffix := endsWith_iff.mp hlean
+  have hpath : pathLike src = true := by
+    rw [pathLike, List.any_eq_true]
+    exact ⟨'.', suffix.subset (by simp), by decide⟩
+  have hjson : src.endsWith ".json" = false := by
+    rw [Bool.eq_false_iff]; intro h
+    have := List.suffix_of_suffix_length_le suffix (endsWith_iff.mp h) (by simp)
+    have := this.eq_of_length (by simp)
+    simp at this
+  have notWord : ∀ w : String, ¬ ".lean".toList <:+ w.toList → src ≠ w := by rintro w h rfl; exact h suffix
+  let env : ArgumentsEnv := ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩
+  have hprog : parseLasmArguments (flags ++ [src, "--"] ++ args) =
+      parseLasmArgumentsWith.program env parseLasmArgumentsWith.start (flags ++ src :: "--" :: args) := by
+    cases flags with
+    | nil =>
+      simp [parseLasmArguments, parseLasmArgumentsWith, parseLasmArgumentsWith.rest, notWord "init" (by decide),
+        notWord "dev" (by decide), notWord "package" (by decide), notWord "editor" (by decide), notWord "cache" (by decide),
+        notWord "build" (by decide), notWord "run" (by decide)]
+      rfl
+    | cons f fs =>
+      have hf : f = "--rebuild" ∨ f = "--verbose" ∨ f = "--release" := by simpa using hflags f (by simp)
+      rcases hf with rfl | rfl | rfl <;>
+        simp [parseLasmArguments, parseLasmArgumentsWith, parseLasmArgumentsWith.rest] <;> rfl
+  have fields := runFlags_fields flags parseLasmArgumentsWith.start
+  rw [hprog, parseLasmArgumentsWith.program, optionLoop_runFlags _ _ _ flags _ hflags (Or.inl rfl),
+    optionLoop_source hdash _ args (by rw [fields.1]; rfl)]
+  obtain ⟨f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11⟩ := fields
+  dsimp only
+  rw [finish_run env { runFlags parseLasmArgumentsWith.start flags with args? := some args } f1 f4 f5 f6 f7 f8 hpath hlean hjson]
+  refine ⟨_, rfl, f1, rfl, rfl, ?_, ?_, ?_⟩
+  · simp only [Parsed.rebuild, f9]; split <;> simp_all [parseLasmArgumentsWith.start]
+  · simp only [Parsed.verbose, f10]; split <;> simp_all [parseLasmArgumentsWith.start]
+  · simp only [Parsed.profile, f11]; split <;> simp_all [parseLasmArgumentsWith.start]
+
 end Lasm.Cli.Theorems

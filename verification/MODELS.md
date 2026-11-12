@@ -34,18 +34,19 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**137 shipped modules**: 4 modelled, 34 pending, 99 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 34 modules still need a model.
+**137 shipped modules**: 5 modelled, 33 pending, 99 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 33 modules still need a model.
 
-### Modelled (4)
+### Modelled (5)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
+| [`src/cli-arguments.mjs`](../src/cli-arguments.mjs) | [CliArguments.lean](../verification/cli/Lasm/Cli/Model/CliArguments.lean) (`asciiLower`, `editDistance`, `closest`, `targetHint`, `parseLasmArguments`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole parser is modelled (run_args_kept, unknown_flag_refused, edit_distance_metric, closest_nearest_first proved); what it imports is a parameter: the parsers of lasm init, dev and package are their modules, existsSync and jsRuntime the environment. Candidates build_options_commute and parse_known_or_refused remain |
 | [`src/edge/builtin-modules.mjs`](../src/edge/builtin-modules.mjs) | [BuiltinModules.lean](../verification/cli/Lasm/Cli/Model/BuiltinModules.lean) (`isBuiltinModule`, `builtinModuleClosure`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the closure is modelled, with the import forms it reads checked by the differential; `builtinModuleNames` and `builtinModuleFile` look a name up in the builtin directory (test/builtin-modules.test.mjs) |
 | [`src/edge/edge-initializers.mjs`](../src/edge/edge-initializers.mjs) | [EdgeInitializers.lean](../verification/cli/Lasm/Cli/Model/EdgeInitializers.lean) (`initializationSchedule`, `compactInitializerWrappers`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | both of its functions are modelled; the module does nothing else |
 | [`src/serverless/lasm-lambda.mjs`](../src/serverless/lasm-lambda.mjs) | [Model.lean](../library/Lasm/Serverless/Proofs/Model.lean) (`query`, `rawQuery`, `headerPairs`, `decode`, `handler`, `cloudFront`; [serverless-http.mjs](../test/fuzz/targets/serverless-http.mjs)) | the request and response mapping is modelled; the rest forwards over loopback |
 | [`src/serverless/lasm-server.mjs`](../src/serverless/lasm-server.mjs) | [Model.lean](../library/Lasm/Serverless/Proofs/Model.lean) (`requestTarget`, `plainHost`, `joinCookies`, `outgoingHeaders`, `isTextual`, `webReply`, `parseSetCookie`, `azureReply`; [serverless-http.mjs](../test/fuzz/targets/serverless-http.mjs)) | the HTTP mapping is modelled; the rest starts the program and forwards over loopback |
 
-### Pending (34)
+### Pending (33)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -59,7 +60,6 @@ How a module moves from pending to modelled:
 | [`src/application-symbols.mjs`](../src/application-symbols.mjs) | — | symbol selection for weak COMDAT definitions: pure over symbol tables |
 | [`src/browser/bundle.mjs`](../src/browser/bundle.mjs) | — | an ES-module bundler for the loader: a pure text transformation |
 | [`src/browser/static-server.mjs`](../src/browser/static-server.mjs) | — | request path to file resolution (candidate static_inside_root): model the resolution |
-| [`src/cli-arguments.mjs`](../src/cli-arguments.mjs) | — | the command-line parser: pure (candidates run_args_kept, build_options_commute, unknown_flag_refused, parse_known_or_refused, edit_distance_metric, closest_nearest_first) |
 | [`src/dev.mjs`](../src/dev.mjs) | [Dev.lean](../verification/cli/Lasm/Cli/Model/Dev.lean) (`changedFiles`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | `lasm dev`: argument parsing and build scheduling remain to model; the rest watches files and runs builds |
 | [`src/edge/edge-js.mjs`](../src/edge/edge-js.mjs) | — | Lasm.JS host operations and the value codec's JavaScript half for the edge profile; the Node copy is checked against Lean's codec (lasm-js-wire), this one not yet (IRREDUCIBLE.md M4) |
 | [`src/edge/lasm_js_edge.c`](../src/edge/lasm_js_edge.c) | — | Lasm.JS C glue for the edge profile, as library/c/lasm_js.c (IRREDUCIBLE.md M4) |

@@ -25,39 +25,20 @@ open Lasm.Cli
 
 /-! ## The command line -/
 
-/-- **Application arguments after `--` come back unchanged.** Running a
-`.lean` file with any of `--rebuild`, `--verbose` and `--release` before it
-parses as `run` of that file, with exactly the arguments after `--` (flags,
-empty strings and `--` included) and each option as given.
-Tested by: test/cli-parse.test.mjs -/
-def run_args_kept : Prop :=
-  ∀ (src : String) (flags args : List String), src.endsWith ".lean" → ¬ src.startsWith "-" →
-    (∀ f ∈ flags, f ∈ ["--rebuild", "--verbose", "--release"]) →
-    ∃ p, parseLasmArguments (flags ++ [src, "--"] ++ args) = .ok p ∧
-      p.command = "run" ∧ p.input = src ∧ p.args = args ∧
-      p.rebuild = flags.contains "--rebuild" ∧ p.verbose = flags.contains "--verbose" ∧
-      p.profile = (if flags.contains "--release" then "release" else "dev")
-
 /-- **Build options mean the same in any order and either form.** When
-`lasm build` accepts a set of distinct options, it accepts every reordering
-of them, with any valued option written `--flag=value` instead of
-`--flag value`, and parses it the same.
+`lasm build` accepts a set of distinct options with at most one input and
+no `--help`, it accepts every reordering of them, with any valued option
+written `--flag=value` instead of `--flag value`, and parses it the same.
+(`--help` stops at once, before an error after it; two positional words
+are the input and the output, in that order.)
 Tested by: test/cli-parse.test.mjs -/
 def build_options_commute : Prop :=
-  ∀ (opts opts' : List (List String)) (forms : List Bool), (∀ o ∈ opts, OptionGroup o) →
+  ∀ (opts opts' : List (List String)) (forms : List Bool), (∀ o ∈ opts, OptionGroup o ∧ o ≠ ["--help"] ∧ o ≠ ["-h"]) →
+    (opts.filter fun o => o.length == 1 && !(o.headD "").startsWith "-").length ≤ 1 →
     (opts.map List.head?).Nodup → opts.Perm opts' → forms.length = opts'.length →
     (parseLasmArguments ("build" :: opts.flatten)).isOk = true →
     parseLasmArguments ("build" :: ((opts'.zip forms).map fun (o, j) => if j then joined o else o).flatten) =
       parseLasmArguments ("build" :: opts.flatten)
-
-/-- **Every unknown flag is refused by name.** A word that starts with `-`
-and is no option of `lasm build` or of running a program is refused, after
-a program and before one, with a message that names it.
-Tested by: test/cli-parse.test.mjs -/
-def unknown_flag_refused : Prop :=
-  ∀ flag : String, flag.startsWith "-" → flag ∉ knownFlags → valuedForm flag = false →
-    parseLasmArguments ["Main.lean", flag] = .error ("Unknown Lasm option: " ++ flag ++ ". Application arguments must follow --.") ∧
-    parseLasmArguments ["build", flag, "Main.lean"] = .error ("Unknown Lasm option: " ++ flag ++ ". Application arguments must follow --.")
 
 /-- **Every parse is a known command, or a readable error.** Whatever the
 arguments, the parser either names a command Lasm has, with a build target,
@@ -74,27 +55,6 @@ def parse_known_or_refused : Prop :=
         (p.command = "package" → p.target ∈ packageTargets ∨ p.target = "browser") ∧
         (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
     | .error m => m.trimAscii.toString ≠ ""
-
-/-- **Edit distance is a metric bounded by the lengths.** It is zero exactly
-between equal words, symmetric, satisfies the triangle inequality, is the
-length from or to the empty word, and lies between the difference of the
-lengths and the larger length.
-Tested by: test/cli-parse.test.mjs -/
-def edit_distance_metric : Prop :=
-  ∀ a b c : String,
-    editDistance a a = 0 ∧ editDistance a "" = a.length ∧ editDistance "" a = a.length ∧
-    editDistance a b = editDistance b a ∧ editDistance a c ≤ editDistance a b + editDistance b c ∧
-    a.length - b.length ≤ editDistance a b ∧ b.length - a.length ≤ editDistance a b ∧
-    editDistance a b ≤ max a.length b.length ∧ (a ≠ b → 0 < editDistance a b)
-
-/-- **A suggestion is the nearest candidate, within reach.** For lowercase
-words, `closest` gives the first candidate at the least edit distance, when
-that distance is within its threshold (two edits, or a third of its length),
-and nothing otherwise.
-Tested by: test/cli-parse.test.mjs -/
-def closest_nearest_first : Prop :=
-  ∀ (word : String) (cs : List String), word.all Char.isLower → (∀ c ∈ cs, c.all Char.isLower) →
-    closest word cs = (nearestFirst (editDistance word) cs).filter fun c => editDistance word c ≤ threshold c
 
 /-! ## The process launcher -/
 

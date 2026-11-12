@@ -25,9 +25,18 @@ answer are the JavaScript's, read as the model's types:
   builtinModuleClosure  {"imports": [["lasm:…", ["lasm:…", …]], …], "specifiers": […]}
                                                     → ["lasm:…", …]
 (initializer names are C identifiers, sent as JSON strings)
+  editDistance   {"a": "<hex>", "b": "<hex>"}       → <number>
+  closest        {"word": "<hex>", "candidates": ["<hex>", …]}  → "<hex>" | null
+  targetHint     "<hex>"                            → "<hex>"
+  parseLasmArguments  {"argv": ["<hex>", …], "existing": ["<hex>", …], "runtime": "node"}
+                                                    → {"parsed": {…}} | {"error": "<hex>"}
+(the parsed object has the fields the JavaScript's has, text fields as hex;
+`existing` are the paths `existsSync` finds; the parsers of `lasm init`,
+`lasm dev` and `lasm package` answer `{"error": hex "delegated:<command>"}`)
 -/
 import Lean.Data.Json
 import Lasm.Cli.Model.BuiltinModules
+import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.NodeHost
@@ -80,6 +89,23 @@ def strings (j : Json) : Except String (List String) := do
 def callsOf (j : Json) : Except String (List (String × List String)) := do
   (← j.getArr?).toList.mapM fun e => return (← (← e.getArrVal? 0).getStr?, ← strings (← e.getArrVal? 1))
 
+/-- A parse as the JavaScript's object: the fields present, text as hex. -/
+def ofParsed (p : Parsed) : Json :=
+  let field := fun (k : String) (v : Option Json) => v.map (k, ·)
+  Json.mkObj ([some ("command", toJson p.command),
+    field "rebuild" (p.rebuild?.map toJson), field "verbose" (p.verbose?.map toJson),
+    field "args" (p.args?.map fun a => toJson (a.map ofText)), field "profile" (p.profile?.map toJson),
+    field "allowDev" (p.allowDev?.map toJson), field "bundler" (p.bundler?.map toJson),
+    field "target" (p.target?.map toJson), field "suspend" (p.suspend?.map toJson),
+    field "output" (p.output?.map ofText), field "input" (p.input?.map ofText)].filterMap id)
+
+def ofResult : Except String Parsed → Json
+  | .ok p => Json.mkObj [("parsed", ofParsed p)]
+  | .error e => Json.mkObj [("error", ofText e)]
+
+def texts (j : Json) : Except String (List String) := do
+  (← j.getArr?).toList.mapM text
+
 def answer (j : Json) : Except String Json := do
   let input ← j.getObjVal? "input"
   match ← j.getObjValAs? String "model" with
@@ -109,6 +135,18 @@ def answer (j : Json) : Except String Json := do
       | .error e => Json.mkObj [("error", toJson e)]
   | "builtinModuleClosure" =>
     return toJson (builtinModuleClosure (← callsOf (← input.getObjVal? "imports")) (← strings (← input.getObjVal? "specifiers")))
+  | "editDistance" => return toJson (editDistance (← text (← input.getObjVal? "a")) (← text (← input.getObjVal? "b")))
+  | "closest" =>
+    return match closest (← text (← input.getObjVal? "word")) (← texts (← input.getObjVal? "candidates")) with
+      | some c => ofText c
+      | none => Json.null
+  | "targetHint" => return ofText (targetHint (← text input))
+  | "parseLasmArguments" =>
+    let existing ← texts (← input.getObjVal? "existing")
+    let delegated := fun (c : String) (_ : List String) => (Except.error ("delegated:" ++ c) : Except String Parsed)
+    let runtime ← (← input.getObjVal? "runtime").getStr?
+    let env : ArgumentsEnv := ⟨fun f => existing.contains f, runtime, delegated "init", delegated "dev", delegated "package"⟩
+    return ofResult (parseLasmArgumentsWith env (← texts (← input.getObjVal? "argv")))
   | m => throw s!"no model {m}"
 
 def main : IO Unit := do

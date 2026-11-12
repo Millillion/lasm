@@ -194,8 +194,21 @@
       "reason": "`lasm cache repair`; orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
     },
     "src/cli-arguments.mjs": {
-      "status": "pending",
-      "reason": "the command-line parser: pure (candidates run_args_kept, build_options_commute, unknown_flag_refused, parse_known_or_refused, edit_distance_metric, closest_nearest_first)"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/CliArguments.lean",
+          "functions": [
+            "asciiLower",
+            "editDistance",
+            "closest",
+            "targetHint",
+            "parseLasmArguments"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "the whole parser is modelled (run_args_kept, unknown_flag_refused, edit_distance_metric, closest_nearest_first proved); what it imports is a parameter: the parsers of lasm init, dev and package are their modules, existsSync and jsRuntime the environment. Candidates build_options_commute and parse_known_or_refused remain"
     },
     "src/dev-build-service.mjs": {
       "status": "exempt",
