@@ -334,8 +334,17 @@
       "reason": "a timer thread writing to the terminal"
     },
     "src/handle-table.mjs": {
-      "status": "pending",
-      "reason": "host handle IDs in the positive i32 range: a small pure allocator"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/HandleTable.lean",
+          "functions": [
+            "HandleTable (constructor, allocate, and the Map's set and delete)"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "the allocator is modelled; handle_fresh_in_range proved"
     },
     "src/init.mjs": {
       "status": "pending",

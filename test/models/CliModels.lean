@@ -30,6 +30,8 @@ answer are the JavaScript's, read as the model's types:
                   "inheritProcessCwd": b, "setsid": b, "envBytes": [["<hex>", "<hex>"], …] | null}
                                                     → {"bytes": "<hex>"} | {"error": "…"}
   launcherRead   "<hex>"  → null (refused) | {"stdio": [n, n, n], "argv": ["<hex>", …], "environ": ["<hex of k=v>", …]}
+  HandleTable    {"first": "<int>", "last": "<int>", "entries": [[n, "v"], …], "ops": [["allocate", "v"] | ["delete", n] | ["set", n, "v"], …]}
+                 → {"error": "…"} | {"results": [n | "full" | null, …], "entries": [[n, "v"], …]}
 (the environment as `setenv` builds it from the pairs read, after `clearenv`:
 a name that is empty or holds `=` is refused, a repeated name is replaced in place)
   initializationSchedule  {"name": "…", "calls": [["…", ["…", …]], …], "keep": ["…", …]}
@@ -53,6 +55,7 @@ import Lasm.Cli.Model.BuiltinModules
 import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
+import Lasm.Cli.Model.HandleTable
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.ProcessLauncher
@@ -196,6 +199,23 @@ def answer (j : Json) : Except String Json := do
         let hexL := fun (l : List UInt8) => toJson (hex ⟨l.toArray⟩)
         Json.mkObj [("stdio", toJson c.stdio), ("argv", toJson (c.argv.map hexL)),
           ("environ", toJson ((setenvAll c.env).map fun (k, v) => hexL (k ++ [61] ++ v)))]
+  | "HandleTable" =>
+    let pair := fun (e : Json) => do return ((← (← e.getArrVal? 0).getNat?), (← (← e.getArrVal? 1).getStr?))
+    let entries ← (← (← input.getObjVal? "entries").getArr?).toList.mapM pair
+    match HandleTable.create (← integer (← input.getObjVal? "first")) (← integer (← input.getObjVal? "last")) entries with
+    | .error e => return Json.mkObj [("error", toJson e)]
+    | .ok t =>
+      let mut t := t
+      let mut results : Array Json := #[]
+      for op in (← (← input.getObjVal? "ops").getArr?) do
+        match ← (← op.getArrVal? 0).getStr? with
+        | "allocate" =>
+          match t.allocate (← (← op.getArrVal? 1).getStr?) with
+          | .ok (id, t') => t := t'; results := results.push (toJson id)
+          | .error _ => results := results.push (toJson "full")
+        | "delete" => t := t.delete (← (← op.getArrVal? 1).getNat?); results := results.push Json.null
+        | _ => t := t.set (← (← op.getArrVal? 1).getNat?) (← (← op.getArrVal? 2).getStr?); results := results.push Json.null
+      return Json.mkObj [("results", toJson results), ("entries", toJson (t.entries.map fun (k, v) => Json.arr #[toJson k, toJson v]))]
   | "componentize" =>
     let field := fun (k : String) => do unhex (← (← input.getObjVal? k).getStr?)
     return ofBytes (componentize (← field "core") (← field "template"))

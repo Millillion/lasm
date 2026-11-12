@@ -1512,6 +1512,38 @@ theorem launcher_config_round_trip : Spec.launcher_config_round_trip := by
   rw [rp']
   simp [pure]
 
+/-! ## Host handles -/
+
+theorem allocateLoop_fresh (start : Nat) (value : String) : ∀ (fuel : Nat) (t t' : HandleTable) (id : Nat),
+    HandleTable.allocateLoop start value fuel t = .ok (id, t') →
+    t.has id = false ∧ t'.entries = t.entries ++ [(id, value)] ∧ t'.first = t.first ∧ t'.last = t.last ∧
+    (t.first ≤ t.next → t.next ≤ t.last → t.first ≤ id ∧ id ≤ t.last ∧ t'.first ≤ t'.next ∧ t'.next ≤ t'.last)
+  | 0, t, t', id, h => by simp [HandleTable.allocateLoop] at h
+  | fuel + 1, t, t', id, h => by
+    simp only [HandleTable.allocateLoop] at h
+    generalize hn : (if t.next = t.last then t.first else t.next + 1) = n at h
+    have hr : t.first ≤ t.next → t.next ≤ t.last → t.first ≤ n ∧ n ≤ t.last := by
+      intro a b; subst hn; split <;> omega
+    have hhas : ({ t with next := n } : HandleTable).has = t.has := rfl
+    rw [hhas] at h
+    by_cases hfree : t.has t.next = true
+    · simp only [hfree, Bool.not_true, Bool.false_eq_true, ↓reduceIte] at h
+      by_cases hs : n = start
+      · simp [hs] at h
+      · simp only [ne_eq, hs, not_false_eq_true, ↓reduceIte] at h
+        have := allocateLoop_fresh start value fuel _ t' id h
+        exact ⟨this.1, this.2.1, this.2.2.1, this.2.2.2.1, fun h1 h2 => this.2.2.2.2 (hr h1 h2).1 (hr h1 h2).2⟩
+    · simp only [Bool.not_eq_true] at hfree
+      simp only [hfree, Bool.not_false, ↓reduceIte, Except.ok.injEq, Prod.mk.injEq] at h
+      obtain ⟨rfl, rfl⟩ := h
+      have hset : ({ t with next := n } : HandleTable).set t.next value = { t with next := n, entries := t.entries ++ [(t.next, value)] } := by
+        simp [HandleTable.set, hhas, hfree]
+      rw [hset]
+      exact ⟨hfree, rfl, rfl, rfl, fun h1 h2 => ⟨h1, h2, (hr h1 h2).1, (hr h1 h2).2⟩⟩
+
+theorem handle_fresh_in_range : Spec.handle_fresh_in_range :=
+  fun t t' _ id h => allocateLoop_fresh _ _ _ t t' id h
+
 /-! ## Function packages -/
 
 theorem zip_deterministic : Spec.zip_deterministic := fun _ => rfl

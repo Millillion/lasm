@@ -31,6 +31,7 @@ import Lasm.Cli.Model.BuiltinModules
 import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
+import Lasm.Cli.Model.HandleTable
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.ProcessLauncher

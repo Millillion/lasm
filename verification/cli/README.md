@@ -58,9 +58,9 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**14 proved propositions (86 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**15 proved propositions (88 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
-## Lasm.Cli (14)
+## Lasm.Cli (15)
 
 ### The command line
 
@@ -105,11 +105,17 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | --- | --- |
 | [`launcher_config_round_trip`](Lasm/Cli/Spec.lean#L168) | **The launcher configuration round-trips.** For options whose texts have no NUL byte and fit the format (under 4 GiB), `encodeProcessConfiguration` succeeds and the native launcher reads back exactly the flags, the three stdio flags, both directories, the command and arguments as its argument vector, and the environment's pairs in order (as UTF-8 bytes). Tested by: test/cli-helpers.test.mjs |
 
+### Host handles
+
+| Proposition | In plain English |
+| --- | --- |
+| [`handle_fresh_in_range`](Lasm/Cli/Spec.lean#L186) | **A host handle is fresh and in range.** When `allocate` gives an id, the table did not hold it and now holds it, with the value, after every entry it had, and the range stays; the id lies in the range, and `#next` stays in it, whenever `#next` was in it (as the constructor starts it). Tested by: test/handle-table.test.mjs |
+
 ### Function packages
 
 | Proposition | In plain English |
 | --- | --- |
-| [`zip_deterministic`](Lasm/Cli/Spec.lean#L186) | **`zip` is deterministic.** The archive depends on the entries alone (no clock, no host state). Of the model, a Lean function, this holds by `rfl`; it is the assumption the model makes, which the test checks of the JavaScript. Tested by: test/serverless-zip.test.mjs |
+| [`zip_deterministic`](Lasm/Cli/Spec.lean#L198) | **`zip` is deterministic.** The archive depends on the entries alone (no clock, no host state). Of the model, a Lean function, this holds by `rfl`; it is the assumption the model makes, which the test checks of the JavaScript. Tested by: test/serverless-zip.test.mjs |
 <!-- END PROPOSITIONS -->
 
 ## Candidates

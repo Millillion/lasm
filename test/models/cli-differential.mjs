@@ -28,6 +28,7 @@ import { numbers } from '../../src/node-host.mjs';
 import { responseFile } from '../../src/platform.mjs';
 import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 import { zip } from '../../src/serverless/zip.mjs';
+import { HandleTable } from '../../src/handle-table.mjs';
 import { encodeProcessConfiguration } from '../../src/process-launcher.mjs';
 import { deflateRawSync, crc32 } from 'node:zlib';
 import { compactInitializerWrappers, initializationSchedule } from '../../src/edge/edge-initializers.mjs';
@@ -352,6 +353,27 @@ export const models = [
     generate: launcherConfig,
     input: bytes => hexOf(bytes),
     js: runLauncher,
+  },
+  {
+    name: 'HandleTable', source: 'src/handle-table.mjs', lean: 'Lasm.Cli.Model.HandleTable',
+    generate: r => {
+      const first = r.next() < 0.1 ? r.pick([0, -1, 0x7fffffff, 0x80000000]) : r.next() < 0.1 ? 0x7ffffffd : r.int(1, 6);
+      const last = r.next() < 0.1 ? r.pick([0x7fffffff, 0x80000000, first - 1]) : first + r.int(0, 4);
+      const key = () => Math.max(0, r.pick([first, first + 1, last, 0, 1, 2, r.int(0, 12)]));
+      return { first, last, entries: r.array(r.int(0, 3), () => [key(), r.pick(['x', 'y'])]),
+        ops: r.array(r.int(0, 14), () => r.pick([() => ['allocate', r.pick(['a', 'b', 'c'])], () => ['allocate', 'd'], () => ['delete', key()], () => ['set', key(), 'e']])()) };
+    },
+    input: ({ first, last, entries, ops }) => ({ first: String(first), last: String(last), entries, ops }),
+    js: ({ first, last, entries, ops }) => {
+      let table;
+      try { table = new HandleTable({ first, last, entries }); } catch (error) { return { error: error.message }; }
+      const results = ops.map(([op, a, b]) => {
+        if (op === 'allocate') { try { return table.allocate(a); } catch (error) { assert.equal(error.code, 'EMFILE'); return 'full'; } }
+        if (op === 'delete') table.delete(a); else table.set(a, b);
+        return null;
+      });
+      return { results, entries: [...table.entries()] };
+    },
   },
   {
     name: 'withoutComponentType', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',

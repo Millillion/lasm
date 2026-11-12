@@ -181,6 +181,18 @@ def launcher_config_round_trip : Prop :=
         stdio := o.stdioFlags.map uint32Of, directory := o.directory.map utf8Bytes, requestedCwd := o.requestedCwd.map utf8Bytes,
         argv := (o.command :: o.args).map utf8Bytes, env := o.env.map fun (k, v) => (utf8Bytes k, utf8Bytes v) }
 
+/-! ## Host handles -/
+
+/-- **A host handle is fresh and in range.** When `allocate` gives an id,
+the table did not hold it and now holds it, with the value, after every
+entry it had, and the range stays; the id lies in the range, and `#next`
+stays in it, whenever `#next` was in it (as the constructor starts it).
+Tested by: test/handle-table.test.mjs -/
+def handle_fresh_in_range : Prop :=
+  ∀ (t t' : HandleTable) (value : String) (id : Nat), t.allocate value = .ok (id, t') →
+    t.has id = false ∧ t'.entries = t.entries ++ [(id, value)] ∧ t'.first = t.first ∧ t'.last = t.last ∧
+    (t.first ≤ t.next → t.next ≤ t.last → t.first ≤ id ∧ id ≤ t.last ∧ t'.first ≤ t'.next ∧ t'.next ≤ t'.last)
+
 /-! ## Function packages -/
 
 /-- **`zip` is deterministic.** The archive depends on the entries alone (no
