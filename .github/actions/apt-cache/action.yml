@@ -1,0 +1,62 @@
+name: Cached apt packages
+description: >-
+  Runs an apt install command so that the job does not depend on an apt mirror
+  being reachable: the .deb files the command installed are cached per runner
+  image (ImageOS, ImageVersion, architecture), the command and
+  scripts/ci/apt-cache.sh, and later runs install them with dpkg without the
+  network. Only a cache miss uses the mirror (with retries). A cache from an
+  older image version is tried first and kept when dpkg accepts it. Not Linux:
+  the command runs as is. Caches are saved on main only. The calling step
+  sets timeout-minutes.
+  docs/CI.md#apt-packages.
+inputs:
+  name:
+    description: A short name for the package set (part of the cache key)
+    required: true
+  run:
+    description: The bash command that installs the packages from the apt mirror
+    required: true
+  attempts:
+    description: How many times to run the command on a cache miss
+    default: '3'
+runs:
+  using: composite
+  steps:
+    - name: The cache key (runner image, package set)
+      id: key
+      shell: bash
+      env:
+        NAME: ${{ inputs.name }}
+        RUN: ${{ inputs.run }}
+      run: |
+        name=$(printf %s "$NAME" | tr -c 'A-Za-z0-9._-' '-')
+        hash=$( { printf %s "$RUN"; cat "$GITHUB_WORKSPACE/scripts/ci/apt-cache.sh"; } | sha256sum | cut -c1-16)
+        prefix="apt-debs-${ImageOS:-none}-${RUNNER_ARCH}-${name}-${hash}-"
+        echo "prefix=$prefix" >> "$GITHUB_OUTPUT"
+        echo "key=${prefix}${ImageVersion:-none}" >> "$GITHUB_OUTPUT"
+        echo "dir=$RUNNER_TEMP/apt-debs/$name" >> "$GITHUB_OUTPUT"
+    - name: Restore the .deb files
+      if: runner.os == 'Linux'
+      id: restore
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.key.outputs.dir }}
+        key: ${{ steps.key.outputs.key }}
+        restore-keys: ${{ steps.key.outputs.prefix }}
+    - name: Install (cached .deb files, else the apt mirror)
+      id: install
+      shell: bash
+      env:
+        CACHE_HIT: ${{ steps.restore.outputs.cache-hit }}
+        RUN: ${{ inputs.run }}
+      run: bash "$GITHUB_WORKSPACE/scripts/ci/apt-cache.sh" "${{ steps.key.outputs.dir }}" "${{ inputs.attempts }}" -- bash -eo pipefail -c "$RUN"
+    # Saved on main only: a pull request's cache is readable by that pull
+    # request alone, so it would only take room in the cache budget
+    # (scripts/ci/cache-budget.mjs). Pull requests restore main's caches.
+    - name: Save the .deb files
+      if: runner.os == 'Linux' && steps.install.outputs.save == 'true' && github.ref == 'refs/heads/main'
+      continue-on-error: true
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ steps.key.outputs.dir }}
+        key: ${{ steps.key.outputs.key }}

@@ -4,6 +4,16 @@
 // deploy targets are ones Lasm has (own keys, never inherited ones such as
 // `constructor`), or a plain Error with a readable message (no TypeError,
 // no "[native code]" or "[object Object]" in it). Never a stack trace.
+// Proposition: Lasm.Cli.Candidates.parse_known_or_refused
+//   ∀ argv : List String,
+//     match parseLasmArguments argv with
+//     | .ok p => p.command ∈ commands ∧
+//         (p.command = "build" → p.target ∈ buildTargets) ∧
+//         ((p.command = "build" ∨ p.command = "run") → p.input.endsWith ".lean" ∨ p.input.endsWith ".json") ∧
+//         (p.command = "init" → p.template ∈ templates ∧ ∀ d ∈ p.deploy, d ∈ deployTargets) ∧
+//         (p.command = "package" → p.target ∈ packageTargets ∨ p.target = "browser") ∧
+//         (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
+//     | .error m => m.trimAscii.toString ≠ ""
 import { parseLasmArguments, buildTargets } from '../../../src/cli-arguments.mjs';
 import { templates, deployTargets } from '../../../src/init.mjs';
 import { packageTargets } from '../../../src/package.mjs';

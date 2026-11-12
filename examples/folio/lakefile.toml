@@ -30,3 +30,10 @@ root = "Cli"
 # Lasm's library (Lasm.UI), which `npm run proofs` provides.
 [[lean_lib]]
 name = "Preview"
+
+# The servers' HTTP layer (requests and responses, embedded static files) and
+# each platform's own server: Lasm.JS.Web with Node's @hono/node-server,
+# Bun.serve, Deno.serve and the edge's default export; Lasm.Fastly. Lasm
+# builds it with PreviewServer.lean and ServerEdge.lean, the programs.
+[[lean_lib]]
+name = "Server"

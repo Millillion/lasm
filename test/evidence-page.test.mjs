@@ -1,9 +1,10 @@
 // The public test-evidence page (scripts/evidence/page.mjs, docs/TESTING.md#the-test-evidence-page).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { benchmarks, campaignStreak, exitBar, matrixList, PAGE, parse, proofCounts, renderPage, repositoryFacts, summarize } from '../scripts/evidence/page.mjs';
+import { appPlatforms, appResults, benchmarks, campaignStreak, exitBar, generatorGaps, matrixList, PAGE, parse, proofCounts, quarantineHistory, renderPage, repositoryFacts, summarize } from '../scripts/evidence/page.mjs';
+import { evaluate } from '../scripts/evidence/levels.mjs';
 import { checkPage } from '../scripts/content/index.mjs';
 import { splitFrontMatter } from '../scripts/content/frontmatter.mjs';
 
@@ -41,6 +42,10 @@ test('job logs: the line each tool prints', () => {
   assert.deepEqual(parse.mutation(`${t}ui-dom: 93.6 % of 758 mutants (threshold 92 %) {"Killed":689}`), { module: 'ui-dom', score: 93.6, mutants: 758, threshold: 92 });
   assert.deepEqual(parse.differential(`${t}80 programs, 9500 cases, 0 divergences, 0 upstream suspects (native vs interpreter, not Lasm), 0 harness errors (summary: x)\n${t}0 programs, 0 cases, 1 divergences, 0 upstream suspects (native vs interpreter, not Lasm), 0 harness errors`),
     { programs: 80, cases: 9500, divergences: 1, harnessErrors: 0 });
+  // A guided campaign (scripts/differential/run.mjs --guided 1) adds its coverage lines.
+  assert.deepEqual(parse.differential(`${t}coverage growth by campaign: 2026-11-10 +900 (900), 2026-11-11 +120 (1020)\n${t}coverage: 2400 features (2300 runtime C, 100 glue), 120 new (110 runtime C, 10 glue; 70 from mutants, 50 from generated cases), 1020 in all campaigns, corpus 300 cases, 400 mutants run\n${t}50 programs, 6000 cases, 0 divergences, 0 upstream suspects (x), 0 harness errors`).coverage,
+    { features: 2400, runtimeC: 2300, glue: 100, new: 120, newRuntimeC: 110, newGlue: 10, newFromMutants: 70, newFromGenerated: 50, cumulative: 1020, corpus: 300, mutants: 400,
+      nights: [{ date: '2026-11-10', new: 900, cumulative: 900 }, { date: '2026-11-11', new: 120, cumulative: 1020 }] });
   assert.deepEqual(parse.fuzz(`${t}fuzz lean-rpc (600 s, seed 42)\n${t}ok   lean-rpc: 123456 runs, 900 edges`), { seconds: 600, seed: 42, runs: 123456, ok: true });
   assert.equal(parse.fuzz(`${t}FAIL ui-patch: 77 runs, 1/2 blocks`).ok, false);
   assert.deepEqual(parse.dst(`${t}tandem: 812 seeds, all passed (1200.1 s)\n${t}tandem: 2 failing seed(s) of 301: 5, 9 (600.0 s)`),
@@ -69,7 +74,7 @@ test('with CI results, each measured fact links its run, and failures show', () 
     mutation: { run: run(5, 'failure'), modules: [job('module (ui-dom)', 'failure', { module: 'ui-dom', score: 80.5, mutants: 700, threshold: 92 })] },
     fuzz: { run: run(6), targets: [job('Fuzz lean-rpc', 'success', { seconds: 600, runs: 1234567, seed: 7 })] },
     dst: { run: run(7), apps: [job('tandem, random seeds', 'success', { seeds: 900, failing: 0 })] },
-    differential: { run: run(8), jobs: [job('differential (release)', 'success', { programs: 80, cases: 9500, divergences: 0 })] },
+    differential: { run: run(8), jobs: [job('differential (release)', 'success', { programs: 80, cases: 9500, divergences: 0, coverage: { features: 2400, new: 120, newFromMutants: 70, nights: [{ date: '2026-11-11', new: 120, cumulative: 1020 }] } })] },
     equivalence: { fetch: { run: run(9), jobs: [job('equivalence (fetch-example)')] }, conduit: { run: run(10), jobs: [job('API on Node 24')] }, conduitPlatforms: { run: null, jobs: [] } },
   };
   const summary = summarize(repo, ci, at);
@@ -81,7 +86,9 @@ test('with CI results, each measured fact links its run, and failures show', () 
   assert.match(page, /\| \[`ci-weekly\.yml`\]\(\.\.\/\.\.\/\.github\/workflows\/ci-weekly\.yml\) \| soak \| no run yet \| — \|/);
   assert.match(page, /\| lean-rpc \| 600 \| 1,234,567 \| 7 \| \[passed\]\(/);
   assert.match(page, /\| tandem \| 900 \| 0 \| \[passed\]\(/);
-  assert.match(page, /\| differential \(release\) \| 80 \| 9,500 \| 0 \|/);
+  assert.match(page, /\| differential \(release\) \| 80 \| 9,500 \| 0 \| 2,400 \(\+120\) \|/);
+  assert.match(page, /Coverage growth by campaign .*\(release\): 2026-11-11 \+120 \(1,020\)/);
+  assert.match(summary.exitBar[7].measured, /coverage feedback: the latest nightly campaign reached 2,400 features in \(release\) \(120 new, 70 of them by mutants of the corpus\)/);
   assert.match(page, /Latest nightly run: \[2026-11-07\]\(https:\/\/github\.com\/Millillion\/lasm\/actions\/runs\/5\), failed\./);
   assert.doesNotMatch(page, /CI results were not read/);
 });
@@ -117,25 +124,45 @@ test('campaigns: consecutive clean nights, Sundays left out, ended by a failure,
 });
 
 test('the exit bar: each of the eight items from the repository and CI, met only when all of it holds', () => {
-  const repo = { ...repositoryFacts(), quarantine: [], modelDifferentials: ['serverless-http', 'ui-decode', 'lasm-js-wire'], featureGenerator: true,
+  const repo = { ...repositoryFacts(), quarantine: [], quarantineHistory: { days: 14, since: '2026-10-27', commits: 0, entries: [] }, modelDifferentials: ['serverless-http', 'ui-decode', 'lasm-js-wire'], featureGenerator: true,
     mutationModules: ['a', 'b'], propositions: { proved: 5, candidates: 2, citations: 4, problems: 0, oracles: { named: 2, total: 2, unnamed: [] }, properties: { named: 1, total: 1, unnamed: [] } } };
   const platform = (id, level) => ({ id, row: id, level, levels: {} });
   const ci = {
     platforms: [platform('node', 3), platform('workers', 3), platform('browser', 3), platform('lambda', 2)],
     mutation: { run: run(1), modules: [job('module (a)', 'success', { module: 'a', score: 91 }), job('module (b)', 'success', { module: 'b', score: 80 })] },
-    coverage: { run: run(2), jobs: [job('unit / unit', 'success', { lines: 80.5, files: 140 })] },
+    coverage: { run: run(2), jobs: [job('unit / unit', 'success', { lines: 80.5, files: 140, zeroFiles: 2, zeroNamed: 2, zeroUnnamed: [] })] },
     campaigns: { nights: 30, endedOn: null, why: 'no older runs', run: null },
+    apps: [{ app: 'conduit', oracle: 'RealWorld', claims: [{ row: 'Node', ok: true }, { row: 'Bun', ok: true }] }],
   };
   const status = (r, c) => exitBar(r, c).map(x => x.status);
-  assert.deepEqual(status(repo, ci), ['met', 'met', 'partly met', 'met', 'partly met', 'not measured', 'met', 'partly met']);
+  assert.deepEqual(status(repo, ci), ['met', 'met', 'met', 'met', 'met', 'met', 'met', 'met']);
+  // 8: the generator generates every feature the bar names (TESTING_STRATEGY.md §2), else only partly.
+  assert.deepEqual(repo.generatorGaps, []);
+  assert.equal(status({ ...repo, generatorGaps: ['Thunk'] }, ci)[7], 'partly met');
+  assert.match(exitBar({ ...repo, generatorGaps: ['ST', 'structures with many fields'] }, ci)[7].measured, /not generated yet: `ST`, structures with many fields$/);
+  assert.match(exitBar(repo, ci)[7].measured, /generated: `Thunk`, `ST`, `FloatArray`, structures with many fields$/);
+  assert.deepEqual(generatorGaps('structure A where\n  f0 : Nat\ndef x := Thunk.mk'), ['ST', 'FloatArray', 'structures with many fields']);
   assert.deepEqual(exitBar(repo, ci).map(x => x.item), [1, 2, 3, 4, 5, 6, 7, 8]);
   // Each item fails on its own.
   const worse = status({ ...repo, quarantine: [{ since: '2026-11-09' }], modelDifferentials: ['serverless-http'],
     propositions: { ...repo.propositions, properties: { named: 0, total: 1, unnamed: ['x'] } } },
   { ...ci, platforms: [platform('node', 3), platform('workers', 2), platform('browser', 3), platform('lambda', -1)],
     mutation: { run: run(1), modules: [job('module (a)', 'failure', { module: 'a' })] }, coverage: { run: run(2), jobs: [job('unit / unit', 'success', { lines: 70, files: 140 })] },
-    campaigns: { nights: 3, endedOn: '2026-11-06', why: 'dst-nightly.yml failure' } });
-  assert.deepEqual(worse, ['not met', 'not met', 'not met', 'not met', 'not met', 'not measured', 'not met', 'not met']);
+    campaigns: { nights: 3, endedOn: '2026-11-06', why: 'dst-nightly.yml failure' },
+    apps: [{ app: 'conduit', claims: [{ row: 'Node', ok: true }, { row: 'Bun', ok: false, unmet: ['x'] }] }] });
+  assert.deepEqual(worse, ['not met', 'not met', 'not met', 'not met', 'not met', 'not met', 'not met', 'not met']);
+  // 3: a 0 % file nobody names fails it; a log without the 0 % line only partly meets it.
+  const coverage = extra => ({ ...ci, coverage: { run: run(2), jobs: [job('unit / unit', 'success', { lines: 80.5, files: 140, ...extra })] } });
+  assert.equal(exitBar(repo, coverage({ zeroFiles: 3, zeroNamed: 2, zeroUnnamed: ['src/x.mjs'] }))[2].status, 'not met');
+  assert.match(exitBar(repo, coverage({ zeroFiles: 3, zeroNamed: 2, zeroUnnamed: ['src/x.mjs'] }))[2].measured, /1 of 3 files at 0 % are not named .*src\/x\.mjs/);
+  assert.equal(exitBar(repo, coverage({}))[2].status, 'partly met');
+  // 5: quarantined in the window, or the window not read.
+  const flakes = history => exitBar({ ...repo, quarantineHistory: history }, ci)[4];
+  assert.deepEqual([flakes({ days: 14, since: '2026-10-27', commits: 2, entries: [{ file: 'test/a.test.mjs', name: 'x' }] }).status, flakes(null).status], ['not met', 'partly met']);
+  assert.match(flakes({ days: 14, since: '2026-10-27', commits: 2, entries: [{ file: 'test/a.test.mjs', name: 'x' }] }).measured, /1 was in the last 14 days \(test\/a\.test\.mjs › x\)/);
+  // 6: which claim fails.
+  assert.match(exitBar(repo, { ...ci, apps: [{ app: 'porter', claims: [{ row: 'Node', ok: true }, { row: 'Docker', ok: false }] }] })[5].measured, /^1 of 2 claimed platforms of 1 apps .*\(not: porter on Docker\)/);
+  assert.equal(exitBar(repo, { ...ci, apps: [] })[5].status, 'not measured');
   const rows = exitBar(repo, { ...ci, platforms: [platform('lambda', -1), platform('node', 2)] });
   assert.match(rows[0].measured, /^1 of 2 platforms at L2 or higher \(not: lambda\); at L3: 0 of 3/);
   assert.equal(status({ ...repo, featureGenerator: false }, ci)[7], 'not met');
@@ -145,4 +172,59 @@ test('the exit bar: each of the eight items from the repository and CI, met only
   const page = renderPage(summarize(repo, null, at));
   assert.ok(page.indexOf('## The exit bar') < page.indexOf('## Platforms'));
   assert.match(page, /\| 7 \| Propositions \| \*\*met\*\* \| the lint is green; 2 of 2 fuzz oracles and 1 of 1 properties name a proposition; 2 candidates, 5 proved propositions \|/);
+});
+
+test('quarantine history: every entry in force during the window, from the file\'s git history', () => {
+  const day = 86_400_000, now = Date.parse('2026-11-11T12:00:00Z');
+  const versions = {
+    a: { at: now - 20 * day, tests: [{ file: 'test/old.test.mjs', name: 'old' }] },           // in force when the window opened
+    b: { at: now - 10 * day, tests: [] },                                                       // removed inside it
+    c: { at: now - 30 * day, tests: [{ file: 'test/older.test.mjs', name: 'older' }] },       // replaced before the window
+  };
+  const git = args => {
+    if (args[0] === 'rev-parse') return 'false\n';
+    if (args[0] === 'log') return ['b', 'a', 'c'].map(sha => `${sha} ${versions[sha].at / 1000}`).join('\n') + '\n';
+    if (args[0] === 'show') return JSON.stringify({ tests: versions[args[1].split(':')[0]].tests });
+    throw new Error(args.join(' '));
+  };
+  assert.deepEqual(quarantineHistory({ now, git }), { days: 14, since: '2026-10-28', commits: 1,
+    entries: [{ file: 'test/old.test.mjs', name: 'old', since: null, issue: null }] });
+  versions.a.tests = [];
+  assert.deepEqual(quarantineHistory({ now, git }).entries, []);
+  assert.equal(quarantineHistory({ now, git: args => args[0] === 'rev-parse' ? 'true\n' : '' }), null);
+  assert.equal(quarantineHistory({ now, git: () => { throw new Error('no git'); } }), null);
+});
+
+test('app claims: scripts/evidence/apps.json matches each app\'s README platform tables, and its jobs are read like platform levels', () => {
+  const config = JSON.parse(readFileSync(new URL('../scripts/evidence/apps.json', import.meta.url), 'utf8'));
+  const workflows = new URL('../.github/workflows/', import.meta.url);
+  for (const app of config.apps) {
+    const readme = readFileSync(new URL(`../${app.readme}`, import.meta.url), 'utf8').split('\n');
+    const rows = [];
+    let inTable = false;
+    for (const line of readme) {
+      if (line.startsWith('| Platform |')) { inTable = true; continue; }
+      if (inTable && line.startsWith('|')) { if (!line.startsWith('| ---')) rows.push(line.slice(1).split(/(?<!\\)\|/)[0].trim()); }
+      else inTable = false;
+    }
+    const claimed = app.claims.filter(c => !c.outsideTable).map(c => c.row);
+    assert.deepEqual([...claimed].sort(), [...rows].sort(), `${app.readme}'s platform tables and scripts/evidence/apps.json's claims for ${app.app} differ: edit apps.json`);
+    assert.ok(app.oracle?.length > 20, `${app.app}: names its outside oracle`);
+    for (const claim of app.claims) {
+      assert.ok(claim.jobs.length, `${app.app} ${claim.row}: at least one job`);
+      for (const j of claim.jobs) {
+        assert.ok(existsSync(new URL(j.workflow, workflows)), `${app.app} ${claim.row}: ${j.workflow} exists`);
+        assert.doesNotThrow(() => new RegExp(j.job));
+      }
+    }
+  }
+  // Evaluated as levels.mjs evaluates platforms: a claim holds when its newest matching jobs passed.
+  const tiny = { maxAgeDays: 30, apps: [{ app: 'x', oracle: 'o', claims: [{ row: 'Node', jobs: [{ workflow: 'x.yml', job: '^API on Node' }] }, { row: 'Bun', jobs: [{ workflow: 'x.yml', job: '^API on Bun' }] }] }] };
+  const platforms = appPlatforms(tiny);
+  assert.deepEqual(platforms.platforms.map(p => p.id), ['x: Node', 'x: Bun']);
+  const now = Date.parse('2026-11-11T00:00:00Z');
+  const runs = { 'x.yml': [{ id: 1, html_url: 'u', head_branch: 'main', created_at: '2026-11-10T00:00:00Z' }] };
+  const jobs = { 1: [{ name: 'API on Node 24', conclusion: 'success' }, { name: 'API on Bun 1.4', conclusion: 'failure' }] };
+  const results = appResults(tiny, evaluate(platforms, runs, jobs, now));
+  assert.deepEqual(results, [{ app: 'x', oracle: 'o', claims: [{ row: 'Node', ok: true }, { row: 'Bun', ok: false, unmet: ['x.yml /^API on Bun/: API on Bun 1.4: failure'] }] }]);
 });

@@ -17,11 +17,17 @@ store from a request: the site changes when its files in the store change.
 
 Routes: `GET /` (index.html), `GET /feed.xml`, `GET /SLUG/` (a page; `/SLUG`
 redirects there), and `POST /api/render`, which renders the request's body
-(safe defaults, as HTML; with `?raw_html=1` raw HTML enabled, as text). -/
-import Lasm.Fetch
+(safe defaults, as HTML; with `?raw_html=1` raw HTML enabled, as text).
+
+Each platform runs `handle` with its own server: Workers and Deno Deploy the
+program's default export (`Server/JsServe.lean`), Fastly its host calls
+(`Server/FastlyServe.lean`). -/
+import Lasm.JS
 import Lasm.KV
 import Folio
-open Std.Async Lasm.Fetch
+import Server.JsServe
+import Server.FastlyServe
+open Std.Async Folio.Server.Web
 
 namespace Folio.Edge
 
@@ -80,8 +86,41 @@ def handle (kv : Lasm.KV.Store) (req : Request) : Async Response := do
     | _, _ => pure <| (Response.text "Method Not Allowed\n" 405).withHeader "allow" "GET, HEAD, POST"
   return r.withHeader "x-folio-store" kv.kind
 
+open Lasm.JS in
+/-- Workers KV: the binding `name` of the Worker's `env`, which arrives with
+each request (`JsServe.platformEnv`); memory when there is no such binding. -/
+def workersStore (name : String) : IO Lasm.KV.Store := do
+  let mem ← Lasm.KV.memory
+  let binding : IO (Option Value) := do
+    let found : Data ← match ← Folio.Server.JsServe.platformEnv.get with
+      | .ref env _ => (try env.get name Data catch _ => pure .undefined)
+      | env@(.object _) => pure (env.field name)
+      | _ => pure .undefined
+    match found with
+    | .ref v _ => return some v
+    | _ => return none
+  let get (k : String) : Async (Option String) := do
+    let some ns ← binding | mem.get k
+    match ← ns.callMethodAwait "get" #[.string k] Data with
+    | .string s => return some s
+    | _ => return none
+  let put (k v : String) : Async Unit := do
+    let some ns ← binding | mem.put k v
+    let _ : Data ← ns.callMethodAwait "put" #[.string k, .string v]
+  let delete (k : String) : Async Unit := do
+    let some ns ← binding | mem.delete k
+    let _ : Data ← ns.callMethodAwait "delete" #[.string k]
+  return { kind := "workers or memory", get, put, delete }
+
 end Folio.Edge
 
 def main : IO Unit := do
-  let kv ← Lasm.KV.open Folio.Edge.storeName
-  Lasm.Fetch.serve (Folio.Edge.handle kv)
+  if ← Lasm.JS.onEdge then
+    -- Deno Deploy: Deno KV (Lasm.KV.open); Cloudflare Workers: the Worker's KV binding.
+    let kv ← if ← Folio.Server.JsServe.onDeno then Lasm.KV.open Folio.Edge.storeName
+      else Folio.Edge.workersStore Folio.Edge.storeName
+    Folio.Server.JsServe.serveEdge (Folio.Edge.handle kv)
+  else
+    -- Fastly Compute: the KV Store (Lasm.KV.open), one request per instance.
+    let kv ← Lasm.KV.open Folio.Edge.storeName
+    Folio.Server.FastlyServe.serve (Folio.Edge.handle kv)
