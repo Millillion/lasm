@@ -1367,4 +1367,8 @@ theorem run_args_kept : Spec.run_args_kept := by
   · simp only [Parsed.verbose, f10]; split <;> simp_all [parseLasmArgumentsWith.start]
   · simp only [Parsed.profile, f11]; split <;> simp_all [parseLasmArgumentsWith.start]
 
+/-! ## Function packages -/
+
+theorem zip_deterministic : Spec.zip_deterministic := fun _ => rfl
+
 end Lasm.Cli.Theorems

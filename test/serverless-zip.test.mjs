@@ -119,7 +119,7 @@ test('property: what zip writes, a ZIP reader reads back', () => {
   }, { runs: 150 });
 });
 
-// Proposition: Lasm.Cli.Candidates.zip_deterministic
+// Proposition: Lasm.Cli.Spec.zip_deterministic
 //   ∀ entries : List ZipEntry, zip entries = zip entries
 test('property: zip is deterministic', () => {
   forAll(r => r.array(r.int(0, 4), (_, i) => ({ name: `d${r.int(0, 2)}/f${i}`, data: r.bytes(0, 200) })), entries => {

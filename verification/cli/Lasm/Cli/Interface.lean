@@ -34,6 +34,7 @@ import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.WasiComponent
+import Lasm.Cli.Model.Zip
 
 namespace Lasm.Cli
 
@@ -470,11 +471,8 @@ def Sec.componentType : Sec → Bool
 
 /-! ## Function packages (src/serverless/zip.mjs) -/
 
-/-- An entry given to `zip`: its name, its bytes, its permissions if set. -/
-structure ZipEntry where
-  name : String
-  data : ByteArray
-  mode : Option Nat
+-- `ZipEntry` and `zip(entries)`: modelled in Model/Zip.lean, with what the
+-- module imports from `node:zlib` as a parameter, here `nodeZlib`.
 
 /-- An entry a ZIP reader reads: name, bytes, Unix mode, method. -/
 structure ReadEntry where
@@ -483,8 +481,12 @@ structure ReadEntry where
   mode : Nat
   method : Nat
 
+/-- Not Lasm's JavaScript: `deflateRawSync(data, { level: 9 })` and
+`crc32(data)` of `node:zlib`. -/
+opaque nodeZlib : ZipCodec
+
 /-- `zip(entries)`, or the message it throws. -/
-opaque zip : List ZipEntry → Except String ByteArray
+def zip (entries : List ZipEntry) : Except String ByteArray := zipWith nodeZlib entries
 
 /-- Not Lasm's JavaScript: a ZIP reader written from APPNOTE.TXT 6.3.10 (the
 test's `unzip`): the entries in the central directory's order. -/

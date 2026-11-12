@@ -224,12 +224,4 @@ def zip_reads_back : Prop :=
       ∀ x ∈ (read.drop (directoriesOf entries).length).zip entries,
         x.1.data = x.2.data ∧ x.1.mode = 0o100000 ||| x.2.mode.getD 0o644
 
-/-- **`zip` is deterministic.** The archive depends on the entries alone (no
-clock, no host state). Stated of a Lean function this holds by `rfl`; it is
-the assumption a model of `zip` makes, which the test checks of the
-JavaScript.
-Tested by: test/serverless-zip.test.mjs -/
-def zip_deterministic : Prop :=
-  ∀ entries : List ZipEntry, zip entries = zip entries
-
 end Lasm.Cli.Candidates

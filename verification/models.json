@@ -679,8 +679,17 @@
       "reason": "the Vercel entry: forwards to lasm-server.mjs, whose mapping is modelled"
     },
     "src/serverless/zip.mjs": {
-      "status": "pending",
-      "reason": "a deterministic ZIP writer: pure (candidates zip_reads_back, zip_deterministic)"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/Zip.lean",
+          "functions": [
+            "zip"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "the writer is modelled byte for byte, with node:zlib (deflateRawSync, crc32) a parameter; zip_deterministic proved; zip_reads_back stays a candidate (its ZIP reader is the test's, an outside oracle)"
     },
     "src/system-git.mjs": {
       "status": "exempt",

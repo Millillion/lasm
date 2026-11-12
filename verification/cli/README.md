@@ -58,9 +58,9 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**12 proved propositions (74 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**13 proved propositions (75 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
-## Lasm.Cli (12)
+## Lasm.Cli (13)
 
 ### The command line
 
@@ -98,6 +98,12 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | [`replace_one_core_module`](Lasm/Cli/Spec.lean#L129) | **`replaceCoreModule` replaces exactly the one matching module.** In a component whose only core module section that starts with `pfx` is `pfx ++ tail`, that section becomes `to ++ tail`, and every other section, before or after it, is kept as it was. Tested by: test/wasi-component.test.mjs |
 | [`componentize_inverse`](Lasm/Cli/Spec.lean#L144) | **A component splices the core module and gives it back.** In a template whose one core module that starts with the placeholder is the placeholder followed by `tail` (as the shipped template is: the test checks it), `componentize` splices in any core that begins no other core module; `extractCore` gives the core back, and `makeTemplate` the template. Tested by: test/wasi-component.test.mjs |
 | [`drops_only_component_type`](Lasm/Cli/Spec.lean#L157) | **`withoutComponentType` drops only component-type custom sections.** A module's custom sections named `component-type…` go; every other section, custom or not, stays, in order. Tested by: test/wasi-component.test.mjs |
+
+### Function packages
+
+| Proposition | In plain English |
+| --- | --- |
+| [`zip_deterministic`](Lasm/Cli/Spec.lean#L168) | **`zip` is deterministic.** The archive depends on the entries alone (no clock, no host state). Of the model, a Lean function, this holds by `rfl`; it is the assumption the model makes, which the test checks of the JavaScript. Tested by: test/serverless-zip.test.mjs |
 <!-- END PROPOSITIONS -->
 
 ## Candidates
@@ -105,9 +111,9 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**17 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+**16 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
-### Lasm.Cli (17)
+### Lasm.Cli (16)
 
 | Candidate | In plain English | Tested by |
 | --- | --- | --- |
@@ -127,5 +133,4 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | [`lowering_leaves_no_atomics`](Lasm/Cli/Candidates.lean#L191) | **Lowering leaves no atomic instruction.** For a valid module, the lowered module is valid without the threads feature and lowering it again changes nothing; a module already valid without threads is returned as it is. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
 | [`lowering_rewrites_atomics`](Lasm/Cli/Candidates.lean#L203) | **Lowering rewrites each atomic and copies everything else.** In a module of any bodies of well-formed instructions, every non-atomic instruction and every local declaration is kept byte for byte, every atomic instruction becomes its documented replacement, and one helper per atomic operation and width follows the functions, numbered in order of first use after the imported and defined ones. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
 | [`zip_reads_back`](Lasm/Cli/Candidates.lean#L219) | **What `zip` writes, a ZIP reader reads back.** Whenever `zip` succeeds, a reader finds the parent directories first (sorted, mode `0o40755`, empty, stored), then every entry in order, with its bytes and its permissions as a regular file (`0o644` unless given). | [test/serverless-zip.test.mjs](../../test/serverless-zip.test.mjs) |
-| [`zip_deterministic`](Lasm/Cli/Candidates.lean#L232) | **`zip` is deterministic.** The archive depends on the entries alone (no clock, no host state). Stated of a Lean function this holds by `rfl`; it is the assumption a model of `zip` makes, which the test checks of the JavaScript. | [test/serverless-zip.test.mjs](../../test/serverless-zip.test.mjs) |
 <!-- END CANDIDATES -->

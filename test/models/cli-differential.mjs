@@ -27,6 +27,8 @@ import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
 import { responseFile } from '../../src/platform.mjs';
 import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
+import { zip } from '../../src/serverless/zip.mjs';
+import { deflateRawSync, crc32 } from 'node:zlib';
 import { compactInitializerWrappers, initializationSchedule } from '../../src/edge/edge-initializers.mjs';
 import { builtinModuleClosure } from '../../src/edge/builtin-modules.mjs';
 
@@ -267,6 +269,21 @@ export const models = [
     generate: r => { const template = templateOf(r); return { template, component: componentOf(r, template) }; },
     input: ({ component, template }) => ({ component: hexOf(component), template: hexOf(template) }),
     js: ({ component, template }) => attempt(() => extractCore(Uint8Array.from(component), Uint8Array.from(template))),
+  },
+  {
+    name: 'zip', source: 'src/serverless/zip.mjs', lean: 'Lasm.Cli.Model.Zip',
+    generate: r => r.array(r.int(0, 5), () => ({
+      name: r.next() < 0.1 ? r.pick(['a', 'a/b', 'dir/', 'a/', '']) : r.array(r.int(1, 3), () => r.string(['a', 'b', 'é', '😀', 'Z', '.'], 1, 3)).join('/'),
+      data: r.next() < 0.5 ? Buffer.from(randomBytes(r, 40)) : Buffer.from('ab'.repeat(r.int(0, 60))),
+      ...(r.next() < 0.5 ? { mode: r.pick([0o755, 0o644, 0o600, 0o4755, 0]) } : {}),
+    })),
+    input: entries => {
+      const all = [Buffer.alloc(0), ...entries.map(e => e.data)];
+      return { entries: entries.map(e => ({ name: hex(e.name), data: e.data.toString('hex'), mode: e.mode ?? null })),
+        deflate: all.map(d => [d.toString('hex'), deflateRawSync(d, { level: 9 }).toString('hex')]),
+        crc32: all.map(d => [d.toString('hex'), crc32(d)]) };
+    },
+    js: entries => attempt(() => zip(entries)),
   },
   {
     name: 'withoutComponentType', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',

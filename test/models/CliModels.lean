@@ -21,6 +21,10 @@ answer are the JavaScript's, read as the model's types:
   componentize   {"core": "<hex>", "template": "<hex>"}    → {"bytes": "<hex>"} | {"error": "…"}
   makeTemplate   {"component": "<hex>", "core": "<hex>"}   → (the same)
   extractCore    {"component": "<hex>", "template": "<hex>"} → (the same)
+  zip            {"entries": [{"name": "<hex>", "data": "<hex>", "mode": <n> | null}, …],
+                  "deflate": [["<hex>", "<hex>"], …], "crc32": [["<hex>", <n>], …]}
+                                                    → {"bytes": "<hex>"} | {"error": "…"}
+(`deflate` and `crc32` are node:zlib's answers for each entry's bytes)
   initializationSchedule  {"name": "…", "calls": [["…", ["…", …]], …], "keep": ["…", …]}
                                                     → ["…", …]
   compactInitializerWrappers  {"closure": […], "keep": […], "calls": […]}
@@ -45,6 +49,7 @@ import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.WasiComponent
+import Lasm.Cli.Model.Zip
 
 open Lean Lasm.Cli
 
@@ -129,6 +134,25 @@ def answer (j : Json) : Except String Json := do
     return match replaceCoreModule (← field "component") (← field "prefix") (← field "to") with
       | .ok b => Json.mkObj [("bytes", toJson (hex b))]
       | .error e => Json.mkObj [("error", toJson e)]
+  | "zip" =>
+    let entries ← (← (← input.getObjVal? "entries").getArr?).toList.mapM fun e => do
+      let modeJ ← e.getObjVal? "mode"
+      let name ← text (← e.getObjVal? "name")
+      let data ← unhex (← (← e.getObjVal? "data").getStr?)
+      let mode ← if modeJ.isNull then pure none else some <$> modeJ.getNat?
+      return ({ name, data, mode } : ZipEntry)
+    let table := fun (k : String) => do
+      (← (← input.getObjVal? k).getArr?).toList.mapM fun e => return ((← (← e.getArrVal? 0).getStr?), ← e.getArrVal? 1)
+    let deflate ← table "deflate"
+    let crc ← table "crc32"
+    let codec : ZipCodec := {
+      deflate := fun d => match deflate.lookup (hex d) with
+        | some j => (j.getStr? >>= unhex).toOption.getD .empty
+        | none => .empty
+      crc32 := fun d => match crc.lookup (hex d) with
+        | some j => (j.getNat?.toOption.getD 0).toUInt32
+        | none => 0 }
+    return ofBytes (zipWith codec entries)
   | "componentize" =>
     let field := fun (k : String) => do unhex (← (← input.getObjVal? k).getStr?)
     return ofBytes (componentize (← field "core") (← field "template"))

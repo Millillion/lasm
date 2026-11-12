@@ -163,4 +163,14 @@ def drops_only_component_type : Prop :=
     withoutComponentType (bytes (moduleHeader ++ ss.flatMap Sec.encoding)) =
       bytes (moduleHeader ++ (ss.filter (!·.componentType)).flatMap Sec.encoding)
 
+/-! ## Function packages -/
+
+/-- **`zip` is deterministic.** The archive depends on the entries alone (no
+clock, no host state). Of the model, a Lean function, this holds by `rfl`;
+it is the assumption the model makes, which the test checks of the
+JavaScript.
+Tested by: test/serverless-zip.test.mjs -/
+def zip_deterministic : Prop :=
+  ∀ entries : List ZipEntry, zip entries = zip entries
+
 end Lasm.Cli.Spec
