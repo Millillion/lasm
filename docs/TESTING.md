@@ -300,6 +300,9 @@ targets of `DIFF_TARGETS_FULL`, upstream Lean 4.35.0 as the oracle):
 | 42646321682, feature only, release | 13 | 2,600 | 60.7 min | 0.21 programs per minute, 0.71 cases per second (11.4 case-target comparisons per second) | no divergence |
 | 42646328709, feature only, dev | 17 | 3,400 | 60 min | 0.28 programs per minute, 0.94 cases per second | no divergence |
 
+| 43117871350, mixed, release, guided (#227: `lazy`, `st`, `wide`, `FloatArray`, `Thunk Nat`) | 30 (6 feature) | 3,330 (480 feature) | 40 min | 0.71 programs per minute | no divergence, no harness error; 11,062 runtime-C and glue features, corpus 387 (201 of the new families, 66 from feature mutants) |
+| 43117883485, feature only, release, guided from the previous state | 11 | 2,200 | 40 min | 0.26 programs per minute | no divergence, no harness error; 22,985 features, 17,586 new |
+
 In all, 12,080 feature cases on 16 targets (about 190,000 case runs) and the
 PR tier's 160. The interpreter differed from native Lean only where compiled
 code evaluates a panicking closed term at initialization (before the first
