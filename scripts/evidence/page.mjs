@@ -27,6 +27,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { collect, evaluate, githubApi, LEVELS, levelText } from './levels.mjs';
 import { sundayGuarded } from '../ci/sunday-guard.mjs';
 import { check as checkPropositions, summary as propositionSummary } from '../propositions.mjs';
+import { renderProgram } from '../differential/generate.mjs';
+import { genFeatureProgram } from '../differential/features.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 export const PAGE = 'content/learn/test-evidence.md';
@@ -177,6 +179,8 @@ export function repositoryFacts({ now = Date.now() } = {}) {
     mutationModules: JSON.parse(read('scripts/mutation/modules.json')).modules.map(m => m.name),
     modelDifferentials: modelDifferentials(targets),
     featureGenerator: existsSync(join(root, 'scripts/differential/features.mjs')),
+    coverageFeedback: existsSync(join(root, 'scripts/differential/coverage.mjs')),
+    generatorGaps: generatorGaps(),
     platforms: JSON.parse(read('scripts/evidence/platforms.json')),
     mutation: JSON.parse(read('docs/evidence/mutation-baseline.json')),
     proofs: proofs(),
@@ -219,7 +223,13 @@ export const parse = {
     const lines = [...log.matchAll(/ (\d+) programs, (\d+) cases, (\d+) divergences, (\d+) upstream suspects[^\n]*?, (\d+) harness errors/g)];
     if (!lines.length) return null;
     const sum = i => lines.reduce((n, m) => n + Number(m[i]), 0);
-    return { programs: sum(1), cases: sum(2), divergences: sum(3), harnessErrors: sum(5) };
+    // Coverage feedback (scripts/differential/run.mjs --guided 1, campaigns only): what tonight's campaign reached and found new.
+    const c = / coverage: (\d+) features \((\d+) runtime C, (\d+) glue\), (\d+) new \((\d+) runtime C, (\d+) glue; (\d+) from mutants, (\d+) from generated cases\), (\d+) in all campaigns, corpus (\d+) cases, (\d+) mutants run/.exec(log);
+    const growth = /coverage growth by campaign: ([^\n]*)/.exec(log);
+    const coverage = c && { features: Number(c[1]), runtimeC: Number(c[2]), glue: Number(c[3]), new: Number(c[4]), newRuntimeC: Number(c[5]), newGlue: Number(c[6]),
+      newFromMutants: Number(c[7]), newFromGenerated: Number(c[8]), cumulative: Number(c[9]), corpus: Number(c[10]), mutants: Number(c[11]),
+      nights: growth ? [...growth[1].matchAll(/(\d{4}-\d\d-\d\d) \+(\d+) \((\d+)\)/g)].map(m => ({ date: m[1], new: Number(m[2]), cumulative: Number(m[3]) })) : [] };
+    return { programs: sum(1), cases: sum(2), divergences: sum(3), harnessErrors: sum(5), ...(coverage ? { coverage } : {}) };
   },
 };
 
@@ -347,6 +357,18 @@ function logReader(repository, token) {
 export const L3_PLATFORMS = ['node', 'workers', 'browser'];
 /** The model differentials exit bar 8 names (the UI decoder, the Lasm.JS wire codec). */
 export const BAR_DIFFERENTIALS = ['ui-decode', 'lasm-js-wire'];
+/** The language features exit bar 8 asks the differential generator for (TESTING_STRATEGY.md §2,
+ * "Next gap"), each with what a generated feature program contains when it generates it. */
+export const BAR_GENERATED = [
+  ['Thunk', text => /Thunk\.mk/.test(text)],
+  ['ST', text => /runST fun σ/.test(text)],
+  ['FloatArray', text => /FloatArray\.mk/.test(text)],
+  ['structures with many fields', text => [...text.matchAll(/^structure \S+ where\n((?: {2}\S+ : .*\n)+)/gm)].some(m => m[1].split('\n').length - 1 >= 17)],
+];
+/** The features of BAR_GENERATED that 400 generated feature cases (seed 1) do not contain. */
+export function generatorGaps(text = renderProgram(genFeatureProgram(1, { cases: 400 }))) {
+  return BAR_GENERATED.filter(([, has]) => !has(text)).map(([name]) => name);
+}
 
 /** Each item of docs/TESTING_STRATEGY.md §7, as far as the repository and CI measure it:
  * { item, name, status: met | partly met | not met | not measured | not read, measured }. */
@@ -415,9 +437,16 @@ export function exitBar(repo, ci) {
     `the lint is ${pr.problems ? `red (${pr.problems} problems)` : 'green'}; ${pr.oracles.named} of ${pr.oracles.total} fuzz oracles and ${pr.properties.named} of ${pr.properties.total} properties name a proposition; ${pr.candidates} candidates, ${pr.proved} proved propositions`));
   // 8. Differential fuzzing
   const missing = BAR_DIFFERENTIALS.filter(t => !repo.modelDifferentials.includes(t));
-  out.push(row(8, 'Differential fuzzing', missing.length ? 'not met' : repo.featureGenerator ? 'partly met' : 'not met',
+  // Coverage feedback: what the latest nightly campaign's jobs measured (their logs), else whether the repository has it.
+  const guided = (ci?.differential?.jobs ?? []).filter(j => j.coverage);
+  const feedback = guided.length
+    ? `coverage feedback: the latest nightly campaign reached ${guided.map(j => `${j.coverage.features.toLocaleString('en-US')} features in ${j.name.replace(/^differential /, '')} (${j.coverage.new.toLocaleString('en-US')} new, ${j.coverage.newFromMutants.toLocaleString('en-US')} of them by mutants of the corpus)`).join(' and ')}`
+    : `coverage feedback for generated programs: ${repo.coverageFeedback ? 'in the repository, no guided nightly campaign read yet' : 'not yet'}`;
+  const gaps = repo.generatorGaps ?? BAR_GENERATED.map(([name]) => name);
+  out.push(row(8, 'Differential fuzzing', missing.length || !repo.featureGenerator ? 'not met' : gaps.length || !repo.coverageFeedback ? 'partly met' : 'met',
     `model differentials in CI: ${repo.modelDifferentials.map(t => `\`${t}\``).join(', ') || 'none'}${missing.length ? ` (missing: ${missing.join(', ')})` : ''}; ` +
-    `generated feature programs: ${repo.featureGenerator ? 'yes' : 'no'}; coverage feedback for generated programs: not yet`));
+    `generated feature programs: ${repo.featureGenerator ? 'yes' : 'no'}; ${feedback}; ` +
+    (gaps.length ? `not generated yet: ${gaps.map(g => /^[A-Z]/.test(g) ? `\`${g}\`` : g).join(', ')}` : `generated: ${BAR_GENERATED.map(([g]) => /^[A-Z]/.test(g) ? `\`${g}\`` : g).join(', ')}`)));
   return out;
 }
 
@@ -444,6 +473,8 @@ export function summarize(repo, ci, { generatedAt, repository, commit }) {
       mutationModules: repo.mutationModules,
       modelDifferentials: repo.modelDifferentials,
       featureGenerator: repo.featureGenerator,
+      coverageFeedback: repo.coverageFeedback,
+      generatorGaps: repo.generatorGaps,
     },
     ci: ci && {
       platforms: ci.platforms.map(p => ({ id: p.id, row: p.row, level: levelText(p.level),
@@ -582,10 +613,13 @@ export function renderPage(summary) {
   else if (!ci.differential.run) p('No scheduled differential campaign on `main` yet.');
   else {
     p(`Latest nightly campaign: ${runLink(ci.differential.run)}, ${outcome(ci.differential.run.conclusion)}.`);
-    p(table(['Job', 'Programs', 'Cases', 'Divergences', 'Result'], ci.differential.jobs.map(j => [j.name, num(j.programs), num(j.cases), num(j.divergences), `[${outcome(j.conclusion)}](${j.url})`])));
+    p(table(['Job', 'Programs', 'Cases', 'Divergences', 'Coverage features (new)', 'Result'], ci.differential.jobs.map(j => [j.name, num(j.programs), num(j.cases), num(j.divergences),
+      j.coverage ? `${num(j.coverage.features)} (+${num(j.coverage.new)})` : '—', `[${outcome(j.conclusion)}](${j.url})`])));
+    const nights = ci.differential.jobs.filter(j => j.coverage?.nights?.length);
+    if (nights.length) p('Coverage growth by campaign (new features, and all features found so far): ' + nights.map(j => `${j.name.replace(/^differential /, '')}: ${j.coverage.nights.map(n => `${n.date} +${num(n.new)} (${num(n.cumulative)})`).join(', ')}`).join('; ') + '.');
   }
   p('### About');
-  p('Generated Lean programs are compiled by Lasm and by Lean\'s own native compiler, run on the same inputs on every target, and their outputs compared. A divergence is any difference. The campaign covers both build profiles. Details: [Differential testing](../../docs/TESTING.md#differential-testing).');
+  p('Generated Lean programs are compiled by Lasm and by Lean\'s own native compiler, run on the same inputs on every target, and their outputs compared. A divergence is any difference. The campaign covers both build profiles. It is coverage-guided: the cases that reach runtime C or Lasm glue no earlier campaign reached are kept, and a quarter of each later program is mutants of them ([Coverage feedback](../../docs/TESTING.md#coverage-feedback)). Details: [Differential testing](../../docs/TESTING.md#differential-testing).');
 
   // Equivalence
   p('## Target equivalence');
