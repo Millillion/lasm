@@ -959,6 +959,15 @@ built from an `IncomingMessage` and a `Response` written to a `ServerResponse`
 `net.connect`) round-tripping generated chunks (up to six of 64 kB), with
 addresses, `getConnections`, `setEncoding`, `net.isIP` and `BlockList`.
 `web-bindings.yml` runs it on Node 26 and 24, Bun and Deno.
+Measured (web-bindings run 43214713325, `node-conformance`): 5,571 checks
+pass on Node 26.13.0, Node 24.22.2 and Bun 1.4.4; on Deno 2.9.6, 5,570 pass
+and one fails as a known runtime gap (`FileHandle.write string`: Deno's
+`filehandle.write(string)` gives the bytes, not the string;
+`test/fixtures/js-node/known.json`). Generated members the runtimes do not
+have (reported, not failures): `net.BlockList`'s `addAddresses`, `addCIDR`,
+`addCIDRs`, `clear`, `removeAddress`, `removeCIDR`, `removeRange`,
+`removeSubnet` and `net.BoundSocket` on Bun and Deno;
+`net.Socket.getTypeOfService` and `setTypeOfService` on Deno.
 
 ## Servers on JavaScript runtimes: `Lasm.JS.Deno`, `Lasm.JS.Bun` and Node
 
