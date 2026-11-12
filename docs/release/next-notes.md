@@ -25,6 +25,11 @@
   Conduit and Folio do: Workers through the default export, Deno with
   `Deno.serve`, Bun with `Bun.serve`. Its request type and embedded files are
   code inside the app (`examples/ledger/Server/`).
+- **Tandem builds with 0.7.0 and no longer uses `Lasm.Fetch`.** Workers serves
+  through the default export, Deno with `Deno.serve` and `Deno.upgradeWebSocket`,
+  Bun with `Bun.serve` and its WebSocket handlers, Node with Tandem's own
+  `node:http` server and the `ws` package, as before. Its request type and
+  embedded files are code inside the app (`examples/tandem/Server/`).
 
 ## Fixes
 
