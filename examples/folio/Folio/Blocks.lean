@@ -586,6 +586,154 @@ termination_by b => sizeOf b
 decreasing_by
   all_goals (have := Array.sizeOf_lt_of_mem ‹_ ∈ cs›; simp_wf; omega)
 
+/-! ### Without recursion
+
+`takeAllRefs` and `toBlocks` recurse once per level of nesting, and an
+engine's stack can be small (just under 10,000 frames on the edge and in
+browsers), while CommonMark allows any depth (cmark's pathological cases nest
+block quotes 25,000 deep). `refsLoop` and `toBlocksLoop` do the same work with
+an explicit stack, and are proved equal to them; the `@[csimp]` theorems
+make compiled code (`parse`) run them in their place. -/
+
+theorem sizeOf_toList_lt {α : Type} [SizeOf α] (a : Array α) : sizeOf a.toList < sizeOf a := by
+  cases a; simp
+
+/-- `takeAllRefs` on one block of a list: the definitions found, and the
+blocks kept. -/
+def refsStep (r : RefMap × Array Blk) (c : Blk) : RefMap × Array Blk :=
+  let (refs, c') := takeAllRefs r.1 c
+  (refs, match c' with | some c' => r.2.push c' | none => r.2)
+
+theorem takeAllRefs_container (refs : RefMap) (k : Kind) (f l : Nat) (content info : String) (cs : Array Blk)
+    (h : k.isPara = false) :
+    takeAllRefs refs (.mk k f l content info cs) =
+      ((cs.toList.foldl refsStep (refs, #[])).1, some (.mk k f l content info (cs.toList.foldl refsStep (refs, #[])).2)) := by
+  rw [takeAllRefs.eq_def]
+  cases k <;> simp only [Kind.isPara, Bool.true_eq_false] at h <;>
+    (dsimp only; rw [Array.foldl_toList, ← Array.foldl_attach (xs := cs) (f := refsStep)]; rfl)
+
+/-- A container block `refsLoop` is inside: its fields, the blocks kept
+before it, and the blocks after it. -/
+structure RefsFrame where
+  kind : Kind
+  first : Nat
+  last : Nat
+  content : String
+  info : String
+  acc : Array Blk
+  rest : List Blk
+
+/-- The size of the blocks left in the frames. -/
+noncomputable def refsFramesSize : List RefsFrame → Nat
+  | [] => 0
+  | f :: st => sizeOf f.rest + refsFramesSize st
+
+/-- `refsStep` over `bs`, then, for each frame, its block with what was kept
+and the blocks after it. -/
+def refsLoop (refs : RefMap) (acc : Array Blk) : List Blk → List RefsFrame → RefMap × Array Blk
+  | [], [] => (refs, acc)
+  | [], f :: st => refsLoop refs (f.acc.push (.mk f.kind f.first f.last f.content f.info acc)) f.rest st
+  | .mk k fst lst content info cs :: rest, st =>
+    if k.isPara then
+      let r := refsStep (refs, acc) (.mk k fst lst content info cs)
+      refsLoop r.1 r.2 rest st
+    else refsLoop refs #[] cs.toList (⟨k, fst, lst, content, info, acc, rest⟩ :: st)
+termination_by bs st => sizeOf bs + refsFramesSize st
+decreasing_by
+  all_goals simp only [refsFramesSize, List.cons.sizeOf_spec, List.nil.sizeOf_spec, Blk.mk.sizeOf_spec]
+  all_goals (try have := sizeOf_toList_lt cs)
+  all_goals omega
+
+/-- What `refsLoop` does after a list: each frame's block, then the blocks after it. -/
+def refsUnwind : RefMap × Array Blk → List RefsFrame → RefMap × Array Blk
+  | r, [] => r
+  | r, f :: st => refsUnwind (f.rest.foldl refsStep (r.1, f.acc.push (.mk f.kind f.first f.last f.content f.info r.2))) st
+
+theorem refsLoop_eq (refs : RefMap) (acc : Array Blk) (bs : List Blk) (st : List RefsFrame) :
+    refsLoop refs acc bs st = refsUnwind (bs.foldl refsStep (refs, acc)) st := by
+  induction refs, acc, bs, st using refsLoop.induct with
+  | case1 refs acc => simp [refsLoop, refsUnwind]
+  | case2 refs acc f st ih => simp [refsLoop, refsUnwind, ih]
+  | case3 refs acc k fst lst content info cs rest st h r ih => simp [refsLoop, h, ih, r]
+  | case4 refs acc k fst lst content info cs rest st h ih =>
+    simp only [Bool.not_eq_true] at h
+    simp [refsLoop, h, ih, refsUnwind, refsStep, takeAllRefs_container refs k fst lst content info cs h]
+
+/-- `takeAllRefs`, with an explicit stack. -/
+def takeAllRefsFast (refs : RefMap) (b : Blk) : RefMap × Option Blk :=
+  let r := refsLoop refs #[] [b] []
+  (r.1, r.2[0]?)
+
+@[csimp] theorem takeAllRefs_eq_fast : @takeAllRefs = @takeAllRefsFast := by
+  funext refs b
+  simp only [takeAllRefsFast, refsLoop_eq, refsUnwind, List.foldl_cons, List.foldl_nil, refsStep]
+  cases takeAllRefs refs b with
+  | mk refs' c => cases c <;> simp
+
+/-- How `toBlocksLoop` finishes a container from its children's blocks: a
+document or list item is its children's blocks, a block quote holds them, a
+list holds them as its items. -/
+inductive BFin where
+  | flat
+  | quote
+  | list (d : ListData)
+
+def BFin.finish : BFin → List (List Block) → List Block
+  | .flat, xs => xs.flatten
+  | .quote, xs => [.quote xs.flatten]
+  | .list d, xs => [.list d.ordered d.start d.tight xs]
+
+/-- A container `toBlocksLoop` is inside: how it finishes the container
+around (`fin`), its earlier children's blocks, and the children after it. -/
+structure BFrame where
+  fin : BFin
+  acc : Array (List Block)
+  rest : List Blk
+
+/-- The size of the blocks left in the frames. -/
+noncomputable def bframesSize : List BFrame → Nat
+  | [] => 0
+  | f :: st => sizeOf f.rest + bframesSize st
+
+/-- `toBlocks` of each of `bs`, after `acc`, finished by `fin`; then each
+frame's container. -/
+def toBlocksLoop (refs : RefMap) (fin : BFin) (acc : Array (List Block)) : List Blk → List BFrame → List Block
+  | [], [] => fin.finish acc.toList
+  | [], f :: st => toBlocksLoop refs f.fin (f.acc.push (fin.finish acc.toList)) f.rest st
+  | .mk k fst lst content info cs :: rest, st =>
+    match k with
+    | .document => toBlocksLoop refs .flat #[] cs.toList (⟨fin, acc, rest⟩ :: st)
+    | .item _ => toBlocksLoop refs .flat #[] cs.toList (⟨fin, acc, rest⟩ :: st)
+    | .quote => toBlocksLoop refs .quote #[] cs.toList (⟨fin, acc, rest⟩ :: st)
+    | .list d => toBlocksLoop refs (.list d) #[] cs.toList (⟨fin, acc, rest⟩ :: st)
+    | k => toBlocksLoop refs fin (acc.push (toBlocks refs (.mk k fst lst content info cs))) rest st
+termination_by bs st => sizeOf bs + bframesSize st
+decreasing_by
+  all_goals simp only [bframesSize, List.cons.sizeOf_spec, List.nil.sizeOf_spec, Blk.mk.sizeOf_spec]
+  all_goals (try have := sizeOf_toList_lt cs)
+  all_goals omega
+
+/-- What `toBlocksLoop` builds after a container's blocks: each frame's
+container, finished. -/
+def toBlocksUnwind (refs : RefMap) : List Block → List BFrame → List Block
+  | v, [] => v
+  | v, f :: st => toBlocksUnwind refs (f.fin.finish (f.acc.toList ++ v :: f.rest.map (toBlocks refs))) st
+
+theorem toBlocks_children (refs : RefMap) (cs : Array Blk) :
+    (cs.attach.toList.flatMap fun ⟨c, _⟩ => toBlocks refs c) = (cs.toList.map (toBlocks refs)).flatten := by
+  simp [List.flatMap_def]
+
+theorem toBlocksLoop_eq (refs : RefMap) (fin : BFin) (acc : Array (List Block)) (bs : List Blk) (st : List BFrame) :
+    toBlocksLoop refs fin acc bs st = toBlocksUnwind refs (fin.finish (acc.toList ++ bs.map (toBlocks refs))) st := by
+  induction fin, acc, bs, st using toBlocksLoop.induct refs <;>
+    simp_all [toBlocksLoop, toBlocksUnwind, BFin.finish, toBlocks, List.flatMap_def]
+
+/-- `toBlocks`, with an explicit stack. -/
+def toBlocksFast (refs : RefMap) (b : Blk) : List Block := toBlocksLoop refs .flat #[] [b] []
+
+@[csimp] theorem toBlocks_eq_fast : @toBlocks = @toBlocksFast := by
+  funext refs b; simp [toBlocksFast, toBlocksLoop_eq, toBlocksUnwind, BFin.finish]
+
 /-- Parses a CommonMark document. -/
 def parse (input : String) : List Block := Id.run do
   let lines := splitLines (chars input)

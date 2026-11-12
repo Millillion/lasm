@@ -6,11 +6,14 @@ name: Folio on every platform
 #   example site is put in the store, and every page served must be byte for
 #   byte what `folio build` writes; a changed site in a new store must be
 #   served the same way; then the CommonMark specification's 652 examples
-#   run on the server through POST /api/render (test/edge.mjs --spec).
-# - wasi: the 652 examples on the WASI build of the batch renderer
-#   (dist/batch-wasi) on wasmtime 49.0.4, wasmer 7.4.2 and node:wasi.
-# - browser: the 652 examples on the browser build (dist/batch-browser) in
-#   headless Chromium, Firefox and WebKit.
+#   run on the server through POST /api/render (test/edge.mjs --spec), and
+#   CommonMark's pathological inputs with nesting far deeper than the
+#   engine's stack (issue #231; test/edge.mjs --pathological).
+# - wasi: the 652 examples and the pathological inputs on the WASI build of
+#   the batch renderer (dist/batch-wasi) on wasmtime 49.0.4, wasmer 7.4.2
+#   and node:wasi.
+# - browser: the 652 examples and the pathological inputs on the browser
+#   build (dist/batch-browser) in headless Chromium, Firefox and WebKit.
 # Every engine must pass all 652 with raw HTML enabled, and with the safe
 # defaults differ only where raw HTML or an unsafe URL is (test/spec.mjs).
 # Local tooling only: no account, nothing deployed, CI=1. Free runners only.
@@ -94,9 +97,9 @@ jobs:
         if: matrix.platform == 'fastly'
         working-directory: ${{ env.FOLIO }}
         run: node tools/kv.mjs fastly | diff fastly.toml -
-      - name: The site from the store, a changed site, and the 652 CommonMark examples on the server
+      - name: The site from the store, a changed site, the 652 CommonMark examples and the pathological inputs on the server
         working-directory: ${{ env.FOLIO }}
-        run: node test/edge.mjs --platform ${{ matrix.platform }} --spec
+        run: node test/edge.mjs --platform ${{ matrix.platform }} --spec --pathological
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -139,6 +142,12 @@ jobs:
           for engine in wasmtime wasmer node-wasi; do
             node test/spec.mjs --engine "$engine" --json "test-results/spec-$engine.json"
           done
+      - name: CommonMark's pathological inputs and deep nesting (issue #231) on each engine
+        working-directory: examples/folio
+        run: |
+          for engine in wasmtime wasmer node-wasi; do
+            node test/pathological.mjs --engine "$engine"
+          done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -175,6 +184,12 @@ jobs:
         run: |
           for engine in chromium firefox webkit; do
             node test/spec.mjs --engine "$engine" --json "test-results/spec-$engine.json"
+          done
+      - name: CommonMark's pathological inputs and deep nesting (issue #231) in each browser
+        working-directory: examples/folio
+        run: |
+          for engine in chromium firefox webkit; do
+            node test/pathological.mjs --engine "$engine"
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
