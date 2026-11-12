@@ -1465,7 +1465,9 @@ def Document.scripts (self : Document) : IO HTMLCollection := do
   pure { val := r }
 
 /-- `readonly attribute HTMLOrSVGScriptElement? currentScript` -/
-def Document.currentScript (self : Document) : IO (Option Value) := self.val.get "currentScript" (Option Value)
+def Document.currentScript (self : Document) : IO (Option Value) := do
+  let r ← self.val.get "currentScript" Data
+  Support.optionalValue r
 
 /-- `readonly attribute WindowProxy? defaultView` -/
 def Document.defaultView (self : Document) : IO (Option Window) := self.val.get "defaultView" (Option Window)
@@ -4249,8 +4251,9 @@ def HTMLTextAreaElement.setSelectionRange (self : HTMLTextAreaElement) (start : 
   self.val.callMethod "setSelectionRange" (Support.args #[toJS start, toJS «end», Support.optional direction]) Unit
 
 /-- `getter (RadioNodeList or Element)? namedItem(DOMString name)` -/
-def HTMLFormControlsCollection.namedItem (self : HTMLFormControlsCollection) (name : String) : IO (Option Value) :=
-  self.val.callMethod "namedItem" (Support.args #[toJS name]) (Option Value)
+def HTMLFormControlsCollection.namedItem (self : HTMLFormControlsCollection) (name : String) : IO (Option Value) := do
+  let r ← self.val.callMethod "namedItem" (Support.args #[toJS name]) Data
+  Support.optionalValue r
 
 /-- `attribute unsigned long length` -/
 def HTMLOptionsCollection.length (self : HTMLOptionsCollection) : IO Nat := self.val.get "length" Nat
