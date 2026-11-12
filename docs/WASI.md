@@ -17,8 +17,8 @@ Compute's host calls, in the layout `fastly compute serve|deploy` uses.
 `DIR` instead (from 0.5.0; Fastly's `pkg/<name>.tar.gz` stays in the project).
 The Node build that the WASI link reuses stays in the build cache
 (`.lake/lasm/applications/`); nothing is written to `dist/`.
-| HTTP served | [`Lasm.Fetch.serve`](FETCH.md): one CGI request per run | wasi:http/incoming-handler | Fastly's downstream request |
-| HTTP sent ([`fetch`](FETCH.md#outbound-requests)) | Not available (no sockets) | wasi:http/outgoing-handler | Backend requests |
+| HTTP served | One CGI request per run (WAGI: the CGI variables and standard input, read with Lean's `IO`) | [`Lasm.WASI.Http`](WASI_FASTLY_BINDINGS.md): wasi:http/incoming-handler | [`Lasm.Fastly`](WASI_FASTLY_BINDINGS.md): Fastly's downstream request |
+| HTTP sent | Not available (no sockets) | `Lasm.WASI.Http`: wasi:http/outgoing-handler | `Lasm.Fastly`: backend requests |
 | Imports | `wasi_snapshot_preview1` | wasi:http, wasi:io, wasi:clocks, wasi:random, wasi:cli 0.2.12 | `wasi_snapshot_preview1` and Fastly's `fastly_*` modules |
 
 CI ([`wasi.yml`](../.github/workflows/wasi.yml),
@@ -92,7 +92,7 @@ this script.)
 | `IO.sleep`, `Std.Async` (`async`, `await`, `sleep`, timers), `Async.block` | ✓ | An event loop over `poll_oneoff` |
 | `Task.spawn`, `IO.asTask`, `Task.get`, `IO.wait`, `IO.waitAny`, `IO.Promise`, `Std.Mutex`, condition variables | ✓ | Cooperative, on one thread (see below) |
 | Lean exceptions (`throw`, `try`/`catch`), panics | ✓ | |
-| HTTP serving | ✓ | [`Lasm.Fetch`](FETCH.md) |
+| HTTP serving | ✓ | As a CGI program: the request from the CGI environment variables and standard input, the response on standard output |
 | Sockets, DNS (`Std.Net`, `Std.Http` server), processes, signals | — | Not in WASI preview 1: clear `unsupportedOperation` errors |
 | `Lasm.JS` | — | No JavaScript: `Lasm.JS.isAvailable` is false and calls fail clearly |
 | Deep recursion | Bounded | By the engine's Wasm stack and an 8 MiB C stack (1 MiB on Fastly). With default settings, a small non-tail recursive function (`deepSum n = (n + 1) + deepSum n`) passes 10,910 frames on wasmtime 49.0.4, 8,177 on wasmtime 30.0.2 and 9,651 on `node:wasi` (Node 24.22.1), measured 2026-10-31; larger frames get less. `wasmtime run -W max-wasm-stack=4194304` (4 MiB) passes 50,000 frames of it, 8 MiB 100,000. Lean's formatter recurses about twice per element, so `repr` of an Array prints at most 1,801 elements on wasmtime 49.0.4 and 3,914 on `node:wasi` (measured 2026-11-10); `toString` has no such limit, and `-W max-wasm-stack=1073741824` prints 100,000 ([FUNDAMENTAL_LIMITATIONS.md](../FUNDAMENTAL_LIMITATIONS.md#printing-a-large-value-with-repr-issue-179)) |
