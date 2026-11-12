@@ -23,6 +23,7 @@ import { changedFiles } from '../../src/dev.mjs';
 import { numbers } from '../../src/node-host.mjs';
 import { responseFile } from '../../src/platform.mjs';
 import { replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
+import { compactInitializerWrappers, initializationSchedule } from '../../src/edge/edge-initializers.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const cliRoot = join(root, 'verification', 'cli');
@@ -58,6 +59,21 @@ function wasmBytes(r, header, section) {
 const randomBytes = (r, high) => Array.from({ length: r.int(0, high) }, () => r.int(0, 255));
 const coreHeader = [0, 0x61, 0x73, 0x6d, 1, 0, 0, 0];
 const componentHeader = [0, 0x61, 0x73, 0x6d, 0x0d, 0, 1, 0];
+
+/** A random initialization plan: initializer names (sometimes invalid), the
+ * calls of each in order (acyclic or not, repeats allowed, some to units
+ * outside the closure), and the kept ones. */
+function plan(r) {
+  const names = r.array(r.int(1, 12), (_, i) => r.next() < 0.03 ? r.pick(['initialize_', 'init_x', 'runtime_meta_initialize_a', 'initialize_é'])
+    : `${r.pick(['initialize_', 'runtime_initialize_', 'meta_initialize_'])}M${i}_${r.string('abcXYZ019_', 0, 3)}`);
+  const acyclic = r.next() < 0.5, calls = {};
+  for (const [i, name] of names.entries()) {
+    const targets = [...names.filter((_, j) => acyclic ? j > i : true), ...(r.next() < 0.2 ? ['initialize_Outside'] : [])];
+    if (targets.length && r.next() < 0.8) calls[name] = r.array(r.int(0, 4), () => r.pick(targets));
+  }
+  return { schema: 1, closure: [...new Set(names)], keep: names.filter(() => r.next() < 0.5), calls };
+}
+const callsEntries = calls => Object.entries(calls);
 
 /** Each model: the JavaScript module and function it mirrors, the Lean
  * module, a generator, the JavaScript's answer and the request's input,
@@ -124,6 +140,20 @@ export const models = [
     input: bytes => hexOf(bytes),
     js: bytes => hexOf(withoutComponentType(Uint8Array.from(bytes))),
   },
+  {
+    name: 'initializationSchedule', source: 'src/edge/edge-initializers.mjs', lean: 'Lasm.Cli.Model.EdgeInitializers',
+    generate: r => { const p = plan(r); return { p, name: r.next() < 0.9 ? r.pick(p.closure) : 'initialize_Outside' }; },
+    input: ({ p, name }) => ({ name, calls: callsEntries(p.calls), keep: p.keep }),
+    js: ({ p, name }) => initializationSchedule(name, p.calls, new Set(p.keep)),
+  },
+  {
+    name: 'compactInitializerWrappers', source: 'src/edge/edge-initializers.mjs', lean: 'Lasm.Cli.Model.EdgeInitializers',
+    generate: plan,
+    input: p => ({ closure: p.closure, keep: p.keep, calls: callsEntries(p.calls) }),
+    js: p => {
+      try { return { source: compactInitializerWrappers(p) }; } catch (error) { return { error: error.message }; }
+    },
+  },
 ];
 
 /** Compiles the model modules and returns a function that asks the runner. */
@@ -162,7 +192,9 @@ async function start(leanPath) {
     for (let i; (i = buffer.indexOf('\n')) >= 0;) {
       const line = buffer.slice(0, i);
       buffer = buffer.slice(i + 1);
-      waiting.shift()?.resolve(JSON.parse(line));
+      let answer;
+      try { answer = JSON.parse(line); } catch { answer = { fault: `the Lean runner wrote ${JSON.stringify(line.slice(0, 500))}` }; }
+      waiting.shift()?.resolve(answer);
     }
   });
   child.on('exit', (code, signal) => {

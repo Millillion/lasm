@@ -347,10 +347,20 @@ parsing with `segments_no_dot_segments`, HEAD as GET, 500 on a throw),
 need was added to Porter's `Web.respond`: **cookie joining**
 (`joinCookies`, `splitCookieCommas`, from `Lasm.Fetch.respond`), since
 Porter reads its session from one `Cookie` header and the web `Headers`
-class joins repeated `Cookie` fields with `, `. The three apps now carry the
-same ~500 lines of HTTP glue each (Conduit, Folio, Porter); a shared answer
+class joins repeated `Cookie` fields with `, `. The apps now carry the same
+~500 lines of HTTP glue each (Conduit, Folio, Porter, Ledger); a shared answer
 (a library, or the `Node.serve` work) is yours to decide when `Lasm.Fetch`
 is deleted.
+### Ledger moved off `Lasm.Fetch` (2026-11-12; what had no replacement)
+
+Ledger serves with Cloudflare Workers' default export
+(`Lasm.JS.exportDefault`, D1 from the `env` argument), `Deno.serve` and
+`Bun.serve`, and on Node (and the Node function platforms and Docker) still
+with `Lasm.Fetch.serveNode`, in `Server/NodeServe.lean`, its only
+`Lasm.Fetch` import. What had no replacement is in
+`examples/ledger/Server/` (`Web.lean`, `Assets.lean`, `Embed.lean`,
+`JsServe.lean`), the same code as Conduit's under Ledger's namespace; the
+simulation (`Sim.lean`) parses requests with the app's `Web.Request`.
 
 ### High-priority work to define with Jordan
 - [ ] **Stamp out Lasm.JS's weaknesses as far as possible** (Jordan,

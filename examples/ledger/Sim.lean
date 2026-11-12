@@ -82,11 +82,11 @@ def simSql (s : Obj) : Ledger.Server.Sql where
   batch stmts := do
     let _ ← s.call "batch" #[.array (stmts.map fun (q, p) => Data.array #[toJS q, .array p])] Data
 
-def fetchRequest (d : Data) : Lasm.Fetch.Request :=
+def fetchRequest (d : Data) : Ledger.Server.Web.Request :=
   { method := str d "method", url := str d "url", body := (str d "body").toUTF8 }
 
 /-- The API's view of a request under `/api`. -/
-def apiRequest (r : Lasm.Fetch.Request) : Option Ledger.Request :=
+def apiRequest (r : Ledger.Server.Web.Request) : Option Ledger.Request :=
   match r.segments with
   | "api" :: path => some { method := r.method, path, query := r.queryParams, body := r.text }
   | _ => none
@@ -113,7 +113,7 @@ def commitRead (db : Ledger.Server.Sql) (r : Read) : Async Ledger.Reply := do
 def handle (w : Obj) (db : Ledger.Server.Sql) (k : String) (ev : Data) : Async Unit := do
   match k with
   | "request" =>
-    let resp ← try Ledger.Server.site none db (fetchRequest ev) catch e => pure ({ status := 500, body := s!"\{\"error\":\"{e}\"}".toUTF8 } : Lasm.Fetch.Response)
+    let resp ← try Ledger.Server.site none db (fetchRequest ev) catch e => pure ({ status := 500, body := s!"\{\"error\":\"{e}\"}".toUTF8 } : Ledger.Server.Web.Response)
     answer w ev resp.status.toNat ((String.fromUTF8? resp.body).getD "")
   | "race" =>
     let reqs := match ev.field "reqs" with

@@ -21,6 +21,11 @@
   `Deno.serve`, Bun with `Bun.serve`. Its request type, embedded files and
   cookie joining are code inside the app (`examples/porter/Server/`).
 
+- **Ledger builds with 0.7.0 and uses `Lasm.Fetch` only for Node**, as
+  Conduit and Folio do: Workers through the default export, Deno with
+  `Deno.serve`, Bun with `Bun.serve`. Its request type and embedded files are
+  code inside the app (`examples/ledger/Server/`).
+
 ## Fixes
 
 - **`HTMLCanvasElement.getContext`, `Document.currentScript` and

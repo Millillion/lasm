@@ -18,9 +18,15 @@ answer are the JavaScript's, read as the model's types:
   replaceCoreModule  {"component": "<hex>", "prefix": "<hex>", "to": "<hex>"}
                                                     → {"bytes": "<hex>"} | {"error": "…"}
   withoutComponentType  "<hex>"                     → "<hex>"
+  initializationSchedule  {"name": "…", "calls": [["…", ["…", …]], …], "keep": ["…", …]}
+                                                    → ["…", …]
+  compactInitializerWrappers  {"closure": […], "keep": […], "calls": […]}
+                                                    → {"source": "…"} | {"error": "…"}
+(initializer names are C identifiers, sent as JSON strings)
 -/
 import Lean.Data.Json
 import Lasm.Cli.Model.Dev
+import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.WasiComponent
@@ -64,6 +70,13 @@ def snapshot (j : Json) : Except String (List (String × Option String)) := do
     let hash ← e.getArrVal? 1
     return (← text (← e.getArrVal? 0), ← if hash.isNull then pure none else some <$> text hash)
 
+def strings (j : Json) : Except String (List String) := do
+  (← j.getArr?).toList.mapM (·.getStr?)
+
+/-- A plan's `calls`: `[[unit, [call, …]], …]`. -/
+def callsOf (j : Json) : Except String (List (String × List String)) := do
+  (← j.getArr?).toList.mapM fun e => return (← (← e.getArrVal? 0).getStr?, ← strings (← e.getArrVal? 1))
+
 def answer (j : Json) : Except String Json := do
   let input ← j.getObjVal? "input"
   match ← j.getObjValAs? String "model" with
@@ -80,6 +93,17 @@ def answer (j : Json) : Except String Json := do
       | .ok b => Json.mkObj [("bytes", toJson (hex b))]
       | .error e => Json.mkObj [("error", toJson e)]
   | "withoutComponentType" => return toJson (hex (withoutComponentType (← unhex (← input.getStr?))))
+  | "initializationSchedule" =>
+    return toJson (initializationSchedule (← (← input.getObjVal? "name").getStr?) (← callsOf (← input.getObjVal? "calls"))
+      (← strings (← input.getObjVal? "keep")))
+  | "compactInitializerWrappers" =>
+    let closure ← strings (← input.getObjVal? "closure")
+    let keep ← strings (← input.getObjVal? "keep")
+    let calls ← callsOf (← input.getObjVal? "calls")
+    let p : Plan := { closure, keep, calls }
+    return match compactInitializerWrappers p with
+      | .ok s => Json.mkObj [("source", toJson s)]
+      | .error e => Json.mkObj [("error", toJson e)]
   | m => throw s!"no model {m}"
 
 def main : IO Unit := do
