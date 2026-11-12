@@ -101,6 +101,62 @@ def Html.writeList (acc : String) : List Html → String
   | h :: hs => Html.writeList (Html.write acc h) hs
 end
 
+/-! ## Writing without recursion
+
+`Html.write` recurses once per level of nesting, and an engine's stack can be
+small (just under 10,000 frames on the edge and in browsers), while
+CommonMark allows any depth (cmark's pathological cases nest 30,000 deep).
+`writeLoop` writes the same text with an explicit stack: the nodes still to
+write at the current level and, for each element it is inside, the element's
+tag and the nodes after it. `writeLoop_eq` proves it equal to `Html.writeList`,
+and the `@[csimp]` theorem `Html.writeList_eq_fast` makes compiled code (`render`
+and everything after this point) run it in place of `Html.writeList`; the
+proofs keep talking about `Html.writeList`. -/
+
+/-- `</t>`, as `Html.write` closes an element. -/
+def closeTag (acc : String) (t : Tag) : String := ((acc.push '<').push '/' ++ t.name).push '>'
+
+/-- The size of what is left to write in the open elements' frames. -/
+noncomputable def writeFramesSize : List (Tag × List Html) → Nat
+  | [] => 0
+  | (_, rest) :: st => sizeOf rest + writeFramesSize st
+
+/-- Writes `hs`, then closes each element of `st` and writes the nodes after it. -/
+def writeLoop (acc : String) : List Html → List (Tag × List Html) → String
+  | [], [] => acc
+  | [], (t, rest) :: st => writeLoop (closeTag acc t) rest st
+  | .text s :: hs, st => writeLoop (writeEscaped acc s) hs st
+  | .raw s :: hs, st => writeLoop (acc ++ s) hs st
+  | .void t as :: hs, st => writeLoop (writeAttrs (acc.push '<' ++ t.name) as ++ " />") hs st
+  | .elem t as cs :: hs, st => writeLoop ((writeAttrs (acc.push '<' ++ t.name) as).push '>') cs ((t, hs) :: st)
+termination_by hs st => sizeOf hs + writeFramesSize st
+decreasing_by
+  all_goals simp only [writeFramesSize, List.cons.sizeOf_spec, List.nil.sizeOf_spec, Html.elem.sizeOf_spec,
+    Html.text.sizeOf_spec, Html.raw.sizeOf_spec, Html.void.sizeOf_spec]
+  all_goals omega
+
+/-- What `writeLoop` must write after `acc`: each frame's closing tag and the
+nodes after it, in order. -/
+def writeUnwind (acc : String) : List (Tag × List Html) → String
+  | [] => acc
+  | (t, rest) :: st => writeUnwind (Html.writeList (closeTag acc t) rest) st
+
+theorem writeLoop_eq (acc : String) (hs : List Html) (st : List (Tag × List Html)) :
+    writeLoop acc hs st = writeUnwind (Html.writeList acc hs) st := by
+  induction acc, hs, st using writeLoop.induct with
+  | case1 acc => simp [writeLoop, writeUnwind, Html.writeList]
+  | case2 acc t rest st ih => simp [writeLoop, writeUnwind, Html.writeList, ih]
+  | case3 acc s hs st ih => simp [writeLoop, Html.writeList, Html.write, ih]
+  | case4 acc s hs st ih => simp [writeLoop, Html.writeList, Html.write, ih]
+  | case5 acc t as hs st ih => simp [writeLoop, Html.writeList, Html.write, ih]
+  | case6 acc t as cs hs st ih => simp [writeLoop, writeUnwind, Html.writeList, Html.write, closeTag, ih]
+
+/-- `Html.writeList`, with an explicit stack. -/
+def Html.writeListFast (acc : String) (hs : List Html) : String := writeLoop acc hs []
+
+@[csimp] theorem Html.writeList_eq_fast : @Html.writeList = @Html.writeListFast := by
+  funext acc hs; simp [Html.writeListFast, writeLoop_eq, writeUnwind]
+
 /-- The HTML text of a list of nodes. -/
 def Html.serialize (hs : List Html) : String := Html.writeList "" hs
 
