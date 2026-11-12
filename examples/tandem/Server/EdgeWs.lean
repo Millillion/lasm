@@ -100,7 +100,8 @@ def serveBun (env : Env) (hub : Hub) (handle : Web.Handler) : IO Unit := do
     let .ref request _ := args[0]?.getD .undefined
       | throw (IO.userError "Tandem: the fetch handler expected a Request")
     if ← wantsWebSocket request then
-      if let (some doc, .ref server _) := (wsDoc (← request.get "url" String), args[1]?.getD .undefined) then
+      let server : Data := args[1]?.getD .undefined
+      if let (some doc, .ref server _) := (wsDoc (← request.get "url" String), server) then
         let ok ← server.callMethod "upgrade" #[.ref request "", obj [("data", obj [("doc", toJS doc)])]] Bool
         if ok then return .undefined
     return toJS (← JsServe.webHandler handle { val := request })
