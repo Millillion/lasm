@@ -11,7 +11,7 @@
 //   `>` or `"` and no `&` but the four references (the run-time check of the
 //   proposition `output_reads_back`).
 //
-//   node test/fuzz.mjs [--seed N] [--minutes M] [--engine lasm|native|chromium|firefox|webkit|URL]
+//   node test/fuzz.mjs [--seed N] [--minutes M] [--documents D] [--engine lasm|native|chromium|firefox|webkit|URL]
 //                      [--platform workers|fastly|deno-deploy]
 //
 // The engine is a build of the renderer (test/batch.mjs): `lasm` (the
@@ -23,7 +23,11 @@
 // HTTP and stops it. The time budget is the same on every engine.
 //
 // The seed is printed first; a run replays from it. A failing document is
-// written to test-results/fuzz-SEED-N.md.
+// written to test-results/fuzz-SEED-N.md. The documents are a function of the
+// seed alone, so `--documents D` replays exactly the seed's first D documents
+// whatever the engine's speed (no time limit then unless --minutes is given):
+// CI replays seed 911870982's first 160 on Workers and in each browser, the
+// run that found issue #231 (deep nesting exhausting the engine's stack).
 import { cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,11 +36,13 @@ import { renderAllAsync } from './batch.mjs';
 const root = fileURLToPath(new URL('..', import.meta.url));
 const arg = (n, d) => process.argv.includes(n) ? process.argv[process.argv.indexOf(n) + 1] : d;
 const seed = Number(arg('--seed', Math.floor(Math.random() * 2 ** 31)));
-const minutes = Number(arg('--minutes', 5));
+const documents = arg('--documents', null) === null ? Infinity : Number(arg('--documents'));
+const minutes = Number(arg('--minutes', documents === Infinity ? 5 : Infinity));
 const platform = arg('--platform', null);
 let engine = { lasm: 'node', native: 'native' }[arg('--engine', 'lasm')] ?? arg('--engine', 'lasm');
 const where = platform ? ` --platform ${platform}` : engine !== 'node' ? ` --engine ${arg('--engine')}` : '';
-console.log(`seed ${seed} (replay: node test/fuzz.mjs --seed ${seed} --minutes ${minutes}${where})`);
+const limit = documents === Infinity ? `--minutes ${minutes}` : `--documents ${documents}`;
+console.log(`seed ${seed} (replay: node test/fuzz.mjs --seed ${seed} ${limit}${where})`);
 
 function rng(s) {
   return () => {
@@ -135,6 +141,7 @@ const render = (cases, timeout) => renderAllAsync(cases, { timeout, engine });
 
 const budget = md => 10_000 + Math.ceil(md.length / 100_000) * 4_000;
 const deadline = Date.now() + minutes * 60_000;
+let generated = 0;
 let docs = 0, chars = 0, failures = 0;
 const fail = (md, why) => {
   failures++;
@@ -144,11 +151,11 @@ const fail = (md, why) => {
   console.log(`FAIL (${why}): ${md.length} characters, ${JSON.stringify(md.slice(0, 80))}… saved to ${file}`);
 };
 
-while (Date.now() < deadline && failures < 5) {
+while (Date.now() < deadline && generated < documents && failures < 5) {
   // a batch of documents up to about a million characters
   const batch = [];
   let size = 0;
-  while (batch.length < 40 && size < 1_000_000) { const md = generate(); batch.push(md); size += md.length; }
+  while (batch.length < 40 && size < 1_000_000 && generated < documents) { const md = generate(); generated++; batch.push(md); size += md.length; }
   const cases = batch.flatMap(md => [{ markdown: md, unsafe: false }, { markdown: md, unsafe: true }]);
   let results;
   try {
