@@ -1,8 +1,9 @@
 name: Library proofs
 # The proofs of Lasm's own library (library/PROOFS.md), as conduit.yml's
 # proofs job does for Conduit: scripts/library-proofs.mjs compiles the proof
-# modules (library/Lasm/UI/Proofs*, each library's Spec.lean and
-# Theorems.lean) against the compiled library with the managed Lean 4.35.0,
+# modules (library/Lasm/UI/Proofs*, each library's Spec.lean,
+# Theorems.lean and Candidates.lean, and verification/cli's propositions about
+# the CLI's JavaScript) against the compiled library with the managed Lean 4.35.0,
 # checks that every proposition of a Spec.lean has its theorem of exactly
 # that type and that every theorem uses only propext, Classical.choice and
 # Quot.sound (no sorry), and that library/PROOFS.md is current.
@@ -14,6 +15,7 @@ on:
     paths:
       - '.github/workflows/library-proofs.yml'
       - 'library/**'
+      - 'verification/cli/**'
       - 'scripts/library-proofs.mjs'
       - 'test/library-proofs/**'
       - 'src/lasm-library.mjs'
@@ -23,6 +25,7 @@ on:
     paths:
       - '.github/workflows/library-proofs.yml'
       - 'library/**'
+      - 'verification/cli/**'
       - 'scripts/library-proofs.mjs'
       - 'test/library-proofs/**'
       - 'src/lasm-library.mjs'

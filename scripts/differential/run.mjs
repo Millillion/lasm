@@ -50,6 +50,15 @@
 // of --feat-seeds are replayed first (the pull-request tier's fixed set); with
 // --feat-random 1 (the default) every seed of the run gets one too.
 //
+// Coverage feedback (coverage.mjs, docs/TESTING.md#coverage-feedback): with
+// --guided 1, every program's runtime-C reach (from the oracle's Main.c) and the
+// node target's glue coverage (V8) are measured; the cases that reach something
+// new join a corpus, and a share (--mutant-share, 0.25) of each later core
+// program's cases are mutants of corpus entries. --coverage-state FILE carries
+// the features and the corpus from one campaign to the next (read at the start,
+// written at the end). A guided program depends on the corpus, so it is
+// reproduced from its Main.lean (kept with every reproducer), not from its seed.
+//
 // Exit status: 0 = no divergence, 1 = divergence (reproducers in WORK/repros), 2 = harness error.
 // Upstream suspects (native vs interpreter) are in the summary and never change it.
 import { spawn, spawnSync } from 'node:child_process';
@@ -59,6 +68,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import * as g from './generate.mjs';
 import { genFeatureProgram } from './features.mjs';
+import * as cov from './coverage.mjs';
 
 const argv = process.argv.slice(2);
 const opt = (name, fallback) => { const i = argv.indexOf(name); return i < 0 ? fallback : argv[i + 1]; };
@@ -86,6 +96,9 @@ const regressionsDir = opt('--regressions');
 const shrinkRounds = Number(opt('--shrink-rounds', '12'));
 const summaryFile = opt('--summary', join(work, 'summary.json'));
 const runTimeoutMs = Number(opt('--run-timeout-s', '120')) * 1000;
+const guided = opt('--guided', '0') === '1';
+const mutantShare = Number(opt('--mutant-share', '0.25'));
+const coverageStateFile = opt('--coverage-state') && resolve(opt('--coverage-state'));
 if (!lasm) { console.error('--lasm PATH/bin/lasm.mjs is required'); process.exit(2); }
 mkdirSync(work, { recursive: true });
 
@@ -101,7 +114,8 @@ const nodeJspi = spawnSync(process.execPath, ['-e', 'process.exit(typeof WebAsse
 const here = dirname(fileURLToPath(import.meta.url));
 const unoptimized = { LASM_TEST_UNOPTIMIZED: '1' };
 const TARGETS = {
-  node: { build: [], run: dir => [process.execPath, [join(dir, 'dist/main.mjs')]], fs: true },
+  // Guided: V8 block coverage of the glue (coverage.mjs), written at exit; it changes no output.
+  node: { build: [], run: dir => [process.execPath, [join(dir, 'dist/main.mjs')], guided ? { NODE_V8_COVERAGE: join(dir, 'v8cov') } : undefined], fs: true },
   // Several variables before LEAN_BACKTRACE: libc's getenv once lost every
   // variable after the third (src/wasi/lasm_wasi_libc.c).
   wasi: { build: ['--target', 'wasi'], run: dir => [wasmtime, ['run', '--dir', '.', ...wasmtimeEnv, join(dir, 'wasi/main.wasm')]], fs: true, out: 'wasi' },
@@ -338,8 +352,8 @@ function writeRepro(target, seed, item, nat, tgt, ending, note) {
   mkdirSync(dir, { recursive: true });
   const program = g.renderProgram([{ ...item, name }], { ending });
   writeFileSync(join(dir, 'Main.lean'), program);
-  writeFileSync(join(dir, `${name}.lean`), `-- Differential regression (docs/TESTING.md#differential-testing): ${target}, seed ${seed}, ${item.c.kind === 'feat' ? `feature case ${item.index} (${item.c.fam})` : `case ${item.index}`}; main ends with "${(ending ?? '  return 0').trim()}" (see Main.lean).\n-- ${note.replace(/\n/g, ' ')}\n` + g.renderCase(item.c, name));
-  writeFileSync(join(dir, 'case.json'), JSON.stringify({ target, seed, index: item.index, case: item.c }, null, 1) + '\n');
+  writeFileSync(join(dir, `${name}.lean`), `-- Differential regression (docs/TESTING.md#differential-testing): ${target}, seed ${seed}, ${item.c.kind === 'feat' ? `feature case ${item.index} (${item.c.fam})` : `case ${item.index}`}${item.from ? ` (a coverage-guided mutant of seed ${item.from.seed} case ${item.from.index})` : ''}; main ends with "${(ending ?? '  return 0').trim()}" (see Main.lean).\n-- ${note.replace(/\n/g, ' ')}\n` + g.renderCase(item.c, name));
+  writeFileSync(join(dir, 'case.json'), JSON.stringify({ target, seed, index: item.index, ...(item.from ? { mutantOf: item.from } : {}), case: item.c }, null, 1) + '\n');
   writeFileSync(join(dir, 'native.json'), JSON.stringify(nat, null, 1) + '\n');
   writeFileSync(join(dir, `${target}.json`), JSON.stringify(tgt, null, 1) + '\n');
   return { name, dir };
@@ -356,6 +370,33 @@ export function loadRegressions(dir) {
 const summary = { started: new Date().toISOString(), seed0, targets, profile, cases: nCases, fsCases: nFsCases, featCases: nFeatCases, featSeeds, programs: [], divergences: [], upstreamSuspects: [], harnessErrors: [] };
 const save = () => writeFileSync(summaryFile, JSON.stringify(summary, null, 2) + '\n');
 const startedAt = Date.now();
+const coverageState = guided ? cov.loadState(coverageStateFile) : null;
+const coverage = guided ? new cov.Coverage(coverageState) : null;
+if (guided) console.log(`coverage feedback: ${coverageState.loaded ? `state of earlier campaigns read (${coverageState.features.length} features, ${coverageState.corpus.length} corpus cases${coverageState.droppedCorpus ? `; ${coverageState.droppedCorpus} dropped: the generator changed` : ''})` : 'no earlier state'}`);
+// The core program of a seed, built once and shared by its variants (nosleep,
+// shallow): guided, its last cases are mutants of the corpus as it is now.
+const coreLists = new Map();
+function coreList(seed) {
+  if (coreLists.has(seed)) return coreLists.get(seed);
+  const list = g.genProgram(seed, { cases: nCases });
+  if (coverage && list.length) {
+    const ms = cov.mutants(coverage, seed, Math.round(list.length * mutantShare));
+    ms.forEach((m, j) => { const at = list.length - ms.length + j; list[at] = { index: list[at].index, c: m.c, from: m.from }; });
+    coverage.mutants += ms.length;
+  }
+  coreLists.clear(); coreLists.set(seed, list);
+  return list;
+}
+// What a program reached; the cases that reached something new join the corpus.
+function measure(dir, list, seed, kind, rec) {
+  const c = existsSync(join(dir, 'Main.c')) ? readFileSync(join(dir, 'Main.c'), 'utf8') : '';
+  const names = list.map(({ index, name }) => name ?? `c${index}`);
+  const feats = cov.cFeatures(c, names.map(cov.cName));
+  let fresh = 0;
+  list.forEach((item, i) => { fresh += coverage.add(feats.get(cov.cName(names[i])) ?? new Set(), { seed, index: item.index, kind, c: item.c, ...(item.from ? { from: item.from } : {}) }).length; });
+  const glue = coverage.add(cov.glueFeatures(join(dir, 'v8cov'), dir), null).length;
+  rec.coverage = { newRuntimeC: fresh, newGlue: glue, mutants: list.filter(x => x.from).length };
+}
 
 async function campaignProgram(seed, kind) {
   // core: the targets without a `program`; fs: the targets with a file system;
@@ -367,7 +408,7 @@ async function campaignProgram(seed, kind) {
   if (!tlist.length) return;
   const list = kind === 'feat' ? genFeatureProgram(seed, { cases: nFeatCases })
     : fsProgram ? g.genProgram(seed, { cases: nFsCases, kinds: ['fs', 'io'] })
-    : (PROGRAMS[kind] ?? (x => x))(g.genProgram(seed, { cases: nCases }));
+    : (PROGRAMS[kind] ?? (x => x))(coreList(seed));
   if (!list.length) return; // --cases 0 / --fs-cases 0: no program of that kind
   const ending = g.ENDINGS[seed % g.ENDINGS.length];
   const dir = join(work, `s${seed}-${kind}`);
@@ -381,6 +422,8 @@ async function campaignProgram(seed, kind) {
     return;
   }
   rec.nativeMs = ev.nat.ms;
+  // Measured on the programs of their own (core, fs, feat), not on the variants of the core program.
+  if (coverage && !PROGRAMS[kind]) measure(dir, list, seed, kind, rec);
   // Native Lean itself took a tenth of the run timeout or more: the generator
   // broke its own bound (a power tower of bignums, in campaign 42572268410),
   // and a slower target (bignums without GMP) would only time out. Nothing to
@@ -426,6 +469,7 @@ async function campaignProgram(seed, kind) {
       // A shrink step accepted inside a batch (where an earlier crash hides later
       // cases) may not diverge alone: fall back to the verified case.
       if (!fin.results?.[t]?.diff?.any) { small = item; fin = alone; }
+      if (item.from) small = { ...small, from: item.from };
       const fr = fin.results?.[t];
       const native = fin.nat, target = fr?.run;
       const repro = writeRepro(t, seed, small, native, target, ending, `native: ${JSON.stringify(native?.stdout?.slice(0, 200))} ${t}: ${JSON.stringify(target?.stdout?.slice(0, 200))}`);
@@ -442,7 +486,8 @@ async function campaignProgram(seed, kind) {
       const pick = (r, ids) => { const o = byCase(r.stdout), e = byCase(r.stderr, true); return Object.fromEntries(ids.map(id => [id, { stdout: o.get(id) ?? null, stderr: e.get(id) ?? null }])); };
       const ids = suspects.slice(0, 4);
       writeFileSync(join(combo, 'outputs.json'), JSON.stringify({ native: { code: ev.nat.code, cases: pick(ev.nat, ids) }, [t]: { code: res.run.code, cases: pick(res.run, ids) } }, null, 1) + '\n');
-      sink.push({ seed, kind, target: t, cases: ids, what: 'diverges only in combination with other cases', repro: combo, reproduce: `--seed ${seed} --programs 1` });
+      // A guided program holds mutants of the corpus: its Main.lean, not its seed, reproduces it.
+      sink.push({ seed, kind, target: t, cases: ids, what: 'diverges only in combination with other cases', repro: combo, reproduce: list.some(x => x.from) ? `${combo}/Main.lean (a coverage-guided program)` : `--seed ${seed} --programs 1` });
     }
   }
   save();
@@ -512,8 +557,20 @@ try {
 }
 summary.finished = new Date().toISOString();
 summary.buildMs = Object.fromEntries(builtTargets);
+if (coverage) {
+  summary.coverage = coverage.summary();
+  const night = { date: summary.started.slice(0, 10), seed0, profile, programs: summary.programs.length, features: summary.coverage.features, new: summary.coverage.new, cumulative: summary.coverage.cumulative, newFromMutants: summary.coverage.newFrom.mutant };
+  summary.coverage.nights = [...coverage.nights, night].slice(-14);
+  if (coverageStateFile) { mkdirSync(dirname(coverageStateFile), { recursive: true }); writeFileSync(coverageStateFile, JSON.stringify(coverage.state(coverageState.generator, night)) + '\n'); }
+}
 summary.knownDivergences = KNOWN.map(k => ({ issue: k.issue, targets: k.targets, what: k.what, applied: knownApplied[k.issue] ?? 0 }));
 save();
 const realDivergences = summary.divergences.length;
+if (coverage) {
+  const k = summary.coverage;
+  // The evidence page reads this line (scripts/evidence/page.mjs parse.differential).
+  console.log(`\ncoverage growth by campaign: ${k.nights.map(n => `${n.date} +${n.new} (${n.cumulative})`).join(', ')}`);
+  console.log(`coverage: ${k.features} features (${k.runtimeC} runtime C, ${k.glue} glue), ${k.new} new (${k.newRuntimeC} runtime C, ${k.newGlue} glue; ${k.newFrom.mutant} from mutants, ${k.newFrom.generated} from generated cases), ${k.cumulative} in all campaigns, corpus ${k.corpus} cases, ${k.mutants} mutants run`);
+}
 console.log(`\n${summary.programs.length} programs, ${summary.programs.reduce((s, p) => s + p.cases, 0)} cases, ${realDivergences} divergences, ${summary.upstreamSuspects.length} upstream suspects (native vs interpreter, not Lasm), ${summary.harnessErrors.length} harness errors (summary: ${summaryFile})`);
 process.exit(realDivergences ? 1 : summary.harnessErrors.length ? 2 : 0);
