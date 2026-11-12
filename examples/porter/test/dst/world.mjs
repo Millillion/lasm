@@ -451,8 +451,11 @@ class World {
       if (!res.ok || res.status === 503) {
         // The rotation may have happened: our refresh token is now possibly rotated. And if
         // it already was, this lost request may have been a reuse that revoked the family.
+        // So may a duplicated one: the server saw it twice, and the copy served after the
+        // rotation was a reuse (#206: the rotation landed, the copy revoked the family, and
+        // the crash that followed lost both answers).
         if (info) info.unsure = true;
-        if (maybeReuse) this.families.get(t.family).unsure = true;
+        if (maybeReuse || res.duplicated) this.families.get(t.family).unsure = true;
         return this.later(this.work.range(200, 20_000), () => this.act(ag));
       }
       if (res.duplicated) this.families.get(t.family).unsure = true;

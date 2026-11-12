@@ -2,7 +2,9 @@ name: Pinned Playwright browsers
 description: >-
   Installs playwright-core at a pinned version into .work/pw and the named
   browsers with their system packages (scripts/ci/playwright-install.sh, which
-  retries a stalled apt mirror and download within one budget). With
+  retries a stalled apt mirror and download within one budget). The system
+  packages go through the apt-cache action: their .deb files are cached per
+  runner image, so only a cache miss needs the apt mirror. With
   cache-key, the browser builds are restored from and saved to the Actions
   cache under that key. The calling step sets timeout-minutes (composite steps
   cannot). docs/CI.md#shared-setup.
@@ -26,14 +28,22 @@ runs:
       with:
         path: ${{ runner.os == 'macOS' && '~/Library/Caches/ms-playwright' || '~/.cache/ms-playwright' }}
         key: ${{ inputs.cache-key }}
-    - name: playwright-core and the browsers
+    - name: playwright-core
       shell: bash
       env:
         PW_VERSION: ${{ inputs.version }}
+      run: npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PW_VERSION"
+    - name: The browsers' system packages (cached .deb files, else the apt mirror)
+      uses: ./.github/actions/apt-cache
+      with:
+        name: playwright-${{ inputs.version }}-${{ inputs.browsers }}
+        attempts: '1'
+        run: for b in ${{ inputs.browsers }}; do bash scripts/ci/playwright-install.sh --deps-only "$b"; done
+    - name: The browsers
+      shell: bash
+      env:
         PW_BROWSERS: ${{ inputs.browsers }}
-      run: |
-        npm install --prefix .work/pw --no-audit --no-fund "playwright-core@$PW_VERSION"
-        for b in $PW_BROWSERS; do bash scripts/ci/playwright-install.sh "$b"; done
+      run: for b in $PW_BROWSERS; do bash scripts/ci/playwright-install.sh --no-deps "$b"; done
     - name: Save the browser builds
       if: inputs.cache-key != '' && steps.restore.outputs.cache-hit != 'true'
       continue-on-error: true

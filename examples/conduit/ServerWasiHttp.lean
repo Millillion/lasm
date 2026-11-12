@@ -8,16 +8,18 @@ import Server.Kv
 import Server.LeanCrypto
 import Server.Postgrest
 import Server.BuildEnv
-import Lasm.Fetch.Embed
+import Server.Embed
+import Server.WasiHttpServe
 
 /-- The browser app and its files (dist/public, from npm run build:client),
 embedded in the program so every target serves them. -/
-def assets : Lasm.Fetch.Assets := embed_dir! "dist/public"
+def assets : Conduit.Server.Web.Assets := embed_dir! "dist/public"
 
 def storeUrl : String := (build_env! "CONDUIT_STORE_URL").getD "http://127.0.0.1:3000"
 def storeKey : Option String := build_env! "CONDUIT_STORE_KEY"
 def jwtSecret : String := (build_env! "JWT_SECRET").getD Conduit.Server.developmentSecret
 
 def main : IO Unit := do
-  let kv ← Conduit.Server.Postgrest.open storeUrl storeKey
-  Conduit.Server.serveWith (Conduit.Server.Kv.store kv) (Conduit.Server.LeanCrypto.services (pure jwtSecret)) assets
+  let kv ← Conduit.Server.Postgrest.open Conduit.Server.WasiHttpServe.fetch storeUrl storeKey
+  Conduit.Server.WasiHttpServe.serve
+    (← Conduit.Server.handlerWith (Conduit.Server.Kv.store kv) (Conduit.Server.LeanCrypto.services (pure jwtSecret)) assets)

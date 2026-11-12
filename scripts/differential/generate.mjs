@@ -265,7 +265,8 @@ op('Bool', ['Char'], a => `${a}.isWhitespace`, 1);
 op('Bool', ['Char'], a => `${a}.isUpper`, 1);
 
 // Float (arithmetic and sqrt are IEEE-exact; the libm functions are marked inexact)
-lit('Float', r => r.chance(0.15) ? r.pick(['(0.0/0.0)', '(1.0/0.0)', '(-1.0/0.0)', '(-0.0)']) : (r.chance(0.3) ? '-' : '') + r.pick(FLOAT_LITS));
+const floatLit = r => r.chance(0.15) ? r.pick(['(0.0/0.0)', '(1.0/0.0)', '(-1.0/0.0)', '(-0.0)']) : (r.chance(0.3) ? '-' : '') + r.pick(FLOAT_LITS);
+lit('Float', floatLit);
 op('Float', ['Float', 'Float'], (a, b) => `(${a} + ${b})`, 3);
 op('Float', ['Float', 'Float'], (a, b) => `(${a} - ${b})`, 2);
 op('Float', ['Float', 'Float'], (a, b) => `(${a} * ${b})`, 2);
@@ -392,9 +393,10 @@ op('Pt', ['Pt', 'Pt'], (a, b) => `(Pt.add ${a} ${b})`, 1);
 // operations also need flags.panic): appended after every core operation and
 // filtered out otherwise, so the core cases of every seed are unchanged.
 // Signed fixed-width integers, Float32, ByteArray, Std's HashSet and TreeMap,
-// and operations that panic (`xs[i]!`, `get!`, `toNat!`, `back!`).
-export const EXT_TYPES = ['Int8', 'Int16', 'Int32', 'Int64', 'Float32', 'ByteArray', 'HSet', 'TMap'];
-Object.assign(LEAN_TYPE, { HSet: 'HashSet Nat', TMap: 'TreeMap Nat String' });
+// FloatArray, Thunk Nat, and operations that panic (`xs[i]!`, `get!`,
+// `toNat!`, `back!`).
+export const EXT_TYPES = ['Int8', 'Int16', 'Int32', 'Int64', 'Float32', 'ByteArray', 'HSet', 'TMap', 'FArr', 'ThNat'];
+Object.assign(LEAN_TYPE, { HSet: 'HashSet Nat', TMap: 'TreeMap Nat String', FArr: 'FloatArray', ThNat: 'Thunk Nat' });
 const xop = (t, args, r, w = 1, extra = {}) => op(t, args, r, w, { ext: true, ...extra });
 const xlit = (t, gen, w = 3) => ops.push({ t, args: [], lit: gen, r: null, w, ext: true, id: ops.length });
 const SBITS = { Int8: 8, Int16: 16, Int32: 32, Int64: 64 };
@@ -480,6 +482,34 @@ xop('Nat', ['ListNat'], a => `${a}.head!`, 1, { panic: true });
 xop('Nat', ['OptNat'], a => `${a}.get!`, 1, { panic: true });
 xop('Nat', ['String'], a => `${a}.toNat!`, 1, { panic: true });
 xop('Char', ['String', 'Nat'], (a, b) => `(${a}.toList[${b} % 6]!)`, 1, { panic: true });
+// FloatArray (unboxed doubles: lean_float_array_*), IEEE-exact operations only
+// where the bits are read. Appended last, so no earlier operation's id moves.
+xlit('FArr', r => `(FloatArray.mk #[${Array.from({ length: r.int(0, 5) }, () => `(${floatLit(r)} : Float)`).join(', ')}])`, 2);
+xop('FArr', ['FArr', 'Float'], (a, b) => `(${a}.push ${b})`, 2);
+xop('FArr', ['FArr', 'Nat', 'Float'], (a, b, c) => `(${a}.set! (${b} % 6) ${c})`, 1);
+xop('FArr', ['ListNat'], a => `(FloatArray.mk (${a}.toArray.map Float.ofNat))`, 1);
+xop('FArr', ['ArrayInt'], a => `(FloatArray.mk (${a}.map Float.ofInt))`, 1);
+xop('FArr', ['FArr'], a => `(FloatArray.mk ${a}.data.reverse)`, 1);
+xop('FArr', ['FArr', 'FArr'], (a, b) => `(FloatArray.mk (${a}.data ++ ${b}.data))`, 1);
+xop('FArr', ['Nat', 'Float'], (a, b) => `((FloatArray.emptyWithCapacity (${a} % 10)).push ${b})`, 1);
+xop('FArr', ['FArr'], null, 1, { bind: { t: 'Float', body: 'Float' }, rb: (a, x, body) => `(FloatArray.mk (${a}.data.map (fun (${x} : Float) => ${body})))` });
+xop('Nat', ['FArr'], a => `${a}.size`, 1);
+xop('Float', ['FArr'], a => `(${a}.foldl (· + ·) 0.0)`, 2);
+xop('Float', ['FArr', 'Nat'], (a, b) => `((${a}.get? (${b} % 6)).getD 0.5)`, 1);
+xop('Float', ['FArr'], a => `(Id.run (ForIn.forIn ${a} (1.0 : Float) (fun (x s : Float) => pure (ForInStep.yield (s * 0.5 + x)))))`, 1);
+xop('Bool', ['FArr'], a => `${a}.isEmpty`, 1);
+xop('UInt64', ['FArr'], a => `(${a}.foldl (fun (acc : UInt64) (x : Float) => mixHash acc x.toBits) 7)`, 1, { exactArgs: true });
+xop('ListNat', ['FArr'], a => `(${a}.toList.map (fun (x : Float) => x.toUInt64.toNat))`, 1);
+xop('String', ['FArr'], a => `(toString ${a}.toList)`, 1);
+xop('Float', ['FArr', 'Nat'], (a, b) => `(${a}.get! (${b} % 6))`, 1, { panic: true });
+// Thunk Nat (lean_mk_thunk, lean_thunk_get: forced once, then cached).
+xlit('ThNat', r => `(Thunk.pure (${natLit(r)} : Nat))`, 2);
+xop('ThNat', ['Nat'], a => `(Thunk.mk (fun _ => ${a}))`, 2);
+xop('ThNat', ['ThNat', 'Nat'], (a, b) => `(Thunk.map (· + ${b}) ${a})`, 1);
+xop('ThNat', ['ThNat'], null, 1, { bind: { t: 'Nat', body: 'Nat' }, rb: (a, x, body) => `(${a}.bind (fun (${x} : Nat) => Thunk.mk (fun _ => ${body})))` });
+xop('ThNat', ['Bool', 'ThNat', 'ThNat'], (c, a, b) => `(if ${c} then ${a} else ${b})`, 1);
+xop('Nat', ['ThNat'], a => `${a}.get`, 2);
+xop('Nat', ['ThNat'], a => `(let t := ${a}; t.get * 2 + t.get)`, 1);
 
 export const OPS = ops;
 const byType = Object.fromEntries([...TYPES, ...EXT_TYPES].map(t => [t, ops.filter(o => o.t === t)]));
@@ -535,7 +565,7 @@ const SHOW = {
   Float: x => `(toString ${x})`, String: x => `(repr ${x}).pretty`, Char: x => `(repr ${x}).pretty`,
   ListNat: x => `(repr ${x}).pretty`, ArrayInt: x => `(repr ${x}).pretty`, OptNat: x => `(repr ${x}).pretty`,
   Tree: x => `(repr ${x}).pretty`, Pt: x => `(repr ${x}).pretty`, ListString: x => `(repr ${x}).pretty`,
-  ByteArray: x => `(toString ${x}.toList)`, HSet: x => `(toString (${x}.toList.mergeSort (· ≤ ·)))`, TMap: x => `(repr ${x}.toList).pretty`,
+  ByteArray: x => `(toString ${x}.toList)`, FArr: x => `(toString ${x}.toList)`, ThNat: x => `(toString ${x}.get)`, HSet: x => `(toString (${x}.toList.mergeSort (· ≤ ·)))`, TMap: x => `(repr ${x}.toList).pretty`,
 };
 export const show = (t, x) => (SHOW[t] ?? (y => `(toString ${y})`))(x);
 
@@ -581,6 +611,8 @@ function genStmts(r, kind, n, depth) {
   }
   return out;
 }
+// One fresh statement of a statement case's kind (coverage.mjs mutates with it).
+export const regenStatement = (r, kind, depth) => genStmts(r, kind, 1, depth)[0];
 const ind = n => '  '.repeat(n);
 function renderStateStmts(ss, d) {
   const lines = [];
@@ -658,6 +690,8 @@ const DEEP = [
   n => `((Array.range ${n}).foldl (fun (m : HashMap Nat Nat) i => m.insert (i * 7919 % ${n}) i) {}).size`,
   n => `(Nat.repr ((10 : Nat) ^ ${n} - 1)).length`,
 ];
+export const DEEP_COUNT = DEEP.length;
+export const DEEP_SIZES = [100, 1000, 3000, 5000];
 export function genCase(seed, index, { kinds = ['expr', 'state', 'io', 'task', 'deep'], depth = 4 } = {}) {
   const r = rng(seed, index);
   uniq = index * 1000;
@@ -665,7 +699,7 @@ export function genCase(seed, index, { kinds = ['expr', 'state', 'io', 'task', '
   // At most 5,000 frames of non-tail recursion: the edge profile and WASI are
   // bounded by the engine's Wasm stack (docs/EDGE.md, docs/WASI.md), about 9,000
   // frames of a small function (issue #30). Deeper recursion is a known difference.
-  if (kind === 'deep') return { kind, f: r.int(0, DEEP.length - 1), n: r.pick([100, 1000, 3000, 5000]) };
+  if (kind === 'deep') return { kind, f: r.int(0, DEEP.length - 1), n: r.pick(DEEP_SIZES) };
   if (kind === 'expr') {
     const t = r.weighted(TYPES.map(t => ({ t, w: ['Nat', 'Int', 'String', 'Float', 'UInt64'].includes(t) ? 3 : 1 }))).t;
     return { kind, t, e: genExpr(r, t, r.int(1, depth), [], {}) };
@@ -807,7 +841,8 @@ export function renderProgram(list, { exit, ending } = {}) {
 // minimal literal, and (for statement cases) every statement removed or its body
 // flattened. Candidates are ordered smallest first.
 const MIN_LIT = { Nat: '0', Int: '0', UInt8: '0', UInt16: '0', UInt32: '0', UInt64: '0', Bool: 'false', Float: '0.0', String: '""', Char: "'a'", ListNat: '[]', ArrayInt: '#[]', OptNat: '(none : Option Nat)', Tree: '(Tree.leaf)', ListString: '[]',
-  Int8: '0', Int16: '0', Int32: '0', Int64: '0', Float32: '0.0', ByteArray: '(ByteArray.mk #[])', HSet: '(HashSet.ofList ([] : List Nat) : HashSet Nat)', TMap: '(TreeMap.ofList ([] : List (Nat × String)) : TreeMap Nat String)' };
+  Int8: '0', Int16: '0', Int32: '0', Int64: '0', Float32: '0.0', ByteArray: '(ByteArray.mk #[])', HSet: '(HashSet.ofList ([] : List Nat) : HashSet Nat)', TMap: '(TreeMap.ofList ([] : List (Nat × String)) : TreeMap Nat String)',
+  FArr: '(FloatArray.mk #[])', ThNat: '(Thunk.pure 0)' };
 function minLit(t) {
   const o = byType[t].find(x => x.lit);
   return o && MIN_LIT[t] !== undefined ? { op: o.id, v: MIN_LIT[t], bb: false } : null;
