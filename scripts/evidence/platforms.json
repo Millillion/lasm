@@ -42,7 +42,10 @@
       "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" },
              { "workflow": "differential.yml", "job": "^equivalence \\(" },
              { "workflow": "conduit.yml", "job": "^API on Cloudflare Workers " }],
-      "L3": null
+      "L3": [{ "workflow": "conduit.yml", "job": "^(API|E2E) on Cloudflare Workers " },
+             { "workflow": "folio-nightly.yml", "job": "^fuzz-workers$" },
+             { "workflow": "porter-nightly.yml", "job": "^40 minutes of fuzzing on Cloudflare Workers$" },
+             { "workflow": "dst-nightly.yml", "job": "^ledger on Cloudflare Workers \\(wrangler dev\\), random seeds$" }]
     },
     {
       "id": "vercel",
@@ -134,7 +137,9 @@
       "L1": [{ "workflow": "release-checks.yml", "job": "^browser / (chromium|firefox|webkit) on " },
              { "workflow": "release-checks.yml", "job": "^ui / ui$" }],
       "L2": [{ "workflow": "differential.yml", "job": "^differential \\(release\\)$" }],
-      "L3": null
+      "L3": [{ "workflow": "conduit.yml", "job": "^E2E on Node, (chromium|firefox|webkit)$" },
+             { "workflow": "folio-nightly.yml", "job": "^fuzz-(chromium|firefox|webkit)$" },
+             { "workflow": "dst-nightly.yml", "job": "^ledger on headless (Chromium|Firefox|WebKit), random seeds$" }]
     }
   ]
 }

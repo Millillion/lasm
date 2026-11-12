@@ -135,27 +135,15 @@ def builtin_closure : Prop :=
     DependenciesFirst imports (builtinModuleClosure imports requested)
 
 /-- **The compact wrappers run the kept initializers as the chains do.** For
-an acyclic plan of valid initializer names, calling kept initializers'
-wrappers runs exactly the kept initializers the Node build's chains run, in
+an acyclic plan of valid initializer names, the wrappers are generated, and
+calling kept initializers' wrappers runs exactly the kept initializers the Node build's chains run, in
 the same order (each once, after those it reaches).
 Tested by: test/edge-initializers.test.mjs -/
 def compact_wrappers_as_chains : Prop :=
-  ∀ (p : Plan) (entries : List String), Acyclic p.calls →
-    (∀ x ∈ p.closure, initializerName x = true) → (∀ x, ∀ y ∈ p.calls x, y ∈ p.closure) →
+  ∀ (p : Plan) (entries : List String), Acyclic p.edges →
+    (∀ x ∈ p.closure, initializerName x = true) → (∀ x, ∀ y ∈ p.edges x, y ∈ p.closure) →
     (∀ e ∈ entries, e ∈ p.keep) → (∀ k ∈ p.keep, k ∈ p.closure) →
-    runInitializers (compactInitializerWrappers p) p.calls entries = chains p entries
-
-/-- **A unit's schedule is the kept units it reaches, dependencies first.**
-For an acyclic call graph, the schedule of `n` holds each kept unit other
-than `n` that `n` reaches, exactly once, and every one after the kept units
-it reaches.
-Tested by: test/edge-initializers.test.mjs -/
-def schedule_reached_kept_first : Prop :=
-  ∀ (calls : String → List String) (keep : List String) (n : String), Acyclic calls →
-    (initializationSchedule n calls keep).Nodup ∧
-    (∀ y, y ∈ initializationSchedule n calls keep ↔ y ∈ keep ∧ y ≠ n ∧ Reaches calls n y) ∧
-    ∀ x ∈ initializationSchedule n calls keep, ∀ y, y ∈ keep → y ≠ n → Reaches calls x y →
-      (initializationSchedule n calls keep).idxOf y < (initializationSchedule n calls keep).idxOf x
+    ∃ source, compactInitializerWrappers p = .ok source ∧ runInitializers source p.edges entries = chains p entries
 
 /-! ## `lasm init` names -/
 
