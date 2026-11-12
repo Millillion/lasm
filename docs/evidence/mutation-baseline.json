@@ -1,23 +1,23 @@
 {
   "comment": "Mutation scores per module (scripts/mutation/run.mjs, docs/TESTING.md#mutation-testing). initial: before the tests were improved (2026-11-02); score: the last recorded measurement; threshold: the floor CI checks (nightly, PRs), the score rounded down to a whole percent, at least 80 % and never lowered (the ratchet, docs/DECISIONS.md 2026-11-03).",
-  "measuredAt": "2026-11-09",
+  "measuredAt": "2026-11-11",
   "tool": "Stryker 10.0.0 with the tap runner over node:test (scripts/mutation/run.mjs)",
   "modules": {
     "host-bridge": {
       "initial": 56.5,
-      "score": 96.4,
-      "mutants": 848,
+      "score": 96.3,
+      "mutants": 880,
       "threshold": 96
     },
     "ui-dom": {
       "initial": 55.1,
-      "score": 93.6,
-      "mutants": 758,
+      "score": 93.9,
+      "mutants": 788,
       "threshold": 93
     },
     "build-service": {
       "initial": 52.4,
-      "score": 94.3,
+      "score": 94.6,
       "mutants": 464,
       "threshold": 94
     },
@@ -29,14 +29,14 @@
     },
     "target-link": {
       "initial": 5.9,
-      "score": 90.6,
-      "mutants": 1965,
-      "threshold": 90
+      "score": 91.2,
+      "mutants": 2050,
+      "threshold": 91
     },
     "edge-glue": {
       "initial": 15.2,
       "score": 97.1,
-      "mutants": 1282,
+      "mutants": 1327,
       "threshold": 97
     },
     "notices": {
@@ -53,8 +53,8 @@
     },
     "toolchains": {
       "initial": 58.9,
-      "score": 89.7,
-      "mutants": 1820,
+      "score": 89.3,
+      "mutants": 1676,
       "threshold": 89
     },
     "cli": {
@@ -66,61 +66,61 @@
     "init": {
       "initial": 53.6,
       "score": 97.1,
-      "mutants": 830,
+      "mutants": 838,
       "threshold": 97
     },
     "dev": {
       "initial": 29.2,
-      "score": 91,
-      "mutants": 1605,
+      "score": 91.8,
+      "mutants": 1615,
       "threshold": 91
     },
     "browser": {
       "initial": 26.1,
-      "score": 96.6,
-      "mutants": 1813,
+      "score": 96.1,
+      "mutants": 1340,
       "threshold": 96
     },
     "application-sources": {
       "initial": 44.5,
-      "score": 85.4,
-      "mutants": 3531,
+      "score": 85.3,
+      "mutants": 3578,
       "threshold": 85
     },
     "application-output": {
       "initial": 51.1,
-      "score": 92.5,
-      "mutants": 2358,
+      "score": 92.4,
+      "mutants": 2223,
       "threshold": 92
     },
     "edge-build": {
       "initial": 31.5,
-      "score": 89.4,
-      "mutants": 996,
+      "score": 89.6,
+      "mutants": 1014,
       "threshold": 89
     },
     "wasi-build": {
       "initial": 45.8,
       "score": 95.6,
-      "mutants": 1067,
+      "mutants": 1065,
       "threshold": 95
     },
     "node-host": {
       "initial": 42,
       "score": 86.2,
-      "mutants": 3794,
+      "mutants": 3795,
       "threshold": 86
     },
     "native-files": {
       "initial": 29.4,
-      "score": 86.4,
-      "mutants": 2027,
-      "threshold": 86
+      "score": 88.5,
+      "mutants": 1804,
+      "threshold": 88
     },
     "serverless": {
       "initial": 40.5,
       "score": 88.5,
-      "mutants": 770,
+      "mutants": 769,
       "threshold": 88
     },
     "node-serve": {
@@ -130,5 +130,5 @@
       "threshold": 80
     }
   },
-  "run": "mutation.yml run 42615928074 on #165 (Node 26.13.0), every module"
+  "run": "mutation.yml run 43024598393, the nightly run on main 28975199 (Node 26.13.0), every module"
 }
