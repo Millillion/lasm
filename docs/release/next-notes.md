@@ -15,3 +15,11 @@
   docs/REVIEW.md. Conduit reads its Fastly secret with the generated
   `SecretStore` calls. Every platform each app ran on before is still checked
   in CI, with the same suites and thresholds.
+
+## Fixes
+
+- **`HTMLCanvasElement.getContext`, `Document.currentScript` and
+  `HTMLFormControlsCollection.namedItem` return `none` for `null`.** They were
+  `some` of a reference to `null` (an unsupported context id, no current
+  script, no such control). The generator now requests a nullable `Value`
+  result as data (`Lasm.JS.Web.Support.optionalValue`). Types are unchanged.

@@ -170,7 +170,12 @@ npm run fuzz -- --minutes 5 # the crash and timeout fuzzer (the seed is printed 
   list ([`test/cmark-pathological`](test/cmark-pathological), vendored with its license), with
   cmark's expected-output patterns. It covers deep nesting (25,000 block quotes, 32,500 nested
   emphases, 30,000 nested list items with blank lines) and runs of unmatched delimiters,
-  brackets, backticks and `<!--` up to 3 million characters. Each case runs in about a second
+  brackets, backticks and `<!--` up to 3 million characters. Deeper cases follow it: a list
+  2,685 deep and block quotes 36,742 deep (issue #231), 20,000 nested ordered lists, lists in
+  block quotes in lists 30,000 deep and images nested 30,000 deep. The same cases run on every
+  build: Node, WASI (wasmtime, wasmer, node:wasi), the browsers (Chromium, Firefox, WebKit) and
+  the site server on each edge platform's local tooling (`--engine`, `test/edge.mjs
+  --pathological`; [folio-platforms.yml](../../.github/workflows/folio-platforms.yml)). Each case runs in about a second
   (backticks: 5 s for 3.1 million characters). commonmark.js takes 9 minutes on `![[]()`
   repeated and almost 2 minutes on unclosed link destinations.
 - **The fuzzer** ([`test/fuzz.mjs`](test/fuzz.mjs)) generates three kinds of documents: syntax
@@ -184,6 +189,13 @@ npm run fuzz -- --minutes 5 # the crash and timeout fuzzer (the seed is printed 
 What it found, all fixed:
 - a stack overflow on the WebAssembly build (rendering 300,000 inlines in one paragraph
   recursed once per inline; the list functions are now tail recursive);
+- a stack overflow on Cloudflare Workers (issue #231, found by fuzzing the Workers server):
+  the edge's and the browsers' engines allow just under 10,000 stack frames, and the tree walks
+  (reference definitions, the document tree, the HTML tree, image descriptions, writing the
+  HTML) recursed once per level of nesting. Each now runs a version with an explicit stack,
+  proved equal to the recursive definition the proofs are about and put in its place by an
+  `@[csimp]` theorem ([PROOFS.md](PROOFS.md#how-the-proofs-reach-the-real-code)); nothing is
+  capped, so the output is the same at any depth;
 - seven quadratic cases, where the parser rescanned to the end of the text. These are now
   answered from facts computed once per paragraph, or skipped as cmark does:
   - backtick runs;
