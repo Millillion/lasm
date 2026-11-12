@@ -177,7 +177,7 @@ def main (args : List String) : IO UInt32 := do
       return 2
     -- Workers and browsers: scripts/sim/remote.mjs calls this handler once the
     -- world in Node is connected, and waits for its exit status.
-    exportDefault (← ofFn fun _ => do
+    exportDefault (← Lasm.JS.Function.ofFn fun _ => do
       let code ← Ledger.Sim.runAll { v := ← (← global).get "lasmSimWorld", remote := true }
       return toJS code)
     return 0
