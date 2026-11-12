@@ -75,7 +75,7 @@ jobs:
     needs: [runtime, native]
     if: ${{ !cancelled() && needs.native.result == 'success' && (needs.runtime.result == 'success' || needs.runtime.result == 'skipped') }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 240
     env:
       LEAN_NUM_THREADS: '2'
       BINARYEN_CORES: '1'
@@ -154,6 +154,20 @@ jobs:
         run: node scripts/wasi/wasi-ci.mjs .work/wasi-apps .work/wasi-tools
       - name: Licence check of every built output (notices file, embedded notices, no copyleft code)
         run: node scripts/license/check-outputs.mjs .work/wasi-apps --expect wasi,fastly,wasi-http --report .work/wasi-apps/license-check.json
+      - name: EVIDENCE (#246, temporary) memory and speed with and without mimalloc's arenas
+        if: ${{ !cancelled() }}
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: node scripts/wasi/evidence-246.mjs .work/evidence-246 .work/wasi-tools
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: evidence-246
+          path: |
+            .work/evidence-246/evidence-246.json
+            .work/evidence-246/*.log
+          retention-days: 14
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
