@@ -34,9 +34,9 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**137 shipped modules**: 11 modelled, 28 pending, 98 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 28 modules still need a model.
+**137 shipped modules**: 12 modelled, 27 pending, 98 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 27 modules still need a model.
 
-### Modelled (11)
+### Modelled (12)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -50,9 +50,10 @@ How a module moves from pending to modelled:
 | [`src/serverless/lasm-lambda.mjs`](../src/serverless/lasm-lambda.mjs) | [Model.lean](../library/Lasm/Serverless/Proofs/Model.lean) (`query`, `rawQuery`, `headerPairs`, `decode`, `handler`, `cloudFront`; [serverless-http.mjs](../test/fuzz/targets/serverless-http.mjs)) | the request and response mapping is modelled; the rest forwards over loopback |
 | [`src/serverless/lasm-server.mjs`](../src/serverless/lasm-server.mjs) | [Model.lean](../library/Lasm/Serverless/Proofs/Model.lean) (`requestTarget`, `plainHost`, `joinCookies`, `outgoingHeaders`, `isTextual`, `webReply`, `parseSetCookie`, `azureReply`; [serverless-http.mjs](../test/fuzz/targets/serverless-http.mjs)) | the HTTP mapping is modelled; the rest starts the program and forwards over loopback |
 | [`src/serverless/zip.mjs`](../src/serverless/zip.mjs) | [Zip.lean](../verification/cli/Lasm/Cli/Model/Zip.lean) (`zip`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the writer is modelled byte for byte, with node:zlib (deflateRawSync, crc32) a parameter; zip_deterministic proved; zip_reads_back stays a candidate (its ZIP reader is the test's, an outside oracle) |
+| [`src/wasi/lower-atomics.mjs`](../src/wasi/lower-atomics.mjs) | [LowerAtomics.lean](../verification/cli/Lasm/Cli/Model/LowerAtomics.lean) (`lowerAtomics`, `moduleImports`, `keepExports`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole module is modelled (lowerAtomics with its readers, moduleImports, keepExports); candidates lowering_rewrites_atomics, lowering_leaves_no_atomics and lowering_keeps_runs are stated over the model, the last two also over WebAssembly validation and execution (outside semantics) |
 | [`src/wasi/wasi-component.mjs`](../src/wasi/wasi-component.mjs) | [WasiComponent.lean](../verification/cli/Lasm/Cli/Model/WasiComponent.lean) (`replaceCoreModule`, `placeholderModule`, `componentize`, `makeTemplate`, `extractCore`, `withoutComponentType`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | every function is modelled (the template, read from component/proxy-template.wasm by default, is an argument); replace_one_core_module, drops_only_component_type and componentize_inverse proved |
 
-### Pending (28)
+### Pending (27)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -82,7 +83,6 @@ How a module moves from pending to modelled:
 | [`src/node-js.mjs`](../src/node-js.mjs) | [Core.lean](../library/Lasm/JS/Core.lean) (the value codec (Writer, reader); [lasm-js-wire.mjs](../test/fuzz/targets/lasm-js-wire.mjs)) | Lasm.JS on Node: the value codec's JavaScript half is checked against Lean's proved codec (lasm-js-wire); the host operations (calls, properties, callbacks, references) are not modelled (IRREDUCIBLE.md M4) |
 | [`src/platform.mjs`](../src/platform.mjs) | [Platform.lean](../verification/cli/Lasm/Cli/Model/Platform.lean) (`responseFile`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | `insideDirectory` (path containment, over Node's `path.relative`) remains to model; the rest is the host check and constants |
 | [`src/wasi/lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c) | — | the wasi-http request and response mapping (edge request mapping, IRREDUCIBLE.md M4) |
-| [`src/wasi/lower-atomics.mjs`](../src/wasi/lower-atomics.mjs) | — | lowers atomic instructions: pure over Wasm bytes (candidates lowering_rewrites_atomics, lowering_leaves_no_atomics, lowering_keeps_runs) |
 | [`src/wasm-objects.mjs`](../src/wasm-objects.mjs) | — | a reader of relocatable Wasm objects: pure |
 
 ### Exempt (98)

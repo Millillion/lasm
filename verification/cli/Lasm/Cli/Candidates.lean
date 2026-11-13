@@ -132,23 +132,25 @@ def python_order_code_points : Prop :=
 
 /-! ## WebAssembly -/
 
-/-- **Lowering atomics keeps what one thread computes.** For a valid module,
-the lowered module is valid, lowering it again changes nothing, and run on
-one thread it gives the same result and leaves the same memory.
+/-- **Lowering atomics keeps what one thread computes.** When it lowers a
+valid module, the lowered module is valid, lowering it again changes nothing,
+and run on one thread it gives the same result and leaves the same memory.
+(The lowering refuses, with an error, SIMD and GC instructions, which a valid
+module may hold.)
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_keeps_runs : Prop :=
-  ∀ (m : ByteArray) (args : List Nat), validate m = true →
-    validate (lowerAtomics m) = true ∧ lowerAtomics (lowerAtomics m) = lowerAtomics m ∧
-    run (lowerAtomics m) args = run m args
+  ∀ (m m' : ByteArray) (args : List Nat), validate m = true → lowerAtomics m = .ok m' →
+    validate m' = true ∧ lowerAtomics m' = .ok m' ∧ run m' args = run m args
 
-/-- **Lowering leaves no atomic instruction.** For a valid module, the
-lowered module is valid without the threads feature and lowering it again
-changes nothing; a module already valid without threads is returned as it is.
+/-- **Lowering leaves no atomic instruction.** When it lowers a valid
+module, the lowered module is valid without the threads feature and lowering
+it again changes nothing; a module already valid without threads is returned
+as it is.
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_leaves_no_atomics : Prop :=
-  ∀ m : ByteArray, validate m = true →
-    validWithoutThreads (lowerAtomics m) = true ∧ lowerAtomics (lowerAtomics m) = lowerAtomics m ∧
-    (validWithoutThreads m = true → lowerAtomics m = m)
+  ∀ m m' : ByteArray, validate m = true → lowerAtomics m = .ok m' →
+    validWithoutThreads m' = true ∧ lowerAtomics m' = .ok m' ∧
+    (validWithoutThreads m = true → m' = m)
 
 /-- **Lowering rewrites each atomic and copies everything else.** In a module
 of any bodies of well-formed instructions, every non-atomic instruction and every local declaration is
@@ -162,7 +164,7 @@ def lowering_rewrites_atomics : Prop :=
     (∀ b ∈ bodies, localDeclarations b.1 = true ∧ ∀ i ∈ b.2, i.WellFormed) →
     let keys := (bodies.flatMap fun b => b.2.filterMap Instr.helper?).eraseDups
     let index := fun sub => imported + bodies.length + keys.idxOf sub
-    ∃ out, codeBodies (lowerAtomics (bytes (moduleOf memory64 types imported bodies))) = some out ∧
+    ∃ m out, lowerAtomics (bytes (moduleOf memory64 types imported bodies)) = .ok m ∧ codeBodies m = some out ∧
       out.length = bodies.length + keys.length ∧
       out.take bodies.length = bodies.map fun (locals, is) => locals ++ is.flatMap (Instr.lowered memory64 index) ++ [0x0b]
 

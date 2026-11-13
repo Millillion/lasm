@@ -28,6 +28,7 @@ import { numbers } from '../../src/node-host.mjs';
 import { responseFile } from '../../src/platform.mjs';
 import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 import { zip } from '../../src/serverless/zip.mjs';
+import { keepExports, lowerAtomics, moduleImports } from '../../src/wasi/lower-atomics.mjs';
 import { HandleTable } from '../../src/handle-table.mjs';
 import { encodeProcessConfiguration } from '../../src/process-launcher.mjs';
 import { deflateRawSync, crc32 } from 'node:zlib';
@@ -184,6 +185,66 @@ const devValues = ['node', 'bun', 'deno', 'browser', 'workers', 'node,browser', 
   'node,bun', 'node=', 'node=a', 'x', '', '--x', '-x', '80', '65535', '65536', '00080', '123456', 'a\nb', '127.0.0.1', 'out', 'deno=b.lean=c'];
 const packageValues = ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf', 'browser', 'constructor', '', '--x', '-x', 'out', 'a\nb'];
 
+
+/** WebAssembly instructions as the lowering reads them: every immediate
+ * form of skipInstruction, atomics of every sub-opcode (and unknown ones),
+ * and instructions it refuses. */
+function instruction(r) {
+  const memargOf = () => { const align = r.pick([0, 1, 2, 3, 0x40 | 2]); return [...leb(align), ...(align & 0x40 ? leb(r.int(0, 2)) : []), ...leb(r.pick([0, 1, 8, 200, 70000, 2 ** 32 + 5]), r.next() < 0.1 ? 1 : 0)]; };
+  const block = () => r.pick([[0x40], [0x7f], [0x7b], [0x70], [0x6f], [0x63, 0x70], [0x64, 0x05], [0x05], [0x80, 0x01]]);
+  const heap = () => r.pick([[0x70], [0x6f], [0x40], [0x05], [0x80, 0x01]]);
+  if (r.next() < 0.02) return [0xfe, ...leb(r.pick([4, 0x0f, 0x4f, 0x60, 200]), r.next() < 0.2 ? 1 : 0), ...memargOf()];
+  if (r.next() < 0.02) return [r.pick([0xfd, 0xfb, 0x27, 0xc5, 0xd7, 0xff]), 0];
+  return r.pick([
+    () => [r.pick([0x00, 0x01, 0x05, 0x0b, 0x0f, 0x1a, 0x1b, 0x45, 0x6a, 0x7c, 0xa7, 0xc4, 0xd1, 0xd3, 0xd4, 0x19, 0x0a])],
+    () => [r.pick([0x02, 0x03, 0x04, 0x06]), ...block()],
+    () => [r.pick([0x07, 0x08, 0x09, 0x0c, 0x0d, 0x10, 0x12, 0x14, 0x15, 0x18, 0xd2, 0xd5, 0xd6, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26]), ...leb(r.int(0, 300))],
+    () => [0x0e, ...leb(2), ...leb(0), ...leb(1), ...leb(0)],
+    () => [r.pick([0x11, 0x13]), ...leb(r.int(0, 3)), ...leb(0)],
+    () => [0x1c, ...leb(1), r.pick([0x7f, 0x63])].concat(r.next() < 0.5 ? [] : [0x70]),
+    () => [0x1f, ...block(), ...leb(2), 0, ...leb(1), ...leb(0), 2, ...leb(0)],
+    () => [r.pick([0x3f, 0x40]), 0],
+    () => [r.pick([0x41, 0x42]), ...leb(r.int(0, 100000), r.next() < 0.1 ? 2 : 0)],
+    () => [0x43, ...randomBytes(r, 0).concat([1, 2, 3, 4])],
+    () => [0x44, 1, 2, 3, 4, 5, 6, 7, 8],
+    () => [0xd0, ...heap()],
+    () => [0xfc, ...leb(r.int(0, 19)), ...leb(0), ...leb(0)],
+    () => [r.int(0x28, 0x3e), ...memargOf()],
+    () => [0xfe, ...leb(r.int(0x10, 0x4e)), ...memargOf()],
+    () => [0xfe, ...leb(r.int(0x10, 0x4e)), ...memargOf()],
+    () => [0xfe, ...leb(r.pick([0, 1, 2])), ...memargOf()],
+    () => [0xfe, 0x03, r.pick([0, 1])],
+  ])();
+}
+/** A core module for the lowering: types, imports of every kind, functions
+ * with locals and instruction streams, a memory (32- or 64-bit), exports and
+ * custom sections; sometimes missing sections, mismatched counts, padded
+ * sizes, or corrupted bytes. */
+function atomicModule(r) {
+  const vec = items => [...leb(items.length), ...items.flat()];
+  const name = text => vec(utf8(text).map(b => [b]));
+  const sections = [];
+  const types = r.int(0, 3);
+  if (r.next() < 0.95) sections.push([1, [...leb(types + (r.next() < 0.05 ? 1 : 0), r.next() < 0.1 ? 1 : 0), ...Array.from({ length: types }, () => [0x60, 0, 0]).flat()]]);
+  if (r.next() < 0.6) sections.push([2, vec(r.array(r.int(0, 4), () => [...name(r.pick(['env', 'wasi', 'λ'])), ...name(r.pick(['f', 'g', 'memory'])),
+    ...(r.next() < 0.05 ? [r.pick([5, 9]), 0] : r.pick([[0, 0], [1, 0x70, 0, 1], [2, 0, 1], [2, 4, 1], [2, 5, 1, 2], [3, 0x7f, 0], [4, 0, 0]]))]))]);
+  const bodies = r.array(r.int(0, 4), () => {
+    const locals = r.pick([[0], [1, 1, 0x7f], [2, 1, 0x7e, 2, 0x63, 0x70], [1, 1, 0x64, 0x80, 0x01]]);
+    const code = [...locals, ...r.array(r.int(0, 8), () => instruction(r)).flat(), 0x0b];
+    return [...leb(Math.max(0, code.length + (r.next() < 0.03 ? r.int(-3, 3) : 0)), r.next() < 0.1 ? 1 : 0), ...code];
+  });
+  if (r.next() < 0.95) sections.push([3, [...leb(bodies.length + (r.next() < 0.03 ? 1 : 0)), ...bodies.map(() => r.int(0, Math.max(types - 1, 0)))]]);
+  if (r.next() < 0.8) sections.push([5, r.next() < 0.1 ? [0] : [1, r.pick([0, 1, 4, 5]), 1, ...(r.next() < 0.3 ? [2] : [])]]);
+  if (r.next() < 0.5) sections.push([7, vec(r.array(r.int(0, 3), () => [...name(r.pick(['run', 'keep', 'memory', '_start', 'λ'])), r.int(0, 2), ...leb(r.int(0, 3))]))]);
+  if (r.next() < 0.95) sections.push([10, [...leb(bodies.length), ...bodies.flat()]]);
+  if (r.next() < 0.3) sections.splice(r.int(0, sections.length), 0, [0, [...name('name'), ...randomBytes(r, 5)]]);
+  let bytes = [...coreHeader, ...sections.flatMap(([id, body]) => [id, ...leb(body.length, r.next() < 0.1 ? 1 : 0), ...body])];
+  const roll = r.next();
+  if (roll < 0.05 && bytes.length) bytes[r.int(0, bytes.length - 1)] = r.int(0, 255);
+  else if (roll < 0.1) bytes = bytes.slice(0, r.int(0, bytes.length));
+  return bytes;
+}
+
 /** Launcher options: texts with the characters that matter to the format
  * and to `setenv` (`=` in names, empty names, repeated names). */
 const launchText = r => r.string(['a', 'Z', ' ', '=', 'λ', '/', '\n', '日', '😀'], 0, 6);
@@ -295,6 +356,24 @@ export const models = [
     generate: r => [...subcommandLine(r, ['--target', '--target', '--output'], packageValues), ...(r.next() < 0.3 ? ['--allow-dev'] : [])],
     input: tokens => tokens.map(hex),
     js: tokens => parseOutcome(() => parsePackageArguments(tokens)),
+  },
+  {
+    name: 'lowerAtomics', source: 'src/wasi/lower-atomics.mjs', lean: 'Lasm.Cli.Model.LowerAtomics',
+    generate: atomicModule,
+    input: bytes => hexOf(bytes),
+    js: bytes => attempt(() => lowerAtomics(Uint8Array.from(bytes))),
+  },
+  {
+    name: 'moduleImports', source: 'src/wasi/lower-atomics.mjs', lean: 'Lasm.Cli.Model.LowerAtomics',
+    generate: atomicModule,
+    input: bytes => hexOf(bytes),
+    js: bytes => { try { return { imports: moduleImports(Uint8Array.from(bytes)).map(({ module, name, kind }) => [hex(module), hex(name), kind]) }; } catch (error) { return { error: error.message }; } },
+  },
+  {
+    name: 'keepExports', source: 'src/wasi/lower-atomics.mjs', lean: 'Lasm.Cli.Model.LowerAtomics',
+    generate: r => ({ bytes: atomicModule(r), keep: r.array(r.int(0, 2), () => r.pick(['run', 'keep', 'memory', '_start', 'λ'])) }),
+    input: ({ bytes, keep }) => ({ bytes: hexOf(bytes), keep: keep.map(hex) }),
+    js: ({ bytes, keep }) => attempt(() => keepExports(Uint8Array.from(bytes), name => keep.includes(name))),
   },
   {
     name: 'numbers', source: 'src/node-host.mjs', lean: 'Lasm.Cli.Model.NodeHost',

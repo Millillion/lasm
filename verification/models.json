@@ -786,8 +786,19 @@
       "reason": "Lean's runtime primitives on this host: their meaning is native Lean's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md)"
     },
     "src/wasi/lower-atomics.mjs": {
-      "status": "pending",
-      "reason": "lowers atomic instructions: pure over Wasm bytes (candidates lowering_rewrites_atomics, lowering_leaves_no_atomics, lowering_keeps_runs)"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/LowerAtomics.lean",
+          "functions": [
+            "lowerAtomics",
+            "moduleImports",
+            "keepExports"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "the whole module is modelled (lowerAtomics with its readers, moduleImports, keepExports); candidates lowering_rewrites_atomics, lowering_leaves_no_atomics and lowering_keeps_runs are stated over the model, the last two also over WebAssembly validation and execution (outside semantics)"
     },
     "src/wasi/wasi-build.mjs": {
       "status": "exempt",

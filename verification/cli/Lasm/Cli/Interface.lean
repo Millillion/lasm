@@ -33,6 +33,7 @@ import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.HandleTable
 import Lasm.Cli.Model.Init
+import Lasm.Cli.Model.LowerAtomics
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
@@ -316,8 +317,9 @@ opaque comparePythonStrings : String → String → Int
 
 /-! ## WebAssembly (src/wasi/lower-atomics.mjs, src/wasi/wasi-component.mjs) -/
 
-/-- `lowerAtomics(bytes)`. -/
-opaque lowerAtomics : ByteArray → ByteArray
+/-- `lowerAtomics(bytes)`, or the message it throws: modelled in
+Model/LowerAtomics.lean. -/
+def lowerAtomics (m : ByteArray) : Except String ByteArray := LowerAtomics.lowerAtomics m
 
 /-- Not Lasm's JavaScript: `WebAssembly.validate`, the threads proposal on. -/
 opaque validate : ByteArray → Bool
@@ -422,10 +424,11 @@ declarations (a vector of counts and value types). -/
 opaque localDeclarations : List UInt8 → Bool
 
 /-- An instruction as the lowering must read it: a non-atomic one is one
-instruction that is not `0xfe`-prefixed; an atomic one other than the fence
+instruction that is not `0xfe`-prefixed, nor a SIMD (`0xfd`) or GC (`0xfb`)
+one, which the lowering refuses; an atomic one other than the fence
 (`sub` 3) is one instruction whose memarg has the given offset. -/
 def Instr.WellFormed : Instr → Prop
-  | .plain e => oneInstruction e = true ∧ e.head? ≠ some 0xfe
+  | .plain e => oneInstruction e = true ∧ e.head? ≠ some 0xfe ∧ e.head? ≠ some 0xfd ∧ e.head? ≠ some 0xfb
   | .fence => True
   | .atomic sub m off => oneInstruction (0xfe :: leb sub ++ m) = true ∧ sub ≠ 3 ∧ memargOffset m = some off
 
