@@ -58,9 +58,9 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**21 proved propositions (186 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**23 proved propositions (192 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
-## Lasm.Cli (21)
+## Lasm.Cli (23)
 
 ### The command line
 
@@ -94,39 +94,46 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | [`builtin_closure`](Lasm/Cli/Spec.lean#L143) | **The builtin closure is the reachable builtins, dependencies first.** For an acyclic import graph, the closure of the requested specifiers holds each builtin reachable from a requested builtin exactly once, nothing else (other specifiers are dropped), and every builtin after those it imports. Tested by: test/builtin-modules.test.mjs |
 | [`schedule_reached_kept_first`](Lasm/Cli/Spec.lean#L155) | **A unit's schedule is the kept units it reaches, dependencies first.** For an acyclic call graph (the entries of the JavaScript object `calls`), the schedule of `n` holds each kept unit other than `n` that `n` reaches, exactly once, and every one after the kept units it reaches. Tested by: test/edge-initializers.test.mjs |
 
+### The link driver's Python semantics
+
+| Proposition | In plain English |
+| --- | --- |
+| [`json_string_printable`](Lasm/Cli/Spec.lean#L169) | **Escaped strings are printable ASCII.** `json.dumps` of any string, `ensure_ascii`, is printable ASCII: quotes, escapes, hexadecimal digits and the printable characters themselves. Tested by: test/link-driver-python.test.mjs |
+| [`python_order_code_points`](Lasm/Cli/Spec.lean#L176) | **Python's string order is the order of code points.** The sign of `comparePythonStrings a b` is that of comparing `a` and `b` code point by code point (a prefix first), as Python orders `str`, unlike JavaScript's UTF-16 order. Tested by: test/link-driver-python.test.mjs |
+
 ### WebAssembly
 
 | Proposition | In plain English |
 | --- | --- |
-| [`replace_one_core_module`](Lasm/Cli/Spec.lean#L169) | **`replaceCoreModule` replaces exactly the one matching module.** In a component whose only core module section that starts with `pfx` is `pfx ++ tail`, that section becomes `to ++ tail`, and every other section, before or after it, is kept as it was. Tested by: test/wasi-component.test.mjs |
-| [`componentize_inverse`](Lasm/Cli/Spec.lean#L184) | **A component splices the core module and gives it back.** In a template whose one core module that starts with the placeholder is the placeholder followed by `tail` (as the shipped template is: the test checks it), `componentize` splices in any core that begins no other core module; `extractCore` gives the core back, and `makeTemplate` the template. Tested by: test/wasi-component.test.mjs |
-| [`drops_only_component_type`](Lasm/Cli/Spec.lean#L197) | **`withoutComponentType` drops only component-type custom sections.** A module's custom sections named `component-type…` go; every other section, custom or not, stays, in order. Tested by: test/wasi-component.test.mjs |
+| [`replace_one_core_module`](Lasm/Cli/Spec.lean#L186) | **`replaceCoreModule` replaces exactly the one matching module.** In a component whose only core module section that starts with `pfx` is `pfx ++ tail`, that section becomes `to ++ tail`, and every other section, before or after it, is kept as it was. Tested by: test/wasi-component.test.mjs |
+| [`componentize_inverse`](Lasm/Cli/Spec.lean#L201) | **A component splices the core module and gives it back.** In a template whose one core module that starts with the placeholder is the placeholder followed by `tail` (as the shipped template is: the test checks it), `componentize` splices in any core that begins no other core module; `extractCore` gives the core back, and `makeTemplate` the template. Tested by: test/wasi-component.test.mjs |
+| [`drops_only_component_type`](Lasm/Cli/Spec.lean#L214) | **`withoutComponentType` drops only component-type custom sections.** A module's custom sections named `component-type…` go; every other section, custom or not, stays, in order. Tested by: test/wasi-component.test.mjs |
 
 ### The process launcher
 
 | Proposition | In plain English |
 | --- | --- |
-| [`launcher_config_round_trip`](Lasm/Cli/Spec.lean#L208) | **The launcher configuration round-trips.** For options whose texts have no NUL byte and fit the format (under 4 GiB), `encodeProcessConfiguration` succeeds and the native launcher reads back exactly the flags, the three stdio flags, both directories, the command and arguments as its argument vector, and the environment's pairs in order (as UTF-8 bytes). Tested by: test/cli-helpers.test.mjs |
+| [`launcher_config_round_trip`](Lasm/Cli/Spec.lean#L225) | **The launcher configuration round-trips.** For options whose texts have no NUL byte and fit the format (under 4 GiB), `encodeProcessConfiguration` succeeds and the native launcher reads back exactly the flags, the three stdio flags, both directories, the command and arguments as its argument vector, and the environment's pairs in order (as UTF-8 bytes). Tested by: test/cli-helpers.test.mjs |
 
 ### Lasm.JS's framing
 
 | Proposition | In plain English |
 | --- | --- |
-| [`events_read_back`](Lasm/Cli/Spec.lean#L226) | **A batch of interop events reads back.** Whatever events the host queues (within the format's bounds), `encodeEvents` writes the first 1024 and leaves the rest queued, and the C glue reads exactly those events, in order, from the batch; a batch followed by other bytes reads as its events followed by what those bytes read as (so the glue stops only at a malformed event of its own). Tested by: test/lasm-js-framing.test.mjs |
-| [`request_read_back`](Lasm/Cli/Spec.lean#L238) | **A request's released handles and payload read back.** For any handles (32-bit, fewer than 2³²) and any payload, the host splits the request the C glue frames into exactly those handles and that payload. Tested by: test/lasm-js-framing.test.mjs |
-| [`into_read_back`](Lasm/Cli/Spec.lean#L247) | **The promise a call settles reads back.** For any 64-bit Lean promise and any input, the host reads the promise and the input from the payload the C glue frames. Tested by: test/lasm-js-framing.test.mjs |
+| [`events_read_back`](Lasm/Cli/Spec.lean#L243) | **A batch of interop events reads back.** Whatever events the host queues (within the format's bounds), `encodeEvents` writes the first 1024 and leaves the rest queued, and the C glue reads exactly those events, in order, from the batch; a batch followed by other bytes reads as its events followed by what those bytes read as (so the glue stops only at a malformed event of its own). Tested by: test/lasm-js-framing.test.mjs |
+| [`request_read_back`](Lasm/Cli/Spec.lean#L255) | **A request's released handles and payload read back.** For any handles (32-bit, fewer than 2³²) and any payload, the host splits the request the C glue frames into exactly those handles and that payload. Tested by: test/lasm-js-framing.test.mjs |
+| [`into_read_back`](Lasm/Cli/Spec.lean#L264) | **The promise a call settles reads back.** For any 64-bit Lean promise and any input, the host reads the promise and the input from the payload the C glue frames. Tested by: test/lasm-js-framing.test.mjs |
 
 ### Host handles
 
 | Proposition | In plain English |
 | --- | --- |
-| [`handle_fresh_in_range`](Lasm/Cli/Spec.lean#L257) | **A host handle is fresh and in range.** When `allocate` gives an id, the table did not hold it and now holds it, with the value, after every entry it had, and the range stays; the id lies in the range, and `#next` stays in it, whenever `#next` was in it (as the constructor starts it). Tested by: test/handle-table.test.mjs |
+| [`handle_fresh_in_range`](Lasm/Cli/Spec.lean#L274) | **A host handle is fresh and in range.** When `allocate` gives an id, the table did not hold it and now holds it, with the value, after every entry it had, and the range stays; the id lies in the range, and `#next` stays in it, whenever `#next` was in it (as the constructor starts it). Tested by: test/handle-table.test.mjs |
 
 ### Function packages
 
 | Proposition | In plain English |
 | --- | --- |
-| [`zip_deterministic`](Lasm/Cli/Spec.lean#L269) | **`zip` is deterministic.** The archive depends on the entries alone (no clock, no host state). Of the model, a Lean function, this holds by `rfl`; it is the assumption the model makes, which the test checks of the JavaScript. Tested by: test/serverless-zip.test.mjs |
+| [`zip_deterministic`](Lasm/Cli/Spec.lean#L286) | **`zip` is deterministic.** The archive depends on the entries alone (no clock, no host state). Of the model, a Lean function, this holds by `rfl`; it is the assumption the model makes, which the test checks of the JavaScript. Tested by: test/serverless-zip.test.mjs |
 <!-- END PROPOSITIONS -->
 
 ## Candidates
@@ -134,9 +141,9 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**12 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+**11 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
-### Lasm.Cli (12)
+### Lasm.Cli (11)
 
 | Candidate | In plain English | Tested by |
 | --- | --- | --- |
@@ -145,11 +152,10 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | [`generated_names_valid`](Lasm/Cli/Candidates.lean#L62) | **Generated names are valid npm, Lake and Supabase names.** Whatever the directory or text: the npm package name is lowercase letters, digits, `.`, `_` and `-`, starts with a letter or digit and does not end with `-`; the Lake name is an identifier of ASCII letters, digits and `_` that starts with a letter and does not end with `_`; the Supabase function name is lowercase letters, digits and `-`, starts with a letter and has at most 54 characters. | [test/init-golden.test.mjs](../../test/init-golden.test.mjs) |
 | [`static_inside_root`](Lasm/Cli/Candidates.lean#L80) | **No request path reaches a file outside the root.** Whatever the path (`..`, encoded dots and slashes, sibling directories that share the root's name as a prefix, malformed percent-encoding), the static server answers 200, 400, 403 or 404, and a file it serves lies under the root directory. | [test/static-server.test.mjs](../../test/static-server.test.mjs) |
 | [`retry_delay_bounded`](Lasm/Cli/Candidates.lean#L95) | **Retry delays stay within 75–100 % of the backoff.** For every attempt and every random draw in [0, 1], the delay is between three quarters of the capped doubling backoff and the backoff itself. It stays tested, not proved: the code computes in doubles, and Lean's `Float` operations are opaque to proofs. It holds because IEEE-754 rounding is monotone and exact on `0.75 * b` and `b` (`b` ≤ 60000), so the delay grows with the draw between its values at 0 and 1, which the test checks for every backoff. | [test/managed-download.test.mjs](../../test/managed-download.test.mjs) |
-| [`json_string_ascii`](Lasm/Cli/Candidates.lean#L105) | **Escaped strings are printable ASCII JSON for the string.** `json.dumps` of any string, `ensure_ascii`, is printable ASCII, and a JSON parser reads it as that string. | [test/link-driver-python.test.mjs](../../test/link-driver-python.test.mjs) |
-| [`json_dumps_parse_back`](Lasm/Cli/Candidates.lean#L113) | **Every layout is JSON for the same value.** Whatever the indentation and key order, what `pythonJsonDumps` writes a JSON parser reads as the value, and without indentation it is one line. | [test/link-driver-python.test.mjs](../../test/link-driver-python.test.mjs) |
-| [`python_order_code_points`](Lasm/Cli/Candidates.lean#L123) | **Python's string order is the order of code points.** The sign of `comparePythonStrings a b` is that of comparing `a` and `b` code point by code point (a prefix first), as Python orders `str`, unlike JavaScript's UTF-16 order. | [test/link-driver-python.test.mjs](../../test/link-driver-python.test.mjs) |
-| [`lowering_keeps_runs`](Lasm/Cli/Candidates.lean#L136) | **Lowering atomics keeps what one thread computes.** When it lowers a valid module, the lowered module is valid, lowering it again changes nothing, and run on one thread it gives the same result and leaves the same memory. (The lowering refuses, with an error, SIMD and GC instructions, which a valid module may hold.) It stays tested, not proved: `validate` and `run` are WebAssembly's own validation and execution, which a proof needs as a formal semantics of WebAssembly to relate the lowering's model to. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
-| [`lowering_leaves_no_atomics`](Lasm/Cli/Candidates.lean#L146) | **Lowering leaves no atomic instruction.** When it lowers a valid module, the lowered module is valid without the threads feature and lowering it again changes nothing; a module already valid without threads is returned as it is. It stays tested, not proved, for the same reason: `validate` and `validWithoutThreads` are WebAssembly's own validation. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
-| [`lowering_rewrites_atomics`](Lasm/Cli/Candidates.lean#L160) | **Lowering rewrites each atomic and copies everything else.** In a module of any bodies of well-formed instructions, every non-atomic instruction and every local declaration is kept byte for byte, every atomic instruction becomes its documented replacement, and one helper per atomic operation and width follows the functions, numbered in order of first use after the imported and defined ones. Of the model, but not yet proved: its hypotheses are WebAssembly's binary grammar (`oneInstruction`, `localDeclarations`), which a proof needs as a Lean definition the model's `skipInstruction` reads exactly. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
-| [`zip_reads_back`](Lasm/Cli/Candidates.lean#L176) | **What `zip` writes, a ZIP reader reads back.** Whenever `zip` succeeds, a reader finds the parent directories first (sorted, mode `0o40755`, empty, stored), then every entry in order, with its bytes and its permissions as a regular file (`0o644` unless given). | [test/serverless-zip.test.mjs](../../test/serverless-zip.test.mjs) |
+| [`json_string_ascii`](Lasm/Cli/Candidates.lean#L107) | **Escaped strings are printable ASCII JSON for the string.** `json.dumps` of any string, `ensure_ascii`, is printable ASCII, and a JSON parser reads it as that string. Its second half is proved (`json_string_printable`); the first needs facts about Lean's JSON parser (`Lean.Json.parse` of escapes and surrogate pairs) that Lean does not state. | [test/link-driver-python.test.mjs](../../test/link-driver-python.test.mjs) |
+| [`json_dumps_parse_back`](Lasm/Cli/Candidates.lean#L115) | **Every layout is JSON for the same value.** Whatever the indentation and key order, what `pythonJsonDumps` writes a JSON parser reads as the value, and without indentation it is one line. | [test/link-driver-python.test.mjs](../../test/link-driver-python.test.mjs) |
+| [`lowering_keeps_runs`](Lasm/Cli/Candidates.lean#L130) | **Lowering atomics keeps what one thread computes.** When it lowers a valid module, the lowered module is valid, lowering it again changes nothing, and run on one thread it gives the same result and leaves the same memory. (The lowering refuses, with an error, SIMD and GC instructions, which a valid module may hold.) It stays tested, not proved: `validate` and `run` are WebAssembly's own validation and execution, which a proof needs as a formal semantics of WebAssembly to relate the lowering's model to. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
+| [`lowering_leaves_no_atomics`](Lasm/Cli/Candidates.lean#L140) | **Lowering leaves no atomic instruction.** When it lowers a valid module, the lowered module is valid without the threads feature and lowering it again changes nothing; a module already valid without threads is returned as it is. It stays tested, not proved, for the same reason: `validate` and `validWithoutThreads` are WebAssembly's own validation. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
+| [`lowering_rewrites_atomics`](Lasm/Cli/Candidates.lean#L154) | **Lowering rewrites each atomic and copies everything else.** In a module of any bodies of well-formed instructions, every non-atomic instruction and every local declaration is kept byte for byte, every atomic instruction becomes its documented replacement, and one helper per atomic operation and width follows the functions, numbered in order of first use after the imported and defined ones. Of the model, but not yet proved: its hypotheses are WebAssembly's binary grammar (`oneInstruction`, `localDeclarations`), which a proof needs as a Lean definition the model's `skipInstruction` reads exactly. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
+| [`zip_reads_back`](Lasm/Cli/Candidates.lean#L170) | **What `zip` writes, a ZIP reader reads back.** Whenever `zip` succeeds, a reader finds the parent directories first (sorted, mode `0o40755`, empty, stored), then every entry in order, with its bytes and its permissions as a regular file (`0o644` unless given). | [test/serverless-zip.test.mjs](../../test/serverless-zip.test.mjs) |
 <!-- END CANDIDATES -->

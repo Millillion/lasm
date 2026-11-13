@@ -452,7 +452,17 @@
     },
     "src/link-driver/python.mjs": {
       "status": "pending",
-      "reason": "Python's JSON and string semantics: pure (candidates json_string_ascii, json_dumps_parse_back, python_order_code_points)"
+      "reason": "Python's JSON and string semantics: pythonJsonString and comparePythonStrings are modelled (json_string_printable and python_order_code_points proved; json_string_ascii's JSON reading stays a candidate); pythonJsonDumps, pythonEquals, truthy and the identifier and whitespace helpers remain to model (candidate json_dumps_parse_back)",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/Python.lean",
+          "functions": [
+            "pythonJsonString",
+            "comparePythonStrings"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ]
     },
     "src/link-driver/settings.mjs": {
       "status": "exempt",

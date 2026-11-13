@@ -218,6 +218,85 @@ theorem lean_at_least_lexicographic : Spec.lean_at_least_lexicographic := by
   · simp only [leanAtLeast, leanAtLeastModel, ha, parts]
     exact (atLeast_parts a a).2 (by obtain ⟨x, y, z⟩ := a; simp [LexGe])
 
+/-! ## The link driver's Python semantics -/
+
+theorem comparePython_go_sign : ∀ x y : List Char,
+    (comparePythonStrings.go x y).sign = if x < y then -1 else if x = y then 0 else 1
+  | [], [] => by simp [comparePythonStrings.go]
+  | [], _ :: _ => by simp [comparePythonStrings.go, List.nil_lt_cons]
+  | _ :: _, [] => by simp [comparePythonStrings.go, List.not_lt_nil]
+  | a :: as, b :: bs => by
+    have ih := comparePython_go_sign as bs
+    by_cases h : a.val.toNat = b.val.toNat
+    · have hab : a = b := Char.ext (UInt32.toNat_inj.mp h)
+      subst hab
+      simp [comparePythonStrings.go, ih]
+    · simp only [comparePythonStrings.go, if_pos h]
+      have e1 : a.toNat = a.val.toNat := rfl
+      have e2 : b.toNat = b.val.toNat := rfl
+      have hne : a ≠ b := fun e => h (e ▸ rfl)
+      rcases Nat.lt_or_gt_of_ne h with hl | hl
+      · have : a < b := hl
+        simp [List.cons_lt_cons_iff, this, hne]; omega
+      · have hba : b < a := hl
+        have hnab : ¬ a < b := fun h' => absurd (Nat.lt_trans hl h') (Nat.lt_irrefl _)
+        simp [List.cons_lt_cons_iff, hnab, hne]; omega
+
+theorem python_order_code_points : Spec.python_order_code_points := by
+  intro a b
+  simp only [comparePythonStrings, comparePython_go_sign, String.lt_iff, String.toList_inj]
+
+/-- Printable ASCII. -/
+def printable (c : Char) : Bool := ' ' ≤ c && c ≤ '~'
+
+theorem digitChar_printable (d : Nat) (h : d < 16) : printable d.digitChar = true := by
+  match d, h with
+  | 0, _ | 1, _ | 2, _ | 3, _ | 4, _ | 5, _ | 6, _ | 7, _ | 8, _ | 9, _ | 10, _ | 11, _ | 12, _ | 13, _ | 14, _ | 15, _ => decide
+  | _ + 16, h => exact absurd h (by omega)
+
+theorem toDigits16_printable (n : Nat) : ∀ c ∈ Nat.toDigits 16 n, printable c = true := by
+  induction n using Nat.strongRecOn with
+  | ind n ih =>
+    rw [Nat.toDigits_eq_ite (by decide)]
+    split
+    · rename_i h; intro c hc; simp at hc; subst hc; exact digitChar_printable n h
+    · intro c hc
+      rcases List.mem_append.mp hc with hc | hc
+      · exact ih (n / 16) (by omega) c hc
+      · simp at hc; subst hc; exact digitChar_printable _ (Nat.mod_lt _ (by decide))
+
+theorem escapeUnit_printable (u : Nat) : ∀ c ∈ escapeUnit u, printable c = true := by
+  intro c hc
+  unfold escapeUnit at hc
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc
+  · simp only [List.mem_cons, hex4, List.mem_append, List.mem_replicate] at hc
+    rcases hc with rfl | rfl | ⟨_, rfl⟩ | hc
+    · decide
+    · decide
+    · decide
+    · exact toDigits16_printable u c hc
+  · rename_i h
+    simp at hc; subst hc
+    have hu : u < 0xd800 := by omega
+    have hv : (Char.ofNat u).val.toNat = u := by
+      simp [Char.ofNat, Char.ofNatAux, Nat.isValidChar, hu]
+    simp only [printable, Bool.and_eq_true, decide_eq_true_eq, Char.le_def, UInt32.le_iff_toNat_le, hv]
+    exact ⟨by simp; omega, by simp; omega⟩
+
+theorem json_string_printable : Spec.json_string_printable := by
+  intro s
+  rw [String.all_bool_eq, pythonJsonString, String.toList_ofList]
+  simp only [List.all_cons, List.all_append, List.all_flatMap, List.all_eq_true, Bool.and_eq_true]
+  refine ⟨⟨by decide, fun x _ u _ c hc => ?_⟩, by simp⟩
+  simpa [printable] using escapeUnit_printable u c hc
+
 /-! ## WebAssembly sections -/
 
 theorem lebJS_eq_leb (n : Nat) : lebJS n = leb n := by

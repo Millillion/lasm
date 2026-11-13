@@ -100,7 +100,9 @@ def retry_delay_bounded : Prop :=
 
 /-- **Escaped strings are printable ASCII JSON for the string.** `json.dumps`
 of any string, `ensure_ascii`, is printable ASCII, and a JSON parser reads it
-as that string.
+as that string. Its second half is proved (`json_string_printable`); the
+first needs facts about Lean's JSON parser (`Lean.Json.parse` of escapes and
+surrogate pairs) that Lean does not state.
 Tested by: test/link-driver-python.test.mjs -/
 def json_string_ascii : Prop :=
   ∀ s : String, Lean.Json.parse (pythonJsonString s) = .ok (.str s) ∧
@@ -114,14 +116,6 @@ def json_dumps_parse_back : Prop :=
   ∀ (v : Lean.Json) (indent : Option Nat) (sortKeys : Bool) (text : String),
     pythonJsonDumps v indent sortKeys = .ok text →
       ((Lean.Json.parse text).toOption.any (· == v)) = true ∧ (indent = none → '\n' ∉ text.toList)
-
-/-- **Python's string order is the order of code points.** The sign of
-`comparePythonStrings a b` is that of comparing `a` and `b` code point by
-code point (a prefix first), as Python orders `str`, unlike JavaScript's
-UTF-16 order.
-Tested by: test/link-driver-python.test.mjs -/
-def python_order_code_points : Prop :=
-  ∀ a b : String, (comparePythonStrings a b).sign = if a < b then -1 else if a = b then 0 else 1
 
 /-! ## WebAssembly -/
 

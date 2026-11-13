@@ -26,6 +26,7 @@ import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
 import { leanAtLeast } from '../../src/lean-io-errors.mjs';
+import { comparePythonStrings, pythonJsonString } from '../../src/link-driver/python.mjs';
 import { responseFile } from '../../src/platform.mjs';
 import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 import { zip } from '../../src/serverless/zip.mjs';
@@ -452,6 +453,18 @@ export const models = [
     },
     input: ([v, m]) => ({ version: hex(v), minimum: hex(m) }),
     js: ([v, m]) => leanAtLeast(v, m),
+  },
+  {
+    name: 'pythonJsonString', source: 'src/link-driver/python.mjs', lean: 'Lasm.Cli.Model.Python',
+    generate: r => r.string([...tricky, '\b', '\f', '\x7f', '\x1f', '~', '\u0085', '\ud7ff', '\ue000', '\uffff', '𝄞', '\u{10ffff}'], 0, 12),
+    input: s => hex(s),
+    js: s => hex(pythonJsonString(s)),
+  },
+  {
+    name: 'comparePythonStrings', source: 'src/link-driver/python.mjs', lean: 'Lasm.Cli.Model.Python',
+    generate: r => { const a = r.string(['a', 'b', 'é', '\uffff', '😀', '𝄞'], 0, 5); return [a, r.next() < 0.2 ? a : r.next() < 0.3 ? a + r.string(['a', '😀'], 1, 2) : r.string(['a', 'b', 'é', '\uffff', '😀', '𝄞'], 0, 5)]; },
+    input: ([a, b]) => ({ a: hex(a), b: hex(b) }),
+    js: ([a, b]) => String(comparePythonStrings(a, b)),
   },
   {
     name: 'numbers', source: 'src/node-host.mjs', lean: 'Lasm.Cli.Model.NodeHost',
