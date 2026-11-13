@@ -124,11 +124,11 @@ test('static server: paths outside the root are refused; directories, fallback a
     assert.equal(missing.body.toString(), 'Not found\n');
     // A directory without index.html and no extension: the fallback page.
     assert.match((await raw(server, '/nested')).body.toString(), /home/);
-    // A malformed escape is a server error with its message, not a crash.
+    // A malformed escape is the client's error, not a crash.
     const bad = await raw(server, '/%E0%A4%A');
-    assert.equal(bad.status, 500);
+    assert.equal(bad.status, 400);
     assert.equal(bad.headers['content-type'], 'text/plain; charset=utf-8');
-    assert.match(bad.body.toString(), /URI malformed/);
+    assert.match(bad.body.toString(), /not valid percent-encoded/);
   } finally { await server.close(); }
   // Without a fallback, unknown routes are 404.
   const strict = await startStaticServer(root, { fallback: null });
