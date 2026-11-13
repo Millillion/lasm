@@ -54,7 +54,7 @@ export function parsePackageArguments(tokens) {
     const token = tokens[i];
     if (token === '--help' || token === '-h') return { command: 'package-help' };
     if (token === '--allow-dev') { result.allowDev = true; continue; }
-    const match = /^--(target|output)(?:=(.*))?$/.exec(token);
+    const match = /^--(target|output)(?:=(.*))?$/s.exec(token);
     if (match) {
       const value = match[2] ?? tokens[++i];
       if (!value || value.startsWith('--')) throw new Error(`--${match[1]} requires a value\n\n${packageUsage}`);

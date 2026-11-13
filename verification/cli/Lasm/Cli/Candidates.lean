@@ -25,37 +25,6 @@ open Lasm.Cli
 
 /-! ## The command line -/
 
-/-- **Build options mean the same in any order and either form.** When
-`lasm build` accepts a set of distinct options with at most one input and
-no `--help`, it accepts every reordering of them, with any valued option
-written `--flag=value` instead of `--flag value`, and parses it the same.
-(`--help` stops at once, before an error after it; two positional words
-are the input and the output, in that order.)
-Tested by: test/cli-parse.test.mjs -/
-def build_options_commute : Prop :=
-  ∀ (opts opts' : List (List String)) (forms : List Bool), (∀ o ∈ opts, OptionGroup o ∧ o ≠ ["--help"] ∧ o ≠ ["-h"]) →
-    (opts.filter fun o => o.length == 1 && !(o.headD "").startsWith "-").length ≤ 1 →
-    (opts.map List.head?).Nodup → opts.Perm opts' → forms.length = opts'.length →
-    (parseLasmArguments ("build" :: opts.flatten)).isOk = true →
-    parseLasmArguments ("build" :: ((opts'.zip forms).map fun (o, j) => if j then joined o else o).flatten) =
-      parseLasmArguments ("build" :: opts.flatten)
-
-/-- **Every parse is a known command, or a readable error.** Whatever the
-arguments, the parser either names a command Lasm has, with a build target,
-an input, `lasm init` templates and deploy targets and `lasm dev` outputs
-that Lasm has, or refuses with a message that is not blank.
-Tested by: test/fuzz/targets/cli-arguments.mjs -/
-def parse_known_or_refused : Prop :=
-  ∀ argv : List String,
-    match parseLasmArguments argv with
-    | .ok p => p.command ∈ commands ∧
-        (p.command = "build" → p.target ∈ buildTargets) ∧
-        ((p.command = "build" ∨ p.command = "run") → p.input.endsWith ".lean" ∨ p.input.endsWith ".json") ∧
-        (p.command = "init" → p.template ∈ templates ∧ ∀ d ∈ p.deploy, d ∈ deployTargets) ∧
-        (p.command = "package" → p.target ∈ packageTargets ∨ p.target = "browser") ∧
-        (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
-    | .error m => m.trimAscii.toString ≠ ""
-
 /-! ## Builds -/
 
 /-- **Mangling round-trips.** For a dotted name Lean mangles unambiguously,
@@ -163,23 +132,25 @@ def python_order_code_points : Prop :=
 
 /-! ## WebAssembly -/
 
-/-- **Lowering atomics keeps what one thread computes.** For a valid module,
-the lowered module is valid, lowering it again changes nothing, and run on
-one thread it gives the same result and leaves the same memory.
+/-- **Lowering atomics keeps what one thread computes.** When it lowers a
+valid module, the lowered module is valid, lowering it again changes nothing,
+and run on one thread it gives the same result and leaves the same memory.
+(The lowering refuses, with an error, SIMD and GC instructions, which a valid
+module may hold.)
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_keeps_runs : Prop :=
-  ∀ (m : ByteArray) (args : List Nat), validate m = true →
-    validate (lowerAtomics m) = true ∧ lowerAtomics (lowerAtomics m) = lowerAtomics m ∧
-    run (lowerAtomics m) args = run m args
+  ∀ (m m' : ByteArray) (args : List Nat), validate m = true → lowerAtomics m = .ok m' →
+    validate m' = true ∧ lowerAtomics m' = .ok m' ∧ run m' args = run m args
 
-/-- **Lowering leaves no atomic instruction.** For a valid module, the
-lowered module is valid without the threads feature and lowering it again
-changes nothing; a module already valid without threads is returned as it is.
+/-- **Lowering leaves no atomic instruction.** When it lowers a valid
+module, the lowered module is valid without the threads feature and lowering
+it again changes nothing; a module already valid without threads is returned
+as it is.
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_leaves_no_atomics : Prop :=
-  ∀ m : ByteArray, validate m = true →
-    validWithoutThreads (lowerAtomics m) = true ∧ lowerAtomics (lowerAtomics m) = lowerAtomics m ∧
-    (validWithoutThreads m = true → lowerAtomics m = m)
+  ∀ m m' : ByteArray, validate m = true → lowerAtomics m = .ok m' →
+    validWithoutThreads m' = true ∧ lowerAtomics m' = .ok m' ∧
+    (validWithoutThreads m = true → m' = m)
 
 /-- **Lowering rewrites each atomic and copies everything else.** In a module
 of any bodies of well-formed instructions, every non-atomic instruction and every local declaration is
@@ -193,7 +164,7 @@ def lowering_rewrites_atomics : Prop :=
     (∀ b ∈ bodies, localDeclarations b.1 = true ∧ ∀ i ∈ b.2, i.WellFormed) →
     let keys := (bodies.flatMap fun b => b.2.filterMap Instr.helper?).eraseDups
     let index := fun sub => imported + bodies.length + keys.idxOf sub
-    ∃ out, codeBodies (lowerAtomics (bytes (moduleOf memory64 types imported bodies))) = some out ∧
+    ∃ m out, lowerAtomics (bytes (moduleOf memory64 types imported bodies)) = .ok m ∧ codeBodies m = some out ∧
       out.length = bodies.length + keys.length ∧
       out.take bodies.length = bodies.map fun (locals, is) => locals ++ is.flatMap (Instr.lowered memory64 index) ++ [0x0b]
 
