@@ -12,9 +12,10 @@ name = "Tandem"
 [[lean_lib]]
 name = "Proofs"
 
-# The server's modules (Lasm.Fetch, Lasm.JS): the SQL layer, the HTTP and
-# WebSocket glue, one SQLite binding per target. ServerNode.lean is the
-# program: lasm builds it (npm run build); it is not a Lake target.
+# The server's modules (Lasm.JS and its Web, Deno and Bun bindings): the SQL
+# layer, the HTTP and WebSocket glue, embedded files, one SQLite binding per
+# target. ServerNode.lean is the program: lasm builds it (npm run build); it
+# is not a Lake target.
 [[lean_lib]]
 name = "Server"
 

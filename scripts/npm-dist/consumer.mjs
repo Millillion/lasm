@@ -263,11 +263,12 @@ if (args.scenario.startsWith('launch-')) {
   }
   // The fetch template: Node, then the WASI targets, then the editor support.
   if (part === 'fetch') {
-  const fetchApp = init('fetch', 'fetch', ['fastly', 'wasi-http']);
+  const fetchApp = init('fetch', 'fetch', ['fastly', 'wasi-http', 'wasi']);
   npmRun('npm run build (fetch)', ['run', 'build'], { cwd: fetchApp });
   await serve('fetch', fetchApp, 'dist/main.mjs', '/', body => JSON.parse(body).message === 'Hello from Lean!');
-  for (const [target, output] of [['wasi', 'wasi/main.wasm'], ['fastly', 'bin/main.wasm'], ['wasi-http', 'wasi-http/main.wasm']]) {
-    npxRun(`npx lasm build --target ${target}`, ['lasm', 'build', 'Main.lean', '--target', target], { cwd: fetchApp });
+  // Each WASI target has its own program (Cgi.lean, Fastly.lean, WasiHttp.lean; src/init.mjs entryFile).
+  for (const [target, entry, output] of [['wasi', 'Cgi.lean', 'wasi/main.wasm'], ['fastly', 'Fastly.lean', 'bin/main.wasm'], ['wasi-http', 'WasiHttp.lean', 'wasi-http/main.wasm']]) {
+    npxRun(`npx lasm build ${entry} --target ${target}`, ['lasm', 'build', entry, '--target', target], { cwd: fetchApp });
     assert.ok(existsSync(join(fetchApp, output)), `--target ${target} wrote no ${output}`);
   }
   // Editor support with Lean already cached: a stub elan records the link and the override.

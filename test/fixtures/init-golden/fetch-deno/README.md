@@ -1,6 +1,6 @@
 # fetch-deno
 
-An HTTP handler in pure Lean (Lasm.Fetch) for Node, Fastly Compute, WASI, Spin and the edge, compiled ahead of time to WebAssembly by
+An HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces, compiled ahead of time to WebAssembly by
 [Lasm](https://github.com/Millillion/lasm). It runs on Node.js, and also on Bun and Deno.
 
 ## Requirements
@@ -40,7 +40,7 @@ Files:
 | `Dockerfile` | Builds with Lasm, runs on `node:24-bookworm-slim`. |
 
 `App.lean` is pure Lean: `lake build App` checks it natively. `Main.lean` imports
-`Lasm.Fetch`, which ships with Lasm, so it builds and runs only with Lasm. `npx lasm editor`
+`Lasm.JS.Web`, which ships with Lasm, so it builds and runs only with Lasm. `npx lasm editor`
 (also run by `npm run dev`) makes the Lean editor resolve it
 ([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
 

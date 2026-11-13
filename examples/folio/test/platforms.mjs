@@ -27,6 +27,17 @@ export const platforms = {
     seed: data => writeFileSync(join(data, 'fastly.toml'), fastlyToml(data + '/site')),
     serve: 'exec viceroy serve --addr 127.0.0.1:{port} -C {data}/fastly.toml bin/main.wasm',
     store: 'fastly',
+    // The pathological cases (test/pathological.mjs) that need more memory
+    // than a Fastly Compute instance has: "128MB heap" per execution
+    // (https://docs.fastly.com/products/compute-resource-limits), which
+    // Viceroy enforces too (its ResourceLimiter, memory_size(128 MiB)). The
+    // renderer, not the request body, needs it: on wasmtime with
+    // -W max-memory-size, unclosed <!-- needs 192-256 MiB and backticks
+    // 256-384 MiB, and every other case fits in 128 MiB (issue #234).
+    pathologicalSkip: {
+      'backticks': 'needs 256-384 MiB; Fastly Compute allows a 128 MB heap per request (#234)',
+      'unclosed <!--': 'needs 192-256 MiB; Fastly Compute allows a 128 MB heap per request (#234)',
+    },
   },
   // wrangler dev (workerd, Miniflare's local Workers KV in the run's own
   // directory); the site is put there by wrangler kv bulk put --local.

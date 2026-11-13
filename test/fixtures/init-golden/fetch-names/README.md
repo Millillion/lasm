@@ -1,6 +1,6 @@
 # a..b-2_
 
-An HTTP handler in pure Lean (Lasm.Fetch) for Node, Fastly Compute, WASI, Spin and the edge, compiled ahead of time to WebAssembly by
+An HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces, compiled ahead of time to WebAssembly by
 [Lasm](https://github.com/Millillion/lasm). It runs on Node.js, and also on Bun and Deno.
 
 ## Requirements
@@ -35,12 +35,14 @@ Files:
 | --- | --- |
 | `Main.lean` | The program. |
 | `App.lean` | Pure Lean logic used by `Main.lean`. |
+| `Fastly.lean` | The same routes on Fastly Compute's own host calls (`Lasm.Fastly`): `npm run build:fastly`. |
+| `WasiHttp.lean` | The same routes as a wasi:http component (`Lasm.WASI.Http`): `npm run build:wasi-http`. |
 | `lakefile.toml`, `lean-toolchain` | The Lake project, pinned to Lean <LEAN_VERSION>. |
 | `package.json` | npm scripts and Lasm (`@lasm/compiler`) as a dev dependency. |
 | `Dockerfile` | Builds with Lasm, runs on `node:24-bookworm-slim`. |
 
 `App.lean` is pure Lean: `lake build App` checks it natively. `Main.lean` imports
-`Lasm.Fetch`, which ships with Lasm, so it builds and runs only with Lasm. `npx lasm editor`
+`Lasm.JS.Web`, which ships with Lasm, so it builds and runs only with Lasm. `npx lasm editor`
 (also run by `npm run dev`) makes the Lean editor resolve it
 ([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
 
@@ -84,7 +86,7 @@ with `fastly compute deploy`. See the [Fastly guide](https://github.com/Millilli
 
 **Fermyon Spin:** `spin.toml` serves the wasi-http component `wasi-http/main.wasm`
 with Spin's HTTP trigger; `spin build` runs `npm run build:wasi-http`, then `spin up` serves on
-port 3000. List the hosts `Lasm.Fetch.fetch` reaches in `allowed_outbound_hosts`. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+port 3000. List the hosts the component's outgoing requests reach in `allowed_outbound_hosts`. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
 
 The image runs on any container platform (Docker, Kubernetes, Cloud Run, Fly.io,
 Railway, Render, Heroku); give it at least 512 MB of memory. Build on the
