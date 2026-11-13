@@ -49,6 +49,16 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
 (the parsed object has the fields the JavaScript's has, text fields as hex;
 `existing` are the paths `existsSync` finds; the parsers of `lasm init`,
 `lasm dev` and `lasm package` answer `{"error": hex "delegated:<command>"}`)
+  parseInitArguments  ["<hex>", …]                 → (the same)
+  parseDevArguments   {"tokens": ["<hex>", …], "runtime": "node"}  → (the same)
+  parsePackageArguments  ["<hex>", …]              → (the same)
+  leanAtLeast    {"version": "<hex>", "minimum": "<hex>"}  → true | false
+  lowerAtomics   "<hex>"                            → {"bytes": "<hex>"} | {"error": "…"}
+  moduleImports  "<hex>"                            → {"imports": [["<hex>", "<hex>", kind], …]} | {"error": "…"}
+  keepExports    {"bytes": "<hex>", "keep": ["<hex>", …]}  → {"bytes": "<hex>"} | {"error": "…"}
+(import and export names are decoded as UTF-8; the generator writes valid UTF-8 names)
+(`outputs` of `lasm dev` as [{"target": "…", "input": "<hex>"}, …], `deploy`
+as ["…", …], `port` a number)
 -/
 import Lean.Data.Json
 import Lasm.Cli.Model.BuiltinModules
@@ -56,7 +66,11 @@ import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.HandleTable
+import Lasm.Cli.Model.LeanIOErrors
+import Lasm.Cli.Model.Init
+import Lasm.Cli.Model.LowerAtomics
 import Lasm.Cli.Model.NodeHost
+import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.ProcessLauncher
 import Lasm.Cli.Model.WasiComponent
@@ -90,6 +104,48 @@ def text (j : Json) : Except String String := do
 
 def ofText (s : String) : Json := toJson (hex s.toUTF8)
 
+/-- Bytes sent as hex. -/
+def bytesOf (j : Json) : Except String ByteArray := do unhex (← j.getStr?)
+
+/-- `new TextDecoder().decode(bytes)`: UTF-8 with U+FFFD for each maximal
+invalid subsequence (the WHATWG decoder; the runner's, not a model's). -/
+def utf8Name (b : ByteArray) : String := Id.run do
+  let mut out := ""
+  let mut cp := 0
+  let mut needed := 0
+  let mut seen := 0
+  let mut lower := 0x80
+  let mut upper := 0xBF
+  let mut i := 0
+  while i < b.size do
+    let x := b[i]!.toNat
+    if needed == 0 then
+      if x ≤ 0x7F then out := out.push (Char.ofNat x)
+      else if 0xC2 ≤ x ∧ x ≤ 0xDF then needed := 1; cp := x % 0x20
+      else if 0xE0 ≤ x ∧ x ≤ 0xEF then
+        if x == 0xE0 then lower := 0xA0
+        if x == 0xED then upper := 0x9F
+        needed := 2; cp := x % 0x10
+      else if 0xF0 ≤ x ∧ x ≤ 0xF4 then
+        if x == 0xF0 then lower := 0x90
+        if x == 0xF4 then upper := 0x8F
+        needed := 3; cp := x % 0x08
+      else out := out.push '\uFFFD'
+      i := i + 1
+    else if x < lower ∨ upper < x then
+      cp := 0; needed := 0; seen := 0; lower := 0x80; upper := 0xBF
+      out := out.push '\uFFFD'
+    else
+      lower := 0x80; upper := 0xBF
+      cp := cp * 64 + x % 64
+      seen := seen + 1
+      if seen == needed then
+        out := out.push (Char.ofNat cp)
+        cp := 0; needed := 0; seen := 0
+      i := i + 1
+  if needed != 0 then out := out.push '\uFFFD'
+  return out
+
 def integer (j : Json) : Except String Int := do
   match (← j.getStr?).toInt? with
   | some i => .ok i
@@ -116,7 +172,11 @@ def ofParsed (p : Parsed) : Json :=
     field "args" (p.args?.map fun a => toJson (a.map ofText)), field "profile" (p.profile?.map toJson),
     field "allowDev" (p.allowDev?.map toJson), field "bundler" (p.bundler?.map toJson),
     field "target" (p.target?.map toJson), field "suspend" (p.suspend?.map toJson),
-    field "output" (p.output?.map ofText), field "input" (p.input?.map ofText)].filterMap id)
+    field "output" (p.output?.map ofText), field "input" (p.input?.map ofText),
+    field "template" (p.template?.map ofText), field "deploy" (p.deploy?.map toJson), field "directory" (p.directory?.map ofText),
+    field "run" (p.run?.map toJson), field "watch" (p.watch?.map toJson), field "port" (p.port?.map toJson),
+    field "host" (p.host?.map ofText),
+    field "outputs" (p.outputs?.map fun os => toJson (os.map fun (t, i) => Json.mkObj [("target", toJson t), ("input", ofText i)]))].filterMap id)
 
 def ofResult : Except String Parsed → Json
   | .ok p => Json.mkObj [("parsed", ofParsed p)]
@@ -251,6 +311,19 @@ def answer (j : Json) : Except String Json := do
     let runtime ← (← input.getObjVal? "runtime").getStr?
     let env : ArgumentsEnv := ⟨fun f => existing.contains f, runtime, delegated "init", delegated "dev", delegated "package"⟩
     return ofResult (parseLasmArgumentsWith env (← texts (← input.getObjVal? "argv")))
+  | "leanAtLeast" => return toJson (leanAtLeastModel (← text (← input.getObjVal? "version")) (← text (← input.getObjVal? "minimum")))
+  | "lowerAtomics" => return ofBytes (LowerAtomics.lowerAtomics (← bytesOf input))
+  | "moduleImports" =>
+    return match LowerAtomics.moduleImports utf8Name (← bytesOf input) with
+      | .ok l => Json.mkObj [("imports", toJson (l.map fun (m, n, k) => [ofText m, ofText n, toJson k]))]
+      | .error e => Json.mkObj [("error", toJson e)]
+  | "keepExports" =>
+    let keep ← texts (← input.getObjVal? "keep")
+    return ofBytes (LowerAtomics.keepExports utf8Name (keep.contains ·) (← bytesOf (← input.getObjVal? "bytes")))
+  | "parseInitArguments" => return ofResult (parseInitArguments (← texts input))
+  | "parseDevArguments" =>
+    return ofResult (parseDevArgumentsWith (← (← input.getObjVal? "runtime").getStr?) (← texts (← input.getObjVal? "tokens")))
+  | "parsePackageArguments" => return ofResult (parsePackageArguments (← texts input))
   | m => throw s!"no model {m}"
 
 def main : IO Unit := do

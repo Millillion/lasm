@@ -78,6 +78,37 @@ def closest_nearest_first : Prop :=
   ∀ (word : String) (cs : List String), word.all Char.isLower → (∀ c ∈ cs, c.all Char.isLower) →
     closest word cs = (nearestFirst (editDistance word) cs).filter fun c => editDistance word c ≤ threshold c
 
+/-- **Build options mean the same in any order and either form.** When
+`lasm build` accepts a set of distinct options with at most one input and
+no `--help`, it accepts every reordering of them, with any valued option
+written `--flag=value` instead of `--flag value`, and parses it the same.
+(`--help` stops at once, before an error after it; two positional words
+are the input and the output, in that order.)
+Tested by: test/cli-parse.test.mjs -/
+def build_options_commute : Prop :=
+  ∀ (opts opts' : List (List String)) (forms : List Bool), (∀ o ∈ opts, OptionGroup o ∧ o ≠ ["--help"] ∧ o ≠ ["-h"]) →
+    (opts.filter fun o => o.length == 1 && !(o.headD "").startsWith "-").length ≤ 1 →
+    (opts.map List.head?).Nodup → opts.Perm opts' → forms.length = opts'.length →
+    (parseLasmArguments ("build" :: opts.flatten)).isOk = true →
+    parseLasmArguments ("build" :: ((opts'.zip forms).map fun (o, j) => if j then joined o else o).flatten) =
+      parseLasmArguments ("build" :: opts.flatten)
+
+/-- **Every parse is a known command, or a readable error.** Whatever the
+arguments, the parser either names a command Lasm has, with a build target,
+an input, `lasm init` templates and deploy targets and `lasm dev` outputs
+that Lasm has, or refuses with a message that is not blank.
+Tested by: test/fuzz/targets/cli-arguments.mjs -/
+def parse_known_or_refused : Prop :=
+  ∀ argv : List String,
+    match parseLasmArguments argv with
+    | .ok p => p.command ∈ commands ∧
+        (p.command = "build" → p.target ∈ buildTargets) ∧
+        ((p.command = "build" ∨ p.command = "run") → p.input.endsWith ".lean" ∨ p.input.endsWith ".json") ∧
+        (p.command = "init" → p.template ∈ templates ∧ ∀ d ∈ p.deploy, d ∈ deployTargets) ∧
+        (p.command = "package" → p.target ∈ packageTargets ∨ p.target = "browser") ∧
+        (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
+    | .error m => m.trimAscii.toString ≠ ""
+
 /-! ## Development server -/
 
 /-- **`changedFiles` reports exactly the files that differ.** Between two
