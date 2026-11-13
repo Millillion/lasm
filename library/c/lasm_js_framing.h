@@ -36,27 +36,29 @@ static inline uint64_t lasm_js_read_u64(const uint8_t *p) { uint64_t v; memcpy(&
 static inline uint32_t lasm_js_read_u32(const uint8_t *p) { uint32_t v; memcpy(&v, p, 4); return v; }
 
 /* Reads the event at *offset (< size) of a batch into *event and moves *offset
-   past it; NULL, or the message the glue panics with when the batch is malformed. */
+   past it; NULL, or the message the glue panics with when the batch is malformed.
+   Bounds are checked against what remains (size - at), never as at + n, which
+   wraps where size_t is 32 bits wide (wasm32) for a size near 2^32. */
 static inline const char *lasm_js_read_event(const uint8_t *batch, size_t size, size_t *offset, lasm_js_event_t *event) {
     size_t at = *offset;
     uint8_t kind = batch[at++];
     event->kind = kind; event->failed = 0; event->word = 0; event->fn = 0; event->size = 0;
     if (kind == 1) {
-        if (at + 13 > size) return "Lasm.JS: malformed completion";
+        if (size - at < 13) return "Lasm.JS: malformed completion";
         event->word = lasm_js_read_u64(batch + at);
         event->failed = batch[at + 8];
         event->size = lasm_js_read_u32(batch + at + 9);
         at += 13;
-        if (at + event->size > size) return "Lasm.JS: malformed completion";
+        if (event->size > size - at) return "Lasm.JS: malformed completion";
     } else if (kind == 2) {
-        if (at + 16 > size) return "Lasm.JS: malformed callback";
+        if (size - at < 16) return "Lasm.JS: malformed callback";
         event->word = lasm_js_read_u64(batch + at);
         event->fn = lasm_js_read_u32(batch + at + 8);
         event->size = lasm_js_read_u32(batch + at + 12);
         at += 16;
-        if (at + event->size > size) return "Lasm.JS: malformed callback";
+        if (event->size > size - at) return "Lasm.JS: malformed callback";
     } else if (kind == 3) {
-        if (at + 4 > size) return "Lasm.JS: malformed release";
+        if (size - at < 4) return "Lasm.JS: malformed release";
         event->fn = lasm_js_read_u32(batch + at);
         at += 4;
     } else return "Lasm.JS: unknown interop event";
