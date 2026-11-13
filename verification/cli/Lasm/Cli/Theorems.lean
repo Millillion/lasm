@@ -1861,6 +1861,714 @@ theorem parse_known_or_refused : Spec.parse_known_or_refused := by
     · exact hrest _
   · exact hrest _
 
+/-! ## The command line: build options commute
+
+The loop reads each option group as one `Item` (`itemOf`, `loop_item`); a
+group it cannot read stops the build with an error (`loop_no_item`). Two
+items that both succeed can be applied in either order to the same effect,
+up to the order in which the loop records the options it has seen
+(`stepItem_comm`, `Equiv`), so a permutation of the items gives the same
+parse (`runItems_perm`); `--flag=value` is the same item as `--flag value`
+(`itemOf_joined`). -/
+
+/-- One option group as the loop reads it. -/
+inductive Item where
+  | flag (f : String)
+  | valued (name value : String)
+  | pos (w : String)
+
+def flagNames : List String := ["--rebuild", "--verbose", "--dev", "--release", "--allow-dev", "--bundler"]
+
+/-- The item a group is, when it is one the loop accepts without stopping. -/
+def itemOf : List String → Option Item
+  | [f, v] => match valuedOf f with
+    | some (n, none) => some (.valued n v)
+    | _ => none
+  | [w] =>
+    if w = "--" ∨ w = "--help" ∨ w = "-h" then none
+    else if w ∈ flagNames then some (.flag w)
+    else match valuedOf w with
+      | some (n, some v) => some (.valued n v)
+      | some (_, none) => none
+      | none => if w.startsWith "-" then none else some (.pos w)
+  | _ => none
+
+abbrev St := Parsed × List String × List String
+
+/-- What the loop does with an item. -/
+def stepItem (s : St) : Item → Except String St
+  | .flag f =>
+    if f = "--rebuild" then .ok ({ s.1 with rebuild? := some true }, s.2)
+    else if f = "--verbose" then .ok ({ s.1 with verbose? := some true }, s.2)
+    else if f = "--dev" ∨ f = "--release" then
+      let profile := (f.drop 2).toString
+      if s.1.profile?.any (· ≠ profile) then .error "Choose one of --dev and --release"
+      else .ok ({ s.1 with profile? := some profile }, s.2)
+    else if f = "--allow-dev" then .ok ({ s.1 with allowDev? := some true }, s.2)
+    else .ok ({ s.1 with bundler? := some true }, s.2)
+  | .valued n v => (setValued s.1 s.2.2 n (some v)).map fun r => (r, s.2.1, n :: s.2.2)
+  | .pos w => .ok (s.1, s.2.1 ++ [w], s.2.2)
+
+theorem valuedOf_bare {f n : String} (h : valuedOf f = some (n, none)) :
+    (f = "--target" ∧ n = "target") ∨ (f = "--suspend" ∧ n = "suspend") ∨ (f = "--output" ∧ n = "output") := by
+  simp only [valuedOf, valuedOption] at h
+  repeat' split at h
+  all_goals simp_all
+
+theorem loop_item (r : Parsed) (pos sup : List String) (g rest : List String) (it : Item) (h : itemOf g = some it) :
+    optionLoop r pos sup (g ++ rest) = match stepItem (r, pos, sup) it with
+      | .ok s => optionLoop s.1 s.2.1 s.2.2 rest
+      | .error e => .error e := by
+  match g, h with
+  | [f, v], h =>
+    simp only [itemOf] at h
+    split at h
+    · rename_i n hv
+      cases h
+      have hf := valuedOf_bare hv
+      have hne : f ≠ "--" ∧ ¬(f = "--help" ∨ f = "-h") ∧ f ≠ "--rebuild" ∧ f ≠ "--verbose" ∧ ¬(f = "--dev" ∨ f = "--release") ∧
+          f ≠ "--allow-dev" ∧ f ≠ "--bundler" := by
+        rcases hf with ⟨rfl, -⟩ | ⟨rfl, -⟩ | ⟨rfl, -⟩ <;> decide
+      obtain ⟨n1, n2, n3, n4, n5, n6, n7⟩ := hne
+      rw [List.cons_append, List.cons_append, optionLoop]
+      simp only [n1, n2, n3, n4, n5, n6, n7, ite_false, hv, takeValue, stepItem, List.nil_append]
+      cases setValued r sup n (some v) <;> rfl
+    · cases h
+  | [w], h =>
+    simp only [itemOf] at h
+    split at h
+    · cases h
+    · rename_i hw
+      split at h
+      · cases h
+        rename_i hf
+        simp only [flagNames, List.mem_cons, List.not_mem_nil, or_false] at hf
+        rw [List.cons_append, List.nil_append, optionLoop]
+        rcases hf with rfl | rfl | rfl | rfl | rfl | rfl
+        all_goals simp only [stepItem]
+        all_goals first | (simp; done) | (simp; split <;> rfl)
+      · rename_i hf
+        split at h
+        · rename_i n v hv
+          cases h
+          have hne : w ≠ "--rebuild" ∧ w ≠ "--verbose" ∧ ¬(w = "--dev" ∨ w = "--release") ∧
+              w ≠ "--allow-dev" ∧ w ≠ "--bundler" := by
+            simp only [flagNames, List.mem_cons, List.not_mem_nil, or_false, not_or] at hf; simp [hf]
+          simp only [not_or] at hw
+          obtain ⟨n1, n2, n3, n4, n5⟩ := hne
+          rw [List.cons_append, List.nil_append, optionLoop]
+          simp only [hw.1, hw.2.1, hw.2.2, n1, n2, n3, n4, n5, false_or, or_self, ite_false, hv, takeValue, stepItem]
+          cases setValued r sup n (some v) <;> rfl
+        · cases h
+        · split at h
+          · cases h
+          · cases h
+            rename_i hv hd
+            have hne : w ≠ "--rebuild" ∧ w ≠ "--verbose" ∧ ¬(w = "--dev" ∨ w = "--release") ∧
+                w ≠ "--allow-dev" ∧ w ≠ "--bundler" := by
+              simp only [flagNames, List.mem_cons, List.not_mem_nil, or_false, not_or] at hf; simp [hf]
+            simp only [not_or] at hw
+            obtain ⟨n1, n2, n3, n4, n5⟩ := hne
+            rw [List.cons_append, List.nil_append, optionLoop]
+            simp [hw.1, hw.2.1, hw.2.2, n1, n2, n3, n4, n5, hv, hd, stepItem]
+
+theorem startsWith_iff' {s t : String} : s.startsWith t = true ↔ t.toList <+: s.toList := by
+  rw [← String.startsWith_toSlice, String.Slice.startsWith_string_iff, String.copy_toSlice]
+
+theorem sw_true {p q : String} (v : String) (h : q.toList <+: p.toList) : (p ++ v).startsWith q = true := by
+  rw [startsWith_iff', String.toList_append]; exact h.trans (List.prefix_append _ _)
+
+theorem sw_false {p q : String} (v : String) (h : ¬ q.toList <+: p.toList) (h' : ¬ p.toList <+: q.toList) :
+    (p ++ v).startsWith q = false := by
+  rw [← Bool.not_eq_true, startsWith_iff', String.toList_append]
+  intro hq
+  have hp : p.toList <+: p.toList ++ v.toList := List.prefix_append _ _
+  rcases Nat.le_total q.toList.length p.toList.length with hl | hl
+  · exact h (List.prefix_of_prefix_length_le hq hp hl)
+  · exact h' (List.prefix_of_prefix_length_le hp hq hl)
+
+theorem app_ne {p q : String} (v : String) (h : ¬ p.toList <+: q.toList) : p ++ v ≠ q := by
+  intro he; apply h; rw [← he, String.toList_append]; exact List.prefix_append _ _
+
+theorem drop_app (p v : String) : ((p ++ v).drop p.length).copy = v := by
+  apply String.toList_inj.mp
+  rw [String.toList_copy_drop, String.toList_append, ← String.length_toList, List.drop_left]
+
+
+/-- `--flag=value` reads as `--flag value`. -/
+theorem valuedOf_joined {f n : String} (v : String) (h : valuedOf f = some (n, none)) :
+    valuedOf (f ++ "=" ++ v) = some (n, some v) := by
+  rcases valuedOf_bare h with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+  · have e : "--target" ++ "=" = "--target=" := by decide
+    rw [e]; unfold valuedOf valuedOption
+    rw [if_neg (app_ne v (by decide)), if_pos (sw_true v (by decide))]
+    exact congrArg (fun x => some ("target", some x)) (drop_app "--target=" v)
+  · have e : "--suspend" ++ "=" = "--suspend=" := by decide
+    rw [e]; unfold valuedOf valuedOption
+    rw [if_neg (app_ne v (by decide)), if_neg (by rw [sw_false v (by decide) (by decide)]; decide)]
+    simp only []
+    rw [if_neg (app_ne v (by decide)), if_pos (sw_true v (by decide))]
+    exact congrArg (fun x => some ("suspend", some x)) (drop_app "--suspend=" v)
+  · have e : "--output" ++ "=" = "--output=" := by decide
+    rw [e]; unfold valuedOf valuedOption
+    rw [if_neg (app_ne v (by decide)), if_neg (by rw [sw_false v (by decide) (by decide)]; decide)]
+    simp only []
+    rw [if_neg (app_ne v (by decide)), if_neg (by rw [sw_false v (by decide) (by decide)]; decide)]
+    simp only []
+    rw [if_neg (app_ne v (by decide)), if_pos (sw_true v (by decide))]
+    exact congrArg (fun x => some ("output", some x)) (drop_app "--output=" v)
+
+theorem itemOf_joined (g : List String) (hg : OptionGroup g) : itemOf (joined g) = itemOf g := by
+  match g, hg with
+  | [f, v], hg =>
+    simp only [OptionGroup, valuedFlags, List.mem_cons, List.not_mem_nil, or_false] at hg
+    have hv : ∃ n, valuedOf f = some (n, none) := by
+      rcases hg with rfl | rfl | rfl
+      · exact ⟨"target", by simp [valuedOf, valuedOption]⟩
+      · exact ⟨"suspend", by simp [valuedOf, valuedOption]⟩
+      · exact ⟨"output", by simp [valuedOf, valuedOption]⟩
+    obtain ⟨n, hv⟩ := hv
+    have hj : joined [f, v] = [f ++ "=" ++ v] := by
+      simp only [joined, valuedFlags, List.mem_cons, List.not_mem_nil, or_false]; rw [if_pos hg]
+    rw [hj]
+    simp only [itemOf, hv]
+    have hne : ∀ t ∈ ["--", "--help", "-h", "--rebuild", "--verbose", "--dev", "--release", "--allow-dev", "--bundler"],
+        f ++ "=" ++ v ≠ t := by
+      intro t ht
+      rcases hg with rfl | rfl | rfl <;>
+        simp only [List.mem_cons, List.not_mem_nil, or_false] at ht <;>
+        rcases ht with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>
+        exact app_ne v (by decide)
+    simp only [List.mem_cons, List.not_mem_nil, or_false, forall_eq_or_imp, forall_eq] at hne
+    obtain ⟨h1, h2, h3, h4, h5, h6, h7, h8, h9⟩ := hne
+    simp [h1, h2, h3, flagNames, h4, h5, h6, h7, h8, h9, valuedOf_joined v hv]
+  | [w], _ => rfl
+
+
+/-- The loop over items. -/
+def runItems (s : St) : List Item → Except String St
+  | [] => .ok s
+  | it :: its => match stepItem s it with
+    | .ok s' => runItems s' its
+    | .error e => .error e
+
+theorem loop_items : ∀ (gs : List (List String)) (its : List Item) (r : Parsed) (pos sup : List String),
+    gs.mapM itemOf = some its →
+    optionLoop r pos sup gs.flatten = match runItems (r, pos, sup) its with
+      | .ok s => .ok (some (s.1, s.2.1))
+      | .error e => .error e
+  | [], its, r, pos, sup, h => by
+    simp only [List.mapM_nil, pure, Option.some.injEq] at h; subst h
+    simp [runItems, optionLoop]
+  | g :: gs, its, r, pos, sup, h => by
+    rw [List.mapM_cons] at h
+    cases hg : itemOf g with
+    | none => simp [hg] at h
+    | some it =>
+      cases hm : gs.mapM itemOf with
+      | none => simp [hg, hm] at h
+      | some its' =>
+        simp only [hg, hm, Option.bind_some, Option.pure_def, bind, Option.some.injEq] at h
+        subst h
+        rw [List.flatten_cons, loop_item r pos sup g _ it hg]
+        simp only [runItems]
+        cases stepItem (r, pos, sup) it with
+        | error e => rfl
+        | ok s => exact loop_items gs its' s.1 s.2.1 s.2.2 hm
+
+theorem stepItem_command {s s' : St} {it : Item} (h : stepItem s it = .ok s') : s'.1.command = s.1.command := by
+  cases it with
+  | flag f =>
+    simp only [stepItem] at h
+    repeat' split at h
+    all_goals (first | (cases h; rfl) | cases h)
+  | valued n v =>
+    simp only [stepItem] at h
+    cases hv : setValued s.1 s.2.2 n (some v) with
+    | error e => rw [hv] at h; cases h
+    | ok r =>
+      rw [hv] at h; cases h
+      simp only [setValued] at hv
+      repeat' split at hv
+      all_goals (first | (cases hv; rfl) | cases hv)
+  | pos w => simp only [stepItem] at h; cases h; rfl
+
+/-- A group the loop has no item for stops a build with an error. -/
+theorem loop_no_item (r : Parsed) (pos sup g rest : List String) (hr : r.command = "build") (hg : OptionGroup g)
+    (hh : g ≠ ["--help"] ∧ g ≠ ["-h"]) (h : itemOf g = none) : ∃ e, optionLoop r pos sup (g ++ rest) = .error e := by
+  match g, hg with
+  | [f, v], hg =>
+    simp only [OptionGroup, valuedFlags, List.mem_cons, List.not_mem_nil, or_false] at hg
+    rcases hg with rfl | rfl | rfl <;> simp [itemOf, valuedOf, valuedOption] at h
+  | [w], hg =>
+    simp only [OptionGroup, valuedFlags, List.mem_cons, List.not_mem_nil, or_false, not_or] at hg
+    simp only [ne_eq, List.cons.injEq, and_true] at hh
+    simp only [itemOf] at h
+    rw [List.cons_append, List.nil_append, optionLoop]
+    by_cases h1 : w = "--"
+    · subst h1; simp [hr]
+    · rw [if_neg h1, if_neg (by simp [hh.1, hh.2])]
+      have hf : w ∉ flagNames := by
+        intro hf; simp [h1, hh.1, hh.2, hf] at h
+      simp only [flagNames, List.mem_cons, List.not_mem_nil, or_false, not_or] at hf
+      simp only [hf.1, hf.2.1, hf.2.2.1, hf.2.2.2.1, hf.2.2.2.2.1, hf.2.2.2.2.2, false_or, or_self, ite_false]
+      cases hv : valuedOf w with
+      | some x =>
+        obtain ⟨n, inl⟩ := x
+        cases inl with
+        | none =>
+          rcases valuedOf_bare hv with ⟨rfl, -⟩ | ⟨rfl, -⟩ | ⟨rfl, -⟩
+          · exact absurd rfl hg.1
+          · exact absurd rfl hg.2.1
+          · exact absurd rfl hg.2.2
+        | some v =>
+          simp [h1, hh.1, hh.2, flagNames, hf.1, hf.2.1, hf.2.2.1, hf.2.2.2.1, hf.2.2.2.2.1, hf.2.2.2.2.2, hv] at h
+      | none =>
+        simp [h1, hh.1, hh.2, flagNames, hf.1, hf.2.1, hf.2.2.1, hf.2.2.2.1, hf.2.2.2.2.1, hf.2.2.2.2.2, hv] at h
+        simp [h]
+
+theorem items_of_ok : ∀ (gs : List (List String)) (r : Parsed) (pos sup : List String) (x : Parsed × List String),
+    r.command = "build" → (∀ g ∈ gs, OptionGroup g ∧ g ≠ ["--help"] ∧ g ≠ ["-h"]) →
+    optionLoop r pos sup gs.flatten = .ok (some x) → ∃ its, gs.mapM itemOf = some its
+  | [], _, _, _, _, _, _, _ => ⟨[], rfl⟩
+  | g :: gs, r, pos, sup, x, hr, hall, h => by
+    have hg := hall g (by simp)
+    cases hi : itemOf g with
+    | none =>
+      obtain ⟨e, he⟩ := loop_no_item r pos sup g gs.flatten hr hg.1 hg.2 hi
+      rw [List.flatten_cons, he] at h; cases h
+    | some it =>
+      rw [List.flatten_cons, loop_item r pos sup g _ it hi] at h
+      cases hs : stepItem (r, pos, sup) it with
+      | error e => rw [hs] at h; cases h
+      | ok s =>
+        rw [hs] at h
+        obtain ⟨its, hits⟩ := items_of_ok gs s.1 s.2.1 s.2.2 x (by rw [stepItem_command hs]; exact hr)
+          (fun g' hg' => hall g' (by simp [hg'])) h
+        exact ⟨it :: its, by simp [List.mapM_cons, hi, hits]⟩
+
+
+/-- Two loop states that differ at most in the order of the options seen. -/
+def Equiv (s t : St) : Prop := s.1 = t.1 ∧ s.2.1 = t.2.1 ∧ ∀ n, n ∈ s.2.2 ↔ n ∈ t.2.2
+
+theorem Equiv.refl (s : St) : Equiv s s := ⟨rfl, rfl, fun _ => Iff.rfl⟩
+theorem Equiv.trans {s t u : St} (h1 : Equiv s t) (h2 : Equiv t u) : Equiv s u :=
+  ⟨h1.1.trans h2.1, h1.2.1.trans h2.2.1, fun n => (h1.2.2 n).trans (h2.2.2 n)⟩
+
+theorem setValued_congr (r : Parsed) {sup sup' : List String} (name : String) (v : Option String)
+    (h : ∀ n, n ∈ sup ↔ n ∈ sup') : setValued r sup name v = setValued r sup' name v := by
+  unfold setValued
+  simp only [h "target", h "suspend", h "output"]
+
+theorem stepItem_congr {s t s' : St} (it : Item) (he : Equiv s t) (h : stepItem s it = .ok s') :
+    ∃ t', stepItem t it = .ok t' ∧ Equiv s' t' := by
+  obtain ⟨r, pos, sup⟩ := s
+  obtain ⟨r', pos', sup'⟩ := t
+  obtain ⟨h1, h2, h3⟩ := he
+  dsimp only at h1 h2 h3
+  subst h1 h2
+  cases it with
+  | flag f =>
+    simp only [stepItem] at h ⊢
+    repeat' split at h
+    all_goals first
+      | (cases h; done)
+      | (cases h; simp_all [Equiv])
+  | valued n v =>
+    simp only [stepItem, setValued_congr r n (some v) h3] at h ⊢
+    cases hv : setValued r sup' n (some v) with
+    | error e => rw [hv] at h; cases h
+    | ok q =>
+      rw [hv] at h; cases h
+      exact ⟨_, rfl, rfl, rfl, fun m => by simp [h3 m]⟩
+  | pos w =>
+    simp only [stepItem] at h ⊢; cases h
+    exact ⟨_, rfl, rfl, rfl, h3⟩
+
+theorem runItems_congr : ∀ (its : List Item) {s t x : St}, Equiv s t → runItems s its = .ok x →
+    ∃ y, runItems t its = .ok y ∧ Equiv x y
+  | [], s, t, x, he, h => by simp only [runItems] at h ⊢; cases h; exact ⟨t, rfl, he⟩
+  | it :: its, s, t, x, he, h => by
+    simp only [runItems] at h ⊢
+    cases hs : stepItem s it with
+    | error e => rw [hs] at h; cases h
+    | ok s' =>
+      rw [hs] at h
+      obtain ⟨t', ht, he'⟩ := stepItem_congr it he hs
+      rw [ht]
+      exact runItems_congr its he' h
+
+
+def Item.isPos : Item → Bool
+  | .pos _ => true
+  | _ => false
+
+/-- The option names items carry. -/
+def ItemOK : Item → Prop
+  | .valued n _ => n = "target" ∨ n = "suspend" ∨ n = "output"
+  | _ => True
+
+/-- What setting a valued option does, when it succeeds. -/
+def setF (r : Parsed) (n v : String) : Parsed :=
+  if n = "target" then { r with target? := some v }
+  else if n = "suspend" then { r with suspend? := some v }
+  else { r with output? := some v }
+
+/-- Whether setting a valued option succeeds, apart from its being seen. -/
+def okVal (r : Parsed) (n v : String) : Prop :=
+  if n = "target" then r.command = "build" ∧ missingValue (some v) = false ∧ v ∈ buildTargets
+  else if n = "suspend" then v ∈ suspendModes
+  else missingValue (some v) = false
+
+theorem setValued_ok_iff {r r' : Parsed} {sup : List String} {n v : String} (hn : n = "target" ∨ n = "suspend" ∨ n = "output") :
+    setValued r sup n (some v) = .ok r' ↔ n ∉ sup ∧ okVal r n v ∧ r' = setF r n v := by
+  rcases hn with rfl | rfl | rfl
+  all_goals
+    unfold setValued okVal setF
+    simp only [ite_true, ite_false, show ("suspend" = "target") = False by decide, show ("output" = "target") = False by decide,
+      show ("output" = "suspend") = False by decide]
+    repeat' split
+    all_goals simp only [reduceCtorEq, false_iff, Except.ok.injEq, not_and]
+    all_goals first
+      | (intro a b _
+         first
+           | exact absurd ‹_ ∈ sup› a
+           | exact absurd b.1 ‹_›
+           | exact Bool.noConfusion (b.2.1.symm.trans ‹missingValue (some v) = true›)
+           | exact absurd b.2.2 ‹_›
+           | exact absurd b ‹_›
+           | exact Bool.noConfusion (b.symm.trans ‹missingValue (some v) = true›))
+      | (constructor
+         · intro hh; subst hh; simp_all only [ne_eq, Decidable.not_not, not_false_eq_true, Bool.not_eq_true, true_and, and_true, and_self]
+         · rintro ⟨-, -, rfl⟩; rfl)
+
+
+/-- What a flag does to the parse. -/
+def flagRes (r : Parsed) (f : String) : Except String Parsed :=
+  if f = "--rebuild" then .ok { r with rebuild? := some true }
+  else if f = "--verbose" then .ok { r with verbose? := some true }
+  else if f = "--dev" ∨ f = "--release" then
+    let profile := (f.drop 2).toString
+    if r.profile?.any (· ≠ profile) then .error "Choose one of --dev and --release"
+    else .ok { r with profile? := some profile }
+  else if f = "--allow-dev" then .ok { r with allowDev? := some true }
+  else .ok { r with bundler? := some true }
+
+theorem stepItem_flag (s : St) (f : String) : stepItem s (.flag f) = (flagRes s.1 f).map fun r => (r, s.2) := by
+  simp only [stepItem, flagRes]
+  repeat' split
+  all_goals rfl
+
+theorem stepItem_valued {s s' : St} {n v : String} (hn : n = "target" ∨ n = "suspend" ∨ n = "output") :
+    stepItem s (.valued n v) = .ok s' ↔ n ∉ s.2.2 ∧ okVal s.1 n v ∧ s' = (setF s.1 n v, s.2.1, n :: s.2.2) := by
+  simp only [stepItem]
+  cases hv : setValued s.1 s.2.2 n (some v) with
+  | error e =>
+    simp only [Except.map, reduceCtorEq, false_iff]
+    rintro ⟨a, b, -⟩
+    have := (setValued_ok_iff hn).mpr ⟨a, b, rfl⟩
+    rw [hv] at this; cases this
+  | ok r =>
+    have := (setValued_ok_iff hn).mp hv
+    simp only [Except.map, Except.ok.injEq]
+    constructor
+    · rintro rfl; exact ⟨this.1, this.2.1, by rw [this.2.2]⟩
+    · rintro ⟨-, -, rfl⟩; rw [this.2.2]
+
+theorem setF_command (r : Parsed) (n v : String) : (setF r n v).command = r.command := by
+  unfold setF; split
+  · rfl
+  · split <;> rfl
+
+theorem okVal_setF (r : Parsed) (n v m w : String) : okVal (setF r n v) m w ↔ okVal r m w := by
+  unfold okVal; rw [setF_command]
+
+theorem flagRes_command {r r' : Parsed} {f : String} (h : flagRes r f = .ok r') : r'.command = r.command := by
+  unfold flagRes at h
+  dsimp only at h
+  repeat' split at h
+  all_goals first | (cases h; done) | (cases h; rfl)
+
+theorem okVal_flag {r r' : Parsed} {f : String} (h : flagRes r f = .ok r') (m w : String) : okVal r' m w ↔ okVal r m w := by
+  unfold okVal; rw [flagRes_command h]
+
+theorem setF_comm (r : Parsed) {n m : String} (v w : String) (hn : n = "target" ∨ n = "suspend" ∨ n = "output")
+    (hm : m = "target" ∨ m = "suspend" ∨ m = "output") (hne : n ≠ m) : setF (setF r n v) m w = setF (setF r m w) n v := by
+  rcases hn with rfl | rfl | rfl <;> rcases hm with rfl | rfl | rfl <;> first | exact absurd rfl hne | rfl
+
+theorem flagRes_setF (r : Parsed) (f n v : String) (hn : n = "target" ∨ n = "suspend" ∨ n = "output") :
+    flagRes (setF r n v) f = (flagRes r f).map fun r' => setF r' n v := by
+  rcases hn with rfl | rfl | rfl <;>
+  · simp only [flagRes, setF]
+    repeat' split
+    all_goals first | rfl | (simp_all; done)
+
+theorem flagRes_comm {r r1 r2 : Parsed} {f g : String} (h1 : flagRes r f = .ok r1) (h2 : flagRes r1 g = .ok r2) :
+    ∃ q1, flagRes r g = .ok q1 ∧ flagRes q1 f = .ok r2 := by
+  unfold flagRes at h1 h2 ⊢
+  dsimp only at h1 h2 ⊢
+  repeat' split at h1
+  all_goals (try (cases h1; done))
+  all_goals cases h1
+  all_goals dsimp only at h2
+  all_goals (repeat' split at h2)
+  all_goals (try (cases h2; done))
+  all_goals cases h2
+  all_goals (repeat' split)
+  all_goals simp_all
+
+
+theorem flag_ok {r : Parsed} {pos sup : List String} {f : String} {s' : St} (h : stepItem (r, pos, sup) (.flag f) = .ok s') :
+    ∃ r', flagRes r f = .ok r' ∧ s' = (r', pos, sup) := by
+  rw [stepItem_flag] at h
+  cases hf : flagRes r f with
+  | error e => rw [hf] at h; cases h
+  | ok r' => rw [hf] at h; cases h; exact ⟨r', rfl, rfl⟩
+
+theorem stepItem_comm {s s1 s2 : St} {a b : Item} (ha : ItemOK a) (hb : ItemOK b) (hp : ¬(a.isPos = true ∧ b.isPos = true))
+    (h1 : stepItem s a = .ok s1) (h2 : stepItem s1 b = .ok s2) :
+    ∃ t1 t2, stepItem s b = .ok t1 ∧ stepItem t1 a = .ok t2 ∧ Equiv s2 t2 := by
+  obtain ⟨r, pos, sup⟩ := s
+  cases a with
+  | flag f =>
+    obtain ⟨r1, hf, rfl⟩ := flag_ok h1
+    cases b with
+    | flag g =>
+      obtain ⟨r2, hg, rfl⟩ := flag_ok h2
+      obtain ⟨q1, hq1, hq2⟩ := flagRes_comm hf hg
+      exact ⟨(q1, pos, sup), (r2, pos, sup), by rw [stepItem_flag, hq1]; rfl, by rw [stepItem_flag, hq2]; rfl, Equiv.refl _⟩
+    | valued m w =>
+      obtain ⟨hm1, hm2, rfl⟩ := (stepItem_valued hb).mp h2
+      refine ⟨(setF r m w, pos, m :: sup), (setF r1 m w, pos, m :: sup), (stepItem_valued hb).mpr ⟨hm1, (okVal_flag hf m w).mp hm2, rfl⟩,
+        ?_, Equiv.refl _⟩
+      rw [stepItem_flag, flagRes_setF r f m w hb, hf]; rfl
+    | pos w =>
+      simp only [stepItem] at h2; cases h2
+      exact ⟨(r, pos ++ [w], sup), (r1, pos ++ [w], sup), rfl, by rw [stepItem_flag, hf]; rfl, Equiv.refl _⟩
+  | valued n v =>
+    obtain ⟨hn1, hn2, rfl⟩ := (stepItem_valued ha).mp h1
+    cases b with
+    | flag g =>
+      obtain ⟨r2, hg, rfl⟩ := flag_ok h2
+      rw [flagRes_setF r g n v ha] at hg
+      cases hq : flagRes r g with
+      | error e => rw [hq] at hg; cases hg
+      | ok q =>
+        rw [hq] at hg; cases hg
+        refine ⟨(q, pos, sup), (setF q n v, pos, n :: sup), by rw [stepItem_flag, hq]; rfl,
+          (stepItem_valued ha).mpr ⟨hn1, (okVal_flag hq n v).mpr hn2, rfl⟩, Equiv.refl _⟩
+    | valued m w =>
+      obtain ⟨hm1, hm2, rfl⟩ := (stepItem_valued hb).mp h2
+      simp only [List.mem_cons, not_or] at hm1
+      have hne : n ≠ m := fun h => hm1.1 h.symm
+      refine ⟨(setF r m w, pos, m :: sup), (setF (setF r m w) n v, pos, n :: m :: sup),
+        (stepItem_valued hb).mpr ⟨hm1.2, (okVal_setF r n v m w).mp hm2, rfl⟩,
+        (stepItem_valued ha).mpr ⟨by simp [hne, hn1], (okVal_setF r m w n v).mpr hn2, rfl⟩, ?_⟩
+      refine ⟨setF_comm r v w ha hb hne, rfl, fun x => ?_⟩
+      simp only [List.mem_cons]; constructor <;> intro hx <;> rcases hx with hx | hx | hx <;> simp [hx]
+    | pos w =>
+      simp only [stepItem] at h2; cases h2
+      exact ⟨(r, pos ++ [w], sup), (setF r n v, pos ++ [w], n :: sup), rfl,
+        (stepItem_valued ha).mpr ⟨hn1, hn2, rfl⟩, Equiv.refl _⟩
+  | pos w =>
+    simp only [stepItem] at h1; cases h1
+    cases b with
+    | flag g =>
+      obtain ⟨r2, hg, rfl⟩ := flag_ok h2
+      exact ⟨(r2, pos, sup), (r2, pos ++ [w], sup), by rw [stepItem_flag, hg]; rfl, rfl, Equiv.refl _⟩
+    | valued m w' =>
+      obtain ⟨hm1, hm2, rfl⟩ := (stepItem_valued hb).mp h2
+      exact ⟨(setF r m w', pos, m :: sup), (setF r m w', pos ++ [w], m :: sup),
+        (stepItem_valued hb).mpr ⟨hm1, hm2, rfl⟩, rfl, Equiv.refl _⟩
+    | pos w' => exact absurd ⟨rfl, rfl⟩ hp
+
+
+theorem runItems_perm {l1 l2 : List Item} (hp : l1.Perm l2) :
+    (∀ it ∈ l1, ItemOK it) → (l1.filter Item.isPos).length ≤ 1 → ∀ (s x : St), runItems s l1 = .ok x →
+      ∃ y, runItems s l2 = .ok y ∧ Equiv x y := by
+  induction hp with
+  | nil => intro _ _ s x h; exact ⟨x, h, Equiv.refl _⟩
+  | cons a p ih =>
+    intro hok hpos s x h
+    simp only [runItems] at h ⊢
+    cases hs : stepItem s a with
+    | error e => rw [hs] at h; cases h
+    | ok s' =>
+      rw [hs] at h
+      exact ih (fun it hit => hok it (by simp [hit])) (by
+        refine Nat.le_trans ?_ hpos
+        simp only [List.filter_cons]; split <;> simp) s' x h
+  | swap a b l =>
+    intro hok hpos s x h
+    simp only [runItems] at h ⊢
+    cases h1 : stepItem s b with
+    | error e => rw [h1] at h; cases h
+    | ok s1 =>
+      rw [h1] at h; dsimp only at h
+      cases h2 : stepItem s1 a with
+      | error e => rw [h2] at h; cases h
+      | ok s2 =>
+        rw [h2] at h
+        have hp' : ¬(b.isPos = true ∧ a.isPos = true) := by
+          rintro ⟨hb, ha⟩
+          simp [List.filter_cons, hb, ha] at hpos
+        obtain ⟨t1, t2, ht1, ht2, he⟩ := stepItem_comm (hok b (by simp)) (hok a (by simp)) hp' h1 h2
+        rw [ht1]; dsimp only; rw [ht2]; dsimp only
+        exact runItems_congr l he h
+  | trans p1 p2 ih1 ih2 =>
+    intro hok hpos s x h
+    obtain ⟨y, hy, he1⟩ := ih1 hok hpos s x h
+    have hok' : ∀ it ∈ _, ItemOK it := fun it hit => hok it (p1.mem_iff.mpr hit)
+    have hpos' := (p1.filter Item.isPos).length_eq ▸ hpos
+    obtain ⟨z, hz, he2⟩ := ih2 hok' hpos' s y hy
+    exact ⟨z, hz, he1.trans he2⟩
+
+theorem mapM_some {α β : Type} (f : α → Option β) (g : α → β) : ∀ l : List α, (∀ x ∈ l, f x = some (g x)) →
+    l.mapM f = some (l.map g)
+  | [], _ => rfl
+  | x :: l, h => by
+    rw [List.mapM_cons, h x (by simp), mapM_some f g l (fun y hy => h y (by simp [hy]))]
+    rfl
+
+theorem filter_length_mono {α : Type} (p q : α → Bool) : ∀ l : List α, (∀ x ∈ l, p x = true → q x = true) →
+    (l.filter p).length ≤ (l.filter q).length
+  | [], _ => by simp
+  | x :: l, h => by
+    have ih := filter_length_mono p q l (fun y hy => h y (by simp [hy]))
+    simp only [List.filter_cons]
+    by_cases hp : p x = true
+    · simp [hp, h x (by simp) hp, ih]
+    · by_cases hq : q x = true
+      · simp [hp, hq]; omega
+      · simp [hp, hq]; omega
+
+theorem valuedOf_name {w n : String} {v : Option String} (h : valuedOf w = some (n, v)) :
+    n = "target" ∨ n = "suspend" ∨ n = "output" := by
+  unfold valuedOf at h
+  cases h1 : valuedOption "target" w with
+  | some x => rw [h1] at h; cases h; simp
+  | none =>
+    rw [h1] at h; dsimp only at h
+    cases h2 : valuedOption "suspend" w with
+    | some x => rw [h2] at h; cases h; simp
+    | none =>
+      rw [h2] at h; dsimp only at h
+      cases h3 : valuedOption "output" w with
+      | some x => rw [h3] at h; cases h; simp
+      | none => rw [h3] at h; cases h
+
+theorem itemOf_ok {g : List String} {it : Item} (h : itemOf g = some it) : ItemOK it := by
+  match g with
+  | [f, v] =>
+    simp only [itemOf] at h; split at h
+    · cases h; exact valuedOf_name ‹_›
+    · cases h
+  | [w] =>
+    simp only [itemOf] at h
+    repeat' split at h
+    all_goals first | (cases h; done) | (cases h; trivial) | (cases h; exact valuedOf_name ‹_›)
+
+theorem itemOf_pos {g : List String} {it : Item} (h : itemOf g = some it) (hp : it.isPos = true) :
+    (g.length == 1 && !(g.headD "").startsWith "-") = true := by
+  match g with
+  | [f, v] =>
+    simp only [itemOf] at h; split at h
+    · cases h; simp [Item.isPos] at hp
+    · cases h
+  | [w] =>
+    simp only [itemOf] at h
+    repeat' split at h
+    all_goals first | (cases h; done) | (cases h; simp [Item.isPos] at hp; done) | (cases h; simp_all)
+
+theorem items_or_error : ∀ (gs : List (List String)) (r : Parsed) (pos sup : List String),
+    r.command = "build" → (∀ g ∈ gs, OptionGroup g ∧ g ≠ ["--help"] ∧ g ≠ ["-h"]) →
+    (∃ e, optionLoop r pos sup gs.flatten = .error e) ∨ (∀ g ∈ gs, (itemOf g).isSome)
+  | [], _, _, _, _, _ => Or.inr (by simp)
+  | g :: gs, r, pos, sup, hr, hall => by
+    have hg := hall g (by simp)
+    cases hi : itemOf g with
+    | none =>
+      obtain ⟨e, he⟩ := loop_no_item r pos sup g gs.flatten hr hg.1 hg.2 hi
+      exact Or.inl ⟨e, by rw [List.flatten_cons, he]⟩
+    | some it =>
+      rw [List.flatten_cons, loop_item r pos sup g _ it hi]
+      cases hs : stepItem (r, pos, sup) it with
+      | error e => exact Or.inl ⟨e, rfl⟩
+      | ok s =>
+        rcases items_or_error gs s.1 s.2.1 s.2.2 (by rw [stepItem_command hs]; exact hr) (fun g' hg' => hall g' (by simp [hg'])) with
+          ⟨e, he⟩ | h
+        · exact Or.inl ⟨e, he⟩
+        · exact Or.inr (by intro g' hg'; simp only [List.mem_cons] at hg'; rcases hg' with rfl | hg' <;> simp_all)
+
+/-- What `parseLasmArguments` imports. -/
+def realEnv : ArgumentsEnv := ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩
+/-- The parse `lasm build` starts from. -/
+def buildStart : Parsed := { parseLasmArgumentsWith.start with command := "build" }
+
+theorem parse_build (toks : List String) : parseLasmArguments ("build" :: toks) =
+    match optionLoop buildStart [] [] toks with
+    | .error e => .error e
+    | .ok none => .ok { command := "help" }
+    | .ok (some (r, positional)) => finish realEnv r positional := by
+  unfold parseLasmArguments parseLasmArgumentsWith
+  have hrest : parseLasmArgumentsWith.rest realEnv ("build" :: toks) =
+      parseLasmArgumentsWith.program realEnv buildStart toks := by
+    simp [parseLasmArgumentsWith.rest, buildStart]
+  split
+  · rename_i t h; cases h; simp only [List.mem_cons, List.not_mem_nil, or_false]
+    rw [if_neg (by decide)]; exact hrest
+  · exact hrest
+
+theorem build_options_commute : Spec.build_options_commute := by
+  intro opts opts' forms hgood hpos _ hperm hforms hok
+  have hr0 : buildStart.command = "build" := rfl
+  rw [parse_build] at hok
+  rw [parse_build, parse_build]
+  -- Every group of `opts` is an item: otherwise the loop, and the parse, fail.
+  have hall : ∀ g ∈ opts, (itemOf g).isSome := by
+    rcases items_or_error opts buildStart [] [] hr0 hgood with ⟨e, he⟩ | h
+    · rw [he] at hok; cases hok
+    · exact h
+  let g : List String → Item := fun o => (itemOf o).getD (.pos "")
+  have hg : ∀ o ∈ opts, itemOf o = some (g o) := by
+    intro o ho; have := hall o ho; simp only [g]; cases h : itemOf o <;> simp_all
+  have hgood' : ∀ o ∈ opts', OptionGroup o := fun o ho => (hgood o (hperm.mem_iff.mpr ho)).1
+  have hg' : ∀ o ∈ opts', itemOf o = some (g o) := fun o ho => hg o (hperm.mem_iff.mpr ho)
+  have hm1 : opts.mapM itemOf = some (opts.map g) := mapM_some _ _ _ hg
+  have hm2 : ((opts'.zip forms).map fun (o, j) => if j then joined o else o).mapM itemOf = some (opts'.map g) := by
+    have hB2 : ∀ o ∈ ((opts'.zip forms).map fun (o, j) => if j then joined o else o), itemOf o = some (g o) := by
+      intro o ho
+      simp only [List.mem_map] at ho
+      obtain ⟨⟨o', j⟩, hp, rfl⟩ := ho
+      have ho' := (List.of_mem_zip hp).1
+      cases j
+      · exact hg' o' ho'
+      · simp only [ite_true]; rw [itemOf_joined o' (hgood' o' ho'), hg' o' ho']
+        simp [g, itemOf_joined o' (hgood' o' ho')]
+    have hB1 : ((opts'.zip forms).map fun (o, j) => if j then joined o else o).map g = opts'.map g := by
+      rw [List.map_map]
+      have : ∀ p ∈ opts'.zip forms, (g ∘ fun (x : List String × Bool) => if x.2 then joined x.1 else x.1) p = (g ∘ Prod.fst) p := by
+        rintro ⟨o, j⟩ hp
+        have ho := (List.of_mem_zip hp).1
+        cases j
+        · rfl
+        · simp [g, itemOf_joined o (hgood' o ho)]
+      rw [List.map_congr_left this, ← List.map_map, List.map_fst_zip (by omega)]
+    rw [mapM_some _ _ _ hB2, hB1]
+  rw [loop_items opts _ buildStart [] [] hm1] at hok ⊢
+  rw [loop_items _ _ buildStart [] [] hm2]
+  cases hx : runItems (buildStart, [], []) (opts.map g) with
+  | error e => rw [hx] at hok; cases hok
+  | ok x =>
+    have hokI : ∀ it ∈ opts.map g, ItemOK it := by
+      intro it hit; simp only [List.mem_map] at hit; obtain ⟨o, ho, rfl⟩ := hit; exact itemOf_ok (hg o ho)
+    have hposI : ((opts.map g).filter Item.isPos).length ≤ 1 := by
+      rw [List.filter_map, List.length_map]
+      exact Nat.le_trans (filter_length_mono _ _ opts fun o ho hp => itemOf_pos (hg o ho) hp) hpos
+    obtain ⟨y, hy, he⟩ := runItems_perm (hperm.map g) hokI hposI _ x hx
+    rw [hy]
+    simp only [he.1, he.2.1]
+
 /-! ## The process launcher -/
 
 theorem readNumber_le32 {n : Nat} (h : n < 4294967296) (r : List UInt8) : readNumber (le32 n ++ r) = some (n, r) := by

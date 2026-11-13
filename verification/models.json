@@ -217,7 +217,7 @@
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "the whole parser is modelled (run_args_kept, unknown_flag_refused, edit_distance_metric, closest_nearest_first, parse_known_or_refused proved, the last with the parsers of lasm init, dev and package it hands to); existsSync is the environment and jsRuntime one of node, bun and deno. Candidate build_options_commute remains"
+      "reason": "the whole parser is modelled (run_args_kept, unknown_flag_refused, edit_distance_metric, closest_nearest_first, build_options_commute, parse_known_or_refused proved, the last with the parsers of lasm init, dev and package it hands to); existsSync is the environment and jsRuntime one of node, bun and deno"
     },
     "src/dev-build-service.mjs": {
       "status": "exempt",

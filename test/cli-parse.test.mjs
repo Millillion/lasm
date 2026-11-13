@@ -244,7 +244,7 @@ test('run: any application arguments after -- come back unchanged, whatever the 
   });
 });
 
-// Proposition: Lasm.Cli.Candidates.build_options_commute
+// Proposition: Lasm.Cli.Spec.build_options_commute
 //   ∀ (opts opts' : List (List String)) (forms : List Bool), (∀ o ∈ opts, OptionGroup o ∧ o ≠ ["--help"] ∧ o ≠ ["-h"]) →
 //     (opts.filter fun o => o.length == 1 && !(o.headD "").startsWith "-").length ≤ 1 →
 //     (opts.map List.head?).Nodup → opts.Perm opts' → forms.length = opts'.length →
