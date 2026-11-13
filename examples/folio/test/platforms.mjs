@@ -34,9 +34,12 @@ export const platforms = {
     // renderer, not the request body, needs it: on wasmtime with
     // -W max-memory-size, unclosed <!-- needs 192-256 MiB and backticks
     // 256-384 MiB, and every other case fits in 128 MiB (issue #234).
+    // With Lasm's mimalloc build after 0.7.0 (issue #246), unclosed <!--
+    // passes on Viceroy at 126.6 MB; Folio pins @lasm/cli 0.7.0, so its skip
+    // stays until a release with that build. Backticks still needs ~290 MiB.
     pathologicalSkip: {
       'backticks': 'needs 256-384 MiB; Fastly Compute allows a 128 MB heap per request (#234)',
-      'unclosed <!--': 'needs 192-256 MiB; Fastly Compute allows a 128 MB heap per request (#234)',
+      'unclosed <!--': 'needs 192-256 MiB with @lasm/cli 0.7.0; Fastly Compute allows a 128 MB heap per request (#234). Fits (126.6 MB) with the next release (#246)',
     },
   },
   // wrangler dev (workerd, Miniflare's local Workers KV in the run's own

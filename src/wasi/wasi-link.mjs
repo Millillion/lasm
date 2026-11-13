@@ -50,9 +50,10 @@ export const wasiSources = ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.
  * cost Fastly programs (128 MB per instance) up to 16 MiB of their heap. With
  * 8 KiB slices an object of more than one slice chunk (128 slices, 1 MiB) is
  * huge, so the smallest arena is 2 MiB. mimalloc doubles the arena size
- * every 8 arenas. */
-// EVIDENCE #246 (temporary): LASM_EVIDENCE_246_MIMALLOC=sysroot links Emscripten's libmimalloc instead, to compare in one CI job.
-const mimalloc = process.env.LASM_EVIDENCE_246_MIMALLOC === 'sysroot' ? null : Object.freeze({ sliceKiB: 8, arenaMiB: 2 });
+ * every 8 arenas. Measured (CI run 43363306366): examples/fastly used 4.2 MB
+ * of heap per request on Viceroy instead of 27.8, and Folio's pathological
+ * inputs peaked lower (backticks 289 MiB instead of 386) at the same speed. */
+const mimalloc = Object.freeze({ sliceKiB: 8, arenaMiB: 2 });
 export const wasiLinkSettings = Object.freeze({
   wasi: Object.freeze({ stackMiB: 8, initialMiB: 16, maximumMiB: 2048, mimalloc, optimize: '-Oz' }),
   fastly: Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, mimalloc, optimize: '-Oz' }),
