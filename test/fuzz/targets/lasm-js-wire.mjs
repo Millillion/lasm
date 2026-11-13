@@ -1,6 +1,9 @@
-// The Lasm.JS value codec's JavaScript half (src/node-js.mjs: the Writer and
-// Reader every value between Lean and JavaScript crosses) against Lean's half
-// (Wire in library/Lasm/JS/Core.lean), the code whose round trip is proved.
+// The Lasm.JS value codec's JavaScript halves (src/node-js.mjs, and the edge
+// profile's copy in src/edge/edge-js.mjs: the Writer and Reader every value
+// between Lean and JavaScript crosses) against Lean's half (Wire in
+// library/Lasm/JS/Core.lean), the code whose round trip is proved, and
+// against each other: the edge copy reads every input as Node's does and
+// writes every value as Node's does, byte for byte.
 // Input: the first byte's low bit picks the direction.
 //   0: the rest is wire bytes. JavaScript's reader and Lean's (Wire.decodeWith)
 //      both refuse them, or both read the same value.
@@ -26,8 +29,9 @@ import { Input } from '../input.mjs';
 import { start } from '../support/serverless-model.mjs';
 import { modelDirectory } from '../support/js-wire-model.mjs';
 import { createNodeJs } from '../../../src/node-js.mjs';
+import { createEdgeJs } from '../../../src/edge/edge-js.mjs';
 
-export const sources = ['src/node-js.mjs'];
+export const sources = ['src/node-js.mjs', 'src/edge/edge-js.mjs'];
 export const maxLength = 2048;
 // Tags 0–10, lengths at the u32 edges, UTF-8 edges, bigint texts and keys.
 export const dictionary = [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10], [0, 0, 0, 0], [1, 0, 0, 0], [0xff, 0xff, 0xff, 0xff],
@@ -35,9 +39,10 @@ export const dictionary = [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10
   [0xed, 0xa0, 0x80], [0xef, 0xbb, 0xbf], [0xc0, 0x80], [0xff], '-', '_', '1_000', '0x10', '+5', ' ', '__proto__', 'constructor', 'toString',
   '0', '4294967295', 'é', '\u{1F600}'];
 
-let js, model;
+let js, edge, model;
 export async function setup() {
   js = createNodeJs();
+  edge = createEdgeJs();
   const dir = modelDirectory();
   if (dir) model = start(dir);
 }
@@ -108,17 +113,22 @@ function same(a, b) {
   return ka.length === kb.length && ka.every((k, i) => k === kb[i] && same(a[k], b[k]));
 }
 
-/** JavaScript's reading of `bytes`: { value } or { refused }. */
-function jsRead(bytes) {
-  try { return { value: js.decode(bytes) }; }
+/** JavaScript's reading of `bytes` (Node's reader, or another's): { value } or { refused }. */
+function jsRead(bytes, reader = js) {
+  try { return { value: reader.decode(bytes) }; }
   catch (error) {
-    if (!refusal(error)) fail(`the reader threw ${error?.name}: ${error?.message}`, { bytes, stack: error?.stack });
+    if (!refusal(error)) fail(`the ${reader === js ? '' : 'edge '}reader threw ${error?.name}: ${error?.message}`, { bytes, stack: error?.stack });
     return { refused: error.message };
   }
 }
 
 async function compareRead(bytes) {
   const mine = jsRead(bytes);
+  // The edge copy refuses what Node's refuses, with the same message, and reads the same value.
+  const theirs = jsRead(bytes, edge);
+  if ('refused' in mine !== 'refused' in theirs || ('refused' in mine && mine.refused !== theirs.refused))
+    fail('the edge reader and Node\'s disagree', { bytes, node: mine, edge: theirs });
+  if ('value' in mine && !same(mine.value, theirs.value)) fail('the edge reader reads another value than Node\'s', { bytes, node: mine.value, edge: theirs.value });
   if (!model) return mine;
   const lean = await model.ask({ decode: hex(bytes) });
   if (lean.fault) fail(`the model failed: ${lean.fault}`, { bytes });
@@ -185,6 +195,10 @@ export async function run(bytes) {
     let encoded;
     try { encoded = new Uint8Array(js.encode(v, 'data')); }
     catch (error) { fail(`the writer threw ${error?.name}: ${error?.message}`, { value: v }); }
+    let edgeEncoded;
+    try { edgeEncoded = new Uint8Array(edge.encode(v, 'data')); }
+    catch (error) { fail(`the edge writer threw ${error?.name}: ${error?.message}`, { value: v }); }
+    if (hex(edgeEncoded) !== hex(encoded)) fail('the edge writer and Node\'s write different bytes', { value: v, node: hex(encoded), edge: hex(edgeEncoded) });
     // decode_encode, of JavaScript's own halves: what it writes it reads back.
     const back = jsRead(encoded);
     if ('refused' in back) fail(`JavaScript refuses what it wrote: ${back.refused}`, { value: v, encoded });

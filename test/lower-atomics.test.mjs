@@ -96,9 +96,8 @@ function execute(bytes, base, seed, memory64) {
 
 for (const memory64 of [false, true]) {
   // Proposition: Lasm.Cli.Candidates.lowering_keeps_runs
-  //   ∀ (m : ByteArray) (args : List Nat), validate m = true →
-  //     validate (lowerAtomics m) = true ∧ lowerAtomics (lowerAtomics m) = lowerAtomics m ∧
-  //     run (lowerAtomics m) args = run m args
+  //   ∀ (m m' : ByteArray) (args : List Nat), validate m = true → lowerAtomics m = .ok m' →
+  //     validate m' = true ∧ lowerAtomics m' = .ok m' ∧ run m' args = run m args
   test(`lowerAtomics: random atomic programs compute the same result and memory (${memory64 ? 'memory64' : '32-bit memory'})`, () => {
     forAll(g => atomicProgram(g, memory64), ({ bytes, base, seed }) => {
       const lowered = lowerAtomics(bytes);
@@ -348,9 +347,9 @@ const v8KnowsEveryKind = () => v8Knows ??= [false, true].every(memory64 => WebAs
 
 for (const memory64 of [false, true]) {
   // Proposition: Lasm.Cli.Candidates.lowering_leaves_no_atomics
-  //   ∀ m : ByteArray, validate m = true →
-  //     validWithoutThreads (lowerAtomics m) = true ∧ lowerAtomics (lowerAtomics m) = lowerAtomics m ∧
-  //     (validWithoutThreads m = true → lowerAtomics m = m)
+  //   ∀ m m' : ByteArray, validate m = true → lowerAtomics m = .ok m' →
+  //     validWithoutThreads m' = true ∧ lowerAtomics m' = .ok m' ∧
+  //     (validWithoutThreads m = true → m' = m)
   test(`lowerAtomics decodes every other instruction kind exactly (${memory64 ? 'memory64' : '32-bit memory'})`, () => {
     const all = statements(memory64 ? 'i64' : 'i32'), atomics = atomicsOf(memory64 ? 'i64' : 'i32');
     // Without atomics: the same bytes, after decoding every instruction.
@@ -491,7 +490,7 @@ for (const memory64 of [false, true]) {
   //     (∀ b ∈ bodies, localDeclarations b.1 = true ∧ ∀ i ∈ b.2, i.WellFormed) →
   //     let keys := (bodies.flatMap fun b => b.2.filterMap Instr.helper?).eraseDups
   //     let index := fun sub => imported + bodies.length + keys.idxOf sub
-  //     ∃ out, codeBodies (lowerAtomics (bytes (moduleOf memory64 types imported bodies))) = some out ∧
+  //     ∃ m out, lowerAtomics (bytes (moduleOf memory64 types imported bodies)) = .ok m ∧ codeBodies m = some out ∧
   //       out.length = bodies.length + keys.length ∧
   //       out.take bodies.length = bodies.map fun (locals, is) => locals ++ is.flatMap (Instr.lowered memory64 index) ++ [0x0b]
   test(`lowerAtomics copies every other instruction exactly and replaces each atomic (${memory64 ? 'memory64' : '32-bit memory'})`, () => {
