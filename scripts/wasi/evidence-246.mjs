@@ -1,9 +1,9 @@
 // EVIDENCE #246 (temporary; removed before merge): the WASI targets' memory and
-// speed with mimalloc's arenas (before) and without them (after), in one job.
+// speed with Emscripten's 16 MiB mimalloc arenas (before) and 8 MiB ones (after), in one job.
 //   node scripts/wasi/evidence-246.mjs WORK TOOLS
 // TOOLS as scripts/wasi/wasi-ci.mjs's. Writes WORK/evidence-246.json and prints a summary.
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
-import { cpSync, createWriteStream, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { closeSync, cpSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { headlessEnvironment } from '../edge/headless.mjs';
@@ -12,16 +12,16 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const [work, tools] = process.argv.slice(2).map(p => resolve(p));
 const viceroy = join(tools, 'viceroy/viceroy'), wasmtimeDir = join(tools, 'wasmtime');
 mkdirSync(work, { recursive: true });
-const variants = { before: '1', after: '0' };
+const variants = { before: '16', after: '8' };
 const out = { builds: {}, trivialFastly: {}, trivialWasi: {}, folioWasi: {}, folioFastly: {} };
 const save = () => writeFileSync(join(work, 'evidence-246.json'), JSON.stringify(out, null, 1) + '\n');
-const env = arenas => ({ ...headlessEnvironment(), LASM_EVIDENCE_246_ARENAS: arenas, PATH: `${wasmtimeDir}:${process.env.PATH}` });
+const env = arenas => ({ ...headlessEnvironment(), LASM_EVIDENCE_246_ARENA_MIB: arenas, PATH: `${wasmtimeDir}:${process.env.PATH}` });
 const passed = ['LASM_APPLICATION_RUNTIME', 'LASM_EDGE_RUNTIME', 'LASM_BUILD_JOBS'].filter(key => process.env[key])
   .map(key => `${key}=${key === 'LASM_BUILD_JOBS' ? process.env[key] : resolve(process.env[key])}`);
 const bounded = [join(root, 'scripts/full-lean/run-bounded.mjs'), '--', 'python3', join(root, 'scripts/full-lean/base-pages.py'), 'env', ...passed];
 function lasm(project, args, variant) {
   const started = Date.now();
-  execFileSync(process.execPath, [...bounded, `LASM_EVIDENCE_246_ARENAS=${variants[variant]}`, process.execPath, join(root, 'bin/lasm.mjs'), ...args],
+  execFileSync(process.execPath, [...bounded, `LASM_EVIDENCE_246_ARENA_MIB=${variants[variant]}`, process.execPath, join(root, 'bin/lasm.mjs'), ...args],
     { cwd: project, stdio: 'inherit', env: env(variants[variant]) });
   out.builds[`${variant} ${args.join(' ')}`] = (Date.now() - started) / 1000;
 }
@@ -30,10 +30,11 @@ const heapOf = log => [...log.matchAll(/using ([\d.]+) MB of WebAssembly heap/g)
 
 /** Starts Viceroy on `wasm`; returns { base, stop, log() }. */
 async function serve(cwd, wasm, port, logFile) {
-  const log = createWriteStream(logFile);
+  // Viceroy writes its log straight to the file: a pipe stalls it while this script waits in spawnSync.
+  const fd = openSync(logFile, 'w');
   const child = spawn(viceroy, ['serve', '--addr', `127.0.0.1:${port}`, '-C', 'fastly.toml', wasm],
-    { cwd, env: { ...headlessEnvironment(), RUST_LOG: 'viceroy=error,viceroy_lib=error,viceroy_lib::execute=info' }, stdio: ['ignore', 'pipe', 'pipe'] });
-  child.stdout.pipe(log); child.stderr.pipe(log);
+    { cwd, env: { ...headlessEnvironment(), RUST_LOG: 'viceroy=error,viceroy_lib=error,viceroy_lib::execute=info' }, stdio: ['ignore', fd, fd] });
+  closeSync(fd);
   const base = `http://127.0.0.1:${port}`;
   const deadline = Date.now() + 180_000;
   for (;;) {
@@ -88,7 +89,7 @@ for (const v of Object.keys(variants)) {
 }
 const node = (args, extra = {}) => {
   const started = performance.now();
-  const r = spawnSync(process.execPath, args, { cwd: folio, encoding: 'utf8', maxBuffer: 256 << 20, env: { ...env('0'), ...extra } });
+  const r = spawnSync(process.execPath, args, { cwd: folio, encoding: 'utf8', maxBuffer: 256 << 20, env: { ...env('8'), ...extra } });
   return { status: r.status, seconds: (performance.now() - started) / 1000, stdout: r.stdout, stderr: r.stderr };
 };
 const caseLines = text => text.split('\n').filter(l => /^(ok  |FAIL|skip) /.test(l));

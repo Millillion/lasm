@@ -56,7 +56,7 @@ test('the WASI link compiles the host, links the application objects with the ed
   const compiled = f.tools.calls('clang');
   assert.deepEqual(compiled.map(args => args[args.indexOf('-c') + 1]), ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c'].map(name => join(here, name)));
   assert.deepEqual(compiled[0], ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
-    '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', '-DLASM_WASI_MAXIMUM_MEMORY=2048', '-DLASM_WASI_NO_ARENAS',
+    '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', '-DLASM_WASI_MAXIMUM_MEMORY=2048', '-DLASM_WASI_ARENA_MIB=8',
     '-ffunction-sections', '-fdata-sections', `-ffile-prefix-map=${here}=lasm/`, '-I', join(f.nodeRuntime.directory, 'include'), '-I', here,
     '-c', join(here, 'lasm_wasi.c'), '-o', join(f.out, 'lasm_wasi.o')]);
   for (const name of ['lasm_wasi', 'lasm_wasi_libc', 'lasm_fetch_wasi']) assert.ok(existsSync(join(f.out, `${name}.o`)));
@@ -89,7 +89,7 @@ test('Fastly and wasi-http targets: their defines, sources, memory and allowed i
   linkWasiProgram({ toolchain: f.toolchain, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, target: 'fastly' });
   const compiled = f.tools.calls('clang');
   assert.deepEqual(compiled.map(args => args.at(-3)), ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c'].map(name => join(here, name)));
-  for (const args of compiled) assert.deepEqual(args.slice(8, 11), ['-DLASM_WASI_MAXIMUM_MEMORY=2048', '-DLASM_WASI_NO_ARENAS', '-DLASM_WASI_FASTLY']);
+  for (const args of compiled) assert.deepEqual(args.slice(8, 11), ['-DLASM_WASI_MAXIMUM_MEMORY=2048', '-DLASM_WASI_ARENA_MIB=8', '-DLASM_WASI_FASTLY']);
   const [link] = f.tools.calls('wasm-ld');
   assert.deepEqual(link.slice(-6), ['--stack-first', '-z', 'stack-size=1048576', '--initial-memory=4194304', '--max-memory=2147483648', '--table-base=1']);
   // The same objects are rejected for plain WASI: no WASI host provides Fastly's calls.
@@ -215,9 +215,9 @@ test('host glue: Lasm.Fastly and Lasm.WASI.Http are compiled with exactly their 
 });
 
 test('WASI targets: settings, the sources of the cache identity, and the host interfaces each one may import', () => {
-  // No mimalloc arenas on any WASI target: the memory grows by what is used, not 16 MiB at a time (#246).
-  const MiB = { stackMiB: 1, initialMiB: 4, maximumMiB: 2048, arenas: false, optimize: '-Oz' };
-  assert.deepEqual(wasiLinkSettings, { wasi: { stackMiB: 8, initialMiB: 16, maximumMiB: 2048, arenas: false, optimize: '-Oz' }, fastly: MiB, 'wasi-http': MiB });
+  // mimalloc's smallest arenas (8 MiB) on every WASI target: the memory grows 8 MiB at a time, not 16 (#246).
+  const MiB = { stackMiB: 1, initialMiB: 4, maximumMiB: 2048, arenaMiB: 8, optimize: '-Oz' };
+  assert.deepEqual(wasiLinkSettings, { wasi: { stackMiB: 8, initialMiB: 16, maximumMiB: 2048, arenaMiB: 8, optimize: '-Oz' }, fastly: MiB, 'wasi-http': MiB });
   // Every file the WASI link reads is part of the program's cache identity.
   assert.deepEqual(wasiSources, ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
     'wasi-component.mjs', 'component/proxy-template.wasm', 'lasm_wasi_http_imports.h', '../../library/c/lasm_fastly.c',

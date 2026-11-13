@@ -35,17 +35,16 @@ export const wasiSources = ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.
 
 /** Link settings per WASI target, part of the program's cache identity. The
  * C shadow stack holds Lean's address-taken locals; recursion depth is
- * bounded by the engine's own Wasm stack first (docs/WASI.md). `arenas`:
- * whether mimalloc reserves its pages in arenas, which on WebAssembly are at
- * least 16 MiB each and grow the memory 16 MiB at a time; without them each
- * page comes from emmalloc, and the memory grows by what is used (issue #246,
- * lasm_wasi.c). */
-// EVIDENCE #246 (temporary): LASM_EVIDENCE_246_ARENAS=1 links with arenas, to compare both in one CI job.
-const evidenceArenas = process.env.LASM_EVIDENCE_246_ARENAS === '1';
+ * bounded by the engine's own Wasm stack first (docs/WASI.md). `arenaMiB`:
+ * the size of mimalloc's arenas, which WebAssembly commits whole, so the
+ * memory grows this much at a time; 8 MiB is mimalloc's smallest, Emscripten's
+ * default 16 MiB (issue #246, lasm_wasi.c). */
+// EVIDENCE #246 (temporary): LASM_EVIDENCE_246_ARENA_MIB overrides the arena size, to compare in one CI job.
+const arenaMiB = Number(process.env.LASM_EVIDENCE_246_ARENA_MIB ?? 8);
 export const wasiLinkSettings = Object.freeze({
-  wasi: Object.freeze({ stackMiB: 8, initialMiB: 16, maximumMiB: 2048, arenas: evidenceArenas, optimize: '-Oz' }),
-  fastly: Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, arenas: evidenceArenas, optimize: '-Oz' }),
-  'wasi-http': Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, arenas: evidenceArenas, optimize: '-Oz' }),
+  wasi: Object.freeze({ stackMiB: 8, initialMiB: 16, maximumMiB: 2048, arenaMiB, optimize: '-Oz' }),
+  fastly: Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, arenaMiB, optimize: '-Oz' }),
+  'wasi-http': Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, arenaMiB, optimize: '-Oz' }),
 });
 // The C sources and defines of each target.
 const targetSources = { wasi: ['lasm_fetch_wasi.c'], fastly: ['lasm_fetch_wasi.c'], 'wasi-http': ['lasm_wasi_http.c'] };
@@ -86,7 +85,7 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
   for (const source of ['lasm_wasi.c', 'lasm_wasi_libc.c', ...targetSources[target]]) {
     const object = join(out, source.replace(/\.c$/, '.o'));
     run('clang', ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
-      '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', `-DLASM_WASI_MAXIMUM_MEMORY=${settings.maximumMiB}`, ...settings.arenas ? [] : ['-DLASM_WASI_NO_ARENAS'], ...targetDefines[target],
+      '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', `-DLASM_WASI_MAXIMUM_MEMORY=${settings.maximumMiB}`, `-DLASM_WASI_ARENA_MIB=${settings.arenaMiB}`, ...targetDefines[target],
       '-ffunction-sections', '-fdata-sections', '-ffile-prefix-map=' + here + '=lasm/', '-I', join(nodeRuntime.directory, 'include'), '-I', here,
       '-c', join(here, source), '-o', object]);
     objects.push(object);

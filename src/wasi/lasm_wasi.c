@@ -60,23 +60,26 @@ _Noreturn void lasm_wasi_fail(const char *message) {
     w_proc_exit(134);
 }
 
-#ifdef LASM_WASI_NO_ARENAS
+#ifdef LASM_WASI_ARENA_MIB
 /* The heap (issue #246). Lean allocates through mimalloc, which Emscripten
- * builds over emmalloc and sbrk. By default mimalloc takes its pages from
- * arenas, and an arena on WebAssembly is at least 16 MiB (512 slices of
- * 32 KiB) and is grown into the memory whole, since WebAssembly memory cannot
- * be reserved without being committed: every program started at its initial
- * memory plus 16 MiB, and grew 16 MiB at a time, which on Fastly Compute
- * (128 MB per instance) wasted up to 16 MiB of the limit. Without arenas each
- * mimalloc page (32 KiB and up) is an emmalloc allocation, and the memory
- * grows by the pages in use (emscripten_resize_heap below grows it by exactly
- * what sbrk asks). This runs before every other constructor, so before the
- * first allocation. */
+ * builds over emmalloc and sbrk. mimalloc takes its pages from arenas, and
+ * on WebAssembly an arena is committed whole when it is reserved (memory
+ * cannot be reserved without being grown into): Emscripten's default arena is
+ * 16 MiB (its 64 MiB arena_reserve, divided by 4 without virtual memory), so
+ * every program started at its initial memory plus 16 MiB and grew 16 MiB at
+ * a time, which on Fastly Compute (128 MB per instance) wasted up to 16 MiB of
+ * the limit. LASM_WASI_ARENA_MIB is the arena size instead: 8 MiB is
+ * mimalloc's smallest here (256 slices of 32 KiB, MI_ARENA_MIN_SIZE). No
+ * arenas at all (mi_option_disallow_arena_alloc) starts lower, but each
+ * 32 KiB page is then a 32 KiB-aligned emmalloc allocation with a header, so
+ * two pages take 64 KiB and loaded programs peaked up to twice as high.
+ * mimalloc multiplies the size by 4 (and doubles it every 8 arenas). This
+ * runs before every other constructor, so before the first allocation. */
 #include <mimalloc.h>
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wprio-ctor-dtor"
-__attribute__((constructor(1))) static void lasm_wasi_heap_without_arenas(void) {
-    mi_option_set(mi_option_disallow_arena_alloc, 1);
+__attribute__((constructor(1))) static void lasm_wasi_arena_size(void) {
+    mi_option_set(mi_option_arena_reserve, (long)LASM_WASI_ARENA_MIB * 4 * 1024);
 }
 #pragma clang diagnostic pop
 #endif

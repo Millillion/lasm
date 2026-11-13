@@ -154,7 +154,7 @@ jobs:
         run: node scripts/wasi/wasi-ci.mjs .work/wasi-apps .work/wasi-tools
       - name: Licence check of every built output (notices file, embedded notices, no copyleft code)
         run: node scripts/license/check-outputs.mjs .work/wasi-apps --expect wasi,fastly,wasi-http --report .work/wasi-apps/license-check.json
-      - name: EVIDENCE (#246, temporary) memory and speed with and without mimalloc's arenas
+      - name: EVIDENCE (#246, temporary) memory and speed with 16 MiB and 8 MiB mimalloc arenas
         if: ${{ !cancelled() }}
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
