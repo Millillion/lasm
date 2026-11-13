@@ -24,7 +24,7 @@ test('only the reviewed Lean releases have an IO error policy', () => {
   assert.throws(() => encodeError({ code: 'EIO' }, '4.36.0'), /No verified IO error policy for Lean 4\.36\.0/);
 });
 
-// Proposition: Lasm.Cli.Candidates.lean_at_least_lexicographic
+// Proposition: Lasm.Cli.Spec.lean_at_least_lexicographic
 //   ∀ (a b : Nat × Nat × Nat) (rc : Option Nat),
 //     (leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText b) = true ↔ LexGe a b) ∧
 //     leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText a) = true

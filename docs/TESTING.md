@@ -1214,7 +1214,7 @@ with `numbers_le64`,
 `replace_one_core_module`, `drops_only_component_type` and
 `schedule_reached_kept_first` and `builtin_closure` (the depth-first walks
 are correct on acyclic graphs), `run_args_kept`, `unknown_flag_refused`,
-`edit_distance_metric`, `closest_nearest_first`, `zip_deterministic`, `launcher_config_round_trip`, `handle_fresh_in_range`, `events_read_back`, `request_read_back`, `into_read_back` and `componentize_inverse`
+`edit_distance_metric`, `closest_nearest_first`, `zip_deterministic`, `launcher_config_round_trip`, `handle_fresh_in_range`, `events_read_back`, `request_read_back`, `into_read_back`, `lean_at_least_lexicographic` and `componentize_inverse`
 (for any template of the shipped one's shape, which the test checks) proved. The
 differentials have found three bugs: `replaceCoreModule` spliced a section
 whose size was a padded LEB128 at the wrong offset, and

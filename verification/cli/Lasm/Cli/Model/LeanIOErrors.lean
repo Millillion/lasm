@@ -31,13 +31,18 @@ inductive JsNum where
   | num (n : Nat)
 deriving DecidableEq, Repr
 
-/-- `Number(text)` of a version part. -/
-def jsNumber (s : String) : JsNum :=
-  if s = "" then .num 0 else if s.all Char.isDigit then .num s.toNat! else .nan
+/-- The value of decimal digits, most significant first. -/
+def decimalValue (s : List Char) : Nat := s.foldl (fun n c => n * 10 + (c.toNat - '0'.toNat)) 0
 
-/-- `value.split('-')[0].split('.').map(Number)`. -/
+/-- `Number(text)` of a version part (its characters). -/
+def jsNumber (s : List Char) : JsNum :=
+  if s = [] then .num 0 else if s.all Char.isDigit then .num (decimalValue s) else .nan
+
+/-- `value.split('-')[0].split('.').map(Number)`: splitting on one ASCII
+character, as JavaScript's `split` does on UTF-16 units, is splitting the
+characters. -/
 def versionParts (value : String) : List JsNum :=
-  (((value.splitOn "-").headD "").splitOn ".").map jsNumber
+  (((value.toList.splitOn '-').headD []).splitOn '.').map jsNumber
 
 /-- `x !== y`. -/
 def JsNum.strictNe : JsNum → JsNum → Bool
