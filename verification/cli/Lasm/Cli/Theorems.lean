@@ -133,6 +133,91 @@ theorem changed_files_exact : Spec.changed_files_exact := by
 
 theorem numbers_le64 : Spec.numbers_le64 := fun _ => rfl
 
+/-! ## Lean versions -/
+
+theorem digitChar_sub (d : Nat) (h : d < 10) : d.digitChar.toNat - '0'.toNat = d := by
+  match d, h with
+  | 0, _ | 1, _ | 2, _ | 3, _ | 4, _ | 5, _ | 6, _ | 7, _ | 8, _ | 9, _ => rfl
+
+theorem decimalValue_toDigits (n : Nat) : decimalValue (Nat.toDigits 10 n) = n := by
+  induction n using Nat.strongRecOn with
+  | ind n ih =>
+    rw [Nat.toDigits_eq_ite (by decide)]
+    split
+    · rename_i h
+      simp only [decimalValue, List.foldl_cons, List.foldl_nil, Nat.zero_mul, Nat.zero_add]
+      exact digitChar_sub n h
+    · have := ih (n / 10) (by omega)
+      simp only [decimalValue, List.foldl_append, List.foldl_cons, List.foldl_nil] at this ⊢
+      rw [this, digitChar_sub _ (Nat.mod_lt _ (by decide))]
+      omega
+
+theorem jsNumber_toString (n : Nat) : jsNumber (toString n).toList = .num n := by
+  have hl : (toString n).toList = Nat.toDigits 10 n := Nat.toList_repr
+  rw [hl, jsNumber, if_neg Nat.toDigits_ne_nil, decimalValue_toDigits]
+  have : (Nat.toDigits 10 n).all Char.isDigit = true := by
+    rw [List.all_eq_true]; intro c hc; exact Nat.isDigit_of_mem_toDigits (by decide) (by decide) hc
+  simp [this]
+
+theorem versionText_toList (a : Nat × Nat × Nat) :
+    (versionText a).toList = Nat.toDigits 10 a.1 ++ '.' :: (Nat.toDigits 10 a.2.1 ++ '.' :: Nat.toDigits 10 a.2.2) := by
+  have h : (toString ".").toList = ['.'] := rfl
+  simp [versionText, h]
+
+theorem digits_not_mem {c : Char} (hc : c.isDigit = false) (n : Nat) : c ∉ Nat.toDigits 10 n := by
+  intro h
+  have := Nat.isDigit_of_mem_toDigits (by decide) (by decide) h
+  simp_all
+
+theorem jsNumber_digits (n : Nat) : jsNumber (Nat.toDigits 10 n) = .num n := by
+  have := jsNumber_toString n
+  rwa [show (toString n).toList = Nat.toDigits 10 n from Nat.toList_repr] at this
+
+theorem versionParts_text (a : Nat × Nat × Nat) (s : String) (hs : s.toList = [] ∨ s.toList.head? = some '-') :
+    versionParts (versionText a ++ s) = [.num a.1, .num a.2.1, .num a.2.2] := by
+  have hd : ∀ n, '-' ∉ Nat.toDigits 10 n := digits_not_mem (by decide)
+  have hdot : ∀ n, '.' ∉ Nat.toDigits 10 n := digits_not_mem (by decide)
+  have hp : '-' ∉ Nat.toDigits 10 a.1 ++ '.' :: (Nat.toDigits 10 a.2.1 ++ '.' :: Nat.toDigits 10 a.2.2) := by
+    simp [hd]
+  have head : (((Nat.toDigits 10 a.1 ++ '.' :: (Nat.toDigits 10 a.2.1 ++ '.' :: Nat.toDigits 10 a.2.2)) ++ s.toList).splitOn '-').headD [] =
+      Nat.toDigits 10 a.1 ++ '.' :: (Nat.toDigits 10 a.2.1 ++ '.' :: Nat.toDigits 10 a.2.2) := by
+    rcases hs with hs | hs
+    · rw [hs, List.append_nil, List.splitOn_eq_singleton hp]; rfl
+    · obtain ⟨t, ht⟩ : ∃ t, s.toList = '-' :: t := by
+        cases h : s.toList with
+        | nil => simp [h] at hs
+        | cons c t => simp [h] at hs; exact ⟨t, by rw [hs]⟩
+      rw [ht, List.splitOn_append_cons_self_of_not_mem hp]; rfl
+  rw [versionParts, String.toList_append, versionText_toList, head,
+    List.splitOn_append_cons_self_of_not_mem (hdot _), List.splitOn_append_cons_self_of_not_mem (hdot _),
+    List.splitOn_eq_singleton (hdot _)]
+  simp [jsNumber_digits]
+
+theorem atLeast_parts (a b : Nat × Nat × Nat) :
+    leanAtLeastModel.go [.num a.1, .num a.2.1, .num a.2.2] [.num b.1, .num b.2.1, .num b.2.2]
+      (fun l i => l[i]?.getD .undef) [0, 1, 2] = true ↔ LexGe a b := by
+  obtain ⟨a1, a2, a3⟩ := a
+  obtain ⟨b1, b2, b3⟩ := b
+  simp only [leanAtLeastModel.go, JsNum.strictNe, JsNum.gt, LexGe]
+  by_cases h1 : a1 = b1 <;> by_cases h2 : a2 = b2 <;> by_cases h3 : a3 = b3 <;> simp_all <;> omega
+
+theorem suffix_shape (rc : Option Nat) :
+    ((rc.map (s!"-rc{·}")).getD "").toList = [] ∨ ((rc.map (s!"-rc{·}")).getD "").toList.head? = some '-' := by
+  cases rc with
+  | none => left; rfl
+  | some n => right; simp; exact Or.inl rfl
+
+theorem lean_at_least_lexicographic : Spec.lean_at_least_lexicographic := by
+  intro a b rc
+  have parts : ∀ c, versionParts (versionText c) = [.num c.1, .num c.2.1, .num c.2.2] := fun c => by
+    simpa using versionParts_text c "" (Or.inl rfl)
+  have ha := versionParts_text a _ (suffix_shape rc)
+  refine ⟨?_, ?_⟩
+  · simp only [leanAtLeast, leanAtLeastModel, ha, parts]
+    exact atLeast_parts a b
+  · simp only [leanAtLeast, leanAtLeastModel, ha, parts]
+    exact (atLeast_parts a a).2 (by obtain ⟨x, y, z⟩ := a; simp [LexGe])
+
 /-! ## WebAssembly sections -/
 
 theorem lebJS_eq_leb (n : Nat) : lebJS n = leb n := by

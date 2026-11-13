@@ -129,6 +129,15 @@ Tested by: test/lean-io-error-policy.test.mjs -/
 def numbers_le64 : Prop :=
   ∀ values : List Int, (numbers values).data.toList = values.flatMap le64
 
+/-- **Lean versions compare lexicographically.** `leanAtLeast v m` holds
+exactly when `v`'s major, minor and patch are `m`'s or later in that order,
+whatever prerelease tag `v` has; a version is at least itself.
+Tested by: test/lean-io-error-policy.test.mjs -/
+def lean_at_least_lexicographic : Prop :=
+  ∀ (a b : Nat × Nat × Nat) (rc : Option Nat),
+    (leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText b) = true ↔ LexGe a b) ∧
+    leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText a) = true
+
 /-! ## Builds -/
 
 /-- **The builtin closure is the reachable builtins, dependencies first.**

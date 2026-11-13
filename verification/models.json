@@ -430,7 +430,7 @@
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "leanAtLeast is modelled (candidate lean_at_least_lexicographic stated over the model, not yet proved); the IO error policy remains to model"
+      "reason": "leanAtLeast is modelled (lean_at_least_lexicographic proved of the model); the IO error policy remains to model"
     },
     "src/link-driver/compile.mjs": {
       "status": "exempt",

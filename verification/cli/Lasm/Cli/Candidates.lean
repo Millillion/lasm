@@ -82,22 +82,15 @@ def static_inside_root : Prop :=
     (staticServe root path).1 ∈ [200, 403, 404] ∧
     ∀ f, (staticServe root path).2 = some f → f.startsWith (root ++ "/")
 
-/-! ## The Node host -/
-
-/-- **Lean versions compare lexicographically.** `leanAtLeast v m` holds
-exactly when `v`'s major, minor and patch are `m`'s or later in that order,
-whatever prerelease tag `v` has; a version is at least itself.
-Tested by: test/lean-io-error-policy.test.mjs -/
-def lean_at_least_lexicographic : Prop :=
-  ∀ (a b : Nat × Nat × Nat) (rc : Option Nat),
-    (leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText b) = true ↔ LexGe a b) ∧
-    leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText a) = true
-
 /-! ## Downloads -/
 
 /-- **Retry delays stay within 75–100 % of the backoff.** For every attempt
 and every random draw in [0, 1], the delay is between three quarters of the
-capped doubling backoff and the backoff itself.
+capped doubling backoff and the backoff itself. It stays tested, not
+proved: the code computes in doubles, and Lean's `Float` operations are
+opaque to proofs. It holds because IEEE-754 rounding is monotone and exact
+on `0.75 * b` and `b` (`b` ≤ 60000), so the delay grows with the draw
+between its values at 0 and 1, which the test checks for every backoff.
 Tested by: test/managed-download.test.mjs -/
 def retry_delay_bounded : Prop :=
   ∀ (attempt : Nat) (r : Float), 1 ≤ attempt → 0 ≤ r → r ≤ 1 →
@@ -136,7 +129,9 @@ def python_order_code_points : Prop :=
 valid module, the lowered module is valid, lowering it again changes nothing,
 and run on one thread it gives the same result and leaves the same memory.
 (The lowering refuses, with an error, SIMD and GC instructions, which a valid
-module may hold.)
+module may hold.) It stays tested, not proved: `validate` and `run` are
+WebAssembly's own validation and execution, which a proof needs as a formal
+semantics of WebAssembly to relate the lowering's model to.
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_keeps_runs : Prop :=
   ∀ (m m' : ByteArray) (args : List Nat), validate m = true → lowerAtomics m = .ok m' →
@@ -145,7 +140,8 @@ def lowering_keeps_runs : Prop :=
 /-- **Lowering leaves no atomic instruction.** When it lowers a valid
 module, the lowered module is valid without the threads feature and lowering
 it again changes nothing; a module already valid without threads is returned
-as it is.
+as it is. It stays tested, not proved, for the same reason: `validate` and
+`validWithoutThreads` are WebAssembly's own validation.
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_leaves_no_atomics : Prop :=
   ∀ m m' : ByteArray, validate m = true → lowerAtomics m = .ok m' →
@@ -157,7 +153,9 @@ of any bodies of well-formed instructions, every non-atomic instruction and ever
 kept byte for byte, every atomic instruction becomes its documented
 replacement, and one helper per atomic operation and width follows the
 functions, numbered in order of first use after the imported and defined
-ones.
+ones. Of the model, but not yet proved: its hypotheses are WebAssembly's
+binary grammar (`oneInstruction`, `localDeclarations`), which a proof needs
+as a Lean definition the model's `skipInstruction` reads exactly.
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_rewrites_atomics : Prop :=
   ∀ (memory64 : Bool) (types imported : Nat) (bodies : List Body),
