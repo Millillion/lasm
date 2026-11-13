@@ -28,6 +28,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import assert from 'node:assert/strict';
+import { request as httpRequest } from 'node:http';
 import { headlessEnvironment } from '../edge/headless.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -432,6 +433,102 @@ if (engines.has('lasm-node'))
   await serveAndCheck('lasm-node', process.execPath, ['dist/main.mjs'], { cwd: fetchApp, port: 3103, env: { PORT: '3103', HOST: '127.0.0.1', GREETING: 'hello from the host' } });
 if (engines.has('deno'))
   await serveAndCheck('deno', toolPath.deno, ['run', '-A', 'deno/main.mjs'], { cwd: fetchApp, port: 3104, env: { PORT: '3104', GREETING: 'hello from the host' } });
+
+// ---- The fetch template's WASI programs ----
+// `lasm init --template fetch --deploy fastly --deploy wasi --deploy wasi-http`
+// writes Fastly.lean (Lasm.Fastly), Cgi.lean (CGI in Lean IO) and WasiHttp.lean
+// (Lasm.WASI.Http); each builds with its package.json script and answers the
+// template's routes.
+{
+  const app = join(work, 'fetch-template');
+  rmSync(app, { recursive: true, force: true });
+  execFileSync(process.execPath, [join(root, 'bin/lasm.mjs'), 'init', app, '--template', 'fetch', '--deploy', 'fastly', '--deploy', 'wasi', '--deploy', 'wasi-http'],
+    { stdio: 'inherit', env: headlessEnvironment() });
+  const out = results.fetch['fetch-template'] = { passed: 0 };
+  const templateRoutes = [
+    { path: '/', json: { message: 'Hello from Lean!' } },
+    { path: '/hello/a%20b', json: { message: 'Hello, a b, from Lean!' } },
+    { path: '/hello/../hello/Ada', json: { message: 'Hello, Ada, from Lean!' } },
+    { path: '/health', json: { ok: true } },
+    { path: '/echo', method: 'POST', headers: { 'content-type': 'text/plain' }, body: 'héllo', text: 'héllo', type: /^text\/plain$/ },
+    { path: '/nope', status: 404, text: 'Not Found\n' },
+  ];
+  const check = (where, route, got) => {
+    assert.equal(got.status, route.status ?? 200, `${where} ${route.path}: status`);
+    const text = new TextDecoder().decode(got.body);
+    if (route.json) assert.deepEqual(JSON.parse(text), route.json, `${where} ${route.path}`);
+    if (route.text !== undefined) assert.equal(text, route.text, `${where} ${route.path}`);
+    if (route.type) assert.match(got.headers.get('content-type') ?? '', route.type, `${where} ${route.path}: content-type`);
+  };
+  const scripts = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8')).scripts;
+  let built = true;
+  for (const target of ['wasi', 'fastly', 'wasi-http']) {
+    try { lasm(app, scripts[`build:${target}`].replace(/^lasm /, '').split(' '), `fetch-template-${target}`); }
+    catch (error) { built = false; fail(`fetch template: npm run build:${target}`, error); }
+  }
+  if (built) {
+    // CGI under wasmtime, one run per request (as `cgi` above, on the template's build).
+    if (engines.has('wasmtime')) for (const route of templateRoutes) {
+      try {
+        const url = new URL(route.path, 'http://localhost:8080');
+        const env = { REQUEST_METHOD: route.method ?? 'GET', X_FULL_URL: url.href, PATH_INFO: url.pathname,
+          ...(route.headers?.['content-type'] ? { CONTENT_TYPE: route.headers['content-type'] } : {}),
+          ...(route.body ? { CONTENT_LENGTH: String(Buffer.byteLength(route.body)) } : {}) };
+        const got = run('wasmtime', app, 'wasi/main.wasm', [], { env, input: route.body ? Buffer.from(route.body) : '' });
+        if (got.status !== 0) throw new Error(`exit ${got.status}: ${got.stderr}`);
+        const split = got.stdout.indexOf('\r\n\r\n');
+        const headers = new Headers();
+        let status = 200;
+        for (const line of got.stdout.subarray(0, split).toString().split('\r\n')) {
+          const colon = line.indexOf(':'), name = line.slice(0, colon).trim(), value = line.slice(colon + 1).trim();
+          if (name.toLowerCase() === 'status') status = Number(value.split(' ')[0]); else headers.append(name, value);
+        }
+        check('fetch template cgi', route, { status, headers, body: new Uint8Array(got.stdout.subarray(split + 4)) });
+        out.passed++;
+      } catch (error) { fail(`fetch template cgi ${route.path}`, error); }
+    }
+    // Viceroy (Fastly.lean) and wasmtime serve (WasiHttp.lean).
+    const servers = [];
+    if (engines.has('viceroy')) servers.push(['viceroy', toolPath.viceroy, ['serve', '--addr', '127.0.0.1:3121', '-C', 'fastly.toml', 'bin/main.wasm'], 3121]);
+    if (engines.has('wasmtime')) servers.push(['wasmtime-serve', toolPath.wasmtime, ['serve', '--addr', '127.0.0.1:3122', 'wasi-http/main.wasm'], 3122]);
+    for (const [name, command, args, port] of servers) {
+      const child = spawn(command, args, { cwd: app, env: headlessEnvironment(), stdio: ['ignore', 'pipe', 'pipe'] });
+      let log = '';
+      child.stdout.on('data', d => { log += d; }); child.stderr.on('data', d => { log += d; });
+      const base = `http://127.0.0.1:${port}`;
+      try {
+        const started = performance.now();
+        for (let ready = false; !ready;) {
+          if (child.exitCode !== null) throw new Error(`${name} exited (${child.exitCode}):\n${log}`);
+          if (performance.now() - started > 120_000) throw new Error(`${name} did not start:\n${log}`);
+          try { await fetch(base + '/', { signal: AbortSignal.timeout(2000) }); ready = true; } catch { await new Promise(r => setTimeout(r, 200)); }
+        }
+        for (const route of templateRoutes) {
+          try {
+            // Raw paths (fetch would resolve `..` itself): node:http sends them as written.
+            const got = await new Promise((done, failed) => {
+              const req = httpRequest({ host: '127.0.0.1', port, path: route.path, method: route.method ?? 'GET', headers: route.headers }, res => {
+                const chunks = [];
+                res.on('data', c => chunks.push(c));
+                res.on('end', () => done({ status: res.statusCode, headers: new Headers(Object.entries(res.headers).map(([k, v]) => [k, String(v)])), body: new Uint8Array(Buffer.concat(chunks)) }));
+              });
+              req.on('error', failed);
+              req.end(route.body);
+            });
+            check(`fetch template ${name}`, route, got);
+            out.passed++;
+          } catch (error) { fail(`fetch template ${name} ${route.path}`, error); }
+        }
+      } catch (error) { fail(`fetch template ${name}`, error); }
+      finally {
+        child.kill('SIGTERM');
+        await new Promise(r => setTimeout(r, 500));
+        if (child.exitCode === null) child.kill('SIGKILL');
+      }
+    }
+  }
+  save();
+}
 
 originServer.close();
 results.finished = new Date().toISOString();

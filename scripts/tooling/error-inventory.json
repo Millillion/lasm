@@ -3,7 +3,7 @@
   "reasons": {
     "src/cli-arguments.mjs: (dynamic message, line 145)": "The usage text (cliUsage, built from a variable): corpus cases no-arguments and build-without-source print it.",
     "src/application-cli.mjs: (dynamic message, line 22)": "A helper program missing from the installation (missingMessage, a variable); not reachable with a complete npm install.",
-    "src/init.mjs: (dynamic message, line 108)": "The usage text (initUsage, a variable): corpus cases init-without-directory and init-two-directories print it.",
+    "src/init.mjs: (dynamic message, line 110)": "The usage text (initUsage, a variable): corpus cases init-without-directory and init-two-directories print it.",
     "src/package.mjs: (dynamic message, line 67)": "The usage text (packageUsage, a variable): corpus case package-two-builds prints it.",
     "src/package.mjs: ). Rebuild it with the current Lasm.": "A build made by an older Lasm without native support manifests; a current lasm build always writes one. Not tested.",
     "src/package.mjs: The package is": "Needs a build over a platform size limit (50 MB zipped): too large for the corpus. Not tested.",
