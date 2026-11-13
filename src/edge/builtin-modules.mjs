@@ -8,7 +8,10 @@
 //   - Node builds copy them to host/lasm-modules/ (src/node-js.mjs loads them);
 //   - the build-time binding check loads them from here.
 // A builtin module uses web-standard APIs only (no Node built-ins), and imports
-// only other builtin modules, by relative path ('./app.mjs').
+// only other builtin modules, by relative path ('./app.mjs'). The exception is
+// `lasm:node-serve` (Node.serve), which takes node:http from
+// process.getBuiltinModule when it serves, never at import, so it still loads
+// everywhere.
 // `lasm:app` is per app instance: the browser loader gives each mounted app
 // its own (its root element, flags, ports); app.mjs is the stand-in that the
 // binding check and non-browser builds see.

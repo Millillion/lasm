@@ -51,9 +51,10 @@ programs that start subprocesses use that helper.
 ## Function platforms, Alpine and gVisor (Phase 6)
 
 Function platforms, Alpine/musl and gVisor. `lasm build --target …` (or
-`lasm package --target …` for an existing `dist/`) makes a function package: a small handler
-starts the Lean server inside the platform's Node process on a loopback port and
-forwards each request to it ([`src/serverless/`](../src/serverless/)). These are
+`lasm package --target …` for an existing `dist/`) makes a function package. A small handler
+starts the Lean program inside the platform's Node process and calls the fetch
+handler that `main` publishes (`Lasm.JS.exportDefault handle`) directly for each
+request, with no server and no port ([`src/serverless/`](../src/serverless/)). These are
 tested by [`serverless.yml`](../.github/workflows/serverless.yml) on Linux x64
 and arm64 runners with the platforms' own local runtimes. Dispatch it with a
 candidate; it overlays only sources changed since `main`

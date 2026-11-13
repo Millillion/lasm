@@ -21,7 +21,7 @@ name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun)
 #     TypeScript declarations (scripts/bindings/deno.idl and bun.idl are
 #     serve-api.mjs's lowering of them, their SHA-256 hashes pinned): the same
 #     candidate builds test/fixtures/js-serve for Node, Bun and Deno, whose servers
-#     (Deno.serve, Bun.serve, @hono/node-server on Node) serve a Lean handler that
+#     (Deno.serve, Bun.serve, Lasm's Node.serve and @hono/node-server on Node) serve a Lean handler that
 #     the program requests over HTTP; then Serve.lean is served by each and
 #     requested from outside the process (scripts/bindings/test-serve.mjs).
 on:
@@ -39,6 +39,7 @@ on:
       - 'test/fixtures/js-serve-size/**'
       - 'test/web-bindings.test.mjs'
       - 'src/node-js.mjs'
+      - 'src/lasm-modules/**'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'
       - 'package.json'
@@ -56,6 +57,7 @@ on:
       - 'test/fixtures/js-serve/**'
       - 'test/fixtures/js-serve-size/**'
       - 'src/node-js.mjs'
+      - 'src/lasm-modules/**'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'
       - '.github/workflows/web-bindings.yml'
@@ -276,7 +278,7 @@ jobs:
           node scripts/bindings/test-web.mjs --fixture js-serve --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-serve" \
             --targets node,bun,deno --bun "$T/bun-linux-x64/bun" --deno "$T/node_modules/.bin/deno" \
             --report "$RUNNER_TEMP/js-serve/report.json" --sizes
-      - name: Serve a Lean handler with Deno.serve, Bun.serve and @hono/node-server, requested from outside
+      - name: Serve a Lean handler with Deno.serve, Bun.serve and Node.serve, requested from outside
         if: success() || failure()
         run: |
           T="$RUNNER_TEMP/tools"

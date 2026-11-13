@@ -125,9 +125,9 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**13 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+**14 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
-### Lasm.Cli (13)
+### Lasm.Cli (14)
 
 | Candidate | In plain English | Tested by |
 | --- | --- | --- |
@@ -144,4 +144,5 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | [`lowering_leaves_no_atomics`](Lasm/Cli/Candidates.lean#L150) | **Lowering leaves no atomic instruction.** When it lowers a valid module, the lowered module is valid without the threads feature and lowering it again changes nothing; a module already valid without threads is returned as it is. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
 | [`lowering_rewrites_atomics`](Lasm/Cli/Candidates.lean#L162) | **Lowering rewrites each atomic and copies everything else.** In a module of any bodies of well-formed instructions, every non-atomic instruction and every local declaration is kept byte for byte, every atomic instruction becomes its documented replacement, and one helper per atomic operation and width follows the functions, numbered in order of first use after the imported and defined ones. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
 | [`zip_reads_back`](Lasm/Cli/Candidates.lean#L178) | **What `zip` writes, a ZIP reader reads back.** Whenever `zip` succeeds, a reader finds the parent directories first (sorted, mode `0o40755`, empty, stored), then every entry in order, with its bytes and its permissions as a regular file (`0o644` unless given). | [test/serverless-zip.test.mjs](../../test/serverless-zip.test.mjs) |
+| [`origin_form_url`](Lasm/Cli/Candidates.lean#L194) | **An origin-form target is the URL's path and query; only a plain Host is its authority.** For a target that starts with `/` (printable ASCII without `#`, space or backslash), `requestUrl` answers a URL that ends with the target, whose host is the Host field's when that is plain and parses as an authority, and the fallback's otherwise. | [test/node-serve.test.mjs](../../test/node-serve.test.mjs) |
 <!-- END CANDIDATES -->

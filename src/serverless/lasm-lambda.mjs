@@ -1,16 +1,17 @@
-// AWS Lambda handler for a Lasm HTTP server (handler `lasm-lambda.handler`).
+// AWS Lambda handler for a Lasm program (handler `lasm-lambda.handler`).
 // Maps API Gateway REST (payload 1.0), API Gateway HTTP API (payload 2.0),
 // Lambda function URL, Application Load Balancer and CloudFront (Lambda@Edge
-// origin-request / viewer-request) events to HTTP requests for the Lean
-// server, and its responses back to each event's response shape. The Lean
+// origin-request / viewer-request) events to web Requests for the fetch
+// handler the program publishes (Lasm.JS.exportDefault), called directly,
+// and its Responses back to each event's response shape. The Lean
 // model of this mapping, with its theorems, is
 // library/Lasm/Serverless/Proofs/Model.lean; the serverless-http fuzz target
 // checks this file against it.
-import { forward, isTextual, requestTarget, startLeanServer } from './lasm-server.mjs';
+import { forward, isTextual, loadHandler, requestTarget } from './lasm-function.mjs';
 
-// Start the server during Lambda's init phase (top-level await), so its time
+// Start the program during Lambda's init phase (top-level await), so its time
 // counts as init rather than as the first invocation.
-await startLeanServer();
+await loadHandler();
 
 const decode = (body, base64) => body == null || body === '' ? undefined : Buffer.from(body, base64 ? 'base64' : 'utf8');
 

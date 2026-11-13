@@ -1,19 +1,20 @@
 // The function platforms' HTTP boundary (src/serverless/): AWS Lambda's event
 // → request mapping (API Gateway REST and HTTP API, function URLs, ALB,
-// CloudFront) in lasm-lambda.mjs, and the helpers of lasm-server.mjs every
-// platform shim uses (outgoingHeaders, joinCookies, parseSetCookie,
-// azureReply, webReply, isTextual). The Lean server is replaced by a stub
-// `forward` (a module hook redirects lasm-lambda.mjs's import), which records
-// the request it would send and answers with headers the input chooses.
+// CloudFront) in lasm-lambda.mjs, and the helpers of lasm-function.mjs every
+// platform shim uses (outgoingHeaders, eventRequest, joinCookies,
+// parseSetCookie, azureReply, webResponse, isTextual). The Lean program is
+// replaced by a stub `forward` (a module hook redirects lasm-lambda.mjs's
+// import), which records the request it would hand the handler and answers
+// with headers the input chooses.
 // Input: structure read field by field (test/fuzz/input.mjs): the event kind,
 // method, path, query values (any text, percent signs included), headers,
 // cookies, body, and the reply.
 // Oracle:
 //   - every well-formed event of each kind is answered (no URIError or
 //     TypeError: a client controls the query string, and an exception is a
-//     502); the request forwarded has a target http.request accepts (visible
-//     ASCII, no `#`) starting with `/`, header pairs of strings, at most one
-//     Cookie and exactly one plain Host field; query values decoded by the
+//     502); the request has a target (visible ASCII, no `#`) starting with
+//     `/`, header pairs of strings, at most one Cookie and exactly one plain
+//     Host field, and a web Request holds it, its URL under that Host; query values decoded by the
 //     platform arrive with the same values; the response body round-trips
 //     (text or base64), and each Set-Cookie arrives once;
 //   - the Lean model (library/Lasm/Serverless/Proofs/Model.lean, whose
@@ -24,7 +25,7 @@ import { registerHooks } from 'node:module';
 import { Input } from '../input.mjs';
 import { modelDirectory, start } from '../support/serverless-model.mjs';
 
-export const sources = ['src/serverless/lasm-lambda.mjs', 'src/serverless/lasm-server.mjs'];
+export const sources = ['src/serverless/lasm-lambda.mjs', 'src/serverless/lasm-function.mjs'];
 export const maxLength = 2048;
 export const dictionary = ['%', '%2', '%25', '%E0%A4%A', '%C3%A9', '%FF', '%00', '+', '&', '=', '?', '#', ';', ',', '; ', ', ', 'a=1', 'b=2',
   'cookie', 'Cookie', 'set-cookie', 'content-type', 'text/html', 'application/json', 'image/png', 'content-encoding', 'gzip',
@@ -38,12 +39,12 @@ export async function setup() {
   if (dir) model = start(dir);
   registerHooks({
     resolve(specifier, context, next) {
-      if (specifier === './lasm-server.mjs' && context.parentURL?.endsWith('/src/serverless/lasm-lambda.mjs')) return { url: stubURL, shortCircuit: true };
+      if (specifier === './lasm-function.mjs' && context.parentURL?.endsWith('/src/serverless/lasm-lambda.mjs')) return { url: stubURL, shortCircuit: true };
       return next(specifier, context);
     },
   });
   stub = await import(stubURL);
-  server = await import(new URL('../../../src/serverless/lasm-server.mjs', import.meta.url).href);
+  server = await import(new URL('../../../src/serverless/lasm-function.mjs', import.meta.url).href);
   lambda = await import(new URL('../../../src/serverless/lasm-lambda.mjs', import.meta.url).href);
 }
 
@@ -100,7 +101,7 @@ function event(input) {
   return { kind, e, params, reply };
 }
 
-// What http.request accepts as a target, without a fragment.
+// A request target: visible ASCII, without a fragment.
 const validTarget = t => /^[\x21-\x7e]*$/.test(t) && !t.includes('#');
 const entriesOf = o => o ? Object.entries(o) : null;
 const wellFormed = x => typeof x === 'string' ? x.isWellFormed() : Array.isArray(x) ? x.every(wellFormed)
@@ -170,9 +171,13 @@ async function checkModel(kind, e, reply, sent, response) {
   if (!same([...azure.headers], [...new Headers(m.azure.headers)]) || !same(azure.cookies, azureCookies.length ? azureCookies : undefined)
       || (reply.body.length ? !azure.body?.equals(reply.body) : azure.body !== undefined))
     fail('azureReply differs from the Lean model', { azure: { headers: [...azure.headers], cookies: azure.cookies }, model: m.azure });
-  const web = server.webReply(reply, r.method);
-  if ((web.body === null) !== m.webNullBody || web.status !== reply.status) fail('webReply differs from the Lean model', { status: reply.status, model: m.webNullBody });
-  if (web.body !== null && !Buffer.from(await web.arrayBuffer()).equals(reply.body)) fail('webReply changed the body', { status: reply.status });
+  // A Response cannot carry a body with a null-body status (or a status outside 200–599).
+  if (reply.status >= 200 && reply.status <= 599) {
+    const nullStatus = [204, 205, 304].includes(reply.status);
+    const web = await server.webResponse(new Response(nullStatus ? null : reply.body, { status: reply.status, statusText: reply.statusText }), r.method);
+    if ((web.body === null) !== m.webNullBody || web.status !== reply.status) fail('webResponse differs from the Lean model', { status: reply.status, model: m.webNullBody });
+    if (web.body !== null && !Buffer.from(await web.arrayBuffer()).equals(reply.body)) fail('webResponse changed the body', { status: reply.status });
+  }
 }
 
 export async function run(bytes) {
@@ -201,6 +206,13 @@ export async function run(bytes) {
   //     ∃ n v, (outgoing hs d).filter (isHost ·.1) = [(n, v)] ∧ plainHost v = true
   const hosts = sent.headers.filter(([n]) => n.toLowerCase() === 'host');
   if (hosts.length !== 1 || !server.plainHost(hosts[0][1])) fail('not one plain Host', sent.headers);
+  // The handler's Request: every well-formed event of these methods has one, its URL under the plain Host
+  // (or localhost), so no field can move the path or the query.
+  if (!sent.web) fail('no web Request holds the event', e);
+  const host = sent.headers.find(([n]) => n.toLowerCase() === 'host')[1];
+  const url = new URL(sent.web.url);
+  const expected = host !== '127.0.0.1:0' && URL.canParse(`http://${host}/`) ? new URL(`http://${host}/`).host : 'localhost';
+  if (url.host !== expected) fail('the Request URL left the Host', { url: sent.web.url, host });
   // API Gateway REST decodes query values; they must arrive as given.
   if (kind === 'rest' && params.length) {
     const got = [...new URLSearchParams(sent.path.slice(sent.path.indexOf('?') + 1))];

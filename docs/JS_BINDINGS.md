@@ -908,10 +908,11 @@ A server on a JavaScript runtime is one Lean function from a web `Request` to a
 
 | Runtime | Server | Lean |
 | --- | --- | --- |
-| Cloudflare Workers and the edge platforms | `export default {fetch}` | `Lasm.JS.exportDefault` |
+| Cloudflare Workers and the edge platforms | `export default {fetch}` | `Lasm.JS.exportDefault handle` |
+| Function platforms on Node (Netlify, Vercel, AWS Lambda and Lambda@Edge, Azure Functions, Google Cloud Functions) | the platform's handler export | `Lasm.JS.exportDefault handle` ([below](#function-platforms-exportdefault)) |
 | Deno | `Deno.serve` | `import Lasm.JS.Deno` (generated, below) |
 | Bun | `Bun.serve` | `import Lasm.JS.Bun` (generated, below) |
-| Node | none of its own takes a `Request`: an npm adapter, such as `@hono/node-server`'s `serve({fetch})` | an `@[js]` binding to the package ([Node](#node-an-npm-adapter)) |
+| Node | none of its own takes a `Request`: Lasm provides `Node.serve`, shaped like `Bun.serve` | `import Lasm.JS.Node.Serve` ([Node](#serving-http-on-node-nodeserve)) |
 
 Outbound HTTP is Lasm.JS.Web's `fetch` everywhere. Status: **current source, not
 yet released** (tier 2 of the standard bindings, second part).
@@ -1020,42 +1021,114 @@ The functions of the runtime's global object are at the top of the module's
 namespace (`Lasm.JS.Deno.serve`, called as `Deno.serve` after `open Lasm.JS`), and
 every doc comment quotes the member's TypeScript declaration before its WebIDL.
 
-### Node: an npm adapter
+### Serving HTTP on Node: `Node.serve`
 
-Node has no server that takes a web `Request`, and Lasm adds no API for one:
-install an adapter and bind it with `@[js]`. `@hono/node-server` (MIT) is one:
-its `serve({fetch, port, hostname}, listening)` calls `fetch` with a `Request`
-and sends the `Response` it resolves to.
-
-```sh
-npm install @hono/node-server hono    # hono is its peer dependency
-```
+Node has no server that takes a web `Request`, so Lasm provides one:
+`Node.serve` in `Lasm.JS.Node.Serve`. It is **provided by Lasm**: hand-written,
+not generated, and not a Node API. Its shape is `Bun.serve`'s: one options
+record with `fetch` inside, and Bun's option names where Bun has the option.
+Underneath it is Node's `node:http`; Lasm's builtin module `lasm:node-serve`
+([`src/lasm-modules/node-serve.mjs`](../src/lasm-modules/node-serve.mjs))
+translates requests and responses. There is no npm dependency.
 
 ```lean
-import Lasm.JS                -- the @[js] attribute
-import Lasm.JS.Web
+import Lasm.JS.Node.Serve
 open Lasm.JS Lasm.JS.Web
 
-/-- `serve(options, listeningListener)` of @hono/node-server; returns the Node server. -/
-@[js "@hono/node-server" "serve"] opaque nodeServe : Data → Value → IO Value
+def handle (request : Request) : Async Response := do
+  Response.new (some (.usvString s!"{← request.method} {← request.url}")) none
 
-def main : IO Unit := do
-  let fetch ← Function.ofFn1 handle                     -- Request → Async Response, as above
-  let listening ← Function.ofFn fun _ => do IO.println "listening on 3000"; return .undefined
-  let _server ← nodeServe (obj [("fetch", toJS fetch), ("port", toJS 3000)]) listening
-  waitForever
+def main : IO Unit :=
+  Node.serve { fetch := handle, port := some 3000, hostname := some "127.0.0.1" }
 ```
 
-The same `handle` then runs on Node, Deno (`Deno.serve`), Bun (`Bun.serve`) and
-Workers (`exportDefault`). A program built for several targets lists the adapter
-in `package.json`'s `"lasm": {"edge": {"exclude": ["@hono/node-server"]}}`, so
-that the Deno, Bun and edge builds leave it out (as the `hono` template does).
+`Node.serve` returns only after the server stops. The Lean runtime ends when
+`main` returns, so this call is what keeps the program running. The server
+stops on `Server.stop`, when `signal` is aborted, or on SIGTERM or SIGINT. A
+stop lets requests in progress finish; a second signal closes them. The
+`Server` handle goes to `onListen`:
+
+| Shape | Meaning |
+| --- | --- |
+| `Node.serve : ServeOptions → IO Unit` | serves until the server stops |
+| `fetch : Request → Async Response` | the handler (required; a Lean function, no `ofFn` step) |
+| `port : Option Nat` | default `$PORT`, else 3000 (as Bun); `some 0` lets the system choose |
+| `hostname : Option String` | default `0.0.0.0` (as Bun) |
+| `signal : Option AbortSignal` | aborting it stops the server (Deno.serve's `signal`) |
+| `onListen : Option (Server → IO Unit)` | called once listening (Deno.serve's `onListen`); by default `Listening on <url>` is printed |
+| `error : Option (IO.Error → Async Response)` | the response when `fetch` throws (Bun's `error`); by default a 500, with the error printed on stderr |
+| `Server.hostname : String`, `Server.port : Nat`, `Server.url : String` | the listening address (Bun's `hostname`, `port`, `url`) |
+| `Server.stop (closeActiveConnections := false) : Async Unit` | stops accepting connections and resolves once the server has closed (Bun's `stop`) |
+| `Server.finished : Async Unit` | resolves once the server has closed (Deno's `finished`) |
+
+What it guarantees (tested in
+[`test/node-serve.test.mjs`](../test/node-serve.test.mjs) and
+[`test/fixtures/js-serve`](../test/fixtures/js-serve)):
+
+- The URL comes from the Host header only when that header is a plain
+  `host[:port]`. A forged Host such as `x/admin#` gets the listening address
+  instead, so it cannot move the path or the query. This is the same rule the
+  function-platform shims use.
+- Several Cookie lines become one Cookie field, joined with `; `, as a browser
+  sends them. Hop-by-hop fields are not passed on.
+- Request and response bodies stream both ways, with backpressure. When a
+  client goes away, `request.signal` is aborted and the response body is
+  cancelled.
+- Each Set-Cookie is sent on its own header line.
+- HEAD responses and the null-body statuses (101, 204, 205, 304) send no body.
+- An empty body is sent as `content-length: 0`, and no content type is added.
+  (`@hono/node-server` adds `text/plain` for an empty byte body.)
+- When the handler throws, `error`'s response is sent, else a 500.
+
+A program built for several targets can import `Lasm.JS.Node.Serve`
+everywhere. The module loads on Bun, Deno and the edge platforms, and fails
+only when `Node.serve` is called there.
+
+An npm adapter such as `@hono/node-server` still works through an `@[js]`
+binding (`test/fixtures/js-serve` keeps such a section). A Hono app is served
+with Hono's own adapter in the same way.
+
+### Function platforms: `exportDefault`
+
+On Netlify (Functions v2), Vercel (Node functions), AWS Lambda and Lambda@Edge,
+Azure Functions and Google Cloud Functions, a program publishes its handler
+with `Lasm.JS.exportDefault`, as it does on Workers. The file that `lasm package`
+(or `lasm build --target …`) generates calls the handler directly. There is no
+HTTP server, no port and no loopback.
+
+```lean
+def main : IO Unit := exportDefault handle   -- handle : Request → Async Response
+```
+
+`exportDefault` takes a Lean function `α → Async β` (a fetch handler) and makes
+it a JavaScript function with `Function.ofFn1`. It also takes any JavaScript
+`Value`, such as a Hono app or an object with a `fetch` method. Behavior by
+target:
+
+- On an edge build, it records the handler and returns.
+- Under a function platform's entry
+  ([`src/serverless/lasm-function.mjs`](../src/serverless/lasm-function.mjs)),
+  it hands the handler over and does not return. The Lean runtime ends when
+  `main` returns, so `main` stays and serves the calls.
+- Elsewhere on Node, it records the value and returns.
+
+The generated platform files:
+
+| Target | Export | Calls |
+| --- | --- | --- |
+| `netlify` | `export default async (request, context) => …` | `handler(request, context)`; Cookie lines that Netlify joined with commas are rejoined with `; `; an empty body becomes no body (#82) |
+| `vercel`, `gcf` | `(req, res)` | the Node request as a web `Request` (`lasm:node-serve`), and the `Response` streamed back |
+| `lambda`, `lambda-edge` | `handler(event)` | each event shape mapped to a `Request` and back, with the existing Host, cookie, base64 and `__proto__` rules |
+| `azure` | `app.http('lasm', …)` | the `Request`, and the `Response` as `HttpResponseInit` (Set-Cookie through `cookies`, #80) |
+
+A program that brings its own HTTP server (Express, or `Node.serve`) cannot
+run on these platforms. There, a program has to publish a handler.
 
 ### Where it runs, tests and cost
 
 [`test/fixtures/js-serve`](../test/fixtures/js-serve) is one program run on Node,
 Bun and Deno: each serves `App.handle` with its own server (Deno.serve with
-options, the defaults and TLS; Bun.serve; @hono/node-server on Node) on
+options, the defaults and TLS; Bun.serve; Node.serve and @hono/node-server on Node) on
 127.0.0.1, and requests it with Lasm.JS.Web's `fetch`. Its properties: an echo of
 generated Unicode bodies returns them with their content type; a computed JSON
 answer for generated inputs; status codes for unknown paths, bad input and a
@@ -1067,7 +1140,10 @@ what their declarations say; and every generated member exists on the live
 objects. Then [`test-serve.mjs`](../scripts/bindings/test-serve.mjs) builds
 [`Serve.lean`](../test/fixtures/js-serve/Serve.lean) for each runtime, starts it
 on a free port, requests it from another process and shuts it down through
-`/shutdown` (exit status 0). `web-bindings.yml` runs both.
+`/shutdown` (exit status 0; Node.serve on Node). `web-bindings.yml` runs both.
+Node.serve's own guarantees (forged Host, cookies, streaming both ways with
+backpressure, client aborts, HEAD, empty bodies, errors, stop, signals) are
+checked over real sockets by `test/node-serve.test.mjs` (`unit.yml`).
 
 On 2026-11-10 (`web-bindings.yml` run 42918093803: Node 26.13.0, Bun 1.4.4,
 Deno 2.9.6, Linux x64) every check passed on Node (30) and Deno (75), and on Bun

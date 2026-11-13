@@ -4,7 +4,8 @@ function on Lasm.JS.Web, served unchanged by Deno.serve (Lasm.JS.Deno), Bun.serv
 (Lasm.JS.Bun) and Node through the npm package @hono/node-server (an `@[js]`
 binding in Main.lean and Serve.lean). Routes:
 
-- `GET /hello`: 200, `hello from Lean`, text/plain;
+- `GET /hello`: 200, `hello from Lean`, text/plain; `HEAD /hello` the same
+  response (the server sends no body for HEAD);
 - `POST /echo`: 200, the request's body, with its content type and the header
   `x-lasm-method` (the request's method);
 - `GET /square?n=k`: 200, `{"n":k,"square":k²}`, application/json; 400 if `n` is
@@ -34,7 +35,7 @@ def handle (request : Request) : Async Response := do
   let url ← URL.new (← request.url)
   let method ← request.method
   match method, ← url.pathname with
-  | "GET", "/hello" => text "hello from Lean"
+  | "GET", "/hello" | "HEAD", "/hello" => text "hello from Lean"
   | "POST", "/echo" =>
     let body ← request.text
     let contentType := (← (← request.headers).get "content-type").getD "application/octet-stream"

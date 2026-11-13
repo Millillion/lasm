@@ -122,6 +122,12 @@
       "score": 88.5,
       "mutants": 769,
       "threshold": 88
+    },
+    "node-serve": {
+      "initial": 80.6,
+      "score": 80.6,
+      "mutants": 392,
+      "threshold": 80
     }
   },
   "run": "mutation.yml run 43024598393, the nightly run on main 28975199 (Node 26.13.0), every module"

@@ -34,6 +34,13 @@ test('builtin modules: every builtin module uses web-standard JavaScript only', 
   for (const name of builtinModuleNames()) {
     // Stryker's instrumentation (mutation testing) reads its mutant from g.process.env: not the module's own code.
     const text = readFileSync(builtinModuleFile('lasm:' + name), 'utf8').replace(/\bg\.process\b/g, 'g');
+    if (name === 'node-serve') {
+      // The documented exception (src/edge/builtin-modules.mjs): it serves Node, so it uses Node
+      // built-ins, but only from process.getBuiltinModule when serve() runs, so it loads everywhere.
+      assert.doesNotMatch(text, /from ['"]node:|import\(['"]node:|require\(/, name);
+      assert.match(text, /globalThis\.process\?\.getBuiltinModule\?\./, name);
+      continue;
+    }
     assert.doesNotMatch(text, /from ['"]node:|require\(|\bprocess\.|\bBuffer\b/, name);
   }
 });

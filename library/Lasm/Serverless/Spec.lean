@@ -2,7 +2,7 @@
 # What is proved about the function platforms' HTTP mapping
 
 Every proposition proved about the model of src/serverless/ (the shims that
-run a Lasm HTTP server on AWS Lambda and Lambda@Edge, Vercel, Netlify,
+run a Lasm program on AWS Lambda and Lambda@Edge, Vercel, Netlify,
 Azure Functions and Google Cloud Functions), as a named `def … : Prop` with
 a plain-English doc comment and no proof. Each proposition `Spec.x` is
 proved by the theorem `Lasm.Serverless.Theorems.x : Spec.x`
@@ -11,8 +11,8 @@ proposition here has its theorem and every theorem uses only Lean's
 standard axioms. library/PROOFS.md is generated from this file.
 
 Reading guide. A shim takes the platform's request (a Lambda event, or a
-Node or WHATWG request), forwards an HTTP request to the program's own
-server over loopback (`forward()`, `pipe()`), and turns the server's reply
+Node or WHATWG request), hands a web Request to the fetch handler the
+program publishes (`forward()`, `pipe()`), and turns the handler's reply
 into the platform's response. The model (Lasm.Serverless.Proofs.Model)
 mirrors the JavaScript function for function; the serverless-http fuzz
 target runs both on every input and fails when they differ, so these
@@ -84,7 +84,7 @@ def target_ignores_headers : Prop :=
 (none, several, or a forged `Host: x/admin#`), forward() and pipe() send
 exactly one Host field, and its value is a plain `host[:port]`: visible
 ASCII without `/ ? # \ @` (the first such Host of the event, else the
-loopback address). -/
+default host). -/
 def host_once : Prop :=
   ∀ (hs : Headers) (d : String), plainHost d = true →
     ∃ n v, (outgoing hs d).filter (isHost ·.1) = [(n, v)] ∧ plainHost v = true

@@ -190,7 +190,7 @@ Lasm code only, MIT, copyright Jordan Last.
 
 `lasm package` outputs (Lambda, Lambda@Edge, Vercel, Netlify, Azure Functions,
 Google Cloud Functions) are this `dist/` plus two Lasm handler files
-(`lasm-server.mjs` and the platform's `lasm-*.mjs`, MIT, from `src/serverless/`),
+(`lasm-function.mjs`, `lasm-node-serve.mjs` and the platform's `lasm-*.mjs`, MIT, from `src/serverless/` and `src/lasm-modules/node-serve.mjs`),
 and, for Azure and Google, a generated `package.json`/`host.json`. They drop the
 musl binaries and keep every notice and licence file. The `@lasm/cli` npm package
 carries `src/serverless/` and `src/zoneinfo/UTC` with the rest of `src/`.

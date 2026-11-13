@@ -1,6 +1,8 @@
 // `lasm package` and the function-platform shims, with a stand-in application:
-// a Node HTTP server in place of a Lean build (no toolchain needed). The real
-// Lean builds run in .github/workflows/serverless.yml.
+// a JavaScript program that publishes a fetch handler, as a Lean program does
+// with Lasm.JS.exportDefault, in place of a Lean build (no toolchain needed).
+// The shims call it directly: no server, no port. The real Lean builds run in
+// .github/workflows/serverless.yml.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -17,7 +19,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 
 const fakeApplication = standInApplication;
 
-/** Runs `script` (ESM) in a fresh Node process: each process starts its server once. */
+/** Runs `script` (ESM) in a fresh Node process: each process starts its program once. */
 function inProcess(script, cwd) {
   const run = spawnSync(process.execPath, ['--input-type=module', '-e', script], { cwd, encoding: 'utf8', timeout: 60_000 });
   assert.equal(run.status, 0, run.stderr + run.stdout);
@@ -71,7 +73,7 @@ test('lasm package refuses a dev-profile build unless --allow-dev', () => {
   assert.deepEqual(parseLasmArguments(['package', '--target', 'lambda', '--allow-dev']), { command: 'package', target: 'lambda', input: 'dist', allowDev: true });
 });
 
-test('Lambda zip: every event shape reaches the server and returns its response shape', { skip: process.platform === 'win32' || spawnSync('unzip', ['-v']).status !== 0 }, () => {
+test('Lambda zip: every event shape reaches the handler and returns its response shape', { skip: process.platform === 'win32' || spawnSync('unzip', ['-v']).status !== 0 }, () => {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-lambda-'));
   const app = fakeApplication(join(directory, 'dist'));
   const result = packageApplication({ input: app, target: 'lambda', output: join(directory, 'lambda.zip') });
@@ -97,6 +99,11 @@ test('Lambda zip: every event shape reaches the server and returns its response 
         cookies: await call({ path: '/cookies' }),
         missing: await call({ path: '/missing' }),
         seeOther: await call({ path: '/see-other' }),
+        thrown: await call({ path: '/throw' }),
+        head: await call({ method: 'HEAD', path: '/hello' }),
+        https: await call({ path: '/hello', headers: { 'x-forwarded-proto': 'https', host: 'api.example' } }),
+        forged: await call({ path: '/public', headers: { host: 'x/admin#' } }),
+        trace: await call({ method: 'TRACE', path: '/' }),
       };
       // The request's cookies in every form the event can carry them, at once
       // (sam local start-api fills both headers.cookie and cookies, #80).
@@ -119,17 +126,25 @@ test('Lambda zip: every event shape reaches the server and returns its response 
     assert.equal(get.url, kind === 'alb' ? '/hello/Ada?a=z' : kind === 'alb-multi-value' ? '/hello/Ada?a=x%20y&a=z' : '/hello/Ada?a=x+y&a=z', kind);
     assert.ok(get.host, kind);
     const post = json(replies.post);
-    assert.deepEqual([post.method, post.url, post.type, post.body], ['POST', '/echo', 'application/json', '{"s":"λ"}'], kind);
+    assert.deepEqual([post.method, post.url, post.type, post.body, post.length], ['POST', '/echo', 'application/json', '{"s":"λ"}', '10'], kind);
     assert.deepEqual([...Buffer.from(replies.binary.body, 'base64')], [0, 255, 1, 254], kind);
     // A single-value ALB target group carries one Set-Cookie (enable multi-value headers for more).
     assert.deepEqual(replies.cookies.headers['set-cookie'], kind === 'alb' ? ['b=2; Path=/'] : ['a=1; Path=/', 'b=2; Path=/'], kind);
-    assert.deepEqual(replies.cookies.headers['x-many'], kind === 'alb' || kind.startsWith('apigw-v2') || kind === 'function-url' ? ['p, q'] : ['p', 'q'], kind);
+    // A web Response joins repeated fields other than Set-Cookie (Fetch standard, "get").
+    assert.deepEqual(replies.cookies.headers['x-many'], ['p, q'], kind);
     assert.equal(replies.missing.status, 404, kind);
+    // A handler that throws is a 500; HEAD and a request no Request can hold (TRACE) send no body.
+    assert.equal(replies.thrown.status, 500, kind);
+    assert.deepEqual([replies.head.status, replies.head.body], [200, ''], kind);
+    assert.equal(replies.trace.status, 400, kind);
+    // The URL: the front end's scheme and a plain Host; a forged Host is replaced.
+    // (The REST sample event's own Host comes first.)
+    assert.deepEqual([json(replies.https).scheme, json(replies.https).host], ['https', kind === 'apigw-v1-rest' ? '1234567890.execute-api.us-east-1.amazonaws.com' : 'api.example'], kind);
+    assert.deepEqual([json(replies.forged).url, json(replies.forged).host === 'x/admin#'], ['/public', false], kind);
     // A redirect with no body keeps its status and Location (#82).
     assert.deepEqual([replies.seeOther.status, replies.seeOther.headers.location, replies.seeOther.body], [303, ['/there'], ''], kind);
     // One Cookie header reaches the server, whatever the event held (#80).
-    const cookies = json(replies.requestCookies);
-    assert.deepEqual([cookies.cookie, cookies.cookieFields], ['a=1; b=2', 1], kind);
+    assert.equal(json(replies.requestCookies).cookie, 'a=1; b=2', kind);
   }
   assert.equal(JSON.parse(Buffer.from(output['apigw-v2-http'].get.body, 'base64')).cookie, 'cookie1; cookie2');
 });
@@ -194,7 +209,7 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
   assert.deepEqual([viaNode.post.url, viaNode.post.body], ['/echo?x=1', 'hi']);
   assert.deepEqual(viaNode.cookies, ['a=1; Path=/', 'b=2; Path=/']);
   assert.deepEqual([viaNode.seeOther.status, viaNode.seeOther.headers.location, viaNode.seeOther.body], [303, '/there', '']);
-  assert.deepEqual([viaNode.requestCookies.cookie, viaNode.requestCookies.cookieFields], ['a=1; b=2', 1]);
+  assert.equal(viaNode.requestCookies.cookie, 'a=1; b=2');
 
   const netlify = packageApplication({ input: app, target: 'netlify', output: join(directory, 'netlify/functions/lasm') });
   const viaFetch = inProcess(`
@@ -214,7 +229,7 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
   assert.deepEqual(viaFetch.cookies, ['a=1; Path=/', 'b=2; Path=/']);
   // No zero-length body stream: Netlify's streaming bootstrap sends nothing for one (#82).
   assert.deepEqual(viaFetch.seeOther, [303, '/there', null]);
-  assert.deepEqual([viaFetch.requestCookies.cookie, viaFetch.requestCookies.cookieFields], ['a=1; b=2', 1]);
+  assert.equal(viaFetch.requestCookies.cookie, 'a=1; b=2');
 
   const azure = packageApplication({ input: app, target: 'azure', output: join(directory, 'azure') });
   assert.equal(azure.dependency, '@azure/functions@1.2.3');
@@ -261,11 +276,11 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
   assert.deepEqual([viaGcf.name, viaGcf.body.method, viaGcf.body.url, viaGcf.body.body], ['lasm', 'PUT', '/echo?x=1', 'hi']);
   assert.deepEqual(viaGcf.cookies, ['a=1; Path=/', 'b=2; Path=/']);
   assert.deepEqual([viaGcf.seeOther.status, viaGcf.seeOther.headers.location, viaGcf.seeOther.body], [303, '/there', '']);
-  assert.deepEqual([viaGcf.requestCookies.cookie, viaGcf.requestCookies.cookieFields], ['a=1; b=2', 1]);
+  assert.equal(viaGcf.requestCookies.cookie, 'a=1; b=2');
 });
 
 test('adapter helpers: one Cookie header, Set-Cookie as cookie objects, Azure replies', async () => {
-  const { joinCookies, parseSetCookie, azureReply } = await import('../src/serverless/lasm-server.mjs');
+  const { joinCookies, parseSetCookie, azureReply } = await import('../src/serverless/lasm-function.mjs');
   assert.deepEqual(joinCookies([['host', 'x'], ['Cookie', 'a=1'], ['accept', '*/*'], ['cookie', 'b=2; c=3']]),
     [['host', 'x'], ['Cookie', 'a=1; b=2; c=3'], ['accept', '*/*']]);
   assert.deepEqual(joinCookies([['cookie', 'a=1'], ['cookie', '']]), [['cookie', 'a=1']]);
@@ -286,18 +301,29 @@ test('adapter helpers: one Cookie header, Set-Cookie as cookie objects, Azure re
   assert.equal(parseSetCookie('=x'), null);
 
   const reply = (headers, body = '') => ({ status: 200, statusText: 'OK', headers, body: Buffer.from(body) });
-  const single = azureReply(reply([['set-cookie', 'a=1; Path=/'], ['content-type', 'text/plain']], 'hi'));
-  assert.deepEqual([single.cookies, single.headers.getSetCookie(), String(single.body)], [undefined, ['a=1; Path=/'], 'hi'], 'one Set-Cookie stays a header');
-  // The first cookie stays a header unless another would change in cookies (its value percent-encoded, an attribute dropped).
-  const many = azureReply(reply([['set-cookie', 'a=1; Path=/; HttpOnly'], ['set-cookie', 'b=; Max-Age=0'], ['set-cookie', 'c=x+y=; Path=/'], ['location', '/x']]));
-  assert.deepEqual(many.cookies, [{ name: 'a', value: '1', path: '/', httpOnly: true }, { name: 'b', value: '', maxAge: 0 }]);
-  assert.deepEqual([many.headers.getSetCookie(), many.headers.get('location'), many.body], [['c=x+y=; Path=/'], '/x', undefined]);
-  const plain = azureReply(reply([['set-cookie', 'a=1'], ['set-cookie', 'b=2; Partitioned; Secure']]));
-  assert.deepEqual([plain.cookies, plain.headers.getSetCookie()], [[{ name: 'a', value: '1' }], ['b=2; Partitioned; Secure']]);
+  const warnings = [];
+  const warn = console.warn;
+  console.warn = message => { warnings.push(message); };
+  try {
+    const single = azureReply(reply([['set-cookie', 'a=1; Path=/'], ['content-type', 'text/plain']], 'hi'));
+    assert.deepEqual([single.cookies, single.headers.getSetCookie(), String(single.body)], [undefined, ['a=1; Path=/'], 'hi'], 'one Set-Cookie stays a header');
+    // The first cookie stays a header unless another would change in cookies (its value percent-encoded, an attribute dropped).
+    const many = azureReply(reply([['set-cookie', 'a=1; Path=/; HttpOnly'], ['set-cookie', 'b=; Max-Age=0'], ['set-cookie', 'c=x+y=; Path=/'], ['location', '/x']]));
+    assert.deepEqual(many.cookies, [{ name: 'a', value: '1', path: '/', httpOnly: true }, { name: 'b', value: '', maxAge: 0 }]);
+    assert.deepEqual([many.headers.getSetCookie(), many.headers.get('location'), many.body], [['c=x+y=; Path=/'], '/x', undefined]);
+    const plain = azureReply(reply([['set-cookie', 'a=1'], ['set-cookie', 'b=2; Partitioned; Secure']]));
+    assert.deepEqual([plain.cookies, plain.headers.getSetCookie()], [[{ name: 'a', value: '1' }], ['b=2; Partitioned; Secure']]);
+    assert.deepEqual(warnings, [], 'cookies that arrive unchanged warn of nothing');
+    // A second cookie that cookies would change: one warning (the first such cookie, once per process); an unparsable Set-Cookie is left out.
+    const changed = azureReply(reply([['set-cookie', 'x=a b'], ['set-cookie', 'novalue'], ['set-cookie', 'y=1'], ['set-cookie', 'z=c d; Partitioned'], ['set-cookie', 'w=e f']]));
+    assert.deepEqual([changed.cookies, changed.headers.getSetCookie()],
+      [[{ name: 'y', value: '1' }, { name: 'z', value: 'c d' }, { name: 'w', value: 'e f' }], ['x=a b']]);
+    assert.deepEqual(warnings, ['Lasm: Azure Functions sends a single Set-Cookie per reply unchanged; cookie z goes through its cookies list, which percent-encodes the value and has no field for Partitioned.']);
+  } finally { console.warn = warn; }
 });
 
-test('adapter helpers: request targets, outgoing fields, textual bodies, web replies (the Lean model, library/Lasm/Serverless)', async () => {
-  const { requestTarget, outgoingHeaders, plainHost, isTextual, joinCookies, webReply } = await import('../src/serverless/lasm-server.mjs');
+test('adapter helpers: request targets, outgoing fields, textual bodies, web responses (the Lean model, library/Lasm/Serverless)', async () => {
+  const { requestTarget, outgoingHeaders, plainHost, isTextual, joinCookies, webResponse } = await import('../src/serverless/lasm-function.mjs');
   // A valid target is sent unchanged: escapes, `://`, a malformed escape in the query.
   assert.equal(requestTarget('/go/https://example.com/a%20b', 'q=%E0&x=1'), '/go/https://example.com/a%20b?q=%E0&x=1');
   assert.equal(requestTarget('', ''), '/');
@@ -326,21 +352,60 @@ test('adapter helpers: request targets, outgoing fields, textual bodies, web rep
   assert.equal(isTextual([['content-type', 'text/plain'], ['content-encoding', 'gzip']], Buffer.from('x')), false);
   assert.equal(isTextual([], Buffer.from([0xff])), false);
 
-  const reply = (status, body = '') => ({ status, statusText: 'S', headers: [['x', '1'], ['x', '2']], body: Buffer.from(body) });
-  const ok = webReply(reply(200, 'hi'), 'GET');
+  // webResponse: no body for a null-body status, HEAD or an empty body (#82); any other body streams on.
+  const response = (status, body) => new Response(body, { status, headers: [['x', '1'], ['x', '2']] });
+  const ok = await webResponse(response(200, 'hi'), 'GET');
   assert.deepEqual([ok.status, ok.headers.get('x'), await ok.text()], [200, '1, 2', 'hi']);
-  for (const [r, method] of [[reply(204, 'x'), 'GET'], [reply(304, 'x'), 'GET'], [reply(200, 'x'), 'HEAD'], [reply(303), 'GET']])
-    assert.equal(webReply(r, method).body, null, `${r.status} ${method}`);
+  for (const [r, method] of [[response(204, null), 'GET'], [response(304, null), 'GET'], [response(200, 'x'), 'HEAD'], [response(303, new Uint8Array(0)), 'GET'], [response(200, ''), 'GET']])
+    assert.equal((await webResponse(r, method)).body, null, `${r.status} ${method}`);
+  const chunks = ['a', 'b', 'c'];
+  const streamed = await webResponse(new Response(new ReadableStream({ pull(c) { if (chunks.length) c.enqueue(new TextEncoder().encode(chunks.shift())); else c.close(); } })), 'GET');
+  assert.equal(await streamed.text(), 'abc');
+  assert.equal(await webResponse(new Response(null, { status: 200 }), 'GET').then(r => r.body), null);
 });
 
-test('a program that does not listen fails clearly', () => {
-  const directory = mkdtempSync(join(tmpdir(), 'lasm-nolisten-'));
+test('adapter helpers: event requests, replies, the forwarded scheme, cleaned Netlify requests', async () => {
+  const { eventRequest, replyOf, forwardedScheme, cleanRequest } = await import('../src/serverless/lasm-function.mjs');
+  const request = eventRequest({ method: 'POST', path: '/a?b=1', headers: [['Host', 'x/admin#'], ['host', 'h.example'], ['Cookie', 'a=1'], ['cookie', 'b=2'],
+    ['Connection', 'close'], ['Content-Length', '99']], body: Buffer.from('hey') });
+  assert.equal(request.url, 'http://h.example/a?b=1');
+  assert.deepEqual([request.headers.get('cookie'), request.headers.get('content-length'), request.headers.has('connection'), await request.text()], ['a=1; b=2', '3', false, 'hey']);
+  // No plain Host: localhost. A path without its leading slash cannot become part of the host.
+  assert.equal(eventRequest({ method: 'GET', path: 'evil.example/x', headers: [['host', 'a b']] }).url, 'http://localhost/evil.example/x');
+  assert.equal(eventRequest({ method: 'GET', path: '//evil.example/x', headers: [] }).url, 'http://localhost//evil.example/x');
+  // A GET's body is dropped; methods a Request cannot hold give null.
+  assert.equal(eventRequest({ method: 'GET', path: '/', headers: [], body: Buffer.from('x') }).body, null);
+  assert.equal(eventRequest({ method: 'CONNECT', path: '/', headers: [] }), null);
+  assert.deepEqual([forwardedScheme([['X-Forwarded-Proto', 'HTTPS, http']]), forwardedScheme([['x-forwarded-proto', 'ftp']]), forwardedScheme([])], ['https', 'http', 'http']);
+
+  const reply = await replyOf(new Response('body', { status: 201, headers: [['Set-Cookie', 'a=1'], ['set-cookie', 'b=2'], ['connection', 'close'], ['x', '1']] }), 'GET');
+  assert.deepEqual(reply, { status: 201, statusText: 'Created', headers: [['content-type', 'text/plain;charset=UTF-8'], ['set-cookie', 'a=1'], ['set-cookie', 'b=2'], ['x', '1']], body: Buffer.from('body') });
+  assert.deepEqual((await replyOf(new Response('x', { status: 200, statusText: 'Fine' }), 'HEAD')), { status: 200, statusText: 'Fine', headers: [['content-type', 'text/plain;charset=UTF-8']], body: Buffer.alloc(0) });
+  assert.equal((await replyOf(new Response(null, { status: 204 }), 'GET')).body.length, 0);
+
+  // Netlify joins two Cookie lines with ", ": the handler sees "; ".
+  const joined = cleanRequest(new Request('https://s.example/', { headers: [['cookie', 'a=1'], ['cookie', 'b=2']] }));
+  assert.equal(joined.headers.get('cookie'), 'a=1; b=2');
+  const same = new Request('https://s.example/', { headers: { cookie: 'a=1; b=2' } });
+  assert.equal(cleanRequest(same), same);
+  const bare = new Request('https://s.example/');
+  assert.equal(cleanRequest(bare), bare);
+  const posted = cleanRequest(new Request('https://s.example/p', { method: 'POST', body: 'payload', headers: [['cookie', 'a=1,b=2']] }));
+  assert.deepEqual([posted.method, posted.headers.get('cookie'), await posted.text()], ['POST', 'a=1; b=2', 'payload']);
+});
+
+test('a program that publishes no handler fails clearly, and one whose handler throws answers 500', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'lasm-nohandler-'));
   const app = fakeApplication(join(directory, 'dist'));
-  writeFileSync(join(app, 'main.mjs'), 'console.log("done");');
+  writeFileSync(join(app, 'main.mjs'), 'console.log("done"); process.exitCode = 0;');
   packageApplication({ input: app, target: 'netlify', output: join(directory, 'fn') });
   const run = spawnSync(process.execPath, ['--input-type=module', '-e', `
-    const { startLeanServer } = await import('./fn/lasm-server.mjs');
-    try { await startLeanServer({ timeoutMs: 500 }); } catch (error) { console.log(error.message); }`], { cwd: directory, encoding: 'utf8' });
-  assert.match(run.stdout, /did not listen on \$PORT/);
+    const { loadHandler } = await import('./fn/lasm-function.mjs');
+    try { await loadHandler({ timeoutMs: 5000 }); } catch (error) { console.log(error.message); }
+    const { default: netlify } = await import('./fn/lasm.mjs');
+    const reply = await netlify(new Request('https://s.example/'));
+    console.log(reply.status);`], { cwd: directory, encoding: 'utf8' });
+  assert.match(run.stdout, /without publishing a fetch handler/);
+  assert.match(run.stdout, /^502$/m);
   assert.ok(root);
 });

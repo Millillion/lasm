@@ -492,4 +492,21 @@ JavaScript sorts strings (by UTF-16 code units). -/
 def directoriesOf (entries : List ZipEntry) : List String :=
   (entries.flatMap fun e => parents e.name).eraseDups.mergeSort fun a b => !(decide (utf16 b < utf16 a))
 
+/-! ## Node.serve (src/lasm-modules/node-serve.mjs) -/
+
+/-- `requestUrl(target, host, fallback)` with its default scheme `http`: the
+URL of a node:http request, or `none` (`null`) for a target that is neither
+origin-form nor an absolute http(s) URL. -/
+opaque requestUrl : String → String → String → Option String
+
+/-- `plainHost(host)`: the Host field is a nonempty run of printable ASCII
+with none of `/`, `?`, `#`, `\` and `@` (no userinfo, path, query or
+fragment). -/
+opaque plainHost : String → Bool
+
+/-- Not Lasm's JavaScript: the `host` (hostname and port) that WHATWG's URL
+parser reads from an absolute URL, `none` when it does not parse (the test's
+oracle is Node's `URL`). -/
+opaque urlHost : String → Option String
+
 end Lasm.Cli

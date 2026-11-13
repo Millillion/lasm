@@ -46,9 +46,15 @@
     },
     {
       "name": "serverless",
-      "description": "Function-platform shims (Lambda, Vercel, Netlify, Azure Functions, Google Cloud Functions), the loopback forwarder and the zip writer",
-      "mutate": ["src/serverless/lasm-server.mjs", "src/serverless/lasm-lambda.mjs", "src/serverless/lasm-vercel.mjs", "src/serverless/lasm-netlify.mjs", "src/serverless/lasm-azure.mjs", "src/serverless/lasm-gcf.mjs", "src/serverless/zip.mjs"],
+      "description": "Function-platform shims (Lambda, Vercel, Netlify, Azure Functions, Google Cloud Functions), the in-process function host and the zip writer",
+      "mutate": ["src/serverless/lasm-function.mjs", "src/serverless/lasm-lambda.mjs", "src/serverless/lasm-vercel.mjs", "src/serverless/lasm-netlify.mjs", "src/serverless/lasm-azure.mjs", "src/serverless/lasm-gcf.mjs", "src/serverless/zip.mjs"],
       "tests": ["test/serverless.test.mjs", "test/serverless-shims.test.mjs", "test/serverless-zip.test.mjs"]
+    },
+    {
+      "name": "node-serve",
+      "description": "Node.serve's node:http server and its req/res and web Request/Response translation (lasm:node-serve), also used by the Vercel and Google Cloud Functions shims",
+      "mutate": ["src/lasm-modules/node-serve.mjs"],
+      "tests": ["test/node-serve.test.mjs", "test/serverless-shims.test.mjs"]
     },
     {
       "name": "downloads",
