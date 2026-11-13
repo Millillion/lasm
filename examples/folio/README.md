@@ -153,8 +153,22 @@ Fastly KV Store linked to the service; on Deno Deploy, `tools/kv.mjs deno site D
 byte for byte the page `folio build` writes, with the right content type, from the platform's
 store. A draft is 404, an unknown page is 404, there are no redirects off the site, and other
 methods get 405. A changed site in a new store (a new page with a new layout, an edited page, a
-page made a draft) must be served the same way. Then the 652 examples run on the server through
-`POST /api/render`.
+page made a draft) must be served the same way. Then the 652 examples and the pathological inputs
+run on the server through `POST /api/render`.
+
+On Fastly, two pathological inputs are skipped, because Fastly Compute gives an instance a
+[128 MB heap](https://docs.fastly.com/products/compute-resource-limits) ("Maximum memory
+consumption: 1M bytes stack, 128MB heap", per execution) and Folio needs more for them: unclosed
+`<!--` (1.2 million characters) needs 192 to 256 MiB, backticks (3.1 million characters) 256 to
+384 MiB, measured on the WASI build with `wasmtime run -W max-memory-size=…` (issue #234). Every
+other case fits in 128 MiB; the largest that passes on Viceroy, `![[]()` repeated (960,000
+characters), used 112 MB. Viceroy enforces the same 128 MiB ([its `Limiter`](https://github.com/fastly/Viceroy/blob/v0.21.1/src/linking.rs)),
+so over the limit it stops the instance (`INTERNAL PANIC: out of memory`, exit status 1) and
+answers 500. The body's size is not the limit (Fastly lists no request body limit, and the
+body is a few MB of the heap): the renderer's working set is. Reading the body as a stream would
+not help, since rendering needs the whole document. The skips and their reasons are in
+[`test/platforms.mjs`](test/platforms.mjs) (`pathologicalSkip`); `test/pathological.mjs --skip`
+prints each one.
 
 ## Untrusted input can't crash it or stall it
 
@@ -175,7 +189,7 @@ npm run fuzz -- --minutes 5 # the crash and timeout fuzzer (the seed is printed 
   block quotes in lists 30,000 deep and images nested 30,000 deep. The same cases run on every
   build: Node, WASI (wasmtime, wasmer, node:wasi), the browsers (Chromium, Firefox, WebKit) and
   the site server on each edge platform's local tooling (`--engine`, `test/edge.mjs
-  --pathological`; [folio-platforms.yml](../../.github/workflows/folio-platforms.yml)). Each case runs in about a second
+  --pathological`; [folio-platforms.yml](../../.github/workflows/folio-platforms.yml)), except two on Fastly (below). Each case runs in about a second
   (backticks: 5 s for 3.1 million characters). commonmark.js takes 9 minutes on `![[]()`
   repeated and almost 2 minutes on unclosed link destinations.
 - **The fuzzer** ([`test/fuzz.mjs`](test/fuzz.mjs)) generates three kinds of documents: syntax
