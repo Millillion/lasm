@@ -12,7 +12,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, symlinkSync, 
 import { join, basename } from 'node:path';
 import { runInNewContext } from 'node:vm';
 import { linkApplication, selectedLinkDriver, configurableThreadPool, initializerStubs, archiveUnitCache, shippedAnalysisDirectory,
-  linkDrivers, buildProfiles, defaultLinkDriver, readStoreEntry, writeStoreEntry, pruneSharedStore, relabelPreJs, sharedStoreLimits } from '../src/application-link.mjs';
+  linkDrivers, buildProfiles, defaultLinkDriver, readStoreEntry, writeStoreEntry, pruneSharedStore, relabelPreJs, sharedStoreLimits, localHeaders } from '../src/application-link.mjs';
 import { createHash } from 'node:crypto';
 import { glueLinkFlags } from '../src/lasm-library.mjs';
 import { responseFile } from '../src/platform.mjs';
@@ -299,6 +299,27 @@ test('the project object cache and the shared store: reuse, damage, pruning', { 
   await build({ ...p, work: join(p.base, 'work-4') }, { sdk: fourth, objectCache, linkOnly: true });
   assert.ok(fourth.calls.some(call => call.args.includes(join(p.base, 'work-4', 'reachability.c'))));
   assert.ok(readdirSync(objectCache).some(name => /^probe-/.test(name)), 'without a shared store the project store keeps the probe records');
+});
+
+test('an object is compiled again when a header it includes by a quoted name beside it changes', { skip: !posix }, async () => {
+  const p = project({ helper: helperModule() + '\n  #  include  "frame.h"\n#include <lean/lean.h>\n#include "missing.h"\n', runtime: { identity: specializedIdentity } });
+  const header = join(p.base, 'c', 'frame.h');
+  writeFileSync(header, '#define FRAME 1\n');
+  assert.deepEqual(localHeaders(p.sources[1]), [header]);
+  assert.deepEqual(localHeaders(p.sources[0]), []);
+  const objectCache = join(p.base, 'objects'), sharedCache = join(p.base, 'shared', 'objects');
+  const run = async name => {
+    const sdk = emccSdk(p.base), work = join(p.base, name);
+    mkdirSync(work);
+    await build({ ...p, work }, { sdk, objectCache, sharedCache, linkOnly: true });
+    return sdk.calls.filter(call => call.tool === 'emcc');
+  };
+  await run('work-1');
+  assert.deepEqual(await run('work-2'), []);
+  writeFileSync(header, '#define FRAME 2\n');
+  const compiled = await run('work-3');
+  assert.equal(compiled.length, 1);
+  assert.ok(compiled[0].args.includes(p.sources[1]), 'only the module that includes the header compiles again');
 });
 
 test('a link that needs symbols of a library Lasm could not compile names it', { skip: !posix }, async () => {
