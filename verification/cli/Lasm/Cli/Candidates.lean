@@ -56,18 +56,6 @@ def parse_known_or_refused : Prop :=
         (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
     | .error m => m.trimAscii.toString ≠ ""
 
-/-! ## The process launcher -/
-
-/-- **The launcher configuration round-trips.** The native launcher reads
-back the command and arguments as its argument vector, the environment in
-order, both directories and the stdio flags, for any text without NUL.
-Tested by: test/cli-helpers.test.mjs -/
-def launcher_config_round_trip : Prop :=
-  ∀ o : LaunchOptions,
-    (∀ s ∈ o.command :: o.args ++ o.env.flatMap (fun (k, v) => [k, v]) ++ o.directory.toList ++ o.requestedCwd.toList, '\x00' ∉ s.toList) →
-    (o.env.map (·.1)).Nodup → o.stdio.length = 3 →
-    launcherReads (encodeProcessConfiguration o) = some (o.command :: o.args, o.env, o.directory, o.requestedCwd, o.stdio)
-
 /-! ## Builds -/
 
 /-- **Mangling round-trips.** For a dotted name Lean mangles unambiguously,
@@ -209,14 +197,6 @@ def lowering_rewrites_atomics : Prop :=
       out.length = bodies.length + keys.length ∧
       out.take bodies.length = bodies.map fun (locals, is) => locals ++ is.flatMap (Instr.lowered memory64 index) ++ [0x0b]
 
-/-- **A component splices the core module and gives it back.** For a core
-module, extracting the core of its component gives the module, and making
-the template from the component and the module gives the shipped template.
-Tested by: test/wasi-component.test.mjs -/
-def componentize_inverse : Prop :=
-  ∀ core : ByteArray, core.data.toList.take 8 = moduleHeader →
-    extractCore (componentize core) = some core ∧ makeTemplate (componentize core) core = some proxyTemplate
-
 /-! ## Function packages -/
 
 /-- **What `zip` writes, a ZIP reader reads back.** Whenever `zip` succeeds,
@@ -231,13 +211,5 @@ def zip_reads_back : Prop :=
       (∀ d ∈ read.take (directoriesOf entries).length, d.mode = 0o40755 ∧ d.data.size = 0 ∧ d.method = 0) ∧
       ∀ x ∈ (read.drop (directoriesOf entries).length).zip entries,
         x.1.data = x.2.data ∧ x.1.mode = 0o100000 ||| x.2.mode.getD 0o644
-
-/-- **`zip` is deterministic.** The archive depends on the entries alone (no
-clock, no host state). Stated of a Lean function this holds by `rfl`; it is
-the assumption a model of `zip` makes, which the test checks of the
-JavaScript.
-Tested by: test/serverless-zip.test.mjs -/
-def zip_deterministic : Prop :=
-  ∀ entries : List ZipEntry, zip entries = zip entries
 
 end Lasm.Cli.Candidates

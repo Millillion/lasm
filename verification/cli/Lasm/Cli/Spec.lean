@@ -141,6 +141,19 @@ def replace_one_core_module : Prop :=
     .ok (bytes (componentHeader ++ before.flatMap (fun s => sectionOf s.1 s.2) ++ unrelated.flatMap (sectionOf 1) ++
         sectionOf 1 (to ++ tail) ++ after.flatMap (fun s => sectionOf s.1 s.2)))
 
+/-- **A component splices the core module and gives it back.** In a
+template whose one core module that starts with the placeholder is the
+placeholder followed by `tail` (as the shipped template is: the test checks
+it), `componentize` splices in any core that begins no other core module;
+`extractCore` gives the core back, and `makeTemplate` the template.
+Tested by: test/wasi-component.test.mjs -/
+def componentize_inverse : Prop :=
+  ∀ (before after : List (UInt8 × List UInt8)) (tail core : List UInt8),
+    (∀ s ∈ before ++ after, s.1 = 1 → ¬ placeholderModule <+: s.2 ∧ ¬ core <+: s.2) →
+    let template := bytes (componentHeader ++ (before ++ (1, placeholderModule ++ tail) :: after).flatMap fun s => sectionOf s.1 s.2)
+    ∃ component, componentize (bytes core) template = .ok component ∧
+      extractCore component template = .ok (bytes core) ∧ makeTemplate component (bytes core) = .ok template
+
 /-- **`withoutComponentType` drops only component-type custom sections.** A
 module's custom sections named `component-type…` go; every other section,
 custom or not, stays, in order.
@@ -149,5 +162,45 @@ def drops_only_component_type : Prop :=
   ∀ ss : List Sec, (∀ s ∈ ss, ∀ id b, s = .other id b → id ≠ 0) →
     withoutComponentType (bytes (moduleHeader ++ ss.flatMap Sec.encoding)) =
       bytes (moduleHeader ++ (ss.filter (!·.componentType)).flatMap Sec.encoding)
+
+/-! ## The process launcher -/
+
+/-- **The launcher configuration round-trips.** For options whose texts
+have no NUL byte and fit the format (under 4 GiB), `encodeProcessConfiguration`
+succeeds and the native launcher reads back exactly the flags, the three
+stdio flags, both directories, the command and arguments as its argument
+vector, and the environment's pairs in order (as UTF-8 bytes).
+Tested by: test/cli-helpers.test.mjs -/
+def launcher_config_round_trip : Prop :=
+  ∀ o : LaunchOptions, o.envBytes = none → o.stdioFlags.length = 3 →
+    (∀ s ∈ o.command :: o.args ++ o.env.flatMap (fun (k, v) => [k, v]) ++ o.directory.toList ++ o.requestedCwd.toList,
+      0 ∉ utf8Bytes s ∧ (utf8Bytes s).length < 0xffffffff) →
+    o.args.length + 1 < 4294967296 → o.env.length < 4294967296 →
+    ∃ b, encodeProcessConfiguration o = .ok b ∧ launcherRead b.data.toList = some
+      { flags := (if o.directoryFd.isNone then 0 else 1) + (if o.inheritProcessCwd then 2 else 0) + (if o.setsid then 4 else 0),
+        stdio := o.stdioFlags.map uint32Of, directory := o.directory.map utf8Bytes, requestedCwd := o.requestedCwd.map utf8Bytes,
+        argv := (o.command :: o.args).map utf8Bytes, env := o.env.map fun (k, v) => (utf8Bytes k, utf8Bytes v) }
+
+/-! ## Host handles -/
+
+/-- **A host handle is fresh and in range.** When `allocate` gives an id,
+the table did not hold it and now holds it, with the value, after every
+entry it had, and the range stays; the id lies in the range, and `#next`
+stays in it, whenever `#next` was in it (as the constructor starts it).
+Tested by: test/handle-table.test.mjs -/
+def handle_fresh_in_range : Prop :=
+  ∀ (t t' : HandleTable) (value : String) (id : Nat), t.allocate value = .ok (id, t') →
+    t.has id = false ∧ t'.entries = t.entries ++ [(id, value)] ∧ t'.first = t.first ∧ t'.last = t.last ∧
+    (t.first ≤ t.next → t.next ≤ t.last → t.first ≤ id ∧ id ≤ t.last ∧ t'.first ≤ t'.next ∧ t'.next ≤ t'.last)
+
+/-! ## Function packages -/
+
+/-- **`zip` is deterministic.** The archive depends on the entries alone (no
+clock, no host state). Of the model, a Lean function, this holds by `rfl`;
+it is the assumption the model makes, which the test checks of the
+JavaScript.
+Tested by: test/serverless-zip.test.mjs -/
+def zip_deterministic : Prop :=
+  ∀ entries : List ZipEntry, zip entries = zip entries
 
 end Lasm.Cli.Spec

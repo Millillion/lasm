@@ -18,6 +18,22 @@ answer are the JavaScript's, read as the model's types:
   replaceCoreModule  {"component": "<hex>", "prefix": "<hex>", "to": "<hex>"}
                                                     → {"bytes": "<hex>"} | {"error": "…"}
   withoutComponentType  "<hex>"                     → "<hex>"
+  componentize   {"core": "<hex>", "template": "<hex>"}    → {"bytes": "<hex>"} | {"error": "…"}
+  makeTemplate   {"component": "<hex>", "core": "<hex>"}   → (the same)
+  extractCore    {"component": "<hex>", "template": "<hex>"} → (the same)
+  zip            {"entries": [{"name": "<hex>", "data": "<hex>", "mode": <n> | null}, …],
+                  "deflate": [["<hex>", "<hex>"], …], "crc32": [["<hex>", <n>], …]}
+                                                    → {"bytes": "<hex>"} | {"error": "…"}
+(`deflate` and `crc32` are node:zlib's answers for each entry's bytes)
+  encodeProcessConfiguration  {"command": "<hex>", "args": [...], "env": [["<hex>", "<hex>"], …],
+                  "directory": "<hex>" | null, "requestedCwd": …, "stdioFlags": ["<int>", …], "directoryFd": n | null,
+                  "inheritProcessCwd": b, "setsid": b, "envBytes": [["<hex>", "<hex>"], …] | null}
+                                                    → {"bytes": "<hex>"} | {"error": "…"}
+  launcherRead   "<hex>"  → null (refused) | {"stdio": [n, n, n], "argv": ["<hex>", …], "environ": ["<hex of k=v>", …]}
+  HandleTable    {"first": "<int>", "last": "<int>", "entries": [[n, "v"], …], "ops": [["allocate", "v"] | ["delete", n] | ["set", n, "v"], …]}
+                 → {"error": "…"} | {"results": [n | "full" | null, …], "entries": [[n, "v"], …]}
+(the environment as `setenv` builds it from the pairs read, after `clearenv`:
+a name that is empty or holds `=` is refused, a repeated name is replaced in place)
   initializationSchedule  {"name": "…", "calls": [["…", ["…", …]], …], "keep": ["…", …]}
                                                     → ["…", …]
   compactInitializerWrappers  {"closure": […], "keep": […], "calls": […]}
@@ -39,9 +55,12 @@ import Lasm.Cli.Model.BuiltinModules
 import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
+import Lasm.Cli.Model.HandleTable
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Platform
+import Lasm.Cli.Model.ProcessLauncher
 import Lasm.Cli.Model.WasiComponent
+import Lasm.Cli.Model.Zip
 
 open Lean Lasm.Cli
 
@@ -106,6 +125,19 @@ def ofResult : Except String Parsed → Json
 def texts (j : Json) : Except String (List String) := do
   (← j.getArr?).toList.mapM text
 
+/-- Bytes, or the message thrown. -/
+def ofBytes : Except String ByteArray → Json
+  | .ok b => Json.mkObj [("bytes", toJson (hex b))]
+  | .error e => Json.mkObj [("error", toJson e)]
+
+/-- `setenv(key, value, 1)` for each pair after `clearenv()` (libc's, not
+the launcher's: what the differential observes is the environment it builds). -/
+def setenvAll (pairs : List (List UInt8 × List UInt8)) : List (List UInt8 × List UInt8) :=
+  pairs.foldl (init := []) fun env (k, v) =>
+    if k = [] || k.contains 61 then env
+    else if env.any (·.1 == k) then env.map fun (k', v') => if k' == k then (k, v) else (k', v')
+    else env ++ [(k, v)]
+
 def answer (j : Json) : Except String Json := do
   let input ← j.getObjVal? "input"
   match ← j.getObjValAs? String "model" with
@@ -121,6 +153,78 @@ def answer (j : Json) : Except String Json := do
     return match replaceCoreModule (← field "component") (← field "prefix") (← field "to") with
       | .ok b => Json.mkObj [("bytes", toJson (hex b))]
       | .error e => Json.mkObj [("error", toJson e)]
+  | "zip" =>
+    let entries ← (← (← input.getObjVal? "entries").getArr?).toList.mapM fun e => do
+      let modeJ ← e.getObjVal? "mode"
+      let name ← text (← e.getObjVal? "name")
+      let data ← unhex (← (← e.getObjVal? "data").getStr?)
+      let mode ← if modeJ.isNull then pure none else some <$> modeJ.getNat?
+      return ({ name, data, mode } : ZipEntry)
+    let table := fun (k : String) => do
+      (← (← input.getObjVal? k).getArr?).toList.mapM fun e => return ((← (← e.getArrVal? 0).getStr?), ← e.getArrVal? 1)
+    let deflate ← table "deflate"
+    let crc ← table "crc32"
+    let codec : ZipCodec := {
+      deflate := fun d => match deflate.lookup (hex d) with
+        | some j => (j.getStr? >>= unhex).toOption.getD .empty
+        | none => .empty
+      crc32 := fun d => match crc.lookup (hex d) with
+        | some j => (j.getNat?.toOption.getD 0).toUInt32
+        | none => 0 }
+    return ofBytes (zipWith codec entries)
+  | "encodeProcessConfiguration" =>
+    let opt := fun (k : String) => do
+      let j ← input.getObjVal? k
+      if j.isNull then pure none else some <$> text j
+    let pairsOf := fun (j : Json) => do
+      (← j.getArr?).toList.mapM fun e => return ((← unhex (← (← e.getArrVal? 0).getStr?)).data.toList, (← unhex (← (← e.getArrVal? 1).getStr?)).data.toList)
+    let command ← text (← input.getObjVal? "command")
+    let args ← texts (← input.getObjVal? "args")
+    let env ← (← (← input.getObjVal? "env").getArr?).toList.mapM fun e => return (← text (← e.getArrVal? 0), ← text (← e.getArrVal? 1))
+    let directory ← opt "directory"
+    let requestedCwd ← opt "requestedCwd"
+    let stdioFlags ← (← (← input.getObjVal? "stdioFlags").getArr?).toList.mapM integer
+    let fdJ ← input.getObjVal? "directoryFd"
+    let directoryFd ← if fdJ.isNull then pure none else some <$> fdJ.getNat?
+    let inheritProcessCwd ← (← input.getObjVal? "inheritProcessCwd").getBool?
+    let setsid ← (← input.getObjVal? "setsid").getBool?
+    let ebJ ← input.getObjVal? "envBytes"
+    let envBytes ← if ebJ.isNull then pure none else some <$> pairsOf ebJ
+    return ofBytes (encodeProcessConfiguration
+      { command, args, env, directory, requestedCwd, stdioFlags, directoryFd, inheritProcessCwd, setsid, envBytes })
+  | "launcherRead" =>
+    return match launcherRead (← unhex (← input.getStr?)).data.toList with
+      | none => Json.null
+      | some c =>
+        let hexL := fun (l : List UInt8) => toJson (hex ⟨l.toArray⟩)
+        Json.mkObj [("stdio", toJson c.stdio), ("argv", toJson (c.argv.map hexL)),
+          ("environ", toJson ((setenvAll c.env).map fun (k, v) => hexL (k ++ [61] ++ v)))]
+  | "HandleTable" =>
+    let pair := fun (e : Json) => do return ((← (← e.getArrVal? 0).getNat?), (← (← e.getArrVal? 1).getStr?))
+    let entries ← (← (← input.getObjVal? "entries").getArr?).toList.mapM pair
+    match HandleTable.create (← integer (← input.getObjVal? "first")) (← integer (← input.getObjVal? "last")) entries with
+    | .error e => return Json.mkObj [("error", toJson e)]
+    | .ok t =>
+      let mut t := t
+      let mut results : Array Json := #[]
+      for op in (← (← input.getObjVal? "ops").getArr?) do
+        match ← (← op.getArrVal? 0).getStr? with
+        | "allocate" =>
+          match t.allocate (← (← op.getArrVal? 1).getStr?) with
+          | .ok (id, t') => t := t'; results := results.push (toJson id)
+          | .error _ => results := results.push (toJson "full")
+        | "delete" => t := t.delete (← (← op.getArrVal? 1).getNat?); results := results.push Json.null
+        | _ => t := t.set (← (← op.getArrVal? 1).getNat?) (← (← op.getArrVal? 2).getStr?); results := results.push Json.null
+      return Json.mkObj [("results", toJson results), ("entries", toJson (t.entries.map fun (k, v) => Json.arr #[toJson k, toJson v]))]
+  | "componentize" =>
+    let field := fun (k : String) => do unhex (← (← input.getObjVal? k).getStr?)
+    return ofBytes (componentize (← field "core") (← field "template"))
+  | "makeTemplate" =>
+    let field := fun (k : String) => do unhex (← (← input.getObjVal? k).getStr?)
+    return ofBytes (makeTemplate (← field "component") (← field "core"))
+  | "extractCore" =>
+    let field := fun (k : String) => do unhex (← (← input.getObjVal? k).getStr?)
+    return ofBytes (extractCore (← field "component") (← field "template"))
   | "withoutComponentType" => return toJson (hex (withoutComponentType (← unhex (← input.getStr?))))
   | "initializationSchedule" =>
     return toJson (initializationSchedule (← (← input.getObjVal? "name").getStr?) (← callsOf (← input.getObjVal? "calls"))

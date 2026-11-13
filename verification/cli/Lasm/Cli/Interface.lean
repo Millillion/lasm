@@ -31,9 +31,12 @@ import Lasm.Cli.Model.BuiltinModules
 import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
+import Lasm.Cli.Model.HandleTable
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Platform
+import Lasm.Cli.Model.ProcessLauncher
 import Lasm.Cli.Model.WasiComponent
+import Lasm.Cli.Model.Zip
 
 namespace Lasm.Cli
 
@@ -199,23 +202,9 @@ def unquote (line : String) : Option String :=
 
 /-! ## The process launcher (src/process-launcher.mjs) -/
 
-/-- The options of `encodeProcessConfiguration` (command, arguments,
-environment in order, working directories, the three stdio flags). -/
-structure LaunchOptions where
-  command : String
-  args : List String
-  env : List (String × String)
-  directory : Option String
-  requestedCwd : Option String
-  stdio : List UInt32
-
-/-- `encodeProcessConfiguration(options)`. -/
-opaque encodeProcessConfiguration : LaunchOptions → ByteArray
-
-/-- Not Lasm's JavaScript: how the native launcher (native/process-launcher.c)
-reads a configuration, as the test transcribes it (`decode`): the argument
-vector, the environment, the two directories and the stdio flags. -/
-opaque launcherReads : ByteArray → Option (List String × List (String × String) × Option String × Option String × List UInt32)
+-- `encodeProcessConfiguration(options)` (src/process-launcher.mjs) and the
+-- launcher's reading of it (native/process-launcher.c): modelled in
+-- Model/ProcessLauncher.lean.
 
 /-! ## Builds: names, initializers, builtin modules -/
 
@@ -448,17 +437,9 @@ def codeBodies (m : ByteArray) : Option (List (List UInt8)) := do
   let (n, r) ← readLeb body
   readSized n r
 
-/-- `componentize(core)`: the wasi-http component of a core module, made from
-the shipped template. -/
-opaque componentize : ByteArray → ByteArray
-/-- `extractCore(component)`, or `none` where it throws. -/
-opaque extractCore : ByteArray → Option ByteArray
-/-- `makeTemplate(component, core)`, or `none` where it throws. -/
-opaque makeTemplate : ByteArray → ByteArray → Option ByteArray
-/-- The shipped template, src/wasi/component/proxy-template.wasm. -/
-opaque proxyTemplate : ByteArray
--- `replaceCoreModule(component, prefix, to)` and `withoutComponentType(module)`:
--- modelled in Model/WasiComponent.lean.
+-- `replaceCoreModule(component, prefix, to)`, `componentize(core, template)`,
+-- `makeTemplate(component, core)`, `extractCore(component, template)` and
+-- `withoutComponentType(module)`: modelled in Model/WasiComponent.lean.
 
 /-- A section of a core module: a custom section (its name and contents) or
 any other (its id and body). -/
@@ -478,11 +459,8 @@ def Sec.componentType : Sec → Bool
 
 /-! ## Function packages (src/serverless/zip.mjs) -/
 
-/-- An entry given to `zip`: its name, its bytes, its permissions if set. -/
-structure ZipEntry where
-  name : String
-  data : ByteArray
-  mode : Option Nat
+-- `ZipEntry` and `zip(entries)`: modelled in Model/Zip.lean, with what the
+-- module imports from `node:zlib` as a parameter, here `nodeZlib`.
 
 /-- An entry a ZIP reader reads: name, bytes, Unix mode, method. -/
 structure ReadEntry where
@@ -491,8 +469,12 @@ structure ReadEntry where
   mode : Nat
   method : Nat
 
+/-- Not Lasm's JavaScript: `deflateRawSync(data, { level: 9 })` and
+`crc32(data)` of `node:zlib`. -/
+opaque nodeZlib : ZipCodec
+
 /-- `zip(entries)`, or the message it throws. -/
-opaque zip : List ZipEntry → Except String ByteArray
+def zip (entries : List ZipEntry) : Except String ByteArray := zipWith nodeZlib entries
 
 /-- Not Lasm's JavaScript: a ZIP reader written from APPNOTE.TXT 6.3.10 (the
 test's `unzip`): the entries in the central directory's order. -/

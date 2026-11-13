@@ -270,6 +270,110 @@ theorem replace_one_core_module : Spec.replace_one_core_module := by
   erw [hrepl']
   rfl
 
+/-! ## Splicing a program into the component template -/
+
+/-- `replaceCoreModule` on a component of encoded sections whose one core
+module starting with `pfx` is `pfx ++ tail`: that section becomes
+`to ++ tail`. -/
+theorem replaceCoreModuleL_sections (before after : List (UInt8 × List UInt8)) (pfx tail to : List UInt8)
+    (h : ∀ s ∈ before ++ after, s.1 = 1 → ¬ pfx <+: s.2) :
+    replaceCoreModuleL (componentHeader ++ (before ++ (1, pfx ++ tail) :: after).flatMap fun s => sectionOf s.1 s.2) pfx to =
+      .ok (componentHeader ++ (before ++ (1, to ++ tail) :: after).flatMap fun s => sectionOf s.1 s.2) := by
+  let f := fun (s : UInt8 × List UInt8) => sectionOf s.1 s.2
+  let L := before ++ (1, pfx ++ tail) :: after
+  let m := fun (s : Section) => s.id == 1 && pfx.isPrefixOf s.body
+  have hm : ∀ s ∈ before ++ after, m (sec s) = false := by
+    intro s hs
+    simp only [m, sec, Bool.and_eq_false_iff, beq_eq_false_iff_ne]
+    by_cases h1 : s.1 = 1
+    · right; exact Bool.eq_false_iff.mpr fun h' => h s hs h1 (List.isPrefixOf_iff_prefix.mp h')
+    · left; exact h1
+  have hfound : (L.map sec).filter m = [sec (1, pfx ++ tail)] := by
+    simp only [L, List.map_append, List.map_cons, List.filter_append, List.filter_cons]
+    have hb : (before.map sec).filter m = [] := by
+      simp only [List.filter_eq_nil_iff, List.mem_map]
+      rintro _ ⟨s, hs, rfl⟩; simp [hm s (List.mem_append_left _ hs)]
+    have ha : (after.map sec).filter m = [] := by
+      simp only [List.filter_eq_nil_iff, List.mem_map]
+      rintro _ ⟨s, hs, rfl⟩; simp [hm s (List.mem_append_right _ hs)]
+    rw [hb, ha]
+    simp [m, sec, List.isPrefixOf_iff_prefix]
+  have hrepl : (L.map sec).flatMap (fun s => if m s = true then
+        1 :: lebJS (to ++ s.body.drop pfx.length).length ++ (to ++ s.body.drop pfx.length) else s.raw) =
+      (before ++ (1, to ++ tail) :: after).flatMap f := by
+    simp only [L, List.map_append, List.map_cons, List.flatMap_append, List.flatMap_cons, List.flatMap_map]
+    congr 1
+    · apply flatMap_congr'
+      intro s hs
+      have := hm s (List.mem_append_left _ hs)
+      simp only [sec] at this
+      simp [this, sec, f]
+    · congr 1
+      · simp [m, sec, f, sectionOf, lebJS_eq_leb, List.isPrefixOf_iff_prefix]
+      · apply flatMap_congr'
+        intro s hs
+        have := hm s (List.mem_append_right _ hs)
+        simp only [sec] at this
+        simp [this, sec, f]
+  have hparse : parseSections (L.flatMap f) = some (L.map sec) := by
+    have := parseSections_flatMap L []
+    simpa [f, parseSections_nil] using this
+  show replaceCoreModuleL (componentHeader ++ L.flatMap f) pfx to = .ok (componentHeader ++ (before ++ (1, to ++ tail) :: after).flatMap f)
+  simp only [replaceCoreModuleL]
+  have hhead : isComponentHeader (componentHeader ++ L.flatMap f) = true := by
+    simp [isComponentHeader, componentHeader]
+  have hd : (componentHeader ++ L.flatMap f).drop 8 = L.flatMap f := by simp [componentHeader]
+  have ht : (componentHeader ++ L.flatMap f).take 8 = componentHeader := by simp [componentHeader]
+  simp only [hhead, Bool.not_true, Bool.false_eq_true, ↓reduceIte, hd, hparse]
+  change (if ((L.map sec).filter m).length = 1 then _ else _) = _
+  rw [hfound]
+  simp only [List.length_singleton, ↓reduceIte, ht]
+  erw [hrepl]
+
+theorem sectionsOf_sections (L : List (UInt8 × List UInt8)) :
+    sectionsOf (componentHeader ++ L.flatMap fun s => sectionOf s.1 s.2) = .ok (L.map sec) := by
+  have hparse := parseSections_flatMap L []
+  simp only [List.append_nil, parseSections_nil, Option.map_some, List.append_nil] at hparse
+  have hd : (componentHeader ++ L.flatMap fun s => sectionOf s.1 s.2).drop 8 = L.flatMap fun s => sectionOf s.1 s.2 := by
+    simp [componentHeader]
+  have hhead : isComponentHeader (componentHeader ++ L.flatMap fun s => sectionOf s.1 s.2) = true := by
+    simp [isComponentHeader, componentHeader]
+  simp only [sectionsOf, hhead, Bool.not_true, Bool.false_eq_true, ↓reduceIte, hd, hparse]
+
+/-- The core modules of encoded sections, around one module `body`. -/
+theorem modules_around (before after : List (UInt8 × List UInt8)) (body : List UInt8) :
+    ((before ++ (1, body) :: after).map sec).filter (·.id == 1) =
+      (before.map sec).filter (·.id == 1) ++ sec (1, body) :: (after.map sec).filter (·.id == 1) := by
+  simp [List.filter_append, sec]
+
+theorem bytes_toList (l : List UInt8) : (bytes l).data.toList = l := by simp [bytes]
+
+theorem componentize_inverse : Spec.componentize_inverse := by
+  intro before after tail core h
+  have hc := replaceCoreModuleL_sections before after placeholderModule tail core (fun s hs h1 => (h s hs h1).1)
+  have ht := replaceCoreModuleL_sections before after core tail placeholderModule (fun s hs h1 => (h s hs h1).2)
+  refine ⟨bytes (componentHeader ++ (before ++ (1, core ++ tail) :: after).flatMap fun s => sectionOf s.1 s.2), ?_, ?_, ?_⟩
+  · simp only [componentize, replaceCoreModule, bytes_toList]
+    erw [hc]; rfl
+  · simp only [extractCore, extractCoreL, bytes_toList, sectionsOf_sections]
+    simp only [bind, Except.bind, modules_around]
+    have hnone : List.findIdx? (fun s => placeholderModule.isPrefixOf s.body) ((before.map sec).filter (·.id == 1)) = none := by
+      rw [List.findIdx?_eq_none_iff]
+      intro x hx
+      simp only [List.mem_filter, List.mem_map] at hx
+      obtain ⟨⟨s, hs, rfl⟩, hid⟩ := hx
+      have := (h s (List.mem_append_left _ hs) (by simpa [sec] using hid)).1
+      exact Bool.eq_false_iff.mpr fun h' => this (List.isPrefixOf_iff_prefix.mp h')
+    rw [List.findIdx?_append, hnone, List.findIdx?_cons]
+    have hp : placeholderModule.isPrefixOf (sec (1, placeholderModule ++ tail)).body = true := by
+      simp [sec, List.isPrefixOf_iff_prefix]
+    simp only [hp, ↓reduceIte, Option.map_some, Nat.zero_add, Option.none_or]
+    rw [List.getD_eq_getElem?_getD, List.getElem?_append_right (Nat.le_refl _), Nat.sub_self,
+      List.getElem?_append_right (by simp), Nat.sub_self]
+    simp [sec, Except.map, bytes]
+  · simp only [makeTemplate, replaceCoreModule, bytes_toList]
+    erw [ht]; rfl
+
 /-! ## Custom section names -/
 
 /-- The first byte of a character's UTF-8 encoding: the character itself
@@ -1262,5 +1366,186 @@ theorem run_args_kept : Spec.run_args_kept := by
   · simp only [Parsed.rebuild, f9]; split <;> simp_all [parseLasmArgumentsWith.start]
   · simp only [Parsed.verbose, f10]; split <;> simp_all [parseLasmArgumentsWith.start]
   · simp only [Parsed.profile, f11]; split <;> simp_all [parseLasmArgumentsWith.start]
+
+/-! ## The process launcher -/
+
+theorem readNumber_le32 {n : Nat} (h : n < 4294967296) (r : List UInt8) : readNumber (le32 n ++ r) = some (n, r) := by
+  simp only [le32, List.cons_append, List.nil_append, readNumber, Option.some.injEq, Prod.mk.injEq, and_true]
+  simp only [Nat.toUInt8_eq, UInt8.toNat_ofNat']
+  omega
+
+theorem readString_some {b : List UInt8} (h0 : 0 ∉ b) (hl : b.length < 0xffffffff) (opt : Bool) (r : List UInt8) :
+    readString opt (le32 b.length ++ b ++ r) = some (some b, r) := by
+  rw [readString, List.append_assoc, readNumber_le32 (by omega)]
+  simp [Nat.ne_of_lt hl, h0]
+
+theorem readString_none (r : List UInt8) : readString true (le32 0xffffffff ++ r) = some (none, r) := by
+  rw [readString, readNumber_le32 (by omega)]
+  simp
+
+theorem encodeString_some {b : List UInt8} (h0 : 0 ∉ b) : encodeString (some b) = .ok (le32 b.length ++ b) := by
+  simp [encodeString, h0]
+
+/-- Text whose UTF-8 has no NUL byte and fits the format. -/
+def Fits (b : List UInt8) : Prop := 0 ∉ b ∧ b.length < 0xffffffff
+
+theorem readStrings_encoded : ∀ (vs : List (List UInt8)) (r : List UInt8), (∀ v ∈ vs, Fits v) →
+    readStrings vs.length ((vs.map fun v => le32 v.length ++ v).flatten ++ r) = some (vs, r)
+  | [], r, _ => by simp [readStrings]
+  | v :: vs, r, h => by
+    have hv := h v (by simp)
+    simp only [List.length_cons, List.map_cons, List.flatten_cons, List.append_assoc, readStrings]
+    rw [← List.append_assoc, readString_some hv.1 hv.2]
+    simp only [bind, Option.bind]
+    rw [readStrings_encoded vs r fun w hw => h w (by simp [hw])]
+    rfl
+
+theorem readPairs_encoded : ∀ (ps : List (List UInt8 × List UInt8)) (r : List UInt8), (∀ p ∈ ps, Fits p.1 ∧ Fits p.2) →
+    readPairs ps.length ((ps.map fun p => le32 p.1.length ++ (p.1 ++ (le32 p.2.length ++ p.2))).flatten ++ r) = some (ps, r)
+  | [], r, _ => by simp [readPairs]
+  | p :: ps, r, h => by
+    have hp := h p (by simp)
+    simp only [List.length_cons, List.map_cons, List.flatten_cons, List.append_assoc, readPairs]
+    rw [← List.append_assoc, readString_some hp.1.1 hp.1.2]
+    simp only [bind, Option.bind]
+    rw [← List.append_assoc, readString_some hp.2.1 hp.2.2]
+    dsimp only
+    rw [readPairs_encoded ps r fun w hw => h w (by simp [hw])]
+    rfl
+
+theorem mapM_encodeString : ∀ (vs : List (List UInt8)), (∀ v ∈ vs, 0 ∉ v) →
+    vs.mapM (fun v => encodeString (some v)) = .ok (vs.map fun v => le32 v.length ++ v)
+  | [], _ => rfl
+  | v :: vs, h => by
+    rw [List.mapM_cons, encodeString_some (h v (by simp)), mapM_encodeString vs fun w hw => h w (by simp [hw])]
+    rfl
+
+/-- An optional string as `string` writes it. -/
+def encOpt : Option (List UInt8) → List UInt8
+  | none => le32 0xffffffff
+  | some b => le32 b.length ++ b
+
+theorem encodeString_opt {x : Option (List UInt8)} (h : ∀ b ∈ x, 0 ∉ b) : encodeString x = .ok (encOpt x) := by
+  cases x with
+  | none => rfl
+  | some b => exact encodeString_some (h b rfl)
+
+theorem readString_opt {x : Option (List UInt8)} (h : ∀ b ∈ x, Fits b) (r : List UInt8) :
+    readString true (encOpt x ++ r) = some (x, r) := by
+  cases x with
+  | none => exact readString_none r
+  | some b => exact readString_some (h b rfl).1 (h b rfl).2 true r
+
+theorem mapM_pairs : ∀ (ps : List (List UInt8 × List UInt8)), (∀ p ∈ ps, 0 ∉ p.1 ∧ 0 ∉ p.2) →
+    ps.mapM (fun (p : List UInt8 × List UInt8) => do return (← encodeString (some p.1)) ++ (← encodeString (some p.2))) =
+      .ok (ps.map fun p => le32 p.1.length ++ (p.1 ++ (le32 p.2.length ++ p.2)))
+  | [], _ => rfl
+  | p :: ps, h => by
+    rw [List.mapM_cons, encodeString_some (h p (by simp)).1, encodeString_some (h p (by simp)).2,
+      mapM_pairs ps fun w hw => h w (by simp [hw])]
+    simp [bind, pure, Except.bind, Except.pure]
+
+theorem launcher_config_round_trip : Spec.launcher_config_round_trip := by
+  intro o hbytes h3 htexts hargs henv
+  obtain ⟨command, args, env, directory, requestedCwd, stdioFlags, directoryFd, inh, setsid, envBytes⟩ := o
+  simp only at hbytes h3 htexts hargs henv ⊢
+  subst hbytes
+  match stdioFlags, h3 with
+  | [a, b, c], _ =>
+  have fits : ∀ s ∈ command :: args ++ env.flatMap (fun (k, v) => [k, v]) ++ directory.toList ++ requestedCwd.toList, Fits (utf8Bytes s) := htexts
+  have hdir : ∀ x ∈ directory.map utf8Bytes, Fits x := by
+    intro x hx; simp only [Option.mem_def, Option.map_eq_some_iff] at hx; obtain ⟨d, rfl, rfl⟩ := hx; exact fits _ (by simp)
+  have hreq : ∀ x ∈ requestedCwd.map utf8Bytes, Fits x := by
+    intro x hx; simp only [Option.mem_def, Option.map_eq_some_iff] at hx; obtain ⟨d, rfl, rfl⟩ := hx; exact fits _ (by simp)
+  have hargv : ∀ x ∈ (command :: args).map utf8Bytes, Fits x := by
+    intro x hx; simp only [List.mem_map] at hx; obtain ⟨d, hd, rfl⟩ := hx; exact fits _ (by simp at hd ⊢; rcases hd with h | h <;> simp [h])
+  have henv' : ∀ p ∈ env.map (fun (k, v) => (utf8Bytes k, utf8Bytes v)), Fits p.1 ∧ Fits p.2 := by
+    intro p hp; simp only [List.mem_map] at hp; obtain ⟨⟨k, v⟩, hkv, rfl⟩ := hp
+    have hk : k ∈ env.flatMap (fun (k, v) => [k, v]) := List.mem_flatMap.mpr ⟨(k, v), hkv, by simp⟩
+    have hv : v ∈ env.flatMap (fun (k, v) => [k, v]) := List.mem_flatMap.mpr ⟨(k, v), hkv, by simp⟩
+    exact ⟨fits _ (by simp only [List.mem_append]; exact Or.inl (Or.inl (Or.inr hk))),
+      fits _ (by simp only [List.mem_append]; exact Or.inl (Or.inl (Or.inr hv)))⟩
+  have nul : ∀ {x : Option (List UInt8)}, (∀ b ∈ x, Fits b) → ∀ b ∈ x, 0 ∉ b := fun h b hb => (h b hb).1
+  have henc : encodeProcessConfiguration (LaunchOptions.mk command args env directory requestedCwd [a, b, c] directoryFd inh setsid none) = .ok ⟨(launcherMagic ++
+        le32 ((if directoryFd.isNone then 0 else 1) + (if inh then 2 else 0) + (if setsid then 4 else 0)) ++
+        (le32 (uint32Of a) ++ le32 (uint32Of b) ++ le32 (uint32Of c)) ++ encOpt (directory.map utf8Bytes) ++
+        encOpt (requestedCwd.map utf8Bytes) ++ le32 (args.length + 1) ++
+        (((command :: args).map utf8Bytes).map fun v => le32 v.length ++ v).flatten ++ le32 env.length ++
+        ((env.map fun (k, v) => (utf8Bytes k, utf8Bytes v)).map fun p => le32 p.1.length ++ (p.1 ++ (le32 p.2.length ++ p.2))).flatten).toArray⟩ := by
+    have e1 := encodeString_opt (nul hdir)
+    have e2 := encodeString_opt (nul hreq)
+    have e3 := mapM_encodeString ((command :: args).map utf8Bytes) fun v hv => (hargv v hv).1
+    have e4 := mapM_pairs (env.map fun (k, v) => (utf8Bytes k, utf8Bytes v)) fun p hp => ⟨(henv' p hp).1.1, (henv' p hp).2.1⟩
+    rw [List.mapM_map] at e3
+    simp only [encodeProcessConfiguration, Option.getD_none, e1, e2]
+    erw [e3, e4]
+    simp [bind, Except.bind, pure, Except.pure, List.append_assoc]
+  refine ⟨_, henc, ?_⟩
+  have u32 : ∀ x : Int, uint32Of x < 4294967296 := fun x => by unfold uint32Of; omega
+  have hflags : ((if directoryFd.isNone = true then 0 else 1) + (if inh = true then 2 else 0) + (if setsid = true then 4 else 0)) < 8 := by
+    split <;> split <;> split <;> omega
+  have rf := readNumber_le32 (Nat.lt_trans hflags (by omega))
+  have ra := readNumber_le32 (u32 a)
+  have rb := readNumber_le32 (u32 b)
+  have rc := readNumber_le32 (u32 c)
+  have rn := readNumber_le32 hargs
+  have re := readNumber_le32 (n := env.length) henv
+  have rd := readString_opt hdir
+  have rr := readString_opt hreq
+  have rs := readStrings_encoded ((command :: args).map utf8Bytes)
+  have rp := readPairs_encoded (env.map fun (k, v) => (utf8Bytes k, utf8Bytes v))
+  simp only [List.length_map, List.length_cons] at rs rp
+  have hm1 : ∀ r : List UInt8, (decide ((launcherMagic ++ r).length < 8) || (launcherMagic ++ r).take 8 != launcherMagic) = false := by
+    intro r
+    rw [Bool.or_eq_false_iff]
+    constructor
+    · apply decide_eq_false; simp only [launcherMagic, List.length_append, List.length_cons, List.length_nil]; omega
+    · simp [launcherMagic]
+  have hm2 : ∀ r : List UInt8, (launcherMagic ++ r).drop 8 = r := by intro r; simp [launcherMagic]
+  simp only [List.append_assoc] at rs rp ⊢
+  have hf' : ¬ ((if directoryFd.isNone = true then 0 else 1) + (if inh = true then 2 else 0) + (if setsid = true then 4 else 0)) ≥ 8 := by omega
+  have hn' : ¬ args.length + 1 = 0 := by omega
+  simp only [launcherRead, hm1, hm2, rf, Option.bind_eq_bind, Option.bind_some, hf', ↓reduceIte, ra, rb, rc, rd, rr, rn, hn', re,
+    rs _ hargv, Bool.false_eq_true]
+  have rp' := rp [] henv'
+  simp only [List.append_nil] at rp'
+  rw [rp']
+  simp [pure]
+
+/-! ## Host handles -/
+
+theorem allocateLoop_fresh (start : Nat) (value : String) : ∀ (fuel : Nat) (t t' : HandleTable) (id : Nat),
+    HandleTable.allocateLoop start value fuel t = .ok (id, t') →
+    t.has id = false ∧ t'.entries = t.entries ++ [(id, value)] ∧ t'.first = t.first ∧ t'.last = t.last ∧
+    (t.first ≤ t.next → t.next ≤ t.last → t.first ≤ id ∧ id ≤ t.last ∧ t'.first ≤ t'.next ∧ t'.next ≤ t'.last)
+  | 0, t, t', id, h => by simp [HandleTable.allocateLoop] at h
+  | fuel + 1, t, t', id, h => by
+    simp only [HandleTable.allocateLoop] at h
+    generalize hn : (if t.next = t.last then t.first else t.next + 1) = n at h
+    have hr : t.first ≤ t.next → t.next ≤ t.last → t.first ≤ n ∧ n ≤ t.last := by
+      intro a b; subst hn; split <;> omega
+    have hhas : ({ t with next := n } : HandleTable).has = t.has := rfl
+    rw [hhas] at h
+    by_cases hfree : t.has t.next = true
+    · simp only [hfree, Bool.not_true, Bool.false_eq_true, ↓reduceIte] at h
+      by_cases hs : n = start
+      · simp [hs] at h
+      · simp only [ne_eq, hs, not_false_eq_true, ↓reduceIte] at h
+        have := allocateLoop_fresh start value fuel _ t' id h
+        exact ⟨this.1, this.2.1, this.2.2.1, this.2.2.2.1, fun h1 h2 => this.2.2.2.2 (hr h1 h2).1 (hr h1 h2).2⟩
+    · simp only [Bool.not_eq_true] at hfree
+      simp only [hfree, Bool.not_false, ↓reduceIte, Except.ok.injEq, Prod.mk.injEq] at h
+      obtain ⟨rfl, rfl⟩ := h
+      have hset : ({ t with next := n } : HandleTable).set t.next value = { t with next := n, entries := t.entries ++ [(t.next, value)] } := by
+        simp [HandleTable.set, hhas, hfree]
+      rw [hset]
+      exact ⟨hfree, rfl, rfl, rfl, fun h1 h2 => ⟨h1, h2, (hr h1 h2).1, (hr h1 h2).2⟩⟩
+
+theorem handle_fresh_in_range : Spec.handle_fresh_in_range :=
+  fun t t' _ id h => allocateLoop_fresh _ _ _ t t' id h
+
+/-! ## Function packages -/
+
+theorem zip_deterministic : Spec.zip_deterministic := fun _ => rfl
 
 end Lasm.Cli.Theorems

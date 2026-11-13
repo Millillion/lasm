@@ -13,8 +13,8 @@
 // the model modules into a temporary directory and checks each model `runs`
 // times (default 2000). Run by the cli-models workflow (docs/CI.md).
 import assert from 'node:assert/strict';
-import { execFileSync, spawn } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
+import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,7 +26,11 @@ import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
 import { responseFile } from '../../src/platform.mjs';
-import { replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
+import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
+import { zip } from '../../src/serverless/zip.mjs';
+import { HandleTable } from '../../src/handle-table.mjs';
+import { encodeProcessConfiguration } from '../../src/process-launcher.mjs';
+import { deflateRawSync, crc32 } from 'node:zlib';
 import { compactInitializerWrappers, initializationSchedule } from '../../src/edge/edge-initializers.mjs';
 import { builtinModuleClosure } from '../../src/edge/builtin-modules.mjs';
 
@@ -79,6 +83,23 @@ function plan(r) {
   return { schema: 1, closure: [...new Set(names)], keep: names.filter(() => r.next() < 0.5), calls };
 }
 const callsEntries = calls => Object.entries(calls);
+
+/** A component template: sections, some core modules starting with the
+ * placeholder (or a cut of it), sometimes broken (wasmBytes). */
+const placeholder = [...placeholderModule()];
+const templateOf = r => wasmBytes(r, componentHeader, g => {
+  const id = g.pick([0, 1, 1, 1, 6, 7]);
+  if (id !== 1) return { id, body: randomBytes(g, 12) };
+  const roll = g.next();
+  return { id, body: roll < 0.4 ? [...placeholder, ...randomBytes(g, 8)] : roll < 0.5 ? placeholder.slice(0, g.int(0, placeholder.length)) : [...coreHeader, ...randomBytes(g, 10)] };
+}).bytes;
+const coreOf = r => r.next() < 0.8 ? [...coreHeader, ...randomBytes(r, 12)] : randomBytes(r, 10);
+const attempt = fn => { try { return { bytes: hexOf(fn()) }; } catch (error) { return { error: error.message }; } };
+/** A component: a template with a core spliced in, or another template. */
+const componentOf = (r, template, core = coreOf(r)) => {
+  if (r.next() < 0.7) { try { return [...componentize(Uint8Array.from(core), Uint8Array.from(template))]; } catch {} }
+  return templateOf(r);
+};
 
 /** Every way a builtin module may import another (relativeImport's forms),
  * and lines that import nothing builtin. */
@@ -144,6 +165,58 @@ const hexFields = ['args', 'output', 'input'];
 const parsedJson = parsed => Object.fromEntries(Object.entries(parsed).map(([k, v]) =>
   [k, k === 'args' ? v.map(hex) : hexFields.includes(k) ? hex(v) : v]));
 const delegates = { init: parseInitArguments, dev: parseDevArguments, package: parsePackageArguments };
+
+/** Launcher options: texts with the characters that matter to the format
+ * and to `setenv` (`=` in names, empty names, repeated names). */
+const launchText = r => r.string(['a', 'Z', ' ', '=', 'λ', '/', '\n', '日', '😀'], 0, 6);
+function launchOptions(r) {
+  const env = r.array(r.int(0, 4), () => [r.pick(['A', 'B', 'A=B', '', 'PATH', launchText(r)]), launchText(r)]);
+  return {
+    command: r.next() < 0.05 ? 'a\0b' : launchText(r) || 'c', args: r.array(r.int(0, 4), () => r.next() < 0.03 ? '\0' : launchText(r)),
+    env: Object.fromEntries(env), directory: r.next() < 0.5 ? launchText(r) : undefined, requestedCwd: r.next() < 0.5 ? launchText(r) : undefined,
+    stdioFlags: [r.int(-2, 9), r.int(0, 2 ** 31), r.int(0, 3)], ...(r.next() < 0.5 ? { directoryFd: r.int(0, 5) } : {}),
+    inheritProcessCwd: r.next() < 0.5, setsid: r.next() < 0.5,
+    ...(r.next() < 0.2 ? { envBytes: env.map(([k, v]) => [Buffer.from(k).toString('base64'), Buffer.from([...Buffer.from(v), r.int(1, 255)]).toString('base64')]) } : {}),
+  };
+}
+/** A configuration for the launcher: an encoding, often corrupted. */
+function launcherConfig(r) {
+  let bytes;
+  try { bytes = [...encodeProcessConfiguration(launchOptions(r))]; } catch { bytes = [...Buffer.from('LASMEX01'), ...randomBytes(r, 30)]; }
+  const roll = r.next(), at = () => r.int(0, bytes.length - 1);
+  if (roll < 0.1) bytes = bytes.slice(0, r.int(0, bytes.length));
+  else if (roll < 0.15) bytes.push(r.int(0, 255));
+  else if (roll < 0.25) bytes[at()] = r.pick([0, 1, 7, 8, 0xff, r.int(0, 255)]);
+  else if (roll < 0.3) bytes[8] = r.int(8, 255);
+  else if (roll < 0.33) bytes[r.int(0, 7)] ^= 1;
+  return bytes;
+}
+/** native/process-launcher.c, compiled with its effects reported
+ * (test/models/process-launcher-harness.c), and run on a configuration:
+ * `null` where it refuses it (exit status 125), else what it would use. */
+let harness;
+function runLauncher(bytes) {
+  if (!harness) {
+    const dir = mkdtempSync(join(tmpdir(), 'lasm-launcher-harness-'));
+    harness = { dir, path: join(dir, 'launcher') };
+    execFileSync(process.env.CC || 'cc', ['-O1', '-w', '-o', harness.path, fileURLToPath(new URL('./process-launcher-harness.c', import.meta.url))],
+      { stdio: ['ignore', 'inherit', 'inherit'] });
+  }
+  const file = join(harness.dir, 'config');
+  writeFileSync(file, Uint8Array.from(bytes));
+  const fd = openSync(file, 'r');
+  try {
+    const run = spawnSync(harness.path, [], { stdio: ['ignore', 'pipe', 'pipe', fd], env: { KEPT: 'cleared' }, timeout: 10_000 });
+    if (run.status === 125) return null;
+    if (run.status !== 0) throw new Error(`the launcher harness exited ${run.status ?? run.signal}: ${run.stderr}`);
+    const out = { stdio: [], argv: [], environ: [] };
+    for (const line of run.stdout.toString().split('\n').filter(Boolean)) {
+      const [kind, value = ''] = line.split(' ');
+      if (kind === 'stdio') out.stdio.push(Number(value)); else out[kind === 'arg' ? 'argv' : 'environ'].push(value);
+    }
+    return out;
+  } finally { closeSync(fd); }
+}
 
 /** Each model: the JavaScript module and function it mirrors, the Lean
  * module, a generator, the JavaScript's answer and the request's input,
@@ -231,6 +304,75 @@ export const models = [
     js: ({ component, prefix, to }) => {
       try { return { bytes: hexOf(replaceCoreModule(Uint8Array.from(component), Uint8Array.from(prefix), Uint8Array.from(to))) }; }
       catch (error) { return { error: error.message }; }
+    },
+  },
+  {
+    name: 'componentize', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',
+    generate: r => ({ core: coreOf(r), template: templateOf(r) }),
+    input: ({ core, template }) => ({ core: hexOf(core), template: hexOf(template) }),
+    js: ({ core, template }) => attempt(() => componentize(Uint8Array.from(core), Uint8Array.from(template))),
+  },
+  {
+    name: 'makeTemplate', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',
+    generate: r => { const template = templateOf(r), core = coreOf(r); return { core, component: r.next() < 0.7 ? componentOf(r, template, core) : template }; },
+    input: ({ core, component }) => ({ core: hexOf(core), component: hexOf(component) }),
+    js: ({ core, component }) => attempt(() => makeTemplate(Uint8Array.from(component), Uint8Array.from(core))),
+  },
+  {
+    name: 'extractCore', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',
+    generate: r => { const template = templateOf(r); return { template, component: componentOf(r, template) }; },
+    input: ({ component, template }) => ({ component: hexOf(component), template: hexOf(template) }),
+    js: ({ component, template }) => attempt(() => extractCore(Uint8Array.from(component), Uint8Array.from(template))),
+  },
+  {
+    name: 'zip', source: 'src/serverless/zip.mjs', lean: 'Lasm.Cli.Model.Zip',
+    generate: r => r.array(r.int(0, 5), () => ({
+      name: r.next() < 0.1 ? r.pick(['a', 'a/b', 'dir/', 'a/', '']) : r.array(r.int(1, 3), () => r.string(['a', 'b', 'é', '😀', 'Z', '.'], 1, 3)).join('/'),
+      data: r.next() < 0.5 ? Buffer.from(randomBytes(r, 40)) : Buffer.from('ab'.repeat(r.int(0, 60))),
+      ...(r.next() < 0.5 ? { mode: r.pick([0o755, 0o644, 0o600, 0o4755, 0]) } : {}),
+    })),
+    input: entries => {
+      const all = [Buffer.alloc(0), ...entries.map(e => e.data)];
+      return { entries: entries.map(e => ({ name: hex(e.name), data: e.data.toString('hex'), mode: e.mode ?? null })),
+        deflate: all.map(d => [d.toString('hex'), deflateRawSync(d, { level: 9 }).toString('hex')]),
+        crc32: all.map(d => [d.toString('hex'), crc32(d)]) };
+    },
+    js: entries => attempt(() => zip(entries)),
+  },
+  {
+    name: 'encodeProcessConfiguration', source: 'src/process-launcher.mjs', lean: 'Lasm.Cli.Model.ProcessLauncher',
+    generate: launchOptions,
+    input: o => ({ command: hex(o.command), args: o.args.map(hex), env: Object.entries(o.env).map(([k, v]) => [hex(k), hex(v)]),
+      directory: o.directory === undefined ? null : hex(o.directory), requestedCwd: o.requestedCwd === undefined ? null : hex(o.requestedCwd),
+      stdioFlags: o.stdioFlags.map(String), directoryFd: o.directoryFd ?? null, inheritProcessCwd: o.inheritProcessCwd, setsid: o.setsid,
+      envBytes: o.envBytes ? o.envBytes.map(pair => pair.map(v => Buffer.from(v, 'base64').toString('hex'))) : null }),
+    js: o => attempt(() => encodeProcessConfiguration(o)),
+  },
+  {
+    name: 'launcherRead', source: 'native/process-launcher.c', lean: 'Lasm.Cli.Model.ProcessLauncher',
+    generate: launcherConfig,
+    input: bytes => hexOf(bytes),
+    js: runLauncher,
+  },
+  {
+    name: 'HandleTable', source: 'src/handle-table.mjs', lean: 'Lasm.Cli.Model.HandleTable',
+    generate: r => {
+      const first = r.next() < 0.1 ? r.pick([0, -1, 0x7fffffff, 0x80000000]) : r.next() < 0.1 ? 0x7ffffffd : r.int(1, 6);
+      const last = r.next() < 0.1 ? r.pick([0x7fffffff, 0x80000000, first - 1]) : first + r.int(0, 4);
+      const key = () => Math.max(0, r.pick([first, first + 1, last, 0, 1, 2, r.int(0, 12)]));
+      return { first, last, entries: r.array(r.int(0, 3), () => [key(), r.pick(['x', 'y'])]),
+        ops: r.array(r.int(0, 14), () => r.pick([() => ['allocate', r.pick(['a', 'b', 'c'])], () => ['allocate', 'd'], () => ['delete', key()], () => ['set', key(), 'e']])()) };
+    },
+    input: ({ first, last, entries, ops }) => ({ first: String(first), last: String(last), entries, ops }),
+    js: ({ first, last, entries, ops }) => {
+      let table;
+      try { table = new HandleTable({ first, last, entries }); } catch (error) { return { error: error.message }; }
+      const results = ops.map(([op, a, b]) => {
+        if (op === 'allocate') { try { return table.allocate(a); } catch (error) { assert.equal(error.code, 'EMFILE'); return 'full'; } }
+        if (op === 'delete') table.delete(a); else table.set(a, b);
+        return null;
+      });
+      return { results, entries: [...table.entries()] };
     },
   },
   {
@@ -323,7 +465,8 @@ async function start(leanPath) {
       waiting.push({ resolve, reject });
       child.stdin.write(JSON.stringify(request) + '\n');
     }),
-    stop: () => { child.stdin.end(); rmSync(out, { recursive: true, force: true }); if (parseDirectory) rmSync(parseDirectory, { recursive: true, force: true }); parseDirectory = undefined; },
+    stop: () => { child.stdin.end(); rmSync(out, { recursive: true, force: true }); if (parseDirectory) rmSync(parseDirectory, { recursive: true, force: true }); parseDirectory = undefined;
+      if (harness) rmSync(harness.dir, { recursive: true, force: true }); harness = undefined; },
   };
 }
 
