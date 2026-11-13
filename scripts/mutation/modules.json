@@ -4,8 +4,9 @@
     {
       "name": "host-bridge",
       "description": "Lasm.JS host bridge on Node: sync callbacks, the doorbell wait and mailbox, completion polling, value marshalling",
+      "keepInSandbox": ["/library"],
       "mutate": ["src/node-js.mjs"],
-      "tests": ["test/node-js.test.mjs", "test/node-js-bridge.test.mjs"]
+      "tests": ["test/node-js.test.mjs", "test/node-js-bridge.test.mjs", "test/lasm-js-framing.test.mjs"]
     },
     {
       "name": "ui-dom",
@@ -37,7 +38,7 @@
       "description": "Edge runtime glue: the edge host, Lasm.JS on the edge, the runtime loader and start-up",
       "keepInSandbox": ["/library"],
       "mutate": ["src/edge/edge-host.mjs", "src/edge/edge-js.mjs", "src/edge/edge-runtime.mjs", "src/edge/edge-start.mjs"],
-      "tests": ["test/edge.test.mjs", "test/edge-js.test.mjs", "test/edge-host.test.mjs", "test/edge-runtime.test.mjs"]
+      "tests": ["test/edge.test.mjs", "test/edge-js.test.mjs", "test/lasm-js-framing.test.mjs", "test/edge-host.test.mjs", "test/edge-runtime.test.mjs"]
     },
     {
       "name": "notices",
