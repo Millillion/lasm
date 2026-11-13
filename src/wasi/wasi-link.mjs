@@ -5,7 +5,8 @@
 //   1. clang compiles the WASI host (lasm_wasi.c, lasm_wasi_libc.c) and
 //      Lasm.Fetch's WASI glue (lasm_fetch_wasi.c; Fastly's host calls with
 //      --target fastly; Lasm.WASI.Http's and lasm_wasi_http.c with --target
-//      wasi-http) for wasm64, as the application objects are.
+//      wasi-http) for wasm64, as the application objects are, and mimalloc
+//      (lasm_mimalloc.c, mimalloc/) with smaller arenas than Emscripten's.
 //   2. wasm-ld links them with the objects, the standard-library archives of
 //      the Node runtime, the edge runtime's three archives and its
 //      single-threaded Emscripten system libraries. Lasm.JS's and Lasm.Fetch's
@@ -29,23 +30,45 @@ import { lowerAtomics, moduleImports, keepExports } from './lower-atomics.mjs';
 import { componentize, httpHandlerExport } from './wasi-component.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
+// Emscripten 6.0.9's mimalloc sources (system/lib/mimalloc), the ones lasm_mimalloc.c includes.
+export const mimallocSources = ['LICENSE', 'include/mimalloc.h', 'include/mimalloc-stats.h',
+  ...['atomic', 'bits', 'internal', 'prim', 'track', 'types'].map(name => `include/mimalloc/${name}.h`),
+  ...['alloc', 'alloc-aligned', 'alloc-override', 'alloc-posix', 'arena', 'arena-meta', 'bitmap', 'free', 'heap', 'init', 'libc', 'options',
+    'os', 'page', 'page-map', 'page-queue', 'random', 'stats', 'theap', 'threadlocal'].map(name => `src/${name}.c`),
+  'src/bitmap.h', 'src/prim/prim.c', 'src/prim/emscripten/prim.c'].map(file => `mimalloc/${file}`);
 export const wasiSources = ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
   'wasi-component.mjs', 'component/proxy-template.wasm', 'lasm_wasi_http_imports.h', '../../library/c/lasm_fastly.c',
-  '../../library/c/lasm_wasi_http_bindings.c'];
+  '../../library/c/lasm_wasi_http_bindings.c', 'lasm_mimalloc.c', ...mimallocSources];
 
 /** Link settings per WASI target, part of the program's cache identity. The
  * C shadow stack holds Lean's address-taken locals; recursion depth is
- * bounded by the engine's own Wasm stack first (docs/WASI.md). `arenaMiB`:
- * the size of mimalloc's arenas, which WebAssembly commits whole, so the
- * memory grows this much at a time; 8 MiB is mimalloc's smallest, Emscripten's
- * default 16 MiB (issue #246, lasm_wasi.c). */
-// EVIDENCE #246 (temporary): LASM_EVIDENCE_246_ARENA_MIB overrides the arena size, to compare in one CI job.
-const arenaMiB = Number(process.env.LASM_EVIDENCE_246_ARENA_MIB ?? 8);
+ * bounded by the engine's own Wasm stack first (docs/WASI.md). `mimalloc`:
+ * the size of mimalloc's arena slices (its smallest page) and of its arenas
+ * (issue #246). WebAssembly cannot reserve memory without growing into it, so
+ * an arena is committed whole and the memory grows an arena at a time: with
+ * Emscripten's libmimalloc (32 KiB slices) the smallest arena is 16 MiB, which
+ * cost Fastly programs (128 MB per instance) up to 16 MiB of their heap. With
+ * 8 KiB slices an object of more than one slice chunk (128 slices, 1 MiB) is
+ * huge, so the smallest arena is 2 MiB. mimalloc doubles the arena size
+ * every 8 arenas. */
+// EVIDENCE #246 (temporary): LASM_EVIDENCE_246_MIMALLOC=sysroot links Emscripten's libmimalloc instead, to compare in one CI job.
+const mimalloc = process.env.LASM_EVIDENCE_246_MIMALLOC === 'sysroot' ? null : Object.freeze({ sliceKiB: 8, arenaMiB: 2 });
 export const wasiLinkSettings = Object.freeze({
-  wasi: Object.freeze({ stackMiB: 8, initialMiB: 16, maximumMiB: 2048, arenaMiB, optimize: '-Oz' }),
-  fastly: Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, arenaMiB, optimize: '-Oz' }),
-  'wasi-http': Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, arenaMiB, optimize: '-Oz' }),
+  wasi: Object.freeze({ stackMiB: 8, initialMiB: 16, maximumMiB: 2048, mimalloc, optimize: '-Oz' }),
+  fastly: Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, mimalloc, optimize: '-Oz' }),
+  'wasi-http': Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, mimalloc, optimize: '-Oz' }),
 });
+/** clang's flags for mimalloc: emcc's code generation flags (`emcc -v`) and
+ * Emscripten's for its libmimalloc (tools/system_libs.py: Library and
+ * libmimalloc cflags, without -g and -Werror), with `settings.mimalloc`'s slice
+ * size and arena reserve (mimalloc divides it by 4 on WebAssembly). */
+export function mimallocFlags({ sliceKiB, arenaMiB }) {
+  return ['-fignore-exceptions', '-mllvm', '-combiner-global-alias-analysis=false', '-mllvm', '-disable-lsr',
+    '-O2', '-Wall', '-fno-unroll-loops', '-fno-builtin', '-Wno-unused-function', '-Wno-unused-but-set-variable', '-Wno-unused-variable',
+    '-Wno-deprecated-pragma', '-DEMMALLOC_NO_STD_EXPORTS', '-DMI_ENABLE_LARGE_PAGES=0', `-DMI_ARENA_SLICE_SHIFT=${Math.log2(sliceKiB * 1024)}`,
+    '-DMI_MAX_ALIGN_SIZE=8', `-DMI_DEFAULT_ARENA_RESERVE=${arenaMiB * 4 * 1024}`, '-DMI_MALLOC_OVERRIDE', '-DMI_DEBUG=0', '-DNDEBUG', '-DMI_LIBC_MUSL',
+    '-DMI_USE_BUILTIN_THREAD_POINTER'];
+}
 // The C sources and defines of each target.
 const targetSources = { wasi: ['lasm_fetch_wasi.c'], fastly: ['lasm_fetch_wasi.c'], 'wasi-http': ['lasm_wasi_http.c'] };
 const targetDefines = { wasi: [], fastly: ['-DLASM_WASI_FASTLY'], 'wasi-http': ['-DLASM_WASI_HTTP'] };
@@ -85,10 +108,21 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
   for (const source of ['lasm_wasi.c', 'lasm_wasi_libc.c', ...targetSources[target]]) {
     const object = join(out, source.replace(/\.c$/, '.o'));
     run('clang', ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
-      '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', `-DLASM_WASI_MAXIMUM_MEMORY=${settings.maximumMiB}`, `-DLASM_WASI_ARENA_MIB=${settings.arenaMiB}`, ...targetDefines[target],
+      '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', `-DLASM_WASI_MAXIMUM_MEMORY=${settings.maximumMiB}`, ...targetDefines[target],
       '-ffunction-sections', '-fdata-sections', '-ffile-prefix-map=' + here + '=lasm/', '-I', join(nodeRuntime.directory, 'include'), '-I', here,
       '-c', join(here, source), '-o', object]);
     objects.push(object);
+  }
+  // mimalloc in place of the edge runtime's libmimalloc.a, whose emmalloc and sbrk members it still uses.
+  if (settings.mimalloc) {
+    const include = join(here, 'mimalloc');
+    for (const [source, name] of [[join(here, 'lasm_mimalloc.c'), 'lasm_mimalloc.o'], [join(include, 'src/prim/prim.c'), 'lasm_mimalloc_prim.o']]) {
+      const object = join(out, name);
+      run('clang', ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
+        ...mimallocFlags(settings.mimalloc), '-ffile-prefix-map=' + here + '=lasm/', '-I', join(include, 'include'), '-I', join(include, 'src'),
+        '-c', source, '-o', object]);
+      objects.push(object);
+    }
   }
 
   // 2. The link. Lasm.JS's and Lasm.Fetch's JavaScript glue objects are replaced.

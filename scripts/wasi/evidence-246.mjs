@@ -1,5 +1,5 @@
 // EVIDENCE #246 (temporary; removed before merge): the WASI targets' memory and
-// speed with Emscripten's 16 MiB mimalloc arenas (before) and 8 MiB ones (after), in one job.
+// speed with Emscripten's libmimalloc (before; 16 MiB arenas) and Lasm's build of it (after; 2 MiB arenas), in one job.
 //   node scripts/wasi/evidence-246.mjs WORK TOOLS
 // TOOLS as scripts/wasi/wasi-ci.mjs's. Writes WORK/evidence-246.json and prints a summary.
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
@@ -12,16 +12,16 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const [work, tools] = process.argv.slice(2).map(p => resolve(p));
 const viceroy = join(tools, 'viceroy/viceroy'), wasmtimeDir = join(tools, 'wasmtime');
 mkdirSync(work, { recursive: true });
-const variants = { before: '16', after: '8' };
+const variants = { before: 'sysroot', after: 'lasm' };
 const out = { builds: {}, trivialFastly: {}, trivialWasi: {}, folioWasi: {}, folioFastly: {} };
 const save = () => writeFileSync(join(work, 'evidence-246.json'), JSON.stringify(out, null, 1) + '\n');
-const env = arenas => ({ ...headlessEnvironment(), LASM_EVIDENCE_246_ARENA_MIB: arenas, PATH: `${wasmtimeDir}:${process.env.PATH}` });
+const env = arenas => ({ ...headlessEnvironment(), LASM_EVIDENCE_246_MIMALLOC: arenas, PATH: `${wasmtimeDir}:${process.env.PATH}` });
 const passed = ['LASM_APPLICATION_RUNTIME', 'LASM_EDGE_RUNTIME', 'LASM_BUILD_JOBS'].filter(key => process.env[key])
   .map(key => `${key}=${key === 'LASM_BUILD_JOBS' ? process.env[key] : resolve(process.env[key])}`);
 const bounded = [join(root, 'scripts/full-lean/run-bounded.mjs'), '--', 'python3', join(root, 'scripts/full-lean/base-pages.py'), 'env', ...passed];
 function lasm(project, args, variant) {
   const started = Date.now();
-  execFileSync(process.execPath, [...bounded, `LASM_EVIDENCE_246_ARENA_MIB=${variants[variant]}`, process.execPath, join(root, 'bin/lasm.mjs'), ...args],
+  execFileSync(process.execPath, [...bounded, `LASM_EVIDENCE_246_MIMALLOC=${variants[variant]}`, process.execPath, join(root, 'bin/lasm.mjs'), ...args],
     { cwd: project, stdio: 'inherit', env: env(variants[variant]) });
   out.builds[`${variant} ${args.join(' ')}`] = (Date.now() - started) / 1000;
 }
@@ -89,7 +89,7 @@ for (const v of Object.keys(variants)) {
 }
 const node = (args, extra = {}) => {
   const started = performance.now();
-  const r = spawnSync(process.execPath, args, { cwd: folio, encoding: 'utf8', maxBuffer: 256 << 20, env: { ...env('8'), ...extra } });
+  const r = spawnSync(process.execPath, args, { cwd: folio, encoding: 'utf8', maxBuffer: 256 << 20, env: { ...env('lasm'), ...extra } });
   return { status: r.status, seconds: (performance.now() - started) / 1000, stdout: r.stdout, stderr: r.stderr };
 };
 const caseLines = text => text.split('\n').filter(l => /^(ok  |FAIL|skip) /.test(l));
