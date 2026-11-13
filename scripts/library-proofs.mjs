@@ -51,7 +51,7 @@ const proofModules = ['Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.P
 // test/models/cli-differential.mjs), the candidates (they must elaborate;
 // scripts/propositions.mjs checks their tests) and the proved propositions
 // (Spec.lean, each with its theorem in Theorems.lean, as a library's).
-const cliModules = ['Lasm.Cli.Model.Zip', 'Lasm.Cli.Model.CliArguments', 'Lasm.Cli.Model.Dev', 'Lasm.Cli.Model.EdgeInitializers', 'Lasm.Cli.Model.BuiltinModules', 'Lasm.Cli.Model.NodeHost', 'Lasm.Cli.Model.Platform', 'Lasm.Cli.Model.HandleTable', 'Lasm.Cli.Model.ProcessLauncher', 'Lasm.Cli.Model.WasiComponent',
+const cliModules = ['Lasm.Cli.Model.Zip', 'Lasm.Cli.Model.CliArguments', 'Lasm.Cli.Model.Dev', 'Lasm.Cli.Model.Init', 'Lasm.Cli.Model.LowerAtomics', 'Lasm.Cli.Model.Package', 'Lasm.Cli.Model.EdgeInitializers', 'Lasm.Cli.Model.BuiltinModules', 'Lasm.Cli.Model.NodeHost', 'Lasm.Cli.Model.Platform', 'Lasm.Cli.Model.HandleTable', 'Lasm.Cli.Model.LeanIOErrors', 'Lasm.Cli.Model.ProcessLauncher', 'Lasm.Cli.Model.WasiComponent',
   'Lasm.Cli.Interface', 'Lasm.Cli.Candidates', 'Lasm.Cli.Spec', 'Lasm.Cli.Theorems'];
 const cliRoot = join(root, 'verification', 'cli');
 const libraries = ['Lasm.UI', 'Lasm.RPC', 'Lasm.KV', 'Lasm.Fetch', 'Lasm.JS', 'Lasm.Serverless'];
