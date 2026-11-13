@@ -64,7 +64,7 @@ with your platform's own CLI (`vercel`, `netlify`, `func`, `gcloud`, `aws` or `s
 
 **WASI:** `npm run build:wasi` writes `wasi/main.wasm`, a standard WASI (preview 1)
 module with no JavaScript: `wasmtime run --dir . wasi/main.wasm`, `wasmer run`, or Node's `node:wasi`.
-A Lasm.Fetch handler answers one CGI request per run. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
 
 The image runs on any container platform (Docker, Kubernetes, Cloud Run, Fly.io,
 Railway, Render, Heroku); give it at least 512 MB of memory. Build on the

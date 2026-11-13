@@ -262,6 +262,7 @@ Bun has an open JSPI regression in 1.4.0–1.4.3 involving Wasm tail calls
 | Netlify Edge ([limits](https://docs.netlify.com/build/edge-functions/limits/)) | 20 MB compressed | 512 MB | 50 ms | — |
 | Deno Deploy ([limits](https://docs.deno.com/deploy/pricing_and_limits/)) | 1 GB | 512 MB | not stated | — |
 | Supabase Edge Functions ([limits](https://supabase.com/docs/guides/functions/limits)) | 20 MB (CLI bundle) | 256 MB | 2 s | — |
+| Fastly Compute ([limits](https://docs.fastly.com/products/compute-resource-limits), fetched 2026-11-12) | not in that table | "1M bytes stack, 128MB heap" per execution; Viceroy enforces 128 MiB too (issue #234) | 50 ms CPU per execution; 2 min run time (60 s on trial accounts) | — |
 
 Vercel now recommends migrating from its edge runtime to Node. Next.js 16.3
 dropped `runtime = 'edge'`.
