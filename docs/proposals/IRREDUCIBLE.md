@@ -72,7 +72,7 @@ This proposal covers Jordan's direction of 2026-11-09, items 2 to 4:
 | Link toolchain: a subset of Emscripten 6.0.9 (clang, wasm-ld, llvm-nm, llvm-objcopy, wasm-opt, wasm-emscripten-finalize, wasm-metadce) | 42–58 MB per platform, plus a 3.4 MB sysroot archive | C → Wasm, link, optimize | Not now. Its pieces can be narrowed (§3) and validated (§5). |
 | Full emsdk 6.0.9 | 264–654 MB | Only `LASM_LINK_DRIVER=emcc` or `node-compile` | **Make it maintainer-only.** Users never need it. |
 | Python 3.13.15 (python-build-standalone) | 22–35 MB | Only emsdk provisioning | Goes with emsdk. |
-| Edge runtime (`lean-4.35.0-edge-v4`) | 1.3 MB | Lean's runtime prebuilt for the edge and WASI | No. It could be built from source in CI and stay pinned. |
+| Edge runtime (`lean-4.35.0-edge-v5`) | 1.3 MB | Lean's runtime prebuilt for the edge and WASI | No. It could be built from source in CI and stay pinned. |
 | Wasmtime bundles | none (`wasmtime-bundles.json` is empty) | — | Remove the code that manages them (§3). |
 
 No managed Node, wasi-sdk or Zig is downloaded by the CLI. WASI is linked with
