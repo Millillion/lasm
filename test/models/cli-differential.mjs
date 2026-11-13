@@ -16,12 +16,12 @@ import assert from 'node:assert/strict';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { random } from '../helpers/property.mjs';
 import { buildTargets, closest, editDistance, parseLasmArguments, targetHint } from '../../src/cli-arguments.mjs';
 import { changedFiles, parseDevArguments } from '../../src/dev.mjs';
-import { parseInitArguments } from '../../src/init.mjs';
+import { lakeName, packageName, parseInitArguments, supabaseFunctionNameOf } from '../../src/init.mjs';
 import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
@@ -47,6 +47,9 @@ const hex = text => Buffer.from(text, 'utf8').toString('hex');
 /** Text with the characters a property is most likely to break on: escapes,
  * quotes, line ends, NUL, non-ASCII and astral characters. */
 const tricky = ['a', 'b', ' ', '\\', '"', "'", '\n', '\r', '\0', '\t', 'λ', '€', '😀', '$', '-', '='];
+/** Characters of directory and package names: the classes' edges, a scope,
+ * and characters whose lower case is ASCII (the Kelvin sign) or longer (İ). */
+const nameAlphabet = ['a', 'Z', '0', '9', '.', '_', '-', ' ', '@', '!', 'λ', '😀', '\u212a', '\u0130', 'é'];
 
 /** Unsigned LEB128, padded with `extra` continuation bytes (a valid,
  * non-minimal encoding, as LLVM writes in object files). */
@@ -453,6 +456,24 @@ export const models = [
     },
     input: ([v, m]) => ({ version: hex(v), minimum: hex(m) }),
     js: ([v, m]) => leanAtLeast(v, m),
+  },
+  {
+    name: 'packageName', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',
+    generate: r => '/tmp/' + r.string([...nameAlphabet, '/', '..'], 0, 70),
+    input: dir => hex(basename(resolve(dir)).toLowerCase()),
+    js: dir => hex(packageName(dir)),
+  },
+  {
+    name: 'lakeName', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',
+    generate: r => r.string(nameAlphabet, 0, 70),
+    input: s => hex(s),
+    js: s => hex(lakeName(s)),
+  },
+  {
+    name: 'supabaseFunctionNameOf', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',
+    generate: r => (r.next() < 0.3 ? '@' + r.string(nameAlphabet, 0, 4) + (r.next() < 0.8 ? '/' : '') : '') + r.string(nameAlphabet, 0, 70),
+    input: s => hex(String(s).toLowerCase()),
+    js: s => hex(supabaseFunctionNameOf(s)),
   },
   {
     name: 'pythonJsonString', source: 'src/link-driver/python.mjs', lean: 'Lasm.Cli.Model.Python',

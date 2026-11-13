@@ -379,12 +379,15 @@
         {
           "lean": "verification/cli/Lasm/Cli/Model/Init.lean",
           "functions": [
-            "parseInitArguments"
+            "parseInitArguments",
+            "packageName (after basename, resolve and toLowerCase)",
+            "lakeName",
+            "supabaseFunctionNameOf (after toLowerCase)"
           ],
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "`lasm init`: argument parsing is modelled (parse_known_or_refused proved); generated names are pure (candidate generated_names_valid) and remain to model; the rest writes templates"
+      "reason": "`lasm init`: argument parsing is modelled (parse_known_or_refused proved) and so are the generated names (generated_names_valid proved); the template texts (golden-tested, test/init-golden.test.mjs) and writing them remain"
     },
     "src/js-runtime.mjs": {
       "status": "exempt",

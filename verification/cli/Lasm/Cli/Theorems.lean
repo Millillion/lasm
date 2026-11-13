@@ -74,6 +74,177 @@ theorem response_file_round_trip : Spec.response_file_round_trip := by
       · simp
     · simp [hnil, List.map_map, Function.comp_def, unquote_quote]
 
+/-! ## `lasm init` names -/
+
+theorem replaceRuns_all (keep : Char → Bool) (r : Char) : ∀ l, ∀ c ∈ replaceRuns keep r l, keep c = true ∨ c = r
+  | [] => by simp [replaceRuns]
+  | c :: cs => by
+    intro x hx
+    rw [replaceRuns] at hx
+    split at hx
+    · rcases List.mem_cons.mp hx with rfl | hx
+      · left; assumption
+      · exact replaceRuns_all keep r cs x hx
+    · rcases List.mem_cons.mp hx with rfl | hx
+      · right; rfl
+      · exact replaceRuns_all keep r _ x hx
+termination_by l => l.length
+decreasing_by
+  all_goals
+    have := (List.dropWhile_sublist (l := cs) (fun d => !keep d)).length_le
+    simp only [List.length_cons]
+    omega
+
+theorem strip_sub {lead trail : Char → Bool} {l : List Char} {c : Char} (h : c ∈ strip lead trail l) : c ∈ l := by
+  simp only [strip, List.mem_reverse] at h
+  exact (List.dropWhile_sublist _).subset (List.mem_reverse.mp ((List.dropWhile_sublist _).subset h))
+
+theorem dropWhile_head {p : Char → Bool} {l : List Char} {c : Char} (h : (l.dropWhile p).head? = some c) : p c = false := by
+  have := List.head?_dropWhile_not p l
+  rw [h] at this; exact this
+
+theorem strip_last {lead trail : Char → Bool} {l : List Char} {c : Char} (h : (strip lead trail l).getLast? = some c) : trail c = false := by
+  simp only [strip, List.getLast?_reverse] at h
+  exact dropWhile_head h
+
+/-- What `strip` keeps first was not stripped at the front: it is the first
+character after the leading run, unless the trailing strip took everything. -/
+theorem strip_head {lead trail : Char → Bool} {l : List Char} {c : Char} (h : (strip lead trail l).head? = some c) : lead c = false := by
+  have hp : strip lead trail l <+: l.dropWhile lead := by
+    have := (List.dropWhile_suffix (l := (l.dropWhile lead).reverse) trail).reverse
+    simpa [strip] using this
+  obtain ⟨t, ht⟩ := hp
+  apply dropWhile_head (l := l)
+  rw [← ht, List.head?_append, h]; rfl
+
+theorem not_endsWith (l : List Char) (c : Char) (h : l.getLast? ≠ some c) : ¬ (String.ofList l).endsWith (String.singleton c) := by
+  simp [← String.endsWith_toSlice]
+  intro hs
+  obtain ⟨t, ht⟩ := hs
+  apply h
+  rw [← ht]; simp
+
+/-- The three facts a name's statement asks, read off its characters. -/
+theorem name_facts (l : List Char) (first every : Char → Bool) (last : Char)
+    (hh : (l.head?.map first) = some true) (ha : ∀ c ∈ l, every c = true) (hl : l.getLast? ≠ some last) :
+    ((String.ofList l).toList.head?.map first) = some true ∧ (String.ofList l).all every = true ∧
+      ¬ (String.ofList l).endsWith (String.singleton last) := by
+  refine ⟨by rw [String.toList_ofList]; exact hh, ?_, not_endsWith l last hl⟩
+  rw [String.all_bool_eq, String.toList_ofList, List.all_eq_true]; exact ha
+
+theorem packageName_valid (x : String) :
+    ((packageNameOf x).toList.head?.map fun c => c.isLower || c.isDigit) = some true ∧
+    (packageNameOf x).all (fun c => c.isLower || c.isDigit || c = '.' || c = '_' || c = '-') ∧
+    ¬ (packageNameOf x).endsWith "-" := by
+  simp only [packageNameOf]
+  split
+  · exact name_facts "lean-app".toList _ _ '-' (by decide) (by decide) (by decide)
+  · rename_i hne
+    generalize hn : strip (fun c => c = '.' || c = '_' || c = '-') (· = '-') (replaceRuns npmChar '-' x.toList) = name at hne
+    have hall : ∀ c ∈ name, npmChar c = true := by
+      intro c hc
+      rw [← hn] at hc
+      rcases replaceRuns_all npmChar '-' _ c (strip_sub hc) with h | h
+      · exact h
+      · subst h; decide
+    apply name_facts name _ _ '-'
+    · cases hh : name with
+      | nil => exact absurd hh hne
+      | cons c t =>
+        have hl := strip_head (lead := fun c => c = '.' || c = '_' || c = '-') (trail := (· = '-'))
+          (l := replaceRuns npmChar '-' x.toList) (c := c) (by rw [hn, hh]; rfl)
+        have hc := hall c (by simp [hh])
+        simp [npmChar] at hc hl ⊢
+        rcases hc with hc | hc | hc | hc | hc <;> simp_all
+    · intro c hc; simpa [npmChar] using hall c hc
+    · intro h
+      have := strip_last (lead := fun c => c = '.' || c = '_' || c = '-') (trail := (· = '-'))
+        (l := replaceRuns npmChar '-' x.toList) (by rw [hn]; exact h)
+      simp at this
+
+theorem lakeName_valid (x : String) :
+    ((lakeNameOf x).toList.head?.map Char.isAlpha) = some true ∧
+    (lakeNameOf x).all (fun c => c.isAlphanum || c = '_') ∧ ¬ (lakeNameOf x).endsWith "_" := by
+  simp only [lakeNameOf]
+  generalize hn : strip (· = '_') (· = '_') (replaceRuns lakeChar '_' x.toList) = id
+  have hall : ∀ c ∈ id, lakeChar c = true := by
+    intro c hc
+    rw [← hn] at hc
+    rcases replaceRuns_all lakeChar '_' _ c (strip_sub hc) with h | h
+    · exact h
+    · subst h; decide
+  have hlast : id.getLast? ≠ some '_' := by
+    intro h
+    have := strip_last (lead := (· = '_')) (trail := (· = '_')) (l := replaceRuns lakeChar '_' x.toList) (by rw [hn]; exact h)
+    simp at this
+  split
+  · rename_i hh
+    exact name_facts id _ _ '_' hh (fun c hc => by simpa [lakeChar] using hall c hc) hlast
+  · apply name_facts _ _ _ '_'
+    · rfl
+    · intro c hc
+      simp only [List.mem_append] at hc
+      rcases hc with hc | hc
+      · have happ : "app".toList = ['a', 'p', 'p'] := rfl
+        rw [happ] at hc; simp at hc; rcases hc with rfl | rfl <;> decide
+      · split at hc
+        · simp at hc
+        · rcases List.mem_cons.mp hc with rfl | hc
+          · decide
+          · simpa [lakeChar] using hall c hc
+    · split
+      · decide
+      · rename_i hne
+        have : ("app".toList ++ '_' :: id).getLast? = id.getLast? := by
+          rw [show "app".toList ++ '_' :: id = ("app".toList ++ ['_']) ++ id by simp, List.getLast?_append]
+          cases h : id.getLast? with
+          | none => exact absurd (List.getLast?_eq_none_iff.mp h) hne
+          | some c => rfl
+        rw [this]; exact hlast
+
+theorem supabaseName_valid (x : String) :
+    ((supabaseNameOf x).toList.head?.map Char.isLower) = some true ∧
+    (supabaseNameOf x).all (fun c => c.isLower || c.isDigit || c = '-') ∧
+    (supabaseNameOf x).length ≤ 54 := by
+  have facts : ∀ l : List Char, (l.head?.map Char.isLower) = some true → (∀ c ∈ l, supabaseChar c = true) → l.length ≤ 54 →
+      ((String.ofList l).toList.head?.map Char.isLower) = some true ∧
+      (String.ofList l).all (fun c => c.isLower || c.isDigit || c = '-') ∧ (String.ofList l).length ≤ 54 := by
+    intro l hh ha hl
+    refine ⟨by rw [String.toList_ofList]; exact hh, ?_, by rw [String.length_ofList]; exact hl⟩
+    rw [String.all_bool_eq, String.toList_ofList, List.all_eq_true]; intro c hc; simpa [supabaseChar] using ha c hc
+  simp only [supabaseNameOf]
+  generalize hn : (strip (· = '-') (· = '-') (replaceRuns supabaseChar '-' (dropScope x.toList))).take 54 = name0
+  have h0 : ∀ c ∈ name0, supabaseChar c = true := by
+    intro c hc
+    rw [← hn] at hc
+    rcases replaceRuns_all supabaseChar '-' _ c (strip_sub (List.mem_of_mem_take hc)) with h | h
+    · exact h
+    · subst h; decide
+  have l0 : name0.length ≤ 54 := by rw [← hn]; exact List.length_take_le _ _
+  generalize hn1 : (if name0 = [] then "lasm-app".toList else name0) = name1
+  have h1 : ∀ c ∈ name1, supabaseChar c = true := by
+    rw [← hn1]; split
+    · decide
+    · exact h0
+  have l1 : name1.length ≤ 54 := by rw [← hn1]; split <;> simp_all <;> decide
+  split
+  · rename_i hh; exact facts name1 hh h1 l1
+  · apply facts
+    · cases name1 <;> rfl
+    · intro c hc
+      rcases List.mem_append.mp (List.mem_of_mem_take hc) with hc | hc
+      · have : "lasm-".toList = ['l', 'a', 's', 'm', '-'] := rfl
+        rw [this] at hc; simp at hc; rcases hc with rfl | rfl | rfl | rfl | rfl <;> decide
+      · exact h1 c hc
+    · exact List.length_take_le _ _
+
+theorem generated_names_valid : Spec.generated_names_valid := by
+  intro dir s
+  obtain ⟨p1, p2, p3⟩ := packageName_valid (lowerBasename dir)
+  obtain ⟨l1, l2, l3⟩ := lakeName_valid s
+  obtain ⟨s1, s2, s3⟩ := supabaseName_valid (jsToLowerCase s)
+  exact ⟨p1, p2, p3, l1, l2, l3, s1, s2, s3⟩
+
 /-! ## Development server -/
 
 theorem lookup_of_mem {l : List (String × Option String)} {k : String} {h : Option String}

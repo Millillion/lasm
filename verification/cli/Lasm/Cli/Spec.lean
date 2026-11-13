@@ -109,6 +109,26 @@ def parse_known_or_refused : Prop :=
         (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
     | .error m => m.trimAscii.toString ≠ ""
 
+/-! ## `lasm init` names -/
+
+/-- **Generated names are valid npm, Lake and Supabase names.** Whatever the
+directory or text: the npm package name is lowercase letters, digits, `.`,
+`_` and `-`, starts with a letter or digit and does not end with `-`; the
+Lake name is an identifier of ASCII letters, digits and `_` that starts with
+a letter and does not end with `_`; the Supabase function name is lowercase
+letters, digits and `-`, starts with a letter and has at most 54 characters.
+Tested by: test/init-golden.test.mjs -/
+def generated_names_valid : Prop :=
+  ∀ dir s : String,
+    ((packageName dir).toList.head?.map fun c => c.isLower || c.isDigit) = some true ∧
+    (packageName dir).all (fun c => c.isLower || c.isDigit || c = '.' || c = '_' || c = '-') ∧
+    ¬ (packageName dir).endsWith "-" ∧
+    ((lakeName s).toList.head?.map Char.isAlpha) = some true ∧
+    (lakeName s).all (fun c => c.isAlphanum || c = '_') ∧ ¬ (lakeName s).endsWith "_" ∧
+    ((supabaseFunctionNameOf s).toList.head?.map Char.isLower) = some true ∧
+    (supabaseFunctionNameOf s).all (fun c => c.isLower || c.isDigit || c = '-') ∧
+    (supabaseFunctionNameOf s).length ≤ 54
+
 /-! ## Development server -/
 
 /-- **`changedFiles` reports exactly the files that differ.** Between two

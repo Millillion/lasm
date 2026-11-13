@@ -264,12 +264,17 @@ def initializerName (n : String) : Bool :=
 
 /-! ## `lasm init` names (src/init.mjs) -/
 
-/-- `packageName(directory)`. -/
-opaque packageName : String → String
-/-- `lakeName(name)`. -/
-opaque lakeName : String → String
-/-- `supabaseFunctionNameOf(packageName)`. -/
-opaque supabaseFunctionNameOf : String → String
+/-- Not Lasm's JavaScript: Node's `path.basename(path.resolve(directory))`,
+then JavaScript's `toLowerCase()`. -/
+opaque lowerBasename : String → String
+/-- Not Lasm's JavaScript: `String(value).toLowerCase()` (Unicode's mapping). -/
+opaque jsToLowerCase : String → String
+/-- `packageName(directory)`: modelled in Model/Init.lean. -/
+def packageName (directory : String) : String := packageNameOf (lowerBasename directory)
+/-- `lakeName(name)`: modelled in Model/Init.lean. -/
+def lakeName (name : String) : String := lakeNameOf name
+/-- `supabaseFunctionNameOf(packageName)`: modelled in Model/Init.lean. -/
+def supabaseFunctionNameOf (name : String) : String := supabaseNameOf (jsToLowerCase name)
 
 /-! ## Development server (src/dev.mjs, src/browser/static-server.mjs) -/
 

@@ -54,6 +54,9 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
   parsePackageArguments  ["<hex>", …]              → (the same)
   leanAtLeast    {"version": "<hex>", "minimum": "<hex>"}  → true | false
   pythonJsonString  "<hex>"                         → "<hex>"
+  packageName    "<hex of basename(resolve(directory)).toLowerCase()>"  → "<hex>"
+  lakeName       "<hex>"                            → "<hex>"
+  supabaseFunctionNameOf  "<hex of String(name).toLowerCase()>"  → "<hex>"
   comparePythonStrings  {"a": "<hex>", "b": "<hex>"}  → "<integer>"
   lowerAtomics   "<hex>"                            → {"bytes": "<hex>"} | {"error": "…"}
   moduleImports  "<hex>"                            → {"imports": [["<hex>", "<hex>", kind], …]} | {"error": "…"}
@@ -356,6 +359,9 @@ def answer (j : Json) : Except String Json := do
     return match intoPrefix (← bytesOf input).data.toList with
       | .ok (promise, rest) => Json.mkObj [("promise", toJson (toString promise)), ("input", toJson (hex ⟨rest.toArray⟩))]
       | .error e => Json.mkObj [("error", toJson e)]
+  | "packageName" => return ofText (packageNameOf (← text input))
+  | "lakeName" => return ofText (lakeNameOf (← text input))
+  | "supabaseFunctionNameOf" => return ofText (supabaseNameOf (← text input))
   | "pythonJsonString" => return ofText (pythonJsonString (← text input))
   | "comparePythonStrings" => return toJson (toString (comparePythonStrings (← text (← input.getObjVal? "a")) (← text (← input.getObjVal? "b"))))
   | "leanAtLeast" => return toJson (leanAtLeastModel (← text (← input.getObjVal? "version")) (← text (← input.getObjVal? "minimum")))

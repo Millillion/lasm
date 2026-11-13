@@ -1206,7 +1206,9 @@ C glues and the hosts (library/c/lasm_js_framing.h, compiled with
 test/models/js-framing-harness.c as is and with a 32-bit `size_t`, wasm32's;
 `encodeEvents`, `splitRequest` and `intoPrefix` of src/node-js.mjs and
 src/edge/edge-js.mjs), `pythonJsonString` and `comparePythonStrings`
-(src/link-driver/python.mjs), and the whole command-line parser,
+(src/link-driver/python.mjs), the names `lasm init` generates (`packageName`,
+`lakeName`, `supabaseFunctionNameOf`, src/init.mjs; Node's path functions and
+`toLowerCase` computed in JavaScript), and the whole command-line parser,
 src/cli-arguments.mjs (`parseLasmArguments`, `editDistance`, `closest`,
 `targetHint`; what it imports, the parsers of `lasm init`, `lasm dev` and
 `lasm package`, `existsSync` and the runtime, is a parameter of the model),
@@ -1215,7 +1217,7 @@ with `numbers_le64`,
 `replace_one_core_module`, `drops_only_component_type` and
 `schedule_reached_kept_first` and `builtin_closure` (the depth-first walks
 are correct on acyclic graphs), `run_args_kept`, `unknown_flag_refused`,
-`edit_distance_metric`, `closest_nearest_first`, `zip_deterministic`, `launcher_config_round_trip`, `handle_fresh_in_range`, `events_read_back`, `request_read_back`, `into_read_back`, `lean_at_least_lexicographic`, `json_string_printable`, `python_order_code_points` and `componentize_inverse`
+`edit_distance_metric`, `closest_nearest_first`, `zip_deterministic`, `launcher_config_round_trip`, `handle_fresh_in_range`, `events_read_back`, `request_read_back`, `into_read_back`, `lean_at_least_lexicographic`, `json_string_printable`, `python_order_code_points`, `generated_names_valid` and `componentize_inverse`
 (for any template of the shipped one's shape, which the test checks) proved. The
 differentials have found three bugs: `replaceCoreModule` spliced a section
 whose size was a padded LEB128 at the wrong offset, and
