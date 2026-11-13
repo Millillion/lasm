@@ -7,11 +7,11 @@
 // the JavaScript on everything this draws; what stays unproved is that the
 // two agree elsewhere.
 //
-//   node test/models/cli-differential.mjs [--runs N] [--seed S] [--lean PATH]
+//   node test/models/cli-differential.mjs [--runs N] [--seed S] [--lean PATH] [--only NAME,…]
 //
 // provisions the managed Lean 4.35.0 (or uses the `lean` at PATH), compiles
 // the model modules into a temporary directory and checks each model `runs`
-// times (default 2000). Run by the cli-models workflow (docs/CI.md).
+// times (default 2000; `--only` checks the named ones). Run by the cli-models workflow (docs/CI.md).
 import assert from 'node:assert/strict';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, rmSync, writeFileSync } from 'node:fs';
@@ -32,6 +32,8 @@ import { zip } from '../../src/serverless/zip.mjs';
 import { keepExports, lowerAtomics, moduleImports } from '../../src/wasi/lower-atomics.mjs';
 import { HandleTable } from '../../src/handle-table.mjs';
 import { encodeProcessConfiguration } from '../../src/process-launcher.mjs';
+import * as nodeJs from '../../src/node-js.mjs';
+import * as edgeJs from '../../src/edge/edge-js.mjs';
 import { deflateRawSync, crc32 } from 'node:zlib';
 import { compactInitializerWrappers, initializationSchedule } from '../../src/edge/edge-initializers.mjs';
 import { builtinModuleClosure } from '../../src/edge/builtin-modules.mjs';
@@ -271,6 +273,70 @@ function launcherConfig(r) {
   else if (roll < 0.33) bytes[r.int(0, 7)] ^= 1;
   return bytes;
 }
+/** Lasm.JS interop events (library/c/lasm_js_framing.h): kinds, 64-bit
+ * words and 32-bit functions at their edges, short payloads. */
+const word64 = r => r.pick([() => 0n, () => 2n ** 64n - 1n, () => BigInt(r.int(0, 2 ** 31)), () => BigInt(r.int(0, 2 ** 31)) * 2n ** 32n + BigInt(r.int(0, 2 ** 31))])();
+const fnOf = r => r.pick([() => 0, () => 0xffffffff, () => r.int(0, 2 ** 31), () => r.int(0, 9)])();
+const jsEvent = r => r.pick([
+  () => ({ kind: 1, promise: word64(r), failed: r.next() < 0.5, bytes: Uint8Array.from(randomBytes(r, 10)) }),
+  () => ({ kind: 2, call: word64(r), fn: fnOf(r), bytes: Uint8Array.from(randomBytes(r, 10)) }),
+  () => ({ kind: 3, fn: fnOf(r) })])();
+const eventJson = e => e.kind === 1 ? ['completion', String(e.promise), e.failed, hexOf(e.bytes)]
+  : e.kind === 2 ? ['call', String(e.call), e.fn, hexOf(e.bytes)] : ['release', e.fn];
+/** A queue: a few events, sometimes more than one batch holds. */
+const eventQueue = r => r.next() < 0.03 ? Array.from({ length: r.int(1020, 1030) }, () => ({ kind: 3, fn: r.int(0, 9) })) : r.array(r.int(0, 6), () => jsEvent(r));
+/** A batch: what the host writes, often broken (a byte changed, cut short,
+ * bytes added, a size near 2³², or random bytes). */
+function eventBatch(r) {
+  let bytes = [...nodeJs.encodeEvents(r.array(r.int(0, 4), () => jsEvent(r)))];
+  const roll = r.next();
+  if (roll < 0.15 && bytes.length) bytes[r.int(0, bytes.length - 1)] = r.int(0, 255);
+  else if (roll < 0.3) bytes = bytes.slice(0, r.int(0, bytes.length));
+  else if (roll < 0.4) bytes.push(...randomBytes(r, 6));
+  else if (roll < 0.5) {
+    const head = r.pick([[1, ...Array(8).fill(r.int(0, 255)), r.int(0, 1)], [2, ...Array(12).fill(r.int(0, 255))]]);
+    bytes.push(...head, ...[...Buffer.from(Uint32Array.of(2 ** 32 - r.int(1, 20)).buffer)], ...randomBytes(r, 6));
+  } else if (roll < 0.55) bytes = randomBytes(r, 24);
+  return bytes;
+}
+/** A request as the glue frames it, often broken. */
+function requestBytes(r) {
+  const ids = r.array(r.int(0, 4), () => fnOf(r));
+  let bytes = [...Buffer.from(Uint32Array.of(ids.length, ...ids).buffer), ...randomBytes(r, 10)];
+  const roll = r.next();
+  if (roll < 0.15) bytes = bytes.slice(0, r.int(0, bytes.length));
+  else if (roll < 0.3) bytes.splice(0, 4, ...Buffer.from(Uint32Array.of(r.pick([r.int(0, 8), 2 ** 32 - 1, 2 ** 30])).buffer));
+  else if (roll < 0.35) bytes = randomBytes(r, 12);
+  return bytes;
+}
+const settled = fn => { try { return fn(); } catch (error) { return { error: error.message }; } };
+const splitOf = split => bytes => settled(() => { const [released, payload] = split(Uint8Array.from(bytes)); return { released, payload: hexOf(payload) }; });
+const intoOf = into => bytes => settled(() => { const [promise, input] = into(bytes); return { promise: String(promise), input: hexOf(input) }; });
+/** library/c/lasm_js_framing.h, compiled with test/models/js-framing-harness.c
+ * as is and with a 32-bit size_t (wasm32's), and run on one input. */
+const framingHarness = {};
+function runFraming(width, args, input) {
+  if (!framingHarness.dir) framingHarness.dir = mkdtempSync(join(tmpdir(), 'lasm-framing-harness-'));
+  const path = join(framingHarness.dir, `framing-${width}`);
+  if (!framingHarness[width]) {
+    execFileSync(process.env.CC || 'cc', ['-O1', '-w', ...(width === 32 ? ['-DLASM_JS_SIZE32'] : []), '-o', path,
+      fileURLToPath(new URL('./js-framing-harness.c', import.meta.url))], { stdio: ['ignore', 'inherit', 'inherit'] });
+    framingHarness[width] = path;
+  }
+  const run = spawnSync(path, args, { input: Uint8Array.from(input), timeout: 10_000, maxBuffer: 1 << 20 });
+  if (run.status !== 0) throw new Error(`the framing harness (${width}-bit, ${args.join(" ")}) exited ${run.status ?? run.signal ?? run.error} on ${hexOf(input)}`);
+  return run.stdout.toString();
+}
+const readEventsC = width => bytes => {
+  const out = { events: [], fatal: null };
+  for (const line of runFraming(width, ['events'], bytes).split('\n').filter(Boolean)) {
+    const [kind, a, b, data = ''] = line.split(' ');
+    if (kind === 'fatal') { out.fatal = line.slice(6); break; }
+    out.events.push(kind === 'completion' ? [kind, a, Number(b) !== 0, data] : kind === 'call' ? [kind, a, Number(b), data] : [kind, Number(a)]);
+  }
+  return out;
+};
+
 /** native/process-launcher.c, compiled with its effects reported
  * (test/models/process-launcher-harness.c), and run on a configuration:
  * `null` where it refuses it (exit status 125), else what it would use. */
@@ -486,6 +552,66 @@ export const models = [
     js: runLauncher,
   },
   {
+    name: 'encodeEvents', source: 'src/node-js.mjs', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: eventQueue,
+    input: queue => queue.map(eventJson),
+    js: queue => { const q = [...queue]; const batch = nodeJs.encodeEvents(q); return { batch: hexOf(batch), left: q.length }; },
+  },
+  {
+    name: 'encodeEvents', source: 'src/edge/edge-js.mjs', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: eventQueue,
+    input: queue => queue.map(eventJson),
+    js: queue => { const q = [...queue]; const batch = edgeJs.encodeEvents(q); return { batch: hexOf(batch), left: q.length }; },
+  },
+  {
+    name: 'readEvents', source: 'library/c/lasm_js_framing.h', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: eventBatch,
+    input: bytes => hexOf(bytes),
+    js: readEventsC(64),
+  },
+  {
+    name: 'readEvents', source: 'library/c/lasm_js_framing.h (32-bit size_t)', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: eventBatch,
+    input: bytes => hexOf(bytes),
+    js: readEventsC(32),
+  },
+  {
+    name: 'frameRequest', source: 'library/c/lasm_js_framing.h', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: r => ({ released: r.array(r.int(0, 5), () => fnOf(r)), payload: randomBytes(r, 12) }),
+    input: ({ released, payload }) => ({ released, payload: hexOf(payload) }),
+    js: ({ released, payload }) => runFraming(64, ['request', ...released.map(String)], payload).trim(),
+  },
+  {
+    name: 'splitRequest', source: 'src/node-js.mjs', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: requestBytes,
+    input: bytes => hexOf(bytes),
+    js: splitOf(nodeJs.splitRequest),
+  },
+  {
+    name: 'splitRequest', source: 'src/edge/edge-js.mjs', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: requestBytes,
+    input: bytes => hexOf(bytes),
+    js: splitOf(edgeJs.splitRequest),
+  },
+  {
+    name: 'frameInto', source: 'library/c/lasm_js_framing.h', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: r => ({ promise: word64(r), input: randomBytes(r, 12) }),
+    input: ({ promise, input }) => ({ promise: String(promise), input: hexOf(input) }),
+    js: ({ promise, input }) => runFraming(64, ['into', String(promise)], input).trim(),
+  },
+  {
+    name: 'intoPrefix', source: 'src/node-js.mjs', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: r => randomBytes(r, 14),
+    input: bytes => hexOf(bytes),
+    js: bytes => intoOf(nodeJs.intoPrefix)(Buffer.from(bytes)),
+  },
+  {
+    name: 'intoPrefix', source: 'src/edge/edge-js.mjs', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: r => randomBytes(r, 14),
+    input: bytes => hexOf(bytes),
+    js: bytes => intoOf(edgeJs.intoPrefix)(Uint8Array.from(bytes)),
+  },
+  {
     name: 'HandleTable', source: 'src/handle-table.mjs', lean: 'Lasm.Cli.Model.HandleTable',
     generate: r => {
       const first = r.next() < 0.1 ? r.pick([0, -1, 0x7fffffff, 0x80000000]) : r.next() < 0.1 ? 0x7ffffffd : r.int(1, 6);
@@ -597,16 +723,17 @@ async function start(leanPath) {
       child.stdin.write(JSON.stringify(request) + '\n');
     }),
     stop: () => { child.stdin.end(); rmSync(out, { recursive: true, force: true }); if (parseDirectory) rmSync(parseDirectory, { recursive: true, force: true }); parseDirectory = undefined;
-      if (harness) rmSync(harness.dir, { recursive: true, force: true }); harness = undefined; },
+      if (harness) rmSync(harness.dir, { recursive: true, force: true }); harness = undefined;
+      if (framingHarness.dir) rmSync(framingHarness.dir, { recursive: true, force: true }); for (const key of Object.keys(framingHarness)) delete framingHarness[key]; },
   };
 }
 
 /** Checks every model `runs` times; resolves with the count per model. */
-export async function differential({ runs = 2000, seed = 1, lean } = {}) {
+export async function differential({ runs = 2000, seed = 1, lean, only } = {}) {
   const session = await start(lean);
   const counts = {};
   try {
-    for (const model of models) {
+    for (const model of models.filter(m => !only || only.includes(m.name))) {
       const gen = random(seed);
       for (let run = 0; run < runs; run++) {
         const value = model.generate(gen);
@@ -620,7 +747,7 @@ export async function differential({ runs = 2000, seed = 1, lean } = {}) {
             + `  input:      ${JSON.stringify(input)}\n  JavaScript: ${JSON.stringify(expected)}\n  Lean:       ${JSON.stringify(answer.ok)}`);
         }
       }
-      counts[model.name] = runs;
+      counts[models.filter(m => m.name === model.name).length > 1 ? `${model.name} (${model.source})` : model.name] = runs;
     }
   } finally {
     session.stop();
@@ -632,7 +759,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const option = (name, fallback) => { const i = process.argv.indexOf(name); return i > 0 ? process.argv[i + 1] : fallback; };
   const runs = Number(option('--runs', 2000)), seed = Number(option('--seed', 1));
   const started = Date.now();
-  const counts = await differential({ runs, seed, lean: option('--lean') });
+  const counts = await differential({ runs, seed, lean: option('--lean'), only: option('--only')?.split(',') });
   for (const [name, n] of Object.entries(counts)) console.log(`ok   ${name}: JavaScript and Lean model agree on ${n} inputs`);
   console.log(`${Object.keys(counts).length} models, seed ${seed} (${((Date.now() - started) / 1000).toFixed(1)} s)`);
 }

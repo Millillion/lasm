@@ -58,9 +58,9 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**17 proved propositions (164 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**20 proved propositions (176 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
-## Lasm.Cli (17)
+## Lasm.Cli (20)
 
 ### The command line
 
@@ -107,17 +107,25 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | --- | --- |
 | [`launcher_config_round_trip`](Lasm/Cli/Spec.lean#L199) | **The launcher configuration round-trips.** For options whose texts have no NUL byte and fit the format (under 4 GiB), `encodeProcessConfiguration` succeeds and the native launcher reads back exactly the flags, the three stdio flags, both directories, the command and arguments as its argument vector, and the environment's pairs in order (as UTF-8 bytes). Tested by: test/cli-helpers.test.mjs |
 
+### Lasm.JS's framing
+
+| Proposition | In plain English |
+| --- | --- |
+| [`events_read_back`](Lasm/Cli/Spec.lean#L217) | **A batch of interop events reads back.** Whatever events the host queues (within the format's bounds), `encodeEvents` writes the first 1024 and leaves the rest queued, and the C glue reads exactly those events, in order, from the batch; a batch followed by other bytes reads as its events followed by what those bytes read as (so the glue stops only at a malformed event of its own). Tested by: test/lasm-js-framing.test.mjs |
+| [`request_read_back`](Lasm/Cli/Spec.lean#L229) | **A request's released handles and payload read back.** For any handles (32-bit, fewer than 2³²) and any payload, the host splits the request the C glue frames into exactly those handles and that payload. Tested by: test/lasm-js-framing.test.mjs |
+| [`into_read_back`](Lasm/Cli/Spec.lean#L238) | **The promise a call settles reads back.** For any 64-bit Lean promise and any input, the host reads the promise and the input from the payload the C glue frames. Tested by: test/lasm-js-framing.test.mjs |
+
 ### Host handles
 
 | Proposition | In plain English |
 | --- | --- |
-| [`handle_fresh_in_range`](Lasm/Cli/Spec.lean#L217) | **A host handle is fresh and in range.** When `allocate` gives an id, the table did not hold it and now holds it, with the value, after every entry it had, and the range stays; the id lies in the range, and `#next` stays in it, whenever `#next` was in it (as the constructor starts it). Tested by: test/handle-table.test.mjs |
+| [`handle_fresh_in_range`](Lasm/Cli/Spec.lean#L248) | **A host handle is fresh and in range.** When `allocate` gives an id, the table did not hold it and now holds it, with the value, after every entry it had, and the range stays; the id lies in the range, and `#next` stays in it, whenever `#next` was in it (as the constructor starts it). Tested by: test/handle-table.test.mjs |
 
 ### Function packages
 
 | Proposition | In plain English |
 | --- | --- |
-| [`zip_deterministic`](Lasm/Cli/Spec.lean#L229) | **`zip` is deterministic.** The archive depends on the entries alone (no clock, no host state). Of the model, a Lean function, this holds by `rfl`; it is the assumption the model makes, which the test checks of the JavaScript. Tested by: test/serverless-zip.test.mjs |
+| [`zip_deterministic`](Lasm/Cli/Spec.lean#L260) | **`zip` is deterministic.** The archive depends on the entries alone (no clock, no host state). Of the model, a Lean function, this holds by `rfl`; it is the assumption the model makes, which the test checks of the JavaScript. Tested by: test/serverless-zip.test.mjs |
 <!-- END PROPOSITIONS -->
 
 ## Candidates
