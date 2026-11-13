@@ -34,6 +34,50 @@ def response_file_round_trip : Prop :=
       (text.toList.splitOn '\n').map String.ofList = lines ++ [""] ∧
       if args = [] then lines = [""] else lines.map unquote = args.map some
 
+/-- **Application arguments after `--` come back unchanged.** Running a
+`.lean` file with any of `--rebuild`, `--verbose` and `--release` before it
+parses as `run` of that file, with exactly the arguments after `--` (flags,
+empty strings and `--` included) and each option as given.
+Tested by: test/cli-parse.test.mjs -/
+def run_args_kept : Prop :=
+  ∀ (src : String) (flags args : List String), src.endsWith ".lean" → ¬ src.startsWith "-" →
+    (∀ f ∈ flags, f ∈ ["--rebuild", "--verbose", "--release"]) →
+    ∃ p, parseLasmArguments (flags ++ [src, "--"] ++ args) = .ok p ∧
+      p.command = "run" ∧ p.input = src ∧ p.args = args ∧
+      p.rebuild = flags.contains "--rebuild" ∧ p.verbose = flags.contains "--verbose" ∧
+      p.profile = (if flags.contains "--release" then "release" else "dev")
+
+/-- **Every unknown flag is refused by name.** A word that starts with `-`
+and is no option of `lasm build` or of running a program is refused, after
+a program and before one, with a message that names it.
+Tested by: test/cli-parse.test.mjs -/
+def unknown_flag_refused : Prop :=
+  ∀ flag : String, flag.startsWith "-" → flag ∉ knownFlags → valuedForm flag = false →
+    parseLasmArguments ["Main.lean", flag] = .error ("Unknown Lasm option: " ++ flag ++ ". Application arguments must follow --.") ∧
+    parseLasmArguments ["build", flag, "Main.lean"] = .error ("Unknown Lasm option: " ++ flag ++ ". Application arguments must follow --.")
+
+/-- **Edit distance is a metric bounded by the lengths.** It is zero exactly
+between equal words, symmetric, satisfies the triangle inequality, is the
+length from or to the empty word, and lies between the difference of the
+lengths and the larger length (lengths in characters: code points, as the
+JavaScript spreads each word before it measures it).
+Tested by: test/cli-parse.test.mjs -/
+def edit_distance_metric : Prop :=
+  ∀ a b c : String,
+    editDistance a a = 0 ∧ editDistance a "" = a.length ∧ editDistance "" a = a.length ∧
+    editDistance a b = editDistance b a ∧ editDistance a c ≤ editDistance a b + editDistance b c ∧
+    a.length - b.length ≤ editDistance a b ∧ b.length - a.length ≤ editDistance a b ∧
+    editDistance a b ≤ max a.length b.length ∧ (a ≠ b → 0 < editDistance a b)
+
+/-- **A suggestion is the nearest candidate, within reach.** For lowercase
+words, `closest` gives the first candidate at the least edit distance, when
+that distance is within its threshold (two edits, or a third of its length),
+and nothing otherwise.
+Tested by: test/cli-parse.test.mjs -/
+def closest_nearest_first : Prop :=
+  ∀ (word : String) (cs : List String), word.all Char.isLower → (∀ c ∈ cs, c.all Char.isLower) →
+    closest word cs = (nearestFirst (editDistance word) cs).filter fun c => editDistance word c ≤ threshold c
+
 /-! ## Development server -/
 
 /-- **`changedFiles` reports exactly the files that differ.** Between two

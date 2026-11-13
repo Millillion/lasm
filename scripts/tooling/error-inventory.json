@@ -1,7 +1,7 @@
 {
   "comment": "Why each CLI error message the error corpus does not print is not in it (scripts/tooling/error-inventory.mjs). Keys: file and the message's longest fixed piece.",
   "reasons": {
-    "src/cli-arguments.mjs: (dynamic message, line 145)": "The usage text (cliUsage, built from a variable): corpus cases no-arguments and build-without-source print it.",
+    "src/cli-arguments.mjs: (dynamic message, line 154)": "The usage text (cliUsage, built from a variable): corpus cases no-arguments and build-without-source print it.",
     "src/application-cli.mjs: (dynamic message, line 22)": "A helper program missing from the installation (missingMessage, a variable); not reachable with a complete npm install.",
     "src/init.mjs: (dynamic message, line 110)": "The usage text (initUsage, a variable): corpus cases init-without-directory and init-two-directories print it.",
     "src/package.mjs: (dynamic message, line 63)": "The usage text (packageUsage, a variable): corpus case package-two-builds prints it.",

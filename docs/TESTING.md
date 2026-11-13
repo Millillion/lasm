@@ -1192,15 +1192,24 @@ like the library's, and its test cites `Lasm.Cli.Spec.…`. Since 2026-11-11:
 `initializationSchedule` and `compactInitializerWrappers`
 (src/edge/edge-initializers.mjs), and `builtinModuleClosure`
 (src/edge/builtin-modules.mjs; the differential writes the builtin files in
-every import form, with decoys), with `numbers_le64`,
+every import form, with decoys), and the whole command-line parser,
+src/cli-arguments.mjs (`parseLasmArguments`, `editDistance`, `closest`,
+`targetHint`; what it imports, the parsers of `lasm init`, `lasm dev` and
+`lasm package`, `existsSync` and the runtime, is a parameter of the model),
+with `numbers_le64`,
 `changed_files_exact`, `response_file_round_trip`,
 `replace_one_core_module`, `drops_only_component_type` and
 `schedule_reached_kept_first` and `builtin_closure` (the depth-first walks
-are correct on acyclic graphs) proved. The
+are correct on acyclic graphs), `run_args_kept`, `unknown_flag_refused`,
+`edit_distance_metric` and `closest_nearest_first` proved. The
 differentials have found three bugs: `replaceCoreModule` spliced a section
 whose size was a padded LEB128 at the wrong offset, and
 `builtinModuleClosure` missed side-effect imports (`import './x.mjs'`) and
-read an import commented out after a statement as real. The fuzz
+read an import commented out after a statement as real. Modelling the
+parser found three more: `editDistance` counted UTF-16 units (an emoji was
+two edits, against `edit_distance_metric` over characters), suggestions
+lowercased with Unicode case mapping (the Kelvin sign matched `k`), and
+`--output=VALUE` refused a value with a line break (the pattern's `.`). The fuzz
 targets `serverless-http`, `lasm-js-wire` and `ui-decode` are the model
 differentials of src/serverless/, the Lasm.JS codec and the UI applier's
 reading.

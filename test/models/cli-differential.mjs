@@ -14,12 +14,16 @@
 // times (default 2000). Run by the cli-models workflow (docs/CI.md).
 import assert from 'node:assert/strict';
 import { execFileSync, spawn } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { random } from '../helpers/property.mjs';
-import { changedFiles } from '../../src/dev.mjs';
+import { buildTargets, closest, editDistance, parseLasmArguments, targetHint } from '../../src/cli-arguments.mjs';
+import { changedFiles, parseDevArguments } from '../../src/dev.mjs';
+import { parseInitArguments } from '../../src/init.mjs';
+import { jsRuntime } from '../../src/js-runtime.mjs';
+import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
 import { responseFile } from '../../src/platform.mjs';
 import { replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
@@ -95,11 +99,90 @@ function builtins(r) {
   return { files, imports: names.map((name, i) => ['lasm:' + name, imports[i].map(j => 'lasm:' + j)]), specifiers: r.next() < 0.5 ? specifiers.reverse() : specifiers };
 }
 
+/** Words for the command line: case, astral characters, the Kelvin sign
+ * (which Unicode lowercases to k), and the targets and commands they near. */
+const letters = ['a', 'b', 'e', 'd', 'K', 'B', 'λ', 'Λ', '😀', '\u212a', '-', '.', '/', ' '];
+const word = r => r.next() < 0.5 ? r.string(letters, 0, 7)
+  : r.pick([...buildTargets, 'cloudflare', 'CloudFlare', 'wrkers', 'lambda-edg', 'BUILD', 'biuld', 'cach', 'Hello', 'λ', 'wor\u212aer']);
+
+/** A command line: a soup of the parser's words, or a well-formed command
+ * with options in any order and form. */
+function commandLine(r) {
+  const source = () => r.pick(['Main.lean', 'App/Main.lean', 'x y.lean', 'λ.lean', 'b.json', 'Hello', 'biuld', 'Main', '', 'a\nb.lean', word(r)]);
+  const value = () => r.pick([...buildTargets, 'none', 'jspi', 'out dir', '', '--rebuild', 'a\nb', word(r)]);
+  if (r.next() < 0.4) {
+    const pool = ['build', 'run', 'init', 'dev', 'package', 'editor', 'cache', 'repair', 'version', '-v', '--version', '--rebuild', '--verbose',
+      '--dev', '--release', '--allow-dev', '--bundler', '--help', '-h', '--', '--target', '--suspend', '--output', '--target=', '--suspend=jspi',
+      '--x', '-q', '-'];
+    return r.array(r.int(0, 7), () => r.next() < 0.6 ? r.pick(pool) : r.next() < 0.5 ? source() : value());
+  }
+  const groups = [[source()]];
+  if (r.next() < 0.2) groups.push([source()]);
+  for (const flag of ['--rebuild', '--verbose', '--dev', '--release', '--allow-dev', '--bundler']) if (r.next() < 0.2) groups.push([flag]);
+  for (const flag of ['--target', '--suspend', '--output']) if (r.next() < 0.4) groups.push([flag, value()]);
+  const shuffled = groups.sort(() => r.next() - 0.5).map(g => g.length === 2 && r.next() < 0.5 ? [`${g[0]}=${g[1]}`] : g).flat();
+  const command = r.pick([['build'], ['build'], ['run'], []]);
+  return [...command, ...shuffled, ...(r.next() < 0.2 ? ['--', ...r.array(r.int(0, 3), () => word(r))] : [])];
+}
+
+/** `existsSync` reads the working directory: the parser runs in one that
+ * holds Hello.lean and λ.lean. */
+let parseDirectory;
+const inParseDirectory = fn => {
+  if (!parseDirectory) {
+    parseDirectory = mkdtempSync(join(tmpdir(), 'lasm-cli-arguments-'));
+    for (const file of ['Hello.lean', 'λ.lean']) writeFileSync(join(parseDirectory, file), '');
+  }
+  const cwd = process.cwd();
+  process.chdir(parseDirectory);
+  try { return fn(); } finally { process.chdir(cwd); }
+};
+const outcome = fn => {
+  try { return { value: fn() }; } catch (error) { return { error: error.message }; }
+};
+const hexFields = ['args', 'output', 'input'];
+const parsedJson = parsed => Object.fromEntries(Object.entries(parsed).map(([k, v]) =>
+  [k, k === 'args' ? v.map(hex) : hexFields.includes(k) ? hex(v) : v]));
+const delegates = { init: parseInitArguments, dev: parseDevArguments, package: parsePackageArguments };
+
 /** Each model: the JavaScript module and function it mirrors, the Lean
  * module, a generator, the JavaScript's answer and the request's input,
  * both in the runner's encoding. Each module's entry in
  * verification/models.json names its model and this differential. */
 export const models = [
+  {
+    name: 'editDistance', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
+    generate: r => [r.string(letters, 0, 9), r.string(letters, 0, 9)],
+    input: ([a, b]) => ({ a: hex(a), b: hex(b) }),
+    js: ([a, b]) => editDistance(a, b),
+  },
+  {
+    name: 'closest', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
+    generate: r => ({ word: word(r), candidates: r.next() < 0.3 ? buildTargets : r.array(r.int(0, 5), () => word(r)) }),
+    input: ({ word, candidates }) => ({ word: hex(word), candidates: candidates.map(hex) }),
+    js: ({ word, candidates }) => { const c = closest(word, candidates); return c === undefined ? null : hex(c); },
+  },
+  {
+    name: 'targetHint', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
+    generate: word,
+    input: hex,
+    js: value => hex(targetHint(value)),
+  },
+  {
+    name: 'parseLasmArguments', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
+    generate: commandLine,
+    input: argv => ({ argv: argv.map(hex), existing: inParseDirectory(() => argv.map(t => t + '.lean').filter(existsSync)).map(hex), runtime: jsRuntime }),
+    js: argv => {
+      const result = inParseDirectory(() => outcome(() => parseLasmArguments(argv)));
+      // `lasm init`, `lasm dev` and `lasm package` are their modules' parsers:
+      // the model checks only that the JavaScript hands the rest to them.
+      if (Object.hasOwn(delegates, argv[0])) {
+        assert.deepEqual(result, inParseDirectory(() => outcome(() => delegates[argv[0]](argv.slice(1)))), `parseLasmArguments(${JSON.stringify(argv)}) is not its delegate's`);
+        return { error: hex('delegated:' + argv[0]) };
+      }
+      return result.error !== undefined ? { error: hex(result.error) } : { parsed: parsedJson(result.value) };
+    },
+  },
   {
     name: 'numbers', source: 'src/node-host.mjs', lean: 'Lasm.Cli.Model.NodeHost',
     generate: r => r.array(r.int(0, 5), () => r.pick([
@@ -240,7 +323,7 @@ async function start(leanPath) {
       waiting.push({ resolve, reject });
       child.stdin.write(JSON.stringify(request) + '\n');
     }),
-    stop: () => { child.stdin.end(); rmSync(out, { recursive: true, force: true }); },
+    stop: () => { child.stdin.end(); rmSync(out, { recursive: true, force: true }); if (parseDirectory) rmSync(parseDirectory, { recursive: true, force: true }); parseDirectory = undefined; },
   };
 }
 

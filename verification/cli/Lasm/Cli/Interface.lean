@@ -28,6 +28,7 @@ the vocabulary the statements share, exact and complete.
 -/
 import Lean.Data.Json
 import Lasm.Cli.Model.BuiltinModules
+import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.NodeHost
@@ -91,36 +92,47 @@ def utf16 (s : String) : List Nat :=
 
 /-! ## The command line (src/cli-arguments.mjs, src/platform.mjs) -/
 
-/-- What `parseLasmArguments` returns on success: a plain object. -/
-opaque Parsed : Type
+-- `parseLasmArguments`, `editDistance`, `closest`, `buildTargets` and what
+-- `parseLasmArguments` returns (`Parsed`, a structure of the object's
+-- fields) are modelled in Model/CliArguments.lean. The model takes what the
+-- module imports as a parameter; here it is the constants below.
 
-/-- `parsed.command`. -/
-opaque Parsed.command : Parsed → String
-/-- `parsed.input` (`""` when absent). -/
-opaque Parsed.input : Parsed → String
-/-- `parsed.args`, the application arguments. -/
-opaque Parsed.args : Parsed → List String
-/-- `parsed.rebuild`. -/
-opaque Parsed.rebuild : Parsed → Bool
-/-- `parsed.verbose`. -/
-opaque Parsed.verbose : Parsed → Bool
-/-- `parsed.profile`: `"dev"` or `"release"`. -/
-opaque Parsed.profile : Parsed → String
-/-- `parsed.target` (`""` when absent). -/
-opaque Parsed.target : Parsed → String
-/-- `parsed.template` (`lasm init`; `""` when absent). -/
-opaque Parsed.template : Parsed → String
-/-- `parsed.deploy` (`lasm init`). -/
-opaque Parsed.deploy : Parsed → List String
-/-- `parsed.outputs` of `lasm dev`: each output's target and input. -/
-opaque Parsed.outputs : Parsed → List (String × String)
+/-- `existsSync(path)` (node:fs): whether a file exists, in the working
+directory the CLI runs in. -/
+opaque fileExists : String → Bool
+/-- `jsRuntime` (src/js-runtime.mjs): `"node"`, `"bun"` or `"deno"`. -/
+opaque jsRuntime : String
+/-- `parseInitArguments(tokens)` (src/init.mjs). -/
+opaque parseInitArguments : List String → Except String Parsed
+/-- `parseDevArguments(tokens)` (src/dev.mjs). -/
+opaque parseDevArguments : List String → Except String Parsed
+/-- `parsePackageArguments(tokens)` (src/package.mjs). -/
+opaque parsePackageArguments : List String → Except String Parsed
 
 /-- `parseLasmArguments(argv)`: the parse, or the message of the `Error` it
 throws. -/
-opaque parseLasmArguments : List String → Except String Parsed
+def parseLasmArguments (argv : List String) : Except String Parsed :=
+  parseLasmArgumentsWith ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩ argv
 
-/-- `buildTargets` (src/cli-arguments.mjs). -/
-opaque buildTargets : List String
+/-- `parsed.input` (`""` when absent). -/
+def Parsed.input (p : Parsed) : String := p.input?.getD ""
+/-- `parsed.args`, the application arguments (`[]` when absent). -/
+def Parsed.args (p : Parsed) : List String := p.args?.getD []
+/-- `parsed.rebuild` (`false` when absent). -/
+def Parsed.rebuild (p : Parsed) : Bool := p.rebuild?.getD false
+/-- `parsed.verbose` (`false` when absent). -/
+def Parsed.verbose (p : Parsed) : Bool := p.verbose?.getD false
+/-- `parsed.profile`: `"dev"` or `"release"` (`""` when absent). -/
+def Parsed.profile (p : Parsed) : String := p.profile?.getD ""
+/-- `parsed.target` (`""` when absent). -/
+def Parsed.target (p : Parsed) : String := p.target?.getD ""
+/-- `parsed.template` (`lasm init`; `""` when absent). -/
+def Parsed.template (p : Parsed) : String := p.template?.getD ""
+/-- `parsed.deploy` (`lasm init`). -/
+def Parsed.deploy (p : Parsed) : List String := p.deploy?.getD []
+/-- `parsed.outputs` of `lasm dev`: each output's target and input. -/
+def Parsed.outputs (p : Parsed) : List (String × String) := p.outputs?.getD []
+
 /-- `templates` of `lasm init` (src/init.mjs), by name. -/
 opaque templates : List String
 /-- `deployTargets` of `lasm init` (src/init.mjs), by name. -/
@@ -156,11 +168,8 @@ def joined : List String → List String
   | [f, v] => if f ∈ valuedFlags then [f ++ "=" ++ v] else [f, v]
   | o => o
 
-/-- `editDistance(a, b)`: the Levenshtein distance. -/
-opaque editDistance : String → String → Nat
-
-/-- `closest(word, candidates)`. -/
-opaque closest : String → List String → Option String
+-- `editDistance(a, b)` (the Levenshtein distance between code points) and
+-- `closest(word, candidates)`: modelled in Model/CliArguments.lean.
 
 /-- How far a suggestion may be: at least 2 edits, else a third of its length. -/
 def threshold (c : String) : Nat := max 2 (c.length / 3)
