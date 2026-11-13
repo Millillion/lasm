@@ -250,11 +250,15 @@ test('the process launcher configuration: header, flags, strings and environment
     assert.throws(() => encodeProcessConfiguration({ env: {}, stdioFlags: [0, 0, 0], ...options }), { message: 'NUL in private process configuration' });
 });
 
-// Proposition: Lasm.Cli.Candidates.launcher_config_round_trip
-//   ∀ o : LaunchOptions,
-//     (∀ s ∈ o.command :: o.args ++ o.env.flatMap (fun (k, v) => [k, v]) ++ o.directory.toList ++ o.requestedCwd.toList, '\x00' ∉ s.toList) →
-//     (o.env.map (·.1)).Nodup → o.stdio.length = 3 →
-//     launcherReads (encodeProcessConfiguration o) = some (o.command :: o.args, o.env, o.directory, o.requestedCwd, o.stdio)
+// Proposition: Lasm.Cli.Spec.launcher_config_round_trip
+//   ∀ o : LaunchOptions, o.envBytes = none → o.stdioFlags.length = 3 →
+//     (∀ s ∈ o.command :: o.args ++ o.env.flatMap (fun (k, v) => [k, v]) ++ o.directory.toList ++ o.requestedCwd.toList,
+//       0 ∉ utf8Bytes s ∧ (utf8Bytes s).length < 0xffffffff) →
+//     o.args.length + 1 < 4294967296 → o.env.length < 4294967296 →
+//     ∃ b, encodeProcessConfiguration o = .ok b ∧ launcherRead b.data.toList = some
+//       { flags := (if o.directoryFd.isNone then 0 else 1) + (if o.inheritProcessCwd then 2 else 0) + (if o.setsid then 4 else 0),
+//         stdio := o.stdioFlags.map uint32Of, directory := o.directory.map utf8Bytes, requestedCwd := o.requestedCwd.map utf8Bytes,
+//         argv := (o.command :: o.args).map utf8Bytes, env := o.env.map fun (k, v) => (utf8Bytes k, utf8Bytes v) }
 test('the process launcher configuration round-trips any command, arguments and environment', async () => {
   const { encodeProcessConfiguration } = await import('../src/process-launcher.mjs');
   const alphabet = ['a', 'Z', ' ', '=', 'λ', '/', '\n', '日'];
@@ -262,14 +266,16 @@ test('the process launcher configuration round-trips any command, arguments and 
     command: r.string(alphabet, 1, 8), args: r.array(r.int(0, 5), () => r.string(alphabet, 0, 8)),
     env: Object.fromEntries(r.array(r.int(0, 4), () => [r.string(['A', 'B', '_'], 1, 4), r.string(alphabet, 0, 6)])),
     directory: r.int(0, 1) ? r.string(alphabet, 1, 6) : undefined, requestedCwd: r.int(0, 1) ? r.string(alphabet, 0, 6) : undefined,
-    stdioFlags: [r.int(0, 9), r.int(0, 9), r.int(0, 9)],
+    stdioFlags: [r.int(0, 9), r.int(0, 9), r.int(-2, 9)],
+    ...(r.int(0, 1) ? { directoryFd: r.int(0, 5) } : {}), inheritProcessCwd: r.int(0, 1) === 1, setsid: r.int(0, 1) === 1,
   }), options => {
     const decoded = decode(encodeProcessConfiguration(options));
+    assert.equal(decoded.flags, (options.directoryFd === undefined ? 0 : 1) + (options.inheritProcessCwd ? 2 : 0) + (options.setsid ? 4 : 0));
     assert.deepEqual(decoded.argv, [options.command, ...options.args]);
     assert.deepEqual(decoded.env, Object.entries(options.env));
     assert.equal(decoded.directory, options.directory);
     assert.equal(decoded.requestedCwd, options.requestedCwd);
-    assert.deepEqual(decoded.stdio, options.stdioFlags);
+    assert.deepEqual(decoded.stdio, options.stdioFlags.map(f => f >>> 0));
   });
 });
 

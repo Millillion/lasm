@@ -48,8 +48,17 @@
       "reason": "POSIX signal delivery through a pipe; tested by the signal tests on Linux and macOS"
     },
     "native/process-launcher.c": {
-      "status": "pending",
-      "reason": "reads the launcher configuration that src/process-launcher.mjs writes: model the format (candidate launcher_config_round_trip)"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/ProcessLauncher.lean",
+          "differential": "test/models/cli-differential.mjs",
+          "functions": [
+            "main's reading of the configuration (number, string, read_exact)"
+          ]
+        }
+      ],
+      "reason": "its reading of the configuration is modelled, and the differential runs the compiled C (effects reported instead of performed, test/models/process-launcher-harness.c); what it then does (stdio flags, chdir, setsid, execvp) is I/O, tested end to end by test/process-launcher.test.mjs"
     },
     "src/application-binding-check.mjs": {
       "status": "pending",
@@ -194,8 +203,21 @@
       "reason": "`lasm cache repair`; orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
     },
     "src/cli-arguments.mjs": {
-      "status": "pending",
-      "reason": "the command-line parser: pure (candidates run_args_kept, build_options_commute, unknown_flag_refused, parse_known_or_refused, edit_distance_metric, closest_nearest_first)"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/CliArguments.lean",
+          "functions": [
+            "asciiLower",
+            "editDistance",
+            "closest",
+            "targetHint",
+            "parseLasmArguments"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "the whole parser is modelled (run_args_kept, unknown_flag_refused, edit_distance_metric, closest_nearest_first proved); what it imports is a parameter: the parsers of lasm init, dev and package are their modules, existsSync and jsRuntime the environment. Candidates build_options_commute and parse_known_or_refused remain"
     },
     "src/dev-build-service.mjs": {
       "status": "exempt",
@@ -312,8 +334,17 @@
       "reason": "a timer thread writing to the terminal"
     },
     "src/handle-table.mjs": {
-      "status": "pending",
-      "reason": "host handle IDs in the positive i32 range: a small pure allocator"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/HandleTable.lean",
+          "functions": [
+            "HandleTable (constructor, allocate, and the Map's set and delete)"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "the allocator is modelled; handle_fresh_in_range proved"
     },
     "src/init.mjs": {
       "status": "pending",
@@ -599,8 +630,17 @@
       "reason": "Lean's runtime primitives on this host: their meaning is native Lean's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md)"
     },
     "src/process-launcher.mjs": {
-      "status": "pending",
-      "reason": "the launcher's configuration format: pure (candidate launcher_config_round_trip)"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/ProcessLauncher.lean",
+          "differential": "test/models/cli-differential.mjs",
+          "functions": [
+            "encodeProcessConfiguration"
+          ]
+        }
+      ],
+      "reason": "the configuration writer is modelled (launcher_config_round_trip proved with the reader's model); nativeProcessLauncher finds and verifies the shipped binary (files and hashes, test/cli-helpers.test.mjs)"
     },
     "src/sdk-repairs.mjs": {
       "status": "exempt",
@@ -666,8 +706,17 @@
       "reason": "the Vercel entry: forwards to lasm-server.mjs, whose mapping is modelled"
     },
     "src/serverless/zip.mjs": {
-      "status": "pending",
-      "reason": "a deterministic ZIP writer: pure (candidates zip_reads_back, zip_deterministic)"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/Zip.lean",
+          "functions": [
+            "zip"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "the writer is modelled byte for byte, with node:zlib (deflateRawSync, crc32) a parameter; zip_deterministic proved; zip_reads_back stays a candidate (its ZIP reader is the test's, an outside oracle)"
     },
     "src/system-git.mjs": {
       "status": "exempt",
@@ -728,18 +777,22 @@
       "reason": "WASI builds; orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
     },
     "src/wasi/wasi-component.mjs": {
-      "status": "pending",
+      "status": "modelled",
       "models": [
         {
           "lean": "verification/cli/Lasm/Cli/Model/WasiComponent.lean",
           "functions": [
             "replaceCoreModule",
+            "placeholderModule",
+            "componentize",
+            "makeTemplate",
+            "extractCore",
             "withoutComponentType"
           ],
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "`replaceCoreModule` and `withoutComponentType` are modelled (`componentize` and `makeTemplate` are `replaceCoreModule` applied to the template and the placeholder); `extractCore`, the inverse, is not yet (candidate componentize_inverse)"
+      "reason": "every function is modelled (the template, read from component/proxy-template.wasm by default, is an argument); replace_one_core_module, drops_only_component_type and componentize_inverse proved"
     },
     "src/wasi/wasi-link.mjs": {
       "status": "exempt",
