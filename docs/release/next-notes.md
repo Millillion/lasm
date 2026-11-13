@@ -25,6 +25,25 @@
   Conduit and Folio do: Workers through the default export, Deno with
   `Deno.serve`, Bun with `Bun.serve`. Its request type and embedded files are
   code inside the app (`examples/ledger/Server/`).
+- **Tandem builds with 0.7.0 and no longer uses `Lasm.Fetch`.** Workers serves
+  through the default export, Deno with `Deno.serve` and `Deno.upgradeWebSocket`,
+  Bun with `Bun.serve` and its WebSocket handlers, Node with Tandem's own
+  `node:http` server and the `ws` package, as before. Its request type and
+  embedded files are code inside the app (`examples/tandem/Server/`).
+
+## Templates
+
+- **`lasm init --template fetch` no longer uses `Lasm.Fetch` except on Node.**
+  `Main.lean` is a handler on the web's `Request` and `Response`
+  (`Lasm.JS.Web`), served as the program's default export on Bun, Deno,
+  Cloudflare Workers and the other edge targets; Node keeps `Lasm.Fetch`'s
+  Node server until Lasm's Node server lands. Fastly, wasi:http and WASI each
+  get their own program with the same routes on that platform's own
+  interface: `--deploy fastly` adds `Fastly.lean` (`Lasm.Fastly`),
+  `--deploy wasi-http` and `--deploy spin` add `WasiHttp.lean`
+  (`Lasm.WASI.Http`), and `--deploy wasi` adds `Cgi.lean` (a CGI program in
+  Lean's `IO`); their `build:<target>` scripts build them. Existing projects
+  keep building: `Lasm.Fetch` still ships.
 
 ## Fixes
 
