@@ -35,6 +35,7 @@
     {
       "name": "edge-glue",
       "description": "Edge runtime glue: the edge host, Lasm.JS on the edge, the runtime loader and start-up",
+      "keepInSandbox": ["/library"],
       "mutate": ["src/edge/edge-host.mjs", "src/edge/edge-js.mjs", "src/edge/edge-runtime.mjs", "src/edge/edge-start.mjs"],
       "tests": ["test/edge.test.mjs", "test/edge-js.test.mjs", "test/edge-host.test.mjs", "test/edge-runtime.test.mjs"]
     },
@@ -90,6 +91,7 @@
     {
       "name": "application-output",
       "description": "Build outputs: the build driver, output layout, native pieces, npm dependencies, the runtime, support files, the build lock, link metadata, native bundles, lasm package",
+      "keepInSandbox": ["/library"],
       "mutate": ["src/application-build.mjs", "src/application-output.mjs", "src/application-native.mjs", "src/application-npm.mjs", "src/application-runtime.mjs", "src/application-support.mjs", "src/application-lock.mjs", "src/native-bundle.mjs", "src/package.mjs", "src/js-runtime.mjs"],
       "tests": ["test/application-output.test.mjs", "test/application-native.test.mjs", "test/application-npm.test.mjs", "test/application-runtime.test.mjs", "test/application-support.test.mjs", "test/application-lock.test.mjs", "test/native-application-bundle.test.mjs", "test/serverless.test.mjs", "test/edge.test.mjs", "test/link-driver-pipeline.test.mjs", "test/build-cache-files.test.mjs", "test/build-progress.test.mjs", "test/cli-error-messages.test.mjs", "test/package.test.mjs", "test/js-runtime.test.mjs", "test/application-build.test.mjs"]
     },
@@ -102,6 +104,7 @@
     {
       "name": "edge-build",
       "description": "Edge builds: platform outputs, builtin modules, initializers, the Emscripten pre-JS (not edge-library.js: its Emscripten preprocessor lines are not JavaScript Stryker can parse)",
+      "keepInSandbox": ["/library"],
       "mutate": ["src/edge/edge-build.mjs", "src/edge/builtin-modules.mjs", "src/edge/edge-initializers.mjs", "src/edge/edge-pre.js"],
       "tests": ["test/edge.test.mjs", "test/browser.test.mjs", "test/notices.test.mjs", "test/platform-output.test.mjs", "test/edge-link-plan.test.mjs", "test/application-link-plan.test.mjs", "test/edge-js.test.mjs", "test/edge-pre.test.mjs", "test/edge-initializers.test.mjs", "test/builtin-modules.test.mjs", "test/edge-entries.test.mjs", "test/edge-output.test.mjs", "test/edge-cache.test.mjs"]
     },
