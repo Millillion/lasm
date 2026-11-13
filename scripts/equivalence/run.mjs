@@ -39,10 +39,15 @@ const env = headlessEnvironment(process.env, { LASM_EDITOR: '0', LASM_EQ_VALUE: 
 const project = join(work, app);
 if (!existsSync(project)) {
   if (app === 'fetch-template') {
-    const r = spawnSync(process.execPath, [lasm, 'init', project, '--template', 'fetch'], { env, encoding: 'utf8' });
+    const r = spawnSync(process.execPath, [lasm, 'init', project, '--template', 'fetch', '--deploy', 'wasi-http'], { env, encoding: 'utf8' });
     if (r.status !== 0) throw new Error(`lasm init failed: ${r.stdout}${r.stderr}`);
   } else if (app === 'fetch-example') cpSync(join(root, 'examples/fetch'), project, { recursive: true });
   else throw new Error(`unknown app ${app}`);
+  // The npm packages the app binds (the fetch template's Node server: @hono/node-server).
+  if (JSON.parse(readFileSync(join(project, 'package.json'), 'utf8')).dependencies) {
+    const npm = spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['install', '--omit=dev', '--no-audit', '--no-fund'], { cwd: project, env, encoding: 'utf8', shell: process.platform === 'win32' });
+    if (npm.status !== 0) throw new Error(`npm install failed: ${npm.stdout}${npm.stderr}`);
+  }
 }
 
 // ---------- targets: build flags and how each serves on a port ----------
@@ -55,7 +60,9 @@ const TARGETS = {
   workers: { build: ['--target', 'workers'], serve: port => [tools.wrangler, ['dev', '--cwd', 'workers', '--port', String(port), '--ip', '127.0.0.1', '--var', 'LASM_EQ_VALUE:same everywhere', '--show-interactive-dev-session=false'], { WRANGLER_SEND_METRICS: 'false' }] },
 };
 function build(target) {
-  const args = [lasm, 'build', 'Main.lean', ...TARGETS[target].build];
+  // The fetch template's wasi:http program is WasiHttp.lean (its own interface); every other target builds Main.lean.
+  const entry = target === 'wasi-http' && existsSync(join(project, 'WasiHttp.lean')) ? 'WasiHttp.lean' : 'Main.lean';
+  const args = [lasm, 'build', entry, ...TARGETS[target].build];
   const [cmd, ...rest] = wrap.length ? [...wrap, process.execPath, ...args] : [process.execPath, ...args];
   const r = spawnSync(cmd, rest, { cwd: project, env, encoding: 'utf8', timeout: 40 * 60_000 });
   if (r.status !== 0) throw new Error(`lasm build --target ${target} failed:\n${(r.stdout + r.stderr).slice(-4000)}`);
