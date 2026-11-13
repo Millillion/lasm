@@ -159,6 +159,37 @@ const shortString = 64, shortKey = 32, keyCache = new Array(1024);
 const empty = new Uint8Array(0);
 const concat = parts => { let n = 0; for (const p of parts) n += p.length; const r = new Uint8Array(n); let o = 0; for (const p of parts) { r.set(p, o); o += p.length; } return r; };
 
+// ---- the framing (library/c/lasm_js_framing.h; Lean model:
+// verification/cli/Lasm/Cli/Model/JsFraming.lean), as src/node-js.mjs's ----
+
+/** Takes up to 1024 events from the front of `queue` and writes them as the batch op 209 replies with. */
+export function encodeEvents(queue) {
+  const w = new Writer();
+  for (let i = 0; i < 1024 && queue.length; i++) {
+    const event = queue.shift();
+    w.u8(event.kind);
+    if (event.kind === 1) { w.u64(event.promise); w.u8(event.failed ? 1 : 0); w.bytes(event.bytes); }
+    else if (event.kind === 2) { w.u64(event.call); w.u32(event.fn); w.bytes(event.bytes); }
+    else w.u32(event.fn);
+  }
+  return w.result();
+}
+/** A request, [u32 count][count × u32 released handle][payload]: the handles and the payload. */
+export function splitRequest(request) {
+  const view = new DataView(request.buffer, request.byteOffset, request.byteLength);
+  if (request.length < 4) throw failure('Malformed Lasm.JS request');
+  const count = view.getUint32(0, true);
+  if (request.length < 4 + 4 * count) throw failure('Malformed Lasm.JS request');
+  const released = [];
+  for (let i = 0; i < count; i++) released.push(view.getUint32(4 + 4 * i, true));
+  return [released, request.subarray(4 + 4 * count)];
+}
+/** The payload of a call that settles a Lean promise (flag 16), [u64 promise][input]: the promise and the input. */
+export function intoPrefix(bytes) {
+  if (bytes.length < 8) throw failure('Malformed Lasm.JS request');
+  return [new DataView(bytes.buffer, bytes.byteOffset, 8).getBigUint64(0, true), bytes.subarray(8)];
+}
+
 /** modules: { specifier: module namespace } (from the generated entry's imports). */
 export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {}) {
   const values = new Map();
@@ -216,17 +247,7 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
 
   const events = [];
   const push = event => { events.push(event); notify(); };
-  function takeEvents() {
-    const w = new Writer();
-    for (let i = 0; i < 1024 && events.length; i++) {
-      const event = events.shift();
-      w.u8(event.kind);
-      if (event.kind === 1) { w.u64(event.promise); w.u8(event.failed ? 1 : 0); w.bytes(event.bytes); }
-      else if (event.kind === 2) { w.u64(event.call); w.u32(event.fn); w.bytes(event.bytes); }
-      else w.u32(event.fn);
-    }
-    return w.result();
-  }
+  const takeEvents = () => encodeEvents(events);
   const pendingCalls = new Map();
   let nextCall = 1n, stopped = null;
   // The Lean instance stopped (edge-pre.js): settle every waiting call.
@@ -303,16 +324,12 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
   }
   function dispatch(op, id, arg, request) {
     try {
-      const view = new DataView(request.buffer, request.byteOffset, request.byteLength);
-      if (request.length < 4) throw failure('Malformed Lasm.JS request');
-      const count = view.getUint32(0, true);
-      if (request.length < 4 + 4 * count) throw failure('Malformed Lasm.JS request');
-      for (let i = 0; i < count; i++) if (values.delete(view.getUint32(4 + 4 * i, true))) stats.released++;
-      let bytes = request.subarray(4 + 4 * count);
+      const [released, payload] = splitRequest(request);
+      for (const id of released) if (values.delete(id)) stats.released++;
+      let bytes = payload;
       let into;
       if ((op === 205 || op === 214) && Number(arg) & 16) {
-        if (bytes.length < 8) throw failure('Malformed Lasm.JS request');
-        into = new DataView(bytes.buffer, bytes.byteOffset, 8).getBigUint64(0, true); bytes = bytes.subarray(8);
+        [into, bytes] = intoPrefix(bytes);
       }
       switch (op) {
       // Protocol 1; the second word (1) tells Lean it runs in an edge build (Lasm.JS.onEdge).

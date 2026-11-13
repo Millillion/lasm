@@ -52,10 +52,12 @@ extern lean_object *lean_io_promise_resolve(lean_object *value, lean_object *pro
    thread runs the program's `main`. */
 extern _Bool lasm_main_thread_is_current(void);
 
+#include "lasm_js_framing.h"
+
 typedef struct { int failed; uint8_t *bytes; size_t size; } reply_t;
 /* Handles of freed Values. Instead of one host call per finalizer, they travel
    ahead of the next Lasm.JS host call: every request is
-   [u32 count][count × u32 handle][payload]. */
+   [u32 count][count × u32 handle][payload] (lasm_js_framing.h). */
 #define RELEASE_CAPACITY 1024
 static uint32_t released[RELEASE_CAPACITY];
 static size_t released_count;
@@ -80,12 +82,9 @@ static uint8_t *build_request(uint8_t *small, const uint8_t *input, size_t lengt
     if (count) memcpy(ids, released, count * sizeof(uint32_t));
     released_count = 0;
     pthread_mutex_unlock(&released_mutex);
-    size_t prefix = 4 + (size_t)count * 4;
-    *size = prefix + length;
+    *size = lasm_js_request_size(count, length);
     uint8_t *request = *size <= SMALL_REQUEST ? small : (uint8_t *)malloc(*size + 1);
-    memcpy(request, &count, 4);
-    if (count) memcpy(request + 4, ids, (size_t)count * 4);
-    if (length) memcpy(request + prefix, input, length);
+    lasm_js_frame_request(request, ids, count, input, length);
     return request;
 }
 static reply_t host_call(uint32_t op, uint32_t handle, uint64_t arg, const uint8_t *input, size_t length) {
@@ -162,8 +161,6 @@ LEAN_EXPORT uint32_t lasm_js_value_handle(b_lean_obj_arg v) { return (uint32_t)(
 static lean_object *dispatcher; /* UInt8 -> UInt32 -> UInt64 -> ByteArray -> IO Unit */
 /* Set once, by the first thread that becomes the poller (a started thread or `main`). */
 static int poller_claimed;
-static uint64_t read_u64(const uint8_t *p) { uint64_t v; memcpy(&v, p, 8); return v; }
-static uint32_t read_u32(const uint8_t *p) { uint32_t v; memcpy(&v, p, 4); return v; }
 static void fatal(const char *message) { lean_internal_panic(message); }
 static int claim_poller(void) {
     int expected = 0;
@@ -175,40 +172,25 @@ static void interop_loop(void) {
         if (batch.failed) fatal("Lasm.JS: the interop event queue failed");
         size_t offset = 0;
         while (offset < batch.size) {
-            uint8_t kind = batch.bytes[offset++];
-            if (kind == 1) {
-                if (offset + 13 > batch.size) fatal("Lasm.JS: malformed completion");
-                lean_object *promise = (lean_object *)(uintptr_t)read_u64(batch.bytes + offset);
-                int failed = batch.bytes[offset + 8];
-                uint32_t size = read_u32(batch.bytes + offset + 9);
-                offset += 13;
-                if (offset + size > batch.size) fatal("Lasm.JS: malformed completion");
+            lasm_js_event_t event;
+            const char *malformed = lasm_js_read_event(batch.bytes, batch.size, &offset, &event);
+            if (malformed) fatal(malformed);
+            if (event.kind == 1) {
+                lean_object *promise = (lean_object *)(uintptr_t)event.word;
                 /* Except String ByteArray: error = constructor 0, ok = constructor 1. */
-                lean_object *value = lean_alloc_ctor(failed ? 0 : 1, 1, 0);
-                lean_ctor_set(value, 0, failed ? lean_mk_string_from_bytes((const char *)batch.bytes + offset, size)
-                                               : bytes_of(batch.bytes + offset, size));
-                offset += size;
+                lean_object *value = lean_alloc_ctor(event.failed ? 0 : 1, 1, 0);
+                lean_ctor_set(value, 0, event.failed ? lean_mk_string_from_bytes((const char *)event.data, event.size)
+                                                     : bytes_of(event.data, event.size));
                 lean_dec(lean_io_promise_resolve(value, promise));
                 lean_dec(promise);
-            } else if (kind == 2 || kind == 3) {
-                uint64_t call = 0; uint32_t fn, size = 0;
-                if (kind == 2) {
-                    if (offset + 16 > batch.size) fatal("Lasm.JS: malformed callback");
-                    call = read_u64(batch.bytes + offset); fn = read_u32(batch.bytes + offset + 8);
-                    size = read_u32(batch.bytes + offset + 12); offset += 16;
-                } else {
-                    if (offset + 4 > batch.size) fatal("Lasm.JS: malformed release");
-                    fn = read_u32(batch.bytes + offset); offset += 4;
-                }
-                if (offset + size > batch.size) fatal("Lasm.JS: malformed callback");
-                lean_object *args = bytes_of(batch.bytes + offset, size);
-                offset += size;
+            } else {
+                lean_object *args = bytes_of(event.data, event.size);
                 lean_object *d = __atomic_load_n(&dispatcher, __ATOMIC_ACQUIRE);
                 if (!d) fatal("Lasm.JS: a JavaScript event arrived before Lasm.JS started");
                 lean_inc(d);
-                lean_object *r = lean_apply_5(d, lean_box(kind), lean_box_uint32(fn), lean_box_uint64(call), args, lean_io_mk_world());
+                lean_object *r = lean_apply_5(d, lean_box(event.kind), lean_box_uint32(event.fn), lean_box_uint64(event.word), args, lean_io_mk_world());
                 lean_dec(r);
-            } else fatal("Lasm.JS: unknown interop event");
+            }
         }
         free(batch.bytes);
     }
@@ -291,9 +273,7 @@ LEAN_EXPORT lean_obj_res lasm_js_call_into(b_lean_obj_arg promise, uint32_t op, 
     if (op != 205 && op != 214) return lean_io_result_mk_error(lean_mk_io_user_error(lean_mk_string("Invalid Lasm.JS operation")));
     size_t length = lean_sarray_size(input);
     uint8_t *request = (uint8_t *)malloc(8 + length);
-    uint64_t pointer = (uint64_t)(uintptr_t)promise;
-    memcpy(request, &pointer, 8);
-    if (length) memcpy(request + 8, lean_sarray_cptr(input), length);
+    lasm_js_frame_into(request, (uint64_t)(uintptr_t)promise, lean_sarray_cptr(input), length);
     start_poller(); /* the host resolves p through the poller */
     lean_inc(promise); lean_mark_mt(promise);
     reply_t r = host_call(op, handle, arg | 16, request, 8 + length);
