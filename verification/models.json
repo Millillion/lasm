@@ -395,7 +395,16 @@
     },
     "src/lean-io-errors.mjs": {
       "status": "pending",
-      "reason": "the IO error policy and version comparison: pure (candidate lean_at_least_lexicographic)"
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/LeanIOErrors.lean",
+          "functions": [
+            "leanAtLeast"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "leanAtLeast is modelled (candidate lean_at_least_lexicographic stated over the model, not yet proved); the IO error policy remains to model"
     },
     "src/link-driver/compile.mjs": {
       "status": "exempt",

@@ -25,6 +25,7 @@ import { parseInitArguments } from '../../src/init.mjs';
 import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
+import { leanAtLeast } from '../../src/lean-io-errors.mjs';
 import { responseFile } from '../../src/platform.mjs';
 import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 import { zip } from '../../src/serverless/zip.mjs';
@@ -374,6 +375,17 @@ export const models = [
     generate: r => ({ bytes: atomicModule(r), keep: r.array(r.int(0, 2), () => r.pick(['run', 'keep', 'memory', '_start', 'λ'])) }),
     input: ({ bytes, keep }) => ({ bytes: hexOf(bytes), keep: keep.map(hex) }),
     js: ({ bytes, keep }) => attempt(() => keepExports(Uint8Array.from(bytes), name => keep.includes(name))),
+  },
+  {
+    name: 'leanAtLeast', source: 'src/lean-io-errors.mjs', lean: 'Lasm.Cli.Model.LeanIOErrors',
+    generate: r => {
+      const part = () => r.pick([() => String(r.int(0, 40)), () => '0' + r.int(0, 9), () => '', () => 'rc' + r.int(0, 3), () => String(r.int(0, 999999999999999))])();
+      const version = () => r.array(r.int(1, 4), part).join('.') + (r.next() < 0.3 ? '-rc' + r.int(0, 3) : '') + (r.next() < 0.05 ? '-x-y' : '');
+      const v = version();
+      return [v, r.next() < 0.2 ? v : version()];
+    },
+    input: ([v, m]) => ({ version: hex(v), minimum: hex(m) }),
+    js: ([v, m]) => leanAtLeast(v, m),
   },
   {
     name: 'numbers', source: 'src/node-host.mjs', lean: 'Lasm.Cli.Model.NodeHost',

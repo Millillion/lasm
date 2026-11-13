@@ -52,6 +52,7 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
   parseInitArguments  ["<hex>", …]                 → (the same)
   parseDevArguments   {"tokens": ["<hex>", …], "runtime": "node"}  → (the same)
   parsePackageArguments  ["<hex>", …]              → (the same)
+  leanAtLeast    {"version": "<hex>", "minimum": "<hex>"}  → true | false
   lowerAtomics   "<hex>"                            → {"bytes": "<hex>"} | {"error": "…"}
   moduleImports  "<hex>"                            → {"imports": [["<hex>", "<hex>", kind], …]} | {"error": "…"}
   keepExports    {"bytes": "<hex>", "keep": ["<hex>", …]}  → {"bytes": "<hex>"} | {"error": "…"}
@@ -65,6 +66,7 @@ import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.HandleTable
+import Lasm.Cli.Model.LeanIOErrors
 import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.LowerAtomics
 import Lasm.Cli.Model.NodeHost
@@ -309,6 +311,7 @@ def answer (j : Json) : Except String Json := do
     let runtime ← (← input.getObjVal? "runtime").getStr?
     let env : ArgumentsEnv := ⟨fun f => existing.contains f, runtime, delegated "init", delegated "dev", delegated "package"⟩
     return ofResult (parseLasmArgumentsWith env (← texts (← input.getObjVal? "argv")))
+  | "leanAtLeast" => return toJson (leanAtLeastModel (← text (← input.getObjVal? "version")) (← text (← input.getObjVal? "minimum")))
   | "lowerAtomics" => return ofBytes (LowerAtomics.lowerAtomics (← bytesOf input))
   | "moduleImports" =>
     return match LowerAtomics.moduleImports utf8Name (← bytesOf input) with

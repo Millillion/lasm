@@ -32,6 +32,7 @@ import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.HandleTable
+import Lasm.Cli.Model.LeanIOErrors
 import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.LowerAtomics
 import Lasm.Cli.Model.NodeHost
@@ -279,8 +280,8 @@ opaque staticServe : String → String → Nat × Option String
 
 /-! ## The Node host (src/lean-io-errors.mjs, src/node-host.mjs) -/
 
-/-- `leanAtLeast(version, minimum)`. -/
-opaque leanAtLeast : String → String → Bool
+/-- `leanAtLeast(version, minimum)`: modelled in Model/LeanIOErrors.lean. -/
+def leanAtLeast (version minimum : String) : Bool := leanAtLeastModel version minimum
 
 /-- `major.minor.patch`. -/
 def versionText (v : Nat × Nat × Nat) : String := s!"{v.1}.{v.2.1}.{v.2.2}"
