@@ -145,18 +145,30 @@ test('static server: paths outside the root are refused; directories, fallback a
 
 // Proposition: Lasm.Cli.Candidates.static_inside_root
 //   ∀ root path : String,
-//     (staticServe root path).1 ∈ [200, 403, 404] ∧
+//     (staticServe root path).1 ∈ [200, 400, 403, 404] ∧
 //     ∀ f, (staticServe root path).2 = some f → f.startsWith (root ++ "/")
 test('static server: no request path reaches a file outside the root', async () => {
   const { parent, root } = site();
   const server = await startStaticServer(root, { fallback: null });
   try {
     const paths = [];
-    forAll(gen => '/' + gen.array(gen.int(1, 5), () => gen.pick(['..', '%2e%2e', '.', 'nested', 'secret.txt', 'dist-secret', 'key.txt', 'dist', 'index.html'])).join(gen.pick(['/', '%2f', '%2F'])), path => { paths.push(path); }, { runs: 150 });
+    forAll(gen => '/' + gen.array(gen.int(1, 5), () => gen.pick(['..', '%2e%2e', '.', 'nested', 'secret.txt', 'dist-secret', 'key.txt', 'dist', 'index.html', '%', '%zz', '%e2%82'])).join(gen.pick(['/', '%2f', '%2F'])), path => { paths.push(path); }, { runs: 150 });
     for (const path of paths) {
       const answer = await raw(server, path);
       assert.doesNotMatch(answer.body.toString(), /outside/, path);
-      assert.ok([200, 403, 404].includes(answer.status), `${path}: ${answer.status}`);
+      assert.ok([200, 400, 403, 404].includes(answer.status), `${path}: ${answer.status}`);
+    }
+  } finally { await server.close(); rmSync(parent, { recursive: true, force: true }); }
+});
+
+test('static server: a path whose percent-encoding is malformed is a bad request', async () => {
+  const { parent, root } = site();
+  const server = await startStaticServer(root, { fallback: null });
+  try {
+    for (const path of ['/%', '/%zz', '/a%2', '/%e2%82', '/nested/%c0']) {
+      const answer = await raw(server, path);
+      assert.equal(answer.status, 400, path);
+      assert.equal(answer.body.toString(), 'Bad request: the path is not valid percent-encoded UTF-8\n', path);
     }
   } finally { await server.close(); rmSync(parent, { recursive: true, force: true }); }
 });
