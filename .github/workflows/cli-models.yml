@@ -5,7 +5,8 @@ name: CLI models
 # and the shipped JavaScript on the same generated inputs, 2000 per function,
 # and fails on any difference. The proofs about the models are checked by
 # library-proofs.yml. On any change to the JavaScript (src/), the models or
-# the differential. Free runner only.
+# the differential, and on the native launcher whose reading it checks
+# (compiled with the system C compiler). Free runner only.
 on:
   workflow_dispatch:
   pull_request:
@@ -15,6 +16,7 @@ on:
       - 'verification/cli/**'
       - 'test/models/**'
       - 'test/helpers/property.mjs'
+      - 'native/process-launcher.c'
   push:
     branches: [main]
     paths:
@@ -23,6 +25,7 @@ on:
       - 'verification/cli/**'
       - 'test/models/**'
       - 'test/helpers/property.mjs'
+      - 'native/process-launcher.c'
 permissions:
   contents: read
 concurrency:

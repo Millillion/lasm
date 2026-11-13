@@ -19,11 +19,24 @@ const moduleHeader = [0, 0x61, 0x73, 0x6d, 1, 0, 0, 0];
 const coreOf = (g, size = g.pick([0, 1, 100, 115, 116, 117, 127, 128, 129, 16370, 16383, 16384, 20000])) =>
   Uint8Array.from([...moduleHeader, ...section(0, [...name('p'), ...Array.from({ length: size }, () => g.int(0, 255))])]);
 
-// Proposition: Lasm.Cli.Candidates.componentize_inverse
-//   ∀ core : ByteArray, core.data.toList.take 8 = moduleHeader →
-//     extractCore (componentize core) = some core ∧ makeTemplate (componentize core) core = some proxyTemplate
+const startsWith = (a, prefix) => a.length >= prefix.length && prefix.every((x, i) => x === a[i]);
+test('the shipped template is of the shape componentize_inverse assumes', () => {
+  // Minimal section sizes (it is its sections, re-encoded), and one core module that starts with the placeholder.
+  const sections = componentSections(template).map(s => ({ id: s.id, body: [...template.subarray(s.start, s.end)] }));
+  assert.deepEqual([...template], [...componentHeader, ...sections.flatMap(s => section(s.id, s.body))]);
+  assert.equal(sections.filter(s => s.id === 1 && startsWith(s.body, [...placeholderModule()])).length, 1);
+});
+// Proposition: Lasm.Cli.Spec.componentize_inverse
+//   ∀ (before after : List (UInt8 × List UInt8)) (tail core : List UInt8),
+//     (∀ s ∈ before ++ after, s.1 = 1 → ¬ placeholderModule <+: s.2 ∧ ¬ core <+: s.2) →
+//     let template := bytes (componentHeader ++ (before ++ (1, placeholderModule ++ tail) :: after).flatMap fun s => sectionOf s.1 s.2)
+//     ∃ component, componentize (bytes core) template = .ok component ∧
+//       extractCore component template = .ok (bytes core) ∧ makeTemplate component (bytes core) = .ok template
 test('componentize and extractCore are inverse, and the template is made back', () => {
+  const otherModules = componentSections(template).filter(s => s.id === 1).map(s => template.subarray(s.start, s.end))
+    .filter(body => !startsWith(body, placeholderModule()));
   forAll(g => coreOf(g), core => {
+    assert.ok(otherModules.every(body => !startsWith(body, core)));
     const component = componentize(core);
     assert.deepEqual(extractCore(component), core);
     assert.deepEqual(makeTemplate(component, core), template);
@@ -31,6 +44,21 @@ test('componentize and extractCore are inverse, and the template is made back', 
     assert.equal(component.length - template.length, core.length - placeholderModule().length
       + leb(core.length + suffix()).length - leb(placeholderModule().length + suffix()).length);
   }, { runs: 40 });
+  // Small templates: other sections and core modules before and after the placeholder's.
+  forAll(g => {
+    const core = [...moduleHeader, ...Array.from({ length: g.int(0, 6) }, () => g.int(0, 255))];
+    const other = () => g.next() < 0.5 ? { id: g.pick([0, 2, 6, 7]), body: Array.from({ length: g.int(0, 5) }, () => g.int(0, 255)) }
+      : { id: 1, body: [...moduleHeader, 1, ...Array.from({ length: g.int(0, 5) }, () => g.int(0, 255))] };
+    const before = Array.from({ length: g.int(0, 3) }, other), after = Array.from({ length: g.int(0, 3) }, other);
+    const tail = Array.from({ length: g.pick([0, 3, 130]) }, () => g.int(0, 255));
+    return { core, before, after, tail };
+  }, ({ core, before, after, tail }) => {
+    if (![...before, ...after].every(s => s.id !== 1 || (!startsWith(s.body, [...placeholderModule()]) && !startsWith(s.body, core)))) return;
+    const small = Uint8Array.from([...componentHeader, ...[...before, { id: 1, body: [...placeholderModule(), ...tail] }, ...after].flatMap(s => section(s.id, s.body))]);
+    const component = componentize(Uint8Array.from(core), small);
+    assert.deepEqual([...extractCore(component, small)], core);
+    assert.deepEqual(makeTemplate(component, core), small);
+  }, { runs: 200 });
   // An ArrayBuffer works as bytes.
   const core = coreOf({ pick: a => a[2], int: () => 7 });
   assert.deepEqual(extractCore(componentize(core.buffer).buffer), core);

@@ -219,7 +219,7 @@ test('a bare word that names a Lean file beside it suggests the file', t => {
 });
 
 const words = ['Main.lean', 'App/Main.lean', 'x y.lean', 'λ.lean', 'a', '', '-', 'b c', '--x', '-h', '--help', '--', '--version'];
-// Proposition: Lasm.Cli.Candidates.run_args_kept
+// Proposition: Lasm.Cli.Spec.run_args_kept
 //   ∀ (src : String) (flags args : List String), src.endsWith ".lean" → ¬ src.startsWith "-" →
 //     (∀ f ∈ flags, f ∈ ["--rebuild", "--verbose", "--release"]) →
 //     ∃ p, parseLasmArguments (flags ++ [src, "--"] ++ args) = .ok p ∧
@@ -243,7 +243,8 @@ test('run: any application arguments after -- come back unchanged, whatever the 
 });
 
 // Proposition: Lasm.Cli.Candidates.build_options_commute
-//   ∀ (opts opts' : List (List String)) (forms : List Bool), (∀ o ∈ opts, OptionGroup o) →
+//   ∀ (opts opts' : List (List String)) (forms : List Bool), (∀ o ∈ opts, OptionGroup o ∧ o ≠ ["--help"] ∧ o ≠ ["-h"]) →
+//     (opts.filter fun o => o.length == 1 && !(o.headD "").startsWith "-").length ≤ 1 →
 //     (opts.map List.head?).Nodup → opts.Perm opts' → forms.length = opts'.length →
 //     (parseLasmArguments ("build" :: opts.flatten)).isOk = true →
 //     parseLasmArguments ("build" :: ((opts'.zip forms).map fun (o, j) => if j then joined o else o).flatten) =
@@ -271,7 +272,7 @@ test('build: options mean the same in any order and in either --flag value or --
   });
 });
 
-// Proposition: Lasm.Cli.Candidates.unknown_flag_refused
+// Proposition: Lasm.Cli.Spec.unknown_flag_refused
 //   ∀ flag : String, flag.startsWith "-" → flag ∉ knownFlags → valuedForm flag = false →
 //     parseLasmArguments ["Main.lean", flag] = .error ("Unknown Lasm option: " ++ flag ++ ". Application arguments must follow --.") ∧
 //     parseLasmArguments ["build", flag, "Main.lean"] = .error ("Unknown Lasm option: " ++ flag ++ ". Application arguments must follow --.")
@@ -284,22 +285,24 @@ test('every unknown flag is refused by name', () => {
   }, { runs: 300 });
 });
 
-// Proposition: Lasm.Cli.Candidates.edit_distance_metric
+// Proposition: Lasm.Cli.Spec.edit_distance_metric
 //   ∀ a b c : String,
 //     editDistance a a = 0 ∧ editDistance a "" = a.length ∧ editDistance "" a = a.length ∧
 //     editDistance a b = editDistance b a ∧ editDistance a c ≤ editDistance a b + editDistance b c ∧
 //     a.length - b.length ≤ editDistance a b ∧ b.length - a.length ≤ editDistance a b ∧
 //     editDistance a b ≤ max a.length b.length ∧ (a ≠ b → 0 < editDistance a b)
 test('edit distance is a metric bounded by the lengths', () => {
-  const alphabet = 'abcde'.split('');
+  // Lengths in code points (Lean's String.length): an astral character is one.
+  const alphabet = ['a', 'b', 'c', 'λ', '😀', '😁'];
+  const length = s => [...s].length;
   forAll(r => [r.string(alphabet, 0, 8), r.string(alphabet, 0, 8), r.string(alphabet, 0, 8)], ([a, b, c]) => {
     assert.equal(editDistance(a, a), 0);
-    assert.equal(editDistance(a, ''), a.length);
-    assert.equal(editDistance('', a), a.length);
+    assert.equal(editDistance(a, ''), length(a));
+    assert.equal(editDistance('', a), length(a));
     assert.equal(editDistance(a, b), editDistance(b, a));
     assert.ok(editDistance(a, c) <= editDistance(a, b) + editDistance(b, c));
-    assert.ok(editDistance(a, b) >= Math.abs(a.length - b.length));
-    assert.ok(editDistance(a, b) <= Math.max(a.length, b.length));
+    assert.ok(editDistance(a, b) >= Math.abs(length(a) - length(b)));
+    assert.ok(editDistance(a, b) <= Math.max(length(a), length(b)));
     if (a !== b) assert.ok(editDistance(a, b) > 0);
   }, { runs: 300 });
   assert.equal(editDistance('kitten', 'sitting'), 3);
@@ -308,6 +311,26 @@ test('edit distance is a metric bounded by the lengths', () => {
   assert.equal(editDistance('ab', 'ba'), 2);
   assert.equal(editDistance('abc', 'xabc'), 1);
   assert.equal(editDistance('abcx', 'abc'), 1);
+  // Code points, not UTF-16 units: an emoji is one edit (two units).
+  assert.equal(editDistance('😀', ''), 1);
+  assert.equal(editDistance('a😀', 'a😁'), 1);
+});
+
+test('suggestions ignore ASCII case only, and measure candidates in code points', () => {
+  // Unicode lowercases the Kelvin sign to k; command names are ASCII.
+  assert.equal(editDistance('K'.toLowerCase(), 'k'), 0);
+  assert.equal(closest('\u212a\u212a\u212a', ['kkk']), undefined); // three edits, not none
+  assert.equal(closest('KKK', ['kkk']), 'kkk');
+  assert.equal(targetHint('WORKERS'), ' (did you mean --target workers?)');
+  // ⌊9 code points / 3⌋ = 3 edits (18 UTF-16 units would allow 6).
+  const emoji = '😀'.repeat(9);
+  assert.equal(closest('😀'.repeat(5), [emoji]), undefined);
+  assert.equal(closest('😀'.repeat(6), [emoji]), emoji);
+});
+
+test('--flag=value takes everything after =, line breaks included', () => {
+  assert.equal(parseLasmArguments(['build', 'Main.lean', '--output=out\ndir']).output, 'out\ndir');
+  assert.equal(parseLasmArguments(['build', 'Main.lean', '--output', 'out\ndir']).output, 'out\ndir');
 });
 
 test('closest: the nearest candidate within max(2, ⌊length/3⌋) edits, ignoring case; the first of equals', () => {
@@ -322,7 +345,7 @@ test('closest: the nearest candidate within max(2, ⌊length/3⌋) edits, ignori
   assert.equal(closest('anything', []), undefined);
 });
 
-// Proposition: Lasm.Cli.Candidates.closest_nearest_first
+// Proposition: Lasm.Cli.Spec.closest_nearest_first
 //   ∀ (word : String) (cs : List String), word.all Char.isLower → (∀ c ∈ cs, c.all Char.isLower) →
 //     closest word cs = (nearestFirst (editDistance word) cs).filter fun c => editDistance word c ≤ threshold c
 test('closest picks a candidate no farther than any other, within the threshold', () => {
