@@ -288,7 +288,7 @@
     },
     "src/edge/edge-js.mjs": {
       "status": "pending",
-      "reason": "Lasm.JS host operations and the value codec's JavaScript half for the edge profile; the Node copy is checked against Lean's codec (lasm-js-wire), this one not yet (IRREDUCIBLE.md M4)"
+      "reason": "Lasm.JS host operations and the value codec's JavaScript half for the edge profile; the codec is checked against Lean's proved codec (Wire, the lasm-js-wire fuzz target, which also checks it reads and writes as the Node copy does, byte for byte); the host operations (calls, properties, callbacks, references) are not modelled (IRREDUCIBLE.md M4)"
     },
     "src/edge/edge-library.js": {
       "status": "exempt",

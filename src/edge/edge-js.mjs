@@ -393,6 +393,7 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
   }
   const snapshot = () => ({ values: values.size, pendingCalls: pendingCalls.size, queuedEvents: events.length,
     functionsLive: stats.functionsCreated - stats.functionsCollected, ...stats });
+  // encode and decode: the value codec, for the lasm-js-wire fuzz target (as src/node-js.mjs exposes its own).
   return { dispatch, snapshot, stop, owns: id => id >= firstJsHandle, release(id) { if (values.delete(id)) stats.released++; },
-    pendingEvents: () => events.length, concat };
+    pendingEvents: () => events.length, concat, encode, decode };
 }
