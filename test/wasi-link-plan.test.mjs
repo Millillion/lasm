@@ -68,7 +68,7 @@ test('the WASI link compiles the host, links the application objects with the ed
     .map(([source, object]) => ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
       ...mimallocFlags({ sliceKiB: 8, arenaMiB: 2 }), `-ffile-prefix-map=${here}=lasm/`, '-I', join(mimalloc, 'include'), '-I', join(mimalloc, 'src'),
       '-c', source, '-o', join(f.out, object)]));
-  for (const flag of ['-DMI_ARENA_SLICE_SHIFT=13', '-DMI_DEFAULT_ARENA_RESERVE=8192', '-DMI_MAX_ALIGN_SIZE=8', '-DEMMALLOC_NO_STD_EXPORTS'])
+  for (const flag of ['-DMI_ARENA_SLICE_SHIFT=13', '-DMI_DEFAULT_ARENA_RESERVE=8192', '-DMI_DEFAULT_VIRTUAL_ADDRESS_BITS=32', '-DMI_MAX_ALIGN_SIZE=8', '-DEMMALLOC_NO_STD_EXPORTS'])
     assert.ok(mimallocFlags({ sliceKiB: 8, arenaMiB: 2 }).includes(flag), flag);
   // 2. Only application objects (no lookup marker, runtime members or JavaScript glue) and the wraps.
   const MiB = 1048576;

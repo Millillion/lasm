@@ -61,13 +61,18 @@ export const wasiLinkSettings = Object.freeze({
 /** clang's flags for mimalloc: emcc's code generation flags (`emcc -v`) and
  * Emscripten's for its libmimalloc (tools/system_libs.py: Library and
  * libmimalloc cflags, without -g and -Werror), with `settings.mimalloc`'s slice
- * size and arena reserve (mimalloc divides it by 4 on WebAssembly). */
+ * size and arena reserve (mimalloc divides it by 4 on WebAssembly), and a
+ * page map for 32-bit addresses. */
 export function mimallocFlags({ sliceKiB, arenaMiB }) {
   return ['-fignore-exceptions', '-mllvm', '-combiner-global-alias-analysis=false', '-mllvm', '-disable-lsr',
     '-O2', '-Wall', '-fno-unroll-loops', '-fno-builtin', '-Wno-unused-function', '-Wno-unused-but-set-variable', '-Wno-unused-variable',
     '-Wno-deprecated-pragma', '-DEMMALLOC_NO_STD_EXPORTS', '-DMI_ENABLE_LARGE_PAGES=0', `-DMI_ARENA_SLICE_SHIFT=${Math.log2(sliceKiB * 1024)}`,
     '-DMI_MAX_ALIGN_SIZE=8', `-DMI_DEFAULT_ARENA_RESERVE=${arenaMiB * 4 * 1024}`, '-DMI_MALLOC_OVERRIDE', '-DMI_DEBUG=0', '-DNDEBUG', '-DMI_LIBC_MUSL',
-    '-DMI_USE_BUILTIN_THREAD_POINTER'];
+    '-DMI_USE_BUILTIN_THREAD_POINTER',
+    // The page map covers 32-bit addresses (wasm-opt lowers the memory to 32 bits; at most 2 GiB), not wasm64's
+    // 48: its top level, allocated whole as WebAssembly cannot reserve memory, is 512 bytes instead of 8 MiB (32 KiB
+    // slices) or 32 MiB (8 KiB). Two-level as on wasm64 (a flat map is the default below 41 bits).
+    '-DMI_DEFAULT_VIRTUAL_ADDRESS_BITS=32', '-DMI_PAGE_MAP_FLAT=0'];
 }
 // The C sources and defines of each target.
 const targetSources = { wasi: ['lasm_fetch_wasi.c'], fastly: ['lasm_fetch_wasi.c'], 'wasi-http': ['lasm_wasi_http.c'] };
