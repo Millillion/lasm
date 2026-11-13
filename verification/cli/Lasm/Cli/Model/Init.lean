@@ -61,7 +61,7 @@ def templateTable : List Template := [
   ⟨"fastify", "Fastify 5 with Lean route handlers (Lasm.JS)", true⟩,
   ⟨"std-http", "an HTTP server in pure Lean (Std.Http)", true⟩,
   ⟨"web", "a browser app in Lean (Lasm.UI): a counter", false⟩,
-  ⟨"fetch", "an HTTP handler in pure Lean (Lasm.Fetch) for Node, Fastly Compute, WASI, Spin and the edge", true⟩,
+  ⟨"fetch", "an HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces", true⟩,
   ⟨"fullstack", "a full-stack Lean app: shared API and validation (Lasm.RPC), a server (Lasm.Fetch) that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target", true⟩]
 
 def deployTargets : List String := deployTable.map (·.name)
