@@ -121,7 +121,8 @@ if (process.argv.includes('--spec')) {
   check(r.status === 0, 'the CommonMark 0.31.2 specification\'s 652 examples');
 }
 if (process.argv.includes('--pathological')) {
-  const r = spawnSync(process.execPath, [join(root, 'test', 'pathological.mjs'), '--engine', base], { stdio: 'inherit' });
+  const skip = platforms[name].pathologicalSkip ?? {};
+  const r = spawnSync(process.execPath, [join(root, 'test', 'pathological.mjs'), '--engine', base, '--skip', JSON.stringify(skip)], { stdio: 'inherit' });
   check(r.status === 0, 'CommonMark\'s pathological inputs and deep nesting');
 }
 await run.server.stop();
