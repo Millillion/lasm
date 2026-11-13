@@ -57,6 +57,13 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
   moduleImports  "<hex>"                            → {"imports": [["<hex>", "<hex>", kind], …]} | {"error": "…"}
   keepExports    {"bytes": "<hex>", "keep": ["<hex>", …]}  → {"bytes": "<hex>"} | {"error": "…"}
 (import and export names are decoded as UTF-8; the generator writes valid UTF-8 names)
+  encodeEvents   [event, …]                         → {"batch": "<hex>", "left": n}
+  readEvents     "<hex>"                            → {"events": [event, …], "fatal": "…" | null}
+(an event: ["completion", "<decimal promise>", failed, "<hex>"] | ["call", "<decimal call>", fn, "<hex>"] | ["release", fn])
+  frameRequest   {"released": [n, …], "payload": "<hex>"}  → "<hex>"
+  splitRequest   "<hex>"                            → {"released": [n, …], "payload": "<hex>"} | {"error": "…"}
+  frameInto      {"promise": "<decimal>", "input": "<hex>"}  → "<hex>"
+  intoPrefix     "<hex>"                            → {"promise": "<decimal>", "input": "<hex>"} | {"error": "…"}
 (`outputs` of `lasm dev` as [{"target": "…", "input": "<hex>"}, …], `deploy`
 as ["…", …], `port` a number)
 -/
@@ -66,6 +73,7 @@ import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.HandleTable
+import Lasm.Cli.Model.JsFraming
 import Lasm.Cli.Model.LeanIOErrors
 import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.LowerAtomics
@@ -198,6 +206,20 @@ def setenvAll (pairs : List (List UInt8 × List UInt8)) : List (List UInt8 × Li
     else if env.any (·.1 == k) then env.map fun (k', v') => if k' == k then (k, v) else (k', v')
     else env ++ [(k, v)]
 
+/-- An interop event as the differential sends it. -/
+def eventOf (j : Json) : Except String JsEvent := do
+  match ← (← j.getArrVal? 0).getStr? with
+  | "completion" => return .completion (← (← j.getArrVal? 1).getStr?).toNat! (← (← j.getArrVal? 2).getBool?) (← bytesOf (← j.getArrVal? 3)).data.toList
+  | "call" => return .call (← (← j.getArrVal? 1).getStr?).toNat! (← (← j.getArrVal? 2).getNat?) (← bytesOf (← j.getArrVal? 3)).data.toList
+  | "release" => return .release (← (← j.getArrVal? 1).getNat?)
+  | other => throw s!"unknown event {other}"
+
+/-- An interop event as the differential reads it. -/
+def ofEvent : JsEvent → Json
+  | .completion p f b => toJson [toJson "completion", toJson (toString p), toJson f, toJson (hex ⟨b.toArray⟩)]
+  | .call c fn b => toJson [toJson "call", toJson (toString c), toJson fn, toJson (hex ⟨b.toArray⟩)]
+  | .release fn => toJson [toJson "release", toJson fn]
+
 def answer (j : Json) : Except String Json := do
   let input ← j.getObjVal? "input"
   match ← j.getObjValAs? String "model" with
@@ -311,6 +333,26 @@ def answer (j : Json) : Except String Json := do
     let runtime ← (← input.getObjVal? "runtime").getStr?
     let env : ArgumentsEnv := ⟨fun f => existing.contains f, runtime, delegated "init", delegated "dev", delegated "package"⟩
     return ofResult (parseLasmArgumentsWith env (← texts (← input.getObjVal? "argv")))
+  | "encodeEvents" =>
+    let (batch, left) := encodeEvents (← (← input.getArr?).toList.mapM eventOf)
+    return Json.mkObj [("batch", toJson (hex ⟨batch.toArray⟩)), ("left", toJson left.length)]
+  | "readEvents" =>
+    let (events, fatal) := readEvents (← bytesOf input).data.toList
+    return Json.mkObj [("events", toJson (events.map ofEvent)), ("fatal", match fatal with | some m => toJson m | none => Json.null)]
+  | "frameRequest" =>
+    let released ← (← (← input.getObjVal? "released").getArr?).toList.mapM (·.getNat?)
+    return toJson (hex ⟨(frameRequest released (← bytesOf (← input.getObjVal? "payload")).data.toList).toArray⟩)
+  | "splitRequest" =>
+    return match splitRequest (← bytesOf input).data.toList with
+      | .ok (released, payload) => Json.mkObj [("released", toJson released), ("payload", toJson (hex ⟨payload.toArray⟩))]
+      | .error e => Json.mkObj [("error", toJson e)]
+  | "frameInto" =>
+    let promise := (← (← input.getObjVal? "promise").getStr?).toNat!
+    return toJson (hex ⟨(frameInto promise (← bytesOf (← input.getObjVal? "input")).data.toList).toArray⟩)
+  | "intoPrefix" =>
+    return match intoPrefix (← bytesOf input).data.toList with
+      | .ok (promise, rest) => Json.mkObj [("promise", toJson (toString promise)), ("input", toJson (hex ⟨rest.toArray⟩))]
+      | .error e => Json.mkObj [("error", toJson e)]
   | "leanAtLeast" => return toJson (leanAtLeastModel (← text (← input.getObjVal? "version")) (← text (← input.getObjVal? "minimum")))
   | "lowerAtomics" => return ofBytes (LowerAtomics.lowerAtomics (← bytesOf input))
   | "moduleImports" =>

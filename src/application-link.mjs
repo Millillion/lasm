@@ -5,7 +5,7 @@ import { writeFile } from 'node:fs/promises';
 import { threadId } from 'node:worker_threads';
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { dirname, isAbsolute, join, relative } from 'node:path';
+import { basename, dirname, isAbsolute, join, relative } from 'node:path';
 import { execFile, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { readApplicationSymbols, readInitializationFreeCppSymbols } from './application-symbols.mjs';
@@ -105,6 +105,9 @@ export function selectedLinkDriver(value = process.env.LASM_LINK_DRIVER) {
 
 /** Object-store entries (generated objects, probe records): a magic, the
  * SHA-256 of the content, then the content; written atomically. */
+/** The headers a C source includes by a quoted name that exist beside it. */
+export const localHeaders = (source, text = readFileSync(source)) =>
+  [...text.toString('latin1').matchAll(/^[ \t]*#[ \t]*include[ \t]+"([^"]+)"/gm)].map(match => join(dirname(source), match[1])).filter(file => existsSync(file));
 const storeMagic = Buffer.from('LASMSTO1');
 let storePartials = 0;
 export function writeStoreEntry(path, bytes) {
@@ -306,10 +309,16 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
   // reuses its object from this or the project's previous build: the key covers
   // the C bytes, the compiler flags (without the runtime path), the runtime
   // identity, the compiler tools and the link driver. Same key, same object bytes.
-  const objectKey = (source, optimization) => createHash('sha256').update(JSON.stringify({ schema: 1, runtime: runtime.identity, linkDriver,
-    tools: sdk.toolchain ?? sdk.driverIdentity ?? null, flags: compileFlags.filter(flag => flag !== join(runtime.directory, 'include')),
-    ...(optimization ? { optimization } : {}) }))
-    .update(readFileSync(source)).digest('hex');
+  // A source's bytes and those of the headers it includes by a quoted name
+  // beside it (library/c/lasm_js.c's lasm_js_framing.h).
+  const objectKey = (source, optimization) => {
+    const text = readFileSync(source);
+    const hash = createHash('sha256').update(JSON.stringify({ schema: 1, runtime: runtime.identity, linkDriver,
+      tools: sdk.toolchain ?? sdk.driverIdentity ?? null, flags: compileFlags.filter(flag => flag !== join(runtime.directory, 'include')),
+      ...(optimization ? { optimization } : {}) })).update(text);
+    for (const header of localHeaders(source, text)) hash.update('\0' + basename(header) + '\0').update(readFileSync(header));
+    return hash.digest('hex');
+  };
   const usedObjects = new Set();
   // Without a project cache, identical C within this build still compiles once
   // (the last planning round's wrappers are the final link's).

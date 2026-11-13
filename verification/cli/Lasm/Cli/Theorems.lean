@@ -2714,6 +2714,96 @@ theorem launcher_config_round_trip : Spec.launcher_config_round_trip := by
   rw [rp']
   simp [pure]
 
+/-! ## Lasm.JS's framing -/
+
+theorem le32_length (n : Nat) : (le32 n).length = 4 := rfl
+theorem u64le_length (n : Nat) : (u64le n).length = 8 := rfl
+
+theorem readWord64_u64le {n : Nat} (h : n < 2 ^ 64) (r : List UInt8) : readWord64 (u64le n ++ r) = some (n, r) := by
+  have h1 := readNumber_le32 (n := n % 4294967296) (by omega) (le32 (n / 4294967296 % 4294967296) ++ r)
+  have h2 := readNumber_le32 (n := n / 4294967296 % 4294967296) (by omega) r
+  simp only [readWord64, u64le, List.append_assoc, h1, h2, Option.pure_def, Option.bind_eq_bind, Option.bind_some,
+    Option.some.injEq, Prod.mk.injEq, and_true]
+  omega
+
+theorem readEvent_encode {e : JsEvent} (h : e.Fits) (r : List UInt8) : readEvent (encodeEvent e ++ r) = .ok (e, r) := by
+  cases e with
+  | completion p f b =>
+    obtain ⟨hp, hb⟩ := h
+    have hn := readNumber_le32 (show b.length < 4294967296 from hb) (b ++ r)
+    cases f
+    · have hw := readWord64_u64le hp ((0 : UInt8) :: (le32 b.length ++ (b ++ r)))
+      simp [encodeEvent, readEvent, Nat.mod_eq_of_lt hp, u64le_length, le32_length, orThrow, hw, hn,
+        bind, Except.bind, pure, Except.pure]
+      rw [if_neg (by omega), if_neg (by omega)]
+    · have hw := readWord64_u64le hp ((1 : UInt8) :: (le32 b.length ++ (b ++ r)))
+      simp [encodeEvent, readEvent, Nat.mod_eq_of_lt hp, u64le_length, le32_length, orThrow, hw, hn,
+        bind, Except.bind, pure, Except.pure]
+      rw [if_neg (by omega), if_neg (by omega)]
+  | call c fn b =>
+    obtain ⟨hc, hfn, hb⟩ := h
+    have hw := readWord64_u64le hc (le32 fn ++ (le32 b.length ++ (b ++ r)))
+    have hf := readNumber_le32 (show fn < 4294967296 from hfn) (le32 b.length ++ (b ++ r))
+    have hn := readNumber_le32 (show b.length < 4294967296 from hb) (b ++ r)
+    simp [encodeEvent, readEvent, Nat.mod_eq_of_lt hc, u64le_length, le32_length, orThrow, hw, hf, hn,
+      bind, Except.bind, pure, Except.pure]
+    rw [if_neg (by omega), if_neg (by omega)]
+  | release fn =>
+    have hf := readNumber_le32 (show fn < 4294967296 from h) r
+    simp [encodeEvent, readEvent, le32_length, orThrow, hf, bind, Except.bind, pure, Except.pure]
+
+theorem encodeEvent_cons (e : JsEvent) : ∃ k t, encodeEvent e = k :: t := by
+  cases e <;> simp [encodeEvent]
+
+theorem readEvents_encode {e : JsEvent} (h : e.Fits) (rest : List UInt8) :
+    readEvents (encodeEvent e ++ rest) = (e :: (readEvents rest).1, (readEvents rest).2) := by
+  obtain ⟨k, t, he⟩ := encodeEvent_cons e
+  have hr := readEvent_encode h rest
+  rw [he] at hr ⊢
+  have hlen : rest.length < (t ++ rest).length + 1 := by simp; omega
+  simp only [List.cons_append] at hr ⊢
+  rw [readEvents, hr]
+  simp only [List.length_append] at hlen
+  simp [hlen]
+
+theorem readEvents_encodeAll (es : List JsEvent) (h : ∀ e ∈ es, e.Fits) (rest : List UInt8) :
+    readEvents (es.flatMap encodeEvent ++ rest) = (es ++ (readEvents rest).1, (readEvents rest).2) := by
+  induction es with
+  | nil => simp
+  | cons e es ih =>
+    rw [List.flatMap_cons, List.append_assoc, readEvents_encode (h e (by simp)), ih (fun x hx => h x (by simp [hx]))]
+    simp
+
+theorem readNumbers_le32 (ids : List Nat) (h : ∀ i ∈ ids, i < 4294967296) (r : List UInt8) :
+    readNumbers ids.length (ids.flatMap le32 ++ r) = some (ids, r) := by
+  induction ids with
+  | nil => rfl
+  | cons i ids ih =>
+    simp only [List.length_cons, List.flatMap_cons, List.append_assoc, readNumbers]
+    rw [readNumber_le32 (h i (by simp))]
+    simp [ih (fun x hx => h x (by simp [hx]))]
+
+theorem events_read_back : Spec.events_read_back :=
+  fun _ rest h => ⟨rfl, readEvents_encodeAll _ (fun e he => h e (List.mem_of_mem_take he)) rest⟩
+
+theorem flatMap_le32_length (l : List Nat) : (l.flatMap le32).length = 4 * l.length := by
+  induction l with
+  | nil => rfl
+  | cons i is ih => rw [List.flatMap_cons, List.length_append, ih, le32_length, List.length_cons]; omega
+
+theorem request_read_back : Spec.request_read_back := by
+  intro released payload hl h
+  have hn := readNumber_le32 (show released.length < 4294967296 from hl) (released.flatMap le32 ++ payload)
+  have hs := readNumbers_le32 released h payload
+  have hlen := flatMap_le32_length released
+  simp only [splitRequest, frameRequest, List.append_assoc, hn, orThrow, hs, bind, Except.bind]
+  simp [le32_length, hlen]
+  rw [if_neg (by omega), if_neg (by omega)]
+
+theorem into_read_back : Spec.into_read_back := by
+  intro promise input h
+  simp [intoPrefix, frameInto, u64le_length, orThrow, readWord64_u64le h, bind, Except.bind]
+
 /-! ## Host handles -/
 
 theorem allocateLoop_fresh (start : Nat) (value : String) : ∀ (fuel : Nat) (t t' : HandleTable) (id : Nat),

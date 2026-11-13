@@ -196,6 +196,39 @@ class Reader {
 // Stryker disable next-line all: the fast path's choice changes speed, not output (test/node-js.test.mjs checks both paths agree)
 const shortKey = 32, keyCache = new Array(1024);
 
+// ---- the framing (library/c/lasm_js_framing.h; Lean model:
+// verification/cli/Lasm/Cli/Model/JsFraming.lean) ----
+
+/** Takes up to 1024 events from the front of `queue` and writes them as the
+ * batch op 209 replies with: 1 completion [u64 promise][u8 failed][u32 size][bytes],
+ * 2 call [u64 call][u32 fn][u32 size][bytes], 3 release [u32 fn]. */
+export function encodeEvents(queue) {
+  const w = new Writer();
+  for (let i = 0; i < 1024 && queue.length; i++) {
+    const event = queue.shift();
+    w.u8(event.kind);
+    if (event.kind === 1) { w.u64(event.promise); w.u8(event.failed ? 1 : 0); w.bytes(event.bytes); }
+    else if (event.kind === 2) { w.u64(event.call); w.u32(event.fn); w.bytes(event.bytes); }
+    else w.u32(event.fn);
+  }
+  return w.result();
+}
+/** A request, [u32 count][count × u32 released handle][payload]: the handles and the payload (a Buffer). */
+export function splitRequest(request) {
+  const head = Buffer.from(request.buffer, request.byteOffset, request.byteLength);
+  if (head.length < 4) throw failure('Malformed Lasm.JS request');
+  const count = head.readUInt32LE(0);
+  if (head.length < 4 + 4 * count) throw failure('Malformed Lasm.JS request');
+  const released = [];
+  for (let i = 0; i < count; i++) released.push(head.readUInt32LE(4 + 4 * i));
+  return [released, head.subarray(4 + 4 * count)];
+}
+/** The payload of a call that settles a Lean promise (flag 16), [u64 promise][input]: the promise and the input. */
+export function intoPrefix(bytes) {
+  if (bytes.length < 8) throw failure('Malformed Lasm.JS request');
+  return [bytes.readBigUInt64LE(0), bytes.subarray(8)];
+}
+
 export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spawnPoller, progress, liveThreads, startedOperations } = {}) {
   const values = new HandleTable({ first: firstJsHandle });
   const moduleRequire = createRequire(appPath ? join(dirname(appPath), 'package.json') : join(process.cwd(), 'package.json'));
@@ -292,17 +325,7 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
     if (waiter) { const w = waiter; waiter = undefined; w(); }
     else wantPoller();
   };
-  function takeEvents() {
-    const w = new Writer();
-    for (let i = 0; i < 1024 && events.length; i++) {
-      const event = events.shift();
-      w.u8(event.kind);
-      if (event.kind === 1) { w.u64(event.promise); w.u8(event.failed ? 1 : 0); w.bytes(event.bytes); }
-      else if (event.kind === 2) { w.u64(event.call); w.u32(event.fn); w.bytes(event.bytes); }
-      else w.u32(event.fn);
-    }
-    return w.result();
-  }
+  const takeEvents = () => encodeEvents(events);
   // Lean functions exposed as JavaScript functions (op 210).
   const pendingCalls = new Map();
   let nextCall = 1n;
@@ -479,19 +502,15 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
     try {
       // Every request starts with handles Lean freed since its previous call
       // ([u32 count][count × u32]), released first.
-      const head = Buffer.from(request.buffer, request.byteOffset, request.byteLength);
-      if (head.length < 4) throw failure('Malformed Lasm.JS request');
-      const count = head.readUInt32LE(0);
-      if (head.length < 4 + 4 * count) throw failure('Malformed Lasm.JS request');
-      for (let i = 0; i < count; i++) if (values.delete(head.readUInt32LE(4 + 4 * i))) stats.released++;
-      let bytes = head.subarray(4 + 4 * count);
+      const [released, payload] = splitRequest(request);
+      for (const id of released) if (values.delete(id)) stats.released++;
+      let bytes = payload;
       // Flag 16 (ops 205, 214): settle the Lean promise that prefixes the request
       // with the result, through the interop thread, instead of replying with it.
       let into;
       if ((op === 205 || op === 214) && Number(arg) & 16) {
         if (syncBusy) throw failure(syncWaitText('a JavaScript call (an Async call, method or binding)'));
-        if (bytes.length < 8) throw failure('Malformed Lasm.JS request');
-        into = bytes.readBigUInt64LE(0); bytes = bytes.subarray(8);
+        [into, bytes] = intoPrefix(bytes);
       }
       switch (op) {
       case 200: return Buffer.from(Uint32Array.of(jsProtocolVersion).buffer);

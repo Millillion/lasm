@@ -212,6 +212,37 @@ def launcher_config_round_trip : Prop :=
         stdio := o.stdioFlags.map uint32Of, directory := o.directory.map utf8Bytes, requestedCwd := o.requestedCwd.map utf8Bytes,
         argv := (o.command :: o.args).map utf8Bytes, env := o.env.map fun (k, v) => (utf8Bytes k, utf8Bytes v) }
 
+/-! ## Lasm.JS's framing -/
+
+/-- **A batch of interop events reads back.** Whatever events the host
+queues (within the format's bounds), `encodeEvents` writes the first 1024 and
+leaves the rest queued, and the C glue reads exactly those events, in order,
+from the batch; a batch followed by other bytes reads as its events followed
+by what those bytes read as (so the glue stops only at a malformed event of
+its own).
+Tested by: test/lasm-js-framing.test.mjs -/
+def events_read_back : Prop :=
+  ∀ (queue : List JsEvent) (rest : List UInt8), (∀ e ∈ queue, e.Fits) →
+    (encodeEvents queue).2 = queue.drop 1024 ∧
+    readEvents ((encodeEvents queue).1 ++ rest) = (queue.take 1024 ++ (readEvents rest).1, (readEvents rest).2)
+
+/-- **A request's released handles and payload read back.** For any handles
+(32-bit, fewer than 2³²) and any payload, the host splits the request the C
+glue frames into exactly those handles and that payload.
+Tested by: test/lasm-js-framing.test.mjs -/
+def request_read_back : Prop :=
+  ∀ (released : List Nat) (payload : List UInt8),
+    released.length < 2 ^ 32 → (∀ i ∈ released, i < 2 ^ 32) →
+    splitRequest (frameRequest released payload) = .ok (released, payload)
+
+/-- **The promise a call settles reads back.** For any 64-bit Lean promise
+and any input, the host reads the promise and the input from the payload
+the C glue frames.
+Tested by: test/lasm-js-framing.test.mjs -/
+def into_read_back : Prop :=
+  ∀ (promise : Nat) (input : List UInt8), promise < 2 ^ 64 →
+    intoPrefix (frameInto promise input) = .ok (promise, input)
+
 /-! ## Host handles -/
 
 /-- **A host handle is fresh and in range.** When `allocate` gives an id,

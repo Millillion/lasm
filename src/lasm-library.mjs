@@ -53,6 +53,8 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
 // library/PROOFS.md) are checked by scripts/library-proofs.mjs (Lasm.UI's also by scripts/ui/lean-tests.mjs), not shipped.
 
 export const glueSource = join(root, 'c', 'lasm_js.c');
+// Headers the glue includes (the build's cache identity hashes them with it).
+export const glueHeaders = [join(root, 'c', 'lasm_js_framing.h')];
 // What a program with that glue links with (src/application-link.mjs): Lean's
 // task waits and Emscripten's futex wait, wrapped by the glue (waits inside
 // synchronous callbacks). The edge and WASI links replace the glue, so they drop these.

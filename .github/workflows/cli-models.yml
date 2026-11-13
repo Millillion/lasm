@@ -17,6 +17,7 @@ on:
       - 'test/models/**'
       - 'test/helpers/property.mjs'
       - 'native/process-launcher.c'
+      - 'library/c/lasm_js_framing.h'
   push:
     branches: [main]
     paths:
@@ -26,6 +27,7 @@ on:
       - 'test/models/**'
       - 'test/helpers/property.mjs'
       - 'native/process-launcher.c'
+      - 'library/c/lasm_js_framing.h'
 permissions:
   contents: read
 concurrency:
