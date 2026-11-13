@@ -56,7 +56,8 @@ test('every template creates a complete project', () => {
       assert.match(dockerfile, /^FROM node:24-bookworm-slim$/m);
       assert.match(dockerfile, /npx lasm build Main\.lean --output dist/);
       assert.equal(/PORT=8080/.test(dockerfile), templates[template].server);
-      assert.equal(read('Main.lean').includes('import Lasm.JS'), templates[template].interop);
+      // Interop templates bind npm packages (import Lasm.JS); the fetch template uses Lasm.JS.Web only.
+      assert.equal(/^import Lasm\.JS$/m.test(read('Main.lean')), templates[template].interop);
       assert.match(read('.gitignore'), /^dist\/$/m);
     }
     const lambda = join(root, 'lambda');
