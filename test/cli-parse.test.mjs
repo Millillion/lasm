@@ -13,7 +13,9 @@ import {
   parseLasmArguments, buildTargets, edgeBuildTargets, wasiBuildTargets, platformBuildTargets, fixedLayoutTargets, suspendModes,
   targetHint, cliUsage, commandNames, editDistance, closest,
 } from '../src/cli-arguments.mjs';
-import { packageTargets } from '../src/package.mjs';
+import { packageTargets, parsePackageArguments } from '../src/package.mjs';
+import { parseInitArguments } from '../src/init.mjs';
+import { parseDevArguments } from '../src/dev.mjs';
 import { originalArguments } from '../src/posix-arguments.mjs';
 import { testUnoptimized } from '../src/test-switches.mjs';
 import { assertSupportedHost, buildPlatforms, executableName, insideDirectory, responseFile, supportedPlatformsText } from '../src/platform.mjs';
@@ -331,6 +333,15 @@ test('suggestions ignore ASCII case only, and measure candidates in code points'
 test('--flag=value takes everything after =, line breaks included', () => {
   assert.equal(parseLasmArguments(['build', 'Main.lean', '--output=out\ndir']).output, 'out\ndir');
   assert.equal(parseLasmArguments(['build', 'Main.lean', '--output', 'out\ndir']).output, 'out\ndir');
+});
+
+test('lasm init, dev and package: --flag=value also takes line breaks (not "unknown option")', () => {
+  assert.throws(() => parseInitArguments(['app', '--template=a\nb']), { message: /^Unknown template "a\nb"/ });
+  assert.throws(() => parseInitArguments(['app', '-t=a\u2028b']), { message: /^Unknown template "a\u2028b"/ });
+  assert.throws(() => parseInitArguments(['app', '--deploy=a\rb']), { message: /^--deploy accepts / });
+  assert.equal(parseDevArguments(['--target=browser', '--output=out\ndir']).output, 'out\ndir');
+  assert.equal(parseDevArguments(['--target=browser', '--host=a\nb']).host, 'a\nb');
+  assert.equal(parsePackageArguments(['--target=lambda', '--output=out\ndir']).output, 'out\ndir');
 });
 
 test('closest: the nearest candidate within max(2, ⌊length/3⌋) edits, ignoring case; the first of equals', () => {

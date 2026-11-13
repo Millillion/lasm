@@ -32,7 +32,9 @@ import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.HandleTable
+import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.NodeHost
+import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.ProcessLauncher
 import Lasm.Cli.Model.WasiComponent
@@ -97,20 +99,25 @@ def utf16 (s : String) : List Nat :=
 
 -- `parseLasmArguments`, `editDistance`, `closest`, `buildTargets` and what
 -- `parseLasmArguments` returns (`Parsed`, a structure of the object's
--- fields) are modelled in Model/CliArguments.lean. The model takes what the
--- module imports as a parameter; here it is the constants below.
+-- fields) are modelled in Model/CliArguments.lean; the parsers of `lasm
+-- init`, `lasm dev` and `lasm package` (`parseInitArguments`,
+-- `parseDevArgumentsWith`, `parsePackageArguments`) and their tables
+-- (`templates`, `deployTargets`, `devTargets`, `packageTargets`) in
+-- Model/Init.lean, Model/Dev.lean and Model/Package.lean. The models take
+-- what they import from outside as a parameter; here it is the constants
+-- below.
 
 /-- `existsSync(path)` (node:fs): whether a file exists, in the working
 directory the CLI runs in. -/
 opaque fileExists : String → Bool
-/-- `jsRuntime` (src/js-runtime.mjs): `"node"`, `"bun"` or `"deno"`. -/
-opaque jsRuntime : String
-/-- `parseInitArguments(tokens)` (src/init.mjs). -/
-opaque parseInitArguments : List String → Except String Parsed
-/-- `parseDevArguments(tokens)` (src/dev.mjs). -/
-opaque parseDevArguments : List String → Except String Parsed
-/-- `parsePackageArguments(tokens)` (src/package.mjs). -/
-opaque parsePackageArguments : List String → Except String Parsed
+/-- `jsRuntime` (src/js-runtime.mjs): the runtime the CLI runs on. Lasm
+cannot know which; the module's three branches can return only `"node"`,
+`"bun"` or `"deno"`, which the type records. -/
+opaque jsRuntimeOf : { s : String // s = "node" ∨ s = "bun" ∨ s = "deno" } := ⟨"node", .inl rfl⟩
+/-- `jsRuntime`. -/
+def jsRuntime : String := jsRuntimeOf.val
+/-- `parseDevArguments(tokens)` (src/dev.mjs), on the runtime the CLI runs on. -/
+def parseDevArguments : List String → Except String Parsed := parseDevArgumentsWith jsRuntime
 
 /-- `parseLasmArguments(argv)`: the parse, or the message of the `Error` it
 throws. -/
@@ -135,15 +142,6 @@ def Parsed.template (p : Parsed) : String := p.template?.getD ""
 def Parsed.deploy (p : Parsed) : List String := p.deploy?.getD []
 /-- `parsed.outputs` of `lasm dev`: each output's target and input. -/
 def Parsed.outputs (p : Parsed) : List (String × String) := p.outputs?.getD []
-
-/-- `templates` of `lasm init` (src/init.mjs), by name. -/
-opaque templates : List String
-/-- `deployTargets` of `lasm init` (src/init.mjs), by name. -/
-opaque deployTargets : List String
-/-- `packageTargets` (src/package.mjs), by name. -/
-opaque packageTargets : List String
-/-- `devTargets` (src/dev.mjs). -/
-opaque devTargets : List String
 
 /-- The commands a parse can name. -/
 def commands : List String :=

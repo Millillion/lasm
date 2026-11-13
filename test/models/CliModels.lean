@@ -49,6 +49,11 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
 (the parsed object has the fields the JavaScript's has, text fields as hex;
 `existing` are the paths `existsSync` finds; the parsers of `lasm init`,
 `lasm dev` and `lasm package` answer `{"error": hex "delegated:<command>"}`)
+  parseInitArguments  ["<hex>", …]                 → (the same)
+  parseDevArguments   {"tokens": ["<hex>", …], "runtime": "node"}  → (the same)
+  parsePackageArguments  ["<hex>", …]              → (the same)
+(`outputs` of `lasm dev` as [{"target": "…", "input": "<hex>"}, …], `deploy`
+as ["…", …], `port` a number)
 -/
 import Lean.Data.Json
 import Lasm.Cli.Model.BuiltinModules
@@ -56,7 +61,9 @@ import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
 import Lasm.Cli.Model.HandleTable
+import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.NodeHost
+import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.ProcessLauncher
 import Lasm.Cli.Model.WasiComponent
@@ -116,7 +123,11 @@ def ofParsed (p : Parsed) : Json :=
     field "args" (p.args?.map fun a => toJson (a.map ofText)), field "profile" (p.profile?.map toJson),
     field "allowDev" (p.allowDev?.map toJson), field "bundler" (p.bundler?.map toJson),
     field "target" (p.target?.map toJson), field "suspend" (p.suspend?.map toJson),
-    field "output" (p.output?.map ofText), field "input" (p.input?.map ofText)].filterMap id)
+    field "output" (p.output?.map ofText), field "input" (p.input?.map ofText),
+    field "template" (p.template?.map ofText), field "deploy" (p.deploy?.map toJson), field "directory" (p.directory?.map ofText),
+    field "run" (p.run?.map toJson), field "watch" (p.watch?.map toJson), field "port" (p.port?.map toJson),
+    field "host" (p.host?.map ofText),
+    field "outputs" (p.outputs?.map fun os => toJson (os.map fun (t, i) => Json.mkObj [("target", toJson t), ("input", ofText i)]))].filterMap id)
 
 def ofResult : Except String Parsed → Json
   | .ok p => Json.mkObj [("parsed", ofParsed p)]
@@ -251,6 +262,10 @@ def answer (j : Json) : Except String Json := do
     let runtime ← (← input.getObjVal? "runtime").getStr?
     let env : ArgumentsEnv := ⟨fun f => existing.contains f, runtime, delegated "init", delegated "dev", delegated "package"⟩
     return ofResult (parseLasmArgumentsWith env (← texts (← input.getObjVal? "argv")))
+  | "parseInitArguments" => return ofResult (parseInitArguments (← texts input))
+  | "parseDevArguments" =>
+    return ofResult (parseDevArgumentsWith (← (← input.getObjVal? "runtime").getStr?) (← texts (← input.getObjVal? "tokens")))
+  | "parsePackageArguments" => return ofResult (parsePackageArguments (← texts input))
   | m => throw s!"no model {m}"
 
 def main : IO Unit := do

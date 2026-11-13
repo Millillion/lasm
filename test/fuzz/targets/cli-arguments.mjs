@@ -4,7 +4,7 @@
 // deploy targets are ones Lasm has (own keys, never inherited ones such as
 // `constructor`), or a plain Error with a readable message (no TypeError,
 // no "[native code]" or "[object Object]" in it). Never a stack trace.
-// Proposition: Lasm.Cli.Candidates.parse_known_or_refused
+// Proposition: Lasm.Cli.Spec.parse_known_or_refused
 //   ∀ argv : List String,
 //     match parseLasmArguments argv with
 //     | .ok p => p.command ∈ commands ∧

@@ -217,7 +217,7 @@
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "the whole parser is modelled (run_args_kept, unknown_flag_refused, edit_distance_metric, closest_nearest_first proved); what it imports is a parameter: the parsers of lasm init, dev and package are their modules, existsSync and jsRuntime the environment. Candidates build_options_commute and parse_known_or_refused remain"
+      "reason": "the whole parser is modelled (run_args_kept, unknown_flag_refused, edit_distance_metric, closest_nearest_first, parse_known_or_refused proved, the last with the parsers of lasm init, dev and package it hands to); existsSync is the environment and jsRuntime one of node, bun and deno. Candidate build_options_commute remains"
     },
     "src/dev-build-service.mjs": {
       "status": "exempt",
@@ -236,12 +236,13 @@
     },
     "src/dev.mjs": {
       "status": "pending",
-      "reason": "`lasm dev`: argument parsing and build scheduling remain to model; the rest watches files and runs builds",
+      "reason": "`lasm dev`: argument parsing and changedFiles are modelled; build scheduling remains to model; the rest watches files and runs builds",
       "models": [
         {
           "lean": "verification/cli/Lasm/Cli/Model/Dev.lean",
           "functions": [
-            "changedFiles"
+            "changedFiles",
+            "parseDevArguments"
           ],
           "differential": "test/models/cli-differential.mjs"
         }
@@ -348,7 +349,16 @@
     },
     "src/init.mjs": {
       "status": "pending",
-      "reason": "`lasm init`: generated names are pure (candidate generated_names_valid); the rest writes templates"
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/Init.lean",
+          "functions": [
+            "parseInitArguments"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "`lasm init`: argument parsing is modelled (parse_known_or_refused proved); generated names are pure (candidate generated_names_valid) and remain to model; the rest writes templates"
     },
     "src/js-runtime.mjs": {
       "status": "exempt",
@@ -602,9 +612,17 @@
       "reason": "moves a finished output into place; orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
     },
     "src/package.mjs": {
-      "status": "exempt",
-      "kind": "io",
-      "reason": "`lasm package`; orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/Package.lean",
+          "functions": [
+            "parsePackageArguments"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "its argument parsing is modelled (parse_known_or_refused proved); the rest packages a build (files, processes and archives), tested end to end"
     },
     "src/platform.mjs": {
       "status": "pending",

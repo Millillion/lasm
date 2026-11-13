@@ -161,10 +161,28 @@ const inParseDirectory = fn => {
 const outcome = fn => {
   try { return { value: fn() }; } catch (error) { return { error: error.message }; }
 };
-const hexFields = ['args', 'output', 'input'];
+const hexFields = ['args', 'output', 'input', 'template', 'directory', 'host'];
 const parsedJson = parsed => Object.fromEntries(Object.entries(parsed).map(([k, v]) =>
-  [k, k === 'args' ? v.map(hex) : hexFields.includes(k) ? hex(v) : v]));
+  [k, k === 'args' ? v.map(hex) : k === 'outputs' ? v.map(o => ({ target: o.target, input: hex(o.input) })) : hexFields.includes(k) ? hex(v) : v]));
+const parseOutcome = fn => {
+  const result = outcome(fn);
+  return result.error !== undefined ? { error: hex(result.error) } : { parsed: parsedJson(result.value) };
+};
 const delegates = { init: parseInitArguments, dev: parseDevArguments, package: parsePackageArguments };
+
+/** Words of `lasm init`, `lasm dev` and `lasm package`: their options in
+ * both forms, their tables' names and near misses, values with line breaks. */
+function subcommandLine(r, options, values) {
+  const spaced = () => { const o = r.pick(options); return r.next() < 0.5 ? [o, r.pick(values)] : [`${o}=${r.pick(values)}`]; };
+  const pool = ['--help', '-h', '--', '-', '--x', 'app', 'my app', 'λ', 'Main.lean', 'a.lean', 'b.lean', '', 'dist', 'x\ny'];
+  return r.array(r.int(0, 6), () => r.next() < 0.5 ? spaced() : [r.pick(pool)]).flat();
+}
+const initValues = ['plain', 'express', 'hono', 'fastify', 'std-http', 'web', 'fetch', 'fullstack', 'constructor', '__proto__', 'lambda',
+  'lambda-zip', 'vercel', 'vercel-edge', 'netlify', 'netlify-edge', 'workers', 'wasi', 'wasi-http', 'spin', 'fastly', 'supabase-edge',
+  'deno-deploy', 'azure', 'gcf', '', '-x', '--x', 'a\nb', 'hon'];
+const devValues = ['node', 'bun', 'deno', 'browser', 'workers', 'node,browser', 'node=Server.lean,browser=Client.lean', 'browser=a.lean',
+  'node,bun', 'node=', 'node=a', 'x', '', '--x', '-x', '80', '65535', '65536', '00080', '123456', 'a\nb', '127.0.0.1', 'out', 'deno=b.lean=c'];
+const packageValues = ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf', 'browser', 'constructor', '', '--x', '-x', 'out', 'a\nb'];
 
 /** Launcher options: texts with the characters that matter to the format
  * and to `setenv` (`=` in names, empty names, repeated names). */
@@ -255,6 +273,28 @@ export const models = [
       }
       return result.error !== undefined ? { error: hex(result.error) } : { parsed: parsedJson(result.value) };
     },
+  },
+  {
+    name: 'parseInitArguments', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',
+    generate: r => r.next() < 0.5 ? subcommandLine(r, ['--template', '-t', '--deploy', '--deploy'], initValues)
+      // A well-formed line: one directory, a template and deploy targets (repeats and conflicts included).
+      : [[r.pick(['app', 'my app'])], ...(r.next() < 0.8 ? [[r.pick(['--template', '-t']), r.pick(initValues.slice(0, 9))]] : []),
+        ...r.array(r.int(0, 3), () => ['--deploy', r.pick(initValues.slice(9, 24))])].sort(() => r.next() - 0.5).flat(),
+    input: tokens => tokens.map(hex),
+    js: tokens => parseOutcome(() => parseInitArguments(tokens)),
+  },
+  {
+    name: 'parseDevArguments', source: 'src/dev.mjs', lean: 'Lasm.Cli.Model.Dev',
+    generate: r => [...subcommandLine(r, ['--target', '--target', '--port', '--host', '--output'], devValues),
+      ...(r.next() < 0.3 ? [r.pick(['--release', '--dev', '--no-run', '--verbose', '--no-watch'])] : [])].sort(() => r.next() - 0.5),
+    input: tokens => ({ tokens: tokens.map(hex), runtime: jsRuntime }),
+    js: tokens => parseOutcome(() => parseDevArguments(tokens)),
+  },
+  {
+    name: 'parsePackageArguments', source: 'src/package.mjs', lean: 'Lasm.Cli.Model.Package',
+    generate: r => [...subcommandLine(r, ['--target', '--target', '--output'], packageValues), ...(r.next() < 0.3 ? ['--allow-dev'] : [])],
+    input: tokens => tokens.map(hex),
+    js: tokens => parseOutcome(() => parsePackageArguments(tokens)),
   },
   {
     name: 'numbers', source: 'src/node-host.mjs', lean: 'Lasm.Cli.Model.NodeHost',

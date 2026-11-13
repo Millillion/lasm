@@ -78,6 +78,22 @@ def closest_nearest_first : Prop :=
   ∀ (word : String) (cs : List String), word.all Char.isLower → (∀ c ∈ cs, c.all Char.isLower) →
     closest word cs = (nearestFirst (editDistance word) cs).filter fun c => editDistance word c ≤ threshold c
 
+/-- **Every parse is a known command, or a readable error.** Whatever the
+arguments, the parser either names a command Lasm has, with a build target,
+an input, `lasm init` templates and deploy targets and `lasm dev` outputs
+that Lasm has, or refuses with a message that is not blank.
+Tested by: test/fuzz/targets/cli-arguments.mjs -/
+def parse_known_or_refused : Prop :=
+  ∀ argv : List String,
+    match parseLasmArguments argv with
+    | .ok p => p.command ∈ commands ∧
+        (p.command = "build" → p.target ∈ buildTargets) ∧
+        ((p.command = "build" ∨ p.command = "run") → p.input.endsWith ".lean" ∨ p.input.endsWith ".json") ∧
+        (p.command = "init" → p.template ∈ templates ∧ ∀ d ∈ p.deploy, d ∈ deployTargets) ∧
+        (p.command = "package" → p.target ∈ packageTargets ∨ p.target = "browser") ∧
+        (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
+    | .error m => m.trimAscii.toString ≠ ""
+
 /-! ## Development server -/
 
 /-- **`changedFiles` reports exactly the files that differ.** Between two

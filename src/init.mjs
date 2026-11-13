@@ -89,13 +89,13 @@ export function parseInitArguments(tokens) {
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
     if (token === '--help' || token === '-h') return { command: 'init-help' };
-    const match = /^(?:--template|-t)(?:=(.*))?$/.exec(token);
+    const match = /^(?:--template|-t)(?:=(.*))?$/s.exec(token);
     if (match) {
       const value = match[1] ?? tokens[++i];
       if (!value || value.startsWith('-')) throw new Error('--template requires a value\n\n' + initUsage);
       result.template = value; continue;
     }
-    const deploy = /^--deploy(?:=(.*))?$/.exec(token);
+    const deploy = /^--deploy(?:=(.*))?$/s.exec(token);
     if (deploy) {
       const value = deploy[1] ?? tokens[++i];
       if (!Object.hasOwn(deployTargets, value ?? '')) throw new Error(`--deploy accepts ${Object.keys(deployTargets).join(', ')}\n\n` + initUsage);

@@ -1329,7 +1329,7 @@ theorem finish_run (env : ArgumentsEnv) {src : String} (r : Parsed) (hc : r.comm
     (hpath : pathLike src = true) (hlean : src.endsWith ".lean" = true) (hjson : src.endsWith ".json" = false) :
     finish env r [src] = .ok { r with input? := some src, profile? := some (r.profile?.getD "dev") } := by
   unfold finish
-  cases r.profile? <;> simp [hc, ho, ha, hs, hb, ht, hpath, hlean, hjson]
+  cases r.profile? <;> simp [hc, ho, ha, hs, hb, ht, hpath, hlean, hjson, placeOutput, defaultProfile, checkOptions]
 
 theorem run_args_kept : Spec.run_args_kept := by
   intro src flags args hlean hdash hflags
@@ -1366,6 +1366,500 @@ theorem run_args_kept : Spec.run_args_kept := by
   · simp only [Parsed.rebuild, f9]; split <;> simp_all [parseLasmArgumentsWith.start]
   · simp only [Parsed.verbose, f10]; split <;> simp_all [parseLasmArgumentsWith.start]
   · simp only [Parsed.profile, f11]; split <;> simp_all [parseLasmArgumentsWith.start]
+
+/-! ## The command line: every parse is known, or refused readably
+
+Each parser's errors are messages with a character that is not whitespace
+(`NB`, decided on the literal that starts each message), and each loop keeps
+an invariant of what it has accepted (`LoopOK`). -/
+
+/-- A text with a character that is not whitespace. -/
+abbrev NB (s : String) : Prop := ∃ c ∈ s.toList, c.isWhitespace = false
+
+theorem nb_left {a : String} (b : String) (h : NB a) : NB (a ++ b) := by
+  obtain ⟨c, hc, hw⟩ := h; exact ⟨c, by simp [hc], hw⟩
+theorem nb_right (a : String) {b : String} (h : NB b) : NB (a ++ b) := by
+  obtain ⟨c, hc, hw⟩ := h; exact ⟨c, by simp [hc], hw⟩
+
+theorem nb_initUsage : NB initUsage := by
+  unfold initUsage; repeat (with_reducible apply nb_left)
+  decide
+theorem nb_devUsage : NB devUsage := by
+  unfold devUsage; repeat (with_reducible apply nb_left)
+  decide
+theorem nb_packageUsage : NB packageUsage := by
+  unfold packageUsage; repeat (with_reducible apply nb_left)
+  decide
+theorem nb_cliUsage : NB cliUsage := by
+  unfold cliUsage; repeat (with_reducible apply nb_left)
+  decide
+
+syntax "nb" : tactic
+macro_rules
+  | `(tactic| nb) => `(tactic| first
+    | with_reducible exact nb_initUsage | with_reducible exact nb_devUsage
+    | with_reducible exact nb_packageUsage | with_reducible exact nb_cliUsage
+    | (with_reducible apply nb_left; nb) | (with_reducible apply nb_right; nb) | decide)
+
+def LoopOK {α} (P : α → Prop) : Except String (Option α) → Prop
+  | .ok (some a) => P a
+  | .ok none => True
+  | .error m => NB m
+
+theorem initLoop_spec (toks : List String) (st : InitState) (h : ∀ d ∈ st.deploy, d ∈ deployTargets) :
+    LoopOK (fun st' : InitState => ∀ d ∈ st'.deploy, d ∈ deployTargets) (initLoop st toks) := by
+  fun_induction initLoop st toks <;> simp only [LoopOK] at *
+  all_goals first
+    | exact h
+    | (with_reducible show NB _; nb)
+    | (rename_i ih; exact ih h)
+    | (rename_i ih; apply ih; intro d hd; split at hd
+       · exact h d hd
+       · simp only [List.mem_append, List.mem_singleton] at hd
+         rcases hd with hd | rfl
+         · exact h _ hd
+         · rename_i hv _; exact Decidable.not_not.mp hv)
+
+theorem deployChecks_nb (template : String) (deploy : List String) :
+    ∀ (ts : List DeployTarget) (m : String), deployChecks template deploy ts = .error m → NB m
+  | [], m, h => by simp [deployChecks] at h
+  | t :: ts, m, h => by
+    unfold deployChecks at h
+    split at h
+    · cases h; nb
+    · split at h
+      · cases h; nb
+      · exact deployChecks_nb template deploy ts m h
+
+/-- What a parse of `lasm init` gives. -/
+def InitOK : Except String Parsed → Prop
+  | .ok p => (p.command = "init" ∧ p.template ∈ templates ∧ ∀ d ∈ p.deploy, d ∈ deployTargets) ∨ p.command = "init-help"
+  | .error m => NB m
+
+theorem parseInit_spec (toks : List String) : InitOK (parseInitArguments toks) := by
+  have hl := initLoop_spec toks {} (by simp)
+  unfold parseInitArguments
+  split
+  · rename_i e he; rw [he] at hl; exact hl
+  · simp [InitOK]
+  · rename_i st hst
+    rw [hst] at hl
+    simp only [LoopOK] at hl
+    unfold initFinish initFinish.finishChecks
+    split
+    · simp only [InitOK]; nb
+    · split
+      · simp only [InitOK]; nb
+      · rename_i t ht
+        have htm : st.template ∈ templates := by
+          have := List.find?_some ht; have hm := List.mem_of_find?_eq_some ht
+          simp at this; simp only [templates, List.mem_map]; exact ⟨t, hm, this⟩
+        dsimp only
+        repeat' split
+        all_goals first
+          | (simp only [InitOK]; nb)
+          | (simp only [InitOK]; exact deployChecks_nb _ _ _ _ ‹_›)
+          | (simp only [InitOK, Parsed.template, Parsed.deploy, Option.getD]; exact Or.inl ⟨trivial, htm, hl⟩)
+
+/-! ### `lasm package` -/
+
+/-- What a parse of `lasm package` gives. -/
+def PackageOK : Except String Parsed → Prop
+  | .ok p => (p.command = "package" ∧ (p.target ∈ packageTargets ∨ p.target = "browser")) ∨ p.command = "package-help"
+  | .error m => NB m
+
+theorem packageLoop_spec (toks : List String) (r : Parsed) (pos : List String) (h : r.command = "package") :
+    LoopOK (fun x : Parsed × List String => x.1.command = "package") (packageLoop r pos toks) := by
+  fun_induction packageLoop r pos toks <;> simp only [LoopOK] at *
+  all_goals first
+    | exact h
+    | (with_reducible show NB _; nb)
+    | (rename_i ih; exact ih h)
+    | (rename_i ih; apply ih; split <;> exact h)
+
+theorem parsePackage_spec (toks : List String) : PackageOK (parsePackageArguments toks) := by
+  have hl := packageLoop_spec toks { command := "package" } [] rfl
+  unfold parsePackageArguments
+  split
+  · rename_i e he; rw [he] at hl; exact hl
+  · simp [PackageOK]
+  · rename_i r pos hst
+    rw [hst] at hl
+    simp only [LoopOK] at hl
+    repeat' split
+    all_goals first
+      | (simp only [PackageOK]; nb)
+      | (simp only [PackageOK, Parsed.target, Option.getD]; refine Or.inl ⟨hl, ?_⟩; simp_all
+         exact Decidable.or_iff_not_imp_left.mpr ‹_›)
+
+/-! ### `lasm dev` -/
+
+/-- What a parse of `lasm dev` gives. -/
+def DevOK : Except String Parsed → Prop
+  | .ok p => (p.command = "dev" ∧ ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean") ∨ p.command = "dev-help"
+  | .error m => NB m
+
+/-- An output of `--target` as the loop keeps it. -/
+def OutputOK (o : String × Option String) : Prop := o.1 ∈ devTargets ∧ ∀ i, o.2 = some i → i.endsWith ".lean"
+
+theorem devOutput_err {item m : String} (h : devOutput item = .error m) : NB m := by
+  unfold devOutput at h
+  dsimp only at h
+  split at h
+  · cases h; nb
+  · split at h
+    · cases h; nb
+    · cases h
+
+theorem devOutput_ok {item : String} {o : String × Option String} (h : devOutput item = .ok o) : OutputOK o := by
+  unfold devOutput at h
+  dsimp only at h
+  split at h
+  · cases h
+  · split at h
+    · cases h
+    · rename_i h1 h2
+      cases h
+      refine ⟨Decidable.not_not.mp h1, fun i hi => ?_⟩
+      cases hj : (item.splitOn "=")[1]? with
+      | none => simp [hj] at hi
+      | some j =>
+        simp only [hj, Option.filter] at hi h2
+        split at hi
+        · cases hi; simpa using h2
+        · cases hi
+
+theorem mapM_devOutput_ok : ∀ (items : List String) (os : List (String × Option String)),
+    items.mapM devOutput = .ok os → ∀ o ∈ os, OutputOK o
+  | [], os, h => by simp [pure, Except.pure] at h; subst h; simp
+  | item :: items, os, h => by
+    rw [List.mapM_cons] at h
+    cases hd : devOutput item <;> rw [hd] at h
+    · cases h
+    · cases hm : items.mapM devOutput <;> rw [hm] at h
+      · cases h
+      · simp only [bind, Except.bind, pure, Except.pure, Except.ok.injEq] at h
+        subst h
+        intro o ho
+        simp only [List.mem_cons] at ho
+        rcases ho with rfl | ho
+        · exact devOutput_ok hd
+        · exact mapM_devOutput_ok items _ hm o ho
+
+theorem mapM_devOutput_err : ∀ (items : List String) (m : String), items.mapM devOutput = .error m → NB m
+  | [], m, h => by simp [pure, Except.pure] at h
+  | item :: items, m, h => by
+    rw [List.mapM_cons] at h
+    cases hd : devOutput item <;> rw [hd] at h
+    · cases h; exact devOutput_err hd
+    · cases hm : items.mapM devOutput <;> rw [hm] at h
+      · cases h; exact mapM_devOutput_err items _ hm
+      · cases h
+
+/-- The loop's invariant. -/
+def DevInv (st : DevState) : Prop :=
+  st.result.command = "dev" ∧ (∀ os, st.outputs = some os → ∀ o ∈ os, OutputOK o) ∧ (st.outputs = none → st.result.target? = none)
+
+theorem devSetValued_err {st : DevState} {name : String} {v : Option String} {m : String}
+    (h : devSetValued st name v = .error m) : NB m := by
+  unfold devSetValued at h
+  repeat' split at h
+  all_goals first
+    | (cases h; done)
+    | (cases h; nb)
+    | (rename_i hm; cases h; exact mapM_devOutput_err _ _ hm)
+
+theorem devSetValued_ok {st st' : DevState} {name : String} {v : Option String} (hi : DevInv st)
+    (h : devSetValued st name v = .ok st') : DevInv st' := by
+  unfold devSetValued at h
+  repeat' split at h
+  all_goals first
+    | (cases h; done)
+    | (cases h; exact ⟨hi.1, hi.2.1, hi.2.2⟩)
+    | (rename_i hm _; cases h; exact ⟨hi.1, fun os' h' => by cases h'; exact mapM_devOutput_ok _ _ hm, fun h' => by cases h'⟩)
+
+theorem devLoop_spec (toks : List String) (st : DevState) (h : DevInv st) :
+    LoopOK DevInv (devLoop st toks) := by
+  fun_induction devLoop st toks <;> simp only [LoopOK] at *
+  all_goals first
+    | exact h
+    | (with_reducible show NB _; nb)
+    | exact ⟨h.1, h.2.1, h.2.2⟩
+    | (rename_i ih; exact ih ⟨h.1, h.2.1, h.2.2⟩)
+    | (rename_i hs ih; exact ih (devSetValued_ok h hs))
+    | (rename_i hs; exact devSetValued_err hs)
+
+theorem jsRuntime_dev : jsRuntime ∈ devTargets := by
+  rcases jsRuntimeOf.property with h | h | h <;> simp [jsRuntime, h, devTargets, runtimeTargets]
+
+theorem devFinal (st : DevState) (hl : DevInv st) (input : String) (hin : input.endsWith ".lean" = true) :
+    ∀ o ∈ (st.outputs.getD [(st.result.target?.getD jsRuntime, none)]).map (fun x => (x.1, x.2.getD input)),
+      o.1 ∈ devTargets ∧ o.2.endsWith ".lean" = true := by
+  intro o ho
+  simp only [List.mem_map] at ho
+  obtain ⟨⟨t, i⟩, hti, rfl⟩ := ho
+  cases hos : st.outputs with
+  | none =>
+    rw [hos] at hti
+    simp only [Option.getD, List.mem_singleton, Prod.mk.injEq] at hti
+    obtain ⟨rfl, rfl⟩ := hti
+    simp only [hl.2.2 hos, Option.getD]
+    exact ⟨jsRuntime_dev, hin⟩
+  | some os =>
+    rw [hos] at hti
+    have := hl.2.1 os hos _ hti
+    refine ⟨this.1, ?_⟩
+    cases i with
+    | none => exact hin
+    | some i => exact this.2 i rfl
+
+theorem parseDev_spec (toks : List String) : DevOK (parseDevArguments toks) := by
+  have hl := devLoop_spec toks { result := { command := "dev", profile? := some "dev", args? := some [], run? := some true, verbose? := some false } }
+    ⟨rfl, (fun _ h => nomatch h), fun _ => rfl⟩
+  unfold parseDevArguments parseDevArgumentsWith
+  dsimp only
+  split
+  · rename_i e he; rw [he] at hl; exact hl
+  · simp [DevOK]
+  · rename_i st hst
+    rw [hst] at hl
+    simp only [LoopOK] at hl
+    unfold devFinish
+    split
+    · simp only [DevOK]; nb
+    · dsimp only
+      split
+      · simp only [DevOK]; nb
+      · rename_i hin
+        have hin' : (st.positional.head?.getD (((st.outputs.getD []).findSome? (·.2)).getD "Main.lean")).endsWith ".lean" = true := by
+          simpa using hin
+        repeat' split
+        all_goals first
+          | (simp only [DevOK]; nb)
+          | exact Or.inl ⟨hl.1, devFinal st hl _ hin'⟩
+
+/-! ### `lasm build` and running a program -/
+
+/-- The option loop's invariant. -/
+def ProgInv (r : Parsed) : Prop := (r.command = "run" ∨ r.command = "build") ∧ ∀ t, r.target? = some t → t ∈ buildTargets
+
+theorem setValued_err {r : Parsed} {sup : List String} {name : String} {v : Option String} {m : String}
+    (h : setValued r sup name v = .error m) : NB m := by
+  unfold setValued at h
+  repeat' split at h
+  all_goals first
+    | (cases h; done)
+    | (cases h; nb)
+
+theorem setValued_ok {r r' : Parsed} {sup : List String} {name : String} {v : Option String} (hi : ProgInv r)
+    (h : setValued r sup name v = .ok r') : ProgInv r' := by
+  unfold setValued at h
+  repeat' split at h
+  all_goals first
+    | (cases h; done)
+    | (cases h; exact hi)
+    | (cases h; exact ⟨hi.1, fun t ht => by cases ht; exact Decidable.not_not.mp ‹_›⟩)
+
+theorem optionLoop_spec (toks : List String) (r : Parsed) (pos sup : List String) (h : ProgInv r) :
+    LoopOK (fun x : Parsed × List String => ProgInv x.1) (optionLoop r pos sup toks) := by
+  fun_induction optionLoop r pos sup toks <;> simp only [LoopOK] at *
+  all_goals first
+    | exact h
+    | (with_reducible show NB _; nb)
+    | exact ⟨h.1, h.2⟩
+    | (rename_i ih; exact ih ⟨h.1, h.2⟩)
+    | (rename_i hs ih; exact ih (setValued_ok h hs))
+    | (rename_i hs; exact setValued_err hs)
+
+/-- What `finish` gives. -/
+def FinishOK : Except String Parsed → Prop
+  | .ok p => (p.command = "run" ∨ p.command = "build") ∧ (p.command = "build" → p.target ∈ buildTargets) ∧
+      (p.input.endsWith ".lean" ∨ p.input.endsWith ".json")
+  | .error m => NB m
+
+theorem jsRuntime_build : jsRuntime ∈ buildTargets := by
+  rcases jsRuntimeOf.property with h | h | h <;> simp [jsRuntime, h, buildTargets, edgeBuildTargets, wasiBuildTargets]
+
+theorem placeOutput_fields (r : Parsed) (more : List String) :
+    (placeOutput r more).1.command = r.command ∧ (placeOutput r more).1.target? = r.target? ∧
+      (placeOutput r more).1.input? = r.input? := by
+  unfold placeOutput; split
+  · split <;> exact ⟨rfl, rfl, rfl⟩
+  · exact ⟨rfl, rfl, rfl⟩
+
+theorem defaultProfile_fields (r : Parsed) (first : String) :
+    (defaultProfile r first).command = r.command ∧ (defaultProfile r first).target? = r.target? ∧
+      (defaultProfile r first).input? = r.input? := by
+  unfold defaultProfile; split <;> exact ⟨rfl, rfl, rfl⟩
+
+theorem checkOptions_spec (r : Parsed) (first : String) (hc : r.command = "run" ∨ r.command = "build")
+    (ht : ∀ t, r.target? = some t → t ∈ buildTargets) (hi : r.input? = some first)
+    (hf : first.endsWith ".lean" = true ∨ first.endsWith ".json" = true) :
+    FinishOK (checkOptions ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩ r first) := by
+  have hin : (r.input?.getD "").endsWith ".lean" = true ∨ (r.input?.getD "").endsWith ".json" = true := by simpa [hi] using hf
+  have hdef : (r.target?.getD (if jsRuntime = "node" ∨ first.endsWith ".json" = true then "node" else jsRuntime)) ∈ buildTargets := by
+    cases hrt : r.target? with
+    | some t => exact ht t hrt
+    | none => simp only [Option.getD]; split
+              · simp [buildTargets]
+              · exact jsRuntime_build
+  unfold checkOptions
+  dsimp only
+  generalize r.target?.getD (if jsRuntime = "node" ∨ first.endsWith ".json" = true then "node" else jsRuntime) = T at hdef ⊢
+  repeat' split
+  all_goals first
+    | (show NB _; nb)
+    | exact ⟨hc, fun _ => hdef, hin⟩
+    | exact ⟨hc, fun hb => absurd hb ‹_›, hin⟩
+
+theorem finish_spec (r : Parsed) (pos : List String) (h : ProgInv r) :
+    FinishOK (finish ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩ r pos) := by
+  unfold finish
+  cases pos with
+  | nil => show NB _; nb
+  | cons first more =>
+    dsimp only
+    split
+    · show NB _; nb
+    · obtain ⟨h1, h2, h3⟩ := placeOutput_fields { r with input? := some first } more
+      generalize placeOutput { r with input? := some first } more = q at h1 h2 h3
+      obtain ⟨r', more'⟩ := q
+      dsimp only at h1 h2 h3 ⊢
+      split
+      · show NB _; nb
+      · split
+        · show NB _; nb
+        · split
+          · show NB _; nb
+          · split
+            · show NB _; nb
+            · rename_i hx _
+              obtain ⟨d1, d2, d3⟩ := defaultProfile_fields r' first
+              apply checkOptions_spec
+              · rw [d1, h1]; exact h.1
+              · rw [d2, h2]; exact h.2
+              · rw [d3, h3]
+              · simp only [Bool.not_eq_true', Bool.or_eq_false_iff] at hx
+                cases hl : first.endsWith ".lean"
+                · cases hj : first.endsWith ".json"
+                  · simp_all
+                  · exact Or.inr rfl
+                · exact Or.inl rfl
+
+theorem all_whitespace_of_trimAscii (s : String) (h : s.trimAscii.toString = "") : s.toList.all Char.isWhitespace = true := by
+  have h1 : (s.toSlice.dropWhile Char.isWhitespace |>.dropEndWhile Char.isWhitespace).isEmpty = true := by
+    have : s.trimAscii.toString = s.trimAscii.copy := rfl
+    rw [this, String.Slice.copy_eq_empty_iff] at h
+    exact h
+  rw [String.Slice.isEmpty_dropEndWhile, String.Slice.revAll_bool_eq] at h1
+  have h2 := String.Slice.takeWhile_append_dropWhile (pat := Char.isWhitespace) (s := s.toSlice)
+  have h3 : (s.toSlice.takeWhile Char.isWhitespace).copy.toList.all Char.isWhitespace = true := by
+    rw [← String.Slice.all_bool_eq]; exact String.Slice.all_takeWhile
+  have : s.toList = (s.toSlice.takeWhile Char.isWhitespace).copy.toList ++ (s.toSlice.dropWhile Char.isWhitespace).copy.toList := by
+    rw [← String.toList_append, h2]; simp
+  rw [this, List.all_append, h1, h3]; rfl
+
+theorem readable_of_nb {m : String} (h : NB m) : m.trimAscii.toString ≠ "" := by
+  intro he
+  obtain ⟨c, hc, hw⟩ := h
+  have := List.all_eq_true.mp (all_whitespace_of_trimAscii m he) c hc
+  rw [hw] at this; cases this
+
+/-- What the proposition asks of a parse. -/
+def Outcome : Except String Parsed → Prop
+  | .ok p => p.command ∈ commands ∧
+        (p.command = "build" → p.target ∈ buildTargets) ∧
+        ((p.command = "build" ∨ p.command = "run") → p.input.endsWith ".lean" ∨ p.input.endsWith ".json") ∧
+        (p.command = "init" → p.template ∈ templates ∧ ∀ d ∈ p.deploy, d ∈ deployTargets) ∧
+        (p.command = "package" → p.target ∈ packageTargets ∨ p.target = "browser") ∧
+        (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
+  | .error m => m.trimAscii.toString ≠ ""
+
+/-- A parse of a command with no checked fields. -/
+theorem outcome_plain (p : Parsed) (h : p.command ∈ ["version", "help", "editor", "cache-repair", "init-help", "dev-help", "package-help"]) :
+    Outcome (.ok p) := by
+  simp only [List.mem_cons, List.not_mem_nil, or_false] at h
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩ <;> rcases h with h | h | h | h | h | h | h <;> simp [h, commands]
+
+theorem outcome_init (r : Except String Parsed) (h : InitOK r) : Outcome r := by
+  cases r with
+  | error m => exact readable_of_nb h
+  | ok p =>
+    rcases h with ⟨hc, ht, hd⟩ | h
+    · refine ⟨?_, ?_, ?_, fun _ => ⟨ht, hd⟩, ?_, ?_⟩ <;> simp [hc, commands]
+    · exact outcome_plain p (by simp [h])
+
+theorem outcome_dev (r : Except String Parsed) (h : DevOK r) : Outcome r := by
+  cases r with
+  | error m => exact readable_of_nb h
+  | ok p =>
+    rcases h with ⟨hc, ho⟩ | h
+    · refine ⟨?_, ?_, ?_, ?_, ?_, fun _ => ho⟩ <;> simp [hc, commands]
+    · exact outcome_plain p (by simp [h])
+
+theorem outcome_package (r : Except String Parsed) (h : PackageOK r) : Outcome r := by
+  cases r with
+  | error m => exact readable_of_nb h
+  | ok p =>
+    rcases h with ⟨hc, ht⟩ | h
+    · refine ⟨?_, ?_, ?_, ?_, fun _ => ht, ?_⟩ <;> simp [hc, commands]
+    · exact outcome_plain p (by simp [h])
+
+theorem outcome_finish (r : Except String Parsed) (h : FinishOK r) : Outcome r := by
+  cases r with
+  | error m => exact readable_of_nb h
+  | ok p =>
+    obtain ⟨hc, ht, hi⟩ := h
+    refine ⟨?_, ht, fun _ => hi, ?_, ?_, ?_⟩ <;> rcases hc with hc | hc <;> simp [hc, commands]
+
+theorem parse_known_or_refused : Spec.parse_known_or_refused := by
+  intro argv
+  show Outcome (parseLasmArguments argv)
+  unfold parseLasmArguments parseLasmArgumentsWith
+  have hrest : ∀ tokens, Outcome (parseLasmArgumentsWith.rest
+      ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩ tokens) := by
+    have hprog : ∀ r toks, ProgInv r → Outcome (parseLasmArgumentsWith.program
+        ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩ r toks) := by
+      intro r toks hr
+      have hl := optionLoop_spec toks r [] [] hr
+      unfold parseLasmArgumentsWith.program
+      split
+      · rename_i e he; rw [he] at hl; exact readable_of_nb hl
+      · exact outcome_plain _ (by simp)
+      · rename_i r' pos hst; rw [hst] at hl; exact outcome_finish _ (finish_spec r' pos hl)
+    have hstart : ProgInv parseLasmArgumentsWith.start := ⟨Or.inl rfl, fun _ h => nomatch h⟩
+    intro tokens
+    unfold parseLasmArgumentsWith.rest
+    split
+    · rename_i c more
+      split
+      · exact outcome_init _ (parseInit_spec more)
+      · split
+        · exact outcome_dev _ (parseDev_spec more)
+        · split
+          · exact outcome_package _ (parsePackage_spec more)
+          · split
+            · split
+              · exact outcome_plain _ (by simp)
+              · split
+                · exact readable_of_nb (by nb)
+                · exact outcome_plain _ (by simp)
+            · split
+              · split
+                · exact outcome_plain _ (by simp)
+                · split
+                  · exact readable_of_nb (by nb)
+                  · exact outcome_plain _ (by simp)
+              · split
+                · rename_i hc
+                  exact hprog _ _ ⟨by rcases hc with hc | hc <;> simp [hc], fun _ h => nomatch h⟩
+                · exact hprog _ _ hstart
+    · exact hprog _ _ hstart
+  split
+  · split
+    · exact outcome_plain _ (by simp)
+    · exact hrest _
+  · exact hrest _
 
 /-! ## The process launcher -/
 

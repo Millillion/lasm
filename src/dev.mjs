@@ -48,7 +48,7 @@ export function parseDevArguments(tokens) {
     if (token === '--no-run') { result.run = false; continue; }
     if (token === '--verbose') { result.verbose = true; continue; }
     if (token === '--no-watch') { result.watch = false; continue; }
-    const option = /^--(target|port|host|output)(?:=(.*))?$/.exec(token);
+    const option = /^--(target|port|host|output)(?:=(.*))?$/s.exec(token);
     if (option) {
       const value = option[2] ?? tokens[++i];
       if (!value || value.startsWith('--')) throw new Error(`--${option[1]} requires a value\n\n${devUsage}`);

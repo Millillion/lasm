@@ -30,9 +30,10 @@ so `.length` of a spread word is `String.length` here.
 namespace Lasm.Cli
 
 /-- What `parseLasmArguments` returns: a plain object, each field present
-(`some`) or absent (`none`). `template?`, `deploy?` and `outputs?` are fields
-of the objects that the parsers of `lasm init` and `lasm dev` return (the
-fields a proposition reads of them); this module never sets them. -/
+(`some`) or absent (`none`). `template?`, `deploy?`, `directory?`, `run?`,
+`watch?`, `port?`, `host?` and `outputs?` are fields of the objects that the
+parsers of `lasm init` and `lasm dev` return (Model/Init.lean,
+Model/Dev.lean); this module never sets them. -/
 structure Parsed where
   command : String
   rebuild? : Option Bool := none
@@ -48,6 +49,11 @@ structure Parsed where
   template? : Option String := none
   deploy? : Option (List String) := none
   outputs? : Option (List (String × String)) := none
+  directory? : Option String := none
+  run? : Option Bool := none
+  watch? : Option Bool := none
+  port? : Option Nat := none
+  host? : Option String := none
 deriving Inhabited, DecidableEq, Repr
 
 /-- What the module imports. -/
@@ -82,7 +88,9 @@ def targetAliases : List (String × String) :=
    ("wasmtime", "wasi"), ("web", "browser"), ("vite", "browser"), ("azure-functions", "azure"), ("google-cloud-functions", "gcf"),
    ("cloud-functions", "gcf"), ("vercel-functions", "vercel"), ("netlify-functions", "netlify")]
 
-def cliUsage : String := "Usage: lasm <Main.lean> [--release] [-- arguments…]
+/-- The usage text: one literal in the JavaScript, two pieces here, so that a
+proof sees its first word without decoding the whole text. -/
+def cliUsage : String := "Usage:" ++ " lasm <Main.lean> [--release] [-- arguments…]
        lasm dev [Main.lean] [--target node|bun|deno|workers|vercel-edge|netlify-edge|deno-deploy|supabase-edge|browser] [-- arguments…]
        lasm build <Main.lean> [--output DIR] [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--suspend none|jspi] [--bundler] [--dev]
        lasm init <directory> [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy …]
@@ -233,6 +241,35 @@ termination_by tokens => tokens.length
 /-- `/[./\\]/.test(word)`. -/
 def pathLike (word : String) : Bool := word.toList.any fun c => c = '.' || c = '/' || c = '\\'
 
+/-- `if (positional.length === 2 && command === 'build' && parsed.output === undefined)`:
+a second positional word of `lasm build` is its output directory. Returns the
+parse and the words left over. -/
+def placeOutput (r : Parsed) (more : List String) : Parsed × List String :=
+  match more with
+  | [o] => if r.command = "build" ∧ r.output? = none then ({ r with output? := some o }, []) else (r, more)
+  | _ => (r, more)
+
+/-- The default profile of a Lean source: release for `lasm build`, dev for
+running it. -/
+def defaultProfile (r : Parsed) (first : String) : Parsed :=
+  if first.endsWith ".lean" ∧ r.profile? = none then { r with profile? := some (if r.command = "build" then "release" else "dev") } else r
+
+/-- The checks after the profile is set, and `lasm build`'s target and output. -/
+def checkOptions (env : ArgumentsEnv) (r : Parsed) (first : String) : Except String Parsed :=
+  if r.allowDev? = some true ∧ !(r.command = "build" ∧ r.target?.any (· ≠ "node")) then
+    .error "--allow-dev applies to lasm build --target <platform> and lasm package"
+  else if r.suspend?.isSome ∧ r.target? ≠ some "browser" then .error "--suspend applies to lasm build --target browser"
+  else if r.bundler? = some true ∧ r.target? ≠ some "browser" then .error "--bundler applies to lasm build --target browser"
+  else if r.command = "build" then
+    let target := r.target?.getD (if env.jsRuntime = "node" ∨ first.endsWith ".json" then "node" else env.jsRuntime)
+    let r := { r with target? := some target }
+    if target ≠ "node" ∧ first.endsWith ".json" then .error "--target applies to Lean applications, not binding configurations"
+    else if target ∈ fixedLayoutTargets ∧ r.output?.isSome then
+      .error ("--output does not apply to --target " ++ target ++ ": the platform fixes its layout (" ++
+        (if target = "vercel-edge" then "api/lasm.mjs and api/_lasm/" else "netlify/edge-functions/lasm.mjs and netlify/lasm/") ++ ")")
+    else .ok (if target ∉ platformBuildTargets ∧ r.output? = none then { r with output? := some "dist" } else r)
+  else .ok r
+
 /-- After the loop: the checks from `if (!positional.length)` on. -/
 def finish (env : ArgumentsEnv) (r : Parsed) (positional : List String) : Except String Parsed :=
   match positional with
@@ -243,30 +280,13 @@ def finish (env : ArgumentsEnv) (r : Parsed) (positional : List String) : Except
       .error ("Unknown command \"" ++ first ++ "\"" ++ (match guess with | some g => " (did you mean lasm " ++ g ++ "?)" | none => "") ++
         ". Commands: " ++ ", ".intercalate commandNames ++ "; or run a program with lasm Main.lean.")
     else
-      let r := { r with input? := some first }
-      let (r, more) := match more with
-        | [o] => if r.command = "build" ∧ r.output? = none then ({ r with output? := some o }, []) else (r, more)
-        | _ => (r, more)
+      let (r, more) := placeOutput { r with input? := some first } more
       if more ≠ [] then .error "Unexpected positional arguments. Put application arguments after --."
       else if r.command = "run" ∧ r.output?.isSome then .error "--output is available only with lasm build"
       else if !(first.endsWith ".lean" || r.command = "build" && first.endsWith ".json") then
         .error "Expected a Lean source file, or a binding configuration for lasm build"
       else if first.endsWith ".json" ∧ r.profile?.isSome then .error "--dev and --release apply to Lean applications"
-      else
-        let r := if first.endsWith ".lean" ∧ r.profile? = none then { r with profile? := some (if r.command = "build" then "release" else "dev") } else r
-        if r.allowDev? = some true ∧ !(r.command = "build" ∧ r.target?.any (· ≠ "node")) then
-          .error "--allow-dev applies to lasm build --target <platform> and lasm package"
-        else if r.suspend?.isSome ∧ r.target? ≠ some "browser" then .error "--suspend applies to lasm build --target browser"
-        else if r.bundler? = some true ∧ r.target? ≠ some "browser" then .error "--bundler applies to lasm build --target browser"
-        else if r.command = "build" then
-          let target := r.target?.getD (if env.jsRuntime = "node" ∨ first.endsWith ".json" then "node" else env.jsRuntime)
-          let r := { r with target? := some target }
-          if target ≠ "node" ∧ first.endsWith ".json" then .error "--target applies to Lean applications, not binding configurations"
-          else if target ∈ fixedLayoutTargets ∧ r.output?.isSome then
-            .error ("--output does not apply to --target " ++ target ++ ": the platform fixes its layout (" ++
-              (if target = "vercel-edge" then "api/lasm.mjs and api/_lasm/" else "netlify/edge-functions/lasm.mjs and netlify/lasm/") ++ ")")
-          else .ok (if target ∉ platformBuildTargets ∧ r.output? = none then { r with output? := some "dist" } else r)
-        else .ok r
+      else checkOptions env (defaultProfile r first) first
 
 /-- `parseLasmArguments(argv)`, with the module's imports `env`. -/
 def parseLasmArgumentsWith (env : ArgumentsEnv) (argv : List String) : Except String Parsed :=
