@@ -25,6 +25,7 @@ import { lakeName, packageName, parseInitArguments, supabaseFunctionNameOf } fro
 import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
+import { decodeFileMessage, encodeFileMessage } from '../../src/native-file-message.mjs';
 import { initializerClosure, unitsReaching } from '../../src/application-initialization.mjs';
 import { applicationLinkRequirements } from '../../src/application-reachability.mjs';
 import { ioErrorTables, leanAtLeast, leanIOError } from '../../src/lean-io-errors.mjs';
@@ -437,6 +438,39 @@ function linkMap(r) {
  * slashes, names sharing prefixes (`a`, `ab`, `..a`). */
 const posixPath = r => (r.next() < 0.7 ? '/' : '') + r.array(r.int(0, 5), () => r.pick(['a', 'b', 'ab', 'a', '..', '.', '', 'x y', 'λ', '..a', 'a.'])).join('/') + (r.next() < 0.2 ? '/' : '');
 
+/** A file worker message value: primitives (the protocol's own tags among
+ * them, as data), ArrayBuffers and SharedArrayBuffers from a pool, Uint8Arrays
+ * over them (whole, sliced, empty), arrays and records, nested. The buffers
+ * are made afresh for each value (a move detaches nothing here: the
+ * message is not posted). */
+function fileValue(r) {
+  const pool = Array.from({ length: 3 }, (_, i) => i === 2 ? new SharedArrayBuffer(8) : new ArrayBuffer(8 + i));
+  const leaf = () => {
+    const roll = r.next();
+    if (roll < 0.3) return r.pick([0, 1.5, -1, 'bytes', 'record', 'type', '', null, undefined, true, false, 12345678901234567890n]);
+    const id = r.int(0, pool.length - 1);
+    if (roll < 0.5) return { $buffer: id };
+    const buffer = pool[id], offset = r.next() < 0.5 ? 0 : r.int(0, buffer.byteLength), length = r.next() < 0.5 ? buffer.byteLength - offset : r.int(0, buffer.byteLength - offset);
+    return { $view: [id, offset, length] };
+  };
+  const tree = depth => depth > 2 || r.next() < 0.4 ? leaf() : r.next() < 0.5 ? { $array: r.array(r.int(0, 3), () => tree(depth + 1)) }
+    : { $record: r.array(r.int(0, 3), (_, i) => [r.pick(['type', 'value', 'a', '0', '__proto__', `k${i}`]), tree(depth + 1)]) };
+  return { pool, shape: tree(0), move: r.next() < 0.5 };
+}
+/** The JavaScript value of a shape, over its pool. */
+function fileShapeValue(pool, shape) {
+  if (shape?.$buffer !== undefined) return pool[shape.$buffer];
+  if (shape?.$view) { const [id, offset, length] = shape.$view; return new Uint8Array(pool[id], offset, length); }
+  if (shape?.$array) return shape.$array.map(s => fileShapeValue(pool, s));
+  if (shape?.$record) {
+    const object = {};
+    for (const [key, s] of shape.$record) Object.defineProperty(object, key, { value: fileShapeValue(pool, s), enumerable: true, writable: true, configurable: true });
+    return object;
+  }
+  return shape;
+}
+const primDesc = v => typeof v === 'bigint' ? `${v}n` : v === undefined ? 'undefined' : JSON.stringify(v);
+
 const models = [
   {
     name: 'editDistance', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
@@ -572,6 +606,36 @@ const models = [
         const result = applicationLinkRequirements(map, { initializationFreeCppSymbols: new Set(initFree) });
         return { ...result, dynamic: result.dynamic.map(hex), cxxRuntime: result.cxxRuntime.map(hex), moduleData: result.moduleData.map(hex) };
       } catch (error) { return { error: error.message }; }
+    },
+  },
+  {
+    name: 'fileMessage', source: 'src/native-file-message.mjs', lean: 'Lasm.Cli.Model.FileMessage',
+    generate: fileValue,
+    input: ({ pool, shape, move }) => {
+      const value = s => s?.$buffer !== undefined ? { buffer: s.$buffer, shared: pool[s.$buffer] instanceof SharedArrayBuffer }
+        : s?.$view ? { view: s.$view[0], shared: pool[s.$view[0]] instanceof SharedArrayBuffer, whole: s.$view[1] === 0 && s.$view[2] === pool[s.$view[0]].byteLength, length: s.$view[2] }
+        : s?.$array ? { array: s.$array.map(value) }
+        : s?.$record ? (entries => { const order = Object.keys(Object.fromEntries([...entries.keys()].map(k => [k, 0]))); return { record: order.map(k => [k, value(entries.get(k))]) }; })(new Map(s.$record))
+        : { prim: primDesc(s) };
+      return { move, value: value(shape) };
+    },
+    js: ({ pool, shape, move }) => {
+      const { message, transfer } = encodeFileMessage(fileShapeValue(pool, shape), { move });
+      const copies = new Map();
+      const ref = buffer => pool.includes(buffer) ? ['own', pool.indexOf(buffer)]
+        : ['copy', copies.has(buffer) ? copies.get(buffer) : (copies.set(buffer, copies.size), copies.size - 1), buffer.byteLength];
+      const describe = m => m === null || typeof m !== 'object' ? { prim: primDesc(m) }
+        : m.type === 'buffer' ? { buffer: ref(m.value), shared: m.value instanceof SharedArrayBuffer }
+        : m.type === 'bytes' ? { bytes: ref(m.value) }
+        : m.type === 'array' ? { array: m.value.map(describe) }
+        : { record: m.value.map(([k, v]) => [k, describe(v)]) };
+      const described = describe(message);
+      const decodedOf = d => d instanceof Uint8Array ? { bytes: ref(d.buffer) }
+        : d instanceof ArrayBuffer || (typeof SharedArrayBuffer !== 'undefined' && d instanceof SharedArrayBuffer) ? { buffer: ref(d), shared: d instanceof SharedArrayBuffer }
+        : Array.isArray(d) ? { array: d.map(decodedOf) }
+        : d !== null && typeof d === 'object' ? { record: Object.entries(d).map(([k, v]) => [k, decodedOf(v)]) }
+        : { prim: primDesc(d) };
+      return { message: described, transfer: transfer.map(ref), decoded: decodedOf(decodeFileMessage(message)) };
     },
   },
   {

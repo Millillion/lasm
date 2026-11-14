@@ -246,6 +246,18 @@ def closure_reached : Prop :=
     (initializerClosureOf units roots).Nodup ∧
     ∀ x, x ∈ initializerClosureOf units roots ↔ ∃ r ∈ roots, InitReaches units r x
 
+/-! ## The file worker -/
+
+/-- **The transfer list names each buffer once, and only when moving.**
+`postMessage` refuses a transfer list that names a buffer twice: whatever
+the message (the same allocation reached as a buffer and as a view, nested
+arrays and records), `encodeFileMessage` lists each buffer it transfers
+once, and without `move` it transfers none.
+Tested by: test/native-file-message.test.mjs -/
+def file_message_transfers : Prop :=
+  ∀ (move : Bool) (v : FileMessage.Value),
+    (FileMessage.encodeFileMessage move v).2.Nodup ∧ (move = false → (FileMessage.encodeFileMessage move v).2 = [])
+
 /-! ## The link driver's Python semantics -/
 
 /-- **Escaped strings are printable ASCII.** `json.dumps` of any string,

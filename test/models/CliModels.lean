@@ -53,6 +53,9 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
   parseDevArguments   {"tokens": ["<hex>", …], "runtime": "node"}  → (the same)
   parsePackageArguments  ["<hex>", …]              → (the same)
   leanAtLeast    {"version": "<hex>", "minimum": "<hex>"}  → true | false
+  fileMessage    {"move": b, "value": V}            → {"message": M, "transfer": [R, …], "decoded": D}
+(V: {"prim": "…"} | {"buffer": id, "shared": b} | {"view": id, "shared": b, "whole": b, "length": n} | {"array": [V, …]} | {"record": [["key", V], …]};
+R: ["own", id] | ["copy", k, length]; M and D: {"prim": "…"} | {"buffer": R, "shared": b} | {"bytes": R} | {"array": […]} | {"record": [["key", …], …]})
   initializerClosure  {"units": [["…", ["…", …]], …], "roots": ["…", …]}  → ["…", …]
   unitsReaching  {"graph": [["…", ["…", …]], …], "candidates": ["…", …], "targets": ["…", …]}  → ["…", …]
   relativePath   {"cwd": "<hex>", "from": "<hex>", "to": "<hex>"}  → "<hex>"  (path.posix.relative)
@@ -105,6 +108,7 @@ import Lasm.Cli.Model.Mangle
 import Lasm.Cli.Model.StaticServer
 import Lasm.Cli.Model.Reachability
 import Lasm.Cli.Model.Initialization
+import Lasm.Cli.Model.FileMessage
 import Lean.Compiler.NameMangling
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
@@ -141,6 +145,35 @@ def text (j : Json) : Except String String := do
   | none => .error "text that is not UTF-8"
 
 def ofText (s : String) : Json := toJson (hex s.toUTF8)
+
+/-- A value of the file worker's messages (Model/FileMessage.lean), from JSON. -/
+partial def fileValueOf (j : Json) : Except String FileMessage.Value := do
+  if let .ok d := j.getObjValAs? String "prim" then return .prim d
+  if let .ok id := j.getObjValAs? Nat "buffer" then return .buffer id (← j.getObjValAs? Bool "shared")
+  if let .ok id := j.getObjValAs? Nat "view" then
+    return .view id (← j.getObjValAs? Bool "shared") (← j.getObjValAs? Bool "whole") (← j.getObjValAs? Nat "length")
+  if let .ok items := j.getObjVal? "array" then return .array (← (← items.getArr?).toList.mapM fileValueOf)
+  let entries ← (← (← j.getObjVal? "record").getArr?).toList.mapM fun e => do
+    let a ← e.getArr?; return ((← (a[0]?.getD Json.null).getStr?), (← fileValueOf (a[1]?.getD Json.null)))
+  return .record entries
+
+def fileRefJson : FileMessage.Ref → Json
+  | .own id => Json.arr #[toJson "own", toJson id]
+  | .copy k n => Json.arr #[toJson "copy", toJson k, toJson n]
+
+partial def fileMessageJson : FileMessage.Message → Json
+  | .prim d => Json.mkObj [("prim", toJson d)]
+  | .buffer r sh => Json.mkObj [("buffer", fileRefJson r), ("shared", toJson sh)]
+  | .bytes r => Json.mkObj [("bytes", fileRefJson r)]
+  | .array ms => Json.mkObj [("array", Json.arr (ms.map fileMessageJson).toArray)]
+  | .record es => Json.mkObj [("record", Json.arr (es.map fun (k, m) => Json.arr #[toJson k, fileMessageJson m]).toArray)]
+
+partial def fileDecodedJson : FileMessage.Decoded → Json
+  | .prim d => Json.mkObj [("prim", toJson d)]
+  | .buffer r sh => Json.mkObj [("buffer", fileRefJson r), ("shared", toJson sh)]
+  | .bytes r => Json.mkObj [("bytes", fileRefJson r)]
+  | .array ms => Json.mkObj [("array", Json.arr (ms.map fileDecodedJson).toArray)]
+  | .record es => Json.mkObj [("record", Json.arr (es.map fun (k, m) => Json.arr #[toJson k, fileDecodedJson m]).toArray)]
 
 /-- Bytes sent as hex. -/
 def bytesOf (j : Json) : Except String ByteArray := do unhex (← j.getStr?)
@@ -421,6 +454,10 @@ def answer (j : Json) : Except String Json := do
       | .error e => Json.mkObj [("error", toJson e)]
       | .ok r => Json.mkObj [("mode", toJson (if r.static then "static" else "dynamic")), ("dynamic", hexes r.dynamic),
           ("cxxRuntime", hexes r.cxxRuntime), ("moduleData", hexes r.moduleData), ("requiresModuleData", toJson r.requiresModuleData)]
+  | "fileMessage" =>
+    let (m, transfer) := FileMessage.encodeFileMessage (← (← input.getObjVal? "move").getBool?) (← fileValueOf (← input.getObjVal? "value"))
+    return Json.mkObj [("message", fileMessageJson m), ("transfer", Json.arr (transfer.map fileRefJson).toArray),
+      ("decoded", fileDecodedJson (FileMessage.decodeFileMessage m))]
   | "initializerClosure" =>
     let strs := fun (j : Json) => do (← j.getArr?).toList.mapM (·.getStr?)
     let entries := fun (j : Json) => do (← j.getArr?).toList.mapM fun e => do

@@ -4417,6 +4417,65 @@ end InitProofs
 theorem closure_reached : Spec.closure_reached := fun units roots =>
   InitProofs.closure_reached units roots
 
+/-! ## The file worker's messages (Model/FileMessage.lean)
+
+Each step of the walk keeps the transfer list free of duplicates (a Set's
+`add`), and without `move` leaves it as it is (`encode_keeps`).
+-/
+
+namespace FileProofs
+open Lasm.Cli.FileMessage
+
+theorem add_nodup (s : State) (r : Ref) (h : s.transfers.Nodup) : (s.add r).transfers.Nodup := by
+  unfold State.add; split
+  · exact h
+  · rename_i hr; simp only; exact List.nodup_append.mpr ⟨h, by simp, by intro a ha b hb; simp at hb; subst hb; intro e; subst e; exact hr ha⟩
+
+/-- What a step keeps of the transfer list: no duplicates; without `move`, unchanged. -/
+def Keeps (move : Bool) (s s' : State) : Prop :=
+  (s.transfers.Nodup → s'.transfers.Nodup) ∧ (move = false → s'.transfers = s.transfers)
+
+theorem keeps_trans {move : Bool} {a b c : State} (h1 : Keeps move a b) (h2 : Keeps move b c) : Keeps move a c :=
+  ⟨fun h => h2.1 (h1.1 h), fun hm => by rw [h2.2 hm, h1.2 hm]⟩
+
+mutual
+theorem encode_keeps (move : Bool) : ∀ (v : Value) (s : State), Keeps move s (encode move v s).2
+  | .prim _, s => ⟨fun h => h, fun _ => rfl⟩
+  | .buffer i shared, s => by
+    simp only [encode]
+    split
+    · rename_i h; exact ⟨add_nodup s _, fun hm => by simp [hm] at h⟩
+    · exact ⟨fun h => h, fun _ => rfl⟩
+  | .view i shared whole length, s => by
+    simp only [encode]
+    cases hw : (whole && !shared) <;> cases move <;> simp only [Bool.false_eq_true, if_false, if_true] <;>
+      first
+      | exact ⟨fun h => h, fun _ => rfl⟩
+      | exact ⟨add_nodup _ _, fun h => by simp at h⟩
+      | exact ⟨fun h => add_nodup { copies := s.copies + 1, transfers := s.transfers } _ h, fun h => by simp at h⟩
+  | .array items, s => by simp only [encode]; exact encodeList_keeps move items s
+  | .record entries, s => by simp only [encode]; exact encodeEntries_keeps move entries s
+theorem encodeList_keeps (move : Bool) : ∀ (vs : List Value) (s : State), Keeps move s (encodeList move vs s).2
+  | [], s => ⟨fun h => h, fun _ => rfl⟩
+  | v :: vs, s => by
+    simp only [encodeList]
+    exact keeps_trans (encode_keeps move v s) (encodeList_keeps move vs _)
+theorem encodeEntries_keeps (move : Bool) : ∀ (es : List (String × Value)) (s : State), Keeps move s (encodeEntries move es s).2
+  | [], s => ⟨fun h => h, fun _ => rfl⟩
+  | (k, v) :: es, s => by
+    simp only [encodeEntries]
+    exact keeps_trans (encode_keeps move v s) (encodeEntries_keeps move es _)
+end
+
+theorem transfers_safe (move : Bool) (v : Value) :
+    (encodeFileMessage move v).2.Nodup ∧ (move = false → (encodeFileMessage move v).2 = []) := by
+  have h := encode_keeps move v {}
+  exact ⟨h.1 List.nodup_nil, fun hm => h.2 hm⟩
+
+end FileProofs
+
+theorem file_message_transfers : Spec.file_message_transfers := FileProofs.transfers_safe
+
 /-! ## Function packages -/
 
 theorem zip_deterministic : Spec.zip_deterministic := fun _ => rfl
