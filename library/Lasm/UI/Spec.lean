@@ -15,8 +15,12 @@ model (Lasm.UI.Model: nodes with ids, attribute slots, and what each patch
 operation does), which the JavaScript applier (src/lasm-modules/ui-dom.mjs)
 implements with the DOM API. How the applier reads the bytes is written in
 Lean as a reference decoder (Lasm.UI.Proofs.Decode, function for function the
-reading half of the applier); that the JavaScript applier does what the
-decoder and the model say is tested, not proved.
+reading half of the applier), and what it does to the DOM as a model of the
+writing half (Lasm.UI.Applier, Proofs/Applier.lean: every node looked up by
+id in one table for the document, as the JavaScript does, and the DOM's
+refusals); that the JavaScript applier does what the decoder and the
+applier model say is tested (test/models/ui-applier-differential.mjs runs
+it on a DOM against the model), not proved.
 
 Vocabulary used below:
 - `Html Msg` is a view; `Live Msg` is a rendered tree (the view plus the DOM
@@ -28,6 +32,7 @@ Vocabulary used below:
 -/
 import Lasm.UI.Proofs
 import Lasm.UI.Proofs.Wire
+import Lasm.UI.Proofs.Apply
 import Lasm.UI.Cmd
 
 namespace Lasm.UI.Spec
@@ -106,6 +111,64 @@ def frames_decode : Prop :=
   ∀ (Msg : Type) (frames : List (Array (Op Msg) × Nat)),
     Decode.frames {} (Decode.encodeAll {} frames) =
       some (frames.map fun (ops, root) => Decode.Wire.ofOps root ops.toList)
+
+/-! ## The applier: what the browser's DOM shows -/
+
+/-- **The applier performs every conforming patch as the model says.** The
+applier (Lasm.UI.Applier, the model of what src/lasm-modules/ui-dom.mjs does
+to the DOM) performs a patch as the flat list of operations it reads from
+the bytes (`Wire.ofOps`), naming every node by id in one table for the
+whole document, and the DOM refuses some (an id not in the document, an
+insert before a node that is not a child, into a text node or into the
+moved node's own subtree). Take any DOM under the root whose ids are
+distinct, none 0 (the root's) and all among `used`, and any patch that
+conforms (`confOps`: each op's nodes are children of its parent there,
+inserts and moves go before such a child or at the end and never before the
+moved node itself, texts change on text nodes and attributes on elements,
+and inserted subtrees bring distinct ids never used). Then no operation is
+refused, the DOM after them is exactly `applyOps`' (Lasm.UI.Model, the
+meaning `diff_correct` is proved against), and its ids are distinct again. -/
+def applier_correct : Prop :=
+  ∀ (Msg : Type) (ops : List (Op Msg)) (dom : List Dom) (used u : List Nat), (Applier.idsIn dom).Nodup →
+    0 ∉ Applier.idsIn dom → (∀ x ∈ Applier.idsIn dom, x ∈ used) → 0 ∈ used → Applier.confOps used ops dom = some u →
+    Applier.run (Decode.Wire.ofOps 0 ops) dom = some (applyOps ops dom) ∧ (Applier.idsIn (applyOps ops dom)).Nodup
+
+/-- **The browser shows every view, if the diff's patches conform.** Assume
+the candidate `Candidates.diff_conforms` (`Applier.DiffConforms`: the patch
+`diff` writes for a well-formed live tree with distinct ids conforms; tested
+on every frame of the model differential, not yet proved). Render any
+sequence of views from an empty root, one frame each as the runtime does
+(`Applier.trace`: the patch of each frame and the DOM of its live tree).
+Then the applier, reading the bytes of every frame as Lean encodes them
+(`Decode.encodeAll`, tables carried across frames) and performing them on
+the DOM the last frame left, refuses none and leaves after each frame
+exactly the DOM of that frame's live tree, which shows its view
+(`session_correct`). This composes `diff_correct`, `frames_decode` and
+`applier_correct`. -/
+def applier_session : Prop :=
+  Applier.DiffConforms → ∀ (Msg : Type) (views : List (List (Html Msg))),
+    Applier.frames {} [] (Decode.encodeAll {} ((Applier.trace Session.empty views).map Prod.fst)) =
+      (Applier.trace Session.empty views).map fun x => some x.2
+
+/-- **Hydration builds what a fresh mount builds.** An app mounted with
+`hydrate: true` adopts the server-rendered DOM with its first frame
+(`Applier.hydrateFrame`): each node of the first render takes the server
+node at its place when it is of the same kind (a text node; an element of
+the same namespace and tag), keeping it, comments are dropped, and server
+nodes left over are removed. For any view and any server DOM at all, the
+applier reads the encoded first render, and hydrating with it gives the same
+nodes as mounting the view from scratch (`Applier.bareIn`: the same ids,
+kinds, namespaces, tags, texts and children, in order); only an adopted
+element may keep a server attribute the view does not set. When the server
+DOM renders the view (`Applier.Rendered`: a node of the same kind for each
+node, comments anywhere, server attributes among the view's), the result is
+exactly the fresh mount's DOM. -/
+def hydrate_correct : Prop :=
+  ∀ (Msg : Type) (view : List (Html Msg)) (server : List Applier.Server),
+    let r := mountOps view 1
+    ∃ ws st dom, Decode.frame {} (Encode.frame {} r.ops 0).1 = some (ws, st) ∧
+      Applier.hydrateFrame server ws = some dom ∧ Applier.bareIn dom = Applier.bareIn (r.live.map toDom) ∧
+      (Applier.Rendered server (r.live.map toDom) → dom = r.live.map toDom)
 
 /-! ## Commands -/
 

@@ -24,6 +24,17 @@ theorem diffAttrs_correct : Spec.diffAttrs_correct :=
 theorem frames_decode : Spec.frames_decode :=
   fun _ frames => Proofs.Wire.frames_decode {} {} frames Proofs.Wire.synced_empty
 
+theorem applier_correct : Spec.applier_correct := fun _ ops dom used u hnd hz hsub hzu hc =>
+  have h := Applier.run_ofOps ops dom used u hnd hz hsub hzu hc
+  ⟨h.1, h.2.1⟩
+
+theorem applier_session : Spec.applier_session := fun hc _ views => Applier.session_applier hc views
+
+theorem hydrate_correct : Spec.hydrate_correct := by
+  intro _ view server
+  obtain ⟨ws, st, h1, h2⟩ := Applier.hydrate_first view server
+  exact ⟨ws, st, _, h1, h2, Applier.hydrateIn_bare _ _, Applier.hydrateIn_rendered⟩
+
 theorem create_correct : Spec.create_correct := by
   intro _ h n
   have s := Proofs.create_spec h n

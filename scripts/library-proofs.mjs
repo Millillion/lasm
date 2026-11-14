@@ -40,7 +40,8 @@ const jsonPath = process.env.LIBRARY_PROOFS_JSON ?? join(work, 'proofs.json');
 // The proof modules, in import order, and the libraries whose Spec.lean
 // PROOFS.md lists (in that order).
 const proofModules = ['Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.Proofs.Children',
-  'Lasm.UI.Proofs.TwoEnded', 'Lasm.UI.Proofs.Diff', 'Lasm.UI.Proofs', 'Lasm.UI.Proofs.Decode', 'Lasm.UI.Proofs.Wire', 'Lasm.UI.Spec', 'Lasm.UI.Theorems',
+  'Lasm.UI.Proofs.TwoEnded', 'Lasm.UI.Proofs.Diff', 'Lasm.UI.Proofs', 'Lasm.UI.Proofs.Decode', 'Lasm.UI.Proofs.Wire',
+  'Lasm.UI.Proofs.Applier', 'Lasm.UI.Proofs.Apply', 'Lasm.UI.Spec', 'Lasm.UI.Theorems',
   'Lasm.UI.Candidates', 'Lasm.RPC.Spec', 'Lasm.RPC.Theorems', 'Lasm.RPC.Candidates', 'Lasm.KV.Spec', 'Lasm.KV.Theorems',
   'Lasm.Fetch.Spec', 'Lasm.Fetch.Theorems', 'Lasm.Fetch.Candidates',
   'Lasm.JS.Proofs.Wire', 'Lasm.JS.Spec', 'Lasm.JS.Theorems',
@@ -52,6 +53,7 @@ const proofModules = ['Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.P
 // scripts/propositions.mjs checks their tests) and the proved propositions
 // (Spec.lean, each with its theorem in Theorems.lean, as a library's).
 const cliModules = ['Lasm.Cli.Model.Zip', 'Lasm.Cli.Model.CliArguments', 'Lasm.Cli.Model.Dev', 'Lasm.Cli.Model.Init', 'Lasm.Cli.Model.LowerAtomics', 'Lasm.Cli.Model.Package', 'Lasm.Cli.Model.EdgeInitializers', 'Lasm.Cli.Model.BuiltinModules', 'Lasm.Cli.Model.NodeHost', 'Lasm.Cli.Model.Platform', 'Lasm.Cli.Model.HandleTable', 'Lasm.Cli.Model.LeanIOErrors', 'Lasm.Cli.Model.ProcessLauncher', 'Lasm.Cli.Model.JsFraming', 'Lasm.Cli.Model.WasiComponent',
+  'Lasm.Cli.Fast.EdgeInitializers', 'Lasm.Cli.Glue',
   'Lasm.Cli.Interface', 'Lasm.Cli.Candidates', 'Lasm.Cli.Spec', 'Lasm.Cli.Theorems'];
 const cliRoot = join(root, 'verification', 'cli');
 const libraries = ['Lasm.UI', 'Lasm.RPC', 'Lasm.KV', 'Lasm.Fetch', 'Lasm.JS', 'Lasm.Serverless'];
