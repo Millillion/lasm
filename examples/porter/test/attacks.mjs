@@ -412,7 +412,7 @@ await t.check('user enumeration: a wrong password and an unknown user get the sa
   const { browser, id } = await startInteraction();
   const post = form => browser.request(`${base}/interaction/${id}/login`, { method: 'POST', form });
   const a = await post({ username: 'alice', password: 'wrong' });
-  const b = await post({ username: 'nobody-' + Math.random(), password: 'wrong' });
+  const b = await post({ username: 'nobody-unknown', password: 'wrong' }); // fixed, so the traffic is the same on every target
   assert.equal(a.status, 200);
   assert.equal(a.status, b.status);
   assert.equal(a.text, b.text);
