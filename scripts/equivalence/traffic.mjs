@@ -33,6 +33,7 @@ export const IGNORED_HEADERS = {
   'transfer-encoding': 'framing, hop-by-hop: the body bytes are compared instead',
   'content-length': 'framing: the body bytes are compared instead (chunked or not is the platform\'s choice)',
   server: 'the platform\'s product name',
+  'content-encoding': 'negotiated with the client\'s Accept-Encoding (RFC 9110 8.4): whether to compress is the platform\'s choice (wrangler dev gzips); the body is compared after the coding is undone',
 };
 
 // Headers one platform's local runtime adds by itself, only on that platform.
@@ -41,10 +42,14 @@ export const PLATFORM_HEADERS = [
   { targets: ['netlify'], name: /^x-nf-/, reason: 'Netlify\'s function bootstrap adds x-nf-invocation-metadata and x-nf-start-timestamp to every response' },
   { targets: ['lambda', 'lambda-image'], name: /^content-type$/, value: /^application\/json$/, emptyBody: true,
     reason: 'sam local start-api gives a bodiless response (204) Content-Type: application/json when the function sets none' },
+  { targets: ['workers'], name: /^(cache-control|etag|cf-cache-status|vary)$/, servedBy: /^cf-cache-status$/,
+    reason: 'the apps\' wrangler.toml lets Workers\' own asset serving answer for the browser page\'s files ([assets]) before the Worker runs; it sets its own caching headers (marked by cf-cache-status), while the bytes are the app\'s and still compared' },
 ];
 function platformHeader(target, name, value, res) {
+  const names = res.headers.map(([n]) => n.toLowerCase());
   return PLATFORM_HEADERS.some(rule => rule.targets.includes(target) && rule.name.test(name) &&
-    (!rule.value || rule.value.test(value)) && (!rule.emptyBody || !res.body));
+    (!rule.value || rule.value.test(value)) && (!rule.emptyBody || !res.body) &&
+    (!rule.servedBy || names.some(n => rule.servedBy.test(n))));
 }
 
 // ---------- recording ----------
@@ -225,7 +230,11 @@ export function normalizeWith(exchanges, target, { scrub = t => t, facts = () =>
     const resHeaders = header(res.headers);
     const encoding = resHeaders.find(([n]) => n === 'content-encoding')?.[1];
     const resBody = decodeBody(res.body, encoding);
+    // A layer of the platform answered (a servedBy rule): the headers it owns
+    // are left out on both sides (compare reads `platformOwned`).
+    const owner = PLATFORM_HEADERS.find(rule => rule.servedBy && rule.targets.includes(target) && resHeaders.some(([n]) => rule.servedBy.test(n)));
     const response = {
+      ...(owner ? { platformOwned: owner.name.source } : {}),
       status: res.status,
       headers: sortHeaders(resHeaders.filter(([n, v]) => !(n in IGNORED_HEADERS) && !platformHeader(target, n, v, res)).map(([n, v]) => [n, scrub(v, 'response', x)])),
       body: bodyOf(resBody, t => scrub(t, 'response', x)),
@@ -320,7 +329,9 @@ export function compare(golden, observed, { app = 'app', target = 'target', know
     if (o.response.error || g.response.error) checks.push(['response', JSON.stringify(g.response), JSON.stringify(o.response)]);
     else {
       checks.push(['status', String(g.response.status), String(o.response.status)]);
-      checks.push(['response headers', headerText(g.response.headers), headerText(o.response.headers)]);
+      const owned = o.response.platformOwned ? new RegExp(o.response.platformOwned) : undefined;
+      const goldenHeaders = owned ? g.response.headers.filter(h => !owned.test(h.slice(0, h.indexOf(':')))) : g.response.headers;
+      checks.push(['response headers', headerText(goldenHeaders), headerText(o.response.headers)]);
       // Byte-equal bodies; shown pretty-printed when they are JSON.
       if (JSON.stringify(g.response.body) !== JSON.stringify(o.response.body)) {
         const a = pretty(g.response.body), b = pretty(o.response.body);
