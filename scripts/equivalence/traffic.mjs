@@ -19,6 +19,7 @@
 //
 // Conduit has its own copy of these pieces (examples/conduit/test/equivalence.mjs)
 // with JWT handling specific to RealWorld.
+import { createHash } from 'node:crypto';
 import { gunzipSync, inflateSync, brotliDecompressSync } from 'node:zlib';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createServer, request } from 'node:http';
@@ -185,10 +186,24 @@ export function decodeBody(base64, encoding) {
   return Buffer.from(text, 'utf8').equals(bytes) ? { text } : { base64: bytes.toString('base64') };
 }
 
+// Bodies longer than this are kept as their SHA-256 and length (still a
+// byte-for-byte comparison, without megabytes in the golden files).
+export const MAX_BODY = 16384;
+const digest = (text, base64) => {
+  const bytes = text !== undefined ? Buffer.from(text, 'utf8') : Buffer.from(base64, 'base64');
+  return `<${bytes.length} bytes, sha256 ${createHash('sha256').update(bytes).digest('hex')}>`;
+};
+const bodyOf = (d, scrub) => {
+  if (d.text === undefined) return d.base64.length > MAX_BODY ? digest(undefined, d.base64) : { base64: d.base64 };
+  const text = scrub(d.text);
+  return text.length > MAX_BODY ? digest(text) : text;
+};
+
 /**
  * The generic normalization: header names lower-cased and sorted (a repeated
  * field keeps its order), IGNORED_HEADERS and the target's PLATFORM_HEADERS
- * dropped, the request's Host dropped, bodies as text. `scrub(text, where, x)`
+ * dropped, the request's Host dropped, bodies as text (after the app's scrub;
+ * longer than MAX_BODY: their digest). `scrub(text, where, x)`
  * (where: 'path' | 'request' | 'response'; x: the raw exchange) is the app's
  * own rule for what legitimately differs; `facts()` after the pass returns
  * whatever the app compares separately (e.g. counts or identities).
@@ -203,7 +218,7 @@ export function normalizeWith(exchanges, target, { scrub = t => t, facts = () =>
       method: req.method,
       path: scrub(req.path, 'path', x),
       headers: sortHeaders(reqHeaders.map(([n, v]) => [n, scrub(v, 'request', x)])),
-      body: reqBody.text === undefined ? { base64: reqBody.base64 } : scrub(reqBody.text, 'request', x),
+      body: bodyOf(reqBody, t => scrub(t, 'request', x)),
     };
     if (!x.response || x.response.error) return { request, response: { error: x.response?.error ?? 'no response' } };
     const res = x.response;
@@ -213,7 +228,7 @@ export function normalizeWith(exchanges, target, { scrub = t => t, facts = () =>
     const response = {
       status: res.status,
       headers: sortHeaders(resHeaders.filter(([n, v]) => !(n in IGNORED_HEADERS) && !platformHeader(target, n, v, res)).map(([n, v]) => [n, scrub(v, 'response', x)])),
-      body: resBody.text === undefined ? { base64: resBody.base64 } : scrub(resBody.text, 'response', x),
+      body: bodyOf(resBody, t => scrub(t, 'response', x)),
     };
     return { request, response };
   });
