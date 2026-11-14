@@ -1,0 +1,216 @@
+name: Link validation
+# Translation validation of the toolchain (ROADMAP M5, docs/TESTING.md#translation-validation-of-the-toolchain).
+# A candidate packed from this commit and installed as a user installs it builds
+# generated differential programs (scripts/differential/generate.mjs, features.mjs)
+# and example programs with LASM_TEST_LINK_EVIDENCE set (src/test-switches.mjs):
+# every wasm-ld link it runs (the Node final and probe links, the edge links,
+# the WASI links) leaves its output module and its -Map file. Then
+# scripts/link-validation/check-wasm-ld.mjs checks each module against its map
+# (sections, functions, data segments and chunks, symbols, globals, exports,
+# __wasm_init_memory), each function against its input object's body and
+# relocations (wasm-ld-relocations.mjs) and, as a self-test, that 12 seeded corruptions of each
+# map are all reported. Then scripts/link-validation/binaryen-diff.mjs re-runs
+# each WASI link's wasm-opt step one lowering pass at a time (--strip-eh,
+# --memory64-lowering, --table64-lowering) and runs every module on wabt's
+# wasm-interp, pinned and built with its WASI host (and the shipped one on wasmtime): all must behave alike.
+#   - pull requests and pushes to main that touch the link path: one core and
+#     one feature program on four targets, and three examples (release profile);
+#   - weekly (ci-weekly.yml, Saturday) and by hand: six core and four feature
+#     programs on six targets, five examples, release and dev profiles.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/link-driver/**'
+      - 'src/application-link.mjs'
+      - 'src/application-reachability.mjs'
+      - 'src/application-initialization.mjs'
+      - 'src/application-live-members.mjs'
+      - 'src/edge/edge-link.mjs'
+      - 'src/edge/edge-build.mjs'
+      - 'src/wasi/wasi-link.mjs'
+      - 'src/link-toolchain.json'
+      - 'src/managed-link-toolchain.mjs'
+      - 'src/application-runtimes.json'
+      - 'src/edge-runtimes.json'
+      - 'src/test-switches.mjs'
+      - 'scripts/link-validation/**'
+      - 'test/link-validation.test.mjs'
+      - 'test/fixtures/link-validation/**'
+      - '.github/workflows/link-validation.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/link-driver/**'
+      - 'src/application-link.mjs'
+      - 'src/application-reachability.mjs'
+      - 'src/application-initialization.mjs'
+      - 'src/application-live-members.mjs'
+      - 'src/edge/edge-link.mjs'
+      - 'src/edge/edge-build.mjs'
+      - 'src/wasi/wasi-link.mjs'
+      - 'src/link-toolchain.json'
+      - 'src/managed-link-toolchain.mjs'
+      - 'src/application-runtimes.json'
+      - 'src/edge-runtimes.json'
+      - 'src/test-switches.mjs'
+      - 'scripts/link-validation/**'
+      - 'test/link-validation.test.mjs'
+      - 'test/fixtures/link-validation/**'
+      - '.github/workflows/link-validation.yml'
+  workflow_call:
+    inputs:
+      scope: { type: string, default: weekly }
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: pr (the pull-request set) or weekly (the full set)
+        default: weekly
+        type: string
+      seed:
+        description: First program seed (empty = derived from the run)
+        default: ''
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: link-validation-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  pack:
+    if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    # The retained runtime input is a draft release asset (needs contents: write to read).
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: ./.github/actions/process-guard
+      - name: Download the pinned retained runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - name: Pack
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: link-validation-packed-candidate
+          path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
+          retention-days: 3
+          if-no-files-found: error
+  wasm-ld:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+      # wabt's wasm-interp (the interpreter of the Binaryen differential) and
+      # wasmtime, official release binaries pinned by SHA-256 (the release's digest).
+      WABT_VERSION: 1.0.42
+      WABT_SOURCE_SHA256: a76cda3c174a43097863a07fc0b0c202f770f53e21806ea2636f167d1ffb1e30
+      WASMTIME_VERSION: v49.0.4
+      WASMTIME_SHA256: 6561abd54bdf941b6519cce883e0857cc9bce94d92c65287ed838d895a27f5a9
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: Install the candidate as a user would
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: link-validation-packed-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: Unit tests of the checker
+        run: node --test test/link-validation.test.mjs
+      - name: Build programs, recording every link
+        id: build
+        env:
+          SCOPE: ${{ inputs.scope || ((github.event_name == 'pull_request' || github.event_name == 'push') && 'pr' || 'weekly') }}
+          SEED_INPUT: ${{ inputs.seed || '' }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -o pipefail
+          SEED="$SEED_INPUT"
+          if [ -z "$SEED" ]; then if [ "$SCOPE" = pr ]; then SEED=$(( 16#$(echo "$HEAD_SHA" | cut -c1-7) % 1000000 )); else SEED=$(( ${{ github.run_id }} % 1000000000 )); fi; fi
+          echo "scope $SCOPE, seed $SEED" | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ "$SCOPE" = pr ]; then
+            SET="--programs 1 --feature-programs 1 --targets node,wasi,deno,supabase-edge --profiles release --examples hello:node+wasi,wasi-http:wasi-http,fastly:fastly"
+          else
+            SET="--programs 6 --feature-programs 4 --targets node,wasi,deno,bun,browser-jspi,supabase-edge --profiles release,dev --examples hello:node+wasi+deno,wasi-cli:wasi,edge-pure:workers+deno,wasi-http:wasi-http,fastly:fastly"
+          fi
+          node scripts/link-validation/build-programs.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
+            --work "$RUNNER_TEMP/link-validation" --evidence "$RUNNER_TEMP/link-evidence" --seed "$SEED" $SET 2>&1 | tee "$RUNNER_TEMP/link-builds.log"
+      - name: wasm-ld against its map
+        if: always()
+        run: |
+          node scripts/link-validation/check-wasm-ld.mjs --evidence "$RUNNER_TEMP/link-evidence" --min-links 10 --self-test 12 --relocations \
+            --report "$RUNNER_TEMP/link-validation/wasm-ld-report.json"
+      # wabt's release binaries are built without WASI (wasm-interp: "wasi support
+      # not compiled in"): wasm-interp is built from the release's source
+      # archive (pinned by SHA-256, with its uvwasi) with WITH_WASI, and cached.
+      - name: wasm-interp (cached build of the pinned source)
+        id: wabt-cache
+        if: always() && steps.build.outcome != 'skipped'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/wabt-build/bin
+          key: wabt-${{ env.WABT_VERSION }}-${{ env.WABT_SOURCE_SHA256 }}-wasi-ubuntu-24.04
+      - name: wasm-interp and wasmtime
+        if: always() && steps.build.outcome != 'skipped'
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; B="$RUNNER_TEMP/wabt-build"; mkdir -p "$T/wasmtime" "$B/bin"
+          if [ ! -x "$B/bin/wasm-interp" ]; then
+            curl -fsSL --retry 3 -o "$T/wabt.tar.xz" "https://github.com/WebAssembly/wabt/releases/download/$WABT_VERSION/wabt-$WABT_VERSION.tar.xz"
+            echo "$WABT_SOURCE_SHA256  $T/wabt.tar.xz" | sha256sum -c
+            mkdir -p "$T/wabt-src" && tar -xJf "$T/wabt.tar.xz" -C "$T/wabt-src" --strip-components=1
+            test -f "$T/wabt-src/third_party/uvwasi/CMakeLists.txt"
+            cmake -S "$T/wabt-src" -B "$T/wabt-obj" -DCMAKE_BUILD_TYPE=Release -DWITH_WASI=ON -DBUILD_TESTS=OFF -DBUILD_LIBWASM=OFF
+            cmake --build "$T/wabt-obj" --target wasm-interp -j 2
+            cp "$T/wabt-obj/wasm-interp" "$B/bin/"
+          fi
+          curl -fsSL --retry 3 -o "$T/wasmtime.tar.xz" "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasmtime-$WASMTIME_VERSION-x86_64-linux.tar.xz"
+          echo "$WASMTIME_SHA256  $T/wasmtime.tar.xz" | sha256sum -c
+          tar -xJf "$T/wasmtime.tar.xz" -C "$T/wasmtime" --strip-components=1
+          "$B/bin/wasm-interp" --version; "$T/wasmtime/wasmtime" --version
+      # The WASI links' wasm-opt step, re-run one lowering pass at a time, each
+      # module on wasm-interp (and the shipped one on wasmtime): docs/TESTING.md#binaryens-lowering-passes-by-differential-execution.
+      - name: Binaryen's lowering passes by differential execution
+        if: always() && steps.build.outcome != 'skipped'
+        run: |
+          WASM_OPT=$(find "$HOME/.cache/lasm" -type f -name wasm-opt -path '*/bin/*' | sort | head -1)
+          test -x "$WASM_OPT" && "$WASM_OPT" --version
+          T="$RUNNER_TEMP/tools"
+          node scripts/link-validation/binaryen-diff.mjs --evidence "$RUNNER_TEMP/link-evidence" --wasm-opt "$WASM_OPT" \
+            --interp "$RUNNER_TEMP/wabt-build/bin/wasm-interp" --wasmtime "$T/wasmtime/wasmtime" --timeout-s 900 --min-programs 1 \
+            --work "$RUNNER_TEMP/binaryen-diff" --report "$RUNNER_TEMP/link-validation/binaryen-report.json"
+      - name: Keep the report and any failing link
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: link-validation-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/link-builds.log
+            ${{ runner.temp }}/link-validation/builds.json
+            ${{ runner.temp }}/link-validation/wasm-ld-report.json
+            ${{ runner.temp }}/link-validation/binaryen-report.json
+          retention-days: 30
+          if-no-files-found: ignore

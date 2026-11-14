@@ -173,6 +173,7 @@ environment variable of the build, not a CLI flag:
 | Variable | Effect | Used by |
 | --- | --- | --- |
 | `LASM_TEST_UNOPTIMIZED=1` | The program's own C at clang `-O0`; the Node link without Binaryen's optimization passes (the unoptimized link, as `LASM_LINK_DEBUG`); the edge link as in the dev profile (only the passes the program needs: memory64 lowering, JSPI/Asyncify); WASI's `wasm-opt` at `-O0` (lowering passes only). The precompiled runtime archives are unchanged. Part of the build's cache identity ([`src/test-switches.mjs`](../src/test-switches.mjs)) | `scripts/differential/run.mjs` (`*-O0` targets) |
+| `LASM_TEST_LINK_EVIDENCE=DIR` | Every wasm-ld link the build runs (the Node final and probe links, the edge links, the WASI link) also leaves wasm-ld's output module and its `-Map` file in a new directory under DIR, and each Binaryen step its input, output and arguments. Changes no output and is not part of the cache identity (a cached build links nothing) ([`src/test-switches.mjs`](../src/test-switches.mjs)) | `scripts/link-validation/build-programs.mjs` ([translation validation](#translation-validation-of-the-toolchain)) |
 
 It is deliberately absent from the user documentation. *Catches:* optimizer
 bugs in clang/LLVM and Binaryen on Lasm's code paths, and UB that the optimizer
@@ -1270,6 +1271,117 @@ exists and names the module. M4's exit check is met when none is pending.
 The Lean candidates are checked in `test/ui/DiffModel.lean` (`ui.yml`) and in
 the `lean-fetch-request` and `lean-rpc` fuzz targets
 (`test/fuzz/native/LasmFuzz.lean`, `fuzz.yml`).
+
+### Translation validation of the toolchain
+
+The toolchain Lasm links with (wasm-ld, Binaryen) is trusted to be correct;
+translation validation checks each of its outputs instead of trusting it
+(ROADMAP M5, [IRREDUCIBLE.md §5](proposals/IRREDUCIBLE.md#5-verification-path-for-each-layer)).
+
+#### wasm-ld against its map
+
+`link-validation.yml` installs a candidate packed from the commit, builds
+generated differential programs and examples with `LASM_TEST_LINK_EVIDENCE`
+set (`scripts/link-validation/build-programs.mjs`), and checks every recorded
+link's module against the map wasm-ld wrote for it
+(`scripts/link-validation/check-wasm-ld.mjs`, the checker in
+`scripts/link-validation/wasm-ld-map.mjs`, with its own Wasm reader so that it
+shares no code with the link driver it checks):
+
+- the map's sections are the module's, in order, at the stated offsets and
+  sizes, and no custom section outside `name`, `producers`, `target_features`
+  and `dylink.0`;
+- one map entry per defined function, in index order, contiguous from the code
+  section's count to its end, each at its offset with its size (its size field
+  and its body); each function symbol on its function; with a name section,
+  each function named as the map names it;
+- every output segment in the file at its offset with its size and at the
+  map's address: an active segment's offset expression, or the `memory.init`
+  that `__wasm_init_memory` runs for a passive one (a small stack interpreter
+  over the instructions wasm-ld generates there); zero-filled segments are its
+  `memory.fill`; input chunks inside their segment, in order, without overlap,
+  at the file offset their address implies; data symbols inside their chunk
+  (a TLS symbol's address is its offset in the thread's block); no two
+  segments overlap, and all fit the initial memory;
+- each map global's index exists, once, named as the name section names it;
+- an export whose name is a map symbol refers to the function or global that
+  symbol is on;
+- the module validates (V8's `WebAssembly.validate`);
+- relocations (`--relocations`, `scripts/link-validation/wasm-ld-relocations.mjs`):
+  every function and data chunk the map attributes to an input object (an
+  object the evidence kept, or an archive member at the path the map names)
+  is that object's body or segment, byte for byte outside its relocation sites, and every site
+  holds a value the map attributes to the symbol the relocation names: a
+  function carrying that symbol (or an import of that name), a table slot
+  holding such a function, the symbol's address plus the addend, the global
+  of that name, a type with the same signature, a table or tag that exists.
+  Symbols resolve as wasm-ld resolves them (locals within their object,
+  `--wrap`). A site the map cannot attribute (a symbol it does not list) is
+  counted, not guessed; one it attributes to another symbol fails.
+
+The map leaves the section header (its id and size field) out of a function's
+or data chunk's offset (wasm-ld 24, `lld/wasm/MapFile.cpp`): the file offset is
+the map's plus the header's length. The checker models that; the fixture test
+pins it.
+
+The checker is itself checked: `--self-test 12` makes seeded corruptions of
+each real map (a function moved, resized, dropped or swapped with its
+neighbour, a segment, a data symbol or a global moved, a section resized, an
+exported symbol moved onto another function) and fails if any is not
+reported; `--min-links` fails a run that recorded too few links.
+`test/link-validation.test.mjs` runs it on four small links
+(`test/fixtures/link-validation/`: passive segments with shared memory, active
+segments, imported memory, and objects with an archive and `--wrap` for the
+relocations) and their corruptions on every pull request.
+
+Pull requests and pushes that touch the link path (the link driver and
+recipes, `src/application-link.mjs`, the edge and WASI links, the toolchain
+and runtime pins): one core and one feature program for Node, WASI, the edge
+(`--target deno`) and Supabase Edge (the edge link with Asyncify), and three examples. Weekly
+(`ci-weekly.yml`): six core and four feature programs on six targets, five
+examples, in the release and the dev profile.
+
+```sh
+LASM_TEST_LINK_EVIDENCE=.work/evidence lasm build Main.lean --target wasi
+node scripts/link-validation/check-wasm-ld.mjs --evidence .work/evidence --self-test 12 --relocations
+```
+
+*Catches:* a function, data chunk or symbol that is not where the map says
+(for example a link that stops reading its inputs as the recipe assumes), a
+passive segment copied to the wrong address, an export bound to another
+definition, an unexpected section, a call or address bound to the wrong
+symbol (in code, or a pointer in initialized data), a function body or data
+chunk changed outside its relocations. *Cannot catch yet:* functions and
+chunks whose input is ambiguous (two archive members of one name), and what
+wasm-ld synthesizes (`__wasm_call_ctors`, `__wasm_init_memory` beyond its
+segment operations, stubs).
+
+#### Binaryen's lowering passes by differential execution
+
+The WASI link lowers wasm-ld's memory64 module with exception handling to the
+32-bit module WASI engines run, in one `wasm-opt` step (`--strip-eh
+--memory64-lowering --table64-lowering -Oz` and strips, src/wasi/wasi-link.mjs).
+`scripts/link-validation/binaryen-diff.mjs` takes that step's recorded input
+and output (`LASM_TEST_LINK_EVIDENCE`) and re-runs it one pass at a time:
+m0 (wasm-ld's output, atomics lowered), m1 after `--strip-eh`, m2 after
+`--memory64-lowering`, m3 after `--table64-lowering`, and m4, the shipped
+module. Each runs on wabt's `wasm-interp` 1.0.42, an interpreter that
+follows the specification, built with its WASI host from the release's source
+archive (pinned by SHA-256; the release binaries have no WASI) and cached, with the same
+arguments and directory; all five must print the same stdout and stderr and
+exit alike, so a difference between two neighbours names the pass. m4 also
+runs on wasmtime, the engine users run, and a difference there is reported as
+an engine disagreement. A module that times out on the interpreter makes the
+program inconclusive, not different; `--min-programs` fails a run with too few
+conclusive programs. It runs in `link-validation.yml`, after the wasm-ld check,
+on the WASI programs of each set (PR and weekly).
+
+*Catches:* a lowering pass that changes what a Lasm program does (an address
+computation, a bounds check, a table index), and the optimizer's changes on
+top of them (m3 against m4). *Cannot catch yet:* passes of the JavaScript
+targets (the Node and edge links' `wasm-opt`, Asyncify), which need their
+JavaScript hosts; equivalence on inputs the programs do not exercise (this is
+testing, not proof).
 
 ## CI tiers
 

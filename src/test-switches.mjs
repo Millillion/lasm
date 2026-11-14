@@ -9,4 +9,39 @@
 // program needs) and WASI's wasm-opt at -O0 (lowering passes only). The
 // precompiled runtime archives are unchanged. The switch is part of the build's
 // cache identity, so optimized and unoptimized outputs never share a cache entry.
+import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { basename, join } from 'node:path';
+
 export const testUnoptimized = (env = process.env) => env.LASM_TEST_UNOPTIMIZED === '1';
+
+// LASM_TEST_LINK_EVIDENCE=DIR: every wasm-ld link Lasm runs (the Node link
+// driver's final, probe and edge links, and the WASI link) also leaves wasm-ld's
+// output module and its -Map file in a new directory under DIR, and the WASI
+// link its wasm-opt step's input, output and arguments, for the toolchain's
+// translation validation (scripts/link-validation/, docs/TESTING.md#translation-validation-of-the-toolchain).
+// It changes no output, and is not part of the cache identity: a build served
+// from the cache links nothing and leaves nothing.
+export const linkEvidenceDirectory = (env = process.env) => env.LASM_TEST_LINK_EVIDENCE || undefined;
+let evidenceCount = 0;
+/** Copies `files` ({ name: source path }) and `meta` into a new directory under
+ * LASM_TEST_LINK_EVIDENCE, and each of `objects` (a link's object-file inputs,
+ * often in a directory the build removes) into its objects/; returns the
+ * directory, or undefined when the switch is off. */
+export function saveLinkEvidence(kind, files, meta = {}, env = process.env, objects = []) {
+  const root = linkEvidenceDirectory(env);
+  if (!root) return undefined;
+  const name = `${Date.now().toString(36)}-${process.pid}-${String(evidenceCount++).padStart(3, '0')}-${kind.replace(/[^A-Za-z0-9_-]/g, '_')}`;
+  const directory = join(root, name);
+  mkdirSync(directory, { recursive: true });
+  for (const [file, source] of Object.entries(files)) copyFileSync(source, join(directory, file));
+  const copied = {};
+  objects.filter(file => existsSync(file)).forEach((file, i) => {
+    if (i === 0) mkdirSync(join(directory, 'objects'));
+    const name = `objects/${String(i).padStart(4, '0')}-${basename(file)}`;
+    copyFileSync(file, join(directory, name));
+    copied[file] = name;
+  });
+  writeFileSync(join(directory, 'evidence.json'), JSON.stringify({ kind, files: Object.keys(files), ...meta,
+    ...(objects.length ? { objects: copied } : {}) }, null, 1) + '\n');
+  return directory;
+}
