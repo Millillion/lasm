@@ -55,7 +55,7 @@
 
 - **Fastly, WASI and wasi-http programs use far less memory** (issue #246).
   `--target fastly`, `wasi` and `wasi-http` now link Lasm's own build of
-  Emscripten's mimalloc (its unchanged sources, MIT, in `src/wasi/mimalloc`).
+  Emscripten's mimalloc (its unchanged sources, MIT, in `src/mimalloc`).
   The build has 2 MiB arenas and a page map for 32-bit addresses, in place of
   the prebuilt one's 16 MiB arenas and its 8 MiB page map. Measured on
   Viceroy:
@@ -64,3 +64,14 @@
   - Folio's site server uses 6.1 MB per request instead of 27.9 MB.
   - Folio's largest inputs peak lower. On Fastly, unclosed `<!--` now fits
     the 128 MB heap.
+
+- **Edge and browser programs start at 4 MiB of Wasm memory instead of 26.6**
+  (issue #247). Every edge target (Workers, Vercel Edge, Netlify Edge,
+  Supabase, Deno Deploy, Deno, Bun) and `--target browser` now link the same
+  mimalloc build, so memory grows 2 MiB at a time instead of 16. Measured on
+  `wrangler dev`:
+  - Porter, Ledger and Conduit start at 5–6 MiB instead of about 28, and peak
+    at 7–9 MiB during their suites.
+  - Folio's largest inputs peak lower: unclosed `<!--` 186 → 129 MiB,
+    backticks 321 → 306 MiB.
+  - Throughput is unchanged.
