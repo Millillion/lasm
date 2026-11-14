@@ -31,6 +31,7 @@ const projectRuns = {
 };
 // L2+L3: every other mixed driver with a deployed phase runs through the generic
 // Lake-driver adapter (native driver, then deployed executables via lake-shim).
+// The pinned release's mixed-driver review (written by scripts/application-tests/classify-mixed.mjs).
 for (const row of JSON.parse(readFileSync(join(root, `docs/evidence/lean-${version}-mixed-driver-classification.json`))).tests)
   // The bespoke per-project adapters are Linux-only; elsewhere the generic adapter
   // runs those drivers too (rc_sticky's C harness keeps its own adapter).
