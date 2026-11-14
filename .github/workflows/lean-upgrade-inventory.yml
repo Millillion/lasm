@@ -5,7 +5,8 @@ name: Lean upgrade inventory
 # patched tree as the runtime build does and inventories upstream's CTest
 # registrations (scripts/lean-upgrade/upstream-inventory.mjs), then carries the
 # hash-bound upstream-suite reviews forward from the previous release
-# (scripts/lean-upgrade/carry-reviews.mjs). Uploads the evidence files and
+# (scripts/lean-upgrade/carry-reviews.mjs), and lists Lean's initializers with
+# the release's native Lean (step 5, scripts/initialization/InitTargets.lean). Uploads the evidence files and
 # reviews; commit them on the upgrade branch. Runs on pushes to Lean upgrade
 # branches that change the upgrade tooling or the source pins, or by dispatch.
 on:
@@ -45,8 +46,15 @@ jobs:
           node-version: 26.13.0
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: ./.github/actions/upstream-lean
+        id: lean
+      - name: Initializer list (step 5)
+        run: |
+          version="$(node -p "require('./scripts/ci/acceptance-versions.json').lean")"
+          "${{ steps.lean.outputs.bin }}/lean" --run scripts/initialization/InitTargets.lean > "src/lean-init-targets-$version.json"
+          node -e "const j=require('./src/lean-init-targets-'+process.argv[1]+'.json'); if (j.lean!==process.argv[1]) throw new Error('lean '+j.lean); console.log(j.initTargets.length+' initializer targets')" "$version"
       - name: Apply Lasm's patches (step 3)
-        run: node scripts/lean-upgrade/check-patches.mjs "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" .work/lean-upgrade | tee .work/check-patches.json
+        run: mkdir -p .work && node scripts/lean-upgrade/check-patches.mjs "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" .work/lean-upgrade | tee .work/check-patches.json
       - name: Upstream application inventory and source manifest (step 8.1)
         run: node scripts/lean-upgrade/upstream-inventory.mjs "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" .work/lean-upgrade
       - name: Carry the hash-bound reviews forward
@@ -62,6 +70,7 @@ jobs:
             .work/carry-reviews.json
             docs/evidence/lean-*-upstream-application-inventory.json
             docs/evidence/lean-*-upstream-source-files.json
+            src/lean-init-targets-*.json
             scripts/application-tests/runtime-adapter-reviewed.json
             scripts/language-coverage/runtime-adapter-l23.json
             scripts/application-tests/eval-io-reviewed.json

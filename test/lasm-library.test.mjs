@@ -35,28 +35,28 @@ test('the library identity is a digest of the module list and every module sourc
   const identity = libraryIdentity();
   assert.match(identity, /^[0-9a-f]{64}$/);
   assert.equal(libraryIdentity(), identity);
-  assert.equal(JSON.parse(readFileSync(join(library, 'prebuilt/lean-4.35.0/manifest.json'), 'utf8')).library, identity);
+  assert.equal(JSON.parse(readFileSync(join(library, 'prebuilt/lean-4.36.0-rc2/manifest.json'), 'utf8')).library, identity);
 });
 
 test('the shipped compilation is used only for its Lean release and commit', () => {
   const commit = toolchainCatalog.lean['4.36.0-rc2'].commit;
-  const prebuilt = prebuiltLibrary('4.35.0', commit);
-  assert.equal(prebuilt.directory, join(library, 'prebuilt', 'lean-4.35.0'));
+  const prebuilt = prebuiltLibrary('4.36.0-rc2', commit);
+  assert.equal(prebuilt.directory, join(library, 'prebuilt', 'lean-4.36.0-rc2'));
   assert.deepEqual(Object.keys(prebuilt.files).sort(), [...libraryOutputs()].sort());
   assert.equal(prebuiltLibrary('4.36.0', commit), undefined);
-  assert.equal(prebuiltLibrary('4.35.0', 'f'.repeat(40)), undefined);
+  assert.equal(prebuiltLibrary('4.36.0-rc2', 'f'.repeat(40)), undefined);
 });
 
 test('a supported prefix with Lean\'s elaborator gets the shipped compilation copied in', t => {
   const tree = scratch(t);
-  assert.equal(compileLibrary(tree, '4.35.0', { commit: toolchainCatalog.lean['4.36.0-rc2'].commit }), false, 'no elaborator libraries');
+  assert.equal(compileLibrary(tree, '4.36.0-rc2', { commit: toolchainCatalog.lean['4.36.0-rc2'].commit }), false, 'no elaborator libraries');
   mkdirSync(join(tree, 'lib/lean/Lean/Elab/Deriving'), { recursive: true });
-  assert.equal(compileLibrary(tree, '4.35.0', { commit: toolchainCatalog.lean['4.36.0-rc2'].commit }), false, 'the deriving handlers\' module data is missing');
+  assert.equal(compileLibrary(tree, '4.36.0-rc2', { commit: toolchainCatalog.lean['4.36.0-rc2'].commit }), false, 'the deriving handlers\' module data is missing');
   put(join(tree, 'lib/lean/Lean/Elab/Deriving/Basic.olean'), '');
   assert.equal(compileLibrary(tree, '4.34.1', { commit: 'x' }), false, 'an unsupported release');
-  assert.equal(compileLibrary(tree, '4.35.0', { commit: toolchainCatalog.lean['4.36.0-rc2'].commit }), true);
+  assert.equal(compileLibrary(tree, '4.36.0-rc2', { commit: toolchainCatalog.lean['4.36.0-rc2'].commit }), true);
   for (const name of libraryOutputs())
-    assert.deepEqual(readFileSync(join(tree, ...name.split('/'))), readFileSync(join(library, 'prebuilt/lean-4.35.0', ...name.split('/'))), name);
+    assert.deepEqual(readFileSync(join(tree, ...name.split('/'))), readFileSync(join(library, 'prebuilt/lean-4.36.0-rc2', ...name.split('/'))), name);
 });
 
 test('without a shipped compilation each module is compiled in import order by the prefix\'s lean, in a clean environment',
@@ -73,7 +73,7 @@ appendFileSync(${JSON.stringify(log)}, JSON.stringify({ args, kept: process.env.
     chmodSync(join(tree, 'bin/lean'), 0o755);
     const saved = { LEAN_PATH: process.env.LEAN_PATH, lake_home: process.env.lake_home, ELAN_HOME: process.env.ELAN_HOME, MY_LEAN_KEPT: process.env.MY_LEAN_KEPT };
     Object.assign(process.env, { LEAN_PATH: '/elsewhere', lake_home: '/elsewhere', ELAN_HOME: '/elsewhere', MY_LEAN_KEPT: 'kept' });
-    try { assert.equal(compileLibrary(tree, '4.35.0', { platform: 'linux' }), true); }
+    try { assert.equal(compileLibrary(tree, '4.36.0-rc2', { platform: 'linux' }), true); }
     finally { for (const [key, value] of Object.entries(saved)) if (value === undefined) delete process.env[key]; else process.env[key] = value; }
     const runs = readFileSync(log, 'utf8').trim().split('\n').map(line => JSON.parse(line));
     assert.equal(runs.length, libraryModules.length);
@@ -123,6 +123,6 @@ test('the library sources a program links come from the prefix, with the glue, a
     { module: 'lasm_async.c', source: asyncGlueSource }]);
   assert.deepEqual(result.oleans, [join(prefix, 'lib', 'lean', 'Lasm', 'JS', 'Core.olean'), join(prefix, 'lib', 'lean', 'Lasm', 'JS.olean')]);
   rmSync(c('Lasm.RPC'));
-  assert.throws(() => librarySources(lean, [program]), { message: `This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean 4.35.0 or Lean's elaborator libraries (the extended tier); it is missing from ${prefix}`.replace('4.35.0 or Lean', '4.35.0 with Lean') });
+  assert.throws(() => librarySources(lean, [program]), { message: `This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean 4.36.0-rc2 or Lean's elaborator libraries (the extended tier); it is missing from ${prefix}`.replace('4.36.0-rc2 or Lean', '4.36.0-rc2 with Lean') });
 });
 

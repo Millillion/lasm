@@ -73,7 +73,7 @@ test('expected text follows #guard_msgs trimming and trailing-whitespace markers
 
 test('every reviewed input names its exact source and supported sidecars', () => {
   const review = JSON.parse(readFileSync(new URL('../scripts/application-tests/runtime-adapter-reviewed.json', import.meta.url)));
-  const sources = JSON.parse(readFileSync(new URL('../docs/evidence/lean-4.35.0-upstream-source-files.json', import.meta.url)));
+  const sources = JSON.parse(readFileSync(new URL('../docs/evidence/lean-4.36.0-rc2-upstream-source-files.json', import.meta.url)));
   const tests = review.releases['4.36.0-rc2'].tests;
   assert.ok(Object.keys(tests).length > 0);
   for (const [name, entry] of Object.entries(tests)) {
