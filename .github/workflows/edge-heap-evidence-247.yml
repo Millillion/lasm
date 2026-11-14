@@ -103,7 +103,7 @@ jobs:
         uses: ./.github/actions/playwright
         with:
           browsers: chromium
-      - name: Evidence (before: Emscripten's libmimalloc; after: Lasm's mimalloc build)
+      - name: Evidence, before (Emscripten's libmimalloc) and after (Lasm's mimalloc build)
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
