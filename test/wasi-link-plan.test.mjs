@@ -5,8 +5,8 @@
 // wasi-http component. The real link is checked by .github/workflows/wasi.yml.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
+import { dirname, join, relative, sep } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { linkWasiProgram, wasiLinkSettings, wasiSources, mimallocSources, mimallocFlags, allowedImportModules, checkWasiModule } from '../src/wasi/wasi-link.mjs';
@@ -68,8 +68,14 @@ test('the WASI link compiles the host, links the application objects with the ed
     .map(([source, object]) => ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
       ...mimallocFlags({ sliceKiB: 8, arenaMiB: 2 }), `-ffile-prefix-map=${here}=lasm/`, '-I', join(mimalloc, 'include'), '-I', join(mimalloc, 'src'),
       '-c', source, '-o', join(f.out, object)]));
-  for (const flag of ['-DMI_ARENA_SLICE_SHIFT=13', '-DMI_DEFAULT_ARENA_RESERVE=8192', '-DMI_DEFAULT_VIRTUAL_ADDRESS_BITS=32', '-DMI_MAX_ALIGN_SIZE=8', '-DEMMALLOC_NO_STD_EXPORTS'])
-    assert.ok(mimallocFlags({ sliceKiB: 8, arenaMiB: 2 }).includes(flag), flag);
+  // Emscripten's flags for its libmimalloc and emcc's code generation flags; the slice size, arena reserve and address bits are Lasm's.
+  assert.deepEqual(mimallocFlags({ sliceKiB: 8, arenaMiB: 2 }), ['-fignore-exceptions', '-mllvm', '-combiner-global-alias-analysis=false', '-mllvm',
+    '-disable-lsr', '-O2', '-Wall', '-fno-unroll-loops', '-fno-builtin', '-Wno-unused-function', '-Wno-unused-but-set-variable', '-Wno-unused-variable',
+    '-Wno-deprecated-pragma', '-DEMMALLOC_NO_STD_EXPORTS', '-DMI_ENABLE_LARGE_PAGES=0', '-DMI_ARENA_SLICE_SHIFT=13', '-DMI_MAX_ALIGN_SIZE=8',
+    '-DMI_DEFAULT_ARENA_RESERVE=8192', '-DMI_MALLOC_OVERRIDE', '-DMI_DEBUG=0', '-DNDEBUG', '-DMI_LIBC_MUSL', '-DMI_USE_BUILTIN_THREAD_POINTER',
+    '-DMI_DEFAULT_VIRTUAL_ADDRESS_BITS=32', '-DMI_PAGE_MAP_FLAT=0']);
+  assert.deepEqual(mimallocFlags({ sliceKiB: 32, arenaMiB: 16 }).filter(flag => /SLICE_SHIFT|ARENA_RESERVE/.test(flag)),
+    ['-DMI_ARENA_SLICE_SHIFT=15', '-DMI_DEFAULT_ARENA_RESERVE=65536']);
   // 2. Only application objects (no lookup marker, runtime members or JavaScript glue) and the wraps.
   const MiB = 1048576;
   const expected = ['-o', join(f.out, 'linked.wasm'), f.objects.main, '--wrap=initialize_Main', f.objects.second,
@@ -233,8 +239,11 @@ test('WASI targets: settings, the sources of the cache identity, and the host in
   assert.deepEqual(wasiSources, ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
     'wasi-component.mjs', 'component/proxy-template.wasm', 'lasm_wasi_http_imports.h', '../../library/c/lasm_fastly.c',
     '../../library/c/lasm_wasi_http_bindings.c', 'lasm_mimalloc.c', ...mimallocSources]);
-  // Every file lasm_mimalloc.c and prim.c include, and mimalloc's licence.
-  assert.equal(mimallocSources.length, 32);
+  // Every file lasm_mimalloc.c and prim.c include, and mimalloc's licence: exactly the vendored files.
+  const vendored = readdirSync(join(here, 'mimalloc'), { recursive: true, withFileTypes: true }).filter(entry => entry.isFile())
+    .map(entry => relative(here, join(entry.parentPath, entry.name)).split(sep).join('/')).sort();
+  assert.deepEqual([...mimallocSources].sort(), vendored);
+  assert.equal(vendored.length, 32);
   for (const name of wasiSources) assert.ok(existsSync(join(here, name)), name);
   const accepts = (target, module) => { try { checkWasiModule(programModule([[module, 'f']]), target); return true; } catch { return false; } };
   // Lasm.Fastly binds every witx module (library/c/lasm_fastly.c).

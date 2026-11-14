@@ -120,15 +120,13 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
     objects.push(object);
   }
   // mimalloc in place of the edge runtime's libmimalloc.a, whose emmalloc and sbrk members it still uses.
-  if (settings.mimalloc) {
-    const include = join(here, 'mimalloc');
-    for (const [source, name] of [[join(here, 'lasm_mimalloc.c'), 'lasm_mimalloc.o'], [join(include, 'src/prim/prim.c'), 'lasm_mimalloc_prim.o']]) {
-      const object = join(out, name);
-      run('clang', ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
-        ...mimallocFlags(settings.mimalloc), '-ffile-prefix-map=' + here + '=lasm/', '-I', join(include, 'include'), '-I', join(include, 'src'),
-        '-c', source, '-o', object]);
-      objects.push(object);
-    }
+  const include = join(here, 'mimalloc');
+  for (const [source, name] of [[join(here, 'lasm_mimalloc.c'), 'lasm_mimalloc.o'], [join(include, 'src/prim/prim.c'), 'lasm_mimalloc_prim.o']]) {
+    const object = join(out, name);
+    run('clang', ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
+      ...mimallocFlags(settings.mimalloc), '-ffile-prefix-map=' + here + '=lasm/', '-I', join(include, 'include'), '-I', join(include, 'src'),
+      '-c', source, '-o', object]);
+    objects.push(object);
   }
 
   // 2. The link. Lasm.JS's and Lasm.Fetch's JavaScript glue objects are replaced.
