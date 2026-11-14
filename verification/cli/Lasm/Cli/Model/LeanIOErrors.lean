@@ -1,5 +1,5 @@
 /-
-# src/lean-io-errors.mjs, in Lean: `leanAtLeast`
+# src/lean-io-errors.mjs, in Lean: `leanAtLeast`, `leanIOError`
 
 A model of the JavaScript, written to mirror it statement for statement,
 and checked against it on generated inputs by
@@ -10,6 +10,7 @@ test/models/cli-differential.mjs (the `cli-models` workflow).
 | `Number(part)` of a version part | `jsNumber` |
 | `parts(value)`: `value.split('-')[0].split('.').map(Number)` | `versionParts` |
 | `leanAtLeast(version, minimum)` | `leanAtLeast` |
+| `leanIOError(error, version, { platform, systemErrorName })` | `leanIOErrorModel` |
 
 `Number(text)` is modelled for the texts a version part is made of: the
 empty text is 0, decimal digits are their value, anything else is NaN. The
@@ -19,7 +20,14 @@ at most 15 digits, letters and dots. A missing part (`a[i]` past the end) is
 `undefined`. `!==` and `>` are JavaScript's: NaN differs from everything, and
 `>` with NaN or `undefined` is false.
 
-The rest of the module (the IO error policy) is not modelled.
+`leanIOError` is modelled over what it reads of an error (`leanUserError`,
+a numeric `errno` (an integer), `code`, whether `errorOrigin` is `'crt'`)
+and what it changes (`code`, `errno`, `message`; the other fields are
+kept, and `nativeMessage` set). Its tables (libuv's messages, Lean's CRT
+aliases, the Windows CRT cases) are parameters: they are data, which the
+differential passes as the module exports them (`ioErrorTables`); a lookup
+finds own entries only. `checkLeanIOVersion` and `receiveSizeError` are a
+list and a constant.
 -/
 
 namespace Lasm.Cli
@@ -66,5 +74,41 @@ where
   go (a b : List JsNum) (get : List JsNum → Nat → JsNum) : List Nat → Bool
     | [] => true
     | i :: is => if (get a i).strictNe (get b i) then (get a i).gt (get b i) else go a b get is
+
+/-- What `leanIOError` reads of an error. -/
+structure IOErrorIn where
+  userError : Bool
+  errno : Option Int
+  code : Option String
+  crt : Bool
+deriving Repr
+
+/-- `leanIOError`'s tables. -/
+structure IOErrorTables where
+  messages : List (String × String)
+  crtAliases : List (String × String)
+  windowsCrtCases : List String
+
+/-- `table[key]` of a table without a prototype. -/
+def lookupCode (table : List (String × String)) : Option String → Option String
+  | some k => table.lookup k
+  | none => none
+
+/-- `leanIOError(error, version, { platform, systemErrorName })`: `none` when
+the error is returned as it is, else its new `code` (undefined as `none`),
+`errno` and `message`. -/
+def leanIOErrorModel (tables : IOErrorTables) (platform version : String) (systemErrorName : Int → Option String)
+    (e : IOErrorIn) : Option (Option String × Int × String) :=
+  if version = "4.32.0" ∨ e.userError then none else
+  let uv := match e.errno with | some n => decide (n < 0) | none => false
+  if !uv && !e.crt then none else
+  let errno := e.errno.getD 0
+  let code := if uv then e.code else (lookupCode tables.crtAliases e.code).or e.code
+  let code := if !uv && platform = "win32" && !(e.code.map (tables.windowsCrtCases.contains ·)).getD false then
+      some ((systemErrorName (-errno)).getD "UNKNOWN") else code
+  let uvNumber := if uv then errno else -errno
+  let message := (if platform = "win32" ∧ code = some "ENOEXEC" then some "exec format error" else none).or
+    (if code ≠ some "UNKNOWN" ∨ uvNumber = -4094 then lookupCode tables.messages code else none)
+  some (code, (if uv then -errno else errno), message.getD s!"Unknown system error {uvNumber}")
 
 end Lasm.Cli
