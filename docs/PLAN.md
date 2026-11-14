@@ -11,7 +11,7 @@ will follow in separate chunks; it is not a prerequisite for this milestone.
 
 This plan supersedes earlier instructions to pursue all engines and complete API
 parity before delivering the basic workflow. The previous plan is preserved in
-[OLD PLAN — archived 2026-09-25](PLAN_OLD_2026-09-25.md) for reference only.
+[OLD PLAN — archived 2026-09-25](history/PLAN_OLD_2026-09-25.md) for reference only.
 Updating this document does not itself start, stop, or interrupt running work.
 
 **Windows ARM64 support removed — 2026-10-16:** user decision; no upstream
@@ -947,7 +947,8 @@ relabel previous failures, or describe deferral as a fundamental limitation.
   Never force-push or discard remote work. Attempt a push at least once after
   every commit. If it fails, retain the commit locally, continue work, and try
   again after the next commit, as requested in the latest user instruction.
-- Include an under-150-word `docs/PROGRESS.md` snapshot at implementation commits:
+- (Ended 2026-10-24; ROADMAP.md is the record now, and the last snapshot is
+  [history/PROGRESS.md](history/PROGRESS.md).) Include an under-150-word `docs/PROGRESS.md` snapshot at implementation commits:
   verified change/evidence, remaining milestone gates, and an evidence-based ETA
   or "not yet estimable." Report this milestone separately from the broader
   compatibility program. Do not transfer the former full-program completion
