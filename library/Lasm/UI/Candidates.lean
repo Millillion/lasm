@@ -15,7 +15,6 @@ file.
 -/
 import Lasm.UI.Proofs.Basic
 import Lasm.UI.Proofs.Decode
-import Lasm.UI.Proofs.Apply
 import Lasm.UI.Url
 
 namespace Lasm.UI.Candidates
@@ -39,25 +38,6 @@ def keyed_reorder_only_moves : Prop :=
   ∀ (Msg : Type) (old : List (Live Msg)) (new : List (Html Msg)) (next : Nat), WF old next →
     (∀ x ∈ old, x.key?.isSome) → (old.map Live.key?).Nodup → new.Perm (old.map Live.erase) →
     (diff old new next).ops.all fun op => match op with | .insert .. | .remove _ | .clear => false | _ => true
-
-/-- **The diff's patches conform.** For a well-formed live tree whose DOM
-has distinct ids, none 0 (as every frame of a session has:
-`Spec.session_correct`, `Spec.applier_correct`), the patch of `diff` to any
-next view conforms (`Applier.confOps`, from the ids below the next free id):
-every node an op names is a child of its parent there, inserts and moves
-go before such a child or at the end and never before the moved node
-itself, text changes are on text nodes and attribute changes on elements
-(with every slot as the encoder sends it), and inserted subtrees bring
-distinct new ids. With it, `Spec.applier_session` says the browser shows
-every view (it assumes this as `Applier.DiffConforms`, the same statement).
-Tested by: test/models/ui-applier-differential.mjs -/
-def diff_conforms : Prop :=
-  ∀ (Msg : Type) (old : List (Live Msg)) (new : List (Html Msg)) (next : Nat), WF old next → 0 < next →
-    (Applier.idsIn (old.map toDom)).Nodup → 0 ∉ Applier.idsIn (old.map toDom) →
-    (Applier.confOps (List.range next) (diff old new next).ops.toList (old.map toDom)).isSome
-
-/-- `Spec.applier_session`'s assumption is this candidate. -/
-example : diff_conforms = Applier.DiffConforms := rfl
 
 /-! ## URLs -/
 

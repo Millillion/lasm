@@ -10,7 +10,7 @@ same patch as the flat list of operations the decoder reads
 whole document, and the DOM refuses what it refuses. The two agree when
 
 * the ids in the document are distinct and none is the root's (0), and
-* the patch conforms (`confOps`): every node an op names is a child of its
+* the patch conforms (`confOps`, Proofs/Conform.lean): every node an op names is a child of its
   parent where the op runs, every insert or move is before such a child (or
   at the end) and never before the moved node itself, a text change is on a
   text node and attribute changes on an element (with the slots as the
@@ -32,63 +32,10 @@ open Lasm.UI Lasm.UI.Model Lasm.UI.Decode
 
 variable {Msg : Type}
 
-/-! ## Conforming patches -/
-
-/-- `before` is a child of the parent, or the end. -/
-def anchored (b : Option Nat) (k : List Dom) : Bool :=
-  match b with
-  | none => true
-  | some x => (k.map Dom.id).contains x
-
-/-- The ids are distinct and none is in `used`. -/
-def fresh (xs used : List Nat) : Bool := decide xs.Nodup && xs.all fun x => !used.contains x
-
-mutual
-/-- Whether a patch on children `k` conforms, and the ids used after it
-(`none`: it does not conform). -/
-def confOps (used : List Nat) : List (Op Msg) → List Dom → Option (List Nat)
-  | [], _ => some used
-  | o :: os, k =>
-    match confOp used o k with
-    | some u => confOps u os (applyOp o k)
-    | none => none
-/-- Whether one op on children `k` conforms. -/
-def confOp (used : List Nat) : Op Msg → List Dom → Option (List Nat)
-  | .insert n b, k => if fresh (toDom n).ids used && anchored b k then some (used ++ (toDom n).ids) else none
-  | .move i b, k => if (k.map Dom.id).contains i && anchored b k && b != some i then some used else none
-  | .remove i, k => if (k.map Dom.id).contains i then some used else none
-  | .clear, _ => some used
-  | .text i _, k =>
-    match findId i k with
-    | some (.text ..) => some used
-    | _ => none
-  | .attrs i aops, k =>
-    match findId i k with
-    | some (.elem ..) => if aops.map AttrOp.wire == aops then some used else none
-    | _ => none
-  | .sub i os, k =>
-    match findId i k with
-    | some (.elem _ _ _ _ kk) => confOps used os kk
-    | _ => none
-end
-
 /-! ## Ids -/
 
 theorem ifN {c : Prop} [Decidable c] {α : Sort _} {t e : α} (h : ¬c) : (if c then t else e) = e := by simp [h]
 theorem ifP {c : Prop} [Decidable c] {α : Sort _} {t e : α} (h : c) : (if c then t else e) = t := by simp [h]
-
-theorem idsIn_nil : idsIn [] = [] := by rw [idsIn]
-
-theorem idsIn_cons (d : Dom) (ds : List Dom) : idsIn (d :: ds) = d.ids ++ idsIn ds := by rw [idsIn]
-
-@[simp] theorem idsIn_append (l r : List Dom) : idsIn (l ++ r) = idsIn l ++ idsIn r := by
-  induction l with
-  | nil => simp [idsIn_nil]
-  | cons d ds ih => simp [idsIn_cons, ih]
-
-theorem ids_text (i : Nat) (s : String) : (Dom.text i s).ids = [i] := by rw [Dom.ids]
-
-theorem ids_elem (i ns tag a cs) : (Dom.elem i ns tag a cs).ids = i :: idsIn cs := by rw [Dom.ids]
 
 theorem id_mem_ids (d : Dom) : d.id ∈ d.ids := by
   cases d <;> simp [ids_text, ids_elem, Dom.id]
@@ -719,11 +666,6 @@ def trace : Proofs.Session Msg → List (List (Html Msg)) → List ((Array (Op M
   | _, [] => []
   | s, v :: vs => (((diff s.live v s.next).ops, 0), (diff s.live v s.next).live.map toDom) :: trace (s.step v) vs
 
-theorem mem_idsIn {x : Nat} {l : List Dom} : x ∈ idsIn l ↔ ∃ d ∈ l, x ∈ d.ids := by
-  induction l with
-  | nil => simp [idsIn_nil]
-  | cons d ds ih => simp [idsIn_cons, ih]
-
 theorem ids_lt_of_WFn {next : Nat} {x : Live Msg} (h : Proofs.WFn next x) : ∀ y ∈ (toDom x).ids, y < next := by
   induction h with
   | text hi => intro y hy; simp [ids_text] at hy; omega
@@ -740,13 +682,7 @@ theorem ids_lt_of_WF {next : Nat} {l : List (Live Msg)} (h : Proofs.WF l next) :
   obtain ⟨x, hx, rfl⟩ := List.mem_map.1 hd
   exact ids_lt_of_WFn (h.1 x hx) y hy
 
-/-- The patches of `diff` conform (Candidates.diff_conforms, tested, not proved). -/
-def DiffConforms : Prop :=
-  ∀ (Msg : Type) (old : List (Live Msg)) (new : List (Html Msg)) (next : Nat), Proofs.WF old next → 0 < next →
-    (idsIn (old.map toDom)).Nodup → 0 ∉ idsIn (old.map toDom) →
-    (confOps (List.range next) (diff old new next).ops.toList (old.map toDom)).isSome
-
-theorem frames_trace (hc : DiffConforms) (views : List (List (Html Msg))) :
+theorem frames_trace (views : List (List (Html Msg))) :
     ∀ (s : Proofs.Session Msg) (t : Encode.Tables) (st : State), Proofs.Wire.Synced t st → Proofs.WF s.live s.next →
       0 < s.next → (idsIn (s.live.map toDom)).Nodup → 0 ∉ idsIn (s.live.map toDom) →
       frames st (s.live.map toDom) (Decode.encodeAll t ((trace s views).map Prod.fst)) =
@@ -755,7 +691,7 @@ theorem frames_trace (hc : DiffConforms) (views : List (List (Html Msg))) :
   | nil => intro s t st _ _ _ _ _; simp [trace, Decode.encodeAll, frames]
   | cons v vs ih =>
     intro s t st hsy hwf hpos hnd hz
-    obtain ⟨u, hu⟩ := Option.isSome_iff_exists.1 (hc Msg s.live v s.next hwf hpos hnd hz)
+    obtain ⟨u, hu⟩ := Option.isSome_iff_exists.1 (Proofs.diff_conforms s.live v s.next hwf)
     have hd := Proofs.diff_correct s.live v s.next hwf
     have hr := run_ofOps _ _ _ _ hnd hz (fun x hx => List.mem_range.2 (ids_lt_of_WF hwf x hx))
       (List.mem_range.2 hpos) hu
@@ -769,12 +705,13 @@ theorem frames_trace (hc : DiffConforms) (views : List (List (Html Msg))) :
     exact ih (s.step v) _ st' hsy' hd.2.2.1 (by have := hd.2.2.2; simp only [Proofs.Session.step]; omega)
       hr.2.1 hr.2.2.1
 
-/-- With conforming patches, the applier, reading every frame of a session
-from an empty root, leaves after each frame the DOM of the live tree. -/
-theorem session_applier (hc : DiffConforms) (views : List (List (Html Msg))) :
+/-- The applier, reading every frame of a session from an empty root,
+leaves after each frame the DOM of the live tree (the diff's patches
+conform: `Proofs.diff_conforms`). -/
+theorem session_applier (views : List (List (Html Msg))) :
     frames {} [] (Decode.encodeAll {} ((trace Proofs.Session.empty views).map Prod.fst)) =
       (trace Proofs.Session.empty views).map fun x => some x.2 :=
-  frames_trace hc views Proofs.Session.empty {} {} Proofs.Wire.synced_empty ⟨by simp [Proofs.Session.empty], by
+  frames_trace views Proofs.Session.empty {} {} Proofs.Wire.synced_empty ⟨by simp [Proofs.Session.empty], by
     simp [Proofs.Session.empty]⟩ (by simp [Proofs.Session.empty]) (by simp [Proofs.Session.empty, idsIn_nil])
     (by simp [Proofs.Session.empty, idsIn_nil])
 

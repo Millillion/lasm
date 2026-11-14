@@ -80,9 +80,9 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**56 proved propositions (405 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**57 proved propositions (441 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
-## Lasm.UI (13)
+## Lasm.UI (14)
 
 ### Rendering: the DOM always shows the view
 
@@ -105,17 +105,18 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 | Proposition | In plain English |
 | --- | --- |
 | [`applier_correct`](Lasm/UI/Spec.lean#L117) | **The applier performs every conforming patch as the model says.** The applier (Lasm.UI.Applier, the model of what src/lasm-modules/ui-dom.mjs does to the DOM) performs a patch as the flat list of operations it reads from the bytes (`Wire.ofOps`), naming every node by id in one table for the whole document, and the DOM refuses some (an id not in the document, an insert before a node that is not a child, into a text node or into the moved node's own subtree). Take any DOM under the root whose ids are distinct, none 0 (the root's) and all among `used`, and any patch that conforms (`confOps`: each op's nodes are children of its parent there, inserts and moves go before such a child or at the end and never before the moved node itself, texts change on text nodes and attributes on elements, and inserted subtrees bring distinct ids never used). Then no operation is refused, the DOM after them is exactly `applyOps`' (Lasm.UI.Model, the meaning `diff_correct` is proved against), and its ids are distinct again. |
-| [`applier_session`](Lasm/UI/Spec.lean#L136) | **The browser shows every view, if the diff's patches conform.** Assume the candidate `Candidates.diff_conforms` (`Applier.DiffConforms`: the patch `diff` writes for a well-formed live tree with distinct ids conforms; tested on every frame of the model differential, not yet proved). Render any sequence of views from an empty root, one frame each as the runtime does (`Applier.trace`: the patch of each frame and the DOM of its live tree). Then the applier, reading the bytes of every frame as Lean encodes them (`Decode.encodeAll`, tables carried across frames) and performing them on the DOM the last frame left, refuses none and leaves after each frame exactly the DOM of that frame's live tree, which shows its view (`session_correct`). This composes `diff_correct`, `frames_decode` and `applier_correct`. |
-| [`hydrate_correct`](Lasm/UI/Spec.lean#L153) | **Hydration builds what a fresh mount builds.** An app mounted with `hydrate: true` adopts the server-rendered DOM with its first frame (`Applier.hydrateFrame`): each node of the first render takes the server node at its place when it is of the same kind (a text node; an element of the same namespace and tag), keeping it, comments are dropped, and server nodes left over are removed. For any view and any server DOM at all, the applier reads the encoded first render, and hydrating with it gives the same nodes as mounting the view from scratch (`Applier.bareIn`: the same ids, kinds, namespaces, tags, texts and children, in order); only an adopted element may keep a server attribute the view does not set. When the server DOM renders the view (`Applier.Rendered`: a node of the same kind for each node, comments anywhere, server attributes among the view's), the result is exactly the fresh mount's DOM. |
+| [`diff_conforms`](Lasm/UI/Spec.lean#L136) | **The diff's patches conform.** For a well-formed live tree whose DOM has distinct ids, none 0 (as every frame of a session has: `Spec.session_correct`, `Spec.applier_correct`), the patch of `diff` to any next view conforms (`Applier.confOps`, from the ids below the next free id): every node an op names is a child of its parent there, inserts and moves go before such a child or at the end and never before the moved node itself, text changes are on text nodes and attribute changes on elements (with every slot as the encoder sends it), and inserted subtrees bring distinct new ids. So `applier_correct` applies to every patch `diff` writes. (Well-formedness alone is enough: the proof does not use the other two assumptions, which the model differential checks hold on every frame.) |
+| [`applier_session`](Lasm/UI/Spec.lean#L152) | **The browser shows every view.** Render any sequence of views from an empty root, one frame each as the runtime does (`Applier.trace`: the patch of each frame and the DOM of its live tree). Then the applier, reading the bytes of every frame as Lean encodes them (`Decode.encodeAll`, tables carried across frames) and performing them on the DOM the last frame left, refuses none and leaves after each frame exactly the DOM of that frame's live tree, which shows its view (`session_correct`). This composes `diff_correct`, `diff_conforms`, `frames_decode` and `applier_correct`. |
+| [`hydrate_correct`](Lasm/UI/Spec.lean#L165) | **Hydration builds what a fresh mount builds.** An app mounted with `hydrate: true` adopts the server-rendered DOM with its first frame (`Applier.hydrateFrame`): each node of the first render takes the server node at its place when it is of the same kind (a text node; an element of the same namespace and tag), keeping it, comments are dropped, and server nodes left over are removed. For any view and any server DOM at all, the applier reads the encoded first render, and hydrating with it gives the same nodes as mounting the view from scratch (`Applier.bareIn`: the same ids, kinds, namespaces, tags, texts and children, in order); only an adopted element may keep a server attribute the view does not set. When the server DOM renders the view (`Applier.Rendered`: a node of the same kind for each node, comments anywhere, server attributes among the view's), the result is exactly the fresh mount's DOM. |
 
 ### Commands
 
 | Proposition | In plain English |
 | --- | --- |
-| [`cmd_map_comp`](Lasm/UI/Spec.lean#L179) | **Mapping commands composes.** `Cmd.map` is how a parent embeds a child component's commands (its messages wrapped in the parent's). Mapping by `g` and then by `f` is the same command as mapping once by `f ∘ g`, so components nest to any depth. |
-| [`cmd_map_effects`](Lasm/UI/Spec.lean#L186) | **Mapping commands keeps their effects.** Mapping a command by any `f` keeps exactly its effects, in order, each of the same kind with the same data (the same request, delay, URL, storage key …): with the messages they deliver forgotten (`Effect.forget`), the effects before and after are equal. Only the messages change. |
-| [`cmd_map_id`](Lasm/UI/Spec.lean#L194) | **Mapping by the identity changes nothing.** |
-| [`cmd_map_batch`](Lasm/UI/Spec.lean#L198) | **Mapping commutes with batching.** Mapping a batch of commands is the batch of the mapped commands: no effect is lost, duplicated or reordered. |
+| [`cmd_map_comp`](Lasm/UI/Spec.lean#L191) | **Mapping commands composes.** `Cmd.map` is how a parent embeds a child component's commands (its messages wrapped in the parent's). Mapping by `g` and then by `f` is the same command as mapping once by `f ∘ g`, so components nest to any depth. |
+| [`cmd_map_effects`](Lasm/UI/Spec.lean#L198) | **Mapping commands keeps their effects.** Mapping a command by any `f` keeps exactly its effects, in order, each of the same kind with the same data (the same request, delay, URL, storage key …): with the messages they deliver forgotten (`Effect.forget`), the effects before and after are equal. Only the messages change. |
+| [`cmd_map_id`](Lasm/UI/Spec.lean#L206) | **Mapping by the identity changes nothing.** |
+| [`cmd_map_batch`](Lasm/UI/Spec.lean#L210) | **Mapping commutes with batching.** Mapping a batch of commands is the batch of the mapped commands: no effect is lost, duplicated or reordered. |
 
 ## Lasm.RPC (14)
 
@@ -243,7 +244,7 @@ the CLI's JavaScript (`Lasm.Cli`) are listed in
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**16 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+**15 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
 ### Lasm.Fetch (5)
 
@@ -270,16 +271,15 @@ the CLI's JavaScript (`Lasm.Cli`) are listed in
 | --- | --- | --- |
 | [`join_cookies_once`](Lasm/Serverless/Candidates.lean#L23) | **`joinCookies` leaves at most one Cookie field and the others in order.** Whatever Cookie fields a request has, at most one remains, and the fields other than Cookie are exactly the request's, in their order. | [test/serverless-shims.test.mjs](../test/serverless-shims.test.mjs) |
 
-### Lasm.UI (6)
+### Lasm.UI (5)
 
 | Candidate | In plain English | Tested by |
 | --- | --- | --- |
-| [`diff_unchanged_empty`](Lasm/UI/Candidates.lean#L30) | **An unchanged view produces an empty patch.** For any well-formed rendered tree, diffing it against the view it already shows emits no operation at all: a frame whose view did not change touches no DOM node. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
-| [`keyed_reorder_only_moves`](Lasm/UI/Candidates.lean#L38) | **Keyed reorders only move.** When every old child is keyed, with distinct keys, and the new children are a permutation of the old ones, the patch inserts, removes and clears nothing: every node is kept and only moved. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
-| [`diff_conforms`](Lasm/UI/Candidates.lean#L54) | **The diff's patches conform.** For a well-formed live tree whose DOM has distinct ids, none 0 (as every frame of a session has: `Spec.session_correct`, `Spec.applier_correct`), the patch of `diff` to any next view conforms (`Applier.confOps`, from the ids below the next free id): every node an op names is a child of its parent there, inserts and moves go before such a child or at the end and never before the moved node itself, text changes are on text nodes and attribute changes on elements (with every slot as the encoder sends it), and inserted subtrees bring distinct new ids. With it, `Spec.applier_session` says the browser shows every view (it assumes this as `Applier.DiffConforms`, the same statement). | [test/models/ui-applier-differential.mjs](../test/models/ui-applier-differential.mjs) |
-| [`percent_round_trip`](Lasm/UI/Candidates.lean#L67) | **Percent-encoding round-trips.** Decoding what `percentEncode` writes gives back the text, for every string (any Unicode, `%` and `+` included). | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
-| [`segments_round_trip`](Lasm/UI/Candidates.lean#L74) | **Encoded segments come back as the segments.** A path built from non-empty segments, each percent-encoded, reads back (`Url.segments`) as exactly those segments: a route matches the values a link was built from. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
-| [`interned_from_table_or_bytes`](Lasm/UI/Candidates.lean#L86) | **An interned name or value is the table's or spelled in the frame.** Reading an interned string (an attribute name or value, an event, a tag) gives a string already in the table or one whose UTF-8 bytes are among the bytes read, and the table grows by at most that string: a reference past the table is a malformed frame, never a made-up name such as `undefined`. | [test/fuzz/targets/ui-patch.mjs](../test/fuzz/targets/ui-patch.mjs) |
+| [`diff_unchanged_empty`](Lasm/UI/Candidates.lean#L29) | **An unchanged view produces an empty patch.** For any well-formed rendered tree, diffing it against the view it already shows emits no operation at all: a frame whose view did not change touches no DOM node. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+| [`keyed_reorder_only_moves`](Lasm/UI/Candidates.lean#L37) | **Keyed reorders only move.** When every old child is keyed, with distinct keys, and the new children are a permutation of the old ones, the patch inserts, removes and clears nothing: every node is kept and only moved. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+| [`percent_round_trip`](Lasm/UI/Candidates.lean#L47) | **Percent-encoding round-trips.** Decoding what `percentEncode` writes gives back the text, for every string (any Unicode, `%` and `+` included). | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+| [`segments_round_trip`](Lasm/UI/Candidates.lean#L54) | **Encoded segments come back as the segments.** A path built from non-empty segments, each percent-encoded, reads back (`Url.segments`) as exactly those segments: a route matches the values a link was built from. | [test/ui/DiffModel.lean](../test/ui/DiffModel.lean) |
+| [`interned_from_table_or_bytes`](Lasm/UI/Candidates.lean#L66) | **An interned name or value is the table's or spelled in the frame.** Reading an interned string (an attribute name or value, an event, a tag) gives a string already in the table or one whose UTF-8 bytes are among the bytes read, and the table grows by at most that string: a reference past the table is a malformed frame, never a made-up name such as `undefined`. | [test/fuzz/targets/ui-patch.mjs](../test/fuzz/targets/ui-patch.mjs) |
 <!-- END CANDIDATES -->
 
 ### Tested, not yet stated in Lean
@@ -291,7 +291,7 @@ Lean model" that §4 leaves to tests until a model exists.
 - **Lasm.UI: the JavaScript applier implements the decoder and the applier
   model, and the browser parses rendered HTML as `Applier.Server`.** What
   the decoder and the applier model do is proved (`frames_decode`,
-  `applier_correct`, `applier_session`, `hydrate_correct`); that
+  `applier_correct`, `diff_conforms`, `applier_session`, `hydrate_correct`); that
   src/lasm-modules/ui-dom.mjs does the same on a real DOM is tested (the
   ui-decode fuzz target and test/models/ui-applier-differential.mjs, on
   happy-dom), and that the HTML `Lasm.UI.Render` writes parses to a server
