@@ -1,0 +1,113 @@
+name: Glue
+# The CLI's glue program (docs/proposals/M6_GLUE.md): verification/cli/LasmGlue.lean
+# built with `--target wasi` by the pinned published @lasm/cli (never this
+# checkout's CLI, so the glue does not depend on itself) into
+# src/glue/lasm-glue.wasm. The build must equal the committed file (release
+# builds are byte-reproducible); the build is uploaded as the `lasm-glue`
+# artifact, to commit when the Lean changes. Then, with the build in place:
+# the glue's tests, its model differential, the smoke test under Bun and Deno,
+# and the measurements of the bar (M6_GLUE.md §3) against main's JavaScript.
+# Free runner, the public registry, no account and no publication.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/glue.yml'
+      - 'verification/cli/**'
+      - 'src/glue/**'
+      - 'src/edge/edge-initializers.mjs'
+      - 'scripts/glue/**'
+      - 'test/glue.test.mjs'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/glue.yml'
+      - 'verification/cli/**'
+      - 'src/glue/**'
+      - 'src/edge/edge-initializers.mjs'
+      - 'scripts/glue/**'
+      - 'test/glue.test.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: glue-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+env:
+  LASM_CLI_VERSION: 0.7.0
+jobs:
+  glue:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      LASM_BUILD_JOBS: '2'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: The pinned published @lasm/cli
+        run: npm install --prefix "$RUNNER_TEMP/lasm-cli" --no-audit --no-fund "@lasm/cli@$LASM_CLI_VERSION"
+      - name: Build the glue program
+        run: |
+          set -euo pipefail
+          cd verification/cli
+          node "$RUNNER_TEMP/lasm-cli/node_modules/@lasm/cli/bin/lasm.mjs" build LasmGlue.lean --target wasi --output "$RUNNER_TEMP/glue"
+          ls -la "$RUNNER_TEMP/glue"
+          mkdir -p "$GITHUB_WORKSPACE/.work/glue"
+          cp "$RUNNER_TEMP/glue/main.wasm" "$GITHUB_WORKSPACE/.work/glue/lasm-glue.wasm"
+          cp "$RUNNER_TEMP/glue/THIRD_PARTY_NOTICES.txt" "$GITHUB_WORKSPACE/.work/glue/THIRD_PARTY_NOTICES.txt"
+          cp "$RUNNER_TEMP/glue/build-info.json" "$GITHUB_WORKSPACE/.work/glue-build-info.json"
+          sha256sum "$GITHUB_WORKSPACE/.work/glue/lasm-glue.wasm"
+          node -e "const m=new WebAssembly.Module(require('fs').readFileSync('$GITHUB_WORKSPACE/.work/glue/lasm-glue.wasm')); console.log(JSON.stringify(WebAssembly.Module.imports(m)))"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: lasm-glue
+          path: |
+            .work/glue
+            .work/glue-build-info.json
+          retention-days: 14
+      - name: Is the committed program this build?
+        id: committed
+        run: |
+          if cmp -s .work/glue/lasm-glue.wasm src/glue/lasm-glue.wasm && cmp -s .work/glue/THIRD_PARTY_NOTICES.txt src/glue/THIRD_PARTY_NOTICES.txt
+          then echo "same=true" >> "$GITHUB_OUTPUT"
+          else echo "same=false" >> "$GITHUB_OUTPUT"; echo "::warning::src/glue/ is not this build; the checks below use the build"; fi
+          cp .work/glue/lasm-glue.wasm .work/glue/THIRD_PARTY_NOTICES.txt src/glue/
+      - name: Tests of the glue and its callers
+        run: node --test test/glue.test.mjs test/edge-initializers.test.mjs test/edge-link-plan.test.mjs test/application-link-plan.test.mjs
+      - name: The model differential of the glue
+        run: node test/models/cli-differential.mjs --only initializationSchedule,compactInitializerWrappers
+      - name: main's JavaScript, the baseline
+        run: |
+          git worktree add "$RUNNER_TEMP/main" origin/main
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/main/node_modules"
+          cp "$RUNNER_TEMP/main/src/edge/edge-initializers.mjs" "$RUNNER_TEMP/baseline.mjs"
+      - name: Bun and Deno
+        run: |
+          set -euo pipefail
+          npm install --prefix .work/host-tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
+          node scripts/glue/smoke.mjs "$RUNNER_TEMP/baseline.mjs"
+          .work/host-tools/node_modules/.bin/bun scripts/glue/smoke.mjs "$RUNNER_TEMP/baseline.mjs"
+          .work/host-tools/node_modules/.bin/deno run -A scripts/glue/smoke.mjs "$RUNNER_TEMP/baseline.mjs"
+      - name: The bar (docs/proposals/M6_GLUE.md §3)
+        run: node scripts/glue/measure.mjs --baseline "$RUNNER_TEMP/baseline.mjs" --main-checkout "$RUNNER_TEMP/main" --json .work/glue-measurements.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: glue-measurements
+          path: .work/glue-measurements.json
+          retention-days: 30
+      - name: The committed program must be this build
+        if: steps.committed.outputs.same != 'true'
+        run: |
+          echo "::error::src/glue/ differs from the build: commit the lasm-glue artifact of this run into src/glue/"
+          exit 1

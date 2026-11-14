@@ -21,6 +21,16 @@ This directory holds them:
   function, through [test/models/CliModels.lean](../../test/models/CliModels.lean))
   and any difference fails the `cli-models` workflow. `Interface.lean`
   imports them in place of the `opaque` constants they replace.
+- [Lasm/Cli/Glue.lean](Lasm/Cli/Glue.lean), run by
+  [LasmGlue.lean](LasmGlue.lean): the CLI's glue program, the models that
+  moved into the CLI (milestone M6,
+  [docs/proposals/M6_GLUE.md](../../docs/proposals/M6_GLUE.md)). Lasm
+  compiles it to `src/glue/lasm-glue.wasm` (`glue.yml`), and the CLI runs it
+  in place of the JavaScript it modelled (`src/edge/edge-initializers.mjs`
+  first). Where a model is too slow to run as is,
+  [Lasm/Cli/Fast/](Lasm/Cli/Fast) has a fast version with a `csimp` theorem
+  that it equals the model, so the compiled program is the model by a proved
+  rewrite.
 - [Lasm/Cli/Spec.lean](Lasm/Cli/Spec.lean) and
   [Lasm/Cli/Theorems.lean](Lasm/Cli/Theorems.lean): the propositions proved
   of the models, each with its theorem (as a library's `Spec.lean` and
@@ -58,7 +68,7 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**21 proved propositions (186 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**21 proved propositions (193 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
 ## Lasm.Cli (21)
 

@@ -34,7 +34,7 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**138 shipped modules**: 13 modelled, 27 pending, 98 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 27 modules still need a model.
+**139 shipped modules**: 13 modelled, 27 pending, 99 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 27 modules still need a model.
 
 ### Modelled (13)
 
@@ -44,7 +44,7 @@ How a module moves from pending to modelled:
 | [`native/process-launcher.c`](../native/process-launcher.c) | [ProcessLauncher.lean](../verification/cli/Lasm/Cli/Model/ProcessLauncher.lean) (main's reading of the configuration (number, string, read_exact); [cli-differential.mjs](../test/models/cli-differential.mjs)) | its reading of the configuration is modelled, and the differential runs the compiled C (effects reported instead of performed, test/models/process-launcher-harness.c); what it then does (stdio flags, chdir, setsid, execvp) is I/O, tested end to end by test/process-launcher.test.mjs |
 | [`src/cli-arguments.mjs`](../src/cli-arguments.mjs) | [CliArguments.lean](../verification/cli/Lasm/Cli/Model/CliArguments.lean) (`asciiLower`, `editDistance`, `closest`, `targetHint`, `parseLasmArguments`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole parser is modelled (run_args_kept, unknown_flag_refused, edit_distance_metric, closest_nearest_first, build_options_commute, parse_known_or_refused proved, the last with the parsers of lasm init, dev and package it hands to); existsSync is the environment and jsRuntime one of node, bun and deno |
 | [`src/edge/builtin-modules.mjs`](../src/edge/builtin-modules.mjs) | [BuiltinModules.lean](../verification/cli/Lasm/Cli/Model/BuiltinModules.lean) (`isBuiltinModule`, `builtinModuleClosure`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the closure is modelled, with the import forms it reads checked by the differential; `builtinModuleNames` and `builtinModuleFile` look a name up in the builtin directory (test/builtin-modules.test.mjs) |
-| [`src/edge/edge-initializers.mjs`](../src/edge/edge-initializers.mjs) | [EdgeInitializers.lean](../verification/cli/Lasm/Cli/Model/EdgeInitializers.lean) (`initializationSchedule`, `compactInitializerWrappers`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | both of its functions are modelled; the module does nothing else |
+| [`src/edge/edge-initializers.mjs`](../src/edge/edge-initializers.mjs) | [EdgeInitializers.lean](../verification/cli/Lasm/Cli/Model/EdgeInitializers.lean) (`initializationSchedule`, `compactInitializerWrappers`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | both functions run as their Lean model, compiled by Lasm into the CLI's glue program (src/glue/glue.mjs, docs/proposals/M6_GLUE.md) through a proved fast version (verification/cli/Lasm/Cli/Fast/EdgeInitializers.lean, a csimp theorem); what remains here is the plan's shape check and the encoding of its fields, which the differential checks together with the compiled program |
 | [`src/handle-table.mjs`](../src/handle-table.mjs) | [HandleTable.lean](../verification/cli/Lasm/Cli/Model/HandleTable.lean) (HandleTable (constructor, allocate, and the Map's set and delete); [cli-differential.mjs](../test/models/cli-differential.mjs)) | the allocator is modelled; handle_fresh_in_range proved |
 | [`src/package.mjs`](../src/package.mjs) | [Package.lean](../verification/cli/Lasm/Cli/Model/Package.lean) (`parsePackageArguments`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | its argument parsing is modelled (parse_known_or_refused proved); the rest packages a build (files, processes and archives), tested end to end |
 | [`src/process-launcher.mjs`](../src/process-launcher.mjs) | [ProcessLauncher.lean](../verification/cli/Lasm/Cli/Model/ProcessLauncher.lean) (`encodeProcessConfiguration`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the configuration writer is modelled (launcher_config_round_trip proved with the reader's model); nativeProcessLauncher finds and verifies the shipped binary (files and hashes, test/cli-helpers.test.mjs) |
@@ -86,7 +86,7 @@ How a module moves from pending to modelled:
 | [`src/wasi/lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c) | — | the wasi-http request and response mapping (edge request mapping, IRREDUCIBLE.md M4) |
 | [`src/wasm-objects.mjs`](../src/wasm-objects.mjs) | — | a reader of relocatable Wasm objects: pure |
 
-### Exempt (98)
+### Exempt (99)
 
 | Module | Kind | Reason |
 | --- | --- | --- |
@@ -131,6 +131,7 @@ How a module moves from pending to modelled:
 | [`src/editor.mjs`](../src/editor.mjs) | io | editor support files; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/elapsed-ticker-worker.mjs`](../src/elapsed-ticker-worker.mjs) | io | a timer thread writing to the terminal |
 | [`src/elapsed-ticker.mjs`](../src/elapsed-ticker.mjs) | io | a timer thread writing to the terminal |
+| [`src/glue/glue.mjs`](../src/glue/glue.mjs) | runtime | the WASI host of the CLI's glue program (stdin, stdout, stderr, clocks, random bytes; nothing else) and its field codec; the program is Lean (verification/cli/Lasm/Cli/Glue.lean), checked with this host by the model differential of src/edge/edge-initializers.mjs and test/glue.test.mjs |
 | [`src/js-runtime.mjs`](../src/js-runtime.mjs) | io | detects the JavaScript runtime |
 | [`src/lasm-library.mjs`](../src/lasm-library.mjs) | io | provisions Lasm's Lean library; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/lasm-modules/app.mjs`](../src/lasm-modules/app.mjs) | runtime | the app instance of Lasm.UI.Mount; tested in browsers (ui.yml) |
