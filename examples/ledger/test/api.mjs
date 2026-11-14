@@ -5,7 +5,7 @@
 //   node test/api.mjs --url http://host:port  # a server that is already running
 //   node test/api.mjs --command "bun bun/main.mjs"   # any other server command ({port}: its port)
 //   node test/api.mjs --name <name>           # the name of the results file (test-results/api-<name>.json)
-//   node test/api.mjs --equivalence           # also record the traffic (test-results/traffic-<name>.json)
+//   node test/api.mjs --equivalence           # also record the traffic (test-results/traffic-api-<name>.json)
 //                                             # for test/equivalence.mjs compare <name>
 import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -151,7 +151,7 @@ try {
     assert.ok(BigInt(a.timestamp) > 10n ** 18n);
   });
 } finally {
-  if (recorder) { await recorder.close(); saveTraffic(root, name, recorder.exchanges); }
+  if (recorder) { await recorder.close(); saveTraffic(root, `api-${name}`, recorder.exchanges); }
   await server.stop();
 }
 const failed = results.filter(r => !r.ok).length;

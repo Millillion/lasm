@@ -9,10 +9,10 @@
 // fixed ids, so every target sees the same requests on an empty database.
 // (The bank workload is concurrent and random, so it is not recorded.)
 //
-//   node test/equivalence.mjs compare NAME   # test-results/traffic-NAME.json against the golden file
+//   node test/equivalence.mjs compare NAME   # test-results/traffic-api-NAME.json against the golden file
 //   node test/equivalence.mjs self-test      # the normalizer and the diff on made-up traffic
 //
-// Re-recording: copy test-results/normalized-node-24.json from the Node 24 job's
+// Re-recording: copy test-results/normalized-api-node-24.json from the Node 24 job's
 // artifact (ledger-api-node-24) over test/equivalence/api.json and review the diff.
 // Known differences, each with an open issue: test/equivalence/known.json.
 //
@@ -26,13 +26,12 @@
 //   compared as facts.
 // Nothing else is: ids, amounts, balances and statuses are the API test's own
 // and the same everywhere.
-import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { decodeBody, main, normalizeWith, selfTestCompare } from '../../../scripts/equivalence/traffic.mjs';
 
 const TIMESTAMP = /"timestamp":"(\d+)"/g;
 
-export function normalize(exchanges, target = 'node') {
+export function normalize({ exchanges }, target = 'node') {
   // The rank of each timestamp among all the responses carried.
   const seen = new Set();
   for (const x of exchanges) {
@@ -66,12 +65,12 @@ function selfTest() {
         response: { status: 200, headers: [['content-type', 'application/json'], ['x-a', '1']], body: b(`[{"id":"9","timestamp":"${t(9)}"}]`) } },
     ];
   };
-  const n = normalize(traffic(0));
+  const n = normalize({ exchanges: traffic(0) });
   if (n.exchanges[2].request.path !== '/api/transfers?after=<ts#1>' || !n.exchanges[2].response.body.includes('<ts#2>')) throw new Error(`timestamps not ranked: ${JSON.stringify(n.exchanges[2])}`);
   return selfTestCompare(normalize, traffic, r => { r.status = 500; r.headers.push(['X-Extra', 'x']); r.body = b('[]'); });
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const root = fileURLToPath(new URL('..', import.meta.url));
-  main({ app: 'Ledger API', root, golden: join(root, 'test/equivalence/api.json'), known: join(root, 'test/equivalence/known.json'), normalize, selfTest });
+  main({ app: 'Ledger', root, suites: ['api'], normalize, selfTest });
 }

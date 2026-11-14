@@ -8,14 +8,14 @@
 // driver sent them.
 //
 // Each app's test/equivalence.mjs supplies its normalizer and calls `main`:
-//   node test/equivalence.mjs compare NAME   # test-results/traffic-NAME.json against the golden file;
-//                                            # writes test-results/equivalence-NAME.{txt,json} and the
-//                                            # normalized traffic (test-results/normalized-NAME.json)
+//   node test/equivalence.mjs compare NAME   # each suite's test-results/traffic-SUITE-NAME.json against
+//                                            # test/equivalence/SUITE.json; writes equivalence-SUITE-NAME.{txt,json}
+//                                            # and the normalized traffic (normalized-SUITE-NAME.json)
 //   node test/equivalence.mjs self-test      # the app's normalizer, and this file's diff, on made-up traffic
 //
 // Re-recording (after a deliberate change to the app's answers or Lasm):
-// copy test-results/normalized-node-24.json from the Node 24 job's artifact over
-// the app's golden file and review the diff.
+// copy test-results/normalized-SUITE-node-24.json from the Node 24 job's artifact over
+// the app's test/equivalence/SUITE.json and review the diff.
 //
 // Conduit has its own copy of these pieces (examples/conduit/test/equivalence.mjs)
 // with JWT handling specific to RealWorld.
@@ -116,13 +116,53 @@ export async function startRecorder(upstream) {
   return { url: `http://127.0.0.1:${server.address().port}`, exchanges, close };
 }
 
-/** Writes a recording to ROOT/test-results/traffic-NAME.json. */
+/** Writes a recording to ROOT/test-results/traffic-NAME.json (`extra`: e.g. the server's base URL). */
 export function saveTraffic(root, name, exchanges, extra = {}) {
   mkdirSync(join(root, 'test-results'), { recursive: true });
   const file = join(root, 'test-results', `traffic-${name}.json`);
   writeFileSync(file, JSON.stringify({ target: name, ...extra, exchanges }, null, 1) + '\n');
   return file;
 }
+
+/**
+ * Records the traffic a test driver sends with the global fetch to `base`
+ * (other URLs pass through unrecorded), for drivers whose clients must see
+ * the server's own origin (an OpenID provider's issuer), where a proxy would
+ * change it. Records what fetch exposes: the headers the client set (not
+ * undici's defaults), the response's headers (set-cookie one per line) and its
+ * body after any content-encoding is undone. `unrecorded(fn)` runs fn
+ * without recording (concurrent requests, whose order is the scheduler's);
+ * `stop()` restores fetch.
+ */
+export function recordFetch(base) {
+  const original = globalThis.fetch;
+  const exchanges = [];
+  let paused = 0;
+  globalThis.fetch = async (input, init) => {
+    const req = new Request(input, init);
+    if (paused || !(req.url === base || req.url.startsWith(base + '/'))) return original(req);
+    const body = Buffer.from(await req.clone().arrayBuffer());
+    const exchange = { request: { method: req.method, path: req.url.slice(base.length) || '/', headers: [...req.headers], body: body.toString('base64') } };
+    exchanges.push(exchange);
+    try {
+      const res = await original(req);
+      const payload = Buffer.from(await res.clone().arrayBuffer());
+      exchange.response = { status: res.status, headers: [...res.headers], body: payload.toString('base64') };
+      return res;
+    } catch (e) {
+      exchange.response = { error: String(e.message ?? e) };
+      throw e;
+    }
+  };
+  return {
+    exchanges,
+    async unrecorded(fn) { paused++; try { return await fn(); } finally { paused--; } },
+    stop() { globalThis.fetch = original; },
+  };
+}
+
+/** `fn()`, unrecorded when a fetch recorder is given. */
+export const unrecorded = (recorder, fn) => (recorder ? recorder.unrecorded(fn) : fn());
 
 function pairs(raw) {
   const out = [];
@@ -288,7 +328,8 @@ export function compare(golden, observed, { app = 'app', target = 'target', know
 }
 
 /** The generic self-test: equal traffic agrees, a changed status, header and body each differ, a missing exchange is found. */
-export function selfTestCompare(normalize, traffic, tweak) {
+export function selfTestCompare(normalizeRecording, traffic, tweak) {
+  const normalize = (exchanges, target) => normalizeRecording({ exchanges }, target);
   const node = normalize(traffic(0), 'node');
   const same = compare(node, normalize(traffic(1), 'same'), { target: 'same' });
   if (same.failing.length) throw new Error(`equal traffic differs:\n${same.report}`);
@@ -309,34 +350,45 @@ export function selfTestCompare(normalize, traffic, tweak) {
 
 /**
  * The `compare NAME` / `self-test` command line of an app's test/equivalence.mjs.
- * `golden` is the app's committed Node recording (normalized), `known` its
- * known-differences file ({ known: [{ targets, request, issue }] }).
+ * Each suite is one driver's recording: test-results/traffic-SUITE-NAME.json
+ * against the app's committed Node recording test/equivalence/SUITE.json
+ * (normalized); `known` is its known-differences file
+ * ({ known: [{ suite?, targets, request, issue }] }, request: a regular expression for "METHOD PATH").
  */
-export function main({ app, root, golden, known, normalize, selfTest, argv = process.argv.slice(2) }) {
-  const [command, name] = argv;
+export function main({ app, root, suites, normalize, selfTest, argv = process.argv.slice(2) }) {
+  const [command, name, ...only] = argv;
   if (command === 'self-test') { console.log('self-test passed\n\n' + selfTest()); return; }
   if (command !== 'compare' || !name) {
-    console.error('usage: node test/equivalence.mjs compare NAME | self-test');
+    console.error('usage: node test/equivalence.mjs compare NAME [SUITE...] | self-test');
     process.exitCode = 2;
     return;
   }
-  const traffic = join(root, `test-results/traffic-${name}.json`);
-  if (!existsSync(traffic)) {
-    console.log(`No recording ${traffic}: run the driver with --equivalence first`);
-    process.exitCode = 1;
-    return;
+  const knownFile = join(root, 'test/equivalence/known.json');
+  const known = existsSync(knownFile) ? JSON.parse(readFileSync(knownFile, 'utf8')).known : [];
+  let failed = false;
+  for (const suite of only.length ? only : suites) {
+    const traffic = join(root, `test-results/traffic-${suite}-${name}.json`);
+    const golden = join(root, `test/equivalence/${suite}.json`);
+    if (!existsSync(traffic)) {
+      console.log(`No recording ${traffic}: run the ${suite} driver with --equivalence first`);
+      failed = true;
+      continue;
+    }
+    const observed = normalize(JSON.parse(readFileSync(traffic, 'utf8')), name);
+    writeFileSync(join(root, `test-results/normalized-${suite}-${name}.json`), JSON.stringify(observed, null, 1) + '\n');
+    if (!existsSync(golden)) {
+      console.log(`No golden recording ${golden}: review test-results/normalized-${suite}-${name}.json (Node's) and commit it there`);
+      failed = true;
+      continue;
+    }
+    const outcome = compare(JSON.parse(readFileSync(golden, 'utf8')), observed, {
+      app: `${app} (${suite})`, target: name,
+      known: known.filter(k => !k.suite || k.suite === suite),
+    });
+    writeFileSync(join(root, `test-results/equivalence-${suite}-${name}.json`), JSON.stringify({ target: name, suite, differences: outcome.differences }, null, 2) + '\n');
+    writeFileSync(join(root, `test-results/equivalence-${suite}-${name}.txt`), outcome.report + '\n');
+    console.log(outcome.report + '\n');
+    if (outcome.failing.length) failed = true;
   }
-  const observed = normalize(JSON.parse(readFileSync(traffic, 'utf8')).exchanges, name);
-  writeFileSync(join(root, `test-results/normalized-${name}.json`), JSON.stringify(observed, null, 1) + '\n');
-  if (!existsSync(golden)) {
-    console.log(`No golden recording ${golden}: review test-results/normalized-${name}.json (Node's) and commit it there`);
-    process.exitCode = 1;
-    return;
-  }
-  const knownList = existsSync(known) ? JSON.parse(readFileSync(known, 'utf8')).known : [];
-  const outcome = compare(JSON.parse(readFileSync(golden, 'utf8')), observed, { app, target: name, known: knownList });
-  writeFileSync(join(root, `test-results/equivalence-${name}.json`), JSON.stringify({ target: name, differences: outcome.differences }, null, 2) + '\n');
-  writeFileSync(join(root, `test-results/equivalence-${name}.txt`), outcome.report + '\n');
-  console.log(outcome.report);
-  process.exitCode = outcome.failing.length ? 1 : 0;
+  process.exitCode = failed ? 1 : 0;
 }
