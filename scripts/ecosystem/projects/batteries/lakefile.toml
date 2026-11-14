@@ -4,7 +4,7 @@ defaultTargets = ["app"]
 [[require]]
 name = "batteries"
 git = "https://github.com/leanprover-community/batteries"
-rev = "66e469188fe07963e5cf666c7d4433f45b8131c5"
+rev = "d4c39b228d4a06f3b00748c2c445a7b9f056a6e3"
 
 [[lean_exe]]
 name = "app"
