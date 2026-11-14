@@ -1,0 +1,52 @@
+name: TEMPORARY edge heap evidence (issue 247)
+# Removed before the issue's PR merges: scripts/edge/heap-evidence-247.mjs on
+# local runtimes only (wrangler dev's workerd, Deno, Bun, headless Chromium).
+on:
+  push:
+    branches: [edge-heap-247]
+    paths:
+      - scripts/edge/heap-evidence-247.mjs
+      - .github/workflows/edge-heap-evidence-247.yml
+permissions:
+  contents: read
+concurrency:
+  group: edge-heap-evidence-247-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  CI: '1'
+  BROWSER: 'none'
+  WRANGLER_SEND_METRICS: 'false'
+  DO_NOT_TRACK: '1'
+jobs:
+  evidence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - uses: ./.github/actions/process-guard
+      - name: npm ci (Folio, @lasm/cli as published)
+        working-directory: examples/folio
+        run: npm ci --no-audit --no-fund
+      - name: Pinned local tools
+        run: npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund wrangler@4.152.0 deno@2.9.6 bun@1.4.4
+      - name: The pinned Playwright's Chromium
+        timeout-minutes: 30
+        uses: ./.github/actions/playwright
+        with:
+          browsers: chromium
+      - name: Evidence (published @lasm/cli, Emscripten's libmimalloc)
+        run: node scripts/edge/heap-evidence-247.mjs examples/folio examples/folio/node_modules/@lasm/cli "$RUNNER_TEMP/tools/node_modules/.bin" "$RUNNER_TEMP/heap-247-before.json"
+      - if: always()
+        run: cat "$RUNNER_TEMP"/heap-247-*.json || true
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: heap-247
+          path: ${{ runner.temp }}/heap-247-*.json
+          retention-days: 14
