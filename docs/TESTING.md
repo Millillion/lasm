@@ -1590,6 +1590,11 @@ longer a dependency: the modules it made are recorded in `test/fixtures/lower-at
 without it V8 validates the output), and
 random instruction streams come out byte for byte as documented.
 
+The modules the testing strategy's step 2 named (the CLI argument and init modules, `src/serverless/` and the WASI
+JavaScript) held in the nightly run 43433389694 on `main` (2026-11-13): `cli` 95 %, `init` 97.1 %, `serverless`
+88.5 %, `wasi-build` 95.8 % and `target-link` (with `wasi/wasi-link.mjs`) 91 %, each at or above its threshold;
+the ROADMAP item is ticked.
+
 Every module is above 80 %; each threshold is its score rounded down. Tests whose assertion is a general
 property use `forAll` from [`test/helpers/property.mjs`](../test/helpers/property.mjs) (seeded, so a failure
 names its seed and input) and name the proposition they check in a comment above the test, with its Lean
