@@ -1,9 +1,10 @@
 name: Weekly tier
 # The weekly tier (docs/CI.md): campaigns too long for every night, through the
 # same reusable workflows. A 100-minute differential campaign in the release and
-# the dev profile (differential.yml; its nightly campaign is 60 minutes), and the
+# the dev profile (differential.yml; its nightly campaign is 60 minutes), the
 # Lasm.JS soak, 200 runs per program on four platforms (lasm-js-stress.yml; a
-# release runs 50). The weekly fuzzing campaign stays in fuzz.yml (Saturday) and
+# release runs 50), and the translation validation of wasm-ld on the full
+# program set (link-validation.yml). The weekly fuzzing campaign stays in fuzz.yml (Saturday) and
 # the image re-pin in image-pins.yml (Monday). Not a release dependency.
 on:
   schedule:
@@ -40,3 +41,14 @@ jobs:
       runs: '200'
       cli-runs: '20'
       timeout-s: '30'
+
+  # Translation validation of wasm-ld (link-validation.yml): the full program set.
+  link-validation:
+    needs: sunday
+    if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public')
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/link-validation.yml
+    with:
+      scope: weekly

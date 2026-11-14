@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
 import { fastlyGlueSource, wasiHttpGlueSource, glueLinkFlags } from '../lasm-library.mjs';
 import { emscriptenResponseFile } from '../link-driver/link.mjs';
-import { testUnoptimized } from '../test-switches.mjs';
+import { linkEvidenceDirectory, saveLinkEvidence, testUnoptimized } from '../test-switches.mjs';
 import { lowerAtomics, moduleImports, keepExports } from './lower-atomics.mjs';
 import { componentize, httpHandlerExport } from './wasi-component.mjs';
 
@@ -138,11 +138,15 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
   writeFileSync(join(out, 'link-args.json'), JSON.stringify({ target, settings, args: linkArgs }, null, 1) + '\n');
   // Windows limits a command line to 32,767 characters, which the inputs of a
   // larger program exceed (ENAMETOOLONG): pass them in a response file there.
+  // LASM_TEST_LINK_EVIDENCE (src/test-switches.mjs): wasm-ld's map too, kept with its output.
+  const evidenceMap = linkEvidenceDirectory() && join(out, 'linked.map');
+  const ldArgs = evidenceMap ? [...linkArgs, `-Map=${evidenceMap}`] : linkArgs;
   if (process.platform === 'win32') {
     const responseFile = join(out, 'wasm-ld.rsp');
-    writeFileSync(responseFile, emscriptenResponseFile(linkArgs, 'win32'));
+    writeFileSync(responseFile, emscriptenResponseFile(ldArgs, 'win32'));
     run('wasm-ld', ['@' + responseFile]);
-  } else run('wasm-ld', linkArgs);
+  } else run('wasm-ld', ldArgs);
+  if (evidenceMap) saveLinkEvidence(`wasi-${target}`, { 'linked.wasm': linked, 'link.map': evidenceMap }, { mode: `wasi-${target}` });
 
   // 3. Atomics to plain memory instructions.
   const lowered = join(out, 'lowered.wasm');
@@ -153,8 +157,11 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
 
   // 4. No exception handling, 32-bit memory and tables, optimized.
   // LASM_TEST_UNOPTIMIZED (src/test-switches.mjs): the lowering passes only.
-  run('wasm-opt', [...inputFeatures, '--strip-eh', '--memory64-lowering', '--table64-lowering', testUnoptimized() ? '-O0' : settings.optimize,
-    '--strip-debug', '--strip-producers', '--strip-target-features', lowered, '-o', program]);
+  const wasmOptArgs = [...inputFeatures, '--strip-eh', '--memory64-lowering', '--table64-lowering', testUnoptimized() ? '-O0' : settings.optimize,
+    '--strip-debug', '--strip-producers', '--strip-target-features', lowered, '-o', program];
+  run('wasm-opt', wasmOptArgs);
+  // LASM_TEST_LINK_EVIDENCE: Binaryen's input, output and arguments.
+  saveLinkEvidence(`wasi-${target}-wasm-opt`, { 'in.wasm': lowered, 'out.wasm': program }, { mode: `wasi-${target}`, args: wasmOptArgs.map(arg => arg === lowered ? '<in>' : arg === program ? '<out>' : arg) });
 
   const bytes = readFileSync(program);
   checkWasiModule(bytes, target);
