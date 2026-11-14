@@ -1,17 +1,20 @@
 /-
 The children diff (`diffChildren`: common prefix, then the two-ended diff)
-is correct for any node diff `f` that is correct on the pairs it is given.
+is correct for any node diff `f` that is correct on the pairs it is given,
+and its patch conforms (Proofs/Conform.lean) when `f`'s do.
 -/
-import Lasm.UI.Proofs.Lists
+import Lasm.UI.Proofs.Conform
 
 namespace Lasm.UI.Proofs
-open Lasm.UI Lasm.UI.Model
+open Lasm.UI Lasm.UI.Model Lasm.UI.Applier
 
 variable {Msg β : Type}
 
 /-- What a node diff guarantees for a kept node `o` showing `h` next: its ops
 replace `o` (named by its id) by the new live node, which keeps `o`'s id, shows
-`h`, is well formed below the returned next id, and allocates no id below `n`. -/
+`h`, is well formed below the returned next id, and allocates no id below `n`;
+and its ops conform wherever `o` is a child (with the only node of its id),
+from used ids below `n`. -/
 structure NSpec (o : Live Msg) (h : Html Msg) (n : Nat) (r : NodeResult Msg) : Prop where
   ops : ∀ l : List Dom, (∀ d ∈ l, d.id = o.id → d = toDom o) →
     applyOps r.ops l = modId o.id (fun _ => toDom r.live) l
@@ -19,14 +22,18 @@ structure NSpec (o : Live Msg) (h : Html Msg) (n : Nat) (r : NodeResult Msg) : P
   id : r.live.id = o.id
   wf : WFn r.next r.live
   le : n ≤ r.next
+  conf : ∀ l : List Dom, toDom o ∈ l → (∀ d ∈ l, d.id = o.id → d = toDom o) → LConf l r.ops n r.next
 
 /-- What the children diff guarantees: from the DOM `dom0` of the old children,
-the ops give the DOM of the new live children, which show `target`. -/
-structure RSpec (dom0 : List Dom) (target : List (Html Msg)) (n : Nat) (r : ChildrenResult Msg) : Prop where
+the ops give the DOM of the new live children, which show `target`; and they
+conform there from the used ids `used0`. -/
+structure RSpec (dom0 : List Dom) (used0 : List Nat) (target : List (Html Msg)) (n : Nat) (r : ChildrenResult Msg) :
+    Prop where
   ops : applyOps r.ops.toList dom0 = r.live.map toDom
   erase : r.live.map Live.erase = target
   wf : WF r.live r.next
   le : n ≤ r.next
+  conf : Conf used0 dom0 r.ops.toList r.next
 
 /-! Steps -/
 
@@ -42,9 +49,11 @@ theorem reuse_step (val : β → Html Msg) (f : Live Msg → β → Nat → Node
     (hs : o.same (val b) = true) :
     applyOps (f o b n).ops ((A ++ o :: B).map toDom) = (A ++ (f o b n).live :: B).map toDom ∧
     ((A ++ (f o b n).live :: B).map Live.id).Nodup ∧ (∀ x ∈ A ++ (f o b n).live :: B, WFn (f o b n).next x) ∧
-    (f o b n).live.erase = val b ∧ (f o b n).live.id = o.id ∧ n ≤ (f o b n).next := by
+    (f o b n).live.erase = val b ∧ (f o b n).live.id = o.id ∧ n ≤ (f o b n).next ∧
+    LConf ((A ++ o :: B).map toDom) (f o b n).ops n (f o b n).next := by
   have spec := hf o b n (hwf o (by simp)) hs
-  refine ⟨?_, (nodup_mid_iff A B o _ spec.id).2 hnd, ?_, spec.erase, spec.id, spec.le⟩
+  refine ⟨?_, (nodup_mid_iff A B o _ spec.id).2 hnd, ?_, spec.erase, spec.id, spec.le,
+    spec.conf _ (by simp) (only_node A B o hnd)⟩
   · rw [spec.ops _ (only_node A B o hnd), modId_mid A B o _ hnd]
   · intro x hx
     simp only [List.mem_append, List.mem_cons] at hx
@@ -274,9 +283,9 @@ theorem removeRange_spec (dom0 : List Dom) (pre suf : List (Live Msg)) (oa : Arr
     simpa using h1
 termination_by hi - lo
 
-theorem RSpec.weaken {dom0 : List Dom} {target : List (Html Msg)} {n m : Nat} {r : ChildrenResult Msg}
-    (h : RSpec dom0 target m r) (hle : n ≤ m) : RSpec dom0 target n r :=
-  ⟨h.ops, h.erase, h.wf, Nat.le_trans hle h.le⟩
+theorem RSpec.weaken {dom0 : List Dom} {used0 : List Nat} {target : List (Html Msg)} {n m : Nat}
+    {r : ChildrenResult Msg} (h : RSpec dom0 used0 target m r) (hle : n ≤ m) : RSpec dom0 used0 target n r :=
+  ⟨h.ops, h.erase, h.wf, Nat.le_trans hle h.le, h.conf⟩
 
 /-- One created node inserted before the head of `suf`. -/
 theorem insert_step (h : Html Msg) (before : Option Nat) (dom0 : List Dom) (suf : List (Live Msg))
@@ -337,6 +346,110 @@ theorem insertRange_spec (val : β → Html Msg) (na : Array β) (before : Optio
   · rename_i hge
     exact ⟨[], by simp, by simp [slice_empty _ (Nat.le_of_not_lt hge)], by simpa using h1,
       by simpa using h2, by simpa using h3, Nat.le_refl _⟩
+termination_by hi - lo
+
+/-! Conformance of the steps -/
+
+theorem Conf.append {used0 : List Nat} {dom0 k : List Dom} {ops : Array (Op Msg)} {xs : List (Op Msg)} {n m : Nat}
+    (h : Conf used0 dom0 ops.toList n) (hk : applyOps ops.toList dom0 = k) (hx : LConf k xs n m) :
+    Conf used0 dom0 (ops ++ xs).toList m := by
+  simpa using h.step hk hx
+
+theorem Conf.push {used0 : List Nat} {dom0 k : List Dom} {ops : Array (Op Msg)} {op : Op Msg} {n m : Nat}
+    (h : Conf used0 dom0 ops.toList n) (hk : applyOps ops.toList dom0 = k) (hx : LConf k [op] n m) :
+    Conf used0 dom0 (ops.push op).toList m := by
+  simpa using h.step hk hx
+
+theorem mem_map_id {x : Live Msg} {l : List (Live Msg)} (h : x ∈ l) : x.id ∈ (l.map toDom).map Dom.id := by
+  simp only [map_id_toDom]; exact List.mem_map_of_mem h
+
+theorem insertAll_conf (val : β → Html Msg) (before : Option Nat) (dom0 : List Dom) (used0 : List Nat)
+    (suf : List (Live Msg)) (hb : before = suf.head?.map Live.id) :
+    ∀ (bs : List β) (n : Nat) (ops : Array (Op Msg)) (acc : Array (Live Msg)),
+    applyOps ops.toList dom0 = (acc.toList ++ suf).map toDom →
+    ((acc.toList ++ suf).map Live.id).Nodup → (∀ x ∈ acc.toList ++ suf, WFn n x) → Conf used0 dom0 ops.toList n →
+    Conf used0 dom0 (insertAll val before bs n ops acc).1.toList (insertAll val before bs n ops acc).2.2 := by
+  intro bs
+  induction bs with
+  | nil => intro n ops acc _ _ _ h5; simpa [insertAll] using h5
+  | cons b bs ih =>
+    intro n ops acc h1 h2 h3 h5
+    simp only [insertAll]
+    obtain ⟨e1, e2, e3⟩ := insert_step (val b) before dom0 suf hb n ops acc h1 h2 h3
+    exact ih _ _ _ e1 e2 e3 (h5.push h1 (lconf_insert _ _ (by rw [hb]; exact anchored_head _ _)))
+
+theorem removeAll_conf (dom0 : List Dom) (used0 : List Nat) (pre : List (Live Msg)) (n : Nat) :
+    ∀ (os : List (Live Msg)) (ops : Array (Op Msg)),
+    applyOps ops.toList dom0 = (pre ++ os).map toDom → ((pre ++ os).map Live.id).Nodup →
+    Conf used0 dom0 ops.toList n → Conf used0 dom0 (removeAll os ops).toList n := by
+  intro os
+  induction os with
+  | nil => intro ops _ _ h5; simpa [removeAll] using h5
+  | cons o os ih =>
+    intro ops h1 h2 h5
+    simp only [removeAll]
+    apply ih
+    · rw [applyOps_push, h1, applyOp]
+      have := removeId_mid pre os o h2
+      simpa using this
+    · have hp : (pre ++ o :: os).Perm (o :: (pre ++ os)) := List.perm_middle
+      have := nodup_rearrange hp h2
+      simp only [List.map_cons, List.nodup_cons] at this
+      exact this.2
+    · exact h5.push h1 (lconf_remove n (mem_map_id (by simp)))
+
+theorem removeRange_conf (dom0 : List Dom) (used0 : List Nat) (n : Nat) (pre suf : List (Live Msg))
+    (oa : Array (Option (Live Msg))) (hi : Nat) (lo : Nat) (ops : Array (Op Msg))
+    (h1 : applyOps ops.toList dom0 = (pre ++ win oa lo hi ++ suf).map toDom)
+    (h2 : ((pre ++ win oa lo hi ++ suf).map Live.id).Nodup) (h5 : Conf used0 dom0 ops.toList n) :
+    Conf used0 dom0 (removeRange oa lo hi ops).toList n := by
+  rw [removeRange]
+  split
+  · rename_i hlt
+    split
+    · rename_i o hs
+      rw [win_cons_some hs hlt] at h1 h2
+      apply removeRange_conf dom0 used0 n pre suf oa hi (lo + 1)
+      · rw [applyOps_push, h1, applyOp]
+        have := removeId_mid pre (win oa (lo + 1) hi ++ suf) o (by simpa using h2)
+        simpa using this
+      · have hp : (pre ++ o :: (win oa (lo + 1) hi ++ suf)).Perm (o :: (pre ++ (win oa (lo + 1) hi ++ suf))) :=
+          List.perm_middle
+        have := nodup_rearrange hp (by simpa using h2)
+        simp only [List.map_cons, List.nodup_cons] at this
+        simpa using this.2
+      · exact h5.push h1 (lconf_remove n (mem_map_id (by simp)))
+    · rename_i hs
+      have hw : win oa lo hi = win oa (lo + 1) hi := by
+        cases h : oa[lo]? with
+        | none =>
+          have : oa.size ≤ lo := by simpa using h
+          rw [win_out oa this, win_out oa (by omega)]
+        | some s =>
+          cases s with
+          | none => exact win_cons_none h hlt
+          | some o => exact absurd h (hs o)
+      rw [hw] at h1 h2
+      exact removeRange_conf dom0 used0 n pre suf oa hi (lo + 1) ops h1 h2 h5
+  · exact h5
+termination_by hi - lo
+
+theorem insertRange_conf (val : β → Html Msg) (na : Array β) (before : Option Nat) (dom0 : List Dom)
+    (used0 : List Nat) (suf : List (Live Msg)) (hb : before = suf.head?.map Live.id) (hi : Nat)
+    (lo n : Nat) (ops : Array (Op Msg)) (acc : Array (Live Msg))
+    (h1 : applyOps ops.toList dom0 = (acc.toList ++ suf).map toDom)
+    (h2 : ((acc.toList ++ suf).map Live.id).Nodup) (h3 : ∀ x ∈ acc.toList ++ suf, WFn n x)
+    (h5 : Conf used0 dom0 ops.toList n) :
+    Conf used0 dom0 (insertRange val na before lo hi n ops acc).1.toList (insertRange val na before lo hi n ops acc).2.2 := by
+  rw [insertRange]
+  split
+  · split
+    · rename_i b _
+      obtain ⟨e1, e2, e3⟩ := insert_step (val b) before dom0 suf hb n ops acc h1 h2 h3
+      exact insertRange_conf val na before dom0 used0 suf hb hi (lo + 1) _ _ _ e1 e2 e3
+        (h5.push h1 (lconf_insert _ _ (by rw [hb]; exact anchored_head _ _)))
+    · exact h5
+  · exact h5
 termination_by hi - lo
 
 end Lasm.UI.Proofs

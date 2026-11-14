@@ -6,10 +6,10 @@ name: UI applier model
 # (library/Lasm/UI/Proofs/Applier.lean, test/models/UiApplierModel.lean),
 # and fails when the DOMs differ after any frame or one side refuses a frame
 # the other applies: Lean's diff of random views (whose patches must conform,
-# Lasm.UI.Candidates.diff_conforms), random operations, hydration of random
+# Lasm.UI.Spec.diff_conforms), random operations, hydration of random
 # server DOMs, and the 120 sessions of test/fixtures/ui/patches.json, plain
 # and hydrating their server-rendered HTML. The proofs about the model
-# (Lasm.UI.Spec.applier_correct, applier_session, hydrate_correct) are
+# (Lasm.UI.Spec.applier_correct, diff_conforms, applier_session, hydrate_correct) are
 # checked by library-proofs.yml. Free runner only.
 on:
   workflow_dispatch:

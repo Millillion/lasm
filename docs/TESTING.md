@@ -1314,16 +1314,17 @@ that are not children, where browsers throw), and with the model
 and fails when the DOMs differ after any frame or one side refuses a frame
 the other applies. It draws 1000 sessions of each kind: Lean's own diff of
 random views (keyed and unkeyed children, reorders, inserts, removals, tag,
-text and attribute changes; every patch must conform, the candidate
-`Lasm.UI.Candidates.diff_conforms`, and every frame apply), random
+text and attribute changes; every patch must conform, the proposition
+`Lasm.UI.Spec.diff_conforms` (proved), and every frame apply), random
 operations from the DOM's own nodes (most apply, a tenth are refused), and
 hydration of random server DOMs (nodes changed, dropped, added, separated by
 comments, with server attributes); then the 120 sessions of
 test/fixtures/ui/patches.json, from an empty root and hydrating their
 server-rendered HTML. Proved of the model (library/PROOFS.md):
 `applier_correct` (a conforming patch is performed exactly as
-Lasm.UI.Model's `applyOps`), `applier_session` (with conforming patches,
-every frame the browser reads leaves the DOM of the view) and
+Lasm.UI.Model's `applyOps`), `diff_conforms` (every patch `diff` writes
+conforms), `applier_session` (every frame the browser reads leaves the DOM
+of the view) and
 `hydrate_correct` (hydration builds the fresh mount's nodes from any server
 DOM, and exactly its DOM from one that renders the view).
 
