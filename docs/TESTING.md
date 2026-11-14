@@ -769,7 +769,7 @@ seed, with one of the generator's endings. The transforms:
 
 | Transform | The program changed | Compared |
 | --- | --- | --- |
-| `rename` | every case's names take another prefix (`c12…` becomes `zqv12…`) | after mapping printed names back |
+| `rename` | every case's names take another prefix of the same length (`c12…` becomes `ζ12…`; `Repr` output wraps at a fixed width, so a longer name would legitimately move line breaks) | after mapping printed names back |
 | `reorder` | the cases' declarations in a random order; `main` calls them in the original one | as is |
 | `dead` | copies of a third of the cases under unused names, and two unused imports | as is |
 | `noinline` | `@[noinline]` on every plain top-level `def` of the cases | as is |

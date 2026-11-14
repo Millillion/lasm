@@ -6,9 +6,11 @@
 //
 // The programs are the differential generator's (generate.mjs, features.mjs):
 // per seed, a core program and a feature program. The transforms:
-//   rename    every case's names get another prefix (`c12…` becomes `zqv12…`):
+//   rename    every case's names get another prefix (`c12…` becomes `ζ12…`):
 //             names reach the output only through printed names, which are
-//             mapped back before the comparison;
+//             mapped back before the comparison. The prefix has the same
+//             length as `c`, because `Repr`/`Format` output wraps at a fixed
+//             width: a longer name legitimately moves the line breaks;
 //   reorder   the cases' declarations in a random order, main still calling
 //             them in the original one (cases are independent);
 //   dead      unused declarations (copies of cases under other names, never
@@ -96,7 +98,9 @@ function render(list, { prefix = 'c', order, extra = '', imports = [], attribute
 }
 const original = (list, ending) => ({ files: render(list, { ending }), unmap: text => text });
 function rename(list, r, ending) {
-  return { files: render(list, { prefix: 'zqv', ending }), unmap: text => text.replace(/zqv(\d)/g, 'c$1') };
+  // One code point, like `c`: the pretty-printer measures names, so the
+  // layout must not change (`ζ` occurs nowhere else in generated programs).
+  return { files: render(list, { prefix: 'ζ', ending }), unmap: text => text.replace(/ζ(\d)/g, 'c$1') };
 }
 function reorder(list, r, ending) {
   const order = [...list];
