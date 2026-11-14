@@ -90,9 +90,11 @@ jobs:
         run: lake build
       - name: Check every configuration, the mutations and the trace self-test
         working-directory: verification/host-bridge
+        shell: bash
         run: .lake/build/bin/host-bridge check --large | tee "$RUNNER_TEMP/model.txt"
       - name: Summary
         if: always()
+        shell: bash
         run: |
           { echo '### Host bridge model'; echo '```'; cat "$RUNNER_TEMP/model.txt" 2>/dev/null | grep -E '^(PASS|FAIL)|checks as' || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
   seed:

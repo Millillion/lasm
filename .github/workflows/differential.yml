@@ -115,6 +115,7 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
           BEFORE: ${{ github.event.before }}
           MACOS_PATHS: '^(src/macos-tbd\.mjs|src/managed-lean\.mjs|src/managed-artifacts\.mjs|scripts/lean-dist/|scripts/ci/macos-c-tier\.mjs|scripts/ci/stack-depth\.mjs|scripts/ecosystem/projects/native-tactic/|test/macos-tbd\.test\.mjs|test/managed-lean-tiers\.test\.mjs|test/fixtures/macos-tbd/|\.github/workflows/differential\.yml$|\.github/actions/install-candidate/)'
+        shell: bash
         run: |
           case "$EVENT" in
             pull_request) files=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR/files" --jq '.[].filename') ;;
@@ -124,7 +125,7 @@ jobs:
           # Not a pull request or a push (schedule, dispatch, a call from ci-weekly.yml), or an
           # unknown range (a new branch, a failed comparison, no files): the macOS jobs run.
           if [ -z "$files" ] || printf '%s' "$BEFORE" | grep -qE '^0+$'; then files=.github/workflows/differential.yml; fi
-          if printf '%s\n' "$files" | grep -qE "$MACOS_PATHS"; then echo macos=true; else echo macos=false; fi | tee -a "$GITHUB_OUTPUT"
+          if printf '%s\n' "$files" | grep -E "$MACOS_PATHS" >/dev/null; then echo macos=true; else echo macos=false; fi | tee -a "$GITHUB_OUTPUT"
   pack:
     needs: sunday
     if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))

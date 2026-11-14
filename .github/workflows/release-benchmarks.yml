@@ -134,6 +134,7 @@ jobs:
       # push. A push that loses a race simply retries on the new main, so no
       # merge conflict on the generated page is possible.
       - name: Commit results to main
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
