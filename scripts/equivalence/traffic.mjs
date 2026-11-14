@@ -4,8 +4,8 @@
 // between targets, each app documents its rules), and `compare` checks it
 // against the Node recording committed in the app's test/equivalence/: equal
 // statuses, equal response headers (apart from IGNORED_HEADERS and
-// PLATFORM_HEADERS) and byte-equal bodies, exchange by exchange in the order the
-// driver sent them.
+// PLATFORM_HEADERS; PLATFORM_FORMS in their canonical form) and byte-equal
+// bodies, exchange by exchange in the order the driver sent them.
 //
 // Each app's test/equivalence.mjs supplies its normalizer and calls `main`:
 //   node test/equivalence.mjs compare NAME   # each suite's test-results/traffic-SUITE-NAME.json against
@@ -45,6 +45,30 @@ export const PLATFORM_HEADERS = [
   { targets: ['workers'], name: /^(cache-control|etag|cf-cache-status|vary)$/, servedBy: /^cf-cache-status$/,
     reason: 'the apps\' wrangler.toml lets Workers\' own asset serving answer for the browser page\'s files ([assets]) before the Worker runs; it sets its own caching headers (marked by cf-cache-status), while the bytes are the app\'s and still compared' },
 ];
+// Header values one platform's local runtime re-serializes: on that platform
+// they are compared in a canonical form, on both sides (`compare`).
+export const PLATFORM_FORMS = [
+  { targets: ['azure'], name: 'set-cookie', form: cookieForm,
+    reason: 'Azure Functions\' Node worker keeps one Set-Cookie per reply as a header; Lasm sends the others in HttpResponseInit.cookies (docs/DECISIONS.md, 2026-11-03), which func start serializes again with lowercase attribute names, its own attribute order and SameSite\'s value lowercased. RFC 6265 5.2: attribute names and the SameSite value are case-insensitive and the order carries no meaning. The name, value and every attribute are still compared' },
+];
+/** A Set-Cookie value with its attributes' names (and Domain and SameSite values) lowercased and sorted. */
+export function cookieForm(value) {
+  const [pair, ...attributes] = value.split(';').map(s => s.trim());
+  return [pair, ...attributes.filter(Boolean).map(a => {
+    const i = a.indexOf('=');
+    if (i < 0) return a.toLowerCase();
+    const name = a.slice(0, i).trim().toLowerCase(), v = a.slice(i + 1).trim();
+    return `${name}=${name === 'samesite' || name === 'domain' ? v.toLowerCase() : v}`;
+  }).sort()].join('; ');
+}
+function formed(target, headers) {
+  const rules = PLATFORM_FORMS.filter(rule => rule.targets.includes(target));
+  if (!rules.length) return headers;
+  return headers.map(h => {
+    const k = h.indexOf(': '), rule = rules.find(r => r.name === h.slice(0, k));
+    return rule ? `${h.slice(0, k)}: ${rule.form(h.slice(k + 2))}` : h;
+  });
+}
 function platformHeader(target, name, value, res) {
   const names = res.headers.map(([n]) => n.toLowerCase());
   return PLATFORM_HEADERS.some(rule => rule.targets.includes(target) && rule.name.test(name) &&
@@ -331,7 +355,7 @@ export function compare(golden, observed, { app = 'app', target = 'target', know
       checks.push(['status', String(g.response.status), String(o.response.status)]);
       const owned = o.response.platformOwned ? new RegExp(o.response.platformOwned) : undefined;
       const goldenHeaders = owned ? g.response.headers.filter(h => !owned.test(h.slice(0, h.indexOf(':')))) : g.response.headers;
-      checks.push(['response headers', headerText(goldenHeaders), headerText(o.response.headers)]);
+      checks.push(['response headers', headerText(formed(target, goldenHeaders)), headerText(formed(target, o.response.headers))]);
       // Byte-equal bodies; shown pretty-printed when they are JSON.
       if (JSON.stringify(g.response.body) !== JSON.stringify(o.response.body)) {
         const a = pretty(g.response.body), b = pretty(o.response.body);
@@ -377,6 +401,13 @@ export function selfTestCompare(normalizeRecording, traffic, tweak) {
   shorter.exchanges = shorter.exchanges.slice(1);
   const shifted = compare(node, normalizeRecording(shorter, 'shifted'), { target: 'shifted' });
   if (!shifted.failing.some(d => d.what.startsWith('missing'))) throw new Error(`a missing exchange was not reported:\n${shifted.report}`);
+  // A platform form (PLATFORM_FORMS) applies on its platform only, and keeps values compared.
+  const cookie = value => ({ exchanges: [{ request: { method: 'GET', path: '/', headers: [], body: '' }, response: { status: 200, headers: [`set-cookie: ${value}`], body: '' } }] });
+  const app = cookie('a=; Path=/x; Max-Age=0; HttpOnly; SameSite=Lax');
+  const azure = cookie('a=; max-age=0; path=/x; samesite=lax; httponly');
+  if (compare(app, azure, { target: 'azure' }).failing.length) throw new Error('Azure\'s re-serialized Set-Cookie differs');
+  if (!compare(app, azure, { target: 'node' }).failing.length) throw new Error('a re-serialized Set-Cookie is not a difference off Azure');
+  if (!compare(app, cookie('a=; max-age=0; path=/y; samesite=lax; httponly'), { target: 'azure' }).failing.length) throw new Error('a changed cookie attribute is not a difference on Azure');
   return differs.report;
 }
 

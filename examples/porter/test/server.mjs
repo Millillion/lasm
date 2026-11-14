@@ -11,6 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { testConfig } from './config.mjs';
+import { recordFetch, saveTraffic } from '../../../scripts/equivalence/traffic.mjs';
 
 export const root = fileURLToPath(new URL('..', import.meta.url));
 
@@ -31,10 +32,22 @@ export async function waitFor(url, child, timeoutMs = 60_000) {
   throw new Error(`no answer from ${url} within ${timeoutMs / 1000} s`);
 }
 
-/** The arguments every test script takes: --url, --command, --platform, --name. */
+/** The arguments every test script takes: --url, --command, --platform, --name,
+and --equivalence (record the traffic for test/equivalence.mjs). */
 export function serverArgs(argv = process.argv.slice(2)) {
   const get = k => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : undefined; };
-  return { url: get('--url'), command: get('--command'), platform: get('--platform'), name: get('--name') };
+  return { url: get('--url'), command: get('--command'), platform: get('--platform'), name: get('--name'),
+           equivalence: argv.includes('--equivalence') };
+}
+
+/** With --equivalence, records the driver's traffic to the server (test/equivalence.mjs);
+`save()` writes it to test-results/traffic-SUITE-NAME.json. */
+export function recorderFor(suite, args, base) {
+  if (!args.equivalence) return undefined;
+  const recorder = recordFetch(base);
+  return Object.assign(recorder, {
+    save() { recorder.stop(); saveTraffic(root, `${suite}-${args.name ?? 'node'}`, recorder.exchanges, { base }); },
+  });
 }
 
 export async function startPorter({ command, url, platform } = {}) {

@@ -32,7 +32,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | Layer | What it checks | Where | CI tier |
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) and [fuzzing](#differential-fuzzing) | Lasm-compiled programs (generated expressions, statements, and feature programs declaring classes, inductives, closures, loops, structures) behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
-| [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic, Ledger's API traffic and Tandem's protocol traffic equal Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs`, `examples/*/test/equivalence.mjs` | PR, nightly |
+| [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic, Ledger's API traffic, Porter's OpenID traffic and Tandem's protocol traffic equal Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs`, `examples/*/test/equivalence.mjs` | PR, nightly |
 | [Standard bindings](#standard-bindings) | Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun are their generator's output (Lasm.JS.Node's lowering is that of the pinned Node docs, Lasm.JS.Deno's and Lasm.JS.Bun's that of the pinned TypeScript declarations), and behave as the specs, Node's docs and the declarations say on every target: WPT's URL and urlencoded data, Lean's UTF-8, hex, base64 and path operations as oracles, published crypto vectors, generated round trips, files and child processes, a Lean handler served by Deno.serve, Bun.serve and @hono/node-server and requested over HTTP | `scripts/bindings/`, `test/fixtures/js-web/`, `test/fixtures/js-node/`, `test/fixtures/js-serve/`, `web-bindings.yml` | PR (paths), main |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
@@ -557,7 +557,13 @@ more platform rule (on Workers, the apps' `wrangler.toml` lets Workers' own
 asset serving answer for the browser page's files before the Worker runs: on
 those responses, recognized by its `cf-cache-status`, the caching headers it
 owns, `cache-control`, `etag`, `vary` and `cf-cache-status`, are left out on
-both sides, while the bytes are still compared), the alignment and diff, and the `compare NAME` /
+both sides, while the bytes are still compared), one platform form (on Azure
+Functions, all but one `Set-Cookie` of a reply travel in Azure's `cookies`
+list, which `func start` writes again with lowercase attribute names in its own
+order (DECISIONS 2026-11-03): there `Set-Cookie` is compared on both sides with
+attribute names, `SameSite` and `Domain` lowercased and the attributes sorted,
+RFC 6265 §5.2; names, values and every attribute still compared), the
+alignment and diff, and the `compare NAME` /
 `self-test` command line. Each app's `examples/<app>/test/equivalence.mjs` adds its own
 normalizer and documents each rule; its Node job writes
 `test-results/normalized-SUITE-node-24.json`, which is committed as
@@ -569,6 +575,7 @@ self-test first.
 | App | Recorded driver (suite) | Normalized, and why | Not recorded |
 | --- | --- | --- | --- |
 | Ledger | `test/api.mjs --equivalence` through the proxy (`api`) | Timestamps (`"timestamp"` in bodies, `?after=` in paths) become their rank among the run's timestamps: they are nanoseconds from the server's clock, while their order is still compared; their count, and that each is above 10^18, are compared as facts | The bank workload (concurrent and random) |
+| Porter | `examples/porter/test/oracles.mjs` and `test/attacks.mjs --equivalence` at the fetch level, because the OpenID libraries must see the issuer as the server's own origin (`oracles`, `attacks`) | The issuer (a free port, also percent-encoded) becomes `<issuer>`; JWTs are decoded, their claims compared with `iat`, `auth_time` as `<time>` and `exp` as `<time>+TTL`, the signature by its length (ES256 signatures are randomized, and every key is generated on first start); 43-character base64url values (32 random bytes: codes, tokens, session and interaction ids, the keys' `kid` and coordinates, the clients' state, nonce and PKCE values) and `at_hash` become ordinals by first appearance, so every reference between an issued and a used value is still compared; JSON times outside a JWT become `<time>`. The counts of each are facts | The adversarial suite's two concurrent checks (one code redeemed 12 times, one refresh token used 8 times at once): which request wins is the scheduler's |
 | Tandem | `test/protocol.mjs --equivalence` at the fetch level (`protocol`) | The clock part of the test documents' names (`p<clock>-<n>`, so that a rerun against a running server starts fresh) | The concurrent writers and the long-poll (scheduler- and platform-timed: 2 s on Node, 10 s on Workers), the WebSocket and SIGKILL tests (only some targets run them), the simulation and the fuzzer (concurrent or time-bounded) |
 
 **What it catches:** a platform's adapter, store or runtime answering one of
