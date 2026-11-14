@@ -1,4 +1,4 @@
-> Archived acceptance report for candidate `.37`, including later investigation history. See [the current report](NODE_ACCEPTANCE.md).
+> Archived acceptance report for candidate `.37`, including later investigation history. See [the current report](../NODE_ACCEPTANCE.md).
 
 # Node acceptance: Linux and macOS
 
@@ -25,22 +25,22 @@ A maintainer with repository access can download the candidate using:
 gh release download node-linux-candidate-36276053827 --repo Millillion/lasm --pattern 'lasm-compiler-0.1.0-experimental.37.tgz' --pattern SHA256SUMS.txt
 ```
 
-Give the unchanged tarball to the developer, who needs only Node/npm. Follow the [README quick start](../README.md#60-second-start); GitHub CLI is a maintainer retrieval tool, not a Lasm prerequisite.
+Give the unchanged tarball to the developer, who needs only Node/npm. Follow the [README quick start](../../README.md#60-second-start); GitHub CLI is a maintainer retrieval tool, not a Lasm prerequisite.
 
 ## Native evidence
 
 | Target | Tested OS | Complete evidence |
 | --- | --- | --- |
-| linux-x64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node37-linux-x64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108499108754) |
-| linux-arm64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node37-linux-arm64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108502713293) |
-| darwin-x64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node37-darwin-x64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108499108743) |
-| darwin-arm64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node37-darwin-arm64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108499108768) |
+| linux-x64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](../evidence/node37-linux-x64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108499108754) |
+| linux-arm64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](../evidence/node37-linux-arm64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108502713293) |
+| darwin-x64 | macOS 15.7.9 (24G830) | [Passed report](../evidence/node37-darwin-x64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108499108743) |
+| darwin-arm64 | macOS 15.7.9 (24G830) | [Passed report](../evidence/node37-darwin-arm64-2026-09-26.json), [job](https://github.com/Millillion/lasm/actions/runs/36276053827/job/108499108768) |
 
 Each job installs the same archive into a fresh project containing spaces and Unicode. Linux Landlock and macOS sandbox-exec deny checkout data and preinstalled developer tools. The consumer receives stock Node/npm and ordinary OS facilities; Lasm provisions its own build tools. Offline phases deny network access. Copied deployments run with source, package, original build output and development tools/cache denied.
 
 Eight applications pass native-versus-Node comparisons: Hello World, arguments/exit status, local Lake imports, two language fixtures, filesystem operations, compile-time macros/proofs, and 1,000 unreachable definitions. Runtime evaluation and module-path fixtures fail during build, create no deployment, and leave no failed staging directories. Cache reuse, invalidation, integrity, interrupted-download recovery, diagnostics and size budgets also pass.
 
-This is a defined release contract, not complete Lean or API parity. See the [exact README restrictions](../README.md#lean-support-and-restrictions).
+This is a defined release contract, not complete Lean or API parity. See the [exact README restrictions](../../README.md#lean-support-and-restrictions).
 
 ## Observed measurements
 
@@ -62,31 +62,31 @@ These are individual CI measurements, not performance guarantees. File sizes cou
 
 Linux memory peaks use cgroup accounting; both guards released, recorded zero OOM events and no resource abort. Linux builds used base pages and one build/Binaryen worker. Mac peaks are sampled process-tree RSS, **not kernel-enforced aggregate limits**. Mac monitors released tracked processes with no resource abort; minimum available host memory was 7.82 GB (Intel) and 2.91 GB (ARM64). All jobs maintained their disk reserves.
 
-Original failures are preserved: [Intel directory ABI](evidence/darwin-x64-directory-failure-2026-09-26.json), [ARM64 temporary names](evidence/darwin-arm64-temporary-failure-2026-09-26.json), and earlier resource/control failures. Both fixes have [native regression controls](evidence/darwin-filesystem-controls-2026-09-26.json). Earlier archives and reports remain unchanged: [`.35` Linux acceptance and `.36` history](NODE_ACCEPTANCE_35_2026-09-26.md), [initial `.32`](NODE_ACCEPTANCE_32_2026-09-26.md), [size reduction and former fallback](BUNDLE_SIZE.md).
+Original failures are preserved: [Intel directory ABI](../evidence/darwin-x64-directory-failure-2026-09-26.json), [ARM64 temporary names](../evidence/darwin-arm64-temporary-failure-2026-09-26.json), and earlier resource/control failures. Both fixes have [native regression controls](../evidence/darwin-filesystem-controls-2026-09-26.json). Earlier archives and reports remain unchanged: [`.35` Linux acceptance and `.36` history](NODE_ACCEPTANCE_35_2026-09-26.md), [initial `.32`](NODE_ACCEPTANCE_32_2026-09-26.md), [size reduction and former fallback](../BUNDLE_SIZE.md).
 
-The later `.39` campaign also passed [Linux x86-64](evidence/node39-linux-x64-2026-09-27.json),
-[Linux ARM64](evidence/node39-linux-arm64-2026-09-27.json),
-[Mac x86-64](evidence/node39-darwin-x64-2026-09-27.json), and
-[Mac ARM64](evidence/node39-darwin-arm64-2026-09-27.json), but
-[failed Windows](evidence/node39-windows-long-path-2026-09-27.json).
+The later `.39` campaign also passed [Linux x86-64](../evidence/node39-linux-x64-2026-09-27.json),
+[Linux ARM64](../evidence/node39-linux-arm64-2026-09-27.json),
+[Mac x86-64](../evidence/node39-darwin-x64-2026-09-27.json), and
+[Mac ARM64](../evidence/node39-darwin-arm64-2026-09-27.json), but
+[failed Windows](../evidence/node39-windows-long-path-2026-09-27.json).
 It was not retained as the accepted release. These results do not establish
 acceptance of later source changes or Windows support.
 
-Candidate `.43` subsequently passed [Linux x86-64](evidence/node43-linux-x64-2026-09-28.json),
-[Linux ARM64](evidence/node43-linux-arm64-2026-09-28.json), and
-[Mac x86-64](evidence/node43-darwin-x64-2026-09-28.json) and
-[Mac ARM64](evidence/node43-darwin-arm64-2026-09-28.json), using the exact archive
+Candidate `.43` subsequently passed [Linux x86-64](../evidence/node43-linux-x64-2026-09-28.json),
+[Linux ARM64](../evidence/node43-linux-arm64-2026-09-28.json), and
+[Mac x86-64](../evidence/node43-darwin-x64-2026-09-28.json) and
+[Mac ARM64](../evidence/node43-darwin-arm64-2026-09-28.json), using the exact archive
 `578b16cbc62d8fe356ae38ce1ae7dcf0c4fd255d1762b18b3245dea50e3af428`.
 The Intel Mac campaign took 84.6 minutes, including a 25.9-minute first build;
 it maintained progress logging and passed without a resource abort, peaking at
 2,338,091,008 bytes of sampled RSS. These are observed timings, not performance
 guarantees. Windows x64 built and executed Hello,
-then [failed its byte-exact output check](evidence/windows-stdio-bytes-2026-09-28.json).
+then [failed its byte-exact output check](../evidence/windows-stdio-bytes-2026-09-28.json).
 The subsequent binary-stream repair passed native x64/ARM64 host controls and is
 in candidate `.44`. These earlier partial results did not replace the accepted
 `.37` release above.
 
-Candidate `.44` then [passed native Windows x64 installed acceptance](evidence/node44-win32-x64-2026-09-28.json)
+Candidate `.44` then [passed native Windows x64 installed acceptance](../evidence/node44-win32-x64-2026-09-28.json)
 in [run `36389214996`](https://github.com/Millillion/lasm/actions/runs/36389214996/job/108821105094).
 The archive is `999389fdd7c27e3ef346977ece892456dd6367b961ff107657b1242bc56cd146`
 (65,337,349 bytes), built from `40e9c0598c831bef49dfaebbdd4c5bd4b6696d1a`;
@@ -110,9 +110,9 @@ Peak committed memory was 2,808,406,016 bytes, below the 6,869,744,025-byte
 proactive stop; host memory and disk reserves passed. These are measurements
 of this run, not performance guarantees.
 
-The same `.44` archive passed [Linux x86-64](evidence/node44-linux-x64-2026-09-28.json),
-[Linux ARM64](evidence/node44-linux-arm64-2026-09-28.json), and
-[macOS ARM64](evidence/node44-darwin-arm64-2026-09-28.json) in runs
+The same `.44` archive passed [Linux x86-64](../evidence/node44-linux-x64-2026-09-28.json),
+[Linux ARM64](../evidence/node44-linux-arm64-2026-09-28.json), and
+[macOS ARM64](../evidence/node44-darwin-arm64-2026-09-28.json) in runs
 `36392920262` and `36392911964`. Cold Hello took 256.8, 308.8 and 332.5 seconds,
 respectively; all copied deployments and resource checks passed. Intel macOS
 and the combined retained-release update remain pending; `.37` remains the

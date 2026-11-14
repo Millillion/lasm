@@ -1,10 +1,10 @@
-> **Historical.** The current plan is [ROADMAP.md](ROADMAP.md) (agreed 2026-11-01). This file is kept as a record.
+> **Historical.** The current plan is [ROADMAP.md](../../ROADMAP.md) (agreed 2026-11-01). This file is kept as a record.
 
 # Next steps
 
 ## Current application product plan — 2026-09-23
 
-These items follow the [updated plan](docs/PLAN.md); the historical milestones
+These items follow the [updated plan](../PLAN.md); the historical milestones
 below retain their original, narrower scope.
 
 - [x] Pin the latest stable acceptance baseline: Lean 4.34.1 and Node 26.10.0.
@@ -37,20 +37,20 @@ below retain their original, narrower scope.
   through that shipping pipeline.
 - [x] ~~Supply and validate native Windows ARM64 Lean and compiler SDK bundles.~~
   Dropped 2026-10-16: Windows ARM64 support was removed (user decision; no
-  upstream Lean/Emscripten prebuilts). Historical: the [native Lean bootstrap](docs/evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json)
+  upstream Lean/Emscripten prebuilts). Historical: the [native Lean bootstrap](../evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json)
   now passes compiler/Lake, interpreted-main and compiled ARM64-main checks;
   managed relocatable distribution and complete package acceptance remain open.
 - [ ] Run unchanged upstream tests through their appropriate native build-time
   and compiled-application paths, including the reviewed mixed drivers.
-  [The latest Node compiled-application category](docs/evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json)
+  [The latest Node compiled-application category](../evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json)
   now has 97 deployed passes and four original compilation-disabled cases;
-  [parallel AOT controls for those four cases](docs/evidence/lean-4.34.1-compile-disabled-2026-09-25.json)
+  [parallel AOT controls for those four cases](../evidence/lean-4.34.1-compile-disabled-2026-09-25.json)
   now pass in Node. Remaining categories and full Node campaigns stay open.
 - [ ] Audit and differentially test all standard APIs, including IO.FS and Std.Http.
 - [ ] Complete source-free deployment and native six-platform acceptance for
   stock Node.
 
-See [implementation evidence and open work](docs/APPLICATION_PIPELINE.md).
+See [implementation evidence and open work](../APPLICATION_PIPELINE.md).
 Passing provisioning or maintainer probes does not close the shipping gates.
 
 ## Historical experimental milestones
@@ -65,8 +65,8 @@ real Chrome, and local Cloudflare workerd. npm, pnpm, and Yarn pass isolated loc
 package installation and execution tests. No remote, publication, or live cloud
 deployment is part of this milestone.
 
-See [developer workflow](docs/DEVELOPER_WORKFLOW.md),
-and [release packaging](docs/RELEASE.md).
+See [developer workflow](../DEVELOPER_WORKFLOW.md),
+and [release packaging](RELEASE.md).
 
 ## Cross-platform installation
 
@@ -111,7 +111,7 @@ Proposed improvements, in recommended order:
 
 The console/filesystem/HTTP-server milestone now has a complete ordinary Lean
 application, an automatically generated main runner, and native/Wasm Vitest tests;
-see [the example](examples/lean-server/README.md).
+see [the example](../../examples/lean-server/README.md).
 
 - [ ] Add scaffolding and watch/restart support around the ordinary Lean main workflow.
 - [ ] Evaluate an existing Lean database library and its runtime dependencies

@@ -21,7 +21,7 @@ published to npm.**
 
 Two independent packs produced identical bytes. The [retention workflow](https://github.com/Millillion/lasm/actions/runs/36398226921)
 rechecked every native job's successful report against this exact archive and
-package source revision. The [retention evidence](evidence/node44-five-platform-retention-2026-09-28.json)
+package source revision. The [retention evidence](../evidence/node44-five-platform-retention-2026-09-28.json)
 verifies GitHub's stored archive digest, size and the combined acceptance receipt.
 The archive remains [an unpublished draft](https://github.com/Millillion/lasm/releases/tag/untagged-1bcaed31d70e517ff80b).
 
@@ -32,7 +32,7 @@ gh release download node-linux-candidate-36398226921 --repo Millillion/lasm --pa
 ```
 
 Give the unchanged tarball to the developer, who needs only Node/npm. Follow the
-[README quick start](../README.md#60-second-start). GitHub CLI is only a maintainer
+[README quick start](../../README.md#60-second-start). GitHub CLI is only a maintainer
 retrieval tool. The README and support guide embedded in this unchanged archive
 predate completion of these tests; the linked repository documentation records
 the current acceptance status. Repacking documentation would require a new hash
@@ -42,11 +42,11 @@ and acceptance campaign.
 
 | Target | Tested OS | Complete evidence |
 | --- | --- | --- |
-| linux-x64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node44-linux-x64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36392920262/job/108832580155) |
-| linux-arm64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](evidence/node44-linux-arm64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36392920262/job/108832580217) |
-| darwin-x64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node44-darwin-x64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36392911964/job/108832553852) |
-| darwin-arm64 | macOS 15.7.9 (24G830) | [Passed report](evidence/node44-darwin-arm64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36392911964/job/108832554084) |
-| win32-x64 | Windows 10.0.26100.33438 (`windows-2025`) | [Passed report](evidence/node44-win32-x64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36389214996/job/108821105094) |
+| linux-x64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](../evidence/node44-linux-x64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36392920262/job/108832580155) |
+| linux-arm64 | Ubuntu 24.04.5 LTS, glibc 2.39 | [Passed report](../evidence/node44-linux-arm64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36392920262/job/108832580217) |
+| darwin-x64 | macOS 15.7.9 (24G830) | [Passed report](../evidence/node44-darwin-x64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36392911964/job/108832553852) |
+| darwin-arm64 | macOS 15.7.9 (24G830) | [Passed report](../evidence/node44-darwin-arm64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36392911964/job/108832554084) |
+| win32-x64 | Windows 10.0.26100.33438 (`windows-2025`) | [Passed report](../evidence/node44-win32-x64-2026-09-28.json), [job](https://github.com/Millillion/lasm/actions/runs/36389214996/job/108821105094) |
 
 Each job installs the same archive into a fresh project with spaces and Unicode.
 Linux Landlock, macOS sandbox-exec, and Windows restricted-token/ACL controls deny
@@ -65,7 +65,7 @@ comparisons consume identical fixture bytes; Git CRLF conversion is recorded
 separately and program output is not normalized.
 
 This defines the release contract; it does not establish complete Lean or standard
-library parity. See the [exact restrictions](../README.md#lean-support-and-restrictions).
+library parity. See the [exact restrictions](../../README.md#lean-support-and-restrictions).
 
 ## Observed measurements
 
@@ -98,14 +98,14 @@ and all platform disk reserves passed.
 
 The [earlier `.37` report and subsequent investigations](NODE_ACCEPTANCE_37_2026-09-26.md)
 retain Linux/macOS acceptance and the Windows failures preceding this pass.
-The [Windows byte-preservation repair](evidence/windows-stdio-bytes-2026-09-28.json)
-and [native C-oracle launch control](evidence/windows-native-oracle-launch-2026-09-28.json)
+The [Windows byte-preservation repair](../evidence/windows-stdio-bytes-2026-09-28.json)
+and [native C-oracle launch control](../evidence/windows-native-oracle-launch-2026-09-28.json)
 have separate failure and regression evidence. Earlier archives remain unchanged.
 
 Windows ARM64's native Lean distribution has passed build, relocation, retention
 and archive auditing and is available as a managed download. Candidate `.45`
 passed the five targets above but exposed an SDK defect with Unicode paths on
 ARM64. The repair passed native SDK execution and archive-relocation checks;
-the [distribution tracker](WINDOWS_TOOLCHAINS.md) records the evidence. Candidate
+the [distribution tracker](../WINDOWS_TOOLCHAINS.md) records the evidence. Candidate
 `.46` connects the repaired tools and must pass its own exact-archive campaign
 before Windows ARM64 becomes supported.

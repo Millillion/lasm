@@ -7,13 +7,13 @@
 > **Emscripten 6.0.9** (no Zig): a wasm64 threaded runtime for Node and a
 > single-threaded edge runtime for the edge, Bun/Deno, browser and WASI targets.
 > Current sources:
-> - the application pipeline and its managed tools: [APPLICATION_PIPELINE.md](APPLICATION_PIPELINE.md),
->   [PLAN.md](PLAN.md) (the Lean 4.35.0 upgrade and runtime patches);
+> - the application pipeline and its managed tools: [APPLICATION_PIPELINE.md](../APPLICATION_PIPELINE.md),
+>   [PLAN.md](../PLAN.md) (the Lean 4.35.0 upgrade and runtime patches);
 > - the runtime build: `scripts/full-lean/build-application-runtime.mjs` and
->   `scripts/full-lean/patches/lean-4.35.0-*.patch`; the edge runtime: [EDGE.md](EDGE.md);
-> - the host bridge: [IO.md](IO.md), [THREAD_REVIEW.md](THREAD_REVIEW.md); WASI: [WASI.md](WASI.md);
-> - accepted candidates and gates: [NODE_ACCEPTANCE.md](NODE_ACCEPTANCE.md),
->   [release/0.1.0-gate.md](release/0.1.0-gate.md); test layers: [TESTING.md](TESTING.md).
+>   `scripts/full-lean/patches/lean-4.35.0-*.patch`; the edge runtime: [EDGE.md](../EDGE.md);
+> - the host bridge: [IO.md](../IO.md), [THREAD_REVIEW.md](../THREAD_REVIEW.md); WASI: [WASI.md](../WASI.md);
+> - accepted candidates and gates: [NODE_ACCEPTANCE.md](../NODE_ACCEPTANCE.md),
+>   [release/0.1.0-gate.md](../release/0.1.0-gate.md); test layers: [TESTING.md](../TESTING.md).
 >
 > The prototype's text is kept unchanged below as a record.
 
@@ -64,7 +64,7 @@ The compiler supports ASCII module/declaration names. Lake projects use Lake's
 own generated C, dependency graph, source directories, compiler options, and host
 metaprograms. The standalone source mode remains available. Foreign executable
 code still requires explicit Wasm implementations. See
-[DEVELOPER_WORKFLOW.md](DEVELOPER_WORKFLOW.md).
+[DEVELOPER_WORKFLOW.md](../DEVELOPER_WORKFLOW.md).
 
 Caches include source, compiler version, flags, and runtime/header fingerprints.
 The source build checks the host compiler commit and the project's Lean toolchain.
@@ -124,8 +124,8 @@ task/promise objects. Dropped pure-task registrations are removed; IO tasks keep
 running to completion. Each suspended invocation owns its own stacks and response
 buffer. Scheduler batches yield to the Node event loop, including when every
 Promise is already resolved. No OS threads or native task priorities are emulated.
-See [NODE_APPS.md](NODE_APPS.md), [IO.md](IO.md), and the unchecked
-[remaining limitations](../IO_LIMITATIONS.md).
+See [NODE_APPS.md](../NODE_APPS.md), [IO.md](../IO.md), and the unchecked
+[remaining limitations](../../IO_LIMITATIONS.md).
 
 ## ABI and lifecycle
 
@@ -148,7 +148,7 @@ It does not synchronously force the JS garbage collector. Further calls fail.
 ## Installation and portable hosts
 
 - Real Lean IO, cancellation, rejection, sequential calls, repeated resource use,
-  Asyncify and JSPI are now implemented and tested; see [IO.md](IO.md).
+  Asyncify and JSPI are now implemented and tested; see [IO.md](../IO.md).
 - A copied generated module runs in a separate Node project with no compiler on
   PATH. Local tarball installation, multi-module Lake builds, paths containing
   spaces, and offline reinstalls pass with npm, pnpm, and Yarn. The compiler remains
