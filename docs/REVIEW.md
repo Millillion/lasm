@@ -503,6 +503,35 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
 - [ ] **`library-prebuilt.yml` stays,** and `library/prebuilt` (40 MB) stays
   committed. A committed copy makes the npm tarball reproducible from the
   commit alone. Generating it in CI is IRREDUCIBLE.md removal 15, deferred.
+  - **Proposal (2026-11-13, M3; not implemented while this is open): generate it
+    instead of committing it.** Measured on main at `64c16b4d`:
+    - The tree is now **89 MB, 292 files** (it was 40 MB when this was decided).
+    - It changed in **86 commits since 2026-10-13** (49 since 2026-11-06), each a
+      `library-prebuilt.yml` run (5–33 minutes) whose artifact is downloaded and
+      rsynced by hand, often twice per PR (after each merge of main).
+    - Those regenerations added **78 MB of packed blobs** in a month: most of the
+      clone's 124 MB pack, and it grows with every library change.
+    - Readers: `src/lasm-library.mjs` (the CLI's first build skips compiling
+      `Lasm.*` when the identity matches), `scripts/package-node-release.mjs` (the
+      candidate copies `library/`), `test/lasm-library-prebuilt.test.mjs` (fails when
+      stale) and `test/lasm-async-glue.test.mjs` (reads one generated C file).
+  - **The design:** `library/prebuilt/` in `.gitignore`. Each workflow that packs a
+    candidate (`node-linux-acceptance.yml` and the ten others that call
+    `package-node-release.mjs`) first runs `scripts/build-library-prebuilt.mjs`, or
+    restores its output from the Actions cache keyed by the library identity it
+    already computes (the hash of `library/` and the managed Lean). The candidate,
+    and so the published `@lasm/cli`, still contains `library/prebuilt/`. The
+    freshness test becomes a determinism check: build twice, compare the identity
+    and bytes (the build is already deterministic; that is what the identity
+    check relies on). Local `lasm` runs from a checkout compile the library on the
+    first build, as a user's machine does when the prebuilt copy is stale today.
+  - **What it costs:** reproducing a published tarball needs that build (about 5
+    minutes in CI with the managed Lean) rather than the commit alone; the
+    cache must not be trusted blindly, so the restore re-checks the identity.
+  - **What it saves:** the manual regenerate-and-commit step on every library PR,
+    78 MB a month of history, and the stale-prebuilt failures between a merge of
+    main and the regeneration. The 89 MB the history already holds stays unless
+    it is rewritten, which this does not propose.
 - [ ] **The Sunday policy.** There are no scheduled or automated runs on
   Sunday (US Eastern), for lasm and the website.
   - Scheduled workflows carry a runtime guard (`TZ=America/New_York date +%u`), and a test checks every cron.
