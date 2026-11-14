@@ -36,10 +36,12 @@ import Lasm.Cli.Model.JsFraming
 import Lasm.Cli.Model.LeanIOErrors
 import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.LowerAtomics
+import Lasm.Cli.Model.Mangle
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.ProcessLauncher
+import Lasm.Cli.Model.Python
 import Lasm.Cli.Model.WasiComponent
 import Lasm.Cli.Model.Zip
 
@@ -209,18 +211,13 @@ def unquote (line : String) : Option String :=
 
 /-! ## Builds: names, initializers, builtin modules -/
 
-/-- `mangleName(name)` (src/application-diagnosis.mjs): Lean's C name of a
-dotted name. -/
-opaque mangleName : String → String
+/-- `mangleName(name)` (src/application-diagnosis.mjs): Lean 4.35's C name
+(`Name.mangle n ""`) of a dotted name; modelled in Model/Mangle.lean. -/
+def mangleName (name : String) : String := Mangle.mangleNameModel name
 /-- `demangleName(text)`. -/
-opaque demangleName : String → String
+def demangleName (text : String) : String := Mangle.demangleNameModel text
 /-- `initializerModule(symbol)`: the module a C initializer initializes. -/
-opaque initializerModule : String → Option String
-
-/-- A dotted name whose components each start with an ASCII letter and do not
-end with `_`, where Lean's mangling is unambiguous. -/
-def wellFormedName (n : String) : Bool :=
-  (n.splitOn ".").all fun c => (c.toList.head?.map Char.isAlpha).getD false && !c.endsWith "_"
+def initializerModule (symbol : String) : Option String := Mangle.initializerModuleModel symbol
 
 -- `builtinModuleClosure(specifiers)` (src/edge/builtin-modules.mjs), with
 -- `imports` the builtin specifiers (`lasm:…`) each builtin's file imports:
@@ -263,12 +260,17 @@ def initializerName (n : String) : Bool :=
 
 /-! ## `lasm init` names (src/init.mjs) -/
 
-/-- `packageName(directory)`. -/
-opaque packageName : String → String
-/-- `lakeName(name)`. -/
-opaque lakeName : String → String
-/-- `supabaseFunctionNameOf(packageName)`. -/
-opaque supabaseFunctionNameOf : String → String
+/-- Not Lasm's JavaScript: Node's `path.basename(path.resolve(directory))`,
+then JavaScript's `toLowerCase()`. -/
+opaque lowerBasename : String → String
+/-- Not Lasm's JavaScript: `String(value).toLowerCase()` (Unicode's mapping). -/
+opaque jsToLowerCase : String → String
+/-- `packageName(directory)`: modelled in Model/Init.lean. -/
+def packageName (directory : String) : String := packageNameOf (lowerBasename directory)
+/-- `lakeName(name)`: modelled in Model/Init.lean. -/
+def lakeName (name : String) : String := lakeNameOf name
+/-- `supabaseFunctionNameOf(packageName)`: modelled in Model/Init.lean. -/
+def supabaseFunctionNameOf (name : String) : String := supabaseNameOf (jsToLowerCase name)
 
 /-! ## Development server (src/dev.mjs, src/browser/static-server.mjs) -/
 
@@ -308,14 +310,12 @@ def backoff (attempt : Nat) : Nat := min 60000 (2000 * 2 ^ (attempt - 1))
 
 /-! ## The link driver's Python semantics (src/link-driver/python.mjs) -/
 
-/-- `pythonJsonString(value)`: `json.dumps` of a string, `ensure_ascii`. -/
-opaque pythonJsonString : String → String
+-- `pythonJsonString(value)` and `comparePythonStrings(a, b)`: modelled in
+-- Model/Python.lean.
 
 /-- `pythonJsonDumps(value, { indent, sortKeys })`, or the message it throws. -/
 opaque pythonJsonDumps : Lean.Json → Option Nat → Bool → Except String String
 
-/-- `comparePythonStrings(a, b)`: negative, zero or positive. -/
-opaque comparePythonStrings : String → String → Int
 
 /-! ## WebAssembly (src/wasi/lower-atomics.mjs, src/wasi/wasi-component.mjs) -/
 

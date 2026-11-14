@@ -109,13 +109,14 @@ test('the policy message carries the explanation and the README pointer', () => 
   assert.throws(() => requireAotApplication(requirements, { explanation: [] }), { code: 'ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE' });
 });
 
-// Names whose components start with a letter and do not end with `_` (Lean's
-// mangling is ambiguous there: `A_.B` and `A._B` both mangle to `A___B`).
-const leanName = random => random.array(random.int(1, 4), () => random.pick(['A', 'b', 'Z'])
-  + random.string(['a', 'B', '0', '9', '!', 'α', '𝔸', "'", '_'], 0, 6) + random.pick(['a', '0', '!', 'α'])).join('.');
+// Any dotted name: components that read as numbers or escapes once mangled
+// (`x2d`, `u03b1`, `0b`, digits), that start or end with `_`, empty ones, and
+// numeric components (`_private.M.0.f`); characters in every escape class.
+const leanName = random => random.array(random.int(1, 4), () => random.next() < 0.15 ? String(random.int(0, 20))
+  : random.string(['a', 'B', 'x', 'u', 'U', '0', '9', 'f', '!', 'α', '𝔸', "'", '_', '2d'], 0, 6)).join('.');
 
-// Proposition: Lasm.Cli.Candidates.mangle_round_trip
-//   ∀ n : String, wellFormedName n = true →
+// Proposition: Lasm.Cli.Spec.mangle_round_trip
+//   ∀ n : String,
 //     demangleName (mangleName n) = n ∧
 //     initializerModule ("initialize_" ++ mangleName n) = some n ∧
 //     initializerModule ("runtime_initialize_" ++ mangleName n) = some n ∧
@@ -127,6 +128,23 @@ test('mangling round-trips through demangling and module initializers', () => {
     assert.equal(initializerModule('runtime_initialize_' + mangleName(name)), name);
     assert.match(mangleName(name), /^[A-Za-z0-9_]+$/);
   }, { runs: 300 });
+});
+
+// What Lean 4.35's `Name.mangle n ""` gives for these names (numbers are
+// numeric components), and `Name.demangle` reads back.
+const leanMangled = [['_private.Main.0.foo', '__private_Main_0__foo'], ['a.x2d', 'a_00x2d'], ['Foo.x86', 'Foo_00x86'],
+  ['A_.B', 'A___00B'], ['A._B', 'A___B'], ['a.0b', 'a_000b'], ['x41', '00x41'], ['7up', '007up'], ['', '00'], ['a.', 'a_00'],
+  ['_', '00__'], ['a.__', 'a_00____'], ['a._x41', 'a_00__x41'], ['foo._at_.bar._spec_1', 'foo___at___00bar___spec__1'],
+  ['a.12.b_.3', 'a_12__b___3_'], ['a-b.λ', 'a_x2db_00_u03bb'], ['a.u03b1', 'a_00u03b1'], ['a.U0001d538x', 'a_00U0001d538x'],
+  ['a.xAB', 'a_xAB'], ['Init.Data.UInt8', 'Init_Data_UInt8']];
+test("mangling is Lean 4.35's, disambiguating components that would read as numbers or escapes", () => {
+  for (const [name, mangled] of leanMangled) {
+    assert.equal(mangleName(name), mangled, name);
+    assert.equal(demangleName(mangled), name, mangled);
+  }
+  assert.equal(initializerModule('initialize_Foo_00x86'), 'Foo.x86');
+  assert.equal(initializerModule('runtime_initialize_App_00u0041'), 'App.u0041');
+  assert.equal(initializerModule('initialize_Foo_x86'), 'Foo\x86', 'an escape, not a component x86');
 });
 
 test('mangling and demangling escapes, separators and runs of underscores', () => {
@@ -145,7 +163,7 @@ test('mangling and demangling escapes, separators and runs of underscores', () =
   assert.equal(demangleName('a_u00e9b'), 'aéb');
   assert.equal(demangleName('a_U0001d538'), 'a𝔸');
   assert.equal(demangleName('a__x41'), 'a_x41', 'an even run is literal underscores');
-  assert.equal(demangleName('_'), '.');
+  assert.equal(demangleName('_'), '');
   assert.equal(demangleName(''), '');
   assert.equal(initializerModule('initialize_a__x41'), 'a_x41');
   assert.equal(initializerModule('initialize__x41'), undefined, 'does not round-trip');
@@ -159,8 +177,9 @@ test('readable declaration names: private prefixes and auxiliary suffixes remove
   assert.equal(declarationName('l_Lean_Json_compress'), 'Lean.Json.compress');
   assert.equal(declarationName('lp_mathlib_Nat_foo'), 'Nat.foo');
   assert.equal(declarationName('lp_my__pkg_Nat_foo'), 'Nat.foo');
-  assert.equal(declarationName('l___private_A_B_0_A_secret'), 'A.secret');
-  assert.equal(declarationName('l___private_A_0_B_0_C'), 'B.0.C', 'the shortest private prefix');
+  assert.equal(declarationName('l___private_A_B_0__A_secret'), 'A.secret');
+  assert.equal(declarationName('l___private_Main_0__foo'), 'foo');
+  assert.equal(declarationName('l___private_A_0__B_0__C'), 'B.0.C', 'the shortest private prefix');
   assert.equal(declarationName('l_f___lam__0'), 'f');
   assert.equal(declarationName('lean_io_prim_put_str'), 'lean_io_prim_put_str');
   assert.equal(declarationName('ll_x'), 'll_x');

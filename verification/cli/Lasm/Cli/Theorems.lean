@@ -74,6 +74,177 @@ theorem response_file_round_trip : Spec.response_file_round_trip := by
       · simp
     · simp [hnil, List.map_map, Function.comp_def, unquote_quote]
 
+/-! ## `lasm init` names -/
+
+theorem replaceRuns_all (keep : Char → Bool) (r : Char) : ∀ l, ∀ c ∈ replaceRuns keep r l, keep c = true ∨ c = r
+  | [] => by simp [replaceRuns]
+  | c :: cs => by
+    intro x hx
+    rw [replaceRuns] at hx
+    split at hx
+    · rcases List.mem_cons.mp hx with rfl | hx
+      · left; assumption
+      · exact replaceRuns_all keep r cs x hx
+    · rcases List.mem_cons.mp hx with rfl | hx
+      · right; rfl
+      · exact replaceRuns_all keep r _ x hx
+termination_by l => l.length
+decreasing_by
+  all_goals
+    have := (List.dropWhile_sublist (l := cs) (fun d => !keep d)).length_le
+    simp only [List.length_cons]
+    omega
+
+theorem strip_sub {lead trail : Char → Bool} {l : List Char} {c : Char} (h : c ∈ strip lead trail l) : c ∈ l := by
+  simp only [strip, List.mem_reverse] at h
+  exact (List.dropWhile_sublist _).subset (List.mem_reverse.mp ((List.dropWhile_sublist _).subset h))
+
+theorem dropWhile_head {p : Char → Bool} {l : List Char} {c : Char} (h : (l.dropWhile p).head? = some c) : p c = false := by
+  have := List.head?_dropWhile_not p l
+  rw [h] at this; exact this
+
+theorem strip_last {lead trail : Char → Bool} {l : List Char} {c : Char} (h : (strip lead trail l).getLast? = some c) : trail c = false := by
+  simp only [strip, List.getLast?_reverse] at h
+  exact dropWhile_head h
+
+/-- What `strip` keeps first was not stripped at the front: it is the first
+character after the leading run, unless the trailing strip took everything. -/
+theorem strip_head {lead trail : Char → Bool} {l : List Char} {c : Char} (h : (strip lead trail l).head? = some c) : lead c = false := by
+  have hp : strip lead trail l <+: l.dropWhile lead := by
+    have := (List.dropWhile_suffix (l := (l.dropWhile lead).reverse) trail).reverse
+    simpa [strip] using this
+  obtain ⟨t, ht⟩ := hp
+  apply dropWhile_head (l := l)
+  rw [← ht, List.head?_append, h]; rfl
+
+theorem not_endsWith (l : List Char) (c : Char) (h : l.getLast? ≠ some c) : ¬ (String.ofList l).endsWith (String.singleton c) := by
+  simp [← String.endsWith_toSlice]
+  intro hs
+  obtain ⟨t, ht⟩ := hs
+  apply h
+  rw [← ht]; simp
+
+/-- The three facts a name's statement asks, read off its characters. -/
+theorem name_facts (l : List Char) (first every : Char → Bool) (last : Char)
+    (hh : (l.head?.map first) = some true) (ha : ∀ c ∈ l, every c = true) (hl : l.getLast? ≠ some last) :
+    ((String.ofList l).toList.head?.map first) = some true ∧ (String.ofList l).all every = true ∧
+      ¬ (String.ofList l).endsWith (String.singleton last) := by
+  refine ⟨by rw [String.toList_ofList]; exact hh, ?_, not_endsWith l last hl⟩
+  rw [String.all_bool_eq, String.toList_ofList, List.all_eq_true]; exact ha
+
+theorem packageName_valid (x : String) :
+    ((packageNameOf x).toList.head?.map fun c => c.isLower || c.isDigit) = some true ∧
+    (packageNameOf x).all (fun c => c.isLower || c.isDigit || c = '.' || c = '_' || c = '-') ∧
+    ¬ (packageNameOf x).endsWith "-" := by
+  simp only [packageNameOf]
+  split
+  · exact name_facts "lean-app".toList _ _ '-' (by decide) (by decide) (by decide)
+  · rename_i hne
+    generalize hn : strip (fun c => c = '.' || c = '_' || c = '-') (· = '-') (replaceRuns npmChar '-' x.toList) = name at hne
+    have hall : ∀ c ∈ name, npmChar c = true := by
+      intro c hc
+      rw [← hn] at hc
+      rcases replaceRuns_all npmChar '-' _ c (strip_sub hc) with h | h
+      · exact h
+      · subst h; decide
+    apply name_facts name _ _ '-'
+    · cases hh : name with
+      | nil => exact absurd hh hne
+      | cons c t =>
+        have hl := strip_head (lead := fun c => c = '.' || c = '_' || c = '-') (trail := (· = '-'))
+          (l := replaceRuns npmChar '-' x.toList) (c := c) (by rw [hn, hh]; rfl)
+        have hc := hall c (by simp [hh])
+        simp [npmChar] at hc hl ⊢
+        rcases hc with hc | hc | hc | hc | hc <;> simp_all
+    · intro c hc; simpa [npmChar] using hall c hc
+    · intro h
+      have := strip_last (lead := fun c => c = '.' || c = '_' || c = '-') (trail := (· = '-'))
+        (l := replaceRuns npmChar '-' x.toList) (by rw [hn]; exact h)
+      simp at this
+
+theorem lakeName_valid (x : String) :
+    ((lakeNameOf x).toList.head?.map Char.isAlpha) = some true ∧
+    (lakeNameOf x).all (fun c => c.isAlphanum || c = '_') ∧ ¬ (lakeNameOf x).endsWith "_" := by
+  simp only [lakeNameOf]
+  generalize hn : strip (· = '_') (· = '_') (replaceRuns lakeChar '_' x.toList) = id
+  have hall : ∀ c ∈ id, lakeChar c = true := by
+    intro c hc
+    rw [← hn] at hc
+    rcases replaceRuns_all lakeChar '_' _ c (strip_sub hc) with h | h
+    · exact h
+    · subst h; decide
+  have hlast : id.getLast? ≠ some '_' := by
+    intro h
+    have := strip_last (lead := (· = '_')) (trail := (· = '_')) (l := replaceRuns lakeChar '_' x.toList) (by rw [hn]; exact h)
+    simp at this
+  split
+  · rename_i hh
+    exact name_facts id _ _ '_' hh (fun c hc => by simpa [lakeChar] using hall c hc) hlast
+  · apply name_facts _ _ _ '_'
+    · rfl
+    · intro c hc
+      simp only [List.mem_append] at hc
+      rcases hc with hc | hc
+      · have happ : "app".toList = ['a', 'p', 'p'] := rfl
+        rw [happ] at hc; simp at hc; rcases hc with rfl | rfl <;> decide
+      · split at hc
+        · simp at hc
+        · rcases List.mem_cons.mp hc with rfl | hc
+          · decide
+          · simpa [lakeChar] using hall c hc
+    · split
+      · decide
+      · rename_i hne
+        have : ("app".toList ++ '_' :: id).getLast? = id.getLast? := by
+          rw [show "app".toList ++ '_' :: id = ("app".toList ++ ['_']) ++ id by simp, List.getLast?_append]
+          cases h : id.getLast? with
+          | none => exact absurd (List.getLast?_eq_none_iff.mp h) hne
+          | some c => rfl
+        rw [this]; exact hlast
+
+theorem supabaseName_valid (x : String) :
+    ((supabaseNameOf x).toList.head?.map Char.isLower) = some true ∧
+    (supabaseNameOf x).all (fun c => c.isLower || c.isDigit || c = '-') ∧
+    (supabaseNameOf x).length ≤ 54 := by
+  have facts : ∀ l : List Char, (l.head?.map Char.isLower) = some true → (∀ c ∈ l, supabaseChar c = true) → l.length ≤ 54 →
+      ((String.ofList l).toList.head?.map Char.isLower) = some true ∧
+      (String.ofList l).all (fun c => c.isLower || c.isDigit || c = '-') ∧ (String.ofList l).length ≤ 54 := by
+    intro l hh ha hl
+    refine ⟨by rw [String.toList_ofList]; exact hh, ?_, by rw [String.length_ofList]; exact hl⟩
+    rw [String.all_bool_eq, String.toList_ofList, List.all_eq_true]; intro c hc; simpa [supabaseChar] using ha c hc
+  simp only [supabaseNameOf]
+  generalize hn : (strip (· = '-') (· = '-') (replaceRuns supabaseChar '-' (dropScope x.toList))).take 54 = name0
+  have h0 : ∀ c ∈ name0, supabaseChar c = true := by
+    intro c hc
+    rw [← hn] at hc
+    rcases replaceRuns_all supabaseChar '-' _ c (strip_sub (List.mem_of_mem_take hc)) with h | h
+    · exact h
+    · subst h; decide
+  have l0 : name0.length ≤ 54 := by rw [← hn]; exact List.length_take_le _ _
+  generalize hn1 : (if name0 = [] then "lasm-app".toList else name0) = name1
+  have h1 : ∀ c ∈ name1, supabaseChar c = true := by
+    rw [← hn1]; split
+    · decide
+    · exact h0
+  have l1 : name1.length ≤ 54 := by rw [← hn1]; split <;> simp_all <;> decide
+  split
+  · rename_i hh; exact facts name1 hh h1 l1
+  · apply facts
+    · cases name1 <;> rfl
+    · intro c hc
+      rcases List.mem_append.mp (List.mem_of_mem_take hc) with hc | hc
+      · have : "lasm-".toList = ['l', 'a', 's', 'm', '-'] := rfl
+        rw [this] at hc; simp at hc; rcases hc with rfl | rfl | rfl | rfl | rfl <;> decide
+      · exact h1 c hc
+    · exact List.length_take_le _ _
+
+theorem generated_names_valid : Spec.generated_names_valid := by
+  intro dir s
+  obtain ⟨p1, p2, p3⟩ := packageName_valid (lowerBasename dir)
+  obtain ⟨l1, l2, l3⟩ := lakeName_valid s
+  obtain ⟨s1, s2, s3⟩ := supabaseName_valid (jsToLowerCase s)
+  exact ⟨p1, p2, p3, l1, l2, l3, s1, s2, s3⟩
+
 /-! ## Development server -/
 
 theorem lookup_of_mem {l : List (String × Option String)} {k : String} {h : Option String}
@@ -217,6 +388,85 @@ theorem lean_at_least_lexicographic : Spec.lean_at_least_lexicographic := by
     exact atLeast_parts a b
   · simp only [leanAtLeast, leanAtLeastModel, ha, parts]
     exact (atLeast_parts a a).2 (by obtain ⟨x, y, z⟩ := a; simp [LexGe])
+
+/-! ## The link driver's Python semantics -/
+
+theorem comparePython_go_sign : ∀ x y : List Char,
+    (comparePythonStrings.go x y).sign = if x < y then -1 else if x = y then 0 else 1
+  | [], [] => by simp [comparePythonStrings.go]
+  | [], _ :: _ => by simp [comparePythonStrings.go, List.nil_lt_cons]
+  | _ :: _, [] => by simp [comparePythonStrings.go, List.not_lt_nil]
+  | a :: as, b :: bs => by
+    have ih := comparePython_go_sign as bs
+    by_cases h : a.val.toNat = b.val.toNat
+    · have hab : a = b := Char.ext (UInt32.toNat_inj.mp h)
+      subst hab
+      simp [comparePythonStrings.go, ih]
+    · simp only [comparePythonStrings.go, if_pos h]
+      have e1 : a.toNat = a.val.toNat := rfl
+      have e2 : b.toNat = b.val.toNat := rfl
+      have hne : a ≠ b := fun e => h (e ▸ rfl)
+      rcases Nat.lt_or_gt_of_ne h with hl | hl
+      · have : a < b := hl
+        simp [List.cons_lt_cons_iff, this, hne]; omega
+      · have hba : b < a := hl
+        have hnab : ¬ a < b := fun h' => absurd (Nat.lt_trans hl h') (Nat.lt_irrefl _)
+        simp [List.cons_lt_cons_iff, hnab, hne]; omega
+
+theorem python_order_code_points : Spec.python_order_code_points := by
+  intro a b
+  simp only [comparePythonStrings, comparePython_go_sign, String.lt_iff, String.toList_inj]
+
+/-- Printable ASCII. -/
+def printable (c : Char) : Bool := ' ' ≤ c && c ≤ '~'
+
+theorem digitChar_printable (d : Nat) (h : d < 16) : printable d.digitChar = true := by
+  match d, h with
+  | 0, _ | 1, _ | 2, _ | 3, _ | 4, _ | 5, _ | 6, _ | 7, _ | 8, _ | 9, _ | 10, _ | 11, _ | 12, _ | 13, _ | 14, _ | 15, _ => decide
+  | _ + 16, h => exact absurd h (by omega)
+
+theorem toDigits16_printable (n : Nat) : ∀ c ∈ Nat.toDigits 16 n, printable c = true := by
+  induction n using Nat.strongRecOn with
+  | ind n ih =>
+    rw [Nat.toDigits_eq_ite (by decide)]
+    split
+    · rename_i h; intro c hc; simp at hc; subst hc; exact digitChar_printable n h
+    · intro c hc
+      rcases List.mem_append.mp hc with hc | hc
+      · exact ih (n / 16) (by omega) c hc
+      · simp at hc; subst hc; exact digitChar_printable _ (Nat.mod_lt _ (by decide))
+
+theorem escapeUnit_printable (u : Nat) : ∀ c ∈ escapeUnit u, printable c = true := by
+  intro c hc
+  unfold escapeUnit at hc
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc; · simp at hc; rcases hc with rfl | rfl <;> decide
+  split at hc
+  · simp only [List.mem_cons, hex4, List.mem_append, List.mem_replicate] at hc
+    rcases hc with rfl | rfl | ⟨_, rfl⟩ | hc
+    · decide
+    · decide
+    · decide
+    · exact toDigits16_printable u c hc
+  · rename_i h
+    simp at hc; subst hc
+    have hu : u < 0xd800 := by omega
+    have hv : (Char.ofNat u).val.toNat = u := by
+      simp [Char.ofNat, Char.ofNatAux, Nat.isValidChar, hu]
+    simp only [printable, Bool.and_eq_true, decide_eq_true_eq, Char.le_def, UInt32.le_iff_toNat_le, hv]
+    exact ⟨by simp; omega, by simp; omega⟩
+
+theorem json_string_printable : Spec.json_string_printable := by
+  intro s
+  rw [String.all_bool_eq, pythonJsonString, String.toList_ofList]
+  simp only [List.all_cons, List.all_append, List.all_flatMap, List.all_eq_true, Bool.and_eq_true]
+  refine ⟨⟨by decide, fun x _ u _ c hc => ?_⟩, by simp⟩
+  simpa [printable] using escapeUnit_printable u c hc
 
 /-! ## WebAssembly sections -/
 
@@ -2920,6 +3170,578 @@ theorem allocateLoop_fresh (start : Nat) (value : String) : ∀ (fuel : Nat) (t 
 
 theorem handle_fresh_in_range : Spec.handle_fresh_in_range :=
   fun t t' _ id h => allocateLoop_fresh _ _ _ t t' id h
+
+/-! ## Lean's name mangling (Model/Mangle.lean)
+
+Reading back the mangled name runs `demangleGo` over it: each component's
+characters (`mangleChar_text`, `escape_text`) leave it with `acc` and half
+`count` the `feed` of the component (`feed_value`); a separator `_00`
+(`sep_zero`, `start_zero`) or a plain `_` before a component whose mangling
+is not ambiguous (`not_ambiguous`, `sep_plain`, `start_plain`) pushes the
+component read; numbers go through the number mode (`text_number`,
+`start_number`); `main` puts them together by induction over the components.
+-/
+
+namespace MangleProofs
+open Lasm.Cli.Mangle
+
+
+theorem hexChar_value : ∀ d, d < 16 → (if (hexChar d).isDigit then (hexChar d).toNat - 48 else (hexChar d).toNat - 87) = d := by decide
+theorem hexChar_hex : ∀ d, d < 16 → isLowerHex (hexChar d) = true := by decide
+theorem hexChar_alnum : ∀ d, d < 16 → (hexChar d).isAlphanum = true := by decide
+
+theorem hexDigits_length (k v : Nat) : (hexDigits k v).length = k := by
+  induction k generalizing v <;> simp_all [hexDigits]
+
+theorem hexDigits_mem (k v : Nat) : ∀ c ∈ hexDigits k v, ∃ d, d < 16 ∧ c = hexChar d := by
+  induction k generalizing v with
+  | zero => simp [hexDigits]
+  | succ k ih =>
+    intro c hc
+    simp only [hexDigits, List.mem_append, List.mem_singleton] at hc
+    rcases hc with hc | hc
+    · exact ih _ c hc
+    · exact ⟨v % 16, Nat.mod_lt _ (by decide), hc⟩
+
+theorem hexValue_hexDigits (k v : Nat) : hexValue (hexDigits k v) = v % 16 ^ k := by
+  induction k generalizing v with
+  | zero => simp [hexDigits, hexValue, Nat.mod_one]
+  | succ k ih =>
+    have h := ih (v / 16)
+    simp only [hexValue] at h ⊢
+    rw [hexDigits, List.foldl_append, h]
+    simp only [List.foldl_cons, List.foldl_nil]
+    rw [hexChar_value _ (Nat.mod_lt _ (by decide)), Nat.pow_succ, Nat.mul_comm (16 ^ k) 16, Nat.mod_mul]
+    omega
+
+theorem hexRun_hexDigits (k v : Nat) (rest : List Char) : hexRun k (hexDigits k v ++ rest) = true := by
+  have hl := hexDigits_length k v
+  have ht : (hexDigits k v ++ rest).take k = hexDigits k v := by
+    rw [List.take_append_of_le_length (by omega), List.take_of_length_le (by omega)]
+  simp only [hexRun, ht, hl, beq_self_eq_true, Bool.true_and, List.all_eq_true]
+  intro c hc
+  obtain ⟨d, hd, rfl⟩ := hexDigits_mem k v c hc
+  exact hexChar_hex d hd
+
+
+theorem ofNat_toNat' (c : Char) : Char.ofNat c.toNat = c := Char.ofNat_toNat c
+
+/-- `n` underscores, and an odd count after an even one. -/
+theorem two_mul_add_one_div (j : Nat) : (2 * j + 1) / 2 = j := by omega
+
+theorem escape_hex (c : Char) (letter : Char) (k : Nat) (hk : escapeDigits letter = some k) (hlt : c.toNat < 16 ^ k)
+    (hd : letter.isDigit = false) (hu : letter ≠ '_') (rest acc : List Char) (j : Nat) (ps : List (List Char)) :
+    demangleGo .text ('_' :: letter :: (hexDigits k c.toNat ++ rest)) acc (2 * j) ps =
+      demangleGo .text rest (acc ++ List.replicate j '_' ++ [c]) 0 ps := by
+  have hl := hexDigits_length k c.toNat
+  have ht : (hexDigits k c.toNat ++ rest).take k = hexDigits k c.toNat := by
+    rw [List.take_append_of_le_length (by omega), List.take_of_length_le (by omega)]
+  have hdrop : (hexDigits k c.toNat ++ rest).drop k = rest := by
+    rw [List.drop_append_of_le_length (by omega), List.drop_of_length_le (by omega), List.nil_append]
+  rw [demangleGo.eq_6, if_pos rfl, demangleGo.eq_6, if_neg hu, if_neg (by omega), if_neg (by simp [hd]), hk]
+  simp only
+  rw [if_pos (hexRun_hexDigits k c.toNat rest), ht, hdrop, hexValue_hexDigits, Nat.mod_eq_of_lt hlt,
+    ofNat_toNat', two_mul_add_one_div]
+
+theorem mangleChar_text (c : Char) (rest acc : List Char) (j : Nat) (ps : List (List Char)) :
+    demangleGo .text (mangleChar c ++ rest) acc (2 * j) ps =
+      if c = '_' then demangleGo .text rest acc (2 * (j + 1)) ps
+      else demangleGo .text rest (acc ++ List.replicate j '_' ++ [c]) 0 ps := by
+  unfold mangleChar
+  by_cases ha : c.isAlphanum = true
+  · have hc : c ≠ '_' := by rintro rfl; exact absurd ha (by decide)
+    rw [if_pos ha, if_neg hc, List.singleton_append, demangleGo.eq_6, if_neg hc, if_pos (by omega),
+      Nat.mul_div_cancel_left _ (by decide)]
+  · rw [if_neg ha]
+    by_cases hc : c = '_'
+    · subst hc
+      rw [if_pos rfl, if_pos rfl, List.cons_append, List.cons_append, List.nil_append, demangleGo.eq_6, if_pos rfl,
+        demangleGo.eq_6, if_pos rfl]
+      congr 1
+    · rw [if_neg hc, if_neg hc]
+      by_cases h1 : c.toNat < 0x100
+      · rw [if_pos h1, List.cons_append, List.cons_append]
+        exact escape_hex c 'x' 2 rfl (by simpa using h1) rfl (by decide) rest acc j ps
+      · rw [if_neg h1]
+        by_cases h2 : c.toNat < 0x10000
+        · rw [if_pos h2, List.cons_append, List.cons_append]
+          exact escape_hex c 'u' 4 rfl (by simpa using h2) rfl (by decide) rest acc j ps
+        · rw [if_neg h2, List.cons_append, List.cons_append]
+          have h3 : c.toNat < 16 ^ 8 := by have := c.val.toNat_lt; simp only [Char.toNat] at *; omega
+          exact escape_hex c 'U' 8 rfl h3 rfl (by decide) rest acc j ps
+
+
+/-- What a component's character does to the text state (`acc`, half of
+`count`) when it is read back. -/
+def feed (s : List Char × Nat) (c : Char) : List Char × Nat :=
+  if c = '_' then (s.1, s.2 + 1) else (s.1 ++ List.replicate s.2 '_' ++ [c], 0)
+
+theorem escape_text (p rest acc : List Char) (j : Nat) (ps : List (List Char)) :
+    demangleGo .text (escapeComponent p ++ rest) acc (2 * j) ps =
+      demangleGo .text rest (p.foldl feed (acc, j)).1 (2 * (p.foldl feed (acc, j)).2) ps := by
+  induction p generalizing acc j with
+  | nil => rfl
+  | cons c p ih =>
+    simp only [escapeComponent, List.flatMap_cons, List.append_assoc] at ih ⊢
+    rw [mangleChar_text]
+    by_cases hc : c = '_'
+    · rw [if_pos hc, ih]; simp [feed, hc]
+    · rw [if_neg hc, show (0 : Nat) = 2 * 0 from rfl, ih]; simp [feed, hc]
+
+theorem feed_value (p acc : List Char) (j : Nat) :
+    (p.foldl feed (acc, j)).1 ++ List.replicate (p.foldl feed (acc, j)).2 '_' = acc ++ List.replicate j '_' ++ p := by
+  induction p generalizing acc j with
+  | nil => simp
+  | cons c p ih =>
+    simp only [List.foldl_cons]
+    by_cases hc : c = '_'
+    · simp only [feed, if_pos hc]; rw [ih, hc, List.replicate_succ']; simp
+    · simp only [feed, if_neg hc]; rw [ih]; simp
+
+theorem underscores_text (n : Nat) (rest acc : List Char) (k : Nat) (ps : List (List Char)) :
+    demangleGo .text (List.replicate n '_' ++ rest) acc k ps = demangleGo .text rest acc (k + n) ps := by
+  induction n generalizing k with
+  | zero => rfl
+  | succ n ih => rw [List.replicate_succ, List.cons_append, demangleGo.eq_6, if_pos rfl, ih]; congr 1; omega
+
+theorem escapeComponent_append (p q : List Char) : escapeComponent (p ++ q) = escapeComponent p ++ escapeComponent q := by
+  simp [escapeComponent]
+
+theorem escapeComponent_underscores (u : Nat) : escapeComponent (List.replicate u '_') = List.replicate (2 * u) '_' := by
+  induction u with
+  | zero => rfl
+  | succ u ih =>
+    rw [List.replicate_succ, show (List.replicate (2 * (u + 1)) '_') = '_' :: '_' :: List.replicate (2 * u) '_' by
+      rw [show 2 * (u + 1) = 2 * u + 1 + 1 by omega, List.replicate_succ, List.replicate_succ]]
+    simp only [escapeComponent, List.flatMap_cons] at ih ⊢
+    rw [ih]; rfl
+
+theorem foldl_feed_underscores (u : Nat) (acc : List Char) (j : Nat) :
+    (List.replicate u '_').foldl feed (acc, j) = (acc, j + u) := by
+  induction u generalizing j with
+  | zero => rfl
+  | succ u ih => rw [List.replicate_succ, List.foldl_cons]; simp only [feed, if_true]; rw [ih]; congr 1; omega
+
+theorem dropWhile_underscores (n : Nat) (l : List Char) :
+    (List.replicate n '_' ++ l).dropWhile (· == '_') = l.dropWhile (· == '_') := by
+  induction n with
+  | zero => rfl
+  | succ n ih => rw [List.replicate_succ, List.cons_append, List.dropWhile_cons_of_pos (by decide), ih]
+
+/-- A component whose mangling is not ambiguous: underscores, then an ASCII
+letter that does not start an escape of what follows. -/
+theorem not_ambiguous (q : List Char) (h : ambiguous (escapeComponent q) = false) :
+    ∃ u c t, q = List.replicate u '_' ++ c :: t ∧ c.isAlphanum = true ∧ c.isDigit = false ∧ c ≠ '_' ∧
+      ∀ k, escapeDigits c = some k → hexRun k (escapeComponent t) = false := by
+  induction q with
+  | nil => simp [escapeComponent, ambiguous] at h
+  | cons c t ih =>
+    by_cases hc : c = '_'
+    · subst hc
+      have h' : ambiguous (escapeComponent t) = false := by
+        have e : escapeComponent ('_' :: t) = List.replicate 2 '_' ++ escapeComponent t := by
+          simp [escapeComponent, mangleChar]
+        rw [e] at h; unfold ambiguous at h ⊢; rw [dropWhile_underscores] at h; exact h
+      obtain ⟨u, c', t', rfl, h1, h2, h3, h4⟩ := ih h'
+      exact ⟨u + 1, c', t', by rw [List.replicate_succ]; rfl, h1, h2, h3, h4⟩
+    · by_cases ha : c.isAlphanum = true
+      · refine ⟨0, c, t, rfl, ha, ?_, hc, ?_⟩
+        all_goals
+          have e : escapeComponent (c :: t) = c :: escapeComponent t := by simp [escapeComponent, mangleChar, ha]
+          rw [e] at h; unfold ambiguous at h
+          rw [List.dropWhile_cons_of_neg (by simpa using hc)] at h
+          simp only [Bool.or_eq_false_iff] at h
+        · exact h.1
+        · intro k hk; rw [hk] at h; exact h.2
+      · exfalso
+        have key : ∀ (letter : Char) (k : Nat), escapeDigits letter = some k → c.toNat < 16 ^ k →
+            escapeComponent (c :: t) = '_' :: letter :: (hexDigits k c.toNat ++ escapeComponent t) →
+            ambiguous (escapeComponent (c :: t)) = true := by
+          intro letter k hk _ e
+          have hl : letter ≠ '_' := by intro hl; subst hl; simp [escapeDigits] at hk
+          rw [e]; unfold ambiguous
+          rw [List.dropWhile_cons_of_pos (by decide), List.dropWhile_cons_of_neg (by simpa using hl)]
+          simp only [hk, hexRun_hexDigits, Bool.or_true]
+        have base : escapeComponent (c :: t) = mangleChar c ++ escapeComponent t := by simp [escapeComponent]
+        unfold mangleChar at base
+        rw [if_neg ha, if_neg hc] at base
+        by_cases h1 : c.toNat < 0x100
+        · rw [if_pos h1] at base
+          have := key 'x' 2 rfl (by simpa using h1) (by rw [base]; rfl); rw [this] at h; exact absurd h (by decide)
+        · rw [if_neg h1] at base
+          by_cases h2 : c.toNat < 0x10000
+          · rw [if_pos h2] at base
+            have := key 'u' 4 rfl (by simpa using h2) (by rw [base]; rfl); rw [this] at h; exact absurd h (by decide)
+          · rw [if_neg h2] at base
+            have h3 : c.toNat < 16 ^ 8 := by have := c.val.toNat_lt; simp only [Char.toNat] at *; omega
+            have := key 'U' 8 rfl h3 (by rw [base]; rfl); rw [this] at h; exact absurd h (by decide)
+
+
+theorem hexRun_append (k : Nat) (l r : List Char) (h : hexRun k l = false) (hr : r = [] ∨ r.head? = some '_') :
+    hexRun k (l ++ r) = false := by
+  by_cases hk : k ≤ l.length
+  · have : (l ++ r).take k = l.take k := List.take_append_of_le_length hk
+    simp only [hexRun] at h ⊢; rw [this]; exact h
+  · rcases hr with rfl | hr
+    · simpa using h
+    · obtain ⟨x, r', rfl⟩ : ∃ x r', r = x :: r' := by cases r <;> simp_all
+      simp only [List.head?_cons, Option.some.injEq] at hr; subst hr
+      have : (l ++ '_' :: r').take k = l ++ '_' :: r'.take (k - l.length - 1) := by
+        rw [List.take_append, List.take_of_length_le (by omega)]
+        congr 1; rw [show k - l.length = (k - l.length - 1) + 1 by omega, List.take_succ_cons]; simp
+      simp only [hexRun, this, List.all_append, List.all_cons, Bool.and_eq_false_imp]
+      intro _; simp [isLowerHex]
+
+/-- A component read from its state: the feed of its characters from nothing. -/
+abbrev state (q : List Char) : List Char × Nat := q.foldl feed ([], 0)
+
+theorem sep_plain (p q rest : List Char) (ps : List (List Char)) (hq : ambiguous (escapeComponent q) = false)
+    (hr : rest = [] ∨ rest.head? = some '_') :
+    demangleGo .text ('_' :: (escapeComponent q ++ rest)) p 0 ps =
+      demangleGo .text rest (state q).1 (2 * (state q).2) (ps ++ [p]) := by
+  obtain ⟨u, c, t, rfl, ha, hd, hc, hk⟩ := not_ambiguous q hq
+  have e : escapeComponent (List.replicate u '_' ++ c :: t) = List.replicate (2 * u) '_' ++ c :: escapeComponent t := by
+    rw [escapeComponent_append, escapeComponent_underscores]; simp [escapeComponent, mangleChar, ha]
+  rw [e, demangleGo.eq_6, if_pos rfl, List.append_assoc, underscores_text, List.cons_append, demangleGo.eq_6,
+    if_neg hc, if_neg (by omega), hd]
+  simp only [Bool.false_eq_true, if_false]
+  have hs : state (List.replicate u '_' ++ c :: t) = t.foldl feed (List.replicate u '_' ++ [c], 0) := by
+    simp only [state, List.foldl_append, foldl_feed_underscores, List.foldl_cons]; simp [feed, hc]
+  have tail : demangleGo .text (escapeComponent t ++ rest) (List.replicate ((0 + 1 + 2 * u) / 2) '_' ++ [c]) 0 (ps ++ [p]) =
+      demangleGo .text rest (state (List.replicate u '_' ++ c :: t)).1 (2 * (state (List.replicate u '_' ++ c :: t)).2) (ps ++ [p]) := by
+    rw [hs, show (0 + 1 + 2 * u) / 2 = u by omega, show (0 : Nat) = 2 * 0 from rfl, escape_text]
+  cases h : escapeDigits c with
+  | none => exact tail
+  | some k => simp only; rw [hexRun_append k _ _ (hk k h) hr]; exact tail
+
+theorem sep_zero (a p q rest : List Char) (J : Nat) (ps : List (List Char)) (hV : a ++ List.replicate J '_' = p) :
+    demangleGo .text ('_' :: '0' :: '0' :: (escapeComponent q ++ rest)) a (2 * J) ps =
+      demangleGo .text rest (state q).1 (2 * (state q).2) (ps ++ [p]) := by
+  rw [demangleGo.eq_6, if_pos rfl, demangleGo.eq_6, if_neg (by decide), if_neg (by omega), if_pos (by decide),
+    if_pos (by simp), List.tail_cons, two_mul_add_one_div, hV, show (0 : Nat) = 2 * 0 from rfl, escape_text]
+
+theorem start_zero (q rest x : List Char) (y : Nat) (ps : List (List Char)) :
+    demangleGo .start ('0' :: '0' :: (escapeComponent q ++ rest)) x y ps =
+      demangleGo .text rest (state q).1 (2 * (state q).2) ps := by
+  rw [demangleGo.eq_2, if_pos (by decide), if_pos (by simp), List.tail_cons, show (0 : Nat) = 2 * 0 from rfl, escape_text]
+
+theorem start_plain (q rest x : List Char) (y : Nat) (ps : List (List Char)) (hq : ambiguous (escapeComponent q) = false) :
+    demangleGo .start (escapeComponent q ++ rest) x y ps =
+      demangleGo .text rest (state q).1 (2 * (state q).2) ps := by
+  obtain ⟨u, c, t, rfl, ha, hd, hc, -⟩ := not_ambiguous q hq
+  have e : escapeComponent (List.replicate u '_' ++ c :: t) = List.replicate (2 * u) '_' ++ c :: escapeComponent t := by
+    rw [escapeComponent_append, escapeComponent_underscores]; simp [escapeComponent, mangleChar, ha]
+  have hs : state (List.replicate u '_' ++ c :: t) = t.foldl feed (List.replicate u '_' ++ [c], 0) := by
+    simp only [state, List.foldl_append, foldl_feed_underscores, List.foldl_cons]; simp [feed, hc]
+  rw [e, hs]
+  cases u with
+  | zero =>
+    simp only [Nat.mul_zero, List.replicate_zero, List.nil_append, List.cons_append]
+    rw [demangleGo.eq_2, hd]; simp only [Bool.false_eq_true, if_false]; rw [if_neg hc]
+    rw [show (0 : Nat) = 2 * 0 from rfl, escape_text]
+  | succ u =>
+    rw [show 2 * (u + 1) = 2 * u + 1 + 1 by omega, List.replicate_succ, List.append_assoc, List.cons_append,
+      demangleGo.eq_2]
+    simp only [show Char.isDigit '_' = false by decide, Bool.false_eq_true, if_false, if_true]
+    rw [underscores_text, List.cons_append, demangleGo.eq_6, if_neg hc, if_pos (by omega),
+      show (1 + (2 * u + 1)) / 2 = u + 1 by omega, List.nil_append, show (0 : Nat) = 2 * 0 from rfl, escape_text]
+
+
+theorem number_digits (ds rest acc : List Char) (k : Nat) (ps : List (List Char)) (h : ds.all Char.isDigit = true) :
+    demangleGo .number (ds ++ '_' :: rest) acc k ps = demangleGo .number ('_' :: rest) (acc ++ ds) 0 ps := by
+  induction ds generalizing acc k with
+  | nil => simp only [List.nil_append, List.append_nil]; rw [demangleGo.eq_4, demangleGo.eq_4]
+  | cons d ds ih =>
+    simp only [List.all_cons, Bool.and_eq_true] at h
+    rw [List.cons_append, demangleGo.eq_4, if_pos h.1, ih _ _ h.2]; simp
+
+theorem number_end (rest acc : List Char) (k : Nat) (ps : List (List Char)) :
+    demangleGo .number ('_' :: rest) acc k ps =
+      if rest = [] then ps ++ [stripZeros acc] else demangleGo .start rest.tail [] 0 (ps ++ [stripZeros acc]) := by
+  rw [demangleGo.eq_4, if_neg (by decide)]
+
+theorem numeral_parts (N : List Char) (h : isNumeral N = true) :
+    ∃ n ns, N = n :: ns ∧ n.isDigit = true ∧ ns.all Char.isDigit = true ∧ (n = '0' → ns = []) ∧ stripZeros N = N := by
+  match N, h with
+  | ['0'], _ => exact ⟨'0', [], rfl, by decide, rfl, fun _ => rfl, by simp [stripZeros]⟩
+  | c :: cs, h =>
+    by_cases hc : c = '0'
+    · subst hc; cases cs with
+      | nil => exact ⟨'0', [], rfl, by decide, rfl, fun _ => rfl, by simp [stripZeros]⟩
+      | cons d ds => simp [isNumeral] at h
+    · simp only [isNumeral] at h
+      have h' : c.isDigit = true ∧ cs.all Char.isDigit = true := by
+        cases cs <;> simp_all
+      refine ⟨c, cs, rfl, h'.1, h'.2, fun e => absurd e hc, ?_⟩
+      unfold stripZeros; split
+      · rename_i heq; simp at heq; exact absurd heq.1 hc
+      · rfl
+
+theorem number_rest (N rest : List Char) (ps : List (List Char)) (hN : isNumeral N = true) (n : Char) (ns : List Char)
+    (e : N = n :: ns) (hd : ns.all Char.isDigit = true) :
+    demangleGo .number (ns ++ '_' :: rest) [n] 0 ps =
+      if rest = [] then ps ++ [N] else demangleGo .start rest.tail [] 0 (ps ++ [N]) := by
+  obtain ⟨_, _, _, _, _, _, hs⟩ := numeral_parts N hN
+  rw [number_digits _ _ _ _ _ hd, number_end, List.singleton_append, ← e, hs]
+
+theorem text_number (a p N rest : List Char) (J : Nat) (ps : List (List Char)) (hV : a ++ List.replicate J '_' = p)
+    (hN : isNumeral N = true) :
+    demangleGo .text ('_' :: (N ++ '_' :: rest)) a (2 * J) ps =
+      if rest = [] then ps ++ [p, N] else demangleGo .start rest.tail [] 0 (ps ++ [p, N]) := by
+  obtain ⟨n, ns, e, hn, hd, hz, -⟩ := numeral_parts N hN
+  have hne : ¬ (n = '0' ∧ (ns ++ '_' :: rest).head? = some '0') := by
+    rintro ⟨h0, h⟩; rw [hz h0] at h; simp at h
+  have hu : n ≠ '_' := by rintro rfl; simp at hn
+  rw [demangleGo.eq_6, if_pos rfl, e, List.cons_append, demangleGo.eq_6, if_neg hu, if_neg (by omega), if_pos hn,
+    if_neg hne, two_mul_add_one_div, hV, ← e, number_rest N rest _ hN n ns e hd]
+  simp
+
+theorem start_number (N rest x : List Char) (y : Nat) (ps : List (List Char)) (hN : isNumeral N = true) :
+    demangleGo .start (N ++ '_' :: rest) x y ps =
+      if rest = [] then ps ++ [N] else demangleGo .start rest.tail [] 0 (ps ++ [N]) := by
+  obtain ⟨n, ns, e, hn, hd, hz, -⟩ := numeral_parts N hN
+  have hne : ¬ (n = '0' ∧ (ns ++ '_' :: rest).head? = some '0') := by
+    rintro ⟨h0, h⟩; rw [hz h0] at h; simp at h
+  rw [e, List.cons_append, demangleGo.eq_2, if_pos hn, if_neg hne, ← e, number_rest N rest _ hN n ns e hd]
+
+theorem mangleParts_head (p : List Char) (qs : List (List Char)) :
+    mangleParts (some p) qs = [] ∨ (mangleParts (some p) qs).head? = some '_' := by
+  cases qs with
+  | nil => left; rfl
+  | cons q qs =>
+    right; simp only [mangleParts, manglePart]
+    split
+    · simp
+    · split <;> simp
+
+theorem state_value (q : List Char) : (state q).1 ++ List.replicate (state q).2 '_' = q := by
+  simpa using feed_value q [] 0
+
+theorem last_of_underscores (a p : List Char) (J : Nat) (hV : a ++ List.replicate J '_' = p) (hJ : J ≠ 0) :
+    p.getLast? = some '_' := by
+  subst hV; obtain ⟨J, rfl⟩ : ∃ J', J = J' + 1 := ⟨J - 1, by omega⟩
+  rw [List.replicate_succ', ← List.append_assoc]; simp
+
+theorem main (qs : List (List Char)) : ∀ (p : List Char) (ps : List (List Char)),
+    (isNumeral p = false → ∀ a J, a ++ List.replicate J '_' = p →
+      demangleGo .text (mangleParts (some p) qs) a (2 * J) ps = ps ++ p :: qs) ∧
+    (isNumeral p = true →
+      (if mangleParts (some p) qs = [] then ps ++ [p] else demangleGo .start (mangleParts (some p) qs).tail [] 0 (ps ++ [p]))
+        = ps ++ p :: qs) := by
+  induction qs with
+  | nil =>
+    intro p ps
+    refine ⟨fun _ a J hV => ?_, fun _ => ?_⟩
+    · simp only [mangleParts]; rw [demangleGo.eq_5, Nat.mul_div_cancel_left _ (by decide), hV]
+    · simp [mangleParts]
+  | cons q qs ih =>
+    intro p ps
+    have hr := mangleParts_head q qs
+    have ihq := ih q (ps ++ [p])
+    simp only [List.append_assoc, List.singleton_append] at ihq
+    constructor
+    · intro hp a J hV
+      simp only [mangleParts, manglePart]
+      by_cases hq : isNumeral q = true
+      · simp only [if_pos hq, List.cons_append, List.append_assoc, List.singleton_append]
+        rw [text_number a p q _ J ps hV hq]
+        have := ihq.2 hq
+        simpa [List.append_assoc] using this
+      · rw [if_neg hq]
+        rw [Bool.not_eq_true] at hq
+        by_cases hz : (p.getLast? == some '_' || ambiguous (escapeComponent q)) = true
+        · rw [if_pos hz, List.append_assoc]
+          simp only [List.cons_append, List.nil_append]
+          rw [sep_zero a p q _ J ps hV]
+          rw [ihq.1 hq _ _ (state_value q)]
+        · rw [if_neg hz, List.append_assoc]
+          simp only [Bool.or_eq_true, beq_iff_eq, not_or] at hz
+          have hJ : J = 0 := by
+            cases J with
+            | zero => rfl
+            | succ J => exact absurd (last_of_underscores a p _ hV (by omega)) hz.1
+          subst hJ
+          simp only [List.replicate_zero, List.append_nil] at hV; subst hV
+          simp only [List.cons_append, List.nil_append, Nat.mul_zero]
+          rw [sep_plain a q _ ps (by simpa using hz.2) hr, ihq.1 hq _ _ (state_value q)]
+    · intro hp
+      have hne : mangleParts (some p) (q :: qs) ≠ [] := by
+        simp only [mangleParts, manglePart]; split <;> (try split) <;> simp
+      rw [if_neg hne]
+      simp only [mangleParts, manglePart]
+      by_cases hq : isNumeral q = true
+      · rw [if_pos hq]
+        simp only [List.cons_append, List.tail_cons, List.append_assoc, List.singleton_append]
+        rw [start_number q _ _ _ _ hq]
+        have := ihq.2 hq; simpa [List.append_assoc] using this
+      · rw [if_neg hq]
+        rw [Bool.not_eq_true] at hq
+        have hlast : (p.getLast? == some '_') = false := by
+          obtain ⟨n, ns, e, -, hd, -, -⟩ := numeral_parts p hp
+          simp only [beq_eq_false_iff_ne, ne_eq]; intro h
+          have := List.mem_of_getLast? h; rw [e] at this
+          simp only [List.mem_cons] at this
+          rcases this with h1 | h1
+          · rw [e] at hp; subst h1; simp [isNumeral] at hp
+          · have := List.all_eq_true.mp hd _ h1; simp at this
+        rw [hlast, Bool.false_or]
+        by_cases ha : ambiguous (escapeComponent q) = true
+        · rw [if_pos ha]; simp only [List.cons_append, List.tail_cons, List.append_assoc, List.nil_append]
+          rw [start_zero, ihq.1 hq _ _ (state_value q)]
+        · rw [if_neg ha]; simp only [List.cons_append, List.tail_cons, List.nil_append]
+          rw [start_plain _ _ _ _ _ (by simpa using ha), ihq.1 hq _ _ (state_value q)]
+
+theorem demangle_mangle (ps : List (List Char)) (h : ps ≠ []) :
+    demangleGo .start (mangleParts none ps) [] 0 [] = ps := by
+  obtain ⟨p, qs, rfl⟩ : ∃ p qs, ps = p :: qs := by cases ps <;> simp_all
+  have hr := mangleParts_head p qs
+  have m := main qs p []
+  simp only [List.nil_append] at m
+  simp only [mangleParts, manglePart]
+  by_cases hp : isNumeral p = true
+  · rw [if_pos hp, List.append_assoc, List.singleton_append, start_number p _ _ _ _ hp]
+    simpa using m.2 hp
+  · rw [if_neg hp]
+    rw [Bool.not_eq_true] at hp
+    by_cases ha : ambiguous (escapeComponent p) = true
+    · rw [if_pos ha]; simp only [List.cons_append, List.nil_append, List.append_assoc]
+      rw [start_zero, m.1 hp _ _ (state_value p)]
+    · rw [if_neg ha, List.nil_append]
+      rw [start_plain _ _ _ _ _ (by simpa using ha), m.1 hp _ _ (state_value p)]
+
+
+theorem mangleChar_chars (c : Char) : ∀ x ∈ mangleChar c, x.isAlphanum = true ∨ x = '_' := by
+  intro x hx
+  unfold mangleChar at hx
+  have hex : ∀ k v, ∀ x ∈ hexDigits k v, x.isAlphanum = true ∨ x = '_' := fun k v x hx => by
+    obtain ⟨d, hd, rfl⟩ := hexDigits_mem k v x hx; exact .inl (hexChar_alnum d hd)
+  split at hx
+  · simp at hx; subst hx; left; assumption
+  · split at hx
+    · simp at hx; right; exact hx
+    · split at hx
+      · simp only [List.mem_cons] at hx; rcases hx with rfl | rfl | hx
+        · right; rfl
+        · left; decide
+        · exact hex _ _ x hx
+      · split at hx
+        · simp only [List.mem_cons] at hx; rcases hx with rfl | rfl | hx
+          · right; rfl
+          · left; decide
+          · exact hex _ _ x hx
+        · simp only [List.mem_cons] at hx; rcases hx with rfl | rfl | hx
+          · right; rfl
+          · left; decide
+          · exact hex _ _ x hx
+
+theorem mangleParts_chars (prev : Option (List Char)) (ps : List (List Char)) :
+    ∀ x ∈ mangleParts prev ps, x.isAlphanum = true ∨ x = '_' := by
+  induction ps generalizing prev with
+  | nil => simp [mangleParts]
+  | cons p ps ih =>
+    intro x hx
+    simp only [mangleParts, List.mem_append] at hx
+    rcases hx with hx | hx
+    · have hesc : ∀ x ∈ escapeComponent p, x.isAlphanum = true ∨ x = '_' := by
+        intro x hx; simp only [escapeComponent, List.mem_flatMap] at hx
+        obtain ⟨c, -, hc⟩ := hx; exact mangleChar_chars c x hc
+      have hnum : isNumeral p = true → ∀ x ∈ p, x.isAlphanum = true := by
+        intro hp x hx
+        obtain ⟨n, ns, rfl, hn, hd, -, -⟩ := numeral_parts p hp
+        simp only [List.mem_cons] at hx
+        have hdig : x.isDigit = true := by
+          rcases hx with rfl | hx
+          · exact hn
+          · exact List.all_eq_true.mp hd x hx
+        simp [Char.isAlphanum, hdig]
+      unfold manglePart at hx
+      split at hx
+      · rename_i hp
+        have : x ∈ p ∨ x = '_' := by
+          by_cases hxp : x ∈ p
+          · exact .inl hxp
+          · right; cases prev <;> simp_all
+        rcases this with h | h
+        · exact .inl (hnum hp x h)
+        · exact .inr h
+      · cases prev <;> simp only at hx <;> rw [List.mem_append] at hx <;> rcases hx with hx | hx
+        · split at hx <;> simp at hx; subst hx; left; decide
+        · exact hesc x hx
+        · split at hx <;> simp at hx <;> rcases hx with rfl | rfl <;> first | (right; rfl) | (left; decide)
+        · exact hesc x hx
+    · exact ih _ x hx
+
+theorem mangleParts_ne_nil (p : List Char) (ps : List (List Char)) : mangleParts none (p :: ps) ≠ [] := by
+  simp only [mangleParts, manglePart, ne_eq, List.append_eq_nil_iff, not_and]
+  intro h; exfalso
+  split at h
+  · simp at h
+  · by_cases ha : ambiguous (escapeComponent p) = true
+    · rw [if_pos ha] at h; simp at h
+    · rw [if_neg ha, List.nil_append] at h
+      rw [h] at ha; exact ha (by simp [ambiguous])
+
+/-- The mangled name of a dotted name, read back. -/
+theorem demangleName_mangleName (n : String) : demangleNameModel (mangleNameModel n) = n := by
+  rw [demangleNameModel, mangleNameModel, String.toList_ofList, demangle_mangle _ (List.splitOn_ne_nil _ _),
+    List.intercalate_splitOn, String.ofList_toList]
+
+theorem mangleName_chars (n : String) : ∀ x ∈ (mangleNameModel n).toList, x.isAlphanum = true ∨ x = '_' := by
+  rw [mangleNameModel, String.toList_ofList]; exact mangleParts_chars _ _
+
+theorem mangleName_ne_nil (n : String) : (mangleNameModel n).toList ≠ [] := by
+  rw [mangleNameModel, String.toList_ofList]
+  obtain ⟨p, qs, h⟩ : ∃ p qs, n.toList.splitOn '.' = p :: qs := by
+    cases h : n.toList.splitOn '.' with
+    | nil => exact absurd h (List.splitOn_ne_nil _ _)
+    | cons p qs => exact ⟨p, qs, rfl⟩
+  rw [h]; exact mangleParts_ne_nil p qs
+
+theorem stem_of_mangled (n : String) :
+    (if (mangleNameModel n).toList ≠ [] ∧ (mangleNameModel n).toList.all regexDot then some (mangleNameModel n).toList else none)
+      = some (mangleNameModel n).toList := by
+  have hall : (mangleNameModel n).toList.all regexDot = true := by
+    rw [List.all_eq_true]; intro x hx
+    rcases mangleName_chars n x hx with h | rfl
+    · have : x ≠ '\n' ∧ x ≠ '\r' ∧ x ≠ '\u2028' ∧ x ≠ '\u2029' := by
+        refine ⟨?_, ?_, ?_, ?_⟩ <;> rintro rfl <;> simp_all <;> contradiction
+      simp [regexDot, this]
+    · decide
+  rw [if_pos ⟨mangleName_ne_nil n, hall⟩]
+
+theorem initializerModule_mangleName (n : String) :
+    initializerModuleModel ("initialize_" ++ mangleNameModel n) = some n ∧
+    initializerModuleModel ("runtime_initialize_" ++ mangleNameModel n) = some n := by
+  have hp : "initialize_".toList = ['i','n','i','t','i','a','l','i','z','e','_'] := by decide
+  have hr : "runtime_initialize_".toList = ['r','u','n','t','i','m','e','_','i','n','i','t','i','a','l','i','z','e','_'] := by decide
+  have back : (if (mangleNameModel (demangleNameModel (String.ofList (mangleNameModel n).toList))).toList = (mangleNameModel n).toList
+      then some (demangleNameModel (String.ofList (mangleNameModel n).toList)) else none) = some n := by
+    rw [String.ofList_toList, demangleName_mangleName, if_pos rfl]
+  have h1 : "runtime_initialize_".toList.isPrefixOf ("initialize_".toList ++ (mangleNameModel n).toList) = false := by
+    rw [hp, hr]; rfl
+  have h2 : ∀ (l m : List Char), l.isPrefixOf (l ++ m) = true := fun l m =>
+    List.isPrefixOf_iff_prefix.mpr (List.prefix_append _ _)
+  have h3 : ("initialize_".toList ++ (mangleNameModel n).toList).drop 11 = (mangleNameModel n).toList := by
+    rw [hp]; rfl
+  have h4 : ("runtime_initialize_".toList ++ (mangleNameModel n).toList).drop 19 = (mangleNameModel n).toList := by
+    rw [hr]; rfl
+  have hs := stem_of_mangled n
+  constructor
+  · simp only [initializerModuleModel, initializerStem, String.toList_append, h1, h2, h3, hs, Bool.false_eq_true,
+      if_false, if_true]
+    exact back
+  · simp only [initializerModuleModel, initializerStem, String.toList_append, h2, h4, hs, if_true, Option.some_or]
+    exact back
+
+end MangleProofs
+
+theorem mangle_round_trip : Spec.mangle_round_trip := by
+  intro n
+  have hi := MangleProofs.initializerModule_mangleName n
+  refine ⟨MangleProofs.demangleName_mangleName n, hi.1, hi.2, ?_, ?_⟩
+  · intro h; exact MangleProofs.mangleName_ne_nil n (by simp [mangleName] at h; simp [h])
+  · rw [String.all_bool_eq, List.all_eq_true]; intro c hc
+    rcases MangleProofs.mangleName_chars n c hc with h | h <;> simp [h]
 
 /-! ## Function packages -/
 
