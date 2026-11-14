@@ -2,12 +2,14 @@
 // (docs/proposals/M6_GLUE.md), compiled by Lasm into one WASI command,
 // lasm-glue.wasm (verification/cli/Lasm/Cli/Glue.lean, built by
 // .github/workflows/glue.yml). The request is the program's stdin, a list of
-// fields each written `<length>:<UTF-8 bytes>`; its stdout is `ok:` and the
-// result or `error:` and a message. The WASI host below is the least the
-// program needs: reading stdin, writing stdout and stderr, a clock that always
-// reads 0 (Lean's runtime reads one as it starts) and exiting; every other
-// call (files, arguments, environment, random bytes) fails with ENOSYS. It
-// uses only WebAssembly and Buffer, so it runs under Node, Bun and Deno,
+// UTF-8 fields: a 0 byte, their count, a 0 byte and the fields separated by 0
+// bytes, or, when a field contains a 0 byte, each field written
+// `<length>:<UTF-8 bytes>`. Its stdout is `ok:` and the result or `error:`
+// and a message. The WASI host below is the least the program needs: reading
+// stdin, writing stdout and stderr, a clock that always reads 0 (Lean's
+// runtime reads one as it starts) and exiting; every other call (files,
+// arguments, environment, random bytes) fails with ENOSYS. It uses only
+// WebAssembly, Buffer and TextEncoder, so it runs under Node, Bun and Deno,
 // synchronously.
 import { Buffer } from 'node:buffer';
 import { readFileSync } from 'node:fs';
@@ -16,11 +18,30 @@ let compiled;
 /** The glue module, compiled once per process, at its first use. */
 export const glueModule = () => compiled ??= new WebAssembly.Module(readFileSync(new URL('./lasm-glue.wasm', import.meta.url)));
 
-/** Fields as the glue program reads them. */
+/** Fields written `<length>:<UTF-8 bytes>`, the program's second way to read them. */
 export function encodeFields(fields) {
   let text = '';
   for (const field of fields) text += `${Buffer.byteLength(field)}:${field}`;
   return Buffer.from(text);
+}
+
+let scratch = new Uint8Array(1 << 16);
+const encoder = new TextEncoder();
+/** A request as the glue program reads it, from lists of fields (in order;
+ * joining whole lists is what makes it cheap): a 0 byte, the number of fields,
+ * a 0 byte and the fields separated by 0 bytes; when a field contains a 0 byte
+ * (its separators are then too many), `encodeFields` of them all. The bytes
+ * are valid until the next request. */
+export function encodeRequest(lists) {
+  let count = 0;
+  const parts = [];
+  for (const list of lists) if (list.length) { count += list.length; parts.push(list.join('\0')); }
+  const text = `\0${count}\0${parts.join('\0')}`;
+  let separators = 0;
+  for (let i = text.indexOf('\0'); i !== -1; i = text.indexOf('\0', i + 1)) separators++;
+  if (separators !== count + 1) return encodeFields(lists.flat());
+  if (scratch.length < text.length * 3) scratch = new Uint8Array(text.length * 3);
+  return scratch.subarray(0, encoder.encodeInto(text, scratch).written);
 }
 
 /** The fields of a result, as the glue program writes them. */
@@ -39,9 +60,11 @@ export function decodeFields(text) {
 const SUCCESS = 0, BADF = 8, NOSYS = 52;
 class Exit { constructor(code) { this.code = code; } }
 
-/** Runs one operation: `{ ok }` with the result, or `{ error }` with the program's message. */
-export function runGlue(fields, module = glueModule()) {
-  const input = encodeFields(fields);
+/** Runs one operation, its fields in one list: `{ ok }` with the result, or `{ error }` with the program's message. */
+export const runGlue = (fields, module = glueModule()) => runRequest(encodeRequest([fields]), module);
+
+/** Runs one encoded request (`encodeRequest`). */
+export function runRequest(input, module = glueModule()) {
   let offset = 0, memory;
   const out = [], err = [];
   const view = () => new DataView(memory.buffer);

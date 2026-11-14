@@ -24,28 +24,99 @@ def word (s : List Char) : Bool := !s.isEmpty && s.all fun c => c.isAlphanum || 
 /-- `initialize_` and a word. -/
 def initializerRest (s : List Char) : Bool := "initialize_".toList.isPrefixOf s && word (s.drop 11)
 
-/-- `Lasm.Cli.validInitializer`, reading the name's characters once and
-testing prefixes without copying them. -/
-def validInitializer (n : String) : Bool :=
-  let l := n.toList
+/-- `Lasm.Cli.validInitializer` over the name's characters, testing prefixes
+without copying them (the step between the model and `validInitializer`). -/
+def validInitializerList (l : List Char) : Bool :=
   initializerRest l || ("runtime_".toList.isPrefixOf l && initializerRest (l.drop 8)) ||
     ("meta_".toList.isPrefixOf l && initializerRest (l.drop 5))
+
+/-- A character of an initializer name. -/
+def wordChar (c : Char) : Bool := c.isAlphanum || c = '_'
+
+/-- `Lasm.Cli.validInitializer`, reading the string in place: every character a
+word character, and one of the three prefixes followed by at least one more
+(no list of characters is built). -/
+def validInitializer (n : String) : Bool :=
+  n.all wordChar && ((n.startsWith "initialize_" && decide (11 < n.length)) ||
+    (n.startsWith "runtime_initialize_" && decide (19 < n.length)) ||
+    (n.startsWith "meta_initialize_" && decide (16 < n.length)))
 
 theorem take_beq (p l : List Char) : (l.take p.length == p) = p.isPrefixOf l := by
   apply Bool.eq_iff_iff.mpr
   rw [beq_iff_eq, List.isPrefixOf_iff_prefix, List.prefix_iff_eq_take]
   exact ⟨Eq.symm, Eq.symm⟩
 
-@[csimp] theorem validInitializer_eq : @Lasm.Cli.validInitializer = @validInitializer := by
+theorem model_eq_list : @Lasm.Cli.validInitializer = fun n => validInitializerList n.toList := by
   funext n
   have r : ∀ s : List Char, (match s.splitAt 11 with
       | (p, w) => p == "initialize_".toList && (!w.isEmpty && w.all fun c => c.isAlphanum || c = '_')) = initializerRest s := by
     intro s
     rw [List.splitAt_eq]
     exact congrArg (· && _) (take_beq "initialize_".toList s)
-  simp only [Lasm.Cli.validInitializer, validInitializer, r]
+  simp only [Lasm.Cli.validInitializer, validInitializerList, r]
   rw [show (8 : Nat) = "runtime_".toList.length from rfl, show (5 : Nat) = "meta_".toList.length from rfl,
     take_beq, take_beq]
+
+/-- A prefix of word characters, then a word: all word characters, the prefix, and more. -/
+theorem prefix_word (p l : List Char) (hp : p.all wordChar = true) :
+    (p.isPrefixOf l && word (l.drop p.length)) = (l.all wordChar && (p.isPrefixOf l && decide (p.length < l.length))) := by
+  by_cases h : p <+: l
+  · obtain ⟨t, rfl⟩ := h
+    have hp' : p.isPrefixOf (p ++ t) = true := List.isPrefixOf_iff_prefix.mpr (List.prefix_append p t)
+    simp only [hp', List.drop_left, List.all_append, hp, word, Bool.true_and, List.length_append]
+    cases t with
+    | nil => simp
+    | cons c t => simp; rfl
+  · have : p.isPrefixOf l = false := by
+      rw [Bool.eq_false_iff]; exact fun h' => h (List.isPrefixOf_iff_prefix.mp h')
+    simp [this]
+
+/-- Two prefixes, one after the other, are their concatenation. -/
+theorem prefix_prefix (p q l : List Char) :
+    (p.isPrefixOf l && q.isPrefixOf (l.drop p.length)) = (p ++ q).isPrefixOf l := by
+  by_cases h : p <+: l
+  · obtain ⟨t, rfl⟩ := h
+    have hp' : p.isPrefixOf (p ++ t) = true := List.isPrefixOf_iff_prefix.mpr (List.prefix_append p t)
+    apply Bool.eq_iff_iff.mpr
+    simp [hp', List.isPrefixOf_iff_prefix, List.prefix_append_right_inj]
+  · have : p.isPrefixOf l = false := by
+      rw [Bool.eq_false_iff]; exact fun h' => h (List.isPrefixOf_iff_prefix.mp h')
+    have : (p ++ q).isPrefixOf l = false := by
+      rw [Bool.eq_false_iff]
+      exact fun h' => h ((List.prefix_append p q).trans (List.isPrefixOf_iff_prefix.mp h'))
+    simp [*]
+
+theorem list_eq_string (n : String) : validInitializerList n.toList = validInitializer n := by
+  have hi : "initialize_".toList.all wordChar = true := by decide
+  have hr : ("runtime_".toList ++ "initialize_".toList).all wordChar = true := by decide
+  have hm : ("meta_".toList ++ "initialize_".toList).all wordChar = true := by decide
+  have rest : ∀ l : List Char, initializerRest l = (l.all wordChar && ("initialize_".toList.isPrefixOf l &&
+      decide ("initialize_".toList.length < l.length))) := fun l => prefix_word _ l hi
+  have nested : ∀ (p : List Char) (l : List Char),
+      (p.isPrefixOf l && initializerRest (l.drop p.length)) =
+        ((p ++ "initialize_".toList).isPrefixOf l && word (l.drop (p ++ "initialize_".toList).length)) := by
+    intro p l
+    simp only [initializerRest, ← Bool.and_assoc, prefix_prefix, List.length_append, List.drop_drop]
+    rw [show "initialize_".toList.length = 11 from rfl, Nat.add_comm]
+  have hrl : ("runtime_".toList ++ "initialize_".toList) = "runtime_initialize_".toList := by decide
+  have hml : ("meta_".toList ++ "initialize_".toList) = "meta_initialize_".toList := by decide
+  simp only [validInitializerList, validInitializer]
+  rw [show (8 : Nat) = "runtime_".toList.length from rfl, show (5 : Nat) = "meta_".toList.length from rfl,
+    nested, nested, prefix_word _ _ hr, prefix_word _ _ hm, rest, hrl, hml]
+  simp only [String.all_bool_eq, String.length_toList.symm]
+  have sw : ∀ p : String, n.startsWith p = p.toList.isPrefixOf n.toList := by
+    intro p
+    apply Bool.eq_iff_iff.mpr
+    rw [String.startsWith_string_iff, List.isPrefixOf_iff_prefix]
+  simp only [sw]
+  rw [show "initialize_".toList.length = 11 from rfl, show "runtime_initialize_".toList.length = 19 from rfl,
+    show "meta_initialize_".toList.length = 16 from rfl]
+  cases n.toList.all wordChar <;> simp
+
+@[csimp] theorem validInitializer_eq : @Lasm.Cli.validInitializer = @validInitializer := by
+  rw [model_eq_list]
+  funext n
+  exact list_eq_string n
 
 /-- The schedule of `name` over prepared tables. -/
 def scheduleWith (m : Std.HashMap String (List String)) (ks : Std.HashSet String) (fuel : Nat) (name : String) : List String :=
