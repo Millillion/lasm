@@ -36,7 +36,7 @@ const run = (file, argv, options = {}) => execFileSync(file, argv, { stdio: ['ig
 if (!prefix) {
   const { provisionLean } = await import('../../../src/managed-lean.mjs');
   writeFileSync(join(work, 'Main.lean'), 'def main : IO Unit := pure ()\n');
-  writeFileSync(join(work, 'lean-toolchain'), 'leanprover/lean4:v4.35.0\n');
+  writeFileSync(join(work, 'lean-toolchain'), 'leanprover/lean4:v4.36.0-rc2\n');
   const lean = await provisionLean(join(work, 'Main.lean'), { native: true, progress: ({ stage }) => stage && console.error(`[lean] ${stage}`) });
   prefix = lean.prefix;
 }

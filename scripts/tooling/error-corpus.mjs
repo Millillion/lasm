@@ -28,7 +28,7 @@ async function occupyPort() {
 
 const main = 'def main : IO Unit := IO.println "hello"\n';
 const lakefile = 'name = "app"\nversion = "0.1.0"\ndefaultTargets = ["app"]\n\n[[lean_exe]]\nname = "app"\nroot = "Main"\n';
-const project = (files = {}) => ({ 'Main.lean': main, 'lakefile.toml': lakefile, 'lean-toolchain': 'leanprover/lean4:v4.35.0\n', ...files });
+const project = (files = {}) => ({ 'Main.lean': main, 'lakefile.toml': lakefile, 'lean-toolchain': 'leanprover/lean4:v4.36.0-rc2\n', ...files });
 const posixUser = process.platform !== 'win32' && process.getuid?.() !== 0;
 
 /** kind: parse (no toolchain), build (a failing build), network (a failing download). */
@@ -126,7 +126,7 @@ export const cases = [
   { id: 'no-main', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': 'def answer : Nat := 42\n' }, expect: /Main\.lean has no `main` function/, fixedIn: '0.4.0' },
   { id: 'run-uncaught-exception', kind: 'build', args: ['Main.lean'], files: { 'Main.lean': 'def main : IO Unit := throw <| IO.userError "boom"\n' }, expect: /uncaught exception: boom/ },
   { id: 'bad-lakefile-toml', kind: 'build', args: ['build', 'Main.lean'], files: project({ 'lakefile.toml': 'name = "app"\n[[lean_exe\n' }), expect: /lakefile\.toml:2:\d+/ },
-  { id: 'bad-lakefile-lean', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': main, 'lean-toolchain': 'leanprover/lean4:v4.35.0\n', 'lakefile.lean': 'import Lake\nopen Lake DSL\npackage app\n@[default_target] lean_exe app where\n  root := `Main\n  bogus\n' }, expect: /lakefile\.lean:\d+:\d+: error/ },
+  { id: 'bad-lakefile-lean', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': main, 'lean-toolchain': 'leanprover/lean4:v4.36.0-rc2\n', 'lakefile.lean': 'import Lake\nopen Lake DSL\npackage app\n@[default_target] lean_exe app where\n  root := `Main\n  bogus\n' }, expect: /lakefile\.lean:\d+:\d+: error/ },
   { id: 'lake-missing-path-dependency', kind: 'build', args: ['build', 'Main.lean'], files: project({ 'lakefile.toml': lakefile + '\n[[require]]\nname = "helper"\npath = "../no-such-helper"\n' }), expect: /no-such-helper|helper/ },
   { id: 'unsupported-toolchain', kind: 'build', args: ['build', 'Main.lean'], files: project({ 'lean-toolchain': 'leanprover/lean4:v4.20.0\n' }), expect: /Unsupported Lean toolchain "leanprover\/lean4:v4\.20\.0".*Lasm supports Lean v4\.35\.0/ },
   { id: 'garbage-toolchain', kind: 'build', args: ['build', 'Main.lean'], files: project({ 'lean-toolchain': 'not a toolchain\n' }), expect: /lean-toolchain/ },

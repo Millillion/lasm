@@ -50,7 +50,7 @@ jobs:
   # has refused x64 runners' addresses for hours: run 40136616607). A cache hit
   # does nothing; consumers fall back to pulling their own architecture.
   images:
-    if: inputs.docker && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    if: inputs.docker && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/lean-') || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 120
     steps:
@@ -76,7 +76,7 @@ jobs:
           key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
   templates:
     needs: images
-    if: always() && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    if: always() && github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/lean-') || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     strategy:
       fail-fast: false
       matrix:

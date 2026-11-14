@@ -22,7 +22,7 @@ test('the glue, its link flags and the outputs of every module relative to a pre
   assert.equal(fetchGlueSource, join(library, 'c', 'lasm_fetch.c'));
   assert.ok(existsSync(glueSource) && existsSync(fetchGlueSource));
   assert.deepEqual(glueLinkFlags, ['-Wl,--wrap=lean_task_get', '-Wl,--wrap=lean_io_wait_any_core', '-Wl,--wrap=emscripten_futex_wait']);
-  assert.deepEqual(libraryLeanVersions, ['4.35.0']);
+  assert.deepEqual(libraryLeanVersions, ['4.36.0-rc2']);
   const outputs = libraryOutputs();
   assert.equal(outputs.length, 3 * libraryModules.length);
   assert.deepEqual(outputs.slice(0, 3), ['lib/lean/Lasm/JS/Core.olean', 'lib/lasm/c/Lasm/JS/Core.c', 'src/lean/Lasm/JS/Core.lean']);
@@ -39,7 +39,7 @@ test('the library identity is a digest of the module list and every module sourc
 });
 
 test('the shipped compilation is used only for its Lean release and commit', () => {
-  const commit = toolchainCatalog.lean['4.35.0'].commit;
+  const commit = toolchainCatalog.lean['4.36.0-rc2'].commit;
   const prebuilt = prebuiltLibrary('4.35.0', commit);
   assert.equal(prebuilt.directory, join(library, 'prebuilt', 'lean-4.35.0'));
   assert.deepEqual(Object.keys(prebuilt.files).sort(), [...libraryOutputs()].sort());
@@ -49,12 +49,12 @@ test('the shipped compilation is used only for its Lean release and commit', () 
 
 test('a supported prefix with Lean\'s elaborator gets the shipped compilation copied in', t => {
   const tree = scratch(t);
-  assert.equal(compileLibrary(tree, '4.35.0', { commit: toolchainCatalog.lean['4.35.0'].commit }), false, 'no elaborator libraries');
+  assert.equal(compileLibrary(tree, '4.35.0', { commit: toolchainCatalog.lean['4.36.0-rc2'].commit }), false, 'no elaborator libraries');
   mkdirSync(join(tree, 'lib/lean/Lean/Elab/Deriving'), { recursive: true });
-  assert.equal(compileLibrary(tree, '4.35.0', { commit: toolchainCatalog.lean['4.35.0'].commit }), false, 'the deriving handlers\' module data is missing');
+  assert.equal(compileLibrary(tree, '4.35.0', { commit: toolchainCatalog.lean['4.36.0-rc2'].commit }), false, 'the deriving handlers\' module data is missing');
   put(join(tree, 'lib/lean/Lean/Elab/Deriving/Basic.olean'), '');
   assert.equal(compileLibrary(tree, '4.34.1', { commit: 'x' }), false, 'an unsupported release');
-  assert.equal(compileLibrary(tree, '4.35.0', { commit: toolchainCatalog.lean['4.35.0'].commit }), true);
+  assert.equal(compileLibrary(tree, '4.35.0', { commit: toolchainCatalog.lean['4.36.0-rc2'].commit }), true);
   for (const name of libraryOutputs())
     assert.deepEqual(readFileSync(join(tree, ...name.split('/'))), readFileSync(join(library, 'prebuilt/lean-4.35.0', ...name.split('/'))), name);
 });

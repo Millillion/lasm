@@ -28,7 +28,7 @@ import { fileURLToPath } from 'node:url';
 import { runLasm, baseEnvironment, temporaryDirectory, writeTree, removeTree, treeHashes, treeTimes, treeDifferences, options, summary, tail } from './lib.mjs';
 
 const fixture = {
-  'lean-toolchain': 'leanprover/lean4:v4.35.0\n',
+  'lean-toolchain': 'leanprover/lean4:v4.36.0-rc2\n',
   'lakefile.toml': 'name = "app"\nversion = "0.1.0"\ndefaultTargets = ["app"]\n\n[[lean_lib]]\nname = "App"\n\n[[lean_exe]]\nname = "app"\nroot = "Main"\n',
   'App.lean': 'import App.Greeting\n',
   'App/Greeting.lean': 'def greeting (name : String) : String := s!"Hello, {name}!"\n\ndef unusedHelper (n : Nat) : Nat := n * 3 + 1\n',

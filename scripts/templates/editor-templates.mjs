@@ -26,7 +26,7 @@ const depLakefile = precompile => `name = "dep"\n${precompile ? 'precompileModul
 /** A Lake project whose dependency has C code: precompiled modules (as UnicodeBasic). */
 function writeCPackage(app) {
   mkdirSync(join(app, 'dep'), { recursive: true });
-  for (const directory of [app, join(app, 'dep')]) writeFileSync(join(directory, 'lean-toolchain'), 'leanprover/lean4:v4.35.0\n');
+  for (const directory of [app, join(app, 'dep')]) writeFileSync(join(directory, 'lean-toolchain'), 'leanprover/lean4:v4.36.0-rc2\n');
   writeFileSync(join(app, 'lakefile.toml'), 'name = "app"\n\n[[require]]\nname = "dep"\npath = "dep"\n\n[[lean_lib]]\nname = "App"\n');
   writeFileSync(join(app, 'App.lean'), 'import Dep\n\ndef hello : String := Dep.greeting\n');
   writeFileSync(join(app, 'dep', 'lakefile.toml'), depLakefile(true));
