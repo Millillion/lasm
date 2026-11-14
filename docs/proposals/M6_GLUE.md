@@ -260,7 +260,22 @@ sections, the shipped template with cores of 0 to 200,000 bytes): no
 difference. Natively, `componentize` of a 30 MB core takes about 40 ms,
 the process and the pipe included; the JavaScript takes 10 ms.
 
-COMPONENT_RESULTS
+Measured in CI (`glue` run 43613955978, Node 26.13.0, ubuntu-24.04;
+`componentize` on synthetic core modules with the shipped template, against
+the module's JavaScript as it was on main at 69d3d4c5):
+
+| Core module (bytes) | Cold, glue | Cold, JavaScript | Warm, glue | Warm, JavaScript |
+| --- | ---: | ---: | ---: | ---: |
+| 300,000 | 23.8 ms | 5.8 ms | 3.0 ms | 0.3 ms |
+| 3,000,000 | 42.9 ms | 8.5 ms | 11.7 ms | 2.5 ms |
+| 30,000,000 | 151.3 ms | 31.7 ms | 108.0 ms | 16.9 ms |
+
+Within the bar at 3 MB (+34 ms cold, +9 ms warm) and linear in the size;
+once per wasi-http build. Start-up unchanged (`lasm --version` 50.7 ms on
+both); `lasm-glue.wasm` grows by 32,559 bytes (8,126 gzipped) to 680,533
+(171,514 gzipped), within the 300 KiB bar. Most of a large call is copying:
+the core module into the program's memory, the component out of it, and
+the appends that build it.
 
 ### What next (M6)
 
