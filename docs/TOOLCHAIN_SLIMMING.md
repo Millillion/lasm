@@ -180,7 +180,7 @@ bytes are unchanged. The
 with peaks of Init/Std 3.89 GiB, Lean 0.91, all libraries 0.90, bundle 2.21 and
 smoke 1.00 GiB. It retained draft release `node-runtime-inputs-38960639129`
 (`node-runtime-inputs.tgz`, SHA-256 `0b6ccf3a…2b95`; runtime manifest
-`7482333e…80d3`). [Evidence](evidence/node-linux-ci-runtime-4.35.0-2026-10-16.json).
+`7482333e…80d3`). [Evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-linux-ci-runtime-4.35.0-2026-10-16.json).
 
 ## Phases
 
