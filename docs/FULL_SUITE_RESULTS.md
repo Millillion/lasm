@@ -19,7 +19,7 @@ with one passing, unskipped JUnit result. No earlier or other-profile passes wer
 imported. All 854 previously unpassed names were prioritized only to change the
 execution order. There are **zero failures, resource aborts, harness failures,
 and pending registrations**. See
-[the complete Node result and final audit](evidence/node-broad-v147-temporary-files-checkpoint3896-2026-09-23.json).
+[the complete Node result and final audit](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v147-temporary-files-checkpoint3896-2026-09-23.json).
 
 | Group | Passed |
 | --- | ---: |
@@ -44,7 +44,7 @@ The maintained `audit-campaign.py` independently confirms all 3,896 final passin
 attempts and repeats the live source, symlink, harness and frozen-runtime checks.
 Its 19 evidence-only controls reject inconsistent results, skipped JUnit cases,
 incomplete selections and unsafe resource records. The read-only Node audit
-uses 57.8 MiB peak RSS; see [the audit validation](evidence/campaign-audit-2026-09-23.json)
+uses 57.8 MiB peak RSS; see [the audit validation](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/campaign-audit-2026-09-23.json)
 and [the reproducible command](../scripts/full-lean/README.md).
 
 Each test ran alone with base pages, one CTest job, one build/Binaryen worker and
@@ -73,10 +73,10 @@ not imported into this frozen v147 result. Native other-OS/ARM64 validation,
 untested API gaps and packaged full-runtime integration remain open.
 
 Earlier checkpoints, including the
-[854-test snapshot](evidence/node-broad-v147-temporary-files-checkpoint854-2026-09-23.json),
+[854-test snapshot](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v147-temporary-files-checkpoint854-2026-09-23.json),
 remain preserved separately. Both original server-driver controls also passed
 before this campaign, peaking at 7.59 GiB without resource events; see
-[the v147 server controls](evidence/server-project-v147-temporary-files-2026-09-22.json).
+[the v147 server controls](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/server-project-v147-temporary-files-2026-09-22.json).
 
 The separate v151 repair makes POSIX home/temporary-directory queries preserve
 empty values, environment precedence, raw bytes and Lean's buffer-limit errors.
@@ -94,7 +94,7 @@ plus the parent test passes in released Node. The existing
 packaged temporary-file/path and system checks also pass. These results do not
 turn the stack failure into a pass, and the issue is not classified
 as fundamental. See
-[the directory-query evidence and retained attempts](evidence/system-directories-2026-09-23.json)
+[the directory-query evidence and retained attempts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/system-directories-2026-09-23.json)
 and [the parallel-probe explanations](../test/fixtures/system-directories/README.md).
 
 The separate v150 host repair retains raw POSIX temporary-directory bytes through
@@ -110,7 +110,7 @@ check for a known native crash. The largest validation peak is
 returned FilePath itself is lossy for malformed bytes; the repair preserves that
 behavior while creating the object in the correct raw directory. Native
 cross-platform and near-limit relative-path validation remain open. See
-[the raw temporary-path evidence](evidence/temporary-path-bytes-2026-09-23.json).
+[the raw temporary-path evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/temporary-path-bytes-2026-09-23.json).
 
 The separate v149 host repair preserves POSIX environment bytes for `IO.getEnv`,
 UV environment queries and inherited child processes. The same eight ordinary
@@ -127,7 +127,7 @@ or monitoring event.
 These results remain separate from the frozen v147 broad campaign below.
 Unusual environment names, concurrent native mutation
 and native cross-platform validation remain open. See
-[the environment-byte comparison and retained attempts](evidence/environment-bytes-2026-09-23.json).
+[the environment-byte comparison and retained attempts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/environment-bytes-2026-09-23.json).
 
 The v147 host repair preserves temporary-path spelling and symlink traversal,
 uses POSIX atomic creation with the upstream filename template, and matches
@@ -149,7 +149,7 @@ precompiled linking, with no failures or
 resource aborts and all original and harness hashes intact. This is a checkpoint, not a
 completed suite. Each test uses its own guard, base pages, one CTest job and
 one build worker. See
-[the 23-test v146 checkpoint](evidence/node-broad-v146-lean-symbol-loader-checkpoint23-2026-09-22.json).
+[the 23-test v146 checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v146-lean-symbol-loader-checkpoint23-2026-09-22.json).
 
 The registration count comprises 3,891 upstream CTest tests and five opt-in
 tests that upstream explicitly excludes as flaky. Seven additional benchmark
@@ -169,7 +169,7 @@ counters; hardware counts are omitted. These benchmark checks do not add passes
 to the broad 3,896-test campaign. The initial diagnostic with an expected-output
 test driver remains recorded: a benchmark printed output but had no expected
 file. See [the complete benchmark comparison](evidence/benchmark-inputs-all-engines-2026-09-22.json),
-[the initial native control](evidence/benchmark-inputs-native-2026-09-22.json)
+[the initial native control](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/benchmark-inputs-native-2026-09-22.json)
 and [the source inventory](evidence/upstream-benchmark-only-inventory-2026-09-22.json).
 
 Source integrity checks now also verify the six symlink targets from the
@@ -201,7 +201,7 @@ using both native and lowered Memory64.
 
 The combined validation completed all native and Node tests. The compiler
 relink itself peaked at 3.05 GiB; all 7,267 original source hashes remain
-intact. See [the Node repair](evidence/lean-plugin-symbols-node-2026-09-22.json).
+intact. See [the Node repair](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-plugin-symbols-node-2026-09-22.json).
 These targeted groups do not complete any JavaScript engine's entire upstream suite.
 
 The v145 broad Node run is paused at **1,390 passes, three conformance failures,
@@ -216,8 +216,8 @@ the guard stopped it before the 10 GiB kernel limit. Several compiler processes
 were resident together. There were no recorded OOM, hard-limit, throttling,
 swap, or monitor failures. This is a resource abort, not a conformance result.
 All 7,267 original source hashes and ten harness/driver hashes remain intact.
-See [the preserved 1,394-attempt checkpoint](evidence/node-broad-v145-runtime-metadata-checkpoint1394-2026-09-22.json)
-and [the initial 21-test checkpoint](evidence/node-broad-v145-runtime-metadata-checkpoint21-2026-09-22.json).
+See [the preserved 1,394-attempt checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v145-runtime-metadata-checkpoint1394-2026-09-22.json)
+and [the initial 21-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v145-runtime-metadata-checkpoint21-2026-09-22.json).
 
 The v145 runtime-library metadata repair passes **seven unchanged upstream
 registrations** in Node. The full
@@ -234,7 +234,7 @@ with no resource abort, OOM, hard-limit, throttling or swap event. The initial
 package link failure and the earlier broad-campaign failure remain recorded.
 These checks do not complete the full suites, native cross-platform validation,
 or UV loop configuration/aliveness. See
-[the metadata repair evidence](evidence/runtime-library-metadata-2026-09-22.json).
+[the metadata repair evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/runtime-library-metadata-2026-09-22.json).
 
 The v145 original compiled server driver also passes
 `server_interactive/cancellation_empty_by.lean`, with all original and harness
@@ -243,7 +243,7 @@ events. An initial misspelled filter selected zero tests and returned success;
 that attempt is retained and is not counted as a pass. The suite runner now
 rejects empty selections explicitly, verified with an actual CTest negative
 control and the passing original registration. See
-[the server and selection evidence](evidence/runtime-library-metadata-server-2026-09-22.json).
+[the server and selection evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/runtime-library-metadata-server-2026-09-22.json).
 
 The v144 Node campaign is paused at **1,629 passes, one conformance failure,
 zero resource aborts, and 2,266 pending registrations**. The unchanged
@@ -283,25 +283,25 @@ Every completed attempt preserves all 7,267 original source hashes and the
 compiled-driver/harness hashes. The paused checkpoint includes only completed
 attempts. This campaign uses base pages, one build worker and the
 separate final-link profile described below. See
-[the 1,630-attempt checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1630-2026-09-22.json).
-The [1,605-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1605-2026-09-22.json),
-[1,505-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1505-2026-09-22.json),
-[1,403-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1403-2026-09-22.json),
-[1,307-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1307-2026-09-22.json),
-[1,210-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1210-2026-09-22.json),
-[1,102-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1102-2026-09-22.json),
-[1,002-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint1002-2026-09-22.json),
-[903-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint903-2026-09-22.json),
-[801-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint801-2026-09-22.json),
-[704-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint704-2026-09-22.json),
-[602-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint602-2026-09-22.json),
-[500-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint500-2026-09-22.json),
-[402-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint402-2026-09-22.json),
-[296-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint296-2026-09-22.json),
-[211-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint211-2026-09-22.json),
-[102-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint102-2026-09-22.json),
-[54-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint54-2026-09-22.json)
-and [initial ten-test checkpoint](evidence/node-broad-v144-split-optimization-checkpoint10-2026-09-22.json)
+[the 1,630-attempt checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint1630-2026-09-22.json).
+The [1,605-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint1605-2026-09-22.json),
+[1,505-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint1505-2026-09-22.json),
+[1,403-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint1403-2026-09-22.json),
+[1,307-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint1307-2026-09-22.json),
+[1,210-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint1210-2026-09-22.json),
+[1,102-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint1102-2026-09-22.json),
+[1,002-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint1002-2026-09-22.json),
+[903-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint903-2026-09-22.json),
+[801-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint801-2026-09-22.json),
+[704-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint704-2026-09-22.json),
+[602-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint602-2026-09-22.json),
+[500-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint500-2026-09-22.json),
+[402-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint402-2026-09-22.json),
+[296-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint296-2026-09-22.json),
+[211-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint211-2026-09-22.json),
+[102-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint102-2026-09-22.json),
+[54-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint54-2026-09-22.json)
+and [initial ten-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v144-split-optimization-checkpoint10-2026-09-22.json)
 remain unchanged.
 
 The v144 standalone final-link profile passes **eleven unchanged upstream
@@ -324,7 +324,7 @@ An initial preparation missing two archive inventory entries, a two-worker
 smoke run, and a manually stopped two-worker regression attempt remain recorded.
 Neither incomplete attempt is counted as a conformance failure. Cross-platform
 and complete-suite validation remain open. See
-[the standalone optimization evidence](evidence/standalone-link-optimization-2026-09-22.json).
+[the standalone optimization evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/standalone-link-optimization-2026-09-22.json).
 
 The same Node profile also passes **four unchanged language-server cancellation
 registrations** with the original upstream test driver compiled ahead of time.
@@ -333,7 +333,7 @@ use four Lean workers. All original and harness hashes match. Preparation peaks
 at 2.96 GiB and execution at 6.53 GiB, without resource aborts, memory-limit events,
 OOM, throttling or swap. These targeted results are recorded separately from
 the new full campaign. See
-[the server-driver validation](evidence/standalone-link-server-driver-2026-09-22.json).
+[the server-driver validation](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/standalone-link-server-driver-2026-09-22.json).
 
 The v142 private file-worker repair passes **six unchanged registrations**:
 ordinary IO, HTTP hang regressions, line reads, file locking, directory reads,
@@ -351,7 +351,7 @@ and the remaining C++/Lean copies still need broader analysis. A supplementary
 package harness initially failed while scanning unrelated permission-denied
 experiment directories; its isolated byte-identical fixture retry passes.
 Full-suite and native cross-platform coverage remain open. See
-[the allocation evidence](evidence/short-read-allocation-2026-09-22.json).
+[the allocation evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/short-read-allocation-2026-09-22.json).
 
 The separate v141 clock validation passes **four unchanged registrations**:
 `timeIO`, `timeNegative`, HTTP hang regressions, and file locking in Node.
@@ -368,7 +368,7 @@ setup failure, and an unsuccessful header-copy build. No upstream test was
 edited. The successful combined validation peaks at 4.46 GiB, with no resource
 abort, OOM, memory-limit, throttling, or swap events. These targeted passes are
 not imported into the broad campaign. See
-[the clock evidence](evidence/wall-clock-2026-09-22.json).
+[the clock evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wall-clock-2026-09-22.json).
 
 The v139 Node campaign stopped with **33 passes, zero conformance failures,
 one resource abort, one harness failure, and 3,861 pending registrations**.
@@ -377,7 +377,7 @@ The synchronous-channel benchmark reached the proactive 8 GiB budget at an
 reported `ENODEV` during unit collection, so the conservative supervisor recorded
 a harness failure and stopped. All original and harness hashes remain intact;
 there were no OOM, hard-limit, throttling, or swap events. The complete
-[stopped checkpoint](evidence/node-broad-v139-stopped35-2026-09-22.json) remains
+[stopped checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v139-stopped35-2026-09-22.json) remains
 unchanged. Retrying or repairing these cases does not rewrite that campaign.
 
 The unchanged channel test passes with the same frozen compiler and four Lean
@@ -399,7 +399,7 @@ swap events. This profile includes the clock and file-worker fixes. The parser
 and map tests each spend roughly twelve minutes in the original build path;
 the pause allows a separate final-link optimization experiment. No passes are
 imported into a different profile. See
-[the standalone checkpoint](evidence/node-broad-v142-standalone-checkpoint3-2026-09-22.json).
+[the standalone checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v142-standalone-checkpoint3-2026-09-22.json).
 
 The preceding saved checkpoint records 20 passes and 3,876 pending registrations.
 It uses shared application linking, the separately compiled standalone server
@@ -408,7 +408,7 @@ not attempted in earlier Node campaigns run first; no earlier passes are importe
 The initial group covers further persistent-map, sorting, reuse, thunk, trie,
 integer, and Unicode-path regressions. All source and harness hashes match;
 the maximum peak is 2.92 GiB with no memory-limit, OOM, or swap events. See
-[the new campaign checkpoint](evidence/node-broad-v139-shared-checkpoint20-2026-09-22.json).
+[the new campaign checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v139-shared-checkpoint20-2026-09-22.json).
 Its continuation after the separate clock/allocation checks produced the stopped
 checkpoint above. The subsequent v142 standalone checkpoint is recorded above.
 
@@ -421,13 +421,13 @@ structured `resourceExhausted` error. All 3,896 registrations remain selected;
 no earlier results are imported. Every completed
 attempt preserves all 7,267 source and nine harness hashes, with no memory-limit
 or swap events and a 5.10 GiB maximum peak. Its last attempt completed and
-released the guard; see [the twenty-seven-test base-page checkpoint](evidence/node-broad-v127-base-pages-checkpoint27-2026-09-22.json).
+released the guard; see [the twenty-seven-test base-page checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v127-base-pages-checkpoint27-2026-09-22.json).
 Both incremental snapshot controls pass: command-granular reuse takes 756.91
 seconds, and fallback after a changed import header takes 760.64 seconds. Two
 initialization regressions pass afterward. A separate compiled API-dependency
 inventory ran during a graceful campaign pause; the identical frozen campaign
 then resumed. Those audit runs are not counted as upstream tests. See
-[the dependency audit](compatibility/API_DEPENDENCIES.md).
+[the dependency audit](history/API_DEPENDENCIES.md).
 The large-closure and Lake-linking regressions also pass, in 762.98 and 750.25
 seconds respectively. The same checkpoint includes passing lazy-list, shared-list,
 compile-time-only import, natural-number shift, and overflow controls.
@@ -436,12 +436,12 @@ Further overflow, partial-function, and persistent-hash-map controls pass too;
 takes 730.31 seconds. The campaign pauses here for a
 separate experiment in reusing the frozen Wasm runtime for AOT
 applications. The existing compiler, campaign, and original sources remain
-unchanged. The [twenty-one-test checkpoint](evidence/node-broad-v127-base-pages-checkpoint21-2026-09-22.json)
+unchanged. The [twenty-one-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v127-base-pages-checkpoint21-2026-09-22.json)
 preserves the preceding results.
-The [fourteen-test checkpoint](evidence/node-broad-v127-base-pages-checkpoint14-2026-09-22.json)
+The [fourteen-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v127-base-pages-checkpoint14-2026-09-22.json)
 preserves the earlier snapshot results.
-The [ten-test checkpoint](evidence/node-broad-v127-base-pages-checkpoint10-2026-09-22.json)
-and [initial five-test checkpoint](evidence/node-broad-v127-base-pages-checkpoint5-2026-09-22.json)
+The [ten-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v127-base-pages-checkpoint10-2026-09-22.json)
+and [initial five-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v127-base-pages-checkpoint5-2026-09-22.json)
 remain intact.
 
 During this pause, a shared-runtime AOT experiment passes **ten native comparisons**
@@ -471,7 +471,7 @@ script's overwritten linker metadata from its verified snapshot. No compiler
 bytes or upstream tests changed in that bookkeeping incident; the original
 untracked linker log was lost and is not used as evidence. Shared-runtime linking
 also retains warnings for unresolved libuv internals. See the complete
-[shared-runtime and compact-index evidence](evidence/shared-program-runtime-2026-09-22.json).
+[shared-runtime and compact-index evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/shared-program-runtime-2026-09-22.json).
 
 The maintained shared-application adapter subsequently passes **five unchanged
 Node CTest registrations with four Lean workers**: cross-process closure
@@ -504,7 +504,7 @@ expression application, and HTTP hang regressions. The cancellation control
 falls to a 6.50 GiB peak; the complete group peaks at 6.84 GiB, with no resource
 aborts, memory-limit events, OOMs, or swap. All 7,267 source hashes and the
 recorded driver/harness hashes remain intact. Four Lean workers are retained,
-and 17 link-selection tests pass. See [the driver comparison](evidence/standalone-server-driver-2026-09-22.json).
+and 17 link-selection tests pass. See [the driver comparison](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/standalone-server-driver-2026-09-22.json).
 
 The v127 Node campaign stopped at **54 passes, zero conformance failures, one
 resource abort, and 3,841 pending registrations**. The guard interrupted
@@ -513,7 +513,7 @@ while more than 21 GiB of host memory remained available. There were no OOM,
 hard-limit, throttling, or swap events. All 7,267 original source and nine harness
 hashes were independently verified after the interruption. The incomplete test
 is not counted as a pass or conformance failure; see
-[the stopped-campaign evidence](evidence/node-broad-v127-stopped55-2026-09-22.json).
+[the stopped-campaign evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v127-stopped55-2026-09-22.json).
 A separate base-page retry passes that unchanged test in **485.68 seconds**, at
 a 5.07 GiB peak. All original source and harness hashes match. Sampled descendants
 report huge pages disabled; recorded kernel allocation-stall, compaction,
@@ -521,7 +521,7 @@ huge-page, and OOM counters did not increase. The original abort and successful
 retry remain separate. Six synthetic campaign controls verify resource-policy
 inheritance, immutable resume, and existing ordering behavior. New campaigns
 use `--base-pages --build-jobs 1`, with guard thresholds and tests unchanged; see
-[the retry and harness evidence](evidence/compact-closure-base-pages-2026-09-22.json).
+[the retry and harness evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/compact-closure-base-pages-2026-09-22.json).
 
 The v127 Node campaign's earlier live checkpoint records **28 passes, zero failures
 or resource aborts, and 3,868 pending registrations**. Its prioritized Lake group,
@@ -531,8 +531,8 @@ campaigns run first, without importing their results. Every completed attempt
 preserves all 7,267 source and nine harness hashes. Peak memory was 5.59 GiB, with
 no memory-limit events; the active attempt is excluded. The harness retains the
 documented 1,800-second deadline and unchanged internal test timings. See
-[the 28-test live checkpoint](evidence/node-broad-v127-checkpoint28-2026-09-22.json).
-The [earlier 11-test checkpoint](evidence/node-broad-v127-checkpoint11-2026-09-22.json)
+[the 28-test live checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v127-checkpoint28-2026-09-22.json).
+The [earlier 11-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v127-checkpoint11-2026-09-22.json)
 remains intact.
 
 The full compiler now preserves native Linux argument ordering when `--run`
@@ -544,7 +544,7 @@ v127 native-memory64 compiler passes the argument comparisons and unchanged
 upstream controls in Node. Every upstream attempt preserves all 7,267
 original source hashes. Peak workload memory was 5.05 GiB, with no resource or
 OOM event. These targeted results do not complete the broad suites or establish
-other-OS CLI parity. See [the argument-ordering evidence](evidence/shell-arguments-2026-09-22.json).
+other-OS CLI parity. See [the argument-ordering evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/shell-arguments-2026-09-22.json).
 
 The full-runtime host transfer ABI now preserves lengths across the 2 GiB and
 4 GiB boundaries. All **72 synthetic checks** pass after reproducing 36 failures
@@ -557,7 +557,7 @@ aborts, and 3,881 pending registrations**. The unchanged Lake `lean/test.sh`
 exposes a shell argument-ordering difference: an operand before `--run` appears
 as an extra application argument. All 7,267 original source and nine harness
 hashes match before and after every completed test. The original failed attempt
-is retained in [the 15-test checkpoint](evidence/node-broad-v123-checkpoint15-2026-09-22.json).
+is retained in [the 15-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v123-checkpoint15-2026-09-22.json).
 
 The v123 Node campaign's first live checkpoint records **eight passes, zero
 failures or resource aborts, and 3,888 pending registrations**. The active test
@@ -567,7 +567,7 @@ importing any previous passes. Every completed test preserves all 7,267 source
 and nine harness hashes. The parallel harness uses a 1,800-second deadline,
 based on the separately verified long-lint result below; upstream sources and
 internal timing assertions remain unchanged. See
-[the eight-test live checkpoint](evidence/node-broad-v123-checkpoint8-2026-09-22.json).
+[the eight-test live checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v123-checkpoint8-2026-09-22.json).
 
 The recorded v119 Node campaign has **14 passes, one harness timeout,
 zero resource aborts, and 3,881 pending registrations**. It includes the host-platform and mixed
@@ -581,17 +581,17 @@ failure. A separate 1,800-second harness now passes that exact original test in
 953.88 seconds, peaking at 5.46 GiB. All 7,267 source and nine harness hashes match,
 with no OOM, limit, throttling, or swap event. The longer deadline is the only
 changed timing setting, and this result is not imported into the broad count.
-See [the successful longer run](evidence/node-long-lint-2026-09-22.json) and
-[the 15-attempt checkpoint](evidence/node-broad-v119-checkpoint15-2026-09-22.json).
+See [the successful longer run](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-long-lint-2026-09-22.json) and
+[the 15-attempt checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v119-checkpoint15-2026-09-22.json).
 The unchanged Lake cache test passes in 694.09 seconds at a 3.86 GiB peak.
-The [prior 14-attempt checkpoint](evidence/node-broad-v119-checkpoint14-2026-09-21.json)
+The [prior 14-attempt checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v119-checkpoint14-2026-09-21.json)
 remains intact.
-The [earlier ten-pass checkpoint](evidence/node-broad-v119-checkpoint10-2026-09-21.json)
+The [earlier ten-pass checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v119-checkpoint10-2026-09-21.json)
 remains intact.
 Its separately compiled original server driver also passes the unchanged
 `server_interactive/cancellation.lean` test at 6.38 GiB, with all integrity checks
 intact and no resource abort. That control is not part of the broad count; see
-[the v119 driver evidence](evidence/node-v119-server-driver-2026-09-21.json).
+[the v119 driver evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-v119-server-driver-2026-09-21.json).
 
 The preceding frozen v114 Node campaign has **200 passes, zero failures or resource
 aborts, and 3,696 pending registrations**. It includes the repaired ordinary-exit
@@ -600,19 +600,19 @@ All three tests that crashed in v113 pass again. Every original source and
 harness artifact matched before and after each test; peak memory was 3.82 GiB,
 with no OOM, hard-limit, throttling, or swap events. All 3,896 registrations remain
 selected, with no passes imported from older campaigns. See
-[the 200-test checkpoint](evidence/node-broad-v114-checkpoint200-2026-09-21.json).
-The [earlier 100-test checkpoint](evidence/node-broad-v114-2026-09-21.json)
+[the 200-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v114-checkpoint200-2026-09-21.json).
+The [earlier 100-test checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v114-2026-09-21.json)
 remains intact. The continued run ends at `elab/Miller1.lean`.
 The newly compiled original server driver also passes a separate unchanged
 `server_interactive/cancellation.lean` control, peaking at 6.52 GiB with all
 source/harness checks intact and no resource abort or memory event. That result
 is not imported into the broad campaign's counts. See
-[the driver control](evidence/node-v114-server-driver-2026-09-21.json).
+[the driver control](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-v114-server-driver-2026-09-21.json).
 
 Earlier checkpoints on 2026-09-21: the v89 Node campaign has **153 passes,
 zero failures/resource aborts, and 3,743 pending registrations**. It uses the
 unchanged server-test driver compiled ahead of time, and prioritizes previously
-unattempted elaboration tests. Its [separate checkpoint](evidence/node-broad-v89-2026-09-21.json)
+unattempted elaboration tests. Its [separate checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v89-2026-09-21.json)
 verifies every original source and driver artifact before and after each test.
 Peak memory was 3.63 GiB with no OOM, throttling, or swap events. This frozen
 runtime includes the file-read state repair; subsequent console and table-growth
@@ -626,7 +626,7 @@ passes were imported or combined across these campaigns. These checkpoints are n
 complete JavaScript-engine suite results. The sections below retain the earlier
 attempts and the scope of each targeted comparison.
 
-The [213-test Node checkpoint](evidence/node-broad-v78-2026-09-21.json) includes
+The [213-test Node checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-broad-v78-2026-09-21.json) includes
 every original hash check before and after each attempt. Peak workload memory
 was 3.40 GiB, with no OOM, throttling, or swap events. In particular,
 `elab/12676.lean` now passes in the full compiler: its ten-million-element list
@@ -638,7 +638,7 @@ The complete registered native control suite passed **3,891 / 3,891 tests** on
 Linux x64 on 2026-09-19 UTC. The clean run took 2,341.39 seconds with two CTest
 workers. All **7,267 original test and documentation-example files** matched their
 recorded hashes before and after execution. See the
-[machine-readable evidence](evidence/full-native-2026-09-19.json).
+[machine-readable evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/full-native-2026-09-19.json).
 
 The parallel harness supplies a 600-second deadline, source-search paths pointing
 to the isolated matching Lean source tree, and an override for the release's
@@ -650,7 +650,7 @@ six-test rerun, and the subsequent clean full run are retained separately under
 The completed `lean4-4.32.0/tests/compile` and `compile_bench` directories are now
 retained as adjacent `.tar.gz` archives with per-file restoration manifests.
 Every original source hash, generated byte, link, mode and timestamp was verified
-before archival. The [storage receipts](evidence/runtime-imports-and-lake-initialization-2026-09-24.json)
+before archival. The [storage receipts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/runtime-imports-and-lake-initialization-2026-09-24.json)
 record restoration details; earlier failures and execution receipts remain intact.
 This storage change adds no new compatibility result.
 
@@ -660,7 +660,7 @@ natural numbers and 64-bit `USize`, runs an ordinary main with tasks, and genera
 C and serialized modules using the full compiler. An initial full Node suite
 attempt was interrupted after collecting repeated defects in the superseded
 build; it is not a completed suite run. Its
-[partial evidence](evidence/full-node-initial-attempt-2026-09-19.json) is retained,
+[partial evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/full-node-initial-attempt-2026-09-19.json) is retained,
 including a tracked `produced.out` file overwritten by an upstream Lake test
 driver during that failed attempt. No upstream source or expected output was
 edited to obtain a pass. The separate application
@@ -670,12 +670,12 @@ Prerequisite executions pass (including ten shutdown stress repetitions): Wasm32
 accesses, asynchronous host calls from four concurrent Wasm threads, pthread stacks plus host memory writes above 2 GiB, detached-thread shutdown without spurious stderr,
 side-module data/function-pointer relocation, and shared-memory growth observed by a blocked worker, each in
 Node 24.13.1. These are build prerequisites, not upstream
-test-suite passes. See [the prerequisite evidence](evidence/full-engine-prerequisites-2026-09-19.json).
+test-suite passes. See [the prerequisite evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/full-engine-prerequisites-2026-09-19.json).
 
 The repaired frozen Node build passes **6/6 unchanged upstream IO tests**:
 `IO_test`, `tempfile`, `sync_shared_mutex`, `async_select_timer`,
 `async_tcp_server_client`, and `async_udp_sockets`. All 7,267 original file hashes
-remain unchanged for that run. See [the IO smoke evidence](evidence/full-node-io-smoke-2026-09-19.json).
+remain unchanged for that run. See [the IO smoke evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/full-node-io-smoke-2026-09-19.json).
 This verifies the actual Lean scheduler and ordinary TCP/UDP/timer APIs in Node;
 it is still only a subset. The real compiled Lake entry point now starts in Node. The Node
 compiler and Leanc also generate and execute an ordinary Lean program through
@@ -706,7 +706,7 @@ control passed four and failed `pkg/test_extern`: inherited shell `pipefail`
 exited on its intentional failing build before its expected-output comparison.
 A documented parallel wrapper lets that original comparison run; the clean
 adjusted native control passed **5/5**, with all 7,267 original hashes unchanged.
-See [the extra-test evidence](evidence/native-excluded-2026-09-19.json). Results from
+See [the extra-test evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/native-excluded-2026-09-19.json). Results from
 these extra tests are separate from the standard 3,891 registrations.
 
 For directory enumeration, the host now uses asynchronous POSIX `scandir` without
@@ -719,7 +719,7 @@ The additional v12 Node tests passed **3/5**: dedicated signal handling,
 worker stack and `test_extern` timed out during dynamic loading. The v15 repair
 run passed the original Lake `ltar` test and DNS; FFI advanced to a C++ exception
 tag import failure, and the HTTP early-streaming deadline failed again. See
-[the recorded subset results](evidence/full-runtime-subsets-2026-09-19.json).
+[the recorded subset results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/full-runtime-subsets-2026-09-19.json).
 
 The archive failure came from generic-allocator constructor sizes: the compactor
 reserved aligned space but recorded an unaligned size in serialized headers.
@@ -727,7 +727,7 @@ The reviewed runtime patch records the actual padded extent. Supplementary
 probes now pass in Node: network-interface records/order match
 native Lean, serialized objects with small scalar fields and large naturals
 survive a byte-identical `leantar` round trip, and native Lean imports those
-Wasm-generated modules. See [the differential evidence](evidence/interface-compact-parity-2026-09-19.json).
+Wasm-generated modules. See [the differential evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/interface-compact-parity-2026-09-19.json).
 An initial synthetic trace-format error and a 300-second timeout under contention
 are retained as failed probe attempts; neither changed an upstream test.
 
@@ -751,7 +751,7 @@ The maintained prerequisite suite now passes in Node, including the concurrent h
 exceptions thrown by a dynamically loaded library and caught by its caller.
 The compiler retains the C/C++ runtime ABI, arithmetic helpers, and exception tag
 for plugins loaded after startup. Optional profiling archive members are not
-rooted in uninstrumented programs. See [the ABI and RPC evidence](evidence/full-engine-abi-rpc-2026-09-19.json).
+rooted in uninstrumented programs. See [the ABI and RPC evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/full-engine-abi-rpc-2026-09-19.json).
 The v19 original FFI run passed precompilation, but failed C++ FFI on `__multi3`
 and reverse FFI on empty CMake shared-library placeholders. The v23 rerun passed
 the unchanged C/C++ FFI example and `pkg/test_extern` (**2/3**). Reverse FFI now
@@ -762,7 +762,7 @@ controls and the corresponding Node executions, including Unicode
 paths and environment-path precedence. The unchanged original reverse-FFI driver
 then passed on Node v24 in 225.10 seconds. The same two-test run still failed
 HTTP streaming; all 7,267 original hashes remained unchanged.
-See [the loader evidence](evidence/runtime-loader-paths-2026-09-19.json).
+See [the loader evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/runtime-loader-paths-2026-09-19.json).
 
 Application linking now retains its actual entry point and linked shared-library
 imports instead of the entire compiler's export set. The unchanged `compile/534`
@@ -813,7 +813,7 @@ uses a separate, recorded JavaScript-only derivative of frozen v25; the Wasm
 compiler bytes are identical.
 The ABI/thread/dynamic-loading prerequisite checks also pass after this
 bridge repair; earlier and repaired runs are both retained.
-See [the host-memory evidence](evidence/host-rpc-highmemory-2026-09-19.json).
+See [the host-memory evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/host-rpc-highmemory-2026-09-19.json).
 
 The lower-memory Lean allocator experiment also exposed a build-cache defect:
 upstream `leanmake` did not rebuild generated C after changing the runtime headers.
@@ -823,7 +823,7 @@ a header change and retaining the cached object when inputs are unchanged.
 The full allocator rebuild completed, including 2,432 generated C objects, and
 its Node version smoke test passed. Frozen v26's allocator behavior still needs
 the targeted memory and serialization checks. See
-[the cache evidence](evidence/build-cache-2026-09-19.json).
+[the cache evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/build-cache-2026-09-19.json).
 
 The v27 unchanged HTTP rerun still fails case 22's early-streaming window. A
 parallel derivative multiplies every millisecond interval by ten, including the
@@ -836,7 +836,7 @@ comparisons are pending. These runs overlapped other work before resource
 isolation was added, so fresh low-contention comparisons remain necessary.
 It is **not** counted as a pass of the original timing-sensitive file, and does
 not establish that every HTTP scheduling difference is resolved. See
-[the timing evidence](evidence/http-scaled-timing-2026-09-19.json).
+[the timing evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/http-scaled-timing-2026-09-19.json).
 
 The old full Node v6 run was interrupted by desktop OOM
 failures. Earlier references to it being in progress are historical; it is
@@ -846,7 +846,7 @@ original `dynlib\n` scratch output with an empty file. That alteration is
 recorded and preserved, not silently repaired. New runs use one workload at a time,
 one CTest job, and the proactive resource guard. Resource-aborted runs are
 reported separately from Lean failures. See [the diagnosis](RESOURCE_FAILURES.md)
-and [the recorded partial results](evidence/resource-protection-2026-09-19.json).
+and [the recorded partial results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/resource-protection-2026-09-19.json).
 
 The first guarded v26 `instances` retry stopped at the proactive memory budget;
 it is not a conformance result. A separate eight-worker derivative retained the
@@ -858,11 +858,11 @@ enumeration, small scalar fields, large naturals, archive round trips, and nativ
 imports of Wasm-produced modules. Its guarded sequence peaked at **6.46 GiB**;
 no OOM, swap, or memory-throttling event occurred. These checks narrow the
 allocator investigation but do not establish full compatibility. See
-[the allocator and resource evidence](evidence/reduced-worker-allocator-2026-09-20.json).
+[the allocator and resource evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/reduced-worker-allocator-2026-09-20.json).
 
 A bounded engine investigation narrows the remaining memory work: native Wasm
 memory64 supports sparse pthread stacks and host access above 4 GiB in Node. See
-[the memory64 evidence](evidence/native-memory64-2026-09-19.json).
+[the memory64 evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/native-memory64-2026-09-19.json).
 
 The native-allocator capacity comparison now isolates an unchecked allocation:
 the same native-memory64 Wasm passes `instances` with an 8 GiB guest limit and
@@ -874,7 +874,7 @@ an upstream test failure. The checked native-memory64 8 GiB build passes the
 unchanged test in **50.41 seconds**. All four capacity/comparison runs preserve
 all 7,267 upstream hashes and record zero host OOM or throttling events. The
 largest guarded run, including suite preparation, peaked at **7.16 GiB**. See
-[the allocation evidence](evidence/region-allocation-2026-09-20.json). This fixes
+[the allocation evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/region-allocation-2026-09-20.json). This fixes
 one corrupting failure path; it does not establish complete low-memory handling
 or remove the lowered-memory64 address-space ceiling.
 
@@ -884,7 +884,7 @@ checks, and four previous stack failures. The complete HTTP file passed in
 19.81 seconds, including the previously failing early-streaming case. Peak host
 memory was 3.24 GiB. The run preserved all upstream hashes with zero OOM or
 throttling events. These are subset results and one successful Node timing run,
-not proof of timing stability or full parity. See [the guarded regressions](evidence/guarded-runtime-regressions-2026-09-20.json).
+not proof of timing stability or full parity. See [the guarded regressions](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/guarded-runtime-regressions-2026-09-20.json).
 
 The fresh 3,896-registration Node campaign stopped near its beginning: the
 `deps` and `ffi` Lake examples hit the proactive aggregate memory budget, and
@@ -892,7 +892,7 @@ the next launch exposed a transient-unit cleanup race. These are **two resource
 aborts and one harness launch failure**, with no Lean conformance result from
 those three attempts. All original hashes remained intact and no host OOM
 occurred. Guard cleanup is repaired; a separate worker-pool comparison is in
-progress. See [the budget evidence](evidence/lake-memory-budget-2026-09-20.json).
+progress. See [the budget evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lake-memory-budget-2026-09-20.json).
 
 The five-worker preinitialization change alone still resource-aborted `deps` and
 `ffi`; `hello` passed. Adding an explicit one-thread Lake default then passed
@@ -911,7 +911,7 @@ host RPC, allowing another Lean thread's delayed reader to run. The unchanged
 fixture then passed in Node. Seventeen related
 host/application checks passed. These are additional differential checks, not upstream-suite passes;
 the packaged cooperative path was addressed separately afterward. See
-[the original and fixed comparisons](evidence/fifo-finalizer-2026-09-20.json).
+[the original and fixed comparisons](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/fifo-finalizer-2026-09-20.json).
 The unchanged upstream `file_read_overflow`, `IO_test`, and `tempfile` tests then
 passed in fixed Node: **3/3** executions, all 7,267 source hashes intact
 before and after each run. Their shared guarded process tree peaked at 5.19 GiB
@@ -927,7 +927,7 @@ A subsequent private host change recycles resource/request IDs before they
 cross the signed i32 import boundary, retaining occupied handles. Seven focused
 tests passed, using only three slots near the real boundary rather than billions
 of allocations. This later change is not present in the frozen v35 campaign;
-see [the separate handle-ID evidence](evidence/handle-ids-2026-09-20.json).
+see [the separate handle-ID evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/handle-ids-2026-09-20.json).
 
 A separate filesystem comparison found a shared-worker-pool deadlock: four
 blocking reads could prevent their dependent writes from starting in the Node
@@ -944,7 +944,7 @@ open-handle lifetime check passed. The full differential run peaked at 3.38 GiB
 with no OOM, throttling, or swap use. Frozen v36 contains these host changes and
 the handle-ID fix while preserving the exact v35 Wasm and embedded dispatch.
 The paused v35 campaign remains a separate older-runtime result. See
-[the retained comparisons](evidence/fifo-workers-2026-09-20.json).
+[the retained comparisons](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/fifo-workers-2026-09-20.json).
 The unchanged `file_read_overflow`, `IO_test`, and `tempfile` registrations also
 pass on v36 in Node: **3/3**, with all 7,267 original hashes intact. Their
 combined preparation/run peaked at 5.56 GiB with zero OOM, throttling, or swap.
@@ -954,7 +954,7 @@ failure in `async_systems_info`: native Lean itself could not change priority
 from 5 to 3 without elevated privileges. Preserving normal priority fixes that
 control and the unchanged test passes in v36 Node. All 7,267 source hashes remained intact. The memory cap and stop
 thresholds are unchanged; the engine comparison peaked at 3.44 GiB with no OOM,
-throttling, or swap. See [the priority evidence](evidence/guard-priority-2026-09-20.json).
+throttling, or swap. See [the priority evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/guard-priority-2026-09-20.json).
 
 The packaged application path now finalizes buffered files asynchronously as
 well. Its original FIFO regression timed out in stock Node.
@@ -990,7 +990,7 @@ peaked at 3.00–3.11 GiB.
 
 Windows still uses deferred binding, and the POSIX implementation requires
 native macOS validation. See
-[the binding evidence and retained failures](evidence/tcp-binding-2026-09-21.json).
+[the binding evidence and retained failures](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/tcp-binding-2026-09-21.json).
 
 The prioritized v38 Node campaign passed its first nine registrations, including
 the three HTTP fuzz files, cancellation, DNS, socket selection, and timers. It
@@ -1016,7 +1016,7 @@ threading, dynamic-loading, and exception checks also pass in Node. The
 maintained implementation is now frozen as v46. Broader upstream validation
 is continuing. No memory cap was raised, and these comparisons recorded no OOM,
 throttling, or swap use. See
-[the full comparisons](evidence/function-table-index-2026-09-21.json).
+[the full comparisons](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/function-table-index-2026-09-21.json).
 
 The v46 Node campaign subsequently passed 25 unchanged registrations, including
 all four cancellation tests, hover, code actions, and the first completion tests.
@@ -1036,7 +1036,7 @@ bytes. The unchanged upstream process, environment, and
 parallel-cancellation regressions pass 3/3 in Node. All original hashes
 remain intact, with no OOM, throttling, or swap use. Broader upstream validation
 remains in progress; see
-[the retained comparisons](evidence/process-lifetime-2026-09-21.json).
+[the retained comparisons](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/process-lifetime-2026-09-21.json).
 
 A separate ordinary Lean comparison caught child working-directory paths being
 normalized before the OS could follow a symlink and subsequent `..`. Preserving
@@ -1044,7 +1044,7 @@ those components fixes Node. Native Lean, stock packaged Node, and the full
 Node compiler now pass absolute and relative cwd controls. The full comparison peaked at 2.43 GiB with no resource abort,
 OOM, throttling, or swap. Its Node snapshot is v52, with unchanged Wasm. These are supplemental Linux path checks, not full-suite
 passes or proof of spawn-error/race parity; see
-[the before/after evidence](evidence/process-cwd-2026-09-21.json).
+[the before/after evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/process-cwd-2026-09-21.json).
 
 Another ordinary Lean fixture exposed incorrect `IO.Process.setCurrentDir`
 error numbers/messages and missing search-permission validation for virtual
@@ -1052,7 +1052,7 @@ working directories. Native Linux and packaged and full Node now match exactly o
 at 0.41 GiB and the full comparison at 2.46 GiB, with no OOM, throttling, or swap.
 Full snapshots v55/v56 preserve the previous Wasm bytes. Cwd rename/removal,
 embedded-NUL behavior, and non-Linux validation remain open; see
-[the before/after comparison](evidence/cwd-errors-2026-09-21.json).
+[the before/after comparison](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/cwd-errors-2026-09-21.json).
 The independently checkpointed v52 Node campaign continues on its original
 snapshot; these focused new passes are not imported into that campaign.
 
@@ -1075,7 +1075,7 @@ remain intact in the completed Lean controls. A fresh 3,896-registration Node
 campaign now uses this separate harness and imports no earlier passes. Neither
 the subset results nor this harness change closes the original-driver resource
 gap or establishes complete conformance. See
-[the configurations and retained outcomes](evidence/compiled-server-driver-2026-09-21.json).
+[the configurations and retained outcomes](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/compiled-server-driver-2026-09-21.json).
 
 Supplementary process comparisons found that the host reported POSIX exec/chdir
 failures to the parent, while native Lean returns a real child that prints a
@@ -1111,7 +1111,7 @@ The maintained full probe executes and verifies an immutable fixture copy. The a
 Unflushed fork-buffer duplication, concurrent cwd changes, and native non-Linux
 validation remain open. The launcher adds startup overhead; these comparisons
 do not establish complete process or full-suite conformance. See
-[the retained process and worker evidence](evidence/process-spawn-2026-09-21.json).
+[the retained process and worker evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/process-spawn-2026-09-21.json).
 
 A separate ordinary Lean fixture verifies embedded-NUL behavior. The native
 runtime passes POSIX process strings and `setCurrentDir` directly to C interfaces,
@@ -1128,7 +1128,7 @@ changed. Packaged Node checks also pass: the new
 fixture plus the existing cwd-error and spawn comparisons. The separate v52
 Node campaign is checkpointed at 31 passes, zero failures/resource aborts, and
 3,865 pending registrations. Native non-Linux validation and other string-boundary cases remain
-open. See [the NUL evidence](evidence/process-nul-2026-09-21.json).
+open. See [the NUL evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/process-nul-2026-09-21.json).
 
 Linux working directories now retain their directory identity across rename and
 removal. Relative filesystem operations and child processes use that identity,
@@ -1159,7 +1159,7 @@ immutable fixture now matches native Lean in the full Node compiler; 15
 packaged and native file-handle checks also pass. Both the failing baseline and
 passing comparison remain recorded. Peak memory stayed below 2.56 GiB, with no
 OOM, throttling, or swap. This is Linux evidence, not cross-platform or complete
-filesystem conformance. See [the truncate comparison](evidence/truncate-errors-2026-09-21.json).
+filesystem conformance. See [the truncate comparison](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/truncate-errors-2026-09-21.json).
 
 The HTTP timing investigation identified a concrete loader bottleneck. Diagnostic
 traces showed all workers ready before case 22; typical main-thread host-handler
@@ -1192,7 +1192,7 @@ initialization. Every run verified all 7,267 original file hashes
 before and after execution; none changed. The largest process-tree peak was
 4.26 GiB, with zero OOM, throttling, cap-hit, or swap events. These are focused
 regressions, separate from the broad campaign and its pending registrations.
-See [the upstream loader regression evidence](evidence/symbol-lookup-upstream-2026-09-21.json).
+See [the upstream loader regression evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/symbol-lookup-upstream-2026-09-21.json).
 
 A supplementary permission comparison exposed a child-launcher discrepancy:
 native Lean inherits its cwd after search permission is revoked, while the old
@@ -1210,13 +1210,13 @@ throttling, cap hits, or swap. The broader v78 Node campaign independently reach
 56 passes and 3,840 pending registrations, with all 7,267 original hashes intact
 on every completed run and a 3.37 GiB maximum peak. Embedded virtual cwd
 permission inheritance, non-Linux behavior, and complete suites remain open. See
-[the permission and lifecycle evidence](evidence/cwd-permissions-2026-09-21.json).
+[the permission and lifecycle evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/cwd-permissions-2026-09-21.json).
 
 The new frozen hosts also pass **4/4 unchanged upstream regressions** in Node:
 `IO_test`, `Process`, `async_http_hang_regressions`, and `tempfile`.
 All 7,267 original hashes remained intact before and after every registration.
 The largest process-tree peak was 3.76 GiB, without OOM, throttling, cap hits,
-or swap. See [the upstream cwd regression evidence](evidence/cwd-permissions-upstream-2026-09-21.json).
+or swap. See [the upstream cwd regression evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/cwd-permissions-upstream-2026-09-21.json).
 
 A new ordinary-Lean fixture exposed fresh pthread bootstrap failures after cwd
 deletion in Node. Node now preloads its private worker cwd fallback; the
@@ -1231,7 +1231,7 @@ source-launcher timeouts caused by concurrent maintainer edits are retained;
 the clean rerun kept sources fixed and used the same deadlines. No upstream test
 or expected output changed. Validation peaked at 2.19 GiB including suite
 preparation, with zero OOM, cap, throttling, or swap events. See
-[the native-launcher and worker evidence](evidence/native-launcher-cwd-2026-09-21.json).
+[the native-launcher and worker evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/native-launcher-cwd-2026-09-21.json).
 
 Independent virtual-cwd permission inheritance, non-Linux conformance and the
 complete upstream suites remain open. The repaired frozen Node build is v86; its
@@ -1243,7 +1243,7 @@ list calculation, `IO_test`, `Process`, HTTP hang regressions, and `tempfile`. B
 original driver requests them. All 7,267 original file hashes remained intact
 before and after each registration. Peak workload memory was **3.78 GiB**, with
 zero OOM, throttling, cap-hit, or swap events. This focused result does not close the complete-suite or
-packaged-runtime gates. See [the upstream regression evidence](evidence/native-launcher-upstream-2026-09-21.json).
+packaged-runtime gates. See [the upstream regression evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/native-launcher-upstream-2026-09-21.json).
 
 Supplementary filesystem comparisons exposed further stream-state defects. A final unterminated `Handle.getLine` left EOF set, hiding
 appended data on the next read. The optimized reader also mishandled partial
@@ -1259,7 +1259,7 @@ byte consumption, and subsequent EOF. Both failing baselines remain recorded;
 the refined C fixture isolates the EOF check in a separate pipe. The original
 upstream tests and expected outputs are unchanged. Validation peaked at **1.98 GiB**,
 without OOM, throttling, cap hits, or swap. Native non-Linux behavior and complete
-suites remain open. See [the stream-state evidence](evidence/getline-state-2026-09-21.json).
+suites remain open. See [the stream-state evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/getline-state-2026-09-21.json).
 
 A supplementary console comparison exposed another native-behavior difference:
 the host wrote directly through JavaScript streams instead of preserving FILE
@@ -1289,7 +1289,7 @@ v89 broad campaign.
 Eight reported packaged controls, fourteen final host/worker controls, and all
 22 Lean-server Vitest tests also pass. The record retains both console baselines,
 the initial failing full-pipe checks, and the corrected diagnostic-fixture
-cleanup; see [the complete console evidence](evidence/console-buffering-2026-09-21.json).
+cleanup; see [the complete console evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/console-buffering-2026-09-21.json).
 
 The subsequent filesystem repair replaces POSIX engine `realpath` calls with
 asynchronous libc calls and copies the returned bytes before freeing their
@@ -1306,7 +1306,7 @@ after every test; applicable compiled-driver artifacts also pass their integrity
 checks. Peak memory was **3.70 GiB**, with zero OOM, throttling, cap-hit, or swap
 events. The record retains a supplementary-fixture compilation error, the first
 adapter's rejected buffer-ownership bug, and a log-name preparation collision.
-See [the full realPath comparisons](evidence/realpath-2026-09-21.json).
+See [the full realPath comparisons](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/realpath-2026-09-21.json).
 Native macOS/Windows validation, long paths, races, and complete suite coverage
 remain open.
 
@@ -1337,7 +1337,7 @@ regressions; all 7,267 original file hashes were verified before and after each
 test. The build and checks had zero OOM, cap-hit, throttle, or swap events.
 These are Linux x64 results. Embedded forced-exit buffer disposal and native
 macOS/Windows validation remain open. See
-[the baseline, repair, and resource evidence](evidence/process-exit-2026-09-21.json).
+[the baseline, repair, and resource evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/process-exit-2026-09-21.json).
 
 The initial exit-repaired facades inherited the builder's `LASM_EMSDK`, so their
 external C tools used that development SDK despite the frozen compiler and host.
@@ -1346,7 +1346,7 @@ the captured SDK first, even with the builder environment still present. Node
 passes four unchanged C/FFI controls with these corrected settings,
 including Lake's FFI and reverse-FFI examples. The guard also explicitly caps
 Emscripten's internal cache-build jobs. See
-[the separate SDK and job-limit validation](evidence/frozen-sdk-build-jobs-2026-09-21.json).
+[the separate SDK and job-limit validation](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/frozen-sdk-build-jobs-2026-09-21.json).
 
 ## Engine shutdown regression repair, September 21
 
@@ -1373,7 +1373,7 @@ All 7,267 original hashes remained unchanged. All OOM, cap-hit, throttling,
 and swap counters were zero; the largest repaired upstream run peaked at
 3.65 GiB. These are Linux x64 results; complete campaigns, embedded forced-exit
 disposal, and other platforms remain unfinished. See
-[the failures, debugger trace, repaired snapshots, and comparisons](evidence/engine-exit-shutdown-2026-09-21.json).
+[the failures, debugger trace, repaired snapshots, and comparisons](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/engine-exit-shutdown-2026-09-21.json).
 
 ## Embedded forced-exit cleanup, September 22 UTC
 
@@ -1391,7 +1391,7 @@ pass with zero skips; peak memory across comparison and regression runs is
 0.54 GiB with no resource event. These are supplementary application checks,
 not upstream-suite registrations. Windows discard remains unimplemented and the
 macOS branch still needs native validation. See
-[the complete cleanup evidence](evidence/embedded-force-exit-2026-09-22.json).
+[the complete cleanup evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/embedded-force-exit-2026-09-22.json).
 
 ## Full-runtime host transfer lengths, September 22 UTC
 
