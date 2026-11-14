@@ -4078,6 +4078,169 @@ end ReachProofs
 theorem link_map_static_sound : Spec.link_map_static_sound := fun initFree map r h =>
   ReachProofs.static_sound (fun x => initFree (String.ofList x)) map.toList r h
 
+/-! ## Directory containment (Model/Platform.lean)
+
+The resolved segments are plain (`resolve_plain`); when the directory's are
+a prefix of the file's, the relative path is the file's remaining segments,
+none of them `..` (`plain_front`), and otherwise it starts with `..`.
+-/
+
+namespace PlatformProofs
+
+theorem splitOnP_no_sep {p : Char → Bool} : ∀ (xs : List Char), ∀ l ∈ xs.splitOnP p, ∀ y ∈ l, p y = false
+  | [] => by simp [List.splitOnP_nil]
+  | x :: xs => by
+    rw [List.splitOnP_cons]
+    have ih := splitOnP_no_sep (p := p) xs
+    split
+    · intro l hl; simp only [List.mem_cons] at hl; rcases hl with rfl | hl
+      · simp
+      · exact ih l hl
+    · rename_i hx
+      obtain ⟨h, t, ht⟩ : ∃ h t, xs.splitOnP p = h :: t := by
+        cases h' : xs.splitOnP p with
+        | nil => exact absurd h' (List.splitOnP_ne_nil _ _)
+        | cons h t => exact ⟨h, t, rfl⟩
+      rw [ht] at ih ⊢
+      intro l hl; simp only [List.modifyHead_cons, List.mem_cons] at hl
+      rcases hl with rfl | hl
+      · intro y hy; simp only [List.mem_cons] at hy; rcases hy with rfl | hy
+        · simpa using hx
+        · exact ih h (by simp) y hy
+      · exact ih l (by simp [hl])
+
+/-- A segment kept by `normalizeString`. -/
+def Plain (s : List Char) : Prop := s ≠ [] ∧ s ≠ ['.', '.'] ∧ '/' ∉ s
+
+theorem fold_plain : ∀ (l : List (List Char)) (stack : List (List Char)),
+    (∀ s ∈ stack, Plain s) → (∀ s ∈ l, '/' ∉ s) → ∀ s ∈ l.foldl pushAbsoluteSegment stack, Plain s
+  | [], stack, hs, _ => hs
+  | seg :: l, stack, hs, hl => by
+    rw [List.foldl_cons]
+    apply fold_plain l
+    · unfold pushAbsoluteSegment
+      split
+      · exact hs
+      · split
+        · intro s h; exact hs s (List.dropLast_subset stack h)
+        · rename_i h1 h2
+          intro s h; simp only [List.mem_append, List.mem_singleton] at h; rcases h with h | rfl
+          · exact hs s h
+          · exact ⟨fun e => h1 (.inl e), h2, hl s (by simp)⟩
+    · intro s h; exact hl s (by simp [h])
+
+theorem resolve_plain (cwd p : List Char) : ∀ s ∈ resolveSegments cwd p, Plain s := by
+  unfold resolveSegments
+  apply fold_plain _ _ (by simp)
+  intro s hs hslash
+  rw [List.splitOn_eq_splitOnP] at hs
+  have := splitOnP_no_sep _ s hs '/' hslash
+  simp at this
+
+theorem commonPrefix_le : ∀ (f t : List (List Char)), commonPrefix f t ≤ f.length
+  | [], _ => by simp [commonPrefix]
+  | _ :: _, [] => by simp [commonPrefix]
+  | a :: as, b :: bs => by
+    unfold commonPrefix; split
+    · have := commonPrefix_le as bs; simp; omega
+    · simp
+
+theorem commonPrefix_full : ∀ (f t : List (List Char)), commonPrefix f t = f.length ↔ f <+: t
+  | [], t => by simp [commonPrefix]
+  | a :: as, [] => by simp [commonPrefix]
+  | a :: as, b :: bs => by
+    unfold commonPrefix; split
+    · rename_i h; subst h; rw [List.cons_prefix_cons]; simp [commonPrefix_full as bs]
+    · rename_i h; rw [List.cons_prefix_cons]; simp [h]
+
+/-- A plain first segment, then nothing or a separator: not `..`, not under
+`../`, not absolute. -/
+theorem plain_front (s tail : List Char) (hs : Plain s) (ht : tail = [] ∨ tail.head? = some '/') :
+    s ++ tail ≠ ['.', '.'] ∧ ¬ ("../".toList <+: s ++ tail) ∧ (s ++ tail).head? ≠ some '/' := by
+  obtain ⟨hne, hdd, hslash⟩ := hs
+  have h3 : "../".toList = ['.', '.', '/'] := rfl
+  rw [h3]
+  match s, hne, hdd, hslash with
+  | [a], _, _, hsl =>
+    refine ⟨?_, ?_, ?_⟩
+    · intro h; simp only [List.singleton_append, List.cons.injEq] at h
+      rcases ht with rfl | ht
+      · simp at h
+      · rw [h.2] at ht; simp at ht
+    · intro h; obtain ⟨u, hu⟩ := h; simp only [List.cons_append, List.singleton_append, List.nil_append, List.cons.injEq] at hu
+      rcases ht with rfl | ht
+      · simp at hu
+      · rw [← hu.2] at ht; simp at ht
+    · simp only [List.singleton_append, List.head?_cons, ne_eq, Option.some.injEq]; intro h; subst h; simp at hsl
+  | [a, b], _, hd, hsl =>
+    refine ⟨?_, ?_, ?_⟩
+    · intro h; simp only [List.cons_append, List.cons.injEq] at h; obtain ⟨rfl, rfl, -⟩ := h; exact hd rfl
+    · intro h; obtain ⟨u, hu⟩ := h; simp only [List.cons_append, List.nil_append, List.cons.injEq] at hu
+      obtain ⟨rfl, rfl, -⟩ := hu; exact hd rfl
+    · simp only [List.cons_append, List.head?_cons, ne_eq, Option.some.injEq]; intro h; subst h; simp at hsl
+  | a :: b :: c :: rest, _, _, hsl =>
+    refine ⟨?_, ?_, ?_⟩
+    · intro h; simp at h
+    · intro h; obtain ⟨u, hu⟩ := h; simp only [List.cons_append, List.nil_append, List.cons.injEq] at hu
+      obtain ⟨-, -, rfl, -⟩ := hu; simp at hsl
+    · simp only [List.cons_append, List.head?_cons, ne_eq, Option.some.injEq]; intro h; subst h; simp at hsl
+
+theorem intercalate_front (s : List Char) (rest : List (List Char)) :
+    ∃ tail, ['/'].intercalate (s :: rest) = s ++ tail ∧ (tail = [] ∨ tail.head? = some '/') := by
+  cases rest with
+  | nil => exact ⟨[], by simp, .inl rfl⟩
+  | cons r rs => exact ⟨'/' :: ['/'].intercalate (r :: rs), by rw [List.intercalate_cons_of_ne_nil (by simp)]; simp, .inr rfl⟩
+
+theorem inside_iff (cwd d f : List Char) :
+    insideDirectoryModel cwd d f = true ↔ resolveSegments cwd d <+: resolveSegments cwd f := by
+  unfold insideDirectoryModel relativePath
+  by_cases hdf : d = f
+  · subst hdf; simp
+  · rw [if_neg hdf]
+    generalize hF : resolveSegments cwd d = F
+    generalize hT : resolveSegments cwd f = T
+    have hTp : ∀ s ∈ T, Plain s := hT ▸ resolve_plain cwd f
+    dsimp only
+    have hk := commonPrefix_le F T
+    by_cases hp : F <+: T
+    · have hk' := (commonPrefix_full F T).mpr hp
+      simp only [hk', Nat.sub_self, List.replicate_zero, List.nil_append, hp, iff_true]
+      cases hd : T.drop F.length with
+      | nil => simp
+      | cons s rest =>
+        have hs : Plain s := hTp s (List.mem_of_mem_drop (by rw [hd]; simp))
+        obtain ⟨tail, he, ht⟩ := intercalate_front s rest
+        obtain ⟨a, b, c⟩ := plain_front s tail hs ht
+        simp only [he]
+        simp only [ne_eq, a, not_false_eq_true, decide_true, Bool.true_and, Bool.and_eq_true, Bool.not_eq_true',
+          List.isPrefixOf_iff_prefix] at *
+        refine ⟨?_, ?_⟩
+        · cases h : ("../".toList.isPrefixOf (s ++ tail)) with
+          | false => rfl
+          | true => exact absurd (List.isPrefixOf_iff_prefix.mp h) b
+        · cases h : (s ++ tail).head? with
+          | none => rfl
+          | some x => simp only [bne_iff_ne, ne_eq, Option.some.injEq]; intro hx; subst hx; exact c h
+    · have hlt : commonPrefix F T < F.length := by
+        rcases Nat.lt_or_eq_of_le hk with h | h
+        · exact h
+        · exact absurd ((commonPrefix_full F T).mp h) hp
+      simp only [hp, iff_false]
+      obtain ⟨m, hm⟩ : ∃ m, F.length - commonPrefix F T = m + 1 := ⟨F.length - commonPrefix F T - 1, by omega⟩
+      simp only [hm, List.replicate_succ, List.cons_append]
+      obtain ⟨tail, he, ht⟩ := intercalate_front ['.', '.'] (List.replicate m ['.', '.'] ++ T.drop (commonPrefix F T))
+      simp only [he]
+      rcases ht with rfl | ht
+      · simp
+      · obtain ⟨x, xs, rfl⟩ : ∃ x xs, tail = x :: xs := by cases tail <;> simp_all
+        simp at ht; subst ht
+        simp [List.isPrefixOf]
+
+end PlatformProofs
+
+theorem inside_directory_prefix : Spec.inside_directory_prefix := fun cwd directory file =>
+  PlatformProofs.inside_iff cwd.toList directory.toList file.toList
+
 /-! ## Function packages -/
 
 theorem zip_deterministic : Spec.zip_deterministic := fun _ => rfl
