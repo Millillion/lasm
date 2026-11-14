@@ -53,6 +53,8 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
   parseDevArguments   {"tokens": ["<hex>", …], "runtime": "node"}  → (the same)
   parsePackageArguments  ["<hex>", …]              → (the same)
   leanAtLeast    {"version": "<hex>", "minimum": "<hex>"}  → true | false
+  relativePath   {"cwd": "<hex>", "from": "<hex>", "to": "<hex>"}  → "<hex>"  (path.posix.relative)
+  insideDirectory  {"cwd": "<hex>", "directory": "<hex>", "file": "<hex>"}  → true | false
   applicationLinkRequirements  {"map": "<hex>", "initFree": ["<hex>", …]}
                                                     → {"error": "…"} | {"mode": "static" | "dynamic", "dynamic": ["<hex>", …],
                                                        "cxxRuntime": […], "moduleData": […], "requiresModuleData": b}
@@ -416,6 +418,12 @@ def answer (j : Json) : Except String Json := do
       | .error e => Json.mkObj [("error", toJson e)]
       | .ok r => Json.mkObj [("mode", toJson (if r.static then "static" else "dynamic")), ("dynamic", hexes r.dynamic),
           ("cxxRuntime", hexes r.cxxRuntime), ("moduleData", hexes r.moduleData), ("requiresModuleData", toJson r.requiresModuleData)]
+  | "relativePath" =>
+    return ofText (String.ofList (relativePath (← text (← input.getObjVal? "cwd")).toList
+      (← text (← input.getObjVal? "from")).toList (← text (← input.getObjVal? "to")).toList))
+  | "insideDirectory" =>
+    return toJson (insideDirectoryModel (← text (← input.getObjVal? "cwd")).toList
+      (← text (← input.getObjVal? "directory")).toList (← text (← input.getObjVal? "file")).toList)
   | "leanIOError" =>
     let tables ← input.getObjVal? "tables"
     let pairs := fun (j : Json) => do (← j.getArr?).toList.mapM fun p => do

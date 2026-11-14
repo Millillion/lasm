@@ -205,6 +205,14 @@ def unquote (line : String) : Option String :=
   | '"' :: r => if r.getLast? = some '"' then some (String.ofList (unescape r.dropLast)) else none
   | _ => none
 
+/-- `insideDirectory(directory, file, path.posix)` (src/platform.mjs; modelled
+in Model/Platform.lean), with `process.cwd()` the absolute `cwd`. -/
+def insideDirectory (cwd directory file : String) : Bool :=
+  insideDirectoryModel cwd.toList directory.toList file.toList
+
+/-- The segments of `path.posix.resolve(p)` from `cwd`. -/
+def resolvedSegments (cwd p : String) : List (List Char) := resolveSegments cwd.toList p.toList
+
 /-- `applicationLinkRequirements(map, { initializationFreeCppSymbols })`
 (src/application-reachability.mjs; modelled in Model/Reachability.lean):
 what the linker map of the reachability link requires, or the message thrown. -/

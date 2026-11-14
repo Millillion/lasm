@@ -29,7 +29,8 @@ import { applicationLinkRequirements } from '../../src/application-reachability.
 import { ioErrorTables, leanAtLeast, leanIOError } from '../../src/lean-io-errors.mjs';
 import { demangleName, initializerModule, mangleName } from '../../src/application-diagnosis.mjs';
 import { comparePythonStrings, pythonJsonString } from '../../src/link-driver/python.mjs';
-import { responseFile } from '../../src/platform.mjs';
+import { insideDirectory, responseFile } from '../../src/platform.mjs';
+import { posix } from 'node:path';
 import { resolveStaticPath } from '../../src/browser/static-server.mjs';
 import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 import { zip } from '../../src/serverless/zip.mjs';
@@ -431,6 +432,10 @@ function linkMap(r) {
   return { map: lines.join(r.next() < 0.05 ? '\r\n' : '\n') + r.pick(['\n', '', '\n  \n']), initFree: r.array(r.int(0, 3), () => r.pick(['f', 'g', '_ZTIfoo', '_ZTVbar', 'h'])) };
 }
 
+/** A POSIX path: absolute or relative, dot segments, doubled and trailing
+ * slashes, names sharing prefixes (`a`, `ab`, `..a`). */
+const posixPath = r => (r.next() < 0.7 ? '/' : '') + r.array(r.int(0, 5), () => r.pick(['a', 'b', 'ab', 'a', '..', '.', '', 'x y', 'λ', '..a', 'a.'])).join('/') + (r.next() < 0.2 ? '/' : '');
+
 const models = [
   {
     name: 'editDistance', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
@@ -567,6 +572,18 @@ const models = [
         return { ...result, dynamic: result.dynamic.map(hex), cxxRuntime: result.cxxRuntime.map(hex), moduleData: result.moduleData.map(hex) };
       } catch (error) { return { error: error.message }; }
     },
+  },
+  {
+    name: 'relativePath', source: 'src/platform.mjs', lean: 'Lasm.Cli.Model.Platform',
+    generate: r => { const from = posixPath(r); return [from, r.next() < 0.1 ? from : r.next() < 0.4 ? from + '/' + posixPath(r).replace(/^\//, '') : posixPath(r)]; },
+    input: ([from, to]) => ({ cwd: hex(process.cwd()), from: hex(from), to: hex(to) }),
+    js: ([from, to]) => hex(posix.relative(from, to)),
+  },
+  {
+    name: 'insideDirectory', source: 'src/platform.mjs', lean: 'Lasm.Cli.Model.Platform',
+    generate: r => { const directory = posixPath(r); return [directory, r.next() < 0.1 ? directory : r.next() < 0.5 ? directory + '/' + posixPath(r).replace(/^\//, '') : posixPath(r)]; },
+    input: ([directory, file]) => ({ cwd: hex(process.cwd()), directory: hex(directory), file: hex(file) }),
+    js: ([directory, file]) => insideDirectory(directory, file, posix),
   },
   {
     name: 'leanIOError', source: 'src/lean-io-errors.mjs', lean: 'Lasm.Cli.Model.LeanIOErrors',

@@ -712,13 +712,14 @@
       "reason": "its argument parsing is modelled (parse_known_or_refused proved); the rest packages a build (files, processes and archives), tested end to end"
     },
     "src/platform.mjs": {
-      "status": "pending",
-      "reason": "`insideDirectory` (path containment, over Node's `path.relative`) remains to model; the rest is the host check and constants",
+      "status": "modelled",
+      "reason": "responseFile and insideDirectory are modelled (response_file_round_trip and inside_directory_prefix proved), insideDirectory over POSIX paths with path.posix.relative checked by the differential; on Windows node:path's win32 rules apply instead (test/cli-parse.test.mjs); the rest is the host check and constants",
       "models": [
         {
           "lean": "verification/cli/Lasm/Cli/Model/Platform.lean",
           "functions": [
-            "responseFile"
+            "responseFile",
+            "insideDirectory (path.posix.relative)"
           ],
           "differential": "test/models/cli-differential.mjs"
         }

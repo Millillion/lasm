@@ -109,6 +109,16 @@ def parse_known_or_refused : Prop :=
         (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
     | .error m => m.trimAscii.toString ≠ ""
 
+/-- **A path is inside a directory exactly when its segments extend the
+directory's.** For POSIX paths resolved against the working directory,
+`insideDirectory` holds exactly when the resolved directory's segments are a
+prefix of the resolved file's: `..`, `.`, doubled and trailing slashes and
+names that share a prefix (`a`, `ab`, `..a`) are read as path segments.
+Tested by: test/cli-parse.test.mjs -/
+def inside_directory_prefix : Prop :=
+  ∀ cwd directory file : String,
+    insideDirectory cwd directory file = true ↔ resolvedSegments cwd directory <+: resolvedSegments cwd file
+
 /-! ## `lasm init` names -/
 
 /-- **Generated names are valid npm, Lake and Supabase names.** Whatever the
