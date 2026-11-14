@@ -36,13 +36,40 @@ function install() {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
   const nap = new Int32Array(new SharedArrayBuffer(4));
+  // Injected delay, every thread together (microseconds): [naps, requested,
+  // taken, late resolutions, requested, taken]. Printed at exit to stderr.
+  let delays = null;
+  if (fuzz) {
+    if (isMainThread) {
+      delays = new BigInt64Array(new SharedArrayBuffer(6 * 8));
+      setEnvironmentData('lasm.bridge.delays', delays.buffer);
+    } else {
+      const buffer = getEnvironmentData('lasm.bridge.delays');
+      if (buffer) delays = new BigInt64Array(buffer);
+    }
+  }
+  const account = (at, requested, taken) => {
+    if (!delays) return;
+    A.add(delays, at, 1n);
+    A.add(delays, at + 1, BigInt(Math.round(requested * 1000)));
+    A.add(delays, at + 2, BigInt(Math.round(taken * 1000)));
+  };
   function perturb() {
     if (!fuzz) return;
     const r = random();
     if (r >= rate) return;
     if (r < rate / 2) { const until = performance.now() + random() * 0.2; while (performance.now() < until); }
-    else A.wait(nap, 0, 0, random() * 2);
+    else {
+      const requested = random() * 2, started = performance.now();
+      A.wait(nap, 0, 0, requested);
+      account(0, requested, performance.now() - started);
+    }
   }
+  if (isMainThread && delays) process.on('exit', () => {
+    const ms = i => (Number(A.load(delays, i)) / 1000).toFixed(0);
+    process.stderr.write(`lasm bridge fuzz: ${A.load(delays, 0)} naps, ${ms(1)} ms requested, ${ms(2)} ms taken; `
+      + `${A.load(delays, 3)} late resolutions, ${ms(4)} ms requested, ${ms(5)} ms taken\n`);
+  });
 
   // Trace buffer, shared by every thread: [lock, count, overflow, -], then
   // records [thread, op, byte address, value].
@@ -143,7 +170,10 @@ function install() {
       () => A.waitAsync(array, index, value, timeout), () => value);
     if (fuzz && result.async && random() < rate) {
       const delay = random() * 3;
-      return { async: true, value: result.value.then(v => new Promise(done => setTimeout(() => done(v), delay))) };
+      return { async: true, value: result.value.then(v => new Promise(done => {
+        const started = performance.now();
+        setTimeout(() => { account(3, delay, performance.now() - started); done(v); }, delay);
+      })) };
     }
     return result;
   };
