@@ -30,7 +30,7 @@ account:
   sieve, big numbers, `HashMap` word counts, time, env, blocking and `Async`
   sleeps, `Async.block`, `Std.Mutex` with tasks, and thrown errors.
 
-The same build also runs on Node 26.13.0, Deno 2.9.6 and **Bun 1.4.4**.
+The same build also runs on Node 26.13.1, Deno 2.9.6 and **Bun 1.4.4**.
 
 **Recommended architecture:**
 
@@ -63,7 +63,7 @@ The same build also runs on Node 26.13.0, Deno 2.9.6 and **Bun 1.4.4**.
   - it builds the runtime, the template and
     [`examples/edge-pure`](../examples/edge-pure/) from source;
   - it serves them with pinned `wrangler dev` 4.152.0;
-  - it runs them on Node 26.13.0, Deno 2.9.6 and Bun 1.4.4;
+  - it runs them on Node 26.13.1, Deno 2.9.6 and Bun 1.4.4;
   - it gates the Free plan's budgets.
 
   The guide is [deploy/workers.md](deploy/workers.md).
@@ -247,7 +247,7 @@ The results are in the evidence file.
 | workerd 1.20261019.1 (wrangler 4.152.0, V8 15.7) | **yes**, no flag or compatibility flag | yes | yes | yes | no ("Threading is not possible in Workers") |
 | Bun 1.4.4 (JavaScriptCore) | **yes** (since 1.3.14) | **no** (needs `BUN_JSC_useWasmMemory64=1`) | yes | yes | n/a |
 | Deno 2.9.6 (V8 15.0) | yes | yes | yes | yes | n/a |
-| Node 26.13.0 | yes | yes | yes | — | n/a |
+| Node 26.13.1 | yes | yes | yes | — | n/a |
 | Node 24.13.1 | **no** | yes | yes | no (flag) | n/a |
 
 Bun has an open JSPI regression in 1.4.0–1.4.3 involving Wasm tail calls
