@@ -43,7 +43,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `examples/*/test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
 | [Named propositions](#named-propositions) | Every test that names a Lean proposition names one that exists and states it verbatim; every candidate (tested, not yet proved) names a test that cites it; every `forAll` property names one | `scripts/propositions.mjs`, `library/Lasm/*/Candidates.lean`, `verification/cli/`, `test/propositions.test.mjs` | PR (`unit.yml`) |
-| [Model differentials](#model-differentials) | Each Lean model of the CLI's JavaScript agrees with it on generated inputs; every shipped JavaScript and C module has a Lean model or a stated reason (the M4 inventory) | `verification/cli/Lasm/Cli/Model/`, `test/models/`, `cli-models.yml`; `verification/models.json`, `verification/MODELS.md`, `scripts/models.mjs`, `test/models-inventory.test.mjs` | PR (paths; the inventory in `unit.yml`) |
+| [Model differentials](#model-differentials) | Each Lean model of the CLI's JavaScript, and of the Lasm.UI applier, agrees with it on generated inputs; every shipped JavaScript and C module has a Lean model or a stated reason (the M4 inventory) | `verification/cli/Lasm/Cli/Model/`, `library/Lasm/UI/Proofs/Applier.lean`, `test/models/`, `cli-models.yml`, `ui-applier-model.yml`; `verification/models.json`, `verification/MODELS.md`, `scripts/models.mjs`, `test/models-inventory.test.mjs` | PR (paths; the inventory in `unit.yml`) |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (`unit.yml`), nightly, release |
 | [Flaky tests](#flaky-tests) | A flaky test is quarantined at once, then fixed or deleted within a week | `test/quarantine.json`, `scripts/test/`, `scripts/ci/flaky-report.mjs` (`flaky.yml`) | nightly report; quarantine on every unit run |
 | [Coverage and mutation](#coverage-and-mutation-testing) | How much of the JavaScript the tests execute, and whether they would notice a change | `scripts/coverage/`, `scripts/mutation/` (`mutation.yml`) | PR, nightly and release (coverage); nightly and PR, changed modules only (mutation) |
@@ -1305,6 +1305,35 @@ targets `serverless-http`, `lasm-js-wire` and `ui-decode` are the model
 differentials of src/serverless/, the Lasm.JS codec and the UI applier's
 reading.
 
+The Lasm.UI applier's DOM operations and hydration (src/lasm-modules/ui-dom.mjs)
+have a Lean model, [library/Lasm/UI/Proofs/Applier.lean](../library/Lasm/UI/Proofs/Applier.lean):
+the applier's `apply(frame)` over an abstract DOM tree, every node looked up
+by id in one table for the document as the JavaScript does, with the DOM's
+refusals (an id not in the document, an insert before a node that is not a
+child, into a text node or into the moved node's own subtree, attributes on
+a text node) and hydration's adoption of server-rendered nodes.
+[test/models/ui-applier-differential.mjs](../test/models/ui-applier-differential.mjs)
+(`ui-applier-model.yml`, on changes to the applier or Lasm.UI) applies the
+same frames with the shipped applier on happy-dom, whose insertion checks it
+makes the DOM standard's (happy-dom inserts into text nodes and before nodes
+that are not children, where browsers throw), and with the model
+(`lean --run` [test/models/UiApplierModel.lean](../test/models/UiApplierModel.lean)),
+and fails when the DOMs differ after any frame or one side refuses a frame
+the other applies. It draws 1000 sessions of each kind: Lean's own diff of
+random views (keyed and unkeyed children, reorders, inserts, removals, tag,
+text and attribute changes; every patch must conform, the candidate
+`Lasm.UI.Candidates.diff_conforms`, and every frame apply), random
+operations from the DOM's own nodes (most apply, a tenth are refused), and
+hydration of random server DOMs (nodes changed, dropped, added, separated by
+comments, with server attributes); then the 120 sessions of
+test/fixtures/ui/patches.json, from an empty root and hydrating their
+server-rendered HTML. Proved of the model (library/PROOFS.md):
+`applier_correct` (a conforming patch is performed exactly as
+Lasm.UI.Model's `applyOps`), `applier_session` (with conforming patches,
+every frame the browser reads leaves the DOM of the view) and
+`hydrate_correct` (hydration builds the fresh mount's nodes from any server
+DOM, and exactly its DOM from one that renders the view).
+
 Which modules have a model, and why the others need none or are still due
 one, is the inventory [verification/MODELS.md](../verification/MODELS.md),
 generated from `verification/models.json` by `node scripts/models.mjs` and
@@ -1870,3 +1899,4 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Deterministic simulation of Porter (4 of 30 seeds) | A token request whose commit succeeded and then reported an error is run again by `runRequest`, finds its own code used or its refresh token rotated, answers `invalid_grant` and revokes the family it just issued: one transient database error signs a user out | Fixed (#138, Jordan's choice of a commit receipt): each commit inserts a row keyed by an id from the request's random values (the same on a rerun), and a failed commit whose receipt is there keeps its reply (`Server/App.lean`, `Spec.landed_commit_stands`); the simulation no longer tolerates the refusal |
 | Mutation testing (`downloads`, 2026-11-09) | **A failing SDK archive decoder was reported as the tar parser's error**: when the managed Python's decoder for `.tar.xz`/`.zip` SDK archives (`src/archive-stream.py`) failed, could not start or was killed, `extract` reported `TAR_BAD_ARCHIVE: Unrecognized archive format` for the empty or truncated stream it left, not the decoder's exit status and messages | Fixed in `src/managed-artifacts.mjs` (the decoder's result is preferred after a broken stream); regressions in `test/managed-artifacts-decoder.test.mjs`; `docs/release/0.6.1-notes.md` |
 | Differential fuzzing, feature programs (campaign 42620999209, seed 620999216, case 132; `wasi`, `wasi-node`, `deno`, the edge engines, browsers, both profiles) | `(repr a).pretty` of an `Array Int` of 5,120 elements stops with "call stack exhausted" / "Maximum call stack size exceeded": Lean's formatter recurses with the number of elements, and the WASI and edge stacks hold about 9,000–11,000 frames. Native Lean and the Node target print it | Open: [#179](https://github.com/Millillion/lasm/issues/179) (the documented recursion-depth limit, reached through the standard library); the generator keeps printed arrays below that size |
+| Flaky `host-fixtures` case ([#196](https://github.com/Millillion/lasm/issues/196): PRs #195, #214, #220) | `temporary-files` failed with status `null`: a native-Lean run was killed at the harness's 60 s timeout. Two native runs crash by design (Lean's error decoders dereference a null file name: `temporary-files`' `missing-directory` and `cwd-tracking-deleted-process`, SIGSEGV), and the ubuntu-24.04 runner pipes cores to systemd-coredump, whose `core_pattern` passes the core limit as unlimited, so it collected each crash's core even under `ulimit -c 0`: 25–60 s per crash, and the two cases took 27–65 s when they passed (a first fix with `ulimit -c 0` still took 42 s). Neither Lasm's nor the oracle's output | Harness fix: the native runs expected to crash run under `prlimit --core=1:1` (`withoutCore` in `integration/host-fixtures.mjs`): Linux skips a piped core dump when the limit is exactly 1 byte; status and signal are unchanged (exec). The run prints the core handler and limit, and a killed oracle names its signal |

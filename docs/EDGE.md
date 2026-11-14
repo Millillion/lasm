@@ -12,7 +12,7 @@ Measured behaviour is marked as measured. Plans are marked as plans.
   [`lean-4.35.0-edge.patch`](../scripts/full-lean/patches/lean-4.35.0-edge.patch)
   and [`runtime/edge.cpp`](../runtime/edge.cpp). CI:
   [`edge-runtime.yml`](../.github/workflows/edge-runtime.yml).
-- Evidence: [edge-prototype-2026-10-24.json](evidence/edge-prototype-2026-10-24.json).
+- Evidence: [edge-prototype-2026-10-24.json](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/edge-prototype-2026-10-24.json).
 - Decisions: [DECISIONS.md](DECISIONS.md).
 
 ## Result
@@ -69,7 +69,7 @@ The same build also runs on Node 26.13.0, Deno 2.9.6 and **Bun 1.4.4**.
   The guide is [deploy/workers.md](deploy/workers.md).
 
   **First green run: 40128600109** (ubuntu-24.04, source `2f42d1b`;
-  [results](evidence/workers-ci-40128600109.json)). Every route passed on
+  [results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/workers-ci-40128600109.json)). Every route passed on
   workerd, Node, Deno and Bun, including the stop-and-restart check, and every
   budget passed.
 
@@ -163,7 +163,7 @@ Measured locally (2026-10-24). Every route passed on both, including the
 stop-and-restart check on Netlify.
 
 **CI: green in run 40143173720** (ubuntu-24.04, source `0994ce3`;
-[results](evidence/workers-ci-40143173720.json)). Every target passed for both
+[results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/workers-ci-40143173720.json)). Every target passed for both
 apps: workerd, Node, Deno, Bun, Vercel Edge, Netlify Edge, Deno Deploy and
 the Bun build. The Node link driver's edge link was byte-identical to `emcc`.
 
