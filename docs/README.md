@@ -70,14 +70,15 @@ WebAssembly hosts and browsers (0.3.0): [Fastly Compute](deploy/fastly.md) ·
 ## 5. Project internals and history
 
 For contributors; not needed to use Lasm. Some pages describe earlier phases
-(for example "Node only" or Lean 4.32/4.34) and are kept as records.
+(for example "Node only" or Lean 4.32/4.34) and are kept as records; pages that
+are only history are in [history/](history/).
 
 - Decisions and plans: [DECISIONS.md](DECISIONS.md) (choices made during launch
-  week, with how to undo each), [PLAN.md](PLAN.md), [PROGRESS.md](PROGRESS.md)
+  week, with how to undo each), [PLAN.md](PLAN.md)
 - Releasing: [RELEASING.md](RELEASING.md), [0.1.0 gate](release/0.1.0-gate.md),
   [NODE_ACCEPTANCE.md](NODE_ACCEPTANCE.md), [CI_STORAGE.md](CI_STORAGE.md)
 - Architecture: [JS interop threading](JS_INTEROP.md),
-  [application pipeline](APPLICATION_PIPELINE.md), [runtime](RUNTIME.md),
+  [application pipeline](APPLICATION_PIPELINE.md),
   [deployment size](BUNDLE_SIZE.md), [toolchain slimming](TOOLCHAIN_SLIMMING.md),
   [toolchain robustness](TOOLCHAIN_ROBUSTNESS.md), [Windows toolchains](WINDOWS_TOOLCHAINS.md)
 - Testing: [upstream Lean tests](UPSTREAM_TESTS.md),

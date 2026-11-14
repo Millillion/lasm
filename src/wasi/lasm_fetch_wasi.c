@@ -458,6 +458,8 @@ static uint32_t dynamic_backend(const char *url, size_t url_length, char *name, 
     strcpy(hostname, authority);
     char *colon = hostname[0] == '[' ? strchr(hostname, ']') : strrchr(hostname, ':');
     if (colon && *colon == ']') colon = colon[1] == ':' ? colon + 1 : NULL;
+    /* An empty port (`host:`) is the scheme's default (RFC 3986 §3.2.3). */
+    if (colon && !colon[1]) { authority[colon - hostname] = 0; *colon = 0; colon = NULL; }
     if (colon) *colon = 0; else strcat(authority, tls ? ":443" : ":80");
     if (hostname[0] == '[') { memmove(hostname, hostname + 1, strlen(hostname)); char *close = strchr(hostname, ']'); if (close) *close = 0; }
     snprintf(name, name_size, "lasm-%s-", tls ? "tls" : "tcp");

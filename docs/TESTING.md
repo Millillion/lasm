@@ -32,18 +32,18 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | Layer | What it checks | Where | CI tier |
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) and [fuzzing](#differential-fuzzing) | Lasm-compiled programs (generated expressions, statements, and feature programs declaring classes, inductives, closures, loops, structures) behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
-| [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic equals Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs` | PR, nightly |
+| [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic, Ledger's API traffic, Porter's OpenID traffic and Tandem's protocol traffic equal Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs`, `examples/*/test/equivalence.mjs` | PR, nightly |
 | [Standard bindings](#standard-bindings) | Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun are their generator's output (Lasm.JS.Node's lowering is that of the pinned Node docs, Lasm.JS.Deno's and Lasm.JS.Bun's that of the pinned TypeScript declarations), and behave as the specs, Node's docs and the declarations say on every target: WPT's URL and urlencoded data, Lean's UTF-8, hex, base64 and path operations as oracles, published crypto vectors, generated round trips, files and child processes, a Lean handler served by Deno.serve, Bun.serve and @hono/node-server and requested over HTTP | `scripts/bindings/`, `test/fixtures/js-web/`, `test/fixtures/js-node/`, `test/fixtures/js-serve/`, `web-bindings.yml` | PR (paths), main |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
 | [Dependable tooling](#dependable-tooling) | Every user-triggerable error prints a clear message (error corpus); incremental, repeated, renamed and touched builds give the clean build's bytes (metamorphic); killed, offline, full-disk, read-only and corrupted runs end in success or a clear error (fault injection) | `scripts/tooling/`, `tooling.yml` | PR (corpus), nightly (all) |
-| [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage: the CLI's arguments, tar archives, the function platforms' HTTP mapping, the Lasm.UI patch decoder, Lasm.Fetch's request parsing, Lasm.RPC's decoding, the WASI C host's CGI request | `test/fuzz/`, `fuzz.yml` | PR (replay), nightly, weekly |
+| [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage: the CLI's arguments, tar archives, `lasm dev`'s proxy, project files, the edge entries' request mapping, the function platforms' HTTP mapping, the Lasm.UI patch decoder, Lasm.Fetch's request parsing, Lasm.RPC's decoding, the WASI C host's CGI request, the Fastly host | `test/fuzz/`, `fuzz.yml` | PR (replay), nightly, weekly |
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
 | [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `examples/*/test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
 | [Named propositions](#named-propositions) | Every test that names a Lean proposition names one that exists and states it verbatim; every candidate (tested, not yet proved) names a test that cites it; every `forAll` property names one | `scripts/propositions.mjs`, `library/Lasm/*/Candidates.lean`, `verification/cli/`, `test/propositions.test.mjs` | PR (`unit.yml`) |
-| [Model differentials](#model-differentials) | Each Lean model of the CLI's JavaScript agrees with it on generated inputs; every shipped JavaScript and C module has a Lean model or a stated reason (the M4 inventory) | `verification/cli/Lasm/Cli/Model/`, `test/models/`, `cli-models.yml`; `verification/models.json`, `verification/MODELS.md`, `scripts/models.mjs`, `test/models-inventory.test.mjs` | PR (paths; the inventory in `unit.yml`) |
+| [Model differentials](#model-differentials) | Each Lean model of the CLI's JavaScript, and of the Lasm.UI applier, agrees with it on generated inputs; every shipped JavaScript and C module has a Lean model or a stated reason (the M4 inventory) | `verification/cli/Lasm/Cli/Model/`, `library/Lasm/UI/Proofs/Applier.lean`, `test/models/`, `cli-models.yml`, `ui-applier-model.yml`; `verification/models.json`, `verification/MODELS.md`, `scripts/models.mjs`, `test/models-inventory.test.mjs` | PR (paths; the inventory in `unit.yml`) |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (`unit.yml`), nightly, release |
 | [Flaky tests](#flaky-tests) | A flaky test is quarantined at once, then fixed or deleted within a week | `test/quarantine.json`, `scripts/test/`, `scripts/ci/flaky-report.mjs` (`flaky.yml`) | nightly report; quarantine on every unit run |
 | [Coverage and mutation](#coverage-and-mutation-testing) | How much of the JavaScript the tests execute, and whether they would notice a change | `scripts/coverage/`, `scripts/mutation/` (`mutation.yml`) | PR, nightly and release (coverage); nightly and PR, changed modules only (mutation) |
@@ -478,7 +478,8 @@ too: a change on Node shows up as a diff in review.
 platform differences in URL parsing. **What it cannot catch:** behaviour the
 corpus does not exercise; timing; headers platforms add themselves (`date`,
 `server`, framing), which are deliberately not compared. Conduit's RealWorld
-traffic is compared too, with its tokens and timestamps normalized (next section).
+traffic is compared too, with its tokens and timestamps normalized (next section),
+and so is the flagship apps' own test traffic ([below](#the-flagship-apps-recorded-traffic)).
 
 #### Conduit's RealWorld traffic
 **Property.** On every target Conduit's CI runs, the official RealWorld API
@@ -535,6 +536,53 @@ body byte (key order, escaping, number formatting, error bodies), which user a
 token belongs to, a write a store lost. **What it cannot catch:** requests the
 suite does not send; behaviour under concurrency (`examples/conduit/test/concurrency.mjs`);
 bugs that are the same on every target, Node included; timing.
+
+#### The flagship apps' recorded traffic
+
+**Property.** On every platform an app's README claims (the rows of
+[`scripts/evidence/apps.json`](../scripts/evidence/apps.json)), the requests
+the app's own outside-oracle tests send get the same answers as on Node: equal
+statuses, equal response headers (apart from `IGNORED_HEADERS` and the
+platform's `PLATFORM_HEADERS`) and equal bodies, exchange by exchange, once
+the app's documented nondeterminism is normalized.
+
+[`scripts/equivalence/traffic.mjs`](../scripts/equivalence/traffic.mjs) holds
+what the apps share: a recording reverse proxy (as Conduit's), a recorder at
+the fetch level for drivers whose clients must see the server's own origin, the
+generic normalization (header names lower-cased and sorted, Conduit's
+ignored headers dropped, and `content-encoding` too: the client accepts gzip,
+`wrangler dev` uses it and Node does not, so the body is compared after the
+coding is undone; bodies over 16 KiB kept as their SHA-256 and length), one
+more platform rule (on Workers, the apps' `wrangler.toml` lets Workers' own
+asset serving answer for the browser page's files before the Worker runs: on
+those responses, recognized by its `cf-cache-status`, the caching headers it
+owns, `cache-control`, `etag`, `vary` and `cf-cache-status`, are left out on
+both sides, while the bytes are still compared), one platform form (on Azure
+Functions, all but one `Set-Cookie` of a reply travel in Azure's `cookies`
+list, which `func start` writes again with lowercase attribute names in its own
+order (DECISIONS 2026-11-03): there `Set-Cookie` is compared on both sides with
+attribute names, `SameSite` and `Domain` lowercased and the attributes sorted,
+RFC 6265 §5.2; names, values and every attribute still compared), the
+alignment and diff, and the `compare NAME` /
+`self-test` command line. Each app's `examples/<app>/test/equivalence.mjs` adds its own
+normalizer and documents each rule; its Node job writes
+`test-results/normalized-SUITE-node-24.json`, which is committed as
+`examples/<app>/test/equivalence/SUITE.json` and reviewed like code, for the reasons Conduit's
+golden file is. Every Node and platform job of the app runs the comparison as
+its step after the recorded driver; the Node jobs run the normalizer's
+self-test first.
+
+| App | Recorded driver (suite) | Normalized, and why | Not recorded |
+| --- | --- | --- | --- |
+| Ledger | `test/api.mjs --equivalence` through the proxy (`api`) | Timestamps (`"timestamp"` in bodies, `?after=` in paths) become their rank among the run's timestamps: they are nanoseconds from the server's clock, while their order is still compared; their count, and that each is above 10^18, are compared as facts | The bank workload (concurrent and random) |
+| Porter | `examples/porter/test/oracles.mjs` and `test/attacks.mjs --equivalence` at the fetch level, because the OpenID libraries must see the issuer as the server's own origin (`oracles`, `attacks`) | The issuer (a free port, also percent-encoded) becomes `<issuer>`; JWTs are decoded, their claims compared with `iat`, `auth_time` as `<time>` and `exp` as `<time>+TTL`, the signature by its length (ES256 signatures are randomized, and every key is generated on first start); 43-character base64url values (32 random bytes: codes, tokens, session and interaction ids, the keys' `kid` and coordinates, the clients' state, nonce and PKCE values) and `at_hash` become ordinals by first appearance, so every reference between an issued and a used value is still compared; JSON times outside a JWT become `<time>`. The counts of each are facts | The adversarial suite's two concurrent checks (one code redeemed 12 times, one refresh token used 8 times at once): which request wins is the scheduler's |
+| Tandem | `test/protocol.mjs --equivalence` at the fetch level (`protocol`) | The clock part of the test documents' names (`p<clock>-<n>`, so that a rerun against a running server starts fresh) | The concurrent writers and the long-poll (scheduler- and platform-timed: 2 s on Node, 10 s on Workers), the WebSocket and SIGKILL tests (only some targets run them), the simulation and the fuzzer (concurrent or time-bounded) |
+
+**What it catches:** a platform's adapter, store or runtime answering one of
+the app's real requests differently from Node: a status, a header, a body
+byte, an order of rows, a reference between issued and used values. **What it
+cannot catch:** requests the drivers do not send; what is not recorded;
+bugs the same on every target.
 
 ### Standard bindings
 
@@ -757,6 +805,31 @@ the black-box harnesses on macOS and Windows (Linux runners only; the
 unit-level installer controls in `installer-faults.yml` run on all five
 platforms); `lasm dev` with several outputs at once.
 
+### Metamorphic compiler relations
+
+[`scripts/differential/metamorphic.mjs`](../scripts/differential/metamorphic.mjs)
+checks relations between two builds of a program that need no oracle: a
+semantics-preserving change to the source must not change what the program
+built by Lasm prints (stdout, stderr and the exit status), on node, node:wasi
+and the edge output run by Node. The programs are the differential
+generator's, a core program (60 cases) and a feature program (40 cases) per
+seed, with one of the generator's endings. The transforms:
+
+| Transform | The program changed | Compared |
+| --- | --- | --- |
+| `rename` | every case's names take another prefix of the same length (`c12…` becomes `ζ12…`; `Repr` output wraps at a fixed width, so a longer name would legitimately move line breaks) | after mapping printed names back |
+| `reorder` | the cases' declarations in a random order; `main` calls them in the original one | as is |
+| `dead` | copies of a third of the cases under unused names, and two unused imports | as is |
+| `noinline` | `@[noinline]` on every plain top-level `def` of the cases | as is |
+| `modules` | the preamble in `Pre.lean`, the cases in `A.lean` and `B.lean`, `main` in `Main.lean` | as is |
+
+A transform that does not build, or prints anything else, breaks its
+relation: both programs and their outputs are kept in `repros/` (artifact
+`metamorphic-<run>`). `--render-only DIR` writes a seed's programs without
+building them. CI ([differential.yml](../.github/workflows/differential.yml)
+`metamorphic`): a 40-minute campaign nightly from a fresh seed, and one seed
+on a pull request or push that changes the harness or the generator.
+
 ### Fuzzing at the boundaries
 
 Coverage-guided fuzzers for every input boundary that had none, in
@@ -772,10 +845,14 @@ where they are; these cover the libraries and hosts every app shares.
 | `ui-patch` | the Lasm.UI patch decoder (`src/lasm-modules/ui-dom.mjs`) on happy-dom, with hydration | JavaScript | a frame applies, or fails with a `Lasm.UI: …` error or a `DOMException`; never a `TypeError`, a hang, or an attribute from a reference past the name table |
 | `ui-decode` | the same applier's reading of a session's frames, on a recording DOM (the DOM's tree semantics, every slot kept), against Lean's reference decoder (`library/Lasm/UI/Proofs/Decode.lean`, which `Lasm.UI.Spec.frames_decode` proves reads every encoded frame as its patch) | JavaScript | frame by frame, the applier refuses exactly the frames the decoder refuses, and otherwise leaves exactly the DOM the decoder's operations make: every node, id, tag, namespace, text, attribute, property, style, and listener with its decoder's paths. The decoder runs with `lean --run` (`test/fuzz/support/ui-decode-model.mjs`, required in CI). Frames whose meaning depends on the DOM, not the bytes (an id not in the document, a move into its own subtree, an id in use, a property that is a DOM member), and numbers above 2^53, end a session without a verdict; a removed property reads as its type's empty value, so `""`, `false` and unset compare equal |
 | `lasm-js-wire` | the Lasm.JS value codec's JavaScript half (`src/node-js.mjs`'s writer and reader), against Lean's half (`Wire` in `library/Lasm/JS/Core.lean`, whose round trip is proved: `Lasm.JS.Spec.decode_encode`) | JavaScript | on any bytes, JavaScript's reader and Lean's (`Wire.decodeWith`) both refuse, or both read the same value; on any value, JavaScript writes exactly Lean's bytes (`Wire.encode`) and reads them back as the value. Lean's half runs with `lean --run` (`test/fuzz/support/js-wire-model.mjs`, required in CI). Normalizations, JavaScript's own semantics: lone surrogates are written as U+FFFD, a repeated key keeps its last value, NaN payloads are not compared (Lean's `Float.ofBits` keeps none) |
+| `dev-proxy` | `lasm dev`'s proxy (`src/dev-proxy.mjs`): a request through it to an upstream that answers with raw bytes the input chooses (Content-Length, chunked or close-delimited replies, a reply cut mid-body, a malformed head) | JavaScript | the upstream receives the request once, unchanged but for its own Host and no Accept-Encoding; a whole reply reaches the client with its status, headers and body byte for byte, a page's with the reload client inserted before the first `</body>` (`Cache-Control: no-store`); a cut reply ends cut and a malformed one as a 502, within 3 s (`Lasm.Cli.Candidates.dev_proxy_*`) |
+| `project-files` | the project files Lasm reads itself: a Lean source's import header (`leanHeader`, the key of the build's reuse of Lake's configuration; `importClosure`, what `lasm dev` rebuilds after an edit), lake-manifest.json and lakefile.lean (`lakeConfigurationKey`), package.json (`edgeModules`, `supabaseFunctionName`, `fastlyName`) | JavaScript | against Lean's own header parser (`Lean.Elab.parseImports`, `test/fuzz/support/LeanHeaderModel.lean`, run with `lean --run` by `test/fuzz/support/lean-header-model.mjs`, required in CI): whenever Lean reads a header without error, `leanHeader` of the source has exactly its imports and `importClosure` reaches every imported file; a manifest is a key or no reuse, never a throw; package.json is read, or refused with a plain `Error` naming it (`Lasm.Cli.Candidates`: `lean_header_keeps_imports`, `import_closure_covers_imports`, `lake_key_total`, `package_readers_clear`). Lean 4.35 reads a header broken by a bare CR as no imports and no error, so texts with one have no verdict on `leanHeader` |
+| `edge-request` | the edge entries' request mapping (`src/edge/edge-build.mjs`): the Supabase entry's `route` (Supabase hands the function `/NAME/PATH`) and the Vercel Edge entry's `identity`, taken from the generated entries' text and run on Node's `Request` | JavaScript (every script's blocks count: the generated functions are `new Function` scripts) | `route` removes exactly the function's name from a path that is the name or starts with it and `/` (the name alone becomes `/`), keeping the origin, query, method, headers and body, and leaves any other request unchanged; `identity` changes nothing but Accept-Encoding (`Lasm.Cli.Candidates`: `supabase_route_strips_name`, `vercel_identity_drops_encoding`) |
 | `tar` | Lasm's tar reader and writer (`src/tar.mjs`): every tool archive, npm package and CI tree Lasm reads, and the Fastly package it writes | JavaScript | whatever Lasm's reader accepts, Python's `tarfile` accepts and reads as the same entries (paths, types, permission bits, sizes, link paths, each file's bytes); Lasm may only be stricter, and refuses with a plain `Invalid tar archive` error; what the writer writes, the reader reads back exactly. Inputs are raw archives (optionally with every expected header's checksum recomputed, to reach the fields behind it) or entries built from fields. Normalizations: trailing slashes, and no verdict for a non-POSIX header with a prefix field (tarfile joins it, POSIX and GNU tar do not). The oracle runs in one `python3 -I` process (`test/fuzz/support/tar-oracle.py`, required in CI) |
 | `lean-fetch-request` | `Lasm.Fetch`'s request parsing as Node's host builds requests (`nodeRequestUrl`, `path`, `segments`, `query`, `queryParams`, `header?`, `percentDecode`, `joinCookies`, `splitCookieCommas`) | libFuzzer, ASan | the path starts with `/` and holds no `?`, `#`, `\`; the Host header never moves the path; the target alone has the same path; resolving again changes nothing; no dot segments; one Cookie header |
 | `lean-rpc` | `Lasm.RPC`'s `decodeRequest` and `decodeResponse` for an endpoint with strings, Booleans, arrays, `Nat` and `Option` | libFuzzer, ASan | accepted only when `validate` passes, otherwise refused as invalid (400); request and response round trips; Lean's JSON printer's output parses and prints the same |
 | `wasi-cgi` | the WASI C host's CGI request and response (`src/wasi/lasm_fetch_wasi.c`), compiled natively | libFuzzer, ASan, UBSan | strings handed to Lean are valid UTF-8; the method is `REQUEST_METHOD`; the Host or `SERVER_NAME` never moves the path; the response head is one line per header, no CR, LF or NUL inside a line |
+| `fastly-host` | the Fastly Compute host (`src/wasi/lasm_fetch_wasi.c` with `-DLASM_WASI_FASTLY`), compiled natively through `test/fuzz/native/fastly_driver.c`, which plays an honest Fastly host: it answers each ABI call as the ABI allows, choosing from the input how many header names or values a call returns, how short a read is, how much of a write it takes, and answering BUFLEN with the length it needs | libFuzzer, ASan, UBSan | the program gets the request's method, URI, headers (grouped by name as the host lists them) and body byte for byte, taken whole or as a head and reads of any size; the host receives the response's status, headers in order and body byte for byte, sent once and ended as the program asked; a fetch's dynamic backend targets the URL's host and port (the scheme's default when there is none or it is empty) and overrides the Host with the host name, for every URL RFC 3986 allows (`Lasm.Fetch.Candidates`: `fastly_request_read`, `fastly_response_written`, `fastly_backend_authority`) |
 
 **Engines.** The JavaScript targets run in a worker under V8's block coverage
 (`node:inspector` `Profiler.takePreciseCoverage`, read after each run): an
@@ -816,6 +893,7 @@ a fix, or an issue.
     node test/fuzz/support/serverless-model.mjs         # serverless-http's Lean model (used when prepared)
     node test/fuzz/support/ui-decode-model.mjs          # ui-decode's Lean decoder (used when prepared)
     node test/fuzz/support/js-wire-model.mjs            # lasm-js-wire's Lean half (used when prepared)
+    node test/fuzz/support/lean-header-model.mjs        # project-files' Lean header parser (used when prepared)
 
 **CI** ([fuzz.yml](../.github/workflows/fuzz.yml)): every pull request and push
 to `main` replays the committed corpus and regressions of the JavaScript
@@ -867,6 +945,27 @@ failing input and uploads its new corpus entries and failing inputs (artifact
   (`Lasm.UI: no decoder N`, `Lasm.UI: text that is not UTF-8`). A number
   above 2^53 is refused instead of rounded, and padding zeros past it, which
   Lean reads as nothing, no longer turn into `NaN`.
+- `lasm dev`'s proxy left the client's response open for ever when the
+  server program stopped mid-reply (as it does on every rebuild), sent a
+  request again up to 100 times over 10 s when the reply was malformed (a
+  POST the server had received, each time), and read pages as UTF-8, so a
+  page in another charset lost its accented letters. It now cuts the
+  client's response, retries only a refused connection, and inserts the
+  reload client into the page's bytes.
+- checked against Lean's header parser, the project files: `importClosure`
+  missed imports written `«My Mod»`, `A.«b c»`, with a name on the line
+  after `import`, after a nested comment, or with Latin-1, Greek or other
+  letters Lean allows (so `lasm dev` did not rebuild after an edit to them);
+  `leanHeader` dropped an import whose name is on the next line (a stale
+  Lake configuration could be reused); `lakeConfigurationKey` threw a
+  `TypeError` on a manifest that is `null` or has packages of the wrong
+  shape; and the package.json readers threw a `TypeError` for `null` and a
+  `SyntaxError` that did not name the file. One reader of Lean headers
+  (`leanHeaderImports`, as Lean's lexer reads names and comments) now serves
+  both, and a malformed manifest is no reuse.
+- against an honest Fastly host, the Fastly host registered the dynamic
+  backend of `http://example.com:/` (an empty port) as `example.com:`
+  instead of `example.com:80`; an empty port is now the scheme's default.
 - checked against Lean's half, the Lasm.JS value codec's JavaScript reader
   (both copies, `src/node-js.mjs` and `src/edge/edge-js.mjs`) disagreed in
   three ways: a Lean object field named `__proto__` set the JavaScript
@@ -909,7 +1008,9 @@ step one access to a shared word:
   that wait for a JavaScript promise (the request fails at once), and callbacks
   that wait for a Lean task (`sync_wait`), which the main thread asks to stop
   when every other Lean thread waits too (`stuckWait`), and not when the task
-  finishes by itself. Waits
+  finishes by itself; a stopped task's thread stays in its host call until the
+  event loop answers it after the callback, independent of later callbacks
+  (while it runs, no other wait is stopped). Waits
   follow `Atomics.wait`/futex semantics; a blocked wait may also wake
   spuriously and a timed wait may time out (each optional per configuration).
 - `HostBridge/Poller.lean`: the interop poller (`claim_poller`'s
@@ -937,6 +1038,7 @@ runs every configuration (CI: about 1.5 s; with `--large` about 15 s):
 | … 4 and (large) 10 callbacks | 1 host call each | 18,756; 98,890 | ok |
 | Work proxied to the main thread inside callbacks | 1 + 1; (large) 5 callbacks, 8 host calls | 8,796; 54,756 | ok (it runs when the wait's 10 ms timeout expires) |
 | A callback waits for a promise, then host calls | 1 + 1 | 11,949 | ok (the wait fails at once) |
+| Callbacks wait for Lean tasks: stuck (stopped), finishing (not stopped) | 1 + 1; 3 callbacks (stuck, finishing, stuck) with a stopped task's thread waiting or running; (large) 4 callbacks mixing task waits and awaits | 13,941; 12,887; 138,037 | ok |
 | Host calls made by work proxied to the callback thread | 2 callbacks; (large) 5 callbacks mixing awaits, nested calls and proxied work | 209,000; 3,837,965 | ok (served when the wait times out) |
 | A generic Lean thread's slot, replies now or in a later task | 3; (large) 30 host calls | 280; 3,196 | ok |
 | Poller and completion thread | 5 scripts (callbacks with and without `waitForever`, awaits, async requests, timer races); (large) 4 calls, 2 awaits, 2 async requests | 84–1,588; up to 34,678 | ok |
@@ -963,7 +1065,9 @@ and after each operation it may spin or sleep (a yield at every handshake step
 and host-call boundary), a blocking wait may return early (`ok`, or `timed-out`
 as if its time had passed) and a `waitAsync` may resolve late. Every decision
 comes from a generator seeded by (seed, thread), so a run's perturbations
-repeat from its seed. `scripts/ci/lasm-js-stress.mjs --seed S` runs the stress
+repeat from its seed. A delay shorter than the platform's timer resolution oversleeps
+(7–11× outside Linux), so each thread's oversleep is paid back by its next delays,
+and the preload prints the delay it asked for and took at exit. `scripts/ci/lasm-js-stress.mjs --seed S` runs the stress
 programs (js-interop, js-callbacks, the Hono server) with seed S + i for run i;
 a run passes with no timeout and the same output as the expected output or the
 first run (timings masked). A failure prints its seed and the command that
@@ -1232,6 +1336,35 @@ malformed completion passed and the glue read past the batch
 targets `serverless-http`, `lasm-js-wire` and `ui-decode` are the model
 differentials of src/serverless/, the Lasm.JS codec and the UI applier's
 reading.
+
+The Lasm.UI applier's DOM operations and hydration (src/lasm-modules/ui-dom.mjs)
+have a Lean model, [library/Lasm/UI/Proofs/Applier.lean](../library/Lasm/UI/Proofs/Applier.lean):
+the applier's `apply(frame)` over an abstract DOM tree, every node looked up
+by id in one table for the document as the JavaScript does, with the DOM's
+refusals (an id not in the document, an insert before a node that is not a
+child, into a text node or into the moved node's own subtree, attributes on
+a text node) and hydration's adoption of server-rendered nodes.
+[test/models/ui-applier-differential.mjs](../test/models/ui-applier-differential.mjs)
+(`ui-applier-model.yml`, on changes to the applier or Lasm.UI) applies the
+same frames with the shipped applier on happy-dom, whose insertion checks it
+makes the DOM standard's (happy-dom inserts into text nodes and before nodes
+that are not children, where browsers throw), and with the model
+(`lean --run` [test/models/UiApplierModel.lean](../test/models/UiApplierModel.lean)),
+and fails when the DOMs differ after any frame or one side refuses a frame
+the other applies. It draws 1000 sessions of each kind: Lean's own diff of
+random views (keyed and unkeyed children, reorders, inserts, removals, tag,
+text and attribute changes; every patch must conform, the candidate
+`Lasm.UI.Candidates.diff_conforms`, and every frame apply), random
+operations from the DOM's own nodes (most apply, a tenth are refused), and
+hydration of random server DOMs (nodes changed, dropped, added, separated by
+comments, with server attributes); then the 120 sessions of
+test/fixtures/ui/patches.json, from an empty root and hydrating their
+server-rendered HTML. Proved of the model (library/PROOFS.md):
+`applier_correct` (a conforming patch is performed exactly as
+Lasm.UI.Model's `applyOps`), `applier_session` (with conforming patches,
+every frame the browser reads leaves the DOM of the view) and
+`hydrate_correct` (hydration builds the fresh mount's nodes from any server
+DOM, and exactly its DOM from one that renders the view).
 
 Which modules have a model, and why the others need none or are still due
 one, is the inventory [verification/MODELS.md](../verification/MODELS.md),
@@ -1565,6 +1698,11 @@ longer a dependency: the modules it made are recorded in `test/fixtures/lower-at
 without it V8 validates the output), and
 random instruction streams come out byte for byte as documented.
 
+The modules the testing strategy's step 2 named (the CLI argument and init modules, `src/serverless/` and the WASI
+JavaScript) held in the nightly run 43433389694 on `main` (2026-11-13): `cli` 95 %, `init` 97.1 %, `serverless`
+88.5 %, `wasi-build` 95.8 % and `target-link` (with `wasi/wasi-link.mjs`) 91 %, each at or above its threshold;
+the ROADMAP item is ticked.
+
 Every module is above 80 %; each threshold is its score rounded down. Tests whose assertion is a general
 property use `forAll` from [`test/helpers/property.mjs`](../test/helpers/property.mjs) (seeded, so a failure
 names its seed and input) and name the proposition they check in a comment above the test, with its Lean
@@ -1782,6 +1920,7 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Host bridge (roadmap) | **Waiting for a JavaScript promise inside a synchronous callback hung for good** (`Value.await`, `callAwait` in `IO`): the promise settles only after the callback returns. `Async.block` there still hangs (the computation runs on another Lean thread, whose host calls wait for the event loop) | Fixed: the request fails at once with the reason; regressions in `test/node-js-bridge.test.mjs`, part 5 of `test/fixtures/js-callbacks`, and the edge profile's controller in `test/edge-js.test.mjs` |
 | Host bridge (approved 2026-11-04) | **Waiting inside a synchronous callback for a Lean task that needs Node hung for good**: a task that makes host calls (`Async` run with `.block`), or a timer, DNS lookup or socket read started in the callback. Node's main thread waits for the callback, and the task's thread (or the completion) waits for the main thread | Fixed: the callback's task waits poll (`sync_wait`, through `--wrap` of `lean_task_get` and `lean_io_wait_any_core`), every other thread's indefinite wait is listed (`--wrap` of `emscripten_futex_wait`, `lasm_js_host_wait`), and the main thread stops a wait once every other Lean thread has waited for 50 ms with nothing changed; regressions in `test/fixtures/js-sync-waits` (each part alone, then all), `test/node-js-bridge.test.mjs`, and the model's `taskWaits`, `pureWaits` and mutants |
 | Mutation testing (`build-service`, first run) | **`createBuildService({ unref: true })` did not let the process exit** (the Vite plugin's build worker): the worker's stdout and stderr were piped, and a worker stdio stream waiting for data refs the worker; `unref()` also came before the `'message'` listener, which refs it again | Fixed ([#49](https://github.com/Millillion/lasm/issues/49)): Node forwards the worker's output itself, and `unref()` comes last; regression in `test/dev-build-service.test.mjs` |
+| Workflow audit ([#291](https://github.com/Millillion/lasm/issues/291)) | **A failing model check passed CI:** `bridge-verification.yml` ran `host-bridge check --large \| tee` under GitHub's default `bash -e`, without pipefail, so the checker's exit 1 was lost and `sync (large): task waits …` reported a fair non-progress cycle on every run since it was added (b435c795). The cycle was in the model, not the bridge: a stopped task's thread decided its next step from the *current* callback's configuration, so a later callback's "stuck" flag made it call the host forever while the event loop answered it; and a later callback skipped its own task wait while that thread ran. In the code (`stuckWait`, `sync_wait`) the stopped task is independent of later callbacks and finishes once answered | Fixed: the model keeps stopped tasks' threads apart (waiting, then running, then done) with a failing-first case; 25 more workflow steps that piped without pipefail run with `shell: bash` (pipefail), steps that piped into `head` or `grep -q` read their whole input instead; `test/workflow-pipefail.test.mjs` fails on any new one |
 | Mutation testing (`host-bridge`, `edge-glue`) | **Lasm.JS failures wrapped twice**: a settled value that could not be converted, or an awaited promise rejected with a Lasm.JS failure, reached Lean as `Error: TypeError: …`, on Node and the edge | Fixed ([#51](https://github.com/Millillion/lasm/issues/51)) in `src/node-js.mjs` and `src/edge/edge-js.mjs`; regressions in `test/node-js-bridge.test.mjs` and `test/edge-js.test.mjs` |
 | Mutation testing (`node-host`, scripted `getifaddrs`) | **macOS network interfaces reported a wrong hardware (MAC) address**: `src/native-interfaces.mjs` read the link-layer address of a `sockaddr_dl` after `sdl_alen` (byte 6) bytes of the name instead of `sdl_nlen` (byte 5), so `en0` reported bytes of its name and address mixed | Fixed (libuv's `LLADDR`); regression in `test/native-interfaces.test.mjs`, and `test/native-interfaces-host.test.mjs` compares every interface with the engine's `os.networkInterfaces()` on each platform |
 | Deterministic simulation of Tandem (first CI run: 12 of 30 seeds) | **The editor could drop an unsent edit from `pending`:** a WebSocket push that did not continue the replica's log sent a second sync while one was in flight, without marking it in flight, so two replies came back and the first one's count (`onReply sent`) dropped operations the second carried. The edit was lost if that second sync failed | Fixed: a push that arrives while a sync is in flight marks the editor behind, and it syncs again when the reply returns (`Frontend/Ui.lean`) |
@@ -1793,3 +1932,5 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Deterministic simulation of Porter (4 of 30 seeds) | A token request whose commit succeeded and then reported an error is run again by `runRequest`, finds its own code used or its refresh token rotated, answers `invalid_grant` and revokes the family it just issued: one transient database error signs a user out | Fixed (#138, Jordan's choice of a commit receipt): each commit inserts a row keyed by an id from the request's random values (the same on a rerun), and a failed commit whose receipt is there keeps its reply (`Server/App.lean`, `Spec.landed_commit_stands`); the simulation no longer tolerates the refusal |
 | Mutation testing (`downloads`, 2026-11-09) | **A failing SDK archive decoder was reported as the tar parser's error**: when the managed Python's decoder for `.tar.xz`/`.zip` SDK archives (`src/archive-stream.py`) failed, could not start or was killed, `extract` reported `TAR_BAD_ARCHIVE: Unrecognized archive format` for the empty or truncated stream it left, not the decoder's exit status and messages | Fixed in `src/managed-artifacts.mjs` (the decoder's result is preferred after a broken stream); regressions in `test/managed-artifacts-decoder.test.mjs`; `docs/release/0.6.1-notes.md` |
 | Differential fuzzing, feature programs (campaign 42620999209, seed 620999216, case 132; `wasi`, `wasi-node`, `deno`, the edge engines, browsers, both profiles) | `(repr a).pretty` of an `Array Int` of 5,120 elements stops with "call stack exhausted" / "Maximum call stack size exceeded": Lean's formatter recurses with the number of elements, and the WASI and edge stacks hold about 9,000–11,000 frames. Native Lean and the Node target print it | Open: [#179](https://github.com/Millillion/lasm/issues/179) (the documented recursion-depth limit, reached through the standard library); the generator keeps printed arrays below that size |
+| Flaky `host-fixtures` case ([#196](https://github.com/Millillion/lasm/issues/196): PRs #195, #214, #220) | `temporary-files` failed with status `null`: a native-Lean run was killed at the harness's 60 s timeout. Two native runs crash by design (Lean's error decoders dereference a null file name: `temporary-files`' `missing-directory` and `cwd-tracking-deleted-process`, SIGSEGV), and the ubuntu-24.04 runner pipes cores to systemd-coredump, whose `core_pattern` passes the core limit as unlimited, so it collected each crash's core even under `ulimit -c 0`: 25–60 s per crash, and the two cases took 27–65 s when they passed (a first fix with `ulimit -c 0` still took 42 s). Neither Lasm's nor the oracle's output | Harness fix: the native runs expected to crash run under `prlimit --core=1:1` (`withoutCore` in `integration/host-fixtures.mjs`): Linux skips a piped core dump when the limit is exactly 1 byte; status and signal are unchanged (exec). The run prints the core handler and limit, and a killed oracle names its signal |
+| Nightly `Host bridge verification` (fuzz / stress on macOS and Windows cancelled at 240 min every night since it began, e.g. 43413265472; [#123](https://github.com/Millillion/lasm/issues/123)) | Every schedule-fuzzed js-interop run outside Linux failed `fan-out of 500 waiting handlers under 5 s` or hit the 60 s run timeout (Linux: 6.6 s per run; unfuzzed: 0.8 s everywhere), and with three replays per failure the job never finished. The fuzzer's own delays, not the bridge: its sub-millisecond `Atomics.wait` naps and `setTimeout` late resolutions take far longer than asked outside Linux. Measured per run (~7,200 naps asking 7.2 s): 7.6 s taken on ubuntu-24.04, 52.8 s on macos-15, 82 s on windows-2025 | Harness fix (`scripts/bridge-fuzz/schedule.cjs`): each thread carries its oversleep as a debt that later delays pay first, so injected delay matches what the seed asks for on every platform; the seeded decisions are unchanged. The fuzzer prints its requested and taken delay at exit and `lasm-js-stress.mjs` reports it per program. No bound or timeout changed |
