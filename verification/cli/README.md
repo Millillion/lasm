@@ -144,9 +144,9 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**22 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+**23 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
-### Lasm.Cli (22)
+### Lasm.Cli (23)
 
 | Candidate | In plain English | Tested by |
 | --- | --- | --- |
@@ -172,4 +172,5 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | [`lowering_rewrites_atomics`](Lasm/Cli/Candidates.lean#L254) | **Lowering rewrites each atomic and copies everything else.** In a module of any bodies of well-formed instructions, every non-atomic instruction and every local declaration is kept byte for byte, every atomic instruction becomes its documented replacement, and one helper per atomic operation and width follows the functions, numbered in order of first use after the imported and defined ones. Of the model, but not yet proved: its hypotheses are WebAssembly's binary grammar (`oneInstruction`, `localDeclarations`), which a proof needs as a Lean definition the model's `skipInstruction` reads exactly. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
 | [`zip_reads_back`](Lasm/Cli/Candidates.lean#L270) | **What `zip` writes, a ZIP reader reads back.** Whenever `zip` succeeds, a reader finds the parent directories first (sorted, mode `0o40755`, empty, stored), then every entry in order, with its bytes and its permissions as a regular file (`0o644` unless given). | [test/serverless-zip.test.mjs](../../test/serverless-zip.test.mjs) |
 | [`glue_fields_round_trip`](Lasm/Cli/Candidates.lean#L284) | **The glue's fields round-trip.** Any list of fields, encoded as the glue program reads its request, is read back exactly as the same list, whatever the fields hold (digits, `:`, line ends, non-ASCII, nothing). | [test/glue.test.mjs](../../test/glue.test.mjs) |
+| [`glue_request_fields`](Lasm/Cli/Candidates.lean#L291) | **A glue request carries its fields.** Lists of fields, encoded as a request, carry exactly their fields in order, whichever format the encoding chose (a table of distinct fields, or lengths when a field holds a 0 byte). | [test/glue.test.mjs](../../test/glue.test.mjs) |
 <!-- END CANDIDATES -->
