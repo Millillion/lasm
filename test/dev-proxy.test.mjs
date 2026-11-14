@@ -292,3 +292,15 @@ test('the dev proxy keeps the bytes of a page that is not UTF-8', async () => {
     assert.ok(body.subarray(at).toString('latin1').endsWith('</script>\n</body>'));
   } finally { await proxy.close(); await upstream.close(); }
 });
+
+// Found by the project-files fuzz target (test/fuzz/targets/project-files.mjs), against Lean's own header parser.
+test('importClosure follows «escaped» names, names on the next line and imports after nested comments', () => {
+  const project = mkdtempSync(join(tmpdir(), 'lasm-dev-proxy-'));
+  try {
+    writeFileSync(join(project, 'Main.lean'), '/- a /- nested -/ still\n-/\nimport «My Mod»\nimport\n  A.«b c»\nimport α\n');
+    mkdirSync(join(project, 'A'));
+    for (const name of ['My Mod', 'A/b c', 'α']) writeFileSync(join(project, name + '.lean'), '');
+    const names = [...importClosure(project, join(project, 'Main.lean'))].map(f => f.slice(project.length + 1)).sort();
+    assert.deepEqual(names, ['A/b c.lean', 'Main.lean', 'My Mod.lean', 'α.lean']);
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});

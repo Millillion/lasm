@@ -113,6 +113,47 @@ def dev_proxy_ends_failed_replies : Prop :=
   ∀ (r : HttpRequest) (u : Upstream), u = .cut ∨ u = .malformed → r.target ≠ "/__lasm/events" →
     (devProxy r u).2 = .cut ∨ ∃ page, (devProxy r u).2 = .reply page ∧ page.status = 502 ∧ u = .malformed
 
+/-! ## Project files -/
+
+/-- **`leanHeader` keeps exactly the source's imports.** Whenever Lean reads
+a source's header without error, it reads the same imports from
+`leanHeader` of the source: a build key over the header changes whenever
+the imports can.
+Tested by: test/fuzz/targets/project-files.mjs -/
+def lean_header_keeps_imports : Prop :=
+  ∀ (text : String) (is : List HeaderImport), NoBareCR text → leanImports text = some is → leanImports (leanHeader text) = some is
+
+/-- **`lasm dev` follows every import.** Whenever Lean reads a source's
+header without error, `importClosure` reaches the file of every module it
+imports that the project has: an edit to it rebuilds the outputs that
+import it.
+Tested by: test/fuzz/targets/project-files.mjs -/
+def import_closure_covers_imports : Prop :=
+  ∀ (text : String) (is : List HeaderImport), leanImports text = some is →
+    (∀ i ∈ is, i.module ≠ [] ∧ i.module ≠ ["Main"] ∧ ∀ c ∈ i.module, FileComponent c) →
+    ∀ i ∈ is, moduleFile i.module ∈ importClosureOf text (is.map (·.module))
+
+/-- **A broken Lake manifest is no reuse, never a crash.** Whatever
+lake-manifest.json and lakefile.lean hold, `lakeConfigurationKey` answers
+a key or none; Lake then reports what it cannot read.
+Tested by: test/fuzz/targets/project-files.mjs, test/application-sources.test.mjs -/
+def lake_key_total : Prop :=
+  ∀ manifest lakefile : String, ∃ key, lakeConfigurationKeyOf manifest lakefile = .ok key
+
+/-- **package.json is read, or refused by name.** Whatever package.json
+holds, the edge modules are distinct non-empty names, the Supabase function
+and Fastly service names are ones those platforms accept, and a refusal is
+a message that names package.json.
+Tested by: test/fuzz/targets/project-files.mjs -/
+def package_readers_clear : Prop :=
+  ∀ text : String,
+    (∀ ms, edgeModulesOf text = .ok ms → ms.Nodup ∧ ∀ m ∈ ms, m ≠ "") ∧
+    (∀ n, supabaseFunctionNameIn text = .ok n →
+      (n.toList.head?.map Char.isLower) = some true ∧ n.all (fun c => c.isLower || c.isDigit || c = '-') ∧ n.length ≤ 54) ∧
+    (∀ n, fastlyNameIn text = .ok n → n ≠ "" ∧ n.all (fun c => c.isLower || c.isDigit || c = '_' || c = '-')) ∧
+    (∀ e, edgeModulesOf text = .error e ∨ supabaseFunctionNameIn text = .error e ∨ fastlyNameIn text = .error e →
+      Mentions e "package.json")
+
 /-! ## Downloads -/
 
 /-- **Retry delays stay within 75–100 % of the backoff.** For every attempt

@@ -571,4 +571,57 @@ def relayedBody (r : HttpRequest) (a : HttpReply) : ByteArray :=
   if r.method = "HEAD" ∨ a.status = 204 ∨ a.status = 304 then .empty
   else if isPage r a then withReload a.body else a.body
 
+/-! ## Project files -/
+
+/-- An import of a Lean header: its module's name, component by component,
+and its `all`, exported and `meta` flags. -/
+structure HeaderImport where
+  module : List String
+  all : Bool
+  exported : Bool
+  isMeta : Bool
+
+/-- Not Lasm's JavaScript: Lean's own header parser (`Lean.Elab.parseImports`
+of Lean 4.35.0): the imports it reads, without the implicit `Init`, or
+`none` when it reports an error. -/
+opaque leanImports : String → Option (List HeaderImport)
+
+/-- `leanHeader(text)` (src/application-sources.mjs). -/
+opaque leanHeader : String → String
+
+/-- `importClosure(project, Main.lean)` (src/dev-proxy.mjs) in a project whose
+`Main.lean` holds `text`, with an empty file for each of `modules`: the
+files it reaches, relative to the project. -/
+opaque importClosureOf : String → List (List String) → List String
+
+/-- A module's file in a project: its components joined by `/`, and `.lean`. -/
+def moduleFile (m : List String) : String := "/".intercalate m ++ ".lean"
+
+/-- A name a file or directory can have on every OS Lasm runs on. -/
+def FileComponent (c : String) : Prop :=
+  c ≠ "" ∧ c ≠ "." ∧ c ≠ ".." ∧ c = c.trimAscii.toString ∧ c.utf8ByteSize < 100 ∧
+    ∀ ch ∈ c.toList, ch.toNat ≥ 32 ∧ ch ∉ ['/', '\\', '<', '>', ':', '"', '|', '?', '*']
+
+/-- No carriage return but before a line feed. -/
+def NoBareCR (text : String) : Prop :=
+  ∀ i, text.toList[i]? = some '\r' → text.toList[i + 1]? = some '\n'
+
+/-- `lakeConfigurationKey(project, undefined, lean)` (src/application-sources.mjs)
+in a project whose lake-manifest.json holds `manifest` and lakefile.lean
+`lakefile`: the key (`none`: no reuse), or the message of what it throws. -/
+opaque lakeConfigurationKeyOf : String → String → Except String (Option String)
+
+/-- `edgeModules(project, [])` (src/edge/edge-build.mjs) in a project whose
+package.json holds the text: the modules, or the message of what it throws. -/
+opaque edgeModulesOf : String → Except String (List String)
+
+/-- `supabaseFunctionName(project)` (src/edge/edge-build.mjs), likewise. -/
+opaque supabaseFunctionNameIn : String → Except String String
+
+/-- `fastlyName(project)` (src/wasi/wasi-build.mjs), likewise. -/
+opaque fastlyNameIn : String → Except String String
+
+/-- `s` occurs in `e`. -/
+def Mentions (e s : String) : Prop := ∃ a b, e = a ++ s ++ b
+
 end Lasm.Cli

@@ -9,6 +9,7 @@ import { createServer as createNetServer, connect } from 'node:net';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve, sep } from 'node:path';
 import { listenError } from './browser/static-server.mjs';
+import { leanHeaderImports } from './application-sources.mjs';
 
 const reloadClient = `<script type="module">
 // Injected by lasm dev: reloads the page when a rebuild finishes.
@@ -18,8 +19,10 @@ source.addEventListener('error-report', event => console.error('[lasm dev] ' + J
 </script>`;
 
 /** The project's Lean files `entry` imports, directly or not, itself included
- * (module `A.B` is `A/B.lean` under the project). Imports from outside the
- * project (Lean, Std, Lasm, packages) are not followed. */
+ * (module `A.B` is `A/B.lean` under the project, `A.«b c»` is `A/b c.lean`).
+ * Imports from outside the project (Lean, Std, Lasm, packages) are not
+ * followed. The header is read generously (leanHeaderImports): a file it
+ * names that Lean would not import only rebuilds more. */
 export function importClosure(project, entry) {
   const files = new Set();
   const visit = file => {
@@ -27,14 +30,7 @@ export function importClosure(project, entry) {
     files.add(file);
     let text;
     try { text = readFileSync(file, 'utf8'); } catch { return; }
-    // The header: everything before the first declaration-like line.
-    for (const line of text.replace(/\/-[\s\S]*?-\//g, '').split('\n')) {
-      const t = line.trim();
-      if (!t || t.startsWith('--')) continue;
-      const m = /^(?:public\s+|meta\s+|private\s+)*import\s+(.+)$/.exec(t);
-      if (!m) { if (/^(module|prelude)\b/.test(t)) continue; break; }
-      for (const name of m[1].split(/\s+/)) if (/^[A-Za-z_][\w.]*$/.test(name)) visit(join(project, ...name.split('.')) + '.lean');
-    }
+    for (const name of leanHeaderImports(text).imports) visit(join(project, ...name) + '.lean');
   };
   visit(resolve(entry));
   return files;

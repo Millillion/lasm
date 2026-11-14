@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 const run = fileURLToPath(new URL('./fuzz/run.mjs', import.meta.url));
 
 test('the JavaScript fuzz targets pass their corpus and regressions', () => {
-  const targets = ['cli-arguments', 'serverless-http', 'ui-patch', 'ui-decode', 'lasm-js-wire', 'dev-proxy'];
+  const targets = ['cli-arguments', 'serverless-http', 'ui-patch', 'ui-decode', 'lasm-js-wire', 'dev-proxy', 'project-files'];
   const result = spawnSync(process.execPath, [run, 'replay', ...targets], { encoding: 'utf8', timeout: 120_000 });
   assert.equal(result.status, 0, result.stdout + result.stderr);
   for (const target of targets) assert.match(result.stdout, new RegExp(`ok   ${target}: \\d+ inputs`));
