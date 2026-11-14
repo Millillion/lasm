@@ -13,8 +13,8 @@
 // the guard counts page cache, so one process per package keeps each step small.
 //
 // --base is a packed Lasm candidate (scripts/package-node-release.mjs output, or a
-// retained one): it supplies the runtime, native helpers and bundled installer
-// dependencies. --overlay-source replaces its bin/, src/ (except src/native; the
+// retained one): it supplies the runtime and native helpers (and, for candidates
+// packaged before src/tar.mjs, the bundled `tar` package). --overlay-source replaces its bin/, src/ (except src/native; the
 // runtime catalogs stay the candidate's) and runtime glue with this checkout's, for
 // validating unpacked source changes against an accepted runtime; the result is a
 // maintainer test package, not a release candidate.
@@ -25,7 +25,7 @@ import { existsSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { x as extractTar } from 'tar';
+import { extractTar, extractTarFile } from '../../src/tar.mjs';
 import { pipeline } from 'node:stream/promises';
 import { createReadStream } from 'node:fs';
 import { createZstdDecompress } from 'node:zlib';
@@ -58,7 +58,7 @@ if (args.step === 'plan') {
   await mkdir(join(out, 'packed'));
   const probe = join(out, 'base-metadata');
   await mkdir(probe);
-  await extractTar({ file: resolve(args.base), cwd: probe, strict: true, preservePaths: false, preserveOwner: false,
+  await extractTarFile(resolve(args.base), { cwd: probe,
     filter: name => ['package/package.json', 'package/application-support.json'].includes(name) });
   const basePackage = await json(join(probe, 'package/package.json')), support = await json(join(probe, 'package/application-support.json'));
   await rm(probe, { recursive: true });
@@ -126,7 +126,7 @@ async function copyArchiveFiles(file, root, members, destination) {
   const found = new Set(), staging = destination + '.extract';
   await rm(staging, { recursive: true, force: true }); await mkdir(staging, { recursive: true });
   const select = name => [...wanted.keys()].some(key => key.endsWith('/') ? name.startsWith(key) : name === key);
-  await pipeline(createReadStream(file), createZstdDecompress(), extractTar({ cwd: staging, strict: true, preservePaths: false, preserveOwner: false,
+  await pipeline(createReadStream(file), createZstdDecompress(), extractTar({ cwd: staging,
     filter: (name, header) => { const keep = header.type === 'File' && select(name); if (keep) found.add(name); return keep; } }));
   for (const [from, to] of wanted) {
     const hits = [...found].filter(name => from.endsWith('/') ? name.startsWith(from) : name === from);
@@ -149,7 +149,7 @@ async function copyLicenseMembers(file, root, destination) {
     return path.startsWith('lasm-notices/') || /^(?:licen[cs]es?|copying|copyright|notice)(?:[-._].*)?$/i.test(base);
   };
   let count = 0;
-  await pipeline(createReadStream(file), createZstdDecompress(), extractTar({ cwd: destination, strip: 1, strict: true, preservePaths: false, preserveOwner: false,
+  await pipeline(createReadStream(file), createZstdDecompress(), extractTar({ cwd: destination, strip: 1,
     filter: (name, header) => { const keep = header.type === 'File' && name.startsWith(root + '/') && wanted(name); if (keep) count++; return keep; } }));
   assert.ok(count, `${basename(file)} has no licence files`);
   for (const entry of await readdir(destination, { recursive: true, withFileTypes: true })) if (entry.isFile()) await chmod(join(entry.parentPath, entry.name), 0o644);
@@ -202,9 +202,18 @@ if (args.step === 'main') {
   await rm(directory, { recursive: true, force: true });
   await mkdir(directory, { recursive: true });
   assert.equal(await hashFile(plan.base.file), plan.base.sha256, 'The base candidate changed since the plan step');
-  await extractTar({ file: plan.base.file, cwd: directory, strict: true, preservePaths: false, preserveOwner: false });
+  await extractTarFile(plan.base.file, { cwd: directory });
   const main = join(directory, 'package'), basePackage = await json(join(main, 'package.json'));
   let overlay;
+  if (plan.overlaySource && !(await json(join(root, 'package.json'))).dependencies?.tar && basePackage.bundleDependencies) {
+    // A candidate packaged when the CLI still bundled the `tar` package: this
+    // checkout's sources read archives themselves (src/tar.mjs), so drop it.
+    assert.deepEqual(basePackage.bundleDependencies, ['tar'], 'Unexpected bundled dependencies in the base candidate');
+    await rm(join(main, 'node_modules'), { recursive: true });
+    await rm(join(main, 'installer-dependencies.json'), { force: true });
+    delete basePackage.dependencies.tar; delete basePackage.bundleDependencies;
+    basePackage.files = basePackage.files.filter(file => file !== 'installer-dependencies.json');
+  }
   if (plan.overlaySource) {
     for (const path of ['bin', 'src']) {
       for (const name of await readdir(join(main, path))) if (!(path === 'src' && name === 'native')) await rm(join(main, path, name), { recursive: true });
@@ -238,7 +247,7 @@ if (args.step === 'main') {
       `The cataloged edge runtime belongs to runtime ${baseRuntimeManifestSha256}, not this candidate's ${provenance.runtimeManifestSha256}`);
     const file = await releaseAsset(artifact), target = join(main, 'targets', artifact.root);
     assert.ok(!existsSync(target), `The candidate already has ${target}`);
-    await pipeline(createReadStream(file), createZstdDecompress(), extractTar({ cwd: join(main, 'targets'), strict: true, preservePaths: false, preserveOwner: false,
+    await pipeline(createReadStream(file), createZstdDecompress(), extractTar({ cwd: join(main, 'targets'),
       filter: (name, header) => (name === artifact.root || name.startsWith(artifact.root + '/')) && ['File', 'Directory'].includes(header.type) }));
     // Fixed modes, so the tarball is byte-identical on every runner.
     await chmod(target, 0o755);
@@ -279,7 +288,7 @@ if (args.step === 'main') {
     }
     if (edgeBundle) await sections(join(main, edgeBundle.directory, 'THIRD_PARTY_NOTICES.txt'), ['edge-runtime']);
     const bundled = [];
-    for (const name of await readdir(join(main, 'node_modules'))) {
+    for (const name of existsSync(join(main, 'node_modules')) ? await readdir(join(main, 'node_modules')) : []) {
       const names = name.startsWith('@') ? (await readdir(join(main, 'node_modules', name))).map(child => name + '/' + child) : [name];
       for (const pkgName of names) {
         const directory = join(main, 'node_modules', pkgName), meta = await json(join(directory, 'package.json'));

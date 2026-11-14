@@ -7,7 +7,7 @@ import { readFileSync, mkdirSync, existsSync, mkdtempSync, rmSync } from 'node:f
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { join, resolve } from 'node:path';
-import { x as untar } from 'tar';
+import { extractTarFile } from '../../src/tar.mjs';
 
 const [outputArg, pinName = 'runtime-overlay.json'] = process.argv.slice(2);
 assert.match(pinName, /^runtime-overlay(-[a-z]+)?\.json$/);
@@ -24,6 +24,6 @@ try {
   const archive = join(download, pin.asset);
   assert.equal(createHash('sha256').update(readFileSync(archive)).digest('hex'), pin.sha256, 'Runtime handoff digest mismatch');
   mkdirSync(output);
-  await untar({ file: archive, cwd: output, strict: true, preservePaths: false });
+  await extractTarFile(archive, { cwd: output });
   console.log(JSON.stringify({ release: pin.release, sha256: pin.sha256, extracted: output }));
 } finally { rmSync(download, { recursive: true, force: true }); }

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, writeFileSync, cpSync, existsSync, appendFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { c as tar } from 'tar';
+import { directoryEntries, writeTar } from '../../src/tar.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { verifyApplicationRuntime } from '../../src/application-runtime.mjs';
@@ -31,7 +31,7 @@ const provenance = {
   smoke,
 };
 writeFileSync(join(directory, 'provenance.json'), JSON.stringify(provenance, null, 2) + '\n');
-await tar({ cwd: directory, file: archive, gzip: true, portable: true, mtime: new Date(0) }, ['runtime', 'native', 'provenance.json']);
+await writeTar(archive, directoryEntries(directory, ['runtime', 'native', 'provenance.json'], { mtime: new Date(0) }), { gzip: true });
 const sha256 = await hashFile(archive);
 const cacheKey = `lasm-node-linux-inputs-${provenance.sourceRevision}-${sha256}`;
 writeFileSync('.work/node-runtime-inputs-result.json', JSON.stringify({ archive, sha256, cacheKey, provenance }, null, 2) + '\n');

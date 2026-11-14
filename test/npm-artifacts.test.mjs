@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { zstdCompressSync } from 'node:zlib';
-import { c as createTar } from 'tar';
+import { directoryEntries, writeTar } from '../src/tar.mjs';
 import { provisionArtifact } from '../src/managed-artifacts.mjs';
 import { artifactSourceMode, validateNpmToolManifest, npmEntryFor, missingPackageMessage, resolveInstalledPackage, findNpm,
   fetchNpmPackage, archiveFileName, checkInstalledToolPackages, bundledNpmToolManifest } from '../src/npm-artifacts.mjs';
@@ -21,7 +21,7 @@ async function fixture(t, { install = 'optional', packageVersion = '1.0.0-lasm.1
   await mkdir(join(source, 'tool/bin'), { recursive: true });
   await writeFile(join(source, 'tool/bin/lean'), 'compiler fixture');
   // A fixed mtime keeps every fixture's archive identical (equal sizes when a test damages one byte).
-  await createTar({ cwd: source, file: join(base, 'tool.tar'), portable: true, mtime: new Date(0) }, ['tool']);
+  await writeTar(join(base, 'tool.tar'), directoryEntries(source, ['tool'], { mtime: new Date(0) }));
   const bytes = zstdCompressSync(await readFile(join(base, 'tool.tar')));
   const artifact = { name: 'tool-1', root: 'tool', url: 'https://example.invalid/tool-1.tar.zst', sha256: hash(bytes),
     bytes: bytes.length, format: 'tar.zst', maximumExtractedBytes: 1_000_000 };
@@ -106,7 +106,7 @@ test('on-demand packages are fetched with npm pack and checked against the pinne
   await mkdir(join(tarballSource, 'package'), { recursive: true });
   await writeFile(join(tarballSource, 'package/package.json'), '{}');
   await writeFile(join(tarballSource, 'package/tool-1.tar.zst'), f.bytes);
-  await createTar({ cwd: tarballSource, file: join(f.base, 'pkg.tgz'), gzip: true, portable: true }, ['package']);
+  await writeTar(join(f.base, 'pkg.tgz'), directoryEntries(tarballSource, ['package']), { gzip: true });
   const tgz = await readFile(join(f.base, 'pkg.tgz'));
   const calls = [];
   const run = async (npm, args, options) => {
@@ -144,7 +144,7 @@ test('fetchNpmPackage extracts only the archive member', async t => {
   const tarballSource = join(f.base, 'pack-source');
   await mkdir(join(tarballSource, 'package'), { recursive: true });
   await writeFile(join(tarballSource, 'package/README.md'), 'x');
-  await createTar({ cwd: tarballSource, file: join(f.base, 'pkg.tgz'), gzip: true, portable: true }, ['package']);
+  await writeTar(join(f.base, 'pkg.tgz'), directoryEntries(tarballSource, ['package']), { gzip: true });
   const tgz = await readFile(join(f.base, 'pkg.tgz'));
   const run = async (npm, args) => { await writeFile(join(args[args.indexOf('--pack-destination') + 1], 'p.tgz'), tgz); return '[]'; };
   const work = join(f.base, 'work'); await mkdir(work);
@@ -210,7 +210,7 @@ test('without npm, Bun and Deno fetch the pinned tarball from the registry', asy
   const tarballSource = join(f.base, 'registry-source');
   await mkdir(join(tarballSource, 'package'), { recursive: true });
   await writeFile(join(tarballSource, 'package', f.entry.file), 'archive bytes');
-  await createTar({ cwd: tarballSource, file: join(f.base, 'reg.tgz'), gzip: true, portable: true }, ['package']);
+  await writeTar(join(f.base, 'reg.tgz'), directoryEntries(tarballSource, ['package']), { gzip: true });
   const tgz = await readFile(join(f.base, 'reg.tgz'));
   const requested = [];
   const fetch = async url => { requested.push(url); return new Response(tgz); };

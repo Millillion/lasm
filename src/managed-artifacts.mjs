@@ -8,7 +8,7 @@ import { pipeline } from 'node:stream/promises';
 import { createZstdDecompress, createGunzip } from 'node:zlib';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { Parser as TarParser } from 'tar';
+import { parseTar } from './tar.mjs';
 import { isDeepStrictEqual } from 'node:util';
 import { setTimeout as delay } from 'node:timers/promises';
 import { downloadArtifact } from './managed-download.mjs';
@@ -64,33 +64,30 @@ function cleanArchivePath(name) {
 }
 
 /** Writes the accepted regular files and directories of a tar stream under
- * `directory`, synchronously one file at a time (node-tar's asynchronous
- * writer was 2-4x slower on Windows and macOS for Lean's many small files),
- * hashing each file from the bytes it writes (`hashes`: name -> sha256, size).
- * Links are never written here (accept defers them); with no link in the
- * tree yet, no write can be redirected outside it. */
+ * `directory`, synchronously one file at a time (an asynchronous writer was
+ * 2-4x slower on Windows and macOS for Lean's many small files), hashing each
+ * file from the bytes it writes (`hashes`: name -> sha256, size). Links are
+ * never written here (accept defers them); with no link in the tree yet, no
+ * write can be redirected outside it. Returns a pipeline stage. */
 function archiveWriter(directory, { strip, accept, hashes, failed }) {
-  const parser = new TarParser({ strict: true });
   const made = new Set([directory]);
   const ensure = path => { if (!made.has(path)) { mkdirSync(path, { recursive: true }); made.add(path); } };
-  parser.on('entry', entry => {
-    if (failed() || !accept(entry.path, entry)) { entry.resume(); return; }
+  return parseTar(entry => {
+    if (failed() || !accept(entry.path, entry)) return;
     const name = entry.path.replace(/^\.\//, '').replace(/\/$/, '').split('/').slice(strip).join('/');
-    if (!name) { entry.resume(); return; }
+    if (!name) return;
     const target = join(directory, ...name.split('/'));
-    if (entry.type === 'Directory') { ensure(target); entry.resume(); return; }
+    if (entry.type === 'Directory') { ensure(target); return; }
     ensure(dirname(target));
-    const fd = openSync(target, 'wx', (entry.mode ?? 0o644) & 0o777 | 0o600);
+    const fd = openSync(target, 'wx', entry.mode & 0o777 | 0o600);
     const hash = createHash('sha256');
-    let bytes = 0, open = true;
-    const close = () => { if (open) { open = false; closeSync(fd); } };
-    entry.on('data', chunk => {
-      try { writeSync(fd, chunk); } catch (error) { close(); parser.abort(error); return; }
-      hash.update(chunk); bytes += chunk.length;
-    });
-    entry.on('end', () => { close(); hashes?.set(name, { sha256: hash.digest('hex'), size: bytes }); });
+    let bytes = 0;
+    return {
+      data: chunk => { writeSync(fd, chunk); hash.update(chunk); bytes += chunk.length; },
+      end: () => { closeSync(fd); hashes?.set(name, { sha256: hash.digest('hex'), size: bytes }); },
+      abort: () => closeSync(fd),
+    };
   });
-  return parser;
 }
 
 async function extract(artifact, archive, directory, python, hashes) {

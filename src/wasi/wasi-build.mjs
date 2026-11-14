@@ -13,6 +13,7 @@ import { createHash } from 'node:crypto';
 import { linkWasiProgram, wasiLinkSettings, wasiSources } from './wasi-link.mjs';
 import { noticesSectionName, targetNotices, withCustomSection } from '../notices.mjs';
 import { foreignOutputError, replaceOutputDirectory } from '../output-directory.mjs';
+import { writeTar } from '../tar.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -85,21 +86,15 @@ build = "${build}"
 `;
 }
 
-/** Writes `pkg/<name>.tar.gz` as `fastly compute pack` does: <name>/fastly.toml and <name>/bin/main.wasm. */
+/** Writes `pkg/<name>.tar.gz` as `fastly compute pack` does: <name>/fastly.toml and <name>/bin/main.wasm,
+ * reproducibly (fixed modes, the source date on files, no times on directories). */
 async function writeFastlyPackage(projectDirectory, name, wasm, notices) {
-  const tar = await import('tar');
-  const staging = join(projectDirectory, 'pkg', `.${name}.${process.pid}`);
-  rmSync(staging, { recursive: true, force: true });
-  mkdirSync(join(staging, name, 'bin'), { recursive: true });
-  copyFileSync(join(projectDirectory, 'fastly.toml'), join(staging, name, 'fastly.toml'));
-  copyFileSync(wasm, join(staging, name, 'bin', 'main.wasm'));
-  // The licence texts travel with the package (they are also inside main.wasm).
-  copyFileSync(notices, join(staging, name, 'THIRD_PARTY_NOTICES.txt'));
-  const file = join(projectDirectory, 'pkg', `${name}.tar.gz`);
-  try {
-    await tar.create({ gzip: { level: 9 }, file, cwd: staging, portable: true, mtime: sourceDate, noDirRecurse: true },
-      [name, `${name}/fastly.toml`, `${name}/THIRD_PARTY_NOTICES.txt`, `${name}/bin`, `${name}/bin/main.wasm`]);
-  } finally { rmSync(staging, { recursive: true, force: true }); }
+  mkdirSync(join(projectDirectory, 'pkg'), { recursive: true });
+  const file = join(projectDirectory, 'pkg', `${name}.tar.gz`), mtime = sourceDate.getTime() / 1000;
+  const member = (path, source) => ({ path, type: 'File', mode: 0o644, mtime, file: source, size: statSync(source).size });
+  await writeTar(file, [{ path: `${name}/`, type: 'Directory' }, member(`${name}/fastly.toml`, join(projectDirectory, 'fastly.toml')),
+    // The licence texts travel with the package (they are also inside main.wasm).
+    member(`${name}/THIRD_PARTY_NOTICES.txt`, notices), { path: `${name}/bin/`, type: 'Directory' }, member(`${name}/bin/main.wasm`, wasm)], { gzip: 9 });
   return file;
 }
 

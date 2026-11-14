@@ -18,7 +18,7 @@ import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { basename, dirname, join, posix, win32 } from 'node:path';
-import { x as extractTar } from 'tar';
+import { extractTarFile } from './tar.mjs';
 import { jsRuntime } from './js-runtime.mjs';
 
 export const artifactSourceModes = Object.freeze(['auto', 'npm', 'https']);
@@ -164,7 +164,7 @@ export async function fetchNpmPackage(entry, directory, { npm = findNpm(), cwd =
   if (await sha512(tarball) !== entry.integrity) throw new Error(`npm package ${npmSpec(entry)} does not match its pinned integrity`);
   const member = `package/${entry.file}`;
   let seen = 0;
-  await extractTar({ file: tarball, cwd: unpacked, strict: true, preservePaths: false, preserveOwner: false,
+  await extractTarFile(tarball, { cwd: unpacked,
     filter: (name, header) => {
       const match = name === member && header.type === 'File';
       if (match) seen++;

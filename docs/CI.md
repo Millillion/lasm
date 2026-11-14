@@ -196,7 +196,6 @@ it), and "dispatch" means `workflow_dispatch`.
 | `edge-runtime.yml` | dispatch, call | Linux | 10 min (max 59) | Single-threaded edge runtime build (called by workers/wasi/browser) | Called |
 | `evidence-levels.yml` | cron 23 8 * * 1-6, dispatch, PR (paths) | Linux | 6 min (max 42) | README evidence levels L0-L3 from main-branch results | PR (paths), nightly |
 | `evidence-page.yml` | cron 41 10 * * 1-6, dispatch, PR (paths) | Linux | new | the public test-evidence page (`content/learn/test-evidence.md`) from the repository and the latest CI results, committed to `main` | PR (paths), nightly |
-| `extract-bench.yml` | dispatch | Linux, macOS, Windows | 35 min | Tier-archive extraction speed per platform | On demand |
 | `flaky.yml` | cron 53 7 * * 1-6, dispatch, PR (paths) | Linux | 12 min (max 40) | Flaky-test report of the last 24 h (issue `flaky`) | PR (paths), nightly |
 | `folio-nightly.yml` | cron 53 3 * * 2-6, dispatch | Linux | 41 min | Folio: CommonMark differential and 40-minute fuzzing; 20-minute fuzzing of the browser build in headless Chromium, Firefox and WebKit and of the Workers build under wrangler dev | Nightly |
 | `folio.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 16 min (max 96) | examples/folio: proofs, CommonMark examples, CLI, WASI, live preview | PR (paths), main |

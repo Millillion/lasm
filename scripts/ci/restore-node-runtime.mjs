@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFile, mkdir, mkdtemp, rename, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
-import { x as untar } from 'tar';
+import { extractTarFile } from '../../src/tar.mjs';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { verifyApplicationRuntime } from '../../src/application-runtime.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
@@ -23,7 +23,7 @@ try {
   const archive = resolve('.work/node-runtime-source.tgz');
   assert.equal(await hashFile(archive), source.sha256, 'Durable runtime input digest must match the reviewed source');
   const unpacked = join(staging, 'unpacked'); await mkdir(unpacked);
-  await untar({ file: archive, cwd: unpacked, strict: true, preservePaths: false,
+  await extractTarFile(archive, { cwd: unpacked,
     filter: path => source.kind === 'handoff' || path.startsWith(`package/targets/${source.runtimeName}/`)
       || path.startsWith('package/src/native/') || path === 'package/provenance.json' });
   const base = source.kind === 'candidate' ? join(unpacked, 'package') : unpacked;

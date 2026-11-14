@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { packCompletedTree, restoreCompletedTree } from '../scripts/ci/tree-archive.mjs';
-import { create } from 'tar';
+import { directoryEntries, writeTar } from '../src/tar.mjs';
 import { hashFile } from '../src/managed-artifacts.mjs';
 
 test('completed CI trees restore exact files, empty directories and recipe checksums', async t => {
@@ -41,13 +41,13 @@ test('valid tar framing cannot hide changed contents or a malformed manifest', a
   await assert.rejects(packCompletedTree(source, join(base, 'original.tgz'), options), /Preserve previous/);
   writeFileSync(join(source, 'program'), 'modified');
   const changed = join(base, 'changed.tgz');
-  await create({ cwd: source, file: changed, gzip: true }, ['program', 'lasm-completed-tree.json']);
+  await writeTar(changed, directoryEntries(source, ['program', 'lasm-completed-tree.json']), { gzip: true });
   const destination = join(base, 'destination');
   await assert.rejects(restoreCompletedTree(changed, destination, { ...options, sha256: await hashFile(changed) }), /deep-equal/);
   assert.equal(existsSync(destination), false);
   writeFileSync(join(source, 'lasm-completed-tree.json'), '{');
   const malformed = join(base, 'malformed.tgz');
-  await create({ cwd: source, file: malformed, gzip: true }, ['program', 'lasm-completed-tree.json']);
+  await writeTar(malformed, directoryEntries(source, ['program', 'lasm-completed-tree.json']), { gzip: true });
   await assert.rejects(restoreCompletedTree(malformed, destination, { ...options, sha256: await hashFile(malformed) }), /JSON|property/);
   assert.equal(existsSync(destination), false);
 });

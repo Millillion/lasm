@@ -152,7 +152,7 @@ export async function extractToolchain(archives, directory) {
   const { mkdirSync, readdirSync, createReadStream } = await import('node:fs');
   const { pipeline: pipe } = await import('node:stream/promises');
   const { createZstdDecompress: zstd } = await import('node:zlib');
-  const { extract } = await import('tar');
+  const { extractTar } = await import('../../src/tar.mjs');
   mkdirSync(directory, { recursive: true });
   if (readdirSync(directory).length) throw new Error('Extract the toolchain into a new, empty directory');
   const { createHash } = await import('node:crypto');
@@ -163,7 +163,7 @@ export async function extractToolchain(archives, directory) {
     const hash = createHash('sha256');
     for await (const chunk of createReadStream(archive)) hash.update(chunk);
     identities[basename(archive).replace(/\.tar\.zst$/, '')] = hash.digest('hex');
-    await pipe(createReadStream(archive), zstd(), extract({ cwd: directory, strict: true, preservePaths: false, preserveOwner: false }));
+    await pipe(createReadStream(archive), zstd(), extractTar({ cwd: directory }));
   }
   // Archive identities, so the link recipe can check what it runs against.
   writeFileSync(join(directory, 'toolchain.json'), JSON.stringify(identities, null, 2) + '\n');
