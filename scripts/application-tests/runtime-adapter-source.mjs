@@ -24,7 +24,12 @@ const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 // `#guard_msgs` (GuardMsgs.lean): captured stdout/stderr as one info message,
 // then the value; exceptions as errors; messages joined by "---\n", trimmed
 // and compared with newlines normalized to spaces.
+// The upstream driver (tests/elab/run_test.sh) and every native step here pass
+// -Dlinter.all=false; `lasm build` takes no Lean options, so the parallel copy
+// sets it itself (a deprecation warning otherwise enters a #guard_msgs that
+// stays a command, as in Lean 4.36's elab/versoSyntaxView).
 export const helpers = String.raw`
+set_option linter.all false
 namespace LasmParallel
 def render (severity text : String) : String :=
   let text := if "\n".isPrefixOf text then text else " " ++ text

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseWasmObject, archiveMembers } from '../src/wasm-objects.mjs';
@@ -79,7 +79,7 @@ test('initializer units, closure, wrappers and reverse reachability', () => {
 test('initialize results and effects classification', () => {
   assert.deepEqual(cInitTargets('l_x = lean_io_result_get_value(res);\nlp_p_y = lean_unbox_uint64(lean_io_result_get_value(res));\nl_z = _init_l_z();\n'),
     ['l_x', 'lp_p_y']);
-  const core = coreInitTargets('4.35.0');
+  const core = coreInitTargets(JSON.parse(readFileSync(new URL('../src/toolchains.json', import.meta.url), 'utf8')).defaultLean);
   assert.ok(core.includes('l_IO_stdGenRef') && core.includes('l_Lean_attributeMapRef'));
   assert.equal(coreInitTargets('0.0.0'), undefined);
   for (const name of ['l_IO_println', 'lean_get_stdout', 'lean_io_prim_handle_put_str', 'lean_io_getenv']) assert.ok(hasExternalEffect(name), name);

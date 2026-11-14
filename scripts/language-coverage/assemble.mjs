@@ -31,6 +31,12 @@ const actionClass = {
 const environmentActions = {
   'elab/Process.lean': { lasmParallelAction7: 'spawns `lean --stdin`; a deployment has no Lean on PATH (native and Lasm both report the same failure without it)' },
 };
+// Reviewed tests of Lean capabilities a deployed application does not have
+// (README, "The deployed application cannot use").
+const unsupportedTests = {
+  'elab/cadical.lean': 'CaDiCaL (the SAT solver behind bv_decide, Lean 4.36) is not compiled into the Wasm runtime: Solver.new stops the program with a clear message',
+  'elab/cadical_signature.lean': 'CaDiCaL is not compiled into the Wasm runtime: Lean.Cadical.Internal.signature is empty, as in a native Lean built without CaDiCaL',
+};
 function adapterOutcome(attempt, name) {
   const c = attempt.compact;
   for (const verdict of c?.verdicts ?? []) {
@@ -53,6 +59,9 @@ function adapterOutcome(attempt, name) {
     : counts['unsupported-by-design (AOT policy)'] ? 'unsupported-by-design'
     : counts['upstream-flake (native repeat differs)'] ? 'upstream-flake'
     : counts.pass ? 'pass-with-harness-exclusions' : 'harness';
+  if (unsupportedTests[name] && outcome !== 'pass')
+    return { outcome: 'unsupported-by-design', reason: unsupportedTests[name], actions: counts,
+      deployedStderrTail: c.commands?.find(command => command.label === 'deployed')?.stderrTail?.slice(-1200) };
   return { outcome, actions: counts, exactOutput: c.exact?.compiledVsDeployed,
     failing: c.verdicts.filter(v => v.verdict !== 'pass').slice(0, 20),
     rejection: c.buildRejected && { detected: c.buildRejected.detected, explanation: c.buildRejected.explanation },
