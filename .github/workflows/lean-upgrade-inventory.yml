@@ -61,6 +61,8 @@ jobs:
         env:
           FROM: ${{ inputs.from || '4.35.0' }}
         run: node scripts/lean-upgrade/carry-reviews.mjs "$FROM" "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" | tee .work/carry-reviews.json
+      - name: Mixed-driver classification (step 8.1)
+        run: node scripts/application-tests/classify-mixed.mjs "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" .work/lean-upgrade/src-node
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -70,6 +72,7 @@ jobs:
             .work/carry-reviews.json
             docs/evidence/lean-*-upstream-application-inventory.json
             docs/evidence/lean-*-upstream-source-files.json
+            docs/evidence/lean-*-mixed-driver-classification.json
             src/lean-init-targets-*.json
             scripts/application-tests/runtime-adapter-reviewed.json
             scripts/language-coverage/runtime-adapter-l23.json
