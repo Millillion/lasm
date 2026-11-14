@@ -34,7 +34,7 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**171 shipped modules**: 14 modelled, 26 pending, 131 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 26 modules still need a model.
+**172 shipped modules**: 14 modelled, 26 pending, 132 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 26 modules still need a model.
 
 ### Modelled (14)
 
@@ -86,7 +86,7 @@ How a module moves from pending to modelled:
 | [`src/wasi/lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c) | — | the wasi-http request and response mapping (edge request mapping, IRREDUCIBLE.md M4) |
 | [`src/wasm-objects.mjs`](../src/wasm-objects.mjs) | — | a reader of relocatable Wasm objects: pure |
 
-### Exempt (131)
+### Exempt (132)
 
 | Module | Kind | Reason |
 | --- | --- | --- |
