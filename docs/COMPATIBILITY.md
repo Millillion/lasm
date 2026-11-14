@@ -24,7 +24,7 @@ standard GitHub runners (Ubuntu 24.04, macOS 15, Windows Server 2025). Runs:
 [win32-x64](https://github.com/Millillion/lasm/actions/runs/39678273637), Tier C
 [linux-x64](https://github.com/Millillion/lasm/actions/runs/39678285205) and
 [linux-arm64](https://github.com/Millillion/lasm/actions/runs/39678297280).
-Evidence: [lean-4.35.0-ecosystem-2026-10-21.json](evidence/lean-4.35.0-ecosystem-2026-10-21.json).
+Evidence: [lean-4.35.0-ecosystem-2026-10-21.json](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.35.0-ecosystem-2026-10-21.json).
 
 **Phase 3 wrap-up re-check (2026-10-22):** every project ran again with candidate
 `0.1.0-experimental.39815056197` (source `7eb24a3`: Lean's clang as `cc` and the C tier; SHA-256
@@ -137,7 +137,7 @@ programs ran on standard GitHub runners in the `js-interop-examples` workflow, c
 installed acceptance run [39891445495](https://github.com/Millillion/lasm/actions/runs/39891445495).
 **pass** means every check of
 [`scripts/js-interop/check-crud.mjs`](../scripts/js-interop/check-crud.mjs) (or the `fetch`
-output check) passed. Evidence: [js-interop-examples-2026-10-23.json](evidence/js-interop-examples-2026-10-23.json).
+output check) passed. Evidence: [js-interop-examples-2026-10-23.json](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/js-interop-examples-2026-10-23.json).
 
 | Package (exact version) | Used by | linux-x64 | linux-arm64 | darwin-x64 | darwin-arm64 | win32-x64 |
 | --- | --- | --- | --- | --- | --- | --- |

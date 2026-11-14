@@ -8,7 +8,8 @@
 //     other host function the objects name is a stub that aborts: the code
 //     under test is pure, so a call to one is itself a finding.
 //   - wasi-cgi: src/wasi/lasm_fetch_wasi.c's CGI request and response code
-//     natively, through cgi_driver.c.
+//     natively, through cgi_driver.c; fastly-host: its Fastly half
+//     (-DLASM_WASI_FASTLY), through fastly_driver.c, which plays Fastly's host.
 //   node test/fuzz/native/build.mjs [--out DIR] [--lean-prefix DIR] [target…]
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -101,7 +102,8 @@ for (const name of selected) {
     objects = [...buildLean(), driver];
   } else {
     const driver = join(dir, 'driver.o');
-    compile(join(here, 'cgi_driver.c'), driver, ['-I', join(root, 'src', 'wasi'), '-fsanitize=undefined', '-fno-sanitize-recover=undefined']);
+    compile(join(here, target.driver), driver, ['-I', join(root, 'src', 'wasi'), '-fsanitize=undefined', '-fno-sanitize-recover=undefined',
+      ...(target.defines ?? []).map(d => `-D${d}`)]);
     objects = [driver];
   }
   const binary = join(out, target.binary);

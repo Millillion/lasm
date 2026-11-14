@@ -11,7 +11,7 @@ body:
     attributes:
       label: lasm --version
       description: The output of `npx lasm --version` in your project.
-      placeholder: lasm 0.3.1 (@lasm/cli; Lean 4.35.0; Node 26.13.0; linux-x64)
+      placeholder: lasm 0.3.1 (@lasm/cli; Lean 4.35.0; Node 26.13.1; linux-x64)
     validations:
       required: true
   - type: dropdown
@@ -26,7 +26,7 @@ body:
     attributes:
       label: Node, Bun or Deno version
       description: '`node --version` (or `bun --version`, `deno --version` if Lasm runs on Bun or Deno).'
-      placeholder: v26.13.0
+      placeholder: v26.13.1
     validations:
       required: true
   - type: dropdown
