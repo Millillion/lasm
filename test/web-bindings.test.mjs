@@ -46,6 +46,38 @@ test('every Lasm.JS.Node container is generated in its module, with the members 
   }
 });
 
+test('Lasm.JS.Node events: each documented event is a typed listener with on<Event> and once<Event>', () => {
+  const idl = readFileSync(new URL('../scripts/bindings/node.idl', import.meta.url), 'utf8');
+  const { surface } = JSON.parse(readFileSync(new URL('../scripts/bindings/node-surface.json', import.meta.url), 'utf8'));
+  // The server's request event, the socket's data event and the client's response event, with the docs' argument types.
+  assert.match(idl, /callback Node_http_Server_RequestListener = undefined \(Node_http_IncomingMessage request, Node_http_ServerResponse response\);/);
+  assert.match(idl, /callback Node_net_Socket_DataListener = undefined \(\(Uint8Array or DOMString\) value\);/);
+  assert.match(idl, /callback Node_http_ClientRequest_ResponseListener = undefined \(Node_http_IncomingMessage response\);/);
+  // A listener parameter the docs add to an event is that event's listener type.
+  assert.match(idl, /createServer\(optional Node_http_CreateServerOptions options, optional Node_http_Server_RequestListener requestListener\);/);
+  assert.match(idl, /createServer\(optional Node_net_CreateServerOptions options, optional Node_net_Server_ConnectionListener connectionListener\);/);
+  // Events whose arguments the docs give in prose are stated (eventProse): a child's exit code is null after a signal.
+  assert.match(idl, /callback Node_ChildProcess_ExitListener = undefined \(long long\? code, DOMString\? signal\);/);
+  const http = readFileSync(new URL('../library/Lasm/JS/Node/Http.lean', import.meta.url), 'utf8');
+  assert.match(http, /def http\.Server\.onRequest \(self : http\.Server\) \(listener : http\.Server\.RequestListener\) : IO http\.Server := do\n  let r ← self\.val\.callMethod "on" \(Support\.args #\[toJS "request", toJS listener\]\) Value/);
+  assert.match(http, /def http\.Server\.onceRequest [^\n]*\n  let r ← self\.val\.callMethod "once" /);
+  // Events are not members of the object: the availability probe does not look for onRequest.
+  const server = surface.find(e => e.lean === 'http.Server');
+  assert.ok(server.events.includes('request') && !server.prototype.includes('onRequest'));
+  // Documented overloads under one heading are each generated (server.listen(options), (path), ([port[, host]])).
+  assert.match(idl, /Node_net_Server listen\(Node_net_Server_ListenOptions options\);/);
+  assert.match(idl, /Node_net_Server listen\(optional double port, optional DOMString host, optional double backlog\);/);
+});
+
+test('Lasm.JS.Node names: a parent projection or instance never repeats an ancestor\'s', () => {
+  const https = readFileSync(new URL('../library/Lasm/JS/Node/Https.lean', import.meta.url), 'utf8');
+  assert.match(https, /structure https\.Server extends toHttpServer : http\.Server/);
+  for (const f of readdirSync(new URL('../library/Lasm/JS/Node/', import.meta.url))) {
+    const source = readFileSync(new URL(`../library/Lasm/JS/Node/${f}`, import.meta.url), 'utf8');
+    for (const [line] of source.matchAll(/^instance : \S+ .*$/gm)) assert.ok(!/ [A-Za-z]\w*\.[A-Za-z]/.test(line.split(':=')[0].split(' where')[0]), `${f}: unnamed instance on a namespaced type: ${line}`);
+  }
+});
+
 test('the generated modules are shipped library modules, in import order', () => {
   for (const tier of ['Web', 'Node', 'Deno', 'Bun']) {
     const generated = readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url)).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`);

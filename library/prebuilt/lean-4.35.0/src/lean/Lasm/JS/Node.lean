@@ -20,3 +20,6 @@ import Lasm.JS.Node.Process
 import Lasm.JS.Node.Fs
 import Lasm.JS.Node.Crypto
 import Lasm.JS.Node.ChildProcess
+import Lasm.JS.Node.Net
+import Lasm.JS.Node.Http
+import Lasm.JS.Node.Https

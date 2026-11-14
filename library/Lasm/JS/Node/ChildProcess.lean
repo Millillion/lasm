@@ -24,6 +24,90 @@ instance : ToJS ChildProcess := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ChildProcess := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ChildProcess", .data⟩
 instance : Coe ChildProcess EventEmitter := ⟨ChildProcess.toEventEmitter⟩
 
+/-- `callback ChildProcess.CloseListener = undefined (long long? code, DOMString? signal)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ChildProcess.CloseListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyChildProcessCloseListener : Nonempty ChildProcess.CloseListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSChildProcessCloseListener : ToJS ChildProcess.CloseListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSChildProcessCloseListener : FromJS ChildProcess.CloseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ChildProcess.CloseListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ChildProcess.CloseListener.ofFn (f : (Option Int) → (Option String) → Async Unit) : IO ChildProcess.CloseListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Option Int) args 0) (← Support.arg (Option String) args 1)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ChildProcess.CloseListener.ofSyncFn (f : (Option Int) → (Option String) → IO Unit) : IO ChildProcess.CloseListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Option Int) args 0) (← Support.arg (Option String) args 1)) }
+
+/-- `callback ChildProcess.DisconnectListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ChildProcess.DisconnectListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyChildProcessDisconnectListener : Nonempty ChildProcess.DisconnectListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSChildProcessDisconnectListener : ToJS ChildProcess.DisconnectListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSChildProcessDisconnectListener : FromJS ChildProcess.DisconnectListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ChildProcess.DisconnectListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ChildProcess.DisconnectListener.ofFn (f : Async Unit) : IO ChildProcess.DisconnectListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ChildProcess.DisconnectListener.ofSyncFn (f : IO Unit) : IO ChildProcess.DisconnectListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
+
+/-- `callback ChildProcess.ErrorListener = undefined (any err)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ChildProcess.ErrorListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyChildProcessErrorListener : Nonempty ChildProcess.ErrorListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSChildProcessErrorListener : ToJS ChildProcess.ErrorListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSChildProcessErrorListener : FromJS ChildProcess.ErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ChildProcess.ErrorListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ChildProcess.ErrorListener.ofFn (f : Data → Async Unit) : IO ChildProcess.ErrorListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ChildProcess.ErrorListener.ofSyncFn (f : Data → IO Unit) : IO ChildProcess.ErrorListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+
+/-- `callback ChildProcess.ExitListener = undefined (long long? code, DOMString? signal)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ChildProcess.ExitListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyChildProcessExitListener : Nonempty ChildProcess.ExitListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSChildProcessExitListener : ToJS ChildProcess.ExitListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSChildProcessExitListener : FromJS ChildProcess.ExitListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ChildProcess.ExitListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ChildProcess.ExitListener.ofFn (f : (Option Int) → (Option String) → Async Unit) : IO ChildProcess.ExitListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Option Int) args 0) (← Support.arg (Option String) args 1)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ChildProcess.ExitListener.ofSyncFn (f : (Option Int) → (Option String) → IO Unit) : IO ChildProcess.ExitListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Option Int) args 0) (← Support.arg (Option String) args 1)) }
+
+/-- `callback ChildProcess.MessageListener = undefined (object message, object? sendHandle)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ChildProcess.MessageListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyChildProcessMessageListener : Nonempty ChildProcess.MessageListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSChildProcessMessageListener : ToJS ChildProcess.MessageListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSChildProcessMessageListener : FromJS ChildProcess.MessageListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ChildProcess.MessageListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ChildProcess.MessageListener.ofFn (f : Data → (Option Data) → Async Unit) : IO ChildProcess.MessageListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option Data) args 1)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ChildProcess.MessageListener.ofSyncFn (f : Data → (Option Data) → IO Unit) : IO ChildProcess.MessageListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option Data) args 1)) }
+
+/-- `callback ChildProcess.SpawnListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ChildProcess.SpawnListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyChildProcessSpawnListener : Nonempty ChildProcess.SpawnListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSChildProcessSpawnListener : ToJS ChildProcess.SpawnListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSChildProcessSpawnListener : FromJS ChildProcess.SpawnListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ChildProcess.SpawnListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ChildProcess.SpawnListener.ofFn (f : Async Unit) : IO ChildProcess.SpawnListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ChildProcess.SpawnListener.ofSyncFn (f : IO Unit) : IO ChildProcess.SpawnListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
+
 /-- `(double or DOMString)`: one constructor per member type. -/
 inductive DoubleOrDOMString where
   /-- `double` -/
@@ -74,7 +158,7 @@ structure child_process.ExecFileOptions where
   shell : Option BooleanOrDOMString := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS child_process.ExecFileOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
+instance instToJSChild_processExecFileOptions : ToJS child_process.ExecFileOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
     ("env", Support.optional d.env),
     ("encoding", Support.optional d.encoding),
     ("timeout", Support.optional d.timeout),
@@ -93,7 +177,7 @@ structure child_process.ExecFileResult where
   stdout : DOMStringOrUint8Array
   /-- `required (DOMString or Uint8Array) stderr` -/
   stderr : DOMStringOrUint8Array
-instance : FromJS child_process.ExecFileResult where
+instance instFromJSChild_processExecFileResult : FromJS child_process.ExecFileResult where
   fromJS d := do return {
     stdout := ← Lasm.JS.readField DOMStringOrUint8Array d "stdout",
     stderr := ← Lasm.JS.readField DOMStringOrUint8Array d "stderr" }
@@ -141,7 +225,7 @@ structure child_process.SpawnOptions where
   timeout : Option Float := none
   /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
   killSignal : Option DOMStringOrLongLong := none
-instance : ToJS child_process.SpawnOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
+instance instToJSChild_processSpawnOptions : ToJS child_process.SpawnOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
     ("env", Support.optional d.env),
     ("argv0", Support.optional d.argv0),
     ("stdio", Support.optional d.stdio),
@@ -176,6 +260,66 @@ def ChildProcess.stdin (self : ChildProcess) : IO (Option stream.Writable) := se
 
 /-- `subprocess.stdout` (added in Node.js v0.1.90): `readonly attribute stream.Readable? stdout` -/
 def ChildProcess.stdout (self : ChildProcess) : IO (Option stream.Readable) := self.val.get "stdout" (Option stream.Readable)
+
+/-- `Event: 'close'` (added in Node.js v0.7.7): `ChildProcess onClose(ChildProcess.CloseListener listener)`: calls `on("close", listener)` -/
+def ChildProcess.onClose (self : ChildProcess) (listener : ChildProcess.CloseListener) : IO ChildProcess := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'close'` (added in Node.js v0.7.7): `ChildProcess onceClose(ChildProcess.CloseListener listener)`: calls `once("close", listener)` -/
+def ChildProcess.onceClose (self : ChildProcess) (listener : ChildProcess.CloseListener) : IO ChildProcess := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'disconnect'` (added in Node.js v0.7.2): `ChildProcess onDisconnect(ChildProcess.DisconnectListener listener)`: calls `on("disconnect", listener)` -/
+def ChildProcess.onDisconnect (self : ChildProcess) (listener : ChildProcess.DisconnectListener) : IO ChildProcess := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "disconnect", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'disconnect'` (added in Node.js v0.7.2): `ChildProcess onceDisconnect(ChildProcess.DisconnectListener listener)`: calls `once("disconnect", listener)` -/
+def ChildProcess.onceDisconnect (self : ChildProcess) (listener : ChildProcess.DisconnectListener) : IO ChildProcess := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "disconnect", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'error'`: `ChildProcess onError(ChildProcess.ErrorListener listener)`: calls `on("error", listener)` -/
+def ChildProcess.onError (self : ChildProcess) (listener : ChildProcess.ErrorListener) : IO ChildProcess := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'error'`: `ChildProcess onceError(ChildProcess.ErrorListener listener)`: calls `once("error", listener)` -/
+def ChildProcess.onceError (self : ChildProcess) (listener : ChildProcess.ErrorListener) : IO ChildProcess := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'exit'` (added in Node.js v0.1.90): `ChildProcess onExit(ChildProcess.ExitListener listener)`: calls `on("exit", listener)` -/
+def ChildProcess.onExit (self : ChildProcess) (listener : ChildProcess.ExitListener) : IO ChildProcess := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "exit", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'exit'` (added in Node.js v0.1.90): `ChildProcess onceExit(ChildProcess.ExitListener listener)`: calls `once("exit", listener)` -/
+def ChildProcess.onceExit (self : ChildProcess) (listener : ChildProcess.ExitListener) : IO ChildProcess := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "exit", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'message'` (added in Node.js v0.5.9): `ChildProcess onMessage(ChildProcess.MessageListener listener)`: calls `on("message", listener)` -/
+def ChildProcess.onMessage (self : ChildProcess) (listener : ChildProcess.MessageListener) : IO ChildProcess := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "message", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'message'` (added in Node.js v0.5.9): `ChildProcess onceMessage(ChildProcess.MessageListener listener)`: calls `once("message", listener)` -/
+def ChildProcess.onceMessage (self : ChildProcess) (listener : ChildProcess.MessageListener) : IO ChildProcess := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "message", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'spawn'` (added in Node.js v15.1.0, v14.17.0): `ChildProcess onSpawn(ChildProcess.SpawnListener listener)`: calls `on("spawn", listener)` -/
+def ChildProcess.onSpawn (self : ChildProcess) (listener : ChildProcess.SpawnListener) : IO ChildProcess := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "spawn", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'spawn'` (added in Node.js v15.1.0, v14.17.0): `ChildProcess onceSpawn(ChildProcess.SpawnListener listener)`: calls `once("spawn", listener)` -/
+def ChildProcess.onceSpawn (self : ChildProcess) (listener : ChildProcess.SpawnListener) : IO ChildProcess := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "spawn", toJS listener]) Value
+  pure { val := r }
 
 /-- `subprocess.kill([signal])` (added in Node.js v0.1.90): `boolean kill(optional (double or DOMString) signal)` -/
 def ChildProcess.kill (self : ChildProcess) (signal : Option DoubleOrDOMString := none) : IO Bool :=

@@ -39,7 +39,7 @@ structure crypto.CreateHashOptions where
   functionName : Option DOMStringOrUint8Array := none
   /-- `double outputLength` -/
   outputLength : Option Float := none
-instance : ToJS crypto.CreateHashOptions := ⟨fun d => Support.fields #[("customization", Support.optional d.customization),
+instance instToJSCryptoCreateHashOptions : ToJS crypto.CreateHashOptions := ⟨fun d => Support.fields #[("customization", Support.optional d.customization),
     ("functionName", Support.optional d.functionName),
     ("outputLength", Support.optional d.outputLength)]⟩
 
@@ -66,7 +66,7 @@ instance : Coe CryptoKey DOMStringOrUint8ArrayOrObjectOrCryptoKey := ⟨.cryptoK
 structure crypto.CreateHmacOptions where
   /-- `DOMString encoding` -/
   encoding : Option String := none
-instance : ToJS crypto.CreateHmacOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSCryptoCreateHmacOptions : ToJS crypto.CreateHmacOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
 
 /-- `dictionary crypto.HashOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.HashOptions where
@@ -78,7 +78,7 @@ structure crypto.HashOptions where
   outputEncoding : Option String := none
   /-- `double outputLength` -/
   outputLength : Option Float := none
-instance : ToJS crypto.HashOptions := ⟨fun d => Support.fields #[("customization", Support.optional d.customization),
+instance instToJSCryptoHashOptions : ToJS crypto.HashOptions := ⟨fun d => Support.fields #[("customization", Support.optional d.customization),
     ("functionName", Support.optional d.functionName),
     ("outputEncoding", Support.optional d.outputEncoding),
     ("outputLength", Support.optional d.outputLength)]⟩
@@ -89,17 +89,17 @@ inductive crypto.HashOptionsOrDOMString where
   | hashOptions (value : crypto.HashOptions)
   /-- `DOMString` -/
   | domString (value : String)
-instance : ToJS crypto.HashOptionsOrDOMString := ⟨fun
+instance instToJSCryptoHashOptionsOrDOMString : ToJS crypto.HashOptionsOrDOMString := ⟨fun
   | .hashOptions v => toJS v
   | .domString v => toJS v⟩
-instance : Coe crypto.HashOptions crypto.HashOptionsOrDOMString := ⟨.hashOptions⟩
-instance : Coe String crypto.HashOptionsOrDOMString := ⟨.domString⟩
+instance instCoeCryptoHashOptionsCryptoHashOptionsOrDOMString : Coe crypto.HashOptions crypto.HashOptionsOrDOMString := ⟨.hashOptions⟩
+instance instCoeStringCryptoHashOptionsOrDOMString : Coe String crypto.HashOptionsOrDOMString := ⟨.domString⟩
 
 /-- `dictionary crypto.RandomUUIDOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.RandomUUIDOptions where
   /-- `boolean disableEntropyCache = false` -/
   disableEntropyCache : Option Bool := none
-instance : ToJS crypto.RandomUUIDOptions := ⟨fun d => Support.fields #[("disableEntropyCache", Support.optional d.disableEntropyCache)]⟩
+instance instToJSCryptoRandomUUIDOptions : ToJS crypto.RandomUUIDOptions := ⟨fun d => Support.fields #[("disableEntropyCache", Support.optional d.disableEntropyCache)]⟩
 
 /-- `dictionary crypto.ScryptOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.ScryptOptions where
@@ -117,7 +117,7 @@ structure crypto.ScryptOptions where
   p : Option Float := none
   /-- `double maxmem` -/
   maxmem : Option Float := none
-instance : ToJS crypto.ScryptOptions := ⟨fun d => Support.fields #[("cost", Support.optional d.cost),
+instance instToJSCryptoScryptOptions : ToJS crypto.ScryptOptions := ⟨fun d => Support.fields #[("cost", Support.optional d.cost),
     ("blockSize", Support.optional d.blockSize),
     ("parallelization", Support.optional d.parallelization),
     ("N", Support.optional d.N),

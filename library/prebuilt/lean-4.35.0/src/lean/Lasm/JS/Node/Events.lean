@@ -32,12 +32,66 @@ instance : ToJS DOMStringOrSymbol := ⟨fun
   | .domString v => toJS v
   | .symbol v => toJS v⟩
 instance : Coe String DOMStringOrSymbol := ⟨.domString⟩
+instance : FromJS DOMStringOrSymbol where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.ref _ _) => (FromJS.fromJS d : Except String Value).map .symbol
+    | _ => .error ""
+  typeName := "Lasm.JS.Node.DOMStringOrSymbol"
+
+/-- `callback EventEmitter.NewListenerListener = undefined ((DOMString or symbol) eventName, Function listener)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure EventEmitter.NewListenerListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyEventEmitterNewListenerListener : Nonempty EventEmitter.NewListenerListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSEventEmitterNewListenerListener : ToJS EventEmitter.NewListenerListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSEventEmitterNewListenerListener : FromJS EventEmitter.NewListenerListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.EventEmitter.NewListenerListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def EventEmitter.NewListenerListener.ofFn (f : DOMStringOrSymbol → JSFunction → Async Unit) : IO EventEmitter.NewListenerListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg DOMStringOrSymbol args 0) (← Support.arg JSFunction args 1)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def EventEmitter.NewListenerListener.ofSyncFn (f : DOMStringOrSymbol → JSFunction → IO Unit) : IO EventEmitter.NewListenerListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg DOMStringOrSymbol args 0) (← Support.arg JSFunction args 1)) }
+
+/-- `callback EventEmitter.RemoveListenerListener = undefined ((DOMString or symbol) eventName, Function listener)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure EventEmitter.RemoveListenerListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyEventEmitterRemoveListenerListener : Nonempty EventEmitter.RemoveListenerListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSEventEmitterRemoveListenerListener : ToJS EventEmitter.RemoveListenerListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSEventEmitterRemoveListenerListener : FromJS EventEmitter.RemoveListenerListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.EventEmitter.RemoveListenerListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def EventEmitter.RemoveListenerListener.ofFn (f : DOMStringOrSymbol → JSFunction → Async Unit) : IO EventEmitter.RemoveListenerListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg DOMStringOrSymbol args 0) (← Support.arg JSFunction args 1)) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def EventEmitter.RemoveListenerListener.ofSyncFn (f : DOMStringOrSymbol → JSFunction → IO Unit) : IO EventEmitter.RemoveListenerListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg DOMStringOrSymbol args 0) (← Support.arg JSFunction args 1)) }
 
 /-- `dictionary events.OnceOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure events.OnceOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS events.OnceOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance instToJSEventsOnceOptions : ToJS events.OnceOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+
+/-- `Event: 'newListener'` (added in Node.js v0.1.26): `EventEmitter onNewListener(EventEmitter.NewListenerListener listener)`: calls `on("newListener", listener)` -/
+def EventEmitter.onNewListener (self : EventEmitter) (listener : EventEmitter.NewListenerListener) : IO EventEmitter := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "newListener", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'newListener'` (added in Node.js v0.1.26): `EventEmitter onceNewListener(EventEmitter.NewListenerListener listener)`: calls `once("newListener", listener)` -/
+def EventEmitter.onceNewListener (self : EventEmitter) (listener : EventEmitter.NewListenerListener) : IO EventEmitter := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "newListener", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'removeListener'` (added in Node.js v0.9.3): `EventEmitter onRemoveListener(EventEmitter.RemoveListenerListener listener)`: calls `on("removeListener", listener)` -/
+def EventEmitter.onRemoveListener (self : EventEmitter) (listener : EventEmitter.RemoveListenerListener) : IO EventEmitter := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "removeListener", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'removeListener'` (added in Node.js v0.9.3): `EventEmitter onceRemoveListener(EventEmitter.RemoveListenerListener listener)`: calls `once("removeListener", listener)` -/
+def EventEmitter.onceRemoveListener (self : EventEmitter) (listener : EventEmitter.RemoveListenerListener) : IO EventEmitter := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "removeListener", toJS listener]) Value
+  pure { val := r }
 
 /-- `emitter.emit(eventName[, ...args])` (added in Node.js v0.1.26): `boolean emit((DOMString or symbol) eventName, any... args)` -/
 def EventEmitter.emit (self : EventEmitter) (eventName : DOMStringOrSymbol) (args : Array Data := #[]) : IO Bool :=

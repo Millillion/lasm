@@ -21,17 +21,17 @@ open Lasm.JS Lasm.JS.Web
 structure fs.Stats where
   /-- The JavaScript object. -/
   val : Value
-instance : Nonempty fs.Stats := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS fs.Stats := ⟨fun x => .ref x.val ""⟩
-instance : FromJS fs.Stats := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.fs.Stats", .data⟩
+instance instNonemptyFsStats : Nonempty fs.Stats := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSFsStats : ToJS fs.Stats := ⟨fun x => .ref x.val ""⟩
+instance instFromJSFsStats : FromJS fs.Stats := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.fs.Stats", .data⟩
 
 /-- `class fs.Dirent` of `node:fs` (Node.js 24.22.2 documentation, fs.md): a handle to the JavaScript object. -/
 structure fs.Dirent where
   /-- The JavaScript object. -/
   val : Value
-instance : Nonempty fs.Dirent := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS fs.Dirent := ⟨fun x => .ref x.val ""⟩
-instance : FromJS fs.Dirent := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.fs.Dirent", .data⟩
+instance instNonemptyFsDirent : Nonempty fs.Dirent := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSFsDirent : ToJS fs.Dirent := ⟨fun x => .ref x.val ""⟩
+instance instFromJSFsDirent : FromJS fs.Dirent := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.fs.Dirent", .data⟩
 
 /-- `class FileHandle` of `node:fs/promises` (Node.js 24.22.2 documentation, fs.md): a handle to the JavaScript object. -/
 structure FileHandle where
@@ -54,6 +54,20 @@ instance : FromJS DoubleOrBigint where
     | _ => .error ""
   typeName := "Lasm.JS.Node.DoubleOrBigint"
 
+/-- `callback FileHandle.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure FileHandle.CloseListener where
+  /-- The JavaScript function. -/
+  val : Value
+instance instNonemptyFileHandleCloseListener : Nonempty FileHandle.CloseListener := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSFileHandleCloseListener : ToJS FileHandle.CloseListener := ⟨fun x => .ref x.val ""⟩
+instance instFromJSFileHandleCloseListener : FromJS FileHandle.CloseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.FileHandle.CloseListener", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def FileHandle.CloseListener.ofFn (f : Async Unit) : IO FileHandle.CloseListener := do
+  return { val := ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f) }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def FileHandle.CloseListener.ofSyncFn (f : IO Unit) : IO FileHandle.CloseListener := do
+  return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
+
 /-- `(DOMString or Uint8Array or object)`: one constructor per member type. -/
 inductive DOMStringOrUint8ArrayOrObject where
   /-- `DOMString` -/
@@ -75,7 +89,7 @@ structure FileHandle.AppendFileOptions where
   encoding : Option String := none
   /-- `AbortSignal? signal` -/
   signal : Option AbortSignal := none
-instance : ToJS FileHandle.AppendFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
+instance instToJSFileHandleAppendFileOptions : ToJS FileHandle.AppendFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
     ("signal", Support.optional d.signal)]⟩
 
 /-- `(FileHandle.AppendFileOptions or DOMString)`: one constructor per member type. -/
@@ -84,11 +98,11 @@ inductive FileHandle.AppendFileOptionsOrDOMString where
   | appendFileOptions (value : FileHandle.AppendFileOptions)
   /-- `DOMString` -/
   | domString (value : String)
-instance : ToJS FileHandle.AppendFileOptionsOrDOMString := ⟨fun
+instance instToJSFileHandleAppendFileOptionsOrDOMString : ToJS FileHandle.AppendFileOptionsOrDOMString := ⟨fun
   | .appendFileOptions v => toJS v
   | .domString v => toJS v⟩
-instance : Coe FileHandle.AppendFileOptions FileHandle.AppendFileOptionsOrDOMString := ⟨.appendFileOptions⟩
-instance : Coe String FileHandle.AppendFileOptionsOrDOMString := ⟨.domString⟩
+instance instCoeFileHandleAppendFileOptionsFileHandleAppendFileOptionsOrDOMString : Coe FileHandle.AppendFileOptions FileHandle.AppendFileOptionsOrDOMString := ⟨.appendFileOptions⟩
+instance instCoeStringFileHandleAppendFileOptionsOrDOMString : Coe String FileHandle.AppendFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `(long long or bigint)`: one constructor per member type. -/
 inductive LongLongOrBigint where
@@ -106,7 +120,7 @@ structure FileHandle.ReadResult where
   bytesRead : Int
   /-- `required Uint8Array buffer` -/
   buffer : ByteArray
-instance : FromJS FileHandle.ReadResult where
+instance instFromJSFileHandleReadResult : FromJS FileHandle.ReadResult where
   fromJS d := do return {
     bytesRead := ← Lasm.JS.readField Int d "bytesRead",
     buffer := ← Lasm.JS.readField ByteArray d "buffer" }
@@ -122,7 +136,7 @@ structure FileHandle.ReadOptions where
   length : Option Int := none
   /-- `(long long or bigint)? position` -/
   position : Option LongLongOrBigint := none
-instance : ToJS FileHandle.ReadOptions := ⟨fun d => Support.fields #[("buffer", Support.optional d.buffer),
+instance instToJSFileHandleReadOptions : ToJS FileHandle.ReadOptions := ⟨fun d => Support.fields #[("buffer", Support.optional d.buffer),
     ("offset", Support.optional d.offset),
     ("length", Support.optional d.length),
     ("position", Support.optional d.position)]⟩
@@ -135,7 +149,7 @@ structure FileHandle.ReadOptions2 where
   length : Option Int := none
   /-- `(long long or bigint)? position` -/
   position : Option LongLongOrBigint := none
-instance : ToJS FileHandle.ReadOptions2 := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
+instance instToJSFileHandleReadOptions2 : ToJS FileHandle.ReadOptions2 := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
     ("length", Support.optional d.length),
     ("position", Support.optional d.position)]⟩
 
@@ -143,7 +157,7 @@ instance : ToJS FileHandle.ReadOptions2 := ⟨fun d => Support.fields #[("offset
 structure FileHandle.ReadableWebStreamOptions where
   /-- `boolean autoClose = false` -/
   autoClose : Option Bool := none
-instance : ToJS FileHandle.ReadableWebStreamOptions := ⟨fun d => Support.fields #[("autoClose", Support.optional d.autoClose)]⟩
+instance instToJSFileHandleReadableWebStreamOptions : ToJS FileHandle.ReadableWebStreamOptions := ⟨fun d => Support.fields #[("autoClose", Support.optional d.autoClose)]⟩
 
 /-- `(Uint8Array or Function)`: one constructor per member type. -/
 inductive Uint8ArrayOrJSFunction where
@@ -165,7 +179,7 @@ structure FileHandle.ReadFileOptions where
   signal : Option AbortSignal := none
   /-- `(Uint8Array or Function) buffer` -/
   buffer : Option Uint8ArrayOrJSFunction := none
-instance : ToJS FileHandle.ReadFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
+instance instToJSFileHandleReadFileOptions : ToJS FileHandle.ReadFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
     ("signal", Support.optional d.signal),
     ("buffer", Support.optional d.buffer)]⟩
 
@@ -175,11 +189,11 @@ inductive FileHandle.ReadFileOptionsOrDOMString where
   | readFileOptions (value : FileHandle.ReadFileOptions)
   /-- `DOMString` -/
   | domString (value : String)
-instance : ToJS FileHandle.ReadFileOptionsOrDOMString := ⟨fun
+instance instToJSFileHandleReadFileOptionsOrDOMString : ToJS FileHandle.ReadFileOptionsOrDOMString := ⟨fun
   | .readFileOptions v => toJS v
   | .domString v => toJS v⟩
-instance : Coe FileHandle.ReadFileOptions FileHandle.ReadFileOptionsOrDOMString := ⟨.readFileOptions⟩
-instance : Coe String FileHandle.ReadFileOptionsOrDOMString := ⟨.domString⟩
+instance instCoeFileHandleReadFileOptionsFileHandleReadFileOptionsOrDOMString : Coe FileHandle.ReadFileOptions FileHandle.ReadFileOptionsOrDOMString := ⟨.readFileOptions⟩
+instance instCoeStringFileHandleReadFileOptionsOrDOMString : Coe String FileHandle.ReadFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `(Uint8Array or DOMString)`: one constructor per member type. -/
 inductive Uint8ArrayOrDOMString where
@@ -200,7 +214,7 @@ structure FileHandle.StatOptions where
   bigint : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS FileHandle.StatOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint),
+instance instToJSFileHandleStatOptions : ToJS FileHandle.StatOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint),
     ("signal", Support.optional d.signal)]⟩
 
 /-- `(double or DOMString or object)`: one constructor per member type. -/
@@ -224,7 +238,7 @@ structure FileHandle.WriteResult where
   bytesWritten : Int
   /-- `required Uint8Array buffer` -/
   buffer : ByteArray
-instance : FromJS FileHandle.WriteResult where
+instance instFromJSFileHandleWriteResult : FromJS FileHandle.WriteResult where
   fromJS d := do return {
     bytesWritten := ← Lasm.JS.readField Int d "bytesWritten",
     buffer := ← Lasm.JS.readField ByteArray d "buffer" }
@@ -238,7 +252,7 @@ structure FileHandle.WriteOptions where
   length : Option Int := none
   /-- `long long? position = null` -/
   position : Option Int := none
-instance : ToJS FileHandle.WriteOptions := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
+instance instToJSFileHandleWriteOptions : ToJS FileHandle.WriteOptions := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
     ("length", Support.optional d.length),
     ("position", Support.optional d.position)]⟩
 
@@ -248,7 +262,7 @@ structure FileHandle.WriteStringResult where
   bytesWritten : Int
   /-- `required DOMString buffer` -/
   buffer : String
-instance : FromJS FileHandle.WriteStringResult where
+instance instFromJSFileHandleWriteStringResult : FromJS FileHandle.WriteStringResult where
   fromJS d := do return {
     bytesWritten := ← Lasm.JS.readField Int d "bytesWritten",
     buffer := ← Lasm.JS.readField String d "buffer" }
@@ -260,7 +274,7 @@ structure FileHandle.WriteFileOptions where
   encoding : Option String := none
   /-- `AbortSignal? signal` -/
   signal : Option AbortSignal := none
-instance : ToJS FileHandle.WriteFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
+instance instToJSFileHandleWriteFileOptions : ToJS FileHandle.WriteFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
     ("signal", Support.optional d.signal)]⟩
 
 /-- `(FileHandle.WriteFileOptions or DOMString)`: one constructor per member type. -/
@@ -269,11 +283,11 @@ inductive FileHandle.WriteFileOptionsOrDOMString where
   | writeFileOptions (value : FileHandle.WriteFileOptions)
   /-- `DOMString` -/
   | domString (value : String)
-instance : ToJS FileHandle.WriteFileOptionsOrDOMString := ⟨fun
+instance instToJSFileHandleWriteFileOptionsOrDOMString : ToJS FileHandle.WriteFileOptionsOrDOMString := ⟨fun
   | .writeFileOptions v => toJS v
   | .domString v => toJS v⟩
-instance : Coe FileHandle.WriteFileOptions FileHandle.WriteFileOptionsOrDOMString := ⟨.writeFileOptions⟩
-instance : Coe String FileHandle.WriteFileOptionsOrDOMString := ⟨.domString⟩
+instance instCoeFileHandleWriteFileOptionsFileHandleWriteFileOptionsOrDOMString : Coe FileHandle.WriteFileOptions FileHandle.WriteFileOptionsOrDOMString := ⟨.writeFileOptions⟩
+instance instCoeStringFileHandleWriteFileOptionsOrDOMString : Coe String FileHandle.WriteFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `(DOMString or Uint8Array or URL)`: one constructor per member type. -/
 inductive DOMStringOrUint8ArrayOrURL where
@@ -321,7 +335,7 @@ structure fsPromises.AppendFileOptions where
   flag : Option String := none
   /-- `boolean flush = false` -/
   flush : Option Bool := none
-instance : ToJS fsPromises.AppendFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
+instance instToJSFsPromisesAppendFileOptions : ToJS fsPromises.AppendFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
     ("mode", Support.optional d.mode),
     ("flag", Support.optional d.flag),
     ("flush", Support.optional d.flush)]⟩
@@ -332,11 +346,11 @@ inductive fsPromises.AppendFileOptionsOrDOMString where
   | appendFileOptions (value : fsPromises.AppendFileOptions)
   /-- `DOMString` -/
   | domString (value : String)
-instance : ToJS fsPromises.AppendFileOptionsOrDOMString := ⟨fun
+instance instToJSFsPromisesAppendFileOptionsOrDOMString : ToJS fsPromises.AppendFileOptionsOrDOMString := ⟨fun
   | .appendFileOptions v => toJS v
   | .domString v => toJS v⟩
-instance : Coe fsPromises.AppendFileOptions fsPromises.AppendFileOptionsOrDOMString := ⟨.appendFileOptions⟩
-instance : Coe String fsPromises.AppendFileOptionsOrDOMString := ⟨.domString⟩
+instance instCoeFsPromisesAppendFileOptionsFsPromisesAppendFileOptionsOrDOMString : Coe fsPromises.AppendFileOptions fsPromises.AppendFileOptionsOrDOMString := ⟨.appendFileOptions⟩
+instance instCoeStringFsPromisesAppendFileOptionsOrDOMString : Coe String fsPromises.AppendFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `(DOMString or long long)`: one constructor per member type. -/
 inductive DOMStringOrLongLong where
@@ -380,7 +394,7 @@ structure fsPromises.CpOptions where
   recursive : Option Bool := none
   /-- `boolean verbatimSymlinks = false` -/
   verbatimSymlinks : Option Bool := none
-instance : ToJS fsPromises.CpOptions := ⟨fun d => Support.fields #[("dereference", Support.optional d.dereference),
+instance instToJSFsPromisesCpOptions : ToJS fsPromises.CpOptions := ⟨fun d => Support.fields #[("dereference", Support.optional d.dereference),
     ("errorOnExist", Support.optional d.errorOnExist),
     ("filter", Support.optional d.filter),
     ("force", Support.optional d.force),
@@ -393,7 +407,7 @@ instance : ToJS fsPromises.CpOptions := ⟨fun d => Support.fields #[("dereferen
 structure fsPromises.LstatOptions where
   /-- `boolean bigint = false` -/
   bigint : Option Bool := none
-instance : ToJS fsPromises.LstatOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint)]⟩
+instance instToJSFsPromisesLstatOptions : ToJS fsPromises.LstatOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint)]⟩
 
 /-- `dictionary fsPromises.MkdirOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.MkdirOptions where
@@ -401,7 +415,7 @@ structure fsPromises.MkdirOptions where
   recursive : Option Bool := none
   /-- `(DOMString or long long) mode` -/
   mode : Option DOMStringOrLongLong := none
-instance : ToJS fsPromises.MkdirOptions := ⟨fun d => Support.fields #[("recursive", Support.optional d.recursive),
+instance instToJSFsPromisesMkdirOptions : ToJS fsPromises.MkdirOptions := ⟨fun d => Support.fields #[("recursive", Support.optional d.recursive),
     ("mode", Support.optional d.mode)]⟩
 
 /-- `(fsPromises.MkdirOptions or long long)`: one constructor per member type. -/
@@ -410,17 +424,17 @@ inductive fsPromises.MkdirOptionsOrLongLong where
   | mkdirOptions (value : fsPromises.MkdirOptions)
   /-- `long long` -/
   | longLong (value : Int)
-instance : ToJS fsPromises.MkdirOptionsOrLongLong := ⟨fun
+instance instToJSFsPromisesMkdirOptionsOrLongLong : ToJS fsPromises.MkdirOptionsOrLongLong := ⟨fun
   | .mkdirOptions v => toJS v
   | .longLong v => toJS v⟩
-instance : Coe fsPromises.MkdirOptions fsPromises.MkdirOptionsOrLongLong := ⟨.mkdirOptions⟩
-instance : Coe Int fsPromises.MkdirOptionsOrLongLong := ⟨.longLong⟩
+instance instCoeFsPromisesMkdirOptionsFsPromisesMkdirOptionsOrLongLong : Coe fsPromises.MkdirOptions fsPromises.MkdirOptionsOrLongLong := ⟨.mkdirOptions⟩
+instance instCoeIntFsPromisesMkdirOptionsOrLongLong : Coe Int fsPromises.MkdirOptionsOrLongLong := ⟨.longLong⟩
 
 /-- `dictionary fsPromises.MkdtempOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.MkdtempOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance : ToJS fsPromises.MkdtempOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsPromisesMkdtempOptions : ToJS fsPromises.MkdtempOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
 
 /-- `(DOMString or fsPromises.MkdtempOptions)`: one constructor per member type. -/
 inductive fsPromises.DOMStringOrMkdtempOptions where
@@ -428,11 +442,11 @@ inductive fsPromises.DOMStringOrMkdtempOptions where
   | domString (value : String)
   /-- `fsPromises.MkdtempOptions` -/
   | mkdtempOptions (value : fsPromises.MkdtempOptions)
-instance : ToJS fsPromises.DOMStringOrMkdtempOptions := ⟨fun
+instance instToJSFsPromisesDOMStringOrMkdtempOptions : ToJS fsPromises.DOMStringOrMkdtempOptions := ⟨fun
   | .domString v => toJS v
   | .mkdtempOptions v => toJS v⟩
-instance : Coe String fsPromises.DOMStringOrMkdtempOptions := ⟨.domString⟩
-instance : Coe fsPromises.MkdtempOptions fsPromises.DOMStringOrMkdtempOptions := ⟨.mkdtempOptions⟩
+instance instCoeStringFsPromisesDOMStringOrMkdtempOptions : Coe String fsPromises.DOMStringOrMkdtempOptions := ⟨.domString⟩
+instance instCoeFsPromisesMkdtempOptionsFsPromisesDOMStringOrMkdtempOptions : Coe fsPromises.MkdtempOptions fsPromises.DOMStringOrMkdtempOptions := ⟨.mkdtempOptions⟩
 
 /-- `dictionary fsPromises.ReaddirOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.ReaddirOptions where
@@ -442,7 +456,7 @@ structure fsPromises.ReaddirOptions where
   withFileTypes : Option Bool := none
   /-- `boolean recursive = false` -/
   recursive : Option Bool := none
-instance : ToJS fsPromises.ReaddirOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
+instance instToJSFsPromisesReaddirOptions : ToJS fsPromises.ReaddirOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
     ("withFileTypes", Support.optional d.withFileTypes),
     ("recursive", Support.optional d.recursive)]⟩
 
@@ -452,11 +466,11 @@ inductive fsPromises.DOMStringOrReaddirOptions where
   | domString (value : String)
   /-- `fsPromises.ReaddirOptions` -/
   | readdirOptions (value : fsPromises.ReaddirOptions)
-instance : ToJS fsPromises.DOMStringOrReaddirOptions := ⟨fun
+instance instToJSFsPromisesDOMStringOrReaddirOptions : ToJS fsPromises.DOMStringOrReaddirOptions := ⟨fun
   | .domString v => toJS v
   | .readdirOptions v => toJS v⟩
-instance : Coe String fsPromises.DOMStringOrReaddirOptions := ⟨.domString⟩
-instance : Coe fsPromises.ReaddirOptions fsPromises.DOMStringOrReaddirOptions := ⟨.readdirOptions⟩
+instance instCoeStringFsPromisesDOMStringOrReaddirOptions : Coe String fsPromises.DOMStringOrReaddirOptions := ⟨.domString⟩
+instance instCoeFsPromisesReaddirOptionsFsPromisesDOMStringOrReaddirOptions : Coe fsPromises.ReaddirOptions fsPromises.DOMStringOrReaddirOptions := ⟨.readdirOptions⟩
 
 /-- `(DOMString or Uint8Array or fs.Dirent)`: one constructor per member type. -/
 inductive fs.DOMStringOrUint8ArrayOrDirent where
@@ -466,7 +480,7 @@ inductive fs.DOMStringOrUint8ArrayOrDirent where
   | uint8Array (value : ByteArray)
   /-- `fs.Dirent` -/
   | dirent (value : fs.Dirent)
-instance : FromJS fs.DOMStringOrUint8ArrayOrDirent where
+instance instFromJSFsDOMStringOrUint8ArrayOrDirent : FromJS fs.DOMStringOrUint8ArrayOrDirent where
   fromJS
     | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
     | d@(.bytes _) => (FromJS.fromJS d : Except String ByteArray).map .uint8Array
@@ -484,7 +498,7 @@ structure fsPromises.ReadFileOptions where
   signal : Option AbortSignal := none
   /-- `(Uint8Array or Function) buffer` -/
   buffer : Option Uint8ArrayOrJSFunction := none
-instance : ToJS fsPromises.ReadFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
+instance instToJSFsPromisesReadFileOptions : ToJS fsPromises.ReadFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
     ("flag", Support.optional d.flag),
     ("signal", Support.optional d.signal),
     ("buffer", Support.optional d.buffer)]⟩
@@ -495,17 +509,17 @@ inductive fsPromises.ReadFileOptionsOrDOMString where
   | readFileOptions (value : fsPromises.ReadFileOptions)
   /-- `DOMString` -/
   | domString (value : String)
-instance : ToJS fsPromises.ReadFileOptionsOrDOMString := ⟨fun
+instance instToJSFsPromisesReadFileOptionsOrDOMString : ToJS fsPromises.ReadFileOptionsOrDOMString := ⟨fun
   | .readFileOptions v => toJS v
   | .domString v => toJS v⟩
-instance : Coe fsPromises.ReadFileOptions fsPromises.ReadFileOptionsOrDOMString := ⟨.readFileOptions⟩
-instance : Coe String fsPromises.ReadFileOptionsOrDOMString := ⟨.domString⟩
+instance instCoeFsPromisesReadFileOptionsFsPromisesReadFileOptionsOrDOMString : Coe fsPromises.ReadFileOptions fsPromises.ReadFileOptionsOrDOMString := ⟨.readFileOptions⟩
+instance instCoeStringFsPromisesReadFileOptionsOrDOMString : Coe String fsPromises.ReadFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `dictionary fsPromises.ReadlinkOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.ReadlinkOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance : ToJS fsPromises.ReadlinkOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsPromisesReadlinkOptions : ToJS fsPromises.ReadlinkOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
 
 /-- `(DOMString or fsPromises.ReadlinkOptions)`: one constructor per member type. -/
 inductive fsPromises.DOMStringOrReadlinkOptions where
@@ -513,17 +527,17 @@ inductive fsPromises.DOMStringOrReadlinkOptions where
   | domString (value : String)
   /-- `fsPromises.ReadlinkOptions` -/
   | readlinkOptions (value : fsPromises.ReadlinkOptions)
-instance : ToJS fsPromises.DOMStringOrReadlinkOptions := ⟨fun
+instance instToJSFsPromisesDOMStringOrReadlinkOptions : ToJS fsPromises.DOMStringOrReadlinkOptions := ⟨fun
   | .domString v => toJS v
   | .readlinkOptions v => toJS v⟩
-instance : Coe String fsPromises.DOMStringOrReadlinkOptions := ⟨.domString⟩
-instance : Coe fsPromises.ReadlinkOptions fsPromises.DOMStringOrReadlinkOptions := ⟨.readlinkOptions⟩
+instance instCoeStringFsPromisesDOMStringOrReadlinkOptions : Coe String fsPromises.DOMStringOrReadlinkOptions := ⟨.domString⟩
+instance instCoeFsPromisesReadlinkOptionsFsPromisesDOMStringOrReadlinkOptions : Coe fsPromises.ReadlinkOptions fsPromises.DOMStringOrReadlinkOptions := ⟨.readlinkOptions⟩
 
 /-- `dictionary fsPromises.RealpathOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.RealpathOptions where
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-instance : ToJS fsPromises.RealpathOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
+instance instToJSFsPromisesRealpathOptions : ToJS fsPromises.RealpathOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding)]⟩
 
 /-- `(DOMString or fsPromises.RealpathOptions)`: one constructor per member type. -/
 inductive fsPromises.DOMStringOrRealpathOptions where
@@ -531,11 +545,11 @@ inductive fsPromises.DOMStringOrRealpathOptions where
   | domString (value : String)
   /-- `fsPromises.RealpathOptions` -/
   | realpathOptions (value : fsPromises.RealpathOptions)
-instance : ToJS fsPromises.DOMStringOrRealpathOptions := ⟨fun
+instance instToJSFsPromisesDOMStringOrRealpathOptions : ToJS fsPromises.DOMStringOrRealpathOptions := ⟨fun
   | .domString v => toJS v
   | .realpathOptions v => toJS v⟩
-instance : Coe String fsPromises.DOMStringOrRealpathOptions := ⟨.domString⟩
-instance : Coe fsPromises.RealpathOptions fsPromises.DOMStringOrRealpathOptions := ⟨.realpathOptions⟩
+instance instCoeStringFsPromisesDOMStringOrRealpathOptions : Coe String fsPromises.DOMStringOrRealpathOptions := ⟨.domString⟩
+instance instCoeFsPromisesRealpathOptionsFsPromisesDOMStringOrRealpathOptions : Coe fsPromises.RealpathOptions fsPromises.DOMStringOrRealpathOptions := ⟨.realpathOptions⟩
 
 /-- `dictionary fsPromises.RmdirOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fsPromises.RmdirOptions where
@@ -545,7 +559,7 @@ structure fsPromises.RmdirOptions where
   recursive : Option Bool := none
   /-- `long long retryDelay = 100` -/
   retryDelay : Option Int := none
-instance : ToJS fsPromises.RmdirOptions := ⟨fun d => Support.fields #[("maxRetries", Support.optional d.maxRetries),
+instance instToJSFsPromisesRmdirOptions : ToJS fsPromises.RmdirOptions := ⟨fun d => Support.fields #[("maxRetries", Support.optional d.maxRetries),
     ("recursive", Support.optional d.recursive),
     ("retryDelay", Support.optional d.retryDelay)]⟩
 
@@ -559,7 +573,7 @@ structure fsPromises.RmOptions where
   recursive : Option Bool := none
   /-- `long long retryDelay = 100` -/
   retryDelay : Option Int := none
-instance : ToJS fsPromises.RmOptions := ⟨fun d => Support.fields #[("force", Support.optional d.force),
+instance instToJSFsPromisesRmOptions : ToJS fsPromises.RmOptions := ⟨fun d => Support.fields #[("force", Support.optional d.force),
     ("maxRetries", Support.optional d.maxRetries),
     ("recursive", Support.optional d.recursive),
     ("retryDelay", Support.optional d.retryDelay)]⟩
@@ -570,7 +584,7 @@ structure fsPromises.StatOptions where
   bigint : Option Bool := none
   /-- `boolean throwIfNoEntry = true` -/
   throwIfNoEntry : Option Bool := none
-instance : ToJS fsPromises.StatOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint),
+instance instToJSFsPromisesStatOptions : ToJS fsPromises.StatOptions := ⟨fun d => Support.fields #[("bigint", Support.optional d.bigint),
     ("throwIfNoEntry", Support.optional d.throwIfNoEntry)]⟩
 
 /-- `dictionary fsPromises.WriteFileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -585,7 +599,7 @@ structure fsPromises.WriteFileOptions where
   flush : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance : ToJS fsPromises.WriteFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
+instance instToJSFsPromisesWriteFileOptions : ToJS fsPromises.WriteFileOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
     ("mode", Support.optional d.mode),
     ("flag", Support.optional d.flag),
     ("flush", Support.optional d.flush),
@@ -597,11 +611,11 @@ inductive fsPromises.WriteFileOptionsOrDOMString where
   | writeFileOptions (value : fsPromises.WriteFileOptions)
   /-- `DOMString` -/
   | domString (value : String)
-instance : ToJS fsPromises.WriteFileOptionsOrDOMString := ⟨fun
+instance instToJSFsPromisesWriteFileOptionsOrDOMString : ToJS fsPromises.WriteFileOptionsOrDOMString := ⟨fun
   | .writeFileOptions v => toJS v
   | .domString v => toJS v⟩
-instance : Coe fsPromises.WriteFileOptions fsPromises.WriteFileOptionsOrDOMString := ⟨.writeFileOptions⟩
-instance : Coe String fsPromises.WriteFileOptionsOrDOMString := ⟨.domString⟩
+instance instCoeFsPromisesWriteFileOptionsFsPromisesWriteFileOptionsOrDOMString : Coe fsPromises.WriteFileOptions fsPromises.WriteFileOptionsOrDOMString := ⟨.writeFileOptions⟩
+instance instCoeStringFsPromisesWriteFileOptionsOrDOMString : Coe String fsPromises.WriteFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `stats.dev`: `readonly attribute (double or bigint) dev` -/
 def fs.Stats.dev (self : fs.Stats) : IO DoubleOrBigint := self.val.get "dev" DoubleOrBigint
@@ -733,6 +747,16 @@ def fs.Dirent.isSymbolicLink (self : fs.Dirent) : IO Bool :=
 
 /-- `filehandle.fd` (added in Node.js v10.0.0): `readonly attribute double fd` -/
 def FileHandle.fd (self : FileHandle) : IO Float := self.val.get "fd" Float
+
+/-- `Event: 'close'` (added in Node.js v15.4.0): `FileHandle onClose(FileHandle.CloseListener listener)`: calls `on("close", listener)` -/
+def FileHandle.onClose (self : FileHandle) (listener : FileHandle.CloseListener) : IO FileHandle := do
+  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+  pure { val := r }
+
+/-- `Event: 'close'` (added in Node.js v15.4.0): `FileHandle onceClose(FileHandle.CloseListener listener)`: calls `once("close", listener)` -/
+def FileHandle.onceClose (self : FileHandle) (listener : FileHandle.CloseListener) : IO FileHandle := do
+  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+  pure { val := r }
 
 /-- `filehandle.appendFile(data[, options])` (added in Node.js v10.0.0): `Promise<undefined> appendFile((DOMString or Uint8Array or object) data, optional (FileHandle.AppendFileOptions or DOMString) options)` -/
 def FileHandle.appendFile (self : FileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : Option FileHandle.AppendFileOptionsOrDOMString := none) : Async Unit :=

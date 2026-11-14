@@ -578,6 +578,185 @@ def childProcesses (r : Checks) : Async Unit := do
     let node ← stream.Readable.fromWeb web
     expect r s!"stream round trip {i}" (bytesEq (← streamBytes (← stream.Readable.toWeb node)) b) ""
 
+/-! node:net, node:http and node:https: servers and clients on 127.0.0.1 -/
+
+/-- The TCP port a listening server is bound to (`server.address()` of an IP socket). -/
+def portOf (s : net.Server) : IO Nat := do
+  match ← s.address with
+  | some (.addressInfo a) => pure a.port.toNat
+  | _ => throw (IO.userError "server.address() is not an IP address")
+
+/-- Listens on 127.0.0.1 at a port the system assigns, and waits for `'listening'`. -/
+def listenLocal (s : net.Server) : Async Nat := do
+  let ready ← IO.Promise.new
+  discard <| s.onceListening (← net.Server.ListeningListener.ofSyncFn (do ready.resolve ()))
+  discard <| s.listenWithPort (some 0) (some "127.0.0.1")
+  Std.Async.await ready
+  portOf s
+
+/-- Closes a server and waits for `'close'` (after its connections end). -/
+def closeServer (s : net.Server) : Async Unit := do
+  let closed ← IO.Promise.new
+  discard <| s.onceClose (← net.Server.CloseListener.ofSyncFn (do closed.resolve ()))
+  discard <| s.close
+  Std.Async.await closed
+
+/-- All bytes of an IncomingMessage (a Node Readable), through its web stream. -/
+def bodyOf (m : http.IncomingMessage) : Async ByteArray := do
+  streamBytes (← stream.Readable.toWeb m)
+
+def bytesOfChunk : Uint8ArrayOrDOMString → ByteArray
+  | .uint8Array b => b
+  | .domString s => s.toUTF8
+
+/-- One request with http.request: status, headers and body of the response. -/
+def httpRequest (port : Nat) (method target : String) (headers : List (String × String)) (body : ByteArray) :
+    Async (Nat × Data × ByteArray) := do
+  let options : http.RequestOptions := {
+    host := some "127.0.0.1", port := some port.toFloat, method := some method, «path» := some target,
+    headers := some (.object (obj (headers.map fun (k, v) => (k, toJS v)))) }
+  let req ← http.request options
+  let got ← IO.Promise.new
+  discard <| req.onceResponse (← http.ClientRequest.ResponseListener.ofSyncFn fun res => do got.resolve res)
+  discard <| req.«end» (some body)
+  let res ← Std.Async.await got
+  let status := (← res.statusCode).toUInt64.toNat
+  let hs ← res.headers
+  return (status, hs, ← bodyOf res)
+
+def httpChecks (r : Checks) : Async Unit := do
+  -- An echo server: the response carries the request's method, URL and x-lasm header, and its body.
+  let echo ← http.Server.RequestListener.ofFn fun req res => do
+    let body ← bodyOf req
+    let url ← req.url
+    if url.startsWith "/missing" then
+      discard <| res.writeHead 404 (some "Not Here")
+      discard <| res.«end»
+    else
+      discard <| res.setHeader "x-method" (← req.method)
+      discard <| res.setHeader "x-url" url
+      discard <| res.setHeader "x-echo" (str ((← req.headers).field "x-lasm"))
+      discard <| res.setHeader "content-length" (toString body.size)
+      discard <| res.writeHead 200
+      discard <| res.«end» (some body)
+  let server ← http.createServer none (some echo)
+  let port ← listenLocal server
+  expect r "http listening" ((← server.listening) && port > 0) s!"{port}"
+  -- For generated bodies (0 to 200 kB), methods, paths and header values: the response echoes each of them.
+  let mut g : Rng := ⟨0x47f1⟩
+  for i in [0:12] do
+    let (b, g1) := g.bytes (if i % 4 == 0 then 200000 else 3000); g := g1
+    let (n, g2) := g.name; g := g2
+    let method := #["POST", "PUT", "PATCH"][i % 3]!
+    let path := s!"/echo/{n}?i={i}"
+    let (status, hs, back) ← httpRequest port method path [("x-lasm", s!"v{n}")] b
+    let echoedUrl := str (hs.field "x-url")
+    expect r s!"http echo {i}" (status == 200 && bytesEq back b && str (hs.field "x-method") == method
+      && echoedUrl == path && str (hs.field "x-echo") == s!"v{n}") s!"{status} {back.size}/{b.size} {echoedUrl}"
+  -- A status and reason phrase from writeHead.
+  let (status, _, _) ← httpRequest port "GET" "/missing" [] .empty
+  expect r "http 404" (status == 404) s!"{status}"
+  -- Concurrency: 10 requests at once each get their own body back.
+  let tasks ← (List.range 10).mapM fun i => (httpRequest port "POST" s!"/c/{i}" [] s!"body {i}".toUTF8).asTask
+  let replies ← tasks.mapM fun t => Std.Async.await t
+  expect r "http concurrent" ((replies.zip (List.range 10)).all fun ((s, _, b), i) => s == 200 && String.fromUTF8! b == s!"body {i}") ""
+  -- http.get: a GET without a body, the response through the same events.
+  let got ← IO.Promise.new
+  let req ← http.getWithUrl (.domString s!"http://127.0.0.1:{port}/get")
+  discard <| req.onceResponse (← http.ClientRequest.ResponseListener.ofSyncFn fun res => do got.resolve res)
+  let res ← Std.Async.await got
+  expect r "http.get" ((← res.statusCode) == 200 && str ((← res.headers).field "x-method") == "GET" && (← bodyOf res).size == 0) ""
+  -- METHODS and STATUS_CODES are Node's tables.
+  expect r "http.METHODS" ((← http.METHODS).contains "PATCH") ""
+  expect r "http.STATUS_CODES" (str ((← http.STATUS_CODES).field "404") == "Not Found") ""
+  -- A web Request built from an IncomingMessage and a web Response written to a ServerResponse
+  -- carry the same method, URL, headers and body (Lasm.JS.Web's types over node:http).
+  let toWeb ← http.Server.RequestListener.ofFn fun req res => do
+    let headers ← Headers.new
+    let raw ← req.rawHeaders
+    for j in [0:raw.size / 2] do headers.append raw[2 * j]! raw[2 * j + 1]!
+    let method ← req.method
+    let body : Option BodyInit ← if method == "GET" || method == "HEAD" then pure none else do
+      pure (some (.readableStream (← stream.Readable.toWeb req)))
+    let host := str ((← req.headers).field "host")
+    let request ← Request.new (.usvString s!"http://{host}{← req.url}")
+      (some { method := some method, headers := some (.sequence ((← headers.entries).map fun (k, v) => #[k, v])), body,
+                duplex := body.map fun _ => .half })
+    let text ← request.text
+    let pathname ← (← URL.new (← request.url)).pathname
+    let response ← Response.new (some (.usvString s!"{← request.method} {pathname} {text.length}"))
+      (some { status := some 201, headers := some (.sequence #[#["x-from", "web"]]) })
+    for (k, v) in ← (← response.headers).entries do discard <| res.setHeader k v
+    discard <| res.writeHead (← response.status).toFloat
+    match ← response.body with
+    | some s => discard <| res.«end» (some (← streamBytes s))
+    | none => discard <| res.«end»
+  let webServer ← http.createServer none (some toWeb)
+  let webPort ← listenLocal webServer
+  let reply ← fetch (.usvString s!"http://127.0.0.1:{webPort}/web/path?q=1") (some { method := some "POST", body := some (.usvString "héllo") })
+  let text ← reply.text
+  expect r "Request and Response over node:http" ((← reply.status) == 201 && text == "POST /web/path 5"
+    && (← (← reply.headers).get "x-from") == some "web") s!"{← reply.status} {text}"
+  closeServer webServer
+  closeServer server
+  expect r "http closed" (!(← server.listening)) ""
+  -- https: the classes and global agent exist (serving needs a certificate: test/fixtures/js-serve covers TLS).
+  let agent ← https.Agent.new (some { maxCachedSessions := some 10 })
+  let ga ← https.globalAgent
+  expect r "https.Agent" ((← reflectHas agent.val "getName") && (← reflectHas ga.val "getName")) ""
+
+def netChecks (r : Checks) : Async Unit := do
+  -- An echo server: each socket writes back what it reads, in order (synchronous listeners), and ends when the client does.
+  let onConnection ← net.Server.ConnectionListener.ofSyncFn fun sock => do
+    discard <| sock.onData (← net.Socket.DataListener.ofSyncFn fun d => do discard <| sock.write (bytesOfChunk d))
+    discard <| sock.onEnd (← net.Socket.EndListener.ofSyncFn (do discard <| sock.«end»))
+  let server ← net.createServer none (some onConnection)
+  let port ← listenLocal server
+  -- For generated sequences of chunks (up to 6 of up to 64 kB): the bytes received are the bytes sent, concatenated.
+  let mut g : Rng := ⟨0x7cb1⟩
+  for i in [0:10] do
+    let (count, g1) := g.below 7; g := g1
+    let mut chunks : Array ByteArray := #[]
+    for _ in [0:count] do
+      let (b, g2) := g.bytes 65536; g := g2
+      chunks := chunks.push b
+    let connected ← IO.Promise.new
+    let sock ← net.connectWithPort port.toFloat (some "127.0.0.1") (some (← net.Socket.ConnectListener.ofSyncFn (do connected.resolve ())))
+    let received ← IO.mkRef ByteArray.empty
+    let closed ← IO.Promise.new
+    discard <| sock.onData (← net.Socket.DataListener.ofSyncFn fun d => received.modify (· ++ bytesOfChunk d))
+    discard <| sock.onceClose (← net.Socket.CloseListener.ofSyncFn fun hadError => do closed.resolve hadError)
+    Std.Async.await connected
+    if i == 0 then
+      let a ← sock.address
+      expect r "socket addresses" ((← sock.remotePort) == port && a.address == "127.0.0.1" && a.family == "IPv4"
+        && (← sock.remoteAddress) == "127.0.0.1") s!"{a.address} {a.family}"
+      expect r "getConnections" ((← server.getConnections) ≥ 1) ""
+    for c in chunks do discard <| sock.write c
+    discard <| sock.«end»
+    let hadError ← Std.Async.await closed
+    let sent := chunks.foldl (· ++ ·) ByteArray.empty
+    expect r s!"net echo {i}" (!hadError && bytesEq (← received.get) sent && (← sock.bytesWritten) == sent.size)
+      s!"{(← received.get).size}/{sent.size}"
+  -- a socket's text: setEncoding makes 'data' strings
+  let connected ← IO.Promise.new
+  let sock ← net.connectWithPort port.toFloat (some "127.0.0.1") (some (← net.Socket.ConnectListener.ofSyncFn (do connected.resolve ())))
+  discard <| sock.setEncoding (some "utf8")
+  let text : IO.Promise String ← IO.Promise.new
+  discard <| sock.onceData (← net.Socket.DataListener.ofSyncFn fun d => do
+    text.resolve (match d with | .domString s => s | .uint8Array _ => "<bytes>"))
+  Std.Async.await connected
+  discard <| sock.write "ünïcode"
+  let first ← Std.Async.await text
+  expect r "socket setEncoding" ("ünïcode".startsWith first && first.length > 0) first
+  discard <| sock.destroy
+  -- net.isIP and BlockList
+  expect r "net.isIP" ((← net.isIP "127.0.0.1") == 4 && (← net.isIP "::1") == 6 && (← net.isIP "nope") == 0) ""
+  let bl ← net.BlockList.new
+  bl.addSubnet "10.0.0.0" 8 (some "ipv4")
+  expect r "BlockList" ((← bl.check "10.1.2.3" (some "ipv4")) && !(← bl.check "11.0.0.1" (some "ipv4"))) ""
+  closeServer server
+
 /-! Availability: which generated members this runtime lacks (reported, never a failure) -/
 
 def availability (r : Checks) : Async Unit := do
@@ -609,7 +788,7 @@ def availability (r : Checks) : Async Unit := do
 def checks : Async (String × Nat) := do
   let r ← IO.mkRef ({} : Report)
   for (name, body) in [("path", paths r), ("os", operatingSystem r), ("process", currentProcess r), ("buffer", buffers r),
-      ("crypto", cryptography r), ("fs", fileSystem r), ("childProcess", childProcesses r), ("availability", availability r)] do
+      ("crypto", cryptography r), ("fs", fileSystem r), ("childProcess", childProcesses r), ("net", netChecks r), ("http", httpChecks r), ("availability", availability r)] do
     runSection r name body
   let s ← r.get
   return ("\n".intercalate (s.lines.push s!"summary {s.passed} {s.failed}").toList ++ "\n", s.failed)
