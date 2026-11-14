@@ -55,7 +55,7 @@
 
 - **Fastly, WASI and wasi-http programs use far less memory** (issue #246).
   `--target fastly`, `wasi` and `wasi-http` now link Lasm's own build of
-  Emscripten's mimalloc (its unchanged sources, MIT, in `src/wasi/mimalloc`).
+  Emscripten's mimalloc (its unchanged sources, MIT, in `src/mimalloc`).
   The build has 2 MiB arenas and a page map for 32-bit addresses, in place of
   the prebuilt one's 16 MiB arenas and its 8 MiB page map. Measured on
   Viceroy:

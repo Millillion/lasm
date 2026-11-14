@@ -15,11 +15,18 @@ import { compactInitializerWrappers } from '../src/edge/edge-initializers.mjs';
 import { responseFile } from '../src/platform.mjs';
 import { glueLinkFlags } from '../src/lasm-library.mjs';
 import { installTools, wasmObject, archive, temporaryDirectory } from './fixtures/link-stand-ins/toolchain.mjs';
+import { mimallocFlags, mimallocLibraryFlags, mimallocSettings } from '../src/mimalloc/mimalloc.mjs';
 import { registerProgram } from './fixtures/link-stand-ins/programs.mjs';
 import { finishLinks, links as finishedLinks, hooks as linkHooks } from './fixtures/link-stand-ins/link-driver.mjs';
 
 const posix = process.platform !== 'win32';
 const here = fileURLToPath(new URL('../src/edge/', import.meta.url));
+const shared = fileURLToPath(new URL('../src/mimalloc', import.meta.url)), vendored = join(shared, 'emscripten');
+// Lasm's mimalloc (src/mimalloc, #247): its two translation units and the objects the link adds.
+const mimallocUnits = [[join(shared, 'lasm_mimalloc.c'), 'lasm_mimalloc.o'], [join(vendored, 'src/prim/prim.c'), 'lasm_mimalloc_prim.o']];
+const mimallocIncludes = [`-ffile-prefix-map=${shared}=lasm/mimalloc`, '-I', join(vendored, 'include'), '-I', join(vendored, 'src')];
+const allocatorObjects = out => mimallocUnits.map(([, name]) => join(out, name));
+const isMimalloc = args => args.includes('-DMI_MALLOC_OVERRIDE');
 let unique = 0;
 
 function fixture({ plan = true, js = true, wrappers = true, exportsList = ['_main', '_malloc', '_free', '_lasm_js_call', '_l_export'], libraries } = {}) {
@@ -75,13 +82,16 @@ test('the edge link relinks the application objects with the edge glue and compa
   // The compact wrappers replace the Node build's wrapper objects, at the first one's place.
   const compactSource = join(f.out, 'initializers-compact.c'), compactObject = join(f.out, 'initializers-compact.o');
   assert.equal(readFileSync(compactSource, 'utf8'), compactInitializerWrappers(JSON.parse(readFileSync(join(f.linkWork, 'initialization-plan.json'), 'utf8'))));
-  const [compile, link] = f.executed;
-  assert.equal(f.executed.length, 2, 'the precompiled Lasm.JS glue is not compiled');
+  const [compile, ...allocator] = f.executed.slice(0, -1), link = f.executed.at(-1);
+  assert.equal(f.executed.length, 4, 'the precompiled Lasm.JS glue is not compiled');
+  // Lasm's mimalloc with 8 KiB slices and 2 MiB arenas (#247): emcc adds its code generation flags itself.
+  assert.deepEqual(allocator, mimallocUnits.map(([source, name]) => ({ tool: 'emcc', args: ['-sMEMORY64=1', ...mimallocLibraryFlags({ sliceKiB: 8, arenaMiB: 2 }),
+    ...mimallocIncludes, '-c', source, '-o', join(f.out, name)], options: { stdio: ['ignore', 'pipe', 'pipe'], env: { SDK_ENV: 'yes', LASM_STAND_IN_SDK: '1', EMCC_CORES: '1' }, timeout: 600_000 } })));
   assert.deepEqual(compile, { tool: 'emcc', args: ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1',
     '-ffunction-sections', '-fdata-sections', '-I', join(f.nodeRuntime.directory, 'include'), '-c', compactSource, '-o', compactObject],
   options: { stdio: ['ignore', 'pipe', 'pipe'], env: { SDK_ENV: 'yes', LASM_STAND_IN_SDK: '1', EMCC_CORES: '1' }, timeout: 600_000 } });
   const objects = [f.objects.main, '-Wl,--wrap=initialize_Main', compactObject, '-Wl,--wrap=initialize_Init', f.objects.second];
-  const args = [...objects, '-Wl,--wrap=lean_io_mark_end_initialization', f.edge.libraries['liblasmjsedge.a'], ...commonFlags(f, 'jspi')];
+  const args = [...objects, '-Wl,--wrap=lean_io_mark_end_initialization', f.edge.libraries['liblasmjsedge.a'], ...allocatorObjects(f.out), ...commonFlags(f, 'jspi')];
   assert.deepEqual(link, { tool: 'em++', args, options: { stdio: ['ignore', 'pipe', 'pipe'], env: { SDK_ENV: 'yes', LASM_STAND_IN_SDK: '1', EMCC_CORES: '1' }, timeout: 3_600_000, maxBuffer: 64 << 20 } });
   // Lasm.JS's Node exports are replaced by the edge pump and the edge glue's sync entry.
   assert.equal(readFileSync(join(f.out, 'exports.json'), 'utf8'), JSON.stringify(['_main', '_malloc', '_free', '_l_export', '_lasm_edge_pump', '_lasm_js_edge_sync']) + '\n');
@@ -94,8 +104,9 @@ test('the edge link relinks the application objects with the edge glue and compa
   f.executed.length = 0;
   linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'again'), verbose: true });
   assert.equal(f.tools.calls('llvm-nm').length, listed);
-  assert.deepEqual(f.executed.map(item => item.tool), ['em++'], 'the compact wrappers are not compiled again');
+  assert.deepEqual(f.executed.map(item => item.tool), ['em++'], 'the compact wrappers and mimalloc are not compiled again');
   assert.deepEqual(readFileSync(join(f.base, 'again', 'initializers-compact.o')), readFileSync(compactObject));
+  for (const [, name] of mimallocUnits) assert.deepEqual(readFileSync(join(f.base, 'again', name)), readFileSync(join(f.out, name)));
   assert.equal(f.executed[0].options.stdio, 'inherit');
 });
 
@@ -105,11 +116,11 @@ test('edge link without Lasm.JS, without a plan, and with Asyncify or no suspens
   assert.equal(result.usesJs, false);
   assert.equal(result.suspend, 'asyncify');
   assert.equal(readFileSync(join(f.out, 'exports.json'), 'utf8'), '["_main","_lasm_edge_pump"]\n');
-  const [link] = f.executed;
-  assert.equal(f.executed.length, 1);
+  const link = f.executed.at(-1);
+  assert.deepEqual(f.executed.map(item => item.tool), ['emcc', 'emcc', 'em++'], 'mimalloc, then the link');
   // Without a plan the Node build's wrappers are linked as they are.
   assert.deepEqual(link.args, [f.objects.main, '-Wl,--wrap=initialize_Main', ...f.objects.wrapperObjects.slice(0, 2), '-Wl,--wrap=initialize_Init',
-    ...f.objects.wrapperObjects.slice(2), f.objects.second, '-Wl,--wrap=lean_io_mark_end_initialization', ...commonFlags(f, 'asyncify')]);
+    ...f.objects.wrapperObjects.slice(2), f.objects.second, '-Wl,--wrap=lean_io_mark_end_initialization', ...allocatorObjects(f.out), ...commonFlags(f, 'asyncify')]);
   assert.equal(existsSync(join(f.out, 'initializers-compact.c')), false);
   assert.equal(asyncifyStackBytes, 1048576);
 
@@ -132,8 +143,9 @@ test('an edge runtime without precompiled Lasm.JS glue: emcc compiles it; the No
   assert.deepEqual(f.executed[0], { tool: 'emcc', args: ['-O2', '-DNDEBUG', '-DLEAN_EXPORTING', '-DLEAN_EMSCRIPTEN', '-fwasm-exceptions', '-sMEMORY64=1', '-ffp-contract=off',
     '-fPIC', '-ffunction-sections', '-fdata-sections', '-I', join(f.nodeRuntime.directory, 'include'), '-c', join(here, 'lasm_js_edge.c'), '-o', glue],
   options: { stdio: 'inherit', env: { SDK_ENV: 'yes', LASM_STAND_IN_SDK: '1', EMCC_CORES: '1' }, timeout: 600_000 } });
-  assert.ok(f.executed[1].args.includes(glue));
-  assert.equal(f.executed[1].args[f.executed[1].args.indexOf('-Wl,--wrap=lean_io_mark_end_initialization') + 1], glue);
+  const link = f.executed.at(-1).args;
+  assert.ok(link.includes(glue));
+  assert.equal(link[link.indexOf('-Wl,--wrap=lean_io_mark_end_initialization') + 1], glue);
   assert.throws(() => linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge, linkWork: f.linkWork, out: f.out, driver: 'node' }),
     { message: 'This edge runtime has no precompiled Lasm.JS glue (liblasmjsedge.a); the Node link driver cannot compile it' });
 });
@@ -178,6 +190,7 @@ function nodeDriver(f) {
   f.edge.sysroot = { cache: join(f.base, 'edge-cache'), directory: 'wasm64-emscripten' };
   f.sdk.toolchain = { shared: 'stand-in', native: 'stand-in' };
   f.sdk.driver = emscripten;
+  f.sdk.cache = join(f.base, 'emscripten-cache');
   return f;
 }
 
@@ -192,6 +205,11 @@ test('the Node link driver replays the recorded edge link with the program\'s in
     '--wrap=initialize_Main', '--wrap=lean_io_mark_end_initialization', `-Map=${join(f.out, 'program.map')}`]) assert.ok(link.includes(input), input);
   assert.ok(!link.includes(f.objects.jsGlue) && !link.includes(f.objects.marker) && !link.includes(f.objects.member));
   assert.ok(link.includes(join(f.out, 'program.wasm')));
+  // Lasm's mimalloc (#247), compiled with the link toolchain's clang as the WASI link compiles it, before the archives.
+  for (const object of allocatorObjects(f.out)) assert.ok(link.indexOf(object) > 0 && link.indexOf(object) < link.indexOf(f.edge.libraries['libInit.a']), object);
+  assert.deepEqual(f.tools.calls('clang').filter(isMimalloc), mimallocUnits.map(([source, name]) => ['-target', 'wasm64-unknown-emscripten',
+    `--sysroot=${join(f.sdk.cache, 'sysroot')}`, '-Xclang', '-iwithsysroot/include/compat', ...mimallocFlags(mimallocSettings), ...mimallocIncludes,
+    '-c', source, '-o', join(f.out, name)]));
   assert.ok(link.some(arg => arg.startsWith('-L') && arg.startsWith('-L' + join(f.edge.sysroot.cache, 'sysroot', 'lib'))), 'the edge runtime\'s system libraries');
   // The temporary link directory is removed even when the link fails.
   assert.deepEqual(readdir(f.out).filter(name => name.startsWith('node-link')), []);
@@ -237,7 +255,7 @@ const archiveOffset = (file, member) => [...archiveIndex(file).names].find(([, n
 
 test('the compact wrappers are compiled once per plan, tools and runtime; at most 16 are kept', { skip: !posix }, () => {
   const f = fixture();
-  const compiles = () => f.executed.filter(item => item.tool === 'emcc').length;
+  const compiles = () => f.executed.filter(item => item.tool === 'emcc' && !isMimalloc(item.args)).length;
   linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'a') });
   assert.equal(compiles(), 1);
   // The same runtime in another directory: reused (its path is not part of the key).
@@ -270,7 +288,6 @@ test('the compact wrappers are compiled once per plan, tools and runtime; at mos
 
 test('the Node link driver compiles the compact wrappers with clang; its tools\' output is captured unless verbose', { skip: !posix }, () => {
   const f = nodeDriver(fixture());
-  f.sdk.cache = join(f.base, 'emscripten-cache');
   assert.throws(() => linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out }),
     error => /stand-in toolchain ends here/.test(String(error.stderr)));
   const [compile] = f.tools.calls('clang');

@@ -5,7 +5,8 @@
 // single-threaded runtime archives (edge-runtime.mjs), 4 MiB initial memory
 // with growth and a 1 MiB C stack placed first in memory, JSPI with the event pump and `main` as the
 // only promising exports, and the edge host glue (edge-pre.js, edge-library.js,
-// lasm_js_edge.c). Engines without JSPI (Supabase's edge runtime) get the
+// lasm_js_edge.c), and Lasm's build of mimalloc with 2 MiB arenas
+// (src/mimalloc, issue #247) in place of Emscripten's. Engines without JSPI (Supabase's edge runtime) get the
 // Asyncify link instead (suspend 'asyncify'): Binaryen's asyncify pass, with
 // the suspending import list limited to the host's one wait (lasm_edge_wait). The Node link driver replays it from its recording
 // (src/link-driver/recipe-emscripten-<version>-edge.json, byte-identical to
@@ -19,8 +20,9 @@ import { executableName } from '../platform.mjs';
 import { glueLinkFlags } from '../lasm-library.mjs';
 import { linkWithNode, bundledNativeSigs, linkTemporaryDirectory, removeTemporary } from '../link-driver/link.mjs';
 import { liveMembers, memberFiles, wasmImports } from '../application-live-members.mjs';
-import { compileObject } from '../link-driver/compile.mjs';
+import { compileObject, emscriptenCache } from '../link-driver/compile.mjs';
 import { compactInitializerWrappers } from './edge-initializers.mjs';
+import { mimallocSettings, mimallocSources, mimallocLibraryFlags, mimallocIncludeArguments, mimallocClangArguments, mimallocUnits } from '../mimalloc/mimalloc.mjs';
 
 let recipeCache;
 /** The Node link driver's recording of the edge link (scripts/edge/derive-edge-recipe.mjs). */
@@ -41,8 +43,14 @@ export const asyncifyStackBytes = 1 << 20;
 const here = fileURLToPath(new URL('./', import.meta.url));
 const readResponse = file => readFileSync(file, 'utf8').split('\n').filter(Boolean).map(line => line.slice(1, -1).replace(/\\(.)/g, '$1'));
 
-/** Edge link settings, part of the edge build's identity. */
-export const edgeLinkSettings = Object.freeze({ memory64: 2, initialMiB: 4, stackMiB: 1, maximumMiB: 2048, malloc: 'mimalloc', optimize: '-Oz' });
+/** Edge link settings, part of the edge build's identity. `mimalloc`: the
+ * slice and arena sizes of Lasm's mimalloc build (src/mimalloc), linked in
+ * place of Emscripten's libmimalloc, whose emmalloc and sbrk members it still
+ * uses (`malloc`: emcc's -sMALLOC, which selects that archive). With
+ * Emscripten's libmimalloc every edge program's memory started at 26.6 MiB (a
+ * 16 MiB arena and the page map of 48-bit addresses) and grew 16 MiB at a time
+ * (issue #247). */
+export const edgeLinkSettings = Object.freeze({ memory64: 2, initialMiB: 4, stackMiB: 1, maximumMiB: 2048, malloc: 'mimalloc', mimalloc: mimallocSettings, optimize: '-Oz' });
 
 /** linkWork: the Node build's kept link directory (link.rsp, objects, exports.json). */
 /** optimize false (dev profile): Binaryen runs only the passes the program
@@ -51,7 +59,7 @@ export const edgeLinkSettings = Object.freeze({ memory64: 2, initialMiB: 4, stac
 /** `members` (dev, src/application-live-members.mjs): { record, directory,
  * save(record) }: link with the archive members the previous full edge link of
  * this program kept, accepted when the program imports nothing new. */
-const nmListings = new Map(), compactObjects = new Map();
+const nmListings = new Map(), compactObjects = new Map(), mimallocObjects = new Map();
 export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend = 'jspi', verbose = false, driver = sdk.toolchain ? 'node' : 'emcc', optimize = true, stepCache, members }) {
   if (!edgeSuspendModes.includes(suspend)) throw new Error(`Unknown edge suspension ${JSON.stringify(suspend)}`);
   const s = edgeLinkSettings;
@@ -117,13 +125,35 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
     objects = objects.filter(arg => !wrappers.test(arg));
     objects.splice(first, 0, object);
   }
+  // Lasm's mimalloc (src/mimalloc): the link toolchain's clang, or emcc with the
+  // same flags (emcc adds the code generation flags itself), so that both
+  // drivers link the same objects (scripts/edge/compare-edge-link.mjs). Reused
+  // within the process by sources, flags and tools (lasm dev relinks often).
+  const allocator = [];
+  // EVIDENCE #247 (temporary): LASM_EVIDENCE_247_MIMALLOC=sysroot links Emscripten's libmimalloc as before.
+  for (const [source, name] of process.env.LASM_EVIDENCE_247_MIMALLOC === 'sysroot' ? [] : mimallocUnits) {
+    const object = join(out, name);
+    const args = driver === 'node'
+      ? mimallocClangArguments({ sysroot: join(emscriptenCache(sdk), 'sysroot'), settings: s.mimalloc, source, object })
+      : ['-sMEMORY64=1', ...mimallocLibraryFlags(s.mimalloc), ...mimallocIncludeArguments(), '-c', source, '-o', object];
+    const key = createHash('sha256').update(JSON.stringify({ schema: 1, driver, prefix: sdk.prefix, tools: sdk.toolchain ?? sdk.driverIdentity ?? null, args: args.slice(0, -1) }))
+      .update(mimallocSourceDigest()).digest('hex');
+    const cached = mimallocObjects.get(key);
+    if (cached) writeFileSync(object, cached);
+    else {
+      if (driver === 'node') execFileSync(join(sdk.prefix, 'bin', executableName('clang')), args, { env: sdk.env, stdio, timeout: 600_000, windowsHide: true });
+      else sdk.execute('emcc', args, { stdio, env, timeout: 600_000 });
+      mimallocObjects.set(key, readFileSync(object));
+    }
+    allocator.push(object);
+  }
   const exportsList = JSON.parse(readFileSync(join(linkWork, 'exports.json'), 'utf8')).filter(name => !name.startsWith('_lasm_js_'));
   const exportsFile = join(out, 'exports.json');
   writeFileSync(exportsFile, JSON.stringify([...new Set([...exportsList, '_lasm_edge_pump', ...(usesJs ? ['_lasm_js_edge_sync'] : [])])]) + '\n');
   const archive = name => edge.libraries[`lib${name}.a`] ?? join(nodeRuntime.directory, 'lib', `lib${name}.a`);
   const libraries = nodeRuntime.manifest.libraries.map(file => file.replace(/^lib\/lib(.+)\.a$/, '$1'))
     .filter(name => name !== 'lasmsymbols').map(archive);
-  const args = [...objects, '-Wl,--wrap=lean_io_mark_end_initialization', ...glue, s.optimize, '--output-eol=linux', '-fwasm-exceptions',
+  const args = [...objects, '-Wl,--wrap=lean_io_mark_end_initialization', ...glue, ...allocator, s.optimize, '--output-eol=linux', '-fwasm-exceptions',
     `-sMEMORY64=${s.memory64}`, `-sMALLOC=${s.malloc}`, `-sEXPORTED_FUNCTIONS=@${exportsFile}`, '-sMODULARIZE=1', '-sEXPORT_ES6=1',
     '-sENVIRONMENT=web', '-sEXIT_RUNTIME=0', '-sFILESYSTEM=0', '-sALLOW_MEMORY_GROWTH=1', `-sINITIAL_MEMORY=${s.initialMiB << 20}`,
     `-sMAXIMUM_MEMORY=${s.maximumMiB * 1048576}`, `-sSTACK_SIZE=${s.stackMiB << 20}`,
@@ -185,6 +215,10 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
   }
   return { program: glueFile, wasm: join(out, 'program.wasm'), usesJs, suspend, driver };
 }
+
+let mimallocDigest;
+const mimallocSourceDigest = () => mimallocDigest ??= createHash('sha256')
+  .update(JSON.stringify(mimallocSources.map(file => [file, createHash('sha256').update(readFileSync(new URL(`../mimalloc/${file}`, import.meta.url))).digest('hex')]))).digest('hex');
 
 /** Emscripten's "// include: /abs/dir/file.js" (and "// end include: …")
  * comments, with the file name only. */
