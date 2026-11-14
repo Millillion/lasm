@@ -11,7 +11,7 @@
 //   node editor-templates.mjs CANDIDATE_TGZ WORK_DIR RESULT.json [--templates a,b]
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { delimiter, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -49,6 +49,11 @@ const run = (label, command, argv, cwd) => {
 mkdirSync(join(work, 'cli'), { recursive: true });
 assert.equal(run('install', npm[0], ['install', '--no-save', tgz], join(work, 'cli')).r.status, 0);
 const lasm = [process.execPath, join(work, 'cli', 'node_modules', '@lasm', 'compiler', 'bin', 'lasm.mjs')];
+// A release without tiers (a release candidate on its upgrade branch,
+// docs/LEAN_UPGRADE.md step 6) uses the full upstream archive, which already
+// has Lean's C compiler and headers: `lasm editor` then links it as is.
+const catalog = JSON.parse(readFileSync(join(dirname(dirname(lasm[1])), 'src', 'toolchains.json'), 'utf8'));
+const cTier = Boolean(catalog.lean[catalog.defaultLean]?.tiers?.c);
 let failed = 0;
 for (const template of templates) {
   const app = join(work, `app-${template}`), entry = { template, steps: [] };
@@ -57,7 +62,7 @@ for (const template of templates) {
   if (cPackage) writeCPackage(app);
   const fixtureCheck = expectC => (label, r) => {
     const linkedC = /with its C compiler and headers \(for the packages with C code: dep\)/.test(r.stderr ?? '');
-    return linkedC === expectC ? undefined : `${label}: expected the ${expectC ? 'C-tier' : 'plain'} toolchain`;
+    return linkedC === (expectC && cTier) ? undefined : `${label}: expected the ${expectC ? 'C-tier' : 'plain'} toolchain`;
   };
   for (const [label, command, argv, cwd, verify] of [
     ...(cPackage ? [] : [['init', lasm[0], [lasm[1], 'init', app, '--template', template], work]]),
