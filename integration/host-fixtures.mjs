@@ -59,11 +59,12 @@ function build(source) {
   builds.set(source, built);
   return built;
 }
-/** `[command, args]` run with core dumps off. For the native oracle where it is known to crash (SIGSEGV in
- * Lean's error decoders, below): ubuntu-24.04's core handler (apport, `|` core_pattern) wrote each such core
- * in full, which took 25–60 s per crash and sometimes passed the 60 s timeout (issue #196). The status and
- * signal are unchanged (`exec`). */
-const withoutCore = ([command, args]) => posix ? ['/bin/sh', ['-c', 'ulimit -c 0 && exec "$0" "$@"', command, ...args]] : [command, args];
+/** `[command, args]` run without a core dump. For the native oracle where it is known to crash (SIGSEGV in
+ * Lean's error decoders, below): ubuntu-24.04 pipes cores to systemd-coredump, which ignores a zero core
+ * limit (its `core_pattern` passes the limit as unlimited) and took 25–60 s per crash, sometimes past the
+ * 60 s timeout (issue #196). A core limit of exactly 1 byte makes Linux skip a piped dump (fs/coredump.c);
+ * `prlimit` (util-linux) execs the command, so its status and signal are unchanged. */
+const withoutCore = ([command, args]) => linux ? ['prlimit', ['--core=1:1', '--', command, ...args]] : [command, args];
 /** Native Lean and the Lasm build of `source`, as [label, command prefix]; `crashes`: native Lean may crash here. */
 function implementations(source, nativeFlags = [], { crashes = false } = {}) {
   const built = build(source);
@@ -438,7 +439,7 @@ assert.ok(!only || only.every(name => cases.some(entry => entry.name === name)),
 mkdirSync(work, { recursive: true });
 const report = { lean: execute(lean, ['--version']).stdout.trim(), lasm: execute(process.execPath, [lasm, '--version']).stdout.trim(), node: process.version,
   host: `${process.platform}-${process.arch}`, cases: [] };
-// The core handler decides how long an expected native crash takes (withoutCore, issue #196).
+// The core handler decides how long an expected native crash would take (withoutCore, issue #196).
 if (linux) report.core = { pattern: readFileSync('/proc/sys/kernel/core_pattern', 'utf8').trim(), limit: execute('/bin/sh', ['-c', 'ulimit -c']).stdout.trim() };
 console.log(`${report.lean}; ${report.lasm}; Node ${report.node}${report.core ? `; core dumps ${report.core.limit} via ${report.core.pattern}` : ''}`);
 let failed = 0;
