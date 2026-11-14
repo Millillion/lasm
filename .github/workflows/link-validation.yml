@@ -8,7 +8,10 @@ name: Link validation
 # scripts/link-validation/check-wasm-ld.mjs checks each module against its map
 # (sections, functions, data segments and chunks, symbols, globals, exports,
 # __wasm_init_memory) and, as a self-test, that 12 seeded corruptions of each
-# map are all reported.
+# map are all reported. Then scripts/link-validation/binaryen-diff.mjs re-runs
+# each WASI link's wasm-opt step one lowering pass at a time (--strip-eh,
+# --memory64-lowering, --table64-lowering) and runs every module on wabt's
+# wasm-interp, pinned (and the shipped one on wasmtime): all must behave alike.
 #   - pull requests and pushes to main that touch the link path: one core and
 #     one feature program on four targets, and three examples (release profile);
 #   - weekly (ci-weekly.yml, Saturday) and by hand: six core and four feature
@@ -115,6 +118,12 @@ jobs:
       CI: '1'
       BROWSER: 'none'
       LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+      # wabt's wasm-interp (the interpreter of the Binaryen differential) and
+      # wasmtime, official release binaries pinned by SHA-256 (the release's digest).
+      WABT_VERSION: 1.0.42
+      WABT_SHA256: 84895407a6bbb80e918f33b16b2fb2206021c150b6bc9ff6f761263a745ab131
+      WASMTIME_VERSION: v49.0.4
+      WASMTIME_SHA256: 6561abd54bdf941b6519cce883e0857cc9bce94d92c65287ed838d895a27f5a9
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -131,6 +140,7 @@ jobs:
       - name: Unit tests of the checker
         run: node --test test/link-validation.test.mjs
       - name: Build programs, recording every link
+        id: build
         env:
           SCOPE: ${{ inputs.scope || ((github.event_name == 'pull_request' || github.event_name == 'push') && 'pr' || 'weekly') }}
           SEED_INPUT: ${{ inputs.seed || '' }}
@@ -152,6 +162,30 @@ jobs:
         run: |
           node scripts/link-validation/check-wasm-ld.mjs --evidence "$RUNNER_TEMP/link-evidence" --min-links 10 --self-test 12 \
             --report "$RUNNER_TEMP/link-validation/wasm-ld-report.json"
+      - name: wasm-interp and wasmtime
+        if: always() && steps.build.outcome != 'skipped'
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T/wabt" "$T/wasmtime"
+          curl -fsSL --retry 3 -o "$T/wabt.tar.gz" "https://github.com/WebAssembly/wabt/releases/download/$WABT_VERSION/wabt-$WABT_VERSION-linux-x64.tar.gz"
+          echo "$WABT_SHA256  $T/wabt.tar.gz" | sha256sum -c
+          tar -xzf "$T/wabt.tar.gz" -C "$T/wabt" --strip-components=1
+          curl -fsSL --retry 3 -o "$T/wasmtime.tar.xz" "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasmtime-$WASMTIME_VERSION-x86_64-linux.tar.xz"
+          echo "$WASMTIME_SHA256  $T/wasmtime.tar.xz" | sha256sum -c
+          tar -xJf "$T/wasmtime.tar.xz" -C "$T/wasmtime" --strip-components=1
+          "$T/wabt/bin/wasm-interp" --version; "$T/wasmtime/wasmtime" --version
+          "$T/wabt/bin/wasm-interp" --help | grep -e '--wasi'
+      # The WASI links' wasm-opt step, re-run one lowering pass at a time, each
+      # module on wasm-interp (and the shipped one on wasmtime): docs/TESTING.md#binaryens-lowering-passes-by-differential-execution.
+      - name: Binaryen's lowering passes by differential execution
+        if: always() && steps.build.outcome != 'skipped'
+        run: |
+          WASM_OPT=$(find "$HOME/.cache/lasm" -type f -name wasm-opt -path '*/bin/*' | sort | head -1)
+          test -x "$WASM_OPT" && "$WASM_OPT" --version
+          T="$RUNNER_TEMP/tools"
+          node scripts/link-validation/binaryen-diff.mjs --evidence "$RUNNER_TEMP/link-evidence" --wasm-opt "$WASM_OPT" \
+            --interp "$T/wabt/bin/wasm-interp" --wasmtime "$T/wasmtime/wasmtime" --timeout-s 900 --min-programs 1 \
+            --work "$RUNNER_TEMP/binaryen-diff" --report "$RUNNER_TEMP/link-validation/binaryen-report.json"
       - name: Keep the report and any failing link
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -161,5 +195,6 @@ jobs:
             ${{ runner.temp }}/link-builds.log
             ${{ runner.temp }}/link-validation/builds.json
             ${{ runner.temp }}/link-validation/wasm-ld-report.json
+            ${{ runner.temp }}/link-validation/binaryen-report.json
           retention-days: 30
           if-no-files-found: ignore
