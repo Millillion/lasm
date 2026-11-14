@@ -374,7 +374,12 @@ export function checkLink(bytes, mapText, { customSections = defaultCustomSectio
         const named = module.names.functions.get(index), inName = /:\((.*)\)$/.exec(f.name)?.[1];
         if (named !== undefined) {
           stats.namesChecked++;
-          if (named !== inName && !f.symbols.some(s => s.name === named)) problem(`function ${index}: the name section calls it ${JSON.stringify(named)}, the map ${f.name}`);
+          // wasm-ld's synthetic functions (lld/wasm/SyntheticSections, Writer): an
+          // undefined weak function's stub, a signature-mismatch stub, are
+          // named with a prefix in the name section, plainly in the map.
+          const synthetic = f.name.startsWith('<internal>:(') && /^(?:undefined_weak|signature_mismatch|undefined_stub):/.test(named)
+            && named.slice(named.indexOf(':') + 1) === inName;
+          if (named !== inName && !synthetic && !f.symbols.some(s => s.name === named)) problem(`function ${index}: the name section calls it ${JSON.stringify(named)}, the map ${f.name}`);
         }
       }
       stats.functions++;

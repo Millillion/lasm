@@ -1337,7 +1337,7 @@ relocations) and their corruptions on every pull request.
 Pull requests and pushes that touch the link path (the link driver and
 recipes, `src/application-link.mjs`, the edge and WASI links, the toolchain
 and runtime pins): one core and one feature program for Node, WASI, the edge
-(`--target deno`) and the browser with Asyncify, and three examples. Weekly
+(`--target deno`) and Supabase Edge (the edge link with Asyncify), and three examples. Weekly
 (`ci-weekly.yml`): six core and four feature programs on six targets, five
 examples, in the release and the dev profile.
 
@@ -1365,8 +1365,9 @@ The WASI link lowers wasm-ld's memory64 module with exception handling to the
 and output (`LASM_TEST_LINK_EVIDENCE`) and re-runs it one pass at a time:
 m0 (wasm-ld's output, atomics lowered), m1 after `--strip-eh`, m2 after
 `--memory64-lowering`, m3 after `--table64-lowering`, and m4, the shipped
-module. Each runs on wabt's `wasm-interp` 1.0.42 (pinned by SHA-256), an
-interpreter that follows the specification and has a WASI host, with the same
+module. Each runs on wabt's `wasm-interp` 1.0.42, an interpreter that
+follows the specification, built with its WASI host from the release's source
+archive (pinned by SHA-256; the release binaries have no WASI) and cached, with the same
 arguments and directory; all five must print the same stdout and stderr and
 exit alike, so a difference between two neighbours names the pass. m4 also
 runs on wasmtime, the engine users run, and a difference there is reported as

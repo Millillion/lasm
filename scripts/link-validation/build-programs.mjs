@@ -5,7 +5,7 @@
 //
 //   node scripts/link-validation/build-programs.mjs --lasm LASM_MJS --work DIR --evidence DIR
 //     [--seed S] [--programs N] [--feature-programs N] [--cases N]
-//     [--targets node,wasi,deno,browser-asyncify] [--profiles release,dev] [--examples a:t1+t2,b:t]
+//     [--targets node,wasi,deno,supabase-edge] [--profiles release,dev] [--examples a:t1+t2,b:t]
 //
 // Programs: the differential tester's generated core programs and feature
 // programs (scripts/differential/generate.mjs, features.mjs) from --seed, and
@@ -33,7 +33,9 @@ if (!lasm) { console.error('usage: build-programs.mjs --lasm LASM_MJS [--work DI
 const TARGET_FLAGS = {
   node: [], wasi: ['--target', 'wasi'], 'wasi-http': ['--target', 'wasi-http'], fastly: ['--target', 'fastly'],
   deno: ['--target', 'deno'], bun: ['--target', 'bun'], workers: ['--target', 'workers'],
-  'browser-jspi': ['--target', 'browser', '--suspend', 'jspi'], 'browser-asyncify': ['--target', 'browser', '--suspend', 'asyncify'],
+  'browser-jspi': ['--target', 'browser', '--suspend', 'jspi'],
+  // The edge link with Asyncify (edge-build.mjs: Supabase's functions suspend with Asyncify).
+  'supabase-edge': ['--target', 'supabase-edge'],
 };
 for (const t of [...targets, ...examples.flatMap(e => e.targets)]) if (!TARGET_FLAGS[t]) { console.error(`unknown target ${t}`); process.exit(2); }
 
