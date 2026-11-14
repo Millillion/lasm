@@ -481,7 +481,7 @@ gap grows with size because GMP's subquadratic algorithms are gone. `Nat.gcd`
 (and so `Rat` normalization of large values) is the weakest case: Lean's
 fallback runs Euclid's algorithm with full divisions. `toString`/`String.toNat?`
 are quadratic Lean code even natively. Full rows (also 20 and 300 digits, `mod`,
-`String.toNat?`) are in [the evidence](evidence/bignum-no-gmp-2026-10-24.json).
+`String.toNat?`) are in [the evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/bignum-no-gmp-2026-10-24.json).
 The release benchmarks record multiplication, division and `toString` at
 10,000 digits on every candidate.
 

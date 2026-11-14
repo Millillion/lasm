@@ -14,7 +14,7 @@ import { testUnoptimized } from '../test-switches.mjs';
 import { builtinModuleClosure, builtinModuleFile, builtinPrefix, isBuiltinModule } from './builtin-modules.mjs';
 import { supabaseFunctionNameOf } from '../init.mjs';
 import { noticeBanner, noticesSectionName, targetNotices, withCustomSection } from '../notices.mjs';
-import { copyNodeModules, planNodeModules } from '../application-npm.mjs';
+import { copyNodeModules, planNodeModules, readPackageJson } from '../application-npm.mjs';
 import { foreignOutputError, replaceOutputDirectory, writeFileIfChanged } from '../output-directory.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
@@ -225,7 +225,7 @@ else throw new Error('Serving a Lasm.JS handler needs Bun or Deno; on Node, buil
  * in the form Supabase accepts (a letter, then letters, digits, - and _). */
 export function supabaseFunctionName(projectDirectory) {
   const file = join(projectDirectory, 'package.json');
-  return supabaseFunctionNameOf(existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')).name ?? basename(projectDirectory) : basename(projectDirectory));
+  return supabaseFunctionNameOf(existsSync(file) ? readPackageJson(file).name ?? basename(projectDirectory) : basename(projectDirectory));
 }
 
 /** deno.json for the function: every npm module the entry imports, mapped to
@@ -304,7 +304,7 @@ export function edgeModules(projectDirectory, bindings = []) {
   const modules = new Set(bindings.map(binding => binding.module).filter(name => name && name !== 'globalThis'));
   const packageFile = join(projectDirectory, 'package.json');
   if (existsSync(packageFile)) {
-    const edge = JSON.parse(readFileSync(packageFile, 'utf8')).lasm?.edge ?? {};
+    const edge = readPackageJson(packageFile).lasm?.edge ?? {};
     for (const key of ['modules', 'exclude']) {
       const list = edge[key] ?? [];
       if (!Array.isArray(list) || list.some(name => typeof name !== 'string' || !name))
