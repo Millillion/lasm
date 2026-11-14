@@ -101,7 +101,18 @@
     },
     "src/application-diagnosis.mjs": {
       "status": "pending",
-      "reason": "Lean name mangling and demangling, and the diagnosis of ahead-of-time rejections: pure string functions (candidate mangle_round_trip)"
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/Mangle.lean",
+          "functions": [
+            "mangleName",
+            "demangleName",
+            "initializerModule"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "Lean name mangling is modelled (mangle_round_trip proved of the model; the differential also checks it against Lean 4.35's own Name.mangle and Name.demangle); the diagnosis of ahead-of-time rejections (parseWhyExtract, archiveMembers, explainRejection, usedModules, declarationName) remains to model"
     },
     "src/application-files.mjs": {
       "status": "exempt",

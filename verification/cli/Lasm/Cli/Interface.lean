@@ -36,6 +36,7 @@ import Lasm.Cli.Model.JsFraming
 import Lasm.Cli.Model.LeanIOErrors
 import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.LowerAtomics
+import Lasm.Cli.Model.Mangle
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
@@ -211,12 +212,12 @@ def unquote (line : String) : Option String :=
 /-! ## Builds: names, initializers, builtin modules -/
 
 /-- `mangleName(name)` (src/application-diagnosis.mjs): Lean 4.35's C name
-(`Name.mangle n ""`) of a dotted name. -/
-opaque mangleName : String → String
+(`Name.mangle n ""`) of a dotted name; modelled in Model/Mangle.lean. -/
+def mangleName (name : String) : String := Mangle.mangleNameModel name
 /-- `demangleName(text)`. -/
-opaque demangleName : String → String
+def demangleName (text : String) : String := Mangle.demangleNameModel text
 /-- `initializerModule(symbol)`: the module a C initializer initializes. -/
-opaque initializerModule : String → Option String
+def initializerModule (symbol : String) : Option String := Mangle.initializerModuleModel symbol
 
 -- `builtinModuleClosure(specifiers)` (src/edge/builtin-modules.mjs), with
 -- `imports` the builtin specifiers (`lasm:…`) each builtin's file imports:

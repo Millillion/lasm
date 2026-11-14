@@ -27,19 +27,6 @@ open Lasm.Cli
 
 /-! ## Builds -/
 
-/-- **Mangling round-trips.** For every dotted name (a component of
-decimal digits without a leading zero is a numeric component, as in
-`_private.M.0.f`), the mangled name is a non-empty C identifier, demangling
-gives the name back, and the module of its initializer (`initialize_…` or
-`runtime_initialize_…`) is the name.
-Tested by: test/application-diagnosis.test.mjs -/
-def mangle_round_trip : Prop :=
-  ∀ n : String,
-    demangleName (mangleName n) = n ∧
-    initializerModule ("initialize_" ++ mangleName n) = some n ∧
-    initializerModule ("runtime_initialize_" ++ mangleName n) = some n ∧
-    mangleName n ≠ "" ∧ (mangleName n).all fun c => c.isAlphanum || c = '_'
-
 /-- **The compact wrappers run the kept initializers as the chains do.** For
 an acyclic plan of valid initializer names, the wrappers are generated, and
 calling kept initializers' wrappers runs exactly the kept initializers the Node build's chains run, in

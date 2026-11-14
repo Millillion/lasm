@@ -53,6 +53,12 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
   parseDevArguments   {"tokens": ["<hex>", …], "runtime": "node"}  → (the same)
   parsePackageArguments  ["<hex>", …]              → (the same)
   leanAtLeast    {"version": "<hex>", "minimum": "<hex>"}  → true | false
+  mangleName     "<hex>"                            → "<hex>"
+  demangleName   "<hex>"                            → "<hex>"
+  initializerModule  "<hex>"                        → "<hex>" | null
+  leanNameMangle  [["<hex>"] | n, …]                → "<hex>"  (Lean's own `Name.mangle n ""`)
+  leanNameDemangle  "<hex>"                         → "<hex>"  (Lean's own `Name.demangle`, components joined by `.`)
+(a component of a Lean `Name`: a string as ["<hex>"], a number as n)
   pythonJsonString  "<hex>"                         → "<hex>"
   packageName    "<hex of basename(resolve(directory)).toLowerCase()>"  → "<hex>"
   lakeName       "<hex>"                            → "<hex>"
@@ -82,6 +88,8 @@ import Lasm.Cli.Model.JsFraming
 import Lasm.Cli.Model.LeanIOErrors
 import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.LowerAtomics
+import Lasm.Cli.Model.Mangle
+import Lean.Compiler.NameMangling
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
@@ -364,6 +372,21 @@ def answer (j : Json) : Except String Json := do
   | "supabaseFunctionNameOf" => return ofText (supabaseNameOf (← text input))
   | "pythonJsonString" => return ofText (pythonJsonString (← text input))
   | "comparePythonStrings" => return toJson (toString (comparePythonStrings (← text (← input.getObjVal? "a")) (← text (← input.getObjVal? "b"))))
+  | "mangleName" => return ofText (Mangle.mangleNameModel (← text input))
+  | "demangleName" => return ofText (Mangle.demangleNameModel (← text input))
+  | "initializerModule" => return match Mangle.initializerModuleModel (← text input) with | some m => ofText m | none => Json.null
+  | "leanNameMangle" =>
+    let name ← (← input.getArr?).foldlM (init := Name.anonymous) fun n c => do
+      match c.getArr? with
+      | .ok #[s] => return n.str (← text s)
+      | _ => return n.num (← c.getNat?)
+    return ofText (name.mangle "")
+  | "leanNameDemangle" =>
+    let rec parts : Name → List String
+      | .anonymous => []
+      | .str p s => parts p ++ [s]
+      | .num p k => parts p ++ [toString k]
+    return ofText (".".intercalate (parts (Name.demangle (← text input))))
   | "leanAtLeast" => return toJson (leanAtLeastModel (← text (← input.getObjVal? "version")) (← text (← input.getObjVal? "minimum")))
   | "lowerAtomics" => return ofBytes (LowerAtomics.lowerAtomics (← bytesOf input))
   | "moduleImports" =>

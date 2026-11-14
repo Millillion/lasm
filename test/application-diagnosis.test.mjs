@@ -115,7 +115,7 @@ test('the policy message carries the explanation and the README pointer', () => 
 const leanName = random => random.array(random.int(1, 4), () => random.next() < 0.15 ? String(random.int(0, 20))
   : random.string(['a', 'B', 'x', 'u', 'U', '0', '9', 'f', '!', 'α', '𝔸', "'", '_', '2d'], 0, 6)).join('.');
 
-// Proposition: Lasm.Cli.Candidates.mangle_round_trip
+// Proposition: Lasm.Cli.Spec.mangle_round_trip
 //   ∀ n : String,
 //     demangleName (mangleName n) = n ∧
 //     initializerModule ("initialize_" ++ mangleName n) = some n ∧

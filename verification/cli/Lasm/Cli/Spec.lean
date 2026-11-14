@@ -184,6 +184,19 @@ def schedule_reached_kept_first : Prop :=
     ∀ x ∈ initializationSchedule n calls keep, ∀ y, y ∈ keep → y ≠ n → Reaches (edgesOf calls) x y →
       (initializationSchedule n calls keep).idxOf y < (initializationSchedule n calls keep).idxOf x
 
+/-- **Mangling round-trips.** For every dotted name (a component of
+decimal digits without a leading zero is a numeric component, as in
+`_private.M.0.f`), the mangled name is a non-empty C identifier, demangling
+gives the name back, and the module of its initializer (`initialize_…` or
+`runtime_initialize_…`) is the name.
+Tested by: test/application-diagnosis.test.mjs -/
+def mangle_round_trip : Prop :=
+  ∀ n : String,
+    demangleName (mangleName n) = n ∧
+    initializerModule ("initialize_" ++ mangleName n) = some n ∧
+    initializerModule ("runtime_initialize_" ++ mangleName n) = some n ∧
+    mangleName n ≠ "" ∧ (mangleName n).all fun c => c.isAlphanum || c = '_'
+
 /-! ## The link driver's Python semantics -/
 
 /-- **Escaped strings are printable ASCII.** `json.dumps` of any string,

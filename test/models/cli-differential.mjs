@@ -26,6 +26,7 @@ import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
 import { leanAtLeast } from '../../src/lean-io-errors.mjs';
+import { demangleName, initializerModule, mangleName } from '../../src/application-diagnosis.mjs';
 import { comparePythonStrings, pythonJsonString } from '../../src/link-driver/python.mjs';
 import { responseFile } from '../../src/platform.mjs';
 import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
@@ -372,7 +373,25 @@ function runLauncher(bytes) {
  * module, a generator, the JavaScript's answer and the request's input,
  * both in the runner's encoding. Each module's entry in
  * verification/models.json names its model and this differential. */
-export const models = [
+export 
+/** Lean names as components: numbers, and strings that read as numbers or
+ * escapes once mangled, start or end with `_`, are empty, or hold
+ * characters of every escape class (never `.`, so the dotted name is the
+ * same name). */
+const nameChars = ['a', 'B', 'x', 'u', 'U', 'f', '0', '7', '_', '-', '!', 'é', 'λ', '\uffff', '😀', '2d', '41', '03b1', '\n'];
+const nameComponents = r => r.array(r.int(1, 4), () => r.next() < 0.15 ? r.int(0, r.pick([9, 30, 1e6]))
+  : (s => /^(?:0|[1-9][0-9]*)$/.test(s) ? s + 'z' : s)(r.string(nameChars, 0, 6)));
+const dotted = parts => parts.map(String).join('.');
+/** Text for demangling: mangled names, mangled names changed, and soups of
+ * underscores, digits, escape letters and hex digits. */
+const mangledText = r => {
+  const roll = r.next();
+  if (roll < 0.4) return mangleName(dotted(nameComponents(r)));
+  if (roll < 0.6) { const m = [...mangleName(dotted(nameComponents(r)))]; const i = r.int(0, m.length); m.splice(i, r.int(0, 2), ...r.string(['_', '0', 'x', 'a'], 0, 2)); return m.join(''); }
+  return r.string(['_', '_', '_', '0', '0', '1', '9', 'x', 'u', 'U', 'a', 'f', 'Z', 'g', 'é'], 0, 16);
+};
+
+const models = [
   {
     name: 'editDistance', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
     generate: r => [r.string(letters, 0, 9), r.string(letters, 0, 9)],
@@ -456,6 +475,37 @@ export const models = [
     },
     input: ([v, m]) => ({ version: hex(v), minimum: hex(m) }),
     js: ([v, m]) => leanAtLeast(v, m),
+  },
+  {
+    name: 'mangleName', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: r => r.next() < 0.1 ? r.string(['a', '.', '_', '0', 'x'], 0, 8) : dotted(nameComponents(r)),
+    input: name => hex(name),
+    js: name => hex(mangleName(name)),
+  },
+  {
+    name: 'demangleName', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: mangledText,
+    input: text => hex(text),
+    js: text => hex(demangleName(text)),
+  },
+  {
+    name: 'initializerModule', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: r => r.pick(['initialize_', 'runtime_initialize_', 'meta_initialize_', 'runtime_', 'initialize', '', 'xinitialize_'])
+      + (r.next() < 0.1 ? r.pick(['\n', 'a\rb', '\u2028']) : '') + mangledText(r),
+    input: symbol => hex(symbol),
+    js: symbol => (m => m === undefined ? null : hex(m))(initializerModule(symbol)),
+  },
+  {
+    name: 'leanNameMangle', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: nameComponents,
+    input: parts => parts.map(p => typeof p === 'number' ? p : [hex(p)]),
+    js: parts => hex(mangleName(dotted(parts))),
+  },
+  {
+    name: 'leanNameDemangle', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: mangledText,
+    input: text => hex(text),
+    js: text => hex(demangleName(text)),
   },
   {
     name: 'packageName', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',
