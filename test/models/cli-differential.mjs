@@ -642,6 +642,10 @@ export const models = [
     input: bytes => hexOf(bytes),
     js: bytes => hexOf(withoutComponentType(Uint8Array.from(bytes))),
   },
+  // src/edge/edge-initializers.mjs runs this model itself, compiled by Lasm
+  // (src/glue/glue.mjs, docs/proposals/M6_GLUE.md): these two entries check the
+  // compiled program, through the module's field encoding, against the model
+  // run by native Lean.
   {
     name: 'initializationSchedule', source: 'src/edge/edge-initializers.mjs', lean: 'Lasm.Cli.Model.EdgeInitializers',
     generate: r => { const p = plan(r); return { p, name: r.next() < 0.9 ? r.pick(p.closure) : 'initialize_Outside' }; },

@@ -299,7 +299,7 @@
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "both of its functions are modelled; the module does nothing else"
+      "reason": "both functions run as their Lean model, compiled by Lasm into the CLI's glue program (src/glue/glue.mjs, docs/proposals/M6_GLUE.md) through a proved fast version (verification/cli/Lasm/Cli/Fast/EdgeInitializers.lean, a csimp theorem); what remains here is the plan's shape check and the encoding of its fields, which the differential checks together with the compiled program"
     },
     "src/edge/edge-js.mjs": {
       "status": "pending",
@@ -359,6 +359,11 @@
       "status": "exempt",
       "kind": "io",
       "reason": "a timer thread writing to the terminal"
+    },
+    "src/glue/glue.mjs": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "the WASI host of the CLI's glue program (reading stdin, writing stdout and stderr, a clock that reads 0, exiting; nothing else) and its field codec; the program is Lean (verification/cli/Lasm/Cli/Glue.lean), checked with this host by the model differential of src/edge/edge-initializers.mjs, and the host by test/glue.test.mjs on hand-made modules"
     },
     "src/handle-table.mjs": {
       "status": "modelled",
