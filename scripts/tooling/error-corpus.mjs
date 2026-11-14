@@ -28,7 +28,10 @@ async function occupyPort() {
 
 const main = 'def main : IO Unit := IO.println "hello"\n';
 const lakefile = 'name = "app"\nversion = "0.1.0"\ndefaultTargets = ["app"]\n\n[[lean_exe]]\nname = "app"\nroot = "Main"\n';
-const project = (files = {}) => ({ 'Main.lean': main, 'lakefile.toml': lakefile, 'lean-toolchain': 'leanprover/lean4:v4.36.0-rc2\n', ...files });
+// The Lean of the CLI under test (its `lasm --version`): the published CLI
+// pins an earlier Lean than a candidate on a Lean upgrade branch.
+const pinnedToolchain = Symbol('the CLI under test\'s lean-toolchain');
+const project = (files = {}) => ({ 'Main.lean': main, 'lakefile.toml': lakefile, 'lean-toolchain': pinnedToolchain, ...files });
 const posixUser = process.platform !== 'win32' && process.getuid?.() !== 0;
 
 /** kind: parse (no toolchain), build (a failing build), network (a failing download). */
@@ -126,9 +129,9 @@ export const cases = [
   { id: 'no-main', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': 'def answer : Nat := 42\n' }, expect: /Main\.lean has no `main` function/, fixedIn: '0.4.0' },
   { id: 'run-uncaught-exception', kind: 'build', args: ['Main.lean'], files: { 'Main.lean': 'def main : IO Unit := throw <| IO.userError "boom"\n' }, expect: /uncaught exception: boom/ },
   { id: 'bad-lakefile-toml', kind: 'build', args: ['build', 'Main.lean'], files: project({ 'lakefile.toml': 'name = "app"\n[[lean_exe\n' }), expect: /lakefile\.toml:2:\d+/ },
-  { id: 'bad-lakefile-lean', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': main, 'lean-toolchain': 'leanprover/lean4:v4.36.0-rc2\n', 'lakefile.lean': 'import Lake\nopen Lake DSL\npackage app\n@[default_target] lean_exe app where\n  root := `Main\n  bogus\n' }, expect: /lakefile\.lean:\d+:\d+: error/ },
+  { id: 'bad-lakefile-lean', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': main, 'lean-toolchain': pinnedToolchain, 'lakefile.lean': 'import Lake\nopen Lake DSL\npackage app\n@[default_target] lean_exe app where\n  root := `Main\n  bogus\n' }, expect: /lakefile\.lean:\d+:\d+: error/ },
   { id: 'lake-missing-path-dependency', kind: 'build', args: ['build', 'Main.lean'], files: project({ 'lakefile.toml': lakefile + '\n[[require]]\nname = "helper"\npath = "../no-such-helper"\n' }), expect: /no-such-helper|helper/ },
-  { id: 'unsupported-toolchain', kind: 'build', args: ['build', 'Main.lean'], files: project({ 'lean-toolchain': 'leanprover/lean4:v4.20.0\n' }), expect: /Unsupported Lean toolchain "leanprover\/lean4:v4\.20\.0".*Lasm supports Lean v4\.35\.0/ },
+  { id: 'unsupported-toolchain', kind: 'build', args: ['build', 'Main.lean'], files: project({ 'lean-toolchain': 'leanprover/lean4:v4.20.0\n' }), expect: lean => new RegExp(`Unsupported Lean toolchain "leanprover/lean4:v4\\.20\\.0".*Lasm supports Lean v${lean.replaceAll('.', '\\.')}`) },
   { id: 'garbage-toolchain', kind: 'build', args: ['build', 'Main.lean'], files: project({ 'lean-toolchain': 'not a toolchain\n' }), expect: /lean-toolchain/ },
   { id: 'output-is-a-file', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': main, dist: 'not a directory\n' }, expect: /dist/, fixedIn: '0.4.0' },
   { id: 'output-not-a-build', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': main, 'dist/notes.txt': 'mine\n' }, expect: /Output directory is not a Lasm application build: .*dist\. Choose --output with an empty directory/ },
@@ -190,6 +193,8 @@ const kinds = { parse: ['parse'], build: ['parse', 'build'], network: ['parse', 
 export async function runCorpus({ lasm, only = 'network', oldNode, work, id, log = console.log }) {
   const version = (await runLasm(lasm, ['--version'], { timeoutMs: 60_000 })).stdout.trim();
   const versionNumber = /^lasm (\S+)/.exec(version)?.[1] ?? 'source';
+  const lean = /; Lean ([^;)\s]+)/.exec(version)?.[1];
+  if (!lean) throw new Error(`lasm --version names no Lean release: ${version}`);
   log(`Error corpus against ${version || lasm}`);
   const results = [], outputs = [];
   for (const entry of cases) {
@@ -199,7 +204,8 @@ export async function runCorpus({ lasm, only = 'network', oldNode, work, id, log
     const directory = temporaryDirectory('error-' + entry.id, work);
     let context;
     try {
-      writeTree(directory, entry.files ?? {});
+      writeTree(directory, Object.fromEntries(Object.entries(entry.files ?? {})
+        .map(([path, content]) => [path, content === pinnedToolchain ? `leanprover/lean4:v${lean}\n` : content])));
       entry.setup?.(directory);
       context = await entry.before?.(directory) ?? {};
       const env = typeof entry.env === 'function' ? entry.env(directory, context) : entry.env ?? {};
@@ -220,7 +226,8 @@ export async function runCorpus({ lasm, only = 'network', oldNode, work, id, log
       else if (result.code === 0 && !entry.exitZero) problems.unshift('exited 0');
       // Ctrl+C may end the process by its signal, as it ends any terminal program.
       else if (result.code === null && !(entry.interruptWhen && result.signal === 'SIGINT')) problems.unshift(`ended by signal ${result.signal}`);
-      if (!entry.expect.test(output)) problems.push(`does not say ${entry.expect}`);
+      const expect = typeof entry.expect === 'function' ? entry.expect(lean) : entry.expect;
+      if (!expect.test(output)) problems.push(`does not say ${expect}`);
       if (entry.then) {
         const after = await runLasm(lasm, entry.then, { cwd, env, timeoutMs: 1_200_000 });
         if (after.code !== 0) problems.push(`lasm ${entry.then.join(' ')} afterwards failed: ${tail(after.stdout + after.stderr, 8)}`);
