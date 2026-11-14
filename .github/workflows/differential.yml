@@ -107,6 +107,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       macos: ${{ steps.scope.outputs.macos }}
+      metamorphic: ${{ steps.scope.outputs.metamorphic }}
     steps:
       - id: scope
         env:
@@ -114,6 +115,7 @@ jobs:
           EVENT: ${{ github.event_name }}
           PR: ${{ github.event.pull_request.number }}
           BEFORE: ${{ github.event.before }}
+          METAMORPHIC_PATHS: '^(scripts/differential/(metamorphic|generate|features)\.mjs|\.github/workflows/differential\.yml)$'
           MACOS_PATHS: '^(src/macos-tbd\.mjs|src/managed-lean\.mjs|src/managed-artifacts\.mjs|scripts/lean-dist/|scripts/ci/macos-c-tier\.mjs|scripts/ci/stack-depth\.mjs|scripts/ecosystem/projects/native-tactic/|test/macos-tbd\.test\.mjs|test/managed-lean-tiers\.test\.mjs|test/fixtures/macos-tbd/|\.github/workflows/differential\.yml$|\.github/actions/install-candidate/)'
         run: |
           case "$EVENT" in
@@ -125,6 +127,7 @@ jobs:
           # unknown range (a new branch, a failed comparison, no files): the macOS jobs run.
           if [ -z "$files" ] || printf '%s' "$BEFORE" | grep -qE '^0+$'; then files=.github/workflows/differential.yml; fi
           if printf '%s\n' "$files" | grep -qE "$MACOS_PATHS"; then echo macos=true; else echo macos=false; fi | tee -a "$GITHUB_OUTPUT"
+          if printf '%s\n' "$files" | grep -qE "$METAMORPHIC_PATHS"; then echo metamorphic=true; else echo metamorphic=false; fi | tee -a "$GITHUB_OUTPUT"
   pack:
     needs: sunday
     if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
@@ -314,6 +317,55 @@ jobs:
   # (cwd, permissions, processes, environment and path bytes, temporary files,
   # finalizers, TCP, clocks), built with the installed candidate for Node and
   # compared with upstream Lean 4.35.0's `lean --run`. Pull requests and main.
+  # Metamorphic compiler relations (scripts/differential/metamorphic.mjs,
+  # docs/TESTING.md#metamorphic-compiler-relations): a renamed, reordered,
+  # padded, noinline or split-into-modules program prints what the original
+  # prints, on node, node:wasi and the edge output on Node. Nightly a
+  # 40-minute campaign from a fresh seed; on a pull request or push only when
+  # the harness or the generator changes, one seed.
+  metamorphic:
+    needs: [sunday, scope, pack]
+    if: needs.sunday.outputs.skip != 'true' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.metamorphic == 'true')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: Install the candidate as a user would
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: differential-packed-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: Metamorphic relations
+        run: |
+          set -o pipefail
+          if [ "${{ github.event_name }}" = schedule ] || [ "${{ github.event_name }}" = workflow_dispatch ]; then
+            AMOUNT="--seed $(( ${{ github.run_id }} % 1000000000 )) --budget-min 40"
+          else
+            AMOUNT="--seed $(( 16#$(echo "${{ github.event.pull_request.head.sha || github.sha }}" | cut -c1-7) )) --seeds 1"
+          fi
+          node scripts/differential/metamorphic.mjs --lasm "$RUNNER_TEMP/lasm/node_modules/@lasm/compiler/bin/lasm.mjs" \
+            --work "$RUNNER_TEMP/metamorphic" $AMOUNT --cases 60 --feat-cases 40 --summary "$RUNNER_TEMP/metamorphic/summary.json" 2>&1 | tee "$RUNNER_TEMP/metamorphic.log"
+      - name: Preserve reproducers and the summary
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: metamorphic-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/metamorphic/repros
+            ${{ runner.temp }}/metamorphic/summary.json
+            ${{ runner.temp }}/metamorphic.log
+          retention-days: 30
+          if-no-files-found: ignore
   host-fixtures:
     needs: [sunday, pack]
     if: needs.sunday.outputs.skip != 'true' && (github.event_name != 'schedule')

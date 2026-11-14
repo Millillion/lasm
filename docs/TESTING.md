@@ -797,6 +797,31 @@ the black-box harnesses on macOS and Windows (Linux runners only; the
 unit-level installer controls in `installer-faults.yml` run on all five
 platforms); `lasm dev` with several outputs at once.
 
+### Metamorphic compiler relations
+
+[`scripts/differential/metamorphic.mjs`](../scripts/differential/metamorphic.mjs)
+checks relations between two builds of a program that need no oracle: a
+semantics-preserving change to the source must not change what the program
+built by Lasm prints (stdout, stderr and the exit status), on node, node:wasi
+and the edge output run by Node. The programs are the differential
+generator's, a core program (60 cases) and a feature program (40 cases) per
+seed, with one of the generator's endings. The transforms:
+
+| Transform | The program changed | Compared |
+| --- | --- | --- |
+| `rename` | every case's names take another prefix of the same length (`c12…` becomes `ζ12…`; `Repr` output wraps at a fixed width, so a longer name would legitimately move line breaks) | after mapping printed names back |
+| `reorder` | the cases' declarations in a random order; `main` calls them in the original one | as is |
+| `dead` | copies of a third of the cases under unused names, and two unused imports | as is |
+| `noinline` | `@[noinline]` on every plain top-level `def` of the cases | as is |
+| `modules` | the preamble in `Pre.lean`, the cases in `A.lean` and `B.lean`, `main` in `Main.lean` | as is |
+
+A transform that does not build, or prints anything else, breaks its
+relation: both programs and their outputs are kept in `repros/` (artifact
+`metamorphic-<run>`). `--render-only DIR` writes a seed's programs without
+building them. CI ([differential.yml](../.github/workflows/differential.yml)
+`metamorphic`): a 40-minute campaign nightly from a fresh seed, and one seed
+on a pull request or push that changes the harness or the generator.
+
 ### Fuzzing at the boundaries
 
 Coverage-guided fuzzers for every input boundary that had none, in
