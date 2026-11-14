@@ -30,7 +30,7 @@ on:
         required: true
       lean:
         type: string
-        default: 4.35.0
+        default: 4.36.0-rc2
       remove-system-c:
         description: Linux only - after the native oracle, purge the system C compiler and C library headers (libc6-dev and everything that depends on it) before the Lasm build
         type: boolean
@@ -39,7 +39,7 @@ permissions:
   contents: read
 jobs:
   plan:
-    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/lean-'))
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:

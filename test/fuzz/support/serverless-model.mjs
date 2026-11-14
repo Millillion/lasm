@@ -33,7 +33,7 @@ export async function prepare(out = defaultDirectory) {
   const work = mkdtempSync(join(tmpdir(), 'lasm-serverless-model-'));
   try {
     writeFileSync(join(work, 'Main.lean'), 'import Lean\ndef main : IO Unit := pure ()\n');
-    writeFileSync(join(work, 'lean-toolchain'), 'leanprover/lean4:v4.35.0\n');
+    writeFileSync(join(work, 'lean-toolchain'), 'leanprover/lean4:v4.36.0-rc2\n');
     const lean = await provisionLean(join(work, 'Main.lean'), { modules: 'extended',
       progress: ({ stage }) => stage && console.error(`[lean] ${stage}`) });
     const olean = join(out, ...module) + '.olean';

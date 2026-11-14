@@ -12,7 +12,7 @@ import { executableName } from './platform.mjs';
 
 const root = fileURLToPath(new URL('../library/', import.meta.url));
 // Lean versions the library is compiled for, and its modules in import order.
-export const libraryLeanVersions = ['4.35.0'];
+export const libraryLeanVersions = ['4.36.0-rc2'];
 // The generated Lasm.Fastly modules: Types, one per witx module, then the umbrella module.
 const fastlyModules = ['Types', 'Cache', 'ConfigStore', 'HttpCache', 'Shielding', 'Abi', 'Uap', 'HttpBody', 'Log', 'HttpReq',
   'HttpDownstream', 'HttpResp', 'Dictionary', 'Geo', 'DeviceDetection', 'Erl', 'ObjectStore', 'ImageOptimizer', 'KvStore', 'SecretStore',

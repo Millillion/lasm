@@ -9,7 +9,7 @@ import { checkLeanIOVersion, leanAtLeast, leanIOError, receiveSizeError } from '
 import { encodeError, numbers, loopAlive, LeanExit } from '../src/node-host.mjs';
 import { forAll } from './helpers/property.mjs';
 
-const verified = ['4.32.0', '4.34.0', '4.34.1', '4.35.0'];
+const verified = ['4.32.0', '4.34.0', '4.34.1', '4.35.0', '4.36.0-rc2'];
 function asPlatform(platform, action) {
   const original = Object.getOwnPropertyDescriptor(process, 'platform');
   Object.defineProperty(process, 'platform', { ...original, value: platform });

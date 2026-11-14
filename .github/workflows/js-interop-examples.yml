@@ -39,7 +39,7 @@ permissions:
   contents: read
 jobs:
   linux:
-    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/lean-') || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     strategy:
       fail-fast: false
       matrix:
@@ -88,7 +88,7 @@ jobs:
         if: always()
         run: node scripts/js-interop/summary.mjs .work/js-interop-examples.json
   other:
-    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/lean-') || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     strategy:
       fail-fast: false
       matrix:

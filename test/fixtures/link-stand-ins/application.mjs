@@ -11,6 +11,9 @@ import { registerProgram } from './programs.mjs';
 import { temporaryDirectory, archive, compileToObject, emscriptenGlue, expandResponseFiles, installTools, linkObjects, parseLinkCommand, programModule, wasmObject } from './toolchain.mjs';
 import { bundledRecipe } from '../../../src/link-driver/compile.mjs';
 
+/** The pinned Lean, as the application and its runtime record it. */
+export const leanVersion = JSON.parse(readFileSync(new URL('../../../src/toolchains.json', import.meta.url), 'utf8')).defaultLean;
+
 /** A runtime identity that src/application-reachability.mjs has reviewed for
  * selective initialization, and one it has not. */
 export const specializedIdentity = '9921c696161a9852442863a19e16990f2d540aa369adaa353906504bb589649a';
@@ -103,7 +106,7 @@ export function writeRuntime(directory, { identity = 'stand-in-runtime', leanIni
     ['module.o', { functions: [{ name: 'lean_read_module_data' }] }],
     // An inline C++ helper: a weak definition any archive may carry.
     ['inline.o', { functions: [{ name: 'lean_inline_helper', weak: true }] }]]);
-  return { directory, identity, manifest: { lean: '4.35.0', libraries: ['lib/libInit.a', 'lib/libleanrt.a', 'lib/libleancpp.a'],
+  return { directory, identity, manifest: { lean: leanVersion, libraries: ['lib/libInit.a', 'lib/libleanrt.a', 'lib/libleancpp.a'],
     applicationSymbolHook: 'lasm_lookup_application_symbol' } };
 }
 

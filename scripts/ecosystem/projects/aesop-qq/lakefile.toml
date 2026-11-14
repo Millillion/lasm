@@ -4,12 +4,12 @@ defaultTargets = ["app"]
 [[require]]
 name = "aesop"
 git = "https://github.com/leanprover-community/aesop"
-rev = "4a174c490d8707121c4a9290800489f105d85e07"
+rev = "7d11bfa88558f8d3d90afdf6bd877ed70001498d"
 
 [[require]]
 name = "Qq"
 git = "https://github.com/leanprover-community/quote4"
-rev = "dce0ad79c486cb1fb504af04f953c3466b0c6db8"
+rev = "b0256621cb88178e9ad932a53633077b3029e621"
 
 [[lean_lib]]
 name = "Proofs"

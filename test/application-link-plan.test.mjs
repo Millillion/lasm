@@ -19,6 +19,8 @@ import { responseFile } from '../src/platform.mjs';
 import { compactInitializerWrappers } from '../src/edge/edge-initializers.mjs';
 import { project, emccSdk, nodeSdk, writeRuntime, mainModule, helperModule, specializedIdentity } from './fixtures/link-stand-ins/application.mjs';
 import { expandResponseFiles } from './fixtures/link-stand-ins/toolchain.mjs';
+// The pinned Lean: the reviewed initializer list (src/lean-init-targets-<version>.json) is per release.
+import { leanVersion } from './fixtures/link-stand-ins/application.mjs';
 
 const posix = process.platform !== 'win32';
 const root = new URL('../', import.meta.url).pathname;
@@ -38,7 +40,7 @@ const readResponse = file => expandResponseFiles(['@' + file]);
 
 function build(p, options = {}) {
   const { sdk } = options.sdk ? options : emccSdk(p.base);
-  return linkApplication({ sources: p.sources, sdk: options.sdk?.sdk ?? sdk, runtime: p.runtime, work: p.work, dist: p.dist, leanVersion: '4.35.0',
+  return linkApplication({ sources: p.sources, sdk: options.sdk?.sdk ?? sdk, runtime: p.runtime, work: p.work, dist: p.dist, leanVersion,
     memoryMode: 1, verbose: false, linkDriver: 'emcc', ...options, ...(options.sdk ? { sdk: options.sdk.sdk } : {}) });
 }
 const withEnv = async (values, run) => {
@@ -71,7 +73,7 @@ test('a release build: compiled modules, the initialization plan, the requiremen
   // Exports: the C entry points and the program's own C exports.
   assert.equal(readFileSync(join(p.work, 'exports.json'), 'utf8'), '["_free","_main","_malloc"]\n');
   assert.equal(readFileSync(join(p.work, 'initializers-exports.json'), 'utf8'), '["_main","_malloc","_free"]\n');
-  assert.equal(readFileSync(join(p.work, 'application-pre.js'), 'utf8'), 'Module.lasmLeanVersion = "4.35.0";\n');
+  assert.equal(readFileSync(join(p.work, 'application-pre.js'), 'utf8'), `Module.lasmLeanVersion = "${leanVersion}";\n`);
   // The plan: Helper's `initialize` result is used by the program; Init.Data's value is not.
   assert.deepEqual(JSON.parse(readFileSync(join(p.work, 'initialization-plan.json'), 'utf8')), { schema: 1,
     closure: ['initialize_Main', 'initialize_Init', 'initialize_Init_Data', 'initialize_Helper'],

@@ -74,7 +74,7 @@ const argv = process.argv.slice(2);
 const opt = (name, fallback) => { const i = argv.indexOf(name); return i < 0 ? fallback : argv[i + 1]; };
 const has = name => argv.includes(name);
 const lasm = opt('--lasm') && resolve(opt('--lasm'));
-const leanBin = resolve(opt('--lean-bin', join(process.env.HOME ?? '', '.elan/toolchains/leanprover--lean4---v4.35.0/bin')));
+const leanBin = resolve(opt('--lean-bin', join(process.env.HOME ?? '', '.elan/toolchains/leanprover--lean4---v4.36.0-rc2/bin')));
 const work = resolve(opt('--work', 'difftest-work'));
 const seed0 = Number(opt('--seed', String(Date.now() % 1e9)));
 const programs = Number(opt('--programs', '1'));

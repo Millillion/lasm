@@ -11,7 +11,7 @@ concurrency:
 # control retains reports in logs only: no release, artifact or cache uploads.
 jobs:
   runtime:
-    if: github.event.repository.visibility == 'public' && github.ref == 'refs/heads/main'
+    if: github.event.repository.visibility == 'public' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/lean-'))
     runs-on: ubuntu-24.04
     timeout-minutes: 300
     env:

@@ -38,7 +38,7 @@
 //
 //   node test/models/ui-applier-differential.mjs [--runs N] [--seed S] [--lean PATH --olean DIR]
 //
-// provisions the managed Lean 4.35.0 with Lasm's library and compiles the
+// provisions the managed Lean (src/toolchains.json defaultLean) with Lasm's library and compiles the
 // model into a temporary directory (or uses `lean` at PATH with the model's
 // modules already compiled in DIR), then checks `runs` sessions of each kind
 // (default 1000). Run by the ui-applier-model workflow (docs/CI.md).
@@ -68,7 +68,7 @@ async function start({ lean, olean } = {}) {
     const work = mkdtempSync(join(tmpdir(), 'lasm-ui-applier-lean-'));
     try {
       writeFileSync(join(work, 'Main.lean'), 'import Lean\ndef main : IO Unit := pure ()\n');
-      writeFileSync(join(work, 'lean-toolchain'), 'leanprover/lean4:v4.35.0\n');
+      writeFileSync(join(work, 'lean-toolchain'), `leanprover/lean4:v${JSON.parse(readFileSync(join(root, 'src/toolchains.json'), 'utf8')).defaultLean}\n`);
       const provisioned = await provisionLean(join(work, 'Main.lean'), { modules: 'extended',
         progress: ({ stage }) => stage && console.error(`[lean] ${stage}`) });
       lean = provisioned.lean;

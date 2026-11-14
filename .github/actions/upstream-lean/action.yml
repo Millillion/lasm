@@ -1,7 +1,7 @@
 name: Upstream Lean (the oracle)
 description: >-
-  Installs the pinned upstream Lean 4.35.0 release archive for linux-x64
-  (scripts/lean-dist/lean-4.35.0-upstream.json), verified by SHA-256 and
+  Installs the pinned upstream Lean 4.36.0-rc2 release archive for linux-x64
+  (scripts/lean-dist/lean-4.36.0-rc2-upstream.json), verified by SHA-256 and
   cached per digest, into $RUNNER_TEMP/lean. The differential tests use it as
   the oracle and the host-bridge model checker builds with it.
   docs/CI.md#shared-setup.
@@ -23,7 +23,7 @@ runs:
       id: pin
       shell: bash
       run: |
-        node -e "const a=require('./scripts/lean-dist/lean-4.35.0-upstream.json').lean['4.35.0'].artifacts['linux-x64']; console.log('url='+a.url); console.log('sha256='+a.sha256); console.log('root='+a.root)" >> "$GITHUB_OUTPUT"
+        node -e "const a=require('./scripts/lean-dist/lean-4.36.0-rc2-upstream.json').lean['4.36.0-rc2'].artifacts['linux-x64']; console.log('url='+a.url); console.log('sha256='+a.sha256); console.log('root='+a.root)" >> "$GITHUB_OUTPUT"
     - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       id: cache
       with:

@@ -14,7 +14,7 @@ import { applicationNotices, leanRuntimeChanges, runtimeLinksGmp, lakeDependency
   noticeVersions, noticeBanner, withoutLeanReleaseLicenses, edgeLeanPatches, noticeKinds, referenceNotices, noticeText, wasmtimeAdapterNotice,
   customSections, withCustomSection, withoutCustomSection, copyleftFindings } from '../src/notices.mjs';
 
-const manifest = (patches = Object.keys(leanRuntimeChanges), libraries = ['lib/libleanrt.a']) => ({ name: 'lean-4.35.0-wasm64', lean: '4.35.0',
+const manifest = (patches = Object.keys(leanRuntimeChanges), libraries = ['lib/libleanrt.a']) => ({ name: 'lean-4.36.0-rc2-wasm64', lean: '4.35.0',
   leanCommit: 'eb6cafb7290e8bd5f2937522d8d804f58f02bafc', emscripten: '6.0.9', libraries,
   patches: Object.fromEntries(patches.map(name => [name, '0'.repeat(64)])) });
 const runtime = '=== Lean ===\nApache\n=== Lean bundled dependencies ===\nGNU C Library LGPL text\n=== mimalloc ===\nMIT text\n';
@@ -173,7 +173,7 @@ test('application notices: the subject, the component list without GNU MP, the t
   assert.ok(node.includes('\n\nThis application was compiled by Lasm. program.wasm and program.cjs contain,\nstatically linked or generated:\n  - Lean 4.35.0 runtime'));
   assert.ok(node.includes('see "libuv LICENSE-extra");\n  - Lasm\'s runtime glue (MIT, "Lasm" below).\nhost/ is'));
   assert.ok(node.includes('edge isolates)\n\n=== LLVM compiler-rt ===\n'));
-  assert.ok(applicationNotices(manifest(), runtime, { cli: true }).includes('\n\nThis is the Lasm compiler package. Its targets/lean-4.35.0-wasm64/ runtime\n'));
+  assert.ok(applicationNotices(manifest(), runtime, { cli: true }).includes('\n\nThis is the Lasm compiler package. Its targets/lean-4.36.0-rc2-wasm64/ runtime\n'));
   for (const kind of noticeKinds.filter(k => k !== 'node')) {
     const text = targetNotices(node, kind);
     assert.ok(text.includes(`Lasm adds no copyleft (GPL, LGPL or similar) code to its outputs.

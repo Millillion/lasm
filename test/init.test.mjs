@@ -43,7 +43,9 @@ test('every template creates a complete project', () => {
       assert.deepEqual(result.files.sort(), ['.dockerignore', '.gitignore', 'App.lean', 'Dockerfile', 'Main.lean', 'README.md',
         'lakefile.toml', 'lean-toolchain', 'package.json']);
       const read = file => readFileSync(join(directory, file), 'utf8');
-      assert.match(read('lean-toolchain'), /^leanprover\/lean4:v4\.\d+\.\d+\n$/);
+      // The pinned Lean exactly (a release candidate during an upgrade dry run).
+      assert.equal(read('lean-toolchain'), `leanprover/lean4:v${JSON.parse(readFileSync(new URL('../src/toolchains.json', import.meta.url), 'utf8')).defaultLean}\n`);
+      assert.match(read('lean-toolchain'), /^leanprover\/lean4:v4\.\d+\.\d+(-rc\d+)?\n$/);
       assert.match(read('lakefile.toml'), /root = "Main"/);
       const pkg = JSON.parse(read('package.json'));
       assert.equal(pkg.scripts.build, 'lasm build Main.lean');

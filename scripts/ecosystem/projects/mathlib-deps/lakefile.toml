@@ -4,17 +4,17 @@ defaultTargets = ["app"]
 [[require]]
 name = "proofwidgets"
 git = "https://github.com/leanprover-community/ProofWidgets4"
-rev = "df72b022e558978a1c50264cfc4d7fec86fa8e04"
+rev = "16259c0d07d61ee37d999d05b5cf96338b8daa11"
 
 [[require]]
 name = "importGraph"
 git = "https://github.com/leanprover-community/import-graph"
-rev = "a41f0e9a4dea23188ea9cc1c41ac9f8bbafe0b93"
+rev = "b8cc5dd0a36233b88a6ed5a7dbf1207d09338c60"
 
 [[require]]
 name = "LeanSearchClient"
 git = "https://github.com/leanprover-community/LeanSearchClient"
-rev = "d6b4c7be5be75ec4917c873ac50c756dc1436372"
+rev = "c61286b7b63cbfd563b28e11e81d0a18233a044a"
 
 [[lean_exe]]
 name = "app"

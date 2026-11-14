@@ -53,10 +53,10 @@ function setup(t, { project = false } = {}) {
   const source = put(join(directory, 'Main.lean'), 'def main : IO Unit := pure ()');
   put(join(runtime, 'THIRD_PARTY_NOTICES.txt'), 'runtime notices');
   const calls = [];
-  const lean = { version: '4.35.0', commit: toolchainCatalog.lean['4.35.0'].commit, identity: 'lean-identity', prefix: join(root, 'lean') };
+  const lean = { version: '4.36.0-rc2', commit: toolchainCatalog.lean['4.36.0-rc2'].commit, identity: 'lean-identity', prefix: join(root, 'lean') };
   const record = (name, value) => (...args) => { calls.push([name, ...args]); return typeof value === 'function' ? value(...args) : value; };
   Object.assign(stubs, {
-    'managed-lean.mjs:selectLeanVersion': record('selectLeanVersion', async () => ({ version: '4.35.0' })),
+    'managed-lean.mjs:selectLeanVersion': record('selectLeanVersion', async () => ({ version: '4.36.0-rc2' })),
     'managed-lean.mjs:provisionLean': record('provisionLean', async (_, options) => ({ ...lean, ...(options.native ? { cCompiler: {} } : {}) })),
     'managed-link-toolchain.mjs:provisionLinkToolchain': record('provisionLinkToolchain', async () => ({ identity: 'toolchain-identity', toolchain: { version: linkToolchainCatalog.version } })),
     'system-git.mjs:checkSystemGit': record('checkSystemGit'),
@@ -95,12 +95,12 @@ test('a first build: the tools in order, the program linked, packaged and record
   assert.equal(result.cached, join(work, result.signature, 'dist'));
   assert.equal(result.output, result.cached);
   assert.match(result.signature, /^[0-9a-f]{64}$/);
-  assert.deepEqual(stages, ['Checking Lean 4.35.0 runtime', 'Checking Lean sources and imports', 'Checking application inputs and cached build',
+  assert.deepEqual(stages, ['Checking Lean 4.36.0-rc2 runtime', 'Checking Lean sources and imports', 'Checking application inputs and cached build',
     'Packaging the application and runtime support', 'Verifying and writing application output']);
   assert.deepEqual(calls.map(call => call[0]).filter(name => name !== 'log'), ['selectLeanVersion', 'applicationRuntime', 'provisionLean', 'applicationSources',
     'provisionLinkToolchain', 'linkApplication', 'copyApplicationHost']);
   const [, runtimeLean, runtimeOptions] = named('applicationRuntime')[0];
-  assert.deepEqual(runtimeLean, { version: '4.35.0', commit: toolchainCatalog.lean['4.35.0'].commit });
+  assert.deepEqual(runtimeLean, { version: '4.36.0-rc2', commit: toolchainCatalog.lean['4.36.0-rc2'].commit });
   assert.equal(runtimeOptions.directory, runtime);
   assert.equal(runtimeOptions.stamps, join(cache, 'verified'));
   const [, , , sourcesWork, sourcesOptions] = named('applicationSources')[0];
@@ -109,7 +109,7 @@ test('a first build: the tools in order, the program linked, packaged and record
   assert.equal(sourcesOptions.afterImports, undefined);
   const link = named('linkApplication')[0][1];
   assert.deepEqual(link.sources, [join(work, 'Main.c')]);
-  assert.equal(link.leanVersion, '4.35.0');
+  assert.equal(link.leanVersion, '4.36.0-rc2');
   assert.equal(link.memoryMode, 1);
   assert.equal(link.linkDriver, 'node');
   assert.equal(link.profile, 'release');
@@ -130,7 +130,7 @@ test('a first build: the tools in order, the program linked, packaged and record
   const info = JSON.parse(read('build-info.json'));
   assert.equal(read('build-info.json'), JSON.stringify(info, null, 2) + '\n');
   assert.deepEqual(info.modules, [{ module: 'Main', sourceSha256: sha(readFileSync(source)), cSha256: sha('int main(int argc, char ** argv) {}\n') }]);
-  for (const [key, value] of Object.entries({ schema: 1, profile: 'release', lean: '4.35.0', leanCommit: toolchainCatalog.lean['4.35.0'].commit, nativeLeanIdentity: 'lean-identity',
+  for (const [key, value] of Object.entries({ schema: 1, profile: 'release', lean: '4.36.0-rc2', leanCommit: toolchainCatalog.lean['4.36.0-rc2'].commit, nativeLeanIdentity: 'lean-identity',
     emscripten: linkToolchainCatalog.version, linkDriver: 'node', linkToolchainIdentity: sha(JSON.stringify(linkToolchainCatalog)), runtimeIdentity: 'runtime-identity',
     target: 'node', host: `${process.platform}-${process.arch}`, minimumNode: '24.0.0', minimumGlibc: '2.28', memoryMode: 1, signature: result.signature,
     linkToolchain: { identity: 'toolchain-identity', version: linkToolchainCatalog.version } }))
@@ -171,7 +171,7 @@ test('without progress the build logs what it prepares and builds; verbose passe
   const { source, named, run } = setup(t);
   await run({ verbose: true });
   const logs = named('log').map(call => call[1]);
-  assert.deepEqual(logs, ['Preparing Lean 4.35.0 for Node…', `Building ${relative(process.cwd(), source)} for Node…`]);
+  assert.deepEqual(logs, ['Preparing Lean 4.36.0-rc2 for Node…', `Building ${relative(process.cwd(), source)} for Node…`]);
   const options = named('applicationSources')[0][4];
   options.log('to the build log');
   assert.equal(named('log').at(-1)[1], 'to the build log');
@@ -455,7 +455,7 @@ test('the program must define main; the C tier without progress; licences of nat
 
 test('a tiered Lean records its tier and components; a link-only build copies no npm packages', async t => {
   const { directory, run } = setup(t);
-  stubs['managed-lean.mjs:provisionLean'] = async () => ({ version: '4.35.0', commit: toolchainCatalog.lean['4.35.0'].commit, identity: 'tiered',
+  stubs['managed-lean.mjs:provisionLean'] = async () => ({ version: '4.36.0-rc2', commit: toolchainCatalog.lean['4.36.0-rc2'].commit, identity: 'tiered',
     prefix: '/lean', distribution: 'tiers', tier: 'extended', components: ['base', 'extended'] });
   put(join(directory, 'package.json'), JSON.stringify({ dependencies: { left: '1' } }));
   put(join(directory, 'node_modules/left/package.json'), JSON.stringify({ name: 'left', version: '1.0.0' }));

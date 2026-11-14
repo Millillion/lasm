@@ -15,7 +15,7 @@ import { applicationNotices, leanRuntimeChanges, noticesSectionName } from '../s
 
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const emptyModule = Buffer.from([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00]);
-const nodeNotices = applicationNotices({ name: 'lean-4.35.0-wasm64', lean: '4.35.0', leanCommit: 'eb6cafb7290e8bd5f2937522d8d804f58f02bafc', emscripten: '6.0.9',
+const nodeNotices = applicationNotices({ name: 'lean-4.36.0-rc2-wasm64', lean: '4.35.0', leanCommit: 'eb6cafb7290e8bd5f2937522d8d804f58f02bafc', emscripten: '6.0.9',
   libraries: ['Init', 'Std', 'Lean', 'leanrt', 'uv'].map(name => `lib/lib${name}.a`),
   patches: Object.fromEntries(Object.keys(leanRuntimeChanges).map(name => [name, '0'.repeat(64)])) },
 ['Lean', 'Emscripten', 'LLVM libc++', 'musl', 'mimalloc', 'libuv'].map(name => `=== ${name} ===\n${name} licence text\n`).join('\n'));

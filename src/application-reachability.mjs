@@ -152,7 +152,19 @@ export function canSpecializeInitialization(runtime) {
     '79968781629d674bc8b506b3050c367ebc14503c869bc45436244c49ee5aee02',
     // Lean 4.35.0 (CI build 40518682274, source af51365, handoff 0646c068…): only
     // liblasmhost's node-async.cpp.o differs (UDP receives use the startup check).
-    '9921c696161a9852442863a19e16990f2d540aa369adaa353906504bb589649a'].includes(runtime.identity);
+    '9921c696161a9852442863a19e16990f2d540aa369adaa353906504bb589649a',
+    // Lean 4.36.0-rc2 (CI build 43570664322, source 2df2cd2, handoff d2de3d60…), reviewed
+    // against 4.35.0 on rc1 (lean-4.36 branch): initialize/init.cpp's `lean_initialize`
+    // moved into `initialize_impl(false)` and still initializes Init, Std and the whole
+    // Lean package, then the kernel and library modules (the minimal variant is
+    // separate); runtime/init_module.cpp adds only `initialize_cadical`, which this
+    // runtime builds without CaDiCaL (an empty function); libleancpp's library and util
+    // modules dropped `num` and `ascii`. rc1 -> rc2 changes no C++ file (init.cpp and
+    // init_module.cpp byte-identical; only Lean sources, tests and the native-only
+    // lean-beam build target), and Lasm's runtime sources since the last rc1 build
+    // (03a516b) only lost unused files. The runtime's own initialization therefore
+    // still stands alone, so the specialization's premise holds.
+    'e59893b53c7aeafd5f3f503bb7d1cb7e3615f14494206b6dda2246b188641eea'].includes(runtime.identity);
 }
 export const selectiveInitialization = 'void lean_initialize_runtime_module(void);\n'
   + 'void __wrap_lean_initialize(void) { lean_initialize_runtime_module(); }\n';

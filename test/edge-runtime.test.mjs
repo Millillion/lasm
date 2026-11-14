@@ -18,7 +18,7 @@ import { edgeLinkSettings } from '../src/edge/edge-link.mjs';
 
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const base = 'b'.repeat(64);
-const nodeRuntime = (manifest = {}) => ({ identity: base, manifest: { lean: '4.35.0', name: 'lean-4.35.0-wasm64', ...manifest } });
+const nodeRuntime = (manifest = {}) => ({ identity: base, manifest: { lean: '4.35.0', name: 'lean-4.36.0-rc2-wasm64', ...manifest } });
 
 /** A runtime directory: lib/<archive>, sysroot/lib/<dir>/<library>, libraries.json. */
 function runtimeTree(directory, { extras = true, sysroot = true, manifest = {} } = {}) {

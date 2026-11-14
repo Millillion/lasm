@@ -4,7 +4,7 @@
 // links that prefix as an elan toolchain and sets it as the project's elan
 // override, so `lake serve` (the language server) resolves every `Lasm.*`
 // import with exactly the Lean and library that `lasm build` uses. The project's
-// files are unchanged (`lean-toolchain` keeps `leanprover/lean4:v4.35.0`); the
+// files are unchanged (`lean-toolchain` keeps `leanprover/lean4:v4.36.0-rc2`); the
 // override is per machine and per directory (`elan override unset` undoes it).
 // A project whose Lake packages have C code (extern_lib, precompileModules, …)
 // gets the prefix with Lean's C compiler and headers, as `lasm build` uses for
