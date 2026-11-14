@@ -6,7 +6,7 @@ import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
-import { c as tar } from 'tar';
+import { directoryEntries, writeTar } from '../src/tar.mjs';
 import { provisionArtifact, hashFile } from '../src/managed-artifacts.mjs';
 import { windowsToolPrefix } from '../src/windows-tool-paths.mjs';
 
@@ -24,7 +24,7 @@ test('a Windows deny-delete handle delays cleanup without losing a published too
     const cache = join(base, 'cache'), archive = join(base, 'archive.tgz');
     await mkdir(join(base, 'source/tool'), { recursive: true });
     await writeFile(join(base, 'source/tool/compiler'), 'verified compiler');
-    await tar({ cwd: join(base, 'source'), file: archive, gzip: true, portable: true }, ['tool']);
+    await writeTar(archive, directoryEntries(join(base, 'source'), ['tool']), { gzip: true });
     const bytes = await readFile(archive), warnings = [];
     const artifact = { name: 'windows-lock-fixture', root: 'tool', format: 'tar.gz', url: 'https://example.invalid/tool',
       bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'), maximumExtractedBytes: 10000 };
