@@ -92,7 +92,7 @@
       "bytes": 489740247,
       "root": "clang+llvm-23.1.1-x86_64-pc-windows-msvc",
       "path": "lib/clang/23/include",
-      "license": "notices/llvm-clang-LICENSE.txt"
+      "license": "../link-driver/notices/clang-LICENSE.TXT"
     },
     "libc": {
       "linux-x64": {
