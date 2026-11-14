@@ -9,6 +9,7 @@ import { createServer as createNetServer, connect } from 'node:net';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve, sep } from 'node:path';
 import { listenError } from './browser/static-server.mjs';
+import { leanHeaderImports } from './application-sources.mjs';
 
 const reloadClient = `<script type="module">
 // Injected by lasm dev: reloads the page when a rebuild finishes.
@@ -18,8 +19,10 @@ source.addEventListener('error-report', event => console.error('[lasm dev] ' + J
 </script>`;
 
 /** The project's Lean files `entry` imports, directly or not, itself included
- * (module `A.B` is `A/B.lean` under the project). Imports from outside the
- * project (Lean, Std, Lasm, packages) are not followed. */
+ * (module `A.B` is `A/B.lean` under the project, `A.«b c»` is `A/b c.lean`).
+ * Imports from outside the project (Lean, Std, Lasm, packages) are not
+ * followed. The header is read generously (leanHeaderImports): a file it
+ * names that Lean would not import only rebuilds more. */
 export function importClosure(project, entry) {
   const files = new Set();
   const visit = file => {
@@ -27,14 +30,7 @@ export function importClosure(project, entry) {
     files.add(file);
     let text;
     try { text = readFileSync(file, 'utf8'); } catch { return; }
-    // The header: everything before the first declaration-like line.
-    for (const line of text.replace(/\/-[\s\S]*?-\//g, '').split('\n')) {
-      const t = line.trim();
-      if (!t || t.startsWith('--')) continue;
-      const m = /^(?:public\s+|meta\s+|private\s+)*import\s+(.+)$/.exec(t);
-      if (!m) { if (/^(module|prelude)\b/.test(t)) continue; break; }
-      for (const name of m[1].split(/\s+/)) if (/^[A-Za-z_][\w.]*$/.test(name)) visit(join(project, ...name.split('.')) + '.lean');
-    }
+    for (const name of leanHeaderImports(text).imports) visit(join(project, ...name) + '.lean');
   };
   visit(resolve(entry));
   return files;
@@ -79,14 +75,22 @@ export function startDevProxy({ port, host = '127.0.0.1', upstreamPort }) {
   const forward = (request, response, body, attempt = 0) => {
     const headers = { ...request.headers, host: `127.0.0.1:${upstreamPort}` };
     delete headers['accept-encoding'];
+    let answered = false;
     const upstream = httpRequest({ host: '127.0.0.1', port: upstreamPort, method: request.method, path: request.url, headers }, reply => {
+      answered = true;
+      // A server that stops mid-reply (killed for a rebuild, or a crash) cuts
+      // the client's response too, instead of leaving it open for ever.
+      reply.on('error', () => {});
+      reply.on('close', () => { if (!reply.complete) response.destroy(); });
       const type = String(reply.headers['content-type'] ?? '');
       if (/^text\/html/.test(type) && request.method !== 'HEAD') {
         const chunks = [];
         reply.on('data', c => chunks.push(c));
         reply.on('end', () => {
-          const html = Buffer.concat(chunks).toString('utf8');
-          const out = html.includes('</body>') ? html.replace('</body>', reloadClient + '\n</body>') : html + reloadClient;
+          // Bytes, not text: a page in another charset than UTF-8 keeps its bytes.
+          const page = Buffer.concat(chunks), at = page.indexOf('</body>');
+          const out = at < 0 ? Buffer.concat([page, Buffer.from(reloadClient)])
+            : Buffer.concat([page.subarray(0, at), Buffer.from(reloadClient + '\n'), page.subarray(at)]);
           const h = { ...reply.headers, 'cache-control': 'no-store' };
           delete h['content-length']; delete h['content-encoding'];
           response.writeHead(reply.statusCode, h).end(out);
@@ -96,11 +100,17 @@ export function startDevProxy({ port, host = '127.0.0.1', upstreamPort }) {
         reply.pipe(response);
       }
     });
-    upstream.on('error', () => {
-      // The server is (re)starting: wait for it, then fail with a page that reloads when it is back.
-      if (attempt < 100) setTimeout(() => forward(request, response, body, attempt + 1), 100);
+    upstream.on('error', error => {
+      // The server is (re)starting: wait for it, then fail with a page that
+      // reloads when it is back. Only a refused connection is retried: the
+      // server never saw the request. Any other failure (a malformed reply, a
+      // connection reset after the request was sent) is a 502 at once, so a
+      // request the server received is never sent twice.
+      if (answered) response.destroy();
+      else if (error?.code === 'ECONNREFUSED' && attempt < 100) setTimeout(() => forward(request, response, body, attempt + 1), 100);
       else if (!response.headersSent) response.writeHead(502, { 'content-type': 'text/html; charset=utf-8' })
         .end(`<!doctype html><title>lasm dev</title><p>The server is not running (see the terminal).</p>${reloadClient}`);
+      else response.destroy();
     });
     upstream.end(body);
   };
