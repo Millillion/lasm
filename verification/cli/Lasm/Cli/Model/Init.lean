@@ -12,9 +12,19 @@ Lasm.Cli.Theorems proves its propositions.
 | `templates` (`summary`, `server`) | `templateTable`; `templates` its names |
 | `initUsage` | `initUsage` (`padEnd`) |
 | `parseInitArguments(tokens)` | `parseInitArguments` (the loop, `initLoop`; the checks after it, `initFinish`) |
+| `packageName(directory)` after `basename(resolve(directory)).toLowerCase()` | `packageNameOf` |
+| `lakeName(name)` | `lakeNameOf` |
+| `supabaseFunctionNameOf(packageName)` after `String(packageName).toLowerCase()` | `supabaseNameOf` (the scope, `dropScope`) |
+| `.replace(/[^…]+/g, r)`, `.replace(/^[…]+\|[…]+$/g, '')` | `replaceRuns`, `strip` |
 
 `Object.keys` lists an object's keys in insertion order: the tables are in
 the source's order. `Object.hasOwn(table, name)` is membership of the names.
+
+The names work on characters: the patterns' classes are ASCII, so a run of
+UTF-16 units outside a class is a run of characters outside it. What comes
+before them, Node's `path.basename(path.resolve(…))` and JavaScript's
+`toLowerCase` (Unicode's mapping), is not modelled: the models take its
+result, which the differential computes in JavaScript.
 -/
 import Lasm.Cli.Model.CliArguments
 
@@ -164,5 +174,59 @@ def parseInitArguments (tokens : List String) : Except String Parsed :=
   | .error e => .error e
   | .ok none => .ok { command := "init-help" }
   | .ok (some st) => initFinish st
+
+/-! ## Generated names -/
+
+/-- `text.replace(/[^…]+/g, r)`: each maximal run of characters outside
+`keep` becomes `r`. -/
+def replaceRuns (keep : Char → Bool) (r : Char) : List Char → List Char
+  | [] => []
+  | c :: cs => if keep c then c :: replaceRuns keep r cs else r :: replaceRuns keep r (cs.dropWhile (fun d => !keep d))
+termination_by l => l.length
+decreasing_by
+  all_goals
+    have := (List.dropWhile_sublist (l := cs) (fun d => !keep d)).length_le
+    simp only [List.length_cons]
+    omega
+
+/-- Removing a leading run of `lead` and a trailing run of `trail`
+(`.replace(/^[…]+|[…]+$/g, '')`). -/
+def strip (lead trail : Char → Bool) (l : List Char) : List Char :=
+  ((l.dropWhile lead).reverse.dropWhile trail).reverse
+
+/-- The characters of an npm package name. -/
+def npmChar (c : Char) : Bool := c.isLower || c.isDigit || c = '.' || c = '_' || c = '-'
+
+/-- `packageName(directory)` after `basename(resolve(directory)).toLowerCase()`. -/
+def packageNameOf (lowered : String) : String :=
+  let name := strip (fun c => c = '.' || c = '_' || c = '-') (· = '-') (replaceRuns npmChar '-' lowered.toList)
+  if name = [] then "lean-app" else String.ofList name
+
+/-- The characters of a Lake package name. -/
+def lakeChar (c : Char) : Bool := c.isAlphanum || c = '_'
+
+/-- `lakeName(name)`. -/
+def lakeNameOf (name : String) : String :=
+  let id := strip (· = '_') (· = '_') (replaceRuns lakeChar '_' name.toList)
+  if (id.head?.map Char.isAlpha) = some true then String.ofList id
+  else String.ofList ("app".toList ++ (if id = [] then [] else '_' :: id))
+
+/-- The characters of a Supabase function name. -/
+def supabaseChar (c : Char) : Bool := c.isLower || c.isDigit || c = '-'
+
+/-- `.replace(/^@[^/]+\//, '')`. -/
+def dropScope : List Char → List Char
+  | '@' :: rest =>
+    match rest.span (· ≠ '/') with
+    | (a, '/' :: b) => if a = [] then '@' :: rest else b
+    | _ => '@' :: rest
+  | l => l
+
+/-- `supabaseFunctionNameOf(packageName)` after `String(packageName).toLowerCase()`. -/
+def supabaseNameOf (lowered : String) : String :=
+  let name := (strip (· = '-') (· = '-') (replaceRuns supabaseChar '-' (dropScope lowered.toList))).take 54
+  let name := if name = [] then "lasm-app".toList else name
+  if (name.head?.map Char.isLower) = some true then String.ofList name
+  else String.ofList (("lasm-".toList ++ name).take 54)
 
 end Lasm.Cli

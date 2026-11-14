@@ -40,6 +40,7 @@ import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.ProcessLauncher
+import Lasm.Cli.Model.Python
 import Lasm.Cli.Model.WasiComponent
 import Lasm.Cli.Model.Zip
 
@@ -263,12 +264,17 @@ def initializerName (n : String) : Bool :=
 
 /-! ## `lasm init` names (src/init.mjs) -/
 
-/-- `packageName(directory)`. -/
-opaque packageName : String → String
-/-- `lakeName(name)`. -/
-opaque lakeName : String → String
-/-- `supabaseFunctionNameOf(packageName)`. -/
-opaque supabaseFunctionNameOf : String → String
+/-- Not Lasm's JavaScript: Node's `path.basename(path.resolve(directory))`,
+then JavaScript's `toLowerCase()`. -/
+opaque lowerBasename : String → String
+/-- Not Lasm's JavaScript: `String(value).toLowerCase()` (Unicode's mapping). -/
+opaque jsToLowerCase : String → String
+/-- `packageName(directory)`: modelled in Model/Init.lean. -/
+def packageName (directory : String) : String := packageNameOf (lowerBasename directory)
+/-- `lakeName(name)`: modelled in Model/Init.lean. -/
+def lakeName (name : String) : String := lakeNameOf name
+/-- `supabaseFunctionNameOf(packageName)`: modelled in Model/Init.lean. -/
+def supabaseFunctionNameOf (name : String) : String := supabaseNameOf (jsToLowerCase name)
 
 /-! ## Development server (src/dev.mjs, src/browser/static-server.mjs) -/
 
@@ -308,14 +314,12 @@ def backoff (attempt : Nat) : Nat := min 60000 (2000 * 2 ^ (attempt - 1))
 
 /-! ## The link driver's Python semantics (src/link-driver/python.mjs) -/
 
-/-- `pythonJsonString(value)`: `json.dumps` of a string, `ensure_ascii`. -/
-opaque pythonJsonString : String → String
+-- `pythonJsonString(value)` and `comparePythonStrings(a, b)`: modelled in
+-- Model/Python.lean.
 
 /-- `pythonJsonDumps(value, { indent, sortKeys })`, or the message it throws. -/
 opaque pythonJsonDumps : Lean.Json → Option Nat → Bool → Except String String
 
-/-- `comparePythonStrings(a, b)`: negative, zero or positive. -/
-opaque comparePythonStrings : String → String → Int
 
 /-! ## WebAssembly (src/wasi/lower-atomics.mjs, src/wasi/wasi-component.mjs) -/
 

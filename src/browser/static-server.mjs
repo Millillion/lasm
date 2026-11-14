@@ -49,7 +49,9 @@ export function startStaticServer(root, { port = 0, host = '127.0.0.1', liveRelo
         return;
       }
       if (request.method !== 'GET' && request.method !== 'HEAD') { response.writeHead(405, { allow: 'GET, HEAD' }).end(); return; }
-      let path = decodeURIComponent(url.pathname);
+      let path;
+      try { path = decodeURIComponent(url.pathname); }
+      catch { response.writeHead(400, { 'content-type': 'text/plain; charset=utf-8' }).end('Bad request: the path is not valid percent-encoded UTF-8\n'); return; }
       if (path.endsWith('/')) path += 'index.html';
       let file = normalize(join(root, path));
       if (file !== root && !file.startsWith(root + sep)) { response.writeHead(403).end(); return; }
