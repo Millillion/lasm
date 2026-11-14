@@ -38,6 +38,7 @@ import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.LowerAtomics
 import Lasm.Cli.Model.Mangle
 import Lasm.Cli.Model.StaticServer
+import Lasm.Cli.Model.Reachability
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
@@ -203,6 +204,12 @@ def unquote (line : String) : Option String :=
   match line.toList with
   | '"' :: r => if r.getLast? = some '"' then some (String.ofList (unescape r.dropLast)) else none
   | _ => none
+
+/-- `applicationLinkRequirements(map, { initializationFreeCppSymbols })`
+(src/application-reachability.mjs; modelled in Model/Reachability.lean):
+what the linker map of the reachability link requires, or the message thrown. -/
+def linkRequirements (initFree : String → Bool) (map : String) : Except String Reachability.Requirements :=
+  Reachability.applicationLinkRequirements (fun s => initFree (String.ofList s)) map.toList
 
 /-! ## The process launcher (src/process-launcher.mjs) -/
 

@@ -210,6 +210,22 @@ def mangle_round_trip : Prop :=
     initializerModule ("runtime_initialize_" ++ mangleName n) = some n ∧
     mangleName n ≠ "" ∧ (mangleName n).all fun c => c.isAlphanum || c = '_'
 
+/-- **A static application has no evidence of runtime evaluation.** When
+the reader accepts a linker map and calls the application static, no row
+of the map names a dynamic loader or symbol lookup, and every section it
+kept from Lean's C++ library (`libleancpp.a`) is read-only data or belongs
+to an initialization-free inline helper; it is static exactly when it lists
+no dynamic symbol and no C++ member.
+Tested by: test/application-reachability.test.mjs -/
+def link_map_static_sound : Prop :=
+  ∀ (initFree : String → Bool) (map : String) (r : Reachability.Requirements),
+    linkRequirements initFree map = .ok r →
+    (r.static = true ↔ r.dynamic = [] ∧ r.cxxRuntime = []) ∧
+    (r.static = true → ∀ line ∈ ((Reachability.trimEnd map.toList).splitOn '\n').tail, ∀ t,
+      Reachability.rowText line = some t → t ∉ Reachability.dynamicSymbols ∧
+      ∀ m s, Reachability.memberSection t = some (m, s) →
+        Reachability.independent (fun x => initFree (String.ofList x)) s = true)
+
 /-! ## The link driver's Python semantics -/
 
 /-- **Escaped strings are printable ASCII.** `json.dumps` of any string,

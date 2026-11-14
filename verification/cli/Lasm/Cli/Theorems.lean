@@ -3908,6 +3908,176 @@ theorem static_inside_root : Spec.static_inside_root := by
   simp only [String.toList_ofList]
   exact h.2 s hs
 
+/-! ## The reachability link's map (Model/Reachability.lean)
+
+Every accepted line leaves its evidence in the reader (`readLine_records`):
+a dynamic symbol among the symbols, a dependent C++ member among the
+members; the evidence only grows over the lines (`fold_records`), and
+`finish` calls the application static only when both lists are empty.
+-/
+
+namespace ReachProofs
+open Lasm.Cli.Reachability
+
+/-- What a reader has recorded about one line it accepted. -/
+def Recorded (initFree : List Char → Bool) (r : Reader) (line : List Char) : Prop :=
+  ∀ t, rowText line = some t →
+    (t ∈ dynamicSymbols → t ∈ r.symbols) ∧
+    ∀ m s, memberSection t = some (m, s) → independent initFree s = false → m ∈ r.cxx
+
+/-- What a reader keeps: header, symbols and members only grow. -/
+def Grows (r r' : Reader) : Prop :=
+  (r.header = true → r'.header = true) ∧ r.symbols ⊆ r'.symbols ∧ r.cxx ⊆ r'.cxx
+
+theorem dropWhile_nil {p : Char → Bool} : ∀ {l : List Char}, l.dropWhile p = [] → ∀ x ∈ l, p x = true
+  | [], _ => by simp
+  | c :: cs, h => by
+    by_cases hc : p c = true
+    · rw [List.dropWhile_cons_of_pos hc] at h
+      intro x hx; simp only [List.mem_cons] at hx; rcases hx with rfl | hx
+      · exact hc
+      · exact dropWhile_nil h x hx
+    · rw [List.dropWhile_cons_of_neg hc] at h; simp at h
+
+theorem dropWhile_head {p : Char → Bool} {c : Char} {cs : List Char} :
+    ∀ {l : List Char}, l.dropWhile p = c :: cs → p c = false
+  | [], h => by simp at h
+  | d :: ds, h => by
+    by_cases hd : p d = true
+    · rw [List.dropWhile_cons_of_pos hd] at h; exact dropWhile_head h
+    · rw [List.dropWhile_cons_of_neg hd] at h; simp at h; rw [← h.1]; simpa using hd
+
+theorem blank_no_row (line : List Char) (h : trim line = []) : rowText line = none := by
+  have hx : line.dropWhile jsSpace = [] := by
+    unfold trim trimEnd at h
+    rw [List.reverse_eq_nil_iff] at h
+    cases hd : line.dropWhile jsSpace with
+    | nil => rfl
+    | cons c cs =>
+      exfalso
+      have hc : jsSpace c = false := dropWhile_head hd
+      rw [hd] at h
+      have := dropWhile_nil h c (by simp)
+      rw [hc] at this; exact absurd this (by decide)
+  unfold rowText; rw [hx]; rfl
+
+theorem readLine_records (initFree : List Char → Bool) (r r' : Reader) (line : List Char)
+    (hh : r.header = true) (h : readLine initFree r line = .ok r') :
+    Grows r r' ∧ Recorded initFree r' line := by
+  unfold readLine at h
+  rw [hh] at h
+  simp only [Bool.not_true, Bool.false_eq_true, if_false] at h
+  by_cases hb : trim line = []
+  · rw [if_pos hb] at h; cases h
+    refine ⟨⟨id, fun _ h => h, fun _ h => h⟩, fun t ht => ?_⟩
+    rw [blank_no_row line hb] at ht; simp at ht
+  · rw [if_neg hb] at h
+    cases hrow : rowText line with
+    | none => rw [hrow] at h; simp at h
+    | some t =>
+      rw [hrow] at h
+      simp only at h
+      have g1 : Grows r (noteRow r t) := ⟨fun h => h, fun x hx => by
+          simp only [noteRow]; split <;> simp_all, fun x hx => hx⟩
+      have s1 : t ∈ dynamicSymbols → t ∈ (noteRow r t).symbols := by
+        intro ht; simp only [noteRow]; rw [if_pos (by simp [ht])]; simp
+      cases hm : memberSection t with
+      | none =>
+        rw [hm] at h; simp only at h
+        split at h
+        · simp at h
+        · cases h
+          refine ⟨g1, fun t' ht' => ?_⟩
+          rw [hrow] at ht'; cases ht'
+          exact ⟨s1, fun m s hms => by rw [hm] at hms; simp at hms⟩
+      | some p =>
+        obtain ⟨member, sec⟩ := p
+        rw [hm] at h; simp only [Except.ok.injEq] at h; subst h
+        refine ⟨⟨fun hh' => by split <;> exact g1.1 hh', ?_, ?_⟩, fun t' ht' => ?_⟩
+        · split
+          · exact g1.2.1
+          · exact g1.2.1
+        · split
+          · exact fun x hx => hx
+          · simp only [noteRow]; exact fun x hx => List.mem_append_left _ hx
+        · rw [hrow] at ht'; cases ht'
+          refine ⟨fun hd => by split <;> exact s1 hd, fun m s hms hind => ?_⟩
+          rw [hm] at hms; simp only [Option.some.injEq, Prod.mk.injEq] at hms; obtain ⟨rfl, rfl⟩ := hms
+          rw [if_neg (by simp [hind])]; simp
+
+theorem fold_records (initFree : List Char → Bool) : ∀ (lines : List (List Char)) (r r' : Reader),
+    r.header = true → lines.foldlM (readLine initFree) r = .ok r' →
+    Grows r r' ∧ ∀ line ∈ lines, Recorded initFree r' line
+  | [], r, r', _, h => by
+    simp only [List.foldlM_nil] at h; cases h
+    exact ⟨⟨id, fun _ h => h, fun _ h => h⟩, by simp⟩
+  | l :: ls, r, r', hh, h => by
+    simp only [List.foldlM_cons] at h
+    cases hl : readLine initFree r l with
+    | error e => rw [hl] at h; cases h
+    | ok r1 =>
+      rw [hl] at h
+      obtain ⟨g1, rec1⟩ := readLine_records initFree r r1 l hh hl
+      obtain ⟨g2, rec2⟩ := fold_records initFree ls r1 r' (g1.1 hh) h
+      refine ⟨⟨fun h => g2.1 (g1.1 h), fun x hx => g2.2.1 (g1.2.1 hx), fun x hx => g2.2.2 (g1.2.2 hx)⟩, ?_⟩
+      intro line hline
+      simp only [List.mem_cons] at hline
+      rcases hline with rfl | hline
+      · intro t ht
+        obtain ⟨a, b⟩ := rec1 t ht
+        exact ⟨fun hd => g2.2.1 (a hd), fun m s hms hi => g2.2.2 (b m s hms hi)⟩
+      · exact rec2 line hline
+
+theorem static_sound (initFree : List Char → Bool) (map : List Char) (r : Requirements)
+    (h : applicationLinkRequirements initFree map = .ok r) :
+    (r.static = true ↔ r.dynamic = [] ∧ r.cxxRuntime = []) ∧
+    (r.static = true → ∀ line ∈ ((trimEnd map).splitOn '\n').tail, ∀ t, rowText line = some t →
+      t ∉ dynamicSymbols ∧ ∀ m s, memberSection t = some (m, s) → independent initFree s = true) := by
+  unfold applicationLinkRequirements at h
+  obtain ⟨l0, ls, hls⟩ : ∃ l0 ls, (trimEnd map).splitOn '\n' = l0 :: ls := by
+    cases h' : (trimEnd map).splitOn '\n' with
+    | nil => exact absurd h' (List.splitOn_ne_nil _ _)
+    | cons l0 ls => exact ⟨l0, ls, rfl⟩
+  rw [hls] at h ⊢
+  simp only [List.tail_cons]
+  cases hfold : (l0 :: ls).foldlM (readLine initFree) {} with
+  | error e => rw [hfold] at h; cases h
+  | ok r' =>
+    rw [hfold] at h
+    simp only [bind, Except.bind] at h
+    simp only [List.foldlM_cons] at hfold
+    cases h0 : readLine initFree {} l0 with
+    | error e => rw [h0] at hfold; cases hfold
+    | ok r0 =>
+      rw [h0] at hfold
+      have hh : r0.header = true := by
+        unfold readLine at h0; simp only [Bool.not_false, if_true] at h0
+        split at h0
+        · cases h0
+        · cases h0; rfl
+      obtain ⟨-, rec⟩ := fold_records initFree ls r0 r' hh hfold
+      unfold Reachability.finish at h
+      split at h
+      · cases h
+      · cases h
+        simp only [Bool.and_eq_true, List.isEmpty_iff]
+        refine ⟨trivial, fun ⟨hd, hc⟩ line hline t ht => ⟨fun hdyn => ?_, fun m s hms => ?_⟩⟩
+        · have := (rec line hline t ht).1 hdyn
+          have hmem : t ∈ dynamicSymbols.filter r'.symbols.contains := List.mem_filter.mpr ⟨hdyn, by simpa using this⟩
+          rw [hd] at hmem; simp at hmem
+        · cases hi : independent initFree s with
+          | true => rfl
+          | false =>
+            have := (rec line hline t ht).2 m s hms hi
+            have hmem : m ∈ sortedUnique r'.cxx := by
+              simp only [sortedUnique, List.mem_mergeSort]; exact List.mem_eraseDups.mpr this
+            rw [hc] at hmem; simp at hmem
+
+end ReachProofs
+
+theorem link_map_static_sound : Spec.link_map_static_sound := fun initFree map r h =>
+  ReachProofs.static_sound (fun x => initFree (String.ofList x)) map.toList r h
+
 /-! ## Function packages -/
 
 theorem zip_deterministic : Spec.zip_deterministic := fun _ => rfl
