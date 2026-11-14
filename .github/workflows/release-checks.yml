@@ -67,7 +67,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - name: Compare the version with the previous commit and with npm
         id: detect
@@ -108,7 +108,7 @@ jobs:
     with:
       base-release: ${{ inputs.candidate-release || needs.candidate.outputs.tested-release }}
       base-sha256: ${{ inputs.candidate-sha256 || needs.candidate.outputs.sha256 }}
-      node: 26.13.0
+      node: 26.13.1
       version: ${{ needs.detect.outputs.version }}
       license: MIT
       overlay-source: ${{ inputs.overlay-source == true }}

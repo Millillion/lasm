@@ -32,7 +32,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | Layer | What it checks | Where | CI tier |
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) and [fuzzing](#differential-fuzzing) | Lasm-compiled programs (generated expressions, statements, and feature programs declaring classes, inductives, closures, loops, structures) behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
-| [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic equals Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs` | PR, nightly |
+| [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic, and Ledger's API traffic, equal Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs`, `examples/*/test/equivalence.mjs` | PR, nightly |
 | [Standard bindings](#standard-bindings) | Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun are their generator's output (Lasm.JS.Node's lowering is that of the pinned Node docs, Lasm.JS.Deno's and Lasm.JS.Bun's that of the pinned TypeScript declarations), and behave as the specs, Node's docs and the declarations say on every target: WPT's URL and urlencoded data, Lean's UTF-8, hex, base64 and path operations as oracles, published crypto vectors, generated round trips, files and child processes, a Lean handler served by Deno.serve, Bun.serve and @hono/node-server and requested over HTTP | `scripts/bindings/`, `test/fixtures/js-web/`, `test/fixtures/js-node/`, `test/fixtures/js-serve/`, `web-bindings.yml` | PR (paths), main |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
@@ -43,7 +43,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `examples/*/test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
 | [Named propositions](#named-propositions) | Every test that names a Lean proposition names one that exists and states it verbatim; every candidate (tested, not yet proved) names a test that cites it; every `forAll` property names one | `scripts/propositions.mjs`, `library/Lasm/*/Candidates.lean`, `verification/cli/`, `test/propositions.test.mjs` | PR (`unit.yml`) |
-| [Model differentials](#model-differentials) | Each Lean model of the CLI's JavaScript agrees with it on generated inputs; every shipped JavaScript and C module has a Lean model or a stated reason (the M4 inventory) | `verification/cli/Lasm/Cli/Model/`, `test/models/`, `cli-models.yml`; `verification/models.json`, `verification/MODELS.md`, `scripts/models.mjs`, `test/models-inventory.test.mjs` | PR (paths; the inventory in `unit.yml`) |
+| [Model differentials](#model-differentials) | Each Lean model of the CLI's JavaScript, and of the Lasm.UI applier, agrees with it on generated inputs; every shipped JavaScript and C module has a Lean model or a stated reason (the M4 inventory) | `verification/cli/Lasm/Cli/Model/`, `library/Lasm/UI/Proofs/Applier.lean`, `test/models/`, `cli-models.yml`, `ui-applier-model.yml`; `verification/models.json`, `verification/MODELS.md`, `scripts/models.mjs`, `test/models-inventory.test.mjs` | PR (paths; the inventory in `unit.yml`) |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (`unit.yml`), nightly, release |
 | [Flaky tests](#flaky-tests) | A flaky test is quarantined at once, then fixed or deleted within a week | `test/quarantine.json`, `scripts/test/`, `scripts/ci/flaky-report.mjs` (`flaky.yml`) | nightly report; quarantine on every unit run |
 | [Coverage and mutation](#coverage-and-mutation-testing) | How much of the JavaScript the tests execute, and whether they would notice a change | `scripts/coverage/`, `scripts/mutation/` (`mutation.yml`) | PR, nightly and release (coverage); nightly and PR, changed modules only (mutation) |
@@ -478,7 +478,8 @@ too: a change on Node shows up as a diff in review.
 platform differences in URL parsing. **What it cannot catch:** behaviour the
 corpus does not exercise; timing; headers platforms add themselves (`date`,
 `server`, framing), which are deliberately not compared. Conduit's RealWorld
-traffic is compared too, with its tokens and timestamps normalized (next section).
+traffic is compared too, with its tokens and timestamps normalized (next section),
+and so is the flagship apps' own test traffic ([below](#the-flagship-apps-recorded-traffic)).
 
 #### Conduit's RealWorld traffic
 **Property.** On every target Conduit's CI runs, the official RealWorld API
@@ -535,6 +536,45 @@ body byte (key order, escaping, number formatting, error bodies), which user a
 token belongs to, a write a store lost. **What it cannot catch:** requests the
 suite does not send; behaviour under concurrency (`examples/conduit/test/concurrency.mjs`);
 bugs that are the same on every target, Node included; timing.
+
+#### The flagship apps' recorded traffic
+
+**Property.** On every platform an app's README claims (the rows of
+[`scripts/evidence/apps.json`](../scripts/evidence/apps.json)), the requests
+the app's own outside-oracle tests send get the same answers as on Node: equal
+statuses, equal response headers (apart from `IGNORED_HEADERS` and the
+platform's `PLATFORM_HEADERS`) and equal bodies, exchange by exchange, once
+the app's documented nondeterminism is normalized.
+
+[`scripts/equivalence/traffic.mjs`](../scripts/equivalence/traffic.mjs) holds
+what the apps share: a recording reverse proxy (as Conduit's), a recorder at
+the fetch level for drivers whose clients must see the server's own origin, the
+generic normalization (header names lower-cased and sorted, Conduit's
+ignored headers dropped, and `content-encoding` too: the client accepts gzip,
+`wrangler dev` uses it and Node does not, so the body is compared after the
+coding is undone; bodies over 16 KiB kept as their SHA-256 and length), one
+more platform rule (on Workers, the apps' `wrangler.toml` lets Workers' own
+asset serving answer for the browser page's files before the Worker runs: on
+those responses, recognized by its `cf-cache-status`, the caching headers it
+owns, `cache-control`, `etag`, `vary` and `cf-cache-status`, are left out on
+both sides, while the bytes are still compared), the alignment and diff, and the `compare NAME` /
+`self-test` command line. Each app's `examples/<app>/test/equivalence.mjs` adds its own
+normalizer and documents each rule; its Node job writes
+`test-results/normalized-SUITE-node-24.json`, which is committed as
+`examples/<app>/test/equivalence/SUITE.json` and reviewed like code, for the reasons Conduit's
+golden file is. Every Node and platform job of the app runs the comparison as
+its step after the recorded driver; the Node jobs run the normalizer's
+self-test first.
+
+| App | Recorded driver (suite) | Normalized, and why | Not recorded |
+| --- | --- | --- | --- |
+| Ledger | `test/api.mjs --equivalence` through the proxy (`api`) | Timestamps (`"timestamp"` in bodies, `?after=` in paths) become their rank among the run's timestamps: they are nanoseconds from the server's clock, while their order is still compared; their count, and that each is above 10^18, are compared as facts | The bank workload (concurrent and random) |
+
+**What it catches:** a platform's adapter, store or runtime answering one of
+the app's real requests differently from Node: a status, a header, a body
+byte, an order of rows, a reference between issued and used values. **What it
+cannot catch:** requests the drivers do not send; what is not recorded;
+bugs the same on every target.
 
 ### Standard bindings
 
@@ -1283,6 +1323,35 @@ targets `serverless-http`, `lasm-js-wire` and `ui-decode` are the model
 differentials of src/serverless/, the Lasm.JS codec and the UI applier's
 reading.
 
+The Lasm.UI applier's DOM operations and hydration (src/lasm-modules/ui-dom.mjs)
+have a Lean model, [library/Lasm/UI/Proofs/Applier.lean](../library/Lasm/UI/Proofs/Applier.lean):
+the applier's `apply(frame)` over an abstract DOM tree, every node looked up
+by id in one table for the document as the JavaScript does, with the DOM's
+refusals (an id not in the document, an insert before a node that is not a
+child, into a text node or into the moved node's own subtree, attributes on
+a text node) and hydration's adoption of server-rendered nodes.
+[test/models/ui-applier-differential.mjs](../test/models/ui-applier-differential.mjs)
+(`ui-applier-model.yml`, on changes to the applier or Lasm.UI) applies the
+same frames with the shipped applier on happy-dom, whose insertion checks it
+makes the DOM standard's (happy-dom inserts into text nodes and before nodes
+that are not children, where browsers throw), and with the model
+(`lean --run` [test/models/UiApplierModel.lean](../test/models/UiApplierModel.lean)),
+and fails when the DOMs differ after any frame or one side refuses a frame
+the other applies. It draws 1000 sessions of each kind: Lean's own diff of
+random views (keyed and unkeyed children, reorders, inserts, removals, tag,
+text and attribute changes; every patch must conform, the candidate
+`Lasm.UI.Candidates.diff_conforms`, and every frame apply), random
+operations from the DOM's own nodes (most apply, a tenth are refused), and
+hydration of random server DOMs (nodes changed, dropped, added, separated by
+comments, with server attributes); then the 120 sessions of
+test/fixtures/ui/patches.json, from an empty root and hydrating their
+server-rendered HTML. Proved of the model (library/PROOFS.md):
+`applier_correct` (a conforming patch is performed exactly as
+Lasm.UI.Model's `applyOps`), `applier_session` (with conforming patches,
+every frame the browser reads leaves the DOM of the view) and
+`hydrate_correct` (hydration builds the fresh mount's nodes from any server
+DOM, and exactly its DOM from one that renders the view).
+
 Which modules have a model, and why the others need none or are still due
 one, is the inventory [verification/MODELS.md](../verification/MODELS.md),
 generated from `verification/models.json` by `node scripts/models.mjs` and
@@ -1615,6 +1684,11 @@ longer a dependency: the modules it made are recorded in `test/fixtures/lower-at
 without it V8 validates the output), and
 random instruction streams come out byte for byte as documented.
 
+The modules the testing strategy's step 2 named (the CLI argument and init modules, `src/serverless/` and the WASI
+JavaScript) held in the nightly run 43433389694 on `main` (2026-11-13): `cli` 95 %, `init` 97.1 %, `serverless`
+88.5 %, `wasi-build` 95.8 % and `target-link` (with `wasi/wasi-link.mjs`) 91 %, each at or above its threshold;
+the ROADMAP item is ticked.
+
 Every module is above 80 %; each threshold is its score rounded down. Tests whose assertion is a general
 property use `forAll` from [`test/helpers/property.mjs`](../test/helpers/property.mjs) (seeded, so a failure
 names its seed and input) and name the proposition they check in a comment above the test, with its Lean
@@ -1843,3 +1917,4 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Deterministic simulation of Porter (4 of 30 seeds) | A token request whose commit succeeded and then reported an error is run again by `runRequest`, finds its own code used or its refresh token rotated, answers `invalid_grant` and revokes the family it just issued: one transient database error signs a user out | Fixed (#138, Jordan's choice of a commit receipt): each commit inserts a row keyed by an id from the request's random values (the same on a rerun), and a failed commit whose receipt is there keeps its reply (`Server/App.lean`, `Spec.landed_commit_stands`); the simulation no longer tolerates the refusal |
 | Mutation testing (`downloads`, 2026-11-09) | **A failing SDK archive decoder was reported as the tar parser's error**: when the managed Python's decoder for `.tar.xz`/`.zip` SDK archives (`src/archive-stream.py`) failed, could not start or was killed, `extract` reported `TAR_BAD_ARCHIVE: Unrecognized archive format` for the empty or truncated stream it left, not the decoder's exit status and messages | Fixed in `src/managed-artifacts.mjs` (the decoder's result is preferred after a broken stream); regressions in `test/managed-artifacts-decoder.test.mjs`; `docs/release/0.6.1-notes.md` |
 | Differential fuzzing, feature programs (campaign 42620999209, seed 620999216, case 132; `wasi`, `wasi-node`, `deno`, the edge engines, browsers, both profiles) | `(repr a).pretty` of an `Array Int` of 5,120 elements stops with "call stack exhausted" / "Maximum call stack size exceeded": Lean's formatter recurses with the number of elements, and the WASI and edge stacks hold about 9,000–11,000 frames. Native Lean and the Node target print it | Open: [#179](https://github.com/Millillion/lasm/issues/179) (the documented recursion-depth limit, reached through the standard library); the generator keeps printed arrays below that size |
+| Flaky `host-fixtures` case ([#196](https://github.com/Millillion/lasm/issues/196): PRs #195, #214, #220) | `temporary-files` failed with status `null`: a native-Lean run was killed at the harness's 60 s timeout. Two native runs crash by design (Lean's error decoders dereference a null file name: `temporary-files`' `missing-directory` and `cwd-tracking-deleted-process`, SIGSEGV), and the ubuntu-24.04 runner pipes cores to systemd-coredump, whose `core_pattern` passes the core limit as unlimited, so it collected each crash's core even under `ulimit -c 0`: 25–60 s per crash, and the two cases took 27–65 s when they passed (a first fix with `ulimit -c 0` still took 42 s). Neither Lasm's nor the oracle's output | Harness fix: the native runs expected to crash run under `prlimit --core=1:1` (`withoutCore` in `integration/host-fixtures.mjs`): Linux skips a piped core dump when the limit is exactly 1 byte; status and signal are unchanged (exec). The run prints the core handler and limit, and a killed oracle names its signal |

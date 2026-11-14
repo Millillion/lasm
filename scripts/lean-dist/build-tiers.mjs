@@ -191,10 +191,11 @@ from the mirrored Lean source below (its application code) against that GNU MP.
 ${sourcesSection('bin')}Module data and Lean sources are distributed separately in the shared
 lean-${options.version}-core-* and lean-${options.version}-ext-* archives.
 `;
-const notices = join(here, 'notices');
 // Verbatim licence texts in scripts/lean-dist/notices/<file>.txt -> lasm-notices/<archive>/<file>.
+// libuv's LICENSE-extra is read from src/notices/, where the CLI's own notices keep it.
+const noticeSource = file => file === 'libuv-LICENSE-extra' ? join(here, '../../src/notices', file + '.txt') : join(here, 'notices', file + '.txt');
 const noticeFiles = async (archive, files) => Promise.all(files.map(async file => ({ path: `lasm-notices/${archive}/${file}`,
-  type: 'file', source: join(notices, file + '.txt'), size: (await stat(join(notices, file + '.txt'))).size })));
+  type: 'file', source: noticeSource(file), size: (await stat(noticeSource(file))).size })));
 const binMembers = [...binary.values(), members.get('LICENSE'), ...(members.has('LICENSES') ? [members.get('LICENSES')] : []),
   generated(`lasm-notices/${binName}/NOTICE`, binNotice),
   ...await noticeFiles(binName, ['libuv-LICENSE']),

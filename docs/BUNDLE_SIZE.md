@@ -143,7 +143,7 @@ All local build campaigns use one workload, one linker/Binaryen worker, base
 pages and the existing memory/disk guards. The final static campaign peaked at
 1.16 GiB and the HTTP campaign at 1.06 GiB, with no OOM events. Earlier attempts
 that stopped at the disk reserve remain resource aborts, not behavior failures.
-See [recorded evidence](evidence/bundle-size-2026-09-26.json) for exact inputs,
+See [recorded evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/bundle-size-2026-09-26.json) for exact inputs,
 intermediate failures, resource reports and candidate acceptance status.
 
 ## Installed candidate verification
@@ -157,16 +157,16 @@ libraries needed to compile different applications from the npm package.
 Both native Linux architectures passed all 49 command checks, eight isolated
 deployments and nine execution cases using that exact archive in the
 [native recheck](https://github.com/Millillion/lasm/actions/runs/36253615772).
-The [x86-64 record](evidence/bundle-size-linux-x64-recheck-2026-09-26.json) and
-[ARM64 record](evidence/bundle-size-linux-arm64-recheck-2026-09-26.json) preserve
+The [x86-64 record](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/bundle-size-linux-x64-recheck-2026-09-26.json) and
+[ARM64 record](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/bundle-size-linux-arm64-recheck-2026-09-26.json) preserve
 all output, resource and disk measurements. Controls ran at
 `e4c23473d024f13476d3fdcf98fdcaaebc146b09`; the package was not rebuilt.
 The packaging job passed 113 Node tests; the native jobs each passed four
 small Python controls for cache advice before installed acceptance.
 
-The first x86-64 attempt also [passed](evidence/bundle-size-linux-x64-2026-09-26.json).
+The first x86-64 attempt also [passed](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/bundle-size-linux-x64-2026-09-26.json).
 The first ARM64 attempt stopped proactively during runtime evaluation, with no
-OOM. Its [abort record](evidence/bundle-size-arm64-resource-abort-2026-09-26.json)
+OOM. Its [abort record](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/bundle-size-arm64-resource-abort-2026-09-26.json)
 remains unchanged. The correction advises the file cache of completed, receipted
 native comparison executables after compilation. It does not change package
 bytes, assertions, timeouts, memory limits or deployed files. Both rechecks passed
@@ -202,7 +202,7 @@ not silently remove runtime-resolved declarations or change initializer effects.
 The exact tested archive, checksum and both native evidence records are retained
 in an [unpublished GitHub draft](https://github.com/Millillion/lasm/releases/tag/untagged-ebf705b7c6153959da56),
 accessible to repository maintainers. A local download matched the tested SHA-256.
-The [candidate receipt](evidence/bundle-size-candidate-2026-09-26.json) records
+The [candidate receipt](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/bundle-size-candidate-2026-09-26.json) records
 asset identities, local verification and the earlier retention failures.
 No npm publication was performed.
 
@@ -230,7 +230,7 @@ addresses of all available compiled Lean declarations, rooting their code.
 `applicationMetadata` then inventories all matching files in `lib/lean` and all
 discovered package metadata roots, rather than computing a runtime module closure.
 
-A [read-only inventory](evidence/bundle-size-fallback-inventory-2026-09-26.json)
+A [read-only inventory](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/bundle-size-fallback-inventory-2026-09-26.json)
 of the pinned local standard library found 2,213,191,695 bytes. The CI deployment
 has 2,213,311,663 bytes of module data including project roots, so these inventories
 must not be presented as identical. The standard-library breakdown is:

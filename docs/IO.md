@@ -53,4 +53,4 @@ JavaScript host can process asynchronous IO while a guest thread waits.
 
 The tests do not establish complete `IO.FS`, `Std.Http`, `Std.Async`, or
 cross-platform compatibility. See [the current limitations](../IO_LIMITATIONS.md)
-and [the API audit](compatibility/API_SURFACE_4_34.md) (recorded for Lean 4.34).
+and [the API audit](history/API_SURFACE_4_34.md) (recorded for Lean 4.34).
