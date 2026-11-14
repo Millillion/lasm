@@ -1356,33 +1356,6 @@ chunks whose input is ambiguous (two archive members of one name), and what
 wasm-ld synthesizes (`__wasm_call_ctors`, `__wasm_init_memory` beyond its
 segment operations, stubs).
 
-#### Binaryen's lowering passes by differential execution
-
-The WASI link lowers wasm-ld's memory64 module with exception handling to the
-32-bit module WASI engines run, in one `wasm-opt` step (`--strip-eh
---memory64-lowering --table64-lowering -Oz` and strips, src/wasi/wasi-link.mjs).
-`scripts/link-validation/binaryen-diff.mjs` takes that step's recorded input
-and output (`LASM_TEST_LINK_EVIDENCE`) and re-runs it one pass at a time:
-m0 (wasm-ld's output, atomics lowered), m1 after `--strip-eh`, m2 after
-`--memory64-lowering`, m3 after `--table64-lowering`, and m4, the shipped
-module. Each runs on wabt's `wasm-interp` 1.0.42, an interpreter that
-follows the specification, built with its WASI host from the release's source
-archive (pinned by SHA-256; the release binaries have no WASI) and cached, with the same
-arguments and directory; all five must print the same stdout and stderr and
-exit alike, so a difference between two neighbours names the pass. m4 also
-runs on wasmtime, the engine users run, and a difference there is reported as
-an engine disagreement. A module that times out on the interpreter makes the
-program inconclusive, not different; `--min-programs` fails a run with too few
-conclusive programs. It runs in `link-validation.yml`, after the wasm-ld check,
-on the WASI programs of each set (PR and weekly).
-
-*Catches:* a lowering pass that changes what a Lasm program does (an address
-computation, a bounds check, a table index), and the optimizer's changes on
-top of them (m3 against m4). *Cannot catch yet:* passes of the JavaScript
-targets (the Node and edge links' `wasm-opt`, Asyncify), which need their
-JavaScript hosts; equivalence on inputs the programs do not exercise (this is
-testing, not proof).
-
 ## CI tiers
 
 [CI.md](CI.md) is the reference: the four tiers, the inventory of every
