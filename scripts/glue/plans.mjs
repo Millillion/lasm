@@ -10,3 +10,13 @@ export function syntheticPlan(n, k) {
   }
   return { schema: 1, closure, keep: Array.from({ length: k }, (_, i) => closure[i * Math.floor(n / k)]), calls };
 }
+
+/** A core module of `size` bytes or so: the header and one custom section of bytes. */
+export function syntheticCore(size) {
+  const payload = Math.max(0, size - 8 - 6), leb = [];
+  for (let n = payload + 2; ; ) { const b = n & 0x7f; n = Math.floor(n / 128); leb.push(n ? b | 0x80 : b); if (!n) break; }
+  const core = new Uint8Array(8 + 1 + leb.length + 2 + payload);
+  core.set([0, 0x61, 0x73, 0x6d, 1, 0, 0, 0, 0, ...leb, 1, 0x70], 0);
+  for (let i = 8 + 1 + leb.length + 2; i < core.length; i++) core[i] = (i * 31) & 0xff;
+  return core;
+}

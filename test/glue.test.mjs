@@ -4,7 +4,7 @@
 // answer that is neither ok nor an error).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { decodeFields, encodeFields, encodeRequest, glueModule, runGlue, runRequest } from '../src/glue/glue.mjs';
+import { decodeFields, encodeByteRequest, encodeFields, encodeRequest, glueModule, runGlue, runRequest } from '../src/glue/glue.mjs';
 import { forAll } from './helpers/property.mjs';
 
 // Proposition: Lasm.Cli.Candidates.glue_fields_round_trip
@@ -47,6 +47,27 @@ test('a request is a table of its distinct fields and their indices, or its fiel
     if (bytes[0] === 1) assert.deepEqual(tableFields(bytes), fields);
     else assert.deepEqual(bytes, encodeFields(fields));
   });
+});
+
+test('a request of bytes is its fields with their lengths, and its answer is bytes', () => {
+  assert.deepEqual([...encodeByteRequest('op', [Uint8Array.of(7, 8), new Uint8Array(0)])],
+    [2, 3, 0, 0, 0, 2, 0, 0, 0, 0x6f, 0x70, 2, 0, 0, 0, 7, 8, 0, 0, 0, 0]);
+  const placeholder = runRequest(encodeByteRequest('placeholderModule', []), undefined, true).ok;
+  assert.ok(placeholder instanceof Uint8Array && !(placeholder instanceof Buffer));
+  assert.equal(placeholder.buffer.byteLength, placeholder.length, 'an array of its own');
+  assert.deepEqual([...placeholder.subarray(0, 8)], [0, 0x61, 0x73, 0x6d, 1, 0, 0, 0]);
+  const module = Uint8Array.of(0, 0x61, 0x73, 0x6d, 1, 0, 0, 0, 1, 1, 0);
+  assert.deepEqual(runRequest(encodeByteRequest('withoutComponentType', [module]), undefined, true), { ok: module });
+  assert.deepEqual(runRequest(encodeByteRequest('withoutComponentType', []), undefined, true), { error: 'withoutComponentType takes 1 fields, not 0' });
+  assert.deepEqual(runRequest(encodeByteRequest('frobnicate', [module]), undefined, true), { error: 'unknown operation frobnicate' });
+  assert.deepEqual(runRequest(encodeByteRequest('componentize', [module, module]), undefined, true), { error: 'Not a WebAssembly component' });
+  // Malformed byte requests are refused.
+  const bad = bytes => runRequest(Uint8Array.from(bytes), undefined, true);
+  assert.deepEqual(bad([2, 1, 0]), { error: 'the request ends inside its header' });
+  assert.deepEqual(bad([2, 1, 0, 0, 0, 5, 0]), { error: "the request ends inside a field's length" });
+  assert.deepEqual(bad([2, 1, 0, 0, 0, 5, 0, 0, 0, 0x61]), { error: 'the request ends inside a field' });
+  assert.deepEqual(bad([2, 0, 0, 0, 0]), { error: 'input ends before a field' });
+  assert.deepEqual(bad([2, 1, 0, 0, 0, 1, 0, 0, 0, 0xff]), { error: 'a field is not UTF-8' });
 });
 
 test('the glue program runs its operations and refuses malformed requests', () => {
