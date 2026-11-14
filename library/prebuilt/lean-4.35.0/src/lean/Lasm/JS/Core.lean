@@ -722,8 +722,10 @@ def onEdge : IO Bool := do
 /-- Publishes `v` as the program's default export. In an edge build
 (`lasm build --target workers`) the Worker's requests go to it: a Hono app (or
 any object with a `fetch` method), or a function `(request, env, ctx) => Response`.
+On Workers, the object's `scheduled` and `queue` methods also receive the cron
+triggers and queue batches (`Lasm.JS.Cloudflare.ExportedHandler` is such an object).
 On Node it only records the value (`globalThis.__lasmDefaultExport`). -/
-def exportDefault (v : Value) : IO Unit := do
+def exportDefault [ToJS α] (v : α) : IO Unit := do
   (← global).set "__lasmDefaultExport" v
 
 /-- Blocks the calling thread forever, for servers whose work happens in

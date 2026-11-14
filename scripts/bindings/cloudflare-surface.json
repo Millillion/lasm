@@ -1,0 +1,199 @@
+{
+  "generatedBy": "scripts/bindings/generate-web.mjs (@cloudflare/workers-types 5.20261019.1 declarations)",
+  "surface": {
+    "globals": {
+      "globalThis": [
+        "caches"
+      ],
+      "cloudflare:sockets": [
+        "connect"
+      ],
+      "cloudflare:workers": [
+        "env"
+      ]
+    },
+    "interfaces": {
+      "KVNamespace": [
+        "get",
+        "list",
+        "put",
+        "getWithMetadata",
+        "delete"
+      ],
+      "D1Database": [
+        "prepare",
+        "batch",
+        "exec",
+        "withSession"
+      ],
+      "D1DatabaseSession": [
+        "prepare",
+        "batch",
+        "getBookmark"
+      ],
+      "D1PreparedStatement": [
+        "bind",
+        "first",
+        "run",
+        "all",
+        "raw"
+      ],
+      "R2Bucket": [
+        "head",
+        "get",
+        "put",
+        "createMultipartUpload",
+        "resumeMultipartUpload",
+        "delete",
+        "list"
+      ],
+      "R2Object": [
+        "key",
+        "version",
+        "size",
+        "etag",
+        "httpEtag",
+        "checksums",
+        "uploaded",
+        "httpMetadata",
+        "customMetadata",
+        "range",
+        "storageClass",
+        "ssecKeyMd5",
+        "writeHttpMetadata"
+      ],
+      "R2ObjectBody": [
+        "body",
+        "bodyUsed",
+        "arrayBuffer",
+        "bytes",
+        "text",
+        "json",
+        "blob"
+      ],
+      "R2Checksums": [
+        "md5",
+        "sha1",
+        "sha256",
+        "sha384",
+        "sha512",
+        "toJSON"
+      ],
+      "R2MultipartUpload": [
+        "key",
+        "uploadId",
+        "uploadPart",
+        "abort",
+        "complete"
+      ],
+      "Queue": [
+        "metrics",
+        "send",
+        "sendBatch"
+      ],
+      "Message": [
+        "id",
+        "timestamp",
+        "body",
+        "attempts",
+        "retry",
+        "ack"
+      ],
+      "MessageBatch": [
+        "messages",
+        "queue",
+        "metadata",
+        "retryAll",
+        "ackAll"
+      ],
+      "CacheStorage": [
+        "open",
+        "default"
+      ],
+      "Cache": [
+        "delete",
+        "match",
+        "put"
+      ],
+      "Socket": [
+        "readable",
+        "writable",
+        "closed",
+        "opened",
+        "upgraded",
+        "secureTransport",
+        "close",
+        "startTls"
+      ],
+      "DurableObjectNamespace": [
+        "newUniqueId",
+        "idFromName",
+        "idFromString",
+        "get",
+        "getByName",
+        "jurisdiction"
+      ],
+      "DurableObjectId": [
+        "toString",
+        "equals",
+        "name",
+        "jurisdiction"
+      ],
+      "DurableObjectStub": [
+        "fetch",
+        "connect",
+        "id",
+        "name"
+      ],
+      "DurableObjectState": [
+        "waitUntil",
+        "props",
+        "id",
+        "storage",
+        "blockConcurrencyWhile",
+        "abort"
+      ],
+      "DurableObjectStorage": [
+        "get",
+        "list",
+        "put",
+        "delete",
+        "deleteAll",
+        "transaction",
+        "getAlarm",
+        "setAlarm",
+        "deleteAlarm",
+        "sync",
+        "getCurrentBookmark",
+        "getBookmarkForTime",
+        "onNextSessionRestoreBookmark"
+      ],
+      "DurableObjectTransaction": [
+        "get",
+        "list",
+        "put",
+        "delete",
+        "rollback",
+        "getAlarm",
+        "setAlarm",
+        "deleteAlarm"
+      ],
+      "ExecutionContext": [
+        "waitUntil",
+        "passThroughOnException",
+        "props",
+        "cache",
+        "abort"
+      ],
+      "CacheContext": [
+        "purge",
+        "invalidate"
+      ],
+      "ScheduledController": [
+        "scheduledTime",
+        "cron",
+        "noRetry"
+      ]
+    }
+  }
+}

@@ -12,13 +12,15 @@ import { fileURLToPath } from 'node:url';
 import { modules } from '../scripts/bindings/web-tier1.mjs';
 import * as nodeTier from '../scripts/bindings/node-tier2.mjs';
 import * as serveTier from '../scripts/bindings/serve-tier2.mjs';
-import { declarations, lowerHost, parseType, typeText } from '../scripts/bindings/serve-api.mjs';
+import * as cloudflareTier from '../scripts/bindings/cloudflare-tier3.mjs';
+import { declarations, genericDefaults, lowerHost, parseType, typeText } from '../scripts/bindings/serve-api.mjs';
+import { untar } from '../scripts/bindings/cloudflare-api.mjs';
 import { modules as browserModules } from '../scripts/bindings/web-browser.mjs';
 import { libraryModules } from '../src/lasm-library.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
-test('the committed Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun modules are the generator output', () => {
+test('the committed Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun and Lasm.JS.Cloudflare modules are the generator output', () => {
   const r = spawnSync(process.execPath, [fileURLToPath(new URL('../scripts/bindings/generate-web.mjs', import.meta.url)), '--check'], { encoding: 'utf8' });
   assert.equal(r.status, 0, r.stdout + r.stderr);
 });
@@ -47,7 +49,7 @@ test('every Lasm.JS.Node container is generated in its module, with the members 
 });
 
 test('the generated modules are shipped library modules, in import order', () => {
-  for (const tier of ['Web', 'Node', 'Deno', 'Bun']) {
+  for (const tier of ['Web', 'Node', 'Deno', 'Bun', 'Cloudflare']) {
     const generated = readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url)).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`);
     for (const m of [...generated, `Lasm.JS.${tier}`]) assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
     for (const m of generated) {
@@ -226,4 +228,165 @@ test('serve-api fails on what its selection does not decide', () => {
   const h5 = host();
   h5.functions.serve.overloads['sock: number'] = { lower: true };
   assert.throws(() => lower(h5), /@experimental, but serve-tier2.mjs selects it/);
+});
+
+// Lasm.JS.Cloudflare (scripts/bindings/cloudflare-api.mjs lowers @cloudflare/workers-types with
+// serve-api.mjs's rich rules; its --check needs the network and runs in web-bindings.yml).
+test('every Lasm.JS.Cloudflare selection is generated, and no exclusion is', () => {
+  const { surface } = JSON.parse(readFileSync(new URL('../scripts/bindings/cloudflare-surface.json', import.meta.url), 'utf8'));
+  const [h] = cloudflareTier.hosts;
+  for (const g of h.globals) for (const m of g.members) assert.ok(surface.globals[g.jsModule]?.includes(m.name), `${g.jsModule} ${m.name} is not generated`);
+  for (const d of h.declarations.filter(d => d.as === 'interface')) {
+    const members = surface.interfaces[d.lean ?? d.name];
+    assert.ok(members, `${d.name} is not generated`);
+    for (const e of Object.keys(d.exclude ?? {})) assert.ok(!members.includes(e), `${d.name}.${e} is excluded but generated`);
+  }
+  // Every dictionary, callback and enum is generated, also those no member names (ExportedHandler).
+  const workers = readFileSync(new URL('../library/Lasm/JS/Cloudflare/Workers.lean', import.meta.url), 'utf8');
+  for (const n of ['structure ExportedHandler where', 'def ExportedHandlerFetchHandler.ofFn', 'def ExportedHandlerScheduledHandler.ofFn',
+    'def ExportedHandlerQueueHandler.ofFn', 'def env : IO Data']) assert.ok(workers.includes(n), n);
+  // The server tiers never import the browser tier, nor Node's modules.
+  for (const f of readdirSync(new URL('../library/Lasm/JS/Cloudflare/', import.meta.url))) {
+    const text = readFileSync(new URL(`../library/Lasm/JS/Cloudflare/${f}`, import.meta.url), 'utf8');
+    for (const [, imported] of text.matchAll(/^import (Lasm\.\S+)$/gm))
+      assert.match(imported, /^Lasm\.JS\.(Cloudflare\.|Web\.(Support|Dom|Streams|File|Url|Fetch)$)/, `${f} imports ${imported}`);
+  }
+  // Nullable record and ArrayBuffer results (D1's first() of no row, KV's get of a missing
+  // key: null) are read as data: Option Value would be a reference to null, never none.
+  const d1 = readFileSync(new URL('../library/Lasm/JS/Cloudflare/D1.lean', import.meta.url), 'utf8');
+  assert.match(d1, /callMethodAwait "first" \(Support\.args #\[\]\) Data\n {2}Support\.optionalRecordOf Data r/);
+  const kv = readFileSync(new URL('../library/Lasm/JS/Cloudflare/Kv.lean', import.meta.url), 'utf8');
+  assert.match(kv, /toJS "arrayBuffer"\]\) Data\n {2}Support\.nullableArrayBufferBytes r/);
+  for (const text of [d1, kv]) assert.doesNotMatch(text, /\(Option Value\)/);
+  const idl = readFileSync(new URL('../scripts/bindings/cloudflare.idl', import.meta.url), 'utf8');
+  assert.match(idl, /D1Database\.dump: @deprecated in its declaration/);
+  assert.match(idl, /\[LasmHost="Cloudflare", LasmLeanModule="Sockets", LasmModule="cloudflare:sockets", LasmPath=""\]\nnamespace Cloudflare_cloudflare_sockets/);
+});
+
+test('cloudflare-api reads the npm package: a tar archive', () => {
+  const header = (name, size) => {
+    const h = Buffer.alloc(512);
+    h.write(name, 0, 'latin1'); h.write(size.toString(8).padStart(11, '0') + '\0', 124, 'latin1'); h.write('0', 156, 'latin1');
+    return h;
+  };
+  const body = Buffer.from('declare const caches: CacheStorage;\n');
+  const pad = Buffer.alloc(512 - body.length % 512);
+  const archive = Buffer.concat([header('package/index.d.ts', body.length), body, pad, header('package/x', 0), Buffer.alloc(1024)]);
+  const files = untar(archive);
+  assert.deepEqual(Object.keys(files), ['package/index.d.ts', 'package/x']);
+  assert.equal(Buffer.from(files['package/index.d.ts']).toString(), body.toString());
+});
+
+/** A rich host (cloudflare-tier3.mjs's shape) over one synthetic declaration file. */
+const richHost = (extra = {}) => ({
+  name: 'Cf', global: null, rich: true, files: ['cf.d.ts'], instantiate: {}, notSelected: {}, intersections: {}, integers: {},
+  modules: [{ name: 'Kv', title: 'KV' }],
+  globals: [{ idl: 'globals_Kv', module: 'Kv', jsModule: 'globalThis', members: [{ const: 'store', name: 'store' }] },
+    { idl: 'mod', module: 'Kv', jsModule: 'cf:mod', members: [{ function: 'cf:mod._open', name: 'open' }] }],
+  declarations: [
+    { name: 'Store', as: 'interface', module: 'Kv', overloads: { get: {
+      'key: Key, options?: Partial<GetOptions<undefined>>': { lower: true },
+      'key: Key, type: "json"': { lower: true },
+      'key: Key[], type: "json"': { exclude: 'several keys' } } } },
+    { name: 'Entry', as: 'interface', module: 'Kv' },
+    { name: 'GetOptions', as: 'dictionary', module: 'Kv', typeArgs: { Type: 'undefined' }, partial: true },
+    { name: 'ListResult', as: 'dictionary', module: 'Kv', merge: true },
+    { name: 'Meta', as: 'dictionary', module: 'Kv' },
+  ],
+  typeNames: { unknown: 'any', Date: 'any', ArrayBuffer: 'ArrayBuffer', ArrayBufferView: 'ArrayBufferView' },
+  ...extra,
+});
+const richSource = `
+type Mode = "a" | "b";
+type Bookmark = string;
+declare abstract class Store<Key extends string = string> {
+  get(key: Key, options?: Partial<GetOptions<undefined>>): Promise<string | null>;
+  get<V = unknown>(key: Key, type: "json"): Promise<V | null>;
+  get(key: Key[], type: "json"): Promise<Map<string, unknown>>;
+  list<M = unknown>(): Promise<Map<string, M>>;
+  put(key: Key, value: string | ArrayBuffer | ArrayBufferView, meta?: { tag?: string; at: Date }): Promise<void>;
+  mode(m: Mode | Bookmark, when: number | Date): void;
+  toString(): string;
+  rows(...values: unknown[]): readonly Entry[];
+  /** @deprecated */
+  old(): void;
+}
+interface Entry {
+  get size(): number;
+  readonly name?: string;
+  labels: Record<string, string>;
+  meta: Meta & Record<string, unknown>;
+  never?: never;
+}
+interface Meta { n: number; }
+interface GetOptions<Type> { type: Type; cacheTtl?: number; }
+type ListResult<M> = { done: false; cursor: string; items: M[] } | { done: true; items: M[] };
+declare const store: Store;
+declare module "cf:mod" {
+  function _open(path: Mode): Store;
+  export { _open as open };
+}
+`;
+const lowerRich = (h = richHost(), text = richSource) => lowerHost(h, [{ file: 'cf.d.ts', text }]);
+
+test('serve-api reads rich declarations: classes, constants, getters and generic defaults', () => {
+  const d = declarations(richSource, 'cf.d.ts', { classes: true });
+  assert.ok(d.some(x => x.kind === 'interface' && x.class && x.name === 'Store'));
+  assert.ok(d.some(x => x.kind === 'const' && x.name === 'store' && x.type === 'Store'));
+  assert.ok(d.some(x => x.kind === 'function' && x.name === 'cf:mod._open'));
+  assert.ok(!declarations(richSource, 'cf.d.ts').some(x => x.name === 'Store'), 'classes only when asked');
+  assert.deepEqual(genericDefaults('Key extends string = string, T = unknown, U'), { Key: 'string', T: 'unknown', U: 'unknown' });
+  assert.equal(typeText(parseType('readonly Entry[]')), 'Entry[]');
+  assert.throws(() => parseType('[string[], ...T[]]'), /tuple types are not lowered/);
+});
+
+test('serve-api lowers by its rich rules', () => {
+  const { idl, excluded } = lowerRich();
+  // Overloads: decided one by one; a string literal parameter is a constant naming its overload.
+  assert.match(idl, /Promise<DOMString\?> get\(DOMString key, optional Cf_GetOptions options\);/);
+  assert.match(idl, /LasmOverloadName="getJson"\] Promise<any> get\(DOMString key, \[LasmConstant="json"\] DOMString type\);/);
+  // Map results are records marked LasmMap; generics are their defaults.
+  assert.match(idl, /LasmMap\] Promise<record<DOMString, any>> list\(\);/);
+  // Unions: ArrayBuffer with ArrayBufferView is BufferSource, a typedef of the host; Date and unknown absorb.
+  assert.match(idl, /typedef \(DOMString or BufferSource\) Cf_DOMStringOrBufferSource;/);
+  assert.match(idl, /undefined mode\(DOMString m, any when\);/);
+  // Object literal types are dictionaries named after their owner, member and parameter.
+  assert.match(idl, /dictionary Cf_StorePutMeta \{[^}]*DOMString tag;[^}]*required any at;/);
+  // Reserved names, rest parameters, readonly arrays, the deprecated member.
+  assert.match(idl, /LasmName="toString"\] DOMString toString_\(\);/);
+  assert.match(idl, /sequence<Cf_Entry> rows\(any\.\.\. values\);/);
+  assert.ok(excluded.some(([w, r]) => w === 'Store.old' && /@deprecated/.test(r)));
+  // Getters, optional attributes (nullable), Record, an intersection with Record<string, unknown>, never.
+  assert.match(idl, /readonly attribute double size;/);
+  assert.match(idl, /readonly attribute DOMString\? name;/);
+  assert.match(idl, /readonly attribute record<DOMString, DOMString> labels;/);
+  assert.match(idl, /readonly attribute Cf_Meta meta;/);
+  assert.ok(excluded.some(([w]) => w === 'Entry.never'));
+  // Partial of an all-optional dictionary; a member of type undefined left out.
+  assert.match(idl, /dictionary Cf_GetOptions \{\n  \/\/ cacheTtl\?: number\n  double cacheTtl;\n\};/);
+  // A type alias of object types merged: members not in every alternative optional, literal booleans boolean.
+  assert.match(idl, /dictionary Cf_ListResult \{[^}]*required boolean done;[^}]*DOMString cursor;[^}]*required sequence<any> items;/);
+  // Globals and module exports; an alias of literals is an enum named after it, beside a string a string.
+  assert.match(idl, /namespace Cf_globals_Kv \{[^}]*readonly attribute Cf_Store store;/);
+  assert.match(idl, /LasmModule="cf:mod", LasmPath=""\]\nnamespace Cf_mod \{[^}]*Cf_Store open\(Cf_Mode path\);/);
+  assert.match(idl, /enum Cf_Mode \{ "a", "b" \};/);
+});
+
+test('serve-api fails on what a rich selection does not decide', () => {
+  // An overload neither lowered nor excluded.
+  const h1 = richHost();
+  delete h1.declarations[0].overloads.get['key: Key[], type: "json"'];
+  assert.throws(() => lowerRich(h1), /an overload the tier neither lowers nor excludes/);
+  // An overload decided but not declared.
+  const h2 = richHost();
+  h2.declarations[0].overloads.get['key: number'] = { lower: true };
+  assert.throws(() => lowerRich(h2), /is decided in the tier but not declared/);
+  // Partial of a dictionary the tier does not say is all optional.
+  const h3 = richHost();
+  h3.declarations = h3.declarations.map(d => d.name === 'GetOptions' ? { ...d, partial: false } : d);
+  assert.throws(() => lowerRich(h3), /the tier does not say its members are all optional/);
+  // A Map keyed by something other than strings.
+  assert.throws(() => lowerRich(richHost(), richSource.replace('Map<string, M>', 'Map<number, M>')), /a Map keyed by number/);
+  // A type neither selected, named nor declared.
+  assert.throws(() => lowerRich(richHost(), richSource.replace('labels: Record<string, string>', 'labels: Bogus')), /neither selected nor in/);
 });

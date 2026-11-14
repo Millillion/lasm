@@ -161,6 +161,54 @@ decisions themselves are logged with their reasoning in
     `@[js]` in the user's program, documented in JS_BINDINGS.md and exercised in
     CI. A user-facing helper (or a template change) is yours to decide.
 
+- [ ] **`Lasm.JS.Cloudflare` (tier 3; 2026-11-11) is generated from
+  `@cloudflare/workers-types` 5.20261019.1** (the declarations of the workerd
+  that CI's wrangler 4.152.0 runs), pinned by hash, through Lasm.JS.Deno's
+  lowering with new rules for richer declarations ([DECISIONS.md](DECISIONS.md),
+  2026-11-11; [JS_BINDINGS.md](JS_BINDINGS.md#cloudflare-workers-lasmjscloudflare)).
+  Covered: KV, D1, R2, Durable Objects, Queues, `ExecutionContext`, the
+  `scheduled` and `queue` handlers, the Cache API, `connect`, `env`. Naming and
+  shape questions, all left as the declarations give them:
+  - **`env` is `Data`**, because the handler types declare `Env = unknown` (each
+    program declares its own `Env`). A binding is read with
+    `IO.ofExcept (readField KVNamespace env "KV")`. A generated
+    `Env`-style accessor (`env.kv "KV"`) or a structure the program declares
+    would read better; either is a Lasm API, so yours.
+  - **Overloads distinguished by a string literal** become one function each,
+    named with the literal: `get(key, type: "json")` is `KVNamespace.getJson`,
+    likewise `getArrayBuffer` and `getStream`; `get(key)` stays `get` (text).
+  - **Overloads with the same parameter names** follow Lasm.JS.Web's rule, which
+    gives `D1PreparedStatement.first colName` and **`first0`** (the declaration's
+    `first()`, which comes second), and `DurableObjectStorage.getWithKeys`,
+    `putWithEntries`, `deleteWithKeys`. `first0` reads badly (`firstRow`?).
+  - **Not generated for that reason**: KV's batch reads (`get(keys: Array<Key>)`
+    has the same parameter names as `get(key)`), and `getWithMetadata` of JSON,
+    bytes or streams (a second instantiation of the result's generic). Both are
+    lowering limits, not choices; a naming rule for them is yours.
+  - **Numbers are `Float`** (`limit`, `expirationTtl`, `size`, `partNumber`,
+    `D1Meta.changes`): the declarations have no doc comments that say "integer",
+    which Lasm.JS.Deno's `Nat` narrowing quotes. A hand list of integer members
+    would read better but is not in the source.
+  - **`Date` is `Data`** (`R2Object.uploaded`, `Message.timestamp`,
+    `setAlarm`'s time); Lasm.JS.Web has no `Date`.
+  - **Unions are the host's own types**, named by their members
+    (`DOMStringOrSequenceOfDOMString` for R2's `delete`), with `Coe` from each
+    member, so `bucket.delete (.domString k)` or `kv.put k (.domString v)`.
+  - **Durable Object classes are JavaScript** (a few lines in the project's
+    `index.mjs` calling Lean functions on `globalThis`), as Lasm.JS's "no classes
+    defined in Lean" limit says; the RPC methods of a stub are untyped
+    (`Value.callMethodAwait`).
+  - **Two Lasm changes outside the generated code**: `Lasm.JS.exportDefault` now
+    takes any `ToJS` value (it took a `Value`), so an `ExportedHandler` can be
+    published; and the Workers entry (`worker.mjs`) now exports `scheduled` and
+    `queue`, forwarding to the published object, and imports `cloudflare:workers`
+    and `cloudflare:sockets` for the bindings.
+  - **Tested only locally** (wrangler dev: workerd and Miniflare), never against
+    real Cloudflare, per the no-real-accounts rule: deviations of the local
+    emulation are listed in `test/fixtures/js-cloudflare/known.json`.
+  - **Replacing Porter's and Ledger's hand D1 bindings** with `Lasm.JS.Cloudflare.D1`
+    is a follow-up (they pin the published `@lasm/cli`, so after a release).
+
 ### Host bindings: `Lasm.Fastly` generated, `Lasm.WASI.*` next (decided by Jordan, 2026-11-10)
 - [x] **Decided.** `Lasm.Fetch` is deleted entirely. Bindings are named for
   the host interface: `Lasm.JS.*`, `Lasm.WASI.*` (generated from the official
