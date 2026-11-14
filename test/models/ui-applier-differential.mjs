@@ -313,7 +313,8 @@ const page = () => {
 /** The live nodes under the root (id → node), in document order. */
 function liveNodes(el, dead) {
   const out = [];
-  const walk = n => { for (let c = n.firstChild; c; c = c.nextSibling) { if (c.$i !== undefined && !dead.has(c.$i)) out.push(c); walk(c); } };
+  // (Under a retired node everything is retired: a clear of its parent would leave its inner ids in the table.)
+  const walk = n => { for (let c = n.firstChild; c; c = c.nextSibling) if (c.$i !== undefined && !dead.has(c.$i)) { out.push(c); walk(c); } };
   walk(el);
   return out;
 }
@@ -362,6 +363,7 @@ function randomFrame(gen, enc, el, ids, dead) {
     } else if (r < 0.65) {
       const p = gen.next() < 0.1 ? 0 : gen.next() < 0.85 ? element() : any();
       const parent = p === 0 ? el : nodes.find(n => n.$i === p);
+      kill(0);
       if (parent) for (const c of parent.childNodes) if (c.$i !== undefined) kill(c.$i);
       enc.byte(4); enc.v(p);
     } else if (r < 0.75) {
