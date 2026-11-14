@@ -15,7 +15,6 @@ import { buildPlatforms } from '../src/platform.mjs';
 import { ensureResourceGuard } from './full-lean/resource-guard.mjs';
 import { archiveUnitCache, shippedAnalysisDirectory } from '../src/application-link.mjs';
 import { initializerUnits } from '../src/application-initialization.mjs';
-import { bundleInstaller } from './bundle-installer.mjs';
 import { candidateReadme } from './candidate-readme.mjs';
 import { applicationNotices, wasmtimeAdapterNotice } from '../src/notices.mjs';
 
@@ -86,19 +85,17 @@ json('src/application-runtimes.json', { schema: 1, lean: { [lean]: expected } })
 // (src/application-output.mjs: Node 24.0.0, glibc 2.28).
 json('application-support.json', { schema: 1, platforms, node: pins.node, minimumNode: pins.minimumNode,
   testedNode: [pins.node24, pins.node], lean, minimumGlibc: '2.34' });
-const installer = await bundleInstaller(root, staging);
-json('provenance.json', { sourceRevision, runtimeManifestSha256: manifestSha256,
-  installerManifestSha256: installer.sha256, lean, node: pins.node });
+json('provenance.json', { sourceRevision, runtimeManifestSha256: manifestSha256, lean, node: pins.node });
 const sourcePackage = JSON.parse(readFileSync(join(root, 'package.json')));
 json('package.json', {
   name: sourcePackage.name, version, private: true, license: 'UNLICENSED', type: 'module',
   description: 'Compile Lean 4 to WebAssembly for Node, Bun, Deno, edge functions, WASI, Fastly and the browser',
   bin: sourcePackage.bin, exports: sourcePackage.exports, engines: { node: '>=' + pins.minimumNode }, os: [...new Set(platforms.map(p => p.split('-')[0]))], cpu: ['x64', 'arm64'],
   files: ['bin', 'src', 'library', 'templates', 'scripts', 'targets', 'docs', 'examples', 'README.md',
-    'THIRD_PARTY_NOTICES.txt', 'application-support.json', 'provenance.json', 'installer-dependencies.json'],
-  dependencies: { tar: sourcePackage.dependencies.tar },
-  bundleDependencies: ['tar'],
+    'THIRD_PARTY_NOTICES.txt', 'application-support.json', 'provenance.json'],
 });
+// No npm dependencies: koffi is bundled under src/native, and archives are read by src/tar.mjs.
+assert.deepEqual(Object.keys(sourcePackage.dependencies), ['koffi']);
 writeFileSync(join(staging, 'THIRD_PARTY_NOTICES.txt'), applicationNotices(runtime.manifest, readFileSync(join(runtime.directory, 'THIRD_PARTY_NOTICES.txt'), 'utf8'), { cli: true })
   + '\n=== Koffi runtime adapter ===\n' + readFileSync(join(staging, 'src/native/node_modules/koffi/LICENSE.txt'), 'utf8')
   + (existsSync(join(staging, 'src/wasi/component/proxy-template.wasm')) ? '\n' + wasmtimeAdapterNotice('src/wasi/component/proxy-template.wasm (the wasi-http component template)') : ''));
@@ -114,13 +111,10 @@ for (const file of ['bin/lasm.mjs', 'src/application-support.mjs', 'src/applicat
   'src/native/process/manifest.json', 'src/native/signals/manifest.json',
   'scripts/full-lean/host-library.js', 'src/init.mjs', 'templates/common/App.lean', 'templates/LICENSE', 'examples/LICENSE', 'templates/hono/Main.lean', 'application-support.json', 'provenance.json', 'THIRD_PARTY_NOTICES.txt',
   `targets/${runtime.manifest.name}/target.json`]) assert.ok(files.has(file), `npm pack omitted ${file}`);
-for (const [path, dependency] of Object.entries(installer.manifest.packages)) {
-  for (const file of Object.keys(dependency.files)) assert.ok(files.has(`${path}/${file}`), `npm pack omitted bundled installer file ${path}/${file}`);
-}
+assert.ok(![...files].some(file => file.startsWith('node_modules/')), 'The candidate bundles no npm packages');
 const result = { scope: 'Reproducible local npm packing; native installed acceptance is separate',
   tarball: archive, sha256, sourceRevision, candidateVersion: version, defaultLean: lean, node: pins.node,
   runtime: { identity: manifestSha256, name: runtime.manifest.name }, reproduciblePacking: true,
-  installer: { identity: installer.sha256, packages: Object.fromEntries(Object.entries(installer.manifest.packages).map(([path, p]) => [path, p.version])) },
   compressedBytes: packed.size, installedBytes: packed.unpackedSize, files: packed.entryCount,
   resourceReport: process.env.LASM_RESOURCE_REPORT, recordedAt: new Date().toISOString() };
 writeFileSync(join(output, 'result.json'), JSON.stringify(result, null, 2) + '\n');

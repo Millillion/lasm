@@ -2,7 +2,7 @@
 // resource headers from the LLVM release matching Lean's clang, and C library
 // headers (Ubuntu glibc + Linux UAPI headers, MinGW-w64 headers). Every input is
 // verified against its pin and only the named directories are staged.
-import { createReadStream, createWriteStream, mkdirSync } from 'node:fs';
+import { createReadStream, mkdirSync } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
@@ -10,7 +10,7 @@ import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { createZstdDecompress } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
-import { Parser } from 'tar';
+import { parseTar, fileSink } from '../../src/tar.mjs';
 
 async function verify(file, pin) {
   const hash = createHash('sha256');
@@ -37,26 +37,19 @@ const safe = path => path && !/[\\\0]/.test(path) && !path.startsWith('/') && pa
 
 /** Streams a tar(.zst) and stages regular files selected by `map(path) -> destination path | null`. */
 async function stageTar(source, map, stage, members) {
-  const parser = new Parser({ strict: true });
-  const writes = [];
-  let failure;
-  parser.on('entry', entry => {
-    try {
-      const path = entry.path.replace(/^\.\//, '').replace(/\/$/, '');
-      const destination = entry.type === 'Directory' ? null : map(path);
-      if (!destination) { entry.resume(); return; }
-      if (!['File', 'OldFile', 'ContiguousFile'].includes(entry.type)) throw new Error(`Unsupported member type ${entry.type}: ${path}`);
-      if (!safe(path) || !safe(destination)) throw new Error(`Unsafe member ${path}`);
-      if (members.has(destination)) throw new Error(`Two C tier inputs provide ${destination}`);
-      const file = join(stage, ...destination.split('/'));
-      mkdirSync(dirname(file), { recursive: true });
-      members.set(destination, { path: destination, type: 'file', source: file, size: entry.size, executable: false });
-      writes.push(pipeline(entry, createWriteStream(file, { flags: 'wx' })));
-    } catch (error) { failure ??= error; entry.resume(); }
+  const parser = parseTar(entry => {
+    const path = entry.path.replace(/^\.\//, '').replace(/\/$/, '');
+    const destination = entry.type === 'Directory' ? null : map(path);
+    if (!destination) return;
+    if (entry.type !== 'File') throw new Error(`Unsupported member type ${entry.type}: ${path}`);
+    if (!safe(path) || !safe(destination)) throw new Error(`Unsafe member ${path}`);
+    if (members.has(destination)) throw new Error(`Two C tier inputs provide ${destination}`);
+    const file = join(stage, ...destination.split('/'));
+    mkdirSync(dirname(file), { recursive: true });
+    members.set(destination, { path: destination, type: 'file', source: file, size: entry.size, executable: false });
+    return fileSink(file);
   });
   await pipeline(source, createZstdDecompress(), parser);
-  await Promise.all(writes);
-  if (failure) throw failure;
 }
 
 /** Stages the pinned inputs for one platform; returns archive members and their provenance. */

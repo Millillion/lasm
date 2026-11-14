@@ -862,6 +862,10 @@
       "kind": "io",
       "reason": "runs the system git; orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
     },
+    "src/tar.mjs": {
+      "status": "pending",
+      "reason": "the tar reader and writer (tool archives, npm packages, the Fastly package): fuzzed against Python's tarfile, an independent implementation (test/fuzz/targets/tar.mjs); a Lean model of the reader's header and pax parsing is due (IRREDUCIBLE.md M4)"
+    },
     "src/test-switches.mjs": {
       "status": "exempt",
       "kind": "data",
