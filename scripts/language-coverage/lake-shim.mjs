@@ -24,7 +24,13 @@ const env = name => { const value = process.env[name]; if (!value) throw new Err
 const stateDir = env('LASM_LAKE_SHIM_STATE'), stateFile = join(stateDir, 'state.json');
 const state = existsSync(stateFile) ? JSON.parse(readFileSync(stateFile, 'utf8'))
   : { substituted: {}, deployments: {}, events: [], next: 0 };
-const save = () => writeFileSync(stateFile, JSON.stringify(state, null, 1) + '\n');
+// Written whole and renamed into place: Lake and drivers can start shims that
+// overlap (4.36's tests/lake/tests/query read an empty state.json mid-write).
+const save = () => {
+  const partial = `${stateFile}.${process.pid}.partial`;
+  writeFileSync(partial, JSON.stringify(state, null, 1) + '\n');
+  renameSync(partial, stateFile);
+};
 const event = record => { state.events.push({ at: new Date().toISOString(), ...record }); save(); };
 const sha256 = file => createHash('sha256').update(readFileSync(file)).digest('hex');
 const invocations = join(stateDir, 'invocations.log');

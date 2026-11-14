@@ -299,3 +299,139 @@ New upstream tests that fail on Lasm (new coverage, not regressions; work for
   (scripts/application-tests/runtime-adapter-source.mjs).
 - `elab/async_http_expect`: reviewed afresh for eval-io (4.36 adds one
   `assertContains r " GMT\r\n"`; same 5 actions).
+
+## Lean 4.36.0-rc2 (second run, branch `lean-4.36-rc2`, PR #287, not merged)
+
+The second run of this runbook, on `main`'s tooling. It stopped partway on
+purpose (2026-11-14): the Lean side is done and the upstream suite has
+partial results. What is left is in "Switch to stable" below.
+
+What porting took (rc1 → rc2 changes no runtime C++):
+
+- **Catalog and references.** `add-release.mjs`/`bump.mjs` (ffa21d6b). No tiers:
+  the branch uses the full upstream archives (step 6). The examples and content
+  tutorials stay on 4.35.0 until a Lasm release ships 4.36.
+- **Patches.** All clean or offset (lean-upgrade-inventory.yml 43568579178).
+- **Initialization.** `init.cpp`/`init_module.cpp` are byte-identical to rc1's,
+  so the rc1 review carries and `canSpecializeInitialization` accepts the
+  runtime.
+- **Lasm's library** compiles unchanged (library-prebuilt.yml 43568304776).
+- **Upstream inventory.** 4565 registrations (rc1: 4561; the new ones are
+  `grind_forall_refuted_ematch`, `grind_forall_true_imp`,
+  `versoDocModuleScoped` and the `pkg/lean-beam` package test); 581 L1
+  adapter candidates. 150 mixed drivers (rc1: 149). The one new driver is
+  `pkg/lean-beam`, classified native build time: it skips unless Lean's
+  release CI built the Beam tools, the same as the external kernel checkers.
+  Fresh reviews: `elab/10078`, `elab/json` and `elab/leanExportParse` (runtime
+  adapter). `elab/async_http_expect` (eval-io) keeps its rc1 review: its
+  source is byte-identical in rc2.
+
+Problems the run found, all fixed on the branch. The first four would also
+hit a stable upgrade:
+
+- The unit tests, the `init` toolchain pattern, the UI applier differential
+  and the error corpus named 4.35.0 or accepted only a stable version. They
+  now read the pinned release, and the error corpus reads the Lean of the CLI
+  under test (68b8e835, 1b202790, 1a123edf).
+- Packing the candidate peaked at 1.61 GiB, past the resource guard's 80%
+  stop under the 2 GiB cap (4.35: 1.45 GiB). The runtime is now hard-linked
+  into staging instead of copied: 1.17–1.25 GiB (e9cb0eba).
+- `classify-mixed.mjs` had been removed as unreferenced, so every
+  language-coverage shard stopped on a missing
+  `lean-<version>-mixed-driver-classification.json`. It is restored, and
+  `lean-upgrade-inventory.yml` now writes that file (e7aa3aa0, 8140dbcb).
+- The resource guard now prints why it stopped and the memory breakdown
+  (a38f4597). Every stop listed below was page cache (`inactive_file`), not heap.
+- Problems that show only without tiers: the editor check expected the C-tier
+  note, and the Linux acceptance isolation control looked for `bin/lean` under
+  `artifacts/` instead of the assembled `derived/` prefix (0871c71e, 354e4efc).
+
+CI on branch `lean-4.36-rc2` (all against 4.36.0-rc2):
+
+| Step | Run | Result |
+| --- | --- | --- |
+| Node runtime (full build) | 43570664322 | runtime manifest `e59893b5…`, handoff `node-runtime-inputs-43570664322` (draft) |
+| Edge runtime | 43580020210 | `lean-4.36.0-rc2-wasm64-edge.tar.zst` `7ace5438…`, draft release `lean-4.36.0-rc2-edge-v1` |
+| Tiers and C tier, five platforms | 43570763123 | success; not published |
+| Language-coverage inventory | 43570728704 | 4565 registrations |
+| Inventory, patches, reviews; mixed-driver classification | 43568579178, 43600945265 | see above |
+| Unit | 43585783596, 43609570111 | pass |
+| UI | 43582348302 | pass |
+| Dev loop (pack, editor, cold start, templates) | 43590016162 | pass |
+| Linux acceptance (x64, arm64, JS interop, templates) | 43609434994 | pass |
+| Upstream suite candidate | 43585787180 | `0.1.0-experimental.20261114110`, release `node-package-43585787180`, sha256 `f74365e3…` (packed from e9cb0eba; later commits change only scripts, tests and evidence) |
+| Upstream suite, Linux x64: runtime adapter, eval-io, compiled applications, projects, docparse, lsp, lsp-server | 43607066936, 43607069454, 43607073138, 43607077491, 43620960610, 43622436712, 43622441999 | 1054 compared with the 4.35.0 Phase 3 baseline: 3 regressions, 0 missing, 0 resource stops (below) |
+| Superseded shards (dispatched before the mixed-driver classification existed) | 43594416837, 43594419251, 43594423135, 43594427827, 43604749451 | failed at start on the missing evidence file; not results |
+
+The three regressions against the baseline:
+
+- `compile/StackOverflow.lean` and `compile/StackOverflowTask.lean` (compiled
+  applications): the deployed program prints Lean's own `Stack overflow
+  detected. Aborting.` and exits as native Lean does (134). Lasm then adds
+  its advice about `LASM_VM_STACK_MB`, which the byte-exact `.out.expected`
+  rejects. This is not a 4.36 change. The advice is from #66 (6507b9eb,
+  2026-11-02), which landed after the 4.35.0 baseline was recorded
+  (2026-10-22), so `main`'s upstream suite should show it too. It needs a decision: write the
+  advice where the comparison ignores it, or have the compiled-application
+  comparison accept it.
+- `tests/lake/tests/query/test.sh` (projects): the test pipes
+  `lake query +A:setup --json | lake env lean --run pretty.lean`. That
+  pipeline runs two language-coverage `lake` shims at once, and one read the
+  other's half-written `state.json`. This is a harness bug: the shim now writes
+  its state atomically. Not re-run: the run paused before the shards were
+  dispatched again.
+
+**Stopped by the resource guard without tiers** (page cache of the full
+upstream archive, about 3.5 GiB `inactive_file`, as on rc1): Browser build
+43586880249, Workers compiler on arm64 and the `workers` job 43586882310
+(every other Workers job passes, including pack), WASI 43586884581,
+Fullstack `npm run dev` (1 and 2 workers) 43586887028, the error-corpus
+candidate leg of the first tooling run (43585783661), and Fastly bindings on
+one of two runs (43609570259; 43585783738 passed). These are expected to pass
+once tiers are published (step 6).
+
+**Failing because the edge archive is a draft:** an anonymous download of a
+draft release's asset returns HTTP 404. Affected: Standard bindings
+conformance 43609570172, Differential (release, equivalence, async depth)
+43609570196, Dependable tooling fault injection, metamorphic and the error
+corpus 43609570130. The suite workflows themselves pass `LASM_EDGE_RUNTIME`
+from the edge artifact, so they are not affected. All of these pass once the
+edge release is published.
+
+Not run (paused 2026-11-14): the remaining upstream shards (lsp-project,
+the four arm64 harnesses), the ecosystem (six runners plus no-system-c), the
+five-platform acceptance and the cold-installation gate.
+
+### Switch to stable (4.36.0)
+
+Mechanical, on a branch `lean-4.36` from `main` (or this branch after
+merging `main`):
+
+1. `node scripts/lean-upgrade/add-release.mjs 4.36.0`; make it the only release in
+   `src/toolchains.json` and set `lean` in `scripts/ci/acceptance-versions.json`.
+2. `node scripts/lean-upgrade/bump.mjs 4.36.0-rc2 4.36.0`, then read its `test/` diff.
+   Examples, content tutorials and the `porter`/`tandem` checker comments move
+   to 4.36.0 only in the release PR.
+3. `check-patches.mjs 4.36.0`. Diff `init.cpp`/`init_module.cpp` and the
+   `@[extern]` lists against rc2, and look for anything new in `runtime/` or
+   `CMakeLists.txt`.
+4. Dispatch `lean-upgrade-inventory.yml` (`from=4.36.0-rc2`): initializer list,
+   upstream inventory, carried reviews, mixed-driver classification. Commit
+   them, and review whatever `carry-reviews` lists and any new mixed driver
+   (`classify-mixed.mjs` names them).
+5. `library-prebuilt.yml`; `language-coverage-baseline.yml -f harness=inventory`
+   and `make-adapter-review.mjs 4.36.0`.
+6. `node-linux-runtime.yml` (full build) → pin it (step 4). Then
+   `edge-runtime.yml` → pin it, and **publish** the edge release.
+7. Run `lean-tiers.yml` with `publish=true` and add the `tiers` block (with
+   `c`) to `src/toolchains.json` **before** the suites. That clears the
+   resource-guard stops above.
+8. Linux acceptance → candidate. Then dispatch the Linux harnesses and the
+   ecosystem runs of `scripts/nightly/layout.json` for that candidate
+   (`scripts/nightly/driver.mjs` `plannedRuns`), and compare with the 4.35.0
+   Phase 3 baseline (`scripts/nightly/compare.mjs`). Re-run
+   `tests/lake/tests/query` and settle the two `StackOverflow` tests (above). Bump any ecosystem project that fails to its
+   `v4.36.0` tag.
+9. Lasm's suites (unit, browser, ui, wasi, workers, fullstack, dx-dev-loop),
+   then the release PR with the full five-platform acceptance and the
+   cold-installation gate (step 9; docs/RELEASING.md).
