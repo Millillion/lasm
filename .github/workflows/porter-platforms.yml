@@ -13,6 +13,7 @@ on:
       - '!examples/porter/Proofs/**'
       - '!examples/porter/Proofs.lean'
       - '!examples/porter/**/*.md'
+      - 'scripts/equivalence/traffic.mjs'
   push:
     branches: [main]
     paths:
@@ -21,6 +22,7 @@ on:
       - '!examples/porter/Proofs/**'
       - '!examples/porter/Proofs.lean'
       - '!examples/porter/**/*.md'
+      - 'scripts/equivalence/traffic.mjs'
 permissions:
   contents: read
 concurrency:
@@ -165,12 +167,17 @@ jobs:
       - name: Build (${{ matrix.build }})
         working-directory: ${{ env.PORTER }}
         run: node "$GITHUB_WORKSPACE/scripts/full-lean/run-bounded.mjs" --memory-mib 8192 -- bash -c "${{ matrix.build }}"
-      - name: The oracle tests
+      - name: The oracle tests (the traffic recorded for target equivalence)
         working-directory: ${{ env.PORTER }}
-        run: node test/oracles.mjs --platform ${{ matrix.platform }} --name ${{ matrix.platform }}
-      - name: The adversarial suite
+        run: node test/oracles.mjs --platform ${{ matrix.platform }} --name ${{ matrix.platform }} --equivalence
+      - name: The adversarial suite (the traffic recorded for target equivalence)
+        if: ${{ !cancelled() }}
         working-directory: ${{ env.PORTER }}
-        run: node test/attacks.mjs --platform ${{ matrix.platform }} --name ${{ matrix.platform }}
+        run: node test/attacks.mjs --platform ${{ matrix.platform }} --name ${{ matrix.platform }} --equivalence
+      - name: Target equivalence (both recordings against Node's, test/equivalence/)
+        if: ${{ !cancelled() }}
+        working-directory: ${{ env.PORTER }}
+        run: node test/equivalence.mjs compare ${{ matrix.platform }}
       # Where Porter's own server takes the HTTP requests (on the function
       # emulators, their gateways answer malformed requests themselves).
       - name: A minute of fuzzing (seeded; the seed is printed first)

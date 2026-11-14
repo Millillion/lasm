@@ -33,12 +33,14 @@ on:
       - '.github/workflows/porter.yml'
       - 'examples/porter/**'
       - 'scripts/sim/**'
+      - 'scripts/equivalence/traffic.mjs'
   push:
     branches: [main]
     paths:
       - '.github/workflows/porter.yml'
       - 'examples/porter/**'
       - 'scripts/sim/**'
+      - 'scripts/equivalence/traffic.mjs'
 permissions:
   contents: read
 concurrency:
@@ -101,12 +103,26 @@ jobs:
       - name: npm run build
         working-directory: examples/porter
         run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
-      - name: The oracle tests (openid-client, oauth4webapi, jose)
+      - name: The oracle tests (openid-client, oauth4webapi, jose; the traffic recorded for target equivalence)
         working-directory: examples/porter
-        run: node test/oracles.mjs --name "node-${{ matrix.node }}"
-      - name: The adversarial suite
+        run: node test/oracles.mjs --name "node-${{ matrix.node }}" --equivalence
+      - name: The adversarial suite (the traffic recorded for target equivalence)
+        if: ${{ !cancelled() }}
         working-directory: examples/porter
-        run: node test/attacks.mjs --name "node-${{ matrix.node }}"
+        run: node test/attacks.mjs --name "node-${{ matrix.node }}" --equivalence
+      - name: Target equivalence (both recordings against test/equivalence/; the normalizer's self-test first)
+        if: ${{ !cancelled() }}
+        working-directory: examples/porter
+        run: |
+          node test/equivalence.mjs self-test > /dev/null
+          node test/equivalence.mjs compare "node-${{ matrix.node }}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: porter-node-${{ matrix.node }}
+          path: examples/porter/test-results/
+          retention-days: 14
+          if-no-files-found: ignore
   dst:
     name: Deterministic simulation (fixed seeds)
     runs-on: ubuntu-24.04
