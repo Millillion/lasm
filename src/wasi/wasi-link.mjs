@@ -146,7 +146,8 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
     writeFileSync(responseFile, emscriptenResponseFile(ldArgs, 'win32'));
     run('wasm-ld', ['@' + responseFile]);
   } else run('wasm-ld', ldArgs);
-  if (evidenceMap) saveLinkEvidence(`wasi-${target}`, { 'linked.wasm': linked, 'link.map': evidenceMap }, { mode: `wasi-${target}` });
+  if (evidenceMap) saveLinkEvidence(`wasi-${target}`, { 'linked.wasm': linked, 'link.map': evidenceMap }, { mode: `wasi-${target}`, args: ldArgs },
+    process.env, ldArgs.filter(arg => arg.endsWith('.o')));
 
   // 3. Atomics to plain memory instructions.
   const lowered = join(out, 'lowered.wasm');

@@ -1306,7 +1306,18 @@ shares no code with the link driver it checks):
 - each map global's index exists, once, named as the name section names it;
 - an export whose name is a map symbol refers to the function or global that
   symbol is on;
-- the module validates (V8's `WebAssembly.validate`).
+- the module validates (V8's `WebAssembly.validate`);
+- relocations (`--relocations`, `scripts/link-validation/wasm-ld-relocations.mjs`):
+  every function the map attributes to an input object (an object the
+  evidence kept, or an archive member at the path the map names) is that
+  object's body, byte for byte outside its relocation sites, and every site
+  holds a value the map attributes to the symbol the relocation names: a
+  function carrying that symbol (or an import of that name), a table slot
+  holding such a function, the symbol's address plus the addend, the global
+  of that name, a type with the same signature, a table or tag that exists.
+  Symbols resolve as wasm-ld resolves them (locals within their object,
+  `--wrap`). A site the map cannot attribute (a symbol it does not list) is
+  counted, not guessed; one it attributes to another symbol fails.
 
 The map leaves the section header (its id and size field) out of a function's
 or data chunk's offset (wasm-ld 24, `lld/wasm/MapFile.cpp`): the file offset is
@@ -1318,9 +1329,10 @@ each real map (a function moved, resized, dropped or swapped with its
 neighbour, a segment, a data symbol or a global moved, a section resized, an
 exported symbol moved onto another function) and fails if any is not
 reported; `--min-links` fails a run that recorded too few links.
-`test/link-validation.test.mjs` runs it on three small links
+`test/link-validation.test.mjs` runs it on four small links
 (`test/fixtures/link-validation/`: passive segments with shared memory, active
-segments, imported memory) and their corruptions on every pull request.
+segments, imported memory, and objects with an archive and `--wrap` for the
+relocations) and their corruptions on every pull request.
 
 Pull requests and pushes that touch the link path (the link driver and
 recipes, `src/application-link.mjs`, the edge and WASI links, the toolchain
@@ -1331,15 +1343,17 @@ examples, in the release and the dev profile.
 
 ```sh
 LASM_TEST_LINK_EVIDENCE=.work/evidence lasm build Main.lean --target wasi
-node scripts/link-validation/check-wasm-ld.mjs --evidence .work/evidence --self-test 12
+node scripts/link-validation/check-wasm-ld.mjs --evidence .work/evidence --self-test 12 --relocations
 ```
 
 *Catches:* a function, data chunk or symbol that is not where the map says
 (for example a link that stops reading its inputs as the recipe assumes), a
 passive segment copied to the wrong address, an export bound to another
-definition, an unexpected section. *Cannot catch yet:* relocation values (that
-each relocation site holds the index or address of the symbol it names): that
-needs the input objects and is the next slice.
+definition, an unexpected section, a call or address bound to the wrong
+symbol, a function body changed outside its relocations. *Cannot catch yet:*
+relocations in data segments (`reloc.DATA`: function pointers and addresses in
+initialized data), and functions whose input is ambiguous (two archive members
+of one name) or that wasm-ld synthesizes.
 
 #### Binaryen's lowering passes by differential execution
 

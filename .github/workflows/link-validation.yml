@@ -7,7 +7,8 @@ name: Link validation
 # the WASI links) leaves its output module and its -Map file. Then
 # scripts/link-validation/check-wasm-ld.mjs checks each module against its map
 # (sections, functions, data segments and chunks, symbols, globals, exports,
-# __wasm_init_memory) and, as a self-test, that 12 seeded corruptions of each
+# __wasm_init_memory), each function against its input object's body and
+# relocations (wasm-ld-relocations.mjs) and, as a self-test, that 12 seeded corruptions of each
 # map are all reported. Then scripts/link-validation/binaryen-diff.mjs re-runs
 # each WASI link's wasm-opt step one lowering pass at a time (--strip-eh,
 # --memory64-lowering, --table64-lowering) and runs every module on wabt's
@@ -160,7 +161,7 @@ jobs:
       - name: wasm-ld against its map
         if: always()
         run: |
-          node scripts/link-validation/check-wasm-ld.mjs --evidence "$RUNNER_TEMP/link-evidence" --min-links 10 --self-test 12 \
+          node scripts/link-validation/check-wasm-ld.mjs --evidence "$RUNNER_TEMP/link-evidence" --min-links 10 --self-test 12 --relocations \
             --report "$RUNNER_TEMP/link-validation/wasm-ld-report.json"
       - name: wasm-interp and wasmtime
         if: always() && steps.build.outcome != 'skipped'

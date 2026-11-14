@@ -9,8 +9,8 @@
 // program needs) and WASI's wasm-opt at -O0 (lowering passes only). The
 // precompiled runtime archives are unchanged. The switch is part of the build's
 // cache identity, so optimized and unoptimized outputs never share a cache entry.
-import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { basename, join } from 'node:path';
 
 export const testUnoptimized = (env = process.env) => env.LASM_TEST_UNOPTIMIZED === '1';
 
@@ -24,14 +24,24 @@ export const testUnoptimized = (env = process.env) => env.LASM_TEST_UNOPTIMIZED 
 export const linkEvidenceDirectory = (env = process.env) => env.LASM_TEST_LINK_EVIDENCE || undefined;
 let evidenceCount = 0;
 /** Copies `files` ({ name: source path }) and `meta` into a new directory under
- * LASM_TEST_LINK_EVIDENCE; returns it, or undefined when the switch is off. */
-export function saveLinkEvidence(kind, files, meta = {}, env = process.env) {
+ * LASM_TEST_LINK_EVIDENCE, and each of `objects` (a link's object-file inputs,
+ * often in a directory the build removes) into its objects/; returns the
+ * directory, or undefined when the switch is off. */
+export function saveLinkEvidence(kind, files, meta = {}, env = process.env, objects = []) {
   const root = linkEvidenceDirectory(env);
   if (!root) return undefined;
   const name = `${Date.now().toString(36)}-${process.pid}-${String(evidenceCount++).padStart(3, '0')}-${kind.replace(/[^A-Za-z0-9_-]/g, '_')}`;
   const directory = join(root, name);
   mkdirSync(directory, { recursive: true });
   for (const [file, source] of Object.entries(files)) copyFileSync(source, join(directory, file));
-  writeFileSync(join(directory, 'evidence.json'), JSON.stringify({ kind, files: Object.keys(files), ...meta }, null, 1) + '\n');
+  const copied = {};
+  objects.filter(file => existsSync(file)).forEach((file, i) => {
+    if (i === 0) mkdirSync(join(directory, 'objects'));
+    const name = `objects/${String(i).padStart(4, '0')}-${basename(file)}`;
+    copyFileSync(file, join(directory, name));
+    copied[file] = name;
+  });
+  writeFileSync(join(directory, 'evidence.json'), JSON.stringify({ kind, files: Object.keys(files), ...meta,
+    ...(objects.length ? { objects: copied } : {}) }, null, 1) + '\n');
   return directory;
 }

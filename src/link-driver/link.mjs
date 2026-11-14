@@ -263,7 +263,8 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   if (mapOnly === 'command') return { program: tool(linkStep.program), args: wasmLdArgs, env };
   run(linkStep.program, wasmLdArgs);
   // LASM_TEST_LINK_EVIDENCE (src/test-switches.mjs): wasm-ld's output and its map.
-  if (parsed.mapFile) saveLinkEvidence(mode, { 'linked.wasm': wasm, 'link.map': parsed.mapFile }, { mode, mapOnly: !!mapOnly });
+  if (parsed.mapFile) saveLinkEvidence(mode, { 'linked.wasm': wasm, 'link.map': parsed.mapFile }, { mode, mapOnly: !!mapOnly, args: linkArgs },
+    process.env, linkArgs.filter(arg => arg.endsWith('.o')));
   // Planning probes (src/application-initialization.mjs) need only wasm-ld's map.
   if (mapOnly) return;
 

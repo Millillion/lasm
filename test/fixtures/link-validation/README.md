@@ -8,3 +8,10 @@ Built with the managed link toolchain's clang and wasm-ld (LLD 24.0.0, Emscripte
 
 shared and imported have passive segments (initialized by __wasm_init_memory,
 the .bss by its memory.fill); active has active segments.
+
+archive links a.o, c.o and libb.a (b.o archived with llvm-ar) with --wrap
+(c.c defines __wrap_helper, which calls __real_helper), for the relocation
+check; the objects are kept beside it:
+
+    llvm-ar rc libb.a b.o
+    wasm-ld -mwasm64 --import-memory --shared-memory --max-memory=1048576 -o archive.wasm a.o c.o libb.a -Map=archive.map --export=helper --strip-debug --wrap=helper

@@ -8,11 +8,12 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { checkLink, parseMap, readModule, initMemoryOperations } from '../scripts/link-validation/wasm-ld-map.mjs';
 import { corruptions, prng } from '../scripts/link-validation/corrupt-map.mjs';
+import { checkRelocations, inputReader, readArchive, readObject, relocTypes } from '../scripts/link-validation/wasm-ld-relocations.mjs';
 import { linkEvidenceDirectory, saveLinkEvidence } from '../src/test-switches.mjs';
 
 const fixtures = new URL('./fixtures/link-validation/', import.meta.url);
 const load = name => ({ bytes: readFileSync(new URL(`${name}.wasm`, fixtures)), map: readFileSync(new URL(`${name}.map`, fixtures), 'utf8') });
-const names = ['shared', 'active', 'imported'];
+const names = ['shared', 'active', 'imported', 'archive'];
 
 test('each fixture link agrees with its map', () => {
   for (const name of names) {
@@ -20,7 +21,7 @@ test('each fixture link agrees with its map', () => {
     const { problems, stats } = checkLink(bytes, map);
     assert.deepEqual(problems, [], name);
     assert.equal(stats.functions, readModule(bytes).functionTypes, name);
-    assert.ok(stats.segments >= 3 && stats.bssSegments === 1 && stats.exportsResolved === 3, name);
+    assert.ok(stats.segments >= 3 && stats.bssSegments === 1 && stats.exportsResolved >= 2, name);
   }
 });
 
@@ -102,5 +103,49 @@ test('LASM_TEST_LINK_EVIDENCE: off by default; on, each link leaves its files', 
     assert.equal(readFileSync(join(first, 'linked.wasm'), 'utf8'), 'bytes');
     assert.deepEqual(JSON.parse(readFileSync(join(first, 'evidence.json'), 'utf8')), { kind: 'final', files: ['linked.wasm'], mode: 'final' });
     assert.match(second, /edge_x$/);
+    const third = saveLinkEvidence('wasi', {}, {}, env, [source, join(root, 'gone.o')]);
+    assert.deepEqual(JSON.parse(readFileSync(join(third, 'evidence.json'), 'utf8')).objects, { [source]: 'objects/0000-x.wasm' });
+    assert.equal(readFileSync(join(third, 'objects/0000-x.wasm'), 'utf8'), 'bytes');
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// The archive fixture: a.o and c.o as objects, b.o from libb.a, helper wrapped.
+const fromFixtures = file => readFileSync(new URL(file, fixtures));
+const relocationsOf = bytes => checkRelocations(bytes, load('archive').map, { objectBytes: inputReader(fromFixtures), wraps: ['helper'] });
+
+test('relocations: every function of the archive link against its input object, every site attributed', () => {
+  assert.deepEqual(readArchive(fromFixtures('libb.a')).map(m => m.name), ['b.o']);
+  const { problems, stats } = relocationsOf(load('archive').bytes);
+  assert.deepEqual(problems, []);
+  assert.equal(stats.functions, 5);
+  assert.equal(stats.functionsMissingInput, 0);
+  assert.ok(stats.relocations >= 14 && stats.attributed === stats.relocations, JSON.stringify(stats));
+  for (const kind of ['FUNCTION_INDEX_LEB', 'TYPE_INDEX_LEB', 'GLOBAL_INDEX_LEB', 'MEMORY_ADDR_LEB64', 'MEMORY_ADDR_SLEB64', 'MEMORY_ADDR_TLS_SLEB64', 'TABLE_NUMBER_LEB'])
+    assert.ok(stats.byKind[kind]?.attributed > 0, kind);
+});
+
+test('relocations: a site holding another symbol, or a byte changed outside the sites, is reported', () => {
+  const { bytes, map } = load('archive');
+  const object = readObject(fromFixtures('a.o')), module = readModule(bytes);
+  const code = parseMap(map).sections.find(s => s.kind === 'CODE');
+  const run = code.functions.findIndex(f => f.name === 'a.o:(run)');
+  const runSymbol = object.symbols.find(s => s.kind === 0 && s.name === 'run' && !s.undefined);
+  const inBody = object.module.code.bodies[runSymbol.index - object.imports.func.length], outBody = module.code.bodies[run];
+  const base = object.module.code.section.contentStart;
+  const call = object.relocations.find(r => relocTypes[r.type][0] === 'FUNCTION_INDEX_LEB' && base + r.offset >= inBody.start && base + r.offset < inBody.end);
+  const at = outBody.start + (base + call.offset - inBody.start);
+  // The call now names function `run` itself (a padded five-byte LEB128).
+  const wrongCall = Buffer.from(bytes);
+  const self = module.imports.func + run;
+  wrongCall.set([0x80 | (self & 0x7f), 0x80 | ((self >> 7) & 0x7f), 0x80, 0x80, 0x00], at);
+  assert.ok(relocationsOf(wrongCall).problems.some(p => /FUNCTION_INDEX_LEB.*the map defines __wrap_helper/.test(p)), JSON.stringify(relocationsOf(wrongCall).problems));
+  // A byte of run's body before any relocation site (its local declarations).
+  const changed = Buffer.from(bytes);
+  changed[outBody.start + 5] ^= 1;
+  assert.ok(relocationsOf(changed).problems.some(p => /function a\.o:\(run\): byte \+5 changed outside any relocation/.test(p)), JSON.stringify(relocationsOf(changed).problems));
+  // An input that is not there is counted, not guessed.
+  const missing = checkRelocations(bytes, map, { objectBytes: () => null, wraps: ['helper'] });
+  assert.deepEqual(missing.problems, []);
+  assert.equal(missing.stats.functions, 0);
+  assert.equal(missing.stats.functionsMissingInput, 5);
 });
