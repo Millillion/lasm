@@ -76,6 +76,15 @@ pull request before, so none of them is a check that was dropped.
    regular expression.
 6. **No runs on Sunday** (below): every workflow with a `schedule:` calls the
    Sunday guard, and every other job in it needs it.
+7. **A step that pipes runs with pipefail.** GitHub runs a step without
+   `shell` as `bash -e {0}` (no pipefail) on Linux and macOS, so in
+   `checker | tee log` a failing checker passes; this hid a failing model check
+   for ten days ([#291](https://github.com/Millillion/lasm/issues/291)). Give
+   such a step `shell: bash` (`bash -eo pipefail`) or start it with
+   `set -o pipefail`, and do not pipe a long output into `head` or `grep -q`,
+   which exit early (the writer's SIGPIPE then fails the step).
+   `test/workflow-pipefail.test.mjs` (`scripts/ci/workflow-pipefail.mjs`)
+   checks every workflow.
 
 ## No runs on Sunday
 
@@ -188,6 +197,7 @@ it), and "dispatch" means `workflow_dispatch`.
 | `ci-nightly.yml` | cron 7 1 * * 2-6, dispatch | Linux + called workflows | — | Nightly tier: the release suites on main | Nightly |
 | `ci-weekly.yml` | cron 7 12 * * 6, dispatch | called workflows | — | Weekly tier: long campaigns | Weekly |
 | `cli-models.yml` | dispatch, PR (paths), push main (paths) | Linux | new | Model differential of the CLI's JavaScript: each function with a Lean model (verification/cli/Lasm/Cli/Model/) agrees with it on 2000 generated inputs | PR (paths), main |
+| `glue.yml` | dispatch, PR (paths), push main (paths) | Linux | new | The CLI's glue program ([docs/proposals/M6_GLUE.md](proposals/M6_GLUE.md)): builds verification/cli/LasmGlue.lean with the pinned published `@lasm/cli` (`--target wasi`), fails unless `src/glue/` is that build (artifact `lasm-glue` to commit), runs the glue's tests and model differential, the smoke test under Node, Bun and Deno, and the measurements of the bar against main's JavaScript | PR (paths), main |
 | `ui-applier-model.yml` | dispatch, PR (paths), push main (paths) | Linux | new | Model differential of the Lasm.UI applier: src/lasm-modules/ui-dom.mjs on happy-dom (the DOM standard's insertion checks) agrees with its Lean model (library/Lasm/UI/Proofs/Applier.lean) after every frame of 1000 sessions each of Lean's diff, random operations and hydration, and the 120 fixture sessions | PR (paths), main |
 | `conduit-platforms.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 35 min (max 103) | examples/conduit on 15 non-Node platforms, RealWorld traffic equivalence | PR (paths), main |
 | `conduit.yml` | dispatch, call, PR (paths), push main,conduit (paths) | Linux | 24 min (max 107) | examples/conduit: proofs, API on Node/Workers/Bun, RealWorld E2E in three browsers | PR (paths), main |
@@ -241,8 +251,8 @@ it), and "dispatch" means `workflow_dispatch`.
 | `npm-dist.yml` | call, dispatch | Linux, macOS, Windows | 43 min | npm packages of the candidate through a loopback registry; Bun/Deno installs | Release (rehearsal) |
 | `platform-support.yml` | call, dispatch, push main (paths) | Linux, macOS, Windows | 12 min (max 196) | Launch platform claims: builds, containers, Lambda, native hosts | Release (called), main (paths) |
 | `porter-nightly.yml` | cron 41 3 * * 2-6, dispatch | Linux | 43 min | Porter: 40-minute endpoint fuzzing of the Node build and of the Workers build under wrangler dev | Nightly |
-| `porter-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 32 min (max 101) | examples/porter on Bun, Deno, Docker, Workers | PR (paths), main |
-| `porter.yml` | dispatch, PR (paths), push main (paths) | Linux | 18 min (max 86) | examples/porter: proofs, oracles, DST, fuzzer, E2E | PR (paths), main |
+| `porter-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 32 min (max 101) | examples/porter on Bun, Deno, Docker, Workers, Lambda (.zip, image), Vercel, Netlify, Azure, GCF; oracle and adversarial traffic equivalence against Node | PR (paths), main |
+| `porter.yml` | dispatch, PR (paths), push main (paths) | Linux | 18 min (max 86) | examples/porter: proofs, oracles and attacks (and their traffic against `test/equivalence/`), DST, fuzzer, E2E | PR (paths), main |
 | `published-templates.yml` | dispatch, after release | Linux | 0 min (max 30) | npm create @lasm from the registry after a release | After release |
 | `release-benchmarks.yml` | call, dispatch | Linux, macOS, Windows + called workflows | 58 min | Release benchmark set | Release (called), on demand |
 | `release-checks.yml` | PR, push main, dispatch | Linux + called workflows | 9 min (max 208) | The single required status of a release | Release (every PR and push to main: detect) |

@@ -4,7 +4,7 @@
 import Lasm.UI.Proofs.TwoEnded
 
 namespace Lasm.UI.Proofs
-open Lasm.UI Lasm.UI.Model
+open Lasm.UI Lasm.UI.Model Lasm.UI.Applier
 
 variable {Msg β : Type}
 
@@ -22,48 +22,54 @@ theorem slice_all (l : List β) : slice l.toArray.toList 0 l.toArray.size = l :=
 
 theorem prefixPhase_spec (val : β → Html Msg) (f : Live Msg → β → Nat → NodeResult Msg)
     (hf : ∀ o b n, WFn n o → o.same (val b) = true → NSpec o (val b) n (f o b n))
-    (dom0 : List Dom) (target : List (Html Msg)) :
+    (dom0 : List Dom) (used0 : List Nat) (target : List (Html Msg)) :
     ∀ (os : List (Live Msg)) (bs : List β) (next : Nat) (ops : Array (Op Msg)) (pre : Array (Live Msg)),
     applyOps ops.toList dom0 = (pre.toList ++ os).map toDom →
     ((pre.toList ++ os).map Live.id).Nodup → (∀ x ∈ pre.toList ++ os, WFn next x) →
-    pre.toList.map Live.erase ++ bs.map val = target →
-    RSpec dom0 target next (prefixPhase val f os bs next ops pre)
-  | [], bs, next, ops, pre, h1, h2, h3, h4 => by
+    pre.toList.map Live.erase ++ bs.map val = target → Conf used0 dom0 ops.toList next →
+    RSpec dom0 used0 target next (prefixPhase val f os bs next ops pre)
+  | [], bs, next, ops, pre, h1, h2, h3, h4, h5 => by
     rw [prefixPhase]
     obtain ⟨cs, e1, e2, e3, e4, e5, e6⟩ :=
       insertAll_spec val none dom0 [] rfl bs next ops pre (by simpa using h1) (by simpa using h2) (by simpa using h3)
-    exact ⟨by simpa using e3, by simp [e1, e2, ← h4], ⟨by simpa using e5, by simpa using e4⟩, e6⟩
-  | o :: os, [], next, ops, pre, h1, h2, h3, h4 => by
+    exact ⟨by simpa using e3, by simp [e1, e2, ← h4], ⟨by simpa using e5, by simpa using e4⟩, e6,
+      insertAll_conf val none dom0 used0 [] rfl bs next ops pre (by simpa using h1) (by simpa using h2)
+        (by simpa using h3) h5⟩
+  | o :: os, [], next, ops, pre, h1, h2, h3, h4, h5 => by
     rw [prefixPhase]
     refine ⟨removeAll_spec dom0 pre.toList (o :: os) ops h1 h2, by simpa using h4,
-      ⟨fun x hx => h3 x (by simp [hx]), ?_⟩, Nat.le_refl _⟩
+      ⟨fun x hx => h3 x (by simp [hx]), ?_⟩, Nat.le_refl _, removeAll_conf dom0 used0 pre.toList next (o :: os) ops h1 h2 h5⟩
     exact List.Sublist.nodup ((List.sublist_append_left _ _).map _) h2
-  | o :: os, b :: bs, next, ops, pre, h1, h2, h3, h4 => by
+  | o :: os, b :: bs, next, ops, pre, h1, h2, h3, h4, h5 => by
     rw [prefixPhase]
     split
     · rename_i hsame
-      obtain ⟨e1, e2, e3, e4, e5, e6⟩ := reuse_step val f hf (A := pre.toList) (B := os) h2 h3 hsame
+      obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := reuse_step val f hf (A := pre.toList) (B := os) h2 h3 hsame
       apply RSpec.weaken _ e6
-      apply prefixPhase_spec val f hf dom0 target os bs
+      apply prefixPhase_spec val f hf dom0 used0 target os bs
       · rw [applyOps_appendList, h1, e1]; simp
       · simpa using e2
       · intro x hx; exact e3 x (by simpa using hx)
       · rw [← h4]; simp [e4]
-    · apply twoEnded_spec val f hf dom0 target _ 0 _ _ 0 _ pre [] ops next none (Nat.le_refl _) (Nat.le_refl _)
+      · exact h5.append h1 e7
+    · apply twoEnded_spec val f hf dom0 used0 target _ 0 _ _ 0 _ pre [] ops next none (Nat.le_refl _) (Nat.le_refl _)
       · rw [win_all]; simpa using h1
       · rw [win_all]; simpa using h2
       · rw [win_all]; simpa using h3
       · rw [slice_all]; simpa using h4
+      · exact h5
 
 /-- The children diff is correct for every node diff `f` correct on the pairs it gets. -/
 theorem diffChildren_spec (val : β → Html Msg) (f : Live Msg → β → Nat → NodeResult Msg)
     (hf : ∀ o b n, WFn n o → o.same (val b) = true → NSpec o (val b) n (f o b n))
-    (old : List (Live Msg)) (new : List β) (next : Nat) (h : WF old next) :
-    RSpec (old.map toDom) (new.map val) next (diffChildren val f old new next) := by
+    (old : List (Live Msg)) (new : List β) (next : Nat) (h : WF old next) (used0 : List Nat)
+    (hu : ∀ x ∈ used0, x < next) :
+    RSpec (old.map toDom) used0 (new.map val) next (diffChildren val f old new next) := by
   rw [diffChildren.eq_def]
   split
-  · exact ⟨by simp, by simp, ⟨by simp, by simp⟩, Nat.le_refl _⟩
-  · exact ⟨by simp [applyOp], by simp, ⟨by simp, by simp⟩, Nat.le_refl _⟩
+  · exact ⟨by simp, by simp, ⟨by simp, by simp⟩, Nat.le_refl _, Conf.nil hu⟩
+  · exact ⟨by simp [applyOp], by simp, ⟨by simp, by simp⟩, Nat.le_refl _,
+      by simpa using (Conf.nil (Msg := Msg) hu).step rfl (lconf_clear _ _)⟩
   · rename_i o b
     split
     · rename_i hs
@@ -74,12 +80,12 @@ theorem diffChildren_spec (val : β → Html Msg) (f : Live Msg → β → Nat �
         rw [prefixPhase, insertAll]
         cases h : (f o b next).ops <;> simp_all
       rw [e]
-      exact prefixPhase_spec val f hf _ _ _ _ next #[] #[] (by simp) (by simp)
-        (by simpa using h.1) (by simp)
-    · exact prefixPhase_spec val f hf _ _ _ _ next #[] #[] (by simp) (by simp)
-        (by simpa using h.1) (by simp)
-  · exact prefixPhase_spec val f hf _ _ _ _ next #[] #[] (by simp) (by simpa using h.2)
-      (by simpa using h.1) (by simp)
+      exact prefixPhase_spec val f hf _ _ _ _ _ next #[] #[] (by simp) (by simp)
+        (by simpa using h.1) (by simp) (Conf.nil hu)
+    · exact prefixPhase_spec val f hf _ _ _ _ _ next #[] #[] (by simp) (by simp)
+        (by simpa using h.1) (by simp) (Conf.nil hu)
+  · exact prefixPhase_spec val f hf _ _ _ _ _ next #[] #[] (by simp) (by simpa using h.2)
+      (by simpa using h.1) (by simp) (Conf.nil hu)
 
 /-! One node -/
 
@@ -134,7 +140,14 @@ theorem diffNode_spec (n : Html Msg) (o : Live Msg) (next : Nat) (hwf : WFn next
   | .text i s, .text s', hwf, _ =>
     rw [diffNode]
     have hi := hwf.id_lt
-    refine ⟨?_, by simp, rfl, .text (by simpa [Live.id] using hi), Nat.le_refl _⟩
+    refine ⟨?_, by simp, rfl, .text (by simpa [Live.id] using hi), Nat.le_refl _, ?conf⟩
+    case conf =>
+      intro l hm hl
+      have hf := findId_unique hm (fun e he hid => hl e he (hid.trans (id_toDom _)))
+      simp only [toDom_text, Dom.id] at hf
+      split
+      · exact LConf.nil _ (Nat.le_refl _)
+      · exact LConf.single fun used hu => ⟨used, by simp [confOp, hf], hu⟩
     intro l hl
     simp only [toDom_text, Live.id] at hl ⊢
     split
@@ -150,18 +163,50 @@ theorem diffNode_spec (n : Html Msg) (o : Live Msg) (next : Nat) (hwf : WFn next
     simp only [beq_self_eq_true, Bool.and_self, ↓reduceIte]
     cases hwf with
     | elem hi hcs hnd =>
-    have hr := diffChildren_spec Subtype.val (fun o c nx => diffNode o c.1 nx)
+    have hall := diffChildren_spec Subtype.val (fun o c nx => diffNode o c.1 nx)
       (fun o c n hw hsm => diffNode_spec c.1 o n hw hsm) ocs ncs.attach next ⟨hcs, hnd⟩
-    obtain ⟨r1, r2, r3, r4⟩ := hr
+    have hr := hall [] (by simp)
+    have hconf : ∀ used : List Nat, (∀ x ∈ used, x < next) →
+        Conf used (ocs.map toDom) (diffChildren Subtype.val (fun o c nx => diffNode o c.1 nx) ocs ncs.attach next).ops.toList
+          (diffChildren Subtype.val (fun o c nx => diffNode o c.1 nx) ocs ncs.attach next).next :=
+      fun used hu => (hall used hu).conf
+    obtain ⟨r1, r2, r3, r4, -⟩ := hr
     have hattrs := diffAttrs_correct oattrs nattrs
     rw [List.attach_map_subtype_val] at r2
     -- the new node's DOM, from the old one's
-    generalize hr : diffChildren Subtype.val (fun o c nx => diffNode o c.1 nx) ocs ncs.attach next = r at r1 r2 r3 r4
-    generalize ha : diffAttrs oattrs nattrs = aops at hattrs
+    generalize hr : diffChildren Subtype.val (fun o c nx => diffNode o c.1 nx) ocs ncs.attach next = r at r1 r2 r3 r4 hconf
+    have hw : (diffAttrs oattrs nattrs).map AttrOp.wire = diffAttrs oattrs nattrs := diffAttrs_wire _ _
+    generalize ha : diffAttrs oattrs nattrs = aops at hattrs hw
     have hlive : toDom (Live.elem (Msg := Msg) i ns tag key nattrs r.live) =
         Dom.modChildren (applyOps r.ops.toList) (Dom.modAttrs (applyAttrOps aops) (toDom (Live.elem i ns tag key oattrs ocs))) := by
       simp [Dom.modAttrs, Dom.modChildren, hattrs, r1]
-    refine ⟨?_, by simp [r2], rfl, .elem (Nat.lt_of_lt_of_le hi r4) r3.1 r3.2, r4⟩
+    refine ⟨?_, by simp [r2], rfl, .elem (Nat.lt_of_lt_of_le hi r4) r3.1 r3.2, r4, ?conf⟩
+    case conf =>
+      intro l hm hl used hu
+      have hf := findId_unique hm (fun e he hid => hl e he (hid.trans (id_toDom _)))
+      simp only [toDom_elem, Dom.id] at hf
+      have hwb : (aops.map AttrOp.wire == aops) = true := by rw [hw]; simp
+      obtain ⟨u, hu1, hu2⟩ := hconf used hu
+      have hf' : findId i (applyOp (Op.attrs (Msg := Msg) i aops) l) =
+          some (.elem i ns tag (applyAttrOps aops (attrsOf oattrs)) (ocs.map toDom)) := by
+        simp only [applyOp]
+        rw [findId_modId (g := Dom.modAttrs (applyAttrOps aops)) (fun e => by cases e <;> rfl) hf]
+        rfl
+      by_cases hA : aops.isEmpty = true
+      · by_cases hC : r.ops.isEmpty = true
+        · simp only [hA, hC, ↓reduceIte]
+          exact ⟨used, confOps_nil .., fun x hx => Nat.lt_of_lt_of_le (hu x hx) r4⟩
+        · simp only [hA, hC, Bool.false_eq_true, ↓reduceIte]
+          exact ⟨u, by simpa [confOps_single, confOp, hf] using hu1, hu2⟩
+      · by_cases hC : r.ops.isEmpty = true
+        · simp only [hA, hC, Bool.false_eq_true, ↓reduceIte]
+          exact ⟨used, by simp [confOps_single, confOp, hf, hwb], fun x hx => Nat.lt_of_lt_of_le (hu x hx) r4⟩
+        · simp only [hA, hC, Bool.false_eq_true, ↓reduceIte]
+          refine ⟨u, ?_, hu2⟩
+          rw [confOps_cons]
+          simp only [confOp, hf, hwb, ↓reduceIte, Option.bind_some]
+          rw [confOps_single]
+          simpa [confOp, hf'] using hu1
     intro l hl
     simp only [Live.id] at hl ⊢
     have hid : ∀ g : List Dom → List Dom, ∀ a : Attrs → Attrs,
