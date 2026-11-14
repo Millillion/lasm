@@ -10,7 +10,7 @@
     "src/package.mjs: Lambda@Edge runs on x86_64; this build has no linux-x64 native support.": "Lambda@Edge from a build without linux-x64 support: only a build made on another host architecture; the corpus runs on linux-x64.",
     "src/dev.mjs: The browser target is not part of this Lasm version yet (docs/BROWSER.md).": "Only an installation without src/browser (a partial package); the published package always has it.",
     "src/browser/browser-dev.mjs: does not exist": "lasm dev checks every source before it calls runBrowserDev (dev-missing-source, dev-output-source-missing).",
-    "src/browser/static-server.mjs: (dynamic message, line 109)": "listenError's messages are chosen from a table (a variable); corpus case dev-browser-port-in-use prints the port-in-use one.",
+    "src/browser/static-server.mjs: (dynamic message, line 126)": "listenError's messages are chosen from a table (a variable); corpus case dev-browser-port-in-use prints the port-in-use one.",
     "src/browser/browser-build.mjs: --suspend must be one of": "The CLI refuses an unknown --suspend first (unknown-suspend); this is the library entry's own check.",
     "src/browser/browser-build.mjs: The browser build uses the JSPI-linked edge program (internal error)": "Internal invariant: a broken installation, cache or tool, not a user action; it is reported as an error, never a stack trace (reportCliError).",
     "src/browser/browser-build.mjs: The browser output directory must not contain the Lean sources": "The CLI refuses an output that holds the sources earlier (src/cli-arguments.mjs and application-build.mjs); this is the browser writer's own check.",

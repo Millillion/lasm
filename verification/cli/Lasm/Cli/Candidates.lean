@@ -40,16 +40,6 @@ def compact_wrappers_as_chains : Prop :=
 
 /-! ## Development server -/
 
-/-- **No request path reaches a file outside the root.** Whatever the path
-(`..`, encoded dots and slashes, sibling directories that share the root's
-name as a prefix, malformed percent-encoding), the static server answers 200,
-400, 403 or 404, and a file it serves lies under the root directory.
-Tested by: test/static-server.test.mjs -/
-def static_inside_root : Prop :=
-  ∀ root path : String,
-    (staticServe root path).1 ∈ [200, 400, 403, 404] ∧
-    ∀ f, (staticServe root path).2 = some f → f.startsWith (root ++ "/")
-
 /-! ## Downloads -/
 
 /-- **Retry delays stay within 75–100 % of the backoff.** For every attempt

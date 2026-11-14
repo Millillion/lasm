@@ -3743,6 +3743,171 @@ theorem mangle_round_trip : Spec.mangle_round_trip := by
   · rw [String.all_bool_eq, List.all_eq_true]; intro c hc
     rcases MangleProofs.mangleName_chars n c hc with h | h <;> simp [h]
 
+/-! ## The static server (Model/StaticServer.lean)
+
+A file served is the normalized join of the root and the request path, which
+the guard keeps under the root (and the root itself is no file), the fallback
+page joined to the root (`join_plain`: joining a resolved directory and a
+name normalizes to their concatenation), or either with `.br` or `.gz` added.
+-/
+
+namespace StaticProofs
+open Lasm.Cli.StaticServer
+
+
+theorem pushSegment_plain (abs : Bool) (stack : List (List Char)) (segs : List (List Char)) (h : ∀ s ∈ segs, pathSegment s) :
+    segs.foldl (pushSegment abs) stack = stack ++ segs := by
+  induction segs generalizing stack with
+  | nil => simp
+  | cons s segs ih =>
+    have hs := h s (by simp)
+    rw [List.foldl_cons, ih _ (fun t ht => h t (by simp [ht]))]
+    simp [pushSegment, hs.1, hs.2.1, hs.2.2.1]
+
+theorem intercalate_snoc (segs : List (List Char)) (f : List Char) (h : segs ≠ []) :
+    ['/'].intercalate (segs ++ [f]) = ['/'].intercalate segs ++ ['/'] ++ f := by
+  induction segs with
+  | nil => exact absurd rfl h
+  | cons s segs ih =>
+    cases segs with
+    | nil => simp
+    | cons t segs =>
+      rw [List.cons_append, List.intercalate_cons_of_ne_nil (l := s) (zs := t :: segs ++ [f]) (by simp), ih (by simp),
+        List.intercalate_cons_of_ne_nil (l := s) (zs := t :: segs) (by simp)]
+      simp only [List.append_assoc]
+
+theorem normalize_plain (parts : List (List Char)) (hne : parts ≠ []) (hall : ∀ s ∈ parts, pathSegment s) :
+    normalizePath (['/'].intercalate ([] :: parts)) = ['/'].intercalate ([] :: parts) := by
+  obtain ⟨segs, f, rfl⟩ : ∃ segs f, parts = segs ++ [f] :=
+    ⟨parts.dropLast, parts.getLast hne, (List.dropLast_concat_getLast hne).symm⟩
+  have hf := hall f (by simp)
+  have hf1 : f ≠ [] := hf.1
+  have hsplit : (['/'].intercalate ([] :: (segs ++ [f]))).splitOn '/' = [] :: (segs ++ [f]) := by
+    apply List.splitOn_intercalate
+    · intro l hl; simp only [List.mem_cons] at hl; rcases hl with rfl | hl
+      · simp
+      · exact (hall l hl).2.2.2
+    · simp
+  have hJ : ['/'].intercalate ([] :: (segs ++ [f])) = '/' :: (['/'].intercalate segs ++ ['/'] ++ f) ∨
+      (segs = [] ∧ ['/'].intercalate ([] :: (segs ++ [f])) = '/' :: f) := by
+    cases segs with
+    | nil => right; simp
+    | cons s segs => left; rw [List.intercalate_cons_of_ne_nil (by simp), intercalate_snoc _ _ (by simp)]; simp
+  have hlast : (['/'].intercalate ([] :: (segs ++ [f]))).getLast? ≠ some '/' := by
+    have hmem : ∀ c, f.getLast? = some c → c ∈ f := fun c h => List.mem_of_getLast? h
+    have hfl : f.getLast? ≠ some '/' := fun h => hf.2.2.2 (hmem _ h)
+    rcases hJ with hJ | ⟨-, hJ⟩ <;> rw [hJ]
+    · rw [← List.cons_append, List.getLast?_append]; cases h : f.getLast? <;> simp_all
+    · rw [show '/' :: f = ['/'] ++ f from rfl, List.getLast?_append]; cases h : f.getLast? <;> simp_all
+  have hhead : (['/'].intercalate ([] :: (segs ++ [f]))).head? = some '/' := by
+    rcases hJ with hJ | ⟨-, hJ⟩ <;> rw [hJ] <;> rfl
+  have hfold : ([] :: (segs ++ [f])).foldl (pushSegment true) [] = segs ++ [f] := by
+    rw [List.foldl_cons, show pushSegment true [] [] = [] by simp [pushSegment], pushSegment_plain _ _ _ hall]; simp
+  have hbody : ['/'].intercalate (segs ++ [f]) ≠ [] := by
+    cases segs with
+    | nil => simp [hf.1]
+    | cons s segs => rw [intercalate_snoc _ _ (by simp)]; simp [hf.1]
+  have hne' : ['/'].intercalate ([] :: (segs ++ [f])) ≠ [] := by intro h; rw [h] at hhead; simp at hhead
+  unfold normalizePath
+  rw [if_neg hne']
+  simp only [hhead, hsplit, decide_true, hfold, if_neg hbody, if_neg hlast, if_true, List.append_nil]
+  rw [List.intercalate_cons_of_ne_nil (by simp)]; simp
+
+theorem join_plain (segs : List (List Char)) (f : List Char) (hne : segs ≠ []) (hsegs : ∀ s ∈ segs, pathSegment s)
+    (hf : pathSegment f) :
+    joinPath ('/' :: ['/'].intercalate segs) f = '/' :: ['/'].intercalate segs ++ ['/'] ++ f := by
+  have hJ : '/' :: ['/'].intercalate segs ++ ['/'] ++ f = ['/'].intercalate ([] :: (segs ++ [f])) := by
+    rw [List.intercalate_cons_of_ne_nil (by simp), intercalate_snoc _ _ hne]; simp
+  have hall : ∀ s ∈ segs ++ [f], pathSegment s := by
+    intro s hs; simp only [List.mem_append, List.mem_singleton] at hs; rcases hs with hs | rfl
+    · exact hsegs s hs
+    · exact hf
+  have hf1 : f ≠ [] := hf.1
+  unfold joinPath
+  simp only [List.filter_cons, List.filter_nil, ne_eq, reduceCtorEq, not_false_eq_true, decide_true, hf1,
+    decide_false, Bool.not_false, if_true, List.intercalate_cons_cons, List.intercalate_singleton]
+  rw [if_neg (by simp), hJ, normalize_plain _ (by simp) hall]
+
+theorem foundFile_inside (fe : List Char → Bool) (segs : List (List Char)) (path file : List Char)
+    (fb : Option (List Char)) (hne : segs ≠ []) (hsegs : ∀ s ∈ segs, pathSegment s)
+    (hfe : fe ('/' :: ['/'].intercalate segs) = false) (hfb : ∀ f ∈ fb, pathSegment f)
+    (hg : ¬ (file ≠ ('/' :: ['/'].intercalate segs) ∧ ¬ (('/' :: ['/'].intercalate segs) ++ ['/']).isPrefixOf file = true))
+    (x : List Char) (hx : foundFile fe ('/' :: ['/'].intercalate segs) path file fb = some x) :
+    ('/' :: ['/'].intercalate segs ++ ['/']) <+: x := by
+  have key : fe file = true → ('/' :: ['/'].intercalate segs ++ ['/']) <+: file := by
+    intro hf
+    by_cases h1 : file = '/' :: ['/'].intercalate segs
+    · rw [h1, hfe] at hf; simp at hf
+    · by_cases h2 : (('/' :: ['/'].intercalate segs) ++ ['/']).isPrefixOf file = true
+      · exact List.isPrefixOf_iff_prefix.mp h2
+      · exact absurd ⟨h1, h2⟩ hg
+  unfold foundFile at hx
+  by_cases h0 : fe file = true
+  · rw [if_pos h0] at hx; cases hx; exact key h0
+  · rw [if_neg h0] at hx
+    cases fb with
+    | none => simp only at hx; rw [if_neg h0] at hx; simp at hx
+    | some f =>
+      simp only at hx
+      by_cases hc : f ≠ [] ∧ extnamePath path = []
+      · rw [if_pos hc] at hx
+        split at hx
+        · cases hx; rw [join_plain _ _ hne hsegs (hfb f (by simp))]; exact List.prefix_append _ _
+        · simp at hx
+      · rw [if_neg hc, if_neg h0] at hx; simp at hx
+
+theorem served_inside (fe : List Char → Bool) (segs : List (List Char)) (pathname accepts : List Char)
+    (fb : Option (List Char)) (hne : segs ≠ []) (hsegs : ∀ s ∈ segs, pathSegment s)
+    (hfe : fe ('/' :: ['/'].intercalate segs) = false) (hfb : ∀ f ∈ fb, pathSegment f) :
+    (resolveStaticPath fe ('/' :: ['/'].intercalate segs) pathname accepts fb).status ∈ [200, 400, 403, 404] ∧
+    ∀ s, (resolveStaticPath fe ('/' :: ['/'].intercalate segs) pathname accepts fb).served = some s →
+      ('/' :: ['/'].intercalate segs ++ ['/']) <+: s := by
+  unfold resolveStaticPath
+  cases decodeURIComponent pathname with
+  | none => simp
+  | some decoded =>
+    simp only
+    split
+    · simp
+    · rename_i hg
+      cases hf : foundFile fe ('/' :: ['/'].intercalate segs) (requestPath decoded)
+          (normalizePath (joinPath ('/' :: ['/'].intercalate segs) (requestPath decoded))) fb with
+      | none => simp
+      | some x =>
+        have hin := foundFile_inside fe segs _ _ fb hne hsegs hfe hfb hg x hf
+        simp only
+        cases hc : compressedCopy fe accepts x with
+        | none => simp; exact hin
+        | some p =>
+          obtain ⟨served, enc⟩ := p
+          simp only [List.mem_cons, List.not_mem_nil, or_false, true_or, Option.some.injEq, forall_eq', true_and]
+          unfold compressedCopy at hc
+          split at hc
+          · split at hc
+            · cases hc; exact hin.trans (List.prefix_append _ _)
+            · split at hc
+              · cases hc; exact hin.trans (List.prefix_append _ _)
+              · simp at hc
+          · simp at hc
+
+end StaticProofs
+
+theorem static_inside_root : Spec.static_inside_root := by
+  intro fileExists root pathname accepts fallback ⟨segs, hne, hsegs, hroot⟩ hfe hfb
+  have hfe' : (fun f => fileExists (String.ofList f)) ('/' :: ['/'].intercalate segs) = false := by
+    simp only; rw [← hroot, String.ofList_toList]; exact hfe
+  have hfb' : ∀ f ∈ fallback.map String.toList, pathSegment f := by
+    intro f hf; simp only [Option.mem_def, Option.map_eq_some_iff] at hf
+    obtain ⟨g, hg, rfl⟩ := hf; exact hfb g hg
+  have h := StaticProofs.served_inside (fun f => fileExists (String.ofList f)) segs pathname.toList accepts.toList _ hne hsegs hfe' hfb'
+  simp only [staticServe, hroot]
+  refine ⟨h.1, fun f hf => ?_⟩
+  simp only [Option.map_eq_some_iff] at hf
+  obtain ⟨s, hs, rfl⟩ := hf
+  rw [String.toList_append, hroot]
+  simp only [String.toList_ofList]
+  exact h.2 s hs
+
 /-! ## Function packages -/
 
 theorem zip_deterministic : Spec.zip_deterministic := fun _ => rfl

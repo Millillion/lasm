@@ -59,6 +59,8 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
   leanNameMangle  [["<hex>"] | n, …]                → "<hex>"  (Lean's own `Name.mangle n ""`)
   leanNameDemangle  "<hex>"                         → "<hex>"  (Lean's own `Name.demangle`, components joined by `.`)
 (a component of a Lean `Name`: a string as ["<hex>"], a number as n)
+  resolveStaticPath  {"root": "<hex>", "pathname": "<hex>", "accepts": "<hex>", "fallback": "<hex>" | null, "files": ["<hex>", …]}
+                                                    → {"status": n, "file": "<hex>" | null, "served": "<hex>" | null, "encoding": "…" | null}
   pythonJsonString  "<hex>"                         → "<hex>"
   packageName    "<hex of basename(resolve(directory)).toLowerCase()>"  → "<hex>"
   lakeName       "<hex>"                            → "<hex>"
@@ -89,6 +91,7 @@ import Lasm.Cli.Model.LeanIOErrors
 import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.LowerAtomics
 import Lasm.Cli.Model.Mangle
+import Lasm.Cli.Model.StaticServer
 import Lean.Compiler.NameMangling
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
@@ -372,6 +375,16 @@ def answer (j : Json) : Except String Json := do
   | "supabaseFunctionNameOf" => return ofText (supabaseNameOf (← text input))
   | "pythonJsonString" => return ofText (pythonJsonString (← text input))
   | "comparePythonStrings" => return toJson (toString (comparePythonStrings (← text (← input.getObjVal? "a")) (← text (← input.getObjVal? "b"))))
+  | "resolveStaticPath" =>
+    let files ← texts (← input.getObjVal? "files")
+    let fallback ← match input.getObjValD "fallback" with
+      | Json.null => pure none
+      | j => some <$> text j
+    let r := StaticServer.resolveStaticPath (fun f => files.contains (String.ofList f)) (← text (← input.getObjVal? "root")).toList
+      (← text (← input.getObjVal? "pathname")).toList (← text (← input.getObjVal? "accepts")).toList (fallback.map String.toList)
+    let opt := fun (o : Option (List Char)) => match o with | some l => ofText (String.ofList l) | none => Json.null
+    return Json.mkObj [("status", toJson r.status), ("file", opt r.file), ("served", opt r.served),
+      ("encoding", match r.encoding with | some e => toJson e | none => Json.null)]
   | "mangleName" => return ofText (Mangle.mangleNameModel (← text input))
   | "demangleName" => return ofText (Mangle.demangleNameModel (← text input))
   | "initializerModule" => return match Mangle.initializerModuleModel (← text input) with | some m => ofText m | none => Json.null

@@ -210,8 +210,17 @@
       "reason": "the browser loader: instantiates the program; Lean's runtime primitives on this host: their meaning is native Lean's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md)"
     },
     "src/browser/static-server.mjs": {
-      "status": "pending",
-      "reason": "request path to file resolution (candidate static_inside_root): model the resolution"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/StaticServer.lean",
+          "functions": [
+            "resolveStaticPath"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "request resolution is modelled with node:path's POSIX normalize, join and extname and the file system a parameter (static_inside_root proved); on Windows node:path's win32 rules apply instead (test/static-server.test.mjs on the Windows job); the rest serves the resolved file over HTTP (headers, live reload) and listenError picks a message from a table"
     },
     "src/build-progress.mjs": {
       "status": "exempt",
