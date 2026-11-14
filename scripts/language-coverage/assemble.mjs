@@ -146,7 +146,7 @@ for (const shard of shards) {
 // L2–L6 areas (docs/PLAN.md). First matching rule wins; names and imports only,
 // so a few tests land in a neighbouring area. Rejections by the AOT policy are
 // Lean-as-library work whatever the test is about.
-const inventory = JSON.parse(readFileSync(new URL('../../docs/evidence/lean-4.35.0-language-coverage-inventory.json', import.meta.url)));
+const inventory = JSON.parse(readFileSync(new URL('../../docs/evidence/lean-4.36.0-rc2-language-coverage-inventory.json', import.meta.url)));
 const imports = new Map(inventory.tests.map(test => [test.name, test.imports ?? []]));
 const base = name => name.split('/').pop();
 const areaRules = [
