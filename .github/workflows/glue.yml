@@ -86,11 +86,13 @@ jobs:
         run: node --test test/glue.test.mjs test/edge-initializers.test.mjs test/edge-link-plan.test.mjs test/application-link-plan.test.mjs
       - name: The model differential of the glue
         run: node test/models/cli-differential.mjs --only initializationSchedule,compactInitializerWrappers
-      - name: main's JavaScript, the baseline
+      # The JavaScript the first slice replaced, as it was on main before PR #286
+      # (main's module now runs the glue too); main itself for start-up.
+      - name: The JavaScript baseline
         run: |
           git worktree add "$RUNNER_TEMP/main" origin/main
           ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/main/node_modules"
-          cp "$RUNNER_TEMP/main/src/edge/edge-initializers.mjs" "$RUNNER_TEMP/baseline.mjs"
+          git show a50e5c57d46a17383f734d0a6e32c318e276e57a:src/edge/edge-initializers.mjs > "$RUNNER_TEMP/baseline.mjs"
       - name: Bun and Deno
         run: |
           set -euo pipefail
