@@ -74,12 +74,12 @@ def generated_names_valid : Prop :=
 
 /-- **No request path reaches a file outside the root.** Whatever the path
 (`..`, encoded dots and slashes, sibling directories that share the root's
-name as a prefix), the static server answers 200, 403 or 404, and a file it
-serves lies under the root directory.
+name as a prefix, malformed percent-encoding), the static server answers 200,
+400, 403 or 404, and a file it serves lies under the root directory.
 Tested by: test/static-server.test.mjs -/
 def static_inside_root : Prop :=
   ∀ root path : String,
-    (staticServe root path).1 ∈ [200, 403, 404] ∧
+    (staticServe root path).1 ∈ [200, 400, 403, 404] ∧
     ∀ f, (staticServe root path).2 = some f → f.startsWith (root ++ "/")
 
 /-- **The proxy sends each request to the server program once, unchanged.**
