@@ -112,7 +112,7 @@ offline firewall restoration and all platform disk reserves passed.
 
 ## Preserved history and scope
 
-The [earlier `.44` report](NODE_ACCEPTANCE_44_2026-09-28.md) preserves the
+The [earlier `.44` report](history/NODE_ACCEPTANCE_44_2026-09-28.md) preserves the
 five-platform baseline and its exact archive. The
 [`.45` campaign](evidence/node45-six-platform-campaign-2026-09-28.json) retains
 the original ARM64 Unicode-path failure. The

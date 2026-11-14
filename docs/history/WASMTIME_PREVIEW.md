@@ -4,10 +4,10 @@
 > `lasm` CLI never reached it and its bundle list was empty. Its code (`src/wasmtime-*.mjs`,
 > `src/application-metadata*.mjs`, the `scripts/full-lean` packaging and probes) is in the
 > git history at [`590a923f`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1). WASI output is built by `--target wasi`
-> ([WASI.md](WASI.md)). Kept below as the record of the investigation.
+> ([WASI.md](../WASI.md)). Kept below as the record of the investigation.
 
-This investigation is paused under the [current Node milestone](PLAN.md).
-The [last bounded operation completed successfully](evidence/wasmtime-module-data-repair-2026-09-26.json):
+This investigation is paused under the [current Node milestone](../PLAN.md).
+The [last bounded operation completed successfully](../evidence/wasmtime-module-data-repair-2026-09-26.json):
 Node passes the unchanged isolated module import and seven runtime evaluations
 under the original 90-second deadline. Forty-three focused checks and the native
 descriptor controls also pass, including eight new `openat` error-precedence
@@ -19,11 +19,11 @@ The Linux x64 preview now runs a copied Lean 4.34.1 application in stock Node
 26.10.0 with its source, build tools and original
 artifacts denied by Landlock. All 45 native/deployed comparisons pass across
 the initial application and supplementary lifecycle and environment fixtures.
-See [the exact evidence and retained failures](evidence/wasmtime-standalone-preview-2026-09-25.json).
-The [baseline CPU follow-up](evidence/wasmtime-baseline-lifecycle-2026-09-25.json)
+See [the exact evidence and retained failures](../evidence/wasmtime-standalone-preview-2026-09-25.json).
+The [baseline CPU follow-up](../evidence/wasmtime-baseline-lifecycle-2026-09-25.json)
 adds 27 fresh lifecycle comparisons with explicit CPU settings, including
 completed recovery from a deleted working directory.
-The [unchanged `const_fold` benchmark also passes](evidence/wasmtime-const-fold-2026-09-26.json)
+The [unchanged `const_fold` benchmark also passes](../evidence/wasmtime-const-fold-2026-09-26.json)
 in three fresh private runs and three isolated copied deployments. Original
 argument `15`, expected output and the 4 GiB Lean stack setting remain intact.
 The diagnostic runs verify a 4,295,098,368-byte guest computation stack, including
@@ -34,7 +34,7 @@ claim a dense 4 GiB memory workload.
 This is a maintainer preview. Automatic provisioning and backend selection in
 the managed `lasm` CLI remain unfinished.
 
-A [module-data checkpoint](evidence/wasmtime-module-data-checkpoint-2026-09-26.json)
+A [module-data checkpoint](../evidence/wasmtime-module-data-checkpoint-2026-09-26.json)
 now imports the deployed `Init` metadata and evaluates seven calls to
 `Nat.nextPowerOfTwo` in an isolated Node application, matching native Lean.
 Packaging verifies and copies the metadata inventory and redistribution notices.
@@ -75,7 +75,7 @@ wrapper; the Lean application and compiled native control stay unchanged.
 Original assertions remain strict. All successful guards release without
 resource events; deployment peaks at 1.77 GiB and compilation at 5.34 GiB.
 
-[Empty and 1.2 MiB process environments now match native Lean](evidence/wasmtime-standalone-environment-2026-09-25.json)
+[Empty and 1.2 MiB process environments now match native Lean](../evidence/wasmtime-standalone-environment-2026-09-25.json)
 in Node. The loader accepts empty snapshots and removes its former
 1 MiB cap while retaining checked sizes, entry counts, termination and guest
 memory ranges. Six valid snapshots, seven malformed snapshots and 16 guest
