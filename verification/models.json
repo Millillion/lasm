@@ -402,8 +402,8 @@
       "reason": "the app instance of Lasm.UI.Mount; tested in browsers (ui.yml)"
     },
     "src/lasm-modules/ui-dom.mjs": {
-      "status": "pending",
-      "reason": "the UI applier: its reading of patch frames is checked against Lean's reference decoder (ui-decode, proved by Lasm.UI.Spec.frames_decode); its DOM operations are not modelled (IRREDUCIBLE.md M4)",
+      "status": "modelled",
+      "reason": "the UI applier: its reading of patch frames is Lean's reference decoder (ui-decode, proved by Lasm.UI.Spec.frames_decode) and its DOM operations and hydration are the applier model (applier_correct, applier_session, hydrate_correct proved; the differential runs it on happy-dom with the DOM standard's insertion checks); left out: events, commands, subscriptions and navigation (tested in test/ui-dom-applier.test.mjs and the browser suites)",
       "models": [
         {
           "lean": "library/Lasm/UI/Proofs/Decode.lean",
@@ -411,6 +411,14 @@
             "the patch-frame reader"
           ],
           "differential": "test/fuzz/targets/ui-decode.mjs"
+        },
+        {
+          "lean": "library/Lasm/UI/Proofs/Applier.lean",
+          "functions": [
+            "apply (its DOM operations)",
+            "node (hydration)"
+          ],
+          "differential": "test/models/ui-applier-differential.mjs"
         }
       ]
     },

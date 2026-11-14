@@ -1,13 +1,7 @@
 {
   "lean": "4.36.0-rc2",
-  "node": "26.13.0",
+  "node": "26.13.1",
   "npm": "11.20.0",
-  "node24": "24.22.2",
-  "minimumNode": "24.0.0",
-  "deferredLatest": {
-    "node": "26.13.1",
-    "decidedAt": "2026-11-14",
-    "reason": "Node 26.13.1 and 24.22.3 appeared during the Lean 4.36.0-rc2 dry run (branch lean-4.36-rc2). Moving the Node pins is its own change on main; this branch follows main when it does (docs/LEAN_UPGRADE.md, Lean 4.36.0-rc2).",
-    "node24": "24.22.3"
-  }
+  "node24": "24.22.3",
+  "minimumNode": "24.0.0"
 }

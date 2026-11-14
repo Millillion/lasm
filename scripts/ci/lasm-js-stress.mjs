@@ -172,11 +172,13 @@ async function stress(name, project, { expected, viaCli = 0, server = false, par
     const trace = fuzz && traceEvery > 0 && i % traceEvery === 0 ? join(work, 'traces', `${name}-${i}`) : undefined;
     const r = await run(i, diagDir, seed, trace);
     record.msMax = Math.max(record.msMax, r.ms); record.msTotal += r.ms;
+    const delay = fuzzDelay(r.stderr);
+    if (delay) { record.fuzzDelay ??= { runs: 0, naps: 0, napRequestedMs: 0, napTakenMs: 0, late: 0, lateRequestedMs: 0, lateTakenMs: 0 }; record.fuzzDelay.runs++; for (const k in delay) record.fuzzDelay[k] += delay[k]; }
     const ok = passes(r);
     if (ok) record.pass++;
     else {
       r.hung ? record.hang++ : record.fail++;
-      const failure = { run: i, seed, hung: r.hung, code: r.code, ms: r.ms, stdoutTail: r.stdout.slice(-600), stderrTail: r.stderr.slice(-2000), diag: existsSync(diagDir) ? readdirSync(diagDir) : [] };
+      const failure = { run: i, seed, hung: r.hung, code: r.code, ms: r.ms, ...(delay ? { fuzzDelay: delay } : {}), stdoutTail: r.stdout.slice(-600), stderrTail: r.stderr.slice(-2000), diag: existsSync(diagDir) ? readdirSync(diagDir) : [] };
       record.failures.push(failure);
       console.log(`${name} run ${i}${fuzz ? ` (seed ${seed})` : ''}: ${r.hung ? 'HANG' : 'FAIL ' + r.code} after ${r.ms} ms; last output: ${JSON.stringify(r.stdout.slice(-120))}`);
       if (fuzz) {
@@ -189,10 +191,21 @@ async function stress(name, project, { expected, viaCli = 0, server = false, par
         console.log(`${name} seed ${seed}: replays ${failure.replays.join(', ')}; replay with: node scripts/ci/lasm-js-stress.mjs CANDIDATE.tgz NEW_WORK_DIR RESULT.json --only ${name} --runs 1 --seed ${seed}`);
       }
     }
-    if ((i + 1) % 25 === 0) { console.log(`${name}: ${i + 1}/${total} (pass ${record.pass}, hang ${record.hang}, fail ${record.fail})`); save(); }
+    if ((i + 1) % 25 === 0) { console.log(`${name}: ${i + 1}/${total} (pass ${record.pass}, hang ${record.hang}, fail ${record.fail})${describeDelay(record.fuzzDelay)}`); save(); }
   }
+  if (record.fuzzDelay) console.log(`${name}: injected delay${describeDelay(record.fuzzDelay)}`);
   save();
 }
+// The schedule fuzzer's account of its injected delay (stderr, at exit): what
+// it asked the platform for and what it got (scripts/bridge-fuzz/schedule.cjs).
+function fuzzDelay(stderr) {
+  const m = /lasm bridge fuzz: (\d+) naps, (\d+) ms requested, (\d+) ms taken; (\d+) late resolutions, (\d+) ms requested, (\d+) ms taken/.exec(stderr);
+  if (!m) return null;
+  const [naps, napRequestedMs, napTakenMs, late, lateRequestedMs, lateTakenMs] = m.slice(1).map(Number);
+  return { naps, napRequestedMs, napTakenMs, late, lateRequestedMs, lateTakenMs };
+}
+const describeDelay = d => !d ? '' : `; fuzz delay per run: ${Math.round(d.naps / d.runs)} naps, ${Math.round(d.napRequestedMs / d.runs)} ms requested, `
+  + `${Math.round(d.napTakenMs / d.runs)} ms taken; ${Math.round(d.late / d.runs)} late resolutions, ${Math.round(d.lateRequestedMs / d.runs)} ms requested, ${Math.round(d.lateTakenMs / d.runs)} ms taken`;
 
 const npmProject = dir => execFileSync(npm, ['install', '--offline', '--no-audit', '--no-fund'], { cwd: dir, stdio: 'inherit', shell: windows });
 const want = name => !only || only.split(',').includes(name);
