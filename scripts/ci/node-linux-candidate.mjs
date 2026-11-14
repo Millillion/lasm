@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
-import { x as untar } from 'tar';
+import { extractTarFile } from '../../src/tar.mjs';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 
@@ -11,7 +11,7 @@ assert.match(expected, /^[a-f0-9]{64}$/);
 assert.equal(await hashFile('.work/node-runtime-inputs.tgz'), expected);
 const restored = resolve('.work/node-runtime-restored');
 assert.ok(!existsSync(restored)); mkdirSync(restored);
-await untar({ cwd: restored, file: '.work/node-runtime-inputs.tgz', strict: true, preservePaths: false });
+await extractTarFile('.work/node-runtime-inputs.tgz', { cwd: restored });
 const provenance = JSON.parse(readFileSync(join(restored, 'provenance.json')));
 console.log('Authenticated runtime source revision: ' + provenance.sourceRevision);
 // Finish extraction before starting a separately guarded packing process. Do not

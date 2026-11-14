@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { createZstdDecompress } from 'node:zlib';
 import { Readable, Writable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
-import { x as extractTar, Parser } from 'tar';
+import { extractTar, parseTar } from '../src/tar.mjs';
 import { moduleOf, dataPieceOf, binaryRoots, binaryCandidate, resolveImport, nativeImports, normalizeMembers,
   packArchive, coreModuleRoots, fixedMtime } from '../scripts/lean-dist/tiers.mjs';
 import { tierCatalogEntry, extractionLimit } from '../scripts/lean-dist/catalog.mjs';
@@ -88,10 +88,9 @@ test('native import tables are read from synthetic ELF, Mach-O and PE files', ()
 
 async function unpackEntries(bytes) {
   const entries = [];
-  const parser = new Parser({ strict: true });
-  parser.on('entry', entry => { entries.push({ path: entry.path, type: entry.type, mode: entry.mode, mtime: entry.mtime?.getTime() / 1000,
-    uid: entry.uid, gid: entry.gid, linkpath: entry.linkpath }); entry.resume(); });
-  await pipeline(Readable.from([bytes]), createZstdDecompress(), parser);
+  await pipeline(Readable.from([bytes]), createZstdDecompress(), parseTar(entry => {
+    entries.push({ path: entry.path, type: entry.type, mode: entry.mode, mtime: entry.mtime, uid: entry.uid, gid: entry.gid, linkpath: entry.linkpath });
+  }));
   return entries;
 }
 
@@ -125,7 +124,7 @@ test('archives are deterministic, sorted, owner-free and keep long paths and exe
   assert.equal(entries.find(entry => entry.path === 'lean-test-bin/bin/lean').mode, 0o755);
   assert.equal(entries.find(entry => entry.path === 'lean-test-bin/LICENSE').mode, 0o644);
   assert.ok(entries.some(entry => entry.path === 'lean-test-bin/' + long));
-  await pipeline(Readable.from([first.bytes]), createZstdDecompress(), extractTar({ cwd: base, strict: true }));
+  await pipeline(Readable.from([first.bytes]), createZstdDecompress(), extractTar({ cwd: base }));
   assert.equal(await readFile(join(base, 'lean-test-bin', long), 'utf8'), 'data');
   if (process.platform !== 'win32') {
     assert.equal(await readlink(join(base, 'lean-test-bin/lib/libc++.so.1')), 'libc++.so.1.0');

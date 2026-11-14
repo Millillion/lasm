@@ -71,7 +71,7 @@ texts are visible without extracting anything.
 | Emscripten headers and system-library code compiled into the runtime (musl, libc++, libc++abi, libunwind, compiler-rt, mimalloc) | 6.0.9 | (MIT OR NCSA), MIT, Apache-2.0 WITH LLVM-exception | their texts in notices |
 | koffi, `@koromix/koffi-*` (`src/native/node_modules`), with node-addon-api compiled in | 3.3.0 | MIT | `koffi/LICENSE.txt`, node-addon-api text |
 | Process/signal helpers (`src/native/{process,signals}`), Zig-built; the musl variants link musl and Zig's compiler_rt statically | Zig 0.16.0 | MIT | `THIRD_PARTY_NOTICES.txt` beside them |
-| Bundled `tar` and its dependencies (`node_modules/`) | tar 7.5.22, minipass 7.1.3, chownr 3.0.0, yallist 5.0.0, minizlib 3.1.0, @isaacs/fs-minipass 4.0.1 | BlueOak-1.0.0, MIT, ISC | each `LICENSE*`, also in `licenses/npm/` |
+| Bundled `tar` and its dependencies (`node_modules/`), **until 0.7.x**: none since 2026-11-13 (`src/tar.mjs`) | tar 7.5.22, minipass 7.1.3, chownr 3.0.0, yallist 5.0.0, minizlib 3.1.0, @isaacs/fs-minipass 4.0.1 | BlueOak-1.0.0, MIT, ISC | each `LICENSE*`, also in `licenses/npm/` |
 
 **`license` field:** an SPDX expression built at packaging time
 (`scripts/npm-dist/packages.mjs` `cliLicense`): Lasm's own licence first, then the

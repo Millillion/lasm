@@ -13,7 +13,7 @@ import { createServer as httpServer } from 'node:http';
 import { connect } from 'node:net';
 import { Writable } from 'node:stream';
 import { syncBuiltinESMExports } from 'node:module';
-import { c as tar } from 'tar';
+import { directoryEntries, writeTar } from '../../src/tar.mjs';
 
 const self = fileURLToPath(import.meta.url), root = process.cwd();
 const digest = b => createHash('sha256').update(b).digest('hex');
@@ -54,7 +54,7 @@ if (process.argv[2] === '--worker') {
   await mkdir(join(fixture, 'tool'), { recursive: true });
   for (const name of ['a', 'z', 'ä']) await writeFile(join(fixture, 'tool', name), 'verified bytes\n');
   const archivePath = join(out, 'tool.tar.gz');
-  await tar({ cwd: fixture, file: archivePath, portable: true, gzip: true }, ['tool']);
+  await writeTar(archivePath, directoryEntries(fixture, ['tool']), { gzip: true });
   const bytes = await readFile(archivePath);
   const cert = join(out, 'cert.pem'), key = join(out, 'key.pem');
   execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', key,

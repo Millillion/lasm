@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { zstdCompressSync } from 'node:zlib';
-import { c as createTar } from 'tar';
+import { directoryEntries, writeTar } from '../src/tar.mjs';
 import { edgeRuntime, edgeRuntimeCatalog, edgeArchives, edgeExtras } from '../src/edge/edge-runtime.mjs';
 import { startLean, stackOverflowCause, edgeStackBytes } from '../src/edge/edge-start.mjs';
 import { edgeLinkSettings } from '../src/edge/edge-link.mjs';
@@ -159,7 +159,7 @@ test('the catalog: supported versions, the base runtime, a verified download', a
   // A download: the archive root is stripped; the catalog's own fields are not part of the artifact.
   const directory = scratch(t);
   runtimeTree(join(directory, 'source', 'edge-root'));
-  await createTar({ cwd: join(directory, 'source'), file: join(directory, 'edge.tar'), portable: true }, ['edge-root']);
+  await writeTar(join(directory, 'edge.tar'), directoryEntries(join(directory, 'source'), ['edge-root']));
   const bytes = zstdCompressSync(readFileSync(join(directory, 'edge.tar')));
   const artifact = { name: 'edge-test.tar.zst', root: 'edge-root', url: 'https://example.invalid/edge-test.tar.zst', sha256: sha(bytes),
     bytes: bytes.length, format: 'tar.zst', maximumExtractedBytes: 1_000_000 };

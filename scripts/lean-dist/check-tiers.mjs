@@ -22,7 +22,7 @@ import { pipeline } from 'node:stream/promises';
 import { createZstdDecompress, createGunzip } from 'node:zlib';
 import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
-import { x as extractTar } from 'tar';
+import { extractTar } from '../../src/tar.mjs';
 
 const { values: options } = parseArgs({ options: {
   tiers: { type: 'string' }, upstream: { type: 'string' }, work: { type: 'string' },
@@ -64,7 +64,7 @@ async function verified(item) {
 async function unpack(file, directory, format = 'tar.zst') {
   await mkdir(directory, { recursive: true });
   await pipeline(createReadStream(file), format === 'tar.gz' ? createGunzip() : createZstdDecompress(),
-    extractTar({ cwd: directory, strip: 1, strict: true, preservePaths: false, preserveOwner: false }));
+    extractTar({ cwd: directory, strip: 1 }));
   // Bound dirty page-cache bursts, which the resource guard reports as memory pressure.
   if (!windows) spawnSync('sync', { stdio: 'ignore' });
 }

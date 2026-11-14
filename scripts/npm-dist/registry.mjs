@@ -11,8 +11,8 @@
 // (src/init.mjs) from registry.npmjs.org into the loopback registry, read-only and
 // integrity-checked, so a consumer can install a scaffolded app without uplinks.
 // --mirror-bundled copies the CLI's bundled dependencies (bundleDependencies, at the
-// bundled versions) the same way: npm installs them from the CLI tarball, but Bun and
-// Deno resolve them from the registry.
+// bundled versions; only candidates packaged before src/tar.mjs have any) the same
+// way: npm installs them from the CLI tarball, but Bun and Deno resolve them from the registry.
 //   node scripts/npm-dist/registry.mjs mirror  --dir DIR --mirror-template hono   (only the template dependencies)
 //   node scripts/npm-dist/registry.mjs stop    --dir DIR
 import assert from 'node:assert/strict';
@@ -24,7 +24,7 @@ import { spawn, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { createHash } from 'node:crypto';
-import { x as extractTar } from 'tar';
+import { extractTarFile } from '../../src/tar.mjs';
 import { findNpm } from '../../src/npm-artifacts.mjs';
 
 export const verdaccioVersion = '6.10.4';
@@ -98,7 +98,7 @@ if (command === 'publish' || command === 'mirror') {
   const manifestOf = async file => {
     const scratch = join(dir, 'manifest-' + process.pid);
     await rm(scratch, { recursive: true, force: true }); await mkdir(scratch, { recursive: true });
-    await extractTar({ file, cwd: scratch, strict: true, preservePaths: false, preserveOwner: false, filter: name => name === 'package/package.json' });
+    await extractTarFile(file, { cwd: scratch, filter: name => name === 'package/package.json' });
     const manifest = JSON.parse(await readFile(join(scratch, 'package/package.json'), 'utf8'));
     await rm(scratch, { recursive: true });
     return manifest;
@@ -149,7 +149,7 @@ if (command === 'publish' || command === 'mirror') {
     const scratch = join(dir, 'bundled-' + process.pid);
     await rm(scratch, { recursive: true, force: true }); await mkdir(scratch, { recursive: true });
     const root = /^package\/(?:node_modules\/(?:@[^/]+\/)?[^/@][^/]*\/)+package\.json$/;
-    await extractTar({ file: join(tarballs, record.main.filename), cwd: scratch, strict: true, preservePaths: false, preserveOwner: false, filter: name => root.test(name) });
+    await extractTarFile(join(tarballs, record.main.filename), { cwd: scratch, filter: name => root.test(name) });
     const bundled = new Map();
     for (const entry of await readdir(scratch, { recursive: true, withFileTypes: true })) {
       if (!entry.isFile() || entry.name !== 'package.json') continue;
@@ -157,7 +157,8 @@ if (command === 'publish' || command === 'mirror') {
       if (meta.name && meta.version) bundled.set(`${meta.name}@${meta.version}`, meta);
     }
     await rm(scratch, { recursive: true });
-    assert.ok(bundled.size, 'The CLI bundles no dependencies');
+    // Candidates packaged since src/tar.mjs bundle nothing; older ones bundle `tar`.
+    if (!bundled.size) console.log('The CLI bundles no npm dependencies: nothing to mirror');
     const names = new Set([...bundled.values()].map(meta => meta.name));
     for (const meta of bundled.values()) {
       const published = await mirrorPublic(meta.name, meta.version);

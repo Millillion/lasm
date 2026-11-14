@@ -7,7 +7,7 @@ import { mkdtemp, mkdir, writeFile, readFile, rm, readdir } from 'node:fs/promis
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
-import { c as createTar } from 'tar';
+import { directoryEntries, writeTar } from '../src/tar.mjs';
 import { validateNpmToolManifest, npmEntryFor, archiveFileName, npmSpec, npmInstallFix, missingPackageMessage, resolveInstalledPackage,
   fetchNpmPackage, registryTarballUrl, acquireArtifact, checkInstalledToolPackages, artifactSourceMode, artifactSourceModes, findNpm } from '../src/npm-artifacts.mjs';
 
@@ -136,7 +136,7 @@ async function packTarball(base, members) {
   await mkdir(join(source, 'package'), { recursive: true });
   for (const [name, text] of Object.entries(members)) await writeFile(join(source, 'package', name), text);
   const file = join(base, 'out-' + Math.random().toString(16).slice(2) + '.tgz');
-  await createTar({ cwd: source, file, gzip: true, portable: true }, ['package']);
+  await writeTar(file, directoryEntries(source, ['package']), { gzip: true });
   return readFile(file);
 }
 
@@ -401,7 +401,7 @@ test('only a regular file member is the archive', async t => {
   const source = join(base, 'src');
   await mkdir(join(source, 'package', entry.file), { recursive: true });
   const file = join(base, 'dir.tgz');
-  await createTar({ cwd: source, file, gzip: true, portable: true }, ['package']);
+  await writeTar(file, directoryEntries(source, ['package']), { gzip: true });
   const tgz = await readFile(file);
   const run = async (npm, args) => { await writeFile(join(args[args.indexOf('--pack-destination') + 1], 'p.tgz'), tgz); return ''; };
   await assert.rejects(fetchNpmPackage({ ...entry, integrity: integrity(tgz) }, join(base, 'w'), { npm: {}, run }), { message: `npm package ${npmSpec(entry)} lacks ${entry.file}` });
@@ -429,7 +429,7 @@ test('a link named like the archive is not the archive', { skip: process.platfor
   await writeFile(join(base, 'src/package/real'), 'x');
   await symlink('real', join(base, 'src/package', entry.file));
   const file = join(base, 'link.tgz');
-  await createTar({ cwd: join(base, 'src'), file, gzip: true, portable: true }, ['package']);
+  await writeTar(file, directoryEntries(join(base, 'src'), ['package']), { gzip: true });
   const tgz = await readFile(file);
   const run = async (npm, args) => { await writeFile(join(args[args.indexOf('--pack-destination') + 1], 'p.tgz'), tgz); return ''; };
   await assert.rejects(fetchNpmPackage({ ...entry, integrity: integrity(tgz) }, join(base, 'w'), { npm: {}, run }), { message: `npm package ${npmSpec(entry)} lacks ${entry.file}` });

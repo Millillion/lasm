@@ -4,9 +4,10 @@ import assert from 'node:assert/strict';
 import { lstatSync, readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, createReadStream, createWriteStream } from 'node:fs';
 import { join, resolve, relative, sep } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
-import { Transform } from 'node:stream';
+import { Readable, Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
-import { create, Parser, extract } from 'tar';
+import { createGzip } from 'node:zlib';
+import { directoryEntries, extractTarFile, packTar, readTar } from '../../src/tar.mjs';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 
 const manifestName = 'lasm-completed-tree.json';
@@ -40,41 +41,26 @@ async function inspect(archive, options) {
   assert.ok(lstatSync(archive).isFile() && lstatSync(archive).size <= maximumArchiveBytes);
   const names = new Set(), files = new Map(), directories = [];
   let bytes = 0, metadata;
-  let parser;
-  const checked = callback => (...args) => {
-    try { callback(...args); } catch (error) { parser.abort(error); }
-  };
-  parser = new Parser({ strict: true, onReadEntry: checked(entry => {
+  await readTar(archive, entry => {
     const name = entry.path.replace(/\/$/, '');
     assert.ok(name && !name.startsWith('/') && !name.includes('\\') && !name.includes(':')
       && name.split('/').every(part => part && part !== '.' && part !== '..'), 'Unsafe completed-tree archive path');
     assert.ok(!names.has(name), 'Duplicate completed-tree path'); names.add(name);
     assert.ok(['File', 'Directory'].includes(entry.type), 'Links and special files are not completed-tree inputs');
-    if (entry.type === 'Directory') { directories.push(name); entry.resume(); return; }
+    if (entry.type === 'Directory') { directories.push(name); return; }
     assert.ok(Number.isSafeInteger(entry.size) && entry.size >= 0);
     bytes += entry.size;
     assert.ok(bytes <= maximumContentBytes + maximumManifestBytes, 'Archive expansion exceeds its ceiling');
     if (name === manifestName) {
       assert.ok(entry.size <= maximumManifestBytes, 'Completed-tree manifest is too large');
       const chunks = [];
-      entry.on('data', chunk => chunks.push(chunk));
-      entry.on('end', checked(() => { metadata = JSON.parse(Buffer.concat(chunks).toString('utf8')); }));
-    } else {
-      const hash = createHash('sha256'); let observed = 0;
-      entry.on('data', chunk => { observed += chunk.length; hash.update(chunk); });
-      entry.on('end', checked(() => {
-        assert.equal(observed, entry.size);
-        files.set(name, { bytes: observed, sha256: hash.digest('hex') });
-      }));
+      return { data: chunk => chunks.push(chunk), end: () => { metadata = JSON.parse(Buffer.concat(chunks).toString('utf8')); } };
     }
-    entry.resume();
-  }) });
-  await new Promise((resolve, reject) => {
-    const input = createReadStream(archive);
-    input.on('error', reject);
-    parser.on('error', error => { input.destroy(); reject(error); });
-    parser.on('end', resolve);
-    input.pipe(parser);
+    const hash = createHash('sha256'); let observed = 0;
+    return {
+      data: chunk => { observed += chunk.length; hash.update(chunk); },
+      end: () => { assert.equal(observed, entry.size); files.set(name, { bytes: observed, sha256: hash.digest('hex') }); },
+    };
   });
   assert.equal(metadata?.schema, 1, 'Missing completed-tree manifest');
   const contentBytes = [...files.values()].reduce((total, file) => total + file.bytes, 0);
@@ -104,7 +90,7 @@ export async function packCompletedTree(directoryArg, archiveArg, options) {
     written += chunk.length;
     callback(written <= maximumArchiveBytes ? null : new Error('Completed-tree archive exceeds its byte ceiling'), chunk);
   } });
-  await pipeline(create({ cwd: directory, gzip: { level: 1 }, portable: true }, readdirSync(directory).sort()),
+  await pipeline(Readable.from(packTar(directoryEntries(directory, readdirSync(directory).sort()))), createGzip({ level: 1 }),
     ceiling, createWriteStream(archive, { flags: 'wx' }));
   assert.deepEqual(await inspect(archive, options), metadata);
   assert.deepEqual(await inventory(directory, maximumContentBytes), content, 'Completed tree changed during archival');
@@ -122,7 +108,7 @@ export async function restoreCompletedTree(archiveArg, directoryArg, options) {
   const metadata = await inspect(archive, options);
   if (options.identity) assert.deepEqual(metadata.identity, options.identity, 'Completed-tree recipe mismatch');
   const temporary = directory + '.partial-' + randomUUID(); mkdirSync(temporary, { recursive: true });
-  await extract({ file: archive, cwd: temporary, strict: true, preservePaths: false });
+  await extractTarFile(archive, { cwd: temporary });
   assert.deepEqual(await inventory(temporary, maximumContentBytes), metadata.content);
   assert.deepEqual(JSON.parse(readFileSync(join(temporary, manifestName))), metadata);
   assert.equal(await hashFile(archive), options.sha256, 'Completed-tree archive changed during restore');

@@ -20,7 +20,7 @@ import { createHash } from 'node:crypto';
 import { pipeline } from 'node:stream/promises';
 import { createZstdDecompress } from 'node:zlib';
 import { parseArgs } from 'node:util';
-import { x as extractTar } from 'tar';
+import { extractTar } from '../../src/tar.mjs';
 import { cCompilerEnvironment, macosSdk } from '../../src/application-sources.mjs';
 
 const { values: options } = parseArgs({ options: {
@@ -52,10 +52,8 @@ for (const item of [archive('bin'), c]) {
   for await (const chunk of createReadStream(file)) hash.update(chunk);
   assert.equal(hash.digest('hex'), item.sha256, `${item.name} checksum`);
   await mkdir(directory, { recursive: true });
-  const links = [];
-  await pipeline(createReadStream(file), createZstdDecompress(), extractTar({ cwd: directory, strip: 1, strict: true, preservePaths: false, preserveOwner: false,
-    filter: (name, entry) => entry.type === 'SymbolicLink' ? (links.push([name.split('/').slice(1).join('/'), entry.linkpath]), false) : true }));
-  for (const [name, target] of links) await symlink(target, join(directory, ...name.split('/')));
+  // Symbolic links are made after every file (extractTar).
+  await pipeline(createReadStream(file), createZstdDecompress(), extractTar({ cwd: directory, strip: 1 }));
   await linkTree(directory, prefix);
 }
 // macOS: the C tier leaves out Apple's libSystem.tbd; Lasm's prefix takes the user's

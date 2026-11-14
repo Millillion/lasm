@@ -45,6 +45,9 @@
       "mutants": 475,
       "threshold": 91
     },
+    "tar": {
+      "threshold": 80
+    },
     "downloads": {
       "initial": 59.3,
       "score": 89.7,
