@@ -17,6 +17,13 @@ const readJson = file => {
   catch (error) { throw new Error(`Cannot read ${file}: ${error.message}`); }
 };
 
+/** A project's package.json, which must hold a JSON object; a plain Error naming the file otherwise. */
+export function readPackageJson(file) {
+  const value = readJson(file);
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) throw new Error(`Cannot read ${file}: it must hold a JSON object`);
+  return value;
+}
+
 /** The directory of package `name` as Node finds it from `from`, within `root`. */
 function findPackage(name, from, root) {
   for (let directory = from; ; directory = dirname(directory)) {
