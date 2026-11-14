@@ -177,7 +177,7 @@ Jordan's direction: rock solid first, then the irreducible essence, then proposi
    - [x] M1, third part (2026-11-10): the wasmtime-preview cluster (1,384 shipped lines), `src/toolchain.mjs` (Lean 4.32) and `src/native-pthread-factory.cjs`, with the Lean 4.32 builders that used them.
    - [ ] M1, rest: duplicate licence texts.
    - [ ] M2: unreferenced evidence and compatibility data out of the repository, closed diagnosis workflows, historical docs to `docs/history/`; the full emsdk and Python paths maintainer-only.
-   - [ ] M3: one Lasm.JS wire codec in JavaScript, no `tar` dependency, `library/prebuilt` generated (each held to the mutation scores).
+   - [ ] M3: one Lasm.JS wire codec in JavaScript, no `tar` dependency, `library/prebuilt` generated (each held to the mutation scores). One wire codec: re-evaluated 2026-11-13 and kept as two copies until the host files are bundled (measurements in docs/proposals/JS_TO_LEAN.md §2).
    - [ ] Simplify the codebase toward its irreducible state, once the tests are strong enough to allow it (issue #21): M1–M3 are its first concrete steps.
 4. Transferable property tests
    - [ ] M4: a `Candidates.lean` per library (library/PROOFS.md's candidates as definitions with `Tested by:`), and a Lean model with a model differential for every remaining shipped JavaScript and C module. Started 2026-11-10: Lasm.UI (4), Lasm.Fetch (2) and Lasm.RPC (4) candidates, each evaluated on generated inputs (`test/ui/DiffModel.lean`, the native fuzz targets); the serverless fuzz oracle and two serverless properties name their propositions.
