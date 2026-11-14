@@ -8,10 +8,10 @@
 
 Current documents:
 
-- [RELEASING.md](RELEASING.md): how a release is cut and published.
-- [README](../README.md): install, CLI and supported environments.
-- [NODE_ACCEPTANCE.md](NODE_ACCEPTANCE.md): accepted candidates, built and
-  accepted by [`node-linux-acceptance.yml`](../.github/workflows/node-linux-acceptance.yml).
-- [INSTALLATION_HARDENING.md](INSTALLATION_HARDENING.md#candidate-inputs-and-release-gates):
+- [RELEASING.md](../RELEASING.md): how a release is cut and published.
+- [README](../../README.md): install, CLI and supported environments.
+- [NODE_ACCEPTANCE.md](../NODE_ACCEPTANCE.md): accepted candidates, built and
+  accepted by [`node-linux-acceptance.yml`](../../.github/workflows/node-linux-acceptance.yml).
+- [INSTALLATION_HARDENING.md](../INSTALLATION_HARDENING.md#candidate-inputs-and-release-gates):
   release gates.
-- [DEPLOYMENT.md](DEPLOYMENT.md).
+- [DEPLOYMENT.md](../DEPLOYMENT.md).

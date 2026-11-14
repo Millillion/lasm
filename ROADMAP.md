@@ -11,7 +11,7 @@ is Jordan's to do or decide.
 
 Details live in the linked docs. This file only says *what* and *in what order*.
 - [issue #21](https://github.com/Millillion/lasm/issues/21) is Jordan's original plan. Each of its points is placed below.
-- NEXT_STEPS.md is historical.
+- NEXT_STEPS.md is historical ([docs/history/NEXT_STEPS.md](docs/history/NEXT_STEPS.md)).
 
 ## Who decides what (2026-11-02)
 - **Claude** owns testing, robustness, CI and platforms outright. Claude decides and logs each decision in [DECISIONS.md](docs/DECISIONS.md), and reports it; nothing here waits on Jordan.
@@ -176,7 +176,7 @@ Jordan's direction: rock solid first, then the irreducible essence, then proposi
    - [x] M1, second part (2026-11-10): `vitest` and its two unreferenced users, unreferenced integration programs, `experiments/edge` and `experiments/js-interop`, about 7,800 lines of unreferenced scripts, and 70 MB of unreferenced evidence.
    - [x] M1, third part (2026-11-10): the wasmtime-preview cluster (1,384 shipped lines), `src/toolchain.mjs` (Lean 4.32) and `src/native-pthread-factory.cjs`, with the Lean 4.32 builders that used them.
    - [ ] M1, rest: duplicate licence texts.
-   - [ ] M2: unreferenced evidence and compatibility data out of the repository, closed diagnosis workflows, historical docs to `docs/history/`; the full emsdk and Python paths maintainer-only.
+   - [ ] M2: unreferenced evidence and compatibility data out of the repository, closed diagnosis workflows, historical docs to `docs/history/` (done 2026-11-13); the full emsdk and Python paths maintainer-only.
    - [ ] M3: one Lasm.JS wire codec in JavaScript, no `tar` dependency, `library/prebuilt` generated (each held to the mutation scores).
    - [ ] Simplify the codebase toward its irreducible state, once the tests are strong enough to allow it (issue #21): M1–M3 are its first concrete steps.
 4. Transferable property tests
