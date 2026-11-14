@@ -10,7 +10,7 @@ import { basename, dirname, join, relative } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { wasiProgramKey, cachedWasiProgram, linkCachedWasiProgram, fastlyName, fastlyToml, writeWasiOutput, wasiTargets } from '../src/wasi/wasi-build.mjs';
-import { wasiLinkSettings } from '../src/wasi/wasi-link.mjs';
+import { wasiLinkSettings, mimallocSources } from '../src/wasi/wasi-link.mjs';
 import { applicationNotices, leanRuntimeChanges, noticesSectionName } from '../src/notices.mjs';
 import { responseFile } from '../src/platform.mjs';
 import { installTools, wasmObject, temporaryDirectory } from './fixtures/link-stand-ins/toolchain.mjs';
@@ -38,7 +38,7 @@ test('wasiProgramKey: every input of the WASI program is part of its identity', 
   // The fields, as the cache identity records them (schema 1).
   const sources = ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
     'wasi-component.mjs', 'component/proxy-template.wasm', 'lasm_wasi_http_imports.h', '../../library/c/lasm_fastly.c',
-    '../../library/c/lasm_wasi_http_bindings.c'];
+    '../../library/c/lasm_wasi_http_bindings.c', 'lasm_mimalloc.c', ...mimallocSources];
   const here = new URL('../src/wasi/', import.meta.url);
   assert.equal(key, sha256(JSON.stringify({ schema: 1, target: 'wasi', node: 'node', runtime: 'edge', settings: wasiLinkSettings.wasi, toolchain: 'clang-20',
     sources: Object.fromEntries(sources.map(file => [file, sha256(readFileSync(new URL(file, here)))])) })));

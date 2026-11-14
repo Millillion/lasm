@@ -21,6 +21,16 @@ This directory holds them:
   function, through [test/models/CliModels.lean](../../test/models/CliModels.lean))
   and any difference fails the `cli-models` workflow. `Interface.lean`
   imports them in place of the `opaque` constants they replace.
+- [Lasm/Cli/Glue.lean](Lasm/Cli/Glue.lean), run by
+  [LasmGlue.lean](LasmGlue.lean): the CLI's glue program, the models that
+  moved into the CLI (milestone M6,
+  [docs/proposals/M6_GLUE.md](../../docs/proposals/M6_GLUE.md)). Lasm
+  compiles it to `src/glue/lasm-glue.wasm` (`glue.yml`), and the CLI runs it
+  in place of the JavaScript it modelled (`src/edge/edge-initializers.mjs`
+  first). Where a model is too slow to run as is,
+  [Lasm/Cli/Fast/](Lasm/Cli/Fast) has a fast version with a `csimp` theorem
+  that it equals the model, so the compiled program is the model by a proved
+  rewrite.
 - [Lasm/Cli/Spec.lean](Lasm/Cli/Spec.lean) and
   [Lasm/Cli/Theorems.lean](Lasm/Cli/Theorems.lean): the propositions proved
   of the models, each with its theorem (as a library's `Spec.lean` and
@@ -58,7 +68,7 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**21 proved propositions (186 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**21 proved propositions (195 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
 ## Lasm.Cli (21)
 
@@ -134,16 +144,16 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**21 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+**22 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
-### Lasm.Cli (21)
+### Lasm.Cli (22)
 
 | Candidate | In plain English | Tested by |
 | --- | --- | --- |
 | [`mangle_round_trip`](Lasm/Cli/Candidates.lean#L35) | **Mangling round-trips.** For a dotted name Lean mangles unambiguously, the mangled name is a non-empty C identifier, demangling gives the name back, and the module of its initializer (`initialize_…` or `runtime_initialize_…`) is the name. | [test/application-diagnosis.test.mjs](../../test/application-diagnosis.test.mjs) |
 | [`compact_wrappers_as_chains`](Lasm/Cli/Candidates.lean#L47) | **The compact wrappers run the kept initializers as the chains do.** For an acyclic plan of valid initializer names, the wrappers are generated, and calling kept initializers' wrappers runs exactly the kept initializers the Node build's chains run, in the same order (each once, after those it reaches). | [test/edge-initializers.test.mjs](../../test/edge-initializers.test.mjs) |
 | [`generated_names_valid`](Lasm/Cli/Candidates.lean#L62) | **Generated names are valid npm, Lake and Supabase names.** Whatever the directory or text: the npm package name is lowercase letters, digits, `.`, `_` and `-`, starts with a letter or digit and does not end with `-`; the Lake name is an identifier of ASCII letters, digits and `_` that starts with a letter and does not end with `_`; the Supabase function name is lowercase letters, digits and `-`, starts with a letter and has at most 54 characters. | [test/init-golden.test.mjs](../../test/init-golden.test.mjs) |
-| [`static_inside_root`](Lasm/Cli/Candidates.lean#L80) | **No request path reaches a file outside the root.** Whatever the path (`..`, encoded dots and slashes, sibling directories that share the root's name as a prefix), the static server answers 200, 403 or 404, and a file it serves lies under the root directory. | [test/static-server.test.mjs](../../test/static-server.test.mjs) |
+| [`static_inside_root`](Lasm/Cli/Candidates.lean#L80) | **No request path reaches a file outside the root.** Whatever the path (`..`, encoded dots and slashes, sibling directories that share the root's name as a prefix, malformed percent-encoding), the static server answers 200, 400, 403 or 404, and a file it serves lies under the root directory. | [test/static-server.test.mjs](../../test/static-server.test.mjs) |
 | [`dev_proxy_forwards_once`](Lasm/Cli/Candidates.lean#L92) | **The proxy sends each request to the server program once, unchanged.** Whatever the server program then does, it receives the request exactly once, with the same method, target and body, its own address as Host, no Accept-Encoding (so a page arrives uncompressed and can be rewritten), and every other header's value. A request is never sent again once the program may have seen it; only a refused connection is retried. | [test/fuzz/targets/dev-proxy.mjs](../../test/fuzz/targets/dev-proxy.mjs) |
 | [`dev_proxy_relays_reply`](Lasm/Cli/Candidates.lean#L102) | **A whole reply reaches the client whole.** Its status and headers (a page's `Cache-Control` is `no-store`), and its body byte for byte, or a page's with the reload client inserted (`relayedBody`), in any charset. | [test/fuzz/targets/dev-proxy.mjs](../../test/fuzz/targets/dev-proxy.mjs) |
 | [`dev_proxy_ends_failed_replies`](Lasm/Cli/Candidates.lean#L112) | **No response is left open.** When the server program stops before its reply ends, the client's response ends cut too; a malformed reply is a 502 or a cut connection, at once. | [test/fuzz/targets/dev-proxy.mjs](../../test/fuzz/targets/dev-proxy.mjs), [test/dev-proxy.test.mjs](../../test/dev-proxy.test.mjs) |
@@ -161,4 +171,5 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | [`lowering_leaves_no_atomics`](Lasm/Cli/Candidates.lean#L240) | **Lowering leaves no atomic instruction.** When it lowers a valid module, the lowered module is valid without the threads feature and lowering it again changes nothing; a module already valid without threads is returned as it is. It stays tested, not proved, for the same reason: `validate` and `validWithoutThreads` are WebAssembly's own validation. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
 | [`lowering_rewrites_atomics`](Lasm/Cli/Candidates.lean#L254) | **Lowering rewrites each atomic and copies everything else.** In a module of any bodies of well-formed instructions, every non-atomic instruction and every local declaration is kept byte for byte, every atomic instruction becomes its documented replacement, and one helper per atomic operation and width follows the functions, numbered in order of first use after the imported and defined ones. Of the model, but not yet proved: its hypotheses are WebAssembly's binary grammar (`oneInstruction`, `localDeclarations`), which a proof needs as a Lean definition the model's `skipInstruction` reads exactly. | [test/lower-atomics.test.mjs](../../test/lower-atomics.test.mjs) |
 | [`zip_reads_back`](Lasm/Cli/Candidates.lean#L270) | **What `zip` writes, a ZIP reader reads back.** Whenever `zip` succeeds, a reader finds the parent directories first (sorted, mode `0o40755`, empty, stored), then every entry in order, with its bytes and its permissions as a regular file (`0o644` unless given). | [test/serverless-zip.test.mjs](../../test/serverless-zip.test.mjs) |
+| [`glue_fields_round_trip`](Lasm/Cli/Candidates.lean#L284) | **The glue's fields round-trip.** Any list of fields, encoded as the glue program reads its request, is read back exactly as the same list, whatever the fields hold (digits, `:`, line ends, non-ASCII, nothing). | [test/glue.test.mjs](../../test/glue.test.mjs) |
 <!-- END CANDIDATES -->
