@@ -165,9 +165,7 @@ try {
     assert.equal(installed.code, 0);
     result.npm = npm('npm version', 'npm', ['--version']).stdout.trim();
     result.provenance = json(join(compiler, 'provenance.json'));
-    const installerManifest = readFileSync(join(compiler, 'installer-dependencies.json'));
-    assert.equal(createHash('sha256').update(installerManifest).digest('hex'), result.provenance.installerManifestSha256);
-    result.installerDependencies = Object.fromEntries(Object.entries(JSON.parse(installerManifest).packages).map(([path, p]) => [path, p.version]));
+    assert.deepEqual(json(join(compiler, 'package.json')).dependencies ?? {}, {}, 'The CLI has no npm dependencies');
     result.packageVersion = json(join(compiler, 'package.json')).version;
     result.compiler = compiler; result.project = project; result.tools = tools;
     result.support = json(join(compiler, 'application-support.json'));
@@ -272,14 +270,9 @@ try {
     const offlineInstall = npm('empty-cache offline npm install', 'npm', ['install', archive, '--offline', '--no-audit', '--no-fund', '--cache', offlineNpmCache], offlineProject);
     assert.equal(offlineInstall.code, 0, offlineInstall.stderr);
     const offlineCompiler = join(offlineProject, 'node_modules/@lasm/compiler');
-    const installer = json(join(offlineCompiler, 'installer-dependencies.json'));
-    for (const [path, dependency] of Object.entries(installer.packages)) {
-      assert.equal(json(join(offlineCompiler, path, 'package.json')).version, dependency.version);
-      for (const [name, expected] of Object.entries(dependency.files))
-        assert.equal(createHash('sha256').update(readFileSync(join(offlineCompiler, path, name))).digest('hex'), expected.sha256);
-    }
-    result.offlineNpmInstall = { emptyCache: true, networkDenied: true, packages: Object.keys(installer.packages).length,
-      installerManifestSha256: result.provenance.installerManifestSha256 };
+    assert.equal(existsSync(join(offlineCompiler, 'node_modules')), false, 'The CLI installs no npm packages of its own');
+    assert.equal(existsSync(join(offlineCompiler, 'bin/lasm.mjs')), true);
+    result.offlineNpmInstall = { emptyCache: true, networkDenied: true, packages: 0 };
     save();
     const inheritedEnvironment = { ...process.env };
     for (const [name, value] of Object.entries({ LEAN_PATH: join(workspace, 'unrelated Lean'),
