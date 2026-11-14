@@ -116,6 +116,7 @@ jobs:
           run-id: ${{ inputs.edge-runtime-run }}
           github-token: ${{ github.token }}
       - name: The packaged edge runtime (checked against its catalog pin)
+        shell: bash
         run: |
           node -e "const a=require('./.work/edge-archive/artifact.json'), c=require('./src/edge-runtimes.json').lean['4.35.0']; if (a.sha256!==c.sha256) throw new Error('edge runtime archive '+a.sha256+' is not the cataloged '+c.sha256)"
           echo "$(node -p "require('./src/edge-runtimes.json').lean['4.35.0'].sha256")  .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst" | sha256sum -c

@@ -86,8 +86,9 @@ jobs:
         id: native
         env:
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        shell: bash
         run: |
-          if [ "$GITHUB_EVENT_NAME" = push ] || git diff --name-only "$BASE" HEAD | grep -qE '^(library/|src/wasi/|src/managed-lean\.mjs|src/lasm-library\.mjs|src/toolchains\.json|test/fuzz/|\.github/workflows/fuzz\.yml)'; then
+          if [ "$GITHUB_EVENT_NAME" = push ] || git diff --name-only "$BASE" HEAD | grep -E '^(library/|src/wasi/|src/managed-lean\.mjs|src/lasm-library\.mjs|src/toolchains\.json|test/fuzz/|\.github/workflows/fuzz\.yml)' >/dev/null; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
       - name: libFuzzer runtime

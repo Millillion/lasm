@@ -4,15 +4,17 @@
 // answer a safe provider must give. Every check names the section it comes
 // from. Raw HTTP, no client library: the attacker does not follow the rules.
 //
-//   node test/attacks.mjs [--url URL | --command CMD | --platform NAME] [--name NAME]
+//   node test/attacks.mjs [--url URL | --command CMD | --platform NAME] [--name NAME] [--equivalence]
 import assert from 'node:assert/strict';
 import { createHash, randomBytes } from 'node:crypto';
-import { Browser, harness, serverArgs, startPorter } from './server.mjs';
+import { Browser, harness, recorderFor, serverArgs, startPorter } from './server.mjs';
 import { cb, clients, users } from './config.mjs';
+import { unrecorded } from '../../../scripts/equivalence/traffic.mjs';
 
 const args = serverArgs();
 const server = await startPorter(args);
 const base = server.base;
+const recorder = recorderFor('attacks', args, base);
 const t = harness(`Adversarial suite${args.name ? ` (${args.name})` : ''}`);
 
 const b64url = b => Buffer.from(b).toString('base64url');
@@ -93,7 +95,8 @@ await t.check('code replay (RFC 6749 §4.1.2, §10.5): the second redemption fai
 
 await t.check('concurrent redemption of one code (RFC 9700 §4.5): exactly one succeeds', async () => {
   const { code, verifier } = await getCode();
-  const results = await Promise.all(Array.from({ length: 12 }, () => redeem(clients.basic, code, verifier)));
+  // Unrecorded: which of the concurrent requests wins is the scheduler's choice.
+  const results = await unrecorded(recorder, () => Promise.all(Array.from({ length: 12 }, () => redeem(clients.basic, code, verifier))));
   assert.equal(results.filter(r => r.status === 200).length, 1, results.map(r => r.status).join(','));
   for (const r of results.filter(r => r.status !== 200)) assertError(r, 400, 'invalid_grant');
 });
@@ -291,7 +294,7 @@ await t.check('refresh token reuse (RFC 9700 §4.14.2): the rotated token revoke
 await t.check('concurrent refreshes of one token: at most one succeeds', async () => {
   const { code, verifier } = await getCode();
   const t0 = (await redeem(clients.basic, code, verifier)).body;
-  const results = await Promise.all(Array.from({ length: 8 }, () => refresh(clients.basic, t0.refresh_token)));
+  const results = await unrecorded(recorder, () => Promise.all(Array.from({ length: 8 }, () => refresh(clients.basic, t0.refresh_token))));
   assert.ok(results.filter(r => r.status === 200).length <= 1, results.map(r => r.status).join(','));
 });
 
@@ -409,7 +412,7 @@ await t.check('user enumeration: a wrong password and an unknown user get the sa
   const { browser, id } = await startInteraction();
   const post = form => browser.request(`${base}/interaction/${id}/login`, { method: 'POST', form });
   const a = await post({ username: 'alice', password: 'wrong' });
-  const b = await post({ username: 'nobody-' + Math.random(), password: 'wrong' });
+  const b = await post({ username: 'nobody-unknown', password: 'wrong' }); // fixed, so the traffic is the same on every target
   assert.equal(a.status, 200);
   assert.equal(a.status, b.status);
   assert.equal(a.text, b.text);
@@ -447,5 +450,6 @@ await t.check('token and userinfo replies are not cached (RFC 6749 §5.1)', asyn
   assert.equal((await userinfo(res.body.access_token)).headers.get('cache-control'), 'no-store');
 });
 
+recorder?.save();
 await server.stop();
 t.done();
