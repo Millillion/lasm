@@ -28,7 +28,9 @@ for an hour or more.
 **On demand.** About 35 workflows run only by `workflow_dispatch`: maintainer
 tools (Lean tiers, link toolchain, library prebuilt, runtime builds), candidate
 rechecks, and the native diagnosis controls kept from earlier investigations.
-They are listed in the inventory below. None of them ran on a schedule or a
+They are listed in the inventory below. The macOS and Windows guard controls were
+removed on 2026-11-13 (IRREDUCIBLE.md removal 12): their checks run in
+`node-darwin-consumer.yml` and `node-windows-consumer.yml`. None of them ran on a schedule or a
 pull request before, so none of them is a check that was dropped.
 
 ### What moved out of the PR tier, and why that is safe
@@ -214,8 +216,8 @@ it), and "dispatch" means `workflow_dispatch`.
 | `language-coverage-probe.yml` | dispatch | input | 5 min (max 14) | One reviewed language-coverage probe (diagnosis) | On demand |
 | `lasm-js-stress.yml` | push hang-stress, call, dispatch | Linux, macOS, Windows | 41 min (max 115) | Lasm.JS hang stress on four platforms | Release, nightly, weekly (soak), called by bridge-verification |
 | `lean-tiers.yml` | dispatch | Linux, macOS, Windows | 42 min (max 160) | Repackages pinned Lean archives into tiers (maintainer) | On demand |
-| `ledger-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 47 min (max 104) | examples/ledger on Bun, Deno, Docker, Workers, WASI auditor | PR (paths), main |
-| `ledger.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 25 min (max 88) | examples/ledger: proofs, API, DST fixed seeds (also on Workers and in three headless browsers, against Node's traces), TigerBeetle differential, E2E | PR (paths), main |
+| `ledger-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 47 min (max 104) | examples/ledger on Bun, Deno, Docker, Workers, Lambda (.zip, image), Vercel, Netlify, Azure, GCF, WASI auditor; API traffic equivalence against Node | PR (paths), main |
+| `ledger.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 25 min (max 88) | examples/ledger: proofs, API (and its traffic against `examples/ledger/test/equivalence/api.json`), DST fixed seeds (also on Workers and in three headless browsers, against Node's traces), TigerBeetle differential, E2E | PR (paths), main |
 | `library-prebuilt.yml` | push prebuilt/**, dispatch | Linux | 3 min (max 16) | Regenerates library/prebuilt (maintainer) | On demand |
 | `library-proofs.yml` | dispatch, call, PR (paths), push main (paths) | Linux | — | Proofs of Lasm's library: theorems match Spec.lean, standard axioms only, library/PROOFS.md current; the Candidates files and verification/cli's propositions elaborate, and its Spec.lean is proved of its models (README current) | PR (paths), main |
 | `link-toolchain-fixtures.yml` | dispatch | Linux, macOS, Windows | 12 min | Link toolchain fixtures (maintainer) | On demand |
@@ -227,7 +229,6 @@ it), and "dispatch" means `workflow_dispatch`.
 | `node-candidate-input.yml` | call | Linux | — | Authenticated candidate input (called) | Called |
 | `node-darwin-candidate-recheck.yml` | dispatch | macOS + called workflows | 28 min (max 87) | Recheck a candidate on macOS | On demand |
 | `node-darwin-consumer.yml` | call | input | — | Installed candidate on macOS (called) | Called |
-| `node-darwin-controls.yml` | dispatch | macOS | 1 min | macOS resource and isolation controls | On demand |
 | `node-linux-acceptance.yml` | push main (paths), dispatch, call | Linux, macOS, Windows + called workflows | 142 min (max 422) | Candidate build and five-platform installed acceptance, templates, js-interop, platform support, benchmarks | Release (candidate), main (paths) |
 | `node-linux-candidate-recheck.yml` | dispatch | Linux + called workflows | 20 min | Recheck a candidate on Linux | On demand |
 | `node-linux-candidate-retain.yml` | dispatch | Linux, Windows | 1 min | Retain a verified candidate draft | On demand |
@@ -264,7 +265,6 @@ it), and "dispatch" means `workflow_dispatch`.
 | `web-bindings.yml` | PR (paths), push main (paths), dispatch | Linux | new | Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun: node.idl is the pinned Node docs' lowering, deno.idl and bun.idl the pinned Deno and Bun declarations', and the generated bindings are the generator's output; the Lasm.JS.Web conformance program on Node 26 and 24, Bun, Deno, Workers (workerd) and Chromium, the Lasm.JS.Node one on Node 26 and 24, Bun and Deno, and the js-serve one (Deno.serve, Bun.serve, @hono/node-server) on Node, Bun and Deno with a served Lean handler requested end to end | PR (paths), main |
 | `fastly-bindings.yml` | PR (paths), dispatch | Linux | new | Lasm.Fastly: the generated bindings are the generator's output for the pinned witx, the binding unit tests, then `wasi.yml` (the conformance fixture and `examples/fastly` under Viceroy) | PR (paths) |
 | `wasi-http-bindings.yml` | PR (paths), dispatch | Linux | new | Lasm.WASI.Http: the generated bindings and wit-bindgen's core signatures are the generator's output for the pinned WASI 0.2.12 WIT, the binding unit tests, then `wasi.yml` (the conformance fixture and `examples/wasi-http` under `wasmtime serve`) | PR (paths) |
-| `windows-guard-controls.yml` | dispatch | Windows | 2 min | Windows resource guard controls | On demand |
 | `windows-lean-path-controls.yml` | dispatch | Windows | 3 min | Windows Lean long-path controls | On demand |
 | `windows-timezone-host.yml` | dispatch | Windows | 5 min | Windows timezone host comparisons | On demand |
 | `workers.yml` | dispatch, call | Linux, macOS, Windows + called workflows | 29 min (max 90) | Edge targets (Workers, Vercel/Netlify Edge, Deno, Supabase) and Bun/Deno on five platforms | Release, nightly |
