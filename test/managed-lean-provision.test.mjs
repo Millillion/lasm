@@ -270,8 +270,8 @@ test('assembled prefixes: conflicts are named, the library is compiled for its L
   await assert.rejects(assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.core[0], label: 'a' }, { artifact: twin.artifact, label: 'b' }], { ...options, fetch }),
     { message: `Lean archives ${f.core[0].name} and ${twin.artifact.name} both contain lib/lean/Core0.olean` });
   void clash;
-  await assembleLeanPrefix('4.35.0', f.release, [{ artifact: f.bin, label: 'bin' }], options);
-  assert.ok(stages.includes("Compiling Lasm's Lean library for Lean 4.35.0"));
+  await assembleLeanPrefix('4.36.0-rc2', f.release, [{ artifact: f.bin, label: 'bin' }], options);
+  assert.ok(stages.includes("Compiling Lasm's Lean library for Lean 4.36.0-rc2"));
   stages.length = 0;
   await assembleLeanPrefix('9.9.9', f.release, [{ artifact: f.bin, label: 'bin' }], options);
   assert.equal(stages.some(stage => /Compiling Lasm/.test(stage)), false);
@@ -335,7 +335,7 @@ test('cached-only reuses an assembled prefix; explicit core ignores a lakefile; 
   const { progress, ...quiet } = f.options; void progress;
   assert.equal((await provisionLean(f.main, quiet)).tier, 'core', 'auto, without a progress callback');
   const { assembleLeanPrefix } = await import('../src/managed-lean.mjs');
-  await assembleLeanPrefix('4.35.0', f.release, [{ artifact: f.bin, label: 'bin' }], quiet);
+  await assembleLeanPrefix('4.36.0-rc2', f.release, [{ artifact: f.bin, label: 'bin' }], quiet);
   const g = await fixture(t);
   await provisionLean(g.main, { ...g.options, distribution: 'full' });
   assert.ok(g.stages.includes('Downloading Lean 9.9.9 and Lake'));

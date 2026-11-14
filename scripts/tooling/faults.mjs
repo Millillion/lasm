@@ -40,7 +40,7 @@ import { dirname, join } from 'node:path';
 import { runLasm, baseEnvironment, messageProblems, temporaryDirectory, writeTree, removeTree, treeHashes, treeDifferences, options, summary, tail } from './lib.mjs';
 
 const fixture = {
-  'lean-toolchain': 'leanprover/lean4:v4.35.0\n',
+  'lean-toolchain': 'leanprover/lean4:v4.36.0-rc2\n',
   'lakefile.toml': 'name = "app"\nversion = "0.1.0"\ndefaultTargets = ["app"]\n\n[[lean_lib]]\nname = "App"\n\n[[lean_exe]]\nname = "app"\nroot = "Main"\n',
   'App.lean': 'def greeting (name : String) : String := s!"Hello, {name}!"\n',
   'Main.lean': 'import App\n\ndef main : IO Unit := IO.println (greeting "faults")\n',

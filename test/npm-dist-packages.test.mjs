@@ -1,12 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import { releaseVersion, toolPackages, toolPackageJson, toolPackageReadme, npmToolManifest, mainPackageJson, maximumPackageBytes,
   cTierLicense, createPackageJson, createPackageLicense, edgeRuntimeBundle } from '../scripts/npm-dist/packages.mjs';
 import { leanDistribution } from '../src/managed-lean.mjs';
 import { validateNpmToolManifest, npmEntryFor } from '../src/npm-artifacts.mjs';
 
 const json = async path => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
+// A Lean upgrade branch has no published tiers until its release PR (docs/LEAN_UPGRADE.md step 6).
+const toolchainsNow = JSON.parse(readFileSync(new URL('../src/toolchains.json', import.meta.url), 'utf8'));
+const untiered = toolchainsNow.lean[toolchainsNow.defaultLean].tiers ? false : `Lean ${toolchainsNow.defaultLean} has no published tiers yet (Lean upgrade branch)`;
 const catalogs = async () => ({ toolchains: await json('../src/toolchains.json'), linkToolchain: await json('../src/link-toolchain.json'),
   edgeRuntimes: await json('../src/edge-runtimes.json'),
 });
@@ -21,7 +25,7 @@ test('package versions come from the immutable release that published each archi
   assert.throws(() => releaseVersion('https://example.com/releases/download/latest/x'), /No package version rule/);
 });
 
-test('every catalogued Lean release maps to platform, shared and on-demand packages under the size ceiling', async () => {
+test('every catalogued Lean release maps to platform, shared and on-demand packages under the size ceiling', { skip: untiered }, async () => {
   const c = await catalogs();
   for (const lean of Object.keys(c.toolchains.lean).filter(version => c.toolchains.lean[version].tiers)) {
     const packages = toolPackages({ lean, ...c });
@@ -58,19 +62,19 @@ test('every catalogued Lean release maps to platform, shared and on-demand packa
     // Shared Emscripten packages keep one version across Lean releases.
     assert.equal(packages.find(p => p.name === '@lasm/emscripten-shared').version, '6.0.9-lasm.1');
   }
-  const scoped = toolPackages({ lean: '4.35.0', ...c, scope: '@example-org' });
+  const scoped = toolPackages({ lean: c.toolchains.defaultLean, ...c, scope: '@example-org' });
   assert.ok(scoped.every(p => p.name.startsWith('@example-org/')));
-  assert.throws(() => toolPackages({ lean: '4.35.0', ...c, scope: 'lasm' }));
+  assert.throws(() => toolPackages({ lean: c.toolchains.defaultLean, ...c, scope: 'lasm' }));
 });
 
 test('the edge runtime is bundled in the CLI package from its cataloged release archive', async () => {
   const c = await catalogs();
-  const edge = edgeRuntimeBundle({ lean: '4.35.0', edgeRuntimes: c.edgeRuntimes });
-  const pinned = c.edgeRuntimes.lean['4.35.0'];
+  const edge = edgeRuntimeBundle({ lean: c.toolchains.defaultLean, edgeRuntimes: c.edgeRuntimes });
+  const pinned = c.edgeRuntimes.lean['4.36.0-rc2'];
   assert.equal(edge.baseRuntimeManifestSha256, pinned.baseRuntimeManifestSha256);
   assert.deepEqual(Object.keys(edge.artifact).sort(), ['bytes', 'format', 'maximumExtractedBytes', 'name', 'root', 'sha256', 'url']);
-  assert.equal(edge.artifact.root, 'lean-4.35.0-wasm64-edge', 'src/edge/edge-runtime.mjs looks for targets/<runtime>-edge');
-  assert.match(edge.artifact.url, /^https:\/\/github\.com\/Millillion\/lasm\/releases\/download\/lean-4\.35\.0-edge-v\d+\//);
+  assert.equal(edge.artifact.root, 'lean-4.36.0-rc2-wasm64-edge', 'src/edge/edge-runtime.mjs looks for targets/<runtime>-edge');
+  assert.match(edge.artifact.url, /^https:\/\/github\.com\/Millillion\/lasm\/releases\/download\/lean-4\.\d+\.\d+(?:-rc\d+)?-edge-v\d+\//);
   assert.equal(edgeRuntimeBundle({ lean: '9.9.9', edgeRuntimes: c.edgeRuntimes }), null);
 });
 
@@ -88,14 +92,14 @@ test('C tier packages carry an SPDX expression of every component', () => {
     for (const term of cTierLicense(platform).split(' AND ')) assert.match(term, /^(?:[A-Za-z0-9.+-]+(?: WITH [A-Za-z0-9.-]+)?|\([A-Za-z0-9.+-]+ OR [A-Za-z0-9.+-]+\))$/, term);
 });
 
-test('the C tier Lasm provisions is the archive its npm package carries', async () => {
+test('the C tier Lasm provisions is the archive its npm package carries', { skip: untiered }, async () => {
   const c = await catalogs();
-  const packages = toolPackages({ lean: '4.35.0', ...c });
+  const packages = toolPackages({ lean: c.toolchains.defaultLean, ...c });
   const packed = Object.fromEntries(packages.map((p, i) => [p.name, { integrity: 'sha512-' + Buffer.alloc(64, i).toString('base64') }]));
   const manifest = validateNpmToolManifest(npmToolManifest(packages, packed));
   for (const platform of ['linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64', 'win32-x64']) {
     // As provisionLean({ native: true }) passes it to provisionArtifact.
-    const { name, url, sha256, bytes, format, root, maximumExtractedBytes } = leanDistribution(c.toolchains.lean['4.35.0'], platform).c;
+    const { name, url, sha256, bytes, format, root, maximumExtractedBytes } = leanDistribution(c.toolchains.lean['4.36.0-rc2'], platform).c;
     const entry = npmEntryFor(manifest, { name, url, sha256, bytes, format, root, maximumExtractedBytes });
     assert.deepEqual([entry.package, entry.version, entry.install, entry.platform], [`@lasm/lean-c-${platform}`, '4.35.0-lasm.2', 'demand', platform]);
   }
@@ -111,13 +115,13 @@ test('@lasm/create pins the CLI exactly and is MIT', () => {
   assert.throws(() => createPackageJson({ name: '@lasm/cli', version: '^0.1.0' }));
 });
 
-test('the runtime manifest and main package pin every tool package exactly', async () => {
+test('the runtime manifest and main package pin every tool package exactly', { skip: untiered }, async () => {
   const c = await catalogs();
   const packages = toolPackages({ lean: '4.35.0', ...c });
   const packed = Object.fromEntries(packages.map((p, i) => [p.name, { integrity: 'sha512-' + Buffer.alloc(64, i).toString('base64') }]));
   const manifest = validateNpmToolManifest(npmToolManifest(packages, packed));
   assert.equal(Object.keys(manifest.artifacts).length, packages.length);
-  const bin = c.toolchains.lean['4.35.0'].tiers.bin['linux-x64'];
+  const bin = c.toolchains.lean['4.36.0-rc2'].tiers.bin['linux-x64'];
   assert.deepEqual(npmEntryFor(manifest, bin), { package: '@lasm/lean-linux-x64', version: '4.35.0-lasm.2', file: bin.name,
     bytes: bin.bytes, integrity: packed['@lasm/lean-linux-x64'].integrity, install: 'optional', platform: 'linux-x64' });
   const native = c.linkToolchain.native['win32-x64'];

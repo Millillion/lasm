@@ -193,5 +193,12 @@ if (args[0] === '--capture') {
   evidence.memoryThrottled = (evidence.service?.memoryEvents?.high ?? 0) > 0;
   save();
   console.error(`[lasm] Peak ${(evidence.peakMemoryBytes / GiB).toFixed(2)} GiB; ${evidence.service?.serviceResult ?? 'launch failed'}${evidence.resourceLimited ? '; resource-limited run, not a conformance result' : ''}`);
+  // A stop is only actionable with what the memory was: print the evidence the report keeps.
+  if (evidence.resourceLimited) {
+    const mib = bytes => `${Math.round(bytes / 2 ** 20)} MiB`;
+    console.error(`[lasm] Stopped because: ${evidence.stoppedBecause ?? evidence.service?.serviceResult}`);
+    if (evidence.lastSample?.memoryBreakdown) console.error(`[lasm] Last sample (${mib(evidence.lastSample.memoryBytes)}): ${Object.entries(evidence.lastSample.memoryBreakdown).map(([key, value]) => `${key} ${mib(value)}`).join(', ')}`);
+    for (const p of evidence.highWaterProcesses?.processes ?? []) console.error(`[lasm] At 60 %: ${JSON.stringify(p)}`);
+  }
   process.exitCode = evidence.resourceLimited || evidence.monitorError ? 125 : result.code ?? 1;
 }

@@ -16,9 +16,13 @@ const result = {};
 const versions = JSON.parse(readFileSync(new URL('./acceptance-versions.json', import.meta.url)));
 const names = ['lean', 'node'];
 assert.ok(process.argv.length <= 3);
-for (const name of [...names, 'npm', 'node24', 'minimumNode']) assert.match(versions[name], /^\d+\.\d+\.\d+$/);
+for (const name of ['node', 'npm', 'node24', 'minimumNode']) assert.match(versions[name], /^\d+\.\d+\.\d+$/);
+// A Lean release candidate is pinned only on a Lean upgrade branch (docs/LEAN_UPGRADE.md):
+// it must be that published prerelease, and the latest stable release is recorded.
+assert.match(versions.lean, /^\d+\.\d+\.\d+(-rc\d+)?$/);
+const leanCandidate = /-rc\d+$/.test(versions.lean);
 for (const [name, repository, expected] of [['lean', 'leanprover/lean4', 'v' + versions.lean]]) {
-  const source = `https://api.github.com/repos/${repository}/releases/latest`;
+  const source = `https://api.github.com/repos/${repository}/releases/${leanCandidate ? 'tags/' + expected : 'latest'}`;
   const lookup = await fetchJson(source);
   if (!lookup.ok) { warn(`Release lookup unavailable: ${name} (${lookup.error} after ${lookup.attempts} attempts); the pin was not rechecked`); result[name] = { source, expected, unavailable: lookup.error }; continue; }
   const release = lookup.json;
@@ -58,7 +62,7 @@ for (const name of names.filter(known)) {
   if (result[name].tag !== result[name].expected && deferred[name] !== undefined)
     assert.equal(result[name].tag, 'v' + deferred[name], `Latest ${name} changed beyond the recorded deferral; update the acceptance pins`);
   else assert.equal(result[name].tag, result[name].expected, `Latest ${name} changed; update the acceptance pins`);
-  if (name !== 'node') { assert.equal(result[name].draft, false); assert.equal(result[name].prerelease, false); }
+  if (name !== 'node') { assert.equal(result[name].draft, false); assert.equal(result[name].prerelease, name === 'lean' && leanCandidate); }
 }
 if (known('node24')) {
   if (result.node24.tag !== result.node24.expected && deferred.node24 !== undefined)

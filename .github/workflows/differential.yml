@@ -1,7 +1,7 @@
 name: Differential testing
 # Black-box differential testing of the compiler (docs/TESTING.md#differential-testing):
 # random well-typed Lean programs (scripts/differential/generate.mjs) built with
-# upstream Lean 4.35.0 natively (the oracle) and with a candidate packed from
+# upstream Lean 4.36.0-rc2 natively (the oracle) and with a candidate packed from
 # this commit and installed with npm, as a user installs @lasm/cli, for node,
 # wasi (wasmtime and node:wasi) and the edge runtime (--target deno, run by
 # Deno). Any difference in stdout, stderr or exit status fails the job; the
@@ -313,7 +313,7 @@ jobs:
   # fixtures of the unit files that built with the retired Lean 4.32 pipeline
   # (cwd, permissions, processes, environment and path bytes, temporary files,
   # finalizers, TCP, clocks), built with the installed candidate for Node and
-  # compared with upstream Lean 4.35.0's `lean --run`. Pull requests and main.
+  # compared with upstream Lean 4.36.0-rc2's `lean --run`. Pull requests and main.
   host-fixtures:
     needs: [sunday, pack]
     if: needs.sunday.outputs.skip != 'true' && (github.event_name != 'schedule')

@@ -4,7 +4,7 @@ defaultTargets = ["app"]
 [[require]]
 name = "plausible"
 git = "https://github.com/leanprover-community/plausible"
-rev = "dfa4f38190d07c37e315953e08b90fe2d95b3c24"
+rev = "129d1ba9a16bc0660f46c79e9fb041ef5d5d80de"
 
 [[lean_exe]]
 name = "app"

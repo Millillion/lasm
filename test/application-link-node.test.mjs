@@ -13,6 +13,8 @@ import { linkApplication, initializerStubs } from '../src/application-link.mjs';
 import { project, nodeSdk, emccSdk, mainModule, trivialModule, specializedIdentity } from './fixtures/link-stand-ins/application.mjs';
 import { expandResponseFiles, wasmObject, archive } from './fixtures/link-stand-ins/toolchain.mjs';
 import { finishLinks, links as finishedLinks, hooks as linkHooks } from './fixtures/link-stand-ins/link-driver.mjs';
+// The pinned Lean: the reviewed initializer list (src/lean-init-targets-<version>.json) is per release.
+import { leanVersion } from './fixtures/link-stand-ins/application.mjs';
 
 const posix = process.platform !== 'win32';
 const readResponse = file => expandResponseFiles(['@' + file]);
@@ -26,7 +28,7 @@ const withEnv = async (values, run) => {
 };
 
 function build(p, toolchain, options = {}) {
-  return linkApplication({ sources: p.sources, sdk: toolchain.sdk, runtime: p.runtime, work: options.work ?? p.work, dist: p.dist, leanVersion: '4.35.0',
+  return linkApplication({ sources: p.sources, sdk: toolchain.sdk, runtime: p.runtime, work: options.work ?? p.work, dist: p.dist, leanVersion,
     memoryMode: 1, verbose: false, linkDriver: 'node', linkOnly: true, ...options });
 }
 const freshWork = (p, name) => { const work = join(p.base, name); mkdirSync(work, { recursive: true }); return work; };
@@ -534,7 +536,7 @@ test('full (not link-only) Node-driver builds: the delivered link is optimized i
   const toolchain = nodeSdk(p.base);
   const seed = join(p.base, 'seed.json');
   const full = options => linkFinished({ sources: p.sources, sdk: toolchain.sdk, runtime: p.runtime, work: freshWork(p, `work-${Math.random()}`), dist: p.dist,
-    leanVersion: '4.35.0', memoryMode: 1, verbose: false, linkDriver: 'node', ...options });
+    leanVersion, memoryMode: 1, verbose: false, linkDriver: 'node', ...options });
   const delivered = () => finishedLinks.filter(item => !item.mapOnly);
   finishedLinks.length = 0;
   assert.equal((await full({})).mode, 'static');
@@ -580,7 +582,7 @@ test('the delivered link is checked as well: a program it finds reaching runtime
   const p = project({ runtime: { identity: specializedIdentity } });
   linkHooks.after = options => copyFileSync(rejectedMap, options.args.find(arg => arg.startsWith('-Wl,-Map=')).slice('-Wl,-Map='.length));
   try {
-    await assert.rejects(linkFinished({ sources: p.sources, sdk: nodeSdk(p.base).sdk, runtime: p.runtime, work: p.work, dist: p.dist, leanVersion: '4.35.0',
+    await assert.rejects(linkFinished({ sources: p.sources, sdk: nodeSdk(p.base).sdk, runtime: p.runtime, work: p.work, dist: p.dist, leanVersion,
       memoryMode: 1, verbose: false, linkDriver: 'node', initialization: 'all' }), { code: 'ERR_LASM_UNSUPPORTED_RUNTIME_FEATURE' });
   } finally { linkHooks.after = undefined; }
 });

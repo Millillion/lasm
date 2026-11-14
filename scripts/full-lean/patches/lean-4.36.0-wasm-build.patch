@@ -1,0 +1,528 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 2499439..4240375 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -166,8 +166,14 @@ if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+ 
+   # From https://emscripten.org/docs/compiling/WebAssembly.html#backends:
+   # > The simple and safe thing is to pass all -s flags at both compile and link time.
+-  set(EMSCRIPTEN_SETTINGS "-s ALLOW_MEMORY_GROWTH=1 -fwasm-exceptions -pthread -flto")
++  set(LASM_MEMORY64 "0" CACHE STRING "Emscripten memory mode: 0, 1, or lowered 2")
++  option(LASM_HOST_BRIDGE "Use Lasm asynchronous host IO" OFF)
++  option(LASM_LINK_LAKE "Link Lake into the full Wasm compiler" OFF)
++  option(LASM_LINK_TOOLS "Link original Lean tool entry points into Wasm" OFF)
++  set(LASM_WASM_LINK_OPTIMIZATION "-O1" CACHE STRING "Wasm link optimization for development iterations")
++  set(EMSCRIPTEN_SETTINGS "-s ALLOW_MEMORY_GROWTH=1 -sMEMORY64=${LASM_MEMORY64} -fwasm-exceptions -pthread")
+   string(APPEND LEANC_EXTRA_CC_FLAGS " -pthread")
++  string(APPEND LEANC_EXTRA_CC_FLAGS " -D LEAN_EMSCRIPTEN ${EMSCRIPTEN_SETTINGS}")
+   string(APPEND LEAN_EXTRA_CXX_FLAGS " -D LEAN_EMSCRIPTEN ${EMSCRIPTEN_SETTINGS}")
+   string(APPEND LEAN_EXTRA_LINKER_FLAGS " ${EMSCRIPTEN_SETTINGS}")
+ endif()
+@@ -525,6 +531,9 @@ else()
+ endif()
+ 
+ set(LEAN_CXX_STDLIB "-lstdc++" CACHE STRING "C++ stdlib linker flags")
++if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
++  set(LEAN_CXX_STDLIB "-lc++ -lc++abi")
++endif()
+ 
+ if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+   set(LEAN_CXX_STDLIB "-lc++")
+@@ -723,7 +732,7 @@ file(WRITE "${CMAKE_BINARY_DIR}/lake-githash" "${LAKE_LEAN_GITHASH}")
+ # Git HASH
+ if(USE_GITHASH)
+   include(GetGitRevisionDescription)
+-  get_git_head_revision(GIT_REFSPEC GIT_SHA1 ALLOW_LOOKING_ABOVE_CMAKE_SOURCE_DIR)
++  set(GIT_SHA1 "8c9756b28d64dab099da31a4c09229a9e6a2ef35") # Lasm: verified source archive identity
+   if(GIT_SHA1 MATCHES "GITDIR-NOTFOUND")
+     message(STATUS "Failed to read git_sha1")
+     set(GIT_SHA1 "")
+@@ -795,6 +804,10 @@ endif()
+ add_subdirectory(initialize)
+ add_subdirectory(shell)
+ 
++if(CMAKE_SYSTEM_NAME MATCHES "Emscripten" AND LASM_HOST_BRIDGE)
++  add_dependencies(lean lasmhost lasmnative)
++endif()
++
+ # The relative path doesn't work once the CMakeLists.txt files have been copied into the stage0 dir.
+ # Since stage0 needs no tests, we just ignore them instead of fixing the path.
+ if(NOT STAGE EQUAL 0)
+@@ -876,6 +889,36 @@ else()
+   set_target_properties(leancpp PROPERTIES OUTPUT_NAME leancpp)
+ endif()
+ 
++if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
++  if(NOT EXISTS "${CMAKE_BINARY_DIR}/lasm-native-symbols.c")
++    file(WRITE "${CMAKE_BINARY_DIR}/lasm-native-symbols.c" "void *lasm_lookup_lean_symbol(const char *s) { return 0; }\n")
++  endif()
++  add_library(lasmnative STATIC "${CMAKE_BINARY_DIR}/lasm-native-symbols.c")
++  target_compile_options(lasmnative PRIVATE -pthread -fwasm-exceptions "-sMEMORY64=${LASM_MEMORY64}")
++  string(APPEND LEAN_EXE_LINKER_FLAGS " ${CMAKE_BINARY_DIR}/lib/lean/liblasmnative.a")
++endif()
++
++if(CMAKE_SYSTEM_NAME MATCHES "Emscripten" AND LASM_LINK_TOOLS)
++  set(LASM_TOOL_SOURCES)
++  foreach(tool LakeMain Leanc LeanIR LeanChecker)
++    set(tool_source "${CMAKE_BINARY_DIR}/generated-tool-c/${tool}.c")
++    if(NOT EXISTS "${tool_source}")
++      file(WRITE "${tool_source}" "/* Filled by prepare-native64.mjs before compilation. */\n")
++    endif()
++    list(APPEND LASM_TOOL_SOURCES "${tool_source}")
++  endforeach()
++  add_library(lasmtools STATIC ${LASM_TOOL_SOURCES})
++  target_compile_options(lasmtools PRIVATE -pthread -fwasm-exceptions "-sMEMORY64=${LASM_MEMORY64}")
++  target_compile_definitions(leanmain PRIVATE LASM_FULL_TOOLS=1)
++  add_dependencies(lean lasmtools)
++  string(APPEND LEAN_EXE_LINKER_FLAGS " ${CMAKE_BINARY_DIR}/lib/lean/liblasmtools.a")
++endif()
++
++if(CMAKE_SYSTEM_NAME MATCHES "Emscripten" AND LASM_HOST_BRIDGE)
++  include("${LEAN_SOURCE_DIR}/lasm/host.cmake")
++  string(APPEND LEAN_EXE_LINKER_FLAGS " -Wl,--whole-archive ${CMAKE_BINARY_DIR}/lib/lean/liblasmhost.a -Wl,--no-whole-archive --pre-js ${LEAN_SOURCE_DIR}/lasm/host-pre.js --js-library ${LEAN_SOURCE_DIR}/lasm/host-library.js")
++endif()
++
+ if(STAGE GREATER 0 AND CADICAL AND INSTALL_CADICAL)
+   add_custom_target(
+     copy-cadical
+@@ -920,7 +963,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+   # in this file.
+   string(
+     APPEND LEAN_EXE_LINKER_FLAGS
+-    " ${LIB}/temp/libleanshell.a ${TOOLCHAIN_STATIC_LINKER_FLAGS} ${EMSCRIPTEN_SETTINGS} -lnodefs.js -s EXIT_RUNTIME=1 -s MAIN_MODULE=1 -s LINKABLE=1 -s EXPORT_ALL=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0"
++    " ${LIB}/temp/libleanshell.a ${TOOLCHAIN_STATIC_LINKER_FLAGS} ${EMSCRIPTEN_SETTINGS} -lnodefs.js -s EXIT_RUNTIME=1 -s NODERAWFS=1 -s MAIN_MODULE=2 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -sEXPORTED_FUNCTIONS=@${CMAKE_BINARY_DIR}/lasm-wasm-exports.json -sEXPORTED_RUNTIME_METHODS=FS,ENV,callMain,ccall,UTF8ToString,stringToNewUTF8 -sSTACK_SIZE=16777216 -sINITIAL_MEMORY=134217728 -sMAXIMUM_MEMORY=4294967296 -sPTHREAD_POOL_SIZE=4 -sPROXY_TO_PTHREAD=1 --pre-js ${LEAN_SOURCE_DIR}/lasm-emscripten-pre.js"
+   )
+ endif()
+ 
+@@ -941,6 +984,9 @@ set(
+ )
+ if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+   list(APPEND STDLIBS Lake LeanChecker)
++elseif(LASM_LINK_LAKE)
++  list(APPEND STDLIBS Lake)
++  string(APPEND LEAN_EXE_LINKER_FLAGS " -lLake")
+ endif()
+ 
+ add_custom_target(
+@@ -974,7 +1020,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+   add_custom_target(
+     leanshared
+     ALL
+-    DEPENDS Init_shared leancpp
++    DEPENDS Init_shared leancpp leanrt leanshell leaninitialize
+     COMMAND touch ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libleanshared_2${CMAKE_SHARED_LIBRARY_SUFFIX}
+     COMMAND touch ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libleanshared_1${CMAKE_SHARED_LIBRARY_SUFFIX}
+     COMMAND touch ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libleanshared${CMAKE_SHARED_LIBRARY_SUFFIX}
+@@ -1150,8 +1196,10 @@ endif()
+ 
+ # use Bash version for building, use Lean version in bin/ for tests & distribution
+ configure_file("${LEAN_SOURCE_DIR}/bin/leanc.in" "${CMAKE_BINARY_DIR}/leanc.sh" @ONLY)
+-if(STAGE GREATER 0 AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
++if(STAGE GREATER 0)
+   configure_file("${LEAN_SOURCE_DIR}/Leanc.lean" "${CMAKE_BINARY_DIR}/leanc/Leanc.lean" @ONLY)
++endif()
++if(STAGE GREATER 0 AND NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+   add_custom_target(
+     leanc
+     ALL
+diff --git a/src/bin/leanc.in b/src/bin/leanc.in
+index 3307553..79ff6d2 100755
+--- a/src/bin/leanc.in
++++ b/src/bin/leanc.in
+@@ -7,7 +7,12 @@ for arg in "$@"; do
+     [[ "$arg" = "-c" ]] && ldflags=()
+     [[ "$arg" = "-v" ]] && v=1
+ done
+-cmd=(${LEAN_CC:-@CMAKE_C_COMPILER@} "-I$root/include" @LEANC_EXTRA_CC_FLAGS@ @LEANC_INTERNAL_FLAGS@ "$@" "${ldflags[@]}" -Wno-unused-command-line-argument)
++# C++ exceptions need Emscripten's C++ link driver even for archive-only links.
++compiler=${LEAN_CC:-@CMAKE_C_COMPILER@}
++if [[ "@CMAKE_SYSTEM_NAME@" == Emscripten && ${#ldflags[@]} -gt 0 ]]; then
++    compiler=@CMAKE_CXX_COMPILER@
++fi
++cmd=($compiler "-I$root/include" @LEANC_EXTRA_CC_FLAGS@ @LEANC_INTERNAL_FLAGS@ "$@" "${ldflags[@]}" -Wno-unused-command-line-argument)
+ cmd=$(printf '%q ' "${cmd[@]}" | sed "s!ROOT!$root!g")
+ [[ $v == 1 ]] && echo $cmd
+ eval $cmd
+diff --git a/src/include/lean/lean.h b/src/include/lean/lean.h
+index a464f75..406eaff 100644
+--- a/src/include/lean/lean.h
++++ b/src/include/lean/lean.h
+@@ -3721,7 +3721,7 @@ static inline lean_obj_res lean_runtime_hold(b_lean_obj_arg a) {
+     return lean_box(0);
+ }
+ 
+-#ifdef LEAN_EMSCRIPTEN
++#if UINTPTR_MAX == UINT32_MAX
+ #define LEAN_SCALAR_PTR_LITERAL(b1, b2, b3, b4, b5, b6, b7, b8) (lean_object*)((uint32_t)b1 | ((uint32_t)b2 << 8) | ((uint32_t)b3 << 16) | ((uint32_t)b4 << 24)), (lean_object*)((uint32_t)b5 | ((uint32_t)b6 << 8) | ((uint32_t)b7 << 16) | ((uint32_t)b8 << 24))
+ #else
+ #define LEAN_SCALAR_PTR_LITERAL(b1, b2, b3, b4, b5, b6, b7, b8) (lean_object*)((uint64_t)b1 | ((uint64_t)b2 << 8) | ((uint64_t)b3 << 16) | ((uint64_t)b4 << 24) | ((uint64_t)b5 << 32) | ((uint64_t)b6 << 40) | ((uint64_t)b7 << 48) | ((uint64_t)b8 << 56))
+diff --git a/src/library/ir_interpreter.cpp b/src/library/ir_interpreter.cpp
+index 9d18f8f..2cc3e7a 100644
+--- a/src/library/ir_interpreter.cpp
++++ b/src/library/ir_interpreter.cpp
+@@ -338,7 +338,14 @@ void print_value(tout const & ios, value const & v, type t) {
+   return print_value(const_cast<tout &>(ios), v, t);
+ }
+ 
++#ifdef LEAN_EMSCRIPTEN
++extern "C" void *lasm_lookup_lean_symbol(char const *);
++#endif
++
+ void * lookup_symbol_in_cur_exe(char const * sym) {
++#ifdef LEAN_EMSCRIPTEN
++    if (void *addr = lasm_lookup_lean_symbol(sym)) return addr;
++#endif
+ #ifdef LEAN_WINDOWS
+     std::vector<HMODULE> hmods(128);
+     DWORD bytes_needed;
+@@ -1208,7 +1215,7 @@ extern "C" LEAN_EXPORT obj_res lean_run_mod_init_core(b_obj_arg  sym) {
+     }
+ }
+ 
+-extern "C" LEAN_EXPORT object * lean_run_init(object * env, object * opts, object * decl, object * init_decl, object *) {
++extern "C" LEAN_EXPORT object * lean_run_init(object * env, object * opts, object * decl, object * init_decl) {
+     return interpreter::with_interpreter<object *>(TO_REF(elab_environment, env), TO_REF(options, opts), TO_REF(name, decl), [&](interpreter & interp) {
+         return interp.run_init(TO_REF(name, decl), TO_REF(name, init_decl));
+     });
+diff --git a/src/library/module.cpp b/src/library/module.cpp
+index 402e522..e86b9f1 100644
+--- a/src/library/module.cpp
++++ b/src/library/module.cpp
+@@ -267,7 +267,7 @@ static std::vector<std::pair<size_t, ptrdiff_t>> read_lib_table_from_buffer(char
+ 
+ extern "C" LEAN_EXPORT object * lean_compacted_region_save(b_obj_arg ofname, b_obj_arg mod, b_obj_arg odata,
+                                                            b_obj_arg odep_regions, obj_arg oprev,
+-                                                           uint8 allow_closures_u8, object *) {
++                                                           uint8 allow_closures_u8) {
+     // `mmap` addresses must be page-aligned. The default (non-huge) page size on x86-64 is 4KB;
+     // `MapViewOfFileEx` addresses must be aligned to the "memory allocation granularity" (64KB).
+     const size_t ALIGN = 1LL<<16;
+@@ -449,7 +449,7 @@ static object * mk_compacted_region(b_obj_arg ofname, object * root,
+ // root to be interpreted as — the C side does no type checking and the caller is responsible for
+ // using a type compatible with what was saved (see `CompactedRegion.read`).
+ // Supports both `v2` and `v3` formats.
+-extern "C" LEAN_EXPORT object * lean_compacted_region_read(b_obj_arg ofname, b_obj_arg odep_regions, object *) {
++extern "C" LEAN_EXPORT object * lean_compacted_region_read(b_obj_arg ofname, b_obj_arg odep_regions) {
+     std::string olean_fn(lean_string_cstr(ofname));
+     try {
+         std::vector<region_view> dep_regions = extract_dep_regions(odep_regions);
+@@ -618,7 +618,7 @@ extern "C" LEAN_EXPORT object * lean_compacted_region_read(b_obj_arg ofname, b_o
+     }
+ }
+ 
+-extern "C" LEAN_EXPORT obj_res lean_compacted_region_free(obj_arg region, object *) {
++extern "C" LEAN_EXPORT obj_res lean_compacted_region_free(obj_arg region) {
+     char * buffer = region_buffer(region);
+     size_t full_sz = region_size(region);
+     bool is_mmap = lean_ctor_get_uint8(region, sizeof(void*) * 5) != 0;
+diff --git a/src/runtime/compact.cpp b/src/runtime/compact.cpp
+index 73c9a4e..c6e947c 100644
+--- a/src/runtime/compact.cpp
++++ b/src/runtime/compact.cpp
+@@ -68,9 +68,17 @@ struct object_compactor::max_sharing_table {
+     }
+ };
+ 
++#ifdef LEAN_EMSCRIPTEN
++extern "C" void lasm_collect_loaded_libraries(void *, void (*)(void *, size_t, char const *));
++#endif
++
+ LEAN_EXPORT std::vector<lib_info> get_loaded_libs() {
+     std::vector<lib_info> libs;
+-#ifdef LEAN_WINDOWS
++#ifdef LEAN_EMSCRIPTEN
++    lasm_collect_loaded_libraries(&libs, [](void *data, size_t base, char const *name) {
++        static_cast<std::vector<lib_info> *>(data)->push_back({base, name});
++    });
++#elif defined(LEAN_WINDOWS)
+     HANDLE proc = GetCurrentProcess();
+     std::vector<HMODULE> mods(128);
+     DWORD needed;
+diff --git a/src/runtime/interrupt.cpp b/src/runtime/interrupt.cpp
+index 5d56b0b..f1aa682 100644
+--- a/src/runtime/interrupt.cpp
++++ b/src/runtime/interrupt.cpp
+@@ -17,7 +17,7 @@ namespace lean {
+ LEAN_THREAD_VALUE(size_t, g_max_heartbeat, 0);
+ LEAN_THREAD_VALUE(size_t, g_heartbeat, 0);
+ 
+-extern "C" LEAN_EXPORT obj_res lean_internal_get_default_max_heartbeat() {
++extern "C" LEAN_EXPORT obj_res lean_internal_get_default_max_heartbeat(lean_object *) {
+ #ifdef LEAN_DEFAULT_MAX_HEARTBEAT
+     return lean_box(LEAN_DEFAULT_MAX_HEARTBEAT);
+ #else
+diff --git a/src/runtime/io.cpp b/src/runtime/io.cpp
+index 0ef8192..97892dc 100644
+--- a/src/runtime/io.cpp
++++ b/src/runtime/io.cpp
+@@ -977,37 +977,12 @@ extern "C" LEAN_EXPORT obj_res lean_io_getenv(b_obj_arg env_var) {
+     if (strlen(env_var_str) != lean_string_size(env_var) - 1) {
+         return mk_option_none();
+     }
+-#if defined(LEAN_EMSCRIPTEN)
+-    // HACK(WN): getenv doesn't seem to work in Emscripten even though it should
+-    // see https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html#interacting-with-code-environment-variables
+-    char* val = reinterpret_cast<char*>(EM_ASM_INT({
+-        var envVar = UTF8ToString($0);
+-        var val = ENV[envVar];
+-        if (val) {
+-            var lengthBytes = lengthBytesUTF8(val)+1;
+-            var valOnWasmHeap = _malloc(lengthBytes);
+-            stringToUTF8(val, valOnWasmHeap, lengthBytes);
+-            return valOnWasmHeap;
+-        } else {
+-            return 0;
+-        }
+-    }, env_var_str));
+-
+-    if (val) {
+-        object * valLean = mk_string(val);
+-        free(val);
+-        return mk_option_some(valLean);
+-    } else {
+-        return mk_option_none();
+-    }
+-#else
+     char * val = std::getenv(env_var_str);
+     if (val) {
+         return mk_option_some(mk_string(val));
+     } else {
+         return mk_option_none();
+     }
+-#endif
+ }
+ 
+ extern "C" LEAN_EXPORT obj_res lean_io_realpath(obj_arg filename) {
+@@ -1257,7 +1232,7 @@ extern "C" LEAN_EXPORT obj_res lean_io_hard_link(b_obj_arg orig, b_obj_arg link)
+ }
+ 
+ /* createTempFile : IO (Handle × FilePath) */
+-extern "C" LEAN_EXPORT obj_res lean_io_create_tempfile(lean_object * /* w */) {
++extern "C" LEAN_EXPORT obj_res lean_io_create_tempfile() {
+     char path[PATH_MAX];
+     size_t base_len = PATH_MAX;
+     int ret = uv_os_tmpdir(path, &base_len);
+@@ -1303,7 +1278,7 @@ extern "C" LEAN_EXPORT obj_res lean_io_create_tempfile(lean_object * /* w */) {
+ }
+ 
+ /* createTempDir : IO FilePath */
+-extern "C" LEAN_EXPORT obj_res lean_io_create_tempdir(lean_object * /* w */) {
++extern "C" LEAN_EXPORT obj_res lean_io_create_tempdir() {
+     char path[PATH_MAX];
+     size_t base_len = PATH_MAX;
+     int ret = uv_os_tmpdir(path, &base_len);
+@@ -1385,8 +1360,8 @@ extern "C" LEAN_EXPORT obj_res lean_io_app_path() {
+     return io_result_mk_ok(mk_string(buf2));
+ #elif defined(LEAN_EMSCRIPTEN)
+     // See https://emscripten.org/docs/api_reference/emscripten.h.html#c.EM_ASM_INT
+-    char* appPath = reinterpret_cast<char*>(EM_ASM_INT({
+-        if ((typeof process === "undefined") || (process.release.name !== "node")) {
++    char* appPath = reinterpret_cast<char*>(EM_ASM_PTR({
++        if (typeof process === "undefined") {
+             return 0;
+         }
+ 
+diff --git a/src/runtime/memory.cpp b/src/runtime/memory.cpp
+index 153c389..f248ac7 100644
+--- a/src/runtime/memory.cpp
++++ b/src/runtime/memory.cpp
+@@ -114,7 +114,7 @@ namespace lean {
+ static size_t g_max_memory = 0;
+ LEAN_THREAD_VALUE(size_t, g_counter, 0);
+ 
+-extern "C" LEAN_EXPORT lean_obj_res lean_internal_get_default_max_memory() {
++extern "C" LEAN_EXPORT lean_obj_res lean_internal_get_default_max_memory(lean_object *) {
+ #ifdef LEAN_DEFAULT_MAX_MEMORY
+     return lean_box(LEAN_DEFAULT_MAX_MEMORY);
+ #else
+diff --git a/src/runtime/uv/system.cpp b/src/runtime/uv/system.cpp
+index 5982a3d..974acfe 100644
+--- a/src/runtime/uv/system.cpp
++++ b/src/runtime/uv/system.cpp
+@@ -630,7 +630,7 @@ extern "C" LEAN_EXPORT lean_obj_res lean_uv_os_get_passwd() {
+ }
+ 
+ // Std.Internal.UV.System.osGetGroup : IO (Option GroupInfo)
+-extern "C" LEAN_EXPORT lean_obj_res lean_uv_os_get_group() {
++extern "C" LEAN_EXPORT lean_obj_res lean_uv_os_get_group(uint64_t gid) {
+     lean_always_assert(
+         false && ("Please build a version of Lean4 with libuv to invoke this.")
+     );
+diff --git a/src/shell/lean.cpp b/src/shell/lean.cpp
+index c2f9a09..bb335cc 100644
+--- a/src/shell/lean.cpp
++++ b/src/shell/lean.cpp
+@@ -11,6 +11,24 @@ Author: Sebastian Ullrich
+ 
+ extern "C" int lean_main(int argc, char ** argv);
+ 
++#ifdef LASM_FULL_TOOLS
++#include <cstdlib>
++#include <cstring>
++extern "C" int lasm_tool_lake_main(int, char **);
++extern "C" int lasm_tool_leanc_main(int, char **);
++extern "C" int lasm_tool_leanir_main(int, char **);
++extern "C" int lasm_tool_leanchecker_main(int, char **);
++#endif
++
+ int main(int argc, char ** argv) {
++#ifdef LASM_FULL_TOOLS
++    char const *tool = std::getenv("LASM_FULL_ENTRYPOINT");
++    if (tool) {
++        if (!std::strcmp(tool, "lake")) return lasm_tool_lake_main(argc, argv);
++        if (!std::strcmp(tool, "leanc")) return lasm_tool_leanc_main(argc, argv);
++        if (!std::strcmp(tool, "leanir")) return lasm_tool_leanir_main(argc, argv);
++        if (!std::strcmp(tool, "leanchecker")) return lasm_tool_leanchecker_main(argc, argv);
++    }
++#endif
+     return lean_main(argc, argv);
+ }
+diff --git a/src/stdlib.make.in b/src/stdlib.make.in
+index 055547f..76a838f 100644
+--- a/src/stdlib.make.in
++++ b/src/stdlib.make.in
+@@ -193,9 +193,20 @@ $(OUTBIN)/lake$(EXE): ${LIB}/temp/LakeMain.*o.export $(OUTLIB)/libLake_shared$(S
+ 
+ lake: $(OUTBIN)/lake$(EXE)
+ 
++ifeq "${CMAKE_SYSTEM_NAME}" "Emscripten"
++$(OUTBIN)/lean$(EXE): ${LIB}/temp/libleanmain.a ${LIB}/temp/libleanshell.a $(OUTLIB)/libleancpp.a $(OUTLIB)/libInit.a $(OUTLIB)/libStd.a $(OUTLIB)/libLean.a $(OUTLIB)/libleanrt.a $(OUTLIB)/liblasmnative.a
++$(OUTBIN)/lean$(EXE): ${CMAKE_BINARY_DIR}/stdlib.make ${CMAKE_BINARY_DIR}/lasm-link-inputs.json ${CMAKE_BINARY_DIR}/lasm-wasm-exports.json ${LEAN_SOURCE_DIR}/lasm-emscripten-pre.js
++ifeq "${LASM_HOST_BRIDGE}" "ON"
++$(OUTBIN)/lean$(EXE): $(OUTLIB)/liblasmhost.a ${LEAN_SOURCE_DIR}/lasm/host-pre.js ${LEAN_SOURCE_DIR}/lasm/host-library.js
++endif
++ifeq "${LASM_LINK_TOOLS}" "ON"
++$(OUTBIN)/lean$(EXE): $(OUTLIB)/liblasmtools.a
++endif
++else
+ $(OUTBIN)/lean$(EXE): $(OUTLIB)/libInit_shared$(SO) $(OUTLIB)/libleanshared_2$(SO) $(OUTLIB)/libleanshared_1$(SO) $(OUTLIB)/libleanshared$(SO) ${LIB}/temp/libleanmain.a
++endif
+ 	$(link-preamble)
+-	$(LEANC_SH) ${LIB}/temp/libleanmain.a ${CMAKE_EXE_LINKER_FLAGS_MAKE} ${CMAKE_DYN_EXE_LINKER_FLAGS_MAKE} ${LEAN_EXE_LINKER_FLAGS} ${LEANC_OPTS} -o $@
++	$(LEANC_SH) ${LIB}/temp/libleanmain.a ${CMAKE_EXE_LINKER_FLAGS_MAKE} ${CMAKE_DYN_EXE_LINKER_FLAGS_MAKE} ${LEAN_EXE_LINKER_FLAGS} ${LEANC_OPTS} ${LASM_WASM_LINK_OPTIMIZATION} -g2 -o $@
+ 
+ lean: $(OUTBIN)/lean$(EXE)
+ 
+diff --git a/src/util/io.h b/src/util/io.h
+index c648a52..7510a4f 100644
+--- a/src/util/io.h
++++ b/src/util/io.h
+@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
+ Author: Leonardo de Moura
+ */
+ #pragma once
++#include <type_traits>
+ #include "runtime/exception.h"
+ #include "runtime/object.h"
+ #include "runtime/string_ref.h"
+@@ -45,7 +46,9 @@ template<typename T> T get_io_scalar_result(object * o) {
+         string_ref error(lean_io_error_to_string(err_obj));
+         throw exception(error.to_std_string());
+     } else {
+-        T r = unbox(io_result_get_value(o));
++        T r;
++        if constexpr (std::is_same_v<T, uint32_t>) r = lean_unbox_uint32(io_result_get_value(o));
++        else r = unbox(io_result_get_value(o));
+         dec(o);
+         return r;
+     }
+diff --git a/src/util/shell.cpp b/src/util/shell.cpp
+index c44fb30..c9aa565 100644
+--- a/src/util/shell.cpp
++++ b/src/util/shell.cpp
+@@ -239,7 +239,7 @@ bool process_shell_option(object_ref & shell_opts, int opt, char const * optarg,
+         dec_ref(r);
+         return false;
+     } else {
+-        rc = unbox(io_result_get_error(r));
++        rc = lean_unbox_uint32(io_result_get_error(r));
+         dec_ref(r);
+         return true;
+     }
+@@ -283,23 +283,7 @@ static void report_task_get_blocked_time(std::chrono::nanoseconds d) {
+ 
+ extern "C" LEAN_EXPORT int lean_main(int argc, char ** argv) {
+ #ifdef LEAN_EMSCRIPTEN
+-    // When running in command-line mode under Node.js, we make system directories available in the virtual filesystem.
+-    // This mode is used to compile 32-bit oleans.
+-    EM_ASM(
+-        if ((typeof process === "undefined") || (process.release.name !== "node")) {
+-            throw new Error("The Lean command-line driver can only run under Node.js. For the embeddable WASM library, see lean_wasm.cpp.");
+-        }
+-
+-        var lean_path = process.env["LEAN_PATH"];
+-        if (lean_path) {
+-            ENV["LEAN_PATH"] = lean_path;
+-        }
+-
+-        // We cannot mount /, see https://github.com/emscripten-core/emscripten/issues/2040
+-        FS.mount(NODEFS, { root: "/home" }, "/home");
+-        FS.mount(NODEFS, { root: "/tmp" }, "/tmp");
+-        FS.chdir(process.cwd());
+-    );
++    // Lasm configures the actual host filesystem and environment with NODERAWFS.
+ #elif defined(LEAN_WINDOWS)
+     // "best practice" according to https://docs.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-seterrormode
+     SetErrorMode(SEM_FAILCRITICALERRORS);
+diff --git a/stage0/src/CMakeLists.txt b/stage0/src/CMakeLists.txt
+index 424677e..055604a 100644
+--- a/stage0/src/CMakeLists.txt
++++ b/stage0/src/CMakeLists.txt
+@@ -723,7 +723,7 @@ file(WRITE "${CMAKE_BINARY_DIR}/lake-githash" "${LAKE_LEAN_GITHASH}")
+ # Git HASH
+ if(USE_GITHASH)
+   include(GetGitRevisionDescription)
+-  get_git_head_revision(GIT_REFSPEC GIT_SHA1 ALLOW_LOOKING_ABOVE_CMAKE_SOURCE_DIR)
++  set(GIT_SHA1 "8c9756b28d64dab099da31a4c09229a9e6a2ef35") # Lasm: verified source archive identity
+   if(GIT_SHA1 MATCHES "GITDIR-NOTFOUND")
+     message(STATUS "Failed to read git_sha1")
+     set(GIT_SHA1 "")
+diff --git a/stage0/src/include/lean/lean.h b/stage0/src/include/lean/lean.h
+index a464f75..406eaff 100644
+--- a/stage0/src/include/lean/lean.h
++++ b/stage0/src/include/lean/lean.h
+@@ -3721,7 +3721,7 @@ static inline lean_obj_res lean_runtime_hold(b_lean_obj_arg a) {
+     return lean_box(0);
+ }
+ 
+-#ifdef LEAN_EMSCRIPTEN
++#if UINTPTR_MAX == UINT32_MAX
+ #define LEAN_SCALAR_PTR_LITERAL(b1, b2, b3, b4, b5, b6, b7, b8) (lean_object*)((uint32_t)b1 | ((uint32_t)b2 << 8) | ((uint32_t)b3 << 16) | ((uint32_t)b4 << 24)), (lean_object*)((uint32_t)b5 | ((uint32_t)b6 << 8) | ((uint32_t)b7 << 16) | ((uint32_t)b8 << 24))
+ #else
+ #define LEAN_SCALAR_PTR_LITERAL(b1, b2, b3, b4, b5, b6, b7, b8) (lean_object*)((uint64_t)b1 | ((uint64_t)b2 << 8) | ((uint64_t)b3 << 16) | ((uint64_t)b4 << 24) | ((uint64_t)b5 << 32) | ((uint64_t)b6 << 40) | ((uint64_t)b7 << 48) | ((uint64_t)b8 << 56))
+diff --git a/stage0/src/util/io.h b/stage0/src/util/io.h
+index c648a52..7510a4f 100644
+--- a/stage0/src/util/io.h
++++ b/stage0/src/util/io.h
+@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
+ Author: Leonardo de Moura
+ */
+ #pragma once
++#include <type_traits>
+ #include "runtime/exception.h"
+ #include "runtime/object.h"
+ #include "runtime/string_ref.h"
+@@ -45,7 +46,9 @@ template<typename T> T get_io_scalar_result(object * o) {
+         string_ref error(lean_io_error_to_string(err_obj));
+         throw exception(error.to_std_string());
+     } else {
+-        T r = unbox(io_result_get_value(o));
++        T r;
++        if constexpr (std::is_same_v<T, uint32_t>) r = lean_unbox_uint32(io_result_get_value(o));
++        else r = unbox(io_result_get_value(o));
+         dec(o);
+         return r;
+     }
+diff --git a/stage0/src/util/shell.cpp b/stage0/src/util/shell.cpp
+index c44fb30..d56c89e 100644
+--- a/stage0/src/util/shell.cpp
++++ b/stage0/src/util/shell.cpp
+@@ -239,7 +239,7 @@ bool process_shell_option(object_ref & shell_opts, int opt, char const * optarg,
+         dec_ref(r);
+         return false;
+     } else {
+-        rc = unbox(io_result_get_error(r));
++        rc = lean_unbox_uint32(io_result_get_error(r));
+         dec_ref(r);
+         return true;
+     }

@@ -8,6 +8,7 @@ import { execFileSync } from 'node:child_process';
 import { ensureResourceGuard } from './resource-guard.mjs';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { maintainerSdk } from './maintainer-sdk.mjs';
+import { leanPatchInputs } from './lean-patches.mjs';
 
 await ensureResourceGuard();
 const root = fileURLToPath(new URL('../..', import.meta.url));
@@ -38,7 +39,7 @@ cpSync(join(build, 'include/lean'), join(target, 'include/lean'), { recursive: t
 if (input.patches?.['wasm-build']) {
   const header = join(target, 'include/lean/lean.h');
   writeFileSync(header, `/* Modified by Lasm (https://github.com/Millillion/lasm): Lean ${input.lean}'s lean.h with
-   scripts/full-lean/patches/lean-${Number(input.lean.split('.')[1]) >= 35 ? '4.35.0' : '4.32.0'}-wasm-build.patch applied
+   scripts/full-lean/patches/${leanPatchInputs(input.lean, { edge: input.profile === 'edge' }).find(p => p.name === 'wasm-build').file} applied
    (SHA-256 ${input.patches['wasm-build']}). Original: https://github.com/leanprover/lean4/blob/${input.leanCommit}/src/include/lean/lean.h */\n`
     + readFileSync(header, 'utf8'));
 }

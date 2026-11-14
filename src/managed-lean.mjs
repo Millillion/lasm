@@ -22,7 +22,7 @@ export async function selectLeanVersion(file, catalog = toolchainCatalog) {
     try { text = (await readFile(pin, 'utf8')).trim(); }
     catch (error) { if (error.code !== 'ENOENT') throw error; }
     if (text !== undefined) {
-      const match = /^(?:leanprover\/lean4:)?v?(\d+\.\d+\.\d+)$/.exec(text);
+      const match = /^(?:leanprover\/lean4:)?v?(\d+\.\d+\.\d+(?:-rc\d+)?)$/.exec(text);
       if (!match || !catalog.lean[match[1]]) {
         // Lasm supports exactly one Lean release (user decision 2026-10-24).
         const supported = Object.keys(catalog.lean);
@@ -148,6 +148,12 @@ export async function provisionLean(file, options = {}) {
       ...details };
   };
   if (distribution.kind === 'full' && options.cachedOnly) throw Object.assign(new Error('Not in the tool cache yet'), { code: 'ERR_LASM_NOT_CACHED' });
+  // A release without tiers yet (a Lean upgrade branch, docs/LEAN_UPGRADE.md) uses
+  // its full archive; programs still get Lasm's library, unless the caller asked
+  // for the plain upstream archive (the runtime build, distribution: 'full').
+  if (distribution.kind === 'full' && options.distribution !== 'full')
+    return finish(await assembleLeanPrefix(selection.version, release,
+      [{ artifact: distribution.artifact, label: `Lean ${selection.version} and Lake` }], options), { distribution: 'full', assembled: true });
   if (distribution.kind === 'full')
     return finish(await provisionArtifact(distribution.artifact, { ...options, label: `Lean ${selection.version} and Lake` }),
       { distribution: 'full' });

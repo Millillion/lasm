@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "lean": {
-    "4.35.0": {
-      "name": "lean-4.35.0-wasm64",
-      "manifestSha256": "9921c696161a9852442863a19e16990f2d540aa369adaa353906504bb589649a"
+    "4.36.0-rc2": {
+      "name": "lean-4.36.0-rc2-wasm64",
+      "manifestSha256": "e59893b53c7aeafd5f3f503bb7d1cb7e3615f14494206b6dda2246b188641eea"
     }
   }
 }

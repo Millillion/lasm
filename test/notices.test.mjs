@@ -17,7 +17,7 @@ test("the copy of Lasm's licence in built applications is the repository LICENSE
 
 const runtimeLibraries = ['Init', 'Std', 'Lean', 'LeanExport', 'Lake', 'leancpp', 'leanrt', 'lasmhost', 'uv', 'lasmsymbols']
   .map(name => `lib/lib${name}.a`);
-const runtimeManifest = libraries => ({ name: 'lean-4.35.0-wasm64', lean: '4.35.0', leanCommit: 'eb6cafb7290e8bd5f2937522d8d804f58f02bafc', emscripten: '6.0.9',
+const runtimeManifest = libraries => ({ name: 'lean-4.36.0-rc2-wasm64', lean: '4.35.0', leanCommit: 'eb6cafb7290e8bd5f2937522d8d804f58f02bafc', emscripten: '6.0.9',
   libraries, patches: Object.fromEntries(Object.keys(leanRuntimeChanges).map(name => [name, '0'.repeat(64)])) });
 
 test('application notices name Lasm, every Lean change and the added licence texts, and no GNU MP', () => {
@@ -134,13 +134,13 @@ test('the edge runtime archive carries the Lasm MIT text and its own list of Lea
   writeFileSync(join(edge, 'sysroot/lib/wasm32-emscripten/libc.a'), 'libc');
   writeFileSync(join(edge, 'libraries.json'), JSON.stringify({ files, baseRuntimeManifestSha256: 'e'.repeat(64),
     sysroot: { directory: 'wasm32-emscripten', files: { 'libc.a': digest('libc') } } }));
-  writeFileSync(join(node, 'target.json'), JSON.stringify({ name: 'lean-4.35.0-wasm64', lean: '4.35.0', leanCommit: 'f'.repeat(40),
+  writeFileSync(join(node, 'target.json'), JSON.stringify({ name: 'lean-4.36.0-rc2-wasm64', lean: '4.35.0', leanCommit: 'f'.repeat(40),
     emscripten: '6.0.9', patches: { 'wasm-build': '0'.repeat(64), 'node-threads': '0'.repeat(64), 'host-platform': '0'.repeat(64) } }));
   writeFileSync(join(node, 'THIRD_PARTY_NOTICES.txt'), '=== The Node runtime notices ===\n');
   const result = spawnSync(process.execPath, [fileURLToPath(new URL('../scripts/edge/package-edge-runtime.mjs', import.meta.url)), edge, node, out],
     { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
-  const text = readFileSync(join(out, 'lean-4.35.0-wasm64-edge/THIRD_PARTY_NOTICES.txt'), 'utf8');
+  const text = readFileSync(join(out, 'lean-4.36.0-rc2-wasm64-edge/THIRD_PARTY_NOTICES.txt'), 'utf8');
   assert.ok(text.includes('\n=== Lasm ===\n' + read('../src/notices/LASM-LICENSE.txt') + '\n=== Changes to Lean (Apache-2.0 section 4(b)) ===\n'));
   // The Node runtime's shared patches plus 'edge'; never node-threads.
   const listed = [...text.matchAll(/^  - ([a-z-]+): /gm)].map(match => match[1]);

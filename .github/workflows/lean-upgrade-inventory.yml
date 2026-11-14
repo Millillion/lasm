@@ -1,0 +1,77 @@
+name: Lean upgrade inventory
+# docs/LEAN_UPGRADE.md steps 3 and 8.1 on a runner instead of a maintainer's
+# machine: applies Lasm's patches to the pinned Lean release's sources
+# (scripts/lean-upgrade/check-patches.mjs), configures (not builds) the
+# patched tree as the runtime build does and inventories upstream's CTest
+# registrations (scripts/lean-upgrade/upstream-inventory.mjs), then carries the
+# hash-bound upstream-suite reviews forward from the previous release
+# (scripts/lean-upgrade/carry-reviews.mjs), and lists Lean's initializers with
+# the release's native Lean (step 5, scripts/initialization/InitTargets.lean). Uploads the evidence files and
+# reviews; commit them on the upgrade branch. Runs on pushes to Lean upgrade
+# branches that change the upgrade tooling or the source pins, or by dispatch.
+on:
+  push:
+    branches: ['lean-*']
+    paths:
+      - 'scripts/lean-upgrade/**'
+      - 'scripts/full-lean/lean-sources.json'
+      - 'scripts/full-lean/patches/**'
+      - '.github/workflows/lean-upgrade-inventory.yml'
+  workflow_dispatch:
+    inputs:
+      from:
+        description: The previous release whose reviews are carried forward
+        type: string
+        default: 4.35.0
+permissions:
+  contents: read
+concurrency:
+  group: lean-upgrade-inventory-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inventory:
+    if: github.event.repository.visibility == 'public' && startsWith(github.ref, 'refs/heads/lean-')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_TOOLCHAIN_CACHE: ${{ github.workspace }}/.cache/lean-upgrade-tools
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: ./.github/actions/upstream-lean
+        id: lean
+      - name: Initializer list (step 5)
+        run: |
+          version="$(node -p "require('./scripts/ci/acceptance-versions.json').lean")"
+          "${{ steps.lean.outputs.bin }}/lean" --run scripts/initialization/InitTargets.lean > "src/lean-init-targets-$version.json"
+          node -e "const j=require('./src/lean-init-targets-'+process.argv[1]+'.json'); if (j.lean!==process.argv[1]) throw new Error('lean '+j.lean); console.log(j.initTargets.length+' initializer targets')" "$version"
+      - name: Apply Lasm's patches (step 3)
+        run: mkdir -p .work && node scripts/lean-upgrade/check-patches.mjs "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" .work/lean-upgrade | tee .work/check-patches.json
+      - name: Upstream application inventory and source manifest (step 8.1)
+        run: node scripts/lean-upgrade/upstream-inventory.mjs "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" .work/lean-upgrade
+      - name: Carry the hash-bound reviews forward
+        env:
+          FROM: ${{ inputs.from || '4.35.0' }}
+        run: node scripts/lean-upgrade/carry-reviews.mjs "$FROM" "$(node -p "require('./scripts/ci/acceptance-versions.json').lean")" | tee .work/carry-reviews.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: lean-upgrade-inventory
+          path: |
+            .work/check-patches.json
+            .work/carry-reviews.json
+            docs/evidence/lean-*-upstream-application-inventory.json
+            docs/evidence/lean-*-upstream-source-files.json
+            src/lean-init-targets-*.json
+            scripts/application-tests/runtime-adapter-reviewed.json
+            scripts/language-coverage/runtime-adapter-l23.json
+            scripts/application-tests/eval-io-reviewed.json
+          retention-days: 14
