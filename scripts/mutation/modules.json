@@ -106,8 +106,8 @@
       "name": "edge-build",
       "description": "Edge builds: platform outputs, builtin modules, initializers, the Emscripten pre-JS (not edge-library.js: its Emscripten preprocessor lines are not JavaScript Stryker can parse)",
       "keepInSandbox": ["/library"],
-      "mutate": ["src/edge/edge-build.mjs", "src/edge/builtin-modules.mjs", "src/edge/edge-initializers.mjs", "src/edge/edge-pre.js"],
-      "tests": ["test/edge.test.mjs", "test/browser.test.mjs", "test/notices.test.mjs", "test/platform-output.test.mjs", "test/edge-link-plan.test.mjs", "test/application-link-plan.test.mjs", "test/edge-js.test.mjs", "test/edge-pre.test.mjs", "test/edge-initializers.test.mjs", "test/builtin-modules.test.mjs", "test/edge-entries.test.mjs", "test/edge-output.test.mjs", "test/edge-cache.test.mjs"]
+      "mutate": ["src/edge/edge-build.mjs", "src/edge/builtin-modules.mjs", "src/edge/edge-initializers.mjs", "src/glue/glue.mjs", "src/edge/edge-pre.js"],
+      "tests": ["test/edge.test.mjs", "test/browser.test.mjs", "test/notices.test.mjs", "test/platform-output.test.mjs", "test/edge-link-plan.test.mjs", "test/application-link-plan.test.mjs", "test/edge-js.test.mjs", "test/edge-pre.test.mjs", "test/edge-initializers.test.mjs", "test/glue.test.mjs", "test/builtin-modules.test.mjs", "test/edge-entries.test.mjs", "test/edge-output.test.mjs", "test/edge-cache.test.mjs"]
     },
     {
       "name": "wasi-build",

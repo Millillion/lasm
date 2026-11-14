@@ -498,6 +498,10 @@ export const models = [
       try { return { text: hex(responseFile(args)) }; } catch (error) { return { error: error.message }; }
     },
   },
+  // src/wasi/wasi-component.mjs runs this model itself, compiled by Lasm
+  // (src/glue/glue.mjs, docs/proposals/M6_GLUE.md): these entries and
+  // withoutComponentType's check the compiled program's fast versions, through
+  // the module's byte requests, against the model run by native Lean.
   {
     name: 'replaceCoreModule', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',
     generate: r => {
@@ -655,6 +659,10 @@ export const models = [
     input: bytes => hexOf(bytes),
     js: bytes => hexOf(withoutComponentType(Uint8Array.from(bytes))),
   },
+  // src/edge/edge-initializers.mjs runs this model itself, compiled by Lasm
+  // (src/glue/glue.mjs, docs/proposals/M6_GLUE.md): these two entries check the
+  // compiled program, through the module's field encoding, against the model
+  // run by native Lean.
   {
     name: 'initializationSchedule', source: 'src/edge/edge-initializers.mjs', lean: 'Lasm.Cli.Model.EdgeInitializers',
     generate: r => { const p = plan(r); return { p, name: r.next() < 0.9 ? r.pick(p.closure) : 'initialize_Outside' }; },

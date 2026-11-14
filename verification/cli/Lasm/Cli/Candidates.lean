@@ -269,4 +269,20 @@ def zip_reads_back : Prop :=
       ∀ x ∈ (read.drop (directoriesOf entries).length).zip entries,
         x.1.data = x.2.data ∧ x.1.mode = 0o100000 ||| x.2.mode.getD 0o644
 
+/-! ## The glue program -/
+
+/-- **The glue's fields round-trip.** Any list of fields, encoded as the glue
+program reads its request, is read back exactly as the same list, whatever
+the fields hold (digits, `:`, line ends, non-ASCII, nothing).
+Tested by: test/glue.test.mjs -/
+def glue_fields_round_trip : Prop :=
+  ∀ fields : List String, decodeFields (encodeFields fields) = .ok fields
+
+/-- **A glue request carries its fields.** Lists of fields, encoded as a
+request, carry exactly their fields in order, whichever format the encoding
+chose (a table of distinct fields, or lengths when a field holds a 0 byte).
+Tested by: test/glue.test.mjs -/
+def glue_request_fields : Prop :=
+  ∀ lists : List (List String), requestFields (encodeRequest lists) = lists.flatten
+
 end Lasm.Cli.Candidates
