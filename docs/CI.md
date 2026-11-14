@@ -215,8 +215,8 @@ it), and "dispatch" means `workflow_dispatch`.
 | `language-coverage-probe.yml` | dispatch | input | 5 min (max 14) | One reviewed language-coverage probe (diagnosis) | On demand |
 | `lasm-js-stress.yml` | push hang-stress, call, dispatch | Linux, macOS, Windows | 41 min (max 115) | Lasm.JS hang stress on four platforms | Release, nightly, weekly (soak), called by bridge-verification |
 | `lean-tiers.yml` | dispatch | Linux, macOS, Windows | 42 min (max 160) | Repackages pinned Lean archives into tiers (maintainer) | On demand |
-| `ledger-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 47 min (max 104) | examples/ledger on Bun, Deno, Docker, Workers, WASI auditor | PR (paths), main |
-| `ledger.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 25 min (max 88) | examples/ledger: proofs, API, DST fixed seeds (also on Workers and in three headless browsers, against Node's traces), TigerBeetle differential, E2E | PR (paths), main |
+| `ledger-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 47 min (max 104) | examples/ledger on Bun, Deno, Docker, Workers, Lambda (.zip, image), Vercel, Netlify, Azure, GCF, WASI auditor; API traffic equivalence against Node | PR (paths), main |
+| `ledger.yml` | dispatch, call, PR (paths), push main (paths) | Linux | 25 min (max 88) | examples/ledger: proofs, API (and its traffic against `examples/ledger/test/equivalence/api.json`), DST fixed seeds (also on Workers and in three headless browsers, against Node's traces), TigerBeetle differential, E2E | PR (paths), main |
 | `library-prebuilt.yml` | push prebuilt/**, dispatch | Linux | 3 min (max 16) | Regenerates library/prebuilt (maintainer) | On demand |
 | `library-proofs.yml` | dispatch, call, PR (paths), push main (paths) | Linux | — | Proofs of Lasm's library: theorems match Spec.lean, standard axioms only, library/PROOFS.md current; the Candidates files and verification/cli's propositions elaborate, and its Spec.lean is proved of its models (README current) | PR (paths), main |
 | `link-toolchain-fixtures.yml` | dispatch | Linux, macOS, Windows | 12 min | Link toolchain fixtures (maintainer) | On demand |
