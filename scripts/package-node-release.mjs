@@ -1,7 +1,7 @@
 // Pack the Node product without requiring a previous Lasm installation.
 // All files come from this checkout and an explicitly authenticated runtime.
 import assert from 'node:assert/strict';
-import { mkdirSync, cpSync, copyFileSync, readFileSync, writeFileSync, existsSync, appendFileSync } from 'node:fs';
+import { mkdirSync, cpSync, copyFileSync, readFileSync, writeFileSync, existsSync, appendFileSync, readdirSync, linkSync, readlinkSync, symlinkSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -51,7 +51,11 @@ for (const path of ['bin', 'src']) cpSync(join(root, path), join(staging, path),
 cpSync(resolve(nativeArg), join(staging, 'src/native'), { recursive: true });
 for (const file of ['manifest.json', 'process/manifest.json', 'signals/manifest.json', 'node_modules/koffi/LICENSE.txt'])
   assert.ok(existsSync(join(staging, 'src/native', file)), `Missing runtime dependency: ${file}`);
-cpSync(runtime.directory, join(staging, 'targets', runtime.manifest.name), { recursive: true });
+// Hard links, not copies: a copy of the ~360 MB runtime is that much new page
+// cache charged to this bounded run (scripts/full-lean/run-bounded.mjs), and
+// npm pack reads regular files either way. Every later write into the staged
+// runtime replaces a file (application-link.mjs archiveUnitCache renames).
+linkTree(runtime.directory, join(staging, 'targets', runtime.manifest.name));
 // The initializer analysis of the runtime's archives (a function of the runtime
 // and of Lasm's analysis code), so a new machine's first build need not parse
 // 360 MB of archives (src/application-link.mjs archiveUnitCache).
@@ -126,3 +130,18 @@ const result = { scope: 'Reproducible local npm packing; native installed accept
 writeFileSync(join(output, 'result.json'), JSON.stringify(result, null, 2) + '\n');
 if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `sha256=${sha256}\nfilename=${packed.filename}\n`);
 console.log(JSON.stringify(result, null, 2));
+
+function linkTree(source, destination) {
+  mkdirSync(destination, { recursive: true });
+  for (const entry of readdirSync(source, { withFileTypes: true })) {
+    const from = join(source, entry.name), to = join(destination, entry.name);
+    if (entry.isDirectory()) linkTree(from, to);
+    else if (entry.isSymbolicLink()) symlinkSync(readlinkSync(from), to);
+    else if (entry.isFile()) {
+      try { linkSync(from, to); } catch (error) {
+        if (!['EXDEV', 'EPERM', 'EMLINK', 'ENOTSUP'].includes(error.code)) throw error;
+        copyFileSync(from, to);
+      }
+    } else throw new Error(`Unexpected runtime entry ${from}`);
+  }
+}
