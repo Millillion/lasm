@@ -109,6 +109,26 @@ def parse_known_or_refused : Prop :=
         (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
     | .error m => m.trimAscii.toString ≠ ""
 
+/-! ## `lasm init` names -/
+
+/-- **Generated names are valid npm, Lake and Supabase names.** Whatever the
+directory or text: the npm package name is lowercase letters, digits, `.`,
+`_` and `-`, starts with a letter or digit and does not end with `-`; the
+Lake name is an identifier of ASCII letters, digits and `_` that starts with
+a letter and does not end with `_`; the Supabase function name is lowercase
+letters, digits and `-`, starts with a letter and has at most 54 characters.
+Tested by: test/init-golden.test.mjs -/
+def generated_names_valid : Prop :=
+  ∀ dir s : String,
+    ((packageName dir).toList.head?.map fun c => c.isLower || c.isDigit) = some true ∧
+    (packageName dir).all (fun c => c.isLower || c.isDigit || c = '.' || c = '_' || c = '-') ∧
+    ¬ (packageName dir).endsWith "-" ∧
+    ((lakeName s).toList.head?.map Char.isAlpha) = some true ∧
+    (lakeName s).all (fun c => c.isAlphanum || c = '_') ∧ ¬ (lakeName s).endsWith "_" ∧
+    ((supabaseFunctionNameOf s).toList.head?.map Char.isLower) = some true ∧
+    (supabaseFunctionNameOf s).all (fun c => c.isLower || c.isDigit || c = '-') ∧
+    (supabaseFunctionNameOf s).length ≤ 54
+
 /-! ## Development server -/
 
 /-- **`changedFiles` reports exactly the files that differ.** Between two
@@ -119,6 +139,19 @@ def changed_files_exact : Prop :=
   ∀ a b : List (String × Option String), (a.map (·.1)).Nodup → (b.map (·.1)).Nodup →
     (changedFiles a b).Nodup ∧
     ∀ k, k ∈ changedFiles a b ↔ (k ∈ a.map (·.1) ∨ k ∈ b.map (·.1)) ∧ a.lookup k ≠ b.lookup k
+
+/-- **No request path reaches a file outside the root.** Whatever the path
+(`..`, encoded dots and slashes, sibling directories that share the root's
+name as a prefix, malformed percent-encoding), whatever files exist and
+whatever the client accepts, the static server answers 200, 400, 403 or 404,
+and a file it serves lies under the root directory: the root is a resolved
+directory (not a file) and the fallback page, if any, a name in it.
+Tested by: test/static-server.test.mjs -/
+def static_inside_root : Prop :=
+  ∀ (fileExists : String → Bool) (root pathname accepts : String) (fallback : Option String),
+    resolvedDirectory root → fileExists root = false → (∀ f ∈ fallback, pathSegment f.toList) →
+    (staticServe fileExists root pathname accepts fallback).1 ∈ [200, 400, 403, 404] ∧
+    ∀ f, (staticServe fileExists root pathname accepts fallback).2 = some f → (root ++ "/").toList <+: f.toList
 
 /-! ## The Node host -/
 
@@ -163,6 +196,52 @@ def schedule_reached_kept_first : Prop :=
     (∀ y, y ∈ initializationSchedule n calls keep ↔ y ∈ keep ∧ y ≠ n ∧ Reaches (edgesOf calls) n y) ∧
     ∀ x ∈ initializationSchedule n calls keep, ∀ y, y ∈ keep → y ≠ n → Reaches (edgesOf calls) x y →
       (initializationSchedule n calls keep).idxOf y < (initializationSchedule n calls keep).idxOf x
+
+/-- **Mangling round-trips.** For every dotted name (a component of
+decimal digits without a leading zero is a numeric component, as in
+`_private.M.0.f`), the mangled name is a non-empty C identifier, demangling
+gives the name back, and the module of its initializer (`initialize_…` or
+`runtime_initialize_…`) is the name.
+Tested by: test/application-diagnosis.test.mjs -/
+def mangle_round_trip : Prop :=
+  ∀ n : String,
+    demangleName (mangleName n) = n ∧
+    initializerModule ("initialize_" ++ mangleName n) = some n ∧
+    initializerModule ("runtime_initialize_" ++ mangleName n) = some n ∧
+    mangleName n ≠ "" ∧ (mangleName n).all fun c => c.isAlphanum || c = '_'
+
+/-- **A static application has no evidence of runtime evaluation.** When
+the reader accepts a linker map and calls the application static, no row
+of the map names a dynamic loader or symbol lookup, and every section it
+kept from Lean's C++ library (`libleancpp.a`) is read-only data or belongs
+to an initialization-free inline helper; it is static exactly when it lists
+no dynamic symbol and no C++ member.
+Tested by: test/application-reachability.test.mjs -/
+def link_map_static_sound : Prop :=
+  ∀ (initFree : String → Bool) (map : String) (r : Reachability.Requirements),
+    linkRequirements initFree map = .ok r →
+    (r.static = true ↔ r.dynamic = [] ∧ r.cxxRuntime = []) ∧
+    (r.static = true → ∀ line ∈ ((Reachability.trimEnd map.toList).splitOn '\n').tail, ∀ t,
+      Reachability.rowText line = some t → t ∉ Reachability.dynamicSymbols ∧
+      ∀ m s, Reachability.memberSection t = some (m, s) →
+        Reachability.independent (fun x => initFree (String.ofList x)) s = true)
+
+/-! ## The link driver's Python semantics -/
+
+/-- **Escaped strings are printable ASCII.** `json.dumps` of any string,
+`ensure_ascii`, is printable ASCII: quotes, escapes, hexadecimal digits and
+the printable characters themselves.
+Tested by: test/link-driver-python.test.mjs -/
+def json_string_printable : Prop :=
+  ∀ s : String, (pythonJsonString s).all (fun c => ' ' ≤ c && c ≤ '~') = true
+
+/-- **Python's string order is the order of code points.** The sign of
+`comparePythonStrings a b` is that of comparing `a` and `b` code point by
+code point (a prefix first), as Python orders `str`, unlike JavaScript's
+UTF-16 order.
+Tested by: test/link-driver-python.test.mjs -/
+def python_order_code_points : Prop :=
+  ∀ a b : String, (comparePythonStrings a b).sign = if a < b then -1 else if a = b then 0 else 1
 
 /-! ## WebAssembly -/
 
