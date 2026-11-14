@@ -1,7 +1,7 @@
 // Pack the Node product without requiring a previous Lasm installation.
 // All files come from this checkout and an explicitly authenticated runtime.
 import assert from 'node:assert/strict';
-import { mkdirSync, cpSync, copyFileSync, readFileSync, writeFileSync, existsSync, appendFileSync } from 'node:fs';
+import { mkdirSync, cpSync, copyFileSync, readFileSync, writeFileSync, existsSync, appendFileSync, readdirSync, linkSync, readlinkSync, symlinkSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -50,7 +50,22 @@ for (const path of ['bin', 'src']) cpSync(join(root, path), join(staging, path),
 cpSync(resolve(nativeArg), join(staging, 'src/native'), { recursive: true });
 for (const file of ['manifest.json', 'process/manifest.json', 'signals/manifest.json', 'node_modules/koffi/LICENSE.txt'])
   assert.ok(existsSync(join(staging, 'src/native', file)), `Missing runtime dependency: ${file}`);
-cpSync(runtime.directory, join(staging, 'targets', runtime.manifest.name), { recursive: true });
+// The runtime (about 350 MB) is hard-linked, not copied: nothing writes into it,
+// and a copy's written pages count against the pack step's resource guard
+// (they took the step to its 1.6 GiB budget). A copy where links cannot be made.
+function linkTree(from, to) {
+  mkdirSync(to, { recursive: true });
+  for (const entry of readdirSync(from, { withFileTypes: true })) {
+    const source = join(from, entry.name), target = join(to, entry.name);
+    if (entry.isDirectory()) linkTree(source, target);
+    else if (entry.isSymbolicLink()) symlinkSync(readlinkSync(source), target);
+    else {
+      try { linkSync(source, target); }
+      catch (error) { if (!['EXDEV', 'EPERM', 'EMLINK'].includes(error.code)) throw error; copyFileSync(source, target); }
+    }
+  }
+}
+linkTree(runtime.directory, join(staging, 'targets', runtime.manifest.name));
 // The initializer analysis of the runtime's archives (a function of the runtime
 // and of Lasm's analysis code), so a new machine's first build need not parse
 // 360 MB of archives (src/application-link.mjs archiveUnitCache).
