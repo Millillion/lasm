@@ -117,7 +117,7 @@ export function inventory(root, read) {
       // The entry's doc comment comes before its @[export]: from the previous entry on.
       oracles.push({ id, file: 'test/fuzz/native/LasmFuzz.lean', named: readCitations(lean.slice(start, end)).length > 0 });
     } else {
-      const file = 'test/fuzz/native/cgi_driver.c';
+      const file = `test/fuzz/native/${target.driver ?? 'cgi_driver.c'}`;
       oracles.push({ id, file, named: existsSync(join(root, file)) && readCitations(read(file)).length > 0 });
     }
   }
