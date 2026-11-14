@@ -252,8 +252,8 @@ it), and "dispatch" means `workflow_dispatch`.
 | `signal-controls.yml` | dispatch | Linux | 1 min | Native signal routing controls | On demand |
 | `sunday-guard.yml` | call | Linux | a few seconds | The Sunday guard: `skip=true` for a scheduled run on a Sunday in New York ([No runs on Sunday](#no-runs-on-sunday)) | Every scheduled workflow |
 | `tandem-nightly.yml` | cron 17 5 * * 1-6, dispatch | Linux | 47 min | Tandem: 40-minute fuzzing, Yjs differential, simulation | Nightly |
-| `tandem-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 11 min (max 74) | examples/tandem on Bun, Deno, Docker, Workers | PR (paths), main |
-| `tandem.yml` | dispatch, PR (paths), push main (paths) | Linux | 19 min (max 97) | examples/tandem: proofs, protocol, Yjs, fuzzer, DST, E2E | PR (paths), main |
+| `tandem-platforms.yml` | dispatch, PR (paths), push main (paths) | Linux | 11 min (max 74) | examples/tandem on Bun, Deno, Docker, Workers; protocol traffic equivalence against Node | PR (paths), main |
+| `tandem.yml` | dispatch, PR (paths), push main (paths) | Linux | 19 min (max 97) | examples/tandem: proofs, protocol (and its traffic against `test/equivalence/protocol.json`), Yjs, fuzzer, DST, E2E | PR (paths), main |
 | `templates.yml` | call, dispatch | Linux, macOS, Windows | 23 min | Every lasm init template on five platforms | Release (called) |
 | `tooling.yml` | PR (paths-ignore), push main, cron 17 5 * * 1-6, dispatch | Linux | 17 min (max 59) | Error corpus with the error inventory check; metamorphic builds and `lasm dev` sessions, and fault injection, one job per target (node, wasi, workers, browser) | PR (corpus; all on harness changes), main, nightly |
 | `ui.yml` | dispatch, call, push browser-ui (paths) | Linux | 1 min (max 19) | Lasm.UI library, proofs, diff model, DOM applier | Release, nightly |
