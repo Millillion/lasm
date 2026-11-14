@@ -142,6 +142,32 @@ breaks if it is wrong, how much of it is pure) against what it costs.
   `Buffer` against `DataView`; each is tested against Lean's side of the
   format (test/node-js.test.mjs, test/edge-js.test.mjs), including the new
   length check. Revisit if the host files are ever bundled.
+- **Re-evaluated for M3 (2026-11-13), measured: still two copies.** Both
+  codecs run on Node 24.22.1 (i7-9750H, median of three rounds; both write
+  identical bytes for every payload):
+
+  | Payload | encode, Node's (Buffer) | encode, edge's (DataView) | decode, Node's | decode, edge's |
+  | --- | --- | --- | --- | --- |
+  | a typical call (468 bytes: eight fields, headers, 64 bytes, a bigint, 20 numbers) | 3.1 µs | 4.0 µs | 3.9 µs | 2.7 µs |
+  | a 100 KB string | 45 µs | 151 µs | 35 µs | 34 µs |
+  | an object of 200 keys (3.7 KB) | 24 µs | 25 µs | 26 µs | 25 µs |
+  | 1 MiB of bytes | 91 µs | 125 µs | 139 µs | 120 µs |
+
+  A portable shared codec would make Node's encoding 28 % slower on a typical
+  call and 3.3× slower on large strings. The cost is `TextEncoder.encodeInto`
+  against `Buffer.write`, not allocation: the edge writer on `Buffer.allocUnsafeSlow`
+  measured the same 141 µs. Keeping Node's speed needs Node's string writer
+  and allocator passed in, so the shared module would still carry both paths.
+  The file layout is unchanged since 2026-11-07: Node's host files are flat in
+  `host/`, the edge's in `lasm/`, the browser bundle maps `./edge-js.mjs`, and
+  the full-Lean toolchain's host set is frozen; one source file in both needs a
+  `host/edge/` subdirectory or a rewritten import at build time. The saving is
+  about 250 lines that the `lasm-js-wire` fuzz target already holds in step
+  byte for byte (and both against Lean's proved codec). So the merge waits for
+  bundled host files, where one source costs no extra output file. One
+  finding to use either way: the edge's DataView reader decodes a typical
+  call about 30 % faster than Node's on Node (Node's `Reader` wraps every
+  request in `Buffer.from`).
 
 ### 3. Function-platform request and response mapping (src/serverless/) — done
 

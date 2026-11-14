@@ -6,7 +6,7 @@ ids, and `pre`, the new window and `suf` show the target.
 import Lasm.UI.Proofs.Children
 
 namespace Lasm.UI.Proofs
-open Lasm.UI Lasm.UI.Model
+open Lasm.UI Lasm.UI.Model Lasm.UI.Applier
 
 variable {Msg β : Type}
 
@@ -46,9 +46,31 @@ theorem found_spec (val : β → Html Msg) (oa : Array (Option (Live Msg))) (oLo
 theorem perm_back (A B C : List α) (x : α) : (A ++ B ++ x :: C).Perm (A ++ x :: (B ++ C)) := by
   simp only [List.append_assoc]; exact List.Perm.append_left _ List.perm_middle
 
+theorem mem_mid_id (A B : List (Live Msg)) (x : Live Msg) : x.id ∈ ((A ++ x :: B).map toDom).map Dom.id :=
+  mem_map_id (by simp)
+
+/-- A move to the end, or before the head of `E`, is not before the moved node. -/
+theorem head_ne (A B E : List (Live Msg)) (x : Live Msg) (h : ((A ++ x :: (B ++ E)).map Live.id).Nodup) :
+    E.head?.map Live.id ≠ some x.id := by
+  cases E with
+  | nil => simp
+  | cons e E =>
+    simp only [List.head?_cons, Option.map_some, ne_eq, Option.some.injEq]
+    intro he
+    rw [List.map_append, List.map_cons, List.nodup_append, List.nodup_cons] at h
+    exact h.2.1.1 (List.mem_map.2 ⟨e, by simp, he⟩)
+
+/-- A move before `y` of a later node `x` is not before the moved node. -/
+theorem before_ne (A E C : List (Live Msg)) (y x : Live Msg) (h : ((A ++ y :: E ++ x :: C).map Live.id).Nodup) :
+    some y.id ≠ some x.id := by
+  intro he
+  simp only [Option.some.injEq] at he
+  rw [List.append_assoc, List.cons_append, List.map_append, List.map_cons, List.nodup_append, List.nodup_cons] at h
+  exact h.2.1.1 (List.mem_map.2 ⟨x, by simp, he.symm⟩)
+
 theorem twoEnded_spec (val : β → Html Msg) (f : Live Msg → β → Nat → NodeResult Msg)
     (hf : ∀ o b n, WFn n o → o.same (val b) = true → NSpec o (val b) n (f o b n))
-    (dom0 : List Dom) (target : List (Html Msg))
+    (dom0 : List Dom) (used0 : List Nat) (target : List (Html Msg))
     (oa : Array (Option (Live Msg))) (oLo oHi : Nat) (na : Array β) (nLo nHi : Nat)
     (pre : Array (Live Msg)) (suf : List (Live Msg)) (ops : Array (Op Msg)) (next : Nat)
     (keys : Option (Std.HashMap String Nat))
@@ -56,8 +78,9 @@ theorem twoEnded_spec (val : β → Html Msg) (f : Live Msg → β → Nat → N
     (h1 : applyOps ops.toList dom0 = (pre.toList ++ win oa oLo oHi ++ suf).map toDom)
     (h2 : ((pre.toList ++ win oa oLo oHi ++ suf).map Live.id).Nodup)
     (h3 : ∀ x ∈ pre.toList ++ win oa oLo oHi ++ suf, WFn next x)
-    (h4 : pre.toList.map Live.erase ++ (slice na.toList nLo nHi).map val ++ suf.map Live.erase = target) :
-    RSpec dom0 target next (twoEnded val f oa oLo oHi na nLo nHi pre suf ops next keys) := by
+    (h4 : pre.toList.map Live.erase ++ (slice na.toList nLo nHi).map val ++ suf.map Live.erase = target)
+    (h5 : Conf used0 dom0 ops.toList next) :
+    RSpec dom0 used0 target next (twoEnded val f oa oLo oHi na nLo nHi pre suf ops next keys) := by
   rw [twoEnded]
   by_cases hO : oLo < oHi
   · simp only [hO, ↓reduceDIte]
@@ -75,13 +98,13 @@ theorem twoEnded_spec (val : β → Html Msg) (f : Live Msg → β → Nat → N
       rcases s1 with _ | os
       · simp only
         rw [win_cons_none hs1 hO] at h1 h2 h3
-        exact twoEnded_spec val f hf dom0 target oa (oLo + 1) oHi na nLo nHi pre suf ops next keys
-          hbO hbN h1 h2 h3 h4
+        exact twoEnded_spec val f hf dom0 used0 target oa (oLo + 1) oHi na nLo nHi pre suf ops next keys
+          hbO hbN h1 h2 h3 h4 h5
       rcases s2 with _ | oe
       · simp only
         rw [win_snoc_none hs2 hO] at h1 h2 h3
-        exact twoEnded_spec val f hf dom0 target oa oLo (oHi - 1) na nLo nHi pre suf ops next keys
-          (by omega) hbN h1 h2 h3 h4
+        exact twoEnded_spec val f hf dom0 used0 target oa oLo (oHi - 1) na nLo nHi pre suf ops next keys
+          (by omega) hbN h1 h2 h3 h4 h5
       simp only
       have hWc := win_cons_some hs1 hO
       have hWs := win_snoc_some hs2 hO
@@ -91,40 +114,42 @@ theorem twoEnded_spec (val : β → Html Msg) (f : Live Msg → β → Nat → N
         rw [hWc] at h1 h2 h3
         have e := reuse_step val f hf (A := pre.toList) (B := win oa (oLo + 1) oHi ++ suf)
           (by simpa using h2) (by simpa using h3) hsame
-        obtain ⟨e1, e2, e3, e4, e5, e6⟩ := e
+        obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := e
         apply RSpec.weaken _ e6
-        apply twoEnded_spec val f hf dom0 target oa (oLo + 1) oHi na (nLo + 1) nHi _ suf _ _ keys hbO hbN
+        apply twoEnded_spec val f hf dom0 used0 target oa (oLo + 1) oHi na (nLo + 1) nHi _ suf _ _ keys hbO hbN
         · rw [applyOps_appendList, h1]; simpa using e1
         · simpa using e2
         · simpa using e3
         · rw [hSc] at h4; simpa [e4] using h4
+        · exact h5.append (by rw [h1]; simp) e7
       split
       · -- the tails match
         rename_i _ hsame
         rw [hWs] at h1 h2 h3
         have e := reuse_step val f hf (A := pre.toList ++ win oa oLo (oHi - 1)) (B := suf)
           (by simpa using h2) (by simpa using h3) hsame
-        obtain ⟨e1, e2, e3, e4, e5, e6⟩ := e
+        obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := e
         apply RSpec.weaken _ e6
-        apply twoEnded_spec val f hf dom0 target oa oLo (oHi - 1) na nLo (nHi - 1) pre _ _ _ keys
+        apply twoEnded_spec val f hf dom0 used0 target oa oLo (oHi - 1) na nLo (nHi - 1) pre _ _ _ keys
           (by omega) (by omega)
         · rw [applyOps_appendList, h1]; simpa using e1
         · simpa using e2
         · simpa using e3
         · rw [hSs] at h4; simpa [e4] using h4
+        · exact h5.append (by rw [h1]; simp) e7
       split
       · -- the old head is the new tail
         rename_i _ _ hsame
         rw [hWc] at h1 h2 h3
         have e := reuse_step val f hf (A := pre.toList) (B := win oa (oLo + 1) oHi ++ suf)
           (by simpa using h2) (by simpa using h3) hsame
-        obtain ⟨e1, e2, e3, e4, e5, e6⟩ := e
+        obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := e
         have hp : (pre.toList ++ (f os ne next).live :: (win oa (oLo + 1) oHi ++ suf)).Perm
             (pre.toList ++ win oa (oLo + 1) oHi ++ (f os ne next).live :: suf) := by
           simp only [List.append_assoc]
           exact List.Perm.append_left _ (List.perm_middle.symm)
         apply RSpec.weaken _ e6
-        apply twoEnded_spec val f hf dom0 target oa (oLo + 1) oHi na nLo (nHi - 1) pre _ _ _ keys hbO
+        apply twoEnded_spec val f hf dom0 used0 target oa (oLo + 1) oHi na nLo (nHi - 1) pre _ _ _ keys hbO
           (by omega)
         · rw [applyOps_push, applyOps_appendList, h1]
           rw [show pre.toList ++ os :: win oa (oLo + 1) oHi ++ suf = pre.toList ++ os :: (win oa (oLo + 1) oHi ++ suf)
@@ -132,6 +157,15 @@ theorem twoEnded_spec (val : β → Html Msg) (f : Live Msg → β → Nat → N
         · exact nodup_rearrange hp e2
         · intro x hx; exact e3 x (hp.mem_iff.2 hx)
         · rw [hSs] at h4; simpa [e4] using h4
+        · refine (h5.append (by rw [h1]; simp) e7).push
+            (k := ((pre.toList ++ (f os ne next).live :: win oa (oLo + 1) oHi) ++ suf).map toDom) ?_
+            (lconf_move _ ?_ (anchored_head _ _) ?_)
+          · rw [applyOps_appendList, h1]
+            rw [show pre.toList ++ os :: win oa (oLo + 1) oHi ++ suf = pre.toList ++ os :: (win oa (oLo + 1) oHi ++ suf)
+              by simp, e1]
+            simp
+          · rw [← e5]; exact mem_map_id (by simp)
+          · rw [← e5]; exact head_ne _ _ _ _ e2
       split
       · -- the old tail is the new head
         rename_i hn1 _ _ hsame
@@ -148,16 +182,20 @@ theorem twoEnded_spec (val : β → Html Msg) (f : Live Msg → β → Nat → N
         rw [hcur] at h1 h2 h3
         have e := reuse_step val f hf (A := pre.toList ++ os :: win oa (oLo + 1) (oHi - 1)) (B := suf)
           h2 h3 hsame
-        obtain ⟨e1, e2, e3, e4, e5, e6⟩ := e
+        obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := e
         have hp := perm_back pre.toList (os :: win oa (oLo + 1) (oHi - 1)) suf (f oe ns next).live
         apply RSpec.weaken _ e6
-        apply twoEnded_spec val f hf dom0 target oa oLo (oHi - 1) na (nLo + 1) nHi _ suf _ _ keys
+        apply twoEnded_spec val f hf dom0 used0 target oa oLo (oHi - 1) na (nLo + 1) nHi _ suf _ _ keys
           (by omega) hbN
         · rw [applyOps_push, applyOps_appendList, h1, e1, ← e5, move_back _ _ _ _ _ e2, hW2]
           simp
         · rw [hW2]; simpa using nodup_rearrange hp e2
         · rw [hW2]; intro x hx; exact e3 x (hp.mem_iff.2 (by simpa using hx))
         · rw [hSc] at h4; simpa [e4] using h4
+        · refine (h5.append h1 e7).push (by rw [applyOps_appendList, h1, e1]) (lconf_move _ ?_ ?_ ?_)
+          · rw [← e5]; exact mem_mid_id _ _ _
+          · exact anchored_some (mem_map_id (by simp))
+          · rw [← e5]; exact before_ne pre.toList (win oa (oLo + 1) (oHi - 1)) suf _ _ (by simpa using e2)
       -- the fallback: a keyed match inside the window, or a new node
       rename_i hn1 hn2 hn3 hn4
       split
@@ -179,16 +217,21 @@ theorem twoEnded_spec (val : β → Html Msg) (f : Live Msg → β → Nat → N
         rw [hcur] at h1 h2 h3
         have e := reuse_step val f hf (A := pre.toList ++ os :: win oa (oLo + 1) i)
           (B := win oa (i + 1) oHi ++ suf) h2 h3 hsame
-        obtain ⟨e1, e2, e3, e4, e5, e6⟩ := e
+        obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := e
         have hp := perm_back pre.toList (os :: win oa (oLo + 1) i) (win oa (i + 1) oHi ++ suf) (f x ns next).live
         apply RSpec.weaken _ e6
-        apply twoEnded_spec val f hf dom0 target (oa.set! i none) oLo oHi na (nLo + 1) nHi _ suf _ _ _
+        apply twoEnded_spec val f hf dom0 used0 target (oa.set! i none) oLo oHi na (nLo + 1) nHi _ suf _ _ _
           (by simp [Array.set!_eq_setIfInBounds]; omega) hbN
         · rw [applyOps_push, applyOps_appendList, h1, e1, ← e5, move_back _ _ _ _ _ e2, hWset, hWlo]
           simp
         · rw [hWset, hWlo]; simpa using nodup_rearrange hp e2
         · rw [hWset, hWlo]; intro y hy; exact e3 y (hp.mem_iff.2 (by simpa using hy))
         · rw [hSc] at h4; simpa [e4] using h4
+        · refine (h5.append h1 e7).push (by rw [applyOps_appendList, h1, e1]) (lconf_move _ ?_ ?_ ?_)
+          · rw [← e5]; exact mem_mid_id _ _ _
+          · exact anchored_some (mem_map_id (by simp))
+          · rw [← e5]; exact before_ne pre.toList (win oa (oLo + 1) i) (win oa (i + 1) oHi ++ suf) _ _
+              (by simpa using e2)
       · -- a new node, inserted before the old head
         have hc := create_spec (val ns) next
         have hcur : pre.toList ++ win oa oLo oHi ++ suf = pre.toList ++ os :: (win oa (oLo + 1) oHi ++ suf) := by
@@ -199,7 +242,7 @@ theorem twoEnded_spec (val : β → Html Msg) (f : Live Msg → β → Nat → N
         have hnd := nodup_fresh pre.toList (os :: (win oa (oLo + 1) oHi ++ suf)) (create (val ns) next).1 next
           h2 hlt hc.id
         apply RSpec.weaken _ (Nat.le_of_lt hc.lt)
-        apply twoEnded_spec val f hf dom0 target oa oLo oHi na (nLo + 1) nHi _ suf _ _ _ hbO hbN
+        apply twoEnded_spec val f hf dom0 used0 target oa oLo oHi na (nLo + 1) nHi _ suf _ _ _ hbO hbN
         · rw [applyOps_push, h1, insert_before _ _ _ _ h2, hWc]
           simp
         · rw [hWc]; simpa using hnd
@@ -211,10 +254,11 @@ theorem twoEnded_spec (val : β → Html Msg) (f : Live Msg → β → Nat → N
           · exact hc.wf
           · exact (h3 y hm).mono (Nat.le_of_lt hc.lt)
         · rw [hSc] at h4; simpa [hc.erase] using h4
+        · exact h5.push h1 (lconf_insert _ _ (anchored_some (mem_map_id (by simp))))
     · -- the new window is empty: remove what is left of the old one
       simp only [hN, ↓reduceDIte]
       have hr := removeRange_spec dom0 pre.toList suf oa oHi oLo ops h1 h2
-      refine ⟨hr, ?_, ⟨fun x hx => h3 x ?_, ?_⟩, Nat.le_refl _⟩
+      refine ⟨hr, ?_, ⟨fun x hx => h3 x ?_, ?_⟩, Nat.le_refl _, removeRange_conf dom0 used0 next pre.toList suf oa oHi oLo ops h1 h2 h5⟩
       · rw [slice_empty _ (by omega)] at h4; simpa using h4
       · simp only [List.mem_append] at hx ⊢; rcases hx with h | h <;> simp [h]
       · exact List.Sublist.nodup ((List.Sublist.append (List.sublist_append_left _ _) (List.Sublist.refl suf)).map _) h2
@@ -224,7 +268,8 @@ theorem twoEnded_spec (val : β → Html Msg) (f : Live Msg → β → Nat → N
     obtain ⟨cs, e1, e2, e3, e4, e5, e6⟩ :=
       insertRange_spec val na (suf.head?.map Live.id) dom0 suf rfl nHi hbN nLo next ops pre
         (by simpa using h1) (by simpa using h2) (by simpa using h3)
-    refine ⟨e3, ?_, ⟨e5, e4⟩, e6⟩
+    refine ⟨e3, ?_, ⟨e5, e4⟩, e6, insertRange_conf val na (suf.head?.map Live.id) dom0 used0 suf rfl nHi nLo next ops pre
+      (by simpa using h1) (by simpa using h2) (by simpa using h3) h5⟩
     simp [e1, e2, ← h4]
 termination_by (oHi - oLo) + (nHi - nLo)
 

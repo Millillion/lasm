@@ -682,4 +682,23 @@ opaque supabaseRoute : String → HttpRequest → HttpRequest
 /-- `identity` of the Vercel Edge entry (`vercelEdgeEntry(modules)`). -/
 opaque vercelIdentity : HttpRequest → HttpRequest
 
+/-! ## The glue program's host (src/glue/glue.mjs) -/
+
+/-- `encodeFields(fields)`: the request the glue program reads, as text
+(each field as its UTF-8 length in decimal, `:`, and the field). -/
+opaque encodeFields : List String → String
+
+/-- `decodeFields(text)`: the fields of a result the glue program wrote, or
+the message it throws on a malformed one. -/
+opaque decodeFields : String → Except String (List String)
+
+/-- `encodeRequest(lists)`: the request the glue program reads, from lists of
+fields (a table of the distinct fields and their indices, or `encodeFields`
+of them all when a field holds a 0 byte). -/
+opaque encodeRequest : List (List String) → ByteArray
+
+/-- The fields a request carries, read as the glue program reads either of
+its formats (the empty request carries none). -/
+opaque requestFields : ByteArray → List String
+
 end Lasm.Cli

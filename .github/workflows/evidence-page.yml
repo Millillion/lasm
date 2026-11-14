@@ -67,6 +67,7 @@ jobs:
       - name: Commit the page to main
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         id: commit
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
