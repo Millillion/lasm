@@ -103,9 +103,18 @@ test('LASM_TEST_LINK_EVIDENCE: off by default; on, each link leaves its files', 
     assert.equal(readFileSync(join(first, 'linked.wasm'), 'utf8'), 'bytes');
     assert.deepEqual(JSON.parse(readFileSync(join(first, 'evidence.json'), 'utf8')), { kind: 'final', files: ['linked.wasm'], mode: 'final' });
     assert.match(second, /edge_x$/);
-    const third = saveLinkEvidence('wasi', {}, {}, env, [source, join(root, 'gone.o')]);
-    assert.deepEqual(JSON.parse(readFileSync(join(third, 'evidence.json'), 'utf8')).objects, { [source]: 'objects/0000-x.wasm' });
+    const other = join(root, 'y.o');
+    writeFileSync(other, 'more');
+    const third = saveLinkEvidence('wasi', {}, {}, env, [source, join(root, 'gone.o'), other]);
+    const text = readFileSync(join(third, 'evidence.json'), 'utf8');
+    assert.ok(text.endsWith('}\n'));
+    assert.deepEqual(JSON.parse(text).objects, { [source]: 'objects/0000-x.wasm', [other]: 'objects/0001-y.o' });
     assert.equal(readFileSync(join(third, 'objects/0000-x.wasm'), 'utf8'), 'bytes');
+    assert.equal(readFileSync(join(third, 'objects/0001-y.o'), 'utf8'), 'more');
+    // Each directory is named by time, process, a counter of three digits and the kind.
+    const counters = [first, second, third].map(directory => /-(\d{3})-[A-Za-z0-9_-]+$/.exec(directory)?.[1]);
+    assert.ok(counters.every(Boolean), JSON.stringify([first, second, third]));
+    assert.deepEqual(counters.map(Number), [0, 1, 2].map(n => Number(counters[0]) + n));
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
