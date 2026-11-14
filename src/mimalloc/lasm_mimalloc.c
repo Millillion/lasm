@@ -1,8 +1,10 @@
-/* mimalloc for the WASI targets (issue #246; src/wasi/wasi-link.mjs).
+/* mimalloc for the WASI and edge targets (issues #246 and #247;
+ * src/mimalloc/mimalloc.mjs, used by src/wasi/wasi-link.mjs and
+ * src/edge/edge-link.mjs).
  *
- * The sources in mimalloc/ are Emscripten 6.0.9's copy of mimalloc 3.4.1
- * (system/lib/mimalloc, MIT, mimalloc/LICENSE), unchanged. The WASI link
- * compiles them with the flags Emscripten builds its libmimalloc with
+ * The sources in emscripten/ are Emscripten 6.0.9's copy of mimalloc 3.4.1
+ * (system/lib/mimalloc, MIT, emscripten/LICENSE), unchanged. The links
+ * compile them with the flags Emscripten builds its libmimalloc with
  * (tools/system_libs.py), except for 8 KiB arena slices instead of 32 KiB and
  * a smaller arena reserve, so that an arena is 2 MiB instead of 16 MiB: on
  * WebAssembly an arena is committed whole, so the memory started 16 MiB above

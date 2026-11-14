@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { edgeRuntime } from './edge-runtime.mjs';
 import { linkEdgeProgram, edgeLinkSettings } from './edge-link.mjs';
+import { mimallocSources } from '../mimalloc/mimalloc.mjs';
 import { managedCacheDirectory } from '../managed-artifacts.mjs';
 import { readStoreEntry, writeStoreEntry } from '../application-link.mjs';
 import { testUnoptimized } from '../test-switches.mjs';
@@ -378,7 +379,8 @@ const workerName = directory => {
 // Inputs of the linked edge program besides the Node build: the edge link and
 // its glue. The host modules (edge-*.mjs) are copied at delivery, not linked.
 const linkSources = ['edge-link.mjs', 'edge-initializers.mjs', 'edge-pre.js', 'edge-library.js', 'lasm_js_edge.c', '../../library/c/lasm_js_framing.h',
-  ...['recipe-emscripten-6.0.9-edge.json', 'link.mjs', 'glue.mjs', 'settings.mjs', 'metadata.mjs', 'wasm.mjs', 'python.mjs'].map(file => '../link-driver/' + file)];
+  ...['recipe-emscripten-6.0.9-edge.json', 'link.mjs', 'glue.mjs', 'settings.mjs', 'metadata.mjs', 'wasm.mjs', 'python.mjs'].map(file => '../link-driver/' + file),
+  ...mimallocSources.map(file => '../mimalloc/' + file)];
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 
 /** The edge program's cache identity: the Node build's signature (its objects
