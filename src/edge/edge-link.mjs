@@ -130,7 +130,8 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
   // drivers link the same objects (scripts/edge/compare-edge-link.mjs). Reused
   // within the process by sources, flags and tools (lasm dev relinks often).
   const allocator = [];
-  for (const [source, name] of mimallocUnits) {
+  // EVIDENCE #247 (temporary): LASM_EVIDENCE_247_MIMALLOC=sysroot links Emscripten's libmimalloc as before.
+  for (const [source, name] of process.env.LASM_EVIDENCE_247_MIMALLOC === 'sysroot' ? [] : mimallocUnits) {
     const object = join(out, name);
     const args = driver === 'node'
       ? mimallocClangArguments({ sysroot: join(emscriptenCache(sdk), 'sysroot'), settings: s.mimalloc, source, object })

@@ -387,7 +387,7 @@ const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
  * and initializer plan), the edge runtime, the edge link and its settings. */
 export function edgeProgramKey({ result, edge, suspend = 'jspi' }) {
   // Schema 1 keys (JSPI) are unchanged.
-  return sha256(JSON.stringify({ schema: 1, node: result.signature, runtime: edge.identity, settings: edgeLinkSettings, suspend,
+  return sha256(JSON.stringify({ schema: 1, node: result.signature, runtime: edge.identity, settings: edgeLinkSettings, suspend, evidence247: process.env.LASM_EVIDENCE_247_MIMALLOC ?? null, // EVIDENCE #247 (temporary)
     sources: Object.fromEntries(linkSources.map(file => [file, sha256(readFileSync(join(here, file)))])) }));
 }
 

@@ -1,52 +1,118 @@
 name: TEMPORARY edge heap evidence (issue 247)
-# Removed before the issue's PR merges: scripts/edge/heap-evidence-247.mjs on
-# local runtimes only (wrangler dev's workerd, Deno, Bun, headless Chromium).
+# Removed before the issue's PR merges. scripts/edge/heap-evidence-247.mjs:
+# each part builds with this checkout's CLI twice in one job, with Emscripten's
+# libmimalloc (LASM_EVIDENCE_247_MIMALLOC=sysroot) and with Lasm's build of it
+# (src/mimalloc), and measures the Wasm memory and speed of both on local
+# runtimes only (wrangler dev's workerd, Node, Deno, Bun, headless Chromium).
 on:
   push:
     branches: [edge-heap-247]
     paths:
       - scripts/edge/heap-evidence-247.mjs
       - .github/workflows/edge-heap-evidence-247.yml
+      - src/mimalloc/**
+      - src/edge/edge-link.mjs
 permissions:
-  contents: read
+  # edge-runtime.yml reads the draft release holding the pinned runtime handoff.
+  contents: write
 concurrency:
   group: edge-heap-evidence-247-${{ github.ref }}
   cancel-in-progress: false
-env:
-  CI: '1'
-  BROWSER: 'none'
-  WRANGLER_SEND_METRICS: 'false'
-  DO_NOT_TRACK: '1'
 jobs:
-  evidence:
+  runtime:
+    uses: ./.github/workflows/edge-runtime.yml
+    with:
+      caller: evidence247
+  native:
     runs-on: ubuntu-24.04
-    timeout-minutes: 150
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.1
+          architecture: x64
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: ./.github/actions/process-guard
+      - name: Native host pieces (koffi, helpers)
+        run: |
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
+      - run: tar -cf .work/native-host.tar -C .cache native-host
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: native-host
+          path: .work/native-host.tar
+          retention-days: 3
+  evidence:
+    needs: [runtime, native]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    name: Evidence ${{ matrix.part }}
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [edge-pure, folio, porter, ledger, conduit]
+    env:
+      LEAN_NUM_THREADS: '2'
+      BINARYEN_CORES: '1'
+      EMCC_CORES: '1'
+      LASM_BUILD_JOBS: '2'
+      CI: '1'
+      BROWSER: 'none'
+      WRANGLER_SEND_METRICS: 'false'
+      DO_NOT_TRACK: '1'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
+          architecture: x64
           package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - uses: ./.github/actions/process-guard
-      - name: npm ci (Folio, @lasm/cli as published)
-        working-directory: examples/folio
-        run: npm ci --no-audit --no-fund
+      - uses: actions/download-artifact@v4
+        with:
+          name: native-host
+          path: .work/native-host
+      - run: mkdir -p .cache && tar -xf .work/native-host/native-host.tar -C .cache
+      - name: Fetch the pinned Node runtime
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and restore the pinned runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: edge-runtime-archive-evidence247
+          path: .work/edge-archive
+      - name: Extract the packaged edge runtime
+        run: mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
       - name: Pinned local tools
         run: npm install --prefix "$RUNNER_TEMP/tools" --no-audit --no-fund wrangler@4.152.0 deno@2.9.6 bun@1.4.4
+      - name: npm ci (the example)
+        if: matrix.part != 'edge-pure'
+        working-directory: examples/${{ matrix.part }}
+        run: npm ci --no-audit --no-fund
       - name: The pinned Playwright's Chromium
+        if: matrix.part == 'folio'
         timeout-minutes: 30
         uses: ./.github/actions/playwright
         with:
           browsers: chromium
-      - name: Evidence (published @lasm/cli, Emscripten's libmimalloc)
-        run: node scripts/edge/heap-evidence-247.mjs examples/folio examples/folio/node_modules/@lasm/cli "$RUNNER_TEMP/tools/node_modules/.bin" "$RUNNER_TEMP/heap-247-before.json"
+      - name: Evidence (before: Emscripten's libmimalloc; after: Lasm's mimalloc build)
+        env:
+          LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
+          LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
+        run: node scripts/edge/heap-evidence-247.mjs ${{ matrix.part }} "$RUNNER_TEMP/tools/node_modules/.bin" "$RUNNER_TEMP/heap-247-${{ matrix.part }}.json"
       - if: always()
         run: cat "$RUNNER_TEMP"/heap-247-*.json || true
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
-          name: heap-247
+          name: heap-247-${{ matrix.part }}
           path: ${{ runner.temp }}/heap-247-*.json
           retention-days: 14
