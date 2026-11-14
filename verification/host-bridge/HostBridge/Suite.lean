@@ -44,6 +44,10 @@ def syncCases : List Case := [
   -- A callback that waits for a Lean task: stopped when the task's thread waits
   -- for the event loop (a host call), not when the task finishes by itself.
   ⟨.ok, fun _ => check (system { name := "sync: task waits, one stuck on a host call (stopped), one that finishes, timeouts", calls := #[1, 1], taskWaits := #[true, false], pureWaits := #[false, true], timeouts := true, spurious := true })⟩,
+  -- A stopped task's thread stays in its host call until the event loop answers
+  -- it, after the callback; it is independent of later callbacks, whose task
+  -- waits run meanwhile (#291: the model once tied it to the current callback).
+  ⟨.ok, fun _ => check (system { name := "sync: task waits (stuck, finishing, stuck) while a stopped task's thread waits or runs, timeouts", calls := #[0, 0, 0], taskWaits := #[true, false, true], pureWaits := #[false, true, false], timeouts := true, spurious := true })⟩,
   -- Work proxied to the callback thread makes a host call (the next depth's
   -- slot) while the thread waits in one: served inline when the wait times out.
   ⟨.ok, fun _ => check (system { name := "sync: proxied work makes a nested host call in 2 callbacks, timeouts", calls := #[1, 2], nested := #[true, true], timeouts := true, spurious := true })⟩,

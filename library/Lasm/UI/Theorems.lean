@@ -28,7 +28,10 @@ theorem applier_correct : Spec.applier_correct := fun _ ops dom used u hnd hz hs
   have h := Applier.run_ofOps ops dom used u hnd hz hsub hzu hc
   ⟨h.1, h.2.1⟩
 
-theorem applier_session : Spec.applier_session := fun hc _ views => Applier.session_applier hc views
+theorem diff_conforms : Spec.diff_conforms :=
+  fun _ old new next h _ _ _ => Proofs.diff_conforms old new next h
+
+theorem applier_session : Spec.applier_session := fun _ views => Applier.session_applier views
 
 theorem hydrate_correct : Spec.hydrate_correct := by
   intro _ view server
