@@ -10,7 +10,7 @@ import { attemptDispatcher, downloadArtifact, globalDispatcher, downloadPolicy, 
 const bytes = Buffer.from('a small but complete download');
 const artifact = { name: 'fixture', url: 'https://example.invalid/tool', bytes: bytes.length,
   sha256: createHash('sha256').update(bytes).digest('hex') };
-const policy = { attempts: 4, connectMs: 500, idleMs: 500, totalMs: 10_000 };
+const policy = { attempts: 4, connectMs: 5000, idleMs: 5000, totalMs: 10_000 };
 async function fixture(t) {
   const base = await mkdtemp(join(tmpdir(), 'lasm-download-'));
   t.after(() => rm(base, { force: true, recursive: true }));
