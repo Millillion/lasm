@@ -607,7 +607,7 @@ docstrings, the propositions and the names.
 - [ ] **Proposed, not built: a WASI reactor build, for the CLI's glue (M6).** The glue
   program ([proposals/M6_GLUE.md](proposals/M6_GLUE.md)) is a WASI command, so every
   call instantiates it again and reruns Lean's runtime and module initialization
-  before its own work (REACTOR_COST, see M6_GLUE.md §4). A reactor pays that once per
+  before its own work (about 2 ms of a 12 ms warm call, and most of the call-to-call spread; M6_GLUE.md §4). A reactor pays that once per
   process. The proposed shape adds no Lean API at all: `lasm build Main.lean --target wasi --reactor`
   (or a target `wasi-reactor`) builds the same program, with `main : IO Unit` unchanged,
   as a module that exports `_initialize` (the runtime and module initializers, once)

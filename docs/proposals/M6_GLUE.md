@@ -182,12 +182,28 @@ Tried and not kept:
   numbering the 28,000 names of a plan costs more than the six walks of the
   bar's plan, and on 8000, 200 the sized hash-set walk is as fast.
 
-RESULTS_CI
+Measured by `scripts/glue/measure.mjs` with the program the `glue` workflow
+built (run 43609171128), locally (Node 24.22.1, linux-x64), against the
+same machine's numbers for the first round above:
+
+| Plan (initializers, kept) | Cold, glue | Cold, JavaScript | Warm, glue | Warm, JavaScript |
+| --- | ---: | ---: | ---: | ---: |
+| 2807, 6 | 47.1 ms (was 68.0) | 6.2 ms | 12.2 ms (was 23.8) | 1.6 ms |
+| 2807, 50 | 53.4 ms (was 76.5) | 11.4 ms | 16.1 ms (was 24.7) | 4.9 ms |
+| 8000, 200 | 94.3 ms (was 132.7) | 21.4 ms | 40.5 ms (was 62.5) | 10.4 ms |
+
+A warm call on the bar's plan: 0.8 ms encoding the request, 2.1 ms an empty
+call (instantiating the program and Lean's runtime and module
+initialization), 9.3 ms the rest (the Lean code, about 3.5 times its native
+2.6 ms, and reading the answer). Start-up unchanged (`lasm --version` 66.4
+against main's 67.1 ms); `lasm-glue.wasm` is 647,974 bytes, 163,388 gzipped.
+The bar is met. The CI numbers are the `glue` workflow's step summary on
+the PR.
 
 Why twice the JavaScript is out of reach for this slice: the JavaScript does
-the whole job in 1.0 ms. Encoding the plan for the glue costs 1.3 ms on its
+the whole job in 1.0 to 1.6 ms. Encoding the plan for the glue costs 0.8 to 1.3 ms on its
 own (28,000 names through a `Map`), and a WASI command pays instantiation and
-Lean's runtime and module initialization on every call (EMPTY_CALL, an empty
+Lean's runtime and module initialization on every call (2.1 ms, an empty
 call). Even with no Lean code at all a call would cost about three times the
 JavaScript. Two changes would move that floor, and both are outside this
 slice: a reactor build, which pays the initialization once per process (it
