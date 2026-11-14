@@ -427,5 +427,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Every platform check passed
+        shell: bash
         run: |
           echo '${{ toJSON(needs) }}' | node -e "const n=JSON.parse(require('fs').readFileSync(0));const bad=Object.entries(n).filter(([k,v])=>k!=='select'&&v.result!=='success');console.log(Object.entries(n).map(([k,v])=>k+': '+v.result).join('\n'));if(bad.length)process.exit(1)"

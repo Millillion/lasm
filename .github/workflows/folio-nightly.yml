@@ -46,6 +46,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 400
       - id: check
+        shell: bash
         run: |
           if [ "${{ github.event_name }}" = workflow_dispatch ] || [ -n "$(git log --since='74 hours ago' --format=%H -- examples/folio | head -1)" ]; then
             echo run=true >> "$GITHUB_OUTPUT"

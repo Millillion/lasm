@@ -67,6 +67,7 @@ jobs:
           node scripts/language-coverage/fetch-pristine.mjs "$LASM_LEAN"
       - uses: ./.github/actions/process-guard
       - name: Download and verify the full native Lean oracle
+        shell: bash
         run: node scripts/server-mvp/provision.mjs native "$LASM_LEAN" "$PWD" .work/l1-provision | tee .work/native.json
       - name: Survey every elaboration test against its own imports (resumable after resource stops)
         run: |

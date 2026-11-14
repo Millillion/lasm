@@ -59,6 +59,7 @@ jobs:
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - name: Download the pinned C tier inputs
+        shell: bash
         run: |
           mkdir -p .work/lean-tiers/c-dl
           node -e '
@@ -222,6 +223,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
           VERSION: ${{ inputs.version }}
+        shell: bash
         run: |
           cd .work/lean-tiers/all
           if [ "${{ inputs.scope }}" = c ]; then

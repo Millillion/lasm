@@ -57,10 +57,11 @@ jobs:
       - id: scope
         env:
           GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
           if [ "${{ github.event_name }}" != pull_request ]; then echo "slow=${{ github.event_name != 'push' }}" >> "$GITHUB_OUTPUT"; exit 0; fi
           files=$(gh api --paginate "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" --jq '.[].filename')
-          if echo "$files" | grep -qE '^(scripts/tooling/|\.github/workflows/tooling\.yml$)'; then echo slow=true; else echo slow=false; fi >> "$GITHUB_OUTPUT"
+          if echo "$files" | grep -E '^(scripts/tooling/|\.github/workflows/tooling\.yml$)' >/dev/null; then echo slow=true; else echo slow=false; fi >> "$GITHUB_OUTPUT"
   pack:
     needs: sunday
     if: needs.sunday.outputs.skip != 'true' && (github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))

@@ -140,8 +140,9 @@ jobs:
           path: .work/fixtures
           merge-multiple: true
       - name: Compare every platform with linux-x64
+        shell: bash
         run: |
-          ls -R .work/fixtures | head -60
+          ls -R .work/fixtures | sed -n 1,60p
           set +e
           mkdir -p .work/eq
           node scripts/link-driver/compare-platforms.mjs .work/fixtures/collected --json .work/eq/equality.json | tee .work/eq/equality.txt
