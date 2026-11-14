@@ -142,7 +142,12 @@ function syncProofsMd(data) {
     const updated = old.slice(0, i + BEGIN.length) + '\n' + text + old.slice(j);
     if (updated !== old) {
       if (write) writeFileSync(path, updated);
-      else problems.push(`${document} is out of date with the Spec.lean files (run \`node scripts/library-proofs.mjs --write\`)`);
+      else {
+        // The first line that differs, so that a stale count can be fixed without rerunning the proofs.
+        const was = old.slice(i, j).split('\n'), now = (BEGIN + '\n' + text).split('\n');
+        const k = now.findIndex((line, n) => line !== was[n]);
+        problems.push(`${document} is out of date with the Spec.lean files (run \`node scripts/library-proofs.mjs --write\`); it should read: ${now[k] ?? '(end)'}`);
+      }
     }
   }
 }
