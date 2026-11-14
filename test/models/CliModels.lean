@@ -53,6 +53,10 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
   parseDevArguments   {"tokens": ["<hex>", …], "runtime": "node"}  → (the same)
   parsePackageArguments  ["<hex>", …]              → (the same)
   leanAtLeast    {"version": "<hex>", "minimum": "<hex>"}  → true | false
+  leanIOError    {"tables": {"messages": [[code, text], …], "crtAliases": [[code, code], …], "windowsCrtCases": [code, …]},
+                  "platform": "…", "version": "…", "names": [[n, name], …],
+                  "error": {"userError": b, "errno": n | null, "code": "…" | null, "crt": b}}
+                                                    → null | {"code": "…" | null, "errno": n, "message": "…"}
   mangleName     "<hex>"                            → "<hex>"
   demangleName   "<hex>"                            → "<hex>"
   initializerModule  "<hex>"                        → "<hex>" | null
@@ -400,6 +404,24 @@ def answer (j : Json) : Except String Json := do
       | .str p s => parts p ++ [s]
       | .num p k => parts p ++ [toString k]
     return ofText (".".intercalate (parts (Name.demangle (← text input))))
+  | "leanIOError" =>
+    let tables ← input.getObjVal? "tables"
+    let pairs := fun (j : Json) => do (← j.getArr?).toList.mapM fun p => do
+      let a ← p.getArr?; return ((← (a[0]?.getD Json.null).getStr?), (← (a[1]?.getD Json.null).getStr?))
+    let t : IOErrorTables := ⟨← pairs (← tables.getObjVal? "messages"), ← pairs (← tables.getObjVal? "crtAliases"),
+      ← (← (← tables.getObjVal? "windowsCrtCases").getArr?).toList.mapM (·.getStr?)⟩
+    let names ← (← (← input.getObjVal? "names").getArr?).toList.mapM fun p => do
+      let a ← p.getArr?; return ((← (a[0]?.getD Json.null).getInt?), (← (a[1]?.getD Json.null).getStr?))
+    let e ← input.getObjVal? "error"
+    let optStr := fun (j : Json) => match j with | Json.null => Except.ok none | j => some <$> j.getStr?
+    let err : IOErrorIn := ⟨← (← e.getObjVal? "userError").getBool?,
+      ← (match e.getObjValD "errno" with | Json.null => Except.ok none | j => some <$> j.getInt?),
+      ← optStr (e.getObjValD "code"), ← (← e.getObjVal? "crt").getBool?⟩
+    return match leanIOErrorModel t (← (← input.getObjVal? "platform").getStr?) (← (← input.getObjVal? "version").getStr?)
+        (fun n => names.lookup n) err with
+      | none => Json.null
+      | some (code, errno, message) => Json.mkObj [("code", match code with | some c => toJson c | none => Json.null),
+          ("errno", toJson errno), ("message", toJson message)]
   | "leanAtLeast" => return toJson (leanAtLeastModel (← text (← input.getObjVal? "version")) (← text (← input.getObjVal? "minimum")))
   | "lowerAtomics" => return ofBytes (LowerAtomics.lowerAtomics (← bytesOf input))
   | "moduleImports" =>

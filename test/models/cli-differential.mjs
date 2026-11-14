@@ -25,7 +25,7 @@ import { lakeName, packageName, parseInitArguments, supabaseFunctionNameOf } fro
 import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
-import { leanAtLeast } from '../../src/lean-io-errors.mjs';
+import { ioErrorTables, leanAtLeast, leanIOError } from '../../src/lean-io-errors.mjs';
 import { demangleName, initializerModule, mangleName } from '../../src/application-diagnosis.mjs';
 import { comparePythonStrings, pythonJsonString } from '../../src/link-driver/python.mjs';
 import { responseFile } from '../../src/platform.mjs';
@@ -536,6 +536,29 @@ const models = [
     generate: mangledText,
     input: text => hex(text),
     js: text => hex(demangleName(text)),
+  },
+  {
+    name: 'leanIOError', source: 'src/lean-io-errors.mjs', lean: 'Lasm.Cli.Model.LeanIOErrors',
+    generate: r => {
+      const tables = ioErrorTables();
+      const codes = [...Object.keys(tables.messages), ...Object.keys(tables.crtAliases), ...tables.windowsCrtCases, 'UNKNOWN', 'ENOTREAL', 'constructor', '__proto__', 'toString', ''];
+      const crt = r.next() < 0.4;
+      const errno = r.next() < 0.1 && !crt ? r.pick([undefined, '-5', null]) : (r.pick([1, -1]) * r.pick([r.int(0, 140), 4094, 4095, 3008, 4022, r.int(0, 99999)]) * (crt ? -1 : 1) * (r.next() < 0.1 ? -1 : 1) || 0);
+      const names = r.array(r.int(0, 6), () => [-r.int(0, 140), r.pick(codes)]);
+      return { platform: r.pick(['linux', 'darwin', 'win32']), version: r.pick(['4.32.0', '4.34.0', '4.34.1', '4.35.0']), names,
+        error: { leanUserError: r.next() < 0.1, errno, code: r.next() < 0.05 ? undefined : r.pick(codes), errorOrigin: crt ? 'crt' : r.pick([undefined, 'uv']) } };
+    },
+    input: ({ platform, version, names, error }) => {
+      const tables = ioErrorTables();
+      return { tables: { messages: Object.entries(tables.messages), crtAliases: Object.entries(tables.crtAliases), windowsCrtCases: tables.windowsCrtCases },
+        platform, version, names, error: { userError: !!error.leanUserError, errno: typeof error.errno === 'number' ? error.errno : null,
+          code: error.code ?? null, crt: error.errorOrigin === 'crt' } };
+    },
+    js: ({ platform, version, names, error }) => {
+      const map = new Map(names);
+      const result = leanIOError(error, version, { platform, systemErrorName: n => map.get(n) });
+      return result === error ? null : { code: result.code ?? null, errno: result.errno, message: result.message };
+    },
   },
   {
     name: 'packageName', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',

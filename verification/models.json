@@ -443,17 +443,18 @@
       "reason": "starts a built program"
     },
     "src/lean-io-errors.mjs": {
-      "status": "pending",
+      "status": "modelled",
       "models": [
         {
           "lean": "verification/cli/Lasm/Cli/Model/LeanIOErrors.lean",
           "functions": [
-            "leanAtLeast"
+            "leanAtLeast",
+            "leanIOError"
           ],
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "leanAtLeast is modelled (lean_at_least_lexicographic proved of the model); the IO error policy remains to model"
+      "reason": "leanAtLeast and the IO error policy leanIOError are modelled (lean_at_least_lexicographic proved), leanIOError with its tables (libuv's messages, Lean's CRT aliases, the Windows CRT cases: data, passed by the differential) and the host (platform, Node's errno names) parameters; checkLeanIOVersion is a list of reviewed releases and receiveSizeError a constant"
     },
     "src/link-driver/compile.mjs": {
       "status": "exempt",

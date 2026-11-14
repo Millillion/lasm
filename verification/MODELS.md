@@ -34,9 +34,9 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**138 shipped modules**: 14 modelled, 26 pending, 98 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 26 modules still need a model.
+**138 shipped modules**: 15 modelled, 25 pending, 98 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 25 modules still need a model.
 
-### Modelled (14)
+### Modelled (15)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -47,6 +47,7 @@ How a module moves from pending to modelled:
 | [`src/edge/builtin-modules.mjs`](../src/edge/builtin-modules.mjs) | [BuiltinModules.lean](../verification/cli/Lasm/Cli/Model/BuiltinModules.lean) (`isBuiltinModule`, `builtinModuleClosure`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the closure is modelled, with the import forms it reads checked by the differential; `builtinModuleNames` and `builtinModuleFile` look a name up in the builtin directory (test/builtin-modules.test.mjs) |
 | [`src/edge/edge-initializers.mjs`](../src/edge/edge-initializers.mjs) | [EdgeInitializers.lean](../verification/cli/Lasm/Cli/Model/EdgeInitializers.lean) (`initializationSchedule`, `compactInitializerWrappers`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | both of its functions are modelled; the module does nothing else |
 | [`src/handle-table.mjs`](../src/handle-table.mjs) | [HandleTable.lean](../verification/cli/Lasm/Cli/Model/HandleTable.lean) (HandleTable (constructor, allocate, and the Map's set and delete); [cli-differential.mjs](../test/models/cli-differential.mjs)) | the allocator is modelled; handle_fresh_in_range proved |
+| [`src/lean-io-errors.mjs`](../src/lean-io-errors.mjs) | [LeanIOErrors.lean](../verification/cli/Lasm/Cli/Model/LeanIOErrors.lean) (`leanAtLeast`, `leanIOError`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | leanAtLeast and the IO error policy leanIOError are modelled (lean_at_least_lexicographic proved), leanIOError with its tables (libuv's messages, Lean's CRT aliases, the Windows CRT cases: data, passed by the differential) and the host (platform, Node's errno names) parameters; checkLeanIOVersion is a list of reviewed releases and receiveSizeError a constant |
 | [`src/package.mjs`](../src/package.mjs) | [Package.lean](../verification/cli/Lasm/Cli/Model/Package.lean) (`parsePackageArguments`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | its argument parsing is modelled (parse_known_or_refused proved); the rest packages a build (files, processes and archives), tested end to end |
 | [`src/process-launcher.mjs`](../src/process-launcher.mjs) | [ProcessLauncher.lean](../verification/cli/Lasm/Cli/Model/ProcessLauncher.lean) (`encodeProcessConfiguration`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the configuration writer is modelled (launcher_config_round_trip proved with the reader's model); nativeProcessLauncher finds and verifies the shipped binary (files and hashes, test/cli-helpers.test.mjs) |
 | [`src/serverless/lasm-lambda.mjs`](../src/serverless/lasm-lambda.mjs) | [Model.lean](../library/Lasm/Serverless/Proofs/Model.lean) (`query`, `rawQuery`, `headerPairs`, `decode`, `handler`, `cloudFront`; [serverless-http.mjs](../test/fuzz/targets/serverless-http.mjs)) | the request and response mapping is modelled; the rest forwards over loopback |
@@ -55,7 +56,7 @@ How a module moves from pending to modelled:
 | [`src/wasi/lower-atomics.mjs`](../src/wasi/lower-atomics.mjs) | [LowerAtomics.lean](../verification/cli/Lasm/Cli/Model/LowerAtomics.lean) (`lowerAtomics`, `moduleImports`, `keepExports`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole module is modelled (lowerAtomics with its readers, moduleImports, keepExports); candidates lowering_rewrites_atomics, lowering_leaves_no_atomics and lowering_keeps_runs are stated over the model, the last two also over WebAssembly validation and execution (outside semantics) |
 | [`src/wasi/wasi-component.mjs`](../src/wasi/wasi-component.mjs) | [WasiComponent.lean](../verification/cli/Lasm/Cli/Model/WasiComponent.lean) (`replaceCoreModule`, `placeholderModule`, `componentize`, `makeTemplate`, `extractCore`, `withoutComponentType`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | every function is modelled (the template, read from component/proxy-template.wasm by default, is an argument); replace_one_core_module, drops_only_component_type and componentize_inverse proved |
 
-### Pending (26)
+### Pending (25)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -72,7 +73,6 @@ How a module moves from pending to modelled:
 | [`src/edge/lasm_js_edge.c`](../src/edge/lasm_js_edge.c) | — | Lasm.JS C glue for the edge profile, as library/c/lasm_js.c: its request and event framing is library/c/lasm_js_framing.h (modelled); the operations are not modelled (IRREDUCIBLE.md M4) |
 | [`src/init.mjs`](../src/init.mjs) | [Init.lean](../verification/cli/Lasm/Cli/Model/Init.lean) (`parseInitArguments`, packageName (after basename, resolve and toLowerCase), `lakeName`, supabaseFunctionNameOf (after toLowerCase); [cli-differential.mjs](../test/models/cli-differential.mjs)) | `lasm init`: argument parsing is modelled (parse_known_or_refused proved) and so are the generated names (generated_names_valid proved); the template texts (golden-tested, test/init-golden.test.mjs) and writing them remain |
 | [`src/lasm-modules/ui-dom.mjs`](../src/lasm-modules/ui-dom.mjs) | [Decode.lean](../library/Lasm/UI/Proofs/Decode.lean) (the patch-frame reader; [ui-decode.mjs](../test/fuzz/targets/ui-decode.mjs)) | the UI applier: its reading of patch frames is checked against Lean's reference decoder (ui-decode, proved by Lasm.UI.Spec.frames_decode); its DOM operations are not modelled (IRREDUCIBLE.md M4) |
-| [`src/lean-io-errors.mjs`](../src/lean-io-errors.mjs) | [LeanIOErrors.lean](../verification/cli/Lasm/Cli/Model/LeanIOErrors.lean) (`leanAtLeast`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | leanAtLeast is modelled (lean_at_least_lexicographic proved of the model); the IO error policy remains to model |
 | [`src/link-driver/glue.mjs`](../src/link-driver/glue.mjs) | — | a port of Emscripten's emscript: a pure text transformation, checked against Emscripten's output (link-toolchain fixtures) |
 | [`src/link-driver/metadata.mjs`](../src/link-driver/metadata.mjs) | — | a port of Emscripten's extract_metadata.py: a pure reader of Wasm |
 | [`src/link-driver/python.mjs`](../src/link-driver/python.mjs) | [Python.lean](../verification/cli/Lasm/Cli/Model/Python.lean) (`pythonJsonString`, `comparePythonStrings`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | Python's JSON and string semantics: pythonJsonString and comparePythonStrings are modelled (json_string_printable and python_order_code_points proved; json_string_ascii's JSON reading stays a candidate); pythonJsonDumps, pythonEquals, truthy and the identifier and whitespace helpers remain to model (candidate json_dumps_parse_back) |
