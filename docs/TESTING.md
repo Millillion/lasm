@@ -38,7 +38,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
 | [Dependable tooling](#dependable-tooling) | Every user-triggerable error prints a clear message (error corpus); incremental, repeated, renamed and touched builds give the clean build's bytes (metamorphic); killed, offline, full-disk, read-only and corrupted runs end in success or a clear error (fault injection) | `scripts/tooling/`, `tooling.yml` | PR (corpus), nightly (all) |
-| [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage: the CLI's arguments, the function platforms' HTTP mapping, the Lasm.UI patch decoder, Lasm.Fetch's request parsing, Lasm.RPC's decoding, the WASI C host's CGI request | `test/fuzz/`, `fuzz.yml` | PR (replay), nightly, weekly |
+| [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage: the CLI's arguments, `lasm dev`'s proxy, project files, the edge entries' request mapping, the function platforms' HTTP mapping, the Lasm.UI patch decoder, Lasm.Fetch's request parsing, Lasm.RPC's decoding, the WASI C host's CGI request, the Fastly host | `test/fuzz/`, `fuzz.yml` | PR (replay), nightly, weekly |
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
 | [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `examples/*/test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
@@ -812,9 +812,13 @@ where they are; these cover the libraries and hosts every app shares.
 | `ui-patch` | the Lasm.UI patch decoder (`src/lasm-modules/ui-dom.mjs`) on happy-dom, with hydration | JavaScript | a frame applies, or fails with a `Lasm.UI: …` error or a `DOMException`; never a `TypeError`, a hang, or an attribute from a reference past the name table |
 | `ui-decode` | the same applier's reading of a session's frames, on a recording DOM (the DOM's tree semantics, every slot kept), against Lean's reference decoder (`library/Lasm/UI/Proofs/Decode.lean`, which `Lasm.UI.Spec.frames_decode` proves reads every encoded frame as its patch) | JavaScript | frame by frame, the applier refuses exactly the frames the decoder refuses, and otherwise leaves exactly the DOM the decoder's operations make: every node, id, tag, namespace, text, attribute, property, style, and listener with its decoder's paths. The decoder runs with `lean --run` (`test/fuzz/support/ui-decode-model.mjs`, required in CI). Frames whose meaning depends on the DOM, not the bytes (an id not in the document, a move into its own subtree, an id in use, a property that is a DOM member), and numbers above 2^53, end a session without a verdict; a removed property reads as its type's empty value, so `""`, `false` and unset compare equal |
 | `lasm-js-wire` | the Lasm.JS value codec's JavaScript half (`src/node-js.mjs`'s writer and reader), against Lean's half (`Wire` in `library/Lasm/JS/Core.lean`, whose round trip is proved: `Lasm.JS.Spec.decode_encode`) | JavaScript | on any bytes, JavaScript's reader and Lean's (`Wire.decodeWith`) both refuse, or both read the same value; on any value, JavaScript writes exactly Lean's bytes (`Wire.encode`) and reads them back as the value. Lean's half runs with `lean --run` (`test/fuzz/support/js-wire-model.mjs`, required in CI). Normalizations, JavaScript's own semantics: lone surrogates are written as U+FFFD, a repeated key keeps its last value, NaN payloads are not compared (Lean's `Float.ofBits` keeps none) |
+| `dev-proxy` | `lasm dev`'s proxy (`src/dev-proxy.mjs`): a request through it to an upstream that answers with raw bytes the input chooses (Content-Length, chunked or close-delimited replies, a reply cut mid-body, a malformed head) | JavaScript | the upstream receives the request once, unchanged but for its own Host and no Accept-Encoding; a whole reply reaches the client with its status, headers and body byte for byte, a page's with the reload client inserted before the first `</body>` (`Cache-Control: no-store`); a cut reply ends cut and a malformed one as a 502, within 3 s (`Lasm.Cli.Candidates.dev_proxy_*`) |
+| `project-files` | the project files Lasm reads itself: a Lean source's import header (`leanHeader`, the key of the build's reuse of Lake's configuration; `importClosure`, what `lasm dev` rebuilds after an edit), lake-manifest.json and lakefile.lean (`lakeConfigurationKey`), package.json (`edgeModules`, `supabaseFunctionName`, `fastlyName`) | JavaScript | against Lean's own header parser (`Lean.Elab.parseImports`, `test/fuzz/support/LeanHeaderModel.lean`, run with `lean --run` by `test/fuzz/support/lean-header-model.mjs`, required in CI): whenever Lean reads a header without error, `leanHeader` of the source has exactly its imports and `importClosure` reaches every imported file; a manifest is a key or no reuse, never a throw; package.json is read, or refused with a plain `Error` naming it (`Lasm.Cli.Candidates`: `lean_header_keeps_imports`, `import_closure_covers_imports`, `lake_key_total`, `package_readers_clear`). Lean 4.35 reads a header broken by a bare CR as no imports and no error, so texts with one have no verdict on `leanHeader` |
+| `edge-request` | the edge entries' request mapping (`src/edge/edge-build.mjs`): the Supabase entry's `route` (Supabase hands the function `/NAME/PATH`) and the Vercel Edge entry's `identity`, taken from the generated entries' text and run on Node's `Request` | JavaScript (every script's blocks count: the generated functions are `new Function` scripts) | `route` removes exactly the function's name from a path that is the name or starts with it and `/` (the name alone becomes `/`), keeping the origin, query, method, headers and body, and leaves any other request unchanged; `identity` changes nothing but Accept-Encoding (`Lasm.Cli.Candidates`: `supabase_route_strips_name`, `vercel_identity_drops_encoding`) |
 | `lean-fetch-request` | `Lasm.Fetch`'s request parsing as Node's host builds requests (`nodeRequestUrl`, `path`, `segments`, `query`, `queryParams`, `header?`, `percentDecode`, `joinCookies`, `splitCookieCommas`) | libFuzzer, ASan | the path starts with `/` and holds no `?`, `#`, `\`; the Host header never moves the path; the target alone has the same path; resolving again changes nothing; no dot segments; one Cookie header |
 | `lean-rpc` | `Lasm.RPC`'s `decodeRequest` and `decodeResponse` for an endpoint with strings, Booleans, arrays, `Nat` and `Option` | libFuzzer, ASan | accepted only when `validate` passes, otherwise refused as invalid (400); request and response round trips; Lean's JSON printer's output parses and prints the same |
 | `wasi-cgi` | the WASI C host's CGI request and response (`src/wasi/lasm_fetch_wasi.c`), compiled natively | libFuzzer, ASan, UBSan | strings handed to Lean are valid UTF-8; the method is `REQUEST_METHOD`; the Host or `SERVER_NAME` never moves the path; the response head is one line per header, no CR, LF or NUL inside a line |
+| `fastly-host` | the Fastly Compute host (`src/wasi/lasm_fetch_wasi.c` with `-DLASM_WASI_FASTLY`), compiled natively through `test/fuzz/native/fastly_driver.c`, which plays an honest Fastly host: it answers each ABI call as the ABI allows, choosing from the input how many header names or values a call returns, how short a read is, how much of a write it takes, and answering BUFLEN with the length it needs | libFuzzer, ASan, UBSan | the program gets the request's method, URI, headers (grouped by name as the host lists them) and body byte for byte, taken whole or as a head and reads of any size; the host receives the response's status, headers in order and body byte for byte, sent once and ended as the program asked; a fetch's dynamic backend targets the URL's host and port (the scheme's default when there is none or it is empty) and overrides the Host with the host name, for every URL RFC 3986 allows (`Lasm.Fetch.Candidates`: `fastly_request_read`, `fastly_response_written`, `fastly_backend_authority`) |
 
 **Engines.** The JavaScript targets run in a worker under V8's block coverage
 (`node:inspector` `Profiler.takePreciseCoverage`, read after each run): an
@@ -855,6 +859,7 @@ a fix, or an issue.
     node test/fuzz/support/serverless-model.mjs         # serverless-http's Lean model (used when prepared)
     node test/fuzz/support/ui-decode-model.mjs          # ui-decode's Lean decoder (used when prepared)
     node test/fuzz/support/js-wire-model.mjs            # lasm-js-wire's Lean half (used when prepared)
+    node test/fuzz/support/lean-header-model.mjs        # project-files' Lean header parser (used when prepared)
 
 **CI** ([fuzz.yml](../.github/workflows/fuzz.yml)): every pull request and push
 to `main` replays the committed corpus and regressions of the JavaScript
@@ -906,6 +911,27 @@ failing input and uploads its new corpus entries and failing inputs (artifact
   (`Lasm.UI: no decoder N`, `Lasm.UI: text that is not UTF-8`). A number
   above 2^53 is refused instead of rounded, and padding zeros past it, which
   Lean reads as nothing, no longer turn into `NaN`.
+- `lasm dev`'s proxy left the client's response open for ever when the
+  server program stopped mid-reply (as it does on every rebuild), sent a
+  request again up to 100 times over 10 s when the reply was malformed (a
+  POST the server had received, each time), and read pages as UTF-8, so a
+  page in another charset lost its accented letters. It now cuts the
+  client's response, retries only a refused connection, and inserts the
+  reload client into the page's bytes.
+- checked against Lean's header parser, the project files: `importClosure`
+  missed imports written `«My Mod»`, `A.«b c»`, with a name on the line
+  after `import`, after a nested comment, or with Latin-1, Greek or other
+  letters Lean allows (so `lasm dev` did not rebuild after an edit to them);
+  `leanHeader` dropped an import whose name is on the next line (a stale
+  Lake configuration could be reused); `lakeConfigurationKey` threw a
+  `TypeError` on a manifest that is `null` or has packages of the wrong
+  shape; and the package.json readers threw a `TypeError` for `null` and a
+  `SyntaxError` that did not name the file. One reader of Lean headers
+  (`leanHeaderImports`, as Lean's lexer reads names and comments) now serves
+  both, and a malformed manifest is no reuse.
+- against an honest Fastly host, the Fastly host registered the dynamic
+  backend of `http://example.com:/` (an empty port) as `example.com:`
+  instead of `example.com:80`; an empty port is now the scheme's default.
 - checked against Lean's half, the Lasm.JS value codec's JavaScript reader
   (both copies, `src/node-js.mjs` and `src/edge/edge-js.mjs`) disagreed in
   three ways: a Lean object field named `__proto__` set the JavaScript
@@ -1603,6 +1629,11 @@ lowering, binaryen-made modules of every other instruction kind stay valid witho
 longer a dependency: the modules it made are recorded in `test/fixtures/lower-atomics-modules.json`, and
 without it V8 validates the output), and
 random instruction streams come out byte for byte as documented.
+
+The modules the testing strategy's step 2 named (the CLI argument and init modules, `src/serverless/` and the WASI
+JavaScript) held in the nightly run 43433389694 on `main` (2026-11-13): `cli` 95 %, `init` 97.1 %, `serverless`
+88.5 %, `wasi-build` 95.8 % and `target-link` (with `wasi/wasi-link.mjs`) 91 %, each at or above its threshold;
+the ROADMAP item is ticked.
 
 Every module is above 80 %; each threshold is its score rounded down. Tests whose assertion is a general
 property use `forAll` from [`test/helpers/property.mjs`](../test/helpers/property.mjs) (seeded, so a failure
