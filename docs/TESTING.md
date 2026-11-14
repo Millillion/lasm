@@ -32,7 +32,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | Layer | What it checks | Where | CI tier |
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) and [fuzzing](#differential-fuzzing) | Lasm-compiled programs (generated expressions, statements, and feature programs declaring classes, inductives, closures, loops, structures) behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
-| [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic equals Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs` | PR, nightly |
+| [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic, and Ledger's API traffic, equal Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs`, `examples/*/test/equivalence.mjs` | PR, nightly |
 | [Standard bindings](#standard-bindings) | Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun are their generator's output (Lasm.JS.Node's lowering is that of the pinned Node docs, Lasm.JS.Deno's and Lasm.JS.Bun's that of the pinned TypeScript declarations), and behave as the specs, Node's docs and the declarations say on every target: WPT's URL and urlencoded data, Lean's UTF-8, hex, base64 and path operations as oracles, published crypto vectors, generated round trips, files and child processes, a Lean handler served by Deno.serve, Bun.serve and @hono/node-server and requested over HTTP | `scripts/bindings/`, `test/fixtures/js-web/`, `test/fixtures/js-node/`, `test/fixtures/js-serve/`, `web-bindings.yml` | PR (paths), main |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
@@ -478,7 +478,8 @@ too: a change on Node shows up as a diff in review.
 platform differences in URL parsing. **What it cannot catch:** behaviour the
 corpus does not exercise; timing; headers platforms add themselves (`date`,
 `server`, framing), which are deliberately not compared. Conduit's RealWorld
-traffic is compared too, with its tokens and timestamps normalized (next section).
+traffic is compared too, with its tokens and timestamps normalized (next section),
+and so is the flagship apps' own test traffic ([below](#the-flagship-apps-recorded-traffic)).
 
 #### Conduit's RealWorld traffic
 **Property.** On every target Conduit's CI runs, the official RealWorld API
@@ -535,6 +536,45 @@ body byte (key order, escaping, number formatting, error bodies), which user a
 token belongs to, a write a store lost. **What it cannot catch:** requests the
 suite does not send; behaviour under concurrency (`examples/conduit/test/concurrency.mjs`);
 bugs that are the same on every target, Node included; timing.
+
+#### The flagship apps' recorded traffic
+
+**Property.** On every platform an app's README claims (the rows of
+[`scripts/evidence/apps.json`](../scripts/evidence/apps.json)), the requests
+the app's own outside-oracle tests send get the same answers as on Node: equal
+statuses, equal response headers (apart from `IGNORED_HEADERS` and the
+platform's `PLATFORM_HEADERS`) and equal bodies, exchange by exchange, once
+the app's documented nondeterminism is normalized.
+
+[`scripts/equivalence/traffic.mjs`](../scripts/equivalence/traffic.mjs) holds
+what the apps share: a recording reverse proxy (as Conduit's), a recorder at
+the fetch level for drivers whose clients must see the server's own origin, the
+generic normalization (header names lower-cased and sorted, Conduit's
+ignored headers dropped, and `content-encoding` too: the client accepts gzip,
+`wrangler dev` uses it and Node does not, so the body is compared after the
+coding is undone; bodies over 16 KiB kept as their SHA-256 and length), one
+more platform rule (on Workers, the apps' `wrangler.toml` lets Workers' own
+asset serving answer for the browser page's files before the Worker runs: on
+those responses, recognized by its `cf-cache-status`, the caching headers it
+owns, `cache-control`, `etag`, `vary` and `cf-cache-status`, are left out on
+both sides, while the bytes are still compared), the alignment and diff, and the `compare NAME` /
+`self-test` command line. Each app's `test/equivalence.mjs` adds its own
+normalizer and documents each rule; its Node job writes
+`test-results/normalized-SUITE-node-24.json`, which is committed as
+`test/equivalence/SUITE.json` and reviewed like code, for the reasons Conduit's
+golden file is. Every Node and platform job of the app runs the comparison as
+its step after the recorded driver; the Node jobs run the normalizer's
+self-test first.
+
+| App | Recorded driver (suite) | Normalized, and why | Not recorded |
+| --- | --- | --- | --- |
+| Ledger | `test/api.mjs --equivalence` through the proxy (`api`) | Timestamps (`"timestamp"` in bodies, `?after=` in paths) become their rank among the run's timestamps: they are nanoseconds from the server's clock, while their order is still compared; their count, and that each is above 10^18, are compared as facts | The bank workload (concurrent and random) |
+
+**What it catches:** a platform's adapter, store or runtime answering one of
+the app's real requests differently from Node: a status, a header, a body
+byte, an order of rows, a reference between issued and used values. **What it
+cannot catch:** requests the drivers do not send; what is not recorded;
+bugs the same on every target.
 
 ### Standard bindings
 
