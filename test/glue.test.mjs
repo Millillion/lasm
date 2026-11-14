@@ -31,6 +31,8 @@ const tableFields = bytes => {
   return Array.from({ length: count }, (_, k) => table[view.getUint32(9 + 4 * k, true)]);
 };
 
+// Proposition: Lasm.Cli.Candidates.glue_request_fields
+//   ∀ lists : List (List String), requestFields (encodeRequest lists) = lists.flatten
 test('a request is a table of its distinct fields and their indices, or its fields with their lengths when one holds a 0 byte', () => {
   const bytes = encodeRequest([['op', 'λ'], [], ['', '12', 'op']]);
   assert.deepEqual([...bytes], [1, 4, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0,
