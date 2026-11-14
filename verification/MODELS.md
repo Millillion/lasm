@@ -34,14 +34,15 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**138 shipped modules**: 15 modelled, 25 pending, 98 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 25 modules still need a model.
+**138 shipped modules**: 16 modelled, 24 pending, 98 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 24 modules still need a model.
 
-### Modelled (15)
+### Modelled (16)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
 | [`library/c/lasm_js_framing.h`](../library/c/lasm_js_framing.h) | [JsFraming.lean](../verification/cli/Lasm/Cli/Model/JsFraming.lean) (lasm_js_read_event (and the glues' loop over a batch), `lasm_js_frame_request`, `lasm_js_frame_into`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the framing both Lasm.JS C glues share is modelled (events_read_back, request_read_back and into_read_back proved); the differential runs the header compiled as is and with a 32-bit size_t (test/models/js-framing-harness.c) |
 | [`native/process-launcher.c`](../native/process-launcher.c) | [ProcessLauncher.lean](../verification/cli/Lasm/Cli/Model/ProcessLauncher.lean) (main's reading of the configuration (number, string, read_exact); [cli-differential.mjs](../test/models/cli-differential.mjs)) | its reading of the configuration is modelled, and the differential runs the compiled C (effects reported instead of performed, test/models/process-launcher-harness.c); what it then does (stdio flags, chdir, setsid, execvp) is I/O, tested end to end by test/process-launcher.test.mjs |
+| [`src/application-reachability.mjs`](../src/application-reachability.mjs) | [Reachability.lean](../verification/cli/Lasm/Cli/Model/Reachability.lean) (`applicationLinkRequirements`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the linker map reader is modelled, its regular expressions as matchers (link_map_static_sound proved); readApplicationLinkRequirements feeds the same reader lines from a stream, canSpecializeInitialization is the list of audited runtimes, and the C sources are constants |
 | [`src/browser/static-server.mjs`](../src/browser/static-server.mjs) | [StaticServer.lean](../verification/cli/Lasm/Cli/Model/StaticServer.lean) (`resolveStaticPath`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | request resolution is modelled with node:path's POSIX normalize, join and extname and the file system a parameter (static_inside_root proved); on Windows node:path's win32 rules apply instead (test/static-server.test.mjs on the Windows job); the rest serves the resolved file over HTTP (headers, live reload) and listenError picks a message from a table |
 | [`src/cli-arguments.mjs`](../src/cli-arguments.mjs) | [CliArguments.lean](../verification/cli/Lasm/Cli/Model/CliArguments.lean) (`asciiLower`, `editDistance`, `closest`, `targetHint`, `parseLasmArguments`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole parser is modelled (run_args_kept, unknown_flag_refused, edit_distance_metric, closest_nearest_first, build_options_commute, parse_known_or_refused proved, the last with the parsers of lasm init, dev and package it hands to); existsSync is the environment and jsRuntime one of node, bun and deno |
 | [`src/edge/builtin-modules.mjs`](../src/edge/builtin-modules.mjs) | [BuiltinModules.lean](../verification/cli/Lasm/Cli/Model/BuiltinModules.lean) (`isBuiltinModule`, `builtinModuleClosure`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the closure is modelled, with the import forms it reads checked by the differential; `builtinModuleNames` and `builtinModuleFile` look a name up in the builtin directory (test/builtin-modules.test.mjs) |
@@ -56,7 +57,7 @@ How a module moves from pending to modelled:
 | [`src/wasi/lower-atomics.mjs`](../src/wasi/lower-atomics.mjs) | [LowerAtomics.lean](../verification/cli/Lasm/Cli/Model/LowerAtomics.lean) (`lowerAtomics`, `moduleImports`, `keepExports`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole module is modelled (lowerAtomics with its readers, moduleImports, keepExports); candidates lowering_rewrites_atomics, lowering_leaves_no_atomics and lowering_keeps_runs are stated over the model, the last two also over WebAssembly validation and execution (outside semantics) |
 | [`src/wasi/wasi-component.mjs`](../src/wasi/wasi-component.mjs) | [WasiComponent.lean](../verification/cli/Lasm/Cli/Model/WasiComponent.lean) (`replaceCoreModule`, `placeholderModule`, `componentize`, `makeTemplate`, `extractCore`, `withoutComponentType`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | every function is modelled (the template, read from component/proxy-template.wasm by default, is an argument); replace_one_core_module, drops_only_component_type and componentize_inverse proved |
 
-### Pending (25)
+### Pending (24)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -65,7 +66,6 @@ How a module moves from pending to modelled:
 | [`src/application-diagnosis.mjs`](../src/application-diagnosis.mjs) | [Mangle.lean](../verification/cli/Lasm/Cli/Model/Mangle.lean) (`mangleName`, `demangleName`, `initializerModule`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | Lean name mangling is modelled (mangle_round_trip proved of the model; the differential also checks it against Lean 4.35's own Name.mangle and Name.demangle); the diagnosis of ahead-of-time rejections (parseWhyExtract, archiveMembers, explainRejection, usedModules, declarationName) remains to model |
 | [`src/application-initialization.mjs`](../src/application-initialization.mjs) | — | runtime initialization planning (initializer pruning): a pure graph computation over the link's symbols |
 | [`src/application-live-members.mjs`](../src/application-live-members.mjs) | — | dev-profile fast link: which archive members wasm-ld keeps, a pure computation over symbol tables |
-| [`src/application-reachability.mjs`](../src/application-reachability.mjs) | — | reads the pinned LLD map: a pure parser of its text |
 | [`src/application-symbols.mjs`](../src/application-symbols.mjs) | — | symbol selection for weak COMDAT definitions: pure over symbol tables |
 | [`src/browser/bundle.mjs`](../src/browser/bundle.mjs) | — | an ES-module bundler for the loader: a pure text transformation |
 | [`src/dev.mjs`](../src/dev.mjs) | [Dev.lean](../verification/cli/Lasm/Cli/Model/Dev.lean) (`changedFiles`, `parseDevArguments`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | `lasm dev`: argument parsing and changedFiles are modelled; build scheduling remains to model; the rest watches files and runs builds |

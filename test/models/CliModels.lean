@@ -53,6 +53,9 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
   parseDevArguments   {"tokens": ["<hex>", …], "runtime": "node"}  → (the same)
   parsePackageArguments  ["<hex>", …]              → (the same)
   leanAtLeast    {"version": "<hex>", "minimum": "<hex>"}  → true | false
+  applicationLinkRequirements  {"map": "<hex>", "initFree": ["<hex>", …]}
+                                                    → {"error": "…"} | {"mode": "static" | "dynamic", "dynamic": ["<hex>", …],
+                                                       "cxxRuntime": […], "moduleData": […], "requiresModuleData": b}
   leanIOError    {"tables": {"messages": [[code, text], …], "crtAliases": [[code, code], …], "windowsCrtCases": [code, …]},
                   "platform": "…", "version": "…", "names": [[n, name], …],
                   "error": {"userError": b, "errno": n | null, "code": "…" | null, "crt": b}}
@@ -96,6 +99,7 @@ import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.LowerAtomics
 import Lasm.Cli.Model.Mangle
 import Lasm.Cli.Model.StaticServer
+import Lasm.Cli.Model.Reachability
 import Lean.Compiler.NameMangling
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
@@ -404,6 +408,14 @@ def answer (j : Json) : Except String Json := do
       | .str p s => parts p ++ [s]
       | .num p k => parts p ++ [toString k]
     return ofText (".".intercalate (parts (Name.demangle (← text input))))
+  | "applicationLinkRequirements" =>
+    let initFree ← texts (← input.getObjVal? "initFree")
+    let hexes := fun (l : List (List Char)) => toJson (l.map fun x => ofText (String.ofList x))
+    return match Reachability.applicationLinkRequirements (fun s => initFree.contains (String.ofList s))
+        (← text (← input.getObjVal? "map")).toList with
+      | .error e => Json.mkObj [("error", toJson e)]
+      | .ok r => Json.mkObj [("mode", toJson (if r.static then "static" else "dynamic")), ("dynamic", hexes r.dynamic),
+          ("cxxRuntime", hexes r.cxxRuntime), ("moduleData", hexes r.moduleData), ("requiresModuleData", toJson r.requiresModuleData)]
   | "leanIOError" =>
     let tables ← input.getObjVal? "tables"
     let pairs := fun (j : Json) => do (← j.getArr?).toList.mapM fun p => do

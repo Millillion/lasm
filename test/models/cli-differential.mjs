@@ -25,6 +25,7 @@ import { lakeName, packageName, parseInitArguments, supabaseFunctionNameOf } fro
 import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
+import { applicationLinkRequirements } from '../../src/application-reachability.mjs';
 import { ioErrorTables, leanAtLeast, leanIOError } from '../../src/lean-io-errors.mjs';
 import { demangleName, initializerModule, mangleName } from '../../src/application-diagnosis.mjs';
 import { comparePythonStrings, pythonJsonString } from '../../src/link-driver/python.mjs';
@@ -411,6 +412,25 @@ function staticRequest(r) {
   return { root, pathname, files, accepts, fallback };
 }
 
+/** A linker map: its header (or a near miss), CODE, rows of every shape the
+ * reader distinguishes (entry points, dynamic loaders, module-data APIs and
+ * near names, libleancpp members with each kind of section, on POSIX and
+ * Windows paths, and look-alikes), malformed rows, unusual white space. */
+function linkMap(r) {
+  const ws = () => r.pick([' ', ' ', '  ', '\t', '\u00a0', ' \u3000']);
+  const symbol = () => r.pick(['main', '__main_void', '__main_argc_argv', 'mainx', 'CODE', 'DATA', 'dlopen', 'dlsym', 'emscripten_dlopen',
+    'lasm_lookup_lean_symbol', 'lean_read_module_data', 'lean_write_module_data_x', 'lean_read_module_data_', 'lean_read_module_datax',
+    'l_Lean_findSysroot___boxed', 'l_Lean_initSearchPath', 'l_Lean_findSysroot__x', 'l_Std_foo', 'λ',
+    `${r.pick(['/r/', 'C:\\r\\', '', 'x', '/a/libleancpp.a(z.o)/'])}libleancpp.a(${r.pick(['a.o', 'b.o', 'Basic.o', '', 'c)d'])}):(${r.pick(['.text.f', 'f', 'g', '.rodata', '.rodata.str', '.rodatax',
+      '.data.rel.ro._ZTIfoo', '.data.rel.ro._ZTSfoo', '.data.rel.ro._ZTVbar', '.data.x', '', 'h)'])})${r.pick(['', '', ' x', ')'])}`,
+    '/r/libleancpp.a(x.o) without a section']);
+  const row = () => r.next() < 0.05 ? r.pick(['zz 1 2 x', '', '   ', '- 1 2', '-  1  2  \u2028', '1 2 3 \u2028x'])
+    : `${ws()}${r.next() < 0.03 ? 'g' : r.pick(['-', '1f', '0'])}${ws()}${r.next() < 0.03 ? 'x' : r.pick(['48', 'ab'])}${ws()}${r.pick(['600', '20'])}${ws()}${r.next() < 0.03 ? ' ' : symbol()}${r.next() < 0.03 ? ' ' : ''}`;
+  const header = r.next() < 0.95 ? '    Addr      Off     Size Out     In      Symbol' : r.pick(['Addr Off Size Out In Symbol', '', 'Address']);
+  const lines = [header, ...(r.next() < 0.9 ? ['       -       48      600 CODE'] : []), ...(r.next() < 0.7 ? ['       -       58       20                 main'] : []), ...r.array(r.int(0, 6), row)];
+  return { map: lines.join(r.next() < 0.05 ? '\r\n' : '\n') + r.pick(['\n', '', '\n  \n']), initFree: r.array(r.int(0, 3), () => r.pick(['f', 'g', '_ZTIfoo', '_ZTVbar', 'h'])) };
+}
+
 const models = [
   {
     name: 'editDistance', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
@@ -536,6 +556,17 @@ const models = [
     generate: mangledText,
     input: text => hex(text),
     js: text => hex(demangleName(text)),
+  },
+  {
+    name: 'applicationLinkRequirements', source: 'src/application-reachability.mjs', lean: 'Lasm.Cli.Model.Reachability',
+    generate: linkMap,
+    input: ({ map, initFree }) => ({ map: hex(map), initFree: initFree.map(hex) }),
+    js: ({ map, initFree }) => {
+      try {
+        const result = applicationLinkRequirements(map, { initializationFreeCppSymbols: new Set(initFree) });
+        return { ...result, dynamic: result.dynamic.map(hex), cxxRuntime: result.cxxRuntime.map(hex), moduleData: result.moduleData.map(hex) };
+      } catch (error) { return { error: error.message }; }
+    },
   },
   {
     name: 'leanIOError', source: 'src/lean-io-errors.mjs', lean: 'Lasm.Cli.Model.LeanIOErrors',

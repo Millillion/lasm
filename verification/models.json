@@ -158,8 +158,17 @@
       "reason": "release support constants"
     },
     "src/application-reachability.mjs": {
-      "status": "pending",
-      "reason": "reads the pinned LLD map: a pure parser of its text"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/Reachability.lean",
+          "functions": [
+            "applicationLinkRequirements"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "the linker map reader is modelled, its regular expressions as matchers (link_map_static_sound proved); readApplicationLinkRequirements feeds the same reader lines from a stream, canSpecializeInitialization is the list of audited runtimes, and the C sources are constants"
     },
     "src/application-runtime.mjs": {
       "status": "exempt",
