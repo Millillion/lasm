@@ -164,7 +164,9 @@ consumption: 1M bytes stack, 128MB heap", per execution) and Folio needs more fo
 other case fits in 128 MiB; the largest that passes on Viceroy, `![[]()` repeated (960,000
 characters), used 112 MB. Viceroy enforces the same 128 MiB ([its `Limiter`](https://github.com/fastly/Viceroy/blob/v0.21.1/src/linking.rs)),
 so over the limit it stops the instance (`INTERNAL PANIC: out of memory`, exit status 1) and
-answers 500. The body's size is not the limit (Fastly lists no request body limit, and the
+answers 500. After @lasm/cli 0.7.0 the Fastly build uses less memory (issue #246): unclosed `<!--`
+then passes on Viceroy at 127 MB, so its skip goes once Folio moves to that release; backticks still
+needs about 290 MiB. The body's size is not the limit (Fastly lists no request body limit, and the
 body is a few MB of the heap): the renderer's working set is. Reading the body as a stream would
 not help, since rendering needs the whole document. The skips and their reasons are in
 [`test/platforms.mjs`](test/platforms.mjs) (`pathologicalSkip`); `test/pathological.mjs --skip`

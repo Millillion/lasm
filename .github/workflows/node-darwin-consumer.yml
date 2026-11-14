@@ -24,7 +24,7 @@ on:
       # (application-support.json); installation-confidence passes it here.
       node-version:
         type: string
-        default: 26.13.0
+        default: 26.13.1
 permissions:
   contents: read
 jobs:
