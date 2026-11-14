@@ -160,7 +160,9 @@ async function checkProgram(seed, kind, list, ending) {
         console.log(`BROKEN ${kind} ${seed} ${name} on ${target}: does not build`);
         continue;
       }
-      const same = ['stdout', 'stderr'].every(k => v.unmap(got[k]) === expected[k]) && got.code === expected.code;
+      // Both sides are mapped: the original may print the prefix itself (a
+      // `Char.ofNat` can make a `ζ`), and then only the mapped texts agree.
+      const same = ['stdout', 'stderr'].every(k => v.unmap(got[k]) === v.unmap(expected[k])) && got.code === expected.code;
       if (same) continue;
       const repro = join(work, 'repros', `${kind}-${seed}-${name}-${target}`);
       mkdirSync(repro, { recursive: true });
