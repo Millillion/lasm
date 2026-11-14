@@ -7,6 +7,8 @@ import assert from 'node:assert/strict';
 import { decodeFields, encodeFields, glueModule, runGlue } from '../src/glue/glue.mjs';
 import { forAll } from './helpers/property.mjs';
 
+// Proposition: Lasm.Cli.Candidates.glue_fields_round_trip
+//   ∀ fields : List String, decodeFields (encodeFields fields) = .ok fields
 test('fields round-trip through the codec, whatever their text', () => {
   forAll(g => g.array(g.int(0, 6), () => g.string('ab:0λ\n\\', 0, 8)), fields => {
     const encoded = encodeFields(fields);

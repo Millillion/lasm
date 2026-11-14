@@ -1,6 +1,6 @@
 # M6: the CLI's pure glue in Lean, compiled by Lasm
 
-Status: **first slice in progress (2026-11-14).** Milestone M6 of
+Status: **first slice implemented (2026-11-14, PR #286), measured against the bar below.** Milestone M6 of
 [IRREDUCIBLE.md](IRREDUCIBLE.md#6-recommended-incremental-path): move the pure
 glue into Lean, compiled by Lasm, and delete the JavaScript copies, so that
 each move removes a model differential, because the model is the code. This
@@ -39,8 +39,10 @@ adds `Lasm/Cli/Fast/EdgeInitializers.lean`: the same functions over
 `Std.HashMap` and `Std.HashSet`, with theorems that they equal the model's,
 registered as `@[csimp]`. Lean's compiler then compiles every call of the
 model's `compactInitializerWrappers` to the fast one, so the program the CLI
-runs is the model as compiled, by a proved rewrite (14 to 32 ms natively on
-the same plans). The proofs are checked with the others (`library-proofs`).
+runs is the model as compiled, by a proved rewrite. A third `csimp` theorem
+replaces the model's name check, which copies each name's characters five
+times, by one that reads them once. Natively the whole generator then takes
+3.2 ms on the web template's plan size. The proofs are checked with the others (`library-proofs`).
 
 ## 2. How the CLI runs it
 
@@ -97,4 +99,33 @@ here and the JavaScript stays.
 
 ## 4. Results
 
-To be filled from the glue workflow's measurement job.
+Measured by `scripts/glue/measure.mjs` (the `glue` workflow's last steps;
+synthetic plans shaped like real ones, `scripts/glue/plans.mjs`), against
+main's JavaScript. Locally (Node 24.22.1, linux-x64, 2026-11-14):
+
+| Plan (initializers, kept) | Cold, glue | Cold, JavaScript | Warm, glue | Warm, JavaScript |
+| --- | ---: | ---: | ---: | ---: |
+| 2807, 6 | 68.0 ms | 5.9 ms | 23.8 ms | 1.3 ms |
+| 2807, 50 | 76.5 ms | 12.5 ms | 24.7 ms | 4.5 ms |
+| 8000, 200 | 132.7 ms | 24.2 ms | 62.5 ms | 9.5 ms |
+
+- **Start-up:** unchanged (`lasm --version` and `lasm --help` within noise of
+  main: nothing loaded at start imports the glue).
+- **Link cost:** within the bar, but not by much. A call costs about 20 ms
+  more than the JavaScript warm and 60 ms cold on the web template's plan
+  size, once per edge or browser link (which takes seconds). Of a warm call,
+  about 3 ms is instantiating the program (the Lean runtime and its 16 MiB
+  memory) and about 15 ms is the compiled Lean, about 5 times slower than the
+  same Lean compiled natively (3.2 ms): the WASI build is size-optimized
+  (`-Oz`) and lowered from memory64. The first version took 34 ms warm; the
+  request encoding (one string instead of a Buffer per field) and the fast
+  name check brought it to 24.
+- **Size:** `lasm-glue.wasm` is 648,488 bytes, 163,005 gzipped, plus 2 KiB
+  for `glue.mjs` and the notices: within the 300 KiB bar. Later slices
+  share the runtime.
+- **Correctness and mutation:** see the PR's checks (unit, `cli-models`,
+  `library-proofs`, `mutation`, `glue` under Node, Bun and Deno).
+
+What would make the next slices cheaper: a WASI build optimized for speed
+(`-O2`) for the glue, and one instance reused across calls (a reactor
+instead of a command), which would remove the 3 ms per call.
