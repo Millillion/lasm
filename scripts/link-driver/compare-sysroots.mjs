@@ -16,7 +16,7 @@ import { pipeline } from 'node:stream/promises';
 import { createZstdDecompress } from 'node:zlib';
 import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
-import { Parser } from 'tar';
+import { parseTar } from '../../src/tar.mjs';
 
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 
@@ -45,19 +45,12 @@ export function arMembers(bytes) {
 }
 
 async function readArchive(file) {
-  const files = new Map(), writes = [];
-  const parser = new Parser({ strict: true });
-  parser.on('entry', entry => {
-    if (entry.type !== 'File') { entry.resume(); return; }
-    const chunks = [];
-    const path = entry.path.split('/').slice(1).join('/');
-    writes.push(new Promise((resolve, reject) => {
-      entry.on('data', chunk => chunks.push(chunk)); entry.on('end', () => { files.set(path, Buffer.concat(chunks)); resolve(); });
-      entry.on('error', reject);
-    }));
-  });
-  await pipeline(createReadStream(file), createZstdDecompress(), parser);
-  await Promise.all(writes);
+  const files = new Map();
+  await pipeline(createReadStream(file), createZstdDecompress(), parseTar(entry => {
+    if (entry.type !== 'File') return;
+    const chunks = [], path = entry.path.split('/').slice(1).join('/');
+    return { data: chunk => chunks.push(chunk), end: () => files.set(path, Buffer.concat(chunks)) };
+  }));
   return files;
 }
 

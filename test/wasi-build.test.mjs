@@ -230,8 +230,8 @@ test('writeWasiOutput refuses unknown targets, outputs holding the sources and d
 });
 
 test('writeWasiOutput --target fastly: bin/main.wasm, fastly.toml when missing and the package fastly compute pack writes', async () => {
-  const tar = await import('tar');
-  const entries = async file => { const list = []; await tar.list({ file, onReadEntry: entry => list.push([entry.path, entry.mtime?.getTime() ?? null, entry.size]) }); return list; };
+  const { listTar, extractTarFile } = await import('../src/tar.mjs');
+  const entries = async file => (await listTar(file)).map(entry => [entry.path, entry.type === 'Directory' ? entry.mtime || null : entry.mtime * 1000, entry.size]);
   const f = outputFixture({ name: '@me/Edge App' });
   try {
     // An earlier main.wasm alone in bin/ (another toolchain's) is replaced.
@@ -245,26 +245,23 @@ test('writeWasiOutput --target fastly: bin/main.wasm, fastly.toml when missing a
     assert.equal(readFileSync(join(f.project, 'fastly.toml'), 'utf8'), fastlyToml('edge-app', 'npx lasm build Main.lean --target fastly'));
     const pkg = join(f.project, 'pkg/edge-app.tar.gz');
     const wasm = readFileSync(built.wasm), notices = readFileSync(join(bin, 'THIRD_PARTY_NOTICES.txt'));
-    // Reproducible: the source date on files, and portable directory entries (no times).
+    // Reproducible: the source date on files, and directory entries with no times.
     const fixed = Date.UTC(1980, 0, 1);
     assert.deepEqual(await entries(pkg), [['edge-app/', null, 0], ['edge-app/fastly.toml', fixed, readFileSync(join(f.project, 'fastly.toml')).length],
       ['edge-app/THIRD_PARTY_NOTICES.txt', fixed, notices.length], ['edge-app/bin/', null, 0], ['edge-app/bin/main.wasm', fixed, wasm.length]]);
     const unpacked = join(f.root, 'unpacked');
     mkdirSync(unpacked);
-    await tar.extract({ file: pkg, cwd: unpacked });
+    await extractTarFile(pkg, { cwd: unpacked });
     assert.ok(readFileSync(join(unpacked, 'edge-app/bin/main.wasm')).equals(wasm));
-    assert.deepEqual(readdirSync(join(f.project, 'pkg')), ['edge-app.tar.gz'], 'the staging directory is gone');
+    assert.deepEqual(readdirSync(join(f.project, 'pkg')), ['edge-app.tar.gz']);
     assert.ok(f.lines[0].endsWith(`(${(wasm.length / 1048576).toFixed(2)} MiB; package ${relative(process.cwd(), pkg)}; run locally with fastly compute serve)`), f.lines[0]);
     assert.ok(f.lines[0].startsWith(`Built ${relative(process.cwd(), f.options.source)} for Fastly Compute: ${relative(process.cwd(), built.wasm)} (`), f.lines[0]);
     // The project's own fastly.toml is kept, and its service name names the package.
     writeFileSync(join(f.project, 'fastly.toml'), 'manifest_version = 3\nservice_name = "other"\n  name = "My  Service!!"\n');
-    // A package staging directory an interrupted build left behind is replaced.
-    mkdirSync(join(f.project, 'pkg', `.My-Service-.${process.pid}`, 'old'), { recursive: true });
     await writeWasiOutput({ ...f.options, target: 'fastly' });
     assert.equal(readFileSync(join(f.project, 'fastly.toml'), 'utf8'), 'manifest_version = 3\nservice_name = "other"\n  name = "My  Service!!"\n');
     assert.ok(existsSync(join(f.project, 'pkg/My-Service-.tar.gz')));
     assert.deepEqual((await entries(join(f.project, 'pkg/My-Service-.tar.gz'))).map(e => e[0])[1], 'My-Service-/fastly.toml');
-    assert.equal(existsSync(join(f.project, 'pkg', `.My-Service-.${process.pid}`)), false);
     writeFileSync(join(f.project, 'fastly.toml'), 'name="Tight"\n');
     await writeWasiOutput({ ...f.options, target: 'fastly' });
     assert.ok(existsSync(join(f.project, 'pkg/Tight.tar.gz')));

@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
-import { c as createTar } from 'tar';
+import { directoryEntries, writeTar } from '../src/tar.mjs';
 import { provisionArtifact } from '../src/managed-artifacts.mjs';
 
 const posix = process.platform !== 'win32';
@@ -21,7 +21,7 @@ async function fixture(t, format, behaviour) {
   await mkdir(join(base, 'source/install/bin'), { recursive: true });
   await writeFile(join(base, 'source/install/bin/tool'), 'decoded tool');
   await writeFile(join(base, 'source/install/NOTICE'), 'notice');
-  await createTar({ cwd: join(base, 'source'), file: join(base, 'stream.tar'), portable: true }, ['install']);
+  await writeTar(join(base, 'stream.tar'), directoryEntries(join(base, 'source'), ['install']));
   // The "archive" the catalog pins: any bytes; the stand-in decoder ignores them.
   const bytes = Buffer.from(`pretend ${format} archive`);
   const python = join(base, 'python3');
@@ -89,7 +89,7 @@ test('the decoder\'s entries pass the same safety checks', { skip: !posix }, asy
   const f = await fixture(t, 'zip', 'cat STREAM');
   await mkdir(join(f.base, 'source/install/sub'), { recursive: true });
   await writeFile(join(f.base, 'escape'), 'x');
-  await createTar({ cwd: f.base, file: join(f.base, 'stream.tar'), portable: true, preservePaths: true }, ['source/install', 'escape']);
+  await writeTar(join(f.base, 'stream.tar'), directoryEntries(f.base, ['source/install', 'escape']));
   await assert.rejects(provisionArtifact(f.artifact, f.options), /Unsafe or duplicate archive entry/);
   assert.deepEqual(await readdir(join(f.cache, 'artifacts')), []);
 });
