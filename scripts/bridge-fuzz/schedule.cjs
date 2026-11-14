@@ -59,11 +59,29 @@ function install() {
     const r = random();
     if (r >= rate) return;
     if (r < rate / 2) { const until = performance.now() + random() * 0.2; while (performance.now() < until); }
-    else {
-      const requested = random() * 2, started = performance.now();
-      A.wait(nap, 0, 0, requested);
-      account(0, requested, performance.now() - started);
-    }
+    else sleep(random() * 2);
+  }
+  // A nap or a late resolution takes the time it asks for, on average, on every
+  // platform. A sub-millisecond timed wait or timer takes far longer than asked
+  // outside Linux: the js-interop program's ~7,200 naps per run asked for 7.2 s
+  // and took 7.6 s on ubuntu-24.04, 52.8 s on macos-15 and 82 s on
+  // windows-2025 (its ~450 late resolutions: 0.7 s asked, 1.0 / 2.4 / 7.3 s
+  // taken), so every fuzzed run there failed its 5 s fan-out bound or hit the
+  // 60 s run timeout. This thread's oversleep is a debt the next delays pay
+  // first: a delay the debt covers is not slept. The generator's decisions are
+  // unchanged.
+  let debt = 0;
+  function owed(requested) {
+    const want = requested - debt;
+    if (want <= 0) { debt = -want; return 0; }
+    debt = 0;
+    return want;
+  }
+  const repay = (want, taken) => { debt += Math.max(0, taken - want); };
+  function sleep(requested) {
+    const want = owed(requested), started = performance.now();
+    if (want > 0) { A.wait(nap, 0, 0, want); repay(want, performance.now() - started); }
+    account(0, requested, performance.now() - started);
   }
   if (isMainThread && delays) process.on('exit', () => {
     const ms = i => (Number(A.load(delays, i)) / 1000).toFixed(0);
@@ -171,8 +189,9 @@ function install() {
     if (fuzz && result.async && random() < rate) {
       const delay = random() * 3;
       return { async: true, value: result.value.then(v => new Promise(done => {
-        const started = performance.now();
-        setTimeout(() => { account(3, delay, performance.now() - started); done(v); }, delay);
+        const want = owed(delay), started = performance.now();
+        if (want <= 0) { account(3, delay, 0); done(v); return; }
+        setTimeout(() => { const taken = performance.now() - started; repay(want, taken); account(3, delay, taken); done(v); }, want);
       })) };
     }
     return result;
