@@ -103,9 +103,20 @@ abbrev Reader := StateT Nat (Except String)
 @[inline] def text (f : Array String) : Reader String := fun i =>
   if h : i < f.size then .ok (f[i], i + 1) else .error "input ends before a field"
 
+/-- A count as the host writes it: decimal digits, read byte by byte. -/
+def decimal? (s : String) : Option Nat :=
+  if s.isEmpty then none else go 0 0
+where
+  go (i n : Nat) : Option Nat :=
+    if h : i < s.utf8ByteSize then
+      let b := s.getUTF8Byte ⟨i⟩ (by simpa [String.Pos.Raw.lt_iff] using h)
+      if 48 ≤ b && b ≤ 57 then go (i + 1) (n * 10 + (b - 48).toNat) else none
+    else some n
+  termination_by s.utf8ByteSize - i
+
 /-- The next field as a count. -/
 @[inline] def count (f : Array String) : Reader Nat := do
-  match (← text f).toNat? with
+  match decimal? (← text f) with
   | some n => return n
   | none => throw "a count is not a number"
 

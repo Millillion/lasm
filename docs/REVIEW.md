@@ -604,6 +604,21 @@ docstrings, the propositions and the names.
   - The README's command table ([README.md](../README.md)) and the usage text in [src/cli-arguments.mjs](../src/cli-arguments.mjs).
 - [ ] `npm create @lasm`, `bun create @lasm` and `deno run -A npm:@lasm/create`: [packages/create-lasm](../packages/create-lasm).
 - [ ] The Vite plugin export `@lasm/cli/vite`: [src/vite/index.d.ts](../src/vite/index.d.ts).
+- [ ] **Proposed, not built: a WASI reactor build, for the CLI's glue (M6).** The glue
+  program ([proposals/M6_GLUE.md](proposals/M6_GLUE.md)) is a WASI command, so every
+  call instantiates it again and reruns Lean's runtime and module initialization
+  before its own work (REACTOR_COST, see M6_GLUE.md §4). A reactor pays that once per
+  process. The proposed shape adds no Lean API at all: `lasm build Main.lean --target wasi --reactor`
+  (or a target `wasi-reactor`) builds the same program, with `main : IO Unit` unchanged,
+  as a module that exports `_initialize` (the runtime and module initializers, once)
+  and `lasm_run` (runs `main` again: stdin is the bytes the host gives it, stdout and
+  the exit status are returned as now). The host calls `_initialize` once and
+  `lasm_run` per call. The glue would switch to it in the release after it ships
+  (it is built by the pinned published CLI). Alternatives considered: exporting
+  `@[export]` Lean functions with a byte-buffer ABI (a new attribute and calling
+  convention to review); calling `_start` again on the same instance (WASI forbids
+  it and Lean's runtime initializes twice). Your call: whether to add the flag, and
+  its name.
 - [ ] **`lasm init -t fullstack` refuses the function platforms** (issue #168). `--deploy lambda`, `lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` with `--template fullstack` used to write a broken project (a `build:undefined` script, no `vercel.json`/`netlify.toml`/`Dockerfile.lambda`, no platform dependency). Claude chose to refuse them (fewer combinations to keep working before 1.0): the message names the templates the target takes and the targets the template takes, for example "--deploy lambda supports the express, hono, fastify, std-http and fetch templates, not fullstack. The fullstack template supports --deploy workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi-http, spin". The other server templates keep every function platform. If you would rather support them, each needs its platform files, the client build in the package, README text and a CI deploy test ([src/init.mjs](../src/init.mjs), `deployTargets`).
 
 ## 3. User-facing text that changed recently
