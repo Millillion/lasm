@@ -79,14 +79,22 @@ export function startDevProxy({ port, host = '127.0.0.1', upstreamPort }) {
   const forward = (request, response, body, attempt = 0) => {
     const headers = { ...request.headers, host: `127.0.0.1:${upstreamPort}` };
     delete headers['accept-encoding'];
+    let answered = false;
     const upstream = httpRequest({ host: '127.0.0.1', port: upstreamPort, method: request.method, path: request.url, headers }, reply => {
+      answered = true;
+      // A server that stops mid-reply (killed for a rebuild, or a crash) cuts
+      // the client's response too, instead of leaving it open for ever.
+      reply.on('error', () => {});
+      reply.on('close', () => { if (!reply.complete) response.destroy(); });
       const type = String(reply.headers['content-type'] ?? '');
       if (/^text\/html/.test(type) && request.method !== 'HEAD') {
         const chunks = [];
         reply.on('data', c => chunks.push(c));
         reply.on('end', () => {
-          const html = Buffer.concat(chunks).toString('utf8');
-          const out = html.includes('</body>') ? html.replace('</body>', reloadClient + '\n</body>') : html + reloadClient;
+          // Bytes, not text: a page in another charset than UTF-8 keeps its bytes.
+          const page = Buffer.concat(chunks), at = page.indexOf('</body>');
+          const out = at < 0 ? Buffer.concat([page, Buffer.from(reloadClient)])
+            : Buffer.concat([page.subarray(0, at), Buffer.from(reloadClient + '\n'), page.subarray(at)]);
           const h = { ...reply.headers, 'cache-control': 'no-store' };
           delete h['content-length']; delete h['content-encoding'];
           response.writeHead(reply.statusCode, h).end(out);
@@ -96,11 +104,17 @@ export function startDevProxy({ port, host = '127.0.0.1', upstreamPort }) {
         reply.pipe(response);
       }
     });
-    upstream.on('error', () => {
-      // The server is (re)starting: wait for it, then fail with a page that reloads when it is back.
-      if (attempt < 100) setTimeout(() => forward(request, response, body, attempt + 1), 100);
+    upstream.on('error', error => {
+      // The server is (re)starting: wait for it, then fail with a page that
+      // reloads when it is back. Only a refused connection is retried: the
+      // server never saw the request. Any other failure (a malformed reply, a
+      // connection reset after the request was sent) is a 502 at once, so a
+      // request the server received is never sent twice.
+      if (answered) response.destroy();
+      else if (error?.code === 'ECONNREFUSED' && attempt < 100) setTimeout(() => forward(request, response, body, attempt + 1), 100);
       else if (!response.headersSent) response.writeHead(502, { 'content-type': 'text/html; charset=utf-8' })
         .end(`<!doctype html><title>lasm dev</title><p>The server is not running (see the terminal).</p>${reloadClient}`);
+      else response.destroy();
     });
     upstream.end(body);
   };

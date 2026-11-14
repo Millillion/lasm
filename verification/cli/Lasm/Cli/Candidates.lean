@@ -82,6 +82,37 @@ def static_inside_root : Prop :=
     (staticServe root path).1 ∈ [200, 403, 404] ∧
     ∀ f, (staticServe root path).2 = some f → f.startsWith (root ++ "/")
 
+/-- **The proxy sends each request to the server program once, unchanged.**
+Whatever the server program then does, it receives the request exactly
+once, with the same method, target and body, its own address as Host, no
+Accept-Encoding (so a page arrives uncompressed and can be rewritten), and
+every other header's value. A request is never sent again once the program
+may have seen it; only a refused connection is retried.
+Tested by: test/fuzz/targets/dev-proxy.mjs -/
+def dev_proxy_forwards_once : Prop :=
+  ∀ (r : HttpRequest) (u : Upstream), PlainHeaders r.headers → r.target ≠ "/__lasm/events" →
+    ∃ s, (devProxy r u).1 = [s] ∧ s.method = r.method ∧ s.target = r.target ∧ s.body = r.body ∧
+      s.header? "host" = some devUpstreamHost ∧ s.header? "accept-encoding" = none ∧
+      ∀ h v, h ≠ "accept-encoding" → r.header? h = some v → s.header? h = some v
+
+/-- **A whole reply reaches the client whole.** Its status and headers
+(a page's `Cache-Control` is `no-store`), and its body byte for byte, or a
+page's with the reload client inserted (`relayedBody`), in any charset.
+Tested by: test/fuzz/targets/dev-proxy.mjs -/
+def dev_proxy_relays_reply : Prop :=
+  ∀ (r : HttpRequest) (a : HttpReply), PlainHeaders r.headers → PlainHeaders a.headers → r.target ≠ "/__lasm/events" →
+    ∃ c, (devProxy r (.answers a)).2 = .reply c ∧ c.status = a.status ∧ c.body = relayedBody r a ∧
+      (isPage r a = true → c.header? "cache-control" = some "no-store") ∧
+      ∀ h v, a.header? h = some v → (isPage r a = false ∨ h ≠ "cache-control") → c.header? h = some v
+
+/-- **No response is left open.** When the server program stops before its
+reply ends, the client's response ends cut too; a malformed reply is a 502
+or a cut connection, at once.
+Tested by: test/fuzz/targets/dev-proxy.mjs, test/dev-proxy.test.mjs -/
+def dev_proxy_ends_failed_replies : Prop :=
+  ∀ (r : HttpRequest) (u : Upstream), u = .cut ∨ u = .malformed → r.target ≠ "/__lasm/events" →
+    (devProxy r u).2 = .cut ∨ ∃ page, (devProxy r u).2 = .reply page ∧ page.status = 502 ∧ u = .malformed
+
 /-! ## Downloads -/
 
 /-- **Retry delays stay within 75–100 % of the backoff.** For every attempt
