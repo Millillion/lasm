@@ -1,0 +1,2247 @@
+{
+ "exchanges": [
+  {
+   "request": {
+    "method": "GET",
+    "path": "/.well-known/openid-configuration",
+    "headers": [
+     "accept: application/json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"issuer\":\"<issuer>\",\"authorization_endpoint\":\"<issuer>/authorize\",\"token_endpoint\":\"<issuer>/token\",\"userinfo_endpoint\":\"<issuer>/userinfo\",\"jwks_uri\":\"<issuer>/jwks\",\"end_session_endpoint\":\"<issuer>/logout\",\"scopes_supported\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"response_types_supported\":[\"code\"],\"response_modes_supported\":[\"query\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"subject_types_supported\":[\"public\"],\"id_token_signing_alg_values_supported\":[\"ES256\",\"EdDSA\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_basic\",\"client_secret_post\",\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\",\"select_account\"],\"claims_supported\":[\"sub\",\"iss\",\"aud\",\"exp\",\"iat\",\"auth_time\",\"nonce\",\"sid\",\"name\",\"preferred_username\",\"email\",\"email_verified\"],\"authorization_response_iss_parameter_supported\":true,\"claims_parameter_supported\":false,\"request_parameter_supported\":false,\"request_uri_parameter_supported\":false,\"require_request_uri_registration\":false}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&scope=openid+profile+email+offline_access&code_challenge=<r#1>&code_challenge_method=S256&state=<r#2>&nonce=<r#3>&client_id=basic-es256&response_type=code",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#4>",
+     "set-cookie: porter_interaction=<r#4>; Path=/interaction; Max-Age=600; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#4>",
+    "headers": [
+     "cookie: porter_interaction=<r#4>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Sign in</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Sign in</h1><p>to continue to <strong>Basic ES256</strong></p><form method=\"post\" action=\"/interaction/<r#4>/login\"><label>Username <input name=\"username\" autocomplete=\"username\" required autofocus></label><label>Password <input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label><button type=\"submit\">Sign in</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;login&quot;,&quot;interaction&quot;:&quot;<r#4>&quot;,&quot;client&quot;:&quot;Basic ES256&quot;,&quot;failed&quot;:false}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#4>/login",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#4>"
+    ],
+    "body": "username=alice&password=wonderland"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#4>",
+     "set-cookie: porter_session=<r#5>; Path=/; Max-Age=28800; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#4>",
+    "headers": [
+     "cookie: porter_interaction=<r#4>; porter_session=<r#5>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Allow access</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Allow Basic ES256?</h1><p>Signed in as <strong>Alice Liddell</strong>. Basic ES256 asks to:</p><ul><li>Sign you in (your user id)</li><li>Your name and username</li><li>Your email address</li><li>Stay signed in to the application (a refresh token)</li></ul><form method=\"post\" action=\"/interaction/<r#4>/consent\"><button type=\"submit\" name=\"decision\" value=\"allow\">Allow</button><button type=\"submit\" name=\"decision\" value=\"deny\" class=\"secondary\">Deny</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;consent&quot;,&quot;interaction&quot;:&quot;<r#4>&quot;,&quot;client&quot;:&quot;Basic ES256&quot;,&quot;user&quot;:&quot;Alice Liddell&quot;,&quot;scopes&quot;:[{&quot;scope&quot;:&quot;openid&quot;,&quot;text&quot;:&quot;Sign you in (your user id)&quot;},{&quot;scope&quot;:&quot;profile&quot;,&quot;text&quot;:&quot;Your name and username&quot;},{&quot;scope&quot;:&quot;email&quot;,&quot;text&quot;:&quot;Your email address&quot;},{&quot;scope&quot;:&quot;offline_access&quot;,&quot;text&quot;:&quot;Stay signed in to the application (a refresh token)&quot;}]}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#4>/consent",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#4>; porter_session=<r#5>"
+    ],
+    "body": "decision=allow"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/cb?code=<r#6>&state=<r#2>&iss=<issuer>",
+     "set-cookie: porter_interaction=; Path=/interaction; Max-Age=0; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "authorization: Basic YmFzaWMlMkRlczI1NjpiYXNpYyUyRGVzMjU2JTJEc2VjcmV0",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&code=<r#6>&code_verifier=<r#7>&grant_type=authorization_code"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#8>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'ES256','kid':'<r#9>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'basic-es256','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#10>','nonce':'<r#3>'} sig:86>\",\"scope\":\"openid profile email offline_access\",\"refresh_token\":\"<r#11>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/jwks",
+    "headers": [
+     "accept: application/json, application/jwk-set+json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"keys\":[{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"<r#12>\",\"y\":\"<r#13>\",\"kid\":\"<r#9>\",\"alg\":\"ES256\",\"use\":\"sig\"},{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"<r#14>\",\"kid\":\"<r#15>\",\"alg\":\"EdDSA\",\"use\":\"sig\"}]}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/jwks",
+    "headers": [
+     "accept: application/json, application/jwk-set+json",
+     "user-agent: jose/v6.2.12"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"keys\":[{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"<r#12>\",\"y\":\"<r#13>\",\"kid\":\"<r#9>\",\"alg\":\"ES256\",\"use\":\"sig\"},{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"<r#14>\",\"kid\":\"<r#15>\",\"alg\":\"EdDSA\",\"use\":\"sig\"}]}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#8>",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761001\",\"name\":\"Alice Liddell\",\"preferred_username\":\"alice\",\"email\":\"alice@example.com\",\"email_verified\":true}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "authorization: Basic YmFzaWMlMkRlczI1NjpiYXNpYyUyRGVzMjU2JTJEc2VjcmV0",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "refresh_token=<r#11>&grant_type=refresh_token"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#16>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'ES256','kid':'<r#9>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'basic-es256','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#10>'} sig:86>\",\"scope\":\"openid profile email offline_access\",\"refresh_token\":\"<r#17>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#16>",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761001\",\"name\":\"Alice Liddell\",\"preferred_username\":\"alice\",\"email\":\"alice@example.com\",\"email_verified\":true}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "authorization: Basic YmFzaWMlMkRlczI1NjpiYXNpYyUyRGVzMjU2JTJEc2VjcmV0",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "scope=openid&refresh_token=<r#17>&grant_type=refresh_token"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#18>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'ES256','kid':'<r#9>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'basic-es256','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#10>'} sig:86>\",\"scope\":\"openid\",\"refresh_token\":\"<r#19>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#18>",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761001\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/.well-known/openid-configuration",
+    "headers": [
+     "accept: application/json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"issuer\":\"<issuer>\",\"authorization_endpoint\":\"<issuer>/authorize\",\"token_endpoint\":\"<issuer>/token\",\"userinfo_endpoint\":\"<issuer>/userinfo\",\"jwks_uri\":\"<issuer>/jwks\",\"end_session_endpoint\":\"<issuer>/logout\",\"scopes_supported\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"response_types_supported\":[\"code\"],\"response_modes_supported\":[\"query\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"subject_types_supported\":[\"public\"],\"id_token_signing_alg_values_supported\":[\"ES256\",\"EdDSA\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_basic\",\"client_secret_post\",\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\",\"select_account\"],\"claims_supported\":[\"sub\",\"iss\",\"aud\",\"exp\",\"iat\",\"auth_time\",\"nonce\",\"sid\",\"name\",\"preferred_username\",\"email\",\"email_verified\"],\"authorization_response_iss_parameter_supported\":true,\"claims_parameter_supported\":false,\"request_parameter_supported\":false,\"request_uri_parameter_supported\":false,\"require_request_uri_registration\":false}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&scope=openid+profile+email+offline_access&code_challenge=<r#20>&code_challenge_method=S256&state=<r#21>&nonce=<r#22>&client_id=post-eddsa&response_type=code",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#23>",
+     "set-cookie: porter_interaction=<r#23>; Path=/interaction; Max-Age=600; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#23>",
+    "headers": [
+     "cookie: porter_interaction=<r#23>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Sign in</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Sign in</h1><p>to continue to <strong>Post EdDSA</strong></p><form method=\"post\" action=\"/interaction/<r#23>/login\"><label>Username <input name=\"username\" autocomplete=\"username\" required autofocus></label><label>Password <input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label><button type=\"submit\">Sign in</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;login&quot;,&quot;interaction&quot;:&quot;<r#23>&quot;,&quot;client&quot;:&quot;Post EdDSA&quot;,&quot;failed&quot;:false}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#23>/login",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#23>"
+    ],
+    "body": "username=alice&password=wonderland"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#23>",
+     "set-cookie: porter_session=<r#24>; Path=/; Max-Age=28800; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#23>",
+    "headers": [
+     "cookie: porter_interaction=<r#23>; porter_session=<r#24>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Allow access</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Allow Post EdDSA?</h1><p>Signed in as <strong>Alice Liddell</strong>. Post EdDSA asks to:</p><ul><li>Sign you in (your user id)</li><li>Your name and username</li><li>Your email address</li><li>Stay signed in to the application (a refresh token)</li></ul><form method=\"post\" action=\"/interaction/<r#23>/consent\"><button type=\"submit\" name=\"decision\" value=\"allow\">Allow</button><button type=\"submit\" name=\"decision\" value=\"deny\" class=\"secondary\">Deny</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;consent&quot;,&quot;interaction&quot;:&quot;<r#23>&quot;,&quot;client&quot;:&quot;Post EdDSA&quot;,&quot;user&quot;:&quot;Alice Liddell&quot;,&quot;scopes&quot;:[{&quot;scope&quot;:&quot;openid&quot;,&quot;text&quot;:&quot;Sign you in (your user id)&quot;},{&quot;scope&quot;:&quot;profile&quot;,&quot;text&quot;:&quot;Your name and username&quot;},{&quot;scope&quot;:&quot;email&quot;,&quot;text&quot;:&quot;Your email address&quot;},{&quot;scope&quot;:&quot;offline_access&quot;,&quot;text&quot;:&quot;Stay signed in to the application (a refresh token)&quot;}]}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#23>/consent",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#23>; porter_session=<r#24>"
+    ],
+    "body": "decision=allow"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/cb?code=<r#25>&state=<r#21>&iss=<issuer>",
+     "set-cookie: porter_interaction=; Path=/interaction; Max-Age=0; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&code=<r#25>&code_verifier=<r#26>&grant_type=authorization_code&client_id=post-eddsa&client_secret=post-eddsa-secret"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#27>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'EdDSA','kid':'<r#15>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'post-eddsa','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#28>','nonce':'<r#22>'} sig:86>\",\"scope\":\"openid profile email offline_access\",\"refresh_token\":\"<r#29>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/jwks",
+    "headers": [
+     "accept: application/json, application/jwk-set+json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"keys\":[{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"<r#12>\",\"y\":\"<r#13>\",\"kid\":\"<r#9>\",\"alg\":\"ES256\",\"use\":\"sig\"},{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"<r#14>\",\"kid\":\"<r#15>\",\"alg\":\"EdDSA\",\"use\":\"sig\"}]}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#27>",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761001\",\"name\":\"Alice Liddell\",\"preferred_username\":\"alice\",\"email\":\"alice@example.com\",\"email_verified\":true}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "refresh_token=<r#29>&grant_type=refresh_token&client_id=post-eddsa&client_secret=post-eddsa-secret"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#30>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'EdDSA','kid':'<r#15>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'post-eddsa','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#28>'} sig:86>\",\"scope\":\"openid profile email offline_access\",\"refresh_token\":\"<r#31>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#30>",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761001\",\"name\":\"Alice Liddell\",\"preferred_username\":\"alice\",\"email\":\"alice@example.com\",\"email_verified\":true}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "scope=openid&refresh_token=<r#31>&grant_type=refresh_token&client_id=post-eddsa&client_secret=post-eddsa-secret"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#32>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'EdDSA','kid':'<r#15>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'post-eddsa','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#28>'} sig:86>\",\"scope\":\"openid\",\"refresh_token\":\"<r#33>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#32>",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761001\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/.well-known/openid-configuration",
+    "headers": [
+     "accept: application/json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"issuer\":\"<issuer>\",\"authorization_endpoint\":\"<issuer>/authorize\",\"token_endpoint\":\"<issuer>/token\",\"userinfo_endpoint\":\"<issuer>/userinfo\",\"jwks_uri\":\"<issuer>/jwks\",\"end_session_endpoint\":\"<issuer>/logout\",\"scopes_supported\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"response_types_supported\":[\"code\"],\"response_modes_supported\":[\"query\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"subject_types_supported\":[\"public\"],\"id_token_signing_alg_values_supported\":[\"ES256\",\"EdDSA\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_basic\",\"client_secret_post\",\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\",\"select_account\"],\"claims_supported\":[\"sub\",\"iss\",\"aud\",\"exp\",\"iat\",\"auth_time\",\"nonce\",\"sid\",\"name\",\"preferred_username\",\"email\",\"email_verified\"],\"authorization_response_iss_parameter_supported\":true,\"claims_parameter_supported\":false,\"request_parameter_supported\":false,\"request_uri_parameter_supported\":false,\"require_request_uri_registration\":false}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&scope=openid+profile+email+offline_access&code_challenge=<r#34>&code_challenge_method=S256&state=<r#35>&nonce=<r#36>&client_id=public-eddsa&response_type=code",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#37>",
+     "set-cookie: porter_interaction=<r#37>; Path=/interaction; Max-Age=600; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#37>",
+    "headers": [
+     "cookie: porter_interaction=<r#37>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Sign in</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Sign in</h1><p>to continue to <strong>Public EdDSA</strong></p><form method=\"post\" action=\"/interaction/<r#37>/login\"><label>Username <input name=\"username\" autocomplete=\"username\" required autofocus></label><label>Password <input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label><button type=\"submit\">Sign in</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;login&quot;,&quot;interaction&quot;:&quot;<r#37>&quot;,&quot;client&quot;:&quot;Public EdDSA&quot;,&quot;failed&quot;:false}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#37>/login",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#37>"
+    ],
+    "body": "username=alice&password=wonderland"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#37>",
+     "set-cookie: porter_session=<r#38>; Path=/; Max-Age=28800; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#37>",
+    "headers": [
+     "cookie: porter_interaction=<r#37>; porter_session=<r#38>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Allow access</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Allow Public EdDSA?</h1><p>Signed in as <strong>Alice Liddell</strong>. Public EdDSA asks to:</p><ul><li>Sign you in (your user id)</li><li>Your name and username</li><li>Your email address</li><li>Stay signed in to the application (a refresh token)</li></ul><form method=\"post\" action=\"/interaction/<r#37>/consent\"><button type=\"submit\" name=\"decision\" value=\"allow\">Allow</button><button type=\"submit\" name=\"decision\" value=\"deny\" class=\"secondary\">Deny</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;consent&quot;,&quot;interaction&quot;:&quot;<r#37>&quot;,&quot;client&quot;:&quot;Public EdDSA&quot;,&quot;user&quot;:&quot;Alice Liddell&quot;,&quot;scopes&quot;:[{&quot;scope&quot;:&quot;openid&quot;,&quot;text&quot;:&quot;Sign you in (your user id)&quot;},{&quot;scope&quot;:&quot;profile&quot;,&quot;text&quot;:&quot;Your name and username&quot;},{&quot;scope&quot;:&quot;email&quot;,&quot;text&quot;:&quot;Your email address&quot;},{&quot;scope&quot;:&quot;offline_access&quot;,&quot;text&quot;:&quot;Stay signed in to the application (a refresh token)&quot;}]}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#37>/consent",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#37>; porter_session=<r#38>"
+    ],
+    "body": "decision=allow"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/cb?code=<r#39>&state=<r#35>&iss=<issuer>",
+     "set-cookie: porter_interaction=; Path=/interaction; Max-Age=0; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&code=<r#39>&code_verifier=<r#40>&grant_type=authorization_code&client_id=public-eddsa"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#41>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'EdDSA','kid':'<r#15>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'public-eddsa','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#42>','nonce':'<r#36>'} sig:86>\",\"scope\":\"openid profile email offline_access\",\"refresh_token\":\"<r#43>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/jwks",
+    "headers": [
+     "accept: application/json, application/jwk-set+json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"keys\":[{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"<r#12>\",\"y\":\"<r#13>\",\"kid\":\"<r#9>\",\"alg\":\"ES256\",\"use\":\"sig\"},{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"<r#14>\",\"kid\":\"<r#15>\",\"alg\":\"EdDSA\",\"use\":\"sig\"}]}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#41>",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761001\",\"name\":\"Alice Liddell\",\"preferred_username\":\"alice\",\"email\":\"alice@example.com\",\"email_verified\":true}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "refresh_token=<r#43>&grant_type=refresh_token&client_id=public-eddsa"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#44>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'EdDSA','kid':'<r#15>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'public-eddsa','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#42>'} sig:86>\",\"scope\":\"openid profile email offline_access\",\"refresh_token\":\"<r#45>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#44>",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761001\",\"name\":\"Alice Liddell\",\"preferred_username\":\"alice\",\"email\":\"alice@example.com\",\"email_verified\":true}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "scope=openid&refresh_token=<r#45>&grant_type=refresh_token&client_id=public-eddsa"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#46>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'EdDSA','kid':'<r#15>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'public-eddsa','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#42>'} sig:86>\",\"scope\":\"openid\",\"refresh_token\":\"<r#47>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#46>",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761001\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/.well-known/openid-configuration",
+    "headers": [
+     "accept: application/json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"issuer\":\"<issuer>\",\"authorization_endpoint\":\"<issuer>/authorize\",\"token_endpoint\":\"<issuer>/token\",\"userinfo_endpoint\":\"<issuer>/userinfo\",\"jwks_uri\":\"<issuer>/jwks\",\"end_session_endpoint\":\"<issuer>/logout\",\"scopes_supported\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"response_types_supported\":[\"code\"],\"response_modes_supported\":[\"query\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"subject_types_supported\":[\"public\"],\"id_token_signing_alg_values_supported\":[\"ES256\",\"EdDSA\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_basic\",\"client_secret_post\",\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\",\"select_account\"],\"claims_supported\":[\"sub\",\"iss\",\"aud\",\"exp\",\"iat\",\"auth_time\",\"nonce\",\"sid\",\"name\",\"preferred_username\",\"email\",\"email_verified\"],\"authorization_response_iss_parameter_supported\":true,\"claims_parameter_supported\":false,\"request_parameter_supported\":false,\"request_uri_parameter_supported\":false,\"require_request_uri_registration\":false}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&scope=openid+email&code_challenge=<r#48>&code_challenge_method=S256&state=<r#49>&nonce=<r#50>&client_id=no-offline&response_type=code",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#51>",
+     "set-cookie: porter_interaction=<r#51>; Path=/interaction; Max-Age=600; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#51>",
+    "headers": [
+     "cookie: porter_interaction=<r#51>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Sign in</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Sign in</h1><p>to continue to <strong>No Offline</strong></p><form method=\"post\" action=\"/interaction/<r#51>/login\"><label>Username <input name=\"username\" autocomplete=\"username\" required autofocus></label><label>Password <input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label><button type=\"submit\">Sign in</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;login&quot;,&quot;interaction&quot;:&quot;<r#51>&quot;,&quot;client&quot;:&quot;No Offline&quot;,&quot;failed&quot;:false}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#51>/login",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#51>"
+    ],
+    "body": "username=bob&password=builder"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#51>",
+     "set-cookie: porter_session=<r#52>; Path=/; Max-Age=28800; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#51>",
+    "headers": [
+     "cookie: porter_interaction=<r#51>; porter_session=<r#52>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Allow access</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Allow No Offline?</h1><p>Signed in as <strong>Bob Builder</strong>. No Offline asks to:</p><ul><li>Sign you in (your user id)</li><li>Your email address</li></ul><form method=\"post\" action=\"/interaction/<r#51>/consent\"><button type=\"submit\" name=\"decision\" value=\"allow\">Allow</button><button type=\"submit\" name=\"decision\" value=\"deny\" class=\"secondary\">Deny</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;consent&quot;,&quot;interaction&quot;:&quot;<r#51>&quot;,&quot;client&quot;:&quot;No Offline&quot;,&quot;user&quot;:&quot;Bob Builder&quot;,&quot;scopes&quot;:[{&quot;scope&quot;:&quot;openid&quot;,&quot;text&quot;:&quot;Sign you in (your user id)&quot;},{&quot;scope&quot;:&quot;email&quot;,&quot;text&quot;:&quot;Your email address&quot;}]}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#51>/consent",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#51>; porter_session=<r#52>"
+    ],
+    "body": "decision=allow"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/cb?code=<r#53>&state=<r#49>&iss=<issuer>",
+     "set-cookie: porter_interaction=; Path=/interaction; Max-Age=0; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&code=<r#53>&code_verifier=<r#54>&grant_type=authorization_code&client_id=no-offline"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#55>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'ES256','kid':'<r#9>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761002','aud':'no-offline','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#56>','nonce':'<r#50>'} sig:86>\",\"scope\":\"openid email\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/jwks",
+    "headers": [
+     "accept: application/json, application/jwk-set+json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"keys\":[{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"<r#12>\",\"y\":\"<r#13>\",\"kid\":\"<r#9>\",\"alg\":\"ES256\",\"use\":\"sig\"},{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"<r#14>\",\"kid\":\"<r#15>\",\"alg\":\"EdDSA\",\"use\":\"sig\"}]}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#55>",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761002\",\"email\":\"bob@example.com\",\"email_verified\":false}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/.well-known/openid-configuration",
+    "headers": [
+     "accept: application/json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"issuer\":\"<issuer>\",\"authorization_endpoint\":\"<issuer>/authorize\",\"token_endpoint\":\"<issuer>/token\",\"userinfo_endpoint\":\"<issuer>/userinfo\",\"jwks_uri\":\"<issuer>/jwks\",\"end_session_endpoint\":\"<issuer>/logout\",\"scopes_supported\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"response_types_supported\":[\"code\"],\"response_modes_supported\":[\"query\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"subject_types_supported\":[\"public\"],\"id_token_signing_alg_values_supported\":[\"ES256\",\"EdDSA\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_basic\",\"client_secret_post\",\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\",\"select_account\"],\"claims_supported\":[\"sub\",\"iss\",\"aud\",\"exp\",\"iat\",\"auth_time\",\"nonce\",\"sid\",\"name\",\"preferred_username\",\"email\",\"email_verified\"],\"authorization_response_iss_parameter_supported\":true,\"claims_parameter_supported\":false,\"request_parameter_supported\":false,\"request_uri_parameter_supported\":false,\"require_request_uri_registration\":false}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&scope=openid+profile+email+offline_access&code_challenge=<r#57>&code_challenge_method=S256&state=<r#58>&nonce=<r#59>&client_id=basic-es256&response_type=code",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#60>",
+     "set-cookie: porter_interaction=<r#60>; Path=/interaction; Max-Age=600; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#60>",
+    "headers": [
+     "cookie: porter_interaction=<r#60>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Sign in</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Sign in</h1><p>to continue to <strong>Basic ES256</strong></p><form method=\"post\" action=\"/interaction/<r#60>/login\"><label>Username <input name=\"username\" autocomplete=\"username\" required autofocus></label><label>Password <input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label><button type=\"submit\">Sign in</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;login&quot;,&quot;interaction&quot;:&quot;<r#60>&quot;,&quot;client&quot;:&quot;Basic ES256&quot;,&quot;failed&quot;:false}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#60>/login",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#60>"
+    ],
+    "body": "username=alice&password=wonderland"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/cb?code=<r#61>&state=<r#58>&iss=<issuer>",
+     "set-cookie: porter_session=<r#62>; Path=/; Max-Age=28800; HttpOnly; SameSite=Lax",
+     "set-cookie: porter_interaction=; Path=/interaction; Max-Age=0; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "authorization: Basic YmFzaWMlMkRlczI1NjpiYXNpYyUyRGVzMjU2JTJEc2VjcmV0",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&code=<r#61>&code_verifier=<r#63>&grant_type=authorization_code"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#64>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'ES256','kid':'<r#9>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'basic-es256','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#65>','nonce':'<r#59>'} sig:86>\",\"scope\":\"openid profile email offline_access\",\"refresh_token\":\"<r#66>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/jwks",
+    "headers": [
+     "accept: application/json, application/jwk-set+json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"keys\":[{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"<r#12>\",\"y\":\"<r#13>\",\"kid\":\"<r#9>\",\"alg\":\"ES256\",\"use\":\"sig\"},{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"<r#14>\",\"kid\":\"<r#15>\",\"alg\":\"EdDSA\",\"use\":\"sig\"}]}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&scope=openid+profile&state=s2&code_challenge=<r#67>&code_challenge_method=S256&client_id=basic-es256&response_type=code",
+    "headers": [
+     "cookie: porter_session=<r#62>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/cb?code=<r#68>&state=s2&iss=<issuer>"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "authorization: Basic YmFzaWMlMkRlczI1NjpiYXNpYyUyRGVzMjU2JTJEc2VjcmV0",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&code=<r#68>&code_verifier=<r#69>&grant_type=authorization_code"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#70>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'ES256','kid':'<r#9>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'basic-es256','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#65>'} sig:86>\",\"scope\":\"openid profile\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/.well-known/openid-configuration",
+    "headers": [
+     "accept: application/json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"issuer\":\"<issuer>\",\"authorization_endpoint\":\"<issuer>/authorize\",\"token_endpoint\":\"<issuer>/token\",\"userinfo_endpoint\":\"<issuer>/userinfo\",\"jwks_uri\":\"<issuer>/jwks\",\"end_session_endpoint\":\"<issuer>/logout\",\"scopes_supported\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"response_types_supported\":[\"code\"],\"response_modes_supported\":[\"query\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"subject_types_supported\":[\"public\"],\"id_token_signing_alg_values_supported\":[\"ES256\",\"EdDSA\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_basic\",\"client_secret_post\",\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\",\"select_account\"],\"claims_supported\":[\"sub\",\"iss\",\"aud\",\"exp\",\"iat\",\"auth_time\",\"nonce\",\"sid\",\"name\",\"preferred_username\",\"email\",\"email_verified\"],\"authorization_response_iss_parameter_supported\":true,\"claims_parameter_supported\":false,\"request_parameter_supported\":false,\"request_uri_parameter_supported\":false,\"require_request_uri_registration\":false}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&scope=openid&state=pn&prompt=none&code_challenge=<r#71>&code_challenge_method=S256&client_id=public-eddsa&response_type=code",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/cb?error=login_required&state=pn&iss=<issuer>"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/.well-known/openid-configuration",
+    "headers": [
+     "accept: application/json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"issuer\":\"<issuer>\",\"authorization_endpoint\":\"<issuer>/authorize\",\"token_endpoint\":\"<issuer>/token\",\"userinfo_endpoint\":\"<issuer>/userinfo\",\"jwks_uri\":\"<issuer>/jwks\",\"end_session_endpoint\":\"<issuer>/logout\",\"scopes_supported\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"response_types_supported\":[\"code\"],\"response_modes_supported\":[\"query\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"subject_types_supported\":[\"public\"],\"id_token_signing_alg_values_supported\":[\"ES256\",\"EdDSA\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_basic\",\"client_secret_post\",\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\",\"select_account\"],\"claims_supported\":[\"sub\",\"iss\",\"aud\",\"exp\",\"iat\",\"auth_time\",\"nonce\",\"sid\",\"name\",\"preferred_username\",\"email\",\"email_verified\"],\"authorization_response_iss_parameter_supported\":true,\"claims_parameter_supported\":false,\"request_parameter_supported\":false,\"request_uri_parameter_supported\":false,\"require_request_uri_registration\":false}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&scope=openid&state=deny&prompt=consent&code_challenge=<r#72>&code_challenge_method=S256&client_id=public-eddsa&response_type=code",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#73>",
+     "set-cookie: porter_interaction=<r#73>; Path=/interaction; Max-Age=600; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#73>",
+    "headers": [
+     "cookie: porter_interaction=<r#73>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Sign in</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Sign in</h1><p>to continue to <strong>Public EdDSA</strong></p><form method=\"post\" action=\"/interaction/<r#73>/login\"><label>Username <input name=\"username\" autocomplete=\"username\" required autofocus></label><label>Password <input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label><button type=\"submit\">Sign in</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;login&quot;,&quot;interaction&quot;:&quot;<r#73>&quot;,&quot;client&quot;:&quot;Public EdDSA&quot;,&quot;failed&quot;:false}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#73>/login",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#73>"
+    ],
+    "body": "username=alice&password=wonderland"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#73>",
+     "set-cookie: porter_session=<r#74>; Path=/; Max-Age=28800; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#73>",
+    "headers": [
+     "cookie: porter_interaction=<r#73>; porter_session=<r#74>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Allow access</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Allow Public EdDSA?</h1><p>Signed in as <strong>Alice Liddell</strong>. Public EdDSA asks to:</p><ul><li>Sign you in (your user id)</li></ul><form method=\"post\" action=\"/interaction/<r#73>/consent\"><button type=\"submit\" name=\"decision\" value=\"allow\">Allow</button><button type=\"submit\" name=\"decision\" value=\"deny\" class=\"secondary\">Deny</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;consent&quot;,&quot;interaction&quot;:&quot;<r#73>&quot;,&quot;client&quot;:&quot;Public EdDSA&quot;,&quot;user&quot;:&quot;Alice Liddell&quot;,&quot;scopes&quot;:[{&quot;scope&quot;:&quot;openid&quot;,&quot;text&quot;:&quot;Sign you in (your user id)&quot;}]}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#73>/consent",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#73>; porter_session=<r#74>"
+    ],
+    "body": "decision=deny"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/cb?error=access_denied&state=deny&iss=<issuer>",
+     "set-cookie: porter_interaction=; Path=/interaction; Max-Age=0; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/.well-known/openid-configuration",
+    "headers": [
+     "accept: application/json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"issuer\":\"<issuer>\",\"authorization_endpoint\":\"<issuer>/authorize\",\"token_endpoint\":\"<issuer>/token\",\"userinfo_endpoint\":\"<issuer>/userinfo\",\"jwks_uri\":\"<issuer>/jwks\",\"end_session_endpoint\":\"<issuer>/logout\",\"scopes_supported\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"response_types_supported\":[\"code\"],\"response_modes_supported\":[\"query\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"subject_types_supported\":[\"public\"],\"id_token_signing_alg_values_supported\":[\"ES256\",\"EdDSA\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_basic\",\"client_secret_post\",\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\",\"select_account\"],\"claims_supported\":[\"sub\",\"iss\",\"aud\",\"exp\",\"iat\",\"auth_time\",\"nonce\",\"sid\",\"name\",\"preferred_username\",\"email\",\"email_verified\"],\"authorization_response_iss_parameter_supported\":true,\"claims_parameter_supported\":false,\"request_parameter_supported\":false,\"request_uri_parameter_supported\":false,\"require_request_uri_registration\":false}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&scope=openid+profile+email+offline_access&code_challenge=<r#75>&code_challenge_method=S256&state=<r#76>&nonce=<r#77>&client_id=basic-es256&response_type=code",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#78>",
+     "set-cookie: porter_interaction=<r#78>; Path=/interaction; Max-Age=600; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#78>",
+    "headers": [
+     "cookie: porter_interaction=<r#78>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Sign in</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Sign in</h1><p>to continue to <strong>Basic ES256</strong></p><form method=\"post\" action=\"/interaction/<r#78>/login\"><label>Username <input name=\"username\" autocomplete=\"username\" required autofocus></label><label>Password <input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label><button type=\"submit\">Sign in</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;login&quot;,&quot;interaction&quot;:&quot;<r#78>&quot;,&quot;client&quot;:&quot;Basic ES256&quot;,&quot;failed&quot;:false}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#78>/login",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#78>"
+    ],
+    "body": "username=alice&password=wonderland"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/cb?code=<r#79>&state=<r#76>&iss=<issuer>",
+     "set-cookie: porter_session=<r#80>; Path=/; Max-Age=28800; HttpOnly; SameSite=Lax",
+     "set-cookie: porter_interaction=; Path=/interaction; Max-Age=0; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "authorization: Basic YmFzaWMlMkRlczI1NjpiYXNpYyUyRGVzMjU2JTJEc2VjcmV0",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": "redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&code=<r#79>&code_verifier=<r#81>&grant_type=authorization_code"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#82>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'ES256','kid':'<r#9>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'basic-es256','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#83>','nonce':'<r#77>'} sig:86>\",\"scope\":\"openid profile email offline_access\",\"refresh_token\":\"<r#84>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/jwks",
+    "headers": [
+     "accept: application/json, application/jwk-set+json",
+     "user-agent: openid-client/v6.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"keys\":[{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"<r#12>\",\"y\":\"<r#13>\",\"kid\":\"<r#9>\",\"alg\":\"ES256\",\"use\":\"sig\"},{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"<r#14>\",\"kid\":\"<r#15>\",\"alg\":\"EdDSA\",\"use\":\"sig\"}]}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/logout?id_token_hint=<jwt {'alg':'ES256','kid':'<r#9>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'basic-es256','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#83>','nonce':'<r#77>'} sig:86>&post_logout_redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fbye&state=bye-state&client_id=basic-es256",
+    "headers": [
+     "cookie: porter_session=<r#80>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Sign out</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><h1>Sign out?</h1><p>You will be signed out of Porter.</p><form method=\"post\" action=\"/logout\"><input type=\"hidden\" name=\"confirm\" value=\"yes\"><input type=\"hidden\" name=\"client_id\" value=\"basic-es256\"><input type=\"hidden\" name=\"post_logout_redirect_uri\" value=\"http://127.0.0.1:59999/bye\"><input type=\"hidden\" name=\"state\" value=\"bye-state\"><button type=\"submit\">Sign out</button></form></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/logout",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_session=<r#80>"
+    ],
+    "body": "confirm=yes&client_id=basic-es256&post_logout_redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fbye&state=bye-state"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/bye?state=bye-state",
+     "set-cookie: porter_session=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&scope=openid&state=x&code_challenge=<r#85>&code_challenge_method=S256&client_id=basic-es256&response_type=code",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#86>",
+     "set-cookie: porter_interaction=<r#86>; Path=/interaction; Max-Age=600; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#86>",
+    "headers": [
+     "cookie: porter_interaction=<r#86>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Sign in</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Sign in</h1><p>to continue to <strong>Basic ES256</strong></p><form method=\"post\" action=\"/interaction/<r#86>/login\"><label>Username <input name=\"username\" autocomplete=\"username\" required autofocus></label><label>Password <input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label><button type=\"submit\">Sign in</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;login&quot;,&quot;interaction&quot;:&quot;<r#86>&quot;,&quot;client&quot;:&quot;Basic ES256&quot;,&quot;failed&quot;:false}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/.well-known/openid-configuration",
+    "headers": [
+     "accept: application/json",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"issuer\":\"<issuer>\",\"authorization_endpoint\":\"<issuer>/authorize\",\"token_endpoint\":\"<issuer>/token\",\"userinfo_endpoint\":\"<issuer>/userinfo\",\"jwks_uri\":\"<issuer>/jwks\",\"end_session_endpoint\":\"<issuer>/logout\",\"scopes_supported\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"response_types_supported\":[\"code\"],\"response_modes_supported\":[\"query\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"subject_types_supported\":[\"public\"],\"id_token_signing_alg_values_supported\":[\"ES256\",\"EdDSA\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_basic\",\"client_secret_post\",\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\",\"select_account\"],\"claims_supported\":[\"sub\",\"iss\",\"aud\",\"exp\",\"iat\",\"auth_time\",\"nonce\",\"sid\",\"name\",\"preferred_username\",\"email\",\"email_verified\"],\"authorization_response_iss_parameter_supported\":true,\"claims_parameter_supported\":false,\"request_parameter_supported\":false,\"request_uri_parameter_supported\":false,\"require_request_uri_registration\":false}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?client_id=post-eddsa&redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&response_type=code&scope=openid+profile+offline_access&state=<r#87>&nonce=<r#88>&code_challenge=<r#89>&code_challenge_method=S256",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#90>",
+     "set-cookie: porter_interaction=<r#90>; Path=/interaction; Max-Age=600; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#90>",
+    "headers": [
+     "cookie: porter_interaction=<r#90>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Sign in</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Sign in</h1><p>to continue to <strong>Post EdDSA</strong></p><form method=\"post\" action=\"/interaction/<r#90>/login\"><label>Username <input name=\"username\" autocomplete=\"username\" required autofocus></label><label>Password <input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label><button type=\"submit\">Sign in</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;login&quot;,&quot;interaction&quot;:&quot;<r#90>&quot;,&quot;client&quot;:&quot;Post EdDSA&quot;,&quot;failed&quot;:false}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#90>/login",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#90>"
+    ],
+    "body": "username=alice&password=wonderland"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/cb?code=<r#91>&state=<r#87>&iss=<issuer>",
+     "set-cookie: porter_session=<r#92>; Path=/; Max-Age=28800; HttpOnly; SameSite=Lax",
+     "set-cookie: porter_interaction=; Path=/interaction; Max-Age=0; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": "redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&code=<r#91>&code_verifier=<r#93>&grant_type=authorization_code&client_id=post-eddsa&client_secret=post-eddsa-secret"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#94>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'EdDSA','kid':'<r#15>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'post-eddsa','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#95>','nonce':'<r#88>'} sig:86>\",\"scope\":\"openid profile offline_access\",\"refresh_token\":\"<r#96>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/jwks",
+    "headers": [
+     "accept: application/json, application/jwk-set+json",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"keys\":[{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"<r#12>\",\"y\":\"<r#13>\",\"kid\":\"<r#9>\",\"alg\":\"ES256\",\"use\":\"sig\"},{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"<r#14>\",\"kid\":\"<r#15>\",\"alg\":\"EdDSA\",\"use\":\"sig\"}]}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#94>",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761001\",\"name\":\"Alice Liddell\",\"preferred_username\":\"alice\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": "refresh_token=<r#96>&grant_type=refresh_token&client_id=post-eddsa&client_secret=post-eddsa-secret"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#97>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'EdDSA','kid':'<r#15>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'post-eddsa','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#95>'} sig:86>\",\"scope\":\"openid profile offline_access\",\"refresh_token\":\"<r#98>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/.well-known/openid-configuration",
+    "headers": [
+     "accept: application/json",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"issuer\":\"<issuer>\",\"authorization_endpoint\":\"<issuer>/authorize\",\"token_endpoint\":\"<issuer>/token\",\"userinfo_endpoint\":\"<issuer>/userinfo\",\"jwks_uri\":\"<issuer>/jwks\",\"end_session_endpoint\":\"<issuer>/logout\",\"scopes_supported\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"response_types_supported\":[\"code\"],\"response_modes_supported\":[\"query\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"subject_types_supported\":[\"public\"],\"id_token_signing_alg_values_supported\":[\"ES256\",\"EdDSA\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_basic\",\"client_secret_post\",\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\",\"select_account\"],\"claims_supported\":[\"sub\",\"iss\",\"aud\",\"exp\",\"iat\",\"auth_time\",\"nonce\",\"sid\",\"name\",\"preferred_username\",\"email\",\"email_verified\"],\"authorization_response_iss_parameter_supported\":true,\"claims_parameter_supported\":false,\"request_parameter_supported\":false,\"request_uri_parameter_supported\":false,\"require_request_uri_registration\":false}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?client_id=basic-es256&redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&response_type=code&scope=openid+profile+offline_access&state=<r#99>&nonce=<r#100>&code_challenge=<r#101>&code_challenge_method=S256",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#102>",
+     "set-cookie: porter_interaction=<r#102>; Path=/interaction; Max-Age=600; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#102>",
+    "headers": [
+     "cookie: porter_interaction=<r#102>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Sign in</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Sign in</h1><p>to continue to <strong>Basic ES256</strong></p><form method=\"post\" action=\"/interaction/<r#102>/login\"><label>Username <input name=\"username\" autocomplete=\"username\" required autofocus></label><label>Password <input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label><button type=\"submit\">Sign in</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;login&quot;,&quot;interaction&quot;:&quot;<r#102>&quot;,&quot;client&quot;:&quot;Basic ES256&quot;,&quot;failed&quot;:false}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#102>/login",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#102>"
+    ],
+    "body": "username=alice&password=wonderland"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/cb?code=<r#103>&state=<r#99>&iss=<issuer>",
+     "set-cookie: porter_session=<r#104>; Path=/; Max-Age=28800; HttpOnly; SameSite=Lax",
+     "set-cookie: porter_interaction=; Path=/interaction; Max-Age=0; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "authorization: Basic YmFzaWMlMkRlczI1NjpiYXNpYyUyRGVzMjU2JTJEc2VjcmV0",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": "redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&code=<r#103>&code_verifier=<r#105>&grant_type=authorization_code"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#106>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'ES256','kid':'<r#9>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'basic-es256','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#107>','nonce':'<r#100>'} sig:86>\",\"scope\":\"openid profile offline_access\",\"refresh_token\":\"<r#108>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/jwks",
+    "headers": [
+     "accept: application/json, application/jwk-set+json",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"keys\":[{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"<r#12>\",\"y\":\"<r#13>\",\"kid\":\"<r#9>\",\"alg\":\"ES256\",\"use\":\"sig\"},{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"<r#14>\",\"kid\":\"<r#15>\",\"alg\":\"EdDSA\",\"use\":\"sig\"}]}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#106>",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761001\",\"name\":\"Alice Liddell\",\"preferred_username\":\"alice\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "authorization: Basic YmFzaWMlMkRlczI1NjpiYXNpYyUyRGVzMjU2JTJEc2VjcmV0",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": "refresh_token=<r#108>&grant_type=refresh_token"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#109>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'ES256','kid':'<r#9>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'basic-es256','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#107>'} sig:86>\",\"scope\":\"openid profile offline_access\",\"refresh_token\":\"<r#110>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/.well-known/openid-configuration",
+    "headers": [
+     "accept: application/json",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"issuer\":\"<issuer>\",\"authorization_endpoint\":\"<issuer>/authorize\",\"token_endpoint\":\"<issuer>/token\",\"userinfo_endpoint\":\"<issuer>/userinfo\",\"jwks_uri\":\"<issuer>/jwks\",\"end_session_endpoint\":\"<issuer>/logout\",\"scopes_supported\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"response_types_supported\":[\"code\"],\"response_modes_supported\":[\"query\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"subject_types_supported\":[\"public\"],\"id_token_signing_alg_values_supported\":[\"ES256\",\"EdDSA\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_basic\",\"client_secret_post\",\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\",\"select_account\"],\"claims_supported\":[\"sub\",\"iss\",\"aud\",\"exp\",\"iat\",\"auth_time\",\"nonce\",\"sid\",\"name\",\"preferred_username\",\"email\",\"email_verified\"],\"authorization_response_iss_parameter_supported\":true,\"claims_parameter_supported\":false,\"request_parameter_supported\":false,\"request_uri_parameter_supported\":false,\"require_request_uri_registration\":false}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/authorize?client_id=public-eddsa&redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&response_type=code&scope=openid+profile+offline_access&state=<r#111>&nonce=<r#112>&code_challenge=<r#113>&code_challenge_method=S256",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: <issuer>/interaction/<r#114>",
+     "set-cookie: porter_interaction=<r#114>; Path=/interaction; Max-Age=600; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/interaction/<r#114>",
+    "headers": [
+     "cookie: porter_interaction=<r#114>"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-security-policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; frame-ancestors 'none'; base-uri 'none'",
+     "content-type: text/html; charset=utf-8",
+     "referrer-policy: no-referrer",
+     "x-content-type-options: nosniff",
+     "x-frame-options: DENY"
+    ],
+    "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"icon\" href=\"data:,\"><title>Sign in</title><style>body{font-family:system-ui,sans-serif;max-width:26rem;margin:4rem auto;padding:0 1rem;color:#1d1d1f}h1{font-size:1.4rem}form{display:grid;gap:.75rem}label{display:grid;gap:.25rem}input{font:inherit;padding:.5rem;border:1px solid #888;border-radius:.4rem}button{font:inherit;padding:.55rem;border-radius:.4rem;border:0;background:#1d4ed8;color:#fff;cursor:pointer}button.secondary{background:#e5e7eb;color:#111}.error{color:#b91c1c}ul{padding-left:1.2rem}p.note{color:#555;font-size:.9rem}label.show{display:flex;gap:.4rem;align-items:center;font-size:.9rem}</style></head><body><noscript><h1>Sign in</h1><p>to continue to <strong>Public EdDSA</strong></p><form method=\"post\" action=\"/interaction/<r#114>/login\"><label>Username <input name=\"username\" autocomplete=\"username\" required autofocus></label><label>Password <input name=\"password\" type=\"password\" autocomplete=\"current-password\" required></label><button type=\"submit\">Sign in</button></form></noscript><div data-lasm-app data-lasm-flags=\"{&quot;kind&quot;:&quot;login&quot;,&quot;interaction&quot;:&quot;<r#114>&quot;,&quot;client&quot;:&quot;Public EdDSA&quot;,&quot;failed&quot;:false}\"></div><script type=\"module\" src=\"/ui/app.js\"></script></body></html>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/interaction/<r#114>/login",
+    "headers": [
+     "content-type: application/x-www-form-urlencoded",
+     "cookie: porter_interaction=<r#114>"
+    ],
+    "body": "username=alice&password=wonderland"
+   },
+   "response": {
+    "status": 303,
+    "headers": [
+     "cache-control: no-store",
+     "location: http://127.0.0.1:59999/cb?code=<r#115>&state=<r#111>&iss=<issuer>",
+     "set-cookie: porter_session=<r#116>; Path=/; Max-Age=28800; HttpOnly; SameSite=Lax",
+     "set-cookie: porter_interaction=; Path=/interaction; Max-Age=0; HttpOnly; SameSite=Lax"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": "redirect_uri=http%3A%2F%2F127.0.0.1%3A59999%2Fcb&code=<r#115>&code_verifier=<r#117>&grant_type=authorization_code&client_id=public-eddsa"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#118>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'EdDSA','kid':'<r#15>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'public-eddsa','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#119>','nonce':'<r#112>'} sig:86>\",\"scope\":\"openid profile offline_access\",\"refresh_token\":\"<r#120>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/jwks",
+    "headers": [
+     "accept: application/json, application/jwk-set+json",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"keys\":[{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"<r#12>\",\"y\":\"<r#13>\",\"kid\":\"<r#9>\",\"alg\":\"ES256\",\"use\":\"sig\"},{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"<r#14>\",\"kid\":\"<r#15>\",\"alg\":\"EdDSA\",\"use\":\"sig\"}]}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/userinfo",
+    "headers": [
+     "accept: application/json, application/jwt",
+     "authorization: Bearer <r#118>",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"sub\":\"248289761001\",\"name\":\"Alice Liddell\",\"preferred_username\":\"alice\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/token",
+    "headers": [
+     "accept: application/json",
+     "content-type: application/x-www-form-urlencoded;charset=UTF-8",
+     "user-agent: oauth4webapi/v3.8.8"
+    ],
+    "body": "refresh_token=<r#120>&grant_type=refresh_token&client_id=public-eddsa"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: no-store",
+     "content-type: application/json",
+     "pragma: no-cache",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"access_token\":\"<r#121>\",\"token_type\":\"Bearer\",\"expires_in\":600,\"id_token\":\"<jwt {'alg':'EdDSA','kid':'<r#15>','typ':'JWT'} {'iss':'<issuer>','sub':'248289761001','aud':'public-eddsa','exp':'<time>+600','iat':'<time>','auth_time':'<time>','sid':'<r#119>'} sig:86>\",\"scope\":\"openid profile offline_access\",\"refresh_token\":\"<r#122>\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/jwks",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"keys\":[{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"<r#12>\",\"y\":\"<r#13>\",\"kid\":\"<r#9>\",\"alg\":\"ES256\",\"use\":\"sig\"},{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"<r#14>\",\"kid\":\"<r#15>\",\"alg\":\"EdDSA\",\"use\":\"sig\"}]}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/.well-known/openid-configuration",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: authorization, content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "cache-control: public, max-age=300",
+     "content-type: application/json",
+     "x-content-type-options: nosniff"
+    ],
+    "body": "{\"issuer\":\"<issuer>\",\"authorization_endpoint\":\"<issuer>/authorize\",\"token_endpoint\":\"<issuer>/token\",\"userinfo_endpoint\":\"<issuer>/userinfo\",\"jwks_uri\":\"<issuer>/jwks\",\"end_session_endpoint\":\"<issuer>/logout\",\"scopes_supported\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"response_types_supported\":[\"code\"],\"response_modes_supported\":[\"query\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\"],\"subject_types_supported\":[\"public\"],\"id_token_signing_alg_values_supported\":[\"ES256\",\"EdDSA\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_basic\",\"client_secret_post\",\"none\"],\"code_challenge_methods_supported\":[\"S256\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\",\"select_account\"],\"claims_supported\":[\"sub\",\"iss\",\"aud\",\"exp\",\"iat\",\"auth_time\",\"nonce\",\"sid\",\"name\",\"preferred_username\",\"email\",\"email_verified\"],\"authorization_response_iss_parameter_supported\":true,\"claims_parameter_supported\":false,\"request_parameter_supported\":false,\"request_uri_parameter_supported\":false,\"require_request_uri_registration\":false}"
+   }
+  }
+ ],
+ "facts": {
+  "randomValues": 122,
+  "hashes": 0,
+  "jwts": 20
+ }
+}

@@ -12,97 +12,42 @@
 // also checks that splicing a program into it gives wasm-tools' own output
 // byte for byte). A build splices the program's module into the template: no
 // wasm-tools, Rust or Python is needed.
+//
+// The splicing is Lean: the model verification/cli/Lasm/Cli/Model/WasiComponent.lean,
+// compiled by Lasm into the CLI's glue program (src/glue/glue.mjs,
+// docs/proposals/M6_GLUE.md) through its proved fast versions
+// (Lasm/Cli/Fast/WasiComponent.lean). What stays here is reading the template
+// and taking any array of bytes.
 import { readFileSync } from 'node:fs';
+import { encodeByteRequest, runRequest } from '../glue/glue.mjs';
 
 export const httpHandlerExport = 'wasi:http/incoming-handler@0.2.12#handle';
 const templateUrl = new URL('./component/proxy-template.wasm', import.meta.url);
 
-/** The template's stand-in for the main module: an empty module with a custom section. */
-export function placeholderModule() {
-  const name = new TextEncoder().encode('lasm:main-module');
-  const payload = [name.length, ...name];
-  return Uint8Array.from([0, 0x61, 0x73, 0x6d, 1, 0, 0, 0, 0, payload.length, ...payload]);
+const asBytes = value => value instanceof Uint8Array ? value : new Uint8Array(value);
+/** Runs one of the glue program's operations on bytes. */
+function run(operation, ...fields) {
+  const result = runRequest(encodeByteRequest(operation, fields.map(asBytes)), undefined, true);
+  if ('error' in result) throw new Error(result.error);
+  return result.ok;
 }
 
-const leb = value => { const out = []; do { let b = value & 0x7f; value = Math.floor(value / 128); if (value) b |= 0x80; out.push(b); } while (value); return out; };
-function readLeb(bytes, at) {
-  let result = 0, shift = 0, b;
-  do { b = bytes[at++]; result += (b & 0x7f) * 2 ** shift; shift += 7; } while (b & 0x80);
-  return [result, at];
-}
-/** A component's top-level sections: [{ id, at, start, end }] (the section's
- * offset, then its payload's). A section that runs past the end is refused
- * (verification/cli/Lasm/Cli/Model/WasiComponent.lean models this). */
-function sections(bytes) {
-  if (bytes[0] !== 0 || bytes[1] !== 0x61 || bytes[2] !== 0x73 || bytes[3] !== 0x6d || bytes[6] !== 1 || bytes[7] !== 0)
-    throw new Error('Not a WebAssembly component');
-  const list = [];
-  for (let at = 8; at < bytes.length;) {
-    const id = bytes[at];
-    const [size, start] = readLeb(bytes, at + 1);
-    if (!(start + size <= bytes.length)) throw new Error('Not a WebAssembly component');
-    list.push({ id, at, start, end: start + size });
-    at = start + size;
-  }
-  return list;
-}
-const startsWith = (a, prefix) => a.length >= prefix.length && prefix.every((x, i) => x === a[i]);
+/** The template's stand-in for the main module: an empty module with a custom section. */
+export const placeholderModule = () => run('placeholderModule');
 
 /** Replaces the core module section that starts with `prefix` (wasm-tools
  * appends custom sections, such as its producers record, to the main module)
  * by `to` followed by the same suffix. */
-export function replaceCoreModule(component, prefix, to) {
-  const found = sections(component).filter(s => s.id === 1 && startsWith(component.subarray(s.start, s.end), prefix));
-  if (found.length !== 1) throw new Error(`The component has ${found.length} matching core modules (expected one)`);
-  const [s] = found;
-  const suffix = component.subarray(s.start + prefix.length, s.end);
-  const module = new Uint8Array(to.length + suffix.length);
-  module.set(to, 0); module.set(suffix, to.length);
-  const header = [1, ...leb(module.length)];
-  // The section's own offset: its size may be a padded (non-minimal) LEB128.
-  const headerStart = s.at;
-  const out = new Uint8Array(headerStart + header.length + module.length + component.length - s.end);
-  out.set(component.subarray(0, headerStart), 0);
-  out.set(header, headerStart);
-  out.set(module, headerStart + header.length);
-  out.set(component.subarray(s.end), headerStart + header.length + module.length);
-  return out;
-}
+export const replaceCoreModule = (component, prefix, to) => run('replaceCoreModule', component, prefix, to);
 
 /** The program's wasi-http component. */
-export function componentize(core, template = readFileSync(templateUrl)) {
-  return replaceCoreModule(new Uint8Array(template), placeholderModule(), core instanceof Uint8Array ? core : new Uint8Array(core));
-}
+export const componentize = (core, template = readFileSync(templateUrl)) => run('componentize', core, template);
 
 /** The template of a component wasm-tools made from `core`. */
-export function makeTemplate(component, core) {
-  return replaceCoreModule(new Uint8Array(component), new Uint8Array(core), placeholderModule());
-}
+export const makeTemplate = (component, core) => run('makeTemplate', component, core);
 
 /** A module without its `component-type*` custom sections (what wasm-tools embeds). */
-export function withoutComponentType(module) {
-  const out = [module.subarray(0, 8)];
-  for (let at = 8; at < module.length;) {
-    const id = module[at];
-    const [size, start] = readLeb(module, at + 1);
-    let drop = false;
-    if (id === 0) { const [n, nameStart] = readLeb(module, start); drop = new TextDecoder().decode(module.subarray(nameStart, nameStart + n)).startsWith('component-type'); }
-    if (!drop) out.push(module.subarray(at, start + size));
-    at = start + size;
-  }
-  const result = new Uint8Array(out.reduce((n, p) => n + p.length, 0));
-  let offset = 0; for (const p of out) { result.set(p, offset); offset += p.length; }
-  return result;
-}
+export const withoutComponentType = module => run('withoutComponentType', module);
 
 /** The program's core module in a component made by `componentize`. */
-export function extractCore(component, template = readFileSync(templateUrl)) {
-  const t = new Uint8Array(template), placeholder = placeholderModule();
-  const modules = sections(t).filter(s => s.id === 1);
-  const index = modules.findIndex(s => startsWith(t.subarray(s.start, s.end), placeholder));
-  if (index < 0) throw new Error('The component template has no placeholder module');
-  const suffixLength = modules[index].end - modules[index].start - placeholder.length;
-  const c = new Uint8Array(component);
-  const main = sections(c).filter(s => s.id === 1)[index];
-  return c.slice(main.start, main.end - suffixLength);
-}
+export const extractCore = (component, template = readFileSync(templateUrl)) => run('extractCore', component, template);
