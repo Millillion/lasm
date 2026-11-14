@@ -648,4 +648,13 @@ opaque encodeFields : List String → String
 the message it throws on a malformed one. -/
 opaque decodeFields : String → Except String (List String)
 
+/-- `encodeRequest(lists)`: the request the glue program reads, from lists of
+fields (a table of the distinct fields and their indices, or `encodeFields`
+of them all when a field holds a 0 byte). -/
+opaque encodeRequest : List (List String) → ByteArray
+
+/-- The fields a request carries, read as the glue program reads either of
+its formats (the empty request carries none). -/
+opaque requestFields : ByteArray → List String
+
 end Lasm.Cli

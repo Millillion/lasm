@@ -284,4 +284,11 @@ Tested by: test/glue.test.mjs -/
 def glue_fields_round_trip : Prop :=
   ∀ fields : List String, decodeFields (encodeFields fields) = .ok fields
 
+/-- **A glue request carries its fields.** Lists of fields, encoded as a
+request, carry exactly their fields in order, whichever format the encoding
+chose (a table of distinct fields, or lengths when a field holds a 0 byte).
+Tested by: test/glue.test.mjs -/
+def glue_request_fields : Prop :=
+  ∀ lists : List (List String), requestFields (encodeRequest lists) = lists.flatten
+
 end Lasm.Cli.Candidates

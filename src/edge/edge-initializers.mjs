@@ -17,20 +17,22 @@
 // compiled by Lasm into the CLI's glue program (src/glue/glue.mjs,
 // docs/proposals/M6_GLUE.md) through its proved fast version
 // (Lasm/Cli/Fast/EdgeInitializers.lean). What stays here is the plan's shape
-// check and the encoding of its fields; `calls` is read as its own entries.
+// check and the encoding of its fields; `calls` is read as its own entries
+// (its own keys, in order, and the value of each).
 
-import { decodeFields, runGlue } from '../glue/glue.mjs';
+import { decodeFields, encodeRequest, runRequest } from '../glue/glue.mjs';
 
 const strings = value => Array.isArray(value) && value.every(item => typeof item === 'string');
-/** A count and the names, onto `fields`. */
-const pushNames = (fields, names) => { fields.push(String(names.length)); for (const name of names) fields.push(name); return fields; };
-/** `calls` as its own entries: their count, then each unit and its names, onto `fields`. */
-const pushCalls = (fields, calls) => {
-  const entries = Object.entries(calls);
-  fields.push(String(entries.length));
-  for (const [unit, called] of entries) { fields.push(unit); pushNames(fields, called); }
-  return fields;
+/** A count and the names, onto `lists` (lists of fields, encodeRequest's argument). */
+const pushNames = (lists, names) => { lists.push([String(names.length)], names); return lists; };
+/** `calls` as its own entries: their count, then each unit and its names, onto `lists`. */
+const pushCalls = (lists, calls) => {
+  const units = Object.keys(calls);
+  lists.push([String(units.length)]);
+  for (const unit of units) { const called = calls[unit]; lists.push([unit, String(called.length)], called); }
+  return lists;
 };
+const runGlue = lists => runRequest(encodeRequest(lists));
 const answer = result => {
   if ('error' in result) throw new Error(result.error);
   return result.ok;
@@ -38,12 +40,12 @@ const answer = result => {
 
 /** Kept initializers reachable from `name`'s calls, in the order the original chains initialize them. */
 export function initializationSchedule(name, calls, keep) {
-  return decodeFields(answer(runGlue(pushNames(pushCalls(['initializationSchedule', name], calls), [...keep]))));
+  return decodeFields(answer(runGlue(pushNames(pushCalls([['initializationSchedule', name]], calls), [...keep]))));
 }
 
 /** C source of the compact wrappers for an initialization plan. */
 export function compactInitializerWrappers(plan) {
   if (plan?.schema !== 1 || !strings(plan.closure) || !strings(plan.keep) || typeof plan.calls !== 'object' || plan.calls === null
     || !Object.values(plan.calls).every(strings)) throw new Error('Unrecognized initialization plan');
-  return answer(runGlue(pushCalls(pushNames(pushNames(['compactInitializerWrappers'], plan.closure), plan.keep), plan.calls)));
+  return answer(runGlue(pushCalls(pushNames(pushNames([['compactInitializerWrappers']], plan.closure), plan.keep), plan.calls)));
 }
