@@ -109,6 +109,17 @@ main's JavaScript. Locally (Node 24.22.1, linux-x64, 2026-11-14):
 | 2807, 50 | 76.5 ms | 12.5 ms | 24.7 ms | 4.5 ms |
 | 8000, 200 | 132.7 ms | 24.2 ms | 62.5 ms | 9.5 ms |
 
+In CI (`glue` run 43564552237, Node 26.13.0, ubuntu-24.04; the glue also
+passed its smoke test under Bun 1.4.4 and Deno 2.9.6):
+
+| Plan (initializers, kept) | Cold, glue | Cold, JavaScript | Warm, glue | Warm, JavaScript |
+| --- | ---: | ---: | ---: | ---: |
+| 2807, 6 | 61.6 ms | 4.9 ms | 15.4 ms | 1.0 ms |
+| 2807, 50 | 67.8 ms | 9.3 ms | 19.1 ms | 3.0 ms |
+| 8000, 200 | 120.9 ms | 17.1 ms | 49.4 ms | 6.6 ms |
+
+`lasm --version` and `lasm --help`: 53.7 ms on the branch, 53.9 ms on main.
+
 - **Start-up:** unchanged (`lasm --version` and `lasm --help` within noise of
   main: nothing loaded at start imports the glue).
 - **Link cost:** within the bar, but not by much. A call costs about 20 ms
