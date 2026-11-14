@@ -45,7 +45,7 @@ export function encodeRequest(lists) {
   const text = table.join('\0');
   let separators = 0;
   for (let i = text.indexOf('\0'); i !== -1; i = text.indexOf('\0', i + 1)) separators++;
-  if (!count || separators !== table.length - 1) return encodeFields(lists.flat());
+  if (separators !== table.length - 1) return encodeFields(lists.flat());
   const start = 9 + 4 * count, bytes = new Uint8Array(start + text.length * 3), view = new DataView(bytes.buffer);
   bytes[0] = 1;
   view.setUint32(1, table.length, true);
