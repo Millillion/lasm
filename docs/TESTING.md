@@ -43,7 +43,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `examples/*/test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
 | [Named propositions](#named-propositions) | Every test that names a Lean proposition names one that exists and states it verbatim; every candidate (tested, not yet proved) names a test that cites it; every `forAll` property names one | `scripts/propositions.mjs`, `library/Lasm/*/Candidates.lean`, `verification/cli/`, `test/propositions.test.mjs` | PR (`unit.yml`) |
-| [Model differentials](#model-differentials) | Each Lean model of the CLI's JavaScript agrees with it on generated inputs; every shipped JavaScript and C module has a Lean model or a stated reason (the M4 inventory) | `verification/cli/Lasm/Cli/Model/`, `test/models/`, `cli-models.yml`; `verification/models.json`, `verification/MODELS.md`, `scripts/models.mjs`, `test/models-inventory.test.mjs` | PR (paths; the inventory in `unit.yml`) |
+| [Model differentials](#model-differentials) | Each Lean model of the CLI's JavaScript, and of the Lasm.UI applier, agrees with it on generated inputs; every shipped JavaScript and C module has a Lean model or a stated reason (the M4 inventory) | `verification/cli/Lasm/Cli/Model/`, `library/Lasm/UI/Proofs/Applier.lean`, `test/models/`, `cli-models.yml`, `ui-applier-model.yml`; `verification/models.json`, `verification/MODELS.md`, `scripts/models.mjs`, `test/models-inventory.test.mjs` | PR (paths; the inventory in `unit.yml`) |
 | Unit tests | Functions of the CLI and host, in isolation | `test/*.test.mjs` (`unit.yml`, a subset in `installer-faults.yml`) | PR (`unit.yml`), nightly, release |
 | [Flaky tests](#flaky-tests) | A flaky test is quarantined at once, then fixed or deleted within a week | `test/quarantine.json`, `scripts/test/`, `scripts/ci/flaky-report.mjs` (`flaky.yml`) | nightly report; quarantine on every unit run |
 | [Coverage and mutation](#coverage-and-mutation-testing) | How much of the JavaScript the tests execute, and whether they would notice a change | `scripts/coverage/`, `scripts/mutation/` (`mutation.yml`) | PR, nightly and release (coverage); nightly and PR, changed modules only (mutation) |
@@ -1297,6 +1297,35 @@ malformed completion passed and the glue read past the batch
 targets `serverless-http`, `lasm-js-wire` and `ui-decode` are the model
 differentials of src/serverless/, the Lasm.JS codec and the UI applier's
 reading.
+
+The Lasm.UI applier's DOM operations and hydration (src/lasm-modules/ui-dom.mjs)
+have a Lean model, [library/Lasm/UI/Proofs/Applier.lean](../library/Lasm/UI/Proofs/Applier.lean):
+the applier's `apply(frame)` over an abstract DOM tree, every node looked up
+by id in one table for the document as the JavaScript does, with the DOM's
+refusals (an id not in the document, an insert before a node that is not a
+child, into a text node or into the moved node's own subtree, attributes on
+a text node) and hydration's adoption of server-rendered nodes.
+[test/models/ui-applier-differential.mjs](../test/models/ui-applier-differential.mjs)
+(`ui-applier-model.yml`, on changes to the applier or Lasm.UI) applies the
+same frames with the shipped applier on happy-dom, whose insertion checks it
+makes the DOM standard's (happy-dom inserts into text nodes and before nodes
+that are not children, where browsers throw), and with the model
+(`lean --run` [test/models/UiApplierModel.lean](../test/models/UiApplierModel.lean)),
+and fails when the DOMs differ after any frame or one side refuses a frame
+the other applies. It draws 1000 sessions of each kind: Lean's own diff of
+random views (keyed and unkeyed children, reorders, inserts, removals, tag,
+text and attribute changes; every patch must conform, the candidate
+`Lasm.UI.Candidates.diff_conforms`, and every frame apply), random
+operations from the DOM's own nodes (most apply, a tenth are refused), and
+hydration of random server DOMs (nodes changed, dropped, added, separated by
+comments, with server attributes); then the 120 sessions of
+test/fixtures/ui/patches.json, from an empty root and hydrating their
+server-rendered HTML. Proved of the model (library/PROOFS.md):
+`applier_correct` (a conforming patch is performed exactly as
+Lasm.UI.Model's `applyOps`), `applier_session` (with conforming patches,
+every frame the browser reads leaves the DOM of the view) and
+`hydrate_correct` (hydration builds the fresh mount's nodes from any server
+DOM, and exactly its DOM from one that renders the view).
 
 Which modules have a model, and why the others need none or are still due
 one, is the inventory [verification/MODELS.md](../verification/MODELS.md),
