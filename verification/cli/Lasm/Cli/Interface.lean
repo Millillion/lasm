@@ -492,4 +492,149 @@ JavaScript sorts strings (by UTF-16 code units). -/
 def directoriesOf (entries : List ZipEntry) : List String :=
   (entries.flatMap fun e => parents e.name).eraseDups.mergeSort fun a b => !(decide (utf16 b < utf16 a))
 
+/-! ## `lasm dev`'s proxy (src/dev-proxy.mjs) -/
+
+/-- An HTTP request: method, target, headers (names in lowercase), body. -/
+structure HttpRequest where
+  method : String
+  target : String
+  headers : List (String × String)
+  body : ByteArray
+  deriving Inhabited
+
+/-- An HTTP reply: status, headers (names in lowercase), body. -/
+structure HttpReply where
+  status : Nat
+  headers : List (String × String)
+  body : ByteArray
+  deriving Inhabited
+
+/-- A request's header, by its lowercase name. -/
+def HttpRequest.header? (r : HttpRequest) (name : String) : Option String := r.headers.lookup name
+
+/-- A reply's header, by its lowercase name. -/
+def HttpReply.header? (r : HttpReply) (name : String) : Option String := r.headers.lookup name
+
+/-- What the server program does with a request the proxy forwards: answers
+with a whole reply, stops before the reply's body ends (as when it is
+killed for a rebuild), or answers with a malformed head. -/
+inductive Upstream where
+  | answers (reply : HttpReply)
+  | cut
+  | malformed
+
+/-- What the client gets: a whole reply, or a connection that ended early. -/
+inductive ClientResult where
+  | reply (r : HttpReply)
+  | cut
+  deriving Inhabited
+
+/-- `startDevProxy({ upstreamPort })` serving one request whose server
+program does `u`: the requests the program receives, and the client's
+result. -/
+opaque devProxy : HttpRequest → Upstream → List HttpRequest × ClientResult
+
+/-- The Host header the proxy sends: `127.0.0.1:` and the program's port. -/
+opaque devUpstreamHost : String
+
+/-- The live-reload client the proxy injects into pages (`reloadClient`). -/
+opaque reloadClient : ByteArray
+
+/-- Headers about a connection rather than a request, which the client and
+the proxy each set for their own connection (and `content-encoding`, which
+a rewritten page drops). -/
+def connectionHeaders : List String :=
+  ["host", "connection", "keep-alive", "transfer-encoding", "content-length", "te", "trailer", "upgrade",
+    "expect", "proxy-connection", "proxy-authorization", "http2-settings", "content-encoding"]
+
+/-- Headers the tests write: distinct lowercase names, none a connection's. -/
+def PlainHeaders (hs : List (String × String)) : Prop :=
+  (hs.map (·.1)).Nodup ∧ ∀ h ∈ hs, h.1 = h.1.toLower ∧ h.1 ∉ connectionHeaders
+
+/-- Whether the proxy rewrites a reply: `text/html…`, to anything but HEAD. -/
+def isPage (r : HttpRequest) (a : HttpReply) : Bool :=
+  ((a.header? "content-type").getD "").startsWith "text/html" && r.method != "HEAD"
+
+/-- `body` with the reload client and a line feed inserted before the first
+`</body>`, or the reload client appended when there is none. -/
+def withReload (body : ByteArray) : ByteArray :=
+  let b := body.toList
+  let tag := "</body>".toUTF8.toList
+  match (List.range (b.length + 1)).find? fun i => (b.drop i).take tag.length == tag with
+  | some i => ⟨(b.take i ++ reloadClient.toList ++ [10] ++ b.drop i).toArray⟩
+  | none => ⟨(b ++ reloadClient.toList).toArray⟩
+
+/-- The body the client gets for `a`: none to HEAD or for 204 and 304, a
+page's with the reload client, any other byte for byte. -/
+def relayedBody (r : HttpRequest) (a : HttpReply) : ByteArray :=
+  if r.method = "HEAD" ∨ a.status = 204 ∨ a.status = 304 then .empty
+  else if isPage r a then withReload a.body else a.body
+
+/-! ## Project files -/
+
+/-- An import of a Lean header: its module's name, component by component,
+and its `all`, exported and `meta` flags. -/
+structure HeaderImport where
+  module : List String
+  all : Bool
+  exported : Bool
+  isMeta : Bool
+
+/-- Not Lasm's JavaScript: Lean's own header parser (`Lean.Elab.parseImports`
+of Lean 4.35.0): the imports it reads, without the implicit `Init`, or
+`none` when it reports an error. -/
+opaque leanImports : String → Option (List HeaderImport)
+
+/-- `leanHeader(text)` (src/application-sources.mjs). -/
+opaque leanHeader : String → String
+
+/-- `importClosure(project, Main.lean)` (src/dev-proxy.mjs) in a project whose
+`Main.lean` holds `text`, with an empty file for each of `modules`: the
+files it reaches, relative to the project. -/
+opaque importClosureOf : String → List (List String) → List String
+
+/-- A module's file in a project: its components joined by `/`, and `.lean`. -/
+def moduleFile (m : List String) : String := "/".intercalate m ++ ".lean"
+
+/-- A name a file or directory can have on every OS Lasm runs on. -/
+def FileComponent (c : String) : Prop :=
+  c ≠ "" ∧ c ≠ "." ∧ c ≠ ".." ∧ c = c.trimAscii.toString ∧ c.utf8ByteSize < 100 ∧
+    ∀ ch ∈ c.toList, ch.toNat ≥ 32 ∧ ch ∉ ['/', '\\', '<', '>', ':', '"', '|', '?', '*']
+
+/-- No carriage return but before a line feed. -/
+def NoBareCR (text : String) : Prop :=
+  ∀ i, text.toList[i]? = some '\r' → text.toList[i + 1]? = some '\n'
+
+/-- `lakeConfigurationKey(project, undefined, lean)` (src/application-sources.mjs)
+in a project whose lake-manifest.json holds `manifest` and lakefile.lean
+`lakefile`: the key (`none`: no reuse), or the message of what it throws. -/
+opaque lakeConfigurationKeyOf : String → String → Except String (Option String)
+
+/-- `edgeModules(project, [])` (src/edge/edge-build.mjs) in a project whose
+package.json holds the text: the modules, or the message of what it throws. -/
+opaque edgeModulesOf : String → Except String (List String)
+
+/-- `supabaseFunctionName(project)` (src/edge/edge-build.mjs), likewise. -/
+opaque supabaseFunctionNameIn : String → Except String String
+
+/-- `fastlyName(project)` (src/wasi/wasi-build.mjs), likewise. -/
+opaque fastlyNameIn : String → Except String String
+
+/-- `s` occurs in `e`. -/
+def Mentions (e s : String) : Prop := ∃ a b, e = a ++ s ++ b
+
+/-! ## The edge entries' request mapping (src/edge/edge-build.mjs) -/
+
+/-- Not Lasm's JavaScript: the WHATWG URL parser (`new URL`): an absolute
+URL's origin, path, and query and fragment together, or `none` when it is
+not one. -/
+opaque urlParts : String → Option (String × String × String)
+
+/-- `route` of the Supabase entry (`supabaseEntry(modules, name)`) on a
+request whose target is its absolute URL. -/
+opaque supabaseRoute : String → HttpRequest → HttpRequest
+
+/-- `identity` of the Vercel Edge entry (`vercelEdgeEntry(modules)`). -/
+opaque vercelIdentity : HttpRequest → HttpRequest
+
 end Lasm.Cli

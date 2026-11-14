@@ -112,11 +112,11 @@ offline firewall restoration and all platform disk reserves passed.
 
 ## Preserved history and scope
 
-The [earlier `.44` report](NODE_ACCEPTANCE_44_2026-09-28.md) preserves the
+The [earlier `.44` report](history/NODE_ACCEPTANCE_44_2026-09-28.md) preserves the
 five-platform baseline and its exact archive. The
-[`.45` campaign](evidence/node45-six-platform-campaign-2026-09-28.json) retains
+[`.45` campaign](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node45-six-platform-campaign-2026-09-28.json) retains
 the original ARM64 Unicode-path failure. The
-[SDK repair and distribution evidence](evidence/windows-arm64-sdk-utf8-distribution-2026-09-28.json)
+[SDK repair and distribution evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-sdk-utf8-distribution-2026-09-28.json)
 and [`.46` reference-compiler setup failure](evidence/node46-windows-arm64-native-reference-2026-09-28.json)
 record the fixes preceding this pass. The [Windows toolchain history](WINDOWS_TOOLCHAINS.md)
 contains the native compiler, license, relocation and archive audits.

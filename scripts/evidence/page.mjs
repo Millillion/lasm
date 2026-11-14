@@ -634,7 +634,7 @@ export function renderPage(summary) {
     if (conduit.length) p(table(['Platform', 'Result'], conduit.map(j => [j.name.replace(/^API on /, ''), `[${outcome(j.conclusion)}](${j.url})`])));
   }
   p('### About');
-  p(`The same app, built for each target, must answer every request of a recorded corpus with the same status, headers and body bytes. The ${r.equivalence.apps.join(' and ')} apps are checked on ${r.equivalence.targets.join(', ')}. Conduit's official RealWorld API suite (about 150 requests) is compared with Node's on every platform Conduit runs on, with tokens and timestamps normalized. Details: [Target equivalence](../../docs/TESTING.md#target-equivalence).`);
+  p(`The same app, built for each target, must answer every request of a recorded corpus with the same status, headers and body bytes. The ${r.equivalence.apps.join(' and ')} apps are checked on ${r.equivalence.targets.join(', ')}. Conduit's official RealWorld API suite (about 150 requests) is compared with Node's on every platform Conduit runs on, with tokens and timestamps normalized. So is the flagship apps' own test traffic (Ledger's API test, Tandem's protocol tests), inside each platform job the example apps section lists, with each app's documented normalizations ([The flagship apps' recorded traffic](../../docs/TESTING.md#the-flagship-apps-recorded-traffic)). Details: [Target equivalence](../../docs/TESTING.md#target-equivalence).`);
 
   // Benchmarks
   p('## Benchmarks');

@@ -21,7 +21,7 @@ export function releaseChecksManifest(e) {
     sha: e.GITHUB_SHA, headSha: e.HEAD_SHA, event: e.GITHUB_EVENT_NAME, ref: e.GITHUB_REF, runId: e.GITHUB_RUN_ID, runAttempt: e.GITHUB_RUN_ATTEMPT,
     jobs: Object.fromEntries(checksJobs.map(job => [job, e[job.toUpperCase()]])),
     candidate: release ? { release: e.REUSE || e.TESTED_RELEASE, sha256: e.REUSE_SHA256 || e.TESTED_SHA256 } : null,
-    rehearsal: release ? { version: e.VERSION, license: 'MIT', node: '26.13.0', overlaySource: e.OVERLAY === 'true', record: 'npm-dist-linux-x64/linux-x64/npm-dist.json' } : null };
+    rehearsal: release ? { version: e.VERSION, license: 'MIT', node: '26.13.1', overlaySource: e.OVERLAY === 'true', record: 'npm-dist-linux-x64/linux-x64/npm-dist.json' } : null };
   const summary = '### release-checks: ' + (passed ? 'passed' : 'FAILED') + '\n\n'
     + (release ? 'Release ' + e.VERSION + (full ? '' : ' (partial: reused candidate ' + e.REUSE + '; dry runs only)') : 'Not a release commit') + '\n';
   return { passed, manifest, summary };
