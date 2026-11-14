@@ -175,7 +175,7 @@ Jordan's direction: rock solid first, then the irreducible essence, then proposi
    - [x] M1, first part (2026-11-09): the unused dependencies `binaryen`, `@yarnpkg/cli-dist`, `pnpm` and `miniflare`; the Lean 4.32 `lean/` and unused `runtime/*.cpp`.
    - [x] M1, second part (2026-11-10): `vitest` and its two unreferenced users, unreferenced integration programs, `experiments/edge` and `experiments/js-interop`, about 7,800 lines of unreferenced scripts, and 70 MB of unreferenced evidence.
    - [x] M1, third part (2026-11-10): the wasmtime-preview cluster (1,384 shipped lines), `src/toolchain.mjs` (Lean 4.32) and `src/native-pthread-factory.cjs`, with the Lean 4.32 builders that used them.
-   - [ ] M1, rest: duplicate licence texts.
+   - [x] M1, rest (2026-11-13): duplicate licence texts — three byte-identical copies removed; Lasm's `src/notices/LASM-LICENSE.txt` kept by decision (docs/LICENSE_AUDIT.md §17).
    - [ ] M2: unreferenced evidence and compatibility data out of the repository, closed diagnosis workflows, historical docs to `docs/history/`; the full emsdk and Python paths maintainer-only.
    - [ ] M3: one Lasm.JS wire codec in JavaScript, no `tar` dependency, `library/prebuilt` generated (each held to the mutation scores).
    - [ ] Simplify the codebase toward its irreducible state, once the tests are strong enough to allow it (issue #21): M1–M3 are its first concrete steps.
