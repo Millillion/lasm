@@ -50,7 +50,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 
 ### Differential testing
 
-**Property.** For a generated Lean program *P*: native Lean 4.35.0's build of
+**Property.** For a generated Lean program *P*: native Lean 4.36.0-rc2's build of
 *P* and Lasm's build of *P* for each target produce the same stdout, the same
 stderr and the same exit status.
 
@@ -69,8 +69,8 @@ lengths, depth). Literals are randomly wrapped in a `@[noinline]` identity so th
 compiler cannot fold them away. Each case draws from its own stream
 `(seed, index)`, so a case is reproducible on its own forever.
 
-**Oracle.** The upstream release archive `lean-4.35.0-linux.tar.zst`
-(SHA-256 pinned in `scripts/lean-dist/lean-4.35.0-upstream.json`): `lean -c`
+**Oracle.** The upstream release archive `lean-4.36.0-rc2-linux.tar.zst`
+(SHA-256 pinned in `scripts/lean-dist/lean-4.36.0-rc2-upstream.json`): `lean -c`
 then `leanc`. Lasm ships Lean itself, but its build is what is under test, so the
 oracle is the untouched upstream toolchain.
 
@@ -101,7 +101,7 @@ which every run replays first.
 ```sh
 npm install @lasm/cli                         # or a packed candidate
 node scripts/differential/run.mjs --lasm node_modules/@lasm/cli/bin/lasm.mjs \
-  --lean-bin ~/.elan/toolchains/leanprover--lean4---v4.35.0/bin --work /tmp/dt \
+  --lean-bin ~/.elan/toolchains/leanprover--lean4---v4.36.0-rc2/bin --work /tmp/dt \
   --seed 1 --programs 1 --targets node,wasi,wasi-node,deno \
   --regressions test/differential/regressions
 # every oracle: --targets node,wasi,wasi-node,deno,interp,node-O0,wasi-O0,deno-O0,edge-node,edge-bun,edge-sm,
@@ -210,7 +210,7 @@ interpreter matched native Lean on every case once its module name was fixed
 ### Differential fuzzing
 
 **Property.** The same as [differential testing](#differential-testing), for
-programs that declare things of their own: native Lean 4.35.0 and every Lasm
+programs that declare things of their own: native Lean 4.36.0-rc2 and every Lasm
 target print the same stdout and stderr and exit with the same status.
 
 **Why.** The core generator's cases are expressions and statement lists over a
@@ -836,7 +836,7 @@ Progress lines print the worker's heap. Jazzer.js
 was not used: it instruments CommonJS through Babel hooks and does not
 instrument ES modules, which all of Lasm's JavaScript is; fast-check is a
 property tester without coverage feedback. The Lean targets are
-`test/fuzz/native/LasmFuzz.lean` compiled to C by the managed Lean 4.35.0 and
+`test/fuzz/native/LasmFuzz.lean` compiled to C by the managed Lean 4.36.0-rc2 and
 linked with the C of the Lasm modules it imports, Lasm's native C glue and
 Lean's runtime, under libFuzzer (`test/fuzz/native/build.mjs`); a Lean panic
 fails the run (`lean_set_exit_on_panic`). This is coverage-guided fuzzing of
