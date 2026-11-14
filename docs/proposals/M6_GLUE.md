@@ -211,15 +211,57 @@ needs a new `lasm build` option, proposed in [REVIEW.md](../REVIEW.md#the-cli-su
 for Jordan), and slices whose Lean work is large next to their input, so
 that encoding is not the bulk.
 
+### The second slice: `src/wasi/wasi-component.mjs`
+
+The whole module is modelled (verification/cli/Lasm/Cli/Model/WasiComponent.lean)
+and its three propositions are proved (`replace_one_core_module`,
+`drops_only_component_type`, `componentize_inverse`); it runs once per
+`--target wasi-http` build, on the program's core module (megabytes), where
+the Lean does real work (reading the sections, splicing) next to the
+encoding (copying the bytes in and out).
+
+- **Fast versions** (`Lasm/Cli/Fast/WasiComponent.lean`). The model reads the
+  component as the list of its bytes; the fast versions read the
+  `ByteArray` by offsets (`readLebAt` with an accumulator, so a long LEB128
+  does not recurse; `sectionsAt`, sections as offsets) and write by appends.
+  Each is proved equal to the model (`sectionsAt_eq`, `prefixAt_eq`,
+  `replaceCoreModule_eq`, `extractCore_eq`, `withoutComponentType_eq`) and
+  registered as `@[csimp]`; `componentize` and `makeTemplate` get their own
+  `csimp` theorems, since the model's compiled code calls the model's
+  `replaceCoreModule`.
+- **Bytes in the glue.** A third request format, the byte 2, the number of
+  fields and each field's length and bytes, the first the operation's name;
+  the answer is the bytes after `ok:` (`runRequest(…, binary)` returns a
+  `Uint8Array` of its own, as the JavaScript did).
+- **The JavaScript left behind** is the adapter: reading the default
+  template (`component/proxy-template.wasm`, an argument of the model) and
+  taking any array of bytes (`Uint8Array`, `ArrayBuffer`, an array of
+  numbers). `extractCore` on a component with fewer core modules than the
+  template's index now throws an `Error` with the `TypeError`'s message.
+- **Start-up.** `src/init.mjs` imports `src/wasi/wasi-build.mjs` (for
+  `fastlyToml`), which imports the WASI link and so this module and
+  `src/glue/glue.mjs` at every start. `glue.mjs` reads and compiles the
+  program only at its first call, so start-up stays within noise (the
+  measurement checks it against main).
+
+Checked before writing the adapter: the program compiled natively against
+the module's JavaScript on 922 inputs (small templates with other sections
+and modules, truncated and corrupted components, `component-type` custom
+sections, the shipped template with cores of 0 to 200,000 bytes): no
+difference. Natively, `componentize` of a 30 MB core takes about 40 ms,
+the process and the pipe included; the JavaScript takes 10 ms.
+
+COMPONENT_RESULTS
+
 ### What next (M6)
 
 The next slice should be one where the Lean code does much more than the
 encoding, or should wait for the reactor:
 
-- **`src/wasi/wasi-component.mjs` and `src/wasi/lower-atomics.mjs`** (WASI
-  links): wholly modelled, run once per WASI build, on megabytes. They need
-  fast `ByteArray` versions of their `List UInt8` models, with `csimp`
-  proofs, and a binary field in the request.
+- **`src/wasi/lower-atomics.mjs`** (WASI links): wholly modelled, run once
+  per WASI build, on megabytes; the same pattern as `wasi-component.mjs`
+  (fast `ByteArray` versions of its readers and writer, with `csimp`
+  proofs).
 - **`src/package.mjs` and `src/init.mjs` argument parsing**: modelled and
   proved, small, but `src/cli-arguments.mjs` imports `package.mjs` at start,
   and a parse costs more in the glue than in JavaScript (worth it only with a

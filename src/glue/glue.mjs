@@ -54,6 +54,19 @@ export function encodeRequest(lists) {
   return bytes.subarray(0, start + encoder.encodeInto(text, bytes.subarray(start)).written);
 }
 
+/** A request of byte fields (the program's operations on bytes): the byte 2,
+ * the number of fields, then each field's length and bytes (32-bit
+ * little-endian); the first field is the operation's name. */
+export function encodeByteRequest(operation, fields) {
+  const all = [encoder.encode(operation), ...fields];
+  const bytes = new Uint8Array(all.reduce((n, field) => n + 4 + field.length, 5)), view = new DataView(bytes.buffer);
+  bytes[0] = 2;
+  view.setUint32(1, all.length, true);
+  let at = 5;
+  for (const field of all) { view.setUint32(at, field.length, true); bytes.set(field, at + 4); at += 4 + field.length; }
+  return bytes;
+}
+
 /** The fields of a result, as the glue program writes them. */
 export function decodeFields(text) {
   const bytes = Buffer.from(text), fields = [];
@@ -73,8 +86,10 @@ class Exit { constructor(code) { this.code = code; } }
 /** Runs one operation, its fields in one list: `{ ok }` with the result, or `{ error }` with the program's message. */
 export const runGlue = (fields, module = glueModule()) => runRequest(encodeRequest([fields]), module);
 
-/** Runs one encoded request (`encodeRequest`). */
-export function runRequest(input, module = glueModule()) {
+/** Runs one encoded request (`encodeRequest`, `encodeByteRequest`): `{ ok }`
+ * with the result as text, or as bytes (a `Uint8Array` of its own) when
+ * `binary`, or `{ error }`. */
+export function runRequest(input, module = glueModule(), binary = false) {
   let offset = 0, memory;
   const out = [], err = [];
   const view = () => new DataView(memory.buffer);
@@ -119,8 +134,8 @@ export function runRequest(input, module = glueModule()) {
     if (!(error instanceof Exit)) throw error;
     if (error.code !== 0) throw new Error(`The glue program exited with status ${error.code}: ${Buffer.concat(err).toString('utf8').trim()}`);
   }
-  const text = Buffer.concat(out).toString('utf8');
-  if (text.startsWith('ok:')) return { ok: text.slice(3) };
-  if (text.startsWith('error:')) return { error: text.slice(6) };
+  const answer = Buffer.concat(out), head = answer.toString('latin1', 0, 6);
+  if (head.startsWith('ok:')) return { ok: binary ? new Uint8Array(answer.subarray(3)) : answer.toString('utf8', 3) };
+  if (head === 'error:') return { error: answer.toString('utf8', 6) };
   throw new Error(`The glue program wrote no answer${err.length ? `: ${Buffer.concat(err).toString('utf8').trim()}` : ''}`);
 }

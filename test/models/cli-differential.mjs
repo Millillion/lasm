@@ -485,6 +485,10 @@ export const models = [
       try { return { text: hex(responseFile(args)) }; } catch (error) { return { error: error.message }; }
     },
   },
+  // src/wasi/wasi-component.mjs runs this model itself, compiled by Lasm
+  // (src/glue/glue.mjs, docs/proposals/M6_GLUE.md): these entries and
+  // withoutComponentType's check the compiled program's fast versions, through
+  // the module's byte requests, against the model run by native Lean.
   {
     name: 'replaceCoreModule', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',
     generate: r => {

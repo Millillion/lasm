@@ -20,13 +20,26 @@ result, or `error:` and a message.
 | ---------------------------- | ------------------------------------------------------------- | ------ |
 | `compactInitializerWrappers` | closure (count, names), keep (count, names), calls (count, then per entry its unit, count, names) | the C source |
 | `initializationSchedule`     | name, calls (as above), keep (count, names)                  | the schedule, each name as a field |
+| `replaceCoreModule`          | component, prefix, to (bytes)                                 | the component (bytes) |
+| `componentize`               | core, template (bytes)                                        | the component (bytes) |
+| `makeTemplate`               | component, core (bytes)                                       | the template (bytes) |
+| `extractCore`                | component, template (bytes)                                   | the core module (bytes) |
+| `withoutComponentType`       | module (bytes)                                                | the module (bytes) |
+| `placeholderModule`          | none                                                          | the module (bytes) |
+
+The byte operations take their request in a third way: the byte 2, the number
+of fields and then each field's length (32-bit little-endian) and bytes, the
+first field the operation's name; their result is the bytes after `ok:`.
 
 `compactInitializerWrappers` is `Lasm.Cli.compactInitializerWrappers`, the
 model of verification/cli/Lasm/Cli/Model/EdgeInitializers.lean; it compiles
 to `Lasm.Cli.Fast.compactInitializerWrappers` by the `csimp` theorem that
-proves the two equal (Lasm/Cli/Fast/EdgeInitializers.lean).
+proves the two equal (Lasm/Cli/Fast/EdgeInitializers.lean). The byte
+operations are the models of Model/WasiComponent.lean, compiled to the
+offset-reading versions of Lasm/Cli/Fast/WasiComponent.lean the same way.
 -/
 import Lasm.Cli.Fast.EdgeInitializers
+import Lasm.Cli.Fast.WasiComponent
 
 namespace Lasm.Cli.Glue
 
@@ -142,8 +155,8 @@ def calls (f : Array String) : Reader (List (String × List String)) := do
 /-- A field as the program writes it. -/
 def encode (s : String) : String := s!"{s.utf8ByteSize}:{s}"
 
-/-- Runs one operation on the input. -/
-def run (input : ByteArray) : Except String String := do
+/-- Runs one operation on fields of text. -/
+def runText (input : ByteArray) : Except String String := do
   let f ← fields input
   let (op, pos) ← text f 0
   match op with
@@ -155,6 +168,40 @@ def run (input : ByteArray) : Except String String := do
     return String.join ((initializationSchedule name calls keep).map encode)
   | _ => throw s!"unknown operation {op}"
 
+/-- The fields of a request of bytes, from byte 5 (`count` of them). -/
+def byteFields (input : ByteArray) (count : Nat) : Except String (Array ByteArray) :=
+  go 0 5 (Array.mkEmpty count)
+where
+  go (k at_ : Nat) (acc : Array ByteArray) : Except String (Array ByteArray) :=
+    if k < count then
+      if at_ + 4 > input.size then .error "the request ends inside a field's length" else
+      let n := u32 input at_
+      if at_ + 4 + n > input.size then .error "the request ends inside a field" else
+      go (k + 1) (at_ + 4 + n) (acc.push (input.extract (at_ + 4) (at_ + 4 + n)))
+    else .ok acc
+  termination_by count - k
+
+/-- Runs one operation on fields of bytes. -/
+def runBytes (input : ByteArray) : Except String ByteArray := do
+  if input.size < 5 then throw "the request ends inside its header"
+  let f ← byteFields input (u32 input 1)
+  let arg := fun (i : Nat) => f[i]?.getD ByteArray.empty
+  let some opBytes := f[0]? | throw "input ends before a field"
+  let some op := String.fromUTF8? opBytes | throw "a field is not UTF-8"
+  let need := fun (n : Nat) => if f.size == n + 1 then pure () else throw s!"{op} takes {n} fields, not {f.size - 1}"
+  match op with
+  | "replaceCoreModule" => need 3; replaceCoreModule (arg 1) (arg 2) (arg 3)
+  | "componentize" => need 2; componentize (arg 1) (arg 2)
+  | "makeTemplate" => need 2; makeTemplate (arg 1) (arg 2)
+  | "extractCore" => need 2; extractCore (arg 1) (arg 2)
+  | "withoutComponentType" => need 1; return withoutComponentType (arg 1)
+  | "placeholderModule" => need 0; return placeholderModule.toByteArray
+  | _ => throw s!"unknown operation {op}"
+
+/-- Runs one operation on the input. -/
+def run (input : ByteArray) : Except String ByteArray :=
+  if input[0]? == some 2 then runBytes input else (runText input).map String.toUTF8
+
 partial def readAll (stream : IO.FS.Stream) (acc : ByteArray) : IO ByteArray := do
   let chunk ← stream.read 65536
   if chunk.isEmpty then return acc else readAll stream (acc ++ chunk)
@@ -164,7 +211,7 @@ def main : IO Unit := do
   let input ← readAll (← IO.getStdin) ByteArray.empty
   let out ← IO.getStdout
   match run input with
-  | .ok result => out.write "ok:".toUTF8; out.write result.toUTF8
+  | .ok result => out.write "ok:".toUTF8; out.write result
   | .error message => out.write ("error:" ++ message).toUTF8
   out.flush
 
