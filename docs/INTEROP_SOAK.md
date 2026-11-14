@@ -5,7 +5,7 @@ mix of error paths, to find handle, callback and memory leaks in `Lasm.JS`.
 **Result: no leak found; all 10 runs passed** (run
 [39976075315](https://github.com/Millillion/lasm/actions/runs/39976075315),
 candidate `0.1.0-experimental.55`, source `17218c5`; evidence:
-[interop-soak-2026-10-23.json](evidence/interop-soak-2026-10-23.json)).
+[interop-soak-2026-10-23.json](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/interop-soak-2026-10-23.json)).
 
 ## Method
 
@@ -117,7 +117,7 @@ handler) 4,860 → 5,490 requests per second, `GET /hello/Ada` 8,620 → 8,830, 
 the benchmark's Hono fixture 13,550 → 13,790: no regression. **CI, candidate `0.1.0-experimental.58`** (source `a9c5a9d`; it passed
 five-platform installed acceptance, the interop examples and the templates in
 run [40012750099](https://github.com/Millillion/lasm/actions/runs/40012750099);
-evidence: [interop-soak-async-2026-10-23.json](evidence/interop-soak-async-2026-10-23.json)).
+evidence: [interop-soak-async-2026-10-23.json](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/interop-soak-async-2026-10-23.json)).
 Run [40021909538](https://github.com/Millillion/lasm/actions/runs/40021909538)
 (15 min per app on every target, the final harness): **all 10 passed**, 0 errors
 (Express on macOS x64 failed p99 drift once while the runner slowed from 125,000

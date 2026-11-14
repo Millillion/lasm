@@ -230,8 +230,8 @@ the complete Lean release (Lean's C compiler, headers and libraries).
 
 **Status: complete, gate passed, awaiting review.** Exit criteria: [PLAN.md](PLAN.md#language-coverage-phases-approved-2026-10-19).
 Candidate gate passed 2026-10-21: three back-to-back cold-installation confidence runs ([39537968104](https://github.com/Millillion/lasm/actions/runs/39537968104), [39537979004](https://github.com/Millillion/lasm/actions/runs/39537979004), [39537992042](https://github.com/Millillion/lasm/actions/runs/39537992042)) on candidate `0.1.0-experimental.39500947696` all succeeded; every platform reports at least 4 consecutive clean cold installs.
-Evidence: [five-platform results](evidence/lean-4.35.0-language-coverage-l23-2026-10-20.json),
-[fixes and probes](evidence/lean-4.35.0-language-coverage-l23-fixes-2026-10-20.json).
+Evidence: [five-platform results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.35.0-language-coverage-l23-2026-10-20.json),
+[fixes and probes](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.35.0-language-coverage-l23-fixes-2026-10-20.json).
 Candidates (runtime `7aa5028c…`, each passing five-platform installed acceptance):
 `.39458561103` (source `cdcfd05`), `.39489327335` (`d41aa03`: Windows DNS, C entry) and
 `.39500947696` (`0c89de9`: Windows link scratch path; SHA-256 `741d4c38…aaed`, release
@@ -333,7 +333,7 @@ Lake drivers run (projects 6 → 23 passes); the 10 sidecar/`#exit` tests run on
 **Status: complete, reviewed (option C).** Correction from Phase 2: the environment
 failures below were not caused by an unseeded `ENV`; see the Phase 2 fix table. Evidence:
 [inventory](evidence/lean-4.35.0-language-coverage-inventory.json),
-[baseline](evidence/lean-4.35.0-language-coverage-baseline-2026-10-20.json),
+[baseline](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.35.0-language-coverage-baseline-2026-10-20.json),
 [4.35.0 mixed-driver review](evidence/lean-4.35.0-mixed-driver-classification.json).
 Every Lasm result is the exact retained candidate `0.1.0-experimental.39310029213`
 (SHA-256 `a976ec4e…72a3`, release `node-package-39310029213`, source `8829c9a`) in
@@ -457,7 +457,7 @@ release+debug, `def_clash`, `path with spaces`, `rc_sticky`), 1 policy
 ### Other platforms (representative)
 
 The same 62 adapter tests (1,668 actions, chosen across every area) and all 118
-compiled applications ([platform evidence](evidence/lean-4.35.0-language-coverage-platforms-2026-10-20.json)). Every adapter action matches native on every target:
+compiled applications ([platform evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.35.0-language-coverage-platforms-2026-10-20.json)). Every adapter action matches native on every target:
 
 | Platform | Adapter subset | Compiled applications |
 | --- | --- | --- |
