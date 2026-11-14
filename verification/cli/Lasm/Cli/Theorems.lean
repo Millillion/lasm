@@ -4241,6 +4241,182 @@ end PlatformProofs
 theorem inside_directory_prefix : Spec.inside_directory_prefix := fun cwd directory file =>
   PlatformProofs.inside_iff cwd.toList directory.toList file.toList
 
+/-! ## The initializer closure (Model/Initialization.lean)
+
+A visit with enough fuel (more than the units not yet in `order`) appends
+only units reached from its name, appends the name when it is a unit, and
+leaves every unit it appends with its called units appended too
+(`visit_facts`, `fold_facts`); so the closure is closed under calls and
+holds the roots that are units.
+-/
+
+namespace InitProofs
+open Lasm.Cli.Initialization
+
+variable (units : List (String × List String))
+
+theorem reach_root_unit {root x : String} (h : InitReaches units root x) : hasUnit units root = true := by
+  induction h with
+  | base h => exact h
+  | step _ _ _ ih => exact ih
+
+theorem reach_unit {root x : String} (h : InitReaches units root x) : hasUnit units x = true := by
+  cases h with
+  | base h => exact h
+  | step _ _ hz => exact hz
+
+theorem reach_trans {a b c : String} (h1 : InitReaches units a b) (h2 : InitReaches units b c) : InitReaches units a c := by
+  induction h2 with
+  | base _ => exact h1
+  | step _ hc hz ih => exact .step ih hc hz
+
+/-- The units the walk has not appended yet. -/
+def unseen (order : List String) : Nat := ((units.map (·.1)).filter (· ∉ order)).length
+
+theorem hasUnit_mem {n : String} (h : hasUnit units n = true) : n ∈ units.map (·.1) := by
+  induction units with
+  | nil => simp [hasUnit] at h
+  | cons p ps ih =>
+    obtain ⟨k, v⟩ := p
+    by_cases hk : n = k
+    · subst hk; simp
+    · simp only [hasUnit, List.lookup_cons] at h ih
+      have : (n == k) = false := by simpa using hk
+      rw [this] at h; simp only at h
+      exact List.mem_cons_of_mem _ (ih h)
+
+theorem filter_length_mono {p q : String → Bool} (h : ∀ x, p x = true → q x = true) :
+    ∀ l : List String, (l.filter p).length ≤ (l.filter q).length
+  | [] => by simp
+  | y :: ys => by
+    have := filter_length_mono h ys
+    simp only [List.filter_cons]
+    by_cases hp : p y = true
+    · rw [if_pos hp, if_pos (h y hp)]; simp; omega
+    · rw [if_neg hp]; split <;> simp <;> omega
+
+theorem filter_append_lt {order : List String} {u : String} (hn : u ∉ order) : ∀ ks : List String, u ∈ ks →
+    (ks.filter (· ∉ order ++ [u])).length < (ks.filter (· ∉ order)).length
+  | [], h => by simp at h
+  | k :: ks, h => by
+    have le : ∀ l : List String, (l.filter (· ∉ order ++ [u])).length ≤ (l.filter (· ∉ order)).length :=
+      filter_length_mono (fun x h => by simp_all)
+    simp only [List.filter_cons]
+    by_cases hk : k = u
+    · subst hk
+      have := le ks
+      rw [if_neg (by simp), if_pos (by simpa using hn)]; simp only [List.length_cons]; omega
+    · have hm' : u ∈ ks := by simp at h; rcases h with h | h; exact absurd h.symm hk; exact h
+      have := filter_append_lt hn ks hm'
+      by_cases ho : k ∈ order
+      · rw [if_neg (by simp [ho]), if_neg (by simp [ho])]; exact this
+      · rw [if_pos (by simp [ho, hk]), if_pos (by simp [ho])]; simp only [List.length_cons]; omega
+
+theorem unseen_append_lt {order : List String} {u : String} (hu : hasUnit units u = true) (hn : u ∉ order) :
+    unseen units (order ++ [u]) < unseen units order :=
+  filter_append_lt hn _ (hasUnit_mem units hu)
+
+theorem unseen_mono {order : List String} (new : List String) : unseen units (order ++ new) ≤ unseen units order := by
+  unfold unseen
+  exact filter_length_mono (fun x h => by simp_all) _
+
+/-- What one visit with fuel `F` does. -/
+def VisitFacts (F : Nat) : Prop :=
+  ∀ (order : List String) (u : String), unseen units order < F →
+    (∃ new, visitUnit units F order u = order ++ new) ∧
+    (order.Nodup → (visitUnit units F order u).Nodup) ∧
+    (∀ x ∈ visitUnit units F order u, x ∉ order → InitReaches units u x) ∧
+    (hasUnit units u = true → u ∈ visitUnit units F order u) ∧
+    (∀ x ∈ visitUnit units F order u, x ∉ order →
+      ∀ c ∈ callsOf units x, hasUnit units c = true → c ∈ visitUnit units F order u)
+
+/-- What visiting a list of names in turn with fuel `F` does. -/
+def FoldFacts (F : Nat) (cs : List String) : Prop :=
+  ∀ (order : List String), unseen units order < F →
+    (∃ new, cs.foldl (visitUnit units F) order = order ++ new) ∧
+    (order.Nodup → (cs.foldl (visitUnit units F) order).Nodup) ∧
+    (∀ x ∈ cs.foldl (visitUnit units F) order, x ∉ order → ∃ c ∈ cs, InitReaches units c x) ∧
+    (∀ c ∈ cs, hasUnit units c = true → c ∈ cs.foldl (visitUnit units F) order) ∧
+    (∀ x ∈ cs.foldl (visitUnit units F) order, x ∉ order →
+      ∀ c ∈ callsOf units x, hasUnit units c = true → c ∈ cs.foldl (visitUnit units F) order)
+
+theorem fold_facts {F : Nat} (hV : VisitFacts units F) : ∀ cs, FoldFacts units F cs
+  | [] => fun order _ => ⟨⟨[], by simp⟩, id, fun x hx hxo => absurd hx hxo, by simp, fun x hx hxo => absurd hx hxo⟩
+  | c :: rest => by
+    intro order hlt
+    obtain ⟨⟨n1, h1⟩, nd1, re1, mem1, cl1⟩ := hV order c hlt
+    have hlt1 : unseen units (visitUnit units F order c) < F := by
+      rw [h1]; exact Nat.lt_of_le_of_lt (unseen_mono units n1) hlt
+    obtain ⟨⟨n2, h2⟩, nd2, re2, mem2, cl2⟩ := fold_facts hV rest _ hlt1
+    simp only [List.foldl_cons]
+    have sub1 : ∀ x ∈ visitUnit units F order c, x ∈ rest.foldl (visitUnit units F) (visitUnit units F order c) := by
+      intro x hx; rw [h2]; exact List.mem_append_left _ hx
+    refine ⟨⟨n1 ++ n2, by rw [h2, h1, List.append_assoc]⟩, fun nd => nd2 (nd1 nd), ?_, ?_, ?_⟩
+    · intro x hx hxo
+      by_cases hx1 : x ∈ visitUnit units F order c
+      · exact ⟨c, by simp, re1 x hx1 hxo⟩
+      · obtain ⟨c', hc', hr⟩ := re2 x hx hx1; exact ⟨c', by simp [hc'], hr⟩
+    · intro c' hc' hu
+      simp only [List.mem_cons] at hc'
+      rcases hc' with rfl | hc'
+      · exact sub1 _ (mem1 hu)
+      · exact mem2 c' hc' hu
+    · intro x hx hxo d hd hu
+      by_cases hx1 : x ∈ visitUnit units F order c
+      · exact sub1 _ (cl1 x hx1 hxo d hd hu)
+      · exact cl2 x hx hx1 d hd hu
+
+theorem visit_facts : ∀ F, VisitFacts units F
+  | 0 => fun _ _ h => absurd h (Nat.not_lt_zero _)
+  | F + 1 => by
+    intro order u hlt
+    simp only [visitUnit]
+    by_cases hskip : u ∈ order ∨ (!hasUnit units u) = true
+    · rw [if_pos hskip]
+      refine ⟨⟨[], by simp⟩, id, fun x hx hxo => absurd hx hxo, fun hu => ?_, fun x hx hxo => absurd hx hxo⟩
+      rcases hskip with h | h
+      · exact h
+      · rw [hu] at h; simp at h
+    · rw [if_neg hskip]
+      simp only [not_or, Bool.not_eq_true', Bool.not_eq_false] at hskip
+      obtain ⟨hn, hu⟩ := hskip
+      have hlt1 : unseen units (order ++ [u]) < F := by
+        have := unseen_append_lt units hu hn; omega
+      obtain ⟨⟨n, h⟩, nd, re, mem, cl⟩ := fold_facts units (visit_facts F) (callsOf units u) _ hlt1
+      have sub : ∀ x ∈ order ++ [u], x ∈ (callsOf units u).foldl (visitUnit units F) (order ++ [u]) := by
+        intro x hx; rw [h]; exact List.mem_append_left _ hx
+      refine ⟨⟨[u] ++ n, by rw [h, List.append_assoc]⟩, fun nd0 => nd (List.nodup_append.mpr ⟨nd0, by simp, fun a ha b hb => by simp at hb; subst hb; intro e; subst e; exact hn ha⟩), ?_,
+        fun _ => sub u (by simp), ?_⟩
+      · intro x hx hxo
+        by_cases hxu : x = u
+        · subst hxu; exact .base hu
+        · obtain ⟨c, hc, hr⟩ := re x hx (by simp [hxo, hxu])
+          exact reach_trans units (.step (.base hu) hc (reach_root_unit units hr)) hr
+      · intro x hx hxo c hc hcu
+        by_cases hxu : x = u
+        · subst hxu; exact mem c hc hcu
+        · exact cl x hx (by simp [hxo, hxu]) c hc hcu
+
+/-- The closure: no unit twice, and exactly the units reached from a root. -/
+theorem closure_reached (roots : List String) :
+    (initializerClosure units roots).Nodup ∧
+    ∀ x, x ∈ initializerClosure units roots ↔ ∃ r ∈ roots, InitReaches units r x := by
+  have hlt : unseen units [] < units.length + 1 := by
+    unfold unseen; have := List.length_filter_le (fun x => decide (x ∉ ([] : List String))) (units.map (·.1)); simp at this ⊢; omega
+  obtain ⟨-, nd, re, mem, cl⟩ := fold_facts units (visit_facts units (units.length + 1)) roots [] hlt
+  refine ⟨nd List.nodup_nil, fun x => ⟨fun hx => re x hx (by simp), fun ⟨r, hr, hreach⟩ => ?_⟩⟩
+  have key : ∀ y, InitReaches units r y → y ∈ roots.foldl (visitUnit units (units.length + 1)) [] := by
+    intro y hy
+    induction hy with
+    | base hu => exact mem r hr hu
+    | step _ hz hu ih => exact cl _ ih (by simp) _ hz hu
+  exact key x hreach
+
+end InitProofs
+
+theorem closure_reached : Spec.closure_reached := fun units roots =>
+  InitProofs.closure_reached units roots
+
 /-! ## Function packages -/
 
 theorem zip_deterministic : Spec.zip_deterministic := fun _ => rfl

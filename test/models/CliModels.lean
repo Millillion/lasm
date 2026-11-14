@@ -53,6 +53,8 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
   parseDevArguments   {"tokens": ["<hex>", …], "runtime": "node"}  → (the same)
   parsePackageArguments  ["<hex>", …]              → (the same)
   leanAtLeast    {"version": "<hex>", "minimum": "<hex>"}  → true | false
+  initializerClosure  {"units": [["…", ["…", …]], …], "roots": ["…", …]}  → ["…", …]
+  unitsReaching  {"graph": [["…", ["…", …]], …], "candidates": ["…", …], "targets": ["…", …]}  → ["…", …]
   relativePath   {"cwd": "<hex>", "from": "<hex>", "to": "<hex>"}  → "<hex>"  (path.posix.relative)
   insideDirectory  {"cwd": "<hex>", "directory": "<hex>", "file": "<hex>"}  → true | false
   applicationLinkRequirements  {"map": "<hex>", "initFree": ["<hex>", …]}
@@ -102,6 +104,7 @@ import Lasm.Cli.Model.LowerAtomics
 import Lasm.Cli.Model.Mangle
 import Lasm.Cli.Model.StaticServer
 import Lasm.Cli.Model.Reachability
+import Lasm.Cli.Model.Initialization
 import Lean.Compiler.NameMangling
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
@@ -418,6 +421,17 @@ def answer (j : Json) : Except String Json := do
       | .error e => Json.mkObj [("error", toJson e)]
       | .ok r => Json.mkObj [("mode", toJson (if r.static then "static" else "dynamic")), ("dynamic", hexes r.dynamic),
           ("cxxRuntime", hexes r.cxxRuntime), ("moduleData", hexes r.moduleData), ("requiresModuleData", toJson r.requiresModuleData)]
+  | "initializerClosure" =>
+    let strs := fun (j : Json) => do (← j.getArr?).toList.mapM (·.getStr?)
+    let entries := fun (j : Json) => do (← j.getArr?).toList.mapM fun e => do
+      let a ← e.getArr?; return ((← (a[0]?.getD Json.null).getStr?), (← strs (a[1]?.getD Json.null)))
+    return toJson (Initialization.initializerClosure (← entries (← input.getObjVal? "units")) (← strs (← input.getObjVal? "roots")))
+  | "unitsReaching" =>
+    let strs := fun (j : Json) => do (← j.getArr?).toList.mapM (·.getStr?)
+    let entries := fun (j : Json) => do (← j.getArr?).toList.mapM fun e => do
+      let a ← e.getArr?; return ((← (a[0]?.getD Json.null).getStr?), (← strs (a[1]?.getD Json.null)))
+    return toJson (Initialization.unitsReaching (← entries (← input.getObjVal? "graph"))
+      (← strs (← input.getObjVal? "candidates")) (← strs (← input.getObjVal? "targets")))
   | "relativePath" =>
     return ofText (String.ofList (relativePath (← text (← input.getObjVal? "cwd")).toList
       (← text (← input.getObjVal? "from")).toList (← text (← input.getObjVal? "to")).toList))

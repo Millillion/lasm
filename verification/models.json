@@ -121,7 +121,17 @@
     },
     "src/application-initialization.mjs": {
       "status": "pending",
-      "reason": "runtime initialization planning (initializer pruning): a pure graph computation over the link's symbols"
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/Initialization.lean",
+          "functions": [
+            "initializerClosure",
+            "unitsReaching"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "initializerClosure and unitsReaching are modelled (closure_reached proved); the initializer units read from objects and archives, the C wrappers and the planning probes remain to model"
     },
     "src/application-link.mjs": {
       "status": "exempt",

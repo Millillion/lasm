@@ -236,6 +236,16 @@ def link_map_static_sound : Prop :=
       ∀ m s, Reachability.memberSection t = some (m, s) →
         Reachability.independent (fun x => initFree (String.ofList x)) s = true)
 
+/-- **The initializer closure is the units the roots reach, once each.**
+Whatever the calls (cycles, calls to units outside the map, repeated
+roots), `initializerClosure` lists each unit reached from a root through
+initializer calls exactly once, and nothing else.
+Tested by: test/application-initialization.test.mjs -/
+def closure_reached : Prop :=
+  ∀ (units : List (String × List String)) (roots : List String),
+    (initializerClosureOf units roots).Nodup ∧
+    ∀ x, x ∈ initializerClosureOf units roots ↔ ∃ r ∈ roots, InitReaches units r x
+
 /-! ## The link driver's Python semantics -/
 
 /-- **Escaped strings are printable ASCII.** `json.dumps` of any string,

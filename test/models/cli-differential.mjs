@@ -25,6 +25,7 @@ import { lakeName, packageName, parseInitArguments, supabaseFunctionNameOf } fro
 import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
+import { initializerClosure, unitsReaching } from '../../src/application-initialization.mjs';
 import { applicationLinkRequirements } from '../../src/application-reachability.mjs';
 import { ioErrorTables, leanAtLeast, leanIOError } from '../../src/lean-io-errors.mjs';
 import { demangleName, initializerModule, mangleName } from '../../src/application-diagnosis.mjs';
@@ -572,6 +573,26 @@ const models = [
         return { ...result, dynamic: result.dynamic.map(hex), cxxRuntime: result.cxxRuntime.map(hex), moduleData: result.moduleData.map(hex) };
       } catch (error) { return { error: error.message }; }
     },
+  },
+  {
+    name: 'initializerClosure', source: 'src/application-initialization.mjs', lean: 'Lasm.Cli.Model.Initialization',
+    generate: r => {
+      const names = Array.from({ length: r.int(1, 9) }, (_, i) => `initialize_U${i}`);
+      const units = [...new Set(names.filter(() => r.next() < 0.85))].map(n => [n, r.array(r.int(0, 4), () => r.next() < 0.1 ? 'initialize_Outside' : r.pick(names))]);
+      return { units, roots: r.array(r.int(0, 4), () => r.next() < 0.1 ? 'initialize_Missing' : r.pick(names)) };
+    },
+    input: v => v,
+    js: ({ units, roots }) => initializerClosure(new Map(units.map(([name, calls]) => [name, { name, calls }])), roots),
+  },
+  {
+    name: 'unitsReaching', source: 'src/application-initialization.mjs', lean: 'Lasm.Cli.Model.Initialization',
+    generate: r => {
+      const names = Array.from({ length: r.int(1, 9) }, (_, i) => r.pick(['initialize_', 'l_', 'lean_']) + i);
+      const graph = [...new Set(names.filter(() => r.next() < 0.8))].map(n => [n, r.array(r.int(0, 4), () => r.next() < 0.1 ? 'l_outside' : r.pick(names))]);
+      return { graph, candidates: r.array(r.int(0, 5), () => r.pick(names)), targets: r.array(r.int(0, 3), () => r.pick([...names, 'l_outside'])) };
+    },
+    input: v => v,
+    js: ({ graph, candidates, targets }) => unitsReaching(new Map(graph), candidates, targets),
   },
   {
     name: 'relativePath', source: 'src/platform.mjs', lean: 'Lasm.Cli.Model.Platform',
