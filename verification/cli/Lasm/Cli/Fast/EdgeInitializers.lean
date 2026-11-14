@@ -202,7 +202,7 @@ theorem list_eq_string (n : String) : validInitializerList n.toList = validIniti
 
 /-- The schedule of `name` over prepared tables. -/
 def scheduleWith (m : Std.HashMap String (List String)) (ks : Std.HashSet String) (fuel : Nat) (name : String) : List String :=
-  ((m.getD name []).foldl (visit m ks fuel) ((∅ : Std.HashSet String).insert name, #[])).2.toList
+  ((m.getD name []).foldl (visit m ks fuel) ((Std.HashSet.emptyWithCapacity m.size).insert name, #[])).2.toList
 
 /-- `Lasm.Cli.initializationSchedule`, in time linear in the plan. -/
 def initializationSchedule (name : String) (calls : List (String × List String)) (keep : List String) : List String :=
@@ -280,7 +280,7 @@ theorem scheduleWith_eq {calls : List (String × List String)} {keep : List Stri
     {m : Std.HashMap String (List String)} {ks : Std.HashSet String}
     (hm : ∀ u, m.getD u [] = edgesOf calls u) (hk : ∀ u, ks.contains u = decide (u ∈ keep)) (name : String) :
     scheduleWith m ks (calls.length + 1) name = Lasm.Cli.initializationSchedule name calls keep := by
-  have hstart : Agree ([name], []) ((∅ : Std.HashSet String).insert name, #[]) := by
+  have hstart : Agree ([name], []) ((Std.HashSet.emptyWithCapacity m.size).insert name, #[]) := by
     refine ⟨fun x => ?_, rfl⟩
     by_cases hx : name = x
     · subst hx; simp

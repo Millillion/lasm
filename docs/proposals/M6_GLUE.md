@@ -48,8 +48,12 @@ times, by one that reads them once. Natively the whole generator then takes
 
 - **One glue program.** `verification/cli/LasmGlue.lean` runs
   `Lasm.Cli.Glue.main` (`Lasm/Cli/Glue.lean`): it reads an operation and its
-  arguments from stdin, as length-prefixed UTF-8 fields, and writes `ok:` and
-  the result or `error:` and a message to stdout. Later slices add
+  arguments from stdin, as UTF-8 fields, and writes `ok:` and
+  the result or `error:` and a message to stdout. The request is a table of
+  its distinct fields (separated by 0 bytes) and each field's 32-bit index
+  into it, so a name the plan repeats (each initializer about ten times) is
+  sent, validated and copied once; a request whose fields hold a 0 byte is
+  written as length-prefixed fields instead (§4, second round). Later slices add
   operations to the same program, so they share the Lean runtime the first
   slice pays for.
 - **Built by the published Lasm, as a WASI command.** `--target wasi` needs no
@@ -66,13 +70,13 @@ times, by one that reads them once. Natively the whole generator then takes
   stderr are collected, every clock reads 0 (Lean's runtime reads one as it
   starts), and every other WASI call (files, arguments, environment, random
   bytes) fails with `ENOSYS`. It
-  uses only `WebAssembly` and `Buffer`, so it runs under Node, Bun and Deno,
+  uses only `WebAssembly`, `Buffer` and `TextEncoder`, so it runs under Node, Bun and Deno,
   as the CLI does, and works from the published npm package (the `.wasm` is
   in `src/`, which ships). The calls stay synchronous, so callers do not
   change.
 - **The JavaScript left behind** is the adapter: the plan's shape check (now
   also requiring string names and arrays of calls) and the field encoding,
-  reading `calls` as its own entries (`Object.entries`), which is exactly the
+  reading `calls` as its own entries (its own keys and their values), which is exactly the
   model's reading (the model's old caveat about `Object.prototype` names goes
   away). No JavaScript fallback: if the glue cannot run, the edge link fails
   with the error.
