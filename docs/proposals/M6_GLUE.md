@@ -145,3 +145,68 @@ passed its smoke test under Bun 1.4.4 and Deno 2.9.6):
 What would make the next slices cheaper: a WASI build optimized for speed
 (`-O2`) for the glue, and one instance reused across calls (a reactor
 instead of a command), which would remove the 3 ms per call.
+
+### Second round: a faster glue (PR #294)
+
+The goal was a warm call within about twice the JavaScript. Measured where
+the time went first (natively, with the same Lean compiled by Lean 4.35.0,
+and in Node on the committed module), then changed what cost most:
+
+| Step | Bar plan (2807, 6), natively | Change |
+| --- | ---: | --- |
+| Reading the request | 3.3 ms → 0.6 ms | The request was one length-prefixed field per name (22,461 fields, 414 KB): each field extracted, validated and copied, with `StateT` closures. It is now a table of the distinct fields (each name once: 56 KB) and a 32-bit index per field; the program validates and splits the table once and shares each name. Index reads use `UInt32` arithmetic (`Nat` shifts cost about 90 ns each). |
+| Its structure | 0.5 ms → 0.4 ms | Counts are read byte by byte (`String.toNat?` goes through the generic pattern machinery). |
+| The name check | 1.2 ms → 0.2 ms | `validInitializer` reads the name's bytes in place: a word character's UTF-8 encoding is one ASCII byte, and every other character's starts with a byte of 192 or more, so checking bytes is checking characters (`enc_all`, `allWordBytes_eq`; the `csimp` theorem now targets the byte loop). |
+| The schedules | 0.8 ms → 0.6 ms | Each walk's seen set is sized to the plan up front instead of growing from empty (about ten rehashes per kept initializer); 2807, 50: 4.3 → 3.2 ms; 8000, 200: 10.0 → 8.9 ms. |
+| Whole program | 5.9 ms → 2.6 ms | |
+
+On the JavaScript side, encoding the request went from 4.7 ms (one string
+and `Buffer.byteLength` per field) to 1.3 ms (a `Map` of distinct fields,
+one `join`, `TextEncoder.encodeInto`).
+
+Tried and not kept:
+
+- **A speed-optimized build.** The published CLI's `--target wasi` has no
+  optimization setting: its C is compiled at `-O2` and `wasm-opt` runs at
+  `-Oz` (`src/wasi/wasi-link.mjs`). Re-running the CLI's own `wasm-opt`
+  (version 132) at `-O2`, `-O3` or `-O4` over the first slice's module, each
+  measured in its own Node process (60 warm calls on the bar's plan), gave
+  medians of 16.6 to 17.3 ms against 16.5 to 17.2 ms for the `-Oz` module:
+  no difference, for up to 1% more bytes. The C is already optimized; what is
+  left is WebAssembly's own cost (about 2.5 times native here) and the
+  per-call spread (12.5 to 20 ms between the 10th and 90th percentiles), which
+  comes from a fresh instance and its 16 MiB memory per call. Not worth a
+  second optimizer pass in the build.
+- **Numbering the names once per plan** (a proved walk over arrays of
+  numbers instead of hash sets of names). A walk got 3 times cheaper, but
+  numbering the 28,000 names of a plan costs more than the six walks of the
+  bar's plan, and on 8000, 200 the sized hash-set walk is as fast.
+
+RESULTS_CI
+
+Why twice the JavaScript is out of reach for this slice: the JavaScript does
+the whole job in 1.0 ms. Encoding the plan for the glue costs 1.3 ms on its
+own (28,000 names through a `Map`), and a WASI command pays instantiation and
+Lean's runtime and module initialization on every call (EMPTY_CALL, an empty
+call). Even with no Lean code at all a call would cost about three times the
+JavaScript. Two changes would move that floor, and both are outside this
+slice: a reactor build, which pays the initialization once per process (it
+needs a new `lasm build` option, proposed in [REVIEW.md](../REVIEW.md#the-cli-surface)
+for Jordan), and slices whose Lean work is large next to their input, so
+that encoding is not the bulk.
+
+### What next (M6)
+
+The next slice should be one where the Lean code does much more than the
+encoding, or should wait for the reactor:
+
+- **`src/wasi/wasi-component.mjs` and `src/wasi/lower-atomics.mjs`** (WASI
+  links): wholly modelled, run once per WASI build, on megabytes. They need
+  fast `ByteArray` versions of their `List UInt8` models, with `csimp`
+  proofs, and a binary field in the request.
+- **`src/package.mjs` and `src/init.mjs` argument parsing**: modelled and
+  proved, small, but `src/cli-arguments.mjs` imports `package.mjs` at start,
+  and a parse costs more in the glue than in JavaScript (worth it only with a
+  reactor).
+- **`src/application-initialization.mjs`** (the initialization plan the
+  first slice consumes): still pending its M4 model.
