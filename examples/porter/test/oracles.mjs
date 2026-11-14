@@ -12,17 +12,18 @@
 // Every client of test/config.mjs is exercised: client_secret_basic and
 // client_secret_post, a public client, ES256 and EdDSA.
 //
-//   node test/oracles.mjs [--url URL | --command CMD | --platform NAME] [--name NAME]
+//   node test/oracles.mjs [--url URL | --command CMD | --platform NAME] [--name NAME] [--equivalence]
 import assert from 'node:assert/strict';
 import * as client from 'openid-client';
 import * as oauth from 'oauth4webapi';
 import * as jose from 'jose';
-import { Browser, harness, serverArgs, startPorter } from './server.mjs';
+import { Browser, harness, recorderFor, serverArgs, startPorter } from './server.mjs';
 import { cb, clients, users } from './config.mjs';
 
 const args = serverArgs();
 const server = await startPorter(args);
 const base = server.base;
+const recorder = recorderFor('oracles', args, base);
 const t = harness(`Oracle tests${args.name ? ` (${args.name})` : ''}`);
 const insecure = { [oauth.allowInsecureRequests]: true };
 const jwks = jose.createRemoteJWKSet(new URL(`${base}/jwks`));
@@ -219,5 +220,6 @@ await t.check('discovery: the metadata OpenID Connect Discovery requires, and on
   assert.equal(d.request_uri_parameter_supported, false);
 });
 
+recorder?.save();
 await server.stop();
 t.done();

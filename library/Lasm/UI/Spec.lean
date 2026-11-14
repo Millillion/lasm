@@ -133,20 +133,32 @@ def applier_correct : Prop :=
     0 ∉ Applier.idsIn dom → (∀ x ∈ Applier.idsIn dom, x ∈ used) → 0 ∈ used → Applier.confOps used ops dom = some u →
     Applier.run (Decode.Wire.ofOps 0 ops) dom = some (applyOps ops dom) ∧ (Applier.idsIn (applyOps ops dom)).Nodup
 
-/-- **The browser shows every view, if the diff's patches conform.** Assume
-the candidate `Candidates.diff_conforms` (`Applier.DiffConforms`: the patch
-`diff` writes for a well-formed live tree with distinct ids conforms; tested
-on every frame of the model differential, not yet proved). Render any
-sequence of views from an empty root, one frame each as the runtime does
-(`Applier.trace`: the patch of each frame and the DOM of its live tree).
-Then the applier, reading the bytes of every frame as Lean encodes them
-(`Decode.encodeAll`, tables carried across frames) and performing them on
-the DOM the last frame left, refuses none and leaves after each frame
-exactly the DOM of that frame's live tree, which shows its view
-(`session_correct`). This composes `diff_correct`, `frames_decode` and
-`applier_correct`. -/
+/-- **The diff's patches conform.** For a well-formed live tree whose DOM
+has distinct ids, none 0 (as every frame of a session has:
+`Spec.session_correct`, `Spec.applier_correct`), the patch of `diff` to any
+next view conforms (`Applier.confOps`, from the ids below the next free id):
+every node an op names is a child of its parent there, inserts and moves
+go before such a child or at the end and never before the moved node
+itself, text changes are on text nodes and attribute changes on elements
+(with every slot as the encoder sends it), and inserted subtrees bring
+distinct new ids. So `applier_correct` applies to every patch `diff`
+writes. (Well-formedness alone is enough: the proof does not use the other
+two assumptions, which the model differential checks hold on every frame.) -/
+def diff_conforms : Prop :=
+  ∀ (Msg : Type) (old : List (Live Msg)) (new : List (Html Msg)) (next : Nat), WF old next → 0 < next →
+    (Applier.idsIn (old.map toDom)).Nodup → 0 ∉ Applier.idsIn (old.map toDom) →
+    (Applier.confOps (List.range next) (diff old new next).ops.toList (old.map toDom)).isSome
+
+/-- **The browser shows every view.** Render any sequence of views from an
+empty root, one frame each as the runtime does (`Applier.trace`: the patch
+of each frame and the DOM of its live tree). Then the applier, reading the
+bytes of every frame as Lean encodes them (`Decode.encodeAll`, tables
+carried across frames) and performing them on the DOM the last frame left,
+refuses none and leaves after each frame exactly the DOM of that frame's
+live tree, which shows its view (`session_correct`). This composes
+`diff_correct`, `diff_conforms`, `frames_decode` and `applier_correct`. -/
 def applier_session : Prop :=
-  Applier.DiffConforms → ∀ (Msg : Type) (views : List (List (Html Msg))),
+  ∀ (Msg : Type) (views : List (List (Html Msg))),
     Applier.frames {} [] (Decode.encodeAll {} ((Applier.trace Session.empty views).map Prod.fst)) =
       (Applier.trace Session.empty views).map fun x => some x.2
 

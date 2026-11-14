@@ -17,7 +17,7 @@
 //   - diff: views drawn at random (keyed and unkeyed children, reorders,
 //     inserts, removals, kind, tag, text and attribute changes), rendered in
 //     turn by Lean's `diff` and encoder (the runner's `views` request); every
-//     patch must conform (Lasm.UI.Candidates.diff_conforms, below) and every
+//     patch must conform (Lasm.UI.Spec.diff_conforms, below) and every
 //     frame must apply;
 //   - random: frames of random operations (inserts of new subtrees, moves,
 //     removals, clears, text and attribute changes, decoder definitions; the
@@ -54,8 +54,8 @@ import { createUi } from '../../src/lasm-modules/ui-dom.mjs';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const runner = fileURLToPath(new URL('./UiApplierModel.lean', import.meta.url));
 // The proof modules the runner imports, in import order (proofs-only: not in the library).
-const modules = ['Proofs.Basic', 'Proofs.Lists', 'Proofs.Children', 'Proofs.TwoEnded', 'Proofs.Diff', 'Proofs', 'Proofs.Decode',
-  'Proofs.Wire', 'Proofs.Applier', 'Proofs.Apply'].map(m => ['Lasm', 'UI', ...m.split('.')]);
+const modules = ['Proofs.Basic', 'Proofs.Lists', 'Proofs.Decode', 'Proofs.Applier', 'Proofs.Conform', 'Proofs.Children',
+  'Proofs.TwoEnded', 'Proofs.Diff', 'Proofs', 'Proofs.Wire', 'Proofs.Apply'].map(m => ['Lasm', 'UI', ...m.split('.')]);
 
 // ---- The Lean model ----
 async function start({ lean, olean } = {}) {
@@ -477,7 +477,7 @@ export async function differential({ runs = 1000, seed = 1, lean, olean } = {}) 
     const gen = random(seed);
     for (let run = 0; run < runs; run++) {
       // Lean's diff of random views.
-      // Proposition: Lasm.UI.Candidates.diff_conforms
+      // Proposition: Lasm.UI.Spec.diff_conforms
       //   ∀ (Msg : Type) (old : List (Live Msg)) (new : List (Html Msg)) (next : Nat), WF old next → 0 < next →
       //     (Applier.idsIn (old.map toDom)).Nodup → 0 ∉ Applier.idsIn (old.map toDom) →
       //     (Applier.confOps (List.range next) (diff old new next).ops.toList (old.map toDom)).isSome
@@ -489,7 +489,7 @@ export async function differential({ runs = 1000, seed = 1, lean, olean } = {}) 
       const rendered = await model.ask({ views });
       if (rendered.fault) throw new Error(`diff session ${run}: the model refused the views: ${rendered.fault}`);
       const bad = rendered.conform.indexOf(false);
-      if (bad >= 0) throw new Error(`diff session ${run} (seed ${seed}), frame ${bad}: the patch does not conform (Candidates.diff_conforms)\n  views: ${JSON.stringify(views)}`);
+      if (bad >= 0) throw new Error(`diff session ${run} (seed ${seed}), frame ${bad}: the patch does not conform (Spec.diff_conforms)\n  views: ${JSON.stringify(views)}`);
       const patches = rendered.patches.map(h => Uint8Array.from(Buffer.from(h, 'hex'))).filter(f => f.length);
       const result = await check(model, `diff session ${run} (seed ${seed})`, patches);
       if (result !== 'applied') throw new Error(`diff session ${run} (seed ${seed}): a frame of Lean's diff was ${result}\n  views: ${JSON.stringify(views)}`);

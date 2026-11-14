@@ -319,7 +319,7 @@
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "both of its functions are modelled; the module does nothing else"
+      "reason": "both functions run as their Lean model, compiled by Lasm into the CLI's glue program (src/glue/glue.mjs, docs/proposals/M6_GLUE.md) through a proved fast version (verification/cli/Lasm/Cli/Fast/EdgeInitializers.lean, a csimp theorem); what remains here is the plan's shape check and the encoding of its fields, which the differential checks together with the compiled program"
     },
     "src/edge/edge-js.mjs": {
       "status": "pending",
@@ -380,6 +380,11 @@
       "kind": "io",
       "reason": "a timer thread writing to the terminal"
     },
+    "src/glue/glue.mjs": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "the WASI host of the CLI's glue program (reading stdin, writing stdout and stderr, a clock that reads 0, exiting; nothing else) and its field codec; the program is Lean (verification/cli/Lasm/Cli/Glue.lean), checked with this host by the model differential of src/edge/edge-initializers.mjs, and the host by test/glue.test.mjs on hand-made modules"
+    },
     "src/handle-table.mjs": {
       "status": "modelled",
       "models": [
@@ -426,7 +431,7 @@
     },
     "src/lasm-modules/ui-dom.mjs": {
       "status": "modelled",
-      "reason": "the UI applier: its reading of patch frames is Lean's reference decoder (ui-decode, proved by Lasm.UI.Spec.frames_decode) and its DOM operations and hydration are the applier model (applier_correct, applier_session, hydrate_correct proved; the differential runs it on happy-dom with the DOM standard's insertion checks); left out: events, commands, subscriptions and navigation (tested in test/ui-dom-applier.test.mjs and the browser suites)",
+      "reason": "the UI applier: its reading of patch frames is Lean's reference decoder (ui-decode, proved by Lasm.UI.Spec.frames_decode) and its DOM operations and hydration are the applier model (applier_correct, diff_conforms, applier_session, hydrate_correct proved; the differential runs it on happy-dom with the DOM standard's insertion checks); left out: events, commands, subscriptions and navigation (tested in test/ui-dom-applier.test.mjs and the browser suites)",
       "models": [
         {
           "lean": "library/Lasm/UI/Proofs/Decode.lean",
@@ -1066,7 +1071,7 @@
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "every function is modelled (the template, read from component/proxy-template.wasm by default, is an argument); replace_one_core_module, drops_only_component_type and componentize_inverse proved"
+      "reason": "every function runs as its Lean model, compiled by Lasm into the CLI's glue program (src/glue/glue.mjs, docs/proposals/M6_GLUE.md) through proved fast versions over byte arrays (verification/cli/Lasm/Cli/Fast/WasiComponent.lean, csimp theorems); what remains here is reading the template (component/proxy-template.wasm, an argument of the model) and taking any array of bytes, which the differential checks together with the compiled program; replace_one_core_module, drops_only_component_type and componentize_inverse proved"
     },
     "src/wasi/wasi-link.mjs": {
       "status": "exempt",
