@@ -11,7 +11,7 @@ suite passes.
 # Lean 4.34 upstream application acceptance
 
 The latest-release target is now **4.34.1**. Its
-[fresh inventory](evidence/lean-4.34.1-upstream-inventory-2026-09-25.json) verifies
+[fresh inventory](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-upstream-inventory-2026-09-25.json) verifies
 7,673 original files and links and records 4,069 registrations. The two added
 BitVec cases are native build-time checks; the new `rc_sticky` C regression
 requires both native and deployed runtime execution. There are now 3,499 native
@@ -23,7 +23,7 @@ counts and upstream exclusions are unchanged. The
 remain separate from earlier evidence. Five focused checks verify release
 isolation, shard coverage and CI argument forwarding. Harness support and this
 inventory do not establish new suite passes. The full runtime rebuild now
-passes, and the [unchanged `rc_sticky` driver](evidence/lean-4.34.1-installed-main-2026-09-25.json)
+passes, and the [unchanged `rc_sticky` driver](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-installed-main-2026-09-25.json)
 passes both natively and through installed `.25` in Node on Linux
 x64. The parallel adapter maps only its exact C compiler invocation to the
 installed application linker. Original assertions remain active; unexpected
@@ -44,12 +44,12 @@ PATH is empty. Five integrity controls enforce Unicode/comment preservation,
 valid contexts/ranges/names and exact release/source review binding. All guards
 release without OOM, swap or resource stops; maximum memory is 4.58 GiB.
 
-The [initial three-input results](evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json)
-and [expanded Node checkpoint](evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json)
+The [initial three-input results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-upstream-http-io-three-engines-2026-09-25.json)
+and [expanded Node checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-upstream-http-io-expanded-node-2026-09-25.json)
 remain intact. Original registrations retain their native-build-time category;
 parallel runtime checks add deployed API observations.
 
-[Ten additional original inputs now pass in Node](evidence/lean-4.34.1-upstream-io-stress-network-complete-2026-09-25.json):
+[Ten additional original inputs now pass in Node](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-upstream-io-stress-network-complete-2026-09-25.json):
 ten comparisons covering temporary files, TCP, UDP,
 cancellation reasons, serial HTTP fuzzing, size limits and hang regressions.
 Combined with the twelve preceding HTTP inputs, these are 22 comparisons. Eight integrity controls enforce exact source and sidecar
@@ -66,7 +66,7 @@ Guarded/scoped evaluations, full declaration coverage and other native platforms
 remain unfinished. These checks do not establish full `Std.Http` or complete
 latest-release upstream-suite acceptance.
 
-The [later successful-output retirement](evidence/lean-4.34.1-successful-output-retention-2026-09-25.json)
+The [later successful-output retirement](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-successful-output-retention-2026-09-25.json)
 reclaims 4.85 GiB from the preceding HTTP comparisons and supplementary
 filesystem/console comparisons. Sources, results, diagnostics and generated
 output hashes remain intact. Their earlier archive receipts are preserved, but
@@ -74,7 +74,7 @@ the reproducible binaries have now been retired under the existing suite
 retention policy. Failed and interrupted outputs remain untouched.
 
 The parallel application harness now [reclaims redundant module data before
-execution](evidence/lean-4.34.1-upstream-metadata-reclamation-2026-09-25.json).
+execution](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-upstream-metadata-reclamation-2026-09-25.json).
 After the installed build finishes, it checks the metadata manifest against the
 recorded build identity and hashes every file in both generated copies. Only
 the identical cached copy is removed; the deployment stays complete. The
@@ -93,7 +93,7 @@ original source and frozen harness file remained unchanged. The failure exposed
 missing `.ir.sig` companion files in automatic module-data packaging: current
 Lean skips interpreter IR when those signatures are absent.
 
-The [signature packaging repair](evidence/lean-4.34.1-ir-signatures-2026-09-25.json)
+The [signature packaging repair](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-ir-signatures-2026-09-25.json)
 passes seven integrity tests, an unchanged-code failure/success diagnostic,
 and fresh installed `.26` executions of the original `incr_cli_snapshot` and
 `incr_header_mismatch` tests. Both deployed clients invoke native Lean children;
@@ -110,7 +110,7 @@ Current managed tools, original source/tests and result logs stay intact.
 Restore archived executable paths using their recorded hashes, modes and times
 before resuming a historical SDK; shared gzip archives must remain immutable.
 
-The [complete fresh Node campaign](evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json)
+The [complete fresh Node campaign](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json)
 now covers all 101 compiled-application registrations through installed `.27`:
 97 deployed passes and four original compilation-disabled registrations. Both
 incremental regressions pass within this complete campaign. All 7,673 original
@@ -187,7 +187,7 @@ Resource aborts, cold-build deadlines, behavior failures, unsupported inputs and
 unexecuted cases must stay distinct in reports. No broad campaign should start
 until it uses the shipping application path and obeys the resource guard.
 
-The separate [excluded-concurrency controls](evidence/upstream-excluded-concurrency-2026-09-24.json)
+The separate [excluded-concurrency controls](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-excluded-concurrency-2026-09-24.json)
 run the unchanged `async_select_channel` and `sync_mutex` elaboration drivers,
 then import their original definitions into a supplementary ordinary main.
 Installed `.19` matches native compiled behavior in three repetitions in
@@ -196,7 +196,7 @@ mutex, try-lock and condition-variable checks. Peak memory
 is 3.59 GiB without resource events. These are extra controls for upstream
 exclusions, not additional default-suite passes or proof against all races.
 
-The [four compilation-disabled Node controls](evidence/upstream-compile-disabled-node-2026-09-24.json)
+The [four compilation-disabled Node controls](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-compile-disabled-node-2026-09-24.json)
 now pass through installed `.19`: `compactor_chain`, `dep_regions`,
 `dep_regions_miss` and `identifier_completion`. Original drivers and markers
 run first, followed by explicitly separate native AOT and deployed AOT checks
@@ -215,7 +215,7 @@ The host now relaunches that exact application through Node,
 preserving ordinary child-process handling. The repaired installed candidate
 passes the original closure test in Node. Eight loader,
 child-process and shutdown controls also pass. The
-[self-launch evidence](evidence/application-self-launch-2026-09-23.json) records
+[self-launch evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-self-launch-2026-09-23.json) records
 the original failure, both package identities, repaired runs and resource use.
 Every original test/helper file and symlink remains unchanged.
 
@@ -230,7 +230,7 @@ on a standard Linux x64 CI runner. The broad run passed 3,495; the two symlink
 inputs then passed after correcting the parallel harness's expected-content
 lookup. Both runs verify all 7,669 original files/links before and after, and
 preserve the original drivers, outputs and assertions. The
-[combined evidence](evidence/upstream-native-build-time-complete-2026-09-23.json)
+[combined evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-native-build-time-complete-2026-09-23.json)
 retains the earlier guarded resource stop and both harness defects. The completed
 broad run peaked at 2.32 GiB without resource events. This result covers native
 compilation and evaluation; it does not validate those same APIs when deployed
@@ -243,12 +243,12 @@ Emscripten worker-mailbox exception (`wait.value.then is not a function`); its
 native output and initial failing deployment are preserved. All original
 files/links and harness hashes remained unchanged. The 4.10 GiB peak caused no
 OOM, throttling or proactive stop. The
-[per-case record](evidence/upstream-applications-node-r1-2026-09-23.json) is the
+[per-case record](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-applications-node-r1-2026-09-23.json) is the
 authoritative count; earlier progress updates missed that failure. It also
 identifies the six compiled fixtures that deliberately launch native Lean child
 processes, keeping those compiler operations separate from deployed behavior.
 
-The [large-stack investigation and repair](evidence/application-large-stack-node-2026-09-23.json)
+The [large-stack investigation and repair](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-large-stack-node-2026-09-23.json)
 now reproduce that failure with the original `LEAN_STACK_SIZE_KB=4194304`
 sidecar setting. Emscripten's backing allocator retained 32-bit limits and masks,
 and pthread creation used its null allocation. Pointer-width bookkeeping and
@@ -273,7 +273,7 @@ complete official archive, because the unchanged checker uses `git ls-files`.
 It verifies all 7,669 recorded test/helper files and links before and after and
 confirms the extracted tree is unchanged. The guarded run peaked at 0.98 GiB
 without resource events. This is a native source-only check, not a deployed
-application result; see the [source-lint evidence](evidence/upstream-source-lint-2026-09-23.json).
+application result; see the [source-lint evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-source-lint-2026-09-23.json).
 
 All **202 documentation-parser inputs pass in stock Node 26.10.0** through
 installed candidate `0.1.0-experimental.9` on Linux x64. The unchanged
@@ -283,7 +283,7 @@ same driver with its exact `lean --run` invocation mapped to the deployed main.
 Original assertions and expected outputs remain in force. All 7,669 source entries
 and the active harness hashes are unchanged before and after execution. The test
 phase took 663.02 seconds; preparation and execution peaked at 3.40 GiB with no
-resource events. The [per-case evidence](evidence/upstream-docparse-node-2026-09-23.json)
+resource events. The [per-case evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-docparse-node-2026-09-23.json)
 does not imply other-platform passes for this category.
 
 The [mixed-driver review](evidence/lean-4.34-mixed-driver-classification.json)
@@ -307,7 +307,7 @@ separate release-pinned directory. This verifies deployed client behavior, not a
 Wasm-hosted Lean compiler. All 7,669 original entries and active harness hashes
 remain unchanged. The sequential preparation/execution run took 25 minutes
 49 seconds and peaked at 3.95 GiB with no resource events. See the
-[per-case evidence](evidence/upstream-lsp-node-2026-09-24.json).
+[per-case evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-lsp-node-2026-09-24.json).
 
 The reviewed native-only mixed campaign now finishes **78 passed and one
 upstream-disabled** registration on Linux x64 with managed Lean 4.34.0. Each
@@ -315,12 +315,12 @@ unchanged shell/Lake driver starts from its own verified source copy; intentiona
 fixture mutations are recorded. All 7,669 original reference entries and active
 harness hashes remain unchanged. The preparation and execution run took
 11 minutes 10 seconds and peaked at 3.62 GiB without resource events. The
-[per-case evidence](evidence/upstream-mixed-native-2026-09-24.json) covers native
+[per-case evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-mixed-native-2026-09-24.json) covers native
 build-time behavior only. The other 31 mixed registrations retain their ordinary
 application or foreign-runtime deployment obligations.
 
 Completed generated binaries may be stored as verified gzip archives to preserve
-the disk reserve. The [archival receipts](evidence/completed-artifact-archives-2026-09-24.json)
+the disk reserve. The [archival receipts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/completed-artifact-archives-2026-09-24.json)
 record original paths, lengths, checksums, modes and modification times, together
 with verified archive checksums and decompression results. Restore and verify a
 binary before replaying its historical probe. This affects only the listed
@@ -328,7 +328,7 @@ completed experiment binaries, including older standalone test drivers; original
 upstream sources, expected outputs, result receipts and failure deployments
 remain in place. It does not add or remove compatibility passes.
 
-The [latest IO campaign receipts](evidence/application-io-surface-2026-09-24.json)
+The [latest IO campaign receipts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-io-surface-2026-09-24.json)
 also record verified archival of 25 generated symbol-registry C files in the
 paused Lean 4.32 compiler research, recovering 2.31 GiB. Their original bytes,
 modes and modification times are recoverable. Restore them before rebuilding
@@ -337,7 +337,7 @@ tests and their result receipts were not changed. Two archive-selection
 preflights exited before making changes and are retained separately. Neither
 archival nor the safe disk stop counts as an application test failure.
 
-The [additional storage receipts](evidence/completed-artifact-storage-2026-09-24.json)
+The [additional storage receipts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/completed-artifact-storage-2026-09-24.json)
 preserve six earlier successful AOT deployments as verified gzip files, then
 share storage for 48 byte-identical archives among 72 completed IO/package
 archive paths. Every path and checksum remains valid. These archives are
@@ -352,7 +352,7 @@ on Linux x64. Its original native shell driver and independent native executable
 both pass before each application build. Relocated deployments run with hidden
 source trees, empty PATH and unchanged datasets; per-file counts, failure counts
 and total output match native. All 7,669 reference entries remain unchanged.
-The [ofScientific evidence](evidence/upstream-ofscientific-2026-09-24.json) records
+The [ofScientific evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-ofscientific-2026-09-24.json) records
 the 3.49 GiB maximum peak without resource events. The separate
 `integration/application-upstream-packages.mjs` harness drives the reviewed
 floating-point project too. Other mixed registrations and native platforms
@@ -364,7 +364,7 @@ The original stage-directory toolchain pin remains intact. An initial harness
 preflight rejected that pin before running the test; the repaired parallel harness
 uses an additional release-pinned application copy, verifies every other original
 byte, and hides all source copies before deployment. The
-[private-import receipts](evidence/upstream-private-import-2026-09-24.json)
+[private-import receipts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-private-import-2026-09-24.json)
 preserve the initial preflight failure and the Node pass, including unchanged
 original drivers and all 7,669 reference entries. Peak guarded memory was
 3.56 GiB without resource events. This is Linux x64 application evidence, not
@@ -377,7 +377,7 @@ native backends. Native controls, per-file counts, totals and failure counts
 match; only elapsed-time text is excluded from comparison. The unchanged program
 explicitly executes `gzip`, so the isolated deployment PATH contains that one
 recorded dependency. All source copies are hidden and all 7,669 reference entries
-remain unchanged. The [floating-point receipts](evidence/upstream-float-2026-09-24.json)
+remain unchanged. The [floating-point receipts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-float-2026-09-24.json)
 record a 4.97 GiB maximum peak without resource events. Original NaN-class and
 exception-flag policies remain unchanged; this is not proof of every possible
 floating-point input or other native platforms.
@@ -388,12 +388,12 @@ four environment controls pass in Node, as does the release executable. Panic lo
 uncaught exceptions match native. `LEAN_BACKTRACE=0` matches complete output;
 enabled traces require real backend frames while preserving their raw output.
 Native ASLR addresses and native/Wasm frame formats differ between executions.
-The [debug receipts](evidence/upstream-debug-2026-09-24.json)
+The [debug receipts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-debug-2026-09-24.json)
 retain the passing executable variants, with unchanged
 original drivers and all 7,669 reference entries. Maximum build memory was
 3.46 GiB. Broader panic semantics and native platform coverage remain open.
 
-The [storage receipts](evidence/panic-storage-2026-09-24.json) retain the completed
+The [storage receipts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/panic-storage-2026-09-24.json) retain the completed
 Wasmtime compilation artifact as verified gzip, share six duplicate float
 archives, and remove only npm cache copies matching retained package tarballs.
 A stale-cache preflight and a release-campaign disk stop remain separately
@@ -407,14 +407,14 @@ CRT. All seven cases
 match native exactly in Node on Linux x64: fallback values, real
 stderr redirection, IO panic failure, and abort with ordinary, zero, empty and
 redirected settings. Sources are hidden and deployments relocated with empty
-PATH. The [seven comparisons](evidence/panic-semantics-2026-09-24.json) and nine focused
+PATH. The [seven comparisons](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/panic-semantics-2026-09-24.json) and nine focused
 unit checks pass; maximum build memory was 3.42 GiB without resource events.
 These are additional controls, not unchanged upstream test passes. Private
 Shell panic controls and native platform parity remain open. Earlier failing
 attempts and verified archival receipts are retained.
 
 The unchanged `pkg/path with spaces` and `pkg/def_clash` projects now pass
-[two installed `.18` Node project comparisons](evidence/upstream-projects-2026-09-24.json)
+[two installed `.18` Node project comparisons](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-projects-2026-09-24.json)
 on Linux x64. Each original native shell driver runs first. The separate AOT
 checks cover cache reuse, relocated executions, and expected
 build rejections with the original duplicate-definition diagnostic assertions.
@@ -439,7 +439,7 @@ Node matches native Lean for the original import, those added assertions,
 and a missing-standard-data error: **three deployed comparisons** in total. All
 7,669 reference entries, original project files, the supplementary fixture and
 copied data remain unchanged. Peak memory was 5.01 GiB without resource events.
-See the [comparisons and repair evidence](evidence/runtime-imports-and-lake-initialization-2026-09-24.json).
+See the [comparisons and repair evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/runtime-imports-and-lake-initialization-2026-09-24.json).
 
 Installed `.18` failed before linking this project: its private Lake-discovery
 helper reached a native interpreter assertion for an uninitialized constant.
@@ -465,9 +465,9 @@ relocated deployed processes at their original PIDs, retaining the one-second
 waits and exact stdout, stderr and termination comparisons. Sources are hidden
 and PATH is empty. All 7,669 reference entries remain unchanged. The maximum
 build/run peak is 3.45 GiB without resource events. See the
-[signal comparisons and retained failure](evidence/upstream-signal-2026-09-24.json).
+[signal comparisons and retained failure](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-signal-2026-09-24.json).
 
-The subsequent [supplementary signal API campaign](evidence/application-signal-policy-2026-09-24.json)
+The subsequent [supplementary signal API campaign](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-signal-policy-2026-09-24.json)
 passes 16 native/deployed comparisons in Node through installed `.22`, after
 retaining the original `.21` differences. It covers all 22 names with one-shot
 and repeated delivery, plus seven default actions before and after stopping a

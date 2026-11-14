@@ -39,14 +39,14 @@ passed in [runtime CI](https://github.com/Millillion/lasm/actions/runs/362145985
 The runtime handoff archive SHA-256 is
 `b00ba194c398a2acf9f384f5fb192214510daeff90a5e4a00c9fbf8f3bd192ca`.
 Full source/tool identities and bounded build records are preserved in the
-[runtime evidence](../evidence/node-linux-ci-runtime-2026-09-26.json).
+[runtime evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-linux-ci-runtime-2026-09-26.json).
 
 The exact tested archive and checksum are retained in an
 [unpublished GitHub draft](https://github.com/Millillion/lasm/releases/tag/untagged-b7f976257db5637e4783)
 under `node-linux-candidate-36221743804`, accessible to repository maintainers.
 A downloaded copy was independently SHA-256-verified at
 `.work/node-linux-tested-36221743804/lasm-compiler-0.1.0-experimental.32.tgz`.
-The [candidate receipt](../evidence/node-linux-candidate-2026-09-26.json) records the
+The [candidate receipt](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-linux-candidate-2026-09-26.json) records the
 release assets and verification. Subsequent evidence/documentation commits do
 not replace the tested archive.
 
@@ -59,8 +59,8 @@ the CI cache adviser.
 
 | Native target | Result | Observed OS / kernel / libc | Evidence |
 | --- | --- | --- | --- |
-| Linux x86-64 | Pass | Ubuntu 24.04.5 LTS; 6.17.0-1022-azure; glibc 2.39 | [Job](https://github.com/Millillion/lasm/actions/runs/36221743804/job/108348340717), [full record](../evidence/node-linux-x64-2026-09-26.json) |
-| Linux ARM64 | Pass | Ubuntu 24.04.5 LTS; 6.17.0-1022-azure; glibc 2.39 | [Job](https://github.com/Millillion/lasm/actions/runs/36221743804/job/108349855894), [full record](../evidence/node-linux-arm64-2026-09-26.json) |
+| Linux x86-64 | Pass | Ubuntu 24.04.5 LTS; 6.17.0-1022-azure; glibc 2.39 | [Job](https://github.com/Millillion/lasm/actions/runs/36221743804/job/108348340717), [full record](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-linux-x64-2026-09-26.json) |
+| Linux ARM64 | Pass | Ubuntu 24.04.5 LTS; 6.17.0-1022-azure; glibc 2.39 | [Job](https://github.com/Millillion/lasm/actions/runs/36221743804/job/108349855894), [full record](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-linux-arm64-2026-09-26.json) |
 
 Each job passed 24 checked CLI/native commands, three startup samples, six
 download/cache recovery controls, and three independently copied applications
@@ -135,10 +135,10 @@ These attempts do not count as complete platform passes. No OOM occurred.
 
 | Attempt | Result and correction |
 | --- | --- |
-| [Combined packaging](https://github.com/Millillion/lasm/actions/runs/36219307441) | Proactive resource stop. Sequential extraction/packing guards reduced packing peak to about 1 GiB. [Record](../evidence/node-linux-packaging-resource-abort-2026-09-26.json). |
-| [Cold tool cache](https://github.com/Millillion/lasm/actions/runs/36219476165) | Proactive stop dominated by inactive file cache. Added scoped completed-tool cache advice. [Record](../evidence/node-linux-cold-file-cache-abort-2026-09-26.json). |
-| [Git configuration](https://github.com/Millillion/lasm/actions/runs/36220144960) | Cold Hello World passed; Lake hit a denied runner system-config include. Private test configs resolved the isolation mismatch. [Record](../evidence/node-linux-cold-hello-git-isolation-2026-09-26.json). |
-| [Later import rebuild](https://github.com/Millillion/lasm/actions/runs/36220732483) | Twenty command checks passed before a proactive stop. Included completed application build caches in scoped advice. [Record](../evidence/node-linux-rebuild-resource-abort-2026-09-26.json). |
+| [Combined packaging](https://github.com/Millillion/lasm/actions/runs/36219307441) | Proactive resource stop. Sequential extraction/packing guards reduced packing peak to about 1 GiB. [Record](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-linux-packaging-resource-abort-2026-09-26.json). |
+| [Cold tool cache](https://github.com/Millillion/lasm/actions/runs/36219476165) | Proactive stop dominated by inactive file cache. Added scoped completed-tool cache advice. [Record](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-linux-cold-file-cache-abort-2026-09-26.json). |
+| [Git configuration](https://github.com/Millillion/lasm/actions/runs/36220144960) | Cold Hello World passed; Lake hit a denied runner system-config include. Private test configs resolved the isolation mismatch. [Record](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-linux-cold-hello-git-isolation-2026-09-26.json). |
+| [Later import rebuild](https://github.com/Millillion/lasm/actions/runs/36220732483) | Twenty command checks passed before a proactive stop. Included completed application build caches in scoped advice. [Record](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node-linux-rebuild-resource-abort-2026-09-26.json). |
 
 ## Support boundary
 

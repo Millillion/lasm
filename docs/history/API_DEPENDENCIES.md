@@ -8,8 +8,8 @@ This inventory traces the pinned Lean 4.32.0 `IO.FS` and `Std.Http` APIs through
 Lean's compiled intermediate representation (IR). It locates primitive
 dependencies; it does **not** establish behavioral or test coverage.
 
-The [graph](lean-4.32.0-api-dependencies.json) contains the same 2,131 roots as
-the [API inventory](lean-4.32.0-api.json): 193 filesystem declarations and 1,938
+The [graph](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/compatibility/lean-4.32.0-api-dependencies.json) contains the same 2,131 roots as
+the [API inventory](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/compatibility/lean-4.32.0-api.json): 193 filesystem declarations and 1,938
 HTTP declarations, including generated declarations. Native Lean and the frozen
 v127 Node compiler produce identical graphs. Across 8,980 nodes, 7,684 have
 compiled bodies and 227 are extern declarations using 217 distinct C symbols.
@@ -27,7 +27,7 @@ inventory runs:
 | `IO.FS.createDirAll` | `lean_io_create_dir` |
 | `Std.Http.Server.serve` | `lean_uv_tcp_bind`, `lean_uv_tcp_listen` |
 
-The [evidence](../evidence/api-dependencies-2026-09-22.json) records commands,
+The [evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/api-dependencies-2026-09-22.json) records commands,
 input/output hashes, compiler pins, resource reports, and earlier audit attempts.
 An initial source-expression traversal produced matching native/Node output
 but missed the real body of partial functions such as `createDirAll`; Lean's
