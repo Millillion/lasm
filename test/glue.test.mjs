@@ -4,7 +4,7 @@
 // answer that is neither ok nor an error).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { decodeFields, encodeFields, glueModule, runGlue } from '../src/glue/glue.mjs';
+import { decodeFields, encodeFields, encodeRequest, glueModule, runGlue, runRequest } from '../src/glue/glue.mjs';
 import { forAll } from './helpers/property.mjs';
 
 // Proposition: Lasm.Cli.Candidates.glue_fields_round_trip
@@ -20,6 +20,35 @@ test('fields round-trip through the codec, whatever their text', () => {
     assert.throws(() => decodeFields(bad), /The glue program wrote a malformed field/, bad);
 });
 
+/** The fields of a request in the table format. */
+const tableFields = bytes => {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  assert.equal(bytes[0], 1);
+  const distinct = view.getUint32(1, true), count = view.getUint32(5, true);
+  const table = Buffer.from(bytes.subarray(9 + 4 * count)).toString('utf8').split('\0');
+  assert.equal(table.length, distinct);
+  assert.equal(new Set(table).size, distinct, 'each field once');
+  return Array.from({ length: count }, (_, k) => table[view.getUint32(9 + 4 * k, true)]);
+};
+
+// Proposition: Lasm.Cli.Candidates.glue_request_fields
+//   ∀ lists : List (List String), requestFields (encodeRequest lists) = lists.flatten
+test('a request is a table of its distinct fields and their indices, or its fields with their lengths when one holds a 0 byte', () => {
+  const bytes = encodeRequest([['op', 'λ'], [], ['', '12', 'op']]);
+  assert.deepEqual([...bytes], [1, 4, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0,
+    ...Buffer.from('op\0λ\0\x0012')]);
+  assert.deepEqual(Buffer.from(encodeRequest([['a\0b', 'c']])), encodeFields(['a\0b', 'c']));
+  assert.deepEqual(Buffer.from(encodeRequest([[], []])), Buffer.alloc(0));
+  // Three bytes for each UTF-16 unit at most.
+  const long = '€'.repeat(30000);
+  assert.deepEqual(tableFields(encodeRequest([[long, '\ud800', long]])), [long, '\ufffd', long]);
+  forAll(g => g.array(g.int(0, 4), () => g.array(g.int(0, 4), () => g.string('ab:0λ\n\0', 0, 6))), lists => {
+    const bytes = Buffer.from(encodeRequest(lists)), fields = lists.flat();
+    if (bytes[0] === 1) assert.deepEqual(tableFields(bytes), fields);
+    else assert.deepEqual(bytes, encodeFields(fields));
+  });
+});
+
 test('the glue program runs its operations and refuses malformed requests', () => {
   assert.deepEqual(runGlue(['initializationSchedule', 'initialize_A', '2', 'initialize_A', '1', 'initialize_B', 'initialize_B', '0', '1', 'initialize_B']),
     { ok: '12:initialize_B' });
@@ -28,6 +57,20 @@ test('the glue program runs its operations and refuses malformed requests', () =
   assert.deepEqual(runGlue(['compactInitializerWrappers', '2', 'initialize_A']), { error: 'input ends before a field' });
   assert.deepEqual(runGlue([]), { error: 'input ends before a field' });
   assert.deepEqual(runGlue(['compactInitializerWrappers', 'many']), { error: 'a count is not a number' });
+  // Either way of writing a request, the same answers; a field may hold a 0 byte.
+  for (const fields of [['initializationSchedule', 'initialize_A', '1', 'initialize_A', '1', 'initialize_\0', '1', 'initialize_\0'],
+    ['compactInitializerWrappers', '1', 'initialize_A', '1', 'initialize_A', '0']])
+    assert.deepEqual(runRequest(encodeFields(fields)), runGlue(fields));
+  assert.deepEqual(runGlue(['initializationSchedule', 'initialize_A', '1', 'initialize_A', '1', 'initialize_\0', '1', 'initialize_\0']),
+    { ok: '12:initialize_\0' });
+  // Malformed tables are refused.
+  const table = (distinct, count, indices, text) => Buffer.from([1, ...words(distinct, count, ...indices), ...Buffer.from(text)]);
+  assert.deepEqual(runRequest(table(1, 1, [0], 'frobnicate')), { error: 'unknown operation frobnicate' });
+  assert.deepEqual(runRequest(table(2, 1, [0], 'frobnicate')), { error: "the request's table has 1 fields, not 2" });
+  assert.deepEqual(runRequest(table(1, 1, [1], 'frobnicate')), { error: 'field 0 is not in the table' });
+  assert.deepEqual(runRequest(table(1, 2, [0], '')), { error: 'the request ends inside its indices' });
+  assert.deepEqual(runRequest(Buffer.from([1, 1, 0])), { error: 'the request ends inside its header' });
+  assert.deepEqual(runRequest(Buffer.from([1, ...words(1, 1, 0), 0xff])), { error: 'the request is not UTF-8' });
   // The module is compiled once per process.
   assert.equal(glueModule(), glueModule());
   assert.ok(WebAssembly.Module.imports(glueModule()).every(({ module }) => module === 'wasi_snapshot_preview1'));
@@ -95,7 +138,7 @@ test('the host reads stdin across buffers, counts what it reads and writes, and 
       ...call(1, i32(1), i32(200), i32(6), i32(52)), 0x1a],
     data: [[0, words(100, 3, 103, 10)], [16, words(97, 3, 112, 0)], [200, words(100, 13, 32, 1, 36, 1, 37, 1, 40, 1, 44, 1)], [97, Buffer.from('ok:')]] });
   // The request is the encoded fields: "7:abcdefg" is 9 bytes.
-  const { ok } = runGlue(['abcdefg'], module);
+  const { ok } = runRequest(encodeFields(['abcdefg']), module);
   const rest = Buffer.from(ok);
   assert.equal(rest.subarray(0, 13).toString(), '7:abcdefg\0\0\0\0', 'read across both buffers, in order');
   assert.deepEqual([...rest.subarray(13)], [9, 0, 8, 3, 8], 'read 9 bytes; fd_read of 3 refused; wrote 3 bytes; fd_write to 5 refused');
@@ -107,7 +150,7 @@ test('the host stops a read at the end of the request', () => {
     code: [...call(0, i32(0), i32(0), i32(2), i32(32)), 0x1a, ...call(0, i32(0), i32(48), i32(1), i32(33)), 0x1a,
       ...call(1, i32(1), i32(16), i32(2), i32(40)), 0x1a],
     data: [[0, words(100, 2, 102, 4)], [48, words(106, 4)], [16, words(97, 13, 32, 2)], [97, Buffer.from('ok:')]] });
-  const rest = Buffer.from(runGlue(['xyz'], module).ok);
+  const rest = Buffer.from(runRequest(encodeFields(['xyz']), module).ok);
   // "3:xyz" fills 2 bytes, then 3 of the next 4 (the read stops there); the second read finds nothing.
   assert.deepEqual([...rest], [...Buffer.from('3:xyz\0\0\0\0\0'), 5, 0]);
 });
