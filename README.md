@@ -55,7 +55,7 @@ files, except on WASI); the rest of Lean works.
 | Install | `npm install -D @lasm/cli` (bin: `lasm`), or no install: `npx @lasm/cli …`; new project: `npm create @lasm@latest` |
 | Lean | exactly **4.35.0** (`lean-toolchain`: `leanprover/lean4:v4.35.0`); Lasm installs it, and you need no elan to build |
 | Develop on | Linux x64/arm64 (glibc 2.34+), macOS x64/arm64, Windows x64 |
-| Compiler runs on | Node ≥ 24 (tested 24.0.0, 24.22.2, 26.13.0); Bun 1.4.4 and Deno 2.9.6 (tested, as the only runtime) |
+| Compiler runs on | Node ≥ 24 (tested 24.0.0, 24.22.3, 26.13.1); Bun 1.4.4 and Deno 2.9.6 (tested, as the only runtime) |
 | Output | `dist/` with `program.wasm` + a JS launcher (Node); or a platform package (`--target …`) |
 | Node apps run on | Node ≥ 24, Linux x64/arm64 (glibc 2.28+ or musl) from any build machine, plus the build machine's own OS; ≥ 512 MB memory |
 | JS/npm interop | `import Lasm.JS`; one `@[js "pkg" "export"]` line per function you call; no premade bindings ([guide](docs/JS_BINDINGS.md)) |
@@ -518,7 +518,7 @@ Machines that **build** with Lasm (the compiler):
 | Windows ARM64 | ARM64 | **Not supported**: neither Lean nor Emscripten publishes Windows ARM64 prebuilts. |
 | Bun 1.4.4 and Deno 2.9.6 as the compiler's runtime (0.2.0) | all of the above | Tested in CI on all five platforms, also with no Node or npm on `PATH` ([BUN_DENO.md](docs/BUN_DENO.md)). |
 
-Node 24 or newer (tested: 24.0.0, 24.22.2, 26.13.0). No engine flags. Exact tested
+Node 24 or newer (tested: 24.0.0, 24.22.3, 26.13.1). No engine flags. Exact tested
 artifacts: [NODE_ACCEPTANCE.md](docs/NODE_ACCEPTANCE.md).
 
 ## Supported platforms
@@ -533,9 +533,9 @@ cloud account. Full matrix: [DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 | Platform | Tested in CI with |
 | --- | --- |
-| Linux x64 and arm64 (glibc 2.28+), Node 24+ | Node 24.0.0, 24.22.2 and 26.13.0 on `ubuntu-24.04` and `ubuntu-24.04-arm` |
-| macOS (x64, arm64) | Node 24.0.0 and 24.22.2 on `macos-15-intel`; Node 24.22.2 on `macos-15`; installed acceptance with Node 26.13.0 |
-| Windows x64 | Node 24.0.0 and 24.22.2 on `windows-2025`; installed acceptance with Node 26.13.0 |
+| Linux x64 and arm64 (glibc 2.28+), Node 24+ | Node 24.0.0, 24.22.3 and 26.13.1 on `ubuntu-24.04` and `ubuntu-24.04-arm` |
+| macOS (x64, arm64) | Node 24.0.0 and 24.22.3 on `macos-15-intel`; Node 24.22.3 on `macos-15`; installed acceptance with Node 26.13.1 |
+| Windows x64 | Node 24.0.0 and 24.22.3 on `windows-2025`; installed acceptance with Node 26.13.1 |
 | Docker / Kubernetes | `node:24-bookworm-slim`, `node:26-bookworm-slim`, `node:24-bullseye-slim`, Ubuntu 22.04/24.04; read-only, 512 MB, x64 and arm64 (Kubernetes manifests are not applied in CI) |
 | Google Cloud Run, Fly.io, Railway, Render, Heroku | the same container images and Dockerfiles; the platforms themselves are never deployed to |
 | AWS Lambda (container image) | `public.ecr.aws/lambda/nodejs:24` + AWS Lambda Web Adapter through the Runtime Interface Emulator, x86_64 and arm64; `amazonlinux:2023` |

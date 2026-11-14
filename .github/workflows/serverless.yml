@@ -51,7 +51,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 24.22.2
+          node-version: 24.22.3
           package-manager-cache: false
       - run: node --test --test-concurrency=1 test/serverless.test.mjs test/init.test.mjs test/cli-arguments.test.mjs test/native-application-bundle.test.mjs test/application-output.test.mjs test/node-host-zone.test.mjs
   input:
@@ -189,7 +189,7 @@ jobs:
         run: node scripts/serverless/run-hosted.mjs "$RUNNER_TEMP/apps/apps.json" .work/hosted.json --func "$RUNNER_TEMP/tools/node_modules/.bin/func" --pack "$RUNNER_TEMP/tools/pack"
       - name: Alpine/musl (node:24-alpine, node:26-alpine)
         if: always() && hashFiles('.work/lambda.json') != ''
-        run: node scripts/serverless/run-linux-variants.mjs "$RUNNER_TEMP/apps/apps.json" .work/alpine.json --images node:24.22.2-alpine,node:26.13.0-alpine
+        run: node scripts/serverless/run-linux-variants.mjs "$RUNNER_TEMP/apps/apps.json" .work/alpine.json --images node:24.22.3-alpine,node:26.13.1-alpine
       - name: Install gVisor release-20261019.0 as a Docker runtime
         if: always() && matrix.arch == 'x64'
         run: |
@@ -201,10 +201,10 @@ jobs:
           sudo /usr/local/bin/runsc install
           sudo systemctl restart docker
           runsc --version
-          docker run --rm --runtime=runsc node:24.22.2-bookworm-slim node -e "console.log(require('os').release())"
+          docker run --rm --runtime=runsc node:24.22.3-bookworm-slim node -e "console.log(require('os').release())"
       - name: gVisor (docker --runtime=runsc, node:24-bookworm-slim)
         if: always() && matrix.arch == 'x64' && hashFiles('.work/lambda.json') != ''
-        run: node scripts/serverless/run-linux-variants.mjs "$RUNNER_TEMP/apps/apps.json" .work/gvisor.json --images node:24.22.2-bookworm-slim --runtime runsc
+        run: node scripts/serverless/run-linux-variants.mjs "$RUNNER_TEMP/apps/apps.json" .work/gvisor.json --images node:24.22.3-bookworm-slim --runtime runsc
       - name: Preserve evidence
         if: always()
         run: |

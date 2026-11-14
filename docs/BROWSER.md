@@ -41,7 +41,7 @@ a Vite app, serves them under a strict Content Security Policy
 (`script-src 'self' 'wasm-unsafe-eval'`), and runs them headless in pinned
 Playwright 1.63.0: **Chromium 153** and **Firefox 155** on `ubuntu-24.04`,
 **WebKit 26.6** on `ubuntu-24.04` and `macos-15`. Evidence:
-[browser-ci-40288509500.json](evidence/browser-ci-40288509500.json).
+[browser-ci-40288509500.json](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/browser-ci-40288509500.json).
 
 - **Platform (this document's scope): every check passed on every engine** — the
   counter, 60 platform checks (all `Lasm.Web` areas; clicks, typing, keys with

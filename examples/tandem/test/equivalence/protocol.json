@@ -1,0 +1,815 @@
+{
+ "exchanges": [
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-0/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 0\ni 1 1 R 104\ni 2 1 1 1 R 101\ni 3 1 2 1 R 108\ni 4 1 3 1 R 108\ni 5 1 4 1 R 111\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 0 5\ni 1 1 R 104\ni 2 1 1 1 R 101\ni 3 1 2 1 R 108\ni 4 1 3 1 R 108\ni 5 1 4 1 R 111\n"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/doc/p<clock>-0/text",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "hello"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-0/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 3\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 3 5\ni 4 1 3 1 R 108\ni 5 1 4 1 R 111\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-1/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 0\ni 1 2 R 97\ni 2 2 1 2 R 98\ni 3 2 2 2 R 99\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 0 3\ni 1 2 R 97\ni 2 2 1 2 R 98\ni 3 2 2 2 R 99\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-1/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 0\ni 1 2 R 97\ni 2 2 1 2 R 98\ni 3 2 2 2 R 99\ni 1 2 R 97\ni 2 2 1 2 R 98\ni 3 2 2 2 R 99\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 0 3\ni 1 2 R 97\ni 2 2 1 2 R 98\ni 3 2 2 2 R 99\n"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/doc/p<clock>-1/text",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "abc"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-2/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 0\nd 2 3\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 0 1\nd 2 3\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-2/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 0\ni 1 3 R 120\ni 2 3 1 3 R 121\ni 3 3 2 3 R 122\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 0 4\nd 2 3\ni 1 3 R 120\ni 2 3 1 3 R 121\ni 3 3 2 3 R 122\n"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/doc/p<clock>-2/text",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "xz"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-3/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 0\ni 5 4 1 4 R 98\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 0 1\ni 5 4 1 4 R 98\n"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/doc/p<clock>-3/text",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": ""
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-3/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 0\ni 1 4 R 97\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 0 2\ni 5 4 1 4 R 98\ni 1 4 R 97\n"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/doc/p<clock>-3/text",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "ab"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 0\ni 1 5 R 111\ni 2 5 1 5 R 107\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 0 2\ni 1 5 R 111\ni 2 5 1 5 R 107\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 2\nsync 0\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror expected tandem 1\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror expected tandem 1\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync x\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad cursor\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync -1\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad cursor\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 1e3\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad cursor\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 0\ni 1 1 R 1114112\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad operation\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 0\ni 1 1 R 55296\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad operation\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 0\ni 1 1 L 97\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad operation\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 0\ni 3 1 3 1 R 97\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad operation\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 0\ni 3 1 5 1 L 97\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad operation\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 0\ni 1000000000000000 1 R 97\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad operation\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 0\nd 1\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad operation\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 0\nx 1 1\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad operation\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 0\ni  1 1 R 97\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad operation\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 0\ni 1 1 R 97 \n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad operation\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 0\ni 01 1 R 97\ni +1 1 R 97\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror bad operation\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror expected tandem 1\n"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/doc/p<clock>-4/text",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "ok"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-4/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 0\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 0 2\ni 1 5 R 111\ni 2 5 1 5 R 107\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-5/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "<102816 bytes, sha256 c34900f9c3bb4e0d921056117553e0cc0fd05c9d83390f4592fd792b03a1d37b>"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror too many operations\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-5/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "<102795 bytes, sha256 ce357c786ce5335c0c0637f9824b6b6ece4c6279317dc1e69156cdfabd145105>"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "<102799 bytes, sha256 04ef4571faecb9c7527e5681f7c04091b9940dff2be7c8975c3b203f415673c7>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-5/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 5000\ni 5001 6 5000 6 R 97\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 5000 5001\ni 5001 6 5000 6 R 97\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-5/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 0\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "<102799 bytes, sha256 04ef4571faecb9c7527e5681f7c04091b9940dff2be7c8975c3b203f415673c7>"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-5/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 5000\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 5000 5001\ni 5001 6 5000 6 R 97\n"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/doc/p<clock>-5/text",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-6/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 0\ni 1 7 R 113\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 0 1\ni 1 7 R 113\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/p<clock>-6/sync",
+    "headers": [
+     "content-type: text/plain"
+    ],
+    "body": "tandem 1\nsync 999\n"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nops 1 1\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/UPPER/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "tandem 1\nsync 0\n"
+   },
+   "response": {
+    "status": 404,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "no such document\n"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/doc/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/text",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 404,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "no such document\n"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/doc/ok/sync",
+    "headers": [],
+    "body": ""
+   },
+   "response": {
+    "status": 404,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "not found\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/ok/sync",
+    "headers": [
+     "content-type: text/plain;charset=UTF-8"
+    ],
+    "body": "<1048577 bytes, sha256 154b8ed3c2383ce429058768595935faf7851b5c38db2b1732594be1d88bc05a>"
+   },
+   "response": {
+    "status": 413,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror too large\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/doc/ok/sync",
+    "headers": [],
+    "body": {
+     "base64": "//4A"
+    }
+   },
+   "response": {
+    "status": 400,
+    "headers": [
+     "cache-control: no-store",
+     "content-type: text/plain; charset=utf-8"
+    ],
+    "body": "tandem 1\nerror not UTF-8\n"
+   }
+  }
+ ],
+ "facts": {}
+}
