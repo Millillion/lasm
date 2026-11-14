@@ -467,6 +467,18 @@ test('supported hosts', () => {
   if (buildPlatforms.includes(`${process.platform}-${process.arch}`)) assert.doesNotThrow(() => assertSupportedHost());
 });
 
+// Proposition: Lasm.Cli.Spec.inside_directory_prefix
+//   ∀ cwd directory file : String,
+//     insideDirectory cwd directory file = true ↔ resolvedSegments cwd directory <+: resolvedSegments cwd file
+test('a POSIX path is inside a directory exactly when its resolved segments extend the directory\'s', () => {
+  const posixPath = r => (r.next() < 0.7 ? '/' : '') + r.array(r.int(0, 5), () => r.pick(['a', 'b', 'ab', '..', '.', '', '..a'])).join('/') + (r.next() < 0.2 ? '/' : '');
+  const segments = p => path.posix.resolve(p).split('/').filter(Boolean);
+  forAll(r => [posixPath(r), posixPath(r)], ([directory, file]) => {
+    const d = segments(directory), f = segments(file);
+    assert.equal(insideDirectory(directory, file, path.posix), d.length <= f.length && d.every((s, i) => s === f[i]), `${directory} ${file}`);
+  }, { runs: 2000 });
+});
+
 test('executable names and directory containment', () => {
   assert.equal(executableName('lean', 'win32'), 'lean.exe');
   assert.equal(executableName('lean', 'linux'), 'lean');

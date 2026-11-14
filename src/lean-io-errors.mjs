@@ -29,7 +29,7 @@ IN THE SOFTWARE.
 */
 import { getSystemErrorMap } from 'node:util';
 
-const messages = {
+const messages = Object.assign(Object.create(null), {
   "E2BIG": "argument list too long",
   "EACCES": "permission denied",
   "EADDRINUSE": "address already in use",
@@ -114,15 +114,17 @@ const messages = {
   "ESOCKTNOSUPPORT": "socket type not supported",
   "ENODATA": "no data available",
   "EUNATCH": "protocol driver not attached"
-};
+});
 
 // lean_crt_to_uv_err in the pinned Lean runtime, including C errno aliases.
-const crtAliases = {
+const crtAliases = Object.assign(Object.create(null), {
   EBADMSG: 'EPROTO', ECHILD: 'ESRCH', EDEADLK: 'EBUSY', EDEADLOCK: 'EBUSY',
   EDOM: 'EINVAL', EIDRM: 'EPIPE', EINPROGRESS: 'EISCONN', ENETRESET: 'ECONNRESET',
   ENOLCK: 'EAGAIN', ENOLINK: 'ECONNRESET', ENOSR: 'ENOBUFS', ENOSTR: 'EINVAL',
   ETIME: 'ETIMEDOUT', ENOMSG: 'ENODATA', EWOULDBLOCK: 'EAGAIN', EOPNOTSUPP: 'ENOTSUP',
-};
+});
+// The tables, for the model differential (test/models/cli-differential.mjs).
+export const ioErrorTables = () => ({ messages: { ...messages }, crtAliases: { ...crtAliases }, windowsCrtCases: [...windowsCrtCases] });
 
 // Exact cases of Lean 4.34's lean_crt_to_uv_err. Windows CRT errno values are
 // distinct from libuv values: an unlisted errno is negated, not translated by
@@ -163,17 +165,21 @@ export function checkLeanIOVersion(version) {
     throw new Error('No verified IO error policy for Lean ' + version);
 }
 
-export function leanIOError(error, version) {
+/** Lean's translation of a libuv or CRT error for the given release: the
+ * pinned libuv code and message and a positive errno. `platform` and
+ * `systemErrorName` (Node's name of a libuv number) are the host's. */
+export function leanIOError(error, version, { platform = process.platform,
+  systemErrorName = errno => getSystemErrorMap().get(errno)?.[0] } = {}) {
   if (version === '4.32.0' || error.leanUserError) return error;
   const uv = typeof error.errno === 'number' && error.errno < 0;
   if (!uv && error.errorOrigin !== 'crt') return error;
   let code = uv ? error.code : crtAliases[error.code] ?? error.code;
-  if (!uv && process.platform === 'win32' && !windowsCrtCases.has(error.code))
-    code = getSystemErrorMap().get(-error.errno)?.[0] ?? 'UNKNOWN';
+  if (!uv && platform === 'win32' && !windowsCrtCases.has(error.code))
+    code = systemErrorName(-error.errno) ?? 'UNKNOWN';
   const uvNumber = uv ? error.errno : -error.errno;
   // UNKNOWN names the real UV_UNKNOWN sentinel only at -4094. Unknown errno
   // values instead include their signed number in libuv's diagnostic.
-  const message = (process.platform === 'win32' && code === 'ENOEXEC' ? 'exec format error' : undefined)
+  const message = (platform === 'win32' && code === 'ENOEXEC' ? 'exec format error' : undefined)
     ?? (code !== 'UNKNOWN' || uvNumber === -4094 ? messages[code] : undefined)
     ?? `Unknown system error ${uvNumber}`;
   return { ...error, code, errno: uv ? -error.errno : error.errno, message, nativeMessage: true };

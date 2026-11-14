@@ -16,17 +16,22 @@ import assert from 'node:assert/strict';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { random } from '../helpers/property.mjs';
 import { buildTargets, closest, editDistance, parseLasmArguments, targetHint } from '../../src/cli-arguments.mjs';
 import { changedFiles, parseDevArguments } from '../../src/dev.mjs';
-import { parseInitArguments } from '../../src/init.mjs';
+import { lakeName, packageName, parseInitArguments, supabaseFunctionNameOf } from '../../src/init.mjs';
 import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
-import { leanAtLeast } from '../../src/lean-io-errors.mjs';
-import { responseFile } from '../../src/platform.mjs';
+import { applicationLinkRequirements } from '../../src/application-reachability.mjs';
+import { ioErrorTables, leanAtLeast, leanIOError } from '../../src/lean-io-errors.mjs';
+import { demangleName, initializerModule, mangleName } from '../../src/application-diagnosis.mjs';
+import { comparePythonStrings, pythonJsonString } from '../../src/link-driver/python.mjs';
+import { insideDirectory, responseFile } from '../../src/platform.mjs';
+import { posix } from 'node:path';
+import { resolveStaticPath } from '../../src/browser/static-server.mjs';
 import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 import { zip } from '../../src/serverless/zip.mjs';
 import { keepExports, lowerAtomics, moduleImports } from '../../src/wasi/lower-atomics.mjs';
@@ -46,6 +51,9 @@ const hex = text => Buffer.from(text, 'utf8').toString('hex');
 /** Text with the characters a property is most likely to break on: escapes,
  * quotes, line ends, NUL, non-ASCII and astral characters. */
 const tricky = ['a', 'b', ' ', '\\', '"', "'", '\n', '\r', '\0', '\t', 'λ', '€', '😀', '$', '-', '='];
+/** Characters of directory and package names: the classes' edges, a scope,
+ * and characters whose lower case is ASCII (the Kelvin sign) or longer (İ). */
+const nameAlphabet = ['a', 'Z', '0', '9', '.', '_', '-', ' ', '@', '!', 'λ', '😀', '\u212a', '\u0130', 'é'];
 
 /** Unsigned LEB128, padded with `extra` continuation bytes (a valid,
  * non-minimal encoding, as LLVM writes in object files). */
@@ -368,7 +376,67 @@ function runLauncher(bytes) {
  * module, a generator, the JavaScript's answer and the request's input,
  * both in the runner's encoding. Each module's entry in
  * verification/models.json names its model and this differential. */
-export const models = [
+export 
+/** Lean names as components: numbers, and strings that read as numbers or
+ * escapes once mangled, start or end with `_`, are empty, or hold
+ * characters of every escape class (never `.`, so the dotted name is the
+ * same name). */
+const nameChars = ['a', 'B', 'x', 'u', 'U', 'f', '0', '7', '_', '-', '!', 'é', 'λ', '\uffff', '😀', '2d', '41', '03b1', '\n'];
+const nameComponents = r => r.array(r.int(1, 4), () => r.next() < 0.15 ? r.int(0, r.pick([9, 30, 1e6]))
+  : (s => /^(?:0|[1-9][0-9]*)$/.test(s) ? s + 'z' : s)(r.string(nameChars, 0, 6)));
+const dotted = parts => parts.map(String).join('.');
+/** Text for demangling: mangled names, mangled names changed, and soups of
+ * underscores, digits, escape letters and hex digits. */
+const mangledText = r => {
+  const roll = r.next();
+  if (roll < 0.4) return mangleName(dotted(nameComponents(r)));
+  if (roll < 0.6) { const m = [...mangleName(dotted(nameComponents(r)))]; const i = r.int(0, m.length); m.splice(i, r.int(0, 2), ...r.string(['_', '0', 'x', 'a'], 0, 2)); return m.join(''); }
+  return r.string(['_', '_', '_', '0', '0', '1', '9', 'x', 'u', 'U', 'a', 'f', 'Z', 'g', 'é'], 0, 16);
+};
+
+/** A static server's request: a root (absolute, sometimes `/` or relative),
+ * a pathname of dot segments, encoded dots and slashes, malformed and
+ * overlong percent-encoding and non-ASCII, the files that exist (under the
+ * root, its precompressed copies, the root itself, outside it), Accept-Encoding
+ * and the fallback page. */
+function staticRequest(r) {
+  const roll = r.next();
+  const root = roll < 0.08 ? '/' : roll < 0.15 ? r.pick(['dist', 'a/../b', '../x', '.']) : '/' + r.array(r.int(1, 3), () => r.pick(['srv', 'dist', 'a b', 'λ', 'x.y'])).join('/');
+  const segment = () => r.pick(['..', '.', '', '%2e%2e', '%2E.', 'index.html', 'app.js', 'app', 'x.css', 'photo.png', '.hidden', 'a.b.c', 'a..', 'λ',
+    '%', '%zz', '%4', '%41', '%e2%82%ac', '%e2%82', '%c0%80', '%ED%A0%80', '%F0%9F%98%80', '%f4%90%80%80', '%5c', '%00', '%2f..', 'dist']);
+  const pathname = (r.next() < 0.9 ? '/' : '') + r.array(r.int(0, 4), segment).join(r.pick(['/', '/', '%2f', '//']));
+  const names = ['index.html', 'app.js', 'app.js.br', 'app.js.gz', 'x.css', 'x.css.gz', 'photo.png', 'photo.png.gz', 'app', 'λ', 'nested/index.html', 'fallback.html'];
+  const base = root === '/' ? '' : root;
+  const files = [...r.array(r.int(0, 6), () => base + '/' + r.pick(names)), ...(r.next() < 0.1 ? [root] : []), ...(r.next() < 0.2 ? ['/etc/passwd', '/srv/secret'] : [])];
+  const accepts = r.pick(['', 'br', 'gzip', 'br, gzip', 'gzip, deflate', 'xbr', 'br_x', 'BR', 'gzip;q=1.0', 'identity']);
+  const fallback = r.pick([null, null, 'index.html', 'fallback.html', '']);
+  return { root, pathname, files, accepts, fallback };
+}
+
+/** A linker map: its header (or a near miss), CODE, rows of every shape the
+ * reader distinguishes (entry points, dynamic loaders, module-data APIs and
+ * near names, libleancpp members with each kind of section, on POSIX and
+ * Windows paths, and look-alikes), malformed rows, unusual white space. */
+function linkMap(r) {
+  const ws = () => r.pick([' ', ' ', '  ', '\t', '\u00a0', ' \u3000']);
+  const symbol = () => r.pick(['main', '__main_void', '__main_argc_argv', 'mainx', 'CODE', 'DATA', 'dlopen', 'dlsym', 'emscripten_dlopen',
+    'lasm_lookup_lean_symbol', 'lean_read_module_data', 'lean_write_module_data_x', 'lean_read_module_data_', 'lean_read_module_datax',
+    'l_Lean_findSysroot___boxed', 'l_Lean_initSearchPath', 'l_Lean_findSysroot__x', 'l_Std_foo', 'λ',
+    `${r.pick(['/r/', 'C:\\r\\', '', 'x', '/a/libleancpp.a(z.o)/'])}libleancpp.a(${r.pick(['a.o', 'b.o', 'Basic.o', '', 'c)d'])}):(${r.pick(['.text.f', 'f', 'g', '.rodata', '.rodata.str', '.rodatax',
+      '.data.rel.ro._ZTIfoo', '.data.rel.ro._ZTSfoo', '.data.rel.ro._ZTVbar', '.data.x', '', 'h)'])})${r.pick(['', '', ' x', ')'])}`,
+    '/r/libleancpp.a(x.o) without a section']);
+  const row = () => r.next() < 0.05 ? r.pick(['zz 1 2 x', '', '   ', '- 1 2', '-  1  2  \u2028', '1 2 3 \u2028x'])
+    : `${ws()}${r.next() < 0.03 ? 'g' : r.pick(['-', '1f', '0'])}${ws()}${r.next() < 0.03 ? 'x' : r.pick(['48', 'ab'])}${ws()}${r.pick(['600', '20'])}${ws()}${r.next() < 0.03 ? ' ' : symbol()}${r.next() < 0.03 ? ' ' : ''}`;
+  const header = r.next() < 0.95 ? '    Addr      Off     Size Out     In      Symbol' : r.pick(['Addr Off Size Out In Symbol', '', 'Address']);
+  const lines = [header, ...(r.next() < 0.9 ? ['       -       48      600 CODE'] : []), ...(r.next() < 0.7 ? ['       -       58       20                 main'] : []), ...r.array(r.int(0, 6), row)];
+  return { map: lines.join(r.next() < 0.05 ? '\r\n' : '\n') + r.pick(['\n', '', '\n  \n']), initFree: r.array(r.int(0, 3), () => r.pick(['f', 'g', '_ZTIfoo', '_ZTVbar', 'h'])) };
+}
+
+/** A POSIX path: absolute or relative, dot segments, doubled and trailing
+ * slashes, names sharing prefixes (`a`, `ab`, `..a`). */
+const posixPath = r => (r.next() < 0.7 ? '/' : '') + r.array(r.int(0, 5), () => r.pick(['a', 'b', 'ab', 'a', '..', '.', '', 'x y', 'λ', '..a', 'a.'])).join('/') + (r.next() < 0.2 ? '/' : '');
+
+const models = [
   {
     name: 'editDistance', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
     generate: r => [r.string(letters, 0, 9), r.string(letters, 0, 9)],
@@ -452,6 +520,123 @@ export const models = [
     },
     input: ([v, m]) => ({ version: hex(v), minimum: hex(m) }),
     js: ([v, m]) => leanAtLeast(v, m),
+  },
+  {
+    name: 'resolveStaticPath', source: 'src/browser/static-server.mjs', lean: 'Lasm.Cli.Model.StaticServer',
+    generate: staticRequest,
+    input: ({ root, pathname, files, accepts, fallback }) => ({ root: hex(root), pathname: hex(pathname), accepts: hex(accepts),
+      fallback: fallback === null ? null : hex(fallback), files: files.map(hex) }),
+    js: ({ root, pathname, files, accepts, fallback }) => {
+      const { status, file, served, encoding } = resolveStaticPath(root, pathname, { fallback, accepts, fileExists: f => files.includes(f) });
+      return { status, file: file === undefined ? null : hex(file), served: served === undefined ? null : hex(served), encoding: encoding ?? null };
+    },
+  },
+  {
+    name: 'mangleName', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: r => r.next() < 0.1 ? r.string(['a', '.', '_', '0', 'x'], 0, 8) : dotted(nameComponents(r)),
+    input: name => hex(name),
+    js: name => hex(mangleName(name)),
+  },
+  {
+    name: 'demangleName', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: mangledText,
+    input: text => hex(text),
+    js: text => hex(demangleName(text)),
+  },
+  {
+    name: 'initializerModule', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: r => r.pick(['initialize_', 'runtime_initialize_', 'meta_initialize_', 'runtime_', 'initialize', '', 'xinitialize_'])
+      + (r.next() < 0.1 ? r.pick(['\n', 'a\rb', '\u2028']) : '') + mangledText(r),
+    input: symbol => hex(symbol),
+    js: symbol => (m => m === undefined ? null : hex(m))(initializerModule(symbol)),
+  },
+  {
+    name: 'leanNameMangle', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: nameComponents,
+    input: parts => parts.map(p => typeof p === 'number' ? p : [hex(p)]),
+    js: parts => hex(mangleName(dotted(parts))),
+  },
+  {
+    name: 'leanNameDemangle', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: mangledText,
+    input: text => hex(text),
+    js: text => hex(demangleName(text)),
+  },
+  {
+    name: 'applicationLinkRequirements', source: 'src/application-reachability.mjs', lean: 'Lasm.Cli.Model.Reachability',
+    generate: linkMap,
+    input: ({ map, initFree }) => ({ map: hex(map), initFree: initFree.map(hex) }),
+    js: ({ map, initFree }) => {
+      try {
+        const result = applicationLinkRequirements(map, { initializationFreeCppSymbols: new Set(initFree) });
+        return { ...result, dynamic: result.dynamic.map(hex), cxxRuntime: result.cxxRuntime.map(hex), moduleData: result.moduleData.map(hex) };
+      } catch (error) { return { error: error.message }; }
+    },
+  },
+  {
+    name: 'relativePath', source: 'src/platform.mjs', lean: 'Lasm.Cli.Model.Platform',
+    generate: r => { const from = posixPath(r); return [from, r.next() < 0.1 ? from : r.next() < 0.4 ? from + '/' + posixPath(r).replace(/^\//, '') : posixPath(r)]; },
+    input: ([from, to]) => ({ cwd: hex(process.cwd()), from: hex(from), to: hex(to) }),
+    js: ([from, to]) => hex(posix.relative(from, to)),
+  },
+  {
+    name: 'insideDirectory', source: 'src/platform.mjs', lean: 'Lasm.Cli.Model.Platform',
+    generate: r => { const directory = posixPath(r); return [directory, r.next() < 0.1 ? directory : r.next() < 0.5 ? directory + '/' + posixPath(r).replace(/^\//, '') : posixPath(r)]; },
+    input: ([directory, file]) => ({ cwd: hex(process.cwd()), directory: hex(directory), file: hex(file) }),
+    js: ([directory, file]) => insideDirectory(directory, file, posix),
+  },
+  {
+    name: 'leanIOError', source: 'src/lean-io-errors.mjs', lean: 'Lasm.Cli.Model.LeanIOErrors',
+    generate: r => {
+      const tables = ioErrorTables();
+      const codes = [...Object.keys(tables.messages), ...Object.keys(tables.crtAliases), ...tables.windowsCrtCases, 'UNKNOWN', 'ENOTREAL', 'constructor', '__proto__', 'toString', ''];
+      const crt = r.next() < 0.4;
+      const errno = r.next() < 0.1 && !crt ? r.pick([undefined, '-5', null]) : (r.pick([1, -1]) * r.pick([r.int(0, 140), 4094, 4095, 3008, 4022, r.int(0, 99999)]) * (crt ? -1 : 1) * (r.next() < 0.1 ? -1 : 1) || 0);
+      const names = r.array(r.int(0, 6), () => [-r.int(0, 140), r.pick(codes)]);
+      return { platform: r.pick(['linux', 'darwin', 'win32']), version: r.pick(['4.32.0', '4.34.0', '4.34.1', '4.35.0']), names,
+        error: { leanUserError: r.next() < 0.1, errno, code: r.next() < 0.05 ? undefined : r.pick(codes), errorOrigin: crt ? 'crt' : r.pick([undefined, 'uv']) } };
+    },
+    input: ({ platform, version, names, error }) => {
+      const tables = ioErrorTables();
+      return { tables: { messages: Object.entries(tables.messages), crtAliases: Object.entries(tables.crtAliases), windowsCrtCases: tables.windowsCrtCases },
+        platform, version, names, error: { userError: !!error.leanUserError, errno: typeof error.errno === 'number' ? error.errno : null,
+          code: error.code ?? null, crt: error.errorOrigin === 'crt' } };
+    },
+    js: ({ platform, version, names, error }) => {
+      const map = new Map(names);
+      const result = leanIOError(error, version, { platform, systemErrorName: n => map.get(n) });
+      return result === error ? null : { code: result.code ?? null, errno: result.errno, message: result.message };
+    },
+  },
+  {
+    name: 'packageName', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',
+    generate: r => '/tmp/' + r.string([...nameAlphabet, '/', '..'], 0, 70),
+    input: dir => hex(basename(resolve(dir)).toLowerCase()),
+    js: dir => hex(packageName(dir)),
+  },
+  {
+    name: 'lakeName', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',
+    generate: r => r.string(nameAlphabet, 0, 70),
+    input: s => hex(s),
+    js: s => hex(lakeName(s)),
+  },
+  {
+    name: 'supabaseFunctionNameOf', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',
+    generate: r => (r.next() < 0.3 ? '@' + r.string(nameAlphabet, 0, 4) + (r.next() < 0.8 ? '/' : '') : '') + r.string(nameAlphabet, 0, 70),
+    input: s => hex(String(s).toLowerCase()),
+    js: s => hex(supabaseFunctionNameOf(s)),
+  },
+  {
+    name: 'pythonJsonString', source: 'src/link-driver/python.mjs', lean: 'Lasm.Cli.Model.Python',
+    generate: r => r.string([...tricky, '\b', '\f', '\x7f', '\x1f', '~', '\u0085', '\ud7ff', '\ue000', '\uffff', '𝄞', '\u{10ffff}'], 0, 12),
+    input: s => hex(s),
+    js: s => hex(pythonJsonString(s)),
+  },
+  {
+    name: 'comparePythonStrings', source: 'src/link-driver/python.mjs', lean: 'Lasm.Cli.Model.Python',
+    generate: r => { const a = r.string(['a', 'b', 'é', '\uffff', '😀', '𝄞'], 0, 5); return [a, r.next() < 0.2 ? a : r.next() < 0.3 ? a + r.string(['a', '😀'], 1, 2) : r.string(['a', 'b', 'é', '\uffff', '😀', '𝄞'], 0, 5)]; },
+    input: ([a, b]) => ({ a: hex(a), b: hex(b) }),
+    js: ([a, b]) => String(comparePythonStrings(a, b)),
   },
   {
     name: 'numbers', source: 'src/node-host.mjs', lean: 'Lasm.Cli.Model.NodeHost',

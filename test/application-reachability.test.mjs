@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
+import { forAll } from './helpers/property.mjs';
 import { tmpdir } from 'node:os';
 import { applicationLinkRequirements, readApplicationLinkRequirements, canSpecializeInitialization, reachabilityRegistry, selectiveInitialization } from '../src/application-reachability.mjs';
 
@@ -127,4 +128,32 @@ test('entry points, sections and rows of the map are read exactly', () => {
   assert.equal(applicationLinkRequirements(map('/l/libleancpp.a(r.o):(.data.rel.ro._ZTIfoo)'), options).mode, 'static');
   assert.equal(applicationLinkRequirements(map('/l/libleancpp.a(r.o):(.rodatax)'), options).mode, 'dynamic');
   assert.equal(applicationLinkRequirements(map('/l/libleancpp.a(r.o):(.rodata.str)'), options).mode, 'static');
+});
+
+// Proposition: Lasm.Cli.Spec.link_map_static_sound
+//   ∀ (initFree : String → Bool) (map : String) (r : Reachability.Requirements),
+//     linkRequirements initFree map = .ok r →
+//     (r.static = true ↔ r.dynamic = [] ∧ r.cxxRuntime = []) ∧
+//     (r.static = true → ∀ line ∈ ((Reachability.trimEnd map.toList).splitOn '\n').tail, ∀ t,
+//       Reachability.rowText line = some t → t ∉ Reachability.dynamicSymbols ∧
+//       ∀ m s, Reachability.memberSection t = some (m, s) →
+//         Reachability.independent (fun x => initFree (String.ofList x)) s = true)
+test('a map read as static names no loader and keeps no stateful C++ section', () => {
+  const dynamicSymbols = ['lasm_lookup_lean_symbol', 'dlopen', 'dlsym', 'dlvsym', 'emscripten_dlopen', 'emscripten_dlopen_promise'];
+  const sectionRow = gen => `${gen.pick(['/r/', 'C:\\r\\', ''])}libleancpp.a(${gen.pick(['a.o', 'b.o'])}):(${gen.pick(['.text.f', 'f', 'g', '.rodata', '.rodata.s', '.data.rel.ro._ZTIfoo', '.data.rel.ro._ZTSfoo', '.data.x'])})`;
+  forAll(gen => ({
+    rows: gen.array(gen.int(0, 6), () => gen.pick([() => gen.pick([...dynamicSymbols, 'l_f', 'lean_read_module_data', 'mainx']), () => sectionRow(gen)])()),
+    initFree: gen.array(gen.int(0, 3), () => gen.pick(['f', 'g', '_ZTIfoo', '_ZTSfoo'])),
+  }), ({ rows, initFree }) => {
+    const free = new Set(initFree), result = applicationLinkRequirements(map(...rows), { initializationFreeCppSymbols: free });
+    assert.equal(result.mode === 'static', result.dynamic.length === 0 && result.cxxRuntime.length === 0);
+    if (result.mode !== 'static') return;
+    for (const row of rows) {
+      assert.ok(!dynamicSymbols.includes(row), row);
+      const member = /(?:^|[/\\])libleancpp\.a\(([^)]+)\):\((.+)\)$/.exec(row);
+      if (!member) continue;
+      const section = member[2], rtti = /^\.data\.rel\.ro\.(_ZT[IV][A-Za-z0-9_]+)$/.exec(section);
+      assert.ok(/^\.rodata(?:\.|$)/.test(section) || (!section.startsWith('.') && free.has(section)) || (rtti && free.has(rtti[1])), row);
+    }
+  }, { runs: 1000 });
 });

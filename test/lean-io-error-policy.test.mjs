@@ -77,6 +77,15 @@ test('UNKNOWN names libuv\'s sentinel only at -4094; other unknown numbers are s
   assert.equal(leanIOError({ code: 'UNKNOWN', errno: 4094, errorOrigin: 'crt' }, '4.34.0').message, 'unknown error');
 });
 
+test('codes named like Object.prototype members are unknown codes, not table entries', () => {
+  for (const code of ['constructor', 'toString', '__proto__', 'hasOwnProperty', 'valueOf']) {
+    const uv = leanIOError({ code, errno: -77 }, '4.35.0');
+    assert.deepEqual(uv, { code, errno: 77, message: 'Unknown system error -77', nativeMessage: true }, code);
+    const crt = asPlatform('linux', () => leanIOError({ code, errno: 77, errorOrigin: 'crt' }, '4.35.0'));
+    assert.deepEqual(crt, { code, errno: 77, message: 'Unknown system error -77', errorOrigin: 'crt', nativeMessage: true }, code);
+  }
+});
+
 test('CRT errors use Lean\'s errno aliases and keep the positive errno', () => {
   const aliases = { EBADMSG: 'EPROTO', ECHILD: 'ESRCH', EDEADLK: 'EBUSY', EDEADLOCK: 'EBUSY', EDOM: 'EINVAL', EIDRM: 'EPIPE',
     EINPROGRESS: 'EISCONN', ENETRESET: 'ECONNRESET', ENOLCK: 'EAGAIN', ENOLINK: 'ECONNRESET', ENOSR: 'ENOBUFS',
