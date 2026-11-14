@@ -197,8 +197,17 @@ call (instantiating the program and Lean's runtime and module
 initialization), 9.3 ms the rest (the Lean code, about 3.5 times its native
 2.6 ms, and reading the answer). Start-up unchanged (`lasm --version` 66.4
 against main's 67.1 ms); `lasm-glue.wasm` is 647,974 bytes, 163,388 gzipped.
-The bar is met. The CI numbers are the `glue` workflow's step summary on
-the PR.
+The bar is met. In CI (`glue` run 43613878906, Node 26.13.0, ubuntu-24.04),
+against the first round's run 43564552237:
+
+| Plan (initializers, kept) | Cold, glue | Cold, JavaScript | Warm, glue | Warm, JavaScript |
+| --- | ---: | ---: | ---: | ---: |
+| 2807, 6 | 37.1 ms (was 61.6) | 4.5 ms | 8.4 ms (was 15.4) | 1.3 ms |
+| 2807, 50 | 40.5 ms (was 67.8) | 7.8 ms | 9.5 ms (was 19.1) | 2.3 ms |
+| 8000, 200 | 69.3 ms (was 120.9) | 14.3 ms | 26.3 ms (was 49.4) | 5.4 ms |
+
+There a warm call on the bar's plan is 0.5 ms encoding, 1.0 ms an empty
+call and 6.9 ms the rest; `lasm --version` 48.3 ms against main's 48.1.
 
 Why twice the JavaScript is out of reach for this slice: the JavaScript does
 the whole job in 1.0 to 1.6 ms. Encoding the plan for the glue costs 0.8 to 1.3 ms on its
