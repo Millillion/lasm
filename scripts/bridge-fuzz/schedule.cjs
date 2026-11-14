@@ -36,13 +36,58 @@ function install() {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
   const nap = new Int32Array(new SharedArrayBuffer(4));
+  // Injected delay, every thread together (microseconds): [naps, requested,
+  // taken, late resolutions, requested, taken]. Printed at exit to stderr.
+  let delays = null;
+  if (fuzz) {
+    if (isMainThread) {
+      delays = new BigInt64Array(new SharedArrayBuffer(6 * 8));
+      setEnvironmentData('lasm.bridge.delays', delays.buffer);
+    } else {
+      const buffer = getEnvironmentData('lasm.bridge.delays');
+      if (buffer) delays = new BigInt64Array(buffer);
+    }
+  }
+  const account = (at, requested, taken) => {
+    if (!delays) return;
+    A.add(delays, at, 1n);
+    A.add(delays, at + 1, BigInt(Math.round(requested * 1000)));
+    A.add(delays, at + 2, BigInt(Math.round(taken * 1000)));
+  };
   function perturb() {
     if (!fuzz) return;
     const r = random();
     if (r >= rate) return;
     if (r < rate / 2) { const until = performance.now() + random() * 0.2; while (performance.now() < until); }
-    else A.wait(nap, 0, 0, random() * 2);
+    else sleep(random() * 2);
   }
+  // A nap or a late resolution takes the time it asks for, on average, on every
+  // platform. A sub-millisecond timed wait or timer takes far longer than asked
+  // outside Linux: the js-interop program's ~7,200 naps per run asked for 7.2 s
+  // and took 7.6 s on ubuntu-24.04, 52.8 s on macos-15 and 82 s on
+  // windows-2025 (its ~450 late resolutions: 0.7 s asked, 1.0 / 2.4 / 7.3 s
+  // taken), so every fuzzed run there failed its 5 s fan-out bound or hit the
+  // 60 s run timeout. This thread's oversleep is a debt the next delays pay
+  // first: a delay the debt covers is not slept. The generator's decisions are
+  // unchanged.
+  let debt = 0;
+  function owed(requested) {
+    const want = requested - debt;
+    if (want <= 0) { debt = -want; return 0; }
+    debt = 0;
+    return want;
+  }
+  const repay = (want, taken) => { debt += Math.max(0, taken - want); };
+  function sleep(requested) {
+    const want = owed(requested), started = performance.now();
+    if (want > 0) { A.wait(nap, 0, 0, want); repay(want, performance.now() - started); }
+    account(0, requested, performance.now() - started);
+  }
+  if (isMainThread && delays) process.on('exit', () => {
+    const ms = i => (Number(A.load(delays, i)) / 1000).toFixed(0);
+    process.stderr.write(`lasm bridge fuzz: ${A.load(delays, 0)} naps, ${ms(1)} ms requested, ${ms(2)} ms taken; `
+      + `${A.load(delays, 3)} late resolutions, ${ms(4)} ms requested, ${ms(5)} ms taken\n`);
+  });
 
   // Trace buffer, shared by every thread: [lock, count, overflow, -], then
   // records [thread, op, byte address, value].
@@ -143,7 +188,11 @@ function install() {
       () => A.waitAsync(array, index, value, timeout), () => value);
     if (fuzz && result.async && random() < rate) {
       const delay = random() * 3;
-      return { async: true, value: result.value.then(v => new Promise(done => setTimeout(() => done(v), delay))) };
+      return { async: true, value: result.value.then(v => new Promise(done => {
+        const want = owed(delay), started = performance.now();
+        if (want <= 0) { account(3, delay, 0); done(v); return; }
+        setTimeout(() => { const taken = performance.now() - started; repay(want, taken); account(3, delay, taken); done(v); }, want);
+      })) };
     }
     return result;
   };

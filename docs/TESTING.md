@@ -32,7 +32,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | Layer | What it checks | Where | CI tier |
 | --- | --- | --- | --- |
 | [Differential testing](#differential-testing) and [fuzzing](#differential-fuzzing) | Lasm-compiled programs (generated expressions, statements, and feature programs declaring classes, inductives, closures, loops, structures) behave exactly like native Lean, unoptimized builds like optimized ones, and one `.wasm` alike on V8, JavaScriptCore, SpiderMonkey and wasmtime; native Lean agrees with its interpreter ([more oracles](#more-oracles)) | `scripts/differential/` | PR, nightly, weekly ([CI.md](CI.md)) |
-| [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic, Ledger's API traffic and Porter's OpenID traffic equal Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs`, `examples/*/test/equivalence.mjs` | PR, nightly |
+| [Target equivalence](#target-equivalence) | One server answers the same on every target; Conduit's RealWorld traffic, Ledger's API traffic, Porter's OpenID traffic and Tandem's protocol traffic equal Node's on every platform | `scripts/equivalence/`, `examples/conduit/test/equivalence.mjs`, `examples/*/test/equivalence.mjs` | PR, nightly |
 | [Standard bindings](#standard-bindings) | Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno and Lasm.JS.Bun are their generator's output (Lasm.JS.Node's lowering is that of the pinned Node docs, Lasm.JS.Deno's and Lasm.JS.Bun's that of the pinned TypeScript declarations), and behave as the specs, Node's docs and the declarations say on every target: WPT's URL and urlencoded data, Lean's UTF-8, hex, base64 and path operations as oracles, published crypto vectors, generated round trips, files and child processes, a Lean handler served by Deno.serve, Bun.serve and @hono/node-server and requested over HTTP | `scripts/bindings/`, `test/fixtures/js-web/`, `test/fixtures/js-node/`, `test/fixtures/js-serve/`, `web-bindings.yml` | PR (paths), main |
 | [Scenario matrix](#scenario-matrix) | Template × `--target` × OS × runtime from the packed/published package | `templates.yml`, `platform-support.yml`, `workers.yml`, `wasi.yml`, `npm-dist.yml`, `published-templates.yml`, `bun-deno-published.yml` | release, nightly (`ci-nightly.yml`), after publish |
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
@@ -576,6 +576,7 @@ self-test first.
 | --- | --- | --- | --- |
 | Ledger | `test/api.mjs --equivalence` through the proxy (`api`) | Timestamps (`"timestamp"` in bodies, `?after=` in paths) become their rank among the run's timestamps: they are nanoseconds from the server's clock, while their order is still compared; their count, and that each is above 10^18, are compared as facts | The bank workload (concurrent and random) |
 | Porter | `examples/porter/test/oracles.mjs` and `test/attacks.mjs --equivalence` at the fetch level, because the OpenID libraries must see the issuer as the server's own origin (`oracles`, `attacks`) | The issuer (a free port, also percent-encoded) becomes `<issuer>`; JWTs are decoded, their claims compared with `iat`, `auth_time` as `<time>` and `exp` as `<time>+TTL`, the signature by its length (ES256 signatures are randomized, and every key is generated on first start); 43-character base64url values (32 random bytes: codes, tokens, session and interaction ids, the keys' `kid` and coordinates, the clients' state, nonce and PKCE values) and `at_hash` become ordinals by first appearance, so every reference between an issued and a used value is still compared; JSON times outside a JWT become `<time>`. The counts of each are facts | The adversarial suite's two concurrent checks (one code redeemed 12 times, one refresh token used 8 times at once): which request wins is the scheduler's |
+| Tandem | `test/protocol.mjs --equivalence` at the fetch level (`protocol`) | The clock part of the test documents' names (`p<clock>-<n>`, so that a rerun against a running server starts fresh) | The concurrent writers and the long-poll (scheduler- and platform-timed: 2 s on Node, 10 s on Workers), the WebSocket and SIGKILL tests (only some targets run them), the simulation and the fuzzer (concurrent or time-bounded) |
 
 **What it catches:** a platform's adapter, store or runtime answering one of
 the app's real requests differently from Node: a status, a header, a body
@@ -803,6 +804,31 @@ nondeterminism that two runs on one machine share (same OS, CPU, locale);
 the black-box harnesses on macOS and Windows (Linux runners only; the
 unit-level installer controls in `installer-faults.yml` run on all five
 platforms); `lasm dev` with several outputs at once.
+
+### Metamorphic compiler relations
+
+[`scripts/differential/metamorphic.mjs`](../scripts/differential/metamorphic.mjs)
+checks relations between two builds of a program that need no oracle: a
+semantics-preserving change to the source must not change what the program
+built by Lasm prints (stdout, stderr and the exit status), on node, node:wasi
+and the edge output run by Node. The programs are the differential
+generator's, a core program (60 cases) and a feature program (40 cases) per
+seed, with one of the generator's endings. The transforms:
+
+| Transform | The program changed | Compared |
+| --- | --- | --- |
+| `rename` | every case's names take another prefix of the same length (`c12…` becomes `ζ12…`; `Repr` output wraps at a fixed width, so a longer name would legitimately move line breaks) | after mapping printed names back |
+| `reorder` | the cases' declarations in a random order; `main` calls them in the original one | as is |
+| `dead` | copies of a third of the cases under unused names, and two unused imports | as is |
+| `noinline` | `@[noinline]` on every plain top-level `def` of the cases | as is |
+| `modules` | the preamble in `Pre.lean`, the cases in `A.lean` and `B.lean`, `main` in `Main.lean` | as is |
+
+A transform that does not build, or prints anything else, breaks its
+relation: both programs and their outputs are kept in `repros/` (artifact
+`metamorphic-<run>`). `--render-only DIR` writes a seed's programs without
+building them. CI ([differential.yml](../.github/workflows/differential.yml)
+`metamorphic`): a 40-minute campaign nightly from a fresh seed, and one seed
+on a pull request or push that changes the harness or the generator.
 
 ### Fuzzing at the boundaries
 
@@ -1035,7 +1061,9 @@ and after each operation it may spin or sleep (a yield at every handshake step
 and host-call boundary), a blocking wait may return early (`ok`, or `timed-out`
 as if its time had passed) and a `waitAsync` may resolve late. Every decision
 comes from a generator seeded by (seed, thread), so a run's perturbations
-repeat from its seed. `scripts/ci/lasm-js-stress.mjs --seed S` runs the stress
+repeat from its seed. A delay shorter than the platform's timer resolution oversleeps
+(7–11× outside Linux), so each thread's oversleep is paid back by its next delays,
+and the preload prints the delay it asked for and took at exit. `scripts/ci/lasm-js-stress.mjs --seed S` runs the stress
 programs (js-interop, js-callbacks, the Hono server) with seed S + i for run i;
 a run passes with no timeout and the same output as the expected output or the
 first run (timings masked). A failure prints its seed and the command that
@@ -1900,3 +1928,4 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | Mutation testing (`downloads`, 2026-11-09) | **A failing SDK archive decoder was reported as the tar parser's error**: when the managed Python's decoder for `.tar.xz`/`.zip` SDK archives (`src/archive-stream.py`) failed, could not start or was killed, `extract` reported `TAR_BAD_ARCHIVE: Unrecognized archive format` for the empty or truncated stream it left, not the decoder's exit status and messages | Fixed in `src/managed-artifacts.mjs` (the decoder's result is preferred after a broken stream); regressions in `test/managed-artifacts-decoder.test.mjs`; `docs/release/0.6.1-notes.md` |
 | Differential fuzzing, feature programs (campaign 42620999209, seed 620999216, case 132; `wasi`, `wasi-node`, `deno`, the edge engines, browsers, both profiles) | `(repr a).pretty` of an `Array Int` of 5,120 elements stops with "call stack exhausted" / "Maximum call stack size exceeded": Lean's formatter recurses with the number of elements, and the WASI and edge stacks hold about 9,000–11,000 frames. Native Lean and the Node target print it | Open: [#179](https://github.com/Millillion/lasm/issues/179) (the documented recursion-depth limit, reached through the standard library); the generator keeps printed arrays below that size |
 | Flaky `host-fixtures` case ([#196](https://github.com/Millillion/lasm/issues/196): PRs #195, #214, #220) | `temporary-files` failed with status `null`: a native-Lean run was killed at the harness's 60 s timeout. Two native runs crash by design (Lean's error decoders dereference a null file name: `temporary-files`' `missing-directory` and `cwd-tracking-deleted-process`, SIGSEGV), and the ubuntu-24.04 runner pipes cores to systemd-coredump, whose `core_pattern` passes the core limit as unlimited, so it collected each crash's core even under `ulimit -c 0`: 25–60 s per crash, and the two cases took 27–65 s when they passed (a first fix with `ulimit -c 0` still took 42 s). Neither Lasm's nor the oracle's output | Harness fix: the native runs expected to crash run under `prlimit --core=1:1` (`withoutCore` in `integration/host-fixtures.mjs`): Linux skips a piped core dump when the limit is exactly 1 byte; status and signal are unchanged (exec). The run prints the core handler and limit, and a killed oracle names its signal |
+| Nightly `Host bridge verification` (fuzz / stress on macOS and Windows cancelled at 240 min every night since it began, e.g. 43413265472; [#123](https://github.com/Millillion/lasm/issues/123)) | Every schedule-fuzzed js-interop run outside Linux failed `fan-out of 500 waiting handlers under 5 s` or hit the 60 s run timeout (Linux: 6.6 s per run; unfuzzed: 0.8 s everywhere), and with three replays per failure the job never finished. The fuzzer's own delays, not the bridge: its sub-millisecond `Atomics.wait` naps and `setTimeout` late resolutions take far longer than asked outside Linux. Measured per run (~7,200 naps asking 7.2 s): 7.6 s taken on ubuntu-24.04, 52.8 s on macos-15, 82 s on windows-2025 | Harness fix (`scripts/bridge-fuzz/schedule.cjs`): each thread carries its oversleep as a debt that later delays pay first, so injected delay matches what the seed asks for on every platform; the seeded decisions are unchanged. The fuzzer prints its requested and taken delay at exit and `lasm-js-stress.mjs` reports it per program. No bound or timeout changed |

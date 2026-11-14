@@ -52,3 +52,15 @@
   `some` of a reference to `null` (an unsupported context id, no current
   script, no such control). The generator now requests a nullable `Value`
   result as data (`Lasm.JS.Web.Support.optionalValue`). Types are unchanged.
+
+- **Fastly, WASI and wasi-http programs use far less memory** (issue #246).
+  `--target fastly`, `wasi` and `wasi-http` now link Lasm's own build of
+  Emscripten's mimalloc (its unchanged sources, MIT, in `src/wasi/mimalloc`).
+  The build has 2 MiB arenas and a page map for 32-bit addresses, in place of
+  the prebuilt one's 16 MiB arenas and its 8 MiB page map. Measured on
+  Viceroy:
+  - examples/fastly uses 4.2 MB of heap per request instead of 27.8 MB, with
+    the same throughput.
+  - Folio's site server uses 6.1 MB per request instead of 27.9 MB.
+  - Folio's largest inputs peak lower. On Fastly, unclosed `<!--` now fits
+    the 128 MB heap.

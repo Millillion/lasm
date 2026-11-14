@@ -267,7 +267,10 @@ for (const engine of ['wasmtime', 'wasmer', 'node'].filter(e => engines.has(e)))
 }
 
 // HTTP servers: Spin (wagi), Viceroy (Fastly), Node, Deno.
-async function serveAndCheck(name, command, args, { cwd, port, env = {}, skipHead = false }) {
+// Viceroy's log line for each request (RUST_LOG viceroy_lib::execute=info): the heap the instance used.
+const heapUsed = log => [...log.matchAll(/using ([\d.]+) MB of WebAssembly heap/g)].map(m => Number(m[1]));
+// heapLimitMB: Viceroy only. Every request must use at most this much heap (issue #246).
+async function serveAndCheck(name, command, args, { cwd, port, env = {}, skipHead = false, heapLimitMB }) {
   const out = results.fetch[name] = { passed: 0 };
   const started = performance.now();
   const child = spawn(command, args, { cwd, env: { ...headlessEnvironment(), ...env }, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -319,6 +322,13 @@ async function serveAndCheck(name, command, args, { cwd, port, env = {}, skipHea
     const all = await Promise.all(Array.from({ length: 20 }, () => fetch(base + '/asleep/200').then(r => r.json())));
     out.concurrentAsleep200Ms = Math.round(performance.now() - t);
     assert.ok(all.every(r => r.sum === 16), `${name}: concurrent waits`);
+    if (heapLimitMB !== undefined) {
+      const heap = heapUsed(log);
+      out.heapMB = { requests: heap.length, min: Math.min(...heap), max: Math.max(...heap) };
+      assert.ok(heap.length >= 50, `${name}: Viceroy logged the heap of ${heap.length} requests`);
+      assert.ok(out.heapMB.max <= heapLimitMB, `${name}: a request used ${out.heapMB.max} MB of heap, over ${heapLimitMB} MB`);
+      out.passed++;
+    }
   } catch (error) { fail(`fetch ${name}`, error); }
   finally {
     child.kill('SIGTERM');
@@ -397,7 +407,9 @@ if (engines.has('viceroy')) {
   await serveAndCheck('viceroy', toolPath.viceroy, ['serve', '--addr', '127.0.0.1:3102', '-C', 'fastly.toml', 'bin/main.wasm'], { cwd: fetchApp, port: 3102 });
   // examples/fastly: the same routes on Lasm.Fastly.
   localServer(fastlyApp);
-  await serveAndCheck('lasm-fastly', toolPath.viceroy, ['serve', '--addr', '127.0.0.1:3107', '-C', 'fastly.toml', 'bin/main.wasm'], { cwd: fastlyApp, port: 3107 });
+  // Its heap per request: Emscripten's mimalloc made every request use about 28 MB (16 MiB arenas), Lasm's build about 4.2 MB (#246).
+  await serveAndCheck('lasm-fastly', toolPath.viceroy, ['serve', '--addr', '127.0.0.1:3107', '-C', 'fastly.toml', 'bin/main.wasm'],
+    { cwd: fastlyApp, port: 3107, heapLimitMB: 8, env: { RUST_LOG: 'viceroy=error,viceroy_lib=error,viceroy_lib::execute=info' } });
   // Lasm.Fastly's conformance checks. Viceroy loading the module at all checks every
   // bound host function's import (the module imports each one).
   localServer(fastlyAbi);
