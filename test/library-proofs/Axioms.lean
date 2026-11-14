@@ -22,6 +22,7 @@ import Lasm.Fetch.Theorems
 import Lasm.JS.Theorems
 import Lasm.Serverless.Theorems
 import Lasm.Cli.Theorems
+import Lasm.Cli.Glue
 open Lean Elab Command
 
 elab "#check_library_proofs" : command => do
