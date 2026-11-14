@@ -149,6 +149,34 @@ test('LASM_TEST_UNOPTIMIZED runs only the lowering passes', { skip: !posix }, ()
   assert.ok(!opt.includes('-Oz'));
 });
 
+test('LASM_TEST_LINK_EVIDENCE: wasm-ld also writes its map; the link and the wasm-opt step are kept', { skip: !posix }, () => {
+  const f = fixture();
+  f.toolchain.env.LASM_STAND_IN_PLAIN_MAP = '1';
+  const previous = process.env.LASM_TEST_LINK_EVIDENCE, evidence = join(f.base, 'evidence');
+  process.env.LASM_TEST_LINK_EVIDENCE = evidence;
+  try { linkWasiProgram({ toolchain: f.toolchain, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out }); }
+  finally { if (previous === undefined) delete process.env.LASM_TEST_LINK_EVIDENCE; else process.env.LASM_TEST_LINK_EVIDENCE = previous; }
+  const [ld] = f.tools.calls('wasm-ld');
+  assert.equal(ld.at(-1), `-Map=${join(f.out, 'linked.map')}`);
+  // The recorded link arguments are the link's own, without the map.
+  assert.ok(!JSON.parse(readFileSync(join(f.out, 'link-args.json'), 'utf8')).args.some(arg => arg.startsWith('-Map=')));
+  const kept = readdirSync(evidence).sort();
+  assert.deepEqual(kept.map(name => name.replace(/^.*-\d{3}-/, '')), ['wasi-wasi', 'wasi-wasi-wasm-opt']);
+  const link = JSON.parse(readFileSync(join(evidence, kept[0], 'evidence.json'), 'utf8'));
+  assert.deepEqual([link.mode, link.files], ['wasi-wasi', ['linked.wasm', 'link.map']]);
+  assert.ok(link.args.includes(`-Map=${join(f.out, 'linked.map')}`) && link.args.includes('--wrap=lean_io_mark_end_initialization'));
+  assert.ok(Object.keys(link.objects).length > 0 && Object.keys(link.objects).every(file => file.endsWith('.o')));
+  const opt = JSON.parse(readFileSync(join(evidence, kept[1], 'evidence.json'), 'utf8'));
+  assert.deepEqual(opt.files, ['in.wasm', 'out.wasm']);
+  assert.ok(opt.args.includes('<in>') && opt.args.includes('<out>') && opt.args.includes('--memory64-lowering'));
+});
+
+test('without LASM_TEST_LINK_EVIDENCE wasm-ld writes no map', { skip: !posix }, () => {
+  const f = fixture();
+  linkWasiProgram({ toolchain: f.toolchain, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out });
+  assert.ok(!f.tools.calls('wasm-ld')[0].some(arg => arg.startsWith('-Map=')));
+});
+
 test('WASI link errors: unknown target, no system libraries, tool failures with and without --verbose', { skip: !posix }, () => {
   const f = fixture();
   const options = { toolchain: f.toolchain, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out };
