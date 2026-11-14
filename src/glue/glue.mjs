@@ -17,12 +17,9 @@ export const glueModule = () => compiled ??= new WebAssembly.Module(readFileSync
 
 /** Fields as the glue program reads them. */
 export function encodeFields(fields) {
-  const parts = [];
-  for (const field of fields) {
-    const bytes = Buffer.from(field, 'utf8');
-    parts.push(Buffer.from(`${bytes.length}:`), bytes);
-  }
-  return Buffer.concat(parts);
+  let text = '';
+  for (const field of fields) text += `${Buffer.byteLength(field, 'utf8')}:${field}`;
+  return Buffer.from(text, 'utf8');
 }
 
 /** The fields of a result, as the glue program writes them. */

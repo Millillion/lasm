@@ -22,10 +22,14 @@
 import { decodeFields, runGlue } from '../glue/glue.mjs';
 
 const strings = value => Array.isArray(value) && value.every(item => typeof item === 'string');
-const namesFields = names => [String(names.length), ...names];
-const callsFields = calls => {
+/** A count and the names, onto `fields`. */
+const pushNames = (fields, names) => { fields.push(String(names.length)); for (const name of names) fields.push(name); return fields; };
+/** `calls` as its own entries: their count, then each unit and its names, onto `fields`. */
+const pushCalls = (fields, calls) => {
   const entries = Object.entries(calls);
-  return [String(entries.length), ...entries.flatMap(([unit, called]) => [unit, ...namesFields(called)])];
+  fields.push(String(entries.length));
+  for (const [unit, called] of entries) { fields.push(unit); pushNames(fields, called); }
+  return fields;
 };
 const answer = result => {
   if ('error' in result) throw new Error(result.error);
@@ -34,12 +38,12 @@ const answer = result => {
 
 /** Kept initializers reachable from `name`'s calls, in the order the original chains initialize them. */
 export function initializationSchedule(name, calls, keep) {
-  return decodeFields(answer(runGlue(['initializationSchedule', name, ...callsFields(calls), ...namesFields([...keep])])));
+  return decodeFields(answer(runGlue(pushNames(pushCalls(['initializationSchedule', name], calls), [...keep]))));
 }
 
 /** C source of the compact wrappers for an initialization plan. */
 export function compactInitializerWrappers(plan) {
   if (plan?.schema !== 1 || !strings(plan.closure) || !strings(plan.keep) || typeof plan.calls !== 'object' || plan.calls === null
     || !Object.values(plan.calls).every(strings)) throw new Error('Unrecognized initialization plan');
-  return answer(runGlue(['compactInitializerWrappers', ...namesFields(plan.closure), ...namesFields(plan.keep), ...callsFields(plan.calls)]));
+  return answer(runGlue(pushCalls(pushNames(pushNames(['compactInitializerWrappers'], plan.closure), plan.keep), plan.calls)));
 }
