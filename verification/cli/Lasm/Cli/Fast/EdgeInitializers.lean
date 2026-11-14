@@ -18,6 +18,35 @@ def visit (calls : Std.HashMap String (List String)) (keep : Std.HashSet String)
       let after := (calls.getD unit []).foldl (visit calls keep fuel) (seen.insert unit, order)
       (after.1, if keep.contains unit then after.2.push unit else after.2)
 
+/-- An initializer name's word: not empty, letters, digits and `_`. -/
+def word (s : List Char) : Bool := !s.isEmpty && s.all fun c => c.isAlphanum || c = '_'
+
+/-- `initialize_` and a word. -/
+def initializerRest (s : List Char) : Bool := "initialize_".toList.isPrefixOf s && word (s.drop 11)
+
+/-- `Lasm.Cli.validInitializer`, reading the name's characters once and
+testing prefixes without copying them. -/
+def validInitializer (n : String) : Bool :=
+  let l := n.toList
+  initializerRest l || ("runtime_".toList.isPrefixOf l && initializerRest (l.drop 8)) ||
+    ("meta_".toList.isPrefixOf l && initializerRest (l.drop 5))
+
+theorem take_beq (p l : List Char) : (l.take p.length == p) = p.isPrefixOf l := by
+  apply Bool.eq_iff_iff.mpr
+  rw [beq_iff_eq, List.isPrefixOf_iff_prefix, List.prefix_iff_eq_take]
+  exact ⟨Eq.symm, Eq.symm⟩
+
+@[csimp] theorem validInitializer_eq : @Lasm.Cli.validInitializer = @validInitializer := by
+  funext n
+  have r : ∀ s : List Char, (match s.splitAt 11 with
+      | (p, w) => p == "initialize_".toList && (!w.isEmpty && w.all fun c => c.isAlphanum || c = '_')) = initializerRest s := by
+    intro s
+    rw [List.splitAt_eq]
+    exact congrArg (· && _) (take_beq "initialize_".toList s)
+  simp only [Lasm.Cli.validInitializer, validInitializer, r]
+  rw [show (8 : Nat) = "runtime_".toList.length from rfl, show (5 : Nat) = "meta_".toList.length from rfl,
+    take_beq, take_beq]
+
 /-- The schedule of `name` over prepared tables. -/
 def scheduleWith (m : Std.HashMap String (List String)) (ks : Std.HashSet String) (fuel : Nat) (name : String) : List String :=
   ((m.getD name []).foldl (visit m ks fuel) ((∅ : Std.HashSet String).insert name, #[])).2.toList
@@ -135,7 +164,7 @@ def declarationsWith (ks : Std.HashSet String) (name : String) : List String :=
 
 /-- `Lasm.Cli.compactInitializerWrappers`, with the tables built once. -/
 def compactInitializerWrappers (p : Plan) : Except String String :=
-  match p.closure.find? (!validInitializer ·) with
+  match p.closure.find? (!Lasm.Cli.validInitializer ·) with
   | some n => .error s!"Unexpected initializer name {n}"
   | none =>
     let m := callsMap p.calls
@@ -162,7 +191,7 @@ def compactInitializerWrappers (p : Plan) : Except String String :=
   have hf : p.closure.filter (· ∈ p.keep) = p.closure.filter (Std.HashSet.ofList p.keep).contains := by
     apply List.filter_congr; intro x _; simp [hk]
   rw [Lasm.Cli.compactInitializerWrappers, compactInitializerWrappers]
-  cases p.closure.find? (!validInitializer ·) with
+  cases p.closure.find? (!Lasm.Cli.validInitializer ·) with
   | some n => rfl
   | none => simp only [hd, hf, show Lasm.Cli.keptWrapper p = _ from funext hw]
 
