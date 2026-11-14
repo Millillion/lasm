@@ -40,7 +40,7 @@ Node. Other benchmark/test-driver piles have not been adapted.
 These observations span exploratory builds and explicit rechecks from different
 compiler revisions. They are not a clean sweep of one final revision. Source
 hashes, artifact hashes, compiler fingerprints, earlier observations and exact
-failure categories are retained in the [machine-readable report](compatibility/lean-4.32.0-results.json).
+failure categories are retained in the [machine-readable report](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/compatibility/lean-4.32.0-results.json).
 The [workflow](UPSTREAM_TESTS.md) documents native baselines, normalization,
 deadlines, command execution markers, and reproduction commands.
 
@@ -58,7 +58,7 @@ functions use the actual pinned Lean library. Source inventories list 193 IO.FS
 and 1,938 Std.Http declarations, including generated constructors and eliminators.
 This establishes implementation locations, not complete behavioral equivalence.
 
-Separate [regression and fresh-package evidence](evidence/2026-09-18-io-conformance.json)
+Separate [regression and fresh-package evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/2026-09-18-io-conformance.json)
 records the core runtime, full Lean HTTP application, Express example, browser,
 workerd, JSPI and installed-package checks. The package was built and tested on
 native Linux x64; the source audit above spans multiple exploratory revisions.
@@ -79,7 +79,7 @@ runtime. Expected errors that match native Lean are counted separately.
 
 The audit observed 102 unresolved native symbols;
 44 map to IO/Std declarations. Some observations precede fixes.
-See each artifact's history and the [954 declaration/symbol mappings](compatibility/lean-4.32.0-externs.json)
+See each artifact's history and the [954 declaration/symbol mappings](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/compatibility/lean-4.32.0-externs.json)
 before treating an earlier unresolved symbol as a current limitation.
 
 No non-Linux native runner results are implied by the package's six-platform build

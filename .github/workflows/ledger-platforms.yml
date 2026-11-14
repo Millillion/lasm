@@ -13,6 +13,7 @@ on:
       - '!examples/ledger/Proofs/**'
       - '!examples/ledger/Proofs.lean'
       - '!examples/ledger/**/*.md'
+      - 'scripts/equivalence/traffic.mjs'
   push:
     branches: [main]
     paths:
@@ -21,6 +22,7 @@ on:
       - '!examples/ledger/Proofs/**'
       - '!examples/ledger/Proofs.lean'
       - '!examples/ledger/**/*.md'
+      - 'scripts/equivalence/traffic.mjs'
 permissions:
   contents: read
 concurrency:
@@ -88,7 +90,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - uses: ./.github/actions/process-guard
       - name: npm ci
@@ -161,9 +163,13 @@ jobs:
       - name: Build (${{ matrix.build }})
         working-directory: ${{ env.LEDGER }}
         run: node "$GITHUB_WORKSPACE/scripts/full-lean/run-bounded.mjs" --memory-mib 8192 -- bash -c "${{ matrix.build }}"
-      - name: The API test
+      - name: The API test (its traffic recorded for target equivalence)
         working-directory: ${{ env.LEDGER }}
-        run: node test/api.mjs --platform ${{ matrix.platform }}
+        run: node test/api.mjs --platform ${{ matrix.platform }} --equivalence
+      - name: Target equivalence (the API traffic against Node's, test/equivalence/api.json)
+        if: ${{ !cancelled() }}
+        working-directory: ${{ env.LEDGER }}
+        run: node test/equivalence.mjs compare ${{ matrix.platform }}
       - name: The bank workload (seeded; the seed is printed first)
         working-directory: ${{ env.LEDGER }}
         run: node test/bank.mjs --platform ${{ matrix.platform }} --seconds 20 --writers 4 --readers 2
@@ -184,7 +190,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - name: npm ci, and the pinned engines
         working-directory: examples/ledger

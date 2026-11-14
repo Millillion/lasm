@@ -171,7 +171,7 @@ The combined automatic suite passed all 127 tests locally under the guard
 (126.2 MiB peak). The [first native automatic run](https://github.com/Millillion/lasm/actions/runs/36509526628)
 passed: Linux and macOS passed 127 tests per architecture; Windows passed 124 per
 architecture with three POSIX-only symlink tests skipped. Native Windows junction
-and compiler-prefix tests passed. [Machine-readable evidence](evidence/installer-faults-2026-09-29.json)
+and compiler-prefix tests passed. [Machine-readable evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-faults-2026-09-29.json)
 preserves job identities and accounting. A further real-Git private-CA/proxy
 fixture passed locally before adding the full installed CLI/Lake control.
 
@@ -255,7 +255,7 @@ that profile is exercised by the new candidate below.
 The final source [139-control matrix](https://github.com/Millillion/lasm/actions/runs/36513317821)
 also passed all six targets, including the environment controls. Each platform
 passed 136 applicable checks with three explicitly inapplicable skips and no
-resource stop. [Exact job identities, OS versions, accounting and memory](evidence/installer-faults-final-2026-09-29.json)
+resource stop. [Exact job identities, OS versions, accounting and memory](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-faults-final-2026-09-29.json)
 are retained. The corresponding reproducible candidate is
 `0.1.0-experimental.36513318119`, SHA-256
 `ea43b7bc35cb665efe24b7341682c863e2073ab4b1cf7f065cb91585da5ae16b`,
@@ -269,7 +269,7 @@ events and no pressure throttling. The network control now uses the primary
 consumer's scoped completed-cache advice sidecar; limits and package bytes stay
 unchanged. This attempt remains a resource abort, not an installed/network pass.
 Apple Silicon subsequently passed the complete installed and network gates. The
-[original Windows ARM64 attempt](evidence/installer-windows-report-contention-2026-09-29.json)
+[original Windows ARM64 attempt](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-windows-report-contention-2026-09-29.json)
 passed cold and Lake builds, then its CI guard encountered access denied while
 atomically replacing its evidence file. Peak commitment was 2.02 GiB, with no
 memory stop. The supervisor now tolerates brief Windows sharing contention during
@@ -281,9 +281,9 @@ These are maintainer-control changes; the candidate bytes remain unchanged.
 The updated [144-control matrix](https://github.com/Millillion/lasm/actions/runs/36516202881)
 passed 141 applicable controls with three skips on each native target. Both
 Windows targets additionally passed three atomic-report controls, including a
-real deny-delete handle. [Compact evidence](evidence/installer-faults-guard-controls-2026-09-29.json)
+real deny-delete handle. [Compact evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-faults-guard-controls-2026-09-29.json)
 records all six jobs and their resource outcomes. The complete
-[Apple Silicon installed/network report](evidence/installer-hardened-darwin-arm64-2026-09-29.json)
+[Apple Silicon installed/network report](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-hardened-darwin-arm64-2026-09-29.json)
 includes an empty-cache npm installation under network denial and all six bundled
 dependency identities. The confidence collector classified that real success
 and the Linux resource abort correctly. The
@@ -301,12 +301,12 @@ commitment, completing initial acceptance of the exact archive on all six target
 
 | Target | Complete installed, deployment, network and resource evidence |
 | --- | --- |
-| Linux x86-64 | [Passed](evidence/installer-hardened-linux-x64-2026-09-29.json) |
-| Linux ARM64 | [Passed](evidence/installer-hardened-linux-arm64-2026-09-29.json) |
-| macOS x86-64 | [Passed](evidence/installer-hardened-darwin-x64-2026-09-29.json) |
-| macOS ARM64 | [Passed](evidence/installer-hardened-darwin-arm64-2026-09-29.json) |
-| Windows x86-64 | [Passed](evidence/installer-hardened-win32-x64-2026-09-29.json) |
-| Windows ARM64 | [Passed](evidence/installer-hardened-win32-arm64-2026-09-29.json) |
+| Linux x86-64 | [Passed](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-hardened-linux-x64-2026-09-29.json) |
+| Linux ARM64 | [Passed](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-hardened-linux-arm64-2026-09-29.json) |
+| macOS x86-64 | [Passed](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-hardened-darwin-x64-2026-09-29.json) |
+| macOS ARM64 | [Passed](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-hardened-darwin-arm64-2026-09-29.json) |
+| Windows x86-64 | [Passed](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-hardened-win32-x64-2026-09-29.json) |
+| Windows ARM64 | [Passed](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-hardened-win32-arm64-2026-09-29.json) |
 
 The [real CLI repair matrix](https://github.com/Millillion/lasm/actions/runs/36516980143)
 also passed all six native targets. No new application/compiler code was needed
@@ -326,7 +326,7 @@ paused, or more than three recoveries fails closed; a paused unsafe workload is
 killed instead of resumed. The original five-second command deadlines and memory
 limits stay unchanged. Reports retain every recovery. Real process-group controls
 verify that work cannot advance during accounting recovery and is killed after
-a persistent failure. The [152-control native matrix](evidence/installer-faults-accounting-recovery-2026-09-29.json)
+a persistent failure. The [152-control native matrix](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-faults-accounting-recovery-2026-09-29.json)
 passed on all six targets: POSIX passed 149 with three inapplicable skips; Windows
 passed 147 with five skips, plus its three separate atomic-report controls.
 The native Mac pause/resume/termination controls passed on both architectures.
@@ -337,7 +337,7 @@ The still-queued run
 `36519931807` was canceled before starting to replace its superseded controls;
 that cancellation remains visible in confidence history.
 The report job completed successfully and retained its
-[first immutable confidence report](evidence/installer-confidence-initial-2026-09-29.json)
+[first immutable confidence report](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installer-confidence-initial-2026-09-29.json)
 on the candidate draft. It correctly records the failed Mac repetition, counts
 the canceled preparation as unavailable, and leaves `passed: false`. The canceled
 preparation conservatively resets every platform's clean sequence.

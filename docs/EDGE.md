@@ -12,7 +12,7 @@ Measured behaviour is marked as measured. Plans are marked as plans.
   [`lean-4.35.0-edge.patch`](../scripts/full-lean/patches/lean-4.35.0-edge.patch)
   and [`runtime/edge.cpp`](../runtime/edge.cpp). CI:
   [`edge-runtime.yml`](../.github/workflows/edge-runtime.yml).
-- Evidence: [edge-prototype-2026-10-24.json](evidence/edge-prototype-2026-10-24.json).
+- Evidence: [edge-prototype-2026-10-24.json](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/edge-prototype-2026-10-24.json).
 - Decisions: [DECISIONS.md](DECISIONS.md).
 
 ## Result
@@ -30,7 +30,7 @@ account:
   sieve, big numbers, `HashMap` word counts, time, env, blocking and `Async`
   sleeps, `Async.block`, `Std.Mutex` with tasks, and thrown errors.
 
-The same build also runs on Node 26.13.0, Deno 2.9.6 and **Bun 1.4.4**.
+The same build also runs on Node 26.13.1, Deno 2.9.6 and **Bun 1.4.4**.
 
 **Recommended architecture:**
 
@@ -63,13 +63,13 @@ The same build also runs on Node 26.13.0, Deno 2.9.6 and **Bun 1.4.4**.
   - it builds the runtime, the template and
     [`examples/edge-pure`](../examples/edge-pure/) from source;
   - it serves them with pinned `wrangler dev` 4.152.0;
-  - it runs them on Node 26.13.0, Deno 2.9.6 and Bun 1.4.4;
+  - it runs them on Node 26.13.1, Deno 2.9.6 and Bun 1.4.4;
   - it gates the Free plan's budgets.
 
   The guide is [deploy/workers.md](deploy/workers.md).
 
   **First green run: 40128600109** (ubuntu-24.04, source `2f42d1b`;
-  [results](evidence/workers-ci-40128600109.json)). Every route passed on
+  [results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/workers-ci-40128600109.json)). Every route passed on
   workerd, Node, Deno and Bun, including the stop-and-restart check, and every
   budget passed.
 
@@ -163,7 +163,7 @@ Measured locally (2026-10-24). Every route passed on both, including the
 stop-and-restart check on Netlify.
 
 **CI: green in run 40143173720** (ubuntu-24.04, source `0994ce3`;
-[results](evidence/workers-ci-40143173720.json)). Every target passed for both
+[results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/workers-ci-40143173720.json)). Every target passed for both
 apps: workerd, Node, Deno, Bun, Vercel Edge, Netlify Edge, Deno Deploy and
 the Bun build. The Node link driver's edge link was byte-identical to `emcc`.
 
@@ -247,7 +247,7 @@ The results are in the evidence file.
 | workerd 1.20261019.1 (wrangler 4.152.0, V8 15.7) | **yes**, no flag or compatibility flag | yes | yes | yes | no ("Threading is not possible in Workers") |
 | Bun 1.4.4 (JavaScriptCore) | **yes** (since 1.3.14) | **no** (needs `BUN_JSC_useWasmMemory64=1`) | yes | yes | n/a |
 | Deno 2.9.6 (V8 15.0) | yes | yes | yes | yes | n/a |
-| Node 26.13.0 | yes | yes | yes | — | n/a |
+| Node 26.13.1 | yes | yes | yes | — | n/a |
 | Node 24.13.1 | **no** | yes | yes | no (flag) | n/a |
 
 Bun has an open JSPI regression in 1.4.0–1.4.3 involving Wasm tail calls
@@ -262,7 +262,7 @@ Bun has an open JSPI regression in 1.4.0–1.4.3 involving Wasm tail calls
 | Netlify Edge ([limits](https://docs.netlify.com/build/edge-functions/limits/)) | 20 MB compressed | 512 MB | 50 ms | — |
 | Deno Deploy ([limits](https://docs.deno.com/deploy/pricing_and_limits/)) | 1 GB | 512 MB | not stated | — |
 | Supabase Edge Functions ([limits](https://supabase.com/docs/guides/functions/limits)) | 20 MB (CLI bundle) | 256 MB | 2 s | — |
-| Fastly Compute ([limits](https://docs.fastly.com/products/compute-resource-limits), fetched 2026-11-12) | not in that table | "1M bytes stack, 128MB heap" per execution; Viceroy enforces 128 MiB too (issue #234) | 50 ms CPU per execution; 2 min run time (60 s on trial accounts) | — |
+| Fastly Compute ([limits](https://docs.fastly.com/products/compute-resource-limits), fetched 2026-11-12) | not in that table | "1M bytes stack, 128MB heap" per execution; Viceroy enforces 128 MiB too (issue #234). A Lasm program starts at about 4 MB and grows 2 MiB at a time (issue #246) | 50 ms CPU per execution; 2 min run time (60 s on trial accounts) | — |
 
 Vercel now recommends migrating from its edge runtime to Node. Next.js 16.3
 dropped `runtime = 'edge'`.
