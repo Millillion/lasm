@@ -2,8 +2,8 @@
 // (docs/proposals/M6_GLUE.md), compiled by Lasm into one WASI command,
 // lasm-glue.wasm (verification/cli/Lasm/Cli/Glue.lean, built by
 // .github/workflows/glue.yml). The request is the program's stdin, a list of
-// UTF-8 fields: a 0 byte, their count, a 0 byte and the fields separated by 0
-// bytes, or, when a field contains a 0 byte, each field written
+// UTF-8 fields: a table of the distinct fields and each field's index in it
+// (encodeRequest), or, when a field contains a 0 byte, each field written
 // `<length>:<UTF-8 bytes>`. Its stdout is `ok:` and the result or `error:`
 // and a message. The WASI host below is the least the program needs: reading
 // stdin, writing stdout and stderr, a clock that always reads 0 (Lean's
@@ -25,23 +25,33 @@ export function encodeFields(fields) {
   return Buffer.from(text);
 }
 
-let scratch = new Uint8Array(1 << 16);
 const encoder = new TextEncoder();
-/** A request as the glue program reads it, from lists of fields (in order;
- * joining whole lists is what makes it cheap): a 0 byte, the number of fields,
- * a 0 byte and the fields separated by 0 bytes; when a field contains a 0 byte
- * (its separators are then too many), `encodeFields` of them all. The bytes
- * are valid until the next request. */
+/** A request as the glue program reads it, from lists of fields (in order):
+ * a table of the distinct fields and each field's index in it (the byte 1,
+ * the number of distinct fields and of fields, each field's index, all 32-bit
+ * little-endian, then the distinct fields separated by 0 bytes); with no
+ * fields, or when a field contains a 0 byte (the table's separators are then
+ * too many), `encodeFields` of them all. */
 export function encodeRequest(lists) {
   let count = 0;
-  const parts = [];
-  for (const list of lists) if (list.length) { count += list.length; parts.push(list.join('\0')); }
-  const text = `\0${count}\0${parts.join('\0')}`;
+  for (const list of lists) count += list.length;
+  const index = new Map(), table = [], indices = new Uint32Array(count);
+  let k = 0;
+  for (const list of lists) for (const field of list) {
+    let i = index.get(field);
+    if (i === undefined) { i = table.length; index.set(field, i); table.push(field); }
+    indices[k++] = i;
+  }
+  const text = table.join('\0');
   let separators = 0;
   for (let i = text.indexOf('\0'); i !== -1; i = text.indexOf('\0', i + 1)) separators++;
-  if (separators !== count + 1) return encodeFields(lists.flat());
-  if (scratch.length < text.length * 3) scratch = new Uint8Array(text.length * 3);
-  return scratch.subarray(0, encoder.encodeInto(text, scratch).written);
+  if (!count || separators !== table.length - 1) return encodeFields(lists.flat());
+  const start = 9 + 4 * count, bytes = new Uint8Array(start + text.length * 3), view = new DataView(bytes.buffer);
+  bytes[0] = 1;
+  view.setUint32(1, table.length, true);
+  view.setUint32(5, count, true);
+  for (let j = 0; j < count; j++) view.setUint32(9 + 4 * j, indices[j], true);
+  return bytes.subarray(0, start + encoder.encodeInto(text, bytes.subarray(start)).written);
 }
 
 /** The fields of a result, as the glue program writes them. */

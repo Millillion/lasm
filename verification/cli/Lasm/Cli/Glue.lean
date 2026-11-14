@@ -7,8 +7,11 @@ verification/cli/LasmGlue.lean (which runs `main` here) by
 the published `@lasm/cli` (`.github/workflows/glue.yml`) and run by
 src/glue/glue.mjs. Its input on stdin is a list of UTF-8 fields: the first
 names the operation, the rest are its arguments. They are written in one of
-two ways: a 0 byte, the number of fields in decimal, a 0 byte and the fields
-separated by 0 bytes (the usual way: one pass to split it); or, when a field
+two ways. Usually as a table of the distinct fields and each field's index
+in it: the byte 1, the number of distinct fields and the number of fields
+(32-bit little-endian), each field's index (32-bit little-endian), then the
+distinct fields separated by 0 bytes (a plan names each initializer about
+ten times; the program reads each name once and shares it). Or, when a field
 contains a 0 byte, each field as `<length>:<bytes>` (the length in decimal,
 of the UTF-8 bytes that follow). Its output on stdout is `ok:` and the
 result, or `error:` and a message.
@@ -52,24 +55,44 @@ where
 /-- The text of `s` (whose bytes are `bytes`) from byte `start`, split at each
 0 byte (machine-word indices: this loop reads every byte of the request). -/
 partial def splitAtZero (bytes : ByteArray) (s : String) (i start : USize) (acc : Array String) : Array String :=
-  if h : i.toNat < bytes.size then
+  if h : i < bytes.usize then
+    have h : i.toNat < bytes.size := Nat.lt_of_lt_of_le (USize.lt_iff_toNat_lt.mp h) (by
+      simp only [ByteArray.usize, USize.toNat_ofNat']; exact Nat.mod_le _ _)
     if bytes.uget i h == 0 then splitAtZero bytes s (i + 1) (i + 1) (acc.push (String.Pos.Raw.extract s ⟨start.toNat⟩ ⟨i.toNat⟩))
     else splitAtZero bytes s (i + 1) start acc
   else acc.push (String.Pos.Raw.extract s ⟨start.toNat⟩ ⟨i.toNat⟩)
 
+/-- The 32-bit little-endian number at byte `i`. -/
+@[inline] def u32 (b : ByteArray) (i : Nat) : Nat :=
+  (b[i]!.toUInt32 ||| b[i + 1]!.toUInt32 <<< 8 ||| b[i + 2]!.toUInt32 <<< 16 ||| b[i + 3]!.toUInt32 <<< 24).toNat
+
+/-- The fields, from their table and their indices (at byte 9). -/
+def tableFields (input : ByteArray) (table : Array String) (count : Nat) : Except String (Array String) :=
+  go 0 (Array.mkEmpty count)
+where
+  go (k : Nat) (acc : Array String) : Except String (Array String) :=
+    if k < count then
+      let i := u32 input (9 + 4 * k)
+      if h : i < table.size then go (k + 1) (acc.push table[i]) else .error s!"field {k} is not in the table"
+    else .ok acc
+  termination_by count - k
+
 /-- The fields of a request, written either way. -/
 def fields (input : ByteArray) : Except String (Array String) :=
   if h : 0 < input.size then
-    if input[0] == 0 then
-      match String.fromUTF8? input with
+    if input[0] == 1 then
+      if input.size < 9 then .error "the request ends inside its header" else
+      let distinct := u32 input 1
+      let count := u32 input 5
+      let start := 9 + 4 * count
+      if input.size < start then .error "the request ends inside its indices" else
+      let bytes := input.extract start input.size
+      match String.fromUTF8? bytes with
       | none => .error "the request is not UTF-8"
-      | some s =>
-        let all := splitAtZero input s 1 1 #[]
-        match all[0]?.bind String.toNat? with
-        | none => .error "the request does not start with its number of fields"
-        | some n =>
-          if all.size == n + 1 then .ok (all.extract 1 all.size)
-          else .error s!"the request has {all.size - 1} fields, not {n}"
+      | some text =>
+        let table := splitAtZero bytes text 0 0 #[]
+        if table.size == distinct then tableFields input table count
+        else .error s!"the request's table has {table.size} fields, not {distinct}"
     else prefixedFields input 0 #[] (input.size + 1)
   else .error "input ends before a field"
 
