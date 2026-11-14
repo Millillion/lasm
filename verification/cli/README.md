@@ -58,9 +58,9 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**24 proved propositions (203 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**26 proved propositions (254 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
-## Lasm.Cli (24)
+## Lasm.Cli (26)
 
 ### The command line
 
@@ -85,61 +85,63 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | Proposition | In plain English |
 | --- | --- |
 | [`changed_files_exact`](Lasm/Cli/Spec.lean#L134) | **`changedFiles` reports exactly the files that differ.** Between two snapshots, it names each file present in only one, or with different hashes, once, and no other. Tested by: test/dev-units.test.mjs |
+| [`static_inside_root`](Lasm/Cli/Spec.lean#L143) | **No request path reaches a file outside the root.** Whatever the path (`..`, encoded dots and slashes, sibling directories that share the root's name as a prefix, malformed percent-encoding), whatever files exist and whatever the client accepts, the static server answers 200, 400, 403 or 404, and a file it serves lies under the root directory: the root is a resolved directory (not a file) and the fallback page, if any, a name in it. Tested by: test/static-server.test.mjs |
 
 ### The Node host
 
 | Proposition | In plain English |
 | --- | --- |
-| [`numbers_le64`](Lasm/Cli/Spec.lean#L145) | **`numbers` writes little-endian `UInt64`s.** Each value becomes eight bytes, low byte first, wrapped modulo 2⁶⁴ (a negative value as its two's complement), in order. Tested by: test/lean-io-error-policy.test.mjs |
-| [`lean_at_least_lexicographic`](Lasm/Cli/Spec.lean#L152) | **Lean versions compare lexicographically.** `leanAtLeast v m` holds exactly when `v`'s major, minor and patch are `m`'s or later in that order, whatever prerelease tag `v` has; a version is at least itself. Tested by: test/lean-io-error-policy.test.mjs |
+| [`numbers_le64`](Lasm/Cli/Spec.lean#L158) | **`numbers` writes little-endian `UInt64`s.** Each value becomes eight bytes, low byte first, wrapped modulo 2⁶⁴ (a negative value as its two's complement), in order. Tested by: test/lean-io-error-policy.test.mjs |
+| [`lean_at_least_lexicographic`](Lasm/Cli/Spec.lean#L165) | **Lean versions compare lexicographically.** `leanAtLeast v m` holds exactly when `v`'s major, minor and patch are `m`'s or later in that order, whatever prerelease tag `v` has; a version is at least itself. Tested by: test/lean-io-error-policy.test.mjs |
 
 ### Builds
 
 | Proposition | In plain English |
 | --- | --- |
-| [`builtin_closure`](Lasm/Cli/Spec.lean#L163) | **The builtin closure is the reachable builtins, dependencies first.** For an acyclic import graph, the closure of the requested specifiers holds each builtin reachable from a requested builtin exactly once, nothing else (other specifiers are dropped), and every builtin after those it imports. Tested by: test/builtin-modules.test.mjs |
-| [`schedule_reached_kept_first`](Lasm/Cli/Spec.lean#L175) | **A unit's schedule is the kept units it reaches, dependencies first.** For an acyclic call graph (the entries of the JavaScript object `calls`), the schedule of `n` holds each kept unit other than `n` that `n` reaches, exactly once, and every one after the kept units it reaches. Tested by: test/edge-initializers.test.mjs |
+| [`builtin_closure`](Lasm/Cli/Spec.lean#L176) | **The builtin closure is the reachable builtins, dependencies first.** For an acyclic import graph, the closure of the requested specifiers holds each builtin reachable from a requested builtin exactly once, nothing else (other specifiers are dropped), and every builtin after those it imports. Tested by: test/builtin-modules.test.mjs |
+| [`schedule_reached_kept_first`](Lasm/Cli/Spec.lean#L188) | **A unit's schedule is the kept units it reaches, dependencies first.** For an acyclic call graph (the entries of the JavaScript object `calls`), the schedule of `n` holds each kept unit other than `n` that `n` reaches, exactly once, and every one after the kept units it reaches. Tested by: test/edge-initializers.test.mjs |
+| [`mangle_round_trip`](Lasm/Cli/Spec.lean#L200) | **Mangling round-trips.** For every dotted name (a component of decimal digits without a leading zero is a numeric component, as in `_private.M.0.f`), the mangled name is a non-empty C identifier, demangling gives the name back, and the module of its initializer (`initialize_…` or `runtime_initialize_…`) is the name. Tested by: test/application-diagnosis.test.mjs |
 
 ### The link driver's Python semantics
 
 | Proposition | In plain English |
 | --- | --- |
-| [`json_string_printable`](Lasm/Cli/Spec.lean#L189) | **Escaped strings are printable ASCII.** `json.dumps` of any string, `ensure_ascii`, is printable ASCII: quotes, escapes, hexadecimal digits and the printable characters themselves. Tested by: test/link-driver-python.test.mjs |
-| [`python_order_code_points`](Lasm/Cli/Spec.lean#L196) | **Python's string order is the order of code points.** The sign of `comparePythonStrings a b` is that of comparing `a` and `b` code point by code point (a prefix first), as Python orders `str`, unlike JavaScript's UTF-16 order. Tested by: test/link-driver-python.test.mjs |
+| [`json_string_printable`](Lasm/Cli/Spec.lean#L215) | **Escaped strings are printable ASCII.** `json.dumps` of any string, `ensure_ascii`, is printable ASCII: quotes, escapes, hexadecimal digits and the printable characters themselves. Tested by: test/link-driver-python.test.mjs |
+| [`python_order_code_points`](Lasm/Cli/Spec.lean#L222) | **Python's string order is the order of code points.** The sign of `comparePythonStrings a b` is that of comparing `a` and `b` code point by code point (a prefix first), as Python orders `str`, unlike JavaScript's UTF-16 order. Tested by: test/link-driver-python.test.mjs |
 
 ### WebAssembly
 
 | Proposition | In plain English |
 | --- | --- |
-| [`replace_one_core_module`](Lasm/Cli/Spec.lean#L206) | **`replaceCoreModule` replaces exactly the one matching module.** In a component whose only core module section that starts with `pfx` is `pfx ++ tail`, that section becomes `to ++ tail`, and every other section, before or after it, is kept as it was. Tested by: test/wasi-component.test.mjs |
-| [`componentize_inverse`](Lasm/Cli/Spec.lean#L221) | **A component splices the core module and gives it back.** In a template whose one core module that starts with the placeholder is the placeholder followed by `tail` (as the shipped template is: the test checks it), `componentize` splices in any core that begins no other core module; `extractCore` gives the core back, and `makeTemplate` the template. Tested by: test/wasi-component.test.mjs |
-| [`drops_only_component_type`](Lasm/Cli/Spec.lean#L234) | **`withoutComponentType` drops only component-type custom sections.** A module's custom sections named `component-type…` go; every other section, custom or not, stays, in order. Tested by: test/wasi-component.test.mjs |
+| [`replace_one_core_module`](Lasm/Cli/Spec.lean#L232) | **`replaceCoreModule` replaces exactly the one matching module.** In a component whose only core module section that starts with `pfx` is `pfx ++ tail`, that section becomes `to ++ tail`, and every other section, before or after it, is kept as it was. Tested by: test/wasi-component.test.mjs |
+| [`componentize_inverse`](Lasm/Cli/Spec.lean#L247) | **A component splices the core module and gives it back.** In a template whose one core module that starts with the placeholder is the placeholder followed by `tail` (as the shipped template is: the test checks it), `componentize` splices in any core that begins no other core module; `extractCore` gives the core back, and `makeTemplate` the template. Tested by: test/wasi-component.test.mjs |
+| [`drops_only_component_type`](Lasm/Cli/Spec.lean#L260) | **`withoutComponentType` drops only component-type custom sections.** A module's custom sections named `component-type…` go; every other section, custom or not, stays, in order. Tested by: test/wasi-component.test.mjs |
 
 ### The process launcher
 
 | Proposition | In plain English |
 | --- | --- |
-| [`launcher_config_round_trip`](Lasm/Cli/Spec.lean#L245) | **The launcher configuration round-trips.** For options whose texts have no NUL byte and fit the format (under 4 GiB), `encodeProcessConfiguration` succeeds and the native launcher reads back exactly the flags, the three stdio flags, both directories, the command and arguments as its argument vector, and the environment's pairs in order (as UTF-8 bytes). Tested by: test/cli-helpers.test.mjs |
+| [`launcher_config_round_trip`](Lasm/Cli/Spec.lean#L271) | **The launcher configuration round-trips.** For options whose texts have no NUL byte and fit the format (under 4 GiB), `encodeProcessConfiguration` succeeds and the native launcher reads back exactly the flags, the three stdio flags, both directories, the command and arguments as its argument vector, and the environment's pairs in order (as UTF-8 bytes). Tested by: test/cli-helpers.test.mjs |
 
 ### Lasm.JS's framing
 
 | Proposition | In plain English |
 | --- | --- |
-| [`events_read_back`](Lasm/Cli/Spec.lean#L263) | **A batch of interop events reads back.** Whatever events the host queues (within the format's bounds), `encodeEvents` writes the first 1024 and leaves the rest queued, and the C glue reads exactly those events, in order, from the batch; a batch followed by other bytes reads as its events followed by what those bytes read as (so the glue stops only at a malformed event of its own). Tested by: test/lasm-js-framing.test.mjs |
-| [`request_read_back`](Lasm/Cli/Spec.lean#L275) | **A request's released handles and payload read back.** For any handles (32-bit, fewer than 2³²) and any payload, the host splits the request the C glue frames into exactly those handles and that payload. Tested by: test/lasm-js-framing.test.mjs |
-| [`into_read_back`](Lasm/Cli/Spec.lean#L284) | **The promise a call settles reads back.** For any 64-bit Lean promise and any input, the host reads the promise and the input from the payload the C glue frames. Tested by: test/lasm-js-framing.test.mjs |
+| [`events_read_back`](Lasm/Cli/Spec.lean#L289) | **A batch of interop events reads back.** Whatever events the host queues (within the format's bounds), `encodeEvents` writes the first 1024 and leaves the rest queued, and the C glue reads exactly those events, in order, from the batch; a batch followed by other bytes reads as its events followed by what those bytes read as (so the glue stops only at a malformed event of its own). Tested by: test/lasm-js-framing.test.mjs |
+| [`request_read_back`](Lasm/Cli/Spec.lean#L301) | **A request's released handles and payload read back.** For any handles (32-bit, fewer than 2³²) and any payload, the host splits the request the C glue frames into exactly those handles and that payload. Tested by: test/lasm-js-framing.test.mjs |
+| [`into_read_back`](Lasm/Cli/Spec.lean#L310) | **The promise a call settles reads back.** For any 64-bit Lean promise and any input, the host reads the promise and the input from the payload the C glue frames. Tested by: test/lasm-js-framing.test.mjs |
 
 ### Host handles
 
 | Proposition | In plain English |
 | --- | --- |
-| [`handle_fresh_in_range`](Lasm/Cli/Spec.lean#L294) | **A host handle is fresh and in range.** When `allocate` gives an id, the table did not hold it and now holds it, with the value, after every entry it had, and the range stays; the id lies in the range, and `#next` stays in it, whenever `#next` was in it (as the constructor starts it). Tested by: test/handle-table.test.mjs |
+| [`handle_fresh_in_range`](Lasm/Cli/Spec.lean#L320) | **A host handle is fresh and in range.** When `allocate` gives an id, the table did not hold it and now holds it, with the value, after every entry it had, and the range stays; the id lies in the range, and `#next` stays in it, whenever `#next` was in it (as the constructor starts it). Tested by: test/handle-table.test.mjs |
 
 ### Function packages
 
 | Proposition | In plain English |
 | --- | --- |
-| [`zip_deterministic`](Lasm/Cli/Spec.lean#L306) | **`zip` is deterministic.** The archive depends on the entries alone (no clock, no host state). Of the model, a Lean function, this holds by `rfl`; it is the assumption the model makes, which the test checks of the JavaScript. Tested by: test/serverless-zip.test.mjs |
+| [`zip_deterministic`](Lasm/Cli/Spec.lean#L332) | **`zip` is deterministic.** The archive depends on the entries alone (no clock, no host state). Of the model, a Lean function, this holds by `rfl`; it is the assumption the model makes, which the test checks of the JavaScript. Tested by: test/serverless-zip.test.mjs |
 <!-- END PROPOSITIONS -->
 
 ## Candidates
