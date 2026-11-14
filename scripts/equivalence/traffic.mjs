@@ -327,21 +327,29 @@ export function compare(golden, observed, { app = 'app', target = 'target', know
   return { differences, failing, report: report.join('\n') };
 }
 
-/** The generic self-test: equal traffic agrees, a changed status, header and body each differ, a missing exchange is found. */
+/**
+ * The generic self-test: equal traffic agrees, a changed status, header and
+ * body each differ, known differences are recognized, a missing exchange is
+ * found. `traffic(seed)` gives a recording (or its exchanges) of the same
+ * session with different random values for each seed; `tweak` changes the
+ * last response.
+ */
 export function selfTestCompare(normalizeRecording, traffic, tweak) {
-  const normalize = (exchanges, target) => normalizeRecording({ exchanges }, target);
-  const node = normalize(traffic(0), 'node');
-  const same = compare(node, normalize(traffic(1), 'same'), { target: 'same' });
+  const recording = seed => { const t = traffic(seed); return Array.isArray(t) ? { exchanges: t } : t; };
+  const node = normalizeRecording(recording(0), 'node');
+  const same = compare(node, normalizeRecording(recording(1), 'same'), { target: 'same' });
   if (same.failing.length) throw new Error(`equal traffic differs:\n${same.report}`);
-  const changed = traffic(1);
-  tweak(changed.at(-1).response);
-  const differs = compare(node, normalize(changed, 'differs'), { target: 'differs' });
+  const changed = recording(1);
+  tweak(changed.exchanges.at(-1).response);
+  const differs = compare(node, normalizeRecording(changed, 'differs'), { target: 'differs' });
   // (A changed body may also change an app's facts; only the exchanges are checked here.)
   const what = differs.failing.filter(d => d.request.startsWith('#')).map(d => d.what).join(',');
   if (what !== 'status,response headers,response body') throw new Error(`expected status, header and body differences, got ${what}:\n${differs.report}`);
-  const known = compare(node, normalize(changed, 't'), { target: 't', known: [{ targets: ['t'], request: '.', issue: 'https://example.invalid/1' }] });
+  const known = compare(node, normalizeRecording(changed, 't'), { target: 't', known: [{ targets: ['t'], request: '.', issue: 'https://example.invalid/1' }] });
   if (known.failing.length || known.differences.filter(d => d.request.startsWith('#')).length !== 3) throw new Error(`known differences not recognized:\n${known.report}`);
-  const shifted = compare(node, normalize(traffic(1).slice(1), 'shifted'), { target: 'shifted' });
+  const shorter = recording(1);
+  shorter.exchanges = shorter.exchanges.slice(1);
+  const shifted = compare(node, normalizeRecording(shorter, 'shifted'), { target: 'shifted' });
   if (!shifted.failing.some(d => d.what.startsWith('missing'))) throw new Error(`a missing exchange was not reported:\n${shifted.report}`);
   return differs.report;
 }
