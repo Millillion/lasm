@@ -76,6 +76,15 @@ pull request before, so none of them is a check that was dropped.
    regular expression.
 6. **No runs on Sunday** (below): every workflow with a `schedule:` calls the
    Sunday guard, and every other job in it needs it.
+7. **A step that pipes runs with pipefail.** GitHub runs a step without
+   `shell` as `bash -e {0}` (no pipefail) on Linux and macOS, so in
+   `checker | tee log` a failing checker passes; this hid a failing model check
+   for ten days ([#291](https://github.com/Millillion/lasm/issues/291)). Give
+   such a step `shell: bash` (`bash -eo pipefail`) or start it with
+   `set -o pipefail`, and do not pipe a long output into `head` or `grep -q`,
+   which exit early (the writer's SIGPIPE then fails the step).
+   `test/workflow-pipefail.test.mjs` (`scripts/ci/workflow-pipefail.mjs`)
+   checks every workflow.
 
 ## No runs on Sunday
 

@@ -102,6 +102,7 @@ jobs:
       - name: fastly.toml is tools/kv.mjs's for site/
         if: matrix.platform == 'fastly'
         working-directory: ${{ env.FOLIO }}
+        shell: bash
         run: node tools/kv.mjs fastly | diff fastly.toml -
       - name: The site from the store, a changed site, the 652 CommonMark examples and the pathological inputs on the server
         working-directory: ${{ env.FOLIO }}
