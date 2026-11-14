@@ -5,16 +5,21 @@
 //   node test/api.mjs --url http://host:port  # a server that is already running
 //   node test/api.mjs --command "bun bun/main.mjs"   # any other server command ({port}: its port)
 //   node test/api.mjs --name <name>           # the name of the results file (test-results/api-<name>.json)
+//   node test/api.mjs --equivalence           # also record the traffic (test-results/traffic-<name>.json)
+//                                             # for test/equivalence.mjs compare <name>
 import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { api, root, startLedger } from './server.mjs';
+import { saveTraffic, startRecorder } from '../../../scripts/equivalence/traffic.mjs';
 
 const args = process.argv.slice(2);
 const option = name => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
 const name = option('--name') ?? option('--platform') ?? 'node';
 const server = await startLedger({ url: option('--url'), command: option('--command'), platform: option('--platform') });
-const base = server.base;
+// --equivalence: every request goes through a recording proxy (test/equivalence.mjs).
+const recorder = args.includes('--equivalence') ? await startRecorder(server.base) : undefined;
+const base = recorder?.url ?? server.base;
 const results = [];
 async function test(title, fn) {
   try { await fn(); results.push({ title, ok: true }); console.log(`ok   ${title}`); }
@@ -146,6 +151,7 @@ try {
     assert.ok(BigInt(a.timestamp) > 10n ** 18n);
   });
 } finally {
+  if (recorder) { await recorder.close(); saveTraffic(root, name, recorder.exchanges); }
   await server.stop();
 }
 const failed = results.filter(r => !r.ok).length;
