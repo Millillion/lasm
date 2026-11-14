@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { encodeFileMessage, decodeFileMessage } from '../src/native-file-message.mjs';
+import { forAll } from './helpers/property.mjs';
 
 function send(value, options) {
   const { message, transfer } = encodeFileMessage(value, options);
@@ -75,4 +76,22 @@ test('raw and viewed references transfer one allocation without detaching shared
   assert.equal(raw.byteLength, 0); assert.equal(shared.byteLength, 16);
   assert.equal(reply.raw, reply.view.buffer); assert.equal(reply.view[8191], 93);
   assert.ok(reply.shared instanceof SharedArrayBuffer);
+});
+
+// Proposition: Lasm.Cli.Spec.file_message_transfers
+//   ∀ (move : Bool) (v : FileMessage.Value),
+//     (FileMessage.encodeFileMessage move v).2.Nodup ∧ (move = false → (FileMessage.encodeFileMessage move v).2 = [])
+test('the transfer list names each buffer once, and only when moving', () => {
+  forAll(r => {
+    const pool = [new ArrayBuffer(8), new ArrayBuffer(4), new SharedArrayBuffer(8)];
+    const leaf = () => { const b = r.pick(pool); return r.pick([() => b, () => new Uint8Array(b), () => { const offset = r.int(0, b.byteLength); return new Uint8Array(b, offset, r.int(0, b.byteLength - offset)); }, () => r.int(0, 9)])(); };
+    const tree = depth => depth > 2 || r.next() < 0.4 ? leaf() : r.next() < 0.5 ? r.array(r.int(0, 3), () => tree(depth + 1))
+      : Object.fromEntries(r.array(r.int(0, 3), (_, i) => ["k" + i, tree(depth + 1)]));
+    return { value: tree(0), move: r.next() < 0.5 };
+  }, ({ value, move }) => {
+    const { transfer } = encodeFileMessage(value, { move });
+    assert.equal(new Set(transfer).size, transfer.length);
+    if (!move) assert.deepEqual(transfer, []);
+    assert.ok(transfer.every(buffer => buffer instanceof ArrayBuffer), 'shared memory is never transferred');
+  }, { runs: 1000 });
 });

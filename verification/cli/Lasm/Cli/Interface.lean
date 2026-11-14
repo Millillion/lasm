@@ -40,6 +40,7 @@ import Lasm.Cli.Model.Mangle
 import Lasm.Cli.Model.StaticServer
 import Lasm.Cli.Model.Reachability
 import Lasm.Cli.Model.Initialization
+import Lasm.Cli.Model.FileMessage
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform

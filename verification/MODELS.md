@@ -34,9 +34,9 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**138 shipped modules**: 17 modelled, 23 pending, 98 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 23 modules still need a model.
+**138 shipped modules**: 18 modelled, 22 pending, 98 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 22 modules still need a model.
 
-### Modelled (17)
+### Modelled (18)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -49,6 +49,7 @@ How a module moves from pending to modelled:
 | [`src/edge/edge-initializers.mjs`](../src/edge/edge-initializers.mjs) | [EdgeInitializers.lean](../verification/cli/Lasm/Cli/Model/EdgeInitializers.lean) (`initializationSchedule`, `compactInitializerWrappers`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | both of its functions are modelled; the module does nothing else |
 | [`src/handle-table.mjs`](../src/handle-table.mjs) | [HandleTable.lean](../verification/cli/Lasm/Cli/Model/HandleTable.lean) (HandleTable (constructor, allocate, and the Map's set and delete); [cli-differential.mjs](../test/models/cli-differential.mjs)) | the allocator is modelled; handle_fresh_in_range proved |
 | [`src/lean-io-errors.mjs`](../src/lean-io-errors.mjs) | [LeanIOErrors.lean](../verification/cli/Lasm/Cli/Model/LeanIOErrors.lean) (`leanAtLeast`, `leanIOError`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | leanAtLeast and the IO error policy leanIOError are modelled (lean_at_least_lexicographic proved), leanIOError with its tables (libuv's messages, Lean's CRT aliases, the Windows CRT cases: data, passed by the differential) and the host (platform, Node's errno names) parameters; checkLeanIOVersion is a list of reviewed releases and receiveSizeError a constant |
+| [`src/native-file-message.mjs`](../src/native-file-message.mjs) | [FileMessage.lean](../verification/cli/Lasm/Cli/Model/FileMessage.lean) (`encodeFileMessage`, `decodeFileMessage`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole codec is modelled, buffers by identity (a value's own or a copy) (file_message_transfers proved) |
 | [`src/package.mjs`](../src/package.mjs) | [Package.lean](../verification/cli/Lasm/Cli/Model/Package.lean) (`parsePackageArguments`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | its argument parsing is modelled (parse_known_or_refused proved); the rest packages a build (files, processes and archives), tested end to end |
 | [`src/platform.mjs`](../src/platform.mjs) | [Platform.lean](../verification/cli/Lasm/Cli/Model/Platform.lean) (`responseFile`, insideDirectory (path.posix.relative); [cli-differential.mjs](../test/models/cli-differential.mjs)) | responseFile and insideDirectory are modelled (response_file_round_trip and inside_directory_prefix proved), insideDirectory over POSIX paths with path.posix.relative checked by the differential; on Windows node:path's win32 rules apply instead (test/cli-parse.test.mjs); the rest is the host check and constants |
 | [`src/process-launcher.mjs`](../src/process-launcher.mjs) | [ProcessLauncher.lean](../verification/cli/Lasm/Cli/Model/ProcessLauncher.lean) (`encodeProcessConfiguration`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the configuration writer is modelled (launcher_config_round_trip proved with the reader's model); nativeProcessLauncher finds and verifies the shipped binary (files and hashes, test/cli-helpers.test.mjs) |
@@ -58,7 +59,7 @@ How a module moves from pending to modelled:
 | [`src/wasi/lower-atomics.mjs`](../src/wasi/lower-atomics.mjs) | [LowerAtomics.lean](../verification/cli/Lasm/Cli/Model/LowerAtomics.lean) (`lowerAtomics`, `moduleImports`, `keepExports`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole module is modelled (lowerAtomics with its readers, moduleImports, keepExports); candidates lowering_rewrites_atomics, lowering_leaves_no_atomics and lowering_keeps_runs are stated over the model, the last two also over WebAssembly validation and execution (outside semantics) |
 | [`src/wasi/wasi-component.mjs`](../src/wasi/wasi-component.mjs) | [WasiComponent.lean](../verification/cli/Lasm/Cli/Model/WasiComponent.lean) (`replaceCoreModule`, `placeholderModule`, `componentize`, `makeTemplate`, `extractCore`, `withoutComponentType`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | every function is modelled (the template, read from component/proxy-template.wasm by default, is an argument); replace_one_core_module, drops_only_component_type and componentize_inverse proved |
 
-### Pending (23)
+### Pending (22)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -80,7 +81,6 @@ How a module moves from pending to modelled:
 | [`src/link-driver/wasm.mjs`](../src/link-driver/wasm.mjs) | — | a Wasm reader: pure (sections, LEB128) |
 | [`src/macos-tbd.mjs`](../src/macos-tbd.mjs) | — | adapts libSystem.tbd: a pure text transformation |
 | [`src/managed-download.mjs`](../src/managed-download.mjs) | — | downloads with retries: the retry delay is pure (candidate retry_delay_bounded); the rest is I/O |
-| [`src/native-file-message.mjs`](../src/native-file-message.mjs) | — | the file worker's message encoding: a pure codec |
 | [`src/node-host.mjs`](../src/node-host.mjs) | [NodeHost.lean](../verification/cli/Lasm/Cli/Model/NodeHost.lean) (`numbers`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the Node host of Lean's runtime primitives (Lean's runtime primitives on this host: their meaning is native Lean's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md)); its pure helpers are modelled one by one |
 | [`src/node-js.mjs`](../src/node-js.mjs) | [Core.lean](../library/Lasm/JS/Core.lean) (the value codec (Writer, reader); [lasm-js-wire.mjs](../test/fuzz/targets/lasm-js-wire.mjs)); [JsFraming.lean](../verification/cli/Lasm/Cli/Model/JsFraming.lean) (`encodeEvents`, `splitRequest`, `intoPrefix`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | Lasm.JS on Node: the value codec's JavaScript half is checked against Lean's proved codec (lasm-js-wire) and the framing (encodeEvents, splitRequest, intoPrefix) against its model (JsFraming.lean); the host operations (calls, properties, callbacks, references) are not modelled (IRREDUCIBLE.md M4) |
 | [`src/wasi/lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c) | — | the wasi-http request and response mapping (edge request mapping, IRREDUCIBLE.md M4) |
