@@ -106,10 +106,10 @@ Tests inject insufficient-space errors without filling a disk or inducing OOM.
 
 ## Evidence and remaining gates
 
-The candidate packer now bundles the six packages in the installer's exact
-committed npm dependency graph. `installer-dependencies.json` records versions,
-registry integrity values, graph edges and every bundled file hash; provenance
-includes its digest. Packing twice must produce identical bytes. The tiny packing
+The CLI has no npm dependencies (since 2026-11-13: archives are read by
+`src/tar.mjs`, and koffi is bundled under `src/native`). Until then the packer
+bundled `tar` and its five dependencies with an `installer-dependencies.json`
+manifest. Packing twice must produce identical bytes. The tiny packing
 control passed installation with an empty npm cache, `--offline`, and an unusable
 registry. Full candidate acceptance additionally repeats installation under OS
 network denial. No dependency lifecycle script is needed.

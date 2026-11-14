@@ -183,11 +183,11 @@ test('linking many files completes them all', async t => {
 // provisionArtifact and deriveArtifact from a small gzip archive served in-process.
 async function served(t, files = { 'tool/bin/run': 'run', 'tool/NOTICE': 'notice' }) {
   const base = await scratch(t);
-  const { c: createTar } = await import('tar');
+  const { directoryEntries, writeTar } = await import('../src/tar.mjs');
   const source = join(base, 'source');
   await mkdir(join(source, 'tool'), { recursive: true });
   for (const [name, text] of Object.entries(files)) { await mkdir(join(source, name, '..'), { recursive: true }); if (text !== null) await writeFile(join(source, name), text); }
-  await createTar({ cwd: source, file: join(base, 'a.tgz'), gzip: true, portable: true }, ['tool']);
+  await writeTar(join(base, 'a.tgz'), directoryEntries(source, ['tool']), { gzip: true });
   const bytes = await readFile(join(base, 'a.tgz'));
   const artifact = { name: 'tool', root: 'tool', url: 'https://example.invalid/tool.tgz', format: 'tar.gz', bytes: bytes.length,
     sha256: sha(bytes), maximumExtractedBytes: 10_000 };
@@ -330,15 +330,9 @@ test('an installation waits for another holder of its lock, and says so', async 
 
 // Raw tar archives, entry by entry, for the extraction rules.
 async function rawArchive(entries) {
-  const { Header } = await import('tar');
+  const { tarBytes } = await import('../src/tar.mjs');
   const { zstdCompressSync } = await import('node:zlib');
-  const parts = [];
-  for (const entry of entries) {
-    const body = Buffer.from(entry.body ?? '');
-    const header = new Header({ mode: 0o644, type: 'File', ...entry, size: body.length });
-    header.encode(); parts.push(header.block, body, Buffer.alloc((512 - body.length % 512) % 512));
-  }
-  return zstdCompressSync(Buffer.concat([...parts, Buffer.alloc(1024)]));
+  return zstdCompressSync(tarBytes(entries.map(({ body, ...entry }) => ({ mode: 0o644, ...entry, data: body ?? '' }))));
 }
 async function install(t, entries, change = {}) {
   const base = await scratch(t);

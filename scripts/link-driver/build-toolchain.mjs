@@ -28,7 +28,7 @@ import { Readable } from 'node:stream';
 import { createZstdDecompress } from 'node:zlib';
 import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
-import { Parser } from 'tar';
+import { parseTar, fileSink } from '../../src/tar.mjs';
 import { nativeImports, packArchive, platformFamily } from '../lean-dist/tiers.mjs';
 import { nativeRoots, nativeCandidate, resourceHeader, resolveNativeImport, sharedJsCandidate, checkRepairCoverage,
   treeDigestInput, nativeArchiveName, sharedArchiveName, sharedLayout, nativeNotice, sharedNotice } from './toolchain.mjs';
@@ -82,35 +82,30 @@ log('upstream archive verified');
 
 // 2. Stage only members that can appear in an archive.
 const clean = path => path && !/[\\\0]/.test(path) && !path.startsWith('/') && path.split('/').every(part => part && part !== '.' && part !== '..');
-const members = new Map(), hardlinks = [], writes = [];
-let failure;
+const members = new Map(), hardlinks = [];
 function stageTar(prefix, wanted, destination) {
-  const parser = new Parser({ strict: true });
-  parser.on('entry', entry => {
-    try {
-      const raw = entry.path.replace(/^\.\//, '').replace(/\/$/, '');
-      if (raw === prefix) { entry.resume(); return; }
-      if (!raw.startsWith(prefix + '/')) throw new Error(`Archive member outside ${prefix}: ${entry.path}`);
-      const path = raw.slice(prefix.length + 1);
-      if (!clean(path)) throw new Error(`Unsafe archive member ${entry.path}`);
-      if (entry.type === 'Directory' || !wanted(path)) { entry.resume(); return; }
-      if (destination.has(path)) throw new Error(`Duplicate archive member ${path}`);
-      const executable = family === 'win32' && destination === members ? /\.(?:exe|dll)$/i.test(path) : !!(entry.mode & 0o111);
-      if (entry.type === 'SymbolicLink') { destination.set(path, { path, type: 'symlink', target: entry.linkpath }); entry.resume(); return; }
-      if (entry.type === 'Link') {
-        const target = entry.linkpath.replace(/^\.\//, '');
-        if (!target.startsWith(prefix + '/')) throw new Error(`Hardlink outside the archive: ${path}`);
-        hardlinks.push({ destination, path, target: target.slice(prefix.length + 1), executable });
-        entry.resume(); return;
-      }
-      if (!['File', 'OldFile', 'ContiguousFile'].includes(entry.type)) throw new Error(`Unsupported member type ${entry.type}: ${path}`);
-      const file = join(tree, prefix === upstream.root ? 'sdk' : 'sysroot', ...path.split('/'));
-      destination.set(path, { path, type: 'file', source: file, size: entry.size, executable });
-      mkdirSync(dirname(file), { recursive: true });
-      writes.push(pipeline(entry, createWriteStream(file, { flags: 'wx' })));
-    } catch (error) { failure ??= error; entry.resume(); }
+  return parseTar(entry => {
+    const raw = entry.path.replace(/^\.\//, '').replace(/\/$/, '');
+    if (raw === prefix) return;
+    if (!raw.startsWith(prefix + '/')) throw new Error(`Archive member outside ${prefix}: ${entry.path}`);
+    const path = raw.slice(prefix.length + 1);
+    if (!clean(path)) throw new Error(`Unsafe archive member ${entry.path}`);
+    if (entry.type === 'Directory' || !wanted(path)) return;
+    if (destination.has(path)) throw new Error(`Duplicate archive member ${path}`);
+    const executable = family === 'win32' && destination === members ? /\.(?:exe|dll)$/i.test(path) : !!(entry.mode & 0o111);
+    if (entry.type === 'SymbolicLink') { destination.set(path, { path, type: 'symlink', target: entry.linkpath }); return; }
+    if (entry.type === 'Link') {
+      const target = entry.linkpath.replace(/^\.\//, '');
+      if (!target.startsWith(prefix + '/')) throw new Error(`Hardlink outside the archive: ${path}`);
+      hardlinks.push({ destination, path, target: target.slice(prefix.length + 1), executable });
+      return;
+    }
+    if (entry.type !== 'File') throw new Error(`Unsupported member type ${entry.type}: ${path}`);
+    const file = join(tree, prefix === upstream.root ? 'sdk' : 'sysroot', ...path.split('/'));
+    destination.set(path, { path, type: 'file', source: file, size: entry.size, executable });
+    mkdirSync(dirname(file), { recursive: true });
+    return fileSink(file);
   });
-  return parser;
 }
 // The JavaScript subset is always staged: every platform reports its digest.
 const wantedSdk = path => nativeCandidate(path)
@@ -125,8 +120,6 @@ if (['tar.xz', 'zip'].includes(upstream.format)) {
   if (code !== 0) throw new Error(`The archive decoder exited with ${code}`);
 } else if (upstream.format === 'tar.zst') await pipeline(createReadStream(options.archive), createZstdDecompress(), sdkParser);
 else throw new Error(`Unsupported SDK archive format ${upstream.format}`);
-await Promise.all(writes.splice(0));
-if (failure) throw failure;
 for (const link of hardlinks.splice(0)) {
   const target = link.destination.get(link.target);
   if (!target || target.type !== 'file') throw new Error(`Unresolvable hardlink ${link.path}`);
@@ -207,8 +200,6 @@ if (sharedMode !== 'none') {
   const sysrootRoot = `emscripten-${version}-cache-wasm64-pic`;
   const sysroot = new Map();
   await pipeline(createReadStream(sysrootArchive), createZstdDecompress(), stageTar(sysrootRoot, () => true, sysroot));
-  await Promise.all(writes.splice(0));
-  if (failure) throw failure;
   if (hardlinks.length) throw new Error('The sysroot archive must not contain hardlinks');
   const pic = 'sysroot/lib/wasm64-emscripten/pic/';
   const missing = recipe.sysroot.libraries.filter(name => sysroot.get(pic + name)?.type !== 'file');
