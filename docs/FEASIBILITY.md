@@ -26,8 +26,8 @@ Run instructions are in [the experiment README](../experiments/feasibility/READM
 | Unmodified Lean IO source | Compile errors exposed mmap, signal, and libuv-header dependencies | The missing header is not proof libuv is impossible to port; the unit cannot simply be compiled unchanged with this setup. |
 
 Saved machine-readable snapshots:
-[compilation and async results](evidence/2026-09-17-feasibility.json) and
-[runtime compilation results](evidence/2026-09-17-runtime-compile.json).
+[compilation and async results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/2026-09-17-feasibility.json) and
+[runtime compilation results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/2026-09-17-runtime-compile.json).
 Generated code, diagnostics, and exact compiler arguments remain under ignored
 `.work/feasibility/` and `.work/runtime-compile/`.
 

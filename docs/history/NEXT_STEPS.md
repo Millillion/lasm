@@ -37,12 +37,12 @@ below retain their original, narrower scope.
   through that shipping pipeline.
 - [x] ~~Supply and validate native Windows ARM64 Lean and compiler SDK bundles.~~
   Dropped 2026-10-16: Windows ARM64 support was removed (user decision; no
-  upstream Lean/Emscripten prebuilts). Historical: the [native Lean bootstrap](../evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json)
+  upstream Lean/Emscripten prebuilts). Historical: the [native Lean bootstrap](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json)
   now passes compiler/Lake, interpreted-main and compiled ARM64-main checks;
   managed relocatable distribution and complete package acceptance remain open.
 - [ ] Run unchanged upstream tests through their appropriate native build-time
   and compiled-application paths, including the reviewed mixed drivers.
-  [The latest Node compiled-application category](../evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json)
+  [The latest Node compiled-application category](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-upstream-applications-node-2026-09-25.json)
   now has 97 deployed passes and four original compilation-disabled cases;
   [parallel AOT controls for those four cases](../evidence/lean-4.34.1-compile-disabled-2026-09-25.json)
   now pass in Node. Remaining categories and full Node campaigns stay open.
