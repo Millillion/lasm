@@ -24,6 +24,7 @@ jobs:
       - id: day
         env:
           EVENT: ${{ github.event_name }}
+        shell: bash
         run: |
           day=$(TZ=America/New_York date +%u)
           skip=false

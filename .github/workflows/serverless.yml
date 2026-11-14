@@ -192,6 +192,7 @@ jobs:
         run: node scripts/serverless/run-linux-variants.mjs "$RUNNER_TEMP/apps/apps.json" .work/alpine.json --images node:24.22.3-alpine,node:26.13.1-alpine
       - name: Install gVisor release-20261019.0 as a Docker runtime
         if: always() && matrix.arch == 'x64'
+        shell: bash
         run: |
           url=https://storage.googleapis.com/gvisor/releases/release/20261019.0/x86_64
           curl -fsSL -o "$RUNNER_TEMP/gvisor.tar.bz2" "$url/gvisor.tar.bz2"

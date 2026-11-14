@@ -99,6 +99,7 @@ jobs:
           name: dx-packed-candidate
           path: .work/node-candidate
       - name: Install elan (no toolchain), as the Lean 4 VS Code extension does
+        shell: bash
         run: |
           set -e
           curl -fsSL -o "$RUNNER_TEMP/elan.tar.gz" "https://github.com/leanprover/elan/releases/download/$ELAN_VERSION/elan-x86_64-unknown-linux-gnu.tar.gz"

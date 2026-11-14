@@ -75,6 +75,7 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
           REUSE: ${{ inputs.candidate-release }}
           REUSE_SHA256: ${{ inputs.candidate-sha256 }}
+        shell: bash
         run: |
           if [ -n "$BASE" ] && ! printf '%s' "$BASE" | grep -Eq '^0+$'; then git fetch --no-tags --depth=1 origin "$BASE"; fi
           if [ -n "$REUSE" ]; then
