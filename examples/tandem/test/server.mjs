@@ -35,7 +35,7 @@ export async function waitFor(url, child, timeoutMs = 60_000) {
 export function args(argv = process.argv.slice(2)) {
   const get = k => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : undefined; };
   return { url: get('--url'), command: get('--command'), platform: get('--platform'), name: get('--name'),
-           seed: get('--seed'), seconds: get('--seconds') };
+           seed: get('--seed'), seconds: get('--seconds'), equivalence: argv.includes('--equivalence') };
 }
 
 export async function startTandem({ command, url, platform, env = {} } = {}) {
