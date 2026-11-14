@@ -59,15 +59,21 @@ function build(source) {
   builds.set(source, built);
   return built;
 }
-/** Native Lean and the Lasm build of `source`, as [label, command prefix]. */
-function implementations(source, nativeFlags = []) {
+/** `[command, args]` run with core dumps off. For the native oracle where it is known to crash (SIGSEGV in
+ * Lean's error decoders, below): ubuntu-24.04's core handler (apport, `|` core_pattern) wrote each such core
+ * in full, which took 25–60 s per crash and sometimes passed the 60 s timeout (issue #196). The status and
+ * signal are unchanged (`exec`). */
+const withoutCore = ([command, args]) => posix ? ['/bin/sh', ['-c', 'ulimit -c 0 && exec "$0" "$@"', command, ...args]] : [command, args];
+/** Native Lean and the Lasm build of `source`, as [label, command prefix]; `crashes`: native Lean may crash here. */
+function implementations(source, nativeFlags = [], { crashes = false } = {}) {
   const built = build(source);
   if (built.error) throw new Error(built.error);
-  return { native: [lean, [...nativeFlags, '--run', built.source]], lasm: [process.execPath, [built.program]], built };
+  const native = [lean, [...nativeFlags, '--run', built.source]];
+  return { native: crashes ? withoutCore(native) : native, lasm: [process.execPath, [built.program]], built };
 }
 /** Runs both implementations in a fresh scenario at the same path; returns both results. */
-function both(name, source, { setup = () => {}, args = () => [], env = {}, cwd, nativeFlags, timeout } = {}) {
-  const { native, lasm: wasm } = implementations(source, nativeFlags);
+function both(name, source, { setup = () => {}, args = () => [], env = {}, cwd, nativeFlags, timeout, crashes } = {}) {
+  const { native, lasm: wasm } = implementations(source, nativeFlags, { crashes });
   const scenario = join(work, 'scenarios', name);
   const results = {};
   for (const [label, [command, prefix]] of Object.entries({ native, lasm: wasm })) {
@@ -172,7 +178,7 @@ add('cwd-tracking-deleted-process', () => {
   // Lean 4.32 dereferenced a null file name in this error branch (a crash);
   // Lasm reports ENOENT. When native Lean succeeds, it is the oracle.
   const results = both('cwd-tracking-deleted-process', fixture('cwd-tracking/DeletedProcess.lean'),
-    { args: directory => [join(directory, 'deleted-process')] });
+    { args: directory => [join(directory, 'deleted-process')], crashes: true });
   succeeded(results.lasm);
   if (results.native.code === 0) { same(results); return undefined; }
   assert.equal(results.lasm.stdout, 'before deleted process cwd\nerror: IO.Error.noFileOrDirectory "" 2 "no such file or directory"\n');
@@ -320,7 +326,7 @@ for (const [name, source, count] of [['system-directories', 'system-directories/
   }, { when: linux });
 
 add('temporary-files', () => {
-  const { native, lasm: wasm } = implementations(fixture('temporary-files/Main.lean'));
+  const { native, lasm: wasm } = implementations(fixture('temporary-files/Main.lean'), [], { crashes: true });
   const scenario = join(work, 'scenarios', 'temporary-files');
   const run = ([command, args], entry) => {
     reset(scenario); mkdirSync(scenario, { recursive: true }); setupTemporaryPaths(scenario);
@@ -333,6 +339,7 @@ add('temporary-files', () => {
     const result = run(native, entry);
     // Lean 4.32's ENOENT decoder dereferenced a null file name here (SIGSEGV).
     if (entry.name === 'missing-directory' && result.signal === 'SIGSEGV') { crashed.push(entry.name); continue; }
+    assert.equal(result.signal, null, `${entry.name}: native Lean killed by ${result.signal}${result.error ? ` (${result.error})` : ''}`);
     succeeded({ code: result.status, stdout: result.stdout, stderr: result.stderr }, 'temporary-files comparison completed\n');
     oracle.set(entry.name, result.stdout);
   }
@@ -431,7 +438,9 @@ assert.ok(!only || only.every(name => cases.some(entry => entry.name === name)),
 mkdirSync(work, { recursive: true });
 const report = { lean: execute(lean, ['--version']).stdout.trim(), lasm: execute(process.execPath, [lasm, '--version']).stdout.trim(), node: process.version,
   host: `${process.platform}-${process.arch}`, cases: [] };
-console.log(`${report.lean}; ${report.lasm}; Node ${report.node}`);
+// The core handler decides how long an expected native crash takes (withoutCore, issue #196).
+if (linux) report.core = { pattern: readFileSync('/proc/sys/kernel/core_pattern', 'utf8').trim(), limit: execute('/bin/sh', ['-c', 'ulimit -c']).stdout.trim() };
+console.log(`${report.lean}; ${report.lasm}; Node ${report.node}${report.core ? `; core dumps ${report.core.limit} via ${report.core.pattern}` : ''}`);
 let failed = 0;
 for (const entry of cases.filter(entry => !only || only.includes(entry.name))) {
   const started = performance.now();
