@@ -624,4 +624,18 @@ opaque fastlyNameIn : String → Except String String
 /-- `s` occurs in `e`. -/
 def Mentions (e s : String) : Prop := ∃ a b, e = a ++ s ++ b
 
+/-! ## The edge entries' request mapping (src/edge/edge-build.mjs) -/
+
+/-- Not Lasm's JavaScript: the WHATWG URL parser (`new URL`): an absolute
+URL's origin, path, and query and fragment together, or `none` when it is
+not one. -/
+opaque urlParts : String → Option (String × String × String)
+
+/-- `route` of the Supabase entry (`supabaseEntry(modules, name)`) on a
+request whose target is its absolute URL. -/
+opaque supabaseRoute : String → HttpRequest → HttpRequest
+
+/-- `identity` of the Vercel Edge entry (`vercelEdgeEntry(modules)`). -/
+opaque vercelIdentity : HttpRequest → HttpRequest
+
 end Lasm.Cli

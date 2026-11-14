@@ -154,6 +154,28 @@ def package_readers_clear : Prop :=
     (∀ e, edgeModulesOf text = .error e ∨ supabaseFunctionNameIn text = .error e ∨ fastlyNameIn text = .error e →
       Mentions e "package.json")
 
+/-! ## Edge entries -/
+
+/-- **Supabase's handler sees the path without the function's name.** For a
+request whose path is the function's name, or the name and a `/` and more,
+the handler gets the rest (`/` for the name alone), with the same origin,
+query, fragment, method, headers and body; any other request reaches it
+unchanged.
+Tested by: test/fuzz/targets/edge-request.mjs -/
+def supabase_route_strips_name : Prop :=
+  ∀ (name origin path rest : String) (r : HttpRequest), urlParts r.target = some (origin, path, rest) →
+    (supabaseRoute name r).method = r.method ∧ (supabaseRoute name r).headers = r.headers ∧
+    (supabaseRoute name r).body = r.body ∧
+    (path = "/" ++ name → urlParts (supabaseRoute name r).target = some (origin, "/", rest)) ∧
+    (∀ p, path = "/" ++ name ++ "/" ++ p → urlParts (supabaseRoute name r).target = some (origin, "/" ++ p, rest)) ∧
+    (path ≠ "/" ++ name → (∀ p, path ≠ "/" ++ name ++ "/" ++ p) → (supabaseRoute name r).target = r.target)
+
+/-- **Vercel's handler never sees Accept-Encoding, and nothing else
+changes.**
+Tested by: test/fuzz/targets/edge-request.mjs -/
+def vercel_identity_drops_encoding : Prop :=
+  ∀ r : HttpRequest, vercelIdentity r = { r with headers := r.headers.filter (·.1 ≠ "accept-encoding") }
+
 /-! ## Downloads -/
 
 /-- **Retry delays stay within 75–100 % of the backoff.** For every attempt

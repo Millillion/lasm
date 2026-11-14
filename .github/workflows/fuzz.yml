@@ -1,6 +1,6 @@
 name: Fuzz
 # Coverage-guided fuzzing at Lasm's input boundaries (docs/TESTING.md#fuzzing-at-the-boundaries,
-# test/fuzz/): the CLI's argument parser, `lasm dev`'s proxy, the project files Lasm reads (against
+# test/fuzz/): the CLI's argument parser, `lasm dev`'s proxy, the edge entries' request mapping, the project files Lasm reads (against
 # Lean's own header parser), the Lasm.UI patch decoder, the
 # function platforms' HTTP mapping and the Lasm.JS value codec (JavaScript,
 # under V8 block coverage; the last two checked against Lean: the model
@@ -11,7 +11,7 @@ name: Fuzz
 #   - pull requests and pushes to main: the committed corpus and regressions,
 #     once each (seconds); the native targets when their sources change;
 #   - nightly: 10 minutes per target; weekly (Saturday): 60 minutes per target (10 for
-#     dev-proxy, project-files and fastly-host).
+#     dev-proxy, project-files, edge-request and fastly-host).
 # A campaign fails on any failing input (a crash, a hang, a broken property)
 # and uploads its new corpus entries and failing inputs as an artifact.
 on:
@@ -81,7 +81,7 @@ jobs:
           LASM_SERVERLESS_MODEL: required
           LASM_JS_WIRE_MODEL: required
           LASM_UI_DECODE_MODEL: required
-        run: node test/fuzz/run.mjs replay cli-arguments serverless-http ui-patch ui-decode lasm-js-wire dev-proxy project-files
+        run: node test/fuzz/run.mjs replay cli-arguments serverless-http ui-patch ui-decode lasm-js-wire dev-proxy project-files edge-request
       - name: Do the native targets' sources change?
         id: native
         env:
@@ -110,7 +110,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        target: [cli-arguments, serverless-http, ui-patch, ui-decode, lasm-js-wire, dev-proxy, project-files, lean-fetch-request, lean-rpc, wasi-cgi, fastly-host]
+        target: [cli-arguments, serverless-http, ui-patch, ui-decode, lasm-js-wire, dev-proxy, project-files, edge-request, lean-fetch-request, lean-rpc, wasi-cgi, fastly-host]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -152,7 +152,7 @@ jobs:
         # which keeps the weekly tier within its budget (docs/CI.md).
         run: |
           seconds="$SECONDS_PER_TARGET"
-          case "${{ matrix.target }}" in dev-proxy|project-files|fastly-host) [ "$seconds" -gt 600 ] && seconds=600 ;; esac
+          case "${{ matrix.target }}" in dev-proxy|project-files|edge-request|fastly-host) [ "$seconds" -gt 600 ] && seconds=600 ;; esac
           node test/fuzz/run.mjs fuzz --seconds "$seconds" --seed "$((GITHUB_RUN_ID % 2147483647))" ${{ matrix.target }}
       - name: New corpus entries and failing inputs
         if: always()
