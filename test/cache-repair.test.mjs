@@ -6,7 +6,7 @@ import { mkdtemp, mkdir, writeFile, readFile, rm, readdir, symlink } from 'node:
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
-import { c as tar } from 'tar';
+import { directoryEntries, writeTar } from '../src/tar.mjs';
 import { provisionArtifact, deriveArtifact } from '../src/managed-artifacts.mjs';
 import { repairManagedCache } from '../src/cache-repair.mjs';
 
@@ -15,7 +15,7 @@ async function setup(t) {
   t.after(() => rm(base, { recursive: true, force: true }));
   await mkdir(join(base, 'source/tool'), { recursive: true });
   await writeFile(join(base, 'source/tool/file'), 'tool');
-  await tar({ cwd: join(base, 'source'), file: join(base, 'a.tgz'), gzip: true, portable: true }, ['tool']);
+  await writeTar(join(base, 'a.tgz'), directoryEntries(join(base, 'source'), ['tool']), { gzip: true });
   const bytes = await readFile(join(base, 'a.tgz'));
   const artifact = { name: 'tool', root: 'tool', url: 'https://example.invalid/tool', format: 'tar.gz', bytes: bytes.length,
     sha256: createHash('sha256').update(bytes).digest('hex'), maximumExtractedBytes: 10_000 };

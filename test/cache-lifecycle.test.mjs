@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { fork } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { c as tar } from 'tar';
+import { directoryEntries, writeTar } from '../src/tar.mjs';
 import { provisionArtifact } from '../src/managed-artifacts.mjs';
 import { removeOwnedStaging, removeDirectoryWithRetries, checkDownloadSpace, storageDiagnostic, withCacheLease } from '../src/cache-lifecycle.mjs';
 import { repairManagedCache } from '../src/cache-repair.mjs';
@@ -17,7 +17,7 @@ async function setup(t) {
   const cache = join(base, 'cache'), archive = join(base, 'archive.tgz');
   await mkdir(join(base, 'source/tool'), { recursive: true });
   for (const name of ['a', 'z', 'ä']) await writeFile(join(base, 'source/tool', name), name);
-  await tar({ cwd: join(base, 'source'), file: archive, gzip: true, portable: true }, ['tool']);
+  await writeTar(archive, directoryEntries(join(base, 'source'), ['tool']), { gzip: true });
   const bytes = await readFile(archive);
   const artifact = { name: 'tiny-tool', root: 'tool', url: 'https://example.invalid/tool', format: 'tar.gz',
     bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'), maximumExtractedBytes: 10000 };
