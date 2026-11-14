@@ -1,6 +1,7 @@
 // Translation validation of wasm-ld, second part: relocations
-// (docs/TESTING.md#wasm-ld-against-its-map). Every function wasm-ld copied from
-// an input object is checked against that object's own body:
+// (docs/TESTING.md#wasm-ld-against-its-map). Every function and every data
+// chunk in the file that wasm-ld copied from an input object is checked against
+// that object's own body or segment:
 //   - every byte outside the object's relocation sites is unchanged;
 //   - every relocation site holds a value the map and the module attribute to
 //     the symbol the relocation names: a function index whose function carries
@@ -118,7 +119,10 @@ export function readObject(bytes) {
   r.uleb(); // version
   while (r.offset < linking.end) {
     const type = r.byte(), size = r.uleb(), end = r.offset + size;
-    if (type === 8) {
+    if (type === 5) {
+      object.segmentNames = [];
+      for (let n = r.uleb(); n > 0; n--) { object.segmentNames.push(r.name()); r.uleb(); r.uleb(); }
+    } else if (type === 8) {
       for (let n = r.uleb(); n > 0; n--) {
         const kind = r.byte(), flags = r.uleb(), symbol = { kind, flags, undefined: !!(flags & 0x10), local: !!(flags & 2), weak: !!(flags & 1), tls: !!(flags & 0x100) };
         if (kind === 0 || kind === 2 || kind === 4 || kind === 5) {
@@ -137,17 +141,21 @@ export function readObject(bytes) {
     }
     r.offset = end;
   }
-  const codeIndex = module.sections.findIndex(s => s.id === 10);
+  // Relocations of the code and data sections, at file offsets, sorted.
+  const codeIndex = module.sections.findIndex(s => s.id === 10), dataIndex = module.sections.findIndex(s => s.id === 11);
+  object.dataRelocations = [];
   for (const section of module.sections.filter(s => s.custom?.startsWith('reloc.'))) {
     const rr = new Reader(bytes, section.payload, section.end);
     const target = rr.uleb();
-    if (target !== codeIndex) continue;
+    if (target !== codeIndex && target !== dataIndex) continue;
+    const list = target === codeIndex ? object.relocations : object.dataRelocations, base = module.sections[target].contentStart;
     for (let n = rr.uleb(); n > 0; n--) {
       const type = rr.uleb(), offset = rr.uleb(), index = rr.uleb();
-      object.relocations.push({ type, offset, index, addend: hasAddend.has(type) ? rr.slebBig() : 0n });
+      list.push({ type, offset, at: base + offset, index, addend: hasAddend.has(type) ? rr.slebBig() : 0n });
     }
   }
-  object.relocations.sort((a, b) => a.offset - b.offset);
+  object.relocations.sort((a, b) => a.at - b.at);
+  object.dataRelocations.sort((a, b) => a.at - b.at);
   return object;
 }
 
@@ -208,7 +216,7 @@ const inName = chunk => { const m = /^(.*):\((.*)\)$/.exec(chunk.name); return m
 export function checkRelocations(bytes, mapText, { objectBytes, wraps = [], maxProblems = 200 } = {}) {
   const problems = [];
   const problem = text => { if (problems.length < maxProblems) problems.push(text); else if (problems.length === maxProblems) problems.push('… more problems not listed'); };
-  const stats = { functions: 0, functionsMissingInput: 0, relocations: 0, attributed: 0, unattributed: 0, byKind: {} };
+  const stats = { functions: 0, functionsMissingInput: 0, chunks: 0, chunksMissingInput: 0, relocations: 0, attributed: 0, unattributed: 0, byKind: {} };
   const module = readModule(bytes), map = parseMap(mapText), out = outputTables(bytes, module);
   if (out.elemUnread) problem(`element section: ${out.elemUnread}`);
   const code = map.sections.find(s => s.kind === 'CODE'), data = map.sections.find(s => s.kind === 'DATA');
@@ -251,37 +259,32 @@ export function checkRelocations(bytes, mapText, { objectBytes, wraps = [], maxP
     else { stats.unattributed++; stats.byKind[kind].unattributed++; }
   };
 
-  (code?.functions ?? []).forEach((f, i) => {
-    const from = inName(f);
-    if (!from || from.file === '<internal>' || from.file.startsWith('<')) return;
-    const object = objectOf(from.file);
-    if (!object) { stats.functionsMissingInput++; return; }
-    if (object.error) { problem(`${from.file}: ${object.error}`); return; }
-    // The object's function of that name (defined function symbols).
-    const candidates = object.symbols.filter(s => s.kind === 0 && !s.undefined && s.name === from.name);
-    const indices = [...new Set(candidates.map(s => s.index))];
-    if (indices.length !== 1) { stats.functionsMissingInput++; return; }
-    const local = indices[0] - object.imports.func.length, body = object.module.code?.bodies[local];
-    const outBody = module.code.bodies[i];
-    if (!body || !outBody) { problem(`function ${f.name}: no body ${local} in its object`); return; }
-    stats.functions++;
-    const base = object.module.code.section.contentStart, inStart = body.start, inEnd = body.end;
-    const relocs = object.relocations.filter(r => base + r.offset >= inStart && base + r.offset < inEnd);
-    if (inEnd - inStart !== outBody.end - outBody.start) { problem(`function ${f.name}: ${outBody.end - outBody.start} bytes, its input ${inEnd - inStart}`); return; }
-    const delta = outBody.start - inStart;
+  // The relocations of one span of an input object (a function body or a data
+  // chunk) copied to `delta` bytes further in the output.
+  const between = (list, start, end) => {
+    let lo = 0, hi = list.length;
+    while (lo < hi) { const mid = (lo + hi) >> 1; if (list[mid].at < start) lo = mid + 1; else hi = mid; }
+    const result = [];
+    for (let k = lo; k < list.length && list[k].at < end; k++) result.push(list[k]);
+    return result;
+  };
+  const checkSpan = (label, object, file, relocs, inStart, inEnd, delta) => {
     let cursor = inStart;
-    const where = r => `function ${f.name} at +${base + r.offset - inStart} (${relocTypes[r.type]?.[0] ?? r.type})`;
+    const where = r => `${label} at +${r.at - inStart} (${relocTypes[r.type]?.[0] ?? r.type})`;
+    const unchanged = (from, to) => {
+      for (let p = from; p < to; p++) if (bytes[p + delta] !== object.bytes[p]) { problem(`${label}: byte +${p - inStart} changed outside any relocation`); return; }
+    };
     for (const r of relocs) {
-      const at = base + r.offset, [typeName, field, kind] = relocTypes[r.type] ?? [String(r.type), null, 'unknown'];
+      const [typeName, field, kind] = relocTypes[r.type] ?? [String(r.type), null, 'unknown'];
       if (!field) { problem(`${where(r)}: unknown relocation type`); continue; }
-      for (let p = cursor; p < at; p++) if (bytes[p + delta] !== objectBytesAt(object, p)) { problem(`function ${f.name}: byte +${p - inStart} changed outside any relocation`); break; }
-      cursor = at + width[field];
+      unchanged(cursor, r.at);
+      cursor = r.at + width[field];
       stats.relocations++;
-      const value = readField(bytes, at + delta, field);
+      const value = readField(bytes, r.at + delta, field);
       const symbol = kind === 'type' ? null : object.symbols[r.index];
       if (kind !== 'type' && !symbol) { problem(`${where(r)}: symbol ${r.index} does not exist`); continue; }
       const name = symbol && resolvedName(symbol);
-      const sameFile = entries => (symbol.local ? entries.filter(e => e.file === from.file) : entries);
+      const sameFile = entries => (symbol.local ? entries.filter(e => e.file === file) : entries);
       if (kind === 'function' || kind === 'table') {
         let index = value;
         if (kind === 'table') {
@@ -293,7 +296,7 @@ export function checkRelocations(bytes, mapText, { objectBytes, wraps = [], maxP
         const defined = functionAt.get(n);
         if (defined) {
           const named = sameFile(functionsNamed.get(name) ?? []);
-          if ((defined.chunk.symbols.some(s => s.name === name) || inName(defined.chunk)?.name === name) && (!symbol.local || defined.file === from.file)) decide(typeName, true);
+          if ((defined.chunk.symbols.some(x => x.name === name) || inName(defined.chunk)?.name === name) && (!symbol.local || defined.file === file)) decide(typeName, true);
           else if (named.length) decide(typeName, false, `${where(r)}: function ${n} (${defined.chunk.name}), the map defines ${name} as function ${named.map(e => e.index).join(', ')}`);
           else decide(typeName, null);
         } else if (n < module.imports.func) decide(typeName, out.funcImports[n] === name ? true : (functionsNamed.has(name) ? false : null),
@@ -301,10 +304,11 @@ export function checkRelocations(bytes, mapText, { objectBytes, wraps = [], maxP
         else decide(typeName, false, `${where(r)}: function ${n} does not exist`);
       } else if (kind === 'memory' || kind === 'tls') {
         const entries = sameFile(dataNamed.get(name) ?? []).filter(e => e.tls === (kind === 'tls'));
-        const want = BigInt.asUintN(64, value) , matches = entries.some(e => BigInt.asUintN(64, e.address + r.addend) === want);
-        if (matches) decide(typeName, true);
-        else if (symbol.undefined && symbol.weak && !entries.length && BigInt.asUintN(64, r.addend) === want) decide(typeName, true);
-        else if (entries.length) decide(typeName, false, `${where(r)}: address ${value}, the map puts ${name}${r.addend ? ` + ${r.addend}` : ''} at ${entries.map(e => e.address + r.addend).join(', ')}`);
+        const bits = field === 'i32' || field.endsWith('5') ? 32 : 64;
+        const want = BigInt.asUintN(bits, value), at = e => BigInt.asUintN(bits, e.address + r.addend);
+        if (entries.some(e => at(e) === want)) decide(typeName, true);
+        else if (symbol.undefined && symbol.weak && !entries.length && BigInt.asUintN(bits, r.addend) === want) decide(typeName, true);
+        else if (entries.length) decide(typeName, false, `${where(r)}: address ${value}, the map puts ${name}${r.addend ? ` + ${r.addend}` : ''} at ${entries.map(at).join(', ')}`);
         else decide(typeName, null);
       } else if (kind === 'global') {
         const n = Number(value);
@@ -318,11 +322,50 @@ export function checkRelocations(bytes, mapText, { objectBytes, wraps = [], maxP
       else if (kind === 'tag') decide(typeName, Number(value) < tags, `${where(r)}: tag ${value}, the module has ${tags}`);
       else decide(typeName, null);
     }
-    for (let p = cursor; p < inEnd; p++) if (bytes[p + delta] !== objectBytesAt(object, p)) { problem(`function ${f.name}: byte +${p - inStart} changed outside any relocation`); break; }
+    unchanged(cursor, inEnd);
+  };
+  const inputOf = from => {
+    if (!from || from.file.startsWith('<')) return undefined;
+    const object = objectOf(from.file);
+    if (object?.error) { problem(`${from.file}: ${object.error}`); return undefined; }
+    return object;
+  };
+
+  // Functions: the object's function of the chunk's name.
+  (code?.functions ?? []).forEach((f, i) => {
+    const from = inName(f);
+    if (!from || from.file.startsWith('<')) return;
+    const object = inputOf(from);
+    if (!object) { stats.functionsMissingInput++; return; }
+    const indices = [...new Set(object.symbols.filter(x => x.kind === 0 && !x.undefined && x.name === from.name).map(x => x.index))];
+    if (indices.length !== 1) { stats.functionsMissingInput++; return; }
+    const local = indices[0] - object.imports.func.length, body = object.module.code?.bodies[local], outBody = module.code.bodies[i];
+    if (!body || !outBody) { problem(`function ${f.name}: no body ${local} in its object`); return; }
+    stats.functions++;
+    if (body.end - body.start !== outBody.end - outBody.start) { problem(`function ${f.name}: ${outBody.end - outBody.start} bytes, its input ${body.end - body.start}`); return; }
+    checkSpan(`function ${f.name}`, object, from.file, between(object.relocations, body.start, body.end), body.start, body.end, outBody.start - body.start);
   });
+
+  // Data chunks in the file: the object's segment of the chunk's name.
+  const dataHeader = module.data?.section.headerLength ?? 0;
+  for (const segment of data?.segments ?? []) {
+    if (segment.offset === data.offset) continue; // zero-filled, not in the file
+    for (const c of segment.chunks) {
+      const from = inName(c);
+      if (!from || from.file.startsWith('<')) continue;
+      const object = inputOf(from);
+      const k = object?.segmentNames?.indexOf(from.name) ?? -1;
+      if (!object || k < 0 || object.segmentNames.lastIndexOf(from.name) !== k) { stats.chunksMissingInput++; continue; }
+      const input = object.module.data?.segments[k];
+      if (!input) { problem(`chunk ${c.name}: no segment ${k} in its object`); continue; }
+      if (input.size !== c.size) { problem(`chunk ${c.name}: ${c.size} bytes, its input ${input.size}`); continue; }
+      stats.chunks++;
+      checkSpan(`chunk ${c.name}`, object, from.file, between(object.dataRelocations, input.contentStart, input.contentStart + input.size),
+        input.contentStart, input.contentStart + input.size, c.offset + dataHeader - input.contentStart);
+    }
+  }
   return { problems, stats };
 }
-const objectBytesAt = (object, p) => object.bytes[p];
 
 /** objectBytes for checkRelocations: a map input `archive(member)` read from
  * the archive, an object from `copies` (original path -> copied file) or its path. */

@@ -1308,9 +1308,9 @@ shares no code with the link driver it checks):
   symbol is on;
 - the module validates (V8's `WebAssembly.validate`);
 - relocations (`--relocations`, `scripts/link-validation/wasm-ld-relocations.mjs`):
-  every function the map attributes to an input object (an object the
-  evidence kept, or an archive member at the path the map names) is that
-  object's body, byte for byte outside its relocation sites, and every site
+  every function and data chunk the map attributes to an input object (an
+  object the evidence kept, or an archive member at the path the map names)
+  is that object's body or segment, byte for byte outside its relocation sites, and every site
   holds a value the map attributes to the symbol the relocation names: a
   function carrying that symbol (or an import of that name), a table slot
   holding such a function, the symbol's address plus the addend, the global
@@ -1350,10 +1350,11 @@ node scripts/link-validation/check-wasm-ld.mjs --evidence .work/evidence --self-
 (for example a link that stops reading its inputs as the recipe assumes), a
 passive segment copied to the wrong address, an export bound to another
 definition, an unexpected section, a call or address bound to the wrong
-symbol, a function body changed outside its relocations. *Cannot catch yet:*
-relocations in data segments (`reloc.DATA`: function pointers and addresses in
-initialized data), and functions whose input is ambiguous (two archive members
-of one name) or that wasm-ld synthesizes.
+symbol (in code, or a pointer in initialized data), a function body or data
+chunk changed outside its relocations. *Cannot catch yet:* functions and
+chunks whose input is ambiguous (two archive members of one name), and what
+wasm-ld synthesizes (`__wasm_call_ctors`, `__wasm_init_memory` beyond its
+segment operations, stubs).
 
 #### Binaryen's lowering passes by differential execution
 

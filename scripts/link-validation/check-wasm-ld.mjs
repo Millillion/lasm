@@ -72,7 +72,7 @@ for (const directory of links) {
   if (problems.length || result.missed.length) failed = true;
   results.push(result);
   console.log(`${problems.length || result.missed.length ? 'FAIL' : 'ok  '} ${meta.kind ?? '?'} ${directory}: ${stats.functions} functions, ${stats.segments} segments (+${stats.bssSegments} zero-filled), ${stats.chunks} data chunks, ${stats.dataSymbols} data symbols, ${stats.globals} globals, ${stats.exportsResolved} exports resolved (${stats.exportsUnnamed} by no map symbol), ${result.ms} ms`);
-  if (relocationStats) console.log(`     relocations: ${relocationStats.functions} functions against their inputs (${relocationStats.functionsMissingInput} without one), ${relocationStats.relocations} relocations, ${relocationStats.attributed} attributed, ${relocationStats.unattributed} unattributed`);
+  if (relocationStats) console.log(`     relocations: ${relocationStats.functions} functions and ${relocationStats.chunks} data chunks against their inputs (${relocationStats.functionsMissingInput} and ${relocationStats.chunksMissingInput} without one), ${relocationStats.relocations} relocations, ${relocationStats.attributed} attributed, ${relocationStats.unattributed} unattributed`);
   for (const p of problems) console.log(`     ${p}`);
   for (const k of result.missed) console.log(`     self-test: the checker missed a corrupted map (${k})`);
 }

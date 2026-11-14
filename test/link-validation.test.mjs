@@ -120,7 +120,8 @@ test('relocations: every function of the archive link against its input object, 
   assert.equal(stats.functions, 5);
   assert.equal(stats.functionsMissingInput, 0);
   assert.ok(stats.relocations >= 14 && stats.attributed === stats.relocations, JSON.stringify(stats));
-  for (const kind of ['FUNCTION_INDEX_LEB', 'TYPE_INDEX_LEB', 'GLOBAL_INDEX_LEB', 'MEMORY_ADDR_LEB64', 'MEMORY_ADDR_SLEB64', 'MEMORY_ADDR_TLS_SLEB64', 'TABLE_NUMBER_LEB'])
+  assert.equal(stats.chunks, 4);
+  for (const kind of ['FUNCTION_INDEX_LEB', 'TYPE_INDEX_LEB', 'GLOBAL_INDEX_LEB', 'MEMORY_ADDR_LEB64', 'MEMORY_ADDR_SLEB64', 'MEMORY_ADDR_TLS_SLEB64', 'TABLE_NUMBER_LEB', 'TABLE_INDEX_I64'])
     assert.ok(stats.byKind[kind]?.attributed > 0, kind);
 });
 
@@ -143,6 +144,11 @@ test('relocations: a site holding another symbol, or a byte changed outside the 
   const changed = Buffer.from(bytes);
   changed[outBody.start + 5] ^= 1;
   assert.ok(relocationsOf(changed).problems.some(p => /function a\.o:\(run\): byte \+5 changed outside any relocation/.test(p)), JSON.stringify(relocationsOf(changed).problems));
+  // The function pointer fp (initialized data) now names an empty table slot.
+  const fp = parseMap(map).sections.find(s => s.kind === 'DATA').segments.flatMap(g => g.chunks).find(c => c.name === 'a.o:(.data.fp)');
+  const wrongPointer = Buffer.from(bytes);
+  wrongPointer[fp.offset + module.data.section.headerLength] += 5;
+  assert.ok(relocationsOf(wrongPointer).problems.some(p => /chunk a\.o:\(\.data\.fp\) at \+0 \(TABLE_INDEX_I64\): table slot \d+ holds no function/.test(p)), JSON.stringify(relocationsOf(wrongPointer).problems));
   // An input that is not there is counted, not guessed.
   const missing = checkRelocations(bytes, map, { objectBytes: () => null, wraps: ['helper'] });
   assert.deepEqual(missing.problems, []);
