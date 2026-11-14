@@ -9,7 +9,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpath
 import { tmpdir } from 'node:os';
 import { delimiter, dirname, join } from 'node:path';
 import { applicationSources, assertDefinesMain, cCompilerEnvironment, exactCaseImportSource, findApplicationProject, lakeConfigurationKey,
-  lakeNativePackages, leanHeader, macosSdk, macosSdkMissing, macosSdkPath, nativeLeanEnvironment, standaloneImportsModules,
+  lakeNativePackages, leanHeader, leanHeaderImports, macosSdk, macosSdkMissing, macosSdkPath, nativeLeanEnvironment, standaloneImportsModules,
   workspaceImportsKey } from '../src/application-sources.mjs';
 import { leanStandIn } from './fixtures/lean-stand-in.mjs';
 
@@ -585,4 +585,40 @@ test('main: a source that does not exist is compared by its path', t => {
   const directory = scratch(t);
   const c = put(join(directory, 'Other.c'), 'no main here');
   assertDefinesMain([{ module: 'Other', source: join(directory, 'Other.lean') }], [c], join(directory, 'Main.lean'));
+});
+
+// Found by the project-files fuzz target (test/fuzz/targets/project-files.mjs), against Lean's own header parser.
+test('leanHeader keeps an import whose name is on the next line', () => {
+  assert.equal(leanHeader('import\n  A.B\n\ndef x := 1\n'), 'import\n  A.B');
+  assert.equal(leanHeader('import -- the module:\nA\ndef x := 1'), 'import -- the module:\nA');
+  assert.equal(leanHeader('public\nimport\nA\nopen A'), 'public\nimport\nA');
+});
+
+test('leanHeaderImports reads names as Lean does: «escaped» components, nested comments, names on the next line', () => {
+  const names = text => leanHeaderImports(text).imports.map(m => m.join('/'));
+  assert.deepEqual(names('import «My Mod»\nimport A.«b c».D\ndef x := 1\nimport Z'), ['My Mod', 'A/b c/D']);
+  assert.deepEqual(names('/- a /- nested -/ still\ndef inside := 1\n-/\nimport A\nopen A'), ['A']);
+  assert.deepEqual(names('import\n  A.B -- note\nimport /- c -/ C\r\nimport α.x₁ x\' y! z?\n#eval 1'), ['A/B', 'C', 'α/x₁', "x'", 'y!', 'z?']);
+  assert.deepEqual(names('module\nprelude\npublic meta import all A\nprivate import B\nimportx C'), ['A', 'B']);
+  assert.deepEqual(names('import Missing D 1bad\nimport E\ntheorem t : True := trivial\nimport F'), ['Missing', 'D', 'E']);
+  assert.deepEqual(names('import A.\nimport B'), ['A', 'B']);
+  assert.deepEqual(names('import 1bad\nimport B'), []);
+  assert.deepEqual(names('/- open'), []);
+  assert.equal(leanHeaderImports('import A\ndef x').end, 'import A'.length);
+  assert.equal(leanHeaderImports('def x').end, 0);
+});
+
+// Proposition: Lasm.Cli.Candidates.lake_key_total
+//    ∀ manifest lakefile : String, ∃ key, lakeConfigurationKeyOf manifest lakefile = .ok key
+test('lakeConfigurationKey: a manifest Lake cannot read is no reuse, never a crash', () => {
+  const project = mkdtempSync(join(tmpdir(), 'lasm-lake-key-'));
+  try {
+    for (const manifest of ['null', '[]', '5', '{"packages": 5}', '{"packages": [null]}', '{"packages": [{"type": "path", "dir": 5}]}',
+      '{"packages": [{"type": "git", "name": 5}]}', '{"packagesDir": 5, "packages": [{"name": "a"}]}']) {
+      writeFileSync(join(project, 'lake-manifest.json'), manifest);
+      assert.equal(lakeConfigurationKey(project, undefined, {}), undefined, manifest);
+    }
+    writeFileSync(join(project, 'lake-manifest.json'), '{"packages": [{"type": "path", "dir": "lib", "name": "lib"}]}');
+    assert.match(lakeConfigurationKey(project, undefined, {}), /^[0-9a-f]{64}$/);
+  } finally { rmSync(project, { recursive: true, force: true }); }
 });

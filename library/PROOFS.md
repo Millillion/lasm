@@ -231,14 +231,17 @@ the CLI's JavaScript (`Lasm.Cli`) are listed in
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**12 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+**15 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
-### Lasm.Fetch (2)
+### Lasm.Fetch (5)
 
 | Candidate | In plain English | Tested by |
 | --- | --- | --- |
 | [`segments_nonempty`](Lasm/Fetch/Candidates.lean#L19) | **No path segment is empty.** Whatever the request's URL (`//`, a trailing `/`, escapes that decode to nothing printable), no segment of `r.segments` is the empty string. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
 | [`percent_round_trip`](Lasm/Fetch/Candidates.lean#L26) | **A server decodes what a Lasm.UI page encodes.** For every string, `Lasm.Fetch.percentDecode` reads `Lasm.UI.Url.percentEncode`'s output back as that string: a path segment or query value a page builds reaches the server's handler unchanged. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
+| [`fastly_request_read`](Lasm/Fetch/Candidates.lean#L116) | **The Fastly host reads the request as Fastly holds it.** Whatever an honest host chooses within the ABI (one name per call or many, short reads, BUFLEN), the program gets the method, the URI, the headers grouped as the host lists them, and the body, byte for byte. | [test/fuzz/native/fastly_driver.c](../test/fuzz/native/fastly_driver.c) |
+| [`fastly_response_written`](Lasm/Fetch/Candidates.lean#L124) | **The Fastly host sends the response as the program wrote it.** Whatever part of each write an honest host takes, it receives the status, every header in order and the body, byte for byte, sent once. | [test/fuzz/native/fastly_driver.c](../test/fuzz/native/fastly_driver.c) |
+| [`fastly_backend_authority`](Lasm/Fetch/Candidates.lean#L133) | **A fetch's dynamic backend is the URL's authority.** For every URL RFC 3986 allows, the backend targets its host and port (the scheme's default when there is none, or it is empty) and overrides the Host with the host name, whatever the userinfo, path, query or fragment hold. | [test/fuzz/native/fastly_driver.c](../test/fuzz/native/fastly_driver.c) |
 
 ### Lasm.RPC (4)
 

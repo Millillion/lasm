@@ -28,7 +28,7 @@ side-module loading, remaining descriptors, reusable cleanup and managed CLI
 integration remain unfinished. These are implementation or validation gaps,
 not demonstrated fundamental limitations.
 
-The [archived compatibility plan](docs/PLAN_OLD_2026-09-25.md) targeted full
+The [archived compatibility plan](docs/history/PLAN_OLD_2026-09-25.md) targeted full
 ordinary Lean applications in Node on all six native build
 platforms. Its [application pipeline status](docs/APPLICATION_PIPELINE.md) and
 [unchanged upstream inventory](docs/UPSTREAM_APPLICATION_TESTS.md) remain research
@@ -42,7 +42,7 @@ runtime. Both remain preserved for future compatibility work. Items labeled
 callable below apply to that earlier path, not to all executable applications.
 See [the IO guide](docs/IO.md) for the interface-to-backend mapping.
 
-The [standalone native-helper preview](docs/WASMTIME_PREVIEW.md) adds copied
+The [standalone native-helper preview](docs/history/WASMTIME_PREVIEW.md) adds copied
 Linux x64 deployment evidence in Node. Managed CLI integration,
 general helper/API parity and the other native platforms remain unfinished.
 

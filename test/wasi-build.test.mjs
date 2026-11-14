@@ -285,3 +285,16 @@ test('WASI targets: labels, summaries and output directories', () => {
   for (const t of Object.values(wasiTargets)) assert.ok(t.summary.includes(t.output + '/'), t.summary);
   assert.equal(basename(dirname(join('a', 'b'))), 'a');
 });
+
+// Found by the project-files fuzz target (test/fuzz/targets/project-files.mjs).
+test('fastlyName refuses a package.json that is not a JSON object, naming it', () => {
+  const root = mkdtempSync(join(tmpdir(), 'lasm-fastly-name-'));
+  try {
+    for (const text of ['null', '[]', '{"name": "app"']) {
+      writeFileSync(join(root, 'package.json'), text);
+      assert.throws(() => fastlyName(root), error => error.constructor === Error && error.message.includes(join(root, 'package.json')), text);
+    }
+    writeFileSync(join(root, 'package.json'), '{"name": "@scope/My App"}');
+    assert.equal(fastlyName(root), 'my-app');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

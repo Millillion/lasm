@@ -1,15 +1,17 @@
 name: Fuzz
 # Coverage-guided fuzzing at Lasm's input boundaries (docs/TESTING.md#fuzzing-at-the-boundaries,
-# test/fuzz/): the CLI's argument parser, the Lasm.UI patch decoder, the
+# test/fuzz/): the CLI's argument parser, `lasm dev`'s proxy, the edge entries' request mapping, the project files Lasm reads (against
+# Lean's own header parser), the Lasm.UI patch decoder, the
 # function platforms' HTTP mapping and the Lasm.JS value codec (JavaScript,
 # under V8 block coverage; the last two checked against Lean: the model
 # library/Lasm/Serverless/Proofs/Model.lean, and Lean's own codec), the
 # Lasm.UI applier's reading against Lean's reference decoder (ui-decode), and
-# Lasm.Fetch's request parsing, Lasm.RPC's decoding and the WASI C host's CGI
-# request (libFuzzer, ASan; UBSan for the C host).
+# Lasm.Fetch's request parsing, Lasm.RPC's decoding, the WASI C host's CGI
+# request and the Fastly host against an honest host (libFuzzer, ASan; UBSan for the C hosts).
 #   - pull requests and pushes to main: the committed corpus and regressions,
 #     once each (seconds); the native targets when their sources change;
-#   - nightly: 10 minutes per target; weekly (Saturday): 60 minutes per target.
+#   - nightly: 10 minutes per target; weekly (Saturday): 60 minutes per target (10 for
+#     dev-proxy, project-files, edge-request and fastly-host).
 # A campaign fails on any failing input (a crash, a hang, a broken property)
 # and uploads its new corpus entries and failing inputs as an artifact.
 on:
@@ -71,12 +73,15 @@ jobs:
         run: node test/fuzz/support/js-wire-model.mjs
       - name: Lean's reference decoder of Lasm.UI patches (ui-decode's oracle)
         run: node test/fuzz/support/ui-decode-model.mjs
+      - name: Lean's header parser (project-files' oracle)
+        run: node test/fuzz/support/lean-header-model.mjs
       - name: JavaScript targets
         env:
+          LASM_LEAN_HEADER_MODEL: required
           LASM_SERVERLESS_MODEL: required
           LASM_JS_WIRE_MODEL: required
           LASM_UI_DECODE_MODEL: required
-        run: node test/fuzz/run.mjs replay cli-arguments serverless-http ui-patch ui-decode lasm-js-wire
+        run: node test/fuzz/run.mjs replay cli-arguments serverless-http ui-patch ui-decode lasm-js-wire dev-proxy project-files edge-request
       - name: Do the native targets' sources change?
         id: native
         env:
@@ -93,7 +98,7 @@ jobs:
         run: node test/fuzz/native/build.mjs
       - name: Native targets
         if: steps.native.outputs.changed == 'true'
-        run: node test/fuzz/run.mjs replay lean-fetch-request lean-rpc wasi-cgi
+        run: node test/fuzz/run.mjs replay lean-fetch-request lean-rpc wasi-cgi fastly-host
 
   campaign:
     needs: sunday
@@ -105,7 +110,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        target: [cli-arguments, serverless-http, ui-patch, ui-decode, lasm-js-wire, lean-fetch-request, lean-rpc, wasi-cgi]
+        target: [cli-arguments, serverless-http, ui-patch, ui-decode, lasm-js-wire, dev-proxy, project-files, edge-request, lean-fetch-request, lean-rpc, wasi-cgi, fastly-host]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -130,15 +135,25 @@ jobs:
         run: |
           node test/fuzz/support/ui-decode-model.mjs
           echo "LASM_UI_DECODE_MODEL=required" >> "$GITHUB_ENV"
+      - name: Lean's header parser (the oracle)
+        if: matrix.target == 'project-files'
+        run: |
+          node test/fuzz/support/lean-header-model.mjs
+          echo "LASM_LEAN_HEADER_MODEL=required" >> "$GITHUB_ENV"
       - name: Native target
-        if: startsWith(matrix.target, 'lean-') || matrix.target == 'wasi-cgi'
+        if: startsWith(matrix.target, 'lean-') || matrix.target == 'wasi-cgi' || matrix.target == 'fastly-host'
         run: |
           scripts/fuzz/ensure-libfuzzer.sh
           node test/fuzz/native/build.mjs ${{ matrix.target }}
       - name: Campaign (the seed is printed first)
         env:
           SECONDS_PER_TARGET: ${{ github.event.inputs.seconds || (github.event.schedule == '41 6 * * 6' && '3600') || '600' }}
-        run: node test/fuzz/run.mjs fuzz --seconds "$SECONDS_PER_TARGET" --seed "$((GITHUB_RUN_ID % 2147483647))" ${{ matrix.target }}
+        # The targets added in November 2026 run 10 minutes on Saturdays too,
+        # which keeps the weekly tier within its budget (docs/CI.md).
+        run: |
+          seconds="$SECONDS_PER_TARGET"
+          case "${{ matrix.target }}" in dev-proxy|project-files|edge-request|fastly-host) [ "$seconds" -gt 600 ] && seconds=600 ;; esac
+          node test/fuzz/run.mjs fuzz --seconds "$seconds" --seed "$((GITHUB_RUN_ID % 2147483647))" ${{ matrix.target }}
       - name: New corpus entries and failing inputs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
