@@ -29,8 +29,8 @@ slots are read at every name of the request and of the decoder's name table
 renders the views in turn from an empty root as the runtime does: each
 frame's patch is `diff` of the live tree against the next view, encoded
 (`Encode.frame`, the tables carried from frame to frame), with whether it
-conforms (`Applier.confOps` from the ids used so far: the candidate
-Lasm.UI.Candidates.diff_conforms on this input). An html is ["t", s] or
+conforms (`Applier.confOps` from the ids used so far: the proposition
+Lasm.UI.Spec.diff_conforms, proved, on this input). An html is ["t", s] or
 ["e", ns, tag, key | null, [attr, …], [html, …]], an attr ["attr", n, v],
 ["prop", n, "<string>" | true | false], ["style", n, v] or
 ["on", event, [[segment, …], …]] (a handler that never answers).

@@ -10,12 +10,13 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync } from 
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { linkEdgeProgram, withoutIncludePaths, provisionEdgeLinker, edgeLinkSettings, edgeRecipe, edgeRecipeHas, edgeRecipeMode, asyncifyStackBytes } from '../src/edge/edge-link.mjs';
+import { linkEdgeProgram, mimallocSourceDigest, withoutIncludePaths, provisionEdgeLinker, edgeLinkSettings, edgeRecipe, edgeRecipeHas, edgeRecipeMode, asyncifyStackBytes } from '../src/edge/edge-link.mjs';
 import { compactInitializerWrappers } from '../src/edge/edge-initializers.mjs';
 import { responseFile } from '../src/platform.mjs';
 import { glueLinkFlags } from '../src/lasm-library.mjs';
 import { installTools, wasmObject, archive, temporaryDirectory } from './fixtures/link-stand-ins/toolchain.mjs';
-import { mimallocFlags, mimallocLibraryFlags, mimallocSettings } from '../src/mimalloc/mimalloc.mjs';
+import { mimallocFlags, mimallocLibraryFlags, mimallocSettings, mimallocSources } from '../src/mimalloc/mimalloc.mjs';
+import { createHash } from 'node:crypto';
 import { registerProgram } from './fixtures/link-stand-ins/programs.mjs';
 import { finishLinks, links as finishedLinks, hooks as linkHooks } from './fixtures/link-stand-ins/link-driver.mjs';
 
@@ -108,6 +109,12 @@ test('the edge link relinks the application objects with the edge glue and compa
   assert.deepEqual(readFileSync(join(f.base, 'again', 'initializers-compact.o')), readFileSync(compactObject));
   for (const [, name] of mimallocUnits) assert.deepEqual(readFileSync(join(f.base, 'again', name)), readFileSync(join(f.out, name)));
   assert.equal(f.executed[0].options.stdio, 'inherit');
+  // Another emcc (its driver identity) compiles the wrappers and mimalloc again, once.
+  for (const [i, tools] of [{ driverIdentity: 'driver-c' }, { driverIdentity: 'driver-c' }].entries()) {
+    f.executed.length = 0;
+    linkEdgeProgram({ sdk: { ...f.sdk, ...tools }, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, `tools-${i}`) });
+    assert.deepEqual(f.executed.map(item => item.tool), i === 0 ? ['emcc', 'emcc', 'emcc', 'em++'] : ['em++'], JSON.stringify(tools));
+  }
 });
 
 test('edge link without Lasm.JS, without a plan, and with Asyncify or no suspension', { skip: !posix }, () => {
@@ -423,4 +430,11 @@ test('the edge dev profile records the full link\'s members and imports, and acc
   try { run({ members: members(undefined) }); } finally { linkHooks.after = undefined; }
   assert.deepEqual(saved, []);
   assert.doesNotThrow(() => run({ members: members(undefined, () => { throw new Error('unwritable'); }) }));
+});
+
+test('the mimalloc objects are keyed by every vendored source file', () => {
+  const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
+  const files = mimallocSources.map(file => [file, sha256(readFileSync(join(shared, file)))]);
+  assert.ok(files.length > 20 && files.some(([file]) => file === 'lasm_mimalloc.c') && files.some(([file]) => file.endsWith('src/prim/prim.c')));
+  assert.equal(mimallocSourceDigest(), sha256(JSON.stringify(files)));
 });

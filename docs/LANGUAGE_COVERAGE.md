@@ -334,7 +334,9 @@ Lake drivers run (projects 6 → 23 passes); the 10 sidecar/`#exit` tests run on
 failures below were not caused by an unseeded `ENV`; see the Phase 2 fix table. Evidence:
 [inventory](evidence/lean-4.35.0-language-coverage-inventory.json),
 [baseline](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.35.0-language-coverage-baseline-2026-10-20.json),
-[4.35.0 mixed-driver review](evidence/lean-4.35.0-mixed-driver-classification.json).
+[4.35.0 mixed-driver review](evidence/lean-4.35.0-mixed-driver-classification.json)
+(generator `scripts/application-tests/classify-mixed.mjs LEAN_VERSION PRISTINE_SOURCE NEW_OUTPUT`;
+every shard reads the pinned release's review, so a Lean upgrade regenerates it first).
 Every Lasm result is the exact retained candidate `0.1.0-experimental.39310029213`
 (SHA-256 `a976ec4e…72a3`, release `node-package-39310029213`, source `8829c9a`) in
 stock Node 26.12.0, compared with native Lean 4.35.0 (`leanc -O2` and the
@@ -398,7 +400,8 @@ registrations stay native build-time tests and none of this is an upstream suite
   (`.github/workflows/language-coverage-baseline.yml`, `run-shard.mjs`,
   `assemble.mjs`): eval-io (22), the reversible runtime adapter for `#eval`,
   `#guard` and `#guard_msgs`+`#eval` (525, structural review
-  `scripts/language-coverage/runtime-adapter-l1.json`), compiled applications (118),
+  `scripts/language-coverage/runtime-adapter-l1.json`, generator
+  `scripts/language-coverage/make-adapter-review.mjs LEAN_VERSION`), compiled applications (118),
   the shared docparse and LSP client drivers (202 + 158) and the per-project
   adapters for 7 mixed registrations. Native interpreted, native compiled and a
   native repeat run first; the deployment then runs relocated with sources hidden.

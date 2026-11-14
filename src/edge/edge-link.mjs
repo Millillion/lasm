@@ -216,7 +216,8 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
 }
 
 let mimallocDigest;
-const mimallocSourceDigest = () => mimallocDigest ??= createHash('sha256')
+/** The mimalloc sources' identity in the compiled objects' cache key. */
+export const mimallocSourceDigest = () => mimallocDigest ??= createHash('sha256')
   .update(JSON.stringify(mimallocSources.map(file => [file, createHash('sha256').update(readFileSync(new URL(`../mimalloc/${file}`, import.meta.url))).digest('hex')]))).digest('hex');
 
 /** Emscripten's "// include: /abs/dir/file.js" (and "// end include: …")

@@ -60,6 +60,7 @@ jobs:
           persist-credentials: false
       - name: test/realworld matches gothinkster/realworld at the pinned commit
         working-directory: examples/conduit/test/realworld
+        shell: bash
         run: |
           set -e
           commit=$(sed -n 2p PINNED)
