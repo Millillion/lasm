@@ -16,32 +16,86 @@ export function parseWhyExtract(text) {
 
 const isMember = name => /\.a\([^()]+\)$/.test(name);
 
-/** Lean's C name escaping (Name.mangle): components are joined by `_`, an `_` inside
- * a component is `__`, and `_xHH`/`_uHHHH`/`_UHHHHHHHH` escape other characters.
- * A run of n underscores is a separator (n odd) followed by ⌊n/2⌋ underscores. */
-export function demangleName(text) {
-  let out = '';
-  for (let i = 0; i < text.length;) {
-    if (text[i] !== '_') { out += text[i++]; continue; }
-    let n = 0;
-    while (text[i + n] === '_') n++;
-    const escape = { x: 2, u: 4, U: 8 }[text[i + n]], digits = escape && text.slice(i + n + 1, i + n + 1 + escape);
-    if (n % 2 === 1 && escape && digits.length === escape && /^[0-9a-f]+$/.test(digits)) {
-      out += '_'.repeat((n - 1) / 2) + String.fromCodePoint(parseInt(digits, 16)); i += n + 1 + escape;
-      continue;
-    }
-    out += (n % 2 ? '.' : '') + '_'.repeat(Math.floor(n / 2)); i += n;
-  }
-  return out;
-}
-export function mangleName(name) {
-  return name.split('.').map(part => [...part].map(char => {
+/** Lean 4.35's C names of names (Lean/Compiler/NameMangling.lean, `Name.mangle n ""`
+ * and `Name.demangle`), over dotted names: a component of decimal digits without
+ * a leading zero is a numeric component (`_private.M.0.f`), any other a string.
+ * In a string component ASCII letters and digits stay, `_` is `__`, and other
+ * characters are `_xHH`, `_uHHHH` or `_UHHHHHHHH`; components are joined by `_`,
+ * a numeric one is `_N_`, and `_00` (`00` first) instead marks a string component
+ * that would read as a number or an escape, or that follows one ending in `_`. */
+const numeral = /^(?:0|[1-9][0-9]*)$/;
+const hexDigits = { x: 2, u: 4, U: 8 };
+function escapeComponent(part) {
+  return [...part].map(char => {
     if (/[A-Za-z0-9]/.test(char)) return char;
     if (char === '_') return '__';
     const code = char.codePointAt(0);
     return code < 0x100 ? '_x' + code.toString(16).padStart(2, '0')
       : code < 0x10000 ? '_u' + code.toString(16).padStart(4, '0') : '_U' + code.toString(16).padStart(8, '0');
-  }).join('')).join('_');
+  }).join('');
+}
+/** Lean's checkDisambiguation: after leading underscores, the text is empty, starts
+ * with a digit, or starts with an escape's letter and its lower-case hex digits. */
+function ambiguous(mangled) {
+  const rest = mangled.replace(/^_*/, '');
+  if (rest === '' || /^[0-9]/.test(rest)) return true;
+  const digits = hexDigits[rest[0]];
+  return digits !== undefined && new RegExp(`^[0-9a-f]{${digits}}`).test(rest.slice(1));
+}
+export function mangleName(name) {
+  let out = '', previous;
+  for (const part of name.split('.')) {
+    if (numeral.test(part)) out += previous === undefined ? part + '_' : '_' + part + '_';
+    else {
+      const mangled = escapeComponent(part);
+      if (previous === undefined) out = (ambiguous(mangled) ? '00' : '') + mangled;
+      else out += (previous.endsWith('_') || ambiguous(mangled) ? '_00' : '_') + mangled;
+    }
+    previous = part;
+  }
+  return out;
+}
+/** Lean's Name.demangle: what text Lean's mangling produced, read back
+ * (any other text is read as Lean reads it). */
+export function demangleName(text) {
+  const s = [...text], parts = [];
+  const lowerHex = (at, digits) => {
+    const run = s.slice(at, at + digits);
+    return run.length === digits && run.every(c => /^[0-9a-f]$/.test(c)) ? parseInt(run.join(''), 16) : undefined;
+  };
+  const charOf = code => code > 0x10ffff || code >= 0xd800 && code <= 0xdfff ? '\0' : String.fromCodePoint(code);
+  let i = 0, acc = '', count = 0, mode = 'start';
+  while (true) {
+    if (mode === 'start') {
+      if (i === s.length) break;
+      const ch = s[i++];
+      if (/^[0-9]$/.test(ch)) {
+        if (ch === '0' && s[i] === '0') { i++; mode = 'text'; acc = ''; count = 0; }
+        else { acc = ch; mode = 'number'; }
+      } else if (ch === '_') { acc = ''; count = 1; mode = 'text'; }
+      else { acc = ch; count = 0; mode = 'text'; }
+    } else if (mode === 'number') {
+      if (i === s.length) { parts.push(String(BigInt(acc))); break; }
+      const ch = s[i++];
+      if (/^[0-9]$/.test(ch)) acc += ch;
+      else { parts.push(String(BigInt(acc))); if (i === s.length) break; i++; mode = 'start'; }
+    } else {
+      if (i === s.length) { parts.push(acc + '_'.repeat(count >> 1)); break; }
+      const ch = s[i++];
+      if (ch === '_') { count++; continue; }
+      if (count % 2 === 0) { acc += '_'.repeat(count >> 1) + ch; count = 0; continue; }
+      if (/^[0-9]$/.test(ch)) {
+        parts.push(acc + '_'.repeat(count >> 1));
+        if (ch === '0' && s[i] === '0') { i++; acc = ''; count = 0; }
+        else { acc = ch; mode = 'number'; }
+        continue;
+      }
+      const digits = hexDigits[ch], code = digits === undefined ? undefined : lowerHex(i, digits);
+      if (code !== undefined) { acc += '_'.repeat(count >> 1) + charOf(code); i += digits; count = 0; continue; }
+      parts.push(acc); acc = '_'.repeat(count >> 1) + ch; count = 0;
+    }
+  }
+  return parts.join('.');
 }
 /** A module name from its initializer symbol, or undefined when it does not round-trip. */
 export function initializerModule(symbol) {
