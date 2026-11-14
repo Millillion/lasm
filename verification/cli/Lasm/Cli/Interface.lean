@@ -39,6 +39,7 @@ import Lasm.Cli.Model.LowerAtomics
 import Lasm.Cli.Model.Mangle
 import Lasm.Cli.Model.StaticServer
 import Lasm.Cli.Model.Reachability
+import Lasm.Cli.Model.Initialization
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
@@ -212,6 +213,19 @@ def insideDirectory (cwd directory file : String) : Bool :=
 
 /-- The segments of `path.posix.resolve(p)` from `cwd`. -/
 def resolvedSegments (cwd p : String) : List (List Char) := resolveSegments cwd.toList p.toList
+
+/-- `initializerClosure(units, roots)` (src/application-initialization.mjs;
+modelled in Model/Initialization.lean), `units` the Map's entries (each
+unit's `calls`). -/
+def initializerClosureOf (units : List (String × List String)) (roots : List String) : List String :=
+  Initialization.initializerClosure units roots
+
+/-- `x` is reached from `root` by initializer calls through units of the
+map: `root` is a unit, and each step calls a unit. -/
+inductive InitReaches (units : List (String × List String)) (root : String) : String → Prop
+  | base : Initialization.hasUnit units root = true → InitReaches units root root
+  | step {y z : String} : InitReaches units root y → z ∈ Initialization.callsOf units y →
+      Initialization.hasUnit units z = true → InitReaches units root z
 
 /-- `applicationLinkRequirements(map, { initializationFreeCppSymbols })`
 (src/application-reachability.mjs; modelled in Model/Reachability.lean):
