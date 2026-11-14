@@ -77,7 +77,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         if: env.SOAK_SECONDS != '0'
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           architecture: ${{ matrix.target.architecture }}
           package-manager-cache: false
       - if: env.SOAK_SECONDS != '0'

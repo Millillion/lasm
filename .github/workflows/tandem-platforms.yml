@@ -16,6 +16,7 @@ on:
       - '!examples/tandem/Proofs/**'
       - '!examples/tandem/Proofs.lean'
       - '!examples/tandem/**/*.md'
+      - 'scripts/equivalence/traffic.mjs'
   push:
     branches: [main]
     paths:
@@ -24,6 +25,7 @@ on:
       - '!examples/tandem/Proofs/**'
       - '!examples/tandem/Proofs.lean'
       - '!examples/tandem/**/*.md'
+      - 'scripts/equivalence/traffic.mjs'
 permissions:
   contents: read
 concurrency:
@@ -63,7 +65,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - uses: ./.github/actions/process-guard
       - name: npm ci
@@ -87,9 +89,13 @@ jobs:
         run: |
           node "$GITHUB_WORKSPACE/scripts/full-lean/run-bounded.mjs" --memory-mib 8192 -- bash -c "${{ matrix.build }}"
           node "$GITHUB_WORKSPACE/scripts/full-lean/run-bounded.mjs" --memory-mib 8192 -- npm run build:clients
-      - name: The protocol tests
+      - name: The protocol tests (the HTTP traffic recorded for target equivalence)
         working-directory: ${{ env.TANDEM }}
-        run: node test/protocol.mjs --platform ${{ matrix.platform }} --name ${{ matrix.platform }}
+        run: node test/protocol.mjs --platform ${{ matrix.platform }} --name ${{ matrix.platform }} --equivalence
+      - name: Target equivalence (the protocol traffic against Node's, test/equivalence/protocol.json)
+        if: ${{ !cancelled() }}
+        working-directory: ${{ env.TANDEM }}
+        run: node test/equivalence.mjs compare ${{ matrix.platform }}
       - name: The live simulation (seeded; the seed is printed first)
         working-directory: ${{ env.TANDEM }}
         run: node test/simulate.mjs --platform ${{ matrix.platform }} --rounds 3 --name ${{ matrix.platform }}
