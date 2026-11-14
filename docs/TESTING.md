@@ -558,10 +558,10 @@ asset serving answer for the browser page's files before the Worker runs: on
 those responses, recognized by its `cf-cache-status`, the caching headers it
 owns, `cache-control`, `etag`, `vary` and `cf-cache-status`, are left out on
 both sides, while the bytes are still compared), the alignment and diff, and the `compare NAME` /
-`self-test` command line. Each app's `test/equivalence.mjs` adds its own
+`self-test` command line. Each app's `examples/<app>/test/equivalence.mjs` adds its own
 normalizer and documents each rule; its Node job writes
 `test-results/normalized-SUITE-node-24.json`, which is committed as
-`test/equivalence/SUITE.json` and reviewed like code, for the reasons Conduit's
+`examples/<app>/test/equivalence/SUITE.json` and reviewed like code, for the reasons Conduit's
 golden file is. Every Node and platform job of the app runs the comparison as
 its step after the recorded driver; the Node jobs run the normalizer's
 self-test first.
