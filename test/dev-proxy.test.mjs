@@ -215,3 +215,92 @@ test('importClosure: indented imports, doubled spaces, a "module" word later in 
     assert.deepEqual(names, ['A.lean', 'B.lean', 'Main.lean']);
   } finally { rmSync(project, { recursive: true, force: true }); }
 });
+
+/** An upstream that answers each request with `bytes` written straight to its socket, then `after` (end or destroy); records what it got. */
+async function rawUpstream(answer) {
+  const seen = [];
+  const upstream = createServer((req, res) => {
+    const chunks = [];
+    req.on('data', c => chunks.push(c));
+    req.on('end', () => {
+      seen.push({ method: req.method, url: req.url, body: Buffer.concat(chunks).toString() });
+      const { bytes, cut } = answer(req);
+      req.socket.write(bytes);
+      if (cut) setTimeout(() => req.socket.destroy(), 20); else req.socket.end();
+    });
+  });
+  await new Promise(r => upstream.listen(0, '127.0.0.1', r));
+  return { seen, port: upstream.address().port, close: () => new Promise(r => { upstream.closeAllConnections(); upstream.close(r); }) };
+}
+
+/** A request through the proxy that settles as { status, body } or { cut } (its connection ended early), or `timeout` after `ms`. */
+function settle(port, path, { method = 'GET', body, ms = 3000 } = {}) {
+  return new Promise(resolve => {
+    const timer = setTimeout(() => { req.destroy(); resolve('timeout'); }, ms);
+    const done = value => { clearTimeout(timer); resolve(value); };
+    const req = httpRequest({ host: '127.0.0.1', port, path, method, agent: false }, response => {
+      const chunks = [];
+      response.on('data', c => chunks.push(c));
+      response.on('end', () => done({ status: response.statusCode, body: Buffer.concat(chunks) }));
+      response.on('error', () => done({ cut: true }));
+      response.on('close', () => { if (!response.complete) done({ cut: true }); });
+    });
+    req.on('error', () => done({ cut: true }));
+    req.end(body);
+  });
+}
+
+// Found by the dev-proxy fuzz target (test/fuzz/targets/dev-proxy.mjs).
+// Proposition: Lasm.Cli.Candidates.dev_proxy_ends_failed_replies
+//    ∀ (r : HttpRequest) (u : Upstream), u = .cut ∨ u = .malformed → r.target ≠ "/__lasm/events" →
+//      (devProxy r u).2 = .cut ∨ ∃ page, (devProxy r u).2 = .reply page ∧ page.status = 502 ∧ u = .malformed
+test('the dev proxy ends the response when the server dies mid-reply, page or not', async () => {
+  for (const type of ['application/octet-stream', 'text/html']) {
+    const upstream = await rawUpstream(() => ({ bytes: `HTTP/1.1 200 OK\r\ncontent-type: ${type}\r\ncontent-length: 100\r\n\r\nabc`, cut: true }));
+    const proxy = await startDevProxy({ port: 0, upstreamPort: upstream.port });
+    try {
+      const outcome = await settle(proxy.port, '/stream');
+      assert.notEqual(outcome, 'timeout', `${type}: the client's response never ended`);
+      assert.deepEqual(outcome, { cut: true }, `${type}: a cut reply reaches the client cut`);
+    } finally { await proxy.close(); await upstream.close(); }
+  }
+});
+
+test('the dev proxy answers a malformed reply with 502 at once, sending the request once', async () => {
+  const upstream = await rawUpstream(() => ({ bytes: 'HTTP/1.1 200 OK\r\nx-bad: a\x01b\r\ncontent-length: 0\r\n\r\n' }));
+  const proxy = await startDevProxy({ port: 0, upstreamPort: upstream.port });
+  try {
+    const started = Date.now();
+    const outcome = await settle(proxy.port, '/order', { method: 'POST', body: 'one order' });
+    assert.equal(outcome.status, 502);
+    assert.ok(Date.now() - started < 2000, `answered after ${Date.now() - started} ms`);
+    assert.equal(upstream.seen.length, 1, 'a POST the server received is not sent again');
+  } finally { await proxy.close(); await upstream.close(); }
+});
+
+test('the dev proxy keeps the bytes of a page that is not UTF-8', async () => {
+  const page = Buffer.concat([Buffer.from('<p>caf'), Buffer.from([0xe9]), Buffer.from('</p></body>')]);
+  const head = `HTTP/1.1 200 OK\r\ncontent-type: text/html; charset=iso-8859-1\r\ncontent-length: ${page.length}\r\n\r\n`;
+  const upstream = await rawUpstream(() => ({ bytes: Buffer.concat([Buffer.from(head), page]) }));
+  const proxy = await startDevProxy({ port: 0, upstreamPort: upstream.port });
+  try {
+    const { status, body } = await settle(proxy.port, '/');
+    assert.equal(status, 200);
+    const at = body.indexOf('<script type="module">');
+    assert.ok(at > 0, 'the reload client is injected');
+    assert.deepEqual(body.subarray(0, at), page.subarray(0, page.indexOf('</body>')), 'the bytes before the script are the page\'s');
+    assert.ok(body.subarray(at).toString('latin1').endsWith('</script>\n</body>'));
+  } finally { await proxy.close(); await upstream.close(); }
+});
+
+// Found by the project-files fuzz target (test/fuzz/targets/project-files.mjs), against Lean's own header parser.
+test('importClosure follows «escaped» names, names on the next line and imports after nested comments', () => {
+  const project = mkdtempSync(join(tmpdir(), 'lasm-dev-proxy-'));
+  try {
+    writeFileSync(join(project, 'Main.lean'), '/- a /- nested -/ still\n-/\nimport «My Mod»\nimport\n  A.«b c»\nimport α\n');
+    mkdirSync(join(project, 'A'));
+    for (const name of ['My Mod', 'A/b c', 'α']) writeFileSync(join(project, name + '.lean'), '');
+    const names = [...importClosure(project, join(project, 'Main.lean'))].map(f => f.slice(project.length + 1)).sort();
+    assert.deepEqual(names, ['A/b c.lean', 'Main.lean', 'My Mod.lean', 'α.lean']);
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
