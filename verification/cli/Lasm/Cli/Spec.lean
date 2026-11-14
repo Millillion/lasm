@@ -164,6 +164,23 @@ def schedule_reached_kept_first : Prop :=
     ∀ x ∈ initializationSchedule n calls keep, ∀ y, y ∈ keep → y ≠ n → Reaches (edgesOf calls) x y →
       (initializationSchedule n calls keep).idxOf y < (initializationSchedule n calls keep).idxOf x
 
+/-! ## The link driver's Python semantics -/
+
+/-- **Escaped strings are printable ASCII.** `json.dumps` of any string,
+`ensure_ascii`, is printable ASCII: quotes, escapes, hexadecimal digits and
+the printable characters themselves.
+Tested by: test/link-driver-python.test.mjs -/
+def json_string_printable : Prop :=
+  ∀ s : String, (pythonJsonString s).all (fun c => ' ' ≤ c && c ≤ '~') = true
+
+/-- **Python's string order is the order of code points.** The sign of
+`comparePythonStrings a b` is that of comparing `a` and `b` code point by
+code point (a prefix first), as Python orders `str`, unlike JavaScript's
+UTF-16 order.
+Tested by: test/link-driver-python.test.mjs -/
+def python_order_code_points : Prop :=
+  ∀ a b : String, (comparePythonStrings a b).sign = if a < b then -1 else if a = b then 0 else 1
+
 /-! ## WebAssembly -/
 
 /-- **`replaceCoreModule` replaces exactly the one matching module.** In a
