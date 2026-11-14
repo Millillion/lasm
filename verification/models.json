@@ -363,7 +363,7 @@
     "src/glue/glue.mjs": {
       "status": "exempt",
       "kind": "runtime",
-      "reason": "the WASI host of the CLI's glue program (stdin, stdout, stderr, clocks, random bytes; nothing else) and its field codec; the program is Lean (verification/cli/Lasm/Cli/Glue.lean), checked with this host by the model differential of src/edge/edge-initializers.mjs and test/glue.test.mjs"
+      "reason": "the WASI host of the CLI's glue program (reading stdin, writing stdout and stderr, a clock that reads 0, exiting; nothing else) and its field codec; the program is Lean (verification/cli/Lasm/Cli/Glue.lean), checked with this host by the model differential of src/edge/edge-initializers.mjs, and the host by test/glue.test.mjs on hand-made modules"
     },
     "src/handle-table.mjs": {
       "status": "modelled",

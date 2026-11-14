@@ -131,7 +131,7 @@ How a module moves from pending to modelled:
 | [`src/editor.mjs`](../src/editor.mjs) | io | editor support files; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/elapsed-ticker-worker.mjs`](../src/elapsed-ticker-worker.mjs) | io | a timer thread writing to the terminal |
 | [`src/elapsed-ticker.mjs`](../src/elapsed-ticker.mjs) | io | a timer thread writing to the terminal |
-| [`src/glue/glue.mjs`](../src/glue/glue.mjs) | runtime | the WASI host of the CLI's glue program (stdin, stdout, stderr, clocks, random bytes; nothing else) and its field codec; the program is Lean (verification/cli/Lasm/Cli/Glue.lean), checked with this host by the model differential of src/edge/edge-initializers.mjs and test/glue.test.mjs |
+| [`src/glue/glue.mjs`](../src/glue/glue.mjs) | runtime | the WASI host of the CLI's glue program (reading stdin, writing stdout and stderr, a clock that reads 0, exiting; nothing else) and its field codec; the program is Lean (verification/cli/Lasm/Cli/Glue.lean), checked with this host by the model differential of src/edge/edge-initializers.mjs, and the host by test/glue.test.mjs on hand-made modules |
 | [`src/js-runtime.mjs`](../src/js-runtime.mjs) | io | detects the JavaScript runtime |
 | [`src/lasm-library.mjs`](../src/lasm-library.mjs) | io | provisions Lasm's Lean library; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/lasm-modules/app.mjs`](../src/lasm-modules/app.mjs) | runtime | the app instance of Lasm.UI.Mount; tested in browsers (ui.yml) |

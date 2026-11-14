@@ -63,8 +63,9 @@ times, by one that reads them once. Natively the whole generator then takes
 - **Run in process, with Node only.** `src/glue/glue.mjs` compiles the module
   once per process (lazily, at the first call) and instantiates it per call
   with a minimal WASI host written for it: stdin is the request, stdout and
-  stderr are collected, there are no files, no environment and no clocks
-  beyond the standard ones; every other WASI call fails with `ENOSYS`. It
+  stderr are collected, every clock reads 0 (Lean's runtime reads one as it
+  starts), and every other WASI call (files, arguments, environment, random
+  bytes) fails with `ENOSYS`. It
   uses only `WebAssembly` and `Buffer`, so it runs under Node, Bun and Deno,
   as the CLI does, and works from the published npm package (the `.wasm` is
   in `src/`, which ships). The calls stay synchronous, so callers do not
