@@ -27,13 +27,14 @@ open Lasm.Cli
 
 /-! ## Builds -/
 
-/-- **Mangling round-trips.** For a dotted name Lean mangles unambiguously,
-the mangled name is a non-empty C identifier, demangling gives the name
-back, and the module of its initializer (`initialize_…` or
+/-- **Mangling round-trips.** For every dotted name (a component of
+decimal digits without a leading zero is a numeric component, as in
+`_private.M.0.f`), the mangled name is a non-empty C identifier, demangling
+gives the name back, and the module of its initializer (`initialize_…` or
 `runtime_initialize_…`) is the name.
 Tested by: test/application-diagnosis.test.mjs -/
 def mangle_round_trip : Prop :=
-  ∀ n : String, wellFormedName n = true →
+  ∀ n : String,
     demangleName (mangleName n) = n ∧
     initializerModule ("initialize_" ++ mangleName n) = some n ∧
     initializerModule ("runtime_initialize_" ++ mangleName n) = some n ∧

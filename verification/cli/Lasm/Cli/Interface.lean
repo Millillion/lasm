@@ -210,18 +210,13 @@ def unquote (line : String) : Option String :=
 
 /-! ## Builds: names, initializers, builtin modules -/
 
-/-- `mangleName(name)` (src/application-diagnosis.mjs): Lean's C name of a
-dotted name. -/
+/-- `mangleName(name)` (src/application-diagnosis.mjs): Lean 4.35's C name
+(`Name.mangle n ""`) of a dotted name. -/
 opaque mangleName : String → String
 /-- `demangleName(text)`. -/
 opaque demangleName : String → String
 /-- `initializerModule(symbol)`: the module a C initializer initializes. -/
 opaque initializerModule : String → Option String
-
-/-- A dotted name whose components each start with an ASCII letter and do not
-end with `_`, where Lean's mangling is unambiguous. -/
-def wellFormedName (n : String) : Bool :=
-  (n.splitOn ".").all fun c => (c.toList.head?.map Char.isAlpha).getD false && !c.endsWith "_"
 
 -- `builtinModuleClosure(specifiers)` (src/edge/builtin-modules.mjs), with
 -- `imports` the builtin specifiers (`lasm:…`) each builtin's file imports:
