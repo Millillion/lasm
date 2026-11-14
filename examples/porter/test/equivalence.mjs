@@ -42,7 +42,9 @@
 // - Times in JSON outside a JWT (iat, exp, auth_time, nbf, updated_at) become
 //   <time>.
 // Nothing else is: client ids, users, claims, error codes and descriptions,
-// pages and cookies' attributes are the same everywhere.
+// pages and cookies' attributes are the same everywhere (on Azure, Set-Cookie
+// is compared in the canonical form of traffic.mjs's PLATFORM_FORMS: its
+// host re-serializes all but one cookie per reply).
 import { fileURLToPath } from 'node:url';
 import { main, normalizeWith, ordinals, selfTestCompare } from '../../../scripts/equivalence/traffic.mjs';
 
