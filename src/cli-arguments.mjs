@@ -32,7 +32,7 @@ const targetAliases = { cloudflare: 'workers', 'cloudflare-workers': 'workers', 
   cloudfront: 'lambda-edge', supabase: 'supabase-edge', 'deno-deploy-edge': 'deno-deploy', spin: 'wasi-http', wasmtime: 'wasi', web: 'browser',
   vite: 'browser', 'azure-functions': 'azure', 'google-cloud-functions': 'gcf', 'cloud-functions': 'gcf', 'vercel-functions': 'vercel', 'netlify-functions': 'netlify' };
 export function targetHint(value) {
-  const alias = value.toLowerCase();
+  const alias = asciiLower(value);
   const guess = (Object.hasOwn(targetAliases, alias) ? targetAliases[alias] : undefined) ?? closest(value, buildTargets);
   return guess ? ` (did you mean --target ${guess}?)` : '';
 }
@@ -53,8 +53,15 @@ Application arguments must follow --.`;
 
 export const commandNames = ['build', 'run', 'dev', 'init', 'package', 'editor', 'cache'];
 
-/** Levenshtein distance, for "did you mean" suggestions. */
+/** ASCII letters lowercased, every other character kept: command and target
+ * names are ASCII (and Unicode case mapping would match the Kelvin sign K to k). */
+export const asciiLower = text => text.replace(/[A-Z]/g, c => c.toLowerCase());
+
+/** Levenshtein distance between the code points of two words (so an astral
+ * character such as an emoji is one edit, not two UTF-16 units), for "did
+ * you mean" suggestions. */
 export function editDistance(a, b) {
+  a = [...a]; b = [...b];
   const row = Array.from({ length: b.length + 1 }, (_, j) => j);
   for (let i = 1; i <= a.length; i++) {
     let previous = row[0]; row[0] = i;
@@ -67,14 +74,15 @@ export function editDistance(a, b) {
   return row[b.length];
 }
 
-/** The closest candidate within a third of its length (at least 2 edits), or undefined. */
+/** The closest candidate (ignoring ASCII case) within a third of its length
+ * in code points (at least 2 edits), or undefined. */
 export function closest(word, candidates) {
   let best, distance = Infinity;
   for (const candidate of candidates) {
-    const d = editDistance(word.toLowerCase(), candidate.toLowerCase());
+    const d = editDistance(asciiLower(word), asciiLower(candidate));
     if (d < distance) { best = candidate; distance = d; }
   }
-  return distance <= Math.max(2, Math.floor((best?.length ?? 0) / 3)) ? best : undefined;
+  return distance <= Math.max(2, Math.floor((best === undefined ? 0 : [...best].length) / 3)) ? best : undefined;
 }
 
 /** Parse independently of provisioning: help/errors must never download tools. */
@@ -113,7 +121,8 @@ export function parseLasmArguments(argv) {
     if (token === '--allow-dev') { result.allowDev = true; continue; }
     // --bundler (browser): the output is input to a bundler (Vite, esbuild, webpack): npm imports stay imports.
     if (token === '--bundler') { result.bundler = true; continue; }
-    const target = /^--target(?:=(.*))?$/.exec(token);
+    // --flag=VALUE: the value is everything after `=`, line breaks included (the s flag).
+    const target = /^--target(?:=(.*))?$/s.exec(token);
     if (target) {
       if (result.command !== 'build') throw new Error('--target is available only with lasm build');
       if (supplied.has('target')) throw new Error('Specify --target only once');
@@ -123,7 +132,7 @@ export function parseLasmArguments(argv) {
       if (!buildTargets.includes(value)) throw new Error(`Unknown build target "${value}"${targetHint(value)}. Choose one of: ${buildTargets.join(', ')}`);
       result.target = value; continue;
     }
-    const suspend = /^--suspend(?:=(.*))?$/.exec(token);
+    const suspend = /^--suspend(?:=(.*))?$/s.exec(token);
     if (suspend) {
       if (supplied.has('suspend')) throw new Error('Specify --suspend only once');
       supplied.add('suspend');
@@ -131,7 +140,7 @@ export function parseLasmArguments(argv) {
       if (!suspendModes.includes(value)) throw new Error(`--suspend requires one of: ${suspendModes.join(', ')}`);
       result.suspend = value; continue;
     }
-    const match = /^--output(?:=(.*))?$/.exec(token);
+    const match = /^--output(?:=(.*))?$/s.exec(token);
     if (match) {
       if (supplied.has('output')) throw new Error('Specify --output only once');
       supplied.add('output');

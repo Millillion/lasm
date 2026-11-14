@@ -546,6 +546,15 @@ test('retry delays stay within 75-100 % of the capped doubling backoff', async (
   });
   assert.equal(retryDelay(1, () => 0.5), 1750);
   assert.equal(retryDelay(7, () => 0), 45_000);
+  // Rounding is monotone, so every draw lies between these: the ends for every
+  // backoff (from attempt 6 on, 2000 * 2^5 > 60000 and the cap holds, up to
+  // 2 ** (attempt - 1) = Infinity).
+  for (const attempt of [1, 2, 3, 4, 5, 6, 7, 1025, 1100]) {
+    const base = Math.min(60_000, 2000 * 2 ** (attempt - 1));
+    assert.equal(retryDelay(attempt, () => 0), 3 * base / 4);
+    assert.equal(retryDelay(attempt, () => 1), base);
+    assert.equal(retryDelay(attempt, () => 1 - Number.EPSILON / 2), base);
+  }
 });
 
 const failure = promise => promise.then(() => assert.fail('expected a failure'), error => error);

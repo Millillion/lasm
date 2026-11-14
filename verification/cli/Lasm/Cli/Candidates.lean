@@ -25,89 +25,6 @@ open Lasm.Cli
 
 /-! ## The command line -/
 
-/-- **Application arguments after `--` come back unchanged.** Running a
-`.lean` file with any of `--rebuild`, `--verbose` and `--release` before it
-parses as `run` of that file, with exactly the arguments after `--` (flags,
-empty strings and `--` included) and each option as given.
-Tested by: test/cli-parse.test.mjs -/
-def run_args_kept : Prop :=
-  ∀ (src : String) (flags args : List String), src.endsWith ".lean" → ¬ src.startsWith "-" →
-    (∀ f ∈ flags, f ∈ ["--rebuild", "--verbose", "--release"]) →
-    ∃ p, parseLasmArguments (flags ++ [src, "--"] ++ args) = .ok p ∧
-      p.command = "run" ∧ p.input = src ∧ p.args = args ∧
-      p.rebuild = flags.contains "--rebuild" ∧ p.verbose = flags.contains "--verbose" ∧
-      p.profile = (if flags.contains "--release" then "release" else "dev")
-
-/-- **Build options mean the same in any order and either form.** When
-`lasm build` accepts a set of distinct options, it accepts every reordering
-of them, with any valued option written `--flag=value` instead of
-`--flag value`, and parses it the same.
-Tested by: test/cli-parse.test.mjs -/
-def build_options_commute : Prop :=
-  ∀ (opts opts' : List (List String)) (forms : List Bool), (∀ o ∈ opts, OptionGroup o) →
-    (opts.map List.head?).Nodup → opts.Perm opts' → forms.length = opts'.length →
-    (parseLasmArguments ("build" :: opts.flatten)).isOk = true →
-    parseLasmArguments ("build" :: ((opts'.zip forms).map fun (o, j) => if j then joined o else o).flatten) =
-      parseLasmArguments ("build" :: opts.flatten)
-
-/-- **Every unknown flag is refused by name.** A word that starts with `-`
-and is no option of `lasm build` or of running a program is refused, after
-a program and before one, with a message that names it.
-Tested by: test/cli-parse.test.mjs -/
-def unknown_flag_refused : Prop :=
-  ∀ flag : String, flag.startsWith "-" → flag ∉ knownFlags → valuedForm flag = false →
-    parseLasmArguments ["Main.lean", flag] = .error ("Unknown Lasm option: " ++ flag ++ ". Application arguments must follow --.") ∧
-    parseLasmArguments ["build", flag, "Main.lean"] = .error ("Unknown Lasm option: " ++ flag ++ ". Application arguments must follow --.")
-
-/-- **Every parse is a known command, or a readable error.** Whatever the
-arguments, the parser either names a command Lasm has, with a build target,
-an input, `lasm init` templates and deploy targets and `lasm dev` outputs
-that Lasm has, or refuses with a message that is not blank.
-Tested by: test/fuzz/targets/cli-arguments.mjs -/
-def parse_known_or_refused : Prop :=
-  ∀ argv : List String,
-    match parseLasmArguments argv with
-    | .ok p => p.command ∈ commands ∧
-        (p.command = "build" → p.target ∈ buildTargets) ∧
-        ((p.command = "build" ∨ p.command = "run") → p.input.endsWith ".lean" ∨ p.input.endsWith ".json") ∧
-        (p.command = "init" → p.template ∈ templates ∧ ∀ d ∈ p.deploy, d ∈ deployTargets) ∧
-        (p.command = "package" → p.target ∈ packageTargets ∨ p.target = "browser") ∧
-        (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
-    | .error m => m.trimAscii.toString ≠ ""
-
-/-- **Edit distance is a metric bounded by the lengths.** It is zero exactly
-between equal words, symmetric, satisfies the triangle inequality, is the
-length from or to the empty word, and lies between the difference of the
-lengths and the larger length.
-Tested by: test/cli-parse.test.mjs -/
-def edit_distance_metric : Prop :=
-  ∀ a b c : String,
-    editDistance a a = 0 ∧ editDistance a "" = a.length ∧ editDistance "" a = a.length ∧
-    editDistance a b = editDistance b a ∧ editDistance a c ≤ editDistance a b + editDistance b c ∧
-    a.length - b.length ≤ editDistance a b ∧ b.length - a.length ≤ editDistance a b ∧
-    editDistance a b ≤ max a.length b.length ∧ (a ≠ b → 0 < editDistance a b)
-
-/-- **A suggestion is the nearest candidate, within reach.** For lowercase
-words, `closest` gives the first candidate at the least edit distance, when
-that distance is within its threshold (two edits, or a third of its length),
-and nothing otherwise.
-Tested by: test/cli-parse.test.mjs -/
-def closest_nearest_first : Prop :=
-  ∀ (word : String) (cs : List String), word.all Char.isLower → (∀ c ∈ cs, c.all Char.isLower) →
-    closest word cs = (nearestFirst (editDistance word) cs).filter fun c => editDistance word c ≤ threshold c
-
-/-! ## The process launcher -/
-
-/-- **The launcher configuration round-trips.** The native launcher reads
-back the command and arguments as its argument vector, the environment in
-order, both directories and the stdio flags, for any text without NUL.
-Tested by: test/cli-helpers.test.mjs -/
-def launcher_config_round_trip : Prop :=
-  ∀ o : LaunchOptions,
-    (∀ s ∈ o.command :: o.args ++ o.env.flatMap (fun (k, v) => [k, v]) ++ o.directory.toList ++ o.requestedCwd.toList, '\x00' ∉ s.toList) →
-    (o.env.map (·.1)).Nodup → o.stdio.length = 3 →
-    launcherReads (encodeProcessConfiguration o) = some (o.command :: o.args, o.env, o.directory, o.requestedCwd, o.stdio)
-
 /-! ## Builds -/
 
 /-- **Mangling round-trips.** For a dotted name Lean mangles unambiguously,
@@ -165,22 +82,15 @@ def static_inside_root : Prop :=
     (staticServe root path).1 ∈ [200, 403, 404] ∧
     ∀ f, (staticServe root path).2 = some f → f.startsWith (root ++ "/")
 
-/-! ## The Node host -/
-
-/-- **Lean versions compare lexicographically.** `leanAtLeast v m` holds
-exactly when `v`'s major, minor and patch are `m`'s or later in that order,
-whatever prerelease tag `v` has; a version is at least itself.
-Tested by: test/lean-io-error-policy.test.mjs -/
-def lean_at_least_lexicographic : Prop :=
-  ∀ (a b : Nat × Nat × Nat) (rc : Option Nat),
-    (leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText b) = true ↔ LexGe a b) ∧
-    leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText a) = true
-
 /-! ## Downloads -/
 
 /-- **Retry delays stay within 75–100 % of the backoff.** For every attempt
 and every random draw in [0, 1], the delay is between three quarters of the
-capped doubling backoff and the backoff itself.
+capped doubling backoff and the backoff itself. It stays tested, not
+proved: the code computes in doubles, and Lean's `Float` operations are
+opaque to proofs. It holds because IEEE-754 rounding is monotone and exact
+on `0.75 * b` and `b` (`b` ≤ 60000), so the delay grows with the draw
+between its values at 0 and 1, which the test checks for every backoff.
 Tested by: test/managed-download.test.mjs -/
 def retry_delay_bounded : Prop :=
   ∀ (attempt : Nat) (r : Float), 1 ≤ attempt → 0 ≤ r → r ≤ 1 →
@@ -215,47 +125,46 @@ def python_order_code_points : Prop :=
 
 /-! ## WebAssembly -/
 
-/-- **Lowering atomics keeps what one thread computes.** For a valid module,
-the lowered module is valid, lowering it again changes nothing, and run on
-one thread it gives the same result and leaves the same memory.
+/-- **Lowering atomics keeps what one thread computes.** When it lowers a
+valid module, the lowered module is valid, lowering it again changes nothing,
+and run on one thread it gives the same result and leaves the same memory.
+(The lowering refuses, with an error, SIMD and GC instructions, which a valid
+module may hold.) It stays tested, not proved: `validate` and `run` are
+WebAssembly's own validation and execution, which a proof needs as a formal
+semantics of WebAssembly to relate the lowering's model to.
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_keeps_runs : Prop :=
-  ∀ (m : ByteArray) (args : List Nat), validate m = true →
-    validate (lowerAtomics m) = true ∧ lowerAtomics (lowerAtomics m) = lowerAtomics m ∧
-    run (lowerAtomics m) args = run m args
+  ∀ (m m' : ByteArray) (args : List Nat), validate m = true → lowerAtomics m = .ok m' →
+    validate m' = true ∧ lowerAtomics m' = .ok m' ∧ run m' args = run m args
 
-/-- **Lowering leaves no atomic instruction.** For a valid module, the
-lowered module is valid without the threads feature and lowering it again
-changes nothing; a module already valid without threads is returned as it is.
+/-- **Lowering leaves no atomic instruction.** When it lowers a valid
+module, the lowered module is valid without the threads feature and lowering
+it again changes nothing; a module already valid without threads is returned
+as it is. It stays tested, not proved, for the same reason: `validate` and
+`validWithoutThreads` are WebAssembly's own validation.
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_leaves_no_atomics : Prop :=
-  ∀ m : ByteArray, validate m = true →
-    validWithoutThreads (lowerAtomics m) = true ∧ lowerAtomics (lowerAtomics m) = lowerAtomics m ∧
-    (validWithoutThreads m = true → lowerAtomics m = m)
+  ∀ m m' : ByteArray, validate m = true → lowerAtomics m = .ok m' →
+    validWithoutThreads m' = true ∧ lowerAtomics m' = .ok m' ∧
+    (validWithoutThreads m = true → m' = m)
 
 /-- **Lowering rewrites each atomic and copies everything else.** In a module
 of any bodies of well-formed instructions, every non-atomic instruction and every local declaration is
 kept byte for byte, every atomic instruction becomes its documented
 replacement, and one helper per atomic operation and width follows the
 functions, numbered in order of first use after the imported and defined
-ones.
+ones. Of the model, but not yet proved: its hypotheses are WebAssembly's
+binary grammar (`oneInstruction`, `localDeclarations`), which a proof needs
+as a Lean definition the model's `skipInstruction` reads exactly.
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_rewrites_atomics : Prop :=
   ∀ (memory64 : Bool) (types imported : Nat) (bodies : List Body),
     (∀ b ∈ bodies, localDeclarations b.1 = true ∧ ∀ i ∈ b.2, i.WellFormed) →
     let keys := (bodies.flatMap fun b => b.2.filterMap Instr.helper?).eraseDups
     let index := fun sub => imported + bodies.length + keys.idxOf sub
-    ∃ out, codeBodies (lowerAtomics (bytes (moduleOf memory64 types imported bodies))) = some out ∧
+    ∃ m out, lowerAtomics (bytes (moduleOf memory64 types imported bodies)) = .ok m ∧ codeBodies m = some out ∧
       out.length = bodies.length + keys.length ∧
       out.take bodies.length = bodies.map fun (locals, is) => locals ++ is.flatMap (Instr.lowered memory64 index) ++ [0x0b]
-
-/-- **A component splices the core module and gives it back.** For a core
-module, extracting the core of its component gives the module, and making
-the template from the component and the module gives the shipped template.
-Tested by: test/wasi-component.test.mjs -/
-def componentize_inverse : Prop :=
-  ∀ core : ByteArray, core.data.toList.take 8 = moduleHeader →
-    extractCore (componentize core) = some core ∧ makeTemplate (componentize core) core = some proxyTemplate
 
 /-! ## Function packages -/
 
@@ -271,13 +180,5 @@ def zip_reads_back : Prop :=
       (∀ d ∈ read.take (directoriesOf entries).length, d.mode = 0o40755 ∧ d.data.size = 0 ∧ d.method = 0) ∧
       ∀ x ∈ (read.drop (directoriesOf entries).length).zip entries,
         x.1.data = x.2.data ∧ x.1.mode = 0o100000 ||| x.2.mode.getD 0o644
-
-/-- **`zip` is deterministic.** The archive depends on the entries alone (no
-clock, no host state). Stated of a Lean function this holds by `rfl`; it is
-the assumption a model of `zip` makes, which the test checks of the
-JavaScript.
-Tested by: test/serverless-zip.test.mjs -/
-def zip_deterministic : Prop :=
-  ∀ entries : List ZipEntry, zip entries = zip entries
 
 end Lasm.Cli.Candidates

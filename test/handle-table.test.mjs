@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { HandleTable } from '../src/handle-table.mjs';
+import { forAll } from './helpers/property.mjs';
 
 test('host IDs reach the signed Wasm boundary and wrap without losing live resources', () => {
   // Start near the actual ABI boundary instead of allocating billions of IDs.
@@ -46,4 +47,30 @@ test('handle ranges must be positive signed i32 integers in order', () => {
   assert.equal(single.allocate('only'), 7);
   assert.throws(() => single.allocate('more'), error => error.code === 'EMFILE' && error.message === 'Host resource handle table is full');
   assert.equal(new HandleTable().allocate('first'), 1);
+});
+
+// Proposition: Lasm.Cli.Spec.handle_fresh_in_range
+//   ∀ (t t' : HandleTable) (value : String) (id : Nat), t.allocate value = .ok (id, t') →
+//     t.has id = false ∧ t'.entries = t.entries ++ [(id, value)] ∧ t'.first = t.first ∧ t'.last = t.last ∧
+//     (t.first ≤ t.next → t.next ≤ t.last → t.first ≤ id ∧ id ≤ t.last ∧ t'.first ≤ t'.next ∧ t'.next ≤ t'.last)
+test('an allocated handle is fresh, in range, and added after every entry', () => {
+  forAll(r => {
+    const first = r.int(1, 5), last = first + r.int(0, 4);
+    return { first, last, ops: r.array(r.int(1, 20), () => r.next() < 0.6 ? ['allocate'] : ['delete', r.int(0, 10)]) };
+  }, ({ first, last, ops }) => {
+    const table = new HandleTable({ first, last, entries: [[0, 'reserved']] });
+    for (const [op, id] of ops) {
+      if (op === 'delete') { table.delete(id); continue; }
+      const before = [...table.entries()];
+      let got;
+      try { got = table.allocate(op); } catch (error) {
+        assert.equal(error.code, 'EMFILE');
+        for (let i = first; i <= last; i++) assert.ok(table.has(i));
+        continue;
+      }
+      assert.ok(!before.some(([k]) => k === got));
+      assert.ok(first <= got && got <= last);
+      assert.deepEqual([...table.entries()], [...before, [got, op]]);
+    }
+  });
 });

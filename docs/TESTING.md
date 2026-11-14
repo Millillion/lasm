@@ -1187,20 +1187,47 @@ then proved of the model and moves to `verification/cli/Lasm/Cli/Spec.lean`
 with its theorem in `Theorems.lean`, checked by `scripts/library-proofs.mjs`
 like the library's, and its test cites `Lasm.Cli.Spec.…`. Since 2026-11-11:
 `numbers` (src/node-host.mjs), `changedFiles` (src/dev.mjs),
-`responseFile` (src/platform.mjs), `replaceCoreModule` and
-`withoutComponentType` (src/wasi/wasi-component.mjs), and
+`responseFile` (src/platform.mjs), `replaceCoreModule`,
+`withoutComponentType` and since 2026-11-12 `componentize`, `makeTemplate`
+and `extractCore` (src/wasi/wasi-component.mjs, the template an argument),
+and
 `initializationSchedule` and `compactInitializerWrappers`
 (src/edge/edge-initializers.mjs), and `builtinModuleClosure`
 (src/edge/builtin-modules.mjs; the differential writes the builtin files in
-every import form, with decoys), with `numbers_le64`,
+every import form, with decoys), `zip` (src/serverless/zip.mjs, byte for byte, with `node:zlib`'s deflate
+and CRC-32 a parameter), the launcher configuration on both sides
+(`encodeProcessConfiguration`, src/process-launcher.mjs, and the native
+launcher's reading of it, native/process-launcher.c: the differential
+compiles the C with its effects reported instead of performed,
+test/models/process-launcher-harness.c, and runs it on encodings and
+corruptions of them), `HandleTable` (src/handle-table.mjs, on random
+sequences of allocations, deletions and sets), Lasm.JS's framing between its
+C glues and the hosts (library/c/lasm_js_framing.h, compiled with
+test/models/js-framing-harness.c as is and with a 32-bit `size_t`, wasm32's;
+`encodeEvents`, `splitRequest` and `intoPrefix` of src/node-js.mjs and
+src/edge/edge-js.mjs), and the whole command-line parser,
+src/cli-arguments.mjs (`parseLasmArguments`, `editDistance`, `closest`,
+`targetHint`; what it imports, the parsers of `lasm init`, `lasm dev` and
+`lasm package`, `existsSync` and the runtime, is a parameter of the model),
+with `numbers_le64`,
 `changed_files_exact`, `response_file_round_trip`,
 `replace_one_core_module`, `drops_only_component_type` and
 `schedule_reached_kept_first` and `builtin_closure` (the depth-first walks
-are correct on acyclic graphs) proved. The
+are correct on acyclic graphs), `run_args_kept`, `unknown_flag_refused`,
+`edit_distance_metric`, `closest_nearest_first`, `zip_deterministic`, `launcher_config_round_trip`, `handle_fresh_in_range`, `events_read_back`, `request_read_back`, `into_read_back`, `lean_at_least_lexicographic` and `componentize_inverse`
+(for any template of the shipped one's shape, which the test checks) proved. The
 differentials have found three bugs: `replaceCoreModule` spliced a section
 whose size was a padded LEB128 at the wrong offset, and
 `builtinModuleClosure` missed side-effect imports (`import './x.mjs'`) and
-read an import commented out after a statement as real. The fuzz
+read an import commented out after a statement as real. Modelling the
+parser found three more: `editDistance` counted UTF-16 units (an emoji was
+two edits, against `edit_distance_metric` over characters), suggestions
+lowercased with Unicode case mapping (the Kelvin sign matched `k`), and
+`--output=VALUE` refused a value with a line break (the pattern's `.`). The
+framing's found one: the glues' event reader checked `offset + size` against
+the batch, which wraps with a 32-bit `size_t` for a size near 2³², so a
+malformed completion passed and the glue read past the batch
+(test/lasm-js-framing.test.mjs). The fuzz
 targets `serverless-http`, `lasm-js-wire` and `ui-decode` are the model
 differentials of src/serverless/, the Lasm.JS codec and the UI applier's
 reading.

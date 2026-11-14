@@ -1,5 +1,5 @@
 /-
-# src/wasi/wasi-component.mjs, in Lean: `replaceCoreModule`, `withoutComponentType`
+# src/wasi/wasi-component.mjs, in Lean
 
 A model of the JavaScript, checked against it on generated inputs by
 test/models/cli-differential.mjs (the `cli-models` workflow).
@@ -12,7 +12,15 @@ Lasm.Cli.Theorems proves its propositions.
 | `sections(bytes)`                     | `isComponentHeader`, `parseSections`  |
 | `startsWith(a, prefix)`               | `List.isPrefixOf`                     |
 | `replaceCoreModule(c, prefix, to)`    | `replaceCoreModule`                   |
+| `placeholderModule()`                 | `placeholderModule`                   |
+| `componentize(core, template)`        | `componentize`                        |
+| `makeTemplate(component, core)`       | `makeTemplate`                        |
+| `extractCore(component, template)`    | `extractCore`                         |
 | `withoutComponentType(module)`        | `withoutComponentType`, `keepSections` |
+
+The template that `componentize` and `extractCore` read by default
+(`readFileSync(templateUrl)`, src/wasi/component/proxy-template.wasm) is an
+argument here, as the JavaScript also takes it.
 
 Reading guide. The JavaScript walks a `Uint8Array` by offsets; the model
 walks the list of bytes that remain, so that `bytes.subarray(a, b)` is a
@@ -57,6 +65,7 @@ structure Section where
   id : UInt8
   raw : List UInt8
   body : List UInt8
+deriving Inhabited
 
 /-- `sections(bytes)` after the header: each section in order, or `none`
 where the JavaScript throws (a section that runs past the end). -/
@@ -101,6 +110,54 @@ core module section that starts with `prefix` replaced by `to` followed by
 the rest of that section, or the message it throws. -/
 def replaceCoreModule (c pfx to : ByteArray) : Except String ByteArray :=
   (replaceCoreModuleL c.data.toList pfx.data.toList to.data.toList).map fun l => ⟨l.toArray⟩
+
+/-- `placeholderModule()`: the template's stand-in for the main module, an
+empty module with one custom section named `lasm:main-module` and no
+payload (`[0, payload.length, ...payload]` with `payload = [name.length,
+...name]`). -/
+def placeholderModule : List UInt8 :=
+  let name := "lasm:main-module".toUTF8.data.toList
+  let payload := name.length.toUInt8 :: name
+  [0, 0x61, 0x73, 0x6d, 1, 0, 0, 0, 0, payload.length.toUInt8] ++ payload
+
+/-- `componentize(core, template)`: the template with its placeholder module
+replaced by `core`. -/
+def componentize (core template : ByteArray) : Except String ByteArray :=
+  replaceCoreModule template ⟨placeholderModule.toArray⟩ core
+
+/-- `makeTemplate(component, core)`: the component with `core` replaced by
+the placeholder. -/
+def makeTemplate (component core : ByteArray) : Except String ByteArray :=
+  replaceCoreModule component core ⟨placeholderModule.toArray⟩
+
+/-- `sections(bytes)`: the sections after the header, or the message it
+throws. -/
+def sectionsOf (c : List UInt8) : Except String (List Section) :=
+  if !isComponentHeader c then .error notAComponent else
+  match parseSections (c.drop 8) with
+  | none => .error notAComponent
+  | some secs => .ok secs
+
+/-- `extractCore(component, template)` on lists of bytes: the template's
+first core module that starts with the placeholder gives the index among
+core modules and the length of the suffix after the placeholder; the core is
+the component's core module at that index without that suffix
+(`c.slice(start, end - suffixLength)`, empty when the end comes first). A
+component with fewer core modules makes `main` undefined: the JavaScript
+throws a `TypeError` reading `main.start`. -/
+def extractCoreL (c t : List UInt8) : Except String (List UInt8) := do
+  let modules := (← sectionsOf t).filter (·.id == 1)
+  match modules.findIdx? (fun s => placeholderModule.isPrefixOf s.body) with
+  | none => .error "The component template has no placeholder module"
+  | some index =>
+    let suffixLength := (modules.getD index default).body.length - placeholderModule.length
+    match ((← sectionsOf c).filter (·.id == 1))[index]? with
+    | none => .error "Cannot read properties of undefined (reading 'start')"
+    | some main => .ok (main.body.take (main.body.length - suffixLength))
+
+/-- `extractCore(component, template)`, or the message it throws. -/
+def extractCore (component template : ByteArray) : Except String ByteArray :=
+  (extractCoreL component.data.toList template.data.toList).map fun l => ⟨l.toArray⟩
 
 /-- The UTF-8 bytes of `component-type`. -/
 def componentTypeBytes : List UInt8 := [99, 111, 109, 112, 111, 110, 101, 110, 116, 45, 116, 121, 112, 101]

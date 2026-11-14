@@ -28,11 +28,20 @@ the vocabulary the statements share, exact and complete.
 -/
 import Lean.Data.Json
 import Lasm.Cli.Model.BuiltinModules
+import Lasm.Cli.Model.CliArguments
 import Lasm.Cli.Model.Dev
 import Lasm.Cli.Model.EdgeInitializers
+import Lasm.Cli.Model.HandleTable
+import Lasm.Cli.Model.JsFraming
+import Lasm.Cli.Model.LeanIOErrors
+import Lasm.Cli.Model.Init
+import Lasm.Cli.Model.LowerAtomics
 import Lasm.Cli.Model.NodeHost
+import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
+import Lasm.Cli.Model.ProcessLauncher
 import Lasm.Cli.Model.WasiComponent
+import Lasm.Cli.Model.Zip
 
 namespace Lasm.Cli
 
@@ -91,44 +100,51 @@ def utf16 (s : String) : List Nat :=
 
 /-! ## The command line (src/cli-arguments.mjs, src/platform.mjs) -/
 
-/-- What `parseLasmArguments` returns on success: a plain object. -/
-opaque Parsed : Type
+-- `parseLasmArguments`, `editDistance`, `closest`, `buildTargets` and what
+-- `parseLasmArguments` returns (`Parsed`, a structure of the object's
+-- fields) are modelled in Model/CliArguments.lean; the parsers of `lasm
+-- init`, `lasm dev` and `lasm package` (`parseInitArguments`,
+-- `parseDevArgumentsWith`, `parsePackageArguments`) and their tables
+-- (`templates`, `deployTargets`, `devTargets`, `packageTargets`) in
+-- Model/Init.lean, Model/Dev.lean and Model/Package.lean. The models take
+-- what they import from outside as a parameter; here it is the constants
+-- below.
 
-/-- `parsed.command`. -/
-opaque Parsed.command : Parsed → String
-/-- `parsed.input` (`""` when absent). -/
-opaque Parsed.input : Parsed → String
-/-- `parsed.args`, the application arguments. -/
-opaque Parsed.args : Parsed → List String
-/-- `parsed.rebuild`. -/
-opaque Parsed.rebuild : Parsed → Bool
-/-- `parsed.verbose`. -/
-opaque Parsed.verbose : Parsed → Bool
-/-- `parsed.profile`: `"dev"` or `"release"`. -/
-opaque Parsed.profile : Parsed → String
-/-- `parsed.target` (`""` when absent). -/
-opaque Parsed.target : Parsed → String
-/-- `parsed.template` (`lasm init`; `""` when absent). -/
-opaque Parsed.template : Parsed → String
-/-- `parsed.deploy` (`lasm init`). -/
-opaque Parsed.deploy : Parsed → List String
-/-- `parsed.outputs` of `lasm dev`: each output's target and input. -/
-opaque Parsed.outputs : Parsed → List (String × String)
+/-- `existsSync(path)` (node:fs): whether a file exists, in the working
+directory the CLI runs in. -/
+opaque fileExists : String → Bool
+/-- `jsRuntime` (src/js-runtime.mjs): the runtime the CLI runs on. Lasm
+cannot know which; the module's three branches can return only `"node"`,
+`"bun"` or `"deno"`, which the type records. -/
+opaque jsRuntimeOf : { s : String // s = "node" ∨ s = "bun" ∨ s = "deno" } := ⟨"node", .inl rfl⟩
+/-- `jsRuntime`. -/
+def jsRuntime : String := jsRuntimeOf.val
+/-- `parseDevArguments(tokens)` (src/dev.mjs), on the runtime the CLI runs on. -/
+def parseDevArguments : List String → Except String Parsed := parseDevArgumentsWith jsRuntime
 
 /-- `parseLasmArguments(argv)`: the parse, or the message of the `Error` it
 throws. -/
-opaque parseLasmArguments : List String → Except String Parsed
+def parseLasmArguments (argv : List String) : Except String Parsed :=
+  parseLasmArgumentsWith ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩ argv
 
-/-- `buildTargets` (src/cli-arguments.mjs). -/
-opaque buildTargets : List String
-/-- `templates` of `lasm init` (src/init.mjs), by name. -/
-opaque templates : List String
-/-- `deployTargets` of `lasm init` (src/init.mjs), by name. -/
-opaque deployTargets : List String
-/-- `packageTargets` (src/package.mjs), by name. -/
-opaque packageTargets : List String
-/-- `devTargets` (src/dev.mjs). -/
-opaque devTargets : List String
+/-- `parsed.input` (`""` when absent). -/
+def Parsed.input (p : Parsed) : String := p.input?.getD ""
+/-- `parsed.args`, the application arguments (`[]` when absent). -/
+def Parsed.args (p : Parsed) : List String := p.args?.getD []
+/-- `parsed.rebuild` (`false` when absent). -/
+def Parsed.rebuild (p : Parsed) : Bool := p.rebuild?.getD false
+/-- `parsed.verbose` (`false` when absent). -/
+def Parsed.verbose (p : Parsed) : Bool := p.verbose?.getD false
+/-- `parsed.profile`: `"dev"` or `"release"` (`""` when absent). -/
+def Parsed.profile (p : Parsed) : String := p.profile?.getD ""
+/-- `parsed.target` (`""` when absent). -/
+def Parsed.target (p : Parsed) : String := p.target?.getD ""
+/-- `parsed.template` (`lasm init`; `""` when absent). -/
+def Parsed.template (p : Parsed) : String := p.template?.getD ""
+/-- `parsed.deploy` (`lasm init`). -/
+def Parsed.deploy (p : Parsed) : List String := p.deploy?.getD []
+/-- `parsed.outputs` of `lasm dev`: each output's target and input. -/
+def Parsed.outputs (p : Parsed) : List (String × String) := p.outputs?.getD []
 
 /-- The commands a parse can name. -/
 def commands : List String :=
@@ -156,11 +172,8 @@ def joined : List String → List String
   | [f, v] => if f ∈ valuedFlags then [f ++ "=" ++ v] else [f, v]
   | o => o
 
-/-- `editDistance(a, b)`: the Levenshtein distance. -/
-opaque editDistance : String → String → Nat
-
-/-- `closest(word, candidates)`. -/
-opaque closest : String → List String → Option String
+-- `editDistance(a, b)` (the Levenshtein distance between code points) and
+-- `closest(word, candidates)`: modelled in Model/CliArguments.lean.
 
 /-- How far a suggestion may be: at least 2 edits, else a third of its length. -/
 def threshold (c : String) : Nat := max 2 (c.length / 3)
@@ -190,23 +203,9 @@ def unquote (line : String) : Option String :=
 
 /-! ## The process launcher (src/process-launcher.mjs) -/
 
-/-- The options of `encodeProcessConfiguration` (command, arguments,
-environment in order, working directories, the three stdio flags). -/
-structure LaunchOptions where
-  command : String
-  args : List String
-  env : List (String × String)
-  directory : Option String
-  requestedCwd : Option String
-  stdio : List UInt32
-
-/-- `encodeProcessConfiguration(options)`. -/
-opaque encodeProcessConfiguration : LaunchOptions → ByteArray
-
-/-- Not Lasm's JavaScript: how the native launcher (native/process-launcher.c)
-reads a configuration, as the test transcribes it (`decode`): the argument
-vector, the environment, the two directories and the stdio flags. -/
-opaque launcherReads : ByteArray → Option (List String × List (String × String) × Option String × Option String × List UInt32)
+-- `encodeProcessConfiguration(options)` (src/process-launcher.mjs) and the
+-- launcher's reading of it (native/process-launcher.c): modelled in
+-- Model/ProcessLauncher.lean.
 
 /-! ## Builds: names, initializers, builtin modules -/
 
@@ -282,8 +281,8 @@ opaque staticServe : String → String → Nat × Option String
 
 /-! ## The Node host (src/lean-io-errors.mjs, src/node-host.mjs) -/
 
-/-- `leanAtLeast(version, minimum)`. -/
-opaque leanAtLeast : String → String → Bool
+/-- `leanAtLeast(version, minimum)`: modelled in Model/LeanIOErrors.lean. -/
+def leanAtLeast (version minimum : String) : Bool := leanAtLeastModel version minimum
 
 /-- `major.minor.patch`. -/
 def versionText (v : Nat × Nat × Nat) : String := s!"{v.1}.{v.2.1}.{v.2.2}"
@@ -320,8 +319,9 @@ opaque comparePythonStrings : String → String → Int
 
 /-! ## WebAssembly (src/wasi/lower-atomics.mjs, src/wasi/wasi-component.mjs) -/
 
-/-- `lowerAtomics(bytes)`. -/
-opaque lowerAtomics : ByteArray → ByteArray
+/-- `lowerAtomics(bytes)`, or the message it throws: modelled in
+Model/LowerAtomics.lean. -/
+def lowerAtomics (m : ByteArray) : Except String ByteArray := LowerAtomics.lowerAtomics m
 
 /-- Not Lasm's JavaScript: `WebAssembly.validate`, the threads proposal on. -/
 opaque validate : ByteArray → Bool
@@ -426,10 +426,11 @@ declarations (a vector of counts and value types). -/
 opaque localDeclarations : List UInt8 → Bool
 
 /-- An instruction as the lowering must read it: a non-atomic one is one
-instruction that is not `0xfe`-prefixed; an atomic one other than the fence
+instruction that is not `0xfe`-prefixed, nor a SIMD (`0xfd`) or GC (`0xfb`)
+one, which the lowering refuses; an atomic one other than the fence
 (`sub` 3) is one instruction whose memarg has the given offset. -/
 def Instr.WellFormed : Instr → Prop
-  | .plain e => oneInstruction e = true ∧ e.head? ≠ some 0xfe
+  | .plain e => oneInstruction e = true ∧ e.head? ≠ some 0xfe ∧ e.head? ≠ some 0xfd ∧ e.head? ≠ some 0xfb
   | .fence => True
   | .atomic sub m off => oneInstruction (0xfe :: leb sub ++ m) = true ∧ sub ≠ 3 ∧ memargOffset m = some off
 
@@ -439,17 +440,9 @@ def codeBodies (m : ByteArray) : Option (List (List UInt8)) := do
   let (n, r) ← readLeb body
   readSized n r
 
-/-- `componentize(core)`: the wasi-http component of a core module, made from
-the shipped template. -/
-opaque componentize : ByteArray → ByteArray
-/-- `extractCore(component)`, or `none` where it throws. -/
-opaque extractCore : ByteArray → Option ByteArray
-/-- `makeTemplate(component, core)`, or `none` where it throws. -/
-opaque makeTemplate : ByteArray → ByteArray → Option ByteArray
-/-- The shipped template, src/wasi/component/proxy-template.wasm. -/
-opaque proxyTemplate : ByteArray
--- `replaceCoreModule(component, prefix, to)` and `withoutComponentType(module)`:
--- modelled in Model/WasiComponent.lean.
+-- `replaceCoreModule(component, prefix, to)`, `componentize(core, template)`,
+-- `makeTemplate(component, core)`, `extractCore(component, template)` and
+-- `withoutComponentType(module)`: modelled in Model/WasiComponent.lean.
 
 /-- A section of a core module: a custom section (its name and contents) or
 any other (its id and body). -/
@@ -469,11 +462,8 @@ def Sec.componentType : Sec → Bool
 
 /-! ## Function packages (src/serverless/zip.mjs) -/
 
-/-- An entry given to `zip`: its name, its bytes, its permissions if set. -/
-structure ZipEntry where
-  name : String
-  data : ByteArray
-  mode : Option Nat
+-- `ZipEntry` and `zip(entries)`: modelled in Model/Zip.lean, with what the
+-- module imports from `node:zlib` as a parameter, here `nodeZlib`.
 
 /-- An entry a ZIP reader reads: name, bytes, Unix mode, method. -/
 structure ReadEntry where
@@ -482,8 +472,12 @@ structure ReadEntry where
   mode : Nat
   method : Nat
 
+/-- Not Lasm's JavaScript: `deflateRawSync(data, { level: 9 })` and
+`crc32(data)` of `node:zlib`. -/
+opaque nodeZlib : ZipCodec
+
 /-- `zip(entries)`, or the message it throws. -/
-opaque zip : List ZipEntry → Except String ByteArray
+def zip (entries : List ZipEntry) : Except String ByteArray := zipWith nodeZlib entries
 
 /-- Not Lasm's JavaScript: a ZIP reader written from APPNOTE.TXT 6.3.10 (the
 test's `unzip`): the entries in the central directory's order. -/
