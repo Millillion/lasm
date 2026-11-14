@@ -8,8 +8,8 @@ Linux x64 only. Everything here ran through installed candidate
 `0.1.0-experimental.54` (SHA-256 `567ea838…aad77`, release
 `node-linux-candidate-38986393273`) in stock Node 26.12.0, built by its default
 Node link driver. Full evidence:
-[baseline](evidence/server-mvp-lean-4.35.0-baseline-2026-10-17.json) and
-[topical inventory](evidence/lean-4.35.0-server-mvp-inventory.json). **These are
+[baseline](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/server-mvp-lean-4.35.0-baseline-2026-10-17.json) and
+[topical inventory](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.35.0-server-mvp-inventory.json). **These are
 extra deployed runtime re-checks of upstream tests.** The upstream registrations
 stay native build-time tests, and none of this counts as an upstream suite pass.
 
@@ -134,16 +134,16 @@ Recorded 2026-10-17. **Not yet met for Lasm:** load and fault behaviour match
 native Lean on all five targets, but candidate `.54` servers leak memory until
 stopped. Two Lasm leaks were found and fixed in reviewed-pending source; with both
 fixes Windows passes every check and the remaining Linux/macOS growth is ~1 KiB per
-request (open). Evidence: [robustness runs](evidence/server-mvp-robustness-2026-10-17.json),
-[leak reproductions](evidence/server-mvp-host-leaks-2026-10-17.json).
+request (open). Evidence: [robustness runs](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/server-mvp-robustness-2026-10-17.json),
+[leak reproductions](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/server-mvp-host-leaks-2026-10-17.json).
 
 Update 2026-10-19: a third leak was found (native file workers, fix 3 below), and the
 send fix has a CI-rebuilt runtime. With all three fixes, Lasm has no memory caps and
 passes load and faults on all five targets. Windows passes the soak. Linux and macOS
 still grow 296–602 B per request and fail the 256 B/request slope check (run
 [39239133744](https://github.com/Millillion/lasm/actions/runs/39239133744), table below).
-Evidence: [run](evidence/server-mvp-robustness-runtime-2026-10-19.json),
-[residual analysis](evidence/server-mvp-residual-leak-2026-10-19.json).
+Evidence: [run](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/server-mvp-robustness-runtime-2026-10-19.json),
+[residual analysis](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/server-mvp-residual-leak-2026-10-19.json).
 
 ### Harness
 
@@ -391,7 +391,7 @@ as a resource stop, and the Windows connection levels were changed.
 A measurement pass, with no product changes. It was run on Linux x64 only, on the local
 host, with the `full` build of the robustness fixture (`.54` plus both pending fixes)
 and native Lean 4.35.0 (`leanc -O2`). Evidence:
-[server-mvp-profile-2026-10-17.json](evidence/server-mvp-profile-2026-10-17.json).
+[server-mvp-profile-2026-10-17.json](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/server-mvp-profile-2026-10-17.json).
 Tools:
 - `scripts/server-mvp/profile.mjs` runs the measurements under `run-bounded.mjs`.
 - `profile-instrument.mjs` makes an instrumented copy of `program.cjs`. It counts every
@@ -527,7 +527,7 @@ the available path.
 
 Linux x64, local, `profile.mjs` load phase on the robustness fixture (8 s per row,
 same-run native control). Evidence:
-[server-mvp-performance-2026-10-19.json](evidence/server-mvp-performance-2026-10-19.json).
+[server-mvp-performance-2026-10-19.json](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/server-mvp-performance-2026-10-19.json).
 
 | Step | RPCs/request (health) | ELU c=16 | req/s c=16 (native) | p50/p99 ms c=16 (native) | p50 ms c=1 (native) |
 | --- | ---: | ---: | --- | --- | --- |
@@ -667,7 +667,7 @@ CI-rebuilt runtime `84934c27…` (handoff `node-runtime-inputs-39287146914`, sou
 `d20932e`; only `liblasmhost.a`'s `node-async.cpp.o` differs from `36cf596b…`, and it is
 byte-identical to the local object `f04c7e92…`) plus `patches/server-transport.patch`
 (steps 1–3). Load 30 s per level, soak 900 s. Evidence:
-[run](evidence/server-mvp-robustness-transport-2026-10-19.json).
+[run](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/server-mvp-robustness-transport-2026-10-19.json).
 
 | Platform | Lasm req/s c=16 (native, ratio) | p99 ms c=16 (native) | req/s c=64, Win 32 (native, ratio) | p99 ms (native) | Lasm soak B/request (native) | Passed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -732,7 +732,7 @@ with candidate `.39891445495`, `GET /hello/Ada`, keep-alive closed loop from a
 Node client on the same host (Linux x64, 12 threads, i7-9750H), 8 s × 2 rounds,
 every Lasm server run from an instrumented copy that counts host RPCs
 ([`http-position.mjs`](../scripts/server-mvp/http-position.mjs); evidence:
-[std-http-position-2026-10-23.json](evidence/std-http-position-2026-10-23.json)).
+[std-http-position-2026-10-23.json](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/std-http-position-2026-10-23.json)).
 The client limits plain Node here (the earlier raw-socket client measured
 43,000 req/s); the Lasm rows are server-bound (main-thread ELU 0.9–1.0).
 
@@ -758,7 +758,7 @@ per request: read the request, call `res.json`/`c.json`, reply, plus the interop
 poll. `Function.ofFnReply` lets a handler answer with `Function.Reply.callMethod res "json"
 #[body]`, which the host makes while processing the reply (one call fewer), and the
 templates read request fields with one `getFields`. Same host, same client, same
-run ([evidence](evidence/interop-reply-2026-10-23.json)):
+run ([evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/interop-reply-2026-10-23.json)):
 
 | Template (c=16) | Before: req/s, calls/request | With `ofFnReply` + `getFields`: req/s, calls/request |
 | --- | --- | --- |

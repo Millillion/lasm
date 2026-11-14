@@ -74,12 +74,12 @@ def generated_names_valid : Prop :=
 
 /-- **No request path reaches a file outside the root.** Whatever the path
 (`..`, encoded dots and slashes, sibling directories that share the root's
-name as a prefix), the static server answers 200, 403 or 404, and a file it
-serves lies under the root directory.
+name as a prefix, malformed percent-encoding), the static server answers 200,
+400, 403 or 404, and a file it serves lies under the root directory.
 Tested by: test/static-server.test.mjs -/
 def static_inside_root : Prop :=
   ∀ root path : String,
-    (staticServe root path).1 ∈ [200, 403, 404] ∧
+    (staticServe root path).1 ∈ [200, 400, 403, 404] ∧
     ∀ f, (staticServe root path).2 = some f → f.startsWith (root ++ "/")
 
 /-- **The proxy sends each request to the server program once, unchanged.**
@@ -274,5 +274,21 @@ def zip_reads_back : Prop :=
       (∀ d ∈ read.take (directoriesOf entries).length, d.mode = 0o40755 ∧ d.data.size = 0 ∧ d.method = 0) ∧
       ∀ x ∈ (read.drop (directoriesOf entries).length).zip entries,
         x.1.data = x.2.data ∧ x.1.mode = 0o100000 ||| x.2.mode.getD 0o644
+
+/-! ## The glue program -/
+
+/-- **The glue's fields round-trip.** Any list of fields, encoded as the glue
+program reads its request, is read back exactly as the same list, whatever
+the fields hold (digits, `:`, line ends, non-ASCII, nothing).
+Tested by: test/glue.test.mjs -/
+def glue_fields_round_trip : Prop :=
+  ∀ fields : List String, decodeFields (encodeFields fields) = .ok fields
+
+/-- **A glue request carries its fields.** Lists of fields, encoded as a
+request, carry exactly their fields in order, whichever format the encoding
+chose (a table of distinct fields, or lengths when a field holds a 0 byte).
+Tested by: test/glue.test.mjs -/
+def glue_request_fields : Prop :=
+  ∀ lists : List (List String), requestFields (encodeRequest lists) = lists.flatten
 
 end Lasm.Cli.Candidates

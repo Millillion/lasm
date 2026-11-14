@@ -183,9 +183,9 @@ The decisions and their alternatives are rows in [DECISIONS.md](DECISIONS.md).
 ## Measurements
 
 Measured in CI run 40293231963 (ubuntu-24.04 x64, a free GitHub runner;
-every check passed; [evidence](evidence/wasi-ci-40293231963.json)). The
+every check passed; [evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wasi-ci-40293231963.json)). The
 first measurements, before outbound requests and streaming, are in
-[run 40283046831's evidence](evidence/wasi-ci-40283046831.json).
+[run 40283046831's evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wasi-ci-40283046831.json).
 
 **Size.**
 

@@ -1,0 +1,944 @@
+{
+ "exchanges": [
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/accounts",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 216",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"id\":\"1\",\"ledger\":1,\"code\":10},{\"id\":\"2\",\"ledger\":1,\"code\":10,\"flags\":{\"debits_must_not_exceed_credits\":true}},{\"id\":\"3\",\"ledger\":2,\"code\":10},{\"id\":\"4\",\"ledger\":1,\"code\":10,\"user_data_128\":\"18446744073709551617\"}]"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"status\":\"created\"},{\"status\":\"created\"},{\"status\":\"created\"},{\"status\":\"created\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/accounts",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 376",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"id\":\"1\",\"ledger\":1,\"code\":10},{\"id\":\"1\",\"ledger\":1,\"code\":11},{\"id\":\"1\",\"ledger\":2,\"code\":10},{\"id\":\"0\",\"ledger\":1,\"code\":1},{\"id\":\"340282366920938463463374607431768211455\",\"ledger\":1,\"code\":1},{\"id\":\"9\",\"ledger\":0,\"code\":1},{\"id\":\"9\",\"ledger\":1,\"code\":0},{\"id\":\"9\",\"ledger\":1,\"code\":1,\"flags\":{\"debits_must_not_exceed_credits\":true,\"credits_must_not_exceed_debits\":true}}]"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"status\":\"exists\"},{\"status\":\"exists_with_different_code\"},{\"status\":\"exists_with_different_ledger\"},{\"status\":\"id_must_not_be_zero\"},{\"status\":\"id_must_not_be_int_max\"},{\"status\":\"ledger_must_not_be_zero\"},{\"status\":\"code_must_not_be_zero\"},{\"status\":\"flags_are_mutually_exclusive\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 95",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"id\":\"100\",\"debit_account_id\":\"1\",\"credit_account_id\":\"2\",\"amount\":\"50\",\"ledger\":1,\"code\":1}]"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"status\":\"created\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 95",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"id\":\"100\",\"debit_account_id\":\"1\",\"credit_account_id\":\"2\",\"amount\":\"50\",\"ledger\":1,\"code\":1}]"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"status\":\"exists\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 95",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"id\":\"100\",\"debit_account_id\":\"1\",\"credit_account_id\":\"2\",\"amount\":\"51\",\"ledger\":1,\"code\":1}]"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"status\":\"exists_with_different_amount\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/accounts/1",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"code\":10,\"credits_pending\":\"0\",\"credits_posted\":\"0\",\"debits_pending\":\"0\",\"debits_posted\":\"50\",\"flags\":{\"credits_must_not_exceed_debits\":false,\"debits_must_not_exceed_credits\":false,\"linked\":false},\"id\":\"1\",\"ledger\":1,\"timestamp\":\"<ts#1>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/accounts/2",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"code\":10,\"credits_pending\":\"0\",\"credits_posted\":\"50\",\"debits_pending\":\"0\",\"debits_posted\":\"0\",\"flags\":{\"credits_must_not_exceed_debits\":false,\"debits_must_not_exceed_credits\":true,\"linked\":false},\"id\":\"2\",\"ledger\":1,\"timestamp\":\"<ts#2>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 95",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"id\":\"101\",\"debit_account_id\":\"2\",\"credit_account_id\":\"1\",\"amount\":\"51\",\"ledger\":1,\"code\":1}]"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"status\":\"exceeds_credits\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 94",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"id\":\"101\",\"debit_account_id\":\"2\",\"credit_account_id\":\"1\",\"amount\":\"1\",\"ledger\":1,\"code\":1}]"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"status\":\"id_already_failed\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 854",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"debit_account_id\":\"1\",\"credit_account_id\":\"2\",\"amount\":\"1\",\"ledger\":1,\"code\":1,\"id\":\"0\"},{\"debit_account_id\":\"0\",\"credit_account_id\":\"2\",\"amount\":\"1\",\"ledger\":1,\"code\":1,\"id\":\"102\"},{\"debit_account_id\":\"1\",\"credit_account_id\":\"1\",\"amount\":\"1\",\"ledger\":1,\"code\":1,\"id\":\"103\"},{\"debit_account_id\":\"1\",\"credit_account_id\":\"2\",\"amount\":\"1\",\"ledger\":1,\"code\":1,\"id\":\"104\",\"pending_id\":\"5\"},{\"debit_account_id\":\"1\",\"credit_account_id\":\"2\",\"amount\":\"1\",\"ledger\":0,\"code\":1,\"id\":\"105\"},{\"debit_account_id\":\"1\",\"credit_account_id\":\"2\",\"amount\":\"1\",\"ledger\":1,\"code\":0,\"id\":\"106\"},{\"debit_account_id\":\"77\",\"credit_account_id\":\"2\",\"amount\":\"1\",\"ledger\":1,\"code\":1,\"id\":\"107\"},{\"debit_account_id\":\"1\",\"credit_account_id\":\"3\",\"amount\":\"1\",\"ledger\":1,\"code\":1,\"id\":\"108\"},{\"debit_account_id\":\"1\",\"credit_account_id\":\"2\",\"amount\":\"1\",\"ledger\":2,\"code\":1,\"id\":\"109\"}]"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"status\":\"id_must_not_be_zero\"},{\"status\":\"debit_account_id_must_not_be_zero\"},{\"status\":\"accounts_must_be_different\"},{\"status\":\"pending_id_must_be_zero\"},{\"status\":\"ledger_must_not_be_zero\"},{\"status\":\"code_must_not_be_zero\"},{\"status\":\"debit_account_not_found\"},{\"status\":\"accounts_must_have_the_same_ledger\"},{\"status\":\"transfer_must_have_the_same_ledger_as_accounts\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 239",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"debit_account_id\":\"1\",\"credit_account_id\":\"4\",\"amount\":\"30\",\"ledger\":1,\"code\":1,\"flags\":{\"pending\":true},\"id\":\"200\"},{\"debit_account_id\":\"1\",\"credit_account_id\":\"4\",\"amount\":\"30\",\"ledger\":1,\"code\":1,\"flags\":{\"pending\":true},\"id\":\"201\"}]"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"status\":\"created\"},{\"status\":\"created\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/accounts/1",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"code\":10,\"credits_pending\":\"0\",\"credits_posted\":\"0\",\"debits_pending\":\"60\",\"debits_posted\":\"50\",\"flags\":{\"credits_must_not_exceed_debits\":false,\"debits_must_not_exceed_credits\":false,\"linked\":false},\"id\":\"1\",\"ledger\":1,\"timestamp\":\"<ts#1>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 507",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"id\":\"202\",\"pending_id\":\"200\",\"amount\":\"10\",\"flags\":{\"post_pending_transfer\":true}},{\"id\":\"203\",\"pending_id\":\"200\",\"amount\":\"0\",\"flags\":{\"void_pending_transfer\":true}},{\"id\":\"204\",\"pending_id\":\"201\",\"amount\":\"31\",\"flags\":{\"post_pending_transfer\":true}},{\"id\":\"205\",\"pending_id\":\"201\",\"amount\":\"0\",\"flags\":{\"void_pending_transfer\":true}},{\"id\":\"206\",\"pending_id\":\"100\",\"amount\":\"0\",\"flags\":{\"void_pending_transfer\":true}},{\"id\":\"207\",\"pending_id\":\"999\",\"amount\":\"0\",\"flags\":{\"void_pending_transfer\":true}}]"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"status\":\"created\"},{\"status\":\"pending_transfer_already_posted\"},{\"status\":\"exceeds_pending_transfer_amount\"},{\"status\":\"created\"},{\"status\":\"pending_transfer_not_pending\"},{\"status\":\"pending_transfer_not_found\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/accounts/1",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"code\":10,\"credits_pending\":\"0\",\"credits_posted\":\"0\",\"debits_pending\":\"0\",\"debits_posted\":\"60\",\"flags\":{\"credits_must_not_exceed_debits\":false,\"debits_must_not_exceed_credits\":false,\"linked\":false},\"id\":\"1\",\"ledger\":1,\"timestamp\":\"<ts#1>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 539",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"debit_account_id\":\"1\",\"credit_account_id\":\"4\",\"amount\":\"5\",\"ledger\":1,\"code\":1,\"id\":\"300\",\"flags\":{\"linked\":true}},{\"debit_account_id\":\"1\",\"credit_account_id\":\"4\",\"amount\":\"5\",\"ledger\":1,\"code\":1,\"id\":\"301\",\"flags\":{\"linked\":true}},{\"debit_account_id\":\"77\",\"credit_account_id\":\"4\",\"amount\":\"5\",\"ledger\":1,\"code\":1,\"id\":\"302\"},{\"debit_account_id\":\"1\",\"credit_account_id\":\"4\",\"amount\":\"5\",\"ledger\":1,\"code\":1,\"id\":\"303\"},{\"debit_account_id\":\"1\",\"credit_account_id\":\"4\",\"amount\":\"5\",\"ledger\":1,\"code\":1,\"id\":\"304\",\"flags\":{\"linked\":true}}]"
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"status\":\"linked_event_failed\"},{\"status\":\"linked_event_failed\"},{\"status\":\"debit_account_not_found\"},{\"status\":\"created\"},{\"status\":\"linked_event_chain_open\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/transfers/300",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 404,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"error\":\"no such transfer\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/transfers/303",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"amount\":\"5\",\"code\":1,\"credit_account_id\":\"4\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":false,\"post_pending_transfer\":false,\"void_pending_transfer\":false},\"id\":\"303\",\"ledger\":1,\"pending_id\":\"0\",\"timestamp\":\"<ts#10>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/accounts?ledger=2",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"code\":10,\"credits_pending\":\"0\",\"credits_posted\":\"0\",\"debits_pending\":\"0\",\"debits_posted\":\"0\",\"flags\":{\"credits_must_not_exceed_debits\":false,\"debits_must_not_exceed_credits\":false,\"linked\":false},\"id\":\"3\",\"ledger\":2,\"timestamp\":\"<ts#3>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/accounts/2/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"amount\":\"50\",\"code\":1,\"credit_account_id\":\"2\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":false,\"post_pending_transfer\":false,\"void_pending_transfer\":false},\"id\":\"100\",\"ledger\":1,\"pending_id\":\"0\",\"timestamp\":\"<ts#5>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/transfers?limit=2",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"amount\":\"50\",\"code\":1,\"credit_account_id\":\"2\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":false,\"post_pending_transfer\":false,\"void_pending_transfer\":false},\"id\":\"100\",\"ledger\":1,\"pending_id\":\"0\",\"timestamp\":\"<ts#5>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},{\"amount\":\"30\",\"code\":1,\"credit_account_id\":\"4\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":true,\"post_pending_transfer\":false,\"void_pending_transfer\":false},\"id\":\"200\",\"ledger\":1,\"pending_id\":\"0\",\"timestamp\":\"<ts#6>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/transfers?after=<ts#6>",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "[{\"amount\":\"30\",\"code\":1,\"credit_account_id\":\"4\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":true,\"post_pending_transfer\":false,\"void_pending_transfer\":false},\"id\":\"201\",\"ledger\":1,\"pending_id\":\"0\",\"timestamp\":\"<ts#7>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},{\"amount\":\"10\",\"code\":1,\"credit_account_id\":\"4\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":false,\"post_pending_transfer\":true,\"void_pending_transfer\":false},\"id\":\"202\",\"ledger\":1,\"pending_id\":\"200\",\"timestamp\":\"<ts#8>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},{\"amount\":\"30\",\"code\":1,\"credit_account_id\":\"4\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":false,\"post_pending_transfer\":false,\"void_pending_transfer\":true},\"id\":\"205\",\"ledger\":1,\"pending_id\":\"201\",\"timestamp\":\"<ts#9>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},{\"amount\":\"5\",\"code\":1,\"credit_account_id\":\"4\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":false,\"post_pending_transfer\":false,\"void_pending_transfer\":false},\"id\":\"303\",\"ledger\":1,\"pending_id\":\"0\",\"timestamp\":\"<ts#10>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"}]"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/transfers/202",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"amount\":\"10\",\"code\":1,\"credit_account_id\":\"4\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":false,\"post_pending_transfer\":true,\"void_pending_transfer\":false},\"id\":\"202\",\"ledger\":1,\"pending_id\":\"200\",\"timestamp\":\"<ts#8>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/journal",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/x-ndjson"
+    ],
+    "body": "{\"data\":{\"code\":10,\"credits_pending\":\"0\",\"credits_posted\":\"0\",\"debits_pending\":\"0\",\"debits_posted\":\"65\",\"flags\":{\"credits_must_not_exceed_debits\":false,\"debits_must_not_exceed_credits\":false,\"linked\":false},\"id\":\"1\",\"ledger\":1,\"timestamp\":\"<ts#1>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},\"type\":\"account\"}\n{\"data\":{\"code\":10,\"credits_pending\":\"0\",\"credits_posted\":\"50\",\"debits_pending\":\"0\",\"debits_posted\":\"0\",\"flags\":{\"credits_must_not_exceed_debits\":false,\"debits_must_not_exceed_credits\":true,\"linked\":false},\"id\":\"2\",\"ledger\":1,\"timestamp\":\"<ts#2>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},\"type\":\"account\"}\n{\"data\":{\"code\":10,\"credits_pending\":\"0\",\"credits_posted\":\"0\",\"debits_pending\":\"0\",\"debits_posted\":\"0\",\"flags\":{\"credits_must_not_exceed_debits\":false,\"debits_must_not_exceed_credits\":false,\"linked\":false},\"id\":\"3\",\"ledger\":2,\"timestamp\":\"<ts#3>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},\"type\":\"account\"}\n{\"data\":{\"code\":10,\"credits_pending\":\"0\",\"credits_posted\":\"15\",\"debits_pending\":\"0\",\"debits_posted\":\"0\",\"flags\":{\"credits_must_not_exceed_debits\":false,\"debits_must_not_exceed_credits\":false,\"linked\":false},\"id\":\"4\",\"ledger\":1,\"timestamp\":\"<ts#4>\",\"user_data_128\":\"18446744073709551617\",\"user_data_32\":0,\"user_data_64\":\"0\"},\"type\":\"account\"}\n{\"data\":{\"amount\":\"50\",\"code\":1,\"credit_account_id\":\"2\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":false,\"post_pending_transfer\":false,\"void_pending_transfer\":false},\"id\":\"100\",\"ledger\":1,\"pending_id\":\"0\",\"timestamp\":\"<ts#5>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},\"type\":\"transfer\"}\n{\"data\":{\"amount\":\"30\",\"code\":1,\"credit_account_id\":\"4\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":true,\"post_pending_transfer\":false,\"void_pending_transfer\":false},\"id\":\"200\",\"ledger\":1,\"pending_id\":\"0\",\"timestamp\":\"<ts#6>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},\"type\":\"transfer\"}\n{\"data\":{\"amount\":\"30\",\"code\":1,\"credit_account_id\":\"4\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":true,\"post_pending_transfer\":false,\"void_pending_transfer\":false},\"id\":\"201\",\"ledger\":1,\"pending_id\":\"0\",\"timestamp\":\"<ts#7>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},\"type\":\"transfer\"}\n{\"data\":{\"amount\":\"10\",\"code\":1,\"credit_account_id\":\"4\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":false,\"post_pending_transfer\":true,\"void_pending_transfer\":false},\"id\":\"202\",\"ledger\":1,\"pending_id\":\"200\",\"timestamp\":\"<ts#8>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},\"type\":\"transfer\"}\n{\"data\":{\"amount\":\"30\",\"code\":1,\"credit_account_id\":\"4\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":false,\"post_pending_transfer\":false,\"void_pending_transfer\":true},\"id\":\"205\",\"ledger\":1,\"pending_id\":\"201\",\"timestamp\":\"<ts#9>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},\"type\":\"transfer\"}\n{\"data\":{\"amount\":\"5\",\"code\":1,\"credit_account_id\":\"4\",\"debit_account_id\":\"1\",\"flags\":{\"linked\":false,\"pending\":false,\"post_pending_transfer\":false,\"void_pending_transfer\":false},\"id\":\"303\",\"ledger\":1,\"pending_id\":\"0\",\"timestamp\":\"<ts#10>\",\"user_data_128\":\"0\",\"user_data_32\":0,\"user_data_64\":\"0\"},\"type\":\"transfer\"}\n"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 24",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"id\":\"1\",\"timeout\":5}]"
+   },
+   "response": {
+    "status": 400,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"error\":\"[0]: unknown field timeout (Ledger implements a subset of TigerBeetle: see README.md)\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 1",
+     "content-type: text/plain;charset=UTF-8",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "["
+   },
+   "response": {
+    "status": 400,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"error\":\"the body is not valid JSON\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/accounts",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 33",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"id\":\"-1\",\"ledger\":1,\"code\":1}]"
+   },
+   "response": {
+    "status": 400,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"error\":\"[0].id: expected a decimal string\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/accounts",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 71",
+     "content-type: application/json",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"id\":\"3402823669209384634633746074317682114550\",\"ledger\":1,\"code\":1}]"
+   },
+   "response": {
+    "status": 400,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"error\":\"[0].id: out of range\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/nope",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 404,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"error\":\"not found\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "DELETE",
+    "path": "/api/accounts",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 405,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"error\":\"method not allowed\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/accounts/77",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 404,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"error\":\"no such account\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/accounts",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 72",
+     "content-type: text/plain;charset=UTF-8",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "{\"title\":\"x\",\"done\":false,\"tags\":[],\"priority\":33330000000049E026191701}"
+   },
+   "response": {
+    "status": 400,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"error\":\"the body is not valid JSON\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/transfers",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 72",
+     "content-type: text/plain;charset=UTF-8",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "{\"title\":\"x\",\"done\":false,\"tags\":[],\"priority\":33330000000049E026191701}"
+   },
+   "response": {
+    "status": 400,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"error\":\"the body is not valid JSON\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "POST",
+    "path": "/api/accounts",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "content-length: 38",
+     "content-type: text/plain;charset=UTF-8",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": "[{\"id\":\"9\",\"ledger\":1,\"code\":1e99999}]"
+   },
+   "response": {
+    "status": 400,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"error\":\"the body is not valid JSON\"}"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-cache",
+     "content-type: text/html; charset=utf-8",
+     "vary: accept-encoding"
+    ],
+    "body": "<!doctype html>\n<!-- Generated by Lasm (lasm build --target browser): the project has no index.html. Add one to customize the page; the loader is injected before </head>. -->\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>ledger</title>\n    <link rel=\"modulepreload\" href=\"./app.76df9cdf9afa.js\">\n    <link rel=\"preload\" href=\"./app.667bb9ba2a5c.wasm\" as=\"fetch\" type=\"application/wasm\" crossorigin>\n    <script type=\"module\" src=\"./app.76df9cdf9afa.js\"></script>\n  </head>\n  <body>\n    <div id=\"app\" data-lasm-app></div>\n    <noscript>This app needs JavaScript and WebAssembly.</noscript>\n  </body>\n</html>\n"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/app.js",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "cache-control: no-cache",
+     "content-type: text/javascript; charset=utf-8",
+     "vary: accept-encoding"
+    ],
+    "body": "// Generated by Lasm (lasm build --target browser): a stable name for app.76df9cdf9afa.js; serve it with a short cache lifetime.\nexport * from './app.76df9cdf9afa.js';\nexport { default } from './app.76df9cdf9afa.js';\n"
+   }
+  },
+  {
+   "request": {
+    "method": "GET",
+    "path": "/api/accounts/4",
+    "headers": [
+     "accept: */*",
+     "accept-encoding: gzip, deflate",
+     "accept-language: *",
+     "connection: keep-alive",
+     "sec-fetch-mode: cors",
+     "user-agent: node"
+    ],
+    "body": ""
+   },
+   "response": {
+    "status": 200,
+    "headers": [
+     "access-control-allow-headers: content-type",
+     "access-control-allow-methods: GET, POST, OPTIONS",
+     "access-control-allow-origin: *",
+     "content-type: application/json"
+    ],
+    "body": "{\"code\":10,\"credits_pending\":\"0\",\"credits_posted\":\"15\",\"debits_pending\":\"0\",\"debits_posted\":\"0\",\"flags\":{\"credits_must_not_exceed_debits\":false,\"debits_must_not_exceed_credits\":false,\"linked\":false},\"id\":\"4\",\"ledger\":1,\"timestamp\":\"<ts#4>\",\"user_data_128\":\"18446744073709551617\",\"user_data_32\":0,\"user_data_64\":\"0\"}"
+   }
+  }
+ ],
+ "facts": {
+  "timestamps": {
+   "count": 10,
+   "allAbove1e18": true
+  }
+ }
+}

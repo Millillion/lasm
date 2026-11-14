@@ -64,7 +64,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - name: The Lean model of src/serverless/ (serverless-http's oracle)
@@ -86,8 +86,9 @@ jobs:
         id: native
         env:
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        shell: bash
         run: |
-          if [ "$GITHUB_EVENT_NAME" = push ] || git diff --name-only "$BASE" HEAD | grep -qE '^(library/|src/wasi/|src/managed-lean\.mjs|src/lasm-library\.mjs|src/toolchains\.json|test/fuzz/|\.github/workflows/fuzz\.yml)'; then
+          if [ "$GITHUB_EVENT_NAME" = push ] || git diff --name-only "$BASE" HEAD | grep -E '^(library/|src/wasi/|src/managed-lean\.mjs|src/lasm-library\.mjs|src/toolchains\.json|test/fuzz/|\.github/workflows/fuzz\.yml)' >/dev/null; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
       - name: libFuzzer runtime
@@ -117,7 +118,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - name: The Lean model of src/serverless/ (the oracle)
