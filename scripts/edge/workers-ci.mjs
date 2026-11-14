@@ -23,6 +23,10 @@ mkdirSync(work, { recursive: true });
 const MiB = 1048576;
 // Workers Free plan (developers.cloudflare.com/workers/platform/limits, 2026-10-12).
 const budget = { bundleBytes: 64 * MiB, startupMs: 1000, cpuMsPerRequest: 10, memoryMiB: 128 };
+// Wasm memory of each app on Node, Deno and Bun, after startup and after its benchmark
+// (scripts/edge/check-worker.mjs): at most 8 MiB. Lasm's mimalloc build (2 MiB arenas)
+// keeps both apps at 4 MiB; Emscripten's libmimalloc (16 MiB arenas) started them at 26.6 MiB (#247).
+const heapLimitMiB = 8;
 const results = { budget, apps: {} };
 
 // The apps.
@@ -89,6 +93,7 @@ for (const [name, project, served, ports] of [['hono', hono, hono, [8787, 8889, 
     startup: node.startupMs < budget.startupMs,
     cpu: node.trivialMsPerRequest < budget.cpuMsPerRequest && node.jsonMsPerRequest < budget.cpuMsPerRequest,
     memory: node.wasmMemoryAfterMiB < budget.memoryMiB / 2,
+    heap: ['node', 'deno', 'bun'].every(engine => app[engine].wasmMemoryMiB <= heapLimitMiB && app[engine].wasmMemoryAfterMiB <= heapLimitMiB),
     vercelEdgeCode: app['vercel-edge'].bundle.gzipBytes < 1024 * 1024,
     netlifyEdgeCode: app['netlify-edge'].bundle.eszipBytes < 20 * 1024 * 1024,
   };
@@ -109,7 +114,7 @@ if (process.env.LASM_KEEP_LINK_WORK) {
 writeFileSync(join(work, 'workers-results.json'), JSON.stringify(results, null, 2) + '\n');
 const engines = ['workerd', 'node', 'deno', 'bun', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'bun-portable'];
 const rows = Object.entries(results.apps).map(([name, a]) => `| ${name} | ${(a.workerd.bundle.bytes / MiB).toFixed(2)} MiB (${(a.workerd.bundle.gzipBytes / 1024).toFixed(0)} KiB gzip); Vercel ${(a['vercel-edge'].bundle.gzipBytes / 1024).toFixed(0)} KiB gzip; Netlify eszip ${(a['netlify-edge'].bundle.eszipBytes / MiB).toFixed(2)} MiB; Deno Deploy ${(a['deno-deploy'].bundle.bytes / MiB).toFixed(2)} MiB | ${a.node.startupMs} / ${a.deno.startupMs} / ${a.bun.startupMs} ms | ${a.node.trivialMsPerRequest} / ${a.node.jsonMsPerRequest} ms | ${a.node.wasmMemoryAfterMiB} MiB | ${engines.map(e => `${e} ${a[e].passed ? 'pass' : 'FAIL'}`).join(', ')} |`);
-const summary = `### Edge targets (experimental)\n\n| App | Bundles (wrangler dry run; Vercel; Netlify; Deno Deploy) | Startup Node / Deno / Bun | Per request, trivial / heavier (Node) | Wasm memory | Checks |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\nBudgets: Workers Free (bundle < 64 MiB, startup < 1 s, CPU < 10 ms per request, memory < 128 MB), Vercel Edge Hobby (1 MB gzip), Netlify Edge (20 MB).\n`;
+const summary = `### Edge targets (experimental)\n\n| App | Bundles (wrangler dry run; Vercel; Netlify; Deno Deploy) | Startup Node / Deno / Bun | Per request, trivial / heavier (Node) | Wasm memory | Checks |\n| --- | --- | --- | --- | --- | --- |\n${rows.join('\n')}\n\nBudgets: Workers Free (bundle < 64 MiB, startup < 1 s, CPU < 10 ms per request, memory < 128 MB), Wasm memory at most ${heapLimitMiB} MiB on Node, Deno and Bun (#247), Vercel Edge Hobby (1 MB gzip), Netlify Edge (20 MB).\n`;
 console.log(summary);
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
 const failed = Object.entries(results.apps).flatMap(([name, a]) => [

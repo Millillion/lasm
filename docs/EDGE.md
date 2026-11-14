@@ -18,7 +18,7 @@ Measured behaviour is marked as measured. Plans are marked as plans.
 ## Result
 
 A Lean program runs in a V8 isolate with no threads, no native add-ons and
-about 27 MiB of Wasm memory. Both prototypes answer requests under
+4 MiB of Wasm memory (about 27 MiB before issue #247). Both prototypes answer requests under
 `wrangler dev` (workerd, Cloudflare's runtime), locally, with `CI=1` and no
 account:
 
@@ -257,7 +257,7 @@ Bun has an open JSPI regression in 1.4.0–1.4.3 involving Wasm tail calls
 
 | Platform | Code size | Memory | CPU | Startup |
 | --- | --- | --- | --- | --- |
-| Cloudflare Workers ([limits](https://developers.cloudflare.com/workers/platform/limits/), updated 2026-10-12) | **64 MiB uncompressed, Free and Paid**. "There is no compressed size limit." The old 3 MB / 10 MB compressed limits ended 2026-09-04 ([changelog](https://developers.cloudflare.com/changelog/post/2026-09-04-increased-worker-size-limit/)) | 128 MB per isolate, JS heap plus Wasm | Free 10 ms per request; Paid 30 s by default, up to 5 min | 1 s to evaluate the global scope (error 10021) |
+| Cloudflare Workers ([limits](https://developers.cloudflare.com/workers/platform/limits/), updated 2026-10-12) | **64 MiB uncompressed, Free and Paid**. "There is no compressed size limit." The old 3 MB / 10 MB compressed limits ended 2026-09-04 ([changelog](https://developers.cloudflare.com/changelog/post/2026-09-04-increased-worker-size-limit/)) | 128 MB per isolate, JS heap plus Wasm. A Lasm program starts at 4 MiB of Wasm memory and grows 2 MiB at a time (issue #247) | Free 10 ms per request; Paid 30 s by default, up to 5 min | 1 s to evaluate the global scope (error 10021) |
 | Vercel Edge ([docs](https://vercel.com/docs/functions/runtimes/edge)) | gzip: 1 MB Hobby, 2 MB Pro, 4 MB Enterprise | not stated (unverified) | not stated; must begin responding within 25 s | — |
 | Netlify Edge ([limits](https://docs.netlify.com/build/edge-functions/limits/)) | 20 MB compressed | 512 MB | 50 ms | — |
 | Deno Deploy ([limits](https://docs.deno.com/deploy/pricing_and_limits/)) | 1 GB | 512 MB | not stated | — |
@@ -484,15 +484,18 @@ reads files.
 
 **Memory (measured).**
 
-- Wasm memory is 26.6 MiB after startup, with `INITIAL_MEMORY` 4 MiB that grows
-  and a 1 MiB C shadow stack.
+- Wasm memory is 4 MiB after startup (its `INITIAL_MEMORY`), with a 1 MiB C
+  shadow stack, and grows 2 MiB at a time: the edge link uses Lasm's build of
+  Emscripten's mimalloc with 2 MiB arenas (`src/mimalloc`, issue #247). With
+  Emscripten's libmimalloc it was 26.6 MiB (a 16 MiB arena and a page map for
+  48-bit addresses) and grew 16 MiB at a time.
 - It is unchanged after 9,000 requests and 100 concurrent waiting requests.
 - With the 8 MiB shadow stack it was 33.6 MiB, with the same recursion depth.
   V8's Wasm stack, not the shadow stack, limits depth.
 - The Node profile reserves 128 MiB initial and 8 GiB maximum, with 64 MiB
   stacks.
 
-That leaves about 100 MB of the 128 MB isolate for the JS heap and growth.
+That leaves almost all of the 128 MB isolate for the JS heap and growth. `scripts/edge/workers-ci.mjs` fails if Wasm memory exceeds 8 MiB after startup or after its benchmark on Node, Deno or Bun.
 `mimalloc` stays: Lean's runtime calls it directly, and `dlmalloc` fails to
 link.
 

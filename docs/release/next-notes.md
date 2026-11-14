@@ -64,3 +64,14 @@
   - Folio's site server uses 6.1 MB per request instead of 27.9 MB.
   - Folio's largest inputs peak lower. On Fastly, unclosed `<!--` now fits
     the 128 MB heap.
+
+- **Edge and browser programs start at 4 MiB of Wasm memory instead of 26.6**
+  (issue #247). Every edge target (Workers, Vercel Edge, Netlify Edge,
+  Supabase, Deno Deploy, Deno, Bun) and `--target browser` now link the same
+  mimalloc build, so memory grows 2 MiB at a time instead of 16. Measured on
+  `wrangler dev`:
+  - Porter, Ledger and Conduit start at 5–6 MiB instead of about 28, and peak
+    at 7–9 MiB during their suites.
+  - Folio's largest inputs peak lower: unclosed `<!--` 186 → 129 MiB,
+    backticks 321 → 306 MiB.
+  - Throughput is unchanged.
