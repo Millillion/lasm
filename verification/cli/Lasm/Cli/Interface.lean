@@ -37,6 +37,7 @@ import Lasm.Cli.Model.LeanIOErrors
 import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.LowerAtomics
 import Lasm.Cli.Model.Mangle
+import Lasm.Cli.Model.StaticServer
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
@@ -276,10 +277,23 @@ def supabaseFunctionNameOf (name : String) : String := supabaseNameOf (jsToLower
 
 -- `changedFiles(before, after)` (src/dev.mjs): modelled in Model/Dev.lean.
 
-/-- The static server (`startStaticServer(root)` without a fallback page)
-answering a GET of a request path: the status, and the file (an absolute
-path) whose bytes are the body, if any. -/
-opaque staticServe : String → String → Nat × Option String
+/-- The static server answering a GET (`resolveStaticPath(root, pathname, {
+fallback, accepts, fileExists })`, src/browser/static-server.mjs; modelled
+in Model/StaticServer.lean): the status, and the file whose bytes are the
+body, if any. `fileExists` is the file system (an existing regular file). -/
+def staticServe (fileExists : String → Bool) (root pathname accepts : String) (fallback : Option String) :
+    Nat × Option String :=
+  let r := StaticServer.resolveStaticPath (fun f => fileExists (String.ofList f)) root.toList pathname.toList
+    accepts.toList (fallback.map String.toList)
+  (r.status, r.served.map String.ofList)
+
+/-- One segment of a path: not empty, `.` or `..`, and without `/`. -/
+def pathSegment (l : List Char) : Prop := l ≠ [] ∧ l ≠ ['.'] ∧ l ≠ ['.', '.'] ∧ '/' ∉ l
+
+/-- An absolute path as `path.resolve` gives one, other than `/`:
+`/` and segments joined by `/`. -/
+def resolvedDirectory (root : String) : Prop :=
+  ∃ segs : List (List Char), segs ≠ [] ∧ (∀ s ∈ segs, pathSegment s) ∧ root.toList = '/' :: ['/'].intercalate segs
 
 /-! ## The Node host (src/lean-io-errors.mjs, src/node-host.mjs) -/
 

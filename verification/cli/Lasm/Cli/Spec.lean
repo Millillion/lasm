@@ -140,6 +140,19 @@ def changed_files_exact : Prop :=
     (changedFiles a b).Nodup ∧
     ∀ k, k ∈ changedFiles a b ↔ (k ∈ a.map (·.1) ∨ k ∈ b.map (·.1)) ∧ a.lookup k ≠ b.lookup k
 
+/-- **No request path reaches a file outside the root.** Whatever the path
+(`..`, encoded dots and slashes, sibling directories that share the root's
+name as a prefix, malformed percent-encoding), whatever files exist and
+whatever the client accepts, the static server answers 200, 400, 403 or 404,
+and a file it serves lies under the root directory: the root is a resolved
+directory (not a file) and the fallback page, if any, a name in it.
+Tested by: test/static-server.test.mjs -/
+def static_inside_root : Prop :=
+  ∀ (fileExists : String → Bool) (root pathname accepts : String) (fallback : Option String),
+    resolvedDirectory root → fileExists root = false → (∀ f ∈ fallback, pathSegment f.toList) →
+    (staticServe fileExists root pathname accepts fallback).1 ∈ [200, 400, 403, 404] ∧
+    ∀ f, (staticServe fileExists root pathname accepts fallback).2 = some f → (root ++ "/").toList <+: f.toList
+
 /-! ## The Node host -/
 
 /-- **`numbers` writes little-endian `UInt64`s.** Each value becomes eight

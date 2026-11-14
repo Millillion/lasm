@@ -29,6 +29,7 @@ import { leanAtLeast } from '../../src/lean-io-errors.mjs';
 import { demangleName, initializerModule, mangleName } from '../../src/application-diagnosis.mjs';
 import { comparePythonStrings, pythonJsonString } from '../../src/link-driver/python.mjs';
 import { responseFile } from '../../src/platform.mjs';
+import { resolveStaticPath } from '../../src/browser/static-server.mjs';
 import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 import { zip } from '../../src/serverless/zip.mjs';
 import { keepExports, lowerAtomics, moduleImports } from '../../src/wasi/lower-atomics.mjs';
@@ -391,6 +392,25 @@ const mangledText = r => {
   return r.string(['_', '_', '_', '0', '0', '1', '9', 'x', 'u', 'U', 'a', 'f', 'Z', 'g', 'é'], 0, 16);
 };
 
+/** A static server's request: a root (absolute, sometimes `/` or relative),
+ * a pathname of dot segments, encoded dots and slashes, malformed and
+ * overlong percent-encoding and non-ASCII, the files that exist (under the
+ * root, its precompressed copies, the root itself, outside it), Accept-Encoding
+ * and the fallback page. */
+function staticRequest(r) {
+  const roll = r.next();
+  const root = roll < 0.08 ? '/' : roll < 0.15 ? r.pick(['dist', 'a/../b', '../x', '.']) : '/' + r.array(r.int(1, 3), () => r.pick(['srv', 'dist', 'a b', 'λ', 'x.y'])).join('/');
+  const segment = () => r.pick(['..', '.', '', '%2e%2e', '%2E.', 'index.html', 'app.js', 'app', 'x.css', 'photo.png', '.hidden', 'a.b.c', 'a..', 'λ',
+    '%', '%zz', '%4', '%41', '%e2%82%ac', '%e2%82', '%c0%80', '%ED%A0%80', '%F0%9F%98%80', '%f4%90%80%80', '%5c', '%00', '%2f..', 'dist']);
+  const pathname = (r.next() < 0.9 ? '/' : '') + r.array(r.int(0, 4), segment).join(r.pick(['/', '/', '%2f', '//']));
+  const names = ['index.html', 'app.js', 'app.js.br', 'app.js.gz', 'x.css', 'x.css.gz', 'photo.png', 'photo.png.gz', 'app', 'λ', 'nested/index.html', 'fallback.html'];
+  const base = root === '/' ? '' : root;
+  const files = [...r.array(r.int(0, 6), () => base + '/' + r.pick(names)), ...(r.next() < 0.1 ? [root] : []), ...(r.next() < 0.2 ? ['/etc/passwd', '/srv/secret'] : [])];
+  const accepts = r.pick(['', 'br', 'gzip', 'br, gzip', 'gzip, deflate', 'xbr', 'br_x', 'BR', 'gzip;q=1.0', 'identity']);
+  const fallback = r.pick([null, null, 'index.html', 'fallback.html', '']);
+  return { root, pathname, files, accepts, fallback };
+}
+
 const models = [
   {
     name: 'editDistance', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
@@ -475,6 +495,16 @@ const models = [
     },
     input: ([v, m]) => ({ version: hex(v), minimum: hex(m) }),
     js: ([v, m]) => leanAtLeast(v, m),
+  },
+  {
+    name: 'resolveStaticPath', source: 'src/browser/static-server.mjs', lean: 'Lasm.Cli.Model.StaticServer',
+    generate: staticRequest,
+    input: ({ root, pathname, files, accepts, fallback }) => ({ root: hex(root), pathname: hex(pathname), accepts: hex(accepts),
+      fallback: fallback === null ? null : hex(fallback), files: files.map(hex) }),
+    js: ({ root, pathname, files, accepts, fallback }) => {
+      const { status, file, served, encoding } = resolveStaticPath(root, pathname, { fallback, accepts, fileExists: f => files.includes(f) });
+      return { status, file: file === undefined ? null : hex(file), served: served === undefined ? null : hex(served), encoding: encoding ?? null };
+    },
   },
   {
     name: 'mangleName', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',

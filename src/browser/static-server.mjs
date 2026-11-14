@@ -26,6 +26,34 @@ source.addEventListener('reload', () => location.reload());
 source.addEventListener('error-report', event => console.error('[lasm dev] ' + JSON.parse(event.data)));
 </script>`;
 
+const isFile = file => existsSync(file) && statSync(file).isFile();
+
+/**
+ * What a GET of `pathname` (a request URL's pathname) serves from `root` (an
+ * absolute, resolved directory): status 400 when the path is not valid
+ * percent-encoded UTF-8, 403 when it leads outside the root, 404 when there
+ * is no such file (nor, for a path without an extension, the fallback page),
+ * else 200 with `file` (whose type and caching apply) and `served` (whose
+ * bytes are sent: its precompressed copy when the client accepts `encoding`).
+ */
+export function resolveStaticPath(root, pathname, { fallback = 'index.html', accepts = '', fileExists = isFile } = {}) {
+  let path;
+  try { path = decodeURIComponent(pathname); } catch { return { status: 400 }; }
+  if (path.endsWith('/')) path += 'index.html';
+  let file = normalize(join(root, path));
+  if (file !== root && !file.startsWith(root + sep)) return { status: 403 };
+  if (!fileExists(file)) {
+    if (fallback && !extname(path)) file = join(root, fallback);
+    if (!fileExists(file)) return { status: 404 };
+  }
+  if (compressible.has(extname(file))) {
+    for (const [encoding, suffix] of [['br', '.br'], ['gzip', '.gz']]) {
+      if (new RegExp(`\\b${encoding}\\b`).test(accepts) && fileExists(file + suffix)) return { status: 200, file, served: file + suffix, encoding };
+    }
+  }
+  return { status: 200, file, served: file, encoding: undefined };
+}
+
 /**
  * root: the directory to serve. options: port (0: any free port), host
  * (default 127.0.0.1), liveReload (inject the reload client), routes(request,
@@ -49,16 +77,11 @@ export function startStaticServer(root, { port = 0, host = '127.0.0.1', liveRelo
         return;
       }
       if (request.method !== 'GET' && request.method !== 'HEAD') { response.writeHead(405, { allow: 'GET, HEAD' }).end(); return; }
-      let path;
-      try { path = decodeURIComponent(url.pathname); }
-      catch { response.writeHead(400, { 'content-type': 'text/plain; charset=utf-8' }).end('Bad request: the path is not valid percent-encoded UTF-8\n'); return; }
-      if (path.endsWith('/')) path += 'index.html';
-      let file = normalize(join(root, path));
-      if (file !== root && !file.startsWith(root + sep)) { response.writeHead(403).end(); return; }
-      if (!existsSync(file) || !statSync(file).isFile()) {
-        if (fallback && !extname(path)) file = join(root, fallback);
-        if (!existsSync(file) || !statSync(file).isFile()) { response.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' }).end('Not found\n'); return; }
-      }
+      const found = resolveStaticPath(root, url.pathname, { fallback, accepts: String(request.headers['accept-encoding'] ?? '') });
+      if (found.status === 400) { response.writeHead(400, { 'content-type': 'text/plain; charset=utf-8' }).end('Bad request: the path is not valid percent-encoded UTF-8\n'); return; }
+      if (found.status === 403) { response.writeHead(403).end(); return; }
+      if (found.status === 404) { response.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' }).end('Not found\n'); return; }
+      const { file, served, encoding } = found;
       const extension = extname(file);
       const headers = { 'content-type': mimeTypes[extension] ?? 'application/octet-stream', vary: 'accept-encoding',
         'cache-control': hashedFile.test(file) ? 'public, max-age=31536000, immutable' : 'no-cache', 'x-content-type-options': 'nosniff', ...extraHeaders };
@@ -68,17 +91,11 @@ export function startStaticServer(root, { port = 0, host = '127.0.0.1', liveRelo
         response.writeHead(200, { ...headers, 'cache-control': 'no-store' }).end(request.method === 'HEAD' ? undefined : body);
         return;
       }
-      const accepts = String(request.headers['accept-encoding'] ?? '');
-      let served = file;
-      if (compressible.has(extension)) {
-        for (const [encoding, suffix] of [['br', '.br'], ['gzip', '.gz']]) {
-          if (new RegExp(`\\b${encoding}\\b`).test(accepts) && existsSync(file + suffix)) { served = file + suffix; headers['content-encoding'] = encoding; break; }
-        }
-      }
+      if (encoding) headers['content-encoding'] = encoding;
       headers['content-length'] = statSync(served).size;
       response.writeHead(200, headers);
       if (request.method === 'HEAD') { response.end(); return; }
-      createReadStream(served).pipe(response);
+      createReadStream(served).on('error', () => response.destroy()).pipe(response);
       log(`${request.method} ${url.pathname} ${headers['content-encoding'] ?? ''}`.trimEnd());
     } catch (error) {
       if (!response.headersSent) response.writeHead(500, { 'content-type': 'text/plain; charset=utf-8' });
