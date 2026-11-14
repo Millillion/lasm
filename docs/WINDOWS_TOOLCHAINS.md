@@ -34,17 +34,17 @@ are published atomically. These temporary execution directories can be removed
 when no build is running and will be recreated. Removing the main tool cache
 alone does not remove its temporary hard links or copies.
 
-[Native Windows x64 validation passed](evidence/windows-lean-physical-prefix-2026-09-27.json): standalone Lean, Lake configurations, the interpreter adapter, and local-import C generation all work with a 289-character original module path. The unchanged upstream-path negative control still fails. Full installed-package acceptance remains separate. A [whole-directory junction
-failed](evidence/windows-lean-junction-failure-2026-09-27.json): Lean 4.34.1's
+[Native Windows x64 validation passed](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-lean-physical-prefix-2026-09-27.json): standalone Lean, Lake configurations, the interpreter adapter, and local-import C generation all work with a 289-character original module path. The unchanged upstream-path negative control still fails. Full installed-package acceptance remains separate. A [whole-directory junction
+failed](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-lean-junction-failure-2026-09-27.json): Lean 4.34.1's
 `IO.appDir` resolves the physical path, and Lake overrides the child's library
 search path. A physically short bin directory addresses that lookup without
 changing a developer's chosen tool cache or Windows settings.
 
-Candidate `.41` [timed out during prerequisite setup](evidence/node41-windows-prerequisite-timeout-2026-09-27.json), before installed application checks. The harness now preserves intermediate setup reports and permits 1200 seconds instead of 480, with the same 1-GiB memory cap and assertions. This is a new bounded run, not a reclassification of the timeout.
+Candidate `.41` [timed out during prerequisite setup](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node41-windows-prerequisite-timeout-2026-09-27.json), before installed application checks. The harness now preserves intermediate setup reports and permits 1200 seconds instead of 480, with the same 1-GiB memory cap and assertions. This is a new bounded run, not a reclassification of the timeout.
 
 The pinned Emscripten linker receives `--output-eol=linux` on all platforms.
 Its default Windows CRLF output failed the strict loader-template check.
-A [compiler differential](evidence/windows-glue-line-ending-controls-2026-09-27.json)
+A [compiler differential](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-glue-line-ending-controls-2026-09-27.json)
 reproduced that failure and verified the LF format without loosening semantic
 checks. Complete Windows installed acceptance remains separate.
 
@@ -53,21 +53,21 @@ required companion source/notices archive for Lasm's own Windows ARM64 build.
 That catalog field and its build-recipe identity were removed with Windows ARM64
 on 2026-10-16; every remaining platform uses unmodified upstream Lean archives.
 
-The native ARM64 [SDK](evidence/windows-arm64-sdk-2026-09-27.json) and
-[leantar helper](evidence/windows-arm64-leantar-2026-09-26.json) passed their
+The native ARM64 [SDK](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-sdk-2026-09-27.json) and
+[leantar helper](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-leantar-2026-09-26.json) passed their
 recorded relocation controls. The SDK is now a public tool prerelease; leantar
 remains a retained bootstrap draft. The new
-Lean 4.34.1 native compiler [reached its deadline while linking](evidence/windows-arm64-lean-release-deadline-2026-09-27.json), with a 1.91-GiB peak and no completed distribution. The reproducible
-[source/notices companion](evidence/windows-arm64-tool-notices-2026-09-27.json)
+Lean 4.34.1 native compiler [reached its deadline while linking](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-lean-release-deadline-2026-09-27.json), with a 1.91-GiB peak and no completed distribution. The reproducible
+[source/notices companion](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-tool-notices-2026-09-27.json)
 was checked against the successful compiler's actual GMP version and leantar
 identity before connection to its distribution. Native Lean download details are
 recorded below; complete installed Lasm acceptance remains pending.
 
-Read-only archive audits verified the retained [SDK and its named licenses](evidence/windows-arm64-sdk-notice-audit-2026-09-27.json) and [leantar executable](evidence/windows-arm64-leantar-archive-audit-2026-09-27.json). They streamed compressed bytes and inventoried native identities without extracting full toolchains locally. The SDK contains 27 recorded native ARM64 files plus the two explicitly unused upstream source launchers; its LLVM, Binaryen, and Emscripten license texts are recorded by hash. These audits establish archive integrity, not complete installed application acceptance.
+Read-only archive audits verified the retained [SDK and its named licenses](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-sdk-notice-audit-2026-09-27.json) and [leantar executable](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-leantar-archive-audit-2026-09-27.json). They streamed compressed bytes and inventoried native identities without extracting full toolchains locally. The SDK contains 27 recorded native ARM64 files plus the two explicitly unused upstream source launchers; its LLVM, Binaryen, and Emscripten license texts are recorded by hash. These audits establish archive integrity, not complete installed application acceptance.
 
 The application host selector now uses the existing small Windows adapter rather
 than copying all native platforms. [Local real-vendor measurements and regression
-controls](evidence/windows-application-bundle-selection-2026-09-27.json) record
+controls](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-application-bundle-selection-2026-09-27.json) record
 1,066,984 native bytes for x64 and 1,357,304 for ARM64, down from 13,335,796.
 These are the adapter payloads, not complete Lean deployment sizes. Loaders and
 licenses remain included. Later `.44` x64 acceptance includes that selection;
@@ -76,7 +76,7 @@ ARM64 installed acceptance remains pending.
 On resumption, `.42` and the queued `.43` run were confirmed cancelled following
 the user's pause. `.42` had passed prerequisite isolation and was still in its
 cold installed build; neither cancellation is a compatibility result.
-[Resume evidence](evidence/windows-resume-controls-2026-09-28.json) preserves the
+[Resume evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-resume-controls-2026-09-28.json) preserves the
 partial report and the new small compiler-cache controls.
 
 The ARM64 retry uses two native build jobs under the unchanged memory cap, a
@@ -88,10 +88,10 @@ per-file hashes. It always starts a fresh build tree and reruns native execution
 and relocation checks. A cache checkpoint never counts as distribution acceptance.
 Cache size is capped at 1 GiB and at most four checkpoint drafts are allowed.
 
-The resumed `.43` x64 attempt [failed during prerequisite discovery](evidence/windows-discovery-timeout-2026-09-28.json), before installed execution. Resolving every ordinary path while traversing the runner's large CodeQL tree exhausted the parent setup deadline. Discovery now uses cached directory metadata and resolves roots and reparse entries only; full coverage, junction traversal, file denials, memory limits and deadlines are unchanged. The unchanged package is being retried with native directory/junction controls. The source/notices companion was first retained in the draft recorded in its original evidence receipt.
+The resumed `.43` x64 attempt [failed during prerequisite discovery](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-discovery-timeout-2026-09-28.json), before installed execution. Resolving every ordinary path while traversing the runner's large CodeQL tree exhausted the parent setup deadline. Discovery now uses cached directory metadata and resolves roots and reparse entries only; full coverage, junction traversal, file denials, memory limits and deadlines are unchanged. The unchanged package is being retried with native directory/junction controls. The source/notices companion was first retained in the draft recorded in its original evidence receipt.
 
 The custom Lean packer now includes upstream `LICENSES` as well as `LICENSE`.
-[Archive-repair controls](evidence/windows-lean-notice-repair-controls-2026-09-28.json)
+[Archive-repair controls](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-lean-notice-repair-controls-2026-09-28.json)
 cover the bootstrap that was already running when the omission was found. The
 existing distribution workflow accepts a retained draft and exact checksum,
 adds only the verified upstream notice bundle, and compares every original
@@ -101,7 +101,7 @@ the repaired archive. Bootstrap inputs stay unpublished throughout; the repaired
 archive has a new checksum and still needs installed Lasm acceptance.
 
 The next `.43` x64 run passed discovery and isolation, built its first Lean
-program, then [failed the exact stdout comparison](evidence/windows-stdio-bytes-2026-09-28.json):
+program, then [failed the exact stdout comparison](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-stdio-bytes-2026-09-28.json):
 CRLF instead of native Lean's LF. The host now sets binary mode on its owned
 standard descriptors, matching Lean initialization without changing the embedding
 Node process's descriptors. Eight local controls passed, including redirected
@@ -113,7 +113,7 @@ Candidate `.44` packed reproducibly with SHA-256
 passed cold installed execution, cached reuse and the local Lake project on
 x64. Its Hello deployment is 3,042,522 bytes. No expected output was normalized.
 
-The `.44` run then [failed while preparing its independent native C oracle](evidence/windows-native-oracle-launch-2026-09-28.json), before the offline and copied-deployment phases.
+The `.44` run then [failed while preparing its independent native C oracle](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-native-oracle-launch-2026-09-28.json), before the offline and copied-deployment phases.
 Upstream `leanc` substitutes the sysroot into `ROOT/bin/clang.exe`; a Windows
 namespace combined with those forward slashes caused the launch failure.
 The maintainer harness now supplies its verified short ordinary prefix only to
@@ -126,7 +126,7 @@ archive through full installed acceptance.
 The [maintained ARM64 SDK download](https://github.com/Millillion/lasm/releases/tag/windows-arm64-sdk-bootstrap-36278363560)
 is pinned in `src/sdk-tools.json`. Its public archive has the same 174,792,332
 bytes and checksum as the native relocation and notices audits. The
-[anonymous download receipt](evidence/windows-arm64-sdk-public-download-2026-09-28.json)
+[anonymous download receipt](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-sdk-public-download-2026-09-28.json)
 records retrieval without GitHub credentials. Fresh native run `36390222907`
 downloaded from this catalog, compiled a C-to-Wasm program, checked its output
 and exit status, and verified cache reuse. Cold compilation took 101.4 seconds;
@@ -135,13 +135,13 @@ peak committed memory was 237,989,888 bytes under a 4-GiB Job Object cap and
 does not establish Windows Lasm support or publish an npm package.
 
 The [source/notices companion](https://github.com/Millillion/lasm/releases/tag/windows-arm64-tool-notices-v1)
-is also public. [Anonymous retrieval](evidence/windows-arm64-tool-notices-public-2026-09-28.json)
+is also public. [Anonymous retrieval](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-tool-notices-public-2026-09-28.json)
 verified its original 14,639,815 bytes and checksum under a 512-MiB local cap;
 peak memory was 30.3 MiB. It covers the recorded leantar commit and GMP 6.3.0-2.
 The native Lean archive must match those identities before this companion is
 attached to its download catalog entry.
 
-Candidate `.44` [passed full Windows x64 acceptance](evidence/node44-win32-x64-2026-09-28.json)
+Candidate `.44` [passed full Windows x64 acceptance](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node44-win32-x64-2026-09-28.json)
 in run `36389214996`: cold Node/npm-only provisioning, ordinary Lean and local
 Lake imports, offline cache reuse, invalidation/recovery, runtime restrictions,
 and all eight independent copied deployments. Native oracle and Node fixture
@@ -153,7 +153,7 @@ The same archive is being checked on Linux (`36392920262`) and macOS
 (`36392911964`) on both native architectures. This pass does not establish
 Windows ARM64 or broad API parity.
 
-The two-job ARM64 retry [completed its native build and relocation](evidence/windows-arm64-lean-retention-failure-2026-09-28.json)
+The two-job ARM64 retry [completed its native build and relocation](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-lean-retention-failure-2026-09-28.json)
 in run `36380911268`, including Lean/Lake execution, C generation and all 15
 native executable/DLL identities. The guarded operation took 170.2 minutes and
 peaked at 2,711,216,128 committed bytes, with no memory abort. The subsequent
@@ -168,7 +168,7 @@ Successful native distributions are retained before the cache, with an explicit
 independent condition. A cache-upload failure cannot skip their retention.
 The retry also includes the already-fixed upstream `LICENSES` bundle directly.
 
-The [early retention control passed](evidence/windows-arm64-retention-preflight-2026-09-28.json)
+The [early retention control passed](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-retention-preflight-2026-09-28.json)
 on native ARM64 in run `36396705986`, including byte-exact retrieval and cleanup.
 The next control failed in tar compression before any compiler rebuild, at a
 60,944,384-byte peak. Its small hard-link input is now constructed synchronously;
@@ -178,7 +178,7 @@ subsequently passed the native Windows recheck below.
 
 That revised notice control and the draft-storage preflight passed on native ARM64
 in run `36397277364`. The [compiler build, retained distribution and archive
-audit passed](evidence/windows-arm64-lean-distribution-2026-09-28.json).
+audit passed](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-lean-distribution-2026-09-28.json).
 The build took 169.8 minutes and peaked at 2,728,611,840 committed bytes;
 its native execution, relocation and local Lake C-generation checks all passed.
 Both distribution and completed-object cache retention succeeded.
@@ -194,7 +194,7 @@ verified inputs and enables the complete six-target installed/deployment matrix;
 those package-level checks are still required before claiming ARM64 support.
 
 Candidate `.45` failed its first native ARM64 installed build after provisioning
-the verified tools. The [preserved failure](evidence/node45-windows-arm64-unicode-failure-2026-09-28.json)
+the verified tools. The [preserved failure](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node45-windows-arm64-unicode-failure-2026-09-28.json)
 shows `wasm-emscripten-finalize` replacing Unicode path characters with `?` while
 opening its output; memory peaked at 1,073,655,808 bytes and disk reserves held.
 A focused native differential now compares the unchanged SDK with copied
@@ -206,7 +206,7 @@ not an accepted SDK or application result. It uses [Microsoft's process code
 page mechanism](https://learn.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page)
 and changes no global Windows settings.
 
-The complete [`.45` campaign](evidence/node45-six-platform-campaign-2026-09-28.json)
+The complete [`.45` campaign](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/node45-six-platform-campaign-2026-09-28.json)
 passed both Linux architectures, both Mac architectures and Windows x64. ARM64's
 failure prevented combined candidate retention. The earlier `.44` archive remains
 the accepted five-target candidate.
@@ -215,14 +215,14 @@ The first native repair controls reproduced the SDK failure with identical Wasm
 bytes under ASCII and Unicode paths. Windows' resource-update API moved relocation
 and debug sections and did not preserve the COFF table as a unique byte sequence;
 those attempts were rejected before repaired execution. The [direct-resource
-evidence](evidence/windows-arm64-sdk-direct-resource-2026-09-28.json) preserves
+evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-sdk-direct-resource-2026-09-28.json) preserves
 the failures and the replacement: append a new manifest section without moving
 any original section or debug data. All eight exact original executables passed
 local whole-file preservation checks, allowing only specified PE header edits.
 Each grows by 1 KiB; the guarded check peaked at 83.2 MiB. Native Windows checksum,
 resource readback, Unicode execution and fresh archive relocation are still gates.
 
-Those [native SDK gates passed](evidence/windows-arm64-sdk-utf8-distribution-2026-09-28.json)
+Those [native SDK gates passed](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-sdk-utf8-distribution-2026-09-28.json)
 in run `36426171536`. Windows verified each executable's checksum and read back
 its manifest, then the repaired optimizer and both Wasm32/Wasm64 C++
 thread/exception applications passed with Unicode paths. Two archive packs were

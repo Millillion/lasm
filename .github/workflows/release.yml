@@ -80,7 +80,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - name: Plan (release-checks for this commit, npm, tag, GitHub release)
         id: plan
@@ -121,7 +121,7 @@ jobs:
           ref: ${{ needs.plan.outputs.sha }}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - name: Node >= 22.14 and npm >= 11.15.0 (trusted publishing)
         run: |

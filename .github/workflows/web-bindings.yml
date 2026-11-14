@@ -81,7 +81,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - name: node.idl is the lowering of the pinned Node.js docs (hashes checked)
@@ -109,7 +109,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - uses: ./.github/actions/process-guard
@@ -142,12 +142,12 @@ jobs:
       # Node 24 (the oldest supported) runs Node's build; Node 26 runs everything else.
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 24.22.2
+          node-version: 24.22.3
           package-manager-cache: false
       - run: echo "NODE24=$(command -v node)" >> "$GITHUB_ENV"
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - name: Install the candidate as a user would
         id: candidate
@@ -202,12 +202,12 @@ jobs:
       # Node 24 (the docs' version) runs Node's build; Node 26 runs everything else.
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 24.22.2
+          node-version: 24.22.3
           package-manager-cache: false
       - run: echo "NODE24=$(command -v node)" >> "$GITHUB_ENV"
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - name: Install the candidate as a user would
         id: candidate
@@ -253,7 +253,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - name: Install the candidate as a user would
         id: candidate

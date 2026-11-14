@@ -13,6 +13,7 @@ import { createHash } from 'node:crypto';
 import { linkWasiProgram, wasiLinkSettings, wasiSources } from './wasi-link.mjs';
 import { noticesSectionName, targetNotices, withCustomSection } from '../notices.mjs';
 import { foreignOutputError, replaceOutputDirectory } from '../output-directory.mjs';
+import { readPackageJson } from '../application-npm.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -66,7 +67,7 @@ export function linkCachedWasiProgram({ result, nodeRuntime, edge, toolchain, ta
 /** The Fastly service name: the project's package name, as Fastly allows. */
 export function fastlyName(projectDirectory) {
   const file = join(projectDirectory, 'package.json');
-  const name = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')).name : undefined;
+  const name = existsSync(file) ? readPackageJson(file).name : undefined;
   return String(name ?? basename(projectDirectory)).toLowerCase().replace(/^@[^/]+\//, '').replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'lasm-app';
 }
 /** fastly.toml for Lasm projects: `fastly compute build` runs Lasm. */
