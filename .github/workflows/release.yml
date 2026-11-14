@@ -175,6 +175,7 @@ jobs:
           node scripts/release/publish.mjs --dist .work/release/npm --tag "$DIST_TAG" --registry "$REGISTRY" $LOCAL --report .work/release/evidence/publish-again.json
           node -e "const r = require('./.work/release/evidence/publish-again.json'); if (r.packages.some(p => p.action !== 'skipped')) throw new Error('A second run published again'); console.log('second run: ' + r.packages.length + ' skipped')"
       - name: npm create @lasm@<version> from the registry (clean directory, empty caches)
+        shell: bash
         run: |
           # The guard caps a workload at host available memory minus 8 GiB and counts
           # page cache: free the packed tarballs and the cache, and run each stage in its own guard.

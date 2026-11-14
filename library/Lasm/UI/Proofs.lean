@@ -17,9 +17,17 @@ that the DOM behaves as the model. That the applier reads the binary encoding
 (Lasm.UI.Encode) back as exactly the patch is proved separately, against a
 reference decoder (Proofs/Decode.lean, Proofs/Wire.lean: Spec.frames_decode).
 
+* `diff_conforms`: the patch conforms (`Applier.confOps`): every node an op
+  names is a child of its parent where the op runs, every anchor is such a
+  child (and never the moved node), and inserted subtrees bring distinct ids
+  never used; so the applier, which looks nodes up by id in one table for
+  the whole document, performs it as `applyOps` says (Proofs/Apply.lean).
+
 Proof files: Proofs/Basic (unfolding, `WF`, `create`, attributes),
-Proofs/Lists (sibling lists, slices), Proofs/Children (steps of the children
-diff), Proofs/TwoEnded, Proofs/Diff.
+Proofs/Lists (sibling lists, slices), Proofs/Conform (conforming patches),
+Proofs/Children (steps of the children diff), Proofs/TwoEnded, Proofs/Diff.
+Each step's proof shows both that it changes the DOM as the model says and
+that its ops conform.
 -/
 import Lasm.UI.Proofs.Diff
 
@@ -34,9 +42,18 @@ theorem diff_correct (old : List (Live Msg)) (new : List (Html Msg)) (next : Nat
     let r := diff old new next
     applyOps r.ops.toList (old.map toDom) = r.live.map toDom ∧ r.live.map Live.erase = new ∧
       WF r.live r.next ∧ next ≤ r.next := by
-  have hs := diffChildren_spec id diffNode (fun o b n hw hsm => diffNode_spec b o n hw hsm) old new next h
+  have hs := diffChildren_spec id diffNode (fun o b n hw hsm => diffNode_spec b o n hw hsm) old new next h [] (by simp)
   simp only [List.map_id] at hs
   exact ⟨hs.ops, hs.erase, hs.wf, hs.le⟩
+
+/-- `diff`'s patch conforms (`Applier.confOps`) on the DOM of a well-formed
+live tree, from the ids below the next free id: the applier can perform it
+(Proofs/Apply.lean: `Applier.run_ofOps`). -/
+theorem diff_conforms (old : List (Live Msg)) (new : List (Html Msg)) (next : Nat) (h : WF old next) :
+    (Applier.confOps (List.range next) (diff old new next).ops.toList (old.map toDom)).isSome := by
+  obtain ⟨u, hu, -⟩ := (diffChildren_spec id diffNode (fun o b n hw hsm => diffNode_spec b o n hw hsm) old new next h
+    (List.range next) (fun x hx => List.mem_range.1 hx)).conf
+  exact Option.isSome_iff_exists.2 ⟨u, hu⟩
 
 /-- The first render: its patch builds, under an empty root, the DOM of a live
 tree that shows the view. -/
