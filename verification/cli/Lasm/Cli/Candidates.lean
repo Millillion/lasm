@@ -62,6 +62,100 @@ def static_inside_root : Prop :=
     (staticServe root path).1 ∈ [200, 400, 403, 404] ∧
     ∀ f, (staticServe root path).2 = some f → f.startsWith (root ++ "/")
 
+/-- **The proxy sends each request to the server program once, unchanged.**
+Whatever the server program then does, it receives the request exactly
+once, with the same method, target and body, its own address as Host, no
+Accept-Encoding (so a page arrives uncompressed and can be rewritten), and
+every other header's value. A request is never sent again once the program
+may have seen it; only a refused connection is retried.
+Tested by: test/fuzz/targets/dev-proxy.mjs -/
+def dev_proxy_forwards_once : Prop :=
+  ∀ (r : HttpRequest) (u : Upstream), PlainHeaders r.headers → r.target ≠ "/__lasm/events" →
+    ∃ s, (devProxy r u).1 = [s] ∧ s.method = r.method ∧ s.target = r.target ∧ s.body = r.body ∧
+      s.header? "host" = some devUpstreamHost ∧ s.header? "accept-encoding" = none ∧
+      ∀ h v, h ≠ "accept-encoding" → r.header? h = some v → s.header? h = some v
+
+/-- **A whole reply reaches the client whole.** Its status and headers
+(a page's `Cache-Control` is `no-store`), and its body byte for byte, or a
+page's with the reload client inserted (`relayedBody`), in any charset.
+Tested by: test/fuzz/targets/dev-proxy.mjs -/
+def dev_proxy_relays_reply : Prop :=
+  ∀ (r : HttpRequest) (a : HttpReply), PlainHeaders r.headers → PlainHeaders a.headers → r.target ≠ "/__lasm/events" →
+    ∃ c, (devProxy r (.answers a)).2 = .reply c ∧ c.status = a.status ∧ c.body = relayedBody r a ∧
+      (isPage r a = true → c.header? "cache-control" = some "no-store") ∧
+      ∀ h v, a.header? h = some v → (isPage r a = false ∨ h ≠ "cache-control") → c.header? h = some v
+
+/-- **No response is left open.** When the server program stops before its
+reply ends, the client's response ends cut too; a malformed reply is a 502
+or a cut connection, at once.
+Tested by: test/fuzz/targets/dev-proxy.mjs, test/dev-proxy.test.mjs -/
+def dev_proxy_ends_failed_replies : Prop :=
+  ∀ (r : HttpRequest) (u : Upstream), u = .cut ∨ u = .malformed → r.target ≠ "/__lasm/events" →
+    (devProxy r u).2 = .cut ∨ ∃ page, (devProxy r u).2 = .reply page ∧ page.status = 502 ∧ u = .malformed
+
+/-! ## Project files -/
+
+/-- **`leanHeader` keeps exactly the source's imports.** Whenever Lean reads
+a source's header without error, it reads the same imports from
+`leanHeader` of the source: a build key over the header changes whenever
+the imports can.
+Tested by: test/fuzz/targets/project-files.mjs -/
+def lean_header_keeps_imports : Prop :=
+  ∀ (text : String) (is : List HeaderImport), NoBareCR text → leanImports text = some is → leanImports (leanHeader text) = some is
+
+/-- **`lasm dev` follows every import.** Whenever Lean reads a source's
+header without error, `importClosure` reaches the file of every module it
+imports that the project has: an edit to it rebuilds the outputs that
+import it.
+Tested by: test/fuzz/targets/project-files.mjs -/
+def import_closure_covers_imports : Prop :=
+  ∀ (text : String) (is : List HeaderImport), leanImports text = some is →
+    (∀ i ∈ is, i.module ≠ [] ∧ i.module ≠ ["Main"] ∧ ∀ c ∈ i.module, FileComponent c) →
+    ∀ i ∈ is, moduleFile i.module ∈ importClosureOf text (is.map (·.module))
+
+/-- **A broken Lake manifest is no reuse, never a crash.** Whatever
+lake-manifest.json and lakefile.lean hold, `lakeConfigurationKey` answers
+a key or none; Lake then reports what it cannot read.
+Tested by: test/fuzz/targets/project-files.mjs, test/application-sources.test.mjs -/
+def lake_key_total : Prop :=
+  ∀ manifest lakefile : String, ∃ key, lakeConfigurationKeyOf manifest lakefile = .ok key
+
+/-- **package.json is read, or refused by name.** Whatever package.json
+holds, the edge modules are distinct non-empty names, the Supabase function
+and Fastly service names are ones those platforms accept, and a refusal is
+a message that names package.json.
+Tested by: test/fuzz/targets/project-files.mjs -/
+def package_readers_clear : Prop :=
+  ∀ text : String,
+    (∀ ms, edgeModulesOf text = .ok ms → ms.Nodup ∧ ∀ m ∈ ms, m ≠ "") ∧
+    (∀ n, supabaseFunctionNameIn text = .ok n →
+      (n.toList.head?.map Char.isLower) = some true ∧ n.all (fun c => c.isLower || c.isDigit || c = '-') ∧ n.length ≤ 54) ∧
+    (∀ n, fastlyNameIn text = .ok n → n ≠ "" ∧ n.all (fun c => c.isLower || c.isDigit || c = '_' || c = '-')) ∧
+    (∀ e, edgeModulesOf text = .error e ∨ supabaseFunctionNameIn text = .error e ∨ fastlyNameIn text = .error e →
+      Mentions e "package.json")
+
+/-! ## Edge entries -/
+
+/-- **Supabase's handler sees the path without the function's name.** For a
+request whose path is the function's name, or the name and a `/` and more,
+the handler gets the rest (`/` for the name alone), with the same origin,
+query, fragment, method, headers and body; any other request reaches it
+unchanged.
+Tested by: test/fuzz/targets/edge-request.mjs -/
+def supabase_route_strips_name : Prop :=
+  ∀ (name origin path rest : String) (r : HttpRequest), urlParts r.target = some (origin, path, rest) →
+    (supabaseRoute name r).method = r.method ∧ (supabaseRoute name r).headers = r.headers ∧
+    (supabaseRoute name r).body = r.body ∧
+    (path = "/" ++ name → urlParts (supabaseRoute name r).target = some (origin, "/", rest)) ∧
+    (∀ p, path = "/" ++ name ++ "/" ++ p → urlParts (supabaseRoute name r).target = some (origin, "/" ++ p, rest)) ∧
+    (path ≠ "/" ++ name → (∀ p, path ≠ "/" ++ name ++ "/" ++ p) → (supabaseRoute name r).target = r.target)
+
+/-- **Vercel's handler never sees Accept-Encoding, and nothing else
+changes.**
+Tested by: test/fuzz/targets/edge-request.mjs -/
+def vercel_identity_drops_encoding : Prop :=
+  ∀ r : HttpRequest, vercelIdentity r = { r with headers := r.headers.filter (·.1 ≠ "accept-encoding") }
+
 /-! ## Downloads -/
 
 /-- **Retry delays stay within 75–100 % of the backoff.** For every attempt

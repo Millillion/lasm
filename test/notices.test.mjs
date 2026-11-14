@@ -96,7 +96,7 @@ test('every target gets notices that name its files, with Lasm\'s MIT licence an
     assert.equal(text.includes('\n=== Wasmtime proxy adapter ===\n'), kind === 'wasi-http', kind);
   }
   const http = notices.targetNotices(node, 'wasi-http');
-  assert.ok(http.endsWith(read('../src/wasi/component/LICENSE')), 'the adapter\'s licence text, verbatim');
+  assert.ok(http.endsWith(read('../src/notices/wasmtime-LICENSE.txt')), 'the adapter\'s licence text, verbatim');
   assert.match(notices.targetNotices(node, 'edge'), /lasm\/program\.mjs: Emscripten 6\.0\.9's JavaScript runtime/);
   assert.throws(() => notices.targetNotices('not ours', 'edge'), /not written by this Lasm/);
 });
@@ -155,10 +155,9 @@ test('the edge runtime archive carries the Lasm MIT text and its own list of Lea
   assert.match(refused.stderr, /No notice text for Lean patch unexplained-patch/);
 });
 
-test('the Wasmtime licence copies are identical (component template, WIT files, notices)', () => {
+test('the Wasmtime licence copies are identical (WIT files, notices)', () => {
   const text = read('../src/notices/wasmtime-LICENSE.txt');
   assert.match(text, /--- LLVM Exceptions to the Apache 2\.0 License ----/);
-  assert.equal(read('../src/wasi/component/LICENSE'), text);
   assert.equal(read('../scripts/wasi/wit/deps/LICENSE'), text);
 });
 

@@ -20,7 +20,7 @@ Windows on x86-64. Windows ARM64 is not supported.`
 Use stock Node without special flags. Other OS versions/distributions, older
 system libraries, and other Node/npm/Lean versions are unverified as build machines.
 **Current source (Phase 5.1)** accepts Node 24 or newer for the compiler (tested on
-Node 24.22.2 and 26.13.0; `bin/lasm.mjs` refuses older Node before loading anything:
+Node 24.22.3 and 26.13.1; `bin/lasm.mjs` refuses older Node before loading anything:
 `Lasm requires Node 24 or newer; you are running Node 22.23.4. Install Node 24 or
 newer and retry.`) and lowers the compiler's Linux floor to glibc 2.34. That floor
 came from the formerly bundled Git; the remaining managed tools need 2.30 (Lean's

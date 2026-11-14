@@ -38,12 +38,14 @@ on:
       - '.github/workflows/ledger.yml'
       - 'examples/ledger/**'
       - 'scripts/sim/**'
+      - 'scripts/equivalence/traffic.mjs'
   push:
     branches: [main]
     paths:
       - '.github/workflows/ledger.yml'
       - 'examples/ledger/**'
       - 'scripts/sim/**'
+      - 'scripts/equivalence/traffic.mjs'
 permissions:
   contents: read
 concurrency:
@@ -62,7 +64,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - name: npm ci
         working-directory: examples/ledger
@@ -92,7 +94,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: ['24', '26.13.0']
+        node: ['24', '26.13.1']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -108,9 +110,15 @@ jobs:
       - name: npm run build
         working-directory: examples/ledger
         run: node ../../scripts/full-lean/run-bounded.mjs --memory-mib 8192 -- npm run build
-      - name: The API test
+      - name: The API test (its traffic recorded for target equivalence)
         working-directory: examples/ledger
-        run: node test/api.mjs --name "node-${{ matrix.node }}"
+        run: node test/api.mjs --name "node-${{ matrix.node }}" --equivalence
+      - name: Target equivalence (the API traffic against test/equivalence/api.json; the normalizer's self-test first)
+        if: ${{ !cancelled() }}
+        working-directory: examples/ledger
+        run: |
+          node test/equivalence.mjs self-test > /dev/null
+          node test/equivalence.mjs compare "node-${{ matrix.node }}"
       - name: The bank workload (seeded; the seed is printed first)
         working-directory: examples/ledger
         run: node test/bank.mjs --seconds 30
@@ -131,7 +139,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - name: npm ci
         working-directory: examples/ledger
@@ -171,7 +179,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - uses: ./.github/actions/process-guard
       - name: npm ci
@@ -225,7 +233,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - uses: ./.github/actions/process-guard
       - name: npm ci, and the official TigerBeetle client at the pinned version
@@ -266,7 +274,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - uses: ./.github/actions/process-guard
       - name: npm ci

@@ -16,7 +16,7 @@ the program's own module it contains:
   (`wit-component`) from the WASI 0.2.12 WIT files (Apache-2.0 WITH
   LLVM-exception, `scripts/wasi/wit/deps/`).
 
-The licence text is in [LICENSE](LICENSE) (Wasmtime's `LICENSE` at v49.0.4,
+The licence text is in [src/notices/wasmtime-LICENSE.txt](../../notices/wasmtime-LICENSE.txt) (Wasmtime's `LICENSE` at v49.0.4,
 byte-identical to wasm-tools' `LICENSE-Apache-2.0_WITH_LLVM-exception`). Wasmtime
 has no NOTICE file. Every wasi-http build's `THIRD_PARTY_NOTICES.txt` and its
 embedded `lasm.notices` section carry this text (src/notices.mjs).
