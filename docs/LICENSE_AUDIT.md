@@ -546,7 +546,7 @@ compiler-rt compiled into a program; their texts are kept anyway (over-complying
 | Component | Where | Licence | Obligation and how it is met |
 | --- | --- | --- | --- |
 | Edge runtime `lean-4.35.0-wasm64-edge` (release `lean-4.35.0-edge-v1`; bundled in `@lasm/cli` 0.2.0 as `targets/lean-4.35.0-wasm64-edge/`) | Lean runtime built single-threaded (Apache-2.0, Lasm's patches), Lasm host bridge and Lasm.JS edge glue (MIT), Emscripten's single-threaded system libraries | Apache-2.0, MIT, MIT OR NCSA, Apache-2.0 WITH LLVM-exception | Its `THIRD_PARTY_NOTICES.txt` (Lasm's MIT stated in the preamble, then the Node runtime's notices); in the CLI as `licenses/edge-runtime/`. **No GMP, no glibc** (§12). No source obligation (permissive only). |
-| Wasmtime `wasi_snapshot_preview1.proxy.wasm` v49.0.4, in `src/wasi/component/proxy-template.wasm` | `@lasm/cli` (0.3.0) and every wasi-http output | Apache-2.0 WITH LLVM-exception (Wasmtime has no NOTICE file) | Licence text: `src/wasi/component/LICENSE`, `src/notices/wasmtime-LICENSE.txt`; provenance `src/wasi/component/README.md`; notice section "Wasmtime proxy adapter" in wasi-http outputs and in the CLI's `THIRD_PARTY_NOTICES.txt` (`scripts/package-node-release.mjs`; `scripts/npm-dist/build.mjs` adds it to a candidate that lacks it); `license` field term `Apache-2.0 WITH LLVM-exception` (`cliNoticeSections`). The LLVM exception does not obviously cover an adapter that is not "a result of compiling your source code", so §4(a) is met in full. |
+| Wasmtime `wasi_snapshot_preview1.proxy.wasm` v49.0.4, in `src/wasi/component/proxy-template.wasm` | `@lasm/cli` (0.3.0) and every wasi-http output | Apache-2.0 WITH LLVM-exception (Wasmtime has no NOTICE file) | Licence text: `src/notices/wasmtime-LICENSE.txt` (until 2026-11-13 also a byte-identical `src/wasi/component/LICENSE`, removed with §17); provenance `src/wasi/component/README.md`; notice section "Wasmtime proxy adapter" in wasi-http outputs and in the CLI's `THIRD_PARTY_NOTICES.txt` (`scripts/package-node-release.mjs`; `scripts/npm-dist/build.mjs` adds it to a candidate that lacks it); `license` field term `Apache-2.0 WITH LLVM-exception` (`cliNoticeSections`). The LLVM exception does not obviously cover an adapter that is not "a result of compiling your source code", so §4(a) is met in full. |
 | wasm-tools 1.262.0 output (component glue) | same | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | the same text (wasm-tools' `LICENSE-Apache-2.0_WITH_LLVM-exception` is byte-identical to Wasmtime's `LICENSE`) |
 | WASI 0.2.12 WIT files, `scripts/wasi/wit/deps/*.wit` | `@lasm/cli` (`scripts/` ships), CI only in use (the component template; Lasm.WASI.Http's generator) | Apache-2.0 WITH LLVM-exception | Unmodified copies of Wasmtime v49.0.4 `crates/wasi-http/wit/deps` (byte-compared); `LICENSE` and `README.md` (provenance) added beside them |
 | Fastly Compute host ABI witx (Viceroy v0.21.1 `wasm_abi/compute-at-edge-abi/*.witx`), `scripts/fastly/witx/` | `@lasm/cli` (`scripts/` ships); generator input only, never linked | Apache-2.0 WITH LLVM-exception (Viceroy has no NOTICE file) | Unmodified copies, SHA-256 pinned in `scripts/fastly/witx/README.md` (provenance) and checked by `test/fastly-bindings.test.mjs`; `LICENSE` copied from the same tag. Checked 2026-11-10 |
@@ -616,3 +616,32 @@ launcher code and stays `MIT`. The root `LICENSE` stays the unmodified MIT text,
 GitHub's and npm's licence detection and the copy embedded in every output's
 notices (`src/notices/LASM-LICENSE.txt`) keep matching; `LICENSE-MIT-0` beside it,
 the README and `docs/LICENSING.md` reference the grant.
+
+## 17. One copy of each licence text (2026-11-13)
+
+Byte-identical copies of a licence text kept in two places of the repository were
+reduced to one where nothing that ships loses its text (IRREDUCIBLE.md removal 10):
+
+- `src/wasi/component/LICENSE` was Wasmtime's licence, identical to
+  `src/notices/wasmtime-LICENSE.txt`. Both shipped in `@lasm/cli`. The package keeps
+  the one under `src/notices/` (the copy the CLI's and every wasi-http output's
+  notices are built from); the component's README names it. Apache-2.0 §4(a) asks
+  for a copy of the licence with the work, which the package and every output still
+  carry.
+- `scripts/lean-dist/notices/libuv-LICENSE-extra.txt` was identical to
+  `src/notices/libuv-LICENSE-extra.txt`; the tier builder now reads the `src/` copy.
+  The archives' member (`lasm-notices/<archive>/libuv-LICENSE-extra`) is unchanged.
+- `scripts/lean-dist/notices/llvm-clang-LICENSE.txt` was identical to
+  `scripts/link-driver/notices/clang-LICENSE.TXT`; the C tier's pinned inputs
+  (`c-tier-sources.json`) now name the latter. The archives' member
+  (`llvm-clang-LICENSE.txt`) is unchanged.
+
+**Kept, by decision:** `src/notices/LASM-LICENSE.txt` = `LICENSE`. The root `LICENSE`
+is what GitHub and npm detect, and it is not part of the CLI candidate that
+`scripts/package-node-release.mjs` stages, while the copy under `src/` is read at run
+time to put Lasm's MIT text into every output's notices (§4.10); the test keeps them
+equal. Also kept: the Apache-2.0 WITH LLVM-exception texts beside the verbatim
+third-party files of `scripts/wasi/wit/deps/` and `scripts/fastly/witx/` (each beside
+the copied work it licenses, and the Fastly one is Viceroy's), and the MIT-0 texts of
+`templates/`, `examples/` and `content/tutorials/`, which mark those directories'
+licence where they are copied on their own.

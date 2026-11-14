@@ -21,6 +21,6 @@ measurements and failures remain in [the size report](BUNDLE_SIZE.md).
 
 Item 3 is verified by focused progress/download tests, a guarded local Lean build,
 and the same candidate's cold installation/build on both architectures. The
-[original progress evidence](evidence/first-build-progress-2026-09-26.json) and
-[native acceptance logs](evidence/bundle-size-linux-x64-recheck-2026-09-26.json)
+[original progress evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/first-build-progress-2026-09-26.json) and
+[native acceptance logs](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/bundle-size-linux-x64-recheck-2026-09-26.json)
 record the first-build notice, download progress and timed phase updates.

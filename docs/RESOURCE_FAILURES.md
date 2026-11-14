@@ -68,7 +68,7 @@ zero OOM/throttling events. It exposed an ordinary `_private` module lookup
 failure in the allocator experiment, recorded separately from memory protection.
 
 Raw diagnostic logs remain ignored under `.work/resource-diagnostics/`.
-[Structured evidence](evidence/resource-protection-2026-09-19.json) includes the
+[Structured evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/resource-protection-2026-09-19.json) includes the
 kernel task summaries, failed first guard, corrected checks, and interrupted
 suite/source-integrity records. No interrupted full suite counts as a pass.
 
@@ -80,7 +80,7 @@ much host memory outside the guard. The 4 GiB guest reports a clean Lean
 allocation failure. This is distinct from either a host OOM or a supervisor stop.
 Kernel and systemd-oomd journals checked after that run contained no memory-kill
 entries since the desktop restart at 20:10 Eastern. See
-[the allocation evidence](evidence/region-allocation-2026-09-20.json).
+[the allocation evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/region-allocation-2026-09-20.json).
 
 Long suites can now use `run-campaign.mjs`, a small supervisor outside the
 workload cgroup. It starts one independently guarded test at a time and retains
@@ -95,7 +95,7 @@ Four tiny synthetic CTest controls verified batch resume, deliberate ordinary
 process interruption and cleanup, preserved prior evidence, and failed-test
 accounting. The intentional failing control remains failed; it was not turned
 into a pass. These controls used about 25 MiB per guarded run and induced no
-memory pressure or OOM. See [the checkpoint evidence](evidence/campaign-checkpoints-2026-09-20.json).
+memory pressure or OOM. See [the checkpoint evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/campaign-checkpoints-2026-09-20.json).
 
 The new full Node campaign exposed aggregate memory growth inside individual
 Lake tests: `deps` and `ffi` started compiler children and reached the proactive
@@ -106,7 +106,7 @@ runner now waits for its own completed unit to disappear before returning.
 The tiny checkpoint/interruption controls passed again after that correction.
 It also records bounded per-process RSS snapshots near the memory high-water
 mark, excluding command lines and unrelated desktop processes. See
-[the Lake budget evidence](evidence/lake-memory-budget-2026-09-20.json). The host
+[the Lake budget evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lake-memory-budget-2026-09-20.json). The host
 cap remains unchanged while lower-worker configurations are investigated.
 
 Reducing only the preinitialized pthread pool from eight to five was insufficient:
@@ -125,7 +125,7 @@ commands required the caller to remember the wrapper. Three representative
 entry points refused an overlapping launch before their bodies ran while a real
 upstream test continued unaffected. All harness scripts passed syntax checks.
 These checks used no memory exhaustion; see
-[the entry-point evidence](evidence/automatic-guard-entrypoints-2026-09-20.json).
+[the entry-point evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/automatic-guard-entrypoints-2026-09-20.json).
 
 The campaign supervisor now accepts `SIGUSR2` to finish and checkpoint the
 current test, then pause before launching another. This makes room for a
@@ -133,7 +133,7 @@ diagnostic without interrupting an upstream driver's cleanup. `SIGTERM` still
 stops immediately when needed. Two tiny guarded CTest controls confirmed that
 the active test passes, the next test remains unstarted, and resumption preserves
 the first test's evidence byte-for-byte. They recorded no OOM or throttling;
-see [the orderly-pause evidence](evidence/campaign-pause-2026-09-20.json).
+see [the orderly-pause evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/campaign-pause-2026-09-20.json).
 
 The original guard's CPU setting (`Nice=5`) caused a separate compatibility
 problem: even native Lean failed the unchanged `async_systems_info` test when
@@ -142,7 +142,7 @@ cannot raise priority from 5 to 3. At normal priority (`Nice=0`) the native
 control passes. The guard now records and preserves that normal CPU setting;
 all memory limits, pressure thresholds, swap restrictions, and concurrency
 limits are unchanged. This was a harness-induced failure, not a fundamental
-Lean or Wasm limit. See [the priority comparison](evidence/guard-priority-2026-09-20.json).
+Lean or Wasm limit. See [the priority comparison](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/guard-priority-2026-09-20.json).
 
 The resumed packaged-finalizer investigation on September 21 found a Wasm
 memory-access trap, not host memory exhaustion. The probe peaked below 0.5 GiB
@@ -170,7 +170,7 @@ imports and saved little; it remains recorded along with the concurrency trials.
 Five focused lookup tests and the ABI/thread/library checks pass.
 Broader server campaigns remain necessary. The memory cap, proactive
 stop, pressure monitor, swap restriction, and single-workload policy are unchanged.
-See [the complete comparisons](evidence/function-table-index-2026-09-21.json).
+See [the complete comparisons](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/function-table-index-2026-09-21.json).
 
 The original-driver v52 Node campaign reached 8.01 GiB in
 `docstringLinksExamples` after 27 passes. Compiling the unchanged small Lean
@@ -178,7 +178,7 @@ server-test driver ahead of time in an explicitly separate harness allowed
 that original registration and four related Node controls to pass at
 6.20–7.31 GiB. The resource abort and these passes remain separate; no
 resource abort is counted as a conformance pass. See
-[the build, suite, and integrity evidence](evidence/compiled-server-driver-2026-09-21.json).
+[the build, suite, and integrity evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/compiled-server-driver-2026-09-21.json).
 
 During the directory-identity runtime rebuild, two full Wasm links stopped on
 workload pressure at 1.80 and 2.26 GiB. The second attempt used only one build
@@ -226,7 +226,7 @@ their identity, reject a changed policy on resume, and check the wrapper before
 each attempt. Two synthetic child/grandchild controls and four existing
 ordering/resume controls pass. Guard thresholds and host settings are unchanged.
 The stopped campaign and successful retry remain separate in
-[the pressure-stop and retry evidence](evidence/compact-closure-base-pages-2026-09-22.json).
+[the pressure-stop and retry evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/compact-closure-base-pages-2026-09-22.json).
 
 The subsequent final-link experiment exposed a settings mismatch: direct guard
 runs still defaulted to two build workers, although the current full-link policy
@@ -240,14 +240,14 @@ direct child/grandchild control verifies those actual defaults; campaign policy,
 resume and rejection controls pass too, peaking at about 26 MiB. No pressure
 or allocation stress is used. Full-suite profiles still explicitly record
 `--base-pages --build-jobs 1`. See
-[the settings correction and retained attempts](evidence/standalone-link-optimization-2026-09-22.json).
+[the settings correction and retained attempts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/standalone-link-optimization-2026-09-22.json).
 
 On 2026-09-24, the optional Windows guard deadline passed on native x64 and
 ARM64 standard runners. A three-second idle parent/child control exits with
 code 124 and `time-limit`, and both PIDs are absent afterward. Ordinary
 parent/child completion still passes below the 512 MiB cap. Maximum observed
 committed memory was 111,812,608 bytes; no pressure or intentional OOM test was
-used. The [native receipts](evidence/windows-guard-deadline-2026-09-24.json)
+used. The [native receipts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-guard-deadline-2026-09-24.json)
 support stopping a long build before the runner's hard deadline so completed
 compiler-cache entries can be collected. They do not establish full compiler
 checkpoint correctness.
@@ -263,7 +263,7 @@ verifies both original hardlink names and their compressed bytes, then completes
 at 303 MB. This was a guarded resource abort, not a compatibility failure or
 an OOM stress test. Separate hash/metadata-verified cache deduplication and
 lossless archival restored disk headroom without deleting test evidence.
-See the [retained archival and cache receipts](evidence/resource-headroom-2026-09-25.json).
+See the [retained archival and cache receipts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/resource-headroom-2026-09-25.json).
 
 The fresh Lean 4.34.1 native IO controls first stopped at 5.08% workload memory
 pressure, with a 596 MiB peak and more than 23 GiB of host memory available.
@@ -273,7 +273,7 @@ An unchanged-fixture retry through `base-pages.py` passed all eight interpreted
 and C-compiled controls at 304 MiB, without resource events. Caps and pressure
 thresholds were unchanged. The first attempt remains a resource abort, including
 its partial observations; the successful retry supports the mitigation without
-establishing a unique cause. See the [two preserved attempts](evidence/lean-4.34.1-native-io-ci-2026-09-25.json).
+establishing a unique cause. See the [two preserved attempts](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-native-io-ci-2026-09-25.json).
 
 A subsequent successful-output cleanup reclaims 4.85 GiB from completed
 Lean 4.34.1 HTTP IO-expression and supplementary filesystem/console
@@ -288,9 +288,9 @@ retired binaries are no longer held in lossless archives. Later per-case
 retirement receipts explicitly supersede the earlier archive retention status.
 Cleanup peaks at 53.74 MiB inside its one-GiB guard, releases the service without
 resource events and leaves 10.43 GiB free. No guard threshold or host setting is
-changed. See the [verified retirement records](evidence/lean-4.34.1-successful-output-retention-2026-09-25.json).
+changed. See the [verified retirement records](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-successful-output-retention-2026-09-25.json).
 
-The [upstream application metadata check](evidence/lean-4.34.1-upstream-metadata-reclamation-2026-09-25.json)
+The [upstream application metadata check](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-upstream-metadata-reclamation-2026-09-25.json)
 extends the already tested HTTP-harness adaptation to compiled-application and
 shared-driver campaigns. After a successful build, the harness binds the
 metadata manifest to its recorded build identity, hashes both generated copies,
