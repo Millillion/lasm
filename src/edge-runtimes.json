@@ -2,16 +2,16 @@
   "schema": 1,
   "note": "Edge runtimes (docs/EDGE.md): Lean's C++ runtime and Lasm's host bridge built single-threaded (edge-runtime.yml, scripts/edge/package-edge-runtime.mjs). Each replaces three archives of the Node runtime named by baseRuntimeManifestSha256. The release is a draft until 0.2.0 publishes it.",
   "lean": {
-    "4.35.0": {
-      "name": "lean-4.35.0-wasm64-edge.tar.zst",
-      "root": "lean-4.35.0-wasm64-edge",
-      "url": "https://github.com/Millillion/lasm/releases/download/lean-4.35.0-edge-v5/lean-4.35.0-wasm64-edge.tar.zst",
-      "sha256": "002378afda78e20e25a4507d44d19cf34c53e823c9f35332a63a884bc3f2ba7b",
-      "bytes": 1281276,
+    "4.36.0-rc2": {
+      "name": "lean-4.36.0-rc2-wasm64-edge.tar.zst",
+      "root": "lean-4.36.0-rc2-wasm64-edge",
+      "url": "https://github.com/Millillion/lasm/releases/download/lean-4.36.0-rc2-edge-v1/lean-4.36.0-rc2-wasm64-edge.tar.zst",
+      "sha256": "7ace543882428bada51f251c3bfe0587179fb6bb7ed5733268428c6c6c7cda89",
+      "bytes": 1228838,
       "format": "tar.zst",
-      "maximumExtractedBytes": 14767172,
-      "baseRuntimeManifestSha256": "9921c696161a9852442863a19e16990f2d540aa369adaa353906504bb589649a",
-      "source": "edge-runtime.yml in wasi.yml run 43377983334 (m4-js-framing, on runtime 9921c696…: the Lasm.JS edge glue includes library/c/lasm_js_framing.h), with scripts/edge/build-edge-extras.mjs (Lasm.JS glue, Emscripten system libraries) and package-edge-runtime.mjs"
+      "maximumExtractedBytes": 14212936,
+      "baseRuntimeManifestSha256": "e59893b53c7aeafd5f3f503bb7d1cb7e3615f14494206b6dda2246b188641eea",
+      "source": "edge-runtime.yml run 43580020210 (branch lean-4.36-rc2, on runtime e59893b5…), with scripts/edge/build-edge-extras.mjs and package-edge-runtime.mjs"
     }
   }
 }
