@@ -24,32 +24,185 @@ def word (s : List Char) : Bool := !s.isEmpty && s.all fun c => c.isAlphanum || 
 /-- `initialize_` and a word. -/
 def initializerRest (s : List Char) : Bool := "initialize_".toList.isPrefixOf s && word (s.drop 11)
 
-/-- `Lasm.Cli.validInitializer`, reading the name's characters once and
-testing prefixes without copying them. -/
-def validInitializer (n : String) : Bool :=
-  let l := n.toList
+/-- `Lasm.Cli.validInitializer` over the name's characters, testing prefixes
+without copying them (the step between the model and `validInitializer`). -/
+def validInitializerList (l : List Char) : Bool :=
   initializerRest l || ("runtime_".toList.isPrefixOf l && initializerRest (l.drop 8)) ||
     ("meta_".toList.isPrefixOf l && initializerRest (l.drop 5))
+
+/-- A character of an initializer name. -/
+def wordChar (c : Char) : Bool := c.isAlphanum || c = '_'
+
+/-- A byte of an initializer name: an ASCII letter or digit, or `_`. -/
+def byteWord (b : UInt8) : Bool := (48 ≤ b && b ≤ 57) || (65 ≤ b && b ≤ 90) || (97 ≤ b && b ≤ 122) || b == 95
+
+/-- A character's UTF-8 bytes are word bytes exactly when it is a word character
+(the others start with a byte of 192 or more). -/
+theorem enc_all (c : Char) : (String.utf8EncodeChar c).all byteWord = wordChar c := by
+  have hv := c.valid
+  simp only [String.utf8EncodeChar]
+  have hc : wordChar c = ((48 ≤ c.val.toNat ∧ c.val.toNat ≤ 57) || (65 ≤ c.val.toNat ∧ c.val.toNat ≤ 90) ||
+      (97 ≤ c.val.toNat ∧ c.val.toNat ≤ 122) || c.val.toNat = 95 : Bool) := by
+    simp only [wordChar, Char.isAlphanum, Char.isAlpha, Char.isUpper, Char.isLower, Char.isDigit]
+    have : (c = '_') ↔ c.val.toNat = 95 := by
+      constructor
+      · rintro rfl; rfl
+      · intro h; apply Char.ext; apply UInt32.toNat_inj.mp; simpa using h
+    apply Bool.eq_iff_iff.mpr
+    simp only [Bool.or_eq_true, Bool.and_eq_true, decide_eq_true_eq, this, ge_iff_le, UInt32.le_iff_toNat_le]
+    simp only [show 'A'.val.toNat = 65 from rfl, show 'Z'.val.toNat = 90 from rfl, show 'a'.val.toNat = 97 from rfl,
+      show 'z'.val.toNat = 122 from rfl, show '0'.val.toNat = 48 from rfl, show '9'.val.toNat = 57 from rfl]
+    omega
+  rw [hc]
+  split
+  · rename_i h
+    simp only [List.all_cons, List.all_nil, Bool.and_true, byteWord]
+    apply Bool.eq_iff_iff.mpr
+    simp only [Bool.or_eq_true, Bool.and_eq_true, decide_eq_true_eq, UInt8.le_iff_toNat_le, beq_iff_eq,
+      UInt8.toNat_ofNat', UInt8.toNat_ofNat, Nat.reducePow, Nat.reduceMod, ← UInt8.toNat_inj]
+    have : c.val.toNat % 2 ^ 8 = c.val.toNat := Nat.mod_eq_of_lt (by omega)
+    simp only [this]
+  · rename_i h
+    have hf : ∀ (x : Nat) (r : List UInt8), 192 ≤ x % 256 → (UInt8.ofNat x :: r).all byteWord = false := by
+      intro x r hx
+      simp only [List.all_cons, byteWord, Bool.and_eq_false_iff]
+      left
+      simp only [Bool.or_eq_false_iff, Bool.and_eq_false_iff, decide_eq_false_iff_not, UInt8.le_iff_toNat_le, UInt8.toNat_ofNat',
+        beq_eq_false_iff_ne, ne_eq, ← UInt8.toNat_inj, Nat.not_le, UInt8.toNat_ofNat, Nat.reducePow, Nat.reduceMod]
+      omega
+    have hw : ((48 ≤ c.val.toNat ∧ c.val.toNat ≤ 57) || (65 ≤ c.val.toNat ∧ c.val.toNat ≤ 90) ||
+      (97 ≤ c.val.toNat ∧ c.val.toNat ≤ 122) || c.val.toNat = 95 : Bool) = false := by
+      simp only [Bool.or_eq_false_iff, decide_eq_false_iff_not]; omega
+    rw [hw]
+    split
+    · exact hf _ _ (by omega)
+    · split
+      · exact hf _ _ (by omega)
+      · exact hf _ _ (by omega)
+
+/-- Every byte of `s` from byte `i` on is a word character's. -/
+def allWordBytes (s : String) (i : Nat) : Bool :=
+  if h : i < s.utf8ByteSize then
+    byteWord (s.getUTF8Byte ⟨i⟩ (by simpa [String.Pos.Raw.lt_iff] using h)) && allWordBytes s (i + 1)
+  else true
+termination_by s.utf8ByteSize - i
+
+theorem toByteArray_eq (s : String) : s.toByteArray = (s.toList.flatMap String.utf8EncodeChar).toByteArray := by
+  rw [← String.utf8Encode_toList]; rfl
+
+theorem allWordBytes_drop (s : String) (i : Nat) :
+    allWordBytes s i = ((s.toList.flatMap String.utf8EncodeChar).drop i).all byteWord := by
+  have hsize : s.utf8ByteSize = (s.toList.flatMap String.utf8EncodeChar).length := by
+    rw [← List.size_toByteArray, ← toByteArray_eq]; rfl
+  fun_induction allWordBytes s i with
+  | case1 i h ih =>
+    have hi : i < (s.toList.flatMap String.utf8EncodeChar).length := hsize ▸ h
+    rw [ih, List.drop_eq_getElem_cons hi, List.all_cons]
+    congr 2
+    simp only [String.getUTF8Byte_eq_getElem]
+    have := List.getElem_toByteArray (l := s.toList.flatMap String.utf8EncodeChar) (i := i) (h := by simpa [List.size_toByteArray] using hi)
+    rw [← this]
+    congr 1
+    exact toByteArray_eq s
+  | case2 i h =>
+    rw [List.drop_eq_nil_of_le (by omega)]
+    rfl
+
+/-- The byte loop reads the characters' check. -/
+theorem allWordBytes_eq (s : String) : allWordBytes s 0 = s.toList.all wordChar := by
+  rw [allWordBytes_drop, List.drop_zero, List.all_flatMap]
+  congr 1
+  funext c
+  exact enc_all c
+
+/-- `Lasm.Cli.validInitializer`, reading the string in place: every byte a word
+character's, and one of the three prefixes followed by at least one more
+character (no list of characters is built). -/
+def validInitializer (n : String) : Bool :=
+  allWordBytes n 0 && ((n.startsWith "initialize_" && decide (11 < n.length)) ||
+    (n.startsWith "runtime_initialize_" && decide (19 < n.length)) ||
+    (n.startsWith "meta_initialize_" && decide (16 < n.length)))
 
 theorem take_beq (p l : List Char) : (l.take p.length == p) = p.isPrefixOf l := by
   apply Bool.eq_iff_iff.mpr
   rw [beq_iff_eq, List.isPrefixOf_iff_prefix, List.prefix_iff_eq_take]
   exact ⟨Eq.symm, Eq.symm⟩
 
-@[csimp] theorem validInitializer_eq : @Lasm.Cli.validInitializer = @validInitializer := by
+theorem model_eq_list : @Lasm.Cli.validInitializer = fun n => validInitializerList n.toList := by
   funext n
   have r : ∀ s : List Char, (match s.splitAt 11 with
       | (p, w) => p == "initialize_".toList && (!w.isEmpty && w.all fun c => c.isAlphanum || c = '_')) = initializerRest s := by
     intro s
     rw [List.splitAt_eq]
     exact congrArg (· && _) (take_beq "initialize_".toList s)
-  simp only [Lasm.Cli.validInitializer, validInitializer, r]
+  simp only [Lasm.Cli.validInitializer, validInitializerList, r]
   rw [show (8 : Nat) = "runtime_".toList.length from rfl, show (5 : Nat) = "meta_".toList.length from rfl,
     take_beq, take_beq]
 
+/-- A prefix of word characters, then a word: all word characters, the prefix, and more. -/
+theorem prefix_word (p l : List Char) (hp : p.all wordChar = true) :
+    (p.isPrefixOf l && word (l.drop p.length)) = (l.all wordChar && (p.isPrefixOf l && decide (p.length < l.length))) := by
+  by_cases h : p <+: l
+  · obtain ⟨t, rfl⟩ := h
+    have hp' : p.isPrefixOf (p ++ t) = true := List.isPrefixOf_iff_prefix.mpr (List.prefix_append p t)
+    simp only [hp', List.drop_left, List.all_append, hp, word, Bool.true_and, List.length_append]
+    cases t with
+    | nil => simp
+    | cons c t => simp; rfl
+  · have : p.isPrefixOf l = false := by
+      rw [Bool.eq_false_iff]; exact fun h' => h (List.isPrefixOf_iff_prefix.mp h')
+    simp [this]
+
+/-- Two prefixes, one after the other, are their concatenation. -/
+theorem prefix_prefix (p q l : List Char) :
+    (p.isPrefixOf l && q.isPrefixOf (l.drop p.length)) = (p ++ q).isPrefixOf l := by
+  by_cases h : p <+: l
+  · obtain ⟨t, rfl⟩ := h
+    have hp' : p.isPrefixOf (p ++ t) = true := List.isPrefixOf_iff_prefix.mpr (List.prefix_append p t)
+    apply Bool.eq_iff_iff.mpr
+    simp [hp', List.isPrefixOf_iff_prefix, List.prefix_append_right_inj]
+  · have : p.isPrefixOf l = false := by
+      rw [Bool.eq_false_iff]; exact fun h' => h (List.isPrefixOf_iff_prefix.mp h')
+    have : (p ++ q).isPrefixOf l = false := by
+      rw [Bool.eq_false_iff]
+      exact fun h' => h ((List.prefix_append p q).trans (List.isPrefixOf_iff_prefix.mp h'))
+    simp [*]
+
+theorem list_eq_string (n : String) : validInitializerList n.toList = validInitializer n := by
+  have hi : "initialize_".toList.all wordChar = true := by decide
+  have hr : ("runtime_".toList ++ "initialize_".toList).all wordChar = true := by decide
+  have hm : ("meta_".toList ++ "initialize_".toList).all wordChar = true := by decide
+  have rest : ∀ l : List Char, initializerRest l = (l.all wordChar && ("initialize_".toList.isPrefixOf l &&
+      decide ("initialize_".toList.length < l.length))) := fun l => prefix_word _ l hi
+  have nested : ∀ (p : List Char) (l : List Char),
+      (p.isPrefixOf l && initializerRest (l.drop p.length)) =
+        ((p ++ "initialize_".toList).isPrefixOf l && word (l.drop (p ++ "initialize_".toList).length)) := by
+    intro p l
+    simp only [initializerRest, ← Bool.and_assoc, prefix_prefix, List.length_append, List.drop_drop]
+    rw [show "initialize_".toList.length = 11 from rfl, Nat.add_comm]
+  have hrl : ("runtime_".toList ++ "initialize_".toList) = "runtime_initialize_".toList := by decide
+  have hml : ("meta_".toList ++ "initialize_".toList) = "meta_initialize_".toList := by decide
+  simp only [validInitializerList, validInitializer]
+  rw [show (8 : Nat) = "runtime_".toList.length from rfl, show (5 : Nat) = "meta_".toList.length from rfl,
+    nested, nested, prefix_word _ _ hr, prefix_word _ _ hm, rest, hrl, hml]
+  simp only [allWordBytes_eq, String.length_toList.symm]
+  have sw : ∀ p : String, n.startsWith p = p.toList.isPrefixOf n.toList := by
+    intro p
+    apply Bool.eq_iff_iff.mpr
+    rw [String.startsWith_string_iff, List.isPrefixOf_iff_prefix]
+  simp only [sw]
+  rw [show "initialize_".toList.length = 11 from rfl, show "runtime_initialize_".toList.length = 19 from rfl,
+    show "meta_initialize_".toList.length = 16 from rfl]
+  cases n.toList.all wordChar <;> simp
+
+@[csimp] theorem validInitializer_eq : @Lasm.Cli.validInitializer = @validInitializer := by
+  rw [model_eq_list]
+  funext n
+  exact list_eq_string n
+
 /-- The schedule of `name` over prepared tables. -/
 def scheduleWith (m : Std.HashMap String (List String)) (ks : Std.HashSet String) (fuel : Nat) (name : String) : List String :=
-  ((m.getD name []).foldl (visit m ks fuel) ((∅ : Std.HashSet String).insert name, #[])).2.toList
+  ((m.getD name []).foldl (visit m ks fuel) ((Std.HashSet.emptyWithCapacity m.size).insert name, #[])).2.toList
 
 /-- `Lasm.Cli.initializationSchedule`, in time linear in the plan. -/
 def initializationSchedule (name : String) (calls : List (String × List String)) (keep : List String) : List String :=
@@ -127,7 +280,7 @@ theorem scheduleWith_eq {calls : List (String × List String)} {keep : List Stri
     {m : Std.HashMap String (List String)} {ks : Std.HashSet String}
     (hm : ∀ u, m.getD u [] = edgesOf calls u) (hk : ∀ u, ks.contains u = decide (u ∈ keep)) (name : String) :
     scheduleWith m ks (calls.length + 1) name = Lasm.Cli.initializationSchedule name calls keep := by
-  have hstart : Agree ([name], []) ((∅ : Std.HashSet String).insert name, #[]) := by
+  have hstart : Agree ([name], []) ((Std.HashSet.emptyWithCapacity m.size).insert name, #[]) := by
     refine ⟨fun x => ?_, rfl⟩
     by_cases hx : name = x
     · subst hx; simp

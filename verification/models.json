@@ -101,7 +101,18 @@
     },
     "src/application-diagnosis.mjs": {
       "status": "pending",
-      "reason": "Lean name mangling and demangling, and the diagnosis of ahead-of-time rejections: pure string functions (candidate mangle_round_trip)"
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/Mangle.lean",
+          "functions": [
+            "mangleName",
+            "demangleName",
+            "initializerModule"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "Lean name mangling is modelled (mangle_round_trip proved of the model; the differential also checks it against Lean 4.35's own Name.mangle and Name.demangle); the diagnosis of ahead-of-time rejections (parseWhyExtract, archiveMembers, explainRejection, usedModules, declarationName) remains to model"
     },
     "src/application-files.mjs": {
       "status": "exempt",
@@ -384,12 +395,15 @@
         {
           "lean": "verification/cli/Lasm/Cli/Model/Init.lean",
           "functions": [
-            "parseInitArguments"
+            "parseInitArguments",
+            "packageName (after basename, resolve and toLowerCase)",
+            "lakeName",
+            "supabaseFunctionNameOf (after toLowerCase)"
           ],
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "`lasm init`: argument parsing is modelled (parse_known_or_refused proved); generated names are pure (candidate generated_names_valid) and remain to model; the rest writes templates"
+      "reason": "`lasm init`: argument parsing is modelled (parse_known_or_refused proved) and so are the generated names (generated_names_valid proved); the template texts (golden-tested, test/init-golden.test.mjs) and writing them remain"
     },
     "src/js-runtime.mjs": {
       "status": "exempt",
@@ -408,7 +422,7 @@
     },
     "src/lasm-modules/ui-dom.mjs": {
       "status": "modelled",
-      "reason": "the UI applier: its reading of patch frames is Lean's reference decoder (ui-decode, proved by Lasm.UI.Spec.frames_decode) and its DOM operations and hydration are the applier model (applier_correct, applier_session, hydrate_correct proved; the differential runs it on happy-dom with the DOM standard's insertion checks); left out: events, commands, subscriptions and navigation (tested in test/ui-dom-applier.test.mjs and the browser suites)",
+      "reason": "the UI applier: its reading of patch frames is Lean's reference decoder (ui-decode, proved by Lasm.UI.Spec.frames_decode) and its DOM operations and hydration are the applier model (applier_correct, diff_conforms, applier_session, hydrate_correct proved; the differential runs it on happy-dom with the DOM standard's insertion checks); left out: events, commands, subscriptions and navigation (tested in test/ui-dom-applier.test.mjs and the browser suites)",
       "models": [
         {
           "lean": "library/Lasm/UI/Proofs/Decode.lean",
@@ -465,7 +479,17 @@
     },
     "src/link-driver/python.mjs": {
       "status": "pending",
-      "reason": "Python's JSON and string semantics: pure (candidates json_string_ascii, json_dumps_parse_back, python_order_code_points)"
+      "reason": "Python's JSON and string semantics: pythonJsonString and comparePythonStrings are modelled (json_string_printable and python_order_code_points proved; json_string_ascii's JSON reading stays a candidate); pythonJsonDumps, pythonEquals, truthy and the identifier and whitespace helpers remain to model (candidate json_dumps_parse_back)",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/Python.lean",
+          "functions": [
+            "pythonJsonString",
+            "comparePythonStrings"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ]
     },
     "src/link-driver/settings.mjs": {
       "status": "exempt",
@@ -513,6 +537,171 @@
       "status": "exempt",
       "kind": "io",
       "reason": "provisions the compiler SDK; orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
+    },
+    "src/mimalloc/emscripten/include/mimalloc-stats.h": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/include/mimalloc.h": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/include/mimalloc/atomic.h": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/include/mimalloc/bits.h": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/include/mimalloc/internal.h": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/include/mimalloc/prim.h": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/include/mimalloc/track.h": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/include/mimalloc/types.h": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/alloc-aligned.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/alloc-override.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/alloc-posix.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/alloc.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/arena-meta.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/arena.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/bitmap.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/bitmap.h": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/free.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/heap.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/init.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/libc.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/options.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/os.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/page-map.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/page-queue.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/page.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/prim/emscripten/prim.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/prim/prim.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/random.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/stats.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/theap.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/emscripten/src/threadlocal.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI and edge targets, issues #246 and #247): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml and workers.yml"
+    },
+    "src/mimalloc/lasm_mimalloc.c": {
+      "status": "exempt",
+      "kind": "runtime",
+      "reason": "includes Emscripten's mimalloc sources (src/mimalloc/emscripten) as one translation unit, with no code of its own: the allocator under Lean's runtime on the WASI and edge targets (issues #246, #247), checked by the differential tests (docs/TESTING.md), wasi.yml and workers.yml"
+    },
+    "src/mimalloc/mimalloc.mjs": {
+      "status": "exempt",
+      "kind": "io",
+      "reason": "the flags and sources of Lasm's mimalloc build, which the WASI and edge links compile; orchestration of files and processes: its effect is the behaviour, tested end to end (wasi.yml, workers.yml) and by the link-plan tests"
     },
     "src/native-abort.cjs": {
       "status": "exempt",
@@ -798,6 +987,10 @@
       "kind": "io",
       "reason": "runs the system git; orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
     },
+    "src/tar.mjs": {
+      "status": "pending",
+      "reason": "the tar reader and writer (tool archives, npm packages, the Fastly package): fuzzed against Python's tarfile, an independent implementation (test/fuzz/targets/tar.mjs); a Lean model of the reader's header and pax parsing is due (IRREDUCIBLE.md M4)"
+    },
     "src/test-switches.mjs": {
       "status": "exempt",
       "kind": "data",
@@ -817,11 +1010,6 @@
       "status": "exempt",
       "kind": "deleting",
       "reason": "Lasm.Fetch on WASI (CGI), deleted with Lasm.Fetch (the 2026-11-10 dissolution)"
-    },
-    "src/wasi/lasm_mimalloc.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "includes Emscripten's mimalloc sources (src/wasi/mimalloc) as one translation unit, with no code of its own: the allocator under Lean's runtime on the WASI targets (issue #246), checked by the differential tests (docs/TESTING.md) and wasi.yml"
     },
     "src/wasi/lasm_wasi.c": {
       "status": "exempt",
@@ -862,161 +1050,6 @@
       ],
       "reason": "the whole module is modelled (lowerAtomics with its readers, moduleImports, keepExports); candidates lowering_rewrites_atomics, lowering_leaves_no_atomics and lowering_keeps_runs are stated over the model, the last two also over WebAssembly validation and execution (outside semantics)"
     },
-    "src/wasi/mimalloc/include/mimalloc-stats.h": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/include/mimalloc.h": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/include/mimalloc/atomic.h": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/include/mimalloc/bits.h": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/include/mimalloc/internal.h": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/include/mimalloc/prim.h": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/include/mimalloc/track.h": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/include/mimalloc/types.h": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/alloc-aligned.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/alloc-override.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/alloc-posix.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/alloc.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/arena-meta.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/arena.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/bitmap.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/bitmap.h": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/free.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/heap.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/init.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/libc.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/options.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/os.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/page-map.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/page-queue.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/page.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/prim/emscripten/prim.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/prim/prim.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/random.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/stats.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/theap.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
-    "src/wasi/mimalloc/src/threadlocal.c": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "Emscripten 6.0.9's mimalloc 3.4.1, vendored unchanged (third-party; the allocator under Lean's runtime on the WASI targets, issue #246): its meaning is Emscripten's libmimalloc's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) and by wasi.yml"
-    },
     "src/wasi/wasi-build.mjs": {
       "status": "exempt",
       "kind": "io",
@@ -1038,7 +1071,7 @@
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "every function is modelled (the template, read from component/proxy-template.wasm by default, is an argument); replace_one_core_module, drops_only_component_type and componentize_inverse proved"
+      "reason": "every function runs as its Lean model, compiled by Lasm into the CLI's glue program (src/glue/glue.mjs, docs/proposals/M6_GLUE.md) through proved fast versions over byte arrays (verification/cli/Lasm/Cli/Fast/WasiComponent.lean, csimp theorems); what remains here is reading the template (component/proxy-template.wasm, an argument of the model) and taking any array of bytes, which the differential checks together with the compiled program; replace_one_core_module, drops_only_component_type and componentize_inverse proved"
     },
     "src/wasi/wasi-link.mjs": {
       "status": "exempt",

@@ -27,18 +27,6 @@ open Lasm.Cli
 
 /-! ## Builds -/
 
-/-- **Mangling round-trips.** For a dotted name Lean mangles unambiguously,
-the mangled name is a non-empty C identifier, demangling gives the name
-back, and the module of its initializer (`initialize_…` or
-`runtime_initialize_…`) is the name.
-Tested by: test/application-diagnosis.test.mjs -/
-def mangle_round_trip : Prop :=
-  ∀ n : String, wellFormedName n = true →
-    demangleName (mangleName n) = n ∧
-    initializerModule ("initialize_" ++ mangleName n) = some n ∧
-    initializerModule ("runtime_initialize_" ++ mangleName n) = some n ∧
-    mangleName n ≠ "" ∧ (mangleName n).all fun c => c.isAlphanum || c = '_'
-
 /-- **The compact wrappers run the kept initializers as the chains do.** For
 an acyclic plan of valid initializer names, the wrappers are generated, and
 calling kept initializers' wrappers runs exactly the kept initializers the Node build's chains run, in
@@ -49,26 +37,6 @@ def compact_wrappers_as_chains : Prop :=
     (∀ x ∈ p.closure, initializerName x = true) → (∀ x, ∀ y ∈ p.edges x, y ∈ p.closure) →
     (∀ e ∈ entries, e ∈ p.keep) → (∀ k ∈ p.keep, k ∈ p.closure) →
     ∃ source, compactInitializerWrappers p = .ok source ∧ runInitializers source p.edges entries = chains p entries
-
-/-! ## `lasm init` names -/
-
-/-- **Generated names are valid npm, Lake and Supabase names.** Whatever the
-directory or text: the npm package name is lowercase letters, digits, `.`,
-`_` and `-`, starts with a letter or digit and does not end with `-`; the
-Lake name is an identifier of ASCII letters, digits and `_` that starts with
-a letter and does not end with `_`; the Supabase function name is lowercase
-letters, digits and `-`, starts with a letter and has at most 54 characters.
-Tested by: test/init-golden.test.mjs -/
-def generated_names_valid : Prop :=
-  ∀ dir s : String,
-    ((packageName dir).toList.head?.map fun c => c.isLower || c.isDigit) = some true ∧
-    (packageName dir).all (fun c => c.isLower || c.isDigit || c = '.' || c = '_' || c = '-') ∧
-    ¬ (packageName dir).endsWith "-" ∧
-    ((lakeName s).toList.head?.map Char.isAlpha) = some true ∧
-    (lakeName s).all (fun c => c.isAlphanum || c = '_') ∧ ¬ (lakeName s).endsWith "_" ∧
-    ((supabaseFunctionNameOf s).toList.head?.map Char.isLower) = some true ∧
-    (supabaseFunctionNameOf s).all (fun c => c.isLower || c.isDigit || c = '-') ∧
-    (supabaseFunctionNameOf s).length ≤ 54
 
 /-! ## Development server -/
 
@@ -194,7 +162,9 @@ def retry_delay_bounded : Prop :=
 
 /-- **Escaped strings are printable ASCII JSON for the string.** `json.dumps`
 of any string, `ensure_ascii`, is printable ASCII, and a JSON parser reads it
-as that string.
+as that string. Its second half is proved (`json_string_printable`); the
+first needs facts about Lean's JSON parser (`Lean.Json.parse` of escapes and
+surrogate pairs) that Lean does not state.
 Tested by: test/link-driver-python.test.mjs -/
 def json_string_ascii : Prop :=
   ∀ s : String, Lean.Json.parse (pythonJsonString s) = .ok (.str s) ∧
@@ -208,14 +178,6 @@ def json_dumps_parse_back : Prop :=
   ∀ (v : Lean.Json) (indent : Option Nat) (sortKeys : Bool) (text : String),
     pythonJsonDumps v indent sortKeys = .ok text →
       ((Lean.Json.parse text).toOption.any (· == v)) = true ∧ (indent = none → '\n' ∉ text.toList)
-
-/-- **Python's string order is the order of code points.** The sign of
-`comparePythonStrings a b` is that of comparing `a` and `b` code point by
-code point (a prefix first), as Python orders `str`, unlike JavaScript's
-UTF-16 order.
-Tested by: test/link-driver-python.test.mjs -/
-def python_order_code_points : Prop :=
-  ∀ a b : String, (comparePythonStrings a b).sign = if a < b then -1 else if a = b then 0 else 1
 
 /-! ## WebAssembly -/
 
@@ -283,5 +245,12 @@ the fields hold (digits, `:`, line ends, non-ASCII, nothing).
 Tested by: test/glue.test.mjs -/
 def glue_fields_round_trip : Prop :=
   ∀ fields : List String, decodeFields (encodeFields fields) = .ok fields
+
+/-- **A glue request carries its fields.** Lists of fields, encoded as a
+request, carry exactly their fields in order, whichever format the encoding
+chose (a table of distinct fields, or lengths when a field holds a 0 byte).
+Tested by: test/glue.test.mjs -/
+def glue_request_fields : Prop :=
+  ∀ lists : List (List String), requestFields (encodeRequest lists) = lists.flatten
 
 end Lasm.Cli.Candidates

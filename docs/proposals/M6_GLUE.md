@@ -48,8 +48,12 @@ times, by one that reads them once. Natively the whole generator then takes
 
 - **One glue program.** `verification/cli/LasmGlue.lean` runs
   `Lasm.Cli.Glue.main` (`Lasm/Cli/Glue.lean`): it reads an operation and its
-  arguments from stdin, as length-prefixed UTF-8 fields, and writes `ok:` and
-  the result or `error:` and a message to stdout. Later slices add
+  arguments from stdin, as UTF-8 fields, and writes `ok:` and
+  the result or `error:` and a message to stdout. The request is a table of
+  its distinct fields (separated by 0 bytes) and each field's 32-bit index
+  into it, so a name the plan repeats (each initializer about ten times) is
+  sent, validated and copied once; a request whose fields hold a 0 byte is
+  written as length-prefixed fields instead (§4, second round). Later slices add
   operations to the same program, so they share the Lean runtime the first
   slice pays for.
 - **Built by the published Lasm, as a WASI command.** `--target wasi` needs no
@@ -66,13 +70,13 @@ times, by one that reads them once. Natively the whole generator then takes
   stderr are collected, every clock reads 0 (Lean's runtime reads one as it
   starts), and every other WASI call (files, arguments, environment, random
   bytes) fails with `ENOSYS`. It
-  uses only `WebAssembly` and `Buffer`, so it runs under Node, Bun and Deno,
+  uses only `WebAssembly`, `Buffer` and `TextEncoder`, so it runs under Node, Bun and Deno,
   as the CLI does, and works from the published npm package (the `.wasm` is
   in `src/`, which ships). The calls stay synchronous, so callers do not
   change.
 - **The JavaScript left behind** is the adapter: the plan's shape check (now
   also requiring string names and arrays of calls) and the field encoding,
-  reading `calls` as its own entries (`Object.entries`), which is exactly the
+  reading `calls` as its own entries (its own keys and their values), which is exactly the
   model's reading (the model's old caveat about `Object.prototype` names goes
   away). No JavaScript fallback: if the glue cannot run, the edge link fails
   with the error.
@@ -141,3 +145,150 @@ passed its smoke test under Bun 1.4.4 and Deno 2.9.6):
 What would make the next slices cheaper: a WASI build optimized for speed
 (`-O2`) for the glue, and one instance reused across calls (a reactor
 instead of a command), which would remove the 3 ms per call.
+
+### Second round: a faster glue (PR #294)
+
+The goal was a warm call within about twice the JavaScript. Measured where
+the time went first (natively, with the same Lean compiled by Lean 4.35.0,
+and in Node on the committed module), then changed what cost most:
+
+| Step | Bar plan (2807, 6), natively | Change |
+| --- | ---: | --- |
+| Reading the request | 3.3 ms → 0.6 ms | The request was one length-prefixed field per name (22,461 fields, 414 KB): each field extracted, validated and copied, with `StateT` closures. It is now a table of the distinct fields (each name once: 56 KB) and a 32-bit index per field; the program validates and splits the table once and shares each name. Index reads use `UInt32` arithmetic (`Nat` shifts cost about 90 ns each). |
+| Its structure | 0.5 ms → 0.4 ms | Counts are read byte by byte (`String.toNat?` goes through the generic pattern machinery). |
+| The name check | 1.2 ms → 0.2 ms | `validInitializer` reads the name's bytes in place: a word character's UTF-8 encoding is one ASCII byte, and every other character's starts with a byte of 192 or more, so checking bytes is checking characters (`enc_all`, `allWordBytes_eq`; the `csimp` theorem now targets the byte loop). |
+| The schedules | 0.8 ms → 0.6 ms | Each walk's seen set is sized to the plan up front instead of growing from empty (about ten rehashes per kept initializer); 2807, 50: 4.3 → 3.2 ms; 8000, 200: 10.0 → 8.9 ms. |
+| Whole program | 5.9 ms → 2.6 ms | |
+
+On the JavaScript side, encoding the request went from 4.7 ms (one string
+and `Buffer.byteLength` per field) to 1.3 ms (a `Map` of distinct fields,
+one `join`, `TextEncoder.encodeInto`).
+
+Tried and not kept:
+
+- **A speed-optimized build.** The published CLI's `--target wasi` has no
+  optimization setting: its C is compiled at `-O2` and `wasm-opt` runs at
+  `-Oz` (`src/wasi/wasi-link.mjs`). Re-running the CLI's own `wasm-opt`
+  (version 132) at `-O2`, `-O3` or `-O4` over the first slice's module, each
+  measured in its own Node process (60 warm calls on the bar's plan), gave
+  medians of 16.6 to 17.3 ms against 16.5 to 17.2 ms for the `-Oz` module:
+  no difference, for up to 1% more bytes. The C is already optimized; what is
+  left is WebAssembly's own cost (about 2.5 times native here) and the
+  per-call spread (12.5 to 20 ms between the 10th and 90th percentiles), which
+  comes from a fresh instance and its 16 MiB memory per call. Not worth a
+  second optimizer pass in the build.
+- **Numbering the names once per plan** (a proved walk over arrays of
+  numbers instead of hash sets of names). A walk got 3 times cheaper, but
+  numbering the 28,000 names of a plan costs more than the six walks of the
+  bar's plan, and on 8000, 200 the sized hash-set walk is as fast.
+
+Measured by `scripts/glue/measure.mjs` with the program the `glue` workflow
+built (run 43609171128), locally (Node 24.22.1, linux-x64), against the
+same machine's numbers for the first round above:
+
+| Plan (initializers, kept) | Cold, glue | Cold, JavaScript | Warm, glue | Warm, JavaScript |
+| --- | ---: | ---: | ---: | ---: |
+| 2807, 6 | 47.1 ms (was 68.0) | 6.2 ms | 12.2 ms (was 23.8) | 1.6 ms |
+| 2807, 50 | 53.4 ms (was 76.5) | 11.4 ms | 16.1 ms (was 24.7) | 4.9 ms |
+| 8000, 200 | 94.3 ms (was 132.7) | 21.4 ms | 40.5 ms (was 62.5) | 10.4 ms |
+
+A warm call on the bar's plan: 0.8 ms encoding the request, 2.1 ms an empty
+call (instantiating the program and Lean's runtime and module
+initialization), 9.3 ms the rest (the Lean code, about 3.5 times its native
+2.6 ms, and reading the answer). Start-up unchanged (`lasm --version` 66.4
+against main's 67.1 ms); `lasm-glue.wasm` is 647,974 bytes, 163,388 gzipped.
+The bar is met. In CI (`glue` run 43613878906, Node 26.13.0, ubuntu-24.04),
+against the first round's run 43564552237:
+
+| Plan (initializers, kept) | Cold, glue | Cold, JavaScript | Warm, glue | Warm, JavaScript |
+| --- | ---: | ---: | ---: | ---: |
+| 2807, 6 | 37.1 ms (was 61.6) | 4.5 ms | 8.4 ms (was 15.4) | 1.3 ms |
+| 2807, 50 | 40.5 ms (was 67.8) | 7.8 ms | 9.5 ms (was 19.1) | 2.3 ms |
+| 8000, 200 | 69.3 ms (was 120.9) | 14.3 ms | 26.3 ms (was 49.4) | 5.4 ms |
+
+There a warm call on the bar's plan is 0.5 ms encoding, 1.0 ms an empty
+call and 6.9 ms the rest; `lasm --version` 48.3 ms against main's 48.1.
+
+Why twice the JavaScript is out of reach for this slice: the JavaScript does
+the whole job in 1.0 to 1.6 ms. Encoding the plan for the glue costs 0.8 to 1.3 ms on its
+own (28,000 names through a `Map`), and a WASI command pays instantiation and
+Lean's runtime and module initialization on every call (2.1 ms, an empty
+call). Even with no Lean code at all a call would cost about three times the
+JavaScript. Two changes would move that floor, and both are outside this
+slice: a reactor build, which pays the initialization once per process (it
+needs a new `lasm build` option, proposed in [REVIEW.md](../REVIEW.md#the-cli-surface)
+for Jordan), and slices whose Lean work is large next to their input, so
+that encoding is not the bulk.
+
+### The second slice: `src/wasi/wasi-component.mjs`
+
+The whole module is modelled (verification/cli/Lasm/Cli/Model/WasiComponent.lean)
+and its three propositions are proved (`replace_one_core_module`,
+`drops_only_component_type`, `componentize_inverse`); it runs once per
+`--target wasi-http` build, on the program's core module (megabytes), where
+the Lean does real work (reading the sections, splicing) next to the
+encoding (copying the bytes in and out).
+
+- **Fast versions** (`Lasm/Cli/Fast/WasiComponent.lean`). The model reads the
+  component as the list of its bytes; the fast versions read the
+  `ByteArray` by offsets (`readLebAt` with an accumulator, so a long LEB128
+  does not recurse; `sectionsAt`, sections as offsets) and write by appends.
+  Each is proved equal to the model (`sectionsAt_eq`, `prefixAt_eq`,
+  `replaceCoreModule_eq`, `extractCore_eq`, `withoutComponentType_eq`) and
+  registered as `@[csimp]`; `componentize` and `makeTemplate` get their own
+  `csimp` theorems, since the model's compiled code calls the model's
+  `replaceCoreModule`.
+- **Bytes in the glue.** A third request format, the byte 2, the number of
+  fields and each field's length and bytes, the first the operation's name;
+  the answer is the bytes after `ok:` (`runRequest(…, binary)` returns a
+  `Uint8Array` of its own, as the JavaScript did).
+- **The JavaScript left behind** is the adapter: reading the default
+  template (`component/proxy-template.wasm`, an argument of the model) and
+  taking any array of bytes (`Uint8Array`, `ArrayBuffer`, an array of
+  numbers). `extractCore` on a component with fewer core modules than the
+  template's index now throws an `Error` with the `TypeError`'s message.
+- **Start-up.** `src/init.mjs` imports `src/wasi/wasi-build.mjs` (for
+  `fastlyToml`), which imports the WASI link and so this module and
+  `src/glue/glue.mjs` at every start. `glue.mjs` reads and compiles the
+  program only at its first call, so start-up stays within noise (the
+  measurement checks it against main).
+
+Checked before writing the adapter: the program compiled natively against
+the module's JavaScript on 922 inputs (small templates with other sections
+and modules, truncated and corrupted components, `component-type` custom
+sections, the shipped template with cores of 0 to 200,000 bytes): no
+difference. Natively, `componentize` of a 30 MB core takes about 40 ms,
+the process and the pipe included; the JavaScript takes 10 ms.
+
+Measured in CI (`glue` run 43613955978, Node 26.13.0, ubuntu-24.04;
+`componentize` on synthetic core modules with the shipped template, against
+the module's JavaScript as it was on main at 69d3d4c5):
+
+| Core module (bytes) | Cold, glue | Cold, JavaScript | Warm, glue | Warm, JavaScript |
+| --- | ---: | ---: | ---: | ---: |
+| 300,000 | 23.8 ms | 5.8 ms | 3.0 ms | 0.3 ms |
+| 3,000,000 | 42.9 ms | 8.5 ms | 11.7 ms | 2.5 ms |
+| 30,000,000 | 151.3 ms | 31.7 ms | 108.0 ms | 16.9 ms |
+
+Within the bar at 3 MB (+34 ms cold, +9 ms warm) and linear in the size;
+once per wasi-http build. Start-up unchanged (`lasm --version` 50.7 ms on
+both); `lasm-glue.wasm` grows by 32,559 bytes (8,126 gzipped) to 680,533
+(171,514 gzipped), within the 300 KiB bar. Most of a large call is copying:
+the core module into the program's memory, the component out of it, and
+the appends that build it.
+
+### What next (M6)
+
+The next slice should be one where the Lean code does much more than the
+encoding, or should wait for the reactor:
+
+- **`src/wasi/lower-atomics.mjs`** (WASI links): wholly modelled, run once
+  per WASI build, on megabytes; the same pattern as `wasi-component.mjs`
+  (fast `ByteArray` versions of its readers and writer, with `csimp`
+  proofs).
+- **`src/package.mjs` and `src/init.mjs` argument parsing**: modelled and
+  proved, small, but `src/cli-arguments.mjs` imports `package.mjs` at start,
+  and a parse costs more in the glue than in JavaScript (worth it only with a
+  reactor).
+- **`src/application-initialization.mjs`** (the initialization plan the
+  first slice consumes): still pending its M4 model.

@@ -19,6 +19,14 @@ test('json.dumps string escaping with ensure_ascii', () => {
 });
 
 const unicode = ['a', 'Z', ' ', '~', '"', '\\', '\n', '\r', '\t', '\b', '\f', '\x00', '\x1f', '\x7f', 'é', ' ', '￿', '😀', '𝔸'];
+// Proposition: Lasm.Cli.Spec.json_string_printable
+//   ∀ s : String, (pythonJsonString s).all (fun c => ' ' ≤ c && c ≤ '~') = true
+test('escaped strings are printable ASCII, whatever the characters', () => {
+  forAll(g => g.string([...unicode, '\x7f', '\x1f', '\b', '\f', '\u0085', '\uffff', '\u{10ffff}'], 0, 16), s => {
+    assert.match(pythonJsonString(s), /^[ -~]*$/);
+  });
+});
+
 // Proposition: Lasm.Cli.Candidates.json_string_ascii
 //   ∀ s : String, Lean.Json.parse (pythonJsonString s) = .ok (.str s) ∧
 //     (pythonJsonString s).all fun c => ' ' ≤ c && c ≤ '~'
@@ -84,7 +92,7 @@ test('strings sort by code point, as Python sorts str', () => {
   const input = ['b', 'a']; pythonSorted(input); assert.deepEqual(input, ['b', 'a'], 'sorted() does not change its argument');
 });
 
-// Proposition: Lasm.Cli.Candidates.python_order_code_points
+// Proposition: Lasm.Cli.Spec.python_order_code_points
 //   ∀ a b : String, (comparePythonStrings a b).sign = if a < b then -1 else if a = b then 0 else 1
 test('the order is the lexicographic order of code points', () => {
   const lexicographic = (a, b) => {

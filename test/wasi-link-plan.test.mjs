@@ -9,7 +9,8 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync, readdi
 import { dirname, join, relative, sep } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { linkWasiProgram, wasiLinkSettings, wasiSources, mimallocSources, mimallocFlags, allowedImportModules, checkWasiModule } from '../src/wasi/wasi-link.mjs';
+import { linkWasiProgram, wasiLinkSettings, wasiSources, allowedImportModules, checkWasiModule } from '../src/wasi/wasi-link.mjs';
+import { mimallocSources, mimallocVendored, mimallocFlags } from '../src/mimalloc/mimalloc.mjs';
 import { moduleImports } from '../src/wasi/lower-atomics.mjs';
 import { extractCore } from '../src/wasi/wasi-component.mjs';
 import { responseFile } from '../src/platform.mjs';
@@ -62,11 +63,11 @@ test('the WASI link compiles the host, links the application objects with the ed
     '-ffunction-sections', '-fdata-sections', `-ffile-prefix-map=${here}=lasm/`, '-I', join(f.nodeRuntime.directory, 'include'), '-I', here,
     '-c', join(here, 'lasm_wasi.c'), '-o', join(f.out, 'lasm_wasi.o')]);
   for (const name of ['lasm_wasi', 'lasm_wasi_libc', 'lasm_fetch_wasi']) assert.ok(existsSync(join(f.out, `${name}.o`)));
-  // mimalloc with 8 KiB slices and 2 MiB arenas (#246): its single-file build, then Emscripten's prim.c on its own.
-  const mimalloc = join(here, 'mimalloc');
-  assert.deepEqual(f.tools.calls('clang').filter(isMimalloc), [[join(here, 'lasm_mimalloc.c'), 'lasm_mimalloc.o'], [join(mimalloc, 'src/prim/prim.c'), 'lasm_mimalloc_prim.o']]
+  // mimalloc with 8 KiB slices and 2 MiB arenas (#246, src/mimalloc): its single-file build, then Emscripten's prim.c on its own.
+  const shared = fileURLToPath(new URL('../src/mimalloc', import.meta.url)), mimalloc = join(shared, 'emscripten');
+  assert.deepEqual(f.tools.calls('clang').filter(isMimalloc), [[join(shared, 'lasm_mimalloc.c'), 'lasm_mimalloc.o'], [join(mimalloc, 'src/prim/prim.c'), 'lasm_mimalloc_prim.o']]
     .map(([source, object]) => ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
-      ...mimallocFlags({ sliceKiB: 8, arenaMiB: 2 }), `-ffile-prefix-map=${here}=lasm/`, '-I', join(mimalloc, 'include'), '-I', join(mimalloc, 'src'),
+      ...mimallocFlags({ sliceKiB: 8, arenaMiB: 2 }), `-ffile-prefix-map=${shared}=lasm/mimalloc`, '-I', join(mimalloc, 'include'), '-I', join(mimalloc, 'src'),
       '-c', source, '-o', join(f.out, object)]));
   // Emscripten's flags for its libmimalloc and emcc's code generation flags; the slice size, arena reserve and address bits are Lasm's.
   assert.deepEqual(mimallocFlags({ sliceKiB: 8, arenaMiB: 2 }), ['-fignore-exceptions', '-mllvm', '-combiner-global-alias-analysis=false', '-mllvm',
@@ -238,12 +239,16 @@ test('WASI targets: settings, the sources of the cache identity, and the host in
   // Every file the WASI link reads is part of the program's cache identity.
   assert.deepEqual(wasiSources, ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
     'wasi-component.mjs', 'component/proxy-template.wasm', 'lasm_wasi_http_imports.h', '../../library/c/lasm_fastly.c',
-    '../../library/c/lasm_wasi_http_bindings.c', 'lasm_mimalloc.c', ...mimallocSources]);
+    '../../library/c/lasm_wasi_http_bindings.c', ...['mimalloc.mjs', 'lasm_mimalloc.c', ...mimallocVendored].map(file => `../mimalloc/${file}`)]);
+  assert.deepEqual(mimallocSources, ['mimalloc.mjs', 'lasm_mimalloc.c', ...mimallocVendored]);
   // Every file lasm_mimalloc.c and prim.c include, and mimalloc's licence: exactly the vendored files.
-  const vendored = readdirSync(join(here, 'mimalloc'), { recursive: true, withFileTypes: true }).filter(entry => entry.isFile())
-    .map(entry => relative(here, join(entry.parentPath, entry.name)).split(sep).join('/')).sort();
-  assert.deepEqual([...mimallocSources].sort(), vendored);
+  const shared = fileURLToPath(new URL('../src/mimalloc/', import.meta.url));
+  const vendored = readdirSync(join(shared, 'emscripten'), { recursive: true, withFileTypes: true }).filter(entry => entry.isFile())
+    .map(entry => relative(shared, join(entry.parentPath, entry.name)).split(sep).join('/')).sort();
+  assert.deepEqual([...mimallocVendored].sort(), vendored);
   assert.equal(vendored.length, 32);
+  // src/mimalloc holds the build and the vendored sources, nothing else.
+  assert.deepEqual(readdirSync(shared).sort(), ['emscripten', 'lasm_mimalloc.c', 'mimalloc.mjs']);
   for (const name of wasiSources) assert.ok(existsSync(join(here, name)), name);
   const accepts = (target, module) => { try { checkWasiModule(programModule([[module, 'f']]), target); return true; } catch { return false; } };
   // Lasm.Fastly binds every witx module (library/c/lasm_fastly.c).

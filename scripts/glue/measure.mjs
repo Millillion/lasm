@@ -14,10 +14,21 @@ import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { syntheticPlan } from './plans.mjs';
+import { syntheticCore, syntheticPlan } from './plans.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const option = name => { const i = process.argv.indexOf(name); return i > 0 ? process.argv[i + 1] : undefined; };
+
+// A child: one cold componentize of the module at argv[3] on a synthetic core module of argv[4] bytes.
+if (process.argv[2] === '--cold-component') {
+  const [file, size] = process.argv.slice(3);
+  const core = syntheticCore(Number(size));
+  const started = performance.now();
+  const { componentize } = await import(pathToFileURL(resolve(file)).href);
+  const bytes = componentize(core);
+  process.stdout.write(JSON.stringify({ ms: performance.now() - started, length: bytes.length }));
+  process.exit(0);
+}
 
 // A child: one cold call of the module at argv[3] on a synthetic plan.
 if (process.argv[2] === '--cold') {
@@ -30,7 +41,7 @@ if (process.argv[2] === '--cold') {
   process.exit(0);
 }
 
-const baseline = option('--baseline'), mainCheckout = option('--main-checkout'), jsonFile = option('--json');
+const baseline = option('--baseline'), componentBaseline = option('--component-baseline'), mainCheckout = option('--main-checkout'), jsonFile = option('--json');
 if (!baseline) throw new Error('Usage: measure.mjs --baseline FILE [--main-checkout DIR] [--json FILE]');
 const median = values => { const s = [...values].sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
 const time = (command, args, runs) => median(Array.from({ length: runs }, () => {
@@ -41,7 +52,7 @@ const time = (command, args, runs) => median(Array.from({ length: runs }, () => 
 const glue = join(root, 'src/edge/edge-initializers.mjs');
 const cold = (file, n, k) => JSON.parse(execFileSync(process.execPath, [fileURLToPath(import.meta.url), '--cold', file, String(n), String(k)], { encoding: 'utf8' }));
 
-const results = { plans: [], startup: [], size: {} };
+const results = { plans: [], components: [], startup: [], size: {}, parts: {} };
 const failures = [];
 const { compactInitializerWrappers: lean } = await import(pathToFileURL(glue).href);
 const { compactInitializerWrappers: js } = await import(pathToFileURL(resolve(baseline)).href);
@@ -56,6 +67,42 @@ for (const [n, k] of [[2807, 6], [2807, 50], [8000, 200]]) {
     if (row.coldGlue - row.coldJs > 100) failures.push(`a cold call costs ${(row.coldGlue - row.coldJs).toFixed(1)} ms more than the JavaScript (limit 100)`);
     if (row.warmGlue - row.warmJs > 25) failures.push(`a warm call costs ${(row.warmGlue - row.warmJs).toFixed(1)} ms more than the JavaScript (limit 25)`);
   }
+}
+// Where a warm call on the web template's plan size goes: encoding the request
+// (JavaScript), an empty call (instantiating the program and Lean's runtime
+// and module initialization, which a reactor would pay once per process,
+// docs/REVIEW.md) and the rest (the Lean code and reading its answer).
+{
+  const { encodeRequest, runGlue } = await import(pathToFileURL(join(root, 'src/glue/glue.mjs')).href);
+  const plan = syntheticPlan(2807, 6), units = Object.keys(plan.calls);
+  const lists = [['compactInitializerWrappers'], [String(plan.closure.length)], plan.closure, [String(plan.keep.length)], plan.keep, [String(units.length)],
+    ...units.flatMap(unit => [[unit, String(plan.calls[unit].length)], plan.calls[unit]])];
+  const each = f => { f(); return median(Array.from({ length: 15 }, () => { const t = performance.now(); f(); return performance.now() - t; })); };
+  const encode = each(() => encodeRequest(lists)), empty = each(() => runGlue(['nothing']));
+  results.parts = { encode, empty, rest: results.plans[0].warmGlue - encode - empty };
+}
+// The second slice (src/wasi/wasi-component.mjs): componentize, once per
+// wasi-http build, on core modules the size of a program's (3 MB) and larger,
+// against main's JavaScript while it is JavaScript there.
+if (componentBaseline) {
+  const glueComponent = join(root, 'src/wasi/wasi-component.mjs');
+  const lean = await import(pathToFileURL(glueComponent).href), js = await import(pathToFileURL(resolve(componentBaseline)).href);
+  const coldComponent = (file, size) => JSON.parse(execFileSync(process.execPath, [fileURLToPath(import.meta.url), '--cold-component', file, String(size)],
+    { encoding: 'utf8', maxBuffer: 1 << 26 })).ms;
+  for (const size of [300_000, 3_000_000, 30_000_000]) {
+    const core = syntheticCore(size);
+    if (!Buffer.from(lean.componentize(core)).equals(Buffer.from(js.componentize(core)))) failures.push(`componentize differs from the JavaScript on a core module of ${size} bytes`);
+    const warm = f => { f(core); return median(Array.from({ length: 9 }, () => { const t = performance.now(); f(core); return performance.now() - t; })); };
+    const coldOf = file => median(Array.from({ length: 3 }, () => coldComponent(file, size)));
+    const row = { size, coldGlue: coldOf(glueComponent), coldJs: coldOf(componentBaseline), warmGlue: warm(lean.componentize), warmJs: warm(js.componentize) };
+    results.components.push(row);
+    if (size === 3_000_000) {
+      if (row.coldGlue - row.coldJs > 100) failures.push(`a cold componentize costs ${(row.coldGlue - row.coldJs).toFixed(1)} ms more than the JavaScript (limit 100)`);
+      if (row.warmGlue - row.warmJs > 25) failures.push(`a warm componentize costs ${(row.warmGlue - row.warmJs).toFixed(1)} ms more than the JavaScript (limit 25)`);
+    }
+  }
+  const [, mid, big] = results.components;
+  if (big.warmGlue > 15 * Math.max(mid.warmGlue, 1)) failures.push(`componentize scales worse than linearly (${mid.warmGlue.toFixed(1)} → ${big.warmGlue.toFixed(1)} ms)`);
 }
 const [small, , large] = results.plans;
 // Linear scaling: 2.85 times the initializers and 33 times the kept ones may cost at most ~33 times as much warm.
@@ -78,6 +125,9 @@ if (gzip > 300 * 1024) failures.push(`the glue adds ${gzip} gzipped bytes to the
 const ms = value => value === undefined ? '—' : `${value.toFixed(1)} ms`;
 const table = ['| Plan (initializers, kept) | Cold, glue | Cold, JavaScript | Warm, glue | Warm, JavaScript |', '| --- | ---: | ---: | ---: | ---: |',
   ...results.plans.map(r => `| ${r.n}, ${r.k} | ${ms(r.coldGlue)} | ${ms(r.coldJs)} | ${ms(r.warmGlue)} | ${ms(r.warmJs)} |`), '',
+  ...(results.components.length ? ['| Core module (bytes) | Cold, glue | Cold, JavaScript | Warm, glue | Warm, JavaScript |', '| --- | ---: | ---: | ---: | ---: |',
+    ...results.components.map(r => `| ${r.size} | ${ms(r.coldGlue)} | ${ms(r.coldJs)} | ${ms(r.warmGlue)} | ${ms(r.warmJs)} |`), ''] : []),
+  `Warm call on the plan of 2807, 6: ${ms(results.parts.encode)} encoding the request, ${ms(results.parts.empty)} an empty call (instance and Lean's initialization), ${ms(results.parts.rest)} the rest (the Lean code, the answer).`, '',
   '| Command | This branch | main |', '| --- | ---: | ---: |', ...results.startup.map(r => `| \`${r.command}\` | ${ms(r.here)} | ${ms(r.main)} |`), '',
   '| File | Bytes | Gzipped |', '| --- | ---: | ---: |', ...Object.entries(results.size).map(([f, s]) => `| \`${f}\` | ${s.bytes} | ${s.gzip} |`), '',
   failures.length ? `**The bar is not met:**\n${failures.map(f => `- ${f}`).join('\n')}` : '**The bar is met.**', ''].join('\n');

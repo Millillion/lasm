@@ -215,7 +215,7 @@ test('project names', () => {
     assert.equal(supabaseFunctionNameOf(input), name, input);
 });
 
-// Proposition: Lasm.Cli.Candidates.generated_names_valid
+// Proposition: Lasm.Cli.Spec.generated_names_valid
 //   ∀ dir s : String,
 //     ((packageName dir).toList.head?.map fun c => c.isLower || c.isDigit) = some true ∧
 //     (packageName dir).all (fun c => c.isLower || c.isDigit || c = '.' || c = '_' || c = '-') ∧
