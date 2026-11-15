@@ -10,100 +10,101 @@ markers is generated (`bench/render.mjs`); the rest of this page is maintained
 by hand.
 
 <!-- benchmarks:generated:start -->
-Latest: **0.1.0-experimental.43661082381** (2026-11-15), candidate SHA-256 `ca6f60e5d0e9…`, source `fe22d73208`, harness `fe22d73208`.
+Latest: **0.1.0-experimental.43670850059** (2026-11-15), candidate SHA-256 `6dc0174d6fef…`, source `c157c954a9`, harness `c157c954a9`.
 
-Reference runner: GitHub Actions ubuntu24 20261111.127.1, Ubuntu 24.04.5 LTS (linux-x64), Intel(R) Xeon(R) 6975P-C, 4 CPUs, 15 GiB RAM, Node 26.13.1, CPU index 434 ms; server on CPUs 0-1, load generator on CPUs 2-3. Raw data: [history/0.1.0-experimental.43661082381.json](benchmarks/history/0.1.0-experimental.43661082381.json).
+Reference runner: GitHub Actions ubuntu24 20261111.127.1, Ubuntu 24.04.5 LTS (linux-x64), Intel(R) Xeon(R) 6975P-C, 4 CPUs, 15 GiB RAM, Node 26.13.1, CPU index 438 ms; server on CPUs 0-1, load generator on CPUs 2-3. Raw data: [history/0.1.0-experimental.43670850059.json](benchmarks/history/0.1.0-experimental.43670850059.json).
 
 | Area | Metric | Median | Spread (min – max) | Same-runner comparison |
 | --- | --- | ---: | --- | --- |
-| Cold start | Trivial program, start to exit | 127 ms | 119 ms – 141 ms (n=10) | 6.13× node-hello |
-| Cold start | Hono + Lean handler, start to first HTTP response | 175 ms | 166 ms – 190 ms (n=10) | 3.93× node-http |
-| Cold start | Std.Http server, start to first HTTP response | 246 ms | 227 ms – 255 ms (n=10) | 5.51× node-http |
+| Cold start | Trivial program, start to exit | 140 ms | 133 ms – 149 ms (n=10) | 5.72× node-hello |
+| Cold start | Hono + Lean handler, start to first HTTP response | 185 ms | 181 ms – 191 ms (n=10) | 3.92× node-http |
+| Cold start | Std.Http server, start to first HTTP response | 259 ms | 241 ms – 276 ms (n=10) | 5.48× node-http |
 | Bundle size | Trivial program: dist/ | 8.2 MiB |  |  |
 | Bundle size | Trivial program: program.wasm | 530 KiB |  |  |
 | Bundle size | Trivial program: dist/, brotli | 1.6 MiB |  |  |
 | Bundle size | Hono app: dist/ without node_modules | 8.5 MiB |  |  |
 | Bundle size | Hono app: program.wasm, brotli | 167 KiB |  |  |
 | Bundle size | Hono app: dist/node_modules | 1.4 MiB |  |  |
-| Memory | Trivial program, peak RSS | 96 MiB | 95 MiB – 96 MiB (n=3) | 1.73× node-hello |
-| Memory | Hono + Lean handler, idle RSS | 120 MiB | 120 MiB – 120 MiB (n=3) | 1.93× node-http |
-| Memory | Hono + Lean handler, peak RSS under load | 273 MiB | 270 MiB – 275 MiB (n=3) | 3.20× node-http |
-| Memory | Std.Http server, peak RSS under load | 387 MiB | 367 MiB – 412 MiB (n=3) | 4.54× node-http |
-| HTTP | Hono + Lean handler, throughput | 28,891 req/s | 28,707 req/s – 29,319 req/s (n=3) | 0.25× node-http; 0.28× node-hono |
-| HTTP | Hono + Lean handler, p99 latency | 2.7 ms | 2.6 ms – 2.7 ms (n=3) | 9.72× node-http |
-| HTTP | Express + Lean handler, throughput | 22,801 req/s | 22,774 req/s – 22,969 req/s (n=3) | 0.20× node-http; 0.45× node-express |
-| HTTP | Express + Lean handler, p99 latency | 3.0 ms | 3.0 ms – 3.0 ms (n=3) | 10.75× node-http |
-| HTTP | Std.Http server, throughput | 1,189 req/s | 1,181 req/s – 1,219 req/s (n=3) | 0.01× node-http |
-| HTTP | Std.Http server, p99 latency | 20 ms | 19 ms – 21 ms (n=3) | 72.09× node-http |
-| HTTP | Plain Node node:http (reference) | 116,437 req/s | 116,082 req/s – 116,812 req/s (n=3) |  |
-| Interop | Lean→JS call round trip, p50 | 8.6 µs | 7.2 µs – 9.2 µs (n=3) |  |
-| Interop | Await a resolved JS promise, p50 | 10 µs | 10 µs – 14 µs (n=3) |  |
-| Big numbers | 10,000-digit multiplication | 940 µs | 940 µs – 940 µs (n=3) |  |
-| Big numbers | 20,000 by 5,000-digit division | 2534 µs | 2531 µs – 2535 µs (n=3) |  |
-| Big numbers | 10,000-digit toString | 118965 µs | 118730 µs – 119383 µs (n=3) |  |
-| Build | Clean build, trivial program | 3.3 s | 3.3 s – 3.3 s (n=3) |  |
-| Build | Incremental build after a one-line change, trivial program | 5.2 s | 5.2 s – 5.2 s (n=3) |  |
-| Build | Clean build, Hono app | 5.1 s | 5.1 s – 23 s (n=3) |  |
-| Build | Incremental build after a one-line change, Hono app | 7.5 s | 7.5 s – 7.9 s (n=3) |  |
-| Build | Incremental dev build (--dev, lasm run), trivial program | 1.0 s | 1.0 s – 1.5 s (n=3) |  |
-| Build | Incremental dev build (--dev, lasm run), Hono app | 2.0 s | 2.0 s – 2.5 s (n=3) |  |
+| Memory | Trivial program, peak RSS | 96 MiB | 95 MiB – 96 MiB (n=3) | 1.59× node-hello |
+| Memory | Hono + Lean handler, idle RSS | 119 MiB | 119 MiB – 120 MiB (n=3) | 1.92× node-http |
+| Memory | Hono + Lean handler, peak RSS under load | 272 MiB | 270 MiB – 275 MiB (n=3) | 3.12× node-http |
+| Memory | Std.Http server, peak RSS under load | 387 MiB | 377 MiB – 425 MiB (n=3) | 4.44× node-http |
+| HTTP | Hono + Lean handler, throughput | 26,975 req/s | 26,933 req/s – 27,215 req/s (n=3) | 0.23× node-http; 0.27× node-hono |
+| HTTP | Hono + Lean handler, p99 latency | 4.1 ms | 4.1 ms – 4.1 ms (n=3) | 13.90× node-http |
+| HTTP | Express + Lean handler, throughput | 21,573 req/s | 21,555 req/s – 21,574 req/s (n=3) | 0.19× node-http; 0.44× node-express |
+| HTTP | Express + Lean handler, p99 latency | 4.5 ms | 4.4 ms – 4.6 ms (n=3) | 15.33× node-http |
+| HTTP | Std.Http server, throughput | 1,165 req/s | 1,134 req/s – 1,172 req/s (n=3) | 0.01× node-http |
+| HTTP | Std.Http server, p99 latency | 22 ms | 22 ms – 22 ms (n=3) | 73.69× node-http |
+| HTTP | Plain Node node:http (reference) | 114,579 req/s | 113,002 req/s – 115,020 req/s (n=3) |  |
+| Interop | Lean→JS call round trip, p50 | 8.9 µs | 7.4 µs – 9.0 µs (n=3) |  |
+| Interop | Await a resolved JS promise, p50 | 12 µs | 10 µs – 14 µs (n=3) |  |
+| Big numbers | 10,000-digit multiplication | 945 µs | 943 µs – 949 µs (n=3) |  |
+| Big numbers | 20,000 by 5,000-digit division | 2541 µs | 2540 µs – 2548 µs (n=3) |  |
+| Big numbers | 10,000-digit toString | 119315 µs | 119115 µs – 119502 µs (n=3) |  |
+| Build | Clean build, trivial program | 3.5 s | 3.5 s – 3.5 s (n=3) |  |
+| Build | Incremental build after a one-line change, trivial program | 5.5 s | 5.5 s – 5.5 s (n=3) |  |
+| Build | Clean build, Hono app | 5.4 s | 5.3 s – 21 s (n=3) |  |
+| Build | Incremental build after a one-line change, Hono app | 7.8 s | 7.8 s – 7.8 s (n=3) |  |
+| Build | Incremental dev build (--dev, lasm run), trivial program | 1.1 s | 1.1 s – 1.6 s (n=3) |  |
+| Build | Incremental dev build (--dev, lasm run), Hono app | 2.1 s | 2.0 s – 2.5 s (n=3) |  |
 | Bundle size | Hono app: program.wasm, dev profile | 936 KiB |  |  |
 | Install | Package download (npm tarball) | 82 MiB |  |  |
 | Install | Installed size | 455 MiB |  |  |
-| Install | npm install, empty cache | 5.3 s | 4.8 s – 5.7 s (n=3) |  |
-| Install | First build incl. one-time tool download | 19 s |  |  |
+| Install | npm install, empty cache | 5.5 s | 5.5 s – 5.6 s (n=3) |  |
+| Install | First build incl. one-time tool download | 16 s |  |  |
 | Install | Tool cache on disk after the first build | 2504 MiB |  |  |
 
-Ratios divide by the plain-Node reference measured in the same run (for throughput, below 1 means slower; for time, latency and memory, above 1 means more). Every metric, including the reference servers and frameworks, is in the [raw data](benchmarks/history/0.1.0-experimental.43661082381.json).
+Ratios divide by the plain-Node reference measured in the same run (for throughput, below 1 means slower; for time, latency and memory, above 1 means more). Every metric, including the reference servers and frameworks, is in the [raw data](benchmarks/history/0.1.0-experimental.43670850059.json).
 
-### Change from the previous release (0.1.0-experimental.43657919989)
+### Change from the previous release (0.1.0-experimental.43661082381)
 
 Flagged (informational; releases are not blocked on performance yet):
 
 | Metric | Before | After | Worse by | Compared as |
 | --- | ---: | ---: | ---: | --- |
-| First build on a new machine (includes one-time tool download) | 15 s | 19 s | 22 % | absolute |
+| Latency p99, Hono with a Lean handler | 2.7 ms | 4.1 ms | 43 % | ratio to node-http |
+| Latency p99, Express with a Lean handler | 3.0 ms | 4.5 ms | 43 % | ratio to node-http |
 
 ### Trend (reference runner, last releases)
 
-| Metric | …43616601303 | …43623725440 | …43630070287 | …43640024870 | …43649714647 | …43652871018 | …43657919989 | …43661082381 |
+| Metric | …43623725440 | …43630070287 | …43640024870 | …43649714647 | …43652871018 | …43657919989 | …43661082381 | …43670850059 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Trivial program, start to exit | 198 ms (6.14×) | 149 ms (5.76×) | 150 ms (5.59×) | 197 ms (6.10×) | 152 ms (6.00×) | 149 ms (5.74×) | 135 ms (5.91×) | 127 ms (6.13×) |
-| Hono + Lean handler, start to first HTTP response | 268 ms (3.98×) | 194 ms (3.89×) | 198 ms (3.88×) | 260 ms (4.01×) | 196 ms (3.84×) | 198 ms (3.95×) | 181 ms (3.83×) | 175 ms (3.93×) |
-| Std.Http server, start to first HTTP response | 371 ms (5.51×) | 276 ms (5.53×) | 279 ms (5.47×) | 360 ms (5.55×) | 272 ms (5.31×) | 279 ms (5.54×) | 251 ms (5.31×) | 246 ms (5.51×) |
+| Trivial program, start to exit | 149 ms (5.76×) | 150 ms (5.59×) | 197 ms (6.10×) | 152 ms (6.00×) | 149 ms (5.74×) | 135 ms (5.91×) | 127 ms (6.13×) | 140 ms (5.72×) |
+| Hono + Lean handler, start to first HTTP response | 194 ms (3.89×) | 198 ms (3.88×) | 260 ms (4.01×) | 196 ms (3.84×) | 198 ms (3.95×) | 181 ms (3.83×) | 175 ms (3.93×) | 185 ms (3.92×) |
+| Std.Http server, start to first HTTP response | 276 ms (5.53×) | 279 ms (5.47×) | 360 ms (5.55×) | 272 ms (5.31×) | 279 ms (5.54×) | 251 ms (5.31×) | 246 ms (5.51×) | 259 ms (5.48×) |
 | Trivial program: dist/ | 8.2 MiB | 8.2 MiB | 8.2 MiB | 8.2 MiB | 8.2 MiB | 8.2 MiB | 8.2 MiB | 8.2 MiB |
 | Trivial program: program.wasm | 530 KiB | 530 KiB | 530 KiB | 530 KiB | 530 KiB | 530 KiB | 530 KiB | 530 KiB |
 | Trivial program: dist/, brotli | 1.6 MiB | 1.6 MiB | 1.6 MiB | 1.6 MiB | 1.6 MiB | 1.6 MiB | 1.6 MiB | 1.6 MiB |
 | Hono app: dist/ without node_modules | 8.5 MiB | 8.5 MiB | 8.5 MiB | 8.5 MiB | 8.5 MiB | 8.5 MiB | 8.5 MiB | 8.5 MiB |
 | Hono app: program.wasm, brotli | 167 KiB | 167 KiB | 167 KiB | 167 KiB | 167 KiB | 167 KiB | 167 KiB | 167 KiB |
 | Hono app: dist/node_modules | 1.4 MiB | 1.4 MiB | 1.4 MiB | 1.4 MiB | 1.4 MiB | 1.4 MiB | 1.4 MiB | 1.4 MiB |
-| Trivial program, peak RSS | 96 MiB (1.53×) | 95 MiB (1.71×) | 96 MiB (1.61×) | 95 MiB (1.59×) | 95 MiB (1.46×) | 95 MiB (1.62×) | 95 MiB (1.63×) | 96 MiB (1.73×) |
-| Hono + Lean handler, idle RSS | 121 MiB (1.94×) | 120 MiB (1.93×) | 120 MiB (1.92×) | 121 MiB (1.95×) | 120 MiB (1.92×) | 120 MiB (1.92×) | 120 MiB (1.92×) | 120 MiB (1.93×) |
-| Hono + Lean handler, peak RSS under load | 271 MiB (3.15×) | 270 MiB (3.21×) | 270 MiB (3.22×) | 271 MiB (3.22×) | 272 MiB (3.17×) | 271 MiB (3.20×) | 271 MiB (3.16×) | 273 MiB (3.20×) |
-| Std.Http server, peak RSS under load | 356 MiB (4.21×) | 384 MiB (4.53×) | 376 MiB (4.49×) | 348 MiB (4.06×) | 379 MiB (4.52×) | 367 MiB (4.33×) | 396 MiB (4.61×) | 387 MiB (4.54×) |
-| Hono + Lean handler, throughput | 9,993 req/s (0.19×) | 14,615 req/s (0.17×) | 14,311 req/s (0.17×) | 9,800 req/s (0.19×) | 14,587 req/s (0.17×) | 14,433 req/s (0.17×) | 28,063 req/s (0.24×) | 28,891 req/s (0.25×) |
-| Hono + Lean handler, p99 latency | 5.9 ms (10.26×) | 5.1 ms (14.29×) | 5.4 ms (15.28×) | 6.5 ms (10.32×) | 5.1 ms (14.38×) | 5.2 ms (14.34×) | 3.8 ms (12.99×) | 2.7 ms (9.72×) |
-| Express + Lean handler, throughput | 6,474 req/s (0.12×) | 9,553 req/s (0.11×) | 9,432 req/s (0.11×) | 6,365 req/s (0.12×) | 9,603 req/s (0.11×) | 9,521 req/s (0.11×) | 21,897 req/s (0.19×) | 22,801 req/s (0.20×) |
-| Express + Lean handler, p99 latency | 8.0 ms (13.14×) | 6.6 ms (18.44×) | 6.8 ms (18.63×) | 8.4 ms (13.67×) | 6.5 ms (18.10×) | 6.5 ms (17.98×) | 4.2 ms (14.42×) | 3.0 ms (10.75×) |
-| Std.Http server, throughput | 640 req/s (0.01×) | 912 req/s (0.01×) | 925 req/s (0.01×) | 633 req/s (0.01×) | 930 req/s (0.01×) | 917 req/s (0.01×) | 1,201 req/s (0.01×) | 1,189 req/s (0.01×) |
-| Std.Http server, p99 latency | 36 ms (59.22×) | 25 ms (69.38×) | 25 ms (70.72×) | 37 ms (60.99×) | 25 ms (69.40×) | 25 ms (67.17×) | 21 ms (72.08×) | 20 ms (72.09×) |
-| Plain Node node:http (reference) | 53,159 req/s | 86,755 req/s | 86,365 req/s | 51,917 req/s | 87,661 req/s | 86,251 req/s | 115,973 req/s | 116,437 req/s |
-| Lean→JS call round trip, p50 | 11 µs | 6.9 µs | 7.0 µs | 10 µs | 6.7 µs | 6.1 µs | 8.1 µs | 8.6 µs |
-| Await a resolved JS promise, p50 | 36 µs | 14 µs | 14 µs | 21 µs | 14 µs | 15 µs | 17 µs | 10 µs |
-| 10,000-digit multiplication | 1264 µs | 963 µs | 949 µs | 1264 µs | 959 µs | 956 µs | 943 µs | 940 µs |
-| 20,000 by 5,000-digit division | 2248 µs | 1914 µs | 1915 µs | 2254 µs | 1912 µs | 1913 µs | 2536 µs | 2534 µs |
-| 10,000-digit toString | 128754 µs | 105693 µs | 105372 µs | 127622 µs | 105344 µs | 105592 µs | 119325 µs | 118965 µs |
-| Clean build, trivial program | 4.7 s | 3.7 s | 3.9 s | 4.7 s | 3.7 s | 3.7 s | 3.5 s | 3.3 s |
-| Incremental build after a one-line change, trivial program | 7.5 s | 5.7 s | 6.1 s | 7.1 s | 5.6 s | 5.8 s | 5.3 s | 5.2 s |
-| Clean build, Hono app | 7.4 s | 5.8 s | 6.2 s | 7.3 s | 5.8 s | 6.1 s | 5.3 s | 5.1 s |
-| Incremental build after a one-line change, Hono app | 10 s | 8.3 s | 9.0 s | 10 s | 8.3 s | 8.3 s | 7.7 s | 7.5 s |
-| Incremental dev build (--dev, lasm run), trivial program | 1.6 s | 1.2 s | 1.3 s | 1.6 s | 1.2 s | 1.3 s | 1.1 s | 1.0 s |
-| Incremental dev build (--dev, lasm run), Hono app | 3.1 s | 2.5 s | 2.7 s | 3.0 s | 2.4 s | 2.6 s | 2.0 s | 2.0 s |
+| Trivial program, peak RSS | 95 MiB (1.71×) | 96 MiB (1.61×) | 95 MiB (1.59×) | 95 MiB (1.46×) | 95 MiB (1.62×) | 95 MiB (1.63×) | 96 MiB (1.73×) | 96 MiB (1.59×) |
+| Hono + Lean handler, idle RSS | 120 MiB (1.93×) | 120 MiB (1.92×) | 121 MiB (1.95×) | 120 MiB (1.92×) | 120 MiB (1.92×) | 120 MiB (1.92×) | 120 MiB (1.93×) | 119 MiB (1.92×) |
+| Hono + Lean handler, peak RSS under load | 270 MiB (3.21×) | 270 MiB (3.22×) | 271 MiB (3.22×) | 272 MiB (3.17×) | 271 MiB (3.20×) | 271 MiB (3.16×) | 273 MiB (3.20×) | 272 MiB (3.12×) |
+| Std.Http server, peak RSS under load | 384 MiB (4.53×) | 376 MiB (4.49×) | 348 MiB (4.06×) | 379 MiB (4.52×) | 367 MiB (4.33×) | 396 MiB (4.61×) | 387 MiB (4.54×) | 387 MiB (4.44×) |
+| Hono + Lean handler, throughput | 14,615 req/s (0.17×) | 14,311 req/s (0.17×) | 9,800 req/s (0.19×) | 14,587 req/s (0.17×) | 14,433 req/s (0.17×) | 28,063 req/s (0.24×) | 28,891 req/s (0.25×) | 26,975 req/s (0.23×) |
+| Hono + Lean handler, p99 latency | 5.1 ms (14.29×) | 5.4 ms (15.28×) | 6.5 ms (10.32×) | 5.1 ms (14.38×) | 5.2 ms (14.34×) | 3.8 ms (12.99×) | 2.7 ms (9.72×) | 4.1 ms (13.90×) |
+| Express + Lean handler, throughput | 9,553 req/s (0.11×) | 9,432 req/s (0.11×) | 6,365 req/s (0.12×) | 9,603 req/s (0.11×) | 9,521 req/s (0.11×) | 21,897 req/s (0.19×) | 22,801 req/s (0.20×) | 21,573 req/s (0.19×) |
+| Express + Lean handler, p99 latency | 6.6 ms (18.44×) | 6.8 ms (18.63×) | 8.4 ms (13.67×) | 6.5 ms (18.10×) | 6.5 ms (17.98×) | 4.2 ms (14.42×) | 3.0 ms (10.75×) | 4.5 ms (15.33×) |
+| Std.Http server, throughput | 912 req/s (0.01×) | 925 req/s (0.01×) | 633 req/s (0.01×) | 930 req/s (0.01×) | 917 req/s (0.01×) | 1,201 req/s (0.01×) | 1,189 req/s (0.01×) | 1,165 req/s (0.01×) |
+| Std.Http server, p99 latency | 25 ms (69.38×) | 25 ms (70.72×) | 37 ms (60.99×) | 25 ms (69.40×) | 25 ms (67.17×) | 21 ms (72.08×) | 20 ms (72.09×) | 22 ms (73.69×) |
+| Plain Node node:http (reference) | 86,755 req/s | 86,365 req/s | 51,917 req/s | 87,661 req/s | 86,251 req/s | 115,973 req/s | 116,437 req/s | 114,579 req/s |
+| Lean→JS call round trip, p50 | 6.9 µs | 7.0 µs | 10 µs | 6.7 µs | 6.1 µs | 8.1 µs | 8.6 µs | 8.9 µs |
+| Await a resolved JS promise, p50 | 14 µs | 14 µs | 21 µs | 14 µs | 15 µs | 17 µs | 10 µs | 12 µs |
+| 10,000-digit multiplication | 963 µs | 949 µs | 1264 µs | 959 µs | 956 µs | 943 µs | 940 µs | 945 µs |
+| 20,000 by 5,000-digit division | 1914 µs | 1915 µs | 2254 µs | 1912 µs | 1913 µs | 2536 µs | 2534 µs | 2541 µs |
+| 10,000-digit toString | 105693 µs | 105372 µs | 127622 µs | 105344 µs | 105592 µs | 119325 µs | 118965 µs | 119315 µs |
+| Clean build, trivial program | 3.7 s | 3.9 s | 4.7 s | 3.7 s | 3.7 s | 3.5 s | 3.3 s | 3.5 s |
+| Incremental build after a one-line change, trivial program | 5.7 s | 6.1 s | 7.1 s | 5.6 s | 5.8 s | 5.3 s | 5.2 s | 5.5 s |
+| Clean build, Hono app | 5.8 s | 6.2 s | 7.3 s | 5.8 s | 6.1 s | 5.3 s | 5.1 s | 5.4 s |
+| Incremental build after a one-line change, Hono app | 8.3 s | 9.0 s | 10 s | 8.3 s | 8.3 s | 7.7 s | 7.5 s | 7.8 s |
+| Incremental dev build (--dev, lasm run), trivial program | 1.2 s | 1.3 s | 1.6 s | 1.2 s | 1.3 s | 1.1 s | 1.0 s | 1.1 s |
+| Incremental dev build (--dev, lasm run), Hono app | 2.5 s | 2.7 s | 3.0 s | 2.4 s | 2.6 s | 2.0 s | 2.0 s | 2.1 s |
 | Hono app: program.wasm, dev profile | 936 KiB | 936 KiB | 936 KiB | 936 KiB | 936 KiB | 936 KiB | 936 KiB | 936 KiB |
 | Package download (npm tarball) | 82 MiB | 82 MiB | 82 MiB | 82 MiB | 82 MiB | 82 MiB | 82 MiB | 82 MiB |
-| Installed size | 457 MiB | 457 MiB | 457 MiB | 455 MiB | 455 MiB | 455 MiB | 455 MiB | 455 MiB |
-| npm install, empty cache | 8.3 s | 6.3 s | 6.7 s | 7.9 s | 6.1 s | 6.1 s | 5.3 s | 5.3 s |
-| First build incl. one-time tool download | 23 s | 23 s | 22 s | 24 s | 24 s | 17 s | 15 s | 19 s |
+| Installed size | 457 MiB | 457 MiB | 455 MiB | 455 MiB | 455 MiB | 455 MiB | 455 MiB | 455 MiB |
+| npm install, empty cache | 6.3 s | 6.7 s | 7.9 s | 6.1 s | 6.1 s | 5.3 s | 5.3 s | 5.5 s |
+| First build incl. one-time tool download | 23 s | 22 s | 24 s | 24 s | 17 s | 15 s | 19 s | 16 s |
 | Tool cache on disk after the first build | 2504 MiB | 2504 MiB | 2504 MiB | 2504 MiB | 2504 MiB | 2504 MiB | 2504 MiB | 2504 MiB |
 <!-- benchmarks:generated:end -->
 
