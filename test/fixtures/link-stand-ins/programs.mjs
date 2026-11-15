@@ -56,7 +56,9 @@ export function runTool(name, log, raw, env = {}) {
     copyFileSync(args[args.indexOf('-o') - 1], after('-o'));
   } else if (name === 'wasm-ld') {
     const command = parseLinkCommand(args);
-    if (command.map) {
+    // LASM_STAND_IN_PLAIN_MAP: a link that writes its map as a by-product (the
+    // WASI link under LASM_TEST_LINK_EVIDENCE) links as without one.
+    if (command.map && !env.LASM_STAND_IN_PLAIN_MAP) {
       let linked;
       // Emscripten's system libraries are not part of the stand-in.
       try { linked = linkObjects({ inputs: command.inputs.filter(({ file }) => existsSync(file)), wrap: command.wrap, roots: command.exports }); }
@@ -76,6 +78,7 @@ export function runTool(name, log, raw, env = {}) {
         }
       }
       writeFileSync(command.output, programModule(imports, { exports: ['_start', 'cabi_realloc', 'wasi:http/incoming-handler@0.2.12#handle', 'lasm_extra'] }));
+      if (command.map) writeFileSync(command.map, '    Addr      Off     Size Out     In      Symbol\n');
     }
   } else if (name === 'compiler.mjs') {
     // Emscripten's JavaScript symbol step: no JavaScript symbols.

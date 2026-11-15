@@ -277,6 +277,35 @@ test('a probe link stops after wasm-ld or hands its command to the caller', () =
   } finally { f.cleanup(); }
 });
 
+test('LASM_TEST_LINK_EVIDENCE keeps wasm-ld\'s output, map, arguments and objects, and Binaryen\'s input and output', () => {
+  const f = fixture('final');
+  const previous = process.env.LASM_TEST_LINK_EVIDENCE, evidence = join(f.directory, 'evidence');
+  try {
+    writeFileSync(f.map, 'the map\n');
+    const quiet = run(f, 'final');
+    assert.ok(!existsSync(evidence) && !quiet.calls.some(call => call.args?.some?.(arg => String(arg).includes('wasm-opt-input'))));
+    process.env.LASM_TEST_LINK_EVIDENCE = evidence;
+    run(f, 'final');
+    const kept = readdirSync(evidence).sort();
+    assert.equal(kept.length, 2);
+    const link = join(evidence, kept.find(name => name.endsWith('-final')));
+    const meta = JSON.parse(readFileSync(join(link, 'evidence.json'), 'utf8'));
+    assert.deepEqual([meta.kind, meta.mode, meta.mapOnly, meta.files], ['final', 'final', false, ['linked.wasm', 'link.map']]);
+    assert.equal(readFileSync(join(link, 'link.map'), 'utf8'), 'the map\n');
+    assert.ok(meta.args.includes('--wrap=lean_initialize') && meta.args.includes(f.object));
+    assert.deepEqual(Object.keys(meta.objects).filter(file => file === f.object), [f.object]);
+    assert.equal(readFileSync(join(link, meta.objects[f.object]), 'utf8'), 'object');
+    const opt = join(evidence, kept.find(name => name.endsWith('-final-wasm-opt')));
+    const optMeta = JSON.parse(readFileSync(join(opt, 'evidence.json'), 'utf8'));
+    assert.deepEqual([optMeta.kind, optMeta.files], ['final-wasm-opt', ['in.wasm', 'out.wasm']]);
+    assert.ok(optMeta.args.includes('<wasm>') && optMeta.args.includes('-Oz'));
+    assert.ok(readFileSync(join(link, 'linked.wasm')).length > 0 && readFileSync(join(opt, 'in.wasm')).length > 0);
+  } finally {
+    if (previous === undefined) delete process.env.LASM_TEST_LINK_EVIDENCE; else process.env.LASM_TEST_LINK_EVIDENCE = previous;
+    f.cleanup();
+  }
+});
+
 test('wasm-ld gets a response file once its command line passes emcc\'s limit', { skip: process.platform === 'win32' && 'Windows quoting of the stand-in\'s paths' }, () => {
   const inputs = Array.from({ length: 120 }, (_, index) => `/objects/a-rather-long-directory-name/for-many-objects/object-${index}.o`);
   const f = fixture('probe', { inputs });
