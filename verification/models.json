@@ -121,7 +121,17 @@
     },
     "src/application-initialization.mjs": {
       "status": "pending",
-      "reason": "runtime initialization planning (initializer pruning): a pure graph computation over the link's symbols"
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/Initialization.lean",
+          "functions": [
+            "initializerClosure",
+            "unitsReaching"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "initializerClosure and unitsReaching are modelled (closure_reached proved); the initializer units read from objects and archives, the C wrappers and the planning probes remain to model"
     },
     "src/application-link.mjs": {
       "status": "exempt",
@@ -158,8 +168,17 @@
       "reason": "release support constants"
     },
     "src/application-reachability.mjs": {
-      "status": "pending",
-      "reason": "reads the pinned LLD map: a pure parser of its text"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/Reachability.lean",
+          "functions": [
+            "applicationLinkRequirements"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "the linker map reader is modelled, its regular expressions as matchers (link_map_static_sound proved); readApplicationLinkRequirements feeds the same reader lines from a stream, canSpecializeInitialization is the list of audited runtimes, and the C sources are constants"
     },
     "src/application-runtime.mjs": {
       "status": "exempt",
@@ -210,8 +229,17 @@
       "reason": "the browser loader: instantiates the program; Lean's runtime primitives on this host: their meaning is native Lean's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md)"
     },
     "src/browser/static-server.mjs": {
-      "status": "pending",
-      "reason": "request path to file resolution (candidate static_inside_root): model the resolution"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/StaticServer.lean",
+          "functions": [
+            "resolveStaticPath"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "request resolution is modelled with node:path's POSIX normalize, join and extname and the file system a parameter (static_inside_root proved); on Windows node:path's win32 rules apply instead (test/static-server.test.mjs on the Windows job); the rest serves the resolved file over HTTP (headers, live reload) and listenError picks a message from a table"
     },
     "src/build-progress.mjs": {
       "status": "exempt",
@@ -447,17 +475,18 @@
       "reason": "starts a built program"
     },
     "src/lean-io-errors.mjs": {
-      "status": "pending",
+      "status": "modelled",
       "models": [
         {
           "lean": "verification/cli/Lasm/Cli/Model/LeanIOErrors.lean",
           "functions": [
-            "leanAtLeast"
+            "leanAtLeast",
+            "leanIOError"
           ],
           "differential": "test/models/cli-differential.mjs"
         }
       ],
-      "reason": "leanAtLeast is modelled (lean_at_least_lexicographic proved of the model); the IO error policy remains to model"
+      "reason": "leanAtLeast and the IO error policy leanIOError are modelled (lean_at_least_lexicographic proved), leanIOError with its tables (libuv's messages, Lean's CRT aliases, the Windows CRT cases: data, passed by the differential) and the host (platform, Node's errno names) parameters; checkLeanIOVersion is a list of reviewed releases and receiveSizeError a constant"
     },
     "src/link-driver/compile.mjs": {
       "status": "exempt",
@@ -724,8 +753,18 @@
       "reason": "Lean's runtime primitives on this host: their meaning is native Lean's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md)"
     },
     "src/native-file-message.mjs": {
-      "status": "pending",
-      "reason": "the file worker's message encoding: a pure codec"
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/FileMessage.lean",
+          "functions": [
+            "encodeFileMessage",
+            "decodeFileMessage"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "the whole codec is modelled, buffers by identity (a value's own or a copy) (file_message_transfers proved)"
     },
     "src/native-file-worker-pool.mjs": {
       "status": "exempt",
@@ -871,13 +910,14 @@
       "reason": "its argument parsing is modelled (parse_known_or_refused proved); the rest packages a build (files, processes and archives), tested end to end"
     },
     "src/platform.mjs": {
-      "status": "pending",
-      "reason": "`insideDirectory` (path containment, over Node's `path.relative`) remains to model; the rest is the host check and constants",
+      "status": "modelled",
+      "reason": "responseFile and insideDirectory are modelled (response_file_round_trip and inside_directory_prefix proved), insideDirectory over POSIX paths with path.posix.relative checked by the differential; on Windows node:path's win32 rules apply instead (test/cli-parse.test.mjs); the rest is the host check and constants",
       "models": [
         {
           "lean": "verification/cli/Lasm/Cli/Model/Platform.lean",
           "functions": [
-            "responseFile"
+            "responseFile",
+            "insideDirectory (path.posix.relative)"
           ],
           "differential": "test/models/cli-differential.mjs"
         }

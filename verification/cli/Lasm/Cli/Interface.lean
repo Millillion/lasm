@@ -37,6 +37,10 @@ import Lasm.Cli.Model.LeanIOErrors
 import Lasm.Cli.Model.Init
 import Lasm.Cli.Model.LowerAtomics
 import Lasm.Cli.Model.Mangle
+import Lasm.Cli.Model.StaticServer
+import Lasm.Cli.Model.Reachability
+import Lasm.Cli.Model.Initialization
+import Lasm.Cli.Model.FileMessage
 import Lasm.Cli.Model.NodeHost
 import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
@@ -203,6 +207,33 @@ def unquote (line : String) : Option String :=
   | '"' :: r => if r.getLast? = some '"' then some (String.ofList (unescape r.dropLast)) else none
   | _ => none
 
+/-- `insideDirectory(directory, file, path.posix)` (src/platform.mjs; modelled
+in Model/Platform.lean), with `process.cwd()` the absolute `cwd`. -/
+def insideDirectory (cwd directory file : String) : Bool :=
+  insideDirectoryModel cwd.toList directory.toList file.toList
+
+/-- The segments of `path.posix.resolve(p)` from `cwd`. -/
+def resolvedSegments (cwd p : String) : List (List Char) := resolveSegments cwd.toList p.toList
+
+/-- `initializerClosure(units, roots)` (src/application-initialization.mjs;
+modelled in Model/Initialization.lean), `units` the Map's entries (each
+unit's `calls`). -/
+def initializerClosureOf (units : List (String × List String)) (roots : List String) : List String :=
+  Initialization.initializerClosure units roots
+
+/-- `x` is reached from `root` by initializer calls through units of the
+map: `root` is a unit, and each step calls a unit. -/
+inductive InitReaches (units : List (String × List String)) (root : String) : String → Prop
+  | base : Initialization.hasUnit units root = true → InitReaches units root root
+  | step {y z : String} : InitReaches units root y → z ∈ Initialization.callsOf units y →
+      Initialization.hasUnit units z = true → InitReaches units root z
+
+/-- `applicationLinkRequirements(map, { initializationFreeCppSymbols })`
+(src/application-reachability.mjs; modelled in Model/Reachability.lean):
+what the linker map of the reachability link requires, or the message thrown. -/
+def linkRequirements (initFree : String → Bool) (map : String) : Except String Reachability.Requirements :=
+  Reachability.applicationLinkRequirements (fun s => initFree (String.ofList s)) map.toList
+
 /-! ## The process launcher (src/process-launcher.mjs) -/
 
 -- `encodeProcessConfiguration(options)` (src/process-launcher.mjs) and the
@@ -276,10 +307,23 @@ def supabaseFunctionNameOf (name : String) : String := supabaseNameOf (jsToLower
 
 -- `changedFiles(before, after)` (src/dev.mjs): modelled in Model/Dev.lean.
 
-/-- The static server (`startStaticServer(root)` without a fallback page)
-answering a GET of a request path: the status, and the file (an absolute
-path) whose bytes are the body, if any. -/
-opaque staticServe : String → String → Nat × Option String
+/-- The static server answering a GET (`resolveStaticPath(root, pathname, {
+fallback, accepts, fileExists })`, src/browser/static-server.mjs; modelled
+in Model/StaticServer.lean): the status, and the file whose bytes are the
+body, if any. `fileExists` is the file system (an existing regular file). -/
+def staticServe (fileExists : String → Bool) (root pathname accepts : String) (fallback : Option String) :
+    Nat × Option String :=
+  let r := StaticServer.resolveStaticPath (fun f => fileExists (String.ofList f)) root.toList pathname.toList
+    accepts.toList (fallback.map String.toList)
+  (r.status, r.served.map String.ofList)
+
+/-- One segment of a path: not empty, `.` or `..`, and without `/`. -/
+def pathSegment (l : List Char) : Prop := l ≠ [] ∧ l ≠ ['.'] ∧ l ≠ ['.', '.'] ∧ '/' ∉ l
+
+/-- An absolute path as `path.resolve` gives one, other than `/`:
+`/` and segments joined by `/`. -/
+def resolvedDirectory (root : String) : Prop :=
+  ∃ segs : List (List Char), segs ≠ [] ∧ (∀ s ∈ segs, pathSegment s) ∧ root.toList = '/' :: ['/'].intercalate segs
 
 /-! ## The Node host (src/lean-io-errors.mjs, src/node-host.mjs) -/
 
