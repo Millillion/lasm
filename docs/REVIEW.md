@@ -493,6 +493,9 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
   `Lasm.Fastly`'s five hand-written store calls give way to the generated host
   ABI. `Lasm.Fetch` still ships and is scheduled for removal in a later
   release ([0.7.0-notes.md](release/0.7.0-notes.md)).
+- [ ] **0.8.0's template change:** `lasm init --template fetch` no longer uses
+  `Lasm.Fetch` except on Node; Fastly, wasi:http/Spin and WASI get their own entry
+  modules. Existing projects keep building ([0.8.0-notes.md](release/0.8.0-notes.md)).
 
 ### Process
 - [ ] **The browser dev-rebuild budget is 2.5 s, was 2 s (2026-11-09).** It

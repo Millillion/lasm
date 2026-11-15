@@ -43,7 +43,7 @@ try {
     cpSync(join(lean.prefix, 'lib', 'lean', 'Lasm'), join(out, 'Lasm'), { recursive: true });
     mkdirSync(join(out, 'Lasm', 'UI', 'Proofs'), { recursive: true });
     let log = '';
-    for (const m of ['Basic', 'Lists', 'Children', 'TwoEnded', 'Diff'])
+    for (const m of ['Basic', 'Lists', 'Decode', 'Applier', 'Conform', 'Children', 'TwoEnded', 'Diff'])
       log += run(['-R', join(root, 'library'), '-o', join(out, 'Lasm/UI/Proofs', m + '.olean'), join(root, 'library/Lasm/UI/Proofs', m + '.lean')], [out]);
     log += run(['-R', join(root, 'library'), '-o', join(out, 'Lasm/UI/Proofs.olean'), join(root, 'library/Lasm/UI/Proofs.lean')], [out]);
     if (/declaration uses `sorry`|error:/.test(log)) throw Object.assign(new Error('sorry or error'), { stdout: log });
