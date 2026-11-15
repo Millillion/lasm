@@ -25,10 +25,15 @@ import { lakeName, packageName, parseInitArguments, supabaseFunctionNameOf } fro
 import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
-import { leanAtLeast } from '../../src/lean-io-errors.mjs';
+import { decodeFileMessage, encodeFileMessage } from '../../src/native-file-message.mjs';
+import { initializerClosure, unitsReaching } from '../../src/application-initialization.mjs';
+import { applicationLinkRequirements } from '../../src/application-reachability.mjs';
+import { ioErrorTables, leanAtLeast, leanIOError } from '../../src/lean-io-errors.mjs';
 import { demangleName, initializerModule, mangleName } from '../../src/application-diagnosis.mjs';
 import { comparePythonStrings, pythonJsonString } from '../../src/link-driver/python.mjs';
-import { responseFile } from '../../src/platform.mjs';
+import { insideDirectory, responseFile } from '../../src/platform.mjs';
+import { posix } from 'node:path';
+import { resolveStaticPath } from '../../src/browser/static-server.mjs';
 import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 import { zip } from '../../src/serverless/zip.mjs';
 import { keepExports, lowerAtomics, moduleImports } from '../../src/wasi/lower-atomics.mjs';
@@ -391,6 +396,81 @@ const mangledText = r => {
   return r.string(['_', '_', '_', '0', '0', '1', '9', 'x', 'u', 'U', 'a', 'f', 'Z', 'g', 'é'], 0, 16);
 };
 
+/** A static server's request: a root (absolute, sometimes `/` or relative),
+ * a pathname of dot segments, encoded dots and slashes, malformed and
+ * overlong percent-encoding and non-ASCII, the files that exist (under the
+ * root, its precompressed copies, the root itself, outside it), Accept-Encoding
+ * and the fallback page. */
+function staticRequest(r) {
+  const roll = r.next();
+  const root = roll < 0.08 ? '/' : roll < 0.15 ? r.pick(['dist', 'a/../b', '../x', '.']) : '/' + r.array(r.int(1, 3), () => r.pick(['srv', 'dist', 'a b', 'λ', 'x.y'])).join('/');
+  const segment = () => r.pick(['..', '.', '', '%2e%2e', '%2E.', 'index.html', 'app.js', 'app', 'x.css', 'photo.png', '.hidden', 'a.b.c', 'a..', 'λ',
+    '%', '%zz', '%4', '%41', '%e2%82%ac', '%e2%82', '%c0%80', '%ED%A0%80', '%F0%9F%98%80', '%f4%90%80%80', '%5c', '%00', '%2f..', 'dist']);
+  const pathname = (r.next() < 0.9 ? '/' : '') + r.array(r.int(0, 4), segment).join(r.pick(['/', '/', '%2f', '//']));
+  const names = ['index.html', 'app.js', 'app.js.br', 'app.js.gz', 'x.css', 'x.css.gz', 'photo.png', 'photo.png.gz', 'app', 'λ', 'nested/index.html', 'fallback.html'];
+  const base = root === '/' ? '' : root;
+  const files = [...r.array(r.int(0, 6), () => base + '/' + r.pick(names)), ...(r.next() < 0.1 ? [root] : []), ...(r.next() < 0.2 ? ['/etc/passwd', '/srv/secret'] : [])];
+  const accepts = r.pick(['', 'br', 'gzip', 'br, gzip', 'gzip, deflate', 'xbr', 'br_x', 'BR', 'gzip;q=1.0', 'identity']);
+  const fallback = r.pick([null, null, 'index.html', 'fallback.html', '']);
+  return { root, pathname, files, accepts, fallback };
+}
+
+/** A linker map: its header (or a near miss), CODE, rows of every shape the
+ * reader distinguishes (entry points, dynamic loaders, module-data APIs and
+ * near names, libleancpp members with each kind of section, on POSIX and
+ * Windows paths, and look-alikes), malformed rows, unusual white space. */
+function linkMap(r) {
+  const ws = () => r.pick([' ', ' ', '  ', '\t', '\u00a0', ' \u3000']);
+  const symbol = () => r.pick(['main', '__main_void', '__main_argc_argv', 'mainx', 'CODE', 'DATA', 'dlopen', 'dlsym', 'emscripten_dlopen',
+    'lasm_lookup_lean_symbol', 'lean_read_module_data', 'lean_write_module_data_x', 'lean_read_module_data_', 'lean_read_module_datax',
+    'l_Lean_findSysroot___boxed', 'l_Lean_initSearchPath', 'l_Lean_findSysroot__x', 'l_Std_foo', 'λ',
+    `${r.pick(['/r/', 'C:\\r\\', '', 'x', '/a/libleancpp.a(z.o)/'])}libleancpp.a(${r.pick(['a.o', 'b.o', 'Basic.o', '', 'c)d'])}):(${r.pick(['.text.f', 'f', 'g', '.rodata', '.rodata.str', '.rodatax',
+      '.data.rel.ro._ZTIfoo', '.data.rel.ro._ZTSfoo', '.data.rel.ro._ZTVbar', '.data.x', '', 'h)'])})${r.pick(['', '', ' x', ')'])}`,
+    '/r/libleancpp.a(x.o) without a section']);
+  const row = () => r.next() < 0.05 ? r.pick(['zz 1 2 x', '', '   ', '- 1 2', '-  1  2  \u2028', '1 2 3 \u2028x'])
+    : `${ws()}${r.next() < 0.03 ? 'g' : r.pick(['-', '1f', '0'])}${ws()}${r.next() < 0.03 ? 'x' : r.pick(['48', 'ab'])}${ws()}${r.pick(['600', '20'])}${ws()}${r.next() < 0.03 ? ' ' : symbol()}${r.next() < 0.03 ? ' ' : ''}`;
+  const header = r.next() < 0.95 ? '    Addr      Off     Size Out     In      Symbol' : r.pick(['Addr Off Size Out In Symbol', '', 'Address']);
+  const lines = [header, ...(r.next() < 0.9 ? ['       -       48      600 CODE'] : []), ...(r.next() < 0.7 ? ['       -       58       20                 main'] : []), ...r.array(r.int(0, 6), row)];
+  return { map: lines.join(r.next() < 0.05 ? '\r\n' : '\n') + r.pick(['\n', '', '\n  \n']), initFree: r.array(r.int(0, 3), () => r.pick(['f', 'g', '_ZTIfoo', '_ZTVbar', 'h'])) };
+}
+
+/** A POSIX path: absolute or relative, dot segments, doubled and trailing
+ * slashes, names sharing prefixes (`a`, `ab`, `..a`). */
+const posixPath = r => (r.next() < 0.7 ? '/' : '') + r.array(r.int(0, 5), () => r.pick(['a', 'b', 'ab', 'a', '..', '.', '', 'x y', 'λ', '..a', 'a.'])).join('/') + (r.next() < 0.2 ? '/' : '');
+
+/** A file worker message value: primitives (the protocol's own tags among
+ * them, as data), ArrayBuffers and SharedArrayBuffers from a pool, Uint8Arrays
+ * over them (whole, sliced, empty), arrays and records, nested. The buffers
+ * are made afresh for each value (a move detaches nothing here: the
+ * message is not posted). */
+function fileValue(r) {
+  const pool = Array.from({ length: 3 }, (_, i) => i === 2 ? new SharedArrayBuffer(8) : new ArrayBuffer(8 + i));
+  const leaf = () => {
+    const roll = r.next();
+    if (roll < 0.3) return r.pick([0, 1.5, -1, 'bytes', 'record', 'type', '', null, undefined, true, false, 12345678901234567890n]);
+    const id = r.int(0, pool.length - 1);
+    if (roll < 0.5) return { $buffer: id };
+    const buffer = pool[id], offset = r.next() < 0.5 ? 0 : r.int(0, buffer.byteLength), length = r.next() < 0.5 ? buffer.byteLength - offset : r.int(0, buffer.byteLength - offset);
+    return { $view: [id, offset, length] };
+  };
+  const tree = depth => depth > 2 || r.next() < 0.4 ? leaf() : r.next() < 0.5 ? { $array: r.array(r.int(0, 3), () => tree(depth + 1)) }
+    : { $record: r.array(r.int(0, 3), (_, i) => [r.pick(['type', 'value', 'a', '0', '__proto__', `k${i}`]), tree(depth + 1)]) };
+  return { pool, shape: tree(0), move: r.next() < 0.5 };
+}
+/** The JavaScript value of a shape, over its pool. */
+function fileShapeValue(pool, shape) {
+  if (shape?.$buffer !== undefined) return pool[shape.$buffer];
+  if (shape?.$view) { const [id, offset, length] = shape.$view; return new Uint8Array(pool[id], offset, length); }
+  if (shape?.$array) return shape.$array.map(s => fileShapeValue(pool, s));
+  if (shape?.$record) {
+    const object = {};
+    for (const [key, s] of shape.$record) Object.defineProperty(object, key, { value: fileShapeValue(pool, s), enumerable: true, writable: true, configurable: true });
+    return object;
+  }
+  return shape;
+}
+const primDesc = v => typeof v === 'bigint' ? `${v}n` : v === undefined ? 'undefined' : JSON.stringify(v);
+
 const models = [
   {
     name: 'editDistance', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
@@ -477,6 +557,16 @@ const models = [
     js: ([v, m]) => leanAtLeast(v, m),
   },
   {
+    name: 'resolveStaticPath', source: 'src/browser/static-server.mjs', lean: 'Lasm.Cli.Model.StaticServer',
+    generate: staticRequest,
+    input: ({ root, pathname, files, accepts, fallback }) => ({ root: hex(root), pathname: hex(pathname), accepts: hex(accepts),
+      fallback: fallback === null ? null : hex(fallback), files: files.map(hex) }),
+    js: ({ root, pathname, files, accepts, fallback }) => {
+      const { status, file, served, encoding } = resolveStaticPath(root, pathname, { fallback, accepts, fileExists: f => files.includes(f) });
+      return { status, file: file === undefined ? null : hex(file), served: served === undefined ? null : hex(served), encoding: encoding ?? null };
+    },
+  },
+  {
     name: 'mangleName', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
     generate: r => r.next() < 0.1 ? r.string(['a', '.', '_', '0', 'x'], 0, 8) : dotted(nameComponents(r)),
     input: name => hex(name),
@@ -506,6 +596,102 @@ const models = [
     generate: mangledText,
     input: text => hex(text),
     js: text => hex(demangleName(text)),
+  },
+  {
+    name: 'applicationLinkRequirements', source: 'src/application-reachability.mjs', lean: 'Lasm.Cli.Model.Reachability',
+    generate: linkMap,
+    input: ({ map, initFree }) => ({ map: hex(map), initFree: initFree.map(hex) }),
+    js: ({ map, initFree }) => {
+      try {
+        const result = applicationLinkRequirements(map, { initializationFreeCppSymbols: new Set(initFree) });
+        return { ...result, dynamic: result.dynamic.map(hex), cxxRuntime: result.cxxRuntime.map(hex), moduleData: result.moduleData.map(hex) };
+      } catch (error) { return { error: error.message }; }
+    },
+  },
+  {
+    name: 'fileMessage', source: 'src/native-file-message.mjs', lean: 'Lasm.Cli.Model.FileMessage',
+    generate: fileValue,
+    input: ({ pool, shape, move }) => {
+      const value = s => s?.$buffer !== undefined ? { buffer: s.$buffer, shared: pool[s.$buffer] instanceof SharedArrayBuffer }
+        : s?.$view ? { view: s.$view[0], shared: pool[s.$view[0]] instanceof SharedArrayBuffer, whole: s.$view[1] === 0 && s.$view[2] === pool[s.$view[0]].byteLength, length: s.$view[2] }
+        : s?.$array ? { array: s.$array.map(value) }
+        : s?.$record ? (entries => { const order = Object.keys(Object.fromEntries([...entries.keys()].map(k => [k, 0]))); return { record: order.map(k => [k, value(entries.get(k))]) }; })(new Map(s.$record))
+        : { prim: primDesc(s) };
+      return { move, value: value(shape) };
+    },
+    js: ({ pool, shape, move }) => {
+      const { message, transfer } = encodeFileMessage(fileShapeValue(pool, shape), { move });
+      const copies = new Map();
+      const ref = buffer => pool.includes(buffer) ? ['own', pool.indexOf(buffer)]
+        : ['copy', copies.has(buffer) ? copies.get(buffer) : (copies.set(buffer, copies.size), copies.size - 1), buffer.byteLength];
+      const describe = m => m === null || typeof m !== 'object' ? { prim: primDesc(m) }
+        : m.type === 'buffer' ? { buffer: ref(m.value), shared: m.value instanceof SharedArrayBuffer }
+        : m.type === 'bytes' ? { bytes: ref(m.value) }
+        : m.type === 'array' ? { array: m.value.map(describe) }
+        : { record: m.value.map(([k, v]) => [k, describe(v)]) };
+      const described = describe(message);
+      const decodedOf = d => d instanceof Uint8Array ? { bytes: ref(d.buffer) }
+        : d instanceof ArrayBuffer || (typeof SharedArrayBuffer !== 'undefined' && d instanceof SharedArrayBuffer) ? { buffer: ref(d), shared: d instanceof SharedArrayBuffer }
+        : Array.isArray(d) ? { array: d.map(decodedOf) }
+        : d !== null && typeof d === 'object' ? { record: Object.entries(d).map(([k, v]) => [k, decodedOf(v)]) }
+        : { prim: primDesc(d) };
+      return { message: described, transfer: transfer.map(ref), decoded: decodedOf(decodeFileMessage(message)) };
+    },
+  },
+  {
+    name: 'initializerClosure', source: 'src/application-initialization.mjs', lean: 'Lasm.Cli.Model.Initialization',
+    generate: r => {
+      const names = Array.from({ length: r.int(1, 9) }, (_, i) => `initialize_U${i}`);
+      const units = [...new Set(names.filter(() => r.next() < 0.85))].map(n => [n, r.array(r.int(0, 4), () => r.next() < 0.1 ? 'initialize_Outside' : r.pick(names))]);
+      return { units, roots: r.array(r.int(0, 4), () => r.next() < 0.1 ? 'initialize_Missing' : r.pick(names)) };
+    },
+    input: v => v,
+    js: ({ units, roots }) => initializerClosure(new Map(units.map(([name, calls]) => [name, { name, calls }])), roots),
+  },
+  {
+    name: 'unitsReaching', source: 'src/application-initialization.mjs', lean: 'Lasm.Cli.Model.Initialization',
+    generate: r => {
+      const names = Array.from({ length: r.int(1, 9) }, (_, i) => r.pick(['initialize_', 'l_', 'lean_']) + i);
+      const graph = [...new Set(names.filter(() => r.next() < 0.8))].map(n => [n, r.array(r.int(0, 4), () => r.next() < 0.1 ? 'l_outside' : r.pick(names))]);
+      return { graph, candidates: r.array(r.int(0, 5), () => r.pick(names)), targets: r.array(r.int(0, 3), () => r.pick([...names, 'l_outside'])) };
+    },
+    input: v => v,
+    js: ({ graph, candidates, targets }) => unitsReaching(new Map(graph), candidates, targets),
+  },
+  {
+    name: 'relativePath', source: 'src/platform.mjs', lean: 'Lasm.Cli.Model.Platform',
+    generate: r => { const from = posixPath(r); return [from, r.next() < 0.1 ? from : r.next() < 0.4 ? from + '/' + posixPath(r).replace(/^\//, '') : posixPath(r)]; },
+    input: ([from, to]) => ({ cwd: hex(process.cwd()), from: hex(from), to: hex(to) }),
+    js: ([from, to]) => hex(posix.relative(from, to)),
+  },
+  {
+    name: 'insideDirectory', source: 'src/platform.mjs', lean: 'Lasm.Cli.Model.Platform',
+    generate: r => { const directory = posixPath(r); return [directory, r.next() < 0.1 ? directory : r.next() < 0.5 ? directory + '/' + posixPath(r).replace(/^\//, '') : posixPath(r)]; },
+    input: ([directory, file]) => ({ cwd: hex(process.cwd()), directory: hex(directory), file: hex(file) }),
+    js: ([directory, file]) => insideDirectory(directory, file, posix),
+  },
+  {
+    name: 'leanIOError', source: 'src/lean-io-errors.mjs', lean: 'Lasm.Cli.Model.LeanIOErrors',
+    generate: r => {
+      const tables = ioErrorTables();
+      const codes = [...Object.keys(tables.messages), ...Object.keys(tables.crtAliases), ...tables.windowsCrtCases, 'UNKNOWN', 'ENOTREAL', 'constructor', '__proto__', 'toString', ''];
+      const crt = r.next() < 0.4;
+      const errno = r.next() < 0.1 && !crt ? r.pick([undefined, '-5', null]) : (r.pick([1, -1]) * r.pick([r.int(0, 140), 4094, 4095, 3008, 4022, r.int(0, 99999)]) * (crt ? -1 : 1) * (r.next() < 0.1 ? -1 : 1) || 0);
+      const names = r.array(r.int(0, 6), () => [-r.int(0, 140), r.pick(codes)]);
+      return { platform: r.pick(['linux', 'darwin', 'win32']), version: r.pick(['4.32.0', '4.34.0', '4.34.1', '4.35.0']), names,
+        error: { leanUserError: r.next() < 0.1, errno, code: r.next() < 0.05 ? undefined : r.pick(codes), errorOrigin: crt ? 'crt' : r.pick([undefined, 'uv']) } };
+    },
+    input: ({ platform, version, names, error }) => {
+      const tables = ioErrorTables();
+      return { tables: { messages: Object.entries(tables.messages), crtAliases: Object.entries(tables.crtAliases), windowsCrtCases: tables.windowsCrtCases },
+        platform, version, names, error: { userError: !!error.leanUserError, errno: typeof error.errno === 'number' ? error.errno : null,
+          code: error.code ?? null, crt: error.errorOrigin === 'crt' } };
+    },
+    js: ({ platform, version, names, error }) => {
+      const map = new Map(names);
+      const result = leanIOError(error, version, { platform, systemErrorName: n => map.get(n) });
+      return result === error ? null : { code: result.code ?? null, errno: result.errno, message: result.message };
+    },
   },
   {
     name: 'packageName', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',

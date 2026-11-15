@@ -109,6 +109,16 @@ def parse_known_or_refused : Prop :=
         (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
     | .error m => m.trimAscii.toString ≠ ""
 
+/-- **A path is inside a directory exactly when its segments extend the
+directory's.** For POSIX paths resolved against the working directory,
+`insideDirectory` holds exactly when the resolved directory's segments are a
+prefix of the resolved file's: `..`, `.`, doubled and trailing slashes and
+names that share a prefix (`a`, `ab`, `..a`) are read as path segments.
+Tested by: test/cli-parse.test.mjs -/
+def inside_directory_prefix : Prop :=
+  ∀ cwd directory file : String,
+    insideDirectory cwd directory file = true ↔ resolvedSegments cwd directory <+: resolvedSegments cwd file
+
 /-! ## `lasm init` names -/
 
 /-- **Generated names are valid npm, Lake and Supabase names.** Whatever the
@@ -139,6 +149,19 @@ def changed_files_exact : Prop :=
   ∀ a b : List (String × Option String), (a.map (·.1)).Nodup → (b.map (·.1)).Nodup →
     (changedFiles a b).Nodup ∧
     ∀ k, k ∈ changedFiles a b ↔ (k ∈ a.map (·.1) ∨ k ∈ b.map (·.1)) ∧ a.lookup k ≠ b.lookup k
+
+/-- **No request path reaches a file outside the root.** Whatever the path
+(`..`, encoded dots and slashes, sibling directories that share the root's
+name as a prefix, malformed percent-encoding), whatever files exist and
+whatever the client accepts, the static server answers 200, 400, 403 or 404,
+and a file it serves lies under the root directory: the root is a resolved
+directory (not a file) and the fallback page, if any, a name in it.
+Tested by: test/static-server.test.mjs -/
+def static_inside_root : Prop :=
+  ∀ (fileExists : String → Bool) (root pathname accepts : String) (fallback : Option String),
+    resolvedDirectory root → fileExists root = false → (∀ f ∈ fallback, pathSegment f.toList) →
+    (staticServe fileExists root pathname accepts fallback).1 ∈ [200, 400, 403, 404] ∧
+    ∀ f, (staticServe fileExists root pathname accepts fallback).2 = some f → (root ++ "/").toList <+: f.toList
 
 /-! ## The Node host -/
 
@@ -196,6 +219,44 @@ def mangle_round_trip : Prop :=
     initializerModule ("initialize_" ++ mangleName n) = some n ∧
     initializerModule ("runtime_initialize_" ++ mangleName n) = some n ∧
     mangleName n ≠ "" ∧ (mangleName n).all fun c => c.isAlphanum || c = '_'
+
+/-- **A static application has no evidence of runtime evaluation.** When
+the reader accepts a linker map and calls the application static, no row
+of the map names a dynamic loader or symbol lookup, and every section it
+kept from Lean's C++ library (`libleancpp.a`) is read-only data or belongs
+to an initialization-free inline helper; it is static exactly when it lists
+no dynamic symbol and no C++ member.
+Tested by: test/application-reachability.test.mjs -/
+def link_map_static_sound : Prop :=
+  ∀ (initFree : String → Bool) (map : String) (r : Reachability.Requirements),
+    linkRequirements initFree map = .ok r →
+    (r.static = true ↔ r.dynamic = [] ∧ r.cxxRuntime = []) ∧
+    (r.static = true → ∀ line ∈ ((Reachability.trimEnd map.toList).splitOn '\n').tail, ∀ t,
+      Reachability.rowText line = some t → t ∉ Reachability.dynamicSymbols ∧
+      ∀ m s, Reachability.memberSection t = some (m, s) →
+        Reachability.independent (fun x => initFree (String.ofList x)) s = true)
+
+/-- **The initializer closure is the units the roots reach, once each.**
+Whatever the calls (cycles, calls to units outside the map, repeated
+roots), `initializerClosure` lists each unit reached from a root through
+initializer calls exactly once, and nothing else.
+Tested by: test/application-initialization.test.mjs -/
+def closure_reached : Prop :=
+  ∀ (units : List (String × List String)) (roots : List String),
+    (initializerClosureOf units roots).Nodup ∧
+    ∀ x, x ∈ initializerClosureOf units roots ↔ ∃ r ∈ roots, InitReaches units r x
+
+/-! ## The file worker -/
+
+/-- **The transfer list names each buffer once, and only when moving.**
+`postMessage` refuses a transfer list that names a buffer twice: whatever
+the message (the same allocation reached as a buffer and as a view, nested
+arrays and records), `encodeFileMessage` lists each buffer it transfers
+once, and without `move` it transfers none.
+Tested by: test/native-file-message.test.mjs -/
+def file_message_transfers : Prop :=
+  ∀ (move : Bool) (v : FileMessage.Value),
+    (FileMessage.encodeFileMessage move v).2.Nodup ∧ (move = false → (FileMessage.encodeFileMessage move v).2 = [])
 
 /-! ## The link driver's Python semantics -/
 

@@ -3743,6 +3743,739 @@ theorem mangle_round_trip : Spec.mangle_round_trip := by
   · rw [String.all_bool_eq, List.all_eq_true]; intro c hc
     rcases MangleProofs.mangleName_chars n c hc with h | h <;> simp [h]
 
+/-! ## The static server (Model/StaticServer.lean)
+
+A file served is the normalized join of the root and the request path, which
+the guard keeps under the root (and the root itself is no file), the fallback
+page joined to the root (`join_plain`: joining a resolved directory and a
+name normalizes to their concatenation), or either with `.br` or `.gz` added.
+-/
+
+namespace StaticProofs
+open Lasm.Cli.StaticServer
+
+
+theorem pushSegment_plain (abs : Bool) (stack : List (List Char)) (segs : List (List Char)) (h : ∀ s ∈ segs, pathSegment s) :
+    segs.foldl (pushSegment abs) stack = stack ++ segs := by
+  induction segs generalizing stack with
+  | nil => simp
+  | cons s segs ih =>
+    have hs := h s (by simp)
+    rw [List.foldl_cons, ih _ (fun t ht => h t (by simp [ht]))]
+    simp [pushSegment, hs.1, hs.2.1, hs.2.2.1]
+
+theorem intercalate_snoc (segs : List (List Char)) (f : List Char) (h : segs ≠ []) :
+    ['/'].intercalate (segs ++ [f]) = ['/'].intercalate segs ++ ['/'] ++ f := by
+  induction segs with
+  | nil => exact absurd rfl h
+  | cons s segs ih =>
+    cases segs with
+    | nil => simp
+    | cons t segs =>
+      rw [List.cons_append, List.intercalate_cons_of_ne_nil (l := s) (zs := t :: segs ++ [f]) (by simp), ih (by simp),
+        List.intercalate_cons_of_ne_nil (l := s) (zs := t :: segs) (by simp)]
+      simp only [List.append_assoc]
+
+theorem normalize_plain (parts : List (List Char)) (hne : parts ≠ []) (hall : ∀ s ∈ parts, pathSegment s) :
+    normalizePath (['/'].intercalate ([] :: parts)) = ['/'].intercalate ([] :: parts) := by
+  obtain ⟨segs, f, rfl⟩ : ∃ segs f, parts = segs ++ [f] :=
+    ⟨parts.dropLast, parts.getLast hne, (List.dropLast_concat_getLast hne).symm⟩
+  have hf := hall f (by simp)
+  have hf1 : f ≠ [] := hf.1
+  have hsplit : (['/'].intercalate ([] :: (segs ++ [f]))).splitOn '/' = [] :: (segs ++ [f]) := by
+    apply List.splitOn_intercalate
+    · intro l hl; simp only [List.mem_cons] at hl; rcases hl with rfl | hl
+      · simp
+      · exact (hall l hl).2.2.2
+    · simp
+  have hJ : ['/'].intercalate ([] :: (segs ++ [f])) = '/' :: (['/'].intercalate segs ++ ['/'] ++ f) ∨
+      (segs = [] ∧ ['/'].intercalate ([] :: (segs ++ [f])) = '/' :: f) := by
+    cases segs with
+    | nil => right; simp
+    | cons s segs => left; rw [List.intercalate_cons_of_ne_nil (by simp), intercalate_snoc _ _ (by simp)]; simp
+  have hlast : (['/'].intercalate ([] :: (segs ++ [f]))).getLast? ≠ some '/' := by
+    have hmem : ∀ c, f.getLast? = some c → c ∈ f := fun c h => List.mem_of_getLast? h
+    have hfl : f.getLast? ≠ some '/' := fun h => hf.2.2.2 (hmem _ h)
+    rcases hJ with hJ | ⟨-, hJ⟩ <;> rw [hJ]
+    · rw [← List.cons_append, List.getLast?_append]; cases h : f.getLast? <;> simp_all
+    · rw [show '/' :: f = ['/'] ++ f from rfl, List.getLast?_append]; cases h : f.getLast? <;> simp_all
+  have hhead : (['/'].intercalate ([] :: (segs ++ [f]))).head? = some '/' := by
+    rcases hJ with hJ | ⟨-, hJ⟩ <;> rw [hJ] <;> rfl
+  have hfold : ([] :: (segs ++ [f])).foldl (pushSegment true) [] = segs ++ [f] := by
+    rw [List.foldl_cons, show pushSegment true [] [] = [] by simp [pushSegment], pushSegment_plain _ _ _ hall]; simp
+  have hbody : ['/'].intercalate (segs ++ [f]) ≠ [] := by
+    cases segs with
+    | nil => simp [hf.1]
+    | cons s segs => rw [intercalate_snoc _ _ (by simp)]; simp [hf.1]
+  have hne' : ['/'].intercalate ([] :: (segs ++ [f])) ≠ [] := by intro h; rw [h] at hhead; simp at hhead
+  unfold normalizePath
+  rw [if_neg hne']
+  simp only [hhead, hsplit, decide_true, hfold, if_neg hbody, if_neg hlast, if_true, List.append_nil]
+  rw [List.intercalate_cons_of_ne_nil (by simp)]; simp
+
+theorem join_plain (segs : List (List Char)) (f : List Char) (hne : segs ≠ []) (hsegs : ∀ s ∈ segs, pathSegment s)
+    (hf : pathSegment f) :
+    joinPath ('/' :: ['/'].intercalate segs) f = '/' :: ['/'].intercalate segs ++ ['/'] ++ f := by
+  have hJ : '/' :: ['/'].intercalate segs ++ ['/'] ++ f = ['/'].intercalate ([] :: (segs ++ [f])) := by
+    rw [List.intercalate_cons_of_ne_nil (by simp), intercalate_snoc _ _ hne]; simp
+  have hall : ∀ s ∈ segs ++ [f], pathSegment s := by
+    intro s hs; simp only [List.mem_append, List.mem_singleton] at hs; rcases hs with hs | rfl
+    · exact hsegs s hs
+    · exact hf
+  have hf1 : f ≠ [] := hf.1
+  unfold joinPath
+  simp only [List.filter_cons, List.filter_nil, ne_eq, reduceCtorEq, not_false_eq_true, decide_true, hf1,
+    decide_false, Bool.not_false, if_true, List.intercalate_cons_cons, List.intercalate_singleton]
+  rw [if_neg (by simp), hJ, normalize_plain _ (by simp) hall]
+
+theorem foundFile_inside (fe : List Char → Bool) (segs : List (List Char)) (path file : List Char)
+    (fb : Option (List Char)) (hne : segs ≠ []) (hsegs : ∀ s ∈ segs, pathSegment s)
+    (hfe : fe ('/' :: ['/'].intercalate segs) = false) (hfb : ∀ f ∈ fb, pathSegment f)
+    (hg : ¬ (file ≠ ('/' :: ['/'].intercalate segs) ∧ ¬ (('/' :: ['/'].intercalate segs) ++ ['/']).isPrefixOf file = true))
+    (x : List Char) (hx : foundFile fe ('/' :: ['/'].intercalate segs) path file fb = some x) :
+    ('/' :: ['/'].intercalate segs ++ ['/']) <+: x := by
+  have key : fe file = true → ('/' :: ['/'].intercalate segs ++ ['/']) <+: file := by
+    intro hf
+    by_cases h1 : file = '/' :: ['/'].intercalate segs
+    · rw [h1, hfe] at hf; simp at hf
+    · by_cases h2 : (('/' :: ['/'].intercalate segs) ++ ['/']).isPrefixOf file = true
+      · exact List.isPrefixOf_iff_prefix.mp h2
+      · exact absurd ⟨h1, h2⟩ hg
+  unfold foundFile at hx
+  by_cases h0 : fe file = true
+  · rw [if_pos h0] at hx; cases hx; exact key h0
+  · rw [if_neg h0] at hx
+    cases fb with
+    | none => simp only at hx; rw [if_neg h0] at hx; simp at hx
+    | some f =>
+      simp only at hx
+      by_cases hc : f ≠ [] ∧ extnamePath path = []
+      · rw [if_pos hc] at hx
+        split at hx
+        · cases hx; rw [join_plain _ _ hne hsegs (hfb f (by simp))]; exact List.prefix_append _ _
+        · simp at hx
+      · rw [if_neg hc, if_neg h0] at hx; simp at hx
+
+theorem served_inside (fe : List Char → Bool) (segs : List (List Char)) (pathname accepts : List Char)
+    (fb : Option (List Char)) (hne : segs ≠ []) (hsegs : ∀ s ∈ segs, pathSegment s)
+    (hfe : fe ('/' :: ['/'].intercalate segs) = false) (hfb : ∀ f ∈ fb, pathSegment f) :
+    (resolveStaticPath fe ('/' :: ['/'].intercalate segs) pathname accepts fb).status ∈ [200, 400, 403, 404] ∧
+    ∀ s, (resolveStaticPath fe ('/' :: ['/'].intercalate segs) pathname accepts fb).served = some s →
+      ('/' :: ['/'].intercalate segs ++ ['/']) <+: s := by
+  unfold resolveStaticPath
+  cases decodeURIComponent pathname with
+  | none => simp
+  | some decoded =>
+    simp only
+    split
+    · simp
+    · rename_i hg
+      cases hf : foundFile fe ('/' :: ['/'].intercalate segs) (requestPath decoded)
+          (normalizePath (joinPath ('/' :: ['/'].intercalate segs) (requestPath decoded))) fb with
+      | none => simp
+      | some x =>
+        have hin := foundFile_inside fe segs _ _ fb hne hsegs hfe hfb hg x hf
+        simp only
+        cases hc : compressedCopy fe accepts x with
+        | none => simp; exact hin
+        | some p =>
+          obtain ⟨served, enc⟩ := p
+          simp only [List.mem_cons, List.not_mem_nil, or_false, true_or, Option.some.injEq, forall_eq', true_and]
+          unfold compressedCopy at hc
+          split at hc
+          · split at hc
+            · cases hc; exact hin.trans (List.prefix_append _ _)
+            · split at hc
+              · cases hc; exact hin.trans (List.prefix_append _ _)
+              · simp at hc
+          · simp at hc
+
+end StaticProofs
+
+theorem static_inside_root : Spec.static_inside_root := by
+  intro fileExists root pathname accepts fallback ⟨segs, hne, hsegs, hroot⟩ hfe hfb
+  have hfe' : (fun f => fileExists (String.ofList f)) ('/' :: ['/'].intercalate segs) = false := by
+    simp only; rw [← hroot, String.ofList_toList]; exact hfe
+  have hfb' : ∀ f ∈ fallback.map String.toList, pathSegment f := by
+    intro f hf; simp only [Option.mem_def, Option.map_eq_some_iff] at hf
+    obtain ⟨g, hg, rfl⟩ := hf; exact hfb g hg
+  have h := StaticProofs.served_inside (fun f => fileExists (String.ofList f)) segs pathname.toList accepts.toList _ hne hsegs hfe' hfb'
+  simp only [staticServe, hroot]
+  refine ⟨h.1, fun f hf => ?_⟩
+  simp only [Option.map_eq_some_iff] at hf
+  obtain ⟨s, hs, rfl⟩ := hf
+  rw [String.toList_append, hroot]
+  simp only [String.toList_ofList]
+  exact h.2 s hs
+
+/-! ## The reachability link's map (Model/Reachability.lean)
+
+Every accepted line leaves its evidence in the reader (`readLine_records`):
+a dynamic symbol among the symbols, a dependent C++ member among the
+members; the evidence only grows over the lines (`fold_records`), and
+`finish` calls the application static only when both lists are empty.
+-/
+
+namespace ReachProofs
+open Lasm.Cli.Reachability
+
+/-- What a reader has recorded about one line it accepted. -/
+def Recorded (initFree : List Char → Bool) (r : Reader) (line : List Char) : Prop :=
+  ∀ t, rowText line = some t →
+    (t ∈ dynamicSymbols → t ∈ r.symbols) ∧
+    ∀ m s, memberSection t = some (m, s) → independent initFree s = false → m ∈ r.cxx
+
+/-- What a reader keeps: header, symbols and members only grow. -/
+def Grows (r r' : Reader) : Prop :=
+  (r.header = true → r'.header = true) ∧ r.symbols ⊆ r'.symbols ∧ r.cxx ⊆ r'.cxx
+
+theorem dropWhile_nil {p : Char → Bool} : ∀ {l : List Char}, l.dropWhile p = [] → ∀ x ∈ l, p x = true
+  | [], _ => by simp
+  | c :: cs, h => by
+    by_cases hc : p c = true
+    · rw [List.dropWhile_cons_of_pos hc] at h
+      intro x hx; simp only [List.mem_cons] at hx; rcases hx with rfl | hx
+      · exact hc
+      · exact dropWhile_nil h x hx
+    · rw [List.dropWhile_cons_of_neg hc] at h; simp at h
+
+theorem dropWhile_head {p : Char → Bool} {c : Char} {cs : List Char} :
+    ∀ {l : List Char}, l.dropWhile p = c :: cs → p c = false
+  | [], h => by simp at h
+  | d :: ds, h => by
+    by_cases hd : p d = true
+    · rw [List.dropWhile_cons_of_pos hd] at h; exact dropWhile_head h
+    · rw [List.dropWhile_cons_of_neg hd] at h; simp at h; rw [← h.1]; simpa using hd
+
+theorem blank_no_row (line : List Char) (h : trim line = []) : rowText line = none := by
+  have hx : line.dropWhile jsSpace = [] := by
+    unfold trim trimEnd at h
+    rw [List.reverse_eq_nil_iff] at h
+    cases hd : line.dropWhile jsSpace with
+    | nil => rfl
+    | cons c cs =>
+      exfalso
+      have hc : jsSpace c = false := dropWhile_head hd
+      rw [hd] at h
+      have := dropWhile_nil h c (by simp)
+      rw [hc] at this; exact absurd this (by decide)
+  unfold rowText; rw [hx]; rfl
+
+theorem readLine_records (initFree : List Char → Bool) (r r' : Reader) (line : List Char)
+    (hh : r.header = true) (h : readLine initFree r line = .ok r') :
+    Grows r r' ∧ Recorded initFree r' line := by
+  unfold readLine at h
+  rw [hh] at h
+  simp only [Bool.not_true, Bool.false_eq_true, if_false] at h
+  by_cases hb : trim line = []
+  · rw [if_pos hb] at h; cases h
+    refine ⟨⟨id, fun _ h => h, fun _ h => h⟩, fun t ht => ?_⟩
+    rw [blank_no_row line hb] at ht; simp at ht
+  · rw [if_neg hb] at h
+    cases hrow : rowText line with
+    | none => rw [hrow] at h; simp at h
+    | some t =>
+      rw [hrow] at h
+      simp only at h
+      have g1 : Grows r (noteRow r t) := ⟨fun h => h, fun x hx => by
+          simp only [noteRow]; split <;> simp_all, fun x hx => hx⟩
+      have s1 : t ∈ dynamicSymbols → t ∈ (noteRow r t).symbols := by
+        intro ht; simp only [noteRow]; rw [if_pos (by simp [ht])]; simp
+      cases hm : memberSection t with
+      | none =>
+        rw [hm] at h; simp only at h
+        split at h
+        · simp at h
+        · cases h
+          refine ⟨g1, fun t' ht' => ?_⟩
+          rw [hrow] at ht'; cases ht'
+          exact ⟨s1, fun m s hms => by rw [hm] at hms; simp at hms⟩
+      | some p =>
+        obtain ⟨member, sec⟩ := p
+        rw [hm] at h; simp only [Except.ok.injEq] at h; subst h
+        refine ⟨⟨fun hh' => by split <;> exact g1.1 hh', ?_, ?_⟩, fun t' ht' => ?_⟩
+        · split
+          · exact g1.2.1
+          · exact g1.2.1
+        · split
+          · exact fun x hx => hx
+          · simp only [noteRow]; exact fun x hx => List.mem_append_left _ hx
+        · rw [hrow] at ht'; cases ht'
+          refine ⟨fun hd => by split <;> exact s1 hd, fun m s hms hind => ?_⟩
+          rw [hm] at hms; simp only [Option.some.injEq, Prod.mk.injEq] at hms; obtain ⟨rfl, rfl⟩ := hms
+          rw [if_neg (by simp [hind])]; simp
+
+theorem fold_records (initFree : List Char → Bool) : ∀ (lines : List (List Char)) (r r' : Reader),
+    r.header = true → lines.foldlM (readLine initFree) r = .ok r' →
+    Grows r r' ∧ ∀ line ∈ lines, Recorded initFree r' line
+  | [], r, r', _, h => by
+    simp only [List.foldlM_nil] at h; cases h
+    exact ⟨⟨id, fun _ h => h, fun _ h => h⟩, by simp⟩
+  | l :: ls, r, r', hh, h => by
+    simp only [List.foldlM_cons] at h
+    cases hl : readLine initFree r l with
+    | error e => rw [hl] at h; cases h
+    | ok r1 =>
+      rw [hl] at h
+      obtain ⟨g1, rec1⟩ := readLine_records initFree r r1 l hh hl
+      obtain ⟨g2, rec2⟩ := fold_records initFree ls r1 r' (g1.1 hh) h
+      refine ⟨⟨fun h => g2.1 (g1.1 h), fun x hx => g2.2.1 (g1.2.1 hx), fun x hx => g2.2.2 (g1.2.2 hx)⟩, ?_⟩
+      intro line hline
+      simp only [List.mem_cons] at hline
+      rcases hline with rfl | hline
+      · intro t ht
+        obtain ⟨a, b⟩ := rec1 t ht
+        exact ⟨fun hd => g2.2.1 (a hd), fun m s hms hi => g2.2.2 (b m s hms hi)⟩
+      · exact rec2 line hline
+
+theorem static_sound (initFree : List Char → Bool) (map : List Char) (r : Requirements)
+    (h : applicationLinkRequirements initFree map = .ok r) :
+    (r.static = true ↔ r.dynamic = [] ∧ r.cxxRuntime = []) ∧
+    (r.static = true → ∀ line ∈ ((trimEnd map).splitOn '\n').tail, ∀ t, rowText line = some t →
+      t ∉ dynamicSymbols ∧ ∀ m s, memberSection t = some (m, s) → independent initFree s = true) := by
+  unfold applicationLinkRequirements at h
+  obtain ⟨l0, ls, hls⟩ : ∃ l0 ls, (trimEnd map).splitOn '\n' = l0 :: ls := by
+    cases h' : (trimEnd map).splitOn '\n' with
+    | nil => exact absurd h' (List.splitOn_ne_nil _ _)
+    | cons l0 ls => exact ⟨l0, ls, rfl⟩
+  rw [hls] at h ⊢
+  simp only [List.tail_cons]
+  cases hfold : (l0 :: ls).foldlM (readLine initFree) {} with
+  | error e => rw [hfold] at h; cases h
+  | ok r' =>
+    rw [hfold] at h
+    simp only [bind, Except.bind] at h
+    simp only [List.foldlM_cons] at hfold
+    cases h0 : readLine initFree {} l0 with
+    | error e => rw [h0] at hfold; cases hfold
+    | ok r0 =>
+      rw [h0] at hfold
+      have hh : r0.header = true := by
+        unfold readLine at h0; simp only [Bool.not_false, if_true] at h0
+        split at h0
+        · cases h0
+        · cases h0; rfl
+      obtain ⟨-, rec⟩ := fold_records initFree ls r0 r' hh hfold
+      unfold Reachability.finish at h
+      split at h
+      · cases h
+      · cases h
+        simp only [Bool.and_eq_true, List.isEmpty_iff]
+        refine ⟨trivial, fun ⟨hd, hc⟩ line hline t ht => ⟨fun hdyn => ?_, fun m s hms => ?_⟩⟩
+        · have := (rec line hline t ht).1 hdyn
+          have hmem : t ∈ dynamicSymbols.filter r'.symbols.contains := List.mem_filter.mpr ⟨hdyn, by simpa using this⟩
+          rw [hd] at hmem; simp at hmem
+        · cases hi : independent initFree s with
+          | true => rfl
+          | false =>
+            have := (rec line hline t ht).2 m s hms hi
+            have hmem : m ∈ sortedUnique r'.cxx := by
+              simp only [sortedUnique, List.mem_mergeSort]; exact List.mem_eraseDups.mpr this
+            rw [hc] at hmem; simp at hmem
+
+end ReachProofs
+
+theorem link_map_static_sound : Spec.link_map_static_sound := fun initFree map r h =>
+  ReachProofs.static_sound (fun x => initFree (String.ofList x)) map.toList r h
+
+/-! ## Directory containment (Model/Platform.lean)
+
+The resolved segments are plain (`resolve_plain`); when the directory's are
+a prefix of the file's, the relative path is the file's remaining segments,
+none of them `..` (`plain_front`), and otherwise it starts with `..`.
+-/
+
+namespace PlatformProofs
+
+theorem splitOnP_no_sep {p : Char → Bool} : ∀ (xs : List Char), ∀ l ∈ xs.splitOnP p, ∀ y ∈ l, p y = false
+  | [] => by simp [List.splitOnP_nil]
+  | x :: xs => by
+    rw [List.splitOnP_cons]
+    have ih := splitOnP_no_sep (p := p) xs
+    split
+    · intro l hl; simp only [List.mem_cons] at hl; rcases hl with rfl | hl
+      · simp
+      · exact ih l hl
+    · rename_i hx
+      obtain ⟨h, t, ht⟩ : ∃ h t, xs.splitOnP p = h :: t := by
+        cases h' : xs.splitOnP p with
+        | nil => exact absurd h' (List.splitOnP_ne_nil _ _)
+        | cons h t => exact ⟨h, t, rfl⟩
+      rw [ht] at ih ⊢
+      intro l hl; simp only [List.modifyHead_cons, List.mem_cons] at hl
+      rcases hl with rfl | hl
+      · intro y hy; simp only [List.mem_cons] at hy; rcases hy with rfl | hy
+        · simpa using hx
+        · exact ih h (by simp) y hy
+      · exact ih l (by simp [hl])
+
+/-- A segment kept by `normalizeString`. -/
+def Plain (s : List Char) : Prop := s ≠ [] ∧ s ≠ ['.', '.'] ∧ '/' ∉ s
+
+theorem fold_plain : ∀ (l : List (List Char)) (stack : List (List Char)),
+    (∀ s ∈ stack, Plain s) → (∀ s ∈ l, '/' ∉ s) → ∀ s ∈ l.foldl pushAbsoluteSegment stack, Plain s
+  | [], stack, hs, _ => hs
+  | seg :: l, stack, hs, hl => by
+    rw [List.foldl_cons]
+    apply fold_plain l
+    · unfold pushAbsoluteSegment
+      split
+      · exact hs
+      · split
+        · intro s h; exact hs s (List.dropLast_subset stack h)
+        · rename_i h1 h2
+          intro s h; simp only [List.mem_append, List.mem_singleton] at h; rcases h with h | rfl
+          · exact hs s h
+          · exact ⟨fun e => h1 (.inl e), h2, hl s (by simp)⟩
+    · intro s h; exact hl s (by simp [h])
+
+theorem resolve_plain (cwd p : List Char) : ∀ s ∈ resolveSegments cwd p, Plain s := by
+  unfold resolveSegments
+  apply fold_plain _ _ (by simp)
+  intro s hs hslash
+  rw [List.splitOn_eq_splitOnP] at hs
+  have := splitOnP_no_sep _ s hs '/' hslash
+  simp at this
+
+theorem commonPrefix_le : ∀ (f t : List (List Char)), commonPrefix f t ≤ f.length
+  | [], _ => by simp [commonPrefix]
+  | _ :: _, [] => by simp [commonPrefix]
+  | a :: as, b :: bs => by
+    unfold commonPrefix; split
+    · have := commonPrefix_le as bs; simp; omega
+    · simp
+
+theorem commonPrefix_full : ∀ (f t : List (List Char)), commonPrefix f t = f.length ↔ f <+: t
+  | [], t => by simp [commonPrefix]
+  | a :: as, [] => by simp [commonPrefix]
+  | a :: as, b :: bs => by
+    unfold commonPrefix; split
+    · rename_i h; subst h; rw [List.cons_prefix_cons]; simp [commonPrefix_full as bs]
+    · rename_i h; rw [List.cons_prefix_cons]; simp [h]
+
+/-- A plain first segment, then nothing or a separator: not `..`, not under
+`../`, not absolute. -/
+theorem plain_front (s tail : List Char) (hs : Plain s) (ht : tail = [] ∨ tail.head? = some '/') :
+    s ++ tail ≠ ['.', '.'] ∧ ¬ ("../".toList <+: s ++ tail) ∧ (s ++ tail).head? ≠ some '/' := by
+  obtain ⟨hne, hdd, hslash⟩ := hs
+  have h3 : "../".toList = ['.', '.', '/'] := rfl
+  rw [h3]
+  match s, hne, hdd, hslash with
+  | [a], _, _, hsl =>
+    refine ⟨?_, ?_, ?_⟩
+    · intro h; simp only [List.singleton_append, List.cons.injEq] at h
+      rcases ht with rfl | ht
+      · simp at h
+      · rw [h.2] at ht; simp at ht
+    · intro h; obtain ⟨u, hu⟩ := h; simp only [List.cons_append, List.singleton_append, List.nil_append, List.cons.injEq] at hu
+      rcases ht with rfl | ht
+      · simp at hu
+      · rw [← hu.2] at ht; simp at ht
+    · simp only [List.singleton_append, List.head?_cons, ne_eq, Option.some.injEq]; intro h; subst h; simp at hsl
+  | [a, b], _, hd, hsl =>
+    refine ⟨?_, ?_, ?_⟩
+    · intro h; simp only [List.cons_append, List.cons.injEq] at h; obtain ⟨rfl, rfl, -⟩ := h; exact hd rfl
+    · intro h; obtain ⟨u, hu⟩ := h; simp only [List.cons_append, List.nil_append, List.cons.injEq] at hu
+      obtain ⟨rfl, rfl, -⟩ := hu; exact hd rfl
+    · simp only [List.cons_append, List.head?_cons, ne_eq, Option.some.injEq]; intro h; subst h; simp at hsl
+  | a :: b :: c :: rest, _, _, hsl =>
+    refine ⟨?_, ?_, ?_⟩
+    · intro h; simp at h
+    · intro h; obtain ⟨u, hu⟩ := h; simp only [List.cons_append, List.nil_append, List.cons.injEq] at hu
+      obtain ⟨-, -, rfl, -⟩ := hu; simp at hsl
+    · simp only [List.cons_append, List.head?_cons, ne_eq, Option.some.injEq]; intro h; subst h; simp at hsl
+
+theorem intercalate_front (s : List Char) (rest : List (List Char)) :
+    ∃ tail, ['/'].intercalate (s :: rest) = s ++ tail ∧ (tail = [] ∨ tail.head? = some '/') := by
+  cases rest with
+  | nil => exact ⟨[], by simp, .inl rfl⟩
+  | cons r rs => exact ⟨'/' :: ['/'].intercalate (r :: rs), by rw [List.intercalate_cons_of_ne_nil (by simp)]; simp, .inr rfl⟩
+
+theorem inside_iff (cwd d f : List Char) :
+    insideDirectoryModel cwd d f = true ↔ resolveSegments cwd d <+: resolveSegments cwd f := by
+  unfold insideDirectoryModel relativePath
+  by_cases hdf : d = f
+  · subst hdf; simp
+  · rw [if_neg hdf]
+    generalize hF : resolveSegments cwd d = F
+    generalize hT : resolveSegments cwd f = T
+    have hTp : ∀ s ∈ T, Plain s := hT ▸ resolve_plain cwd f
+    dsimp only
+    have hk := commonPrefix_le F T
+    by_cases hp : F <+: T
+    · have hk' := (commonPrefix_full F T).mpr hp
+      simp only [hk', Nat.sub_self, List.replicate_zero, List.nil_append, hp, iff_true]
+      cases hd : T.drop F.length with
+      | nil => simp
+      | cons s rest =>
+        have hs : Plain s := hTp s (List.mem_of_mem_drop (by rw [hd]; simp))
+        obtain ⟨tail, he, ht⟩ := intercalate_front s rest
+        obtain ⟨a, b, c⟩ := plain_front s tail hs ht
+        simp only [he]
+        simp only [ne_eq, a, not_false_eq_true, decide_true, Bool.true_and, Bool.and_eq_true, Bool.not_eq_true',
+          List.isPrefixOf_iff_prefix] at *
+        refine ⟨?_, ?_⟩
+        · cases h : ("../".toList.isPrefixOf (s ++ tail)) with
+          | false => rfl
+          | true => exact absurd (List.isPrefixOf_iff_prefix.mp h) b
+        · cases h : (s ++ tail).head? with
+          | none => rfl
+          | some x => simp only [bne_iff_ne, ne_eq, Option.some.injEq]; intro hx; subst hx; exact c h
+    · have hlt : commonPrefix F T < F.length := by
+        rcases Nat.lt_or_eq_of_le hk with h | h
+        · exact h
+        · exact absurd ((commonPrefix_full F T).mp h) hp
+      simp only [hp, iff_false]
+      obtain ⟨m, hm⟩ : ∃ m, F.length - commonPrefix F T = m + 1 := ⟨F.length - commonPrefix F T - 1, by omega⟩
+      simp only [hm, List.replicate_succ, List.cons_append]
+      obtain ⟨tail, he, ht⟩ := intercalate_front ['.', '.'] (List.replicate m ['.', '.'] ++ T.drop (commonPrefix F T))
+      simp only [he]
+      rcases ht with rfl | ht
+      · simp
+      · obtain ⟨x, xs, rfl⟩ : ∃ x xs, tail = x :: xs := by cases tail <;> simp_all
+        simp at ht; subst ht
+        simp [List.isPrefixOf]
+
+end PlatformProofs
+
+theorem inside_directory_prefix : Spec.inside_directory_prefix := fun cwd directory file =>
+  PlatformProofs.inside_iff cwd.toList directory.toList file.toList
+
+/-! ## The initializer closure (Model/Initialization.lean)
+
+A visit with enough fuel (more than the units not yet in `order`) appends
+only units reached from its name, appends the name when it is a unit, and
+leaves every unit it appends with its called units appended too
+(`visit_facts`, `fold_facts`); so the closure is closed under calls and
+holds the roots that are units.
+-/
+
+namespace InitProofs
+open Lasm.Cli.Initialization
+
+variable (units : List (String × List String))
+
+theorem reach_root_unit {root x : String} (h : InitReaches units root x) : hasUnit units root = true := by
+  induction h with
+  | base h => exact h
+  | step _ _ _ ih => exact ih
+
+theorem reach_unit {root x : String} (h : InitReaches units root x) : hasUnit units x = true := by
+  cases h with
+  | base h => exact h
+  | step _ _ hz => exact hz
+
+theorem reach_trans {a b c : String} (h1 : InitReaches units a b) (h2 : InitReaches units b c) : InitReaches units a c := by
+  induction h2 with
+  | base _ => exact h1
+  | step _ hc hz ih => exact .step ih hc hz
+
+/-- The units the walk has not appended yet. -/
+def unseen (order : List String) : Nat := ((units.map (·.1)).filter (· ∉ order)).length
+
+theorem hasUnit_mem {n : String} (h : hasUnit units n = true) : n ∈ units.map (·.1) := by
+  induction units with
+  | nil => simp [hasUnit] at h
+  | cons p ps ih =>
+    obtain ⟨k, v⟩ := p
+    by_cases hk : n = k
+    · subst hk; simp
+    · simp only [hasUnit, List.lookup_cons] at h ih
+      have : (n == k) = false := by simpa using hk
+      rw [this] at h; simp only at h
+      exact List.mem_cons_of_mem _ (ih h)
+
+theorem filter_length_mono {p q : String → Bool} (h : ∀ x, p x = true → q x = true) :
+    ∀ l : List String, (l.filter p).length ≤ (l.filter q).length
+  | [] => by simp
+  | y :: ys => by
+    have := filter_length_mono h ys
+    simp only [List.filter_cons]
+    by_cases hp : p y = true
+    · rw [if_pos hp, if_pos (h y hp)]; simp; omega
+    · rw [if_neg hp]; split <;> simp <;> omega
+
+theorem filter_append_lt {order : List String} {u : String} (hn : u ∉ order) : ∀ ks : List String, u ∈ ks →
+    (ks.filter (· ∉ order ++ [u])).length < (ks.filter (· ∉ order)).length
+  | [], h => by simp at h
+  | k :: ks, h => by
+    have le : ∀ l : List String, (l.filter (· ∉ order ++ [u])).length ≤ (l.filter (· ∉ order)).length :=
+      filter_length_mono (fun x h => by simp_all)
+    simp only [List.filter_cons]
+    by_cases hk : k = u
+    · subst hk
+      have := le ks
+      rw [if_neg (by simp), if_pos (by simpa using hn)]; simp only [List.length_cons]; omega
+    · have hm' : u ∈ ks := by simp at h; rcases h with h | h; exact absurd h.symm hk; exact h
+      have := filter_append_lt hn ks hm'
+      by_cases ho : k ∈ order
+      · rw [if_neg (by simp [ho]), if_neg (by simp [ho])]; exact this
+      · rw [if_pos (by simp [ho, hk]), if_pos (by simp [ho])]; simp only [List.length_cons]; omega
+
+theorem unseen_append_lt {order : List String} {u : String} (hu : hasUnit units u = true) (hn : u ∉ order) :
+    unseen units (order ++ [u]) < unseen units order :=
+  filter_append_lt hn _ (hasUnit_mem units hu)
+
+theorem unseen_mono {order : List String} (new : List String) : unseen units (order ++ new) ≤ unseen units order := by
+  unfold unseen
+  exact filter_length_mono (fun x h => by simp_all) _
+
+/-- What one visit with fuel `F` does. -/
+def VisitFacts (F : Nat) : Prop :=
+  ∀ (order : List String) (u : String), unseen units order < F →
+    (∃ new, visitUnit units F order u = order ++ new) ∧
+    (order.Nodup → (visitUnit units F order u).Nodup) ∧
+    (∀ x ∈ visitUnit units F order u, x ∉ order → InitReaches units u x) ∧
+    (hasUnit units u = true → u ∈ visitUnit units F order u) ∧
+    (∀ x ∈ visitUnit units F order u, x ∉ order →
+      ∀ c ∈ callsOf units x, hasUnit units c = true → c ∈ visitUnit units F order u)
+
+/-- What visiting a list of names in turn with fuel `F` does. -/
+def FoldFacts (F : Nat) (cs : List String) : Prop :=
+  ∀ (order : List String), unseen units order < F →
+    (∃ new, cs.foldl (visitUnit units F) order = order ++ new) ∧
+    (order.Nodup → (cs.foldl (visitUnit units F) order).Nodup) ∧
+    (∀ x ∈ cs.foldl (visitUnit units F) order, x ∉ order → ∃ c ∈ cs, InitReaches units c x) ∧
+    (∀ c ∈ cs, hasUnit units c = true → c ∈ cs.foldl (visitUnit units F) order) ∧
+    (∀ x ∈ cs.foldl (visitUnit units F) order, x ∉ order →
+      ∀ c ∈ callsOf units x, hasUnit units c = true → c ∈ cs.foldl (visitUnit units F) order)
+
+theorem fold_facts {F : Nat} (hV : VisitFacts units F) : ∀ cs, FoldFacts units F cs
+  | [] => fun order _ => ⟨⟨[], by simp⟩, id, fun x hx hxo => absurd hx hxo, by simp, fun x hx hxo => absurd hx hxo⟩
+  | c :: rest => by
+    intro order hlt
+    obtain ⟨⟨n1, h1⟩, nd1, re1, mem1, cl1⟩ := hV order c hlt
+    have hlt1 : unseen units (visitUnit units F order c) < F := by
+      rw [h1]; exact Nat.lt_of_le_of_lt (unseen_mono units n1) hlt
+    obtain ⟨⟨n2, h2⟩, nd2, re2, mem2, cl2⟩ := fold_facts hV rest _ hlt1
+    simp only [List.foldl_cons]
+    have sub1 : ∀ x ∈ visitUnit units F order c, x ∈ rest.foldl (visitUnit units F) (visitUnit units F order c) := by
+      intro x hx; rw [h2]; exact List.mem_append_left _ hx
+    refine ⟨⟨n1 ++ n2, by rw [h2, h1, List.append_assoc]⟩, fun nd => nd2 (nd1 nd), ?_, ?_, ?_⟩
+    · intro x hx hxo
+      by_cases hx1 : x ∈ visitUnit units F order c
+      · exact ⟨c, by simp, re1 x hx1 hxo⟩
+      · obtain ⟨c', hc', hr⟩ := re2 x hx hx1; exact ⟨c', by simp [hc'], hr⟩
+    · intro c' hc' hu
+      simp only [List.mem_cons] at hc'
+      rcases hc' with rfl | hc'
+      · exact sub1 _ (mem1 hu)
+      · exact mem2 c' hc' hu
+    · intro x hx hxo d hd hu
+      by_cases hx1 : x ∈ visitUnit units F order c
+      · exact sub1 _ (cl1 x hx1 hxo d hd hu)
+      · exact cl2 x hx hx1 d hd hu
+
+theorem visit_facts : ∀ F, VisitFacts units F
+  | 0 => fun _ _ h => absurd h (Nat.not_lt_zero _)
+  | F + 1 => by
+    intro order u hlt
+    simp only [visitUnit]
+    by_cases hskip : u ∈ order ∨ (!hasUnit units u) = true
+    · rw [if_pos hskip]
+      refine ⟨⟨[], by simp⟩, id, fun x hx hxo => absurd hx hxo, fun hu => ?_, fun x hx hxo => absurd hx hxo⟩
+      rcases hskip with h | h
+      · exact h
+      · rw [hu] at h; simp at h
+    · rw [if_neg hskip]
+      simp only [not_or, Bool.not_eq_true', Bool.not_eq_false] at hskip
+      obtain ⟨hn, hu⟩ := hskip
+      have hlt1 : unseen units (order ++ [u]) < F := by
+        have := unseen_append_lt units hu hn; omega
+      obtain ⟨⟨n, h⟩, nd, re, mem, cl⟩ := fold_facts units (visit_facts F) (callsOf units u) _ hlt1
+      have sub : ∀ x ∈ order ++ [u], x ∈ (callsOf units u).foldl (visitUnit units F) (order ++ [u]) := by
+        intro x hx; rw [h]; exact List.mem_append_left _ hx
+      refine ⟨⟨[u] ++ n, by rw [h, List.append_assoc]⟩, fun nd0 => nd (List.nodup_append.mpr ⟨nd0, by simp, fun a ha b hb => by simp at hb; subst hb; intro e; subst e; exact hn ha⟩), ?_,
+        fun _ => sub u (by simp), ?_⟩
+      · intro x hx hxo
+        by_cases hxu : x = u
+        · subst hxu; exact .base hu
+        · obtain ⟨c, hc, hr⟩ := re x hx (by simp [hxo, hxu])
+          exact reach_trans units (.step (.base hu) hc (reach_root_unit units hr)) hr
+      · intro x hx hxo c hc hcu
+        by_cases hxu : x = u
+        · subst hxu; exact mem c hc hcu
+        · exact cl x hx (by simp [hxo, hxu]) c hc hcu
+
+/-- The closure: no unit twice, and exactly the units reached from a root. -/
+theorem closure_reached (roots : List String) :
+    (initializerClosure units roots).Nodup ∧
+    ∀ x, x ∈ initializerClosure units roots ↔ ∃ r ∈ roots, InitReaches units r x := by
+  have hlt : unseen units [] < units.length + 1 := by
+    unfold unseen; have := List.length_filter_le (fun x => decide (x ∉ ([] : List String))) (units.map (·.1)); simp at this ⊢; omega
+  obtain ⟨-, nd, re, mem, cl⟩ := fold_facts units (visit_facts units (units.length + 1)) roots [] hlt
+  refine ⟨nd List.nodup_nil, fun x => ⟨fun hx => re x hx (by simp), fun ⟨r, hr, hreach⟩ => ?_⟩⟩
+  have key : ∀ y, InitReaches units r y → y ∈ roots.foldl (visitUnit units (units.length + 1)) [] := by
+    intro y hy
+    induction hy with
+    | base hu => exact mem r hr hu
+    | step _ hz hu ih => exact cl _ ih (by simp) _ hz hu
+  exact key x hreach
+
+end InitProofs
+
+theorem closure_reached : Spec.closure_reached := fun units roots =>
+  InitProofs.closure_reached units roots
+
+/-! ## The file worker's messages (Model/FileMessage.lean)
+
+Each step of the walk keeps the transfer list free of duplicates (a Set's
+`add`), and without `move` leaves it as it is (`encode_keeps`).
+-/
+
+namespace FileProofs
+open Lasm.Cli.FileMessage
+
+theorem add_nodup (s : State) (r : Ref) (h : s.transfers.Nodup) : (s.add r).transfers.Nodup := by
+  unfold State.add; split
+  · exact h
+  · rename_i hr; simp only; exact List.nodup_append.mpr ⟨h, by simp, by intro a ha b hb; simp at hb; subst hb; intro e; subst e; exact hr ha⟩
+
+/-- What a step keeps of the transfer list: no duplicates; without `move`, unchanged. -/
+def Keeps (move : Bool) (s s' : State) : Prop :=
+  (s.transfers.Nodup → s'.transfers.Nodup) ∧ (move = false → s'.transfers = s.transfers)
+
+theorem keeps_trans {move : Bool} {a b c : State} (h1 : Keeps move a b) (h2 : Keeps move b c) : Keeps move a c :=
+  ⟨fun h => h2.1 (h1.1 h), fun hm => by rw [h2.2 hm, h1.2 hm]⟩
+
+mutual
+theorem encode_keeps (move : Bool) : ∀ (v : Value) (s : State), Keeps move s (encode move v s).2
+  | .prim _, s => ⟨fun h => h, fun _ => rfl⟩
+  | .buffer i shared, s => by
+    simp only [encode]
+    split
+    · rename_i h; exact ⟨add_nodup s _, fun hm => by simp [hm] at h⟩
+    · exact ⟨fun h => h, fun _ => rfl⟩
+  | .view i shared whole length, s => by
+    simp only [encode]
+    cases hw : (whole && !shared) <;> cases move <;> simp only [Bool.false_eq_true, if_false, if_true] <;>
+      first
+      | exact ⟨fun h => h, fun _ => rfl⟩
+      | exact ⟨add_nodup _ _, fun h => by simp at h⟩
+      | exact ⟨fun h => add_nodup { copies := s.copies + 1, transfers := s.transfers } _ h, fun h => by simp at h⟩
+  | .array items, s => by simp only [encode]; exact encodeList_keeps move items s
+  | .record entries, s => by simp only [encode]; exact encodeEntries_keeps move entries s
+theorem encodeList_keeps (move : Bool) : ∀ (vs : List Value) (s : State), Keeps move s (encodeList move vs s).2
+  | [], s => ⟨fun h => h, fun _ => rfl⟩
+  | v :: vs, s => by
+    simp only [encodeList]
+    exact keeps_trans (encode_keeps move v s) (encodeList_keeps move vs _)
+theorem encodeEntries_keeps (move : Bool) : ∀ (es : List (String × Value)) (s : State), Keeps move s (encodeEntries move es s).2
+  | [], s => ⟨fun h => h, fun _ => rfl⟩
+  | (k, v) :: es, s => by
+    simp only [encodeEntries]
+    exact keeps_trans (encode_keeps move v s) (encodeEntries_keeps move es _)
+end
+
+theorem transfers_safe (move : Bool) (v : Value) :
+    (encodeFileMessage move v).2.Nodup ∧ (move = false → (encodeFileMessage move v).2 = []) := by
+  have h := encode_keeps move v {}
+  exact ⟨h.1 List.nodup_nil, fun hm => h.2 hm⟩
+
+end FileProofs
+
+theorem file_message_transfers : Spec.file_message_transfers := FileProofs.transfers_safe
+
 /-! ## Function packages -/
 
 theorem zip_deterministic : Spec.zip_deterministic := fun _ => rfl
