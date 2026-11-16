@@ -12,6 +12,8 @@ import Lasm.JS.Web.Dom
 import Lasm.JS.Node.Events
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer
+import Lasm.JS.Node.Net
+import Lasm.JS.Node.Process
 import Lasm.JS.Node.Fs
 
 namespace Lasm.JS.Node
@@ -108,29 +110,47 @@ def ChildProcess.SpawnListener.ofFn (f : Async Unit) : IO ChildProcess.SpawnList
 def ChildProcess.SpawnListener.ofSyncFn (f : IO Unit) : IO ChildProcess.SpawnListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
 
-/-- `(double or DOMString)`: one constructor per member type. -/
-inductive DoubleOrDOMString where
-  /-- `double` -/
-  | double (value : Float)
-  /-- `DOMString` -/
-  | domString (value : String)
-instance : ToJS DoubleOrDOMString := ⟨fun
-  | .double v => toJS v
-  | .domString v => toJS v⟩
-instance : Coe Float DoubleOrDOMString := ⟨.double⟩
-instance : Coe String DoubleOrDOMString := ⟨.domString⟩
+/-- `dictionary ChildProcess.SendOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ChildProcess.SendOptions where
+  /-- `boolean keepOpen = false` -/
+  keepOpen : Option Bool := none
+instance instToJSChildProcessSendOptions : ToJS ChildProcess.SendOptions := ⟨fun d => Support.fields #[("keepOpen", Support.optional d.keepOpen)]⟩
 
-/-- `(boolean or DOMString)`: one constructor per member type. -/
-inductive BooleanOrDOMString where
-  /-- `boolean` -/
-  | boolean (value : Bool)
-  /-- `DOMString` -/
-  | domString (value : String)
-instance : ToJS BooleanOrDOMString := ⟨fun
-  | .boolean v => toJS v
-  | .domString v => toJS v⟩
-instance : Coe Bool BooleanOrDOMString := ⟨.boolean⟩
-instance : Coe String BooleanOrDOMString := ⟨.domString⟩
+/-- `dictionary child_process.ExecOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure child_process.ExecOptions where
+  /-- `(DOMString or URL) cwd` -/
+  cwd : Option DOMStringOrURL := none
+  /-- `object env` -/
+  env : Data := .undefined
+  /-- `DOMString encoding = "utf8"` -/
+  encoding : Option String := none
+  /-- `DOMString shell` -/
+  shell : Option String := none
+  /-- `AbortSignal signal` -/
+  signal : Option AbortSignal := none
+  /-- `double /* integer: Nat */ timeout = 0` -/
+  timeout : Option Nat := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
+  /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
+  killSignal : Option DOMStringOrLongLong := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
+  /-- `boolean windowsHide = false` -/
+  windowsHide : Option Bool := none
+instance instToJSChild_processExecOptions : ToJS child_process.ExecOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
+    ("env", d.env),
+    ("encoding", Support.optional d.encoding),
+    ("shell", Support.optional d.shell),
+    ("signal", Support.optional d.signal),
+    ("timeout", Support.optional d.timeout),
+    ("maxBuffer", Support.optional d.maxBuffer),
+    ("killSignal", Support.optional d.killSignal),
+    ("uid", Support.optional d.uid),
+    ("gid", Support.optional d.gid),
+    ("windowsHide", Support.optional d.windowsHide)]⟩
 
 /-- `dictionary child_process.ExecFileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure child_process.ExecFileOptions where
@@ -195,6 +215,54 @@ instance : ToJS SequenceOfAnyOrDOMString := ⟨fun
 instance : Coe (Array Data) SequenceOfAnyOrDOMString := ⟨.sequence⟩
 instance : Coe String SequenceOfAnyOrDOMString := ⟨.domString⟩
 
+/-- `dictionary child_process.ForkOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure child_process.ForkOptions where
+  /-- `(DOMString or URL) cwd` -/
+  cwd : Option DOMStringOrURL := none
+  /-- `boolean detached` -/
+  detached : Option Bool := none
+  /-- `object env` -/
+  env : Data := .undefined
+  /-- `DOMString execPath` -/
+  execPath : Option String := none
+  /-- `sequence<DOMString> execArgv` -/
+  execArgv : Option (Array String) := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
+  /-- `DOMString serialization = "json"` -/
+  serialization : Option String := none
+  /-- `AbortSignal signal` -/
+  signal : Option AbortSignal := none
+  /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
+  killSignal : Option DOMStringOrLongLong := none
+  /-- `boolean silent = false` -/
+  silent : Option Bool := none
+  /-- `(sequence<any> or DOMString) stdio` -/
+  stdio : Option SequenceOfAnyOrDOMString := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `boolean windowsHide = false` -/
+  windowsHide : Option Bool := none
+  /-- `boolean windowsVerbatimArguments = false` -/
+  windowsVerbatimArguments : Option Bool := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
+instance instToJSChild_processForkOptions : ToJS child_process.ForkOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
+    ("detached", Support.optional d.detached),
+    ("env", d.env),
+    ("execPath", Support.optional d.execPath),
+    ("execArgv", Support.optional d.execArgv),
+    ("gid", Support.optional d.gid),
+    ("serialization", Support.optional d.serialization),
+    ("signal", Support.optional d.signal),
+    ("killSignal", Support.optional d.killSignal),
+    ("silent", Support.optional d.silent),
+    ("stdio", Support.optional d.stdio),
+    ("uid", Support.optional d.uid),
+    ("windowsHide", Support.optional d.windowsHide),
+    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
+    ("timeout", Support.optional d.timeout)]⟩
+
 /-- `dictionary child_process.SpawnOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure child_process.SpawnOptions where
   /-- `(DOMString or URL) cwd` -/
@@ -240,9 +308,150 @@ instance instToJSChild_processSpawnOptions : ToJS child_process.SpawnOptions := 
     ("timeout", Support.optional d.timeout),
     ("killSignal", Support.optional d.killSignal)]⟩
 
+/-- `(DOMString or sequence<any>)`: one constructor per member type. -/
+inductive DOMStringOrSequenceOfAny where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `sequence<any>` -/
+  | sequence (value : Array Data)
+instance : ToJS DOMStringOrSequenceOfAny := ⟨fun
+  | .domString v => toJS v
+  | .sequence v => toJS v⟩
+instance : Coe String DOMStringOrSequenceOfAny := ⟨.domString⟩
+instance : Coe (Array Data) DOMStringOrSequenceOfAny := ⟨.sequence⟩
+
+/-- `dictionary child_process.ExecFileSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure child_process.ExecFileSyncOptions where
+  /-- `(DOMString or URL) cwd` -/
+  cwd : Option DOMStringOrURL := none
+  /-- `(DOMString or Uint8Array) input` -/
+  input : Option DOMStringOrUint8Array := none
+  /-- `(DOMString or sequence<any>) stdio = "pipe"` -/
+  stdio : Option DOMStringOrSequenceOfAny := none
+  /-- `object env` -/
+  env : Data := .undefined
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
+  /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
+  killSignal : Option DOMStringOrLongLong := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
+  /-- `DOMString encoding = "buffer"` -/
+  encoding : Option String := none
+  /-- `boolean windowsHide = false` -/
+  windowsHide : Option Bool := none
+  /-- `(boolean or DOMString) shell` -/
+  shell : Option BooleanOrDOMString := none
+instance instToJSChild_processExecFileSyncOptions : ToJS child_process.ExecFileSyncOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
+    ("input", Support.optional d.input),
+    ("stdio", Support.optional d.stdio),
+    ("env", d.env),
+    ("uid", Support.optional d.uid),
+    ("gid", Support.optional d.gid),
+    ("timeout", Support.optional d.timeout),
+    ("killSignal", Support.optional d.killSignal),
+    ("maxBuffer", Support.optional d.maxBuffer),
+    ("encoding", Support.optional d.encoding),
+    ("windowsHide", Support.optional d.windowsHide),
+    ("shell", Support.optional d.shell)]⟩
+
+/-- `dictionary child_process.ExecSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure child_process.ExecSyncOptions where
+  /-- `(DOMString or URL) cwd` -/
+  cwd : Option DOMStringOrURL := none
+  /-- `(DOMString or Uint8Array) input` -/
+  input : Option DOMStringOrUint8Array := none
+  /-- `(DOMString or sequence<any>) stdio = "pipe"` -/
+  stdio : Option DOMStringOrSequenceOfAny := none
+  /-- `object env` -/
+  env : Data := .undefined
+  /-- `DOMString shell` -/
+  shell : Option String := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
+  /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
+  killSignal : Option DOMStringOrLongLong := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
+  /-- `DOMString encoding = "buffer"` -/
+  encoding : Option String := none
+  /-- `boolean windowsHide = false` -/
+  windowsHide : Option Bool := none
+instance instToJSChild_processExecSyncOptions : ToJS child_process.ExecSyncOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
+    ("input", Support.optional d.input),
+    ("stdio", Support.optional d.stdio),
+    ("env", d.env),
+    ("shell", Support.optional d.shell),
+    ("uid", Support.optional d.uid),
+    ("gid", Support.optional d.gid),
+    ("timeout", Support.optional d.timeout),
+    ("killSignal", Support.optional d.killSignal),
+    ("maxBuffer", Support.optional d.maxBuffer),
+    ("encoding", Support.optional d.encoding),
+    ("windowsHide", Support.optional d.windowsHide)]⟩
+
+/-- `dictionary child_process.SpawnSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure child_process.SpawnSyncOptions where
+  /-- `(DOMString or URL) cwd` -/
+  cwd : Option DOMStringOrURL := none
+  /-- `(DOMString or Uint8Array) input` -/
+  input : Option DOMStringOrUint8Array := none
+  /-- `DOMString argv0` -/
+  argv0 : Option String := none
+  /-- `(DOMString or sequence<any>) stdio = "pipe"` -/
+  stdio : Option DOMStringOrSequenceOfAny := none
+  /-- `object env` -/
+  env : Data := .undefined
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
+  /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
+  killSignal : Option DOMStringOrLongLong := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
+  /-- `DOMString encoding = "buffer"` -/
+  encoding : Option String := none
+  /-- `(boolean or DOMString) shell` -/
+  shell : Option BooleanOrDOMString := none
+  /-- `boolean windowsVerbatimArguments = false` -/
+  windowsVerbatimArguments : Option Bool := none
+  /-- `boolean windowsHide = false` -/
+  windowsHide : Option Bool := none
+instance instToJSChild_processSpawnSyncOptions : ToJS child_process.SpawnSyncOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
+    ("input", Support.optional d.input),
+    ("argv0", Support.optional d.argv0),
+    ("stdio", Support.optional d.stdio),
+    ("env", d.env),
+    ("uid", Support.optional d.uid),
+    ("gid", Support.optional d.gid),
+    ("timeout", Support.optional d.timeout),
+    ("killSignal", Support.optional d.killSignal),
+    ("maxBuffer", Support.optional d.maxBuffer),
+    ("encoding", Support.optional d.encoding),
+    ("shell", Support.optional d.shell),
+    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
+    ("windowsHide", Support.optional d.windowsHide)]⟩
+
 /-- `v instanceof ChildProcess`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ChildProcess`). -/
 def ChildProcess.cast? (v : Value) : IO (Option ChildProcess) := do
   return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:child_process" ["ChildProcess"] Value) v) then some { val := v } else none
+
+/-- `subprocess.channel` (added in Node.js v7.1.0): `readonly attribute object channel` -/
+def ChildProcess.channel (self : ChildProcess) : IO Data := self.val.get "channel" Data
+
+/-- `subprocess.connected` (added in Node.js v0.7.2): `readonly attribute boolean connected` -/
+def ChildProcess.connected (self : ChildProcess) : IO Bool := self.val.get "connected" Bool
 
 /-- `subprocess.exitCode`: `readonly attribute long long? exitCode` -/
 def ChildProcess.exitCode (self : ChildProcess) : IO (Option Int) := self.val.get "exitCode" (Option Int)
@@ -256,11 +465,20 @@ def ChildProcess.pid (self : ChildProcess) : IO (Option Int) := self.val.get "pi
 /-- `subprocess.signalCode`: `readonly attribute DOMString? signalCode` -/
 def ChildProcess.signalCode (self : ChildProcess) : IO (Option String) := self.val.get "signalCode" (Option String)
 
+/-- `subprocess.spawnargs`: `readonly attribute sequence<any> spawnargs` -/
+def ChildProcess.spawnargs (self : ChildProcess) : IO (Array Data) := self.val.get "spawnargs" (Array Data)
+
+/-- `subprocess.spawnfile`: `readonly attribute DOMString spawnfile` -/
+def ChildProcess.spawnfile (self : ChildProcess) : IO String := self.val.get "spawnfile" String
+
 /-- `subprocess.stderr` (added in Node.js v0.1.90): `readonly attribute stream.Readable? stderr` -/
 def ChildProcess.stderr (self : ChildProcess) : IO (Option stream.Readable) := self.val.get "stderr" (Option stream.Readable)
 
 /-- `subprocess.stdin` (added in Node.js v0.1.90): `readonly attribute stream.Writable? stdin` -/
 def ChildProcess.stdin (self : ChildProcess) : IO (Option stream.Writable) := self.val.get "stdin" (Option stream.Writable)
+
+/-- `subprocess.stdio` (added in Node.js v0.7.10): `readonly attribute sequence<any> stdio` -/
+def ChildProcess.stdio (self : ChildProcess) : IO (Array Data) := self.val.get "stdio" (Array Data)
 
 /-- `subprocess.stdout` (added in Node.js v0.1.90): `readonly attribute stream.Readable? stdout` -/
 def ChildProcess.stdout (self : ChildProcess) : IO (Option stream.Readable) := self.val.get "stdout" (Option stream.Readable)
@@ -325,18 +543,61 @@ def ChildProcess.onceSpawn (self : ChildProcess) (listener : ChildProcess.SpawnL
   let r ← self.val.callMethod "once" (Support.args #[toJS "spawn", toJS listener]) Value
   pure { val := r }
 
+/-- `subprocess.disconnect()` (added in Node.js v0.7.2): `undefined disconnect()` -/
+def ChildProcess.disconnect (self : ChildProcess) : IO Unit :=
+  self.val.callMethod "disconnect" (Support.args #[]) Unit
+
 /-- `subprocess.kill([signal])` (added in Node.js v0.1.90): `boolean kill(optional (double or DOMString) signal)` -/
 def ChildProcess.kill (self : ChildProcess) (signal : Option DoubleOrDOMString := none) : IO Bool :=
   self.val.callMethod "kill" (Support.args #[Support.optional signal]) Bool
 
+/-- `subprocess.ref()` (added in Node.js v0.7.10): `undefined ref()` -/
+def ChildProcess.ref (self : ChildProcess) : IO Unit :=
+  self.val.callMethod "ref" (Support.args #[]) Unit
+
+/-- `subprocess.send(message[, sendHandle[, options]][, callback])` (added in Node.js v0.5.9): `boolean send(object message, optional object sendHandle, optional ChildProcess.SendOptions options)` -/
+def ChildProcess.send (self : ChildProcess) (message : Data) (sendHandle : Data := .undefined) (options : Option ChildProcess.SendOptions := none) : IO Bool :=
+  self.val.callMethod "send" (Support.args #[toJS message, sendHandle, Support.optional options]) Bool
+
+/-- `subprocess.unref()` (added in Node.js v0.7.10): `undefined unref()` -/
+def ChildProcess.unref (self : ChildProcess) : IO Unit :=
+  self.val.callMethod "unref" (Support.args #[]) Unit
+
+/-- `child_process.exec(command[, options][, callback])` (added in Node.js v0.1.90): `ChildProcess exec(DOMString command, optional child_process.ExecOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
+def child_process.exec (command : String) (options : Option child_process.ExecOptions := none) : IO ChildProcess := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.child_process.exec", module := "node:child_process", path := "exec", construct := false, arity := 2 }
+    (Support.args #[toJS command, Support.optional options]) (await := false)
+  pure { val := r }
+
 /-- `child_process.execFile(file[, args][, options][, callback])` (added in Node.js v0.1.91): `Promise<child_process.ExecFileResult> execFile(DOMString file, optional sequence<DOMString> args, optional child_process.ExecFileOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
 def child_process.execFile (file : String) (args : Option (Array String) := none) (options : Option child_process.ExecFileOptions := none) : Async child_process.ExecFileResult :=
   Support.promisified child_process.ExecFileResult "node:child_process" "execFile" (Support.args #[toJS file, Support.optional args, Support.optional options])
+
+/-- `child_process.fork(modulePath[, args][, options])` (added in Node.js v0.5.0): `ChildProcess fork((DOMString or URL) modulePath, optional sequence<DOMString> args, optional child_process.ForkOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
+def child_process.fork (modulePath : DOMStringOrURL) (args : Option (Array String) := none) (options : Option child_process.ForkOptions := none) : IO ChildProcess := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.child_process.fork", module := "node:child_process", path := "fork", construct := false, arity := 3 }
+    (Support.args #[toJS modulePath, Support.optional args, Support.optional options]) (await := false)
+  pure { val := r }
 
 /-- `child_process.spawn(command[, args][, options])` (added in Node.js v0.1.90): `ChildProcess spawn(DOMString command, optional sequence<DOMString> args, optional child_process.SpawnOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
 def child_process.spawn (command : String) (args : Option (Array String) := none) (options : Option child_process.SpawnOptions := none) : IO ChildProcess := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.child_process.spawn", module := "node:child_process", path := "spawn", construct := false, arity := 3 }
     (Support.args #[toJS command, Support.optional args, Support.optional options]) (await := false)
   pure { val := r }
+
+/-- `child_process.execFileSync(file[, args][, options])` (added in Node.js v0.11.12): `(Uint8Array or DOMString)? execFileSync(DOMString file, optional sequence<DOMString> args, optional child_process.ExecFileSyncOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
+def child_process.execFileSync (file : String) (args : Option (Array String) := none) (options : Option child_process.ExecFileSyncOptions := none) : IO (Option Uint8ArrayOrDOMString) :=
+  Lasm.JS.Binding.invoke (Option Uint8ArrayOrDOMString) { name := "Lasm.JS.Node.child_process.execFileSync", module := "node:child_process", path := "execFileSync", construct := false, arity := 3 }
+    (Support.args #[toJS file, Support.optional args, Support.optional options]) (await := false)
+
+/-- `child_process.execSync(command[, options])` (added in Node.js v0.11.12): `(Uint8Array or DOMString)? execSync(DOMString command, optional child_process.ExecSyncOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
+def child_process.execSync (command : String) (options : Option child_process.ExecSyncOptions := none) : IO (Option Uint8ArrayOrDOMString) :=
+  Lasm.JS.Binding.invoke (Option Uint8ArrayOrDOMString) { name := "Lasm.JS.Node.child_process.execSync", module := "node:child_process", path := "execSync", construct := false, arity := 2 }
+    (Support.args #[toJS command, Support.optional options]) (await := false)
+
+/-- `child_process.spawnSync(command[, args][, options])` (added in Node.js v0.11.12): `object spawnSync(DOMString command, optional sequence<DOMString> args, optional child_process.SpawnSyncOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
+def child_process.spawnSync (command : String) (args : Option (Array String) := none) (options : Option child_process.SpawnSyncOptions := none) : IO Data :=
+  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.child_process.spawnSync", module := "node:child_process", path := "spawnSync", construct := false, arity := 3 }
+    (Support.args #[toJS command, Support.optional args, Support.optional options]) (await := false)
 
 end Lasm.JS.Node
