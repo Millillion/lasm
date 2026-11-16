@@ -1110,8 +1110,8 @@ review the diff of the IDL files.
 from Deno's own TypeScript declarations (`cli/tsc/dts/lib.deno.ns.d.ts`,
 `lib.deno_net.d.ts`, and Deno KV and `Deno.cron` from `lib.deno.unstable.d.ts`):
 every function, constant and class, and every type they use. Status: **current
-source, not yet released** (Stage 0, milestone 0.4; docs/API_DECISIONS.md A2.1,
-A25.1, 0.4-10 to 0.4-15). It runs with `--target deno` and `--target deno-deploy`.
+source, not yet released** (Stage 0, milestone 0.4; docs/API_DECISIONS.md 0.4-5,
+0.4-7, 0.4-9, 0.4-10 to 0.4-15). It runs with `--target deno` and `--target deno-deploy`.
 
 ```lean
 import Lasm.JS.Deno
