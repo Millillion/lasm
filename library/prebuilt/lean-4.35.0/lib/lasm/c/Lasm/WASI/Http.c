@@ -1,6 +1,6 @@
 // Lean compiler output
 // Module: Lasm.WASI.Http
-// Imports: public import Init public meta import Init public import Lasm.WASI.Io.Error public import Lasm.WASI.Io.Poll public import Lasm.WASI.Io.Streams public import Lasm.WASI.Clocks.MonotonicClock public import Lasm.WASI.Http.Types public import Lasm.WASI.Http.OutgoingHandler public import Lasm.WASI.Http.IncomingHandler
+// Imports: public import Init public meta import Init public import Lasm.WASI.Io.Error public import Lasm.WASI.Io.Poll public import Lasm.WASI.Io.Streams public import Lasm.WASI.Clocks.MonotonicClock public import Lasm.WASI.Http.Types public import Lasm.WASI.Http.OutgoingHandler public import Lasm.WASI.Http.IncomingHandler public import Lasm.WASI.Http.Respond
 #include <lean/lean.h>
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -22,6 +22,7 @@ lean_object* initialize_Lasm_WASI_Clocks_MonotonicClock(uint8_t builtin);
 lean_object* initialize_Lasm_WASI_Http_Types(uint8_t builtin);
 lean_object* initialize_Lasm_WASI_Http_OutgoingHandler(uint8_t builtin);
 lean_object* initialize_Lasm_WASI_Http_IncomingHandler(uint8_t builtin);
+lean_object* initialize_Lasm_WASI_Http_Respond(uint8_t builtin);
 void lean_initialize_runtime_module();
 static bool _G_initialized = false;
 LEAN_EXPORT lean_object* initialize_Lasm_WASI_Http(uint8_t builtin) {
@@ -54,6 +55,9 @@ res = initialize_Lasm_WASI_Http_OutgoingHandler(builtin);
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_Lasm_WASI_Http_IncomingHandler(builtin);
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_Lasm_WASI_Http_Respond(builtin);
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 return lean_io_result_mk_ok(lean_box(0));

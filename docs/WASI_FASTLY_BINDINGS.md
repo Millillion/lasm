@@ -259,6 +259,34 @@ through preview 1.
   uses (src/wasi/lasm_wasi_http.c), so read bodies in chunks (64 KiB is
   plenty). `blocking-write-and-flush` takes at most 4096 bytes a call (WASI).
 
+### Helpers
+
+`Lasm.WASI.Http.Respond`, imported by `Lasm.WASI.Http`, is hand-written: the
+few lines every wasi:http program otherwise writes for whole bodies.
+
+```lean
+InputStream.readAll (s : InputStream) : IO (Except StreamError ByteArray)            -- to `closed`
+OutputStream.writeAll (s : OutputStream) (bytes : ByteArray) : IO (Except StreamError Unit)  -- 4096 bytes a call
+IncomingRequest.readBody (request : IncomingRequest) : IO ByteArray                  -- consumes and finishes the body
+respond (out : ResponseOutparam) (status : UInt16) (headers : Array (String × String)) (body : ByteArray) : IO Unit
+```
+
+```lean
+import Lasm.WASI.Http
+open Lasm.WASI.Http
+
+def main : IO Unit := IncomingHandler.serve fun request out => do
+  let body ← request.readBody
+  respond out 200 #[("content-type", "text/plain")] s!"{body.size} bytes\n".toUTF8
+```
+
+The stream helpers return the WIT's error, as the calls they repeat do.
+`readBody` and `respond` make several calls each and throw an `IO.Error`
+naming the one that failed (`wasi:http fields.append "connection": …`):
+`respond` checks every header before it sets the response, so a refused
+header sends nothing. Streaming a body, trailers and outgoing requests use the
+generated calls (examples/wasi-http shows each).
+
 ### How it is built
 
 [`scripts/bindings/wit.mjs`](../scripts/bindings/wit.mjs) reads the WIT
