@@ -192,7 +192,7 @@ function subcommandLine(r, options, values) {
   return r.array(r.int(0, 6), () => r.next() < 0.5 ? spaced() : [r.pick(pool)]).flat();
 }
 const initValues = ['plain', 'express', 'hono', 'fastify', 'std-http', 'web', 'fetch', 'fullstack', 'constructor', '__proto__', 'lambda',
-  'lambda-zip', 'vercel', 'vercel-edge', 'netlify', 'netlify-edge', 'workers', 'wasi', 'wasi-http', 'spin', 'fastly', 'supabase-edge',
+  'lambda-container', 'vercel', 'vercel-edge', 'netlify', 'netlify-edge', 'workers', 'wasi', 'wasi-http', 'spin', 'fastly', 'supabase-edge',
   'deno-deploy', 'azure', 'gcf', '', '-x', '--x', 'a\nb', 'hon', 'Hono', 'worker', 'cloudflare', 'vercl', 'aws'];
 const devValues = ['node', 'bun', 'deno', 'browser', 'workers', 'node,browser', 'node=Server.lean,browser=Client.lean', 'browser=a.lean',
   'node,bun', 'node=', 'node=a', 'x', '', '--x', '-x', '80', '65535', '65536', '00080', '123456', 'a\nb', '127.0.0.1', 'out', 'deno=b.lean=c',

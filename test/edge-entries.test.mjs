@@ -15,11 +15,12 @@ import { workersEntry, vercelEdgeEntry, netlifyEdgeEntry, portableEntry, supabas
 
 registerHooks({
   resolve(specifier, context, next) {
-    if (specifier === 'cloudflare:workers' || specifier.startsWith('lasm-test-module:')) return { url: 'lasm-stand-in:' + specifier, shortCircuit: true };
+    if (specifier === 'cloudflare:workers' || specifier === 'cloudflare:sockets' || specifier.startsWith('lasm-test-module:')) return { url: 'lasm-stand-in:' + specifier, shortCircuit: true };
     return next(specifier, context);
   },
   load(url, context, next) {
     if (url === 'lasm-stand-in:cloudflare:workers') return { format: 'module', shortCircuit: true, source: 'export const env = globalThis.__lasmBindings;' };
+    if (url === 'lasm-stand-in:cloudflare:sockets') return { format: 'module', shortCircuit: true, source: 'export const connect = () => "socket";' };
     if (url.startsWith('lasm-stand-in:lasm-test-module:')) return { format: 'module', shortCircuit: true, source: `export const name = ${JSON.stringify(url.slice(url.lastIndexOf(':') + 1))};` };
     if (/\.wasm(\?module)?$/.test(url)) return { format: 'module', shortCircuit: true, source: 'export default globalThis.__lasmWasmModule;' };
     return next(url, context);
@@ -62,18 +63,42 @@ test('workers: Lean starts once per isolate with the string bindings, and the ha
   const seen = [];
   const starts = lean({ handler: (request, env, ctx) => { seen.push([request.url, env, ctx]); return new Response('fn'); } });
   globalThis.__lasmDefaultExport = 'stale';
-  const worker = (await import(place(workersEntry(['lasm-test-module:a', 'lasm:web'])))).default;
+  // A binding of the runtime's own module (cloudflare:workers) is imported once, with the entry's.
+  const worker = (await import(place(workersEntry(['cloudflare:workers', 'lasm-test-module:a', 'lasm:web'])))).default;
   assert.equal(starts.length, 1);
   assert.equal(starts[0].wasmModule, 'compiled module');
   assert.equal(typeof starts[0].createProgram, 'function');
   assert.deepEqual(starts[0].env, { GREETING: 'hello' });
-  assert.deepEqual(Object.keys(starts[0].modules), ['lasm-test-module:a', 'lasm:web']);
+  assert.deepEqual(Object.keys(starts[0].modules), ['cloudflare:workers', 'cloudflare:sockets', 'lasm-test-module:a', 'lasm:web']);
+  assert.equal(starts[0].modules['cloudflare:workers'].env, globalThis.__lasmBindings, 'Lasm.JS.Cloudflare.env');
+  assert.equal(starts[0].modules['cloudflare:sockets'].connect(), 'socket', 'Lasm.JS.Cloudflare.connect');
   assert.equal(starts[0].modules['lasm-test-module:a'].name, 'a');
   assert.equal(starts[0].modules['lasm:web'].web, true, 'builtins from lasm/modules/');
   const env = { GREETING: 'per request' }, ctx = { waitUntil() {} };
   assert.equal(await (await worker.fetch(new Request('http://x/a'), env, ctx)).text(), 'fn');
   assert.deepEqual(seen, [['http://x/a', env, ctx]]);
   assert.equal(starts.length, 1);
+  // A function handler has no scheduled or queue method: those events fail, saying why.
+  await assert.rejects(worker.scheduled({ cron: '* * * * *' }, env, ctx), { message: 'The handler of the Lean program (Lasm.JS.exportDefault) has no scheduled method' });
+  await assert.rejects(worker.queue({ messages: [] }, env, ctx), { message: 'The handler of the Lean program (Lasm.JS.exportDefault) has no queue method' });
+});
+
+test('workers: an object handler\'s scheduled and queue methods receive cron triggers and queue batches', async () => {
+  globalThis.__lasmBindings = {};
+  const seen = [];
+  globalThis.__lasmStart = async () => {
+    globalThis.__lasmDefaultExport = {
+      fetch: () => new Response('fetch'),
+      scheduled: async (controller, env, ctx) => { seen.push(['scheduled', controller.cron, env.n, ctx.c]); },
+      queue: async (batch, env, ctx) => { seen.push(['queue', batch.queue, env.n, ctx.c]); return 'done'; },
+    };
+    return { lasmEdge: { stopped: null } };
+  };
+  const worker = (await import(place(workersEntry([])))).default;
+  assert.equal(await worker.scheduled({ cron: '*/5 * * * *' }, { n: 1 }, { c: 2 }), undefined);
+  assert.equal(await worker.queue({ queue: 'jobs', messages: [] }, { n: 3 }, { c: 4 }), 'done');
+  assert.deepEqual(seen, [['scheduled', '*/5 * * * *', 1, 2], ['queue', 'jobs', 3, 4]]);
+  assert.equal(await (await worker.fetch(new Request('http://x/'), {}, {})).text(), 'fetch');
 });
 
 test('workers: an object handler\'s fetch, a stopped instance replaced, and a program without a handler', async () => {
@@ -92,7 +117,7 @@ test('workers: an object handler\'s fetch, a stopped instance replaced, and a pr
   instances[0].lasmEdge.stopped = new Error('stack exhausted');
   assert.equal(await (await worker.fetch(new Request('http://x/'), { n: 1 }, { c: 2 })).text(), 'object 2 1 2');
   assert.equal(await (await worker.fetch(new Request('http://x/'), { n: 1 }, { c: 2 })).text(), 'object 2 1 2', 'the new instance is kept');
-  assert.deepEqual(starts[0].modules, {});
+  assert.deepEqual(Object.keys(starts[0].modules), ['cloudflare:workers', 'cloudflare:sockets'], 'only the runtime\'s own modules');
   // No handler: the isolate fails to start, saying why.
   lean({});
   delete globalThis.__lasmDefaultExport;

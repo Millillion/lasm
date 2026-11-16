@@ -59,6 +59,7 @@ export const cases = [
   { id: 'dev-option-twice', kind: 'parse', args: ['dev', '--target', 'browser', '--port', '1', '--port', '2'], files: { 'Main.lean': main }, expect: /Specify --port only once/, fixedIn: '0.9.0' },
   { id: 'dev-unknown-target', kind: 'parse', args: ['dev', '--target', 'worker'], files: { 'Main.lean': main }, expect: /not "worker" \(did you mean --target workers\?\)/, fixedIn: '0.9.0' },
   { id: 'init-template-twice', kind: 'parse', args: ['init', 'app', '-t', 'hono', '--template', 'web'], expect: /Specify --template only once/, fixedIn: '0.9.0' },
+  { id: 'init-renamed-deploy', kind: 'parse', args: ['init', 'app', '-t', 'hono', '--deploy', 'lambda-zip'], expect: /\(did you mean --deploy lambda\?\)/, fixedIn: '0.9.0' },
   { id: 'init-unknown-deploy', kind: 'parse', args: ['init', 'app', '-t', 'hono', '--deploy', 'cloudflare'], expect: /--deploy accepts .* \(did you mean --deploy workers\?\)/, fixedIn: '0.9.0' },
   { id: 'arguments-to-build', kind: 'parse', args: ['build', 'Main.lean', '--', 'x'], files: { 'Main.lean': main }, expect: /Application arguments are accepted by lasm run, not lasm build/ },
   { id: 'not-a-lean-file', kind: 'parse', args: ['build', 'Main.txt'], files: { 'Main.txt': main }, expect: /Expected a Lean source file/ },
