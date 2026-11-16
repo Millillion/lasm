@@ -313,3 +313,213 @@ Deno"](JS_BINDINGS.md#standard-bindings-for-deno-lasmjsdeno).
   docs/release/next-notes.md.
 - **Where:** PR #307; unreleased (breaking: one rename).
 - **Status:** pending sign-off.
+
+### Milestone 0.4: Bun (Lasm.JS.Bun)
+
+Decided by Claude under Jordan's direction calls of 2026-11-16 (generate everything
+the declarations contain, exclude only what cannot work from Wasm, web types are
+Lasm.JS.Web's). Detail and the mapping: [JS_BINDINGS.md, "Standard bindings for
+Bun"](JS_BINDINGS.md#standard-bindings-for-bun-lasmjsbun).
+
+#### 0.4-16 Lasm.JS.Bun is the whole Bun namespace and bun:sqlite
+
+- **Decision:** `import Lasm.JS.Bun` gives every function, constant and class of the
+  `Bun` namespace of Bun 1.4.4 and of `bun:sqlite`, with every type they use,
+  generated from `packages/bun-types` by `ts-auto.mjs` (the rules of 0.4-11, plus:
+  `XOR<A, B>` is the union A | B, so `Bun.serve`'s options are one structure;
+  `Pick`/`Omit<T, …>` are `T`; tuples are arrays; a union of number literals is a
+  number; another module's type is `Data`; keyword-argument overloads add their
+  keywords to the name; a nested namespace's declaration is prefixed with it,
+  `UdpSocket`). Modules: `Lasm.JS.Bun.Core`, `.Serve`, `.Shell`, `.Sqlite`, `.Sql`,
+  `.Redis`, `.S3`. `bun:sqlite` is loaded with `require` on Bun (src/edge/edge-js.mjs).
+  Member types TypeScript computes are stated in the reviewed override table of
+  `bun-tier2.mjs` (`Subprocess.stdout`, `Database.query`, `Server.upgrade`'s
+  options, `Bun.env`, `Bun.hash`, …), each with its reason.
+  ```lean
+  let db ← Bun.Database.new (some ":memory:") none
+  discard <| db.run "create table t (name text)"
+  discard <| (← db.query "insert into t values (?)").run #[#[toJS "ada"]]
+  let rows ← (← db.query "select name from t").all
+  let out ← Bun.spawnSync { cmd := #["printf", "%s", "hi"] }
+  let z ← Bun.gzipSync (.domString "text") none
+  ```
+- **Why:** Jordan, 2026-11-16: generate everything bun-types contains, drive the
+  generator by an exclusion table. Alternatives: the 0.7.0 cut (`Bun.serve` only).
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### A24.1 Bun's port stays `string | number`
+
+- **Decision:** `ServeOptions.port : Option DOMStringOrUnsignedShort`, as declared
+  (`port := some (.unsignedShort 3000)`, or a `Nat` or `String` through its `Coe`
+  instances); no override.
+- **Why:** platform-native: Bun accepts both. Alternative: `Option Nat` through the
+  override table (rejected: the override table is for awkward names, Jordan 2026-11-16).
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### A25.2 WebSockets on Bun: generated now
+
+- **Decision:** `ServeOptions.websocket` (`WebSocketHandler`: `message`, `open`,
+  `close`, `drain`, `ping`, `pong`, `error`), `Server.upgrade`, `Server.publish`,
+  `ServerWebSocket` (`send`, `subscribe`, `publish`, `close`, …).
+  ```lean
+  let message ← Bun.WebSocketHandlerMessage.ofFn fun ws msg => discard <| ws.send (match msg with
+    | .domString s => .domString s | .uint8Array b => .uint8Array b) none
+  let fetch ← Bun.ServeOptionsFetch.ofFn fun req server => do
+    if ← server.upgrade req none then Response.new none none else Response.new (some (.usvString "hi")) none
+  let server ← Bun.serve { fetch, websocket := some { message }, port := some (.unsignedShort 3000) }
+  ```
+- **Why:** the platform-native WebSocket server on Bun (Tandem's need).
+  `ServeOptions.fetch` is now optional (a server of `routes` alone has none);
+  a `ServeOptionsFetch` still coerces to `Option`.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-17 Lasm.JS.Bun leaves out the @category Bundler declarations
+
+- **Decision:** not generated.
+- **Why:** Bun.build, plugins and the transpiler configure Bun's bundler, which builds JavaScript; Lasm builds the program.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-18 Lasm.JS.Bun leaves out the @category FFI declarations
+
+- **Decision:** not generated.
+- **Why:** native libraries through pointers (bun:ffi): computed TypeScript types.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-19 Lasm.JS.Bun leaves out `$`
+
+- **Decision:** not generated.
+- **Why:** the shell is a tagged template literal (`$`ls ${dir}``): its escaping comes from the template's TemplateStringsArray, which Lean cannot make; Bun.spawn runs commands.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-20 Lasm.JS.Bun leaves out `sql`
+
+- **Decision:** not generated.
+- **Why:** the default SQL client is a tagged template literal (sql`select …`), as $; Bun.SQL's methods (unsafe, …) run queries.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-21 Lasm.JS.Bun leaves out `fetch`
+
+- **Decision:** not generated.
+- **Why:** the web fetch (Lasm.JS.Web.fetch), declared again on Bun.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-22 Lasm.JS.Bun leaves out `plugin`
+
+- **Decision:** not generated.
+- **Why:** registers bundler plugins for Bun's module loader (JavaScript source transforms).
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-23 Lasm.JS.Bun leaves out `markdown.react`
+
+- **Decision:** not generated.
+- **Why:** renders to React elements (JSX).
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-24 Lasm.JS.Bun leaves out `TranspilerOptions.macro`
+
+- **Decision:** not generated.
+- **Why:** bundler macros (JavaScript modules run at transpile time).
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-25 Lasm.JS.Bun leaves out `unsafe.arrayBufferToString(buffer: Uint16Array)`
+
+- **Decision:** not generated.
+- **Why:** reads a UTF-16 Uint16Array in place; the Uint8Array overload takes bytes.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-26 Lasm.JS.Bun leaves out `Glob.scanSync`
+
+- **Decision:** not generated.
+- **Why:** returns a synchronous iterator object (not an array); scan gives the same paths.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-27 Lasm.JS.Bun leaves out `CookieMap.entries`
+
+- **Decision:** not generated.
+- **Why:** returns a synchronous iterator object; toJSON gives the cookies.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-28 Lasm.JS.Bun leaves out `CookieMap.keys`
+
+- **Decision:** not generated.
+- **Why:** as entries.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-29 Lasm.JS.Bun leaves out `CookieMap.values`
+
+- **Decision:** not generated.
+- **Why:** as entries.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-30 Lasm.JS.Bun leaves out `Statement.iterate`
+
+- **Decision:** not generated.
+- **Why:** returns a synchronous iterator object; all gives the rows.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-31 Lasm.JS.Bun leaves out `Statement.as`
+
+- **Decision:** not generated.
+- **Why:** maps rows to instances of a JavaScript class (a constructor type).
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-32 Lasm.JS.Bun leaves out `S3File.unlink`
+
+- **Decision:** not generated.
+- **Why:** the same function as delete (declared as its type).
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-33 Lasm.JS.Bun leaves out `Database.transaction`
+
+- **Decision:** not generated.
+- **Why:** wraps a JavaScript function in a transaction and returns a callable object (generic over its arguments); run BEGIN and COMMIT with Database.run.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-34 Lasm.JS.Bun leaves out `cron.parse`
+
+- **Decision:** not generated.
+- **Why:** typed with template literal types (cron expressions); Bun.cron takes the expression as a string.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-35 Lasm.JS.Bun leaves out deprecated members
+
+- **Decision:** members Bun's declarations mark @deprecated (`Bun.shrink`, `Database.exec`, `RedisClient.hmset`, `RedisClient.substr`, `Bun.postgres`, `S3Options.highWaterMark`, `MatchedRoute.scriptSrc`) are not generated.
+- **Why:** each has a replacement Bun names in its declaration, which is generated.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-36 Lasm.JS.Bun leaves out Bun.ModuleGraph and Bun.WebView
+
+- **Decision:** not generated.
+- **Why:** both are @experimental; ModuleGraph describes Bun's bundler graph (Lasm builds the program) and WebView drives a browser window, which a server process run by Lasm has none of.
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+
+#### 0.4-37 Lasm.JS.Bun leaves out call signatures and Symbol-keyed members
+
+- **Decision:** a call or construct signature of an object type (`Bun.cron(…)`, `SQL.NameTransform`) and a Symbol-keyed member (`[Symbol.dispose]`, `[Symbol.iterator]`) are not generated; the object's other members are.
+- **Why:** Lean calls such an object with Lasm.JS's `Value.call`; `using` and `for … of` have no Lean counterpart (the iterators' contents are read with `all`, `toJSON` or `values`).
+- **Where:** the Bun PR; unreleased.
+- **Status:** pending sign-off.
+

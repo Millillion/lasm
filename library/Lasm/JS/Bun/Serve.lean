@@ -697,9 +697,9 @@ def Server.id (self : Server) : IO String := self.val.get "id" String
 def Server.stop (self : Server) (closeActiveConnections : Option Bool := none) : Async Unit :=
   self.val.callMethodAwait "stop" (Support.args #[Support.optional closeActiveConnections]) Unit
 
-/-- `closeIdleConnections(): number`: `double closeIdleConnections()` -/
-def Server.closeIdleConnections (self : Server) : IO Float :=
-  self.val.callMethod "closeIdleConnections" (Support.args #[]) Float
+/-- `closeIdleConnections(): number`: `unsigned long closeIdleConnections()` -/
+def Server.closeIdleConnections (self : Server) : IO Nat :=
+  self.val.callMethod "closeIdleConnections" (Support.args #[]) Nat
 
 /-- `reload<R extends string>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData> (read as {'options':'Serve.Options<undefined, never>'}: the same options as Bun.serve (the declaration instantiates the route parameter as string rather than never))`: `Server reload(ServeOptions options)` -/
 def Server.reload (self : Server) (options : ServeOptions) : IO Server := do
@@ -727,8 +727,8 @@ def Server.subscriberCount (self : Server) (topic : String) : IO Float :=
 def Server.requestIP (self : Server) (request : Request) : IO (Option SocketAddress) :=
   self.val.callMethod "requestIP" (Support.args #[toJS request]) (Option SocketAddress)
 
-/-- `timeout(request: Request, seconds: number): void`: `undefined timeout(Request request, double seconds)` -/
-def Server.timeout (self : Server) (request : Request) (seconds : Float) : IO Unit :=
+/-- `timeout(request: Request, seconds: number): void`: `undefined timeout(Request request, unsigned long seconds)` -/
+def Server.timeout (self : Server) (request : Request) (seconds : Nat) : IO Unit :=
   self.val.callMethod "timeout" (Support.args #[toJS request, toJS seconds]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/

@@ -115,6 +115,8 @@ export const bun = {
     'ServeOptions.maxRequestBodySize': { type: 'unsigned long long', quote: 'The maximum size of a request body, in bytes' },
     'Server.port': { type: 'unsigned short', quote: 'The port the server is listening on.' },
     'Server.pendingRequests': { type: 'unsigned long', quote: 'The number of in-flight requests' },
+    'Server.timeout.seconds': { type: 'unsigned long', quote: 'to the given number of seconds' },
+    'Server.closeIdleConnections': { type: 'unsigned long', quote: 'The number of connections that were closed.' },
     'SocketAddress.port': { type: 'unsigned short', quote: 'The port of the client.' },
   },
   typeNames: {

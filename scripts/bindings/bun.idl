@@ -2497,7 +2497,7 @@ interface Bun_Server {
   // stop(closeActiveConnections?: boolean): Promise<void>
   [LasmHost="Bun", LasmSignature="stop(closeActiveConnections?: boolean): Promise<void>"] Promise<undefined> stop(optional boolean closeActiveConnections);
   // closeIdleConnections(): number
-  [LasmHost="Bun", LasmSignature="closeIdleConnections(): number"] double closeIdleConnections();
+  [LasmHost="Bun", LasmSignature="closeIdleConnections(): number"] unsigned long closeIdleConnections();
   // reload<R extends string>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData> (read as  {"options":"Serve.Options<undefined, never>"}: the same options as Bun.serve (the declaration instantiates the route parameter as string rather than never))
   [LasmHost="Bun", LasmSignature="reload<R extends string>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData> (read as {'options':'Serve.Options<undefined, never>'}: the same options as Bun.serve (the declaration instantiates the route parameter as string rather than never))"] Bun_Server reload(Bun_ServeOptions options);
   // fetch(request: Request | string): Response | Promise<Response>
@@ -2511,7 +2511,7 @@ interface Bun_Server {
   // requestIP(request: Request): SocketAddress | null
   [LasmHost="Bun", LasmSignature="requestIP(request: Request): SocketAddress | null"] Bun_SocketAddress? requestIP(Request request);
   // timeout(request: Request, seconds: number): void
-  [LasmHost="Bun", LasmSignature="timeout(request: Request, seconds: number): void"] undefined timeout(Request request, double seconds);
+  [LasmHost="Bun", LasmSignature="timeout(request: Request, seconds: number): void"] undefined timeout(Request request, unsigned long seconds);
   // ref(): void
   [LasmHost="Bun", LasmSignature="ref(): void"] undefined ref();
   // unref(): void
