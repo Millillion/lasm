@@ -4,219 +4,392 @@
 done.**
 - Claude updates it whenever work starts or finishes.
 - Jordan decides what goes on it.
-- Status: **agreed with Jordan, 2026-11-01.** It replaces NEXT_STEPS.md, ROBUSTNESS_PLAN.md and TESTING_PROGRAM.md.
+- Status: **restructured into stages with Jordan, 2026-11-16.** The roadmap as
+  it stood before is kept in [docs/history/ROADMAP_2026-11-16.md](docs/history/ROADMAP_2026-11-16.md).
 
 Legend: `[ ]` not started, `[~]` in progress, `[x]` done. `(J)` means the item
 is Jordan's to do or decide.
 
-Details live in the linked docs. This file only says *what* and *in what order*.
-- [issue #21](https://github.com/Millillion/lasm/issues/21) is Jordan's original plan. Each of its points is placed below.
-- NEXT_STEPS.md is historical ([docs/history/NEXT_STEPS.md](docs/history/NEXT_STEPS.md)).
+Details live in the linked docs. This file only says *what* and *in what
+order*. [Issue #21](https://github.com/Millillion/lasm/issues/21) is Jordan's
+original plan; each of its points is placed below.
 
-## Who decides what (2026-11-02)
-- **Claude** owns testing, robustness, CI and platforms outright. Claude decides and logs each decision in [DECISIONS.md](docs/DECISIONS.md), and reports it; nothing here waits on Jordan.
+## How the roadmap works (Jordan, 2026-11-16)
+
+- **Stage:** one major item. Stages run strictly one after another. Each has a
+  written definition of done, and Jordan signs it off before the next stage
+  starts. Claude focuses all work, and all parallel agents, on the current
+  stage.
+- **Milestone:** a deliverable inside a stage, numbered by stage (0.1, 0.2, …),
+  with its own done check. Milestones within a stage run in parallel.
+- **Task:** a PR-sized piece of a milestone. Tasks are tracked in PRs and
+  issues, not here.
+- **Maintenance** may interrupt any stage: Lean upgrades, fixes for outside bug
+  reports, and moving the example apps to a new release (see
+  [Maintenance](#maintenance)).
+- **API decisions:** before 1.0, a PR that adds or changes a public API may
+  merge without waiting for Jordan, but every API decision is recorded in
+  [docs/API_DECISIONS.md](docs/API_DECISIONS.md) in the same PR and needs
+  Jordan's sign-off before 1.0.
+- **Measurement terms, not structure:** the CI tiers (PR, nightly, weekly,
+  release; [docs/CI.md](docs/CI.md)) and the platform evidence levels L0–L3
+  ([docs/TESTING.md](docs/TESTING.md#evidence-levels)).
+- **Retired as structure:** the old language and launch phases, the "Steps" of
+  the testing order, the milestones M1–M7, "Now / Next / Later", and the
+  binding "Tiers". Where each went is in [History](#history).
+
+**The order:** Stage 0 API surface → Stage 1 initial robustness → Stage 2
+direct Lean → Wasm backend → Stage 3 shrink → Stage 4 Lean all the way →
+Stage 5 performance → Stage 6 1.0. After 1.0: the [post-1.0 list](#after-10).
+
+**Performance ratchet, across every stage (Jordan, 2026-11-16):** milestone
+1.6 measures five dimensions in CI and puts them on the evidence page: disk
+space (install and package size, output `.wasm` size), build time (cold,
+warm, incremental, `lasm dev` rebuild), runtime memory (peak, baseline), CPU
+usage, and speed (throughput, latency, startup), per platform and on the five
+apps. From then on, no stage may regress beyond the ratchet unless it records
+an explicit trade-off for Jordan (as #293 did). Stage 2 also keeps its own
+budget as a gate (no slower than the Clang path). Stage 5 sets the targets.
+
+**Current stage: none started.** Stage 0 starts when Jordan says go.
+
+## Who decides what
+
+- **Claude** owns testing, robustness, CI and platforms outright. Claude
+  decides and logs each decision in [DECISIONS.md](docs/DECISIONS.md), and
+  reports it.
 - **Claude** also chooses, builds and tests the next example apps.
-- **Jordan** owns everything a user touches that Lasm created: syntax, APIs, shapes, seams, the CLI, the examples' code and propositions, and all human-facing text.
-- Public API changes that come out of testing are proposals for Jordan, unless he has already approved them (#27 was approved on 2026-11-02).
+- **Jordan** owns everything a user touches that Lasm created: syntax, APIs,
+  shapes, seams, the CLI, the examples' code and propositions, and all
+  human-facing text. Pre-1.0 his sign-off on APIs follows the rule above.
+- Claude never signs up for anything, and never creates a new repo, without
+  Jordan's explicit permission (Jordan, 2026-11-02).
+- Decisions Claude made that Jordan may want to revisit are in
+  [docs/REVIEW.md](docs/REVIEW.md).
+
+## Stage 0: the API surface
+
+All bindings and every `Lasm.*` question are settled first, so every later
+stage hardens, shrinks, models and proves the final surface (Jordan,
+2026-11-16). Jordan signs off per milestone.
+
+**Definition of done:** every entry of
+[docs/API_DECISIONS.md](docs/API_DECISIONS.md) is decided, implemented,
+released, and signed off by Jordan; the example apps and templates use only
+the final APIs; no hand-written binding remains where a generated one exists.
+
+- [ ] **0.1 Inventory.** List every public surface in `docs/API_DECISIONS.md`:
+  every `Lasm.*` namespace and generated binding, the CLI's commands and
+  flags, project configuration, what `lasm init` generates, and the platform
+  output layout. Seeded on 2026-11-16 with the 46 questions of the
+  [API shapes review](docs/api/SHAPES_REVIEW_2026-11-11.md) and the API items
+  of REVIEW.md. Also inventories the API proposals in
+  [Jordan's checklist](#jordans-checklist) (Ledger's, Folio's, Porter's and
+  Tandem's).
+- [ ] **0.2 Serving model, and `Lasm.Fetch` deleted.** `Node.serve` (in
+  `Lasm.JS.Node.Serve`, shaped like `Bun.serve`); function platforms call
+  `exportDefault`, and the generated platform file calls the handler directly
+  (Jordan, 2026-11-11); a small entry module per target for Fastly
+  (`Lasm.Fastly.*`), wasi-http (`Lasm.WASI.Http`) and WASI; the templates,
+  Conduit and Folio off `Lasm.Fetch` on every target; then `Lasm.Fetch` deleted
+  ([IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md#3-ranked-removal-list),
+  removal 18). Held PRs: #222 (`Node.serve` and direct function handlers) and
+  #213 (fullstack template with `Lasm.RPC.dispatch` and
+  `Lasm.KV.setWorkersEnv`). Questions A19–A23 and A41–A46.
+- [ ] **0.3 `Lasm.JS.Web`.** The WinterTC common web APIs are generated
+  (0.6.1, #172) and the browser tier replaced `Lasm.Web` (0.7.0); remaining:
+  the rest of the web platform, and the generated-binding mapping rules
+  (A9–A13). Tested with web-platform-tests and official vectors on every
+  JavaScript target.
+- [ ] **0.4 Node, Bun and Deno.** `Lasm.JS.Node` (held PR #220: `node:net`,
+  `node:http`, `node:https`; then `node:worker_threads`, `node:zlib`,
+  `node:util`); the rest of `Lasm.JS.Bun` and `Lasm.JS.Deno` (Unix sockets,
+  WebSockets, Bun's routes). **Deno is under deliberation, leaning yes**
+  (Jordan, 2026-11-16: people use it now, and nobody knows what Cloudflare's
+  acquisition will mean); A1–A3, A17, A18, A24, A25.
+- [ ] **0.5 Cloudflare, and the apps off hand-written bindings.**
+  `Lasm.JS.Cloudflare` from Cloudflare's workers-types (KV, D1, R2, Durable
+  Objects, env bindings; held PR #216); Porter and Ledger move off their
+  hand-written D1 bindings, and Tandem's WebSocket client moves from
+  `Lasm.Web.WebSocket` to `Lasm.JS.Web.WebSocket`; A26–A29.
+- [ ] **0.6 The `Lasm.*` libraries.** Review `Lasm.UI`, `Lasm.RPC`, `Lasm.KV`
+  (with the decision on its Deno and Workers backends), the `Lasm.JS` interop
+  core (including its known weaknesses: no inline JavaScript, no JavaScript
+  classes from Lean, the synchronous-callback limits, the per-call cost;
+  [REVIEW.md](docs/REVIEW.md#high-priority-work-to-define-with-jordan)),
+  `Lasm.Fastly` and `Lasm.WASI`; and where the libraries live (`@lasm/cli` or
+  separate packages). A4–A8, A14–A16, A30–A40.
+- [ ] **0.7 The CLI and configuration.** Commands, flags, `lasm init` output,
+  the platform output layout, error text (Jordan's checklist: "Review the
+  whole `lasm` CLI").
+
+## Stage 1: initial robustness
+
+The testing strategy's exit bar ([TESTING_STRATEGY.md §7](docs/TESTING_STRATEGY.md#7-exit-bar-rock-solid)),
+measured by CI on the [evidence page](content/learn/test-evidence.md).
+
+**Definition of done:** items 1–3 and 5–8 of the exit bar hold at the same
+time on the evidence page, target equivalence covers Ledger, Porter and
+Tandem, the differential-fuzzing generator covers the remaining features of
+§2's "Next gap", and the performance baselines and their ratchet are in CI
+(1.6). Item 4, the streak of clean nightly campaigns, is
+observed and reported only: it never blocks this stage or anything else
+(Jordan, 2026-11-16).
+
+- [ ] **1.1 Platforms (item 1).** Every platform at L2 or higher, and Node,
+  Workers and the browser at L3. The page of 2026-11-16 reads 6 of 13 at L2
+  and 0 of 3 at L3, mostly "no main-branch run has this job", which 0.8.0's
+  release checks on `main` may already have changed: re-measure first.
+- [ ] **1.2 Propositions (item 7).** Every library candidate in
+  [library/PROOFS.md](library/PROOFS.md) is a `Candidates.lean` definition with
+  a `Tested by:` line, and every fuzz oracle and JavaScript property names a
+  proposition, except fuzz targets checked against an outside reference
+  implementation (the rule of 2026-11-16, §7).
+- [ ] **1.3 Target equivalence for Ledger, Porter and Tandem.** Their recorded
+  traffic compared across targets, as Conduit's is (started 2026-11-13 with
+  `scripts/equivalence/traffic.mjs`; finish, and record what each covers).
+- [ ] **1.4 The generator's remaining features.** The differential-fuzzing
+  generator covers every feature under §2's "Next gap" (item 8 reads met on
+  2026-11-16; confirm nothing listed remains).
+- [ ] **1.5 Items 2, 3, 5 and 6 stay met** (mutation, coverage, flakes, apps;
+  all met on 2026-11-16).
+- [ ] **1.6 Performance baselines.** The five dimensions of the
+  [performance ratchet](#how-the-roadmap-works-jordan-2026-11-16) measured in
+  CI per platform and on the five apps, on the evidence page, with a
+  no-regression ratchet that every later stage must hold or record a trade-off
+  against.
+- **Observed, not required:** the campaign streak (item 4). It broke on
+  2026-11-14 with a `fuzz.yml` failure, to be looked into as a bug.
+
+## Stage 2: a direct Lean → Wasm backend
+
+[docs/proposals/WASM_BACKEND.md](docs/proposals/WASM_BACKEND.md) has the
+deliberation of 2026-11-16: an `EmitWasm` in Lean from LCNF's impure phase
+(the input `EmitC` takes), verified by proof and by differential testing
+against the Clang path, native Lean and several engines. It comes before
+shrinking because much of the code Stages 3 and 4 would shrink and prove
+exists only to drive Clang, Emscripten and Binaryen, and much of the
+JavaScript Stage 4 would model goes with it. No go/no-go gate: the
+backend implements all of Lean (Jordan, 2026-11-16).
+
+**Definition of done:**
+- **Completeness:** every LCNF impure-phase construct and every runtime entry
+  point is implemented; 100 % of functions across all corpora compile
+  directly; Clang, Emscripten, Binaryen and `wasm-ld` are out of the user's
+  build path.
+- **Proof:** the emitter is proved to preserve meaning, from the LCNF semantics
+  to the Wasm semantics, with Lean's standard axioms only. Until then, every
+  compiled function's translation is checked automatically.
+- **Semantics checked:** Lasm's executable LCNF semantics agrees with native
+  Lean on every corpus; the Lean Wasm semantics passes the official spec
+  tests.
+- **Differential:** agreement on every corpus (Lean's upstream suite, the
+  language-coverage campaign, generated programs, the five apps' outside
+  oracles, the metamorphic relations) against native Lean and, while it
+  exists, the Clang path; allocation traces match exactly; every engine
+  agrees.
+- **Performance:** no slower than the Clang path, for speed and size (a gate;
+  Jordan may set a different budget), and no regression beyond the ratchet
+  of 1.6 in the other dimensions without a recorded trade-off.
+- **Lean upgrades:** a written process for re-checking the semantics and the
+  proof when LCNF changes.
+
+Outside the proof: the C runtime (compiled once to Wasm; rewriting it in Lean
+is the first item [after 1.0](#after-10)) and the engines.
+
+- [ ] **2.1 Foundations.** Check whether Lean's `.olean` files carry enough
+  compiled form for the standard library (else CI compiles it from source with
+  the backend and ships it prebuilt); the executable LCNF semantics; the
+  choice of Lean Wasm semantics (Talos, the NeurIPS 2026 framework, or
+  Lasm's own).
+- [ ] **2.2 The harness.** Mixed linking per function with the Clang path,
+  automatic bisection of a divergence to one function, allocation traces,
+  the engine matrix, and the nightly metrics on the evidence page.
+- [ ] **2.3 `EmitWasm`, all of Lean.** Scalars, constructors, `case`, calls,
+  reference counting and reuse, closures and partial applications, thunks,
+  tasks, `IO`, exports, initializers, the FFI; suspension (JSPI or selective)
+  and tail calls emitted directly.
+- [ ] **2.4 Linking and optimization in Lean** (decided 2026-11-16). Whole-
+  program emission plus a small Lean step that merges one pre-linked C runtime
+  object; optimization in the backend. `wasm-ld` and `wasm-opt` serve as
+  oracles and benchmarks only.
+- [ ] **2.5 The proof.** Per-function translation checks, then the emitter's
+  proof.
+- [ ] **2.6 Switch-over.** The Clang path leaves the user's build; the
+  installer and downloads shrink to Lean plus prebuilt runtime files.
+
+## Stage 3: shrink
+
+[docs/proposals/IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md)'s removal list,
+after the backend has made the toolchain code obsolete. It follows Stage 2
+and precedes Stage 4, so that Stage 4 models only the irreducible remainder.
+
+**Definition of done:** every remaining removal is done; an inventory of
+every shipped file, with its reason to exist, is signed off by Jordan; size
+metrics are recorded; Stage 1's definition of done and the performance
+ratchet still hold.
+
+- [ ] **3.1 What Stage 2 made obsolete:** the C link drivers, the Emscripten
+  and Python paths, the Binaryen and Asyncify glue, the toolchain downloads
+  and their install code.
+- [ ] **3.2 M2's and M3's rest:** the full emsdk and Python paths
+  maintainer-only (may be moot after 3.1); `library/prebuilt` generated in CI,
+  not committed (decided 2026-11-16; [REVIEW.md](docs/REVIEW.md#process) has
+  the design); one Lasm.JS wire codec once the host files are bundled (two
+  copies until then, JS_TO_LEAN.md §2). The `tar` target's nightly fuzzing,
+  M3's exit check, is already running.
+- [ ] **3.3 Simplify** toward the irreducible state (issue #21).
+- [ ] **3.4 The inventory** of every shipped file and its reason to exist,
+  for Jordan's sign-off, and the size metrics.
+
+## Stage 4: Lean all the way
+
+Property tests and Lean rewrites in one stage, so no JavaScript is
+property-tested only to be deleted later (Jordan, 2026-11-16). The rule:
+every remaining module gets a Lean model with a model differential. Pure
+logic becomes proved Lean that *is* the implementation, compiled by Lasm;
+impure host glue that cannot be Lean keeps its JavaScript, held by its model,
+the differential and property tests. Every library candidate becomes a
+`Candidates.lean` definition with a `Tested by:` line
+([TESTING_STRATEGY.md §4](docs/TESTING_STRATEGY.md#4-property-testing-convention-propositions-that-carry-over-to-proofs)),
+and every proposition is exercised by a property test or a fuzz oracle.
+
+**Definition of done:** every module is modelled, implemented in Lean, or
+exempt under criteria Jordan approved (2026-11-16: 19 modelled, 22 pending,
+132 exempt of 173, [verification/MODELS.md](verification/MODELS.md), before
+Stages 2 and 3 change the set); every proposition is exercised; the earlier
+stages' bars, and the performance ratchet, still hold.
+
+- [ ] **4.1 Exemption criteria** for Jordan's approval.
+- [ ] **4.2 Module models** with model differentials (the old M4) for every
+  module not exempt, and candidates everywhere.
+- [ ] **4.3 Pure glue into Lean,** compiled by Lasm, proved, replacing its
+  JavaScript (the old M6; [M6_GLUE.md](docs/proposals/M6_GLUE.md); two slices
+  merged, #286, #294, #295, paused 2026-11-14). Includes the WASI reactor
+  decision (A55). Specification work done so far: the UI patch encoding, the
+  Lasm.JS value codec, the function-platform mapping
+  ([JS_TO_LEAN.md](docs/proposals/JS_TO_LEAN.md)).
+- [ ] **4.4 Host glue property tests:** the JavaScript that stays, each held
+  by its model, its differential and named propositions.
+- [ ] **4.5 Toolchain validation of whatever remains after Stage 2** (the old
+  M5). `wasm-ld` against its map and inputs is done (#285,
+  `link-validation.yml`); the Binaryen draft (branch `m5-binaryen-draft`) is
+  moot once Binaryen leaves the build.
+
+## Stage 5: performance
+
+After Lean all the way, because only then does the final code exist.
+
+**Definition of done:** every dimension of the performance ratchet (disk
+space, build time, runtime memory, CPU usage, speed) meets its
+Jordan-approved target on every platform, measured in CI.
+
+- [ ] **5.1 Targets,** set with Jordan at the start of the stage, against
+  native Lean, the Clang path (as last measured) and comparable Wasm
+  toolchains, per platform and on the five apps.
+- [ ] **5.2 Reach them.** Proved code stays proved while it is optimized:
+  faster versions go through `@[csimp]` or equivalence proofs.
+
+## Stage 6: 1.0
+
+**Definition of done:** Lasm 1.0.0 is released, with:
+
+- [ ] **6.1** every entry of [docs/API_DECISIONS.md](docs/API_DECISIONS.md)
+  signed off by Jordan;
+- [ ] **6.2** the stability promise (semantic versioning of the public
+  surface);
+- [ ] **6.3** the Lean version support policy;
+- [ ] **6.4** complete docs: [How Lasm works](docs/HOW_LASM_WORKS.md), the
+  reference, the guides, `llms.txt`;
+- [ ] **6.5** a final review of the evidence and the benchmarks;
+- [ ] **6.6** the 1.0.0 release.
+
+## After 1.0
+
+- [ ] Rewrite the C runtime (allocator, big numbers, tasks) in Lean: the
+  first item after 1.0, and the last piece outside Stage 2's proof.
+- [ ] Lean as a runtime library (parked since the language phases,
+  [docs/PLAN.md](docs/PLAN.md)).
+
+## Maintenance
+
+May interrupt any stage (Jordan, 2026-11-16).
+
+- [ ] Lean 4.36: when 4.36.0 stable ships. The rc2 dry run is PR #287
+  (held until stable); its runbook is
+  [docs/LEAN_UPGRADE.md](docs/LEAN_UPGRADE.md) on that branch. The two
+  StackOverflow differences compare the advice text, not Lean's exact output
+  (Jordan, 2026-11-16).
+- [ ] The example apps move to `@lasm/cli` 0.8.0.
+- Outside bug reports are fixed as they come.
+- Releases follow [docs/RELEASING.md](docs/RELEASING.md).
 
 ## Decisions for Jordan (only user-facing ones)
-- [x] (J) Agree to this roadmap, and to keeping it as the single source of truth (2026-11-01).
-- [x] (J) Issue #27: resolve dot segments in `Request.path` on every platform, as browsers do (approved 2026-11-02; ships in 0.3.9).
-- [x] (J) OSS-Fuzz: not doing it (2026-11-02). Fuzzing is built in this repo and runs on our own CI.
-- [x] (J) `Lasm.Fetch`: decided 2026-11-10, remove it entirely; bindings named for the host interface (`Lasm.JS.*`, `Lasm.WASI.*`, `Lasm.Fastly.*`), generated (below).
+
 - [ ] (J) Issue #44 (lean-html's shared HTML model with Lasm.UI): on hold, by Jordan.
-- [x] (J) Conduit's headline count: "50 proved propositions (294 theorems)" (2026-11-02).
-- [x] (J) Conduit's two recorded gaps: fixed and proved (2026-11-02): an empty-text link shows its target (SPEC L6), and the delete and remove icons are buttons (SPEC L7).
-- [ ] (J) Where Lasm's educational content is published: the Lasm repo's `content/` directory as the source, the Millillion website as the place it's read (Claude's recommendation, 2026-11-02).
+- [ ] (J) Where Lasm's educational content is published: the Lasm repo's
+  `content/` directory as the source, the Millillion website as the place
+  it's read (Claude's recommendation, 2026-11-02).
+- [ ] (J) Deno: generate and keep `Lasm.JS.Deno` and the Deno targets
+  (leaning yes; milestone 0.4).
+- [ ] (J) Stage 2's performance budget, if not "no slower than the Clang path";
+  Stage 5's targets.
 
-Rule (Jordan, 2026-11-02): Claude never signs up for anything, and never creates a new repo, without Jordan's explicit permission.
+## Jordan's checklist
 
-Decided by Claude on 2026-11-02, under the new ownership (details in DECISIONS.md):
-- Evidence levels keep the names L0–L3, each with a one-line meaning. Jordan may reword them in the README.
-- "Untrusted input can't crash or subvert a Lasm program" becomes the fifth claim of the testing strategy.
-- Claim 4, dependable tooling, gets the same priority as claim 1.
-- The exit bar for the robustness phase is in [TESTING_STRATEGY.md §7](docs/TESTING_STRATEGY.md#7-exit-bar-rock-solid) (moved out of proposals and adopted 2026-11-09).
-- The next example apps: **Ledger** (landed 2026-11-02), then the **Markdown site generator** (building now), following [NEXT_EXAMPLE_APPS.md](docs/proposals/NEXT_EXAMPLE_APPS.md)'s build plan. Ledger follows TigerBeetle's data model and result codes, so TigerBeetle can serve as its differential oracle.
+His words, 2026-11-02, from issue #21. The API questions in it are inventoried
+by milestone 0.1.
 
-## Jordan's checklist (his words, 2026-11-02; from issue #21)
 - [ ] (J) Hone the propositions of Lasm's own library: 30 in [library/Lasm/UI/Spec.lean](library/Lasm/UI/Spec.lean), [RPC/Spec.lean](library/Lasm/RPC/Spec.lean), [KV/Spec.lean](library/Lasm/KV/Spec.lean) and [Fetch/Spec.lean](library/Lasm/Fetch/Spec.lean) ([library/PROOFS.md](library/PROOFS.md)).
 - [ ] (J) Hone the Lean code of every example, especially the propositions and the theorem structure: Conduit first (52 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean)), then Ledger (31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean)).
 - [ ] (J) Review the whole `lasm` CLI: its UX, and that it works.
-- [ ] (J) Hone the libraries Lasm added: Lasm.Fetch, Lasm.UI, Lasm.JS (with the generated Lasm.JS.Web), Lasm.RPC, Lasm.KV.
+- [ ] (J) Hone the libraries Lasm added: Lasm.UI, Lasm.JS (with the generated Lasm.JS.Web), Lasm.RPC, Lasm.KV.
 - [ ] (J) Work out the whole front-end UI story.
 - [ ] (J) Play with Lasm, front end to back end, and hone what comes up.
-- [ ] (J) Hone the README, [TRUST.md](docs/proposals/TRUST.md) and every human-facing text.
+- [ ] (J) Hone the README, [TRUST.md](docs/proposals/TRUST.md) and every human-facing text, including [HOW_LASM_WORKS.md](docs/HOW_LASM_WORKS.md) and `llms.txt` (drafted 2026-11-06).
 - [ ] (J) Storytelling, about 80% of the effort per issue #21: posts, videos, launch follow-ups.
 - [ ] (J) GitHub Sponsors tiers and description (a manual edit; suggested text was given).
 - [ ] (J) Manual testing.
-- [ ] (J) Hone Ledger's 31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
-- [ ] (J) Ledger's open API questions: `Lasm.Fetch` Brotli on Workers (`encodeBody: "manual"`); a cross-request async lock that works on Workers; the CLI's `--target wasi` failure when `dist/` already holds another build.
-- [ ] (J) Review Folio's 22 propositions in [Proofs/Spec.lean](examples/folio/Proofs/Spec.lean).
+- [ ] (J) Review Ledger's 31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean), Folio's 22, Porter's 28 and Tandem's 29 (each app's `Proofs/Spec.lean`).
+- [ ] (J) Ledger's open API questions: Brotli on Workers (`encodeBody: "manual"`); a cross-request async lock that works on Workers; the CLI's `--target wasi` failure when `dist/` already holds another build.
 - [ ] (J) Folio's API questions: a `Lasm.Markdown` library module from Folio's renderer (so Conduit can use it); consistent `--output` for the wasi, bun and deno targets; the name "Folio"; safe mode escaping raw HTML rather than dropping it.
-- [ ] (J) Review Porter's 28 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
-- [ ] (J) Porter's API proposals: a shared Web Crypto module (e.g. `Lasm.Web.Crypto`), since Conduit and Porter each hand-bind SHA-256, PBKDF2, random values, ECDSA, Ed25519 and JWK export; a documented way to read Workers environment variables; documentation of what `Lasm.UI` mount does with an element's existing children; Porter's `test/Axioms.lean` totality check (no `partial`, `unsafe`, `opaque` or panicking definition reachable) shipped as a reusable Lasm tool.
-- [ ] (J) Review the propositions: Tandem's 29 propositions (the CRDT, the edits, the wire format, the sync server, the replica) in [Proofs/Spec.lean](examples/tandem/Proofs/Spec.lean).
-- [ ] (J) Tandem's API proposals: an upgrade (WebSocket) hook in `Lasm.Fetch.serve`, so apps need not run their own `node:http` server; a server-side WebSocket type in `Lasm.Web` shared by Node, Bun and Deno; Lasm's Bun entry passing `websocket` handlers to `Bun.serve` (Tandem uses `server.reload`); exporting a Durable Object class from a Workers build, so Workers can hold WebSockets; a selection-preserving text-area `value` in `Lasm.UI`; the name "Tandem".
+- [ ] (J) Porter's API proposals: a shared Web Crypto module, since Conduit and Porter each hand-bind SHA-256, PBKDF2, random values, ECDSA, Ed25519 and JWK export; a documented way to read Workers environment variables; documentation of what `Lasm.UI` mount does with an element's existing children; Porter's `test/Axioms.lean` totality check shipped as a reusable Lasm tool.
+- [ ] (J) Tandem's API proposals: a WebSocket upgrade hook for servers; a server-side WebSocket type shared by Node, Bun and Deno; Lasm's Bun entry passing `websocket` handlers to `Bun.serve`; exporting a Durable Object class from a Workers build; a selection-preserving text-area `value` in `Lasm.UI`; the name "Tandem".
 
-## Now (November 2026)
+## History
 
-- [ ] **Top priority (scope with Jordan first):** stamp out Lasm.JS's weaknesses as far as possible (Jordan, 2026-11-09). The known weaknesses:
-  - no inline JavaScript;
-  - Symbol-keyed properties not reachable through `get`;
-  - no defining or subclassing JavaScript classes from Lean;
-  - synchronous-callback limits: no async waits inside synchronous callbacks, and the #90 depth limit;
-  - about 25–35 µs per call.
+Finished work, in full, is in
+[docs/history/ROADMAP_2026-11-16.md](docs/history/ROADMAP_2026-11-16.md) and
+in the release notes ([docs/release/](docs/release/)). In short:
 
-  See [docs/REVIEW.md](docs/REVIEW.md#high-priority-work-to-define-with-jordan).
-- [x] Conduit: requests isolated on node:sqlite and bun:sqlite (issue #59; reads saw other requests' writes half done).
-- [x] Standard bindings, tier 1 (Jordan, 2026-11-09): `Lasm.JS.Web`, the WinterTC Minimum Common Web API generated from WebIDL (`scripts/bindings/generate-web.mjs`, pinned `@webref/idl`), with a conformance program (WPT URL and urlencoded data, Lean's UTF-8 as oracle, Web Crypto vectors, generated round trips) on Node 26 and 24, Bun, Deno, Workers and Chromium (`web-bindings.yml`), PR #172 ([JS_BINDINGS.md](docs/JS_BINDINGS.md#standard-bindings-lasmjsweb)). Next tiers: `Lasm.JS.Node`, `Lasm.JS.Deno`, `Lasm.JS.Bun`, `Lasm.JS.Cloudflare`; the browser tier `Lasm.JS.Web.Browser` replaced `Lasm.Web` on 2026-11-10 (Jordan's decision).
-- [x] Standard bindings, tier 2, first part (2026-11-10): `Lasm.JS.Node`, Node's server-essential modules (`node:fs/promises`, `path`, `os`, `process`, `buffer`, `crypto` extras, `child_process`, `events`, `stream`'s web conversion) generated from Node's own API docs (`doc/api/*.json` of Node 24.22.2, hashes pinned; lowered to WebIDL by `scripts/bindings/node-api.mjs`, then `generate-web.mjs`), with a conformance program (Lean as oracle of hex/base64/UTF-8/paths, FIPS 180, RFC 4231/6070/7914/5869 vectors, files, child processes) on Node 26 and 24, Bun and Deno ([JS_BINDINGS.md](docs/JS_BINDINGS.md#standard-bindings-for-node-lasmjsnode)).
-- [x] Standard bindings, tier 2, second part (2026-11-10): `Deno.serve` and `Bun.serve` as `Lasm.JS.Deno` and `Lasm.JS.Bun` (Jordan, 2026-11-10: JS-target servers are Lasm.JS.Web `Request → Async Response` handlers on each platform's own entry; Node through an npm adapter, so no `node:http` server bindings), generated from the runtimes' own TypeScript declarations at the CI versions (Deno 2.9.6, Bun 1.4.4; `scripts/bindings/serve-api.mjs`, hashes pinned), with the server options, the server handle and what a handler needs; experimental members never; Node serves the same handler through `@hono/node-server` bound with `@[js]` (documented, no Lasm API). `test/fixtures/js-serve` checks each on its runtime and `scripts/bindings/test-serve.mjs` requests a served Lean handler from outside on all three ([docs/JS_BINDINGS.md](docs/JS_BINDINGS.md#servers-on-javascript-runtimes-lasmjsdeno-lasmjsbun-and-node)).
-- [x] Standard bindings, tier 2: `node:net`, `node:http` and `node:https` in `Lasm.JS.Node` (Jordan, 2026-11-11: Lasm.JS.Node complete; how Lean servers run on Node is decided separately), from the same docs and generator, with documented events as typed listeners (`server.onRequest`, `socket.onData`) on every generated class; conformance: HTTP and TCP echo servers and clients on 127.0.0.1 in `test/fixtures/js-node` ([JS_BINDINGS.md](docs/JS_BINDINGS.md#events-typed-listeners)).
-- [ ] Standard bindings, tier 2, next: the rest of `Lasm.JS.Deno` and `Lasm.JS.Bun` (Unix sockets, WebSockets with Tandem's proposal, Bun's routes), then Node extras (`node:worker_threads`, `node:zlib`, `node:util`).
-- [x] Lasm.JS synchronous callbacks (approved 2026-11-04, for 0.5.0; PR #122): every wait there that needs Node fails at once instead of never finishing (a task making host calls, `.block`, a timer, DNS lookup or socket read started inside); `Value.toTask` without waiting works.
+- **Language and launch phases** ([docs/PLAN.md](docs/PLAN.md)): language
+  coverage on Node, JS/npm interop, the Node launch (0.1.0), the edge isolates
+  and Bun/Deno (0.2.0), WASI, wasi-http/Spin, Fastly and browsers (0.3.0).
+  Complete; Lean as a runtime library stays parked ([After 1.0](#after-10)).
+- **Releases** 0.3.6 to 0.8.0 (published 2026-11-14).
+- **Five flagship apps:** Conduit, Ledger, Folio, Porter and Tandem, each on
+  every platform it claims with its outside oracle, proofs and fuzzing.
+- **Testing:** the strategy (2026-11-09), differential testing against
+  upstream Lean, target equivalence, mutation testing above 80 % on every
+  module, unit coverage at 98 %, fuzzing at every boundary with nightly and
+  weekly campaigns, deterministic simulation of the apps, metamorphic tests of
+  the tooling, fault injection, the error corpus, the flaky-test policy, the
+  proposition lint, the public evidence page.
+- **Bindings:** `Lasm.JS.Web` (WinterTC), the browser tier replacing
+  `Lasm.Web`, `Lasm.JS.Node`'s first parts, `Deno.serve` and `Bun.serve`,
+  `Lasm.Fastly` generated from witx, `Lasm.WASI.Http` from WIT.
+- **Reduction:** M1 complete; M2 apart from the emsdk and Python paths; M3's
+  `tar` removal (0 npm dependencies).
 
-### Releases
-- [x] 0.3.6: two Vercel Edge fixes.
-- [x] 0.3.7: version bumped on main (PR #40), **not published**. Its release check failed on a timing-dependent stress fixture (fixed in PR #42), and the fixed commit doesn't change the version, so it can't release (as with 0.3.3).
-- [x] 0.3.8 (published 2026-11-02): everything in 0.3.7 (the WASI dev-build fix #34, and the fix for a hang when a synchronous JS callback makes the program's first async runtime request, #37), plus #26 and the #30 docs (PR #36).
-- [x] 0.3.9 (published 2026-11-03, PR #81): #27, browser-style dot-segment resolution in `Request.path` on every platform, with a proof that `segments` never contains `.` or `..`; also #76 (a `://` in the query), #66 (Node recursion depth), #80 and #82 (cookies and redirects on function platforms), #49 (dev build service `unref`) and #51 (Lasm.JS errors wrapped twice).
-- [x] 0.4.0 (published 2026-11-03, PR #97): retry downloads cut short before Content-Length arrives (PR #91), the macOS C-tier fix (#73, PR #85), the editor fix (#72, PR #86), the Node pins moving to 26.13.0 and 24.22.2 (PR #98), and Lasm.UI handlers deciding `preventDefault`/`stopPropagation` per event, a breaking change (#71, PR #96; [0.4.0-notes.md](docs/release/0.4.0-notes.md)). A minor version because of the breaking change.
-- [x] 0.4.1 (published 2026-11-04): the edge C-stack overflow message (#115), the `ofSyncFn` docstring, the mutation ratchet (#116) and the examples moving to 0.4.0 (PR #117); [0.4.1-notes.md](docs/release/0.4.1-notes.md).
-- [x] 0.5.0 (breaking): `--output` with an edge, WASI or browser target names the deployable directory; the Node build stays in the build cache (Jordan's decision 2026-11-04, PR #125). The examples' platform build scripts dropped `--output` with their move to 0.5.0.
-- [x] Next minor (0.5.0), approved by Jordan 2026-11-04: Lasm.UI delegates events in the bubble phase (a Lean `stopPropagation` no longer keeps the event from its target's own listeners or the link router), and `Attr.onWith` is removed (`on e d`). Breaking; in `docs/release/next-notes.md`.
-- [x] 0.5.0 release (published 2026-11-05, PR #127): Lasm.UI bubble phase and `Attr.onWith` removed (#121), `--output` names the platform directory (#125), synchronous-callback waits fail at once (#122), the shorter stack-overflow message (#119) and the #90 limit documented (#120); [0.5.0-notes.md](docs/release/0.5.0-notes.md). The examples moved to 0.5.0 afterwards (PR "Examples on 0.5.0").
-- [x] 0.5.1 (published 2026-11-07, PR #140): the fixes boundary fuzzing found (#136): Host header path injection on Node and WASI, the Lasm.RPC exponent hang, `://` in paths, the ALB 502, the UI decoder hang, inherited CLI keys; [0.5.1-notes.md](docs/release/0.5.1-notes.md). The examples moved to 0.5.1 afterwards and parse untrusted JSON with `Lasm.RPC.parseJson` (#135, PR "Examples on 0.5.1"); `parseJson` also writes a parsed zero as `0` (next release); the upstream Lean report is drafted in [LEAN_UPSTREAM_JSON.md](docs/proposals/LEAN_UPSTREAM_JSON.md) for Jordan to file.
-- [x] 0.6.0 (never published: its release checks failed on CI problems, fixed in #176 and #180; its changes ship in 0.6.1): Lasm.JS lengths that do not fit 32 bits fail instead of being misread (#154; `Lasm.JS.Wire.encode` returns `Except`, breaking), stalled downloads reconnect (#152), four `lasm dev` fixes from the Claim 4 harness; [0.6.0-notes.md](docs/release/0.6.0-notes.md).
-- [x] 0.6.1 (published 2026-11-10, npm and GitHub release v0.6.1, PR #181): the first 0.6 release, 0.6.0's changes and since then `Lasm.JS.Web` tier 1 (#172), Symbol keys in `get`/`set` (#170), cheaper Lasm.JS calls on Node (#171), `Async` loops of any length (#90, #175), the edge C stack first (#126, #173), the JSPI lost wake-up (#162, #180), the U+FEFF fix, the mutation-testing fixes and the removals (#174); [0.6.1-notes.md](docs/release/0.6.1-notes.md).
-- [x] 0.7.0 (PR "Release 0.7.0"): breaking: `Lasm.Web` deleted, replaced by the generated browser tier `Lasm.JS.Web.Browser` and `Lasm.UI.Mount` (#193, #197), and `Lasm.Fastly` generated from Fastly's host ABI (#194); new: generated `Lasm.WASI.Http` (#202), `Lasm.JS.Node` (#192), `Lasm.JS.Deno` and `Lasm.JS.Bun` (#203); `lasm init` refuses fullstack on function platforms (#168, #184), the `repr` limits documented (#179, #183), removals (#182, #186, #195, #199). `Lasm.Fetch` still ships, removal scheduled for a later release; [0.7.0-notes.md](docs/release/0.7.0-notes.md).
-- [x] 0.8.0 (PR "Release 0.8.0"): the `fetch` template off `Lasm.Fetch` except on Node, with its own entry modules for Fastly, wasi:http and WASI (#218); Lasm's mimalloc build for Fastly, WASI and wasi-http (#246, #253); nullable browser results return `none` (#232); the example apps off `Lasm.Fetch` except on Node; Node pins 26.13.1 and 24.22.3 (#288). `Lasm.Fetch` still ships; [0.8.0-notes.md](docs/release/0.8.0-notes.md).
-- [x] Move the Node pins to 26.13.0 and 24.22.2 (deferred in 0.3.6 and 0.3.7): every workflow, container image, acceptance pin and doc version list; the deferral is removed. Both are still the newest 26 and 24 releases (2026-11-03).
-- [x] Investigate: in one js-callbacks stress run the callback printed at 345 ms, but the main thread read its flag as unset at ≥ 400 ms: a stalled thread, not a visibility bug (the flag is a multi-threaded `IO.Ref`, accessed with sequentially consistent atomics; the printed time precedes a host call the thread waits for); the polling fixture already removed the timing assumption ([DECISIONS.md](docs/DECISIONS.md)).
+Where the retired structure went:
 
-### Testing ([TESTING.md](docs/TESTING.md), [TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md))
-- [x] Differential testing against upstream Lean: generator, shrinker, PR and nightly CI.
-- [x] Target equivalence on Node, Deno, Bun, wasi-http and Workers.
-- [x] Coverage baseline (67.5% of lines), with a CI gate on drops.
-- [x] Test-quality audit (13 tests that only read files as text).
-- [x] Three more oracles for differential testing: Lean's interpreter, `-O0` vs `-O2`, and three JS engines (PR #36).
-- [x] Fix #26 (edge environment variables) and #30 (two docs that overstate limits) (PR #36).
-- [x] Host bridge: a Lean model checked over every interleaving (8 reintroduced bugs, including the 0.3.0 hang, all caught), seeded schedule fuzzing, and checking traces from the real code against the model (#37).
-- [x] Replace the remaining tests that only read files as text, and port or retire the 29 Lean 4.32 test files: the release-checks verdict is a tested module, the edge notices are read from a real packager run, workflow lints are cross-references (#110); the 29 files are ported to 31 host-fixture cases against Lean 4.35.0 in `differential.yml` or retired, and the port found a bug: no Lean thread or child process could start in a cwd without search permission (fixed) (#111).
-- [x] Remove the retired `lasm.json` library pipeline (dead code only a checkout could reach): `src/build.mjs`, `main.mjs`, `runtime.mjs`, `host.mjs`, `lake.mjs` and what only they used, their scripts, integration tests, examples and docs; the CLI's `.json` input always refuses, as the published CLI already did; `npm pack` loses only the 50 deleted files.
-- [x] Host bridge: awaiting a JavaScript promise inside a synchronous JS callback fails at once with the reason (it hung); in the model (its mutant is caught), with regressions on Node (unit, js-callbacks part 5) and the edge profile (already clear there). Support is impossible (a promise settles only after the callback returns). Remaining: waiting there for a Lean task that uses the host (including `Async.block`) or for a timer or socket started in the callback still never finishes (needs a runtime hook; options in PR #101).
-- [x] Host bridge: model host calls made by tasks proxied to the synchronous-callback thread. The model found a hang (the next-depth slot was never served inline); fixed, in the model and the trace checking (`seq1`/`ready1`), with a regression test.
-- [x] Browser and Bun targets in differential testing: `bun`, `bun-O0`, and `browser-chromium` (every PR), `browser-firefox`, `browser-webkit` (campaigns), mounted with the public API in headless Playwright (PR #109). Found and fixed: `IO.Process.exit` in an edge isolate stopped with "unreachable" instead of its refusal. Browsers now reach evidence L2.
-- [x] Mutation testing (Stryker) on the critical JavaScript, with published scores (moved up from Next): seven modules, nightly and PR CI, host bridge 56→96 %, UI applier 55→93 %, build service 52→92 %, edge glue 15→79 %, notices 63→75 % (#53; bugs #49, #51).
-- [x] Mutation scores to 80 % for every module: link driver 54→93 %, target links 6→87 % (unit tests of the link plans with a stand-in toolchain), edge glue 79→97 %, notices 75→92 %, build service 92→95 % (fault injection into output delivery); no new bugs found.
-- [x] Edge C-stack overflow: the instance stops with a stack overflow (native Lean's wording, naming the 1 MiB edge stack) instead of "memory access out of bounds" (found by the differential, PR #109), with no per-call cost (PR #115). Checked in CI at `-O0` on Deno, Node and Bun: a 24-local recursion overflows the C stack at about 154 frames and `deepSum` at about 3,169, and both are named; for `sumTo`, V8 runs out of its engine stack first (about 7,500 frames).
-- [x] Raise the mutation targets above 80 % now that every module passes them: a ratchet (score rounded down, at least 80 %, never lowered), set from main's run 41749603692: host bridge 96, UI applier 92, build service 94, link driver 93, target links 86, edge glue 97, notices 91 (#116).
-- [x] Platform evidence levels L0–L3, generated from CI results, in the README's platform table: `scripts/evidence/levels.mjs` and `platforms.json`, refreshed nightly by `evidence-levels.yml` (a PR when a level moves). First result: every server platform L2, the browser L1 (no browser differential yet); Node is one requirement short of L3 (a Porter nightly fuzz failure, 2026-11-03). Only Node has fuzzing and simulation in CI ([TESTING.md](docs/TESTING.md#evidence-levels)).
-- [x] Flaky tests: a nightly report of retried or cancelled jobs, and the policy (quarantine at once, fix or delete within a week): `flaky.yml` (07:53 UTC) reports re-runs, jobs that passed only on retry with the tests that failed first, timed-out and unsuperseded cancelled jobs, as an artifact and in the one issue labelled `flaky`; `test/quarantine.json` is skipped with a notice by the unit suite and `npm test`, and an entry older than 7 days fails the suite ([TESTING.md](docs/TESTING.md#flaky-tests)).
-- [x] Claim 4, dependable tooling: metamorphic tests of `lasm dev` (an incremental build equals a clean one; the same input gives the same bytes; a rename changes nothing else). `scripts/tooling/metamorphic.mjs`, one job per target in `tooling.yml` (nightly; PRs that change the harness): for `lasm build` on node, wasi, workers and browser, release and dev, determinism across directories and a cold tool cache, incremental = clean, revert, rename of an unimported module or an unused definition, touch; and a `lasm dev` session per target it supports (node, workers, browser; it has no wasi target) and profile (`--release` too): first build, edit, touch, renamed module, revert and a second edit saved by rename, each compared with clean builds, then `lasm build` reusing the session's build. Dev rebuilds are seeded by the previous build's initialization plan, so where their bytes differ both outputs are run and must print the same, on every target (Node, `node:wasi`, the Worker's program on Node, headless Chromium); release sessions match byte for byte. Found and fixed: dev edge and browser glue carried absolute paths, and every rebuild rewrote unchanged output (#103); `lasm dev --target browser` missed saves made by renaming over a file and rebuilt on a touch; `lasm dev` crashed with a stack trace when a build's staging directory vanished before it was watched (PR #148).
-- [x] Claim 4: fault injection in the installer and the build (a dropped network, a full disk, a killed process, a read-only cache). `scripts/tooling/faults.mjs`, one job per target (node, wasi, workers, browser): builds killed at every stage and while replacing an output, killed tool installs (npm and HTTPS), downloads cut or stalled by a proxy, full disks on loop file systems (tool cache and project), read-only caches, corrupted tool archives, derived tools, shared objects and project caches; with node also `npm install` of the CLI killed, through cut connections and onto a full disk, and `lasm dev` killed mid-rebuild. Every scenario ends in success with a clean build's bytes or a clear error then a clean rerun. Found: a pathless `ENOSPC … write` message (fixed, #103); a stalled download never reconnects (#152, open: it fails clearly, but does not recover).
-- [x] Claim 4: every error a user can trigger prints a clear message, never a stack trace (an error corpus run against the published CLI). `scripts/tooling/error-corpus.mjs`, about 120 cases against the packed candidate and `@lasm/cli@latest` on every PR (`tooling.yml`), and an inventory of the 148 error messages in the CLI's modules (`scripts/tooling/error-inventory.mjs`): each is printed by a case or has a stated reason in `error-inventory.json`, or the candidate's job fails. Found and fixed: raw Node file-system errors, a lock error with no path, `lasm init` onto a file, an unnamed file `--output`, a misleading message for a program without `main` (#100); `lasm dev --target browser` hanging after a failed first build or on a port in use (now named), and a missing per-output `lasm dev` source failing late (PR #148).
-- [x] Bun gives no response to an encoded slash, `/hello/a%2Fb` (found by target equivalence; investigate): neither Bun nor Lasm. The harness's first run (2026-10-31) sent `Connection: close` through Node's pooled keep-alive agent and reused the socket Bun had closed; fixed that day, and Bun has answered `Hello, a/b` in every run since. A new `keepAlive` corpus case checks the encoded slash over one persistent connection on every target.
-- [x] Deterministic simulation testing of the example apps (PR #133, [TESTING.md](docs/TESTING.md#deterministic-simulation-of-the-example-apps)): one harness, `scripts/sim` (seeded PRNG, simulated clock, network with partitions, KV and SQLite/D1 stores with failed and ambiguous commits and crash-restarts, fault profiles per seed, replayable traces), and Lean drivers that run Tandem's editor and server, Ledger's and Porter's servers, compiled, in simulated worlds. 30 fixed seeds per PR (each replayed), random seeds nightly (`dst-nightly.yml`), every failure printed with its seed and repro command. Found and fixed three Tandem bugs (two syncs in flight dropping an unsent edit, a failed catch-up never retried, an ambiguous commit's operations never pushed); Porter's ambiguous-commit revocation reported (#138, since fixed with a commit receipt); Ledger kept every invariant.
-- [x] Differential fuzzing with generated programs that declare their own type classes, inductives, closures (arity 1–18), loops and tail calls, structures and exceptions, plus `Int8`–`Int64`, `Float32`, `ByteArray`, `HashSet`, `TreeMap` and panics (`scripts/differential/features.mjs`, PR #167): a tree shrinker writing regression files, every target, PR fixed seeds, nightly and weekly campaigns. First campaigns: 12,080 feature cases on 16 targets; found #179 (`repr` of a 5,000-element array overflows the WASI and edge stacks); no miscompilation.
-
-### Example apps
-- [x] Conduit: fix the two recorded gaps (empty Markdown link labels; keyboard access to the delete and remove icons), and change the headline to "50 proved propositions (294 theorems)" (fixed and proved 2026-11-02, SPEC L6 and L7).
-- [x] Specification map, 50 reviewable propositions, frontend and layout proofs, five independent proof checkers.
-- [x] Conduit on all 18 platforms, each tested in CI with its own local tooling and both official RealWorld suites (PRs #24, #29, #39).
-- [x] Ledger (example app 2), following TigerBeetle's model: proofs of conservation, idempotency and two-phase transfers; TigerBeetle as a differential oracle; a bank workload; then every platform with a strongly consistent store.
-- [x] Conduit: one end-to-end test failed once on the Lambda container image under SAM (73/74), and couldn't be reproduced. Result: a Lasm.UI bug, not SAM. A link clicked while an HTTP response's frame was still waiting changed the address one animation frame before the page (run 41236311299, `articles.spec.ts` "should view article from home feed", strict `h1` matched the feed's 4). `lasm:ui-dom` now renders a waiting frame with discrete input; regression test in test/ui-dom-applier.test.mjs.
-
-### Ledger ([examples/ledger](examples/ledger), the second flagship app)
-- [x] 1. Pure core in TigerBeetle's data model and result codes (0.17.9 subset), the model, and the proofs: 27 propositions (31 with the page) in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean), a requirements map ([SPEC.md](examples/ledger/SPEC.md)), `proofs:paranoid`.
-- [x] 2. Node server (`node:sqlite`), the differential test against a pinned TigerBeetle release, and the Jepsen-style bank workload.
-- [x] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms (Lambda .zip and image, Vercel, Netlify, Azure, GCF), and the WASI auditor `ledger verify journal.ndjson` on wasmtime, wasmer and `node:wasi`. No Fastly build (its KV is eventually consistent).
-- [x] 4. The `Lasm.UI` page (accounts and journal, a ledger filter), four propositions about it, and its end-to-end tests on Chromium, Firefox and WebKit.
-- [ ] (J) Review and hone the 31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean).
-
-### Folio ([examples/folio](examples/folio), the third flagship app: a Markdown site generator)
-- [x] 1. Pure core: a CommonMark 0.31.2 renderer (a port of commonmark.js) and a site generator (front matter, layouts, the page index, an RSS feed); all 652 specification examples pass, a differential test against commonmark.js; 21 propositions in [Proofs/Spec.lean](examples/folio/Proofs/Spec.lean) (escaping: no Markdown can inject HTML unless raw HTML is enabled; totality; the output tree; slugs; index links), `proofs:paranoid`.
-- [x] 2. The `folio` command on Node (`folio build`, `folio render`) and on WASI (wasmtime, wasmer, `node:wasi`), each checked on an example site with a draft and a hostile page; every engine writes the same bytes as Node.
-- [x] 3. The live preview (`Lasm.UI`, the renderer running in the page), served on Node, Bun and Deno, with Playwright tests (hostile Markdown runs nothing) and `preview_safe` (22 propositions in all).
-- [x] 4. Fuzzing: cmark's pathological inputs and a crash and timeout fuzzer on every PR, a nightly job (40 minutes of fuzzing, twenty differential seeds against commonmark.js). Found and fixed a stack overflow on WebAssembly and seven quadratic cases.
-
-### Porter ([examples/porter](examples/porter), the fourth flagship app: an OpenID Connect provider)
-- [x] 1. Pure core (authorization code flow with PKCE S256, discovery, JWKS, token, userinfo, ES256 and EdDSA ID tokens, refresh-token rotation with reuse detection, sessions, consent, logout), the model, and the proofs: 26 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean) (codes redeemed at most once and bound to client, redirect URI and verifier; exact redirect URIs; reuse revokes the family; claims match session and client; errors reveal nothing; totality), a requirements map ([SPEC.md](examples/porter/SPEC.md)), `proofs:paranoid`.
-- [x] 2. Node server (Web Crypto, `node:sqlite`), openid-client 6.8.8, oauth4webapi 3.8.8 and jose 6.2.12 as oracles (13 checks), the adversarial suite (31 attacks from RFC 6749/6819/9700 and OpenID Connect Core), the endpoint fuzzer (three minutes per PR). Found #76 (`Lasm.Fetch` paths with `://` in the query).
-- [x] 3. Bun, Deno, Workers (D1), Docker, the Node function platforms (Lambda .zip and image, Vercel, Netlify, Azure, GCF), each with the oracle tests and the adversarial suite in CI. No Fastly or WASI (no Web Crypto).
-- [x] 4. The `Lasm.UI` sign-in and consent pages (a plain-form fallback without JavaScript) with Playwright tests on Chromium, Firefox and WebKit, and a nightly job (40 minutes of fuzzing).
-- [x] 5. On `@lasm/cli` 0.3.9, without the workarounds for #76 (Porter's own path segments), #80 (joining `Cookie` headers, one `Set-Cookie` per reply) and #82 (a text body on redirects).
-- [x] 6. Bound `state` (2048 bytes; a longer one is a 400 page): the nightly fuzzer's `Header overflow` (run 41634567003), a ~16 KB `state` reflected into an error redirect's `Location`. New proposition `redirect_state_bounded`; the fuzzer replays a regression corpus (`test/fuzz-corpus/`) and flags any `Location` over 8 KiB. Merged 2026-11-03 (PR #105); the 40-minute nightly fuzzer passed on the branch.
-- [x] 7. Commit receipts (#138, Jordan 2026-11-07: option 1): a commit that lands and then reports an error keeps its reply instead of running again and revoking the tokens it issued; a `commits` table (pruned after a day in the same transaction), `Spec.landed_commit_stands`, and the simulation fails on the refusal.
-- [ ] (J) Review the 28 propositions in [Proofs/Spec.lean](examples/porter/Proofs/Spec.lean).
-
-### Tandem ([examples/tandem](examples/tandem), the fifth flagship app: a collaborative text editor on a CRDT)
-- [x] 1. Pure core: Fugue's sequence CRDT with the state as a canonical set of operations, local edits (insertion, deletion, typed runs, `edit` for a text area's change), the wire format and the sync server's logic, and the proofs: 25 propositions in [Proofs/Spec.lean](examples/tandem/Proofs/Spec.lean) (strong eventual consistency, commutativity, idempotence, intent preservation, non-interleaving of concurrent typing, the explicit-stack traversal equals the paper's, the server never loses an acknowledged operation, bounded total parsers), a requirements map ([SPEC.md](examples/tandem/SPEC.md)), `proofs:paranoid`.
-- [x] 2. Node sync server (HTTP sync, WebSockets through `ws`, long-poll, `node:sqlite`), the differential test against Yjs 13.6.33 (partitions, reordering, duplication, out-of-causal-order delivery; Yjs interleaves in about 40 % of two-device backward sessions, Tandem in none), the live simulation (replicas in Lean over an unreliable network, the server SIGKILLed mid-run), and the protocol fuzzer (three minutes per PR). 29 propositions in all (bulk application, the replica's sync).
-- [x] 3. Bun (WebSockets through `server.reload`), Deno (`Deno.upgradeWebSocket`), Workers (D1, long-poll), Docker (read-only, 512 MB), each with the protocol tests, the live simulation and a minute of fuzzing in CI. No function platforms, Fastly or WASI (no shared store or long-lived connections).
-- [x] Bun and Deno: an `Async` loop of a few thousand awaited host calls overflows the JavaScript stack, which Node does not (#90, found by Tandem; worked around there). Documented, not changed (Jordan, 2026-11-04). CI (`async-depth`, run 41846096224) showed the cause is steps that complete at once, not awaits. Synchronous host calls, `IO` and `pure` steps reach 2,001 on Deno, 8,099 on Bun and 1,855 on workerd; awaited calls reach 100,000 everywhere. `Std.Async.sleep 0` every 100 steps fixes it (`IO.sleep 0` does not). Floors in CI; see docs/EDGE.md#async-loops-of-steps-that-complete-at-once-issue-90. **Fixed 2026-11-09** (#175): Lasm's link bounds the nesting of ready binds (`library/c/lasm_async.c`); CI requires 1,000,000 steps of every kind on every engine.
-- [x] 4. The `Lasm.UI` editor (offline, saved in `localStorage`, merges on reconnect, the caret kept beside its text), Playwright tests on Chromium, Firefox and WebKit, and Chromium against Workers (long-poll): two browsers editing concurrently, offline then reconnect, a closed page while offline; and a nightly job (40 minutes of fuzzing, 20,000 differential histories, ten simulation rounds).
-- [ ] (J) Review the propositions in [Proofs/Spec.lean](examples/tandem/Proofs/Spec.lean).
-
-## Testing, reduction and verification: the order (Jordan, 2026-11-09)
-
-Jordan's direction: rock solid first, then the irreducible essence, then propositions that carry over to proofs, then a rewrite assessment. Each step starts when the one before it is done; (J) items elsewhere are unchanged. Decisions made under it are listed for Jordan in [docs/REVIEW.md](docs/REVIEW.md).
-
-1. Strategy
-   - [x] Adopt the testing strategy: [docs/TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md) (moved from proposals), with the method × component × tier matrix, the property-testing convention, the nine decisions (DECISIONS.md, 2026-11-09) and the measurable exit bar (§7).
-2. Close the gaps the exit bar needs ([§2 "Next gap"](docs/TESTING_STRATEGY.md#2-methods), [§7](docs/TESTING_STRATEGY.md#7-exit-bar-rock-solid))
-   - [ ] Differential fuzzing: coverage feedback for generated programs, and the generator features listed in §2; model differentials for the UI decoder and the Lasm.JS wire codec. The UI decoder's is done (2026-11-10): the `ui-decode` fuzz target checks the Lasm.UI applier's reading against `Lasm/UI/Proofs/Decode.lean` on every PR (replay), nightly and weekly; it found two kinds of frame the applier read and the decoder refuses (a listener of an undefined decoder, text that is not UTF-8), now refused. The Lasm.JS wire codec's is done (2026-11-10): the `lasm-js-wire` fuzz target checks `src/node-js.mjs`'s writer and reader against Lean's `Wire` on every PR (replay), nightly and weekly; it found three reader disagreements, fixed in both JavaScript copies (a `__proto__` field set the prototype; invalid UTF-8 read as U+FFFD; `BigInt`'s laxer grammar). The UI applier's DOM operations and hydration are modelled too (2026-11-13): `library/Lasm/UI/Proofs/Applier.lean`, checked against the shipped applier on happy-dom by `test/models/ui-applier-differential.mjs` (`ui-applier-model.yml`), with `applier_correct`, `applier_session` (given the tested candidate `diff_conforms`) and `hydrate_correct` proved; `diff_conforms` proved too (2026-11-14), so `applier_session` holds unconditionally.
-   - [x] Mutation testing on the CLI argument and init modules, `src/serverless/` and the WASI JavaScript (80 %). Met (2026-11-13): the `cli` (42.7→95 %), `init` (53.6→97.1 %), `serverless` (40.5→88.5 %) and `wasi-build` (45.8→95.8 %) modules, and `wasi/wasi-link.mjs` in `target-link` (91 %), all above their ratchets in the nightly mutation.yml run 43433389694; every JavaScript file under `src/` is in a module but `edge/edge-library.js` ([TESTING.md](docs/TESTING.md#scores)).
-   - [x] Unit-suite line coverage to 75 %; every 0 % file covered by a named integration workflow or removed (2026-11-11: 98.05 %; the baseline's `integration` list names the two Emscripten inputs, `report.mjs` fails on an unnamed 0 % file).
-   - [x] Measure exit bars 5 and 6 (2026-11-11): the 14-day quarantine window from `test/quarantine.json`'s history; each flagship app's claimed platforms and oracle jobs in `scripts/evidence/apps.json` (50 of 50 pass).
-   - [x] Fuzzing of the remaining boundaries (Fastly host, edge request mapping, the `lasm dev` proxy, project files); metamorphic compiler relations. Four targets (2026-11-14): `dev-proxy`, `project-files` (against Lean's own header parser), `edge-request`, `fastly-host` (native, against an honest Fastly host), each oracle naming candidates; `scripts/differential/metamorphic.mjs` (rename, reorder, unused code, `@[noinline]`, modules; nightly in `differential.yml`). Found and fixed: the dev proxy left responses open when the server died mid-reply, re-sent requests on a malformed reply, and corrupted non-UTF-8 pages; `importClosure` and `leanHeader` missed imports Lean reads (`«names»`, names on the next line, nested comments, Latin-1 and Greek letters); malformed manifests and package.json threw `TypeError`; the Fastly dynamic backend of an empty port.
-   - [ ] Target equivalence of Ledger's, Porter's and Tandem's recorded traffic.
-   - [x] The proposition lint (every `Proposition:` and `Tested by:` reference exists, the cited statement is the definition's, and library/PROOFS.md's candidates list is generated): `scripts/propositions.mjs`, a unit test on every PR (2026-11-10). It also measures exit bar 7: fuzz oracles and `forAll` properties that name a proposition.
-   - [ ] 30 consecutive clean nightly campaigns (Sundays excluded). The DST nightly's first failures are fixed (2026-11-10): Tandem's unpushed operations after an ambiguous commit (#190, a server bug) and Porter's (#189, all in the simulated world's oracle); their seeds are regression seeds in `tandem.yml` and `porter.yml`.
-3. Reduce ([docs/proposals/IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md), a proposal for Jordan; the removals change no API)
-   - [x] M1, first part (2026-11-09): the unused dependencies `binaryen`, `@yarnpkg/cli-dist`, `pnpm` and `miniflare`; the Lean 4.32 `lean/` and unused `runtime/*.cpp`.
-   - [x] M1, second part (2026-11-10): `vitest` and its two unreferenced users, unreferenced integration programs, `experiments/edge` and `experiments/js-interop`, about 7,800 lines of unreferenced scripts, and 70 MB of unreferenced evidence.
-   - [x] M1, third part (2026-11-10): the wasmtime-preview cluster (1,384 shipped lines), `src/toolchain.mjs` (Lean 4.32) and `src/native-pthread-factory.cjs`, with the Lean 4.32 builders that used them.
-   - [x] M1, rest (2026-11-13): duplicate licence texts — three byte-identical copies removed; Lasm's `src/notices/LASM-LICENSE.txt` kept by decision (docs/LICENSE_AUDIT.md §17).
-   - [ ] M2: unreferenced evidence and compatibility data out of the repository, closed diagnosis workflows, historical docs to `docs/history/` (all three done 2026-11-13: historical pages moved; 372 evidence and compatibility files, 70 MB, removed; two closed diagnosis workflows removed); the full emsdk and Python paths maintainer-only (deferred until the `verification/` models work settles).
-   - [ ] M3: one Lasm.JS wire codec in JavaScript, no `tar` dependency, `library/prebuilt` generated (each held to the mutation scores). One wire codec: re-evaluated 2026-11-13 and kept as two copies until the host files are bundled (measurements in docs/proposals/JS_TO_LEAN.md §2). No `tar`: done 2026-11-13 (`src/tar.mjs`, fuzzed against Python's tarfile; its week of nightly fuzzing is the exit check).
-   - [ ] Simplify the codebase toward its irreducible state, once the tests are strong enough to allow it (issue #21): M1–M3 are its first concrete steps.
-4. Transferable property tests
-   - [ ] M4: a `Candidates.lean` per library (library/PROOFS.md's candidates as definitions with `Tested by:`), and a Lean model with a model differential for every remaining shipped JavaScript and C module. Started 2026-11-10: Lasm.UI (4), Lasm.Fetch (2) and Lasm.RPC (4) candidates, each evaluated on generated inputs (`test/ui/DiffModel.lean`, the native fuzz targets); the serverless fuzz oracle and two serverless properties name their propositions.
-   - [~] Specify JavaScript glue in Lean (strategy decision 7: reduce, then model and prove, then move only pure logic beside Lean code) where it can be proved, starting with what mutation testing shows is riskiest (issue #21). Candidates ranked in [docs/proposals/JS_TO_LEAN.md](docs/proposals/JS_TO_LEAN.md) (2026-11-07): most of the JavaScript is calls to the DOM, Node or the platform, and the pure logic worth proving is the wire formats. Done: the UI patch encoding. A Lean reference decoder of ui-dom.mjs's reading half (library/Lasm/UI/Proofs/Decode.lean), and `Lasm.UI.Spec.frames_decode`: every frame of any session is read back as exactly its patch, the interning tables never out of step (proofs-only, no runtime change). Done: the Lasm.JS value codec. Lean's reader is total (`Wire.decodeWith`), `Lasm.JS.Spec.decode_encode` proves every encoded value is read back exactly and `encode_ok_iff_fits` that lengths never wrap; it surfaced #154 (lengths of 2³² or more wrapped silently), fixed on both sides. The two JavaScript copies stay (sharing them would add a file to every host output). Done: the function-platform mapping (src/serverless/). A Lean model of the shim, function for function (library/Lasm/Serverless/Proofs/Model.lean), with 20 propositions proved (Lasm/Serverless/Spec.lean: the path a server sees is the event's, one plain Host that cannot move it, query values and cookies once and unchanged, the body byte for byte, every reply field in each response shape), and the serverless-http fuzz oracle checking the JavaScript against the model on every input (`lean --run`, required in CI). It found five shim bugs, fixed: decoded paths and unencoded queries (a 502, or part of the path moved into the query), forged Host fields reaching servers that build their URL from Host, empty Cookie fields, Latin-1 text bodies, `__proto__`/`constructor` reply fields. Next: candidates 4 and 5 need no move (their proofs, where useful, are about Lean that exists).
-5. Rewrite assessment
-   - [ ] M5: translation validation: wasm-ld's output against its map, then Binaryen's lowering passes by differential execution on a spec interpreter (weekly). Assess verifying or replacing parts of the toolchain: Clang, LLVM, Emscripten, Binaryen (issue #21). Started 2026-11-13: wasm-ld's output against its map (`link-validation.yml`, [TESTING.md](docs/TESTING.md#wasm-ld-against-its-map)): every link of generated differential programs and examples (Node final and probe links, edge, WASI) checked for sections, functions, data segments and chunks, symbols, globals, exports and `__wasm_init_memory` against its `-Map` file, and each function and data chunk against its input object (bytes, and every relocation attributed to its symbol), with a self-test of seeded map corruptions, on PRs touching the link path and weekly. Next: Binaryen's lowering passes by differential execution (a draft on branch `m5-binaryen-draft`, paused 2026-11-14).
-   - [~] M6: move the pure glue into Lean, compiled by Lasm (wire codecs, request mapping, link and initialization plans). Started 2026-11-14 ([docs/proposals/M6_GLUE.md](docs/proposals/M6_GLUE.md), PR #286): `src/edge/edge-initializers.mjs` runs its Lean model, compiled through proved `csimp` fast versions into one WASI glue program (`src/glue/lasm-glue.wasm`, built by the published `@lasm/cli`, run in process by `src/glue/glue.mjs` under Node, Bun and Deno). Within the bar, with about 20 ms more per edge link warm. Next: a speed-optimized glue build and a reused instance, then the next slices (the init-name generator once modelled, the link plan).
-   - [ ] (J) M7: decide on a direct Lean IR → Wasm backend in Lean (research), after M6. Lean recommended over Rust ([IRREDUCIBLE.md §5](docs/proposals/IRREDUCIBLE.md#5-verification-path-for-each-layer)).
-
-## Generated standard-library bindings (Jordan, 2026-11-09; after the current testing work)
-
-Jordan decided the bindings ship inside `@lasm/cli`, with no optional download, under `Lasm.JS`, named for what they mirror: `Lasm.JS.Web`, `Lasm.JS.Node` (for example `Lasm.JS.Node.Fs`), `Lasm.JS.Deno` and `Lasm.JS.Bun`. They are generated from WebIDL (w3c/webref), `@types/node`, `lib.deno.d.ts` and `bun-types`. They are spec-faithful, with one surface per platform, generated against the oldest supported version and with newer APIs labelled by version. The details are in [docs/REVIEW.md](docs/REVIEW.md).
-- [ ] Tier 1, the first piece of work: the WinterTC common web APIs as `Lasm.JS.Web`, tested with web-platform-tests and official vectors, on every JavaScript target.
-- [x] Replace the hand-written `Lasm.Web` with the generated `Lasm.JS.Web` (2026-11-10): the browser tier `Lasm.JS.Web.Browser` (DOM, HTML elements, window, UI events, canvas 2D, WebSocket; `scripts/bindings/web-browser.mjs`, conformance checks in the platform suite on Chromium, Firefox and WebKit), PR #193; `Lasm.Web` and `lasm:web` deleted, `Lasm.Web.App` moved to `Lasm.UI.Mount`, migration table in [docs/release/next-notes.md](docs/release/next-notes.md).
-- [ ] Tiers 2 and 3: the full web platform, then Node core, `Deno.*`, `Bun.*` and `Lasm.JS.Cloudflare` (from Cloudflare's workers-types: KV, D1, R2, Durable Objects, env bindings), pinned per supported version. `Lasm.JS.Cloudflare` replaces the example apps' hand bindings (Porter, Ledger).
-- [ ] Then remove what `Lasm.JS.*` makes obsolete ([IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md#3-ranked-removal-list), removal 17):
-  - [x] all of `Lasm.Web` (its mount glue moved into `Lasm.UI.Mount`; done 2026-11-10);
-  - [ ] Tandem moves its WebSocket client from `Lasm.Web.WebSocket` to `Lasm.JS.Web.WebSocket` when it pins the first release with the browser tier (it builds with the published `@lasm/cli` 0.5.1, which still has `Lasm.Web`; the change is the `connectSocket` table row of docs/release/0.7.0-notes.md);
-  - [ ] `Lasm.Fetch` entirely (decided 2026-11-10; no portable handler survives, each target gets its own entry module);
-  - `Lasm.KV`'s Deno and Workers backends (pending Jordan's KV review).
-
-## Host bindings: Lasm.Fastly, Lasm.WASI, then no Lasm.Fetch (Jordan, 2026-11-10)
-- [x] `Lasm.Fastly` generated from Fastly's witx (Viceroy v0.21.1): 244 of 252 functions, `EIO FastlyStatus` calls, C glue generated; the hand-written `Lasm.Fastly` deleted; `examples/fastly` and the conformance fixture (`test/fixtures/fastly-abi`, 28 checks, every import checked by Viceroy) in `wasi.yml`; [WASI_FASTLY_BINDINGS.md](docs/WASI_FASTLY_BINDINGS.md).
-- [x] `Lasm.WASI.Http` generated from the WASI 0.2.12 WIT: wasi:io/{error,poll,streams}, the monotonic clock, wasi:http/{types,outgoing-handler} (90 functions) and the incoming-handler export, canonical ABI glue generated; every wasi-http program imports every bound function, so one component template serves all; `examples/wasi-http` and the conformance fixture (`test/fixtures/wasi-http-abi`, 35 checks) under `wasmtime serve` in `wasi.yml`; [WASI_FASTLY_BINDINGS.md](docs/WASI_FASTLY_BINDINGS.md#lasmwasihttp).
-- [ ] Move the Fastly and wasi-http builds of the templates, Conduit and Folio off `Lasm.Fetch` to a small per-target entry module each, sharing pure Lean app logic (decided 2026-11-10: no single handler across JS and Fastly/WASI targets; JS targets serve Web `Request → Async Response` through `Lasm.JS.Web`, Fastly uses `Lasm.Fastly.*`, WASI `Lasm.WASI.Http`; [REVIEW.md](docs/REVIEW.md)). The examples pin the published `@lasm/cli`, so each moves only after a release that ships the new bindings: Conduit's `ServerFastly.lean` still reads its secret through the old `Lasm.Fastly.SecretStore` until then.
-- [ ] Then the JavaScript-host step, and delete `Lasm.Fetch` ([IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md#3-ranked-removal-list), removal 18).
-
-## Next (December 2026 to January 2027)
-- [x] Nightly fuzzing at every input boundary: HTTP, RPC, the patch decoder, the parsers, the CLI. Six coverage-guided targets in `test/fuzz/` (`fuzz.yml`, [TESTING.md](docs/TESTING.md#fuzzing-at-the-boundaries)): the CLI's arguments, the function platforms' HTTP mapping and the Lasm.UI patch decoder (JavaScript, V8 block coverage), Lasm.Fetch's request parsing and Lasm.RPC's decoding (Lean compiled to C under libFuzzer), the WASI CGI host (libFuzzer, ASan, UBSan). Found and fixed: a decoder hang on a truncated frame, inherited keys accepted by `lasm init`/`package`, a `URIError` 502 on ALB queries, `://` in a path and a Host header that moved the path (Node and WASI hosts), an RPC request that hung the server with a huge exponent; #135 (closed): the example apps use `Lasm.RPC.parseJson`, which also writes zeros as `0`; the upstream JSON bugs are drafted for leanprover/lean4 in [LEAN_UPSTREAM_JSON.md](docs/proposals/LEAN_UPSTREAM_JSON.md).
-- [x] Target equivalence for Conduit's RealWorld traffic, with token and timestamp normalization: every Conduit API job (Node 24 and 26, Workers, Bun and the 15 platforms of `conduit-platforms.yml`) compares the official suite's 154 exchanges with Node's committed recording (`examples/conduit/test/equivalence.mjs`, docs/TESTING.md#conduits-realworld-traffic). No divergence in Conduit or Lasm; the first run found only platform-added headers and the key-value stores' shared id sequence (both normalized, documented).
-- [x] Consolidate the CI workflows into PR, nightly, weekly and release tiers ([docs/CI.md](docs/CI.md): the inventory of all 87 workflows and the tier design). PRs no longer use macOS unless macOS-specific code changes (the differential macOS jobs run nightly; installer faults run on Linux and Windows on PRs and on all five platforms on `main`, in releases and nightly). A change to docs or the flagship apps alone skips the compiler suites. The unit suite now runs on every PR. The release suites (browser, edge, Bun/Deno, WASI, UI, fullstack, dev loop, Lasm.JS stress) now run nightly (`ci-nightly.yml`), not only for a release. Weekly long campaigns run in `ci-weekly.yml`. Composite actions in `.github/actions/` replace the copied Playwright, upstream Lean, candidate-install and process-guard steps. `release-checks` is unchanged.
-- [x] Example app 3: the Markdown site generator, held to CommonMark's 652 examples, on WASI, Fastly, the edge and the browser. Done 2026-11-07: Folio ([examples/folio](examples/folio), its section above) passes all 652 examples and the commonmark.js differential on Node, and runs on WASI (wasmtime, wasmer, `node:wasi`: the `folio` command, the same bytes as Node), in the browser (the live preview, Playwright on three engines) and at the edge: `ServerEdge.lean` builds the site from the platform's KV store on every request, on Fastly (Viceroy, its KV Store), Cloudflare Workers (wrangler dev, Workers KV) and Deno Deploy's build (Deno KV), every page byte for byte `folio build`'s, before and after the store changes. The 652 examples run on every target: Node, WASI (three engines), headless Chromium, Firefox and WebKit, and each edge server over HTTP. Green: [folio.yml](https://github.com/Millillion/lasm/actions/runs/42381691128), [folio-nightly.yml](https://github.com/Millillion/lasm/actions/runs/42367124815), [folio-platforms.yml](https://github.com/Millillion/lasm/actions/runs/42423485357).
-- [x] Organize the proofs of Lasm's own libraries (Lasm.UI, RPC, KV) like Conduit's Spec.lean, for human review (issue #21). 30 propositions in four Spec files (Lasm.UI 9, Lasm.RPC 14, Lasm.KV 6, Lasm.Fetch 1), each proved by its `Theorems.lean`, listed in [library/PROOFS.md](library/PROOFS.md) with the candidates not yet proved; `library-proofs.yml` checks them on every library change.
-- [ ] Lean 4.36: resume when 4.36.0 stable ships, around mid-November. It becomes the next minor release after 0.4.0. Checked 2026-11-07: the newest is v4.36.0-rc2 (2026-10-27); no stable release yet.
-
-## Later (first half of 2027)
-- [x] Example apps 4 and 5: the identity provider (Porter, done) and the collaborative editor (Tandem, done 2026-11-07 audit: steps 1 to 4 of its section above). Green on `main`: [porter.yml](https://github.com/Millillion/lasm/actions/runs/42392921764), [porter-platforms.yml](https://github.com/Millillion/lasm/actions/runs/42392921776), [porter-nightly.yml](https://github.com/Millillion/lasm/actions/runs/42367521499), [tandem.yml](https://github.com/Millillion/lasm/actions/runs/42381691055), [tandem-platforms.yml](https://github.com/Millillion/lasm/actions/runs/42399791685), [tandem-nightly.yml](https://github.com/Millillion/lasm/actions/runs/42369579075). Their proposition reviews and API proposals are Jordan's checklist items.
-- [x] Continuous fuzzing in our own CI: nightly and weekly campaigns on every boundary, corpora and crashes kept in the repo, coverage-guided (libFuzzer for the C host, Jazzer.js or fast-check for JavaScript, Plausible for Lean). Nightly 10 minutes and weekly 60 minutes per target, a corpus replay on every PR, `test/fuzz/corpus/` and `test/fuzz/regressions/`; a V8-coverage engine instead of Jazzer.js (no ES module support) and libFuzzer on Lean's C output instead of Plausible ([DECISIONS](docs/DECISIONS.md)).
-- [x] Public test-evidence page on the website, generated by CI. [content/learn/test-evidence.md](content/learn/test-evidence.md), live at https://millillion.org/learn/lasm/test-evidence/: platform levels, the CI tiers' latest results, mutation scores, proof counts, fuzzing, DST, differential and equivalence results and benchmarks, each CI fact with its date and run link. Regenerated Monday to Saturday by `evidence-page.yml` (`scripts/evidence/page.mjs`), committed to `main` and picked up by the website's hourly sync ([TESTING.md](docs/TESTING.md#the-test-evidence-page)).
-- [~] An organized `llms.txt`, and a "How Lasm works" document (issue #21; Jordan hones the text). Drafted 2026-11-06: [docs/HOW_LASM_WORKS.md](docs/HOW_LASM_WORKS.md), checked against the code, and `llms.txt` in sections (getting started, CLI, libraries, platforms, examples, testing, release notes, limitations). (J) Hone the text.
+| Before | Now |
+| --- | --- |
+| Steps 1–2 (strategy, close the gaps) | Stage 1 |
+| Step 3: M1, M2, M3 | Stage 3 (M1 done) |
+| Step 4: M4, glue specified in Lean | Stage 4 (4.2, 4.3) |
+| Step 5: M5 | 4.5 |
+| Step 5: M6 | 4.3 |
+| Step 5: M7 (direct backend) | Stage 2 |
+| Binding tiers 1–3, host bindings, `Lasm.Fetch` removal | Stage 0 |
+| "Now / Next / Later" | the stages, Maintenance, and History |
