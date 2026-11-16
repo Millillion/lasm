@@ -65,7 +65,6 @@
     "src/npm-artifacts.mjs: is larger than": "Registry fetch of a tool package over 2 GiB (a hostile registry). Not tested.",
     "src/npm-artifacts.mjs: and LASM_ARTIFACT_SOURCE=npm forbids direct downloads:": "Registry fetch of a tool package with LASM_ARTIFACT_SOURCE=npm (see above); unit tests: test/npm-artifacts.test.mjs.",
     "src/npm-artifacts.mjs: LASM_ARTIFACT_SOURCE=npm forbids downloading": "Only an installation without the npm tool packages: the published package carries them (with LASM_ARTIFACT_SOURCE=npm it builds), a packed candidate does not, so a corpus case would test the candidate's packaging, not a user error. Unit tests: test/npm-artifacts.test.mjs.",
-    "src/managed-download.mjs: (dynamic message, line 16)": "Download errors carry their message in a variable; corpus case download-unreachable and fault injection (cut and stalled downloads) print them.",
-    "src/application-build.mjs: A Lasm.JS binding names a project JavaScript file in a form the build did not find; write it as @[js \"./path/file.mjs\" \"export\"]": "Internal invariant: a binding of a project file is always written `@[js \"./…\"`, which the source scan finds; only a macro that generates `@[js]` could hide one. Not reachable from a plain program."
+    "src/managed-download.mjs: (dynamic message, line 16)": "Download errors carry their message in a variable; corpus case download-unreachable and fault injection (cut and stalled downloads) print them."
   }
 }
