@@ -13,6 +13,10 @@ import Lasm.JS.Web.Streams
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
 
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
 /-- `interface KVNamespace` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure KVNamespace where
   /-- The JavaScript object. -/
@@ -26,10 +30,6 @@ structure KVNamespaceGetOptions where
   /-- `double cacheTtl` -/
   cacheTtl : Option Float := none
 instance : ToJS KVNamespaceGetOptions := ⟨fun d => Support.fields #[("cacheTtl", Support.optional d.cacheTtl)]⟩
-instance : FromJS KVNamespaceGetOptions where
-  fromJS d := do return {
-    cacheTtl := ← Lasm.JS.readField (Option Float) d "cacheTtl" }
-  typeName := "Lasm.JS.Cloudflare.KVNamespaceGetOptions"
 
 /-- `dictionary KVNamespaceListOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KVNamespaceListOptions where
@@ -42,12 +42,6 @@ structure KVNamespaceListOptions where
 instance : ToJS KVNamespaceListOptions := ⟨fun d => Support.fields #[("limit", Support.optional d.limit),
     ("prefix", Support.optional d.«prefix»),
     ("cursor", Support.optional d.cursor)]⟩
-instance : FromJS KVNamespaceListOptions where
-  fromJS d := do return {
-    limit := ← Lasm.JS.readField (Option Float) d "limit",
-    «prefix» := ← Lasm.JS.readField (Option String) d "prefix",
-    cursor := ← Lasm.JS.readField (Option String) d "cursor" }
-  typeName := "Lasm.JS.Cloudflare.KVNamespaceListOptions"
 
 /-- `dictionary KVNamespaceListKey` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KVNamespaceListKey where
@@ -57,9 +51,6 @@ structure KVNamespaceListKey where
   expiration : Option Float := none
   /-- `any metadata` -/
   metadata : Data := .undefined
-instance : ToJS KVNamespaceListKey := ⟨fun d => Support.fields #[("name", toJS d.name),
-    ("expiration", Support.optional d.expiration),
-    ("metadata", d.metadata)]⟩
 instance : FromJS KVNamespaceListKey where
   fromJS d := do return {
     name := ← Lasm.JS.readField String d "name",
@@ -77,10 +68,6 @@ structure KVNamespaceListResult where
   cursor : Option String := none
   /-- `required DOMString? cacheStatus` -/
   cacheStatus : Option String
-instance : ToJS KVNamespaceListResult := ⟨fun d => Support.fields #[("list_complete", toJS d.list_complete),
-    ("keys", toJS d.keys),
-    ("cursor", Support.optional d.cursor),
-    ("cacheStatus", toJS d.cacheStatus)]⟩
 instance : FromJS KVNamespaceListResult where
   fromJS d := do return {
     list_complete := ← Lasm.JS.readField Bool d "list_complete",
@@ -116,12 +103,6 @@ structure KVNamespacePutOptions where
 instance : ToJS KVNamespacePutOptions := ⟨fun d => Support.fields #[("expiration", Support.optional d.expiration),
     ("expirationTtl", Support.optional d.expirationTtl),
     ("metadata", d.metadata)]⟩
-instance : FromJS KVNamespacePutOptions where
-  fromJS d := do return {
-    expiration := ← Lasm.JS.readField (Option Float) d "expiration",
-    expirationTtl := ← Lasm.JS.readField (Option Float) d "expirationTtl",
-    metadata := ← Lasm.JS.readField Data d "metadata" }
-  typeName := "Lasm.JS.Cloudflare.KVNamespacePutOptions"
 
 /-- `dictionary KVNamespaceGetWithMetadataResult` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KVNamespaceGetWithMetadataResult where
@@ -131,9 +112,6 @@ structure KVNamespaceGetWithMetadataResult where
   metadata : Data
   /-- `required DOMString? cacheStatus` -/
   cacheStatus : Option String
-instance : ToJS KVNamespaceGetWithMetadataResult := ⟨fun d => Support.fields #[("value", toJS d.value),
-    ("metadata", toJS d.metadata),
-    ("cacheStatus", toJS d.cacheStatus)]⟩
 instance : FromJS KVNamespaceGetWithMetadataResult where
   fromJS d := do return {
     value := ← Lasm.JS.readField (Option String) d "value",

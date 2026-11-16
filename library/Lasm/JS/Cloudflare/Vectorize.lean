@@ -12,6 +12,10 @@ import Lasm.JS.Cloudflare.Support
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
 
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
 /-- `interface VectorizeIndex` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure VectorizeIndex where
   /-- The JavaScript object. -/
@@ -96,9 +100,6 @@ structure VectorizeIndexConfig where
   metric : Option VectorizeDistanceMetric := none
   /-- `DOMString preset` -/
   preset : Option String := none
-instance : ToJS VectorizeIndexConfig := ⟨fun d => Support.fields #[("dimensions", Support.optional d.dimensions),
-    ("metric", Support.optional d.metric),
-    ("preset", Support.optional d.preset)]⟩
 instance : FromJS VectorizeIndexConfig where
   fromJS d := do return {
     dimensions := ← Lasm.JS.readField (Option Float) d "dimensions",
@@ -118,11 +119,6 @@ structure VectorizeIndexDetails where
   config : VectorizeIndexConfig
   /-- `required double vectorsCount` -/
   vectorsCount : Float
-instance : ToJS VectorizeIndexDetails := ⟨fun d => Support.fields #[("id", toJS d.id),
-    ("name", toJS d.name),
-    ("description", Support.optional d.description),
-    ("config", toJS d.config),
-    ("vectorsCount", toJS d.vectorsCount)]⟩
 instance : FromJS VectorizeIndexDetails where
   fromJS d := do return {
     id := ← Lasm.JS.readField String d "id",
@@ -155,9 +151,6 @@ instance : Coe VectorizeQueryOptionsReturnMetadata3 BooleanOrVectorizeQueryOptio
 /-- `dictionary VectorizeVectorMetadataFilter` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure VectorizeVectorMetadataFilter where
 instance : ToJS VectorizeVectorMetadataFilter := ⟨fun _ => Support.fields #[]⟩
-instance : FromJS VectorizeVectorMetadataFilter where
-  fromJS d := match d with | .object _ => .ok {} | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.VectorizeVectorMetadataFilter"
 
 /-- `dictionary VectorizeQueryOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure VectorizeQueryOptions where
@@ -250,11 +243,6 @@ structure VectorizeMatch where
   metadata : Option (Record DOMStringOrDoubleOrBooleanOrSequenceOfDOMStringOrRecordOfDOMStringOrDoubleOrBooleanOrSequenceOfDOMString) := none
   /-- `required double score` -/
   score : Float
-instance : ToJS VectorizeMatch := ⟨fun d => Support.fields #[("values", d.values),
-    ("id", toJS d.id),
-    ("namespace", Support.optional d.«namespace»),
-    ("metadata", Support.optional d.metadata),
-    ("score", toJS d.score)]⟩
 instance : FromJS VectorizeMatch where
   fromJS d := do return {
     values := ← Lasm.JS.readField Data d "values",
@@ -270,8 +258,6 @@ structure VectorizeMatches where
   «matches» : Array VectorizeMatch
   /-- `required double count` -/
   count : Float
-instance : ToJS VectorizeMatches := ⟨fun d => Support.fields #[("matches", toJS d.«matches»),
-    ("count", toJS d.count)]⟩
 instance : FromJS VectorizeMatches where
   fromJS d := do return {
     «matches» := ← Lasm.JS.readField (Array VectorizeMatch) d "matches",
@@ -306,8 +292,6 @@ structure VectorizeVectorMutation where
   ids : Array String
   /-- `required double count` -/
   count : Float
-instance : ToJS VectorizeVectorMutation := ⟨fun d => Support.fields #[("ids", toJS d.ids),
-    ("count", toJS d.count)]⟩
 instance : FromJS VectorizeVectorMutation where
   fromJS d := do return {
     ids := ← Lasm.JS.readField (Array String) d "ids",
@@ -324,10 +308,6 @@ structure VectorizeIndexInfo where
   processedUpToDatetime : Float
   /-- `required double processedUpToMutation` -/
   processedUpToMutation : Float
-instance : ToJS VectorizeIndexInfo := ⟨fun d => Support.fields #[("vectorCount", toJS d.vectorCount),
-    ("dimensions", toJS d.dimensions),
-    ("processedUpToDatetime", toJS d.processedUpToDatetime),
-    ("processedUpToMutation", toJS d.processedUpToMutation)]⟩
 instance : FromJS VectorizeIndexInfo where
   fromJS d := do return {
     vectorCount := ← Lasm.JS.readField Float d "vectorCount",
@@ -340,7 +320,6 @@ instance : FromJS VectorizeIndexInfo where
 structure VectorizeAsyncMutation where
   /-- `required DOMString mutationId` -/
   mutationId : String
-instance : ToJS VectorizeAsyncMutation := ⟨fun d => Support.fields #[("mutationId", toJS d.mutationId)]⟩
 instance : FromJS VectorizeAsyncMutation where
   fromJS d := do return {
     mutationId := ← Lasm.JS.readField String d "mutationId" }

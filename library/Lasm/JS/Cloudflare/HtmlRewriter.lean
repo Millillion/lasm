@@ -14,6 +14,10 @@ import Lasm.JS.Web.Fetch
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
 
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
 /-- `interface HTMLRewriter` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure HTMLRewriter where
   /-- The JavaScript object. -/
@@ -65,12 +69,6 @@ structure Doctype where
 instance : ToJS Doctype := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("publicId", toJS d.publicId),
     ("systemId", toJS d.systemId)]⟩
-instance : FromJS Doctype where
-  fromJS d := do return {
-    name := ← Lasm.JS.readField (Option String) d "name",
-    publicId := ← Lasm.JS.readField (Option String) d "publicId",
-    systemId := ← Lasm.JS.readField (Option String) d "systemId" }
-  typeName := "Lasm.JS.Cloudflare.Doctype"
 
 /-- `typedef DOMString or ReadableStream or Response DOMStringOrReadableStreamOrResponse`: one constructor per member type. -/
 inductive DOMStringOrReadableStreamOrResponse where
@@ -93,10 +91,6 @@ structure ContentOptions where
   /-- `boolean html` -/
   html : Option Bool := none
 instance : ToJS ContentOptions := ⟨fun d => Support.fields #[("html", Support.optional d.html)]⟩
-instance : FromJS ContentOptions where
-  fromJS d := do return {
-    html := ← Lasm.JS.readField (Option Bool) d "html" }
-  typeName := "Lasm.JS.Cloudflare.ContentOptions"
 
 /-- `dictionary TextOptionsFont` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TextOptionsFont where

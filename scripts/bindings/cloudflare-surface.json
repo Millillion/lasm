@@ -2,14 +2,14 @@
   "generatedBy": "scripts/bindings/generate-web.mjs (@cloudflare/workers-types 5.20261019.1 declarations)",
   "surface": {
     "globals": {
+      "cloudflare:workers": [
+        "env"
+      ],
       "globalThis": [
         "caches"
       ],
       "cloudflare:sockets": [
         "connect"
-      ],
-      "cloudflare:workers": [
-        "env"
       ]
     },
     "interfaces": {
@@ -85,6 +85,70 @@
         "uploadPart",
         "abort",
         "complete"
+      ],
+      "ExecutionContext": [
+        "waitUntil",
+        "passThroughOnException",
+        "exports",
+        "props",
+        "cache",
+        "access",
+        "tracing",
+        "abort"
+      ],
+      "CacheContext": [
+        "purge",
+        "invalidate"
+      ],
+      "ScheduledController": [
+        "scheduledTime",
+        "cron",
+        "noRetry"
+      ],
+      "CloudflareAccessContext": [
+        "aud",
+        "getIdentity"
+      ],
+      "ScheduledEvent": [
+        "type",
+        "eventPhase",
+        "composed",
+        "bubbles",
+        "cancelable",
+        "defaultPrevented",
+        "currentTarget",
+        "target",
+        "timeStamp",
+        "isTrusted",
+        "stopImmediatePropagation",
+        "preventDefault",
+        "stopPropagation",
+        "composedPath",
+        "NONE",
+        "CAPTURING_PHASE",
+        "AT_TARGET",
+        "BUBBLING_PHASE",
+        "waitUntil",
+        "scheduledTime",
+        "cron",
+        "noRetry"
+      ],
+      "Tracing": [
+        "enterSpan",
+        "startActiveSpan",
+        "startSpan",
+        "getActiveSpan",
+        "Span"
+      ],
+      "Span": [
+        "isTraced",
+        "spanContext",
+        "setAttribute",
+        "setAttributes",
+        "recordException",
+        "updateName",
+        "setStatus",
+        "end"
       ],
       "Queue": [
         "metrics",
@@ -290,6 +354,14 @@
         "put",
         "delete"
       ],
+      "CloudflareWorkersModuleDurableObject": [
+        "alarm",
+        "fetch",
+        "connect",
+        "webSocketMessage",
+        "webSocketClose",
+        "webSocketError"
+      ],
       "TailEvent": [
         "type",
         "eventPhase",
@@ -323,70 +395,6 @@
       "UnsafeTraceMetrics": [
         "fromTrace"
       ],
-      "Tracing": [
-        "enterSpan",
-        "startActiveSpan",
-        "startSpan",
-        "getActiveSpan",
-        "Span"
-      ],
-      "Span": [
-        "isTraced",
-        "spanContext",
-        "setAttribute",
-        "setAttributes",
-        "recordException",
-        "updateName",
-        "setStatus",
-        "end"
-      ],
-      "ExecutionContext": [
-        "waitUntil",
-        "passThroughOnException",
-        "exports",
-        "props",
-        "cache",
-        "access",
-        "tracing",
-        "abort"
-      ],
-      "CacheContext": [
-        "purge",
-        "invalidate"
-      ],
-      "ScheduledController": [
-        "scheduledTime",
-        "cron",
-        "noRetry"
-      ],
-      "CloudflareAccessContext": [
-        "aud",
-        "getIdentity"
-      ],
-      "ScheduledEvent": [
-        "type",
-        "eventPhase",
-        "composed",
-        "bubbles",
-        "cancelable",
-        "defaultPrevented",
-        "currentTarget",
-        "target",
-        "timeStamp",
-        "isTrusted",
-        "stopImmediatePropagation",
-        "preventDefault",
-        "stopPropagation",
-        "composedPath",
-        "NONE",
-        "CAPTURING_PHASE",
-        "AT_TARGET",
-        "BUBBLING_PHASE",
-        "waitUntil",
-        "scheduledTime",
-        "cron",
-        "noRetry"
-      ],
       "ForwardableEmailMessage": [
         "raw",
         "headers",
@@ -419,14 +427,6 @@
         "BUBBLING_PHASE",
         "waitUntil",
         "message"
-      ],
-      "CloudflareWorkersModuleDurableObject": [
-        "alarm",
-        "fetch",
-        "connect",
-        "webSocketMessage",
-        "webSocketClose",
-        "webSocketError"
       ],
       "HTMLRewriter": [
         null,

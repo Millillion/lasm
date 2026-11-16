@@ -14,6 +14,10 @@ import Lasm.JS.Web.Fetch
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
 
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
 /-- `interface CacheStorage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure CacheStorage where
   /-- The JavaScript object. -/
@@ -51,10 +55,6 @@ structure CacheQueryOptions where
   /-- `boolean ignoreMethod` -/
   ignoreMethod : Option Bool := none
 instance : ToJS CacheQueryOptions := ⟨fun d => Support.fields #[("ignoreMethod", Support.optional d.ignoreMethod)]⟩
-instance : FromJS CacheQueryOptions where
-  fromJS d := do return {
-    ignoreMethod := ← Lasm.JS.readField (Option Bool) d "ignoreMethod" }
-  typeName := "Lasm.JS.Cloudflare.CacheQueryOptions"
 
 /-- `readonly default: Cache`: `readonly attribute Cache default` -/
 def CacheStorage.default (self : CacheStorage) : IO Cache := do

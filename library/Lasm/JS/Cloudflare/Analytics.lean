@@ -14,6 +14,10 @@ import Lasm.JS.Cloudflare.Images
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
 
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
 /-- `interface AnalyticsEngineDataset` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure AnalyticsEngineDataset where
   /-- The JavaScript object. -/
@@ -53,12 +57,6 @@ instance : ToJS SequenceOfDOMStringOrDoubleOrBooleanOrRecordOfDOMStringOrDoubleO
   | .record v => toJS v⟩
 instance : Coe (Array (Option DOMStringOrDoubleOrBoolean)) SequenceOfDOMStringOrDoubleOrBooleanOrRecordOfDOMStringOrDoubleOrBoolean := ⟨.sequence⟩
 instance : Coe (Record (Option DOMStringOrDoubleOrBoolean)) SequenceOfDOMStringOrDoubleOrBooleanOrRecordOfDOMStringOrDoubleOrBoolean := ⟨.record⟩
-instance : FromJS SequenceOfDOMStringOrDoubleOrBooleanOrRecordOfDOMStringOrDoubleOrBoolean where
-  fromJS
-    | d@(.array _) => (FromJS.fromJS d : Except String (Array (Option DOMStringOrDoubleOrBoolean))).map .sequence
-    | d@(.object _) => (FromJS.fromJS d : Except String (Record (Option DOMStringOrDoubleOrBoolean))).map .record
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.SequenceOfDOMStringOrDoubleOrBooleanOrRecordOfDOMStringOrDoubleOrBoolean"
 
 /-- `dictionary AnalyticsSQLQuery` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AnalyticsSQLQuery where
@@ -68,11 +66,6 @@ structure AnalyticsSQLQuery where
   params : Option SequenceOfDOMStringOrDoubleOrBooleanOrRecordOfDOMStringOrDoubleOrBoolean := none
 instance : ToJS AnalyticsSQLQuery := ⟨fun d => Support.fields #[("query", toJS d.query),
     ("params", Support.optional d.params)]⟩
-instance : FromJS AnalyticsSQLQuery where
-  fromJS d := do return {
-    query := ← Lasm.JS.readField String d "query",
-    params := ← Lasm.JS.readField (Option SequenceOfDOMStringOrDoubleOrBooleanOrRecordOfDOMStringOrDoubleOrBoolean) d "params" }
-  typeName := "Lasm.JS.Cloudflare.AnalyticsSQLQuery"
 
 /-- `dictionary AnalyticsSQLStatistics` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure AnalyticsSQLStatistics where
@@ -82,9 +75,6 @@ structure AnalyticsSQLStatistics where
   rows_read : Float
   /-- `required double bytes_read` -/
   bytes_read : Float
-instance : ToJS AnalyticsSQLStatistics := ⟨fun d => Support.fields #[("elapsed_ms", toJS d.elapsed_ms),
-    ("rows_read", toJS d.rows_read),
-    ("bytes_read", toJS d.bytes_read)]⟩
 instance : FromJS AnalyticsSQLStatistics where
   fromJS d := do return {
     elapsed_ms := ← Lasm.JS.readField Float d "elapsed_ms",
@@ -100,9 +90,6 @@ structure AnalyticsSQLResult where
   rows : Float
   /-- `required AnalyticsSQLStatistics statistics` -/
   statistics : AnalyticsSQLStatistics
-instance : ToJS AnalyticsSQLResult := ⟨fun d => Support.fields #[("data", toJS d.data),
-    ("rows", toJS d.rows),
-    ("statistics", toJS d.statistics)]⟩
 instance : FromJS AnalyticsSQLResult where
   fromJS d := do return {
     data := ← Lasm.JS.readField (Array (Record Data)) d "data",

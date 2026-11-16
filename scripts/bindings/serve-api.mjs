@@ -524,7 +524,9 @@ export function lowerHost(host, files) {
   const isNullish = t => t.k === 'name' && (t.name === 'null' || t.name === 'undefined');
   const isVoid = t => t.k === 'name' && t.name === 'void';
   const isPromise = t => t.k === 'name' && t.name === 'Promise';
-  const anyString = t => t.k === 'inter' && t.parts.length === 2 && t.parts[0].k === 'name' && t.parts[0].name === 'string' && t.parts[1].k === 'obj' && !t.parts[1].body.trim();
+  // `string & {}`, and (rich) any string with a brand (`string & NonNullable<unknown>`): a string.
+  const anyString = t => t.k === 'inter' && t.parts.length === 2 && t.parts[0].k === 'name' && t.parts[0].name === 'string'
+    && ((t.parts[1].k === 'obj' && !t.parts[1].body.trim()) || (rich && t.parts[1].k === 'name' && ['NonNullable', 'Record'].includes(t.parts[1].name)));
   const flat = t => t.k === 'union' ? t.alts.flatMap(flat)
     : t.k === 'name' && t.name === 'MaybePromise' ? [t.args[0], { k: 'name', name: 'Promise', args: [t.args[0]] }] : [t];
 

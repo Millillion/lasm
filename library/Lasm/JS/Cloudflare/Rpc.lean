@@ -9,16 +9,21 @@ declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Cloudflare.Support
 import Lasm.JS.Web.Fetch
+import Lasm.JS.Cloudflare.Workers
 import Lasm.JS.Cloudflare.Queues
 import Lasm.JS.Cloudflare.Cache
 import Lasm.JS.Cloudflare.Sockets
 import Lasm.JS.Cloudflare.Containers
 import Lasm.JS.Cloudflare.DurableObjects
 import Lasm.JS.Cloudflare.Tail
-import Lasm.JS.Cloudflare.Workers
+import Lasm.JS.Cloudflare.Email
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
+
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface WorkerStub` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure WorkerStub where
@@ -76,11 +81,6 @@ structure workerdResourceLimits where
   subRequests : Option Float := none
 instance : ToJS workerdResourceLimits := ⟨fun d => Support.fields #[("cpuMs", Support.optional d.cpuMs),
     ("subRequests", Support.optional d.subRequests)]⟩
-instance : FromJS workerdResourceLimits where
-  fromJS d := do return {
-    cpuMs := ← Lasm.JS.readField (Option Float) d "cpuMs",
-    subRequests := ← Lasm.JS.readField (Option Float) d "subRequests" }
-  typeName := "Lasm.JS.Cloudflare.workerdResourceLimits"
 
 /-- `dictionary WorkerStubEntrypointOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkerStubEntrypointOptions where
@@ -90,11 +90,6 @@ structure WorkerStubEntrypointOptions where
   limits : Option workerdResourceLimits := none
 instance : ToJS WorkerStubEntrypointOptions := ⟨fun d => Support.fields #[("props", d.props),
     ("limits", Support.optional d.limits)]⟩
-instance : FromJS WorkerStubEntrypointOptions where
-  fromJS d := do return {
-    props := ← Lasm.JS.readField Data d "props",
-    limits := ← Lasm.JS.readField (Option workerdResourceLimits) d "limits" }
-  typeName := "Lasm.JS.Cloudflare.WorkerStubEntrypointOptions"
 
 /-- `callback WorkerStubGetEntrypointFetch = Promise<Response> (RequestInfoOrURL input, optional RequestInit init)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure WorkerStubGetEntrypointFetch where
@@ -142,8 +137,6 @@ structure WorkerStubGetEntrypoint where
   fetch : WorkerStubGetEntrypointFetch
   /-- `required WorkerStubGetEntrypointConnect connect` -/
   connect : WorkerStubGetEntrypointConnect
-instance : ToJS WorkerStubGetEntrypoint := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
-    ("connect", toJS d.connect)]⟩
 instance : FromJS WorkerStubGetEntrypoint where
   fromJS d := do return {
     fetch := ← Lasm.JS.readField WorkerStubGetEntrypointFetch d "fetch",
@@ -198,11 +191,6 @@ structure WorkerLoaderWorkerCodeGlobalOutbound where
   connect : WorkerLoaderWorkerCodeGlobalOutboundConnect
 instance : ToJS WorkerLoaderWorkerCodeGlobalOutbound := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
     ("connect", toJS d.connect)]⟩
-instance : FromJS WorkerLoaderWorkerCodeGlobalOutbound where
-  fromJS d := do return {
-    fetch := ← Lasm.JS.readField WorkerLoaderWorkerCodeGlobalOutboundFetch d "fetch",
-    connect := ← Lasm.JS.readField WorkerLoaderWorkerCodeGlobalOutboundConnect d "connect" }
-  typeName := "Lasm.JS.Cloudflare.WorkerLoaderWorkerCodeGlobalOutbound"
 
 /-- `callback WorkerLoaderWorkerCodeTailsFetch = Promise<Response> (RequestInfoOrURL input, optional RequestInit init)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure WorkerLoaderWorkerCodeTailsFetch where
@@ -252,11 +240,6 @@ structure WorkerLoaderWorkerCodeTails where
   connect : WorkerLoaderWorkerCodeTailsConnect
 instance : ToJS WorkerLoaderWorkerCodeTails := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
     ("connect", toJS d.connect)]⟩
-instance : FromJS WorkerLoaderWorkerCodeTails where
-  fromJS d := do return {
-    fetch := ← Lasm.JS.readField WorkerLoaderWorkerCodeTailsFetch d "fetch",
-    connect := ← Lasm.JS.readField WorkerLoaderWorkerCodeTailsConnect d "connect" }
-  typeName := "Lasm.JS.Cloudflare.WorkerLoaderWorkerCodeTails"
 
 /-- `callback WorkerLoaderWorkerCodeStreamingTailsFetch = Promise<Response> (RequestInfoOrURL input, optional RequestInit init)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure WorkerLoaderWorkerCodeStreamingTailsFetch where
@@ -306,11 +289,6 @@ structure WorkerLoaderWorkerCodeStreamingTails where
   connect : WorkerLoaderWorkerCodeStreamingTailsConnect
 instance : ToJS WorkerLoaderWorkerCodeStreamingTails := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
     ("connect", toJS d.connect)]⟩
-instance : FromJS WorkerLoaderWorkerCodeStreamingTails where
-  fromJS d := do return {
-    fetch := ← Lasm.JS.readField WorkerLoaderWorkerCodeStreamingTailsFetch d "fetch",
-    connect := ← Lasm.JS.readField WorkerLoaderWorkerCodeStreamingTailsConnect d "connect" }
-  typeName := "Lasm.JS.Cloudflare.WorkerLoaderWorkerCodeStreamingTails"
 
 /-- `dictionary WorkerLoaderWorkerCode` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WorkerLoaderWorkerCode where
@@ -344,19 +322,6 @@ instance : ToJS WorkerLoaderWorkerCode := ⟨fun d => Support.fields #[("compati
     ("globalOutbound", Support.optional d.globalOutbound),
     ("tails", Support.optional d.tails),
     ("streamingTails", Support.optional d.streamingTails)]⟩
-instance : FromJS WorkerLoaderWorkerCode where
-  fromJS d := do return {
-    compatibilityDate := ← Lasm.JS.readField String d "compatibilityDate",
-    compatibilityFlags := ← Lasm.JS.readField (Option (Array String)) d "compatibilityFlags",
-    allowExperimental := ← Lasm.JS.readField (Option Bool) d "allowExperimental",
-    limits := ← Lasm.JS.readField (Option workerdResourceLimits) d "limits",
-    mainModule := ← Lasm.JS.readField String d "mainModule",
-    modules := ← Lasm.JS.readField (Record Data) d "modules",
-    env := ← Lasm.JS.readField Data d "env",
-    globalOutbound := ← Lasm.JS.readField (Option WorkerLoaderWorkerCodeGlobalOutbound) d "globalOutbound",
-    tails := ← Lasm.JS.readField (Option (Array WorkerLoaderWorkerCodeTails)) d "tails",
-    streamingTails := ← Lasm.JS.readField (Option (Array WorkerLoaderWorkerCodeStreamingTails)) d "streamingTails" }
-  typeName := "Lasm.JS.Cloudflare.WorkerLoaderWorkerCode"
 
 /-- `callback WorkerLoaderGetGetCode = Promise<WorkerLoaderWorkerCode> ()` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure WorkerLoaderGetGetCode where
@@ -378,33 +343,14 @@ def WorkerLoaderGetGetCode.ofSyncFn (f : IO WorkerLoaderWorkerCode) : IO WorkerL
     #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
   return { val := fn }
 
-/-- `dictionary DynamicDispatchLimits` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure DynamicDispatchLimits where
-  /-- `double cpuMs` -/
-  cpuMs : Option Float := none
-  /-- `double subRequests` -/
-  subRequests : Option Float := none
-instance : ToJS DynamicDispatchLimits := ⟨fun d => Support.fields #[("cpuMs", Support.optional d.cpuMs),
-    ("subRequests", Support.optional d.subRequests)]⟩
-instance : FromJS DynamicDispatchLimits where
-  fromJS d := do return {
-    cpuMs := ← Lasm.JS.readField (Option Float) d "cpuMs",
-    subRequests := ← Lasm.JS.readField (Option Float) d "subRequests" }
-  typeName := "Lasm.JS.Cloudflare.DynamicDispatchLimits"
-
 /-- `dictionary DynamicDispatchOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DynamicDispatchOptions where
-  /-- `DynamicDispatchLimits limits` -/
-  limits : Option DynamicDispatchLimits := none
+  /-- `workerdResourceLimits limits` -/
+  limits : Option workerdResourceLimits := none
   /-- `record<DOMString, any> outbound` -/
   outbound : Option (Record Data) := none
 instance : ToJS DynamicDispatchOptions := ⟨fun d => Support.fields #[("limits", Support.optional d.limits),
     ("outbound", Support.optional d.outbound)]⟩
-instance : FromJS DynamicDispatchOptions where
-  fromJS d := do return {
-    limits := ← Lasm.JS.readField (Option DynamicDispatchLimits) d "limits",
-    outbound := ← Lasm.JS.readField (Option (Record Data)) d "outbound" }
-  typeName := "Lasm.JS.Cloudflare.DynamicDispatchOptions"
 
 /-- `callback DispatchNamespaceGetFetch = Promise<Response> (RequestInfoOrURL input, optional RequestInit init)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure DispatchNamespaceGetFetch where
@@ -452,8 +398,6 @@ structure DispatchNamespaceGet where
   fetch : DispatchNamespaceGetFetch
   /-- `required DispatchNamespaceGetConnect connect` -/
   connect : DispatchNamespaceGetConnect
-instance : ToJS DispatchNamespaceGet := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
-    ("connect", toJS d.connect)]⟩
 instance : FromJS DispatchNamespaceGet where
   fromJS d := do return {
     fetch := ← Lasm.JS.readField DispatchNamespaceGetFetch d "fetch",
@@ -491,26 +435,17 @@ instance : FromJS RpcTargetBranded where
   fromJS d := match d with | .object _ => .ok {} | _ => .error ""
   typeName := "Lasm.JS.Cloudflare.RpcTargetBranded"
 
-/-- `dictionary WorkerEntrypointBranded` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure WorkerEntrypointBranded where
-instance : ToJS WorkerEntrypointBranded := ⟨fun _ => Support.fields #[]⟩
-instance : FromJS WorkerEntrypointBranded where
-  fromJS d := match d with | .object _ => .ok {} | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.WorkerEntrypointBranded"
+/-- `WorkerEntrypointBranded` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `RpcTargetBranded`. -/
+abbrev WorkerEntrypointBranded := RpcTargetBranded
 
-/-- `dictionary DurableObjectBranded` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure DurableObjectBranded where
-instance : ToJS DurableObjectBranded := ⟨fun _ => Support.fields #[]⟩
-instance : FromJS DurableObjectBranded where
-  fromJS d := match d with | .object _ => .ok {} | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.DurableObjectBranded"
+/-- `DurableObjectBranded` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `RpcTargetBranded`. -/
+abbrev DurableObjectBranded := RpcTargetBranded
 
-/-- `dictionary WorkflowEntrypointBranded` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure WorkflowEntrypointBranded where
-instance : ToJS WorkflowEntrypointBranded := ⟨fun _ => Support.fields #[]⟩
-instance : FromJS WorkflowEntrypointBranded where
-  fromJS d := match d with | .object _ => .ok {} | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.WorkflowEntrypointBranded"
+/-- `WorkflowEntrypointBranded` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `RpcTargetBranded`. -/
+abbrev WorkflowEntrypointBranded := RpcTargetBranded
+
+/-- `DynamicDispatchLimits` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `workerdResourceLimits`. -/
+abbrev DynamicDispatchLimits := workerdResourceLimits
 
 /-- `getEntrypoint<T extends Rpc.WorkerEntrypointBranded | undefined>(name?: string, options?: WorkerStubEntrypointOptions): Fetcher<T>`: `WorkerStubGetEntrypoint getEntrypoint(optional DOMString name, optional WorkerStubEntrypointOptions options)` -/
 def WorkerStub.getEntrypoint (self : WorkerStub) (name : Option String := none) (options : Option WorkerStubEntrypointOptions := none) : IO WorkerStubGetEntrypoint :=

@@ -9,9 +9,14 @@ declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Cloudflare.Support
 import Lasm.JS.Web.Streams
+import Lasm.JS.Cloudflare.Workers
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
+
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Socket` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure Socket where
@@ -48,8 +53,6 @@ structure SocketInfo where
   remoteAddress : Option String := none
   /-- `DOMString localAddress` -/
   localAddress : Option String := none
-instance : ToJS SocketInfo := ⟨fun d => Support.fields #[("remoteAddress", Support.optional d.remoteAddress),
-    ("localAddress", Support.optional d.localAddress)]⟩
 instance : FromJS SocketInfo where
   fromJS d := do return {
     remoteAddress := ← Lasm.JS.readField (Option String) d "remoteAddress",
@@ -61,10 +64,6 @@ structure TlsOptions where
   /-- `DOMString expectedServerHostname` -/
   expectedServerHostname : Option String := none
 instance : ToJS TlsOptions := ⟨fun d => Support.fields #[("expectedServerHostname", Support.optional d.expectedServerHostname)]⟩
-instance : FromJS TlsOptions where
-  fromJS d := do return {
-    expectedServerHostname := ← Lasm.JS.readField (Option String) d "expectedServerHostname" }
-  typeName := "Lasm.JS.Cloudflare.TlsOptions"
 
 /-- `dictionary SocketAddress` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SocketAddress where
@@ -127,6 +126,26 @@ instance : FromJS SocketOptions where
     allowHalfOpen := ← Lasm.JS.readField Bool d "allowHalfOpen",
     highWaterMark := ← Lasm.JS.readField (Option DoubleOrBigint) d "highWaterMark" }
   typeName := "Lasm.JS.Cloudflare.SocketOptions"
+
+/-- `callback ExportedHandlerConnectHandler = Promise<undefined> (Socket socket, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ExportedHandlerConnectHandler where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty ExportedHandlerConnectHandler := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ExportedHandlerConnectHandler := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ExportedHandlerConnectHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerConnectHandler", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ExportedHandlerConnectHandler.ofFn {Env : Type} [FromJS Env] (f : Socket → Env → ExecutionContext → Async Unit) : IO ExportedHandlerConnectHandler := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ExportedHandlerConnectHandler.ofSyncFn {Env : Type} [FromJS Env] (f : Socket → Env → ExecutionContext → IO Unit) : IO ExportedHandlerConnectHandler := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
 
 /-- `get readable(): ReadableStream`: `readonly attribute ReadableStream readable` -/
 def Socket.readable (self : Socket) : IO ReadableStream := do

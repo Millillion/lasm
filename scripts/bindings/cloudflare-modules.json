@@ -12,6 +12,10 @@
   "title": "R2 object storage (R2Bucket)"
  },
  {
+  "name": "Workers",
+  "title": "the fetch and scheduled handlers and their ExecutionContext (env of cloudflare:workers)"
+ },
+ {
   "name": "Queues",
   "title": "Queues (Queue, MessageBatch)"
  },
@@ -36,8 +40,12 @@
   "title": "Tail Workers, trace events and tracing (TraceItem, TailStream, Tracing)"
  },
  {
-  "name": "Workers",
-  "title": "handlers and their ExecutionContext (fetch, scheduled, queue; env of cloudflare:workers); Email Workers and sending email (ForwardableEmailMessage, SendEmail)"
+  "name": "Email",
+  "title": "Email Workers and sending email (ForwardableEmailMessage, SendEmail)"
+ },
+ {
+  "name": "Handlers",
+  "title": "ExportedHandler, every handler of a Worker together (fetch, scheduled, queue, email, tail, trace, tailStream, connect, test)"
  },
  {
   "name": "HtmlRewriter",

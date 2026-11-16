@@ -9,9 +9,14 @@ declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Cloudflare.Support
 import Lasm.JS.Web.Dom
+import Lasm.JS.Cloudflare.Workers
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
+
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface TailEvent` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure TailEvent where
@@ -36,43 +41,6 @@ structure UnsafeTraceMetrics where
 instance : Nonempty UnsafeTraceMetrics := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS UnsafeTraceMetrics := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UnsafeTraceMetrics := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.UnsafeTraceMetrics", .data⟩
-
-/-- `interface Tracing` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
-structure Tracing where
-  /-- The JavaScript object. -/
-  val : Value
-instance : Nonempty Tracing := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS Tracing := ⟨fun x => .ref x.val ""⟩
-instance : FromJS Tracing := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.Tracing", .data⟩
-
-/-- `interface Span` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
-structure Span where
-  /-- The JavaScript object. -/
-  val : Value
-instance : Nonempty Span := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS Span := ⟨fun x => .ref x.val ""⟩
-instance : FromJS Span := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.Span", .data⟩
-
-/-- `enum TracingSpanStatusCode` (@cloudflare/workers-types 5.20261019.1 type declarations): "unset", "ok", "error". -/
-inductive TracingSpanStatusCode where
-  /-- "unset" -/
-  | unset
-  /-- "ok" -/
-  | ok
-  /-- "error" -/
-  | error
-  deriving BEq, Repr, Inhabited
-instance : ToJS TracingSpanStatusCode := ⟨fun
-  | .unset => .string "unset"
-  | .ok => .string "ok"
-  | .error => .string "error"⟩
-instance : FromJS TracingSpanStatusCode where
-  fromJS
-    | .string "unset" => .ok .unset
-    | .string "ok" => .ok .ok
-    | .string "error" => .ok .error
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.TracingSpanStatusCode"
 
 /-- `enum FetchEventInfoType` (@cloudflare/workers-types 5.20261019.1 type declarations): "fetch". -/
 inductive FetchEventInfoType where
@@ -229,19 +197,6 @@ instance : FromJS CustomEventInfoType where
     | .string "custom" => .ok .custom
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Cloudflare.CustomEventInfoType"
-
-/-- `enum FetchResponseInfoType` (@cloudflare/workers-types 5.20261019.1 type declarations): "fetch". -/
-inductive FetchResponseInfoType where
-  /-- "fetch" -/
-  | fetch
-  deriving BEq, Repr, Inhabited
-instance : ToJS FetchResponseInfoType := ⟨fun
-  | .fetch => .string "fetch"⟩
-instance : FromJS FetchResponseInfoType where
-  fromJS
-    | .string "fetch" => .ok .fetch
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Cloudflare.FetchResponseInfoType"
 
 /-- `enum ConnectEventInfoType` (@cloudflare/workers-types 5.20261019.1 type declarations): "connect". -/
 inductive ConnectEventInfoType where
@@ -619,13 +574,6 @@ instance : FromJS TraceItemTailEventInfo where
     consumedEvents := ← Lasm.JS.readField (Array TraceItemTailEventInfoTailItem) d "consumedEvents" }
   typeName := "Lasm.JS.Cloudflare.TraceItemTailEventInfo"
 
-/-- `dictionary TraceItemCustomEventInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure TraceItemCustomEventInfo where
-instance : ToJS TraceItemCustomEventInfo := ⟨fun _ => Support.fields #[]⟩
-instance : FromJS TraceItemCustomEventInfo where
-  fromJS d := match d with | .object _ => .ok {} | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.TraceItemCustomEventInfo"
-
 /-- `dictionary TraceItemHibernatableWebSocketEventInfoMessage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TraceItemHibernatableWebSocketEventInfoMessage where
   /-- `required DOMString webSocketEventType` -/
@@ -654,31 +602,19 @@ instance : FromJS TraceItemHibernatableWebSocketEventInfoClose where
     wasClean := ← Lasm.JS.readField Bool d "wasClean" }
   typeName := "Lasm.JS.Cloudflare.TraceItemHibernatableWebSocketEventInfoClose"
 
-/-- `dictionary TraceItemHibernatableWebSocketEventInfoError` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure TraceItemHibernatableWebSocketEventInfoError where
-  /-- `required DOMString webSocketEventType` -/
-  webSocketEventType : String
-instance : ToJS TraceItemHibernatableWebSocketEventInfoError := ⟨fun d => Support.fields #[("webSocketEventType", toJS d.webSocketEventType)]⟩
-instance : FromJS TraceItemHibernatableWebSocketEventInfoError where
-  fromJS d := do return {
-    webSocketEventType := ← Lasm.JS.readField String d "webSocketEventType" }
-  typeName := "Lasm.JS.Cloudflare.TraceItemHibernatableWebSocketEventInfoError"
-
-/-- `typedef TraceItemHibernatableWebSocketEventInfoMessage or TraceItemHibernatableWebSocketEventInfoClose or TraceItemHibernatableWebSocketEventInfoError TraceItemHibernatableWebSocketEventInfoMessageOrTraceItemHibernatableWebSocketEventInfoCloseOrTraceItemHibernatableWebSocketEventInfoError`: one constructor per member type. -/
+/-- `typedef TraceItemHibernatableWebSocketEventInfoMessage or TraceItemHibernatableWebSocketEventInfoClose or TraceItemHibernatableWebSocketEventInfoMessage TraceItemHibernatableWebSocketEventInfoMessageOrTraceItemHibernatableWebSocketEventInfoCloseOrTraceItemHibernatableWebSocketEventInfoError`: one constructor per member type. -/
 inductive TraceItemHibernatableWebSocketEventInfoMessageOrTraceItemHibernatableWebSocketEventInfoCloseOrTraceItemHibernatableWebSocketEventInfoError where
   /-- `TraceItemHibernatableWebSocketEventInfoMessage` -/
   | traceItemHibernatableWebSocketEventInfoMessage (value : TraceItemHibernatableWebSocketEventInfoMessage)
   /-- `TraceItemHibernatableWebSocketEventInfoClose` -/
   | traceItemHibernatableWebSocketEventInfoClose (value : TraceItemHibernatableWebSocketEventInfoClose)
-  /-- `TraceItemHibernatableWebSocketEventInfoError` -/
-  | traceItemHibernatableWebSocketEventInfoError (value : TraceItemHibernatableWebSocketEventInfoError)
+  /-- `TraceItemHibernatableWebSocketEventInfoMessage` -/
+  | traceItemHibernatableWebSocketEventInfoMessage2 (value : TraceItemHibernatableWebSocketEventInfoMessage)
 instance : ToJS TraceItemHibernatableWebSocketEventInfoMessageOrTraceItemHibernatableWebSocketEventInfoCloseOrTraceItemHibernatableWebSocketEventInfoError := ⟨fun
   | .traceItemHibernatableWebSocketEventInfoMessage v => toJS v
   | .traceItemHibernatableWebSocketEventInfoClose v => toJS v
-  | .traceItemHibernatableWebSocketEventInfoError v => toJS v⟩
-instance : Coe TraceItemHibernatableWebSocketEventInfoMessage TraceItemHibernatableWebSocketEventInfoMessageOrTraceItemHibernatableWebSocketEventInfoCloseOrTraceItemHibernatableWebSocketEventInfoError := ⟨.traceItemHibernatableWebSocketEventInfoMessage⟩
+  | .traceItemHibernatableWebSocketEventInfoMessage2 v => toJS v⟩
 instance : Coe TraceItemHibernatableWebSocketEventInfoClose TraceItemHibernatableWebSocketEventInfoMessageOrTraceItemHibernatableWebSocketEventInfoCloseOrTraceItemHibernatableWebSocketEventInfoError := ⟨.traceItemHibernatableWebSocketEventInfoClose⟩
-instance : Coe TraceItemHibernatableWebSocketEventInfoError TraceItemHibernatableWebSocketEventInfoMessageOrTraceItemHibernatableWebSocketEventInfoCloseOrTraceItemHibernatableWebSocketEventInfoError := ⟨.traceItemHibernatableWebSocketEventInfoError⟩
 
 /-- `dictionary TraceItemHibernatableWebSocketEventInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TraceItemHibernatableWebSocketEventInfo where
@@ -686,7 +622,7 @@ structure TraceItemHibernatableWebSocketEventInfo where
   getWebSocketEvent : TraceItemHibernatableWebSocketEventInfoMessageOrTraceItemHibernatableWebSocketEventInfoCloseOrTraceItemHibernatableWebSocketEventInfoError
 instance : ToJS TraceItemHibernatableWebSocketEventInfo := ⟨fun d => Support.fields #[("getWebSocketEvent", toJS d.getWebSocketEvent)]⟩
 
-/-- `typedef TraceItemFetchEventInfo or TraceItemJsRpcEventInfo or TraceItemConnectEventInfo or TraceItemScheduledEventInfo or TraceItemAlarmEventInfo or TraceItemQueueEventInfo or TraceItemEmailEventInfo or TraceItemTailEventInfo or TraceItemCustomEventInfo or TraceItemHibernatableWebSocketEventInfo TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo`: one constructor per member type. -/
+/-- `typedef TraceItemFetchEventInfo or TraceItemJsRpcEventInfo or TraceItemConnectEventInfo or TraceItemScheduledEventInfo or TraceItemAlarmEventInfo or TraceItemQueueEventInfo or TraceItemEmailEventInfo or TraceItemTailEventInfo or TraceItemConnectEventInfo or TraceItemHibernatableWebSocketEventInfo TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo`: one constructor per member type. -/
 inductive TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo where
   /-- `TraceItemFetchEventInfo` -/
   | traceItemFetchEventInfo (value : TraceItemFetchEventInfo)
@@ -704,8 +640,8 @@ inductive TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEven
   | traceItemEmailEventInfo (value : TraceItemEmailEventInfo)
   /-- `TraceItemTailEventInfo` -/
   | traceItemTailEventInfo (value : TraceItemTailEventInfo)
-  /-- `TraceItemCustomEventInfo` -/
-  | traceItemCustomEventInfo (value : TraceItemCustomEventInfo)
+  /-- `TraceItemConnectEventInfo` -/
+  | traceItemConnectEventInfo2 (value : TraceItemConnectEventInfo)
   /-- `TraceItemHibernatableWebSocketEventInfo` -/
   | traceItemHibernatableWebSocketEventInfo (value : TraceItemHibernatableWebSocketEventInfo)
 instance : ToJS TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo := ⟨fun
@@ -717,17 +653,15 @@ instance : ToJS TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConne
   | .traceItemQueueEventInfo v => toJS v
   | .traceItemEmailEventInfo v => toJS v
   | .traceItemTailEventInfo v => toJS v
-  | .traceItemCustomEventInfo v => toJS v
+  | .traceItemConnectEventInfo2 v => toJS v
   | .traceItemHibernatableWebSocketEventInfo v => toJS v⟩
 instance : Coe TraceItemFetchEventInfo TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo := ⟨.traceItemFetchEventInfo⟩
 instance : Coe TraceItemJsRpcEventInfo TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo := ⟨.traceItemJsRpcEventInfo⟩
-instance : Coe TraceItemConnectEventInfo TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo := ⟨.traceItemConnectEventInfo⟩
 instance : Coe TraceItemScheduledEventInfo TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo := ⟨.traceItemScheduledEventInfo⟩
 instance : Coe TraceItemAlarmEventInfo TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo := ⟨.traceItemAlarmEventInfo⟩
 instance : Coe TraceItemQueueEventInfo TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo := ⟨.traceItemQueueEventInfo⟩
 instance : Coe TraceItemEmailEventInfo TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo := ⟨.traceItemEmailEventInfo⟩
 instance : Coe TraceItemTailEventInfo TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo := ⟨.traceItemTailEventInfo⟩
-instance : Coe TraceItemCustomEventInfo TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo := ⟨.traceItemCustomEventInfo⟩
 instance : Coe TraceItemHibernatableWebSocketEventInfo TraceItemFetchEventInfoOrTraceItemJsRpcEventInfoOrTraceItemConnectEventInfoOrTraceItemScheduledEventInfoOrTraceItemAlarmEventInfoOrTraceItemQueueEventInfoOrTraceItemEmailEventInfoOrTraceItemTailEventInfoOrTraceItemCustomEventInfoOrTraceItemHibernatableWebSocketEventInfo := ⟨.traceItemHibernatableWebSocketEventInfo⟩
 
 /-- `dictionary TraceLogErrorInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -828,29 +762,6 @@ instance : FromJS ScriptVersion where
     message := ← Lasm.JS.readField (Option String) d "message" }
   typeName := "Lasm.JS.Cloudflare.ScriptVersion"
 
-/-- `typedef boolean or double or DOMString BooleanOrDoubleOrDOMString`: one constructor per member type. -/
-inductive BooleanOrDoubleOrDOMString where
-  /-- `boolean` -/
-  | boolean (value : Bool)
-  /-- `double` -/
-  | double (value : Float)
-  /-- `DOMString` -/
-  | domString (value : String)
-instance : ToJS BooleanOrDoubleOrDOMString := ⟨fun
-  | .boolean v => toJS v
-  | .double v => toJS v
-  | .domString v => toJS v⟩
-instance : Coe Bool BooleanOrDoubleOrDOMString := ⟨.boolean⟩
-instance : Coe Float BooleanOrDoubleOrDOMString := ⟨.double⟩
-instance : Coe String BooleanOrDoubleOrDOMString := ⟨.domString⟩
-instance : FromJS BooleanOrDoubleOrDOMString where
-  fromJS
-    | d@(.bool _) => (FromJS.fromJS d : Except String Bool).map .boolean
-    | d@(.number _) => (FromJS.fromJS d : Except String Float).map .double
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.BooleanOrDoubleOrDOMString"
-
 /-- `dictionary TracePreviewInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TracePreviewInfo where
   /-- `required DOMString id` -/
@@ -932,85 +843,11 @@ structure TraceMetrics where
   cpuTime : Float
   /-- `required double wallTime` -/
   wallTime : Float
-instance : ToJS TraceMetrics := ⟨fun d => Support.fields #[("cpuTime", toJS d.cpuTime),
-    ("wallTime", toJS d.wallTime)]⟩
 instance : FromJS TraceMetrics where
   fromJS d := do return {
     cpuTime := ← Lasm.JS.readField Float d "cpuTime",
     wallTime := ← Lasm.JS.readField Float d "wallTime" }
   typeName := "Lasm.JS.Cloudflare.TraceMetrics"
-
-/-- `callback TracingEnterSpanCallback = any (Span span, any args)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure TracingEnterSpanCallback where
-  /-- The JavaScript function. -/
-  val : Value
-instance : Nonempty TracingEnterSpanCallback := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS TracingEnterSpanCallback := ⟨fun x => .ref x.val ""⟩
-instance : FromJS TracingEnterSpanCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.TracingEnterSpanCallback", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def TracingEnterSpanCallback.ofFn (f : Span → Data → Async Data) : IO TracingEnterSpanCallback := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Span args 0) (← Support.arg Data args 1))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
-  return { val := fn }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def TracingEnterSpanCallback.ofSyncFn (f : Span → Data → IO Data) : IO TracingEnterSpanCallback := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Span args 0) (← Support.arg Data args 1))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
-  return { val := fn }
-
-/-- `callback TracingStartActiveSpanCallback = any (Span span, any args)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure TracingStartActiveSpanCallback where
-  /-- The JavaScript function. -/
-  val : Value
-instance : Nonempty TracingStartActiveSpanCallback := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS TracingStartActiveSpanCallback := ⟨fun x => .ref x.val ""⟩
-instance : FromJS TracingStartActiveSpanCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.TracingStartActiveSpanCallback", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def TracingStartActiveSpanCallback.ofFn (f : Span → Data → Async Data) : IO TracingStartActiveSpanCallback := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Span args 0) (← Support.arg Data args 1))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
-  return { val := fn }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def TracingStartActiveSpanCallback.ofSyncFn (f : Span → Data → IO Data) : IO TracingStartActiveSpanCallback := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Span args 0) (← Support.arg Data args 1))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
-  return { val := fn }
-
-/-- `dictionary TracingSpanContext` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure TracingSpanContext where
-  /-- `required DOMString traceId` -/
-  traceId : String
-  /-- `required DOMString spanId` -/
-  spanId : String
-  /-- `required double traceFlags` -/
-  traceFlags : Float
-instance : ToJS TracingSpanContext := ⟨fun d => Support.fields #[("traceId", toJS d.traceId),
-    ("spanId", toJS d.spanId),
-    ("traceFlags", toJS d.traceFlags)]⟩
-instance : FromJS TracingSpanContext where
-  fromJS d := do return {
-    traceId := ← Lasm.JS.readField String d "traceId",
-    spanId := ← Lasm.JS.readField String d "spanId",
-    traceFlags := ← Lasm.JS.readField Float d "traceFlags" }
-  typeName := "Lasm.JS.Cloudflare.TracingSpanContext"
-
-/-- `dictionary TracingSpanStatus` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure TracingSpanStatus where
-  /-- `required TracingSpanStatusCode code` -/
-  code : TracingSpanStatusCode
-  /-- `DOMString message` -/
-  message : Option String := none
-instance : ToJS TracingSpanStatus := ⟨fun d => Support.fields #[("code", toJS d.code),
-    ("message", Support.optional d.message)]⟩
-instance : FromJS TracingSpanStatus where
-  fromJS d := do return {
-    code := ← Lasm.JS.readField TracingSpanStatusCode d "code",
-    message := ← Lasm.JS.readField (Option String) d "message" }
-  typeName := "Lasm.JS.Cloudflare.TracingSpanStatus"
 
 /-- `dictionary Header` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Header where
@@ -1223,15 +1060,15 @@ instance : FromJS CustomEventInfo where
 
 /-- `dictionary FetchResponseInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FetchResponseInfo where
-  /-- `required FetchResponseInfoType type` -/
-  type : FetchResponseInfoType
+  /-- `required FetchEventInfoType type` -/
+  type : FetchEventInfoType
   /-- `required double statusCode` -/
   statusCode : Float
 instance : ToJS FetchResponseInfo := ⟨fun d => Support.fields #[("type", toJS d.type),
     ("statusCode", toJS d.statusCode)]⟩
 instance : FromJS FetchResponseInfo where
   fromJS d := do return {
-    type := ← Lasm.JS.readField FetchResponseInfoType d "type",
+    type := ← Lasm.JS.readField FetchEventInfoType d "type",
     statusCode := ← Lasm.JS.readField Float d "statusCode" }
   typeName := "Lasm.JS.Cloudflare.FetchResponseInfo"
 
@@ -1262,24 +1099,6 @@ instance : FromJS TailStreamScriptVersion where
     tag := ← Lasm.JS.readField (Option String) d "tag",
     message := ← Lasm.JS.readField (Option String) d "message" }
   typeName := "Lasm.JS.Cloudflare.TailStreamScriptVersion"
-
-/-- `dictionary TailStreamTracePreviewInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure TailStreamTracePreviewInfo where
-  /-- `required DOMString id` -/
-  id : String
-  /-- `required DOMString slug` -/
-  slug : String
-  /-- `required DOMString name` -/
-  name : String
-instance : ToJS TailStreamTracePreviewInfo := ⟨fun d => Support.fields #[("id", toJS d.id),
-    ("slug", toJS d.slug),
-    ("name", toJS d.name)]⟩
-instance : FromJS TailStreamTracePreviewInfo where
-  fromJS d := do return {
-    id := ← Lasm.JS.readField String d "id",
-    slug := ← Lasm.JS.readField String d "slug",
-    name := ← Lasm.JS.readField String d "name" }
-  typeName := "Lasm.JS.Cloudflare.TailStreamTracePreviewInfo"
 
 /-- `typedef DOMString or sequence<DOMString> or boolean or sequence<boolean> or double or sequence<double> or bigint or sequence<bigint> DOMStringOrSequenceOfDOMStringOrBooleanOrSequenceOfBooleanOrDoubleOrSequenceOfDoubleOrBigintOrSequenceOfBigint`: one constructor per member type. -/
 inductive DOMStringOrSequenceOfDOMStringOrBooleanOrSequenceOfBooleanOrDoubleOrSequenceOfDoubleOrBigintOrSequenceOfBigint where
@@ -1549,24 +1368,6 @@ instance : FromJS DiagnosticChannelEvent where
     message := ← Lasm.JS.readField Data d "message" }
   typeName := "Lasm.JS.Cloudflare.DiagnosticChannelEvent"
 
-/-- `typedef DOMString or double DOMStringOrDouble`: one constructor per member type. -/
-inductive DOMStringOrDouble where
-  /-- `DOMString` -/
-  | domString (value : String)
-  /-- `double` -/
-  | double (value : Float)
-instance : ToJS DOMStringOrDouble := ⟨fun
-  | .domString v => toJS v
-  | .double v => toJS v⟩
-instance : Coe String DOMStringOrDouble := ⟨.domString⟩
-instance : Coe Float DOMStringOrDouble := ⟨.double⟩
-instance : FromJS DOMStringOrDouble where
-  fromJS
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | d@(.number _) => (FromJS.fromJS d : Except String Float).map .double
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.DOMStringOrDouble"
-
 /-- `dictionary Exception` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure Exception where
   /-- `required ExceptionType type` -/
@@ -1592,24 +1393,6 @@ instance : FromJS Exception where
     message := ← Lasm.JS.readField String d "message",
     stack := ← Lasm.JS.readField (Option String) d "stack" }
   typeName := "Lasm.JS.Cloudflare.Exception"
-
-/-- `dictionary TailStreamErrorInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure TailStreamErrorInfo where
-  /-- `required DOMString name` -/
-  name : String
-  /-- `required DOMString message` -/
-  message : String
-  /-- `DOMString stack` -/
-  stack : Option String := none
-instance : ToJS TailStreamErrorInfo := ⟨fun d => Support.fields #[("name", toJS d.name),
-    ("message", toJS d.message),
-    ("stack", Support.optional d.stack)]⟩
-instance : FromJS TailStreamErrorInfo where
-  fromJS d := do return {
-    name := ← Lasm.JS.readField String d "name",
-    message := ← Lasm.JS.readField String d "message",
-    stack := ← Lasm.JS.readField (Option String) d "stack" }
-  typeName := "Lasm.JS.Cloudflare.TailStreamErrorInfo"
 
 /-- `dictionary DroppedEventsDiagnostic` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DroppedEventsDiagnostic where
@@ -1759,27 +1542,98 @@ instance : FromJS TailEventHandlerObject where
     attributes := ← Lasm.JS.readField (Option TailEventHandler) d "attributes" }
   typeName := "Lasm.JS.Cloudflare.TailEventHandlerObject"
 
-/-- `dictionary SpanRecordExceptionException` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure SpanRecordExceptionException where
-  /-- `required DOMStringOrDouble code` -/
-  code : DOMStringOrDouble
-  /-- `DOMString name` -/
-  name : Option String := none
-  /-- `DOMString message` -/
-  message : Option String := none
-  /-- `DOMString stack` -/
-  stack : Option String := none
-instance : ToJS SpanRecordExceptionException := ⟨fun d => Support.fields #[("code", toJS d.code),
-    ("name", Support.optional d.name),
-    ("message", Support.optional d.message),
-    ("stack", Support.optional d.stack)]⟩
-instance : FromJS SpanRecordExceptionException where
-  fromJS d := do return {
-    code := ← Lasm.JS.readField DOMStringOrDouble d "code",
-    name := ← Lasm.JS.readField (Option String) d "name",
-    message := ← Lasm.JS.readField (Option String) d "message",
-    stack := ← Lasm.JS.readField (Option String) d "stack" }
-  typeName := "Lasm.JS.Cloudflare.SpanRecordExceptionException"
+/-- `callback ExportedHandlerTailHandler = Promise<undefined> (sequence<TraceItem> events, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ExportedHandlerTailHandler where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty ExportedHandlerTailHandler := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ExportedHandlerTailHandler := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ExportedHandlerTailHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerTailHandler", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ExportedHandlerTailHandler.ofFn {Env : Type} [FromJS Env] (f : (Array Data) → Env → ExecutionContext → Async Unit) : IO ExportedHandlerTailHandler := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Array Data) args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ExportedHandlerTailHandler.ofSyncFn {Env : Type} [FromJS Env] (f : (Array Data) → Env → ExecutionContext → IO Unit) : IO ExportedHandlerTailHandler := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Array Data) args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+
+/-- `callback ExportedHandlerTraceHandler = Promise<undefined> (sequence<TraceItem> traces, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ExportedHandlerTraceHandler where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty ExportedHandlerTraceHandler := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ExportedHandlerTraceHandler := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ExportedHandlerTraceHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerTraceHandler", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ExportedHandlerTraceHandler.ofFn {Env : Type} [FromJS Env] (f : (Array Data) → Env → ExecutionContext → Async Unit) : IO ExportedHandlerTraceHandler := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Array Data) args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ExportedHandlerTraceHandler.ofSyncFn {Env : Type} [FromJS Env] (f : (Array Data) → Env → ExecutionContext → IO Unit) : IO ExportedHandlerTraceHandler := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Array Data) args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+
+/-- `typedef TailEventHandler or TailEventHandlerObject TailEventHandlerOrTailEventHandlerObject`: one constructor per member type. -/
+inductive TailEventHandlerOrTailEventHandlerObject where
+  /-- `TailEventHandler` -/
+  | tailEventHandler (value : TailEventHandler)
+  /-- `TailEventHandlerObject` -/
+  | tailEventHandlerObject (value : TailEventHandlerObject)
+instance : ToJS TailEventHandlerOrTailEventHandlerObject := ⟨fun
+  | .tailEventHandler v => toJS v
+  | .tailEventHandlerObject v => toJS v⟩
+instance : Coe TailEventHandler TailEventHandlerOrTailEventHandlerObject := ⟨.tailEventHandler⟩
+instance : Coe TailEventHandlerObject TailEventHandlerOrTailEventHandlerObject := ⟨.tailEventHandlerObject⟩
+instance : FromJS TailEventHandlerOrTailEventHandlerObject where
+  fromJS
+    | d@(.ref _ _) => (FromJS.fromJS d : Except String TailEventHandler).map .tailEventHandler
+    | d@(.object _) => (FromJS.fromJS d : Except String TailEventHandlerObject).map .tailEventHandlerObject
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.TailEventHandlerOrTailEventHandlerObject"
+
+/-- `callback ExportedHandlerTailStreamHandler = Promise<TailEventHandlerOrTailEventHandlerObject?> (TailStreamTailEvent event, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ExportedHandlerTailStreamHandler where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty ExportedHandlerTailStreamHandler := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ExportedHandlerTailStreamHandler := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ExportedHandlerTailStreamHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerTailStreamHandler", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ExportedHandlerTailStreamHandler.ofFn {Env : Type} [FromJS Env] (f : TailStreamTailEvent → Env → ExecutionContext → Async (Option TailEventHandlerOrTailEventHandlerObject)) : IO ExportedHandlerTailStreamHandler := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TailStreamTailEvent args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ExportedHandlerTailStreamHandler.ofSyncFn {Env : Type} [FromJS Env] (f : TailStreamTailEvent → Env → ExecutionContext → IO (Option TailEventHandlerOrTailEventHandlerObject)) : IO ExportedHandlerTailStreamHandler := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TailStreamTailEvent args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+
+/-- `TraceItemCustomEventInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `TraceItemConnectEventInfo`. -/
+abbrev TraceItemCustomEventInfo := TraceItemConnectEventInfo
+
+/-- `TraceItemHibernatableWebSocketEventInfoError` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `TraceItemHibernatableWebSocketEventInfoMessage`. -/
+abbrev TraceItemHibernatableWebSocketEventInfoError := TraceItemHibernatableWebSocketEventInfoMessage
+
+/-- `TailStreamTracePreviewInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `TracePreviewInfo`. -/
+abbrev TailStreamTracePreviewInfo := TracePreviewInfo
+
+/-- `TailStreamErrorInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): the same members as `TraceLogErrorInfo`. -/
+abbrev TailStreamErrorInfo := TraceLogErrorInfo
+
+/-- `FetchResponseInfoType` (@cloudflare/workers-types 5.20261019.1 type declarations): the same members as `FetchEventInfoType`. -/
+abbrev FetchResponseInfoType := FetchEventInfoType
 
 /-- `get type(): string`: `readonly attribute DOMString type` -/
 def TailEvent.type (self : TailEvent) : IO String := self.val.get "type" String
@@ -1871,60 +1725,5 @@ def TraceItemFetchEventInfoRequest.getUnredacted (self : TraceItemFetchEventInfo
 /-- `fromTrace(item: TraceItem): TraceMetrics`: `TraceMetrics fromTrace(TraceItem item)` -/
 def UnsafeTraceMetrics.fromTrace (self : UnsafeTraceMetrics) (item : TraceItem) : IO TraceMetrics :=
   self.val.callMethod "fromTrace" (Support.args #[toJS item]) TraceMetrics
-
-/-- `Span: typeof Span`: `readonly attribute any Span` -/
-def Tracing.SpanClass (self : Tracing) : IO Data := self.val.get "Span" Data
-
-/-- `enterSpan<T, A extends unknown[]>(name: string, callback: (span: Span, ...args: A) => T, ...args: A): T`: `any enterSpan(DOMString name, TracingEnterSpanCallback callback, any... args)` -/
-def Tracing.enterSpan (self : Tracing) (name : String) (callback : TracingEnterSpanCallback) (args : Array Data := #[]) : IO Data :=
-  self.val.callMethod "enterSpan" (Support.argsWith #[toJS name, toJS callback] (args.map toJS)) Data
-
-/-- `startActiveSpan<T, A extends unknown[]>(name: string, callback: (span: Span, ...args: A) => T, ...args: A): T`: `any startActiveSpan(DOMString name, TracingStartActiveSpanCallback callback, any... args)` -/
-def Tracing.startActiveSpan (self : Tracing) (name : String) (callback : TracingStartActiveSpanCallback) (args : Array Data := #[]) : IO Data :=
-  self.val.callMethod "startActiveSpan" (Support.argsWith #[toJS name, toJS callback] (args.map toJS)) Data
-
-/-- `startSpan(name: string): Span`: `Span startSpan(DOMString name)` -/
-def Tracing.startSpan (self : Tracing) (name : String) : IO Span := do
-  let r ← self.val.callMethod "startSpan" (Support.args #[toJS name]) Value
-  pure { val := r }
-
-/-- `getActiveSpan(): Span | undefined`: `Span? getActiveSpan()` -/
-def Tracing.getActiveSpan (self : Tracing) : IO (Option Span) :=
-  self.val.callMethod "getActiveSpan" (Support.args #[]) (Option Span)
-
-/-- `get isTraced(): boolean`: `readonly attribute boolean isTraced` -/
-def Span.isTraced (self : Span) : IO Bool := self.val.get "isTraced" Bool
-
-/-- `spanContext(): TracingSpanContext`: `TracingSpanContext spanContext()` -/
-def Span.spanContext (self : Span) : IO TracingSpanContext :=
-  self.val.callMethod "spanContext" (Support.args #[]) TracingSpanContext
-
-/-- `setAttribute(key: string, value: boolean | number | string): this`: `Span setAttribute(DOMString key, BooleanOrDoubleOrDOMString value)` -/
-def Span.setAttribute (self : Span) (key : String) (value : BooleanOrDoubleOrDOMString) : IO Span := do
-  let r ← self.val.callMethod "setAttribute" (Support.args #[toJS key, toJS value]) Value
-  pure { val := r }
-
-/-- `setAttributes(attributes: Record<string, boolean | number | string | undefined>): this`: `Span setAttributes(record<DOMString, BooleanOrDoubleOrDOMString?> attributes)` -/
-def Span.setAttributes (self : Span) (attributes : Record (Option BooleanOrDoubleOrDOMString)) : IO Span := do
-  let r ← self.val.callMethod "setAttributes" (Support.args #[toJS attributes]) Value
-  pure { val := r }
-
-/-- `recordException(exception: | string | { code: string | number; name?: string; message?: string; stack?: string; } | { code?: string | number; name: string; message?: string; stack?: string; } | { code?: string | number; name?: string; message: string; stack?: string; }): void`: `undefined recordException(any exception)` -/
-def Span.recordException (self : Span) (exception : Data) : IO Unit :=
-  self.val.callMethod "recordException" (Support.args #[toJS exception]) Unit
-
-/-- `updateName(name: string): this`: `Span updateName(DOMString name)` -/
-def Span.updateName (self : Span) (name : String) : IO Span := do
-  let r ← self.val.callMethod "updateName" (Support.args #[toJS name]) Value
-  pure { val := r }
-
-/-- `setStatus(status: TracingSpanStatus): this`: `Span setStatus(TracingSpanStatus status)` -/
-def Span.setStatus (self : Span) (status : TracingSpanStatus) : IO Span := do
-  let r ← self.val.callMethod "setStatus" (Support.args #[toJS status]) Value
-  pure { val := r }
-
-/-- `end(): void`: `undefined end()` -/
-def Span.«end» (self : Span) : IO Unit :=
-  self.val.callMethod "end" (Support.args #[]) Unit
 
 end Lasm.JS.Cloudflare

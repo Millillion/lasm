@@ -16,6 +16,10 @@ import Lasm.JS.Cloudflare.Containers
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
 
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
 /-- `interface DurableObjectNamespace` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure DurableObjectNamespace where
   /-- The JavaScript object. -/
@@ -127,6 +131,14 @@ structure SyncKvStorage where
 instance : Nonempty SyncKvStorage := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS SyncKvStorage := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SyncKvStorage := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.SyncKvStorage", .data⟩
+
+/-- `interface CloudflareWorkersModule.DurableObject` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
+structure CloudflareWorkersModuleDurableObject where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty CloudflareWorkersModuleDurableObject := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS CloudflareWorkersModuleDurableObject := ⟨fun x => .ref x.val ""⟩
+instance : FromJS CloudflareWorkersModuleDurableObject := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.CloudflareWorkersModuleDurableObject", .data⟩
 
 /-- `enum DurableObjectJurisdiction` (@cloudflare/workers-types 5.20261019.1 type declarations): "eu", "fedramp", "fedramp-high", "us". -/
 inductive DurableObjectJurisdiction where
@@ -268,10 +280,6 @@ structure DurableObjectAbortOptions where
   /-- `boolean retryAlarm` -/
   retryAlarm : Option Bool := none
 instance : ToJS DurableObjectAbortOptions := ⟨fun d => Support.fields #[("retryAlarm", Support.optional d.retryAlarm)]⟩
-instance : FromJS DurableObjectAbortOptions where
-  fromJS d := do return {
-    retryAlarm := ← Lasm.JS.readField (Option Bool) d "retryAlarm" }
-  typeName := "Lasm.JS.Cloudflare.DurableObjectAbortOptions"
 
 /-- `dictionary DurableObjectGetOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DurableObjectGetOptions where
@@ -281,11 +289,6 @@ structure DurableObjectGetOptions where
   noCache : Option Bool := none
 instance : ToJS DurableObjectGetOptions := ⟨fun d => Support.fields #[("allowConcurrency", Support.optional d.allowConcurrency),
     ("noCache", Support.optional d.noCache)]⟩
-instance : FromJS DurableObjectGetOptions where
-  fromJS d := do return {
-    allowConcurrency := ← Lasm.JS.readField (Option Bool) d "allowConcurrency",
-    noCache := ← Lasm.JS.readField (Option Bool) d "noCache" }
-  typeName := "Lasm.JS.Cloudflare.DurableObjectGetOptions"
 
 /-- `dictionary DurableObjectListOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DurableObjectListOptions where
@@ -313,17 +316,6 @@ instance : ToJS DurableObjectListOptions := ⟨fun d => Support.fields #[("start
     ("limit", Support.optional d.limit),
     ("allowConcurrency", Support.optional d.allowConcurrency),
     ("noCache", Support.optional d.noCache)]⟩
-instance : FromJS DurableObjectListOptions where
-  fromJS d := do return {
-    start := ← Lasm.JS.readField (Option String) d "start",
-    startAfter := ← Lasm.JS.readField (Option String) d "startAfter",
-    «end» := ← Lasm.JS.readField (Option String) d "end",
-    «prefix» := ← Lasm.JS.readField (Option String) d "prefix",
-    reverse := ← Lasm.JS.readField (Option Bool) d "reverse",
-    limit := ← Lasm.JS.readField (Option Float) d "limit",
-    allowConcurrency := ← Lasm.JS.readField (Option Bool) d "allowConcurrency",
-    noCache := ← Lasm.JS.readField (Option Bool) d "noCache" }
-  typeName := "Lasm.JS.Cloudflare.DurableObjectListOptions"
 
 /-- `dictionary DurableObjectPutOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DurableObjectPutOptions where
@@ -336,12 +328,6 @@ structure DurableObjectPutOptions where
 instance : ToJS DurableObjectPutOptions := ⟨fun d => Support.fields #[("allowConcurrency", Support.optional d.allowConcurrency),
     ("allowUnconfirmed", Support.optional d.allowUnconfirmed),
     ("noCache", Support.optional d.noCache)]⟩
-instance : FromJS DurableObjectPutOptions where
-  fromJS d := do return {
-    allowConcurrency := ← Lasm.JS.readField (Option Bool) d "allowConcurrency",
-    allowUnconfirmed := ← Lasm.JS.readField (Option Bool) d "allowUnconfirmed",
-    noCache := ← Lasm.JS.readField (Option Bool) d "noCache" }
-  typeName := "Lasm.JS.Cloudflare.DurableObjectPutOptions"
 
 /-- `callback DurableObjectStorageTransactionClosure = Promise<any> (DurableObjectTransaction txn)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure DurableObjectStorageTransactionClosure where
@@ -368,10 +354,6 @@ structure DurableObjectGetAlarmOptions where
   /-- `boolean allowConcurrency` -/
   allowConcurrency : Option Bool := none
 instance : ToJS DurableObjectGetAlarmOptions := ⟨fun d => Support.fields #[("allowConcurrency", Support.optional d.allowConcurrency)]⟩
-instance : FromJS DurableObjectGetAlarmOptions where
-  fromJS d := do return {
-    allowConcurrency := ← Lasm.JS.readField (Option Bool) d "allowConcurrency" }
-  typeName := "Lasm.JS.Cloudflare.DurableObjectGetAlarmOptions"
 
 /-- `dictionary DurableObjectSetAlarmOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DurableObjectSetAlarmOptions where
@@ -381,11 +363,6 @@ structure DurableObjectSetAlarmOptions where
   allowUnconfirmed : Option Bool := none
 instance : ToJS DurableObjectSetAlarmOptions := ⟨fun d => Support.fields #[("allowConcurrency", Support.optional d.allowConcurrency),
     ("allowUnconfirmed", Support.optional d.allowUnconfirmed)]⟩
-instance : FromJS DurableObjectSetAlarmOptions where
-  fromJS d := do return {
-    allowConcurrency := ← Lasm.JS.readField (Option Bool) d "allowConcurrency",
-    allowUnconfirmed := ← Lasm.JS.readField (Option Bool) d "allowUnconfirmed" }
-  typeName := "Lasm.JS.Cloudflare.DurableObjectSetAlarmOptions"
 
 /-- `callback DurableObjectStorageTransactionSyncClosure = any ()` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure DurableObjectStorageTransactionSyncClosure where
@@ -453,8 +430,6 @@ structure ColoLocalActorNamespaceGet where
   fetch : ColoLocalActorNamespaceGetFetch
   /-- `required ColoLocalActorNamespaceGetConnect connect` -/
   connect : ColoLocalActorNamespaceGetConnect
-instance : ToJS ColoLocalActorNamespaceGet := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
-    ("connect", toJS d.connect)]⟩
 instance : FromJS ColoLocalActorNamespaceGet where
   fromJS d := do return {
     fetch := ← Lasm.JS.readField ColoLocalActorNamespaceGetFetch d "fetch",
@@ -472,12 +447,6 @@ structure AlarmInvocationInfo where
 instance : ToJS AlarmInvocationInfo := ⟨fun d => Support.fields #[("isRetry", toJS d.isRetry),
     ("retryCount", toJS d.retryCount),
     ("scheduledTime", toJS d.scheduledTime)]⟩
-instance : FromJS AlarmInvocationInfo where
-  fromJS d := do return {
-    isRetry := ← Lasm.JS.readField Bool d "isRetry",
-    retryCount := ← Lasm.JS.readField Float d "retryCount",
-    scheduledTime := ← Lasm.JS.readField Float d "scheduledTime" }
-  typeName := "Lasm.JS.Cloudflare.AlarmInvocationInfo"
 
 /-- `typedef DOMString or ArrayBuffer DOMStringOrArrayBuffer`: one constructor per member type. -/
 inductive DOMStringOrArrayBuffer where
@@ -502,12 +471,6 @@ instance : ToJS DurableObjectIdOrDOMString := ⟨fun
   | .domString v => toJS v⟩
 instance : Coe DurableObjectId DurableObjectIdOrDOMString := ⟨.durableObjectId⟩
 instance : Coe String DurableObjectIdOrDOMString := ⟨.domString⟩
-instance : FromJS DurableObjectIdOrDOMString where
-  fromJS
-    | d@(.ref _ _) => (FromJS.fromJS d : Except String DurableObjectId).map .durableObjectId
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | _ => .error ""
-  typeName := "Lasm.JS.Cloudflare.DurableObjectIdOrDOMString"
 
 /-- `dictionary DurableObjectClass` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DurableObjectClass where
@@ -524,11 +487,6 @@ structure FacetStartupOptions where
   «class» : DurableObjectClass
 instance : ToJS FacetStartupOptions := ⟨fun d => Support.fields #[("id", Support.optional d.id),
     ("class", toJS d.«class»)]⟩
-instance : FromJS FacetStartupOptions where
-  fromJS d := do return {
-    id := ← Lasm.JS.readField (Option DurableObjectIdOrDOMString) d "id",
-    «class» := ← Lasm.JS.readField DurableObjectClass d "class" }
-  typeName := "Lasm.JS.Cloudflare.FacetStartupOptions"
 
 /-- `callback DurableObjectFacetsGetGetStartupOptions = Promise<FacetStartupOptions> ()` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure DurableObjectFacetsGetGetStartupOptions where
@@ -596,8 +554,6 @@ structure DurableObjectFacetsGet where
   fetch : DurableObjectFacetsGetFetch
   /-- `required DurableObjectFacetsGetConnect connect` -/
   connect : DurableObjectFacetsGetConnect
-instance : ToJS DurableObjectFacetsGet := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
-    ("connect", toJS d.connect)]⟩
 instance : FromJS DurableObjectFacetsGet where
   fromJS d := do return {
     fetch := ← Lasm.JS.readField DurableObjectFacetsGetFetch d "fetch",
@@ -624,15 +580,6 @@ instance : ToJS SyncKvListOptions := ⟨fun d => Support.fields #[("start", Supp
     ("prefix", Support.optional d.«prefix»),
     ("reverse", Support.optional d.reverse),
     ("limit", Support.optional d.limit)]⟩
-instance : FromJS SyncKvListOptions where
-  fromJS d := do return {
-    start := ← Lasm.JS.readField (Option String) d "start",
-    startAfter := ← Lasm.JS.readField (Option String) d "startAfter",
-    «end» := ← Lasm.JS.readField (Option String) d "end",
-    «prefix» := ← Lasm.JS.readField (Option String) d "prefix",
-    reverse := ← Lasm.JS.readField (Option Bool) d "reverse",
-    limit := ← Lasm.JS.readField (Option Float) d "limit" }
-  typeName := "Lasm.JS.Cloudflare.SyncKvListOptions"
 
 /-- `callback LoopbackDurableObjectNamespaceNewUniqueId = DurableObjectId (optional DurableObjectNamespaceNewUniqueIdOptions options)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure LoopbackDurableObjectNamespaceNewUniqueId where
@@ -832,11 +779,6 @@ structure LoopbackColoLocalActorNamespaceGet where
   connect : LoopbackColoLocalActorNamespaceGetConnect
 instance : ToJS LoopbackColoLocalActorNamespaceGet := ⟨fun d => Support.fields #[("fetch", toJS d.fetch),
     ("connect", toJS d.connect)]⟩
-instance : FromJS LoopbackColoLocalActorNamespaceGet where
-  fromJS d := do return {
-    fetch := ← Lasm.JS.readField LoopbackColoLocalActorNamespaceGetFetch d "fetch",
-    connect := ← Lasm.JS.readField LoopbackColoLocalActorNamespaceGetConnect d "connect" }
-  typeName := "Lasm.JS.Cloudflare.LoopbackColoLocalActorNamespaceGet"
 
 /-- `callback LoopbackColoLocalActorNamespaceGet2 = LoopbackColoLocalActorNamespaceGet (DOMString actorId)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure LoopbackColoLocalActorNamespaceGet2 where
@@ -1234,5 +1176,30 @@ def SyncKvStorage.put (self : SyncKvStorage) (key : String) (value : Data) : IO 
 /-- `delete(key: string): boolean`: `boolean delete(DOMString key)` -/
 def SyncKvStorage.delete (self : SyncKvStorage) (key : String) : IO Bool :=
   self.val.callMethod "delete" (Support.args #[toJS key]) Bool
+
+/-- `alarm?(alarmInfo?: AlarmInvocationInfo): void | Promise<void>`: `Promise<undefined> alarm(optional AlarmInvocationInfo alarmInfo)` -/
+def CloudflareWorkersModuleDurableObject.alarm (self : CloudflareWorkersModuleDurableObject) (alarmInfo : Option AlarmInvocationInfo := none) : Async Unit :=
+  self.val.callMethodAwait "alarm" (Support.args #[Support.optional alarmInfo]) Unit
+
+/-- `fetch?(request: Request): Response | Promise<Response>`: `Promise<Response> fetch(Request request)` -/
+def CloudflareWorkersModuleDurableObject.fetch (self : CloudflareWorkersModuleDurableObject) (request : Request) : Async Response := do
+  let r ← self.val.callMethodAwait "fetch" (Support.args #[toJS request]) Value
+  pure { val := r }
+
+/-- `connect?(socket: Socket): void | Promise<void>`: `Promise<undefined> connect(Socket socket)` -/
+def CloudflareWorkersModuleDurableObject.connect (self : CloudflareWorkersModuleDurableObject) (socket : Socket) : Async Unit :=
+  self.val.callMethodAwait "connect" (Support.args #[toJS socket]) Unit
+
+/-- `webSocketMessage?(ws: WebSocket, message: string | ArrayBuffer): void | Promise<void>`: `Promise<undefined> webSocketMessage(WebSocket ws, DOMStringOrArrayBuffer message)` -/
+def CloudflareWorkersModuleDurableObject.webSocketMessage (self : CloudflareWorkersModuleDurableObject) (ws : Value) (message : DOMStringOrArrayBuffer) : Async Unit :=
+  self.val.callMethodAwait "webSocketMessage" (Support.args #[toJS ws, toJS message]) Unit
+
+/-- `webSocketClose?(ws: WebSocket, code: number, reason: string, wasClean: boolean): void | Promise<void>`: `Promise<undefined> webSocketClose(WebSocket ws, double code, DOMString reason, boolean wasClean)` -/
+def CloudflareWorkersModuleDurableObject.webSocketClose (self : CloudflareWorkersModuleDurableObject) (ws : Value) (code : Float) (reason : String) (wasClean : Bool) : Async Unit :=
+  self.val.callMethodAwait "webSocketClose" (Support.args #[toJS ws, toJS code, toJS reason, toJS wasClean]) Unit
+
+/-- `webSocketError?(ws: WebSocket, error: unknown): void | Promise<void>`: `Promise<undefined> webSocketError(WebSocket ws, any error)` -/
+def CloudflareWorkersModuleDurableObject.webSocketError (self : CloudflareWorkersModuleDurableObject) (ws : Value) (error : Data) : Async Unit :=
+  self.val.callMethodAwait "webSocketError" (Support.args #[toJS ws, toJS error]) Unit
 
 end Lasm.JS.Cloudflare

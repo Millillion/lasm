@@ -13,6 +13,10 @@ import Lasm.JS.Cloudflare.Sockets
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
 
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
 /-- `interface Hyperdrive` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure Hyperdrive where
   /-- The JavaScript object. -/
@@ -54,14 +58,6 @@ instance : ToJS HyperdriveDynamicConfig := ⟨fun d => Support.fields #[("dynami
     ("targetRegion", toJS d.targetRegion),
     ("cachingEnabled", Support.optional d.cachingEnabled),
     ("maxConnections", Support.optional d.maxConnections)]⟩
-instance : FromJS HyperdriveDynamicConfig where
-  fromJS d := do return {
-    dynamicHyperdriveConnectionString := ← Lasm.JS.readField String d "dynamicHyperdriveConnectionString",
-    connectionString := ← Lasm.JS.readField String d "connectionString",
-    targetRegion := ← Lasm.JS.readField String d "targetRegion",
-    cachingEnabled := ← Lasm.JS.readField (Option Bool) d "cachingEnabled",
-    maxConnections := ← Lasm.JS.readField (Option Float) d "maxConnections" }
-  typeName := "Lasm.JS.Cloudflare.HyperdriveDynamicConfig"
 
 /-- `readonly connectionString: string`: `readonly attribute DOMString connectionString` -/
 def Hyperdrive.connectionString (self : Hyperdrive) : IO String := self.val.get "connectionString" String

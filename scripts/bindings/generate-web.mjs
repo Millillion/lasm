@@ -670,7 +670,9 @@ for (const m of plan) inTier(m.tier, () => {
     if (!d) fail(`extra type ${x} not found`);
     // Lasm.JS.Cloudflare: each is written and read wherever it is met (a field of a type read
     // here and written there), so it gets both instances where it can.
-    if (m.host?.rich) { const t = resolveName(x), at = moduleOfType.get(typeKey(t) ?? x) ?? m.key; visit(t, 'to', at); visit(t, 'from', at); continue; }
+    // Lasm.JS.Cloudflare: a type no member uses (Workers AI's per-model inputs and outputs) gets
+    // both instances, as a program may write or read it; one that members use gets what they need.
+    if (m.host?.rich) { if (moduleOfType.has(typeKey(resolveName(x)) ?? x)) continue; const t = resolveName(x); visit(t, 'to', m.key); visit(t, 'from', m.key); continue; }
     if (m.host && moduleOfType.has(x)) continue;
     visit(resolveName(x), 'to', m.key);
   }
@@ -1174,6 +1176,15 @@ function emitSupport(key, stack = []) {
 // Enums first (nothing depends on order for them), then the rest in first-use order.
 for (const k of supportKeys.filter(k => !k.startsWith('union:') && def(k).type === 'enum')) emitSupport(k);
 for (const k of supportKeys) emitSupport(k);
+// Lasm.JS.Cloudflare's shared shapes (cloudflare-api.mjs shareShapes): each later type of the same
+// members is an abbrev of the first, in its own module, after every type of that module.
+for (const m of plan) if (m.host?.rich) inTier(m.tier, () => {
+  for (const d of [...defs.values()].filter(d => d.type === 'typedef' && extAttr(d, 'LasmAlias') && hostOf(d) === m.host.name && extValue(extAttr(d, 'LasmLeanModule')) === m.name)) {
+    const target = resolve(d.idlType);
+    requireType(m.key, target);
+    out.get(m.key).support.push(`/-- \`${extValue(extAttr(d, 'LasmName')) ?? d.name}\` (${specOf(d.spec)}): the same members as \`${argType(target)}\`. -/\nabbrev ${leanTypeName(d.name)} := ${argType(target)}`);
+  }
+});
 
 // ---------- writing ----------
 
@@ -1209,6 +1220,9 @@ for (const m of plan) {
 ${m.key}: ${m.title} (${m.specs}).
 ${isNode ? nodeGeneratedBy : m.host ? hostGeneratedBy(m.host) : generatedBy}
 -/`, ...imports.map(i => `import ${i}`), '', `namespace ${m.ns}`, isNode || m.host ? 'open Lasm.JS Lasm.JS.Web' : 'open Lasm.JS', '',
+  // Lasm.JS.Cloudflare: no injectivity or sizeOf lemmas for its thousands of structures (proof
+  // support no binding needs; 15 % of the module files and a third of their compile time).
+  ...(m.host?.rich ? ['set_option genInjectivity false', 'set_option genSizeOfSpec false', 'set_option compiler.extract_closed false', ''] : []),
   ...o.types.flatMap(t => [t, '']), ...o.support.flatMap(t => [t, '']), ...o.decls.flatMap(t => [t, '']), `end ${m.ns}`, ''].join('\n');
   files.set(moduleFile(m.key), text);
 }
@@ -1237,13 +1251,13 @@ ${nodeGeneratedBy}
 -/`, ...order.filter(n => n.startsWith(NODE_NS + '.')).map(n => `import ${n}`), ''].join('\n'));
 
 files.set(join(root, 'library', 'Lasm', 'JS', 'Cloudflare.lean'), [`/-
-Lasm.JS.Cloudflare: the runtime APIs of Cloudflare Workers as declared by ${hostSource(cloudflareTier.hosts[0])}: the
-bindings of a Worker's env (Workers KV, D1, R2, Durable Objects, Queues), the handlers (fetch, scheduled, queue) and
-their ExecutionContext, the Cache API and TCP sockets, with Lasm.JS.Web's Request, Response and streams as their web
-types. The same mapping as Lasm.JS.Web: bindings are handle types, Promise results are \`Async\`, options
+Lasm.JS.Cloudflare: the runtime APIs of Cloudflare Workers as declared by ${hostSource(cloudflareTier.hosts[0])}: every
+module of Cloudflare's own APIs except ${cloudflareTier.hosts[0].umbrellaExcludes.map(n => `Lasm.JS.Cloudflare.${n}`).join(', ')},
+which a program imports by name (a Worker links what it imports: import only the modules it uses, such as
+Lasm.JS.Cloudflare.Kv and Lasm.JS.Cloudflare.D1). Lasm.JS.Web's Request, Response and streams are their web types. The same mapping as Lasm.JS.Web: bindings are handle types, Promise results are \`Async\`, options
 dictionaries, handlers callbacks made from Lean functions (docs/JS_BINDINGS.md, "Cloudflare Workers: Lasm.JS.Cloudflare").
 ${hostGeneratedBy(cloudflareTier.hosts[0])}
--/`, ...order.filter(n => n.startsWith('Lasm.JS.Cloudflare.')).map(n => `import ${n}`), ''].join('\n'));
+-/`, ...order.filter(n => n.startsWith('Lasm.JS.Cloudflare.') && !cloudflareTier.hosts[0].umbrellaExcludes.includes(n.slice(19))).map(n => `import ${n}`), ''].join('\n'));
 for (const h of serveTier.hosts) files.set(join(root, 'library', 'Lasm', 'JS', `${h.name}.lean`), [`/-
 Lasm.JS.${h.name}: ${h.name}'s HTTP server (\`${h.global}.serve\`) as declared for ${h.name} ${h.version}, with Lasm.JS.Web's
 Request and Response as the handler's types. The same mapping as Lasm.JS.Web: the server is a handle type,

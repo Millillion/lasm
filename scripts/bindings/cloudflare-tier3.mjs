@@ -63,7 +63,8 @@ export const hosts = [
       { name: 'Cache', title: 'the Cache API (caches)' },
       { name: 'Sockets', title: 'TCP sockets (connect of cloudflare:sockets)' },
       { name: 'DurableObjects', title: 'Durable Objects (DurableObjectNamespace, DurableObjectState)' },
-      { name: 'Workers', title: 'handlers and their ExecutionContext (fetch, scheduled, queue; env of cloudflare:workers)' },
+      { name: 'Workers', title: 'the fetch and scheduled handlers and their ExecutionContext (env of cloudflare:workers)' },
+      { name: 'Handlers', title: 'ExportedHandler, every handler of a Worker together (fetch, scheduled, queue, email, tail, trace, tailStream, connect, test)' },
       { name: 'Ai', title: 'Workers AI, AI Gateway, AI Search and AutoRAG, Agent memory (Ai, AiGateway, AiSearchNamespace)' },
       { name: 'Vectorize', title: 'Vectorize, vector indexes (VectorizeIndex)' },
       { name: 'Hyperdrive', title: 'Hyperdrive, database connection pooling (Hyperdrive)' },
@@ -85,8 +86,21 @@ export const hosts = [
     // Node's. Each goes to the first module whose pattern its name matches (else Services).
     // `declarations` below are only the ones that need more than the mechanical rules.
     selectAll: true,
+    // Modules the umbrella `import Lasm.JS.Cloudflare` leaves out: Workers AI's model catalog is
+    // most of the library; a program imports it by name.
+    umbrellaExcludes: ['Ai'],
     allOverloads: true,
     areas: [
+      // A Worker that uses only some bindings imports only their modules: each handler type is its
+      // event's (the queue handler is Queues'), the fetch handler and ExecutionContext are Workers'
+      // (with the tracing and Access types ExecutionContext names), and ExportedHandler, which
+      // names every handler, is Handlers', after all of them.
+      [/^ExportedHandler$/, 'Handlers'],
+      [/^ExportedHandlerQueueHandler/, 'Queues'], [/^ExportedHandler(Tail|Trace|TailStream)Handler/, 'Tail'],
+      [/^ExportedHandlerConnectHandler/, 'Sockets'], [/^EmailExportedHandler/, 'Email'],
+      [/^(Tracing|Span|TracingSpan|CloudflareAccess)/, 'Workers'],
+      [/^CloudflareWorkersModule\.DurableObject/, 'DurableObjects'],
+      [/^Disposable$/, 'Workers'], [/^InstanceStatus$/, 'Workflows'],
       [/^KVNamespace/, 'Kv'], [/^D1/, 'D1'], [/^R2/, 'R2'],
       [/^(Queue|Message|MessageBatch|MessageSend)/, 'Queues'],
       [/^(Socket|TlsOptions|cloudflare:sockets)/, 'Sockets'],
@@ -209,8 +223,8 @@ export const hosts = [
       { name: 'ScheduledController', as: 'interface', module: 'Workers' },
       { name: 'ExportedHandlerFetchHandler', as: 'callback', module: 'Workers' },
       { name: 'ExportedHandlerScheduledHandler', as: 'callback', module: 'Workers' },
-      { name: 'ExportedHandlerQueueHandler', as: 'callback', module: 'Workers' },
-      { name: 'ExportedHandler', as: 'dictionary', module: 'Workers' },
+      { name: 'ExportedHandlerQueueHandler', as: 'callback', module: 'Queues' },
+      { name: 'ExportedHandler', as: 'dictionary', module: 'Handlers' },
     ],
     intersections: {},
     integers: {},
