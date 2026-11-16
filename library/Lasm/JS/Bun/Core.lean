@@ -109,34 +109,34 @@ instance : ToJS Socket := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Socket := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.Socket", .data⟩
 
 /-- `interface Bun.TCPSocketListener` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
-structure TCPSocketListenerUndefined extends SocketListener
-instance : Nonempty TCPSocketListenerUndefined := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS TCPSocketListenerUndefined := ⟨fun x => .ref x.val ""⟩
-instance : FromJS TCPSocketListenerUndefined := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.TCPSocketListenerUndefined", .data⟩
-instance : Coe TCPSocketListenerUndefined SocketListener := ⟨TCPSocketListenerUndefined.toSocketListener⟩
+structure TCPSocketListener extends SocketListener
+instance : Nonempty TCPSocketListener := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS TCPSocketListener := ⟨fun x => .ref x.val ""⟩
+instance : FromJS TCPSocketListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.TCPSocketListener", .data⟩
+instance : Coe TCPSocketListener SocketListener := ⟨TCPSocketListener.toSocketListener⟩
 
 /-- `interface Bun.UnixSocketListener` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
-structure UnixSocketListenerUndefined extends SocketListener
-instance : Nonempty UnixSocketListenerUndefined := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS UnixSocketListenerUndefined := ⟨fun x => .ref x.val ""⟩
-instance : FromJS UnixSocketListenerUndefined := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UnixSocketListenerUndefined", .data⟩
-instance : Coe UnixSocketListenerUndefined SocketListener := ⟨UnixSocketListenerUndefined.toSocketListener⟩
+structure UnixSocketListener extends SocketListener
+instance : Nonempty UnixSocketListener := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UnixSocketListener := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UnixSocketListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UnixSocketListener", .data⟩
+instance : Coe UnixSocketListener SocketListener := ⟨UnixSocketListener.toSocketListener⟩
 
 /-- `interface Bun.udp.Socket` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
-structure udpSocketBuffer where
+structure UdpSocket where
   /-- The JavaScript object. -/
   val : Value
-instance : Nonempty udpSocketBuffer := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS udpSocketBuffer := ⟨fun x => .ref x.val ""⟩
-instance : FromJS udpSocketBuffer := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.udpSocketBuffer", .data⟩
+instance : Nonempty UdpSocket := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UdpSocket := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UdpSocket := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpSocket", .data⟩
 
 /-- `interface Bun.udp.ConnectedSocket` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
-structure udpConnectedSocketBuffer where
+structure UdpConnectedSocket where
   /-- The JavaScript object. -/
   val : Value
-instance : Nonempty udpConnectedSocketBuffer := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS udpConnectedSocketBuffer := ⟨fun x => .ref x.val ""⟩
-instance : FromJS udpConnectedSocketBuffer := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.udpConnectedSocketBuffer", .data⟩
+instance : Nonempty UdpConnectedSocket := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UdpConnectedSocket := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UdpConnectedSocket := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpConnectedSocket", .data⟩
 
 /-- `interface Bun.Terminal` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
 structure Terminal where
@@ -147,12 +147,12 @@ instance : ToJS Terminal := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Terminal := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.Terminal", .data⟩
 
 /-- `interface Bun.Subprocess` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
-structure SubprocessIgnorePipeInherit where
+structure Subprocess where
   /-- The JavaScript object. -/
   val : Value
-instance : Nonempty SubprocessIgnorePipeInherit := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS SubprocessIgnorePipeInherit := ⟨fun x => .ref x.val ""⟩
-instance : FromJS SubprocessIgnorePipeInherit := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SubprocessIgnorePipeInherit", .data⟩
+instance : Nonempty Subprocess := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS Subprocess := ⟨fun x => .ref x.val ""⟩
+instance : FromJS Subprocess := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.Subprocess", .data⟩
 
 /-- `interface Bun.ArrayBufferSink` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
 structure ArrayBufferSink where
@@ -522,27 +522,6 @@ instance : FromJS S3FilePresignOptionsMethod where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Bun.S3FilePresignOptionsMethod"
 
-/-- `enum SocketHandlerUndefinedBufferBinaryType` (Bun 1.4.4 type declarations): "arraybuffer", "buffer", "uint8array". -/
-inductive SocketHandlerUndefinedBufferBinaryType where
-  /-- "arraybuffer" -/
-  | arraybuffer
-  /-- "buffer" -/
-  | buffer
-  /-- "uint8array" -/
-  | uint8array
-  deriving BEq, Repr, Inhabited
-instance : ToJS SocketHandlerUndefinedBufferBinaryType := ⟨fun
-  | .arraybuffer => .string "arraybuffer"
-  | .buffer => .string "buffer"
-  | .uint8array => .string "uint8array"⟩
-instance : FromJS SocketHandlerUndefinedBufferBinaryType where
-  fromJS
-    | .string "arraybuffer" => .ok .arraybuffer
-    | .string "buffer" => .ok .buffer
-    | .string "uint8array" => .ok .uint8array
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Bun.SocketHandlerUndefinedBufferBinaryType"
-
 /-- `enum SocketHandlerBinaryType` (Bun 1.4.4 type declarations): "arraybuffer", "buffer", "uint8array". -/
 inductive SocketHandlerBinaryType where
   /-- "arraybuffer" -/
@@ -563,6 +542,27 @@ instance : FromJS SocketHandlerBinaryType where
     | .string "uint8array" => .ok .uint8array
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Bun.SocketHandlerBinaryType"
+
+/-- `enum SocketHandlerUnknownBufferBinaryType` (Bun 1.4.4 type declarations): "arraybuffer", "buffer", "uint8array". -/
+inductive SocketHandlerUnknownBufferBinaryType where
+  /-- "arraybuffer" -/
+  | arraybuffer
+  /-- "buffer" -/
+  | buffer
+  /-- "uint8array" -/
+  | uint8array
+  deriving BEq, Repr, Inhabited
+instance : ToJS SocketHandlerUnknownBufferBinaryType := ⟨fun
+  | .arraybuffer => .string "arraybuffer"
+  | .buffer => .string "buffer"
+  | .uint8array => .string "uint8array"⟩
+instance : FromJS SocketHandlerUnknownBufferBinaryType where
+  fromJS
+    | .string "arraybuffer" => .ok .arraybuffer
+    | .string "buffer" => .ok .buffer
+    | .string "uint8array" => .ok .uint8array
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.SocketHandlerUnknownBufferBinaryType"
 
 /-- `enum SocketUnknownRemoteFamily` (Bun 1.4.4 type declarations): "IPv4", "IPv6". -/
 inductive SocketUnknownRemoteFamily where
@@ -1485,31 +1485,31 @@ instance : FromJS GunzipSyncOptionsLibrary where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Bun.GunzipSyncOptionsLibrary"
 
-/-- `enum udpSocketOptionsBufferBinaryType` (Bun 1.4.4 type declarations): "buffer". -/
-inductive udpSocketOptionsBufferBinaryType where
+/-- `enum UdpSocketOptionsBinaryType` (Bun 1.4.4 type declarations): "buffer". -/
+inductive UdpSocketOptionsBinaryType where
   /-- "buffer" -/
   | buffer
   deriving BEq, Repr, Inhabited
-instance : ToJS udpSocketOptionsBufferBinaryType := ⟨fun
+instance : ToJS UdpSocketOptionsBinaryType := ⟨fun
   | .buffer => .string "buffer"⟩
-instance : FromJS udpSocketOptionsBufferBinaryType where
+instance : FromJS UdpSocketOptionsBinaryType where
   fromJS
     | .string "buffer" => .ok .buffer
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Bun.udpSocketOptionsBufferBinaryType"
+  typeName := "Lasm.JS.Bun.UdpSocketOptionsBinaryType"
 
-/-- `enum udpConnectSocketOptionsBufferBinaryType` (Bun 1.4.4 type declarations): "buffer". -/
-inductive udpConnectSocketOptionsBufferBinaryType where
+/-- `enum UdpConnectSocketOptionsBinaryType` (Bun 1.4.4 type declarations): "buffer". -/
+inductive UdpConnectSocketOptionsBinaryType where
   /-- "buffer" -/
   | buffer
   deriving BEq, Repr, Inhabited
-instance : ToJS udpConnectSocketOptionsBufferBinaryType := ⟨fun
+instance : ToJS UdpConnectSocketOptionsBinaryType := ⟨fun
   | .buffer => .string "buffer"⟩
-instance : FromJS udpConnectSocketOptionsBufferBinaryType where
+instance : FromJS UdpConnectSocketOptionsBinaryType where
   fromJS
     | .string "buffer" => .ok .buffer
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Bun.udpConnectSocketOptionsBufferBinaryType"
+  typeName := "Lasm.JS.Bun.UdpConnectSocketOptionsBinaryType"
 
 /-- `enum RandomUUIDv7Encoding` (Bun 1.4.4 type declarations): "hex", "base64", "base64url". -/
 inductive RandomUUIDv7Encoding where
@@ -1629,8 +1629,8 @@ instance : FromJS RandomUUIDv5WithBufferEncoding where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Bun.RandomUUIDv5WithBufferEncoding"
 
-/-- `enum markdownCellMetaAlign` (Bun 1.4.4 type declarations): "left", "center", "right". -/
-inductive markdownCellMetaAlign where
+/-- `enum MarkdownCellMetaAlign` (Bun 1.4.4 type declarations): "left", "center", "right". -/
+inductive MarkdownCellMetaAlign where
   /-- "left" -/
   | left
   /-- "center" -/
@@ -1638,17 +1638,17 @@ inductive markdownCellMetaAlign where
   /-- "right" -/
   | right
   deriving BEq, Repr, Inhabited
-instance : ToJS markdownCellMetaAlign := ⟨fun
+instance : ToJS MarkdownCellMetaAlign := ⟨fun
   | .left => .string "left"
   | .center => .string "center"
   | .right => .string "right"⟩
-instance : FromJS markdownCellMetaAlign where
+instance : FromJS MarkdownCellMetaAlign where
   fromJS
     | .string "left" => .ok .left
     | .string "center" => .ok .center
     | .string "right" => .ok .right
     | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Bun.markdownCellMetaAlign"
+  typeName := "Lasm.JS.Bun.MarkdownCellMetaAlign"
 
 /-- `enum PeekStatusResult` (Bun 1.4.4 type declarations): "pending", "fulfilled", "rejected". -/
 inductive PeekStatusResult where
@@ -2013,250 +2013,7 @@ instance : FromJS S3Stats where
     type := ← Lasm.JS.readField String d "type" }
   typeName := "Lasm.JS.Bun.S3Stats"
 
-/-- `callback SocketHandlerUndefinedBufferOpen = Promise<undefined> (Socket socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure SocketHandlerUndefinedBufferOpen where
-  /-- The JavaScript function. -/
-  val : Value
-instance : Nonempty SocketHandlerUndefinedBufferOpen := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS SocketHandlerUndefinedBufferOpen := ⟨fun x => .ref x.val ""⟩
-instance : FromJS SocketHandlerUndefinedBufferOpen := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUndefinedBufferOpen", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerUndefinedBufferOpen.ofFn (f : Socket → Async Unit) : IO SocketHandlerUndefinedBufferOpen := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
-  return { val := fn }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerUndefinedBufferOpen.ofSyncFn (f : Socket → IO Unit) : IO SocketHandlerUndefinedBufferOpen := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
-  return { val := fn }
-
-/-- `callback SocketHandlerUndefinedBufferClose = Promise<undefined> (Socket socket, optional object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure SocketHandlerUndefinedBufferClose where
-  /-- The JavaScript function. -/
-  val : Value
-instance : Nonempty SocketHandlerUndefinedBufferClose := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS SocketHandlerUndefinedBufferClose := ⟨fun x => .ref x.val ""⟩
-instance : FromJS SocketHandlerUndefinedBufferClose := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUndefinedBufferClose", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerUndefinedBufferClose.ofFn (f : Socket → Data → Async Unit) : IO SocketHandlerUndefinedBufferClose := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
-  return { val := fn }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerUndefinedBufferClose.ofSyncFn (f : Socket → Data → IO Unit) : IO SocketHandlerUndefinedBufferClose := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
-  return { val := fn }
-
-/-- `callback SocketHandlerUndefinedBufferError = Promise<undefined> (Socket socket, object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure SocketHandlerUndefinedBufferError where
-  /-- The JavaScript function. -/
-  val : Value
-instance : Nonempty SocketHandlerUndefinedBufferError := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS SocketHandlerUndefinedBufferError := ⟨fun x => .ref x.val ""⟩
-instance : FromJS SocketHandlerUndefinedBufferError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUndefinedBufferError", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerUndefinedBufferError.ofFn (f : Socket → Data → Async Unit) : IO SocketHandlerUndefinedBufferError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
-  return { val := fn }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerUndefinedBufferError.ofSyncFn (f : Socket → Data → IO Unit) : IO SocketHandlerUndefinedBufferError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
-  return { val := fn }
-
-/-- `callback SocketHandlerUndefinedBufferData = Promise<undefined> (Socket socket, Uint8Array data)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure SocketHandlerUndefinedBufferData where
-  /-- The JavaScript function. -/
-  val : Value
-instance : Nonempty SocketHandlerUndefinedBufferData := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS SocketHandlerUndefinedBufferData := ⟨fun x => .ref x.val ""⟩
-instance : FromJS SocketHandlerUndefinedBufferData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUndefinedBufferData", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerUndefinedBufferData.ofFn (f : Socket → ByteArray → Async Unit) : IO SocketHandlerUndefinedBufferData := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg ByteArray args 1))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
-  return { val := fn }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerUndefinedBufferData.ofSyncFn (f : Socket → ByteArray → IO Unit) : IO SocketHandlerUndefinedBufferData := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg ByteArray args 1))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
-  return { val := fn }
-
-/-- `callback SocketHandlerUndefinedBufferDrain = Promise<undefined> (Socket socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure SocketHandlerUndefinedBufferDrain where
-  /-- The JavaScript function. -/
-  val : Value
-instance : Nonempty SocketHandlerUndefinedBufferDrain := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS SocketHandlerUndefinedBufferDrain := ⟨fun x => .ref x.val ""⟩
-instance : FromJS SocketHandlerUndefinedBufferDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUndefinedBufferDrain", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerUndefinedBufferDrain.ofFn (f : Socket → Async Unit) : IO SocketHandlerUndefinedBufferDrain := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
-  return { val := fn }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerUndefinedBufferDrain.ofSyncFn (f : Socket → IO Unit) : IO SocketHandlerUndefinedBufferDrain := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
-  return { val := fn }
-
-/-- `callback SocketHandlerUndefinedBufferHandshake = undefined (Socket socket, boolean success, object? authorizationError)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure SocketHandlerUndefinedBufferHandshake where
-  /-- The JavaScript function. -/
-  val : Value
-instance : Nonempty SocketHandlerUndefinedBufferHandshake := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS SocketHandlerUndefinedBufferHandshake := ⟨fun x => .ref x.val ""⟩
-instance : FromJS SocketHandlerUndefinedBufferHandshake := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUndefinedBufferHandshake", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerUndefinedBufferHandshake.ofFn (f : Socket → Bool → (Option Data) → Async Unit) : IO SocketHandlerUndefinedBufferHandshake := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Bool args 1) (← Support.arg (Option Data) args 2))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
-  return { val := fn }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerUndefinedBufferHandshake.ofSyncFn (f : Socket → Bool → (Option Data) → IO Unit) : IO SocketHandlerUndefinedBufferHandshake := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Bool args 1) (← Support.arg (Option Data) args 2))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
-  return { val := fn }
-
-/-- `callback SocketHandlerUndefinedBufferEnd = Promise<undefined> (Socket socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure SocketHandlerUndefinedBufferEnd where
-  /-- The JavaScript function. -/
-  val : Value
-instance : Nonempty SocketHandlerUndefinedBufferEnd := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS SocketHandlerUndefinedBufferEnd := ⟨fun x => .ref x.val ""⟩
-instance : FromJS SocketHandlerUndefinedBufferEnd := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUndefinedBufferEnd", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerUndefinedBufferEnd.ofFn (f : Socket → Async Unit) : IO SocketHandlerUndefinedBufferEnd := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
-  return { val := fn }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerUndefinedBufferEnd.ofSyncFn (f : Socket → IO Unit) : IO SocketHandlerUndefinedBufferEnd := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
-  return { val := fn }
-
-/-- `callback SocketHandlerUndefinedBufferConnectError = Promise<undefined> (Socket socket, object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure SocketHandlerUndefinedBufferConnectError where
-  /-- The JavaScript function. -/
-  val : Value
-instance : Nonempty SocketHandlerUndefinedBufferConnectError := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS SocketHandlerUndefinedBufferConnectError := ⟨fun x => .ref x.val ""⟩
-instance : FromJS SocketHandlerUndefinedBufferConnectError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUndefinedBufferConnectError", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerUndefinedBufferConnectError.ofFn (f : Socket → Data → Async Unit) : IO SocketHandlerUndefinedBufferConnectError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
-  return { val := fn }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerUndefinedBufferConnectError.ofSyncFn (f : Socket → Data → IO Unit) : IO SocketHandlerUndefinedBufferConnectError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
-  return { val := fn }
-
-/-- `callback SocketHandlerUndefinedBufferTimeout = Promise<undefined> (Socket socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure SocketHandlerUndefinedBufferTimeout where
-  /-- The JavaScript function. -/
-  val : Value
-instance : Nonempty SocketHandlerUndefinedBufferTimeout := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS SocketHandlerUndefinedBufferTimeout := ⟨fun x => .ref x.val ""⟩
-instance : FromJS SocketHandlerUndefinedBufferTimeout := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUndefinedBufferTimeout", .data⟩
-/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerUndefinedBufferTimeout.ofFn (f : Socket → Async Unit) : IO SocketHandlerUndefinedBufferTimeout := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
-  return { val := fn }
-/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerUndefinedBufferTimeout.ofSyncFn (f : Socket → IO Unit) : IO SocketHandlerUndefinedBufferTimeout := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0))
-  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
-    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
-  return { val := fn }
-
-/-- `dictionary SocketHandlerUndefinedBuffer` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure SocketHandlerUndefinedBuffer where
-  /-- `SocketHandlerUndefinedBufferOpen open` -/
-  «open» : Option SocketHandlerUndefinedBufferOpen := none
-  /-- `SocketHandlerUndefinedBufferClose close` -/
-  close : Option SocketHandlerUndefinedBufferClose := none
-  /-- `SocketHandlerUndefinedBufferError error` -/
-  error : Option SocketHandlerUndefinedBufferError := none
-  /-- `SocketHandlerUndefinedBufferData data` -/
-  data : Option SocketHandlerUndefinedBufferData := none
-  /-- `SocketHandlerUndefinedBufferDrain drain` -/
-  drain : Option SocketHandlerUndefinedBufferDrain := none
-  /-- `SocketHandlerUndefinedBufferHandshake handshake` -/
-  handshake : Option SocketHandlerUndefinedBufferHandshake := none
-  /-- `SocketHandlerUndefinedBufferEnd end` -/
-  «end» : Option SocketHandlerUndefinedBufferEnd := none
-  /-- `SocketHandlerUndefinedBufferConnectError connectError` -/
-  connectError : Option SocketHandlerUndefinedBufferConnectError := none
-  /-- `SocketHandlerUndefinedBufferTimeout timeout` -/
-  timeout : Option SocketHandlerUndefinedBufferTimeout := none
-  /-- `SocketHandlerUndefinedBufferBinaryType binaryType` -/
-  binaryType : Option SocketHandlerUndefinedBufferBinaryType := none
-instance : ToJS SocketHandlerUndefinedBuffer := ⟨fun d => Support.fields #[("open", Support.optional d.«open»),
-    ("close", Support.optional d.close),
-    ("error", Support.optional d.error),
-    ("data", Support.optional d.data),
-    ("drain", Support.optional d.drain),
-    ("handshake", Support.optional d.handshake),
-    ("end", Support.optional d.«end»),
-    ("connectError", Support.optional d.connectError),
-    ("timeout", Support.optional d.timeout),
-    ("binaryType", Support.optional d.binaryType)]⟩
-
-/-- `dictionary SocketOptionsUndefined` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure SocketOptionsUndefined where
-  /-- `required SocketHandlerUndefinedBuffer socket` -/
-  socket : SocketHandlerUndefinedBuffer
-  /-- `undefined data` -/
-  data : Option Unit := none
-  /-- `boolean allowHalfOpen` -/
-  allowHalfOpen : Option Bool := none
-instance : ToJS SocketOptionsUndefined := ⟨fun d => Support.fields #[("socket", toJS d.socket),
-    ("data", Support.optional d.data),
-    ("allowHalfOpen", Support.optional d.allowHalfOpen)]⟩
-
-/-- `typedef DOMString or Uint8Array DOMStringOrUint8Array`: one constructor per member type. -/
-inductive DOMStringOrUint8Array where
-  /-- `DOMString` -/
-  | domString (value : String)
-  /-- `Uint8Array` -/
-  | uint8Array (value : ByteArray)
-instance : ToJS DOMStringOrUint8Array := ⟨fun
-  | .domString v => toJS v
-  | .uint8Array v => toJS v⟩
-instance : Coe String DOMStringOrUint8Array := ⟨.domString⟩
-instance : Coe ByteArray DOMStringOrUint8Array := ⟨.uint8Array⟩
-instance : FromJS DOMStringOrUint8Array where
-  fromJS
-    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
-    | d@(.bytes _) => (FromJS.fromJS d : Except String ByteArray).map .uint8Array
-    | _ => .error ""
-  typeName := "Lasm.JS.Bun.DOMStringOrUint8Array"
-
-/-- `callback SocketHandlerOpen = Promise<undefined> (SocketUnknown socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback SocketHandlerOpen = Promise<undefined> (Socket socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SocketHandlerOpen where
   /-- The JavaScript function. -/
   val : Value
@@ -2264,19 +2021,19 @@ instance : Nonempty SocketHandlerOpen := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS SocketHandlerOpen := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerOpen := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerOpen", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerOpen.ofFn (f : SocketUnknown → Async Unit) : IO SocketHandlerOpen := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+def SocketHandlerOpen.ofFn (f : Socket → Async Unit) : IO SocketHandlerOpen := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerOpen.ofSyncFn (f : SocketUnknown → IO Unit) : IO SocketHandlerOpen := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+def SocketHandlerOpen.ofSyncFn (f : Socket → IO Unit) : IO SocketHandlerOpen := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback SocketHandlerClose = Promise<undefined> (SocketUnknown socket, optional object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback SocketHandlerClose = Promise<undefined> (Socket socket, optional object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SocketHandlerClose where
   /-- The JavaScript function. -/
   val : Value
@@ -2284,19 +2041,19 @@ instance : Nonempty SocketHandlerClose := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS SocketHandlerClose := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerClose := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerClose", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerClose.ofFn (f : SocketUnknown → Data → Async Unit) : IO SocketHandlerClose := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+def SocketHandlerClose.ofFn (f : Socket → Data → Async Unit) : IO SocketHandlerClose := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerClose.ofSyncFn (f : SocketUnknown → Data → IO Unit) : IO SocketHandlerClose := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+def SocketHandlerClose.ofSyncFn (f : Socket → Data → IO Unit) : IO SocketHandlerClose := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `callback SocketHandlerError = Promise<undefined> (SocketUnknown socket, object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback SocketHandlerError = Promise<undefined> (Socket socket, object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SocketHandlerError where
   /-- The JavaScript function. -/
   val : Value
@@ -2304,19 +2061,19 @@ instance : Nonempty SocketHandlerError := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS SocketHandlerError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerError.ofFn (f : SocketUnknown → Data → Async Unit) : IO SocketHandlerError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+def SocketHandlerError.ofFn (f : Socket → Data → Async Unit) : IO SocketHandlerError := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerError.ofSyncFn (f : SocketUnknown → Data → IO Unit) : IO SocketHandlerError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+def SocketHandlerError.ofSyncFn (f : Socket → Data → IO Unit) : IO SocketHandlerError := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `callback SocketHandlerData = Promise<undefined> (SocketUnknown socket, Uint8Array data)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback SocketHandlerData = Promise<undefined> (Socket socket, Uint8Array data)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SocketHandlerData where
   /-- The JavaScript function. -/
   val : Value
@@ -2324,19 +2081,19 @@ instance : Nonempty SocketHandlerData := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS SocketHandlerData := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerData", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerData.ofFn (f : SocketUnknown → ByteArray → Async Unit) : IO SocketHandlerData := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg ByteArray args 1))
+def SocketHandlerData.ofFn (f : Socket → ByteArray → Async Unit) : IO SocketHandlerData := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg ByteArray args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerData.ofSyncFn (f : SocketUnknown → ByteArray → IO Unit) : IO SocketHandlerData := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg ByteArray args 1))
+def SocketHandlerData.ofSyncFn (f : Socket → ByteArray → IO Unit) : IO SocketHandlerData := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg ByteArray args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `callback SocketHandlerDrain = Promise<undefined> (SocketUnknown socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback SocketHandlerDrain = Promise<undefined> (Socket socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SocketHandlerDrain where
   /-- The JavaScript function. -/
   val : Value
@@ -2344,19 +2101,19 @@ instance : Nonempty SocketHandlerDrain := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS SocketHandlerDrain := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerDrain", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerDrain.ofFn (f : SocketUnknown → Async Unit) : IO SocketHandlerDrain := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+def SocketHandlerDrain.ofFn (f : Socket → Async Unit) : IO SocketHandlerDrain := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerDrain.ofSyncFn (f : SocketUnknown → IO Unit) : IO SocketHandlerDrain := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+def SocketHandlerDrain.ofSyncFn (f : Socket → IO Unit) : IO SocketHandlerDrain := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback SocketHandlerHandshake = undefined (SocketUnknown socket, boolean success, object? authorizationError)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback SocketHandlerHandshake = undefined (Socket socket, boolean success, object? authorizationError)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SocketHandlerHandshake where
   /-- The JavaScript function. -/
   val : Value
@@ -2364,19 +2121,19 @@ instance : Nonempty SocketHandlerHandshake := ⟨{ val := Classical.ofNonempty }
 instance : ToJS SocketHandlerHandshake := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerHandshake := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerHandshake", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerHandshake.ofFn (f : SocketUnknown → Bool → (Option Data) → Async Unit) : IO SocketHandlerHandshake := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Bool args 1) (← Support.arg (Option Data) args 2))
+def SocketHandlerHandshake.ofFn (f : Socket → Bool → (Option Data) → Async Unit) : IO SocketHandlerHandshake := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Bool args 1) (← Support.arg (Option Data) args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerHandshake.ofSyncFn (f : SocketUnknown → Bool → (Option Data) → IO Unit) : IO SocketHandlerHandshake := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Bool args 1) (← Support.arg (Option Data) args 2))
+def SocketHandlerHandshake.ofSyncFn (f : Socket → Bool → (Option Data) → IO Unit) : IO SocketHandlerHandshake := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Bool args 1) (← Support.arg (Option Data) args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 
-/-- `callback SocketHandlerEnd = Promise<undefined> (SocketUnknown socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback SocketHandlerEnd = Promise<undefined> (Socket socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SocketHandlerEnd where
   /-- The JavaScript function. -/
   val : Value
@@ -2384,19 +2141,19 @@ instance : Nonempty SocketHandlerEnd := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS SocketHandlerEnd := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerEnd := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerEnd", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerEnd.ofFn (f : SocketUnknown → Async Unit) : IO SocketHandlerEnd := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+def SocketHandlerEnd.ofFn (f : Socket → Async Unit) : IO SocketHandlerEnd := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerEnd.ofSyncFn (f : SocketUnknown → IO Unit) : IO SocketHandlerEnd := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+def SocketHandlerEnd.ofSyncFn (f : Socket → IO Unit) : IO SocketHandlerEnd := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback SocketHandlerConnectError = Promise<undefined> (SocketUnknown socket, object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback SocketHandlerConnectError = Promise<undefined> (Socket socket, object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SocketHandlerConnectError where
   /-- The JavaScript function. -/
   val : Value
@@ -2404,19 +2161,19 @@ instance : Nonempty SocketHandlerConnectError := ⟨{ val := Classical.ofNonempt
 instance : ToJS SocketHandlerConnectError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerConnectError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerConnectError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerConnectError.ofFn (f : SocketUnknown → Data → Async Unit) : IO SocketHandlerConnectError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+def SocketHandlerConnectError.ofFn (f : Socket → Data → Async Unit) : IO SocketHandlerConnectError := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerConnectError.ofSyncFn (f : SocketUnknown → Data → IO Unit) : IO SocketHandlerConnectError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+def SocketHandlerConnectError.ofSyncFn (f : Socket → Data → IO Unit) : IO SocketHandlerConnectError := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `callback SocketHandlerTimeout = Promise<undefined> (SocketUnknown socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback SocketHandlerTimeout = Promise<undefined> (Socket socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SocketHandlerTimeout where
   /-- The JavaScript function. -/
   val : Value
@@ -2424,14 +2181,14 @@ instance : Nonempty SocketHandlerTimeout := ⟨{ val := Classical.ofNonempty }�
 instance : ToJS SocketHandlerTimeout := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerTimeout := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerTimeout", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SocketHandlerTimeout.ofFn (f : SocketUnknown → Async Unit) : IO SocketHandlerTimeout := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+def SocketHandlerTimeout.ofFn (f : Socket → Async Unit) : IO SocketHandlerTimeout := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SocketHandlerTimeout.ofSyncFn (f : SocketUnknown → IO Unit) : IO SocketHandlerTimeout := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+def SocketHandlerTimeout.ofSyncFn (f : Socket → IO Unit) : IO SocketHandlerTimeout := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -2473,11 +2230,254 @@ instance : ToJS SocketHandler := ⟨fun d => Support.fields #[("open", Support.o
 structure SocketOptions where
   /-- `required SocketHandler socket` -/
   socket : SocketHandler
+  /-- `undefined data` -/
+  data : Option Unit := none
+  /-- `boolean allowHalfOpen` -/
+  allowHalfOpen : Option Bool := none
+instance : ToJS SocketOptions := ⟨fun d => Support.fields #[("socket", toJS d.socket),
+    ("data", Support.optional d.data),
+    ("allowHalfOpen", Support.optional d.allowHalfOpen)]⟩
+
+/-- `typedef DOMString or Uint8Array DOMStringOrUint8Array`: one constructor per member type. -/
+inductive DOMStringOrUint8Array where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `Uint8Array` -/
+  | uint8Array (value : ByteArray)
+instance : ToJS DOMStringOrUint8Array := ⟨fun
+  | .domString v => toJS v
+  | .uint8Array v => toJS v⟩
+instance : Coe String DOMStringOrUint8Array := ⟨.domString⟩
+instance : Coe ByteArray DOMStringOrUint8Array := ⟨.uint8Array⟩
+instance : FromJS DOMStringOrUint8Array where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.bytes _) => (FromJS.fromJS d : Except String ByteArray).map .uint8Array
+    | _ => .error ""
+  typeName := "Lasm.JS.Bun.DOMStringOrUint8Array"
+
+/-- `callback SocketHandlerUnknownBufferOpen = Promise<undefined> (SocketUnknown socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SocketHandlerUnknownBufferOpen where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SocketHandlerUnknownBufferOpen := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SocketHandlerUnknownBufferOpen := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SocketHandlerUnknownBufferOpen := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferOpen", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SocketHandlerUnknownBufferOpen.ofFn (f : SocketUnknown → Async Unit) : IO SocketHandlerUnknownBufferOpen := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SocketHandlerUnknownBufferOpen.ofSyncFn (f : SocketUnknown → IO Unit) : IO SocketHandlerUnknownBufferOpen := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `callback SocketHandlerUnknownBufferClose = Promise<undefined> (SocketUnknown socket, optional object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SocketHandlerUnknownBufferClose where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SocketHandlerUnknownBufferClose := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SocketHandlerUnknownBufferClose := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SocketHandlerUnknownBufferClose := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferClose", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SocketHandlerUnknownBufferClose.ofFn (f : SocketUnknown → Data → Async Unit) : IO SocketHandlerUnknownBufferClose := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SocketHandlerUnknownBufferClose.ofSyncFn (f : SocketUnknown → Data → IO Unit) : IO SocketHandlerUnknownBufferClose := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `callback SocketHandlerUnknownBufferError = Promise<undefined> (SocketUnknown socket, object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SocketHandlerUnknownBufferError where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SocketHandlerUnknownBufferError := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SocketHandlerUnknownBufferError := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SocketHandlerUnknownBufferError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferError", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SocketHandlerUnknownBufferError.ofFn (f : SocketUnknown → Data → Async Unit) : IO SocketHandlerUnknownBufferError := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SocketHandlerUnknownBufferError.ofSyncFn (f : SocketUnknown → Data → IO Unit) : IO SocketHandlerUnknownBufferError := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `callback SocketHandlerUnknownBufferData = Promise<undefined> (SocketUnknown socket, Uint8Array data)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SocketHandlerUnknownBufferData where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SocketHandlerUnknownBufferData := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SocketHandlerUnknownBufferData := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SocketHandlerUnknownBufferData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferData", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SocketHandlerUnknownBufferData.ofFn (f : SocketUnknown → ByteArray → Async Unit) : IO SocketHandlerUnknownBufferData := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg ByteArray args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SocketHandlerUnknownBufferData.ofSyncFn (f : SocketUnknown → ByteArray → IO Unit) : IO SocketHandlerUnknownBufferData := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg ByteArray args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `callback SocketHandlerUnknownBufferDrain = Promise<undefined> (SocketUnknown socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SocketHandlerUnknownBufferDrain where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SocketHandlerUnknownBufferDrain := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SocketHandlerUnknownBufferDrain := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SocketHandlerUnknownBufferDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferDrain", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SocketHandlerUnknownBufferDrain.ofFn (f : SocketUnknown → Async Unit) : IO SocketHandlerUnknownBufferDrain := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SocketHandlerUnknownBufferDrain.ofSyncFn (f : SocketUnknown → IO Unit) : IO SocketHandlerUnknownBufferDrain := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `callback SocketHandlerUnknownBufferHandshake = undefined (SocketUnknown socket, boolean success, object? authorizationError)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SocketHandlerUnknownBufferHandshake where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SocketHandlerUnknownBufferHandshake := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SocketHandlerUnknownBufferHandshake := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SocketHandlerUnknownBufferHandshake := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferHandshake", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SocketHandlerUnknownBufferHandshake.ofFn (f : SocketUnknown → Bool → (Option Data) → Async Unit) : IO SocketHandlerUnknownBufferHandshake := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Bool args 1) (← Support.arg (Option Data) args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SocketHandlerUnknownBufferHandshake.ofSyncFn (f : SocketUnknown → Bool → (Option Data) → IO Unit) : IO SocketHandlerUnknownBufferHandshake := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Bool args 1) (← Support.arg (Option Data) args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+
+/-- `callback SocketHandlerUnknownBufferEnd = Promise<undefined> (SocketUnknown socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SocketHandlerUnknownBufferEnd where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SocketHandlerUnknownBufferEnd := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SocketHandlerUnknownBufferEnd := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SocketHandlerUnknownBufferEnd := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferEnd", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SocketHandlerUnknownBufferEnd.ofFn (f : SocketUnknown → Async Unit) : IO SocketHandlerUnknownBufferEnd := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SocketHandlerUnknownBufferEnd.ofSyncFn (f : SocketUnknown → IO Unit) : IO SocketHandlerUnknownBufferEnd := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `callback SocketHandlerUnknownBufferConnectError = Promise<undefined> (SocketUnknown socket, object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SocketHandlerUnknownBufferConnectError where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SocketHandlerUnknownBufferConnectError := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SocketHandlerUnknownBufferConnectError := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SocketHandlerUnknownBufferConnectError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferConnectError", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SocketHandlerUnknownBufferConnectError.ofFn (f : SocketUnknown → Data → Async Unit) : IO SocketHandlerUnknownBufferConnectError := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SocketHandlerUnknownBufferConnectError.ofSyncFn (f : SocketUnknown → Data → IO Unit) : IO SocketHandlerUnknownBufferConnectError := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `callback SocketHandlerUnknownBufferTimeout = Promise<undefined> (SocketUnknown socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure SocketHandlerUnknownBufferTimeout where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty SocketHandlerUnknownBufferTimeout := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SocketHandlerUnknownBufferTimeout := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SocketHandlerUnknownBufferTimeout := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferTimeout", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def SocketHandlerUnknownBufferTimeout.ofFn (f : SocketUnknown → Async Unit) : IO SocketHandlerUnknownBufferTimeout := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def SocketHandlerUnknownBufferTimeout.ofSyncFn (f : SocketUnknown → IO Unit) : IO SocketHandlerUnknownBufferTimeout := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `dictionary SocketHandlerUnknownBuffer` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure SocketHandlerUnknownBuffer where
+  /-- `SocketHandlerUnknownBufferOpen open` -/
+  «open» : Option SocketHandlerUnknownBufferOpen := none
+  /-- `SocketHandlerUnknownBufferClose close` -/
+  close : Option SocketHandlerUnknownBufferClose := none
+  /-- `SocketHandlerUnknownBufferError error` -/
+  error : Option SocketHandlerUnknownBufferError := none
+  /-- `SocketHandlerUnknownBufferData data` -/
+  data : Option SocketHandlerUnknownBufferData := none
+  /-- `SocketHandlerUnknownBufferDrain drain` -/
+  drain : Option SocketHandlerUnknownBufferDrain := none
+  /-- `SocketHandlerUnknownBufferHandshake handshake` -/
+  handshake : Option SocketHandlerUnknownBufferHandshake := none
+  /-- `SocketHandlerUnknownBufferEnd end` -/
+  «end» : Option SocketHandlerUnknownBufferEnd := none
+  /-- `SocketHandlerUnknownBufferConnectError connectError` -/
+  connectError : Option SocketHandlerUnknownBufferConnectError := none
+  /-- `SocketHandlerUnknownBufferTimeout timeout` -/
+  timeout : Option SocketHandlerUnknownBufferTimeout := none
+  /-- `SocketHandlerUnknownBufferBinaryType binaryType` -/
+  binaryType : Option SocketHandlerUnknownBufferBinaryType := none
+instance : ToJS SocketHandlerUnknownBuffer := ⟨fun d => Support.fields #[("open", Support.optional d.«open»),
+    ("close", Support.optional d.close),
+    ("error", Support.optional d.error),
+    ("data", Support.optional d.data),
+    ("drain", Support.optional d.drain),
+    ("handshake", Support.optional d.handshake),
+    ("end", Support.optional d.«end»),
+    ("connectError", Support.optional d.connectError),
+    ("timeout", Support.optional d.timeout),
+    ("binaryType", Support.optional d.binaryType)]⟩
+
+/-- `dictionary SocketOptionsUnknown` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure SocketOptionsUnknown where
+  /-- `required SocketHandlerUnknownBuffer socket` -/
+  socket : SocketHandlerUnknownBuffer
   /-- `any data` -/
   data : Data := .undefined
   /-- `boolean allowHalfOpen` -/
   allowHalfOpen : Option Bool := none
-instance : ToJS SocketOptions := ⟨fun d => Support.fields #[("socket", toJS d.socket),
+instance : ToJS SocketOptionsUnknown := ⟨fun d => Support.fields #[("socket", toJS d.socket),
     ("data", d.data),
     ("allowHalfOpen", Support.optional d.allowHalfOpen)]⟩
 
@@ -2593,15 +2593,15 @@ instance : ToJS TLSOptionsOrBoolean := ⟨fun
 instance : Coe TLSOptions TLSOptionsOrBoolean := ⟨.tlsOptions⟩
 instance : Coe Bool TLSOptionsOrBoolean := ⟨.boolean⟩
 
-/-- `dictionary TLSUpgradeOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure TLSUpgradeOptions where
+/-- `dictionary TLSUpgradeOptionsUnknown` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure TLSUpgradeOptionsUnknown where
   /-- `any data` -/
   data : Data := .undefined
   /-- `required TLSOptionsOrBoolean tls` -/
   tls : TLSOptionsOrBoolean
-  /-- `required SocketHandler socket` -/
-  socket : SocketHandler
-instance : ToJS TLSUpgradeOptions := ⟨fun d => Support.fields #[("data", d.data),
+  /-- `required SocketHandlerUnknownBuffer socket` -/
+  socket : SocketHandlerUnknownBuffer
+instance : ToJS TLSUpgradeOptionsUnknown := ⟨fun d => Support.fields #[("data", d.data),
     ("tls", toJS d.tls),
     ("socket", toJS d.socket)]⟩
 
@@ -2623,99 +2623,99 @@ instance : ToJS UdpDataOrDOMStringOrDouble := ⟨fun
 instance : Coe ByteArray UdpDataOrDOMStringOrDouble := ⟨.uint8Array⟩
 instance : Coe Float UdpDataOrDOMStringOrDouble := ⟨.double⟩
 
-/-- `typedef DOMString or Uint8Array udpData`: one constructor per member type. -/
-inductive udpData where
+/-- `typedef DOMString or Uint8Array UdpData`: one constructor per member type. -/
+inductive UdpData where
   /-- `DOMString` -/
   | domString (value : String)
   /-- `Uint8Array` -/
   | uint8Array (value : ByteArray)
-instance : ToJS udpData := ⟨fun
+instance : ToJS UdpData := ⟨fun
   | .domString v => toJS v
   | .uint8Array v => toJS v⟩
-instance : Coe String udpData := ⟨.domString⟩
-instance : Coe ByteArray udpData := ⟨.uint8Array⟩
+instance : Coe String UdpData := ⟨.domString⟩
+instance : Coe ByteArray UdpData := ⟨.uint8Array⟩
 
-/-- `dictionary udpReceiveFlags` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure udpReceiveFlags where
+/-- `dictionary UdpReceiveFlags` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure UdpReceiveFlags where
   /-- `required boolean truncated` -/
   truncated : Bool
   /-- `required boolean ipv6` -/
   ipv6 : Bool
-instance : FromJS udpReceiveFlags where
+instance : FromJS UdpReceiveFlags where
   fromJS d := do return {
     truncated := ← Lasm.JS.readField Bool d "truncated",
     ipv6 := ← Lasm.JS.readField Bool d "ipv6" }
-  typeName := "Lasm.JS.Bun.udpReceiveFlags"
+  typeName := "Lasm.JS.Bun.UdpReceiveFlags"
 
-/-- `callback udpSocketHandlerBufferData = Promise<undefined> (udpSocketBuffer socket, Uint8Array data, double port, DOMString address, udpReceiveFlags flags)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure udpSocketHandlerBufferData where
+/-- `callback UdpSocketHandlerData = Promise<undefined> (UdpSocket socket, Uint8Array data, double port, DOMString address, UdpReceiveFlags flags)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UdpSocketHandlerData where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty udpSocketHandlerBufferData := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS udpSocketHandlerBufferData := ⟨fun x => .ref x.val ""⟩
-instance : FromJS udpSocketHandlerBufferData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.udpSocketHandlerBufferData", .data⟩
+instance : Nonempty UdpSocketHandlerData := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UdpSocketHandlerData := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UdpSocketHandlerData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpSocketHandlerData", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def udpSocketHandlerBufferData.ofFn (f : udpSocketBuffer → ByteArray → Float → String → udpReceiveFlags → Async Unit) : IO udpSocketHandlerBufferData := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg udpSocketBuffer args 0) (← Support.arg ByteArray args 1) (← Support.arg Float args 2) (← Support.arg String args 3) (← Support.arg udpReceiveFlags args 4))
+def UdpSocketHandlerData.ofFn (f : UdpSocket → ByteArray → Float → String → UdpReceiveFlags → Async Unit) : IO UdpSocketHandlerData := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Float args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 5)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def udpSocketHandlerBufferData.ofSyncFn (f : udpSocketBuffer → ByteArray → Float → String → udpReceiveFlags → IO Unit) : IO udpSocketHandlerBufferData := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg udpSocketBuffer args 0) (← Support.arg ByteArray args 1) (← Support.arg Float args 2) (← Support.arg String args 3) (← Support.arg udpReceiveFlags args 4))
+def UdpSocketHandlerData.ofSyncFn (f : UdpSocket → ByteArray → Float → String → UdpReceiveFlags → IO Unit) : IO UdpSocketHandlerData := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Float args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 5)]] Value
   return { val := fn }
 
-/-- `callback udpSocketHandlerBufferDrain = Promise<undefined> (udpSocketBuffer socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure udpSocketHandlerBufferDrain where
+/-- `callback UdpSocketHandlerDrain = Promise<undefined> (UdpSocket socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UdpSocketHandlerDrain where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty udpSocketHandlerBufferDrain := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS udpSocketHandlerBufferDrain := ⟨fun x => .ref x.val ""⟩
-instance : FromJS udpSocketHandlerBufferDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.udpSocketHandlerBufferDrain", .data⟩
+instance : Nonempty UdpSocketHandlerDrain := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UdpSocketHandlerDrain := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UdpSocketHandlerDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpSocketHandlerDrain", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def udpSocketHandlerBufferDrain.ofFn (f : udpSocketBuffer → Async Unit) : IO udpSocketHandlerBufferDrain := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg udpSocketBuffer args 0))
+def UdpSocketHandlerDrain.ofFn (f : UdpSocket → Async Unit) : IO UdpSocketHandlerDrain := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def udpSocketHandlerBufferDrain.ofSyncFn (f : udpSocketBuffer → IO Unit) : IO udpSocketHandlerBufferDrain := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg udpSocketBuffer args 0))
+def UdpSocketHandlerDrain.ofSyncFn (f : UdpSocket → IO Unit) : IO UdpSocketHandlerDrain := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback udpSocketHandlerBufferError = Promise<undefined> (udpSocketBuffer socket, object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure udpSocketHandlerBufferError where
+/-- `callback UdpSocketHandlerError = Promise<undefined> (UdpSocket socket, object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UdpSocketHandlerError where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty udpSocketHandlerBufferError := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS udpSocketHandlerBufferError := ⟨fun x => .ref x.val ""⟩
-instance : FromJS udpSocketHandlerBufferError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.udpSocketHandlerBufferError", .data⟩
+instance : Nonempty UdpSocketHandlerError := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UdpSocketHandlerError := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UdpSocketHandlerError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpSocketHandlerError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def udpSocketHandlerBufferError.ofFn (f : udpSocketBuffer → Data → Async Unit) : IO udpSocketHandlerBufferError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg udpSocketBuffer args 0) (← Support.arg Data args 1))
+def UdpSocketHandlerError.ofFn (f : UdpSocket → Data → Async Unit) : IO UdpSocketHandlerError := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def udpSocketHandlerBufferError.ofSyncFn (f : udpSocketBuffer → Data → IO Unit) : IO udpSocketHandlerBufferError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg udpSocketBuffer args 0) (← Support.arg Data args 1))
+def UdpSocketHandlerError.ofSyncFn (f : UdpSocket → Data → IO Unit) : IO UdpSocketHandlerError := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `dictionary udpSocketHandlerBuffer` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure udpSocketHandlerBuffer where
-  /-- `udpSocketHandlerBufferData data` -/
-  data : Option udpSocketHandlerBufferData := none
-  /-- `udpSocketHandlerBufferDrain drain` -/
-  drain : Option udpSocketHandlerBufferDrain := none
-  /-- `udpSocketHandlerBufferError error` -/
-  error : Option udpSocketHandlerBufferError := none
-instance : ToJS udpSocketHandlerBuffer := ⟨fun d => Support.fields #[("data", Support.optional d.data),
+/-- `dictionary UdpSocketHandler` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure UdpSocketHandler where
+  /-- `UdpSocketHandlerData data` -/
+  data : Option UdpSocketHandlerData := none
+  /-- `UdpSocketHandlerDrain drain` -/
+  drain : Option UdpSocketHandlerDrain := none
+  /-- `UdpSocketHandlerError error` -/
+  error : Option UdpSocketHandlerError := none
+instance : ToJS UdpSocketHandler := ⟨fun d => Support.fields #[("data", Support.optional d.data),
     ("drain", Support.optional d.drain),
     ("error", Support.optional d.error)]⟩
 
@@ -2734,75 +2734,75 @@ instance : FromJS SocketAddress where
     family := ← Lasm.JS.readField SocketAddressFamily d "family" }
   typeName := "Lasm.JS.Bun.SocketAddress"
 
-/-- `callback udpConnectedSocketHandlerBufferData = Promise<undefined> (udpConnectedSocketBuffer socket, Uint8Array data, double port, DOMString address, udpReceiveFlags flags)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure udpConnectedSocketHandlerBufferData where
+/-- `callback UdpConnectedSocketHandlerData = Promise<undefined> (UdpConnectedSocket socket, Uint8Array data, double port, DOMString address, UdpReceiveFlags flags)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UdpConnectedSocketHandlerData where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty udpConnectedSocketHandlerBufferData := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS udpConnectedSocketHandlerBufferData := ⟨fun x => .ref x.val ""⟩
-instance : FromJS udpConnectedSocketHandlerBufferData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.udpConnectedSocketHandlerBufferData", .data⟩
+instance : Nonempty UdpConnectedSocketHandlerData := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UdpConnectedSocketHandlerData := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UdpConnectedSocketHandlerData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpConnectedSocketHandlerData", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def udpConnectedSocketHandlerBufferData.ofFn (f : udpConnectedSocketBuffer → ByteArray → Float → String → udpReceiveFlags → Async Unit) : IO udpConnectedSocketHandlerBufferData := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg udpConnectedSocketBuffer args 0) (← Support.arg ByteArray args 1) (← Support.arg Float args 2) (← Support.arg String args 3) (← Support.arg udpReceiveFlags args 4))
+def UdpConnectedSocketHandlerData.ofFn (f : UdpConnectedSocket → ByteArray → Float → String → UdpReceiveFlags → Async Unit) : IO UdpConnectedSocketHandlerData := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Float args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 5)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def udpConnectedSocketHandlerBufferData.ofSyncFn (f : udpConnectedSocketBuffer → ByteArray → Float → String → udpReceiveFlags → IO Unit) : IO udpConnectedSocketHandlerBufferData := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg udpConnectedSocketBuffer args 0) (← Support.arg ByteArray args 1) (← Support.arg Float args 2) (← Support.arg String args 3) (← Support.arg udpReceiveFlags args 4))
+def UdpConnectedSocketHandlerData.ofSyncFn (f : UdpConnectedSocket → ByteArray → Float → String → UdpReceiveFlags → IO Unit) : IO UdpConnectedSocketHandlerData := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Float args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 5)]] Value
   return { val := fn }
 
-/-- `callback udpConnectedSocketHandlerBufferDrain = Promise<undefined> (udpConnectedSocketBuffer socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure udpConnectedSocketHandlerBufferDrain where
+/-- `callback UdpConnectedSocketHandlerDrain = Promise<undefined> (UdpConnectedSocket socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UdpConnectedSocketHandlerDrain where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty udpConnectedSocketHandlerBufferDrain := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS udpConnectedSocketHandlerBufferDrain := ⟨fun x => .ref x.val ""⟩
-instance : FromJS udpConnectedSocketHandlerBufferDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.udpConnectedSocketHandlerBufferDrain", .data⟩
+instance : Nonempty UdpConnectedSocketHandlerDrain := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UdpConnectedSocketHandlerDrain := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UdpConnectedSocketHandlerDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpConnectedSocketHandlerDrain", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def udpConnectedSocketHandlerBufferDrain.ofFn (f : udpConnectedSocketBuffer → Async Unit) : IO udpConnectedSocketHandlerBufferDrain := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg udpConnectedSocketBuffer args 0))
+def UdpConnectedSocketHandlerDrain.ofFn (f : UdpConnectedSocket → Async Unit) : IO UdpConnectedSocketHandlerDrain := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def udpConnectedSocketHandlerBufferDrain.ofSyncFn (f : udpConnectedSocketBuffer → IO Unit) : IO udpConnectedSocketHandlerBufferDrain := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg udpConnectedSocketBuffer args 0))
+def UdpConnectedSocketHandlerDrain.ofSyncFn (f : UdpConnectedSocket → IO Unit) : IO UdpConnectedSocketHandlerDrain := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback udpConnectedSocketHandlerBufferError = Promise<undefined> (udpConnectedSocketBuffer socket, object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure udpConnectedSocketHandlerBufferError where
+/-- `callback UdpConnectedSocketHandlerError = Promise<undefined> (UdpConnectedSocket socket, object error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure UdpConnectedSocketHandlerError where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty udpConnectedSocketHandlerBufferError := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS udpConnectedSocketHandlerBufferError := ⟨fun x => .ref x.val ""⟩
-instance : FromJS udpConnectedSocketHandlerBufferError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.udpConnectedSocketHandlerBufferError", .data⟩
+instance : Nonempty UdpConnectedSocketHandlerError := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS UdpConnectedSocketHandlerError := ⟨fun x => .ref x.val ""⟩
+instance : FromJS UdpConnectedSocketHandlerError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpConnectedSocketHandlerError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def udpConnectedSocketHandlerBufferError.ofFn (f : udpConnectedSocketBuffer → Data → Async Unit) : IO udpConnectedSocketHandlerBufferError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg udpConnectedSocketBuffer args 0) (← Support.arg Data args 1))
+def UdpConnectedSocketHandlerError.ofFn (f : UdpConnectedSocket → Data → Async Unit) : IO UdpConnectedSocketHandlerError := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def udpConnectedSocketHandlerBufferError.ofSyncFn (f : udpConnectedSocketBuffer → Data → IO Unit) : IO udpConnectedSocketHandlerBufferError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg udpConnectedSocketBuffer args 0) (← Support.arg Data args 1))
+def UdpConnectedSocketHandlerError.ofSyncFn (f : UdpConnectedSocket → Data → IO Unit) : IO UdpConnectedSocketHandlerError := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0) (← Support.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `dictionary udpConnectedSocketHandlerBuffer` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure udpConnectedSocketHandlerBuffer where
-  /-- `udpConnectedSocketHandlerBufferData data` -/
-  data : Option udpConnectedSocketHandlerBufferData := none
-  /-- `udpConnectedSocketHandlerBufferDrain drain` -/
-  drain : Option udpConnectedSocketHandlerBufferDrain := none
-  /-- `udpConnectedSocketHandlerBufferError error` -/
-  error : Option udpConnectedSocketHandlerBufferError := none
-instance : ToJS udpConnectedSocketHandlerBuffer := ⟨fun d => Support.fields #[("data", Support.optional d.data),
+/-- `dictionary UdpConnectedSocketHandler` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure UdpConnectedSocketHandler where
+  /-- `UdpConnectedSocketHandlerData data` -/
+  data : Option UdpConnectedSocketHandlerData := none
+  /-- `UdpConnectedSocketHandlerDrain drain` -/
+  drain : Option UdpConnectedSocketHandlerDrain := none
+  /-- `UdpConnectedSocketHandlerError error` -/
+  error : Option UdpConnectedSocketHandlerError := none
+instance : ToJS UdpConnectedSocketHandler := ⟨fun d => Support.fields #[("data", Support.optional d.data),
     ("drain", Support.optional d.drain),
     ("error", Support.optional d.error)]⟩
 
@@ -4132,10 +4132,10 @@ structure ZstdCompressOptions where
   level : Option Float := none
 instance : ToJS ZstdCompressOptions := ⟨fun d => Support.fields #[("level", Support.optional d.level)]⟩
 
-/-- `dictionary TCPSocketConnectOptions : SocketOptionsUndefined` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+/-- `dictionary TCPSocketConnectOptions : SocketOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TCPSocketConnectOptions where
-  /-- `required SocketHandlerUndefinedBuffer socket` -/
-  socket : SocketHandlerUndefinedBuffer
+  /-- `required SocketHandler socket` -/
+  socket : SocketHandler
   /-- `undefined data` -/
   data : Option Unit := none
   /-- `boolean allowHalfOpen` -/
@@ -4162,10 +4162,10 @@ instance : ToJS TCPSocketConnectOptions := ⟨fun d => Support.fields #[("socket
     ("reusePort", Support.optional d.reusePort),
     ("ipv6Only", Support.optional d.ipv6Only)]⟩
 
-/-- `dictionary UnixSocketOptions : SocketOptionsUndefined` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+/-- `dictionary UnixSocketOptions : SocketOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure UnixSocketOptions where
-  /-- `required SocketHandlerUndefinedBuffer socket` -/
-  socket : SocketHandlerUndefinedBuffer
+  /-- `required SocketHandler socket` -/
+  socket : SocketHandler
   /-- `undefined data` -/
   data : Option Unit := none
   /-- `boolean allowHalfOpen` -/
@@ -4180,10 +4180,10 @@ instance : ToJS UnixSocketOptions := ⟨fun d => Support.fields #[("socket", toJ
     ("unix", toJS d.unix),
     ("tls", Support.optional d.tls)]⟩
 
-/-- `dictionary TCPSocketListenOptions : SocketOptionsUndefined` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+/-- `dictionary TCPSocketListenOptions : SocketOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TCPSocketListenOptions where
-  /-- `required SocketHandlerUndefinedBuffer socket` -/
-  socket : SocketHandlerUndefinedBuffer
+  /-- `required SocketHandler socket` -/
+  socket : SocketHandler
   /-- `undefined data` -/
   data : Option Unit := none
   /-- `boolean allowHalfOpen` -/
@@ -4204,43 +4204,43 @@ instance : ToJS TCPSocketListenOptions := ⟨fun d => Support.fields #[("socket"
     ("tls", Support.optional d.tls),
     ("exclusive", Support.optional d.exclusive)]⟩
 
-/-- `dictionary udpSocketOptionsBuffer` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure udpSocketOptionsBuffer where
+/-- `dictionary UdpSocketOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure UdpSocketOptions where
   /-- `DOMString hostname` -/
   hostname : Option String := none
   /-- `double port` -/
   port : Option Float := none
-  /-- `udpSocketOptionsBufferBinaryType binaryType` -/
-  binaryType : Option udpSocketOptionsBufferBinaryType := none
-  /-- `udpSocketHandlerBuffer socket` -/
-  socket : Option udpSocketHandlerBuffer := none
-instance : ToJS udpSocketOptionsBuffer := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
+  /-- `UdpSocketOptionsBinaryType binaryType` -/
+  binaryType : Option UdpSocketOptionsBinaryType := none
+  /-- `UdpSocketHandler socket` -/
+  socket : Option UdpSocketHandler := none
+instance : ToJS UdpSocketOptions := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
     ("port", Support.optional d.port),
     ("binaryType", Support.optional d.binaryType),
     ("socket", Support.optional d.socket)]⟩
 
-/-- `dictionary udpConnectSocketOptionsBufferConnect` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure udpConnectSocketOptionsBufferConnect where
+/-- `dictionary UdpConnectSocketOptionsConnect` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure UdpConnectSocketOptionsConnect where
   /-- `required DOMString hostname` -/
   hostname : String
   /-- `required double port` -/
   port : Float
-instance : ToJS udpConnectSocketOptionsBufferConnect := ⟨fun d => Support.fields #[("hostname", toJS d.hostname),
+instance : ToJS UdpConnectSocketOptionsConnect := ⟨fun d => Support.fields #[("hostname", toJS d.hostname),
     ("port", toJS d.port)]⟩
 
-/-- `dictionary udpConnectSocketOptionsBuffer` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure udpConnectSocketOptionsBuffer where
+/-- `dictionary UdpConnectSocketOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure UdpConnectSocketOptions where
   /-- `DOMString hostname` -/
   hostname : Option String := none
   /-- `double port` -/
   port : Option Float := none
-  /-- `udpConnectSocketOptionsBufferBinaryType binaryType` -/
-  binaryType : Option udpConnectSocketOptionsBufferBinaryType := none
-  /-- `udpConnectedSocketHandlerBuffer socket` -/
-  socket : Option udpConnectedSocketHandlerBuffer := none
-  /-- `required udpConnectSocketOptionsBufferConnect connect` -/
-  connect : udpConnectSocketOptionsBufferConnect
-instance : ToJS udpConnectSocketOptionsBuffer := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
+  /-- `UdpConnectSocketOptionsBinaryType binaryType` -/
+  binaryType : Option UdpConnectSocketOptionsBinaryType := none
+  /-- `UdpConnectedSocketHandler socket` -/
+  socket : Option UdpConnectedSocketHandler := none
+  /-- `required UdpConnectSocketOptionsConnect connect` -/
+  connect : UdpConnectSocketOptionsConnect
+instance : ToJS UdpConnectSocketOptions := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
     ("port", Support.optional d.port),
     ("binaryType", Support.optional d.binaryType),
     ("socket", Support.optional d.socket),
@@ -4691,53 +4691,53 @@ instance : FromJS JSONLParseChunkResult where
     error := ← Lasm.JS.readField (Option Data) d "error" }
   typeName := "Lasm.JS.Bun.JSONLParseChunkResult"
 
-/-- `dictionary markdownOptionsAutolinks` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure markdownOptionsAutolinks where
+/-- `dictionary MarkdownOptionsAutolinks` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MarkdownOptionsAutolinks where
   /-- `boolean url` -/
   url : Option Bool := none
   /-- `boolean www` -/
   www : Option Bool := none
   /-- `boolean email` -/
   email : Option Bool := none
-instance : ToJS markdownOptionsAutolinks := ⟨fun d => Support.fields #[("url", Support.optional d.url),
+instance : ToJS MarkdownOptionsAutolinks := ⟨fun d => Support.fields #[("url", Support.optional d.url),
     ("www", Support.optional d.www),
     ("email", Support.optional d.email)]⟩
 
-/-- `typedef boolean or markdownOptionsAutolinks BooleanOrMarkdownOptionsAutolinks`: one constructor per member type. -/
+/-- `typedef boolean or MarkdownOptionsAutolinks BooleanOrMarkdownOptionsAutolinks`: one constructor per member type. -/
 inductive BooleanOrMarkdownOptionsAutolinks where
   /-- `boolean` -/
   | boolean (value : Bool)
-  /-- `markdownOptionsAutolinks` -/
-  | markdownOptionsAutolinks (value : markdownOptionsAutolinks)
+  /-- `MarkdownOptionsAutolinks` -/
+  | markdownOptionsAutolinks (value : MarkdownOptionsAutolinks)
 instance : ToJS BooleanOrMarkdownOptionsAutolinks := ⟨fun
   | .boolean v => toJS v
   | .markdownOptionsAutolinks v => toJS v⟩
 instance : Coe Bool BooleanOrMarkdownOptionsAutolinks := ⟨.boolean⟩
-instance : Coe markdownOptionsAutolinks BooleanOrMarkdownOptionsAutolinks := ⟨.markdownOptionsAutolinks⟩
+instance : Coe MarkdownOptionsAutolinks BooleanOrMarkdownOptionsAutolinks := ⟨.markdownOptionsAutolinks⟩
 
-/-- `dictionary markdownOptionsHeadings` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure markdownOptionsHeadings where
+/-- `dictionary MarkdownOptionsHeadings` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MarkdownOptionsHeadings where
   /-- `boolean ids` -/
   ids : Option Bool := none
   /-- `boolean autolink` -/
   autolink : Option Bool := none
-instance : ToJS markdownOptionsHeadings := ⟨fun d => Support.fields #[("ids", Support.optional d.ids),
+instance : ToJS MarkdownOptionsHeadings := ⟨fun d => Support.fields #[("ids", Support.optional d.ids),
     ("autolink", Support.optional d.autolink)]⟩
 
-/-- `typedef boolean or markdownOptionsHeadings BooleanOrMarkdownOptionsHeadings`: one constructor per member type. -/
+/-- `typedef boolean or MarkdownOptionsHeadings BooleanOrMarkdownOptionsHeadings`: one constructor per member type. -/
 inductive BooleanOrMarkdownOptionsHeadings where
   /-- `boolean` -/
   | boolean (value : Bool)
-  /-- `markdownOptionsHeadings` -/
-  | markdownOptionsHeadings (value : markdownOptionsHeadings)
+  /-- `MarkdownOptionsHeadings` -/
+  | markdownOptionsHeadings (value : MarkdownOptionsHeadings)
 instance : ToJS BooleanOrMarkdownOptionsHeadings := ⟨fun
   | .boolean v => toJS v
   | .markdownOptionsHeadings v => toJS v⟩
 instance : Coe Bool BooleanOrMarkdownOptionsHeadings := ⟨.boolean⟩
-instance : Coe markdownOptionsHeadings BooleanOrMarkdownOptionsHeadings := ⟨.markdownOptionsHeadings⟩
+instance : Coe MarkdownOptionsHeadings BooleanOrMarkdownOptionsHeadings := ⟨.markdownOptionsHeadings⟩
 
-/-- `dictionary markdownOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure markdownOptions where
+/-- `dictionary MarkdownOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MarkdownOptions where
   /-- `boolean tables` -/
   tables : Option Bool := none
   /-- `boolean strikethrough` -/
@@ -4768,7 +4768,7 @@ structure markdownOptions where
   autolinks : Option BooleanOrMarkdownOptionsAutolinks := none
   /-- `BooleanOrMarkdownOptionsHeadings headings` -/
   headings : Option BooleanOrMarkdownOptionsHeadings := none
-instance : ToJS markdownOptions := ⟨fun d => Support.fields #[("tables", Support.optional d.tables),
+instance : ToJS MarkdownOptions := ⟨fun d => Support.fields #[("tables", Support.optional d.tables),
     ("strikethrough", Support.optional d.strikethrough),
     ("tasklists", Support.optional d.tasklists),
     ("hardSoftBreaks", Support.optional d.hardSoftBreaks),
@@ -4784,8 +4784,8 @@ instance : ToJS markdownOptions := ⟨fun d => Support.fields #[("tables", Suppo
     ("autolinks", Support.optional d.autolinks),
     ("headings", Support.optional d.headings)]⟩
 
-/-- `dictionary markdownAnsiTheme` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure markdownAnsiTheme where
+/-- `dictionary MarkdownAnsiTheme` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MarkdownAnsiTheme where
   /-- `boolean colors` -/
   colors : Option Bool := none
   /-- `boolean hyperlinks` -/
@@ -4796,150 +4796,150 @@ structure markdownAnsiTheme where
   columns : Option Float := none
   /-- `boolean kittyGraphics` -/
   kittyGraphics : Option Bool := none
-instance : ToJS markdownAnsiTheme := ⟨fun d => Support.fields #[("colors", Support.optional d.colors),
+instance : ToJS MarkdownAnsiTheme := ⟨fun d => Support.fields #[("colors", Support.optional d.colors),
     ("hyperlinks", Support.optional d.hyperlinks),
     ("light", Support.optional d.light),
     ("columns", Support.optional d.columns),
     ("kittyGraphics", Support.optional d.kittyGraphics)]⟩
 
-/-- `dictionary markdownHeadingMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure markdownHeadingMeta where
+/-- `dictionary MarkdownHeadingMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MarkdownHeadingMeta where
   /-- `required double level` -/
   level : Float
   /-- `DOMString id` -/
   id : Option String := none
-instance : FromJS markdownHeadingMeta where
+instance : FromJS MarkdownHeadingMeta where
   fromJS d := do return {
     level := ← Lasm.JS.readField Float d "level",
     id := ← Lasm.JS.readField (Option String) d "id" }
-  typeName := "Lasm.JS.Bun.markdownHeadingMeta"
+  typeName := "Lasm.JS.Bun.MarkdownHeadingMeta"
 
-/-- `callback markdownRenderCallbacksHeading = DOMString? (DOMString children, markdownHeadingMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksHeading where
+/-- `callback MarkdownRenderCallbacksHeading = DOMString? (DOMString children, MarkdownHeadingMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksHeading where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksHeading := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksHeading := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksHeading := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksHeading", .data⟩
+instance : Nonempty MarkdownRenderCallbacksHeading := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksHeading := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksHeading := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksHeading", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksHeading.ofFn (f : String → markdownHeadingMeta → Async (Option String)) : IO markdownRenderCallbacksHeading := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg markdownHeadingMeta args 1))
+def MarkdownRenderCallbacksHeading.ofFn (f : String → MarkdownHeadingMeta → Async (Option String)) : IO MarkdownRenderCallbacksHeading := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownHeadingMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksHeading.ofSyncFn (f : String → markdownHeadingMeta → IO (Option String)) : IO markdownRenderCallbacksHeading := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg markdownHeadingMeta args 1))
+def MarkdownRenderCallbacksHeading.ofSyncFn (f : String → MarkdownHeadingMeta → IO (Option String)) : IO MarkdownRenderCallbacksHeading := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownHeadingMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksParagraph = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksParagraph where
+/-- `callback MarkdownRenderCallbacksParagraph = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksParagraph where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksParagraph := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksParagraph := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksParagraph := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksParagraph", .data⟩
+instance : Nonempty MarkdownRenderCallbacksParagraph := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksParagraph := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksParagraph := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksParagraph", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksParagraph.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksParagraph := do
+def MarkdownRenderCallbacksParagraph.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksParagraph := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksParagraph.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksParagraph := do
+def MarkdownRenderCallbacksParagraph.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksParagraph := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksBlockquote = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksBlockquote where
+/-- `callback MarkdownRenderCallbacksBlockquote = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksBlockquote where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksBlockquote := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksBlockquote := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksBlockquote := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksBlockquote", .data⟩
+instance : Nonempty MarkdownRenderCallbacksBlockquote := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksBlockquote := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksBlockquote := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksBlockquote", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksBlockquote.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksBlockquote := do
+def MarkdownRenderCallbacksBlockquote.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksBlockquote := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksBlockquote.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksBlockquote := do
+def MarkdownRenderCallbacksBlockquote.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksBlockquote := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `dictionary markdownCodeBlockMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure markdownCodeBlockMeta where
+/-- `dictionary MarkdownCodeBlockMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MarkdownCodeBlockMeta where
   /-- `DOMString language` -/
   language : Option String := none
-instance : FromJS markdownCodeBlockMeta where
+instance : FromJS MarkdownCodeBlockMeta where
   fromJS d := do return {
     language := ← Lasm.JS.readField (Option String) d "language" }
-  typeName := "Lasm.JS.Bun.markdownCodeBlockMeta"
+  typeName := "Lasm.JS.Bun.MarkdownCodeBlockMeta"
 
-/-- `callback markdownRenderCallbacksCode = DOMString? (DOMString children, optional markdownCodeBlockMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksCode where
+/-- `callback MarkdownRenderCallbacksCode = DOMString? (DOMString children, optional MarkdownCodeBlockMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksCode where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksCode := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksCode := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksCode := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksCode", .data⟩
+instance : Nonempty MarkdownRenderCallbacksCode := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksCode := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksCode := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksCode", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksCode.ofFn (f : String → (Option markdownCodeBlockMeta) → Async (Option String)) : IO markdownRenderCallbacksCode := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option markdownCodeBlockMeta) args 1))
+def MarkdownRenderCallbacksCode.ofFn (f : String → (Option MarkdownCodeBlockMeta) → Async (Option String)) : IO MarkdownRenderCallbacksCode := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option MarkdownCodeBlockMeta) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksCode.ofSyncFn (f : String → (Option markdownCodeBlockMeta) → IO (Option String)) : IO markdownRenderCallbacksCode := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option markdownCodeBlockMeta) args 1))
+def MarkdownRenderCallbacksCode.ofSyncFn (f : String → (Option MarkdownCodeBlockMeta) → IO (Option String)) : IO MarkdownRenderCallbacksCode := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option MarkdownCodeBlockMeta) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `dictionary markdownListMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure markdownListMeta where
+/-- `dictionary MarkdownListMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MarkdownListMeta where
   /-- `required boolean ordered` -/
   ordered : Bool
   /-- `double start` -/
   start : Option Float := none
   /-- `required double depth` -/
   depth : Float
-instance : FromJS markdownListMeta where
+instance : FromJS MarkdownListMeta where
   fromJS d := do return {
     ordered := ← Lasm.JS.readField Bool d "ordered",
     start := ← Lasm.JS.readField (Option Float) d "start",
     depth := ← Lasm.JS.readField Float d "depth" }
-  typeName := "Lasm.JS.Bun.markdownListMeta"
+  typeName := "Lasm.JS.Bun.MarkdownListMeta"
 
-/-- `callback markdownRenderCallbacksList = DOMString? (DOMString children, markdownListMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksList where
+/-- `callback MarkdownRenderCallbacksList = DOMString? (DOMString children, MarkdownListMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksList where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksList := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksList := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksList := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksList", .data⟩
+instance : Nonempty MarkdownRenderCallbacksList := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksList := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksList := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksList", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksList.ofFn (f : String → markdownListMeta → Async (Option String)) : IO markdownRenderCallbacksList := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg markdownListMeta args 1))
+def MarkdownRenderCallbacksList.ofFn (f : String → MarkdownListMeta → Async (Option String)) : IO MarkdownRenderCallbacksList := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownListMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksList.ofSyncFn (f : String → markdownListMeta → IO (Option String)) : IO markdownRenderCallbacksList := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg markdownListMeta args 1))
+def MarkdownRenderCallbacksList.ofSyncFn (f : String → MarkdownListMeta → IO (Option String)) : IO MarkdownRenderCallbacksList := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownListMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `dictionary markdownListItemMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure markdownListItemMeta where
+/-- `dictionary MarkdownListItemMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MarkdownListItemMeta where
   /-- `required double index` -/
   index : Float
   /-- `required double depth` -/
@@ -4950,413 +4950,413 @@ structure markdownListItemMeta where
   start : Option Float := none
   /-- `boolean checked` -/
   checked : Option Bool := none
-instance : FromJS markdownListItemMeta where
+instance : FromJS MarkdownListItemMeta where
   fromJS d := do return {
     index := ← Lasm.JS.readField Float d "index",
     depth := ← Lasm.JS.readField Float d "depth",
     ordered := ← Lasm.JS.readField Bool d "ordered",
     start := ← Lasm.JS.readField (Option Float) d "start",
     checked := ← Lasm.JS.readField (Option Bool) d "checked" }
-  typeName := "Lasm.JS.Bun.markdownListItemMeta"
+  typeName := "Lasm.JS.Bun.MarkdownListItemMeta"
 
-/-- `callback markdownRenderCallbacksListItem = DOMString? (DOMString children, markdownListItemMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksListItem where
+/-- `callback MarkdownRenderCallbacksListItem = DOMString? (DOMString children, MarkdownListItemMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksListItem where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksListItem := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksListItem := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksListItem := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksListItem", .data⟩
+instance : Nonempty MarkdownRenderCallbacksListItem := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksListItem := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksListItem := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksListItem", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksListItem.ofFn (f : String → markdownListItemMeta → Async (Option String)) : IO markdownRenderCallbacksListItem := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg markdownListItemMeta args 1))
+def MarkdownRenderCallbacksListItem.ofFn (f : String → MarkdownListItemMeta → Async (Option String)) : IO MarkdownRenderCallbacksListItem := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownListItemMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksListItem.ofSyncFn (f : String → markdownListItemMeta → IO (Option String)) : IO markdownRenderCallbacksListItem := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg markdownListItemMeta args 1))
+def MarkdownRenderCallbacksListItem.ofSyncFn (f : String → MarkdownListItemMeta → IO (Option String)) : IO MarkdownRenderCallbacksListItem := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownListItemMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksHr = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksHr where
+/-- `callback MarkdownRenderCallbacksHr = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksHr where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksHr := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksHr := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksHr := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksHr", .data⟩
+instance : Nonempty MarkdownRenderCallbacksHr := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksHr := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksHr := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksHr", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksHr.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksHr := do
+def MarkdownRenderCallbacksHr.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksHr := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksHr.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksHr := do
+def MarkdownRenderCallbacksHr.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksHr := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksTable = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksTable where
+/-- `callback MarkdownRenderCallbacksTable = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksTable where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksTable := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksTable := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksTable := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksTable", .data⟩
+instance : Nonempty MarkdownRenderCallbacksTable := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksTable := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksTable := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksTable", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksTable.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksTable := do
+def MarkdownRenderCallbacksTable.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksTable := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksTable.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksTable := do
+def MarkdownRenderCallbacksTable.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksTable := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksThead = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksThead where
+/-- `callback MarkdownRenderCallbacksThead = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksThead where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksThead := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksThead := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksThead := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksThead", .data⟩
+instance : Nonempty MarkdownRenderCallbacksThead := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksThead := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksThead := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksThead", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksThead.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksThead := do
+def MarkdownRenderCallbacksThead.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksThead := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksThead.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksThead := do
+def MarkdownRenderCallbacksThead.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksThead := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksTbody = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksTbody where
+/-- `callback MarkdownRenderCallbacksTbody = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksTbody where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksTbody := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksTbody := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksTbody := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksTbody", .data⟩
+instance : Nonempty MarkdownRenderCallbacksTbody := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksTbody := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksTbody := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksTbody", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksTbody.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksTbody := do
+def MarkdownRenderCallbacksTbody.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksTbody := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksTbody.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksTbody := do
+def MarkdownRenderCallbacksTbody.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksTbody := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksTr = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksTr where
+/-- `callback MarkdownRenderCallbacksTr = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksTr where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksTr := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksTr := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksTr := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksTr", .data⟩
+instance : Nonempty MarkdownRenderCallbacksTr := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksTr := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksTr := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksTr", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksTr.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksTr := do
+def MarkdownRenderCallbacksTr.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksTr := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksTr.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksTr := do
+def MarkdownRenderCallbacksTr.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksTr := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `dictionary markdownCellMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure markdownCellMeta where
-  /-- `markdownCellMetaAlign align` -/
-  align : Option markdownCellMetaAlign := none
-instance : FromJS markdownCellMeta where
+/-- `dictionary MarkdownCellMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MarkdownCellMeta where
+  /-- `MarkdownCellMetaAlign align` -/
+  align : Option MarkdownCellMetaAlign := none
+instance : FromJS MarkdownCellMeta where
   fromJS d := do return {
-    align := ← Lasm.JS.readField (Option markdownCellMetaAlign) d "align" }
-  typeName := "Lasm.JS.Bun.markdownCellMeta"
+    align := ← Lasm.JS.readField (Option MarkdownCellMetaAlign) d "align" }
+  typeName := "Lasm.JS.Bun.MarkdownCellMeta"
 
-/-- `callback markdownRenderCallbacksTh = DOMString? (DOMString children, optional markdownCellMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksTh where
+/-- `callback MarkdownRenderCallbacksTh = DOMString? (DOMString children, optional MarkdownCellMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksTh where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksTh := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksTh := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksTh := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksTh", .data⟩
+instance : Nonempty MarkdownRenderCallbacksTh := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksTh := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksTh := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksTh", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksTh.ofFn (f : String → (Option markdownCellMeta) → Async (Option String)) : IO markdownRenderCallbacksTh := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option markdownCellMeta) args 1))
+def MarkdownRenderCallbacksTh.ofFn (f : String → (Option MarkdownCellMeta) → Async (Option String)) : IO MarkdownRenderCallbacksTh := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option MarkdownCellMeta) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksTh.ofSyncFn (f : String → (Option markdownCellMeta) → IO (Option String)) : IO markdownRenderCallbacksTh := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option markdownCellMeta) args 1))
+def MarkdownRenderCallbacksTh.ofSyncFn (f : String → (Option MarkdownCellMeta) → IO (Option String)) : IO MarkdownRenderCallbacksTh := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option MarkdownCellMeta) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksTd = DOMString? (DOMString children, optional markdownCellMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksTd where
+/-- `callback MarkdownRenderCallbacksTd = DOMString? (DOMString children, optional MarkdownCellMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksTd where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksTd := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksTd := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksTd := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksTd", .data⟩
+instance : Nonempty MarkdownRenderCallbacksTd := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksTd := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksTd := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksTd", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksTd.ofFn (f : String → (Option markdownCellMeta) → Async (Option String)) : IO markdownRenderCallbacksTd := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option markdownCellMeta) args 1))
+def MarkdownRenderCallbacksTd.ofFn (f : String → (Option MarkdownCellMeta) → Async (Option String)) : IO MarkdownRenderCallbacksTd := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option MarkdownCellMeta) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksTd.ofSyncFn (f : String → (Option markdownCellMeta) → IO (Option String)) : IO markdownRenderCallbacksTd := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option markdownCellMeta) args 1))
+def MarkdownRenderCallbacksTd.ofSyncFn (f : String → (Option MarkdownCellMeta) → IO (Option String)) : IO MarkdownRenderCallbacksTd := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option MarkdownCellMeta) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksHtml = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksHtml where
+/-- `callback MarkdownRenderCallbacksHtml = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksHtml where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksHtml := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksHtml := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksHtml := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksHtml", .data⟩
+instance : Nonempty MarkdownRenderCallbacksHtml := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksHtml := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksHtml := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksHtml", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksHtml.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksHtml := do
+def MarkdownRenderCallbacksHtml.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksHtml := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksHtml.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksHtml := do
+def MarkdownRenderCallbacksHtml.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksHtml := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksStrong = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksStrong where
+/-- `callback MarkdownRenderCallbacksStrong = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksStrong where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksStrong := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksStrong := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksStrong := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksStrong", .data⟩
+instance : Nonempty MarkdownRenderCallbacksStrong := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksStrong := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksStrong := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksStrong", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksStrong.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksStrong := do
+def MarkdownRenderCallbacksStrong.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksStrong := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksStrong.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksStrong := do
+def MarkdownRenderCallbacksStrong.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksStrong := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksEmphasis = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksEmphasis where
+/-- `callback MarkdownRenderCallbacksEmphasis = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksEmphasis where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksEmphasis := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksEmphasis := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksEmphasis := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksEmphasis", .data⟩
+instance : Nonempty MarkdownRenderCallbacksEmphasis := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksEmphasis := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksEmphasis := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksEmphasis", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksEmphasis.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksEmphasis := do
+def MarkdownRenderCallbacksEmphasis.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksEmphasis := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksEmphasis.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksEmphasis := do
+def MarkdownRenderCallbacksEmphasis.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksEmphasis := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `dictionary markdownLinkMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure markdownLinkMeta where
+/-- `dictionary MarkdownLinkMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MarkdownLinkMeta where
   /-- `required DOMString href` -/
   href : String
   /-- `DOMString title` -/
   title : Option String := none
-instance : FromJS markdownLinkMeta where
+instance : FromJS MarkdownLinkMeta where
   fromJS d := do return {
     href := ← Lasm.JS.readField String d "href",
     title := ← Lasm.JS.readField (Option String) d "title" }
-  typeName := "Lasm.JS.Bun.markdownLinkMeta"
+  typeName := "Lasm.JS.Bun.MarkdownLinkMeta"
 
-/-- `callback markdownRenderCallbacksLink = DOMString? (DOMString children, markdownLinkMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksLink where
+/-- `callback MarkdownRenderCallbacksLink = DOMString? (DOMString children, MarkdownLinkMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksLink where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksLink := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksLink := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksLink := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksLink", .data⟩
+instance : Nonempty MarkdownRenderCallbacksLink := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksLink := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksLink := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksLink", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksLink.ofFn (f : String → markdownLinkMeta → Async (Option String)) : IO markdownRenderCallbacksLink := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg markdownLinkMeta args 1))
+def MarkdownRenderCallbacksLink.ofFn (f : String → MarkdownLinkMeta → Async (Option String)) : IO MarkdownRenderCallbacksLink := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownLinkMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksLink.ofSyncFn (f : String → markdownLinkMeta → IO (Option String)) : IO markdownRenderCallbacksLink := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg markdownLinkMeta args 1))
+def MarkdownRenderCallbacksLink.ofSyncFn (f : String → MarkdownLinkMeta → IO (Option String)) : IO MarkdownRenderCallbacksLink := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownLinkMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `dictionary markdownImageMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure markdownImageMeta where
+/-- `dictionary MarkdownImageMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MarkdownImageMeta where
   /-- `required DOMString src` -/
   src : String
   /-- `DOMString title` -/
   title : Option String := none
-instance : FromJS markdownImageMeta where
+instance : FromJS MarkdownImageMeta where
   fromJS d := do return {
     src := ← Lasm.JS.readField String d "src",
     title := ← Lasm.JS.readField (Option String) d "title" }
-  typeName := "Lasm.JS.Bun.markdownImageMeta"
+  typeName := "Lasm.JS.Bun.MarkdownImageMeta"
 
-/-- `callback markdownRenderCallbacksImage = DOMString? (DOMString children, markdownImageMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksImage where
+/-- `callback MarkdownRenderCallbacksImage = DOMString? (DOMString children, MarkdownImageMeta meta)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksImage where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksImage := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksImage := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksImage := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksImage", .data⟩
+instance : Nonempty MarkdownRenderCallbacksImage := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksImage := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksImage := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksImage", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksImage.ofFn (f : String → markdownImageMeta → Async (Option String)) : IO markdownRenderCallbacksImage := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg markdownImageMeta args 1))
+def MarkdownRenderCallbacksImage.ofFn (f : String → MarkdownImageMeta → Async (Option String)) : IO MarkdownRenderCallbacksImage := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownImageMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksImage.ofSyncFn (f : String → markdownImageMeta → IO (Option String)) : IO markdownRenderCallbacksImage := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg markdownImageMeta args 1))
+def MarkdownRenderCallbacksImage.ofSyncFn (f : String → MarkdownImageMeta → IO (Option String)) : IO MarkdownRenderCallbacksImage := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownImageMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksCodespan = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksCodespan where
+/-- `callback MarkdownRenderCallbacksCodespan = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksCodespan where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksCodespan := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksCodespan := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksCodespan := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksCodespan", .data⟩
+instance : Nonempty MarkdownRenderCallbacksCodespan := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksCodespan := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksCodespan := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksCodespan", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksCodespan.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksCodespan := do
+def MarkdownRenderCallbacksCodespan.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksCodespan := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksCodespan.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksCodespan := do
+def MarkdownRenderCallbacksCodespan.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksCodespan := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksStrikethrough = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksStrikethrough where
+/-- `callback MarkdownRenderCallbacksStrikethrough = DOMString? (DOMString children)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksStrikethrough where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksStrikethrough := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksStrikethrough := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksStrikethrough := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksStrikethrough", .data⟩
+instance : Nonempty MarkdownRenderCallbacksStrikethrough := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksStrikethrough := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksStrikethrough := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksStrikethrough", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksStrikethrough.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksStrikethrough := do
+def MarkdownRenderCallbacksStrikethrough.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksStrikethrough := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksStrikethrough.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksStrikethrough := do
+def MarkdownRenderCallbacksStrikethrough.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksStrikethrough := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `callback markdownRenderCallbacksText = DOMString? (DOMString text)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
-structure markdownRenderCallbacksText where
+/-- `callback MarkdownRenderCallbacksText = DOMString? (DOMString text)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure MarkdownRenderCallbacksText where
   /-- The JavaScript function. -/
   val : Value
-instance : Nonempty markdownRenderCallbacksText := ⟨{ val := Classical.ofNonempty }⟩
-instance : ToJS markdownRenderCallbacksText := ⟨fun x => .ref x.val ""⟩
-instance : FromJS markdownRenderCallbacksText := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.markdownRenderCallbacksText", .data⟩
+instance : Nonempty MarkdownRenderCallbacksText := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS MarkdownRenderCallbacksText := ⟨fun x => .ref x.val ""⟩
+instance : FromJS MarkdownRenderCallbacksText := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksText", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def markdownRenderCallbacksText.ofFn (f : String → Async (Option String)) : IO markdownRenderCallbacksText := do
+def MarkdownRenderCallbacksText.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksText := do
   let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def markdownRenderCallbacksText.ofSyncFn (f : String → IO (Option String)) : IO markdownRenderCallbacksText := do
+def MarkdownRenderCallbacksText.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksText := do
   let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 
-/-- `dictionary markdownRenderCallbacks` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure markdownRenderCallbacks where
-  /-- `markdownRenderCallbacksHeading heading` -/
-  heading : Option markdownRenderCallbacksHeading := none
-  /-- `markdownRenderCallbacksParagraph paragraph` -/
-  paragraph : Option markdownRenderCallbacksParagraph := none
-  /-- `markdownRenderCallbacksBlockquote blockquote` -/
-  blockquote : Option markdownRenderCallbacksBlockquote := none
-  /-- `markdownRenderCallbacksCode code` -/
-  code : Option markdownRenderCallbacksCode := none
-  /-- `markdownRenderCallbacksList list` -/
-  list : Option markdownRenderCallbacksList := none
-  /-- `markdownRenderCallbacksListItem listItem` -/
-  listItem : Option markdownRenderCallbacksListItem := none
-  /-- `markdownRenderCallbacksHr hr` -/
-  hr : Option markdownRenderCallbacksHr := none
-  /-- `markdownRenderCallbacksTable table` -/
-  table : Option markdownRenderCallbacksTable := none
-  /-- `markdownRenderCallbacksThead thead` -/
-  thead : Option markdownRenderCallbacksThead := none
-  /-- `markdownRenderCallbacksTbody tbody` -/
-  tbody : Option markdownRenderCallbacksTbody := none
-  /-- `markdownRenderCallbacksTr tr` -/
-  tr : Option markdownRenderCallbacksTr := none
-  /-- `markdownRenderCallbacksTh th` -/
-  th : Option markdownRenderCallbacksTh := none
-  /-- `markdownRenderCallbacksTd td` -/
-  td : Option markdownRenderCallbacksTd := none
-  /-- `markdownRenderCallbacksHtml html` -/
-  html : Option markdownRenderCallbacksHtml := none
-  /-- `markdownRenderCallbacksStrong strong` -/
-  strong : Option markdownRenderCallbacksStrong := none
-  /-- `markdownRenderCallbacksEmphasis emphasis` -/
-  emphasis : Option markdownRenderCallbacksEmphasis := none
-  /-- `markdownRenderCallbacksLink link` -/
-  link : Option markdownRenderCallbacksLink := none
-  /-- `markdownRenderCallbacksImage image` -/
-  image : Option markdownRenderCallbacksImage := none
-  /-- `markdownRenderCallbacksCodespan codespan` -/
-  codespan : Option markdownRenderCallbacksCodespan := none
-  /-- `markdownRenderCallbacksStrikethrough strikethrough` -/
-  strikethrough : Option markdownRenderCallbacksStrikethrough := none
-  /-- `markdownRenderCallbacksText text` -/
-  text : Option markdownRenderCallbacksText := none
-instance : ToJS markdownRenderCallbacks := ⟨fun d => Support.fields #[("heading", Support.optional d.heading),
+/-- `dictionary MarkdownRenderCallbacks` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure MarkdownRenderCallbacks where
+  /-- `MarkdownRenderCallbacksHeading heading` -/
+  heading : Option MarkdownRenderCallbacksHeading := none
+  /-- `MarkdownRenderCallbacksParagraph paragraph` -/
+  paragraph : Option MarkdownRenderCallbacksParagraph := none
+  /-- `MarkdownRenderCallbacksBlockquote blockquote` -/
+  blockquote : Option MarkdownRenderCallbacksBlockquote := none
+  /-- `MarkdownRenderCallbacksCode code` -/
+  code : Option MarkdownRenderCallbacksCode := none
+  /-- `MarkdownRenderCallbacksList list` -/
+  list : Option MarkdownRenderCallbacksList := none
+  /-- `MarkdownRenderCallbacksListItem listItem` -/
+  listItem : Option MarkdownRenderCallbacksListItem := none
+  /-- `MarkdownRenderCallbacksHr hr` -/
+  hr : Option MarkdownRenderCallbacksHr := none
+  /-- `MarkdownRenderCallbacksTable table` -/
+  table : Option MarkdownRenderCallbacksTable := none
+  /-- `MarkdownRenderCallbacksThead thead` -/
+  thead : Option MarkdownRenderCallbacksThead := none
+  /-- `MarkdownRenderCallbacksTbody tbody` -/
+  tbody : Option MarkdownRenderCallbacksTbody := none
+  /-- `MarkdownRenderCallbacksTr tr` -/
+  tr : Option MarkdownRenderCallbacksTr := none
+  /-- `MarkdownRenderCallbacksTh th` -/
+  th : Option MarkdownRenderCallbacksTh := none
+  /-- `MarkdownRenderCallbacksTd td` -/
+  td : Option MarkdownRenderCallbacksTd := none
+  /-- `MarkdownRenderCallbacksHtml html` -/
+  html : Option MarkdownRenderCallbacksHtml := none
+  /-- `MarkdownRenderCallbacksStrong strong` -/
+  strong : Option MarkdownRenderCallbacksStrong := none
+  /-- `MarkdownRenderCallbacksEmphasis emphasis` -/
+  emphasis : Option MarkdownRenderCallbacksEmphasis := none
+  /-- `MarkdownRenderCallbacksLink link` -/
+  link : Option MarkdownRenderCallbacksLink := none
+  /-- `MarkdownRenderCallbacksImage image` -/
+  image : Option MarkdownRenderCallbacksImage := none
+  /-- `MarkdownRenderCallbacksCodespan codespan` -/
+  codespan : Option MarkdownRenderCallbacksCodespan := none
+  /-- `MarkdownRenderCallbacksStrikethrough strikethrough` -/
+  strikethrough : Option MarkdownRenderCallbacksStrikethrough := none
+  /-- `MarkdownRenderCallbacksText text` -/
+  text : Option MarkdownRenderCallbacksText := none
+instance : ToJS MarkdownRenderCallbacks := ⟨fun d => Support.fields #[("heading", Support.optional d.heading),
     ("paragraph", Support.optional d.paragraph),
     ("blockquote", Support.optional d.blockquote),
     ("code", Support.optional d.code),
@@ -5750,8 +5750,8 @@ def SocketListener.ref (self : SocketListener) : IO Unit :=
 def SocketListener.unref (self : SocketListener) : IO Unit :=
   self.val.callMethod "unref" (Support.args #[]) Unit
 
-/-- `reload(options: Pick<SocketOptions<Data>, 'socket'>): void`: `undefined reload(SocketOptionsUndefined options)` -/
-def SocketListener.reload (self : SocketListener) (options : SocketOptionsUndefined) : IO Unit :=
+/-- `reload(options: Pick<SocketOptions<Data>, 'socket'>): void`: `undefined reload(SocketOptions options)` -/
+def SocketListener.reload (self : SocketListener) (options : SocketOptions) : IO Unit :=
   self.val.callMethod "reload" (Support.args #[toJS options]) Unit
 
 /-- `data: Data`: `readonly attribute any data` -/
@@ -5826,8 +5826,8 @@ def SocketUnknown.unref (self : SocketUnknown) : IO Unit :=
 def SocketUnknown.flush (self : SocketUnknown) : IO Unit :=
   self.val.callMethod "flush" (Support.args #[]) Unit
 
-/-- `reload(options: Pick<SocketOptions<Data>, 'socket'>): void`: `undefined reload(SocketOptions options)` -/
-def SocketUnknown.reload (self : SocketUnknown) (options : SocketOptions) : IO Unit :=
+/-- `reload(options: Pick<SocketOptions<Data>, 'socket'>): void`: `undefined reload(SocketOptionsUnknown options)` -/
+def SocketUnknown.reload (self : SocketUnknown) (options : SocketOptionsUnknown) : IO Unit :=
   self.val.callMethod "reload" (Support.args #[toJS options]) Unit
 
 /-- `disableRenegotiation(): void`: `undefined disableRenegotiation()` -/
@@ -5930,8 +5930,8 @@ def SocketUnknown.getSession (self : SocketUnknown) : IO Unit :=
 def SocketUnknown.setSession (self : SocketUnknown) (session : DOMStringOrUint8Array) : IO Unit :=
   self.val.callMethod "setSession" (Support.args #[toJS session]) Unit
 
-/-- `upgradeTLS<Data>(options: TLSUpgradeOptions<Data>): [raw: Socket<Data>, tls: Socket<Data>]`: `sequence<SocketUnknown> upgradeTLS(TLSUpgradeOptions options)` -/
-def SocketUnknown.upgradeTLS (self : SocketUnknown) (options : TLSUpgradeOptions) : IO (Array SocketUnknown) :=
+/-- `upgradeTLS<Data>(options: TLSUpgradeOptions<Data>): [raw: Socket<Data>, tls: Socket<Data>]`: `sequence<SocketUnknown> upgradeTLS(TLSUpgradeOptionsUnknown options)` -/
+def SocketUnknown.upgradeTLS (self : SocketUnknown) (options : TLSUpgradeOptionsUnknown) : IO (Array SocketUnknown) :=
   self.val.callMethod "upgradeTLS" (Support.args #[toJS options]) (Array SocketUnknown)
 
 /-- `close(): void`: `undefined close()` -/
@@ -6018,8 +6018,8 @@ def Socket.unref (self : Socket) : IO Unit :=
 def Socket.flush (self : Socket) : IO Unit :=
   self.val.callMethod "flush" (Support.args #[]) Unit
 
-/-- `reload(options: Pick<SocketOptions<Data>, 'socket'>): void`: `undefined reload(SocketOptionsUndefined options)` -/
-def Socket.reload (self : Socket) (options : SocketOptionsUndefined) : IO Unit :=
+/-- `reload(options: Pick<SocketOptions<Data>, 'socket'>): void`: `undefined reload(SocketOptions options)` -/
+def Socket.reload (self : Socket) (options : SocketOptions) : IO Unit :=
   self.val.callMethod "reload" (Support.args #[toJS options]) Unit
 
 /-- `disableRenegotiation(): void`: `undefined disableRenegotiation()` -/
@@ -6122,8 +6122,8 @@ def Socket.getSession (self : Socket) : IO Unit :=
 def Socket.setSession (self : Socket) (session : DOMStringOrUint8Array) : IO Unit :=
   self.val.callMethod "setSession" (Support.args #[toJS session]) Unit
 
-/-- `upgradeTLS<Data>(options: TLSUpgradeOptions<Data>): [raw: Socket<Data>, tls: Socket<Data>]`: `sequence<SocketUnknown> upgradeTLS(TLSUpgradeOptions options)` -/
-def Socket.upgradeTLS (self : Socket) (options : TLSUpgradeOptions) : IO (Array SocketUnknown) :=
+/-- `upgradeTLS<Data>(options: TLSUpgradeOptions<Data>): [raw: Socket<Data>, tls: Socket<Data>]`: `sequence<SocketUnknown> upgradeTLS(TLSUpgradeOptionsUnknown options)` -/
+def Socket.upgradeTLS (self : Socket) (options : TLSUpgradeOptionsUnknown) : IO (Array SocketUnknown) :=
   self.val.callMethod "upgradeTLS" (Support.args #[toJS options]) (Array SocketUnknown)
 
 /-- `close(): void`: `undefined close()` -/
@@ -6139,39 +6139,39 @@ def Socket.setServername (self : Socket) (name : String) : IO Unit :=
   self.val.callMethod "setServername" (Support.args #[toJS name]) Unit
 
 /-- `readonly port: number`: `readonly attribute double port` -/
-def TCPSocketListenerUndefined.port (self : TCPSocketListenerUndefined) : IO Float := self.val.get "port" Float
+def TCPSocketListener.port (self : TCPSocketListener) : IO Float := self.val.get "port" Float
 
 /-- `readonly hostname: string`: `readonly attribute DOMString hostname` -/
-def TCPSocketListenerUndefined.hostname (self : TCPSocketListenerUndefined) : IO String := self.val.get "hostname" String
+def TCPSocketListener.hostname (self : TCPSocketListener) : IO String := self.val.get "hostname" String
 
 /-- `readonly unix: string`: `readonly attribute DOMString unix` -/
-def UnixSocketListenerUndefined.unix (self : UnixSocketListenerUndefined) : IO String := self.val.get "unix" String
+def UnixSocketListener.unix (self : UnixSocketListener) : IO String := self.val.get "unix" String
 
 /-- `sendMany(packets: readonly (Data | string | number)[]): number`: `double sendMany(sequence<UdpDataOrDOMStringOrDouble> packets)` -/
-def udpSocketBuffer.sendMany (self : udpSocketBuffer) (packets : Array UdpDataOrDOMStringOrDouble) : IO Float :=
+def UdpSocket.sendMany (self : UdpSocket) (packets : Array UdpDataOrDOMStringOrDouble) : IO Float :=
   self.val.callMethod "sendMany" (Support.args #[toJS packets]) Float
 
-/-- `send(data: Data, port: number, address: string): boolean`: `boolean send(udpData data, double port, DOMString address)` -/
-def udpSocketBuffer.send (self : udpSocketBuffer) (data : udpData) (port : Float) (address : String) : IO Bool :=
+/-- `send(data: Data, port: number, address: string): boolean`: `boolean send(UdpData data, double port, DOMString address)` -/
+def UdpSocket.send (self : UdpSocket) (data : UdpData) (port : Float) (address : String) : IO Bool :=
   self.val.callMethod "send" (Support.args #[toJS data, toJS port, toJS address]) Bool
 
-/-- `reload(handler: SocketHandler<DataBinaryType>): void`: `undefined reload(udpSocketHandlerBuffer handler)` -/
-def udpSocketBuffer.reload (self : udpSocketBuffer) (handler : udpSocketHandlerBuffer) : IO Unit :=
+/-- `reload(handler: SocketHandler<DataBinaryType>): void`: `undefined reload(UdpSocketHandler handler)` -/
+def UdpSocket.reload (self : UdpSocket) (handler : UdpSocketHandler) : IO Unit :=
   self.val.callMethod "reload" (Support.args #[toJS handler]) Unit
 
 /-- `readonly remoteAddress: SocketAddress`: `readonly attribute SocketAddress remoteAddress` -/
-def udpConnectedSocketBuffer.remoteAddress (self : udpConnectedSocketBuffer) : IO SocketAddress := self.val.get "remoteAddress" SocketAddress
+def UdpConnectedSocket.remoteAddress (self : UdpConnectedSocket) : IO SocketAddress := self.val.get "remoteAddress" SocketAddress
 
-/-- `sendMany(packets: readonly Data[]): number`: `double sendMany(sequence<udpData> packets)` -/
-def udpConnectedSocketBuffer.sendMany (self : udpConnectedSocketBuffer) (packets : Array udpData) : IO Float :=
+/-- `sendMany(packets: readonly Data[]): number`: `double sendMany(sequence<UdpData> packets)` -/
+def UdpConnectedSocket.sendMany (self : UdpConnectedSocket) (packets : Array UdpData) : IO Float :=
   self.val.callMethod "sendMany" (Support.args #[toJS packets]) Float
 
-/-- `send(data: Data): boolean`: `boolean send(udpData data)` -/
-def udpConnectedSocketBuffer.send (self : udpConnectedSocketBuffer) (data : udpData) : IO Bool :=
+/-- `send(data: Data): boolean`: `boolean send(UdpData data)` -/
+def UdpConnectedSocket.send (self : UdpConnectedSocket) (data : UdpData) : IO Bool :=
   self.val.callMethod "send" (Support.args #[toJS data]) Bool
 
-/-- `reload(handler: ConnectedSocketHandler<DataBinaryType>): void`: `undefined reload(udpConnectedSocketHandlerBuffer handler)` -/
-def udpConnectedSocketBuffer.reload (self : udpConnectedSocketBuffer) (handler : udpConnectedSocketHandlerBuffer) : IO Unit :=
+/-- `reload(handler: ConnectedSocketHandler<DataBinaryType>): void`: `undefined reload(UdpConnectedSocketHandler handler)` -/
+def UdpConnectedSocket.reload (self : UdpConnectedSocket) (handler : UdpConnectedSocketHandler) : IO Unit :=
   self.val.callMethod "reload" (Support.args #[toJS handler]) Unit
 
 /-- `constructor(options: TerminalOptions)`: `constructor(TerminalOptions options)` -/
@@ -6235,62 +6235,62 @@ def Terminal.close (self : Terminal) : IO Unit :=
   self.val.callMethod "close" (Support.args #[]) Unit
 
 /-- `readonly stdin: SpawnOptions.WritableToIO<In> (read as FileSink | number | undefined: conditional on the stdin option (a FileSink when 'pipe'))`: `readonly attribute FileSinkOrDouble? stdin` -/
-def SubprocessIgnorePipeInherit.stdin (self : SubprocessIgnorePipeInherit) : IO (Option FileSinkOrDouble) := self.val.get "stdin" (Option FileSinkOrDouble)
+def Subprocess.stdin (self : Subprocess) : IO (Option FileSinkOrDouble) := self.val.get "stdin" (Option FileSinkOrDouble)
 
 /-- `readonly stdout: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option (a stream when 'pipe'))`: `readonly attribute ReadableStreamOrDouble? stdout` -/
-def SubprocessIgnorePipeInherit.stdout (self : SubprocessIgnorePipeInherit) : IO (Option ReadableStreamOrDouble) := self.val.get "stdout" (Option ReadableStreamOrDouble)
+def Subprocess.stdout (self : Subprocess) : IO (Option ReadableStreamOrDouble) := self.val.get "stdout" (Option ReadableStreamOrDouble)
 
 /-- `readonly stderr: SpawnOptions.ReadableToIO<Err> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stderr option (a stream when 'pipe'))`: `readonly attribute ReadableStreamOrDouble? stderr` -/
-def SubprocessIgnorePipeInherit.stderr (self : SubprocessIgnorePipeInherit) : IO (Option ReadableStreamOrDouble) := self.val.get "stderr" (Option ReadableStreamOrDouble)
+def Subprocess.stderr (self : Subprocess) : IO (Option ReadableStreamOrDouble) := self.val.get "stderr" (Option ReadableStreamOrDouble)
 
 /-- `readonly terminal: Terminal | undefined`: `readonly attribute Terminal? terminal` -/
-def SubprocessIgnorePipeInherit.terminal (self : SubprocessIgnorePipeInherit) : IO (Option Terminal) := self.val.get "terminal" (Option Terminal)
+def Subprocess.terminal (self : Subprocess) : IO (Option Terminal) := self.val.get "terminal" (Option Terminal)
 
 /-- `readonly stdio: [null, null, null, ...(number | null)[]]`: `readonly attribute sequence<any> stdio` -/
-def SubprocessIgnorePipeInherit.stdio (self : SubprocessIgnorePipeInherit) : IO (Array Data) := self.val.get "stdio" (Array Data)
+def Subprocess.stdio (self : Subprocess) : IO (Array Data) := self.val.get "stdio" (Array Data)
 
 /-- `readonly readable: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option)`: `readonly attribute ReadableStreamOrDouble? readable` -/
-def SubprocessIgnorePipeInherit.readable (self : SubprocessIgnorePipeInherit) : IO (Option ReadableStreamOrDouble) := self.val.get "readable" (Option ReadableStreamOrDouble)
+def Subprocess.readable (self : Subprocess) : IO (Option ReadableStreamOrDouble) := self.val.get "readable" (Option ReadableStreamOrDouble)
 
 /-- `readonly pid: number`: `readonly attribute double pid` -/
-def SubprocessIgnorePipeInherit.pid (self : SubprocessIgnorePipeInherit) : IO Float := self.val.get "pid" Float
+def Subprocess.pid (self : Subprocess) : IO Float := self.val.get "pid" Float
 
 /-- `readonly exited: Promise<number>`: `readonly attribute Promise<double> exited` -/
-def SubprocessIgnorePipeInherit.exited (self : SubprocessIgnorePipeInherit) : Async Float := do
+def Subprocess.exited (self : Subprocess) : Async Float := do
   let p ← self.val.get "exited" Value
   p.await Float
 
 /-- `readonly exitCode: number | null`: `readonly attribute double? exitCode` -/
-def SubprocessIgnorePipeInherit.exitCode (self : SubprocessIgnorePipeInherit) : IO (Option Float) := self.val.get "exitCode" (Option Float)
+def Subprocess.exitCode (self : Subprocess) : IO (Option Float) := self.val.get "exitCode" (Option Float)
 
 /-- `readonly signalCode: NodeJS.Signals | number | null`: `readonly attribute DOMStringOrDouble? signalCode` -/
-def SubprocessIgnorePipeInherit.signalCode (self : SubprocessIgnorePipeInherit) : IO (Option DOMStringOrDouble) := self.val.get "signalCode" (Option DOMStringOrDouble)
+def Subprocess.signalCode (self : Subprocess) : IO (Option DOMStringOrDouble) := self.val.get "signalCode" (Option DOMStringOrDouble)
 
 /-- `readonly killed: boolean`: `readonly attribute boolean killed` -/
-def SubprocessIgnorePipeInherit.killed (self : SubprocessIgnorePipeInherit) : IO Bool := self.val.get "killed" Bool
+def Subprocess.killed (self : Subprocess) : IO Bool := self.val.get "killed" Bool
 
 /-- `kill(exitCode?: number | NodeJS.Signals): void`: `undefined kill(optional DoubleOrDOMString exitCode)` -/
-def SubprocessIgnorePipeInherit.kill (self : SubprocessIgnorePipeInherit) (exitCode : Option DoubleOrDOMString := none) : IO Unit :=
+def Subprocess.kill (self : Subprocess) (exitCode : Option DoubleOrDOMString := none) : IO Unit :=
   self.val.callMethod "kill" (Support.args #[Support.optional exitCode]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def SubprocessIgnorePipeInherit.ref (self : SubprocessIgnorePipeInherit) : IO Unit :=
+def Subprocess.ref (self : Subprocess) : IO Unit :=
   self.val.callMethod "ref" (Support.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def SubprocessIgnorePipeInherit.unref (self : SubprocessIgnorePipeInherit) : IO Unit :=
+def Subprocess.unref (self : Subprocess) : IO Unit :=
   self.val.callMethod "unref" (Support.args #[]) Unit
 
 /-- `send(message: any): void`: `undefined send(any message)` -/
-def SubprocessIgnorePipeInherit.send (self : SubprocessIgnorePipeInherit) (message : Data) : IO Unit :=
+def Subprocess.send (self : Subprocess) (message : Data) : IO Unit :=
   self.val.callMethod "send" (Support.args #[toJS message]) Unit
 
 /-- `disconnect(): void`: `undefined disconnect()` -/
-def SubprocessIgnorePipeInherit.disconnect (self : SubprocessIgnorePipeInherit) : IO Unit :=
+def Subprocess.disconnect (self : Subprocess) : IO Unit :=
   self.val.callMethod "disconnect" (Support.args #[]) Unit
 
 /-- `resourceUsage(): ResourceUsage | undefined`: `ResourceUsage? resourceUsage()` -/
-def SubprocessIgnorePipeInherit.resourceUsage (self : SubprocessIgnorePipeInherit) : IO (Option ResourceUsage) :=
+def Subprocess.resourceUsage (self : Subprocess) : IO (Option ResourceUsage) :=
   self.val.callMethod "resourceUsage" (Support.args #[]) (Option ResourceUsage)
 
 /-- `start(options?: { asUint8Array?: boolean; highWaterMark?: number; stream?: boolean; }): void`: `undefined start(optional ArrayBufferSinkStartOptions options)` -/
@@ -7426,38 +7426,38 @@ def connectWithUnixSocketOptions (options : UnixSocketOptions) : Async Socket :=
     (Support.args #[toJS options])
   pure { val := r }
 
-/-- `Bun.listen<Data = undefined>(options: TCPSocketListenOptions<Data>): TCPSocketListener<Data>`: `TCPSocketListenerUndefined listen(TCPSocketListenOptions options)` (Bun 1.4.4 type declarations) -/
-def listen (options : TCPSocketListenOptions) : IO TCPSocketListenerUndefined := do
+/-- `Bun.listen<Data = undefined>(options: TCPSocketListenOptions<Data>): TCPSocketListener<Data>`: `TCPSocketListener listen(TCPSocketListenOptions options)` (Bun 1.4.4 type declarations) -/
+def listen (options : TCPSocketListenOptions) : IO TCPSocketListener := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.listen", module := "globalThis", path := "Bun.listen", construct := false, arity := 1 }
     (Support.args #[toJS options]) (await := false)
   pure { val := r }
 
-/-- `Bun.listen<Data = undefined>(options: UnixSocketOptions<Data>): UnixSocketListener<Data>`: `UnixSocketListenerUndefined listen(UnixSocketOptions options)` (Bun 1.4.4 type declarations) -/
-def listenWithUnixSocketOptions (options : UnixSocketOptions) : IO UnixSocketListenerUndefined := do
+/-- `Bun.listen<Data = undefined>(options: UnixSocketOptions<Data>): UnixSocketListener<Data>`: `UnixSocketListener listen(UnixSocketOptions options)` (Bun 1.4.4 type declarations) -/
+def listenWithUnixSocketOptions (options : UnixSocketOptions) : IO UnixSocketListener := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.listenWithUnixSocketOptions", module := "globalThis", path := "Bun.listen", construct := false, arity := 1 }
     (Support.args #[toJS options]) (await := false)
   pure { val := r }
 
-/-- `Bun.udpSocket<DataBinaryType extends BinaryType = 'buffer'>(options: udp.SocketOptions<DataBinaryType>): Promise<udp.Socket<DataBinaryType>>`: `Promise<udpSocketBuffer> udpSocket(udpSocketOptionsBuffer options)` (Bun 1.4.4 type declarations) -/
-def udpSocket (options : udpSocketOptionsBuffer) : Async udpSocketBuffer := do
+/-- `Bun.udpSocket<DataBinaryType extends BinaryType = 'buffer'>(options: udp.SocketOptions<DataBinaryType>): Promise<udp.Socket<DataBinaryType>>`: `Promise<UdpSocket> udpSocket(UdpSocketOptions options)` (Bun 1.4.4 type declarations) -/
+def udpSocket (options : UdpSocketOptions) : Async UdpSocket := do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Bun.udpSocket", module := "globalThis", path := "Bun.udpSocket", construct := false, arity := 1 }
     (Support.args #[toJS options])
   pure { val := r }
 
-/-- `Bun.udpSocket<DataBinaryType extends BinaryType = 'buffer'>(options: udp.ConnectSocketOptions<DataBinaryType>): Promise<udp.ConnectedSocket<DataBinaryType>>`: `Promise<udpConnectedSocketBuffer> udpSocket(udpConnectSocketOptionsBuffer options)` (Bun 1.4.4 type declarations) -/
-def udpSocketWithUdpConnectSocketOptions (options : udpConnectSocketOptionsBuffer) : Async udpConnectedSocketBuffer := do
+/-- `Bun.udpSocket<DataBinaryType extends BinaryType = 'buffer'>(options: udp.ConnectSocketOptions<DataBinaryType>): Promise<udp.ConnectedSocket<DataBinaryType>>`: `Promise<UdpConnectedSocket> udpSocket(UdpConnectSocketOptions options)` (Bun 1.4.4 type declarations) -/
+def udpSocketWithUdpConnectSocketOptions (options : UdpConnectSocketOptions) : Async UdpConnectedSocket := do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Bun.udpSocketWithUdpConnectSocketOptions", module := "globalThis", path := "Bun.udpSocket", construct := false, arity := 1 }
     (Support.args #[toJS options])
   pure { val := r }
 
-/-- `Bun.spawn<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'inherit'>(options: SpawnOptions.SpawnOptions<In, Out, Err> & { cmd: string[]; }): Subprocess<In, Out, Err>`: `SubprocessIgnorePipeInherit spawn(SpawnCmdOptions options)` (Bun 1.4.4 type declarations) -/
-def spawn (options : SpawnCmdOptions) : IO SubprocessIgnorePipeInherit := do
+/-- `Bun.spawn<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'inherit'>(options: SpawnOptions.SpawnOptions<In, Out, Err> & { cmd: string[]; }): Subprocess<In, Out, Err>`: `Subprocess spawn(SpawnCmdOptions options)` (Bun 1.4.4 type declarations) -/
+def spawn (options : SpawnCmdOptions) : IO Subprocess := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.spawn", module := "globalThis", path := "Bun.spawn", construct := false, arity := 1 }
     (Support.args #[toJS options]) (await := false)
   pure { val := r }
 
-/-- `Bun.spawn<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'inherit'>(cmds: string[], options?: SpawnOptions.SpawnOptions<In, Out, Err>): Subprocess<In, Out, Err>`: `SubprocessIgnorePipeInherit spawn(sequence<DOMString> cmds, optional SpawnSpawnOptionsIgnorePipeInherit options)` (Bun 1.4.4 type declarations) -/
-def spawnWithCmds (cmds : Array String) (options : Option SpawnSpawnOptionsIgnorePipeInherit := none) : IO SubprocessIgnorePipeInherit := do
+/-- `Bun.spawn<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'inherit'>(cmds: string[], options?: SpawnOptions.SpawnOptions<In, Out, Err>): Subprocess<In, Out, Err>`: `Subprocess spawn(sequence<DOMString> cmds, optional SpawnSpawnOptionsIgnorePipeInherit options)` (Bun 1.4.4 type declarations) -/
+def spawnWithCmds (cmds : Array String) (options : Option SpawnSpawnOptionsIgnorePipeInherit := none) : IO Subprocess := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.spawnWithCmds", module := "globalThis", path := "Bun.spawn", construct := false, arity := 2 }
     (Support.args #[toJS cmds, Support.optional options]) (await := false)
   pure { val := r }
@@ -7557,18 +7557,18 @@ def YAML.stringify (input : Data) (replacer : Data := .undefined) (space : Optio
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.YAML.stringify", module := "globalThis", path := "Bun.YAML.stringify", construct := false, arity := 3 }
     (Support.args #[toJS input, replacer, Support.optional space]) (await := false)
 
-/-- `Bun.html(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, options?: Options): string`: `DOMString html(DOMStringOrUint8Array input, optional markdownOptions options)` (Bun 1.4.4 type declarations) -/
-def markdown.html (input : DOMStringOrUint8Array) (options : Option markdownOptions := none) : IO String :=
+/-- `Bun.html(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, options?: Options): string`: `DOMString html(DOMStringOrUint8Array input, optional MarkdownOptions options)` (Bun 1.4.4 type declarations) -/
+def markdown.html (input : DOMStringOrUint8Array) (options : Option MarkdownOptions := none) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.markdown.html", module := "globalThis", path := "Bun.markdown.html", construct := false, arity := 2 }
     (Support.args #[toJS input, Support.optional options]) (await := false)
 
-/-- `Bun.ansi(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, theme?: AnsiTheme): string`: `DOMString ansi(DOMStringOrUint8Array input, optional markdownAnsiTheme theme)` (Bun 1.4.4 type declarations) -/
-def markdown.ansi (input : DOMStringOrUint8Array) (theme : Option markdownAnsiTheme := none) : IO String :=
+/-- `Bun.ansi(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, theme?: AnsiTheme): string`: `DOMString ansi(DOMStringOrUint8Array input, optional MarkdownAnsiTheme theme)` (Bun 1.4.4 type declarations) -/
+def markdown.ansi (input : DOMStringOrUint8Array) (theme : Option MarkdownAnsiTheme := none) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.markdown.ansi", module := "globalThis", path := "Bun.markdown.ansi", construct := false, arity := 2 }
     (Support.args #[toJS input, Support.optional theme]) (await := false)
 
-/-- `Bun.render(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, callbacks?: RenderCallbacks, options?: Options): string`: `DOMString render(DOMStringOrUint8Array input, optional markdownRenderCallbacks callbacks, optional markdownOptions options)` (Bun 1.4.4 type declarations) -/
-def markdown.render (input : DOMStringOrUint8Array) (callbacks : Option markdownRenderCallbacks := none) (options : Option markdownOptions := none) : IO String :=
+/-- `Bun.render(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, callbacks?: RenderCallbacks, options?: Options): string`: `DOMString render(DOMStringOrUint8Array input, optional MarkdownRenderCallbacks callbacks, optional MarkdownOptions options)` (Bun 1.4.4 type declarations) -/
+def markdown.render (input : DOMStringOrUint8Array) (callbacks : Option MarkdownRenderCallbacks := none) (options : Option MarkdownOptions := none) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.markdown.render", module := "globalThis", path := "Bun.markdown.render", construct := false, arity := 3 }
     (Support.args #[toJS input, Support.optional callbacks, Support.optional options]) (await := false)
 

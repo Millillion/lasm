@@ -56,7 +56,8 @@ export const bun = {
     'cron.parse': 'typed with template literal types (cron expressions); Bun.cron takes the expression as a string',
   },
   /** Generic parameters whose instantiation by a function differs from the declaration's default: the one the plain name stands for. */
-  defaults: { 'Serve.Options.R': 'never', 'Serve.Options.WebSocketData': 'undefined' },
+  defaults: { 'Serve.Options.R': 'never', WebSocketData: 'undefined', Data: 'undefined', DataBinaryType: '"buffer"',
+    'Subprocess.In': '"ignore"', 'Subprocess.Out': '"pipe"', 'Subprocess.Err': '"inherit"' },
   as: {},
   split: {},
   names: {

@@ -648,19 +648,19 @@
           "getServername",
           "setServername"
         ],
-        "TCPSocketListenerUndefined": [
+        "TCPSocketListener": [
           "port",
           "hostname"
         ],
-        "UnixSocketListenerUndefined": [
+        "UnixSocketListener": [
           "unix"
         ],
-        "udpSocketBuffer": [
+        "UdpSocket": [
           "sendMany",
           "send",
           "reload"
         ],
-        "udpConnectedSocketBuffer": [
+        "UdpConnectedSocket": [
           "remoteAddress",
           "sendMany",
           "send",
@@ -679,7 +679,7 @@
           "localFlags",
           "controlFlags"
         ],
-        "SubprocessIgnorePipeInherit": [
+        "Subprocess": [
           "stdin",
           "stdout",
           "stderr",
@@ -875,7 +875,7 @@
           "resume",
           "isPaused"
         ],
-        "ServerUndefined": [
+        "Server": [
           "stop",
           "closeIdleConnections",
           "reload",

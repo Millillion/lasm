@@ -156,10 +156,11 @@ export function lowerAuto(host, files) {
     if (!byName.has(n)) byName.set(n, { ...d, more: [] });
   }
   for (const [f, t] of Object.entries(host.unstable ?? {})) for (const n of t.names) if (!used.has(`unstable:${n}`)) fail(`${host.name}: unstable ${n} is not declared in ${f}`);
-  const leanOf = n => n.replace(/\./g, '');
+  // A nested namespace's declaration: its namespaces capitalised in front (`udp.Socket` → `UdpSocket`, apart from the function `udpSocket`).
+  const leanOf = n => n.includes('.') ? n.split('.').map(capital).join('') : n;
   /** A name as declared, looked up from a nested namespace outwards (`HostnamePortServeOptions` in `Serve`). */
   const scoped = (n, scope = '') => { n = strip(n); for (let sc = scope; sc; sc = sc.split('.').slice(0, -1).join('.')) if (byName.has(`${sc}.${n}`)) return `${sc}.${n}`; return n; };
-  const idl = lean => `${host.name}_${lean}`;
+  const idl = lean => `${host.name}_${lean.replace(/\./g, '_')}`;
   const moduleOfCategory = (doc, where, file) => {
     const c = categoryOf(doc);
     if (!c) return host.fileModules?.[file?.split('/').at(-1)] ?? null;

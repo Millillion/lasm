@@ -151,9 +151,9 @@ dictionary Bun_JSONLParseChunkResult {
   required object? error;
 };
 
-// object Bun.markdownOptionsAutolinksObject
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownOptionsAutolinksObject", LasmPath="Bun.markdownOptionsAutolinksObject"]
-dictionary Bun_markdownOptionsAutolinksObject {
+// object Bun.MarkdownOptionsAutolinksObject
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownOptionsAutolinksObject", LasmPath="Bun.MarkdownOptionsAutolinksObject"]
+dictionary Bun_MarkdownOptionsAutolinksObject {
   // url?: boolean
   boolean url;
   // www?: boolean
@@ -162,9 +162,9 @@ dictionary Bun_markdownOptionsAutolinksObject {
   boolean email;
 };
 
-// object Bun.markdownOptionsAutolinks
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownOptionsAutolinks", LasmPath="Bun.markdownOptionsAutolinks"]
-dictionary Bun_markdownOptionsAutolinks {
+// object Bun.MarkdownOptionsAutolinks
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownOptionsAutolinks", LasmPath="Bun.MarkdownOptionsAutolinks"]
+dictionary Bun_MarkdownOptionsAutolinks {
   // url?: boolean
   boolean url;
   // www?: boolean
@@ -174,20 +174,20 @@ dictionary Bun_markdownOptionsAutolinks {
 };
 
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="BooleanOrMarkdownOptionsAutolinks"]
-typedef (boolean or Bun_markdownOptionsAutolinks) Bun_BooleanOrMarkdownOptionsAutolinks;
+typedef (boolean or Bun_MarkdownOptionsAutolinks) Bun_BooleanOrMarkdownOptionsAutolinks;
 
-// object Bun.markdownOptionsHeadingsObject
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownOptionsHeadingsObject", LasmPath="Bun.markdownOptionsHeadingsObject"]
-dictionary Bun_markdownOptionsHeadingsObject {
+// object Bun.MarkdownOptionsHeadingsObject
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownOptionsHeadingsObject", LasmPath="Bun.MarkdownOptionsHeadingsObject"]
+dictionary Bun_MarkdownOptionsHeadingsObject {
   // ids?: boolean
   boolean ids;
   // autolink?: boolean
   boolean autolink;
 };
 
-// object Bun.markdownOptionsHeadings
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownOptionsHeadings", LasmPath="Bun.markdownOptionsHeadings"]
-dictionary Bun_markdownOptionsHeadings {
+// object Bun.MarkdownOptionsHeadings
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownOptionsHeadings", LasmPath="Bun.MarkdownOptionsHeadings"]
+dictionary Bun_MarkdownOptionsHeadings {
   // ids?: boolean
   boolean ids;
   // autolink?: boolean
@@ -195,11 +195,11 @@ dictionary Bun_markdownOptionsHeadings {
 };
 
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="BooleanOrMarkdownOptionsHeadings"]
-typedef (boolean or Bun_markdownOptionsHeadings) Bun_BooleanOrMarkdownOptionsHeadings;
+typedef (boolean or Bun_MarkdownOptionsHeadings) Bun_BooleanOrMarkdownOptionsHeadings;
 
 // object Bun.markdown.Options
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="markdownOptions", LasmPath="Bun.markdown.Options"]
-dictionary Bun_markdownOptions {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="MarkdownOptions", LasmPath="Bun.markdown.Options"]
+dictionary Bun_MarkdownOptions {
   // tables?: boolean
   boolean tables;
   // strikethrough?: boolean
@@ -233,8 +233,8 @@ dictionary Bun_markdownOptions {
 };
 
 // object Bun.markdown.AnsiTheme
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="markdownAnsiTheme", LasmPath="Bun.markdown.AnsiTheme"]
-dictionary Bun_markdownAnsiTheme {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="MarkdownAnsiTheme", LasmPath="Bun.markdown.AnsiTheme"]
+dictionary Bun_MarkdownAnsiTheme {
   // colors?: boolean
   boolean colors;
   // hyperlinks?: boolean
@@ -248,8 +248,8 @@ dictionary Bun_markdownAnsiTheme {
 };
 
 // object Bun.markdown.HeadingMeta
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="markdownHeadingMeta", LasmPath="Bun.markdown.HeadingMeta"]
-dictionary Bun_markdownHeadingMeta {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="MarkdownHeadingMeta", LasmPath="Bun.markdown.HeadingMeta"]
+dictionary Bun_MarkdownHeadingMeta {
   // level: number
   required double level;
   // id?: string
@@ -257,31 +257,31 @@ dictionary Bun_markdownHeadingMeta {
 };
 
 // (children: string, meta: HeadingMeta) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksHeading", LasmSignature="(children: string, meta: HeadingMeta) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksHeading = DOMString? (DOMString children, Bun_markdownHeadingMeta meta);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksHeading", LasmSignature="(children: string, meta: HeadingMeta) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksHeading = DOMString? (DOMString children, Bun_MarkdownHeadingMeta meta);
 
 // (children: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksParagraph", LasmSignature="(children: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksParagraph = DOMString? (DOMString children);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksParagraph", LasmSignature="(children: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksParagraph = DOMString? (DOMString children);
 
 // (children: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksBlockquote", LasmSignature="(children: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksBlockquote = DOMString? (DOMString children);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksBlockquote", LasmSignature="(children: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksBlockquote = DOMString? (DOMString children);
 
 // object Bun.markdown.CodeBlockMeta
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="markdownCodeBlockMeta", LasmPath="Bun.markdown.CodeBlockMeta"]
-dictionary Bun_markdownCodeBlockMeta {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="MarkdownCodeBlockMeta", LasmPath="Bun.markdown.CodeBlockMeta"]
+dictionary Bun_MarkdownCodeBlockMeta {
   // language?: string
   DOMString language;
 };
 
 // (children: string, meta?: CodeBlockMeta) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksCode", LasmSignature="(children: string, meta?: CodeBlockMeta) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksCode = DOMString? (DOMString children, optional Bun_markdownCodeBlockMeta meta);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksCode", LasmSignature="(children: string, meta?: CodeBlockMeta) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksCode = DOMString? (DOMString children, optional Bun_MarkdownCodeBlockMeta meta);
 
 // object Bun.markdown.ListMeta
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="markdownListMeta", LasmPath="Bun.markdown.ListMeta"]
-dictionary Bun_markdownListMeta {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="MarkdownListMeta", LasmPath="Bun.markdown.ListMeta"]
+dictionary Bun_MarkdownListMeta {
   // ordered: boolean
   required boolean ordered;
   // start?: number
@@ -291,12 +291,12 @@ dictionary Bun_markdownListMeta {
 };
 
 // (children: string, meta: ListMeta) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksList", LasmSignature="(children: string, meta: ListMeta) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksList = DOMString? (DOMString children, Bun_markdownListMeta meta);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksList", LasmSignature="(children: string, meta: ListMeta) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksList = DOMString? (DOMString children, Bun_MarkdownListMeta meta);
 
 // object Bun.markdown.ListItemMeta
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="markdownListItemMeta", LasmPath="Bun.markdown.ListItemMeta"]
-dictionary Bun_markdownListItemMeta {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="MarkdownListItemMeta", LasmPath="Bun.markdown.ListItemMeta"]
+dictionary Bun_MarkdownListItemMeta {
   // index: number
   required double index;
   // depth: number
@@ -310,62 +310,62 @@ dictionary Bun_markdownListItemMeta {
 };
 
 // (children: string, meta: ListItemMeta) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksListItem", LasmSignature="(children: string, meta: ListItemMeta) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksListItem = DOMString? (DOMString children, Bun_markdownListItemMeta meta);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksListItem", LasmSignature="(children: string, meta: ListItemMeta) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksListItem = DOMString? (DOMString children, Bun_MarkdownListItemMeta meta);
 
 // (children: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksHr", LasmSignature="(children: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksHr = DOMString? (DOMString children);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksHr", LasmSignature="(children: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksHr = DOMString? (DOMString children);
 
 // (children: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksTable", LasmSignature="(children: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksTable = DOMString? (DOMString children);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksTable", LasmSignature="(children: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksTable = DOMString? (DOMString children);
 
 // (children: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksThead", LasmSignature="(children: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksThead = DOMString? (DOMString children);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksThead", LasmSignature="(children: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksThead = DOMString? (DOMString children);
 
 // (children: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksTbody", LasmSignature="(children: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksTbody = DOMString? (DOMString children);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksTbody", LasmSignature="(children: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksTbody = DOMString? (DOMString children);
 
 // (children: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksTr", LasmSignature="(children: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksTr = DOMString? (DOMString children);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksTr", LasmSignature="(children: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksTr = DOMString? (DOMString children);
 
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownCellMetaAlign"]
-enum Bun_markdownCellMetaAlign { "left", "center", "right" };
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownCellMetaAlign"]
+enum Bun_MarkdownCellMetaAlign { "left", "center", "right" };
 
 // object Bun.markdown.CellMeta
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="markdownCellMeta", LasmPath="Bun.markdown.CellMeta"]
-dictionary Bun_markdownCellMeta {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="MarkdownCellMeta", LasmPath="Bun.markdown.CellMeta"]
+dictionary Bun_MarkdownCellMeta {
   // align?: "left" | "center" | "right"
-  Bun_markdownCellMetaAlign align;
+  Bun_MarkdownCellMetaAlign align;
 };
 
 // (children: string, meta?: CellMeta) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksTh", LasmSignature="(children: string, meta?: CellMeta) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksTh = DOMString? (DOMString children, optional Bun_markdownCellMeta meta);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksTh", LasmSignature="(children: string, meta?: CellMeta) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksTh = DOMString? (DOMString children, optional Bun_MarkdownCellMeta meta);
 
 // (children: string, meta?: CellMeta) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksTd", LasmSignature="(children: string, meta?: CellMeta) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksTd = DOMString? (DOMString children, optional Bun_markdownCellMeta meta);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksTd", LasmSignature="(children: string, meta?: CellMeta) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksTd = DOMString? (DOMString children, optional Bun_MarkdownCellMeta meta);
 
 // (children: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksHtml", LasmSignature="(children: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksHtml = DOMString? (DOMString children);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksHtml", LasmSignature="(children: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksHtml = DOMString? (DOMString children);
 
 // (children: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksStrong", LasmSignature="(children: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksStrong = DOMString? (DOMString children);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksStrong", LasmSignature="(children: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksStrong = DOMString? (DOMString children);
 
 // (children: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksEmphasis", LasmSignature="(children: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksEmphasis = DOMString? (DOMString children);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksEmphasis", LasmSignature="(children: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksEmphasis = DOMString? (DOMString children);
 
 // object Bun.markdown.LinkMeta
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="markdownLinkMeta", LasmPath="Bun.markdown.LinkMeta"]
-dictionary Bun_markdownLinkMeta {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="MarkdownLinkMeta", LasmPath="Bun.markdown.LinkMeta"]
+dictionary Bun_MarkdownLinkMeta {
   // href: string
   required DOMString href;
   // title?: string
@@ -373,12 +373,12 @@ dictionary Bun_markdownLinkMeta {
 };
 
 // (children: string, meta: LinkMeta) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksLink", LasmSignature="(children: string, meta: LinkMeta) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksLink = DOMString? (DOMString children, Bun_markdownLinkMeta meta);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksLink", LasmSignature="(children: string, meta: LinkMeta) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksLink = DOMString? (DOMString children, Bun_MarkdownLinkMeta meta);
 
 // object Bun.markdown.ImageMeta
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="markdownImageMeta", LasmPath="Bun.markdown.ImageMeta"]
-dictionary Bun_markdownImageMeta {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="MarkdownImageMeta", LasmPath="Bun.markdown.ImageMeta"]
+dictionary Bun_MarkdownImageMeta {
   // src: string
   required DOMString src;
   // title?: string
@@ -386,66 +386,66 @@ dictionary Bun_markdownImageMeta {
 };
 
 // (children: string, meta: ImageMeta) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksImage", LasmSignature="(children: string, meta: ImageMeta) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksImage = DOMString? (DOMString children, Bun_markdownImageMeta meta);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksImage", LasmSignature="(children: string, meta: ImageMeta) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksImage = DOMString? (DOMString children, Bun_MarkdownImageMeta meta);
 
 // (children: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksCodespan", LasmSignature="(children: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksCodespan = DOMString? (DOMString children);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksCodespan", LasmSignature="(children: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksCodespan = DOMString? (DOMString children);
 
 // (children: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksStrikethrough", LasmSignature="(children: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksStrikethrough = DOMString? (DOMString children);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksStrikethrough", LasmSignature="(children: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksStrikethrough = DOMString? (DOMString children);
 
 // (text: string) => string | null | undefined
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="markdownRenderCallbacksText", LasmSignature="(text: string) => string | null | undefined"]
-callback Bun_markdownRenderCallbacksText = DOMString? (DOMString text);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="MarkdownRenderCallbacksText", LasmSignature="(text: string) => string | null | undefined"]
+callback Bun_MarkdownRenderCallbacksText = DOMString? (DOMString text);
 
 // object Bun.markdown.RenderCallbacks
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="markdownRenderCallbacks", LasmPath="Bun.markdown.RenderCallbacks"]
-dictionary Bun_markdownRenderCallbacks {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="MarkdownRenderCallbacks", LasmPath="Bun.markdown.RenderCallbacks"]
+dictionary Bun_MarkdownRenderCallbacks {
   // heading?: (children: string, meta: HeadingMeta) => string | null | undefined
-  Bun_markdownRenderCallbacksHeading heading;
+  Bun_MarkdownRenderCallbacksHeading heading;
   // paragraph?: (children: string) => string | null | undefined
-  Bun_markdownRenderCallbacksParagraph paragraph;
+  Bun_MarkdownRenderCallbacksParagraph paragraph;
   // blockquote?: (children: string) => string | null | undefined
-  Bun_markdownRenderCallbacksBlockquote blockquote;
+  Bun_MarkdownRenderCallbacksBlockquote blockquote;
   // code?: (children: string, meta?: CodeBlockMeta) => string | null | undefined
-  Bun_markdownRenderCallbacksCode code;
+  Bun_MarkdownRenderCallbacksCode code;
   // list?: (children: string, meta: ListMeta) => string | null | undefined
-  Bun_markdownRenderCallbacksList list;
+  Bun_MarkdownRenderCallbacksList list;
   // listItem?: (children: string, meta: ListItemMeta) => string | null | undefined
-  Bun_markdownRenderCallbacksListItem listItem;
+  Bun_MarkdownRenderCallbacksListItem listItem;
   // hr?: (children: string) => string | null | undefined
-  Bun_markdownRenderCallbacksHr hr;
+  Bun_MarkdownRenderCallbacksHr hr;
   // table?: (children: string) => string | null | undefined
-  Bun_markdownRenderCallbacksTable table;
+  Bun_MarkdownRenderCallbacksTable table;
   // thead?: (children: string) => string | null | undefined
-  Bun_markdownRenderCallbacksThead thead;
+  Bun_MarkdownRenderCallbacksThead thead;
   // tbody?: (children: string) => string | null | undefined
-  Bun_markdownRenderCallbacksTbody tbody;
+  Bun_MarkdownRenderCallbacksTbody tbody;
   // tr?: (children: string) => string | null | undefined
-  Bun_markdownRenderCallbacksTr tr;
+  Bun_MarkdownRenderCallbacksTr tr;
   // th?: (children: string, meta?: CellMeta) => string | null | undefined
-  Bun_markdownRenderCallbacksTh th;
+  Bun_MarkdownRenderCallbacksTh th;
   // td?: (children: string, meta?: CellMeta) => string | null | undefined
-  Bun_markdownRenderCallbacksTd td;
+  Bun_MarkdownRenderCallbacksTd td;
   // html?: (children: string) => string | null | undefined
-  Bun_markdownRenderCallbacksHtml html;
+  Bun_MarkdownRenderCallbacksHtml html;
   // strong?: (children: string) => string | null | undefined
-  Bun_markdownRenderCallbacksStrong strong;
+  Bun_MarkdownRenderCallbacksStrong strong;
   // emphasis?: (children: string) => string | null | undefined
-  Bun_markdownRenderCallbacksEmphasis emphasis;
+  Bun_MarkdownRenderCallbacksEmphasis emphasis;
   // link?: (children: string, meta: LinkMeta) => string | null | undefined
-  Bun_markdownRenderCallbacksLink link;
+  Bun_MarkdownRenderCallbacksLink link;
   // image?: (children: string, meta: ImageMeta) => string | null | undefined
-  Bun_markdownRenderCallbacksImage image;
+  Bun_MarkdownRenderCallbacksImage image;
   // codespan?: (children: string) => string | null | undefined
-  Bun_markdownRenderCallbacksCodespan codespan;
+  Bun_MarkdownRenderCallbacksCodespan codespan;
   // strikethrough?: (children: string) => string | null | undefined
-  Bun_markdownRenderCallbacksStrikethrough strikethrough;
+  Bun_MarkdownRenderCallbacksStrikethrough strikethrough;
   // text?: (text: string) => string | null | undefined
-  Bun_markdownRenderCallbacksText text;
+  Bun_MarkdownRenderCallbacksText text;
 };
 
 // object Bun.BunFileWriterOptions
@@ -1111,74 +1111,74 @@ dictionary Bun_ZstdCompressOptions {
 };
 
 // (socket: Socket<Data>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUndefinedBufferOpen", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
-callback Bun_SocketHandlerUndefinedBufferOpen = Promise<undefined> (Bun_Socket socket);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerOpen", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
+callback Bun_SocketHandlerOpen = Promise<undefined> (Bun_Socket socket);
 
 // (socket: Socket<Data>, error?: Error) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUndefinedBufferClose", LasmSignature="(socket: Socket<Data>, error?: Error) => void | Promise<void>"]
-callback Bun_SocketHandlerUndefinedBufferClose = Promise<undefined> (Bun_Socket socket, optional object error);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerClose", LasmSignature="(socket: Socket<Data>, error?: Error) => void | Promise<void>"]
+callback Bun_SocketHandlerClose = Promise<undefined> (Bun_Socket socket, optional object error);
 
 // (socket: Socket<Data>, error: Error) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUndefinedBufferError", LasmSignature="(socket: Socket<Data>, error: Error) => void | Promise<void>"]
-callback Bun_SocketHandlerUndefinedBufferError = Promise<undefined> (Bun_Socket socket, object error);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerError", LasmSignature="(socket: Socket<Data>, error: Error) => void | Promise<void>"]
+callback Bun_SocketHandlerError = Promise<undefined> (Bun_Socket socket, object error);
 
 // (socket: Socket<Data>, data: Uint8Array) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUndefinedBufferData", LasmSignature="(socket: Socket<Data>, data: Uint8Array) => void | Promise<void>"]
-callback Bun_SocketHandlerUndefinedBufferData = Promise<undefined> (Bun_Socket socket, Uint8Array data);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerData", LasmSignature="(socket: Socket<Data>, data: Uint8Array) => void | Promise<void>"]
+callback Bun_SocketHandlerData = Promise<undefined> (Bun_Socket socket, Uint8Array data);
 
 // (socket: Socket<Data>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUndefinedBufferDrain", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
-callback Bun_SocketHandlerUndefinedBufferDrain = Promise<undefined> (Bun_Socket socket);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerDrain", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
+callback Bun_SocketHandlerDrain = Promise<undefined> (Bun_Socket socket);
 
 // (socket: Socket<Data>, success: boolean, authorizationError: Error | null) => void
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUndefinedBufferHandshake", LasmSignature="(socket: Socket<Data>, success: boolean, authorizationError: Error | null) => void"]
-callback Bun_SocketHandlerUndefinedBufferHandshake = undefined (Bun_Socket socket, boolean success, object? authorizationError);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerHandshake", LasmSignature="(socket: Socket<Data>, success: boolean, authorizationError: Error | null) => void"]
+callback Bun_SocketHandlerHandshake = undefined (Bun_Socket socket, boolean success, object? authorizationError);
 
 // (socket: Socket<Data>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUndefinedBufferEnd", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
-callback Bun_SocketHandlerUndefinedBufferEnd = Promise<undefined> (Bun_Socket socket);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerEnd", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
+callback Bun_SocketHandlerEnd = Promise<undefined> (Bun_Socket socket);
 
 // (socket: Socket<Data>, error: Error) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUndefinedBufferConnectError", LasmSignature="(socket: Socket<Data>, error: Error) => void | Promise<void>"]
-callback Bun_SocketHandlerUndefinedBufferConnectError = Promise<undefined> (Bun_Socket socket, object error);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerConnectError", LasmSignature="(socket: Socket<Data>, error: Error) => void | Promise<void>"]
+callback Bun_SocketHandlerConnectError = Promise<undefined> (Bun_Socket socket, object error);
 
 // (socket: Socket<Data>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUndefinedBufferTimeout", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
-callback Bun_SocketHandlerUndefinedBufferTimeout = Promise<undefined> (Bun_Socket socket);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerTimeout", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
+callback Bun_SocketHandlerTimeout = Promise<undefined> (Bun_Socket socket);
 
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUndefinedBufferBinaryType"]
-enum Bun_SocketHandlerUndefinedBufferBinaryType { "arraybuffer", "buffer", "uint8array" };
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerBinaryType"]
+enum Bun_SocketHandlerBinaryType { "arraybuffer", "buffer", "uint8array" };
 
 // object Bun.SocketHandler (SocketHandler<undefined, "buffer">)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SocketHandlerUndefinedBuffer", LasmPath="Bun.SocketHandler"]
-dictionary Bun_SocketHandlerUndefinedBuffer {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SocketHandler", LasmPath="Bun.SocketHandler"]
+dictionary Bun_SocketHandler {
   // open?(socket: Socket<Data>): void | Promise<void>
-  Bun_SocketHandlerUndefinedBufferOpen open;
+  Bun_SocketHandlerOpen open;
   // close?(socket: Socket<Data>, error?: Error): void | Promise<void>
-  Bun_SocketHandlerUndefinedBufferClose close;
+  Bun_SocketHandlerClose close;
   // error?(socket: Socket<Data>, error: Error): void | Promise<void>
-  Bun_SocketHandlerUndefinedBufferError error;
+  Bun_SocketHandlerError error;
   // data?(socket: Socket<Data>, data: BinaryTypeList[DataBinaryType]): void | Promise<void> (read as  {"data":"Uint8Array"}: indexed by the binary type (a Buffer by default))
-  Bun_SocketHandlerUndefinedBufferData data;
+  Bun_SocketHandlerData data;
   // drain?(socket: Socket<Data>): void | Promise<void>
-  Bun_SocketHandlerUndefinedBufferDrain drain;
+  Bun_SocketHandlerDrain drain;
   // handshake?(socket: Socket<Data>, success: boolean, authorizationError: Error | null): void
-  Bun_SocketHandlerUndefinedBufferHandshake handshake;
+  Bun_SocketHandlerHandshake handshake;
   // end?(socket: Socket<Data>): void | Promise<void>
-  Bun_SocketHandlerUndefinedBufferEnd end;
+  Bun_SocketHandlerEnd end;
   // connectError?(socket: Socket<Data>, error: Error): void | Promise<void>
-  Bun_SocketHandlerUndefinedBufferConnectError connectError;
+  Bun_SocketHandlerConnectError connectError;
   // timeout?(socket: Socket<Data>): void | Promise<void>
-  Bun_SocketHandlerUndefinedBufferTimeout timeout;
+  Bun_SocketHandlerTimeout timeout;
   // binaryType?: BinaryType (read as "arraybuffer" | "buffer" | "uint8array": keyof BinaryTypeList)
-  Bun_SocketHandlerUndefinedBufferBinaryType binaryType;
+  Bun_SocketHandlerBinaryType binaryType;
 };
 
 // object Bun.SocketOptions (SocketOptions<undefined>)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SocketOptionsUndefined", LasmPath="Bun.SocketOptions"]
-dictionary Bun_SocketOptionsUndefined {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SocketOptions", LasmPath="Bun.SocketOptions"]
+dictionary Bun_SocketOptions {
   // socket: SocketHandler<Data>
-  required Bun_SocketHandlerUndefinedBuffer socket;
+  required Bun_SocketHandler socket;
   // data?: Data
   undefined data;
   // allowHalfOpen?: boolean
@@ -1195,7 +1195,7 @@ interface Bun_SocketListener {
   // unref(): void
   [LasmHost="Bun", LasmSignature="unref(): void"] undefined unref();
   // reload(options: Pick<SocketOptions<Data>, "socket">): void
-  [LasmHost="Bun", LasmSignature="reload(options: Pick<SocketOptions<Data>, 'socket'>): void"] undefined reload(Bun_SocketOptionsUndefined options);
+  [LasmHost="Bun", LasmSignature="reload(options: Pick<SocketOptions<Data>, 'socket'>): void"] undefined reload(Bun_SocketOptions options);
   // data: Data
   [LasmHost="Bun", LasmSignature="data: Data"] readonly attribute undefined data;
 };
@@ -1256,10 +1256,10 @@ dictionary Bun_TLSOptions {
 typedef (Bun_TLSOptions or boolean) Bun_TLSOptionsOrBoolean;
 
 // object Bun.SocketOptions (SocketOptions<unknown>)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SocketOptions", LasmPath="Bun.SocketOptions"]
-dictionary Bun_SocketOptions {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SocketOptionsUnknown", LasmPath="Bun.SocketOptions"]
+dictionary Bun_SocketOptionsUnknown {
   // socket: SocketHandler<Data>
-  required Bun_SocketHandler socket;
+  required Bun_SocketHandlerUnknownBuffer socket;
   // data?: Data
   any data;
   // allowHalfOpen?: boolean
@@ -1298,7 +1298,7 @@ interface Bun_SocketUnknown {
   // flush(): void
   [LasmHost="Bun", LasmSignature="flush(): void"] undefined flush();
   // reload(options: Pick<SocketOptions<Data>, "socket">): void
-  [LasmHost="Bun", LasmSignature="reload(options: Pick<SocketOptions<Data>, 'socket'>): void"] undefined reload(Bun_SocketOptions options);
+  [LasmHost="Bun", LasmSignature="reload(options: Pick<SocketOptions<Data>, 'socket'>): void"] undefined reload(Bun_SocketOptionsUnknown options);
   // readonly listener?: SocketListener
   [LasmHost="Bun", LasmSignature="readonly listener?: SocketListener"] readonly attribute Bun_SocketListener? listener;
   // readonly remoteFamily: "IPv4" | "IPv6"
@@ -1370,7 +1370,7 @@ interface Bun_SocketUnknown {
   // setSession(session: string | Buffer | BufferSource): void
   [LasmHost="Bun", LasmSignature="setSession(session: string | Buffer | BufferSource): void"] undefined setSession(Bun_DOMStringOrUint8Array session);
   // upgradeTLS<Data>(options: TLSUpgradeOptions<Data>): [raw: Socket<Data>, tls: Socket<Data>]
-  [LasmHost="Bun", LasmSignature="upgradeTLS<Data>(options: TLSUpgradeOptions<Data>): [raw: Socket<Data>, tls: Socket<Data>]"] sequence<Bun_SocketUnknown> upgradeTLS(Bun_TLSUpgradeOptions options);
+  [LasmHost="Bun", LasmSignature="upgradeTLS<Data>(options: TLSUpgradeOptions<Data>): [raw: Socket<Data>, tls: Socket<Data>]"] sequence<Bun_SocketUnknown> upgradeTLS(Bun_TLSUpgradeOptionsUnknown options);
   // close(): void
   [LasmHost="Bun", LasmSignature="close(): void"] undefined close();
   // getServername(): string
@@ -1380,78 +1380,78 @@ interface Bun_SocketUnknown {
 };
 
 // (socket: Socket<Data>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerOpen", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
-callback Bun_SocketHandlerOpen = Promise<undefined> (Bun_SocketUnknown socket);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUnknownBufferOpen", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
+callback Bun_SocketHandlerUnknownBufferOpen = Promise<undefined> (Bun_SocketUnknown socket);
 
 // (socket: Socket<Data>, error?: Error) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerClose", LasmSignature="(socket: Socket<Data>, error?: Error) => void | Promise<void>"]
-callback Bun_SocketHandlerClose = Promise<undefined> (Bun_SocketUnknown socket, optional object error);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUnknownBufferClose", LasmSignature="(socket: Socket<Data>, error?: Error) => void | Promise<void>"]
+callback Bun_SocketHandlerUnknownBufferClose = Promise<undefined> (Bun_SocketUnknown socket, optional object error);
 
 // (socket: Socket<Data>, error: Error) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerError", LasmSignature="(socket: Socket<Data>, error: Error) => void | Promise<void>"]
-callback Bun_SocketHandlerError = Promise<undefined> (Bun_SocketUnknown socket, object error);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUnknownBufferError", LasmSignature="(socket: Socket<Data>, error: Error) => void | Promise<void>"]
+callback Bun_SocketHandlerUnknownBufferError = Promise<undefined> (Bun_SocketUnknown socket, object error);
 
 // (socket: Socket<Data>, data: Uint8Array) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerData", LasmSignature="(socket: Socket<Data>, data: Uint8Array) => void | Promise<void>"]
-callback Bun_SocketHandlerData = Promise<undefined> (Bun_SocketUnknown socket, Uint8Array data);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUnknownBufferData", LasmSignature="(socket: Socket<Data>, data: Uint8Array) => void | Promise<void>"]
+callback Bun_SocketHandlerUnknownBufferData = Promise<undefined> (Bun_SocketUnknown socket, Uint8Array data);
 
 // (socket: Socket<Data>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerDrain", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
-callback Bun_SocketHandlerDrain = Promise<undefined> (Bun_SocketUnknown socket);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUnknownBufferDrain", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
+callback Bun_SocketHandlerUnknownBufferDrain = Promise<undefined> (Bun_SocketUnknown socket);
 
 // (socket: Socket<Data>, success: boolean, authorizationError: Error | null) => void
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerHandshake", LasmSignature="(socket: Socket<Data>, success: boolean, authorizationError: Error | null) => void"]
-callback Bun_SocketHandlerHandshake = undefined (Bun_SocketUnknown socket, boolean success, object? authorizationError);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUnknownBufferHandshake", LasmSignature="(socket: Socket<Data>, success: boolean, authorizationError: Error | null) => void"]
+callback Bun_SocketHandlerUnknownBufferHandshake = undefined (Bun_SocketUnknown socket, boolean success, object? authorizationError);
 
 // (socket: Socket<Data>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerEnd", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
-callback Bun_SocketHandlerEnd = Promise<undefined> (Bun_SocketUnknown socket);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUnknownBufferEnd", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
+callback Bun_SocketHandlerUnknownBufferEnd = Promise<undefined> (Bun_SocketUnknown socket);
 
 // (socket: Socket<Data>, error: Error) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerConnectError", LasmSignature="(socket: Socket<Data>, error: Error) => void | Promise<void>"]
-callback Bun_SocketHandlerConnectError = Promise<undefined> (Bun_SocketUnknown socket, object error);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUnknownBufferConnectError", LasmSignature="(socket: Socket<Data>, error: Error) => void | Promise<void>"]
+callback Bun_SocketHandlerUnknownBufferConnectError = Promise<undefined> (Bun_SocketUnknown socket, object error);
 
 // (socket: Socket<Data>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerTimeout", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
-callback Bun_SocketHandlerTimeout = Promise<undefined> (Bun_SocketUnknown socket);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUnknownBufferTimeout", LasmSignature="(socket: Socket<Data>) => void | Promise<void>"]
+callback Bun_SocketHandlerUnknownBufferTimeout = Promise<undefined> (Bun_SocketUnknown socket);
 
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerBinaryType"]
-enum Bun_SocketHandlerBinaryType { "arraybuffer", "buffer", "uint8array" };
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketHandlerUnknownBufferBinaryType"]
+enum Bun_SocketHandlerUnknownBufferBinaryType { "arraybuffer", "buffer", "uint8array" };
 
 // object Bun.SocketHandler (SocketHandler<unknown, "buffer">)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SocketHandler", LasmPath="Bun.SocketHandler"]
-dictionary Bun_SocketHandler {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SocketHandlerUnknownBuffer", LasmPath="Bun.SocketHandler"]
+dictionary Bun_SocketHandlerUnknownBuffer {
   // open?(socket: Socket<Data>): void | Promise<void>
-  Bun_SocketHandlerOpen open;
+  Bun_SocketHandlerUnknownBufferOpen open;
   // close?(socket: Socket<Data>, error?: Error): void | Promise<void>
-  Bun_SocketHandlerClose close;
+  Bun_SocketHandlerUnknownBufferClose close;
   // error?(socket: Socket<Data>, error: Error): void | Promise<void>
-  Bun_SocketHandlerError error;
+  Bun_SocketHandlerUnknownBufferError error;
   // data?(socket: Socket<Data>, data: BinaryTypeList[DataBinaryType]): void | Promise<void> (read as  {"data":"Uint8Array"}: indexed by the binary type (a Buffer by default))
-  Bun_SocketHandlerData data;
+  Bun_SocketHandlerUnknownBufferData data;
   // drain?(socket: Socket<Data>): void | Promise<void>
-  Bun_SocketHandlerDrain drain;
+  Bun_SocketHandlerUnknownBufferDrain drain;
   // handshake?(socket: Socket<Data>, success: boolean, authorizationError: Error | null): void
-  Bun_SocketHandlerHandshake handshake;
+  Bun_SocketHandlerUnknownBufferHandshake handshake;
   // end?(socket: Socket<Data>): void | Promise<void>
-  Bun_SocketHandlerEnd end;
+  Bun_SocketHandlerUnknownBufferEnd end;
   // connectError?(socket: Socket<Data>, error: Error): void | Promise<void>
-  Bun_SocketHandlerConnectError connectError;
+  Bun_SocketHandlerUnknownBufferConnectError connectError;
   // timeout?(socket: Socket<Data>): void | Promise<void>
-  Bun_SocketHandlerTimeout timeout;
+  Bun_SocketHandlerUnknownBufferTimeout timeout;
   // binaryType?: BinaryType (read as "arraybuffer" | "buffer" | "uint8array": keyof BinaryTypeList)
-  Bun_SocketHandlerBinaryType binaryType;
+  Bun_SocketHandlerUnknownBufferBinaryType binaryType;
 };
 
 // object Bun.TLSUpgradeOptions (TLSUpgradeOptions<unknown>)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="TLSUpgradeOptions", LasmPath="Bun.TLSUpgradeOptions"]
-dictionary Bun_TLSUpgradeOptions {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="TLSUpgradeOptionsUnknown", LasmPath="Bun.TLSUpgradeOptions"]
+dictionary Bun_TLSUpgradeOptionsUnknown {
   // data?: Data
   any data;
   // tls: TLSOptions | boolean
   required Bun_TLSOptionsOrBoolean tls;
   // socket: SocketHandler<Data>
-  required Bun_SocketHandler socket;
+  required Bun_SocketHandlerUnknownBuffer socket;
 };
 
 // interface Bun.Socket (Socket<undefined>)
@@ -1480,7 +1480,7 @@ interface Bun_Socket {
   // flush(): void
   [LasmHost="Bun", LasmSignature="flush(): void"] undefined flush();
   // reload(options: Pick<SocketOptions<Data>, "socket">): void
-  [LasmHost="Bun", LasmSignature="reload(options: Pick<SocketOptions<Data>, 'socket'>): void"] undefined reload(Bun_SocketOptionsUndefined options);
+  [LasmHost="Bun", LasmSignature="reload(options: Pick<SocketOptions<Data>, 'socket'>): void"] undefined reload(Bun_SocketOptions options);
   // readonly listener?: SocketListener
   [LasmHost="Bun", LasmSignature="readonly listener?: SocketListener"] readonly attribute Bun_SocketListener? listener;
   // readonly remoteFamily: "IPv4" | "IPv6"
@@ -1552,7 +1552,7 @@ interface Bun_Socket {
   // setSession(session: string | Buffer | BufferSource): void
   [LasmHost="Bun", LasmSignature="setSession(session: string | Buffer | BufferSource): void"] undefined setSession(Bun_DOMStringOrUint8Array session);
   // upgradeTLS<Data>(options: TLSUpgradeOptions<Data>): [raw: Socket<Data>, tls: Socket<Data>]
-  [LasmHost="Bun", LasmSignature="upgradeTLS<Data>(options: TLSUpgradeOptions<Data>): [raw: Socket<Data>, tls: Socket<Data>]"] sequence<Bun_SocketUnknown> upgradeTLS(Bun_TLSUpgradeOptions options);
+  [LasmHost="Bun", LasmSignature="upgradeTLS<Data>(options: TLSUpgradeOptions<Data>): [raw: Socket<Data>, tls: Socket<Data>]"] sequence<Bun_SocketUnknown> upgradeTLS(Bun_TLSUpgradeOptionsUnknown options);
   // close(): void
   [LasmHost="Bun", LasmSignature="close(): void"] undefined close();
   // getServername(): string
@@ -1563,7 +1563,7 @@ interface Bun_Socket {
 
 // object Bun.TCPSocketConnectOptions (TCPSocketConnectOptions<undefined>)
 [LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="TCPSocketConnectOptions", LasmPath="Bun.TCPSocketConnectOptions"]
-dictionary Bun_TCPSocketConnectOptions : Bun_SocketOptionsUndefined {
+dictionary Bun_TCPSocketConnectOptions : Bun_SocketOptions {
   // hostname: string
   required DOMString hostname;
   // port: number
@@ -1580,7 +1580,7 @@ dictionary Bun_TCPSocketConnectOptions : Bun_SocketOptionsUndefined {
 
 // object Bun.UnixSocketOptions (UnixSocketOptions<undefined>)
 [LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UnixSocketOptions", LasmPath="Bun.UnixSocketOptions"]
-dictionary Bun_UnixSocketOptions : Bun_SocketOptionsUndefined {
+dictionary Bun_UnixSocketOptions : Bun_SocketOptions {
   // unix: string
   required DOMString unix;
   // tls?: TLSOptions | boolean
@@ -1588,8 +1588,8 @@ dictionary Bun_UnixSocketOptions : Bun_SocketOptionsUndefined {
 };
 
 // interface Bun.TCPSocketListener (TCPSocketListener<undefined>)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="TCPSocketListenerUndefined", LasmPath="Bun.TCPSocketListener"]
-interface Bun_TCPSocketListenerUndefined : Bun_SocketListener {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="TCPSocketListener", LasmPath="Bun.TCPSocketListener"]
+interface Bun_TCPSocketListener : Bun_SocketListener {
   // readonly port: number
   [LasmHost="Bun", LasmSignature="readonly port: number"] readonly attribute double port;
   // readonly hostname: string
@@ -1598,7 +1598,7 @@ interface Bun_TCPSocketListenerUndefined : Bun_SocketListener {
 
 // object Bun.TCPSocketListenOptions (TCPSocketListenOptions<undefined>)
 [LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="TCPSocketListenOptions", LasmPath="Bun.TCPSocketListenOptions"]
-dictionary Bun_TCPSocketListenOptions : Bun_SocketOptionsUndefined {
+dictionary Bun_TCPSocketListenOptions : Bun_SocketOptions {
   // hostname: string
   required DOMString hostname;
   // port: number
@@ -1610,21 +1610,21 @@ dictionary Bun_TCPSocketListenOptions : Bun_SocketOptionsUndefined {
 };
 
 // interface Bun.UnixSocketListener (UnixSocketListener<undefined>)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UnixSocketListenerUndefined", LasmPath="Bun.UnixSocketListener"]
-interface Bun_UnixSocketListenerUndefined : Bun_SocketListener {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UnixSocketListener", LasmPath="Bun.UnixSocketListener"]
+interface Bun_UnixSocketListener : Bun_SocketListener {
   // readonly unix: string
   [LasmHost="Bun", LasmSignature="readonly unix: string"] readonly attribute DOMString unix;
 };
 
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="udpData"]
-typedef (DOMString or Uint8Array) Bun_udpData;
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpData"]
+typedef (DOMString or Uint8Array) Bun_UdpData;
 
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpDataOrDOMStringOrDouble"]
-typedef (Bun_udpData or DOMString or double) Bun_UdpDataOrDOMStringOrDouble;
+typedef (Bun_UdpData or DOMString or double) Bun_UdpDataOrDOMStringOrDouble;
 
 // object Bun.udp.ReceiveFlags
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="udpReceiveFlags", LasmPath="Bun.udp.ReceiveFlags"]
-dictionary Bun_udpReceiveFlags {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UdpReceiveFlags", LasmPath="Bun.udp.ReceiveFlags"]
+dictionary Bun_UdpReceiveFlags {
   // truncated: boolean
   required boolean truncated;
   // ipv6: boolean
@@ -1632,53 +1632,53 @@ dictionary Bun_udpReceiveFlags {
 };
 
 // (socket: Socket<DataBinaryType>, data: Uint8Array, port: number, address: string, flags: ReceiveFlags) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="udpSocketHandlerBufferData", LasmSignature="(socket: Socket<DataBinaryType>, data: Uint8Array, port: number, address: string, flags: ReceiveFlags) => void | Promise<void>"]
-callback Bun_udpSocketHandlerBufferData = Promise<undefined> (Bun_udpSocketBuffer socket, Uint8Array data, double port, DOMString address, Bun_udpReceiveFlags flags);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpSocketHandlerData", LasmSignature="(socket: Socket<DataBinaryType>, data: Uint8Array, port: number, address: string, flags: ReceiveFlags) => void | Promise<void>"]
+callback Bun_UdpSocketHandlerData = Promise<undefined> (Bun_UdpSocket socket, Uint8Array data, double port, DOMString address, Bun_UdpReceiveFlags flags);
 
 // (socket: Socket<DataBinaryType>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="udpSocketHandlerBufferDrain", LasmSignature="(socket: Socket<DataBinaryType>) => void | Promise<void>"]
-callback Bun_udpSocketHandlerBufferDrain = Promise<undefined> (Bun_udpSocketBuffer socket);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpSocketHandlerDrain", LasmSignature="(socket: Socket<DataBinaryType>) => void | Promise<void>"]
+callback Bun_UdpSocketHandlerDrain = Promise<undefined> (Bun_UdpSocket socket);
 
 // (socket: Socket<DataBinaryType>, error: Error) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="udpSocketHandlerBufferError", LasmSignature="(socket: Socket<DataBinaryType>, error: Error) => void | Promise<void>"]
-callback Bun_udpSocketHandlerBufferError = Promise<undefined> (Bun_udpSocketBuffer socket, object error);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpSocketHandlerError", LasmSignature="(socket: Socket<DataBinaryType>, error: Error) => void | Promise<void>"]
+callback Bun_UdpSocketHandlerError = Promise<undefined> (Bun_UdpSocket socket, object error);
 
 // object Bun.udp.SocketHandler (udp.SocketHandler<"buffer">)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="udpSocketHandlerBuffer", LasmPath="Bun.udp.SocketHandler"]
-dictionary Bun_udpSocketHandlerBuffer {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UdpSocketHandler", LasmPath="Bun.udp.SocketHandler"]
+dictionary Bun_UdpSocketHandler {
   // data?(socket: Socket<DataBinaryType>, data: BinaryTypeList[DataBinaryType], port: number, address: string, flags: ReceiveFlags): void | Promise<void> (read as  {"data":"Uint8Array"}: indexed by the binary type (a Buffer by default))
-  Bun_udpSocketHandlerBufferData data;
+  Bun_UdpSocketHandlerData data;
   // drain?(socket: Socket<DataBinaryType>): void | Promise<void>
-  Bun_udpSocketHandlerBufferDrain drain;
+  Bun_UdpSocketHandlerDrain drain;
   // error?(socket: Socket<DataBinaryType>, error: Error): void | Promise<void>
-  Bun_udpSocketHandlerBufferError error;
+  Bun_UdpSocketHandlerError error;
 };
 
 // interface Bun.udp.Socket (udp.Socket<"buffer">)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="udpSocketBuffer", LasmPath="Bun.udp.Socket"]
-interface Bun_udpSocketBuffer {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UdpSocket", LasmPath="Bun.udp.Socket"]
+interface Bun_UdpSocket {
   // sendMany(packets: readonly (Data | string | number)[]): number
   [LasmHost="Bun", LasmSignature="sendMany(packets: readonly (Data | string | number)[]): number"] double sendMany(sequence<Bun_UdpDataOrDOMStringOrDouble> packets);
   // send(data: Data, port: number, address: string): boolean
-  [LasmHost="Bun", LasmSignature="send(data: Data, port: number, address: string): boolean"] boolean send(Bun_udpData data, double port, DOMString address);
+  [LasmHost="Bun", LasmSignature="send(data: Data, port: number, address: string): boolean"] boolean send(Bun_UdpData data, double port, DOMString address);
   // reload(handler: SocketHandler<DataBinaryType>): void
-  [LasmHost="Bun", LasmSignature="reload(handler: SocketHandler<DataBinaryType>): void"] undefined reload(Bun_udpSocketHandlerBuffer handler);
+  [LasmHost="Bun", LasmSignature="reload(handler: SocketHandler<DataBinaryType>): void"] undefined reload(Bun_UdpSocketHandler handler);
 };
 
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="udpSocketOptionsBufferBinaryType"]
-enum Bun_udpSocketOptionsBufferBinaryType { "buffer" };
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpSocketOptionsBinaryType"]
+enum Bun_UdpSocketOptionsBinaryType { "buffer" };
 
 // object Bun.udp.SocketOptions (udp.SocketOptions<"buffer">)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="udpSocketOptionsBuffer", LasmPath="Bun.udp.SocketOptions"]
-dictionary Bun_udpSocketOptionsBuffer {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UdpSocketOptions", LasmPath="Bun.udp.SocketOptions"]
+dictionary Bun_UdpSocketOptions {
   // hostname?: string
   DOMString hostname;
   // port?: number
   double port;
   // binaryType?: DataBinaryType
-  Bun_udpSocketOptionsBufferBinaryType binaryType;
+  Bun_UdpSocketOptionsBinaryType binaryType;
   // socket?: SocketHandler<DataBinaryType>
-  Bun_udpSocketHandlerBuffer socket;
+  Bun_UdpSocketHandler socket;
 };
 
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="SocketAddressFamily"]
@@ -1696,47 +1696,47 @@ dictionary Bun_SocketAddress {
 };
 
 // (socket: ConnectedSocket<DataBinaryType>, data: Uint8Array, port: number, address: string, flags: ReceiveFlags) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="udpConnectedSocketHandlerBufferData", LasmSignature="(socket: ConnectedSocket<DataBinaryType>, data: Uint8Array, port: number, address: string, flags: ReceiveFlags) => void | Promise<void>"]
-callback Bun_udpConnectedSocketHandlerBufferData = Promise<undefined> (Bun_udpConnectedSocketBuffer socket, Uint8Array data, double port, DOMString address, Bun_udpReceiveFlags flags);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpConnectedSocketHandlerData", LasmSignature="(socket: ConnectedSocket<DataBinaryType>, data: Uint8Array, port: number, address: string, flags: ReceiveFlags) => void | Promise<void>"]
+callback Bun_UdpConnectedSocketHandlerData = Promise<undefined> (Bun_UdpConnectedSocket socket, Uint8Array data, double port, DOMString address, Bun_UdpReceiveFlags flags);
 
 // (socket: ConnectedSocket<DataBinaryType>) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="udpConnectedSocketHandlerBufferDrain", LasmSignature="(socket: ConnectedSocket<DataBinaryType>) => void | Promise<void>"]
-callback Bun_udpConnectedSocketHandlerBufferDrain = Promise<undefined> (Bun_udpConnectedSocketBuffer socket);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpConnectedSocketHandlerDrain", LasmSignature="(socket: ConnectedSocket<DataBinaryType>) => void | Promise<void>"]
+callback Bun_UdpConnectedSocketHandlerDrain = Promise<undefined> (Bun_UdpConnectedSocket socket);
 
 // (socket: ConnectedSocket<DataBinaryType>, error: Error) => void | Promise<void>
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="udpConnectedSocketHandlerBufferError", LasmSignature="(socket: ConnectedSocket<DataBinaryType>, error: Error) => void | Promise<void>"]
-callback Bun_udpConnectedSocketHandlerBufferError = Promise<undefined> (Bun_udpConnectedSocketBuffer socket, object error);
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpConnectedSocketHandlerError", LasmSignature="(socket: ConnectedSocket<DataBinaryType>, error: Error) => void | Promise<void>"]
+callback Bun_UdpConnectedSocketHandlerError = Promise<undefined> (Bun_UdpConnectedSocket socket, object error);
 
 // object Bun.udp.ConnectedSocketHandler (udp.ConnectedSocketHandler<"buffer">)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="udpConnectedSocketHandlerBuffer", LasmPath="Bun.udp.ConnectedSocketHandler"]
-dictionary Bun_udpConnectedSocketHandlerBuffer {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UdpConnectedSocketHandler", LasmPath="Bun.udp.ConnectedSocketHandler"]
+dictionary Bun_UdpConnectedSocketHandler {
   // data?(socket: ConnectedSocket<DataBinaryType>, data: BinaryTypeList[DataBinaryType], port: number, address: string, flags: ReceiveFlags): void | Promise<void> (read as  {"data":"Uint8Array"}: indexed by the binary type (a Buffer by default))
-  Bun_udpConnectedSocketHandlerBufferData data;
+  Bun_UdpConnectedSocketHandlerData data;
   // drain?(socket: ConnectedSocket<DataBinaryType>): void | Promise<void>
-  Bun_udpConnectedSocketHandlerBufferDrain drain;
+  Bun_UdpConnectedSocketHandlerDrain drain;
   // error?(socket: ConnectedSocket<DataBinaryType>, error: Error): void | Promise<void>
-  Bun_udpConnectedSocketHandlerBufferError error;
+  Bun_UdpConnectedSocketHandlerError error;
 };
 
 // interface Bun.udp.ConnectedSocket (udp.ConnectedSocket<"buffer">)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="udpConnectedSocketBuffer", LasmPath="Bun.udp.ConnectedSocket"]
-interface Bun_udpConnectedSocketBuffer {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UdpConnectedSocket", LasmPath="Bun.udp.ConnectedSocket"]
+interface Bun_UdpConnectedSocket {
   // readonly remoteAddress: SocketAddress
   [LasmHost="Bun", LasmSignature="readonly remoteAddress: SocketAddress"] readonly attribute Bun_SocketAddress remoteAddress;
   // sendMany(packets: readonly Data[]): number
-  [LasmHost="Bun", LasmSignature="sendMany(packets: readonly Data[]): number"] double sendMany(sequence<Bun_udpData> packets);
+  [LasmHost="Bun", LasmSignature="sendMany(packets: readonly Data[]): number"] double sendMany(sequence<Bun_UdpData> packets);
   // send(data: Data): boolean
-  [LasmHost="Bun", LasmSignature="send(data: Data): boolean"] boolean send(Bun_udpData data);
+  [LasmHost="Bun", LasmSignature="send(data: Data): boolean"] boolean send(Bun_UdpData data);
   // reload(handler: ConnectedSocketHandler<DataBinaryType>): void
-  [LasmHost="Bun", LasmSignature="reload(handler: ConnectedSocketHandler<DataBinaryType>): void"] undefined reload(Bun_udpConnectedSocketHandlerBuffer handler);
+  [LasmHost="Bun", LasmSignature="reload(handler: ConnectedSocketHandler<DataBinaryType>): void"] undefined reload(Bun_UdpConnectedSocketHandler handler);
 };
 
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="udpConnectSocketOptionsBufferBinaryType"]
-enum Bun_udpConnectSocketOptionsBufferBinaryType { "buffer" };
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpConnectSocketOptionsBinaryType"]
+enum Bun_UdpConnectSocketOptionsBinaryType { "buffer" };
 
-// object Bun.udpConnectSocketOptionsBufferConnect
-[LasmHost="Bun", LasmLeanModule="Core", LasmName="udpConnectSocketOptionsBufferConnect", LasmPath="Bun.udpConnectSocketOptionsBufferConnect"]
-dictionary Bun_udpConnectSocketOptionsBufferConnect {
+// object Bun.UdpConnectSocketOptionsConnect
+[LasmHost="Bun", LasmLeanModule="Core", LasmName="UdpConnectSocketOptionsConnect", LasmPath="Bun.UdpConnectSocketOptionsConnect"]
+dictionary Bun_UdpConnectSocketOptionsConnect {
   // hostname: string
   required DOMString hostname;
   // port: number
@@ -1744,18 +1744,18 @@ dictionary Bun_udpConnectSocketOptionsBufferConnect {
 };
 
 // object Bun.udp.ConnectSocketOptions (udp.ConnectSocketOptions<"buffer">)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="udpConnectSocketOptionsBuffer", LasmPath="Bun.udp.ConnectSocketOptions"]
-dictionary Bun_udpConnectSocketOptionsBuffer {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="UdpConnectSocketOptions", LasmPath="Bun.udp.ConnectSocketOptions"]
+dictionary Bun_UdpConnectSocketOptions {
   // hostname?: string
   DOMString hostname;
   // port?: number
   double port;
   // binaryType?: DataBinaryType
-  Bun_udpConnectSocketOptionsBufferBinaryType binaryType;
+  Bun_UdpConnectSocketOptionsBinaryType binaryType;
   // socket?: ConnectedSocketHandler<DataBinaryType>
-  Bun_udpConnectedSocketHandlerBuffer socket;
+  Bun_UdpConnectedSocketHandler socket;
   // connect: { hostname: string; port: number; }
-  required Bun_udpConnectSocketOptionsBufferConnect connect;
+  required Bun_UdpConnectSocketOptionsConnect connect;
 };
 
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="FileSinkOrDouble"]
@@ -1885,8 +1885,8 @@ dictionary Bun_ResourceUsage {
 };
 
 // interface Bun.Subprocess (Subprocess<"ignore", "pipe", "inherit">)
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="SubprocessIgnorePipeInherit", LasmPath="Bun.Subprocess"]
-interface Bun_SubprocessIgnorePipeInherit {
+[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="Subprocess", LasmPath="Bun.Subprocess"]
+interface Bun_Subprocess {
   // readonly stdin: SpawnOptions.WritableToIO<In> (read as FileSink | number | undefined: conditional on the stdin option (a FileSink when "pipe"))
   [LasmHost="Bun", LasmSignature="readonly stdin: SpawnOptions.WritableToIO<In> (read as FileSink | number | undefined: conditional on the stdin option (a FileSink when 'pipe'))"] readonly attribute Bun_FileSinkOrDouble? stdin;
   // readonly stdout: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option (a stream when "pipe"))
@@ -2052,7 +2052,7 @@ callback Bun_ServeOptionsError = Promise<Response> (Bun_ErrorLike error);
 
 // (this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>) => MaybePromise<Response>
 [LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServeOptionsFetch", LasmSignature="(this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>) => MaybePromise<Response>"]
-callback Bun_ServeOptionsFetch = Promise<Response> (Request req, Bun_ServerUndefined server);
+callback Bun_ServeOptionsFetch = Promise<Response> (Request req, Bun_Server server);
 
 // object Bun.Serve.Routes
 [LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServeRoutesUndefinedNever", LasmPath="Bun.Serve.Routes"]
@@ -2262,9 +2262,9 @@ dictionary Bun_ServeOptions {
 [LasmHost="Bun", LasmLeanModule="Serve", LasmName="RequestOrDOMString"]
 typedef (Request or DOMString) Bun_RequestOrDOMString;
 
-// object Bun.ServerUndefinedUpgradeOptions
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServerUndefinedUpgradeOptions", LasmPath="Bun.ServerUndefinedUpgradeOptions"]
-dictionary Bun_ServerUndefinedUpgradeOptions {
+// object Bun.ServerUpgradeOptions
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServerUpgradeOptions", LasmPath="Bun.ServerUpgradeOptions"]
+dictionary Bun_ServerUpgradeOptions {
   // headers?: HeadersInit
   HeadersInit headers;
   // data?: unknown
@@ -2274,22 +2274,22 @@ dictionary Bun_ServerUndefinedUpgradeOptions {
 [LasmHost="Bun", LasmLeanModule="Serve", LasmName="DOMStringOrUint8ArrayOrArrayBufferOrBlob"]
 typedef (DOMString or Uint8Array or ArrayBuffer or Blob) Bun_DOMStringOrUint8ArrayOrArrayBufferOrBlob;
 
-[LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServerUndefinedProtocol"]
-enum Bun_ServerUndefinedProtocol { "http", "https" };
+[LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServerProtocol"]
+enum Bun_ServerProtocol { "http", "https" };
 
 // interface Bun.Server (Server<undefined>)
-[LasmHost="Bun", LasmLeanModule="Serve", LasmFile="serve.d.ts", LasmName="ServerUndefined", LasmPath="Bun.Server"]
-interface Bun_ServerUndefined {
+[LasmHost="Bun", LasmLeanModule="Serve", LasmFile="serve.d.ts", LasmName="Server", LasmPath="Bun.Server"]
+interface Bun_Server {
   // stop(closeActiveConnections?: boolean): Promise<void>
   [LasmHost="Bun", LasmSignature="stop(closeActiveConnections?: boolean): Promise<void>"] Promise<undefined> stop(optional boolean closeActiveConnections);
   // closeIdleConnections(): number
   [LasmHost="Bun", LasmSignature="closeIdleConnections(): number"] double closeIdleConnections();
   // reload<R extends string>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData> (read as  {"options":"Serve.Options<undefined, never>"}: the same options as Bun.serve (the declaration instantiates the route parameter as string rather than never))
-  [LasmHost="Bun", LasmSignature="reload<R extends string>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData> (read as {'options':'Serve.Options<undefined, never>'}: the same options as Bun.serve (the declaration instantiates the route parameter as string rather than never))"] Bun_ServerUndefined reload(Bun_ServeOptions options);
+  [LasmHost="Bun", LasmSignature="reload<R extends string>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData> (read as {'options':'Serve.Options<undefined, never>'}: the same options as Bun.serve (the declaration instantiates the route parameter as string rather than never))"] Bun_Server reload(Bun_ServeOptions options);
   // fetch(request: Request | string): Response | Promise<Response>
   [LasmHost="Bun", LasmSignature="fetch(request: Request | string): Response | Promise<Response>"] Promise<Response> fetch(Bun_RequestOrDOMString request);
   // upgrade(request: Request, ...options: [WebSocketData] extends [undefined] ? [options?: { headers?: HeadersInit; data?: undefined; }] : [options: { headers?: HeadersInit; data: WebSocketData; }]): boolean (read as  {"options":"{ headers?: HeadersInit; data?: unknown }"}: a conditional rest tuple on the WebSocket data type)
-  [LasmHost="Bun", LasmSignature="upgrade(request: Request, ...options: [WebSocketData] extends [undefined] ? [options?: { headers?: HeadersInit; data?: undefined; }] : [options: { headers?: HeadersInit; data: WebSocketData; }]): boolean (read as {'options':'{ headers?: HeadersInit; data?: unknown }'}: a conditional rest tuple on the WebSocket data type)"] boolean upgrade(Request request, Bun_ServerUndefinedUpgradeOptions... options);
+  [LasmHost="Bun", LasmSignature="upgrade(request: Request, ...options: [WebSocketData] extends [undefined] ? [options?: { headers?: HeadersInit; data?: undefined; }] : [options: { headers?: HeadersInit; data: WebSocketData; }]): boolean (read as {'options':'{ headers?: HeadersInit; data?: unknown }'}: a conditional rest tuple on the WebSocket data type)"] boolean upgrade(Request request, Bun_ServerUpgradeOptions... options);
   // publish(topic: string, data: string | ArrayBufferView | ArrayBuffer | SharedArrayBuffer | Blob, compress?: boolean): ServerWebSocketSendStatus
   [LasmHost="Bun", LasmSignature="publish(topic: string, data: string | ArrayBufferView | ArrayBuffer | SharedArrayBuffer | Blob, compress?: boolean): ServerWebSocketSendStatus"] double publish(DOMString topic, Bun_DOMStringOrUint8ArrayOrArrayBufferOrBlob data, optional boolean compress);
   // subscriberCount(topic: string): number
@@ -2313,7 +2313,7 @@ interface Bun_ServerUndefined {
   // readonly hostname: string | undefined
   [LasmHost="Bun", LasmSignature="readonly hostname: string | undefined"] readonly attribute DOMString? hostname;
   // readonly protocol: "http" | "https" | null
-  [LasmHost="Bun", LasmSignature="readonly protocol: 'http' | 'https' | null"] readonly attribute Bun_ServerUndefinedProtocol? protocol;
+  [LasmHost="Bun", LasmSignature="readonly protocol: 'http' | 'https' | null"] readonly attribute Bun_ServerProtocol? protocol;
   // readonly development: boolean
   [LasmHost="Bun", LasmSignature="readonly development: boolean"] readonly attribute boolean development;
   // readonly id: string
@@ -5121,17 +5121,17 @@ namespace Bun_nsCore {
   // Bun.connect<Data = undefined>(options: UnixSocketOptions<Data>): Promise<Socket<Data>>
   [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.connect<Data = undefined>(options: UnixSocketOptions<Data>): Promise<Socket<Data>>", LasmLeanName="connectWithUnixSocketOptions"] Promise<Bun_Socket> connect(Bun_UnixSocketOptions options);
   // Bun.listen<Data = undefined>(options: TCPSocketListenOptions<Data>): TCPSocketListener<Data>
-  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.listen<Data = undefined>(options: TCPSocketListenOptions<Data>): TCPSocketListener<Data>"] Bun_TCPSocketListenerUndefined listen(Bun_TCPSocketListenOptions options);
+  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.listen<Data = undefined>(options: TCPSocketListenOptions<Data>): TCPSocketListener<Data>"] Bun_TCPSocketListener listen(Bun_TCPSocketListenOptions options);
   // Bun.listen<Data = undefined>(options: UnixSocketOptions<Data>): UnixSocketListener<Data>
-  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.listen<Data = undefined>(options: UnixSocketOptions<Data>): UnixSocketListener<Data>", LasmLeanName="listenWithUnixSocketOptions"] Bun_UnixSocketListenerUndefined listen(Bun_UnixSocketOptions options);
+  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.listen<Data = undefined>(options: UnixSocketOptions<Data>): UnixSocketListener<Data>", LasmLeanName="listenWithUnixSocketOptions"] Bun_UnixSocketListener listen(Bun_UnixSocketOptions options);
   // Bun.udpSocket<DataBinaryType extends BinaryType = "buffer">(options: udp.SocketOptions<DataBinaryType>): Promise<udp.Socket<DataBinaryType>>
-  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.udpSocket<DataBinaryType extends BinaryType = 'buffer'>(options: udp.SocketOptions<DataBinaryType>): Promise<udp.Socket<DataBinaryType>>"] Promise<Bun_udpSocketBuffer> udpSocket(Bun_udpSocketOptionsBuffer options);
+  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.udpSocket<DataBinaryType extends BinaryType = 'buffer'>(options: udp.SocketOptions<DataBinaryType>): Promise<udp.Socket<DataBinaryType>>"] Promise<Bun_UdpSocket> udpSocket(Bun_UdpSocketOptions options);
   // Bun.udpSocket<DataBinaryType extends BinaryType = "buffer">(options: udp.ConnectSocketOptions<DataBinaryType>): Promise<udp.ConnectedSocket<DataBinaryType>>
-  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.udpSocket<DataBinaryType extends BinaryType = 'buffer'>(options: udp.ConnectSocketOptions<DataBinaryType>): Promise<udp.ConnectedSocket<DataBinaryType>>", LasmLeanName="udpSocketWithUdpConnectSocketOptions"] Promise<Bun_udpConnectedSocketBuffer> udpSocket(Bun_udpConnectSocketOptionsBuffer options);
+  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.udpSocket<DataBinaryType extends BinaryType = 'buffer'>(options: udp.ConnectSocketOptions<DataBinaryType>): Promise<udp.ConnectedSocket<DataBinaryType>>", LasmLeanName="udpSocketWithUdpConnectSocketOptions"] Promise<Bun_UdpConnectedSocket> udpSocket(Bun_UdpConnectSocketOptions options);
   // Bun.spawn<const In extends SpawnOptions.Writable = "ignore", const Out extends SpawnOptions.Readable = "pipe", const Err extends SpawnOptions.Readable = "inherit">(options: SpawnOptions.SpawnOptions<In, Out, Err> & { cmd: string[]; }): Subprocess<In, Out, Err>
-  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.spawn<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'inherit'>(options: SpawnOptions.SpawnOptions<In, Out, Err> & { cmd: string[]; }): Subprocess<In, Out, Err>"] Bun_SubprocessIgnorePipeInherit spawn(Bun_SpawnCmdOptions options);
+  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.spawn<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'inherit'>(options: SpawnOptions.SpawnOptions<In, Out, Err> & { cmd: string[]; }): Subprocess<In, Out, Err>"] Bun_Subprocess spawn(Bun_SpawnCmdOptions options);
   // Bun.spawn<const In extends SpawnOptions.Writable = "ignore", const Out extends SpawnOptions.Readable = "pipe", const Err extends SpawnOptions.Readable = "inherit">(cmds: string[], options?: SpawnOptions.SpawnOptions<In, Out, Err>): Subprocess<In, Out, Err>
-  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.spawn<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'inherit'>(cmds: string[], options?: SpawnOptions.SpawnOptions<In, Out, Err>): Subprocess<In, Out, Err>", LasmLeanName="spawnWithCmds"] Bun_SubprocessIgnorePipeInherit spawn(sequence<DOMString> cmds, optional Bun_SpawnSpawnOptionsIgnorePipeInherit options);
+  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.spawn<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'inherit'>(cmds: string[], options?: SpawnOptions.SpawnOptions<In, Out, Err>): Subprocess<In, Out, Err>", LasmLeanName="spawnWithCmds"] Bun_Subprocess spawn(sequence<DOMString> cmds, optional Bun_SpawnSpawnOptionsIgnorePipeInherit options);
   // Bun.spawnSync<const In extends SpawnOptions.Writable = "ignore", const Out extends SpawnOptions.Readable = "pipe", const Err extends SpawnOptions.Readable = "pipe">(options: SpawnOptions.SpawnSyncOptions<In, Out, Err> & { cmd: string[]; onExit?: never; }): SyncSubprocess<Out, Err>
   [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.spawnSync<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'pipe'>(options: SpawnOptions.SpawnSyncOptions<In, Out, Err> & { cmd: string[]; onExit?: never; }): SyncSubprocess<Out, Err>"] Bun_ReadableSyncSubprocess spawnSync(Bun_SpawnSyncCmdOptions options);
   // Bun.spawnSync<const In extends SpawnOptions.Writable = "ignore", const Out extends SpawnOptions.Readable = "pipe", const Err extends SpawnOptions.Readable = "pipe">(cmds: string[], options?: SpawnOptions.SpawnSyncOptions<In, Out, Err>): SyncSubprocess<Out, Err>
@@ -5235,11 +5235,11 @@ namespace Bun_nsCoreYAML {
 [LasmHost="Bun", LasmLeanModule="Core", LasmPath="Bun.markdown", LasmLeanPrefix="markdown."]
 namespace Bun_nsCoreMarkdown {
   // Bun.html(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, options?: Options): string
-  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.html(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, options?: Options): string"] DOMString html(Bun_DOMStringOrUint8Array input, optional Bun_markdownOptions options);
+  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.html(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, options?: Options): string"] DOMString html(Bun_DOMStringOrUint8Array input, optional Bun_MarkdownOptions options);
   // Bun.ansi(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, theme?: AnsiTheme): string
-  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.ansi(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, theme?: AnsiTheme): string"] DOMString ansi(Bun_DOMStringOrUint8Array input, optional Bun_markdownAnsiTheme theme);
+  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.ansi(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, theme?: AnsiTheme): string"] DOMString ansi(Bun_DOMStringOrUint8Array input, optional Bun_MarkdownAnsiTheme theme);
   // Bun.render(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, callbacks?: RenderCallbacks, options?: Options): string
-  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.render(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, callbacks?: RenderCallbacks, options?: Options): string"] DOMString render(Bun_DOMStringOrUint8Array input, optional Bun_markdownRenderCallbacks callbacks, optional Bun_markdownOptions options);
+  [LasmHost="Bun", LasmFile="bun.d.ts", LasmSignature="Bun.render(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, callbacks?: RenderCallbacks, options?: Options): string"] DOMString render(Bun_DOMStringOrUint8Array input, optional Bun_MarkdownRenderCallbacks callbacks, optional Bun_MarkdownOptions options);
 };
 
 // The global Bun.JSON5: Bun's utilities, files, processes and sockets (Bun.file, Bun.spawn, Bun.listen, Bun.password, …)
@@ -5323,7 +5323,7 @@ namespace Bun_nsCoreUnsafe {
 [LasmHost="Bun", LasmLeanModule="Serve", LasmPath="Bun"]
 namespace Bun_nsServe {
   // Bun.serve<WebSocketData = undefined, R extends string = never>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData>
-  [LasmHost="Bun", LasmFile="serve.d.ts", LasmSignature="Bun.serve<WebSocketData = undefined, R extends string = never>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData>"] Bun_ServerUndefined serve(Bun_ServeOptions options);
+  [LasmHost="Bun", LasmFile="serve.d.ts", LasmSignature="Bun.serve<WebSocketData = undefined, R extends string = never>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData>"] Bun_Server serve(Bun_ServeOptions options);
 };
 
 // The module bun:sqlite.constants: bun:sqlite
