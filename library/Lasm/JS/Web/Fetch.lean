@@ -482,7 +482,7 @@ instance : FromJS FormDataEntryValue where
 
 /-- `v instanceof Headers`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Headers`). -/
 def Headers.cast? (v : Value) : IO (Option Headers) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Headers"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Headers"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional HeadersInit init)` -/
 def Headers.new (init : Option HeadersInit := none) : IO Headers :=
@@ -527,7 +527,7 @@ def Headers.values (self : Headers) : IO (Array String) :=
 
 /-- `v instanceof Request`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Request`). -/
 def Request.cast? (v : Value) : IO (Option Request) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Request"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Request"] Value) v) then some { val := v } else none
 
 /-- `constructor(RequestInfo input, optional RequestInit init)` -/
 def Request.new (input : RequestInfo) (init : Option RequestInit := none) : IO Request :=
@@ -631,7 +631,7 @@ def Request.textStream (self : Request) : IO ReadableStream := do
 
 /-- `v instanceof Response`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Response`). -/
 def Response.cast? (v : Value) : IO (Option Response) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Response"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Response"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional BodyInit? body, optional ResponseInit init)` -/
 def Response.new (body : Option BodyInit := none) (init : Option ResponseInit := none) : IO Response :=
@@ -724,7 +724,7 @@ def Response.textStream (self : Response) : IO ReadableStream := do
 
 /-- `v instanceof FormData`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FormData`). -/
 def FormData.cast? (v : Value) : IO (Option FormData) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FormData"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FormData"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional HTMLFormElement form, optional HTMLElement? submitter)` -/
 def FormData.new (form : Option Value := none) (submitter : Option Value := none) : IO FormData :=

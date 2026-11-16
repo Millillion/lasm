@@ -72,7 +72,7 @@ instance : ToJS TextDecodeOptions := ⟨fun d => Support.fields #[("stream", Sup
 
 /-- `v instanceof TextEncoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextEncoder`). -/
 def TextEncoder.cast? (v : Value) : IO (Option TextEncoder) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextEncoder"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextEncoder"] Value) v) then some { val := v } else none
 
 /-- `constructor()` -/
 def TextEncoder.new : IO TextEncoder :=
@@ -92,7 +92,7 @@ def TextEncoder.encodeInto (self : TextEncoder) (source : String) (destination :
 
 /-- `v instanceof TextDecoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextDecoder`). -/
 def TextDecoder.cast? (v : Value) : IO (Option TextDecoder) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextDecoder"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextDecoder"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional DOMString label, optional TextDecoderOptions options)` -/
 def TextDecoder.new (label : Option String := none) (options : Option TextDecoderOptions := none) : IO TextDecoder :=
@@ -114,7 +114,7 @@ def TextDecoder.decode (self : TextDecoder) (input : Option ByteArray := none) (
 
 /-- `v instanceof TextEncoderStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextEncoderStream`). -/
 def TextEncoderStream.cast? (v : Value) : IO (Option TextEncoderStream) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextEncoderStream"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextEncoderStream"] Value) v) then some { val := v } else none
 
 /-- `constructor()` -/
 def TextEncoderStream.new : IO TextEncoderStream :=
@@ -136,7 +136,7 @@ def TextEncoderStream.writable (self : TextEncoderStream) : IO WritableStream :=
 
 /-- `v instanceof TextDecoderStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextDecoderStream`). -/
 def TextDecoderStream.cast? (v : Value) : IO (Option TextDecoderStream) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextDecoderStream"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextDecoderStream"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional DOMString label, optional TextDecoderOptions options)` -/
 def TextDecoderStream.new (label : Option String := none) (options : Option TextDecoderOptions := none) : IO TextDecoderStream :=

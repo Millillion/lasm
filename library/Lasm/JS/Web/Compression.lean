@@ -54,7 +54,7 @@ instance : FromJS CompressionFormat where
 
 /-- `v instanceof CompressionStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CompressionStream`). -/
 def CompressionStream.cast? (v : Value) : IO (Option CompressionStream) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CompressionStream"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CompressionStream"] Value) v) then some { val := v } else none
 
 /-- `constructor(CompressionFormat format)` -/
 def CompressionStream.new (format : CompressionFormat) : IO CompressionStream :=
@@ -73,7 +73,7 @@ def CompressionStream.writable (self : CompressionStream) : IO WritableStream :=
 
 /-- `v instanceof DecompressionStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DecompressionStream`). -/
 def DecompressionStream.cast? (v : Value) : IO (Option DecompressionStream) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DecompressionStream"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DecompressionStream"] Value) v) then some { val := v } else none
 
 /-- `constructor(CompressionFormat format)` -/
 def DecompressionStream.new (format : CompressionFormat) : IO DecompressionStream :=

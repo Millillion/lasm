@@ -94,7 +94,7 @@ instance : ToJS CloseEventInit := ⟨fun d => Support.fields #[("bubbles", Suppo
 
 /-- `v instanceof WebSocket`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebSocket`). -/
 def WebSocket.cast? (v : Value) : IO (Option WebSocket) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebSocket"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebSocket"] Value) v) then some { val := v } else none
 
 /-- `constructor(USVString url, optional (DOMString or sequence<DOMString>) protocols)` -/
 def WebSocket.new (url : String) (protocols : Option DOMStringOrSequenceOfDOMString := none) : IO WebSocket :=
@@ -145,7 +145,7 @@ def WebSocket.send (self : WebSocket) (data : BufferSourceOrBlobOrUSVString) : I
 
 /-- `v instanceof CloseEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CloseEvent`). -/
 def CloseEvent.cast? (v : Value) : IO (Option CloseEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CloseEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CloseEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional CloseEventInit eventInitDict)` -/
 def CloseEvent.new (type : String) (eventInitDict : Option CloseEventInit := none) : IO CloseEvent :=

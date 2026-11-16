@@ -60,7 +60,7 @@ instance : ToJS MediaQueryListEventInit := ⟨fun d => Support.fields #[("bubble
 
 /-- `v instanceof CSSStyleDeclaration`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSStyleDeclaration`). -/
 def CSSStyleDeclaration.cast? (v : Value) : IO (Option CSSStyleDeclaration) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSStyleDeclaration"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSStyleDeclaration"] Value) v) then some { val := v } else none
 
 /-- `attribute CSSOMString cssText` -/
 def CSSStyleDeclaration.cssText (self : CSSStyleDeclaration) : IO String := self.val.get "cssText" String
@@ -97,7 +97,7 @@ def CSSStyleDeclaration.removeProperty (self : CSSStyleDeclaration) (property : 
 
 /-- `v instanceof CSSStyleProperties`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSStyleProperties`). -/
 def CSSStyleProperties.cast? (v : Value) : IO (Option CSSStyleProperties) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSStyleProperties"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSStyleProperties"] Value) v) then some { val := v } else none
 
 /-- `attribute CSSOMString cssFloat` -/
 def CSSStyleProperties.cssFloat (self : CSSStyleProperties) : IO String := self.val.get "cssFloat" String
@@ -108,7 +108,7 @@ def CSSStyleProperties.setCssFloat (self : CSSStyleProperties) (value : String) 
 
 /-- `v instanceof MediaQueryList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaQueryList`). -/
 def MediaQueryList.cast? (v : Value) : IO (Option MediaQueryList) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaQueryList"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaQueryList"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute CSSOMString media` -/
 def MediaQueryList.media (self : MediaQueryList) : IO String := self.val.get "media" String
@@ -126,7 +126,7 @@ def MediaQueryList.removeListener (self : MediaQueryList) (callback : Option Eve
 
 /-- `v instanceof MediaQueryListEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaQueryListEvent`). -/
 def MediaQueryListEvent.cast? (v : Value) : IO (Option MediaQueryListEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaQueryListEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaQueryListEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(CSSOMString type, optional MediaQueryListEventInit eventInitDict)` -/
 def MediaQueryListEvent.new (type : String) (eventInitDict : Option MediaQueryListEventInit := none) : IO MediaQueryListEvent :=

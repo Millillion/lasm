@@ -80,7 +80,7 @@ instance : ToJS stream.Writable.FromWebOptions := ⟨fun d => Support.fields #[(
 
 /-- `v instanceof Readable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Readable`). -/
 def stream.Readable.cast? (v : Value) : IO (Option stream.Readable) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Readable"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Readable"] Value) v) then some { val := v } else none
 
 /-- `stream.Readable.fromWeb(readableStream[, options])` (added in Node.js v17.0.0): `static stream.Readable fromWeb(ReadableStream readableStream, optional stream.Readable.FromWebOptions options)` -/
 def stream.Readable.fromWeb (readableStream : ReadableStream) (options : Option stream.Readable.FromWebOptions := none) : IO stream.Readable := do
@@ -96,7 +96,7 @@ def stream.Readable.toWeb (streamReadable : stream.Readable) (options : Option s
 
 /-- `v instanceof Writable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Writable`). -/
 def stream.Writable.cast? (v : Value) : IO (Option stream.Writable) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Writable"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Writable"] Value) v) then some { val := v } else none
 
 /-- `stream.Writable.fromWeb(writableStream[, options])` (added in Node.js v17.0.0): `static stream.Writable fromWeb(WritableStream writableStream, optional stream.Writable.FromWebOptions options)` -/
 def stream.Writable.fromWeb (writableStream : WritableStream) (options : Option stream.Writable.FromWebOptions := none) : IO stream.Writable := do

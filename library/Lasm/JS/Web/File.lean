@@ -82,7 +82,7 @@ instance : ToJS FilePropertyBag := ⟨fun d => Support.fields #[("type", Support
 
 /-- `v instanceof Blob`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Blob`). -/
 def Blob.cast? (v : Value) : IO (Option Blob) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Blob"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Blob"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional sequence<BlobPart> blobParts, optional BlobPropertyBag options)` -/
 def Blob.new (blobParts : Option (Array BlobPart) := none) (options : Option BlobPropertyBag := none) : IO Blob :=
@@ -125,7 +125,7 @@ def Blob.bytes (self : Blob) : Async ByteArray :=
 
 /-- `v instanceof File`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `File`). -/
 def File.cast? (v : Value) : IO (Option File) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["File"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["File"] Value) v) then some { val := v } else none
 
 /-- `constructor(sequence<BlobPart> fileBits, USVString fileName, optional FilePropertyBag options)` -/
 def File.new (fileBits : Array BlobPart) (fileName : String) (options : Option FilePropertyBag := none) : IO File :=

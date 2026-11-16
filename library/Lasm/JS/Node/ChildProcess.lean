@@ -158,7 +158,7 @@ instance : ToJS child_process.SpawnOptions := ⟨fun d => Support.fields #[("cwd
 
 /-- `v instanceof ChildProcess`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ChildProcess`). -/
 def ChildProcess.cast? (v : Value) : IO (Option ChildProcess) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getExport "node:child_process" ["ChildProcess"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:child_process" ["ChildProcess"] Value) v) then some { val := v } else none
 
 /-- `subprocess.exitCode`: `readonly attribute long long? exitCode` -/
 def ChildProcess.exitCode (self : ChildProcess) : IO (Option Int) := self.val.get "exitCode" (Option Int)

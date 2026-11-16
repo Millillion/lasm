@@ -1179,7 +1179,7 @@ def FrameRequestCallback.ofSyncFn (f : Float → IO Unit) : IO FrameRequestCallb
 
 /-- `v instanceof Node`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Node`). -/
 def Node.cast? (v : Value) : IO (Option Node) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Node"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Node"] Value) v) then some { val := v } else none
 
 /-- `const unsigned short ELEMENT_NODE = 1` -/
 def Node.ELEMENT_NODE : Nat := 1
@@ -1355,7 +1355,7 @@ def Node.removeChild (self : Node) (child : Node) : IO Node := do
 
 /-- `v instanceof Document`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Document`). -/
 def Document.cast? (v : Value) : IO (Option Document) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Document"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Document"] Value) v) then some { val := v } else none
 
 /-- `constructor()` -/
 def Document.new : IO Document :=
@@ -1809,7 +1809,7 @@ def Document.convertPointFromNode (self : Document) (point : DOMPointInit) («fr
 
 /-- `v instanceof DocumentType`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DocumentType`). -/
 def DocumentType.cast? (v : Value) : IO (Option DocumentType) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DocumentType"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DocumentType"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute DOMString name` -/
 def DocumentType.name (self : DocumentType) : IO String := self.val.get "name" String
@@ -1838,7 +1838,7 @@ def DocumentType.remove (self : DocumentType) : IO Unit :=
 
 /-- `v instanceof DocumentFragment`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DocumentFragment`). -/
 def DocumentFragment.cast? (v : Value) : IO (Option DocumentFragment) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DocumentFragment"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DocumentFragment"] Value) v) then some { val := v } else none
 
 /-- `constructor()` -/
 def DocumentFragment.new : IO DocumentFragment :=
@@ -1890,7 +1890,7 @@ def DocumentFragment.querySelectorAll (self : DocumentFragment) (selectors : Str
 
 /-- `v instanceof ShadowRoot`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ShadowRoot`). -/
 def ShadowRoot.cast? (v : Value) : IO (Option ShadowRoot) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ShadowRoot"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ShadowRoot"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute ShadowRootMode mode` -/
 def ShadowRoot.mode (self : ShadowRoot) : IO ShadowRootMode := self.val.get "mode" ShadowRootMode
@@ -1965,7 +1965,7 @@ def ShadowRoot.getHTML (self : ShadowRoot) (options : Option GetHTMLOptions := n
 
 /-- `v instanceof Element`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Element`). -/
 def Element.cast? (v : Value) : IO (Option Element) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Element"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Element"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute DOMString? namespaceURI` -/
 def Element.namespaceURI (self : Element) : IO (Option String) := self.val.get "namespaceURI" (Option String)
@@ -2362,7 +2362,7 @@ def Element.convertPointFromNode (self : Element) (point : DOMPointInit) («from
 
 /-- `v instanceof Attr`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Attr`). -/
 def Attr.cast? (v : Value) : IO (Option Attr) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Attr"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Attr"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute DOMString? namespaceURI` -/
 def Attr.namespaceURI (self : Attr) : IO (Option String) := self.val.get "namespaceURI" (Option String)
@@ -2391,7 +2391,7 @@ def Attr.specified (self : Attr) : IO Bool := self.val.get "specified" Bool
 
 /-- `v instanceof NamedNodeMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NamedNodeMap`). -/
 def NamedNodeMap.cast? (v : Value) : IO (Option NamedNodeMap) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NamedNodeMap"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NamedNodeMap"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute unsigned long length` -/
 def NamedNodeMap.length (self : NamedNodeMap) : IO Nat := self.val.get "length" Nat
@@ -2428,7 +2428,7 @@ def NamedNodeMap.removeNamedItemNS (self : NamedNodeMap) («namespace» : Option
 
 /-- `v instanceof CharacterData`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CharacterData`). -/
 def CharacterData.cast? (v : Value) : IO (Option CharacterData) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CharacterData"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CharacterData"] Value) v) then some { val := v } else none
 
 /-- `attribute DOMString data` -/
 def CharacterData.data (self : CharacterData) : IO String := self.val.get "data" String
@@ -2508,7 +2508,7 @@ def CharacterData.remove (self : CharacterData) : IO Unit :=
 
 /-- `v instanceof Text`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Text`). -/
 def Text.cast? (v : Value) : IO (Option Text) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Text"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Text"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional DOMString data)` -/
 def Text.new (data : Option String := none) : IO Text :=
@@ -2544,7 +2544,7 @@ def Text.convertPointFromNode (self : Text) (point : DOMPointInit) («from» : G
 
 /-- `v instanceof Comment`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Comment`). -/
 def Comment.cast? (v : Value) : IO (Option Comment) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Comment"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Comment"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional DOMString data)` -/
 def Comment.new (data : Option String := none) : IO Comment :=
@@ -2553,7 +2553,7 @@ def Comment.new (data : Option String := none) : IO Comment :=
 
 /-- `v instanceof NodeList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NodeList`). -/
 def NodeList.cast? (v : Value) : IO (Option NodeList) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NodeList"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["NodeList"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute unsigned long length` -/
 def NodeList.length (self : NodeList) : IO Nat := self.val.get "length" Nat
@@ -2568,7 +2568,7 @@ def NodeList.values (self : NodeList) : IO (Array Node) :=
 
 /-- `v instanceof HTMLCollection`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLCollection`). -/
 def HTMLCollection.cast? (v : Value) : IO (Option HTMLCollection) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLCollection"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLCollection"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute unsigned long length` -/
 def HTMLCollection.length (self : HTMLCollection) : IO Nat := self.val.get "length" Nat
@@ -2583,7 +2583,7 @@ def HTMLCollection.namedItem (self : HTMLCollection) (name : String) : IO (Optio
 
 /-- `v instanceof DOMTokenList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMTokenList`). -/
 def DOMTokenList.cast? (v : Value) : IO (Option DOMTokenList) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMTokenList"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMTokenList"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute unsigned long length` -/
 def DOMTokenList.length (self : DOMTokenList) : IO Nat := self.val.get "length" Nat
@@ -2632,11 +2632,11 @@ def DOMTokenList.values (self : DOMTokenList) : IO (Array String) :=
 
 /-- `v instanceof DOMStringMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMStringMap`). -/
 def DOMStringMap.cast? (v : Value) : IO (Option DOMStringMap) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMStringMap"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMStringMap"] Value) v) then some { val := v } else none
 
 /-- `v instanceof MutationObserver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MutationObserver`). -/
 def MutationObserver.cast? (v : Value) : IO (Option MutationObserver) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MutationObserver"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MutationObserver"] Value) v) then some { val := v } else none
 
 /-- `constructor(MutationCallback callback)` -/
 def MutationObserver.new (callback : MutationCallback) : IO MutationObserver :=
@@ -2657,7 +2657,7 @@ def MutationObserver.takeRecords (self : MutationObserver) : IO (Array MutationR
 
 /-- `v instanceof MutationRecord`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MutationRecord`). -/
 def MutationRecord.cast? (v : Value) : IO (Option MutationRecord) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MutationRecord"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MutationRecord"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute DOMString type` -/
 def MutationRecord.type (self : MutationRecord) : IO String := self.val.get "type" String
@@ -2694,7 +2694,7 @@ def MutationRecord.oldValue (self : MutationRecord) : IO (Option String) := self
 
 /-- `v instanceof HTMLElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLElement`). -/
 def HTMLElement.cast? (v : Value) : IO (Option HTMLElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLElement"] Value) v) then some { val := v } else none
 
 /-- `attribute DOMString title` -/
 def HTMLElement.title (self : HTMLElement) : IO String := self.val.get "title" String
@@ -2921,7 +2921,7 @@ def HTMLElement.blur (self : HTMLElement) : IO Unit :=
 
 /-- `v instanceof HTMLAnchorElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLAnchorElement`). -/
 def HTMLAnchorElement.cast? (v : Value) : IO (Option HTMLAnchorElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLAnchorElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLAnchorElement"] Value) v) then some { val := v } else none
 
 /-- `attribute DOMString download` -/
 def HTMLAnchorElement.download (self : HTMLAnchorElement) : IO String := self.val.get "download" String
@@ -3097,7 +3097,7 @@ def HTMLAnchorElement.setTarget (self : HTMLAnchorElement) (value : String) : IO
 
 /-- `v instanceof HTMLButtonElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLButtonElement`). -/
 def HTMLButtonElement.cast? (v : Value) : IO (Option HTMLButtonElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLButtonElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLButtonElement"] Value) v) then some { val := v } else none
 
 /-- `attribute DOMString command` -/
 def HTMLButtonElement.command (self : HTMLButtonElement) : IO String := self.val.get "command" String
@@ -3223,7 +3223,7 @@ def HTMLButtonElement.setCustomValidity (self : HTMLButtonElement) (error : Stri
 
 /-- `v instanceof HTMLDialogElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLDialogElement`). -/
 def HTMLDialogElement.cast? (v : Value) : IO (Option HTMLDialogElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLDialogElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLDialogElement"] Value) v) then some { val := v } else none
 
 /-- `attribute boolean open` -/
 def HTMLDialogElement.«open» (self : HTMLDialogElement) : IO Bool := self.val.get "open" Bool
@@ -3264,7 +3264,7 @@ def HTMLDialogElement.requestClose (self : HTMLDialogElement) (returnValue : Opt
 
 /-- `v instanceof HTMLDivElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLDivElement`). -/
 def HTMLDivElement.cast? (v : Value) : IO (Option HTMLDivElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLDivElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLDivElement"] Value) v) then some { val := v } else none
 
 /-- `attribute DOMString align` -/
 def HTMLDivElement.align (self : HTMLDivElement) : IO String := self.val.get "align" String
@@ -3275,7 +3275,7 @@ def HTMLDivElement.setAlign (self : HTMLDivElement) (value : String) : IO Unit :
 
 /-- `v instanceof HTMLFormElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLFormElement`). -/
 def HTMLFormElement.cast? (v : Value) : IO (Option HTMLFormElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLFormElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLFormElement"] Value) v) then some { val := v } else none
 
 /-- `attribute DOMString acceptCharset` -/
 def HTMLFormElement.acceptCharset (self : HTMLFormElement) : IO String := self.val.get "acceptCharset" String
@@ -3382,11 +3382,11 @@ def HTMLFormElement.reportValidity (self : HTMLFormElement) : IO Bool :=
 
 /-- `v instanceof HTMLHeadElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLHeadElement`). -/
 def HTMLHeadElement.cast? (v : Value) : IO (Option HTMLHeadElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLHeadElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLHeadElement"] Value) v) then some { val := v } else none
 
 /-- `v instanceof HTMLImageElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLImageElement`). -/
 def HTMLImageElement.cast? (v : Value) : IO (Option HTMLImageElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLImageElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLImageElement"] Value) v) then some { val := v } else none
 
 /-- `attribute DOMString alt` -/
 def HTMLImageElement.alt (self : HTMLImageElement) : IO String := self.val.get "alt" String
@@ -3559,7 +3559,7 @@ def HTMLImageElement.decode (self : HTMLImageElement) : Async Unit :=
 
 /-- `v instanceof HTMLInputElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLInputElement`). -/
 def HTMLInputElement.cast? (v : Value) : IO (Option HTMLInputElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLInputElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLInputElement"] Value) v) then some { val := v } else none
 
 /-- `attribute DOMString accept` -/
 def HTMLInputElement.accept (self : HTMLInputElement) : IO String := self.val.get "accept" String
@@ -3938,7 +3938,7 @@ def HTMLInputElement.showPicker (self : HTMLInputElement) : IO Unit :=
 
 /-- `v instanceof HTMLLabelElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLLabelElement`). -/
 def HTMLLabelElement.cast? (v : Value) : IO (Option HTMLLabelElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLLabelElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLLabelElement"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute HTMLFormElement? form` -/
 def HTMLLabelElement.form (self : HTMLLabelElement) : IO (Option HTMLFormElement) := self.val.get "form" (Option HTMLFormElement)
@@ -3955,7 +3955,7 @@ def HTMLLabelElement.control (self : HTMLLabelElement) : IO (Option HTMLElement)
 
 /-- `v instanceof HTMLOptionElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLOptionElement`). -/
 def HTMLOptionElement.cast? (v : Value) : IO (Option HTMLOptionElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLOptionElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLOptionElement"] Value) v) then some { val := v } else none
 
 /-- `attribute boolean disabled` -/
 def HTMLOptionElement.disabled (self : HTMLOptionElement) : IO Bool := self.val.get "disabled" Bool
@@ -4007,7 +4007,7 @@ def HTMLOptionElement.index (self : HTMLOptionElement) : IO Int := self.val.get 
 
 /-- `v instanceof HTMLSelectElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLSelectElement`). -/
 def HTMLSelectElement.cast? (v : Value) : IO (Option HTMLSelectElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLSelectElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLSelectElement"] Value) v) then some { val := v } else none
 
 /-- `attribute DOMString autocomplete` -/
 def HTMLSelectElement.autocomplete (self : HTMLSelectElement) : IO String := self.val.get "autocomplete" String
@@ -4142,7 +4142,7 @@ def HTMLSelectElement.showPicker (self : HTMLSelectElement) : IO Unit :=
 
 /-- `v instanceof HTMLTemplateElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLTemplateElement`). -/
 def HTMLTemplateElement.cast? (v : Value) : IO (Option HTMLTemplateElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLTemplateElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLTemplateElement"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute DocumentFragment content` -/
 def HTMLTemplateElement.content (self : HTMLTemplateElement) : IO DocumentFragment := do
@@ -4200,7 +4200,7 @@ def HTMLTemplateElement.setShadowRootCustomElementRegistry (self : HTMLTemplateE
 
 /-- `v instanceof HTMLTextAreaElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLTextAreaElement`). -/
 def HTMLTextAreaElement.cast? (v : Value) : IO (Option HTMLTextAreaElement) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLTextAreaElement"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLTextAreaElement"] Value) v) then some { val := v } else none
 
 /-- `attribute DOMString autocomplete` -/
 def HTMLTextAreaElement.autocomplete (self : HTMLTextAreaElement) : IO String := self.val.get "autocomplete" String
@@ -4376,7 +4376,7 @@ def HTMLTextAreaElement.setSelectionRange (self : HTMLTextAreaElement) (start : 
 
 /-- `v instanceof HTMLFormControlsCollection`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLFormControlsCollection`). -/
 def HTMLFormControlsCollection.cast? (v : Value) : IO (Option HTMLFormControlsCollection) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLFormControlsCollection"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLFormControlsCollection"] Value) v) then some { val := v } else none
 
 /-- `getter (RadioNodeList or Element)? namedItem(DOMString name)` -/
 def HTMLFormControlsCollection.namedItem (self : HTMLFormControlsCollection) (name : String) : IO (Option Value) := do
@@ -4385,7 +4385,7 @@ def HTMLFormControlsCollection.namedItem (self : HTMLFormControlsCollection) (na
 
 /-- `v instanceof HTMLOptionsCollection`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLOptionsCollection`). -/
 def HTMLOptionsCollection.cast? (v : Value) : IO (Option HTMLOptionsCollection) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLOptionsCollection"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLOptionsCollection"] Value) v) then some { val := v } else none
 
 /-- `attribute unsigned long length` -/
 def HTMLOptionsCollection.length (self : HTMLOptionsCollection) : IO Nat := self.val.get "length" Nat
@@ -4411,7 +4411,7 @@ def HTMLOptionsCollection.remove (self : HTMLOptionsCollection) (index : Int) : 
 
 /-- `v instanceof RadioNodeList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RadioNodeList`). -/
 def RadioNodeList.cast? (v : Value) : IO (Option RadioNodeList) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RadioNodeList"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["RadioNodeList"] Value) v) then some { val := v } else none
 
 /-- `attribute DOMString value` -/
 def RadioNodeList.value (self : RadioNodeList) : IO String := self.val.get "value" String
@@ -4422,7 +4422,7 @@ def RadioNodeList.setValue (self : RadioNodeList) (value : String) : IO Unit :=
 
 /-- `v instanceof ValidityState`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ValidityState`). -/
 def ValidityState.cast? (v : Value) : IO (Option ValidityState) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ValidityState"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ValidityState"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute boolean valueMissing` -/
 def ValidityState.valueMissing (self : ValidityState) : IO Bool := self.val.get "valueMissing" Bool
@@ -4459,7 +4459,7 @@ def ValidityState.valid (self : ValidityState) : IO Bool := self.val.get "valid"
 
 /-- `v instanceof FileList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileList`). -/
 def FileList.cast? (v : Value) : IO (Option FileList) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileList"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FileList"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute unsigned long length` -/
 def FileList.length (self : FileList) : IO Nat := self.val.get "length" Nat
@@ -4470,7 +4470,7 @@ def FileList.item (self : FileList) (index : Nat) : IO (Option File) :=
 
 /-- `v instanceof Window`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Window`). -/
 def Window.cast? (v : Value) : IO (Option Window) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Window"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Window"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute (Event or undefined) event` -/
 def Window.event (self : Window) : IO (Option Event) := self.val.get "event" (Option Event)
@@ -4756,7 +4756,7 @@ def Window.cancelAnimationFrame (self : Window) (handle : Nat) : IO Unit :=
 
 /-- `v instanceof Location`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Location`). -/
 def Location.cast? (v : Value) : IO (Option Location) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Location"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Location"] Value) v) then some { val := v } else none
 
 /-- `stringifier attribute USVString href` -/
 def Location.href (self : Location) : IO String := self.val.get "href" String
@@ -4837,7 +4837,7 @@ def Location.reload (self : Location) : IO Unit :=
 
 /-- `v instanceof History`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `History`). -/
 def History.cast? (v : Value) : IO (Option History) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["History"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["History"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute unsigned long length` -/
 def History.length (self : History) : IO Nat := self.val.get "length" Nat
@@ -4874,7 +4874,7 @@ def History.replaceState (self : History) (data : Data) (unused : String) (url :
 
 /-- `v instanceof Storage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Storage`). -/
 def Storage.cast? (v : Value) : IO (Option Storage) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Storage"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Storage"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute unsigned long length` -/
 def Storage.length (self : Storage) : IO Nat := self.val.get "length" Nat

@@ -41,7 +41,7 @@ instance : ToJS events.OnceOptions := ⟨fun d => Support.fields #[("signal", Su
 
 /-- `v instanceof EventEmitter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EventEmitter`). -/
 def EventEmitter.cast? (v : Value) : IO (Option EventEmitter) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getExport "node:events" ["EventEmitter"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:events" ["EventEmitter"] Value) v) then some { val := v } else none
 
 /-- `emitter.emit(eventName[, ...args])` (added in Node.js v0.1.26): `boolean emit((DOMString or symbol) eventName, any... args)` -/
 def EventEmitter.emit (self : EventEmitter) (eventName : DOMStringOrSymbol) (args : Array Data := #[]) : IO Bool :=

@@ -50,7 +50,7 @@ instance : ToJS DOMRectInit := ⟨fun d => Support.fields #[("x", Support.option
 
 /-- `v instanceof DOMRectReadOnly`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMRectReadOnly`). -/
 def DOMRectReadOnly.cast? (v : Value) : IO (Option DOMRectReadOnly) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMRectReadOnly"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMRectReadOnly"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional unrestricted double x, optional unrestricted double y, optional unrestricted double width, optional unrestricted double height)` -/
 def DOMRectReadOnly.new (x : Option Float := none) (y : Option Float := none) (width : Option Float := none) (height : Option Float := none) : IO DOMRectReadOnly :=
@@ -93,7 +93,7 @@ def DOMRectReadOnly.toJSON (self : DOMRectReadOnly) : IO Data :=
 
 /-- `v instanceof DOMRect`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMRect`). -/
 def DOMRect.cast? (v : Value) : IO (Option DOMRect) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMRect"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMRect"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional unrestricted double x, optional unrestricted double y, optional unrestricted double width, optional unrestricted double height)` -/
 def DOMRect.new (x : Option Float := none) (y : Option Float := none) (width : Option Float := none) (height : Option Float := none) : IO DOMRect :=
@@ -136,7 +136,7 @@ def DOMRect.fromRect (other : Option DOMRectInit := none) : IO DOMRect := do
 
 /-- `v instanceof DOMRectList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMRectList`). -/
 def DOMRectList.cast? (v : Value) : IO (Option DOMRectList) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMRectList"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMRectList"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute unsigned long length` -/
 def DOMRectList.length (self : DOMRectList) : IO Nat := self.val.get "length" Nat

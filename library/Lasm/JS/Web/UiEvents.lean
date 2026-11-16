@@ -671,7 +671,7 @@ instance : ToJS StorageEventInit := ⟨fun d => Support.fields #[("bubbles", Sup
 
 /-- `v instanceof UIEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `UIEvent`). -/
 def UIEvent.cast? (v : Value) : IO (Option UIEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["UIEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["UIEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional UIEventInit eventInitDict)` -/
 def UIEvent.new (type : String) (eventInitDict : Option UIEventInit := none) : IO UIEvent :=
@@ -693,7 +693,7 @@ def UIEvent.initUIEvent (self : UIEvent) (typeArg : String) (bubblesArg : Option
 
 /-- `v instanceof MouseEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MouseEvent`). -/
 def MouseEvent.cast? (v : Value) : IO (Option MouseEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MouseEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MouseEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional MouseEventInit eventInitDict)` -/
 def MouseEvent.new (type : String) (eventInitDict : Option MouseEventInit := none) : IO MouseEvent :=
@@ -767,7 +767,7 @@ def MouseEvent.initMouseEvent (self : MouseEvent) (typeArg : String) (bubblesArg
 
 /-- `v instanceof WheelEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WheelEvent`). -/
 def WheelEvent.cast? (v : Value) : IO (Option WheelEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WheelEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WheelEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional WheelEventInit eventInitDict)` -/
 def WheelEvent.new (type : String) (eventInitDict : Option WheelEventInit := none) : IO WheelEvent :=
@@ -800,7 +800,7 @@ def WheelEvent.momentum (self : WheelEvent) : IO Bool := self.val.get "momentum"
 
 /-- `v instanceof KeyboardEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `KeyboardEvent`). -/
 def KeyboardEvent.cast? (v : Value) : IO (Option KeyboardEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["KeyboardEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["KeyboardEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional KeyboardEventInit eventInitDict)` -/
 def KeyboardEvent.new (type : String) (eventInitDict : Option KeyboardEventInit := none) : IO KeyboardEvent :=
@@ -862,7 +862,7 @@ def KeyboardEvent.initKeyboardEvent (self : KeyboardEvent) (typeArg : String) (b
 
 /-- `v instanceof InputEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InputEvent`). -/
 def InputEvent.cast? (v : Value) : IO (Option InputEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["InputEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["InputEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional InputEventInit eventInitDict)` -/
 def InputEvent.new (type : String) (eventInitDict : Option InputEventInit := none) : IO InputEvent :=
@@ -880,7 +880,7 @@ def InputEvent.inputType (self : InputEvent) : IO String := self.val.get "inputT
 
 /-- `v instanceof FocusEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FocusEvent`). -/
 def FocusEvent.cast? (v : Value) : IO (Option FocusEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FocusEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["FocusEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional FocusEventInit eventInitDict)` -/
 def FocusEvent.new (type : String) (eventInitDict : Option FocusEventInit := none) : IO FocusEvent :=
@@ -892,7 +892,7 @@ def FocusEvent.relatedTarget (self : FocusEvent) : IO (Option EventTarget) := se
 
 /-- `v instanceof CompositionEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CompositionEvent`). -/
 def CompositionEvent.cast? (v : Value) : IO (Option CompositionEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CompositionEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CompositionEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional CompositionEventInit eventInitDict)` -/
 def CompositionEvent.new (type : String) (eventInitDict : Option CompositionEventInit := none) : IO CompositionEvent :=
@@ -908,7 +908,7 @@ def CompositionEvent.initCompositionEvent (self : CompositionEvent) (typeArg : S
 
 /-- `v instanceof PointerEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PointerEvent`). -/
 def PointerEvent.cast? (v : Value) : IO (Option PointerEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PointerEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PointerEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional PointerEventInit eventInitDict)` -/
 def PointerEvent.new (type : String) (eventInitDict : Option PointerEventInit := none) : IO PointerEvent :=
@@ -964,7 +964,7 @@ def PointerEvent.getPredictedEvents (self : PointerEvent) : IO (Array PointerEve
 
 /-- `v instanceof SubmitEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SubmitEvent`). -/
 def SubmitEvent.cast? (v : Value) : IO (Option SubmitEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SubmitEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SubmitEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional SubmitEventInit eventInitDict)` -/
 def SubmitEvent.new (type : String) (eventInitDict : Option SubmitEventInit := none) : IO SubmitEvent :=
@@ -976,7 +976,7 @@ def SubmitEvent.submitter (self : SubmitEvent) : IO (Option HTMLElement) := self
 
 /-- `v instanceof HashChangeEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HashChangeEvent`). -/
 def HashChangeEvent.cast? (v : Value) : IO (Option HashChangeEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HashChangeEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HashChangeEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional HashChangeEventInit eventInitDict)` -/
 def HashChangeEvent.new (type : String) (eventInitDict : Option HashChangeEventInit := none) : IO HashChangeEvent :=
@@ -991,7 +991,7 @@ def HashChangeEvent.newURL (self : HashChangeEvent) : IO String := self.val.get 
 
 /-- `v instanceof PopStateEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PopStateEvent`). -/
 def PopStateEvent.cast? (v : Value) : IO (Option PopStateEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PopStateEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["PopStateEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional PopStateEventInit eventInitDict)` -/
 def PopStateEvent.new (type : String) (eventInitDict : Option PopStateEventInit := none) : IO PopStateEvent :=
@@ -1006,7 +1006,7 @@ def PopStateEvent.hasUAVisualTransition (self : PopStateEvent) : IO Bool := self
 
 /-- `v instanceof StorageEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StorageEvent`). -/
 def StorageEvent.cast? (v : Value) : IO (Option StorageEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["StorageEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["StorageEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional StorageEventInit eventInitDict)` -/
 def StorageEvent.new (type : String) (eventInitDict : Option StorageEventInit := none) : IO StorageEvent :=

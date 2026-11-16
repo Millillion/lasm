@@ -803,7 +803,7 @@ function emitInterface(module, name) {
     const ctor = hostOf(d) || extAttr(d, 'LegacyNoInterfaceObject') ? null
       : isNode ? (extValue(extAttr(d, 'LasmPath')) ? `Support.getExport "${jsModule}" [${jsPath(name).split('.').map(s => `"${s}"`).join(', ')}] Value` : null)
       : `Support.getGlobal [${jsPath(name).split('.').map(s => `"${s}"`).join(', ')}] Value`;
-    if (ctor) o.decls.push(`/-- \`v instanceof ${jsPath(name)}\`: \`some\` handle to \`v\` when it is one, else \`none\` (also when the runtime has no \`${jsPath(name)}\`). -/\ndef ${T}.cast? (v : Value) : IO (Option ${T}) := do\n  return if ← Lasm.JS.Web.Support.isInstance (${ctor}) v then some { val := v } else none`);
+    if (ctor) o.decls.push(`/-- \`v instanceof ${jsPath(name)}\`: \`some\` handle to \`v\` when it is one, else \`none\` (also when the runtime has no \`${jsPath(name)}\`). -/\ndef ${T}.cast? (v : Value) : IO (Option ${T}) := do\n  return if (← Lasm.JS.Web.Support.isInstance (${ctor}) v) then some { val := v } else none`);
   }
 
   const members = membersOf(name);

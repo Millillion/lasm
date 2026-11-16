@@ -579,7 +579,7 @@ instance : ToJS Pbkdf2Params := ⟨fun d => Support.fields #[("name", toJS d.nam
 
 /-- `v instanceof Crypto`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Crypto`). -/
 def Crypto.cast? (v : Value) : IO (Option Crypto) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Crypto"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Crypto"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute SubtleCrypto subtle` -/
 def Crypto.subtle (self : Crypto) : IO SubtleCrypto := do
@@ -597,7 +597,7 @@ def Crypto.randomUUID (self : Crypto) : IO String :=
 
 /-- `v instanceof CryptoKey`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CryptoKey`). -/
 def CryptoKey.cast? (v : Value) : IO (Option CryptoKey) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CryptoKey"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CryptoKey"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute KeyType type` -/
 def CryptoKey.type (self : CryptoKey) : IO KeyType := self.val.get "type" KeyType
@@ -613,7 +613,7 @@ def CryptoKey.usages (self : CryptoKey) : IO Data := self.val.get "usages" Data
 
 /-- `v instanceof SubtleCrypto`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SubtleCrypto`). -/
 def SubtleCrypto.cast? (v : Value) : IO (Option SubtleCrypto) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SubtleCrypto"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["SubtleCrypto"] Value) v) then some { val := v } else none
 
 /-- `Promise<ArrayBuffer> encrypt(AlgorithmIdentifier algorithm, CryptoKey key, BufferSource data)` -/
 def SubtleCrypto.encrypt (self : SubtleCrypto) (algorithm : AlgorithmIdentifier) (key : CryptoKey) (data : ByteArray) : Async ByteArray := do

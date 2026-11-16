@@ -127,7 +127,7 @@ instance : ToJS crypto.ScryptOptions := ⟨fun d => Support.fields #[("cost", Su
 
 /-- `v instanceof Hash`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Hash`). -/
 def Hash.cast? (v : Value) : IO (Option Hash) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Hash"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Hash"] Value) v) then some { val := v } else none
 
 /-- `hash.copy([options])` (added in Node.js v13.1.0): `Hash copy(optional object options)` -/
 def Hash.copy (self : Hash) (options : Data := .undefined) : IO Hash := do
@@ -144,7 +144,7 @@ def Hash.update (self : Hash) (data : DOMStringOrUint8Array) (inputEncoding : Op
 
 /-- `v instanceof Hmac`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Hmac`). -/
 def Hmac.cast? (v : Value) : IO (Option Hmac) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Hmac"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Hmac"] Value) v) then some { val := v } else none
 
 /-- `hmac.digest([encoding])` (added in Node.js v0.1.94): `(Uint8Array or DOMString) digest(optional DOMString encoding)` -/
 def Hmac.digest (self : Hmac) (encoding : Option String := none) : IO Uint8ArrayOrDOMString :=

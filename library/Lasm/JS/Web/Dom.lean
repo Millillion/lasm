@@ -158,7 +158,7 @@ def EventHandlerNonNull.ofSyncFn (f : Event → IO Data) : IO EventHandlerNonNul
 
 /-- `v instanceof EventTarget`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EventTarget`). -/
 def EventTarget.cast? (v : Value) : IO (Option EventTarget) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["EventTarget"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["EventTarget"] Value) v) then some { val := v } else none
 
 /-- `constructor()` -/
 def EventTarget.new : IO EventTarget :=
@@ -179,7 +179,7 @@ def EventTarget.dispatchEvent (self : EventTarget) (event : Event) : IO Bool :=
 
 /-- `v instanceof Event`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Event`). -/
 def Event.cast? (v : Value) : IO (Option Event) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Event"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Event"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional EventInit eventInitDict)` -/
 def Event.new (type : String) (eventInitDict : Option EventInit := none) : IO Event :=
@@ -267,7 +267,7 @@ def Event.initEvent (self : Event) (type : String) (bubbles : Option Bool := non
 
 /-- `v instanceof CustomEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CustomEvent`). -/
 def CustomEvent.cast? (v : Value) : IO (Option CustomEvent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CustomEvent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CustomEvent"] Value) v) then some { val := v } else none
 
 /-- `constructor(DOMString type, optional CustomEventInit eventInitDict)` -/
 def CustomEvent.new (type : String) (eventInitDict : Option CustomEventInit := none) : IO CustomEvent :=
@@ -283,7 +283,7 @@ def CustomEvent.initCustomEvent (self : CustomEvent) (type : String) (bubbles : 
 
 /-- `v instanceof AbortController`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AbortController`). -/
 def AbortController.cast? (v : Value) : IO (Option AbortController) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AbortController"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AbortController"] Value) v) then some { val := v } else none
 
 /-- `constructor()` -/
 def AbortController.new : IO AbortController :=
@@ -301,7 +301,7 @@ def AbortController.abort (self : AbortController) (reason : Data := .undefined)
 
 /-- `v instanceof AbortSignal`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AbortSignal`). -/
 def AbortSignal.cast? (v : Value) : IO (Option AbortSignal) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AbortSignal"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["AbortSignal"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute boolean aborted` -/
 def AbortSignal.aborted (self : AbortSignal) : IO Bool := self.val.get "aborted" Bool
@@ -340,7 +340,7 @@ def AbortSignal.throwIfAborted (self : AbortSignal) : IO Unit :=
 
 /-- `v instanceof DOMException`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMException`). -/
 def DOMException.cast? (v : Value) : IO (Option DOMException) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMException"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["DOMException"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional DOMString message, optional DOMString name)` -/
 def DOMException.new (message : Option String := none) (name : Option String := none) : IO DOMException :=

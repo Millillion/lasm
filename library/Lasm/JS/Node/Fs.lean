@@ -605,7 +605,7 @@ instance : Coe String fsPromises.WriteFileOptionsOrDOMString := ⟨.domString⟩
 
 /-- `v instanceof Stats`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Stats`). -/
 def fs.Stats.cast? (v : Value) : IO (Option fs.Stats) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Stats"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Stats"] Value) v) then some { val := v } else none
 
 /-- `stats.dev`: `readonly attribute (double or bigint) dev` -/
 def fs.Stats.dev (self : fs.Stats) : IO DoubleOrBigint := self.val.get "dev" DoubleOrBigint
@@ -703,7 +703,7 @@ def fs.Stats.isSymbolicLink (self : fs.Stats) : IO Bool :=
 
 /-- `v instanceof Dirent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Dirent`). -/
 def fs.Dirent.cast? (v : Value) : IO (Option fs.Dirent) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Dirent"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Dirent"] Value) v) then some { val := v } else none
 
 /-- `dirent.name` (added in Node.js v10.10.0): `readonly attribute (DOMString or Uint8Array) name` -/
 def fs.Dirent.name (self : fs.Dirent) : IO DOMStringOrUint8Array := self.val.get "name" DOMStringOrUint8Array

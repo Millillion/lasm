@@ -175,7 +175,7 @@ instance : FromJS URLPatternResult where
 
 /-- `v instanceof URL`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `URL`). -/
 def URL.cast? (v : Value) : IO (Option URL) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["URL"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["URL"] Value) v) then some { val := v } else none
 
 /-- `constructor(USVString url, optional USVString base)` -/
 def URL.new (url : String) (base : Option String := none) : IO URL :=
@@ -289,7 +289,7 @@ def URL.toJSON (self : URL) : IO String :=
 
 /-- `v instanceof URLSearchParams`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `URLSearchParams`). -/
 def URLSearchParams.cast? (v : Value) : IO (Option URLSearchParams) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["URLSearchParams"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["URLSearchParams"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional (sequence<sequence<USVString>> or record<USVString, USVString> or USVString) init)` -/
 def URLSearchParams.new (init : Option SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString := none) : IO URLSearchParams :=
@@ -344,7 +344,7 @@ def URLSearchParams.values (self : URLSearchParams) : IO (Array String) :=
 
 /-- `v instanceof URLPattern`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `URLPattern`). -/
 def URLPattern.cast? (v : Value) : IO (Option URLPattern) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["URLPattern"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["URLPattern"] Value) v) then some { val := v } else none
 
 /-- `constructor(URLPatternInput input, USVString baseURL, optional URLPatternOptions options)` -/
 def URLPattern.new (input : URLPatternInput) (baseURL : String) (options : Option URLPatternOptions := none) : IO URLPattern :=

@@ -20,7 +20,7 @@ instance : Coe Performance EventTarget := ⟨Performance.toEventTarget⟩
 
 /-- `v instanceof Performance`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Performance`). -/
 def Performance.cast? (v : Value) : IO (Option Performance) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Performance"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Performance"] Value) v) then some { val := v } else none
 
 /-- `readonly attribute DOMHighResTimeStamp timeOrigin` -/
 def Performance.timeOrigin (self : Performance) : IO Float := self.val.get "timeOrigin" Float

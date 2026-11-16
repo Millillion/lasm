@@ -289,7 +289,7 @@ instance : FromJS WebAssemblyInstantiatedSource where
 
 /-- `v instanceof WebAssembly.Module`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Module`). -/
 def WebAssembly.Module.cast? (v : Value) : IO (Option WebAssembly.Module) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Module"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Module"] Value) v) then some { val := v } else none
 
 /-- `constructor(AllowSharedBufferSource bytes, optional WebAssemblyCompileOptions options)` -/
 def WebAssembly.Module.new (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : IO WebAssembly.Module :=
@@ -314,7 +314,7 @@ def WebAssembly.Module.customSections (moduleObject : WebAssembly.Module) (secti
 
 /-- `v instanceof WebAssembly.Instance`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Instance`). -/
 def WebAssembly.Instance.cast? (v : Value) : IO (Option WebAssembly.Instance) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Instance"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Instance"] Value) v) then some { val := v } else none
 
 /-- `constructor(Module module, optional object importObject)` -/
 def WebAssembly.Instance.new («module» : WebAssembly.Module) (importObject : Data := .undefined) : IO WebAssembly.Instance :=
@@ -326,7 +326,7 @@ def WebAssembly.Instance.exports (self : WebAssembly.Instance) : IO Data := self
 
 /-- `v instanceof WebAssembly.Memory`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Memory`). -/
 def WebAssembly.Memory.cast? (v : Value) : IO (Option WebAssembly.Memory) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Memory"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Memory"] Value) v) then some { val := v } else none
 
 /-- `constructor(MemoryDescriptor descriptor)` -/
 def WebAssembly.Memory.new (descriptor : MemoryDescriptor) : IO WebAssembly.Memory :=
@@ -354,7 +354,7 @@ def WebAssembly.Memory.toResizableBuffer (self : WebAssembly.Memory) : IO ByteAr
 
 /-- `v instanceof WebAssembly.Table`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Table`). -/
 def WebAssembly.Table.cast? (v : Value) : IO (Option WebAssembly.Table) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Table"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Table"] Value) v) then some { val := v } else none
 
 /-- `constructor(TableDescriptor descriptor, optional any value)` -/
 def WebAssembly.Table.new (descriptor : TableDescriptor) (value : Data := .undefined) : IO WebAssembly.Table :=
@@ -378,7 +378,7 @@ def WebAssembly.Table.set (self : WebAssembly.Table) (index : Data) (value : Dat
 
 /-- `v instanceof WebAssembly.Global`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Global`). -/
 def WebAssembly.Global.cast? (v : Value) : IO (Option WebAssembly.Global) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Global"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Global"] Value) v) then some { val := v } else none
 
 /-- `constructor(GlobalDescriptor descriptor, optional any v)` -/
 def WebAssembly.Global.new (descriptor : GlobalDescriptor) (v : Data := .undefined) : IO WebAssembly.Global :=
@@ -398,7 +398,7 @@ def WebAssembly.Global.valueOf (self : WebAssembly.Global) : IO Data :=
 
 /-- `v instanceof WebAssembly.Tag`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Tag`). -/
 def WebAssembly.Tag.cast? (v : Value) : IO (Option WebAssembly.Tag) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Tag"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Tag"] Value) v) then some { val := v } else none
 
 /-- `constructor(TagType type)` -/
 def WebAssembly.Tag.new (type : TagType) : IO WebAssembly.Tag :=
@@ -407,7 +407,7 @@ def WebAssembly.Tag.new (type : TagType) : IO WebAssembly.Tag :=
 
 /-- `v instanceof WebAssembly.Exception`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Exception`). -/
 def WebAssembly.Exception.cast? (v : Value) : IO (Option WebAssembly.Exception) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Exception"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Exception"] Value) v) then some { val := v } else none
 
 /-- `constructor(Tag exceptionTag, sequence<any> payload, optional ExceptionOptions options)` -/
 def WebAssembly.Exception.new (exceptionTag : WebAssembly.Tag) (payload : Array Data) (options : Option ExceptionOptions := none) : IO WebAssembly.Exception :=
@@ -427,7 +427,7 @@ def WebAssembly.Exception.is (self : WebAssembly.Exception) (exceptionTag : WebA
 
 /-- `v instanceof WebAssembly.CompileError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.CompileError`). -/
 def WebAssembly.CompileError.cast? (v : Value) : IO (Option WebAssembly.CompileError) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "CompileError"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "CompileError"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional DOMString message)` -/
 def WebAssembly.CompileError.new (message : Option String := none) : IO WebAssembly.CompileError :=
@@ -442,7 +442,7 @@ def WebAssembly.CompileError.message (self : WebAssembly.CompileError) : IO Stri
 
 /-- `v instanceof WebAssembly.LinkError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.LinkError`). -/
 def WebAssembly.LinkError.cast? (v : Value) : IO (Option WebAssembly.LinkError) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "LinkError"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "LinkError"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional DOMString message)` -/
 def WebAssembly.LinkError.new (message : Option String := none) : IO WebAssembly.LinkError :=
@@ -457,7 +457,7 @@ def WebAssembly.LinkError.message (self : WebAssembly.LinkError) : IO String := 
 
 /-- `v instanceof WebAssembly.RuntimeError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.RuntimeError`). -/
 def WebAssembly.RuntimeError.cast? (v : Value) : IO (Option WebAssembly.RuntimeError) := do
-  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "RuntimeError"] Value) v then some { val := v } else none
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "RuntimeError"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional DOMString message)` -/
 def WebAssembly.RuntimeError.new (message : Option String := none) : IO WebAssembly.RuntimeError :=
