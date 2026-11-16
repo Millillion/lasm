@@ -141,6 +141,19 @@ def served (r : Checks) (name base : String) (thrown : Nat) : Async Unit := do
       s!"{q.status} {q.body}"
   let bad ← request s!"{base}/square?n=minus"
   expect r s!"{name} 400" (bad.status == 400) s!"{bad.status}"
+  -- Lasm.RPC.webHandler: ∀ n ≤ 2^20, POST /rpc/square {"n":n} = 200 {"ok":n²} (application/json);
+  -- invalid requests 400, unknown endpoints 404, other methods 405.
+  for i in [0:4] do
+    let (n, g') := g.below (2 ^ 20); g := g'
+    let q ← request s!"{base}/rpc/square" (method := "POST") (body := some s!"\{\"n\":{n}}") (contentType := some "application/json")
+    expect r s!"{name} rpc[{i}]" (q.status == 200 && q.body == s!"\{\"ok\":{n * n}}" && q.contentType == some "application/json")
+      s!"{q.status} {q.body} {q.contentType}"
+  let big ← request s!"{base}/rpc/square" (method := "POST") (body := some "{\"n\":2000000}")
+  expect r s!"{name} rpc invalid" (big.status == 400 && big.body == "{\"error\":\"n is too large\"}") s!"{big.status} {big.body}"
+  let unknown ← request s!"{base}/rpc/cube" (method := "POST") (body := some "{}")
+  expect r s!"{name} rpc unknown" (unknown.status == 404) s!"{unknown.status} {unknown.body}"
+  let wrong ← request s!"{base}/rpc/square"
+  expect r s!"{name} rpc GET" (wrong.status == 405) s!"{wrong.status} {wrong.body}"
   let missing ← request s!"{base}/no/such/path"
   expect r s!"{name} 404" (missing.status == 404 && missing.body == "not found: /no/such/path") s!"{missing.status} {missing.body}"
   -- A handler that throws: the server's error handling answers `thrown`.

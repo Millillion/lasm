@@ -67,21 +67,22 @@ handler work with it by name.
 ## Server
 
 ```lean
--- Server.lean
-import Lasm.Fetch
-import Lasm.RPC.Server
+-- Server.lean: the endpoints, served on the JavaScript runtimes
+import Lasm.JS.Web
+import Lasm.RPC.Web
 import Shared
-open Lasm.Fetch Lasm.RPC
+open Lasm.RPC
 
 def store (title : String) (_ : checkTitle title = .ok ()) : Todo := …   -- only validated titles
 
-def main : IO Unit := do
-  let routes := [
-    addTodo.serve fun req ok => do            -- ok : addTodo.validate req = .ok ()
-      return .ok (store req.title ok),
-    listTodos.serve' fun _ => do return .ok #[] ]
-  serve <| handler routes fun req => do       -- every other request
-    return .notFound
+def routes : List Route := [
+  addTodo.serve fun req ok => do            -- ok : addTodo.validate req = .ok ()
+    return .ok (store req.title ok),
+  listTodos.serve' fun _ => do return .ok #[] ]
+
+def fetch (request : Lasm.JS.Web.Request) : Async Lasm.JS.Web.Response := do
+  if let some response ← webHandler routes request then return response
+  Lasm.JS.Web.Response.new (some (.usvString "Not Found\n")) (some { status := some 404 })
 ```
 
 - `Endpoint.serve e (fun req ok => …)`: the handler runs in `Async` (it can
@@ -89,12 +90,24 @@ def main : IO Unit := do
   `.error message` (status 500). A body that is not JSON, does not decode, or
   fails `validate` answers status 400 without running it.
 - `Endpoint.serve'`: the same, for handlers that do not need the proof.
-- `handler routes fallback` is a `Lasm.Fetch` handler: `POST /rpc/<name>` goes
-  to the route, `GET /rpc/…` answers 405, everything else to `fallback` (your
-  pages, static files).
-- `Lasm.Fetch.serve` runs it on every server target: Node (`lasm build`), the
-  edge platforms (`--target workers`, `vercel-edge`, `netlify-edge`,
-  `deno-deploy`), Bun and Deno, WASI and Fastly Compute ([FETCH.md](FETCH.md)).
+- `webHandler routes request` (`Lasm.RPC.Web`) answers a Lasm.JS.Web
+  `Request` whose path is `/rpc/<name>`: `POST` runs the route, an unknown
+  name answers 404, any other method 405 (`allow: POST`). For every other
+  path it answers `none`, and the program serves its pages and files. `fetch`
+  above is the platform's own handler shape, so it goes to `Deno.serve`,
+  `Bun.serve`, `Node.serve` or the edge platforms' default export unchanged.
+- `dispatch routes method path body` (`Lasm.RPC.Server`) is the same for any
+  server: give it the request's method, URL path and body text, and send the
+  `Answer` (`status`, `headers`, `body`) back. Fastly and wasi-http programs
+  call it directly:
+
+  ```lean
+  match Lasm.RPC.dispatch routes method path body with
+  | some answer => let a ← answer; …write a.status, a.headers, a.body…
+  | none => …your pages…
+  ```
+- `handler routes fallback`, the `Lasm.Fetch` handler, remains until
+  Lasm.Fetch is deleted; use `webHandler` or `dispatch` instead.
 
 ## Client
 
@@ -258,9 +271,10 @@ CI tests them end to end.
 | Module | |
 | --- | --- |
 | `Lasm.RPC.Core` | `Endpoint` (`name`, `validate`, `path`, `encodeRequest`, `decodeRequest`, `encodeResponse`, `decodeResponse`), `Error`, `decodeRequest_valid` |
-| `Lasm.RPC.Server` | `Endpoint.serve`, `Endpoint.serve'`, `Route`, `handler` |
+| `Lasm.RPC.Server` | `Endpoint.serve`, `Endpoint.serve'`, `Route`, `Answer`, `endpointName?`, `dispatch`; `handler` (Lasm.Fetch, until it is deleted) |
+| `Lasm.RPC.Web` | `webHandler`, `Answer.toResponse` (Lasm.JS.Web; not imported by `Lasm.RPC`) |
 | `Lasm.RPC.Client` | `Endpoint.call`, `call_invalid` |
-| `Lasm.RPC` | all three |
+| `Lasm.RPC` | `Core`, `Server` and `Client` |
 | `Lasm.Fetch.Assets`, `Lasm.Fetch.Embed` | `Assets`, `Assets.serve`, `Assets.wrap`; `embed_dir!` |
 | `Lasm.KV` | `Store`, `memory`, `workers`, `deno`, `fastly`, `open` |
 

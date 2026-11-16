@@ -12,7 +12,9 @@ Reading guide. An endpoint `e : Endpoint Req Res` has a name and a
 `validate` function. On the server, `e.decodeRequest body` reads a request
 body (JSON, then the request type, then `validate`), `e.serve handler` is
 the route that answers `POST /rpc/<name>`, and `handler routes fallback` is
-the `Lasm.Fetch` handler that dispatches to the routes. In the browser,
+the `Lasm.Fetch` handler that dispatches to the routes (until Lasm.Fetch is
+deleted), and `dispatch routes method path body` answers an HTTP request for
+`/rpc/<name>` on any server. In the browser,
 `e.call req handle` is the Lasm.UI command that sends the request. Every
 proposition holds for every endpoint, every request type and every
 `validate`. Lean's JSON parser and printer (`Json.parse`, `Json.compress`)
@@ -22,7 +24,7 @@ hypothesis.
 import Lasm.RPC
 
 namespace Lasm.RPC.Spec
-open Lean Lasm.RPC Lasm.Fetch Lasm.UI
+open Lean Lasm.RPC Lasm.Fetch Lasm.UI Std.Async
 
 /-! ## The server only runs handlers on valid requests -/
 
@@ -116,6 +118,37 @@ def handler_method : Prop :=
   ∀ (routes : List Route) (fallback : Handler) (req : Request) (name : String),
     req.method ≠ "POST" → req.segments = ["rpc", name] →
       handler routes fallback req = pure ((Response.text "Use POST\n" 405).withHeader "allow" "POST")
+
+/-! ## `dispatch`: the same, for any server -/
+
+/-- **Other paths are left to the program.** For a URL path that does not
+name an endpoint (`endpointName? path = none`: not `/rpc/<name>`), `dispatch`
+gives no answer, whatever the method and body: the program answers it. -/
+def dispatch_other : Prop :=
+  ∀ (routes : List Route) (method path body : String),
+    endpointName? path = none → dispatch routes method path body = none
+
+/-- **`POST /rpc/<name>` runs the route of that name.** For a `POST` to a
+path naming the endpoint `name`, `dispatch` runs the first route named
+`name` on the body and answers its status and JSON body, never cached. -/
+def dispatch_route : Prop :=
+  ∀ (routes : List Route) (path body name : String) (route : Route),
+    endpointName? path = some name → routes.find? (·.name == name) = some route →
+      dispatch routes "POST" path body = some (Answer.ofRoute <$> route.run body)
+
+/-- **An unknown endpoint answers 404.** A `POST` to `/rpc/<name>` when no
+route has that name answers status 404, and runs no route. -/
+def dispatch_unknown : Prop :=
+  ∀ (routes : List Route) (path body name : String),
+    endpointName? path = some name → routes.find? (·.name == name) = none →
+      dispatch routes "POST" path body = some (pure (Answer.unknown name))
+
+/-- **Only `POST` reaches an endpoint.** Any other method on `/rpc/<name>`
+answers 405 with `allow: POST`, and runs no route. -/
+def dispatch_method : Prop :=
+  ∀ (routes : List Route) (method path body name : String),
+    method ≠ "POST" → endpointName? path = some name →
+      dispatch routes method path body = some (pure Answer.wrongMethod)
 
 /-! ## The client -/
 

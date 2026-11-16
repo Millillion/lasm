@@ -47,8 +47,9 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
   'Lasm.UI.Url', 'Lasm.UI.Mount', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',
-  // Lasm.RPC (docs/RPC.md): typed endpoints shared by a Lasm.Fetch server and a Lasm.UI app.
-  'Lasm.RPC.Core', 'Lasm.RPC.Server', 'Lasm.RPC.Client', 'Lasm.RPC'];
+  // Lasm.RPC (docs/RPC.md): typed endpoints shared by a Lean server and a Lasm.UI app;
+  // Lasm.RPC.Web serves them for a Lasm.JS.Web Request (not imported by Lasm.RPC).
+  'Lasm.RPC.Core', 'Lasm.RPC.Server', 'Lasm.RPC.Client', 'Lasm.RPC', 'Lasm.RPC.Web'];
 // The proofs-only modules (library/Lasm/UI/Proofs*, each library's Spec.lean and Theorems.lean;
 // library/PROOFS.md) are checked by scripts/library-proofs.mjs (Lasm.UI's also by scripts/ui/lean-tests.mjs), not shipped.
 

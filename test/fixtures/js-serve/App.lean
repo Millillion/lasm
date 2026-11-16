@@ -11,11 +11,19 @@ binding in Main.lean and Serve.lean). Routes:
   not a natural number;
 - `GET /slow?ms=k`: 200 after waiting k milliseconds (a timer; no Lean thread held);
 - `GET /throw`: the handler throws (the runtime's error handling answers);
+- `/rpc/<name>`: Lasm.RPC's endpoints, answered by `Lasm.RPC.webHandler`
+  (`POST /rpc/square` with `{"n":k}` answers `{"ok":k²}`; `n > 2^20` fails
+  validation, 400);
 - anything else: 404, `not found: <path>`.
 -/
 import Lasm.JS
 import Lasm.JS.Web
+import Lasm.RPC.Web
 open Lasm.JS Lasm.JS.Web
+
+structure SquareReq where
+  n : Nat
+  deriving Lean.ToJson, Lean.FromJson
 
 namespace App
 
@@ -29,8 +37,15 @@ def sleep (ms : Nat) : Async Unit := do
 def text (body : String) (status : Nat := 200) (contentType := "text/plain; charset=utf-8") (extra : Array (String × String) := #[]) : IO Response :=
   Response.new (some (.usvString body)) (some { status := some status, headers := some (.record ⟨#[("content-type", contentType)] ++ extra⟩) })
 
+/-- `POST /rpc/square`: `n²`, for `n ≤ 2^20` (`validate`). -/
+def square : Lasm.RPC.Endpoint SquareReq Nat :=
+  { name := "square", validate := fun r => if r.n ≤ 2 ^ 20 then .ok () else .error "n is too large" }
+
+def routes : List Lasm.RPC.Route := [square.serve' fun r => return .ok (r.n * r.n)]
+
 /-- The handler. -/
 def handle (request : Request) : Async Response := do
+  if let some response ← Lasm.RPC.webHandler routes request then return response
   let url ← URL.new (← request.url)
   let method ← request.method
   match method, ← url.pathname with

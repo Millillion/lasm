@@ -80,7 +80,7 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**57 proved propositions (441 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**61 proved propositions (445 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
 ## Lasm.UI (14)
 
@@ -118,36 +118,45 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 | [`cmd_map_id`](Lasm/UI/Spec.lean#L206) | **Mapping by the identity changes nothing.** |
 | [`cmd_map_batch`](Lasm/UI/Spec.lean#L210) | **Mapping commutes with batching.** Mapping a batch of commands is the batch of the mapped commands: no effect is lost, duplicated or reordered. |
 
-## Lasm.RPC (14)
+## Lasm.RPC (18)
 
 ### The server only runs handlers on valid requests
 
 | Proposition | In plain English |
 | --- | --- |
-| [`decodeRequest_valid`](Lasm/RPC/Spec.lean#L29) | **A decoded request is valid.** Whenever `decodeRequest` accepts a body as the request `r`, `r` passed the endpoint's `validate`. (This is the proof that `serve` hands to every handler.) |
-| [`decodeRequest_accepts`](Lasm/RPC/Spec.lean#L36) | **A valid request is accepted.** If a body is JSON that reads as the request `r`, and `r` passes `validate`, then `decodeRequest` accepts it as exactly `r`: the server never refuses a well-formed, valid request. |
-| [`decodeRequest_rejects`](Lasm/RPC/Spec.lean#L43) | **An invalid request is refused with the validation's message.** If a body reads as the request `r` but `validate r` fails with message `m`, `decodeRequest` refuses it with `Error.invalid m`. |
-| [`decodeRequest_error_invalid`](Lasm/RPC/Spec.lean#L51) | **Decoding only fails as "invalid".** Every way `decodeRequest` can refuse a body (not JSON, not the request type, or failing `validate`) is an `Error.invalid`, which the server answers with status 400. |
-| [`decodeRequest_hugeExponent`](Lasm/RPC/Spec.lean#L58) | **Huge exponents are refused before parsing.** A body holding a number whose exponent has more than four digits (`1e10000`, which would make Lean's JSON parser compute `10 ^ 10000`) is refused as invalid without being parsed, so such a request cannot exhaust the server's time or memory. |
-| [`serve_invalid`](Lasm/RPC/Spec.lean#L66) | **An invalid request answers 400 without running the handler.** When `decodeRequest` refuses a body, the route that `serve` builds answers status 400 with the error, and does nothing else: the handler is not called. |
-| [`serve_valid`](Lasm/RPC/Spec.lean#L75) | **A valid request runs the handler once.** When `decodeRequest` accepts a body as `r`, the route runs the handler on `r` (with the proof that `r` is valid), once, and answers status 200 with its result if it succeeded and 500 with its message if it failed. |
+| [`decodeRequest_valid`](Lasm/RPC/Spec.lean#L31) | **A decoded request is valid.** Whenever `decodeRequest` accepts a body as the request `r`, `r` passed the endpoint's `validate`. (This is the proof that `serve` hands to every handler.) |
+| [`decodeRequest_accepts`](Lasm/RPC/Spec.lean#L38) | **A valid request is accepted.** If a body is JSON that reads as the request `r`, and `r` passes `validate`, then `decodeRequest` accepts it as exactly `r`: the server never refuses a well-formed, valid request. |
+| [`decodeRequest_rejects`](Lasm/RPC/Spec.lean#L45) | **An invalid request is refused with the validation's message.** If a body reads as the request `r` but `validate r` fails with message `m`, `decodeRequest` refuses it with `Error.invalid m`. |
+| [`decodeRequest_error_invalid`](Lasm/RPC/Spec.lean#L53) | **Decoding only fails as "invalid".** Every way `decodeRequest` can refuse a body (not JSON, not the request type, or failing `validate`) is an `Error.invalid`, which the server answers with status 400. |
+| [`decodeRequest_hugeExponent`](Lasm/RPC/Spec.lean#L60) | **Huge exponents are refused before parsing.** A body holding a number whose exponent has more than four digits (`1e10000`, which would make Lean's JSON parser compute `10 ^ 10000`) is refused as invalid without being parsed, so such a request cannot exhaust the server's time or memory. |
+| [`serve_invalid`](Lasm/RPC/Spec.lean#L68) | **An invalid request answers 400 without running the handler.** When `decodeRequest` refuses a body, the route that `serve` builds answers status 400 with the error, and does nothing else: the handler is not called. |
+| [`serve_valid`](Lasm/RPC/Spec.lean#L77) | **A valid request runs the handler once.** When `decodeRequest` accepts a body as `r`, the route runs the handler on `r` (with the proof that `r` is valid), once, and answers status 200 with its result if it succeeded and 500 with its message if it failed. |
 
 ### Dispatch: `POST /rpc/<name>` and nothing else
 
 | Proposition | In plain English |
 | --- | --- |
-| [`handler_fallback`](Lasm/RPC/Spec.lean#L88) | **Other paths reach the fallback.** A request whose path is not `/rpc/<name>` (one segment after `rpc`) is passed to the fallback handler unchanged, whatever its method. |
-| [`handler_route`](Lasm/RPC/Spec.lean#L95) | **`POST /rpc/<name>` runs the route of that name.** For a `POST` to `/rpc/<name>`, the handler runs the first route named `name` on the request body and answers its status and JSON body, never cached. |
-| [`handler_unknown`](Lasm/RPC/Spec.lean#L104) | **An unknown endpoint answers 404.** A `POST` to `/rpc/<name>` when no route has that name answers status 404, and runs no route and not the fallback. |
-| [`handler_method`](Lasm/RPC/Spec.lean#L113) | **Only `POST` reaches an endpoint.** Any other method on `/rpc/<name>` answers 405 with `allow: POST`, and runs no route and not the fallback. |
+| [`handler_fallback`](Lasm/RPC/Spec.lean#L90) | **Other paths reach the fallback.** A request whose path is not `/rpc/<name>` (one segment after `rpc`) is passed to the fallback handler unchanged, whatever its method. |
+| [`handler_route`](Lasm/RPC/Spec.lean#L97) | **`POST /rpc/<name>` runs the route of that name.** For a `POST` to `/rpc/<name>`, the handler runs the first route named `name` on the request body and answers its status and JSON body, never cached. |
+| [`handler_unknown`](Lasm/RPC/Spec.lean#L106) | **An unknown endpoint answers 404.** A `POST` to `/rpc/<name>` when no route has that name answers status 404, and runs no route and not the fallback. |
+| [`handler_method`](Lasm/RPC/Spec.lean#L115) | **Only `POST` reaches an endpoint.** Any other method on `/rpc/<name>` answers 405 with `allow: POST`, and runs no route and not the fallback. |
+
+### `dispatch`: the same, for any server
+
+| Proposition | In plain English |
+| --- | --- |
+| [`dispatch_other`](Lasm/RPC/Spec.lean#L124) | **Other paths are left to the program.** For a URL path that does not name an endpoint (`endpointName? path = none`: not `/rpc/<name>`), `dispatch` gives no answer, whatever the method and body: the program answers it. |
+| [`dispatch_route`](Lasm/RPC/Spec.lean#L131) | **`POST /rpc/<name>` runs the route of that name.** For a `POST` to a path naming the endpoint `name`, `dispatch` runs the first route named `name` on the body and answers its status and JSON body, never cached. |
+| [`dispatch_unknown`](Lasm/RPC/Spec.lean#L139) | **An unknown endpoint answers 404.** A `POST` to `/rpc/<name>` when no route has that name answers status 404, and runs no route. |
+| [`dispatch_method`](Lasm/RPC/Spec.lean#L146) | **Only `POST` reaches an endpoint.** Any other method on `/rpc/<name>` answers 405 with `allow: POST`, and runs no route. |
 
 ### The client
 
 | Proposition | In plain English |
 | --- | --- |
-| [`call_invalid`](Lasm/RPC/Spec.lean#L122) | **An invalid request is never sent.** When `validate` refuses a request with message `m`, the command `call` performs no HTTP request: its only effect delivers `Error.invalid m` to the app. |
-| [`call_valid`](Lasm/RPC/Spec.lean#L130) | **A valid request is sent once, as JSON, to its endpoint.** When `validate` accepts a request, the command `call` performs exactly one effect: a `POST` of the encoded request to `base ++ e.path` (`base` followed by `/rpc/<name>`) with a JSON content type. A network failure reaches the app as `Error.network`, and any answer as the endpoint's reading of its status and body (`decodeResponse`). |
-| [`decodeResponse_not_network`](Lasm/RPC/Spec.lean#L146) | **Reading an answer never claims a network failure.** Whatever status and body the server answers, `decodeResponse` never reports `Error.network`: that error means only that no answer arrived. |
+| [`call_invalid`](Lasm/RPC/Spec.lean#L155) | **An invalid request is never sent.** When `validate` refuses a request with message `m`, the command `call` performs no HTTP request: its only effect delivers `Error.invalid m` to the app. |
+| [`call_valid`](Lasm/RPC/Spec.lean#L163) | **A valid request is sent once, as JSON, to its endpoint.** When `validate` accepts a request, the command `call` performs exactly one effect: a `POST` of the encoded request to `base ++ e.path` (`base` followed by `/rpc/<name>`) with a JSON content type. A network failure reaches the app as `Error.network`, and any answer as the endpoint's reading of its status and body (`decodeResponse`). |
+| [`decodeResponse_not_network`](Lasm/RPC/Spec.lean#L179) | **Reading an answer never claims a network failure.** Whatever status and body the server answers, `decodeResponse` never reports `Error.network`: that error means only that no answer arrived. |
 
 ## Lasm.KV (6)
 
