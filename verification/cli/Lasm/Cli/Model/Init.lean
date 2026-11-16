@@ -41,8 +41,8 @@ structure DeployTarget where
 def functionTemplates : List String := ["express", "hono", "fastify", "std-http", "fetch"]
 
 def deployTable : List DeployTarget := [
-  { name := "lambda", summary := "AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)", templates := functionTemplates },
-  { name := "lambda-zip", summary := "AWS Lambda .zip for nodejs24.x (npm run build:lambda)", templates := functionTemplates },
+  { name := "lambda", summary := "AWS Lambda .zip for nodejs24.x (npm run build:lambda)", templates := functionTemplates },
+  { name := "lambda-container", summary := "AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)", templates := functionTemplates },
   { name := "lambda-edge", summary := "Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)", templates := functionTemplates },
   { name := "vercel", summary := "Vercel Function (vercel.json; Vercel runs the build)", templates := functionTemplates },
   { name := "netlify", summary := "Netlify Function (netlify.toml; Netlify runs the build)", templates := functionTemplates },
@@ -88,7 +88,7 @@ The directory must be new or empty. The default template is plain.
 --deploy (repeatable; server templates, and wasi for plain too) adds a target's files and
 npm scripts (build:<target> runs lasm build --target <target>). Lasm never
 installs or starts a platform's own tools; use the platform's CLI for that:
-" ++ "\n".intercalate (deployTable.map fun t => "  " ++ padEnd t.name 12 ++ " " ++ t.summary) ++ "
+" ++ "\n".intercalate (deployTable.map fun t => "  " ++ padEnd t.name 16 ++ " " ++ t.summary) ++ "
 
 Templates:
 " ++ "\n".intercalate (templateTable.map fun t => "  " ++ padEnd t.name 9 ++ " " ++ t.summary) ++ "
