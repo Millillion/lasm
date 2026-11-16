@@ -97,7 +97,7 @@ the build cache (`.lake/lasm/applications/`); nothing is written to `dist/`.
   result, or `IO.Process.exit`, is the exit code. Standard output and error
   are written byte for byte.
 - **A server.** If `main` publishes a handler with `Lasm.JS.exportDefault`
-  (the Hono template does this when `Lasm.JS.onEdge` is true), the program
+  (the hono and fetch templates do this in `Export.lean`), the program
   serves it. Bun uses `Bun.serve` on `PORT` (default 3000). Deno uses
   `Deno.serve` on `PORT` (default 8000). A stopped instance is replaced on
   the next request.

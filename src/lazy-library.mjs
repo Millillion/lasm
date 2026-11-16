@@ -5,20 +5,21 @@
 // compiled into the managed Lean prefix the first time a program (or `lasm editor`) imports it, together with
 // the modules it imports. Each compiled module is stamped with the hash of its source and of its dependencies'
 // stamps, so a new Lasm version recompiles only what changed. Modules that do not depend on each other compile
-// in parallel; every output is written to a temporary file and renamed into place.
+// in parallel; every output is written to a temporary file and renamed into place. The compile lock lives next to
+// the prefix, in its parent's .locks/, never inside the prefix's verified contents.
 import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, statSync, writeFileSync, copyFileSync } from 'node:fs';
 import { availableParallelism, totalmem } from 'node:os';
-import { dirname, join, relative, toNamespacedPath } from 'node:path';
+import { basename, dirname, join, relative, toNamespacedPath } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { executableName } from './platform.mjs';
 
 const libraryRoot = fileURLToPath(new URL('../library/', import.meta.url));
 
-/** The generated binding namespaces whose modules may be compiled on first import. */
+/** The generated binding namespaces whose modules (and umbrella module, `Lasm.JS.Deno`) may be compiled on first import. */
 export const lazyNamespaces = ['Lasm.JS.Web.', 'Lasm.JS.Node.', 'Lasm.JS.Deno.', 'Lasm.JS.Bun.', 'Lasm.JS.Cloudflare.'];
-export const isLazyNamespace = module => lazyNamespaces.some(prefix => module.startsWith(prefix));
+export const isLazyNamespace = module => lazyNamespaces.some(prefix => module.startsWith(prefix) || module === prefix.slice(0, -1));
 
 /** A module's source in the shipped library. */
 export const librarySourceFile = (module, root = libraryRoot) => join(root, ...module.split('.')) + '.lean';
@@ -48,7 +49,9 @@ export function lazyModules(eager, root = libraryRoot) {
     }
   };
   for (const prefix of lazyNamespaces) {
-    const parts = prefix.slice(0, -1).split('.');
+    const umbrella = prefix.slice(0, -1), parts = umbrella.split('.');
+    // The umbrella module (library/Lasm/JS/Deno.lean), which imports the namespace's modules.
+    if (existsSync(join(root, ...parts) + '.lean') && !eager.includes(umbrella)) found.push(umbrella);
     walk(join(root, ...parts), prefix);
   }
   return found;
@@ -112,15 +115,20 @@ const outputsOf = (tree, module) => {
     source: join(tree, 'src', 'lean', ...parts) + '.lean' };
 };
 
-/** Lean compiling one module of the library into the prefix `tree` (as src/lasm-library.mjs compileLibrary). */
-export function leanCompileCommand(tree, { source, olean, c }, platform = process.platform) {
+/** The lock that serializes compiles into the prefix `tree`: in `.locks/` beside it, outside its verified contents
+ * (a lock file stays after its holder exits, which the next build's integrity check would refuse). */
+export const lazyLockPath = tree => join(dirname(tree), '.locks', `lazy-${basename(tree)}.lock`);
+
+/** Lean compiling one module of the library into the prefix `tree` (as src/lasm-library.mjs compileLibrary).
+ * The source is read where it ships (`root`), so nothing but finished outputs ever enters the prefix. */
+export function leanCompileCommand(tree, { source, olean, c, root = join(tree, 'src', 'lean') }, platform = process.platform) {
   const env = { ...process.env };
   for (const key of Object.keys(env)) if (/^(?:LEAN_|LAKE_|ELAN_)/i.test(key)) delete env[key];
   Object.assign(env, { LEAN_NUM_THREADS: '1', LEAN_STACK_SIZE_KB: '8192' });
   if (platform === 'win32') Object.assign(env, { LEAN_SYSROOT: toNamespacedPath(tree), LEAN_PATH: toNamespacedPath(join(tree, 'lib', 'lean')) });
   const native = path => platform === 'win32' ? toNamespacedPath(path) : path;
   return { program: native(join(tree, 'bin', executableName('lean', platform))),
-    args: ['-j1', '-s8192', '-R', join(tree, 'src', 'lean'), '-Dcompiler.postponeCompile=false', '-o', olean, '-c', c, source], env };
+    args: ['-j1', '-s8192', '-R', root, '-Dcompiler.postponeCompile=false', '-o', olean, '-c', c, source], env };
 }
 
 const runLean = ({ program, args, env }) => new Promise((resolveRun, reject) => {
@@ -152,7 +160,7 @@ export async function ensureLazyModules(tree, roots, { eager, root = libraryRoot
     return existsSync(o.olean) && existsSync(o.c) && readStamp(tree, m)?.identity === identity.get(m);
   };
   if (order.every(upToDate)) return { compiled: [], ms: 0 };
-  return lock(join(tree, 'lib', 'lasm', 'lazy.lock'), async () => {
+  return lock(lazyLockPath(tree), async () => {
     const todo = order.filter(m => !upToDate(m)); // again, under the lock: another process may have compiled them
     if (!todo.length) return { compiled: [], ms: 0 };
     const started = Date.now();
@@ -162,12 +170,13 @@ export async function ensureLazyModules(tree, roots, { eager, root = libraryRoot
       const o = outputsOf(tree, m);
       for (const f of Object.values(o)) mkdirSync(dirname(f), { recursive: true });
       mkdirSync(dirname(stampFile(tree, m)), { recursive: true });
-      copyFileSync(librarySourceFile(m, root), o.source);
-      const tmp = { olean: `${o.olean}.tmp-${process.pid}`, c: `${o.c}.tmp-${process.pid}` };
+      const tmp = { olean: `${o.olean}.tmp-${process.pid}`, c: `${o.c}.tmp-${process.pid}`, source: `${o.source}.tmp-${process.pid}` };
       log(`[lasm] Compiling ${m} (first use)…`);
-      const promise = compile(leanCompileCommand(tree, { source: o.source, olean: tmp.olean, c: tmp.c }, platform)).then(() => {
+      const promise = compile(leanCompileCommand(tree, { source: librarySourceFile(m, root), root, olean: tmp.olean, c: tmp.c }, platform)).then(() => {
+        copyFileSync(librarySourceFile(m, root), tmp.source);
         renameSync(tmp.olean, o.olean);
         renameSync(tmp.c, o.c);
+        renameSync(tmp.source, o.source);
         const name = file => relative(realpathSync(tree), realpathSync(file)).split(/[\\/]/).join('/');
         const stamp = { schema: 1, module: m, identity: identity.get(m), files: Object.fromEntries(Object.values(o).map(f => [name(f), entryOf(f)])) };
         writeFileSync(`${stampFile(tree, m)}.tmp-${process.pid}`, JSON.stringify(stamp) + '\n');

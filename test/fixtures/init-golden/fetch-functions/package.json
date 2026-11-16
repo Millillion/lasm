@@ -1,0 +1,32 @@
+{
+  "name": "func-app.v2",
+  "version": "0.1.0",
+  "private": true,
+  "description": "an HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces, compiled to WebAssembly by Lasm",
+  "scripts": {
+    "dev": "lasm dev Main.lean",
+    "build": "lasm build Main.lean",
+    "start": "node dist/main.mjs",
+    "build:lambda": "lasm build Export.lean --target lambda",
+    "build:lambda-edge": "lasm build Export.lean --target lambda-edge",
+    "build:vercel": "lasm build Export.lean --target vercel",
+    "build:netlify": "lasm build Export.lean --target netlify",
+    "build:azure": "lasm build Export.lean --target azure",
+    "build:gcf": "lasm build Export.lean --target gcf",
+    "dev:bun": "bun x --bun lasm dev Main.lean",
+    "build:bun": "bun x --bun lasm build Export.lean --target bun",
+    "start:bun": "bun bun/main.mjs",
+    "build:deno": "lasm build Export.lean --target deno",
+    "start:deno": "deno run -A deno/main.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@azure/functions": "4.17.0",
+    "@google-cloud/functions-framework": "5.0.5"
+  },
+  "devDependencies": {
+    "@lasm/compiler": "<LASM_VERSION>"
+  }
+}

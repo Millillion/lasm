@@ -76,6 +76,10 @@ def main : IO Unit := do
     let g ← greet s
     return g.toUpper
   IO.println s!"applyAsync: {← applyAsync shout "callbacks"}"
+  -- A function's `length`: 0 by default, 1 and 2 for ofFn1 and ofFn2, or given.
+  let pair ← Function.ofFn2 fun (a : Nat) (b : Nat) => do return a + b
+  let three ← Function.ofSyncFn (length := 3) fun _ => do return .undefined
+  IO.println s!"lengths: {← double.get "length" Nat} {← shout.get "length" Nat} {← pair.get "length" Nat} {← three.get "length" Nat}"
   let failing ← Function.ofFn fun _ => throw (IO.userError "from Lean")
   try
     let _ ← applyAsync failing "x"

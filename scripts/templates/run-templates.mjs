@@ -139,8 +139,8 @@ try {
   const cli = join(work, 'cli');
   mkdirSync(cli);
   run('npm install Lasm (for lasm init)', npm, ['install', '--no-save', tgz], cli);
-  if (docker) for (const image of ['node:24-trixie', 'node:24-bookworm-slim', 'public.ecr.aws/lambda/nodejs:24', 'public.ecr.aws/awsguru/aws-lambda-adapter:1.1.0'])
-    if (spawnSync('docker', ['image', 'inspect', image], { stdio: 'ignore' }).status !== 0)  // CI loads the adapter image
+  if (docker) for (const image of ['node:24-trixie', 'node:24-bookworm-slim', 'public.ecr.aws/lambda/nodejs:24'])
+    if (spawnSync('docker', ['image', 'inspect', image], { stdio: 'ignore' }).status !== 0)  // CI loads the Lambda image
       await dockerWithRetry(`docker pull ${image}`, ['pull', '-q', image], cli);
   for (const template of templates) {
     const entry = { template, ok: false }; result.templates.push(entry); save();
@@ -149,8 +149,9 @@ try {
     const guide = template === 'guide';
     const base = guide ? 'hono' : template;
     const app = join(work, `${template} app λ`);
-    // With --docker, server templates also get and test the Lambda image.
-    const lambda = docker && base !== 'plain' ? ['--deploy', 'lambda'] : [];
+    // With --docker, the templates with a handler (hono here) also get and test
+    // the Lambda image (Dockerfile.lambda: the handler on Lambda's base image).
+    const lambda = docker && base === 'hono' && !guide ? ['--deploy', 'lambda-container'] : [];
     // LASM_INIT_FROM_SOURCE=1 takes `lasm init` from this checkout (local runs with an older candidate).
     if (process.env.LASM_INIT_FROM_SOURCE === '1')
       run(`lasm init ${template} (source)`, [process.execPath], [fileURLToPath(new URL('../../bin/lasm.mjs', import.meta.url)), 'init', app, '--template', base, ...lambda], cli);
@@ -248,7 +249,7 @@ try {
           entry.dockerLogs = spawnSync('docker', ['logs', name], { encoding: 'utf8' }).stdout?.slice(-2000);
           spawnSync('docker', ['rm', '-f', name]);
         }
-        entry.lambda = await checkLambda(app, template);
+        if (lambda.length) entry.lambda = await checkLambda(app, template);
       }
     }
     entry.ok = true; save();

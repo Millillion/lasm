@@ -72,7 +72,7 @@ test/edge-js.test.mjs), while the Lean half's reader is the very function
 theorems); the function-platform shims (src/serverless/), which are JavaScript
 that runs before the program: Lasm.Serverless's propositions are about a Lean
 model of them (Lasm/Serverless/Proofs/Model.lean, function for function
-lasm-lambda.mjs and lasm-server.mjs), and the serverless-http fuzz target
+lasm-lambda.mjs and lasm-function.mjs), and the serverless-http fuzz target
 checks the JavaScript against the model on every input, while Node's base64,
 `Date.parse` and the platforms themselves are left outside it; Lean's JSON parser and printer; the `IO.Ref` that holds the memory
 store's table; and the platform stores and HTTP stacks, which Lasm only calls.
@@ -80,7 +80,7 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**57 proved propositions (441 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**56 proved propositions (440 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
 ## Lasm.UI (14)
 
@@ -114,11 +114,11 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 | Proposition | In plain English |
 | --- | --- |
 | [`cmd_map_comp`](Lasm/UI/Spec.lean#L191) | **Mapping commands composes.** `Cmd.map` is how a parent embeds a child component's commands (its messages wrapped in the parent's). Mapping by `g` and then by `f` is the same command as mapping once by `f ∘ g`, so components nest to any depth. |
-| [`cmd_map_effects`](Lasm/UI/Spec.lean#L198) | **Mapping commands keeps their effects.** Mapping a command by any `f` keeps exactly its effects, in order, each of the same kind with the same data (the same request, delay, URL, storage key …): with the messages they deliver forgotten (`Effect.forget`), the effects before and after are equal. Only the messages change. |
+| [`cmd_map_effects`](Lasm/UI/Spec.lean#L198) | **Mapping commands keeps their effects.** Mapping a command by any `f` keeps exactly its effects, in order, each of the same kind with the same data (the same delay, the same URL, the same task): with the messages they deliver forgotten (`Effect.forget`), the effects before and after are equal. Only the messages change. |
 | [`cmd_map_id`](Lasm/UI/Spec.lean#L206) | **Mapping by the identity changes nothing.** |
 | [`cmd_map_batch`](Lasm/UI/Spec.lean#L210) | **Mapping commutes with batching.** Mapping a batch of commands is the batch of the mapped commands: no effect is lost, duplicated or reordered. |
 
-## Lasm.RPC (14)
+## Lasm.RPC (13)
 
 ### The server only runs handlers on valid requests
 
@@ -146,8 +146,7 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 | Proposition | In plain English |
 | --- | --- |
 | [`call_invalid`](Lasm/RPC/Spec.lean#L122) | **An invalid request is never sent.** When `validate` refuses a request with message `m`, the command `call` performs no HTTP request: its only effect delivers `Error.invalid m` to the app. |
-| [`call_valid`](Lasm/RPC/Spec.lean#L130) | **A valid request is sent once, as JSON, to its endpoint.** When `validate` accepts a request, the command `call` performs exactly one effect: a `POST` of the encoded request to `base ++ e.path` (`base` followed by `/rpc/<name>`) with a JSON content type. A network failure reaches the app as `Error.network`, and any answer as the endpoint's reading of its status and body (`decodeResponse`). |
-| [`decodeResponse_not_network`](Lasm/RPC/Spec.lean#L146) | **Reading an answer never claims a network failure.** Whatever status and body the server answers, `decodeResponse` never reports `Error.network`: that error means only that no answer arrived. |
+| [`decodeResponse_not_network`](Lasm/RPC/Spec.lean#L130) | **Reading an answer never claims a network failure.** Whatever status and body the server answers, `decodeResponse` never reports `Error.network`: that error means only that no answer arrived. |
 
 ## Lasm.KV (6)
 
@@ -195,7 +194,7 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 
 | Proposition | In plain English |
 | --- | --- |
-| [`host_once`](Lasm/Serverless/Spec.lean#L83) | **Exactly one Host, a plain one.** Whatever fields an event carries (none, several, or a forged `Host: x/admin#`), forward() and pipe() send exactly one Host field, and its value is a plain `host[:port]`: visible ASCII without `/ ? # \ @` (the first such Host of the event, else the loopback address). |
+| [`host_once`](Lasm/Serverless/Spec.lean#L83) | **Exactly one Host, a plain one.** Whatever fields an event carries (none, several, or a forged `Host: x/admin#`), forward() and pipe() send exactly one Host field, and its value is a plain `host[:port]`: visible ASCII without `/ ? # \ @` (the first such Host of the event, else the default host). |
 | [`host_url`](Lasm/Serverless/Spec.lean#L92) | **A plain Host cannot move the path.** A server that builds its URL from the Host field and the target (`http://` + host + target, as Hono's Node adapter and Lasm.Fetch's Node host do) reads back exactly that host and that target, for every plain host and every target that starts with `/`. Together with `host_once` and `target_split`: no client can change the path or query a server sees through Host (`Host: x/admin#` once made `/public` read as `/admin` in Lasm.Fetch). |
 
 ### Query strings

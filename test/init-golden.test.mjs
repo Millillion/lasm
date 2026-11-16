@@ -37,12 +37,11 @@ const update = process.env.LASM_UPDATE_INIT_GOLDEN === '1';
 // Directory names exercise the npm, Lake, Workers, Spin, Fastly and Supabase name rules.
 const configurations = [
   ...Object.keys(templates).map(template => ({ name: template, directory: `${template} app`, template, deploy: [] })),
-  { name: 'express-functions', directory: 'Func App.v2', template: 'express', deploy: ['lambda', 'lambda-zip', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] },
-  { name: 'fastify-gcf', directory: 'fastify_gcf', template: 'fastify', deploy: ['gcf'] },
-  { name: 'std-http-lambda', directory: '2nd-server', template: 'std-http', deploy: ['lambda', 'vercel'] },
+  { name: 'fetch-functions', directory: 'Func App.v2', template: 'fetch', deploy: ['lambda', 'lambda-container', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] },
+  { name: 'hono-lambda', directory: '2nd-server', template: 'hono', deploy: ['lambda-container'] },
   { name: 'hono-edge', directory: '@Edge App!', template: 'hono', deploy: ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'supabase-edge'] },
   { name: 'hono-netlify-azure', directory: 'hono-2', template: 'hono', deploy: ['netlify', 'azure', 'lambda-edge'] },
-  { name: 'fetch-wasi', directory: 'Fetch.App', template: 'fetch', deploy: ['fastly', 'wasi', 'wasi-http', 'spin', 'workers'] },
+  { name: 'fetch-wasi', directory: 'Fetch.App', template: 'fetch', deploy: ['fastly', 'wasi-http', 'spin', 'workers'] },
   { name: 'fetch-deno', directory: 'fetch deno', template: 'fetch', deploy: ['deno-deploy', 'vercel-edge'] },
   { name: 'plain-wasi', directory: 'plain_wasi', template: 'plain', deploy: ['wasi'] },
   { name: 'fullstack-all', directory: '1st Stack', template: 'fullstack', deploy: ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'fastly', 'wasi-http', 'spin'] },
@@ -126,7 +125,7 @@ test('lasm init refuses files and non-empty directories, and accepts an empty on
   assert.equal(existsSync(join(root, 'x')), false);
   // The default is no deploy targets.
   assert.deepEqual(initProject({ directory: join(root, 'default'), template: 'hono' }).files.sort(),
-    ['.dockerignore', '.gitignore', 'App.lean', 'Dockerfile', 'Main.lean', 'README.md', 'lakefile.toml', 'lean-toolchain', 'package.json']);
+    ['.dockerignore', '.gitignore', 'App.lean', 'Dockerfile', 'Export.lean', 'Main.lean', 'README.md', 'Routes.lean', 'lakefile.toml', 'lean-toolchain', 'package.json']);
 });
 
 test('lasm init arguments: every option form and every error message', () => {
@@ -162,18 +161,22 @@ test('lasm init arguments: every option form and every error message', () => {
   assert.deepEqual(parseInitArguments(['app', '--deploy', 'wasi']).deploy, ['wasi']);
   fails(['app', '--deploy', 'wasi', '--deploy', 'netlify'], '--deploy netlify needs a server template (express, hono, fastify, std-http or fetch), not plain');
   // Each refusal names the targets the template does support.
-  const functions = 'lambda, lambda-zip, lambda-edge, vercel, netlify, azure, gcf';
-  fails(['app', '-t', 'express', '--deploy', 'supabase-edge'], `--deploy supabase-edge supports the hono template, not express. The express template supports --deploy ${functions}`);
+  const functions = 'lambda, lambda-container, lambda-edge, vercel, netlify, azure, gcf';
+  fails(['app', '-t', 'express', '--deploy', 'supabase-edge'], '--deploy supabase-edge supports the hono template, not express. The express template has no --deploy targets: it runs wherever its Dockerfile runs');
+  // The function platforms (and the Lambda image) call a published handler (exportDefault): not the templates that bring their own server.
+  for (const template of ['express', 'fastify', 'std-http'])
+    for (const target of ['lambda-container', 'vercel'])
+      fails(['app', '-t', template, '--deploy', target], `--deploy ${target} supports the hono and fetch templates, not ${template}. The ${template} template has no --deploy targets: it runs wherever its Dockerfile runs`);
   fails(['app', '-t', 'hono', '--deploy', 'fastly'], `--deploy fastly supports the fetch and fullstack templates, not hono. The hono template supports --deploy ${functions}, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge`);
-  fails(['app', '-t', 'express', '--deploy', 'workers'], `--deploy workers supports the hono, fetch and fullstack templates, not express. The express template supports --deploy ${functions}`);
-  fails(['app', '-t', 'fetch', '--deploy', 'supabase-edge'], `--deploy supabase-edge supports the hono template, not fetch. The fetch template supports --deploy ${functions}, workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi, wasi-http, spin`);
+  fails(['app', '-t', 'express', '--deploy', 'workers'], `--deploy workers supports the hono, fetch and fullstack templates, not express. The express template has no --deploy targets: it runs wherever its Dockerfile runs`);
+  fails(['app', '-t', 'fetch', '--deploy', 'supabase-edge'], `--deploy supabase-edge supports the hono template, not fetch. The fetch template supports --deploy ${functions}, workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi-http, spin`);
   // Issue #168: the fullstack template writes no function-platform files, so it refuses them.
   for (const target of functions.split(', '))
-    fails(['app', '-t', 'fullstack', '--deploy', target], `--deploy ${target} supports the express, hono, fastify, std-http and fetch templates, not fullstack. `
+    fails(['app', '-t', 'fullstack', '--deploy', target], `--deploy ${target} supports the hono and fetch templates, not fullstack. `
       + 'The fullstack template supports --deploy workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi-http, spin');
   // The issue's command: the first refused target is named.
   fails(['app', '--template', 'fullstack', '--deploy', 'workers', '--deploy', 'lambda', '--deploy', 'vercel', '--deploy', 'azure'],
-    '--deploy lambda supports the express, hono, fastify, std-http and fetch templates, not fullstack. The fullstack template supports --deploy workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi-http, spin');
+    '--deploy lambda supports the hono and fetch templates, not fullstack. The fullstack template supports --deploy workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi-http, spin');
   fails(['app', '-t', 'hono', '--deploy', 'vercel', '--deploy', 'vercel-edge'], '--deploy vercel-edge and --deploy vercel both configure the same platform; choose one');
   fails(['app', '-t', 'hono', '--deploy', 'netlify-edge', '--deploy', 'netlify'], '--deploy netlify-edge and --deploy netlify both configure the same platform; choose one');
 });
@@ -189,9 +192,11 @@ test('every deploy target accepts exactly its templates', () => {
   // Not fullstack on the function platforms (issue #168).
   const server = ['express', 'hono', 'fastify', 'std-http', 'fetch'];
   const accepted = {
-    lambda: server, 'lambda-zip': server, 'lambda-edge': server, vercel: server, netlify: server, azure: server, gcf: server,
+    // The function platforms and the Lambda image call a published handler: the hono and fetch templates (Export.lean).
+    lambda: ['hono', 'fetch'], 'lambda-container': ['hono', 'fetch'], 'lambda-edge': ['hono', 'fetch'], vercel: ['hono', 'fetch'], netlify: ['hono', 'fetch'],
+    azure: ['hono', 'fetch'], gcf: ['hono', 'fetch'],
     workers: ['hono', 'fetch', 'fullstack'], 'vercel-edge': ['hono', 'fetch', 'fullstack'], 'netlify-edge': ['hono', 'fetch', 'fullstack'],
-    'deno-deploy': ['hono', 'fetch', 'fullstack'], 'supabase-edge': ['hono'], fastly: ['fetch', 'fullstack'], wasi: ['fetch', 'plain'],
+    'deno-deploy': ['hono', 'fetch', 'fullstack'], 'supabase-edge': ['hono'], fastly: ['fetch', 'fullstack'], wasi: ['plain'],
     'wasi-http': ['fetch', 'fullstack'], spin: ['fetch', 'fullstack'],
   };
   assert.deepEqual(Object.keys(accepted), Object.keys(deployTargets));
@@ -204,7 +209,7 @@ test('every deploy target accepts exactly its templates', () => {
 
 test('the init usage lists every template and deploy target with its summary', () => {
   assert.ok(initUsage.startsWith(`Usage: lasm init <directory> [--template plain|express|hono|fastify|std-http|web|fetch|fullstack] [--deploy TARGET]…\n\nCreates a Lean project`));
-  for (const [name, target] of Object.entries(deployTargets)) assert.ok(initUsage.includes(`\n  ${name.padEnd(12)} ${target.summary}\n`), name);
+  for (const [name, target] of Object.entries(deployTargets)) assert.ok(initUsage.includes(`\n  ${name.padEnd(16)} ${target.summary}\n`), name);
   for (const [name, template] of Object.entries(templates)) assert.ok(initUsage.includes(`\n  ${name.padEnd(9)} ${template.summary}`), name);
   assert.ok(initUsage.endsWith('\n\nExample: npx @lasm/cli init my-app --template hono'));
 });

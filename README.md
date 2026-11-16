@@ -59,7 +59,7 @@ files, except on WASI); the rest of Lean works.
 | Output | `dist/` with `program.wasm` + a JS launcher (Node); or a platform package (`--target …`) |
 | Node apps run on | Node ≥ 24, Linux x64/arm64 (glibc 2.28+ or musl) from any build machine, plus the build machine's own OS; ≥ 512 MB memory |
 | JS/npm interop | `import Lasm.JS`; one `@[js "pkg" "export"]` line per function you call; no premade bindings ([guide](docs/JS_BINDINGS.md)) |
-| Frameworks in Lean | `Lasm.Fetch` (HTTP, every server target), `Lasm.UI` (browser, Elm architecture, proved diff), `Lasm.RPC` (typed client/server API), `Lasm.KV`; `Lasm.JS.Web` (the standard web APIs of every JavaScript target, generated from WebIDL), `Lasm.JS.Node` (Node's fs, path, os, process, crypto, child_process, generated from Node's docs); `Lasm.Fastly` (Fastly Compute's host ABI, generated from its witx) and `Lasm.WASI.Http` (the wasi:http proxy world, generated from the WASI WIT); source, not yet released |
+| Frameworks in Lean | `Lasm.Fetch` (HTTP, every server target), `Lasm.UI` (browser, Elm architecture, proved diff), `Lasm.RPC` (typed client/server API), `Lasm.KV`; `Lasm.JS.Web` (the standard web APIs of every JavaScript target, generated from WebIDL), `Lasm.JS.Node` (Node's fs, path, os, process, crypto, child_process, generated from Node's docs), `Lasm.JS.Cloudflare` (Workers KV, D1, R2, Durable Objects, Queues, cron and queue handlers, generated from `@cloudflare/workers-types`); `Lasm.Fastly` (Fastly Compute's host ABI, generated from its witx) and `Lasm.WASI.Http` (the wasi:http proxy world, generated from the WASI WIT); source, not yet released |
 | Not available at run time | elaboration, `#eval`-style evaluation, loading `.olean`, Lean's kernel ([exact list](#lean-support-and-restrictions)); all of these work at build time |
 | License | MIT (Lasm); templates, examples and README code samples also MIT-0 |
 | Repository / issues | https://github.com/Millillion/lasm · [report a bug](https://github.com/Millillion/lasm/issues/new?template=bug.yml) (include `npx lasm --version`) |
@@ -71,7 +71,7 @@ files, except on WASI); the rest of Lean works.
 | A command-line program | `npm create @lasm@latest my-tool` | [examples/hello](examples/hello), [examples/wasi-cli](examples/wasi-cli) |
 | A REST API on Node with an npm framework | `npm create @lasm@latest my-api -- --template hono` (or `express`, `fastify`) | [examples/js-crud](examples/js-crud) (Postgres + JWT, Express and Hono) |
 | A server in pure Lean (no npm) | `npm create @lasm@latest my-api -- --template fetch` (any target) or `--template std-http` (Node, also native Lean) | [examples/fetch](examples/fetch); the `std-http` template |
-| A serverless function (Lambda, Vercel, Netlify, Azure, GCF) | `npm create @lasm@latest my-fn -- --template hono --deploy lambda-zip` (or `vercel`, `netlify`, `azure`, `gcf`, `lambda-edge`) | [docs/deploy](docs/deploy/README.md) |
+| A serverless function (Lambda, Vercel, Netlify, Azure, GCF) | `npm create @lasm@latest my-fn -- --template hono --deploy lambda` (or `vercel`, `netlify`, `azure`, `gcf`, `lambda-edge`) | [docs/deploy](docs/deploy/README.md) |
 | An edge function (Workers, Vercel/Netlify Edge, Deno Deploy, Supabase) | `npm create @lasm@latest my-edge -- --template hono --deploy workers` (or `fetch`) | [examples/edge-pure](examples/edge-pure), [docs/EDGE.md](docs/EDGE.md) |
 | A Fastly, WASI or Spin service | `npm create @lasm@latest my-svc -- --template fetch --deploy fastly` (or `wasi-http`, `spin`, `wasi`) | [examples/fetch](examples/fetch), [examples/fastly](examples/fastly) (Fastly's own host calls, `Lasm.Fastly`), [examples/wasi-http](examples/wasi-http) (wasi:http's own interfaces, `Lasm.WASI.Http`), [docs/WASI.md](docs/WASI.md) |
 | A browser app | `npm create @lasm@latest my-web -- --template web` | [examples/ui](examples/ui) (counter, TodoMVC with proofs, feature demo, benchmark) |
@@ -166,9 +166,9 @@ docker build -t my-api . && docker run -p 8080:8080 my-api   # the generated Doc
 **AWS Lambda / Vercel / Netlify / Azure / Google Cloud Functions.**
 
 ```sh
-npm create @lasm@latest my-fn -- --template hono --deploy lambda-zip   # or vercel, netlify, azure, gcf, lambda-edge
+npm create @lasm@latest my-fn -- --template hono --deploy lambda        # or vercel, netlify, azure, gcf, lambda-edge
 cd my-fn && npm install
-npm run build:lambda                          # dist/ and lambda.zip (handler lasm-lambda.handler)
+npm run build:lambda                          # lambda.zip (handler lasm-lambda.handler)
 # deploy lambda.zip with the AWS console, aws CLI or SAM; recipes: docs/deploy/lambda.md
 ```
 
@@ -327,6 +327,11 @@ own modules are `import Lasm.JS.Node`: `fsPromises.readFile`, `path.join`,
 `os.tmpdir`, `process.argv`, `crypto.scrypt`, `child_process.spawn` and more, as
 Node 24's docs define them, on Node and where Bun and Deno implement them
 ([Lasm.JS.Node](docs/JS_BINDINGS.md#standard-bindings-for-node-lasmjsnode)).
+Cloudflare Workers' runtime APIs are `import Lasm.JS.Cloudflare` (source, not
+yet released): Workers KV, D1, R2, Durable Objects, Queues, the `scheduled` and
+`queue` handlers, `ctx.waitUntil`, the Cache API and `connect`, generated from
+`@cloudflare/workers-types`
+([Lasm.JS.Cloudflare](docs/JS_BINDINGS.md#cloudflare-workers-lasmjscloudflare)).
 
 Full guide, with Express, Hono, `pg`, `jose` and `fetch` examples and an agent
 checklist: [docs/JS_BINDINGS.md](docs/JS_BINDINGS.md).
@@ -377,7 +382,7 @@ is slower than native Lean (no GMP).
   stack), but about 10,000 on the edge targets, in the browser and on WASI hosts'
   default stacks. Make deep recursion tail recursive
   ([limits per target](FUNDAMENTAL_LIMITATIONS.md#recursion-depth)).
-- **No premade bindings** for npm packages; `Lasm.JS.Web` covers the web APIs every JavaScript target has (the WinterTC Minimum Common API), `Lasm.JS.Node` Node's server-essential modules (servers through an npm adapter) and `Lasm.JS.Web.Browser` the browser's DOM.
+- **No premade bindings** for npm packages; `Lasm.JS.Web` covers the web APIs every JavaScript target has (the WinterTC Minimum Common API), `Lasm.JS.Node` Node's server-essential modules (servers with Lasm's `Node.serve`, shaped like `Bun.serve`), `Lasm.JS.Cloudflare` Cloudflare Workers' runtime APIs and `Lasm.JS.Web.Browser` the browser's DOM.
 - **Editor:** `Lasm.*` imports resolve in the editor after `npx lasm editor` (above).
 - **Platforms:** no Windows ARM64 and no Alpine/musl build machines (built apps run
   on Alpine). Hosted platforms are tested with their local tools, never with a real
@@ -448,8 +453,8 @@ npx lasm build Main.lean --target lambda    # lambda.zip for AWS Lambda
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help`, `npx lasm init --help` | Show usage; `-h` is an alias. |
 | Version | `npx lasm --version` | Print `lasm 0.8.0 (@lasm/cli; Lean 4.35.0; Node 26.13.1; linux-x64)`; `-v` is an alias. |
-| New project | `npm create @lasm@latest my-app -- --template hono` or `npx @lasm/cli init my-app --template hono` | Create a Lake project in a new or empty directory (`Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `README.md`, `.gitignore`, and for servers a `Dockerfile` and `.dockerignore`). Templates: see [Start here](#start-here). `--deploy` (repeatable) adds a platform's files and `npm run build:<target>`: `lambda` (`Dockerfile.lambda`, a container image), `lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf` (templates `express`, `hono`, `fastify`, `std-http`, `fetch`); `workers`, `vercel-edge`, `netlify-edge`, `deno-deploy` (templates `hono`, `fetch`, `fullstack`), `supabase-edge` (`hono`); `fastly`, `wasi-http`, `spin` (`fetch`, `fullstack`), `wasi` (`fetch`, `plain`). The `fetch` and `fullstack` templates and their targets are 0.3.0. Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` also works. |
-| Package an existing build | `npx lasm package --target lambda` | Package a built server (default `dist/`) for a function platform without rebuilding: the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output. Checks the platform's size limit. Refuses a dev build unless `--allow-dev`. For a browser build, `npx lasm package dist --target browser` checks every file against `lasm-manifest.json` and writes `_headers`. |
+| New project | `npm create @lasm@latest my-app -- --template hono` or `npx @lasm/cli init my-app --template hono` | Create a Lake project in a new or empty directory (`Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `README.md`, `.gitignore`, and for servers a `Dockerfile` and `.dockerignore`). Templates: see [Start here](#start-here). `--deploy` (repeatable) adds a platform's files and `npm run build:<target>`: `lambda` (`lambda.zip`), `lambda-container` (`Dockerfile.lambda`, a container image), `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf` (templates `express`, `hono`, `fastify`, `std-http`, `fetch`); `workers`, `vercel-edge`, `netlify-edge`, `deno-deploy` (templates `hono`, `fetch`, `fullstack`), `supabase-edge` (`hono`); `fastly`, `wasi-http`, `spin` (`fetch`, `fullstack`), `wasi` (`fetch`, `plain`). The `fetch` and `fullstack` templates and their targets are 0.3.0. Each `--deploy` name is the `lasm build --target` it builds, except `lambda-container` and `spin` (which builds `wasi-http`). Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` also works. |
+| Package an existing build | `npx lasm package --target lambda` | Package a built program (default `dist/`) whose `main` publishes a fetch handler with `Lasm.JS.exportDefault handle` for a function platform, without rebuilding; the platform's handler calls it directly (no server, no port): the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output. Checks the platform's size limit. Refuses a dev build unless `--allow-dev`. For a browser build, `npx lasm package dist --target browser` checks every file against `lasm-manifest.json` and writes `_headers`. |
 | Editor support (0.3.0) | `npx lasm editor` | Make the Lean editor (VS Code's Lean 4 extension, any Lean language server client) resolve `import Lasm.*` in this Lake project: links Lasm's Lean 4.35.0 with its library as the elan toolchain `lasm-4.35.0-…` and sets it as the directory's elan override (`elan override unset` undoes it). `lasm init` (when Lasm's Lean is already installed), `lasm dev` and `lasm build` do the same, printing one line per project, except on CI or with `LASM_EDITOR=0`. [Editor setup](docs/GETTING_STARTED.md#editor). |
 | Cache repair | `npx lasm cache repair` | Offline verification and removal of invalid tools and abandoned staging. Refuses an active build. |
 
@@ -479,6 +484,7 @@ refuse a dev build unless you pass `--allow-dev`.
 | `LASM_BUILD_JOBS` | `LASM_BUILD_JOBS=2 npx lasm build Main.lean` | Threads for Binaryen's optimizer (default: the CPUs, at most 8). The output is the same for any value. |
 | `LASM_EDITOR` | `LASM_EDITOR=0 npx lasm build Main.lean` | `0`: `lasm init`, `lasm dev` and `lasm build` leave the editor setup alone ([editor setup](docs/GETTING_STARTED.md#editor)). |
 | `LASM_THREAD_POOL` (built apps; 0.3.0) | `LASM_THREAD_POOL=0 node dist/main.mjs` | Lean thread Workers started before `main` (0–64, default 1). [Measurements](docs/BENCHMARKS.md#cold-start-on-a-fraction-of-a-cpu). |
+| `LASM_VM_STACK_MB` (built apps on Node) | `LASM_VM_STACK_MB=256 node dist/main.mjs` | Each Lean thread's engine stack in MiB (default 1 GiB, capped at a quarter of the memory; [recursion depth](FUNDAMENTAL_LIMITATIONS.md#recursion-depth)). |
 | `LASM_ARTIFACT_SOURCE` | `LASM_ARTIFACT_SOURCE=npm npx lasm Main.lean` | `auto` (default): `@lasm/…` npm tool packages when present, else HTTPS; `npm`: never download directly; `https`: ignore the npm packages. |
 | `LASM_DOWNLOAD_ATTEMPTS`, `LASM_DOWNLOAD_CONNECT_MS`, `LASM_DOWNLOAD_IDLE_MS`, `LASM_DOWNLOAD_TOTAL_MS` | `LASM_DOWNLOAD_TOTAL_MS=14400000 npx lasm Main.lean` | Download retries and timeouts ([defaults and ranges](docs/INSTALLATION_HARDENING.md#transfers)). |
 | `NODE_USE_ENV_PROXY`, `HTTPS_PROXY`, `NO_PROXY`, `NODE_EXTRA_CA_CERTS` (Node's own) | `NODE_USE_ENV_PROXY=1 HTTPS_PROXY=http://proxy:8080 npx lasm Main.lean` | Proxies and private CAs ([corporate networks](docs/INSTALLATION_HARDENING.md#corporate-networks)). |
@@ -540,8 +546,8 @@ cloud account. Full matrix: [DEPLOYMENT.md](docs/DEPLOYMENT.md).
 | Windows x64 | Node 24.0.0 and 24.22.3 on `windows-2025`; installed acceptance with Node 26.13.1 |
 | Docker / Kubernetes | `node:24-bookworm-slim`, `node:26-bookworm-slim`, `node:24-bullseye-slim`, Ubuntu 22.04/24.04; read-only, 512 MB, x64 and arm64 (Kubernetes manifests are not applied in CI) |
 | Google Cloud Run, Fly.io, Railway, Render, Heroku | the same container images and Dockerfiles; the platforms themselves are never deployed to |
-| AWS Lambda (container image) | `public.ecr.aws/lambda/nodejs:24` + AWS Lambda Web Adapter through the Runtime Interface Emulator, x86_64 and arm64; `amazonlinux:2023` |
-| AWS Lambda (.zip, `nodejs24.x`) | every server template's `--target lambda` zip in `public.ecr.aws/lambda/nodejs:24` through the Runtime Interface Emulator, x86_64 and arm64, with API Gateway REST/HTTP, function URL and ALB events; `sam local invoke` and `sam local start-api` |
+| AWS Lambda (container image) | the hono template's `Dockerfile.lambda` (`public.ecr.aws/lambda/nodejs:24` with `CMD ["lasm-lambda.handler"]`, the program's default export, no server inside) through the Runtime Interface Emulator; `amazonlinux:2023` |
+| AWS Lambda (.zip, `nodejs24.x`) | the hono and fetch templates' `--target lambda` zips in `public.ecr.aws/lambda/nodejs:24` through the Runtime Interface Emulator, x86_64 and arm64, with API Gateway REST/HTTP, function URL and ALB events; `sam local invoke` and `sam local start-api` |
 | Lambda@Edge (origin request, x86_64) | the same image and emulator with CloudFront origin-request events |
 | Vercel Functions (Node.js 24) | `vercel build` offline; the function under `@vercel/node` in `public.ecr.aws/lambda/nodejs:24` |
 | Netlify Functions (v2) | `netlify build --offline` and `netlify dev --offline`; the deploy zip in `public.ecr.aws/lambda/nodejs:24` |

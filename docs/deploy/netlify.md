@@ -30,11 +30,13 @@ executable.
   (6.4–7.6 MB unpacked), far below Netlify's limits. In the Lambda image the
   first response after a cold start took 0.76–0.97 s (run 40078265584). Request and response
   payloads up to 6 MB buffered. Give the function 1024 MB (Netlify's default).
-- **Not supported:** Netlify Edge Functions (Deno isolates; Phase 8), background
-  and scheduled functions (untested).
+- **Netlify Edge Functions** are a separate target: [netlify-edge.md](netlify-edge.md)
+  (`--target netlify-edge`, tested in CI with `netlify build --offline` and
+  `netlify dev --offline`).
+- **Untested:** background and scheduled functions.
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64; no Netlify
-account): for every server template, Netlify CLI 27.14.2 `netlify build
+account): for the hono and fetch templates (each publishes its handler with `exportDefault`), Netlify CLI 27.14.2 `netlify build
 --offline` runs the build command and bundles the function exactly as for a
 deploy (`.netlify/functions/lasm.zip`, checked for the Wasm program, host,
 native pieces, permissions and size); `netlify dev --offline` serves the

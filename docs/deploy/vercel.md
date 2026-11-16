@@ -4,7 +4,7 @@ A Lasm server runs as one Vercel Function
 on the Node.js 24 runtime that answers every path.
 
 ```sh
-npx lasm build Main.lean --target vercel   # .vercel/output (a server on $HOST:$PORT)
+npx lasm build Main.lean --target vercel   # Main.lean calls exportDefault; writes dist/ and .vercel/output
 vercel deploy --prebuilt                   # Vercel's own CLI uploads exactly that output
 ```
 
@@ -33,19 +33,21 @@ Lean and Lasm's tools, a few hundred MB, and takes a few minutes) and deploys th
 zero-config routes to `config.json`; the `routes` entry keeps the function first
 for every path.
 
-- **Handler:** Node's `(req, res)`; the Lean server starts on the first request
-  (Vercel's launcher intercepts `http.Server#listen` while it imports the
-  function, so it cannot start earlier). Each request is piped to the server
-  over loopback; Vercel's request helpers may be on or off.
+- **Handler:** Node's `(req, res)`. The Lean program starts when the
+  function loads. Each request becomes a web `Request` for the handler that
+  `main` publishes (`Lasm.JS.exportDefault handle`), called directly, and the
+  `Response` streams back. Vercel's request helpers may be on or off.
 - **Limits:** the function is 5.3–6.5 MB for the templates; packaging fails
   above Vercel's 250 MB uncompressed limit. Request and response bodies up to
   4.5 MB (Vercel's limit). Set the memory to at least 512 MB (Hobby: 2 GB
   default) and the maximum duration as needed.
 - **Architecture:** x86_64 (Vercel's default).
-- **Not supported:** the Edge runtime (no threads or native add-ons; Phase 8).
+- **Vercel Edge Functions** are a separate target: [vercel-edge.md](vercel-edge.md)
+  (`--target vercel-edge`, tested in CI with `vercel build` offline and
+  Vercel's `edge-runtime`).
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64; no Vercel
-account): for every server template, the `lasm package` output is checked
+account): for the hono and fetch templates (each publishes its handler with `exportDefault`), the `lasm package` output is checked
 (config, every file, permissions, size); Vercel CLI 65.2.0 `vercel build` runs
 offline in the `lasm init --deploy vercel` project, with a local
 `.vercel/project.json` in place of `vercel link`; the built function then runs

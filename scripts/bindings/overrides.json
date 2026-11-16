@@ -33,6 +33,7 @@
     { "name": "uid", "type": "Nat", "decision": "A11.1", "why": "a user id" },
     { "name": "gid", "type": "Nat", "decision": "A11.1", "why": "a group id" },
     { "name": "pid", "type": "Int", "decision": "A11.1", "why": "a process id; negative for a process group (process.kill)" },
+    { "name": "ppid", "type": "Int", "decision": "0.4-19", "why": "the parent process id, as pid (Deno.ppid)" },
     { "name": "timeout", "type": "Nat", "decision": "A11.1", "why": "a duration in whole milliseconds or seconds" },
     { "name": "idleTimeout", "type": "Nat", "decision": "A11.1", "why": "a duration in whole seconds" },
     { "name": "tcpBacklog", "type": "Nat", "decision": "A11.1", "why": "a queue length" },

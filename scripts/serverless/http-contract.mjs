@@ -14,6 +14,12 @@ export async function waitFor(url, { timeoutMs = 120_000, alive = () => true } =
   }
 }
 
+/** What `GET /` answers: the npm-framework templates name their framework; the
+ * fetch template (framework `Lasm.JS.Web`) does not. */
+export const rootMessage = framework => framework === 'Lasm.JS.Web' ? 'Hello from Lean!' : `Hello from Lean on ${framework}!`;
+/** What `POST /echo` answers for a JSON body: `{ echo: body }`, or the body itself (the fetch template). */
+export const echoed = (framework, body) => framework === 'Lasm.JS.Web' ? body : { echo: body };
+
 /** Returns [{ name, ok, error? }]. */
 export async function checkContract(base, framework) {
   const checks = [];
@@ -27,9 +33,9 @@ export async function checkContract(base, framework) {
       checks.push({ name, ok: true });
     } catch (error) { checks.push({ name, ok: false, error: error.message.slice(0, 1000) }); }
   };
-  await check('GET /', 'GET', '/', undefined, 200, { message: `Hello from Lean on ${framework}!` });
+  await check('GET /', 'GET', '/', undefined, 200, { message: rootMessage(framework) });
   await check('GET /hello/Ada?x=1', 'GET', '/hello/Ada?x=1', undefined, 200, { message: 'Hello, Ada, from Lean!' });
-  await check('POST /echo (JSON body)', 'POST', '/echo', { n: [1, 2], s: 'λ' }, 200, { echo: { n: [1, 2], s: 'λ' } });
+  await check('POST /echo (JSON body)', 'POST', '/echo', { n: [1, 2], s: 'λ' }, 200, echoed(framework, { n: [1, 2], s: 'λ' }));
   await check('GET /health', 'GET', '/health', undefined, 200, { ok: true });
   await check('GET /missing is 404', 'GET', '/missing', undefined, 404);
   return checks;

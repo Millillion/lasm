@@ -1,7 +1,7 @@
 // End-to-end test of a Lean HTTP handler served by each runtime's own server API
 // (docs/TESTING.md, "Standard bindings"): test/fixtures/js-serve/Serve.lean serves
 // App.handle with Deno.serve (Lasm.JS.Deno), Bun.serve (Lasm.JS.Bun) and, on Node,
-// @hono/node-server (an `@[js]` binding to the npm package the fixture installs).
+// Lasm's Node.serve (Lasm.JS.Node.Serve).
 // For each target this builds Serve.lean with an installed @lasm/cli, starts it on
 // a free port, requests it over HTTP from this process (another process than the
 // server's), then asks it to shut down and expects it to exit with 0.

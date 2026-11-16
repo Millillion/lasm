@@ -1,10 +1,10 @@
 // The function-platform shims (src/serverless/) on each platform's own local
 // runtime, with the stand-in application (scripts/serverless/stand-in-app.mjs:
-// a Node HTTP server in place of a Lean build, so no toolchain and no build):
+// a published fetch handler in place of a Lean build, so no toolchain and no build):
 // what a sign-in sends and a browser sends back must survive every adapter.
 //   - several Set-Cookie headers in one reply, each arriving whole (#80);
-//   - two Cookie header lines in one request reaching the server as one
-//     Cookie header joined with "; " (RFC 6265 §5.4, #80);
+//   - two Cookie header lines in one request reaching the handler's web
+//     Request as one Cookie field joined with "; " (RFC 6265 §5.4, #80);
 //   - a 303 with only a Location and no body (#82).
 // Platforms (CI only: platform CLIs never run on a developer's machine):
 //   lambda   AWS SAM `sam local start-api`: an HTTP API (payload 2.0) on /v2/…
@@ -98,15 +98,15 @@ async function checkAll(base, label) {
   await check('two Cookie header lines reach the server as one, joined with "; "', async () => {
     const r = await request(base, '/hello', ['cookie', 'a=1', 'cookie', 'b=2']);
     assert.equal(r.status, 200, r.body.slice(0, 500));
-    const { cookie, cookieFields } = JSON.parse(r.body);
-    assert.deepEqual({ cookie, cookieFields }, { cookie: 'a=1; b=2', cookieFields: 1 });
-    return { cookie, cookieFields };
+    const { cookie } = JSON.parse(r.body);
+    assert.equal(cookie, 'a=1; b=2');
+    return { cookie };
   });
   await check('one Cookie header line arrives as it was sent', async () => {
     const r = await request(base, '/hello', ['cookie', 'a=1; b=2']);
-    const { cookie, cookieFields } = JSON.parse(r.body);
-    assert.deepEqual({ cookie, cookieFields }, { cookie: 'a=1; b=2', cookieFields: 1 });
-    return { cookie, cookieFields };
+    const { cookie } = JSON.parse(r.body);
+    assert.equal(cookie, 'a=1; b=2');
+    return { cookie };
   });
   await check('a 303 with no body reaches the client with its Location', async () => {
     const r = await request(base, '/see-other');

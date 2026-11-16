@@ -3,7 +3,8 @@
 //   native      run-checks.mjs with this machine's Node
 //   containers  run-containers.mjs (every image for this machine's own Linux
 //               build; Debian 12 and the recipe for cross-built ones)
-//   lambda      run-lambda.mjs
+// (AWS Lambda is checked by the templates and serverless workflows: the
+// handler on Lambda's own image, with no server inside; docs/api/decisions/0.2.md, 0.2-11.)
 //   node run-matrix.mjs KIND ARTIFACTS_DIR RESULTS_DIR BUILD... [--expect-node-error | --expect-host-error]
 // A missing build (its job failed) is a failed result. Exits 1 if anything failed.
 import assert from 'node:assert/strict';
@@ -14,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
 const [kind, artifactsArg, resultsArg, ...rest] = process.argv.slice(2);
-assert.ok(['native', 'containers', 'lambda'].includes(kind) && artifactsArg && resultsArg, 'Usage: node run-matrix.mjs KIND ARTIFACTS_DIR RESULTS_DIR BUILD...');
+assert.ok(['native', 'containers'].includes(kind) && artifactsArg && resultsArg, 'Usage: node run-matrix.mjs KIND ARTIFACTS_DIR RESULTS_DIR BUILD...');
 const flags = rest.filter(item => item.startsWith('--')), builds = rest.filter(item => !item.startsWith('--'));
 const artifacts = resolve(artifactsArg), results = resolve(resultsArg);
 mkdirSync(results, { recursive: true });
@@ -38,9 +39,8 @@ for (const build of builds) {
   }
   let run;
   if (kind === 'native') run = spawnSync(process.execPath, [join(here, 'run-checks.mjs'), apps, ...flags], { encoding: 'utf8', timeout: 1800_000 });
-  else if (kind === 'containers') run = spawnSync(process.execPath, [join(here, 'run-containers.mjs'), apps, resultFile,
+  else run = spawnSync(process.execPath, [join(here, 'run-containers.mjs'), apps, resultFile,
     ...(build === own ? [] : ['debian12-node24,recipe'])], { encoding: 'utf8', timeout: 3600_000, stdio: ['ignore', 'pipe', 'pipe'] });
-  else run = spawnSync(process.execPath, [join(here, 'run-lambda.mjs'), apps, resultFile], { encoding: 'utf8', timeout: 3600_000 });
   process.stdout.write(run.stdout); process.stderr.write(run.stderr.slice(-4000));
   if (kind === 'native') {
     let report; try { report = JSON.parse(run.stdout.trim().split('\n').pop()); } catch { report = { ok: false, stdout: run.stdout.slice(-2000) }; }
