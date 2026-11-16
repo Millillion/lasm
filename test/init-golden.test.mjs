@@ -143,7 +143,7 @@ test('lasm init arguments: every option form and every error message', () => {
     fails(tokens, '--template requires a value\n\n' + initUsage);
   // A value ending with a dash is a value.
   fails(['app', '-t', 'hono-'], `Unknown template "hono-" (did you mean --template hono?). Choose one of: ${Object.keys(templates).join(', ')}`);
-  // Each option once; near misses suggested (0.7-4).
+  // Each option once; near misses suggested (0.7-23).
   fails(['app', '-t', 'hono', '--template=web'], 'Specify --template only once');
   fails(['app', '--deploy', 'worker'], `--deploy accepts ${deployList} (did you mean --deploy workers?)\n\n` + initUsage);
   fails(['app', '--deploy', 'cloudflare'], `--deploy accepts ${deployList} (did you mean --deploy workers?)\n\n` + initUsage);

@@ -9,7 +9,7 @@
   `lasm build Main.lean --output dist`.
 
 - **Breaking: with a function platform, `--output` names the package**
-  (0.7-3). `lasm build Main.lean --target lambda --output app.zip` writes
+  (0.7-5). `lasm build Main.lean --target lambda --output app.zip` writes
   `app.zip`; before, `--output` named the Node build and the package went to
   its default place. As with the edge, WASI and browser targets since 0.5.0,
   the Node build a package is made from now stays in the build cache
@@ -26,7 +26,7 @@
   the CLI is a release candidate, with every command, the targets of
   `lasm build` and `lasm package`, and what `--output` names.
 
-- **The same option rules in every command** (0.7-4): `lasm dev` refuses `--dev`
+- **The same option rules in every command** (0.7-23): `lasm dev` refuses `--dev`
   with `--release` (`Choose one of --dev and --release`) and a repeated
   `--target`, `--port`, `--host` or `--output` (`Specify --port only once`), as
   `lasm build` does; `lasm init` refuses a repeated `--template`. An unknown
@@ -34,6 +34,9 @@
   names the closest one, as `lasm build --target` does:
   `lasm dev --target worker` → `… not "worker" (did you mean --target workers?)`.
   Migration: give each option once.
+
+- `lasm dev --help` lists `--verbose`, `--dev` and the `supabase-edge` target
+  (0.7-6).
 
 - `npm create @lasm` with no directory prints a usage line that no longer lists
   only four templates; `npx @lasm/cli init --help` lists them all.
