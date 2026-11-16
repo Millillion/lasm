@@ -154,8 +154,10 @@ not run; the trust step is untested until the real bootstrap.
 ## Cutting a release
 
 1. Branch from `main`; set `"version"` in `package.json` (for example `0.1.0`, or
-   `0.2.0-rc.1` for a prerelease on `next`); add `docs/release/<version>-notes.md`;
-   update README and `docs/release/` as needed.
+   `0.2.0-rc.1` for a prerelease on `next`); add `docs/release/<version>-notes.md`,
+   made from the per-branch fragments in `docs/release/next/` (every file but its
+   README, in merge order), and delete those fragments; update README and
+   `docs/release/` as needed.
 2. Open the PR. `release-checks` runs the candidate checks and the rehearsal (about
    five hours). Fix and push until it passes.
 3. Merge (the agent may merge release PRs once green, except 0.1.0, which waits for
