@@ -541,6 +541,9 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
   `Lasm.Fastly`'s five hand-written store calls give way to the generated host
   ABI. `Lasm.Fetch` still ships and is scheduled for removal in a later
   release ([0.7.0-notes.md](release/0.7.0-notes.md)).
+- [ ] **0.8.0's template change:** `lasm init --template fetch` no longer uses
+  `Lasm.Fetch` except on Node; Fastly, wasi:http/Spin and WASI get their own entry
+  modules. Existing projects keep building ([0.8.0-notes.md](release/0.8.0-notes.md)).
 
 ### Process
 - [ ] **The browser dev-rebuild budget is 2.5 s, was 2 s (2026-11-09).** It
@@ -551,6 +554,35 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
 - [ ] **`library-prebuilt.yml` stays,** and `library/prebuilt` (40 MB) stays
   committed. A committed copy makes the npm tarball reproducible from the
   commit alone. Generating it in CI is IRREDUCIBLE.md removal 15, deferred.
+  - **Proposal (2026-11-13, M3; not implemented while this is open): generate it
+    instead of committing it.** Measured on main at `64c16b4d`:
+    - The tree is now **89 MB, 292 files** (it was 40 MB when this was decided).
+    - It changed in **86 commits since 2026-10-13** (49 since 2026-11-06), each a
+      `library-prebuilt.yml` run (5–33 minutes) whose artifact is downloaded and
+      rsynced by hand, often twice per PR (after each merge of main).
+    - Those regenerations added **78 MB of packed blobs** in a month: most of the
+      clone's 124 MB pack, and it grows with every library change.
+    - Readers: `src/lasm-library.mjs` (the CLI's first build skips compiling
+      `Lasm.*` when the identity matches), `scripts/package-node-release.mjs` (the
+      candidate copies `library/`), `test/lasm-library-prebuilt.test.mjs` (fails when
+      stale) and `test/lasm-async-glue.test.mjs` (reads one generated C file).
+  - **The design:** `library/prebuilt/` in `.gitignore`. Each workflow that packs a
+    candidate (`node-linux-acceptance.yml` and the ten others that call
+    `package-node-release.mjs`) first runs `scripts/build-library-prebuilt.mjs`, or
+    restores its output from the Actions cache keyed by the library identity it
+    already computes (the hash of `library/` and the managed Lean). The candidate,
+    and so the published `@lasm/cli`, still contains `library/prebuilt/`. The
+    freshness test becomes a determinism check: build twice, compare the identity
+    and bytes (the build is already deterministic; that is what the identity
+    check relies on). Local `lasm` runs from a checkout compile the library on the
+    first build, as a user's machine does when the prebuilt copy is stale today.
+  - **What it costs:** reproducing a published tarball needs that build (about 5
+    minutes in CI with the managed Lean) rather than the commit alone; the
+    cache must not be trusted blindly, so the restore re-checks the identity.
+  - **What it saves:** the manual regenerate-and-commit step on every library PR,
+    78 MB a month of history, and the stale-prebuilt failures between a merge of
+    main and the regeneration. The 89 MB the history already holds stays unless
+    it is rewritten, which this does not propose.
 - [ ] **The Sunday policy.** There are no scheduled or automated runs on
   Sunday (US Eastern), for lasm and the website.
   - Scheduled workflows carry a runtime guard (`TZ=America/New_York date +%u`), and a test checks every cron.
@@ -652,6 +684,21 @@ docstrings, the propositions and the names.
   - The README's command table ([README.md](../README.md)) and the usage text in [src/cli-arguments.mjs](../src/cli-arguments.mjs).
 - [ ] `npm create @lasm`, `bun create @lasm` and `deno run -A npm:@lasm/create`: [packages/create-lasm](../packages/create-lasm).
 - [ ] The Vite plugin export `@lasm/cli/vite`: [src/vite/index.d.ts](../src/vite/index.d.ts).
+- [ ] **Proposed, not built: a WASI reactor build, for the CLI's glue (M6).** The glue
+  program ([proposals/M6_GLUE.md](proposals/M6_GLUE.md)) is a WASI command, so every
+  call instantiates it again and reruns Lean's runtime and module initialization
+  before its own work (about 2 ms of a 12 ms warm call, and most of the call-to-call spread; M6_GLUE.md §4). A reactor pays that once per
+  process. The proposed shape adds no Lean API at all: `lasm build Main.lean --target wasi --reactor`
+  (or a target `wasi-reactor`) builds the same program, with `main : IO Unit` unchanged,
+  as a module that exports `_initialize` (the runtime and module initializers, once)
+  and `lasm_run` (runs `main` again: stdin is the bytes the host gives it, stdout and
+  the exit status are returned as now). The host calls `_initialize` once and
+  `lasm_run` per call. The glue would switch to it in the release after it ships
+  (it is built by the pinned published CLI). Alternatives considered: exporting
+  `@[export]` Lean functions with a byte-buffer ABI (a new attribute and calling
+  convention to review); calling `_start` again on the same instance (WASI forbids
+  it and Lean's runtime initializes twice). Your call: whether to add the flag, and
+  its name.
 - [ ] **`lasm init -t fullstack` refuses the function platforms** (issue #168). `--deploy lambda`, `lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` with `--template fullstack` used to write a broken project (a `build:undefined` script, no `vercel.json`/`netlify.toml`/`Dockerfile.lambda`, no platform dependency). Claude chose to refuse them (fewer combinations to keep working before 1.0): the message names the templates the target takes and the targets the template takes, for example "--deploy lambda supports the express, hono, fastify, std-http and fetch templates, not fullstack. The fullstack template supports --deploy workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi-http, spin". The other server templates keep every function platform. If you would rather support them, each needs its platform files, the client build in the package, README text and a CI deploy test ([src/init.mjs](../src/init.mjs), `deployTargets`).
 
 ## 3. User-facing text that changed recently

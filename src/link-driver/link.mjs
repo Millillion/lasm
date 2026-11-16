@@ -16,6 +16,7 @@ import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { scriptPrefix, runtimeExecutable } from '../js-runtime.mjs';
 import { executableName } from '../platform.mjs';
+import { linkEvidenceDirectory, saveLinkEvidence } from '../test-switches.mjs';
 import { Settings, instantiateSettings } from './settings.mjs';
 import { extractMetadata, updateMetadata } from './metadata.mjs';
 import { WasmModule, getWeakImports } from './wasm.mjs';
@@ -261,6 +262,9 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
   // mapOnly 'command': the caller runs wasm-ld itself (concurrent planning probes).
   if (mapOnly === 'command') return { program: tool(linkStep.program), args: wasmLdArgs, env };
   run(linkStep.program, wasmLdArgs);
+  // LASM_TEST_LINK_EVIDENCE (src/test-switches.mjs): wasm-ld's output and its map.
+  if (parsed.mapFile) saveLinkEvidence(mode, { 'linked.wasm': wasm, 'link.map': parsed.mapFile }, { mode, mapOnly: !!mapOnly, args: linkArgs },
+    process.env, linkArgs.filter(arg => arg.endsWith('.o')));
   // Planning probes (src/application-initialization.mjs) need only wasm-ld's map.
   if (mapOnly) return;
 
@@ -327,7 +331,12 @@ export function linkWithNode({ recipe, mode, args, sdk, cache, temp, intermediat
     if (!optimize && sizeOnly(entry) && !(devWasmOpt && entry.kind === 'wasm-opt')) { step++; continue; }
     if (entry.kind === 'wasm-opt') {
       step++;
-      run(entry.program, expandArguments(devWasmOpt ? entry.args.filter(arg => !/^-O[0-4sz]$/.test(arg)) : entry.args, values, platform));
+      const wasmOptArgs = expandArguments(devWasmOpt ? entry.args.filter(arg => !/^-O[0-4sz]$/.test(arg)) : entry.args, values, platform);
+      // LASM_TEST_LINK_EVIDENCE: Binaryen's input, output and arguments.
+      const before = linkEvidenceDirectory() && paths.join(temp, 'wasm-opt-input.wasm');
+      if (before) copyFileSync(wasm, before);
+      run(entry.program, wasmOptArgs);
+      if (before) saveLinkEvidence(`${mode}-wasm-opt`, { 'in.wasm': before, 'out.wasm': wasm }, { mode, args: wasmOptArgs.map(arg => arg === wasm ? '<wasm>' : arg) });
       saveFile('wasm-opt.wasm', wasm);
       saveFile('byn.wasm', wasm);
     } else if (entry.kind === 'acorn') {

@@ -10,7 +10,7 @@ import { attemptDispatcher, downloadArtifact, globalDispatcher, downloadPolicy, 
 const bytes = Buffer.from('a small but complete download');
 const artifact = { name: 'fixture', url: 'https://example.invalid/tool', bytes: bytes.length,
   sha256: createHash('sha256').update(bytes).digest('hex') };
-const policy = { attempts: 4, connectMs: 500, idleMs: 500, totalMs: 10_000 };
+const policy = { attempts: 4, connectMs: 5000, idleMs: 5000, totalMs: 10_000 };
 async function fixture(t) {
   const base = await mkdtemp(join(tmpdir(), 'lasm-download-'));
   t.after(() => rm(base, { force: true, recursive: true }));
@@ -546,6 +546,15 @@ test('retry delays stay within 75-100 % of the capped doubling backoff', async (
   });
   assert.equal(retryDelay(1, () => 0.5), 1750);
   assert.equal(retryDelay(7, () => 0), 45_000);
+  // Rounding is monotone, so every draw lies between these: the ends for every
+  // backoff (from attempt 6 on, 2000 * 2^5 > 60000 and the cap holds, up to
+  // 2 ** (attempt - 1) = Infinity).
+  for (const attempt of [1, 2, 3, 4, 5, 6, 7, 1025, 1100]) {
+    const base = Math.min(60_000, 2000 * 2 ** (attempt - 1));
+    assert.equal(retryDelay(attempt, () => 0), 3 * base / 4);
+    assert.equal(retryDelay(attempt, () => 1), base);
+    assert.equal(retryDelay(attempt, () => 1 - Number.EPSILON / 2), base);
+  }
 });
 
 const failure = promise => promise.then(() => assert.fail('expected a failure'), error => error);

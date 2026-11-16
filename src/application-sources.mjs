@@ -156,9 +156,86 @@ function writeJsonRecord(file, value, prefix) {
   } catch { /* not recorded */ }
 }
 
+// Lean identifiers, as Lean reads them (Init/Meta/Defs.lean: isIdFirst,
+// isIdRest, isLetterLike, isSubScriptAlnum), and «escaped» components, which
+// may hold anything but `»`.
+const letterLike = '\\u00c0-\\u00d6\\u00d8-\\u00f6\\u00f8-\\u017f\\u0391-\\u039f\\u03a1\\u03a2\\u03a4-\\u03a9\\u03b1-\\u03ba\\u03bc-\\u03fb'
+  + '\\u1f00-\\u1ffe\\u2100-\\u214f\\u{1d49c}-\\u{1d59f}';
+const idFirst = `A-Za-z_${letterLike}`;
+const nameComponent = new RegExp(`«[^»]*»|[${idFirst}][${idFirst}0-9'!?\\u2080-\\u209c\\u1d62-\\u1d6a\\u2c7c]*`, 'uy');
+const headerWords = new Set(['module', 'prelude', 'public', 'private', 'meta', 'all']);
+
+/** The modules a Lean source's header imports, read generously (a superset of
+ * Lean's reading): `{ imports, end }`, each import its name's components
+ * («escapes» removed), `end` the index just past the header's last token.
+ * Comments nest as Lean reads them; an import's name may be on a later line;
+ * further names on the line of an import count too. */
+export function leanHeaderImports(text) {
+  const imports = [];
+  let i = 0, end = 0;
+  const space = () => {
+    for (;;) {
+      while (i < text.length && /\s/.test(text[i])) i++;
+      if (text.startsWith('--', i)) { const eol = text.indexOf('\n', i); i = eol < 0 ? text.length : eol + 1; continue; }
+      if (!text.startsWith('/-', i)) return;
+      // As Lean's lexer reads a block comment (finishCommentBlock): the
+      // character after `/-` is skipped (so `/-/` opens one comment, not two),
+      // then `/-` nests and `-/` closes. Doc comments (`/--`, `/-!`), which
+      // end Lean's header, are read as comments too: generously.
+      i += 2;
+      if (i < text.length) i += text.codePointAt(i) > 0xffff ? 2 : 1;
+      for (let depth = 1; i < text.length;) {
+        const c = text[i++];
+        if (c === '-' && text[i] === '/') { i++; if (--depth === 0) break; }
+        else if (c === '/' && text[i] === '-') { i++; depth++; }
+      }
+    }
+  };
+  const name = () => {
+    const parts = [];
+    for (;;) {
+      nameComponent.lastIndex = i;
+      const m = nameComponent.exec(text);
+      if (!m) return parts.length ? parts : null;
+      parts.push(m[0].startsWith('«') ? m[0].slice(1, -1) : m[0]);
+      i = nameComponent.lastIndex;
+      if (text[i] !== '.') return parts;
+      nameComponent.lastIndex = i + 1;
+      if (!nameComponent.test(text)) return parts;
+      i++;
+    }
+  };
+  for (;;) {
+    space();
+    const word = name();
+    if (!word) break;
+    if (word.length === 1 && headerWords.has(word[0])) { end = i; continue; }
+    if (word.length !== 1 || word[0] !== 'import') break;
+    space();
+    let first = name();
+    if (first?.length === 1 && first[0] === 'all') { space(); first = name(); }
+    if (!first) break;
+    imports.push(first);
+    end = i;
+    // The rest of the line, up to a comment: every name on it.
+    const eol = text.indexOf('\n', i);
+    for (const stop = eol < 0 ? text.length : eol; i < stop && !text.startsWith('--', i) && !text.startsWith('/-', i);) {
+      const at = i, more = name();
+      // Another `import` (or a modifier) on the line starts the next import.
+      if (more?.length === 1 && (more[0] === 'import' || headerWords.has(more[0]))) { i = at; break; }
+      if (more) { imports.push(more); end = i; }
+      else if (/\s/.test(text[i])) i++;
+      else while (i < stop && !/\s/.test(text[i])) i++; // not a name (`1bad`): skipped whole
+    }
+  }
+  return { imports, end };
+}
+
 /** The import header of a Lean source: everything before its first command
- * other than `module`, `prelude` and imports (comments included). Generous on
- * purpose: any change in that region counts. */
+ * other than `module`, `prelude` and imports (comments included), and at
+ * least every line that holds a token of the header (an import's name may
+ * be on the line after `import`). Generous on purpose: any change in that
+ * region counts. */
 export function leanHeader(text) {
   const lines = text.split(/\r?\n/), header = [];
   let depth = 0;
@@ -170,7 +247,9 @@ export function leanHeader(text) {
     depth += (line.match(/\/-/g) ?? []).length - (line.match(/-\//g) ?? []).length;
     if (depth < 0) depth = 0;
   }
-  return header.join('\n');
+  const { end } = leanHeaderImports(text);
+  const through = end === 0 ? 0 : text.slice(0, end).split(/\r?\n/).length;
+  return lines.slice(0, Math.max(header.length, through)).join('\n');
 }
 
 /** Identity of what Lasm's Lake adapter reads: the workspace's and its
@@ -187,6 +266,8 @@ export function lakeConfigurationKey(project, source, lean) {
   let manifest = { packagesDir: '.lake/packages', packages: [] };
   try { manifest = JSON.parse(readFileSync(join(project, 'lake-manifest.json'), 'utf8')); }
   catch (error) { if (error.code !== 'ENOENT') return undefined; }
+  // A manifest Lake cannot read either: no reuse, and Lake reports it.
+  if (!lakeManifestShape(manifest)) return undefined;
   hash.update('manifest\0').update(JSON.stringify({ packagesDir: manifest.packagesDir ?? '.lake/packages', packages: manifest.packages ?? [] }));
   for (const pkg of manifest.packages ?? []) directories.push(pkg.type === 'path'
     ? resolve(project, pkg.dir) : resolve(project, manifest.packagesDir ?? '.lake/packages', pkg.name));
@@ -200,6 +281,16 @@ export function lakeConfigurationKey(project, source, lean) {
   }
   if (source !== undefined) try { hash.update('header\0').update(leanHeader(readFileSync(source, 'utf8'))); } catch { return undefined; }
   return hash.digest('hex');
+}
+
+/** Whether a parsed lake-manifest.json has the shape Lasm reads: an object
+ * whose packages are objects naming a path package's directory or another
+ * package's name. */
+function lakeManifestShape(manifest) {
+  const isObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+  if (!isObject(manifest) || !Array.isArray(manifest.packages ?? [])) return false;
+  if (manifest.packagesDir !== undefined && typeof manifest.packagesDir !== 'string') return false;
+  return (manifest.packages ?? []).every(pkg => isObject(pkg) && typeof (pkg.type === 'path' ? pkg.dir : pkg.name) === 'string');
 }
 
 /** Lake's initialized native library, which Lasm's Lake adapter loads (Lake's upstream install paths). */

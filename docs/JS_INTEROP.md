@@ -7,9 +7,9 @@ measurements that chose the architecture, and the implementation notes below.
 
 - Prototype source and measurement scripts: [`experiments/js-interop/`](https://github.com/Millillion/lasm/tree/590a923f25403040df064ad417719db130d02fa1/experiments/js-interop)
   (throwaway; removed 2026-11-10, in the git history at `590a923f` so the numbers can be reproduced).
-- Evidence: [js-interop-calls-2026-10-22.json](evidence/js-interop-calls-2026-10-22.json)
+- Evidence: [js-interop-calls-2026-10-22.json](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/js-interop-calls-2026-10-22.json)
   (call costs, synchronous callbacks, compatibility, stack depth) and
-  [js-interop-load-2026-10-22.json](evidence/js-interop-load-2026-10-22.json) (HTTP load).
+  [js-interop-load-2026-10-22.json](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/js-interop-load-2026-10-22.json) (HTTP load).
 - Host: Linux x64 (local, 12 threads, desktop workload running; same-run ratios are more
   reliable than absolute numbers). Node 26.12.1 (V8 14.6), Emscripten 6.0.9, Lean 4.35.0,
   application runtime `7aa5028c…` (the current pin). **No runtime rebuild was needed.**
@@ -78,7 +78,7 @@ measurements that chose the architecture, and the implementation notes below.
   saving comes from not waking either thread between consecutive calls
   (below, "Waking the threads").
 - **Measured cost of the library** (Linux x64, local host under load;
-  [evidence](evidence/js-interop-library-2026-10-22.json)), mean per call, before
+  [evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/js-interop-library-2026-10-22.json)), mean per call, before
   the 2026-11-09 changes:
   - `get` is about 25 µs, `callMethod` 24–28 µs, a typed binding 30–37 µs.
   - Awaiting a resolved promise as a task costs about 110 µs.

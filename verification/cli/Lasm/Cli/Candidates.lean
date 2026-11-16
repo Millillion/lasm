@@ -27,18 +27,6 @@ open Lasm.Cli
 
 /-! ## Builds -/
 
-/-- **Mangling round-trips.** For a dotted name Lean mangles unambiguously,
-the mangled name is a non-empty C identifier, demangling gives the name
-back, and the module of its initializer (`initialize_…` or
-`runtime_initialize_…`) is the name.
-Tested by: test/application-diagnosis.test.mjs -/
-def mangle_round_trip : Prop :=
-  ∀ n : String, wellFormedName n = true →
-    demangleName (mangleName n) = n ∧
-    initializerModule ("initialize_" ++ mangleName n) = some n ∧
-    initializerModule ("runtime_initialize_" ++ mangleName n) = some n ∧
-    mangleName n ≠ "" ∧ (mangleName n).all fun c => c.isAlphanum || c = '_'
-
 /-- **The compact wrappers run the kept initializers as the chains do.** For
 an acyclic plan of valid initializer names, the wrappers are generated, and
 calling kept initializers' wrappers runs exactly the kept initializers the Node build's chains run, in
@@ -50,54 +38,111 @@ def compact_wrappers_as_chains : Prop :=
     (∀ e ∈ entries, e ∈ p.keep) → (∀ k ∈ p.keep, k ∈ p.closure) →
     ∃ source, compactInitializerWrappers p = .ok source ∧ runInitializers source p.edges entries = chains p entries
 
-/-! ## `lasm init` names -/
-
-/-- **Generated names are valid npm, Lake and Supabase names.** Whatever the
-directory or text: the npm package name is lowercase letters, digits, `.`,
-`_` and `-`, starts with a letter or digit and does not end with `-`; the
-Lake name is an identifier of ASCII letters, digits and `_` that starts with
-a letter and does not end with `_`; the Supabase function name is lowercase
-letters, digits and `-`, starts with a letter and has at most 54 characters.
-Tested by: test/init-golden.test.mjs -/
-def generated_names_valid : Prop :=
-  ∀ dir s : String,
-    ((packageName dir).toList.head?.map fun c => c.isLower || c.isDigit) = some true ∧
-    (packageName dir).all (fun c => c.isLower || c.isDigit || c = '.' || c = '_' || c = '-') ∧
-    ¬ (packageName dir).endsWith "-" ∧
-    ((lakeName s).toList.head?.map Char.isAlpha) = some true ∧
-    (lakeName s).all (fun c => c.isAlphanum || c = '_') ∧ ¬ (lakeName s).endsWith "_" ∧
-    ((supabaseFunctionNameOf s).toList.head?.map Char.isLower) = some true ∧
-    (supabaseFunctionNameOf s).all (fun c => c.isLower || c.isDigit || c = '-') ∧
-    (supabaseFunctionNameOf s).length ≤ 54
-
 /-! ## Development server -/
 
-/-- **No request path reaches a file outside the root.** Whatever the path
-(`..`, encoded dots and slashes, sibling directories that share the root's
-name as a prefix), the static server answers 200, 403 or 404, and a file it
-serves lies under the root directory.
-Tested by: test/static-server.test.mjs -/
-def static_inside_root : Prop :=
-  ∀ root path : String,
-    (staticServe root path).1 ∈ [200, 403, 404] ∧
-    ∀ f, (staticServe root path).2 = some f → f.startsWith (root ++ "/")
+/-- **The proxy sends each request to the server program once, unchanged.**
+Whatever the server program then does, it receives the request exactly
+once, with the same method, target and body, its own address as Host, no
+Accept-Encoding (so a page arrives uncompressed and can be rewritten), and
+every other header's value. A request is never sent again once the program
+may have seen it; only a refused connection is retried.
+Tested by: test/fuzz/targets/dev-proxy.mjs -/
+def dev_proxy_forwards_once : Prop :=
+  ∀ (r : HttpRequest) (u : Upstream), PlainHeaders r.headers → r.target ≠ "/__lasm/events" →
+    ∃ s, (devProxy r u).1 = [s] ∧ s.method = r.method ∧ s.target = r.target ∧ s.body = r.body ∧
+      s.header? "host" = some devUpstreamHost ∧ s.header? "accept-encoding" = none ∧
+      ∀ h v, h ≠ "accept-encoding" → r.header? h = some v → s.header? h = some v
 
-/-! ## The Node host -/
+/-- **A whole reply reaches the client whole.** Its status and headers
+(a page's `Cache-Control` is `no-store`), and its body byte for byte, or a
+page's with the reload client inserted (`relayedBody`), in any charset.
+Tested by: test/fuzz/targets/dev-proxy.mjs -/
+def dev_proxy_relays_reply : Prop :=
+  ∀ (r : HttpRequest) (a : HttpReply), PlainHeaders r.headers → PlainHeaders a.headers → r.target ≠ "/__lasm/events" →
+    ∃ c, (devProxy r (.answers a)).2 = .reply c ∧ c.status = a.status ∧ c.body = relayedBody r a ∧
+      (isPage r a = true → c.header? "cache-control" = some "no-store") ∧
+      ∀ h v, a.header? h = some v → (isPage r a = false ∨ h ≠ "cache-control") → c.header? h = some v
 
-/-- **Lean versions compare lexicographically.** `leanAtLeast v m` holds
-exactly when `v`'s major, minor and patch are `m`'s or later in that order,
-whatever prerelease tag `v` has; a version is at least itself.
-Tested by: test/lean-io-error-policy.test.mjs -/
-def lean_at_least_lexicographic : Prop :=
-  ∀ (a b : Nat × Nat × Nat) (rc : Option Nat),
-    (leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText b) = true ↔ LexGe a b) ∧
-    leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText a) = true
+/-- **No response is left open.** When the server program stops before its
+reply ends, the client's response ends cut too; a malformed reply is a 502
+or a cut connection, at once.
+Tested by: test/fuzz/targets/dev-proxy.mjs, test/dev-proxy.test.mjs -/
+def dev_proxy_ends_failed_replies : Prop :=
+  ∀ (r : HttpRequest) (u : Upstream), u = .cut ∨ u = .malformed → r.target ≠ "/__lasm/events" →
+    (devProxy r u).2 = .cut ∨ ∃ page, (devProxy r u).2 = .reply page ∧ page.status = 502 ∧ u = .malformed
+
+/-! ## Project files -/
+
+/-- **`leanHeader` keeps exactly the source's imports.** Whenever Lean reads
+a source's header without error, it reads the same imports from
+`leanHeader` of the source: a build key over the header changes whenever
+the imports can.
+Tested by: test/fuzz/targets/project-files.mjs -/
+def lean_header_keeps_imports : Prop :=
+  ∀ (text : String) (is : List HeaderImport), NoBareCR text → leanImports text = some is → leanImports (leanHeader text) = some is
+
+/-- **`lasm dev` follows every import.** Whenever Lean reads a source's
+header without error, `importClosure` reaches the file of every module it
+imports that the project has: an edit to it rebuilds the outputs that
+import it.
+Tested by: test/fuzz/targets/project-files.mjs -/
+def import_closure_covers_imports : Prop :=
+  ∀ (text : String) (is : List HeaderImport), leanImports text = some is →
+    (∀ i ∈ is, i.module ≠ [] ∧ i.module ≠ ["Main"] ∧ ∀ c ∈ i.module, FileComponent c) →
+    ∀ i ∈ is, moduleFile i.module ∈ importClosureOf text (is.map (·.module))
+
+/-- **A broken Lake manifest is no reuse, never a crash.** Whatever
+lake-manifest.json and lakefile.lean hold, `lakeConfigurationKey` answers
+a key or none; Lake then reports what it cannot read.
+Tested by: test/fuzz/targets/project-files.mjs, test/application-sources.test.mjs -/
+def lake_key_total : Prop :=
+  ∀ manifest lakefile : String, ∃ key, lakeConfigurationKeyOf manifest lakefile = .ok key
+
+/-- **package.json is read, or refused by name.** Whatever package.json
+holds, the edge modules are distinct non-empty names, the Supabase function
+and Fastly service names are ones those platforms accept, and a refusal is
+a message that names package.json.
+Tested by: test/fuzz/targets/project-files.mjs -/
+def package_readers_clear : Prop :=
+  ∀ text : String,
+    (∀ ms, edgeModulesOf text = .ok ms → ms.Nodup ∧ ∀ m ∈ ms, m ≠ "") ∧
+    (∀ n, supabaseFunctionNameIn text = .ok n →
+      (n.toList.head?.map Char.isLower) = some true ∧ n.all (fun c => c.isLower || c.isDigit || c = '-') ∧ n.length ≤ 54) ∧
+    (∀ n, fastlyNameIn text = .ok n → n ≠ "" ∧ n.all (fun c => c.isLower || c.isDigit || c = '_' || c = '-')) ∧
+    (∀ e, edgeModulesOf text = .error e ∨ supabaseFunctionNameIn text = .error e ∨ fastlyNameIn text = .error e →
+      Mentions e "package.json")
+
+/-! ## Edge entries -/
+
+/-- **Supabase's handler sees the path without the function's name.** For a
+request whose path is the function's name, or the name and a `/` and more,
+the handler gets the rest (`/` for the name alone), with the same origin,
+query, fragment, method, headers and body; any other request reaches it
+unchanged.
+Tested by: test/fuzz/targets/edge-request.mjs -/
+def supabase_route_strips_name : Prop :=
+  ∀ (name origin path rest : String) (r : HttpRequest), urlParts r.target = some (origin, path, rest) →
+    (supabaseRoute name r).method = r.method ∧ (supabaseRoute name r).headers = r.headers ∧
+    (supabaseRoute name r).body = r.body ∧
+    (path = "/" ++ name → urlParts (supabaseRoute name r).target = some (origin, "/", rest)) ∧
+    (∀ p, path = "/" ++ name ++ "/" ++ p → urlParts (supabaseRoute name r).target = some (origin, "/" ++ p, rest)) ∧
+    (path ≠ "/" ++ name → (∀ p, path ≠ "/" ++ name ++ "/" ++ p) → (supabaseRoute name r).target = r.target)
+
+/-- **Vercel's handler never sees Accept-Encoding, and nothing else
+changes.**
+Tested by: test/fuzz/targets/edge-request.mjs -/
+def vercel_identity_drops_encoding : Prop :=
+  ∀ r : HttpRequest, vercelIdentity r = { r with headers := r.headers.filter (·.1 ≠ "accept-encoding") }
 
 /-! ## Downloads -/
 
 /-- **Retry delays stay within 75–100 % of the backoff.** For every attempt
 and every random draw in [0, 1], the delay is between three quarters of the
-capped doubling backoff and the backoff itself.
+capped doubling backoff and the backoff itself. It stays tested, not
+proved: the code computes in doubles, and Lean's `Float` operations are
+opaque to proofs. It holds because IEEE-754 rounding is monotone and exact
+on `0.75 * b` and `b` (`b` ≤ 60000), so the delay grows with the draw
+between its values at 0 and 1, which the test checks for every backoff.
 Tested by: test/managed-download.test.mjs -/
 def retry_delay_bounded : Prop :=
   ∀ (attempt : Nat) (r : Float), 1 ≤ attempt → 0 ≤ r → r ≤ 1 →
@@ -107,7 +152,9 @@ def retry_delay_bounded : Prop :=
 
 /-- **Escaped strings are printable ASCII JSON for the string.** `json.dumps`
 of any string, `ensure_ascii`, is printable ASCII, and a JSON parser reads it
-as that string.
+as that string. Its second half is proved (`json_string_printable`); the
+first needs facts about Lean's JSON parser (`Lean.Json.parse` of escapes and
+surrogate pairs) that Lean does not state.
 Tested by: test/link-driver-python.test.mjs -/
 def json_string_ascii : Prop :=
   ∀ s : String, Lean.Json.parse (pythonJsonString s) = .ok (.str s) ∧
@@ -122,21 +169,15 @@ def json_dumps_parse_back : Prop :=
     pythonJsonDumps v indent sortKeys = .ok text →
       ((Lean.Json.parse text).toOption.any (· == v)) = true ∧ (indent = none → '\n' ∉ text.toList)
 
-/-- **Python's string order is the order of code points.** The sign of
-`comparePythonStrings a b` is that of comparing `a` and `b` code point by
-code point (a prefix first), as Python orders `str`, unlike JavaScript's
-UTF-16 order.
-Tested by: test/link-driver-python.test.mjs -/
-def python_order_code_points : Prop :=
-  ∀ a b : String, (comparePythonStrings a b).sign = if a < b then -1 else if a = b then 0 else 1
-
 /-! ## WebAssembly -/
 
 /-- **Lowering atomics keeps what one thread computes.** When it lowers a
 valid module, the lowered module is valid, lowering it again changes nothing,
 and run on one thread it gives the same result and leaves the same memory.
 (The lowering refuses, with an error, SIMD and GC instructions, which a valid
-module may hold.)
+module may hold.) It stays tested, not proved: `validate` and `run` are
+WebAssembly's own validation and execution, which a proof needs as a formal
+semantics of WebAssembly to relate the lowering's model to.
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_keeps_runs : Prop :=
   ∀ (m m' : ByteArray) (args : List Nat), validate m = true → lowerAtomics m = .ok m' →
@@ -145,7 +186,8 @@ def lowering_keeps_runs : Prop :=
 /-- **Lowering leaves no atomic instruction.** When it lowers a valid
 module, the lowered module is valid without the threads feature and lowering
 it again changes nothing; a module already valid without threads is returned
-as it is.
+as it is. It stays tested, not proved, for the same reason: `validate` and
+`validWithoutThreads` are WebAssembly's own validation.
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_leaves_no_atomics : Prop :=
   ∀ m m' : ByteArray, validate m = true → lowerAtomics m = .ok m' →
@@ -157,7 +199,9 @@ of any bodies of well-formed instructions, every non-atomic instruction and ever
 kept byte for byte, every atomic instruction becomes its documented
 replacement, and one helper per atomic operation and width follows the
 functions, numbered in order of first use after the imported and defined
-ones.
+ones. Of the model, but not yet proved: its hypotheses are WebAssembly's
+binary grammar (`oneInstruction`, `localDeclarations`), which a proof needs
+as a Lean definition the model's `skipInstruction` reads exactly.
 Tested by: test/lower-atomics.test.mjs -/
 def lowering_rewrites_atomics : Prop :=
   ∀ (memory64 : Bool) (types imported : Nat) (bodies : List Body),
@@ -182,5 +226,21 @@ def zip_reads_back : Prop :=
       (∀ d ∈ read.take (directoriesOf entries).length, d.mode = 0o40755 ∧ d.data.size = 0 ∧ d.method = 0) ∧
       ∀ x ∈ (read.drop (directoriesOf entries).length).zip entries,
         x.1.data = x.2.data ∧ x.1.mode = 0o100000 ||| x.2.mode.getD 0o644
+
+/-! ## The glue program -/
+
+/-- **The glue's fields round-trip.** Any list of fields, encoded as the glue
+program reads its request, is read back exactly as the same list, whatever
+the fields hold (digits, `:`, line ends, non-ASCII, nothing).
+Tested by: test/glue.test.mjs -/
+def glue_fields_round_trip : Prop :=
+  ∀ fields : List String, decodeFields (encodeFields fields) = .ok fields
+
+/-- **A glue request carries its fields.** Lists of fields, encoded as a
+request, carry exactly their fields in order, whichever format the encoding
+chose (a table of distinct fields, or lengths when a field holds a 0 byte).
+Tested by: test/glue.test.mjs -/
+def glue_request_fields : Prop :=
+  ∀ lists : List (List String), requestFields (encodeRequest lists) = lists.flatten
 
 end Lasm.Cli.Candidates

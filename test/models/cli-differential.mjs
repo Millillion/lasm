@@ -7,31 +7,40 @@
 // the JavaScript on everything this draws; what stays unproved is that the
 // two agree elsewhere.
 //
-//   node test/models/cli-differential.mjs [--runs N] [--seed S] [--lean PATH]
+//   node test/models/cli-differential.mjs [--runs N] [--seed S] [--lean PATH] [--only NAME,…]
 //
 // provisions the managed Lean 4.35.0 (or uses the `lean` at PATH), compiles
 // the model modules into a temporary directory and checks each model `runs`
-// times (default 2000). Run by the cli-models workflow (docs/CI.md).
+// times (default 2000; `--only` checks the named ones). Run by the cli-models workflow (docs/CI.md).
 import assert from 'node:assert/strict';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { random } from '../helpers/property.mjs';
 import { buildTargets, closest, editDistance, parseLasmArguments, targetHint } from '../../src/cli-arguments.mjs';
 import { changedFiles, parseDevArguments } from '../../src/dev.mjs';
-import { parseInitArguments } from '../../src/init.mjs';
+import { lakeName, packageName, parseInitArguments, supabaseFunctionNameOf } from '../../src/init.mjs';
 import { jsRuntime } from '../../src/js-runtime.mjs';
 import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
-import { leanAtLeast } from '../../src/lean-io-errors.mjs';
-import { responseFile } from '../../src/platform.mjs';
+import { decodeFileMessage, encodeFileMessage } from '../../src/native-file-message.mjs';
+import { initializerClosure, unitsReaching } from '../../src/application-initialization.mjs';
+import { applicationLinkRequirements } from '../../src/application-reachability.mjs';
+import { ioErrorTables, leanAtLeast, leanIOError } from '../../src/lean-io-errors.mjs';
+import { demangleName, initializerModule, mangleName } from '../../src/application-diagnosis.mjs';
+import { comparePythonStrings, pythonJsonString } from '../../src/link-driver/python.mjs';
+import { insideDirectory, responseFile } from '../../src/platform.mjs';
+import { posix } from 'node:path';
+import { resolveStaticPath } from '../../src/browser/static-server.mjs';
 import { componentize, extractCore, makeTemplate, placeholderModule, replaceCoreModule, withoutComponentType } from '../../src/wasi/wasi-component.mjs';
 import { zip } from '../../src/serverless/zip.mjs';
 import { keepExports, lowerAtomics, moduleImports } from '../../src/wasi/lower-atomics.mjs';
 import { HandleTable } from '../../src/handle-table.mjs';
 import { encodeProcessConfiguration } from '../../src/process-launcher.mjs';
+import * as nodeJs from '../../src/node-js.mjs';
+import * as edgeJs from '../../src/edge/edge-js.mjs';
 import { deflateRawSync, crc32 } from 'node:zlib';
 import { compactInitializerWrappers, initializationSchedule } from '../../src/edge/edge-initializers.mjs';
 import { builtinModuleClosure } from '../../src/edge/builtin-modules.mjs';
@@ -44,6 +53,9 @@ const hex = text => Buffer.from(text, 'utf8').toString('hex');
 /** Text with the characters a property is most likely to break on: escapes,
  * quotes, line ends, NUL, non-ASCII and astral characters. */
 const tricky = ['a', 'b', ' ', '\\', '"', "'", '\n', '\r', '\0', '\t', 'λ', '€', '😀', '$', '-', '='];
+/** Characters of directory and package names: the classes' edges, a scope,
+ * and characters whose lower case is ASCII (the Kelvin sign) or longer (İ). */
+const nameAlphabet = ['a', 'Z', '0', '9', '.', '_', '-', ' ', '@', '!', 'λ', '😀', '\u212a', '\u0130', 'é'];
 
 /** Unsigned LEB128, padded with `extra` continuation bytes (a valid,
  * non-minimal encoding, as LLVM writes in object files). */
@@ -271,6 +283,70 @@ function launcherConfig(r) {
   else if (roll < 0.33) bytes[r.int(0, 7)] ^= 1;
   return bytes;
 }
+/** Lasm.JS interop events (library/c/lasm_js_framing.h): kinds, 64-bit
+ * words and 32-bit functions at their edges, short payloads. */
+const word64 = r => r.pick([() => 0n, () => 2n ** 64n - 1n, () => BigInt(r.int(0, 2 ** 31)), () => BigInt(r.int(0, 2 ** 31)) * 2n ** 32n + BigInt(r.int(0, 2 ** 31))])();
+const fnOf = r => r.pick([() => 0, () => 0xffffffff, () => r.int(0, 2 ** 31), () => r.int(0, 9)])();
+const jsEvent = r => r.pick([
+  () => ({ kind: 1, promise: word64(r), failed: r.next() < 0.5, bytes: Uint8Array.from(randomBytes(r, 10)) }),
+  () => ({ kind: 2, call: word64(r), fn: fnOf(r), bytes: Uint8Array.from(randomBytes(r, 10)) }),
+  () => ({ kind: 3, fn: fnOf(r) })])();
+const eventJson = e => e.kind === 1 ? ['completion', String(e.promise), e.failed, hexOf(e.bytes)]
+  : e.kind === 2 ? ['call', String(e.call), e.fn, hexOf(e.bytes)] : ['release', e.fn];
+/** A queue: a few events, sometimes more than one batch holds. */
+const eventQueue = r => r.next() < 0.03 ? Array.from({ length: r.int(1020, 1030) }, () => ({ kind: 3, fn: r.int(0, 9) })) : r.array(r.int(0, 6), () => jsEvent(r));
+/** A batch: what the host writes, often broken (a byte changed, cut short,
+ * bytes added, a size near 2³², or random bytes). */
+function eventBatch(r) {
+  let bytes = [...nodeJs.encodeEvents(r.array(r.int(0, 4), () => jsEvent(r)))];
+  const roll = r.next();
+  if (roll < 0.15 && bytes.length) bytes[r.int(0, bytes.length - 1)] = r.int(0, 255);
+  else if (roll < 0.3) bytes = bytes.slice(0, r.int(0, bytes.length));
+  else if (roll < 0.4) bytes.push(...randomBytes(r, 6));
+  else if (roll < 0.5) {
+    const head = r.pick([[1, ...Array(8).fill(r.int(0, 255)), r.int(0, 1)], [2, ...Array(12).fill(r.int(0, 255))]]);
+    bytes.push(...head, ...[...Buffer.from(Uint32Array.of(2 ** 32 - r.int(1, 20)).buffer)], ...randomBytes(r, 6));
+  } else if (roll < 0.55) bytes = randomBytes(r, 24);
+  return bytes;
+}
+/** A request as the glue frames it, often broken. */
+function requestBytes(r) {
+  const ids = r.array(r.int(0, 4), () => fnOf(r));
+  let bytes = [...Buffer.from(Uint32Array.of(ids.length, ...ids).buffer), ...randomBytes(r, 10)];
+  const roll = r.next();
+  if (roll < 0.15) bytes = bytes.slice(0, r.int(0, bytes.length));
+  else if (roll < 0.3) bytes.splice(0, 4, ...Buffer.from(Uint32Array.of(r.pick([r.int(0, 8), 2 ** 32 - 1, 2 ** 30])).buffer));
+  else if (roll < 0.35) bytes = randomBytes(r, 12);
+  return bytes;
+}
+const settled = fn => { try { return fn(); } catch (error) { return { error: error.message }; } };
+const splitOf = split => bytes => settled(() => { const [released, payload] = split(Uint8Array.from(bytes)); return { released, payload: hexOf(payload) }; });
+const intoOf = into => bytes => settled(() => { const [promise, input] = into(bytes); return { promise: String(promise), input: hexOf(input) }; });
+/** library/c/lasm_js_framing.h, compiled with test/models/js-framing-harness.c
+ * as is and with a 32-bit size_t (wasm32's), and run on one input. */
+const framingHarness = {};
+function runFraming(width, args, input) {
+  if (!framingHarness.dir) framingHarness.dir = mkdtempSync(join(tmpdir(), 'lasm-framing-harness-'));
+  const path = join(framingHarness.dir, `framing-${width}`);
+  if (!framingHarness[width]) {
+    execFileSync(process.env.CC || 'cc', ['-O1', '-w', ...(width === 32 ? ['-DLASM_JS_SIZE32'] : []), '-o', path,
+      fileURLToPath(new URL('./js-framing-harness.c', import.meta.url))], { stdio: ['ignore', 'inherit', 'inherit'] });
+    framingHarness[width] = path;
+  }
+  const run = spawnSync(path, args, { input: Uint8Array.from(input), timeout: 10_000, maxBuffer: 1 << 20 });
+  if (run.status !== 0) throw new Error(`the framing harness (${width}-bit, ${args.join(" ")}) exited ${run.status ?? run.signal ?? run.error} on ${hexOf(input)}`);
+  return run.stdout.toString();
+}
+const readEventsC = width => bytes => {
+  const out = { events: [], fatal: null };
+  for (const line of runFraming(width, ['events'], bytes).split('\n').filter(Boolean)) {
+    const [kind, a, b, data = ''] = line.split(' ');
+    if (kind === 'fatal') { out.fatal = line.slice(6); break; }
+    out.events.push(kind === 'completion' ? [kind, a, Number(b) !== 0, data] : kind === 'call' ? [kind, a, Number(b), data] : [kind, Number(a)]);
+  }
+  return out;
+};
+
 /** native/process-launcher.c, compiled with its effects reported
  * (test/models/process-launcher-harness.c), and run on a configuration:
  * `null` where it refuses it (exit status 125), else what it would use. */
@@ -302,7 +378,100 @@ function runLauncher(bytes) {
  * module, a generator, the JavaScript's answer and the request's input,
  * both in the runner's encoding. Each module's entry in
  * verification/models.json names its model and this differential. */
-export const models = [
+export 
+/** Lean names as components: numbers, and strings that read as numbers or
+ * escapes once mangled, start or end with `_`, are empty, or hold
+ * characters of every escape class (never `.`, so the dotted name is the
+ * same name). */
+const nameChars = ['a', 'B', 'x', 'u', 'U', 'f', '0', '7', '_', '-', '!', 'é', 'λ', '\uffff', '😀', '2d', '41', '03b1', '\n'];
+const nameComponents = r => r.array(r.int(1, 4), () => r.next() < 0.15 ? r.int(0, r.pick([9, 30, 1e6]))
+  : (s => /^(?:0|[1-9][0-9]*)$/.test(s) ? s + 'z' : s)(r.string(nameChars, 0, 6)));
+const dotted = parts => parts.map(String).join('.');
+/** Text for demangling: mangled names, mangled names changed, and soups of
+ * underscores, digits, escape letters and hex digits. */
+const mangledText = r => {
+  const roll = r.next();
+  if (roll < 0.4) return mangleName(dotted(nameComponents(r)));
+  if (roll < 0.6) { const m = [...mangleName(dotted(nameComponents(r)))]; const i = r.int(0, m.length); m.splice(i, r.int(0, 2), ...r.string(['_', '0', 'x', 'a'], 0, 2)); return m.join(''); }
+  return r.string(['_', '_', '_', '0', '0', '1', '9', 'x', 'u', 'U', 'a', 'f', 'Z', 'g', 'é'], 0, 16);
+};
+
+/** A static server's request: a root (absolute, sometimes `/` or relative),
+ * a pathname of dot segments, encoded dots and slashes, malformed and
+ * overlong percent-encoding and non-ASCII, the files that exist (under the
+ * root, its precompressed copies, the root itself, outside it), Accept-Encoding
+ * and the fallback page. */
+function staticRequest(r) {
+  const roll = r.next();
+  const root = roll < 0.08 ? '/' : roll < 0.15 ? r.pick(['dist', 'a/../b', '../x', '.']) : '/' + r.array(r.int(1, 3), () => r.pick(['srv', 'dist', 'a b', 'λ', 'x.y'])).join('/');
+  const segment = () => r.pick(['..', '.', '', '%2e%2e', '%2E.', 'index.html', 'app.js', 'app', 'x.css', 'photo.png', '.hidden', 'a.b.c', 'a..', 'λ',
+    '%', '%zz', '%4', '%41', '%e2%82%ac', '%e2%82', '%c0%80', '%ED%A0%80', '%F0%9F%98%80', '%f4%90%80%80', '%5c', '%00', '%2f..', 'dist']);
+  const pathname = (r.next() < 0.9 ? '/' : '') + r.array(r.int(0, 4), segment).join(r.pick(['/', '/', '%2f', '//']));
+  const names = ['index.html', 'app.js', 'app.js.br', 'app.js.gz', 'x.css', 'x.css.gz', 'photo.png', 'photo.png.gz', 'app', 'λ', 'nested/index.html', 'fallback.html'];
+  const base = root === '/' ? '' : root;
+  const files = [...r.array(r.int(0, 6), () => base + '/' + r.pick(names)), ...(r.next() < 0.1 ? [root] : []), ...(r.next() < 0.2 ? ['/etc/passwd', '/srv/secret'] : [])];
+  const accepts = r.pick(['', 'br', 'gzip', 'br, gzip', 'gzip, deflate', 'xbr', 'br_x', 'BR', 'gzip;q=1.0', 'identity']);
+  const fallback = r.pick([null, null, 'index.html', 'fallback.html', '']);
+  return { root, pathname, files, accepts, fallback };
+}
+
+/** A linker map: its header (or a near miss), CODE, rows of every shape the
+ * reader distinguishes (entry points, dynamic loaders, module-data APIs and
+ * near names, libleancpp members with each kind of section, on POSIX and
+ * Windows paths, and look-alikes), malformed rows, unusual white space. */
+function linkMap(r) {
+  const ws = () => r.pick([' ', ' ', '  ', '\t', '\u00a0', ' \u3000']);
+  const symbol = () => r.pick(['main', '__main_void', '__main_argc_argv', 'mainx', 'CODE', 'DATA', 'dlopen', 'dlsym', 'emscripten_dlopen',
+    'lasm_lookup_lean_symbol', 'lean_read_module_data', 'lean_write_module_data_x', 'lean_read_module_data_', 'lean_read_module_datax',
+    'l_Lean_findSysroot___boxed', 'l_Lean_initSearchPath', 'l_Lean_findSysroot__x', 'l_Std_foo', 'λ',
+    `${r.pick(['/r/', 'C:\\r\\', '', 'x', '/a/libleancpp.a(z.o)/'])}libleancpp.a(${r.pick(['a.o', 'b.o', 'Basic.o', '', 'c)d'])}):(${r.pick(['.text.f', 'f', 'g', '.rodata', '.rodata.str', '.rodatax',
+      '.data.rel.ro._ZTIfoo', '.data.rel.ro._ZTSfoo', '.data.rel.ro._ZTVbar', '.data.x', '', 'h)'])})${r.pick(['', '', ' x', ')'])}`,
+    '/r/libleancpp.a(x.o) without a section']);
+  const row = () => r.next() < 0.05 ? r.pick(['zz 1 2 x', '', '   ', '- 1 2', '-  1  2  \u2028', '1 2 3 \u2028x'])
+    : `${ws()}${r.next() < 0.03 ? 'g' : r.pick(['-', '1f', '0'])}${ws()}${r.next() < 0.03 ? 'x' : r.pick(['48', 'ab'])}${ws()}${r.pick(['600', '20'])}${ws()}${r.next() < 0.03 ? ' ' : symbol()}${r.next() < 0.03 ? ' ' : ''}`;
+  const header = r.next() < 0.95 ? '    Addr      Off     Size Out     In      Symbol' : r.pick(['Addr Off Size Out In Symbol', '', 'Address']);
+  const lines = [header, ...(r.next() < 0.9 ? ['       -       48      600 CODE'] : []), ...(r.next() < 0.7 ? ['       -       58       20                 main'] : []), ...r.array(r.int(0, 6), row)];
+  return { map: lines.join(r.next() < 0.05 ? '\r\n' : '\n') + r.pick(['\n', '', '\n  \n']), initFree: r.array(r.int(0, 3), () => r.pick(['f', 'g', '_ZTIfoo', '_ZTVbar', 'h'])) };
+}
+
+/** A POSIX path: absolute or relative, dot segments, doubled and trailing
+ * slashes, names sharing prefixes (`a`, `ab`, `..a`). */
+const posixPath = r => (r.next() < 0.7 ? '/' : '') + r.array(r.int(0, 5), () => r.pick(['a', 'b', 'ab', 'a', '..', '.', '', 'x y', 'λ', '..a', 'a.'])).join('/') + (r.next() < 0.2 ? '/' : '');
+
+/** A file worker message value: primitives (the protocol's own tags among
+ * them, as data), ArrayBuffers and SharedArrayBuffers from a pool, Uint8Arrays
+ * over them (whole, sliced, empty), arrays and records, nested. The buffers
+ * are made afresh for each value (a move detaches nothing here: the
+ * message is not posted). */
+function fileValue(r) {
+  const pool = Array.from({ length: 3 }, (_, i) => i === 2 ? new SharedArrayBuffer(8) : new ArrayBuffer(8 + i));
+  const leaf = () => {
+    const roll = r.next();
+    if (roll < 0.3) return r.pick([0, 1.5, -1, 'bytes', 'record', 'type', '', null, undefined, true, false, 12345678901234567890n]);
+    const id = r.int(0, pool.length - 1);
+    if (roll < 0.5) return { $buffer: id };
+    const buffer = pool[id], offset = r.next() < 0.5 ? 0 : r.int(0, buffer.byteLength), length = r.next() < 0.5 ? buffer.byteLength - offset : r.int(0, buffer.byteLength - offset);
+    return { $view: [id, offset, length] };
+  };
+  const tree = depth => depth > 2 || r.next() < 0.4 ? leaf() : r.next() < 0.5 ? { $array: r.array(r.int(0, 3), () => tree(depth + 1)) }
+    : { $record: r.array(r.int(0, 3), (_, i) => [r.pick(['type', 'value', 'a', '0', '__proto__', `k${i}`]), tree(depth + 1)]) };
+  return { pool, shape: tree(0), move: r.next() < 0.5 };
+}
+/** The JavaScript value of a shape, over its pool. */
+function fileShapeValue(pool, shape) {
+  if (shape?.$buffer !== undefined) return pool[shape.$buffer];
+  if (shape?.$view) { const [id, offset, length] = shape.$view; return new Uint8Array(pool[id], offset, length); }
+  if (shape?.$array) return shape.$array.map(s => fileShapeValue(pool, s));
+  if (shape?.$record) {
+    const object = {};
+    for (const [key, s] of shape.$record) Object.defineProperty(object, key, { value: fileShapeValue(pool, s), enumerable: true, writable: true, configurable: true });
+    return object;
+  }
+  return shape;
+}
+const primDesc = v => typeof v === 'bigint' ? `${v}n` : v === undefined ? 'undefined' : JSON.stringify(v);
+
+const models = [
   {
     name: 'editDistance', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
     generate: r => [r.string(letters, 0, 9), r.string(letters, 0, 9)],
@@ -388,6 +557,173 @@ export const models = [
     js: ([v, m]) => leanAtLeast(v, m),
   },
   {
+    name: 'resolveStaticPath', source: 'src/browser/static-server.mjs', lean: 'Lasm.Cli.Model.StaticServer',
+    generate: staticRequest,
+    input: ({ root, pathname, files, accepts, fallback }) => ({ root: hex(root), pathname: hex(pathname), accepts: hex(accepts),
+      fallback: fallback === null ? null : hex(fallback), files: files.map(hex) }),
+    js: ({ root, pathname, files, accepts, fallback }) => {
+      const { status, file, served, encoding } = resolveStaticPath(root, pathname, { fallback, accepts, fileExists: f => files.includes(f) });
+      return { status, file: file === undefined ? null : hex(file), served: served === undefined ? null : hex(served), encoding: encoding ?? null };
+    },
+  },
+  {
+    name: 'mangleName', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: r => r.next() < 0.1 ? r.string(['a', '.', '_', '0', 'x'], 0, 8) : dotted(nameComponents(r)),
+    input: name => hex(name),
+    js: name => hex(mangleName(name)),
+  },
+  {
+    name: 'demangleName', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: mangledText,
+    input: text => hex(text),
+    js: text => hex(demangleName(text)),
+  },
+  {
+    name: 'initializerModule', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: r => r.pick(['initialize_', 'runtime_initialize_', 'meta_initialize_', 'runtime_', 'initialize', '', 'xinitialize_'])
+      + (r.next() < 0.1 ? r.pick(['\n', 'a\rb', '\u2028']) : '') + mangledText(r),
+    input: symbol => hex(symbol),
+    js: symbol => (m => m === undefined ? null : hex(m))(initializerModule(symbol)),
+  },
+  {
+    name: 'leanNameMangle', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: nameComponents,
+    input: parts => parts.map(p => typeof p === 'number' ? p : [hex(p)]),
+    js: parts => hex(mangleName(dotted(parts))),
+  },
+  {
+    name: 'leanNameDemangle', source: 'src/application-diagnosis.mjs', lean: 'Lasm.Cli.Model.Mangle',
+    generate: mangledText,
+    input: text => hex(text),
+    js: text => hex(demangleName(text)),
+  },
+  {
+    name: 'applicationLinkRequirements', source: 'src/application-reachability.mjs', lean: 'Lasm.Cli.Model.Reachability',
+    generate: linkMap,
+    input: ({ map, initFree }) => ({ map: hex(map), initFree: initFree.map(hex) }),
+    js: ({ map, initFree }) => {
+      try {
+        const result = applicationLinkRequirements(map, { initializationFreeCppSymbols: new Set(initFree) });
+        return { ...result, dynamic: result.dynamic.map(hex), cxxRuntime: result.cxxRuntime.map(hex), moduleData: result.moduleData.map(hex) };
+      } catch (error) { return { error: error.message }; }
+    },
+  },
+  {
+    name: 'fileMessage', source: 'src/native-file-message.mjs', lean: 'Lasm.Cli.Model.FileMessage',
+    generate: fileValue,
+    input: ({ pool, shape, move }) => {
+      const value = s => s?.$buffer !== undefined ? { buffer: s.$buffer, shared: pool[s.$buffer] instanceof SharedArrayBuffer }
+        : s?.$view ? { view: s.$view[0], shared: pool[s.$view[0]] instanceof SharedArrayBuffer, whole: s.$view[1] === 0 && s.$view[2] === pool[s.$view[0]].byteLength, length: s.$view[2] }
+        : s?.$array ? { array: s.$array.map(value) }
+        : s?.$record ? (entries => { const order = Object.keys(Object.fromEntries([...entries.keys()].map(k => [k, 0]))); return { record: order.map(k => [k, value(entries.get(k))]) }; })(new Map(s.$record))
+        : { prim: primDesc(s) };
+      return { move, value: value(shape) };
+    },
+    js: ({ pool, shape, move }) => {
+      const { message, transfer } = encodeFileMessage(fileShapeValue(pool, shape), { move });
+      const copies = new Map();
+      const ref = buffer => pool.includes(buffer) ? ['own', pool.indexOf(buffer)]
+        : ['copy', copies.has(buffer) ? copies.get(buffer) : (copies.set(buffer, copies.size), copies.size - 1), buffer.byteLength];
+      const describe = m => m === null || typeof m !== 'object' ? { prim: primDesc(m) }
+        : m.type === 'buffer' ? { buffer: ref(m.value), shared: m.value instanceof SharedArrayBuffer }
+        : m.type === 'bytes' ? { bytes: ref(m.value) }
+        : m.type === 'array' ? { array: m.value.map(describe) }
+        : { record: m.value.map(([k, v]) => [k, describe(v)]) };
+      const described = describe(message);
+      const decodedOf = d => d instanceof Uint8Array ? { bytes: ref(d.buffer) }
+        : d instanceof ArrayBuffer || (typeof SharedArrayBuffer !== 'undefined' && d instanceof SharedArrayBuffer) ? { buffer: ref(d), shared: d instanceof SharedArrayBuffer }
+        : Array.isArray(d) ? { array: d.map(decodedOf) }
+        : d !== null && typeof d === 'object' ? { record: Object.entries(d).map(([k, v]) => [k, decodedOf(v)]) }
+        : { prim: primDesc(d) };
+      return { message: described, transfer: transfer.map(ref), decoded: decodedOf(decodeFileMessage(message)) };
+    },
+  },
+  {
+    name: 'initializerClosure', source: 'src/application-initialization.mjs', lean: 'Lasm.Cli.Model.Initialization',
+    generate: r => {
+      const names = Array.from({ length: r.int(1, 9) }, (_, i) => `initialize_U${i}`);
+      const units = [...new Set(names.filter(() => r.next() < 0.85))].map(n => [n, r.array(r.int(0, 4), () => r.next() < 0.1 ? 'initialize_Outside' : r.pick(names))]);
+      return { units, roots: r.array(r.int(0, 4), () => r.next() < 0.1 ? 'initialize_Missing' : r.pick(names)) };
+    },
+    input: v => v,
+    js: ({ units, roots }) => initializerClosure(new Map(units.map(([name, calls]) => [name, { name, calls }])), roots),
+  },
+  {
+    name: 'unitsReaching', source: 'src/application-initialization.mjs', lean: 'Lasm.Cli.Model.Initialization',
+    generate: r => {
+      const names = Array.from({ length: r.int(1, 9) }, (_, i) => r.pick(['initialize_', 'l_', 'lean_']) + i);
+      const graph = [...new Set(names.filter(() => r.next() < 0.8))].map(n => [n, r.array(r.int(0, 4), () => r.next() < 0.1 ? 'l_outside' : r.pick(names))]);
+      return { graph, candidates: r.array(r.int(0, 5), () => r.pick(names)), targets: r.array(r.int(0, 3), () => r.pick([...names, 'l_outside'])) };
+    },
+    input: v => v,
+    js: ({ graph, candidates, targets }) => unitsReaching(new Map(graph), candidates, targets),
+  },
+  {
+    name: 'relativePath', source: 'src/platform.mjs', lean: 'Lasm.Cli.Model.Platform',
+    generate: r => { const from = posixPath(r); return [from, r.next() < 0.1 ? from : r.next() < 0.4 ? from + '/' + posixPath(r).replace(/^\//, '') : posixPath(r)]; },
+    input: ([from, to]) => ({ cwd: hex(process.cwd()), from: hex(from), to: hex(to) }),
+    js: ([from, to]) => hex(posix.relative(from, to)),
+  },
+  {
+    name: 'insideDirectory', source: 'src/platform.mjs', lean: 'Lasm.Cli.Model.Platform',
+    generate: r => { const directory = posixPath(r); return [directory, r.next() < 0.1 ? directory : r.next() < 0.5 ? directory + '/' + posixPath(r).replace(/^\//, '') : posixPath(r)]; },
+    input: ([directory, file]) => ({ cwd: hex(process.cwd()), directory: hex(directory), file: hex(file) }),
+    js: ([directory, file]) => insideDirectory(directory, file, posix),
+  },
+  {
+    name: 'leanIOError', source: 'src/lean-io-errors.mjs', lean: 'Lasm.Cli.Model.LeanIOErrors',
+    generate: r => {
+      const tables = ioErrorTables();
+      const codes = [...Object.keys(tables.messages), ...Object.keys(tables.crtAliases), ...tables.windowsCrtCases, 'UNKNOWN', 'ENOTREAL', 'constructor', '__proto__', 'toString', ''];
+      const crt = r.next() < 0.4;
+      const errno = r.next() < 0.1 && !crt ? r.pick([undefined, '-5', null]) : (r.pick([1, -1]) * r.pick([r.int(0, 140), 4094, 4095, 3008, 4022, r.int(0, 99999)]) * (crt ? -1 : 1) * (r.next() < 0.1 ? -1 : 1) || 0);
+      const names = r.array(r.int(0, 6), () => [-r.int(0, 140), r.pick(codes)]);
+      return { platform: r.pick(['linux', 'darwin', 'win32']), version: r.pick(['4.32.0', '4.34.0', '4.34.1', '4.35.0']), names,
+        error: { leanUserError: r.next() < 0.1, errno, code: r.next() < 0.05 ? undefined : r.pick(codes), errorOrigin: crt ? 'crt' : r.pick([undefined, 'uv']) } };
+    },
+    input: ({ platform, version, names, error }) => {
+      const tables = ioErrorTables();
+      return { tables: { messages: Object.entries(tables.messages), crtAliases: Object.entries(tables.crtAliases), windowsCrtCases: tables.windowsCrtCases },
+        platform, version, names, error: { userError: !!error.leanUserError, errno: typeof error.errno === 'number' ? error.errno : null,
+          code: error.code ?? null, crt: error.errorOrigin === 'crt' } };
+    },
+    js: ({ platform, version, names, error }) => {
+      const map = new Map(names);
+      const result = leanIOError(error, version, { platform, systemErrorName: n => map.get(n) });
+      return result === error ? null : { code: result.code ?? null, errno: result.errno, message: result.message };
+    },
+  },
+  {
+    name: 'packageName', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',
+    generate: r => '/tmp/' + r.string([...nameAlphabet, '/', '..'], 0, 70),
+    input: dir => hex(basename(resolve(dir)).toLowerCase()),
+    js: dir => hex(packageName(dir)),
+  },
+  {
+    name: 'lakeName', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',
+    generate: r => r.string(nameAlphabet, 0, 70),
+    input: s => hex(s),
+    js: s => hex(lakeName(s)),
+  },
+  {
+    name: 'supabaseFunctionNameOf', source: 'src/init.mjs', lean: 'Lasm.Cli.Model.Init',
+    generate: r => (r.next() < 0.3 ? '@' + r.string(nameAlphabet, 0, 4) + (r.next() < 0.8 ? '/' : '') : '') + r.string(nameAlphabet, 0, 70),
+    input: s => hex(String(s).toLowerCase()),
+    js: s => hex(supabaseFunctionNameOf(s)),
+  },
+  {
+    name: 'pythonJsonString', source: 'src/link-driver/python.mjs', lean: 'Lasm.Cli.Model.Python',
+    generate: r => r.string([...tricky, '\b', '\f', '\x7f', '\x1f', '~', '\u0085', '\ud7ff', '\ue000', '\uffff', '𝄞', '\u{10ffff}'], 0, 12),
+    input: s => hex(s),
+    js: s => hex(pythonJsonString(s)),
+  },
+  {
+    name: 'comparePythonStrings', source: 'src/link-driver/python.mjs', lean: 'Lasm.Cli.Model.Python',
+    generate: r => { const a = r.string(['a', 'b', 'é', '\uffff', '😀', '𝄞'], 0, 5); return [a, r.next() < 0.2 ? a : r.next() < 0.3 ? a + r.string(['a', '😀'], 1, 2) : r.string(['a', 'b', 'é', '\uffff', '😀', '𝄞'], 0, 5)]; },
+    input: ([a, b]) => ({ a: hex(a), b: hex(b) }),
+    js: ([a, b]) => String(comparePythonStrings(a, b)),
+  },
+  {
     name: 'numbers', source: 'src/node-host.mjs', lean: 'Lasm.Cli.Model.NodeHost',
     generate: r => r.array(r.int(0, 5), () => r.pick([
       () => BigInt(r.int(-1000, 1000)),
@@ -419,6 +755,10 @@ export const models = [
       try { return { text: hex(responseFile(args)) }; } catch (error) { return { error: error.message }; }
     },
   },
+  // src/wasi/wasi-component.mjs runs this model itself, compiled by Lasm
+  // (src/glue/glue.mjs, docs/proposals/M6_GLUE.md): these entries and
+  // withoutComponentType's check the compiled program's fast versions, through
+  // the module's byte requests, against the model run by native Lean.
   {
     name: 'replaceCoreModule', source: 'src/wasi/wasi-component.mjs', lean: 'Lasm.Cli.Model.WasiComponent',
     generate: r => {
@@ -486,6 +826,66 @@ export const models = [
     js: runLauncher,
   },
   {
+    name: 'encodeEvents', source: 'src/node-js.mjs', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: eventQueue,
+    input: queue => queue.map(eventJson),
+    js: queue => { const q = [...queue]; const batch = nodeJs.encodeEvents(q); return { batch: hexOf(batch), left: q.length }; },
+  },
+  {
+    name: 'encodeEvents', source: 'src/edge/edge-js.mjs', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: eventQueue,
+    input: queue => queue.map(eventJson),
+    js: queue => { const q = [...queue]; const batch = edgeJs.encodeEvents(q); return { batch: hexOf(batch), left: q.length }; },
+  },
+  {
+    name: 'readEvents', source: 'library/c/lasm_js_framing.h', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: eventBatch,
+    input: bytes => hexOf(bytes),
+    js: readEventsC(64),
+  },
+  {
+    name: 'readEvents', source: 'library/c/lasm_js_framing.h (32-bit size_t)', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: eventBatch,
+    input: bytes => hexOf(bytes),
+    js: readEventsC(32),
+  },
+  {
+    name: 'frameRequest', source: 'library/c/lasm_js_framing.h', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: r => ({ released: r.array(r.int(0, 5), () => fnOf(r)), payload: randomBytes(r, 12) }),
+    input: ({ released, payload }) => ({ released, payload: hexOf(payload) }),
+    js: ({ released, payload }) => runFraming(64, ['request', ...released.map(String)], payload).trim(),
+  },
+  {
+    name: 'splitRequest', source: 'src/node-js.mjs', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: requestBytes,
+    input: bytes => hexOf(bytes),
+    js: splitOf(nodeJs.splitRequest),
+  },
+  {
+    name: 'splitRequest', source: 'src/edge/edge-js.mjs', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: requestBytes,
+    input: bytes => hexOf(bytes),
+    js: splitOf(edgeJs.splitRequest),
+  },
+  {
+    name: 'frameInto', source: 'library/c/lasm_js_framing.h', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: r => ({ promise: word64(r), input: randomBytes(r, 12) }),
+    input: ({ promise, input }) => ({ promise: String(promise), input: hexOf(input) }),
+    js: ({ promise, input }) => runFraming(64, ['into', String(promise)], input).trim(),
+  },
+  {
+    name: 'intoPrefix', source: 'src/node-js.mjs', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: r => randomBytes(r, 14),
+    input: bytes => hexOf(bytes),
+    js: bytes => intoOf(nodeJs.intoPrefix)(Buffer.from(bytes)),
+  },
+  {
+    name: 'intoPrefix', source: 'src/edge/edge-js.mjs', lean: 'Lasm.Cli.Model.JsFraming',
+    generate: r => randomBytes(r, 14),
+    input: bytes => hexOf(bytes),
+    js: bytes => intoOf(edgeJs.intoPrefix)(Uint8Array.from(bytes)),
+  },
+  {
     name: 'HandleTable', source: 'src/handle-table.mjs', lean: 'Lasm.Cli.Model.HandleTable',
     generate: r => {
       const first = r.next() < 0.1 ? r.pick([0, -1, 0x7fffffff, 0x80000000]) : r.next() < 0.1 ? 0x7ffffffd : r.int(1, 6);
@@ -516,6 +916,10 @@ export const models = [
     input: bytes => hexOf(bytes),
     js: bytes => hexOf(withoutComponentType(Uint8Array.from(bytes))),
   },
+  // src/edge/edge-initializers.mjs runs this model itself, compiled by Lasm
+  // (src/glue/glue.mjs, docs/proposals/M6_GLUE.md): these two entries check the
+  // compiled program, through the module's field encoding, against the model
+  // run by native Lean.
   {
     name: 'initializationSchedule', source: 'src/edge/edge-initializers.mjs', lean: 'Lasm.Cli.Model.EdgeInitializers',
     generate: r => { const p = plan(r); return { p, name: r.next() < 0.9 ? r.pick(p.closure) : 'initialize_Outside' }; },
@@ -597,16 +1001,17 @@ async function start(leanPath) {
       child.stdin.write(JSON.stringify(request) + '\n');
     }),
     stop: () => { child.stdin.end(); rmSync(out, { recursive: true, force: true }); if (parseDirectory) rmSync(parseDirectory, { recursive: true, force: true }); parseDirectory = undefined;
-      if (harness) rmSync(harness.dir, { recursive: true, force: true }); harness = undefined; },
+      if (harness) rmSync(harness.dir, { recursive: true, force: true }); harness = undefined;
+      if (framingHarness.dir) rmSync(framingHarness.dir, { recursive: true, force: true }); for (const key of Object.keys(framingHarness)) delete framingHarness[key]; },
   };
 }
 
 /** Checks every model `runs` times; resolves with the count per model. */
-export async function differential({ runs = 2000, seed = 1, lean } = {}) {
+export async function differential({ runs = 2000, seed = 1, lean, only } = {}) {
   const session = await start(lean);
   const counts = {};
   try {
-    for (const model of models) {
+    for (const model of models.filter(m => !only || only.includes(m.name))) {
       const gen = random(seed);
       for (let run = 0; run < runs; run++) {
         const value = model.generate(gen);
@@ -620,7 +1025,7 @@ export async function differential({ runs = 2000, seed = 1, lean } = {}) {
             + `  input:      ${JSON.stringify(input)}\n  JavaScript: ${JSON.stringify(expected)}\n  Lean:       ${JSON.stringify(answer.ok)}`);
         }
       }
-      counts[model.name] = runs;
+      counts[models.filter(m => m.name === model.name).length > 1 ? `${model.name} (${model.source})` : model.name] = runs;
     }
   } finally {
     session.stop();
@@ -632,7 +1037,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const option = (name, fallback) => { const i = process.argv.indexOf(name); return i > 0 ? process.argv[i + 1] : fallback; };
   const runs = Number(option('--runs', 2000)), seed = Number(option('--seed', 1));
   const started = Date.now();
-  const counts = await differential({ runs, seed, lean: option('--lean') });
+  const counts = await differential({ runs, seed, lean: option('--lean'), only: option('--only')?.split(',') });
   for (const [name, n] of Object.entries(counts)) console.log(`ok   ${name}: JavaScript and Lean model agree on ${n} inputs`);
   console.log(`${Object.keys(counts).length} models, seed ${seed} (${((Date.now() - started) / 1000).toFixed(1)} s)`);
 }

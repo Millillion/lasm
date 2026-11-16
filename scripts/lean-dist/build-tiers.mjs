@@ -21,7 +21,7 @@ import { Readable } from 'node:stream';
 import { createZstdDecompress, createGunzip } from 'node:zlib';
 import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
-import { Parser } from 'tar';
+import { parseTar, fileSink } from '../../src/tar.mjs';
 import { dataLayout, dataPieces, dataPieceOf, moduleOf, binaryRoots, binaryCandidate, nativeImports, resolveImport,
   packArchive, zstdParameters, platformFamily, coreModuleRoots, cCandidate, cToolRoots, cDataMember, cMultiarch } from './tiers.mjs';
 import { stageCInputs } from './c-inputs.mjs';
@@ -62,40 +62,33 @@ if (archiveBytes !== upstream.bytes || archiveHash.digest('hex') !== upstream.sh
 // 2. Stage only members that can appear in some tier.
 const members = new Map(), hardlinks = [];
 const clean = path => path && !/[\\\0]/.test(path) && !path.startsWith('/') && path.split('/').every(part => part && part !== '.' && part !== '..');
-const parser = new Parser({ strict: true });
-const writes = [];
-let failure;
-parser.on('entry', entry => {
-  try {
-    const raw = entry.path.replace(/^\.\//, '').replace(/\/$/, '');
-    if (raw === upstream.root) { entry.resume(); return; }
-    if (!raw.startsWith(upstream.root + '/')) throw new Error(`Archive member outside ${upstream.root}: ${entry.path}`);
-    const path = raw.slice(upstream.root.length + 1);
-    if (!clean(path)) throw new Error(`Unsafe archive member ${entry.path}`);
-    const piece = dataPieceOf(path);
-    const wanted = (options.data !== 'none' && piece && piece !== 'excluded')
-      || (options.c ? cCandidate(path, options.platform) : binaryCandidate(path, options.platform));
-    if (!wanted || entry.type === 'Directory') { entry.resume(); return; }
-    if (members.has(path)) throw new Error(`Duplicate archive member ${path}`);
-    if (entry.type === 'SymbolicLink') {
-      members.set(path, { path, type: 'symlink', target: entry.linkpath }); entry.resume(); return;
-    }
-    if (entry.type === 'Link') {
-      const target = entry.linkpath.replace(/^\.\//, '');
-      if (!target.startsWith(upstream.root + '/')) throw new Error(`Hardlink outside the archive: ${path}`);
-      hardlinks.push({ path, target: target.slice(upstream.root.length + 1), executable: !!(entry.mode & 0o111) });
-      entry.resume(); return;
-    }
-    if (!['File', 'OldFile', 'ContiguousFile'].includes(entry.type)) throw new Error(`Unsupported member type ${entry.type}: ${path}`);
-    const source = join(tree, ...path.split('/'));
-    members.set(path, { path, type: 'file', source, size: entry.size, executable: !!(entry.mode & 0o111) });
-    mkdirSync(dirname(source), { recursive: true });
-    writes.push(pipeline(entry, createWriteStream(source, { flags: 'wx' })));
-  } catch (error) { failure ??= error; entry.resume(); }
+const parser = parseTar(entry => {
+  const raw = entry.path.replace(/^\.\//, '').replace(/\/$/, '');
+  if (raw === upstream.root) return;
+  if (!raw.startsWith(upstream.root + '/')) throw new Error(`Archive member outside ${upstream.root}: ${entry.path}`);
+  const path = raw.slice(upstream.root.length + 1);
+  if (!clean(path)) throw new Error(`Unsafe archive member ${entry.path}`);
+  const piece = dataPieceOf(path);
+  const wanted = (options.data !== 'none' && piece && piece !== 'excluded')
+    || (options.c ? cCandidate(path, options.platform) : binaryCandidate(path, options.platform));
+  if (!wanted || entry.type === 'Directory') return;
+  if (members.has(path)) throw new Error(`Duplicate archive member ${path}`);
+  if (entry.type === 'SymbolicLink') {
+    members.set(path, { path, type: 'symlink', target: entry.linkpath }); return;
+  }
+  if (entry.type === 'Link') {
+    const target = entry.linkpath.replace(/^\.\//, '');
+    if (!target.startsWith(upstream.root + '/')) throw new Error(`Hardlink outside the archive: ${path}`);
+    hardlinks.push({ path, target: target.slice(upstream.root.length + 1), executable: !!(entry.mode & 0o111) });
+    return;
+  }
+  if (entry.type !== 'File') throw new Error(`Unsupported member type ${entry.type}: ${path}`);
+  const source = join(tree, ...path.split('/'));
+  members.set(path, { path, type: 'file', source, size: entry.size, executable: !!(entry.mode & 0o111) });
+  mkdirSync(dirname(source), { recursive: true });
+  return fileSink(source);
 });
 await pipeline(createReadStream(options.archive), upstream.format === 'tar.gz' ? createGunzip() : createZstdDecompress(), parser);
-await Promise.all(writes);
-if (failure) throw failure;
 for (const link of hardlinks) {
   const target = members.get(link.target);
   if (!target || target.type !== 'file') throw new Error(`Unresolvable hardlink ${link.path}`);
@@ -191,10 +184,11 @@ from the mirrored Lean source below (its application code) against that GNU MP.
 ${sourcesSection('bin')}Module data and Lean sources are distributed separately in the shared
 lean-${options.version}-core-* and lean-${options.version}-ext-* archives.
 `;
-const notices = join(here, 'notices');
 // Verbatim licence texts in scripts/lean-dist/notices/<file>.txt -> lasm-notices/<archive>/<file>.
+// libuv's LICENSE-extra is read from src/notices/, where the CLI's own notices keep it.
+const noticeSource = file => file === 'libuv-LICENSE-extra' ? join(here, '../../src/notices', file + '.txt') : join(here, 'notices', file + '.txt');
 const noticeFiles = async (archive, files) => Promise.all(files.map(async file => ({ path: `lasm-notices/${archive}/${file}`,
-  type: 'file', source: join(notices, file + '.txt'), size: (await stat(join(notices, file + '.txt'))).size })));
+  type: 'file', source: noticeSource(file), size: (await stat(noticeSource(file))).size })));
 const binMembers = [...binary.values(), members.get('LICENSE'), ...(members.has('LICENSES') ? [members.get('LICENSES')] : []),
   generated(`lasm-notices/${binName}/NOTICE`, binNotice),
   ...await noticeFiles(binName, ['libuv-LICENSE']),

@@ -70,7 +70,7 @@ SHA-256 checks:
   and Deno give a `program.wasm` byte-identical to Node's, for both the Node
   build and the edge link.
 - CI: run 40143173720, job `hosts`, on ubuntu-24.04 and ubuntu-24.04-arm
-  ([results](evidence/compiler-hosts-40143173720.json)). It builds the pure
+  ([results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/compiler-hosts-40143173720.json)). It builds the pure
   example under Node, Bun 1.4.4 and Deno 2.9.6. All outputs are identical,
   across both architectures too. Bun and Deno serve the build, and a
   command-line program passes under both.

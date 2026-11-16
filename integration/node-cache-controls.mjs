@@ -4,16 +4,15 @@ import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync, readFileSync, rmSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 
 export async function cacheControls(compiler, directory) {
   const { provisionArtifact } = await import(pathToFileURL(join(compiler, 'src/managed-artifacts.mjs')));
-  const { c: tar } = createRequire(join(compiler, 'package.json'))('tar');
+  const { directoryEntries, writeTar } = await import(pathToFileURL(join(compiler, 'src/tar.mjs')));
   mkdirSync(join(directory, 'source/tool'), { recursive: true });
   writeFileSync(join(directory, 'source/tool/value'), 'verified fixture\n');
-  await tar({ cwd: join(directory, 'source'), file: join(directory, 'archive.tgz'), gzip: true, portable: true }, ['tool']);
+  await writeTar(join(directory, 'archive.tgz'), directoryEntries(join(directory, 'source'), ['tool']), { gzip: true });
   const bytes = readFileSync(join(directory, 'archive.tgz'));
   const artifact = { name: 'recovery-control.tar.gz', root: 'tool', url: 'https://example.invalid/control',
     format: 'tar.gz', bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'), maximumExtractedBytes: 10000 };

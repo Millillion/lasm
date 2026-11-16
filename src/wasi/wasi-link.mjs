@@ -5,7 +5,8 @@
 //   1. clang compiles the WASI host (lasm_wasi.c, lasm_wasi_libc.c) and
 //      Lasm.Fetch's WASI glue (lasm_fetch_wasi.c; Fastly's host calls with
 //      --target fastly; Lasm.WASI.Http's and lasm_wasi_http.c with --target
-//      wasi-http) for wasm64, as the application objects are.
+//      wasi-http) for wasm64, as the application objects are, and Lasm's
+//      build of mimalloc (src/mimalloc) with smaller arenas than Emscripten's.
 //   2. wasm-ld links them with the objects, the standard-library archives of
 //      the Node runtime, the edge runtime's three archives and its
 //      single-threaded Emscripten system libraries. Lasm.JS's and Lasm.Fetch's
@@ -24,22 +25,29 @@ import { fileURLToPath } from 'node:url';
 import { executableName } from '../platform.mjs';
 import { fastlyGlueSource, wasiHttpGlueSource, glueLinkFlags } from '../lasm-library.mjs';
 import { emscriptenResponseFile } from '../link-driver/link.mjs';
-import { testUnoptimized } from '../test-switches.mjs';
+import { linkEvidenceDirectory, saveLinkEvidence, testUnoptimized } from '../test-switches.mjs';
 import { lowerAtomics, moduleImports, keepExports } from './lower-atomics.mjs';
 import { componentize, httpHandlerExport } from './wasi-component.mjs';
+import { mimallocSettings, mimallocSources, mimallocClangArguments, mimallocUnits } from '../mimalloc/mimalloc.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 export const wasiSources = ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
   'wasi-component.mjs', 'component/proxy-template.wasm', 'lasm_wasi_http_imports.h', '../../library/c/lasm_fastly.c',
-  '../../library/c/lasm_wasi_http_bindings.c'];
+  '../../library/c/lasm_wasi_http_bindings.c', ...mimallocSources.map(file => `../mimalloc/${file}`)];
 
 /** Link settings per WASI target, part of the program's cache identity. The
  * C shadow stack holds Lean's address-taken locals; recursion depth is
- * bounded by the engine's own Wasm stack first (docs/WASI.md). */
+ * bounded by the engine's own Wasm stack first (docs/WASI.md). `mimalloc`:
+ * the size of mimalloc's arena slices and of its arenas (src/mimalloc,
+ * issue #246). Measured (CI run 43363306366): examples/fastly used 4.2 MB of
+ * heap per request on Viceroy instead of 27.8 with Emscripten's libmimalloc
+ * (16 MiB arenas), and Folio's pathological inputs peaked lower (backticks
+ * 289 MiB instead of 386) at the same speed. */
+const mimalloc = mimallocSettings;
 export const wasiLinkSettings = Object.freeze({
-  wasi: Object.freeze({ stackMiB: 8, initialMiB: 16, maximumMiB: 2048, optimize: '-Oz' }),
-  fastly: Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, optimize: '-Oz' }),
-  'wasi-http': Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, optimize: '-Oz' }),
+  wasi: Object.freeze({ stackMiB: 8, initialMiB: 16, maximumMiB: 2048, mimalloc, optimize: '-Oz' }),
+  fastly: Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, mimalloc, optimize: '-Oz' }),
+  'wasi-http': Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, mimalloc, optimize: '-Oz' }),
 });
 // The C sources and defines of each target.
 const targetSources = { wasi: ['lasm_fetch_wasi.c'], fastly: ['lasm_fetch_wasi.c'], 'wasi-http': ['lasm_wasi_http.c'] };
@@ -83,6 +91,12 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
       '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', `-DLASM_WASI_MAXIMUM_MEMORY=${settings.maximumMiB}`, ...targetDefines[target],
       '-ffunction-sections', '-fdata-sections', '-ffile-prefix-map=' + here + '=lasm/', '-I', join(nodeRuntime.directory, 'include'), '-I', here,
       '-c', join(here, source), '-o', object]);
+    objects.push(object);
+  }
+  // mimalloc in place of the edge runtime's libmimalloc.a, whose emmalloc and sbrk members it still uses.
+  for (const [source, name] of mimallocUnits) {
+    const object = join(out, name);
+    run('clang', mimallocClangArguments({ sysroot, settings: settings.mimalloc, source, object }));
     objects.push(object);
   }
 
@@ -138,11 +152,16 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
   writeFileSync(join(out, 'link-args.json'), JSON.stringify({ target, settings, args: linkArgs }, null, 1) + '\n');
   // Windows limits a command line to 32,767 characters, which the inputs of a
   // larger program exceed (ENAMETOOLONG): pass them in a response file there.
+  // LASM_TEST_LINK_EVIDENCE (src/test-switches.mjs): wasm-ld's map too, kept with its output.
+  const evidenceMap = linkEvidenceDirectory() && join(out, 'linked.map');
+  const ldArgs = evidenceMap ? [...linkArgs, `-Map=${evidenceMap}`] : linkArgs;
   if (process.platform === 'win32') {
     const responseFile = join(out, 'wasm-ld.rsp');
-    writeFileSync(responseFile, emscriptenResponseFile(linkArgs, 'win32'));
+    writeFileSync(responseFile, emscriptenResponseFile(ldArgs, 'win32'));
     run('wasm-ld', ['@' + responseFile]);
-  } else run('wasm-ld', linkArgs);
+  } else run('wasm-ld', ldArgs);
+  if (evidenceMap) saveLinkEvidence(`wasi-${target}`, { 'linked.wasm': linked, 'link.map': evidenceMap }, { mode: `wasi-${target}`, args: ldArgs },
+    process.env, ldArgs.filter(arg => arg.endsWith('.o')));
 
   // 3. Atomics to plain memory instructions.
   const lowered = join(out, 'lowered.wasm');
@@ -153,8 +172,11 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
 
   // 4. No exception handling, 32-bit memory and tables, optimized.
   // LASM_TEST_UNOPTIMIZED (src/test-switches.mjs): the lowering passes only.
-  run('wasm-opt', [...inputFeatures, '--strip-eh', '--memory64-lowering', '--table64-lowering', testUnoptimized() ? '-O0' : settings.optimize,
-    '--strip-debug', '--strip-producers', '--strip-target-features', lowered, '-o', program]);
+  const wasmOptArgs = [...inputFeatures, '--strip-eh', '--memory64-lowering', '--table64-lowering', testUnoptimized() ? '-O0' : settings.optimize,
+    '--strip-debug', '--strip-producers', '--strip-target-features', lowered, '-o', program];
+  run('wasm-opt', wasmOptArgs);
+  // LASM_TEST_LINK_EVIDENCE: Binaryen's input, output and arguments.
+  saveLinkEvidence(`wasi-${target}-wasm-opt`, { 'in.wasm': lowered, 'out.wasm': program }, { mode: `wasi-${target}`, args: wasmOptArgs.map(arg => arg === lowered ? '<in>' : arg === program ? '<out>' : arg) });
 
   const bytes = readFileSync(program);
   checkWasiModule(bytes, target);

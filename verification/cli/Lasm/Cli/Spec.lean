@@ -109,6 +109,36 @@ def parse_known_or_refused : Prop :=
         (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
     | .error m => m.trimAscii.toString ≠ ""
 
+/-- **A path is inside a directory exactly when its segments extend the
+directory's.** For POSIX paths resolved against the working directory,
+`insideDirectory` holds exactly when the resolved directory's segments are a
+prefix of the resolved file's: `..`, `.`, doubled and trailing slashes and
+names that share a prefix (`a`, `ab`, `..a`) are read as path segments.
+Tested by: test/cli-parse.test.mjs -/
+def inside_directory_prefix : Prop :=
+  ∀ cwd directory file : String,
+    insideDirectory cwd directory file = true ↔ resolvedSegments cwd directory <+: resolvedSegments cwd file
+
+/-! ## `lasm init` names -/
+
+/-- **Generated names are valid npm, Lake and Supabase names.** Whatever the
+directory or text: the npm package name is lowercase letters, digits, `.`,
+`_` and `-`, starts with a letter or digit and does not end with `-`; the
+Lake name is an identifier of ASCII letters, digits and `_` that starts with
+a letter and does not end with `_`; the Supabase function name is lowercase
+letters, digits and `-`, starts with a letter and has at most 54 characters.
+Tested by: test/init-golden.test.mjs -/
+def generated_names_valid : Prop :=
+  ∀ dir s : String,
+    ((packageName dir).toList.head?.map fun c => c.isLower || c.isDigit) = some true ∧
+    (packageName dir).all (fun c => c.isLower || c.isDigit || c = '.' || c = '_' || c = '-') ∧
+    ¬ (packageName dir).endsWith "-" ∧
+    ((lakeName s).toList.head?.map Char.isAlpha) = some true ∧
+    (lakeName s).all (fun c => c.isAlphanum || c = '_') ∧ ¬ (lakeName s).endsWith "_" ∧
+    ((supabaseFunctionNameOf s).toList.head?.map Char.isLower) = some true ∧
+    (supabaseFunctionNameOf s).all (fun c => c.isLower || c.isDigit || c = '-') ∧
+    (supabaseFunctionNameOf s).length ≤ 54
+
 /-! ## Development server -/
 
 /-- **`changedFiles` reports exactly the files that differ.** Between two
@@ -120,6 +150,19 @@ def changed_files_exact : Prop :=
     (changedFiles a b).Nodup ∧
     ∀ k, k ∈ changedFiles a b ↔ (k ∈ a.map (·.1) ∨ k ∈ b.map (·.1)) ∧ a.lookup k ≠ b.lookup k
 
+/-- **No request path reaches a file outside the root.** Whatever the path
+(`..`, encoded dots and slashes, sibling directories that share the root's
+name as a prefix, malformed percent-encoding), whatever files exist and
+whatever the client accepts, the static server answers 200, 400, 403 or 404,
+and a file it serves lies under the root directory: the root is a resolved
+directory (not a file) and the fallback page, if any, a name in it.
+Tested by: test/static-server.test.mjs -/
+def static_inside_root : Prop :=
+  ∀ (fileExists : String → Bool) (root pathname accepts : String) (fallback : Option String),
+    resolvedDirectory root → fileExists root = false → (∀ f ∈ fallback, pathSegment f.toList) →
+    (staticServe fileExists root pathname accepts fallback).1 ∈ [200, 400, 403, 404] ∧
+    ∀ f, (staticServe fileExists root pathname accepts fallback).2 = some f → (root ++ "/").toList <+: f.toList
+
 /-! ## The Node host -/
 
 /-- **`numbers` writes little-endian `UInt64`s.** Each value becomes eight
@@ -128,6 +171,15 @@ complement), in order.
 Tested by: test/lean-io-error-policy.test.mjs -/
 def numbers_le64 : Prop :=
   ∀ values : List Int, (numbers values).data.toList = values.flatMap le64
+
+/-- **Lean versions compare lexicographically.** `leanAtLeast v m` holds
+exactly when `v`'s major, minor and patch are `m`'s or later in that order,
+whatever prerelease tag `v` has; a version is at least itself.
+Tested by: test/lean-io-error-policy.test.mjs -/
+def lean_at_least_lexicographic : Prop :=
+  ∀ (a b : Nat × Nat × Nat) (rc : Option Nat),
+    (leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText b) = true ↔ LexGe a b) ∧
+    leanAtLeast (versionText a ++ (rc.map (s!"-rc{·}")).getD "") (versionText a) = true
 
 /-! ## Builds -/
 
@@ -154,6 +206,74 @@ def schedule_reached_kept_first : Prop :=
     (∀ y, y ∈ initializationSchedule n calls keep ↔ y ∈ keep ∧ y ≠ n ∧ Reaches (edgesOf calls) n y) ∧
     ∀ x ∈ initializationSchedule n calls keep, ∀ y, y ∈ keep → y ≠ n → Reaches (edgesOf calls) x y →
       (initializationSchedule n calls keep).idxOf y < (initializationSchedule n calls keep).idxOf x
+
+/-- **Mangling round-trips.** For every dotted name (a component of
+decimal digits without a leading zero is a numeric component, as in
+`_private.M.0.f`), the mangled name is a non-empty C identifier, demangling
+gives the name back, and the module of its initializer (`initialize_…` or
+`runtime_initialize_…`) is the name.
+Tested by: test/application-diagnosis.test.mjs -/
+def mangle_round_trip : Prop :=
+  ∀ n : String,
+    demangleName (mangleName n) = n ∧
+    initializerModule ("initialize_" ++ mangleName n) = some n ∧
+    initializerModule ("runtime_initialize_" ++ mangleName n) = some n ∧
+    mangleName n ≠ "" ∧ (mangleName n).all fun c => c.isAlphanum || c = '_'
+
+/-- **A static application has no evidence of runtime evaluation.** When
+the reader accepts a linker map and calls the application static, no row
+of the map names a dynamic loader or symbol lookup, and every section it
+kept from Lean's C++ library (`libleancpp.a`) is read-only data or belongs
+to an initialization-free inline helper; it is static exactly when it lists
+no dynamic symbol and no C++ member.
+Tested by: test/application-reachability.test.mjs -/
+def link_map_static_sound : Prop :=
+  ∀ (initFree : String → Bool) (map : String) (r : Reachability.Requirements),
+    linkRequirements initFree map = .ok r →
+    (r.static = true ↔ r.dynamic = [] ∧ r.cxxRuntime = []) ∧
+    (r.static = true → ∀ line ∈ ((Reachability.trimEnd map.toList).splitOn '\n').tail, ∀ t,
+      Reachability.rowText line = some t → t ∉ Reachability.dynamicSymbols ∧
+      ∀ m s, Reachability.memberSection t = some (m, s) →
+        Reachability.independent (fun x => initFree (String.ofList x)) s = true)
+
+/-- **The initializer closure is the units the roots reach, once each.**
+Whatever the calls (cycles, calls to units outside the map, repeated
+roots), `initializerClosure` lists each unit reached from a root through
+initializer calls exactly once, and nothing else.
+Tested by: test/application-initialization.test.mjs -/
+def closure_reached : Prop :=
+  ∀ (units : List (String × List String)) (roots : List String),
+    (initializerClosureOf units roots).Nodup ∧
+    ∀ x, x ∈ initializerClosureOf units roots ↔ ∃ r ∈ roots, InitReaches units r x
+
+/-! ## The file worker -/
+
+/-- **The transfer list names each buffer once, and only when moving.**
+`postMessage` refuses a transfer list that names a buffer twice: whatever
+the message (the same allocation reached as a buffer and as a view, nested
+arrays and records), `encodeFileMessage` lists each buffer it transfers
+once, and without `move` it transfers none.
+Tested by: test/native-file-message.test.mjs -/
+def file_message_transfers : Prop :=
+  ∀ (move : Bool) (v : FileMessage.Value),
+    (FileMessage.encodeFileMessage move v).2.Nodup ∧ (move = false → (FileMessage.encodeFileMessage move v).2 = [])
+
+/-! ## The link driver's Python semantics -/
+
+/-- **Escaped strings are printable ASCII.** `json.dumps` of any string,
+`ensure_ascii`, is printable ASCII: quotes, escapes, hexadecimal digits and
+the printable characters themselves.
+Tested by: test/link-driver-python.test.mjs -/
+def json_string_printable : Prop :=
+  ∀ s : String, (pythonJsonString s).all (fun c => ' ' ≤ c && c ≤ '~') = true
+
+/-- **Python's string order is the order of code points.** The sign of
+`comparePythonStrings a b` is that of comparing `a` and `b` code point by
+code point (a prefix first), as Python orders `str`, unlike JavaScript's
+UTF-16 order.
+Tested by: test/link-driver-python.test.mjs -/
+def python_order_code_points : Prop :=
+  ∀ a b : String, (comparePythonStrings a b).sign = if a < b then -1 else if a = b then 0 else 1
 
 /-! ## WebAssembly -/
 
@@ -211,6 +331,37 @@ def launcher_config_round_trip : Prop :=
       { flags := (if o.directoryFd.isNone then 0 else 1) + (if o.inheritProcessCwd then 2 else 0) + (if o.setsid then 4 else 0),
         stdio := o.stdioFlags.map uint32Of, directory := o.directory.map utf8Bytes, requestedCwd := o.requestedCwd.map utf8Bytes,
         argv := (o.command :: o.args).map utf8Bytes, env := o.env.map fun (k, v) => (utf8Bytes k, utf8Bytes v) }
+
+/-! ## Lasm.JS's framing -/
+
+/-- **A batch of interop events reads back.** Whatever events the host
+queues (within the format's bounds), `encodeEvents` writes the first 1024 and
+leaves the rest queued, and the C glue reads exactly those events, in order,
+from the batch; a batch followed by other bytes reads as its events followed
+by what those bytes read as (so the glue stops only at a malformed event of
+its own).
+Tested by: test/lasm-js-framing.test.mjs -/
+def events_read_back : Prop :=
+  ∀ (queue : List JsEvent) (rest : List UInt8), (∀ e ∈ queue, e.Fits) →
+    (encodeEvents queue).2 = queue.drop 1024 ∧
+    readEvents ((encodeEvents queue).1 ++ rest) = (queue.take 1024 ++ (readEvents rest).1, (readEvents rest).2)
+
+/-- **A request's released handles and payload read back.** For any handles
+(32-bit, fewer than 2³²) and any payload, the host splits the request the C
+glue frames into exactly those handles and that payload.
+Tested by: test/lasm-js-framing.test.mjs -/
+def request_read_back : Prop :=
+  ∀ (released : List Nat) (payload : List UInt8),
+    released.length < 2 ^ 32 → (∀ i ∈ released, i < 2 ^ 32) →
+    splitRequest (frameRequest released payload) = .ok (released, payload)
+
+/-- **The promise a call settles reads back.** For any 64-bit Lean promise
+and any input, the host reads the promise and the input from the payload
+the C glue frames.
+Tested by: test/lasm-js-framing.test.mjs -/
+def into_read_back : Prop :=
+  ∀ (promise : Nat) (input : List UInt8), promise < 2 ^ 64 →
+    intoPrefix (frameInto promise input) = .ok (promise, input)
 
 /-! ## Host handles -/
 
