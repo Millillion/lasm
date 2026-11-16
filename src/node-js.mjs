@@ -478,28 +478,27 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
     }
     return value;
   }
+  // A module file beside the host; `missing` is the error when it is not there.
+  function requireBeside(path, missing) {
+    try { return moduleRequire(fileURLToPath(new URL(path, import.meta.url))); }
+    catch (error) {
+      if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND') throw failure(missing);
+      throw jsFailure(error);
+    }
+  }
   function load(specifier) {
     // Global functions (fetch, setTimeout, structuredClone, …) bind to module "globalThis".
     if (specifier === 'globalThis') return globalThis;
     // Lasm's builtin modules (lasm:<name>, src/edge/builtin-modules.mjs), copied beside the host.
     if (specifier.startsWith('lasm:')) {
       const name = specifier.slice(5);
-      if (!/^[a-z][a-z0-9-]*$/.test(name)) throw failure(`Unknown Lasm builtin JavaScript module ${JSON.stringify(specifier)}`);
-      try { return moduleRequire(fileURLToPath(new URL(`./lasm-modules/${name}.mjs`, import.meta.url))); }
-      catch (error) {
-        if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND') throw failure(`Unknown Lasm builtin JavaScript module ${JSON.stringify(specifier)}`);
-        throw jsFailure(error);
-      }
+      const unknown = `Unknown Lasm builtin JavaScript module ${JSON.stringify(specifier)}`;
+      if (!/^[a-z][a-z0-9-]*$/.test(name)) throw failure(unknown);
+      return requireBeside(`./lasm-modules/${name}.mjs`, unknown);
     }
     // The project's own files (@[js "./ffi/x.mjs" …], src/project-modules.mjs), copied beside the host.
-    if (specifier.startsWith('./')) {
-      try { return moduleRequire(fileURLToPath(new URL(`./project-modules/${specifier.slice(2)}`, import.meta.url))); }
-      catch (error) {
-        if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND')
-          throw failure(`The project's JavaScript file ${JSON.stringify(specifier)} is not in this build. Bind it with @[js "./…" …] and run lasm build again.`);
-        throw jsFailure(error);
-      }
-    }
+    if (specifier.startsWith('./'))
+      return requireBeside(`./project-modules/${specifier}`, `The project's JavaScript file ${JSON.stringify(specifier)} is not in this build. Bind it with @[js "./…" …] and run lasm build again.`);
     try { return moduleRequire(specifier); }
     catch (error) {
       if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND')

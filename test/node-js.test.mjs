@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createNodeJs as createHost, describe, firstJsHandle } from '../src/node-js.mjs';
@@ -331,8 +331,18 @@ test('a synchronous callback runs work the Lean thread proxied to the main threa
   assert.ok(performance.now() - started < 500, 'the wait is short');
 });
 
-test('project files (./…) load from project-modules/ beside the host; a missing one says how to add it', () => {
+test('project files (./…) load from project-modules/ beside the host; a missing one says how to add it; one that throws reports it', t => {
+  const directory = new URL('../src/project-modules/lasm-test/', import.meta.url);
+  mkdirSync(directory, { recursive: true });
+  t.after(() => rmSync(new URL('../src/project-modules/', import.meta.url), { recursive: true, force: true }));
+  writeFileSync(new URL('ok.mjs', directory), "import { two } from './lib.mjs';\nexport const twice = n => n * two;\n");
+  writeFileSync(new URL('lib.mjs', directory), 'export const two = 2;\n');
+  writeFileSync(new URL('bad.mjs', directory), "throw new RangeError('bad module');\n");
   const js = createNodeJs();
+  assert.equal(js.decode(js.dispatch(214, 0, 0n, wire(['f', './lasm-test/ok.mjs', 'twice', [21]]))), 42);
   assert.throws(() => js.dispatch(214, 0, 0n, wire(['f', './App/missing.mjs', 'f', []])),
     /The project's JavaScript file "\.\/App\/missing\.mjs" is not in this build/);
+  assert.throws(() => js.dispatch(214, 0, 0n, wire(['f', './lasm-test/bad.mjs', 'f', []])), /RangeError: bad module/);
+  // Builtin modules go through the same loader: an unknown one is named.
+  assert.throws(() => js.dispatch(214, 0, 0n, wire(['f', 'lasm:no-such-module', 'f', []])), /Unknown Lasm builtin JavaScript module "lasm:no-such-module"/);
 });
