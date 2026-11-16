@@ -92,14 +92,14 @@ export async function editorLean(project, { note = console.error, provision, det
 
 /** After a good build: set up the editor for a Lake project, unless disabled
  * (LASM_EDITOR=0) or on CI. Never fails the build. */
-export async function autoSetupEditor(source, { log = console.error, env = process.env, cachedOnly = false } = {}) {
+export async function autoSetupEditor(source, { log = console.error, env = process.env, cachedOnly = false, lean: leanFor = editorLean, compileLibrary = compileProjectLibrary } = {}) {
   if (env.LASM_EDITOR === '0' || (env.CI && env.CI !== 'false' && env.LASM_EDITOR !== '1')) return undefined;
   try {
     const { findApplicationProject } = await import('./application-sources.mjs');
     const project = findApplicationProject(source);
     if (!project) return undefined;
     let lean, native;
-    try { ({ lean, native } = await editorLean(project, { note: log, log: () => {}, cachedOnly })); }
+    try { ({ lean, native } = await leanFor(project, { note: log, log: () => {}, cachedOnly })); }
     catch (error) {
       // lasm init on a machine without Lasm's Lean yet: the first build sets the editor up.
       if (error.code === 'ERR_LASM_NOT_CACHED') {
@@ -108,11 +108,21 @@ export async function autoSetupEditor(source, { log = console.error, env = proce
       }
       throw error;
     }
+    if (!cachedOnly) await compileLibrary(project, lean, log);
     return setupEditor({ project, prefix: lean.executionPrefix, version: lean.version, native, log, env });
   } catch (error) {
     log(`[lasm] Editor setup skipped: ${String(error.message).split('\n')[0]}`);
     return { status: 'failed' };
   }
+}
+
+/** Compiles the lazily compiled Lasm library modules the project's files import, so the editor resolves them.
+ * Returns ensureProgramLibrary's result (`compiled`: the modules compiled now). */
+export async function compileProjectLibrary(project, lean, log = console.error) {
+  const { ensureProgramLibrary } = await import('./lazy-library.mjs');
+  const { libraryModules } = await import('./lasm-library.mjs');
+  const { withApplicationLock } = await import('./application-lock.mjs');
+  return ensureProgramLibrary(lean.prefix, project, { eager: libraryModules, log, lock: withApplicationLock });
 }
 
 /** `lasm editor [directory]`: set up (or refresh) the editor explicitly. */
@@ -129,6 +139,8 @@ export async function runEditor({ input = '.' } = {}) {
   try { ({ lean, native } = await editorLean(project, { progress: event => progress.update(event), note: line => notes.push(line) })); }
   finally { progress.finish(); }
   for (const line of notes) console.error(line);
+  // The Lasm library modules this project imports that are compiled on first import (src/lazy-library.mjs).
+  await compileProjectLibrary(project, lean);
   const result = setupEditor({ project, prefix: lean.executionPrefix, version: lean.version, native, explicit: true });
   return result.status === 'linked' || result.status === 'current' ? 0 : 1;
 }

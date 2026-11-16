@@ -363,3 +363,38 @@ for (const [name, corrupt] of [
   // The staging directory is removed, and a good archive installs afterwards.
   assert.equal((await provisionArtifact(f.artifact, f.options)).cacheHit, false);
 });
+
+test('a verified tree accepts library modules compiled into it on first import, as their stamps vouch, and nothing else', async () => {
+  const { verifyArtifactDirectory } = await import('../src/managed-artifacts.mjs');
+  const tree = await mkdtemp(join(tmpdir(), 'lasm-lazy-verify-'));
+  const entry = async (file, text) => {
+    await mkdir(join(tree, file, '..'), { recursive: true });
+    await writeFile(join(tree, file), text);
+    return { type: 'file', bytes: Buffer.byteLength(text), sha256: createHash('sha256').update(text).digest('hex'),
+      ...(process.platform === 'win32' ? {} : { executable: false }) };
+  };
+  try {
+    await mkdir(join(tree, 'lib', 'lean'), { recursive: true });
+    const files = { bin: { type: 'directory' }, 'bin/lean': await entry('bin/lean', 'lean'), lib: { type: 'directory' }, 'lib/lean': { type: 'directory' } };
+    await writeFile(join(tree, '.lasm-artifact.json'), JSON.stringify({ schema: 1, identity: 'id', files }));
+    await verifyArtifactDirectory(tree, 'id');
+    // A module and its stamp.
+    const olean = await entry('lib/lean/Lasm/JS/Web/X.olean', 'olean'), c = await entry('lib/lasm/c/Lasm/JS/Web/X.c', 'c');
+    const source = await entry('src/lean/Lasm/JS/Web/X.lean', 'source');
+    await entry('lib/lasm/lazy/Lasm.JS.Web.X.json', JSON.stringify({ schema: 1, module: 'Lasm.JS.Web.X', identity: 'i',
+      files: { 'lib/lean/Lasm/JS/Web/X.olean': olean, 'lib/lasm/c/Lasm/JS/Web/X.c': c, 'src/lean/Lasm/JS/Web/X.lean': source } }));
+    await verifyArtifactDirectory(tree, 'id');
+    // An interrupted compile's temporary file under lib/ is inert.
+    await entry('lib/lean/Lasm/JS/Web/Y.olean.tmp-123', 'partial');
+    await verifyArtifactDirectory(tree, 'id');
+    // A changed output, a file no stamp vouches for, a stray directory, or a temporary file elsewhere: refused.
+    for (const [file, text, directory] of [['lib/lean/Lasm/JS/Web/X.olean', 'tampered'], ['lib/lean/Lasm/JS/Web/Z.olean', 'unstamped'],
+      ['bin/extra.tmp-1', 'x'], [null, null, 'lib/other'], ['lib/lasm/lazy/Lasm.JS.Web.X.json', '{"files":{}}']]) {
+      const before = file && await readFile(join(tree, file), 'utf8').catch(() => null);
+      if (file) await entry(file, text); else await mkdir(join(tree, directory), { recursive: true });
+      await assert.rejects(verifyArtifactDirectory(tree, 'id'), /Managed cache contents changed/, file ?? directory);
+      if (file && before !== null) await writeFile(join(tree, file), before); else await rm(join(tree, file ?? directory), { recursive: true, force: true });
+      await verifyArtifactDirectory(tree, 'id');
+    }
+  } finally { await rm(tree, { recursive: true, force: true }); }
+});

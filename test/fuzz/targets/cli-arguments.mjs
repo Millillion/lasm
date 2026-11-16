@@ -78,7 +78,7 @@ export function run(bytes) {
 
 export function seeds() {
   return [
-    ['Main.lean'], ['build', 'Main.lean', '--target', 'workers'], ['build', 'Main.lean', 'out', '--dev'], ['run', 'Main.lean', '--', 'a', '--b'],
+    ['Main.lean'], ['build', 'Main.lean', '--target', 'workers'], ['build', 'Main.lean', '--output', 'out', '--dev'], ['run', 'Main.lean', '--', 'a', '--b'],
     ['build', 'Main.lean', '--target=browser', '--suspend', 'jspi', '--bundler'], ['build', 'bindings.json'],
     ['init', 'app', '--template', 'fullstack', '--deploy', 'workers'], ['init', 'app', '-t', 'express', '--deploy=lambda'], ['init', 'app', '--template', 'plain'],
     ['dev', '--target', 'node=Server.lean,browser=Client.lean', '--port', '5173'], ['dev', 'Main.lean', '--release', '--no-run'],

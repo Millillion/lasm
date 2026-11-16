@@ -9,6 +9,11 @@ drift in CI, and are conformance-tested only in local emulators (Viceroy for
 Fastly, wasmtime for WASI), never against real cloud accounts (Jordan,
 2026-11-10; [DECISIONS.md](DECISIONS.md)).
 
+The rules every generated binding shares (overload names, callback names,
+numbers, checked downcasts) and the reviewed override table are in
+[BINDING_RULES.md](BINDING_RULES.md). WIT and witx type their integers and have
+no overloads or callbacks, so no override applies here yet.
+
 | Bindings | Generated from | Generator | Status |
 | --- | --- | --- | --- |
 | `Lasm.Fastly.*` | The witx of Fastly Compute's host ABI that Viceroy v0.21.1 ships (`scripts/fastly/witx/`) | [`scripts/bindings/generate-fastly.mjs`](../scripts/bindings/generate-fastly.mjs) | Current source, not yet released: 244 of 252 functions |
@@ -253,6 +258,34 @@ through preview 1.
   bytes, `fields.entries`) must fit the 2 MiB scratch buffer `cabi_realloc`
   uses (src/wasi/lasm_wasi_http.c), so read bodies in chunks (64 KiB is
   plenty). `blocking-write-and-flush` takes at most 4096 bytes a call (WASI).
+
+### Helpers
+
+`Lasm.WASI.Http.Respond`, imported by `Lasm.WASI.Http`, is hand-written: the
+few lines every wasi:http program otherwise writes for whole bodies.
+
+```lean
+InputStream.readAll (s : InputStream) : IO (Except StreamError ByteArray)            -- to `closed`
+OutputStream.writeAll (s : OutputStream) (bytes : ByteArray) : IO (Except StreamError Unit)  -- 4096 bytes a call
+IncomingRequest.readBody (request : IncomingRequest) : IO ByteArray                  -- consumes and finishes the body
+respond (out : ResponseOutparam) (status : UInt16) (headers : Array (String × String)) (body : ByteArray) : IO Unit
+```
+
+```lean
+import Lasm.WASI.Http
+open Lasm.WASI.Http
+
+def main : IO Unit := IncomingHandler.serve fun request out => do
+  let body ← request.readBody
+  respond out 200 #[("content-type", "text/plain")] s!"{body.size} bytes\n".toUTF8
+```
+
+The stream helpers return the WIT's error, as the calls they repeat do.
+`readBody` and `respond` make several calls each and throw an `IO.Error`
+naming the one that failed (`wasi:http fields.append "connection": …`):
+`respond` checks every header before it sets the response, so a refused
+header sends nothing. Streaming a body, trailers and outgoing requests use the
+generated calls (examples/wasi-http shows each).
 
 ### How it is built
 

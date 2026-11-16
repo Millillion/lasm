@@ -1,6 +1,7 @@
 // Builds a standard bindings conformance program (test/fixtures/js-web for
 // Lasm.JS.Web, test/fixtures/js-node for Lasm.JS.Node, test/fixtures/js-serve for
-// Lasm.JS.Deno, Lasm.JS.Bun and the Node adapter: --fixture) with an
+// Lasm.JS.Deno, Lasm.JS.Bun and the Node adapter, test/fixtures/js-cloudflare for
+// Lasm.JS.Cloudflare: --fixture) with an
 // installed @lasm/cli for each JavaScript target and runs it there
 // (docs/TESTING.md, "Standard bindings"). A target passes when its build
 // succeeds, the program reports a summary, and every failed check is listed
@@ -8,15 +9,20 @@
 // deviation from the spec or the docs, never a binding bug); a listed check
 // that passes fails the run too, so the list stays exact.
 //
-//   node scripts/bindings/test-web.mjs --lasm PATH/bin/lasm.mjs --work DIR [--fixture js-web|js-node|js-serve]
+//   node scripts/bindings/test-web.mjs --lasm PATH/bin/lasm.mjs --work DIR [--fixture js-web|js-node|js-serve|js-cloudflare]
 //     [--targets node,node24,bun,deno,workers,browser-chromium] [--node24 PATH] [--bun PATH]
 //     [--deno PATH] [--wrangler PATH] [--playwright DIR] [--report FILE] [--sizes]
 //
 // CI only for workers (wrangler dev runs workerd locally, offline): platform
-// CLIs are never run on a developer's machine.
+// CLIs are never run on a developer's machine. A fixture with its own
+// wrangler.toml (js-cloudflare: KV, D1, R2, a Durable Object, a queue, all
+// emulated locally) is served from its root with --test-scheduled: the runner
+// triggers its cron handler (/__scheduled) before requesting /, and passes the
+// port of a TCP echo server it starts as the variable ECHO_PORT.
 import { spawn } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync, appendFileSync } from 'node:fs';
 import { createServer, request } from 'node:http';
+import { createServer as createTcpServer } from 'node:net';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -29,9 +35,9 @@ const { values } = parseArgs({ options: {
   sizes: { type: 'boolean', default: false },
 } });
 if (!values.lasm || !values.work) { console.error('--lasm and --work are required'); process.exit(2); }
-if (!['js-web', 'js-node', 'js-serve'].includes(values.fixture)) { console.error('--fixture is js-web, js-node or js-serve'); process.exit(2); }
+if (!['js-web', 'js-node', 'js-serve', 'js-cloudflare'].includes(values.fixture)) { console.error('--fixture is js-web, js-node, js-serve or js-cloudflare'); process.exit(2); }
 const fixture = join(root, 'test', 'fixtures', values.fixture);
-const tierName = { 'js-web': 'Lasm.JS.Web', 'js-node': 'Lasm.JS.Node', 'js-serve': 'Lasm.JS.Deno and Lasm.JS.Bun' }[values.fixture];
+const tierName = { 'js-web': 'Lasm.JS.Web', 'js-node': 'Lasm.JS.Node', 'js-serve': 'Lasm.JS.Deno and Lasm.JS.Bun', 'js-cloudflare': 'Lasm.JS.Cloudflare' }[values.fixture];
 const lasm = resolve(values.lasm), work = resolve(values.work);
 const known = JSON.parse(readFileSync(join(fixture, 'known.json'), 'utf8'));
 const env = { ...process.env, CI: '1', BROWSER: 'none', LASM_EDITOR: '0', NO_COLOR: '1', WRANGLER_SEND_METRICS: 'false' };
@@ -56,23 +62,48 @@ const dirSize = dir => existsSync(dir) ? readdirSync(dir, { recursive: true }).r
   const s = statSync(join(dir, f)); return n + (s.isFile() ? s.size : 0);
 }, 0) : 0;
 const freePort = () => new Promise((ok, fail) => { const s = createServer(); s.once('error', fail); s.listen(0, '127.0.0.1', () => { const { port } = s.address(); s.close(() => ok(port)); }); });
-const get = (port, timeoutMs) => new Promise((ok, fail) => {
-  const r = request({ host: '127.0.0.1', port, path: '/', timeout: timeoutMs }, res => {
+const get = (port, timeoutMs, path = '/') => new Promise((ok, fail) => {
+  const r = request({ host: '127.0.0.1', port, path, timeout: timeoutMs }, res => {
     const chunks = []; res.on('data', c => chunks.push(c)); res.on('end', () => ok({ status: res.statusCode, body: Buffer.concat(chunks).toString('utf8') }));
   });
   r.on('timeout', () => r.destroy(new Error('timeout'))); r.on('error', fail); r.end();
 });
 
+/** A TCP echo server on 127.0.0.1 (js-cloudflare's sockets section): every byte back, then the end. */
+const echoServer = () => new Promise((ok, fail) => {
+  const server = createTcpServer(socket => { socket.on('error', () => {}); socket.pipe(socket); });
+  server.once('error', fail);
+  server.listen(0, '127.0.0.1', () => ok(server));
+});
+
 async function serveWorkers(project) {
   const port = await freePort();
-  const child = spawn(values.wrangler, ['dev', '--cwd', 'workers', '--port', String(port), '--ip', '127.0.0.1', '--show-interactive-dev-session=false'],
-    { cwd: project, env, stdio: ['ignore', 'pipe', 'pipe'] });
+  // A fixture with its own wrangler.toml (its bindings) is served from its root.
+  const own = existsSync(join(project, 'wrangler.toml'));
+  const echo = own ? await echoServer() : null;
+  const args = own ? ['dev', '--port', String(port), '--ip', '127.0.0.1', '--show-interactive-dev-session=false', '--test-scheduled',
+    '--var', `ECHO_PORT:${echo.address().port}`] : ['dev', '--cwd', 'workers', '--port', String(port), '--ip', '127.0.0.1', '--show-interactive-dev-session=false'];
+  const child = spawn(values.wrangler, args, { cwd: project, env, stdio: ['ignore', 'pipe', 'pipe'] });
   const logs = [];
   child.stdout.on('data', d => logs.push(String(d))); child.stderr.on('data', d => logs.push(String(d)));
   try {
     const until = Date.now() + 180_000;
+    // The cron trigger first (its handler records what it saw for the checks of /).
+    let scheduled = !own;
     while (Date.now() < until) {
       if (child.exitCode !== null) throw new Error(`wrangler dev exited (${child.exitCode}):\n${logs.join('').slice(-3000)}`);
+      if (!scheduled) {
+        try {
+          // A failed handler is reported by the checks of / (scheduled section); its answer goes to the log.
+          const res = await get(port, 60_000, '/__scheduled?cron=*/5+*+*+*+*');
+          if (res.status !== 200) logs.push(`\n[test-web] /__scheduled answered ${res.status}: ${res.body.slice(0, 2000)}\n`);
+          scheduled = true;
+        } catch (error) {
+          if (/timeout/.test(String(error))) throw error;
+          await new Promise(r => setTimeout(r, 500));
+        }
+        continue;
+      }
       try {
         // The first answered request runs every check (minutes on a slow runner).
         const res = await get(port, 600_000);
@@ -83,7 +114,7 @@ async function serveWorkers(project) {
       }
     }
     throw new Error(`wrangler dev did not answer:\n${logs.join('').slice(-3000)}`);
-  } finally { child.kill('SIGTERM'); }
+  } finally { child.kill('SIGTERM'); echo?.close(); }
 }
 
 const TARGETS = {
@@ -169,6 +200,8 @@ if (values.sizes) {
   const sizeFixture = join(root, 'test', 'fixtures', `${values.fixture}-size`);
   // js-web: Browser.lean imports the browser tier too (Lasm.JS.Web.Browser), built for the browser as well.
   const sizeTargets = values.fixture === 'js-web' ? [['node', [], 'dist'], ['deno', ['--target', 'deno'], 'deno'], ['browser', ['--target', 'browser'], 'dist']]
+    // js-cloudflare: the Workers build, the only target of Lasm.JS.Cloudflare.
+    : values.fixture === 'js-cloudflare' ? [['workers', ['--target', 'workers'], 'workers']]
     : [['node', [], 'dist'], ['deno', ['--target', 'deno'], 'deno']];
   const programs = readdirSync(sizeFixture).filter(f => f.endsWith('.lean')).map(f => f.slice(0, -5)).sort((a, b) => (a !== 'Base') - (b !== 'Base') || a.localeCompare(b));
   for (const [target, flags, output] of sizeTargets) {

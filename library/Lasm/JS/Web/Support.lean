@@ -62,6 +62,13 @@ def optionalValue : Data → IO (Option Value)
 def arrayBufferBytes (buffer : Value) : IO ByteArray :=
   Binding.invoke ByteArray { name := "Lasm.JS.Web.Support.arrayBufferBytes", module := "globalThis", path := "Uint8Array", construct := true, arity := 1 } #[.ref buffer ""] (await := false)
 
+/-- The bytes of a nullable `ArrayBuffer` result, read as data: `none` for null or undefined
+(a reference-mode result would be a reference to null). -/
+def nullableArrayBufferBytes : Data → IO (Option ByteArray)
+  | .null | .undefined => pure none
+  | .ref buffer _ => some <$> arrayBufferBytes buffer
+  | d => throw (IO.userError s!"expected an ArrayBuffer or null, got {d.describe}")
+
 /-- The bytes of a typed array result: a `Uint8Array` arrives as bytes; any other view (ImageData's
 `Uint8ClampedArray`) is copied through `new Uint8Array(view.buffer, view.byteOffset, view.byteLength)`. -/
 def viewBytes : Data → IO ByteArray
@@ -103,6 +110,15 @@ def getGlobal (path : List String) (α : Type) [FromJS α] : IO α := do
     | [k] => o.get k α
     | k :: ks => do go (← o.get k Value) ks
   go (← global) path
+
+/-- `v instanceof C`, for the constructor `ctor` reads (`C.prototype.isPrototypeOf(v)`, which is
+`instanceof` for the platform's classes): `false` when `ctor` fails or is not a constructor (a
+runtime without `C`). The generated `I.cast?` (docs/BINDING_RULES.md, rule A12). -/
+def isInstance (ctor : IO Value) (v : Value) : IO Bool := do
+  try
+    let proto ← (← ctor).get "prototype" Value
+    proto.callMethod "isPrototypeOf" #[.ref v ""] Bool
+  catch _ => return false
 
 end Support
 end Lasm.JS.Web
