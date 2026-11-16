@@ -208,7 +208,7 @@ def fsChecks (r : Checks) (live : Live) : Async Unit := do
       let p := s!"{dir}/text{i}.txt"
       Deno.writeTextFile (.domString p) (.domString s) none
       expect r s!"text[{i}]" ((← Deno.readTextFile (.domString p) none) == s && (← Deno.readTextFileSync (.domString p)) == s) ""
-      expect r s!"text size[{i}]" ((← Deno.stat (.domString p)).size == (utf8 s).size.toFloat) ""
+      expect r s!"text size[{i}]" ((← Deno.stat (.domString p)).size == (utf8 s).size) ""
     for i in [0:16] do
       let (b, g') := g.bytes 2000; g := g'
       let p := s!"{dir}/bytes{i}.bin"
@@ -279,7 +279,7 @@ def fsChecks (r : Checks) (live : Live) : Async Unit := do
     let (b, _) := g.bytes 5000
     writeAll (← f.writable) b
     let f2 ← Deno.«open» (.domString p) (some { read := some true, write := some true })
-    expect r "FsFile.stat" ((← f2.stat).size == b.size.toFloat) ""
+    expect r "FsFile.stat" ((← f2.stat).size == b.size) ""
     let pos ← f2.seek (.double 10) 0
     expect r "FsFile.seek" (pos == 10) s!"{pos}"
     let rest ← readAll (← f2.readable)
@@ -360,7 +360,7 @@ def netChecks (r : Checks) (live : Live) : Async Unit := do
     let mut g : Rng := ⟨61⟩
     let (b, _) := g.bytes 20000
     let accepted ← (l.accept).asTask
-    let c ← Deno.connect { port := addr.port.toFloat, hostname := some "127.0.0.1" }
+    let c ← Deno.connect { port := addr.port, hostname := some "127.0.0.1" }
     see live "TcpConn" c.val
     see live "Conn" c.val
     c.setNoDelay (some true); c.setKeepAlive (some true)
@@ -376,7 +376,7 @@ def netChecks (r : Checks) (live : Live) : Async Unit := do
     see live "TlsListener" l.val
     let port := (← l.addr).port
     let accepted ← (l.accept).asTask
-    let c ← Deno.connectTls { port := port.toFloat, hostname := some "localhost", caCerts := some #[Tls.ca] }
+    let c ← Deno.connectTls { port := port, hostname := some "localhost", caCerts := some #[Tls.ca] }
     see live "TlsConn" c.val
     discard <| c.handshake
     let server ← Std.Async.await accepted

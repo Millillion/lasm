@@ -287,6 +287,10 @@ instance : FromJS WebAssemblyInstantiatedSource where
     «instance» := ← Lasm.JS.readField WebAssembly.Instance d "instance" }
   typeName := "Lasm.JS.Web.WebAssemblyInstantiatedSource"
 
+/-- `v instanceof WebAssembly.Module`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Module`). -/
+def WebAssembly.Module.cast? (v : Value) : IO (Option WebAssembly.Module) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Module"] Value) v) then some { val := v } else none
+
 /-- `constructor(AllowSharedBufferSource bytes, optional WebAssemblyCompileOptions options)` -/
 def WebAssembly.Module.new (bytes : ByteArray) (options : Option WebAssemblyCompileOptions := none) : IO WebAssembly.Module :=
   Lasm.JS.Binding.invoke WebAssembly.Module { name := "Lasm.JS.Web.WebAssembly.Module.new", module := "globalThis", path := "WebAssembly.Module", construct := true, arity := 2 }
@@ -308,6 +312,10 @@ def WebAssembly.Module.customSections (moduleObject : WebAssembly.Module) (secti
     (Support.args #[toJS moduleObject, toJS sectionName]) (await := false)
   (fun x => x.mapM Support.arrayBufferBytes) r
 
+/-- `v instanceof WebAssembly.Instance`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Instance`). -/
+def WebAssembly.Instance.cast? (v : Value) : IO (Option WebAssembly.Instance) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Instance"] Value) v) then some { val := v } else none
+
 /-- `constructor(Module module, optional object importObject)` -/
 def WebAssembly.Instance.new («module» : WebAssembly.Module) (importObject : Data := .undefined) : IO WebAssembly.Instance :=
   Lasm.JS.Binding.invoke WebAssembly.Instance { name := "Lasm.JS.Web.WebAssembly.Instance.new", module := "globalThis", path := "WebAssembly.Instance", construct := true, arity := 2 }
@@ -315,6 +323,10 @@ def WebAssembly.Instance.new («module» : WebAssembly.Module) (importObject : D
 
 /-- `readonly attribute object exports` -/
 def WebAssembly.Instance.exports (self : WebAssembly.Instance) : IO Data := self.val.get "exports" Data
+
+/-- `v instanceof WebAssembly.Memory`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Memory`). -/
+def WebAssembly.Memory.cast? (v : Value) : IO (Option WebAssembly.Memory) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Memory"] Value) v) then some { val := v } else none
 
 /-- `constructor(MemoryDescriptor descriptor)` -/
 def WebAssembly.Memory.new (descriptor : MemoryDescriptor) : IO WebAssembly.Memory :=
@@ -340,6 +352,10 @@ def WebAssembly.Memory.toResizableBuffer (self : WebAssembly.Memory) : IO ByteAr
   let r ← self.val.callMethod "toResizableBuffer" (Support.args #[]) Value
   Support.arrayBufferBytes r
 
+/-- `v instanceof WebAssembly.Table`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Table`). -/
+def WebAssembly.Table.cast? (v : Value) : IO (Option WebAssembly.Table) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Table"] Value) v) then some { val := v } else none
+
 /-- `constructor(TableDescriptor descriptor, optional any value)` -/
 def WebAssembly.Table.new (descriptor : TableDescriptor) (value : Data := .undefined) : IO WebAssembly.Table :=
   Lasm.JS.Binding.invoke WebAssembly.Table { name := "Lasm.JS.Web.WebAssembly.Table.new", module := "globalThis", path := "WebAssembly.Table", construct := true, arity := 2 }
@@ -360,6 +376,10 @@ def WebAssembly.Table.get (self : WebAssembly.Table) (index : Data) : IO Data :=
 def WebAssembly.Table.set (self : WebAssembly.Table) (index : Data) (value : Data := .undefined) : IO Unit :=
   self.val.callMethod "set" (Support.args #[toJS index, value]) Unit
 
+/-- `v instanceof WebAssembly.Global`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Global`). -/
+def WebAssembly.Global.cast? (v : Value) : IO (Option WebAssembly.Global) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Global"] Value) v) then some { val := v } else none
+
 /-- `constructor(GlobalDescriptor descriptor, optional any v)` -/
 def WebAssembly.Global.new (descriptor : GlobalDescriptor) (v : Data := .undefined) : IO WebAssembly.Global :=
   Lasm.JS.Binding.invoke WebAssembly.Global { name := "Lasm.JS.Web.WebAssembly.Global.new", module := "globalThis", path := "WebAssembly.Global", construct := true, arity := 2 }
@@ -376,10 +396,18 @@ def WebAssembly.Global.setValue (self : WebAssembly.Global) (value : Data) : IO 
 def WebAssembly.Global.valueOf (self : WebAssembly.Global) : IO Data :=
   self.val.callMethod "valueOf" (Support.args #[]) Data
 
+/-- `v instanceof WebAssembly.Tag`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Tag`). -/
+def WebAssembly.Tag.cast? (v : Value) : IO (Option WebAssembly.Tag) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Tag"] Value) v) then some { val := v } else none
+
 /-- `constructor(TagType type)` -/
 def WebAssembly.Tag.new (type : TagType) : IO WebAssembly.Tag :=
   Lasm.JS.Binding.invoke WebAssembly.Tag { name := "Lasm.JS.Web.WebAssembly.Tag.new", module := "globalThis", path := "WebAssembly.Tag", construct := true, arity := 1 }
     (Support.args #[toJS type]) (await := false)
+
+/-- `v instanceof WebAssembly.Exception`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.Exception`). -/
+def WebAssembly.Exception.cast? (v : Value) : IO (Option WebAssembly.Exception) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "Exception"] Value) v) then some { val := v } else none
 
 /-- `constructor(Tag exceptionTag, sequence<any> payload, optional ExceptionOptions options)` -/
 def WebAssembly.Exception.new (exceptionTag : WebAssembly.Tag) (payload : Array Data) (options : Option ExceptionOptions := none) : IO WebAssembly.Exception :=
@@ -397,6 +425,10 @@ def WebAssembly.Exception.getArg (self : WebAssembly.Exception) (exceptionTag : 
 def WebAssembly.Exception.is (self : WebAssembly.Exception) (exceptionTag : WebAssembly.Tag) : IO Bool :=
   self.val.callMethod "is" (Support.args #[toJS exceptionTag]) Bool
 
+/-- `v instanceof WebAssembly.CompileError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.CompileError`). -/
+def WebAssembly.CompileError.cast? (v : Value) : IO (Option WebAssembly.CompileError) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "CompileError"] Value) v) then some { val := v } else none
+
 /-- `constructor(optional DOMString message)` -/
 def WebAssembly.CompileError.new (message : Option String := none) : IO WebAssembly.CompileError :=
   Lasm.JS.Binding.invoke WebAssembly.CompileError { name := "Lasm.JS.Web.WebAssembly.CompileError.new", module := "globalThis", path := "WebAssembly.CompileError", construct := true, arity := 1 }
@@ -408,6 +440,10 @@ def WebAssembly.CompileError.name (self : WebAssembly.CompileError) : IO String 
 /-- `readonly attribute DOMString message` -/
 def WebAssembly.CompileError.message (self : WebAssembly.CompileError) : IO String := self.val.get "message" String
 
+/-- `v instanceof WebAssembly.LinkError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.LinkError`). -/
+def WebAssembly.LinkError.cast? (v : Value) : IO (Option WebAssembly.LinkError) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "LinkError"] Value) v) then some { val := v } else none
+
 /-- `constructor(optional DOMString message)` -/
 def WebAssembly.LinkError.new (message : Option String := none) : IO WebAssembly.LinkError :=
   Lasm.JS.Binding.invoke WebAssembly.LinkError { name := "Lasm.JS.Web.WebAssembly.LinkError.new", module := "globalThis", path := "WebAssembly.LinkError", construct := true, arity := 1 }
@@ -418,6 +454,10 @@ def WebAssembly.LinkError.name (self : WebAssembly.LinkError) : IO String := sel
 
 /-- `readonly attribute DOMString message` -/
 def WebAssembly.LinkError.message (self : WebAssembly.LinkError) : IO String := self.val.get "message" String
+
+/-- `v instanceof WebAssembly.RuntimeError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebAssembly.RuntimeError`). -/
+def WebAssembly.RuntimeError.cast? (v : Value) : IO (Option WebAssembly.RuntimeError) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WebAssembly", "RuntimeError"] Value) v) then some { val := v } else none
 
 /-- `constructor(optional DOMString message)` -/
 def WebAssembly.RuntimeError.new (message : Option String := none) : IO WebAssembly.RuntimeError :=

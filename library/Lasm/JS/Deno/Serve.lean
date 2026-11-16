@@ -270,8 +270,8 @@ structure ServeVsockOptions where
   transport : Option ServeVsockOptionsTransport := none
   /-- `required double cid` -/
   cid : Float
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
 instance : ToJS ServeVsockOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
     ("onError", Support.optional d.onError),
     ("onListen", Support.optional d.onListen),

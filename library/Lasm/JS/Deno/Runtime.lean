@@ -392,11 +392,11 @@ def Env.has (self : Env) (key : String) : IO Bool :=
 def Env.toObject (self : Env) : IO (Record String) :=
   self.val.callMethod "toObject" (Support.args #[]) (Record String)
 
-/-- `const Deno.pid: number`: `readonly attribute double pid` (Deno 2.9.6 type declarations) -/
-def pid : IO Float := Support.getGlobal ["Deno", "pid"] Float
+/-- `const Deno.pid: number`: `readonly attribute double /* integer: Int */ pid` (Deno 2.9.6 type declarations) -/
+def pid : IO Int := Support.getGlobal ["Deno", "pid"] Int
 
-/-- `const Deno.ppid: number`: `readonly attribute double ppid` (Deno 2.9.6 type declarations) -/
-def ppid : IO Float := Support.getGlobal ["Deno", "ppid"] Float
+/-- `const Deno.ppid: number`: `readonly attribute double /* integer: Int */ ppid` (Deno 2.9.6 type declarations) -/
+def ppid : IO Int := Support.getGlobal ["Deno", "ppid"] Int
 
 /-- `const Deno.noColor: boolean`: `readonly attribute boolean noColor` (Deno 2.9.6 type declarations) -/
 def noColor : IO Bool := Support.getGlobal ["Deno", "noColor"] Bool

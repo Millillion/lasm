@@ -6,6 +6,7 @@ import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fastlyToml } from './wasi/wasi-build.mjs';
 import { packageTargets } from './package.mjs';
+import { targetHintAmong } from './cli-arguments.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const templateRoot = join(root, 'templates');
@@ -88,6 +89,7 @@ Example: npx @lasm/cli init my-app --template hono`;
 export function parseInitArguments(tokens) {
   const result = { command: 'init', template: 'plain', deploy: [] };
   const positional = [];
+  let templateGiven = false;
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
     if (token === '--help' || token === '-h') return { command: 'init-help' };
@@ -95,12 +97,14 @@ export function parseInitArguments(tokens) {
     if (match) {
       const value = match[1] ?? tokens[++i];
       if (!value || value.startsWith('-')) throw new Error('--template requires a value\n\n' + initUsage);
+      if (templateGiven) throw new Error('Specify --template only once');
+      templateGiven = true;
       result.template = value; continue;
     }
     const deploy = /^--deploy(?:=(.*))?$/s.exec(token);
     if (deploy) {
       const value = deploy[1] ?? tokens[++i];
-      if (!Object.hasOwn(deployTargets, value ?? '')) throw new Error(`--deploy accepts ${Object.keys(deployTargets).join(', ')}\n\n` + initUsage);
+      if (!Object.hasOwn(deployTargets, value ?? '')) throw new Error(`--deploy accepts ${Object.keys(deployTargets).join(', ')}${value ? targetHintAmong(value, Object.keys(deployTargets), '--deploy') : ''}\n\n` + initUsage);
       if (!result.deploy.includes(value)) result.deploy.push(value);
       continue;
     }
@@ -110,7 +114,7 @@ export function parseInitArguments(tokens) {
   if (positional.length !== 1) throw new Error(initUsage);
   // Own keys only: `constructor` or `__proto__` is not a template (found by test/fuzz).
   if (!Object.hasOwn(templates, result.template))
-    throw new Error(`Unknown template "${result.template}". Choose one of: ${Object.keys(templates).join(', ')}`);
+    throw new Error(`Unknown template "${result.template}"${targetHintAmong(result.template, Object.keys(templates), '--template')}. Choose one of: ${Object.keys(templates).join(', ')}`);
   const serverOnly = result.deploy.find(target => !deployTargets[target].cli);
   if (serverOnly && !templates[result.template].server)
     throw new Error(`--deploy ${serverOnly} needs a server template (express, hono, fastify, std-http or fetch), not ${result.template}`);

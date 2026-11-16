@@ -9,6 +9,11 @@ drift in CI, and are conformance-tested only in local emulators (Viceroy for
 Fastly, wasmtime for WASI), never against real cloud accounts (Jordan,
 2026-11-10; [DECISIONS.md](DECISIONS.md)).
 
+The rules every generated binding shares (overload names, callback names,
+numbers, checked downcasts) and the reviewed override table are in
+[BINDING_RULES.md](BINDING_RULES.md). WIT and witx type their integers and have
+no overloads or callbacks, so no override applies here yet.
+
 | Bindings | Generated from | Generator | Status |
 | --- | --- | --- | --- |
 | `Lasm.Fastly.*` | The witx of Fastly Compute's host ABI that Viceroy v0.21.1 ships (`scripts/fastly/witx/`) | [`scripts/bindings/generate-fastly.mjs`](../scripts/bindings/generate-fastly.mjs) | Current source, not yet released: 244 of 252 functions |

@@ -1988,14 +1988,14 @@ def DOMStringOrUint8ArrayOrArrayBuffer.decode (d : Data) : IO DOMStringOrUint8Ar
 
 /-- `dictionary FileSinkStartOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileSinkStartOptions where
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
 instance : ToJS FileSinkStartOptions := ⟨fun d => Support.fields #[("highWaterMark", Support.optional d.highWaterMark)]⟩
 
 /-- `dictionary BunFileWriterOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BunFileWriterOptions where
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
 instance : ToJS BunFileWriterOptions := ⟨fun d => Support.fields #[("highWaterMark", Support.optional d.highWaterMark)]⟩
 
 /-- `typedef DOMString or Uint8Array or ArrayBuffer or Request or Response or BunFile or ReadableStream DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrReadableStream`: one constructor per member type. -/
@@ -2030,8 +2030,8 @@ instance : Coe ReadableStream DOMStringOrUint8ArrayOrArrayBufferOrRequestOrRespo
 
 /-- `dictionary BunFileWriteOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BunFileWriteOptions where
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
 instance : ToJS BunFileWriteOptions := ⟨fun d => Support.fields #[("highWaterMark", Support.optional d.highWaterMark)]⟩
 
 /-- `typedef DOMString or Blob or Uint8Array BlobPart`: one constructor per member type. -/
@@ -2153,8 +2153,8 @@ instance : Coe Archive DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBu
 
 /-- `dictionary S3Stats` (Bun 1.4.4 type declarations, s3.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure S3Stats where
-  /-- `required double size` -/
-  size : Float
+  /-- `required double /* integer: Nat */ size` -/
+  size : Nat
   /-- `required object lastModified` -/
   lastModified : Data
   /-- `required DOMString etag` -/
@@ -2163,7 +2163,7 @@ structure S3Stats where
   type : String
 instance : FromJS S3Stats where
   fromJS d := do return {
-    size := ← Lasm.JS.readField Float d "size",
+    size := ← Lasm.JS.readField Nat d "size",
     lastModified := ← Lasm.JS.readField Data d "lastModified",
     etag := ← Lasm.JS.readField String d "etag",
     type := ← Lasm.JS.readField String d "type" }
@@ -2818,7 +2818,7 @@ instance : FromJS UdpReceiveFlags where
     ipv6 := ← Lasm.JS.readField Bool d "ipv6" }
   typeName := "Lasm.JS.Bun.UdpReceiveFlags"
 
-/-- `callback UdpSocketHandlerData = Promise<undefined> (UdpSocket socket, Uint8Array data, double port, DOMString address, UdpReceiveFlags flags)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback UdpSocketHandlerData = Promise<undefined> (UdpSocket socket, Uint8Array data, double /* integer: Nat */ port, DOMString address, UdpReceiveFlags flags)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure UdpSocketHandlerData where
   /-- The JavaScript function. -/
   val : Value
@@ -2826,14 +2826,14 @@ instance : Nonempty UdpSocketHandlerData := ⟨{ val := Classical.ofNonempty }�
 instance : ToJS UdpSocketHandlerData := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UdpSocketHandlerData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpSocketHandlerData", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def UdpSocketHandlerData.ofFn (f : UdpSocket → ByteArray → Float → String → UdpReceiveFlags → Async Unit) : IO UdpSocketHandlerData := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Float args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
+def UdpSocketHandlerData.ofFn (f : UdpSocket → ByteArray → Nat → String → UdpReceiveFlags → Async Unit) : IO UdpSocketHandlerData := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Nat args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 5)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def UdpSocketHandlerData.ofSyncFn (f : UdpSocket → ByteArray → Float → String → UdpReceiveFlags → IO Unit) : IO UdpSocketHandlerData := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Float args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
+def UdpSocketHandlerData.ofSyncFn (f : UdpSocket → ByteArray → Nat → String → UdpReceiveFlags → IO Unit) : IO UdpSocketHandlerData := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Nat args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 5)]] Value
   return { val := fn }
@@ -2890,7 +2890,7 @@ instance : ToJS UdpSocketHandler := ⟨fun d => Support.fields #[("data", Suppor
     ("drain", Support.optional d.drain),
     ("error", Support.optional d.error)]⟩
 
-/-- `callback UdpConnectedSocketHandlerData = Promise<undefined> (UdpConnectedSocket socket, Uint8Array data, double port, DOMString address, UdpReceiveFlags flags)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback UdpConnectedSocketHandlerData = Promise<undefined> (UdpConnectedSocket socket, Uint8Array data, double /* integer: Nat */ port, DOMString address, UdpReceiveFlags flags)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure UdpConnectedSocketHandlerData where
   /-- The JavaScript function. -/
   val : Value
@@ -2898,14 +2898,14 @@ instance : Nonempty UdpConnectedSocketHandlerData := ⟨{ val := Classical.ofNon
 instance : ToJS UdpConnectedSocketHandlerData := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UdpConnectedSocketHandlerData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpConnectedSocketHandlerData", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def UdpConnectedSocketHandlerData.ofFn (f : UdpConnectedSocket → ByteArray → Float → String → UdpReceiveFlags → Async Unit) : IO UdpConnectedSocketHandlerData := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Float args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
+def UdpConnectedSocketHandlerData.ofFn (f : UdpConnectedSocket → ByteArray → Nat → String → UdpReceiveFlags → Async Unit) : IO UdpConnectedSocketHandlerData := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Nat args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 5)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def UdpConnectedSocketHandlerData.ofSyncFn (f : UdpConnectedSocket → ByteArray → Float → String → UdpReceiveFlags → IO Unit) : IO UdpConnectedSocketHandlerData := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Float args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
+def UdpConnectedSocketHandlerData.ofSyncFn (f : UdpConnectedSocket → ByteArray → Nat → String → UdpReceiveFlags → IO Unit) : IO UdpConnectedSocketHandlerData := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Nat args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 5)]] Value
   return { val := fn }
@@ -3154,8 +3154,8 @@ instance : Coe String DoubleOrDOMString := ⟨.domString⟩
 structure ArrayBufferSinkStartOptions where
   /-- `boolean asUint8Array` -/
   asUint8Array : Option Bool := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `boolean stream` -/
   stream : Option Bool := none
 instance : ToJS ArrayBufferSinkStartOptions := ⟨fun d => Support.fields #[("asUint8Array", Support.optional d.asUint8Array),
@@ -3351,8 +3351,8 @@ instance : ToJS PasswordArgon2Algorithm := ⟨fun d => Support.fields #[("algori
 structure PasswordBCryptAlgorithm where
   /-- `required PasswordBCryptAlgorithmAlgorithm algorithm` -/
   algorithm : PasswordBCryptAlgorithmAlgorithm
-  /-- `double cost` -/
-  cost : Option Float := none
+  /-- `double /* integer: Nat */ cost` -/
+  cost : Option Nat := none
 instance : ToJS PasswordBCryptAlgorithm := ⟨fun d => Support.fields #[("algorithm", toJS d.algorithm),
     ("cost", Support.optional d.cost)]⟩
 
@@ -3470,8 +3470,8 @@ instance : Coe FetchProxyOption FetchProxyOptionUnion := ⟨.fetchProxyOption⟩
 
 /-- `dictionary FetchSessionInitKeepAlive` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FetchSessionInitKeepAlive where
-  /-- `double idleTimeout` -/
-  idleTimeout : Option Float := none
+  /-- `double /* integer: Nat */ idleTimeout` -/
+  idleTimeout : Option Nat := none
   /-- `double maxIdleSockets` -/
   maxIdleSockets : Option Float := none
 instance : ToJS FetchSessionInitKeepAlive := ⟨fun d => Support.fields #[("idleTimeout", Support.optional d.idleTimeout),
@@ -4268,8 +4268,8 @@ structure TCPSocketConnectOptions where
   allowHalfOpen : Option Bool := none
   /-- `required DOMString hostname` -/
   hostname : String
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
   /-- `TLSOptionsOrBoolean tls` -/
   tls : Option TLSOptionsOrBoolean := none
   /-- `boolean exclusive` -/
@@ -4316,8 +4316,8 @@ structure TCPSocketListenOptions where
   allowHalfOpen : Option Bool := none
   /-- `required DOMString hostname` -/
   hostname : String
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
   /-- `TLSOptionsOrBoolean tls` -/
   tls : Option TLSOptionsOrBoolean := none
   /-- `boolean exclusive` -/
@@ -4334,8 +4334,8 @@ instance : ToJS TCPSocketListenOptions := ⟨fun d => Support.fields #[("socket"
 structure UdpSocketOptions where
   /-- `DOMString hostname` -/
   hostname : Option String := none
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `UdpSocketOptionsBinaryType binaryType` -/
   binaryType : Option UdpSocketOptionsBinaryType := none
   /-- `UdpSocketHandler socket` -/
@@ -4349,8 +4349,8 @@ instance : ToJS UdpSocketOptions := ⟨fun d => Support.fields #[("hostname", Su
 structure UdpConnectSocketOptionsConnect where
   /-- `required DOMString hostname` -/
   hostname : String
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
 instance : ToJS UdpConnectSocketOptionsConnect := ⟨fun d => Support.fields #[("hostname", toJS d.hostname),
     ("port", toJS d.port)]⟩
 
@@ -4358,8 +4358,8 @@ instance : ToJS UdpConnectSocketOptionsConnect := ⟨fun d => Support.fields #[(
 structure UdpConnectSocketOptions where
   /-- `DOMString hostname` -/
   hostname : Option String := none
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `UdpConnectSocketOptionsBinaryType binaryType` -/
   binaryType : Option UdpConnectSocketOptionsBinaryType := none
   /-- `UdpConnectedSocketHandler socket` -/
@@ -4465,10 +4465,10 @@ structure SpawnCmdOptions where
   cwd : Option String := none
   /-- `boolean detached` -/
   detached : Option Bool := none
-  /-- `double uid` -/
-  uid : Option Float := none
-  /-- `double gid` -/
-  gid : Option Float := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
   /-- `DOMStringOrDouble cgroup` -/
   cgroup : Option DOMStringOrDouble := none
   /-- `record<DOMString, DOMString> env` -/
@@ -4497,12 +4497,12 @@ structure SpawnCmdOptions where
   argv0 : Option String := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `DOMStringOrDouble killSignal` -/
   killSignal : Option DOMStringOrDouble := none
-  /-- `double maxBuffer` -/
-  maxBuffer : Option Float := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
   /-- `boolean lazy` -/
   lazy : Option Bool := none
   /-- `TerminalOptionsOrTerminal terminal` -/
@@ -4540,10 +4540,10 @@ structure SpawnSpawnOptionsIgnorePipeInherit where
   cwd : Option String := none
   /-- `boolean detached` -/
   detached : Option Bool := none
-  /-- `double uid` -/
-  uid : Option Float := none
-  /-- `double gid` -/
-  gid : Option Float := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
   /-- `DOMStringOrDouble cgroup` -/
   cgroup : Option DOMStringOrDouble := none
   /-- `record<DOMString, DOMString> env` -/
@@ -4572,12 +4572,12 @@ structure SpawnSpawnOptionsIgnorePipeInherit where
   argv0 : Option String := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `DOMStringOrDouble killSignal` -/
   killSignal : Option DOMStringOrDouble := none
-  /-- `double maxBuffer` -/
-  maxBuffer : Option Float := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
   /-- `boolean lazy` -/
   lazy : Option Bool := none
   /-- `TerminalOptionsOrTerminal terminal` -/
@@ -4672,10 +4672,10 @@ structure SpawnSyncCmdOptions where
   cwd : Option String := none
   /-- `boolean detached` -/
   detached : Option Bool := none
-  /-- `double uid` -/
-  uid : Option Float := none
-  /-- `double gid` -/
-  gid : Option Float := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
   /-- `DOMStringOrDouble cgroup` -/
   cgroup : Option DOMStringOrDouble := none
   /-- `record<DOMString, DOMString> env` -/
@@ -4704,12 +4704,12 @@ structure SpawnSyncCmdOptions where
   argv0 : Option String := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `DOMStringOrDouble killSignal` -/
   killSignal : Option DOMStringOrDouble := none
-  /-- `double maxBuffer` -/
-  maxBuffer : Option Float := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
   /-- `required sequence<DOMString> cmd` -/
   cmd : Array String
 instance : ToJS SpawnSyncCmdOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
@@ -4753,8 +4753,8 @@ structure ReadableSyncSubprocess where
   exitedDueToTimeout : Option Bool := none
   /-- `boolean exitedDueToMaxBuffer` -/
   exitedDueToMaxBuffer : Option Bool := none
-  /-- `required double pid` -/
-  pid : Float
+  /-- `required double /* integer: Int */ pid` -/
+  pid : Int
 instance : FromJS ReadableSyncSubprocess where
   fromJS d := do return {
     stdout := ← Lasm.JS.readField (Option ByteArray) d "stdout",
@@ -4765,7 +4765,7 @@ instance : FromJS ReadableSyncSubprocess where
     signalCode := ← Lasm.JS.readField (Option DOMStringOrDouble) d "signalCode",
     exitedDueToTimeout := ← Lasm.JS.readField (Option Bool) d "exitedDueToTimeout",
     exitedDueToMaxBuffer := ← Lasm.JS.readField (Option Bool) d "exitedDueToMaxBuffer",
-    pid := ← Lasm.JS.readField Float d "pid" }
+    pid := ← Lasm.JS.readField Int d "pid" }
   typeName := "Lasm.JS.Bun.ReadableSyncSubprocess"
 
 /-- `dictionary SpawnSpawnSyncOptionsIgnorePipePipe : SpawnBaseOptionsIgnorePipePipe` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -4774,10 +4774,10 @@ structure SpawnSpawnSyncOptionsIgnorePipePipe where
   cwd : Option String := none
   /-- `boolean detached` -/
   detached : Option Bool := none
-  /-- `double uid` -/
-  uid : Option Float := none
-  /-- `double gid` -/
-  gid : Option Float := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
   /-- `DOMStringOrDouble cgroup` -/
   cgroup : Option DOMStringOrDouble := none
   /-- `record<DOMString, DOMString> env` -/
@@ -4806,12 +4806,12 @@ structure SpawnSpawnSyncOptionsIgnorePipePipe where
   argv0 : Option String := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `DOMStringOrDouble killSignal` -/
   killSignal : Option DOMStringOrDouble := none
-  /-- `double maxBuffer` -/
-  maxBuffer : Option Float := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
 instance : ToJS SpawnSpawnSyncOptionsIgnorePipePipe := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
     ("detached", Support.optional d.detached),
     ("uid", Support.optional d.uid),
@@ -5907,8 +5907,8 @@ structure DnsLookupOptions where
   socketType : Option DnsLookupOptionsSocketType := none
   /-- `double flags` -/
   flags : Option Float := none
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `DnsLookupOptionsBackend backend` -/
   backend : Option DnsLookupOptionsBackend := none
 instance : ToJS DnsLookupOptions := ⟨fun d => Support.fields #[("family", Support.optional d.family),
@@ -5940,8 +5940,8 @@ structure DnsGetCacheStatsResult where
   cacheHitsInflight : Float
   /-- `required double cacheMisses` -/
   cacheMisses : Float
-  /-- `required double size` -/
-  size : Float
+  /-- `required double /* integer: Nat */ size` -/
+  size : Nat
   /-- `required double errors` -/
   errors : Float
   /-- `required double totalCount` -/
@@ -5951,7 +5951,7 @@ instance : FromJS DnsGetCacheStatsResult where
     cacheHitsCompleted := ← Lasm.JS.readField Float d "cacheHitsCompleted",
     cacheHitsInflight := ← Lasm.JS.readField Float d "cacheHitsInflight",
     cacheMisses := ← Lasm.JS.readField Float d "cacheMisses",
-    size := ← Lasm.JS.readField Float d "size",
+    size := ← Lasm.JS.readField Nat d "size",
     errors := ← Lasm.JS.readField Float d "errors",
     totalCount := ← Lasm.JS.readField Float d "totalCount" }
   typeName := "Lasm.JS.Bun.DnsGetCacheStatsResult"
@@ -6299,12 +6299,12 @@ def SocketUnknown.alpnProtocol (self : SocketUnknown) : IO (Option DOMStringOrBo
 /-- `readonly bytesWritten: number`: `readonly attribute double bytesWritten` -/
 def SocketUnknown.bytesWritten (self : SocketUnknown) : IO Float := self.val.get "bytesWritten" Float
 
-/-- `write(data: string | BufferSource, byteOffset?: number, byteLength?: number): number`: `double write(DOMStringOrUint8Array data, optional double byteOffset, optional double byteLength)` -/
-def SocketUnknown.write (self : SocketUnknown) (data : DOMStringOrUint8Array) (byteOffset : Option Float := none) (byteLength : Option Float := none) : IO Float :=
+/-- `write(data: string | BufferSource, byteOffset?: number, byteLength?: number): number`: `double write(DOMStringOrUint8Array data, optional double byteOffset, optional double /* integer: Nat */ byteLength)` -/
+def SocketUnknown.write (self : SocketUnknown) (data : DOMStringOrUint8Array) (byteOffset : Option Float := none) (byteLength : Option Nat := none) : IO Float :=
   self.val.callMethod "write" (Support.args #[toJS data, Support.optional byteOffset, Support.optional byteLength]) Float
 
-/-- `end(data?: string | BufferSource, byteOffset?: number, byteLength?: number): number`: `double end(optional DOMStringOrUint8Array data, optional double byteOffset, optional double byteLength)` -/
-def SocketUnknown.«end» (self : SocketUnknown) (data : Option DOMStringOrUint8Array := none) (byteOffset : Option Float := none) (byteLength : Option Float := none) : IO Float :=
+/-- `end(data?: string | BufferSource, byteOffset?: number, byteLength?: number): number`: `double end(optional DOMStringOrUint8Array data, optional double byteOffset, optional double /* integer: Nat */ byteLength)` -/
+def SocketUnknown.«end» (self : SocketUnknown) (data : Option DOMStringOrUint8Array := none) (byteOffset : Option Float := none) (byteLength : Option Nat := none) : IO Float :=
   self.val.callMethod "end" (Support.args #[Support.optional data, Support.optional byteOffset, Support.optional byteLength]) Float
 
 /-- `end(): void`: `undefined end()` -/
@@ -6343,12 +6343,12 @@ def SocketUnknown.reload (self : SocketUnknown) (options : SocketOptionsUnknown)
 def SocketUnknown.disableRenegotiation (self : SocketUnknown) : IO Unit :=
   self.val.callMethod "disableRenegotiation" (Support.args #[]) Unit
 
-/-- `exportKeyingMaterial(length: number, label: string, context: Buffer): Buffer`: `Uint8Array exportKeyingMaterial(double length, DOMString label, Uint8Array context)` -/
-def SocketUnknown.exportKeyingMaterial (self : SocketUnknown) (length : Float) (label : String) (context : ByteArray) : IO ByteArray :=
+/-- `exportKeyingMaterial(length: number, label: string, context: Buffer): Buffer`: `Uint8Array exportKeyingMaterial(double /* integer: Nat */ length, DOMString label, Uint8Array context)` -/
+def SocketUnknown.exportKeyingMaterial (self : SocketUnknown) (length : Nat) (label : String) (context : ByteArray) : IO ByteArray :=
   self.val.callMethod "exportKeyingMaterial" (Support.args #[toJS length, toJS label, toJS context]) ByteArray
 
-/-- `exportKeyingMaterial(length: number, label: string, context?: string | BufferSource): void`: `undefined exportKeyingMaterial(double length, DOMString label, optional DOMStringOrUint8Array context)` -/
-def SocketUnknown.exportKeyingMaterialWithStringBufferSource (self : SocketUnknown) (length : Float) (label : String) (context : Option DOMStringOrUint8Array := none) : IO Unit :=
+/-- `exportKeyingMaterial(length: number, label: string, context?: string | BufferSource): void`: `undefined exportKeyingMaterial(double /* integer: Nat */ length, DOMString label, optional DOMStringOrUint8Array context)` -/
+def SocketUnknown.exportKeyingMaterialWithStringBufferSource (self : SocketUnknown) (length : Nat) (label : String) (context : Option DOMStringOrUint8Array := none) : IO Unit :=
   self.val.callMethod "exportKeyingMaterial" (Support.args #[toJS length, toJS label, Support.optional context]) Unit
 
 /-- `getAuthorizationError(): Error | null`: `object? getAuthorizationError()` -/
@@ -6403,8 +6403,8 @@ def SocketUnknown.getTLSVersion (self : SocketUnknown) : IO String :=
 def SocketUnknown.isSessionReused (self : SocketUnknown) : IO Bool :=
   self.val.callMethod "isSessionReused" (Support.args #[]) Bool
 
-/-- `setMaxSendFragment(size: number): boolean`: `boolean setMaxSendFragment(double size)` -/
-def SocketUnknown.setMaxSendFragment (self : SocketUnknown) (size : Float) : IO Bool :=
+/-- `setMaxSendFragment(size: number): boolean`: `boolean setMaxSendFragment(double /* integer: Nat */ size)` -/
+def SocketUnknown.setMaxSendFragment (self : SocketUnknown) (size : Nat) : IO Bool :=
   self.val.callMethod "setMaxSendFragment" (Support.args #[toJS size]) Bool
 
 /-- `setNoDelay(noDelay?: boolean): boolean`: `boolean setNoDelay(optional boolean noDelay)` -/
@@ -6491,12 +6491,12 @@ def Socket.alpnProtocol (self : Socket) : IO (Option DOMStringOrBoolean) := self
 /-- `readonly bytesWritten: number`: `readonly attribute double bytesWritten` -/
 def Socket.bytesWritten (self : Socket) : IO Float := self.val.get "bytesWritten" Float
 
-/-- `write(data: string | BufferSource, byteOffset?: number, byteLength?: number): number`: `double write(DOMStringOrUint8Array data, optional double byteOffset, optional double byteLength)` -/
-def Socket.write (self : Socket) (data : DOMStringOrUint8Array) (byteOffset : Option Float := none) (byteLength : Option Float := none) : IO Float :=
+/-- `write(data: string | BufferSource, byteOffset?: number, byteLength?: number): number`: `double write(DOMStringOrUint8Array data, optional double byteOffset, optional double /* integer: Nat */ byteLength)` -/
+def Socket.write (self : Socket) (data : DOMStringOrUint8Array) (byteOffset : Option Float := none) (byteLength : Option Nat := none) : IO Float :=
   self.val.callMethod "write" (Support.args #[toJS data, Support.optional byteOffset, Support.optional byteLength]) Float
 
-/-- `end(data?: string | BufferSource, byteOffset?: number, byteLength?: number): number`: `double end(optional DOMStringOrUint8Array data, optional double byteOffset, optional double byteLength)` -/
-def Socket.«end» (self : Socket) (data : Option DOMStringOrUint8Array := none) (byteOffset : Option Float := none) (byteLength : Option Float := none) : IO Float :=
+/-- `end(data?: string | BufferSource, byteOffset?: number, byteLength?: number): number`: `double end(optional DOMStringOrUint8Array data, optional double byteOffset, optional double /* integer: Nat */ byteLength)` -/
+def Socket.«end» (self : Socket) (data : Option DOMStringOrUint8Array := none) (byteOffset : Option Float := none) (byteLength : Option Nat := none) : IO Float :=
   self.val.callMethod "end" (Support.args #[Support.optional data, Support.optional byteOffset, Support.optional byteLength]) Float
 
 /-- `end(): void`: `undefined end()` -/
@@ -6535,12 +6535,12 @@ def Socket.reload (self : Socket) (options : SocketOptions) : IO Unit :=
 def Socket.disableRenegotiation (self : Socket) : IO Unit :=
   self.val.callMethod "disableRenegotiation" (Support.args #[]) Unit
 
-/-- `exportKeyingMaterial(length: number, label: string, context: Buffer): Buffer`: `Uint8Array exportKeyingMaterial(double length, DOMString label, Uint8Array context)` -/
-def Socket.exportKeyingMaterial (self : Socket) (length : Float) (label : String) (context : ByteArray) : IO ByteArray :=
+/-- `exportKeyingMaterial(length: number, label: string, context: Buffer): Buffer`: `Uint8Array exportKeyingMaterial(double /* integer: Nat */ length, DOMString label, Uint8Array context)` -/
+def Socket.exportKeyingMaterial (self : Socket) (length : Nat) (label : String) (context : ByteArray) : IO ByteArray :=
   self.val.callMethod "exportKeyingMaterial" (Support.args #[toJS length, toJS label, toJS context]) ByteArray
 
-/-- `exportKeyingMaterial(length: number, label: string, context?: string | BufferSource): void`: `undefined exportKeyingMaterial(double length, DOMString label, optional DOMStringOrUint8Array context)` -/
-def Socket.exportKeyingMaterialWithStringBufferSource (self : Socket) (length : Float) (label : String) (context : Option DOMStringOrUint8Array := none) : IO Unit :=
+/-- `exportKeyingMaterial(length: number, label: string, context?: string | BufferSource): void`: `undefined exportKeyingMaterial(double /* integer: Nat */ length, DOMString label, optional DOMStringOrUint8Array context)` -/
+def Socket.exportKeyingMaterialWithStringBufferSource (self : Socket) (length : Nat) (label : String) (context : Option DOMStringOrUint8Array := none) : IO Unit :=
   self.val.callMethod "exportKeyingMaterial" (Support.args #[toJS length, toJS label, Support.optional context]) Unit
 
 /-- `getAuthorizationError(): Error | null`: `object? getAuthorizationError()` -/
@@ -6595,8 +6595,8 @@ def Socket.getTLSVersion (self : Socket) : IO String :=
 def Socket.isSessionReused (self : Socket) : IO Bool :=
   self.val.callMethod "isSessionReused" (Support.args #[]) Bool
 
-/-- `setMaxSendFragment(size: number): boolean`: `boolean setMaxSendFragment(double size)` -/
-def Socket.setMaxSendFragment (self : Socket) (size : Float) : IO Bool :=
+/-- `setMaxSendFragment(size: number): boolean`: `boolean setMaxSendFragment(double /* integer: Nat */ size)` -/
+def Socket.setMaxSendFragment (self : Socket) (size : Nat) : IO Bool :=
   self.val.callMethod "setMaxSendFragment" (Support.args #[toJS size]) Bool
 
 /-- `setNoDelay(noDelay?: boolean): boolean`: `boolean setNoDelay(optional boolean noDelay)` -/
@@ -6647,8 +6647,8 @@ def Socket.getServername (self : Socket) : IO String :=
 def Socket.setServername (self : Socket) (name : String) : IO Unit :=
   self.val.callMethod "setServername" (Support.args #[toJS name]) Unit
 
-/-- `readonly port: number`: `readonly attribute double port` -/
-def TCPSocketListener.port (self : TCPSocketListener) : IO Float := self.val.get "port" Float
+/-- `readonly port: number`: `readonly attribute double /* integer: Nat */ port` -/
+def TCPSocketListener.port (self : TCPSocketListener) : IO Nat := self.val.get "port" Nat
 
 /-- `readonly hostname: string`: `readonly attribute DOMString hostname` -/
 def TCPSocketListener.hostname (self : TCPSocketListener) : IO String := self.val.get "hostname" String
@@ -6659,8 +6659,8 @@ def UnixSocketListener.unix (self : UnixSocketListener) : IO String := self.val.
 /-- `readonly hostname: string`: `readonly attribute DOMString hostname` -/
 def UdpBaseUDPSocket.hostname (self : UdpBaseUDPSocket) : IO String := self.val.get "hostname" String
 
-/-- `readonly port: number`: `readonly attribute double port` -/
-def UdpBaseUDPSocket.port (self : UdpBaseUDPSocket) : IO Float := self.val.get "port" Float
+/-- `readonly port: number`: `readonly attribute double /* integer: Nat */ port` -/
+def UdpBaseUDPSocket.port (self : UdpBaseUDPSocket) : IO Nat := self.val.get "port" Nat
 
 /-- `readonly address: SocketAddress`: `readonly attribute SocketAddress address` -/
 def UdpBaseUDPSocket.address (self : UdpBaseUDPSocket) : IO SocketAddress := self.val.get "address" SocketAddress
@@ -6723,8 +6723,8 @@ def UdpBaseUDPSocket.dropSourceSpecificMembership (self : UdpBaseUDPSocket) (sou
 def UdpSocket.sendMany (self : UdpSocket) (packets : Array UdpDataOrDOMStringOrDouble) : IO Float :=
   self.val.callMethod "sendMany" (Support.args #[toJS packets]) Float
 
-/-- `send(data: Data, port: number, address: string): boolean`: `boolean send(UdpData data, double port, DOMString address)` -/
-def UdpSocket.send (self : UdpSocket) (data : UdpData) (port : Float) (address : String) : IO Bool :=
+/-- `send(data: Data, port: number, address: string): boolean`: `boolean send(UdpData data, double /* integer: Nat */ port, DOMString address)` -/
+def UdpSocket.send (self : UdpSocket) (data : UdpData) (port : Nat) (address : String) : IO Bool :=
   self.val.callMethod "send" (Support.args #[toJS data, toJS port, toJS address]) Bool
 
 /-- `reload(handler: SocketHandler<DataBinaryType>): void`: `undefined reload(UdpSocketHandler handler)` -/
@@ -6848,8 +6848,8 @@ def Subprocess.stdio (self : Subprocess) : IO (Array Data) := self.val.get "stdi
 /-- `readonly readable: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option)`: `readonly attribute ReadableStreamOrDouble? readable` -/
 def Subprocess.readable (self : Subprocess) : IO (Option ReadableStreamOrDouble) := self.val.get "readable" (Option ReadableStreamOrDouble)
 
-/-- `readonly pid: number`: `readonly attribute double pid` -/
-def Subprocess.pid (self : Subprocess) : IO Float := self.val.get "pid" Float
+/-- `readonly pid: number`: `readonly attribute double /* integer: Int */ pid` -/
+def Subprocess.pid (self : Subprocess) : IO Int := self.val.get "pid" Int
 
 /-- `readonly exited: Promise<number>`: `readonly attribute Promise<double> exited` -/
 def Subprocess.exited (self : Subprocess) : Async Float := do
@@ -6907,8 +6907,8 @@ def SubprocessIgnorePipePipe.stdio (self : SubprocessIgnorePipePipe) : IO (Array
 /-- `readonly readable: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option)`: `readonly attribute ReadableStreamOrDouble? readable` -/
 def SubprocessIgnorePipePipe.readable (self : SubprocessIgnorePipePipe) : IO (Option ReadableStreamOrDouble) := self.val.get "readable" (Option ReadableStreamOrDouble)
 
-/-- `readonly pid: number`: `readonly attribute double pid` -/
-def SubprocessIgnorePipePipe.pid (self : SubprocessIgnorePipePipe) : IO Float := self.val.get "pid" Float
+/-- `readonly pid: number`: `readonly attribute double /* integer: Int */ pid` -/
+def SubprocessIgnorePipePipe.pid (self : SubprocessIgnorePipePipe) : IO Int := self.val.get "pid" Int
 
 /-- `readonly exited: Promise<number>`: `readonly attribute Promise<double> exited` -/
 def SubprocessIgnorePipePipe.exited (self : SubprocessIgnorePipePipe) : Async Float := do
@@ -7023,8 +7023,8 @@ def Secrets.set (self : Secrets) (options : SecretsSetOptions) : Async Unit :=
 def Secrets.delete (self : Secrets) (options : SecretsDeleteOptions) : Async Bool :=
   self.val.callMethodAwait "delete" (Support.args #[toJS options]) Bool
 
-/-- `readonly byteLength: number`: `readonly attribute double byteLength` -/
-def CryptoHashInterface.byteLength (self : CryptoHashInterface) : IO Float := self.val.get "byteLength" Float
+/-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
+def CryptoHashInterface.byteLength (self : CryptoHashInterface) : IO Nat := self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `any update(BlobOrStringOrBuffer data)` -/
 def CryptoHashInterface.update (self : CryptoHashInterface) (data : BlobOrStringOrBuffer) : IO Data :=
@@ -7056,8 +7056,8 @@ def CryptoHasher.new (algorithm : SupportedCryptoAlgorithms) (hmacKey : Option D
 /-- `readonly algorithm: SupportedCryptoAlgorithms`: `readonly attribute SupportedCryptoAlgorithms algorithm` -/
 def CryptoHasher.algorithm (self : CryptoHasher) : IO SupportedCryptoAlgorithms := self.val.get "algorithm" SupportedCryptoAlgorithms
 
-/-- `readonly byteLength: number`: `readonly attribute double byteLength` -/
-def CryptoHasher.byteLength (self : CryptoHasher) : IO Float := self.val.get "byteLength" Float
+/-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
+def CryptoHasher.byteLength (self : CryptoHasher) : IO Nat := self.val.get "byteLength" Nat
 
 /-- `static readonly algorithms: SupportedCryptoAlgorithms[]`: `static readonly attribute sequence<SupportedCryptoAlgorithms> algorithms` -/
 def CryptoHasher.algorithms : IO (Array SupportedCryptoAlgorithms) := Support.getGlobal ["Bun", "CryptoHasher", "algorithms"] (Array SupportedCryptoAlgorithms)
@@ -7099,8 +7099,8 @@ def CryptoHasher.hashWithEncoding (algorithm : SupportedCryptoAlgorithms) (input
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.CryptoHasher.hashWithEncoding", module := "globalThis", path := "Bun.CryptoHasher.hash", construct := false, arity := 3 }
     (Support.args #[toJS algorithm, toJS input, toJS encoding]) (await := false)
 
-/-- `readonly byteLength: number`: `readonly attribute double byteLength` -/
-def CryptoHashInterfaceSHA1.byteLength (self : CryptoHashInterfaceSHA1) : IO Float := self.val.get "byteLength" Float
+/-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
+def CryptoHashInterfaceSHA1.byteLength (self : CryptoHashInterfaceSHA1) : IO Nat := self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `SHA1 update(BlobOrStringOrBuffer data)` -/
 def CryptoHashInterfaceSHA1.update (self : CryptoHashInterfaceSHA1) (data : BlobOrStringOrBuffer) : IO SHA1 := do
@@ -7130,11 +7130,11 @@ def SHA1.new : IO SHA1 :=
   Lasm.JS.Binding.invoke SHA1 { name := "Lasm.JS.Bun.SHA1.new", module := "globalThis", path := "Bun.SHA1", construct := true, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `static readonly byteLength: 20`: `static readonly attribute double byteLength` -/
-def SHA1.byteLength : IO Float := Support.getGlobal ["Bun", "SHA1", "byteLength"] Float
+/-- `static readonly byteLength: 20`: `static readonly attribute double /* integer: Nat */ byteLength` -/
+def SHA1.byteLength : IO Nat := Support.getGlobal ["Bun", "SHA1", "byteLength"] Nat
 
-/-- `readonly byteLength: number`: `readonly attribute double byteLength` -/
-def CryptoHashInterfaceMD5.byteLength (self : CryptoHashInterfaceMD5) : IO Float := self.val.get "byteLength" Float
+/-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
+def CryptoHashInterfaceMD5.byteLength (self : CryptoHashInterfaceMD5) : IO Nat := self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `MD5 update(BlobOrStringOrBuffer data)` -/
 def CryptoHashInterfaceMD5.update (self : CryptoHashInterfaceMD5) (data : BlobOrStringOrBuffer) : IO MD5 := do
@@ -7164,11 +7164,11 @@ def MD5.new : IO MD5 :=
   Lasm.JS.Binding.invoke MD5 { name := "Lasm.JS.Bun.MD5.new", module := "globalThis", path := "Bun.MD5", construct := true, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `static readonly byteLength: 16`: `static readonly attribute double byteLength` -/
-def MD5.byteLength : IO Float := Support.getGlobal ["Bun", "MD5", "byteLength"] Float
+/-- `static readonly byteLength: 16`: `static readonly attribute double /* integer: Nat */ byteLength` -/
+def MD5.byteLength : IO Nat := Support.getGlobal ["Bun", "MD5", "byteLength"] Nat
 
-/-- `readonly byteLength: number`: `readonly attribute double byteLength` -/
-def CryptoHashInterfaceMD4.byteLength (self : CryptoHashInterfaceMD4) : IO Float := self.val.get "byteLength" Float
+/-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
+def CryptoHashInterfaceMD4.byteLength (self : CryptoHashInterfaceMD4) : IO Nat := self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `MD4 update(BlobOrStringOrBuffer data)` -/
 def CryptoHashInterfaceMD4.update (self : CryptoHashInterfaceMD4) (data : BlobOrStringOrBuffer) : IO MD4 := do
@@ -7198,11 +7198,11 @@ def MD4.new : IO MD4 :=
   Lasm.JS.Binding.invoke MD4 { name := "Lasm.JS.Bun.MD4.new", module := "globalThis", path := "Bun.MD4", construct := true, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `static readonly byteLength: 16`: `static readonly attribute double byteLength` -/
-def MD4.byteLength : IO Float := Support.getGlobal ["Bun", "MD4", "byteLength"] Float
+/-- `static readonly byteLength: 16`: `static readonly attribute double /* integer: Nat */ byteLength` -/
+def MD4.byteLength : IO Nat := Support.getGlobal ["Bun", "MD4", "byteLength"] Nat
 
-/-- `readonly byteLength: number`: `readonly attribute double byteLength` -/
-def CryptoHashInterfaceSHA224.byteLength (self : CryptoHashInterfaceSHA224) : IO Float := self.val.get "byteLength" Float
+/-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
+def CryptoHashInterfaceSHA224.byteLength (self : CryptoHashInterfaceSHA224) : IO Nat := self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `SHA224 update(BlobOrStringOrBuffer data)` -/
 def CryptoHashInterfaceSHA224.update (self : CryptoHashInterfaceSHA224) (data : BlobOrStringOrBuffer) : IO SHA224 := do
@@ -7232,11 +7232,11 @@ def SHA224.new : IO SHA224 :=
   Lasm.JS.Binding.invoke SHA224 { name := "Lasm.JS.Bun.SHA224.new", module := "globalThis", path := "Bun.SHA224", construct := true, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `static readonly byteLength: 28`: `static readonly attribute double byteLength` -/
-def SHA224.byteLength : IO Float := Support.getGlobal ["Bun", "SHA224", "byteLength"] Float
+/-- `static readonly byteLength: 28`: `static readonly attribute double /* integer: Nat */ byteLength` -/
+def SHA224.byteLength : IO Nat := Support.getGlobal ["Bun", "SHA224", "byteLength"] Nat
 
-/-- `readonly byteLength: number`: `readonly attribute double byteLength` -/
-def CryptoHashInterfaceSHA512.byteLength (self : CryptoHashInterfaceSHA512) : IO Float := self.val.get "byteLength" Float
+/-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
+def CryptoHashInterfaceSHA512.byteLength (self : CryptoHashInterfaceSHA512) : IO Nat := self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `SHA512 update(BlobOrStringOrBuffer data)` -/
 def CryptoHashInterfaceSHA512.update (self : CryptoHashInterfaceSHA512) (data : BlobOrStringOrBuffer) : IO SHA512 := do
@@ -7266,11 +7266,11 @@ def SHA512.new : IO SHA512 :=
   Lasm.JS.Binding.invoke SHA512 { name := "Lasm.JS.Bun.SHA512.new", module := "globalThis", path := "Bun.SHA512", construct := true, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `static readonly byteLength: 64`: `static readonly attribute double byteLength` -/
-def SHA512.byteLength : IO Float := Support.getGlobal ["Bun", "SHA512", "byteLength"] Float
+/-- `static readonly byteLength: 64`: `static readonly attribute double /* integer: Nat */ byteLength` -/
+def SHA512.byteLength : IO Nat := Support.getGlobal ["Bun", "SHA512", "byteLength"] Nat
 
-/-- `readonly byteLength: number`: `readonly attribute double byteLength` -/
-def CryptoHashInterfaceSHA384.byteLength (self : CryptoHashInterfaceSHA384) : IO Float := self.val.get "byteLength" Float
+/-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
+def CryptoHashInterfaceSHA384.byteLength (self : CryptoHashInterfaceSHA384) : IO Nat := self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `SHA384 update(BlobOrStringOrBuffer data)` -/
 def CryptoHashInterfaceSHA384.update (self : CryptoHashInterfaceSHA384) (data : BlobOrStringOrBuffer) : IO SHA384 := do
@@ -7300,11 +7300,11 @@ def SHA384.new : IO SHA384 :=
   Lasm.JS.Binding.invoke SHA384 { name := "Lasm.JS.Bun.SHA384.new", module := "globalThis", path := "Bun.SHA384", construct := true, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `static readonly byteLength: 48`: `static readonly attribute double byteLength` -/
-def SHA384.byteLength : IO Float := Support.getGlobal ["Bun", "SHA384", "byteLength"] Float
+/-- `static readonly byteLength: 48`: `static readonly attribute double /* integer: Nat */ byteLength` -/
+def SHA384.byteLength : IO Nat := Support.getGlobal ["Bun", "SHA384", "byteLength"] Nat
 
-/-- `readonly byteLength: number`: `readonly attribute double byteLength` -/
-def CryptoHashInterfaceSHA256.byteLength (self : CryptoHashInterfaceSHA256) : IO Float := self.val.get "byteLength" Float
+/-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
+def CryptoHashInterfaceSHA256.byteLength (self : CryptoHashInterfaceSHA256) : IO Nat := self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `SHA256 update(BlobOrStringOrBuffer data)` -/
 def CryptoHashInterfaceSHA256.update (self : CryptoHashInterfaceSHA256) (data : BlobOrStringOrBuffer) : IO SHA256 := do
@@ -7334,11 +7334,11 @@ def SHA256.new : IO SHA256 :=
   Lasm.JS.Binding.invoke SHA256 { name := "Lasm.JS.Bun.SHA256.new", module := "globalThis", path := "Bun.SHA256", construct := true, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `static readonly byteLength: 32`: `static readonly attribute double byteLength` -/
-def SHA256.byteLength : IO Float := Support.getGlobal ["Bun", "SHA256", "byteLength"] Float
+/-- `static readonly byteLength: 32`: `static readonly attribute double /* integer: Nat */ byteLength` -/
+def SHA256.byteLength : IO Nat := Support.getGlobal ["Bun", "SHA256", "byteLength"] Nat
 
-/-- `readonly byteLength: number`: `readonly attribute double byteLength` -/
-def CryptoHashInterfaceSHA512256.byteLength (self : CryptoHashInterfaceSHA512256) : IO Float := self.val.get "byteLength" Float
+/-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
+def CryptoHashInterfaceSHA512256.byteLength (self : CryptoHashInterfaceSHA512256) : IO Nat := self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `SHA512_256 update(BlobOrStringOrBuffer data)` -/
 def CryptoHashInterfaceSHA512256.update (self : CryptoHashInterfaceSHA512256) (data : BlobOrStringOrBuffer) : IO SHA512_256 := do
@@ -7368,8 +7368,8 @@ def SHA512_256.new : IO SHA512_256 :=
   Lasm.JS.Binding.invoke SHA512_256 { name := "Lasm.JS.Bun.SHA512_256.new", module := "globalThis", path := "Bun.SHA512_256", construct := true, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `static readonly byteLength: 32`: `static readonly attribute double byteLength` -/
-def SHA512_256.byteLength : IO Float := Support.getGlobal ["Bun", "SHA512_256", "byteLength"] Float
+/-- `static readonly byteLength: 32`: `static readonly attribute double /* integer: Nat */ byteLength` -/
+def SHA512_256.byteLength : IO Nat := Support.getGlobal ["Bun", "SHA512_256", "byteLength"] Nat
 
 /-- `remove(title: string): Promise<void>`: `Promise<undefined> remove(DOMString title)` -/
 def Cron.remove (self : Cron) (title : String) : Async Unit :=
@@ -7684,8 +7684,8 @@ def CookieMap.new (init : Option SequenceOfSequenceOfDOMStringOrRecordOfDOMStrin
   Lasm.JS.Binding.invoke CookieMap { name := "Lasm.JS.Bun.CookieMap.new", module := "globalThis", path := "Bun.CookieMap", construct := true, arity := 1 }
     (Support.args #[Support.optional init]) (await := false)
 
-/-- `readonly size: number`: `readonly attribute double size` -/
-def CookieMap.size (self : CookieMap) : IO Float := self.val.get "size" Float
+/-- `readonly size: number`: `readonly attribute double /* integer: Nat */ size` -/
+def CookieMap.size (self : CookieMap) : IO Nat := self.val.get "size" Nat
 
 /-- `get(name: string): string | null`: `DOMString? get(DOMString name)` -/
 def CookieMap.get (self : CookieMap) (name : String) : IO (Option String) :=
@@ -7933,8 +7933,8 @@ def fileWithFileDescriptor (fileDescriptor : Float) (options : Option BlobProper
     (Support.args #[toJS fileDescriptor, Support.optional options]) (await := false)
   pure { val := r }
 
-/-- `Bun.allocUnsafe(size: number): Uint8Array<ArrayBuffer>`: `Uint8Array allocUnsafe(double size)` (Bun 1.4.4 type declarations) -/
-def allocUnsafe (size : Float) : IO ByteArray :=
+/-- `Bun.allocUnsafe(size: number): Uint8Array<ArrayBuffer>`: `Uint8Array allocUnsafe(double /* integer: Nat */ size)` (Bun 1.4.4 type declarations) -/
+def allocUnsafe (size : Nat) : IO ByteArray :=
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.allocUnsafe", module := "globalThis", path := "Bun.allocUnsafe", construct := false, arity := 1 }
     (Support.args #[toJS size]) (await := false)
 
@@ -8256,8 +8256,8 @@ def dns.lookup (hostname : String) (options : Option DnsLookupOptions := none) :
   Lasm.JS.Binding.invokeAsync (Array DNSLookup) { name := "Lasm.JS.Bun.dns.lookup", module := "globalThis", path := "Bun.dns.lookup", construct := false, arity := 2 }
     (Support.args #[toJS hostname, Support.optional options])
 
-/-- `Bun.prefetch(hostname: string, port?: number): void`: `undefined prefetch(DOMString hostname, optional double port)` (Bun 1.4.4 type declarations) -/
-def dns.prefetch (hostname : String) (port : Option Float := none) : IO Unit :=
+/-- `Bun.prefetch(hostname: string, port?: number): void`: `undefined prefetch(DOMString hostname, optional double /* integer: Nat */ port)` (Bun 1.4.4 type declarations) -/
+def dns.prefetch (hostname : String) (port : Option Nat := none) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Bun.dns.prefetch", module := "globalThis", path := "Bun.dns.prefetch", construct := false, arity := 2 }
     (Support.args #[toJS hostname, Support.optional port]) (await := false)
 

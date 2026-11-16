@@ -1992,8 +1992,8 @@ instance : Coe TLSOptions BooleanOrTLSOptions := ⟨.tlsOptions⟩
 structure RedisOptions where
   /-- `double connectionTimeout` -/
   connectionTimeout : Option Float := none
-  /-- `double idleTimeout` -/
-  idleTimeout : Option Float := none
+  /-- `double /* integer: Nat */ idleTimeout` -/
+  idleTimeout : Option Nat := none
   /-- `boolean autoReconnect` -/
   autoReconnect : Option Bool := none
   /-- `double maxRetries` -/
@@ -2473,12 +2473,12 @@ def RedisClient.hexists (self : RedisClient) (key : RedisClientKeyLike) (field :
 def RedisClient.hrandfield (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
   self.val.callMethodAwait "hrandfield" (Support.args #[toJS key]) (Option String)
 
-/-- `hrandfield(key: RedisClient.KeyLike, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> hrandfield(RedisClientKeyLike key, double count)` -/
-def RedisClient.hrandfieldWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Float) : Async (Array String) :=
+/-- `hrandfield(key: RedisClient.KeyLike, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> hrandfield(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
+def RedisClient.hrandfieldWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Array String) :=
   self.val.callMethodAwait "hrandfield" (Support.args #[toJS key, toJS count]) (Array String)
 
-/-- `hrandfield(key: RedisClient.KeyLike, count: number, withValues: 'WITHVALUES'): Promise<[string, string][]>`: `Promise<sequence<sequence<DOMString>>> hrandfield(RedisClientKeyLike key, double count, RedisClientHrandfieldWithvaluesWithValues withValues)` -/
-def RedisClient.hrandfieldWithvalues (self : RedisClient) (key : RedisClientKeyLike) (count : Float) (withValues : RedisClientHrandfieldWithvaluesWithValues) : Async (Array (Array String)) :=
+/-- `hrandfield(key: RedisClient.KeyLike, count: number, withValues: 'WITHVALUES'): Promise<[string, string][]>`: `Promise<sequence<sequence<DOMString>>> hrandfield(RedisClientKeyLike key, double /* integer: Nat */ count, RedisClientHrandfieldWithvaluesWithValues withValues)` -/
+def RedisClient.hrandfieldWithvalues (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) (withValues : RedisClientHrandfieldWithvaluesWithValues) : Async (Array (Array String)) :=
   self.val.callMethodAwait "hrandfield" (Support.args #[toJS key, toJS count, toJS withValues]) (Array (Array String))
 
 /-- `hscan(key: RedisClient.KeyLike, cursor: number | string): Promise<[string, string[]]>`: `Promise<sequence<any>> hscan(RedisClientKeyLike key, DoubleOrDOMString cursor)` -/
@@ -2489,12 +2489,12 @@ def RedisClient.hscan (self : RedisClient) (key : RedisClientKeyLike) (cursor : 
 def RedisClient.hscanMatch (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) («match» : RedisClientHscanMatchMatch) (pattern : String) : Async (Array Data) :=
   self.val.callMethodAwait "hscan" (Support.args #[toJS key, toJS cursor, toJS «match», toJS pattern]) (Array Data)
 
-/-- `hscan(key: RedisClient.KeyLike, cursor: number | string, count: 'COUNT', limit: number): Promise<[string, string[]]>`: `Promise<sequence<any>> hscan(RedisClientKeyLike key, DoubleOrDOMString cursor, RedisClientHscanWithCountCount count, double limit)` -/
-def RedisClient.hscanWithCount (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) (count : RedisClientHscanWithCountCount) (limit : Float) : Async (Array Data) :=
+/-- `hscan(key: RedisClient.KeyLike, cursor: number | string, count: 'COUNT', limit: number): Promise<[string, string[]]>`: `Promise<sequence<any>> hscan(RedisClientKeyLike key, DoubleOrDOMString cursor, RedisClientHscanWithCountCount count, double /* integer: Nat */ limit)` -/
+def RedisClient.hscanWithCount (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) (count : RedisClientHscanWithCountCount) (limit : Nat) : Async (Array Data) :=
   self.val.callMethodAwait "hscan" (Support.args #[toJS key, toJS cursor, toJS count, toJS limit]) (Array Data)
 
-/-- `hscan(key: RedisClient.KeyLike, cursor: number | string, match: 'MATCH', pattern: string, count: 'COUNT', limit: number): Promise<[string, string[]]>`: `Promise<sequence<any>> hscan(RedisClientKeyLike key, DoubleOrDOMString cursor, RedisClientHscanWithMatchMatch match, DOMString pattern, RedisClientHscanWithMatchCount count, double limit)` -/
-def RedisClient.hscanWithMatch (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) («match» : RedisClientHscanWithMatchMatch) (pattern : String) (count : RedisClientHscanWithMatchCount) (limit : Float) : Async (Array Data) :=
+/-- `hscan(key: RedisClient.KeyLike, cursor: number | string, match: 'MATCH', pattern: string, count: 'COUNT', limit: number): Promise<[string, string[]]>`: `Promise<sequence<any>> hscan(RedisClientKeyLike key, DoubleOrDOMString cursor, RedisClientHscanWithMatchMatch match, DOMString pattern, RedisClientHscanWithMatchCount count, double /* integer: Nat */ limit)` -/
+def RedisClient.hscanWithMatch (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) («match» : RedisClientHscanWithMatchMatch) (pattern : String) (count : RedisClientHscanWithMatchCount) (limit : Nat) : Async (Array Data) :=
   self.val.callMethodAwait "hscan" (Support.args #[toJS key, toJS cursor, toJS «match», toJS pattern, toJS count, toJS limit]) (Array Data)
 
 /-- `sismember(key: RedisClient.KeyLike, member: string): Promise<boolean>`: `Promise<boolean> sismember(RedisClientKeyLike key, DOMString member)` -/
@@ -2521,16 +2521,16 @@ def RedisClient.smembers (self : RedisClient) (key : RedisClientKeyLike) : Async
 def RedisClient.srandmember (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
   self.val.callMethodAwait "srandmember" (Support.args #[toJS key]) (Option String)
 
-/-- `srandmember(key: RedisClient.KeyLike, count: number): Promise<string[] | null>`: `Promise<sequence<DOMString>?> srandmember(RedisClientKeyLike key, double count)` -/
-def RedisClient.srandmemberWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Float) : Async (Option (Array String)) :=
+/-- `srandmember(key: RedisClient.KeyLike, count: number): Promise<string[] | null>`: `Promise<sequence<DOMString>?> srandmember(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
+def RedisClient.srandmemberWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Option (Array String)) :=
   self.val.callMethodAwait "srandmember" (Support.args #[toJS key, toJS count]) (Option (Array String))
 
 /-- `spop(key: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> spop(RedisClientKeyLike key)` -/
 def RedisClient.spop (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
   self.val.callMethodAwait "spop" (Support.args #[toJS key]) (Option String)
 
-/-- `spop(key: RedisClient.KeyLike, count: number): Promise<string[] | null>`: `Promise<sequence<DOMString>?> spop(RedisClientKeyLike key, double count)` -/
-def RedisClient.spopWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Float) : Async (Option (Array String)) :=
+/-- `spop(key: RedisClient.KeyLike, count: number): Promise<string[] | null>`: `Promise<sequence<DOMString>?> spop(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
+def RedisClient.spopWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Option (Array String)) :=
   self.val.callMethodAwait "spop" (Support.args #[toJS key, toJS count]) (Option (Array String))
 
 /-- `spublish(channel: RedisClient.KeyLike, message: string): Promise<number>`: `Promise<double> spublish(RedisClientKeyLike channel, DOMString message)` -/
@@ -2589,16 +2589,16 @@ def RedisClient.blpop (self : RedisClient) (args : Array RedisClientKeyLikeOrDou
 def RedisClient.brpop (self : RedisClient) (args : Array RedisClientKeyLikeOrDouble := #[]) : Async (Option (Array String)) :=
   self.val.callMethodAwait "brpop" (Support.argsWith #[] (args.map toJS)) (Option (Array String))
 
-/-- `blmove(source: RedisClient.KeyLike, destination: RedisClient.KeyLike, from: 'LEFT' | 'RIGHT', to: 'LEFT' | 'RIGHT', timeout: number): Promise<string | null>`: `Promise<DOMString?> blmove(RedisClientKeyLike source, RedisClientKeyLike destination, RedisClientBlmoveFrom from, RedisClientBlmoveTo to, double timeout)` -/
-def RedisClient.blmove (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) («from» : RedisClientBlmoveFrom) (to : RedisClientBlmoveTo) (timeout : Float) : Async (Option String) :=
+/-- `blmove(source: RedisClient.KeyLike, destination: RedisClient.KeyLike, from: 'LEFT' | 'RIGHT', to: 'LEFT' | 'RIGHT', timeout: number): Promise<string | null>`: `Promise<DOMString?> blmove(RedisClientKeyLike source, RedisClientKeyLike destination, RedisClientBlmoveFrom from, RedisClientBlmoveTo to, double /* integer: Nat */ timeout)` -/
+def RedisClient.blmove (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) («from» : RedisClientBlmoveFrom) (to : RedisClientBlmoveTo) (timeout : Nat) : Async (Option String) :=
   self.val.callMethodAwait "blmove" (Support.args #[toJS source, toJS destination, toJS «from», toJS to, toJS timeout]) (Option String)
 
-/-- `blmpop(timeout: number, numkeys: number, ...args: (string | number)[]): Promise<[string, string[]] | null>`: `Promise<sequence<any>?> blmpop(double timeout, double numkeys, DOMStringOrDouble... args)` -/
-def RedisClient.blmpop (self : RedisClient) (timeout : Float) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) :=
+/-- `blmpop(timeout: number, numkeys: number, ...args: (string | number)[]): Promise<[string, string[]] | null>`: `Promise<sequence<any>?> blmpop(double /* integer: Nat */ timeout, double numkeys, DOMStringOrDouble... args)` -/
+def RedisClient.blmpop (self : RedisClient) (timeout : Nat) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) :=
   self.val.callMethodAwait "blmpop" (Support.argsWith #[toJS timeout, toJS numkeys] (args.map toJS)) (Option (Array Data))
 
-/-- `brpoplpush(source: RedisClient.KeyLike, destination: RedisClient.KeyLike, timeout: number): Promise<string | null>`: `Promise<DOMString?> brpoplpush(RedisClientKeyLike source, RedisClientKeyLike destination, double timeout)` -/
-def RedisClient.brpoplpush (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) (timeout : Float) : Async (Option String) :=
+/-- `brpoplpush(source: RedisClient.KeyLike, destination: RedisClient.KeyLike, timeout: number): Promise<string | null>`: `Promise<DOMString?> brpoplpush(RedisClientKeyLike source, RedisClientKeyLike destination, double /* integer: Nat */ timeout)` -/
+def RedisClient.brpoplpush (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) (timeout : Nat) : Async (Option String) :=
   self.val.callMethodAwait "brpoplpush" (Support.args #[toJS source, toJS destination, toJS timeout]) (Option String)
 
 /-- `lindex(key: RedisClient.KeyLike, index: number): Promise<string | null>`: `Promise<DOMString?> lindex(RedisClientKeyLike key, double index)` -/
@@ -2617,8 +2617,8 @@ def RedisClient.lmove (self : RedisClient) (source : RedisClientKeyLike) (destin
 def RedisClient.lpop (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
   self.val.callMethodAwait "lpop" (Support.args #[toJS key]) (Option String)
 
-/-- `lpop(key: RedisClient.KeyLike, count: number): Promise<string[] | null>`: `Promise<sequence<DOMString>?> lpop(RedisClientKeyLike key, double count)` -/
-def RedisClient.lpopWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Float) : Async (Option (Array String)) :=
+/-- `lpop(key: RedisClient.KeyLike, count: number): Promise<string[] | null>`: `Promise<sequence<DOMString>?> lpop(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
+def RedisClient.lpopWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Option (Array String)) :=
   self.val.callMethodAwait "lpop" (Support.args #[toJS key, toJS count]) (Option (Array String))
 
 /-- `lpos(key: RedisClient.KeyLike, element: RedisClient.KeyLike, ...options: (string | number)[]): Promise<number | number[] | null>`: `Promise<DoubleOrSequenceOfDouble?> lpos(RedisClientKeyLike key, RedisClientKeyLike element, DOMStringOrDouble... options)` -/
@@ -2661,8 +2661,8 @@ def RedisClient.randomkey (self : RedisClient) : Async (Option String) :=
 def RedisClient.rpop (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
   self.val.callMethodAwait "rpop" (Support.args #[toJS key]) (Option String)
 
-/-- `rpop(key: RedisClient.KeyLike, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> rpop(RedisClientKeyLike key, double count)` -/
-def RedisClient.rpopWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Float) : Async (Array String) :=
+/-- `rpop(key: RedisClient.KeyLike, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> rpop(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
+def RedisClient.rpopWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Array String) :=
   self.val.callMethodAwait "rpop" (Support.args #[toJS key, toJS count]) (Array String)
 
 /-- `rpoplpush(source: RedisClient.KeyLike, destination: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> rpoplpush(RedisClientKeyLike source, RedisClientKeyLike destination)` -/
@@ -2741,16 +2741,16 @@ def RedisClient.zlexcount (self : RedisClient) (key : RedisClientKeyLike) (min :
 def RedisClient.zpopmax (self : RedisClient) (key : RedisClientKeyLike) : Async (Array Data) :=
   self.val.callMethodAwait "zpopmax" (Support.args #[toJS key]) (Array Data)
 
-/-- `zpopmax(key: RedisClient.KeyLike, count: number): Promise<Array<[string, number]>>`: `Promise<sequence<sequence<any>>> zpopmax(RedisClientKeyLike key, double count)` -/
-def RedisClient.zpopmaxWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Float) : Async (Array (Array Data)) :=
+/-- `zpopmax(key: RedisClient.KeyLike, count: number): Promise<Array<[string, number]>>`: `Promise<sequence<sequence<any>>> zpopmax(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
+def RedisClient.zpopmaxWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Array (Array Data)) :=
   self.val.callMethodAwait "zpopmax" (Support.args #[toJS key, toJS count]) (Array (Array Data))
 
 /-- `zpopmin(key: RedisClient.KeyLike): Promise<[string, number] | []>`: `Promise<sequence<any>> zpopmin(RedisClientKeyLike key)` -/
 def RedisClient.zpopmin (self : RedisClient) (key : RedisClientKeyLike) : Async (Array Data) :=
   self.val.callMethodAwait "zpopmin" (Support.args #[toJS key]) (Array Data)
 
-/-- `zpopmin(key: RedisClient.KeyLike, count: number): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zpopmin(RedisClientKeyLike key, double count)` -/
-def RedisClient.zpopminWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Float) : Async (Array (Array Data)) :=
+/-- `zpopmin(key: RedisClient.KeyLike, count: number): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zpopmin(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
+def RedisClient.zpopminWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Array (Array Data)) :=
   self.val.callMethodAwait "zpopmin" (Support.args #[toJS key, toJS count]) (Array (Array Data))
 
 /-- `bzpopmin(...args: (RedisClient.KeyLike | number)[]): Promise<[string, string, number] | null>`: `Promise<sequence<any>?> bzpopmin(RedisClientKeyLikeOrDouble... args)` -/
@@ -2765,12 +2765,12 @@ def RedisClient.bzpopmax (self : RedisClient) (args : Array RedisClientKeyLikeOr
 def RedisClient.zrandmember (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
   self.val.callMethodAwait "zrandmember" (Support.args #[toJS key]) (Option String)
 
-/-- `zrandmember(key: RedisClient.KeyLike, count: number): Promise<string[] | null>`: `Promise<sequence<DOMString>?> zrandmember(RedisClientKeyLike key, double count)` -/
-def RedisClient.zrandmemberWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Float) : Async (Option (Array String)) :=
+/-- `zrandmember(key: RedisClient.KeyLike, count: number): Promise<string[] | null>`: `Promise<sequence<DOMString>?> zrandmember(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
+def RedisClient.zrandmemberWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Option (Array String)) :=
   self.val.callMethodAwait "zrandmember" (Support.args #[toJS key, toJS count]) (Option (Array String))
 
-/-- `zrandmember(key: RedisClient.KeyLike, count: number, withscores: 'WITHSCORES'): Promise<[string, number][] | null>`: `Promise<sequence<sequence<any>>?> zrandmember(RedisClientKeyLike key, double count, RedisClientZrandmemberWithscoresWithscores withscores)` -/
-def RedisClient.zrandmemberWithscores (self : RedisClient) (key : RedisClientKeyLike) (count : Float) (withscores : RedisClientZrandmemberWithscoresWithscores) : Async (Option (Array (Array Data))) :=
+/-- `zrandmember(key: RedisClient.KeyLike, count: number, withscores: 'WITHSCORES'): Promise<[string, number][] | null>`: `Promise<sequence<sequence<any>>?> zrandmember(RedisClientKeyLike key, double /* integer: Nat */ count, RedisClientZrandmemberWithscoresWithscores withscores)` -/
+def RedisClient.zrandmemberWithscores (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) (withscores : RedisClientZrandmemberWithscoresWithscores) : Async (Option (Array (Array Data))) :=
   self.val.callMethodAwait "zrandmember" (Support.args #[toJS key, toJS count, toJS withscores]) (Option (Array (Array Data)))
 
 /-- `zrange(key: RedisClient.KeyLike, start: string | number, stop: string | number, withscores: 'WITHSCORES'): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zrange(RedisClientKeyLike key, DOMStringOrDouble start, DOMStringOrDouble stop, RedisClientZrangeWithscores withscores)` -/
@@ -2825,8 +2825,8 @@ def RedisClient.lpush (self : RedisClient) (key : RedisClientKeyLike) (value : R
 def RedisClient.lpushx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async Float :=
   self.val.callMethodAwait "lpushx" (Support.args #[toJS key, toJS value]) Float
 
-/-- `lrem(key: RedisClient.KeyLike, count: number, element: RedisClient.KeyLike): Promise<number>`: `Promise<double> lrem(RedisClientKeyLike key, double count, RedisClientKeyLike element)` -/
-def RedisClient.lrem (self : RedisClient) (key : RedisClientKeyLike) (count : Float) (element : RedisClientKeyLike) : Async Float :=
+/-- `lrem(key: RedisClient.KeyLike, count: number, element: RedisClient.KeyLike): Promise<number>`: `Promise<double> lrem(RedisClientKeyLike key, double /* integer: Nat */ count, RedisClientKeyLike element)` -/
+def RedisClient.lrem (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) (element : RedisClientKeyLike) : Async Float :=
   self.val.callMethodAwait "lrem" (Support.args #[toJS key, toJS count, toJS element]) Float
 
 /-- `ltrim(key: RedisClient.KeyLike, start: number, stop: number): Promise<string>`: `Promise<DOMString> ltrim(RedisClientKeyLike key, double start, double stop)` -/
@@ -2897,8 +2897,8 @@ def RedisClient.zremrangebyscore (self : RedisClient) (key : RedisClientKeyLike)
 def RedisClient.zrangebylex (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) : Async (Array String) :=
   self.val.callMethodAwait "zrangebylex" (Support.args #[toJS key, toJS min, toJS max]) (Array String)
 
-/-- `zrangebylex(key: RedisClient.KeyLike, min: string, max: string, limit: 'LIMIT', offset: number, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> zrangebylex(RedisClientKeyLike key, DOMString min, DOMString max, RedisClientZrangebylexWithLimitLimit limit, double offset, double count)` -/
-def RedisClient.zrangebylexWithLimit (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) (limit : RedisClientZrangebylexWithLimitLimit) (offset : Float) (count : Float) : Async (Array String) :=
+/-- `zrangebylex(key: RedisClient.KeyLike, min: string, max: string, limit: 'LIMIT', offset: number, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> zrangebylex(RedisClientKeyLike key, DOMString min, DOMString max, RedisClientZrangebylexWithLimitLimit limit, double offset, double /* integer: Nat */ count)` -/
+def RedisClient.zrangebylexWithLimit (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) (limit : RedisClientZrangebylexWithLimitLimit) (offset : Float) (count : Nat) : Async (Array String) :=
   self.val.callMethodAwait "zrangebylex" (Support.args #[toJS key, toJS min, toJS max, toJS limit, toJS offset, toJS count]) (Array String)
 
 /-- `zrangebylex(key: RedisClient.KeyLike, min: string, max: string, ...options: (string | number)[]): Promise<string[]>`: `Promise<sequence<DOMString>> zrangebylex(RedisClientKeyLike key, DOMString min, DOMString max, DOMStringOrDouble... options)` -/
@@ -2913,16 +2913,16 @@ def RedisClient.zrangebyscore (self : RedisClient) (key : RedisClientKeyLike) (m
 def RedisClient.zrangebyscoreWithscores (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (withscores : RedisClientZrangebyscoreWithscoresWithscores) : Async (Array (Array Data)) :=
   self.val.callMethodAwait "zrangebyscore" (Support.args #[toJS key, toJS min, toJS max, toJS withscores]) (Array (Array Data))
 
-/-- `zrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number, limit: 'LIMIT', offset: number, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> zrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max, RedisClientZrangebyscoreWithLimitLimit limit, double offset, double count)` -/
-def RedisClient.zrangebyscoreWithLimit (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (limit : RedisClientZrangebyscoreWithLimitLimit) (offset : Float) (count : Float) : Async (Array String) :=
+/-- `zrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number, limit: 'LIMIT', offset: number, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> zrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max, RedisClientZrangebyscoreWithLimitLimit limit, double offset, double /* integer: Nat */ count)` -/
+def RedisClient.zrangebyscoreWithLimit (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (limit : RedisClientZrangebyscoreWithLimitLimit) (offset : Float) (count : Nat) : Async (Array String) :=
   self.val.callMethodAwait "zrangebyscore" (Support.args #[toJS key, toJS min, toJS max, toJS limit, toJS offset, toJS count]) (Array String)
 
 /-- `zrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number, withscores: 'WITHSCORES', ...options: (string | number)[]): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max, RedisClientZrangebyscoreWithscoresOptionsWithscores withscores, DOMStringOrDouble... options)` -/
 def RedisClient.zrangebyscoreWithscoresOptions (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (withscores : RedisClientZrangebyscoreWithscoresOptionsWithscores) (options : Array DOMStringOrDouble := #[]) : Async (Array (Array Data)) :=
   self.val.callMethodAwait "zrangebyscore" (Support.argsWith #[toJS key, toJS min, toJS max, toJS withscores] (options.map toJS)) (Array (Array Data))
 
-/-- `zrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number, withscores: 'WITHSCORES', limit: 'LIMIT', offset: number, count: number, ...options: (string | number)[]): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max, RedisClientZrangebyscoreWithWithscoresWithscores withscores, RedisClientZrangebyscoreWithWithscoresLimit limit, double offset, double count, DOMStringOrDouble... options)` -/
-def RedisClient.zrangebyscoreWithWithscores (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (withscores : RedisClientZrangebyscoreWithWithscoresWithscores) (limit : RedisClientZrangebyscoreWithWithscoresLimit) (offset : Float) (count : Float) (options : Array DOMStringOrDouble := #[]) : Async (Array (Array Data)) :=
+/-- `zrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number, withscores: 'WITHSCORES', limit: 'LIMIT', offset: number, count: number, ...options: (string | number)[]): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max, RedisClientZrangebyscoreWithWithscoresWithscores withscores, RedisClientZrangebyscoreWithWithscoresLimit limit, double offset, double /* integer: Nat */ count, DOMStringOrDouble... options)` -/
+def RedisClient.zrangebyscoreWithWithscores (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (withscores : RedisClientZrangebyscoreWithWithscoresWithscores) (limit : RedisClientZrangebyscoreWithWithscoresLimit) (offset : Float) (count : Nat) (options : Array DOMStringOrDouble := #[]) : Async (Array (Array Data)) :=
   self.val.callMethodAwait "zrangebyscore" (Support.argsWith #[toJS key, toJS min, toJS max, toJS withscores, toJS limit, toJS offset, toJS count] (options.map toJS)) (Array (Array Data))
 
 /-- `zrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number, ...options: (string | number)[]): Promise<string[]>`: `Promise<sequence<DOMString>> zrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max, DOMStringOrDouble... options)` -/
@@ -2937,8 +2937,8 @@ def RedisClient.zrevrangebyscore (self : RedisClient) (key : RedisClientKeyLike)
 def RedisClient.zrevrangebyscoreWithWithscores (self : RedisClient) (key : RedisClientKeyLike) (max : DOMStringOrDouble) (min : DOMStringOrDouble) (withscores : RedisClientZrevrangebyscoreWithWithscoresWithscores) : Async (Array (Array Data)) :=
   self.val.callMethodAwait "zrevrangebyscore" (Support.args #[toJS key, toJS max, toJS min, toJS withscores]) (Array (Array Data))
 
-/-- `zrevrangebyscore(key: RedisClient.KeyLike, max: string | number, min: string | number, limit: 'LIMIT', offset: number, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> zrevrangebyscore(RedisClientKeyLike key, DOMStringOrDouble max, DOMStringOrDouble min, RedisClientZrevrangebyscoreWithLimitLimit limit, double offset, double count)` -/
-def RedisClient.zrevrangebyscoreWithLimit (self : RedisClient) (key : RedisClientKeyLike) (max : DOMStringOrDouble) (min : DOMStringOrDouble) (limit : RedisClientZrevrangebyscoreWithLimitLimit) (offset : Float) (count : Float) : Async (Array String) :=
+/-- `zrevrangebyscore(key: RedisClient.KeyLike, max: string | number, min: string | number, limit: 'LIMIT', offset: number, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> zrevrangebyscore(RedisClientKeyLike key, DOMStringOrDouble max, DOMStringOrDouble min, RedisClientZrevrangebyscoreWithLimitLimit limit, double offset, double /* integer: Nat */ count)` -/
+def RedisClient.zrevrangebyscoreWithLimit (self : RedisClient) (key : RedisClientKeyLike) (max : DOMStringOrDouble) (min : DOMStringOrDouble) (limit : RedisClientZrevrangebyscoreWithLimitLimit) (offset : Float) (count : Nat) : Async (Array String) :=
   self.val.callMethodAwait "zrevrangebyscore" (Support.args #[toJS key, toJS max, toJS min, toJS limit, toJS offset, toJS count]) (Array String)
 
 /-- `zrevrangebyscore(key: RedisClient.KeyLike, max: string | number, min: string | number, ...options: (string | number)[]): Promise<string[]>`: `Promise<sequence<DOMString>> zrevrangebyscore(RedisClientKeyLike key, DOMStringOrDouble max, DOMStringOrDouble min, DOMStringOrDouble... options)` -/
@@ -3150,8 +3150,8 @@ def RedisClient.zunionstore (self : RedisClient) (destination : RedisClientKeyLi
 def RedisClient.zmpop (self : RedisClient) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) :=
   self.val.callMethodAwait "zmpop" (Support.argsWith #[toJS numkeys] (args.map toJS)) (Option (Array Data))
 
-/-- `bzmpop(timeout: number, numkeys: number, ...args: (string | number)[]): Promise<[string, [string, number][]] | null>`: `Promise<sequence<any>?> bzmpop(double timeout, double numkeys, DOMStringOrDouble... args)` -/
-def RedisClient.bzmpop (self : RedisClient) (timeout : Float) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) :=
+/-- `bzmpop(timeout: number, numkeys: number, ...args: (string | number)[]): Promise<[string, [string, number][]] | null>`: `Promise<sequence<any>?> bzmpop(double /* integer: Nat */ timeout, double numkeys, DOMStringOrDouble... args)` -/
+def RedisClient.bzmpop (self : RedisClient) (timeout : Nat) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) :=
   self.val.callMethodAwait "bzmpop" (Support.argsWith #[toJS timeout, toJS numkeys] (args.map toJS)) (Option (Array Data))
 
 /-- `bitop(operation: 'NOT' | 'not', destkey: RedisClient.KeyLike, key: RedisClient.KeyLike): Promise<number>`: `Promise<double> bitop(RedisClientBitopOperation operation, RedisClientKeyLike destkey, RedisClientKeyLike key)` -/
@@ -3286,8 +3286,8 @@ def RedisClient.object (self : RedisClient) (subcommand : String) (args : Array 
 def RedisClient.sort (self : RedisClient) (key : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async SequenceOfDOMStringOrDouble :=
   self.val.callMethodAwait "sort" (Support.argsWith #[toJS key] (args.map toJS)) SequenceOfDOMStringOrDouble
 
-/-- `wait(numreplicas: number, timeout: number): Promise<number>`: `Promise<double> wait(double numreplicas, double timeout)` -/
-def RedisClient.wait (self : RedisClient) (numreplicas : Float) (timeout : Float) : Async Float :=
+/-- `wait(numreplicas: number, timeout: number): Promise<number>`: `Promise<double> wait(double numreplicas, double /* integer: Nat */ timeout)` -/
+def RedisClient.wait (self : RedisClient) (numreplicas : Float) (timeout : Nat) : Async Float :=
   self.val.callMethodAwait "wait" (Support.args #[toJS numreplicas, toJS timeout]) Float
 
 /-- `lcs(key1: RedisClient.KeyLike, key2: RedisClient.KeyLike, ...options: (string | number)[]): Promise<any>`: `Promise<any> lcs(RedisClientKeyLike key1, RedisClientKeyLike key2, DOMStringOrDouble... options)` -/

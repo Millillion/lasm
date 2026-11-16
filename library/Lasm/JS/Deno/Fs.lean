@@ -131,8 +131,8 @@ structure FileInfo where
   isDirectory : Bool
   /-- `required boolean isSymlink` -/
   isSymlink : Bool
-  /-- `required double size` -/
-  size : Float
+  /-- `required double /* integer: Nat */ size` -/
+  size : Nat
   /-- `required object? mtime` -/
   mtime : Option Data
   /-- `required object? atime` -/
@@ -149,10 +149,10 @@ structure FileInfo where
   mode : Option Float
   /-- `required double? nlink` -/
   nlink : Option Float
-  /-- `required double? uid` -/
-  uid : Option Float
-  /-- `required double? gid` -/
-  gid : Option Float
+  /-- `required double /* integer: Nat */? uid` -/
+  uid : Option Nat
+  /-- `required double /* integer: Nat */? gid` -/
+  gid : Option Nat
   /-- `required double? rdev` -/
   rdev : Option Float
   /-- `required double? blksize` -/
@@ -172,7 +172,7 @@ instance : FromJS FileInfo where
     isFile := ← Lasm.JS.readField Bool d "isFile",
     isDirectory := ← Lasm.JS.readField Bool d "isDirectory",
     isSymlink := ← Lasm.JS.readField Bool d "isSymlink",
-    size := ← Lasm.JS.readField Float d "size",
+    size := ← Lasm.JS.readField Nat d "size",
     mtime := ← Lasm.JS.readField (Option Data) d "mtime",
     atime := ← Lasm.JS.readField (Option Data) d "atime",
     birthtime := ← Lasm.JS.readField (Option Data) d "birthtime",
@@ -181,8 +181,8 @@ instance : FromJS FileInfo where
     ino := ← Lasm.JS.readField (Option Float) d "ino",
     mode := ← Lasm.JS.readField (Option Float) d "mode",
     nlink := ← Lasm.JS.readField (Option Float) d "nlink",
-    uid := ← Lasm.JS.readField (Option Float) d "uid",
-    gid := ← Lasm.JS.readField (Option Float) d "gid",
+    uid := ← Lasm.JS.readField (Option Nat) d "uid",
+    gid := ← Lasm.JS.readField (Option Nat) d "gid",
     rdev := ← Lasm.JS.readField (Option Float) d "rdev",
     blksize := ← Lasm.JS.readField (Option Float) d "blksize",
     blocks := ← Lasm.JS.readField (Option Float) d "blocks",
@@ -575,13 +575,13 @@ def chmodSync (path : DOMStringOrURL) (mode : Float) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.chmodSync", module := "globalThis", path := "Deno.chmodSync", construct := false, arity := 2 }
     (Support.args #[toJS path, toJS mode]) (await := false)
 
-/-- `Deno.chown(path: string | URL, uid: number | null, gid: number | null): Promise<void>`: `Promise<undefined> chown(DOMStringOrURL path, double? uid, double? gid)` (Deno 2.9.6 type declarations) -/
-def chown (path : DOMStringOrURL) (uid : Option Float) (gid : Option Float) : Async Unit :=
+/-- `Deno.chown(path: string | URL, uid: number | null, gid: number | null): Promise<void>`: `Promise<undefined> chown(DOMStringOrURL path, double /* integer: Nat */? uid, double /* integer: Nat */? gid)` (Deno 2.9.6 type declarations) -/
+def chown (path : DOMStringOrURL) (uid : Option Nat) (gid : Option Nat) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Deno.chown", module := "globalThis", path := "Deno.chown", construct := false, arity := 3 }
     (Support.args #[toJS path, toJS uid, toJS gid])
 
-/-- `Deno.chownSync(path: string | URL, uid: number | null, gid: number | null): void`: `undefined chownSync(DOMStringOrURL path, double? uid, double? gid)` (Deno 2.9.6 type declarations) -/
-def chownSync (path : DOMStringOrURL) (uid : Option Float) (gid : Option Float) : IO Unit :=
+/-- `Deno.chownSync(path: string | URL, uid: number | null, gid: number | null): void`: `undefined chownSync(DOMStringOrURL path, double /* integer: Nat */? uid, double /* integer: Nat */? gid)` (Deno 2.9.6 type declarations) -/
+def chownSync (path : DOMStringOrURL) (uid : Option Nat) (gid : Option Nat) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.chownSync", module := "globalThis", path := "Deno.chownSync", construct := false, arity := 3 }
     (Support.args #[toJS path, toJS uid, toJS gid]) (await := false)
 

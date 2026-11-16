@@ -17,8 +17,8 @@ open Lasm.JS Lasm.JS.Web
 structure UpgradeWebSocketOptions where
   /-- `DOMString protocol` -/
   protocol : Option String := none
-  /-- `double idleTimeout` -/
-  idleTimeout : Option Float := none
+  /-- `double /* integer: Nat */ idleTimeout` -/
+  idleTimeout : Option Nat := none
   /-- `Uint8Array head` -/
   head : Option ByteArray := none
 instance : ToJS UpgradeWebSocketOptions := ⟨fun d => Support.fields #[("protocol", Support.optional d.protocol),

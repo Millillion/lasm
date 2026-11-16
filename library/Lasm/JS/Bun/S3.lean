@@ -263,8 +263,8 @@ structure S3ListObjectsResponseContents where
   owner : Option S3ListObjectsResponseContentsOwner := none
   /-- `S3ListObjectsResponseContentsRestoreStatus restoreStatus` -/
   restoreStatus : Option S3ListObjectsResponseContentsRestoreStatus := none
-  /-- `double size` -/
-  size : Option Float := none
+  /-- `double /* integer: Nat */ size` -/
+  size : Option Nat := none
   /-- `S3ListObjectsResponseContentsStorageClass storageClass` -/
   storageClass : Option S3ListObjectsResponseContentsStorageClass := none
 instance : FromJS S3ListObjectsResponseContents where
@@ -276,7 +276,7 @@ instance : FromJS S3ListObjectsResponseContents where
     lastModified := ← Lasm.JS.readField (Option String) d "lastModified",
     owner := ← Lasm.JS.readField (Option S3ListObjectsResponseContentsOwner) d "owner",
     restoreStatus := ← Lasm.JS.readField (Option S3ListObjectsResponseContentsRestoreStatus) d "restoreStatus",
-    size := ← Lasm.JS.readField (Option Float) d "size",
+    size := ← Lasm.JS.readField (Option Nat) d "size",
     storageClass := ← Lasm.JS.readField (Option S3ListObjectsResponseContentsStorageClass) d "storageClass" }
   typeName := "Lasm.JS.Bun.S3ListObjectsResponseContents"
 

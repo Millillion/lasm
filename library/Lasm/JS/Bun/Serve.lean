@@ -464,8 +464,8 @@ structure WebSocketHandler where
   backpressureLimit : Option Float := none
   /-- `boolean closeOnBackpressureLimit` -/
   closeOnBackpressureLimit : Option Bool := none
-  /-- `double idleTimeout` -/
-  idleTimeout : Option Float := none
+  /-- `double /* integer: Nat */ idleTimeout` -/
+  idleTimeout : Option Nat := none
   /-- `boolean publishToSelf` -/
   publishToSelf : Option Bool := none
   /-- `boolean sendPings` -/
