@@ -5,7 +5,7 @@
 // its modules and the C glue are linked only into programs that import it.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, toNamespacedPath } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { executableName } from './platform.mjs';
@@ -31,7 +31,13 @@ const webModules = (() => {
     need.add(module);
     for (const imported of importsOfSource(readFileSync(join(root, ...module.split('.')) + '.lean', 'utf8'))) visit(imported);
   };
-  eagerWebRoots.forEach(visit);
+  // And whatever Lasm.JS.Node, Deno and Bun (compiled with the prefix) import of it.
+  const hostRoots = ['Node', 'Deno', 'Bun'].flatMap(host => {
+    const dir = join(root, 'Lasm', 'JS', host);
+    const files = [`${dir}.lean`, ...(existsSync(dir) ? readdirSync(dir).filter(f => f.endsWith('.lean')).map(f => join(dir, f)) : [])];
+    return files.filter(existsSync).flatMap(file => importsOfSource(readFileSync(file, 'utf8')));
+  });
+  [...eagerWebRoots, ...hostRoots].forEach(visit);
   return all.filter(module => need.has(module));
 })();
 // The generated Lasm.WASI.Http modules: one per WIT interface, then the umbrella module.

@@ -283,3 +283,10 @@ test('every generated enum has exactly its WebIDL values, as abbrevs over the st
   }
   assert.ok(checked > 300, `${checked} enums checked`);
 });
+
+test('every module compiled with the prefix imports only modules compiled with it, earlier in the list', async () => {
+  const { importsOfSource } = await import('../src/lazy-library.mjs');
+  for (const m of libraryModules)
+    for (const i of importsOfSource(readFileSync(`${root}library/${m.replaceAll('.', '/')}.lean`, 'utf8')).filter(x => x.startsWith('Lasm.')))
+      assert.ok(libraryModules.indexOf(i) >= 0 && libraryModules.indexOf(i) < libraryModules.indexOf(m), `${m} imports ${i}`);
+});
