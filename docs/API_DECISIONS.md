@@ -154,8 +154,11 @@ Deno"](JS_BINDINGS.md#standard-bindings-for-deno-lasmjsdeno).
   let handler ← Deno.ServeHandler.ofFn fun req _ => do
     let up ← Deno.upgradeWebSocket req none
     let socket : WebSocket := { val := up.socket }
-    socket.val.set "onmessage" (toJS (← Function.ofSyncFn fun args => do
-      let _ : Value ← socket.val.callMethod "send" #[(← (args[0]!.field "data" |> pure))]; return .undefined))
+    let echo ← Function.ofSyncFn fun args => do
+      match (args[0]? : Option Data) with
+      | some (.ref event _) => do let _ : Value ← socket.val.callMethod "send" #[← event.get "data" Data]; return .undefined
+      | _ => return .undefined
+    socket.val.set "onmessage" (toJS echo)
     return up.response
   ```
 - **Why:** the platform-native WebSocket server on Deno; Tandem's server-side
@@ -283,9 +286,7 @@ Deno"](JS_BINDINGS.md#standard-bindings-for-deno-lasmjsdeno).
   ```lean
   let names := (← (← Deno.readDir (.domString ".")).values).map (·.name)
   let it ← (← Deno.listen {}).iterator
-  while true do
-    let some conn ← it.next | break
-    handleConn conn
+  if let some conn ← it.next then conn.close           -- the first connection
   ```
 - **Why:** `for await` is the only way to read these APIs; `values` matches
   Lasm.JS.Web's sync iterables (which collect into an array), and `next` serves

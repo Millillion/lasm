@@ -1110,8 +1110,8 @@ review the diff of the IDL files.
 from Deno's own TypeScript declarations (`cli/tsc/dts/lib.deno.ns.d.ts`,
 `lib.deno_net.d.ts`, and Deno KV and `Deno.cron` from `lib.deno.unstable.d.ts`):
 every function, constant and class, and every type they use. Status: **current
-source, not yet released** (Stage 0, milestone 0.4; docs/API_DECISIONS.md 0.4-21 to
-0.4-26). It runs with `--target deno` and `--target deno-deploy`.
+source, not yet released** (Stage 0, milestone 0.4; docs/API_DECISIONS.md A2.1,
+A25.1, 0.4-21 to 0.4-26). It runs with `--target deno` and `--target deno-deploy`.
 
 ```lean
 import Lasm.JS.Deno
@@ -1166,7 +1166,7 @@ Not generated, with the reason (each in
 - **Marked `@experimental`, `UNSTABLE` or `@deprecated`**: VSOCK, QUIC and
   WebTransport, `Deno.spawn` and its forms, the unstable file's other APIs. Deno
   KV and `Deno.cron` are the exception: they are generated although their
-  declarations are unstable (Jordan, 2026-11-16; API_DECISIONS 0.4-22).
+  declarations are unstable (Jordan, 2026-11-16; API_DECISIONS 0.4-21).
 - **FFI** (`Deno.dlopen`, `UnsafePointer`, …): signatures computed by
   TypeScript's type system, and Deno Deploy has no FFI. **`Deno.test` and
   `Deno.bench`**: they register tests for `deno test`, which does not run Lasm's
@@ -1189,7 +1189,7 @@ Not generated, with the reason (each in
 
 [`ts-auto.mjs`](../scripts/bindings/ts-auto.mjs) lowers the namespace to WebIDL
 with the declaration reader of `serve-api.mjs` and these rules (each in
-API_DECISIONS 0.4-23); `generate-web.mjs` then generates Lean as for the other
+API_DECISIONS 0.4-22); `generate-web.mjs` then generates Lean as for the other
 tiers ([above](#how-a-webidl-declaration-becomes-lean)).
 
 | TypeScript | WebIDL | Lean |
@@ -1213,7 +1213,7 @@ tiers ([above](#how-a-webidl-declaration-becomes-lean)).
 | `never` (`exit`) | `undefined` | `IO Unit` |
 
 Four small tables in `deno-tier2.mjs` complete the mechanical rules, every entry
-reviewed (API_DECISIONS 0.4-24): **names** of overloads, **split** (a parameter
+reviewed (API_DECISIONS 0.4-23): **names** of overloads, **split** (a parameter
 that is a union of option types becomes one overload per alternative:
 `serveWithOptions`, `serveWithTlsOptions`), **intersections** (names of
 `A & B` option types: `ListenTcpOptions`, `ServeTcpTlsOptions`) and **overrides**
