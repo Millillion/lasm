@@ -179,6 +179,40 @@ test('bun: modules come from process.getBuiltinModule, else require, on Bun only
   }
 });
 
+test('only an exact bun: prefix on Bun loads a Bun module; without process or getBuiltinModule, require answers', () => {
+  const answer = s => ({ tag: () => `answer ${s}` }); // a getBuiltinModule and a require that answer every specifier
+  const bunDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'Bun');
+  const processDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'process');
+  const builtinDescriptor = Object.getOwnPropertyDescriptor(globalThis.process, 'getBuiltinModule');
+  const requireDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'require');
+  const unknown = (value, specifier) => assert.throws(() => value(201, 0, 0, enc.encode(specifier)),
+    new RegExp(`JavaScript module ${JSON.stringify(specifier)} is not in this edge build`));
+  try {
+    Object.defineProperty(globalThis.process, 'getBuiltinModule', { value: answer, configurable: true, writable: true });
+    Object.defineProperty(globalThis, 'require', { value: answer, configurable: true, writable: true });
+    // Not on Bun: even a bun: specifier both would answer is unknown.
+    delete globalThis.Bun;
+    unknown(edge({ modules: {} }).value, 'bun:sqlite');
+    Object.defineProperty(globalThis, 'Bun', { value: { version: 'test' }, configurable: true, writable: true });
+    {
+      const { value } = edge({ modules: {} });
+      assert.equal(value(214, 0, 0, wire(['T.tag', 'bun:sqlite', 'tag', []])), 'answer bun:sqlite');
+      // On Bun, a specifier without the exact bun: prefix never reaches getBuiltinModule or require.
+      for (const specifier of ['bunx:sqlite', ':bun:sqlite', 'sqlite', 'Bun:sqlite', 'other']) unknown(value, specifier);
+    }
+    // getBuiltinModule absent, then process absent: require answers.
+    delete globalThis.process.getBuiltinModule;
+    assert.equal(edge({ modules: {} }).value(214, 0, 0, wire(['T.tag', 'bun:a', 'tag', []])), 'answer bun:a');
+    Object.defineProperty(globalThis, 'process', { value: undefined, configurable: true, writable: true });
+    assert.equal(edge({ modules: {} }).value(214, 0, 0, wire(['T.tag', 'bun:b', 'tag', []])), 'answer bun:b');
+  } finally {
+    Object.defineProperty(globalThis, 'process', processDescriptor);
+    if (builtinDescriptor) Object.defineProperty(globalThis.process, 'getBuiltinModule', builtinDescriptor); else delete globalThis.process.getBuiltinModule;
+    if (bunDescriptor) Object.defineProperty(globalThis, 'Bun', bunDescriptor); else delete globalThis.Bun;
+    if (requireDescriptor) Object.defineProperty(globalThis, 'require', requireDescriptor); else delete globalThis.require;
+  }
+});
+
 // Strings and object keys have ASCII fast paths (Writer.string, Reader.string,
 // Reader.key); their bytes and values must be exactly the general path's
 // (TextEncoder's UTF-8; TextDecoder), on both sides of every boundary.
