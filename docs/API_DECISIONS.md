@@ -42,9 +42,9 @@ linked section of the review.
 
 | Id | Area | Decision to sign off | Detail | Status |
 | --- | --- | --- | --- | --- |
-| A1 | Deno | What happens to `--target deno-deploy`? | [Q1](api/SHAPES_REVIEW_2026-11-11.md#0-deno-decide-first-it-affects-several-sections) | pending sign-off |
-| A2 | Deno | What happens to `Lasm.JS.Deno` and `--target deno`? | [Q2](api/SHAPES_REVIEW_2026-11-11.md#0-deno-decide-first-it-affects-several-sections) | pending sign-off |
-| A3 | Deno | Should Netlify Edge and Supabase Edge, which depend on the Deno runtime, be marked as at-risk targets? | [Q3](api/SHAPES_REVIEW_2026-11-11.md#0-deno-decide-first-it-affects-several-sections) | pending sign-off |
+| A1 | Deno | What happens to `--target deno-deploy`? | [Q1](api/SHAPES_REVIEW_2026-11-11.md#0-deno-decide-first-it-affects-several-sections) | decided by Jordan (2026-11-16): keep `--target deno-deploy` fully supported, with no at-risk warning ([milestone 0.4](#milestone-04-node-bun-and-deno)) |
+| A2 | Deno | What happens to `Lasm.JS.Deno` and `--target deno`? | [Q2](api/SHAPES_REVIEW_2026-11-11.md#0-deno-decide-first-it-affects-several-sections) | decided by Jordan (2026-11-16): full support, `Lasm.JS.Deno` generated in full including Deno KV ([milestone 0.4](#milestone-04-node-bun-and-deno)) |
+| A3 | Deno | Should Netlify Edge and Supabase Edge, which depend on the Deno runtime, be marked as at-risk targets? | [Q3](api/SHAPES_REVIEW_2026-11-11.md#0-deno-decide-first-it-affects-several-sections) | decided by Jordan (2026-11-16): not marked at risk ([milestone 0.4](#milestone-04-node-bun-and-deno)) |
 | A4 | Lasm.JS core | Should `Function.ofFn` set `length`? | [Q4](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A5 | Lasm.JS core | Should the build-time check skip `globalThis` exports that Node lacks? | [Q5](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A6 | Lasm.JS core | Inline JavaScript and classes (LASM_JS_GAPS.md, PR #169): `@[js "./ffi/foo.mjs" "f"]` paths relative to the Lean file, and a `Lasm.JS.Class.define` builder (a real `class extends`, no `eval`). | [Q6](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
@@ -58,8 +58,8 @@ linked section of the review.
 | A14 | Browser tier | Unmount cleanup. Should apps remove their own listeners, timers and sockets (current state)? | [Q14](api/SHAPES_REVIEW_2026-11-11.md#4-browser-tier-lasmjswebbrowser-and-lasmuimount) | pending sign-off |
 | A15 | Browser tier | Should Claude accept the loss of batching (`Context2D.draw`, `Event.info`), with one JavaScript call per method? | [Q15](api/SHAPES_REVIEW_2026-11-11.md#4-browser-tier-lasmjswebbrowser-and-lasmuimount) | pending sign-off |
 | A16 | Browser tier | Mount callbacks. Keep plain Lean functions (simpler, nothing to remove), or switch to handles for consistency? | [Q16](api/SHAPES_REVIEW_2026-11-11.md#4-browser-tier-lasmjswebbrowser-and-lasmuimount) | pending sign-off |
-| A17 | Lasm.JS.Node | Should Node's docs be the source instead of `@types/node`? | [Q17](api/SHAPES_REVIEW_2026-11-11.md#5-lasmjsnode-generated) | pending sign-off |
-| A18 | Lasm.JS.Node | Should Claude merge the `node:http`/`net`/`https` branch (about 2,700 lines of generated Lean)? | [Q18](api/SHAPES_REVIEW_2026-11-11.md#5-lasmjsnode-generated) | pending sign-off |
+| A17 | Lasm.JS.Node | Should Node's docs be the source instead of `@types/node`? | [Q17](api/SHAPES_REVIEW_2026-11-11.md#5-lasmjsnode-generated) | decided by Jordan (2026-11-16): Node's own doc JSON ([milestone 0.4](#milestone-04-node-bun-and-deno)) |
+| A18 | Lasm.JS.Node | Should Claude merge the `node:http`/`net`/`https` branch (about 2,700 lines of generated Lean)? | [Q18](api/SHAPES_REVIEW_2026-11-11.md#5-lasmjsnode-generated) | decided (2026-11-16): merged in #220, pending sign-off ([milestone 0.4](#milestone-04-node-bun-and-deno)) |
 | A19 | `Node.serve`, and serverless `exportDefault` | Should `Node.serve` take the options structure with a plain Lean `fetch` (as decided), with `port : Option Nat` and `hostname : Option String`? | [Q19](api/SHAPES_REVIEW_2026-11-11.md#6-nodeserve-and-serverless-exportdefault) | pending sign-off |
 | A20 | `Node.serve`, and serverless `exportDefault` | Should Lasm's Node entry also serve a program's `exportDefault` on `$PORT`, as the Deno and Bun entries do? | [Q20](api/SHAPES_REVIEW_2026-11-11.md#6-nodeserve-and-serverless-exportdefault) | pending sign-off |
 | A21 | `Node.serve`, and serverless `exportDefault` | Consistency. Should `exportDefault` get a typed form for the common case, `exportDefault (fetch : Request → Async Response)`, so programs stop writing `Function.ofFn1`? | [Q21](api/SHAPES_REVIEW_2026-11-11.md#6-nodeserve-and-serverless-exportdefault) | pending sign-off |
@@ -103,3 +103,107 @@ linked section of the review.
 | A54 | Libraries | PR #124's drafts (`Lasm.Web.Crypto`, a WebSocket upgrade in `Lasm.Fetch.serve`, `Lasm.Markdown`) not taken; kept on the `api-proposals` branch. | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A55 | CLI | Proposed, not built: a WASI reactor build (`lasm build … --target wasi --reactor`) for the CLI's glue; under Stage 2's backend this question may change. | [REVIEW.md §2](REVIEW.md#the-cli-surface) | pending sign-off |
 | A56 | Packaging | Where the `Lasm.*` libraries live (inside `@lasm/cli` or separate `@lasm/*` packages): deferred by Jordan until the APIs are final. | [REVIEW.md §1](REVIEW.md#major-where-the-lasm-libraries-live-deferred-by-jordan-2026-11-10) | pending decision |
+
+## Milestone 0.4: Node, Bun and Deno
+
+Entries of [ROADMAP.md](../ROADMAP.md)'s milestone 0.4. Full rules and examples:
+[JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-for-node-lasmjsnode).
+
+### A1–A3: Deno stays fully supported
+
+- **Decision (Jordan, 2026-11-16):** full Deno support. `--target deno` and
+  `--target deno-deploy` stay fully supported with no at-risk warnings (none
+  existed in the CLI or README; none are added), Netlify Edge and Supabase
+  Edge are not marked at risk, and `Lasm.JS.Deno` is generated in full,
+  including Deno KV (apps use it directly once `Lasm.KV` is deleted).
+- **Why:** people use Deno now, and the effect of Cloudflare's acquisition is
+  unknown. **Alternatives:** keep until Deno Deploy closes, freeze at 2.9.6,
+  or plan removal (Q1–Q3).
+- **Where:** this milestone's Deno PRs. **Status:** decided by Jordan.
+
+### A17: Lasm.JS.Node is generated from Node's own docs
+
+- **Decision (Jordan, 2026-11-16):** the source is Node's machine-readable
+  documentation (`https://nodejs.org/dist/v<version>/docs/api/<module>.json`,
+  hashes pinned in `scripts/bindings/node-api.lock.json`), lowered to WebIDL by
+  `scripts/bindings/node-api.mjs`, then `generate-web.mjs`.
+
+  ```lean
+  import Lasm.JS.Node
+  open Lasm.JS Lasm.JS.Web Lasm.JS.Node
+
+  def run : Async Unit := do
+    let file ← path.join #[← os.tmpdir, "hello.txt"]
+    fsPromises.writeFile file "hi"
+    let key ← crypto.scrypt "password" "salt" 32
+    IO.println (← Buffer.toString key (some "hex"))
+  ```
+- **Why:** the docs are Node's own statement of the API, with stability
+  levels (Experimental, Deprecated and Legacy members are never generated),
+  `added:` versions and per-member prose that the lowering quotes and checks.
+  **Alternative:** `@types/node` (community-maintained; no stability marks;
+  overloaded TypeScript shapes that do not map to Lean one to one).
+- **Where:** #192 (0.7.0); unchanged since. **Status:** decided by Jordan
+  (2026-11-16).
+
+### A18: `node:net`, `node:http` and `node:https` are generated and merged
+
+- **Decision:** merge PR #220. `Lasm.JS.Node.Net`, `.Http` and `.Https` give
+  every stable member of `net` (`createServer`, `connect`, `Server`, `Socket`,
+  `BlockList`, `SocketAddress`, `BoundSocket`), `http` (`createServer`,
+  `request`, `get`, `Server`, `IncomingMessage`, `ServerResponse`,
+  `ClientRequest`, `OutgoingMessage`, `Agent`) and `https`, from the same docs
+  and generator. This is not a serving path: Node servers use `Node.serve`
+  (milestone 0.2, `Lasm.JS.Node.Serve`); these are for raw TCP servers and
+  outbound `http.request`. The namespaces do not collide with
+  `Lasm.JS.Node.Serve` (`Node.serve` is a separate module under the same
+  root; the generated names are the docs' lowercase ones: `http.createServer`).
+
+  ```lean
+  let echo ← http.Server.RequestListener.ofFn fun req res => do
+    discard <| res.setHeader "x-method" (← req.method)
+    discard <| res.writeHead 200
+    discard <| res.«end» (some body)
+  let server ← http.createServer none (some echo)
+  ```
+- **Why:** Jordan's direction is complete generated bindings per platform, and
+  users who need a raw socket or Node's HTTP client should not hand-bind them.
+  **Alternatives:** drop `http` and keep `net` only; keep the branch held.
+- **Where:** #220 (unreleased). **Status:** pending sign-off.
+
+### 0.4-1: documented events are typed listeners
+
+- **Decision:** each stable documented event of a generated class becomes a
+  listener type with the event's documented argument types
+  (`http.Server.RequestListener`, made with `ofFn` or `ofSyncFn`) and two
+  operations, `on<Event>` and `once<Event>`, that call `emitter.on` /
+  `emitter.once` with the event's name and return the emitter. Arguments the
+  docs give only in prose are stated in `node-tier2.mjs` `eventProse`, quoting
+  the sentence. Listener parameters (`requestListener`, `connectListener`)
+  take that event's listener type.
+
+  ```lean
+  discard <| server.onceListening (← net.Server.ListeningListener.ofSyncFn (do ready.resolve ()))
+  discard <| child.onceExit (← ChildProcess.ExitListener.ofFn fun code signal => …)
+  ```
+- **Why:** the event names and argument types are part of the documented API;
+  a typed listener catches a misspelled event or a wrong argument type at
+  compile time. **Alternative:** only the generic `EventEmitter.on (event :
+  String)` with `Data` arguments (still available).
+- **Where:** #220 (unreleased). **Status:** pending sign-off.
+
+### 0.4-2: parent projections named in full where they collide
+
+- **Decision:** a class whose ancestors' automatic Lean parent projections
+  would collide gets the parent's full name (`https.Server.toHttpServer`).
+- **Why:** Lean's automatic name (`toServer`) is ambiguous between
+  `net.Server` and `http.Server`. **Alternative:** renaming the classes.
+- **Where:** #220 (unreleased). **Status:** pending sign-off.
+
+### 0.4-3: explicit instance names on generated Node types
+
+- **Decision:** instances of generated `Lasm.JS.Node` types have explicit
+  names (`instFromJSFsStats`). Nothing refers to the automatic names.
+- **Why:** Lean's automatic instance names collided across namespaced types
+  (`fs.Stats`, `net.Server`). **Alternative:** none that keeps both types.
+- **Where:** #220 (unreleased). **Status:** pending sign-off.
