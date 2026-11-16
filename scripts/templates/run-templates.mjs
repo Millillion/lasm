@@ -150,7 +150,7 @@ try {
     const base = guide ? 'hono' : template;
     const app = join(work, `${template} app λ`);
     // With --docker, server templates also get and test the Lambda image.
-    const lambda = docker && base !== 'plain' ? ['--deploy', 'lambda'] : [];
+    const lambda = docker && base !== 'plain' ? ['--deploy', 'lambda-container'] : [];
     // LASM_INIT_FROM_SOURCE=1 takes `lasm init` from this checkout (local runs with an older candidate).
     if (process.env.LASM_INIT_FROM_SOURCE === '1')
       run(`lasm init ${template} (source)`, [process.execPath], [fileURLToPath(new URL('../../bin/lasm.mjs', import.meta.url)), 'init', app, '--template', base, ...lambda], cli);
