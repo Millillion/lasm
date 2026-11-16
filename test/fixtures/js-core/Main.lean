@@ -61,7 +61,8 @@ def projectFiles (r : Checks) : IO Unit := runSection r "project-files" do
 /-! Classes (A6.2): exercised from JavaScript (ffi/files.mjs `useClass`). -/
 
 @[js "./ffi/files.mjs" "useClass"] opaque useClass : Value → IO Data
-@[js "globalThis" "Error"] opaque errorClass : IO Value
+/-- The `Error` class itself (a binding would call it). -/
+def errorClass : IO Value := do (← global).get "Error"
 
 def classes (r : Checks) : IO Unit := runSection r "classes" do
   let c ← Class.define {

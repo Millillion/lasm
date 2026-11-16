@@ -427,7 +427,7 @@ JavaScript target:
 import Lasm.JS.Class
 open Lasm.JS
 
-@[js "globalThis" "Error"] opaque errorClass : IO Value
+def errorClass : IO Value := do (← global).get "Error"   -- the class itself; a binding would call it
 
 def notFound : IO Value := do
   Class.define {
