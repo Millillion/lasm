@@ -194,6 +194,17 @@ export async function ensureLazyModules(tree, roots, { eager, root = libraryRoot
   });
 }
 
+/**
+ * A build's or the editor's step: compiles into `prefix` the lazy modules the Lean files under `directory`
+ * import. Messages go to `progress` (as stages) when there is one, else to `log`; `lock` is
+ * src/application-lock.mjs withApplicationLock, so builds of different projects share the compiles.
+ */
+export function ensureProgramLibrary(prefix, directory, { eager, log = message => console.error(message), progress, lock } = {}) {
+  return ensureLazyModules(prefix, programLibraryImports(directory), {
+    eager, log: message => (progress ? progress({ stage: message.replace(/^\[lasm\] /, '') }) : log(message)),
+    lock: lock && ((path, action) => lock(path, action, { onWait: () => progress?.({ stage: 'Waiting for another build compiling Lasm library modules' }) })) });
+}
+
 /** The lazy modules compiled into the prefix, in an order where each comes after the modules it imports. */
 export function compiledLazyModules(tree, eager, root = libraryRoot) {
   const present = lazyModules(eager, root).filter(m => readStamp(tree, m) && existsSync(outputsOf(tree, m).c));

@@ -122,3 +122,15 @@ test('the managed cache accepts a prefix holding stamped modules, and refuses a 
     await assert.rejects(verifyArtifactDirectory(tree, 'test'), /Managed cache contents changed/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test('ensureProgramLibrary: the imports of the directory\'s files, messages as progress stages or log lines, the shared lock', async () => {
+  const { ensureProgramLibrary } = await import('../src/lazy-library.mjs');
+  const { root, tree, eager, dir } = fixture();
+  try {
+    // Without a lazy import nothing is compiled, and the lock is not taken.
+    put(join(dir, 'p1', 'Main.lean'), 'import Lasm.JS\n');
+    const locks = [];
+    assert.deepEqual((await ensureProgramLibrary(tree, join(dir, 'p1'), { eager, lock: async (...a) => { locks.push(a); return a[1](); } })).compiled, []);
+    assert.deepEqual(locks, []);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
