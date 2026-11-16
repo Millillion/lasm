@@ -42,6 +42,10 @@ def tty.WriteStream.ResizeListener.ofFn (f : Async Unit) : IO tty.WriteStream.Re
 def tty.WriteStream.ResizeListener.ofSyncFn (f : IO Unit) : IO tty.WriteStream.ResizeListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
 
+/-- `v instanceof ReadStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadStream`). -/
+def tty.ReadStream.cast? (v : Value) : IO (Option tty.ReadStream) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:tty" ["ReadStream"] Value) v) then some { val := v } else none
+
 /-- `readStream.isRaw` (added in Node.js v0.7.7): `readonly attribute any isRaw` -/
 def tty.ReadStream.isRaw (self : tty.ReadStream) : IO Data := self.val.get "isRaw" Data
 
@@ -55,6 +59,10 @@ def tty.ReadStream.rawMode (self : tty.ReadStream) : IO BooleanOrDOMString := se
 def tty.ReadStream.setRawMode (self : tty.ReadStream) (mode : BooleanOrDOMString) : IO tty.ReadStream := do
   let r ← self.val.callMethod "setRawMode" (Support.args #[toJS mode]) Value
   pure { val := r }
+
+/-- `v instanceof WriteStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WriteStream`). -/
+def tty.WriteStream.cast? (v : Value) : IO (Option tty.WriteStream) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:tty" ["WriteStream"] Value) v) then some { val := v } else none
 
 /-- `writeStream.columns` (added in Node.js v0.7.7): `readonly attribute any columns` -/
 def tty.WriteStream.columns (self : tty.WriteStream) : IO Data := self.val.get "columns" Data
@@ -103,8 +111,8 @@ def tty.WriteStream.hasColors (self : tty.WriteStream) (count : Option Int := no
 def tty.WriteStream.moveCursor (self : tty.WriteStream) (dx : Float) (dy : Float) : IO Bool :=
   self.val.callMethod "moveCursor" (Support.args #[toJS dx, toJS dy]) Bool
 
-/-- `tty.isatty(fd)` (added in Node.js v0.5.8): `boolean isatty(double fd)` (Node.js 24.22.2 documentation, tty.md) -/
-def tty.isatty (fd : Float) : IO Bool :=
+/-- `tty.isatty(fd)` (added in Node.js v0.5.8): `boolean isatty(double /* integer: Nat */ fd)` (Node.js 24.22.2 documentation, tty.md) -/
+def tty.isatty (fd : Nat) : IO Bool :=
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.tty.isatty", module := "node:tty", path := "isatty", construct := false, arity := 1 }
     (Support.args #[toJS fd]) (await := false)
 

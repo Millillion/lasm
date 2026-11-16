@@ -38,6 +38,18 @@ instance instNonemptyAssertCallTracker : Nonempty assert.CallTracker := ⟨{ val
 instance instToJSAssertCallTracker : ToJS assert.CallTracker := ⟨fun x => .ref x.val ""⟩
 instance instFromJSAssertCallTracker : FromJS assert.CallTracker := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.assert.CallTracker", .data⟩
 
+/-- `v instanceof AssertionError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AssertionError`). -/
+def assert.AssertionError.cast? (v : Value) : IO (Option assert.AssertionError) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:assert" ["AssertionError"] Value) v) then some { val := v } else none
+
+/-- `v instanceof Assert`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Assert`). -/
+def assert.Assert.cast? (v : Value) : IO (Option assert.Assert) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:assert" ["Assert"] Value) v) then some { val := v } else none
+
+/-- `v instanceof CallTracker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CallTracker`). -/
+def assert.CallTracker.cast? (v : Value) : IO (Option assert.CallTracker) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:assert" ["CallTracker"] Value) v) then some { val := v } else none
+
 /-- **Deprecated** in the Node.js 24.22.2 docs. `tracker.calls([fn][, exact])` (added in Node.js v14.2.0, v12.19.0): `Function calls(optional Function fn, optional double exact)` -/
 def assert.CallTracker.calls (self : assert.CallTracker) (fn : Option JSFunction := none) (exact : Option Float := none) : IO JSFunction :=
   self.val.callMethod "calls" (Support.args #[Support.optional fn, Support.optional exact]) JSFunction

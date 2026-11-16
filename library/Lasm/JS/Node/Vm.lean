@@ -301,6 +301,10 @@ instance instToJSVmRunInThisContextOptionsOrDOMString : ToJS vm.RunInThisContext
 instance instCoeVmRunInThisContextOptionsVmRunInThisContextOptionsOrDOMString : Coe vm.RunInThisContextOptions vm.RunInThisContextOptionsOrDOMString := ⟨.runInThisContextOptions⟩
 instance instCoeStringVmRunInThisContextOptionsOrDOMString : Coe String vm.RunInThisContextOptionsOrDOMString := ⟨.domString⟩
 
+/-- `v instanceof Script`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Script`). -/
+def vm.Script.cast? (v : Value) : IO (Option vm.Script) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:vm" ["Script"] Value) v) then some { val := v } else none
+
 /-- `script.cachedDataRejected` (added in Node.js v5.7.0): `readonly attribute boolean? cachedDataRejected` -/
 def vm.Script.cachedDataRejected (self : vm.Script) : IO (Option Bool) := self.val.get "cachedDataRejected" (Option Bool)
 
@@ -323,6 +327,10 @@ def vm.Script.runInNewContext (self : vm.Script) (contextObject : Data := .undef
 def vm.Script.runInThisContext (self : vm.Script) (options : Option vm.Script.RunInThisContextOptions := none) : IO Data :=
   self.val.callMethod "runInThisContext" (Support.args #[Support.optional options]) Data
 
+/-- `v instanceof Module`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Module`). -/
+def vm.Module.cast? (v : Value) : IO (Option vm.Module) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:vm" ["Module"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.error`: `readonly attribute any error` -/
 def vm.Module.error (self : vm.Module) : IO Data := self.val.get "error" Data
 
@@ -342,6 +350,10 @@ def vm.Module.evaluate (self : vm.Module) (options : Option vm.Module.EvaluateOp
 /-- **Experimental** in the Node.js 24.22.2 docs. `module.link(linker)`: `Promise<any> link(Function linker)` -/
 def vm.Module.link (self : vm.Module) (linker : JSFunction) : Async Data :=
   self.val.callMethodAwait "link" (Support.args #[toJS linker]) Data
+
+/-- `v instanceof SourceTextModule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SourceTextModule`). -/
+def vm.SourceTextModule.cast? (v : Value) : IO (Option vm.SourceTextModule) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:vm" ["SourceTextModule"] Value) v) then some { val := v } else none
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `sourceTextModule.dependencySpecifiers`: `readonly attribute sequence<DOMString> dependencySpecifiers` -/
 def vm.SourceTextModule.dependencySpecifiers (self : vm.SourceTextModule) : IO (Array String) := self.val.get "dependencySpecifiers" (Array String)
@@ -368,6 +380,10 @@ def vm.SourceTextModule.instantiate (self : vm.SourceTextModule) : IO Unit :=
 /-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.linkRequests(modules)` (added in Node.js v24.8.0): `undefined linkRequests(sequence<vm.Module> modules)` -/
 def vm.SourceTextModule.linkRequests (self : vm.SourceTextModule) (modules : Array vm.Module) : IO Unit :=
   self.val.callMethod "linkRequests" (Support.args #[toJS modules]) Unit
+
+/-- `v instanceof SyntheticModule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SyntheticModule`). -/
+def vm.SyntheticModule.cast? (v : Value) : IO (Option vm.SyntheticModule) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:vm" ["SyntheticModule"] Value) v) then some { val := v } else none
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `syntheticModule.setExport(name, value)` (added in Node.js v13.0.0, v12.16.0): `undefined setExport(DOMString name, any value)` -/
 def vm.SyntheticModule.setExport (self : vm.SyntheticModule) (name : String) (value : Data) : IO Unit :=

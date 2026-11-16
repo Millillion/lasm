@@ -21,6 +21,10 @@ instance : Nonempty StringDecoder := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS StringDecoder := ⟨fun x => .ref x.val ""⟩
 instance : FromJS StringDecoder := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.StringDecoder", .data⟩
 
+/-- `v instanceof StringDecoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StringDecoder`). -/
+def StringDecoder.cast? (v : Value) : IO (Option StringDecoder) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:string_decoder" ["StringDecoder"] Value) v) then some { val := v } else none
+
 /-- `stringDecoder.end([buffer])` (added in Node.js v0.9.3): `DOMString end(optional (DOMString or Uint8Array) buffer)` -/
 def StringDecoder.«end» (self : StringDecoder) (buffer_ : Option DOMStringOrUint8Array := none) : IO String :=
   self.val.callMethod "end" (Support.args #[Support.optional buffer_]) String

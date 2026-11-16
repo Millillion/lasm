@@ -277,6 +277,10 @@ instance instToJSSqliteBackupOptions : ToJS sqlite.BackupOptions := ⟨fun d => 
     ("rate", Support.optional d.rate),
     ("progress", Support.optional d.progress)]⟩
 
+/-- `v instanceof DatabaseSync`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DatabaseSync`). -/
+def DatabaseSync.cast? (v : Value) : IO (Option DatabaseSync) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:sqlite" ["DatabaseSync"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.isOpen` (added in Node.js v23.11.0, v22.15.0): `readonly attribute boolean isOpen` -/
 def DatabaseSync.isOpen (self : DatabaseSync) : IO Bool := self.val.get "isOpen" Bool
 
@@ -357,6 +361,10 @@ def DatabaseSync.createSession (self : DatabaseSync) (options : Option DatabaseS
 def DatabaseSync.applyChangeset (self : DatabaseSync) (changeset : ByteArray) (options : Option DatabaseSync.ApplyChangesetOptions := none) : IO Bool :=
   self.val.callMethod "applyChangeset" (Support.args #[toJS changeset, Support.optional options]) Bool
 
+/-- `v instanceof Session`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Session`). -/
+def Session.cast? (v : Value) : IO (Option Session) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:sqlite" ["Session"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `session.changeset()` (added in Node.js v23.3.0, v22.12.0): `Uint8Array changeset()` -/
 def Session.changeset (self : Session) : IO ByteArray :=
   self.val.callMethod "changeset" (Support.args #[]) ByteArray
@@ -368,6 +376,10 @@ def Session.patchset (self : Session) : IO ByteArray :=
 /-- **Experimental** in the Node.js 24.22.2 docs. `session.close()`: `undefined close()` -/
 def Session.close (self : Session) : IO Unit :=
   self.val.callMethod "close" (Support.args #[]) Unit
+
+/-- `v instanceof StatementSync`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StatementSync`). -/
+def StatementSync.cast? (v : Value) : IO (Option StatementSync) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:sqlite" ["StatementSync"] Value) v) then some { val := v } else none
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.expandedSQL` (added in Node.js v22.5.0): `readonly attribute DOMString expandedSQL` -/
 def StatementSync.expandedSQL (self : StatementSync) : IO String := self.val.get "expandedSQL" String
@@ -415,6 +427,10 @@ def StatementSync.setReturnArrays (self : StatementSync) (enabled : Bool) : IO U
 def StatementSync.setReadBigInts (self : StatementSync) (enabled : Bool) : IO Unit :=
   self.val.callMethod "setReadBigInts" (Support.args #[toJS enabled]) Unit
 
+/-- `v instanceof SQLTagStore`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SQLTagStore`). -/
+def SQLTagStore.cast? (v : Value) : IO (Option SQLTagStore) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:sqlite" ["SQLTagStore"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.size` (added in Node.js v24.9.0): `readonly attribute long long size` -/
 def SQLTagStore.size (self : SQLTagStore) : IO Int := self.val.get "size" Int
 
@@ -445,6 +461,10 @@ def SQLTagStore.run (self : SQLTagStore) (stringElements : Array String) (boundP
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.clear()` (added in Node.js v24.9.0): `undefined clear()` -/
 def SQLTagStore.clear (self : SQLTagStore) : IO Unit :=
   self.val.callMethod "clear" (Support.args #[]) Unit
+
+/-- `v instanceof Database`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Database`). -/
+def Database.cast? (v : Value) : IO (Option Database) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:sqlite" ["Database"] Value) v) then some { val := v } else none
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.isOpen` (added in Node.js v23.11.0, v22.15.0): `readonly attribute boolean isOpen` -/
 def Database.isOpen (self : Database) : IO Bool := self.val.get "isOpen" Bool
@@ -529,6 +549,10 @@ def Database.createSession (self : Database) (options : Option Database.CreateSe
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.applyChangeset(changeset[, options])` (added in Node.js v23.3.0, v22.12.0): `boolean applyChangeset(Uint8Array changeset, optional Database.ApplyChangesetOptions options)` -/
 def Database.applyChangeset (self : Database) (changeset : ByteArray) (options : Option Database.ApplyChangesetOptions := none) : IO Bool :=
   self.val.callMethod "applyChangeset" (Support.args #[toJS changeset, Support.optional options]) Bool
+
+/-- `v instanceof Statement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Statement`). -/
+def Statement.cast? (v : Value) : IO (Option Statement) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:sqlite" ["Statement"] Value) v) then some { val := v } else none
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.expandedSQL` (added in Node.js v22.5.0): `readonly attribute DOMString expandedSQL` -/
 def Statement.expandedSQL (self : Statement) : IO String := self.val.get "expandedSQL" String

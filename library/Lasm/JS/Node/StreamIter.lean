@@ -105,6 +105,10 @@ instance : ToJS ObjectOrBroadcastChannel := ⟨fun
   | .object v => toJS v
   | .broadcastChannel v => toJS v⟩
 
+/-- `v instanceof Share`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Share`). -/
+def Share.cast? (v : Value) : IO (Option Share) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream/iter" ["Share"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `share.consumerCount`: `readonly attribute double consumerCount` -/
 def Share.consumerCount (self : Share) : IO Float := self.val.get "consumerCount" Float
 
@@ -121,6 +125,10 @@ def Share.«from» (input : Data) (options : Data := .undefined) : IO Share := d
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.Share.from", module := "node:stream/iter", path := "Share.from", construct := false, arity := 2 }
     (Support.args #[toJS input, options]) (await := false)
   pure { val := r }
+
+/-- `v instanceof SyncShare`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SyncShare`). -/
+def SyncShare.cast? (v : Value) : IO (Option SyncShare) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream/iter" ["SyncShare"] Value) v) then some { val := v } else none
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `share.bufferSize`: `readonly attribute double bufferSize` -/
 def SyncShare.bufferSize (self : SyncShare) : IO Float := self.val.get "bufferSize" Float
@@ -145,6 +153,10 @@ def SyncShare.fromSync (input : Data) (options : Data := .undefined) : IO SyncSh
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.SyncShare.fromSync", module := "node:stream/iter", path := "SyncShare.fromSync", construct := false, arity := 2 }
     (Support.args #[toJS input, options]) (await := false)
   pure { val := r }
+
+/-- `v instanceof Writer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Writer`). -/
+def Writer.cast? (v : Value) : IO (Option Writer) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream/iter" ["Writer"] Value) v) then some { val := v } else none
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `writer.canWrite`: `readonly attribute boolean? canWrite` -/
 def Writer.canWrite (self : Writer) : IO (Option Bool) := self.val.get "canWrite" (Option Bool)
@@ -180,6 +192,10 @@ def Writer.writev (self : Writer) (chunks : SequenceOfUint8ArrayOrSequenceOfDOMS
 /-- **Experimental** in the Node.js 24.22.2 docs. `writer.writevSync(chunks)`: `boolean writevSync((sequence<Uint8Array> or sequence<DOMString>) chunks)` -/
 def Writer.writevSync (self : Writer) (chunks : SequenceOfUint8ArrayOrSequenceOfDOMString) : IO Bool :=
   self.val.callMethod "writevSync" (Support.args #[toJS chunks]) Bool
+
+/-- `v instanceof Broadcast`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Broadcast`). -/
+def Broadcast.cast? (v : Value) : IO (Option Broadcast) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream/iter" ["Broadcast"] Value) v) then some { val := v } else none
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `broadcast.consumerCount`: `readonly attribute double consumerCount` -/
 def Broadcast.consumerCount (self : Broadcast) : IO Float := self.val.get "consumerCount" Float

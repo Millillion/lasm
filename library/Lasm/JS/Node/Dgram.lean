@@ -166,6 +166,10 @@ instance instToJSDgramCreateSocketOptions : ToJS dgram.CreateSocketOptions := �
     ("receiveBlockList", Support.optional d.receiveBlockList),
     ("sendBlockList", Support.optional d.sendBlockList)]⟩
 
+/-- `v instanceof Socket`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Socket`). -/
+def dgram.Socket.cast? (v : Value) : IO (Option dgram.Socket) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:dgram" ["Socket"] Value) v) then some { val := v } else none
+
 /-- `Event: 'close'` (added in Node.js v0.1.99): `dgram.Socket onClose(dgram.Socket.CloseListener listener)`: calls `on("close", listener)` -/
 def dgram.Socket.onClose (self : dgram.Socket) (listener : dgram.Socket.CloseListener) : IO dgram.Socket := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value

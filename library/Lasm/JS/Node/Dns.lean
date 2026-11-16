@@ -114,6 +114,14 @@ structure dnsPromises.Resolve6Options where
   ttl : Option Bool := none
 instance instToJSDnsPromisesResolve6Options : ToJS dnsPromises.Resolve6Options := ⟨fun d => Support.fields #[("ttl", Support.optional d.ttl)]⟩
 
+/-- `v instanceof Resolver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Resolver`). -/
+def dnsPromises.Resolver.cast? (v : Value) : IO (Option dnsPromises.Resolver) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:dns/promises" ["Resolver"] Value) v) then some { val := v } else none
+
+/-- `v instanceof Resolver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Resolver`). -/
+def dns.Resolver.cast? (v : Value) : IO (Option dns.Resolver) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:dns" ["Resolver"] Value) v) then some { val := v } else none
+
 /-- `resolver.cancel()` (added in Node.js v8.3.0): `undefined cancel()` -/
 def dns.Resolver.cancel (self : dns.Resolver) : IO Unit :=
   self.val.callMethod "cancel" (Support.args #[]) Unit
@@ -142,8 +150,8 @@ def dns.lookup0 : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dns.lookup0", module := "node:dns", path := "lookup", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `dns.lookupService(address, port, callback)` (added in Node.js v0.11.14): `undefined lookupService(DOMString address, double port, Function callback)` (Node.js 24.22.2 documentation, dns.md) -/
-def dns.lookupService (address : String) (port : Float) (callback : JSFunction) : IO Unit :=
+/-- `dns.lookupService(address, port, callback)` (added in Node.js v0.11.14): `undefined lookupService(DOMString address, double /* integer: Nat */ port, Function callback)` (Node.js 24.22.2 documentation, dns.md) -/
+def dns.lookupService (address : String) (port : Nat) (callback : JSFunction) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dns.lookupService", module := "node:dns", path := "lookupService", construct := false, arity := 3 }
     (Support.args #[toJS address, toJS port, toJS callback]) (await := false)
 
@@ -233,8 +241,8 @@ def dnsPromises.lookup (hostname : String) (options : Option dnsPromises.LongLon
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.lookup", module := "node:dns/promises", path := "lookup", construct := false, arity := 2 }
     (Support.args #[toJS hostname, Support.optional options]) (await := false)
 
-/-- `dnsPromises.lookupService(address, port)` (added in Node.js v10.6.0): `undefined lookupService(DOMString address, double port)` (Node.js 24.22.2 documentation, dns.md) -/
-def dnsPromises.lookupService (address : String) (port : Float) : IO Unit :=
+/-- `dnsPromises.lookupService(address, port)` (added in Node.js v10.6.0): `undefined lookupService(DOMString address, double /* integer: Nat */ port)` (Node.js 24.22.2 documentation, dns.md) -/
+def dnsPromises.lookupService (address : String) (port : Nat) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.dnsPromises.lookupService", module := "node:dns/promises", path := "lookupService", construct := false, arity := 2 }
     (Support.args #[toJS address, toJS port]) (await := false)
 

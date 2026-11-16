@@ -670,8 +670,8 @@ structure TestsStream.TestPlanData where
   line : Option Float := none
   /-- `double nesting` -/
   nesting : Option Float := none
-  /-- `double count` -/
-  count : Option Float := none
+  /-- `double /* integer: Nat */ count` -/
+  count : Option Nat := none
 instance instFromJSTestsStreamTestPlanData : FromJS TestsStream.TestPlanData where
   fromJS d := do return {
     column := ← Lasm.JS.readField (Option Float) d "column",
@@ -679,7 +679,7 @@ instance instFromJSTestsStreamTestPlanData : FromJS TestsStream.TestPlanData whe
     file := ← Lasm.JS.readField (Option String) d "file",
     line := ← Lasm.JS.readField (Option Float) d "line",
     nesting := ← Lasm.JS.readField (Option Float) d "nesting",
-    count := ← Lasm.JS.readField (Option Float) d "count" }
+    count := ← Lasm.JS.readField (Option Nat) d "count" }
   typeName := "Lasm.JS.Node.TestsStream.TestPlanData"
 
 /-- `callback TestsStream.TestPlanListener = undefined (TestsStream.TestPlanData data)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
@@ -895,8 +895,8 @@ def TestsStream.TestWatchRestartedListener.ofSyncFn (f : IO Unit) : IO TestsStre
 structure TestContext.BeforeOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
 instance instToJSTestContextBeforeOptions : ToJS TestContext.BeforeOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
     ("timeout", Support.optional d.timeout)]⟩
 
@@ -904,8 +904,8 @@ instance instToJSTestContextBeforeOptions : ToJS TestContext.BeforeOptions := �
 structure TestContext.BeforeEachOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
 instance instToJSTestContextBeforeEachOptions : ToJS TestContext.BeforeEachOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
     ("timeout", Support.optional d.timeout)]⟩
 
@@ -913,8 +913,8 @@ instance instToJSTestContextBeforeEachOptions : ToJS TestContext.BeforeEachOptio
 structure TestContext.AfterOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
 instance instToJSTestContextAfterOptions : ToJS TestContext.AfterOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
     ("timeout", Support.optional d.timeout)]⟩
 
@@ -922,8 +922,8 @@ instance instToJSTestContextAfterOptions : ToJS TestContext.AfterOptions := ⟨f
 structure TestContext.AfterEachOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
 instance instToJSTestContextAfterEachOptions : ToJS TestContext.AfterEachOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
     ("timeout", Support.optional d.timeout)]⟩
 
@@ -971,8 +971,8 @@ structure TestContext.TestOptions where
   tags : Option (Array String) := none
   /-- `(boolean or DOMString) todo = false` -/
   todo : Option BooleanOrDOMString := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `double plan` -/
   plan : Option Float := none
 instance instToJSTestContextTestOptions : ToJS TestContext.TestOptions := ⟨fun d => Support.fields #[("concurrency", Support.optional d.concurrency),
@@ -988,10 +988,14 @@ instance instToJSTestContextTestOptions : ToJS TestContext.TestOptions := ⟨fun
 structure TestContext.WaitForOptions where
   /-- `double interval = 50` -/
   interval : Option Float := none
-  /-- `double timeout = 1000` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout = 1000` -/
+  timeout : Option Nat := none
 instance instToJSTestContextWaitForOptions : ToJS TestContext.WaitForOptions := ⟨fun d => Support.fields #[("interval", Support.optional d.interval),
     ("timeout", Support.optional d.timeout)]⟩
+
+/-- `v instanceof MockFunctionContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockFunctionContext`). -/
+def MockFunctionContext.cast? (v : Value) : IO (Option MockFunctionContext) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["MockFunctionContext"] Value) v) then some { val := v } else none
 
 /-- `ctx.calls` (added in Node.js v19.1.0, v18.13.0): `readonly attribute sequence<any> calls` -/
 def MockFunctionContext.calls (self : MockFunctionContext) : IO (Array Data) := self.val.get "calls" (Array Data)
@@ -1016,9 +1020,17 @@ def MockFunctionContext.resetCalls (self : MockFunctionContext) : IO Unit :=
 def MockFunctionContext.restore (self : MockFunctionContext) : IO Unit :=
   self.val.callMethod "restore" (Support.args #[]) Unit
 
+/-- `v instanceof MockModuleContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockModuleContext`). -/
+def MockModuleContext.cast? (v : Value) : IO (Option MockModuleContext) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["MockModuleContext"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `ctx.restore()` (added in Node.js v22.3.0, v20.18.0): `undefined restore()` -/
 def MockModuleContext.restore (self : MockModuleContext) : IO Unit :=
   self.val.callMethod "restore" (Support.args #[]) Unit
+
+/-- `v instanceof MockPropertyContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockPropertyContext`). -/
+def MockPropertyContext.cast? (v : Value) : IO (Option MockPropertyContext) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["MockPropertyContext"] Value) v) then some { val := v } else none
 
 /-- `ctx.accesses`: `readonly attribute sequence<any> accesses` -/
 def MockPropertyContext.accesses (self : MockPropertyContext) : IO (Array Data) := self.val.get "accesses" (Array Data)
@@ -1042,6 +1054,10 @@ def MockPropertyContext.resetAccesses (self : MockPropertyContext) : IO Unit :=
 /-- `ctx.restore()`: `undefined restore()` -/
 def MockPropertyContext.restore (self : MockPropertyContext) : IO Unit :=
   self.val.callMethod "restore" (Support.args #[]) Unit
+
+/-- `v instanceof MockTracker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockTracker`). -/
+def MockTracker.cast? (v : Value) : IO (Option MockTracker) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["MockTracker"] Value) v) then some { val := v } else none
 
 /-- `mock.fn([original[, implementation]][, options])` (added in Node.js v19.1.0, v18.13.0): `object fn(optional Function original, optional Function implementation, optional MockTracker.FnOptions options)` -/
 def MockTracker.fn (self : MockTracker) (original : Option JSFunction := none) (implementation : Option JSFunction := none) (options : Option MockTracker.FnOptions := none) : IO Data :=
@@ -1076,6 +1092,10 @@ def MockTracker.restoreAll (self : MockTracker) : IO Unit :=
 def MockTracker.setter (self : MockTracker) (object : Data) (methodName : Data) (implementation : Data := .undefined) (options : Data := .undefined) : IO Unit :=
   self.val.callMethod "setter" (Support.args #[toJS object, toJS methodName, implementation, options]) Unit
 
+/-- `v instanceof MockTimers`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockTimers`). -/
+def MockTimers.cast? (v : Value) : IO (Option MockTimers) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["MockTimers"] Value) v) then some { val := v } else none
+
 /-- `timers.enable([enableOptions])` (added in Node.js v20.4.0, v18.19.0): `undefined enable(optional any enableOptions)` -/
 def MockTimers.enable (self : MockTimers) (enableOptions : Data := .undefined) : IO Unit :=
   self.val.callMethod "enable" (Support.args #[enableOptions]) Unit
@@ -1095,6 +1115,10 @@ def MockTimers.runAll (self : MockTimers) : IO Unit :=
 /-- `timers.setTime(milliseconds)` (added in Node.js v21.2.0, v20.11.0): `undefined setTime(any milliseconds)` -/
 def MockTimers.setTime (self : MockTimers) (milliseconds : Data) : IO Unit :=
   self.val.callMethod "setTime" (Support.args #[toJS milliseconds]) Unit
+
+/-- `v instanceof TestsStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TestsStream`). -/
+def TestsStream.cast? (v : Value) : IO (Option TestsStream) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["TestsStream"] Value) v) then some { val := v } else none
 
 /-- `Event: 'test:coverage'`: `TestsStream onTestCoverage(TestsStream.TestCoverageListener listener)`: calls `on("test:coverage", listener)` -/
 def TestsStream.onTestCoverage (self : TestsStream) (listener : TestsStream.TestCoverageListener) : IO TestsStream := do
@@ -1256,6 +1280,10 @@ def TestsStream.onceTestWatchRestarted (self : TestsStream) (listener : TestsStr
   let r ← self.val.callMethod "once" (Support.args #[toJS "test:watch:restarted", toJS listener]) Value
   pure { val := r }
 
+/-- `v instanceof TestContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TestContext`). -/
+def TestContext.cast? (v : Value) : IO (Option TestContext) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["TestContext"] Value) v) then some { val := v } else none
+
 /-- `context.assert` (added in Node.js v22.2.0, v20.15.0): `readonly attribute any assert` -/
 def TestContext.assert (self : TestContext) : IO Data := self.val.get "assert" Data
 
@@ -1312,8 +1340,8 @@ def TestContext.diagnostic (self : TestContext) (message : String) : IO Unit :=
 def TestContext.log (self : TestContext) (message : String) (data : Data := .undefined) : IO Unit :=
   self.val.callMethod "log" (Support.args #[toJS message, data]) Unit
 
-/-- `context.plan(count[,options])` (added in Node.js v22.2.0, v20.15.0): `undefined plan(double count, optional TestContext.PlanOptions options)` -/
-def TestContext.plan (self : TestContext) (count : Float) (options : Option TestContext.PlanOptions := none) : IO Unit :=
+/-- `context.plan(count[,options])` (added in Node.js v22.2.0, v20.15.0): `undefined plan(double /* integer: Nat */ count, optional TestContext.PlanOptions options)` -/
+def TestContext.plan (self : TestContext) (count : Nat) (options : Option TestContext.PlanOptions := none) : IO Unit :=
   self.val.callMethod "plan" (Support.args #[toJS count, Support.optional options]) Unit
 
 /-- `context.runOnly(shouldRunOnlyTests)` (added in Node.js v18.0.0, v16.17.0): `undefined runOnly(boolean shouldRunOnlyTests)` -/
@@ -1335,6 +1363,10 @@ def TestContext.test (self : TestContext) (name : Option String := none) (option
 /-- `context.waitFor(condition[, options])` (added in Node.js v23.7.0, v22.14.0): `Promise<any> waitFor(Function condition, optional TestContext.WaitForOptions options)` -/
 def TestContext.waitFor (self : TestContext) (condition : JSFunction) (options : Option TestContext.WaitForOptions := none) : Async Data :=
   self.val.callMethodAwait "waitFor" (Support.args #[toJS condition, Support.optional options]) Data
+
+/-- `v instanceof SuiteContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SuiteContext`). -/
+def SuiteContext.cast? (v : Value) : IO (Option SuiteContext) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:test" ["SuiteContext"] Value) v) then some { val := v } else none
 
 /-- `context.filePath` (added in Node.js v22.6.0): `readonly attribute any filePath` -/
 def SuiteContext.filePath (self : SuiteContext) : IO Data := self.val.get "filePath" Data

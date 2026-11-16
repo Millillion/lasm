@@ -291,7 +291,7 @@ def currentProcess (r : Checks) : Async Unit := do
   expect r "uptime" ((← process.uptime) > 0) ""
   expect r "memoryUsage" ((← process.memoryUsage).field "rss" matches .number _) ""
   -- kill pid 0 tests that the process exists (signal 0) without signalling it
-  process.kill pid.toNat.toFloat (some (.double 0))
+  process.kill (pid.toNat : Int) (some (.double 0))
   expect r "kill with signal 0" true ""
   -- title is a string
   discard process.title
@@ -613,7 +613,7 @@ def bytesOfChunk : Uint8ArrayOrDOMString → ByteArray
 def httpRequest (port : Nat) (method target : String) (headers : List (String × String)) (body : ByteArray) :
     Async (Nat × Data × ByteArray) := do
   let options : http.RequestOptions := {
-    host := some "127.0.0.1", port := some port.toFloat, method := some method, «path» := some target,
+    host := some "127.0.0.1", port := some port, method := some method, «path» := some target,
     headers := some (.object (obj (headers.map fun (k, v) => (k, toJS v)))) }
   let req ← http.request options
   let got ← IO.Promise.new
@@ -687,7 +687,7 @@ def httpChecks (r : Checks) : Async Unit := do
     let response ← Response.new (some (.usvString s!"{← request.method} {pathname} {text.length}"))
       (some { status := some 201, headers := some (.sequence #[#["x-from", "web"]]) })
     for (k, v) in ← (← response.headers).entries do discard <| res.setHeader k v
-    discard <| res.writeHead (← response.status).toFloat
+    discard <| res.writeHead (← response.status)
     match ← response.body with
     | some s => discard <| res.«end» (some (← streamBytes s))
     | none => discard <| res.«end»
@@ -721,7 +721,7 @@ def netChecks (r : Checks) : Async Unit := do
       let (b, g2) := g.bytes 65536; g := g2
       chunks := chunks.push b
     let connected ← IO.Promise.new
-    let sock ← net.connectWithPort port.toFloat (some "127.0.0.1") (some (← net.Socket.ConnectListener.ofSyncFn (do connected.resolve ())))
+    let sock ← net.connectWithPort port (some "127.0.0.1") (some (← net.Socket.ConnectListener.ofSyncFn (do connected.resolve ())))
     let received ← IO.mkRef ByteArray.empty
     let closed ← IO.Promise.new
     discard <| sock.onData (← net.Socket.DataListener.ofSyncFn fun d => received.modify (· ++ bytesOfChunk d))
@@ -740,7 +740,7 @@ def netChecks (r : Checks) : Async Unit := do
       s!"{(← received.get).size}/{sent.size}"
   -- a socket's text: setEncoding makes 'data' strings
   let connected ← IO.Promise.new
-  let sock ← net.connectWithPort port.toFloat (some "127.0.0.1") (some (← net.Socket.ConnectListener.ofSyncFn (do connected.resolve ())))
+  let sock ← net.connectWithPort port (some "127.0.0.1") (some (← net.Socket.ConnectListener.ofSyncFn (do connected.resolve ())))
   discard <| sock.setEncoding (some "utf8")
   let text : IO.Promise String ← IO.Promise.new
   discard <| sock.onceData (← net.Socket.DataListener.ofSyncFn fun d => do

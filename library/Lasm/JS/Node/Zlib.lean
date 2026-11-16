@@ -264,14 +264,78 @@ instance instToJSZlibDOMStringOrZipFilesOptions : ToJS zlib.DOMStringOrZipFilesO
 instance instCoeStringZlibDOMStringOrZipFilesOptions : Coe String zlib.DOMStringOrZipFilesOptions := ⟨.domString⟩
 instance instCoeZlibZipFilesOptionsZlibDOMStringOrZipFilesOptions : Coe zlib.ZipFilesOptions zlib.DOMStringOrZipFilesOptions := ⟨.zipFilesOptions⟩
 
+/-- `v instanceof BrotliCompress`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BrotliCompress`). -/
+def zlib.BrotliCompress.cast? (v : Value) : IO (Option zlib.BrotliCompress) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["BrotliCompress"] Value) v) then some { val := v } else none
+
+/-- `v instanceof BrotliDecompress`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BrotliDecompress`). -/
+def zlib.BrotliDecompress.cast? (v : Value) : IO (Option zlib.BrotliDecompress) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["BrotliDecompress"] Value) v) then some { val := v } else none
+
+/-- `v instanceof Deflate`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Deflate`). -/
+def zlib.Deflate.cast? (v : Value) : IO (Option zlib.Deflate) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["Deflate"] Value) v) then some { val := v } else none
+
+/-- `v instanceof DeflateRaw`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DeflateRaw`). -/
+def zlib.DeflateRaw.cast? (v : Value) : IO (Option zlib.DeflateRaw) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["DeflateRaw"] Value) v) then some { val := v } else none
+
+/-- `v instanceof Gunzip`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Gunzip`). -/
+def zlib.Gunzip.cast? (v : Value) : IO (Option zlib.Gunzip) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["Gunzip"] Value) v) then some { val := v } else none
+
+/-- `v instanceof Gzip`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Gzip`). -/
+def zlib.Gzip.cast? (v : Value) : IO (Option zlib.Gzip) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["Gzip"] Value) v) then some { val := v } else none
+
+/-- `v instanceof Inflate`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Inflate`). -/
+def zlib.Inflate.cast? (v : Value) : IO (Option zlib.Inflate) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["Inflate"] Value) v) then some { val := v } else none
+
+/-- `v instanceof InflateRaw`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InflateRaw`). -/
+def zlib.InflateRaw.cast? (v : Value) : IO (Option zlib.InflateRaw) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["InflateRaw"] Value) v) then some { val := v } else none
+
+/-- `v instanceof Unzip`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Unzip`). -/
+def zlib.Unzip.cast? (v : Value) : IO (Option zlib.Unzip) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["Unzip"] Value) v) then some { val := v } else none
+
+/-- `v instanceof ZlibBase`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZlibBase`). -/
+def zlib.ZlibBase.cast? (v : Value) : IO (Option zlib.ZlibBase) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZlibBase"] Value) v) then some { val := v } else none
+
 /-- `bytesWritten` (added in Node.js v10.0.0): `readonly attribute double bytesWritten` -/
 def zlib.ZlibBase.bytesWritten (self : zlib.ZlibBase) : IO Float := self.val.get "bytesWritten" Float
+
+/-- `v instanceof ZstdCompress`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZstdCompress`). -/
+def zlib.ZstdCompress.cast? (v : Value) : IO (Option zlib.ZstdCompress) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZstdCompress"] Value) v) then some { val := v } else none
+
+/-- `v instanceof ZstdDecompress`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZstdDecompress`). -/
+def zlib.ZstdDecompress.cast? (v : Value) : IO (Option zlib.ZstdDecompress) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZstdDecompress"] Value) v) then some { val := v } else none
+
+/-- `v instanceof Options`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Options`). -/
+def Options.cast? (v : Value) : IO (Option Options) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["Options"] Value) v) then some { val := v } else none
+
+/-- `v instanceof BrotliOptions`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BrotliOptions`). -/
+def BrotliOptions.cast? (v : Value) : IO (Option BrotliOptions) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["BrotliOptions"] Value) v) then some { val := v } else none
+
+/-- `v instanceof ZstdOptions`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZstdOptions`). -/
+def ZstdOptions.cast? (v : Value) : IO (Option ZstdOptions) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZstdOptions"] Value) v) then some { val := v } else none
+
+/-- `v instanceof ZipBuffer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZipBuffer`). -/
+def zlib.ZipBuffer.cast? (v : Value) : IO (Option zlib.ZipBuffer) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZipBuffer"] Value) v) then some { val := v } else none
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.comment` (added in Node.js v26.8.0): `readonly attribute DOMString comment` -/
 def zlib.ZipBuffer.comment (self : zlib.ZipBuffer) : IO String := self.val.get "comment" String
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.size` (added in Node.js v26.8.0): `readonly attribute double size` -/
-def zlib.ZipBuffer.size (self : zlib.ZipBuffer) : IO Float := self.val.get "size" Float
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.size` (added in Node.js v26.8.0): `readonly attribute double /* integer: Nat */ size` -/
+def zlib.ZipBuffer.size (self : zlib.ZipBuffer) : IO Nat := self.val.get "size" Nat
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.writable` (added in Node.js v26.8.0): `readonly attribute boolean writable` -/
 def zlib.ZipBuffer.writable (self : zlib.ZipBuffer) : IO Bool := self.val.get "writable" Bool
@@ -332,6 +396,10 @@ def zlib.ZipBuffer.toBufferSync (self : zlib.ZipBuffer) (options : Option DOMStr
 def zlib.ZipBuffer.values (self : zlib.ZipBuffer) : IO Data :=
   self.val.callMethod "values" (Support.args #[]) Data
 
+/-- `v instanceof ZipEntry`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZipEntry`). -/
+def zlib.ZipEntry.cast? (v : Value) : IO (Option zlib.ZipEntry) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZipEntry"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.comment` (added in Node.js v26.8.0): `readonly attribute DOMString comment` -/
 def zlib.ZipEntry.comment (self : zlib.ZipEntry) : IO String := self.val.get "comment" String
 
@@ -374,8 +442,8 @@ def zlib.ZipEntry.nameBuffer (self : zlib.ZipEntry) : IO ByteArray := self.val.g
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.rawContent` (added in Node.js v26.8.0): `readonly attribute Uint8Array? rawContent` -/
 def zlib.ZipEntry.rawContent (self : zlib.ZipEntry) : IO (Option ByteArray) := self.val.get "rawContent" (Option ByteArray)
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.size` (added in Node.js v26.8.0): `readonly attribute double size` -/
-def zlib.ZipEntry.size (self : zlib.ZipEntry) : IO Float := self.val.get "size" Float
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.size` (added in Node.js v26.8.0): `readonly attribute double /* integer: Nat */ size` -/
+def zlib.ZipEntry.size (self : zlib.ZipEntry) : IO Nat := self.val.get "size" Nat
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.content([options])` (added in Node.js v26.8.0): `Promise<Uint8Array> content(optional zlib.ZipEntry.ContentOptions options)` -/
 def zlib.ZipEntry.content (self : zlib.ZipEntry) (options : Option zlib.ZipEntry.ContentOptions := none) : Async ByteArray :=
@@ -389,11 +457,15 @@ def zlib.ZipEntry.contentSync (self : zlib.ZipEntry) (options : Data := .undefin
 def zlib.ZipEntry.contentIterator (self : zlib.ZipEntry) (options : Option zlib.ZipEntry.ContentIteratorOptions := none) : IO Data :=
   self.val.callMethod "contentIterator" (Support.args #[Support.optional options]) Data
 
+/-- `v instanceof ZipFile`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZipFile`). -/
+def zlib.ZipFile.cast? (v : Value) : IO (Option zlib.ZipFile) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:zlib" ["ZipFile"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.comment` (added in Node.js v26.8.0): `readonly attribute DOMString comment` -/
 def zlib.ZipFile.comment (self : zlib.ZipFile) : IO String := self.val.get "comment" String
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.size` (added in Node.js v26.8.0): `readonly attribute double size` -/
-def zlib.ZipFile.size (self : zlib.ZipFile) : IO Float := self.val.get "size" Float
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.size` (added in Node.js v26.8.0): `readonly attribute double /* integer: Nat */ size` -/
+def zlib.ZipFile.size (self : zlib.ZipFile) : IO Nat := self.val.get "size" Nat
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.writable` (added in Node.js v26.8.0): `readonly attribute boolean writable` -/
 def zlib.ZipFile.writable (self : zlib.ZipFile) : IO Bool := self.val.get "writable" Bool
@@ -574,8 +646,8 @@ def zlib.getMaxZipContentSize : IO Float :=
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.zlib.getMaxZipContentSize", module := "node:zlib", path := "getMaxZipContentSize", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.setMaxZipContentSize(size)` (added in Node.js v26.8.0): `undefined setMaxZipContentSize(double size)` (Node.js 24.22.2 documentation, zlib.md) -/
-def zlib.setMaxZipContentSize (size : Float) : IO Unit :=
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.setMaxZipContentSize(size)` (added in Node.js v26.8.0): `undefined setMaxZipContentSize(double /* integer: Nat */ size)` (Node.js 24.22.2 documentation, zlib.md) -/
+def zlib.setMaxZipContentSize (size : Nat) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.setMaxZipContentSize", module := "node:zlib", path := "setMaxZipContentSize", construct := false, arity := 1 }
     (Support.args #[toJS size]) (await := false)
 

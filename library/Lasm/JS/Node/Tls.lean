@@ -239,8 +239,8 @@ structure tls.ConnectOptions where
   enableTrace : Data := .undefined
   /-- `DOMString host = "localhost"` -/
   host : Option String := none
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `DOMString path` -/
   path : Option String := none
   /-- `Node_stream_Duplex socket` -/
@@ -261,10 +261,10 @@ structure tls.ConnectOptions where
   requestOCSP : Option Bool := none
   /-- `double minDHSize = 1024` -/
   minDHSize : Option Float := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `any secureContext` -/
   secureContext : Data := .undefined
   /-- `object onread` -/
@@ -451,6 +451,10 @@ instance : ToJS SequenceOfDOMStringOrSequenceOfUint8Array := ⟨fun
 instance : Coe (Array String) SequenceOfDOMStringOrSequenceOfUint8Array := ⟨.sequence⟩
 instance : Coe (Array ByteArray) SequenceOfDOMStringOrSequenceOfUint8Array := ⟨.sequence2⟩
 
+/-- `v instanceof Server`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Server`). -/
+def tls.Server.cast? (v : Value) : IO (Option tls.Server) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:tls" ["Server"] Value) v) then some { val := v } else none
+
 /-- `Event: 'connection'` (added in Node.js v0.3.2): `tls.Server onConnection(tls.Server.ConnectionListener listener)`: calls `on("connection", listener)` -/
 def tls.Server.onConnection (self : tls.Server) (listener : tls.Server.ConnectionListener) : IO tls.Server := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "connection", toJS listener]) Value
@@ -550,6 +554,10 @@ def tls.Server.setSecureContext (self : tls.Server) (options : Data) : IO Unit :
 def tls.Server.setTicketKeys (self : tls.Server) (keys : ByteArray) : IO Unit :=
   self.val.callMethod "setTicketKeys" (Support.args #[toJS keys]) Unit
 
+/-- `v instanceof TLSSocket`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TLSSocket`). -/
+def tls.TLSSocket.cast? (v : Value) : IO (Option tls.TLSSocket) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:tls" ["TLSSocket"] Value) v) then some { val := v } else none
+
 /-- `tlsSocket.alpnProtocol` (added in Node.js v6.0.0): `readonly attribute (DOMString or boolean)? alpnProtocol` -/
 def tls.TLSSocket.alpnProtocol (self : tls.TLSSocket) : IO (Option DOMStringOrBoolean) := self.val.get "alpnProtocol" (Option DOMStringOrBoolean)
 
@@ -642,8 +650,8 @@ def tls.TLSSocket.disableRenegotiation (self : tls.TLSSocket) : IO Unit :=
 def tls.TLSSocket.enableTrace (self : tls.TLSSocket) : IO Unit :=
   self.val.callMethod "enableTrace" (Support.args #[]) Unit
 
-/-- `tlsSocket.exportKeyingMaterial(length, label[, context])` (added in Node.js v13.10.0, v12.17.0): `Uint8Array exportKeyingMaterial(double length, DOMString label, optional Uint8Array context)` -/
-def tls.TLSSocket.exportKeyingMaterial (self : tls.TLSSocket) (length : Float) (label : String) (context : Option ByteArray := none) : IO ByteArray :=
+/-- `tlsSocket.exportKeyingMaterial(length, label[, context])` (added in Node.js v13.10.0, v12.17.0): `Uint8Array exportKeyingMaterial(double /* integer: Nat */ length, DOMString label, optional Uint8Array context)` -/
+def tls.TLSSocket.exportKeyingMaterial (self : tls.TLSSocket) (length : Nat) (label : String) (context : Option ByteArray := none) : IO ByteArray :=
   self.val.callMethod "exportKeyingMaterial" (Support.args #[toJS length, toJS label, Support.optional context]) ByteArray
 
 /-- `tlsSocket.getCertificate()` (added in Node.js v11.2.0): `object getCertificate()` -/
@@ -708,8 +716,8 @@ def tls.TLSSocket.renegotiate (self : tls.TLSSocket) (options : tls.TLSSocket.Re
 def tls.TLSSocket.setKeyCert (self : tls.TLSSocket) (context : Data) : IO Unit :=
   self.val.callMethod "setKeyCert" (Support.args #[toJS context]) Unit
 
-/-- `tlsSocket.setMaxSendFragment(size)` (added in Node.js v0.11.11): `boolean setMaxSendFragment(double size)` -/
-def tls.TLSSocket.setMaxSendFragment (self : tls.TLSSocket) (size : Float) : IO Bool :=
+/-- `tlsSocket.setMaxSendFragment(size)` (added in Node.js v0.11.11): `boolean setMaxSendFragment(double /* integer: Nat */ size)` -/
+def tls.TLSSocket.setMaxSendFragment (self : tls.TLSSocket) (size : Nat) : IO Bool :=
   self.val.callMethod "setMaxSendFragment" (Support.args #[toJS size]) Bool
 
 /-- `tls.rootCertificates` (added in Node.js v12.3.0): `readonly attribute sequence<DOMString> rootCertificates` (Node.js 24.22.2 documentation, tls.md) -/
@@ -744,8 +752,8 @@ def tls.connectWithPath (path_ : String) (options : Data := .undefined) : IO tls
     (Support.args #[toJS path_, options]) (await := false)
   pure { val := r }
 
-/-- `tls.connect(port[, host][, options][, callback])` (added in Node.js v0.11.3): `tls.TLSSocket connect(double port, optional DOMString host, optional object options)` (Node.js 24.22.2 documentation, tls.md) -/
-def tls.connectWithPort (port : Float) (host : Option String := none) (options : Data := .undefined) : IO tls.TLSSocket := do
+/-- `tls.connect(port[, host][, options][, callback])` (added in Node.js v0.11.3): `tls.TLSSocket connect(double /* integer: Nat */ port, optional DOMString host, optional object options)` (Node.js 24.22.2 documentation, tls.md) -/
+def tls.connectWithPort (port : Nat) (host : Option String := none) (options : Data := .undefined) : IO tls.TLSSocket := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.tls.connectWithPort", module := "node:tls", path := "connect", construct := false, arity := 3 }
     (Support.args #[toJS port, Support.optional host, options]) (await := false)
   pure { val := r }

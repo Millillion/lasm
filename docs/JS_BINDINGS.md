@@ -492,15 +492,19 @@ and content types, workerd's urlencoded form decoding).
 
 ### How a WebIDL declaration becomes Lean
 
+The rules shared by every generated tier (overload names, callback type names,
+numbers, checked downcasts) and the reviewed override table are in
+[BINDING_RULES.md](BINDING_RULES.md).
+
 | WebIDL | Lean |
 | --- | --- |
 | `interface I` | `structure I where val : Value`, a handle to the JavaScript object (`ToJS`, `FromJS`, `Nonempty`). In a namespace: `WebAssembly.Module`. |
-| `interface I : P` | `structure I extends P`: `P`'s functions apply to an `I` (`signal.addEventListener …` on an `AbortSignal`), and `Coe I P` passes an `I` where a `P` is expected (an `HTMLInputElement` to `appendChild`'s `Node`). The other way, a handle of a more specific interface is made from the same object: `({ val := e.val } : HTMLInputElement)`, unchecked (like a TypeScript cast). |
+| `interface I : P` | `structure I extends P`: `P`'s functions apply to an `I` (`signal.addEventListener …` on an `AbortSignal`), and `Coe I P` passes an `I` where a `P` is expected (an `HTMLInputElement` to `appendChild`'s `Node`). The other way, a handle of a more specific interface is checked with `I.cast? (v : Value) : IO (Option I)` (`instanceof`; `HTMLInputElement.cast? e.val`), or made unchecked from the same object, `({ val := e.val } : HTMLInputElement)` (like a TypeScript cast). |
 | `constructor(…)` | `I.new … : IO I`. Not for `[HTMLConstructor]` (HTML elements: their constructor builds only custom elements): use `document.createElement`. |
 | `attribute T a` | `I.a (self) : IO T`; unless `readonly`, also `I.setA (self) (value : T) : IO Unit`. A `Promise` attribute (`reader.closed`) is `Async T`. |
 | operation `R op(…)` | `I.op (self) … : IO R`; `static` ones take no `self` (`URL.canParse`). A static operation that shares its name with an instance one gets the prefix `static`: `Response.staticJson` (`Response.json(data)`) beside `response.json`. |
 | `Promise<T>` result | `Async T` (awaited without holding a Lean thread; `.block` from `IO`) |
-| overloads | the first in IDL order keeps the name; each other adds `With` and its first argument that differs by name: `FormData.append` (string) and `FormData.appendWithBlobValue`, `URLPattern.new` and `URLPattern.newWithOptions`, `WebAssembly.instantiate` and `WebAssembly.instantiateWithModuleObject` |
+| overloads | the first in IDL order keeps the name; each other adds `With` and its first argument that differs by name: `URLPattern.new` and `URLPattern.newWithOptions`, `WebAssembly.instantiate` and `WebAssembly.instantiateWithModuleObject`. A name that reads badly is replaced through the reviewed override table: `FormData.append` (string) and `FormData.appendBlob` ([BINDING_RULES.md](BINDING_RULES.md#a9-overload-names)) |
 | `optional T x` | `(x : Option T := none)`; `none` passes nothing (`undefined`), so the spec's default applies. `optional any x` is `(x : Data := .undefined)`. |
 | `T... xs` (variadic) | `(xs : Array T := #[])` |
 | `T?` (nullable) | `Option T`; `none` is `null` (or `undefined`). A nullable result that is a `Value` (`getContext`'s `RenderingContext?`) is requested as data, so that `null` is `none`: a reference-mode result would be a reference to `null` (`Support.optionalValue`). |
@@ -690,7 +694,8 @@ imports a browser one).
   `undefinedPromises`).
 - HTML elements have no `new` (their `[HTMLConstructor]` only builds custom
   elements); create them with `document.createElement` and make the handle
-  of the element's interface from it, as above. The cast is not checked.
+  of the element's interface from it, as above: checked with
+  `HTMLInputElement.cast? e.val`, or unchecked with `{ val := e.val }`.
 - Listeners and other callbacks act on the page directly, with nothing removed
   for you: remove what an app adds (`removeEventListener`,
   `cancelAnimationFrame`, `WebSocket.close`) when it no longer needs it, in a
@@ -884,7 +889,7 @@ rules as Lasm.JS.Web ([above](#how-a-webidl-declaration-becomes-lean)):
 | Node's docs | WebIDL | Lean |
 | --- | --- | --- |
 | `fsPromises.readFile(path[, options])` | `readFile(… path, optional … options)` in `namespace fsPromises` | `fsPromises.readFile (path) (options := none)` |
-| `{string}`, `{integer}`, `{number}`, `{boolean}`, `{bigint}` | `DOMString`, `long long`, `double`, `boolean`, `bigint` | `String`, `Int`, `Float`, `Bool`, `Int` |
+| `{string}`, `{integer}`, `{number}`, `{boolean}`, `{bigint}` | `DOMString`, `long long`, `double`, `boolean`, `bigint` | `String`, `Int`, `Float`, `Bool`, `Int`; a `{number}` named in the integer table (`keylen`, `fd`, `pid`, …) is `Nat` or `Int` ([BINDING_RULES.md](BINDING_RULES.md#a11-numbers)) |
 | `{Buffer}`, `{TypedArray}`, `{DataView}`, `{Uint8Array}` | `Uint8Array` | `ByteArray` (a copy) |
 | `{string\|Buffer\|URL}` | `(DOMString or Uint8Array or URL)` | `DOMStringOrUint8ArrayOrURL`: `.domString "a.txt"`, `.uint8Array b`, `.url u`, or the value itself through tier 1's `Coe` instances (`fsPromises.readFile "a.txt"`) |
 | `{null}`, `{undefined}` in a type | nullable | `Option` |

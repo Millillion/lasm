@@ -128,16 +128,16 @@ structure child_process.ExecOptions where
   shell : Option String := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-  /-- `double timeout = 0` -/
-  timeout : Option Float := none
-  /-- `double maxBuffer` -/
-  maxBuffer : Option Float := none
+  /-- `double /* integer: Nat */ timeout = 0` -/
+  timeout : Option Nat := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
   /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
   killSignal : Option DOMStringOrLongLong := none
-  /-- `double uid` -/
-  uid : Option Float := none
-  /-- `double gid` -/
-  gid : Option Float := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
   /-- `boolean windowsHide = false` -/
   windowsHide : Option Bool := none
 instance instToJSChild_processExecOptions : ToJS child_process.ExecOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
@@ -160,16 +160,16 @@ structure child_process.ExecFileOptions where
   env : Option (Record String) := none
   /-- `DOMString encoding = "utf8"` -/
   encoding : Option String := none
-  /-- `double timeout = 0` -/
-  timeout : Option Float := none
-  /-- `double maxBuffer` -/
-  maxBuffer : Option Float := none
+  /-- `double /* integer: Nat */ timeout = 0` -/
+  timeout : Option Nat := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
   /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
   killSignal : Option DOMStringOrLongLong := none
-  /-- `double uid` -/
-  uid : Option Float := none
-  /-- `double gid` -/
-  gid : Option Float := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
   /-- `boolean windowsHide = false` -/
   windowsHide : Option Bool := none
   /-- `boolean windowsVerbatimArguments = false` -/
@@ -227,8 +227,8 @@ structure child_process.ForkOptions where
   execPath : Option String := none
   /-- `sequence<DOMString> execArgv` -/
   execArgv : Option (Array String) := none
-  /-- `double gid` -/
-  gid : Option Float := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
   /-- `DOMString serialization = "json"` -/
   serialization : Option String := none
   /-- `AbortSignal signal` -/
@@ -239,14 +239,14 @@ structure child_process.ForkOptions where
   silent : Option Bool := none
   /-- `(sequence<any> or DOMString) stdio` -/
   stdio : Option SequenceOfAnyOrDOMString := none
-  /-- `double uid` -/
-  uid : Option Float := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
   /-- `boolean windowsHide = false` -/
   windowsHide : Option Bool := none
   /-- `boolean windowsVerbatimArguments = false` -/
   windowsVerbatimArguments : Option Bool := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
 instance instToJSChild_processForkOptions : ToJS child_process.ForkOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
     ("detached", Support.optional d.detached),
     ("env", d.env),
@@ -275,10 +275,10 @@ structure child_process.SpawnOptions where
   stdio : Option SequenceOfAnyOrDOMString := none
   /-- `boolean detached` -/
   detached : Option Bool := none
-  /-- `double uid` -/
-  uid : Option Float := none
-  /-- `double gid` -/
-  gid : Option Float := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
   /-- `DOMString serialization = "json"` -/
   serialization : Option String := none
   /-- `(boolean or DOMString) shell` -/
@@ -289,8 +289,8 @@ structure child_process.SpawnOptions where
   windowsHide : Option Bool := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
   killSignal : Option DOMStringOrLongLong := none
 instance instToJSChild_processSpawnOptions : ToJS child_process.SpawnOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
@@ -330,16 +330,16 @@ structure child_process.ExecFileSyncOptions where
   stdio : Option DOMStringOrSequenceOfAny := none
   /-- `object env` -/
   env : Data := .undefined
-  /-- `double uid` -/
-  uid : Option Float := none
-  /-- `double gid` -/
-  gid : Option Float := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
   killSignal : Option DOMStringOrLongLong := none
-  /-- `double maxBuffer` -/
-  maxBuffer : Option Float := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
   /-- `DOMString encoding = "buffer"` -/
   encoding : Option String := none
   /-- `boolean windowsHide = false` -/
@@ -371,16 +371,16 @@ structure child_process.ExecSyncOptions where
   env : Data := .undefined
   /-- `DOMString shell` -/
   shell : Option String := none
-  /-- `double uid` -/
-  uid : Option Float := none
-  /-- `double gid` -/
-  gid : Option Float := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
   killSignal : Option DOMStringOrLongLong := none
-  /-- `double maxBuffer` -/
-  maxBuffer : Option Float := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
   /-- `DOMString encoding = "buffer"` -/
   encoding : Option String := none
   /-- `boolean windowsHide = false` -/
@@ -410,16 +410,16 @@ structure child_process.SpawnSyncOptions where
   stdio : Option DOMStringOrSequenceOfAny := none
   /-- `object env` -/
   env : Data := .undefined
-  /-- `double uid` -/
-  uid : Option Float := none
-  /-- `double gid` -/
-  gid : Option Float := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ uid` -/
+  uid : Option Nat := none
+  /-- `double /* integer: Nat */ gid` -/
+  gid : Option Nat := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
   killSignal : Option DOMStringOrLongLong := none
-  /-- `double maxBuffer` -/
-  maxBuffer : Option Float := none
+  /-- `double /* integer: Nat */ maxBuffer` -/
+  maxBuffer : Option Nat := none
   /-- `DOMString encoding = "buffer"` -/
   encoding : Option String := none
   /-- `(boolean or DOMString) shell` -/
@@ -442,6 +442,10 @@ instance instToJSChild_processSpawnSyncOptions : ToJS child_process.SpawnSyncOpt
     ("shell", Support.optional d.shell),
     ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
     ("windowsHide", Support.optional d.windowsHide)]⟩
+
+/-- `v instanceof ChildProcess`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ChildProcess`). -/
+def ChildProcess.cast? (v : Value) : IO (Option ChildProcess) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:child_process" ["ChildProcess"] Value) v) then some { val := v } else none
 
 /-- `subprocess.channel` (added in Node.js v7.1.0): `readonly attribute object channel` -/
 def ChildProcess.channel (self : ChildProcess) : IO Data := self.val.get "channel" Data

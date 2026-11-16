@@ -26,6 +26,10 @@ structure trace_events.CreateTracingOptions where
   categories : Option (Array String) := none
 instance instToJSTrace_eventsCreateTracingOptions : ToJS trace_events.CreateTracingOptions := ⟨fun d => Support.fields #[("categories", Support.optional d.categories)]⟩
 
+/-- `v instanceof Tracing`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Tracing`). -/
+def Tracing.cast? (v : Value) : IO (Option Tracing) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:trace_events" ["Tracing"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `tracing.categories` (added in Node.js v10.0.0): `readonly attribute DOMString categories` -/
 def Tracing.categories (self : Tracing) : IO String := self.val.get "categories" String
 

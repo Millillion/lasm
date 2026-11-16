@@ -85,6 +85,10 @@ structure module.SetSourceMapsSupportOptions where
 instance instToJSModuleSetSourceMapsSupportOptions : ToJS module.SetSourceMapsSupportOptions := ⟨fun d => Support.fields #[("nodeModules", Support.optional d.nodeModules),
     ("generatedCode", Support.optional d.generatedCode)]⟩
 
+/-- `v instanceof SourceMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SourceMap`). -/
+def module.SourceMap.cast? (v : Value) : IO (Option module.SourceMap) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:module" ["SourceMap"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `sourceMap.payload`: `readonly attribute object payload` -/
 def module.SourceMap.payload (self : module.SourceMap) : IO Data := self.val.get "payload" Data
 

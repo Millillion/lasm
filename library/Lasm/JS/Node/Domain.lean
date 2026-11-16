@@ -21,6 +21,10 @@ instance : ToJS Domain := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Domain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Domain", .data⟩
 instance : Coe Domain EventEmitter := ⟨Domain.toEventEmitter⟩
 
+/-- `v instanceof Domain`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Domain`). -/
+def Domain.cast? (v : Value) : IO (Option Domain) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:domain" ["Domain"] Value) v) then some { val := v } else none
+
 /-- **Deprecated** in the Node.js 24.22.2 docs. `domain.members`: `readonly attribute sequence<any> members` -/
 def Domain.members (self : Domain) : IO (Array Data) := self.val.get "members" (Array Data)
 

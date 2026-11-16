@@ -27,6 +27,10 @@ structure WASI.FinalizeBindingsOptions where
   memory : Option WebAssembly.Memory := none
 instance instToJSWASIFinalizeBindingsOptions : ToJS WASI.FinalizeBindingsOptions := ⟨fun d => Support.fields #[("memory", Support.optional d.memory)]⟩
 
+/-- `v instanceof WASI`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WASI`). -/
+def WASI.cast? (v : Value) : IO (Option WASI) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:wasi" ["WASI"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `wasi.wasiImport` (added in Node.js v13.3.0, v12.16.0): `readonly attribute object wasiImport` -/
 def WASI.wasiImport (self : WASI) : IO Data := self.val.get "wasiImport" Data
 

@@ -165,6 +165,10 @@ instance instToJSPromiseHooksCreateHookCallbacks : ToJS promiseHooks.CreateHookC
     ("after", Support.optional d.after),
     ("settled", Support.optional d.settled)]⟩
 
+/-- `v instanceof Serializer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Serializer`). -/
+def v8.Serializer.cast? (v : Value) : IO (Option v8.Serializer) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["Serializer"] Value) v) then some { val := v } else none
+
 /-- `serializer.writeHeader()`: `undefined writeHeader()` -/
 def v8.Serializer.writeHeader (self : v8.Serializer) : IO Unit :=
   self.val.callMethod "writeHeader" (Support.args #[]) Unit
@@ -213,6 +217,10 @@ def v8.Serializer.getSharedArrayBufferId (self : v8.Serializer) (sharedArrayBuff
 def v8.Serializer.setTreatArrayBufferViewsAsHostObjects (self : v8.Serializer) (flag : Bool) : IO Unit :=
   self.val.callMethod "setTreatArrayBufferViewsAsHostObjects" (Support.args #[toJS flag]) Unit
 
+/-- `v instanceof Deserializer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Deserializer`). -/
+def v8.Deserializer.cast? (v : Value) : IO (Option v8.Deserializer) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["Deserializer"] Value) v) then some { val := v } else none
+
 /-- `deserializer.readHeader()`: `undefined readHeader()` -/
 def v8.Deserializer.readHeader (self : v8.Deserializer) : IO Unit :=
   self.val.callMethod "readHeader" (Support.args #[]) Unit
@@ -249,6 +257,18 @@ def v8.Deserializer.readRawBytes (self : v8.Deserializer) (length : Int) : IO By
 def v8.Deserializer.readHostObject (self : v8.Deserializer) : IO Unit :=
   self.val.callMethod "readHostObject" (Support.args #[]) Unit
 
+/-- `v instanceof DefaultSerializer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DefaultSerializer`). -/
+def v8.DefaultSerializer.cast? (v : Value) : IO (Option v8.DefaultSerializer) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["DefaultSerializer"] Value) v) then some { val := v } else none
+
+/-- `v instanceof DefaultDeserializer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DefaultDeserializer`). -/
+def v8.DefaultDeserializer.cast? (v : Value) : IO (Option v8.DefaultDeserializer) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["DefaultDeserializer"] Value) v) then some { val := v } else none
+
+/-- `v instanceof GCProfiler`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GCProfiler`). -/
+def v8.GCProfiler.cast? (v : Value) : IO (Option v8.GCProfiler) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["GCProfiler"] Value) v) then some { val := v } else none
+
 /-- `profiler.start()` (added in Node.js v19.6.0, v18.15.0): `undefined start()` -/
 def v8.GCProfiler.start (self : v8.GCProfiler) : IO Unit :=
   self.val.callMethod "start" (Support.args #[]) Unit
@@ -257,17 +277,33 @@ def v8.GCProfiler.start (self : v8.GCProfiler) : IO Unit :=
 def v8.GCProfiler.stop (self : v8.GCProfiler) : IO Unit :=
   self.val.callMethod "stop" (Support.args #[]) Unit
 
+/-- `v instanceof SyncCPUProfileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SyncCPUProfileHandle`). -/
+def SyncCPUProfileHandle.cast? (v : Value) : IO (Option SyncCPUProfileHandle) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["SyncCPUProfileHandle"] Value) v) then some { val := v } else none
+
 /-- `syncCpuProfileHandle.stop()` (added in Node.js v24.12.0): `DOMString stop()` -/
 def SyncCPUProfileHandle.stop (self : SyncCPUProfileHandle) : IO String :=
   self.val.callMethod "stop" (Support.args #[]) String
+
+/-- `v instanceof CPUProfileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CPUProfileHandle`). -/
+def CPUProfileHandle.cast? (v : Value) : IO (Option CPUProfileHandle) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["CPUProfileHandle"] Value) v) then some { val := v } else none
 
 /-- `cpuProfileHandle.stop()` (added in Node.js v24.8.0): `Promise<any> stop()` -/
 def CPUProfileHandle.stop (self : CPUProfileHandle) : Async Data :=
   self.val.callMethodAwait "stop" (Support.args #[]) Data
 
+/-- `v instanceof HeapProfileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HeapProfileHandle`). -/
+def HeapProfileHandle.cast? (v : Value) : IO (Option HeapProfileHandle) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["HeapProfileHandle"] Value) v) then some { val := v } else none
+
 /-- `heapProfileHandle.stop()` (added in Node.js v24.9.0): `Promise<any> stop()` -/
 def HeapProfileHandle.stop (self : HeapProfileHandle) : Async Data :=
   self.val.callMethodAwait "stop" (Support.args #[]) Data
+
+/-- `v instanceof SyncHeapProfileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SyncHeapProfileHandle`). -/
+def SyncHeapProfileHandle.cast? (v : Value) : IO (Option SyncHeapProfileHandle) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:v8" ["SyncHeapProfileHandle"] Value) v) then some { val := v } else none
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `syncHeapProfileHandle.stop()` (added in Node.js v26.1.0): `DOMString stop()` -/
 def SyncHeapProfileHandle.stop (self : SyncHeapProfileHandle) : IO String :=

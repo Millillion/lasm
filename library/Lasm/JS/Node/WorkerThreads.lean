@@ -139,6 +139,10 @@ instance : ToJS MessagePortOrBroadcastChannel := ⟨fun
   | .broadcastChannel v => toJS v⟩
 instance : Coe MessagePort MessagePortOrBroadcastChannel := ⟨.messagePort⟩
 
+/-- `v instanceof Worker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Worker`). -/
+def worker_threads.Worker.cast? (v : Value) : IO (Option worker_threads.Worker) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:worker_threads" ["Worker"] Value) v) then some { val := v } else none
+
 /-- `worker.performance` (added in Node.js v15.1.0, v14.17.0, v12.22.0): `readonly attribute any performance` -/
 def worker_threads.Worker.performance (self : worker_threads.Worker) : IO Data := self.val.get "performance" Data
 
@@ -311,8 +315,8 @@ def worker_threads.moveMessagePortToContext (port : MessagePort) (contextifiedSa
     (Support.args #[toJS port, toJS contextifiedSandbox]) (await := false)
   pure { val := r }
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `worker_threads.postMessageToThread(threadId, value[, transferList][, timeout])` (added in Node.js v22.5.0, v20.19.0): `Promise<any> postMessageToThread(double threadId, any value, optional sequence<object> transferList, optional double timeout)` (Node.js 24.22.2 documentation, worker_threads.md) -/
-def worker_threads.postMessageToThread (threadId : Float) (value : Data) (transferList : Option (Array Data) := none) (timeout : Option Float := none) : Async Data :=
+/-- **Experimental** in the Node.js 24.22.2 docs. `worker_threads.postMessageToThread(threadId, value[, transferList][, timeout])` (added in Node.js v22.5.0, v20.19.0): `Promise<any> postMessageToThread(double threadId, any value, optional sequence<object> transferList, optional double /* integer: Nat */ timeout)` (Node.js 24.22.2 documentation, worker_threads.md) -/
+def worker_threads.postMessageToThread (threadId : Float) (value : Data) (transferList : Option (Array Data) := none) (timeout : Option Nat := none) : Async Data :=
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.worker_threads.postMessageToThread", module := "node:worker_threads", path := "postMessageToThread", construct := false, arity := 4 }
     (Support.args #[toJS threadId, toJS value, Support.optional transferList, Support.optional timeout])
 

@@ -58,10 +58,18 @@ instance instToJSAsync_hooksCreateHookOptions : ToJS async_hooks.CreateHookOptio
     ("promiseResolve", Support.optional d.promiseResolve),
     ("trackPromises", Support.optional d.trackPromises)]⟩
 
+/-- `v instanceof AsyncResource`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AsyncResource`). -/
+def AsyncResource.cast? (v : Value) : IO (Option AsyncResource) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:async_hooks" ["AsyncResource"] Value) v) then some { val := v } else none
+
 /-- `AsyncResource.bind(fn[, type[, thisArg]])` (added in Node.js v14.8.0, v12.19.0): `static undefined bind(Function fn, optional DOMString type, optional any thisArg)` -/
 def AsyncResource.bind (fn : JSFunction) (type : Option String := none) (thisArg : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.AsyncResource.bind", module := "node:async_hooks", path := "AsyncResource.bind", construct := false, arity := 3 }
     (Support.args #[toJS fn, Support.optional type, thisArg]) (await := false)
+
+/-- `v instanceof AsyncHook`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AsyncHook`). -/
+def AsyncHook.cast? (v : Value) : IO (Option AsyncHook) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:async_hooks" ["AsyncHook"] Value) v) then some { val := v } else none
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.asyncWrapProviders` (added in Node.js v17.2.0, v16.14.0): `readonly attribute any asyncWrapProviders` -/
 def AsyncHook.asyncWrapProviders (self : AsyncHook) : IO Data := self.val.get "asyncWrapProviders" Data
@@ -77,6 +85,10 @@ def AsyncHook.executionAsyncId (self : AsyncHook) : IO Float :=
 /-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.triggerAsyncId()`: `double triggerAsyncId()` -/
 def AsyncHook.triggerAsyncId (self : AsyncHook) : IO Float :=
   self.val.callMethod "triggerAsyncId" (Support.args #[]) Float
+
+/-- `v instanceof AsyncLocalStorage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AsyncLocalStorage`). -/
+def AsyncLocalStorage.cast? (v : Value) : IO (Option AsyncLocalStorage) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:async_hooks" ["AsyncLocalStorage"] Value) v) then some { val := v } else none
 
 /-- `name` (added in Node.js v24.0.0): `readonly attribute DOMString name` -/
 def AsyncLocalStorage.name (self : AsyncLocalStorage) : IO String := self.val.get "name" String

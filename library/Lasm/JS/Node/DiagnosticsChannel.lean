@@ -133,6 +133,10 @@ instance : ToJS DOMStringOrBoundedChannel := ⟨fun
 instance : Coe String DOMStringOrBoundedChannel := ⟨.domString⟩
 instance : Coe BoundedChannel DOMStringOrBoundedChannel := ⟨.boundedChannel⟩
 
+/-- `v instanceof Channel`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Channel`). -/
+def Channel.cast? (v : Value) : IO (Option Channel) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:diagnostics_channel" ["Channel"] Value) v) then some { val := v } else none
+
 /-- `channel.hasSubscribers` (added in Node.js v15.1.0, v14.17.0): `readonly attribute boolean hasSubscribers` -/
 def Channel.hasSubscribers (self : Channel) : IO Bool := self.val.get "hasSubscribers" Bool
 
@@ -165,6 +169,10 @@ def Channel.withStoreScope (self : Channel) (data : Data) : IO RunStoresScope :=
   let r ← self.val.callMethod "withStoreScope" (Support.args #[toJS data]) Value
   pure { val := r }
 
+/-- `v instanceof TracingChannel`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TracingChannel`). -/
+def TracingChannel.cast? (v : Value) : IO (Option TracingChannel) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:diagnostics_channel" ["TracingChannel"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.hasSubscribers` (added in Node.js v22.0.0, v20.13.0): `readonly attribute boolean hasSubscribers` -/
 def TracingChannel.hasSubscribers (self : TracingChannel) : IO Bool := self.val.get "hasSubscribers" Bool
 
@@ -188,6 +196,14 @@ def TracingChannel.tracePromise (self : TracingChannel) (fn : JSFunction) (conte
 def TracingChannel.traceCallback (self : TracingChannel) (fn : JSFunction) (position : Option Float := none) (context : Data := .undefined) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Data :=
   self.val.callMethod "traceCallback" (Support.argsWith #[toJS fn, Support.optional position, context, thisArg] (args.map toJS)) Data
 
+/-- `v instanceof RunStoresScope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RunStoresScope`). -/
+def RunStoresScope.cast? (v : Value) : IO (Option RunStoresScope) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:diagnostics_channel" ["RunStoresScope"] Value) v) then some { val := v } else none
+
+/-- `v instanceof BoundedChannel`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BoundedChannel`). -/
+def BoundedChannel.cast? (v : Value) : IO (Option BoundedChannel) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:diagnostics_channel" ["BoundedChannel"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `boundedChannel.subscribe(handlers)` (added in Node.js v26.1.0): `undefined subscribe(BoundedChannel.SubscribeHandlers handlers)` -/
 def BoundedChannel.subscribe (self : BoundedChannel) (handlers : BoundedChannel.SubscribeHandlers) : IO Unit :=
   self.val.callMethod "subscribe" (Support.args #[toJS handlers]) Unit
@@ -204,6 +220,10 @@ def BoundedChannel.run (self : BoundedChannel) (context : Data) (fn : JSFunction
 def BoundedChannel.withScope (self : BoundedChannel) (context : Data := .undefined) : IO BoundedChannelScope := do
   let r ← self.val.callMethod "withScope" (Support.args #[context]) Value
   pure { val := r }
+
+/-- `v instanceof BoundedChannelScope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BoundedChannelScope`). -/
+def BoundedChannelScope.cast? (v : Value) : IO (Option BoundedChannelScope) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:diagnostics_channel" ["BoundedChannelScope"] Value) v) then some { val := v } else none
 
 /-- `diagnostics_channel.hasSubscribers(name)` (added in Node.js v15.1.0, v14.17.0): `boolean hasSubscribers((DOMString or symbol) name)` (Node.js 24.22.2 documentation, diagnostics_channel.md) -/
 def diagnostics_channel.hasSubscribers (name : DOMStringOrSymbol) : IO Bool :=

@@ -520,8 +520,8 @@ structure ServerHttp2Stream.RespondWithFDOptions where
   waitForTrailers : Option Bool := none
   /-- `double offset` -/
   offset : Option Float := none
-  /-- `double length` -/
-  length : Option Float := none
+  /-- `double /* integer: Nat */ length` -/
+  length : Option Nat := none
 instance instToJSServerHttp2StreamRespondWithFDOptions : ToJS ServerHttp2Stream.RespondWithFDOptions := ⟨fun d => Support.fields #[("statCheck", Support.optional d.statCheck),
     ("waitForTrailers", Support.optional d.waitForTrailers),
     ("offset", Support.optional d.offset),
@@ -537,8 +537,8 @@ structure ServerHttp2Stream.RespondWithFileOptions where
   waitForTrailers : Option Bool := none
   /-- `double offset` -/
   offset : Option Float := none
-  /-- `double length` -/
-  length : Option Float := none
+  /-- `double /* integer: Nat */ length` -/
+  length : Option Nat := none
 instance instToJSServerHttp2StreamRespondWithFileOptions : ToJS ServerHttp2Stream.RespondWithFileOptions := ⟨fun d => Support.fields #[("statCheck", Support.optional d.statCheck),
     ("onError", Support.optional d.onError),
     ("waitForTrailers", Support.optional d.waitForTrailers),
@@ -1012,6 +1012,10 @@ instance instToJSHttp2ConnectOptions : ToJS http2.ConnectOptions := ⟨fun d => 
     ("unknownProtocolTimeout", Support.optional d.unknownProtocolTimeout),
     ("strictFieldWhitespaceValidation", Support.optional d.strictFieldWhitespaceValidation)]⟩
 
+/-- `v instanceof Http2Session`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2Session`). -/
+def Http2Session.cast? (v : Value) : IO (Option Http2Session) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["Http2Session"] Value) v) then some { val := v } else none
+
 /-- `http2session.alpnProtocol` (added in Node.js v9.4.0): `readonly attribute DOMString? alpnProtocol` -/
 def Http2Session.alpnProtocol (self : Http2Session) : IO (Option String) := self.val.get "alpnProtocol" (Option String)
 
@@ -1188,6 +1192,10 @@ def Http2Session.settings (self : Http2Session) (settings : Data := .undefined) 
 def Http2Session.unref (self : Http2Session) : IO Unit :=
   self.val.callMethod "unref" (Support.args #[]) Unit
 
+/-- `v instanceof ServerHttp2Session`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServerHttp2Session`). -/
+def ServerHttp2Session.cast? (v : Value) : IO (Option ServerHttp2Session) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["ServerHttp2Session"] Value) v) then some { val := v } else none
+
 /-- `serverhttp2session.altsvc(alt, originOrStream)` (added in Node.js v9.4.0): `undefined altsvc(DOMString alt, (double or DOMString or URL or object) originOrStream)` -/
 def ServerHttp2Session.altsvc (self : ServerHttp2Session) (alt : String) (originOrStream : DoubleOrDOMStringOrURLOrObject) : IO Unit :=
   self.val.callMethod "altsvc" (Support.args #[toJS alt, toJS originOrStream]) Unit
@@ -1195,6 +1203,10 @@ def ServerHttp2Session.altsvc (self : ServerHttp2Session) (alt : String) (origin
 /-- `serverhttp2session.origin(...origins)` (added in Node.js v10.12.0): `undefined origin((DOMString or URL or object)... origins)` -/
 def ServerHttp2Session.origin (self : ServerHttp2Session) (origins : Array DOMStringOrURLOrObject := #[]) : IO Unit :=
   self.val.callMethod "origin" (Support.argsWith #[] (origins.map toJS)) Unit
+
+/-- `v instanceof ClientHttp2Session`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ClientHttp2Session`). -/
+def ClientHttp2Session.cast? (v : Value) : IO (Option ClientHttp2Session) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["ClientHttp2Session"] Value) v) then some { val := v } else none
 
 /-- `Event: 'altsvc'` (added in Node.js v9.4.0): `ClientHttp2Session onAltsvc(ClientHttp2Session.AltsvcListener listener)`: calls `on("altsvc", listener)` -/
 def ClientHttp2Session.onAltsvc (self : ClientHttp2Session) (listener : ClientHttp2Session.AltsvcListener) : IO ClientHttp2Session := do
@@ -1220,6 +1232,10 @@ def ClientHttp2Session.onceOrigin (self : ClientHttp2Session) (listener : Client
 def ClientHttp2Session.request (self : ClientHttp2Session) (headers : ObjectOrSequenceOfAny) (options : Option ClientHttp2Session.RequestOptions := none) : IO ClientHttp2Stream := do
   let r ← self.val.callMethod "request" (Support.args #[toJS headers, Support.optional options]) Value
   pure { val := r }
+
+/-- `v instanceof Http2Stream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2Stream`). -/
+def Http2Stream.cast? (v : Value) : IO (Option Http2Stream) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["Http2Stream"] Value) v) then some { val := v } else none
 
 /-- `http2stream.aborted` (added in Node.js v8.4.0): `readonly attribute boolean aborted` -/
 def Http2Stream.aborted (self : Http2Stream) : IO Bool := self.val.get "aborted" Bool
@@ -1358,6 +1374,10 @@ def Http2Stream.setTimeout (self : Http2Stream) (msecs : Float) (callback : JSFu
 def Http2Stream.sendTrailers (self : Http2Stream) (headers : Data) : IO Unit :=
   self.val.callMethod "sendTrailers" (Support.args #[toJS headers]) Unit
 
+/-- `v instanceof ClientHttp2Stream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ClientHttp2Stream`). -/
+def ClientHttp2Stream.cast? (v : Value) : IO (Option ClientHttp2Stream) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["ClientHttp2Stream"] Value) v) then some { val := v } else none
+
 /-- `Event: 'continue'` (added in Node.js v8.5.0): `ClientHttp2Stream onContinue(ClientHttp2Stream.ContinueListener listener)`: calls `on("continue", listener)` -/
 def ClientHttp2Stream.onContinue (self : ClientHttp2Stream) (listener : ClientHttp2Stream.ContinueListener) : IO ClientHttp2Stream := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "continue", toJS listener]) Value
@@ -1398,6 +1418,10 @@ def ClientHttp2Stream.onceResponse (self : ClientHttp2Stream) (listener : Client
   let r ← self.val.callMethod "once" (Support.args #[toJS "response", toJS listener]) Value
   pure { val := r }
 
+/-- `v instanceof ServerHttp2Stream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServerHttp2Stream`). -/
+def ServerHttp2Stream.cast? (v : Value) : IO (Option ServerHttp2Stream) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["ServerHttp2Stream"] Value) v) then some { val := v } else none
+
 /-- `http2stream.headersSent` (added in Node.js v8.4.0): `readonly attribute boolean headersSent` -/
 def ServerHttp2Stream.headersSent (self : ServerHttp2Stream) : IO Bool := self.val.get "headersSent" Bool
 
@@ -1428,8 +1452,12 @@ def ServerHttp2Stream.respondWithFD (self : ServerHttp2Stream) (fd : DoubleOrFil
 def ServerHttp2Stream.respondWithFile (self : ServerHttp2Stream) (path_ : DOMStringOrUint8ArrayOrURL) (headers : Data := .undefined) (options : Option ServerHttp2Stream.RespondWithFileOptions := none) : IO Unit :=
   self.val.callMethod "respondWithFile" (Support.args #[toJS path_, headers, Support.optional options]) Unit
 
-/-- `server.timeout` (added in Node.js v8.4.0): `readonly attribute double timeout` -/
-def Http2Server.timeout (self : Http2Server) : IO Float := self.val.get "timeout" Float
+/-- `v instanceof Http2Server`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2Server`). -/
+def Http2Server.cast? (v : Value) : IO (Option Http2Server) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["Http2Server"] Value) v) then some { val := v } else none
+
+/-- `server.timeout` (added in Node.js v8.4.0): `readonly attribute double /* integer: Nat */ timeout` -/
+def Http2Server.timeout (self : Http2Server) : IO Nat := self.val.get "timeout" Nat
 
 /-- `Event: 'checkContinue'` (added in Node.js v8.5.0): `Http2Server onCheckContinue(Http2Server.CheckContinueListener listener)`: calls `on("checkContinue", listener)` -/
 def Http2Server.onCheckContinue (self : Http2Server) (listener : Http2Server.CheckContinueListener) : IO Http2Server := do
@@ -1514,8 +1542,12 @@ def Http2Server.setTimeout (self : Http2Server) (msecs : Option Float := none) :
 def Http2Server.updateSettings (self : Http2Server) (settings : Data := .undefined) : IO Unit :=
   self.val.callMethod "updateSettings" (Support.args #[settings]) Unit
 
-/-- `server.timeout` (added in Node.js v8.4.0): `readonly attribute double timeout` -/
-def Http2SecureServer.timeout (self : Http2SecureServer) : IO Float := self.val.get "timeout" Float
+/-- `v instanceof Http2SecureServer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2SecureServer`). -/
+def Http2SecureServer.cast? (v : Value) : IO (Option Http2SecureServer) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["Http2SecureServer"] Value) v) then some { val := v } else none
+
+/-- `server.timeout` (added in Node.js v8.4.0): `readonly attribute double /* integer: Nat */ timeout` -/
+def Http2SecureServer.timeout (self : Http2SecureServer) : IO Nat := self.val.get "timeout" Nat
 
 /-- `Event: 'checkContinue'` (added in Node.js v8.5.0): `Http2SecureServer onCheckContinue(Http2SecureServer.CheckContinueListener listener)`: calls `on("checkContinue", listener)` -/
 def Http2SecureServer.onCheckContinue (self : Http2SecureServer) (listener : Http2SecureServer.CheckContinueListener) : IO Http2SecureServer := do
@@ -1610,6 +1642,10 @@ def Http2SecureServer.setTimeout (self : Http2SecureServer) (msecs : Option Floa
 def Http2SecureServer.updateSettings (self : Http2SecureServer) (settings : Data := .undefined) : IO Unit :=
   self.val.callMethod "updateSettings" (Support.args #[settings]) Unit
 
+/-- `v instanceof Http2ServerRequest`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2ServerRequest`). -/
+def http2.Http2ServerRequest.cast? (v : Value) : IO (Option http2.Http2ServerRequest) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["Http2ServerRequest"] Value) v) then some { val := v } else none
+
 /-- `request.aborted` (added in Node.js v10.1.0): `readonly attribute boolean aborted` -/
 def http2.Http2ServerRequest.aborted (self : http2.Http2ServerRequest) : IO Bool := self.val.get "aborted" Bool
 
@@ -1683,6 +1719,10 @@ def http2.Http2ServerRequest.setTimeout (self : http2.Http2ServerRequest) (msecs
   let r ← self.val.callMethod "setTimeout" (Support.args #[toJS msecs, toJS callback]) Value
   pure { val := r }
 
+/-- `v instanceof Http2ServerResponse`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2ServerResponse`). -/
+def http2.Http2ServerResponse.cast? (v : Value) : IO (Option http2.Http2ServerResponse) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http2" ["Http2ServerResponse"] Value) v) then some { val := v } else none
+
 /-- **Deprecated** in the Node.js 24.22.2 docs. `response.connection` (added in Node.js v8.4.0): `readonly attribute (net.Socket or tls.TLSSocket) connection` -/
 def http2.Http2ServerResponse.connection (self : http2.Http2ServerResponse) : IO Value := self.val.get "connection" Value
 
@@ -1703,8 +1743,8 @@ def http2.Http2ServerResponse.sendDate (self : http2.Http2ServerResponse) : IO B
 /-- `response.socket` (added in Node.js v8.4.0): `readonly attribute (net.Socket or tls.TLSSocket) socket` -/
 def http2.Http2ServerResponse.socket (self : http2.Http2ServerResponse) : IO Value := self.val.get "socket" Value
 
-/-- `response.statusCode` (added in Node.js v8.4.0): `readonly attribute double statusCode` -/
-def http2.Http2ServerResponse.statusCode (self : http2.Http2ServerResponse) : IO Float := self.val.get "statusCode" Float
+/-- `response.statusCode` (added in Node.js v8.4.0): `readonly attribute double /* integer: Nat */ statusCode` -/
+def http2.Http2ServerResponse.statusCode (self : http2.Http2ServerResponse) : IO Nat := self.val.get "statusCode" Nat
 
 /-- `response.statusMessage` (added in Node.js v8.4.0): `readonly attribute DOMString statusMessage` -/
 def http2.Http2ServerResponse.statusMessage (self : http2.Http2ServerResponse) : IO String := self.val.get "statusMessage" String
@@ -1796,12 +1836,12 @@ def http2.Http2ServerResponse.writeContinue (self : http2.Http2ServerResponse) :
 def http2.Http2ServerResponse.writeEarlyHints (self : http2.Http2ServerResponse) (hints : Data) : IO Unit :=
   self.val.callMethod "writeEarlyHints" (Support.args #[toJS hints]) Unit
 
-/-- `response.writeInformation(statusCode[, headers])` (added in Node.js v24.18.0): `undefined writeInformation(double statusCode, optional object headers)` -/
-def http2.Http2ServerResponse.writeInformation (self : http2.Http2ServerResponse) (statusCode : Float) (headers : Data := .undefined) : IO Unit :=
+/-- `response.writeInformation(statusCode[, headers])` (added in Node.js v24.18.0): `undefined writeInformation(double /* integer: Nat */ statusCode, optional object headers)` -/
+def http2.Http2ServerResponse.writeInformation (self : http2.Http2ServerResponse) (statusCode : Nat) (headers : Data := .undefined) : IO Unit :=
   self.val.callMethod "writeInformation" (Support.args #[toJS statusCode, headers]) Unit
 
-/-- `response.writeHead(statusCode[, statusMessage][, headers])` (added in Node.js v8.4.0): `http2.Http2ServerResponse writeHead(double statusCode, optional DOMString statusMessage, optional (object or sequence<any>) headers)` -/
-def http2.Http2ServerResponse.writeHead (self : http2.Http2ServerResponse) (statusCode : Float) (statusMessage : Option String := none) (headers : Option ObjectOrSequenceOfAny := none) : IO http2.Http2ServerResponse := do
+/-- `response.writeHead(statusCode[, statusMessage][, headers])` (added in Node.js v8.4.0): `http2.Http2ServerResponse writeHead(double /* integer: Nat */ statusCode, optional DOMString statusMessage, optional (object or sequence<any>) headers)` -/
+def http2.Http2ServerResponse.writeHead (self : http2.Http2ServerResponse) (statusCode : Nat) (statusMessage : Option String := none) (headers : Option ObjectOrSequenceOfAny := none) : IO http2.Http2ServerResponse := do
   let r ← self.val.callMethod "writeHead" (Support.args #[toJS statusCode, Support.optional statusMessage, Support.optional headers]) Value
   pure { val := r }
 

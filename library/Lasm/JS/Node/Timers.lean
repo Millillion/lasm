@@ -56,6 +56,10 @@ structure timersPromises.scheduler.WaitOptions where
 instance instToJSTimersPromisesSchedulerWaitOptions : ToJS timersPromises.scheduler.WaitOptions := ⟨fun d => Support.fields #[("ref", Support.optional d.ref),
     ("signal", Support.optional d.signal)]⟩
 
+/-- `v instanceof Immediate`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Immediate`). -/
+def Immediate.cast? (v : Value) : IO (Option Immediate) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:timers" ["Immediate"] Value) v) then some { val := v } else none
+
 /-- `immediate.hasRef()` (added in Node.js v11.0.0): `boolean hasRef()` -/
 def Immediate.hasRef (self : Immediate) : IO Bool :=
   self.val.callMethod "hasRef" (Support.args #[]) Bool
@@ -69,6 +73,10 @@ def Immediate.ref (self : Immediate) : IO Immediate := do
 def Immediate.unref (self : Immediate) : IO Immediate := do
   let r ← self.val.callMethod "unref" (Support.args #[]) Value
   pure { val := r }
+
+/-- `v instanceof Timeout`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Timeout`). -/
+def Timeout.cast? (v : Value) : IO (Option Timeout) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:timers" ["Timeout"] Value) v) then some { val := v } else none
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `timeout.close()` (added in Node.js v0.9.1): `Timeout close()` -/
 def Timeout.close (self : Timeout) : IO Timeout := do

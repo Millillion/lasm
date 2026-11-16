@@ -73,6 +73,10 @@ instance : FromJS LongLongOrDOMString where
     | _ => .error ""
   typeName := "Lasm.JS.Node.LongLongOrDOMString"
 
+/-- `v instanceof SlowBuffer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SlowBuffer`). -/
+def SlowBuffer.cast? (v : Value) : IO (Option SlowBuffer) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:buffer" ["SlowBuffer"] Value) v) then some { val := v } else none
+
 /-- `buf.compare(target[, targetStart[, targetEnd[, sourceStart[, sourceEnd]]]])` (added in Node.js v0.11.13): `long long compare(Uint8Array target, optional long long targetStart, optional long long targetEnd, optional long long sourceStart, optional long long sourceEnd)` -/
 def Buffer.compare (self : ByteArray) (target : ByteArray) (targetStart : Option Int := none) (targetEnd : Option Int := none) (sourceStart : Option Int := none) (sourceEnd : Option Int := none) : IO Int :=
   Support.callOnBytes "node:buffer" "Buffer.prototype.compare" self (Support.args #[toJS target, Support.optional targetStart, Support.optional targetEnd, Support.optional sourceStart, Support.optional sourceEnd]) Int

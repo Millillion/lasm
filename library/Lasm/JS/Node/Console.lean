@@ -32,6 +32,10 @@ instance instToJSConsoleDirOptions : ToJS Console.DirOptions := ⟨fun d => Supp
     ("depth", Support.optional d.depth),
     ("colors", Support.optional d.colors)]⟩
 
+/-- `v instanceof Console`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Console`). -/
+def Console.cast? (v : Value) : IO (Option Console) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:console" ["Console"] Value) v) then some { val := v } else none
+
 /-- `console.assert(value[, ...message])` (added in Node.js v0.1.101): `undefined assert(any value, any... message)` -/
 def Console.assert (self : Console) (value : Data) (message : Array Data := #[]) : IO Unit :=
   self.val.callMethod "assert" (Support.argsWith #[toJS value] (message.map toJS)) Unit

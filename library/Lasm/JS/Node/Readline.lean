@@ -276,6 +276,10 @@ instance instToJSReadlinePromisesCreateInterfaceOptions : ToJS readlinePromises.
     ("tabSize", Support.optional d.tabSize),
     ("signal", Support.optional d.signal)]⟩
 
+/-- `v instanceof InterfaceConstructor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InterfaceConstructor`). -/
+def InterfaceConstructor.cast? (v : Value) : IO (Option InterfaceConstructor) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:readline" ["InterfaceConstructor"] Value) v) then some { val := v } else none
+
 /-- `rl.line` (added in Node.js v0.1.98): `readonly attribute DOMString line` -/
 def InterfaceConstructor.line (self : InterfaceConstructor) : IO String := self.val.get "line" String
 
@@ -404,9 +408,17 @@ def InterfaceConstructor.write (self : InterfaceConstructor) (data : String) (ke
 def InterfaceConstructor.getCursorPos (self : InterfaceConstructor) : IO Data :=
   self.val.callMethod "getCursorPos" (Support.args #[]) Data
 
+/-- `v instanceof Interface`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Interface`). -/
+def readlinePromises.Interface.cast? (v : Value) : IO (Option readlinePromises.Interface) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:readline/promises" ["Interface"] Value) v) then some { val := v } else none
+
 /-- `rl.question(query[, options])` (added in Node.js v17.0.0): `Promise<any> question(DOMString query, optional readlinePromises.Interface.QuestionOptions options)` -/
 def readlinePromises.Interface.question (self : readlinePromises.Interface) (query : String) (options : Option readlinePromises.Interface.QuestionOptions := none) : Async Data :=
   self.val.callMethodAwait "question" (Support.args #[toJS query, Support.optional options]) Data
+
+/-- `v instanceof Readline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Readline`). -/
+def readlinePromises.Readline.cast? (v : Value) : IO (Option readlinePromises.Readline) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:readline/promises" ["Readline"] Value) v) then some { val := v } else none
 
 /-- `rl.clearLine(dir)` (added in Node.js v17.0.0): `any clearLine(long long dir)` -/
 def readlinePromises.Readline.clearLine (self : readlinePromises.Readline) (dir : Int) : IO Data :=
@@ -431,6 +443,10 @@ def readlinePromises.Readline.moveCursor (self : readlinePromises.Readline) (dx 
 /-- `rl.rollback()` (added in Node.js v17.0.0): `any rollback()` -/
 def readlinePromises.Readline.rollback (self : readlinePromises.Readline) : IO Data :=
   self.val.callMethod "rollback" (Support.args #[]) Data
+
+/-- `v instanceof Interface`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Interface`). -/
+def readline.Interface.cast? (v : Value) : IO (Option readline.Interface) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:readline" ["Interface"] Value) v) then some { val := v } else none
 
 /-- `rl.question(query[, options], callback)` (added in Node.js v0.3.3): `undefined question(DOMString query, Function callback)` -/
 def readline.Interface.question (self : readline.Interface) (query : String) (callback : JSFunction) : IO Unit :=

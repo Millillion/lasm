@@ -128,6 +128,10 @@ instance instToJSEventsOnOptions : ToJS events.OnOptions := ⟨fun d => Support.
     ("highWaterMark", Support.optional d.highWaterMark),
     ("lowWaterMark", Support.optional d.lowWaterMark)]⟩
 
+/-- `v instanceof NodeEventTarget`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NodeEventTarget`). -/
+def NodeEventTarget.cast? (v : Value) : IO (Option NodeEventTarget) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:events" ["NodeEventTarget"] Value) v) then some { val := v } else none
+
 /-- `nodeEventTarget.addListener(type, listener)` (added in Node.js v14.5.0): `EventTarget addListener(DOMString type, Function listener)` -/
 def NodeEventTarget.addListener (self : NodeEventTarget) (type : String) (listener : JSFunction) : IO EventTarget := do
   let r ← self.val.callMethod "addListener" (Support.args #[toJS type, toJS listener]) Value
@@ -177,6 +181,10 @@ def NodeEventTarget.removeAllListeners (self : NodeEventTarget) (type : Option S
 def NodeEventTarget.removeListener (self : NodeEventTarget) (type : String) (listener : JSFunction) (options : Option NodeEventTarget.RemoveListenerOptions := none) : IO EventTarget := do
   let r ← self.val.callMethod "removeListener" (Support.args #[toJS type, toJS listener, Support.optional options]) Value
   pure { val := r }
+
+/-- `v instanceof EventEmitter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EventEmitter`). -/
+def EventEmitter.cast? (v : Value) : IO (Option EventEmitter) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:events" ["EventEmitter"] Value) v) then some { val := v } else none
 
 /-- `Event: 'newListener'` (added in Node.js v0.1.26): `EventEmitter onNewListener(EventEmitter.NewListenerListener listener)`: calls `on("newListener", listener)` -/
 def EventEmitter.onNewListener (self : EventEmitter) (listener : EventEmitter.NewListenerListener) : IO EventEmitter := do
@@ -265,6 +273,10 @@ def EventEmitter.setMaxListeners (self : EventEmitter) (n : Int) : IO EventEmitt
 /-- `emitter.rawListeners(eventName)` (added in Node.js v9.4.0): `sequence<Function> rawListeners((DOMString or symbol) eventName)` -/
 def EventEmitter.rawListeners (self : EventEmitter) (eventName : DOMStringOrSymbol) : IO (Array JSFunction) :=
   self.val.callMethod "rawListeners" (Support.args #[toJS eventName]) (Array JSFunction)
+
+/-- `v instanceof EventEmitterAsyncResource`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EventEmitterAsyncResource`). -/
+def events.EventEmitterAsyncResource.cast? (v : Value) : IO (Option events.EventEmitterAsyncResource) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:events" ["EventEmitterAsyncResource"] Value) v) then some { val := v } else none
 
 /-- `eventemitterasyncresource.asyncId`: `readonly attribute double asyncId` -/
 def events.EventEmitterAsyncResource.asyncId (self : events.EventEmitterAsyncResource) : IO Float := self.val.get "asyncId" Float

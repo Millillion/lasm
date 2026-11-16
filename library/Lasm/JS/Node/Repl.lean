@@ -55,8 +55,8 @@ def REPLServer.ResetListener.ofSyncFn (f : IO Unit) : IO REPLServer.ResetListene
 structure REPLServer.SetupHistoryHistoryConfig where
   /-- `DOMString filePath` -/
   filePath : Option String := none
-  /-- `double size = 30` -/
-  size : Option Float := none
+  /-- `double /* integer: Nat */ size = 30` -/
+  size : Option Nat := none
   /-- `boolean removeHistoryDuplicates = false` -/
   removeHistoryDuplicates : Option Bool := none
   /-- `Function onHistoryFileLoaded` -/
@@ -131,6 +131,10 @@ instance instToJSReplStartOptionsOrDOMString : ToJS repl.StartOptionsOrDOMString
   | .domString v => toJS v⟩
 instance instCoeReplStartOptionsReplStartOptionsOrDOMString : Coe repl.StartOptions repl.StartOptionsOrDOMString := ⟨.startOptions⟩
 instance instCoeStringReplStartOptionsOrDOMString : Coe String repl.StartOptionsOrDOMString := ⟨.domString⟩
+
+/-- `v instanceof REPLServer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `REPLServer`). -/
+def REPLServer.cast? (v : Value) : IO (Option REPLServer) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:repl" ["REPLServer"] Value) v) then some { val := v } else none
 
 /-- `Event: 'exit'` (added in Node.js v0.7.7): `REPLServer onExit(REPLServer.ExitListener listener)`: calls `on("exit", listener)` -/
 def REPLServer.onExit (self : REPLServer) (listener : REPLServer.ExitListener) : IO REPLServer := do

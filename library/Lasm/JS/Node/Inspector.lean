@@ -34,6 +34,10 @@ def inspector.Session.InspectorNotificationListener.ofFn (f : Data → Async Uni
 def inspector.Session.InspectorNotificationListener.ofSyncFn (f : Data → IO Unit) : IO inspector.Session.InspectorNotificationListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
 
+/-- `v instanceof Session`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Session`). -/
+def inspector.Session.cast? (v : Value) : IO (Option inspector.Session) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:inspector" ["Session"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'inspectorNotification'` (added in Node.js v8.0.0): `inspector.Session onInspectorNotification(inspector.Session.InspectorNotificationListener listener)`: calls `on("inspectorNotification", listener)` -/
 def inspector.Session.onInspectorNotification (self : inspector.Session) (listener : inspector.Session.InspectorNotificationListener) : IO inspector.Session := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "inspectorNotification", toJS listener]) Value
@@ -72,8 +76,8 @@ def inspector.close : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.inspector.close", module := "node:inspector", path := "close", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `inspector.open([port[, host[, wait]]])`: `object open(optional double port, optional DOMString host, optional boolean wait)` (Node.js 24.22.2 documentation, inspector.md) -/
-def inspector.«open» (port : Option Float := none) (host : Option String := none) (wait : Option Bool := none) : IO Data :=
+/-- `inspector.open([port[, host[, wait]]])`: `object open(optional double /* integer: Nat */ port, optional DOMString host, optional boolean wait)` (Node.js 24.22.2 documentation, inspector.md) -/
+def inspector.«open» (port : Option Nat := none) (host : Option String := none) (wait : Option Bool := none) : IO Data :=
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.inspector.open", module := "node:inspector", path := "open", construct := false, arity := 3 }
     (Support.args #[Support.optional port, Support.optional host, Support.optional wait]) (await := false)
 

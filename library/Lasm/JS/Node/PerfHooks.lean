@@ -153,6 +153,10 @@ structure performance.TimerifyOptions where
   histogram : Option RecordableHistogram := none
 instance instToJSPerformanceTimerifyOptions : ToJS performance.TimerifyOptions := ⟨fun d => Support.fields #[("histogram", Support.optional d.histogram)]⟩
 
+/-- `v instanceof PerformanceNodeEntry`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceNodeEntry`). -/
+def PerformanceNodeEntry.cast? (v : Value) : IO (Option PerformanceNodeEntry) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:perf_hooks" ["PerformanceNodeEntry"] Value) v) then some { val := v } else none
+
 /-- `detail` (added in Node.js v16.0.0): `readonly attribute any detail` -/
 def PerformanceNodeEntry.detail (self : PerformanceNodeEntry) : IO Data := self.val.get "detail" Data
 
@@ -161,6 +165,10 @@ def PerformanceNodeEntry.flags (self : PerformanceNodeEntry) : IO Float := self.
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `kind` (added in Node.js v8.5.0): `readonly attribute double kind` -/
 def PerformanceNodeEntry.kind (self : PerformanceNodeEntry) : IO Float := self.val.get "kind" Float
+
+/-- `v instanceof PerformanceNodeTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceNodeTiming`). -/
+def PerformanceNodeTiming.cast? (v : Value) : IO (Option PerformanceNodeTiming) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:perf_hooks" ["PerformanceNodeTiming"] Value) v) then some { val := v } else none
 
 /-- `bootstrapComplete` (added in Node.js v8.5.0): `readonly attribute double bootstrapComplete` -/
 def PerformanceNodeTiming.bootstrapComplete (self : PerformanceNodeTiming) : IO Float := self.val.get "bootstrapComplete" Float
@@ -189,8 +197,12 @@ def PerformanceNodeTiming.v8Start (self : PerformanceNodeTiming) : IO Float := s
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `uvMetricsInfoBigInt` (added in Node.js v26.11.0): `readonly attribute object uvMetricsInfoBigInt` -/
 def PerformanceNodeTiming.uvMetricsInfoBigInt (self : PerformanceNodeTiming) : IO Data := self.val.get "uvMetricsInfoBigInt" Data
 
-/-- `histogram.count` (added in Node.js v17.4.0, v16.14.0): `readonly attribute double count` -/
-def Histogram.count (self : Histogram) : IO Float := self.val.get "count" Float
+/-- `v instanceof Histogram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Histogram`). -/
+def Histogram.cast? (v : Value) : IO (Option Histogram) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:perf_hooks" ["Histogram"] Value) v) then some { val := v } else none
+
+/-- `histogram.count` (added in Node.js v17.4.0, v16.14.0): `readonly attribute double /* integer: Nat */ count` -/
+def Histogram.count (self : Histogram) : IO Nat := self.val.get "count" Nat
 
 /-- `histogram.countBigInt` (added in Node.js v17.4.0, v16.14.0): `readonly attribute bigint countBigInt` -/
 def Histogram.countBigInt (self : Histogram) : IO Int := self.val.get "countBigInt" Int
@@ -329,6 +341,10 @@ def Histogram.snapshot (self : Histogram) : IO Histogram := do
   let r ← self.val.callMethod "snapshot" (Support.args #[]) Value
   pure { val := r }
 
+/-- `v instanceof ELDHistogram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ELDHistogram`). -/
+def ELDHistogram.cast? (v : Value) : IO (Option ELDHistogram) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:perf_hooks" ["ELDHistogram"] Value) v) then some { val := v } else none
+
 /-- `histogram.disable()` (added in Node.js v11.10.0): `boolean disable()` -/
 def ELDHistogram.disable (self : ELDHistogram) : IO Bool :=
   self.val.callMethod "disable" (Support.args #[]) Bool
@@ -336,6 +352,10 @@ def ELDHistogram.disable (self : ELDHistogram) : IO Bool :=
 /-- `histogram.enable()` (added in Node.js v11.10.0): `boolean enable()` -/
 def ELDHistogram.enable (self : ELDHistogram) : IO Bool :=
   self.val.callMethod "enable" (Support.args #[]) Bool
+
+/-- `v instanceof RecordableHistogram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RecordableHistogram`). -/
+def RecordableHistogram.cast? (v : Value) : IO (Option RecordableHistogram) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:perf_hooks" ["RecordableHistogram"] Value) v) then some { val := v } else none
 
 /-- `histogram.add(other)` (added in Node.js v17.4.0, v16.14.0): `undefined add(RecordableHistogram other)` -/
 def RecordableHistogram.add (self : RecordableHistogram) (other : RecordableHistogram) : IO Unit :=
@@ -356,6 +376,10 @@ def RecordableHistogram.recordCorrected (self : RecordableHistogram) (val : Doub
 /-- `histogram.subtract(other)` (added in Node.js v24.21.0): `undefined subtract(RecordableHistogram other)` -/
 def RecordableHistogram.subtract (self : RecordableHistogram) (other : RecordableHistogram) : IO Unit :=
   self.val.callMethod "subtract" (Support.args #[toJS other]) Unit
+
+/-- `v instanceof SlidingWindowHistogram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SlidingWindowHistogram`). -/
+def SlidingWindowHistogram.cast? (v : Value) : IO (Option SlidingWindowHistogram) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:perf_hooks" ["SlidingWindowHistogram"] Value) v) then some { val := v } else none
 
 /-- `slidingWindowHistogram.record(val)` (added in Node.js v24.22.0): `undefined record((double or bigint) val)` -/
 def SlidingWindowHistogram.record (self : SlidingWindowHistogram) (val : DoubleOrBigint) : IO Unit :=

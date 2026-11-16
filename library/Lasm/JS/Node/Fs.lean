@@ -185,8 +185,8 @@ structure FileHandle.CreateWriteStreamOptions where
   emitClose : Option Bool := none
   /-- `long long start` -/
   start : Option Int := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `boolean flush = false` -/
   flush : Option Bool := none
 instance instToJSFileHandleCreateWriteStreamOptions : ToJS FileHandle.CreateWriteStreamOptions := ⟨fun d => Support.fields #[("encoding", Support.optional d.encoding),
@@ -215,8 +215,8 @@ structure FileHandle.PullOptions where
   autoClose : Option Bool := none
   /-- `double start` -/
   start : Option Float := none
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `double chunkSize` -/
   chunkSize : Option Float := none
 instance instToJSFileHandlePullOptions : ToJS FileHandle.PullOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
@@ -231,8 +231,8 @@ structure FileHandle.PullSyncOptions where
   autoClose : Option Bool := none
   /-- `double start` -/
   start : Option Float := none
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `double chunkSize` -/
   chunkSize : Option Float := none
 instance instToJSFileHandlePullSyncOptions : ToJS FileHandle.PullSyncOptions := ⟨fun d => Support.fields #[("autoClose", Support.optional d.autoClose),
@@ -427,8 +427,8 @@ structure FileHandle.WriterOptions where
   autoClose : Option Bool := none
   /-- `double start` -/
   start : Option Float := none
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `double chunkSize` -/
   chunkSize : Option Float := none
 instance instToJSFileHandleWriterOptions : ToJS FileHandle.WriterOptions := ⟨fun d => Support.fields #[("autoClose", Support.optional d.autoClose),
@@ -1287,8 +1287,8 @@ structure fs.CreateWriteStreamOptions where
   fs : Data := .undefined
   /-- `AbortSignal? signal = null` -/
   signal : Option AbortSignal := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `boolean flush = false` -/
   flush : Option Bool := none
   /-- `bigint windowsHandle = null` -/
@@ -2037,8 +2037,8 @@ instance instToJSFsRealpathSyncDOMStringOrNativeOptions : ToJS fs.realpathSync.D
 instance instCoeStringFsRealpathSyncDOMStringOrNativeOptions : Coe String fs.realpathSync.DOMStringOrNativeOptions := ⟨.domString⟩
 instance instCoeFsRealpathSyncNativeOptionsFsRealpathSyncDOMStringOrNativeOptions : Coe fs.realpathSync.NativeOptions fs.realpathSync.DOMStringOrNativeOptions := ⟨.nativeOptions⟩
 
-/-- `filehandle.fd` (added in Node.js v10.0.0): `readonly attribute double fd` -/
-def FileHandle.fd (self : FileHandle) : IO Float := self.val.get "fd" Float
+/-- `filehandle.fd` (added in Node.js v10.0.0): `readonly attribute double /* integer: Nat */ fd` -/
+def FileHandle.fd (self : FileHandle) : IO Nat := self.val.get "fd" Nat
 
 /-- `Event: 'close'` (added in Node.js v15.4.0): `FileHandle onClose(FileHandle.CloseListener listener)`: calls `on("close", listener)` -/
 def FileHandle.onClose (self : FileHandle) (listener : FileHandle.CloseListener) : IO FileHandle := do
@@ -2159,6 +2159,10 @@ def FileHandle.writev (self : FileHandle) (buffers : Array ByteArray) (position 
 def FileHandle.writer (self : FileHandle) (options : Option FileHandle.WriterOptions := none) : IO Data :=
   self.val.callMethod "writer" (Support.args #[Support.optional options]) Data
 
+/-- `v instanceof Dir`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Dir`). -/
+def fs.Dir.cast? (v : Value) : IO (Option fs.Dir) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Dir"] Value) v) then some { val := v } else none
+
 /-- `dir.path` (added in Node.js v12.12.0): `readonly attribute DOMString path` -/
 def fs.Dir.path (self : fs.Dir) : IO String := self.val.get "path" String
 
@@ -2185,6 +2189,10 @@ def fs.Dir.read0 (self : fs.Dir) : Async (Option fs.Dirent) :=
 /-- `dir.readSync()` (added in Node.js v12.12.0): `fs.Dirent? readSync()` -/
 def fs.Dir.readSync (self : fs.Dir) : IO (Option fs.Dirent) :=
   self.val.callMethod "readSync" (Support.args #[]) (Option fs.Dirent)
+
+/-- `v instanceof Dirent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Dirent`). -/
+def fs.Dirent.cast? (v : Value) : IO (Option fs.Dirent) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Dirent"] Value) v) then some { val := v } else none
 
 /-- `dirent.name` (added in Node.js v10.10.0): `readonly attribute (DOMString or Uint8Array) name` -/
 def fs.Dirent.name (self : fs.Dirent) : IO DOMStringOrUint8Array := self.val.get "name" DOMStringOrUint8Array
@@ -2219,6 +2227,10 @@ def fs.Dirent.isSocket (self : fs.Dirent) : IO Bool :=
 /-- `dirent.isSymbolicLink()` (added in Node.js v10.10.0): `boolean isSymbolicLink()` -/
 def fs.Dirent.isSymbolicLink (self : fs.Dirent) : IO Bool :=
   self.val.callMethod "isSymbolicLink" (Support.args #[]) Bool
+
+/-- `v instanceof FSWatcher`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FSWatcher`). -/
+def fs.FSWatcher.cast? (v : Value) : IO (Option fs.FSWatcher) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["FSWatcher"] Value) v) then some { val := v } else none
 
 /-- `Event: 'change'` (added in Node.js v0.5.8): `fs.FSWatcher onChange(fs.FSWatcher.ChangeListener listener)`: calls `on("change", listener)` -/
 def fs.FSWatcher.onChange (self : fs.FSWatcher) (listener : fs.FSWatcher.ChangeListener) : IO fs.FSWatcher := do
@@ -2264,6 +2276,10 @@ def fs.FSWatcher.unref (self : fs.FSWatcher) : IO fs.FSWatcher := do
   let r ← self.val.callMethod "unref" (Support.args #[]) Value
   pure { val := r }
 
+/-- `v instanceof StatWatcher`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StatWatcher`). -/
+def fs.StatWatcher.cast? (v : Value) : IO (Option fs.StatWatcher) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["StatWatcher"] Value) v) then some { val := v } else none
+
 /-- `watcher.ref()` (added in Node.js v14.3.0, v12.20.0): `fs.StatWatcher ref()` -/
 def fs.StatWatcher.ref (self : fs.StatWatcher) : IO fs.StatWatcher := do
   let r ← self.val.callMethod "ref" (Support.args #[]) Value
@@ -2273,6 +2289,10 @@ def fs.StatWatcher.ref (self : fs.StatWatcher) : IO fs.StatWatcher := do
 def fs.StatWatcher.unref (self : fs.StatWatcher) : IO fs.StatWatcher := do
   let r ← self.val.callMethod "unref" (Support.args #[]) Value
   pure { val := r }
+
+/-- `v instanceof ReadStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ReadStream`). -/
+def fs.ReadStream.cast? (v : Value) : IO (Option fs.ReadStream) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["ReadStream"] Value) v) then some { val := v } else none
 
 /-- `bytesRead` (added in Node.js v6.4.0): `readonly attribute double bytesRead` -/
 def fs.ReadStream.bytesRead (self : fs.ReadStream) : IO Float := self.val.get "bytesRead" Float
@@ -2312,6 +2332,10 @@ def fs.ReadStream.onReady (self : fs.ReadStream) (listener : fs.ReadStream.Ready
 def fs.ReadStream.onceReady (self : fs.ReadStream) (listener : fs.ReadStream.ReadyListener) : IO fs.ReadStream := do
   let r ← self.val.callMethod "once" (Support.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
+
+/-- `v instanceof Stats`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Stats`). -/
+def fs.Stats.cast? (v : Value) : IO (Option fs.Stats) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Stats"] Value) v) then some { val := v } else none
 
 /-- `stats.dev`: `readonly attribute (double or bigint) dev` -/
 def fs.Stats.dev (self : fs.Stats) : IO DoubleOrBigint := self.val.get "dev" DoubleOrBigint
@@ -2407,6 +2431,10 @@ def fs.Stats.isSocket (self : fs.Stats) : IO Bool :=
 def fs.Stats.isSymbolicLink (self : fs.Stats) : IO Bool :=
   self.val.callMethod "isSymbolicLink" (Support.args #[]) Bool
 
+/-- `v instanceof StatFs`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StatFs`). -/
+def fs.StatFs.cast? (v : Value) : IO (Option fs.StatFs) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["StatFs"] Value) v) then some { val := v } else none
+
 /-- `bavail` (added in Node.js v19.6.0, v18.15.0): `readonly attribute (double or bigint) bavail` -/
 def fs.StatFs.bavail (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "bavail" DoubleOrBigint
 
@@ -2431,14 +2459,18 @@ def fs.StatFs.files (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "file
 /-- `type` (added in Node.js v19.6.0, v18.15.0): `readonly attribute (double or bigint) type` -/
 def fs.StatFs.type (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "type" DoubleOrBigint
 
+/-- `v instanceof Utf8Stream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Utf8Stream`). -/
+def fs.Utf8Stream.cast? (v : Value) : IO (Option fs.Utf8Stream) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Utf8Stream"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.append`: `readonly attribute boolean append` -/
 def fs.Utf8Stream.append (self : fs.Utf8Stream) : IO Bool := self.val.get "append" Bool
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.contentMode`: `readonly attribute DOMString contentMode` -/
 def fs.Utf8Stream.contentMode (self : fs.Utf8Stream) : IO String := self.val.get "contentMode" String
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.fd`: `readonly attribute double fd` -/
-def fs.Utf8Stream.fd (self : fs.Utf8Stream) : IO Float := self.val.get "fd" Float
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.fd`: `readonly attribute double /* integer: Nat */ fd` -/
+def fs.Utf8Stream.fd (self : fs.Utf8Stream) : IO Nat := self.val.get "fd" Nat
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.file`: `readonly attribute DOMString file` -/
 def fs.Utf8Stream.file (self : fs.Utf8Stream) : IO String := self.val.get "file" String
@@ -2560,6 +2592,10 @@ def fs.Utf8Stream.reopen (self : fs.Utf8Stream) (file : DOMStringOrUint8ArrayOrU
 /-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.write(data)`: `boolean write((DOMString or Uint8Array) data)` -/
 def fs.Utf8Stream.write (self : fs.Utf8Stream) (data : DOMStringOrUint8Array) : IO Bool :=
   self.val.callMethod "write" (Support.args #[toJS data]) Bool
+
+/-- `v instanceof WriteStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WriteStream`). -/
+def fs.WriteStream.cast? (v : Value) : IO (Option fs.WriteStream) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["WriteStream"] Value) v) then some { val := v } else none
 
 /-- `writeStream.bytesWritten` (added in Node.js v0.4.7): `readonly attribute any bytesWritten` -/
 def fs.WriteStream.bytesWritten (self : fs.WriteStream) : IO Data := self.val.get "bytesWritten" Data

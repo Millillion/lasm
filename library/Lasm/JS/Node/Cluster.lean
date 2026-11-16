@@ -111,6 +111,10 @@ structure cluster.Worker.SendOptions where
   keepOpen : Option Bool := none
 instance instToJSClusterWorkerSendOptions : ToJS cluster.Worker.SendOptions := ⟨fun d => Support.fields #[("keepOpen", Support.optional d.keepOpen)]⟩
 
+/-- `v instanceof Worker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Worker`). -/
+def cluster.Worker.cast? (v : Value) : IO (Option cluster.Worker) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:cluster" ["Worker"] Value) v) then some { val := v } else none
+
 /-- `worker.exitedAfterDisconnect` (added in Node.js v6.0.0): `readonly attribute boolean exitedAfterDisconnect` -/
 def cluster.Worker.exitedAfterDisconnect (self : cluster.Worker) : IO Bool := self.val.get "exitedAfterDisconnect" Bool
 

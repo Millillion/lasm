@@ -203,6 +203,10 @@ structure util.StyleTextOptions where
 instance instToJSUtilStyleTextOptions : ToJS util.StyleTextOptions := ⟨fun d => Support.fields #[("validateStream", Support.optional d.validateStream),
     ("stream", Support.optional d.stream)]⟩
 
+/-- `v instanceof MIMEType`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MIMEType`). -/
+def util.MIMEType.cast? (v : Value) : IO (Option util.MIMEType) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:util" ["MIMEType"] Value) v) then some { val := v } else none
+
 /-- `mime.type`: `readonly attribute DOMString type` -/
 def util.MIMEType.type (self : util.MIMEType) : IO String := self.val.get "type" String
 
@@ -230,6 +234,10 @@ def util.MIMEType.parse (string : Data) : IO util.MIMEType := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.util.MIMEType.parse", module := "node:util", path := "MIMEType.parse", construct := false, arity := 1 }
     (Support.args #[toJS string]) (await := false)
   pure { val := r }
+
+/-- `v instanceof MIMEParams`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MIMEParams`). -/
+def util.MIMEParams.cast? (v : Value) : IO (Option util.MIMEParams) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:util" ["MIMEParams"] Value) v) then some { val := v } else none
 
 /-- `mimeParams.delete(name)`: `undefined delete(DOMString name)` -/
 def util.MIMEParams.delete (self : util.MIMEParams) (name : String) : IO Unit :=

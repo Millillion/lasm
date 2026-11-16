@@ -20,6 +20,10 @@ instance : Nonempty RunScope := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS RunScope := ⟨fun x => .ref x.val ""⟩
 instance : FromJS RunScope := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.RunScope", .data⟩
 
+/-- `v instanceof RunScope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RunScope`). -/
+def RunScope.cast? (v : Value) : IO (Option RunScope) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:async_hooks" ["RunScope"] Value) v) then some { val := v } else none
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `scope.dispose()` (added in Node.js v24.20.0): `undefined dispose()` -/
 def RunScope.dispose (self : RunScope) : IO Unit :=
   self.val.callMethod "dispose" (Support.args #[]) Unit

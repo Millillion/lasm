@@ -140,8 +140,8 @@ def stream.Writable.UnpipeListener.ofSyncFn (f : stream.Readable → IO Unit) : 
 structure stream.Writable.FromWebOptions where
   /-- `boolean decodeStrings` -/
   decodeStrings : Option Bool := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `boolean objectMode` -/
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
@@ -295,8 +295,8 @@ instance instToJSStreamReadableIteratorOptions : ToJS stream.Readable.IteratorOp
 structure stream.Readable.MapOptions where
   /-- `double concurrency = 1` -/
   concurrency : Option Float := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
 instance instToJSStreamReadableMapOptions : ToJS stream.Readable.MapOptions := ⟨fun d => Support.fields #[("concurrency", Support.optional d.concurrency),
@@ -307,8 +307,8 @@ instance instToJSStreamReadableMapOptions : ToJS stream.Readable.MapOptions := �
 structure stream.Readable.FilterOptions where
   /-- `double concurrency = 1` -/
   concurrency : Option Float := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
 instance instToJSStreamReadableFilterOptions : ToJS stream.Readable.FilterOptions := ⟨fun d => Support.fields #[("concurrency", Support.optional d.concurrency),
@@ -388,8 +388,8 @@ instance instToJSStreamReadableReduceOptions : ToJS stream.Readable.ReduceOption
 structure stream.Readable.FromWebOptions where
   /-- `DOMString encoding` -/
   encoding : Option String := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `boolean objectMode` -/
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
@@ -413,8 +413,8 @@ instance instCoeReadableStreamStreamReadableOrReadableStream : Coe ReadableStrea
 
 /-- `dictionary stream.Readable.ToWebOptionsStrategy` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.ToWebOptionsStrategy where
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `Function size` -/
   size : Option JSFunction := none
 instance instToJSStreamReadableToWebOptionsStrategy : ToJS stream.Readable.ToWebOptionsStrategy := ⟨fun d => Support.fields #[("highWaterMark", Support.optional d.highWaterMark),
@@ -446,8 +446,8 @@ structure stream.Duplex.FromWebOptions where
   decodeStrings : Option Bool := none
   /-- `DOMString encoding` -/
   encoding : Option String := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `boolean objectMode` -/
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
@@ -710,6 +710,10 @@ instance instToJSStreamFinishedOptions2 : ToJS stream.FinishedOptions2 := ⟨fun
     ("signal", Support.optional d.signal),
     ("cleanup", Support.optional d.cleanup)]⟩
 
+/-- `v instanceof Writable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Writable`). -/
+def stream.Writable.cast? (v : Value) : IO (Option stream.Writable) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Writable"] Value) v) then some { val := v } else none
+
 /-- `writable.closed` (added in Node.js v18.0.0): `readonly attribute boolean closed` -/
 def stream.Writable.closed (self : stream.Writable) : IO Bool := self.val.get "closed" Bool
 
@@ -865,6 +869,10 @@ def stream.Writable.toWeb (streamWritable : stream.Writable) : IO WritableStream
     (Support.args #[toJS streamWritable]) (await := false)
   pure { val := r }
 
+/-- `v instanceof Readable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Readable`). -/
+def stream.Readable.cast? (v : Value) : IO (Option stream.Readable) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Readable"] Value) v) then some { val := v } else none
+
 /-- `readable.closed` (added in Node.js v18.0.0): `readonly attribute boolean closed` -/
 def stream.Readable.closed (self : stream.Readable) : IO Bool := self.val.get "closed" Bool
 
@@ -994,16 +1002,16 @@ def stream.Readable.pipe (self : stream.Readable) (destination : stream.Writable
   let r ← self.val.callMethod "pipe" (Support.args #[toJS destination, Support.optional options]) Value
   pure { val := r }
 
-/-- `readable.read([size])` (added in Node.js v0.9.4): `any read(optional double size)` -/
-def stream.Readable.read (self : stream.Readable) (size : Option Float := none) : IO Data :=
+/-- `readable.read([size])` (added in Node.js v0.9.4): `any read(optional double /* integer: Nat */ size)` -/
+def stream.Readable.read (self : stream.Readable) (size : Option Nat := none) : IO Data :=
   self.val.callMethod "read" (Support.args #[Support.optional size]) Data
 
 /-- `readable.read(0)`: `undefined read()` -/
 def stream.Readable.read0 (self : stream.Readable) : IO Unit :=
   self.val.callMethod "read" (Support.args #[]) Unit
 
-/-- `readable._read(size)` (added in Node.js v0.9.4): `undefined read(double size)` -/
-def stream.Readable.read1 (self : stream.Readable) (size : Float) : IO Unit :=
+/-- `readable._read(size)` (added in Node.js v0.9.4): `undefined read(double /* integer: Nat */ size)` -/
+def stream.Readable.read1 (self : stream.Readable) (size : Nat) : IO Unit :=
   self.val.callMethod "read" (Support.args #[toJS size]) Unit
 
 /-- `readable.resume()` (added in Node.js v0.9.4): `stream.Readable resume()` -/
@@ -1074,13 +1082,13 @@ def stream.Readable.flatMap (self : stream.Readable) (fn : JSFunction) (options 
   let r ← self.val.callMethod "flatMap" (Support.args #[toJS fn, Support.optional options]) Value
   pure { val := r }
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `readable.drop(limit[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable drop(double limit, optional stream.Readable.DropOptions options)` -/
-def stream.Readable.drop (self : stream.Readable) (limit : Float) (options : Option stream.Readable.DropOptions := none) : IO stream.Readable := do
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.drop(limit[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable drop(double /* integer: Nat */ limit, optional stream.Readable.DropOptions options)` -/
+def stream.Readable.drop (self : stream.Readable) (limit : Nat) (options : Option stream.Readable.DropOptions := none) : IO stream.Readable := do
   let r ← self.val.callMethod "drop" (Support.args #[toJS limit, Support.optional options]) Value
   pure { val := r }
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `readable.take(limit[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable take(double limit, optional stream.Readable.TakeOptions options)` -/
-def stream.Readable.take (self : stream.Readable) (limit : Float) (options : Option stream.Readable.TakeOptions := none) : IO stream.Readable := do
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.take(limit[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable take(double /* integer: Nat */ limit, optional stream.Readable.TakeOptions options)` -/
+def stream.Readable.take (self : stream.Readable) (limit : Nat) (options : Option stream.Readable.TakeOptions := none) : IO stream.Readable := do
   let r ← self.val.callMethod "take" (Support.args #[toJS limit, Support.optional options]) Value
   pure { val := r }
 
@@ -1123,6 +1131,10 @@ def stream.Readable.toWeb (streamReadable : stream.Readable) (options : Option s
     (Support.args #[toJS streamReadable, Support.optional options]) (await := false)
   pure { val := r }
 
+/-- `v instanceof Duplex`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Duplex`). -/
+def stream.Duplex.cast? (v : Value) : IO (Option stream.Duplex) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Duplex"] Value) v) then some { val := v } else none
+
 /-- `allowHalfOpen` (added in Node.js v0.9.4): `readonly attribute boolean allowHalfOpen` -/
 def stream.Duplex.allowHalfOpen (self : stream.Duplex) : IO Bool := self.val.get "allowHalfOpen" Bool
 
@@ -1143,6 +1155,10 @@ def stream.Duplex.toWeb (streamDuplex : stream.Duplex) (options : Option stream.
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.stream.Duplex.toWeb", module := "node:stream", path := "Duplex.toWeb", construct := false, arity := 2 }
     (Support.args #[toJS streamDuplex, Support.optional options]) (await := false)
 
+/-- `v instanceof Transform`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Transform`). -/
+def stream.Transform.cast? (v : Value) : IO (Option stream.Transform) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Transform"] Value) v) then some { val := v } else none
+
 /-- `transform.destroy([error])` (added in Node.js v8.0.0): `stream.Transform destroy(optional any error)` -/
 def stream.Transform.destroy (self : stream.Transform) (error : Data := .undefined) : IO stream.Transform := do
   let r ← self.val.callMethod "destroy" (Support.args #[error]) Value
@@ -1155,6 +1171,10 @@ def stream.Transform.flush (self : stream.Transform) (callback : JSFunction) : I
 /-- `transform._transform(chunk, encoding, callback)`: `undefined transform(any chunk, DOMString encoding, Function callback)` -/
 def stream.Transform.transform (self : stream.Transform) (chunk : Data) (encoding : String) (callback : JSFunction) : IO Unit :=
   self.val.callMethod "transform" (Support.args #[toJS chunk, toJS encoding, toJS callback]) Unit
+
+/-- `v instanceof PassThrough`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PassThrough`). -/
+def stream.PassThrough.cast? (v : Value) : IO (Option stream.PassThrough) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["PassThrough"] Value) v) then some { val := v } else none
 
 /-- `stream.finished(stream[, options], callback)` (added in Node.js v10.0.0): `Function finished((EventEmitter or ReadableStream or WritableStream) stream, Function callback)` (Node.js 24.22.2 documentation, stream.md) -/
 def stream.finished (stream_ : EventEmitterOrReadableStreamOrWritableStream) (callback : JSFunction) : IO JSFunction :=

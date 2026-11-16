@@ -7,7 +7,7 @@ the `nodejs24` runtime with the Functions Framework. (A container on
 ```sh
 npx lasm init my-app --template hono --deploy gcf   # adds @google-cloud/functions-framework
 cd my-app && npm install
-npm run build:gcf                                   # lasm build --target gcf: dist/ and gcf/
+npm run build:gcf                                   # lasm build --target gcf: gcf/
 gcloud functions deploy my-app --gen2 --runtime nodejs24 --region REGION \
   --trigger-http --entry-point lasm --source gcf --memory 1Gi
 ```
