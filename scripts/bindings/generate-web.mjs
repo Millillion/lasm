@@ -1165,10 +1165,13 @@ ${nodeGeneratedBy}
 -/`, ...order.filter(n => n.startsWith(NODE_NS + '.')).map(n => `import ${n}`), ''].join('\n'));
 
 for (const h of serveTier.hosts) files.set(join(root, 'library', 'Lasm', 'JS', `${h.name}.lean`), [`/-
-Lasm.JS.${h.name}: ${h.name}'s HTTP server (\`${h.global}.serve\`) as declared for ${h.name} ${h.version}, with Lasm.JS.Web's
+${h.auto ? `Lasm.JS.${h.name}: ${h.title} as declared for ${h.name} ${h.version} (every function, constant and class, with
+the types they use), on Lasm.JS.Web's types. The same mapping as Lasm.JS.Web: classes and the objects the runtime
+keeps are handle types, Promise results are \`Async\`, plain objects structures, callbacks made from Lean functions
+(docs/JS_BINDINGS.md, "Lasm.JS.${h.name}").` : `Lasm.JS.${h.name}: ${h.name}'s HTTP server (\`${h.global}.serve\`) as declared for ${h.name} ${h.version}, with Lasm.JS.Web's
 Request and Response as the handler's types. The same mapping as Lasm.JS.Web: the server is a handle type,
 Promise results are \`Async\`, options dictionaries, the handler a callback made from a Lean function
-(docs/JS_BINDINGS.md, "Lasm.JS.Deno and Lasm.JS.Bun").
+(docs/JS_BINDINGS.md, "Lasm.JS.Deno and Lasm.JS.Bun").`}
 ${hostGeneratedBy(h)}
 -/`, ...order.filter(n => n.startsWith(`Lasm.JS.${h.name}.`)).map(n => `import ${n}`), ''].join('\n'));
 
