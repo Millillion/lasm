@@ -83,3 +83,23 @@ export function copyProjectModules(directory, { files }) {
  * project `directory`, where Lean ran), so later steps resolve it from anywhere. */
 export const withAbsoluteFiles = (bindings, directory) =>
   bindings.map(b => typeof b.relative === 'string' && typeof b.file === 'string' && !isAbsolute(b.file) ? { ...b, file: resolve(directory, b.file) } : b);
+
+/** Whether any of the program's Lean source texts declares a project file
+ * binding: such a build waits for its bindings before it links, since the
+ * files are part of the build's identity. */
+export const programNamesProjectFiles = texts => texts.some(declaresProjectModules);
+
+/** The bindings to check, each project file's binding with the path it loads
+ * (`projectFile`), and the identity the check is cached under (the npm
+ * closure's, then the files' digests). `named`: whether the build found
+ * project files in the sources (`programNamesProjectFiles`); a binding of one
+ * it did not find is an internal error, since the build would not ship it. */
+export function projectCheckPlan(bindings, project, { named, npmIdentity = 'none' }) {
+  if (!named && bindings.some(b => typeof b.relative === 'string'))
+    throw new Error('A Lasm.JS binding names a project JavaScript file in a form the build did not find; write it as @[js "./path/file.mjs" "export"]');
+  const paths = new Map(project.files.map(file => [file.specifier, file.path]));
+  return {
+    bindings: bindings.map(b => paths.has(b.module) ? { ...b, projectFile: paths.get(b.module) } : b),
+    identity: npmIdentity + (project.files.length ? ' ' + project.files.map(f => f.sha256).join(',') : ''),
+  };
+}

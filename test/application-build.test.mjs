@@ -265,6 +265,31 @@ test('a failed link removes its staging, keeps the delivered build and reports a
   assert.ok(named('linkApplication').length >= 1);
 });
 
+test('Lasm.JS programs with project files: shipped under host/project-modules, part of the identity, checked from their paths; one the scan missed fails', async t => {
+  const { directory, source, run } = setup(t);
+  stubs.programC = 'int main(int argc, char ** argv) { initialize_Lasm_JS(builtin); }\n';
+  stubs['lasm-library.mjs:librarySources'] = () => ({ sources: [], inputs: [], modules: [], oleans: [] });
+  put(join(directory, 'ffi/x.mjs'), "import { y } from './y.mjs';\nexport const f = () => y;\n");
+  put(join(directory, 'ffi/y.mjs'), 'export const y = 1;\n');
+  const binding = { name: 'Main.f', module: './ffi/x.mjs', path: 'f', arity: 0, relative: './ffi/x.mjs', file: 'Main.lean' };
+  const checks = [];
+  stubs['application-binding-check.mjs:readBindingsAsync'] = async () => [binding];
+  stubs['application-binding-check.mjs:checkBindingsAsync'] = async (...args) => { checks.push(args); return args[1]; };
+  // The source does not declare it (a binding the scan could not see): an internal error, before anything ships.
+  await assert.rejects(run(), { message: 'A Lasm.JS binding names a project JavaScript file in a form the build did not find; write it as @[js "./path/file.mjs" "export"]' });
+  writeFileSync(source, '@[js "./ffi/x.mjs" "f"] opaque f : IO Nat\ndef main : IO Unit := pure ()');
+  const result = await run();
+  assert.deepEqual(result.projectModules.map(f => f.name), ['ffi/x.mjs', 'ffi/y.mjs']);
+  assert.equal(readFileSync(join(result.cached, 'host/project-modules/ffi/y.mjs'), 'utf8'), 'export const y = 1;\n');
+  const [, checked, options] = checks.at(-1);
+  assert.equal(checked[0].projectFile, join(directory, 'ffi/x.mjs'));
+  assert.equal(checked[0].file, join(directory, 'Main.lean'));
+  assert.equal(options.identity, `none ${result.projectModules.map(f => f.sha256).join(',')}`);
+  // Editing a project file changes the build's identity.
+  put(join(directory, 'ffi/y.mjs'), 'export const y = 2;\n');
+  assert.notEqual((await run()).signature, result.signature);
+});
+
 test('Lasm.JS programs: the library is linked and the bindings are checked against the deployed packages', async t => {
   const { directory, root, run, named, lean } = setup(t);
   put(join(directory, 'package.json'), JSON.stringify({ dependencies: { left: '1' } }));

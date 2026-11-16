@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { copyProjectModules, declaresProjectModules, isProjectModule, projectModuleName, projectModules, relativeImportsOf, withAbsoluteFiles } from '../src/project-modules.mjs';
+import { copyProjectModules, declaresProjectModules, isProjectModule, programNamesProjectFiles, projectCheckPlan, projectModuleName, projectModules, relativeImportsOf, withAbsoluteFiles } from '../src/project-modules.mjs';
 
 function project(t, files) {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-project-modules-'));
@@ -84,4 +84,17 @@ test('refused: a missing file, a file that is not .mjs, a path above the source 
   writeFileSync(join(directory, 'Lib/two.mjs'), '');
   assert.throws(() => projectModules([binding('./two.mjs', './two.mjs', lean), binding('./two.mjs', './two.mjs', join(directory, 'Lib/M.lean'), 'C')], directory),
     /\.\/two\.mjs names two files/);
+});
+
+test('the check plan: project bindings get their paths, the identity adds the files\' digests, a binding the scan missed fails', () => {
+  assert.equal(programNamesProjectFiles(['def main := 1', '@[js "./a.mjs" "f"] opaque f : IO Unit']), true);
+  assert.equal(programNamesProjectFiles(['@[js "pg" "Pool"] opaque p : IO Unit']), false);
+  assert.equal(programNamesProjectFiles([]), false);
+  const project = { files: [{ specifier: './a.mjs', name: 'a.mjs', path: '/p/a.mjs', sha256: 'aa' }, { specifier: './b.mjs', name: 'b.mjs', path: '/p/b.mjs', sha256: 'bb' }] };
+  const bindings = [{ name: 'F', module: './a.mjs', relative: './a.mjs', file: '/p/Main.lean' }, { name: 'G', module: 'pg' }];
+  assert.deepEqual(projectCheckPlan(bindings, project, { named: true, npmIdentity: 'npm' }), {
+    bindings: [{ ...bindings[0], projectFile: '/p/a.mjs' }, bindings[1]], identity: 'npm aa,bb' });
+  assert.deepEqual(projectCheckPlan([bindings[1]], { files: [] }, { named: false }), { bindings: [bindings[1]], identity: 'none' });
+  assert.throws(() => projectCheckPlan(bindings, { files: [] }, { named: false }),
+    { message: 'A Lasm.JS binding names a project JavaScript file in a form the build did not find; write it as @[js "./path/file.mjs" "export"]' });
 });

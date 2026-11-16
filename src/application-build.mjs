@@ -14,7 +14,7 @@ import { applicationSources, findApplicationProject, assertDefinesMain } from '.
 import { glueHeaders, importsLibrary, librarySources } from './lasm-library.mjs';
 import { planNodeModules, copyNodeModulesAsync } from './application-npm.mjs';
 import { readBindingsAsync, checkBindingsAsync, requireValidBindings } from './application-binding-check.mjs';
-import { copyProjectModules, declaresProjectModules, projectModules, withAbsoluteFiles } from './project-modules.mjs';
+import { copyProjectModules, programNamesProjectFiles, projectCheckPlan, projectModules, withAbsoluteFiles } from './project-modules.mjs';
 import { linkApplication, selectedLinkDriver, buildProfiles } from './application-link.mjs';
 import { copyApplicationHost, writeApplicationEntrypoint, minimumApplicationNode, minimumApplicationGlibc } from './application-output.mjs';
 import { applicationNativeTargets } from './native-bundle.mjs';
@@ -136,15 +136,12 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     const read = readBindingsAsync(lean, generated.env, [...generated.oleans(), ...library.oleans], { cache })
       .then(bindings => withAbsoluteFiles(bindings, directory));
     read.catch(() => {});
-    const namesFiles = programSources.some(file => declaresProjectModules(readFileSync(file, 'utf8')));
-    if (namesFiles) projectFiles = projectModules(await read, directory);
+    const named = programNamesProjectFiles(programSources.map(file => readFileSync(file, 'utf8')));
+    if (named) projectFiles = projectModules(await read, directory);
     bindingCheck = read
       .then(bindings => {
-        if (!namesFiles && bindings.some(b => typeof b.relative === 'string'))
-          throw new Error('A Lasm.JS binding names a project JavaScript file in a form the build did not find; write it as @[js "./path/file.mjs" "export"]');
-        const paths = new Map(projectFiles.files.map(file => [file.specifier, file.path]));
-        return checkBindingsAsync(directory, bindings.map(b => paths.has(b.module) ? { ...b, projectFile: paths.get(b.module) } : b), { cache,
-          identity: (nodeModules?.identity ?? 'none') + (projectFiles.files.length ? ' ' + projectFiles.files.map(f => f.sha256).join(',') : '') });
+        const plan = projectCheckPlan(bindings, projectFiles, { named, npmIdentity: nodeModules?.identity });
+        return checkBindingsAsync(directory, plan.bindings, { cache, identity: plan.identity });
       })
       .then(results => { for (const warning of requireValidBindings(results, { target: bindingTarget })) log(`Lasm.JS binding warning: ${warning}`); return results; });
     bindingCheck.catch(() => {});
