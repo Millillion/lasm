@@ -19,8 +19,9 @@ const fastlyModules = ['Types', 'Cache', 'ConfigStore', 'HttpCache', 'Shielding'
   'HttpDownstream', 'HttpResp', 'Dictionary', 'Geo', 'DeviceDetection', 'Erl', 'ObjectStore', 'ImageOptimizer', 'KvStore', 'SecretStore',
   'Backend', 'AsyncIo', 'Purge', 'ComputeRuntime', 'Acl'].map(name => `Lasm.Fastly.${name}`).concat('Lasm.Fastly');
 // The generated Lasm.WASI.Http modules: one per WIT interface, then the umbrella module.
+// Http.Respond is hand-written (whole bodies and respond), imported by the umbrella module.
 const wasiHttpModules = ['Io.Error', 'Io.Poll', 'Io.Streams', 'Clocks.MonotonicClock', 'Http.Types', 'Http.OutgoingHandler',
-  'Http.IncomingHandler', 'Http'].map(name => `Lasm.WASI.${name}`);
+  'Http.IncomingHandler', 'Http.Respond', 'Http'].map(name => `Lasm.WASI.${name}`);
 export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
   // Lasm.Fetch (docs/FETCH.md): one HTTP handler for Node, WASI, Fastly and the edge.
   // Lasm.Fastly (docs/WASI_FASTLY_BINDINGS.md): Fastly Compute's host ABI, generated from its witx

@@ -1,4 +1,4 @@
-// Library modules compiled on first import (docs/API_DECISIONS.md 0.3-6; docs/HOW_LASM_WORKS.md, "Lasm's
+// Library modules compiled on first import (docs/api/decisions/0.3.md, 0.3-6; docs/HOW_LASM_WORKS.md, "Lasm's
 // library"). The generated bindings (Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun, Lasm.JS.Cloudflare)
 // are too large to ship compiled whole. Their Lean sources ship in library/, a small core set ships compiled
 // (src/lasm-library.mjs libraryModules, library/prebuilt), and any other module under these namespaces is
