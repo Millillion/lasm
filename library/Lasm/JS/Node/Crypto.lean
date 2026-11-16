@@ -37,8 +37,8 @@ structure crypto.CreateHashOptions where
   customization : Option DOMStringOrUint8Array := none
   /-- `(DOMString or Uint8Array) functionName` -/
   functionName : Option DOMStringOrUint8Array := none
-  /-- `double outputLength` -/
-  outputLength : Option Float := none
+  /-- `double /* integer: Nat */ outputLength` -/
+  outputLength : Option Nat := none
 instance : ToJS crypto.CreateHashOptions := ⟨fun d => Support.fields #[("customization", Support.optional d.customization),
     ("functionName", Support.optional d.functionName),
     ("outputLength", Support.optional d.outputLength)]⟩
@@ -76,8 +76,8 @@ structure crypto.HashOptions where
   functionName : Option DOMStringOrUint8Array := none
   /-- `DOMString outputEncoding = "hex"` -/
   outputEncoding : Option String := none
-  /-- `double outputLength` -/
-  outputLength : Option Float := none
+  /-- `double /* integer: Nat */ outputLength` -/
+  outputLength : Option Nat := none
 instance : ToJS crypto.HashOptions := ⟨fun d => Support.fields #[("customization", Support.optional d.customization),
     ("functionName", Support.optional d.functionName),
     ("outputEncoding", Support.optional d.outputEncoding),
@@ -103,20 +103,20 @@ instance : ToJS crypto.RandomUUIDOptions := ⟨fun d => Support.fields #[("disab
 
 /-- `dictionary crypto.ScryptOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure crypto.ScryptOptions where
-  /-- `double cost = 16384` -/
-  cost : Option Float := none
-  /-- `double blockSize = 8` -/
-  blockSize : Option Float := none
-  /-- `double parallelization = 1` -/
-  parallelization : Option Float := none
-  /-- `double N` -/
-  N : Option Float := none
-  /-- `double r` -/
-  r : Option Float := none
-  /-- `double p` -/
-  p : Option Float := none
-  /-- `double maxmem` -/
-  maxmem : Option Float := none
+  /-- `double /* integer: Nat */ cost = 16384` -/
+  cost : Option Nat := none
+  /-- `double /* integer: Nat */ blockSize = 8` -/
+  blockSize : Option Nat := none
+  /-- `double /* integer: Nat */ parallelization = 1` -/
+  parallelization : Option Nat := none
+  /-- `double /* integer: Nat */ N` -/
+  N : Option Nat := none
+  /-- `double /* integer: Nat */ r` -/
+  r : Option Nat := none
+  /-- `double /* integer: Nat */ p` -/
+  p : Option Nat := none
+  /-- `double /* integer: Nat */ maxmem` -/
+  maxmem : Option Nat := none
 instance : ToJS crypto.ScryptOptions := ⟨fun d => Support.fields #[("cost", Support.optional d.cost),
     ("blockSize", Support.optional d.blockSize),
     ("parallelization", Support.optional d.parallelization),
@@ -124,6 +124,10 @@ instance : ToJS crypto.ScryptOptions := ⟨fun d => Support.fields #[("cost", Su
     ("r", Support.optional d.r),
     ("p", Support.optional d.p),
     ("maxmem", Support.optional d.maxmem)]⟩
+
+/-- `v instanceof Hash`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Hash`). -/
+def Hash.cast? (v : Value) : IO (Option Hash) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Hash"] Value) v) then some { val := v } else none
 
 /-- `hash.copy([options])` (added in Node.js v13.1.0): `Hash copy(optional object options)` -/
 def Hash.copy (self : Hash) (options : Data := .undefined) : IO Hash := do
@@ -137,6 +141,10 @@ def Hash.digest (self : Hash) (encoding : Option String := none) : IO Uint8Array
 /-- `hash.update(data[, inputEncoding])` (added in Node.js v0.1.92): `undefined update((DOMString or Uint8Array) data, optional DOMString inputEncoding)` -/
 def Hash.update (self : Hash) (data : DOMStringOrUint8Array) (inputEncoding : Option String := none) : IO Unit :=
   self.val.callMethod "update" (Support.args #[toJS data, Support.optional inputEncoding]) Unit
+
+/-- `v instanceof Hmac`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Hmac`). -/
+def Hmac.cast? (v : Value) : IO (Option Hmac) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:crypto" ["Hmac"] Value) v) then some { val := v } else none
 
 /-- `hmac.digest([encoding])` (added in Node.js v0.1.94): `(Uint8Array or DOMString) digest(optional DOMString encoding)` -/
 def Hmac.digest (self : Hmac) (encoding : Option String := none) : IO Uint8ArrayOrDOMString :=
@@ -168,17 +176,17 @@ def crypto.hash (algorithm : Option String) (data : DOMStringOrUint8Array) (opti
   Lasm.JS.Binding.invoke DOMStringOrUint8Array { name := "Lasm.JS.Node.crypto.hash", module := "node:crypto", path := "hash", construct := false, arity := 3 }
     (Support.args #[toJS algorithm, toJS data, Support.optional options]) (await := false)
 
-/-- `crypto.hkdf(digest, ikm, salt, info, keylen, callback)` (added in Node.js v15.0.0): `Promise<ArrayBuffer> hkdf(DOMString digest, (DOMString or Uint8Array or object) ikm, (DOMString or Uint8Array) salt, (DOMString or Uint8Array) info, double keylen)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.hkdf (digest : String) (ikm : DOMStringOrUint8ArrayOrObject) (salt : DOMStringOrUint8Array) (info : DOMStringOrUint8Array) (keylen : Float) : Async ByteArray := do
+/-- `crypto.hkdf(digest, ikm, salt, info, keylen, callback)` (added in Node.js v15.0.0): `Promise<ArrayBuffer> hkdf(DOMString digest, (DOMString or Uint8Array or object) ikm, (DOMString or Uint8Array) salt, (DOMString or Uint8Array) info, double /* integer: Nat */ keylen)` (Node.js 24.22.2 documentation, crypto.md) -/
+def crypto.hkdf (digest : String) (ikm : DOMStringOrUint8ArrayOrObject) (salt : DOMStringOrUint8Array) (info : DOMStringOrUint8Array) (keylen : Nat) : Async ByteArray := do
   let r ← Support.promisified Value "node:crypto" "hkdf" (Support.args #[toJS digest, toJS ikm, toJS salt, toJS info, toJS keylen])
   Support.arrayBufferBytes r
 
-/-- `crypto.pbkdf2(password, salt, iterations, keylen, digest, callback)` (added in Node.js v0.5.5): `Promise<Uint8Array> pbkdf2((DOMString or Uint8Array) password, (DOMString or Uint8Array) salt, double iterations, double keylen, DOMString digest)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.pbkdf2 (password : DOMStringOrUint8Array) (salt : DOMStringOrUint8Array) (iterations : Float) (keylen : Float) (digest : String) : Async ByteArray :=
+/-- `crypto.pbkdf2(password, salt, iterations, keylen, digest, callback)` (added in Node.js v0.5.5): `Promise<Uint8Array> pbkdf2((DOMString or Uint8Array) password, (DOMString or Uint8Array) salt, double /* integer: Nat */ iterations, double /* integer: Nat */ keylen, DOMString digest)` (Node.js 24.22.2 documentation, crypto.md) -/
+def crypto.pbkdf2 (password : DOMStringOrUint8Array) (salt : DOMStringOrUint8Array) (iterations : Nat) (keylen : Nat) (digest : String) : Async ByteArray :=
   Support.promisified ByteArray "node:crypto" "pbkdf2" (Support.args #[toJS password, toJS salt, toJS iterations, toJS keylen, toJS digest])
 
-/-- `crypto.randomBytes(size[, callback])` (added in Node.js v0.5.8): `Uint8Array randomBytes(double size)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.randomBytes (size : Float) : IO ByteArray :=
+/-- `crypto.randomBytes(size[, callback])` (added in Node.js v0.5.8): `Uint8Array randomBytes(double /* integer: Nat */ size)` (Node.js 24.22.2 documentation, crypto.md) -/
+def crypto.randomBytes (size : Nat) : IO ByteArray :=
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.crypto.randomBytes", module := "node:crypto", path := "randomBytes", construct := false, arity := 1 }
     (Support.args #[toJS size]) (await := false)
 
@@ -197,8 +205,8 @@ def crypto.randomUUID (options : Option crypto.RandomUUIDOptions := none) : IO S
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.crypto.randomUUID", module := "node:crypto", path := "randomUUID", construct := false, arity := 1 }
     (Support.args #[Support.optional options]) (await := false)
 
-/-- `crypto.scrypt(password, salt, keylen[, options], callback)` (added in Node.js v10.5.0): `Promise<Uint8Array> scrypt((DOMString or Uint8Array) password, (DOMString or Uint8Array) salt, double keylen, optional crypto.ScryptOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
-def crypto.scrypt (password : DOMStringOrUint8Array) (salt : DOMStringOrUint8Array) (keylen : Float) (options : Option crypto.ScryptOptions := none) : Async ByteArray :=
+/-- `crypto.scrypt(password, salt, keylen[, options], callback)` (added in Node.js v10.5.0): `Promise<Uint8Array> scrypt((DOMString or Uint8Array) password, (DOMString or Uint8Array) salt, double /* integer: Nat */ keylen, optional crypto.ScryptOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
+def crypto.scrypt (password : DOMStringOrUint8Array) (salt : DOMStringOrUint8Array) (keylen : Nat) (options : Option crypto.ScryptOptions := none) : Async ByteArray :=
   Support.promisified ByteArray "node:crypto" "scrypt" (Support.args #[toJS password, toJS salt, toJS keylen, Support.optional options])
 
 /-- `crypto.timingSafeEqual(a, b)` (added in Node.js v6.6.0): `boolean timingSafeEqual(Uint8Array a, Uint8Array b)` (Node.js 24.22.2 documentation, crypto.md) -/

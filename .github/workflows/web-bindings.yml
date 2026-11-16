@@ -47,6 +47,8 @@ on:
       - 'test/fixtures/js-cloudflare/**'
       - 'test/fixtures/js-cloudflare-size/**'
       - 'test/web-bindings.test.mjs'
+      - 'test/binding-overrides.test.mjs'
+      - 'docs/API_DECISIONS.md'
       - 'src/node-js.mjs'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'
@@ -105,6 +107,8 @@ jobs:
         run: node scripts/bindings/generate-web.mjs --check
       - name: The WPT data is the pinned commit's
         run: node scripts/bindings/wpt-data.mjs --check
+      - name: The override table of the generated bindings is well formed and recorded (docs/BINDING_RULES.md)
+        run: node --test test/binding-overrides.test.mjs
       - run: node --test test/web-bindings.test.mjs
   pack:
     if: github.event.repository.visibility == 'public' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
