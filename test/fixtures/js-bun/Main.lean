@@ -14,7 +14,13 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 -/
 import Lasm.JS
 import Lasm.JS.Web
-import Lasm.JS.Bun
+import Lasm.JS.Bun.Core
+import Lasm.JS.Bun.Redis
+import Lasm.JS.Bun.S3
+import Lasm.JS.Bun.Serve
+import Lasm.JS.Bun.Shell
+import Lasm.JS.Bun.Sql
+import Lasm.JS.Bun.Sqlite
 import Lasm.JS.Web.WebSocket
 import Surface
 open Lasm.JS Lasm.JS.Web

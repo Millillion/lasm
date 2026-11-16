@@ -1,5 +1,5 @@
 /- The same server through Lasm.JS.Bun, for scripts/bindings/test-web.mjs --fixture js-serve --sizes. Built, not run. -/
-import Lasm.JS.Bun
+import Lasm.JS.Bun.Serve
 open Lasm.JS Lasm.JS.Web
 
 def main : IO Unit := do

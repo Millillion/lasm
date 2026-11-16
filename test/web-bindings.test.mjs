@@ -7,7 +7,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { modules } from '../scripts/bindings/web-tier1.mjs';
 import * as nodeTier from '../scripts/bindings/node-tier2.mjs';
@@ -68,11 +68,15 @@ const denoBunCore = [];
 test('no Lasm.JS.Deno or Lasm.JS.Bun module is prebuilt beyond the declared core; every other one compiles on first import', () => {
   const lazy = lazyModules(libraryModules);
   for (const tier of ['Deno', 'Bun']) {
-    const shipped = [`Lasm.JS.${tier}`, ...readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url))
-      .filter(f => f.endsWith('.lean')).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`)];
+    // No umbrella module (0.4-21): a program imports the modules it uses.
+    assert.ok(!existsSync(new URL(`../library/Lasm/JS/${tier}.lean`, import.meta.url)), `library/Lasm/JS/${tier}.lean: no umbrella module (0.4-21)`);
+    const shipped = readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url))
+      .filter(f => f.endsWith('.lean')).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`);
     for (const m of libraryModules.filter(m => m === `Lasm.JS.${tier}` || m.startsWith(`Lasm.JS.${tier}.`)))
       assert.ok(denoBunCore.includes(m), `${m} is prebuilt (src/lasm-library.mjs libraryModules) but not in the declared core`);
     for (const m of shipped) assert.ok(denoBunCore.includes(m) || lazy.includes(m), `${m} is neither prebuilt nor compiled on first import`);
+    for (const dir of ['examples', 'test/fixtures']) for (const f of readdirSync(new URL(`../${dir}/`, import.meta.url), { recursive: true }).filter(f => String(f).endsWith('.lean') && !/\.lake|node_modules/.test(String(f))))
+      assert.ok(!new RegExp(`^import Lasm\\.JS\\.${tier}\\s*$`, 'm').test(readFileSync(new URL(`../${dir}/${f}`, import.meta.url), 'utf8')), `${dir}/${f} imports the removed umbrella module Lasm.JS.${tier}`);
     for (const t of readdirSync(new URL('../templates/', import.meta.url), { recursive: true }).filter(f => String(f).endsWith('.lean')))
       assert.ok(!/^import Lasm\.JS\.(Deno|Bun)\b/m.test(readFileSync(new URL(`../templates/${t}`, import.meta.url), 'utf8')),
         `templates/${t} imports Lasm.JS.Deno or Lasm.JS.Bun: its modules belong in the prebuilt core`);

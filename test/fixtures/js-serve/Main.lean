@@ -20,8 +20,11 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 -/
 import Lasm.JS
 import Lasm.JS.Web
-import Lasm.JS.Deno
-import Lasm.JS.Bun
+import Lasm.JS.Deno.Fs
+import Lasm.JS.Deno.Net
+import Lasm.JS.Deno.Serve
+import Lasm.JS.Bun.Core
+import Lasm.JS.Bun.Serve
 import Lasm.JS.Node.Serve
 import App
 import Surface

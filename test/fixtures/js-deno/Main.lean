@@ -16,7 +16,16 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 -/
 import Lasm.JS
 import Lasm.JS.Web
-import Lasm.JS.Deno
+import Lasm.JS.Deno.Fetch
+import Lasm.JS.Deno.Fs
+import Lasm.JS.Deno.Io
+import Lasm.JS.Deno.Kv
+import Lasm.JS.Deno.Net
+import Lasm.JS.Deno.Permissions
+import Lasm.JS.Deno.Runtime
+import Lasm.JS.Deno.Serve
+import Lasm.JS.Deno.Subprocess
+import Lasm.JS.Deno.WebSockets
 import Lasm.JS.Web.WebSocket
 import Surface
 import Tls
