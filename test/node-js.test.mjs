@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createNodeJs as createHost, describe, firstJsHandle } from '../src/node-js.mjs';
@@ -154,6 +154,13 @@ test('require, typed bindings, construction, methods and errors', async () => {
   js.dispatch(200, 0, 0n, Buffer.alloc(0), [id]);
   assert.throws(() => js.dispatch(206, id, 0n, Buffer.alloc(0)), /released Lasm.JS value handle/);
   assert.equal(js.decode(js.dispatch(214, 0, 0n, wire(['clone', 'globalThis', 'structuredClone', [{ a: [1] }]]))).a[0], 1);
+});
+
+test('op 210: the length above the kind byte sets the function\'s length (Function.ofFn1, ofFn2)', () => {
+  const js = createNodeJs();
+  assert.equal(js.decode(js.dispatch(210, 7, 1n, Buffer.alloc(0))).length, 0);
+  assert.equal(js.decode(js.dispatch(210, 7, 1n + 2n * 256n, Buffer.alloc(0))).length, 2);
+  assert.equal(js.decode(js.dispatch(210, 7, 1n + 3n * 256n, Buffer.alloc(0))).length, 3);
 });
 
 test('asynchronous Lean functions are queued to the interop thread', async () => {
@@ -322,4 +329,20 @@ test('a synchronous callback runs work the Lean thread proxied to the main threa
   finally { Atomics.wait = wait; }
   assert.equal(mailboxRuns, 1);
   assert.ok(performance.now() - started < 500, 'the wait is short');
+});
+
+test('project files (./…) load from project-modules/ beside the host; a missing one says how to add it; one that throws reports it', t => {
+  const directory = new URL('../src/project-modules/lasm-test/', import.meta.url);
+  mkdirSync(directory, { recursive: true });
+  t.after(() => rmSync(new URL('../src/project-modules/', import.meta.url), { recursive: true, force: true }));
+  writeFileSync(new URL('ok.mjs', directory), "import { two } from './lib.mjs';\nexport const twice = n => n * two;\n");
+  writeFileSync(new URL('lib.mjs', directory), 'export const two = 2;\n');
+  writeFileSync(new URL('bad.mjs', directory), "throw new RangeError('bad module');\n");
+  const js = createNodeJs();
+  assert.equal(js.decode(js.dispatch(214, 0, 0n, wire(['f', './lasm-test/ok.mjs', 'twice', [21]]))), 42);
+  assert.throws(() => js.dispatch(214, 0, 0n, wire(['f', './App/missing.mjs', 'f', []])),
+    /The project's JavaScript file "\.\/App\/missing\.mjs" is not in this build/);
+  assert.throws(() => js.dispatch(214, 0, 0n, wire(['f', './lasm-test/bad.mjs', 'f', []])), /RangeError: bad module/);
+  // Builtin modules go through the same loader: an unknown one is named.
+  assert.throws(() => js.dispatch(214, 0, 0n, wire(['f', 'lasm:no-such-module', 'f', []])), /Unknown Lasm builtin JavaScript module "lasm:no-such-module"/);
 });

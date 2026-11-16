@@ -27,7 +27,7 @@ export function copyApplicationNativeBundle(root, output, { platform = process.p
     mkdirSync(dirname(join(destination, name)), { recursive: true });
     copyFileSync(join(source, name), join(destination, name));
   };
-  const json = name => JSON.parse(readFileSync(join(source, name), 'utf8'));
+  const json = name => JSON.parse(readFileSync(join(source, name)));
   const write = (name, value) => {
     mkdirSync(dirname(join(destination, name)), { recursive: true });
     writeFileSync(join(destination, name), JSON.stringify(value, null, 2) + '\n');

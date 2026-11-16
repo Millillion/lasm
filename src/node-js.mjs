@@ -29,7 +29,7 @@
 //   214 typed binding [Lean name, module, export path, arguments]; flags as 205
 //   207 resolve the Lean promise at arg when a value settles (interop thread event)
 //   208 replies of Lean callbacks (status 0 value, 1 error, 2 method call)   209 interop thread long poll (events)
-//   210 a JavaScript function calling Lean function `handle` (arg 1 async, 2 sync)
+//   210 a JavaScript function calling Lean function `handle` (arg: 1 async, 2 sync, plus its length × 256)
 //   211 register the synchronous-callback channel   213 statistics
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
@@ -478,19 +478,27 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
     }
     return value;
   }
+  // A module file beside the host; `missing` is the error when it is not there.
+  function requireBeside(path, missing) {
+    try { return moduleRequire(fileURLToPath(new URL(path, import.meta.url))); }
+    catch (error) {
+      if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND') throw failure(missing);
+      throw jsFailure(error);
+    }
+  }
   function load(specifier) {
     // Global functions (fetch, setTimeout, structuredClone, …) bind to module "globalThis".
     if (specifier === 'globalThis') return globalThis;
     // Lasm's builtin modules (lasm:<name>, src/edge/builtin-modules.mjs), copied beside the host.
     if (specifier.startsWith('lasm:')) {
       const name = specifier.slice(5);
-      if (!/^[a-z][a-z0-9-]*$/.test(name)) throw failure(`Unknown Lasm builtin JavaScript module ${JSON.stringify(specifier)}`);
-      try { return moduleRequire(fileURLToPath(new URL(`./lasm-modules/${name}.mjs`, import.meta.url))); }
-      catch (error) {
-        if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND') throw failure(`Unknown Lasm builtin JavaScript module ${JSON.stringify(specifier)}`);
-        throw jsFailure(error);
-      }
+      const unknown = `Unknown Lasm builtin JavaScript module ${JSON.stringify(specifier)}`;
+      if (!/^[a-z][a-z0-9-]*$/.test(name)) throw failure(unknown);
+      return requireBeside(`./lasm-modules/${name}.mjs`, unknown);
     }
+    // The project's own files (@[js "./ffi/x.mjs" …], src/project-modules.mjs), copied beside the host.
+    if (specifier.startsWith('./'))
+      return requireBeside(`./project-modules/${specifier}`, `The project's JavaScript file ${JSON.stringify(specifier)} is not in this build. Bind it with @[js "./…" …] and run lasm build again.`);
     try { return moduleRequire(specifier); }
     catch (error) {
       if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND')
@@ -574,7 +582,10 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
         return new Promise(resolve => { waiter = () => resolve(takeEvents()); });
       case 210: {
         // A JavaScript function calling Lean function `id`; arg 1 asynchronous, 2 synchronous.
-        const f = Number(arg) === 2 ? syncFunction(id) : asyncFunction(id);
+        // The low byte of arg is the kind (1 asynchronous, 2 synchronous), the rest the function's `length`.
+        const flags = Number(arg), length = Math.floor(flags / 256);
+        const f = (flags & 255) === 2 ? syncFunction(id) : asyncFunction(id);
+        Object.defineProperty(f, 'length', { value: length });
         stats.functionsCreated++;
         return encode(f, 'reference');
       }

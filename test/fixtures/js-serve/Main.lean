@@ -229,6 +229,35 @@ def deno (r : Checks) (live : Live) : Async Unit := do
     expect r "TLS" (status == 200 && body == "hello from Lean") s!"{status} {body}"
     let _ : Value ← client.callMethod "close" #[]
     server.shutdown
+  runSection r "deno.serveWithUnixOptions" do
+    -- serve on a Unix domain socket: addr is its path; a request over the socket is answered by App.handle.
+    let dir ← Deno.makeTempDir none
+    let path := s!"{dir}/http.sock"
+    let seen ← IO.mkRef (none : Option Deno.UnixAddrTransport)
+    let handler ← Deno.ServeHandlerUnixAddr.ofFn fun req info => do
+      live.modify (·.push ("ServeHandlerInfoUnixAddr", info.val))
+      seen.set (some (← info.remoteAddr).transport)
+      App.handle req
+    let server ← Deno.serveWithUnixOptions { path, transport := some .unix } handler
+    live.modify (·.push ("HttpServerUnixAddr", server.val))
+    let addr ← server.addr
+    expect r "unix addr" (addr.path == path && addr.transport == .unix) addr.path
+    let conn ← Deno.connectUnix { path, transport := .unix }
+    let w ← (← conn.writable).getWriter
+    w.write (toJS "GET /hello HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n".toUTF8)
+    let reader : ReadableStreamDefaultReader := { val := (← (← conn.readable).getReader none) }
+    let mut got := ByteArray.empty
+    for _ in [0:100] do
+      let chunk ← reader.val.callMethodAwait "read" #[] Value
+      if ← chunk.get "done" Bool then break
+      got := got ++ (← chunk.get "value" ByteArray)
+    let text := String.fromUTF8? got |>.getD ""
+    expect r "unix request" (text.startsWith "HTTP/1.1 200" && (text.splitOn "hello from Lean").length > 1) (text.take 80).toString
+    expect r "unix info.remoteAddr" ((← seen.get) == some .unix) ""
+    server.unref; server.ref
+    server.shutdown
+    server.finished
+    Deno.remove (.domString dir) (some { recursive := some true })
 
 /-! Bun.serve (Lasm.JS.Bun) -/
 
@@ -386,7 +415,10 @@ def availability (r : Checks) (rt : Runtime) (live : Live) : Async Unit := do
   let .object ifaces := info.field "interfaces" | throw (IO.userError "no interfaces")
   for (iface, members) in ifaces do
     match (← live.get).find? (·.1 == iface) with
-    | none => expect r s!"available {host}.{iface}" false "no live object was seen"
+    | none =>
+      -- Probed live elsewhere: WebSockets by js-bun, VSOCK servers need a VSOCK device.
+      unless ["ServerWebSocket", "HttpServerVsockAddr", "ServeHandlerInfoVsockAddr"].contains iface do
+        expect r s!"available {host}.{iface}" false "no live object was seen"
     | some (_, v) =>
       for m in names members do
         expect r s!"available {host}.{iface}.{m}" (← reflectHas v m) ""

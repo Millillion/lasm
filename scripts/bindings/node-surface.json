@@ -25,6 +25,10 @@
         "once",
         "removeAllListeners"
       ],
+      "events": [
+        "newListener",
+        "removeListener"
+      ],
       "instance": []
     },
     {
@@ -36,13 +40,52 @@
         "fromWeb",
         "toWeb"
       ],
-      "prototype": [],
+      "prototype": [
+        "destroy",
+        "isPaused",
+        "pause",
+        "resume",
+        "setEncoding"
+      ],
+      "events": [
+        "close",
+        "data",
+        "end",
+        "error",
+        "pause",
+        "readable",
+        "resume"
+      ],
       "instance": []
     },
     {
       "lean": "stream.Writable",
       "module": "node:stream",
       "path": "Writable",
+      "leanModule": "Stream",
+      "static": [
+        "fromWeb",
+        "toWeb"
+      ],
+      "prototype": [
+        "destroy",
+        "end",
+        "write"
+      ],
+      "events": [
+        "close",
+        "drain",
+        "error",
+        "finish",
+        "pipe",
+        "unpipe"
+      ],
+      "instance": []
+    },
+    {
+      "lean": "stream.Duplex",
+      "module": "node:stream",
+      "path": "Duplex",
       "leanModule": "Stream",
       "static": [
         "fromWeb",
@@ -280,6 +323,9 @@
         "write",
         "writeFile"
       ],
+      "events": [
+        "close"
+      ],
       "instance": [
         "fd"
       ]
@@ -347,6 +393,14 @@
       "prototype": [
         "kill"
       ],
+      "events": [
+        "close",
+        "disconnect",
+        "error",
+        "exit",
+        "message",
+        "spawn"
+      ],
       "instance": [
         "exitCode",
         "killed",
@@ -355,6 +409,442 @@
         "stderr",
         "stdin",
         "stdout"
+      ]
+    },
+    {
+      "lean": "net",
+      "module": "node:net",
+      "path": "",
+      "leanModule": "Net",
+      "namespace": [
+        "connect",
+        "createConnection",
+        "createServer",
+        "getDefaultAutoSelectFamily",
+        "setDefaultAutoSelectFamily",
+        "getDefaultAutoSelectFamilyAttemptTimeout",
+        "setDefaultAutoSelectFamilyAttemptTimeout",
+        "isIP",
+        "isIPv4",
+        "isIPv6"
+      ]
+    },
+    {
+      "lean": "net.SocketAddress",
+      "module": "node:net",
+      "path": "SocketAddress",
+      "leanModule": "Net",
+      "static": [
+        "parse"
+      ],
+      "prototype": [],
+      "instance": [
+        "address",
+        "family",
+        "flowlabel",
+        "port"
+      ]
+    },
+    {
+      "lean": "net.BlockList",
+      "module": "node:net",
+      "path": "BlockList",
+      "leanModule": "Net",
+      "static": [
+        "isBlockList"
+      ],
+      "prototype": [
+        "addAddress",
+        "addAddresses",
+        "addCIDR",
+        "addCIDRs",
+        "addRange",
+        "addSubnet",
+        "check",
+        "clear",
+        "removeAddress",
+        "removeCIDR",
+        "removeRange",
+        "removeSubnet"
+      ],
+      "instance": [
+        "PRIVATE_RANGES",
+        "rules",
+        "size"
+      ]
+    },
+    {
+      "lean": "net.BoundSocket",
+      "module": "node:net",
+      "path": "BoundSocket",
+      "leanModule": "Net",
+      "static": [],
+      "prototype": [
+        "address",
+        "fd",
+        "close"
+      ],
+      "instance": [
+        "isPipe"
+      ]
+    },
+    {
+      "lean": "net.Server",
+      "module": "node:net",
+      "path": "Server",
+      "leanModule": "Net",
+      "static": [],
+      "prototype": [
+        "address",
+        "close",
+        "getConnections",
+        "listen",
+        "ref",
+        "unref"
+      ],
+      "events": [
+        "close",
+        "connection",
+        "error",
+        "listening",
+        "drop"
+      ],
+      "instance": [
+        "listening",
+        "maxConnections",
+        "dropMaxConnection"
+      ]
+    },
+    {
+      "lean": "net.Socket",
+      "module": "node:net",
+      "path": "Socket",
+      "leanModule": "Net",
+      "static": [],
+      "prototype": [
+        "address",
+        "connect",
+        "destroy",
+        "destroySoon",
+        "end",
+        "pause",
+        "ref",
+        "resetAndDestroy",
+        "resume",
+        "setEncoding",
+        "setKeepAlive",
+        "setNoDelay",
+        "setTimeout",
+        "getTypeOfService",
+        "setTypeOfService",
+        "unref",
+        "write"
+      ],
+      "events": [
+        "close",
+        "connect",
+        "connectionAttempt",
+        "connectionAttemptFailed",
+        "connectionAttemptTimeout",
+        "data",
+        "drain",
+        "end",
+        "error",
+        "lookup",
+        "ready",
+        "timeout"
+      ],
+      "instance": [
+        "autoSelectFamilyAttemptedAddresses",
+        "bytesRead",
+        "bytesWritten",
+        "connecting",
+        "destroyed",
+        "localAddress",
+        "localPort",
+        "localFamily",
+        "pending",
+        "remoteAddress",
+        "remoteFamily",
+        "remotePort",
+        "server",
+        "timeout",
+        "readyState"
+      ]
+    },
+    {
+      "lean": "http",
+      "module": "node:http",
+      "path": "",
+      "leanModule": "Http",
+      "namespace": [
+        "createServer",
+        "get",
+        "request",
+        "validateHeaderName",
+        "validateHeaderValue",
+        "setMaxIdleHTTPParsers",
+        "setGlobalProxyFromEnv",
+        "METHODS",
+        "STATUS_CODES",
+        "globalAgent",
+        "maxHeaderSize"
+      ]
+    },
+    {
+      "lean": "http.Agent",
+      "module": "node:http",
+      "path": "Agent",
+      "leanModule": "Http",
+      "static": [],
+      "prototype": [
+        "createConnection",
+        "keepSocketAlive",
+        "reuseSocket",
+        "destroy",
+        "getName"
+      ],
+      "instance": [
+        "freeSockets",
+        "maxFreeSockets",
+        "maxSockets",
+        "maxTotalSockets",
+        "requests",
+        "sockets"
+      ]
+    },
+    {
+      "lean": "http.OutgoingMessage",
+      "module": "node:http",
+      "path": "OutgoingMessage",
+      "leanModule": "Http",
+      "static": [],
+      "prototype": [
+        "addTrailers",
+        "appendHeader",
+        "cork",
+        "destroy",
+        "end",
+        "flushHeaders",
+        "getHeader",
+        "getHeaderNames",
+        "getHeaders",
+        "hasHeader",
+        "removeHeader",
+        "setHeader",
+        "setHeaders",
+        "setTimeout",
+        "uncork",
+        "write"
+      ],
+      "events": [
+        "drain",
+        "finish",
+        "prefinish"
+      ],
+      "instance": [
+        "headersSent",
+        "socket",
+        "writableCorked",
+        "writableEnded",
+        "writableFinished",
+        "writableHighWaterMark",
+        "writableLength",
+        "writableObjectMode"
+      ]
+    },
+    {
+      "lean": "http.ClientRequest",
+      "module": "node:http",
+      "path": "ClientRequest",
+      "leanModule": "Http",
+      "static": [],
+      "prototype": [
+        "cork",
+        "end",
+        "destroy",
+        "flushHeaders",
+        "getHeader",
+        "getHeaderNames",
+        "getHeaders",
+        "getRawHeaderNames",
+        "hasHeader",
+        "removeHeader",
+        "setHeader",
+        "setNoDelay",
+        "setSocketKeepAlive",
+        "setTimeout",
+        "uncork",
+        "write"
+      ],
+      "events": [
+        "close",
+        "connect",
+        "continue",
+        "finish",
+        "information",
+        "response",
+        "socket",
+        "timeout",
+        "upgrade"
+      ],
+      "instance": [
+        "maxHeadersCount",
+        "path",
+        "method",
+        "host",
+        "protocol",
+        "reusedSocket",
+        "socket",
+        "writableEnded",
+        "writableFinished"
+      ]
+    },
+    {
+      "lean": "http.ServerResponse",
+      "module": "node:http",
+      "path": "ServerResponse",
+      "leanModule": "Http",
+      "static": [],
+      "prototype": [
+        "addTrailers",
+        "cork",
+        "end",
+        "flushHeaders",
+        "getHeader",
+        "getHeaderNames",
+        "getHeaders",
+        "hasHeader",
+        "removeHeader",
+        "setHeader",
+        "setTimeout",
+        "uncork",
+        "write",
+        "writeContinue",
+        "writeEarlyHints",
+        "writeHead",
+        "writeInformation",
+        "writeProcessing"
+      ],
+      "events": [
+        "close",
+        "finish"
+      ],
+      "instance": [
+        "headersSent",
+        "req",
+        "sendDate",
+        "socket",
+        "statusCode",
+        "statusMessage",
+        "strictContentLength",
+        "writableEnded",
+        "writableFinished"
+      ]
+    },
+    {
+      "lean": "http.IncomingMessage",
+      "module": "node:http",
+      "path": "IncomingMessage",
+      "leanModule": "Http",
+      "static": [],
+      "prototype": [
+        "destroy",
+        "setTimeout"
+      ],
+      "events": [
+        "close"
+      ],
+      "instance": [
+        "complete",
+        "headers",
+        "headersDistinct",
+        "httpVersion",
+        "method",
+        "rawHeaders",
+        "rawTrailers",
+        "signal",
+        "socket",
+        "statusCode",
+        "statusMessage",
+        "trailers",
+        "trailersDistinct",
+        "url"
+      ]
+    },
+    {
+      "lean": "http.Server",
+      "module": "node:http",
+      "path": "Server",
+      "leanModule": "Http",
+      "static": [],
+      "prototype": [
+        "close",
+        "closeAllConnections",
+        "closeIdleConnections",
+        "setTimeout"
+      ],
+      "events": [
+        "checkContinue",
+        "checkExpectation",
+        "clientError",
+        "close",
+        "connect",
+        "connection",
+        "dropRequest",
+        "request",
+        "upgrade"
+      ],
+      "instance": [
+        "headersTimeout",
+        "listening",
+        "maxHeadersCount",
+        "requestTimeout",
+        "maxRequestsPerSocket",
+        "timeout",
+        "keepAliveTimeout",
+        "keepAliveTimeoutBuffer"
+      ]
+    },
+    {
+      "lean": "https",
+      "module": "node:https",
+      "path": "",
+      "leanModule": "Https",
+      "namespace": [
+        "createServer",
+        "get",
+        "request",
+        "globalAgent"
+      ]
+    },
+    {
+      "lean": "https.Agent",
+      "module": "node:https",
+      "path": "Agent",
+      "leanModule": "Https",
+      "static": [],
+      "prototype": [],
+      "instance": []
+    },
+    {
+      "lean": "https.Server",
+      "module": "node:https",
+      "path": "Server",
+      "leanModule": "Https",
+      "static": [],
+      "prototype": [
+        "close",
+        "closeAllConnections",
+        "closeIdleConnections",
+        "setTimeout"
+      ],
+      "instance": [
+        "headersTimeout",
+        "maxHeadersCount",
+        "requestTimeout",
+        "timeout",
+        "keepAliveTimeout"
       ]
     }
   ]
