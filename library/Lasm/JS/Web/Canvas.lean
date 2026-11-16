@@ -109,27 +109,6 @@ instance : FromJS CanvasColorType where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Web.CanvasColorType"
 
-/-- `enum ImageSmoothingQuality` (HTML Standard (https://html.spec.whatwg.org/multipage/)): "low", "medium", "high". -/
-inductive ImageSmoothingQuality where
-  /-- "low" -/
-  | low
-  /-- "medium" -/
-  | medium
-  /-- "high" -/
-  | high
-  deriving BEq, Repr, Inhabited
-instance : ToJS ImageSmoothingQuality := ⟨fun
-  | .low => .string "low"
-  | .medium => .string "medium"
-  | .high => .string "high"⟩
-instance : FromJS ImageSmoothingQuality where
-  fromJS
-    | .string "low" => .ok .low
-    | .string "medium" => .ok .medium
-    | .string "high" => .ok .high
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.ImageSmoothingQuality"
-
 /-- `enum CanvasFillRule` (HTML Standard (https://html.spec.whatwg.org/multipage/)): "nonzero", "evenodd". -/
 inductive CanvasFillRule where
   /-- "nonzero" -/
@@ -289,134 +268,6 @@ instance : FromJS CanvasDirection where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Web.CanvasDirection"
 
-/-- `enum CanvasFontKerning` (HTML Standard (https://html.spec.whatwg.org/multipage/)): "auto", "normal", "none". -/
-inductive CanvasFontKerning where
-  /-- "auto" -/
-  | auto
-  /-- "normal" -/
-  | normal
-  /-- "none" -/
-  | none
-  deriving BEq, Repr, Inhabited
-instance : ToJS CanvasFontKerning := ⟨fun
-  | .auto => .string "auto"
-  | .normal => .string "normal"
-  | .none => .string "none"⟩
-instance : FromJS CanvasFontKerning where
-  fromJS
-    | .string "auto" => .ok .auto
-    | .string "normal" => .ok .normal
-    | .string "none" => .ok .none
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CanvasFontKerning"
-
-/-- `enum CanvasFontStretch` (HTML Standard (https://html.spec.whatwg.org/multipage/)): "ultra-condensed", "extra-condensed", "condensed", "semi-condensed", "normal", "semi-expanded", "expanded", "extra-expanded", "ultra-expanded". -/
-inductive CanvasFontStretch where
-  /-- "ultra-condensed" -/
-  | ultraCondensed
-  /-- "extra-condensed" -/
-  | extraCondensed
-  /-- "condensed" -/
-  | condensed
-  /-- "semi-condensed" -/
-  | semiCondensed
-  /-- "normal" -/
-  | normal
-  /-- "semi-expanded" -/
-  | semiExpanded
-  /-- "expanded" -/
-  | expanded
-  /-- "extra-expanded" -/
-  | extraExpanded
-  /-- "ultra-expanded" -/
-  | ultraExpanded
-  deriving BEq, Repr, Inhabited
-instance : ToJS CanvasFontStretch := ⟨fun
-  | .ultraCondensed => .string "ultra-condensed"
-  | .extraCondensed => .string "extra-condensed"
-  | .condensed => .string "condensed"
-  | .semiCondensed => .string "semi-condensed"
-  | .normal => .string "normal"
-  | .semiExpanded => .string "semi-expanded"
-  | .expanded => .string "expanded"
-  | .extraExpanded => .string "extra-expanded"
-  | .ultraExpanded => .string "ultra-expanded"⟩
-instance : FromJS CanvasFontStretch where
-  fromJS
-    | .string "ultra-condensed" => .ok .ultraCondensed
-    | .string "extra-condensed" => .ok .extraCondensed
-    | .string "condensed" => .ok .condensed
-    | .string "semi-condensed" => .ok .semiCondensed
-    | .string "normal" => .ok .normal
-    | .string "semi-expanded" => .ok .semiExpanded
-    | .string "expanded" => .ok .expanded
-    | .string "extra-expanded" => .ok .extraExpanded
-    | .string "ultra-expanded" => .ok .ultraExpanded
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CanvasFontStretch"
-
-/-- `enum CanvasFontVariantCaps` (HTML Standard (https://html.spec.whatwg.org/multipage/)): "normal", "small-caps", "all-small-caps", "petite-caps", "all-petite-caps", "unicase", "titling-caps". -/
-inductive CanvasFontVariantCaps where
-  /-- "normal" -/
-  | normal
-  /-- "small-caps" -/
-  | smallCaps
-  /-- "all-small-caps" -/
-  | allSmallCaps
-  /-- "petite-caps" -/
-  | petiteCaps
-  /-- "all-petite-caps" -/
-  | allPetiteCaps
-  /-- "unicase" -/
-  | unicase
-  /-- "titling-caps" -/
-  | titlingCaps
-  deriving BEq, Repr, Inhabited
-instance : ToJS CanvasFontVariantCaps := ⟨fun
-  | .normal => .string "normal"
-  | .smallCaps => .string "small-caps"
-  | .allSmallCaps => .string "all-small-caps"
-  | .petiteCaps => .string "petite-caps"
-  | .allPetiteCaps => .string "all-petite-caps"
-  | .unicase => .string "unicase"
-  | .titlingCaps => .string "titling-caps"⟩
-instance : FromJS CanvasFontVariantCaps where
-  fromJS
-    | .string "normal" => .ok .normal
-    | .string "small-caps" => .ok .smallCaps
-    | .string "all-small-caps" => .ok .allSmallCaps
-    | .string "petite-caps" => .ok .petiteCaps
-    | .string "all-petite-caps" => .ok .allPetiteCaps
-    | .string "unicase" => .ok .unicase
-    | .string "titling-caps" => .ok .titlingCaps
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CanvasFontVariantCaps"
-
-/-- `enum CanvasTextRendering` (HTML Standard (https://html.spec.whatwg.org/multipage/)): "auto", "optimizeSpeed", "optimizeLegibility", "geometricPrecision". -/
-inductive CanvasTextRendering where
-  /-- "auto" -/
-  | auto
-  /-- "optimizeSpeed" -/
-  | optimizeSpeed
-  /-- "optimizeLegibility" -/
-  | optimizeLegibility
-  /-- "geometricPrecision" -/
-  | geometricPrecision
-  deriving BEq, Repr, Inhabited
-instance : ToJS CanvasTextRendering := ⟨fun
-  | .auto => .string "auto"
-  | .optimizeSpeed => .string "optimizeSpeed"
-  | .optimizeLegibility => .string "optimizeLegibility"
-  | .geometricPrecision => .string "geometricPrecision"⟩
-instance : FromJS CanvasTextRendering where
-  fromJS
-    | .string "auto" => .ok .auto
-    | .string "optimizeSpeed" => .ok .optimizeSpeed
-    | .string "optimizeLegibility" => .ok .optimizeLegibility
-    | .string "geometricPrecision" => .ok .geometricPrecision
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CanvasTextRendering"
-
 /-- `callback BlobCallback = undefined (Blob? blob)` (HTML Standard (https://html.spec.whatwg.org/multipage/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure BlobCallback where
   /-- The JavaScript function. -/
@@ -543,6 +394,21 @@ structure ImageDataSettings where
 instance : ToJS ImageDataSettings := ⟨fun d => Support.fields #[("colorSpace", Support.optional d.colorSpace),
     ("pixelFormat", Support.optional d.pixelFormat)]⟩
 
+/-- `dictionary DOMPointInit` (Geometry Interfaces Module Level 1 (https://drafts.csswg.org/geometry-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure DOMPointInit where
+  /-- `unrestricted double x = 0` -/
+  x : Option Float := none
+  /-- `unrestricted double y = 0` -/
+  y : Option Float := none
+  /-- `unrestricted double z = 0` -/
+  z : Option Float := none
+  /-- `unrestricted double w = 1` -/
+  w : Option Float := none
+instance : ToJS DOMPointInit := ⟨fun d => Support.fields #[("x", Support.optional d.x),
+    ("y", Support.optional d.y),
+    ("z", Support.optional d.z),
+    ("w", Support.optional d.w)]⟩
+
 /-- `(unrestricted double or DOMPointInit)`: one constructor per member type. -/
 inductive UnrestrictedDoubleOrDOMPointInit where
   /-- `unrestricted double` -/
@@ -648,13 +514,6 @@ def CanvasRenderingContext2D.imageSmoothingEnabled (self : CanvasRenderingContex
 def CanvasRenderingContext2D.setImageSmoothingEnabled (self : CanvasRenderingContext2D) (value : Bool) : IO Unit :=
   self.val.set "imageSmoothingEnabled" (toJS value)
 
-/-- `attribute ImageSmoothingQuality imageSmoothingQuality` -/
-def CanvasRenderingContext2D.imageSmoothingQuality (self : CanvasRenderingContext2D) : IO ImageSmoothingQuality := self.val.get "imageSmoothingQuality" ImageSmoothingQuality
-
-/-- Sets `imageSmoothingQuality`: `attribute ImageSmoothingQuality imageSmoothingQuality` -/
-def CanvasRenderingContext2D.setImageSmoothingQuality (self : CanvasRenderingContext2D) (value : ImageSmoothingQuality) : IO Unit :=
-  self.val.set "imageSmoothingQuality" (toJS value)
-
 /-- `attribute (DOMString or CanvasGradient or CanvasPattern) strokeStyle` -/
 def CanvasRenderingContext2D.strokeStyle (self : CanvasRenderingContext2D) : IO Data := self.val.get "strokeStyle" Data
 
@@ -697,13 +556,6 @@ def CanvasRenderingContext2D.shadowColor (self : CanvasRenderingContext2D) : IO 
 def CanvasRenderingContext2D.setShadowColor (self : CanvasRenderingContext2D) (value : String) : IO Unit :=
   self.val.set "shadowColor" (toJS value)
 
-/-- `attribute DOMString filter` -/
-def CanvasRenderingContext2D.filter (self : CanvasRenderingContext2D) : IO String := self.val.get "filter" String
-
-/-- Sets `filter`: `attribute DOMString filter` -/
-def CanvasRenderingContext2D.setFilter (self : CanvasRenderingContext2D) (value : String) : IO Unit :=
-  self.val.set "filter" (toJS value)
-
 /-- `attribute unrestricted double lineWidth` -/
 def CanvasRenderingContext2D.lineWidth (self : CanvasRenderingContext2D) : IO Float := self.val.get "lineWidth" Float
 
@@ -738,13 +590,6 @@ def CanvasRenderingContext2D.lineDashOffset (self : CanvasRenderingContext2D) : 
 /-- Sets `lineDashOffset`: `attribute unrestricted double lineDashOffset` -/
 def CanvasRenderingContext2D.setLineDashOffset (self : CanvasRenderingContext2D) (value : Float) : IO Unit :=
   self.val.set "lineDashOffset" (toJS value)
-
-/-- `attribute DOMString lang` -/
-def CanvasRenderingContext2D.lang (self : CanvasRenderingContext2D) : IO String := self.val.get "lang" String
-
-/-- Sets `lang`: `attribute DOMString lang` -/
-def CanvasRenderingContext2D.setLang (self : CanvasRenderingContext2D) (value : String) : IO Unit :=
-  self.val.set "lang" (toJS value)
 
 /-- `attribute DOMString font` -/
 def CanvasRenderingContext2D.font (self : CanvasRenderingContext2D) : IO String := self.val.get "font" String
@@ -781,34 +626,6 @@ def CanvasRenderingContext2D.letterSpacing (self : CanvasRenderingContext2D) : I
 def CanvasRenderingContext2D.setLetterSpacing (self : CanvasRenderingContext2D) (value : String) : IO Unit :=
   self.val.set "letterSpacing" (toJS value)
 
-/-- `attribute CanvasFontKerning fontKerning` -/
-def CanvasRenderingContext2D.fontKerning (self : CanvasRenderingContext2D) : IO CanvasFontKerning := self.val.get "fontKerning" CanvasFontKerning
-
-/-- Sets `fontKerning`: `attribute CanvasFontKerning fontKerning` -/
-def CanvasRenderingContext2D.setFontKerning (self : CanvasRenderingContext2D) (value : CanvasFontKerning) : IO Unit :=
-  self.val.set "fontKerning" (toJS value)
-
-/-- `attribute CanvasFontStretch fontStretch` -/
-def CanvasRenderingContext2D.fontStretch (self : CanvasRenderingContext2D) : IO CanvasFontStretch := self.val.get "fontStretch" CanvasFontStretch
-
-/-- Sets `fontStretch`: `attribute CanvasFontStretch fontStretch` -/
-def CanvasRenderingContext2D.setFontStretch (self : CanvasRenderingContext2D) (value : CanvasFontStretch) : IO Unit :=
-  self.val.set "fontStretch" (toJS value)
-
-/-- `attribute CanvasFontVariantCaps fontVariantCaps` -/
-def CanvasRenderingContext2D.fontVariantCaps (self : CanvasRenderingContext2D) : IO CanvasFontVariantCaps := self.val.get "fontVariantCaps" CanvasFontVariantCaps
-
-/-- Sets `fontVariantCaps`: `attribute CanvasFontVariantCaps fontVariantCaps` -/
-def CanvasRenderingContext2D.setFontVariantCaps (self : CanvasRenderingContext2D) (value : CanvasFontVariantCaps) : IO Unit :=
-  self.val.set "fontVariantCaps" (toJS value)
-
-/-- `attribute CanvasTextRendering textRendering` -/
-def CanvasRenderingContext2D.textRendering (self : CanvasRenderingContext2D) : IO CanvasTextRendering := self.val.get "textRendering" CanvasTextRendering
-
-/-- Sets `textRendering`: `attribute CanvasTextRendering textRendering` -/
-def CanvasRenderingContext2D.setTextRendering (self : CanvasRenderingContext2D) (value : CanvasTextRendering) : IO Unit :=
-  self.val.set "textRendering" (toJS value)
-
 /-- `attribute DOMString wordSpacing` -/
 def CanvasRenderingContext2D.wordSpacing (self : CanvasRenderingContext2D) : IO String := self.val.get "wordSpacing" String
 
@@ -831,10 +648,6 @@ def CanvasRenderingContext2D.restore (self : CanvasRenderingContext2D) : IO Unit
 /-- `undefined reset()` -/
 def CanvasRenderingContext2D.reset (self : CanvasRenderingContext2D) : IO Unit :=
   self.val.callMethod "reset" (Support.args #[]) Unit
-
-/-- `boolean isContextLost()` -/
-def CanvasRenderingContext2D.isContextLost (self : CanvasRenderingContext2D) : IO Bool :=
-  self.val.callMethod "isContextLost" (Support.args #[]) Bool
 
 /-- `undefined scale(unrestricted double x, unrestricted double y)` -/
 def CanvasRenderingContext2D.scale (self : CanvasRenderingContext2D) (x : Float) (y : Float) : IO Unit :=
@@ -1141,12 +954,6 @@ def TextMetrics.actualBoundingBoxAscent (self : TextMetrics) : IO Float := self.
 /-- `readonly attribute double actualBoundingBoxDescent` -/
 def TextMetrics.actualBoundingBoxDescent (self : TextMetrics) : IO Float := self.val.get "actualBoundingBoxDescent" Float
 
-/-- `readonly attribute double emHeightAscent` -/
-def TextMetrics.emHeightAscent (self : TextMetrics) : IO Float := self.val.get "emHeightAscent" Float
-
-/-- `readonly attribute double emHeightDescent` -/
-def TextMetrics.emHeightDescent (self : TextMetrics) : IO Float := self.val.get "emHeightDescent" Float
-
 /-- `readonly attribute double hangingBaseline` -/
 def TextMetrics.hangingBaseline (self : TextMetrics) : IO Float := self.val.get "hangingBaseline" Float
 
@@ -1181,11 +988,5 @@ def ImageData.height (self : ImageData) : IO Nat := self.val.get "height" Nat
 def ImageData.data (self : ImageData) : IO ByteArray := do
   let r ← self.val.get "data" Data
   Support.viewBytes r
-
-/-- `readonly attribute ImageDataPixelFormat pixelFormat` -/
-def ImageData.pixelFormat (self : ImageData) : IO ImageDataPixelFormat := self.val.get "pixelFormat" ImageDataPixelFormat
-
-/-- `readonly attribute PredefinedColorSpace colorSpace` -/
-def ImageData.colorSpace (self : ImageData) : IO PredefinedColorSpace := self.val.get "colorSpace" PredefinedColorSpace
 
 end Lasm.JS.Web

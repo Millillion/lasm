@@ -21,6 +21,7 @@ import * as tier from './web-tier1.mjs';
 import * as nodeTier from './node-tier2.mjs';
 import * as serveTier from './serve-tier2.mjs';
 import * as browser from './web-browser.mjs';
+import * as platform from './web-platform.mjs';
 import * as overrides from './overrides.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -69,11 +70,16 @@ for (const spec of fullSpecs) {
 /** Interfaces of the specs read only for their types (WebGLRenderingContext): known to be interfaces, not generated. */
 const otherInterfaces = new Set();
 const typeSpecs = readdirSync(idlDir).filter(f => f.endsWith('.idl')).map(f => f.slice(0, -4)).filter(s => !fullSpecs.includes(s)).sort();
+// The rest of the browser platform (scripts/bindings/web-platform.mjs): every other spec is read
+// whole, except those excluded on purpose, which are read only for their types as above.
+const platformSpecs = new Set(typeSpecs.filter(s => !platform.excludedSpecs[s]));
+for (const s of Object.keys(platform.excludedSpecs)) if (!typeSpecs.includes(s)) fail(`web-platform.mjs excludes ${s}, which webref does not have (or a tier reads whole)`);
 for (const spec of typeSpecs) {
   const text = readFileSync(join(idlDir, spec + '.idl'), 'utf8');
   const source = /^\/\/ Source: (.*)$/m.exec(text);
   specTitles[spec] = source ? source[1] : spec;
   for (const d of webidl2.parse(text)) {
+    if (platformSpecs.has(spec)) { if (d.type !== 'eof') asts.push({ spec, d: JSON.parse(JSON.stringify(d)) }); continue; }
     if (!d.partial && ['enum', 'dictionary', 'typedef', 'callback', 'callback interface'].includes(d.type)) asts.push({ spec, d: JSON.parse(JSON.stringify(d)) });
     if (!d.partial && d.type === 'interface') otherInterfaces.add(d.name);
   }
@@ -113,8 +119,15 @@ const extValue = a => !a?.rhs ? undefined : Array.isArray(a.rhs.value) ? a.rhs.v
 /** Merged definitions by IDL name. */
 const defs = new Map();
 const includes = new Map();
+/** The spec of each `I includes M` statement: a mixin's own members belong to the spec that includes it. */
+const includesSpec = new Map();
 for (const { spec, d } of asts) {
-  if (d.type === 'includes') { if (!includes.has(d.target)) includes.set(d.target, []); includes.get(d.target).push(d.includes); continue; }
+  if (d.type === 'includes') {
+    if (!includes.has(d.target)) includes.set(d.target, []);
+    includes.get(d.target).push(d.includes);
+    includesSpec.set(`${d.target} includes ${d.includes}`, spec);
+    continue;
+  }
   if (d.type === 'eof') continue;
   const key = d.name;
   const existing = defs.get(key);
@@ -253,7 +266,18 @@ const exposedToWindow = node => {
 // sees only tier 1's, so its output does not depend on the browser tier.
 // Supporting types are resolved in the tier of the module that owns them.
 let ctxTier = 1;
-const inTier = (t, f) => { const saved = ctxTier; ctxTier = t; try { return f(); } finally { ctxTier = saved; } };
+// Whether the module being generated is outside Lasm.JS.Web (Lasm.JS.Node, Deno, Bun): unions it creates are its own.
+let ctxExt = false;
+const inTier = (t, f, ext = ctxExt) => {
+  const saved = [ctxTier, ctxExt]; ctxTier = t; ctxExt = ext;
+  try { return f(); } finally { [ctxTier, ctxExt] = saved; }
+};
+/** Whether a module is outside Lasm.JS.Web. */
+const extModule = key => nsOf(key) !== NS;
+/** Runs `f` in the context of module `key`. */
+const inModule = (key, f) => inTier(moduleTier.get(key), f, extModule(key));
+/** Runs `f` in the context of the module that owns the supporting type `key` (or the current one). */
+const inOwner = (key, f) => moduleOfType.has(key) ? inTier(moduleTier.get(moduleOfType.get(key)), f, extModule(moduleOfType.get(key))) : f();
 // The modules: Lasm.JS.Web's tier 1 and browser tier, then Lasm.JS.Node's, each with
 // its full Lean name (`key`). Lasm.JS.Node is generated in tier 1's context (members
 // exposed to workers, only tier 1's interfaces visible); its members are its node.idl
@@ -276,7 +300,9 @@ const allModules = [...tier.modules.map(m => ({ ...m, tier: 1, ns: NS, key: `${N
   ...browser.modules.map(m => ({ ...m, tier: 2, ns: NS, key: `${NS}.${m.name}` })), ...nodeModules, ...hostModules];
 const moduleTier = new Map(allModules.map(m => [m.key, m.tier]));
 if (moduleTier.size !== allModules.length) fail('two modules share a name');
-const nsOf = key => key.slice(0, key.lastIndexOf('.'));
+const moduleNs = new Map(allModules.map(m => [m.key, m.ns]));
+/** A module's Lean namespace (`Lasm.JS.Web` for `Lasm.JS.Web.Platform.Webgl2` too). */
+const nsOf = key => moduleNs.get(key) ?? key.slice(0, key.lastIndexOf('.'));
 /** The first components of Lasm.JS.Node's names (`path` of `path.PathObject`, `fsPromises`). */
 const nodeNamespaces = new Set(nodeDefs.flatMap(d => [extValue(extAttr(d, 'LasmNamespace')), d.type === 'namespace' ? extValue(extAttr(d, 'LasmName')) : null]).filter(Boolean));
 
@@ -301,32 +327,130 @@ for (const m of browser.modules) for (const n of m.interfaces) {
   const parent = def(n).inheritance;
   if (parent && !selectedInterfaces.has(parent)) fail(`${n} extends ${parent}, which is not selected`);
 }
+// ---------- the rest of the browser platform (tier 3, scripts/bindings/web-platform.mjs) ----------
+// One module per spec, `Lasm.JS.Web.Platform.<Spec>`, in namespace Lasm.JS.Web: the spec's shipped
+// interfaces exposed to Window (for the specs tiers 1 and 2 read, the interfaces they do not
+// select), the members its partials and mixins add to interfaces of other modules, the
+// WindowOrWorkerGlobalScope members it adds (as globals), and its namespaces' members.
+const PLATFORM = `${NS}.Platform`;
+const specModuleName = spec => platform.moduleNames[spec] ?? spec.split(/[^A-Za-z0-9]+/).filter(Boolean).map(capital).join('');
+const platformModules = new Map(); // key → module
+const tier1Globals = new Set(tier.modules.flatMap(m => m.globals ?? []));
+const mergedInto = new Map(); // a platform module merged into another (a cycle) → that one
+function platformModuleOf(spec) {
+  let key = `${PLATFORM}.${specModuleName(spec)}`;
+  while (mergedInto.has(key)) key = mergedInto.get(key);
+  if (!platformModules.has(key)) {
+    platformModules.set(key, { name: `Platform.${specModuleName(spec)}`, key, tier: 3, ns: NS, specSet: new Set(),
+      interfaces: [], contributions: [], globalMembers: [], nsMembers: [] });
+    moduleTier.set(key, 3);
+    moduleNs.set(key, NS);
+  }
+  const m = platformModules.get(key);
+  if (m.specSet.size && !m.specSet.has(spec) && ![...m.specSet].every(s => specModuleName(s) === specModuleName(spec))) fail(`specs ${[...m.specSet]} and ${spec} share the module name ${key}`);
+  m.specSet.add(spec);
+  return key;
+}
+// Interfaces: shipped, exposed to Window, not selected by tiers 1 and 2, and with a generated parent.
+{
+  let candidates = [...defs.values()].filter(d => d.type === 'interface' && !d.partialOnly && !selectedInterfaces.has(d.name) && d.spec
+    && (platformSpecs.has(d.spec) || fullSpecs.includes(d.spec)) && exposedToWindow(d) && platform.shipped([d.name]));
+  for (let changed = true; changed;) {
+    const names = new Set(candidates.map(d => d.name));
+    const kept = candidates.filter(d => !d.inheritance || selectedInterfaces.has(d.inheritance) || names.has(d.inheritance));
+    changed = kept.length !== candidates.length;
+    candidates = kept;
+  }
+  for (const d of candidates.sort((a, b) => a.name < b.name ? -1 : 1)) {
+    const key = platformModuleOf(d.spec);
+    platformModules.get(key).interfaces.push(d.name);
+    selectedInterfaces.set(d.name, key);
+    moduleOfType.set(d.name, key);
+  }
+}
 /** Whether a member is an event handler IDL attribute (`onclick`), not generated in the browser tier. */
 const isEventHandler = m => m.type === 'attribute' && !m.idlType.union && !m.idlType.generic && browser.eventHandlerTypes.includes(m.idlType.idlType);
 
 const promiseOfUndefined = JSON.parse(JSON.stringify(webidl2.parse('interface X { Promise<undefined> f(); };')[0].members[0].idlType));
 
-/** Members of an interface: its own (and partials'), then its mixins'. */
-function membersOf(name) {
+/** Members of an interface: its own (and partials'), then its mixins', all specs. */
+function allMembersOf(name) {
   const d = def(name);
-  let members = [...d.members];
+  const members = [...d.members];
   const excluded = ctxTier >= 2 ? browser.excludeMixins[name] ?? [] : [];
   for (const mixin of includes.get(name) ?? []) {
     if (excluded.includes(mixin)) continue;
     const md = def(mixin);
     if (!md) fail(`mixin ${mixin} not found`);
-    members.push(...md.members);
+    // The mixin's own members are added by the spec of the `includes` statement (LinkStyle's `sheet` on
+    // HTMLStyleElement, by HTML); a partial mixin's members by the partial's spec.
+    const by = includesSpec.get(`${name} includes ${mixin}`);
+    members.push(...md.members.map(m => m.spec === md.spec && by ? { ...m, spec: by } : m));
   }
-  members = members.filter(ctxTier >= 2 ? exposedToWindow : exposedToWorkers);
-  if (ctxTier >= 2) members = members.filter(m => !isEventHandler(m));
+  return members;
+}
+/** The BCD path of a member of interface `name` (`['Element', 'append']`; a constructor is `['URL', 'URL']`). */
+const bcdPath = (name, m) => m.type === 'constructor' ? [name, name] : m.type === 'iterable' ? [name, m.idlType.length === 2 ? 'entries' : 'values'] : [name, m.name];
+/** Whether the browser tiers generate a member: shipped by every supported engine (scripts/bindings/web-platform.mjs). */
+const memberShipped = (name, m) => m.type === 'const' || (!m.name && m.type !== 'constructor' && m.type !== 'iterable') || platform.shipped(bcdPath(name, m))
+  // BCD names a static member `<name>_static` (DOMRectReadOnly.fromRect_static).
+  || m.special === 'static' && platform.shipped([name, `${m.name}_static`]);
+/** Whether tier 1 generates member `m` of its interface `name`. */
+const inTier1 = (name, m) => exposedToWorkers(m) && !platformSpecs.has(m.spec) && (!tier.memberFilter[name] || tier.memberFilter[name].includes(m.name));
+/** The browser module that generates member `m` of interface `name` (tier 2 or 3), or null when tier 1 does. */
+function memberModule(name, m) {
+  const home = selectedInterfaces.get(name);
+  if (platformSpecs.has(m.spec)) return platformModuleOf(m.spec);
+  if (moduleTier.get(home) >= 2) return home;
+  return inTier1(name, m) ? null : platformModuleOf(m.spec);
+}
+/**
+ * Members of an interface as the current tier generates them: tier 1's (exposed to workers),
+ * or the browser's (exposed to Window, shipped, not event handlers). With `module`, only the
+ * members that module generates (a spec's partials go to the spec's module).
+ */
+function membersOf(name, module = null) {
+  let members = allMembersOf(name);
+  if (ctxTier === 1) members = members.filter(m => inTier1(name, m));
+  else {
+    members = members.filter(m => exposedToWindow(m) && !isEventHandler(m) && memberShipped(name, m));
+    if (module) members = members.filter(m => memberModule(name, m) === module);
+  }
   // Operations the specs now type as returning a promise that shipping browsers do not return (scrollIntoView):
   // read as Promise<undefined>, which awaits either (docs/JS_BINDINGS.md).
   if (ctxTier >= 2) members = members.map(m => m.type === 'operation' && browser.undefinedPromises.includes(`${name}.${m.name}`)
     ? { ...m, specIdlType: m.idlType, idlType: promiseOfUndefined } : m);
-  const only = tier.memberFilter[name];
-  if (only) members = members.filter(m => only.includes(m.name));
   return members;
 }
+
+// The browser members each platform module adds to interfaces of other modules, its globals and
+// its namespaces' members; then the platform modules in dependency order, after the browser tier's.
+inTier(3, () => {
+  for (const [name, home] of [...selectedInterfaces]) {
+    if (nsOf(home) !== NS) continue;
+    const by = new Map();
+    for (const m of membersOf(name)) {
+      const key = memberModule(name, m);
+      if (key && key !== home && moduleTier.get(key) === 3) by.set(key, true);
+    }
+    for (const key of [...by.keys()].sort()) platformModules.get(key).contributions.push(name);
+  }
+  // WindowOrWorkerGlobalScope members tier 1 does not generate: globals (`indexedDB`, `createImageBitmap`).
+  for (const m of def('WindowOrWorkerGlobalScope').members)
+    if (m.name && !tier1Globals.has(m.name) && exposedToWindow(m) && platform.shipped([m.name]))
+      platformModules.get(platformModuleOf(m.spec)).globalMembers.push(m);
+  // Namespaces exposed to Window that tier 1 does not generate (`CSS`), member by member.
+  const tier1Namespaces = new Set(tier.modules.flatMap(m => m.namespaces ?? []));
+  for (const d of [...defs.values()].filter(d => d.type === 'namespace' && !tier1Namespaces.has(d.name) && !extAttr(d, 'LasmModule') && !hostOf(d)
+    && exposedToWindow(d) && platform.shipped([d.name]))) {
+    for (const m of d.members.filter(m => m.name && exposedToWindow(m) && platform.shipped([d.name, m.name]))) {
+      const pm = platformModules.get(platformModuleOf(m.spec));
+      let entry = pm.nsMembers.find(e => e.ns === d.name);
+      if (!entry) pm.nsMembers.push(entry = { ns: d.name, members: [] });
+      entry.members.push(m);
+    }
+  }
+});
 
 // ---------- types ----------
 // A resolved type: { k, ... }
@@ -436,15 +560,21 @@ function makeUnion(types, typedefName, outerNullable = false) {
     // A union that names a browser interface is resolved anew in the browser tier.
     const resolved = flat.alts.map(resolve);
     const browserOnly = ctxTier >= 2 && resolved.some(namesBrowserInterface);
-    const key = (browserOnly ? 'browser:' : '') + (typedefName ?? flat.alts.map(idlText).join('|'));
+    let key = (browserOnly ? 'browser:' : '') + (typedefName ?? flat.alts.map(idlText).join('|'));
+    // Lasm.JS.Web never uses a union of Lasm.JS.Node's or Deno's or Bun's (another namespace): it makes its own.
+    if (!ctxExt && unions.get(key)?.ext) key = 'web:' + key;
     if (!unions.has(key)) {
       let name = typedefName ? (tier.renames[typedefName] ?? typedefName) : flat.alts.map(typeKeyName).join('Or');
       // A union of a Lasm.JS.Node dictionary or class in a namespace lives in that namespace
       // (`fsPromises.ReadFileOptionsOrDOMString` beside `FileHandle.ReadFileOptionsOrDOMString`).
       const home = flat.alts.map(t => !t.union && !t.generic && def(t.idlType) && extValue(extAttr(def(t.idlType), 'LasmNamespace'))).find(Boolean);
       if (home) name = `${home}.${name}`;
-      if ([...unions.values()].some(o => o.name === name)) fail(`two unions are named ${name} (one in each tier)`);
-      const u = { key, name, alts: [], typedef: typedefName };
+      const same = [...unions.values()].find(o => o.name === name && o.ext === ctxExt);
+      // The rest of the browser platform (tier 3) takes the union tiers 1 and 2 already generate under the
+      // name (where those tiers resolved a member it sees as an interface as Value): one type per name.
+      if (same && ctxTier === 3) { r = { k: 'union', key: same.key }; return (flat.nullable || outerNullable) ? { k: 'nullable', inner: r } : r; }
+      if (same) fail(`two unions are named ${name} (one in each tier)`);
+      const u = { key, name, alts: [], typedef: typedefName, ext: ctxExt };
       unions.set(key, u);
       const used = new Set();
       flat.alts.forEach((t, i) => {
@@ -508,14 +638,17 @@ const dictReadableMemo = new Map();
 function dictReadable(name) {
   if (dictReadableMemo.has(name)) return dictReadableMemo.get(name);
   dictReadableMemo.set(name, false);
-  const ok = inTier(tierOfKey(name), () => dictFields(name).every(f => { const t = resolve(f.idlType); return readable(t) && !needsPost(t); }));
+  const ok = inOwner(name, () => dictFields(name).every(f => { const t = resolve(f.idlType); return readable(t) && !needsPost(t); }));
   dictReadableMemo.set(name, ok);
   return ok;
 }
 function dictFields(name) {
   const d = def(name);
   const parent = d.inheritance && def(d.inheritance) ? dictFields(d.inheritance) : [];
-  return [...parent, ...d.members.filter(m => m.type === 'field')];
+  // A dictionary of tiers 1 and 2 keeps its own specs' members: the rest of the platform's partials
+  // (RequestInit's `browsingTopics`) would change a type every tier shares.
+  const own = platformSpecs.has(d.spec) ? () => true : m => !platformSpecs.has(m.spec);
+  return [...parent, ...d.members.filter(m => m.type === 'field' && own(m))];
 }
 
 // ---------- Lean type text ----------
@@ -600,7 +733,7 @@ function visit(t, mode, module) {
       visit(c.ret, 'to', owner);
       needTo.add(key); needFrom.add(key);
     }
-  });
+  }, extModule(owner));
 }
 function callbackSignature(name) {
   const d = def(name);
@@ -610,8 +743,11 @@ function callbackSignature(name) {
 }
 
 // The members to generate, per module.
-const plan = allModules.map(m => ({ ...m, ifaces: (m.interfaces ?? []).map(configIdl), globals: m.globals ?? [], namespaces: m.namespaces ?? [],
-  windowGlobals: m.windowGlobals ?? [] }));
+const planEntry = m => ({ ...m, ifaces: (m.interfaces ?? []).map(configIdl), globals: m.globals ?? [], namespaces: m.namespaces ?? [],
+  windowGlobals: m.windowGlobals ?? [], contributions: m.contributions ?? [], globalMembers: m.globalMembers ?? [], nsMembers: m.nsMembers ?? [] });
+const plan = allModules.map(planEntry);
+/** A tier-1 namespace's members (not those the browser platform's specs add). */
+const namespaceMembers = n => def(n).members.filter(x => exposedToWorkers(x) && !platformSpecs.has(x.spec));
 const globalMixin = def('WindowOrWorkerGlobalScope');
 const globalMember = n => {
   const found = globalMixin.members.filter(x => x.name === n);
@@ -620,7 +756,7 @@ const globalMember = n => {
 };
 /** A member of Window (with its mixins and partials) that the browser tier also generates as a global (`document`). */
 const windowMember = n => {
-  const found = inTier(2, () => membersOf('Window')).filter(x => x.name === n);
+  const found = inTier(2, () => membersOf('Window', selectedInterfaces.get('Window'))).filter(x => x.name === n);
   if (!found.length) fail(`Window member ${n} not found`);
   return found;
 };
@@ -637,14 +773,20 @@ function visitMember(m, module) {
     for (const t of m.idlType) visit(resolve(t), 'from', module);
   }
 }
-for (const m of plan) inTier(m.tier, () => {
+const visitModule = m => inModule(m.key, () => {
   for (const i of m.ifaces) {
     const d = def(i);
     if (d.inheritance && selectedInterfaces.has(d.inheritance)) visit({ k: 'iface', name: d.inheritance }, 'none', m.key);
-    for (const mem of membersOf(i)) visitMember(mem, m.key);
+    for (const mem of membersOf(i, m.key)) visitMember(mem, m.key);
   }
+  for (const i of m.contributions) {
+    visit({ k: 'iface', name: i }, 'none', m.key);
+    for (const mem of membersOf(i, m.key)) visitMember(mem, m.key);
+  }
+  for (const mem of m.globalMembers) visitMember(mem, m.key);
+  for (const e of m.nsMembers) for (const mem of e.members) visitMember(mem, m.key);
   for (const g of m.globals) for (const mem of globalMember(g)) visitMember(mem, m.key);
-  for (const n of m.namespaces) for (const mem of def(n).members.filter(exposedToWorkers)) visitMember(mem, m.key);
+  for (const n of m.namespaces) for (const mem of namespaceMembers(n)) visitMember(mem, m.key);
   for (const g of m.windowGlobals) for (const mem of windowMember(g)) visitMember(mem, m.key);
   for (const x of m.extraTypes ?? []) {
     const d = def(x);
@@ -652,6 +794,114 @@ for (const m of plan) inTier(m.tier, () => {
     visit(resolveName(x), 'to', m.key);
   }
 });
+for (const m of plan) visitModule(m);
+
+// The interfaces a type names, through dictionaries, typedefs, unions and callbacks (not through interfaces).
+function namedInterfaces(t, out, seen = new Set(), inUnion = false) {
+  if (!t) return;
+  if (t.union) { for (const x of t.idlType) namedInterfaces(x, out, seen, true); return; }
+  if (t.generic) { for (const x of t.idlType) namedInterfaces(x, out, seen); return; }
+  if (typeof t.idlType !== 'string') return namedInterfaces(t.idlType, out, seen, inUnion);
+  const n = browser.aliases[t.idlType] ?? t.idlType;
+  if (seen.has(n + inUnion)) return;
+  seen.add(n + inUnion);
+  const d = def(n);
+  if (!d) return;
+  // A dictionary or union tiers 1 and 2 already generate keeps their reading (an interface they do not see is a
+  // Value), unless it is spliced into another union (a typedef'd union inside a union is flattened).
+  if (d.type !== 'interface' && !inUnion && (moduleOfType.has(n) || moduleOfType.has('union:' + n) || moduleOfType.has('union:browser:' + n))) return;
+  if (d.type === 'interface') out.add(n);
+  else if (d.type === 'dictionary') for (const f of dictFields(n)) namedInterfaces(f.idlType, out, seen);
+  else if (d.type === 'typedef') namedInterfaces(d.idlType, out, seen, inUnion || !!d.idlType.union);
+  else if (d.type === 'callback') { namedInterfaces(d.idlType, out, seen); for (const a of d.arguments) namedInterfaces(a.idlType, out, seen); }
+  else if (d.type === 'callback interface') for (const op of d.members.filter(x => x.type === 'operation')) {
+    namedInterfaces(op.idlType, out, seen); for (const a of op.arguments) namedInterfaces(a.idlType, out, seen);
+  }
+}
+/** The alternatives of a union type, through typedefs (null when `t` is not a union). */
+function unionAlternatives(t) {
+  if (t.generic) return null;
+  if (t.union) return t.idlType.flatMap(x => unionAlternatives(x) ?? [x]);
+  const d = typeof t.idlType === 'string' && def(t.idlType);
+  return d?.type === 'typedef' ? unionAlternatives(d.idlType) : null;
+}
+const memberInterfaces = (m, out) => {
+  // A result union of interfaces only (OffscreenCanvas.getContext's contexts) is read back as a Value.
+  const alts = m.idlType && m.type !== 'constructor' && unionAlternatives(m.idlType.generic === 'Promise' ? m.idlType.idlType[0] : m.idlType);
+  const valueRead = alts && alts.every(x => !x.generic && !x.union && def(x.idlType)?.type === 'interface');
+  if (m.idlType && !valueRead) namedInterfaces(m.idlType, out);
+  for (const a of m.arguments ?? []) namedInterfaces(a.idlType, out);
+};
+/** The platform modules a platform module's declarations name. */
+function platformDeps(pm) {
+  const named = new Set();
+  inTier(3, () => {
+    for (const i of pm.interfaces) {
+      if (def(i).inheritance) named.add(def(i).inheritance);
+      for (const m of membersOf(i, pm.key)) memberInterfaces(m, named);
+    }
+    for (const i of pm.contributions) { named.add(i); for (const m of membersOf(i, pm.key)) memberInterfaces(m, named); }
+    for (const m of pm.globalMembers) memberInterfaces(m, named);
+    for (const e of pm.nsMembers) for (const m of e.members) memberInterfaces(m, named);
+  });
+  return new Set([...named].map(n => selectedInterfaces.get(n)).filter(k => k && k !== pm.key && moduleTier.get(k) === 3));
+}
+// Cycles (Tarjan's strongly connected components) are merged into one module, named after its specs.
+for (;;) {
+  const keys = [...platformModules.keys()].sort();
+  const deps = new Map(keys.map(k => [k, [...platformDeps(platformModules.get(k))].sort()]));
+  let index = 0; const idx = new Map(), low = new Map(), stack = [], on = new Set(), sccs = [];
+  const strong = v => {
+    idx.set(v, index); low.set(v, index); index++; stack.push(v); on.add(v);
+    for (const w of deps.get(v)) {
+      if (!idx.has(w)) { strong(w); low.set(v, Math.min(low.get(v), low.get(w))); }
+      else if (on.has(w)) low.set(v, Math.min(low.get(v), idx.get(w)));
+    }
+    if (low.get(v) === idx.get(v)) { const c = []; let w; do { w = stack.pop(); on.delete(w); c.push(w); } while (w !== v); sccs.push(c); }
+  };
+  for (const k of keys) if (!idx.has(k)) strong(k);
+  const cycles = sccs.filter(c => c.length > 1);
+  if (process.env.LASM_CYCLES) for (const c of cycles) for (const k of c) {
+    const pm = platformModules.get(k);
+    for (const d of deps.get(k)) if (c.includes(d)) {
+      const named = new Set();
+      inTier(3, () => { for (const i of pm.interfaces) for (const m of membersOf(i, pm.key)) { const o = new Set(); memberInterfaces(m, o); for (const n of o) if (selectedInterfaces.get(n) === d) named.add(`${i}.${m.name ?? m.type}→${n}`); }
+        for (const i of pm.contributions) for (const m of membersOf(i, pm.key)) { const o = new Set(); memberInterfaces(m, o); for (const n of o) if (selectedInterfaces.get(n) === d) named.add(`+${i}.${m.name}→${n}`); }
+        for (const i of pm.interfaces) if (selectedInterfaces.get(def(i).inheritance) === d) named.add(`${i} extends ${def(i).inheritance}`); });
+      console.error(`${k} → ${d}: ${[...named].slice(0, 6).join(', ')}`);
+    }
+  }
+  if (!cycles.length) {
+    // Tarjan emits components dependencies first: that is the module order.
+    const ordered = sccs.map(c => platformModules.get(c[0]));
+    // Last: a supporting type goes to the first module that uses it, and tiers 1 and 2 own theirs.
+    for (const m of ordered) {
+      const specs = [...m.specSet].sort();
+      Object.assign(m, { title: `the rest of the browser platform from ${specs.length > 1 ? 'these specs' : 'this spec'}`,
+        specs: specs.map(x => specTitles[x]).join('; ') });
+    }
+    allModules.push(...ordered);
+    for (const m of ordered) { const e = planEntry(m); plan.push(e); visitModule(e); }
+    break;
+  }
+  for (const c of cycles) {
+    const members = c.map(k => platformModules.get(k)).sort((a, b) => a.key < b.key ? -1 : 1);
+    const name = `Platform.${members.map(m => m.name.slice('Platform.'.length)).join('And')}`;
+    const merged = { name, key: `${NS}.${name}`, tier: 3, ns: NS, specSet: new Set(members.flatMap(m => [...m.specSet])),
+      interfaces: members.flatMap(m => m.interfaces), contributions: [...new Set(members.flatMap(m => m.contributions))].sort(),
+      globalMembers: members.flatMap(m => m.globalMembers), nsMembers: [] };
+    for (const m of members) for (const e of m.nsMembers) {
+      const found = merged.nsMembers.find(x => x.ns === e.ns);
+      if (found) found.members.push(...e.members); else merged.nsMembers.push({ ns: e.ns, members: [...e.members] });
+    }
+    merged.contributions = merged.contributions.filter(i => !merged.interfaces.includes(i));
+    for (const m of members) { platformModules.delete(m.key); mergedInto.set(m.key, merged.key); }
+    platformModules.set(merged.key, merged);
+    moduleTier.set(merged.key, 3); moduleNs.set(merged.key, NS);
+    for (const i of merged.interfaces) { selectedInterfaces.set(i, merged.key); moduleOfType.set(i, merged.key); }
+  }
+}
+
 
 // ---------- emitting ----------
 
@@ -667,6 +917,9 @@ function requireType(module, t) {
   if (!owner) fail(`no module for ${key}`);
   if (owner !== module) {
     if (moduleIndex(owner) > moduleIndex(module)) fail(`${module} uses ${key} of the later module ${owner}`);
+    if (!extModule(module) && extModule(owner)) fail(`${module} uses ${key} of ${owner}, outside Lasm.JS.Web`);
+    // A module never imports a module of a later tier (a server program links nothing of the DOM).
+    if (moduleTier.get(owner) > moduleTier.get(module)) fail(`${module} (tier ${moduleTier.get(module)}) uses ${key} of ${owner} (tier ${moduleTier.get(owner)})`);
     out.get(module).imports.add(owner);
   }
 }
@@ -770,11 +1023,17 @@ function overloadNames(group) {
   });
   // Two overloads that would get one name: each adds all its argument names (FileHandle's
   // read(options) and read(buffer, options): readWithOptions, readWithBufferOptions).
-  return names.map((n, i) => i > 0 && names.indexOf(n) !== i ? `${group[i].name}With${group[i].arguments.map(a => capital(a.name)).join('')}` : n);
+  const named = names.map((n, i) => i > 0 && names.indexOf(n) !== i ? `${group[i].name}With${group[i].arguments.map(a => capital(a.name)).join('')}` : n);
+  // Overloads that differ only by their arguments' types (RTCDataChannel's send(data) for a string, a Blob, an
+  // ArrayBuffer and a view): each one after the first adds its argument types instead (`sendWithBlob`).
+  return named.map((n, i) => i > 0 && named.indexOf(n) !== i ? `${group[i].name}With${group[i].arguments.map(a => typeKeyName(a.idlType)).join('')}` : n);
 }
 const constructorName = 'new';
 
-function emitInterface(module, name) {
+/** Names taken per interface, across the modules that generate its members. */
+const takenNames = new Map();
+/** Interface `name`'s handle type (with `declare`) and the members `module` generates. */
+function emitInterface(module, name, declare = true) {
   const d = def(name);
   const o = out.get(module);
   const T = leanTypeName(name);
@@ -788,7 +1047,7 @@ function emitInterface(module, name) {
     ? `/-- \`class ${leanTypeName(name)}${d.inheritance ? ' extends ' + leanTypeName(d.inheritance) : ''}\` of \`${jsModule}\` (${specOf(d.spec)}): a handle to the JavaScript object. -/`
     : `/-- \`interface ${jsPath(name)}${d.inheritance ? ' : ' + d.inheritance : ''}\` (${specOf(d.spec)}): a handle to the JavaScript object. -/`;
   // LasmNoHandle (Node's Buffer): no handle type, a Lean ByteArray stands for the object.
-  if (!extAttr(d, 'LasmNoHandle')) {
+  if (declare && !extAttr(d, 'LasmNoHandle')) {
     if (parent) decls.push(`${header}\nstructure ${T} extends ${parent}`);
     else decls.push(`${header}\nstructure ${T} where\n  /-- The JavaScript object. -/\n  val : Value`);
     decls.push(`instance : Nonempty ${T} := ⟨{ val := Classical.ofNonempty }⟩`);
@@ -806,11 +1065,12 @@ function emitInterface(module, name) {
     if (ctor) o.decls.push(`/-- \`v instanceof ${jsPath(name)}\`: \`some\` handle to \`v\` when it is one, else \`none\` (also when the runtime has no \`${jsPath(name)}\`). -/\ndef ${T}.cast? (v : Value) : IO (Option ${T}) := do\n  return if (← Lasm.JS.Web.Support.isInstance (${ctor}) v) then some { val := v } else none`);
   }
 
-  const members = membersOf(name);
-  const taken = new Set(['mk', 'val', 'rec', 'recOn', 'casesOn', 'noConfusion', 'noConfusionType', 'ctorIdx', 'ofFn', 'ofSyncFn', 'cast?']);
+  const members = membersOf(name, module);
+  if (!takenNames.has(name)) takenNames.set(name, new Set(['mk', 'val', 'rec', 'recOn', 'casesOn', 'noConfusion', 'noConfusionType', 'ctorIdx', 'ofFn', 'ofSyncFn', 'cast?']));
+  const taken = takenNames.get(name);
   const take = (n, what) => { if (taken.has(n)) fail(`${T}.${n} (${what}) is generated twice`); taken.add(n); return n; };
-  const staticNames = new Set(members.filter(m => m.special === 'static').map(memberName));
-  const instanceNames = new Set(members.filter(m => m.special !== 'static' && m.name).map(memberName));
+  // Static names clash with instance names of every module's members.
+  const instanceNames = new Set(allMembersOf(name).filter(m => m.special !== 'static' && m.name).map(memberName));
   const fns = [];
   const doc = (m, extra = '') => `/-- ${nodeSignature(m)}\`${docText(memberIdl(m, name))}\`${extra}${m.specIdlType
     ? `: read as \`Promise<undefined>\`, since shipping browsers return \`undefined\` (awaited at once) where the spec now returns a promise` : ''} -/`;
@@ -896,7 +1156,8 @@ function emitInterface(module, name) {
   for (const it of members.filter(m => m.type === 'iterable' && m.idlType.length === 2)) {
     const [k, v] = it.idlType.map(resolve);
     for (const t of [k, v]) requireType(module, t);
-    if (needsPost(k) || needsPost(v)) fail(`${T}: iterable needing decoding`);
+    // An iterable of ArrayBuffers (MediaKeyStatusMap's key IDs) would need decoding per entry: not generated (docs/JS_BINDINGS.md).
+    if (needsPost(k) || needsPost(v)) { if (ctxTier === 3) continue; fail(`${T}: iterable needing decoding`); }
     const K = paren(retType(k)), V = paren(retType(v));
     const idl = `iterable<${it.idlType.map(idlText).join(', ')}>`;
     fns.push(`/-- \`${idl}\`: \`entries()\`, collected into an array. -/\ndef ${T}.${id(take('entries', 'iterable'))} (self : ${T}) : IO (Array (${K} × ${V})) :=\n  Support.iterate self.val "entries" (Array (${K} × ${V}))`);
@@ -907,11 +1168,12 @@ function emitInterface(module, name) {
   for (const it of members.filter(m => m.type === 'iterable' && m.idlType.length === 1)) {
     const v = resolve(it.idlType[0]);
     requireType(module, v);
-    if (needsPost(v)) fail(`${T}: iterable needing decoding`);
+    if (needsPost(v)) { if (ctxTier === 3) continue; fail(`${T}: iterable needing decoding`); }
     const V = paren(retType(v));
     fns.push(`/-- \`iterable<${idlText(it.idlType[0])}>\`: \`values()\`, collected into an array. -/\ndef ${T}.${id(take('values', 'iterable'))} (self : ${T}) : IO (Array ${V}) :=\n  Support.iterate self.val "values" (Array ${V})`);
   }
-  if (parent) requireType(module, { k: 'iface', name: d.inheritance });
+  if (parent && declare) requireType(module, { k: 'iface', name: d.inheritance });
+  if (!declare) requireType(module, { k: 'iface', name });
   o.decls.push(...fns);
 }
 
@@ -1071,21 +1333,26 @@ function emitUnion(module, key) {
 
 // Collect per module, in dependency order within the module.
 for (const o of out.values()) Object.assign(o, { types: [], support: [] });
-for (const m of plan) inTier(m.tier, () => { for (const i of m.ifaces) emitInterface(m.key, i); });
-for (const m of plan) inTier(m.tier, () => {
+for (const m of plan) inModule(m.key, () => {
+  for (const i of m.ifaces) emitInterface(m.key, i);
+  for (const i of m.contributions) emitInterface(m.key, i, false);
+});
+for (const m of plan) inModule(m.key, () => {
   emitNamespaceOrGlobal(m.key, 'WindowOrWorkerGlobalScope', m.globals.flatMap(globalMember), [], '');
   for (const n of m.namespaces) {
     const jsModule = jsModuleOf(n);
     // Lasm.JS.Deno and Lasm.JS.Bun: the runtime's global object's functions, at the top of the module's namespace (`Lasm.JS.Deno.serve`).
     if (hostOf(def(n))) emitNamespaceOrGlobal(m.key, n, def(n).members, [extValue(extAttr(def(n), 'LasmPath'))], '');
-    else if (jsModule === 'globalThis') emitNamespaceOrGlobal(m.key, n, def(n).members.filter(exposedToWorkers), [n], `${n}.`);
+    else if (jsModule === 'globalThis') emitNamespaceOrGlobal(m.key, n, namespaceMembers(n), [n], `${n}.`);
     else emitNamespaceOrGlobal(m.key, n, def(n).members.map(x => ({ ...x, name: memberName(x) })), [], `${leanTypeName(n)}.`, jsModule);
   }
   emitNamespaceOrGlobal(m.key, 'Window', m.windowGlobals.flatMap(windowMember), [], '');
+  emitNamespaceOrGlobal(m.key, 'WindowOrWorkerGlobalScope', m.globalMembers, [], '');
+  for (const e of m.nsMembers) emitNamespaceOrGlobal(m.key, e.ns, e.members, [e.ns], `${e.ns}.`);
 });
 // Supporting declarations, topologically sorted per module.
 const supportKeys = [...moduleOfType.keys()].filter(k => !selectedInterfaces.has(k));
-const depsOf = key => inTier(tierOfKey(key), () => {
+const depsOf = key => inOwner(key, () => {
   const deps = [];
   const walk = t => {
     if (!t) return;
@@ -1109,7 +1376,7 @@ function emitSupport(key, stack = []) {
   emitted.add(key);
   const module = moduleOfType.get(key);
   const o = out.get(module);
-  const text = inTier(moduleTier.get(module), () => {
+  const text = inModule(module, () => {
     if (key.startsWith('union:')) return emitUnion(module, key.slice(6));
     const d = def(key);
     return d.type === 'enum' ? emitEnum(key) : d.type === 'dictionary' ? emitDict(module, key) : emitCallback(module, key);
@@ -1161,12 +1428,24 @@ types, Promise results are \`Async\`, nullable values \`Option\`s, dictionaries 
 ${generatedBy}
 -/`, ...plan.filter(m => m.ns === NS && m.tier === 1).map(m => `import ${m.key}`), ''].join('\n'));
 files.set(join(outDir, 'Browser.lean'), [`/-
-${NS}.Browser: everything Lasm.JS.Web has in a browser: the Minimum Common Web API (\`import Lasm.JS.Web\`)
-and the browser tier (scripts/bindings/web-browser.mjs): the DOM and the HTML elements, the window,
-location, history and storage, user-interface events, canvas 2D and WebSocket
-(docs/JS_BINDINGS.md, "The browser tier").
+${NS}.Browser: the Minimum Common Web API (\`import Lasm.JS.Web\`) and the core of the browser tier
+(scripts/bindings/web-browser.mjs): the DOM and the HTML elements, the window, location, history and
+storage, user-interface events, canvas 2D and WebSocket (docs/JS_BINDINGS.md, "The browser tier").
+The rest of the browser platform is \`import ${PLATFORM}\`, or one of its modules.
 ${generatedBy}
 -/`, `import ${NS}`, ...plan.filter(m => m.ns === NS && m.tier === 2).map(m => `import ${m.key}`), ''].join('\n'));
+// The rest of the browser platform: one umbrella module, and the module list src/lasm-library.mjs compiles.
+const platformPlan = plan.filter(m => m.tier === 3);
+files.set(join(root, 'library', ...PLATFORM.split('.')) + '.lean', [`/-
+${PLATFORM}: everything Lasm.JS.Web has in a browser: Lasm.JS.Web.Browser and the rest of the browser
+platform, every interface and member of @webref/idl exposed to Window that Chromium ${platform.baseline.chrome},
+Firefox ${platform.baseline.firefox} and Safari ${platform.baseline.safari} all ship (@mdn/browser-compat-data ${platform.bcdVersion};
+scripts/bindings/web-platform.mjs; docs/JS_BINDINGS.md, "The rest of the browser platform"). Each spec is
+also its own module (\`import ${PLATFORM}.IndexedDB\`), which links less.
+${generatedBy}
+-/`, `import ${NS}.Browser`, ...platformPlan.map(m => `import ${m.key}`), ''].join('\n'));
+files.set(join(root, 'library', ...PLATFORM.split('.'), 'modules.json'), JSON.stringify({
+  generatedBy: 'scripts/bindings/generate-web.mjs', modules: [...platformPlan.map(m => m.key), PLATFORM] }, null, 2) + '\n');
 files.set(join(root, 'library', 'Lasm', 'JS', 'Node.lean'), [`/-
 ${NODE_NS}: the server-essential Node.js modules (node:fs/promises, node:path, node:os,
 node:process, node:buffer, node:crypto, node:child_process, node:events, node:stream) as
@@ -1186,26 +1465,31 @@ ${hostGeneratedBy(h)}
 
 // The generated surface, for the availability probes: tier 1's (test/fixtures/js-web)
 // and the browser tier's (test/browser/platform).
-const surfaceOf = t => {
-const surface = {};
-for (const m of plan.filter(m => m.ns === NS && m.tier === t)) inTier(t, () => {
-  for (const i of m.ifaces) {
-    const members = membersOf(i);
-    surface[jsPath(i)] = {
-      module: m.name,
-      static: [...new Set(members.filter(x => x.special === 'static' && x.name).map(x => x.name))],
+const surfaceOf = tiers => {
+  const surface = {};
+  const add = (path, module, kind, names) => {
+    const e = (surface[path] ??= { module, static: [], prototype: [] });
+    e[kind] = [...new Set([...e[kind], ...names])];
+  };
+  for (const m of plan.filter(m => m.ns === NS && tiers.includes(m.tier))) inModule(m.key, () => {
+    for (const i of [...m.ifaces, ...m.contributions]) {
+      const members = membersOf(i, m.tier === 1 ? null : m.key);
+      const home = selectedInterfaces.get(i).slice(NS.length + 1);
+      add(jsPath(i), home, 'static', members.filter(x => x.special === 'static' && x.name).map(x => x.name));
       // [LegacyUnforgeable] attributes are own properties of each instance, not of the prototype.
-      prototype: [...new Set(members.filter(x => x.special !== 'static' && (x.type === 'operation' || x.type === 'attribute') && x.name
-        && !extAttr(x, 'LegacyUnforgeable')).map(x => x.name))],
-    };
-  }
-  for (const g of m.globals) surface[g] = { module: m.name, global: true };
-  for (const n of m.namespaces) surface[n] = { module: m.name, namespace: [...new Set(def(n).members.filter(exposedToWorkers).map(x => x.name))] };
-  for (const g of m.windowGlobals) surface[g] = { module: m.name, global: true };
-});
-return surface;
+      add(jsPath(i), home, 'prototype', members.filter(x => x.special !== 'static' && (x.type === 'operation' || x.type === 'attribute') && x.name
+        && !extAttr(x, 'LegacyUnforgeable')).map(x => x.name));
+    }
+    for (const g of [...m.globals, ...m.windowGlobals, ...m.globalMembers.map(x => x.name)]) surface[g] = { module: m.name, global: true };
+    for (const n of m.namespaces) surface[n] = { module: m.name, namespace: [...new Set(namespaceMembers(n).map(x => x.name))] };
+    for (const e of m.nsMembers) {
+      const ns = (surface[e.ns] ??= { module: m.name, namespace: [] });
+      ns.namespace = [...new Set([...ns.namespace, ...e.members.map(x => x.name)])];
+    }
+  });
+  return surface;
 };
-const surface = surfaceOf(1), browserSurface = surfaceOf(2);
+const surface = surfaceOf([1]), browserSurface = surfaceOf([2, 3]);
 files.set(join(root, 'scripts', 'bindings', 'web-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion})`, surface }, null, 2) + '\n');
 
 // The same surface as Lean data for the conformance program's availability probe.
@@ -1298,7 +1582,12 @@ if (check) {
   const known = new Set([...files.keys()].map(f => f.slice(root.length)));
   for (const [dir, tierName] of [[outDir, 'Web'], [nodeOutDir, 'Node'], ...serveTier.hosts.map(h => [join(root, 'library', 'Lasm', 'JS', h.name), h.name])]) for (const name of existsSync(dir) ? readdirSync(dir) : []) {
     const rel = join('library', 'Lasm', 'JS', tierName, name);
-    if (name !== 'Support.lean' && !known.has(rel)) stale.push(rel + ' (not generated)');
+    if (name !== 'Support.lean' && name !== 'Platform' && !known.has(rel)) stale.push(rel + ' (not generated)');
+  }
+  const platformDir = join(outDir, 'Platform');
+  for (const name of existsSync(platformDir) ? readdirSync(platformDir) : []) {
+    const rel = join('library', 'Lasm', 'JS', 'Web', 'Platform', name);
+    if (!known.has(rel)) stale.push(rel + ' (not generated)');
   }
   if (stale.length) {
     console.error(`The standard bindings are stale: ${stale.join(', ')}. Run node scripts/bindings/generate-web.mjs and commit the result.`);

@@ -8,7 +8,6 @@ and W3C specifications (W3C Software and Document License), with attribution to 
 import Lasm.JS.Web.Support
 import Lasm.JS.Web.Dom
 import Lasm.JS.Web.File
-import Lasm.JS.Web.Fetch
 import Lasm.JS.Web.Global
 import Lasm.JS.Web.Geometry
 import Lasm.JS.Web.Css
@@ -359,31 +358,6 @@ instance : FromJS DocumentVisibilityState where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Web.DocumentVisibilityState"
 
-/-- `enum CSSBoxType` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)): "margin", "border", "padding", "content". -/
-inductive CSSBoxType where
-  /-- "margin" -/
-  | margin
-  /-- "border" -/
-  | border
-  /-- "padding" -/
-  | padding
-  /-- "content" -/
-  | content
-  deriving BEq, Repr, Inhabited
-instance : ToJS CSSBoxType := ⟨fun
-  | .margin => .string "margin"
-  | .border => .string "border"
-  | .padding => .string "padding"
-  | .content => .string "content"⟩
-instance : FromJS CSSBoxType where
-  fromJS
-    | .string "margin" => .ok .margin
-    | .string "border" => .ok .border
-    | .string "padding" => .ok .padding
-    | .string "content" => .ok .content
-    | _ => .error "not a value of the enumeration"
-  typeName := "Lasm.JS.Web.CSSBoxType"
-
 /-- `enum ShadowRootMode` (DOM Standard (https://dom.spec.whatwg.org/)): "open", "closed". -/
 inductive ShadowRootMode where
   /-- "open" -/
@@ -610,6 +584,11 @@ structure SanitizerAttributeNamespace where
   «namespace» : Option String := none
 instance : ToJS SanitizerAttributeNamespace := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("namespace", Support.optional d.«namespace»)]⟩
+instance : FromJS SanitizerAttributeNamespace where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    «namespace» := ← Lasm.JS.readField (Option String) d "namespace" }
+  typeName := "Lasm.JS.Web.SanitizerAttributeNamespace"
 
 /-- `typedef DOMString or SanitizerAttributeNamespace SanitizerAttribute`: one constructor per member type. -/
 inductive SanitizerAttribute where
@@ -622,6 +601,12 @@ instance : ToJS SanitizerAttribute := ⟨fun
   | .sanitizerAttributeNamespace v => toJS v⟩
 instance : Coe String SanitizerAttribute := ⟨.domString⟩
 instance : Coe SanitizerAttributeNamespace SanitizerAttribute := ⟨.sanitizerAttributeNamespace⟩
+instance : FromJS SanitizerAttribute where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.object _) => (FromJS.fromJS d : Except String SanitizerAttributeNamespace).map .sanitizerAttributeNamespace
+    | _ => .error ""
+  typeName := "Lasm.JS.Web.SanitizerAttribute"
 
 /-- `dictionary SanitizerElementNamespaceWithAttributes : SanitizerElementNamespace` (HTML Standard (https://html.spec.whatwg.org/multipage/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SanitizerElementNamespaceWithAttributes where
@@ -637,6 +622,13 @@ instance : ToJS SanitizerElementNamespaceWithAttributes := ⟨fun d => Support.f
     ("namespace", Support.optional d.«namespace»),
     ("attributes", Support.optional d.attributes),
     ("removeAttributes", Support.optional d.removeAttributes)]⟩
+instance : FromJS SanitizerElementNamespaceWithAttributes where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    «namespace» := ← Lasm.JS.readField (Option String) d "namespace",
+    attributes := ← Lasm.JS.readField (Option (Array SanitizerAttribute)) d "attributes",
+    removeAttributes := ← Lasm.JS.readField (Option (Array SanitizerAttribute)) d "removeAttributes" }
+  typeName := "Lasm.JS.Web.SanitizerElementNamespaceWithAttributes"
 
 /-- `typedef DOMString or SanitizerElementNamespaceWithAttributes SanitizerElementWithAttributes`: one constructor per member type. -/
 inductive SanitizerElementWithAttributes where
@@ -649,6 +641,12 @@ instance : ToJS SanitizerElementWithAttributes := ⟨fun
   | .sanitizerElementNamespaceWithAttributes v => toJS v⟩
 instance : Coe String SanitizerElementWithAttributes := ⟨.domString⟩
 instance : Coe SanitizerElementNamespaceWithAttributes SanitizerElementWithAttributes := ⟨.sanitizerElementNamespaceWithAttributes⟩
+instance : FromJS SanitizerElementWithAttributes where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.object _) => (FromJS.fromJS d : Except String SanitizerElementNamespaceWithAttributes).map .sanitizerElementNamespaceWithAttributes
+    | _ => .error ""
+  typeName := "Lasm.JS.Web.SanitizerElementWithAttributes"
 
 /-- `dictionary SanitizerElementNamespace` (HTML Standard (https://html.spec.whatwg.org/multipage/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SanitizerElementNamespace where
@@ -658,6 +656,11 @@ structure SanitizerElementNamespace where
   «namespace» : Option String := none
 instance : ToJS SanitizerElementNamespace := ⟨fun d => Support.fields #[("name", toJS d.name),
     ("namespace", Support.optional d.«namespace»)]⟩
+instance : FromJS SanitizerElementNamespace where
+  fromJS d := do return {
+    name := ← Lasm.JS.readField String d "name",
+    «namespace» := ← Lasm.JS.readField (Option String) d "namespace" }
+  typeName := "Lasm.JS.Web.SanitizerElementNamespace"
 
 /-- `typedef DOMString or SanitizerElementNamespace SanitizerElement`: one constructor per member type. -/
 inductive SanitizerElement where
@@ -670,12 +673,22 @@ instance : ToJS SanitizerElement := ⟨fun
   | .sanitizerElementNamespace v => toJS v⟩
 instance : Coe String SanitizerElement := ⟨.domString⟩
 instance : Coe SanitizerElementNamespace SanitizerElement := ⟨.sanitizerElementNamespace⟩
+instance : FromJS SanitizerElement where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.object _) => (FromJS.fromJS d : Except String SanitizerElementNamespace).map .sanitizerElementNamespace
+    | _ => .error ""
+  typeName := "Lasm.JS.Web.SanitizerElement"
 
 /-- `dictionary SanitizerProcessingInstruction` (HTML Standard (https://html.spec.whatwg.org/multipage/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SanitizerProcessingInstruction where
   /-- `required DOMString target` -/
   target : String
 instance : ToJS SanitizerProcessingInstruction := ⟨fun d => Support.fields #[("target", toJS d.target)]⟩
+instance : FromJS SanitizerProcessingInstruction where
+  fromJS d := do return {
+    target := ← Lasm.JS.readField String d "target" }
+  typeName := "Lasm.JS.Web.SanitizerProcessingInstruction"
 
 /-- `typedef DOMString or SanitizerProcessingInstruction SanitizerPI`: one constructor per member type. -/
 inductive SanitizerPI where
@@ -688,6 +701,12 @@ instance : ToJS SanitizerPI := ⟨fun
   | .sanitizerProcessingInstruction v => toJS v⟩
 instance : Coe String SanitizerPI := ⟨.domString⟩
 instance : Coe SanitizerProcessingInstruction SanitizerPI := ⟨.sanitizerProcessingInstruction⟩
+instance : FromJS SanitizerPI where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.object _) => (FromJS.fromJS d : Except String SanitizerProcessingInstruction).map .sanitizerProcessingInstruction
+    | _ => .error ""
+  typeName := "Lasm.JS.Web.SanitizerPI"
 
 /-- `dictionary SanitizerConfig` (HTML Standard (https://html.spec.whatwg.org/multipage/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SanitizerConfig where
@@ -721,6 +740,19 @@ instance : ToJS SanitizerConfig := ⟨fun d => Support.fields #[("elements", Sup
     ("comments", Support.optional d.comments),
     ("dataAttributes", Support.optional d.dataAttributes),
     ("javascriptURLs", Support.optional d.javascriptURLs)]⟩
+instance : FromJS SanitizerConfig where
+  fromJS d := do return {
+    elements := ← Lasm.JS.readField (Option (Array SanitizerElementWithAttributes)) d "elements",
+    removeElements := ← Lasm.JS.readField (Option (Array SanitizerElement)) d "removeElements",
+    replaceWithChildrenElements := ← Lasm.JS.readField (Option (Array SanitizerElement)) d "replaceWithChildrenElements",
+    processingInstructions := ← Lasm.JS.readField (Option (Array SanitizerPI)) d "processingInstructions",
+    removeProcessingInstructions := ← Lasm.JS.readField (Option (Array SanitizerPI)) d "removeProcessingInstructions",
+    attributes := ← Lasm.JS.readField (Option (Array SanitizerAttribute)) d "attributes",
+    removeAttributes := ← Lasm.JS.readField (Option (Array SanitizerAttribute)) d "removeAttributes",
+    comments := ← Lasm.JS.readField (Option Bool) d "comments",
+    dataAttributes := ← Lasm.JS.readField (Option Bool) d "dataAttributes",
+    javascriptURLs := ← Lasm.JS.readField (Option Bool) d "javascriptURLs" }
+  typeName := "Lasm.JS.Web.SanitizerConfig"
 
 /-- `(Sanitizer or SanitizerConfig or SanitizerPresets)`: one constructor per member type. -/
 inductive SanitizerOrSanitizerConfigOrSanitizerPresets where
@@ -736,6 +768,13 @@ instance : ToJS SanitizerOrSanitizerConfigOrSanitizerPresets := ⟨fun
   | .sanitizerPresets v => toJS v⟩
 instance : Coe SanitizerConfig SanitizerOrSanitizerConfigOrSanitizerPresets := ⟨.sanitizerConfig⟩
 instance : Coe SanitizerPresets SanitizerOrSanitizerConfigOrSanitizerPresets := ⟨.sanitizerPresets⟩
+instance : FromJS SanitizerOrSanitizerConfigOrSanitizerPresets where
+  fromJS
+    | d@(.ref _ _) => (FromJS.fromJS d : Except String Value).map .sanitizer
+    | d@(.object _) => (FromJS.fromJS d : Except String SanitizerConfig).map .sanitizerConfig
+    | d@(.string _) => (FromJS.fromJS d : Except String SanitizerPresets).map .sanitizerPresets
+    | _ => .error ""
+  typeName := "Lasm.JS.Web.SanitizerOrSanitizerConfigOrSanitizerPresets"
 
 /-- `dictionary ParseHTMLUnsafeOptions` (HTML Standard (https://html.spec.whatwg.org/multipage/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ParseHTMLUnsafeOptions where
@@ -753,12 +792,6 @@ instance : ToJS ParseHTMLUnsafeOptionsOrTrustedHTMLParserOptions := ⟨fun
   | .parseHTMLUnsafeOptions v => toJS v
   | .trustedHTMLParserOptions v => toJS v⟩
 instance : Coe ParseHTMLUnsafeOptions ParseHTMLUnsafeOptionsOrTrustedHTMLParserOptions := ⟨.parseHTMLUnsafeOptions⟩
-
-/-- `dictionary SetHTMLOptions` (HTML Standard (https://html.spec.whatwg.org/multipage/)); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure SetHTMLOptions where
-  /-- `(Sanitizer or SanitizerConfig or SanitizerPresets) sanitizer = "default"` -/
-  sanitizer : Option SanitizerOrSanitizerConfigOrSanitizerPresets := none
-instance : ToJS SetHTMLOptions := ⟨fun d => Support.fields #[("sanitizer", Support.optional d.sanitizer)]⟩
 
 /-- `dictionary CaretPositionFromPointOptions` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CaretPositionFromPointOptions where
@@ -792,73 +825,6 @@ def XPathNSResolver.ofFn (f : (Option String) → Async (Option String)) : IO XP
 def XPathNSResolver.ofSyncFn (f : (Option String) → IO (Option String)) : IO XPathNSResolver := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Option String) args 0)) }
 
-/-- `typedef Text or Element or CSSPseudoElement or Document GeometryNode`: one constructor per member type. -/
-inductive GeometryNode where
-  /-- `Text` -/
-  | text (value : Text)
-  /-- `Element` -/
-  | element (value : Element)
-  /-- `CSSPseudoElement` -/
-  | cssPseudoElement (value : Value)
-  /-- `Document` -/
-  | document (value : Document)
-instance : ToJS GeometryNode := ⟨fun
-  | .text v => toJS v
-  | .element v => toJS v
-  | .cssPseudoElement v => toJS v
-  | .document v => toJS v⟩
-instance : Coe Text GeometryNode := ⟨.text⟩
-instance : Coe Element GeometryNode := ⟨.element⟩
-instance : Coe Document GeometryNode := ⟨.document⟩
-
-/-- `dictionary BoxQuadOptions` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure BoxQuadOptions where
-  /-- `CSSBoxType box = "border"` -/
-  box : Option CSSBoxType := none
-  /-- `GeometryNode relativeTo` -/
-  relativeTo : Option GeometryNode := none
-instance : ToJS BoxQuadOptions := ⟨fun d => Support.fields #[("box", Support.optional d.box),
-    ("relativeTo", Support.optional d.relativeTo)]⟩
-
-/-- `dictionary DOMPointInit` (Geometry Interfaces Module Level 1 (https://drafts.csswg.org/geometry-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure DOMPointInit where
-  /-- `unrestricted double x = 0` -/
-  x : Option Float := none
-  /-- `unrestricted double y = 0` -/
-  y : Option Float := none
-  /-- `unrestricted double z = 0` -/
-  z : Option Float := none
-  /-- `unrestricted double w = 1` -/
-  w : Option Float := none
-instance : ToJS DOMPointInit := ⟨fun d => Support.fields #[("x", Support.optional d.x),
-    ("y", Support.optional d.y),
-    ("z", Support.optional d.z),
-    ("w", Support.optional d.w)]⟩
-
-/-- `dictionary DOMQuadInit` (Geometry Interfaces Module Level 1 (https://drafts.csswg.org/geometry-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure DOMQuadInit where
-  /-- `DOMPointInit p1` -/
-  p1 : Option DOMPointInit := none
-  /-- `DOMPointInit p2` -/
-  p2 : Option DOMPointInit := none
-  /-- `DOMPointInit p3` -/
-  p3 : Option DOMPointInit := none
-  /-- `DOMPointInit p4` -/
-  p4 : Option DOMPointInit := none
-instance : ToJS DOMQuadInit := ⟨fun d => Support.fields #[("p1", Support.optional d.p1),
-    ("p2", Support.optional d.p2),
-    ("p3", Support.optional d.p3),
-    ("p4", Support.optional d.p4)]⟩
-
-/-- `dictionary ConvertCoordinateOptions` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ConvertCoordinateOptions where
-  /-- `CSSBoxType fromBox = "border"` -/
-  fromBox : Option CSSBoxType := none
-  /-- `CSSBoxType toBox = "border"` -/
-  toBox : Option CSSBoxType := none
-instance : ToJS ConvertCoordinateOptions := ⟨fun d => Support.fields #[("fromBox", Support.optional d.fromBox),
-    ("toBox", Support.optional d.toBox)]⟩
-
 /-- `dictionary SetHTMLUnsafeOptions` (HTML Standard (https://html.spec.whatwg.org/multipage/)); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SetHTMLUnsafeOptions where
   /-- `(Sanitizer or SanitizerConfig or SanitizerPresets) sanitizer` -/
@@ -867,6 +833,11 @@ structure SetHTMLUnsafeOptions where
   runScripts : Option Bool := none
 instance : ToJS SetHTMLUnsafeOptions := ⟨fun d => Support.fields #[("sanitizer", Support.optional d.sanitizer),
     ("runScripts", Support.optional d.runScripts)]⟩
+instance : FromJS SetHTMLUnsafeOptions where
+  fromJS d := do return {
+    sanitizer := ← Lasm.JS.readField (Option SanitizerOrSanitizerConfigOrSanitizerPresets) d "sanitizer",
+    runScripts := ← Lasm.JS.readField (Option Bool) d "runScripts" }
+  typeName := "Lasm.JS.Web.SetHTMLUnsafeOptions"
 
 /-- `(SetHTMLUnsafeOptions or TrustedHTMLParserOptions)`: one constructor per member type. -/
 inductive SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions where
@@ -1112,57 +1083,6 @@ structure WindowPostMessageOptions where
 instance : ToJS WindowPostMessageOptions := ⟨fun d => Support.fields #[("transfer", Support.optional d.transfer),
     ("targetOrigin", Support.optional d.targetOrigin)]⟩
 
-/-- `dictionary DeferredRequestInit : RequestInit` (Fetch Standard (https://fetch.spec.whatwg.org/)); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure DeferredRequestInit where
-  /-- `ByteString method` -/
-  method : Option String := none
-  /-- `HeadersInit headers` -/
-  headers : Option HeadersInit := none
-  /-- `BodyInit? body` -/
-  body : Option BodyInit := none
-  /-- `USVString referrer` -/
-  referrer : Option String := none
-  /-- `ReferrerPolicy referrerPolicy` -/
-  referrerPolicy : Option ReferrerPolicy := none
-  /-- `RequestMode mode` -/
-  mode : Option RequestMode := none
-  /-- `RequestCredentials credentials` -/
-  credentials : Option RequestCredentials := none
-  /-- `RequestCache cache` -/
-  cache : Option RequestCache := none
-  /-- `RequestRedirect redirect` -/
-  redirect : Option RequestRedirect := none
-  /-- `DOMString integrity` -/
-  integrity : Option String := none
-  /-- `boolean keepalive` -/
-  keepalive : Option Bool := none
-  /-- `AbortSignal? signal` -/
-  signal : Option AbortSignal := none
-  /-- `RequestDuplex duplex` -/
-  duplex : Option RequestDuplex := none
-  /-- `RequestPriority priority` -/
-  priority : Option RequestPriority := none
-  /-- `any window` -/
-  window : Data := .undefined
-  /-- `DOMHighResTimeStamp activateAfter` -/
-  activateAfter : Option Float := none
-instance : ToJS DeferredRequestInit := ⟨fun d => Support.fields #[("method", Support.optional d.method),
-    ("headers", Support.optional d.headers),
-    ("body", Support.optional d.body),
-    ("referrer", Support.optional d.referrer),
-    ("referrerPolicy", Support.optional d.referrerPolicy),
-    ("mode", Support.optional d.mode),
-    ("credentials", Support.optional d.credentials),
-    ("cache", Support.optional d.cache),
-    ("redirect", Support.optional d.redirect),
-    ("integrity", Support.optional d.integrity),
-    ("keepalive", Support.optional d.keepalive),
-    ("signal", Support.optional d.signal),
-    ("duplex", Support.optional d.duplex),
-    ("priority", Support.optional d.priority),
-    ("window", d.window),
-    ("activateAfter", Support.optional d.activateAfter)]⟩
-
 /-- `callback FrameRequestCallback = undefined (DOMHighResTimeStamp time)` (HTML Standard (https://html.spec.whatwg.org/multipage/)): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure FrameRequestCallback where
   /-- The JavaScript function. -/
@@ -1377,12 +1297,6 @@ def Document.compatMode (self : Document) : IO String := self.val.get "compatMod
 /-- `readonly attribute DOMString characterSet` -/
 def Document.characterSet (self : Document) : IO String := self.val.get "characterSet" String
 
-/-- `readonly attribute DOMString charset` -/
-def Document.charset (self : Document) : IO String := self.val.get "charset" String
-
-/-- `readonly attribute DOMString inputEncoding` -/
-def Document.inputEncoding (self : Document) : IO String := self.val.get "inputEncoding" String
-
 /-- `readonly attribute DOMString contentType` -/
 def Document.contentType (self : Document) : IO String := self.val.get "contentType" String
 
@@ -1394,13 +1308,6 @@ def Document.documentElement (self : Document) : IO (Option Element) := self.val
 
 /-- `readonly attribute Location? location` -/
 def Document.location (self : Document) : IO (Option Location) := self.val.get "location" (Option Location)
-
-/-- `attribute USVString domain` -/
-def Document.domain (self : Document) : IO String := self.val.get "domain" String
-
-/-- Sets `domain`: `attribute USVString domain` -/
-def Document.setDomain (self : Document) (value : String) : IO Unit :=
-  self.val.set "domain" (toJS value)
 
 /-- `readonly attribute USVString referrer` -/
 def Document.referrer (self : Document) : IO String := self.val.get "referrer" String
@@ -1493,59 +1400,8 @@ def Document.hidden (self : Document) : IO Bool := self.val.get "hidden" Bool
 /-- `readonly attribute DocumentVisibilityState visibilityState` -/
 def Document.visibilityState (self : Document) : IO DocumentVisibilityState := self.val.get "visibilityState" DocumentVisibilityState
 
-/-- `attribute DOMString fgColor` -/
-def Document.fgColor (self : Document) : IO String := self.val.get "fgColor" String
-
-/-- Sets `fgColor`: `attribute DOMString fgColor` -/
-def Document.setFgColor (self : Document) (value : String) : IO Unit :=
-  self.val.set "fgColor" (toJS value)
-
-/-- `attribute DOMString linkColor` -/
-def Document.linkColor (self : Document) : IO String := self.val.get "linkColor" String
-
-/-- Sets `linkColor`: `attribute DOMString linkColor` -/
-def Document.setLinkColor (self : Document) (value : String) : IO Unit :=
-  self.val.set "linkColor" (toJS value)
-
-/-- `attribute DOMString vlinkColor` -/
-def Document.vlinkColor (self : Document) : IO String := self.val.get "vlinkColor" String
-
-/-- Sets `vlinkColor`: `attribute DOMString vlinkColor` -/
-def Document.setVlinkColor (self : Document) (value : String) : IO Unit :=
-  self.val.set "vlinkColor" (toJS value)
-
-/-- `attribute DOMString alinkColor` -/
-def Document.alinkColor (self : Document) : IO String := self.val.get "alinkColor" String
-
-/-- Sets `alinkColor`: `attribute DOMString alinkColor` -/
-def Document.setAlinkColor (self : Document) (value : String) : IO Unit :=
-  self.val.set "alinkColor" (toJS value)
-
-/-- `attribute DOMString bgColor` -/
-def Document.bgColor (self : Document) : IO String := self.val.get "bgColor" String
-
-/-- Sets `bgColor`: `attribute DOMString bgColor` -/
-def Document.setBgColor (self : Document) (value : String) : IO Unit :=
-  self.val.set "bgColor" (toJS value)
-
-/-- `readonly attribute HTMLCollection anchors` -/
-def Document.anchors (self : Document) : IO HTMLCollection := do
-  let r ← self.val.get "anchors" Value
-  pure { val := r }
-
-/-- `readonly attribute HTMLCollection applets` -/
-def Document.applets (self : Document) : IO HTMLCollection := do
-  let r ← self.val.get "applets" Value
-  pure { val := r }
-
-/-- `readonly attribute HTMLAllCollection all` -/
-def Document.all (self : Document) : IO Data := self.val.get "all" Data
-
 /-- `readonly attribute Element? scrollingElement` -/
 def Document.scrollingElement (self : Document) : IO (Option Element) := self.val.get "scrollingElement" (Option Element)
-
-/-- `readonly attribute CustomElementRegistry? customElementRegistry` -/
-def Document.customElementRegistry (self : Document) : IO (Option Data) := self.val.get "customElementRegistry" (Option Data)
 
 /-- `readonly attribute Element? activeElement` -/
 def Document.activeElement (self : Document) : IO (Option Element) := self.val.get "activeElement" (Option Element)
@@ -1642,11 +1498,6 @@ def Document.createAttributeNS (self : Document) («namespace» : Option String)
   let r ← self.val.callMethod "createAttributeNS" (Support.args #[toJS «namespace», toJS qualifiedName]) Value
   pure { val := r }
 
-/-- `Event createEvent(DOMString interface)` -/
-def Document.createEvent (self : Document) (interface : String) : IO Event := do
-  let r ← self.val.callMethod "createEvent" (Support.args #[toJS interface]) Value
-  pure { val := r }
-
 /-- `Range createRange()` -/
 def Document.createRange (self : Document) : IO Data :=
   self.val.callMethod "createRange" (Support.args #[]) Data
@@ -1662,12 +1513,6 @@ def Document.createTreeWalker (self : Document) (root : Node) (whatToShow : Opti
 /-- `static Document parseHTMLUnsafe((TrustedHTML or DOMString) html, optional (ParseHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 def Document.parseHTMLUnsafe (html : TrustedHTMLOrDOMString) (options : Option ParseHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Document := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Document.parseHTMLUnsafe", module := "globalThis", path := "Document.parseHTMLUnsafe", construct := false, arity := 2 }
-    (Support.args #[toJS html, Support.optional options]) (await := false)
-  pure { val := r }
-
-/-- `static Document parseHTML(DOMString html, optional SetHTMLOptions options)` -/
-def Document.parseHTML (html : String) (options : Option SetHTMLOptions := none) : IO Document := do
-  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Document.parseHTML", module := "globalThis", path := "Document.parseHTML", construct := false, arity := 2 }
     (Support.args #[toJS html, Support.optional options]) (await := false)
   pure { val := r }
 
@@ -1689,53 +1534,9 @@ def Document.openWithUrl (self : Document) (url : String) (name : String) (featu
 def Document.close (self : Document) : IO Unit :=
   self.val.callMethod "close" (Support.args #[]) Unit
 
-/-- `undefined write((TrustedHTML or DOMString)... text)` -/
-def Document.write (self : Document) (text : Array TrustedHTMLOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "write" (Support.argsWith #[] (text.map toJS)) Unit
-
-/-- `undefined writeln((TrustedHTML or DOMString)... text)` -/
-def Document.writeln (self : Document) (text : Array TrustedHTMLOrDOMString := #[]) : IO Unit :=
-  self.val.callMethod "writeln" (Support.argsWith #[] (text.map toJS)) Unit
-
 /-- `boolean hasFocus()` -/
 def Document.hasFocus (self : Document) : IO Bool :=
   self.val.callMethod "hasFocus" (Support.args #[]) Bool
-
-/-- `boolean execCommand(DOMString commandId, optional boolean showUI, optional DOMString value)` -/
-def Document.execCommand (self : Document) (commandId : String) (showUI : Option Bool := none) (value : Option String := none) : IO Bool :=
-  self.val.callMethod "execCommand" (Support.args #[toJS commandId, Support.optional showUI, Support.optional value]) Bool
-
-/-- `boolean queryCommandEnabled(DOMString commandId)` -/
-def Document.queryCommandEnabled (self : Document) (commandId : String) : IO Bool :=
-  self.val.callMethod "queryCommandEnabled" (Support.args #[toJS commandId]) Bool
-
-/-- `boolean queryCommandIndeterm(DOMString commandId)` -/
-def Document.queryCommandIndeterm (self : Document) (commandId : String) : IO Bool :=
-  self.val.callMethod "queryCommandIndeterm" (Support.args #[toJS commandId]) Bool
-
-/-- `boolean queryCommandState(DOMString commandId)` -/
-def Document.queryCommandState (self : Document) (commandId : String) : IO Bool :=
-  self.val.callMethod "queryCommandState" (Support.args #[toJS commandId]) Bool
-
-/-- `boolean queryCommandSupported(DOMString commandId)` -/
-def Document.queryCommandSupported (self : Document) (commandId : String) : IO Bool :=
-  self.val.callMethod "queryCommandSupported" (Support.args #[toJS commandId]) Bool
-
-/-- `DOMString queryCommandValue(DOMString commandId)` -/
-def Document.queryCommandValue (self : Document) (commandId : String) : IO String :=
-  self.val.callMethod "queryCommandValue" (Support.args #[toJS commandId]) String
-
-/-- `undefined clear()` -/
-def Document.clear (self : Document) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
-
-/-- `undefined captureEvents()` -/
-def Document.captureEvents (self : Document) : IO Unit :=
-  self.val.callMethod "captureEvents" (Support.args #[]) Unit
-
-/-- `undefined releaseEvents()` -/
-def Document.releaseEvents (self : Document) : IO Unit :=
-  self.val.callMethod "releaseEvents" (Support.args #[]) Unit
 
 /-- `Element? elementFromPoint(double x, double y)` -/
 def Document.elementFromPoint (self : Document) (x : Float) (y : Float) : IO (Option Element) :=
@@ -1765,10 +1566,6 @@ def Document.append (self : Document) (nodes : Array NodeOrDOMString := #[]) : I
 def Document.replaceChildren (self : Document) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
   self.val.callMethod "replaceChildren" (Support.argsWith #[] (nodes.map toJS)) Unit
 
-/-- `undefined moveBefore(Node node, Node? child)` -/
-def Document.moveBefore (self : Document) (node : Node) (child : Option Node) : IO Unit :=
-  self.val.callMethod "moveBefore" (Support.args #[toJS node, toJS child]) Unit
-
 /-- `Element? querySelector(DOMString selectors)` -/
 def Document.querySelector (self : Document) (selectors : String) : IO (Option Element) :=
   self.val.callMethod "querySelector" (Support.args #[toJS selectors]) (Option Element)
@@ -1782,30 +1579,9 @@ def Document.querySelectorAll (self : Document) (selectors : String) : IO NodeLi
 def Document.createExpression (self : Document) (expression : String) (resolver : Option XPathNSResolver := none) : IO Data :=
   self.val.callMethod "createExpression" (Support.args #[toJS expression, Support.optional resolver]) Data
 
-/-- `Node createNSResolver(Node nodeResolver)` -/
-def Document.createNSResolver (self : Document) (nodeResolver : Node) : IO Node := do
-  let r ← self.val.callMethod "createNSResolver" (Support.args #[toJS nodeResolver]) Value
-  pure { val := r }
-
 /-- `XPathResult evaluate(DOMString expression, Node contextNode, optional XPathNSResolver? resolver, optional unsigned short type, optional XPathResult? result)` -/
 def Document.evaluate (self : Document) (expression : String) (contextNode : Node) (resolver : Option XPathNSResolver := none) (type : Option Nat := none) (result : Option Value := none) : IO Data :=
   self.val.callMethod "evaluate" (Support.args #[toJS expression, toJS contextNode, Support.optional resolver, Support.optional type, Support.optional result]) Data
-
-/-- `sequence<DOMQuad> getBoxQuads(optional BoxQuadOptions options)` -/
-def Document.getBoxQuads (self : Document) (options : Option BoxQuadOptions := none) : IO (Array Data) :=
-  self.val.callMethod "getBoxQuads" (Support.args #[Support.optional options]) (Array Data)
-
-/-- `DOMQuad convertQuadFromNode(DOMQuadInit quad, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Document.convertQuadFromNode (self : Document) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO Data :=
-  self.val.callMethod "convertQuadFromNode" (Support.args #[toJS quad, toJS «from», Support.optional options]) Data
-
-/-- `DOMQuad convertRectFromNode(DOMRectReadOnly rect, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Document.convertRectFromNode (self : Document) (rect : DOMRectReadOnly) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO Data :=
-  self.val.callMethod "convertRectFromNode" (Support.args #[toJS rect, toJS «from», Support.optional options]) Data
-
-/-- `DOMPoint convertPointFromNode(DOMPointInit point, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Document.convertPointFromNode (self : Document) (point : DOMPointInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO Data :=
-  self.val.callMethod "convertPointFromNode" (Support.args #[toJS point, toJS «from», Support.optional options]) Data
 
 /-- `v instanceof DocumentType`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DocumentType`). -/
 def DocumentType.cast? (v : Value) : IO (Option DocumentType) := do
@@ -1875,10 +1651,6 @@ def DocumentFragment.append (self : DocumentFragment) (nodes : Array NodeOrDOMSt
 def DocumentFragment.replaceChildren (self : DocumentFragment) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
   self.val.callMethod "replaceChildren" (Support.argsWith #[] (nodes.map toJS)) Unit
 
-/-- `undefined moveBefore(Node node, Node? child)` -/
-def DocumentFragment.moveBefore (self : DocumentFragment) (node : Node) (child : Option Node) : IO Unit :=
-  self.val.callMethod "moveBefore" (Support.args #[toJS node, toJS child]) Unit
-
 /-- `Element? querySelector(DOMString selectors)` -/
 def DocumentFragment.querySelector (self : DocumentFragment) (selectors : String) : IO (Option Element) :=
   self.val.callMethod "querySelector" (Support.args #[toJS selectors]) (Option Element)
@@ -1919,9 +1691,6 @@ def ShadowRoot.innerHTML (self : ShadowRoot) : IO TrustedHTMLOrDOMString := self
 def ShadowRoot.setInnerHTML (self : ShadowRoot) (value : TrustedHTMLOrDOMString) : IO Unit :=
   self.val.set "innerHTML" (toJS value)
 
-/-- `readonly attribute CustomElementRegistry? customElementRegistry` -/
-def ShadowRoot.customElementRegistry (self : ShadowRoot) : IO (Option Data) := self.val.get "customElementRegistry" (Option Data)
-
 /-- `readonly attribute Element? activeElement` -/
 def ShadowRoot.activeElement (self : ShadowRoot) : IO (Option Element) := self.val.get "activeElement" (Option Element)
 
@@ -1935,29 +1704,9 @@ def ShadowRoot.adoptedStyleSheets (self : ShadowRoot) : IO (Array Data) := self.
 def ShadowRoot.setAdoptedStyleSheets (self : ShadowRoot) (value : Array Value) : IO Unit :=
   self.val.set "adoptedStyleSheets" (toJS value)
 
-/-- `undefined setHTML(DOMString html, optional SetHTMLOptions options)` -/
-def ShadowRoot.setHTML (self : ShadowRoot) (html : String) (options : Option SetHTMLOptions := none) : IO Unit :=
-  self.val.callMethod "setHTML" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined appendHTML(DOMString html, optional SetHTMLOptions options)` -/
-def ShadowRoot.appendHTML (self : ShadowRoot) (html : String) (options : Option SetHTMLOptions := none) : IO Unit :=
-  self.val.callMethod "appendHTML" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined prependHTML(DOMString html, optional SetHTMLOptions options)` -/
-def ShadowRoot.prependHTML (self : ShadowRoot) (html : String) (options : Option SetHTMLOptions := none) : IO Unit :=
-  self.val.callMethod "prependHTML" (Support.args #[toJS html, Support.optional options]) Unit
-
 /-- `undefined setHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 def ShadowRoot.setHTMLUnsafe (self : ShadowRoot) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit :=
   self.val.callMethod "setHTMLUnsafe" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined appendHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
-def ShadowRoot.appendHTMLUnsafe (self : ShadowRoot) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit :=
-  self.val.callMethod "appendHTMLUnsafe" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined prependHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
-def ShadowRoot.prependHTMLUnsafe (self : ShadowRoot) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit :=
-  self.val.callMethod "prependHTMLUnsafe" (Support.args #[toJS html, Support.optional options]) Unit
 
 /-- `DOMString getHTML(optional GetHTMLOptions options)` -/
 def ShadowRoot.getHTML (self : ShadowRoot) (options : Option GetHTMLOptions := none) : IO String :=
@@ -2012,9 +1761,6 @@ def Element.attributes (self : Element) : IO NamedNodeMap := do
 
 /-- `readonly attribute ShadowRoot? shadowRoot` -/
 def Element.shadowRoot (self : Element) : IO (Option ShadowRoot) := self.val.get "shadowRoot" (Option ShadowRoot)
-
-/-- `readonly attribute CustomElementRegistry? customElementRegistry` -/
-def Element.customElementRegistry (self : Element) : IO (Option Data) := self.val.get "customElementRegistry" (Option Data)
 
 /-- `attribute (TrustedHTML or DOMString) innerHTML` -/
 def Element.innerHTML (self : Element) : IO TrustedHTMLOrDOMString := self.val.get "innerHTML" TrustedHTMLOrDOMString
@@ -2166,10 +1912,6 @@ def Element.closest (self : Element) (selectors : String) : IO (Option Element) 
 def Element.«matches» (self : Element) (selectors : String) : IO Bool :=
   self.val.callMethod "matches" (Support.args #[toJS selectors]) Bool
 
-/-- `boolean webkitMatchesSelector(DOMString selectors)` -/
-def Element.webkitMatchesSelector (self : Element) (selectors : String) : IO Bool :=
-  self.val.callMethod "webkitMatchesSelector" (Support.args #[toJS selectors]) Bool
-
 /-- `HTMLCollection getElementsByTagName(DOMString qualifiedName)` -/
 def Element.getElementsByTagName (self : Element) (qualifiedName : String) : IO HTMLCollection := do
   let r ← self.val.callMethod "getElementsByTagName" (Support.args #[toJS qualifiedName]) Value
@@ -2193,29 +1935,9 @@ def Element.insertAdjacentElement (self : Element) («where» : String) (element
 def Element.insertAdjacentText (self : Element) («where» : String) (data : String) : IO Unit :=
   self.val.callMethod "insertAdjacentText" (Support.args #[toJS «where», toJS data]) Unit
 
-/-- `undefined setHTML(DOMString html, optional SetHTMLOptions options)` -/
-def Element.setHTML (self : Element) (html : String) (options : Option SetHTMLOptions := none) : IO Unit :=
-  self.val.callMethod "setHTML" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined appendHTML(DOMString html, optional SetHTMLOptions options)` -/
-def Element.appendHTML (self : Element) (html : String) (options : Option SetHTMLOptions := none) : IO Unit :=
-  self.val.callMethod "appendHTML" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined prependHTML(DOMString html, optional SetHTMLOptions options)` -/
-def Element.prependHTML (self : Element) (html : String) (options : Option SetHTMLOptions := none) : IO Unit :=
-  self.val.callMethod "prependHTML" (Support.args #[toJS html, Support.optional options]) Unit
-
 /-- `undefined setHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 def Element.setHTMLUnsafe (self : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit :=
   self.val.callMethod "setHTMLUnsafe" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined appendHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
-def Element.appendHTMLUnsafe (self : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit :=
-  self.val.callMethod "appendHTMLUnsafe" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined prependHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
-def Element.prependHTMLUnsafe (self : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit :=
-  self.val.callMethod "prependHTMLUnsafe" (Support.args #[toJS html, Support.optional options]) Unit
 
 /-- `DOMString getHTML(optional GetHTMLOptions options)` -/
 def Element.getHTML (self : Element) (options : Option GetHTMLOptions := none) : IO String :=
@@ -2291,10 +2013,6 @@ def Element.append (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO 
 def Element.replaceChildren (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
   self.val.callMethod "replaceChildren" (Support.argsWith #[] (nodes.map toJS)) Unit
 
-/-- `undefined moveBefore(Node node, Node? child)` -/
-def Element.moveBefore (self : Element) (node : Node) (child : Option Node) : IO Unit :=
-  self.val.callMethod "moveBefore" (Support.args #[toJS node, toJS child]) Unit
-
 /-- `Element? querySelector(DOMString selectors)` -/
 def Element.querySelector (self : Element) (selectors : String) : IO (Option Element) :=
   self.val.callMethod "querySelector" (Support.args #[toJS selectors]) (Option Element)
@@ -2303,30 +2021,6 @@ def Element.querySelector (self : Element) (selectors : String) : IO (Option Ele
 def Element.querySelectorAll (self : Element) (selectors : String) : IO NodeList := do
   let r ← self.val.callMethod "querySelectorAll" (Support.args #[toJS selectors]) Value
   pure { val := r }
-
-/-- `undefined beforeHTML(DOMString html, optional SetHTMLOptions options)` -/
-def Element.beforeHTML (self : Element) (html : String) (options : Option SetHTMLOptions := none) : IO Unit :=
-  self.val.callMethod "beforeHTML" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined afterHTML(DOMString html, optional SetHTMLOptions options)` -/
-def Element.afterHTML (self : Element) (html : String) (options : Option SetHTMLOptions := none) : IO Unit :=
-  self.val.callMethod "afterHTML" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined replaceWithHTML(DOMString html, optional SetHTMLOptions options)` -/
-def Element.replaceWithHTML (self : Element) (html : String) (options : Option SetHTMLOptions := none) : IO Unit :=
-  self.val.callMethod "replaceWithHTML" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined beforeHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
-def Element.beforeHTMLUnsafe (self : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit :=
-  self.val.callMethod "beforeHTMLUnsafe" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined afterHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
-def Element.afterHTMLUnsafe (self : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit :=
-  self.val.callMethod "afterHTMLUnsafe" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined replaceWithHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
-def Element.replaceWithHTMLUnsafe (self : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit :=
-  self.val.callMethod "replaceWithHTMLUnsafe" (Support.args #[toJS html, Support.optional options]) Unit
 
 /-- `undefined before((Node or DOMString)... nodes)` -/
 def Element.before (self : Element) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
@@ -2343,22 +2037,6 @@ def Element.replaceWith (self : Element) (nodes : Array NodeOrDOMString := #[]) 
 /-- `undefined remove()` -/
 def Element.remove (self : Element) : IO Unit :=
   self.val.callMethod "remove" (Support.args #[]) Unit
-
-/-- `sequence<DOMQuad> getBoxQuads(optional BoxQuadOptions options)` -/
-def Element.getBoxQuads (self : Element) (options : Option BoxQuadOptions := none) : IO (Array Data) :=
-  self.val.callMethod "getBoxQuads" (Support.args #[Support.optional options]) (Array Data)
-
-/-- `DOMQuad convertQuadFromNode(DOMQuadInit quad, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Element.convertQuadFromNode (self : Element) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO Data :=
-  self.val.callMethod "convertQuadFromNode" (Support.args #[toJS quad, toJS «from», Support.optional options]) Data
-
-/-- `DOMQuad convertRectFromNode(DOMRectReadOnly rect, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Element.convertRectFromNode (self : Element) (rect : DOMRectReadOnly) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO Data :=
-  self.val.callMethod "convertRectFromNode" (Support.args #[toJS rect, toJS «from», Support.optional options]) Data
-
-/-- `DOMPoint convertPointFromNode(DOMPointInit point, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Element.convertPointFromNode (self : Element) (point : DOMPointInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO Data :=
-  self.val.callMethod "convertPointFromNode" (Support.args #[toJS point, toJS «from», Support.optional options]) Data
 
 /-- `v instanceof Attr`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Attr`). -/
 def Attr.cast? (v : Value) : IO (Option Attr) := do
@@ -2385,9 +2063,6 @@ def Attr.setValue (self : Attr) (value : String) : IO Unit :=
 
 /-- `readonly attribute Element? ownerElement` -/
 def Attr.ownerElement (self : Attr) : IO (Option Element) := self.val.get "ownerElement" (Option Element)
-
-/-- `readonly attribute boolean specified` -/
-def Attr.specified (self : Attr) : IO Bool := self.val.get "specified" Bool
 
 /-- `v instanceof NamedNodeMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NamedNodeMap`). -/
 def NamedNodeMap.cast? (v : Value) : IO (Option NamedNodeMap) := do
@@ -2466,30 +2141,6 @@ def CharacterData.deleteData (self : CharacterData) (offset : Nat) (count : Nat)
 def CharacterData.replaceData (self : CharacterData) (offset : Nat) (count : Nat) (data : String) : IO Unit :=
   self.val.callMethod "replaceData" (Support.args #[toJS offset, toJS count, toJS data]) Unit
 
-/-- `undefined beforeHTML(DOMString html, optional SetHTMLOptions options)` -/
-def CharacterData.beforeHTML (self : CharacterData) (html : String) (options : Option SetHTMLOptions := none) : IO Unit :=
-  self.val.callMethod "beforeHTML" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined afterHTML(DOMString html, optional SetHTMLOptions options)` -/
-def CharacterData.afterHTML (self : CharacterData) (html : String) (options : Option SetHTMLOptions := none) : IO Unit :=
-  self.val.callMethod "afterHTML" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined replaceWithHTML(DOMString html, optional SetHTMLOptions options)` -/
-def CharacterData.replaceWithHTML (self : CharacterData) (html : String) (options : Option SetHTMLOptions := none) : IO Unit :=
-  self.val.callMethod "replaceWithHTML" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined beforeHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
-def CharacterData.beforeHTMLUnsafe (self : CharacterData) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit :=
-  self.val.callMethod "beforeHTMLUnsafe" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined afterHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
-def CharacterData.afterHTMLUnsafe (self : CharacterData) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit :=
-  self.val.callMethod "afterHTMLUnsafe" (Support.args #[toJS html, Support.optional options]) Unit
-
-/-- `undefined replaceWithHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
-def CharacterData.replaceWithHTMLUnsafe (self : CharacterData) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit :=
-  self.val.callMethod "replaceWithHTMLUnsafe" (Support.args #[toJS html, Support.optional options]) Unit
-
 /-- `undefined before((Node or DOMString)... nodes)` -/
 def CharacterData.before (self : CharacterData) (nodes : Array NodeOrDOMString := #[]) : IO Unit :=
   self.val.callMethod "before" (Support.argsWith #[] (nodes.map toJS)) Unit
@@ -2525,22 +2176,6 @@ def Text.assignedSlot (self : Text) : IO (Option Data) := self.val.get "assigned
 def Text.splitText (self : Text) (offset : Nat) : IO Text := do
   let r ← self.val.callMethod "splitText" (Support.args #[toJS offset]) Value
   pure { val := r }
-
-/-- `sequence<DOMQuad> getBoxQuads(optional BoxQuadOptions options)` -/
-def Text.getBoxQuads (self : Text) (options : Option BoxQuadOptions := none) : IO (Array Data) :=
-  self.val.callMethod "getBoxQuads" (Support.args #[Support.optional options]) (Array Data)
-
-/-- `DOMQuad convertQuadFromNode(DOMQuadInit quad, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Text.convertQuadFromNode (self : Text) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO Data :=
-  self.val.callMethod "convertQuadFromNode" (Support.args #[toJS quad, toJS «from», Support.optional options]) Data
-
-/-- `DOMQuad convertRectFromNode(DOMRectReadOnly rect, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Text.convertRectFromNode (self : Text) (rect : DOMRectReadOnly) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO Data :=
-  self.val.callMethod "convertRectFromNode" (Support.args #[toJS rect, toJS «from», Support.optional options]) Data
-
-/-- `DOMPoint convertPointFromNode(DOMPointInit point, GeometryNode from, optional ConvertCoordinateOptions options)` -/
-def Text.convertPointFromNode (self : Text) (point : DOMPointInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO Data :=
-  self.val.callMethod "convertPointFromNode" (Support.args #[toJS point, toJS «from», Support.optional options]) Data
 
 /-- `v instanceof Comment`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Comment`). -/
 def Comment.cast? (v : Value) : IO (Option Comment) := do
@@ -2745,9 +2380,6 @@ def HTMLElement.accessKey (self : HTMLElement) : IO String := self.val.get "acce
 def HTMLElement.setAccessKey (self : HTMLElement) (value : String) : IO Unit :=
   self.val.set "accessKey" (toJS value)
 
-/-- `readonly attribute DOMString accessKeyLabel` -/
-def HTMLElement.accessKeyLabel (self : HTMLElement) : IO String := self.val.get "accessKeyLabel" String
-
 /-- `attribute boolean draggable` -/
 def HTMLElement.draggable (self : HTMLElement) : IO Bool := self.val.get "draggable" Bool
 
@@ -2761,20 +2393,6 @@ def HTMLElement.spellcheck (self : HTMLElement) : IO Bool := self.val.get "spell
 /-- Sets `spellcheck`: `attribute boolean spellcheck` -/
 def HTMLElement.setSpellcheck (self : HTMLElement) (value : Bool) : IO Unit :=
   self.val.set "spellcheck" (toJS value)
-
-/-- `attribute DOMString writingSuggestions` -/
-def HTMLElement.writingSuggestions (self : HTMLElement) : IO String := self.val.get "writingSuggestions" String
-
-/-- Sets `writingSuggestions`: `attribute DOMString writingSuggestions` -/
-def HTMLElement.setWritingSuggestions (self : HTMLElement) (value : String) : IO Unit :=
-  self.val.set "writingSuggestions" (toJS value)
-
-/-- `attribute DOMString autocapitalize` -/
-def HTMLElement.autocapitalize (self : HTMLElement) : IO String := self.val.get "autocapitalize" String
-
-/-- Sets `autocapitalize`: `attribute DOMString autocapitalize` -/
-def HTMLElement.setAutocapitalize (self : HTMLElement) (value : String) : IO Unit :=
-  self.val.set "autocapitalize" (toJS value)
 
 /-- `attribute boolean autocorrect` -/
 def HTMLElement.autocorrect (self : HTMLElement) : IO Bool := self.val.get "autocorrect" Bool
@@ -2803,23 +2421,6 @@ def HTMLElement.popover (self : HTMLElement) : IO (Option String) := self.val.ge
 /-- Sets `popover`: `attribute DOMString? popover` -/
 def HTMLElement.setPopover (self : HTMLElement) (value : Option String) : IO Unit :=
   self.val.set "popover" (toJS value)
-
-/-- `attribute unsigned long headingOffset` -/
-def HTMLElement.headingOffset (self : HTMLElement) : IO Nat := self.val.get "headingOffset" Nat
-
-/-- Sets `headingOffset`: `attribute unsigned long headingOffset` -/
-def HTMLElement.setHeadingOffset (self : HTMLElement) (value : Nat) : IO Unit :=
-  self.val.set "headingOffset" (toJS value)
-
-/-- `attribute boolean headingReset` -/
-def HTMLElement.headingReset (self : HTMLElement) : IO Bool := self.val.get "headingReset" Bool
-
-/-- Sets `headingReset`: `attribute boolean headingReset` -/
-def HTMLElement.setHeadingReset (self : HTMLElement) (value : Bool) : IO Unit :=
-  self.val.set "headingReset" (toJS value)
-
-/-- `readonly attribute Element? scrollParent` -/
-def HTMLElement.scrollParent (self : HTMLElement) : IO (Option Element) := self.val.get "scrollParent" (Option Element)
 
 /-- `readonly attribute Element? offsetParent` -/
 def HTMLElement.offsetParent (self : HTMLElement) : IO (Option Element) := self.val.get "offsetParent" (Option Element)
@@ -2930,13 +2531,6 @@ def HTMLAnchorElement.download (self : HTMLAnchorElement) : IO String := self.va
 def HTMLAnchorElement.setDownload (self : HTMLAnchorElement) (value : String) : IO Unit :=
   self.val.set "download" (toJS value)
 
-/-- `attribute USVString ping` -/
-def HTMLAnchorElement.ping (self : HTMLAnchorElement) : IO String := self.val.get "ping" String
-
-/-- Sets `ping`: `attribute USVString ping` -/
-def HTMLAnchorElement.setPing (self : HTMLAnchorElement) (value : String) : IO Unit :=
-  self.val.set "ping" (toJS value)
-
 /-- `attribute DOMString rel` -/
 def HTMLAnchorElement.rel (self : HTMLAnchorElement) : IO String := self.val.get "rel" String
 
@@ -2962,41 +2556,6 @@ def HTMLAnchorElement.referrerPolicy (self : HTMLAnchorElement) : IO String := s
 /-- Sets `referrerPolicy`: `attribute DOMString referrerPolicy` -/
 def HTMLAnchorElement.setReferrerPolicy (self : HTMLAnchorElement) (value : String) : IO Unit :=
   self.val.set "referrerPolicy" (toJS value)
-
-/-- `attribute DOMString coords` -/
-def HTMLAnchorElement.coords (self : HTMLAnchorElement) : IO String := self.val.get "coords" String
-
-/-- Sets `coords`: `attribute DOMString coords` -/
-def HTMLAnchorElement.setCoords (self : HTMLAnchorElement) (value : String) : IO Unit :=
-  self.val.set "coords" (toJS value)
-
-/-- `attribute DOMString charset` -/
-def HTMLAnchorElement.charset (self : HTMLAnchorElement) : IO String := self.val.get "charset" String
-
-/-- Sets `charset`: `attribute DOMString charset` -/
-def HTMLAnchorElement.setCharset (self : HTMLAnchorElement) (value : String) : IO Unit :=
-  self.val.set "charset" (toJS value)
-
-/-- `attribute DOMString name` -/
-def HTMLAnchorElement.name (self : HTMLAnchorElement) : IO String := self.val.get "name" String
-
-/-- Sets `name`: `attribute DOMString name` -/
-def HTMLAnchorElement.setName (self : HTMLAnchorElement) (value : String) : IO Unit :=
-  self.val.set "name" (toJS value)
-
-/-- `attribute DOMString rev` -/
-def HTMLAnchorElement.rev (self : HTMLAnchorElement) : IO String := self.val.get "rev" String
-
-/-- Sets `rev`: `attribute DOMString rev` -/
-def HTMLAnchorElement.setRev (self : HTMLAnchorElement) (value : String) : IO Unit :=
-  self.val.set "rev" (toJS value)
-
-/-- `attribute DOMString shape` -/
-def HTMLAnchorElement.shape (self : HTMLAnchorElement) : IO String := self.val.get "shape" String
-
-/-- Sets `shape`: `attribute DOMString shape` -/
-def HTMLAnchorElement.setShape (self : HTMLAnchorElement) (value : String) : IO Unit :=
-  self.val.set "shape" (toJS value)
 
 /-- `readonly attribute USVString origin` -/
 def HTMLAnchorElement.origin (self : HTMLAnchorElement) : IO String := self.val.get "origin" String
@@ -3239,13 +2798,6 @@ def HTMLDialogElement.returnValue (self : HTMLDialogElement) : IO String := self
 def HTMLDialogElement.setReturnValue (self : HTMLDialogElement) (value : String) : IO Unit :=
   self.val.set "returnValue" (toJS value)
 
-/-- `attribute DOMString closedBy` -/
-def HTMLDialogElement.closedBy (self : HTMLDialogElement) : IO String := self.val.get "closedBy" String
-
-/-- Sets `closedBy`: `attribute DOMString closedBy` -/
-def HTMLDialogElement.setClosedBy (self : HTMLDialogElement) (value : String) : IO Unit :=
-  self.val.set "closedBy" (toJS value)
-
 /-- `undefined show()` -/
 def HTMLDialogElement.«show» (self : HTMLDialogElement) : IO Unit :=
   self.val.callMethod "show" (Support.args #[]) Unit
@@ -3265,13 +2817,6 @@ def HTMLDialogElement.requestClose (self : HTMLDialogElement) (returnValue : Opt
 /-- `v instanceof HTMLDivElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLDivElement`). -/
 def HTMLDivElement.cast? (v : Value) : IO (Option HTMLDivElement) := do
   return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLDivElement"] Value) v) then some { val := v } else none
-
-/-- `attribute DOMString align` -/
-def HTMLDivElement.align (self : HTMLDivElement) : IO String := self.val.get "align" String
-
-/-- Sets `align`: `attribute DOMString align` -/
-def HTMLDivElement.setAlign (self : HTMLDivElement) (value : String) : IO Unit :=
-  self.val.set "align" (toJS value)
 
 /-- `v instanceof HTMLFormElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLFormElement`). -/
 def HTMLFormElement.cast? (v : Value) : IO (Option HTMLFormElement) := do
@@ -3437,13 +2982,6 @@ def HTMLImageElement.isMap (self : HTMLImageElement) : IO Bool := self.val.get "
 def HTMLImageElement.setIsMap (self : HTMLImageElement) (value : Bool) : IO Unit :=
   self.val.set "isMap" (toJS value)
 
-/-- `attribute boolean controls` -/
-def HTMLImageElement.controls (self : HTMLImageElement) : IO Bool := self.val.get "controls" Bool
-
-/-- Sets `controls`: `attribute boolean controls` -/
-def HTMLImageElement.setControls (self : HTMLImageElement) (value : Bool) : IO Unit :=
-  self.val.set "controls" (toJS value)
-
 /-- `attribute unsigned long width` -/
 def HTMLImageElement.width (self : HTMLImageElement) : IO Nat := self.val.get "width" Nat
 
@@ -3498,55 +3036,6 @@ def HTMLImageElement.fetchPriority (self : HTMLImageElement) : IO String := self
 def HTMLImageElement.setFetchPriority (self : HTMLImageElement) (value : String) : IO Unit :=
   self.val.set "fetchPriority" (toJS value)
 
-/-- `attribute DOMString name` -/
-def HTMLImageElement.name (self : HTMLImageElement) : IO String := self.val.get "name" String
-
-/-- Sets `name`: `attribute DOMString name` -/
-def HTMLImageElement.setName (self : HTMLImageElement) (value : String) : IO Unit :=
-  self.val.set "name" (toJS value)
-
-/-- `attribute USVString lowsrc` -/
-def HTMLImageElement.lowsrc (self : HTMLImageElement) : IO String := self.val.get "lowsrc" String
-
-/-- Sets `lowsrc`: `attribute USVString lowsrc` -/
-def HTMLImageElement.setLowsrc (self : HTMLImageElement) (value : String) : IO Unit :=
-  self.val.set "lowsrc" (toJS value)
-
-/-- `attribute DOMString align` -/
-def HTMLImageElement.align (self : HTMLImageElement) : IO String := self.val.get "align" String
-
-/-- Sets `align`: `attribute DOMString align` -/
-def HTMLImageElement.setAlign (self : HTMLImageElement) (value : String) : IO Unit :=
-  self.val.set "align" (toJS value)
-
-/-- `attribute unsigned long hspace` -/
-def HTMLImageElement.hspace (self : HTMLImageElement) : IO Nat := self.val.get "hspace" Nat
-
-/-- Sets `hspace`: `attribute unsigned long hspace` -/
-def HTMLImageElement.setHspace (self : HTMLImageElement) (value : Nat) : IO Unit :=
-  self.val.set "hspace" (toJS value)
-
-/-- `attribute unsigned long vspace` -/
-def HTMLImageElement.vspace (self : HTMLImageElement) : IO Nat := self.val.get "vspace" Nat
-
-/-- Sets `vspace`: `attribute unsigned long vspace` -/
-def HTMLImageElement.setVspace (self : HTMLImageElement) (value : Nat) : IO Unit :=
-  self.val.set "vspace" (toJS value)
-
-/-- `attribute USVString longDesc` -/
-def HTMLImageElement.longDesc (self : HTMLImageElement) : IO String := self.val.get "longDesc" String
-
-/-- Sets `longDesc`: `attribute USVString longDesc` -/
-def HTMLImageElement.setLongDesc (self : HTMLImageElement) (value : String) : IO Unit :=
-  self.val.set "longDesc" (toJS value)
-
-/-- `attribute DOMString border` -/
-def HTMLImageElement.border (self : HTMLImageElement) : IO String := self.val.get "border" String
-
-/-- Sets `border`: `attribute DOMString border` -/
-def HTMLImageElement.setBorder (self : HTMLImageElement) (value : String) : IO Unit :=
-  self.val.set "border" (toJS value)
-
 /-- `readonly attribute long x` -/
 def HTMLImageElement.x (self : HTMLImageElement) : IO Int := self.val.get "x" Int
 
@@ -3567,13 +3056,6 @@ def HTMLInputElement.accept (self : HTMLInputElement) : IO String := self.val.ge
 /-- Sets `accept`: `attribute DOMString accept` -/
 def HTMLInputElement.setAccept (self : HTMLInputElement) (value : String) : IO Unit :=
   self.val.set "accept" (toJS value)
-
-/-- `attribute boolean alpha` -/
-def HTMLInputElement.alpha (self : HTMLInputElement) : IO Bool := self.val.get "alpha" Bool
-
-/-- Sets `alpha`: `attribute boolean alpha` -/
-def HTMLInputElement.setAlpha (self : HTMLInputElement) (value : Bool) : IO Unit :=
-  self.val.set "alpha" (toJS value)
 
 /-- `attribute DOMString alt` -/
 def HTMLInputElement.alt (self : HTMLInputElement) : IO String := self.val.get "alt" String
@@ -3602,13 +3084,6 @@ def HTMLInputElement.checked (self : HTMLInputElement) : IO Bool := self.val.get
 /-- Sets `checked`: `attribute boolean checked` -/
 def HTMLInputElement.setChecked (self : HTMLInputElement) (value : Bool) : IO Unit :=
   self.val.set "checked" (toJS value)
-
-/-- `attribute DOMString colorSpace` -/
-def HTMLInputElement.colorSpace (self : HTMLInputElement) : IO String := self.val.get "colorSpace" String
-
-/-- Sets `colorSpace`: `attribute DOMString colorSpace` -/
-def HTMLInputElement.setColorSpace (self : HTMLInputElement) (value : String) : IO Unit :=
-  self.val.set "colorSpace" (toJS value)
 
 /-- `attribute DOMString dirName` -/
 def HTMLInputElement.dirName (self : HTMLInputElement) : IO String := self.val.get "dirName" String
@@ -3854,34 +3329,6 @@ def HTMLInputElement.selectionDirection (self : HTMLInputElement) : IO (Option S
 def HTMLInputElement.setSelectionDirection (self : HTMLInputElement) (value : Option String) : IO Unit :=
   self.val.set "selectionDirection" (toJS value)
 
-/-- `attribute DOMString align` -/
-def HTMLInputElement.align (self : HTMLInputElement) : IO String := self.val.get "align" String
-
-/-- Sets `align`: `attribute DOMString align` -/
-def HTMLInputElement.setAlign (self : HTMLInputElement) (value : String) : IO Unit :=
-  self.val.set "align" (toJS value)
-
-/-- `attribute DOMString useMap` -/
-def HTMLInputElement.useMap (self : HTMLInputElement) : IO String := self.val.get "useMap" String
-
-/-- Sets `useMap`: `attribute DOMString useMap` -/
-def HTMLInputElement.setUseMap (self : HTMLInputElement) (value : String) : IO Unit :=
-  self.val.set "useMap" (toJS value)
-
-/-- `attribute unsigned long hspace` -/
-def HTMLInputElement.hspace (self : HTMLInputElement) : IO Nat := self.val.get "hspace" Nat
-
-/-- Sets `hspace`: `attribute unsigned long hspace` -/
-def HTMLInputElement.setHspace (self : HTMLInputElement) (value : Nat) : IO Unit :=
-  self.val.set "hspace" (toJS value)
-
-/-- `attribute unsigned long vspace` -/
-def HTMLInputElement.vspace (self : HTMLInputElement) : IO Nat := self.val.get "vspace" Nat
-
-/-- Sets `vspace`: `attribute unsigned long vspace` -/
-def HTMLInputElement.setVspace (self : HTMLInputElement) (value : Nat) : IO Unit :=
-  self.val.set "vspace" (toJS value)
-
 /-- `attribute Element? popoverTargetElement` -/
 def HTMLInputElement.popoverTargetElement (self : HTMLInputElement) : IO (Option Element) := self.val.get "popoverTargetElement" (Option Element)
 
@@ -3895,14 +3342,6 @@ def HTMLInputElement.popoverTargetAction (self : HTMLInputElement) : IO String :
 /-- Sets `popoverTargetAction`: `attribute DOMString popoverTargetAction` -/
 def HTMLInputElement.setPopoverTargetAction (self : HTMLInputElement) (value : String) : IO Unit :=
   self.val.set "popoverTargetAction" (toJS value)
-
-/-- `undefined stepUp(optional long n)` -/
-def HTMLInputElement.stepUp (self : HTMLInputElement) (n : Option Int := none) : IO Unit :=
-  self.val.callMethod "stepUp" (Support.args #[Support.optional n]) Unit
-
-/-- `undefined stepDown(optional long n)` -/
-def HTMLInputElement.stepDown (self : HTMLInputElement) (n : Option Int := none) : IO Unit :=
-  self.val.callMethod "stepDown" (Support.args #[Support.optional n]) Unit
 
 /-- `boolean checkValidity()` -/
 def HTMLInputElement.checkValidity (self : HTMLInputElement) : IO Bool :=
@@ -4136,10 +3575,6 @@ def HTMLSelectElement.reportValidity (self : HTMLSelectElement) : IO Bool :=
 def HTMLSelectElement.setCustomValidity (self : HTMLSelectElement) (error : String) : IO Unit :=
   self.val.callMethod "setCustomValidity" (Support.args #[toJS error]) Unit
 
-/-- `undefined showPicker()` -/
-def HTMLSelectElement.showPicker (self : HTMLSelectElement) : IO Unit :=
-  self.val.callMethod "showPicker" (Support.args #[]) Unit
-
 /-- `v instanceof HTMLTemplateElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLTemplateElement`). -/
 def HTMLTemplateElement.cast? (v : Value) : IO (Option HTMLTemplateElement) := do
   return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLTemplateElement"] Value) v) then some { val := v } else none
@@ -4148,13 +3583,6 @@ def HTMLTemplateElement.cast? (v : Value) : IO (Option HTMLTemplateElement) := d
 def HTMLTemplateElement.content (self : HTMLTemplateElement) : IO DocumentFragment := do
   let r ← self.val.get "content" Value
   pure { val := r }
-
-/-- `attribute DOMString htmlFor` -/
-def HTMLTemplateElement.htmlFor (self : HTMLTemplateElement) : IO String := self.val.get "htmlFor" String
-
-/-- Sets `htmlFor`: `attribute DOMString htmlFor` -/
-def HTMLTemplateElement.setHtmlFor (self : HTMLTemplateElement) (value : String) : IO Unit :=
-  self.val.set "htmlFor" (toJS value)
 
 /-- `attribute DOMString shadowRootMode` -/
 def HTMLTemplateElement.shadowRootMode (self : HTMLTemplateElement) : IO String := self.val.get "shadowRootMode" String
@@ -4177,26 +3605,12 @@ def HTMLTemplateElement.shadowRootSerializable (self : HTMLTemplateElement) : IO
 def HTMLTemplateElement.setShadowRootSerializable (self : HTMLTemplateElement) (value : Bool) : IO Unit :=
   self.val.set "shadowRootSerializable" (toJS value)
 
-/-- `attribute DOMString shadowRootSlotAssignment` -/
-def HTMLTemplateElement.shadowRootSlotAssignment (self : HTMLTemplateElement) : IO String := self.val.get "shadowRootSlotAssignment" String
-
-/-- Sets `shadowRootSlotAssignment`: `attribute DOMString shadowRootSlotAssignment` -/
-def HTMLTemplateElement.setShadowRootSlotAssignment (self : HTMLTemplateElement) (value : String) : IO Unit :=
-  self.val.set "shadowRootSlotAssignment" (toJS value)
-
 /-- `attribute boolean shadowRootClonable` -/
 def HTMLTemplateElement.shadowRootClonable (self : HTMLTemplateElement) : IO Bool := self.val.get "shadowRootClonable" Bool
 
 /-- Sets `shadowRootClonable`: `attribute boolean shadowRootClonable` -/
 def HTMLTemplateElement.setShadowRootClonable (self : HTMLTemplateElement) (value : Bool) : IO Unit :=
   self.val.set "shadowRootClonable" (toJS value)
-
-/-- `attribute DOMString shadowRootCustomElementRegistry` -/
-def HTMLTemplateElement.shadowRootCustomElementRegistry (self : HTMLTemplateElement) : IO String := self.val.get "shadowRootCustomElementRegistry" String
-
-/-- Sets `shadowRootCustomElementRegistry`: `attribute DOMString shadowRootCustomElementRegistry` -/
-def HTMLTemplateElement.setShadowRootCustomElementRegistry (self : HTMLTemplateElement) (value : String) : IO Unit :=
-  self.val.set "shadowRootCustomElementRegistry" (toJS value)
 
 /-- `v instanceof HTMLTextAreaElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLTextAreaElement`). -/
 def HTMLTextAreaElement.cast? (v : Value) : IO (Option HTMLTextAreaElement) := do
@@ -4472,9 +3886,6 @@ def FileList.item (self : FileList) (index : Nat) : IO (Option File) :=
 def Window.cast? (v : Value) : IO (Option Window) := do
   return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Window"] Value) v) then some { val := v } else none
 
-/-- `readonly attribute (Event or undefined) event` -/
-def Window.event (self : Window) : IO (Option Event) := self.val.get "event" (Option Event)
-
 /-- `readonly attribute WindowProxy window` -/
 def Window.window (self : Window) : IO Window := do
   let r ← self.val.get "window" Value
@@ -4531,13 +3942,6 @@ def Window.statusbar (self : Window) : IO Data := self.val.get "statusbar" Data
 /-- `readonly attribute BarProp toolbar` -/
 def Window.toolbar (self : Window) : IO Data := self.val.get "toolbar" Data
 
-/-- `attribute DOMString status` -/
-def Window.status (self : Window) : IO String := self.val.get "status" String
-
-/-- Sets `status`: `attribute DOMString status` -/
-def Window.setStatus (self : Window) (value : String) : IO Unit :=
-  self.val.set "status" (toJS value)
-
 /-- `readonly attribute boolean closed` -/
 def Window.closed (self : Window) : IO Bool := self.val.get "closed" Bool
 
@@ -4570,17 +3974,6 @@ def Window.navigator (self : Window) : IO Navigator := do
   let r ← self.val.get "navigator" Value
   pure { val := r }
 
-/-- `readonly attribute Navigator clientInformation` -/
-def Window.clientInformation (self : Window) : IO Navigator := do
-  let r ← self.val.get "clientInformation" Value
-  pure { val := r }
-
-/-- `readonly attribute boolean originAgentCluster` -/
-def Window.originAgentCluster (self : Window) : IO Bool := self.val.get "originAgentCluster" Bool
-
-/-- `readonly attribute External external` -/
-def Window.external (self : Window) : IO Data := self.val.get "external" Data
-
 /-- `readonly attribute Screen screen` -/
 def Window.screen (self : Window) : IO Data := self.val.get "screen" Data
 
@@ -4596,14 +3989,8 @@ def Window.innerHeight (self : Window) : IO Int := self.val.get "innerHeight" In
 /-- `readonly attribute double scrollX` -/
 def Window.scrollX (self : Window) : IO Float := self.val.get "scrollX" Float
 
-/-- `readonly attribute double pageXOffset` -/
-def Window.pageXOffset (self : Window) : IO Float := self.val.get "pageXOffset" Float
-
 /-- `readonly attribute double scrollY` -/
 def Window.scrollY (self : Window) : IO Float := self.val.get "scrollY" Float
-
-/-- `readonly attribute double pageYOffset` -/
-def Window.pageYOffset (self : Window) : IO Float := self.val.get "pageYOffset" Float
 
 /-- `readonly attribute long screenX` -/
 def Window.screenX (self : Window) : IO Int := self.val.get "screenX" Int
@@ -4622,9 +4009,6 @@ def Window.outerWidth (self : Window) : IO Int := self.val.get "outerWidth" Int
 
 /-- `readonly attribute long outerHeight` -/
 def Window.outerHeight (self : Window) : IO Int := self.val.get "outerHeight" Int
-
-/-- `readonly attribute double devicePixelRatio` -/
-def Window.devicePixelRatio (self : Window) : IO Float := self.val.get "devicePixelRatio" Float
 
 /-- `readonly attribute Storage sessionStorage` -/
 def Window.sessionStorage (self : Window) : IO Storage := do
@@ -4647,10 +4031,6 @@ def Window.stop (self : Window) : IO Unit :=
 /-- `undefined focus()` -/
 def Window.focus (self : Window) : IO Unit :=
   self.val.callMethod "focus" (Support.args #[]) Unit
-
-/-- `undefined blur()` -/
-def Window.blur (self : Window) : IO Unit :=
-  self.val.callMethod "blur" (Support.args #[]) Unit
 
 /-- `WindowProxy? open(optional USVString url, optional DOMString target, optional DOMString features)` -/
 def Window.«open» (self : Window) (url : Option String := none) (target : Option String := none) (features : Option String := none) : IO (Option Window) :=
@@ -4683,18 +4063,6 @@ def Window.postMessage (self : Window) (message : Data) (targetOrigin : String) 
 /-- `undefined postMessage(any message, optional WindowPostMessageOptions options)` -/
 def Window.postMessageWithOptions (self : Window) (message : Data) (options : Option WindowPostMessageOptions := none) : IO Unit :=
   self.val.callMethod "postMessage" (Support.args #[toJS message, Support.optional options]) Unit
-
-/-- `undefined captureEvents()` -/
-def Window.captureEvents (self : Window) : IO Unit :=
-  self.val.callMethod "captureEvents" (Support.args #[]) Unit
-
-/-- `undefined releaseEvents()` -/
-def Window.releaseEvents (self : Window) : IO Unit :=
-  self.val.callMethod "releaseEvents" (Support.args #[]) Unit
-
-/-- `FetchLaterResult fetchLater(RequestInfo input, optional DeferredRequestInit init)` -/
-def Window.fetchLater (self : Window) (input : RequestInfo) (init : Option DeferredRequestInit := none) : IO Data :=
-  self.val.callMethod "fetchLater" (Support.args #[toJS input, Support.optional init]) Data
 
 /-- `CSSStyleProperties getComputedStyle(Element elt, optional CSSOMString? pseudoElt)` -/
 def Window.getComputedStyle (self : Window) (elt : Element) (pseudoElt : Option String := none) : IO CSSStyleProperties := do

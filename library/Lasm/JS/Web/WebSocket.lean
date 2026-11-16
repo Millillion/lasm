@@ -54,6 +54,12 @@ instance : ToJS DOMStringOrSequenceOfDOMString := ⟨fun
   | .sequence v => toJS v⟩
 instance : Coe String DOMStringOrSequenceOfDOMString := ⟨.domString⟩
 instance : Coe (Array String) DOMStringOrSequenceOfDOMString := ⟨.sequence⟩
+instance : FromJS DOMStringOrSequenceOfDOMString where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.array _) => (FromJS.fromJS d : Except String (Array String)).map .sequence
+    | _ => .error ""
+  typeName := "Lasm.JS.Web.DOMStringOrSequenceOfDOMString"
 
 /-- `(BufferSource or Blob or USVString)`: one constructor per member type. -/
 inductive BufferSourceOrBlobOrUSVString where

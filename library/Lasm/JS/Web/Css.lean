@@ -99,13 +99,6 @@ def CSSStyleDeclaration.removeProperty (self : CSSStyleDeclaration) (property : 
 def CSSStyleProperties.cast? (v : Value) : IO (Option CSSStyleProperties) := do
   return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSStyleProperties"] Value) v) then some { val := v } else none
 
-/-- `attribute CSSOMString cssFloat` -/
-def CSSStyleProperties.cssFloat (self : CSSStyleProperties) : IO String := self.val.get "cssFloat" String
-
-/-- Sets `cssFloat`: `attribute CSSOMString cssFloat` -/
-def CSSStyleProperties.setCssFloat (self : CSSStyleProperties) (value : String) : IO Unit :=
-  self.val.set "cssFloat" (toJS value)
-
 /-- `v instanceof MediaQueryList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaQueryList`). -/
 def MediaQueryList.cast? (v : Value) : IO (Option MediaQueryList) := do
   return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MediaQueryList"] Value) v) then some { val := v } else none
@@ -115,14 +108,6 @@ def MediaQueryList.media (self : MediaQueryList) : IO String := self.val.get "me
 
 /-- `readonly attribute boolean matches` -/
 def MediaQueryList.«matches» (self : MediaQueryList) : IO Bool := self.val.get "matches" Bool
-
-/-- `undefined addListener(EventListener? callback)` -/
-def MediaQueryList.addListener (self : MediaQueryList) (callback : Option EventListener) : IO Unit :=
-  self.val.callMethod "addListener" (Support.args #[toJS callback]) Unit
-
-/-- `undefined removeListener(EventListener? callback)` -/
-def MediaQueryList.removeListener (self : MediaQueryList) (callback : Option EventListener) : IO Unit :=
-  self.val.callMethod "removeListener" (Support.args #[toJS callback]) Unit
 
 /-- `v instanceof MediaQueryListEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaQueryListEvent`). -/
 def MediaQueryListEvent.cast? (v : Value) : IO (Option MediaQueryListEvent) := do

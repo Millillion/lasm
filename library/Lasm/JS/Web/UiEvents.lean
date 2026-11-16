@@ -684,13 +684,6 @@ def UIEvent.view (self : UIEvent) : IO (Option Window) := self.val.get "view" (O
 /-- `readonly attribute long detail` -/
 def UIEvent.detail (self : UIEvent) : IO Int := self.val.get "detail" Int
 
-/-- `readonly attribute unsigned long which` -/
-def UIEvent.which (self : UIEvent) : IO Nat := self.val.get "which" Nat
-
-/-- `undefined initUIEvent(DOMString typeArg, optional boolean bubblesArg, optional boolean cancelableArg, optional Window? viewArg, optional long detailArg)` -/
-def UIEvent.initUIEvent (self : UIEvent) (typeArg : String) (bubblesArg : Option Bool := none) (cancelableArg : Option Bool := none) (viewArg : Option Window := none) (detailArg : Option Int := none) : IO Unit :=
-  self.val.callMethod "initUIEvent" (Support.args #[toJS typeArg, Support.optional bubblesArg, Support.optional cancelableArg, Support.optional viewArg, Support.optional detailArg]) Unit
-
 /-- `v instanceof MouseEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MouseEvent`). -/
 def MouseEvent.cast? (v : Value) : IO (Option MouseEvent) := do
   return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["MouseEvent"] Value) v) then some { val := v } else none
@@ -761,10 +754,6 @@ def MouseEvent.relatedTarget (self : MouseEvent) : IO (Option EventTarget) := se
 def MouseEvent.getModifierState (self : MouseEvent) (keyArg : String) : IO Bool :=
   self.val.callMethod "getModifierState" (Support.args #[toJS keyArg]) Bool
 
-/-- `undefined initMouseEvent(DOMString typeArg, optional boolean bubblesArg, optional boolean cancelableArg, optional Window? viewArg, optional long detailArg, optional long screenXArg, optional long screenYArg, optional long clientXArg, optional long clientYArg, optional boolean ctrlKeyArg, optional boolean altKeyArg, optional boolean shiftKeyArg, optional boolean metaKeyArg, optional short buttonArg, optional EventTarget? relatedTargetArg)` -/
-def MouseEvent.initMouseEvent (self : MouseEvent) (typeArg : String) (bubblesArg : Option Bool := none) (cancelableArg : Option Bool := none) (viewArg : Option Window := none) (detailArg : Option Int := none) (screenXArg : Option Int := none) (screenYArg : Option Int := none) (clientXArg : Option Int := none) (clientYArg : Option Int := none) (ctrlKeyArg : Option Bool := none) (altKeyArg : Option Bool := none) (shiftKeyArg : Option Bool := none) (metaKeyArg : Option Bool := none) (buttonArg : Option Int := none) (relatedTargetArg : Option EventTarget := none) : IO Unit :=
-  self.val.callMethod "initMouseEvent" (Support.args #[toJS typeArg, Support.optional bubblesArg, Support.optional cancelableArg, Support.optional viewArg, Support.optional detailArg, Support.optional screenXArg, Support.optional screenYArg, Support.optional clientXArg, Support.optional clientYArg, Support.optional ctrlKeyArg, Support.optional altKeyArg, Support.optional shiftKeyArg, Support.optional metaKeyArg, Support.optional buttonArg, Support.optional relatedTargetArg]) Unit
-
 /-- `v instanceof WheelEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WheelEvent`). -/
 def WheelEvent.cast? (v : Value) : IO (Option WheelEvent) := do
   return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["WheelEvent"] Value) v) then some { val := v } else none
@@ -794,9 +783,6 @@ def WheelEvent.deltaZ (self : WheelEvent) : IO Float := self.val.get "deltaZ" Fl
 
 /-- `readonly attribute unsigned long deltaMode` -/
 def WheelEvent.deltaMode (self : WheelEvent) : IO Nat := self.val.get "deltaMode" Nat
-
-/-- `readonly attribute boolean momentum` -/
-def WheelEvent.momentum (self : WheelEvent) : IO Bool := self.val.get "momentum" Bool
 
 /-- `v instanceof KeyboardEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `KeyboardEvent`). -/
 def KeyboardEvent.cast? (v : Value) : IO (Option KeyboardEvent) := do
@@ -843,22 +829,9 @@ def KeyboardEvent.metaKey (self : KeyboardEvent) : IO Bool := self.val.get "meta
 /-- `readonly attribute boolean repeat` -/
 def KeyboardEvent.«repeat» (self : KeyboardEvent) : IO Bool := self.val.get "repeat" Bool
 
-/-- `readonly attribute boolean isComposing` -/
-def KeyboardEvent.isComposing (self : KeyboardEvent) : IO Bool := self.val.get "isComposing" Bool
-
-/-- `readonly attribute unsigned long charCode` -/
-def KeyboardEvent.charCode (self : KeyboardEvent) : IO Nat := self.val.get "charCode" Nat
-
-/-- `readonly attribute unsigned long keyCode` -/
-def KeyboardEvent.keyCode (self : KeyboardEvent) : IO Nat := self.val.get "keyCode" Nat
-
 /-- `boolean getModifierState(DOMString keyArg)` -/
 def KeyboardEvent.getModifierState (self : KeyboardEvent) (keyArg : String) : IO Bool :=
   self.val.callMethod "getModifierState" (Support.args #[toJS keyArg]) Bool
-
-/-- `undefined initKeyboardEvent(DOMString typeArg, optional boolean bubblesArg, optional boolean cancelableArg, optional Window? viewArg, optional DOMString keyArg, optional unsigned long locationArg, optional boolean ctrlKey, optional boolean altKey, optional boolean shiftKey, optional boolean metaKey)` -/
-def KeyboardEvent.initKeyboardEvent (self : KeyboardEvent) (typeArg : String) (bubblesArg : Option Bool := none) (cancelableArg : Option Bool := none) (viewArg : Option Window := none) (keyArg : Option String := none) (locationArg : Option Nat := none) (ctrlKey : Option Bool := none) (altKey : Option Bool := none) (shiftKey : Option Bool := none) (metaKey : Option Bool := none) : IO Unit :=
-  self.val.callMethod "initKeyboardEvent" (Support.args #[toJS typeArg, Support.optional bubblesArg, Support.optional cancelableArg, Support.optional viewArg, Support.optional keyArg, Support.optional locationArg, Support.optional ctrlKey, Support.optional altKey, Support.optional shiftKey, Support.optional metaKey]) Unit
 
 /-- `v instanceof InputEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InputEvent`). -/
 def InputEvent.cast? (v : Value) : IO (Option InputEvent) := do
@@ -871,9 +844,6 @@ def InputEvent.new (type : String) (eventInitDict : Option InputEventInit := non
 
 /-- `readonly attribute USVString? data` -/
 def InputEvent.data (self : InputEvent) : IO (Option String) := self.val.get "data" (Option String)
-
-/-- `readonly attribute boolean isComposing` -/
-def InputEvent.isComposing (self : InputEvent) : IO Bool := self.val.get "isComposing" Bool
 
 /-- `readonly attribute DOMString inputType` -/
 def InputEvent.inputType (self : InputEvent) : IO String := self.val.get "inputType" String
@@ -901,10 +871,6 @@ def CompositionEvent.new (type : String) (eventInitDict : Option CompositionEven
 
 /-- `readonly attribute USVString data` -/
 def CompositionEvent.data (self : CompositionEvent) : IO String := self.val.get "data" String
-
-/-- `undefined initCompositionEvent(DOMString typeArg, optional boolean bubblesArg, optional boolean cancelableArg, optional WindowProxy? viewArg, optional DOMString dataArg)` -/
-def CompositionEvent.initCompositionEvent (self : CompositionEvent) (typeArg : String) (bubblesArg : Option Bool := none) (cancelableArg : Option Bool := none) (viewArg : Option Window := none) (dataArg : Option String := none) : IO Unit :=
-  self.val.callMethod "initCompositionEvent" (Support.args #[toJS typeArg, Support.optional bubblesArg, Support.optional cancelableArg, Support.optional viewArg, Support.optional dataArg]) Unit
 
 /-- `v instanceof PointerEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PointerEvent`). -/
 def PointerEvent.cast? (v : Value) : IO (Option PointerEvent) := do
@@ -950,9 +916,6 @@ def PointerEvent.pointerType (self : PointerEvent) : IO String := self.val.get "
 
 /-- `readonly attribute boolean isPrimary` -/
 def PointerEvent.isPrimary (self : PointerEvent) : IO Bool := self.val.get "isPrimary" Bool
-
-/-- `readonly attribute long persistentDeviceId` -/
-def PointerEvent.persistentDeviceId (self : PointerEvent) : IO Int := self.val.get "persistentDeviceId" Int
 
 /-- `sequence<PointerEvent> getCoalescedEvents()` -/
 def PointerEvent.getCoalescedEvents (self : PointerEvent) : IO (Array PointerEvent) :=
@@ -1027,9 +990,5 @@ def StorageEvent.url (self : StorageEvent) : IO String := self.val.get "url" Str
 
 /-- `readonly attribute Storage? storageArea` -/
 def StorageEvent.storageArea (self : StorageEvent) : IO (Option Storage) := self.val.get "storageArea" (Option Storage)
-
-/-- `undefined initStorageEvent(DOMString type, optional boolean bubbles, optional boolean cancelable, optional DOMString? key, optional DOMString? oldValue, optional DOMString? newValue, optional USVString url, optional Storage? storageArea)` -/
-def StorageEvent.initStorageEvent (self : StorageEvent) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) (key : Option String := none) (oldValue : Option String := none) (newValue : Option String := none) (url : Option String := none) (storageArea : Option Storage := none) : IO Unit :=
-  self.val.callMethod "initStorageEvent" (Support.args #[toJS type, Support.optional bubbles, Support.optional cancelable, Support.optional key, Support.optional oldValue, Support.optional newValue, Support.optional url, Support.optional storageArea]) Unit
 
 end Lasm.JS.Web
