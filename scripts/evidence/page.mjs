@@ -354,7 +354,6 @@ function logReader(repository, token) {
 // ---------------------------------------------------------------- the exit bar
 
 /** The platforms exit bar 1 needs at L3. */
-export const L3_PLATFORMS = ['node', 'workers', 'browser'];
 /** The model differentials exit bar 8 names (the UI decoder, the Lasm.JS wire codec). */
 export const BAR_DIFFERENTIALS = ['ui-decode', 'lasm-js-wire'];
 /** The language features exit bar 8 asks the differential generator for (TESTING_STRATEGY.md §2,
@@ -379,11 +378,10 @@ export function exitBar(repo, ci) {
   if (!ci) out.push(row(1, 'Platforms', 'not read', notRead));
   else {
     const level = p => (typeof p.level === 'number' ? p.level : -1);
-    const below = ci.platforms.filter(p => level(p) < 2);
-    const atL3 = L3_PLATFORMS.filter(id => ci.platforms.some(p => p.id === id && level(p) >= 3));
-    out.push(row(1, 'Platforms', below.length || atL3.length < L3_PLATFORMS.length ? 'not met' : 'met',
-      `${ci.platforms.length - below.length} of ${ci.platforms.length} platforms at L2 or higher${below.length ? ` (not: ${below.map(p => p.row).join(', ')})` : ''}; ` +
-      `at L3: ${atL3.length} of ${L3_PLATFORMS.length} (Node.js, Workers, browsers)`));
+    // Every platform at L3 (Jordan, 2026-11-16; it was L2, with L3 for Node, Workers and the browser only).
+    const below = ci.platforms.filter(p => level(p) < 3);
+    out.push(row(1, 'Platforms', below.length ? 'not met' : 'met',
+      `${ci.platforms.length - below.length} of ${ci.platforms.length} platforms at L3${below.length ? ` (not: ${below.map(p => `${p.row} at ${level(p) < 0 ? 'no level' : `L${level(p)}`}`).join(', ')})` : ''}`));
   }
   // 2. Mutation
   if (!ci) out.push(row(2, 'Mutation', 'not read', notRead));

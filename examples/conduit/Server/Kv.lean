@@ -23,7 +23,7 @@ compare-and-set).
 -/
 import Lasm.KV
 import Lean.Data.Json
-import Lasm.RPC.Core
+import Conduit.SafeJson
 import Conduit.Store
 open Lean Std.Async
 
@@ -74,7 +74,7 @@ variable (kv : Lasm.KV.Store)
 
 def read {α : Type} (decode : Json → Option α) (key : String) : Async (Option α) := do
   match ← kv.get key with
-  | some text => return (Lasm.RPC.parseJson text).toOption.bind decode
+  | some text => return (Conduit.parseJson text).toOption.bind decode
   | none => return none
 
 def write (key : String) (value : Json) : Async Unit := kv.put key value.compress
