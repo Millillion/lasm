@@ -56,13 +56,6 @@ docker run --rm -p 8080:8080 2nd-server
 
 The image sets `PORT=8080`; platforms that assign a port override it.
 
-Lasm builds for each platform; it does not install or start the platform's tools. Test and deploy
-with your platform's own CLI (`vercel`, `netlify`, `func`, `gcloud`, `aws` or `sam`), installed as its docs say.
-
-**Vercel:** `vercel.json` makes Vercel run `npm run build:vercel`, which writes
-the function to `.vercel/output`; deploy with `vercel deploy` (or push to a connected Git
-repository). See the [Vercel guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/vercel.md).
-
 `Dockerfile.lambda` builds an AWS Lambda container image (Lambda's Node 24 image behind the
 AWS Lambda Web Adapter): `docker build -f Dockerfile.lambda -t 2nd-server-lambda .`; see the
 [Lambda guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md).

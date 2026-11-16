@@ -3,6 +3,7 @@
   ".gitignore",
   "App.lean",
   "Dockerfile",
+  "Dockerfile.lambda",
   "Main.lean",
   "README.md",
   "lakefile.toml",

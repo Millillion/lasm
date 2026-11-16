@@ -8,8 +8,5 @@
   "README.md",
   "lakefile.toml",
   "lean-toolchain",
-  "netlify.toml",
-  "package.json",
-  "public/.gitkeep",
-  "vercel.json"
+  "package.json"
 ]

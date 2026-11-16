@@ -1,4 +1,4 @@
-# fastify_gcf
+# fastify_lambda
 
 Fastify 5 with Lean route handlers (Lasm.JS), compiled ahead of time to WebAssembly by
 [Lasm](https://github.com/Millillion/lasm) and run by Node.js.
@@ -53,18 +53,15 @@ own OS and architecture) and run `node dist/main.mjs`.
 With Docker:
 
 ```sh
-docker build -t fastify_gcf .
-docker run --rm -p 8080:8080 fastify_gcf
+docker build -t fastify_lambda .
+docker run --rm -p 8080:8080 fastify_lambda
 ```
 
 The image sets `PORT=8080`; platforms that assign a port override it.
 
-Lasm builds for each platform; it does not install or start the platform's tools. Test and deploy
-with your platform's own CLI (`vercel`, `netlify`, `func`, `gcloud`, `aws` or `sam`), installed as its docs say.
-
-**Google Cloud Functions:** `npm run build:gcf` writes `gcf/`; deploy with
-`gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source gcf`.
-See the [Cloud Functions guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/cloud-functions.md).
+`Dockerfile.lambda` builds an AWS Lambda container image (Lambda's Node 24 image behind the
+AWS Lambda Web Adapter): `docker build -f Dockerfile.lambda -t fastify_lambda-lambda .`; see the
+[Lambda guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md).
 
 The image runs on any container platform (Docker, Kubernetes, Cloud Run, Fly.io,
 Railway, Render, Heroku); give it at least 512 MB of memory. Build on the

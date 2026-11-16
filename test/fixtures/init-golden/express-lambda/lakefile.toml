@@ -1,4 +1,4 @@
-name = "fastify_gcf"
+name = "express_lambda"
 version = "0.1.0"
 defaultTargets = ["app"]
 

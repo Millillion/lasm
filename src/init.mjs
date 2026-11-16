@@ -18,13 +18,16 @@ const npm = {
 };
 export const templateDependencies = npm;
 
-// `--deploy` targets. Function platforms run the server through `lasm package`
-// (src/package.mjs); azure and gcf also deploy the platform's npm package.
-// They take the Node server templates, not fullstack: its init writes no
-// platform files for them (issue #168).
-const functionTemplates = ['express', 'hono', 'fastify', 'std-http', 'fetch'];
+// `--deploy` targets. Function platforms call the handler the program
+// publishes with `exportDefault` (Export.lean), through `lasm package`
+// (src/package.mjs); azure and gcf also deploy the platform's npm package. So
+// they take the templates with a handler (hono, fetch), not the ones that bring
+// their own server (express, fastify, std-http), which run on Lambda as a
+// container image behind the AWS Lambda Web Adapter (`--deploy lambda`), and
+// not fullstack: its init writes no platform files for them (issue #168).
+const functionTemplates = ['hono', 'fetch'];
 export const deployTargets = {
-  lambda: { summary: 'AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)', templates: functionTemplates },
+  lambda: { summary: 'AWS Lambda container image (Dockerfile.lambda, AWS Lambda Web Adapter)', templates: ['express', 'hono', 'fastify', 'std-http', 'fetch'] },
   'lambda-zip': { summary: 'AWS Lambda .zip for nodejs24.x (npm run build:lambda)', package: 'lambda', templates: functionTemplates },
   'lambda-edge': { summary: 'Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)', package: 'lambda-edge', templates: functionTemplates },
   vercel: { summary: 'Vercel Function (vercel.json; Vercel runs the build)', package: 'vercel', templates: functionTemplates },
@@ -39,7 +42,7 @@ export const deployTargets = {
   'supabase-edge': { summary: 'Supabase Edge Function (supabase/config.toml; npm run build:supabase-edge, then npx supabase functions deploy NAME)', package: 'supabase-edge', templates: ['hono'] },
   // WASI targets (docs/WASI.md): a standard WASI module, no JavaScript.
   fastly: { summary: 'Fastly Compute (fastly.toml; npm run build:fastly, then fastly compute serve)', package: 'fastly', templates: ['fetch', 'fullstack'] },
-  wasi: { summary: 'a WASI module (npm run build:wasi writes wasi/main.wasm; wasmtime run --dir . wasi/main.wasm)', package: 'wasi', templates: ['fetch', 'plain'], cli: true },
+  wasi: { summary: 'a WASI module (npm run build:wasi writes wasi/main.wasm; wasmtime run --dir . wasi/main.wasm)', package: 'wasi', templates: ['plain'], cli: true },
   'wasi-http': { summary: 'a wasi-http component (npm run build:wasi-http writes wasi-http/main.wasm; wasmtime serve wasi-http/main.wasm)', package: 'wasi-http', templates: ['fetch', 'fullstack'] },
   spin: { summary: 'Fermyon Spin (spin.toml; npm run build:wasi-http, then spin up)', package: 'wasi-http', templates: ['fetch', 'fullstack'] },
 };
@@ -56,15 +59,15 @@ export const templates = {
   // portable: also runs on Bun and Deno (the portable profile, Phase 7.5).
   plain: { summary: 'a Lean program (IO only)', server: false, interop: false, portable: true },
   express: { summary: 'Express 5 with Lean request handlers (Lasm.JS)', server: true, interop: true },
-  hono: { summary: 'Hono on @hono/node-server with Lean request handlers (Lasm.JS)', server: true, interop: true, portable: true },
+  hono: { summary: 'Hono on @hono/node-server with Lean request handlers (Lasm.JS)', server: true, interop: true, portable: true, handler: 'Routes.lean' },
   fastify: { summary: 'Fastify 5 with Lean route handlers (Lasm.JS)', server: true, interop: true },
   'std-http': { summary: "an HTTP server in pure Lean (Std.Http)", server: true, interop: false },
   // The browser (docs/BROWSER.md): a static web app, built with --target browser.
   web: { summary: 'a browser app in Lean (Lasm.UI): a counter', server: false, interop: true, browser: true },
-  // A web fetch handler (Lasm.JS.Web) for Node, the edge, Bun and Deno; with
-  // --deploy, the same routes on Fastly's (Lasm.Fastly) and wasi:http's
-  // (Lasm.WASI.Http) own interfaces and as a CGI program (WASI).
-  fetch: { summary: 'an HTTP handler on the web\'s Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces', server: true, interop: false, library: 'Lasm.JS.Web', portable: true },
+  // A web fetch handler (Lasm.JS.Web): Node.serve on Node, the default export
+  // on the edge, Bun, Deno and the function platforms; with --deploy, the same
+  // routes on Fastly's (Lasm.Fastly) and wasi:http's (Lasm.WASI.Http) own interfaces.
+  fetch: { summary: 'an HTTP handler on the web\'s Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces', server: true, interop: false, library: 'Lasm.JS.Web', portable: true, handler: 'Handler.lean' },
   // The whole stack in Lean (docs/RPC.md): shared types, API and validation; a
   // Lasm.Fetch server with server-side rendering; a Lasm.UI app that hydrates it.
   fullstack: { summary: 'a full-stack Lean app: shared API and validation (Lasm.RPC), a server (Lasm.Fetch) that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target', server: true, interop: false, fullstack: true },
@@ -150,7 +153,8 @@ export function lakeName(name) {
   return /^[A-Za-z]/.test(id) ? id : 'app' + (id ? '_' + id : '');
 }
 
-function lakefile(name) {
+function lakefile(name, template) {
+  const handler = templates[template]?.handler?.replace(/\.lean$/, '');
   return `name = "${lakeName(name)}"
 version = "0.1.0"
 defaultTargets = ["app"]
@@ -158,7 +162,11 @@ defaultTargets = ["app"]
 # Pure Lean modules (App.lean).
 [[lean_lib]]
 name = "App"
-
+${handler ? `
+# The ${template === 'hono' ? 'Hono app' : 'HTTP handler'} (${handler}.lean), shared by Main.lean (Node) and Export.lean.
+[[lean_lib]]
+name = "${handler}"
+` : ''}
 # The program: Main.lean. Lasm builds it with \`lasm build Main.lean\`.
 [[lean_exe]]
 name = "app"
@@ -252,12 +260,15 @@ cached forever. See the [browser deployment guide](https://github.com/Millillion
 `;
 }
 
-/** The fetch template's program for a WASI target: Fastly, wasi:http and CGI
- * each have their own interface (templates/fetch/Fastly.lean, WasiHttp.lean,
- * Cgi.lean); every other target builds Main.lean. */
-const wasiEntries = { fastly: 'Fastly.lean', 'wasi-http': 'WasiHttp.lean', wasi: 'Cgi.lean' };
+/** The program a target builds. Node (and the Lambda container image) runs
+ * Main.lean, the template's own server. The fetch and hono templates publish
+ * their handler as the default export in Export.lean, which Bun, Deno, the edge
+ * targets and the function platforms call. Fastly and wasi:http have their own
+ * interfaces (templates/fetch/Fastly.lean, WasiHttp.lean). */
+const wasiEntries = { fastly: 'Fastly.lean', 'wasi-http': 'WasiHttp.lean' };
 export function entryFile(template, platform) {
-  return template === 'fetch' && wasiEntries[platform] ? wasiEntries[platform] : 'Main.lean';
+  if (template === 'fetch' && wasiEntries[platform]) return wasiEntries[platform];
+  return templates[template]?.handler && platform && platform !== 'node' ? 'Export.lean' : 'Main.lean';
 }
 
 function packageJson(name, template, deploy = []) {
@@ -286,8 +297,8 @@ function packageJson(name, template, deploy = []) {
   // Bun (bun x --bun, even when Node is installed); `deno task dev` runs it on
   // Deno. Deno Deploy runs the same deno/main.mjs.
   if (templates[template].portable) Object.assign(pkg.scripts, {
-    'dev:bun': templates[template].server ? 'bun x --bun lasm dev Main.lean' : 'bun x --bun lasm Main.lean --', 'build:bun': 'bun x --bun lasm build Main.lean --target bun', 'start:bun': 'bun bun/main.mjs',
-    'build:deno': 'lasm build Main.lean --target deno', 'start:deno': 'deno run -A deno/main.mjs' });
+    'dev:bun': templates[template].server ? 'bun x --bun lasm dev Main.lean' : 'bun x --bun lasm Main.lean --', 'build:bun': `bun x --bun lasm build ${entryFile(template, 'bun')} --target bun`, 'start:bun': 'bun bun/main.mjs',
+    'build:deno': `lasm build ${entryFile(template, 'deno')} --target deno`, 'start:deno': 'deno run -A deno/main.mjs' });
   // Edge and portable builds import the npm modules Lean binds; the Node server stays out.
   if (template === 'hono') pkg.lasm = { edge: { exclude: ['@hono/node-server'] } };
   const dependencies = Object.assign({}, npm[template], ...deploy.map(target => deployTargets[target].dependencies));
@@ -481,7 +492,7 @@ npm run build               # write dist/
 PORT=8080 npm start         # run the build (node dist/main.mjs): only Node is needed
 \`\`\`
 
-The server listens on \`$HOST\` (default \`0.0.0.0\`) and \`$PORT\` (default 3000) and
+The server listens on ${template === 'fetch' ? '\`$PORT\` (default 3000), on every IPv4 address,' : '\`$HOST\` (default \`0.0.0.0\`) and \`$PORT\` (default 3000)'} and
 exits cleanly on SIGTERM or SIGINT. \`npm run dev\` (\`lasm dev\`) watches the Lean files, rebuilds
 in about 2 s after an ordinary edit and restarts the server; a build error is shown with its
 file and line while the last good server keeps running.`;
@@ -513,9 +524,13 @@ Files:
 
 | File | What it is |
 | --- | --- |
-| \`Main.lean\` | The program${t.interop ? ': routes and Lean request handlers' : ''}. |
+${t.handler ? `| \`Main.lean\` | The program on Node: ${template === 'hono' ? 'the Hono app on \`@hono/node-server\`' : 'the handler on \`Node.serve\` (\`Lasm.JS.Node.Serve\`)'}. |
+| \`${t.handler}\` | ${template === 'hono' ? 'The Hono app: routes and Lean request handlers' : 'The HTTP handler, on the web\'s \`Request\` and \`Response\` (\`Lasm.JS.Web\`)'}. |
+| \`Export.lean\` | The ${template === 'hono' ? 'app' : 'handler'} as the program's default export (\`exportDefault\`), for Bun, Deno, the edge and the function platforms. |
+| \`App.lean\` | Pure Lean logic used by \`${t.handler}\`. |
+` : `| \`Main.lean\` | The program${t.interop ? ': routes and Lean request handlers' : ''}. |
 | \`App.lean\` | Pure Lean logic used by \`Main.lean\`. |
-${entryRows(template, deploy)}| \`lakefile.toml\`, \`lean-toolchain\` | The Lake project, pinned to Lean ${defaultLean()}. |
+`}${entryRows(template, deploy)}| \`lakefile.toml\`, \`lean-toolchain\` | The Lake project, pinned to Lean ${defaultLean()}. |
 | \`package.json\` | npm scripts${t.interop ? ', the npm packages Lean calls' : ''} and Lasm (\`${lasm.name}\`) as a dev dependency. |
 | \`Dockerfile\` | Builds with Lasm, runs on \`node:24-bookworm-slim\`. |
 
@@ -523,8 +538,8 @@ ${native}
 ${t.portable ? `
 ## Bun and Deno
 
-The same \`Main.lean\` also runs on Bun and Deno with Lasm's portable profile. Lean
-runs single-threaded there, with no files, sockets or processes${t.server ? `, and ${template === 'hono' ? 'the Hono app' : 'the handler'} is\nserved with \`Bun.serve\` or \`Deno.serve\`` : ''}:
+${t.handler ? `\`Export.lean\`` : 'The same \`Main.lean\`'} also runs on Bun and Deno with Lasm's portable profile. Lean
+runs single-threaded there, with no files, sockets or processes${t.server ? `, and ${template === 'hono' ? 'the Hono app' : 'the handler'} is\nserved as the module's default export, as \`bun\` and \`deno serve\` serve one` : ''}:
 
 \`\`\`sh
 bun install && bun run dev:bun${template === 'plain' ? ' Ada' : '   '}       # Lasm itself runs on Bun
@@ -567,9 +582,8 @@ platforms). Platform recipes: [Lasm deployment guides](https://github.com/Millil
 /** README rows for the fetch template's WASI programs (entryFile). */
 function entryRows(template, deploy) {
   const what = { 'Fastly.lean': 'The same routes on Fastly Compute\'s own host calls (\`Lasm.Fastly\`): \`npm run build:fastly\`.',
-    'WasiHttp.lean': 'The same routes as a wasi:http component (\`Lasm.WASI.Http\`): \`npm run build:wasi-http\`.',
-    'Cgi.lean': 'The same routes as a CGI program in plain Lean IO (WASI): \`npm run build:wasi\`.' };
-  const files = [...new Set(deploy.map(target => entryFile(template, deployTargets[target].package)))].filter(file => file !== 'Main.lean');
+    'WasiHttp.lean': 'The same routes as a wasi:http component (\`Lasm.WASI.Http\`): \`npm run build:wasi-http\`.' };
+  const files = [...new Set(deploy.map(target => entryFile(template, deployTargets[target].package)))].filter(file => what[file]);
   return files.map(file => `| \`${file}\` | ${what[file]} |\n`).join('');
 }
 
@@ -597,8 +611,8 @@ See the [Netlify guide](${guide('netlify')}).
 `,
   workers: () => `**Cloudflare Workers:** \`npm run build:workers\` writes
 \`workers/\` (the Worker entry, the Lean program and its host); \`wrangler.toml\` points at it.
-Test with \`npx wrangler dev\` and deploy with \`npx wrangler deploy\`. The same \`Main.lean\`
-serves Node and Workers (\`Lasm.JS.onEdge\`). See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
+Test with \`npx wrangler dev\` and deploy with \`npx wrangler deploy\`. The Worker serves the
+program's default export (\`Export.lean\`). See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
 `,
   'vercel-edge': () => `**Vercel Edge:** \`vercel.json\` makes Vercel run \`npm run build:vercel-edge\`,
 which writes the edge function \`api/lasm.mjs\` (and \`api/_lasm/\`); deploy with \`vercel deploy\`.
@@ -615,7 +629,7 @@ with \`fastly compute deploy\`. See the [Fastly guide](${guide('fastly')}).
 `,
   wasi: (name, template) => `**WASI:** \`npm run build:wasi\` writes \`wasi/main.wasm\`, a standard WASI (preview 1)
 module with no JavaScript: \`wasmtime run --dir . wasi/main.wasm\`, \`wasmer run\`, or Node's \`node:wasi\`.
-${template === 'fetch' ? '\`Cgi.lean\` answers one CGI request per run (WAGI). ' : ''}See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
+See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
 `,
   'wasi-http': () => `**wasi-http:** \`npm run build:wasi-http\` writes \`wasi-http/main.wasm\`, a
 wasi:http/proxy component: \`wasmtime serve wasi-http/main.wasm\` serves it on port 8080, and any
@@ -672,7 +686,7 @@ export function initProject({ directory, template, deploy = [] }) {
   }
   const files = templates[template].browser ? {
     'lean-toolchain': `leanprover/lean4:v${defaultLean()}\n`,
-    'lakefile.toml': lakefile(name),
+    'lakefile.toml': lakefile(name, template),
     'package.json': packageJson(name, template),
     'App.lean': readFileSync(join(templateRoot, 'common/App.lean'), 'utf8'),
     'Main.lean': readFileSync(join(templateRoot, template, 'Main.lean'), 'utf8'),
@@ -682,7 +696,7 @@ export function initProject({ directory, template, deploy = [] }) {
     '.gitignore': gitignore,
   } : {
     'lean-toolchain': `leanprover/lean4:v${defaultLean()}\n`,
-    'lakefile.toml': lakefile(name),
+    'lakefile.toml': lakefile(name, template),
     'package.json': packageJson(name, template, deploy),
     'App.lean': readFileSync(join(templateRoot, 'common/App.lean'), 'utf8'),
     'Main.lean': readFileSync(join(templateRoot, template, 'Main.lean'), 'utf8'),
@@ -701,7 +715,11 @@ export function initProject({ directory, template, deploy = [] }) {
   if (deploy.includes('supabase-edge')) files['supabase/config.toml'] = supabaseConfig(supabaseFunctionNameOf(name));
   if (deploy.includes('fastly')) files['fastly.toml'] = fastlyToml(fastlyName(target));
   if (deploy.includes('spin')) files['spin.toml'] = spinToml(spinName(name));
-  // The fetch template's programs for the WASI targets (entryFile).
+  // The fetch and hono templates: the handler, and the default export (entryFile).
+  if (templates[template].handler)
+    for (const file of [templates[template].handler, 'Export.lean'])
+      files[file] = readFileSync(join(templateRoot, template, file), 'utf8');
+  // The fetch template's programs for Fastly and wasi:http (entryFile).
   if (template === 'fetch')
     for (const platform of new Set(deploy.map(target => deployTargets[target].package)))
       if (wasiEntries[platform]) files[wasiEntries[platform]] = readFileSync(join(templateRoot, 'fetch', wasiEntries[platform]), 'utf8');

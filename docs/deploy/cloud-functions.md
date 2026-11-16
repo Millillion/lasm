@@ -30,7 +30,7 @@ Locally: `node node_modules/@google-cloud/functions-framework/build/src/main.js
 --target=lasm` in `gcf/`.
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64; no Google
-account): for every server template, the Functions Framework 5.0.5 serves the
+account): for the hono and fetch templates (each publishes its handler with `exportDefault`), the Functions Framework 5.0.5 serves the
 packaged directory on the runner (Ubuntu 24.04, the `nodejs24` runtime's OS);
 and Google Cloud's buildpacks build it as Cloud Run functions do (pack 0.38.2,
 `gcr.io/buildpacks/builder:google-24`, Node 24, `npm ci`, the Functions

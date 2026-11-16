@@ -61,7 +61,7 @@ supported here: it has to publish a handler.
   without publishing a handler fails the init phase, with a message that says so.
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64 and arm64 runners;
-no AWS account): every server template's zip, extracted with Info-ZIP `unzip` and
+no AWS account): the hono and fetch templates' zips, extracted with Info-ZIP `unzip` and
 mounted read-only at `/var/task` of `public.ecr.aws/lambda/nodejs:24`, invoked
 through the image's Runtime Interface Emulator with AWS's documented sample
 events for each type above (`scripts/serverless/events/`), with 512 MB and a

@@ -1,6 +1,6 @@
 # fetch.app
 
-An HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun and Deno, and on Fastly Compute, WASI and Spin through their own interfaces, compiled ahead of time to WebAssembly by
+An HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces, compiled ahead of time to WebAssembly by
 [Lasm](https://github.com/Millillion/lasm). It runs on Node.js, and also on Bun and Deno.
 
 ## Requirements
@@ -24,7 +24,7 @@ npm run build               # write dist/
 PORT=8080 npm start         # run the build (node dist/main.mjs): only Node is needed
 ```
 
-The server listens on `$HOST` (default `0.0.0.0`) and `$PORT` (default 3000) and
+The server listens on `$PORT` (default 3000), on every IPv4 address, and
 exits cleanly on SIGTERM or SIGINT. `npm run dev` (`lasm dev`) watches the Lean files, rebuilds
 in about 2 s after an ordinary edit and restarts the server; a build error is shown with its
 file and line while the last good server keeps running.
@@ -33,10 +33,11 @@ Files:
 
 | File | What it is |
 | --- | --- |
-| `Main.lean` | The program. |
-| `App.lean` | Pure Lean logic used by `Main.lean`. |
+| `Main.lean` | The program on Node: the handler on `Node.serve` (`Lasm.JS.Node.Serve`). |
+| `Handler.lean` | The HTTP handler, on the web's `Request` and `Response` (`Lasm.JS.Web`). |
+| `Export.lean` | The handler as the program's default export (`exportDefault`), for Bun, Deno, the edge and the function platforms. |
+| `App.lean` | Pure Lean logic used by `Handler.lean`. |
 | `Fastly.lean` | The same routes on Fastly Compute's own host calls (`Lasm.Fastly`): `npm run build:fastly`. |
-| `Cgi.lean` | The same routes as a CGI program in plain Lean IO (WASI): `npm run build:wasi`. |
 | `WasiHttp.lean` | The same routes as a wasi:http component (`Lasm.WASI.Http`): `npm run build:wasi-http`. |
 | `lakefile.toml`, `lean-toolchain` | The Lake project, pinned to Lean <LEAN_VERSION>. |
 | `package.json` | npm scripts and Lasm (`@lasm/compiler`) as a dev dependency. |
@@ -49,9 +50,9 @@ Files:
 
 ## Bun and Deno
 
-The same `Main.lean` also runs on Bun and Deno with Lasm's portable profile. Lean
+`Export.lean` also runs on Bun and Deno with Lasm's portable profile. Lean
 runs single-threaded there, with no files, sockets or processes, and the handler is
-served with `Bun.serve` or `Deno.serve`:
+served as the module's default export, as `bun` and `deno serve` serve one:
 
 ```sh
 bun install && bun run dev:bun          # Lasm itself runs on Bun
@@ -85,10 +86,6 @@ with your platform's own CLI (`vercel`, `netlify`, `func`, `gcloud`, `aws` or `s
 `serve` and `deploy` run it. Test locally with `fastly compute serve` (Fastly's Viceroy) and deploy
 with `fastly compute deploy`. See the [Fastly guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/fastly.md).
 
-**WASI:** `npm run build:wasi` writes `wasi/main.wasm`, a standard WASI (preview 1)
-module with no JavaScript: `wasmtime run --dir . wasi/main.wasm`, `wasmer run`, or Node's `node:wasi`.
-`Cgi.lean` answers one CGI request per run (WAGI). See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
-
 **wasi-http:** `npm run build:wasi-http` writes `wasi-http/main.wasm`, a
 wasi:http/proxy component: `wasmtime serve wasi-http/main.wasm` serves it on port 8080, and any
 wasi-http host (Spin, wasmCloud, …) runs it. See [WASI](https://github.com/Millillion/lasm/blob/main/docs/WASI.md).
@@ -99,8 +96,8 @@ port 3000. List the hosts the component's outgoing requests reach in `allowed_ou
 
 **Cloudflare Workers:** `npm run build:workers` writes
 `workers/` (the Worker entry, the Lean program and its host); `wrangler.toml` points at it.
-Test with `npx wrangler dev` and deploy with `npx wrangler deploy`. The same `Main.lean`
-serves Node and Workers (`Lasm.JS.onEdge`). See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
+Test with `npx wrangler dev` and deploy with `npx wrangler deploy`. The Worker serves the
+program's default export (`Export.lean`). See the [edge notes](https://github.com/Millillion/lasm/blob/main/docs/EDGE.md).
 
 The image runs on any container platform (Docker, Kubernetes, Cloud Run, Fly.io,
 Railway, Render, Heroku); give it at least 512 MB of memory. Build on the

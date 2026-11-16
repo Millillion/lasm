@@ -8,6 +8,5 @@
   "README.md",
   "lakefile.toml",
   "lean-toolchain",
-  "package.json",
-  "vercel.json"
+  "package.json"
 ]

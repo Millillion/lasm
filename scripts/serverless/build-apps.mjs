@@ -5,12 +5,16 @@
 // (lasm build --target).
 // Two projects per template, because Azure Functions and Google Cloud
 // Functions add their platform's npm package to the deployment:
+// The templates that publish a handler (exportDefault in Export.lean): the
+// function platforms call it directly, so express, fastify and std-http (which
+// bring their own server) run only as the Lambda container image.
 //   <template>          --deploy lambda-zip lambda-edge vercel netlify
 //   <template>-hosted   --deploy azure gcf
-// Plus `probe` (scripts/serverless/probe/Main.lean), a program that uses the
+// Plus `std-http` (the template's Node server, no function package) for the
+// Linux variants' time-zone checks, and `probe` (scripts/serverless/probe/Main.lean), a program that uses the
 // native pieces (subprocess, files, environment) for the Linux variants.
 // Writes OUTPUT/apps.json for the run-*.mjs scripts.
-//   node build-apps.mjs CANDIDATE_TGZ WORK_DIR [--templates hono,express,fastify,std-http] [--only functions,hosted,probe]
+//   node build-apps.mjs CANDIDATE_TGZ WORK_DIR [--templates hono,fetch] [--only functions,hosted,servers,probe]
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
@@ -19,9 +23,9 @@ import { fileURLToPath } from 'node:url';
 
 const args = process.argv.slice(2);
 const flag = name => { const i = args.indexOf(name); if (i < 0) return undefined; const [, value] = args.splice(i, 2); return value; };
-const templates = (flag('--templates') ?? 'hono,express,fastify,std-http').split(',');
-// --only functions,hosted,probe limits the projects (one build per bounded run).
-const only = (flag('--only') ?? 'functions,hosted,probe').split(',');
+const templates = (flag('--templates') ?? 'hono,fetch').split(',');
+// --only functions,hosted,servers,probe limits the projects (one build per bounded run).
+const only = (flag('--only') ?? 'functions,hosted,servers,probe').split(',');
 const [tgzArg, workArg] = args;
 assert.ok(tgzArg && workArg, 'Usage: node build-apps.mjs CANDIDATE_TGZ WORK_DIR [--templates a,b]');
 const tgz = resolve(tgzArg), work = resolve(workArg);
@@ -45,7 +49,7 @@ const cli = join(work, 'cli');
 mkdirSync(cli);
 run('install the Lasm package', bin('npm'), ['install', '--no-save', tgz], cli);
 const lasm = [process.execPath, join(cli, 'node_modules/@lasm/compiler/bin/lasm.mjs')];
-const frameworks = { hono: 'Hono', express: 'Express', fastify: 'Fastify', 'std-http': 'Std.Http' };
+const frameworks = { hono: 'Hono', fetch: 'Lasm.JS.Web' };
 const apps = [];
 for (const template of templates) {
   for (const [suffix, deploy, kind] of [['', ['lambda-zip', 'lambda-edge', 'vercel', 'netlify'], 'functions'], ['-hosted', ['azure', 'gcf'], 'hosted']]) {
@@ -64,6 +68,14 @@ for (const template of templates) {
     }
     apps.push({ name, template, framework: frameworks[template], project, dist: join(project, 'dist'), distBytes: size(join(project, 'dist')), packages });
   }
+}
+if (only.includes('servers')) {
+  const project = join(work, 'std-http');
+  run('lasm init std-http', lasm, ['init', project, '--template', 'std-http'], work);
+  run('npm install -D Lasm (std-http)', bin('npm'), ['install', '-D', tgz], project);
+  run('npm run build (std-http)', bin('npm'), ['run', 'build'], project);
+  apps.push({ name: 'std-http', template: 'std-http', framework: 'Std.Http', kind: 'server', project, dist: join(project, 'dist'),
+    distBytes: size(join(project, 'dist')), packages: {} });
 }
 if (only.includes('probe')) {
   const project = join(work, 'probe');

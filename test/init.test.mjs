@@ -40,8 +40,10 @@ test('every template creates a complete project', () => {
     for (const template of Object.keys(templates).filter(name => !templates[name].browser && !templates[name].fullstack)) {
       const directory = join(root, `app ${template}`);
       const result = initProject({ directory, template });
+      // The fetch and hono templates also have their handler and its default export (Export.lean).
+      const handler = templates[template].handler ? [templates[template].handler, 'Export.lean'] : [];
       assert.deepEqual(result.files.sort(), ['.dockerignore', '.gitignore', 'App.lean', 'Dockerfile', 'Main.lean', 'README.md',
-        'lakefile.toml', 'lean-toolchain', 'package.json']);
+        'lakefile.toml', 'lean-toolchain', 'package.json', ...handler].sort());
       const read = file => readFileSync(join(directory, file), 'utf8');
       assert.match(read('lean-toolchain'), /^leanprover\/lean4:v4\.\d+\.\d+\n$/);
       assert.match(read('lakefile.toml'), /root = "Main"/);
@@ -57,7 +59,7 @@ test('every template creates a complete project', () => {
       assert.match(dockerfile, /npx lasm build Main\.lean --output dist/);
       assert.equal(/PORT=8080/.test(dockerfile), templates[template].server);
       // Interop templates bind npm packages (import Lasm.JS); the fetch template uses Lasm.JS.Web only.
-      assert.equal(/^import Lasm\.JS$/m.test(read('Main.lean')), templates[template].interop);
+      assert.equal(/^import Lasm\.JS$/m.test(read(templates[template].handler ?? 'Main.lean')), templates[template].interop);
       assert.match(read('.gitignore'), /^dist\/$/m);
     }
     const lambda = join(root, 'lambda');
@@ -67,14 +69,14 @@ test('every template creates a complete project', () => {
     assert.match(recipe, /AWS_LWA_READINESS_CHECK_PATH=\/health/);
     assert.match(recipe, /printf '#!\/bin\/sh\\nexec node "\$LAMBDA_TASK_ROOT\/main\.mjs"\\n'/);
     assert.match(readFileSync(join(lambda, 'README.md'), 'utf8'), /Dockerfile\.lambda/);
-    // Function platforms: npm scripts that run lasm package, platform files and packages.
+    // Function platforms: npm scripts that build the default export (Export.lean) with lasm package, platform files and packages.
     const functions = join(root, 'functions');
-    const created = initProject({ directory: functions, template: 'std-http', deploy: ['lambda-zip', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] }).files;
+    const created = initProject({ directory: functions, template: 'fetch', deploy: ['lambda-zip', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] }).files;
     for (const file of ['vercel.json', 'netlify.toml', 'public/.gitkeep']) assert.ok(created.includes(file), file);
     assert.ok(!created.includes('Dockerfile.lambda'));
     const pkg = JSON.parse(readFileSync(join(functions, 'package.json'), 'utf8'));
     for (const target of ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'])
-      assert.equal(pkg.scripts[`build:${target}`], `lasm build Main.lean --target ${target}`);
+      assert.equal(pkg.scripts[`build:${target}`], `lasm build Export.lean --target ${target}`);
     // Platform CLIs are the user's: never dependencies of a generated project.
     for (const cli of ['vercel', 'netlify-cli', 'aws-sam-cli', 'azure-functions-core-tools', '@google-cloud/functions-framework-cli'])
       assert.ok(!pkg.dependencies?.[cli] && !pkg.devDependencies?.[cli], cli);
@@ -91,14 +93,14 @@ test('every template creates a complete project', () => {
     for (const file of ['wrangler.toml', 'vercel.json', 'netlify.toml', 'public/lasm.txt']) assert.ok(edgeFiles.includes(file), file);
     const edgePkg = JSON.parse(readFileSync(join(edge, 'package.json'), 'utf8'));
     for (const target of ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy'])
-      assert.equal(edgePkg.scripts[`build:${target}`], `lasm build Main.lean --target ${target}`);
+      assert.equal(edgePkg.scripts[`build:${target}`], `lasm build Export.lean --target ${target}`);
     assert.equal(edgePkg.scripts['start:deno'], 'deno run -A deno/main.mjs');
     assert.deepEqual(edgePkg.lasm, { edge: { exclude: ['@hono/node-server'] } });
     assert.match(readFileSync(join(edge, '.gitignore'), 'utf8'), /^deno\/$/m);
     assert.match(readFileSync(join(edge, 'README.md'), 'utf8'), /entrypoint to `deno\/main\.mjs`/);
     // Bun and Deno scripts (portable templates: plain and hono only).
     assert.equal(edgePkg.scripts['dev:bun'], 'bun x --bun lasm dev Main.lean');
-    assert.equal(edgePkg.scripts['build:deno'], 'lasm build Main.lean --target deno');
+    assert.equal(edgePkg.scripts['build:deno'], 'lasm build Export.lean --target deno');
     assert.match(readFileSync(join(edge, 'README.md'), 'utf8'), /## Bun and Deno/);
     assert.match(readFileSync(join(edge, '.gitignore'), 'utf8'), /^bun\/$/m);
     assert.equal(readFileSync(join(edge, '.gitignore'), 'utf8').match(/^deno\/$/gm).length, 1);
@@ -108,7 +110,7 @@ test('every template creates a complete project', () => {
     assert.ok(supabaseFiles.includes('supabase/config.toml'));
     const supabaseConfig = readFileSync(join(supabase, 'supabase/config.toml'), 'utf8');
     assert.match(supabaseConfig, /^\[functions\.supa-app\]\nverify_jwt = true\nimport_map = "\.\/functions\/supa-app\/deno\.json"$/m);
-    assert.equal(JSON.parse(readFileSync(join(supabase, 'package.json'), 'utf8')).scripts['build:supabase-edge'], 'lasm build Main.lean --target supabase-edge');
+    assert.equal(JSON.parse(readFileSync(join(supabase, 'package.json'), 'utf8')).scripts['build:supabase-edge'], 'lasm build Export.lean --target supabase-edge');
     assert.match(readFileSync(join(supabase, '.gitignore'), 'utf8'), /^supabase\/functions\/supa-app\/$/m);
     assert.match(readFileSync(join(supabase, 'README.md'), 'utf8'), /npx supabase functions deploy supa-app --project-ref PROJECT_REF/);
     assert.equal(supabaseFunctionNameOf('supa-app'), 'supa-app');

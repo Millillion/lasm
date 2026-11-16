@@ -1,4 +1,4 @@
-name = "func_app_v2"
+name = "fastify_lambda"
 version = "0.1.0"
 defaultTargets = ["app"]
 

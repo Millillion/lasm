@@ -4,7 +4,7 @@ A Lasm server runs as one Vercel Function
 on the Node.js 24 runtime that answers every path.
 
 ```sh
-npx lasm build Main.lean --target vercel   # dist/ (a server on $HOST:$PORT) and .vercel/output
+npx lasm build Main.lean --target vercel   # Main.lean calls exportDefault; writes dist/ and .vercel/output
 vercel deploy --prebuilt                   # Vercel's own CLI uploads exactly that output
 ```
 
@@ -45,7 +45,7 @@ for every path.
 - **Not supported:** the Edge runtime (no threads or native add-ons; Phase 8).
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64; no Vercel
-account): for every server template, the `lasm package` output is checked
+account): for the hono and fetch templates (each publishes its handler with `exportDefault`), the `lasm package` output is checked
 (config, every file, permissions, size); Vercel CLI 65.2.0 `vercel build` runs
 offline in the `lasm init --deploy vercel` project, with a local
 `.vercel/project.json` in place of `vercel link`; the built function then runs

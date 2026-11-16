@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "lasm dev Main.lean",
     "build": "lasm build Main.lean",
-    "start": "node dist/main.mjs",
-    "build:vercel": "lasm build Main.lean --target vercel"
+    "start": "node dist/main.mjs"
   },
   "engines": {
     "node": ">=24"

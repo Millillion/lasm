@@ -82,10 +82,10 @@ linked section of the review.
 | A38 | Lasm.RPC | Keep `serve'` (prime) as the name for the proof-free form, or `serveNoProof` / `serveSimple`? | [Q38](api/SHAPES_REVIEW_2026-11-11.md#12-lasmrpc) | pending sign-off |
 | A39 | Lasm.KV | What `Lasm.KV` becomes: keep `open` with `setWorkersEnv` (PR #213), or typed constructors taking the platform binding (recommended)? | [Q39](api/SHAPES_REVIEW_2026-11-11.md#13-lasmkv) | pending sign-off |
 | A40 | Lasm.KV | Should values stay `String` only, or become `ByteArray` (or generic, through `ToJson`)? | [Q40](api/SHAPES_REVIEW_2026-11-11.md#13-lasmkv) | pending sign-off |
-| A41 | Lasm.Fetch | Embedded assets after Lasm.Fetch: keep them copied in apps, or a small transport-free library (`Lasm.Embed`, recommended)? | [Q41](api/SHAPES_REVIEW_2026-11-11.md#14-lasmfetch-scheduled-for-deletion) | pending sign-off |
-| A42 | Lasm.Fetch | Request and routing helpers after Lasm.Fetch: a copy per app, or a pure, transport-free `Lasm.Http.Path` usable on every target? | [Q42](api/SHAPES_REVIEW_2026-11-11.md#14-lasmfetch-scheduled-for-deletion) | pending sign-off |
-| A43 | Lasm.Fetch | Outbound fetch across JavaScript, wasi-http and Fastly: no common call (apps pass a `send` function), or one cross-host `send` signature? | [Q43](api/SHAPES_REVIEW_2026-11-11.md#14-lasmfetch-scheduled-for-deletion) | pending sign-off |
-| A44 | Lasm.Fetch | WASI CGI (`--target wasi`), whose only server was Lasm.Fetch: template-only code, a small library, or dropped as a server target? | [Q44](api/SHAPES_REVIEW_2026-11-11.md#14-lasmfetch-scheduled-for-deletion) | pending sign-off |
+| A41 | Lasm.Fetch | Embedded assets after Lasm.Fetch: keep them copied in apps, or a small transport-free library (`Lasm.Embed`, recommended)? | [Q41](api/SHAPES_REVIEW_2026-11-11.md#14-lasmfetch-scheduled-for-deletion) | decided by Jordan 2026-11-16 ([milestone 0.2](#milestone-02-the-serving-model-and-lasmfetch-deleted)); pending sign-off |
+| A42 | Lasm.Fetch | Request and routing helpers after Lasm.Fetch: a copy per app, or a pure, transport-free `Lasm.Http.Path` usable on every target? | [Q42](api/SHAPES_REVIEW_2026-11-11.md#14-lasmfetch-scheduled-for-deletion) | decided by Jordan 2026-11-16 ([milestone 0.2](#milestone-02-the-serving-model-and-lasmfetch-deleted)); pending sign-off |
+| A43 | Lasm.Fetch | Outbound fetch across JavaScript, wasi-http and Fastly: no common call (apps pass a `send` function), or one cross-host `send` signature? | [Q43](api/SHAPES_REVIEW_2026-11-11.md#14-lasmfetch-scheduled-for-deletion) | decided by Jordan 2026-11-16 ([milestone 0.2](#milestone-02-the-serving-model-and-lasmfetch-deleted)); pending sign-off |
+| A44 | Lasm.Fetch | WASI CGI (`--target wasi`), whose only server was Lasm.Fetch: template-only code, a small library, or dropped as a server target? | [Q44](api/SHAPES_REVIEW_2026-11-11.md#14-lasmfetch-scheduled-for-deletion) | decided by Jordan 2026-11-16 ([milestone 0.2](#milestone-02-the-serving-model-and-lasmfetch-deleted)); pending sign-off |
 | A45 | Lasm.Fetch | Should Lasm.Fetch's proved `Request`/`Response` model move into the test suite as a spec (as decided), or be deleted with the library? | [Q45](api/SHAPES_REVIEW_2026-11-11.md#14-lasmfetch-scheduled-for-deletion) | pending sign-off |
 | A46 | Lasm.Fetch | When to delete `Lasm.Fetch`: proposed, the first release after `Node.serve` and the function-platform `exportDefault` land and nothing imports it. | [Q46](api/SHAPES_REVIEW_2026-11-11.md#14-lasmfetch-scheduled-for-deletion) | pending sign-off |
 
@@ -99,7 +99,7 @@ linked section of the review.
 | A50 | Lasm.JS core | `Lasm.JS.Wire.encode` returns `Except String ByteArray` (#154, 0.6.1, breaking). | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A51 | Bindings | `Lasm.Web` deleted for the generated `Lasm.JS.Web.Browser`, with `Lasm.UI.Mount` (#193, #197, 0.7.0, breaking). | [REVIEW.md §1](REVIEW.md#the-browser-tier-replaced-lasmweb-2026-11-10-jordans-decision-claudes-choices-to-review) | pending sign-off |
 | A52 | Bindings | `Lasm.Fastly` generated from Fastly's witx; the hand-written store calls removed (#194, 0.7.0, breaking). | [REVIEW.md §1](REVIEW.md#host-bindings-lasmfastly-generated-lasmwasi-next-decided-by-jordan-2026-11-10) | pending sign-off |
-| A53 | Templates | `lasm init --template fetch` uses `Lasm.Fetch` only on Node; Fastly, wasi:http/Spin and WASI get their own entry modules (#218, 0.8.0). | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
+| A53 | Templates | `lasm init --template fetch` uses `Lasm.Fetch` only on Node; Fastly, wasi:http/Spin and WASI get their own entry modules (#218, 0.8.0). | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | superseded by 0.2-3 ([milestone 0.2](#milestone-02-the-serving-model-and-lasmfetch-deleted)) |
 | A54 | Libraries | PR #124's drafts (`Lasm.Web.Crypto`, a WebSocket upgrade in `Lasm.Fetch.serve`, `Lasm.Markdown`) not taken; kept on the `api-proposals` branch. | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A55 | CLI | Proposed, not built: a WASI reactor build (`lasm build … --target wasi --reactor`) for the CLI's glue; under Stage 2's backend this question may change. | [REVIEW.md §2](REVIEW.md#the-cli-surface) | pending sign-off |
 | A56 | Packaging | Where the `Lasm.*` libraries live (inside `@lasm/cli` or separate `@lasm/*` packages): deferred by Jordan until the APIs are final. | [REVIEW.md §1](REVIEW.md#major-where-the-lasm-libraries-live-deferred-by-jordan-2026-11-10) | pending decision |
@@ -245,3 +245,73 @@ own server (Express, Fastify, `Std.Http`, `Node.serve`) runs on Lambda only
 as a container image behind the AWS Lambda Web Adapter (`--deploy lambda`),
 which is that platform's own way to run a server. **Alternative:** keep the
 loopback adapter (`lasm-server.mjs`), which Jordan rejected on 2026-11-11.
+
+### 0.2-3: templates serve with one entry module per serving model
+
+**Decision.** `lasm init --template fetch` and `--template hono` write the
+handler once and one small program per way of serving it, with no
+`Lasm.JS.onEdge` branch:
+
+| File | fetch | hono | Built by |
+| --- | --- | --- | --- |
+| `Handler.lean` / `Routes.lean` | `Handler.handle : Request → Async Response` | `Routes.app : IO Value` (the Hono app) | (imported) |
+| `Main.lean` | `Node.serve { fetch := Handler.handle }` | `@hono/node-server`'s `serve`, Hono's own Node adapter | `npm run build`, `dev`, `start`, the Dockerfile, `--deploy lambda` |
+| `Export.lean` | `exportDefault Handler.handle` | `exportDefault (← Routes.app)` | `build:bun`, `build:deno`, every edge and function-platform `build:<target>` |
+| `Fastly.lean`, `WasiHttp.lean` | the same routes on `Lasm.Fastly` and `Lasm.WASI.Http` (unchanged) | – | `build:fastly`, `build:wasi-http` |
+
+```lean
+-- Main.lean (fetch)
+import Handler
+import Lasm.JS.Node.Serve
+open Lasm.JS
+def main : IO Unit := Node.serve { fetch := Handler.handle }
+
+-- Export.lean (fetch)
+import Handler
+import Lasm.JS
+open Lasm.JS
+def main : IO Unit := exportDefault Handler.handle
+```
+
+**Why:** each platform gets what it natively expects (a server on Node, a
+default export elsewhere), and no program changes behavior with where it
+runs. **Alternatives:** one `Main.lean` that branches on `onEdge` (0.8.0's
+templates; context-dependent); `Main.lean` as the default export and a
+separate `Node.lean` (the Node build is the default one, so it keeps the
+name `Main.lean`). **Where:** this PR. Supersedes A53.
+
+### 0.2-4: the function platforms take the templates that publish a handler
+
+**Decision.** `--deploy lambda-zip|lambda-edge|vercel|netlify|azure|gcf`
+accept the hono and fetch templates only (they build `Export.lean`). The
+express, fastify and std-http templates bring their own server, so on AWS they
+keep `--deploy lambda`, the container image behind the AWS Lambda Web
+Adapter, which runs a server as Lambda's own tooling intends; `lasm init`
+refuses the others with the targets the template supports. **Alternatives:**
+port express and fastify to a handler (they are Node servers by design);
+keep a loopback adapter (rejected by Jordan, 2026-11-11). **Where:** this PR.
+
+### A44: the WASI CGI server mode is dropped (Jordan, 2026-11-16)
+
+**Decision:** HTTP on WASI goes through wasi-http only. `--target wasi`
+stays for command-line and batch programs. `lasm init --template fetch` no
+longer accepts `--deploy wasi` and has no `Cgi.lean`; `--deploy wasi` is the
+plain template's. The CGI glue and its fuzz target go with `Lasm.Fetch`
+(0.2's deletion PR). **Alternatives:** CGI as template-only code (0.8.0) or a
+small library.
+
+### A41–A43: no new namespaces replace Lasm.Fetch's helpers (Jordan, 2026-11-16)
+
+- **A41, embedded assets:** apps embed their own (Conduit's and Folio's
+  `Server/Embed.lean` and `Server/Assets.lean`, the fullstack template's
+  `Embed.lean`). No `Lasm.Embed`.
+- **A42, request and routing helpers:** apps route in a few lines of pure
+  Lean; on JavaScript hosts they read the URL with `Lasm.JS.Web`'s `URL` and
+  `URLSearchParams`, as the templates do. No `Lasm.Http.Path`.
+- **A43, outbound requests:** each host's own API: `Lasm.JS.Web.fetch` on
+  JavaScript, `OutgoingHandler.handle` on wasi-http, `HttpReq.send` on
+  Fastly. No cross-host `send`.
+
+**Why:** Jordan's direction (2026-11-16): no Lasm-specific layer between a
+program and its host. **Alternatives:** the review's options (b) and (c) for
+each (a small transport-free library, or a CLI feature).

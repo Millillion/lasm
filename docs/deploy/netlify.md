@@ -34,7 +34,7 @@ executable.
   and scheduled functions (untested).
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64; no Netlify
-account): for every server template, Netlify CLI 27.14.2 `netlify build
+account): for the hono and fetch templates (each publishes its handler with `exportDefault`), Netlify CLI 27.14.2 `netlify build
 --offline` runs the build command and bundles the function exactly as for a
 deploy (`.netlify/functions/lasm.zip`, checked for the Wasm program, host,
 native pieces, permissions and size); `netlify dev --offline` serves the
