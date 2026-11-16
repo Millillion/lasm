@@ -71,31 +71,6 @@ private partial def explicitArity (type : Expr) : MetaM Nat :=
       if (← x.fvarId!.getBinderInfo).isExplicit then n := n + 1
     return n
 
-/-- The run-time specifier of project file `./…` (`projectSpecifier` of the
-module being compiled). -/
-elab "lasm_js_project% " s:str : term => do
-  return mkStrLit (projectSpecifier (← getMainModule) s.getString)
-
-syntax (name := lasmJsRecord) "lasm_js_record " str str (" new")? : attr
-
-initialize registerBuiltinAttribute {
-  name := `lasmJsRecord
-  descr := "Records a Lasm.JS binding for the build-time binding check (added by `@[js]`)."
-  applicationTime := .afterTypeChecking
-  add := fun decl stx _ => do
-    let `(attr| lasm_js_record $m:str $p:str $[new%$c]?) := stx | throwUnsupportedSyntax
-    let info ← getConstInfo decl
-    let arity ← (explicitArity info.type).run' {} {}
-    let written := m.getString
-    let mainModule ← getMainModule
-    let fileName ← getFileName
-    let b : BindingInfo := if isProjectFile written then
-        { declName := decl, module := projectSpecifier mainModule written, path := p.getString, construct := c.isSome, arity,
-          relative := written, file := fileName }
-      else { declName := decl, module := written, path := p.getString, construct := c.isSome, arity }
-    modifyEnv fun env => bindingExtension.addEntry env b.json
-}
-
 /-- `@[js "module" "export"] opaque f : A → B → IO C` binds `f` to the export
 (`"default"`; `""` for the module value itself; `"a.b"` for a nested export).
 `@[js "module" "new Export"]` calls it with `new`. A module starting with
@@ -104,24 +79,34 @@ file (`@[js "./ffi/stream.mjs" "writeAndEnd"]`): `lasm build` ships it, and
 the files it imports by relative path, with the program on every target. -/
 syntax (name := jsAttr) "js " str str : attr
 
-macro_rules
+/-- `@[js …] opaque` elaborates to a `def` over `Bindable.bind` and records the
+binding in the module's data (`bindingExtension`) for `lasm build`'s binding
+check, with no attribute or syntax of its own. -/
+elab_rules : command
   | `($[$doc:docComment]? @[js $m:str $e:str] opaque $n:ident : $t:term) => do
     let spec := e.getString.trimAscii.toString
     let (construct, path) := if spec.startsWith "new " then (true, (spec.drop 4).trimAscii.toString) else (false, spec)
     let name := quote n.getId.toString
     let pathLit := Syntax.mkStrLit path
-    -- A project file is loaded by its path from the source root (projectSpecifier),
-    -- which needs the main module: `lasm_js_project%` and the record compute it.
-    let relative := m.getString
-    let project := isProjectFile relative
-    let moduleTerm ← if project then `(lasm_js_project% $m) else `($m:str)
-    let definition ← `($[$doc:docComment]? @[noinline] def $n : $t :=
+    -- A project file is loaded by its path from the source root (projectSpecifier).
+    let written := m.getString
+    let project := isProjectFile written
+    let mainModule ← getMainModule
+    let module := if project then projectSpecifier mainModule written else written
+    let moduleLit := Syntax.mkStrLit module
+    elabCommand (← `($[$doc:docComment]? @[noinline] def $n : $t :=
         Lasm.JS.Bindable.bind (α := $t)
-          { name := $name, module := $moduleTerm, path := $pathLit, construct := $(quote construct),
-            arity := Lasm.JS.Bindable.arity (α := $t) } #[])
-    let record ← if construct then `(attribute [lasm_js_record $m $pathLit new] $n)
-      else `(attribute [lasm_js_record $m $pathLit] $n)
-    return mkNullNode #[definition, record]
+          { name := $name, module := $moduleLit, path := $pathLit, construct := $(quote construct),
+            arity := Lasm.JS.Bindable.arity (α := $t) } #[]))
+    let decl := (← getCurrNamespace) ++ n.getId
+    let info ← getConstInfo decl
+    let nArgs ← liftTermElabM (explicitArity info.type)
+    let fileName ← getFileName
+    let b : BindingInfo := {
+      declName := decl, module := module, path := path, construct := construct, arity := nArgs
+      relative := if project then written else ""
+      file := if project then fileName else "" }
+    modifyEnv fun env => bindingExtension.addEntry env b.json
 
 /-! Deriving -/
 
