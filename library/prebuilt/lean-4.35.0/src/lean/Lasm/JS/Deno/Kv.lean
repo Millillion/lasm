@@ -108,7 +108,7 @@ instance : ToJS KvKeyPart := ⟨fun
   | .uint8Array v => toJS v
   | .domString v => toJS v
   | .double v => toJS v
-  | .bigint v => toJS v
+  | .bigint v => (Data.bigint v)
   | .boolean v => toJS v⟩
 instance : Coe ByteArray KvKeyPart := ⟨.uint8Array⟩
 instance : Coe String KvKeyPart := ⟨.domString⟩
@@ -448,7 +448,7 @@ partial def KvListIterator.values (self : KvListIterator) : Async (Array KvEntry
 /-- `constructor(value: bigint)`: `constructor(bigint value)` -/
 def KvU64.new (value : Int) : IO KvU64 :=
   Lasm.JS.Binding.invoke KvU64 { name := "Lasm.JS.Deno.KvU64.new", module := "globalThis", path := "Deno.KvU64", construct := true, arity := 1 }
-    (Support.args #[toJS value]) (await := false)
+    (Support.args #[(Data.bigint value)]) (await := false)
 
 /-- `readonly value: bigint`: `readonly attribute bigint value` -/
 def KvU64.value (self : KvU64) : IO Int := self.val.get "value" Int
@@ -465,17 +465,17 @@ def AtomicOperation.mutate (self : AtomicOperation) (mutations : Array KvMutatio
 
 /-- `sum(key: KvKey, n: bigint): this`: `AtomicOperation sum(sequence<KvKeyPart> key, bigint n)` -/
 def AtomicOperation.sum (self : AtomicOperation) (key : Array KvKeyPart) (n : Int) : IO AtomicOperation := do
-  let r ← self.val.callMethod "sum" (Support.args #[toJS key, toJS n]) Value
+  let r ← self.val.callMethod "sum" (Support.args #[toJS key, (Data.bigint n)]) Value
   pure { val := r }
 
 /-- `min(key: KvKey, n: bigint): this`: `AtomicOperation min(sequence<KvKeyPart> key, bigint n)` -/
 def AtomicOperation.min (self : AtomicOperation) (key : Array KvKeyPart) (n : Int) : IO AtomicOperation := do
-  let r ← self.val.callMethod "min" (Support.args #[toJS key, toJS n]) Value
+  let r ← self.val.callMethod "min" (Support.args #[toJS key, (Data.bigint n)]) Value
   pure { val := r }
 
 /-- `max(key: KvKey, n: bigint): this`: `AtomicOperation max(sequence<KvKeyPart> key, bigint n)` -/
 def AtomicOperation.max (self : AtomicOperation) (key : Array KvKeyPart) (n : Int) : IO AtomicOperation := do
-  let r ← self.val.callMethod "max" (Support.args #[toJS key, toJS n]) Value
+  let r ← self.val.callMethod "max" (Support.args #[toJS key, (Data.bigint n)]) Value
   pure { val := r }
 
 /-- `set(key: KvKey, value: unknown, options?: { expireIn?: number }): this`: `AtomicOperation set(sequence<KvKeyPart> key, any value, optional AtomicOperationSetOptions options)` -/

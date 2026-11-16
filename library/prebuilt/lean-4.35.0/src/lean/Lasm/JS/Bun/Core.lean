@@ -153,6 +153,14 @@ instance : Nonempty Terminal := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS Terminal := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Terminal := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.Terminal", .data⟩
 
+/-- `interface Bun.ResourceUsage` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
+structure ResourceUsage where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty ResourceUsage := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ResourceUsage := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ResourceUsage := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.ResourceUsage", .data⟩
+
 /-- `interface Bun.Subprocess` (Bun 1.4.4 type declarations, bun.d.ts): a handle to the JavaScript object. -/
 structure Subprocess where
   /-- The JavaScript object. -/
@@ -3035,6 +3043,57 @@ instance : ToJS TerminalOptions := ⟨fun d => Support.fields #[("cols", Support
     ("exit", Support.optional d.exit),
     ("drain", Support.optional d.drain)]⟩
 
+/-- `dictionary ResourceUsageContextSwitches` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ResourceUsageContextSwitches where
+  /-- `required double voluntary` -/
+  voluntary : Float
+  /-- `required double involuntary` -/
+  involuntary : Float
+instance : FromJS ResourceUsageContextSwitches where
+  fromJS d := do return {
+    voluntary := ← Lasm.JS.readField Float d "voluntary",
+    involuntary := ← Lasm.JS.readField Float d "involuntary" }
+  typeName := "Lasm.JS.Bun.ResourceUsageContextSwitches"
+
+/-- `dictionary ResourceUsageCpuTime` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ResourceUsageCpuTime where
+  /-- `required bigint user` -/
+  user : Int
+  /-- `required bigint system` -/
+  system : Int
+  /-- `required bigint total` -/
+  total : Int
+instance : FromJS ResourceUsageCpuTime where
+  fromJS d := do return {
+    user := ← Lasm.JS.readField Int d "user",
+    system := ← Lasm.JS.readField Int d "system",
+    total := ← Lasm.JS.readField Int d "total" }
+  typeName := "Lasm.JS.Bun.ResourceUsageCpuTime"
+
+/-- `dictionary ResourceUsageMessages` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ResourceUsageMessages where
+  /-- `required double sent` -/
+  sent : Float
+  /-- `required double received` -/
+  received : Float
+instance : FromJS ResourceUsageMessages where
+  fromJS d := do return {
+    sent := ← Lasm.JS.readField Float d "sent",
+    received := ← Lasm.JS.readField Float d "received" }
+  typeName := "Lasm.JS.Bun.ResourceUsageMessages"
+
+/-- `dictionary ResourceUsageOps` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ResourceUsageOps where
+  /-- `required double in` -/
+  «in» : Float
+  /-- `required double out` -/
+  out : Float
+instance : FromJS ResourceUsageOps where
+  fromJS d := do return {
+    «in» := ← Lasm.JS.readField Float d "in",
+    out := ← Lasm.JS.readField Float d "out" }
+  typeName := "Lasm.JS.Bun.ResourceUsageOps"
+
 /-- `typedef FileSink or double FileSinkOrDouble`: one constructor per member type. -/
 inductive FileSinkOrDouble where
   /-- `FileSink` -/
@@ -3090,87 +3149,6 @@ instance : ToJS DoubleOrDOMString := ⟨fun
   | .domString v => toJS v⟩
 instance : Coe Float DoubleOrDOMString := ⟨.double⟩
 instance : Coe String DoubleOrDOMString := ⟨.domString⟩
-
-/-- `dictionary ResourceUsageContextSwitches` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ResourceUsageContextSwitches where
-  /-- `required double voluntary` -/
-  voluntary : Float
-  /-- `required double involuntary` -/
-  involuntary : Float
-instance : FromJS ResourceUsageContextSwitches where
-  fromJS d := do return {
-    voluntary := ← Lasm.JS.readField Float d "voluntary",
-    involuntary := ← Lasm.JS.readField Float d "involuntary" }
-  typeName := "Lasm.JS.Bun.ResourceUsageContextSwitches"
-
-/-- `dictionary ResourceUsageCpuTime` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ResourceUsageCpuTime where
-  /-- `required bigint user` -/
-  user : Int
-  /-- `required bigint system` -/
-  system : Int
-  /-- `required bigint total` -/
-  total : Int
-instance : FromJS ResourceUsageCpuTime where
-  fromJS d := do return {
-    user := ← Lasm.JS.readField Int d "user",
-    system := ← Lasm.JS.readField Int d "system",
-    total := ← Lasm.JS.readField Int d "total" }
-  typeName := "Lasm.JS.Bun.ResourceUsageCpuTime"
-
-/-- `dictionary ResourceUsageMessages` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ResourceUsageMessages where
-  /-- `required double sent` -/
-  sent : Float
-  /-- `required double received` -/
-  received : Float
-instance : FromJS ResourceUsageMessages where
-  fromJS d := do return {
-    sent := ← Lasm.JS.readField Float d "sent",
-    received := ← Lasm.JS.readField Float d "received" }
-  typeName := "Lasm.JS.Bun.ResourceUsageMessages"
-
-/-- `dictionary ResourceUsageOps` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ResourceUsageOps where
-  /-- `required double in` -/
-  «in» : Float
-  /-- `required double out` -/
-  out : Float
-instance : FromJS ResourceUsageOps where
-  fromJS d := do return {
-    «in» := ← Lasm.JS.readField Float d "in",
-    out := ← Lasm.JS.readField Float d "out" }
-  typeName := "Lasm.JS.Bun.ResourceUsageOps"
-
-/-- `dictionary ResourceUsage` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ResourceUsage where
-  /-- `required ResourceUsageContextSwitches contextSwitches` -/
-  contextSwitches : ResourceUsageContextSwitches
-  /-- `required ResourceUsageCpuTime cpuTime` -/
-  cpuTime : ResourceUsageCpuTime
-  /-- `required double maxRSS` -/
-  maxRSS : Float
-  /-- `required ResourceUsageMessages messages` -/
-  messages : ResourceUsageMessages
-  /-- `required ResourceUsageOps ops` -/
-  ops : ResourceUsageOps
-  /-- `required double shmSize` -/
-  shmSize : Float
-  /-- `required double signalCount` -/
-  signalCount : Float
-  /-- `required double swapCount` -/
-  swapCount : Float
-instance : FromJS ResourceUsage where
-  fromJS d := do return {
-    contextSwitches := ← Lasm.JS.readField ResourceUsageContextSwitches d "contextSwitches",
-    cpuTime := ← Lasm.JS.readField ResourceUsageCpuTime d "cpuTime",
-    maxRSS := ← Lasm.JS.readField Float d "maxRSS",
-    messages := ← Lasm.JS.readField ResourceUsageMessages d "messages",
-    ops := ← Lasm.JS.readField ResourceUsageOps d "ops",
-    shmSize := ← Lasm.JS.readField Float d "shmSize",
-    signalCount := ← Lasm.JS.readField Float d "signalCount",
-    swapCount := ← Lasm.JS.readField Float d "swapCount" }
-  typeName := "Lasm.JS.Bun.ResourceUsage"
 
 /-- `dictionary ArrayBufferSinkStartOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ArrayBufferSinkStartOptions where
@@ -4085,7 +4063,7 @@ inductive DoubleOrBigint where
   | bigint (value : Int)
 instance : ToJS DoubleOrBigint := ⟨fun
   | .double v => toJS v
-  | .bigint v => toJS v⟩
+  | .bigint v => (Data.bigint v)⟩
 instance : Coe Float DoubleOrBigint := ⟨.double⟩
 instance : Coe Int DoubleOrBigint := ⟨.bigint⟩
 instance : FromJS DoubleOrBigint where
@@ -6827,6 +6805,30 @@ def Terminal.unref (self : Terminal) : IO Unit :=
 /-- `close(): void`: `undefined close()` -/
 def Terminal.close (self : Terminal) : IO Unit :=
   self.val.callMethod "close" (Support.args #[]) Unit
+
+/-- `contextSwitches: { voluntary: number; involuntary: number; }`: `readonly attribute ResourceUsageContextSwitches contextSwitches` -/
+def ResourceUsage.contextSwitches (self : ResourceUsage) : IO ResourceUsageContextSwitches := self.val.get "contextSwitches" ResourceUsageContextSwitches
+
+/-- `cpuTime: { user: bigint; system: bigint; total: bigint; }`: `readonly attribute ResourceUsageCpuTime cpuTime` -/
+def ResourceUsage.cpuTime (self : ResourceUsage) : IO ResourceUsageCpuTime := self.val.get "cpuTime" ResourceUsageCpuTime
+
+/-- `maxRSS: number`: `readonly attribute double maxRSS` -/
+def ResourceUsage.maxRSS (self : ResourceUsage) : IO Float := self.val.get "maxRSS" Float
+
+/-- `messages: { sent: number; received: number; }`: `readonly attribute ResourceUsageMessages messages` -/
+def ResourceUsage.messages (self : ResourceUsage) : IO ResourceUsageMessages := self.val.get "messages" ResourceUsageMessages
+
+/-- `ops: { in: number; out: number; }`: `readonly attribute ResourceUsageOps ops` -/
+def ResourceUsage.ops (self : ResourceUsage) : IO ResourceUsageOps := self.val.get "ops" ResourceUsageOps
+
+/-- `shmSize: number`: `readonly attribute double shmSize` -/
+def ResourceUsage.shmSize (self : ResourceUsage) : IO Float := self.val.get "shmSize" Float
+
+/-- `signalCount: number`: `readonly attribute double signalCount` -/
+def ResourceUsage.signalCount (self : ResourceUsage) : IO Float := self.val.get "signalCount" Float
+
+/-- `swapCount: number`: `readonly attribute double swapCount` -/
+def ResourceUsage.swapCount (self : ResourceUsage) : IO Float := self.val.get "swapCount" Float
 
 /-- `readonly stdin: SpawnOptions.WritableToIO<In> (read as FileSink | number | undefined: conditional on the stdin option (a FileSink when 'pipe'))`: `readonly attribute FileSinkOrDouble? stdin` -/
 def Subprocess.stdin (self : Subprocess) : IO (Option FileSinkOrDouble) := self.val.get "stdin" (Option FileSinkOrDouble)

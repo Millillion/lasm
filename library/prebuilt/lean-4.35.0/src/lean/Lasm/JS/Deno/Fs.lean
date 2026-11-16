@@ -119,7 +119,7 @@ inductive DoubleOrBigint where
   | bigint (value : Int)
 instance : ToJS DoubleOrBigint := ⟨fun
   | .double v => toJS v
-  | .bigint v => toJS v⟩
+  | .bigint v => (Data.bigint v)⟩
 instance : Coe Float DoubleOrBigint := ⟨.double⟩
 instance : Coe Int DoubleOrBigint := ⟨.bigint⟩
 
