@@ -60,7 +60,7 @@ export const templates = {
   // portable: also runs on Bun and Deno (the portable profile, Phase 7.5).
   plain: { summary: 'a Lean program (IO only)', server: false, interop: false, portable: true },
   express: { summary: 'Express 5 with Lean request handlers (Lasm.JS)', server: true, interop: true },
-  hono: { summary: 'Hono on @hono/node-server with Lean request handlers (Lasm.JS)', server: true, interop: true, portable: true, handler: 'Routes.lean' },
+  hono: { summary: 'Hono on @hono/node-server with Lean request handlers (Lasm.JS)', server: true, interop: true, portable: true, handler: 'Routes' },
   fastify: { summary: 'Fastify 5 with Lean route handlers (Lasm.JS)', server: true, interop: true },
   'std-http': { summary: "an HTTP server in pure Lean (Std.Http)", server: true, interop: false },
   // The browser (docs/BROWSER.md): a static web app, built with --target browser.
@@ -68,7 +68,7 @@ export const templates = {
   // A web fetch handler (Lasm.JS.Web): Node.serve on Node, the default export
   // on the edge, Bun, Deno and the function platforms; with --deploy, the same
   // routes on Fastly's (Lasm.Fastly) and wasi:http's (Lasm.WASI.Http) own interfaces.
-  fetch: { summary: 'an HTTP handler on the web\'s Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces', server: true, interop: false, library: 'Lasm.JS.Web', portable: true, handler: 'Handler.lean' },
+  fetch: { summary: 'an HTTP handler on the web\'s Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces', server: true, interop: false, library: 'Lasm.JS.Web', portable: true, handler: 'Handler' },
   // The whole stack in Lean (docs/RPC.md): shared types, API and validation; a
   // Lasm.Fetch server with server-side rendering; a Lasm.UI app that hydrates it.
   fullstack: { summary: 'a full-stack Lean app: shared API and validation (Lasm.RPC), a server (Lasm.Fetch) that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target', server: true, interop: false, fullstack: true },
@@ -158,7 +158,7 @@ export function lakeName(name) {
 }
 
 function lakefile(name, template) {
-  const handler = templates[template]?.handler?.replace(/\.lean$/, '');
+  const handler = templates[template].handler;
   return `name = "${lakeName(name)}"
 version = "0.1.0"
 defaultTargets = ["app"]
@@ -527,9 +527,9 @@ Files:
 | File | What it is |
 | --- | --- |
 ${t.handler ? `| \`Main.lean\` | The program on Node: ${template === 'hono' ? 'the Hono app on \`@hono/node-server\`' : 'the handler on \`Node.serve\` (\`Lasm.JS.Node.Serve\`)'}. |
-| \`${t.handler}\` | ${template === 'hono' ? 'The Hono app: routes and Lean request handlers' : 'The HTTP handler, on the web\'s \`Request\` and \`Response\` (\`Lasm.JS.Web\`)'}. |
+| \`${t.handler}.lean\` | ${template === 'hono' ? 'The Hono app: routes and Lean request handlers' : 'The HTTP handler, on the web\'s \`Request\` and \`Response\` (\`Lasm.JS.Web\`)'}. |
 | \`Export.lean\` | The ${template === 'hono' ? 'app' : 'handler'} as the program's default export (\`exportDefault\`), for Bun, Deno, the edge and the function platforms. |
-| \`App.lean\` | Pure Lean logic used by \`${t.handler}\`. |
+| \`App.lean\` | Pure Lean logic used by \`${t.handler}.lean\`. |
 ` : `| \`Main.lean\` | The program${t.interop ? ': routes and Lean request handlers' : ''}. |
 | \`App.lean\` | Pure Lean logic used by \`Main.lean\`. |
 `}${entryRows(template, deploy)}| \`lakefile.toml\`, \`lean-toolchain\` | The Lake project, pinned to Lean ${defaultLean()}. |
@@ -719,12 +719,12 @@ export function initProject({ directory, template, deploy = [] }) {
   if (deploy.includes('spin')) files['spin.toml'] = spinToml(spinName(name));
   // The fetch and hono templates: the handler, and the default export (entryFile).
   if (templates[template].handler)
-    for (const file of [templates[template].handler, 'Export.lean'])
+    for (const file of [`${templates[template].handler}.lean`, 'Export.lean'])
       files[file] = readFileSync(join(templateRoot, template, file), 'utf8');
-  // The fetch template's programs for Fastly and wasi:http (entryFile).
-  if (template === 'fetch')
-    for (const platform of new Set(deploy.map(target => deployTargets[target].package)))
-      if (wasiEntries[platform]) files[wasiEntries[platform]] = readFileSync(join(templateRoot, 'fetch', wasiEntries[platform]), 'utf8');
+  // The fetch template's programs for Fastly and wasi:http (entryFile; only the
+  // fetch template, among those that reach here, accepts those targets).
+  for (const platform of new Set(deploy.map(target => deployTargets[target].package)))
+    if (wasiEntries[platform]) files[wasiEntries[platform]] = readFileSync(join(templateRoot, 'fetch', wasiEntries[platform]), 'utf8');
   return writeFiles(target, name, files);
 }
 

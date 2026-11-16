@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseLasmArguments } from '../src/cli-arguments.mjs';
-import { initProject, lakeName, packageName, supabaseFunctionNameOf, templates } from '../src/init.mjs';
+import { deployTargets, entryFile, initProject, lakeName, packageName, parseInitArguments, supabaseFunctionNameOf, templates } from '../src/init.mjs';
 
 test('lasm init arguments', () => {
   assert.deepEqual(parseLasmArguments(['init', 'my-app']), { command: 'init', template: 'plain', deploy: [], directory: 'my-app' });
@@ -43,7 +43,7 @@ test('every template creates a complete project', () => {
       const directory = join(root, `app ${template}`);
       const result = initProject({ directory, template });
       // The fetch and hono templates also have their handler and its default export (Export.lean).
-      const handler = templates[template].handler ? [templates[template].handler, 'Export.lean'] : [];
+      const handler = templates[template].handler ? [`${templates[template].handler}.lean`, 'Export.lean'] : [];
       assert.deepEqual(result.files.sort(), ['.dockerignore', '.gitignore', 'App.lean', 'Dockerfile', 'Main.lean', 'README.md',
         'lakefile.toml', 'lean-toolchain', 'package.json', ...handler].sort());
       const read = file => readFileSync(join(directory, file), 'utf8');
@@ -61,7 +61,7 @@ test('every template creates a complete project', () => {
       assert.match(dockerfile, /npx lasm build Main\.lean --output dist/);
       assert.equal(/PORT=8080/.test(dockerfile), templates[template].server);
       // Interop templates bind npm packages (import Lasm.JS); the fetch template uses Lasm.JS.Web only.
-      assert.equal(/^import Lasm\.JS$/m.test(read(templates[template].handler ?? 'Main.lean')), templates[template].interop);
+      assert.equal(/^import Lasm\.JS$/m.test(read(templates[template].handler ? `${templates[template].handler}.lean` : 'Main.lean')), templates[template].interop);
       assert.match(read('.gitignore'), /^dist\/$/m);
     }
     const lambda = join(root, 'lambda');
@@ -179,5 +179,62 @@ test('the fullstack template: shared, server and client modules; Node and Worker
     assert.match(readFileSync(join(root, 'all', 'fastly.toml'), 'utf8'), /\[local_server\.kv_stores\]\n  TODOS = \[\]/);
     assert.match(read('Server.lean'), /embed_dir! "dist\/public"/);
     assert.match(read('Server.lean'), /Lasm\.KV\.open "TODOS"/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+// The program each target builds (entryFile): Main.lean on Node, the default
+// export (Export.lean) for the templates that publish a handler, and the fetch
+// template's own programs for Fastly and wasi:http.
+test('entryFile: Main.lean on Node, Export.lean for the default export, Fastly.lean and WasiHttp.lean', () => {
+  for (const template of ['fetch', 'hono']) {
+    assert.equal(entryFile(template, 'node'), 'Main.lean', template);
+    assert.equal(entryFile(template, undefined), 'Main.lean', template);
+    for (const platform of ['bun', 'deno', 'workers', 'vercel-edge', 'lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'])
+      assert.equal(entryFile(template, platform), 'Export.lean', `${template} ${platform}`);
+  }
+  assert.equal(entryFile('fetch', 'fastly'), 'Fastly.lean');
+  assert.equal(entryFile('fetch', 'wasi-http'), 'WasiHttp.lean');
+  // Only the fetch template has its own Fastly and wasi:http programs.
+  assert.equal(entryFile('hono', 'fastly'), 'Export.lean');
+  assert.equal(entryFile('hono', 'wasi-http'), 'Export.lean');
+  // Templates without a handler module build Main.lean everywhere, as does an unknown name.
+  for (const template of ['plain', 'express', 'fastify', 'std-http', 'web', 'fullstack', 'koa'])
+    for (const platform of ['node', 'bun', 'deno', 'workers', 'lambda', 'fastly', 'wasi-http'])
+      assert.equal(entryFile(template, platform), 'Main.lean', `${template} ${platform}`);
+});
+
+// Which templates the function platforms take (API decisions 0.2-10, 0.2-11).
+test('the function platforms and the Lambda image take only the templates with a handler', () => {
+  const functionTargets = ['lambda', 'lambda-container', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'];
+  for (const target of functionTargets) {
+    assert.deepEqual(deployTargets[target].templates, ['hono', 'fetch'], target);
+    for (const template of ['hono', 'fetch'])
+      assert.deepEqual(parseInitArguments(['x', '-t', template, '--deploy', target]).deploy, [target], `${template} ${target}`);
+    for (const template of ['express', 'fastify', 'std-http'])
+      assert.throws(() => parseInitArguments(['x', '-t', template, '--deploy', target]),
+        { message: `--deploy ${target} supports the hono and fetch templates, not ${template}. The ${template} template has no --deploy targets: it runs wherever its Dockerfile runs` });
+  }
+  // express, fastify and std-http accept no --deploy target at all.
+  for (const template of ['express', 'fastify', 'std-http'])
+    for (const target of Object.keys(deployTargets))
+      assert.throws(() => parseInitArguments(['x', '-t', template, '--deploy', target]), /--deploy /, `${template} ${target}`);
+  // The container image is the handler on Lambda's own image (no Web Adapter).
+  const root = mkdtempSync(join(tmpdir(), 'lasm-init-lambda-'));
+  try {
+    for (const template of ['fetch', 'hono']) {
+      const app = join(root, template);
+      const files = initProject({ directory: app, template, deploy: ['lambda-container', 'lambda'] }).files;
+      assert.ok(files.includes('Dockerfile.lambda') && files.includes('Export.lean'), template);
+      const recipe = readFileSync(join(app, 'Dockerfile.lambda'), 'utf8');
+      assert.match(recipe, /^FROM public\.ecr\.aws\/lambda\/nodejs:24$/m);
+      assert.match(recipe, /npx lasm build Export\.lean --target lambda/);
+      assert.match(recipe, /^CMD \["lasm-lambda\.handler"\]$/m);
+      assert.doesNotMatch(recipe, /adapter|AWS_LWA/i);
+      const pkg = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8'));
+      assert.equal(pkg.scripts['build:lambda'], 'lasm build Export.lean --target lambda');
+      assert.equal(pkg.scripts.build, 'lasm build Main.lean');
+      assert.equal(pkg.scripts['build:bun'], 'bun x --bun lasm build Export.lean --target bun');
+      assert.match(readFileSync(join(app, 'lakefile.toml'), 'utf8'), new RegExp(`\\[\\[lean_lib\\]\\]\\nname = "${template === 'hono' ? 'Routes' : 'Handler'}"`));
+    }
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
