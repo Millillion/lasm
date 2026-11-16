@@ -34,7 +34,7 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**173 shipped modules**: 19 modelled, 22 pending, 132 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 22 modules still need a model.
+**174 shipped modules**: 19 modelled, 22 pending, 133 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 22 modules still need a model.
 
 ### Modelled (19)
 
@@ -87,7 +87,7 @@ How a module moves from pending to modelled:
 | [`src/wasi/lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c) | — | the wasi-http request and response mapping (edge request mapping, IRREDUCIBLE.md M4) |
 | [`src/wasm-objects.mjs`](../src/wasm-objects.mjs) | — | a reader of relocatable Wasm objects: pure |
 
-### Exempt (132)
+### Exempt (133)
 
 | Module | Kind | Reason |
 | --- | --- | --- |
@@ -137,6 +137,7 @@ How a module moves from pending to modelled:
 | [`src/lasm-library.mjs`](../src/lasm-library.mjs) | io | provisions Lasm's Lean library; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/lasm-modules/app.mjs`](../src/lasm-modules/app.mjs) | runtime | the app instance of Lasm.UI.Mount; tested in browsers (ui.yml) |
 | [`src/launcher.mjs`](../src/launcher.mjs) | io | starts a built program |
+| [`src/lazy-library.mjs`](../src/lazy-library.mjs) | io | compiles Lasm's library modules on first import; orchestration of files and processes: its effect is the behaviour, tested by test/lazy-library.test.mjs with a fake compiler |
 | [`src/link-driver/compile.mjs`](../src/link-driver/compile.mjs) | io | compiles Lasm's C with the managed clang; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/link-driver/link.mjs`](../src/link-driver/link.mjs) | io | runs wasm-ld and the glue; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/link-driver/settings.mjs`](../src/link-driver/settings.mjs) | data | Emscripten link settings as data |

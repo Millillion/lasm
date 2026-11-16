@@ -474,6 +474,11 @@
       "kind": "io",
       "reason": "starts a built program"
     },
+    "src/lazy-library.mjs": {
+      "status": "exempt",
+      "kind": "io",
+      "reason": "compiles Lasm's library modules on first import; orchestration of files and processes: its effect is the behaviour, tested by test/lazy-library.test.mjs with a fake compiler"
+    },
     "src/lean-io-errors.mjs": {
       "status": "modelled",
       "models": [
