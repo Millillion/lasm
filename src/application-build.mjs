@@ -135,8 +135,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     const cache = join(work, 'bindings');
     const read = readBindingsAsync(lean, generated.env, [...generated.oleans(), ...library.oleans], { cache })
       .then(bindings => withAbsoluteFiles(bindings, directory));
-    read.catch(() => {});
-    const named = programNamesProjectFiles(programSources.map(file => readFileSync(file, 'utf8')));
+    const named = programNamesProjectFiles(programSources.map(file => String(readFileSync(file))));
     if (named) projectFiles = projectModules(await read, directory);
     bindingCheck = read
       .then(bindings => {
@@ -176,14 +175,14 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
     ...(nodeModules ? { nodeModules: { identity: nodeModules.identity, packages: nodeModules.packages } } : {}) };
   const signature = digest(JSON.stringify(recipe)), cached = join(work, signature, 'dist');
   output = resolve(output ?? cached);
-  if (insideDirectory(output, source) || insideDirectory(output, work) && output !== cached)
+  if (insideDirectory(output, source) || insideDirectory(output, work))
     throw new Error('Output directory must not contain application sources or its build cache');
   if (!rebuild && await reusableOutput(cached, signature)) {
     if (usesJs) progress?.({ stage: 'Checking Lasm.JS bindings' });
     await bindingCheck;
     progress?.({ stage: 'Reusing verified application build' });
     await deliverOutput(cached, output, signature);
-    return { ...JSON.parse(await readFile(join(cached, 'build-info.json'), 'utf8')), output, cached, signature, cacheHit: true };
+    return { ...JSON.parse(await readFile(join(cached, 'build-info.json'))), output, cached, signature, cacheHit: true };
   }
   // No compiler tool runs on an unchanged application. The tool catalog and
   // link driver are still part of the cache identity. Revalidate the tools only

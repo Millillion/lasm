@@ -118,6 +118,14 @@ test('a first build: the tools in order, the program linked, packaged and record
   assert.equal(link.sharedCache, join(cache, 'objects'));
   assert.equal(link.analysisCache, join(cache, 'analysis'));
   assert.equal(link.initializationSeed, join(work, 'initialization-seed.json'));
+  // The tools get the cache, the log and the progress; a Lean without tiers adds no tier to the identity.
+  const [, toolOptions] = named('provisionLinkToolchain')[0];
+  assert.equal(toolOptions.cache, cache);
+  assert.equal(typeof toolOptions.log, 'function');
+  assert.equal(typeof toolOptions.progress, 'function');
+  assert.equal('nativeLeanTier' in result, false);
+  // The cached output itself is a valid --output.
+  assert.equal((await run({ output: result.cached })).output, result.cached);
   assert.equal(link.dist, join(link.work, 'dist'));
   assert.match(relative(work, link.work), /^\.build-[0-9a-f-]{36}$/);
   assert.deepEqual(link.nativeCompilations, []);
@@ -290,6 +298,29 @@ test('Lasm.JS programs with project files: shipped under host/project-modules, p
   assert.notEqual((await run()).signature, result.signature);
 });
 
+test('Lasm.JS programs without project files link while their bindings are read; the target decides about missing globals; no progress callback is needed', async t => {
+  const { run, named } = setup(t);
+  stubs.programC = 'int main(int argc, char ** argv) { initialize_Lasm_JS(builtin); }\n';
+  stubs['lasm-library.mjs:librarySources'] = () => ({ sources: [], inputs: [], modules: [], oleans: [] });
+  // The read finishes only once linking has started (or after a second, which would mean the build waited).
+  const order = [];
+  stubs['application-binding-check.mjs:readBindingsAsync'] = () => new Promise(resolve => {
+    const done = why => { order.push(why); resolve([{ name: 'G', module: 'globalThis', path: 'Deno.serve', arity: 1 }]); };
+    stubs.readStarted = done;
+    setTimeout(() => done('timer'), 1000).unref();
+  });
+  const link = stubs['application-link.mjs:linkApplication'];
+  stubs['application-link.mjs:linkApplication'] = async options => { stubs.readStarted?.('link'); return link(options); };
+  const missing = { name: 'G', module: 'globalThis', path: 'Deno.serve', arity: 1, error: 'globalThis export "Deno.serve" is missing', missingGlobal: true };
+  stubs['application-binding-check.mjs:checkBindingsAsync'] = async () => [missing];
+  await assert.rejects(run(), { code: 'ERR_LASM_JS_BINDING' });
+  assert.equal(order[0], 'link');
+  const result = await run({ bindingTarget: 'deno' });
+  assert.ok(named('log').some(call => call[1] === 'Lasm.JS binding warning: G: globalThis export "Deno.serve" is missing where Lasm checks bindings; it must exist on deno'));
+  // Reused from the cache, with no progress callback either.
+  assert.equal((await run({ bindingTarget: 'deno' })).signature, result.signature);
+});
+
 test('Lasm.JS programs: the library is linked and the bindings are checked against the deployed packages', async t => {
   const { directory, root, run, named, lean } = setup(t);
   put(join(directory, 'package.json'), JSON.stringify({ dependencies: { left: '1' } }));
@@ -412,9 +443,14 @@ test('a maintainer link driver uses the full SDK and records its identity', asyn
   const { run, named } = setup(t);
   const { sdkCatalog } = await import(new URL('../src/managed-sdk.mjs', import.meta.url).href);
   stubs['application-link.mjs:selectedLinkDriver'] = () => 'emcc';
-  stubs['managed-sdk.mjs:provisionSdk'] = async () => ({ identity: 'sdk-identity', driverIdentity: 'driver-identity' });
+  let sdkOptions;
+  stubs['managed-sdk.mjs:provisionSdk'] = async options => { sdkOptions = options; return { identity: 'sdk-identity', driverIdentity: 'driver-identity' }; };
   stubs['application-runtime.mjs:applicationRuntime'] = async (lean, options) => ({ directory: options.directory, identity: 'rt', manifest: { name: 'rt', emscripten: sdkCatalog.version } });
-  const result = await run();
+  const progress = () => {};
+  const result = await run({ progress });
+  assert.equal(typeof sdkOptions.cache, 'string');
+  assert.equal(typeof sdkOptions.log, 'function');
+  assert.equal(sdkOptions.progress, progress);
   assert.equal(result.linkDriver, 'emcc');
   assert.equal(result.emscripten, sdkCatalog.version);
   assert.equal(result.sdkCatalogIdentity, sha(JSON.stringify(sdkCatalog)));
