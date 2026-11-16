@@ -40,6 +40,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as tier from './serve-tier2.mjs';
+import { lowerAuto } from './ts-auto.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const lockFile = join(root, 'scripts', 'bindings', 'serve-api.lock.json');
@@ -100,7 +101,7 @@ export function blank(text) {
 
 const opens = { '(': ')', '[': ']', '{': '}' };
 /** The index of the bracket closing the one at `at` (in a `shape`). */
-function matchClose(shape, at) {
+export function matchClose(shape, at) {
   let depth = 0;
   for (let i = at; i < shape.length; i++) {
     const c = shape[i];
@@ -110,7 +111,7 @@ function matchClose(shape, at) {
   fail(`unbalanced ${shape[at]} at ${at}`);
 }
 /** The index of the first `ch` at bracket depth 0 (angle brackets included, `=>` excepted) from `from`, or -1. */
-function findTop(shape, from, to, chars, angles = true) {
+export function findTop(shape, from, to, chars, angles = true) {
   let depth = 0;
   for (let i = from; i < to; i++) {
     const c = shape[i];
@@ -120,15 +121,15 @@ function findTop(shape, from, to, chars, angles = true) {
   }
   return -1;
 }
-const docBefore = (src, pos) => {
+export const docBefore = (src, pos) => {
   let best = null;
   for (const d of src.docs) if (d.end <= pos && src.code.slice(d.end, pos).trim() === '') best = d;
   return best ? best.text : '';
 };
-const squash = s => s.replace(/\s+/g, ' ').replace(/([(<\[]) /g, '$1').replace(/,? ([)>\]])/g, '$1').trim();
+export const squash = s => s.replace(/\s+/g, ' ').replace(/([(<\[]) /g, '$1').replace(/,? ([)>\]])/g, '$1').trim();
 
 /** Every interface, type alias and function of a file, by qualified name (`Deno.HttpServer`, `Bun.Serve.Options`). */
-export function declarations(text, file, { classes = false } = {}) {
+export function declarations(text, file, { classes = false, auto = false } = {}) {
   const src = { ...blank(text), file };
   const out = [];
   const head = /^(?:export\s+)?(?:declare\s+)?/;
@@ -169,6 +170,21 @@ export function declarations(text, file, { classes = false } = {}) {
           doc: docBefore(src, i) });
         i = close + 1; continue;
       }
+      // ts-auto.mjs (Lasm.JS.Deno, Lasm.JS.Bun): classes, enums and constants as they are declared.
+      if (auto && (m = /^(?:abstract\s+)?(class|enum)\s+([\w$]+)/.exec(body))) {
+        const open = findTop(src.shape, i + lead + m[0].length, end, '{');
+        const close = open < 0 ? end - 1 : matchClose(src.shape, open);
+        if (open >= 0) out.push({ kind: m[1], name: qual(m[2]), header: squash(src.code.slice(i + lead + m[0].length, open)), src, body: [open + 1, close],
+          doc: docBefore(src, i) });
+        i = close + 1; continue;
+      }
+      if (auto && (m = /^(const|let|var)\s+([\w$]+)\s*:/.exec(body))) {
+        const stop = findTop(src.shape, i, end, ';', false);
+        const e = stop < 0 ? end : stop;
+        out.push({ kind: 'const', name: qual(m[2]), mutable: m[1] !== 'const', type: squash(src.code.slice(i + lead + m[0].length, e)), src,
+          at: i + lead + m[0].length, doc: docBefore(src, i) });
+        i = e + 1; continue;
+      }
       if ((m = /^(?:abstract\s+)?(?:class|enum)\s/.exec(body))) {
         const open = findTop(src.shape, i, end, '{', false);
         i = open < 0 ? end : matchClose(src.shape, open) + 1; continue;
@@ -200,7 +216,7 @@ export function membersOf(src, from, to) {
   }
   return out;
 }
-function parseMember(text, shape) {
+export function parseMember(text, shape) {
   let s = 0;
   const ws = () => { while (/\s/.test(text[s])) s++; };
   let readonly = false;
@@ -251,7 +267,7 @@ export function splitParams(text, shape) {
   return out;
 }
 /** The overloads of a function declaration's text: [{ params, type }]. */
-function functionSignature(text) {
+export function functionSignature(text) {
   const { shape } = blank(text);
   const m = /function\s+[\w$]+\s*/.exec(shape);
   let at = m.index + m[0].length, generics = '';
@@ -263,7 +279,7 @@ function functionSignature(text) {
   return { params, type: squash(text.slice(r + 1)), generics };
 }
 /** The right-hand side of a type alias (after the `=` that follows its generic parameters). */
-function aliasBody(d) {
+export function aliasBody(d) {
   const { shape } = blank(d.text);
   const m = /type\s+[\w$]+\s*/.exec(shape);
   const eq = findTop(shape, m.index + m[0].length, shape.length, '=');
@@ -374,6 +390,8 @@ export function parseType(text) {
     }
     if (/^["'`]/.test(t)) { next(); if (t[0] === '`') fail(`template literal types are not lowered: ${text}`); return { k: 'lit', value: JSON.parse(t[0] === "'" ? `"${t.slice(1, -1)}"` : t) }; }
     if (/^\d/.test(t)) { next(); return { k: 'num', value: +t }; }
+    // `readonly T[]`: the array (Lean arrays are values).
+    if (t === 'readonly' && toks[p + 1] && /^[A-Za-z_$(]/.test(toks[p + 1].t)) { next(); return postfix(); }
     if (['keyof', 'typeof', 'infer', 'unique'].includes(t)) fail(`${t} types are not lowered: ${text}`);
     // `readonly T[]`: an array (Lean's arrays are values).
     if (t === 'readonly') { next(); return postfix(); }
@@ -925,15 +943,15 @@ export async function lowerAll() {
   for (const host of tier.hosts) {
     const files = [];
     for (const file of host.files) files.push({ file, text: await loadFile(host, file) });
-    const { idl, excluded } = lowerHost(host, files);
+    const { idl, excluded } = host.auto ? lowerAuto(host, files) : lowerHost(host, files);
     const header = `// GENERATED by scripts/bindings/serve-api.mjs from the ${host.name} ${host.version} TypeScript declarations
 // (${host.files.map(f => `https://github.com/${host.repo}/blob/${host.tag}/${f}`).join(',\n//  ')};
-// ${host.license}), for what serve-tier2.mjs selects; do not edit. Comments quote each
+// ${host.license}), for what ${host.auto ? `${host.name.toLowerCase()}-tier2.mjs excludes (ts-auto.mjs's rules)` : 'serve-tier2.mjs selects'}; do not edit. Comments quote each
 // member's declaration. generate-web.mjs turns this into Lasm.JS.${host.name}.
 //
-// Not lowered (serve-tier2.mjs; the declarations' own @experimental and UNSTABLE tags):
+// Not lowered (${host.auto ? `${host.name.toLowerCase()}-tier2.mjs` : 'serve-tier2.mjs'}; the declarations' own @experimental and UNSTABLE tags):
 ${excluded.map(([w, r]) => `//   - ${w}: ${r}`).join('\n')}
-${Object.entries(host.notSelected).map(([w, r]) => `//   - ${w} (not selected): ${r}`).join('\n')}
+${Object.entries(host.notSelected ?? {}).map(([w, r]) => `//   - ${w} (not selected): ${r}`).join('\n')}
 `;
     results.push({ file: join(root, 'scripts', 'bindings', `${host.name.toLowerCase()}.idl`), text: `${header}\n${idl}\n` });
   }

@@ -48,9 +48,9 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   'Lasm.JS.Node.Http', 'Lasm.JS.Node.Https', 'Lasm.JS.Node',
   // Node.serve (docs/JS_BINDINGS.md, "Serving HTTP on Node: Node.serve"): provided by Lasm, hand-written, not generated.
   'Lasm.JS.Node.Serve',
-  // Lasm.JS.Deno and Lasm.JS.Bun (docs/JS_BINDINGS.md, "Lasm.JS.Deno and Lasm.JS.Bun"): Deno.serve and Bun.serve,
-  // generated from the runtimes' TypeScript declarations (scripts/bindings/serve-api.mjs, generate-web.mjs).
-  'Lasm.JS.Deno.Serve', 'Lasm.JS.Deno', 'Lasm.JS.Bun.Serve', 'Lasm.JS.Bun',
+  // Lasm.JS.Deno and Lasm.JS.Bun (docs/JS_BINDINGS.md, "Standard bindings for Deno") have no prebuilt core
+  // (docs/api/decisions/0.4.md, 0.4-20): their modules ship as source and compile on first import
+  // (src/lazy-library.mjs), so none is listed here.
   // Lasm.JS.Cloudflare (docs/JS_BINDINGS.md, "Cloudflare Workers: Lasm.JS.Cloudflare"): Workers' runtime APIs,
   // generated from @cloudflare/workers-types (scripts/bindings/cloudflare-api.mjs, generate-web.mjs).
   'Lasm.JS.Cloudflare.Support', 'Lasm.JS.Cloudflare.Kv', 'Lasm.JS.Cloudflare.D1', 'Lasm.JS.Cloudflare.R2', 'Lasm.JS.Cloudflare.Queues',

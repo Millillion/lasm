@@ -1116,7 +1116,7 @@ path resolves.
 
 | Module | Members | Declared in |
 | --- | --- | --- |
-| `Lasm.JS.Deno.Serve` | `Deno.serve(handler)` as `serve`; `Deno.serve(options, handler)` as `serveWithOptions` (`ServeTcpOptions`: `port`, `hostname`, `signal`, `onListen`, `onError`, `reusePort`, `tcpBacklog`, `automaticCompression`, `transport`) and, with `cert` and `key`, `serveWithTlsOptions` (`ServeTcpTlsOptions`); `ServeHandler` (`Request → ServeHandlerInfo → Async Response`); `HttpServer` (`finished`, `shutdown`, `addr`, `ref`, `unref`); `ServeHandlerInfo` (`remoteAddr`, `completed`); the structure `NetAddr` (`transport`, `hostname`, `port`) | Deno 2.9.6, `cli/tsc/dts/lib.deno.ns.d.ts`, `lib.deno_net.d.ts` |
+| `Lasm.JS.Deno.Serve` | `Deno.serve(handler)` as `serve`; `Deno.serve(options, handler)` as `serveWithOptions` (`ServeTcpOptions`: `port`, `hostname`, `signal`, `onListen`, `onError`, `reusePort`, `tcpBacklog`, `automaticCompression`, `transport`) and, with `cert` and `key`, `serveWithTlsOptions` (`ServeTcpTlsOptions`); on a Unix socket, `serveWithUnixOptions` (`ServeUnixOptions`: `path`; `HttpServerUnixAddr`, `ServeHandlerUnixAddr`); `ServeHandler` (`Request → ServeHandlerInfo → Async Response`); `HttpServer` (`finished`, `shutdown`, `addr`, `ref`, `unref`); `ServeHandlerInfo` (`remoteAddr`, `completed`); the structure `NetAddr` (`transport`, `hostname`, `port`; in `Lasm.JS.Deno.Net`). The rest of the namespace: [Lasm.JS.Deno](#standard-bindings-for-deno-lasmjsdeno) | Deno 2.9.6, `cli/tsc/dts/lib.deno.ns.d.ts`, `lib.deno_net.d.ts` |
 | `Lasm.JS.Bun.Serve` | `Bun.serve(options)` as `serve`; `ServeOptions` (`fetch`, `port`, `hostname`, `error`, `idleTimeout`, `maxRequestBodySize`, `reusePort`, `ipv6Only`, `id`); `ServeOptionsFetch` (`Request → Server → Async Response`); `Server` (`stop`, `url`, `port`, `hostname`, `protocol`, `requestIP`, `timeout`, `fetch`, `reload`, `pendingRequests`, `closeIdleConnections`, `ref`, `unref`, `development`, `id`); the structure `SocketAddress` (`address`, `port`, `family`) | Bun 1.4.4, `packages/bun-types/serve.d.ts`, `bun.d.ts` |
 
 `import Lasm.JS.Deno` and `import Lasm.JS.Bun` import their module (and the
@@ -1129,9 +1129,10 @@ Not generated, with the reason (each listed in
 - **Experimental or unstable** (the declaration says `@experimental` or
   `UNSTABLE`; never generated): Deno's VSOCK overloads (`ServeVsockOptions`),
   Bun's `http1`, `http2` and `http3` options.
-- **Outside the server entry points:** Unix domain sockets (Deno's
-  `ServeUnixOptions` overloads, Bun's `unix`); WebSockets (`Server.upgrade`,
-  `publish`, `subscriberCount`, `pendingWebSockets`, the `websocket` handlers);
+- **Outside the server entry points (Bun):** Unix domain sockets (Bun's `unix`;
+  Deno's are `serveWithUnixOptions`); WebSockets (`Server.upgrade`,
+  `publish`, `subscriberCount`, `pendingWebSockets`, the `websocket` handlers;
+  Deno's are `Deno.upgradeWebSocket`, in [Lasm.JS.Deno](#standard-bindings-for-deno-lasmjsdeno));
   Bun's `routes` (a Lean handler routes in Lean), `tls` (it takes Bun's file
   objects) and `development` (Bun's dev server for HTML bundles).
 - **Another form of a generated operation:** Deno's overloads that take the
@@ -1322,8 +1323,10 @@ each of the three servers.
 - **Build time: no measurable change** for a new project with warm tools
   (Node 21.1 s for the baseline, 18.2 and 19.8 s; the edge runtime 17.9 s, 16.4
   and 16.7 s).
-- **Package size:** the compiled library (`library/prebuilt`) grows by 2.6 MB
-  (1.9 MB of `.olean` files), 0.6 MB compressed.
+- **Package size: sources only.** Neither namespace is prebuilt
+  (docs/api/decisions/0.4.md, 0.4-20): their modules ship as Lean source and
+  compile into Lasm's managed Lean prefix the first time a program imports them,
+  then are reused.
 
 ### Pinned versions and drift
 
@@ -1339,6 +1342,143 @@ give. To move to newer versions: change `version` and `tag` in
 `node scripts/bindings/generate-web.mjs`; decide every new member or overload
 the lowering reports, regenerate `library/prebuilt` (`library-prebuilt.yml`) and
 review the diff of the IDL files.
+
+## Standard bindings for Deno: `Lasm.JS.Deno`
+
+`import Lasm.JS.Deno` gives **the whole `Deno` namespace** of Deno 2.9.6, generated
+from Deno's own TypeScript declarations (`cli/tsc/dts/lib.deno.ns.d.ts`,
+`lib.deno_net.d.ts`, and Deno KV and `Deno.cron` from `lib.deno.unstable.d.ts`):
+every function, constant and class, and every type they use. Status: **current
+source, not yet released** (Stage 0, milestone 0.4; docs/API_DECISIONS.md 0.4-5,
+0.4-7, 0.4-9, 0.4-10 to 0.4-15). It runs with `--target deno` and `--target deno-deploy`.
+Its modules ship as source and compile on the first build that imports them
+(0.4-20); import only the modules you use (`import Lasm.JS.Deno.Kv`) to compile less.
+
+```lean
+import Lasm.JS.Deno
+open Lasm.JS Lasm.JS.Web
+
+def run : Async Unit := do
+  let dir ← Deno.makeTempDir none
+  Deno.writeTextFile (.domString s!"{dir}/a.txt") (.domString "hi") none   -- or just "…": the unions have Coe instances
+  IO.println (← Deno.readTextFile (.domString s!"{dir}/a.txt") none)       -- hi
+  for e in ← (← Deno.readDir (.domString dir)).values do                     -- an async iterable, read to the end
+    IO.println s!"{e.name} {e.isFile}"
+  let out ← (← Deno.Command.new (.domString "git") (some { args := some #["--version"] })).output
+  IO.println s!"{out.code} {String.fromUTF8! out.stdout}"
+  let kv ← Deno.openKv none                                                  -- Deno KV
+  discard <| kv.set #["users", "ada"] (toJS "Ada Lovelace") none
+  let e ← kv.get #["users", "ada"] none
+  IO.println s!"{e.versionstamp}"
+  for entry in ← (← kv.list { «prefix» := some #["users"] } none).values do
+    IO.println s!"{entry.key.size} {entry.versionstamp}"
+
+def main : IO Unit := run.block
+```
+
+The Deno CLI needs Deno's own flags for KV and cron (`deno run -A --unstable-kv
+deno/main.mjs`); Deno Deploy provides both without flags.
+[examples/deno-kv](../examples/deno-kv) is a todo API on Deno KV served with
+`Deno.serve`, built and checked over HTTP by CI.
+
+### What is covered
+
+| Module | Members |
+| --- | --- |
+| `Lasm.JS.Deno.Runtime` | `env` (`Env`: `get`, `set`, `delete`, `has`, `toObject`), `args`, `pid`, `ppid`, `build`, `version`, `noColor`, `exitCode`, `mainModule`, `exit`, `cwd`, `chdir`, `execPath`, `hostname`, `osRelease`, `osUptime`, `loadavg`, `memoryUsage`, `systemMemoryInfo`, `uid`, `gid`, `addSignalListener`, `removeSignalListener`, `refTimer`, `unrefTimer` |
+| `Lasm.JS.Deno.Permissions` | `permissions` (`Permissions`: `query`, `request`, `revoke` and their `Sync` forms), `PermissionStatus`, `PermissionDescriptor` |
+| `Lasm.JS.Deno.Io` | `stdin`, `stdout`, `stderr` (`readable`/`writable` streams, `setRaw`, `isTerminal`, `close`), `consoleSize`, `inspect` |
+| `Lasm.JS.Deno.Fs` | `readFile`, `readTextFile`, `writeFile`, `writeTextFile`, `open`, `create`, `stat`, `lstat`, `readDir`, `mkdir`, `makeTempDir`, `makeTempFile`, `remove`, `rename`, `copyFile`, `link`, `symlink`, `readLink`, `realPath`, `chmod`, `chown`, `truncate`, `utime`, `umask`, `watchFs`, each with its `Sync` form; `FsFile` (`readable`, `writable`, `seek`, `stat`, `truncate`, `sync`, `lock`, `utime`, …), `FsWatcher` |
+| `Lasm.JS.Deno.Subprocess` | `Command` (`new`, `output`, `outputSync`, `spawn`), `ChildProcess` (`stdin`, `stdout`, `stderr`, `pid`, `status`, `output`, `kill`, `ref`, `unref`), `kill` |
+| `Lasm.JS.Deno.Net` | `listen` (TCP), `listenUnix`, `listenTls`, `connect`, `connectUnix`, `connectTls`, `startTls`, `resolveDns` (one function per record type: `resolveDnsMx`, …), `networkInterfaces`; `TcpListener`, `UnixListener`, `TlsListener` (async iterables of connections), `TcpConn`, `UnixConn`, `TlsConn` |
+| `Lasm.JS.Deno.Serve` | `serve`, `serveWithOptions`, `serveWithTlsOptions`, `serveWithUnixOptions` (above) |
+| `Lasm.JS.Deno.WebSockets` | `upgradeWebSocket` (a `WebSocketUpgrade` of the response and the socket, a Lasm.JS.Web `WebSocket`: `{ val := up.socket : WebSocket }`) |
+| `Lasm.JS.Deno.Fetch` | `createHttpClient` (`HttpClient`: pass it as `fetch`'s `client`) |
+| `Lasm.JS.Deno.Kv` | Deno KV: `openKv`, `Kv` (`get`, `getMany`, `set`, `delete`, `list`, `atomic`, `enqueue`, `listenQueue`, `watch`, `close`), `AtomicOperation` (`check`, `mutate`, `set`, `delete`, `sum`, `min`, `max`, `enqueue`, `commit`), `KvU64`, `KvListIterator`; `cron` |
+
+91 functions and constants, 29 classes and handle types (134 members) and 134
+supporting types. Each module is generated from the declarations with that
+`@category` (a type used by an earlier module lives there).
+
+Not generated, with the reason (each in
+[`deno-tier2.mjs`](../scripts/bindings/deno-tier2.mjs) and listed at the top of
+[`deno.idl`](../scripts/bindings/deno.idl)):
+
+- **Marked `@experimental`, `UNSTABLE` or `@deprecated`**: VSOCK, QUIC and
+  WebTransport, `Deno.spawn` and its forms, the unstable file's other APIs. Deno
+  KV and `Deno.cron` are the exception: they are generated although their
+  declarations are unstable (Jordan, 2026-11-16; API_DECISIONS 0.4-10).
+- **FFI** (`Deno.dlopen`, `UnsafePointer`, …): signatures computed by
+  TypeScript's type system, and Deno Deploy has no FFI. **`Deno.test` and
+  `Deno.bench`**: they register tests for `deno test`, which does not run Lasm's
+  output. **`Deno.errors`**: error classes for `instanceof`; a JavaScript error
+  reaches Lean as an `IO.Error` whose message starts with the class name.
+  **`Deno.telemetry`**: OpenTelemetry provider objects typed `any`.
+- **In-place buffers**: `read(p)` and `write(p)` of `FsFile`, `Conn`, `stdin`,
+  `stdout` and `stderr` read into or write part of a caller's buffer; Lean bytes
+  are copies. Read the `readable` stream and write the `writable` one.
+- `readDirSync` (a synchronous iterator object; `readDir` gives the same entries),
+  `Kv.commitVersionstamp` (a Symbol placeholder), `UpgradeWebSocketOptions.socket`
+  (a `node:net` socket), the handler-inside-options forms of `serve`, the
+  general `resolveDns(query, recordType: RecordType)` (the per-type functions
+  return typed records), the iterator protocol's own `next` and `return` (the
+  async iterables have `iterator` and `values`), `PermissionStatus`'s
+  `addEventListener` (its `EventTarget` parent's is the same call), and every
+  Symbol-keyed member (`[Symbol.dispose]`: `using`, which Lean does not have).
+
+### How Deno's declarations become Lean
+
+[`ts-auto.mjs`](../scripts/bindings/ts-auto.mjs) lowers the namespace to WebIDL
+with the declaration reader of `serve-api.mjs` and these rules (each in
+API_DECISIONS 0.4-11); `generate-web.mjs` then generates Lean as for the other
+tiers ([above](#how-a-webidl-declaration-becomes-lean)).
+
+| TypeScript | WebIDL | Lean |
+| --- | --- | --- |
+| a function, a constant (`const pid: number`), a class | an operation or attribute of the namespace; an `interface` with constructors and statics | `Deno.readFile`, `Deno.pid : IO Float`, `Deno.Command.new`, `Deno.FsFile` |
+| an interface with a required method or a `Promise` property, a class, an interface extending one | `interface` (properties `readonly`, except a class's writable fields and an interface's function-typed property, such as `onchange`) | a handle type |
+| an interface of plain data (`FileInfo`, `DirEntry`, `NetAddr`, options) | `dictionary` | a structure, copied |
+| a union of object types (`KvEntryMaybe`, `KvListSelector`, `PermissionDescriptor`, `KvMutation`) | one `dictionary`: each member's type is the union of its types, optional where an alternative lacks it | one structure: `entry.versionstamp : Option String` |
+| a union of other types (`string \| URL`) | a `typedef` named after the alias, else after its members (`DOMStringOrURL`), in Lasm.JS.Deno's namespace | an inductive with `Coe` instances (`Deno.readFile "a.txt"` works) |
+| `AsyncIterable<T>` result (`readDir`), `extends AsyncIterable<T>` (`FsWatcher`, `TcpListener`), `[Symbol.asyncIterator]` (`KvListIterator`) | `async iterable<T>` (on a generated `DirEntryAsyncIterable`, or the interface itself) | `values : Async (Array T)` (to the end), `iterator : IO It` and `It.next : Async (Option T)` (one at a time) |
+| a generic declaration (`Conn<A>`, `ServeHandler<Addr>`) | one definition per instantiation: the declared defaults (`Addr` = `NetAddr`) give the plain name, an alias its name (`TcpListener`), others add their arguments (`ConnUnixAddr`) | separate types |
+| a generic method's parameter (`get<T = unknown>`) | its default, else `unknown` | `Data` |
+| overloads | the first keeps the name; the others add `With` and their first parameter that differs by name, else by type; a reviewed table names the rest (`listenUnix`, `connectUnix`, `resolveDnsMx`, `serveWithUnixOptions`) | separate functions |
+| `"SIGTERM" \| "SIGINT" \| …` | `enum Signal` | `.sigterm`: an all-capitals value is a lower-case constructor |
+| a TypeScript `enum` (`SeekMode`) | its number (`unsigned long`) | `Nat` |
+| `Date`, `object`, `unknown` | `object`, `any` | `Data` |
+| `Uint8Array<ArrayBuffer>` and the other byte views | `Uint8Array` | `ByteArray` (a copy) |
+| `{ [k: string]: T }`, `Record<string, T>` | `record<DOMString, T>` | `Record T` |
+| `readonly T[]`, `Iterable<T>` | `sequence<T>` | `Array T` |
+| a `symbol` alternative of a union (`KvKeyPart`) | dropped | — |
+| `never` (`exit`) | `undefined` | `IO Unit` |
+
+Four small tables in `deno-tier2.mjs` complete the mechanical rules, every entry
+reviewed (API_DECISIONS 0.4-12): **names** of overloads, **split** (a parameter
+that is a union of option types becomes one overload per alternative:
+`serveWithOptions`, `serveWithTlsOptions`), **intersections** (names of
+`A & B` option types: `ListenTcpOptions`, `ServeTcpTlsOptions`) and **overrides**
+(member types TypeScript computes with mapped tuples: `Kv.getMany` and `Kv.watch`
+take an array of keys).
+
+### Tests
+
+[`test/fixtures/js-deno`](../test/fixtures/js-deno) runs on Deno in
+`web-bindings.yml` (`deno-conformance`), with the Lean model as oracle: the
+environment as a map (set, get, has, delete, `toObject` over generated
+Unicode values); files and bytes round-tripped for generated contents, sizes,
+append, truncate, `createNew`, copy, rename, links, permissions; a directory as
+the set of names written to it (`readDir`, its iterator); `FsFile` seek, streams,
+locks; subprocess output for generated arguments, exit codes, environment,
+working directory, piped stdin and signals; a TCP echo of generated bytes and a
+Unix-socket exchange; a WebSocket echo through `Deno.serve` and
+`upgradeWebSocket`; Deno KV against a sorted map (get and set of generated
+values, `getMany`, `list` by prefix, range, `reverse` and `limit`, key parts of
+every kind, atomic checks on current and stale versionstamps, `sum` of `KvU64`s
+modulo 2^64, `mutate`, the queue); and every generated function on `Deno` and
+member on a live object. [`test/fixtures/js-serve`](../test/fixtures/js-serve)
+also serves on a Unix socket. The drift check of `serve-api.mjs` covers the
+three declaration files.
 
 ## Cloudflare Workers: `Lasm.JS.Cloudflare`
 

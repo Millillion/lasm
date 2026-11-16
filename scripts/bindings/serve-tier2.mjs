@@ -36,61 +36,12 @@
 // lowering fails if they are no longer there. `typeNames` maps the names the
 // declarations use that are not selected here (web classes are Lasm.JS.Web's).
 
+import { deno } from './deno-tier2.mjs';
+
 /** The runtimes, each one Lean module tree Lasm.JS.<name>. */
 export const hosts = [
-  {
-    name: 'Deno', version: '2.9.6', repo: 'denoland/deno', tag: 'v2.9.6',
-    files: ['cli/tsc/dts/lib.deno.ns.d.ts', 'cli/tsc/dts/lib.deno_net.d.ts'],
-    license: 'MIT, Copyright 2018-2026 the Deno authors',
-    /** The global object whose functions are lowered (`Deno.serve`). */
-    global: 'Deno',
-    modules: [{ name: 'Serve', title: 'HTTP servers (Deno.serve)' }],
-    /** Generic parameters, instantiated once: the TCP overloads' address. */
-    instantiate: { Addr: 'NetAddr' },
-    functions: {
-      serve: {
-        module: 'Serve',
-        overloads: {
-          'handler: ServeHandler<Deno.NetAddr>': { lower: true },
-          'options: ServeTcpOptions | (ServeTcpOptions & TlsCertifiedKeyPem), handler: ServeHandler<Deno.NetAddr>':
-            // One overload per alternative of the union; the second's argument is named for it.
-            { lower: true, split: { options: ['options', 'tlsOptions'] } },
-          'options: ServeUnixOptions, handler: ServeHandler<Deno.UnixAddr>':
-            { exclude: 'Unix domain sockets: outside the HTTP entry-point cut (TCP and TLS); they would instantiate the generic Addr a second time (UnixAddr), which the lowering does not do yet' },
-          'options: ServeUnixOptions & ServeInit<Deno.UnixAddr>':
-            { exclude: 'Unix domain sockets (as above), with the handler inside the options' },
-          'options: (ServeTcpOptions | (ServeTcpOptions & TlsCertifiedKeyPem)) & ServeInit<Deno.NetAddr>':
-            { exclude: 'the same operation as serve(options, handler) with the handler inside the options: one Lean function per operation (serveWithOptions, serveWithTlsOptions)' },
-        },
-      },
-    },
-    declarations: [
-      { name: 'ServeHandler', as: 'callback', module: 'Serve' },
-      { name: 'ServeHandlerInfo', as: 'interface', module: 'Serve' },
-      { name: 'HttpServer', as: 'interface', module: 'Serve' },
-      { name: 'ServeOptions', as: 'dictionary', module: 'Serve' },
-      { name: 'ServeTcpOptions', as: 'dictionary', module: 'Serve' },
-      { name: 'TlsCertifiedKeyPem', as: 'dictionary', module: 'Serve' },
-      { name: 'NetAddr', as: 'dictionary', module: 'Serve' },
-    ],
-    /** Intersections of selected object types, lowered to a dictionary inheriting the first. */
-    intersections: { 'ServeTcpOptions & TlsCertifiedKeyPem': 'ServeTcpTlsOptions' },
-    integers: {
-      'ServeTcpOptions.port': { type: 'unsigned short', quote: 'The port to listen on.' },
-      'ServeTcpOptions.tcpBacklog': { type: 'unsigned long', quote: 'Maximum number of pending connections in the listen queue.' },
-      'NetAddr.port': { type: 'unsigned short', quote: 'The port number.' },
-    },
-    typeNames: { Request: 'Request', Response: 'Response', AbortSignal: 'AbortSignal', unknown: 'any' },
-    /** Declarations not selected, named by a selected one, and why (reported, never lowered). */
-    notSelected: {
-      AsyncDisposable: 'HttpServer extends it: [Symbol.asyncDispose], a Symbol-keyed method for `await using` (explicit resource management), which Lean does not have; shutdown() is the same operation',
-      ServeDefaultExport: '`export default {fetch}` (deno serve): Lasm\'s Deno entry serves Lasm.JS.exportDefault the same way',
-      ServeUnixOptions: 'Unix domain sockets (see serve\'s overloads)',
-      ServeVsockOptions: 'experimental (VSOCK)',
-      ServeInit: 'the handler-inside-options overloads (see serve\'s overloads)',
-      UnixAddr: 'Unix domain sockets', VsockAddr: 'experimental (VSOCK)',
-    },
-  },
+  // Lasm.JS.Deno: the whole Deno namespace (deno-tier2.mjs, lowered by ts-auto.mjs).
+  deno,
   {
     name: 'Bun', version: '1.4.4', repo: 'oven-sh/bun', tag: 'bun-v1.4.4',
     files: ['packages/bun-types/serve.d.ts', 'packages/bun-types/bun.d.ts'],
