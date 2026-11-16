@@ -133,7 +133,7 @@ npm run build:workers && npx wrangler deploy   # Cloudflare Workers (workers/; d
 
 `--deploy` takes the edge and WASI targets: `workers`, `vercel-edge`,
 `netlify-edge`, `deno-deploy`, `fastly`, `wasi-http` and `spin`. The function
-platforms (`lambda`, `lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure`,
+platforms (`lambda`, `lambda-container`, `lambda-edge`, `vercel`, `netlify`, `azure`,
 `gcf`) are refused for this template: `lasm init` would write no platform files
 for them (issue #168).
 
