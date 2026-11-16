@@ -115,7 +115,9 @@ test('every Lasm.JS.Deno and Lasm.JS.Bun selection is generated, and no exclusio
     }
   }
   const idl = readFileSync(new URL('../scripts/bindings/deno.idl', import.meta.url), 'utf8');
-  assert.match(idl, /Deno\.serve\(options: ServeVsockOptions, handler: ServeHandler<Deno\.VsockAddr>\): @experimental in its declaration/);
+  // Experimental declarations that work are generated (VSOCK); excluded ones carry their reason.
+  assert.doesNotMatch(idl, /ServeVsockOptions, handler: ServeHandler<Deno\.VsockAddr>\): @experimental/);
+  assert.match(idl, /LasmLeanName="serveWithVsockOptions"/);
 });
 
 /** A host of serve-tier2.mjs's shape over one synthetic declaration file. */
