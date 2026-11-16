@@ -81,10 +81,18 @@ instance instCoeHttpsRequestOptionsHttpsRequestOptionsOrDOMStringOrURL : Coe htt
 instance instCoeStringHttpsRequestOptionsOrDOMStringOrURL : Coe String https.RequestOptionsOrDOMStringOrURL := ⟨.domString⟩
 instance instCoeURLHttpsRequestOptionsOrDOMStringOrURL : Coe URL https.RequestOptionsOrDOMStringOrURL := ⟨.url⟩
 
+/-- `v instanceof Agent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Agent`). -/
+def https.Agent.cast? (v : Value) : IO (Option https.Agent) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:https" ["Agent"] Value) v) then some { val := v } else none
+
 /-- `new Agent([options])` (added in Node.js v0.4.5): `constructor(optional https.Agent.NewOptions options)` -/
 def https.Agent.new (options : Option https.Agent.NewOptions := none) : IO https.Agent :=
   Lasm.JS.Binding.invoke https.Agent { name := "Lasm.JS.Node.https.Agent.new", module := "node:https", path := "Agent", construct := true, arity := 1 }
     (Support.args #[Support.optional options]) (await := false)
+
+/-- `v instanceof Server`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Server`). -/
+def https.Server.cast? (v : Value) : IO (Option https.Server) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:https" ["Server"] Value) v) then some { val := v } else none
 
 /-- `server.headersTimeout` (added in Node.js v11.3.0): `readonly attribute double headersTimeout` -/
 def https.Server.headersTimeout (self : https.Server) : IO Float := self.val.get "headersTimeout" Float
@@ -95,8 +103,8 @@ def https.Server.maxHeadersCount (self : https.Server) : IO Float := self.val.ge
 /-- `server.requestTimeout` (added in Node.js v14.11.0): `readonly attribute double requestTimeout` -/
 def https.Server.requestTimeout (self : https.Server) : IO Float := self.val.get "requestTimeout" Float
 
-/-- `server.timeout` (added in Node.js v0.11.2): `readonly attribute double timeout` -/
-def https.Server.timeout (self : https.Server) : IO Float := self.val.get "timeout" Float
+/-- `server.timeout` (added in Node.js v0.11.2): `readonly attribute double /* integer: Nat */ timeout` -/
+def https.Server.timeout (self : https.Server) : IO Nat := self.val.get "timeout" Nat
 
 /-- `server.keepAliveTimeout` (added in Node.js v8.0.0): `readonly attribute double keepAliveTimeout` -/
 def https.Server.keepAliveTimeout (self : https.Server) : IO Float := self.val.get "keepAliveTimeout" Float

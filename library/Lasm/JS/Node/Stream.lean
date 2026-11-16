@@ -138,8 +138,8 @@ def stream.Readable.ResumeListener.ofSyncFn (f : IO Unit) : IO stream.Readable.R
 structure stream.Readable.FromWebOptions where
   /-- `DOMString encoding` -/
   encoding : Option String := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `boolean objectMode` -/
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
@@ -151,8 +151,8 @@ instance instToJSStreamReadableFromWebOptions : ToJS stream.Readable.FromWebOpti
 
 /-- `dictionary stream.Readable.ToWebOptionsStrategy` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.ToWebOptionsStrategy where
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `Function size` -/
   size : Option JSFunction := none
 instance instToJSStreamReadableToWebOptionsStrategy : ToJS stream.Readable.ToWebOptionsStrategy := ⟨fun d => Support.fields #[("highWaterMark", Support.optional d.highWaterMark),
@@ -255,8 +255,8 @@ def stream.Writable.UnpipeListener.ofSyncFn (f : stream.Readable → IO Unit) : 
 structure stream.Writable.FromWebOptions where
   /-- `boolean decodeStrings` -/
   decodeStrings : Option Bool := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `boolean objectMode` -/
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
@@ -283,8 +283,8 @@ structure stream.Duplex.FromWebOptions where
   decodeStrings : Option Bool := none
   /-- `DOMString encoding` -/
   encoding : Option String := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `boolean objectMode` -/
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
@@ -301,6 +301,10 @@ structure stream.Duplex.ToWebOptions where
   /-- `DOMString readableType` -/
   readableType : Option String := none
 instance instToJSStreamDuplexToWebOptions : ToJS stream.Duplex.ToWebOptions := ⟨fun d => Support.fields #[("readableType", Support.optional d.readableType)]⟩
+
+/-- `v instanceof Readable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Readable`). -/
+def stream.Readable.cast? (v : Value) : IO (Option stream.Readable) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Readable"] Value) v) then some { val := v } else none
 
 /-- `Event: 'close'` (added in Node.js v0.9.4): `stream.Readable onClose(stream.Readable.CloseListener listener)`: calls `on("close", listener)` -/
 def stream.Readable.onClose (self : stream.Readable) (listener : stream.Readable.CloseListener) : IO stream.Readable := do
@@ -408,6 +412,10 @@ def stream.Readable.toWeb (streamReadable : stream.Readable) (options : Option s
     (Support.args #[toJS streamReadable, Support.optional options]) (await := false)
   pure { val := r }
 
+/-- `v instanceof Writable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Writable`). -/
+def stream.Writable.cast? (v : Value) : IO (Option stream.Writable) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Writable"] Value) v) then some { val := v } else none
+
 /-- `Event: 'close'` (added in Node.js v0.9.4): `stream.Writable onClose(stream.Writable.CloseListener listener)`: calls `on("close", listener)` -/
 def stream.Writable.onClose (self : stream.Writable) (listener : stream.Writable.CloseListener) : IO stream.Writable := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
@@ -493,6 +501,10 @@ def stream.Writable.toWeb (streamWritable : stream.Writable) : IO WritableStream
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Writable.toWeb", module := "node:stream", path := "Writable.toWeb", construct := false, arity := 1 }
     (Support.args #[toJS streamWritable]) (await := false)
   pure { val := r }
+
+/-- `v instanceof Duplex`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Duplex`). -/
+def stream.Duplex.cast? (v : Value) : IO (Option stream.Duplex) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Duplex"] Value) v) then some { val := v } else none
 
 /-- `stream.Duplex.fromWeb(pair[, options])` (added in Node.js v17.0.0): `static stream.Duplex fromWeb(stream.Duplex.FromWebPair pair, optional stream.Duplex.FromWebOptions options)` -/
 def stream.Duplex.fromWeb (pair : stream.Duplex.FromWebPair) (options : Option stream.Duplex.FromWebOptions := none) : IO stream.Duplex := do

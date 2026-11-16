@@ -101,8 +101,8 @@ structure http.Agent.NewOptions where
   maxFreeSockets : Option Float := none
   /-- `DOMString scheduling = "lifo"` -/
   scheduling : Option String := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `Node_http_Agent_NewOptionsProxyEnv? proxyEnv` -/
   proxyEnv : Option http.Agent.NewOptionsProxyEnv := none
   /-- `double defaultPort = 80` -/
@@ -125,8 +125,8 @@ instance instToJSHttpAgentNewOptions : ToJS http.Agent.NewOptions := ⟨fun d =>
 structure http.Agent.GetNameOptions where
   /-- `DOMString host` -/
   host : Option String := none
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `DOMString localAddress` -/
   localAddress : Option String := none
   /-- `long long family` -/
@@ -550,8 +550,8 @@ structure http.CreateServerOptions where
   connectionsCheckingInterval : Option Unit := none
   /-- `undefined headersTimeout = 60000` -/
   headersTimeout : Option Unit := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `DOMString httpValidation` -/
   httpValidation : Option String := none
   /-- `boolean insecureHTTPParser = false` -/
@@ -651,8 +651,8 @@ structure http.RequestOptions where
   method : Option String := none
   /-- `DOMString path` -/
   path : Option String := none
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `DOMString protocol = "http:"` -/
   protocol : Option String := none
   /-- `boolean setDefaultHeaders` -/
@@ -663,8 +663,8 @@ structure http.RequestOptions where
   signal : Option AbortSignal := none
   /-- `DOMString socketPath` -/
   socketPath : Option String := none
-  /-- `double timeout` -/
-  timeout : Option Float := none
+  /-- `double /* integer: Nat */ timeout` -/
+  timeout : Option Nat := none
   /-- `sequence<any> uniqueHeaders` -/
   uniqueHeaders : Option (Array Data) := none
 instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => Support.fields #[("agent", Support.optional d.agent),
@@ -693,6 +693,10 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => Su
     ("socketPath", Support.optional d.socketPath),
     ("timeout", Support.optional d.timeout),
     ("uniqueHeaders", Support.optional d.uniqueHeaders)]⟩
+
+/-- `v instanceof Agent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Agent`). -/
+def http.Agent.cast? (v : Value) : IO (Option http.Agent) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http" ["Agent"] Value) v) then some { val := v } else none
 
 /-- `new Agent([options])` (added in Node.js v0.3.4): `constructor(optional http.Agent.NewOptions options)` -/
 def http.Agent.new (options : Option http.Agent.NewOptions := none) : IO http.Agent :=
@@ -737,6 +741,10 @@ def http.Agent.destroy (self : http.Agent) : IO Unit :=
 /-- `agent.getName([options])` (added in Node.js v0.11.4): `DOMString getName(optional http.Agent.GetNameOptions options)` -/
 def http.Agent.getName (self : http.Agent) (options : Option http.Agent.GetNameOptions := none) : IO String :=
   self.val.callMethod "getName" (Support.args #[Support.optional options]) String
+
+/-- `v instanceof OutgoingMessage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `OutgoingMessage`). -/
+def http.OutgoingMessage.cast? (v : Value) : IO (Option http.OutgoingMessage) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http" ["OutgoingMessage"] Value) v) then some { val := v } else none
 
 /-- `outgoingMessage.headersSent` (added in Node.js v0.9.3): `readonly attribute boolean headersSent` -/
 def http.OutgoingMessage.headersSent (self : http.OutgoingMessage) : IO Bool := self.val.get "headersSent" Bool
@@ -863,6 +871,10 @@ def http.OutgoingMessage.uncork (self : http.OutgoingMessage) : IO Unit :=
 /-- `outgoingMessage.write(chunk[, encoding][, callback])` (added in Node.js v0.1.29): `boolean write((DOMString or Uint8Array) chunk, optional DOMString encoding)` -/
 def http.OutgoingMessage.write (self : http.OutgoingMessage) (chunk : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool :=
   self.val.callMethod "write" (Support.args #[toJS chunk, Support.optional encoding]) Bool
+
+/-- `v instanceof ClientRequest`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ClientRequest`). -/
+def http.ClientRequest.cast? (v : Value) : IO (Option http.ClientRequest) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http" ["ClientRequest"] Value) v) then some { val := v } else none
 
 /-- `request.maxHeadersCount`: `readonly attribute double maxHeadersCount` -/
 def http.ClientRequest.maxHeadersCount (self : http.ClientRequest) : IO Float := self.val.get "maxHeadersCount" Float
@@ -1037,8 +1049,8 @@ def http.ClientRequest.setNoDelay (self : http.ClientRequest) (noDelay : Option 
 def http.ClientRequest.setSocketKeepAlive (self : http.ClientRequest) (enable : Option Bool := none) (initialDelay : Option Float := none) : IO Unit :=
   self.val.callMethod "setSocketKeepAlive" (Support.args #[Support.optional enable, Support.optional initialDelay]) Unit
 
-/-- `request.setTimeout(timeout[, callback])` (added in Node.js v0.5.9): `http.ClientRequest setTimeout(double timeout)` -/
-def http.ClientRequest.setTimeout (self : http.ClientRequest) (timeout : Float) : IO http.ClientRequest := do
+/-- `request.setTimeout(timeout[, callback])` (added in Node.js v0.5.9): `http.ClientRequest setTimeout(double /* integer: Nat */ timeout)` -/
+def http.ClientRequest.setTimeout (self : http.ClientRequest) (timeout : Nat) : IO http.ClientRequest := do
   let r ← self.val.callMethod "setTimeout" (Support.args #[toJS timeout]) Value
   pure { val := r }
 
@@ -1049,6 +1061,10 @@ def http.ClientRequest.uncork (self : http.ClientRequest) : IO Unit :=
 /-- `request.write(chunk[, encoding][, callback])` (added in Node.js v0.1.29): `boolean write((DOMString or Uint8Array) chunk, optional DOMString encoding)` -/
 def http.ClientRequest.write (self : http.ClientRequest) (chunk : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool :=
   self.val.callMethod "write" (Support.args #[toJS chunk, Support.optional encoding]) Bool
+
+/-- `v instanceof ServerResponse`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServerResponse`). -/
+def http.ServerResponse.cast? (v : Value) : IO (Option http.ServerResponse) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http" ["ServerResponse"] Value) v) then some { val := v } else none
 
 /-- `response.headersSent` (added in Node.js v0.9.3): `readonly attribute boolean headersSent` -/
 def http.ServerResponse.headersSent (self : http.ServerResponse) : IO Bool := self.val.get "headersSent" Bool
@@ -1066,8 +1082,8 @@ def http.ServerResponse.socket (self : http.ServerResponse) : IO stream.Duplex :
   let r ← self.val.get "socket" Value
   pure { val := r }
 
-/-- `response.statusCode` (added in Node.js v0.4.0): `readonly attribute double statusCode` -/
-def http.ServerResponse.statusCode (self : http.ServerResponse) : IO Float := self.val.get "statusCode" Float
+/-- `response.statusCode` (added in Node.js v0.4.0): `readonly attribute double /* integer: Nat */ statusCode` -/
+def http.ServerResponse.statusCode (self : http.ServerResponse) : IO Nat := self.val.get "statusCode" Nat
 
 /-- `response.statusMessage` (added in Node.js v0.11.8): `readonly attribute DOMString statusMessage` -/
 def http.ServerResponse.statusMessage (self : http.ServerResponse) : IO String := self.val.get "statusMessage" String
@@ -1164,18 +1180,22 @@ def http.ServerResponse.writeContinue (self : http.ServerResponse) : IO Unit :=
 def http.ServerResponse.writeEarlyHints (self : http.ServerResponse) (hints : Data) : IO Unit :=
   self.val.callMethod "writeEarlyHints" (Support.args #[toJS hints]) Unit
 
-/-- `response.writeHead(statusCode[, statusMessage][, headers])` (added in Node.js v0.1.30): `http.ServerResponse writeHead(double statusCode, optional DOMString statusMessage, optional (object or sequence<any>) headers)` -/
-def http.ServerResponse.writeHead (self : http.ServerResponse) (statusCode : Float) (statusMessage : Option String := none) (headers : Option ObjectOrSequenceOfAny := none) : IO http.ServerResponse := do
+/-- `response.writeHead(statusCode[, statusMessage][, headers])` (added in Node.js v0.1.30): `http.ServerResponse writeHead(double /* integer: Nat */ statusCode, optional DOMString statusMessage, optional (object or sequence<any>) headers)` -/
+def http.ServerResponse.writeHead (self : http.ServerResponse) (statusCode : Nat) (statusMessage : Option String := none) (headers : Option ObjectOrSequenceOfAny := none) : IO http.ServerResponse := do
   let r ← self.val.callMethod "writeHead" (Support.args #[toJS statusCode, Support.optional statusMessage, Support.optional headers]) Value
   pure { val := r }
 
-/-- `response.writeInformation(statusCode[, headers][, callback])` (added in Node.js v24.18.0): `undefined writeInformation(double statusCode, optional (object or sequence<any>) headers)` -/
-def http.ServerResponse.writeInformation (self : http.ServerResponse) (statusCode : Float) (headers : Option ObjectOrSequenceOfAny := none) : IO Unit :=
+/-- `response.writeInformation(statusCode[, headers][, callback])` (added in Node.js v24.18.0): `undefined writeInformation(double /* integer: Nat */ statusCode, optional (object or sequence<any>) headers)` -/
+def http.ServerResponse.writeInformation (self : http.ServerResponse) (statusCode : Nat) (headers : Option ObjectOrSequenceOfAny := none) : IO Unit :=
   self.val.callMethod "writeInformation" (Support.args #[toJS statusCode, Support.optional headers]) Unit
 
 /-- `response.writeProcessing()` (added in Node.js v10.0.0): `undefined writeProcessing()` -/
 def http.ServerResponse.writeProcessing (self : http.ServerResponse) : IO Unit :=
   self.val.callMethod "writeProcessing" (Support.args #[]) Unit
+
+/-- `v instanceof IncomingMessage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `IncomingMessage`). -/
+def http.IncomingMessage.cast? (v : Value) : IO (Option http.IncomingMessage) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http" ["IncomingMessage"] Value) v) then some { val := v } else none
 
 /-- `message.complete` (added in Node.js v0.3.0): `readonly attribute boolean complete` -/
 def http.IncomingMessage.complete (self : http.IncomingMessage) : IO Bool := self.val.get "complete" Bool
@@ -1208,8 +1228,8 @@ def http.IncomingMessage.socket (self : http.IncomingMessage) : IO stream.Duplex
   let r ← self.val.get "socket" Value
   pure { val := r }
 
-/-- `message.statusCode` (added in Node.js v0.1.1): `readonly attribute double statusCode` -/
-def http.IncomingMessage.statusCode (self : http.IncomingMessage) : IO Float := self.val.get "statusCode" Float
+/-- `message.statusCode` (added in Node.js v0.1.1): `readonly attribute double /* integer: Nat */ statusCode` -/
+def http.IncomingMessage.statusCode (self : http.IncomingMessage) : IO Nat := self.val.get "statusCode" Nat
 
 /-- `message.statusMessage` (added in Node.js v0.11.10): `readonly attribute DOMString statusMessage` -/
 def http.IncomingMessage.statusMessage (self : http.IncomingMessage) : IO String := self.val.get "statusMessage" String
@@ -1243,6 +1263,10 @@ def http.IncomingMessage.setTimeout (self : http.IncomingMessage) (msecs : Float
   let r ← self.val.callMethod "setTimeout" (Support.args #[toJS msecs]) Value
   pure { val := r }
 
+/-- `v instanceof Server`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Server`). -/
+def http.Server.cast? (v : Value) : IO (Option http.Server) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:http" ["Server"] Value) v) then some { val := v } else none
+
 /-- `server.headersTimeout` (added in Node.js v11.3.0, v10.14.0): `readonly attribute double headersTimeout` -/
 def http.Server.headersTimeout (self : http.Server) : IO Float := self.val.get "headersTimeout" Float
 
@@ -1258,8 +1282,8 @@ def http.Server.requestTimeout (self : http.Server) : IO Float := self.val.get "
 /-- `server.maxRequestsPerSocket` (added in Node.js v16.10.0): `readonly attribute double maxRequestsPerSocket` -/
 def http.Server.maxRequestsPerSocket (self : http.Server) : IO Float := self.val.get "maxRequestsPerSocket" Float
 
-/-- `server.timeout` (added in Node.js v0.9.12): `readonly attribute double timeout` -/
-def http.Server.timeout (self : http.Server) : IO Float := self.val.get "timeout" Float
+/-- `server.timeout` (added in Node.js v0.9.12): `readonly attribute double /* integer: Nat */ timeout` -/
+def http.Server.timeout (self : http.Server) : IO Nat := self.val.get "timeout" Nat
 
 /-- `server.keepAliveTimeout` (added in Node.js v8.0.0): `readonly attribute double keepAliveTimeout` -/
 def http.Server.keepAliveTimeout (self : http.Server) : IO Float := self.val.get "keepAliveTimeout" Float

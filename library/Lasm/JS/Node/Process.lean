@@ -97,8 +97,8 @@ def process.exit (code : Option LongLongOrDOMString := none) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.exit", module := "node:process", path := "exit", construct := false, arity := 1 }
     (Support.args #[Support.optional code]) (await := false)
 
-/-- `process.kill(pid[, signal])` (added in Node.js v0.0.6): `undefined kill(double pid, optional (DOMString or double) signal)` (Node.js 24.22.2 documentation, process.md) -/
-def process.kill (pid : Float) (signal : Option DOMStringOrDouble := none) : IO Unit :=
+/-- `process.kill(pid[, signal])` (added in Node.js v0.0.6): `undefined kill(double /* integer: Int */ pid, optional (DOMString or double) signal)` (Node.js 24.22.2 documentation, process.md) -/
+def process.kill (pid : Int) (signal : Option DOMStringOrDouble := none) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.process.kill", module := "node:process", path := "kill", construct := false, arity := 2 }
     (Support.args #[toJS pid, Support.optional signal]) (await := false)
 
