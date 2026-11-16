@@ -208,17 +208,55 @@ export function lowerAuto(host, files) {
     : t.k === 'union' ? { ...t, alts: t.alts.map(a => substT(a, s)) } : t.k === 'inter' ? { ...t, parts: t.parts.map(a => substT(a, s)) }
     : t.k === 'array' ? { ...t, inner: substT(t.inner, s) } : t;
   /** The members of an object-like type (an object literal, a dictionary-like interface, an intersection of them), or null. */
+  /** A method of an options object as a function-typed member (`fetch(req, server): Response` → a callback). */
+  const asProperty = m => m.kind === 'method' ? { ...m, kind: 'property', method: true, type: `(${m.params.map(p => `${p.rest ? '...' : ''}${p.name}${p.optional ? '?' : ''}: ${p.type}`).join(', ')}) => ${m.type}` } : m;
+  /** Alternatives with each intersection's alias and XOR parts expanded and distributed (to a fixed point). */
+  function spreadObjects(alts, scope) {
+    const expand = x => {
+      if (x.k === 'name' && /(^|\.)XOR$/.test(x.name)) return { k: 'union', alts: x.args };
+      const d = x.k === 'name' && byName.get(scoped(x.name, scope));
+      if (d?.kind !== 'type') return x;
+      const { params } = aliasParams(d);
+      const sub = new Map(params.map((p, i) => [p.name, x.args[i] ?? parseType(p.def ?? 'unknown')]));
+      return substT(parseType(aliasBody(d)), sub);
+    };
+    let out = alts;
+    for (let round = 0; round < 6; round++) {
+      const next = out.flatMap(a => {
+        if (a.k === 'union') return a.alts;
+        if (a.k !== 'inter') return [a];
+        const parts = a.parts.map(expand).flatMap(x => x.k === 'inter' ? x.parts : [x]);
+        let combos = [[]];
+        for (const part of parts) combos = combos.flatMap(c => (part.k === 'union' ? part.alts : [part]).map(y => [...c, y]));
+        return combos.map(ps => ({ k: 'inter', parts: ps.flatMap(x => x.k === 'inter' ? x.parts : [x]) }));
+      });
+      if (next.map(typeText).join('|') === out.map(typeText).join('|')) break;
+      out = next;
+    }
+    return out;
+  }
   function objectMembers(t, scope = '') {
-    if (t.k === 'obj') { const ms = membersOf({ ...blank(t.body), file: '' }, 0, t.body.length); return ms.some(m => m.kind === 'index' || m.kind === 'call') ? null : ms; }
+    if (t.k === 'obj') { const ms = membersOf({ ...blank(t.body), file: '' }, 0, t.body.length).map(asProperty); return ms.some(m => m.kind === 'index' || m.kind === 'call' || (m.method && !m.optional && false)) ? null : ms; }
     if (t.k === 'inter') { const parts = t.parts.map(x => objectMembers(x, scope)); return parts.some(x => !x) ? null : parts.flat(); }
     if (t.k === 'name') {
       const d = byName.get(scoped(t.name, scope));
       if (d?.kind !== 'interface') return null;
-      const ps = typeParams(d.header).params;
-      let ms = [d, ...d.more].flatMap(x => membersOf(x.src, x.body[0], x.body[1]));
+      const { params: ps, rest } = typeParams(d.header);
       // A generic interface's members with its arguments (or defaults) written in.
-      if (ps.length) ms = ms.map(m => ({ ...m, type: ps.reduce((ty, p, i) => ty.replace(new RegExp(`\\b${p.name}\\b`, 'g'), `(${t.args[i] ? typeText(t.args[i]) : p.def ?? 'unknown'})`), m.type) }));
-      if (ms.some(m => (m.kind === 'method' && !m.optional) || (m.kind === 'property' && /^Promise\b/.test(m.type)) || m.kind === 'index')) return null;
+      const write = ty => ps.reduce((acc, p, i) => acc.replace(new RegExp(`\\b${p.name}\\b`, 'g'), `(${t.args[i] ? typeText(t.args[i]) : p.def ?? 'unknown'})`), ty);
+      let ms = [d, ...d.more].flatMap(x => membersOf(x.src, x.body[0], x.body[1]));
+      // A method of an options object is a function-typed member (`fetch(req, server): Response` → a callback).
+      ms = ms.map(asProperty);
+      if (ps.length) ms = ms.map(m => ({ ...m, type: write(m.type) }));
+      if (ms.some(m => (m.method && !m.optional) || (m.kind === 'property' && /^Promise\b/.test(m.type)) || m.kind === 'index' || m.kind === 'call')) return null;
+      // The members of its bases (`extends BaseServeOptions<WebSocketData>`), after its own.
+      const sc = strip(d.name).split('.').slice(0, -1).join('.');
+      for (const h of heritageOf(rest)) {
+        if (h.k !== 'name' || ['Disposable', 'AsyncDisposable'].includes(h.name)) continue;
+        const base = objectMembers(parseType(write(typeText(h))), sc);
+        if (!base) return null;
+        for (const b of base) if (!ms.some(m => m.name === b.name)) ms.push(b);
+      }
       return ms;
     }
     return null;
@@ -234,9 +272,11 @@ export function lowerAuto(host, files) {
     for (const n of names) {
       const ms = each.map(x => x.find(m => m.name === n));
       const optional = ms.some(m => !m || m.optional);
-      const types = [...new Set(ms.filter(Boolean).map(m => m.type))];
+      let types = [...new Set(ms.filter(Boolean).map(m => m.type))];
+      // A callback member declared differently per alternative (Bun's fetch, with or without WebSockets): the first one.
+      if (types.length > 1 && types.every(x => { try { return parseType(x).k === 'fn'; } catch { return false; } })) types = [types[0]];
       const t = parseType(types.map(x => `(${x})`).join(' | '));
-      const lt = lower(t, { ...ctx, owner: lean, member: n, role: 'field', optional, enumName: null, intKey: null });
+      const lt = lower(t, { ...ctx, owner: lean, member: n, role: 'field', optional, enumName: null, intKey: `${lean}.${n}`, doc: ms.find(Boolean)?.doc ?? '' });
       lines.push(`  // ${n}: ${types.join(' | ')}${optional ? ' (optional)' : ''}`);
       lines.push(`  ${optional ? '' : 'required '}${optional ? lt.replace(/\?$/, '') : lt} ${escape(n)};`);
     }
@@ -317,6 +357,8 @@ export function lowerAuto(host, files) {
       return `Promise<${it}${nullable && !it.endsWith('?') ? '?' : ''}>`;
     }
     if (ctx.role === 'cbResult' && rest.some(isVoid) && rest.some(a => !isVoid(a))) rest = rest.filter(a => !isVoid(a));
+    // Intersections of aliases of unions (Bun's XOR<…> & XOR<…>): spread into their object alternatives first.
+    rest = spreadObjects(rest, ctx.scope);
     if (rest.length > 1 && rest.every(a => objectMembers(a, ctx.scope))) {
       const base = mergeObjects(rest, ctx.enumName ?? `${ctx.owner}${capital(ctx.member)}`, ctx);
       return nullable ? `${base}?` : base;

@@ -2249,6 +2249,12 @@ instance : ToJS DOMStringOrUint8Array := ⟨fun
   | .uint8Array v => toJS v⟩
 instance : Coe String DOMStringOrUint8Array := ⟨.domString⟩
 instance : Coe ByteArray DOMStringOrUint8Array := ⟨.uint8Array⟩
+instance : FromJS DOMStringOrUint8Array where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.bytes _) => (FromJS.fromJS d : Except String ByteArray).map .uint8Array
+    | _ => .error ""
+  typeName := "Lasm.JS.Bun.DOMStringOrUint8Array"
 
 /-- `callback SocketHandlerOpen = Promise<undefined> (SocketUnknown socket)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SocketHandlerOpen where
@@ -2717,14 +2723,14 @@ instance : ToJS udpSocketHandlerBuffer := ⟨fun d => Support.fields #[("data", 
 structure SocketAddress where
   /-- `required DOMString address` -/
   address : String
-  /-- `required double port` -/
-  port : Float
+  /-- `required unsigned short port` -/
+  port : Nat
   /-- `required SocketAddressFamily family` -/
   family : SocketAddressFamily
 instance : FromJS SocketAddress where
   fromJS d := do return {
     address := ← Lasm.JS.readField String d "address",
-    port := ← Lasm.JS.readField Float d "port",
+    port := ← Lasm.JS.readField Nat d "port",
     family := ← Lasm.JS.readField SocketAddressFamily d "family" }
   typeName := "Lasm.JS.Bun.SocketAddress"
 

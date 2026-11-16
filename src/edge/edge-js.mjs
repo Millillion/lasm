@@ -320,6 +320,11 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
       const builtin = globalThis.process.getBuiltinModule(specifier);
       if (builtin !== undefined) return builtin;
     }
+    // Bun's own modules (`bun:sqlite`, Lasm.JS.Bun) on Bun, which provides require in ES modules.
+    if (specifier.startsWith('bun:') && typeof globalThis.Bun === 'object') {
+      const builtin = globalThis.process?.getBuiltinModule?.(specifier) ?? (typeof require === 'function' ? require(specifier) : undefined);
+      if (builtin !== undefined) return builtin;
+    }
     throw failure(`JavaScript module ${JSON.stringify(specifier)} is not in this edge build. Edge builds import modules statically: use it in a binding (@[js "${specifier}" …]) or list it in the build's modules.`);
   }
   function dispatch(op, id, arg, request) {

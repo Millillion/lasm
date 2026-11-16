@@ -16,6 +16,14 @@ import Lasm.JS.Bun.Core
 namespace Lasm.JS.Bun
 open Lasm.JS Lasm.JS.Web
 
+/-- `interface Bun.ServerWebSocket` (Bun 1.4.4 type declarations, serve.d.ts): a handle to the JavaScript object. -/
+structure ServerWebSocket where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty ServerWebSocket := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ServerWebSocket := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ServerWebSocket := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.ServerWebSocket", .data⟩
+
 /-- `interface Bun.Server` (Bun 1.4.4 type declarations, serve.d.ts): a handle to the JavaScript object. -/
 structure ServerUndefined where
   /-- The JavaScript object. -/
@@ -23,6 +31,84 @@ structure ServerUndefined where
 instance : Nonempty ServerUndefined := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS ServerUndefined := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServerUndefined := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.ServerUndefined", .data⟩
+
+/-- `enum ServerWebSocketBinaryType` (Bun 1.4.4 type declarations): "nodebuffer", "arraybuffer", "uint8array", "blob". -/
+inductive ServerWebSocketBinaryType where
+  /-- "nodebuffer" -/
+  | nodebuffer
+  /-- "arraybuffer" -/
+  | arraybuffer
+  /-- "uint8array" -/
+  | uint8array
+  /-- "blob" -/
+  | blob
+  deriving BEq, Repr, Inhabited
+instance : ToJS ServerWebSocketBinaryType := ⟨fun
+  | .nodebuffer => .string "nodebuffer"
+  | .arraybuffer => .string "arraybuffer"
+  | .uint8array => .string "uint8array"
+  | .blob => .string "blob"⟩
+instance : FromJS ServerWebSocketBinaryType where
+  fromJS
+    | .string "nodebuffer" => .ok .nodebuffer
+    | .string "arraybuffer" => .ok .arraybuffer
+    | .string "uint8array" => .ok .uint8array
+    | .string "blob" => .ok .blob
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.ServerWebSocketBinaryType"
+
+/-- `enum WebSocketCompressor` (Bun 1.4.4 type declarations): "disable", "shared", "dedicated", "3KB", "4KB", "8KB", "16KB", "32KB", "64KB", "128KB", "256KB". -/
+inductive WebSocketCompressor where
+  /-- "disable" -/
+  | disable
+  /-- "shared" -/
+  | shared
+  /-- "dedicated" -/
+  | dedicated
+  /-- "3KB" -/
+  | v3KB
+  /-- "4KB" -/
+  | v4KB
+  /-- "8KB" -/
+  | v8KB
+  /-- "16KB" -/
+  | v16KB
+  /-- "32KB" -/
+  | v32KB
+  /-- "64KB" -/
+  | v64KB
+  /-- "128KB" -/
+  | v128KB
+  /-- "256KB" -/
+  | v256KB
+  deriving BEq, Repr, Inhabited
+instance : ToJS WebSocketCompressor := ⟨fun
+  | .disable => .string "disable"
+  | .shared => .string "shared"
+  | .dedicated => .string "dedicated"
+  | .v3KB => .string "3KB"
+  | .v4KB => .string "4KB"
+  | .v8KB => .string "8KB"
+  | .v16KB => .string "16KB"
+  | .v32KB => .string "32KB"
+  | .v64KB => .string "64KB"
+  | .v128KB => .string "128KB"
+  | .v256KB => .string "256KB"⟩
+instance : FromJS WebSocketCompressor where
+  fromJS
+    | .string "disable" => .ok .disable
+    | .string "shared" => .ok .shared
+    | .string "dedicated" => .ok .dedicated
+    | .string "3KB" => .ok .v3KB
+    | .string "4KB" => .ok .v4KB
+    | .string "8KB" => .ok .v8KB
+    | .string "16KB" => .ok .v16KB
+    | .string "32KB" => .ok .v32KB
+    | .string "64KB" => .ok .v64KB
+    | .string "128KB" => .ok .v128KB
+    | .string "256KB" => .ok .v256KB
+    | _ => .error "not a value of the enumeration"
+  typeName := "Lasm.JS.Bun.WebSocketCompressor"
 
 /-- `enum ServerUndefinedProtocol` (Bun 1.4.4 type declarations): "http", "https". -/
 inductive ServerUndefinedProtocol where
@@ -41,16 +127,388 @@ instance : FromJS ServerUndefinedProtocol where
     | _ => .error "not a value of the enumeration"
   typeName := "Lasm.JS.Bun.ServerUndefinedProtocol"
 
-/-- `dictionary ServeRoutesUndefinedString` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ServeRoutesUndefinedString where
-instance : ToJS ServeRoutesUndefinedString := ⟨fun _ => Support.fields #[]⟩
+/-- `typedef Uint8Array or Blob Uint8ArrayOrBlob`: one constructor per member type. -/
+inductive Uint8ArrayOrBlob where
+  /-- `Uint8Array` -/
+  | uint8Array (value : ByteArray)
+  /-- `Blob` -/
+  | blob (value : Blob)
+instance : ToJS Uint8ArrayOrBlob := ⟨fun
+  | .uint8Array v => toJS v
+  | .blob v => toJS v⟩
+instance : Coe ByteArray Uint8ArrayOrBlob := ⟨.uint8Array⟩
+instance : Coe Blob Uint8ArrayOrBlob := ⟨.blob⟩
 
-/-- `dictionary ServeOptionsUndefinedString` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ServeOptionsUndefinedString where
+/-- `callback ServerWebSocketCorkCallback = any (ServerWebSocket ws)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ServerWebSocketCorkCallback where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty ServerWebSocketCorkCallback := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ServerWebSocketCorkCallback := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ServerWebSocketCorkCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.ServerWebSocketCorkCallback", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ServerWebSocketCorkCallback.ofFn (f : ServerWebSocket → Async Data) : IO ServerWebSocketCorkCallback := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ServerWebSocketCorkCallback.ofSyncFn (f : ServerWebSocket → IO Data) : IO ServerWebSocketCorkCallback := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `typedef DOMString or unsigned short DOMStringOrUnsignedShort`: one constructor per member type. -/
+inductive DOMStringOrUnsignedShort where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `unsigned short` -/
+  | unsignedShort (value : Nat)
+instance : ToJS DOMStringOrUnsignedShort := ⟨fun
+  | .domString v => toJS v
+  | .unsignedShort v => toJS v⟩
+instance : Coe String DOMStringOrUnsignedShort := ⟨.domString⟩
+instance : Coe Nat DOMStringOrUnsignedShort := ⟨.unsignedShort⟩
+
+/-- `typedef TLSOptions or sequence<TLSOptions> TLSOptionsOrSequenceOfTLSOptions`: one constructor per member type. -/
+inductive TLSOptionsOrSequenceOfTLSOptions where
+  /-- `TLSOptions` -/
+  | tlsOptions (value : TLSOptions)
+  /-- `sequence<TLSOptions>` -/
+  | sequence (value : Array TLSOptions)
+instance : ToJS TLSOptionsOrSequenceOfTLSOptions := ⟨fun
+  | .tlsOptions v => toJS v
+  | .sequence v => toJS v⟩
+instance : Coe TLSOptions TLSOptionsOrSequenceOfTLSOptions := ⟨.tlsOptions⟩
+instance : Coe (Array TLSOptions) TLSOptionsOrSequenceOfTLSOptions := ⟨.sequence⟩
+
+/-- `dictionary ServeDevelopment` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ServeDevelopment where
+  /-- `boolean hmr` -/
+  hmr : Option Bool := none
+  /-- `boolean console` -/
+  console : Option Bool := none
+  /-- `boolean chromeDevToolsAutomaticWorkspaceFolders` -/
+  chromeDevToolsAutomaticWorkspaceFolders : Option Bool := none
+instance : ToJS ServeDevelopment := ⟨fun d => Support.fields #[("hmr", Support.optional d.hmr),
+    ("console", Support.optional d.console),
+    ("chromeDevToolsAutomaticWorkspaceFolders", Support.optional d.chromeDevToolsAutomaticWorkspaceFolders)]⟩
+
+/-- `typedef boolean or ServeDevelopment ServeDevelopmentUnion`: one constructor per member type. -/
+inductive ServeDevelopmentUnion where
+  /-- `boolean` -/
+  | boolean (value : Bool)
+  /-- `ServeDevelopment` -/
+  | serveDevelopment (value : ServeDevelopment)
+instance : ToJS ServeDevelopmentUnion := ⟨fun
+  | .boolean v => toJS v
+  | .serveDevelopment v => toJS v⟩
+instance : Coe Bool ServeDevelopmentUnion := ⟨.boolean⟩
+instance : Coe ServeDevelopment ServeDevelopmentUnion := ⟨.serveDevelopment⟩
+
+/-- `dictionary ErrorLike` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ErrorLike where
+  /-- `DOMString code` -/
+  code : Option String := none
+  /-- `double errno` -/
+  errno : Option Float := none
+  /-- `DOMString syscall` -/
+  syscall : Option String := none
+instance : FromJS ErrorLike where
+  fromJS d := do return {
+    code := ← Lasm.JS.readField (Option String) d "code",
+    errno := ← Lasm.JS.readField (Option Float) d "errno",
+    syscall := ← Lasm.JS.readField (Option String) d "syscall" }
+  typeName := "Lasm.JS.Bun.ErrorLike"
+
+/-- `callback ServeOptionsError = Promise<Response> (ErrorLike error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ServeOptionsError where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty ServeOptionsError := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ServeOptionsError := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ServeOptionsError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.ServeOptionsError", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ServeOptionsError.ofFn (f : ErrorLike → Async Response) : IO ServeOptionsError := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ErrorLike args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ServeOptionsError.ofSyncFn (f : ErrorLike → IO Response) : IO ServeOptionsError := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ErrorLike args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `callback ServeOptionsFetch = Promise<Response> (Request req, ServerUndefined server)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ServeOptionsFetch where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty ServeOptionsFetch := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ServeOptionsFetch := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ServeOptionsFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.ServeOptionsFetch", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ServeOptionsFetch.ofFn (f : Request → ServerUndefined → Async Response) : IO ServeOptionsFetch := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg ServerUndefined args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ServeOptionsFetch.ofSyncFn (f : Request → ServerUndefined → IO Response) : IO ServeOptionsFetch := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg ServerUndefined args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `dictionary ServeRoutesUndefinedNever` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ServeRoutesUndefinedNever where
+instance : ToJS ServeRoutesUndefinedNever := ⟨fun _ => Support.fields #[]⟩
+
+/-- `dictionary ServeRoutesWithUpgradeUndefinedNever` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ServeRoutesWithUpgradeUndefinedNever where
+instance : ToJS ServeRoutesWithUpgradeUndefinedNever := ⟨fun _ => Support.fields #[]⟩
+
+/-- `typedef ServeRoutesUndefinedNever or ServeRoutesWithUpgradeUndefinedNever ServeRoutesUndefinedNeverOrServeRoutesWithUpgradeUndefinedNever`: one constructor per member type. -/
+inductive ServeRoutesUndefinedNeverOrServeRoutesWithUpgradeUndefinedNever where
+  /-- `ServeRoutesUndefinedNever` -/
+  | serveRoutesUndefinedNever (value : ServeRoutesUndefinedNever)
+  /-- `ServeRoutesWithUpgradeUndefinedNever` -/
+  | serveRoutesWithUpgradeUndefinedNever (value : ServeRoutesWithUpgradeUndefinedNever)
+instance : ToJS ServeRoutesUndefinedNeverOrServeRoutesWithUpgradeUndefinedNever := ⟨fun
+  | .serveRoutesUndefinedNever v => toJS v
+  | .serveRoutesWithUpgradeUndefinedNever v => toJS v⟩
+instance : Coe ServeRoutesUndefinedNever ServeRoutesUndefinedNeverOrServeRoutesWithUpgradeUndefinedNever := ⟨.serveRoutesUndefinedNever⟩
+instance : Coe ServeRoutesWithUpgradeUndefinedNever ServeRoutesUndefinedNeverOrServeRoutesWithUpgradeUndefinedNever := ⟨.serveRoutesWithUpgradeUndefinedNever⟩
+
+/-- `callback WebSocketHandlerUndefinedMessage = Promise<undefined> (ServerWebSocket ws, DOMStringOrUint8Array message)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure WebSocketHandlerUndefinedMessage where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty WebSocketHandlerUndefinedMessage := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS WebSocketHandlerUndefinedMessage := ⟨fun x => .ref x.val ""⟩
+instance : FromJS WebSocketHandlerUndefinedMessage := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.WebSocketHandlerUndefinedMessage", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def WebSocketHandlerUndefinedMessage.ofFn (f : ServerWebSocket → DOMStringOrUint8Array → Async Unit) : IO WebSocketHandlerUndefinedMessage := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0) (← Support.arg DOMStringOrUint8Array args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def WebSocketHandlerUndefinedMessage.ofSyncFn (f : ServerWebSocket → DOMStringOrUint8Array → IO Unit) : IO WebSocketHandlerUndefinedMessage := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0) (← Support.arg DOMStringOrUint8Array args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `callback WebSocketHandlerUndefinedOpen = Promise<undefined> (ServerWebSocket ws)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure WebSocketHandlerUndefinedOpen where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty WebSocketHandlerUndefinedOpen := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS WebSocketHandlerUndefinedOpen := ⟨fun x => .ref x.val ""⟩
+instance : FromJS WebSocketHandlerUndefinedOpen := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.WebSocketHandlerUndefinedOpen", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def WebSocketHandlerUndefinedOpen.ofFn (f : ServerWebSocket → Async Unit) : IO WebSocketHandlerUndefinedOpen := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def WebSocketHandlerUndefinedOpen.ofSyncFn (f : ServerWebSocket → IO Unit) : IO WebSocketHandlerUndefinedOpen := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `callback WebSocketHandlerUndefinedDrain = Promise<undefined> (ServerWebSocket ws)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure WebSocketHandlerUndefinedDrain where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty WebSocketHandlerUndefinedDrain := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS WebSocketHandlerUndefinedDrain := ⟨fun x => .ref x.val ""⟩
+instance : FromJS WebSocketHandlerUndefinedDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.WebSocketHandlerUndefinedDrain", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def WebSocketHandlerUndefinedDrain.ofFn (f : ServerWebSocket → Async Unit) : IO WebSocketHandlerUndefinedDrain := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def WebSocketHandlerUndefinedDrain.ofSyncFn (f : ServerWebSocket → IO Unit) : IO WebSocketHandlerUndefinedDrain := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `callback WebSocketHandlerUndefinedClose = Promise<undefined> (ServerWebSocket ws, double code, DOMString reason)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure WebSocketHandlerUndefinedClose where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty WebSocketHandlerUndefinedClose := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS WebSocketHandlerUndefinedClose := ⟨fun x => .ref x.val ""⟩
+instance : FromJS WebSocketHandlerUndefinedClose := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.WebSocketHandlerUndefinedClose", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def WebSocketHandlerUndefinedClose.ofFn (f : ServerWebSocket → Float → String → Async Unit) : IO WebSocketHandlerUndefinedClose := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0) (← Support.arg Float args 1) (← Support.arg String args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def WebSocketHandlerUndefinedClose.ofSyncFn (f : ServerWebSocket → Float → String → IO Unit) : IO WebSocketHandlerUndefinedClose := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0) (← Support.arg Float args 1) (← Support.arg String args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+
+/-- `callback WebSocketHandlerUndefinedPing = Promise<undefined> (ServerWebSocket ws, Uint8Array data)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure WebSocketHandlerUndefinedPing where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty WebSocketHandlerUndefinedPing := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS WebSocketHandlerUndefinedPing := ⟨fun x => .ref x.val ""⟩
+instance : FromJS WebSocketHandlerUndefinedPing := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.WebSocketHandlerUndefinedPing", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def WebSocketHandlerUndefinedPing.ofFn (f : ServerWebSocket → ByteArray → Async Unit) : IO WebSocketHandlerUndefinedPing := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0) (← Support.arg ByteArray args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def WebSocketHandlerUndefinedPing.ofSyncFn (f : ServerWebSocket → ByteArray → IO Unit) : IO WebSocketHandlerUndefinedPing := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0) (← Support.arg ByteArray args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `callback WebSocketHandlerUndefinedPong = Promise<undefined> (ServerWebSocket ws, Uint8Array data)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure WebSocketHandlerUndefinedPong where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty WebSocketHandlerUndefinedPong := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS WebSocketHandlerUndefinedPong := ⟨fun x => .ref x.val ""⟩
+instance : FromJS WebSocketHandlerUndefinedPong := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.WebSocketHandlerUndefinedPong", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def WebSocketHandlerUndefinedPong.ofFn (f : ServerWebSocket → ByteArray → Async Unit) : IO WebSocketHandlerUndefinedPong := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0) (← Support.arg ByteArray args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def WebSocketHandlerUndefinedPong.ofSyncFn (f : ServerWebSocket → ByteArray → IO Unit) : IO WebSocketHandlerUndefinedPong := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ServerWebSocket args 0) (← Support.arg ByteArray args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `callback WebSocketHandlerUndefinedError = Promise<undefined> (object error, ServerWebSocket ws)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure WebSocketHandlerUndefinedError where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty WebSocketHandlerUndefinedError := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS WebSocketHandlerUndefinedError := ⟨fun x => .ref x.val ""⟩
+instance : FromJS WebSocketHandlerUndefinedError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.WebSocketHandlerUndefinedError", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def WebSocketHandlerUndefinedError.ofFn (f : Data → ServerWebSocket → Async Unit) : IO WebSocketHandlerUndefinedError := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg ServerWebSocket args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def WebSocketHandlerUndefinedError.ofSyncFn (f : Data → ServerWebSocket → IO Unit) : IO WebSocketHandlerUndefinedError := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg ServerWebSocket args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `typedef WebSocketCompressor or boolean WebSocketCompressorOrBoolean`: one constructor per member type. -/
+inductive WebSocketCompressorOrBoolean where
+  /-- `WebSocketCompressor` -/
+  | webSocketCompressor (value : WebSocketCompressor)
+  /-- `boolean` -/
+  | boolean (value : Bool)
+instance : ToJS WebSocketCompressorOrBoolean := ⟨fun
+  | .webSocketCompressor v => toJS v
+  | .boolean v => toJS v⟩
+instance : Coe WebSocketCompressor WebSocketCompressorOrBoolean := ⟨.webSocketCompressor⟩
+instance : Coe Bool WebSocketCompressorOrBoolean := ⟨.boolean⟩
+
+/-- `dictionary WebSocketHandlerUndefinedPerMessageDeflate` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure WebSocketHandlerUndefinedPerMessageDeflate where
+  /-- `WebSocketCompressorOrBoolean compress` -/
+  compress : Option WebSocketCompressorOrBoolean := none
+  /-- `WebSocketCompressorOrBoolean decompress` -/
+  decompress : Option WebSocketCompressorOrBoolean := none
+instance : ToJS WebSocketHandlerUndefinedPerMessageDeflate := ⟨fun d => Support.fields #[("compress", Support.optional d.compress),
+    ("decompress", Support.optional d.decompress)]⟩
+
+/-- `typedef boolean or WebSocketHandlerUndefinedPerMessageDeflate BooleanOrWebSocketHandlerUndefinedPerMessageDeflate`: one constructor per member type. -/
+inductive BooleanOrWebSocketHandlerUndefinedPerMessageDeflate where
+  /-- `boolean` -/
+  | boolean (value : Bool)
+  /-- `WebSocketHandlerUndefinedPerMessageDeflate` -/
+  | webSocketHandlerUndefinedPerMessageDeflate (value : WebSocketHandlerUndefinedPerMessageDeflate)
+instance : ToJS BooleanOrWebSocketHandlerUndefinedPerMessageDeflate := ⟨fun
+  | .boolean v => toJS v
+  | .webSocketHandlerUndefinedPerMessageDeflate v => toJS v⟩
+instance : Coe Bool BooleanOrWebSocketHandlerUndefinedPerMessageDeflate := ⟨.boolean⟩
+instance : Coe WebSocketHandlerUndefinedPerMessageDeflate BooleanOrWebSocketHandlerUndefinedPerMessageDeflate := ⟨.webSocketHandlerUndefinedPerMessageDeflate⟩
+
+/-- `dictionary WebSocketHandlerUndefined` (Bun 1.4.4 type declarations, serve.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure WebSocketHandlerUndefined where
+  /-- `undefined data` -/
+  data : Option Unit := none
+  /-- `WebSocketHandlerUndefinedMessage message` -/
+  message : Option WebSocketHandlerUndefinedMessage := none
+  /-- `WebSocketHandlerUndefinedOpen open` -/
+  «open» : Option WebSocketHandlerUndefinedOpen := none
+  /-- `WebSocketHandlerUndefinedDrain drain` -/
+  drain : Option WebSocketHandlerUndefinedDrain := none
+  /-- `WebSocketHandlerUndefinedClose close` -/
+  close : Option WebSocketHandlerUndefinedClose := none
+  /-- `WebSocketHandlerUndefinedPing ping` -/
+  ping : Option WebSocketHandlerUndefinedPing := none
+  /-- `WebSocketHandlerUndefinedPong pong` -/
+  pong : Option WebSocketHandlerUndefinedPong := none
+  /-- `WebSocketHandlerUndefinedError error` -/
+  error : Option WebSocketHandlerUndefinedError := none
+  /-- `double maxPayloadLength` -/
+  maxPayloadLength : Option Float := none
+  /-- `double backpressureLimit` -/
+  backpressureLimit : Option Float := none
+  /-- `boolean closeOnBackpressureLimit` -/
+  closeOnBackpressureLimit : Option Bool := none
+  /-- `double idleTimeout` -/
+  idleTimeout : Option Float := none
+  /-- `boolean publishToSelf` -/
+  publishToSelf : Option Bool := none
+  /-- `boolean sendPings` -/
+  sendPings : Option Bool := none
+  /-- `BooleanOrWebSocketHandlerUndefinedPerMessageDeflate perMessageDeflate` -/
+  perMessageDeflate : Option BooleanOrWebSocketHandlerUndefinedPerMessageDeflate := none
+instance : ToJS WebSocketHandlerUndefined := ⟨fun d => Support.fields #[("data", Support.optional d.data),
+    ("message", Support.optional d.message),
+    ("open", Support.optional d.«open»),
+    ("drain", Support.optional d.drain),
+    ("close", Support.optional d.close),
+    ("ping", Support.optional d.ping),
+    ("pong", Support.optional d.pong),
+    ("error", Support.optional d.error),
+    ("maxPayloadLength", Support.optional d.maxPayloadLength),
+    ("backpressureLimit", Support.optional d.backpressureLimit),
+    ("closeOnBackpressureLimit", Support.optional d.closeOnBackpressureLimit),
+    ("idleTimeout", Support.optional d.idleTimeout),
+    ("publishToSelf", Support.optional d.publishToSelf),
+    ("sendPings", Support.optional d.sendPings),
+    ("perMessageDeflate", Support.optional d.perMessageDeflate)]⟩
+
+/-- `dictionary ServeOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ServeOptions where
   /-- `DOMString hostname` -/
   hostname : Option String := none
-  /-- `DOMStringOrDouble port` -/
-  port : Option DOMStringOrDouble := none
+  /-- `DOMStringOrUnsignedShort port` -/
+  port : Option DOMStringOrUnsignedShort := none
   /-- `boolean reusePort` -/
   reusePort : Option Bool := none
   /-- `boolean ipv6Only` -/
@@ -61,13 +519,27 @@ structure ServeOptionsUndefinedString where
   http2 : Option Bool := none
   /-- `boolean http1` -/
   http1 : Option Bool := none
-  /-- `double idleTimeout` -/
-  idleTimeout : Option Float := none
-  /-- `Promise<Response> fetch` -/
-  fetch : Option Value := none
-  /-- `ServeRoutesUndefinedString routes` -/
-  routes : Option ServeRoutesUndefinedString := none
-instance : ToJS ServeOptionsUndefinedString := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
+  /-- `unsigned long idleTimeout` -/
+  idleTimeout : Option Nat := none
+  /-- `TLSOptionsOrSequenceOfTLSOptions tls` -/
+  tls : Option TLSOptionsOrSequenceOfTLSOptions := none
+  /-- `unsigned long long maxRequestBodySize` -/
+  maxRequestBodySize : Option Nat := none
+  /-- `ServeDevelopmentUnion development` -/
+  development : Option ServeDevelopmentUnion := none
+  /-- `ServeOptionsError error` -/
+  error : Option ServeOptionsError := none
+  /-- `DOMString id` -/
+  id : Option String := none
+  /-- `ServeOptionsFetch fetch` -/
+  fetch : Option ServeOptionsFetch := none
+  /-- `ServeRoutesUndefinedNeverOrServeRoutesWithUpgradeUndefinedNever routes` -/
+  routes : Option ServeRoutesUndefinedNeverOrServeRoutesWithUpgradeUndefinedNever := none
+  /-- `WebSocketHandlerUndefined websocket` -/
+  websocket : Option WebSocketHandlerUndefined := none
+  /-- `DOMString unix` -/
+  unix : Option String := none
+instance : ToJS ServeOptions := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
     ("port", Support.optional d.port),
     ("reusePort", Support.optional d.reusePort),
     ("ipv6Only", Support.optional d.ipv6Only),
@@ -75,8 +547,15 @@ instance : ToJS ServeOptionsUndefinedString := ⟨fun d => Support.fields #[("ho
     ("http2", Support.optional d.http2),
     ("http1", Support.optional d.http1),
     ("idleTimeout", Support.optional d.idleTimeout),
+    ("tls", Support.optional d.tls),
+    ("maxRequestBodySize", Support.optional d.maxRequestBodySize),
+    ("development", Support.optional d.development),
+    ("error", Support.optional d.error),
+    ("id", Support.optional d.id),
     ("fetch", Support.optional d.fetch),
-    ("routes", Support.optional d.routes)]⟩
+    ("routes", Support.optional d.routes),
+    ("websocket", Support.optional d.websocket),
+    ("unix", Support.optional d.unix)]⟩
 
 /-- `typedef Request or DOMString RequestOrDOMString`: one constructor per member type. -/
 inductive RequestOrDOMString where
@@ -117,45 +596,94 @@ instance : ToJS DOMStringOrUint8ArrayOrArrayBufferOrBlob := ⟨fun
 instance : Coe String DOMStringOrUint8ArrayOrArrayBufferOrBlob := ⟨.domString⟩
 instance : Coe Blob DOMStringOrUint8ArrayOrArrayBufferOrBlob := ⟨.blob⟩
 
-/-- `dictionary ServeRoutesUndefinedNever` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ServeRoutesUndefinedNever where
-instance : ToJS ServeRoutesUndefinedNever := ⟨fun _ => Support.fields #[]⟩
+/-- `readonly subscriptions: string[]`: `readonly attribute sequence<DOMString> subscriptions` -/
+def ServerWebSocket.subscriptions (self : ServerWebSocket) : IO (Array String) := self.val.get "subscriptions" (Array String)
 
-/-- `dictionary ServeOptionsUndefinedNever` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ServeOptionsUndefinedNever where
-  /-- `DOMString hostname` -/
-  hostname : Option String := none
-  /-- `DOMStringOrDouble port` -/
-  port : Option DOMStringOrDouble := none
-  /-- `boolean reusePort` -/
-  reusePort : Option Bool := none
-  /-- `boolean ipv6Only` -/
-  ipv6Only : Option Bool := none
-  /-- `boolean http3` -/
-  http3 : Option Bool := none
-  /-- `boolean http2` -/
-  http2 : Option Bool := none
-  /-- `boolean http1` -/
-  http1 : Option Bool := none
-  /-- `double idleTimeout` -/
-  idleTimeout : Option Float := none
-  /-- `Promise<Response> fetch` -/
-  fetch : Option Value := none
-  /-- `ServeRoutesUndefinedNever routes` -/
-  routes : Option ServeRoutesUndefinedNever := none
-instance : ToJS ServeOptionsUndefinedNever := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
-    ("port", Support.optional d.port),
-    ("reusePort", Support.optional d.reusePort),
-    ("ipv6Only", Support.optional d.ipv6Only),
-    ("http3", Support.optional d.http3),
-    ("http2", Support.optional d.http2),
-    ("http1", Support.optional d.http1),
-    ("idleTimeout", Support.optional d.idleTimeout),
-    ("fetch", Support.optional d.fetch),
-    ("routes", Support.optional d.routes)]⟩
+/-- `readonly remoteAddress: string`: `readonly attribute DOMString remoteAddress` -/
+def ServerWebSocket.remoteAddress (self : ServerWebSocket) : IO String := self.val.get "remoteAddress" String
 
-/-- `readonly pendingRequests: number`: `readonly attribute double pendingRequests` -/
-def ServerUndefined.pendingRequests (self : ServerUndefined) : IO Float := self.val.get "pendingRequests" Float
+/-- `readonly readyState: WebSocketReadyState`: `readonly attribute double readyState` -/
+def ServerWebSocket.readyState (self : ServerWebSocket) : IO Float := self.val.get "readyState" Float
+
+/-- `binaryType?: 'nodebuffer' | 'arraybuffer' | 'uint8array' | 'blob'`: `readonly attribute ServerWebSocketBinaryType? binaryType` -/
+def ServerWebSocket.binaryType (self : ServerWebSocket) : IO (Option ServerWebSocketBinaryType) := self.val.get "binaryType" (Option ServerWebSocketBinaryType)
+
+/-- `data: T`: `readonly attribute undefined data` -/
+def ServerWebSocket.data (self : ServerWebSocket) : IO Unit := self.val.get "data" Unit
+
+/-- `readonly isPaused: boolean`: `readonly attribute boolean isPaused` -/
+def ServerWebSocket.isPaused (self : ServerWebSocket) : IO Bool := self.val.get "isPaused" Bool
+
+/-- `send(data: string | BufferSource | Blob, compress?: boolean): ServerWebSocketSendStatus`: `double send(DOMStringOrUint8ArrayOrBlob data, optional boolean compress)` -/
+def ServerWebSocket.send (self : ServerWebSocket) (data : DOMStringOrUint8ArrayOrBlob) (compress : Option Bool := none) : IO Float :=
+  self.val.callMethod "send" (Support.args #[toJS data, Support.optional compress]) Float
+
+/-- `sendText(data: string, compress?: boolean): ServerWebSocketSendStatus`: `double sendText(DOMString data, optional boolean compress)` -/
+def ServerWebSocket.sendText (self : ServerWebSocket) (data : String) (compress : Option Bool := none) : IO Float :=
+  self.val.callMethod "sendText" (Support.args #[toJS data, Support.optional compress]) Float
+
+/-- `sendBinary(data: BufferSource | Blob, compress?: boolean): ServerWebSocketSendStatus`: `double sendBinary(Uint8ArrayOrBlob data, optional boolean compress)` -/
+def ServerWebSocket.sendBinary (self : ServerWebSocket) (data : Uint8ArrayOrBlob) (compress : Option Bool := none) : IO Float :=
+  self.val.callMethod "sendBinary" (Support.args #[toJS data, Support.optional compress]) Float
+
+/-- `close(code?: number, reason?: string): void`: `undefined close(optional double code, optional DOMString reason)` -/
+def ServerWebSocket.close (self : ServerWebSocket) (code : Option Float := none) (reason : Option String := none) : IO Unit :=
+  self.val.callMethod "close" (Support.args #[Support.optional code, Support.optional reason]) Unit
+
+/-- `terminate(): void`: `undefined terminate()` -/
+def ServerWebSocket.terminate (self : ServerWebSocket) : IO Unit :=
+  self.val.callMethod "terminate" (Support.args #[]) Unit
+
+/-- `ping(data?: string | BufferSource | Blob): ServerWebSocketSendStatus`: `double ping(optional DOMStringOrUint8ArrayOrBlob data)` -/
+def ServerWebSocket.ping (self : ServerWebSocket) (data : Option DOMStringOrUint8ArrayOrBlob := none) : IO Float :=
+  self.val.callMethod "ping" (Support.args #[Support.optional data]) Float
+
+/-- `pong(data?: string | BufferSource | Blob): ServerWebSocketSendStatus`: `double pong(optional DOMStringOrUint8ArrayOrBlob data)` -/
+def ServerWebSocket.pong (self : ServerWebSocket) (data : Option DOMStringOrUint8ArrayOrBlob := none) : IO Float :=
+  self.val.callMethod "pong" (Support.args #[Support.optional data]) Float
+
+/-- `publish(topic: string, data: string | BufferSource | Blob, compress?: boolean): ServerWebSocketSendStatus`: `double publish(DOMString topic, DOMStringOrUint8ArrayOrBlob data, optional boolean compress)` -/
+def ServerWebSocket.publish (self : ServerWebSocket) (topic : String) (data : DOMStringOrUint8ArrayOrBlob) (compress : Option Bool := none) : IO Float :=
+  self.val.callMethod "publish" (Support.args #[toJS topic, toJS data, Support.optional compress]) Float
+
+/-- `publishText(topic: string, data: string, compress?: boolean): ServerWebSocketSendStatus`: `double publishText(DOMString topic, DOMString data, optional boolean compress)` -/
+def ServerWebSocket.publishText (self : ServerWebSocket) (topic : String) (data : String) (compress : Option Bool := none) : IO Float :=
+  self.val.callMethod "publishText" (Support.args #[toJS topic, toJS data, Support.optional compress]) Float
+
+/-- `publishBinary(topic: string, data: BufferSource | Blob, compress?: boolean): ServerWebSocketSendStatus`: `double publishBinary(DOMString topic, Uint8ArrayOrBlob data, optional boolean compress)` -/
+def ServerWebSocket.publishBinary (self : ServerWebSocket) (topic : String) (data : Uint8ArrayOrBlob) (compress : Option Bool := none) : IO Float :=
+  self.val.callMethod "publishBinary" (Support.args #[toJS topic, toJS data, Support.optional compress]) Float
+
+/-- `subscribe(topic: string): boolean`: `boolean subscribe(DOMString topic)` -/
+def ServerWebSocket.subscribe (self : ServerWebSocket) (topic : String) : IO Bool :=
+  self.val.callMethod "subscribe" (Support.args #[toJS topic]) Bool
+
+/-- `unsubscribe(topic: string): boolean`: `boolean unsubscribe(DOMString topic)` -/
+def ServerWebSocket.unsubscribe (self : ServerWebSocket) (topic : String) : IO Bool :=
+  self.val.callMethod "unsubscribe" (Support.args #[toJS topic]) Bool
+
+/-- `isSubscribed(topic: string): boolean`: `boolean isSubscribed(DOMString topic)` -/
+def ServerWebSocket.isSubscribed (self : ServerWebSocket) (topic : String) : IO Bool :=
+  self.val.callMethod "isSubscribed" (Support.args #[toJS topic]) Bool
+
+/-- `cork<R = unknown>(callback: (ws: ServerWebSocket<T>) => R): R`: `any cork(ServerWebSocketCorkCallback callback)` -/
+def ServerWebSocket.cork (self : ServerWebSocket) (callback : ServerWebSocketCorkCallback) : IO Data :=
+  self.val.callMethod "cork" (Support.args #[toJS callback]) Data
+
+/-- `getBufferedAmount(): number`: `double getBufferedAmount()` -/
+def ServerWebSocket.getBufferedAmount (self : ServerWebSocket) : IO Float :=
+  self.val.callMethod "getBufferedAmount" (Support.args #[]) Float
+
+/-- `pause(): void`: `undefined pause()` -/
+def ServerWebSocket.pause (self : ServerWebSocket) : IO Unit :=
+  self.val.callMethod "pause" (Support.args #[]) Unit
+
+/-- `resume(): void`: `undefined resume()` -/
+def ServerWebSocket.resume (self : ServerWebSocket) : IO Unit :=
+  self.val.callMethod "resume" (Support.args #[]) Unit
+
+/-- `readonly pendingRequests: number`: `readonly attribute unsigned long pendingRequests` -/
+def ServerUndefined.pendingRequests (self : ServerUndefined) : IO Nat := self.val.get "pendingRequests" Nat
 
 /-- `readonly pendingWebSockets: number`: `readonly attribute double pendingWebSockets` -/
 def ServerUndefined.pendingWebSockets (self : ServerUndefined) : IO Float := self.val.get "pendingWebSockets" Float
@@ -165,8 +693,8 @@ def ServerUndefined.url (self : ServerUndefined) : IO URL := do
   let r ← self.val.get "url" Value
   pure { val := r }
 
-/-- `readonly port: number | undefined`: `readonly attribute double? port` -/
-def ServerUndefined.port (self : ServerUndefined) : IO (Option Float) := self.val.get "port" (Option Float)
+/-- `readonly port: number | undefined`: `readonly attribute unsigned short? port` -/
+def ServerUndefined.port (self : ServerUndefined) : IO (Option Nat) := self.val.get "port" (Option Nat)
 
 /-- `readonly hostname: string | undefined`: `readonly attribute DOMString? hostname` -/
 def ServerUndefined.hostname (self : ServerUndefined) : IO (Option String) := self.val.get "hostname" (Option String)
@@ -188,8 +716,8 @@ def ServerUndefined.stop (self : ServerUndefined) (closeActiveConnections : Opti
 def ServerUndefined.closeIdleConnections (self : ServerUndefined) : IO Float :=
   self.val.callMethod "closeIdleConnections" (Support.args #[]) Float
 
-/-- `reload<R extends string>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData>`: `ServerUndefined reload(ServeOptionsUndefinedString options)` -/
-def ServerUndefined.reload (self : ServerUndefined) (options : ServeOptionsUndefinedString) : IO ServerUndefined := do
+/-- `reload<R extends string>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData> (read as {'options':'Serve.Options<undefined, never>'}: the same options as Bun.serve (the declaration instantiates the route parameter as string rather than never))`: `ServerUndefined reload(ServeOptions options)` -/
+def ServerUndefined.reload (self : ServerUndefined) (options : ServeOptions) : IO ServerUndefined := do
   let r ← self.val.callMethod "reload" (Support.args #[toJS options]) Value
   pure { val := r }
 
@@ -226,8 +754,8 @@ def ServerUndefined.ref (self : ServerUndefined) : IO Unit :=
 def ServerUndefined.unref (self : ServerUndefined) : IO Unit :=
   self.val.callMethod "unref" (Support.args #[]) Unit
 
-/-- `Bun.serve<WebSocketData = undefined, R extends string = never>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData>`: `ServerUndefined serve(ServeOptionsUndefinedNever options)` (Bun 1.4.4 type declarations) -/
-def serve (options : ServeOptionsUndefinedNever) : IO ServerUndefined := do
+/-- `Bun.serve<WebSocketData = undefined, R extends string = never>(options: Serve.Options<WebSocketData, R>): Server<WebSocketData>`: `ServerUndefined serve(ServeOptions options)` (Bun 1.4.4 type declarations) -/
+def serve (options : ServeOptions) : IO ServerUndefined := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.serve", module := "globalThis", path := "Bun.serve", construct := false, arity := 1 }
     (Support.args #[toJS options]) (await := false)
   pure { val := r }

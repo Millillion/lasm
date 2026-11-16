@@ -55,7 +55,8 @@ export const bun = {
     'Database.transaction': 'wraps a JavaScript function in a transaction and returns a callable object (generic over its arguments); run BEGIN and COMMIT with Database.run',
     'cron.parse': 'typed with template literal types (cron expressions); Bun.cron takes the expression as a string',
   },
-  defaults: {},
+  /** Generic parameters whose instantiation by a function differs from the declaration's default: the one the plain name stands for. */
+  defaults: { 'Serve.Options.R': 'never', 'Serve.Options.WebSocketData': 'undefined' },
   as: {},
   split: {},
   names: {
@@ -82,6 +83,7 @@ export const bun = {
   /** Member types TypeScript computes (conditional, indexed or keyof types), stated plainly, with why. */
   overrides: {
     'TOML.stringify': { type: 'string | undefined', reason: 'a conditional type of the value; a string, or undefined for a function or symbol' },
+    'Server.reload': { params: { options: 'Serve.Options<undefined, never>' }, reason: 'the same options as Bun.serve (the declaration instantiates the route parameter as string rather than never)' },
     'Server.upgrade': { params: { options: '{ headers?: HeadersInit; data?: unknown }' }, reason: 'a conditional rest tuple on the WebSocket data type' },
     'Database.query': { type: 'Statement', reason: 'a conditional type of the parameters' },
     'Database.prepare': { type: 'Statement', reason: 'a conditional type of the parameters' },
@@ -102,7 +104,15 @@ export const bun = {
     'udp.ConnectedSocketHandler.data': { params: { data: 'Uint8Array' }, reason: 'indexed by the binary type (a Buffer by default)' },
   },
   instances: {},
-  integers: {},
+  /** `number`s the doc comment describes as a port, count or size (WebIDL integers; `double` otherwise), each quoting it. */
+  integers: {
+    'ServeOptions.port': { type: 'unsigned short', quote: 'The port the server listens on' },
+    'ServeOptions.idleTimeout': { type: 'unsigned long', quote: 'Sets the number of seconds to wait before timing out a connection' },
+    'ServeOptions.maxRequestBodySize': { type: 'unsigned long long', quote: 'The maximum size of a request body, in bytes' },
+    'Server.port': { type: 'unsigned short', quote: 'The port the server is listening on.' },
+    'Server.pendingRequests': { type: 'unsigned long', quote: 'The number of in-flight requests' },
+    'SocketAddress.port': { type: 'unsigned short', quote: 'The port of the client.' },
+  },
   typeNames: {
     Request: 'Request', Response: 'Response', URL: 'URL', AbortSignal: 'AbortSignal', ReadableStream: 'ReadableStream', WritableStream: 'WritableStream',
     WebSocket: 'WebSocket', Headers: 'Headers', Blob: 'Blob', EventTarget: 'EventTarget', ArrayBuffer: 'ArrayBuffer', Event: 'Event', HeadersInit: 'HeadersInit',
