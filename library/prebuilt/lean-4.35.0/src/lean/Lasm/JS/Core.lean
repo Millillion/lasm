@@ -654,6 +654,19 @@ def ofSyncFn2 [FromJS α] [FromJS β] [ToJS γ] (f : α → β → IO γ) : IO V
 
 end Function
 
+namespace Async
+
+/-- A JavaScript promise of `act`'s result, for APIs that take a promise of work still
+running: Workers' `ctx.waitUntil (← Async.toPromise (kv.put "k" v))`. `act` starts at
+once as a Lean task (as a call of a `Function.ofFn` function does) and holds no Lean
+thread while it awaits; the promise resolves with `toJS` of its result, or rejects
+with an `Error` if it throws. -/
+def toPromise [ToJS α] (act : Async α) : IO Value := do
+  let f ← Function.ofFn fun _ => do return toJS (← act)
+  f.call #[]
+
+end Async
+
 /-! Typed bindings: `@[js "module" "export"] opaque f : A → B → Async C` (macro in
 Lasm.JS.Meta) defines `f` with `Bindable.bind`; the glue comes from the type. -/
 
@@ -735,20 +748,25 @@ def waitForever : IO Unit := do
   discard <| IO.wait p.result?
   discard <| r.get
 
-/-- What `exportDefault` publishes: a JavaScript value as it is, or a Lean
-function `α → Async β` (a fetch handler `Request → Async Response`) as a
-JavaScript function made with `Function.ofFn1`. -/
+/-- What `exportDefault` publishes: any value with `ToJS` as JavaScript sees it
+(a `Value` such as a Hono app, or a structure of handlers such as
+`Lasm.JS.Cloudflare.ExportedHandler`), or a Lean function `α → Async β` (a
+fetch handler `Request → Async Response`) as a JavaScript function made with
+`Function.ofFn1`. -/
 class DefaultExport (α : Type) where
   /-- The JavaScript value published for `x`. -/
-  toDefaultExport : α → IO Value
+  toDefaultExport : α → IO Data
 
-instance : DefaultExport Value := ⟨pure⟩
-instance [FromJS α] [ToJS β] : DefaultExport (α → Async β) := ⟨Function.ofFn1⟩
+instance (priority := low) [ToJS α] : DefaultExport α := ⟨fun x => pure (toJS x)⟩
+instance [FromJS α] [ToJS β] : DefaultExport (α → Async β) := ⟨fun f => do return toJS (← Function.ofFn1 f)⟩
 
 /-- Publishes `x` as the program's default export, as `export default` would in
 a JavaScript module: a fetch handler `Request → Async Response` (Lasm.JS.Web's
-types, `exportDefault handle`), or any JavaScript value (`Value`): an object with
-a `fetch` method such as a Hono app, or a function `(request, env, ctx) => Response`.
+types, `exportDefault handle`), or any value with `ToJS`: an object with a
+`fetch` method such as a Hono app, a function `(request, env, ctx) => Response`,
+or a structure of handlers. On Workers, the object's `scheduled` and `queue`
+methods also receive the cron triggers and queue batches
+(`Lasm.JS.Cloudflare.ExportedHandler` is such an object).
 
 - Edge builds (`lasm build --target workers`, Bun, Deno and the other edge
   targets): the platform's requests go to it, after `main` returns.
@@ -769,7 +787,7 @@ def exportDefault [DefaultExport α] (x : α) : IO Unit := do
   -- takes requests once it has it.
   match ← g.get "__lasmFunctionHost" Data with
   | .ref publish _ =>
-    let _ : Data ← publish.call #[.ref v ""] Data
+    let _ : Data ← publish.call #[v] Data
     waitForever
   | _ => pure ()
 

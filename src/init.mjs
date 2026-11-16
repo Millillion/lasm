@@ -6,6 +6,7 @@ import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fastlyToml } from './wasi/wasi-build.mjs';
 import { packageTargets } from './package.mjs';
+import { targetHintAmong } from './cli-arguments.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const templateRoot = join(root, 'templates');
@@ -27,8 +28,8 @@ export const templateDependencies = npm;
 // is the same handler on Lambda's base image (no HTTP server inside).
 const functionTemplates = ['hono', 'fetch'];
 export const deployTargets = {
-  lambda: { summary: 'AWS Lambda container image (Dockerfile.lambda: Lambda\'s Node 24 image calling the default export)', templates: functionTemplates },
-  'lambda-zip': { summary: 'AWS Lambda .zip for nodejs24.x (npm run build:lambda)', package: 'lambda', templates: functionTemplates },
+  lambda: { summary: 'AWS Lambda .zip for nodejs24.x (npm run build:lambda)', package: 'lambda', templates: functionTemplates },
+  'lambda-container': { summary: 'AWS Lambda container image (Dockerfile.lambda: Lambda\'s Node 24 image calling the default export)', templates: functionTemplates },
   'lambda-edge': { summary: 'Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)', package: 'lambda-edge', templates: functionTemplates },
   vercel: { summary: 'Vercel Function (vercel.json; Vercel runs the build)', package: 'vercel', templates: functionTemplates },
   netlify: { summary: 'Netlify Function (netlify.toml; Netlify runs the build)', package: 'netlify', templates: functionTemplates },
@@ -81,7 +82,7 @@ The directory must be new or empty. The default template is plain.
 --deploy (repeatable; server templates, and wasi for plain too) adds a target's files and
 npm scripts (build:<target> runs lasm build --target <target>). Lasm never
 installs or starts a platform's own tools; use the platform's CLI for that:
-${Object.entries(deployTargets).map(([name, t]) => `  ${name.padEnd(12)} ${t.summary}`).join('\n')}
+${Object.entries(deployTargets).map(([name, t]) => `  ${name.padEnd(16)} ${t.summary}`).join('\n')}
 
 Templates:
 ${Object.entries(templates).map(([name, t]) => `  ${name.padEnd(9)} ${t.summary}`).join('\n')}
@@ -91,6 +92,7 @@ Example: npx @lasm/cli init my-app --template hono`;
 export function parseInitArguments(tokens) {
   const result = { command: 'init', template: 'plain', deploy: [] };
   const positional = [];
+  let templateGiven = false;
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
     if (token === '--help' || token === '-h') return { command: 'init-help' };
@@ -98,12 +100,14 @@ export function parseInitArguments(tokens) {
     if (match) {
       const value = match[1] ?? tokens[++i];
       if (!value || value.startsWith('-')) throw new Error('--template requires a value\n\n' + initUsage);
+      if (templateGiven) throw new Error('Specify --template only once');
+      templateGiven = true;
       result.template = value; continue;
     }
     const deploy = /^--deploy(?:=(.*))?$/s.exec(token);
     if (deploy) {
       const value = deploy[1] ?? tokens[++i];
-      if (!Object.hasOwn(deployTargets, value ?? '')) throw new Error(`--deploy accepts ${Object.keys(deployTargets).join(', ')}\n\n` + initUsage);
+      if (!Object.hasOwn(deployTargets, value ?? '')) throw new Error(`--deploy accepts ${Object.keys(deployTargets).join(', ')}${value ? targetHintAmong(value, Object.keys(deployTargets), '--deploy') : ''}\n\n` + initUsage);
       if (!result.deploy.includes(value)) result.deploy.push(value);
       continue;
     }
@@ -113,7 +117,7 @@ export function parseInitArguments(tokens) {
   if (positional.length !== 1) throw new Error(initUsage);
   // Own keys only: `constructor` or `__proto__` is not a template (found by test/fuzz).
   if (!Object.hasOwn(templates, result.template))
-    throw new Error(`Unknown template "${result.template}". Choose one of: ${Object.keys(templates).join(', ')}`);
+    throw new Error(`Unknown template "${result.template}"${targetHintAmong(result.template, Object.keys(templates), '--template')}. Choose one of: ${Object.keys(templates).join(', ')}`);
   const serverOnly = result.deploy.find(target => !deployTargets[target].cli);
   if (serverOnly && !templates[result.template].server)
     throw new Error(`--deploy ${serverOnly} needs a server template (express, hono, fastify, std-http or fetch), not ${result.template}`);
@@ -457,7 +461,7 @@ import_map = "./functions/${name}/deno.json"
 `;
 
 function deployGitignore(deploy, template, name) {
-  const extra = { 'lambda-zip': 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/',
+  const extra = { lambda: 'lambda.zip', 'lambda-edge': 'lambda-edge.zip', vercel: '.vercel/', netlify: '.netlify/\nnetlify/functions/lasm/', azure: 'azure-functions/', gcf: 'gcf/', workers: 'workers/\n.wrangler/',
     'vercel-edge': '.vercel/\napi/lasm.mjs\napi/_lasm/', 'netlify-edge': '.netlify/\nnetlify/lasm/\nnetlify/edge-functions/lasm.mjs', 'deno-deploy': 'deno/',
     'supabase-edge': `supabase/functions/${supabaseFunctionNameOf(name)}/\nsupabase/.temp/\nsupabase/.branches/`,
     fastly: 'bin/\npkg/', wasi: 'wasi/', 'wasi-http': 'wasi-http/', spin: 'wasi-http/\n.spin/' };
@@ -566,7 +570,7 @@ The image sets \`PORT=8080\`; platforms that assign a port override it.` : ''}
 ${deploy.some(target => deployTargets[target].package) ? `Lasm builds for each platform; it does not install or start the platform's tools. Test and deploy
 with your platform's own CLI (\`vercel\`, \`netlify\`, \`func\`, \`gcloud\`, \`aws\` or \`sam\`), installed as its docs say.
 
-` : ''}${deploy.filter(target => target !== 'lambda').map(target => deployReadme[target](name, template) + '\n').join('')}${deploy.includes('lambda') ? `\`Dockerfile.lambda\` builds an AWS Lambda container image (Lambda's Node 24 image, whose
+` : ''}${deploy.filter(target => target !== 'lambda-container').map(target => deployReadme[target](name, template) + '\n').join('')}${deploy.includes('lambda-container') ? `\`Dockerfile.lambda\` builds an AWS Lambda container image (Lambda's Node 24 image, whose
 runtime calls the handler \`Export.lean\` publishes): \`docker build -f Dockerfile.lambda -t ${name}-lambda .\`; see the
 [Lambda guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/lambda.md).
 
@@ -587,7 +591,7 @@ function entryRows(template, deploy) {
 
 const guide = page => `https://github.com/Millillion/lasm/blob/main/docs/deploy/${page}.md`;
 const deployReadme = {
-  'lambda-zip': () => `**AWS Lambda (.zip):** \`npm run build:lambda\` writes \`lambda.zip\` for the
+  lambda: () => `**AWS Lambda (.zip):** \`npm run build:lambda\` writes \`lambda.zip\` for the
 \`nodejs24.x\` runtime with handler \`lasm-lambda.handler\` (x86_64 or arm64, 512 MB or more); see the
 [Lambda guide](${guide('lambda')}).
 `,
@@ -703,7 +707,7 @@ export function initProject({ directory, template, deploy = [] }) {
     '.dockerignore': dockerignore,
     '.gitignore': deployGitignore(deploy, template, name),
   };
-  if (deploy.includes('lambda')) files['Dockerfile.lambda'] = lambdaDockerfile();
+  if (deploy.includes('lambda-container')) files['Dockerfile.lambda'] = lambdaDockerfile();
   if (deploy.includes('vercel')) files['vercel.json'] = vercelJson;
   if (deploy.includes('netlify')) { files['netlify.toml'] = netlifyToml; files['public/.gitkeep'] = ''; }
   if (deploy.includes('workers')) files['wrangler.toml'] = wranglerToml(name);

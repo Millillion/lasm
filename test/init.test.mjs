@@ -13,8 +13,8 @@ test('lasm init arguments', () => {
   // The Lambda image calls a published handler: not for a template that brings its own server.
   assert.throws(() => parseLasmArguments(['init', '-t=std-http', 'x', '--deploy', 'lambda']), /has no --deploy targets/);
   assert.throws(() => parseLasmArguments(['init', 'x', '--deploy', 'lambda']), /needs a server template/);
-  assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=vercel', '--deploy', 'lambda-zip', '--deploy', 'vercel']).deploy, ['vercel', 'lambda-zip']);
-  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /--deploy accepts lambda, lambda-zip, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
+  assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=vercel', '--deploy', 'lambda-container', '--deploy', 'vercel']).deploy, ['vercel', 'lambda-container']);
+  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /--deploy accepts lambda, lambda-container, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
   // Cloudflare Workers (edge build): the Hono template only.
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=workers']).deploy, ['workers']);
   assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'express', '--deploy', 'workers']), /--deploy workers supports the hono, fetch and fullstack templates, not express/);
@@ -65,7 +65,7 @@ test('every template creates a complete project', () => {
       assert.match(read('.gitignore'), /^dist\/$/m);
     }
     const lambda = join(root, 'lambda');
-    assert.ok(initProject({ directory: lambda, template: 'hono', deploy: ['lambda'] }).files.includes('Dockerfile.lambda'));
+    assert.ok(initProject({ directory: lambda, template: 'hono', deploy: ['lambda-container'] }).files.includes('Dockerfile.lambda'));
     const recipe = readFileSync(join(lambda, 'Dockerfile.lambda'), 'utf8');
     assert.match(recipe, /^FROM public\.ecr\.aws\/lambda\/nodejs:24$/m);
     // The handler on Lambda's own image: no Web Adapter, no server inside.
@@ -75,7 +75,7 @@ test('every template creates a complete project', () => {
     assert.match(readFileSync(join(lambda, 'README.md'), 'utf8'), /Dockerfile\.lambda/);
     // Function platforms: npm scripts that build the default export (Export.lean) with lasm package, platform files and packages.
     const functions = join(root, 'functions');
-    const created = initProject({ directory: functions, template: 'fetch', deploy: ['lambda-zip', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] }).files;
+    const created = initProject({ directory: functions, template: 'fetch', deploy: ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] }).files;
     for (const file of ['vercel.json', 'netlify.toml', 'public/.gitkeep']) assert.ok(created.includes(file), file);
     assert.ok(!created.includes('Dockerfile.lambda'));
     const pkg = JSON.parse(readFileSync(join(functions, 'package.json'), 'utf8'));

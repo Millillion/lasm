@@ -14,7 +14,7 @@ aws lambda create-function --function-name my-app --runtime nodejs24.x \
 aws lambda create-function-url-config --function-name my-app --auth-type AWS_IAM
 ```
 
-With `lasm init my-app --template hono --deploy lambda-zip` the project has
+With `lasm init my-app --template hono --deploy lambda` the project has
 `npm run build:lambda` for the first step. `npx lasm package --target lambda`
 packages an existing `dist/` without rebuilding.
 
@@ -103,7 +103,7 @@ server (Express, Fastify, `Std.Http`) runs on a container platform instead
 
 ### From a `lasm init` project
 
-`lasm init my-app --template fetch --deploy lambda` (or `--template hono`)
+`lasm init my-app --template fetch --deploy lambda-container` (or `--template hono`)
 writes this file as `Dockerfile.lambda` next to the ordinary `Dockerfile`;
 build it with `docker build -f Dockerfile.lambda -t my-app .`. The template CI
 builds it and invokes it through the image's Runtime Interface Emulator.

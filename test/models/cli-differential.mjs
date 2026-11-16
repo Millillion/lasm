@@ -192,10 +192,11 @@ function subcommandLine(r, options, values) {
   return r.array(r.int(0, 6), () => r.next() < 0.5 ? spaced() : [r.pick(pool)]).flat();
 }
 const initValues = ['plain', 'express', 'hono', 'fastify', 'std-http', 'web', 'fetch', 'fullstack', 'constructor', '__proto__', 'lambda',
-  'lambda-zip', 'vercel', 'vercel-edge', 'netlify', 'netlify-edge', 'workers', 'wasi', 'wasi-http', 'spin', 'fastly', 'supabase-edge',
-  'deno-deploy', 'azure', 'gcf', '', '-x', '--x', 'a\nb', 'hon'];
+  'lambda-container', 'vercel', 'vercel-edge', 'netlify', 'netlify-edge', 'workers', 'wasi', 'wasi-http', 'spin', 'fastly', 'supabase-edge',
+  'deno-deploy', 'azure', 'gcf', '', '-x', '--x', 'a\nb', 'hon', 'Hono', 'worker', 'cloudflare', 'vercl', 'aws'];
 const devValues = ['node', 'bun', 'deno', 'browser', 'workers', 'node,browser', 'node=Server.lean,browser=Client.lean', 'browser=a.lean',
-  'node,bun', 'node=', 'node=a', 'x', '', '--x', '-x', '80', '65535', '65536', '00080', '123456', 'a\nb', '127.0.0.1', 'out', 'deno=b.lean=c'];
+  'node,bun', 'node=', 'node=a', 'x', '', '--x', '-x', '80', '65535', '65536', '00080', '123456', 'a\nb', '127.0.0.1', 'out', 'deno=b.lean=c',
+  'worker', 'cloudflare', 'brwser', 'node,brwser', 'aws', 'lambda'];
 const packageValues = ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf', 'browser', 'constructor', '', '--x', '-x', 'out', 'a\nb'];
 
 
@@ -517,7 +518,7 @@ const models = [
   {
     name: 'parseDevArguments', source: 'src/dev.mjs', lean: 'Lasm.Cli.Model.Dev',
     generate: r => [...subcommandLine(r, ['--target', '--target', '--port', '--host', '--output'], devValues),
-      ...(r.next() < 0.3 ? [r.pick(['--release', '--dev', '--no-run', '--verbose', '--no-watch'])] : [])].sort(() => r.next() - 0.5),
+      ...r.array(r.next() < 0.3 ? r.int(1, 2) : 0, () => r.pick(['--release', '--dev', '--no-run', '--verbose', '--no-watch']))].sort(() => r.next() - 0.5),
     input: tokens => ({ tokens: tokens.map(hex), runtime: jsRuntime }),
     js: tokens => parseOutcome(() => parseDevArguments(tokens)),
   },
