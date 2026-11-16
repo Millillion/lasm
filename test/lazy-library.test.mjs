@@ -6,9 +6,10 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
-import { compiledLazyModules, defaultJobs, ensureLazyModules, importsOfSource, isLazyNamespace, lazyClosure, lazyModules,
+import { dirname, join, relative } from 'node:path';
+import { compiledLazyModules, defaultJobs, ensureLazyModules, importsOfSource, isLazyNamespace, lazyClosure, lazyLockPath, lazyModules,
   programLibraryImports } from '../src/lazy-library.mjs';
+import { withApplicationLock } from '../src/application-lock.mjs';
 import { verifyArtifactDirectory } from '../src/managed-artifacts.mjs';
 
 const put = (file, text) => { mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, text); };
@@ -29,11 +30,11 @@ function fakeCompile({ fail = new Set(), delay = 5 } = {}) {
   const runs = [];
   let running = 0, most = 0;
   const compile = async ({ args }) => {
-    const source = args.at(-1), olean = args[args.indexOf('-o') + 1], c = args[args.indexOf('-c') + 1];
+    const source = args.at(-1), olean = args[args.indexOf('-o') + 1], c = args[args.indexOf('-c') + 1], root = args[args.indexOf('-R') + 1];
     running++; most = Math.max(most, running);
     await new Promise(r => setTimeout(r, delay));
     running--;
-    const module = source.split(/[\\/]src[\\/]lean[\\/]/)[1].replace(/\.lean$/, '').split(/[\\/]/).join('.');
+    const module = relative(root, source).replace(/\.lean$/, '').split(/[\\/]/).join('.');
     runs.push(module);
     writeFileSync(olean, `olean of ${module}`);
     if (fail.has(module)) throw new Error(`Lean failed on ${module}`);
@@ -132,5 +133,77 @@ test('ensureProgramLibrary: the imports of the directory\'s files, messages as p
     const locks = [];
     assert.deepEqual((await ensureProgramLibrary(tree, join(dir, 'p1'), { eager, lock: async (...a) => { locks.push(a); return a[1](); } })).compiled, []);
     assert.deepEqual(locks, []);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+/** A receipt for `tree` as assembled: one file, as the managed cache writes it. */
+function assembled(tree) {
+  put(join(tree, 'bin', 'lean'), 'lean');
+  const bytes = readFileSync(join(tree, 'bin', 'lean'));
+  const files = { bin: { type: 'directory' }, 'bin/lean': { type: 'file', bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'),
+    ...(process.platform === 'win32' ? {} : { executable: false }) }, lib: { type: 'directory' }, 'lib/lean': { type: 'directory' } };
+  writeFileSync(join(tree, '.lasm-artifact.json'), JSON.stringify({ schema: 1, identity: 'test', files }));
+}
+
+// Regression (#320, cloudflare-conformance): the compile lock was left in the prefix, and the next build's
+// integrity check refused it ("Managed cache contents changed … lib/lasm/lazy.lock").
+test('a build that compiles on first import, then the next build: both pass the integrity check; the lock is outside the prefix', async () => {
+  const { root, tree, eager, dir } = fixture();
+  try {
+    assembled(tree);
+    await verifyArtifactDirectory(tree, 'test');
+    // The real lock, as builds use it (src/application-lock.mjs).
+    const first = await ensureLazyModules(tree, ['Lasm.JS.Web.C'], { eager, root, log: () => {}, compile: fakeCompile().compile, lock: withApplicationLock });
+    assert.deepEqual(first.compiled, ['Lasm.JS.Web.B', 'Lasm.JS.Web.A', 'Lasm.JS.Web.C']);
+    assert.ok(existsSync(lazyLockPath(tree)), 'the lock file stays, beside the prefix');
+    assert.equal(dirname(dirname(lazyLockPath(tree))), dirname(tree));
+    assert.ok(!existsSync(join(tree, 'lib', 'lasm', 'lazy.lock')));
+    await verifyArtifactDirectory(tree, 'test');
+    // The second build: nothing to compile, and the prefix still verifies.
+    assert.deepEqual((await ensureLazyModules(tree, ['Lasm.JS.Web.C'], { eager, root, log: () => {}, compile: fakeCompile().compile, lock: withApplicationLock })).compiled, []);
+    await verifyArtifactDirectory(tree, 'test');
+    // A compiled output changed afterwards is still refused: the outputs stay verified.
+    writeFileSync(join(tree, 'lib/lasm/c/Lasm/JS/Web/B.c'), 'tampered');
+    await assert.rejects(verifyArtifactDirectory(tree, 'test'), /Managed cache contents changed: .*"lib\/lasm\/c\/Lasm\/JS\/Web\/B\.c"/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('an interrupted compile (Lean fails, or the process is killed) leaves a prefix that still verifies, and the next build compiles it', async () => {
+  const { root, tree, eager, dir } = fixture();
+  try {
+    assembled(tree);
+    // Lean fails: its temporary outputs are removed, and no source copy is left behind.
+    await assert.rejects(ensureLazyModules(tree, ['Lasm.JS.Web.A'], { eager, root, log: () => {}, compile: fakeCompile({ fail: new Set(['Lasm.JS.Web.A']) }).compile,
+      lock: withApplicationLock }), /Lean failed on Lasm\.JS\.Web\.A/);
+    assert.ok(!existsSync(join(tree, 'src/lean/Lasm/JS/Web/A.lean')));
+    await verifyArtifactDirectory(tree, 'test');
+    // Killed mid-compile (no cleanup ran): its temporary files, named exactly, do not fail the check.
+    const killed = ['lib/lean/Lasm/JS/Web/A.olean.tmp-4242', 'lib/lasm/c/Lasm/JS/Web/A.c.tmp-4242', 'src/lean/Lasm/JS/Web/A.lean.tmp-4242',
+      'lib/lasm/lazy/Lasm.JS.Web.A.json.tmp-4242'];
+    for (const name of killed) put(join(tree, name), 'partial');
+    // As does the empty lock file an earlier Lasm kept in the prefix.
+    put(join(tree, 'lib/lasm/lazy.lock'), '');
+    await verifyArtifactDirectory(tree, 'test');
+    assert.deepEqual((await ensureLazyModules(tree, ['Lasm.JS.Web.A'], { eager, root, log: () => {}, compile: fakeCompile().compile, lock: withApplicationLock })).compiled, ['Lasm.JS.Web.A']);
+    await verifyArtifactDirectory(tree, 'test');
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('only the lazy compile\'s bookkeeping files are ignored, by exact name: anything else unvouched fails the check', async () => {
+  for (const name of ['lib/lasm/other.lock', 'lib/lean/Init.olean.tmp-1', 'lib/lean/Lasm/JS/Web/A.olean.tmp-x', 'lib/lean/Lasm/JS/Web/A.olean.tmp-1/x',
+    'src/lean/Lasm/JS/Web/A.lean', 'lib/lasm/lazy/Lasm.JS.Web.A.json', 'bin/lean.tmp-1', 'lib/lasm/lazy.lock.tmp-1']) {
+    const { tree, dir } = fixture();
+    try {
+      assembled(tree);
+      put(join(tree, name), 'x');
+      await assert.rejects(verifyArtifactDirectory(tree, 'test'), /Managed cache contents changed/, name);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  }
+  // A lazy.lock with content is not the empty lock file.
+  const { tree, dir } = fixture();
+  try {
+    assembled(tree);
+    put(join(tree, 'lib/lasm/lazy.lock'), 'not a lock');
+    await assert.rejects(verifyArtifactDirectory(tree, 'test'), /"lib\/lasm\/lazy\.lock"/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
