@@ -51,5 +51,18 @@ def mapOf (α : Type) [FromJS α] (v : Value) : IO (Lasm.JS.Web.Record α) := do
     #[.ref v ""] (await := false)
   return ⟨entries⟩
 
+/-- A type the program declares (Workers' `Env`: `structure Env where KV : KVNamespace …
+deriving FromJS`), read from the JavaScript object `d` with its `FromJS`. A plain object
+arrives as data already; an object that is not plain (a proxy) is copied first with
+`Object.entries`, its non-plain values (the bindings) staying references. -/
+def declared (α : Type) [FromJS α] (d : Data) : IO α := do
+  let d ← match d with
+    | .ref v _ => do
+      let entries ← Lasm.JS.Binding.invoke (Array (String × Data)) { name := "Lasm.JS.Cloudflare.Support.declared", module := "globalThis", path := "Object.entries", construct := false, arity := 1 }
+        #[.ref v ""] (await := false)
+      pure (Data.object entries)
+    | d => pure d
+  decodeAs α "the Worker's env" d
+
 end Support
 end Lasm.JS.Cloudflare

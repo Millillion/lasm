@@ -13,18 +13,20 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern lean_object* l_Lasm_JS_instFromJSValue;
-lean_object* l_Lasm_JS_require___redArg(lean_object*, lean_object*);
-lean_object* lean_string_append(lean_object*, lean_object*);
-lean_object* l_Lasm_JS_instToJSString___lam__0(lean_object*);
-lean_object* l_Lasm_JS_Value_get___redArg(lean_object*, lean_object*, lean_object*, lean_object*);
-lean_object* l_instMonadEIO___redArg();
+lean_object* l_Lasm_JS_decodeAs___redArg(lean_object*, lean_object*, lean_object*);
+extern lean_object* l_Lasm_JS_instFromJSData;
 extern lean_object* l_Lasm_JS_instFromJSString;
 lean_object* l_Lasm_JS_instFromJSProd___redArg(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_instFromJSArray___redArg(lean_object*);
 lean_object* lean_mk_empty_array_with_capacity(lean_object*);
 lean_object* lean_array_push(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Binding_invoke___redArg(lean_object*, lean_object*, lean_object*, uint8_t);
+extern lean_object* l_Lasm_JS_instFromJSValue;
+lean_object* l_Lasm_JS_require___redArg(lean_object*, lean_object*);
+lean_object* lean_string_append(lean_object*, lean_object*);
+lean_object* l_Lasm_JS_instToJSString___lam__0(lean_object*);
+lean_object* l_Lasm_JS_Value_get___redArg(lean_object*, lean_object*, lean_object*, lean_object*);
+lean_object* l_instMonadEIO___redArg();
 lean_object* l_Lasm_JS_Data_describe(lean_object*);
 lean_object* lean_string_utf8_byte_size(lean_object*);
 uint8_t lean_nat_dec_eq(lean_object*, lean_object*);
@@ -86,6 +88,20 @@ LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_mapOf___redArg(lean_object
 LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_mapOf___redArg___boxed(lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_mapOf(lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_mapOf___boxed(lean_object*, lean_object*, lean_object*, lean_object*);
+static const lean_string_object l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 17, .m_capacity = 17, .m_length = 16, .m_data = "the Worker's env"};
+static const lean_object* l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__0 = (const lean_object*)&l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__0_value;
+static lean_once_cell_t l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__1_once = LEAN_ONCE_CELL_INITIALIZER;
+static lean_object* l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__1;
+static lean_once_cell_t l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__2_once = LEAN_ONCE_CELL_INITIALIZER;
+static lean_object* l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__2;
+static const lean_string_object l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__3_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 36, .m_capacity = 36, .m_length = 35, .m_data = "Lasm.JS.Cloudflare.Support.declared"};
+static const lean_object* l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__3 = (const lean_object*)&l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__3_value;
+static const lean_ctor_object l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__4_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_ctor_object) + sizeof(void*)*4 + 8, .m_other = 4, .m_tag = 0}, .m_objs = {((lean_object*)&l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__3_value),((lean_object*)&l_Lasm_JS_Cloudflare_Support_recordOf___redArg___closed__1_value),((lean_object*)&l_Lasm_JS_Cloudflare_Support_recordOf___redArg___closed__2_value),((lean_object*)(((size_t)(1) << 1) | 1)),LEAN_SCALAR_PTR_LITERAL(0, 0, 0, 0, 0, 0, 0, 0)}};
+static const lean_object* l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__4 = (const lean_object*)&l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__4_value;
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_declared___redArg(lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_declared___redArg___boxed(lean_object*, lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_declared(lean_object*, lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_declared___boxed(lean_object*, lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_getExport_go___redArg(lean_object* v_module_3_, lean_object* v_inst_4_, lean_object* v_o_5_, lean_object* v_a_6_){
 _start:
 {
@@ -1035,6 +1051,174 @@ _start:
 lean_object* v_res_323_; 
 v_res_323_ = l_Lasm_JS_Cloudflare_Support_mapOf(v_00_u03b1_319_, v_inst_320_, v_v_321_);
 return v_res_323_;
+}
+}
+static lean_object* _init_l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__1(void){
+_start:
+{
+lean_object* v___x_325_; lean_object* v___x_326_; lean_object* v___x_327_; 
+v___x_325_ = l_Lasm_JS_instFromJSData;
+v___x_326_ = l_Lasm_JS_instFromJSString;
+v___x_327_ = l_Lasm_JS_instFromJSProd___redArg(v___x_326_, v___x_325_);
+return v___x_327_;
+}
+}
+static lean_object* _init_l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__2(void){
+_start:
+{
+lean_object* v___x_328_; lean_object* v___x_329_; 
+v___x_328_ = lean_obj_once(&l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__1, &l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__1_once, _init_l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__1);
+v___x_329_ = l_Lasm_JS_instFromJSArray___redArg(v___x_328_);
+return v___x_329_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_declared___redArg(lean_object* v_inst_337_, lean_object* v_d_338_){
+_start:
+{
+lean_object* v_d_341_; lean_object* v___x_344_; 
+v___x_344_ = lean_obj_once(&l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__2, &l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__2_once, _init_l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__2);
+if (lean_obj_tag(v_d_338_) == 9)
+{
+lean_object* v_value_345_; lean_object* v___x_347_; uint8_t v_isShared_348_; uint8_t v_isSharedCheck_369_; 
+v_value_345_ = lean_ctor_get(v_d_338_, 0);
+v_isSharedCheck_369_ = !lean_is_exclusive(v_d_338_);
+if (v_isSharedCheck_369_ == 0)
+{
+lean_object* v_unused_370_; 
+v_unused_370_ = lean_ctor_get(v_d_338_, 1);
+lean_dec(v_unused_370_);
+v___x_347_ = v_d_338_;
+v_isShared_348_ = v_isSharedCheck_369_;
+goto v_resetjp_346_;
+}
+else
+{
+lean_inc(v_value_345_);
+lean_dec(v_d_338_);
+v___x_347_ = lean_box(0);
+v_isShared_348_ = v_isSharedCheck_369_;
+goto v_resetjp_346_;
+}
+v_resetjp_346_:
+{
+uint8_t v___x_349_; lean_object* v___x_350_; lean_object* v___x_351_; lean_object* v___x_352_; lean_object* v___x_354_; 
+v___x_349_ = 0;
+v___x_350_ = lean_unsigned_to_nat(1u);
+v___x_351_ = ((lean_object*)(l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__4));
+v___x_352_ = ((lean_object*)(l_Lasm_JS_Cloudflare_Support_recordOf___redArg___closed__4));
+if (v_isShared_348_ == 0)
+{
+lean_ctor_set(v___x_347_, 1, v___x_352_);
+v___x_354_ = v___x_347_;
+goto v_reusejp_353_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_368_; 
+v_reuseFailAlloc_368_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v_reuseFailAlloc_368_, 0, v_value_345_);
+lean_ctor_set(v_reuseFailAlloc_368_, 1, v___x_352_);
+v___x_354_ = v_reuseFailAlloc_368_;
+goto v_reusejp_353_;
+}
+v_reusejp_353_:
+{
+lean_object* v___x_355_; lean_object* v___x_356_; lean_object* v___x_357_; 
+v___x_355_ = lean_mk_empty_array_with_capacity(v___x_350_);
+v___x_356_ = lean_array_push(v___x_355_, v___x_354_);
+v___x_357_ = l_Lasm_JS_Binding_invoke___redArg(v___x_344_, v___x_351_, v___x_356_, v___x_349_);
+if (lean_obj_tag(v___x_357_) == 0)
+{
+lean_object* v_a_358_; lean_object* v___x_359_; 
+v_a_358_ = lean_ctor_get(v___x_357_, 0);
+lean_inc(v_a_358_);
+lean_dec_ref_known(v___x_357_, 1);
+v___x_359_ = lean_alloc_ctor(8, 1, 0);
+lean_ctor_set(v___x_359_, 0, v_a_358_);
+v_d_341_ = v___x_359_;
+goto v___jp_340_;
+}
+else
+{
+lean_object* v_a_360_; lean_object* v___x_362_; uint8_t v_isShared_363_; uint8_t v_isSharedCheck_367_; 
+lean_dec_ref(v_inst_337_);
+v_a_360_ = lean_ctor_get(v___x_357_, 0);
+v_isSharedCheck_367_ = !lean_is_exclusive(v___x_357_);
+if (v_isSharedCheck_367_ == 0)
+{
+v___x_362_ = v___x_357_;
+v_isShared_363_ = v_isSharedCheck_367_;
+goto v_resetjp_361_;
+}
+else
+{
+lean_inc(v_a_360_);
+lean_dec(v___x_357_);
+v___x_362_ = lean_box(0);
+v_isShared_363_ = v_isSharedCheck_367_;
+goto v_resetjp_361_;
+}
+v_resetjp_361_:
+{
+lean_object* v___x_365_; 
+if (v_isShared_363_ == 0)
+{
+v___x_365_ = v___x_362_;
+goto v_reusejp_364_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_366_; 
+v_reuseFailAlloc_366_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_366_, 0, v_a_360_);
+v___x_365_ = v_reuseFailAlloc_366_;
+goto v_reusejp_364_;
+}
+v_reusejp_364_:
+{
+return v___x_365_;
+}
+}
+}
+}
+}
+}
+else
+{
+v_d_341_ = v_d_338_;
+goto v___jp_340_;
+}
+v___jp_340_:
+{
+lean_object* v___x_342_; lean_object* v___x_343_; 
+v___x_342_ = ((lean_object*)(l_Lasm_JS_Cloudflare_Support_declared___redArg___closed__0));
+v___x_343_ = l_Lasm_JS_decodeAs___redArg(v_inst_337_, v___x_342_, v_d_341_);
+return v___x_343_;
+}
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_declared___redArg___boxed(lean_object* v_inst_371_, lean_object* v_d_372_, lean_object* v_a_373_){
+_start:
+{
+lean_object* v_res_374_; 
+v_res_374_ = l_Lasm_JS_Cloudflare_Support_declared___redArg(v_inst_371_, v_d_372_);
+return v_res_374_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_declared(lean_object* v_00_u03b1_375_, lean_object* v_inst_376_, lean_object* v_d_377_){
+_start:
+{
+lean_object* v___x_379_; 
+v___x_379_ = l_Lasm_JS_Cloudflare_Support_declared___redArg(v_inst_376_, v_d_377_);
+return v___x_379_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_declared___boxed(lean_object* v_00_u03b1_380_, lean_object* v_inst_381_, lean_object* v_d_382_, lean_object* v_a_383_){
+_start:
+{
+lean_object* v_res_384_; 
+v_res_384_ = l_Lasm_JS_Cloudflare_Support_declared(v_00_u03b1_380_, v_inst_381_, v_d_382_);
+return v_res_384_;
 }
 }
 lean_object* initialize_Init(uint8_t builtin);
