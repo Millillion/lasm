@@ -87,15 +87,17 @@ test('a Lambda zip holds the build, the shims, executable entry and Linux helper
   const files = [...entries.keys()].filter(name => !name.endsWith('/'));
   assert.deepEqual(files, [...files].sort());
   assert.ok(!entries.has('.lasm-application.json'));
-  for (const name of ['main.mjs', 'program.cjs', 'program.wasm', 'build-info.json', 'package.json', 'lasm-server.mjs', 'lasm-lambda.mjs'])
+  for (const name of ['main.mjs', 'program.cjs', 'program.wasm', 'build-info.json', 'package.json', 'lasm-function.mjs', 'lasm-node-serve.mjs', 'lasm-lambda.mjs'])
     assert.ok(entries.has(name), name);
   assert.equal(entries.get('lasm-lambda.mjs').data.toString(), readFileSync(new URL('../src/serverless/lasm-lambda.mjs', import.meta.url), 'utf8'));
+  // The shims' lasm-node-serve.mjs is lasm:node-serve itself, not the repository's re-export.
+  assert.equal(entries.get('lasm-node-serve.mjs').data.toString(), readFileSync(new URL('../src/lasm-modules/node-serve.mjs', import.meta.url), 'utf8'));
   const mode = name => entries.get(name).mode & 0o777;
   assert.equal(mode('main.mjs'), 0o755);
   assert.equal(mode('host/native/process/linux-x64-gnu'), 0o755);
   assert.equal(mode('host/native/process/linux-arm64-gnu'), 0o755);
   for (const name of ['host/native/process/linux-x64.json', 'host/native/process/linux-x64.txt', 'host/native/process/linux-x64.c',
-    'host/native/process/darwin-arm64', 'host/native/process/sub/linux-x64-gnu', 'program.cjs', 'lasm-server.mjs', 'host/native/manifest.json'])
+    'host/native/process/darwin-arm64', 'host/native/process/sub/linux-x64-gnu', 'program.cjs', 'lasm-function.mjs', 'lasm-node-serve.mjs', 'host/native/manifest.json'])
     assert.equal(mode(name), 0o644, name);
   assert.equal(summary.target, 'lambda');
   assert.equal(summary.input, app);
@@ -174,7 +176,7 @@ test('Vercel: the function directory, its routes and configuration; an earlier o
     launcherType: 'Nodejs', shouldAddHelpers: false, supportsResponseStreaming: true, architecture: 'x86_64' });
   assert.ok(readFileSync(join(func, '.vc-config.json'), 'utf8').endsWith('}\n'));
   assert.equal(readFileSync(join(func, 'main.mjs'), 'utf8'), readFileSync(join(app, 'main.mjs'), 'utf8'));
-  assert.ok(existsSync(join(func, 'lasm-vercel.mjs')) && existsSync(join(func, 'lasm-server.mjs')));
+  assert.ok(existsSync(join(func, 'lasm-vercel.mjs')) && existsSync(join(func, 'lasm-function.mjs')) && existsSync(join(func, 'lasm-node-serve.mjs')));
   assert.ok(!existsSync(join(func, 'lasm-lambda.mjs')));
   if (process.platform !== 'win32') {
     assert.equal(statSync(join(func, 'main.mjs')).mode & 0o777, 0o755);
@@ -190,7 +192,7 @@ test('Netlify: the shim becomes lasm.mjs and the summary names it relative to th
   const summary = packageApplication({ input: app, target: 'netlify', output });
   assert.equal(readFileSync(join(output, 'lasm.mjs'), 'utf8'), readFileSync(new URL('../src/serverless/lasm-netlify.mjs', import.meta.url), 'utf8'));
   assert.ok(!existsSync(join(output, 'lasm-netlify.mjs')));
-  assert.ok(existsSync(join(output, 'lasm-server.mjs')));
+  assert.ok(existsSync(join(output, 'lasm-function.mjs')) && existsSync(join(output, 'lasm-node-serve.mjs')));
   assert.equal(summary.function, relative(process.cwd(), join(output, 'lasm.mjs')).split('\\').join('/'));
 });
 

@@ -1,4 +1,4 @@
-name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun)
+name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun, Lasm.JS.Cloudflare)
 # Lasm.JS.Web, the WinterTC Minimum Common Web API generated from WebIDL, and
 # Lasm.JS.Node, Node's server-essential modules generated from Node's API docs
 # (docs/JS_BINDINGS.md, "Standard bindings" and "Lasm.JS.Node"; docs/TESTING.md):
@@ -21,9 +21,16 @@ name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun)
 #     TypeScript declarations (scripts/bindings/deno.idl and bun.idl are
 #     serve-api.mjs's lowering of them, their SHA-256 hashes pinned): the same
 #     candidate builds test/fixtures/js-serve for Node, Bun and Deno, whose servers
-#     (Deno.serve, Bun.serve, @hono/node-server on Node) serve a Lean handler that
+#     (Deno.serve, Bun.serve, Lasm's Node.serve and @hono/node-server on Node) serve a Lean handler that
 #     the program requests over HTTP; then Serve.lean is served by each and
-#     requested from outside the process (scripts/bindings/test-serve.mjs).
+#     requested from outside the process (scripts/bindings/test-serve.mjs);
+#   - cloudflare-conformance: Lasm.JS.Cloudflare, generated from
+#     @cloudflare/workers-types (scripts/bindings/cloudflare.idl is
+#     cloudflare-api.mjs's lowering of it, its SHA-256 hash pinned): the same
+#     candidate builds test/fixtures/js-cloudflare for Workers and wrangler dev
+#     serves it with local emulation only (workerd; Miniflare's KV, D1, R2,
+#     Durable Objects and Queues; a cron trigger; a TCP echo server of the
+#     runner). No Cloudflare account is used.
 on:
   pull_request:
     branches: [main]
@@ -37,10 +44,13 @@ on:
       - 'test/fixtures/js-node-size/**'
       - 'test/fixtures/js-serve/**'
       - 'test/fixtures/js-serve-size/**'
+      - 'test/fixtures/js-cloudflare/**'
+      - 'test/fixtures/js-cloudflare-size/**'
       - 'test/web-bindings.test.mjs'
       - 'test/binding-overrides.test.mjs'
       - 'docs/API_DECISIONS.md'
       - 'src/node-js.mjs'
+      - 'src/lasm-modules/**'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'
       - 'package.json'
@@ -57,7 +67,10 @@ on:
       - 'test/fixtures/js-node-size/**'
       - 'test/fixtures/js-serve/**'
       - 'test/fixtures/js-serve-size/**'
+      - 'test/fixtures/js-cloudflare/**'
+      - 'test/fixtures/js-cloudflare-size/**'
       - 'src/node-js.mjs'
+      - 'src/lasm-modules/**'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'
       - '.github/workflows/web-bindings.yml'
@@ -90,6 +103,8 @@ jobs:
         run: node scripts/bindings/node-api.mjs --check
       - name: deno.idl and bun.idl are the lowering of the pinned Deno and Bun declarations (hashes checked)
         run: node scripts/bindings/serve-api.mjs --check
+      - name: cloudflare.idl is the lowering of the pinned @cloudflare/workers-types (hash checked)
+        run: node scripts/bindings/cloudflare-api.mjs --check
       - name: The generated bindings are the generator's output
         run: node scripts/bindings/generate-web.mjs --check
       - name: The WPT data is the pinned commit's
@@ -124,7 +139,7 @@ jobs:
       - name: Verify and extract the runtime
         run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
       - name: Pack
-        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 4096 -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: web-bindings-candidate
@@ -280,7 +295,7 @@ jobs:
           node scripts/bindings/test-web.mjs --fixture js-serve --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-serve" \
             --targets node,bun,deno --bun "$T/bun-linux-x64/bun" --deno "$T/node_modules/.bin/deno" \
             --report "$RUNNER_TEMP/js-serve/report.json" --sizes
-      - name: Serve a Lean handler with Deno.serve, Bun.serve and @hono/node-server, requested from outside
+      - name: Serve a Lean handler with Deno.serve, Bun.serve and Node.serve, requested from outside
         if: success() || failure()
         run: |
           T="$RUNNER_TEMP/tools"
@@ -296,5 +311,48 @@ jobs:
             ${{ runner.temp }}/js-serve/report.json
             ${{ runner.temp }}/js-serve-e2e/*.txt
             ${{ runner.temp }}/js-serve-e2e/report.json
+          retention-days: 14
+          if-no-files-found: ignore
+  cloudflare-conformance:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.0
+          package-manager-cache: false
+      - name: Install the candidate as a user would
+        id: candidate
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: web-bindings-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: wrangler (workerd and Miniflare, local only)
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/tools"; mkdir -p "$T"
+          npm install --prefix "$T" --no-audit --no-fund "wrangler@$WRANGLER_VERSION"
+          "$T/node_modules/.bin/wrangler" --version
+      - name: Build the Lasm.JS.Cloudflare conformance program and serve it with wrangler dev (local emulation)
+        run: |
+          T="$RUNNER_TEMP/tools"
+          node scripts/bindings/test-web.mjs --fixture js-cloudflare --lasm "${{ steps.candidate.outputs.lasm }}" --work "$RUNNER_TEMP/js-cloudflare" \
+            --targets workers --wrangler "$T/node_modules/.bin/wrangler" \
+            --report "$RUNNER_TEMP/js-cloudflare/report.json" --sizes
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: cloudflare-bindings-conformance
+          path: |
+            ${{ runner.temp }}/js-cloudflare/*.txt
+            ${{ runner.temp }}/js-cloudflare/report.json
           retention-days: 14
           if-no-files-found: ignore

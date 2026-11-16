@@ -701,4 +701,21 @@ opaque encodeRequest : List (List String) → ByteArray
 its formats (the empty request carries none). -/
 opaque requestFields : ByteArray → List String
 
+/-! ## Node.serve (src/lasm-modules/node-serve.mjs) -/
+
+/-- `requestUrl(target, host, fallback)` with its default scheme `http`: the
+URL of a node:http request, or `none` (`null`) for a target that is neither
+origin-form nor an absolute http(s) URL. -/
+opaque requestUrl : String → String → String → Option String
+
+/-- `plainHost(host)`: the Host field is a nonempty run of printable ASCII
+with none of `/`, `?`, `#`, `\` and `@` (no userinfo, path, query or
+fragment). -/
+opaque plainHost : String → Bool
+
+/-- Not Lasm's JavaScript: the `host` (hostname and port) that WHATWG's URL
+parser reads from an absolute URL, `none` when it does not parse (the test's
+oracle is Node's `URL`). -/
+opaque urlHost : String → Option String
+
 end Lasm.Cli
