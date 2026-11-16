@@ -1,5 +1,3 @@
-# Unreleased
-
 ## Standard bindings
 
 - **`Lasm.JS.Deno` is the whole `Deno` namespace.** Generated from Deno 2.9.6's own
@@ -22,10 +20,10 @@
 - Async iterables (`Deno.readDir`, `Kv.list`, a listener's connections, `FsWatcher`)
   have `values` (every value, read to the end) and `iterator` with `next` (one at a
   time).
-- New example: [examples/deno-kv](../../examples/deno-kv), a todo API on Deno KV,
+- New example: [examples/deno-kv](../../../examples/deno-kv), a todo API on Deno KV,
   built and checked by CI.
 
-### Migration
+## Migration (Lasm.JS.Deno)
 
 - `Lasm.JS.Deno.TlsCertifiedKeyPemKeyFormat` is now
   `Lasm.JS.Deno.ServeTcpTlsOptionsKeyFormat` (the type of

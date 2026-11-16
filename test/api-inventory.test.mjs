@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { check, codeSpans, decisionsPath, entryIds, flagsIn, mentioned, surfaces } from '../scripts/api/inventory.mjs';
+import { check, codeSpans, decisionsPath, readDecisions, entryIds, flagsIn, mentioned, surfaces } from '../scripts/api/inventory.mjs';
 
 test('docs/API_DECISIONS.md names every public surface, with well-formed ids', async () => {
   const { problems, surfaces: all, ids } = await check();
@@ -28,7 +28,7 @@ test('the guard finds the surfaces it is meant to guard', async () => {
 });
 
 test('a surface the inventory drops fails the check', async () => {
-  const markdown = readFileSync(decisionsPath, 'utf8').replaceAll('`--no-watch`', 'no-watch').replaceAll('`lasm:app`', 'lasm-app');
+  const markdown = readDecisions().replaceAll('`--no-watch`', 'no-watch').replaceAll('`lasm:app`', 'lasm-app');
   const { problems } = await check(undefined, markdown);
   assert.ok(problems.includes('CLI flag --no-watch is not in docs/API_DECISIONS.md'), problems.join('\n'));
   assert.ok(problems.includes('builtin module lasm:app is not in docs/API_DECISIONS.md'));
@@ -59,7 +59,7 @@ test('entry ids follow the Stage 0 scheme', () => {
 });
 
 test('new entries never take a bare A57+ id, and ids are unique', async () => {
-  const markdown = readFileSync(decisionsPath, 'utf8');
+  const markdown = readDecisions();
   const { problems } = await check(undefined, markdown + '\n| A57 | x | y | open |\n| 0.1-1 | x | y | open |\n');
   assert.ok(problems.some(p => p.startsWith('entry id A57: new entries take milestone-prefixed ids')));
   assert.ok(problems.includes('entry id 0.1-1 is used twice'));
