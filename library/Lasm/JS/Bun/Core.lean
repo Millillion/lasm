@@ -4372,22 +4372,7 @@ instance : ToJS UdpConnectSocketOptions := ⟨fun d => Support.fields #[("hostna
     ("socket", Support.optional d.socket),
     ("connect", toJS d.connect)]⟩
 
-/-- `dictionary ErrorLike` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure ErrorLike where
-  /-- `DOMString code` -/
-  code : Option String := none
-  /-- `double errno` -/
-  errno : Option Float := none
-  /-- `DOMString syscall` -/
-  syscall : Option String := none
-instance : FromJS ErrorLike where
-  fromJS d := do return {
-    code := ← Lasm.JS.readField (Option String) d "code",
-    errno := ← Lasm.JS.readField (Option Float) d "errno",
-    syscall := ← Lasm.JS.readField (Option String) d "syscall" }
-  typeName := "Lasm.JS.Bun.ErrorLike"
-
-/-- `callback SpawnBaseOptionsIgnorePipeInheritOnExit = Promise<undefined> (Subprocess subprocess, double? exitCode, DOMStringOrDouble? signalCode, optional ErrorLike error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback SpawnBaseOptionsIgnorePipeInheritOnExit = Promise<undefined> (Subprocess subprocess, double? exitCode, DOMStringOrDouble? signalCode, optional any error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SpawnBaseOptionsIgnorePipeInheritOnExit where
   /-- The JavaScript function. -/
   val : Value
@@ -4395,14 +4380,14 @@ instance : Nonempty SpawnBaseOptionsIgnorePipeInheritOnExit := ⟨{ val := Class
 instance : ToJS SpawnBaseOptionsIgnorePipeInheritOnExit := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SpawnBaseOptionsIgnorePipeInheritOnExit := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritOnExit", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SpawnBaseOptionsIgnorePipeInheritOnExit.ofFn (f : Subprocess → (Option Float) → (Option DOMStringOrDouble) → (Option ErrorLike) → Async Unit) : IO SpawnBaseOptionsIgnorePipeInheritOnExit := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Subprocess args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg (Option ErrorLike) args 3))
+def SpawnBaseOptionsIgnorePipeInheritOnExit.ofFn (f : Subprocess → (Option Float) → (Option DOMStringOrDouble) → Data → Async Unit) : IO SpawnBaseOptionsIgnorePipeInheritOnExit := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Subprocess args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg Data args 3))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SpawnBaseOptionsIgnorePipeInheritOnExit.ofSyncFn (f : Subprocess → (Option Float) → (Option DOMStringOrDouble) → (Option ErrorLike) → IO Unit) : IO SpawnBaseOptionsIgnorePipeInheritOnExit := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Subprocess args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg (Option ErrorLike) args 3))
+def SpawnBaseOptionsIgnorePipeInheritOnExit.ofSyncFn (f : Subprocess → (Option Float) → (Option DOMStringOrDouble) → Data → IO Unit) : IO SpawnBaseOptionsIgnorePipeInheritOnExit := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Subprocess args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg Data args 3))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
   return { val := fn }
@@ -4606,7 +4591,7 @@ instance : ToJS SpawnSpawnOptionsIgnorePipeInherit := ⟨fun d => Support.fields
     ("lazy", Support.optional d.lazy),
     ("terminal", Support.optional d.terminal)]⟩
 
-/-- `callback SpawnBaseOptionsIgnorePipePipeOnExit = Promise<undefined> (SubprocessIgnorePipePipe subprocess, double? exitCode, DOMStringOrDouble? signalCode, optional ErrorLike error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback SpawnBaseOptionsIgnorePipePipeOnExit = Promise<undefined> (SubprocessIgnorePipePipe subprocess, double? exitCode, DOMStringOrDouble? signalCode, optional any error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SpawnBaseOptionsIgnorePipePipeOnExit where
   /-- The JavaScript function. -/
   val : Value
@@ -4614,14 +4599,14 @@ instance : Nonempty SpawnBaseOptionsIgnorePipePipeOnExit := ⟨{ val := Classica
 instance : ToJS SpawnBaseOptionsIgnorePipePipeOnExit := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SpawnBaseOptionsIgnorePipePipeOnExit := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeOnExit", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def SpawnBaseOptionsIgnorePipePipeOnExit.ofFn (f : SubprocessIgnorePipePipe → (Option Float) → (Option DOMStringOrDouble) → (Option ErrorLike) → Async Unit) : IO SpawnBaseOptionsIgnorePipePipeOnExit := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SubprocessIgnorePipePipe args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg (Option ErrorLike) args 3))
+def SpawnBaseOptionsIgnorePipePipeOnExit.ofFn (f : SubprocessIgnorePipePipe → (Option Float) → (Option DOMStringOrDouble) → Data → Async Unit) : IO SpawnBaseOptionsIgnorePipePipeOnExit := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SubprocessIgnorePipePipe args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg Data args 3))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def SpawnBaseOptionsIgnorePipePipeOnExit.ofSyncFn (f : SubprocessIgnorePipePipe → (Option Float) → (Option DOMStringOrDouble) → (Option ErrorLike) → IO Unit) : IO SpawnBaseOptionsIgnorePipePipeOnExit := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SubprocessIgnorePipePipe args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg (Option ErrorLike) args 3))
+def SpawnBaseOptionsIgnorePipePipeOnExit.ofSyncFn (f : SubprocessIgnorePipePipe → (Option Float) → (Option DOMStringOrDouble) → Data → IO Unit) : IO SpawnBaseOptionsIgnorePipePipeOnExit := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SubprocessIgnorePipePipe args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg Data args 3))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
   return { val := fn }

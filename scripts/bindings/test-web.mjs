@@ -33,7 +33,7 @@ if (!['js-web', 'js-node', 'js-serve', 'js-deno', 'js-bun'].includes(values.fixt
 const fixture = join(root, 'test', 'fixtures', values.fixture);
 const tierName = { 'js-web': 'Lasm.JS.Web', 'js-node': 'Lasm.JS.Node', 'js-serve': 'Lasm.JS.Deno and Lasm.JS.Bun', 'js-deno': 'Lasm.JS.Deno', 'js-bun': 'Lasm.JS.Bun' }[values.fixture];
 // Deno KV and Deno.cron are behind Deno's own flags on the Deno CLI (Deno Deploy enables them).
-const denoFlags = values.fixture === 'js-deno' ? ['--unstable-kv', '--unstable-cron'] : [];
+const denoFlags = values.fixture === 'js-deno' ? ['--unstable-kv', '--unstable-cron', '--unstable-net'] : [];
 const lasm = resolve(values.lasm), work = resolve(values.work);
 const known = JSON.parse(readFileSync(join(fixture, 'known.json'), 'utf8'));
 const env = { ...process.env, CI: '1', BROWSER: 'none', LASM_EDITOR: '0', NO_COLOR: '1', WRANGLER_SEND_METRICS: 'false' };

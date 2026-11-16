@@ -1814,8 +1814,8 @@ def listenDatagram (options : ListenDatagramUdpOptions) : IO DatagramConn := do
   pure { val := r }
 
 /-- `Deno.listenDatagram(options: UnixListenDatagramOptions & { transport: 'unixpacket' }): DatagramConn`: `DatagramConn listenDatagram(ListenDatagramUnixOptions options)` (Deno 2.9.6 type declarations) -/
-def listenDatagramWithUnixListenDatagramOptionsTransportUnixpacket (options : ListenDatagramUnixOptions) : IO DatagramConn := do
-  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.listenDatagramWithUnixListenDatagramOptionsTransportUnixpacket", module := "globalThis", path := "Deno.listenDatagram", construct := false, arity := 1 }
+def listenDatagramUnix (options : ListenDatagramUnixOptions) : IO DatagramConn := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.listenDatagramUnix", module := "globalThis", path := "Deno.listenDatagram", construct := false, arity := 1 }
     (Support.args #[toJS options]) (await := false)
   pure { val := r }
 

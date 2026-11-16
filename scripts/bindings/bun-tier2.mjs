@@ -124,6 +124,6 @@ export const bun = {
     Request: 'Request', Response: 'Response', URL: 'URL', AbortSignal: 'AbortSignal', ReadableStream: 'ReadableStream', WritableStream: 'WritableStream',
     WebSocket: 'WebSocket', Headers: 'Headers', Blob: 'Blob', EventTarget: 'EventTarget', ArrayBuffer: 'ArrayBuffer', Event: 'Event', HeadersInit: 'HeadersInit',
     File: 'File', FormData: 'FormData', BlobPropertyBag: 'BlobPropertyBag', BufferEncoding: 'DOMString', Float32Array: 'object', Float64Array: 'object', Uint16Array: 'object', 'NodeJS.Signals': 'DOMString',
-    BunFetchRequestInit: 'object', BunFetchRequestInitTLS: 'object', TemplateStringsArray: 'object', BodyInit: 'BodyInit', RequestInit: 'RequestInit', ResponseInit: 'ResponseInit', TextDecoder: 'TextDecoder',
+    BunFetchRequestInit: 'object', ErrorLike: 'any', BunFetchRequestInitTLS: 'object', TemplateStringsArray: 'object', BodyInit: 'BodyInit', RequestInit: 'RequestInit', ResponseInit: 'ResponseInit', TextDecoder: 'TextDecoder',
   },
 };

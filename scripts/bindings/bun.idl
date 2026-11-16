@@ -21,7 +21,6 @@
 //   - Bun.shrink(): @deprecated in its declaration
 //   - Socket.[Symbol.dispose]: a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call
 //   - Terminal.[Symbol.asyncDispose]: a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call
-//   - Bun.ErrorLike extends Error: not declared in the namespace
 //   - Serve.Routes.[Path in R]: a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call
 //   - Serve.RoutesWithUpgrade.[Path in R]: a Symbol-keyed member (explicit resource management or a well-known Symbol), which Lean code does not call
 //   - Bun.$(strings: TemplateStringsArray, ...expressions: ShellExpression[]): the shell is a tagged template literal (`$`ls ${dir}``): its escaping comes from the template's TemplateStringsArray, which Lean cannot make; Bun.spawn runs commands
@@ -1967,20 +1966,9 @@ enum Bun_SpawnBaseOptionsIgnorePipeInheritStdout { "pipe" };
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipeInheritStderr"]
 enum Bun_SpawnBaseOptionsIgnorePipeInheritStderr { "inherit" };
 
-// object Bun.ErrorLike
-[LasmHost="Bun", LasmLeanModule="Core", LasmFile="bun.d.ts", LasmName="ErrorLike", LasmPath="Bun.ErrorLike"]
-dictionary Bun_ErrorLike {
-  // code?: string
-  DOMString code;
-  // errno?: number
-  double errno;
-  // syscall?: string
-  DOMString syscall;
-};
-
 // (subprocess: Subprocess<In, Out, Err>, exitCode: number | null, signalCode: NodeJS.Signals | number | null, error?: ErrorLike) => void | Promise<void>
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipeInheritOnExit", LasmSignature="(subprocess: Subprocess<In, Out, Err>, exitCode: number | null, signalCode: NodeJS.Signals | number | null, error?: ErrorLike) => void | Promise<void>"]
-callback Bun_SpawnBaseOptionsIgnorePipeInheritOnExit = Promise<undefined> (Bun_Subprocess subprocess, double? exitCode, Bun_DOMStringOrDouble? signalCode, optional Bun_ErrorLike error);
+callback Bun_SpawnBaseOptionsIgnorePipeInheritOnExit = Promise<undefined> (Bun_Subprocess subprocess, double? exitCode, Bun_DOMStringOrDouble? signalCode, optional any error);
 
 // () => void | Promise<void>
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipeInheritOnDisconnect", LasmSignature="() => void | Promise<void>"]
@@ -2132,7 +2120,7 @@ interface Bun_SubprocessIgnorePipePipe {
 
 // (subprocess: Subprocess<In, Out, Err>, exitCode: number | null, signalCode: NodeJS.Signals | number | null, error?: ErrorLike) => void | Promise<void>
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipePipeOnExit", LasmSignature="(subprocess: Subprocess<In, Out, Err>, exitCode: number | null, signalCode: NodeJS.Signals | number | null, error?: ErrorLike) => void | Promise<void>"]
-callback Bun_SpawnBaseOptionsIgnorePipePipeOnExit = Promise<undefined> (Bun_SubprocessIgnorePipePipe subprocess, double? exitCode, Bun_DOMStringOrDouble? signalCode, optional Bun_ErrorLike error);
+callback Bun_SpawnBaseOptionsIgnorePipePipeOnExit = Promise<undefined> (Bun_SubprocessIgnorePipePipe subprocess, double? exitCode, Bun_DOMStringOrDouble? signalCode, optional any error);
 
 // () => void | Promise<void>
 [LasmHost="Bun", LasmLeanModule="Core", LasmName="SpawnBaseOptionsIgnorePipePipeOnDisconnect", LasmSignature="() => void | Promise<void>"]
@@ -2262,7 +2250,7 @@ typedef (boolean or Bun_ServeDevelopment) Bun_ServeDevelopmentUnion;
 
 // (this: Server<(undefined)>, error: ErrorLike) => Response | Promise<Response> | void | Promise<void>
 [LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServeOptionsError", LasmSignature="(this: Server<(undefined)>, error: ErrorLike) => Response | Promise<Response> | void | Promise<void>"]
-callback Bun_ServeOptionsError = Promise<Response> (Bun_ErrorLike error);
+callback Bun_ServeOptionsError = Promise<Response> (any error);
 
 // (this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>) => MaybePromise<Response>
 [LasmHost="Bun", LasmLeanModule="Serve", LasmName="ServeOptionsFetch", LasmSignature="(this: Server<WebSocketData>, req: Request, server: Server<WebSocketData>) => MaybePromise<Response>"]

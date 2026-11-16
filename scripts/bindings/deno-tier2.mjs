@@ -82,6 +82,7 @@ export const deno = {
   /** Overload names the mechanical rule would give twice (or badly). */
   names: {
     'listen(options: UnixListenOptions & {transport: "unix"})': 'listenUnix',
+    'listenDatagram(options: UnixListenDatagramOptions & {transport: "unixpacket"})': 'listenDatagramUnix',
     'connect(options: UnixConnectOptions)': 'connectUnix',
     'resolveDns(query: string, recordType: "CAA", options?: ResolveDnsOptions)': 'resolveDnsCaa',
     'resolveDns(query: string, recordType: "MX", options?: ResolveDnsOptions)': 'resolveDnsMx',

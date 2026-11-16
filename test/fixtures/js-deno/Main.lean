@@ -403,6 +403,10 @@ def netChecks (r : Checks) (live : Live) : Async Unit := do
     -- the loopback interface is listed
     let ifs ← Deno.networkInterfaces
     expect r "networkInterfaces" (ifs.any (·.address == "127.0.0.1")) s!"{ifs.size}"
+    -- a UDP socket listens on the port it reports (Deno.listenDatagram, --unstable-net)
+    let d ← Deno.listenDatagram { transport := .udp, hostname := some "127.0.0.1", port := some 0 }
+    see live "DatagramConn" d.val
+    d.close
   runSection r "websockets" do
     -- A WebSocket server (Deno.serve + Deno.upgradeWebSocket) echoes every message; Lasm.JS.Web's WebSocket is the client.
     let handler ← Deno.ServeHandler.ofFn fun req _ => do
@@ -568,7 +572,10 @@ def availability (r : Checks) (live : Live) : Async Unit := do
     match (← live.get).find? (·.1 == iface) with
     | none =>
       -- Deno.serve's objects are probed live by test/fixtures/js-serve.
-      unless ["HttpServer", "ServeHandlerInfo", "HttpServerUnixAddr", "ServeHandlerInfoUnixAddr"].contains iface do
+      -- VSOCK needs a VSOCK device and QUIC a QUIC peer, which the CI runner has neither of.
+      unless ["HttpServer", "ServeHandlerInfo", "HttpServerUnixAddr", "ServeHandlerInfoUnixAddr", "HttpServerVsockAddr", "ServeHandlerInfoVsockAddr",
+          "ConnVsockAddr", "VsockConn", "VsockListener", "QuicReceiveStream", "QuicSendStream", "QuicIncoming", "QuicListener", "QuicEndpoint",
+          "QuicConn"].contains iface do
         expect r s!"available Deno.{iface}" false "no live object was seen"
     | some (_, v) =>
       for m in names members do

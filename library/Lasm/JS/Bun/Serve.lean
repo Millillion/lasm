@@ -207,7 +207,7 @@ instance : ToJS ServeDevelopmentUnion := ⟨fun
 instance : Coe Bool ServeDevelopmentUnion := ⟨.boolean⟩
 instance : Coe ServeDevelopment ServeDevelopmentUnion := ⟨.serveDevelopment⟩
 
-/-- `callback ServeOptionsError = Promise<Response> (ErrorLike error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+/-- `callback ServeOptionsError = Promise<Response> (any error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ServeOptionsError where
   /-- The JavaScript function. -/
   val : Value
@@ -215,14 +215,14 @@ instance : Nonempty ServeOptionsError := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS ServeOptionsError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.ServeOptionsError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
-def ServeOptionsError.ofFn (f : ErrorLike → Async Response) : IO ServeOptionsError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ErrorLike args 0))
+def ServeOptionsError.ofFn (f : Data → Async Response) : IO ServeOptionsError := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
-def ServeOptionsError.ofSyncFn (f : ErrorLike → IO Response) : IO ServeOptionsError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ErrorLike args 0))
+def ServeOptionsError.ofSyncFn (f : Data → IO Response) : IO ServeOptionsError := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }

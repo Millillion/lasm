@@ -136,6 +136,49 @@ test('node: modules not in the static map come from process.getBuiltinModule whe
   } finally { Object.defineProperty(globalThis.process, 'getBuiltinModule', saved); }
 });
 
+test('bun: modules come from process.getBuiltinModule, else require, on Bun only (Lasm.JS.Bun: bun:sqlite)', () => {
+  const sqlite = { Database: function Database() {}, tag: () => 'sqlite' };
+  const bunDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'Bun');
+  const builtinDescriptor = Object.getOwnPropertyDescriptor(globalThis.process, 'getBuiltinModule');
+  const requireDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'require');
+  try {
+    // Not on Bun: a bun: specifier is an unknown module.
+    {
+      const { value } = edge({ modules: {} });
+      assert.throws(() => value(201, 0, 0, enc.encode('bun:sqlite')), /JavaScript module "bun:sqlite" is not in this edge build/);
+    }
+    Object.defineProperty(globalThis, 'Bun', { value: { version: 'test' }, configurable: true, writable: true });
+    // getBuiltinModule answers.
+    Object.defineProperty(globalThis.process, 'getBuiltinModule', { value: s => s === 'bun:sqlite' ? sqlite : undefined, configurable: true, writable: true });
+    {
+      const { value } = edge({ modules: {} });
+      assert.equal(value(214, 0, 0, wire(['T.tag', 'bun:sqlite', 'tag', []])), 'sqlite');
+    }
+    // No getBuiltinModule answer: require.
+    Object.defineProperty(globalThis.process, 'getBuiltinModule', { value: () => undefined, configurable: true, writable: true });
+    Object.defineProperty(globalThis, 'require', { value: s => s === 'bun:other' ? { tag: () => 'other' } : undefined, configurable: true, writable: true });
+    {
+      const { value } = edge({ modules: {} });
+      assert.equal(value(214, 0, 0, wire(['T.tag', 'bun:other', 'tag', []])), 'other');
+      // Neither knows it: the usual error.
+      assert.throws(() => value(201, 0, 0, enc.encode('bun:none')), /JavaScript module "bun:none" is not in this edge build/);
+      // Only bun: specifiers.
+      assert.throws(() => value(201, 0, 0, enc.encode('other:sqlite')), /JavaScript module "other:sqlite" is not in this edge build/);
+    }
+    // Neither getBuiltinModule nor require: the usual error.
+    delete globalThis.require;
+    delete globalThis.process.getBuiltinModule;
+    {
+      const { value } = edge({ modules: {} });
+      assert.throws(() => value(201, 0, 0, enc.encode('bun:sqlite')), /JavaScript module "bun:sqlite" is not in this edge build/);
+    }
+  } finally {
+    if (bunDescriptor) Object.defineProperty(globalThis, 'Bun', bunDescriptor); else delete globalThis.Bun;
+    if (requireDescriptor) Object.defineProperty(globalThis, 'require', requireDescriptor); else delete globalThis.require;
+    if (builtinDescriptor) Object.defineProperty(globalThis.process, 'getBuiltinModule', builtinDescriptor);
+  }
+});
+
 // Strings and object keys have ASCII fast paths (Writer.string, Reader.string,
 // Reader.key); their bytes and values must be exactly the general path's
 // (TextEncoder's UTF-8; TextDecoder), on both sides of every boundary.

@@ -2154,7 +2154,7 @@ namespace Deno_nsNet {
   // Deno.listenDatagram(options: UdpListenOptions & { transport: "udp" }): DatagramConn
   [LasmHost="Deno", LasmFile="lib.deno.unstable.d.ts", LasmSignature="Deno.listenDatagram(options: UdpListenOptions & { transport: 'udp' }): DatagramConn"] Deno_DatagramConn listenDatagram(Deno_ListenDatagramUdpOptions options);
   // Deno.listenDatagram(options: UnixListenDatagramOptions & { transport: "unixpacket" }): DatagramConn
-  [LasmHost="Deno", LasmFile="lib.deno.unstable.d.ts", LasmSignature="Deno.listenDatagram(options: UnixListenDatagramOptions & { transport: 'unixpacket' }): DatagramConn", LasmLeanName="listenDatagramWithUnixListenDatagramOptionsTransportUnixpacket"] Deno_DatagramConn listenDatagram(Deno_ListenDatagramUnixOptions options);
+  [LasmHost="Deno", LasmFile="lib.deno.unstable.d.ts", LasmSignature="Deno.listenDatagram(options: UnixListenDatagramOptions & { transport: 'unixpacket' }): DatagramConn", LasmLeanName="listenDatagramUnix"] Deno_DatagramConn listenDatagram(Deno_ListenDatagramUnixOptions options);
 };
 
 // The global Deno: the file system (Deno.readFile, Deno.open, Deno.FsFile, …)

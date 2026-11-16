@@ -341,7 +341,10 @@ def availability (r : Checks) (rt : Runtime) (live : Live) : Async Unit := do
   let .object ifaces := info.field "interfaces" | throw (IO.userError "no interfaces")
   for (iface, members) in ifaces do
     match (← live.get).find? (·.1 == iface) with
-    | none => expect r s!"available {host}.{iface}" false "no live object was seen"
+    | none =>
+      -- Probed live elsewhere: WebSockets by js-bun, VSOCK servers need a VSOCK device.
+      unless ["ServerWebSocket", "HttpServerVsockAddr", "ServeHandlerInfoVsockAddr"].contains iface do
+        expect r s!"available {host}.{iface}" false "no live object was seen"
     | some (_, v) =>
       for m in names members do
         expect r s!"available {host}.{iface}.{m}" (← reflectHas v m) ""

@@ -45,6 +45,11 @@ def handle (db : Bun.Database) (req : Request) : Async Response := do
     | none => respond "{\"error\":\"the id is not a number\"}" 400
   | _, _ => respond "{\"error\":\"not found\"}" 404
 
+/-- Waits an hour at a time with Bun.sleep, forever (holding no Lean thread). -/
+partial def serveForever : Async Unit := do
+  Bun.sleep (toJS (3600000 : Nat))
+  serveForever
+
 def main : IO Unit := do
   let env ← Bun.env
   let get k := env.entries.find? (·.1 == k) |>.map (·.2)
@@ -54,6 +59,5 @@ def main : IO Unit := do
   let fetch ← Bun.ServeOptionsFetch.ofFn fun req _ => handle db req
   let server ← Bun.serve { fetch := some fetch, port := some (.unsignedShort port) }
   IO.println s!"listening on {← (← server.url).href}"
-  -- Serve until the process is stopped: wait on a promise nothing resolves.
-  let forever : IO.Promise Unit ← IO.Promise.new
-  (Std.Async.await forever : Async Unit).block
+  -- Serve until the process is stopped: Bun's entry exits when main returns.
+  serveForever.block
