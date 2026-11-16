@@ -62,6 +62,13 @@ def optionalValue : Data → IO (Option Value)
 def arrayBufferBytes (buffer : Value) : IO ByteArray :=
   Binding.invoke ByteArray { name := "Lasm.JS.Web.Support.arrayBufferBytes", module := "globalThis", path := "Uint8Array", construct := true, arity := 1 } #[.ref buffer ""] (await := false)
 
+/-- The bytes of a nullable `ArrayBuffer` result, read as data: `none` for null or undefined
+(a reference-mode result would be a reference to null). -/
+def nullableArrayBufferBytes : Data → IO (Option ByteArray)
+  | .null | .undefined => pure none
+  | .ref buffer _ => some <$> arrayBufferBytes buffer
+  | d => throw (IO.userError s!"expected an ArrayBuffer or null, got {d.describe}")
+
 /-- The bytes of a typed array result: a `Uint8Array` arrives as bytes; any other view (ImageData's
 `Uint8ClampedArray`) is copied through `new Uint8Array(view.buffer, view.byteOffset, view.byteLength)`. -/
 def viewBytes : Data → IO ByteArray
