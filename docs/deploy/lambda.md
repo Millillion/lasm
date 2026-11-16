@@ -97,7 +97,7 @@ managed Node 24 image with the .zip package's files: the image's runtime
 interface client calls `lasm-lambda.handler` for each invocation, which calls
 the handler the program publishes with `exportDefault`, as in the .zip
 package. No HTTP server runs inside the function (no loopback adapter;
-[API_DECISIONS.md](../API_DECISIONS.md) 0.2-5). A program that runs its own
+[API decisions](../api/decisions/0.2.md) 0.2-11). A program that runs its own
 server (Express, Fastify, `Std.Http`) runs on a container platform instead
 (Cloud Run, Fly.io and the others in [the deployment guides](README.md)).
 

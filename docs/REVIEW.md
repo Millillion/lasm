@@ -163,7 +163,7 @@ decisions themselves are logged with their reasoning in
 
 ### Node.serve and function-platform handlers (decided by Jordan 2026-11-11)
 - [ ] **The shapes are recorded for sign-off** in
-  [API_DECISIONS.md, milestone 0.2](API_DECISIONS.md#milestone-02-the-serving-model-and-lasmfetch-deleted)
+  [API_DECISIONS.md, milestone 0.2](api/decisions/0.2.md#milestone-02-decisions-in-detail)
   (A7, A19–A23, 0.2-1), with the code, the reasons and the alternatives.
   [JS_BINDINGS.md](JS_BINDINGS.md#serving-http-on-node-nodeserve) is the guide.
 

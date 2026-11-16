@@ -4,7 +4,7 @@
 //   containers  run-containers.mjs (every image for this machine's own Linux
 //               build; Debian 12 and the recipe for cross-built ones)
 // (AWS Lambda is checked by the templates and serverless workflows: the
-// handler on Lambda's own image, with no server inside; API_DECISIONS 0.2-5.)
+// handler on Lambda's own image, with no server inside; docs/api/decisions/0.2.md, 0.2-11.)
 //   node run-matrix.mjs KIND ARTIFACTS_DIR RESULTS_DIR BUILD... [--expect-node-error | --expect-host-error]
 // A missing build (its job failed) is a failed result. Exits 1 if anything failed.
 import assert from 'node:assert/strict';

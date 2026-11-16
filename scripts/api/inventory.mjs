@@ -25,6 +25,16 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 export const root = fileURLToPath(new URL('../../', import.meta.url));
 export const decisionsPath = join(root, 'docs/API_DECISIONS.md');
 
+/** The inventory: docs/API_DECISIONS.md (the rule, the format, the contents)
+ * followed by every per-milestone file docs/api/decisions/*.md, which only
+ * the owning milestone's stream edits so that parallel PRs do not conflict. */
+export function readDecisions(base = root) {
+  const dir = join(base, 'docs/api/decisions');
+  let files = [];
+  try { files = readdirSync(dir).filter(f => f.endsWith('.md')).sort(); } catch {}
+  return [readFileSync(join(base, 'docs/API_DECISIONS.md'), 'utf8'), ...files.map(f => readFileSync(join(dir, f), 'utf8'))].join('\n');
+}
+
 function walk(directory, keep) {
   const out = [];
   for (const entry of readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : 1)) {
@@ -171,7 +181,7 @@ export function entryIds(markdown) {
 }
 
 /** Problems: surfaces the inventory misses, bare A57+ ids, malformed and duplicate ids. */
-export async function check(base = root, markdown = readFileSync(join(base, 'docs/API_DECISIONS.md'), 'utf8')) {
+export async function check(base = root, markdown = readDecisions(base)) {
   const spans = codeSpans(markdown);
   const all = await surfaces(base);
   const missing = all.filter(s => !mentioned(s, spans));
