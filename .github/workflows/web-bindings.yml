@@ -39,7 +39,7 @@ on:
       - 'test/fixtures/js-serve-size/**'
       - 'test/web-bindings.test.mjs'
       - 'test/binding-overrides.test.mjs'
-      - 'docs/API_DECISIONS.md'
+      - 'docs/api/decisions/0.3.md'
       - 'src/node-js.mjs'
       - 'src/edge/**'
       - 'src/lasm-library.mjs'

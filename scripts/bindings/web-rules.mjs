@@ -1,7 +1,7 @@
 // Lasm.JS.Web is the whole web platform of the pinned @webref/idl, generated as it is by
-// scripts/bindings/generate-web.mjs (docs/JS_BINDINGS.md, "Lasm.JS.Web"; docs/API_DECISIONS.md 0.3-1).
+// scripts/bindings/generate-web.mjs (docs/JS_BINDINGS.md, "Lasm.JS.Web"; docs/api/decisions/0.3.md 0.3-1).
 // There is no list of interfaces: this file holds only what the mapping cannot read from the IDL, and the
-// few things it cannot generate. Each entry names its decision in docs/API_DECISIONS.md.
+// few things it cannot generate. Each entry names its decision in docs/api/decisions/0.3.md.
 
 /** WebIDL names that would collide with Lasm.JS or Lean names when opened. */
 export const renames = { Function: 'JSFunction' };
@@ -31,7 +31,7 @@ export const aliases = { WindowProxy: 'Window' };
 export const undefinedPromises = ['Element.scroll', 'Element.scrollTo', 'Element.scrollBy', 'Element.scrollIntoView',
   'Window.scroll', 'Window.scrollTo', 'Window.scrollBy'];
 
-/** Specs not generated: what cannot work from Wasm or through the bridge (docs/API_DECISIONS.md). None. */
+/** Specs not generated: what cannot work from Wasm or through the bridge (docs/api/decisions/0.3.md). None. */
 export const excludedSpecs = {};
 /** Interfaces not generated, each with its reason and decision. None. */
 export const excludedInterfaces = {};

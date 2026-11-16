@@ -1,5 +1,5 @@
 {
-  "$comment": "Corrections to the compatibility data that scripts/bindings/web-availability.mjs reads, for `lasm build --target`'s check (docs/JS_BINDINGS.md, \"Availability per target\"). Each entry: the API's compatibility path (api.Window.navigator) or Lean name, the runtimes it corrects, `available`, why, a link (the upstream report, or Lasm's evidence), and its decision in docs/API_DECISIONS.md.",
+  "$comment": "Corrections to the compatibility data that scripts/bindings/web-availability.mjs reads, for `lasm build --target`'s check (docs/JS_BINDINGS.md, \"Availability per target\"). Each entry: the API's compatibility path (api.Window.navigator) or Lean name, the runtimes it corrects, `available`, why, a link (the upstream report, or Lasm's evidence), and its decision in docs/api/decisions/0.3.md.",
   "overrides": [
     { "api": "api.Window.navigator", "runtimes": ["node", "bun", "workerd"], "available": true, "decision": "0.3-19",
       "why": "the global navigator: the data records it under api.Navigator for these runtimes (BCD: Node 21; runtime-compat: Bun, workerd), not under Window; js-web conformance reads navigator.userAgent on each",

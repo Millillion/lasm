@@ -265,7 +265,7 @@ const exposedList = node => { const e = extValue(extAttr(node, 'Exposed')); retu
 // ---------- modules ----------
 // Lasm.JS.Web is the whole web platform of the pinned @webref/idl: one module per spec,
 // `Lasm.JS.Web.<Spec>` (UpperCamel of the shortname: `fetch` → Fetch, `hr-time` → HrTime), all in
-// namespace Lasm.JS.Web (docs/JS_BINDINGS.md, "Lasm.JS.Web"; docs/API_DECISIONS.md 0.3-1). A module holds
+// namespace Lasm.JS.Web (docs/JS_BINDINGS.md, "Lasm.JS.Web"; docs/api/decisions/0.3.md 0.3-1). A module holds
 // its spec's interfaces and namespaces, and the members its partials and mixins add to interfaces of other
 // specs (`Navigator.geolocation` is in Geolocation). `Window` is the global object of a page: its members
 // (with those of its mixins, WindowOrWorkerGlobalScope's among them) are top-level functions on globalThis
@@ -1346,7 +1346,7 @@ function emitCallback(module, name) {
     `/-- A JavaScript function that runs \`f\` synchronously (\`Lasm.JS.Function.ofSyncFn\`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling \`preventDefault\`, a queuing strategy's \`size\`). -/\ndef ${T}.ofSyncFn (f : ${fnType('IO')}) : IO ${T} := do\n  ${withLength(`← Lasm.JS.Function.ofSyncFn fun ${reads.length ? 'args' : '_'} => do return toJS (← ${call})`)}`];
   // Rule A10: reviewed aliases of the mechanical name (overrides.json `aliases`).
   for (const a of ov.aliasesOf(`${nsOf(module)}.${T}`))
-    lines.push(`/-- \`${a.alias.split('.').at(-1)}\`: \`${T}\` (an alias, docs/API_DECISIONS.md ${a.decision}: ${docText(a.why)}). -/\nabbrev ${a.alias.slice(nsOf(module).length + 1)} := ${T}`);
+    lines.push(`/-- \`${a.alias.split('.').at(-1)}\`: \`${T}\` (an alias, docs/api/decisions/0.3.md ${a.decision}: ${docText(a.why)}). -/\nabbrev ${a.alias.slice(nsOf(module).length + 1)} := ${T}`);
   return lines.join('\n');
 }
 function emitDict(module, name) {

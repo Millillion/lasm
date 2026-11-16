@@ -1,5 +1,5 @@
 // `lasm build --target X` refuses a program that calls a Lasm.JS.Web API that X does not provide
-// (docs/JS_BINDINGS.md, "Availability per target"; docs/API_DECISIONS.md 0.3-10). Each generated binding is
+// (docs/JS_BINDINGS.md, "Availability per target"; docs/api/decisions/0.3.md 0.3-10). Each generated binding is
 // `@[macro_inline]` and passes its full name to `Internal.api`, so the program's generated C holds that name as
 // a string literal at each call site; library/Lasm/JS/Web/availability.json (scripts/bindings/generate-web.mjs,
 // from compatibility data) says where each is missing.

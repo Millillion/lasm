@@ -1,5 +1,5 @@
 // Where each Lasm.JS.Web function is available, per runtime Lasm targets, from compatibility data used as it is
-// (docs/JS_BINDINGS.md, "Availability per target"; docs/API_DECISIONS.md 0.3-10):
+// (docs/JS_BINDINGS.md, "Availability per target"; docs/api/decisions/0.3.md 0.3-10):
 //   - @mdn/browser-compat-data (pinned in package.json) for the browsers, Node and Deno;
 //   - unjs/runtime-compat's data (pinned below by commit and SHA-256; MIT) for Bun, Cloudflare Workers (workerd),
 //     Vercel Edge (edge-light) and Netlify Edge, which BCD does not cover.
