@@ -42,7 +42,7 @@ const jsonPath = process.env.LIBRARY_PROOFS_JSON ?? join(work, 'proofs.json');
 const proofModules = ['Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.Proofs.Decode',
   'Lasm.UI.Proofs.Applier', 'Lasm.UI.Proofs.Conform', 'Lasm.UI.Proofs.Children', 'Lasm.UI.Proofs.TwoEnded',
   'Lasm.UI.Proofs.Diff', 'Lasm.UI.Proofs', 'Lasm.UI.Proofs.Wire', 'Lasm.UI.Proofs.Apply', 'Lasm.UI.Spec', 'Lasm.UI.Theorems',
-  'Lasm.UI.Candidates', 'Lasm.RPC.Spec', 'Lasm.RPC.Theorems', 'Lasm.RPC.Candidates', 'Lasm.KV.Spec', 'Lasm.KV.Theorems',
+  'Lasm.UI.Candidates', 'Lasm.KV.Spec', 'Lasm.KV.Theorems',
   'Lasm.Fetch.Spec', 'Lasm.Fetch.Theorems', 'Lasm.Fetch.Candidates',
   'Lasm.JS.Proofs.Wire', 'Lasm.JS.Spec', 'Lasm.JS.Theorems',
   'Lasm.Serverless.Proofs.Model', 'Lasm.Serverless.Proofs.Mapping', 'Lasm.Serverless.Spec', 'Lasm.Serverless.Theorems',
@@ -56,7 +56,7 @@ const cliModules = ['Lasm.Cli.Model.Zip', 'Lasm.Cli.Model.CliArguments', 'Lasm.C
   'Lasm.Cli.Model.StaticServer', 'Lasm.Cli.Model.Reachability', 'Lasm.Cli.Model.Initialization', 'Lasm.Cli.Model.FileMessage', 'Lasm.Cli.Fast.EdgeInitializers', 'Lasm.Cli.Fast.WasiComponent', 'Lasm.Cli.Glue',
   'Lasm.Cli.Interface', 'Lasm.Cli.Candidates', 'Lasm.Cli.Spec', 'Lasm.Cli.Theorems'];
 const cliRoot = join(root, 'verification', 'cli');
-const libraries = ['Lasm.UI', 'Lasm.RPC', 'Lasm.KV', 'Lasm.Fetch', 'Lasm.JS', 'Lasm.Serverless'];
+const libraries = ['Lasm.UI', 'Lasm.KV', 'Lasm.Fetch', 'Lasm.JS', 'Lasm.Serverless'];
 const sourceOf = (module, base = library) => join(base, ...module.split('.')) + '.lean';
 
 async function check() {

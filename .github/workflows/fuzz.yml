@@ -7,7 +7,7 @@ name: Fuzz
 # library/Lasm/Serverless/Proofs/Model.lean, and Lean's own codec), the
 # Lasm.UI applier's reading against Lean's reference decoder (ui-decode), Lasm's
 # tar reader against Python's tarfile (tar), and
-# Lasm.Fetch's request parsing, Lasm.RPC's decoding, the WASI C host's CGI
+# Lasm.Fetch's request parsing, the WASI C host's CGI
 # request and the Fastly host against an honest host (libFuzzer, ASan; UBSan for the C hosts).
 #   - pull requests and pushes to main: the committed corpus and regressions,
 #     once each (seconds); the native targets when their sources change;
@@ -100,7 +100,7 @@ jobs:
         run: node test/fuzz/native/build.mjs
       - name: Native targets
         if: steps.native.outputs.changed == 'true'
-        run: node test/fuzz/run.mjs replay lean-fetch-request lean-rpc wasi-cgi fastly-host
+        run: node test/fuzz/run.mjs replay lean-fetch-request wasi-cgi fastly-host
 
   campaign:
     needs: sunday
@@ -112,7 +112,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        target: [cli-arguments, serverless-http, ui-patch, ui-decode, lasm-js-wire, dev-proxy, project-files, edge-request, tar, lean-fetch-request, lean-rpc, wasi-cgi, fastly-host]
+        target: [cli-arguments, serverless-http, ui-patch, ui-decode, lasm-js-wire, dev-proxy, project-files, edge-request, tar, lean-fetch-request, wasi-cgi, fastly-host]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
