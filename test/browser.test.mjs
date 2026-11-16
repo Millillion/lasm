@@ -190,7 +190,7 @@ test('every lasm:app and lasm:ui-dom binding of Lasm.UI names an export', { skip
       assert.equal(typeof exports[module][name], 'function', `${file}: ${module} ${name}`);
     }
   }
-  assert.ok(count > 20, `${count} bindings`);
+  assert.ok(count > 15, `${count} bindings`);
 });
 
 test('compact initializers: kept units run once, in the original chain order', async () => {

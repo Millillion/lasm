@@ -18,7 +18,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
   const names = [], values = [], decoders = [];
   const listening = new Set();
   const subs = new Map();
-  let lean = null, pending = false, stopped = false, hydrating = hydrate, focusQueue = [], routing = false;
+  let lean = null, pending = false, stopped = false, hydrating = hydrate, afterFrameQueue = [], routing = false;
   // History changes asked for by Cmd.pushUrl/replaceUrl, made by the next
   // frame: the address bar and the page it shows change in the same task.
   let historyQueue = [];
@@ -194,10 +194,10 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     }
     bytes = null;
   }
-  // Cmd.focus / Cmd.blur, after the frame that may create the element.
-  function focusQueued() {
-    const queue = focusQueue; focusQueue = [];
-    for (const [id, blur] of queue) { const el = doc.getElementById(id); if (el) blur ? el.blur() : el.focus(); }
+  // Lasm.UI.afterFrame: the callbacks waiting for the frame that may create an element.
+  function afterFrameQueued() {
+    const queue = afterFrameQueue; afterFrameQueue = [];
+    for (const f of queue) f();
   }
 
   // ---- frames ----
@@ -214,7 +214,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     const patch = lean.frame();
     const t1 = performance.now();
     if (patch.length) apply(patch);
-    if (focusQueue.length) focusQueued();
+    if (afterFrameQueue.length) afterFrameQueued();
     last.leanMs = t1 - t0; last.applyMs = performance.now() - t1; last.bytes = patch.length; last.frames++;
   }
   function schedule() { if (!pending && !stopped) { pending = true; raf(frame); } }
@@ -352,7 +352,6 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     subs.set(id, sub);
   }
 
-  const storage = which => which === 'session' ? win.sessionStorage : win.localStorage;
   const module = {
     options: () => ({ flags, url: win.location?.href ?? 'http://localhost/', hydrate }),
     connect(callbacks) {
@@ -369,12 +368,6 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
     sub: subscribe,
     unsub(id) { subs.get(id)?.stop(); subs.delete(id); },
     timeout(ms, f) { setTimeout(() => { if (!stopped) after(f()); }, ms); },
-    http(method, url, headers, body, credentials, f) {
-      win.fetch(url, { method, headers, body: body ?? undefined, credentials })
-        .then(async r => [true, r.status, r.statusText, [...r.headers], await r.text()], e => [false, String(e?.message ?? e)])
-        .then(result => { if (!stopped) after(f(...result)); });
-    },
-    now: () => Date.now(),
     navigate(url, replace) {
       // Called from Lean's update: the app gets the URL now, and the history
       // entry is made by the frame that shows the new page (render above).
@@ -383,13 +376,7 @@ export function createUi({ root, flags = null, hydrate = false, window: win = ro
       if (lean) lean.url(href);
       schedule();
     },
-    go(n) { win.history.go(n); },
-    load(url) { win.location.assign(url); },
-    storageSet(which, key, value) { try { storage(which).setItem(key, value); } catch { /* storage unavailable */ } },
-    storageRemove(which, key) { try { storage(which).removeItem(key); } catch { /* storage unavailable */ } },
-    storageGet(which, key) { try { return storage(which).getItem(key); } catch { return null; } },
-    focus(id, blur) { focusQueue.push([id, blur]); schedule(); },
-    title(t) { doc.title = t; },
+    afterFrame(f) { afterFrameQueue.push(f); schedule(); },
   };
   return {
     module,
@@ -433,14 +420,6 @@ export const error = browserOnly('error');
 export const sub = browserOnly('sub');
 export const unsub = browserOnly('unsub');
 export const timeout = browserOnly('timeout');
-export const http = browserOnly('http');
-export const now = browserOnly('now');
 export const navigate = browserOnly('navigate');
-export const go = browserOnly('go');
-export const load = browserOnly('load');
-export const storageSet = browserOnly('storageSet');
-export const storageRemove = browserOnly('storageRemove');
-export const storageGet = browserOnly('storageGet');
-export const focus = browserOnly('focus');
-export const title = browserOnly('title');
-const standIn = { options, connect, apply, schedule, error, sub, unsub, timeout, http, now, navigate, go, load, storageSet, storageRemove, storageGet, focus, title };
+export const afterFrame = browserOnly('afterFrame');
+const standIn = { options, connect, apply, schedule, error, sub, unsub, timeout, navigate, afterFrame };
