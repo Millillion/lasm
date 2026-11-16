@@ -107,7 +107,7 @@ so that proving it later is a mechanical step:
   - [library/Lasm/RPC/Spec.lean](../library/Lasm/RPC/Spec.lean)
   - [library/Lasm/UI/Spec.lean](../library/Lasm/UI/Spec.lean)
   - [library/Lasm/JS/Spec.lean](../library/Lasm/JS/Spec.lean)
-  - [library/Lasm/Serverless/Spec.lean](../library/Lasm/Serverless/Spec.lean)
+  - [verification/cli/Lasm/Serverless/Spec.lean](../verification/cli/Lasm/Serverless/Spec.lean)
   - each app's `Proofs/Spec.lean`, for example [examples/ledger/Proofs/Spec.lean](../examples/ledger/Proofs/Spec.lean)
 - **Tested propositions** go in a sibling file, `Candidates.lean`, in the same
   namespace and with the same form. The doc comment adds one line,
@@ -144,7 +144,7 @@ so that proving it later is a mechanical step:
   - the Lean statement, verbatim.
 
   The Lean side holds a model of the JavaScript, function for function, as
-  [library/Lasm/Serverless/Proofs/Model.lean](../library/Lasm/Serverless/Proofs/Model.lean)
+  [verification/cli/Lasm/Serverless/Proofs/Model.lean](../verification/cli/Lasm/Serverless/Proofs/Model.lean)
   does for `src/serverless/`. The proposition is about the model, and is
   proved there.
 - The test checks two things on every input:

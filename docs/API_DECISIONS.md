@@ -253,8 +253,17 @@ as a container image behind the AWS Lambda Web Adapter (`--deploy lambda`),
 which is that platform's own way to run a server. **Alternative:** keep the
 loopback adapter (`lasm-server.mjs`), which Jordan rejected on 2026-11-11.
 
-### 0.2-2: `Lasm.Serverless` leaves the library (proposed, follow-up PR)
+### 0.2-2: `Lasm.Serverless` leaves the library
 
-The library namespace `Lasm.Serverless` (proofs only, no runtime API) is
-deleted; see A23. Status: decided by Jordan (2026-11-16); implementation
-pending.
+**Decision (Jordan's, A23):** the library namespace `Lasm.Serverless` (a model
+of the function-platform files, with 20 proved propositions and one
+candidate, and no runtime API) is no longer part of Lasm's library. Its files
+move unchanged to `verification/cli/Lasm/Serverless/`, beside the other models
+of the CLI's JavaScript: `scripts/library-proofs.mjs` still compiles and
+checks them, `verification/cli/README.md` lists their propositions (not
+`library/PROOFS.md`), and the serverless-http fuzz oracle still runs the model
+on every input. All 20 propositions still describe `lasm-function.mjs` and
+`lasm-lambda.mjs` (the request target and fields each event becomes, and the
+response each platform gets), so none is dropped. The Lean names stay
+`Lasm.Serverless.*`, so the tests' `Proposition:` citations are unchanged.
+**Where:** PR "Lasm.Serverless moves to verification/cli".

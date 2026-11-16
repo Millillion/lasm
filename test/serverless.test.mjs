@@ -322,7 +322,7 @@ test('adapter helpers: one Cookie header, Set-Cookie as cookie objects, Azure re
   } finally { console.warn = warn; }
 });
 
-test('adapter helpers: request targets, outgoing fields, textual bodies, web responses (the Lean model, library/Lasm/Serverless)', async () => {
+test('adapter helpers: request targets, outgoing fields, textual bodies, web responses (the Lean model, verification/cli/Lasm/Serverless)', async () => {
   const { requestTarget, outgoingHeaders, plainHost, isTextual, joinCookies, webResponse } = await import('../src/serverless/lasm-function.mjs');
   // A valid target is sent unchanged: escapes, `://`, a malformed escape in the query.
   assert.equal(requestTarget('/go/https://example.com/a%20b', 'q=%E0&x=1'), '/go/https://example.com/a%20b?q=%E0&x=1');

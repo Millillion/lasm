@@ -153,7 +153,7 @@ export function parseSetCookie(header) {
 }
 
 // The Lean model of this file's request and response mapping, and of
-// lasm-lambda.mjs's, is library/Lasm/Serverless/Proofs/Model.lean (its
+// lasm-lambda.mjs's, is verification/cli/Lasm/Serverless/Proofs/Model.lean (its
 // theorems: library/PROOFS.md); the serverless-http fuzz target checks the
 // two agree.
 
