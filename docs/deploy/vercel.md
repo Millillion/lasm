@@ -42,7 +42,9 @@ for every path.
   4.5 MB (Vercel's limit). Set the memory to at least 512 MB (Hobby: 2 GB
   default) and the maximum duration as needed.
 - **Architecture:** x86_64 (Vercel's default).
-- **Not supported:** the Edge runtime (no threads or native add-ons; Phase 8).
+- **Vercel Edge Functions** are a separate target: [vercel-edge.md](vercel-edge.md)
+  (`--target vercel-edge`, tested in CI with `vercel build` offline and
+  Vercel's `edge-runtime`).
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64; no Vercel
 account): for the hono and fetch templates (each publishes its handler with `exportDefault`), the `lasm package` output is checked
