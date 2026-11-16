@@ -52,7 +52,7 @@ lean_object* l_Lasm_JS_global();
 lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_obj(lean_object*);
 lean_object* l_Lasm_JS_Function_ofSyncFn(lean_object*);
-lean_object* l_Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Deno_env_spec__0(lean_object*);
+lean_object* l_Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Web_EventTarget_cast_x3f_spec__0(lean_object*);
 lean_object* l_Lasm_JS_Value_set___at___00Lasm_JS_Web_Event_setCancelBubble_spec__0(lean_object*, lean_object*, lean_object*);
 static const lean_string_object l_Lasm_JS_Deno_instToJSPermissionStatus___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 1, .m_capacity = 1, .m_length = 0, .m_data = ""};
 static const lean_object* l_Lasm_JS_Deno_instToJSPermissionStatus___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Deno_instToJSPermissionStatus___lam__0___closed__0_value;
@@ -7098,7 +7098,7 @@ _start:
 {
 lean_object* v___x_2334_; lean_object* v___x_2335_; 
 v___x_2334_ = ((lean_object*)(l_Lasm_JS_Deno_permissions___closed__3));
-v___x_2335_ = l_Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Deno_env_spec__0(v___x_2334_);
+v___x_2335_ = l_Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Web_EventTarget_cast_x3f_spec__0(v___x_2334_);
 if (lean_obj_tag(v___x_2335_) == 0)
 {
 lean_object* v_a_2336_; lean_object* v___x_2338_; uint8_t v_isShared_2339_; uint8_t v_isSharedCheck_2343_; 

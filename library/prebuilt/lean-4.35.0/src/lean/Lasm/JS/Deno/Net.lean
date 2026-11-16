@@ -553,13 +553,13 @@ structure VsockAddr where
   transport : VsockAddrTransport
   /-- `required double cid` -/
   cid : Float
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
 instance : FromJS VsockAddr where
   fromJS d := do return {
     transport := ← Lasm.JS.readField VsockAddrTransport d "transport",
     cid := ← Lasm.JS.readField Float d "cid",
-    port := ← Lasm.JS.readField Float d "port" }
+    port := ← Lasm.JS.readField Nat d "port" }
   typeName := "Lasm.JS.Deno.VsockAddr"
 
 /-- `dictionary TlsHandshakeInfo` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -605,8 +605,8 @@ instance : ToJS QuicAcceptOptions := ⟨fun d => Support.fields #[("keepAliveInt
 structure QuicEndpointOptions where
   /-- `DOMString hostname` -/
   hostname : Option String := none
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
 instance : ToJS QuicEndpointOptions := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
     ("port", Support.optional d.port)]⟩
 
@@ -811,8 +811,8 @@ structure Addr where
   transport : AddrTransport
   /-- `DOMString hostname` -/
   hostname : Option String := none
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `DOMString path` -/
   path : Option String := none
   /-- `double cid` -/
@@ -826,7 +826,7 @@ instance : FromJS Addr where
   fromJS d := do return {
     transport := ← Lasm.JS.readField AddrTransport d "transport",
     hostname := ← Lasm.JS.readField (Option String) d "hostname",
-    port := ← Lasm.JS.readField (Option Float) d "port",
+    port := ← Lasm.JS.readField (Option Nat) d "port",
     path := ← Lasm.JS.readField (Option String) d "path",
     cid := ← Lasm.JS.readField (Option Float) d "cid" }
   typeName := "Lasm.JS.Deno.Addr"
@@ -862,8 +862,8 @@ instance : FromJS NetworkInterfaceInfo where
 structure ResolveDnsOptionsNameServer where
   /-- `required DOMString ipAddr` -/
   ipAddr : String
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
 instance : ToJS ResolveDnsOptionsNameServer := ⟨fun d => Support.fields #[("ipAddr", toJS d.ipAddr),
     ("port", Support.optional d.port)]⟩
 
@@ -960,26 +960,26 @@ structure SrvRecord where
   priority : Float
   /-- `required double weight` -/
   weight : Float
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
   /-- `required DOMString target` -/
   target : String
 instance : FromJS SrvRecord where
   fromJS d := do return {
     priority := ← Lasm.JS.readField Float d "priority",
     weight := ← Lasm.JS.readField Float d "weight",
-    port := ← Lasm.JS.readField Float d "port",
+    port := ← Lasm.JS.readField Nat d "port",
     target := ← Lasm.JS.readField String d "target" }
   typeName := "Lasm.JS.Deno.SrvRecord"
 
 /-- `dictionary ListenTcpOptions : TcpListenOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ListenTcpOptions where
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `DOMString hostname` -/
   hostname : Option String := none
-  /-- `double tcpBacklog` -/
-  tcpBacklog : Option Float := none
+  /-- `double /* integer: Nat */ tcpBacklog` -/
+  tcpBacklog : Option Nat := none
   /-- `boolean reusePort` -/
   reusePort : Option Bool := none
   /-- `ListenTcpOptionsTransport transport` -/
@@ -1003,8 +1003,8 @@ instance : ToJS ListenUnixOptions := ⟨fun d => Support.fields #[("path", toJS 
 structure ListenVsockOptions where
   /-- `required double cid` -/
   cid : Float
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
   /-- `required ListenVsockOptionsTransport transport` -/
   transport : ListenVsockOptionsTransport
 instance : ToJS ListenVsockOptions := ⟨fun d => Support.fields #[("cid", toJS d.cid),
@@ -1013,12 +1013,12 @@ instance : ToJS ListenVsockOptions := ⟨fun d => Support.fields #[("cid", toJS 
 
 /-- `dictionary ListenTlsCertifiedOptions : ListenTlsOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ListenTlsCertifiedOptions where
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `DOMString hostname` -/
   hostname : Option String := none
-  /-- `double tcpBacklog` -/
-  tcpBacklog : Option Float := none
+  /-- `double /* integer: Nat */ tcpBacklog` -/
+  tcpBacklog : Option Nat := none
   /-- `boolean reusePort` -/
   reusePort : Option Bool := none
   /-- `ListenTlsOptionsTransport transport` -/
@@ -1043,8 +1043,8 @@ instance : ToJS ListenTlsCertifiedOptions := ⟨fun d => Support.fields #[("port
 
 /-- `dictionary ConnectOptions` (Deno 2.9.6 type declarations, lib.deno_net.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ConnectOptions where
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
   /-- `DOMString hostname` -/
   hostname : Option String := none
   /-- `ConnectOptionsTransport transport` -/
@@ -1077,16 +1077,16 @@ structure VsockConnectOptions where
   transport : VsockConnectOptionsTransport
   /-- `required double cid` -/
   cid : Float
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
 instance : ToJS VsockConnectOptions := ⟨fun d => Support.fields #[("transport", toJS d.transport),
     ("cid", toJS d.cid),
     ("port", toJS d.port)]⟩
 
 /-- `dictionary ConnectTlsOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ConnectTlsOptions where
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
   /-- `DOMString hostname` -/
   hostname : Option String := none
   /-- `sequence<DOMString> caCerts` -/
@@ -1143,8 +1143,8 @@ structure ConnectQuicOptions where
   maxConcurrentUnidirectionalStreams : Option Float := none
   /-- `QuicTransportOptionsCongestionControl congestionControl` -/
   congestionControl : Option QuicTransportOptionsCongestionControl := none
-  /-- `required double port` -/
-  port : Float
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
   /-- `required DOMString hostname` -/
   hostname : String
   /-- `DOMString serverName` -/
@@ -1172,12 +1172,12 @@ instance : ToJS ConnectQuicOptions := ⟨fun d => Support.fields #[("keepAliveIn
 
 /-- `dictionary ListenDatagramUdpOptions : UdpListenOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ListenDatagramUdpOptions where
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `DOMString hostname` -/
   hostname : Option String := none
-  /-- `double tcpBacklog` -/
-  tcpBacklog : Option Float := none
+  /-- `double /* integer: Nat */ tcpBacklog` -/
+  tcpBacklog : Option Nat := none
   /-- `boolean reuseAddress` -/
   reuseAddress : Option Bool := none
   /-- `boolean loopback` -/

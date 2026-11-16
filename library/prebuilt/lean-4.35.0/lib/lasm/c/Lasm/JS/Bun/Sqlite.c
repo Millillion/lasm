@@ -106,7 +106,7 @@ extern lean_object* l_Lasm_JS_Bun_instFromJSDoubleOrBigint;
 lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Bun_BunFile_name_spec__0(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_URL_toString_spec__0(lean_object*, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Bun_SocketUnknown_exportKeyingMaterial_spec__0(lean_object*, lean_object*, lean_object*);
-lean_object* l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_dispatchEvent_spec__0(lean_object*, lean_object*, lean_object*);
+lean_object* l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_Support_isInstance_spec__0(lean_object*, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Event_type_spec__0(lean_object*, lean_object*);
 lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_JS_Bun_Subprocess_stdio_spec__0_spec__0(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Bun_argv_spec__0_spec__0_spec__1(lean_object*, lean_object*);
@@ -17533,7 +17533,7 @@ _start:
 lean_object* v___x_4845_; lean_object* v___x_4846_; lean_object* v___x_4847_; 
 v___x_4845_ = ((lean_object*)(l_Lasm_JS_Bun_instToJSDatabaseOptions___lam__0___closed__3));
 v___x_4846_ = lean_obj_once(&l_Lasm_JS_Bun_Statement_safeIntegers0___closed__0, &l_Lasm_JS_Bun_Statement_safeIntegers0___closed__0_once, _init_l_Lasm_JS_Bun_Statement_safeIntegers0___closed__0);
-v___x_4847_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_dispatchEvent_spec__0(v_self_4843_, v___x_4845_, v___x_4846_);
+v___x_4847_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_Support_isInstance_spec__0(v_self_4843_, v___x_4845_, v___x_4846_);
 return v___x_4847_;
 }
 }

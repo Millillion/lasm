@@ -85,8 +85,8 @@ structure Proxy where
   basicAuth : Option BasicAuth := none
   /-- `DOMString hostname` -/
   hostname : Option String := none
-  /-- `double port` -/
-  port : Option Float := none
+  /-- `double /* integer: Nat */ port` -/
+  port : Option Nat := none
   /-- `DOMString path` -/
   path : Option String := none
   /-- `double cid` -/

@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(lean_object*);
-lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(lean_object*);
+lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStreamBYOBReader_read_spec__0_spec__0(lean_object*);
 lean_object* lean_mk_empty_array_with_capacity(lean_object*);
 lean_object* lean_array_push(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Web_Support_fields(lean_object*);
@@ -42,7 +42,7 @@ extern lean_object* l_Lasm_JS_Web_instFromJSResponse;
 lean_object* l_Lasm_JS_readField___redArg(lean_object*, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_instToJSString___lam__0(lean_object*);
 lean_object* l_Lasm_JS_instToJSByteArray___lam__0(lean_object*);
-lean_object* l_Lasm_JS_instToJSFloat___lam__0___boxed(lean_object*);
+lean_object* l_Lasm_JS_instToJSNat___lam__0(lean_object*);
 lean_object* l_Lasm_JS_Web_Support_optional___redArg(lean_object*, lean_object*);
 static const lean_string_object l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 9, .m_capacity = 9, .m_length = 8, .m_data = "protocol"};
 static const lean_object* l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___lam__0___closed__0_value;
@@ -53,7 +53,7 @@ static const lean_object* l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___lam__
 LEAN_EXPORT lean_object* l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___lam__0(lean_object*, lean_object*, lean_object*, lean_object*);
 static const lean_closure_object l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSString___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
 static const lean_object* l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___closed__0 = (const lean_object*)&l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___closed__0_value;
-static const lean_closure_object l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSFloat___lam__0___boxed, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
+static const lean_closure_object l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSNat___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
 static const lean_object* l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___closed__1 = (const lean_object*)&l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___closed__1_value;
 static const lean_closure_object l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___closed__2_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSByteArray___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
 static const lean_object* l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___closed__2 = (const lean_object*)&l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___closed__2_value;
@@ -445,8 +445,7 @@ v___x_100_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_100_, 0, v___x_98_);
 lean_ctor_set(v___x_100_, 1, v___x_99_);
 v___x_101_ = ((lean_object*)(l_Lasm_JS_Deno_instToJSUpgradeWebSocketOptions___lam__0___closed__1));
-v___x_102_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(v_idleTimeout_96_);
-lean_dec(v_idleTimeout_96_);
+v___x_102_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStreamBYOBReader_read_spec__0_spec__0(v_idleTimeout_96_);
 v___x_103_ = lean_alloc_ctor(0, 2, 0);
 lean_ctor_set(v___x_103_, 0, v___x_101_);
 lean_ctor_set(v___x_103_, 1, v___x_102_);
