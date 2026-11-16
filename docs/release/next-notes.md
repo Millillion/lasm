@@ -15,7 +15,7 @@
   `.WebSockets`, `.Fetch`, `.Kv` (`import Lasm.JS.Deno` imports them all). Exclusions,
   each with its reason, are in `scripts/bindings/deno-tier2.mjs` (FFI, `Deno.test`,
   experimental APIs, in-place buffer reads). docs/JS_BINDINGS.md, "Standard bindings
-  for Deno"; docs/API_DECISIONS.md A2.1, A25.1, 0.4-10 to 0.4-15.
+  for Deno"; docs/API_DECISIONS.md 0.4-5, 0.4-7, 0.4-9, 0.4-10 to 0.4-15.
 - **Deno KV needs Deno's `--unstable-kv` flag on the Deno CLI** (`deno run -A
   --unstable-kv deno/main.mjs`); Deno Deploy provides KV without it.
 - **`Deno.serveWithUnixOptions`** serves on a Unix domain socket.
@@ -39,8 +39,8 @@
   `ServerWebSocket`). New modules `Lasm.JS.Bun.Core`, `.Shell`, `.Sqlite`, `.Sql`,
   `.Redis`, `.S3`. Excluded with reasons: the `$` shell and the `sql` tagged
   templates, the bundler, `Bun.fetch` (Lasm.JS.Web's), deprecated and experimental
-  members. docs/JS_BINDINGS.md, "Standard bindings for Bun"; API_DECISIONS 0.4-16
-  onwards, A24.1, A25.2.
+  members. docs/JS_BINDINGS.md, "Standard bindings for Bun"; API_DECISIONS 0.4-4,
+  0.4-7, 0.4-8, A24.1, 0.4-17.x.
 - New example: [examples/bun-sqlite](../../examples/bun-sqlite), a todo API on
   `bun:sqlite`, built and checked by CI.
 

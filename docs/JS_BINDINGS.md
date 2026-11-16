@@ -1110,8 +1110,8 @@ review the diff of the IDL files.
 from Deno's own TypeScript declarations (`cli/tsc/dts/lib.deno.ns.d.ts`,
 `lib.deno_net.d.ts`, and Deno KV and `Deno.cron` from `lib.deno.unstable.d.ts`):
 every function, constant and class, and every type they use. Status: **current
-source, not yet released** (Stage 0, milestone 0.4; docs/API_DECISIONS.md A2.1,
-A25.1, 0.4-10 to 0.4-15). It runs with `--target deno` and `--target deno-deploy`.
+source, not yet released** (Stage 0, milestone 0.4; docs/API_DECISIONS.md 0.4-5,
+0.4-7, 0.4-9, 0.4-10 to 0.4-15). It runs with `--target deno` and `--target deno-deploy`.
 
 ```lean
 import Lasm.JS.Deno
@@ -1166,7 +1166,7 @@ Not generated, with the reason (each in
 - **Marked `@deprecated`** (their replacements are generated). Declarations
   Deno marks `@experimental` or `UNSTABLE` are generated (VSOCK, QUIC,
   `Deno.listenDatagram`, `Deno.spawn`, Deno KV, `Deno.cron`; Jordan, 2026-11-16,
-  API_DECISIONS 0.4-38); the Deno CLI runs them with its `--unstable-*` flags.
+  API_DECISIONS 0.4-16); the Deno CLI runs them with its `--unstable-*` flags.
 - **Bundler, Linter, GPU, Jupyter**: `Deno.bundle`, `Deno.lint`'s plugin API, a
   WebGPU window surface and `Deno.jupyter` work only in Deno's own tools or with a
   window.
@@ -1251,7 +1251,7 @@ three declaration files.
 generator and rules as [Lasm.JS.Deno](#how-denos-declarations-become-lean). Web
 types Bun declares again (`Request`, `Response`, `WebSocket`, `Blob`, streams) are
 Lasm.JS.Web's. Status: **current source, not yet released** (Stage 0, milestone
-0.4; docs/API_DECISIONS.md A24.1, A25.2, 0.4-16 onwards).
+0.4; docs/API_DECISIONS.md 0.4-4, 0.4-7, 0.4-8, A24.1, 0.4-17.x).
 
 ```lean
 import Lasm.JS.Bun
@@ -1297,7 +1297,7 @@ and transpiler macros (Bun's bundler), `Bun.fetch` (Lasm.JS.Web's `fetch`),
 object), `Statement.as` (a JavaScript class), deprecated and experimental members
 (`Bun.ModuleGraph`, `Bun.WebView`), call signatures and Symbol-keyed members.
 
-What Bun's declarations needed beyond Deno's rules (API_DECISIONS 0.4-16):
+What Bun's declarations needed beyond Deno's rules (API_DECISIONS 0.4-4):
 `XOR<A, B>` (exactly one of two option shapes) is the union of A and B, so
 `Bun.serve`'s options are one structure with every member optional where one
 shape lacks it; `Pick<T, …>` and `Omit<T, …>` are `T`; tuples are arrays; a union
