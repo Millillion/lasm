@@ -103,3 +103,97 @@ linked section of the review.
 | A54 | Libraries | PR #124's drafts (`Lasm.Web.Crypto`, a WebSocket upgrade in `Lasm.Fetch.serve`, `Lasm.Markdown`) not taken; kept on the `api-proposals` branch. | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A55 | CLI | Proposed, not built: a WASI reactor build (`lasm build … --target wasi --reactor`) for the CLI's glue; under Stage 2's backend this question may change. | [REVIEW.md §2](REVIEW.md#the-cli-surface) | pending sign-off |
 | A56 | Packaging | Where the `Lasm.*` libraries live (inside `@lasm/cli` or separate `@lasm/*` packages): deferred by Jordan until the APIs are final. | [REVIEW.md §1](REVIEW.md#major-where-the-lasm-libraries-live-deferred-by-jordan-2026-11-10) | pending decision |
+
+## Milestone 0.7: the CLI and configuration
+
+Entries `0.7-n`: everything a user types or configures outside Lean code
+(commands and flags, target names, environment variables, configuration, the
+output layout, `lasm init` and `npm create @lasm`). The rule for every one:
+one consistent, minimal CLI that does what each platform expects.
+
+### 0.7-1 One help text, and no `lasm version` (CLI)
+
+- **Decision:** `lasm --help` (`-h`, and `--help` after any command but
+  `init`, `dev` and `package`, which have their own) prints one text,
+  `cliUsage` in src/cli-arguments.mjs, built from the same target tables the
+  parser uses. The bare word `lasm version` is no longer a command; the version
+  is `lasm --version` or `lasm -v` (npm's, Node's, Bun's and Deno's spelling).
+
+  ```sh
+  npx lasm --help        # every command, the targets of build and package, what --output names
+  npx lasm --version     # lasm 0.9.0 (@lasm/cli; Lean 4.35.0; Node 26.13.1; linux-x64)
+  npx lasm version       # Unknown command "version". Commands: build, run, dev, init, package, editor, cache; …
+  ```
+- **Why:** there were two help texts (a release candidate printed a second,
+  hand-written one with different target lists), and three spellings of the
+  version. Alternatives: keep `lasm version` as an alias (redundant; no
+  platform CLI Lasm sits beside has both).
+- **Where:** PR "CLI surface: one help text, `--output` names what is
+  deployed, consistent option errors" (milestone 0.7); release: next.
+- **Status:** pending sign-off.
+
+### 0.7-2 `lasm build` takes one source; `--output` names the output (CLI)
+
+- **Decision:** the positional output alias is removed.
+
+  ```sh
+  npx lasm build Main.lean --output dist     # was also: npx lasm build Main.lean dist
+  npx lasm build Main.lean dist              # Unexpected argument "dist": lasm build takes one Lean source. Name the output with --output.
+  ```
+- **Why:** two ways to say one thing, and a second word that silently became a
+  directory. Every other command names its output with `--output`. Migration
+  note in docs/release/next-notes.md.
+- **Where:** as 0.7-1. **Status:** pending sign-off.
+
+### 0.7-3 `--output` always names what the target writes for deployment (CLI, output layout)
+
+- **Decision:** with `--target node` (the default under Node) `--output` names
+  the Node build (default `dist/`, which `lasm package` reads). With every
+  other target it names what is deployed, default the platform's own place,
+  and the Node build that is made from stays in the build cache
+  (`.lake/lasm/`). This extends Jordan's decision of 2026-11-04 (for the edge,
+  WASI and browser targets, 0.5.0) to the function platforms.
+
+  | Target | Default output |
+  | --- | --- |
+  | `node` | `dist/` |
+  | `lambda`, `lambda-edge` | `lambda.zip`, `lambda-edge.zip` |
+  | `vercel`, `netlify` | `.vercel/output`, `netlify/functions/lasm` |
+  | `azure`, `gcf` | `azure-functions/`, `gcf/` |
+  | `workers`, `bun`, `deno`, `deno-deploy` | `workers/`, `bun/`, `deno/`, `deno/` |
+  | `supabase-edge` | `supabase/functions/<name>/` |
+  | `vercel-edge`, `netlify-edge` | fixed by the platform (`api/`, `netlify/`); `--output` refused |
+  | `wasi`, `wasi-http`, `fastly` | `wasi/`, `wasi-http/`, `bin/` and `pkg/` |
+  | `browser` | `dist/` |
+
+  ```sh
+  npx lasm build Main.lean --target lambda --output app.zip   # writes app.zip; no dist/
+  npx lasm build Main.lean && npx lasm package --target lambda  # dist/ and lambda.zip, as before
+  ```
+- **Why:** `--output` meant the Node build for six targets and the deployable
+  for twelve. Now one rule. Alternative: keep `dist/` for function
+  platforms (inconsistent, and `lasm package` already covers "a Node build and
+  a package").
+- **Where:** as 0.7-1. **Status:** pending sign-off.
+
+### 0.7-4 The same option rules and error shapes in every command (CLI, errors)
+
+- **Decision:** every command refuses a repeated option with
+  `Specify --<option> only once` and `--dev` with `--release` with
+  `Choose one of --dev and --release` (`lasm dev` and `lasm init --template`
+  now do, as `lasm build` did). An unknown name in a list (`--target` of
+  `lasm build` and `lasm dev`, `lasm init --template` and `--deploy`) is
+  refused with the list and the closest name, or the name another platform
+  spelling means (`cloudflare` → `workers`), when there is one.
+
+  ```sh
+  npx lasm dev --target worker     # lasm dev --target accepts node, bun, …, not "worker" (did you mean --target workers?)
+  npx lasm dev --release --dev     # Choose one of --dev and --release
+  npx lasm init app -t Hono        # Unknown template "Hono" (did you mean --template hono?). Choose one of: plain, …
+  npx lasm init app --deploy cloudflare   # --deploy accepts lambda, …, spin (did you mean --deploy workers?)
+  ```
+- **Why:** the commands disagreed (last one silently won in `lasm dev` and
+  `lasm init`; only `lasm build` suggested names). Each is in the Lean models
+  (verification/cli/Lasm/Cli/Model/) and the model differential, and the
+  error corpus prints each.
+- **Where:** as 0.7-1. **Status:** pending sign-off.

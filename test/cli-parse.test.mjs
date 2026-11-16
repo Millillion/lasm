@@ -10,7 +10,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-  parseLasmArguments, buildTargets, edgeBuildTargets, wasiBuildTargets, platformBuildTargets, fixedLayoutTargets, suspendModes,
+  parseLasmArguments, buildTargets, edgeBuildTargets, wasiBuildTargets, fixedLayoutTargets, suspendModes,
   targetHint, cliUsage, commandNames, editDistance, closest,
 } from '../src/cli-arguments.mjs';
 import { packageTargets, parsePackageArguments } from '../src/package.mjs';
@@ -28,7 +28,6 @@ test('the target lists', () => {
   assert.deepEqual(edgeBuildTargets, ['workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy', 'supabase-edge']);
   assert.deepEqual(wasiBuildTargets, ['wasi', 'fastly', 'wasi-http']);
   assert.deepEqual(buildTargets, ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, ...wasiBuildTargets, 'browser']);
-  assert.deepEqual(platformBuildTargets, [...edgeBuildTargets, ...wasiBuildTargets, 'browser']);
   assert.deepEqual(fixedLayoutTargets, ['vercel-edge', 'netlify-edge']);
   assert.deepEqual(suspendModes, ['none', 'jspi']);
   assert.deepEqual(commandNames, ['build', 'run', 'dev', 'init', 'package', 'editor', 'cache']);
@@ -38,7 +37,9 @@ test('the target lists', () => {
 });
 
 test('version: one token only', () => {
-  for (const flag of ['--version', '-v', 'version']) assert.deepEqual(parseLasmArguments([flag]), { command: 'version' });
+  for (const flag of ['--version', '-v']) assert.deepEqual(parseLasmArguments([flag]), { command: 'version' });
+  // The bare word is no command (0.7-1).
+  fails(['version'], 'Unknown command "version". Commands: build, run, dev, init, package, editor, cache; or run a program with lasm Main.lean.');
   fails(['--version', 'Main.lean'], 'Unknown Lasm option: --version. Application arguments must follow --.');
   fails(['-v', 'Main.lean'], 'Unknown Lasm option: -v. Application arguments must follow --.');
   assert.throws(() => parseLasmArguments(['version', 'Main.lean']), /^Error: Unknown command "version"/);
@@ -84,7 +85,7 @@ test('the run and build results, field by field', () => {
   assert.deepEqual(parseLasmArguments(['build', 'Main.lean', '--target=browser', '--suspend=jspi', '--bundler', '--dev']),
     { command: 'build', rebuild: false, verbose: false, args: [], input: 'Main.lean', profile: 'dev', target: 'browser', suspend: 'jspi', bundler: true });
   assert.deepEqual(parseLasmArguments(['build', 'Main.lean', '--target', 'lambda', '--dev', '--allow-dev']),
-    { command: 'build', rebuild: false, verbose: false, args: [], input: 'Main.lean', profile: 'dev', target: 'lambda', allowDev: true, output: 'dist' });
+    { command: 'build', rebuild: false, verbose: false, args: [], input: 'Main.lean', profile: 'dev', target: 'lambda', allowDev: true });
   // A binding configuration: no profile, the node target.
   assert.deepEqual(parseLasmArguments(['build', 'bindings.json']),
     { command: 'build', rebuild: false, verbose: false, args: [], input: 'bindings.json', target: 'node', output: 'dist' });
@@ -171,24 +172,26 @@ test('--bundler and --allow-dev', () => {
     fails(argv, '--allow-dev applies to lasm build --target <platform> and lasm package');
 });
 
-test('--output and the build positional output', () => {
+test('--output, and no positional output (0.7-2)', () => {
   assert.equal(parseLasmArguments(['build', 'Main.lean', '--output=out']).output, 'out');
   assert.equal(parseLasmArguments(['build', '--output', 'out', 'Main.lean']).output, 'out');
-  assert.equal(parseLasmArguments(['build', 'Main.lean', 'out']).output, 'out');
+  fails(['build', 'Main.lean', 'out'], 'Unexpected argument "out": lasm build takes one Lean source. Name the output with --output.');
   for (const argv of [['build', 'Main.lean', '--output'], ['build', 'Main.lean', '--output='], ['build', 'Main.lean', '--output', '--dev']])
     fails(argv, '--output requires a value');
   fails(['build', 'Main.lean', '--output=a', '--output=b'], 'Specify --output only once');
-  fails(['build', 'Main.lean', '--output', 'a', 'b'], 'Unexpected positional arguments. Put application arguments after --.');
-  fails(['build', 'Main.lean', 'a', 'b'], 'Unexpected positional arguments. Put application arguments after --.');
+  fails(['build', 'Main.lean', '--output', 'a', 'b'], 'Unexpected argument "b": lasm build takes one Lean source. Name the output with --output.');
+  fails(['build', 'Main.lean', 'a', 'b'], 'Unexpected argument "a": lasm build takes one Lean source. Name the output with --output.');
   fails(['Main.lean', 'a'], 'Unexpected positional arguments. Put application arguments after --.');
   fails(['Main.lean', '--output', 'out'], '--output is available only with lasm build');
   fails(['build', 'Main.lean', '--target', 'vercel-edge', '--output', 'out'],
     '--output does not apply to --target vercel-edge: the platform fixes its layout (api/lasm.mjs and api/_lasm/)');
-  fails(['build', 'Main.lean', 'out', '--target', 'netlify-edge'],
+  fails(['build', 'Main.lean', '--output', 'out', '--target', 'netlify-edge'],
     '--output does not apply to --target netlify-edge: the platform fixes its layout (netlify/edge-functions/lasm.mjs and netlify/lasm/)');
-  // Platform targets other than those keep --output; none gets dist/ by default.
-  for (const target of platformBuildTargets.filter(target => !fixedLayoutTargets.includes(target)))
+  // Every other target keeps --output, and only node gets dist/ by default (0.7-3).
+  for (const target of buildTargets.filter(target => !fixedLayoutTargets.includes(target))) {
     assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target, '--output', 'o']).output, 'o', target);
+    assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target]).output, target === 'node' ? 'dist' : undefined, target);
+  }
 });
 
 test('sources and commands', () => {

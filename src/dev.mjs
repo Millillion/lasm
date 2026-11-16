@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, statSync, watch } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { jsRuntime } from './js-runtime.mjs';
+import { targetHintAmong } from './cli-arguments.mjs';
 
 const runtimeTargets = ['node', 'bun', 'deno'];
 const edgeOnlyTargets = ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'supabase-edge'];
@@ -23,7 +24,7 @@ each change (dev profile: about 2 s for an ordinary edit once the first build
 is done) and restarts the program. Arguments after -- are passed to main.
   node, bun, deno   run the program with that runtime (default: the runtime
                     running Lasm); a build error keeps the last good program running
-  workers, vercel-edge, netlify-edge, deno-deploy
+  workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge
                     rebuild the edge output only; run the platform's own local
                     server yourself (for example npx wrangler dev). Lasm never
                     starts platform tools.
@@ -38,13 +39,16 @@ Type rs and Enter to rebuild and restart; Ctrl+C stops.`;
 
 export function parseDevArguments(tokens) {
   const result = { command: 'dev', profile: 'dev', args: [], run: true, verbose: false };
-  const positional = [];
+  const positional = [], supplied = new Set();
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
     if (token === '--') { result.args = tokens.slice(i + 1); break; }
     if (token === '--help' || token === '-h') return { command: 'dev-help' };
-    if (token === '--release') { result.profile = 'release'; continue; }
-    if (token === '--dev') { result.profile = 'dev'; continue; }
+    if (token === '--release' || token === '--dev') {
+      const profile = token.slice(2);
+      if (supplied.has('profile') && result.profile !== profile) throw new Error('Choose one of --dev and --release');
+      supplied.add('profile'); result.profile = profile; continue;
+    }
     if (token === '--no-run') { result.run = false; continue; }
     if (token === '--verbose') { result.verbose = true; continue; }
     if (token === '--no-watch') { result.watch = false; continue; }
@@ -52,12 +56,14 @@ export function parseDevArguments(tokens) {
     if (option) {
       const value = option[2] ?? tokens[++i];
       if (!value || value.startsWith('--')) throw new Error(`--${option[1]} requires a value\n\n${devUsage}`);
+      if (supplied.has(option[1])) throw new Error(`Specify --${option[1]} only once`);
+      supplied.add(option[1]);
       if (option[1] === 'target') {
         // Several outputs of one project: --target node,browser, or with their
         // own sources: --target node=Server.lean,browser=Client.lean.
         result.outputs = value.split(',').map(item => {
           const [target, input] = item.split('=');
-          if (!devTargets.includes(target)) throw new Error(`lasm dev --target accepts ${devTargets.join(', ')}, not "${target}"`);
+          if (!devTargets.includes(target)) throw new Error(`lasm dev --target accepts ${devTargets.join(', ')}, not "${target}"${targetHintAmong(target, devTargets)}`);
           if (input !== undefined && !input.endsWith('.lean')) throw new Error(`--target ${item}: the source must be a .lean file`);
           return { target, ...(input ? { input } : {}) };
         });

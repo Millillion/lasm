@@ -130,14 +130,10 @@ test('version and help print and return 0 without building', async () => {
   globalThis.cliStandIns.support.applicationSupport = () => undefined;
   assert.equal(await cli(['--help']), 0);
   assert.deepEqual(lines.log.slice(1), [cliUsage]);
-  // A release candidate prints the full help.
+  // One help text, with or without a release candidate's support.
   globalThis.cliStandIns.support.applicationSupport = () => ({ platforms: [] });
   assert.equal(await cli(['build', '-h']), 0);
-  const help = lines.log[2];
-  assert.ok(help.startsWith('Usage: lasm Main.lean [--release] [-- arguments…]\n       lasm dev [Main.lean]'));
-  assert.ok(help.includes('--output: the Node build for node and function targets (default dist/); the\n'));
-  assert.ok(help.endsWith('lasm editor makes the Lean editor resolve import Lasm.* (elan toolchain for this project).'));
-  assert.notEqual(help, cliUsage);
+  assert.equal(lines.log[2], cliUsage);
   for (const [argv, usage] of [[['init', '--help'], initUsage], [['dev', '--help'], devUsage], [['package', '--help'], packageUsage]]) {
     lines.log = [];
     assert.equal(await cli(argv), 0);
@@ -208,6 +204,15 @@ test('lasm build for Node: the build, its summary line, the editor, and packagin
   globalThis.cliStandIns.package.runPackage = record('runPackage', 9);
   assert.equal(await cli(['build', source, '--target', 'netlify', '--dev', '--allow-dev']), 9);
   assert.deepEqual(named('runPackage'), [[{ input: 'out', target: 'netlify', allowDev: true }]]);
+  // --output names the package; the Node build stays in its cache entry (0.7-3).
+  calls.length = 0;
+  assert.equal(await cli(['build', source, '--target', 'lambda', '--output', 'app.zip']), 9);
+  assert.deepEqual(named('runPackage'), [[{ input: 'out', target: 'lambda', allowDev: undefined, output: 'app.zip' }]]);
+  globalThis.cliStandIns.build.buildApplicationWithProgress = record('build', { output: 'out', lean: '4.98.0', profile: 'release', cacheHit: true });
+  assert.equal(await cli(['build', source, '--target', 'vercel', '--output', 'v']), 9);
+  assert.equal(named('build').at(-1)[1].output, undefined);
+  assert.equal(await cli(['build', source, '--output', 'n']), 0);
+  assert.equal(named('build').at(-1)[1].output, 'n');
 });
 
 test('lasm run: builds, says which profile, runs main.mjs with the arguments and returns its exit code', async () => {
