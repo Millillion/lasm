@@ -14,9 +14,15 @@ test('lasm dev arguments: defaults, flags and their errors', () => {
   assert.deepEqual(parseDevArguments([]), { command: 'dev', profile: 'dev', args: [], run: true, verbose: false, input: 'Main.lean', target: jsRuntime,
     outputs: [{ target: jsRuntime, input: 'Main.lean' }] });
   assert.deepEqual(devTargets, ['node', 'bun', 'deno', 'workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'supabase-edge', 'browser']);
-  const all = parseDevArguments(['--release', '--dev', '--no-run', '--verbose', 'App.lean', '--', 'x', '--help']);
+  const all = parseDevArguments(['--dev', '--no-run', '--verbose', 'App.lean', '--', 'x', '--help']);
   assert.deepEqual([all.profile, all.run, all.verbose, all.input, all.args], ['dev', false, true, 'App.lean', ['x', '--help']]);
   assert.equal(parseDevArguments(['--release']).profile, 'release');
+  assert.equal(parseDevArguments(['--release', '--release']).profile, 'release');
+  // As lasm build: one profile, each valued option once (0.7-23).
+  for (const tokens of [['--release', '--dev'], ['--dev', '--release']])
+    assert.throws(() => parseDevArguments(tokens), /^Error: Choose one of --dev and --release$/);
+  for (const [name, a, b] of [['target', 'node', 'browser'], ['port', '1', '2'], ['host', 'a', 'b'], ['output', 'a', 'b']])
+    assert.throws(() => parseDevArguments(['--target=browser', `--${name}`, a, `--${name}=${b}`].slice(name === 'target' ? 1 : 0)), new RegExp(`^Error: Specify --${name} only once$`));
   assert.deepEqual(parseDevArguments(['-h']), { command: 'dev-help' });
   // --target values: per-output sources, the first named source names the project.
   const outputs = parseDevArguments(['--target', 'browser=Client.lean,node']);
@@ -26,6 +32,12 @@ test('lasm dev arguments: defaults, flags and their errors', () => {
   assert.equal(parseDevArguments(['Main.lean', '--target', 'node=Server.lean']).input, 'Main.lean');
   assert.throws(() => parseDevArguments(['--target', 'node=Server.js']), /^Error: --target node=Server\.js: the source must be a \.lean file$/);
   assert.throws(() => parseDevArguments(['--target', 'lambda']), new RegExp(`^Error: lasm dev --target accepts ${devTargets.join(', ')}, not "lambda"$`));
+  // A near miss or another name for a dev target is suggested (0.7-23).
+  assert.throws(() => parseDevArguments(['--target', 'worker']), new RegExp(`^Error: lasm dev --target accepts ${devTargets.join(', ')}, not "worker" \\(did you mean --target workers\\?\\)$`));
+  assert.throws(() => parseDevArguments(['--target', 'node,brwser']), /not "brwser" \(did you mean --target browser\?\)$/);
+  assert.throws(() => parseDevArguments(['--target', 'cloudflare']), /not "cloudflare" \(did you mean --target workers\?\)$/);
+  // An alias of a target lasm dev does not build is no hint.
+  assert.throws(() => parseDevArguments(['--target', 'aws']), /not "aws"$/);
   assert.throws(() => parseDevArguments(['--target', 'bun,deno']), /^Error: lasm dev runs one program: choose one of node, bun and deno$/);
   assert.equal(parseDevArguments(['--target', 'node,workers']).outputs.length, 2);
   // Values: =, the next token; a missing value or another flag is an error with the usage.

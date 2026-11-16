@@ -142,15 +142,20 @@ test('lasm init arguments: every option form and every error message', () => {
   for (const tokens of [['app', '--template'], ['app', '--template='], ['app', '-t', '--deploy'], ['app', '-t', '-x']])
     fails(tokens, '--template requires a value\n\n' + initUsage);
   // A value ending with a dash is a value.
-  fails(['app', '-t', 'hono-'], `Unknown template "hono-". Choose one of: ${Object.keys(templates).join(', ')}`);
+  fails(['app', '-t', 'hono-'], `Unknown template "hono-" (did you mean --template hono?). Choose one of: ${Object.keys(templates).join(', ')}`);
+  // Each option once; near misses suggested (0.7-23).
+  fails(['app', '-t', 'hono', '--template=web'], 'Specify --template only once');
+  fails(['app', '--deploy', 'worker'], `--deploy accepts ${deployList} (did you mean --deploy workers?)\n\n` + initUsage);
+  fails(['app', '--deploy', 'cloudflare'], `--deploy accepts ${deployList} (did you mean --deploy workers?)\n\n` + initUsage);
   for (const tokens of [['app', '--deploy'], ['app', '--deploy='], ['app', '--deploy', 'pages'], ['app', '-t', 'hono', '--deploy', 'constructor'], ['app', '--deploy', '__proto__']])
     fails(tokens, `--deploy accepts ${deployList}\n\n` + initUsage);
   for (const option of ['--templates', '-tx', '--deployment', '--rebuild', '-'])
     fails(['app', option], `Unknown lasm init option: ${option}\n\n${initUsage}`);
   fails([], initUsage);
   fails(['a', 'b'], initUsage);
-  for (const template of ['constructor', 'toString', 'Hono'])
+  for (const template of ['constructor', 'toString'])
     fails(['app', '-t', template], `Unknown template "${template}". Choose one of: plain, express, hono, fastify, std-http, web, fetch, fullstack`);
+  fails(['app', '-t', 'Hono'], 'Unknown template "Hono" (did you mean --template hono?). Choose one of: plain, express, hono, fastify, std-http, web, fetch, fullstack');
   for (const template of ['plain', 'web'])
     fails(['app', '-t', template, '--deploy', 'lambda'], `--deploy lambda needs a server template (express, hono, fastify, std-http or fetch), not ${template}`);
   // wasi is a CLI target: plain takes it; the first server-only target is named.
