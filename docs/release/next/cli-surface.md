@@ -1,9 +1,7 @@
-# Unreleased
-
 ## The CLI (Stage 0, milestone 0.7)
 
 - **Breaking: `lasm build` takes one Lean source; the output is named only with
-  `--output`** (docs/API_DECISIONS.md 0.7-2). `lasm build Main.lean dist` now
+  `--output`** (docs/api/decisions/0.7.md, 0.7-2). `lasm build Main.lean dist` now
   fails with `Unexpected argument "dist": lasm build takes one Lean source. Name
   the output with --output.` Migration: `lasm build Main.lean dist` →
   `lasm build Main.lean --output dist`.
@@ -40,13 +38,3 @@
 
 - `npm create @lasm` with no directory prints a usage line that no longer lists
   only four templates; `npx @lasm/cli init --help` lists them all.
-
-- **Breaking: `lasm init --deploy lambda` writes the Lambda `.zip` setup**
-  (`npm run build:lambda`, which was `--deploy lambda-zip`); the container image
-  (`Dockerfile.lambda`) is now `--deploy lambda-container` (0.7-9). Every
-  `--deploy` name is now the `lasm build --target` it builds, except
-  `lambda-container` and `spin`. Migration: `--deploy lambda-zip` →
-  `--deploy lambda`; `--deploy lambda` → `--deploy lambda-container`. Existing
-  projects are unchanged (`lasm init` writes files once).
-
-- The README's environment variables list `LASM_VM_STACK_MB` (0.7-13).

@@ -12,7 +12,7 @@ import Conduit.Validation
 import Conduit.Slug
 import Conduit.Paging
 import Conduit.Rules
-import Lasm.RPC.Core
+import Conduit.SafeJson
 open Lean
 
 namespace Conduit
@@ -66,10 +66,10 @@ def requireUser (s : Store m) (svc : Services m) (r : Request) : M m (UserRow ×
   | some v => return v
   | none => throw (.unauthorized "is missing")
 
-/-- The request body: `{"<key>": {…}}`, decoded. `Lasm.RPC.parseJson` refuses
+/-- The request body: `{"<key>": {…}}`, decoded. `Conduit.parseJson` refuses
 numbers with huge exponents, which `Json.parse` would expand (#135). -/
 def bodyOf {α : Type} (r : Request) (key : String) (decode : Json → Except String α) : M m α := do
-  let j ← match Lasm.RPC.parseJson r.body with
+  let j ← match Conduit.parseJson r.body with
     | .ok j => pure j
     | .error _ => throw (.invalid [("body", ["is not valid JSON"])])
   let inner ← match Decode.unwrap key j with
