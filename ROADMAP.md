@@ -85,7 +85,9 @@ the final APIs; no hand-written binding remains where a generated one exists.
   [API shapes review](docs/api/SHAPES_REVIEW_2026-11-11.md) and the API items
   of REVIEW.md. Also inventories the API proposals in
   [Jordan's checklist](#jordans-checklist) (Ledger's, Folio's, Porter's and
-  Tandem's).
+  Tandem's). Listed on 2026-11-16 (74 entries, `0.1-1` to `0.7-22`, beside
+  A1–A56); `scripts/api/inventory.mjs` fails the unit job when a public
+  surface is missing. Awaiting Jordan's sign-off.
 - [ ] **0.2 Serving model, and `Lasm.Fetch` deleted.** `Node.serve` (in
   `Lasm.JS.Node.Serve`, shaped like `Bun.serve`); function platforms call
   `exportDefault`, and the generated platform file calls the handler directly
@@ -136,8 +138,13 @@ Tandem, the differential-fuzzing generator covers the remaining features of
 observed and reported only: it never blocks this stage or anything else
 (Jordan, 2026-11-16).
 
-- [ ] **1.1 Platforms (item 1).** Every platform at L2 or higher, and Node,
-  Workers and the browser at L3. The page of 2026-11-16 reads 6 of 13 at L2
+- [ ] **1.1 Platforms (item 1).** **Every** platform at L3 (Jordan, 2026-11-16;
+  it was L2 everywhere and L3 only for Node, Workers and the browser). For each
+  platform that means a flagship app passing its outside oracle, fuzzing and
+  deterministic simulation, all on that platform's own runtime, emulator or
+  base image in CI. Stage 2's backend then has per-platform oracles on every
+  platform. L3 is runtime evidence, not production evidence: no live
+  deployments (no real accounts). The page of 2026-11-16 reads 6 of 13 at L2
   and 0 of 3 at L3, mostly "no main-branch run has this job", which 0.8.0's
   release checks on `main` may already have changed: re-measure first.
 - [ ] **1.2 Propositions (item 7).** Every library candidate in

@@ -6,7 +6,7 @@
 // in `modules` to WebIDL (scripts/bindings/node.idl), finding its classes and
 // namespaces itself, and scripts/bindings/generate-web.mjs turns that into
 // library/Lasm/JS/Node/*.lean with the mapping rules of Lasm.JS.Web
-// (docs/JS_BINDINGS.md, "Lasm.JS.Node"; API_DECISIONS.md A17, 0.4-33 to 0.4-38).
+// (docs/JS_BINDINGS.md, "Lasm.JS.Node"; docs/api/decisions/0.4.md A17, 0.4-33 to 0.4-38).
 //
 // This file holds only what the docs do not say in their structure: the JavaScript
 // module of a name (`jsModules`), what a class's heading or prose says about it
@@ -130,7 +130,7 @@ export const classes = {
 
 /**
  * Members not generated, each with why it cannot work from Lean compiled to Wasm
- * (an API_DECISIONS.md entry, milestone 0.4). Keyed by the documented name
+ * (an entry of docs/api/decisions/0.4.md). Keyed by the documented name
  * (`fs.readSync`, `filehandle.readv`) or with its parameters
  * (`fs.read(fd, buffer, offset, length, position, callback)`).
  */
