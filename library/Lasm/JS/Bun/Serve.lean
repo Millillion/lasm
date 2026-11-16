@@ -8,8 +8,7 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Url
-import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Types
 
 namespace Lasm.JS.Bun
 open Lasm.JS Lasm.JS.Web

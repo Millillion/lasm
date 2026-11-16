@@ -8,8 +8,8 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types
+import Lasm.JS.Web.Webidl
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web

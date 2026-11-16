@@ -8,7 +8,7 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Crypto
+import Lasm.JS.Web.Types
 import Lasm.JS.Node.Buffer
 import Lasm.JS.Node.Fs
 
