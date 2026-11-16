@@ -21,6 +21,8 @@ const fastlyModules = ['Types', 'Cache', 'ConfigStore', 'HttpCache', 'Shielding'
 const wasiHttpModules = ['Io.Error', 'Io.Poll', 'Io.Streams', 'Clocks.MonotonicClock', 'Http.Types', 'Http.OutgoingHandler',
   'Http.IncomingHandler', 'Http'].map(name => `Lasm.WASI.${name}`);
 export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
+  // Lasm.JS.Class (docs/JS_BINDINGS.md, "JavaScript classes"): not imported by Lasm.JS.
+  'Lasm.JS.Class',
   // Lasm.Fetch (docs/FETCH.md): one HTTP handler for Node, WASI, Fastly and the edge.
   // Lasm.Fastly (docs/WASI_FASTLY_BINDINGS.md): Fastly Compute's host ABI, generated from its witx
   // by scripts/bindings/generate-fastly.mjs (fastlyModules, in import order).

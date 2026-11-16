@@ -399,6 +399,45 @@ let _ ← app.callMethod "use" #[toJS handler]
 A server's `main` must not return while JavaScript serves requests: end it with
 `Lasm.JS.waitForever`.
 
+## JavaScript classes: `Lasm.JS.Class.define`
+
+Some APIs take a class, not a function: `customElements.define`, subclasses
+of `Error`, `EventTarget` or Node's streams, frameworks that call `new` on
+what you pass. `Lasm.JS.Class.define` (`import Lasm.JS.Class`) makes a real
+`class Name extends Base` from Lean, without `eval`, so it works on every
+JavaScript target:
+
+```lean
+import Lasm.JS.Class
+open Lasm.JS
+
+@[js "globalThis" "Error"] opaque errorClass : IO Value
+
+def notFound : IO Value := do
+  Class.define {
+    name := "NotFound"
+    extends? := some (← errorClass)                    -- super(...args) runs first
+    constructor := some fun self _ => self.set "status" (404 : Nat)
+    methods := #[("describe", .sync fun self _ => do
+      return toJS s!"{← self.get "message" String} ({← self.get "status" Nat})")]
+    getters := #[("retryable", fun _ => return .bool false)] }
+-- In JavaScript: const e = new NotFound("no such page"); e instanceof Error; e.describe()
+```
+
+- Each constructor, method and getter is a Lean function of the instance
+  (`self`, JavaScript's `this`) and the call's arguments.
+- `.sync` methods and getters follow `Function.ofSyncFn`'s rules (JavaScript
+  waits for them, and they cannot wait for JavaScript); `.async` methods
+  return a promise and follow `Function.ofFn`'s. Choose per method: a DOM
+  lifecycle callback or a method whose result is used at once is `.sync`.
+- `statics` sets properties of the class itself (`observedAttributes`).
+- Each call of a method is a JavaScript → Lean call (about 20 µs on Node).
+  Per-instance state lives on the instance (`self.set`), or in Lean keyed by
+  a field.
+- Classes a platform finds by export name (Cloudflare Durable Objects,
+  Workers RPC entrypoints) must exist when the module loads, before Lean
+  runs: `define` cannot make those.
+
 ## Errors
 
 - **A JavaScript exception or rejected promise** becomes an `IO.userError` with

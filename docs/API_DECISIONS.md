@@ -47,7 +47,7 @@ linked section of the review.
 | A3 | Deno | Should Netlify Edge and Supabase Edge, which depend on the Deno runtime, be marked as at-risk targets? | [Q3](api/SHAPES_REVIEW_2026-11-11.md#0-deno-decide-first-it-affects-several-sections) | pending sign-off |
 | A4 | Lasm.JS core | Should `Function.ofFn` set `length`? | [Q4](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A5 | Lasm.JS core | Should the build-time check skip `globalThis` exports that Node lacks? | [Q5](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
-| A6 | Lasm.JS core | Inline JavaScript and classes (LASM_JS_GAPS.md, PR #169): `@[js "./ffi/foo.mjs" "f"]` paths relative to the Lean file, and a `Lasm.JS.Class.define` builder (a real `class extends`, no `eval`). | [Q6](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | part 1 decided in 0.6 ([A6.1](#a61-the-projects-own-javascript-files-jsffixmjs-f)); classes pending |
+| A6 | Lasm.JS core | Inline JavaScript and classes (LASM_JS_GAPS.md, PR #169): `@[js "./ffi/foo.mjs" "f"]` paths relative to the Lean file, and a `Lasm.JS.Class.define` builder (a real `class extends`, no `eval`). | [Q6](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | decided in 0.6 ([A6.1](#a61-the-projects-own-javascript-files-jsffixmjs-f), [A6.2](#a62-javascript-classes-from-lean-lasmjsclassdefine)), pending sign-off |
 | A7 | Lasm.JS core | Should `exportDefault` take `[ToJS α]` (branch)? | [Q7](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A8 | Lasm.JS core | Confirm the core shapes in REVIEW.md §1: Symbol and number keys (#170); no fire-and-forget `Async` in `ofSyncFn`; waits inside synchronous callbacks stay a clear error. | [Q8](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A9 | Generated-binding mapping rules | Overload naming. Should Claude keep the mechanical rule, or add a small override table for names that read badly? | [Q9](api/SHAPES_REVIEW_2026-11-11.md#2-generated-binding-mapping-rules-shared-by-every-lasmjs-tier) | pending sign-off |
@@ -159,5 +159,55 @@ tiny host calls), run-time `eval` (1D: refused by Workers and CSP).
 **Tests.** test/project-modules.test.mjs (resolution, imports, refusals);
 test/fixtures/js-core on Node 26 and 24, Bun, Deno, Workers and Chromium
 (web-bindings.yml). Docs: docs/JS_BINDINGS.md, "Your own JavaScript files".
+
+**Where.** PR (this one), next release. **Status:** pending sign-off.
+
+#### A6.2: JavaScript classes from Lean, `Lasm.JS.Class.define`
+
+**Decision.** Option 2B of [LASM_JS_GAPS.md](proposals/LASM_JS_GAPS.md): a
+small builder in its own module, `Lasm.JS.Class` (not imported by `Lasm.JS`),
+over a builtin JavaScript module, `lasm:class`, that makes a real
+`class … extends Base` without `eval`.
+
+```lean
+inductive Class.Method where
+  | sync (f : Value → Array Data → IO Data)      -- this, args
+  | async (f : Value → Array Data → Async Data)  -- returns a promise
+structure Class.Spec where
+  name : String
+  extends? : Option Value := none
+  constructor : Option (Value → Array Data → IO Unit) := none   -- after super(...args)
+  methods : Array (String × Class.Method) := #[]
+  getters : Array (String × (Value → IO Data)) := #[]
+  statics : Array (String × Data) := #[]
+def Class.define (s : Class.Spec) : IO Value      -- the class (its constructor)
+
+let c ← Class.define {
+  name := "Counter", extends? := some (← errorClass)
+  constructor := some fun self _ => self.set "count" (0 : Nat)
+  methods := #[("increment", .sync fun self _ => do
+    let n := (← self.get "count" Nat) + 1; self.set "count" n; return toJS n)] }
+```
+
+**Why.** It is the smallest addition that turns "write JavaScript for every
+class" into a Lean definition, on every JavaScript target, and keeps sync
+versus async explicit per method, which the semantics need (a DOM lifecycle
+callback cannot wait). `this` reaches Lean as the first argument of the
+underlying functions, so no host change was needed. A6.1's project files
+remain the escape hatch for anything else.
+
+**Not covered.** Classes a platform looks up by export name when the module
+loads (Durable Objects, Workers RPC entrypoints): option 2D, a build-time
+exported class, designed with the Workers entry module (the 0.5 stream's
+Durable Objects; A28).
+
+**Alternatives.** 2A, only project files (every class needs JavaScript);
+2C, `deriving JSClass` sugar (a larger elaborator surface, revisit once 2B
+has users); 2E, Proxy-based fakes (`customElements.define`, `instanceof` and
+`super` need a real class).
+
+**Tests.** test/lasm-class.test.mjs; test/fixtures/js-core's "classes"
+section on every JavaScript target (a class extending `Error`, used from
+JavaScript and from Lean). Docs: docs/JS_BINDINGS.md, "JavaScript classes".
 
 **Where.** PR (this one), next release. **Status:** pending sign-off.

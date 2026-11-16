@@ -10,3 +10,7 @@ file into `<version>-notes.md`.
   relative to the Lean file, and `lasm build` ships it, with the files it
   imports by relative path, on every target. Migration: a local `file:` npm
   package used only for this can become a project file.
+- **JavaScript classes from Lean** (A6.2): `Lasm.JS.Class.define` (`import
+  Lasm.JS.Class`) makes a real `class Name extends Base` whose constructor,
+  methods and getters are Lean functions given `this`, for APIs that take a
+  class (`customElements.define`, `Error` subclasses). Migration: none.
