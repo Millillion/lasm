@@ -228,8 +228,8 @@ structure DurableObjectListOptions where
   «prefix» : Option String := none
   /-- `boolean reverse` -/
   reverse : Option Bool := none
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `boolean allowConcurrency` -/
   allowConcurrency : Option Bool := none
   /-- `boolean noCache` -/

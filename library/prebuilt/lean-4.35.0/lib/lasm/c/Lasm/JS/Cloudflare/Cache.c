@@ -39,13 +39,13 @@ lean_object* lean_array_push(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(lean_object*);
 lean_object* l_Lasm_JS_Web_Support_fields(lean_object*);
 lean_object* l_Lasm_JS_Web_Support_args(lean_object*);
-lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_instToJSBool___lam__0___boxed(lean_object*);
 lean_object* l_Lasm_JS_Web_Support_optional___redArg(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0(lean_object*, lean_object*, lean_object*);
-lean_object* l_Lasm_JS_global();
-uint64_t l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_dispatchEvent_spec__0_spec__0(uint8_t, uint64_t);
-lean_object* l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_dispatchEvent_spec__0_spec__1_spec__2(lean_object*, lean_object*);
+lean_object* l_Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Web_EventTarget_cast_x3f_spec__0(lean_object*);
+lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(lean_object*, lean_object*);
+uint64_t l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_Support_isInstance_spec__0_spec__0(uint8_t, uint64_t);
+lean_object* l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_Support_isInstance_spec__0_spec__1_spec__2(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(lean_object*, lean_object*, lean_object*);
 static const lean_string_object l_Lasm_JS_Cloudflare_instToJSCacheStorage___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 1, .m_capacity = 1, .m_length = 0, .m_data = ""};
 static const lean_object* l_Lasm_JS_Cloudflare_instToJSCacheStorage___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Cloudflare_instToJSCacheStorage___lam__0___closed__0_value;
@@ -203,14 +203,6 @@ static const lean_string_object l_Lasm_JS_Cloudflare_Cache_put___closed__0_value
 static const lean_object* l_Lasm_JS_Cloudflare_Cache_put___closed__0 = (const lean_object*)&l_Lasm_JS_Cloudflare_Cache_put___closed__0_value;
 LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Cache_put(lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Cache_put___boxed(lean_object*, lean_object*, lean_object*, lean_object*);
-static const lean_string_object l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 31, .m_capacity = 31, .m_length = 30, .m_data = "Lasm.JS.Web: empty global path"};
-static const lean_object* l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0___closed__0 = (const lean_object*)&l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0___closed__0_value;
-static const lean_ctor_object l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_ctor_object) + sizeof(void*)*1 + 0, .m_other = 1, .m_tag = 18}, .m_objs = {((lean_object*)&l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0___closed__0_value)}};
-static const lean_object* l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0___closed__1 = (const lean_object*)&l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0___closed__1_value;
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0(lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0___boxed(lean_object*, lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0(lean_object*);
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0___boxed(lean_object*, lean_object*);
 static const lean_string_object l_Lasm_JS_Cloudflare_caches___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 7, .m_capacity = 7, .m_length = 6, .m_data = "caches"};
 static const lean_object* l_Lasm_JS_Cloudflare_caches___closed__0 = (const lean_object*)&l_Lasm_JS_Cloudflare_caches___closed__0_value;
 static const lean_ctor_object l_Lasm_JS_Cloudflare_caches___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_ctor_object) + sizeof(void*)*2 + 0, .m_other = 2, .m_tag = 1}, .m_objs = {((lean_object*)&l_Lasm_JS_Cloudflare_caches___closed__0_value),((lean_object*)(((size_t)(0) << 1) | 1))}};
@@ -1626,7 +1618,7 @@ goto v_resetjp_455_;
 v_resetjp_455_:
 {
 lean_object* v___x_458_; 
-v___x_458_ = l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_dispatchEvent_spec__0_spec__1_spec__2(v_context_439_, v_a_454_);
+v___x_458_ = l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_Support_isInstance_spec__0_spec__1_spec__2(v_context_439_, v_a_454_);
 if (lean_obj_tag(v___x_458_) == 0)
 {
 lean_object* v_a_459_; lean_object* v___x_461_; 
@@ -1951,7 +1943,7 @@ _start:
 uint64_t v___x_548_; uint8_t v___x_549_; uint64_t v___x_550_; 
 v___x_548_ = 8ULL;
 v___x_549_ = 0;
-v___x_550_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_dispatchEvent_spec__0_spec__0(v___x_549_, v___x_548_);
+v___x_550_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_Support_isInstance_spec__0_spec__0(v___x_549_, v___x_548_);
 return v___x_550_;
 }
 }
@@ -3365,191 +3357,102 @@ v_res_1014_ = l_Lasm_JS_Cloudflare_Cache_put(v_self_1010_, v_request_1011_, v_re
 return v_res_1014_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0(lean_object* v_o_1018_, lean_object* v_a_1019_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_caches(){
 _start:
 {
-if (lean_obj_tag(v_a_1019_) == 0)
+lean_object* v___x_1020_; lean_object* v___x_1021_; 
+v___x_1020_ = ((lean_object*)(l_Lasm_JS_Cloudflare_caches___closed__1));
+v___x_1021_ = l_Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Web_EventTarget_cast_x3f_spec__0(v___x_1020_);
+if (lean_obj_tag(v___x_1021_) == 0)
 {
-lean_object* v___x_1021_; lean_object* v___x_1022_; 
-lean_dec(v_o_1018_);
-v___x_1021_ = ((lean_object*)(l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0___closed__1));
-v___x_1022_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v___x_1022_, 0, v___x_1021_);
-return v___x_1022_;
+lean_object* v_a_1022_; lean_object* v___x_1024_; uint8_t v_isShared_1025_; uint8_t v_isSharedCheck_1029_; 
+v_a_1022_ = lean_ctor_get(v___x_1021_, 0);
+v_isSharedCheck_1029_ = !lean_is_exclusive(v___x_1021_);
+if (v_isSharedCheck_1029_ == 0)
+{
+v___x_1024_ = v___x_1021_;
+v_isShared_1025_ = v_isSharedCheck_1029_;
+goto v_resetjp_1023_;
 }
 else
 {
-lean_object* v_tail_1023_; 
-v_tail_1023_ = lean_ctor_get(v_a_1019_, 1);
-if (lean_obj_tag(v_tail_1023_) == 0)
+lean_inc(v_a_1022_);
+lean_dec(v___x_1021_);
+v___x_1024_ = lean_box(0);
+v_isShared_1025_ = v_isSharedCheck_1029_;
+goto v_resetjp_1023_;
+}
+v_resetjp_1023_:
 {
-lean_object* v_head_1024_; lean_object* v___x_1025_; 
-v_head_1024_ = lean_ctor_get(v_a_1019_, 0);
-lean_inc(v_head_1024_);
-lean_dec_ref_known(v_a_1019_, 2);
-v___x_1025_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_o_1018_, v_head_1024_);
-return v___x_1025_;
+lean_object* v___x_1027_; 
+if (v_isShared_1025_ == 0)
+{
+v___x_1027_ = v___x_1024_;
+goto v_reusejp_1026_;
 }
 else
 {
-lean_object* v_head_1026_; lean_object* v___x_1027_; 
-lean_inc(v_tail_1023_);
-v_head_1026_ = lean_ctor_get(v_a_1019_, 0);
-lean_inc(v_head_1026_);
-lean_dec_ref_known(v_a_1019_, 2);
-v___x_1027_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_o_1018_, v_head_1026_);
-if (lean_obj_tag(v___x_1027_) == 0)
-{
-lean_object* v_a_1028_; 
-v_a_1028_ = lean_ctor_get(v___x_1027_, 0);
-lean_inc(v_a_1028_);
-lean_dec_ref_known(v___x_1027_, 1);
-v_o_1018_ = v_a_1028_;
-v_a_1019_ = v_tail_1023_;
-goto _start;
+lean_object* v_reuseFailAlloc_1028_; 
+v_reuseFailAlloc_1028_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1028_, 0, v_a_1022_);
+v___x_1027_ = v_reuseFailAlloc_1028_;
+goto v_reusejp_1026_;
 }
-else
+v_reusejp_1026_:
 {
-lean_dec(v_tail_1023_);
 return v___x_1027_;
 }
 }
 }
+else
+{
+lean_object* v_a_1030_; lean_object* v___x_1032_; uint8_t v_isShared_1033_; uint8_t v_isSharedCheck_1037_; 
+v_a_1030_ = lean_ctor_get(v___x_1021_, 0);
+v_isSharedCheck_1037_ = !lean_is_exclusive(v___x_1021_);
+if (v_isSharedCheck_1037_ == 0)
+{
+v___x_1032_ = v___x_1021_;
+v_isShared_1033_ = v_isSharedCheck_1037_;
+goto v_resetjp_1031_;
+}
+else
+{
+lean_inc(v_a_1030_);
+lean_dec(v___x_1021_);
+v___x_1032_ = lean_box(0);
+v_isShared_1033_ = v_isSharedCheck_1037_;
+goto v_resetjp_1031_;
+}
+v_resetjp_1031_:
+{
+lean_object* v___x_1035_; 
+if (v_isShared_1033_ == 0)
+{
+v___x_1035_ = v___x_1032_;
+goto v_reusejp_1034_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1036_; 
+v_reuseFailAlloc_1036_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1036_, 0, v_a_1030_);
+v___x_1035_ = v_reuseFailAlloc_1036_;
+goto v_reusejp_1034_;
+}
+v_reusejp_1034_:
+{
+return v___x_1035_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0___boxed(lean_object* v_o_1030_, lean_object* v_a_1031_, lean_object* v_a_1032_){
+}
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_caches___boxed(lean_object* v_a_1038_){
 _start:
 {
-lean_object* v_res_1033_; 
-v_res_1033_ = l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0(v_o_1030_, v_a_1031_);
-return v_res_1033_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0(lean_object* v_path_1034_){
-_start:
-{
-lean_object* v___x_1036_; 
-v___x_1036_ = l_Lasm_JS_global();
-if (lean_obj_tag(v___x_1036_) == 0)
-{
-lean_object* v_a_1037_; lean_object* v___x_1038_; 
-v_a_1037_ = lean_ctor_get(v___x_1036_, 0);
-lean_inc(v_a_1037_);
-lean_dec_ref_known(v___x_1036_, 1);
-v___x_1038_ = l_Lasm_JS_Web_Support_getGlobal_go___at___00Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0_spec__0(v_a_1037_, v_path_1034_);
-return v___x_1038_;
-}
-else
-{
-lean_dec(v_path_1034_);
-return v___x_1036_;
-}
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0___boxed(lean_object* v_path_1039_, lean_object* v_a_1040_){
-_start:
-{
-lean_object* v_res_1041_; 
-v_res_1041_ = l_Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0(v_path_1039_);
-return v_res_1041_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_caches(){
-_start:
-{
-lean_object* v___x_1047_; lean_object* v___x_1048_; 
-v___x_1047_ = ((lean_object*)(l_Lasm_JS_Cloudflare_caches___closed__1));
-v___x_1048_ = l_Lasm_JS_Web_Support_getGlobal___at___00Lasm_JS_Cloudflare_caches_spec__0(v___x_1047_);
-if (lean_obj_tag(v___x_1048_) == 0)
-{
-lean_object* v_a_1049_; lean_object* v___x_1051_; uint8_t v_isShared_1052_; uint8_t v_isSharedCheck_1056_; 
-v_a_1049_ = lean_ctor_get(v___x_1048_, 0);
-v_isSharedCheck_1056_ = !lean_is_exclusive(v___x_1048_);
-if (v_isSharedCheck_1056_ == 0)
-{
-v___x_1051_ = v___x_1048_;
-v_isShared_1052_ = v_isSharedCheck_1056_;
-goto v_resetjp_1050_;
-}
-else
-{
-lean_inc(v_a_1049_);
-lean_dec(v___x_1048_);
-v___x_1051_ = lean_box(0);
-v_isShared_1052_ = v_isSharedCheck_1056_;
-goto v_resetjp_1050_;
-}
-v_resetjp_1050_:
-{
-lean_object* v___x_1054_; 
-if (v_isShared_1052_ == 0)
-{
-v___x_1054_ = v___x_1051_;
-goto v_reusejp_1053_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1055_; 
-v_reuseFailAlloc_1055_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1055_, 0, v_a_1049_);
-v___x_1054_ = v_reuseFailAlloc_1055_;
-goto v_reusejp_1053_;
-}
-v_reusejp_1053_:
-{
-return v___x_1054_;
-}
-}
-}
-else
-{
-lean_object* v_a_1057_; lean_object* v___x_1059_; uint8_t v_isShared_1060_; uint8_t v_isSharedCheck_1064_; 
-v_a_1057_ = lean_ctor_get(v___x_1048_, 0);
-v_isSharedCheck_1064_ = !lean_is_exclusive(v___x_1048_);
-if (v_isSharedCheck_1064_ == 0)
-{
-v___x_1059_ = v___x_1048_;
-v_isShared_1060_ = v_isSharedCheck_1064_;
-goto v_resetjp_1058_;
-}
-else
-{
-lean_inc(v_a_1057_);
-lean_dec(v___x_1048_);
-v___x_1059_ = lean_box(0);
-v_isShared_1060_ = v_isSharedCheck_1064_;
-goto v_resetjp_1058_;
-}
-v_resetjp_1058_:
-{
-lean_object* v___x_1062_; 
-if (v_isShared_1060_ == 0)
-{
-v___x_1062_ = v___x_1059_;
-goto v_reusejp_1061_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1063_; 
-v_reuseFailAlloc_1063_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1063_, 0, v_a_1057_);
-v___x_1062_ = v_reuseFailAlloc_1063_;
-goto v_reusejp_1061_;
-}
-v_reusejp_1061_:
-{
-return v___x_1062_;
-}
-}
-}
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_caches___boxed(lean_object* v_a_1065_){
-_start:
-{
-lean_object* v_res_1066_; 
-v_res_1066_ = l_Lasm_JS_Cloudflare_caches();
-return v_res_1066_;
+lean_object* v_res_1039_; 
+v_res_1039_ = l_Lasm_JS_Cloudflare_caches();
+return v_res_1039_;
 }
 }
 lean_object* initialize_Init(uint8_t builtin);

@@ -68,7 +68,7 @@ lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optiona
 lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(lean_object*, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_Cache_delete_spec__1(lean_object*, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(lean_object*);
-lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(lean_object*);
+lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStreamBYOBReader_read_spec__0_spec__0(lean_object*);
 lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0(lean_object*, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_text_spec__0(lean_object*, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Function_ofFn(lean_object*);
@@ -84,8 +84,8 @@ lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Web_CustomEvent_detail_spec__0
 lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Request_json_spec__0(lean_object*, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_connect_spec__0(lean_object*);
 lean_object* l_Lasm_JS_instToJSString___lam__0(lean_object*);
-lean_object* l_Lasm_JS_instToJSFloat___lam__0___boxed(lean_object*);
-lean_object* l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_dispatchEvent_spec__0(lean_object*, lean_object*, lean_object*);
+lean_object* l_Lasm_JS_instToJSNat___lam__0(lean_object*);
+lean_object* l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_Support_isInstance_spec__0(lean_object*, lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Request_new_spec__0(lean_object*);
 static const lean_string_object l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 1, .m_capacity = 1, .m_length = 0, .m_data = ""};
 static const lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0 = (const lean_object*)&l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0_value;
@@ -569,7 +569,7 @@ static const lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions_
 LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0(lean_object*, lean_object*, lean_object*, lean_object*);
 static const lean_closure_object l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSString___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
 static const lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___closed__0 = (const lean_object*)&l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___closed__0_value;
-static const lean_closure_object l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSFloat___lam__0___boxed, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
+static const lean_closure_object l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSNat___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
 static const lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___closed__1 = (const lean_object*)&l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___closed__1_value;
 static const lean_closure_object l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___closed__2_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*3, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0, .m_arity = 4, .m_num_fixed = 3, .m_objs = {((lean_object*)&l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___closed__0_value),((lean_object*)&l_Lasm_JS_Cloudflare_instToJSDurableObjectAbortOptions___closed__0_value),((lean_object*)&l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___closed__1_value)} };
 static const lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___closed__2 = (const lean_object*)&l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___closed__2_value;
@@ -2990,13 +2990,13 @@ _start:
 {
 if (lean_obj_tag(v_x_906_) == 0)
 {
-lean_object* v_value_907_; lean_object* v___x_909_; uint8_t v_isShared_910_; uint8_t v_isSharedCheck_926_; 
+lean_object* v_value_907_; lean_object* v___x_909_; uint8_t v_isShared_910_; uint8_t v_isSharedCheck_940_; 
 v_value_907_ = lean_ctor_get(v_x_906_, 0);
-v_isSharedCheck_926_ = !lean_is_exclusive(v_x_906_);
-if (v_isSharedCheck_926_ == 0)
+v_isSharedCheck_940_ = !lean_is_exclusive(v_x_906_);
+if (v_isSharedCheck_940_ == 0)
 {
 v___x_909_ = v_x_906_;
-v_isShared_910_ = v_isSharedCheck_926_;
+v_isShared_910_ = v_isSharedCheck_940_;
 goto v_resetjp_908_;
 }
 else
@@ -3004,4670 +3004,4790 @@ else
 lean_inc(v_value_907_);
 lean_dec(v_x_906_);
 v___x_909_ = lean_box(0);
-v_isShared_910_ = v_isSharedCheck_926_;
+v_isShared_910_ = v_isSharedCheck_940_;
 goto v_resetjp_908_;
 }
 v_resetjp_908_:
 {
-lean_object* v_hostname_911_; double v_port_912_; lean_object* v___x_913_; lean_object* v___x_915_; 
+lean_object* v_hostname_911_; lean_object* v_port_912_; lean_object* v___x_914_; uint8_t v_isShared_915_; uint8_t v_isSharedCheck_939_; 
 v_hostname_911_ = lean_ctor_get(v_value_907_, 0);
-lean_inc_ref(v_hostname_911_);
-v_port_912_ = lean_ctor_get_float(v_value_907_, sizeof(void*)*1);
-lean_dec_ref(v_value_907_);
-v___x_913_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSSocketAddressOrDOMString___lam__0___closed__0));
+v_port_912_ = lean_ctor_get(v_value_907_, 1);
+v_isSharedCheck_939_ = !lean_is_exclusive(v_value_907_);
+if (v_isSharedCheck_939_ == 0)
+{
+v___x_914_ = v_value_907_;
+v_isShared_915_ = v_isSharedCheck_939_;
+goto v_resetjp_913_;
+}
+else
+{
+lean_inc(v_port_912_);
+lean_inc(v_hostname_911_);
+lean_dec(v_value_907_);
+v___x_914_ = lean_box(0);
+v_isShared_915_ = v_isSharedCheck_939_;
+goto v_resetjp_913_;
+}
+v_resetjp_913_:
+{
+lean_object* v___x_916_; lean_object* v___x_918_; 
+v___x_916_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSSocketAddressOrDOMString___lam__0___closed__0));
 if (v_isShared_910_ == 0)
 {
 lean_ctor_set_tag(v___x_909_, 4);
 lean_ctor_set(v___x_909_, 0, v_hostname_911_);
-v___x_915_ = v___x_909_;
-goto v_reusejp_914_;
+v___x_918_ = v___x_909_;
+goto v_reusejp_917_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_925_; 
-v_reuseFailAlloc_925_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_925_, 0, v_hostname_911_);
-v___x_915_ = v_reuseFailAlloc_925_;
-goto v_reusejp_914_;
+lean_object* v_reuseFailAlloc_938_; 
+v_reuseFailAlloc_938_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_938_, 0, v_hostname_911_);
+v___x_918_ = v_reuseFailAlloc_938_;
+goto v_reusejp_917_;
 }
-v_reusejp_914_:
+v_reusejp_917_:
 {
-lean_object* v___x_916_; lean_object* v___x_917_; lean_object* v___x_918_; lean_object* v___x_919_; lean_object* v___x_920_; lean_object* v___x_921_; lean_object* v___x_922_; lean_object* v___x_923_; lean_object* v___x_924_; 
-v___x_916_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_916_, 0, v___x_913_);
-lean_ctor_set(v___x_916_, 1, v___x_915_);
-v___x_917_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSSocketAddressOrDOMString___lam__0___closed__1));
-v___x_918_ = lean_alloc_ctor(3, 0, 8);
-lean_ctor_set_float(v___x_918_, 0, v_port_912_);
-v___x_919_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_919_, 0, v___x_917_);
-lean_ctor_set(v___x_919_, 1, v___x_918_);
-v___x_920_ = lean_unsigned_to_nat(2u);
-v___x_921_ = lean_mk_empty_array_with_capacity(v___x_920_);
-v___x_922_ = lean_array_push(v___x_921_, v___x_916_);
-v___x_923_ = lean_array_push(v___x_922_, v___x_919_);
-v___x_924_ = l_Lasm_JS_Web_Support_fields(v___x_923_);
-lean_dec_ref(v___x_923_);
-return v___x_924_;
+lean_object* v___x_920_; 
+if (v_isShared_915_ == 0)
+{
+lean_ctor_set(v___x_914_, 1, v___x_918_);
+lean_ctor_set(v___x_914_, 0, v___x_916_);
+v___x_920_ = v___x_914_;
+goto v_reusejp_919_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_937_; 
+v_reuseFailAlloc_937_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v_reuseFailAlloc_937_, 0, v___x_916_);
+lean_ctor_set(v_reuseFailAlloc_937_, 1, v___x_918_);
+v___x_920_ = v_reuseFailAlloc_937_;
+goto v_reusejp_919_;
+}
+v_reusejp_919_:
+{
+lean_object* v___x_921_; lean_object* v___y_923_; lean_object* v___x_930_; lean_object* v___x_931_; lean_object* v___x_932_; uint8_t v___x_933_; 
+v___x_921_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSSocketAddressOrDOMString___lam__0___closed__1));
+v___x_930_ = lean_nat_to_int(v_port_912_);
+v___x_931_ = lean_nat_abs(v___x_930_);
+v___x_932_ = lean_cstr_to_nat("9007199254740991");
+v___x_933_ = lean_nat_dec_le(v___x_931_, v___x_932_);
+lean_dec(v___x_931_);
+if (v___x_933_ == 0)
+{
+lean_object* v___x_934_; 
+v___x_934_ = lean_alloc_ctor(5, 1, 0);
+lean_ctor_set(v___x_934_, 0, v___x_930_);
+v___y_923_ = v___x_934_;
+goto v___jp_922_;
+}
+else
+{
+double v___x_935_; lean_object* v___x_936_; 
+v___x_935_ = l_Float_ofInt(v___x_930_);
+lean_dec(v___x_930_);
+v___x_936_ = lean_alloc_ctor(3, 0, 8);
+lean_ctor_set_float(v___x_936_, 0, v___x_935_);
+v___y_923_ = v___x_936_;
+goto v___jp_922_;
+}
+v___jp_922_:
+{
+lean_object* v___x_924_; lean_object* v___x_925_; lean_object* v___x_926_; lean_object* v___x_927_; lean_object* v___x_928_; lean_object* v___x_929_; 
+v___x_924_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_924_, 0, v___x_921_);
+lean_ctor_set(v___x_924_, 1, v___y_923_);
+v___x_925_ = lean_unsigned_to_nat(2u);
+v___x_926_ = lean_mk_empty_array_with_capacity(v___x_925_);
+v___x_927_ = lean_array_push(v___x_926_, v___x_920_);
+v___x_928_ = lean_array_push(v___x_927_, v___x_924_);
+v___x_929_ = l_Lasm_JS_Web_Support_fields(v___x_928_);
+lean_dec_ref(v___x_928_);
+return v___x_929_;
+}
+}
+}
 }
 }
 }
 else
 {
-lean_object* v_value_927_; lean_object* v___x_929_; uint8_t v_isShared_930_; uint8_t v_isSharedCheck_934_; 
-v_value_927_ = lean_ctor_get(v_x_906_, 0);
-v_isSharedCheck_934_ = !lean_is_exclusive(v_x_906_);
-if (v_isSharedCheck_934_ == 0)
+lean_object* v_value_941_; lean_object* v___x_943_; uint8_t v_isShared_944_; uint8_t v_isSharedCheck_948_; 
+v_value_941_ = lean_ctor_get(v_x_906_, 0);
+v_isSharedCheck_948_ = !lean_is_exclusive(v_x_906_);
+if (v_isSharedCheck_948_ == 0)
 {
-v___x_929_ = v_x_906_;
-v_isShared_930_ = v_isSharedCheck_934_;
-goto v_resetjp_928_;
+v___x_943_ = v_x_906_;
+v_isShared_944_ = v_isSharedCheck_948_;
+goto v_resetjp_942_;
 }
 else
 {
-lean_inc(v_value_927_);
+lean_inc(v_value_941_);
 lean_dec(v_x_906_);
-v___x_929_ = lean_box(0);
-v_isShared_930_ = v_isSharedCheck_934_;
-goto v_resetjp_928_;
+v___x_943_ = lean_box(0);
+v_isShared_944_ = v_isSharedCheck_948_;
+goto v_resetjp_942_;
 }
-v_resetjp_928_:
+v_resetjp_942_:
 {
-lean_object* v___x_932_; 
-if (v_isShared_930_ == 0)
+lean_object* v___x_946_; 
+if (v_isShared_944_ == 0)
 {
-lean_ctor_set_tag(v___x_929_, 4);
-v___x_932_ = v___x_929_;
-goto v_reusejp_931_;
+lean_ctor_set_tag(v___x_943_, 4);
+v___x_946_ = v___x_943_;
+goto v_reusejp_945_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_933_; 
-v_reuseFailAlloc_933_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_933_, 0, v_value_927_);
-v___x_932_ = v_reuseFailAlloc_933_;
-goto v_reusejp_931_;
+lean_object* v_reuseFailAlloc_947_; 
+v_reuseFailAlloc_947_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_947_, 0, v_value_941_);
+v___x_946_ = v_reuseFailAlloc_947_;
+goto v_reusejp_945_;
 }
-v_reusejp_931_:
+v_reusejp_945_:
 {
-return v___x_932_;
+return v___x_946_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instCoeSocketAddressSocketAddressOrDOMString___lam__0(lean_object* v_value_937_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instCoeSocketAddressSocketAddressOrDOMString___lam__0(lean_object* v_value_951_){
 _start:
 {
-lean_object* v___x_938_; 
-v___x_938_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_938_, 0, v_value_937_);
-return v___x_938_;
+lean_object* v___x_952_; 
+v___x_952_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_952_, 0, v_value_951_);
+return v___x_952_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instCoeStringSocketAddressOrDOMString___lam__0(lean_object* v_value_941_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instCoeStringSocketAddressOrDOMString___lam__0(lean_object* v_value_955_){
 _start:
 {
-lean_object* v___x_942_; 
-v___x_942_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v___x_942_, 0, v_value_941_);
-return v___x_942_;
+lean_object* v___x_956_; 
+v___x_956_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v___x_956_, 0, v_value_955_);
+return v___x_956_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__0(lean_object* v_x_952_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__0(lean_object* v_x_966_){
 _start:
 {
-lean_object* v___x_954_; 
-v___x_954_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_954_, 0, v_x_952_);
-return v___x_954_;
+lean_object* v___x_968_; 
+v___x_968_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_968_, 0, v_x_966_);
+return v___x_968_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__0___boxed(lean_object* v_x_955_, lean_object* v___y_956_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__0___boxed(lean_object* v_x_969_, lean_object* v___y_970_){
 _start:
 {
-lean_object* v_res_957_; 
-v_res_957_ = l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__0(v_x_955_);
-return v_res_957_;
+lean_object* v_res_971_; 
+v_res_971_ = l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__0(v_x_969_);
+return v_res_971_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__1(lean_object* v_f_958_, lean_object* v___f_959_, lean_object* v_x_960_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__1(lean_object* v_f_972_, lean_object* v___f_973_, lean_object* v_x_974_){
 _start:
 {
-lean_object* v___x_962_; uint8_t v___x_963_; lean_object* v___x_964_; lean_object* v___x_965_; 
-v___x_962_ = lean_unsigned_to_nat(0u);
-v___x_963_ = 0;
-v___x_964_ = lean_apply_1(v_f_958_, lean_box(0));
-v___x_965_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_962_, v___x_963_, v___x_964_, v___f_959_);
-return v___x_965_;
+lean_object* v___x_976_; uint8_t v___x_977_; lean_object* v___x_978_; lean_object* v___x_979_; 
+v___x_976_ = lean_unsigned_to_nat(0u);
+v___x_977_ = 0;
+v___x_978_ = lean_apply_1(v_f_972_, lean_box(0));
+v___x_979_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_976_, v___x_977_, v___x_978_, v___f_973_);
+return v___x_979_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__1___boxed(lean_object* v_f_966_, lean_object* v___f_967_, lean_object* v_x_968_, lean_object* v___y_969_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__1___boxed(lean_object* v_f_980_, lean_object* v___f_981_, lean_object* v_x_982_, lean_object* v___y_983_){
 _start:
 {
-lean_object* v_res_970_; 
-v_res_970_ = l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__1(v_f_966_, v___f_967_, v_x_968_);
-lean_dec_ref(v_x_968_);
-return v_res_970_;
+lean_object* v_res_984_; 
+v_res_984_ = l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__1(v_f_980_, v___f_981_, v_x_982_);
+lean_dec_ref(v_x_982_);
+return v_res_984_;
 }
 }
 static lean_object* _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6(void){
 _start:
 {
-lean_object* v___x_978_; lean_object* v___x_979_; 
-v___x_978_ = lean_unsigned_to_nat(0u);
-v___x_979_ = lean_nat_to_int(v___x_978_);
-return v___x_979_;
+lean_object* v___x_992_; lean_object* v___x_993_; 
+v___x_992_ = lean_unsigned_to_nat(0u);
+v___x_993_ = lean_nat_to_int(v___x_992_);
+return v___x_993_;
 }
 }
 static lean_object* _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__7(void){
 _start:
 {
-lean_object* v___x_980_; lean_object* v___x_981_; 
-v___x_980_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6);
-v___x_981_ = lean_nat_abs(v___x_980_);
-return v___x_981_;
+lean_object* v___x_994_; lean_object* v___x_995_; 
+v___x_994_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6);
+v___x_995_ = lean_nat_abs(v___x_994_);
+return v___x_995_;
 }
 }
 static uint8_t _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8(void){
 _start:
 {
-lean_object* v___x_982_; lean_object* v___x_983_; uint8_t v___x_984_; 
-v___x_982_ = lean_cstr_to_nat("9007199254740991");
-v___x_983_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__7, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__7_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__7);
-v___x_984_ = lean_nat_dec_le(v___x_983_, v___x_982_);
-return v___x_984_;
+lean_object* v___x_996_; lean_object* v___x_997_; uint8_t v___x_998_; 
+v___x_996_ = lean_cstr_to_nat("9007199254740991");
+v___x_997_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__7, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__7_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__7);
+v___x_998_ = lean_nat_dec_le(v___x_997_, v___x_996_);
+return v___x_998_;
 }
 }
 static lean_object* _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9(void){
 _start:
 {
-lean_object* v___x_985_; lean_object* v___x_986_; 
-v___x_985_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6);
-v___x_986_ = lean_alloc_ctor(5, 1, 0);
-lean_ctor_set(v___x_986_, 0, v___x_985_);
-return v___x_986_;
+lean_object* v___x_999_; lean_object* v___x_1000_; 
+v___x_999_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6);
+v___x_1000_ = lean_alloc_ctor(5, 1, 0);
+lean_ctor_set(v___x_1000_, 0, v___x_999_);
+return v___x_1000_;
 }
 }
 static double _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__10(void){
 _start:
 {
-lean_object* v___x_987_; double v___x_988_; 
-v___x_987_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6);
-v___x_988_ = l_Float_ofInt(v___x_987_);
-return v___x_988_;
+lean_object* v___x_1001_; double v___x_1002_; 
+v___x_1001_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__6);
+v___x_1002_ = l_Float_ofInt(v___x_1001_);
+return v___x_1002_;
 }
 }
 static lean_object* _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11(void){
 _start:
 {
-double v___x_989_; lean_object* v___x_990_; 
-v___x_989_ = lean_float_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__10, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__10_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__10);
-v___x_990_ = lean_alloc_ctor(3, 0, 8);
-lean_ctor_set_float(v___x_990_, 0, v___x_989_);
-return v___x_990_;
+double v___x_1003_; lean_object* v___x_1004_; 
+v___x_1003_ = lean_float_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__10, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__10_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__10);
+v___x_1004_ = lean_alloc_ctor(3, 0, 8);
+lean_ctor_set_float(v___x_1004_, 0, v___x_1003_);
+return v___x_1004_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn(lean_object* v_f_991_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn(lean_object* v_f_1005_){
 _start:
 {
-lean_object* v___f_993_; lean_object* v___f_994_; lean_object* v___x_995_; 
-v___f_993_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__0));
-v___f_994_ = lean_alloc_closure((void*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__1___boxed), 4, 2);
-lean_closure_set(v___f_994_, 0, v_f_991_);
-lean_closure_set(v___f_994_, 1, v___f_993_);
-v___x_995_ = l_Lasm_JS_Function_ofFn(v___f_994_);
-if (lean_obj_tag(v___x_995_) == 0)
+lean_object* v___f_1007_; lean_object* v___f_1008_; lean_object* v___x_1009_; 
+v___f_1007_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__0));
+v___f_1008_ = lean_alloc_closure((void*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___lam__1___boxed), 4, 2);
+lean_closure_set(v___f_1008_, 0, v_f_1005_);
+lean_closure_set(v___f_1008_, 1, v___f_1007_);
+v___x_1009_ = l_Lasm_JS_Function_ofFn(v___f_1008_);
+if (lean_obj_tag(v___x_1009_) == 0)
 {
-lean_object* v_a_996_; lean_object* v___x_997_; 
-v_a_996_ = lean_ctor_get(v___x_995_, 0);
-lean_inc(v_a_996_);
-lean_dec_ref_known(v___x_995_, 1);
-v___x_997_ = l_Lasm_JS_global();
-if (lean_obj_tag(v___x_997_) == 0)
+lean_object* v_a_1010_; lean_object* v___x_1011_; 
+v_a_1010_ = lean_ctor_get(v___x_1009_, 0);
+lean_inc(v_a_1010_);
+lean_dec_ref_known(v___x_1009_, 1);
+v___x_1011_ = l_Lasm_JS_global();
+if (lean_obj_tag(v___x_1011_) == 0)
 {
-lean_object* v_a_998_; lean_object* v___x_999_; lean_object* v___x_1000_; 
-v_a_998_ = lean_ctor_get(v___x_997_, 0);
-lean_inc(v_a_998_);
-lean_dec_ref_known(v___x_997_, 1);
-v___x_999_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__1));
-v___x_1000_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_a_998_, v___x_999_);
-if (lean_obj_tag(v___x_1000_) == 0)
+lean_object* v_a_1012_; lean_object* v___x_1013_; lean_object* v___x_1014_; 
+v_a_1012_ = lean_ctor_get(v___x_1011_, 0);
+lean_inc(v_a_1012_);
+lean_dec_ref_known(v___x_1011_, 1);
+v___x_1013_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__1));
+v___x_1014_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_a_1012_, v___x_1013_);
+if (lean_obj_tag(v___x_1014_) == 0)
 {
-lean_object* v_a_1001_; lean_object* v___x_1002_; lean_object* v___x_1003_; lean_object* v___x_1004_; lean_object* v___x_1005_; lean_object* v___x_1006_; lean_object* v___y_1008_; uint8_t v___x_1035_; 
-v_a_1001_ = lean_ctor_get(v___x_1000_, 0);
-lean_inc(v_a_1001_);
-lean_dec_ref_known(v___x_1000_, 1);
-v___x_1002_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__2));
-v___x_1003_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-lean_inc(v_a_996_);
-v___x_1004_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_1004_, 0, v_a_996_);
-lean_ctor_set(v___x_1004_, 1, v___x_1003_);
-v___x_1005_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__4));
-v___x_1006_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__5));
-v___x_1035_ = lean_uint8_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8);
-if (v___x_1035_ == 0)
+lean_object* v_a_1015_; lean_object* v___x_1016_; lean_object* v___x_1017_; lean_object* v___x_1018_; lean_object* v___x_1019_; lean_object* v___x_1020_; lean_object* v___y_1022_; uint8_t v___x_1049_; 
+v_a_1015_ = lean_ctor_get(v___x_1014_, 0);
+lean_inc(v_a_1015_);
+lean_dec_ref_known(v___x_1014_, 1);
+v___x_1016_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__2));
+v___x_1017_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+lean_inc(v_a_1010_);
+v___x_1018_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_1018_, 0, v_a_1010_);
+lean_ctor_set(v___x_1018_, 1, v___x_1017_);
+v___x_1019_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__4));
+v___x_1020_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__5));
+v___x_1049_ = lean_uint8_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8);
+if (v___x_1049_ == 0)
 {
-lean_object* v___x_1036_; 
-v___x_1036_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9);
-v___y_1008_ = v___x_1036_;
-goto v___jp_1007_;
+lean_object* v___x_1050_; 
+v___x_1050_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9);
+v___y_1022_ = v___x_1050_;
+goto v___jp_1021_;
 }
 else
-{
-lean_object* v___x_1037_; 
-v___x_1037_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11);
-v___y_1008_ = v___x_1037_;
-goto v___jp_1007_;
-}
-v___jp_1007_:
-{
-lean_object* v___x_1009_; lean_object* v___x_1010_; lean_object* v___x_1011_; lean_object* v___x_1012_; lean_object* v___x_1013_; lean_object* v___x_1014_; lean_object* v___x_1015_; lean_object* v___x_1016_; lean_object* v___x_1017_; lean_object* v___x_1018_; 
-lean_inc(v___y_1008_);
-v___x_1009_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1009_, 0, v___x_1006_);
-lean_ctor_set(v___x_1009_, 1, v___y_1008_);
-v___x_1010_ = lean_box(0);
-v___x_1011_ = lean_alloc_ctor(1, 2, 0);
-lean_ctor_set(v___x_1011_, 0, v___x_1009_);
-lean_ctor_set(v___x_1011_, 1, v___x_1010_);
-v___x_1012_ = l_Lasm_JS_obj(v___x_1011_);
-v___x_1013_ = lean_unsigned_to_nat(3u);
-v___x_1014_ = lean_mk_empty_array_with_capacity(v___x_1013_);
-v___x_1015_ = lean_array_push(v___x_1014_, v___x_1004_);
-v___x_1016_ = lean_array_push(v___x_1015_, v___x_1005_);
-v___x_1017_ = lean_array_push(v___x_1016_, v___x_1012_);
-v___x_1018_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_a_1001_, v___x_1002_, v___x_1017_);
-if (lean_obj_tag(v___x_1018_) == 0)
-{
-lean_object* v___x_1020_; uint8_t v_isShared_1021_; uint8_t v_isSharedCheck_1025_; 
-v_isSharedCheck_1025_ = !lean_is_exclusive(v___x_1018_);
-if (v_isSharedCheck_1025_ == 0)
-{
-lean_object* v_unused_1026_; 
-v_unused_1026_ = lean_ctor_get(v___x_1018_, 0);
-lean_dec(v_unused_1026_);
-v___x_1020_ = v___x_1018_;
-v_isShared_1021_ = v_isSharedCheck_1025_;
-goto v_resetjp_1019_;
-}
-else
-{
-lean_dec(v___x_1018_);
-v___x_1020_ = lean_box(0);
-v_isShared_1021_ = v_isSharedCheck_1025_;
-goto v_resetjp_1019_;
-}
-v_resetjp_1019_:
-{
-lean_object* v___x_1023_; 
-if (v_isShared_1021_ == 0)
-{
-lean_ctor_set(v___x_1020_, 0, v_a_996_);
-v___x_1023_ = v___x_1020_;
-goto v_reusejp_1022_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1024_; 
-v_reuseFailAlloc_1024_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1024_, 0, v_a_996_);
-v___x_1023_ = v_reuseFailAlloc_1024_;
-goto v_reusejp_1022_;
-}
-v_reusejp_1022_:
-{
-return v___x_1023_;
-}
-}
-}
-else
-{
-lean_object* v_a_1027_; lean_object* v___x_1029_; uint8_t v_isShared_1030_; uint8_t v_isSharedCheck_1034_; 
-lean_dec(v_a_996_);
-v_a_1027_ = lean_ctor_get(v___x_1018_, 0);
-v_isSharedCheck_1034_ = !lean_is_exclusive(v___x_1018_);
-if (v_isSharedCheck_1034_ == 0)
-{
-v___x_1029_ = v___x_1018_;
-v_isShared_1030_ = v_isSharedCheck_1034_;
-goto v_resetjp_1028_;
-}
-else
-{
-lean_inc(v_a_1027_);
-lean_dec(v___x_1018_);
-v___x_1029_ = lean_box(0);
-v_isShared_1030_ = v_isSharedCheck_1034_;
-goto v_resetjp_1028_;
-}
-v_resetjp_1028_:
-{
-lean_object* v___x_1032_; 
-if (v_isShared_1030_ == 0)
-{
-v___x_1032_ = v___x_1029_;
-goto v_reusejp_1031_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1033_; 
-v_reuseFailAlloc_1033_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1033_, 0, v_a_1027_);
-v___x_1032_ = v_reuseFailAlloc_1033_;
-goto v_reusejp_1031_;
-}
-v_reusejp_1031_:
-{
-return v___x_1032_;
-}
-}
-}
-}
-}
-else
-{
-lean_object* v_a_1038_; lean_object* v___x_1040_; uint8_t v_isShared_1041_; uint8_t v_isSharedCheck_1045_; 
-lean_dec(v_a_996_);
-v_a_1038_ = lean_ctor_get(v___x_1000_, 0);
-v_isSharedCheck_1045_ = !lean_is_exclusive(v___x_1000_);
-if (v_isSharedCheck_1045_ == 0)
-{
-v___x_1040_ = v___x_1000_;
-v_isShared_1041_ = v_isSharedCheck_1045_;
-goto v_resetjp_1039_;
-}
-else
-{
-lean_inc(v_a_1038_);
-lean_dec(v___x_1000_);
-v___x_1040_ = lean_box(0);
-v_isShared_1041_ = v_isSharedCheck_1045_;
-goto v_resetjp_1039_;
-}
-v_resetjp_1039_:
-{
-lean_object* v___x_1043_; 
-if (v_isShared_1041_ == 0)
-{
-v___x_1043_ = v___x_1040_;
-goto v_reusejp_1042_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1044_; 
-v_reuseFailAlloc_1044_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1044_, 0, v_a_1038_);
-v___x_1043_ = v_reuseFailAlloc_1044_;
-goto v_reusejp_1042_;
-}
-v_reusejp_1042_:
-{
-return v___x_1043_;
-}
-}
-}
-}
-else
-{
-lean_object* v_a_1046_; lean_object* v___x_1048_; uint8_t v_isShared_1049_; uint8_t v_isSharedCheck_1053_; 
-lean_dec(v_a_996_);
-v_a_1046_ = lean_ctor_get(v___x_997_, 0);
-v_isSharedCheck_1053_ = !lean_is_exclusive(v___x_997_);
-if (v_isSharedCheck_1053_ == 0)
-{
-v___x_1048_ = v___x_997_;
-v_isShared_1049_ = v_isSharedCheck_1053_;
-goto v_resetjp_1047_;
-}
-else
-{
-lean_inc(v_a_1046_);
-lean_dec(v___x_997_);
-v___x_1048_ = lean_box(0);
-v_isShared_1049_ = v_isSharedCheck_1053_;
-goto v_resetjp_1047_;
-}
-v_resetjp_1047_:
 {
 lean_object* v___x_1051_; 
-if (v_isShared_1049_ == 0)
+v___x_1051_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11);
+v___y_1022_ = v___x_1051_;
+goto v___jp_1021_;
+}
+v___jp_1021_:
 {
-v___x_1051_ = v___x_1048_;
-goto v_reusejp_1050_;
+lean_object* v___x_1023_; lean_object* v___x_1024_; lean_object* v___x_1025_; lean_object* v___x_1026_; lean_object* v___x_1027_; lean_object* v___x_1028_; lean_object* v___x_1029_; lean_object* v___x_1030_; lean_object* v___x_1031_; lean_object* v___x_1032_; 
+lean_inc(v___y_1022_);
+v___x_1023_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1023_, 0, v___x_1020_);
+lean_ctor_set(v___x_1023_, 1, v___y_1022_);
+v___x_1024_ = lean_box(0);
+v___x_1025_ = lean_alloc_ctor(1, 2, 0);
+lean_ctor_set(v___x_1025_, 0, v___x_1023_);
+lean_ctor_set(v___x_1025_, 1, v___x_1024_);
+v___x_1026_ = l_Lasm_JS_obj(v___x_1025_);
+v___x_1027_ = lean_unsigned_to_nat(3u);
+v___x_1028_ = lean_mk_empty_array_with_capacity(v___x_1027_);
+v___x_1029_ = lean_array_push(v___x_1028_, v___x_1018_);
+v___x_1030_ = lean_array_push(v___x_1029_, v___x_1019_);
+v___x_1031_ = lean_array_push(v___x_1030_, v___x_1026_);
+v___x_1032_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_a_1015_, v___x_1016_, v___x_1031_);
+if (lean_obj_tag(v___x_1032_) == 0)
+{
+lean_object* v___x_1034_; uint8_t v_isShared_1035_; uint8_t v_isSharedCheck_1039_; 
+v_isSharedCheck_1039_ = !lean_is_exclusive(v___x_1032_);
+if (v_isSharedCheck_1039_ == 0)
+{
+lean_object* v_unused_1040_; 
+v_unused_1040_ = lean_ctor_get(v___x_1032_, 0);
+lean_dec(v_unused_1040_);
+v___x_1034_ = v___x_1032_;
+v_isShared_1035_ = v_isSharedCheck_1039_;
+goto v_resetjp_1033_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1052_; 
-v_reuseFailAlloc_1052_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1052_, 0, v_a_1046_);
-v___x_1051_ = v_reuseFailAlloc_1052_;
-goto v_reusejp_1050_;
+lean_dec(v___x_1032_);
+v___x_1034_ = lean_box(0);
+v_isShared_1035_ = v_isSharedCheck_1039_;
+goto v_resetjp_1033_;
 }
-v_reusejp_1050_:
+v_resetjp_1033_:
 {
-return v___x_1051_;
+lean_object* v___x_1037_; 
+if (v_isShared_1035_ == 0)
+{
+lean_ctor_set(v___x_1034_, 0, v_a_1010_);
+v___x_1037_ = v___x_1034_;
+goto v_reusejp_1036_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1038_; 
+v_reuseFailAlloc_1038_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1038_, 0, v_a_1010_);
+v___x_1037_ = v_reuseFailAlloc_1038_;
+goto v_reusejp_1036_;
+}
+v_reusejp_1036_:
+{
+return v___x_1037_;
+}
+}
+}
+else
+{
+lean_object* v_a_1041_; lean_object* v___x_1043_; uint8_t v_isShared_1044_; uint8_t v_isSharedCheck_1048_; 
+lean_dec(v_a_1010_);
+v_a_1041_ = lean_ctor_get(v___x_1032_, 0);
+v_isSharedCheck_1048_ = !lean_is_exclusive(v___x_1032_);
+if (v_isSharedCheck_1048_ == 0)
+{
+v___x_1043_ = v___x_1032_;
+v_isShared_1044_ = v_isSharedCheck_1048_;
+goto v_resetjp_1042_;
+}
+else
+{
+lean_inc(v_a_1041_);
+lean_dec(v___x_1032_);
+v___x_1043_ = lean_box(0);
+v_isShared_1044_ = v_isSharedCheck_1048_;
+goto v_resetjp_1042_;
+}
+v_resetjp_1042_:
+{
+lean_object* v___x_1046_; 
+if (v_isShared_1044_ == 0)
+{
+v___x_1046_ = v___x_1043_;
+goto v_reusejp_1045_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1047_; 
+v_reuseFailAlloc_1047_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1047_, 0, v_a_1041_);
+v___x_1046_ = v_reuseFailAlloc_1047_;
+goto v_reusejp_1045_;
+}
+v_reusejp_1045_:
+{
+return v___x_1046_;
+}
 }
 }
 }
 }
 else
 {
-lean_object* v_a_1054_; lean_object* v___x_1056_; uint8_t v_isShared_1057_; uint8_t v_isSharedCheck_1061_; 
-v_a_1054_ = lean_ctor_get(v___x_995_, 0);
-v_isSharedCheck_1061_ = !lean_is_exclusive(v___x_995_);
-if (v_isSharedCheck_1061_ == 0)
+lean_object* v_a_1052_; lean_object* v___x_1054_; uint8_t v_isShared_1055_; uint8_t v_isSharedCheck_1059_; 
+lean_dec(v_a_1010_);
+v_a_1052_ = lean_ctor_get(v___x_1014_, 0);
+v_isSharedCheck_1059_ = !lean_is_exclusive(v___x_1014_);
+if (v_isSharedCheck_1059_ == 0)
 {
-v___x_1056_ = v___x_995_;
-v_isShared_1057_ = v_isSharedCheck_1061_;
-goto v_resetjp_1055_;
+v___x_1054_ = v___x_1014_;
+v_isShared_1055_ = v_isSharedCheck_1059_;
+goto v_resetjp_1053_;
 }
 else
 {
-lean_inc(v_a_1054_);
-lean_dec(v___x_995_);
-v___x_1056_ = lean_box(0);
-v_isShared_1057_ = v_isSharedCheck_1061_;
-goto v_resetjp_1055_;
+lean_inc(v_a_1052_);
+lean_dec(v___x_1014_);
+v___x_1054_ = lean_box(0);
+v_isShared_1055_ = v_isSharedCheck_1059_;
+goto v_resetjp_1053_;
 }
-v_resetjp_1055_:
+v_resetjp_1053_:
 {
-lean_object* v___x_1059_; 
-if (v_isShared_1057_ == 0)
+lean_object* v___x_1057_; 
+if (v_isShared_1055_ == 0)
 {
-v___x_1059_ = v___x_1056_;
-goto v_reusejp_1058_;
+v___x_1057_ = v___x_1054_;
+goto v_reusejp_1056_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1060_; 
-v_reuseFailAlloc_1060_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1060_, 0, v_a_1054_);
-v___x_1059_ = v_reuseFailAlloc_1060_;
-goto v_reusejp_1058_;
+lean_object* v_reuseFailAlloc_1058_; 
+v_reuseFailAlloc_1058_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1058_, 0, v_a_1052_);
+v___x_1057_ = v_reuseFailAlloc_1058_;
+goto v_reusejp_1056_;
 }
-v_reusejp_1058_:
+v_reusejp_1056_:
 {
-return v___x_1059_;
+return v___x_1057_;
+}
+}
+}
+}
+else
+{
+lean_object* v_a_1060_; lean_object* v___x_1062_; uint8_t v_isShared_1063_; uint8_t v_isSharedCheck_1067_; 
+lean_dec(v_a_1010_);
+v_a_1060_ = lean_ctor_get(v___x_1011_, 0);
+v_isSharedCheck_1067_ = !lean_is_exclusive(v___x_1011_);
+if (v_isSharedCheck_1067_ == 0)
+{
+v___x_1062_ = v___x_1011_;
+v_isShared_1063_ = v_isSharedCheck_1067_;
+goto v_resetjp_1061_;
+}
+else
+{
+lean_inc(v_a_1060_);
+lean_dec(v___x_1011_);
+v___x_1062_ = lean_box(0);
+v_isShared_1063_ = v_isSharedCheck_1067_;
+goto v_resetjp_1061_;
+}
+v_resetjp_1061_:
+{
+lean_object* v___x_1065_; 
+if (v_isShared_1063_ == 0)
+{
+v___x_1065_ = v___x_1062_;
+goto v_reusejp_1064_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1066_; 
+v_reuseFailAlloc_1066_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1066_, 0, v_a_1060_);
+v___x_1065_ = v_reuseFailAlloc_1066_;
+goto v_reusejp_1064_;
+}
+v_reusejp_1064_:
+{
+return v___x_1065_;
+}
+}
+}
+}
+else
+{
+lean_object* v_a_1068_; lean_object* v___x_1070_; uint8_t v_isShared_1071_; uint8_t v_isSharedCheck_1075_; 
+v_a_1068_ = lean_ctor_get(v___x_1009_, 0);
+v_isSharedCheck_1075_ = !lean_is_exclusive(v___x_1009_);
+if (v_isSharedCheck_1075_ == 0)
+{
+v___x_1070_ = v___x_1009_;
+v_isShared_1071_ = v_isSharedCheck_1075_;
+goto v_resetjp_1069_;
+}
+else
+{
+lean_inc(v_a_1068_);
+lean_dec(v___x_1009_);
+v___x_1070_ = lean_box(0);
+v_isShared_1071_ = v_isSharedCheck_1075_;
+goto v_resetjp_1069_;
+}
+v_resetjp_1069_:
+{
+lean_object* v___x_1073_; 
+if (v_isShared_1071_ == 0)
+{
+v___x_1073_ = v___x_1070_;
+goto v_reusejp_1072_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1074_; 
+v_reuseFailAlloc_1074_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1074_, 0, v_a_1068_);
+v___x_1073_ = v_reuseFailAlloc_1074_;
+goto v_reusejp_1072_;
+}
+v_reusejp_1072_:
+{
+return v___x_1073_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___boxed(lean_object* v_f_1062_, lean_object* v_a_1063_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___boxed(lean_object* v_f_1076_, lean_object* v_a_1077_){
 _start:
 {
-lean_object* v_res_1064_; 
-v_res_1064_ = l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn(v_f_1062_);
-return v_res_1064_;
+lean_object* v_res_1078_; 
+v_res_1078_ = l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn(v_f_1076_);
+return v_res_1078_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn___lam__0(lean_object* v_f_1065_, lean_object* v_x_1066_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn___lam__0(lean_object* v_f_1079_, lean_object* v_x_1080_){
 _start:
 {
-lean_object* v___x_1068_; 
-v___x_1068_ = lean_apply_1(v_f_1065_, lean_box(0));
-return v___x_1068_;
+lean_object* v___x_1082_; 
+v___x_1082_ = lean_apply_1(v_f_1079_, lean_box(0));
+return v___x_1082_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn___lam__0___boxed(lean_object* v_f_1069_, lean_object* v_x_1070_, lean_object* v___y_1071_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn___lam__0___boxed(lean_object* v_f_1083_, lean_object* v_x_1084_, lean_object* v___y_1085_){
 _start:
 {
-lean_object* v_res_1072_; 
-v_res_1072_ = l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn___lam__0(v_f_1069_, v_x_1070_);
-lean_dec_ref(v_x_1070_);
-return v_res_1072_;
+lean_object* v_res_1086_; 
+v_res_1086_ = l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn___lam__0(v_f_1083_, v_x_1084_);
+lean_dec_ref(v_x_1084_);
+return v_res_1086_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn(lean_object* v_f_1073_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn(lean_object* v_f_1087_){
 _start:
 {
-lean_object* v___f_1075_; lean_object* v___x_1076_; 
-v___f_1075_ = lean_alloc_closure((void*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn___lam__0___boxed), 3, 1);
-lean_closure_set(v___f_1075_, 0, v_f_1073_);
-v___x_1076_ = l_Lasm_JS_Function_ofSyncFn(v___f_1075_);
-if (lean_obj_tag(v___x_1076_) == 0)
+lean_object* v___f_1089_; lean_object* v___x_1090_; 
+v___f_1089_ = lean_alloc_closure((void*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn___lam__0___boxed), 3, 1);
+lean_closure_set(v___f_1089_, 0, v_f_1087_);
+v___x_1090_ = l_Lasm_JS_Function_ofSyncFn(v___f_1089_);
+if (lean_obj_tag(v___x_1090_) == 0)
 {
-lean_object* v_a_1077_; lean_object* v___x_1078_; 
-v_a_1077_ = lean_ctor_get(v___x_1076_, 0);
-lean_inc(v_a_1077_);
-lean_dec_ref_known(v___x_1076_, 1);
-v___x_1078_ = l_Lasm_JS_global();
-if (lean_obj_tag(v___x_1078_) == 0)
+lean_object* v_a_1091_; lean_object* v___x_1092_; 
+v_a_1091_ = lean_ctor_get(v___x_1090_, 0);
+lean_inc(v_a_1091_);
+lean_dec_ref_known(v___x_1090_, 1);
+v___x_1092_ = l_Lasm_JS_global();
+if (lean_obj_tag(v___x_1092_) == 0)
 {
-lean_object* v_a_1079_; lean_object* v___x_1080_; lean_object* v___x_1081_; 
-v_a_1079_ = lean_ctor_get(v___x_1078_, 0);
-lean_inc(v_a_1079_);
-lean_dec_ref_known(v___x_1078_, 1);
-v___x_1080_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__1));
-v___x_1081_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_a_1079_, v___x_1080_);
-if (lean_obj_tag(v___x_1081_) == 0)
+lean_object* v_a_1093_; lean_object* v___x_1094_; lean_object* v___x_1095_; 
+v_a_1093_ = lean_ctor_get(v___x_1092_, 0);
+lean_inc(v_a_1093_);
+lean_dec_ref_known(v___x_1092_, 1);
+v___x_1094_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__1));
+v___x_1095_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_a_1093_, v___x_1094_);
+if (lean_obj_tag(v___x_1095_) == 0)
 {
-lean_object* v_a_1082_; lean_object* v___x_1083_; lean_object* v___x_1084_; lean_object* v___x_1085_; lean_object* v___x_1086_; lean_object* v___x_1087_; lean_object* v___y_1089_; uint8_t v___x_1116_; 
-v_a_1082_ = lean_ctor_get(v___x_1081_, 0);
-lean_inc(v_a_1082_);
-lean_dec_ref_known(v___x_1081_, 1);
-v___x_1083_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__2));
-v___x_1084_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-lean_inc(v_a_1077_);
-v___x_1085_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_1085_, 0, v_a_1077_);
-lean_ctor_set(v___x_1085_, 1, v___x_1084_);
-v___x_1086_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__4));
-v___x_1087_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__5));
-v___x_1116_ = lean_uint8_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8);
-if (v___x_1116_ == 0)
+lean_object* v_a_1096_; lean_object* v___x_1097_; lean_object* v___x_1098_; lean_object* v___x_1099_; lean_object* v___x_1100_; lean_object* v___x_1101_; lean_object* v___y_1103_; uint8_t v___x_1130_; 
+v_a_1096_ = lean_ctor_get(v___x_1095_, 0);
+lean_inc(v_a_1096_);
+lean_dec_ref_known(v___x_1095_, 1);
+v___x_1097_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__2));
+v___x_1098_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+lean_inc(v_a_1091_);
+v___x_1099_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_1099_, 0, v_a_1091_);
+lean_ctor_set(v___x_1099_, 1, v___x_1098_);
+v___x_1100_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__4));
+v___x_1101_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__5));
+v___x_1130_ = lean_uint8_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__8);
+if (v___x_1130_ == 0)
 {
-lean_object* v___x_1117_; 
-v___x_1117_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9);
-v___y_1089_ = v___x_1117_;
-goto v___jp_1088_;
+lean_object* v___x_1131_; 
+v___x_1131_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__9);
+v___y_1103_ = v___x_1131_;
+goto v___jp_1102_;
 }
 else
-{
-lean_object* v___x_1118_; 
-v___x_1118_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11);
-v___y_1089_ = v___x_1118_;
-goto v___jp_1088_;
-}
-v___jp_1088_:
-{
-lean_object* v___x_1090_; lean_object* v___x_1091_; lean_object* v___x_1092_; lean_object* v___x_1093_; lean_object* v___x_1094_; lean_object* v___x_1095_; lean_object* v___x_1096_; lean_object* v___x_1097_; lean_object* v___x_1098_; lean_object* v___x_1099_; 
-lean_inc(v___y_1089_);
-v___x_1090_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1090_, 0, v___x_1087_);
-lean_ctor_set(v___x_1090_, 1, v___y_1089_);
-v___x_1091_ = lean_box(0);
-v___x_1092_ = lean_alloc_ctor(1, 2, 0);
-lean_ctor_set(v___x_1092_, 0, v___x_1090_);
-lean_ctor_set(v___x_1092_, 1, v___x_1091_);
-v___x_1093_ = l_Lasm_JS_obj(v___x_1092_);
-v___x_1094_ = lean_unsigned_to_nat(3u);
-v___x_1095_ = lean_mk_empty_array_with_capacity(v___x_1094_);
-v___x_1096_ = lean_array_push(v___x_1095_, v___x_1085_);
-v___x_1097_ = lean_array_push(v___x_1096_, v___x_1086_);
-v___x_1098_ = lean_array_push(v___x_1097_, v___x_1093_);
-v___x_1099_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_a_1082_, v___x_1083_, v___x_1098_);
-if (lean_obj_tag(v___x_1099_) == 0)
-{
-lean_object* v___x_1101_; uint8_t v_isShared_1102_; uint8_t v_isSharedCheck_1106_; 
-v_isSharedCheck_1106_ = !lean_is_exclusive(v___x_1099_);
-if (v_isSharedCheck_1106_ == 0)
-{
-lean_object* v_unused_1107_; 
-v_unused_1107_ = lean_ctor_get(v___x_1099_, 0);
-lean_dec(v_unused_1107_);
-v___x_1101_ = v___x_1099_;
-v_isShared_1102_ = v_isSharedCheck_1106_;
-goto v_resetjp_1100_;
-}
-else
-{
-lean_dec(v___x_1099_);
-v___x_1101_ = lean_box(0);
-v_isShared_1102_ = v_isSharedCheck_1106_;
-goto v_resetjp_1100_;
-}
-v_resetjp_1100_:
-{
-lean_object* v___x_1104_; 
-if (v_isShared_1102_ == 0)
-{
-lean_ctor_set(v___x_1101_, 0, v_a_1077_);
-v___x_1104_ = v___x_1101_;
-goto v_reusejp_1103_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1105_; 
-v_reuseFailAlloc_1105_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1105_, 0, v_a_1077_);
-v___x_1104_ = v_reuseFailAlloc_1105_;
-goto v_reusejp_1103_;
-}
-v_reusejp_1103_:
-{
-return v___x_1104_;
-}
-}
-}
-else
-{
-lean_object* v_a_1108_; lean_object* v___x_1110_; uint8_t v_isShared_1111_; uint8_t v_isSharedCheck_1115_; 
-lean_dec(v_a_1077_);
-v_a_1108_ = lean_ctor_get(v___x_1099_, 0);
-v_isSharedCheck_1115_ = !lean_is_exclusive(v___x_1099_);
-if (v_isSharedCheck_1115_ == 0)
-{
-v___x_1110_ = v___x_1099_;
-v_isShared_1111_ = v_isSharedCheck_1115_;
-goto v_resetjp_1109_;
-}
-else
-{
-lean_inc(v_a_1108_);
-lean_dec(v___x_1099_);
-v___x_1110_ = lean_box(0);
-v_isShared_1111_ = v_isSharedCheck_1115_;
-goto v_resetjp_1109_;
-}
-v_resetjp_1109_:
-{
-lean_object* v___x_1113_; 
-if (v_isShared_1111_ == 0)
-{
-v___x_1113_ = v___x_1110_;
-goto v_reusejp_1112_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1114_; 
-v_reuseFailAlloc_1114_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1114_, 0, v_a_1108_);
-v___x_1113_ = v_reuseFailAlloc_1114_;
-goto v_reusejp_1112_;
-}
-v_reusejp_1112_:
-{
-return v___x_1113_;
-}
-}
-}
-}
-}
-else
-{
-lean_object* v_a_1119_; lean_object* v___x_1121_; uint8_t v_isShared_1122_; uint8_t v_isSharedCheck_1126_; 
-lean_dec(v_a_1077_);
-v_a_1119_ = lean_ctor_get(v___x_1081_, 0);
-v_isSharedCheck_1126_ = !lean_is_exclusive(v___x_1081_);
-if (v_isSharedCheck_1126_ == 0)
-{
-v___x_1121_ = v___x_1081_;
-v_isShared_1122_ = v_isSharedCheck_1126_;
-goto v_resetjp_1120_;
-}
-else
-{
-lean_inc(v_a_1119_);
-lean_dec(v___x_1081_);
-v___x_1121_ = lean_box(0);
-v_isShared_1122_ = v_isSharedCheck_1126_;
-goto v_resetjp_1120_;
-}
-v_resetjp_1120_:
-{
-lean_object* v___x_1124_; 
-if (v_isShared_1122_ == 0)
-{
-v___x_1124_ = v___x_1121_;
-goto v_reusejp_1123_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1125_; 
-v_reuseFailAlloc_1125_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1125_, 0, v_a_1119_);
-v___x_1124_ = v_reuseFailAlloc_1125_;
-goto v_reusejp_1123_;
-}
-v_reusejp_1123_:
-{
-return v___x_1124_;
-}
-}
-}
-}
-else
-{
-lean_object* v_a_1127_; lean_object* v___x_1129_; uint8_t v_isShared_1130_; uint8_t v_isSharedCheck_1134_; 
-lean_dec(v_a_1077_);
-v_a_1127_ = lean_ctor_get(v___x_1078_, 0);
-v_isSharedCheck_1134_ = !lean_is_exclusive(v___x_1078_);
-if (v_isSharedCheck_1134_ == 0)
-{
-v___x_1129_ = v___x_1078_;
-v_isShared_1130_ = v_isSharedCheck_1134_;
-goto v_resetjp_1128_;
-}
-else
-{
-lean_inc(v_a_1127_);
-lean_dec(v___x_1078_);
-v___x_1129_ = lean_box(0);
-v_isShared_1130_ = v_isSharedCheck_1134_;
-goto v_resetjp_1128_;
-}
-v_resetjp_1128_:
 {
 lean_object* v___x_1132_; 
-if (v_isShared_1130_ == 0)
+v___x_1132_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11, &l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__11);
+v___y_1103_ = v___x_1132_;
+goto v___jp_1102_;
+}
+v___jp_1102_:
 {
-v___x_1132_ = v___x_1129_;
-goto v_reusejp_1131_;
+lean_object* v___x_1104_; lean_object* v___x_1105_; lean_object* v___x_1106_; lean_object* v___x_1107_; lean_object* v___x_1108_; lean_object* v___x_1109_; lean_object* v___x_1110_; lean_object* v___x_1111_; lean_object* v___x_1112_; lean_object* v___x_1113_; 
+lean_inc(v___y_1103_);
+v___x_1104_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1104_, 0, v___x_1101_);
+lean_ctor_set(v___x_1104_, 1, v___y_1103_);
+v___x_1105_ = lean_box(0);
+v___x_1106_ = lean_alloc_ctor(1, 2, 0);
+lean_ctor_set(v___x_1106_, 0, v___x_1104_);
+lean_ctor_set(v___x_1106_, 1, v___x_1105_);
+v___x_1107_ = l_Lasm_JS_obj(v___x_1106_);
+v___x_1108_ = lean_unsigned_to_nat(3u);
+v___x_1109_ = lean_mk_empty_array_with_capacity(v___x_1108_);
+v___x_1110_ = lean_array_push(v___x_1109_, v___x_1099_);
+v___x_1111_ = lean_array_push(v___x_1110_, v___x_1100_);
+v___x_1112_ = lean_array_push(v___x_1111_, v___x_1107_);
+v___x_1113_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_a_1096_, v___x_1097_, v___x_1112_);
+if (lean_obj_tag(v___x_1113_) == 0)
+{
+lean_object* v___x_1115_; uint8_t v_isShared_1116_; uint8_t v_isSharedCheck_1120_; 
+v_isSharedCheck_1120_ = !lean_is_exclusive(v___x_1113_);
+if (v_isSharedCheck_1120_ == 0)
+{
+lean_object* v_unused_1121_; 
+v_unused_1121_ = lean_ctor_get(v___x_1113_, 0);
+lean_dec(v_unused_1121_);
+v___x_1115_ = v___x_1113_;
+v_isShared_1116_ = v_isSharedCheck_1120_;
+goto v_resetjp_1114_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1133_; 
-v_reuseFailAlloc_1133_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1133_, 0, v_a_1127_);
-v___x_1132_ = v_reuseFailAlloc_1133_;
-goto v_reusejp_1131_;
+lean_dec(v___x_1113_);
+v___x_1115_ = lean_box(0);
+v_isShared_1116_ = v_isSharedCheck_1120_;
+goto v_resetjp_1114_;
 }
-v_reusejp_1131_:
+v_resetjp_1114_:
 {
-return v___x_1132_;
+lean_object* v___x_1118_; 
+if (v_isShared_1116_ == 0)
+{
+lean_ctor_set(v___x_1115_, 0, v_a_1091_);
+v___x_1118_ = v___x_1115_;
+goto v_reusejp_1117_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1119_; 
+v_reuseFailAlloc_1119_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1119_, 0, v_a_1091_);
+v___x_1118_ = v_reuseFailAlloc_1119_;
+goto v_reusejp_1117_;
+}
+v_reusejp_1117_:
+{
+return v___x_1118_;
+}
+}
+}
+else
+{
+lean_object* v_a_1122_; lean_object* v___x_1124_; uint8_t v_isShared_1125_; uint8_t v_isSharedCheck_1129_; 
+lean_dec(v_a_1091_);
+v_a_1122_ = lean_ctor_get(v___x_1113_, 0);
+v_isSharedCheck_1129_ = !lean_is_exclusive(v___x_1113_);
+if (v_isSharedCheck_1129_ == 0)
+{
+v___x_1124_ = v___x_1113_;
+v_isShared_1125_ = v_isSharedCheck_1129_;
+goto v_resetjp_1123_;
+}
+else
+{
+lean_inc(v_a_1122_);
+lean_dec(v___x_1113_);
+v___x_1124_ = lean_box(0);
+v_isShared_1125_ = v_isSharedCheck_1129_;
+goto v_resetjp_1123_;
+}
+v_resetjp_1123_:
+{
+lean_object* v___x_1127_; 
+if (v_isShared_1125_ == 0)
+{
+v___x_1127_ = v___x_1124_;
+goto v_reusejp_1126_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1128_; 
+v_reuseFailAlloc_1128_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1128_, 0, v_a_1122_);
+v___x_1127_ = v_reuseFailAlloc_1128_;
+goto v_reusejp_1126_;
+}
+v_reusejp_1126_:
+{
+return v___x_1127_;
+}
 }
 }
 }
 }
 else
 {
-lean_object* v_a_1135_; lean_object* v___x_1137_; uint8_t v_isShared_1138_; uint8_t v_isSharedCheck_1142_; 
-v_a_1135_ = lean_ctor_get(v___x_1076_, 0);
-v_isSharedCheck_1142_ = !lean_is_exclusive(v___x_1076_);
-if (v_isSharedCheck_1142_ == 0)
+lean_object* v_a_1133_; lean_object* v___x_1135_; uint8_t v_isShared_1136_; uint8_t v_isSharedCheck_1140_; 
+lean_dec(v_a_1091_);
+v_a_1133_ = lean_ctor_get(v___x_1095_, 0);
+v_isSharedCheck_1140_ = !lean_is_exclusive(v___x_1095_);
+if (v_isSharedCheck_1140_ == 0)
 {
-v___x_1137_ = v___x_1076_;
-v_isShared_1138_ = v_isSharedCheck_1142_;
-goto v_resetjp_1136_;
+v___x_1135_ = v___x_1095_;
+v_isShared_1136_ = v_isSharedCheck_1140_;
+goto v_resetjp_1134_;
 }
 else
 {
-lean_inc(v_a_1135_);
-lean_dec(v___x_1076_);
-v___x_1137_ = lean_box(0);
-v_isShared_1138_ = v_isSharedCheck_1142_;
-goto v_resetjp_1136_;
+lean_inc(v_a_1133_);
+lean_dec(v___x_1095_);
+v___x_1135_ = lean_box(0);
+v_isShared_1136_ = v_isSharedCheck_1140_;
+goto v_resetjp_1134_;
 }
-v_resetjp_1136_:
+v_resetjp_1134_:
 {
-lean_object* v___x_1140_; 
-if (v_isShared_1138_ == 0)
+lean_object* v___x_1138_; 
+if (v_isShared_1136_ == 0)
 {
-v___x_1140_ = v___x_1137_;
-goto v_reusejp_1139_;
+v___x_1138_ = v___x_1135_;
+goto v_reusejp_1137_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1141_; 
-v_reuseFailAlloc_1141_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1141_, 0, v_a_1135_);
-v___x_1140_ = v_reuseFailAlloc_1141_;
-goto v_reusejp_1139_;
+lean_object* v_reuseFailAlloc_1139_; 
+v_reuseFailAlloc_1139_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1139_, 0, v_a_1133_);
+v___x_1138_ = v_reuseFailAlloc_1139_;
+goto v_reusejp_1137_;
 }
-v_reusejp_1139_:
+v_reusejp_1137_:
 {
-return v___x_1140_;
+return v___x_1138_;
+}
+}
+}
+}
+else
+{
+lean_object* v_a_1141_; lean_object* v___x_1143_; uint8_t v_isShared_1144_; uint8_t v_isSharedCheck_1148_; 
+lean_dec(v_a_1091_);
+v_a_1141_ = lean_ctor_get(v___x_1092_, 0);
+v_isSharedCheck_1148_ = !lean_is_exclusive(v___x_1092_);
+if (v_isSharedCheck_1148_ == 0)
+{
+v___x_1143_ = v___x_1092_;
+v_isShared_1144_ = v_isSharedCheck_1148_;
+goto v_resetjp_1142_;
+}
+else
+{
+lean_inc(v_a_1141_);
+lean_dec(v___x_1092_);
+v___x_1143_ = lean_box(0);
+v_isShared_1144_ = v_isSharedCheck_1148_;
+goto v_resetjp_1142_;
+}
+v_resetjp_1142_:
+{
+lean_object* v___x_1146_; 
+if (v_isShared_1144_ == 0)
+{
+v___x_1146_ = v___x_1143_;
+goto v_reusejp_1145_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1147_; 
+v_reuseFailAlloc_1147_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1147_, 0, v_a_1141_);
+v___x_1146_ = v_reuseFailAlloc_1147_;
+goto v_reusejp_1145_;
+}
+v_reusejp_1145_:
+{
+return v___x_1146_;
+}
+}
+}
+}
+else
+{
+lean_object* v_a_1149_; lean_object* v___x_1151_; uint8_t v_isShared_1152_; uint8_t v_isSharedCheck_1156_; 
+v_a_1149_ = lean_ctor_get(v___x_1090_, 0);
+v_isSharedCheck_1156_ = !lean_is_exclusive(v___x_1090_);
+if (v_isSharedCheck_1156_ == 0)
+{
+v___x_1151_ = v___x_1090_;
+v_isShared_1152_ = v_isSharedCheck_1156_;
+goto v_resetjp_1150_;
+}
+else
+{
+lean_inc(v_a_1149_);
+lean_dec(v___x_1090_);
+v___x_1151_ = lean_box(0);
+v_isShared_1152_ = v_isSharedCheck_1156_;
+goto v_resetjp_1150_;
+}
+v_resetjp_1150_:
+{
+lean_object* v___x_1154_; 
+if (v_isShared_1152_ == 0)
+{
+v___x_1154_ = v___x_1151_;
+goto v_reusejp_1153_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1155_; 
+v_reuseFailAlloc_1155_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1155_, 0, v_a_1149_);
+v___x_1154_ = v_reuseFailAlloc_1155_;
+goto v_reusejp_1153_;
+}
+v_reusejp_1153_:
+{
+return v___x_1154_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn___boxed(lean_object* v_f_1143_, lean_object* v_a_1144_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn___boxed(lean_object* v_f_1157_, lean_object* v_a_1158_){
 _start:
 {
-lean_object* v_res_1145_; 
-v_res_1145_ = l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn(v_f_1143_);
-return v_res_1145_;
+lean_object* v_res_1159_; 
+v_res_1159_ = l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofSyncFn(v_f_1157_);
+return v_res_1159_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectAbortOptions___lam__0(lean_object* v___f_1147_, lean_object* v_d_1148_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectAbortOptions___lam__0(lean_object* v___f_1161_, lean_object* v_d_1162_){
 _start:
 {
-lean_object* v___x_1149_; lean_object* v___x_1150_; lean_object* v___x_1151_; lean_object* v___x_1152_; lean_object* v___x_1153_; lean_object* v___x_1154_; lean_object* v___x_1155_; 
-v___x_1149_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectAbortOptions___lam__0___closed__0));
-v___x_1150_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1147_, v_d_1148_);
-v___x_1151_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1151_, 0, v___x_1149_);
-lean_ctor_set(v___x_1151_, 1, v___x_1150_);
-v___x_1152_ = lean_unsigned_to_nat(1u);
-v___x_1153_ = lean_mk_empty_array_with_capacity(v___x_1152_);
-v___x_1154_ = lean_array_push(v___x_1153_, v___x_1151_);
-v___x_1155_ = l_Lasm_JS_Web_Support_fields(v___x_1154_);
-lean_dec_ref(v___x_1154_);
-return v___x_1155_;
+lean_object* v___x_1163_; lean_object* v___x_1164_; lean_object* v___x_1165_; lean_object* v___x_1166_; lean_object* v___x_1167_; lean_object* v___x_1168_; lean_object* v___x_1169_; 
+v___x_1163_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectAbortOptions___lam__0___closed__0));
+v___x_1164_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1161_, v_d_1162_);
+v___x_1165_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1165_, 0, v___x_1163_);
+lean_ctor_set(v___x_1165_, 1, v___x_1164_);
+v___x_1166_ = lean_unsigned_to_nat(1u);
+v___x_1167_ = lean_mk_empty_array_with_capacity(v___x_1166_);
+v___x_1168_ = lean_array_push(v___x_1167_, v___x_1165_);
+v___x_1169_ = l_Lasm_JS_Web_Support_fields(v___x_1168_);
+lean_dec_ref(v___x_1168_);
+return v___x_1169_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0(lean_object* v___f_1162_, lean_object* v_d_1163_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0(lean_object* v___f_1176_, lean_object* v_d_1177_){
 _start:
 {
-lean_object* v_allowConcurrency_1164_; lean_object* v_noCache_1165_; lean_object* v___x_1167_; uint8_t v_isShared_1168_; uint8_t v_isSharedCheck_1182_; 
-v_allowConcurrency_1164_ = lean_ctor_get(v_d_1163_, 0);
-v_noCache_1165_ = lean_ctor_get(v_d_1163_, 1);
-v_isSharedCheck_1182_ = !lean_is_exclusive(v_d_1163_);
-if (v_isSharedCheck_1182_ == 0)
+lean_object* v_allowConcurrency_1178_; lean_object* v_noCache_1179_; lean_object* v___x_1181_; uint8_t v_isShared_1182_; uint8_t v_isSharedCheck_1196_; 
+v_allowConcurrency_1178_ = lean_ctor_get(v_d_1177_, 0);
+v_noCache_1179_ = lean_ctor_get(v_d_1177_, 1);
+v_isSharedCheck_1196_ = !lean_is_exclusive(v_d_1177_);
+if (v_isSharedCheck_1196_ == 0)
 {
-v___x_1167_ = v_d_1163_;
-v_isShared_1168_ = v_isSharedCheck_1182_;
-goto v_resetjp_1166_;
+v___x_1181_ = v_d_1177_;
+v_isShared_1182_ = v_isSharedCheck_1196_;
+goto v_resetjp_1180_;
 }
 else
 {
-lean_inc(v_noCache_1165_);
-lean_inc(v_allowConcurrency_1164_);
-lean_dec(v_d_1163_);
-v___x_1167_ = lean_box(0);
-v_isShared_1168_ = v_isSharedCheck_1182_;
-goto v_resetjp_1166_;
+lean_inc(v_noCache_1179_);
+lean_inc(v_allowConcurrency_1178_);
+lean_dec(v_d_1177_);
+v___x_1181_ = lean_box(0);
+v_isShared_1182_ = v_isSharedCheck_1196_;
+goto v_resetjp_1180_;
 }
-v_resetjp_1166_:
+v_resetjp_1180_:
 {
-lean_object* v___x_1169_; lean_object* v___x_1170_; lean_object* v___x_1172_; 
-v___x_1169_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
-lean_inc_ref(v___f_1162_);
-v___x_1170_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1162_, v_allowConcurrency_1164_);
-if (v_isShared_1168_ == 0)
+lean_object* v___x_1183_; lean_object* v___x_1184_; lean_object* v___x_1186_; 
+v___x_1183_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
+lean_inc_ref(v___f_1176_);
+v___x_1184_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1176_, v_allowConcurrency_1178_);
+if (v_isShared_1182_ == 0)
 {
-lean_ctor_set(v___x_1167_, 1, v___x_1170_);
-lean_ctor_set(v___x_1167_, 0, v___x_1169_);
-v___x_1172_ = v___x_1167_;
-goto v_reusejp_1171_;
+lean_ctor_set(v___x_1181_, 1, v___x_1184_);
+lean_ctor_set(v___x_1181_, 0, v___x_1183_);
+v___x_1186_ = v___x_1181_;
+goto v_reusejp_1185_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1181_; 
-v_reuseFailAlloc_1181_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v_reuseFailAlloc_1181_, 0, v___x_1169_);
-lean_ctor_set(v_reuseFailAlloc_1181_, 1, v___x_1170_);
-v___x_1172_ = v_reuseFailAlloc_1181_;
-goto v_reusejp_1171_;
+lean_object* v_reuseFailAlloc_1195_; 
+v_reuseFailAlloc_1195_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v_reuseFailAlloc_1195_, 0, v___x_1183_);
+lean_ctor_set(v_reuseFailAlloc_1195_, 1, v___x_1184_);
+v___x_1186_ = v_reuseFailAlloc_1195_;
+goto v_reusejp_1185_;
 }
-v_reusejp_1171_:
+v_reusejp_1185_:
 {
-lean_object* v___x_1173_; lean_object* v___x_1174_; lean_object* v___x_1175_; lean_object* v___x_1176_; lean_object* v___x_1177_; lean_object* v___x_1178_; lean_object* v___x_1179_; lean_object* v___x_1180_; 
-v___x_1173_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__1));
-v___x_1174_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1162_, v_noCache_1165_);
-v___x_1175_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1175_, 0, v___x_1173_);
-lean_ctor_set(v___x_1175_, 1, v___x_1174_);
-v___x_1176_ = lean_unsigned_to_nat(2u);
-v___x_1177_ = lean_mk_empty_array_with_capacity(v___x_1176_);
-v___x_1178_ = lean_array_push(v___x_1177_, v___x_1172_);
-v___x_1179_ = lean_array_push(v___x_1178_, v___x_1175_);
-v___x_1180_ = l_Lasm_JS_Web_Support_fields(v___x_1179_);
-lean_dec_ref(v___x_1179_);
-return v___x_1180_;
+lean_object* v___x_1187_; lean_object* v___x_1188_; lean_object* v___x_1189_; lean_object* v___x_1190_; lean_object* v___x_1191_; lean_object* v___x_1192_; lean_object* v___x_1193_; lean_object* v___x_1194_; 
+v___x_1187_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__1));
+v___x_1188_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1176_, v_noCache_1179_);
+v___x_1189_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1189_, 0, v___x_1187_);
+lean_ctor_set(v___x_1189_, 1, v___x_1188_);
+v___x_1190_ = lean_unsigned_to_nat(2u);
+v___x_1191_ = lean_mk_empty_array_with_capacity(v___x_1190_);
+v___x_1192_ = lean_array_push(v___x_1191_, v___x_1186_);
+v___x_1193_ = lean_array_push(v___x_1192_, v___x_1189_);
+v___x_1194_ = l_Lasm_JS_Web_Support_fields(v___x_1193_);
+lean_dec_ref(v___x_1193_);
+return v___x_1194_;
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0(lean_object* v___f_1192_, lean_object* v___f_1193_, lean_object* v___f_1194_, lean_object* v_d_1195_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0(lean_object* v___f_1206_, lean_object* v___f_1207_, lean_object* v___f_1208_, lean_object* v_d_1209_){
 _start:
 {
-lean_object* v_start_1196_; lean_object* v_startAfter_1197_; lean_object* v_end_1198_; lean_object* v_prefix_1199_; lean_object* v_reverse_1200_; lean_object* v_limit_1201_; lean_object* v_allowConcurrency_1202_; lean_object* v_noCache_1203_; lean_object* v___x_1204_; lean_object* v___x_1205_; lean_object* v___x_1206_; lean_object* v___x_1207_; lean_object* v___x_1208_; lean_object* v___x_1209_; lean_object* v___x_1210_; lean_object* v___x_1211_; lean_object* v___x_1212_; lean_object* v___x_1213_; lean_object* v___x_1214_; lean_object* v___x_1215_; lean_object* v___x_1216_; lean_object* v___x_1217_; lean_object* v___x_1218_; lean_object* v___x_1219_; lean_object* v___x_1220_; lean_object* v___x_1221_; lean_object* v___x_1222_; lean_object* v___x_1223_; lean_object* v___x_1224_; lean_object* v___x_1225_; lean_object* v___x_1226_; lean_object* v___x_1227_; lean_object* v___x_1228_; lean_object* v___x_1229_; lean_object* v___x_1230_; lean_object* v___x_1231_; lean_object* v___x_1232_; lean_object* v___x_1233_; lean_object* v___x_1234_; lean_object* v___x_1235_; lean_object* v___x_1236_; lean_object* v___x_1237_; lean_object* v___x_1238_; 
-v_start_1196_ = lean_ctor_get(v_d_1195_, 0);
-lean_inc(v_start_1196_);
-v_startAfter_1197_ = lean_ctor_get(v_d_1195_, 1);
-lean_inc(v_startAfter_1197_);
-v_end_1198_ = lean_ctor_get(v_d_1195_, 2);
-lean_inc(v_end_1198_);
-v_prefix_1199_ = lean_ctor_get(v_d_1195_, 3);
-lean_inc(v_prefix_1199_);
-v_reverse_1200_ = lean_ctor_get(v_d_1195_, 4);
-lean_inc(v_reverse_1200_);
-v_limit_1201_ = lean_ctor_get(v_d_1195_, 5);
-lean_inc(v_limit_1201_);
-v_allowConcurrency_1202_ = lean_ctor_get(v_d_1195_, 6);
-lean_inc(v_allowConcurrency_1202_);
-v_noCache_1203_ = lean_ctor_get(v_d_1195_, 7);
-lean_inc(v_noCache_1203_);
-lean_dec_ref(v_d_1195_);
-v___x_1204_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__0));
-lean_inc_ref_n(v___f_1192_, 3);
-v___x_1205_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1192_, v_start_1196_);
-v___x_1206_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1206_, 0, v___x_1204_);
-lean_ctor_set(v___x_1206_, 1, v___x_1205_);
-v___x_1207_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__1));
-v___x_1208_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1192_, v_startAfter_1197_);
-v___x_1209_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1209_, 0, v___x_1207_);
-lean_ctor_set(v___x_1209_, 1, v___x_1208_);
-v___x_1210_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__2));
-v___x_1211_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1192_, v_end_1198_);
-v___x_1212_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1212_, 0, v___x_1210_);
-lean_ctor_set(v___x_1212_, 1, v___x_1211_);
-v___x_1213_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__3));
-v___x_1214_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1192_, v_prefix_1199_);
-v___x_1215_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1215_, 0, v___x_1213_);
-lean_ctor_set(v___x_1215_, 1, v___x_1214_);
-v___x_1216_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__4));
-lean_inc_ref_n(v___f_1193_, 2);
-v___x_1217_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1193_, v_reverse_1200_);
-v___x_1218_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1218_, 0, v___x_1216_);
-lean_ctor_set(v___x_1218_, 1, v___x_1217_);
-v___x_1219_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__5));
-v___x_1220_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1194_, v_limit_1201_);
-v___x_1221_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1221_, 0, v___x_1219_);
-lean_ctor_set(v___x_1221_, 1, v___x_1220_);
-v___x_1222_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
-v___x_1223_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1193_, v_allowConcurrency_1202_);
-v___x_1224_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1224_, 0, v___x_1222_);
-lean_ctor_set(v___x_1224_, 1, v___x_1223_);
-v___x_1225_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__1));
-v___x_1226_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1193_, v_noCache_1203_);
-v___x_1227_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1227_, 0, v___x_1225_);
-lean_ctor_set(v___x_1227_, 1, v___x_1226_);
-v___x_1228_ = lean_unsigned_to_nat(8u);
-v___x_1229_ = lean_mk_empty_array_with_capacity(v___x_1228_);
-v___x_1230_ = lean_array_push(v___x_1229_, v___x_1206_);
-v___x_1231_ = lean_array_push(v___x_1230_, v___x_1209_);
-v___x_1232_ = lean_array_push(v___x_1231_, v___x_1212_);
-v___x_1233_ = lean_array_push(v___x_1232_, v___x_1215_);
-v___x_1234_ = lean_array_push(v___x_1233_, v___x_1218_);
-v___x_1235_ = lean_array_push(v___x_1234_, v___x_1221_);
-v___x_1236_ = lean_array_push(v___x_1235_, v___x_1224_);
-v___x_1237_ = lean_array_push(v___x_1236_, v___x_1227_);
-v___x_1238_ = l_Lasm_JS_Web_Support_fields(v___x_1237_);
-lean_dec_ref(v___x_1237_);
-return v___x_1238_;
+lean_object* v_start_1210_; lean_object* v_startAfter_1211_; lean_object* v_end_1212_; lean_object* v_prefix_1213_; lean_object* v_reverse_1214_; lean_object* v_limit_1215_; lean_object* v_allowConcurrency_1216_; lean_object* v_noCache_1217_; lean_object* v___x_1218_; lean_object* v___x_1219_; lean_object* v___x_1220_; lean_object* v___x_1221_; lean_object* v___x_1222_; lean_object* v___x_1223_; lean_object* v___x_1224_; lean_object* v___x_1225_; lean_object* v___x_1226_; lean_object* v___x_1227_; lean_object* v___x_1228_; lean_object* v___x_1229_; lean_object* v___x_1230_; lean_object* v___x_1231_; lean_object* v___x_1232_; lean_object* v___x_1233_; lean_object* v___x_1234_; lean_object* v___x_1235_; lean_object* v___x_1236_; lean_object* v___x_1237_; lean_object* v___x_1238_; lean_object* v___x_1239_; lean_object* v___x_1240_; lean_object* v___x_1241_; lean_object* v___x_1242_; lean_object* v___x_1243_; lean_object* v___x_1244_; lean_object* v___x_1245_; lean_object* v___x_1246_; lean_object* v___x_1247_; lean_object* v___x_1248_; lean_object* v___x_1249_; lean_object* v___x_1250_; lean_object* v___x_1251_; lean_object* v___x_1252_; 
+v_start_1210_ = lean_ctor_get(v_d_1209_, 0);
+lean_inc(v_start_1210_);
+v_startAfter_1211_ = lean_ctor_get(v_d_1209_, 1);
+lean_inc(v_startAfter_1211_);
+v_end_1212_ = lean_ctor_get(v_d_1209_, 2);
+lean_inc(v_end_1212_);
+v_prefix_1213_ = lean_ctor_get(v_d_1209_, 3);
+lean_inc(v_prefix_1213_);
+v_reverse_1214_ = lean_ctor_get(v_d_1209_, 4);
+lean_inc(v_reverse_1214_);
+v_limit_1215_ = lean_ctor_get(v_d_1209_, 5);
+lean_inc(v_limit_1215_);
+v_allowConcurrency_1216_ = lean_ctor_get(v_d_1209_, 6);
+lean_inc(v_allowConcurrency_1216_);
+v_noCache_1217_ = lean_ctor_get(v_d_1209_, 7);
+lean_inc(v_noCache_1217_);
+lean_dec_ref(v_d_1209_);
+v___x_1218_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__0));
+lean_inc_ref_n(v___f_1206_, 3);
+v___x_1219_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1206_, v_start_1210_);
+v___x_1220_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1220_, 0, v___x_1218_);
+lean_ctor_set(v___x_1220_, 1, v___x_1219_);
+v___x_1221_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__1));
+v___x_1222_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1206_, v_startAfter_1211_);
+v___x_1223_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1223_, 0, v___x_1221_);
+lean_ctor_set(v___x_1223_, 1, v___x_1222_);
+v___x_1224_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__2));
+v___x_1225_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1206_, v_end_1212_);
+v___x_1226_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1226_, 0, v___x_1224_);
+lean_ctor_set(v___x_1226_, 1, v___x_1225_);
+v___x_1227_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__3));
+v___x_1228_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1206_, v_prefix_1213_);
+v___x_1229_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1229_, 0, v___x_1227_);
+lean_ctor_set(v___x_1229_, 1, v___x_1228_);
+v___x_1230_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__4));
+lean_inc_ref_n(v___f_1207_, 2);
+v___x_1231_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1207_, v_reverse_1214_);
+v___x_1232_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1232_, 0, v___x_1230_);
+lean_ctor_set(v___x_1232_, 1, v___x_1231_);
+v___x_1233_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__5));
+v___x_1234_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1208_, v_limit_1215_);
+v___x_1235_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1235_, 0, v___x_1233_);
+lean_ctor_set(v___x_1235_, 1, v___x_1234_);
+v___x_1236_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
+v___x_1237_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1207_, v_allowConcurrency_1216_);
+v___x_1238_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1238_, 0, v___x_1236_);
+lean_ctor_set(v___x_1238_, 1, v___x_1237_);
+v___x_1239_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__1));
+v___x_1240_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1207_, v_noCache_1217_);
+v___x_1241_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1241_, 0, v___x_1239_);
+lean_ctor_set(v___x_1241_, 1, v___x_1240_);
+v___x_1242_ = lean_unsigned_to_nat(8u);
+v___x_1243_ = lean_mk_empty_array_with_capacity(v___x_1242_);
+v___x_1244_ = lean_array_push(v___x_1243_, v___x_1220_);
+v___x_1245_ = lean_array_push(v___x_1244_, v___x_1223_);
+v___x_1246_ = lean_array_push(v___x_1245_, v___x_1226_);
+v___x_1247_ = lean_array_push(v___x_1246_, v___x_1229_);
+v___x_1248_ = lean_array_push(v___x_1247_, v___x_1232_);
+v___x_1249_ = lean_array_push(v___x_1248_, v___x_1235_);
+v___x_1250_ = lean_array_push(v___x_1249_, v___x_1238_);
+v___x_1251_ = lean_array_push(v___x_1250_, v___x_1241_);
+v___x_1252_ = l_Lasm_JS_Web_Support_fields(v___x_1251_);
+lean_dec_ref(v___x_1251_);
+return v___x_1252_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectPutOptions___lam__0(lean_object* v___f_1247_, lean_object* v_d_1248_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectPutOptions___lam__0(lean_object* v___f_1261_, lean_object* v_d_1262_){
 _start:
 {
-lean_object* v_allowConcurrency_1249_; lean_object* v_allowUnconfirmed_1250_; lean_object* v_noCache_1251_; lean_object* v___x_1252_; lean_object* v___x_1253_; lean_object* v___x_1254_; lean_object* v___x_1255_; lean_object* v___x_1256_; lean_object* v___x_1257_; lean_object* v___x_1258_; lean_object* v___x_1259_; lean_object* v___x_1260_; lean_object* v___x_1261_; lean_object* v___x_1262_; lean_object* v___x_1263_; lean_object* v___x_1264_; lean_object* v___x_1265_; lean_object* v___x_1266_; 
-v_allowConcurrency_1249_ = lean_ctor_get(v_d_1248_, 0);
-lean_inc(v_allowConcurrency_1249_);
-v_allowUnconfirmed_1250_ = lean_ctor_get(v_d_1248_, 1);
-lean_inc(v_allowUnconfirmed_1250_);
-v_noCache_1251_ = lean_ctor_get(v_d_1248_, 2);
-lean_inc(v_noCache_1251_);
-lean_dec_ref(v_d_1248_);
-v___x_1252_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
-lean_inc_ref_n(v___f_1247_, 2);
-v___x_1253_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1247_, v_allowConcurrency_1249_);
-v___x_1254_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1254_, 0, v___x_1252_);
-lean_ctor_set(v___x_1254_, 1, v___x_1253_);
-v___x_1255_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectPutOptions___lam__0___closed__0));
-v___x_1256_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1247_, v_allowUnconfirmed_1250_);
-v___x_1257_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1257_, 0, v___x_1255_);
-lean_ctor_set(v___x_1257_, 1, v___x_1256_);
-v___x_1258_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__1));
-v___x_1259_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1247_, v_noCache_1251_);
-v___x_1260_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1260_, 0, v___x_1258_);
-lean_ctor_set(v___x_1260_, 1, v___x_1259_);
-v___x_1261_ = lean_unsigned_to_nat(3u);
-v___x_1262_ = lean_mk_empty_array_with_capacity(v___x_1261_);
-v___x_1263_ = lean_array_push(v___x_1262_, v___x_1254_);
-v___x_1264_ = lean_array_push(v___x_1263_, v___x_1257_);
-v___x_1265_ = lean_array_push(v___x_1264_, v___x_1260_);
-v___x_1266_ = l_Lasm_JS_Web_Support_fields(v___x_1265_);
-lean_dec_ref(v___x_1265_);
-return v___x_1266_;
+lean_object* v_allowConcurrency_1263_; lean_object* v_allowUnconfirmed_1264_; lean_object* v_noCache_1265_; lean_object* v___x_1266_; lean_object* v___x_1267_; lean_object* v___x_1268_; lean_object* v___x_1269_; lean_object* v___x_1270_; lean_object* v___x_1271_; lean_object* v___x_1272_; lean_object* v___x_1273_; lean_object* v___x_1274_; lean_object* v___x_1275_; lean_object* v___x_1276_; lean_object* v___x_1277_; lean_object* v___x_1278_; lean_object* v___x_1279_; lean_object* v___x_1280_; 
+v_allowConcurrency_1263_ = lean_ctor_get(v_d_1262_, 0);
+lean_inc(v_allowConcurrency_1263_);
+v_allowUnconfirmed_1264_ = lean_ctor_get(v_d_1262_, 1);
+lean_inc(v_allowUnconfirmed_1264_);
+v_noCache_1265_ = lean_ctor_get(v_d_1262_, 2);
+lean_inc(v_noCache_1265_);
+lean_dec_ref(v_d_1262_);
+v___x_1266_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
+lean_inc_ref_n(v___f_1261_, 2);
+v___x_1267_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1261_, v_allowConcurrency_1263_);
+v___x_1268_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1268_, 0, v___x_1266_);
+lean_ctor_set(v___x_1268_, 1, v___x_1267_);
+v___x_1269_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectPutOptions___lam__0___closed__0));
+v___x_1270_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1261_, v_allowUnconfirmed_1264_);
+v___x_1271_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1271_, 0, v___x_1269_);
+lean_ctor_set(v___x_1271_, 1, v___x_1270_);
+v___x_1272_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__1));
+v___x_1273_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1261_, v_noCache_1265_);
+v___x_1274_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1274_, 0, v___x_1272_);
+lean_ctor_set(v___x_1274_, 1, v___x_1273_);
+v___x_1275_ = lean_unsigned_to_nat(3u);
+v___x_1276_ = lean_mk_empty_array_with_capacity(v___x_1275_);
+v___x_1277_ = lean_array_push(v___x_1276_, v___x_1268_);
+v___x_1278_ = lean_array_push(v___x_1277_, v___x_1271_);
+v___x_1279_ = lean_array_push(v___x_1278_, v___x_1274_);
+v___x_1280_ = l_Lasm_JS_Web_Support_fields(v___x_1279_);
+lean_dec_ref(v___x_1279_);
+return v___x_1280_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__1(lean_object* v_f_1277_, lean_object* v___f_1278_, lean_object* v_x_1279_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__1(lean_object* v_f_1291_, lean_object* v___f_1292_, lean_object* v_x_1293_){
 _start:
 {
-if (lean_obj_tag(v_x_1279_) == 0)
+if (lean_obj_tag(v_x_1293_) == 0)
 {
-lean_object* v_a_1281_; lean_object* v___x_1283_; uint8_t v_isShared_1284_; uint8_t v_isSharedCheck_1289_; 
-lean_dec_ref(v___f_1278_);
-lean_dec_ref(v_f_1277_);
-v_a_1281_ = lean_ctor_get(v_x_1279_, 0);
-v_isSharedCheck_1289_ = !lean_is_exclusive(v_x_1279_);
-if (v_isSharedCheck_1289_ == 0)
+lean_object* v_a_1295_; lean_object* v___x_1297_; uint8_t v_isShared_1298_; uint8_t v_isSharedCheck_1303_; 
+lean_dec_ref(v___f_1292_);
+lean_dec_ref(v_f_1291_);
+v_a_1295_ = lean_ctor_get(v_x_1293_, 0);
+v_isSharedCheck_1303_ = !lean_is_exclusive(v_x_1293_);
+if (v_isSharedCheck_1303_ == 0)
 {
-v___x_1283_ = v_x_1279_;
-v_isShared_1284_ = v_isSharedCheck_1289_;
-goto v_resetjp_1282_;
+v___x_1297_ = v_x_1293_;
+v_isShared_1298_ = v_isSharedCheck_1303_;
+goto v_resetjp_1296_;
 }
 else
 {
-lean_inc(v_a_1281_);
-lean_dec(v_x_1279_);
-v___x_1283_ = lean_box(0);
-v_isShared_1284_ = v_isSharedCheck_1289_;
-goto v_resetjp_1282_;
+lean_inc(v_a_1295_);
+lean_dec(v_x_1293_);
+v___x_1297_ = lean_box(0);
+v_isShared_1298_ = v_isSharedCheck_1303_;
+goto v_resetjp_1296_;
 }
-v_resetjp_1282_:
+v_resetjp_1296_:
 {
-lean_object* v___x_1286_; 
-if (v_isShared_1284_ == 0)
+lean_object* v___x_1300_; 
+if (v_isShared_1298_ == 0)
 {
-v___x_1286_ = v___x_1283_;
-goto v_reusejp_1285_;
+v___x_1300_ = v___x_1297_;
+goto v_reusejp_1299_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1288_; 
-v_reuseFailAlloc_1288_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1288_, 0, v_a_1281_);
-v___x_1286_ = v_reuseFailAlloc_1288_;
-goto v_reusejp_1285_;
+lean_object* v_reuseFailAlloc_1302_; 
+v_reuseFailAlloc_1302_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1302_, 0, v_a_1295_);
+v___x_1300_ = v_reuseFailAlloc_1302_;
+goto v_reusejp_1299_;
 }
-v_reusejp_1285_:
+v_reusejp_1299_:
 {
-lean_object* v___x_1287_; 
-v___x_1287_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_1287_, 0, v___x_1286_);
-return v___x_1287_;
+lean_object* v___x_1301_; 
+v___x_1301_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_1301_, 0, v___x_1300_);
+return v___x_1301_;
 }
 }
 }
 else
 {
-lean_object* v_a_1290_; lean_object* v___x_1291_; uint8_t v___x_1292_; lean_object* v___x_1293_; lean_object* v___x_1294_; 
-v_a_1290_ = lean_ctor_get(v_x_1279_, 0);
-lean_inc(v_a_1290_);
-lean_dec_ref_known(v_x_1279_, 1);
-v___x_1291_ = lean_unsigned_to_nat(0u);
-v___x_1292_ = 0;
-v___x_1293_ = lean_apply_2(v_f_1277_, v_a_1290_, lean_box(0));
-v___x_1294_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_1291_, v___x_1292_, v___x_1293_, v___f_1278_);
-return v___x_1294_;
+lean_object* v_a_1304_; lean_object* v___x_1305_; uint8_t v___x_1306_; lean_object* v___x_1307_; lean_object* v___x_1308_; 
+v_a_1304_ = lean_ctor_get(v_x_1293_, 0);
+lean_inc(v_a_1304_);
+lean_dec_ref_known(v_x_1293_, 1);
+v___x_1305_ = lean_unsigned_to_nat(0u);
+v___x_1306_ = 0;
+v___x_1307_ = lean_apply_2(v_f_1291_, v_a_1304_, lean_box(0));
+v___x_1308_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_1305_, v___x_1306_, v___x_1307_, v___f_1292_);
+return v___x_1308_;
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__1___boxed(lean_object* v_f_1295_, lean_object* v___f_1296_, lean_object* v_x_1297_, lean_object* v___y_1298_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__1___boxed(lean_object* v_f_1309_, lean_object* v___f_1310_, lean_object* v_x_1311_, lean_object* v___y_1312_){
 _start:
 {
-lean_object* v_res_1299_; 
-v_res_1299_ = l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__1(v_f_1295_, v___f_1296_, v_x_1297_);
-return v_res_1299_;
+lean_object* v_res_1313_; 
+v_res_1313_ = l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__1(v_f_1309_, v___f_1310_, v_x_1311_);
+return v_res_1313_;
 }
 }
 static lean_object* _init_l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__3(void){
 _start:
 {
-lean_object* v___x_1303_; lean_object* v___x_1304_; 
-v___x_1303_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___x_1304_ = lean_string_utf8_byte_size(v___x_1303_);
-return v___x_1304_;
+lean_object* v___x_1317_; lean_object* v___x_1318_; 
+v___x_1317_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___x_1318_ = lean_string_utf8_byte_size(v___x_1317_);
+return v___x_1318_;
 }
 }
 static uint8_t _init_l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__4(void){
 _start:
 {
-lean_object* v___x_1305_; lean_object* v___x_1306_; uint8_t v___x_1307_; 
-v___x_1305_ = lean_unsigned_to_nat(0u);
-v___x_1306_ = lean_obj_once(&l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__3, &l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__3_once, _init_l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__3);
-v___x_1307_ = lean_nat_dec_eq(v___x_1306_, v___x_1305_);
-return v___x_1307_;
+lean_object* v___x_1319_; lean_object* v___x_1320_; uint8_t v___x_1321_; 
+v___x_1319_ = lean_unsigned_to_nat(0u);
+v___x_1320_ = lean_obj_once(&l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__3, &l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__3_once, _init_l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__3);
+v___x_1321_ = lean_nat_dec_eq(v___x_1320_, v___x_1319_);
+return v___x_1321_;
 }
 }
 static lean_object* _init_l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9(void){
 _start:
 {
-lean_object* v___x_1312_; lean_object* v___x_1313_; lean_object* v___x_1314_; lean_object* v___x_1315_; lean_object* v___x_1316_; lean_object* v___x_1317_; 
-v___x_1312_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__8));
-v___x_1313_ = lean_unsigned_to_nat(46u);
-v___x_1314_ = lean_unsigned_to_nat(193u);
-v___x_1315_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__7));
-v___x_1316_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__6));
-v___x_1317_ = l_mkPanicMessageWithDecl(v___x_1316_, v___x_1315_, v___x_1314_, v___x_1313_, v___x_1312_);
-return v___x_1317_;
+lean_object* v___x_1326_; lean_object* v___x_1327_; lean_object* v___x_1328_; lean_object* v___x_1329_; lean_object* v___x_1330_; lean_object* v___x_1331_; 
+v___x_1326_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__8));
+v___x_1327_ = lean_unsigned_to_nat(46u);
+v___x_1328_ = lean_unsigned_to_nat(193u);
+v___x_1329_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__7));
+v___x_1330_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__6));
+v___x_1331_ = l_mkPanicMessageWithDecl(v___x_1330_, v___x_1329_, v___x_1328_, v___x_1327_, v___x_1326_);
+return v___x_1331_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0(lean_object* v_context_1319_, lean_object* v_d_1320_){
+LEAN_EXPORT lean_object* l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0(lean_object* v_context_1333_, lean_object* v_d_1334_){
 _start:
 {
-lean_object* v___y_1323_; lean_object* v___y_1324_; 
-if (lean_obj_tag(v_d_1320_) == 9)
+lean_object* v___y_1337_; lean_object* v___y_1338_; 
+if (lean_obj_tag(v_d_1334_) == 9)
 {
-lean_object* v_value_1328_; lean_object* v___x_1329_; 
-v_value_1328_ = lean_ctor_get(v_d_1320_, 0);
-lean_inc(v_value_1328_);
-lean_dec_ref_known(v_d_1320_, 2);
-v___x_1329_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_1329_, 0, v_value_1328_);
-return v___x_1329_;
+lean_object* v_value_1342_; lean_object* v___x_1343_; 
+v_value_1342_ = lean_ctor_get(v_d_1334_, 0);
+lean_inc(v_value_1342_);
+lean_dec_ref_known(v_d_1334_, 2);
+v___x_1343_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_1343_, 0, v_value_1342_);
+return v___x_1343_;
 }
 else
 {
-lean_object* v___x_1330_; lean_object* v_received_1332_; 
-v___x_1330_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-if (lean_obj_tag(v_d_1320_) == 9)
+lean_object* v___x_1344_; lean_object* v_received_1346_; 
+v___x_1344_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+if (lean_obj_tag(v_d_1334_) == 9)
 {
-lean_object* v_value_1346_; lean_object* v_description_1347_; uint8_t v___x_1348_; 
-v_value_1346_ = lean_ctor_get(v_d_1320_, 0);
-v_description_1347_ = lean_ctor_get(v_d_1320_, 1);
-v___x_1348_ = lean_string_dec_eq(v_description_1347_, v___x_1330_);
-if (v___x_1348_ == 0)
+lean_object* v_value_1360_; lean_object* v_description_1361_; uint8_t v___x_1362_; 
+v_value_1360_ = lean_ctor_get(v_d_1334_, 0);
+v_description_1361_ = lean_ctor_get(v_d_1334_, 1);
+v___x_1362_ = lean_string_dec_eq(v_description_1361_, v___x_1344_);
+if (v___x_1362_ == 0)
 {
-goto v___jp_1344_;
+goto v___jp_1358_;
 }
 else
 {
-uint32_t v___x_1349_; uint64_t v___x_1350_; lean_object* v___x_1351_; uint32_t v___x_1352_; lean_object* v___x_1353_; 
-lean_inc_n(v_value_1346_, 2);
-lean_dec_ref_known(v_d_1320_, 2);
-v___x_1349_ = 206;
-v___x_1350_ = 0ULL;
-v___x_1351_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_1351_, 0, v_value_1346_);
-lean_ctor_set(v___x_1351_, 1, v___x_1330_);
-v___x_1352_ = lasm_js_value_handle(v_value_1346_);
-lean_dec(v_value_1346_);
-v___x_1353_ = l___private_Lasm_JS_Core_0__Lasm_JS_hostCallWith(v___x_1349_, v___x_1350_, v___x_1351_, v___x_1352_);
-lean_dec_ref_known(v___x_1351_, 2);
-if (lean_obj_tag(v___x_1353_) == 0)
+uint32_t v___x_1363_; uint64_t v___x_1364_; lean_object* v___x_1365_; uint32_t v___x_1366_; lean_object* v___x_1367_; 
+lean_inc_n(v_value_1360_, 2);
+lean_dec_ref_known(v_d_1334_, 2);
+v___x_1363_ = 206;
+v___x_1364_ = 0ULL;
+v___x_1365_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_1365_, 0, v_value_1360_);
+lean_ctor_set(v___x_1365_, 1, v___x_1344_);
+v___x_1366_ = lasm_js_value_handle(v_value_1360_);
+lean_dec(v_value_1360_);
+v___x_1367_ = l___private_Lasm_JS_Core_0__Lasm_JS_hostCallWith(v___x_1363_, v___x_1364_, v___x_1365_, v___x_1366_);
+lean_dec_ref_known(v___x_1365_, 2);
+if (lean_obj_tag(v___x_1367_) == 0)
 {
-lean_object* v_a_1354_; uint8_t v___x_1355_; 
-v_a_1354_ = lean_ctor_get(v___x_1353_, 0);
-lean_inc(v_a_1354_);
-lean_dec_ref_known(v___x_1353_, 1);
-v___x_1355_ = lean_string_validate_utf8(v_a_1354_);
-if (v___x_1355_ == 0)
+lean_object* v_a_1368_; uint8_t v___x_1369_; 
+v_a_1368_ = lean_ctor_get(v___x_1367_, 0);
+lean_inc(v_a_1368_);
+lean_dec_ref_known(v___x_1367_, 1);
+v___x_1369_ = lean_string_validate_utf8(v_a_1368_);
+if (v___x_1369_ == 0)
 {
-lean_object* v___x_1356_; lean_object* v___x_1357_; 
-lean_dec(v_a_1354_);
-v___x_1356_ = lean_obj_once(&l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9, &l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9_once, _init_l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9);
-v___x_1357_ = l_panic___at___00System_Uri_UriEscape_decodeUri_spec__1(v___x_1356_);
-v_received_1332_ = v___x_1357_;
-goto v___jp_1331_;
+lean_object* v___x_1370_; lean_object* v___x_1371_; 
+lean_dec(v_a_1368_);
+v___x_1370_ = lean_obj_once(&l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9, &l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9_once, _init_l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9);
+v___x_1371_ = l_panic___at___00System_Uri_UriEscape_decodeUri_spec__1(v___x_1370_);
+v_received_1346_ = v___x_1371_;
+goto v___jp_1345_;
 }
 else
 {
-lean_object* v___x_1358_; 
-v___x_1358_ = lean_string_from_utf8_unchecked(v_a_1354_);
-v_received_1332_ = v___x_1358_;
-goto v___jp_1331_;
+lean_object* v___x_1372_; 
+v___x_1372_ = lean_string_from_utf8_unchecked(v_a_1368_);
+v_received_1346_ = v___x_1372_;
+goto v___jp_1345_;
 }
 }
 else
+{
+lean_object* v___x_1373_; 
+lean_dec_ref_known(v___x_1367_, 1);
+v___x_1373_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__10));
+v_received_1346_ = v___x_1373_;
+goto v___jp_1345_;
+}
+}
+}
+else
+{
+goto v___jp_1358_;
+}
+v___jp_1345_:
+{
+lean_object* v___x_1347_; lean_object* v___x_1348_; lean_object* v___x_1349_; lean_object* v___x_1350_; lean_object* v___x_1351_; lean_object* v___x_1352_; lean_object* v___x_1353_; lean_object* v___x_1354_; lean_object* v___x_1355_; uint8_t v___x_1356_; 
+v___x_1347_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__0));
+v___x_1348_ = lean_string_append(v___x_1347_, v_context_1333_);
+v___x_1349_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__1));
+v___x_1350_ = lean_string_append(v___x_1348_, v___x_1349_);
+v___x_1351_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instFromJSDurableObjectTransaction___closed__0));
+v___x_1352_ = lean_string_append(v___x_1350_, v___x_1351_);
+v___x_1353_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__2));
+v___x_1354_ = lean_string_append(v___x_1352_, v___x_1353_);
+v___x_1355_ = lean_string_append(v___x_1354_, v_received_1346_);
+lean_dec_ref(v_received_1346_);
+v___x_1356_ = lean_uint8_once(&l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__4, &l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__4_once, _init_l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__4);
+if (v___x_1356_ == 0)
+{
+lean_object* v___x_1357_; 
+v___x_1357_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__5));
+v___y_1337_ = v___x_1355_;
+v___y_1338_ = v___x_1357_;
+goto v___jp_1336_;
+}
+else
+{
+v___y_1337_ = v___x_1355_;
+v___y_1338_ = v___x_1344_;
+goto v___jp_1336_;
+}
+}
+v___jp_1358_:
 {
 lean_object* v___x_1359_; 
-lean_dec_ref_known(v___x_1353_, 1);
-v___x_1359_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__10));
-v_received_1332_ = v___x_1359_;
-goto v___jp_1331_;
+v___x_1359_ = l_Lasm_JS_Data_describe(v_d_1334_);
+v_received_1346_ = v___x_1359_;
+goto v___jp_1345_;
 }
 }
-}
-else
+v___jp_1336_:
 {
-goto v___jp_1344_;
-}
-v___jp_1331_:
-{
-lean_object* v___x_1333_; lean_object* v___x_1334_; lean_object* v___x_1335_; lean_object* v___x_1336_; lean_object* v___x_1337_; lean_object* v___x_1338_; lean_object* v___x_1339_; lean_object* v___x_1340_; lean_object* v___x_1341_; uint8_t v___x_1342_; 
-v___x_1333_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__0));
-v___x_1334_ = lean_string_append(v___x_1333_, v_context_1319_);
-v___x_1335_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__1));
-v___x_1336_ = lean_string_append(v___x_1334_, v___x_1335_);
-v___x_1337_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instFromJSDurableObjectTransaction___closed__0));
-v___x_1338_ = lean_string_append(v___x_1336_, v___x_1337_);
-v___x_1339_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__2));
-v___x_1340_ = lean_string_append(v___x_1338_, v___x_1339_);
-v___x_1341_ = lean_string_append(v___x_1340_, v_received_1332_);
-lean_dec_ref(v_received_1332_);
-v___x_1342_ = lean_uint8_once(&l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__4, &l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__4_once, _init_l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__4);
-if (v___x_1342_ == 0)
-{
-lean_object* v___x_1343_; 
-v___x_1343_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__5));
-v___y_1323_ = v___x_1341_;
-v___y_1324_ = v___x_1343_;
-goto v___jp_1322_;
-}
-else
-{
-v___y_1323_ = v___x_1341_;
-v___y_1324_ = v___x_1330_;
-goto v___jp_1322_;
-}
-}
-v___jp_1344_:
-{
-lean_object* v___x_1345_; 
-v___x_1345_ = l_Lasm_JS_Data_describe(v_d_1320_);
-v_received_1332_ = v___x_1345_;
-goto v___jp_1331_;
-}
-}
-v___jp_1322_:
-{
-lean_object* v___x_1325_; lean_object* v___x_1326_; lean_object* v___x_1327_; 
-v___x_1325_ = lean_string_append(v___y_1323_, v___y_1324_);
-v___x_1326_ = lean_alloc_ctor(18, 1, 0);
-lean_ctor_set(v___x_1326_, 0, v___x_1325_);
-v___x_1327_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v___x_1327_, 0, v___x_1326_);
-return v___x_1327_;
+lean_object* v___x_1339_; lean_object* v___x_1340_; lean_object* v___x_1341_; 
+v___x_1339_ = lean_string_append(v___y_1337_, v___y_1338_);
+v___x_1340_ = lean_alloc_ctor(18, 1, 0);
+lean_ctor_set(v___x_1340_, 0, v___x_1339_);
+v___x_1341_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v___x_1341_, 0, v___x_1340_);
+return v___x_1341_;
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___boxed(lean_object* v_context_1360_, lean_object* v_d_1361_, lean_object* v_a_1362_){
+LEAN_EXPORT lean_object* l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___boxed(lean_object* v_context_1374_, lean_object* v_d_1375_, lean_object* v_a_1376_){
 _start:
 {
-lean_object* v_res_1363_; 
-v_res_1363_ = l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0(v_context_1360_, v_d_1361_);
-lean_dec_ref(v_context_1360_);
-return v_res_1363_;
+lean_object* v_res_1377_; 
+v_res_1377_ = l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0(v_context_1374_, v_d_1375_);
+lean_dec_ref(v_context_1374_);
+return v_res_1377_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0(lean_object* v_args_1365_, lean_object* v_i_1366_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0(lean_object* v_args_1379_, lean_object* v_i_1380_){
 _start:
 {
-lean_object* v___x_1368_; lean_object* v___x_1369_; lean_object* v___x_1370_; lean_object* v___x_1371_; lean_object* v___x_1372_; lean_object* v___x_1373_; uint8_t v___x_1374_; 
-v___x_1368_ = ((lean_object*)(l_Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0___closed__0));
-v___x_1369_ = lean_unsigned_to_nat(1u);
-v___x_1370_ = lean_nat_add(v_i_1366_, v___x_1369_);
-v___x_1371_ = l_Nat_reprFast(v___x_1370_);
-v___x_1372_ = lean_string_append(v___x_1368_, v___x_1371_);
-lean_dec_ref(v___x_1371_);
-v___x_1373_ = lean_array_get_size(v_args_1365_);
-v___x_1374_ = lean_nat_dec_lt(v_i_1366_, v___x_1373_);
-if (v___x_1374_ == 0)
+lean_object* v___x_1382_; lean_object* v___x_1383_; lean_object* v___x_1384_; lean_object* v___x_1385_; lean_object* v___x_1386_; lean_object* v___x_1387_; uint8_t v___x_1388_; 
+v___x_1382_ = ((lean_object*)(l_Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0___closed__0));
+v___x_1383_ = lean_unsigned_to_nat(1u);
+v___x_1384_ = lean_nat_add(v_i_1380_, v___x_1383_);
+v___x_1385_ = l_Nat_reprFast(v___x_1384_);
+v___x_1386_ = lean_string_append(v___x_1382_, v___x_1385_);
+lean_dec_ref(v___x_1385_);
+v___x_1387_ = lean_array_get_size(v_args_1379_);
+v___x_1388_ = lean_nat_dec_lt(v_i_1380_, v___x_1387_);
+if (v___x_1388_ == 0)
 {
-lean_object* v___x_1375_; lean_object* v___x_1376_; 
-v___x_1375_ = lean_box(0);
-v___x_1376_ = l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0(v___x_1372_, v___x_1375_);
-lean_dec_ref(v___x_1372_);
-return v___x_1376_;
+lean_object* v___x_1389_; lean_object* v___x_1390_; 
+v___x_1389_ = lean_box(0);
+v___x_1390_ = l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0(v___x_1386_, v___x_1389_);
+lean_dec_ref(v___x_1386_);
+return v___x_1390_;
 }
 else
 {
-lean_object* v___x_1377_; lean_object* v___x_1378_; 
-v___x_1377_ = lean_array_fget_borrowed(v_args_1365_, v_i_1366_);
-lean_inc(v___x_1377_);
-v___x_1378_ = l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0(v___x_1372_, v___x_1377_);
-lean_dec_ref(v___x_1372_);
-return v___x_1378_;
+lean_object* v___x_1391_; lean_object* v___x_1392_; 
+v___x_1391_ = lean_array_fget_borrowed(v_args_1379_, v_i_1380_);
+lean_inc(v___x_1391_);
+v___x_1392_ = l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0(v___x_1386_, v___x_1391_);
+lean_dec_ref(v___x_1386_);
+return v___x_1392_;
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0___boxed(lean_object* v_args_1379_, lean_object* v_i_1380_, lean_object* v_a_1381_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0___boxed(lean_object* v_args_1393_, lean_object* v_i_1394_, lean_object* v_a_1395_){
 _start:
 {
-lean_object* v_res_1382_; 
-v_res_1382_ = l_Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0(v_args_1379_, v_i_1380_);
-lean_dec(v_i_1380_);
-lean_dec_ref(v_args_1379_);
-return v_res_1382_;
+lean_object* v_res_1396_; 
+v_res_1396_ = l_Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0(v_args_1393_, v_i_1394_);
+lean_dec(v_i_1394_);
+lean_dec_ref(v_args_1393_);
+return v_res_1396_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__0(lean_object* v___f_1383_, lean_object* v_args_1384_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__0(lean_object* v___f_1397_, lean_object* v_args_1398_){
 _start:
 {
-lean_object* v___x_1386_; uint8_t v___x_1387_; lean_object* v_val_1389_; lean_object* v___x_1392_; 
-v___x_1386_ = lean_unsigned_to_nat(0u);
-v___x_1387_ = 0;
-v___x_1392_ = l_Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0(v_args_1384_, v___x_1386_);
-if (lean_obj_tag(v___x_1392_) == 0)
+lean_object* v___x_1400_; uint8_t v___x_1401_; lean_object* v_val_1403_; lean_object* v___x_1406_; 
+v___x_1400_ = lean_unsigned_to_nat(0u);
+v___x_1401_ = 0;
+v___x_1406_ = l_Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0(v_args_1398_, v___x_1400_);
+if (lean_obj_tag(v___x_1406_) == 0)
 {
-lean_object* v_a_1393_; lean_object* v___x_1395_; uint8_t v_isShared_1396_; uint8_t v_isSharedCheck_1400_; 
-v_a_1393_ = lean_ctor_get(v___x_1392_, 0);
-v_isSharedCheck_1400_ = !lean_is_exclusive(v___x_1392_);
-if (v_isSharedCheck_1400_ == 0)
+lean_object* v_a_1407_; lean_object* v___x_1409_; uint8_t v_isShared_1410_; uint8_t v_isSharedCheck_1414_; 
+v_a_1407_ = lean_ctor_get(v___x_1406_, 0);
+v_isSharedCheck_1414_ = !lean_is_exclusive(v___x_1406_);
+if (v_isSharedCheck_1414_ == 0)
 {
-v___x_1395_ = v___x_1392_;
-v_isShared_1396_ = v_isSharedCheck_1400_;
-goto v_resetjp_1394_;
+v___x_1409_ = v___x_1406_;
+v_isShared_1410_ = v_isSharedCheck_1414_;
+goto v_resetjp_1408_;
 }
 else
 {
-lean_inc(v_a_1393_);
-lean_dec(v___x_1392_);
-v___x_1395_ = lean_box(0);
-v_isShared_1396_ = v_isSharedCheck_1400_;
-goto v_resetjp_1394_;
+lean_inc(v_a_1407_);
+lean_dec(v___x_1406_);
+v___x_1409_ = lean_box(0);
+v_isShared_1410_ = v_isSharedCheck_1414_;
+goto v_resetjp_1408_;
 }
-v_resetjp_1394_:
+v_resetjp_1408_:
 {
-lean_object* v___x_1398_; 
-if (v_isShared_1396_ == 0)
+lean_object* v___x_1412_; 
+if (v_isShared_1410_ == 0)
 {
-lean_ctor_set_tag(v___x_1395_, 1);
-v___x_1398_ = v___x_1395_;
-goto v_reusejp_1397_;
+lean_ctor_set_tag(v___x_1409_, 1);
+v___x_1412_ = v___x_1409_;
+goto v_reusejp_1411_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1399_; 
-v_reuseFailAlloc_1399_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1399_, 0, v_a_1393_);
-v___x_1398_ = v_reuseFailAlloc_1399_;
-goto v_reusejp_1397_;
+lean_object* v_reuseFailAlloc_1413_; 
+v_reuseFailAlloc_1413_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1413_, 0, v_a_1407_);
+v___x_1412_ = v_reuseFailAlloc_1413_;
+goto v_reusejp_1411_;
 }
-v_reusejp_1397_:
+v_reusejp_1411_:
 {
-v_val_1389_ = v___x_1398_;
-goto v___jp_1388_;
+v_val_1403_ = v___x_1412_;
+goto v___jp_1402_;
 }
 }
 }
 else
 {
-lean_object* v_a_1401_; lean_object* v___x_1403_; uint8_t v_isShared_1404_; uint8_t v_isSharedCheck_1408_; 
-v_a_1401_ = lean_ctor_get(v___x_1392_, 0);
-v_isSharedCheck_1408_ = !lean_is_exclusive(v___x_1392_);
-if (v_isSharedCheck_1408_ == 0)
+lean_object* v_a_1415_; lean_object* v___x_1417_; uint8_t v_isShared_1418_; uint8_t v_isSharedCheck_1422_; 
+v_a_1415_ = lean_ctor_get(v___x_1406_, 0);
+v_isSharedCheck_1422_ = !lean_is_exclusive(v___x_1406_);
+if (v_isSharedCheck_1422_ == 0)
 {
-v___x_1403_ = v___x_1392_;
-v_isShared_1404_ = v_isSharedCheck_1408_;
-goto v_resetjp_1402_;
+v___x_1417_ = v___x_1406_;
+v_isShared_1418_ = v_isSharedCheck_1422_;
+goto v_resetjp_1416_;
 }
 else
 {
-lean_inc(v_a_1401_);
-lean_dec(v___x_1392_);
-v___x_1403_ = lean_box(0);
-v_isShared_1404_ = v_isSharedCheck_1408_;
-goto v_resetjp_1402_;
+lean_inc(v_a_1415_);
+lean_dec(v___x_1406_);
+v___x_1417_ = lean_box(0);
+v_isShared_1418_ = v_isSharedCheck_1422_;
+goto v_resetjp_1416_;
 }
-v_resetjp_1402_:
+v_resetjp_1416_:
 {
-lean_object* v___x_1406_; 
-if (v_isShared_1404_ == 0)
+lean_object* v___x_1420_; 
+if (v_isShared_1418_ == 0)
 {
-lean_ctor_set_tag(v___x_1403_, 0);
-v___x_1406_ = v___x_1403_;
-goto v_reusejp_1405_;
+lean_ctor_set_tag(v___x_1417_, 0);
+v___x_1420_ = v___x_1417_;
+goto v_reusejp_1419_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1407_; 
-v_reuseFailAlloc_1407_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1407_, 0, v_a_1401_);
-v___x_1406_ = v_reuseFailAlloc_1407_;
-goto v_reusejp_1405_;
+lean_object* v_reuseFailAlloc_1421_; 
+v_reuseFailAlloc_1421_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1421_, 0, v_a_1415_);
+v___x_1420_ = v_reuseFailAlloc_1421_;
+goto v_reusejp_1419_;
 }
-v_reusejp_1405_:
+v_reusejp_1419_:
 {
-v_val_1389_ = v___x_1406_;
-goto v___jp_1388_;
+v_val_1403_ = v___x_1420_;
+goto v___jp_1402_;
 }
 }
 }
-v___jp_1388_:
+v___jp_1402_:
 {
-lean_object* v___x_1390_; lean_object* v___x_1391_; 
-v___x_1390_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_1390_, 0, v_val_1389_);
-v___x_1391_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_1386_, v___x_1387_, v___x_1390_, v___f_1383_);
-return v___x_1391_;
+lean_object* v___x_1404_; lean_object* v___x_1405_; 
+v___x_1404_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_1404_, 0, v_val_1403_);
+v___x_1405_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_1400_, v___x_1401_, v___x_1404_, v___f_1397_);
+return v___x_1405_;
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__0___boxed(lean_object* v___f_1409_, lean_object* v_args_1410_, lean_object* v___y_1411_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__0___boxed(lean_object* v___f_1423_, lean_object* v_args_1424_, lean_object* v___y_1425_){
 _start:
 {
-lean_object* v_res_1412_; 
-v_res_1412_ = l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__0(v___f_1409_, v_args_1410_);
-lean_dec_ref(v_args_1410_);
-return v_res_1412_;
+lean_object* v_res_1426_; 
+v_res_1426_ = l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__0(v___f_1423_, v_args_1424_);
+lean_dec_ref(v_args_1424_);
+return v_res_1426_;
 }
 }
 static lean_object* _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__0(void){
 _start:
 {
-lean_object* v___x_1413_; lean_object* v___x_1414_; 
-v___x_1413_ = lean_obj_once(&l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9, &l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9_once, _init_l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9);
-v___x_1414_ = lean_nat_abs(v___x_1413_);
-return v___x_1414_;
+lean_object* v___x_1427_; lean_object* v___x_1428_; 
+v___x_1427_ = lean_obj_once(&l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9, &l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9_once, _init_l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9);
+v___x_1428_ = lean_nat_abs(v___x_1427_);
+return v___x_1428_;
 }
 }
 static uint8_t _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1(void){
 _start:
 {
-lean_object* v___x_1415_; lean_object* v___x_1416_; uint8_t v___x_1417_; 
-v___x_1415_ = lean_cstr_to_nat("9007199254740991");
-v___x_1416_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__0, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__0_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__0);
-v___x_1417_ = lean_nat_dec_le(v___x_1416_, v___x_1415_);
-return v___x_1417_;
+lean_object* v___x_1429_; lean_object* v___x_1430_; uint8_t v___x_1431_; 
+v___x_1429_ = lean_cstr_to_nat("9007199254740991");
+v___x_1430_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__0, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__0_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__0);
+v___x_1431_ = lean_nat_dec_le(v___x_1430_, v___x_1429_);
+return v___x_1431_;
 }
 }
 static lean_object* _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2(void){
 _start:
 {
-lean_object* v___x_1418_; lean_object* v___x_1419_; 
-v___x_1418_ = lean_obj_once(&l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9, &l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9_once, _init_l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9);
-v___x_1419_ = lean_alloc_ctor(5, 1, 0);
-lean_ctor_set(v___x_1419_, 0, v___x_1418_);
-return v___x_1419_;
+lean_object* v___x_1432_; lean_object* v___x_1433_; 
+v___x_1432_ = lean_obj_once(&l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9, &l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9_once, _init_l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9);
+v___x_1433_ = lean_alloc_ctor(5, 1, 0);
+lean_ctor_set(v___x_1433_, 0, v___x_1432_);
+return v___x_1433_;
 }
 }
 static double _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__3(void){
 _start:
 {
-lean_object* v___x_1420_; double v___x_1421_; 
-v___x_1420_ = lean_obj_once(&l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9, &l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9_once, _init_l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9);
-v___x_1421_ = l_Float_ofInt(v___x_1420_);
-return v___x_1421_;
+lean_object* v___x_1434_; double v___x_1435_; 
+v___x_1434_ = lean_obj_once(&l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9, &l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9_once, _init_l_Lasm_JS_Cloudflare_instReprDurableObjectJurisdiction_repr___closed__9);
+v___x_1435_ = l_Float_ofInt(v___x_1434_);
+return v___x_1435_;
 }
 }
 static lean_object* _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4(void){
 _start:
 {
-double v___x_1422_; lean_object* v___x_1423_; 
-v___x_1422_ = lean_float_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__3, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__3_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__3);
-v___x_1423_ = lean_alloc_ctor(3, 0, 8);
-lean_ctor_set_float(v___x_1423_, 0, v___x_1422_);
-return v___x_1423_;
+double v___x_1436_; lean_object* v___x_1437_; 
+v___x_1436_ = lean_float_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__3, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__3_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__3);
+v___x_1437_ = lean_alloc_ctor(3, 0, 8);
+lean_ctor_set_float(v___x_1437_, 0, v___x_1436_);
+return v___x_1437_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn(lean_object* v_f_1424_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn(lean_object* v_f_1438_){
 _start:
 {
-lean_object* v___f_1426_; lean_object* v___f_1427_; lean_object* v___f_1428_; lean_object* v___x_1429_; 
-v___f_1426_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__0));
-v___f_1427_ = lean_alloc_closure((void*)(l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__1___boxed), 4, 2);
-lean_closure_set(v___f_1427_, 0, v_f_1424_);
-lean_closure_set(v___f_1427_, 1, v___f_1426_);
-v___f_1428_ = lean_alloc_closure((void*)(l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__0___boxed), 3, 1);
-lean_closure_set(v___f_1428_, 0, v___f_1427_);
-v___x_1429_ = l_Lasm_JS_Function_ofFn(v___f_1428_);
-if (lean_obj_tag(v___x_1429_) == 0)
+lean_object* v___f_1440_; lean_object* v___f_1441_; lean_object* v___f_1442_; lean_object* v___x_1443_; 
+v___f_1440_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__0));
+v___f_1441_ = lean_alloc_closure((void*)(l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__1___boxed), 4, 2);
+lean_closure_set(v___f_1441_, 0, v_f_1438_);
+lean_closure_set(v___f_1441_, 1, v___f_1440_);
+v___f_1442_ = lean_alloc_closure((void*)(l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___lam__0___boxed), 3, 1);
+lean_closure_set(v___f_1442_, 0, v___f_1441_);
+v___x_1443_ = l_Lasm_JS_Function_ofFn(v___f_1442_);
+if (lean_obj_tag(v___x_1443_) == 0)
 {
-lean_object* v_a_1430_; lean_object* v___x_1431_; 
-v_a_1430_ = lean_ctor_get(v___x_1429_, 0);
-lean_inc(v_a_1430_);
-lean_dec_ref_known(v___x_1429_, 1);
-v___x_1431_ = l_Lasm_JS_global();
-if (lean_obj_tag(v___x_1431_) == 0)
+lean_object* v_a_1444_; lean_object* v___x_1445_; 
+v_a_1444_ = lean_ctor_get(v___x_1443_, 0);
+lean_inc(v_a_1444_);
+lean_dec_ref_known(v___x_1443_, 1);
+v___x_1445_ = l_Lasm_JS_global();
+if (lean_obj_tag(v___x_1445_) == 0)
 {
-lean_object* v_a_1432_; lean_object* v___x_1433_; lean_object* v___x_1434_; 
-v_a_1432_ = lean_ctor_get(v___x_1431_, 0);
-lean_inc(v_a_1432_);
-lean_dec_ref_known(v___x_1431_, 1);
-v___x_1433_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__1));
-v___x_1434_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_a_1432_, v___x_1433_);
-if (lean_obj_tag(v___x_1434_) == 0)
+lean_object* v_a_1446_; lean_object* v___x_1447_; lean_object* v___x_1448_; 
+v_a_1446_ = lean_ctor_get(v___x_1445_, 0);
+lean_inc(v_a_1446_);
+lean_dec_ref_known(v___x_1445_, 1);
+v___x_1447_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__1));
+v___x_1448_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_a_1446_, v___x_1447_);
+if (lean_obj_tag(v___x_1448_) == 0)
 {
-lean_object* v_a_1435_; lean_object* v___x_1436_; lean_object* v___x_1437_; lean_object* v___x_1438_; lean_object* v___x_1439_; lean_object* v___x_1440_; lean_object* v___y_1442_; uint8_t v___x_1469_; 
-v_a_1435_ = lean_ctor_get(v___x_1434_, 0);
-lean_inc(v_a_1435_);
-lean_dec_ref_known(v___x_1434_, 1);
-v___x_1436_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__2));
-v___x_1437_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-lean_inc(v_a_1430_);
-v___x_1438_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_1438_, 0, v_a_1430_);
-lean_ctor_set(v___x_1438_, 1, v___x_1437_);
-v___x_1439_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__4));
-v___x_1440_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__5));
-v___x_1469_ = lean_uint8_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1);
-if (v___x_1469_ == 0)
+lean_object* v_a_1449_; lean_object* v___x_1450_; lean_object* v___x_1451_; lean_object* v___x_1452_; lean_object* v___x_1453_; lean_object* v___x_1454_; lean_object* v___y_1456_; uint8_t v___x_1483_; 
+v_a_1449_ = lean_ctor_get(v___x_1448_, 0);
+lean_inc(v_a_1449_);
+lean_dec_ref_known(v___x_1448_, 1);
+v___x_1450_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__2));
+v___x_1451_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+lean_inc(v_a_1444_);
+v___x_1452_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_1452_, 0, v_a_1444_);
+lean_ctor_set(v___x_1452_, 1, v___x_1451_);
+v___x_1453_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__4));
+v___x_1454_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__5));
+v___x_1483_ = lean_uint8_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1);
+if (v___x_1483_ == 0)
 {
-lean_object* v___x_1470_; 
-v___x_1470_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2);
-v___y_1442_ = v___x_1470_;
-goto v___jp_1441_;
+lean_object* v___x_1484_; 
+v___x_1484_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2);
+v___y_1456_ = v___x_1484_;
+goto v___jp_1455_;
 }
 else
-{
-lean_object* v___x_1471_; 
-v___x_1471_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4);
-v___y_1442_ = v___x_1471_;
-goto v___jp_1441_;
-}
-v___jp_1441_:
-{
-lean_object* v___x_1443_; lean_object* v___x_1444_; lean_object* v___x_1445_; lean_object* v___x_1446_; lean_object* v___x_1447_; lean_object* v___x_1448_; lean_object* v___x_1449_; lean_object* v___x_1450_; lean_object* v___x_1451_; lean_object* v___x_1452_; 
-lean_inc(v___y_1442_);
-v___x_1443_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1443_, 0, v___x_1440_);
-lean_ctor_set(v___x_1443_, 1, v___y_1442_);
-v___x_1444_ = lean_box(0);
-v___x_1445_ = lean_alloc_ctor(1, 2, 0);
-lean_ctor_set(v___x_1445_, 0, v___x_1443_);
-lean_ctor_set(v___x_1445_, 1, v___x_1444_);
-v___x_1446_ = l_Lasm_JS_obj(v___x_1445_);
-v___x_1447_ = lean_unsigned_to_nat(3u);
-v___x_1448_ = lean_mk_empty_array_with_capacity(v___x_1447_);
-v___x_1449_ = lean_array_push(v___x_1448_, v___x_1438_);
-v___x_1450_ = lean_array_push(v___x_1449_, v___x_1439_);
-v___x_1451_ = lean_array_push(v___x_1450_, v___x_1446_);
-v___x_1452_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_a_1435_, v___x_1436_, v___x_1451_);
-if (lean_obj_tag(v___x_1452_) == 0)
-{
-lean_object* v___x_1454_; uint8_t v_isShared_1455_; uint8_t v_isSharedCheck_1459_; 
-v_isSharedCheck_1459_ = !lean_is_exclusive(v___x_1452_);
-if (v_isSharedCheck_1459_ == 0)
-{
-lean_object* v_unused_1460_; 
-v_unused_1460_ = lean_ctor_get(v___x_1452_, 0);
-lean_dec(v_unused_1460_);
-v___x_1454_ = v___x_1452_;
-v_isShared_1455_ = v_isSharedCheck_1459_;
-goto v_resetjp_1453_;
-}
-else
-{
-lean_dec(v___x_1452_);
-v___x_1454_ = lean_box(0);
-v_isShared_1455_ = v_isSharedCheck_1459_;
-goto v_resetjp_1453_;
-}
-v_resetjp_1453_:
-{
-lean_object* v___x_1457_; 
-if (v_isShared_1455_ == 0)
-{
-lean_ctor_set(v___x_1454_, 0, v_a_1430_);
-v___x_1457_ = v___x_1454_;
-goto v_reusejp_1456_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1458_; 
-v_reuseFailAlloc_1458_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1458_, 0, v_a_1430_);
-v___x_1457_ = v_reuseFailAlloc_1458_;
-goto v_reusejp_1456_;
-}
-v_reusejp_1456_:
-{
-return v___x_1457_;
-}
-}
-}
-else
-{
-lean_object* v_a_1461_; lean_object* v___x_1463_; uint8_t v_isShared_1464_; uint8_t v_isSharedCheck_1468_; 
-lean_dec(v_a_1430_);
-v_a_1461_ = lean_ctor_get(v___x_1452_, 0);
-v_isSharedCheck_1468_ = !lean_is_exclusive(v___x_1452_);
-if (v_isSharedCheck_1468_ == 0)
-{
-v___x_1463_ = v___x_1452_;
-v_isShared_1464_ = v_isSharedCheck_1468_;
-goto v_resetjp_1462_;
-}
-else
-{
-lean_inc(v_a_1461_);
-lean_dec(v___x_1452_);
-v___x_1463_ = lean_box(0);
-v_isShared_1464_ = v_isSharedCheck_1468_;
-goto v_resetjp_1462_;
-}
-v_resetjp_1462_:
-{
-lean_object* v___x_1466_; 
-if (v_isShared_1464_ == 0)
-{
-v___x_1466_ = v___x_1463_;
-goto v_reusejp_1465_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1467_; 
-v_reuseFailAlloc_1467_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1467_, 0, v_a_1461_);
-v___x_1466_ = v_reuseFailAlloc_1467_;
-goto v_reusejp_1465_;
-}
-v_reusejp_1465_:
-{
-return v___x_1466_;
-}
-}
-}
-}
-}
-else
-{
-lean_object* v_a_1472_; lean_object* v___x_1474_; uint8_t v_isShared_1475_; uint8_t v_isSharedCheck_1479_; 
-lean_dec(v_a_1430_);
-v_a_1472_ = lean_ctor_get(v___x_1434_, 0);
-v_isSharedCheck_1479_ = !lean_is_exclusive(v___x_1434_);
-if (v_isSharedCheck_1479_ == 0)
-{
-v___x_1474_ = v___x_1434_;
-v_isShared_1475_ = v_isSharedCheck_1479_;
-goto v_resetjp_1473_;
-}
-else
-{
-lean_inc(v_a_1472_);
-lean_dec(v___x_1434_);
-v___x_1474_ = lean_box(0);
-v_isShared_1475_ = v_isSharedCheck_1479_;
-goto v_resetjp_1473_;
-}
-v_resetjp_1473_:
-{
-lean_object* v___x_1477_; 
-if (v_isShared_1475_ == 0)
-{
-v___x_1477_ = v___x_1474_;
-goto v_reusejp_1476_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1478_; 
-v_reuseFailAlloc_1478_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1478_, 0, v_a_1472_);
-v___x_1477_ = v_reuseFailAlloc_1478_;
-goto v_reusejp_1476_;
-}
-v_reusejp_1476_:
-{
-return v___x_1477_;
-}
-}
-}
-}
-else
-{
-lean_object* v_a_1480_; lean_object* v___x_1482_; uint8_t v_isShared_1483_; uint8_t v_isSharedCheck_1487_; 
-lean_dec(v_a_1430_);
-v_a_1480_ = lean_ctor_get(v___x_1431_, 0);
-v_isSharedCheck_1487_ = !lean_is_exclusive(v___x_1431_);
-if (v_isSharedCheck_1487_ == 0)
-{
-v___x_1482_ = v___x_1431_;
-v_isShared_1483_ = v_isSharedCheck_1487_;
-goto v_resetjp_1481_;
-}
-else
-{
-lean_inc(v_a_1480_);
-lean_dec(v___x_1431_);
-v___x_1482_ = lean_box(0);
-v_isShared_1483_ = v_isSharedCheck_1487_;
-goto v_resetjp_1481_;
-}
-v_resetjp_1481_:
 {
 lean_object* v___x_1485_; 
-if (v_isShared_1483_ == 0)
+v___x_1485_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4);
+v___y_1456_ = v___x_1485_;
+goto v___jp_1455_;
+}
+v___jp_1455_:
 {
-v___x_1485_ = v___x_1482_;
-goto v_reusejp_1484_;
+lean_object* v___x_1457_; lean_object* v___x_1458_; lean_object* v___x_1459_; lean_object* v___x_1460_; lean_object* v___x_1461_; lean_object* v___x_1462_; lean_object* v___x_1463_; lean_object* v___x_1464_; lean_object* v___x_1465_; lean_object* v___x_1466_; 
+lean_inc(v___y_1456_);
+v___x_1457_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1457_, 0, v___x_1454_);
+lean_ctor_set(v___x_1457_, 1, v___y_1456_);
+v___x_1458_ = lean_box(0);
+v___x_1459_ = lean_alloc_ctor(1, 2, 0);
+lean_ctor_set(v___x_1459_, 0, v___x_1457_);
+lean_ctor_set(v___x_1459_, 1, v___x_1458_);
+v___x_1460_ = l_Lasm_JS_obj(v___x_1459_);
+v___x_1461_ = lean_unsigned_to_nat(3u);
+v___x_1462_ = lean_mk_empty_array_with_capacity(v___x_1461_);
+v___x_1463_ = lean_array_push(v___x_1462_, v___x_1452_);
+v___x_1464_ = lean_array_push(v___x_1463_, v___x_1453_);
+v___x_1465_ = lean_array_push(v___x_1464_, v___x_1460_);
+v___x_1466_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_a_1449_, v___x_1450_, v___x_1465_);
+if (lean_obj_tag(v___x_1466_) == 0)
+{
+lean_object* v___x_1468_; uint8_t v_isShared_1469_; uint8_t v_isSharedCheck_1473_; 
+v_isSharedCheck_1473_ = !lean_is_exclusive(v___x_1466_);
+if (v_isSharedCheck_1473_ == 0)
+{
+lean_object* v_unused_1474_; 
+v_unused_1474_ = lean_ctor_get(v___x_1466_, 0);
+lean_dec(v_unused_1474_);
+v___x_1468_ = v___x_1466_;
+v_isShared_1469_ = v_isSharedCheck_1473_;
+goto v_resetjp_1467_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1486_; 
-v_reuseFailAlloc_1486_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1486_, 0, v_a_1480_);
-v___x_1485_ = v_reuseFailAlloc_1486_;
-goto v_reusejp_1484_;
+lean_dec(v___x_1466_);
+v___x_1468_ = lean_box(0);
+v_isShared_1469_ = v_isSharedCheck_1473_;
+goto v_resetjp_1467_;
 }
-v_reusejp_1484_:
+v_resetjp_1467_:
 {
-return v___x_1485_;
+lean_object* v___x_1471_; 
+if (v_isShared_1469_ == 0)
+{
+lean_ctor_set(v___x_1468_, 0, v_a_1444_);
+v___x_1471_ = v___x_1468_;
+goto v_reusejp_1470_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1472_; 
+v_reuseFailAlloc_1472_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1472_, 0, v_a_1444_);
+v___x_1471_ = v_reuseFailAlloc_1472_;
+goto v_reusejp_1470_;
+}
+v_reusejp_1470_:
+{
+return v___x_1471_;
+}
+}
+}
+else
+{
+lean_object* v_a_1475_; lean_object* v___x_1477_; uint8_t v_isShared_1478_; uint8_t v_isSharedCheck_1482_; 
+lean_dec(v_a_1444_);
+v_a_1475_ = lean_ctor_get(v___x_1466_, 0);
+v_isSharedCheck_1482_ = !lean_is_exclusive(v___x_1466_);
+if (v_isSharedCheck_1482_ == 0)
+{
+v___x_1477_ = v___x_1466_;
+v_isShared_1478_ = v_isSharedCheck_1482_;
+goto v_resetjp_1476_;
+}
+else
+{
+lean_inc(v_a_1475_);
+lean_dec(v___x_1466_);
+v___x_1477_ = lean_box(0);
+v_isShared_1478_ = v_isSharedCheck_1482_;
+goto v_resetjp_1476_;
+}
+v_resetjp_1476_:
+{
+lean_object* v___x_1480_; 
+if (v_isShared_1478_ == 0)
+{
+v___x_1480_ = v___x_1477_;
+goto v_reusejp_1479_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1481_; 
+v_reuseFailAlloc_1481_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1481_, 0, v_a_1475_);
+v___x_1480_ = v_reuseFailAlloc_1481_;
+goto v_reusejp_1479_;
+}
+v_reusejp_1479_:
+{
+return v___x_1480_;
+}
 }
 }
 }
 }
 else
 {
-lean_object* v_a_1488_; lean_object* v___x_1490_; uint8_t v_isShared_1491_; uint8_t v_isSharedCheck_1495_; 
-v_a_1488_ = lean_ctor_get(v___x_1429_, 0);
-v_isSharedCheck_1495_ = !lean_is_exclusive(v___x_1429_);
-if (v_isSharedCheck_1495_ == 0)
+lean_object* v_a_1486_; lean_object* v___x_1488_; uint8_t v_isShared_1489_; uint8_t v_isSharedCheck_1493_; 
+lean_dec(v_a_1444_);
+v_a_1486_ = lean_ctor_get(v___x_1448_, 0);
+v_isSharedCheck_1493_ = !lean_is_exclusive(v___x_1448_);
+if (v_isSharedCheck_1493_ == 0)
 {
-v___x_1490_ = v___x_1429_;
-v_isShared_1491_ = v_isSharedCheck_1495_;
-goto v_resetjp_1489_;
+v___x_1488_ = v___x_1448_;
+v_isShared_1489_ = v_isSharedCheck_1493_;
+goto v_resetjp_1487_;
 }
 else
 {
-lean_inc(v_a_1488_);
-lean_dec(v___x_1429_);
-v___x_1490_ = lean_box(0);
-v_isShared_1491_ = v_isSharedCheck_1495_;
-goto v_resetjp_1489_;
+lean_inc(v_a_1486_);
+lean_dec(v___x_1448_);
+v___x_1488_ = lean_box(0);
+v_isShared_1489_ = v_isSharedCheck_1493_;
+goto v_resetjp_1487_;
 }
-v_resetjp_1489_:
+v_resetjp_1487_:
 {
-lean_object* v___x_1493_; 
-if (v_isShared_1491_ == 0)
+lean_object* v___x_1491_; 
+if (v_isShared_1489_ == 0)
 {
-v___x_1493_ = v___x_1490_;
-goto v_reusejp_1492_;
+v___x_1491_ = v___x_1488_;
+goto v_reusejp_1490_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1494_; 
-v_reuseFailAlloc_1494_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1494_, 0, v_a_1488_);
-v___x_1493_ = v_reuseFailAlloc_1494_;
-goto v_reusejp_1492_;
+lean_object* v_reuseFailAlloc_1492_; 
+v_reuseFailAlloc_1492_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1492_, 0, v_a_1486_);
+v___x_1491_ = v_reuseFailAlloc_1492_;
+goto v_reusejp_1490_;
 }
-v_reusejp_1492_:
+v_reusejp_1490_:
 {
-return v___x_1493_;
+return v___x_1491_;
+}
+}
+}
+}
+else
+{
+lean_object* v_a_1494_; lean_object* v___x_1496_; uint8_t v_isShared_1497_; uint8_t v_isSharedCheck_1501_; 
+lean_dec(v_a_1444_);
+v_a_1494_ = lean_ctor_get(v___x_1445_, 0);
+v_isSharedCheck_1501_ = !lean_is_exclusive(v___x_1445_);
+if (v_isSharedCheck_1501_ == 0)
+{
+v___x_1496_ = v___x_1445_;
+v_isShared_1497_ = v_isSharedCheck_1501_;
+goto v_resetjp_1495_;
+}
+else
+{
+lean_inc(v_a_1494_);
+lean_dec(v___x_1445_);
+v___x_1496_ = lean_box(0);
+v_isShared_1497_ = v_isSharedCheck_1501_;
+goto v_resetjp_1495_;
+}
+v_resetjp_1495_:
+{
+lean_object* v___x_1499_; 
+if (v_isShared_1497_ == 0)
+{
+v___x_1499_ = v___x_1496_;
+goto v_reusejp_1498_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1500_; 
+v_reuseFailAlloc_1500_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1500_, 0, v_a_1494_);
+v___x_1499_ = v_reuseFailAlloc_1500_;
+goto v_reusejp_1498_;
+}
+v_reusejp_1498_:
+{
+return v___x_1499_;
+}
+}
+}
+}
+else
+{
+lean_object* v_a_1502_; lean_object* v___x_1504_; uint8_t v_isShared_1505_; uint8_t v_isSharedCheck_1509_; 
+v_a_1502_ = lean_ctor_get(v___x_1443_, 0);
+v_isSharedCheck_1509_ = !lean_is_exclusive(v___x_1443_);
+if (v_isSharedCheck_1509_ == 0)
+{
+v___x_1504_ = v___x_1443_;
+v_isShared_1505_ = v_isSharedCheck_1509_;
+goto v_resetjp_1503_;
+}
+else
+{
+lean_inc(v_a_1502_);
+lean_dec(v___x_1443_);
+v___x_1504_ = lean_box(0);
+v_isShared_1505_ = v_isSharedCheck_1509_;
+goto v_resetjp_1503_;
+}
+v_resetjp_1503_:
+{
+lean_object* v___x_1507_; 
+if (v_isShared_1505_ == 0)
+{
+v___x_1507_ = v___x_1504_;
+goto v_reusejp_1506_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1508_; 
+v_reuseFailAlloc_1508_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1508_, 0, v_a_1502_);
+v___x_1507_ = v_reuseFailAlloc_1508_;
+goto v_reusejp_1506_;
+}
+v_reusejp_1506_:
+{
+return v___x_1507_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___boxed(lean_object* v_f_1496_, lean_object* v_a_1497_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___boxed(lean_object* v_f_1510_, lean_object* v_a_1511_){
 _start:
 {
-lean_object* v_res_1498_; 
-v_res_1498_ = l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn(v_f_1496_);
-return v_res_1498_;
+lean_object* v_res_1512_; 
+v_res_1512_ = l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn(v_f_1510_);
+return v_res_1512_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn___lam__0(lean_object* v_f_1499_, lean_object* v_args_1500_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn___lam__0(lean_object* v_f_1513_, lean_object* v_args_1514_){
 _start:
 {
-lean_object* v___x_1502_; lean_object* v___x_1503_; 
-v___x_1502_ = lean_unsigned_to_nat(0u);
-v___x_1503_ = l_Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0(v_args_1500_, v___x_1502_);
-if (lean_obj_tag(v___x_1503_) == 0)
+lean_object* v___x_1516_; lean_object* v___x_1517_; 
+v___x_1516_ = lean_unsigned_to_nat(0u);
+v___x_1517_ = l_Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0(v_args_1514_, v___x_1516_);
+if (lean_obj_tag(v___x_1517_) == 0)
 {
-lean_object* v_a_1504_; lean_object* v___x_1505_; 
-v_a_1504_ = lean_ctor_get(v___x_1503_, 0);
-lean_inc(v_a_1504_);
-lean_dec_ref_known(v___x_1503_, 1);
-v___x_1505_ = lean_apply_2(v_f_1499_, v_a_1504_, lean_box(0));
-return v___x_1505_;
+lean_object* v_a_1518_; lean_object* v___x_1519_; 
+v_a_1518_ = lean_ctor_get(v___x_1517_, 0);
+lean_inc(v_a_1518_);
+lean_dec_ref_known(v___x_1517_, 1);
+v___x_1519_ = lean_apply_2(v_f_1513_, v_a_1518_, lean_box(0));
+return v___x_1519_;
 }
 else
 {
-lean_object* v_a_1506_; lean_object* v___x_1508_; uint8_t v_isShared_1509_; uint8_t v_isSharedCheck_1513_; 
-lean_dec_ref(v_f_1499_);
-v_a_1506_ = lean_ctor_get(v___x_1503_, 0);
-v_isSharedCheck_1513_ = !lean_is_exclusive(v___x_1503_);
-if (v_isSharedCheck_1513_ == 0)
+lean_object* v_a_1520_; lean_object* v___x_1522_; uint8_t v_isShared_1523_; uint8_t v_isSharedCheck_1527_; 
+lean_dec_ref(v_f_1513_);
+v_a_1520_ = lean_ctor_get(v___x_1517_, 0);
+v_isSharedCheck_1527_ = !lean_is_exclusive(v___x_1517_);
+if (v_isSharedCheck_1527_ == 0)
 {
-v___x_1508_ = v___x_1503_;
-v_isShared_1509_ = v_isSharedCheck_1513_;
-goto v_resetjp_1507_;
+v___x_1522_ = v___x_1517_;
+v_isShared_1523_ = v_isSharedCheck_1527_;
+goto v_resetjp_1521_;
 }
 else
 {
-lean_inc(v_a_1506_);
-lean_dec(v___x_1503_);
-v___x_1508_ = lean_box(0);
-v_isShared_1509_ = v_isSharedCheck_1513_;
-goto v_resetjp_1507_;
+lean_inc(v_a_1520_);
+lean_dec(v___x_1517_);
+v___x_1522_ = lean_box(0);
+v_isShared_1523_ = v_isSharedCheck_1527_;
+goto v_resetjp_1521_;
 }
-v_resetjp_1507_:
+v_resetjp_1521_:
 {
-lean_object* v___x_1511_; 
-if (v_isShared_1509_ == 0)
+lean_object* v___x_1525_; 
+if (v_isShared_1523_ == 0)
 {
-v___x_1511_ = v___x_1508_;
-goto v_reusejp_1510_;
+v___x_1525_ = v___x_1522_;
+goto v_reusejp_1524_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1512_; 
-v_reuseFailAlloc_1512_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1512_, 0, v_a_1506_);
-v___x_1511_ = v_reuseFailAlloc_1512_;
-goto v_reusejp_1510_;
+lean_object* v_reuseFailAlloc_1526_; 
+v_reuseFailAlloc_1526_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1526_, 0, v_a_1520_);
+v___x_1525_ = v_reuseFailAlloc_1526_;
+goto v_reusejp_1524_;
 }
-v_reusejp_1510_:
+v_reusejp_1524_:
 {
-return v___x_1511_;
+return v___x_1525_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn___lam__0___boxed(lean_object* v_f_1514_, lean_object* v_args_1515_, lean_object* v___y_1516_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn___lam__0___boxed(lean_object* v_f_1528_, lean_object* v_args_1529_, lean_object* v___y_1530_){
 _start:
 {
-lean_object* v_res_1517_; 
-v_res_1517_ = l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn___lam__0(v_f_1514_, v_args_1515_);
-lean_dec_ref(v_args_1515_);
-return v_res_1517_;
+lean_object* v_res_1531_; 
+v_res_1531_ = l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn___lam__0(v_f_1528_, v_args_1529_);
+lean_dec_ref(v_args_1529_);
+return v_res_1531_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn(lean_object* v_f_1518_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn(lean_object* v_f_1532_){
 _start:
 {
-lean_object* v___f_1520_; lean_object* v___x_1521_; 
-v___f_1520_ = lean_alloc_closure((void*)(l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn___lam__0___boxed), 3, 1);
-lean_closure_set(v___f_1520_, 0, v_f_1518_);
-v___x_1521_ = l_Lasm_JS_Function_ofSyncFn(v___f_1520_);
-if (lean_obj_tag(v___x_1521_) == 0)
+lean_object* v___f_1534_; lean_object* v___x_1535_; 
+v___f_1534_ = lean_alloc_closure((void*)(l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn___lam__0___boxed), 3, 1);
+lean_closure_set(v___f_1534_, 0, v_f_1532_);
+v___x_1535_ = l_Lasm_JS_Function_ofSyncFn(v___f_1534_);
+if (lean_obj_tag(v___x_1535_) == 0)
 {
-lean_object* v_a_1522_; lean_object* v___x_1523_; 
-v_a_1522_ = lean_ctor_get(v___x_1521_, 0);
-lean_inc(v_a_1522_);
-lean_dec_ref_known(v___x_1521_, 1);
-v___x_1523_ = l_Lasm_JS_global();
-if (lean_obj_tag(v___x_1523_) == 0)
+lean_object* v_a_1536_; lean_object* v___x_1537_; 
+v_a_1536_ = lean_ctor_get(v___x_1535_, 0);
+lean_inc(v_a_1536_);
+lean_dec_ref_known(v___x_1535_, 1);
+v___x_1537_ = l_Lasm_JS_global();
+if (lean_obj_tag(v___x_1537_) == 0)
 {
-lean_object* v_a_1524_; lean_object* v___x_1525_; lean_object* v___x_1526_; 
-v_a_1524_ = lean_ctor_get(v___x_1523_, 0);
-lean_inc(v_a_1524_);
-lean_dec_ref_known(v___x_1523_, 1);
-v___x_1525_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__1));
-v___x_1526_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_a_1524_, v___x_1525_);
-if (lean_obj_tag(v___x_1526_) == 0)
+lean_object* v_a_1538_; lean_object* v___x_1539_; lean_object* v___x_1540_; 
+v_a_1538_ = lean_ctor_get(v___x_1537_, 0);
+lean_inc(v_a_1538_);
+lean_dec_ref_known(v___x_1537_, 1);
+v___x_1539_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__1));
+v___x_1540_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_a_1538_, v___x_1539_);
+if (lean_obj_tag(v___x_1540_) == 0)
 {
-lean_object* v_a_1527_; lean_object* v___x_1528_; lean_object* v___x_1529_; lean_object* v___x_1530_; lean_object* v___x_1531_; lean_object* v___x_1532_; lean_object* v___y_1534_; uint8_t v___x_1561_; 
-v_a_1527_ = lean_ctor_get(v___x_1526_, 0);
-lean_inc(v_a_1527_);
-lean_dec_ref_known(v___x_1526_, 1);
-v___x_1528_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__2));
-v___x_1529_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-lean_inc(v_a_1522_);
-v___x_1530_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_1530_, 0, v_a_1522_);
-lean_ctor_set(v___x_1530_, 1, v___x_1529_);
-v___x_1531_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__4));
-v___x_1532_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__5));
-v___x_1561_ = lean_uint8_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1);
-if (v___x_1561_ == 0)
+lean_object* v_a_1541_; lean_object* v___x_1542_; lean_object* v___x_1543_; lean_object* v___x_1544_; lean_object* v___x_1545_; lean_object* v___x_1546_; lean_object* v___y_1548_; uint8_t v___x_1575_; 
+v_a_1541_ = lean_ctor_get(v___x_1540_, 0);
+lean_inc(v_a_1541_);
+lean_dec_ref_known(v___x_1540_, 1);
+v___x_1542_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__2));
+v___x_1543_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+lean_inc(v_a_1536_);
+v___x_1544_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_1544_, 0, v_a_1536_);
+lean_ctor_set(v___x_1544_, 1, v___x_1543_);
+v___x_1545_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__4));
+v___x_1546_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStateBlockConcurrencyWhileCallback_ofFn___closed__5));
+v___x_1575_ = lean_uint8_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__1);
+if (v___x_1575_ == 0)
 {
-lean_object* v___x_1562_; 
-v___x_1562_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2);
-v___y_1534_ = v___x_1562_;
-goto v___jp_1533_;
+lean_object* v___x_1576_; 
+v___x_1576_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__2);
+v___y_1548_ = v___x_1576_;
+goto v___jp_1547_;
 }
 else
-{
-lean_object* v___x_1563_; 
-v___x_1563_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4);
-v___y_1534_ = v___x_1563_;
-goto v___jp_1533_;
-}
-v___jp_1533_:
-{
-lean_object* v___x_1535_; lean_object* v___x_1536_; lean_object* v___x_1537_; lean_object* v___x_1538_; lean_object* v___x_1539_; lean_object* v___x_1540_; lean_object* v___x_1541_; lean_object* v___x_1542_; lean_object* v___x_1543_; lean_object* v___x_1544_; 
-lean_inc(v___y_1534_);
-v___x_1535_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1535_, 0, v___x_1532_);
-lean_ctor_set(v___x_1535_, 1, v___y_1534_);
-v___x_1536_ = lean_box(0);
-v___x_1537_ = lean_alloc_ctor(1, 2, 0);
-lean_ctor_set(v___x_1537_, 0, v___x_1535_);
-lean_ctor_set(v___x_1537_, 1, v___x_1536_);
-v___x_1538_ = l_Lasm_JS_obj(v___x_1537_);
-v___x_1539_ = lean_unsigned_to_nat(3u);
-v___x_1540_ = lean_mk_empty_array_with_capacity(v___x_1539_);
-v___x_1541_ = lean_array_push(v___x_1540_, v___x_1530_);
-v___x_1542_ = lean_array_push(v___x_1541_, v___x_1531_);
-v___x_1543_ = lean_array_push(v___x_1542_, v___x_1538_);
-v___x_1544_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_a_1527_, v___x_1528_, v___x_1543_);
-if (lean_obj_tag(v___x_1544_) == 0)
-{
-lean_object* v___x_1546_; uint8_t v_isShared_1547_; uint8_t v_isSharedCheck_1551_; 
-v_isSharedCheck_1551_ = !lean_is_exclusive(v___x_1544_);
-if (v_isSharedCheck_1551_ == 0)
-{
-lean_object* v_unused_1552_; 
-v_unused_1552_ = lean_ctor_get(v___x_1544_, 0);
-lean_dec(v_unused_1552_);
-v___x_1546_ = v___x_1544_;
-v_isShared_1547_ = v_isSharedCheck_1551_;
-goto v_resetjp_1545_;
-}
-else
-{
-lean_dec(v___x_1544_);
-v___x_1546_ = lean_box(0);
-v_isShared_1547_ = v_isSharedCheck_1551_;
-goto v_resetjp_1545_;
-}
-v_resetjp_1545_:
-{
-lean_object* v___x_1549_; 
-if (v_isShared_1547_ == 0)
-{
-lean_ctor_set(v___x_1546_, 0, v_a_1522_);
-v___x_1549_ = v___x_1546_;
-goto v_reusejp_1548_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1550_; 
-v_reuseFailAlloc_1550_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1550_, 0, v_a_1522_);
-v___x_1549_ = v_reuseFailAlloc_1550_;
-goto v_reusejp_1548_;
-}
-v_reusejp_1548_:
-{
-return v___x_1549_;
-}
-}
-}
-else
-{
-lean_object* v_a_1553_; lean_object* v___x_1555_; uint8_t v_isShared_1556_; uint8_t v_isSharedCheck_1560_; 
-lean_dec(v_a_1522_);
-v_a_1553_ = lean_ctor_get(v___x_1544_, 0);
-v_isSharedCheck_1560_ = !lean_is_exclusive(v___x_1544_);
-if (v_isSharedCheck_1560_ == 0)
-{
-v___x_1555_ = v___x_1544_;
-v_isShared_1556_ = v_isSharedCheck_1560_;
-goto v_resetjp_1554_;
-}
-else
-{
-lean_inc(v_a_1553_);
-lean_dec(v___x_1544_);
-v___x_1555_ = lean_box(0);
-v_isShared_1556_ = v_isSharedCheck_1560_;
-goto v_resetjp_1554_;
-}
-v_resetjp_1554_:
-{
-lean_object* v___x_1558_; 
-if (v_isShared_1556_ == 0)
-{
-v___x_1558_ = v___x_1555_;
-goto v_reusejp_1557_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1559_; 
-v_reuseFailAlloc_1559_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1559_, 0, v_a_1553_);
-v___x_1558_ = v_reuseFailAlloc_1559_;
-goto v_reusejp_1557_;
-}
-v_reusejp_1557_:
-{
-return v___x_1558_;
-}
-}
-}
-}
-}
-else
-{
-lean_object* v_a_1564_; lean_object* v___x_1566_; uint8_t v_isShared_1567_; uint8_t v_isSharedCheck_1571_; 
-lean_dec(v_a_1522_);
-v_a_1564_ = lean_ctor_get(v___x_1526_, 0);
-v_isSharedCheck_1571_ = !lean_is_exclusive(v___x_1526_);
-if (v_isSharedCheck_1571_ == 0)
-{
-v___x_1566_ = v___x_1526_;
-v_isShared_1567_ = v_isSharedCheck_1571_;
-goto v_resetjp_1565_;
-}
-else
-{
-lean_inc(v_a_1564_);
-lean_dec(v___x_1526_);
-v___x_1566_ = lean_box(0);
-v_isShared_1567_ = v_isSharedCheck_1571_;
-goto v_resetjp_1565_;
-}
-v_resetjp_1565_:
-{
-lean_object* v___x_1569_; 
-if (v_isShared_1567_ == 0)
-{
-v___x_1569_ = v___x_1566_;
-goto v_reusejp_1568_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1570_; 
-v_reuseFailAlloc_1570_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1570_, 0, v_a_1564_);
-v___x_1569_ = v_reuseFailAlloc_1570_;
-goto v_reusejp_1568_;
-}
-v_reusejp_1568_:
-{
-return v___x_1569_;
-}
-}
-}
-}
-else
-{
-lean_object* v_a_1572_; lean_object* v___x_1574_; uint8_t v_isShared_1575_; uint8_t v_isSharedCheck_1579_; 
-lean_dec(v_a_1522_);
-v_a_1572_ = lean_ctor_get(v___x_1523_, 0);
-v_isSharedCheck_1579_ = !lean_is_exclusive(v___x_1523_);
-if (v_isSharedCheck_1579_ == 0)
-{
-v___x_1574_ = v___x_1523_;
-v_isShared_1575_ = v_isSharedCheck_1579_;
-goto v_resetjp_1573_;
-}
-else
-{
-lean_inc(v_a_1572_);
-lean_dec(v___x_1523_);
-v___x_1574_ = lean_box(0);
-v_isShared_1575_ = v_isSharedCheck_1579_;
-goto v_resetjp_1573_;
-}
-v_resetjp_1573_:
 {
 lean_object* v___x_1577_; 
-if (v_isShared_1575_ == 0)
+v___x_1577_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4, &l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4_once, _init_l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn___closed__4);
+v___y_1548_ = v___x_1577_;
+goto v___jp_1547_;
+}
+v___jp_1547_:
 {
-v___x_1577_ = v___x_1574_;
-goto v_reusejp_1576_;
+lean_object* v___x_1549_; lean_object* v___x_1550_; lean_object* v___x_1551_; lean_object* v___x_1552_; lean_object* v___x_1553_; lean_object* v___x_1554_; lean_object* v___x_1555_; lean_object* v___x_1556_; lean_object* v___x_1557_; lean_object* v___x_1558_; 
+lean_inc(v___y_1548_);
+v___x_1549_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1549_, 0, v___x_1546_);
+lean_ctor_set(v___x_1549_, 1, v___y_1548_);
+v___x_1550_ = lean_box(0);
+v___x_1551_ = lean_alloc_ctor(1, 2, 0);
+lean_ctor_set(v___x_1551_, 0, v___x_1549_);
+lean_ctor_set(v___x_1551_, 1, v___x_1550_);
+v___x_1552_ = l_Lasm_JS_obj(v___x_1551_);
+v___x_1553_ = lean_unsigned_to_nat(3u);
+v___x_1554_ = lean_mk_empty_array_with_capacity(v___x_1553_);
+v___x_1555_ = lean_array_push(v___x_1554_, v___x_1544_);
+v___x_1556_ = lean_array_push(v___x_1555_, v___x_1545_);
+v___x_1557_ = lean_array_push(v___x_1556_, v___x_1552_);
+v___x_1558_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_a_1541_, v___x_1542_, v___x_1557_);
+if (lean_obj_tag(v___x_1558_) == 0)
+{
+lean_object* v___x_1560_; uint8_t v_isShared_1561_; uint8_t v_isSharedCheck_1565_; 
+v_isSharedCheck_1565_ = !lean_is_exclusive(v___x_1558_);
+if (v_isSharedCheck_1565_ == 0)
+{
+lean_object* v_unused_1566_; 
+v_unused_1566_ = lean_ctor_get(v___x_1558_, 0);
+lean_dec(v_unused_1566_);
+v___x_1560_ = v___x_1558_;
+v_isShared_1561_ = v_isSharedCheck_1565_;
+goto v_resetjp_1559_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1578_; 
-v_reuseFailAlloc_1578_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1578_, 0, v_a_1572_);
-v___x_1577_ = v_reuseFailAlloc_1578_;
-goto v_reusejp_1576_;
+lean_dec(v___x_1558_);
+v___x_1560_ = lean_box(0);
+v_isShared_1561_ = v_isSharedCheck_1565_;
+goto v_resetjp_1559_;
 }
-v_reusejp_1576_:
+v_resetjp_1559_:
 {
-return v___x_1577_;
+lean_object* v___x_1563_; 
+if (v_isShared_1561_ == 0)
+{
+lean_ctor_set(v___x_1560_, 0, v_a_1536_);
+v___x_1563_ = v___x_1560_;
+goto v_reusejp_1562_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1564_; 
+v_reuseFailAlloc_1564_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1564_, 0, v_a_1536_);
+v___x_1563_ = v_reuseFailAlloc_1564_;
+goto v_reusejp_1562_;
+}
+v_reusejp_1562_:
+{
+return v___x_1563_;
+}
+}
+}
+else
+{
+lean_object* v_a_1567_; lean_object* v___x_1569_; uint8_t v_isShared_1570_; uint8_t v_isSharedCheck_1574_; 
+lean_dec(v_a_1536_);
+v_a_1567_ = lean_ctor_get(v___x_1558_, 0);
+v_isSharedCheck_1574_ = !lean_is_exclusive(v___x_1558_);
+if (v_isSharedCheck_1574_ == 0)
+{
+v___x_1569_ = v___x_1558_;
+v_isShared_1570_ = v_isSharedCheck_1574_;
+goto v_resetjp_1568_;
+}
+else
+{
+lean_inc(v_a_1567_);
+lean_dec(v___x_1558_);
+v___x_1569_ = lean_box(0);
+v_isShared_1570_ = v_isSharedCheck_1574_;
+goto v_resetjp_1568_;
+}
+v_resetjp_1568_:
+{
+lean_object* v___x_1572_; 
+if (v_isShared_1570_ == 0)
+{
+v___x_1572_ = v___x_1569_;
+goto v_reusejp_1571_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1573_; 
+v_reuseFailAlloc_1573_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1573_, 0, v_a_1567_);
+v___x_1572_ = v_reuseFailAlloc_1573_;
+goto v_reusejp_1571_;
+}
+v_reusejp_1571_:
+{
+return v___x_1572_;
+}
 }
 }
 }
 }
 else
 {
-lean_object* v_a_1580_; lean_object* v___x_1582_; uint8_t v_isShared_1583_; uint8_t v_isSharedCheck_1587_; 
-v_a_1580_ = lean_ctor_get(v___x_1521_, 0);
-v_isSharedCheck_1587_ = !lean_is_exclusive(v___x_1521_);
-if (v_isSharedCheck_1587_ == 0)
+lean_object* v_a_1578_; lean_object* v___x_1580_; uint8_t v_isShared_1581_; uint8_t v_isSharedCheck_1585_; 
+lean_dec(v_a_1536_);
+v_a_1578_ = lean_ctor_get(v___x_1540_, 0);
+v_isSharedCheck_1585_ = !lean_is_exclusive(v___x_1540_);
+if (v_isSharedCheck_1585_ == 0)
 {
-v___x_1582_ = v___x_1521_;
-v_isShared_1583_ = v_isSharedCheck_1587_;
-goto v_resetjp_1581_;
+v___x_1580_ = v___x_1540_;
+v_isShared_1581_ = v_isSharedCheck_1585_;
+goto v_resetjp_1579_;
 }
 else
 {
-lean_inc(v_a_1580_);
-lean_dec(v___x_1521_);
-v___x_1582_ = lean_box(0);
-v_isShared_1583_ = v_isSharedCheck_1587_;
-goto v_resetjp_1581_;
+lean_inc(v_a_1578_);
+lean_dec(v___x_1540_);
+v___x_1580_ = lean_box(0);
+v_isShared_1581_ = v_isSharedCheck_1585_;
+goto v_resetjp_1579_;
 }
-v_resetjp_1581_:
+v_resetjp_1579_:
 {
-lean_object* v___x_1585_; 
-if (v_isShared_1583_ == 0)
+lean_object* v___x_1583_; 
+if (v_isShared_1581_ == 0)
 {
-v___x_1585_ = v___x_1582_;
-goto v_reusejp_1584_;
+v___x_1583_ = v___x_1580_;
+goto v_reusejp_1582_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1586_; 
-v_reuseFailAlloc_1586_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1586_, 0, v_a_1580_);
-v___x_1585_ = v_reuseFailAlloc_1586_;
-goto v_reusejp_1584_;
+lean_object* v_reuseFailAlloc_1584_; 
+v_reuseFailAlloc_1584_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1584_, 0, v_a_1578_);
+v___x_1583_ = v_reuseFailAlloc_1584_;
+goto v_reusejp_1582_;
 }
-v_reusejp_1584_:
+v_reusejp_1582_:
 {
-return v___x_1585_;
+return v___x_1583_;
 }
 }
 }
 }
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn___boxed(lean_object* v_f_1588_, lean_object* v_a_1589_){
-_start:
+else
 {
-lean_object* v_res_1590_; 
-v_res_1590_ = l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn(v_f_1588_);
-return v_res_1590_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectGetAlarmOptions___lam__0(lean_object* v___f_1591_, lean_object* v_d_1592_){
-_start:
+lean_object* v_a_1586_; lean_object* v___x_1588_; uint8_t v_isShared_1589_; uint8_t v_isSharedCheck_1593_; 
+lean_dec(v_a_1536_);
+v_a_1586_ = lean_ctor_get(v___x_1537_, 0);
+v_isSharedCheck_1593_ = !lean_is_exclusive(v___x_1537_);
+if (v_isSharedCheck_1593_ == 0)
 {
-lean_object* v___x_1593_; lean_object* v___x_1594_; lean_object* v___x_1595_; lean_object* v___x_1596_; lean_object* v___x_1597_; lean_object* v___x_1598_; lean_object* v___x_1599_; 
-v___x_1593_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
-v___x_1594_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1591_, v_d_1592_);
-v___x_1595_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1595_, 0, v___x_1593_);
-lean_ctor_set(v___x_1595_, 1, v___x_1594_);
-v___x_1596_ = lean_unsigned_to_nat(1u);
-v___x_1597_ = lean_mk_empty_array_with_capacity(v___x_1596_);
-v___x_1598_ = lean_array_push(v___x_1597_, v___x_1595_);
-v___x_1599_ = l_Lasm_JS_Web_Support_fields(v___x_1598_);
-lean_dec_ref(v___x_1598_);
+v___x_1588_ = v___x_1537_;
+v_isShared_1589_ = v_isSharedCheck_1593_;
+goto v_resetjp_1587_;
+}
+else
+{
+lean_inc(v_a_1586_);
+lean_dec(v___x_1537_);
+v___x_1588_ = lean_box(0);
+v_isShared_1589_ = v_isSharedCheck_1593_;
+goto v_resetjp_1587_;
+}
+v_resetjp_1587_:
+{
+lean_object* v___x_1591_; 
+if (v_isShared_1589_ == 0)
+{
+v___x_1591_ = v___x_1588_;
+goto v_reusejp_1590_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1592_; 
+v_reuseFailAlloc_1592_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1592_, 0, v_a_1586_);
+v___x_1591_ = v_reuseFailAlloc_1592_;
+goto v_reusejp_1590_;
+}
+v_reusejp_1590_:
+{
+return v___x_1591_;
+}
+}
+}
+}
+else
+{
+lean_object* v_a_1594_; lean_object* v___x_1596_; uint8_t v_isShared_1597_; uint8_t v_isSharedCheck_1601_; 
+v_a_1594_ = lean_ctor_get(v___x_1535_, 0);
+v_isSharedCheck_1601_ = !lean_is_exclusive(v___x_1535_);
+if (v_isSharedCheck_1601_ == 0)
+{
+v___x_1596_ = v___x_1535_;
+v_isShared_1597_ = v_isSharedCheck_1601_;
+goto v_resetjp_1595_;
+}
+else
+{
+lean_inc(v_a_1594_);
+lean_dec(v___x_1535_);
+v___x_1596_ = lean_box(0);
+v_isShared_1597_ = v_isSharedCheck_1601_;
+goto v_resetjp_1595_;
+}
+v_resetjp_1595_:
+{
+lean_object* v___x_1599_; 
+if (v_isShared_1597_ == 0)
+{
+v___x_1599_ = v___x_1596_;
+goto v_reusejp_1598_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1600_; 
+v_reuseFailAlloc_1600_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1600_, 0, v_a_1594_);
+v___x_1599_ = v_reuseFailAlloc_1600_;
+goto v_reusejp_1598_;
+}
+v_reusejp_1598_:
+{
 return v___x_1599_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectSetAlarmOptions___lam__0(lean_object* v___f_1603_, lean_object* v_d_1604_){
+}
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn___boxed(lean_object* v_f_1602_, lean_object* v_a_1603_){
 _start:
 {
-lean_object* v_allowConcurrency_1605_; lean_object* v_allowUnconfirmed_1606_; lean_object* v___x_1608_; uint8_t v_isShared_1609_; uint8_t v_isSharedCheck_1623_; 
-v_allowConcurrency_1605_ = lean_ctor_get(v_d_1604_, 0);
-v_allowUnconfirmed_1606_ = lean_ctor_get(v_d_1604_, 1);
-v_isSharedCheck_1623_ = !lean_is_exclusive(v_d_1604_);
-if (v_isSharedCheck_1623_ == 0)
-{
-v___x_1608_ = v_d_1604_;
-v_isShared_1609_ = v_isSharedCheck_1623_;
-goto v_resetjp_1607_;
-}
-else
-{
-lean_inc(v_allowUnconfirmed_1606_);
-lean_inc(v_allowConcurrency_1605_);
-lean_dec(v_d_1604_);
-v___x_1608_ = lean_box(0);
-v_isShared_1609_ = v_isSharedCheck_1623_;
-goto v_resetjp_1607_;
-}
-v_resetjp_1607_:
-{
-lean_object* v___x_1610_; lean_object* v___x_1611_; lean_object* v___x_1613_; 
-v___x_1610_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
-lean_inc_ref(v___f_1603_);
-v___x_1611_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1603_, v_allowConcurrency_1605_);
-if (v_isShared_1609_ == 0)
-{
-lean_ctor_set(v___x_1608_, 1, v___x_1611_);
-lean_ctor_set(v___x_1608_, 0, v___x_1610_);
-v___x_1613_ = v___x_1608_;
-goto v_reusejp_1612_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1622_; 
-v_reuseFailAlloc_1622_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v_reuseFailAlloc_1622_, 0, v___x_1610_);
-lean_ctor_set(v_reuseFailAlloc_1622_, 1, v___x_1611_);
-v___x_1613_ = v_reuseFailAlloc_1622_;
-goto v_reusejp_1612_;
-}
-v_reusejp_1612_:
-{
-lean_object* v___x_1614_; lean_object* v___x_1615_; lean_object* v___x_1616_; lean_object* v___x_1617_; lean_object* v___x_1618_; lean_object* v___x_1619_; lean_object* v___x_1620_; lean_object* v___x_1621_; 
-v___x_1614_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectPutOptions___lam__0___closed__0));
-v___x_1615_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1603_, v_allowUnconfirmed_1606_);
-v___x_1616_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1616_, 0, v___x_1614_);
-lean_ctor_set(v___x_1616_, 1, v___x_1615_);
-v___x_1617_ = lean_unsigned_to_nat(2u);
-v___x_1618_ = lean_mk_empty_array_with_capacity(v___x_1617_);
-v___x_1619_ = lean_array_push(v___x_1618_, v___x_1613_);
-v___x_1620_ = lean_array_push(v___x_1619_, v___x_1616_);
-v___x_1621_ = l_Lasm_JS_Web_Support_fields(v___x_1620_);
-lean_dec_ref(v___x_1620_);
-return v___x_1621_;
+lean_object* v_res_1604_; 
+v_res_1604_ = l_Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofSyncFn(v_f_1602_);
+return v_res_1604_;
 }
 }
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0_spec__0(lean_object* v_x_1627_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectGetAlarmOptions___lam__0(lean_object* v___f_1605_, lean_object* v_d_1606_){
 _start:
 {
-if (lean_obj_tag(v_x_1627_) == 0)
+lean_object* v___x_1607_; lean_object* v___x_1608_; lean_object* v___x_1609_; lean_object* v___x_1610_; lean_object* v___x_1611_; lean_object* v___x_1612_; lean_object* v___x_1613_; 
+v___x_1607_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
+v___x_1608_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1605_, v_d_1606_);
+v___x_1609_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1609_, 0, v___x_1607_);
+lean_ctor_set(v___x_1609_, 1, v___x_1608_);
+v___x_1610_ = lean_unsigned_to_nat(1u);
+v___x_1611_ = lean_mk_empty_array_with_capacity(v___x_1610_);
+v___x_1612_ = lean_array_push(v___x_1611_, v___x_1609_);
+v___x_1613_ = l_Lasm_JS_Web_Support_fields(v___x_1612_);
+lean_dec_ref(v___x_1612_);
+return v___x_1613_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_instToJSDurableObjectSetAlarmOptions___lam__0(lean_object* v___f_1617_, lean_object* v_d_1618_){
+_start:
 {
-lean_object* v___x_1628_; 
-v___x_1628_ = lean_box(0);
-return v___x_1628_;
+lean_object* v_allowConcurrency_1619_; lean_object* v_allowUnconfirmed_1620_; lean_object* v___x_1622_; uint8_t v_isShared_1623_; uint8_t v_isSharedCheck_1637_; 
+v_allowConcurrency_1619_ = lean_ctor_get(v_d_1618_, 0);
+v_allowUnconfirmed_1620_ = lean_ctor_get(v_d_1618_, 1);
+v_isSharedCheck_1637_ = !lean_is_exclusive(v_d_1618_);
+if (v_isSharedCheck_1637_ == 0)
+{
+v___x_1622_ = v_d_1618_;
+v_isShared_1623_ = v_isSharedCheck_1637_;
+goto v_resetjp_1621_;
 }
 else
 {
-lean_object* v_val_1629_; uint8_t v___x_1630_; 
-v_val_1629_ = lean_ctor_get(v_x_1627_, 0);
-v___x_1630_ = lean_unbox(v_val_1629_);
-switch(v___x_1630_)
+lean_inc(v_allowUnconfirmed_1620_);
+lean_inc(v_allowConcurrency_1619_);
+lean_dec(v_d_1618_);
+v___x_1622_ = lean_box(0);
+v_isShared_1623_ = v_isSharedCheck_1637_;
+goto v_resetjp_1621_;
+}
+v_resetjp_1621_:
+{
+lean_object* v___x_1624_; lean_object* v___x_1625_; lean_object* v___x_1627_; 
+v___x_1624_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
+lean_inc_ref(v___f_1617_);
+v___x_1625_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1617_, v_allowConcurrency_1619_);
+if (v_isShared_1623_ == 0)
+{
+lean_ctor_set(v___x_1622_, 1, v___x_1625_);
+lean_ctor_set(v___x_1622_, 0, v___x_1624_);
+v___x_1627_ = v___x_1622_;
+goto v_reusejp_1626_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1636_; 
+v_reuseFailAlloc_1636_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v_reuseFailAlloc_1636_, 0, v___x_1624_);
+lean_ctor_set(v_reuseFailAlloc_1636_, 1, v___x_1625_);
+v___x_1627_ = v_reuseFailAlloc_1636_;
+goto v_reusejp_1626_;
+}
+v_reusejp_1626_:
+{
+lean_object* v___x_1628_; lean_object* v___x_1629_; lean_object* v___x_1630_; lean_object* v___x_1631_; lean_object* v___x_1632_; lean_object* v___x_1633_; lean_object* v___x_1634_; lean_object* v___x_1635_; 
+v___x_1628_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectPutOptions___lam__0___closed__0));
+v___x_1629_ = l_Lasm_JS_Web_Support_optional___redArg(v___f_1617_, v_allowUnconfirmed_1620_);
+v___x_1630_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1630_, 0, v___x_1628_);
+lean_ctor_set(v___x_1630_, 1, v___x_1629_);
+v___x_1631_ = lean_unsigned_to_nat(2u);
+v___x_1632_ = lean_mk_empty_array_with_capacity(v___x_1631_);
+v___x_1633_ = lean_array_push(v___x_1632_, v___x_1627_);
+v___x_1634_ = lean_array_push(v___x_1633_, v___x_1630_);
+v___x_1635_ = l_Lasm_JS_Web_Support_fields(v___x_1634_);
+lean_dec_ref(v___x_1634_);
+return v___x_1635_;
+}
+}
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0_spec__0(lean_object* v_x_1641_){
+_start:
+{
+if (lean_obj_tag(v_x_1641_) == 0)
+{
+lean_object* v___x_1642_; 
+v___x_1642_ = lean_box(0);
+return v___x_1642_;
+}
+else
+{
+lean_object* v_val_1643_; uint8_t v___x_1644_; 
+v_val_1643_ = lean_ctor_get(v_x_1641_, 0);
+v___x_1644_ = lean_unbox(v_val_1643_);
+switch(v___x_1644_)
 {
 case 0:
 {
-lean_object* v___x_1631_; 
-v___x_1631_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__1));
-return v___x_1631_;
+lean_object* v___x_1645_; 
+v___x_1645_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__1));
+return v___x_1645_;
 }
 case 1:
 {
-lean_object* v___x_1632_; 
-v___x_1632_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__3));
-return v___x_1632_;
+lean_object* v___x_1646_; 
+v___x_1646_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__3));
+return v___x_1646_;
 }
 case 2:
 {
-lean_object* v___x_1633_; 
-v___x_1633_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__5));
-return v___x_1633_;
+lean_object* v___x_1647_; 
+v___x_1647_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__5));
+return v___x_1647_;
 }
 default: 
 {
-lean_object* v___x_1634_; 
-v___x_1634_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__7));
-return v___x_1634_;
+lean_object* v___x_1648_; 
+v___x_1648_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__7));
+return v___x_1648_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0_spec__0___boxed(lean_object* v_x_1635_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0_spec__0___boxed(lean_object* v_x_1649_){
 _start:
 {
-lean_object* v_res_1636_; 
-v_res_1636_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0_spec__0(v_x_1635_);
-lean_dec(v_x_1635_);
-return v_res_1636_;
+lean_object* v_res_1650_; 
+v_res_1650_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0_spec__0(v_x_1649_);
+lean_dec(v_x_1649_);
+return v_res_1650_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0(lean_object* v_x_1637_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0(lean_object* v_x_1651_){
 _start:
 {
-if (lean_obj_tag(v_x_1637_) == 0)
+if (lean_obj_tag(v_x_1651_) == 0)
 {
-lean_object* v___x_1638_; 
-v___x_1638_ = lean_box(0);
-return v___x_1638_;
+lean_object* v___x_1652_; 
+v___x_1652_ = lean_box(0);
+return v___x_1652_;
 }
 else
 {
-lean_object* v_val_1639_; lean_object* v___x_1640_; lean_object* v___x_1641_; lean_object* v___x_1642_; lean_object* v___x_1643_; lean_object* v___x_1644_; lean_object* v___x_1645_; lean_object* v___x_1646_; 
-v_val_1639_ = lean_ctor_get(v_x_1637_, 0);
-v___x_1640_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespaceNewUniqueIdOptions___lam__0___closed__0));
-v___x_1641_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0_spec__0(v_val_1639_);
-v___x_1642_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1642_, 0, v___x_1640_);
-lean_ctor_set(v___x_1642_, 1, v___x_1641_);
-v___x_1643_ = lean_unsigned_to_nat(1u);
-v___x_1644_ = lean_mk_empty_array_with_capacity(v___x_1643_);
-v___x_1645_ = lean_array_push(v___x_1644_, v___x_1642_);
-v___x_1646_ = l_Lasm_JS_Web_Support_fields(v___x_1645_);
-lean_dec_ref(v___x_1645_);
-return v___x_1646_;
+lean_object* v_val_1653_; lean_object* v___x_1654_; lean_object* v___x_1655_; lean_object* v___x_1656_; lean_object* v___x_1657_; lean_object* v___x_1658_; lean_object* v___x_1659_; lean_object* v___x_1660_; 
+v_val_1653_ = lean_ctor_get(v_x_1651_, 0);
+v___x_1654_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespaceNewUniqueIdOptions___lam__0___closed__0));
+v___x_1655_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0_spec__0(v_val_1653_);
+v___x_1656_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1656_, 0, v___x_1654_);
+lean_ctor_set(v___x_1656_, 1, v___x_1655_);
+v___x_1657_ = lean_unsigned_to_nat(1u);
+v___x_1658_ = lean_mk_empty_array_with_capacity(v___x_1657_);
+v___x_1659_ = lean_array_push(v___x_1658_, v___x_1656_);
+v___x_1660_ = l_Lasm_JS_Web_Support_fields(v___x_1659_);
+lean_dec_ref(v___x_1659_);
+return v___x_1660_;
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0___boxed(lean_object* v_x_1647_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0___boxed(lean_object* v_x_1661_){
 _start:
 {
-lean_object* v_res_1648_; 
-v_res_1648_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0(v_x_1647_);
-lean_dec(v_x_1647_);
-return v_res_1648_;
+lean_object* v_res_1662_; 
+v_res_1662_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0(v_x_1661_);
+lean_dec(v_x_1661_);
+return v_res_1662_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId(lean_object* v_self_1650_, lean_object* v_options_1651_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId(lean_object* v_self_1664_, lean_object* v_options_1665_){
 _start:
 {
-lean_object* v___x_1653_; lean_object* v___x_1654_; lean_object* v___x_1655_; lean_object* v___x_1656_; lean_object* v___x_1657_; lean_object* v___x_1658_; lean_object* v___x_1659_; 
-v___x_1653_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId___closed__0));
-v___x_1654_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0(v_options_1651_);
-v___x_1655_ = lean_unsigned_to_nat(1u);
-v___x_1656_ = lean_mk_empty_array_with_capacity(v___x_1655_);
-v___x_1657_ = lean_array_push(v___x_1656_, v___x_1654_);
-v___x_1658_ = l_Lasm_JS_Web_Support_args(v___x_1657_);
-v___x_1659_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_1650_, v___x_1653_, v___x_1658_);
-if (lean_obj_tag(v___x_1659_) == 0)
+lean_object* v___x_1667_; lean_object* v___x_1668_; lean_object* v___x_1669_; lean_object* v___x_1670_; lean_object* v___x_1671_; lean_object* v___x_1672_; lean_object* v___x_1673_; 
+v___x_1667_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId___closed__0));
+v___x_1668_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId_spec__0(v_options_1665_);
+v___x_1669_ = lean_unsigned_to_nat(1u);
+v___x_1670_ = lean_mk_empty_array_with_capacity(v___x_1669_);
+v___x_1671_ = lean_array_push(v___x_1670_, v___x_1668_);
+v___x_1672_ = l_Lasm_JS_Web_Support_args(v___x_1671_);
+v___x_1673_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_1664_, v___x_1667_, v___x_1672_);
+if (lean_obj_tag(v___x_1673_) == 0)
 {
-lean_object* v_a_1660_; lean_object* v___x_1662_; uint8_t v_isShared_1663_; uint8_t v_isSharedCheck_1667_; 
-v_a_1660_ = lean_ctor_get(v___x_1659_, 0);
-v_isSharedCheck_1667_ = !lean_is_exclusive(v___x_1659_);
-if (v_isSharedCheck_1667_ == 0)
+lean_object* v_a_1674_; lean_object* v___x_1676_; uint8_t v_isShared_1677_; uint8_t v_isSharedCheck_1681_; 
+v_a_1674_ = lean_ctor_get(v___x_1673_, 0);
+v_isSharedCheck_1681_ = !lean_is_exclusive(v___x_1673_);
+if (v_isSharedCheck_1681_ == 0)
 {
-v___x_1662_ = v___x_1659_;
-v_isShared_1663_ = v_isSharedCheck_1667_;
-goto v_resetjp_1661_;
+v___x_1676_ = v___x_1673_;
+v_isShared_1677_ = v_isSharedCheck_1681_;
+goto v_resetjp_1675_;
 }
 else
 {
-lean_inc(v_a_1660_);
-lean_dec(v___x_1659_);
-v___x_1662_ = lean_box(0);
-v_isShared_1663_ = v_isSharedCheck_1667_;
-goto v_resetjp_1661_;
+lean_inc(v_a_1674_);
+lean_dec(v___x_1673_);
+v___x_1676_ = lean_box(0);
+v_isShared_1677_ = v_isSharedCheck_1681_;
+goto v_resetjp_1675_;
 }
-v_resetjp_1661_:
+v_resetjp_1675_:
 {
-lean_object* v___x_1665_; 
-if (v_isShared_1663_ == 0)
+lean_object* v___x_1679_; 
+if (v_isShared_1677_ == 0)
 {
-v___x_1665_ = v___x_1662_;
-goto v_reusejp_1664_;
+v___x_1679_ = v___x_1676_;
+goto v_reusejp_1678_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1666_; 
-v_reuseFailAlloc_1666_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1666_, 0, v_a_1660_);
-v___x_1665_ = v_reuseFailAlloc_1666_;
-goto v_reusejp_1664_;
+lean_object* v_reuseFailAlloc_1680_; 
+v_reuseFailAlloc_1680_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1680_, 0, v_a_1674_);
+v___x_1679_ = v_reuseFailAlloc_1680_;
+goto v_reusejp_1678_;
 }
-v_reusejp_1664_:
+v_reusejp_1678_:
 {
-return v___x_1665_;
+return v___x_1679_;
 }
 }
 }
 else
 {
-lean_object* v_a_1668_; lean_object* v___x_1670_; uint8_t v_isShared_1671_; uint8_t v_isSharedCheck_1675_; 
-v_a_1668_ = lean_ctor_get(v___x_1659_, 0);
-v_isSharedCheck_1675_ = !lean_is_exclusive(v___x_1659_);
-if (v_isSharedCheck_1675_ == 0)
+lean_object* v_a_1682_; lean_object* v___x_1684_; uint8_t v_isShared_1685_; uint8_t v_isSharedCheck_1689_; 
+v_a_1682_ = lean_ctor_get(v___x_1673_, 0);
+v_isSharedCheck_1689_ = !lean_is_exclusive(v___x_1673_);
+if (v_isSharedCheck_1689_ == 0)
 {
-v___x_1670_ = v___x_1659_;
-v_isShared_1671_ = v_isSharedCheck_1675_;
-goto v_resetjp_1669_;
+v___x_1684_ = v___x_1673_;
+v_isShared_1685_ = v_isSharedCheck_1689_;
+goto v_resetjp_1683_;
 }
 else
 {
-lean_inc(v_a_1668_);
-lean_dec(v___x_1659_);
-v___x_1670_ = lean_box(0);
-v_isShared_1671_ = v_isSharedCheck_1675_;
-goto v_resetjp_1669_;
+lean_inc(v_a_1682_);
+lean_dec(v___x_1673_);
+v___x_1684_ = lean_box(0);
+v_isShared_1685_ = v_isSharedCheck_1689_;
+goto v_resetjp_1683_;
 }
-v_resetjp_1669_:
+v_resetjp_1683_:
 {
-lean_object* v___x_1673_; 
-if (v_isShared_1671_ == 0)
+lean_object* v___x_1687_; 
+if (v_isShared_1685_ == 0)
 {
-v___x_1673_ = v___x_1670_;
-goto v_reusejp_1672_;
+v___x_1687_ = v___x_1684_;
+goto v_reusejp_1686_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1674_; 
-v_reuseFailAlloc_1674_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1674_, 0, v_a_1668_);
-v___x_1673_ = v_reuseFailAlloc_1674_;
-goto v_reusejp_1672_;
+lean_object* v_reuseFailAlloc_1688_; 
+v_reuseFailAlloc_1688_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1688_, 0, v_a_1682_);
+v___x_1687_ = v_reuseFailAlloc_1688_;
+goto v_reusejp_1686_;
 }
-v_reusejp_1672_:
+v_reusejp_1686_:
 {
-return v___x_1673_;
+return v___x_1687_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId___boxed(lean_object* v_self_1676_, lean_object* v_options_1677_, lean_object* v_a_1678_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId___boxed(lean_object* v_self_1690_, lean_object* v_options_1691_, lean_object* v_a_1692_){
 _start:
 {
-lean_object* v_res_1679_; 
-v_res_1679_ = l_Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId(v_self_1676_, v_options_1677_);
-lean_dec(v_options_1677_);
-return v_res_1679_;
+lean_object* v_res_1693_; 
+v_res_1693_ = l_Lasm_JS_Cloudflare_DurableObjectNamespace_newUniqueId(v_self_1690_, v_options_1691_);
+lean_dec(v_options_1691_);
+return v_res_1693_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromName(lean_object* v_self_1681_, lean_object* v_name_1682_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromName(lean_object* v_self_1695_, lean_object* v_name_1696_){
 _start:
 {
-lean_object* v___x_1684_; lean_object* v___x_1685_; lean_object* v___x_1686_; lean_object* v___x_1687_; lean_object* v___x_1688_; lean_object* v___x_1689_; lean_object* v___x_1690_; 
-v___x_1684_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromName___closed__0));
-v___x_1685_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_1685_, 0, v_name_1682_);
-v___x_1686_ = lean_unsigned_to_nat(1u);
-v___x_1687_ = lean_mk_empty_array_with_capacity(v___x_1686_);
-v___x_1688_ = lean_array_push(v___x_1687_, v___x_1685_);
-v___x_1689_ = l_Lasm_JS_Web_Support_args(v___x_1688_);
-v___x_1690_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_1681_, v___x_1684_, v___x_1689_);
-if (lean_obj_tag(v___x_1690_) == 0)
+lean_object* v___x_1698_; lean_object* v___x_1699_; lean_object* v___x_1700_; lean_object* v___x_1701_; lean_object* v___x_1702_; lean_object* v___x_1703_; lean_object* v___x_1704_; 
+v___x_1698_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromName___closed__0));
+v___x_1699_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v___x_1699_, 0, v_name_1696_);
+v___x_1700_ = lean_unsigned_to_nat(1u);
+v___x_1701_ = lean_mk_empty_array_with_capacity(v___x_1700_);
+v___x_1702_ = lean_array_push(v___x_1701_, v___x_1699_);
+v___x_1703_ = l_Lasm_JS_Web_Support_args(v___x_1702_);
+v___x_1704_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_1695_, v___x_1698_, v___x_1703_);
+if (lean_obj_tag(v___x_1704_) == 0)
 {
-lean_object* v_a_1691_; lean_object* v___x_1693_; uint8_t v_isShared_1694_; uint8_t v_isSharedCheck_1698_; 
-v_a_1691_ = lean_ctor_get(v___x_1690_, 0);
-v_isSharedCheck_1698_ = !lean_is_exclusive(v___x_1690_);
-if (v_isSharedCheck_1698_ == 0)
+lean_object* v_a_1705_; lean_object* v___x_1707_; uint8_t v_isShared_1708_; uint8_t v_isSharedCheck_1712_; 
+v_a_1705_ = lean_ctor_get(v___x_1704_, 0);
+v_isSharedCheck_1712_ = !lean_is_exclusive(v___x_1704_);
+if (v_isSharedCheck_1712_ == 0)
 {
-v___x_1693_ = v___x_1690_;
-v_isShared_1694_ = v_isSharedCheck_1698_;
-goto v_resetjp_1692_;
+v___x_1707_ = v___x_1704_;
+v_isShared_1708_ = v_isSharedCheck_1712_;
+goto v_resetjp_1706_;
 }
 else
 {
-lean_inc(v_a_1691_);
-lean_dec(v___x_1690_);
-v___x_1693_ = lean_box(0);
-v_isShared_1694_ = v_isSharedCheck_1698_;
-goto v_resetjp_1692_;
+lean_inc(v_a_1705_);
+lean_dec(v___x_1704_);
+v___x_1707_ = lean_box(0);
+v_isShared_1708_ = v_isSharedCheck_1712_;
+goto v_resetjp_1706_;
 }
-v_resetjp_1692_:
+v_resetjp_1706_:
 {
-lean_object* v___x_1696_; 
-if (v_isShared_1694_ == 0)
+lean_object* v___x_1710_; 
+if (v_isShared_1708_ == 0)
 {
-v___x_1696_ = v___x_1693_;
-goto v_reusejp_1695_;
+v___x_1710_ = v___x_1707_;
+goto v_reusejp_1709_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1697_; 
-v_reuseFailAlloc_1697_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1697_, 0, v_a_1691_);
-v___x_1696_ = v_reuseFailAlloc_1697_;
-goto v_reusejp_1695_;
+lean_object* v_reuseFailAlloc_1711_; 
+v_reuseFailAlloc_1711_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1711_, 0, v_a_1705_);
+v___x_1710_ = v_reuseFailAlloc_1711_;
+goto v_reusejp_1709_;
 }
-v_reusejp_1695_:
+v_reusejp_1709_:
 {
-return v___x_1696_;
+return v___x_1710_;
 }
 }
 }
 else
 {
-lean_object* v_a_1699_; lean_object* v___x_1701_; uint8_t v_isShared_1702_; uint8_t v_isSharedCheck_1706_; 
-v_a_1699_ = lean_ctor_get(v___x_1690_, 0);
-v_isSharedCheck_1706_ = !lean_is_exclusive(v___x_1690_);
-if (v_isSharedCheck_1706_ == 0)
+lean_object* v_a_1713_; lean_object* v___x_1715_; uint8_t v_isShared_1716_; uint8_t v_isSharedCheck_1720_; 
+v_a_1713_ = lean_ctor_get(v___x_1704_, 0);
+v_isSharedCheck_1720_ = !lean_is_exclusive(v___x_1704_);
+if (v_isSharedCheck_1720_ == 0)
 {
-v___x_1701_ = v___x_1690_;
-v_isShared_1702_ = v_isSharedCheck_1706_;
-goto v_resetjp_1700_;
+v___x_1715_ = v___x_1704_;
+v_isShared_1716_ = v_isSharedCheck_1720_;
+goto v_resetjp_1714_;
 }
 else
 {
-lean_inc(v_a_1699_);
-lean_dec(v___x_1690_);
-v___x_1701_ = lean_box(0);
-v_isShared_1702_ = v_isSharedCheck_1706_;
-goto v_resetjp_1700_;
+lean_inc(v_a_1713_);
+lean_dec(v___x_1704_);
+v___x_1715_ = lean_box(0);
+v_isShared_1716_ = v_isSharedCheck_1720_;
+goto v_resetjp_1714_;
 }
-v_resetjp_1700_:
+v_resetjp_1714_:
 {
-lean_object* v___x_1704_; 
-if (v_isShared_1702_ == 0)
+lean_object* v___x_1718_; 
+if (v_isShared_1716_ == 0)
 {
-v___x_1704_ = v___x_1701_;
-goto v_reusejp_1703_;
+v___x_1718_ = v___x_1715_;
+goto v_reusejp_1717_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1705_; 
-v_reuseFailAlloc_1705_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1705_, 0, v_a_1699_);
-v___x_1704_ = v_reuseFailAlloc_1705_;
-goto v_reusejp_1703_;
+lean_object* v_reuseFailAlloc_1719_; 
+v_reuseFailAlloc_1719_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1719_, 0, v_a_1713_);
+v___x_1718_ = v_reuseFailAlloc_1719_;
+goto v_reusejp_1717_;
 }
-v_reusejp_1703_:
+v_reusejp_1717_:
 {
-return v___x_1704_;
+return v___x_1718_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromName___boxed(lean_object* v_self_1707_, lean_object* v_name_1708_, lean_object* v_a_1709_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromName___boxed(lean_object* v_self_1721_, lean_object* v_name_1722_, lean_object* v_a_1723_){
 _start:
 {
-lean_object* v_res_1710_; 
-v_res_1710_ = l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromName(v_self_1707_, v_name_1708_);
-return v_res_1710_;
+lean_object* v_res_1724_; 
+v_res_1724_ = l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromName(v_self_1721_, v_name_1722_);
+return v_res_1724_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromString(lean_object* v_self_1712_, lean_object* v_id_1713_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromString(lean_object* v_self_1726_, lean_object* v_id_1727_){
 _start:
 {
-lean_object* v___x_1715_; lean_object* v___x_1716_; lean_object* v___x_1717_; lean_object* v___x_1718_; lean_object* v___x_1719_; lean_object* v___x_1720_; lean_object* v___x_1721_; 
-v___x_1715_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromString___closed__0));
-v___x_1716_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_1716_, 0, v_id_1713_);
-v___x_1717_ = lean_unsigned_to_nat(1u);
-v___x_1718_ = lean_mk_empty_array_with_capacity(v___x_1717_);
-v___x_1719_ = lean_array_push(v___x_1718_, v___x_1716_);
-v___x_1720_ = l_Lasm_JS_Web_Support_args(v___x_1719_);
-v___x_1721_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_1712_, v___x_1715_, v___x_1720_);
-if (lean_obj_tag(v___x_1721_) == 0)
+lean_object* v___x_1729_; lean_object* v___x_1730_; lean_object* v___x_1731_; lean_object* v___x_1732_; lean_object* v___x_1733_; lean_object* v___x_1734_; lean_object* v___x_1735_; 
+v___x_1729_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromString___closed__0));
+v___x_1730_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v___x_1730_, 0, v_id_1727_);
+v___x_1731_ = lean_unsigned_to_nat(1u);
+v___x_1732_ = lean_mk_empty_array_with_capacity(v___x_1731_);
+v___x_1733_ = lean_array_push(v___x_1732_, v___x_1730_);
+v___x_1734_ = l_Lasm_JS_Web_Support_args(v___x_1733_);
+v___x_1735_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_1726_, v___x_1729_, v___x_1734_);
+if (lean_obj_tag(v___x_1735_) == 0)
 {
-lean_object* v_a_1722_; lean_object* v___x_1724_; uint8_t v_isShared_1725_; uint8_t v_isSharedCheck_1729_; 
-v_a_1722_ = lean_ctor_get(v___x_1721_, 0);
-v_isSharedCheck_1729_ = !lean_is_exclusive(v___x_1721_);
-if (v_isSharedCheck_1729_ == 0)
+lean_object* v_a_1736_; lean_object* v___x_1738_; uint8_t v_isShared_1739_; uint8_t v_isSharedCheck_1743_; 
+v_a_1736_ = lean_ctor_get(v___x_1735_, 0);
+v_isSharedCheck_1743_ = !lean_is_exclusive(v___x_1735_);
+if (v_isSharedCheck_1743_ == 0)
 {
-v___x_1724_ = v___x_1721_;
-v_isShared_1725_ = v_isSharedCheck_1729_;
-goto v_resetjp_1723_;
+v___x_1738_ = v___x_1735_;
+v_isShared_1739_ = v_isSharedCheck_1743_;
+goto v_resetjp_1737_;
 }
 else
 {
-lean_inc(v_a_1722_);
-lean_dec(v___x_1721_);
-v___x_1724_ = lean_box(0);
-v_isShared_1725_ = v_isSharedCheck_1729_;
-goto v_resetjp_1723_;
+lean_inc(v_a_1736_);
+lean_dec(v___x_1735_);
+v___x_1738_ = lean_box(0);
+v_isShared_1739_ = v_isSharedCheck_1743_;
+goto v_resetjp_1737_;
 }
-v_resetjp_1723_:
+v_resetjp_1737_:
 {
-lean_object* v___x_1727_; 
-if (v_isShared_1725_ == 0)
+lean_object* v___x_1741_; 
+if (v_isShared_1739_ == 0)
 {
-v___x_1727_ = v___x_1724_;
-goto v_reusejp_1726_;
+v___x_1741_ = v___x_1738_;
+goto v_reusejp_1740_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1728_; 
-v_reuseFailAlloc_1728_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1728_, 0, v_a_1722_);
-v___x_1727_ = v_reuseFailAlloc_1728_;
-goto v_reusejp_1726_;
+lean_object* v_reuseFailAlloc_1742_; 
+v_reuseFailAlloc_1742_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1742_, 0, v_a_1736_);
+v___x_1741_ = v_reuseFailAlloc_1742_;
+goto v_reusejp_1740_;
 }
-v_reusejp_1726_:
+v_reusejp_1740_:
 {
-return v___x_1727_;
+return v___x_1741_;
 }
 }
 }
 else
 {
-lean_object* v_a_1730_; lean_object* v___x_1732_; uint8_t v_isShared_1733_; uint8_t v_isSharedCheck_1737_; 
-v_a_1730_ = lean_ctor_get(v___x_1721_, 0);
-v_isSharedCheck_1737_ = !lean_is_exclusive(v___x_1721_);
-if (v_isSharedCheck_1737_ == 0)
+lean_object* v_a_1744_; lean_object* v___x_1746_; uint8_t v_isShared_1747_; uint8_t v_isSharedCheck_1751_; 
+v_a_1744_ = lean_ctor_get(v___x_1735_, 0);
+v_isSharedCheck_1751_ = !lean_is_exclusive(v___x_1735_);
+if (v_isSharedCheck_1751_ == 0)
 {
-v___x_1732_ = v___x_1721_;
-v_isShared_1733_ = v_isSharedCheck_1737_;
-goto v_resetjp_1731_;
+v___x_1746_ = v___x_1735_;
+v_isShared_1747_ = v_isSharedCheck_1751_;
+goto v_resetjp_1745_;
 }
 else
 {
-lean_inc(v_a_1730_);
-lean_dec(v___x_1721_);
-v___x_1732_ = lean_box(0);
-v_isShared_1733_ = v_isSharedCheck_1737_;
-goto v_resetjp_1731_;
+lean_inc(v_a_1744_);
+lean_dec(v___x_1735_);
+v___x_1746_ = lean_box(0);
+v_isShared_1747_ = v_isSharedCheck_1751_;
+goto v_resetjp_1745_;
 }
-v_resetjp_1731_:
+v_resetjp_1745_:
 {
-lean_object* v___x_1735_; 
-if (v_isShared_1733_ == 0)
+lean_object* v___x_1749_; 
+if (v_isShared_1747_ == 0)
 {
-v___x_1735_ = v___x_1732_;
-goto v_reusejp_1734_;
+v___x_1749_ = v___x_1746_;
+goto v_reusejp_1748_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1736_; 
-v_reuseFailAlloc_1736_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1736_, 0, v_a_1730_);
-v___x_1735_ = v_reuseFailAlloc_1736_;
-goto v_reusejp_1734_;
+lean_object* v_reuseFailAlloc_1750_; 
+v_reuseFailAlloc_1750_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1750_, 0, v_a_1744_);
+v___x_1749_ = v_reuseFailAlloc_1750_;
+goto v_reusejp_1748_;
 }
-v_reusejp_1734_:
+v_reusejp_1748_:
 {
-return v___x_1735_;
+return v___x_1749_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromString___boxed(lean_object* v_self_1738_, lean_object* v_id_1739_, lean_object* v_a_1740_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromString___boxed(lean_object* v_self_1752_, lean_object* v_id_1753_, lean_object* v_a_1754_){
 _start:
 {
-lean_object* v_res_1741_; 
-v_res_1741_ = l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromString(v_self_1738_, v_id_1739_);
-return v_res_1741_;
+lean_object* v_res_1755_; 
+v_res_1755_ = l_Lasm_JS_Cloudflare_DurableObjectNamespace_idFromString(v_self_1752_, v_id_1753_);
+return v_res_1755_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__1(lean_object* v_x_1742_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__1(lean_object* v_x_1756_){
 _start:
 {
-if (lean_obj_tag(v_x_1742_) == 0)
+if (lean_obj_tag(v_x_1756_) == 0)
 {
-lean_object* v___x_1743_; 
-v___x_1743_ = lean_box(0);
-return v___x_1743_;
+lean_object* v___x_1757_; 
+v___x_1757_ = lean_box(0);
+return v___x_1757_;
 }
 else
 {
-lean_object* v___x_1744_; 
-v___x_1744_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectRoutingMode___lam__0___closed__1));
-return v___x_1744_;
+lean_object* v___x_1758_; 
+v___x_1758_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectRoutingMode___lam__0___closed__1));
+return v___x_1758_;
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__1___boxed(lean_object* v_x_1745_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__1___boxed(lean_object* v_x_1759_){
 _start:
 {
-lean_object* v_res_1746_; 
-v_res_1746_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__1(v_x_1745_);
-lean_dec(v_x_1745_);
-return v_res_1746_;
+lean_object* v_res_1760_; 
+v_res_1760_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__1(v_x_1759_);
+lean_dec(v_x_1759_);
+return v_res_1760_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__0(lean_object* v_x_1747_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__0(lean_object* v_x_1761_){
 _start:
 {
-if (lean_obj_tag(v_x_1747_) == 0)
+if (lean_obj_tag(v_x_1761_) == 0)
 {
-lean_object* v___x_1748_; 
-v___x_1748_ = lean_box(0);
-return v___x_1748_;
+lean_object* v___x_1762_; 
+v___x_1762_ = lean_box(0);
+return v___x_1762_;
 }
 else
 {
-lean_object* v_val_1749_; uint8_t v___x_1750_; 
-v_val_1749_ = lean_ctor_get(v_x_1747_, 0);
-v___x_1750_ = lean_unbox(v_val_1749_);
-switch(v___x_1750_)
+lean_object* v_val_1763_; uint8_t v___x_1764_; 
+v_val_1763_ = lean_ctor_get(v_x_1761_, 0);
+v___x_1764_ = lean_unbox(v_val_1763_);
+switch(v___x_1764_)
 {
 case 0:
 {
-lean_object* v___x_1751_; 
-v___x_1751_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__1));
-return v___x_1751_;
+lean_object* v___x_1765_; 
+v___x_1765_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__1));
+return v___x_1765_;
 }
 case 1:
 {
-lean_object* v___x_1752_; 
-v___x_1752_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__3));
-return v___x_1752_;
+lean_object* v___x_1766_; 
+v___x_1766_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__3));
+return v___x_1766_;
 }
 case 2:
 {
-lean_object* v___x_1753_; 
-v___x_1753_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__5));
-return v___x_1753_;
+lean_object* v___x_1767_; 
+v___x_1767_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__5));
+return v___x_1767_;
 }
 case 3:
 {
-lean_object* v___x_1754_; 
-v___x_1754_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__7));
-return v___x_1754_;
+lean_object* v___x_1768_; 
+v___x_1768_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__7));
+return v___x_1768_;
 }
 case 4:
 {
-lean_object* v___x_1755_; 
-v___x_1755_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__9));
-return v___x_1755_;
+lean_object* v___x_1769_; 
+v___x_1769_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__9));
+return v___x_1769_;
 }
 case 5:
 {
-lean_object* v___x_1756_; 
-v___x_1756_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__11));
-return v___x_1756_;
+lean_object* v___x_1770_; 
+v___x_1770_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__11));
+return v___x_1770_;
 }
 case 6:
 {
-lean_object* v___x_1757_; 
-v___x_1757_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__13));
-return v___x_1757_;
+lean_object* v___x_1771_; 
+v___x_1771_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__13));
+return v___x_1771_;
 }
 case 7:
 {
-lean_object* v___x_1758_; 
-v___x_1758_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__15));
-return v___x_1758_;
+lean_object* v___x_1772_; 
+v___x_1772_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__15));
+return v___x_1772_;
 }
 case 8:
 {
-lean_object* v___x_1759_; 
-v___x_1759_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__17));
-return v___x_1759_;
+lean_object* v___x_1773_; 
+v___x_1773_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__17));
+return v___x_1773_;
 }
 case 9:
 {
-lean_object* v___x_1760_; 
-v___x_1760_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__19));
-return v___x_1760_;
+lean_object* v___x_1774_; 
+v___x_1774_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__19));
+return v___x_1774_;
 }
 default: 
 {
-lean_object* v___x_1761_; 
-v___x_1761_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__21));
-return v___x_1761_;
+lean_object* v___x_1775_; 
+v___x_1775_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectLocationHint___lam__0___closed__21));
+return v___x_1775_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__0___boxed(lean_object* v_x_1762_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__0___boxed(lean_object* v_x_1776_){
 _start:
 {
-lean_object* v_res_1763_; 
-v_res_1763_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__0(v_x_1762_);
-lean_dec(v_x_1762_);
-return v_res_1763_;
+lean_object* v_res_1777_; 
+v_res_1777_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__0(v_x_1776_);
+lean_dec(v_x_1776_);
+return v_res_1777_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0(lean_object* v_x_1764_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0(lean_object* v_x_1778_){
 _start:
 {
-if (lean_obj_tag(v_x_1764_) == 0)
+if (lean_obj_tag(v_x_1778_) == 0)
 {
-lean_object* v___x_1765_; 
-v___x_1765_ = lean_box(0);
-return v___x_1765_;
+lean_object* v___x_1779_; 
+v___x_1779_ = lean_box(0);
+return v___x_1779_;
 }
 else
 {
-lean_object* v_val_1766_; lean_object* v_locationHint_1767_; lean_object* v_routingMode_1768_; lean_object* v___x_1770_; uint8_t v_isShared_1771_; uint8_t v_isSharedCheck_1785_; 
-v_val_1766_ = lean_ctor_get(v_x_1764_, 0);
-lean_inc(v_val_1766_);
-lean_dec_ref_known(v_x_1764_, 1);
-v_locationHint_1767_ = lean_ctor_get(v_val_1766_, 0);
-v_routingMode_1768_ = lean_ctor_get(v_val_1766_, 1);
-v_isSharedCheck_1785_ = !lean_is_exclusive(v_val_1766_);
-if (v_isSharedCheck_1785_ == 0)
+lean_object* v_val_1780_; lean_object* v_locationHint_1781_; lean_object* v_routingMode_1782_; lean_object* v___x_1784_; uint8_t v_isShared_1785_; uint8_t v_isSharedCheck_1799_; 
+v_val_1780_ = lean_ctor_get(v_x_1778_, 0);
+lean_inc(v_val_1780_);
+lean_dec_ref_known(v_x_1778_, 1);
+v_locationHint_1781_ = lean_ctor_get(v_val_1780_, 0);
+v_routingMode_1782_ = lean_ctor_get(v_val_1780_, 1);
+v_isSharedCheck_1799_ = !lean_is_exclusive(v_val_1780_);
+if (v_isSharedCheck_1799_ == 0)
 {
-v___x_1770_ = v_val_1766_;
-v_isShared_1771_ = v_isSharedCheck_1785_;
-goto v_resetjp_1769_;
+v___x_1784_ = v_val_1780_;
+v_isShared_1785_ = v_isSharedCheck_1799_;
+goto v_resetjp_1783_;
 }
 else
 {
-lean_inc(v_routingMode_1768_);
-lean_inc(v_locationHint_1767_);
-lean_dec(v_val_1766_);
-v___x_1770_ = lean_box(0);
-v_isShared_1771_ = v_isSharedCheck_1785_;
-goto v_resetjp_1769_;
+lean_inc(v_routingMode_1782_);
+lean_inc(v_locationHint_1781_);
+lean_dec(v_val_1780_);
+v___x_1784_ = lean_box(0);
+v_isShared_1785_ = v_isSharedCheck_1799_;
+goto v_resetjp_1783_;
 }
-v_resetjp_1769_:
+v_resetjp_1783_:
 {
-lean_object* v___x_1772_; lean_object* v___x_1773_; lean_object* v___x_1775_; 
-v___x_1772_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespaceGetDurableObjectOptions___lam__0___closed__0));
-v___x_1773_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__0(v_locationHint_1767_);
-lean_dec(v_locationHint_1767_);
-if (v_isShared_1771_ == 0)
+lean_object* v___x_1786_; lean_object* v___x_1787_; lean_object* v___x_1789_; 
+v___x_1786_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespaceGetDurableObjectOptions___lam__0___closed__0));
+v___x_1787_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__0(v_locationHint_1781_);
+lean_dec(v_locationHint_1781_);
+if (v_isShared_1785_ == 0)
 {
-lean_ctor_set(v___x_1770_, 1, v___x_1773_);
-lean_ctor_set(v___x_1770_, 0, v___x_1772_);
-v___x_1775_ = v___x_1770_;
-goto v_reusejp_1774_;
+lean_ctor_set(v___x_1784_, 1, v___x_1787_);
+lean_ctor_set(v___x_1784_, 0, v___x_1786_);
+v___x_1789_ = v___x_1784_;
+goto v_reusejp_1788_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1784_; 
-v_reuseFailAlloc_1784_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v_reuseFailAlloc_1784_, 0, v___x_1772_);
-lean_ctor_set(v_reuseFailAlloc_1784_, 1, v___x_1773_);
-v___x_1775_ = v_reuseFailAlloc_1784_;
-goto v_reusejp_1774_;
+lean_object* v_reuseFailAlloc_1798_; 
+v_reuseFailAlloc_1798_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v_reuseFailAlloc_1798_, 0, v___x_1786_);
+lean_ctor_set(v_reuseFailAlloc_1798_, 1, v___x_1787_);
+v___x_1789_ = v_reuseFailAlloc_1798_;
+goto v_reusejp_1788_;
 }
-v_reusejp_1774_:
+v_reusejp_1788_:
 {
-lean_object* v___x_1776_; lean_object* v___x_1777_; lean_object* v___x_1778_; lean_object* v___x_1779_; lean_object* v___x_1780_; lean_object* v___x_1781_; lean_object* v___x_1782_; lean_object* v___x_1783_; 
-v___x_1776_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespaceGetDurableObjectOptions___lam__0___closed__1));
-v___x_1777_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__1(v_routingMode_1768_);
-lean_dec(v_routingMode_1768_);
-v___x_1778_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_1778_, 0, v___x_1776_);
-lean_ctor_set(v___x_1778_, 1, v___x_1777_);
-v___x_1779_ = lean_unsigned_to_nat(2u);
-v___x_1780_ = lean_mk_empty_array_with_capacity(v___x_1779_);
-v___x_1781_ = lean_array_push(v___x_1780_, v___x_1775_);
-v___x_1782_ = lean_array_push(v___x_1781_, v___x_1778_);
-v___x_1783_ = l_Lasm_JS_Web_Support_fields(v___x_1782_);
-lean_dec_ref(v___x_1782_);
-return v___x_1783_;
+lean_object* v___x_1790_; lean_object* v___x_1791_; lean_object* v___x_1792_; lean_object* v___x_1793_; lean_object* v___x_1794_; lean_object* v___x_1795_; lean_object* v___x_1796_; lean_object* v___x_1797_; 
+v___x_1790_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespaceGetDurableObjectOptions___lam__0___closed__1));
+v___x_1791_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0_spec__1(v_routingMode_1782_);
+lean_dec(v_routingMode_1782_);
+v___x_1792_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_1792_, 0, v___x_1790_);
+lean_ctor_set(v___x_1792_, 1, v___x_1791_);
+v___x_1793_ = lean_unsigned_to_nat(2u);
+v___x_1794_ = lean_mk_empty_array_with_capacity(v___x_1793_);
+v___x_1795_ = lean_array_push(v___x_1794_, v___x_1789_);
+v___x_1796_ = lean_array_push(v___x_1795_, v___x_1792_);
+v___x_1797_ = l_Lasm_JS_Web_Support_fields(v___x_1796_);
+lean_dec_ref(v___x_1796_);
+return v___x_1797_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_get(lean_object* v_self_1787_, lean_object* v_id_1788_, lean_object* v_options_1789_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_get(lean_object* v_self_1801_, lean_object* v_id_1802_, lean_object* v_options_1803_){
 _start:
 {
-lean_object* v___x_1791_; lean_object* v___x_1792_; lean_object* v___x_1793_; lean_object* v___x_1794_; lean_object* v___x_1795_; lean_object* v___x_1796_; lean_object* v___x_1797_; lean_object* v___x_1798_; lean_object* v___x_1799_; lean_object* v___x_1800_; 
-v___x_1791_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_get___closed__0));
-v___x_1792_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___x_1793_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_1793_, 0, v_id_1788_);
-lean_ctor_set(v___x_1793_, 1, v___x_1792_);
-v___x_1794_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0(v_options_1789_);
-v___x_1795_ = lean_unsigned_to_nat(2u);
-v___x_1796_ = lean_mk_empty_array_with_capacity(v___x_1795_);
-v___x_1797_ = lean_array_push(v___x_1796_, v___x_1793_);
-v___x_1798_ = lean_array_push(v___x_1797_, v___x_1794_);
-v___x_1799_ = l_Lasm_JS_Web_Support_args(v___x_1798_);
-v___x_1800_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_1787_, v___x_1791_, v___x_1799_);
-if (lean_obj_tag(v___x_1800_) == 0)
+lean_object* v___x_1805_; lean_object* v___x_1806_; lean_object* v___x_1807_; lean_object* v___x_1808_; lean_object* v___x_1809_; lean_object* v___x_1810_; lean_object* v___x_1811_; lean_object* v___x_1812_; lean_object* v___x_1813_; lean_object* v___x_1814_; 
+v___x_1805_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_get___closed__0));
+v___x_1806_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___x_1807_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_1807_, 0, v_id_1802_);
+lean_ctor_set(v___x_1807_, 1, v___x_1806_);
+v___x_1808_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0(v_options_1803_);
+v___x_1809_ = lean_unsigned_to_nat(2u);
+v___x_1810_ = lean_mk_empty_array_with_capacity(v___x_1809_);
+v___x_1811_ = lean_array_push(v___x_1810_, v___x_1807_);
+v___x_1812_ = lean_array_push(v___x_1811_, v___x_1808_);
+v___x_1813_ = l_Lasm_JS_Web_Support_args(v___x_1812_);
+v___x_1814_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_1801_, v___x_1805_, v___x_1813_);
+if (lean_obj_tag(v___x_1814_) == 0)
 {
-lean_object* v_a_1801_; lean_object* v___x_1803_; uint8_t v_isShared_1804_; uint8_t v_isSharedCheck_1808_; 
-v_a_1801_ = lean_ctor_get(v___x_1800_, 0);
-v_isSharedCheck_1808_ = !lean_is_exclusive(v___x_1800_);
-if (v_isSharedCheck_1808_ == 0)
+lean_object* v_a_1815_; lean_object* v___x_1817_; uint8_t v_isShared_1818_; uint8_t v_isSharedCheck_1822_; 
+v_a_1815_ = lean_ctor_get(v___x_1814_, 0);
+v_isSharedCheck_1822_ = !lean_is_exclusive(v___x_1814_);
+if (v_isSharedCheck_1822_ == 0)
 {
-v___x_1803_ = v___x_1800_;
-v_isShared_1804_ = v_isSharedCheck_1808_;
-goto v_resetjp_1802_;
+v___x_1817_ = v___x_1814_;
+v_isShared_1818_ = v_isSharedCheck_1822_;
+goto v_resetjp_1816_;
 }
 else
 {
-lean_inc(v_a_1801_);
-lean_dec(v___x_1800_);
-v___x_1803_ = lean_box(0);
-v_isShared_1804_ = v_isSharedCheck_1808_;
-goto v_resetjp_1802_;
+lean_inc(v_a_1815_);
+lean_dec(v___x_1814_);
+v___x_1817_ = lean_box(0);
+v_isShared_1818_ = v_isSharedCheck_1822_;
+goto v_resetjp_1816_;
 }
-v_resetjp_1802_:
+v_resetjp_1816_:
 {
-lean_object* v___x_1806_; 
-if (v_isShared_1804_ == 0)
+lean_object* v___x_1820_; 
+if (v_isShared_1818_ == 0)
 {
-v___x_1806_ = v___x_1803_;
-goto v_reusejp_1805_;
+v___x_1820_ = v___x_1817_;
+goto v_reusejp_1819_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1807_; 
-v_reuseFailAlloc_1807_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1807_, 0, v_a_1801_);
-v___x_1806_ = v_reuseFailAlloc_1807_;
-goto v_reusejp_1805_;
+lean_object* v_reuseFailAlloc_1821_; 
+v_reuseFailAlloc_1821_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1821_, 0, v_a_1815_);
+v___x_1820_ = v_reuseFailAlloc_1821_;
+goto v_reusejp_1819_;
 }
-v_reusejp_1805_:
+v_reusejp_1819_:
 {
-return v___x_1806_;
+return v___x_1820_;
 }
 }
 }
 else
 {
-lean_object* v_a_1809_; lean_object* v___x_1811_; uint8_t v_isShared_1812_; uint8_t v_isSharedCheck_1816_; 
-v_a_1809_ = lean_ctor_get(v___x_1800_, 0);
-v_isSharedCheck_1816_ = !lean_is_exclusive(v___x_1800_);
-if (v_isSharedCheck_1816_ == 0)
+lean_object* v_a_1823_; lean_object* v___x_1825_; uint8_t v_isShared_1826_; uint8_t v_isSharedCheck_1830_; 
+v_a_1823_ = lean_ctor_get(v___x_1814_, 0);
+v_isSharedCheck_1830_ = !lean_is_exclusive(v___x_1814_);
+if (v_isSharedCheck_1830_ == 0)
 {
-v___x_1811_ = v___x_1800_;
-v_isShared_1812_ = v_isSharedCheck_1816_;
-goto v_resetjp_1810_;
+v___x_1825_ = v___x_1814_;
+v_isShared_1826_ = v_isSharedCheck_1830_;
+goto v_resetjp_1824_;
 }
 else
 {
-lean_inc(v_a_1809_);
-lean_dec(v___x_1800_);
-v___x_1811_ = lean_box(0);
-v_isShared_1812_ = v_isSharedCheck_1816_;
-goto v_resetjp_1810_;
+lean_inc(v_a_1823_);
+lean_dec(v___x_1814_);
+v___x_1825_ = lean_box(0);
+v_isShared_1826_ = v_isSharedCheck_1830_;
+goto v_resetjp_1824_;
 }
-v_resetjp_1810_:
+v_resetjp_1824_:
 {
-lean_object* v___x_1814_; 
-if (v_isShared_1812_ == 0)
+lean_object* v___x_1828_; 
+if (v_isShared_1826_ == 0)
 {
-v___x_1814_ = v___x_1811_;
-goto v_reusejp_1813_;
+v___x_1828_ = v___x_1825_;
+goto v_reusejp_1827_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1815_; 
-v_reuseFailAlloc_1815_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1815_, 0, v_a_1809_);
-v___x_1814_ = v_reuseFailAlloc_1815_;
-goto v_reusejp_1813_;
+lean_object* v_reuseFailAlloc_1829_; 
+v_reuseFailAlloc_1829_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1829_, 0, v_a_1823_);
+v___x_1828_ = v_reuseFailAlloc_1829_;
+goto v_reusejp_1827_;
 }
-v_reusejp_1813_:
+v_reusejp_1827_:
 {
-return v___x_1814_;
+return v___x_1828_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_get___boxed(lean_object* v_self_1817_, lean_object* v_id_1818_, lean_object* v_options_1819_, lean_object* v_a_1820_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_get___boxed(lean_object* v_self_1831_, lean_object* v_id_1832_, lean_object* v_options_1833_, lean_object* v_a_1834_){
 _start:
 {
-lean_object* v_res_1821_; 
-v_res_1821_ = l_Lasm_JS_Cloudflare_DurableObjectNamespace_get(v_self_1817_, v_id_1818_, v_options_1819_);
-return v_res_1821_;
+lean_object* v_res_1835_; 
+v_res_1835_ = l_Lasm_JS_Cloudflare_DurableObjectNamespace_get(v_self_1831_, v_id_1832_, v_options_1833_);
+return v_res_1835_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_getByName(lean_object* v_self_1823_, lean_object* v_name_1824_, lean_object* v_options_1825_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_getByName(lean_object* v_self_1837_, lean_object* v_name_1838_, lean_object* v_options_1839_){
 _start:
 {
-lean_object* v___x_1827_; lean_object* v___x_1828_; lean_object* v___x_1829_; lean_object* v___x_1830_; lean_object* v___x_1831_; lean_object* v___x_1832_; lean_object* v___x_1833_; lean_object* v___x_1834_; lean_object* v___x_1835_; 
-v___x_1827_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_getByName___closed__0));
-v___x_1828_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_1828_, 0, v_name_1824_);
-v___x_1829_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0(v_options_1825_);
-v___x_1830_ = lean_unsigned_to_nat(2u);
-v___x_1831_ = lean_mk_empty_array_with_capacity(v___x_1830_);
-v___x_1832_ = lean_array_push(v___x_1831_, v___x_1828_);
-v___x_1833_ = lean_array_push(v___x_1832_, v___x_1829_);
-v___x_1834_ = l_Lasm_JS_Web_Support_args(v___x_1833_);
-v___x_1835_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_1823_, v___x_1827_, v___x_1834_);
-if (lean_obj_tag(v___x_1835_) == 0)
+lean_object* v___x_1841_; lean_object* v___x_1842_; lean_object* v___x_1843_; lean_object* v___x_1844_; lean_object* v___x_1845_; lean_object* v___x_1846_; lean_object* v___x_1847_; lean_object* v___x_1848_; lean_object* v___x_1849_; 
+v___x_1841_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_getByName___closed__0));
+v___x_1842_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v___x_1842_, 0, v_name_1838_);
+v___x_1843_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectNamespace_get_spec__0(v_options_1839_);
+v___x_1844_ = lean_unsigned_to_nat(2u);
+v___x_1845_ = lean_mk_empty_array_with_capacity(v___x_1844_);
+v___x_1846_ = lean_array_push(v___x_1845_, v___x_1842_);
+v___x_1847_ = lean_array_push(v___x_1846_, v___x_1843_);
+v___x_1848_ = l_Lasm_JS_Web_Support_args(v___x_1847_);
+v___x_1849_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_1837_, v___x_1841_, v___x_1848_);
+if (lean_obj_tag(v___x_1849_) == 0)
 {
-lean_object* v_a_1836_; lean_object* v___x_1838_; uint8_t v_isShared_1839_; uint8_t v_isSharedCheck_1843_; 
-v_a_1836_ = lean_ctor_get(v___x_1835_, 0);
-v_isSharedCheck_1843_ = !lean_is_exclusive(v___x_1835_);
-if (v_isSharedCheck_1843_ == 0)
+lean_object* v_a_1850_; lean_object* v___x_1852_; uint8_t v_isShared_1853_; uint8_t v_isSharedCheck_1857_; 
+v_a_1850_ = lean_ctor_get(v___x_1849_, 0);
+v_isSharedCheck_1857_ = !lean_is_exclusive(v___x_1849_);
+if (v_isSharedCheck_1857_ == 0)
 {
-v___x_1838_ = v___x_1835_;
-v_isShared_1839_ = v_isSharedCheck_1843_;
-goto v_resetjp_1837_;
+v___x_1852_ = v___x_1849_;
+v_isShared_1853_ = v_isSharedCheck_1857_;
+goto v_resetjp_1851_;
 }
 else
 {
-lean_inc(v_a_1836_);
-lean_dec(v___x_1835_);
-v___x_1838_ = lean_box(0);
-v_isShared_1839_ = v_isSharedCheck_1843_;
-goto v_resetjp_1837_;
+lean_inc(v_a_1850_);
+lean_dec(v___x_1849_);
+v___x_1852_ = lean_box(0);
+v_isShared_1853_ = v_isSharedCheck_1857_;
+goto v_resetjp_1851_;
 }
-v_resetjp_1837_:
+v_resetjp_1851_:
 {
-lean_object* v___x_1841_; 
-if (v_isShared_1839_ == 0)
+lean_object* v___x_1855_; 
+if (v_isShared_1853_ == 0)
 {
-v___x_1841_ = v___x_1838_;
-goto v_reusejp_1840_;
+v___x_1855_ = v___x_1852_;
+goto v_reusejp_1854_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1842_; 
-v_reuseFailAlloc_1842_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1842_, 0, v_a_1836_);
-v___x_1841_ = v_reuseFailAlloc_1842_;
-goto v_reusejp_1840_;
+lean_object* v_reuseFailAlloc_1856_; 
+v_reuseFailAlloc_1856_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1856_, 0, v_a_1850_);
+v___x_1855_ = v_reuseFailAlloc_1856_;
+goto v_reusejp_1854_;
 }
-v_reusejp_1840_:
+v_reusejp_1854_:
 {
-return v___x_1841_;
+return v___x_1855_;
 }
 }
 }
 else
 {
-lean_object* v_a_1844_; lean_object* v___x_1846_; uint8_t v_isShared_1847_; uint8_t v_isSharedCheck_1851_; 
-v_a_1844_ = lean_ctor_get(v___x_1835_, 0);
-v_isSharedCheck_1851_ = !lean_is_exclusive(v___x_1835_);
-if (v_isSharedCheck_1851_ == 0)
+lean_object* v_a_1858_; lean_object* v___x_1860_; uint8_t v_isShared_1861_; uint8_t v_isSharedCheck_1865_; 
+v_a_1858_ = lean_ctor_get(v___x_1849_, 0);
+v_isSharedCheck_1865_ = !lean_is_exclusive(v___x_1849_);
+if (v_isSharedCheck_1865_ == 0)
 {
-v___x_1846_ = v___x_1835_;
-v_isShared_1847_ = v_isSharedCheck_1851_;
-goto v_resetjp_1845_;
+v___x_1860_ = v___x_1849_;
+v_isShared_1861_ = v_isSharedCheck_1865_;
+goto v_resetjp_1859_;
 }
 else
 {
-lean_inc(v_a_1844_);
-lean_dec(v___x_1835_);
-v___x_1846_ = lean_box(0);
-v_isShared_1847_ = v_isSharedCheck_1851_;
-goto v_resetjp_1845_;
+lean_inc(v_a_1858_);
+lean_dec(v___x_1849_);
+v___x_1860_ = lean_box(0);
+v_isShared_1861_ = v_isSharedCheck_1865_;
+goto v_resetjp_1859_;
 }
-v_resetjp_1845_:
+v_resetjp_1859_:
 {
-lean_object* v___x_1849_; 
-if (v_isShared_1847_ == 0)
+lean_object* v___x_1863_; 
+if (v_isShared_1861_ == 0)
 {
-v___x_1849_ = v___x_1846_;
-goto v_reusejp_1848_;
+v___x_1863_ = v___x_1860_;
+goto v_reusejp_1862_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1850_; 
-v_reuseFailAlloc_1850_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1850_, 0, v_a_1844_);
-v___x_1849_ = v_reuseFailAlloc_1850_;
-goto v_reusejp_1848_;
+lean_object* v_reuseFailAlloc_1864_; 
+v_reuseFailAlloc_1864_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1864_, 0, v_a_1858_);
+v___x_1863_ = v_reuseFailAlloc_1864_;
+goto v_reusejp_1862_;
 }
-v_reusejp_1848_:
+v_reusejp_1862_:
 {
-return v___x_1849_;
+return v___x_1863_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_getByName___boxed(lean_object* v_self_1852_, lean_object* v_name_1853_, lean_object* v_options_1854_, lean_object* v_a_1855_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_getByName___boxed(lean_object* v_self_1866_, lean_object* v_name_1867_, lean_object* v_options_1868_, lean_object* v_a_1869_){
 _start:
 {
-lean_object* v_res_1856_; 
-v_res_1856_ = l_Lasm_JS_Cloudflare_DurableObjectNamespace_getByName(v_self_1852_, v_name_1853_, v_options_1854_);
-return v_res_1856_;
+lean_object* v_res_1870_; 
+v_res_1870_ = l_Lasm_JS_Cloudflare_DurableObjectNamespace_getByName(v_self_1866_, v_name_1867_, v_options_1868_);
+return v_res_1870_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_jurisdiction(lean_object* v_self_1857_, uint8_t v_jurisdiction_1858_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_jurisdiction(lean_object* v_self_1871_, uint8_t v_jurisdiction_1872_){
 _start:
 {
-lean_object* v___x_1860_; lean_object* v___y_1862_; 
-v___x_1860_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespaceNewUniqueIdOptions___lam__0___closed__0));
-switch(v_jurisdiction_1858_)
+lean_object* v___x_1874_; lean_object* v___y_1876_; 
+v___x_1874_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespaceNewUniqueIdOptions___lam__0___closed__0));
+switch(v_jurisdiction_1872_)
 {
 case 0:
 {
-lean_object* v___x_1884_; 
-v___x_1884_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__1));
-v___y_1862_ = v___x_1884_;
-goto v___jp_1861_;
+lean_object* v___x_1898_; 
+v___x_1898_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__1));
+v___y_1876_ = v___x_1898_;
+goto v___jp_1875_;
 }
 case 1:
 {
-lean_object* v___x_1885_; 
-v___x_1885_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__3));
-v___y_1862_ = v___x_1885_;
-goto v___jp_1861_;
+lean_object* v___x_1899_; 
+v___x_1899_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__3));
+v___y_1876_ = v___x_1899_;
+goto v___jp_1875_;
 }
 case 2:
 {
-lean_object* v___x_1886_; 
-v___x_1886_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__5));
-v___y_1862_ = v___x_1886_;
-goto v___jp_1861_;
+lean_object* v___x_1900_; 
+v___x_1900_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__5));
+v___y_1876_ = v___x_1900_;
+goto v___jp_1875_;
 }
 default: 
 {
+lean_object* v___x_1901_; 
+v___x_1901_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__7));
+v___y_1876_ = v___x_1901_;
+goto v___jp_1875_;
+}
+}
+v___jp_1875_:
+{
+lean_object* v___x_1877_; lean_object* v___x_1878_; lean_object* v___x_1879_; lean_object* v___x_1880_; lean_object* v___x_1881_; 
+v___x_1877_ = lean_unsigned_to_nat(1u);
+v___x_1878_ = lean_mk_empty_array_with_capacity(v___x_1877_);
+lean_inc(v___y_1876_);
+v___x_1879_ = lean_array_push(v___x_1878_, v___y_1876_);
+v___x_1880_ = l_Lasm_JS_Web_Support_args(v___x_1879_);
+v___x_1881_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_1871_, v___x_1874_, v___x_1880_);
+if (lean_obj_tag(v___x_1881_) == 0)
+{
+lean_object* v_a_1882_; lean_object* v___x_1884_; uint8_t v_isShared_1885_; uint8_t v_isSharedCheck_1889_; 
+v_a_1882_ = lean_ctor_get(v___x_1881_, 0);
+v_isSharedCheck_1889_ = !lean_is_exclusive(v___x_1881_);
+if (v_isSharedCheck_1889_ == 0)
+{
+v___x_1884_ = v___x_1881_;
+v_isShared_1885_ = v_isSharedCheck_1889_;
+goto v_resetjp_1883_;
+}
+else
+{
+lean_inc(v_a_1882_);
+lean_dec(v___x_1881_);
+v___x_1884_ = lean_box(0);
+v_isShared_1885_ = v_isSharedCheck_1889_;
+goto v_resetjp_1883_;
+}
+v_resetjp_1883_:
+{
 lean_object* v___x_1887_; 
-v___x_1887_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectJurisdiction___lam__0___closed__7));
-v___y_1862_ = v___x_1887_;
-goto v___jp_1861_;
-}
-}
-v___jp_1861_:
+if (v_isShared_1885_ == 0)
 {
-lean_object* v___x_1863_; lean_object* v___x_1864_; lean_object* v___x_1865_; lean_object* v___x_1866_; lean_object* v___x_1867_; 
-v___x_1863_ = lean_unsigned_to_nat(1u);
-v___x_1864_ = lean_mk_empty_array_with_capacity(v___x_1863_);
-lean_inc(v___y_1862_);
-v___x_1865_ = lean_array_push(v___x_1864_, v___y_1862_);
-v___x_1866_ = l_Lasm_JS_Web_Support_args(v___x_1865_);
-v___x_1867_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_1857_, v___x_1860_, v___x_1866_);
-if (lean_obj_tag(v___x_1867_) == 0)
-{
-lean_object* v_a_1868_; lean_object* v___x_1870_; uint8_t v_isShared_1871_; uint8_t v_isSharedCheck_1875_; 
-v_a_1868_ = lean_ctor_get(v___x_1867_, 0);
-v_isSharedCheck_1875_ = !lean_is_exclusive(v___x_1867_);
-if (v_isSharedCheck_1875_ == 0)
-{
-v___x_1870_ = v___x_1867_;
-v_isShared_1871_ = v_isSharedCheck_1875_;
-goto v_resetjp_1869_;
+v___x_1887_ = v___x_1884_;
+goto v_reusejp_1886_;
 }
 else
 {
-lean_inc(v_a_1868_);
-lean_dec(v___x_1867_);
-v___x_1870_ = lean_box(0);
-v_isShared_1871_ = v_isSharedCheck_1875_;
-goto v_resetjp_1869_;
+lean_object* v_reuseFailAlloc_1888_; 
+v_reuseFailAlloc_1888_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1888_, 0, v_a_1882_);
+v___x_1887_ = v_reuseFailAlloc_1888_;
+goto v_reusejp_1886_;
 }
-v_resetjp_1869_:
+v_reusejp_1886_:
 {
-lean_object* v___x_1873_; 
-if (v_isShared_1871_ == 0)
-{
-v___x_1873_ = v___x_1870_;
-goto v_reusejp_1872_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1874_; 
-v_reuseFailAlloc_1874_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1874_, 0, v_a_1868_);
-v___x_1873_ = v_reuseFailAlloc_1874_;
-goto v_reusejp_1872_;
-}
-v_reusejp_1872_:
-{
-return v___x_1873_;
+return v___x_1887_;
 }
 }
 }
 else
 {
-lean_object* v_a_1876_; lean_object* v___x_1878_; uint8_t v_isShared_1879_; uint8_t v_isSharedCheck_1883_; 
-v_a_1876_ = lean_ctor_get(v___x_1867_, 0);
-v_isSharedCheck_1883_ = !lean_is_exclusive(v___x_1867_);
-if (v_isSharedCheck_1883_ == 0)
+lean_object* v_a_1890_; lean_object* v___x_1892_; uint8_t v_isShared_1893_; uint8_t v_isSharedCheck_1897_; 
+v_a_1890_ = lean_ctor_get(v___x_1881_, 0);
+v_isSharedCheck_1897_ = !lean_is_exclusive(v___x_1881_);
+if (v_isSharedCheck_1897_ == 0)
 {
-v___x_1878_ = v___x_1867_;
-v_isShared_1879_ = v_isSharedCheck_1883_;
-goto v_resetjp_1877_;
+v___x_1892_ = v___x_1881_;
+v_isShared_1893_ = v_isSharedCheck_1897_;
+goto v_resetjp_1891_;
 }
 else
 {
-lean_inc(v_a_1876_);
-lean_dec(v___x_1867_);
-v___x_1878_ = lean_box(0);
-v_isShared_1879_ = v_isSharedCheck_1883_;
-goto v_resetjp_1877_;
+lean_inc(v_a_1890_);
+lean_dec(v___x_1881_);
+v___x_1892_ = lean_box(0);
+v_isShared_1893_ = v_isSharedCheck_1897_;
+goto v_resetjp_1891_;
 }
-v_resetjp_1877_:
+v_resetjp_1891_:
 {
-lean_object* v___x_1881_; 
-if (v_isShared_1879_ == 0)
+lean_object* v___x_1895_; 
+if (v_isShared_1893_ == 0)
 {
-v___x_1881_ = v___x_1878_;
-goto v_reusejp_1880_;
+v___x_1895_ = v___x_1892_;
+goto v_reusejp_1894_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1882_; 
-v_reuseFailAlloc_1882_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1882_, 0, v_a_1876_);
-v___x_1881_ = v_reuseFailAlloc_1882_;
-goto v_reusejp_1880_;
+lean_object* v_reuseFailAlloc_1896_; 
+v_reuseFailAlloc_1896_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1896_, 0, v_a_1890_);
+v___x_1895_ = v_reuseFailAlloc_1896_;
+goto v_reusejp_1894_;
 }
-v_reusejp_1880_:
+v_reusejp_1894_:
 {
-return v___x_1881_;
+return v___x_1895_;
 }
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_jurisdiction___boxed(lean_object* v_self_1888_, lean_object* v_jurisdiction_1889_, lean_object* v_a_1890_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectNamespace_jurisdiction___boxed(lean_object* v_self_1902_, lean_object* v_jurisdiction_1903_, lean_object* v_a_1904_){
 _start:
 {
-uint8_t v_jurisdiction_boxed_1891_; lean_object* v_res_1892_; 
-v_jurisdiction_boxed_1891_ = lean_unbox(v_jurisdiction_1889_);
-v_res_1892_ = l_Lasm_JS_Cloudflare_DurableObjectNamespace_jurisdiction(v_self_1888_, v_jurisdiction_boxed_1891_);
-return v_res_1892_;
+uint8_t v_jurisdiction_boxed_1905_; lean_object* v_res_1906_; 
+v_jurisdiction_boxed_1905_ = lean_unbox(v_jurisdiction_1903_);
+v_res_1906_ = l_Lasm_JS_Cloudflare_DurableObjectNamespace_jurisdiction(v_self_1902_, v_jurisdiction_boxed_1905_);
+return v_res_1906_;
 }
 }
 static uint64_t _init_l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0(void){
 _start:
 {
-uint8_t v___x_1893_; uint64_t v___x_1894_; 
-v___x_1893_ = 0;
-v___x_1894_ = l___private_Lasm_JS_Core_0__Lasm_JS_modeArg(v___x_1893_);
-return v___x_1894_;
+uint8_t v___x_1907_; uint64_t v___x_1908_; 
+v___x_1907_ = 0;
+v___x_1908_ = l___private_Lasm_JS_Core_0__Lasm_JS_modeArg(v___x_1907_);
+return v___x_1908_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0(lean_object* v_o_1896_, lean_object* v_key_1897_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0(lean_object* v_o_1910_, lean_object* v_key_1911_){
 _start:
 {
-lean_object* v_k_1899_; lean_object* v___x_1900_; 
-v_k_1899_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v_k_1899_, 0, v_key_1897_);
-v___x_1900_ = l_Lasm_JS_Wire_encodeIO(v_k_1899_);
-if (lean_obj_tag(v___x_1900_) == 0)
+lean_object* v_k_1913_; lean_object* v___x_1914_; 
+v_k_1913_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v_k_1913_, 0, v_key_1911_);
+v___x_1914_ = l_Lasm_JS_Wire_encodeIO(v_k_1913_);
+if (lean_obj_tag(v___x_1914_) == 0)
 {
-lean_object* v_a_1901_; uint32_t v___x_1902_; uint32_t v___x_1903_; uint64_t v___x_1904_; lean_object* v___x_1905_; lean_object* v___x_1906_; lean_object* v___x_1907_; lean_object* v___x_1908_; lean_object* v___x_1909_; lean_object* v___x_1910_; lean_object* v___x_1911_; lean_object* v___x_1912_; 
-v_a_1901_ = lean_ctor_get(v___x_1900_, 0);
-lean_inc(v_a_1901_);
-lean_dec_ref_known(v___x_1900_, 1);
-v___x_1902_ = 203;
-v___x_1903_ = lasm_js_value_handle(v_o_1896_);
-v___x_1904_ = lean_uint64_once(&l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0, &l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0_once, _init_l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0);
-v___x_1905_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___x_1906_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_1906_, 0, v_o_1896_);
-lean_ctor_set(v___x_1906_, 1, v___x_1905_);
-v___x_1907_ = lean_unsigned_to_nat(2u);
-v___x_1908_ = lean_mk_empty_array_with_capacity(v___x_1907_);
-lean_inc_ref(v_k_1899_);
-v___x_1909_ = lean_array_push(v___x_1908_, v_k_1899_);
-v___x_1910_ = lean_array_push(v___x_1909_, v___x_1906_);
-v___x_1911_ = lean_alloc_ctor(7, 1, 0);
-lean_ctor_set(v___x_1911_, 0, v___x_1910_);
-v___x_1912_ = lasm_js_call(v___x_1902_, v___x_1903_, v___x_1904_, v_a_1901_, v___x_1911_);
-lean_dec_ref_known(v___x_1911_, 1);
-lean_dec(v_a_1901_);
-if (lean_obj_tag(v___x_1912_) == 0)
+lean_object* v_a_1915_; uint32_t v___x_1916_; uint32_t v___x_1917_; uint64_t v___x_1918_; lean_object* v___x_1919_; lean_object* v___x_1920_; lean_object* v___x_1921_; lean_object* v___x_1922_; lean_object* v___x_1923_; lean_object* v___x_1924_; lean_object* v___x_1925_; lean_object* v___x_1926_; 
+v_a_1915_ = lean_ctor_get(v___x_1914_, 0);
+lean_inc(v_a_1915_);
+lean_dec_ref_known(v___x_1914_, 1);
+v___x_1916_ = 203;
+v___x_1917_ = lasm_js_value_handle(v_o_1910_);
+v___x_1918_ = lean_uint64_once(&l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0, &l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0_once, _init_l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0);
+v___x_1919_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___x_1920_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_1920_, 0, v_o_1910_);
+lean_ctor_set(v___x_1920_, 1, v___x_1919_);
+v___x_1921_ = lean_unsigned_to_nat(2u);
+v___x_1922_ = lean_mk_empty_array_with_capacity(v___x_1921_);
+lean_inc_ref(v_k_1913_);
+v___x_1923_ = lean_array_push(v___x_1922_, v_k_1913_);
+v___x_1924_ = lean_array_push(v___x_1923_, v___x_1920_);
+v___x_1925_ = lean_alloc_ctor(7, 1, 0);
+lean_ctor_set(v___x_1925_, 0, v___x_1924_);
+v___x_1926_ = lasm_js_call(v___x_1916_, v___x_1917_, v___x_1918_, v_a_1915_, v___x_1925_);
+lean_dec_ref_known(v___x_1925_, 1);
+lean_dec(v_a_1915_);
+if (lean_obj_tag(v___x_1926_) == 0)
 {
-lean_object* v_a_1913_; lean_object* v___x_1914_; lean_object* v___x_1915_; lean_object* v___x_1916_; lean_object* v___x_1917_; 
-v_a_1913_ = lean_ctor_get(v___x_1912_, 0);
-lean_inc(v_a_1913_);
-lean_dec_ref_known(v___x_1912_, 1);
-v___x_1914_ = ((lean_object*)(l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__1));
-v___x_1915_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_keyText(v_k_1899_);
-v___x_1916_ = lean_string_append(v___x_1914_, v___x_1915_);
-lean_dec_ref(v___x_1915_);
-v___x_1917_ = l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_URLSearchParams_get_spec__0_spec__1(v___x_1916_, v_a_1913_);
-lean_dec(v_a_1913_);
-lean_dec_ref(v___x_1916_);
-return v___x_1917_;
-}
-else
-{
-lean_object* v_a_1918_; lean_object* v___x_1920_; uint8_t v_isShared_1921_; uint8_t v_isSharedCheck_1925_; 
-lean_dec_ref_known(v_k_1899_, 1);
-v_a_1918_ = lean_ctor_get(v___x_1912_, 0);
-v_isSharedCheck_1925_ = !lean_is_exclusive(v___x_1912_);
-if (v_isSharedCheck_1925_ == 0)
-{
-v___x_1920_ = v___x_1912_;
-v_isShared_1921_ = v_isSharedCheck_1925_;
-goto v_resetjp_1919_;
-}
-else
-{
-lean_inc(v_a_1918_);
-lean_dec(v___x_1912_);
-v___x_1920_ = lean_box(0);
-v_isShared_1921_ = v_isSharedCheck_1925_;
-goto v_resetjp_1919_;
-}
-v_resetjp_1919_:
-{
-lean_object* v___x_1923_; 
-if (v_isShared_1921_ == 0)
-{
-v___x_1923_ = v___x_1920_;
-goto v_reusejp_1922_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1924_; 
-v_reuseFailAlloc_1924_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1924_, 0, v_a_1918_);
-v___x_1923_ = v_reuseFailAlloc_1924_;
-goto v_reusejp_1922_;
-}
-v_reusejp_1922_:
-{
-return v___x_1923_;
-}
-}
-}
-}
-else
-{
-lean_object* v_a_1926_; lean_object* v___x_1928_; uint8_t v_isShared_1929_; uint8_t v_isSharedCheck_1933_; 
-lean_dec_ref_known(v_k_1899_, 1);
-lean_dec(v_o_1896_);
-v_a_1926_ = lean_ctor_get(v___x_1900_, 0);
-v_isSharedCheck_1933_ = !lean_is_exclusive(v___x_1900_);
-if (v_isSharedCheck_1933_ == 0)
-{
-v___x_1928_ = v___x_1900_;
-v_isShared_1929_ = v_isSharedCheck_1933_;
-goto v_resetjp_1927_;
-}
-else
-{
-lean_inc(v_a_1926_);
-lean_dec(v___x_1900_);
-v___x_1928_ = lean_box(0);
-v_isShared_1929_ = v_isSharedCheck_1933_;
-goto v_resetjp_1927_;
-}
-v_resetjp_1927_:
-{
-lean_object* v___x_1931_; 
-if (v_isShared_1929_ == 0)
-{
-v___x_1931_ = v___x_1928_;
-goto v_reusejp_1930_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_1932_; 
-v_reuseFailAlloc_1932_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1932_, 0, v_a_1926_);
-v___x_1931_ = v_reuseFailAlloc_1932_;
-goto v_reusejp_1930_;
-}
-v_reusejp_1930_:
-{
+lean_object* v_a_1927_; lean_object* v___x_1928_; lean_object* v___x_1929_; lean_object* v___x_1930_; lean_object* v___x_1931_; 
+v_a_1927_ = lean_ctor_get(v___x_1926_, 0);
+lean_inc(v_a_1927_);
+lean_dec_ref_known(v___x_1926_, 1);
+v___x_1928_ = ((lean_object*)(l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__1));
+v___x_1929_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_keyText(v_k_1913_);
+v___x_1930_ = lean_string_append(v___x_1928_, v___x_1929_);
+lean_dec_ref(v___x_1929_);
+v___x_1931_ = l___private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_URLSearchParams_get_spec__0_spec__1(v___x_1930_, v_a_1927_);
+lean_dec(v_a_1927_);
+lean_dec_ref(v___x_1930_);
 return v___x_1931_;
 }
+else
+{
+lean_object* v_a_1932_; lean_object* v___x_1934_; uint8_t v_isShared_1935_; uint8_t v_isSharedCheck_1939_; 
+lean_dec_ref_known(v_k_1913_, 1);
+v_a_1932_ = lean_ctor_get(v___x_1926_, 0);
+v_isSharedCheck_1939_ = !lean_is_exclusive(v___x_1926_);
+if (v_isSharedCheck_1939_ == 0)
+{
+v___x_1934_ = v___x_1926_;
+v_isShared_1935_ = v_isSharedCheck_1939_;
+goto v_resetjp_1933_;
+}
+else
+{
+lean_inc(v_a_1932_);
+lean_dec(v___x_1926_);
+v___x_1934_ = lean_box(0);
+v_isShared_1935_ = v_isSharedCheck_1939_;
+goto v_resetjp_1933_;
+}
+v_resetjp_1933_:
+{
+lean_object* v___x_1937_; 
+if (v_isShared_1935_ == 0)
+{
+v___x_1937_ = v___x_1934_;
+goto v_reusejp_1936_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1938_; 
+v_reuseFailAlloc_1938_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1938_, 0, v_a_1932_);
+v___x_1937_ = v_reuseFailAlloc_1938_;
+goto v_reusejp_1936_;
+}
+v_reusejp_1936_:
+{
+return v___x_1937_;
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___boxed(lean_object* v_o_1934_, lean_object* v_key_1935_, lean_object* v_a_1936_){
+else
+{
+lean_object* v_a_1940_; lean_object* v___x_1942_; uint8_t v_isShared_1943_; uint8_t v_isSharedCheck_1947_; 
+lean_dec_ref_known(v_k_1913_, 1);
+lean_dec(v_o_1910_);
+v_a_1940_ = lean_ctor_get(v___x_1914_, 0);
+v_isSharedCheck_1947_ = !lean_is_exclusive(v___x_1914_);
+if (v_isSharedCheck_1947_ == 0)
+{
+v___x_1942_ = v___x_1914_;
+v_isShared_1943_ = v_isSharedCheck_1947_;
+goto v_resetjp_1941_;
+}
+else
+{
+lean_inc(v_a_1940_);
+lean_dec(v___x_1914_);
+v___x_1942_ = lean_box(0);
+v_isShared_1943_ = v_isSharedCheck_1947_;
+goto v_resetjp_1941_;
+}
+v_resetjp_1941_:
+{
+lean_object* v___x_1945_; 
+if (v_isShared_1943_ == 0)
+{
+v___x_1945_ = v___x_1942_;
+goto v_reusejp_1944_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_1946_; 
+v_reuseFailAlloc_1946_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_1946_, 0, v_a_1940_);
+v___x_1945_ = v_reuseFailAlloc_1946_;
+goto v_reusejp_1944_;
+}
+v_reusejp_1944_:
+{
+return v___x_1945_;
+}
+}
+}
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___boxed(lean_object* v_o_1948_, lean_object* v_key_1949_, lean_object* v_a_1950_){
 _start:
 {
-lean_object* v_res_1937_; 
-v_res_1937_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0(v_o_1934_, v_key_1935_);
-return v_res_1937_;
+lean_object* v_res_1951_; 
+v_res_1951_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0(v_o_1948_, v_key_1949_);
+return v_res_1951_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_name(lean_object* v_self_1939_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_name(lean_object* v_self_1953_){
 _start:
 {
-lean_object* v___x_1941_; lean_object* v___x_1942_; 
-v___x_1941_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectId_name___closed__0));
-v___x_1942_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0(v_self_1939_, v___x_1941_);
-return v___x_1942_;
+lean_object* v___x_1955_; lean_object* v___x_1956_; 
+v___x_1955_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectId_name___closed__0));
+v___x_1956_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0(v_self_1953_, v___x_1955_);
+return v___x_1956_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_name___boxed(lean_object* v_self_1943_, lean_object* v_a_1944_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_name___boxed(lean_object* v_self_1957_, lean_object* v_a_1958_){
 _start:
 {
-lean_object* v_res_1945_; 
-v_res_1945_ = l_Lasm_JS_Cloudflare_DurableObjectId_name(v_self_1943_);
-return v_res_1945_;
+lean_object* v_res_1959_; 
+v_res_1959_ = l_Lasm_JS_Cloudflare_DurableObjectId_name(v_self_1957_);
+return v_res_1959_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_jurisdiction(lean_object* v_self_1946_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_jurisdiction(lean_object* v_self_1960_){
 _start:
 {
-lean_object* v___x_1948_; lean_object* v___x_1949_; 
-v___x_1948_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespaceNewUniqueIdOptions___lam__0___closed__0));
-v___x_1949_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0(v_self_1946_, v___x_1948_);
-return v___x_1949_;
+lean_object* v___x_1962_; lean_object* v___x_1963_; 
+v___x_1962_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespaceNewUniqueIdOptions___lam__0___closed__0));
+v___x_1963_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0(v_self_1960_, v___x_1962_);
+return v___x_1963_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_jurisdiction___boxed(lean_object* v_self_1950_, lean_object* v_a_1951_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_jurisdiction___boxed(lean_object* v_self_1964_, lean_object* v_a_1965_){
 _start:
 {
-lean_object* v_res_1952_; 
-v_res_1952_ = l_Lasm_JS_Cloudflare_DurableObjectId_jurisdiction(v_self_1950_);
-return v_res_1952_;
+lean_object* v_res_1966_; 
+v_res_1966_ = l_Lasm_JS_Cloudflare_DurableObjectId_jurisdiction(v_self_1964_);
+return v_res_1966_;
 }
 }
 static lean_object* _init_l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2(void){
 _start:
 {
-lean_object* v___x_1956_; lean_object* v___x_1957_; 
-v___x_1956_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__1));
-v___x_1957_ = l_Lasm_JS_Web_Support_args(v___x_1956_);
-return v___x_1957_;
+lean_object* v___x_1970_; lean_object* v___x_1971_; 
+v___x_1970_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__1));
+v___x_1971_ = l_Lasm_JS_Web_Support_args(v___x_1970_);
+return v___x_1971_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_toString(lean_object* v_self_1958_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_toString(lean_object* v_self_1972_){
 _start:
 {
-lean_object* v___x_1960_; lean_object* v___x_1961_; lean_object* v___x_1962_; 
-v___x_1960_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__0));
-v___x_1961_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2, &l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2_once, _init_l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2);
-v___x_1962_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_URL_toString_spec__0(v_self_1958_, v___x_1960_, v___x_1961_);
-return v___x_1962_;
+lean_object* v___x_1974_; lean_object* v___x_1975_; lean_object* v___x_1976_; 
+v___x_1974_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__0));
+v___x_1975_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2, &l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2_once, _init_l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2);
+v___x_1976_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_URL_toString_spec__0(v_self_1972_, v___x_1974_, v___x_1975_);
+return v___x_1976_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_toString___boxed(lean_object* v_self_1963_, lean_object* v_a_1964_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_toString___boxed(lean_object* v_self_1977_, lean_object* v_a_1978_){
 _start:
 {
-lean_object* v_res_1965_; 
-v_res_1965_ = l_Lasm_JS_Cloudflare_DurableObjectId_toString(v_self_1963_);
-return v_res_1965_;
+lean_object* v_res_1979_; 
+v_res_1979_ = l_Lasm_JS_Cloudflare_DurableObjectId_toString(v_self_1977_);
+return v_res_1979_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_equals(lean_object* v_self_1967_, lean_object* v_other_1968_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_equals(lean_object* v_self_1981_, lean_object* v_other_1982_){
 _start:
 {
-lean_object* v___x_1970_; lean_object* v___x_1971_; lean_object* v___x_1972_; lean_object* v___x_1973_; lean_object* v___x_1974_; lean_object* v___x_1975_; lean_object* v___x_1976_; lean_object* v___x_1977_; 
-v___x_1970_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectId_equals___closed__0));
-v___x_1971_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___x_1972_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_1972_, 0, v_other_1968_);
-lean_ctor_set(v___x_1972_, 1, v___x_1971_);
-v___x_1973_ = lean_unsigned_to_nat(1u);
-v___x_1974_ = lean_mk_empty_array_with_capacity(v___x_1973_);
-v___x_1975_ = lean_array_push(v___x_1974_, v___x_1972_);
-v___x_1976_ = l_Lasm_JS_Web_Support_args(v___x_1975_);
-v___x_1977_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_dispatchEvent_spec__0(v_self_1967_, v___x_1970_, v___x_1976_);
-return v___x_1977_;
+lean_object* v___x_1984_; lean_object* v___x_1985_; lean_object* v___x_1986_; lean_object* v___x_1987_; lean_object* v___x_1988_; lean_object* v___x_1989_; lean_object* v___x_1990_; lean_object* v___x_1991_; 
+v___x_1984_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectId_equals___closed__0));
+v___x_1985_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___x_1986_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_1986_, 0, v_other_1982_);
+lean_ctor_set(v___x_1986_, 1, v___x_1985_);
+v___x_1987_ = lean_unsigned_to_nat(1u);
+v___x_1988_ = lean_mk_empty_array_with_capacity(v___x_1987_);
+v___x_1989_ = lean_array_push(v___x_1988_, v___x_1986_);
+v___x_1990_ = l_Lasm_JS_Web_Support_args(v___x_1989_);
+v___x_1991_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_Support_isInstance_spec__0(v_self_1981_, v___x_1984_, v___x_1990_);
+return v___x_1991_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_equals___boxed(lean_object* v_self_1978_, lean_object* v_other_1979_, lean_object* v_a_1980_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectId_equals___boxed(lean_object* v_self_1992_, lean_object* v_other_1993_, lean_object* v_a_1994_){
 _start:
 {
-lean_object* v_res_1981_; 
-v_res_1981_ = l_Lasm_JS_Cloudflare_DurableObjectId_equals(v_self_1978_, v_other_1979_);
-return v_res_1981_;
+lean_object* v_res_1995_; 
+v_res_1995_ = l_Lasm_JS_Cloudflare_DurableObjectId_equals(v_self_1992_, v_other_1993_);
+return v_res_1995_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_id(lean_object* v_self_1983_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_id(lean_object* v_self_1997_){
 _start:
 {
-lean_object* v___x_1985_; lean_object* v___x_1986_; 
-v___x_1985_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStub_id___closed__0));
-v___x_1986_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_self_1983_, v___x_1985_);
-if (lean_obj_tag(v___x_1986_) == 0)
+lean_object* v___x_1999_; lean_object* v___x_2000_; 
+v___x_1999_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStub_id___closed__0));
+v___x_2000_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_self_1997_, v___x_1999_);
+if (lean_obj_tag(v___x_2000_) == 0)
 {
-lean_object* v_a_1987_; lean_object* v___x_1989_; uint8_t v_isShared_1990_; uint8_t v_isSharedCheck_1994_; 
-v_a_1987_ = lean_ctor_get(v___x_1986_, 0);
-v_isSharedCheck_1994_ = !lean_is_exclusive(v___x_1986_);
-if (v_isSharedCheck_1994_ == 0)
+lean_object* v_a_2001_; lean_object* v___x_2003_; uint8_t v_isShared_2004_; uint8_t v_isSharedCheck_2008_; 
+v_a_2001_ = lean_ctor_get(v___x_2000_, 0);
+v_isSharedCheck_2008_ = !lean_is_exclusive(v___x_2000_);
+if (v_isSharedCheck_2008_ == 0)
 {
-v___x_1989_ = v___x_1986_;
-v_isShared_1990_ = v_isSharedCheck_1994_;
-goto v_resetjp_1988_;
+v___x_2003_ = v___x_2000_;
+v_isShared_2004_ = v_isSharedCheck_2008_;
+goto v_resetjp_2002_;
 }
 else
 {
-lean_inc(v_a_1987_);
-lean_dec(v___x_1986_);
-v___x_1989_ = lean_box(0);
-v_isShared_1990_ = v_isSharedCheck_1994_;
-goto v_resetjp_1988_;
+lean_inc(v_a_2001_);
+lean_dec(v___x_2000_);
+v___x_2003_ = lean_box(0);
+v_isShared_2004_ = v_isSharedCheck_2008_;
+goto v_resetjp_2002_;
 }
-v_resetjp_1988_:
+v_resetjp_2002_:
 {
-lean_object* v___x_1992_; 
-if (v_isShared_1990_ == 0)
+lean_object* v___x_2006_; 
+if (v_isShared_2004_ == 0)
 {
-v___x_1992_ = v___x_1989_;
-goto v_reusejp_1991_;
+v___x_2006_ = v___x_2003_;
+goto v_reusejp_2005_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_1993_; 
-v_reuseFailAlloc_1993_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_1993_, 0, v_a_1987_);
-v___x_1992_ = v_reuseFailAlloc_1993_;
-goto v_reusejp_1991_;
+lean_object* v_reuseFailAlloc_2007_; 
+v_reuseFailAlloc_2007_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2007_, 0, v_a_2001_);
+v___x_2006_ = v_reuseFailAlloc_2007_;
+goto v_reusejp_2005_;
 }
-v_reusejp_1991_:
+v_reusejp_2005_:
 {
-return v___x_1992_;
+return v___x_2006_;
 }
 }
 }
 else
 {
-lean_object* v_a_1995_; lean_object* v___x_1997_; uint8_t v_isShared_1998_; uint8_t v_isSharedCheck_2002_; 
-v_a_1995_ = lean_ctor_get(v___x_1986_, 0);
-v_isSharedCheck_2002_ = !lean_is_exclusive(v___x_1986_);
-if (v_isSharedCheck_2002_ == 0)
+lean_object* v_a_2009_; lean_object* v___x_2011_; uint8_t v_isShared_2012_; uint8_t v_isSharedCheck_2016_; 
+v_a_2009_ = lean_ctor_get(v___x_2000_, 0);
+v_isSharedCheck_2016_ = !lean_is_exclusive(v___x_2000_);
+if (v_isSharedCheck_2016_ == 0)
 {
-v___x_1997_ = v___x_1986_;
-v_isShared_1998_ = v_isSharedCheck_2002_;
-goto v_resetjp_1996_;
+v___x_2011_ = v___x_2000_;
+v_isShared_2012_ = v_isSharedCheck_2016_;
+goto v_resetjp_2010_;
 }
 else
 {
-lean_inc(v_a_1995_);
-lean_dec(v___x_1986_);
-v___x_1997_ = lean_box(0);
-v_isShared_1998_ = v_isSharedCheck_2002_;
-goto v_resetjp_1996_;
+lean_inc(v_a_2009_);
+lean_dec(v___x_2000_);
+v___x_2011_ = lean_box(0);
+v_isShared_2012_ = v_isSharedCheck_2016_;
+goto v_resetjp_2010_;
 }
-v_resetjp_1996_:
+v_resetjp_2010_:
 {
-lean_object* v___x_2000_; 
-if (v_isShared_1998_ == 0)
+lean_object* v___x_2014_; 
+if (v_isShared_2012_ == 0)
 {
-v___x_2000_ = v___x_1997_;
-goto v_reusejp_1999_;
+v___x_2014_ = v___x_2011_;
+goto v_reusejp_2013_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2001_; 
-v_reuseFailAlloc_2001_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2001_, 0, v_a_1995_);
-v___x_2000_ = v_reuseFailAlloc_2001_;
-goto v_reusejp_1999_;
+lean_object* v_reuseFailAlloc_2015_; 
+v_reuseFailAlloc_2015_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2015_, 0, v_a_2009_);
+v___x_2014_ = v_reuseFailAlloc_2015_;
+goto v_reusejp_2013_;
 }
-v_reusejp_1999_:
+v_reusejp_2013_:
 {
-return v___x_2000_;
+return v___x_2014_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_id___boxed(lean_object* v_self_2003_, lean_object* v_a_2004_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_id___boxed(lean_object* v_self_2017_, lean_object* v_a_2018_){
 _start:
 {
-lean_object* v_res_2005_; 
-v_res_2005_ = l_Lasm_JS_Cloudflare_DurableObjectStub_id(v_self_2003_);
-return v_res_2005_;
+lean_object* v_res_2019_; 
+v_res_2019_ = l_Lasm_JS_Cloudflare_DurableObjectStub_id(v_self_2017_);
+return v_res_2019_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_name(lean_object* v_self_2006_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_name(lean_object* v_self_2020_){
 _start:
 {
-lean_object* v___x_2008_; lean_object* v___x_2009_; 
-v___x_2008_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectId_name___closed__0));
-v___x_2009_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0(v_self_2006_, v___x_2008_);
-return v___x_2009_;
+lean_object* v___x_2022_; lean_object* v___x_2023_; 
+v___x_2022_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectId_name___closed__0));
+v___x_2023_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0(v_self_2020_, v___x_2022_);
+return v___x_2023_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_name___boxed(lean_object* v_self_2010_, lean_object* v_a_2011_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_name___boxed(lean_object* v_self_2024_, lean_object* v_a_2025_){
 _start:
 {
-lean_object* v_res_2012_; 
-v_res_2012_ = l_Lasm_JS_Cloudflare_DurableObjectStub_name(v_self_2010_);
-return v_res_2012_;
+lean_object* v_res_2026_; 
+v_res_2026_ = l_Lasm_JS_Cloudflare_DurableObjectStub_name(v_self_2024_);
+return v_res_2026_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_fetch___lam__0(lean_object* v_x_2013_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_fetch___lam__0(lean_object* v_x_2027_){
 _start:
 {
-if (lean_obj_tag(v_x_2013_) == 0)
+if (lean_obj_tag(v_x_2027_) == 0)
 {
-lean_object* v_a_2015_; lean_object* v___x_2017_; uint8_t v_isShared_2018_; uint8_t v_isSharedCheck_2023_; 
-v_a_2015_ = lean_ctor_get(v_x_2013_, 0);
-v_isSharedCheck_2023_ = !lean_is_exclusive(v_x_2013_);
-if (v_isSharedCheck_2023_ == 0)
+lean_object* v_a_2029_; lean_object* v___x_2031_; uint8_t v_isShared_2032_; uint8_t v_isSharedCheck_2037_; 
+v_a_2029_ = lean_ctor_get(v_x_2027_, 0);
+v_isSharedCheck_2037_ = !lean_is_exclusive(v_x_2027_);
+if (v_isSharedCheck_2037_ == 0)
 {
-v___x_2017_ = v_x_2013_;
-v_isShared_2018_ = v_isSharedCheck_2023_;
-goto v_resetjp_2016_;
+v___x_2031_ = v_x_2027_;
+v_isShared_2032_ = v_isSharedCheck_2037_;
+goto v_resetjp_2030_;
 }
 else
 {
-lean_inc(v_a_2015_);
-lean_dec(v_x_2013_);
-v___x_2017_ = lean_box(0);
-v_isShared_2018_ = v_isSharedCheck_2023_;
-goto v_resetjp_2016_;
+lean_inc(v_a_2029_);
+lean_dec(v_x_2027_);
+v___x_2031_ = lean_box(0);
+v_isShared_2032_ = v_isSharedCheck_2037_;
+goto v_resetjp_2030_;
 }
-v_resetjp_2016_:
+v_resetjp_2030_:
 {
-lean_object* v___x_2020_; 
-if (v_isShared_2018_ == 0)
+lean_object* v___x_2034_; 
+if (v_isShared_2032_ == 0)
 {
-v___x_2020_ = v___x_2017_;
-goto v_reusejp_2019_;
+v___x_2034_ = v___x_2031_;
+goto v_reusejp_2033_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2022_; 
-v_reuseFailAlloc_2022_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2022_, 0, v_a_2015_);
-v___x_2020_ = v_reuseFailAlloc_2022_;
-goto v_reusejp_2019_;
+lean_object* v_reuseFailAlloc_2036_; 
+v_reuseFailAlloc_2036_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2036_, 0, v_a_2029_);
+v___x_2034_ = v_reuseFailAlloc_2036_;
+goto v_reusejp_2033_;
 }
-v_reusejp_2019_:
+v_reusejp_2033_:
 {
-lean_object* v___x_2021_; 
-v___x_2021_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2021_, 0, v___x_2020_);
-return v___x_2021_;
+lean_object* v___x_2035_; 
+v___x_2035_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2035_, 0, v___x_2034_);
+return v___x_2035_;
 }
 }
 }
 else
 {
-lean_object* v_a_2024_; lean_object* v___x_2026_; uint8_t v_isShared_2027_; uint8_t v_isSharedCheck_2032_; 
-v_a_2024_ = lean_ctor_get(v_x_2013_, 0);
-v_isSharedCheck_2032_ = !lean_is_exclusive(v_x_2013_);
-if (v_isSharedCheck_2032_ == 0)
+lean_object* v_a_2038_; lean_object* v___x_2040_; uint8_t v_isShared_2041_; uint8_t v_isSharedCheck_2046_; 
+v_a_2038_ = lean_ctor_get(v_x_2027_, 0);
+v_isSharedCheck_2046_ = !lean_is_exclusive(v_x_2027_);
+if (v_isSharedCheck_2046_ == 0)
 {
-v___x_2026_ = v_x_2013_;
-v_isShared_2027_ = v_isSharedCheck_2032_;
-goto v_resetjp_2025_;
+v___x_2040_ = v_x_2027_;
+v_isShared_2041_ = v_isSharedCheck_2046_;
+goto v_resetjp_2039_;
 }
 else
 {
-lean_inc(v_a_2024_);
-lean_dec(v_x_2013_);
-v___x_2026_ = lean_box(0);
-v_isShared_2027_ = v_isSharedCheck_2032_;
-goto v_resetjp_2025_;
+lean_inc(v_a_2038_);
+lean_dec(v_x_2027_);
+v___x_2040_ = lean_box(0);
+v_isShared_2041_ = v_isSharedCheck_2046_;
+goto v_resetjp_2039_;
 }
-v_resetjp_2025_:
+v_resetjp_2039_:
 {
-lean_object* v___x_2029_; 
-if (v_isShared_2027_ == 0)
+lean_object* v___x_2043_; 
+if (v_isShared_2041_ == 0)
 {
-v___x_2029_ = v___x_2026_;
-goto v_reusejp_2028_;
+v___x_2043_ = v___x_2040_;
+goto v_reusejp_2042_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2031_; 
-v_reuseFailAlloc_2031_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2031_, 0, v_a_2024_);
-v___x_2029_ = v_reuseFailAlloc_2031_;
-goto v_reusejp_2028_;
+lean_object* v_reuseFailAlloc_2045_; 
+v_reuseFailAlloc_2045_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2045_, 0, v_a_2038_);
+v___x_2043_ = v_reuseFailAlloc_2045_;
+goto v_reusejp_2042_;
 }
-v_reusejp_2028_:
+v_reusejp_2042_:
 {
-lean_object* v___x_2030_; 
-v___x_2030_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2030_, 0, v___x_2029_);
-return v___x_2030_;
+lean_object* v___x_2044_; 
+v___x_2044_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2044_, 0, v___x_2043_);
+return v___x_2044_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_fetch___lam__0___boxed(lean_object* v_x_2033_, lean_object* v___y_2034_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_fetch___lam__0___boxed(lean_object* v_x_2047_, lean_object* v___y_2048_){
 _start:
 {
-lean_object* v_res_2035_; 
-v_res_2035_ = l_Lasm_JS_Cloudflare_DurableObjectStub_fetch___lam__0(v_x_2033_);
-return v_res_2035_;
+lean_object* v_res_2049_; 
+v_res_2049_ = l_Lasm_JS_Cloudflare_DurableObjectStub_fetch___lam__0(v_x_2047_);
+return v_res_2049_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_fetch(lean_object* v_self_2038_, lean_object* v_input_2039_, lean_object* v_init_2040_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_fetch(lean_object* v_self_2052_, lean_object* v_input_2053_, lean_object* v_init_2054_){
 _start:
 {
-lean_object* v___f_2042_; lean_object* v___x_2043_; lean_object* v___y_2045_; 
-v___f_2042_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStub_fetch___closed__0));
-v___x_2043_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStub_fetch___closed__1));
-if (lean_obj_tag(v_input_2039_) == 1)
+lean_object* v___f_2056_; lean_object* v___x_2057_; lean_object* v___y_2059_; 
+v___f_2056_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStub_fetch___closed__0));
+v___x_2057_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStub_fetch___closed__1));
+if (lean_obj_tag(v_input_2053_) == 1)
 {
-lean_object* v_value_2056_; lean_object* v___x_2058_; uint8_t v_isShared_2059_; uint8_t v_isSharedCheck_2063_; 
-v_value_2056_ = lean_ctor_get(v_input_2039_, 0);
-v_isSharedCheck_2063_ = !lean_is_exclusive(v_input_2039_);
-if (v_isSharedCheck_2063_ == 0)
+lean_object* v_value_2070_; lean_object* v___x_2072_; uint8_t v_isShared_2073_; uint8_t v_isSharedCheck_2077_; 
+v_value_2070_ = lean_ctor_get(v_input_2053_, 0);
+v_isSharedCheck_2077_ = !lean_is_exclusive(v_input_2053_);
+if (v_isSharedCheck_2077_ == 0)
 {
-v___x_2058_ = v_input_2039_;
-v_isShared_2059_ = v_isSharedCheck_2063_;
-goto v_resetjp_2057_;
+v___x_2072_ = v_input_2053_;
+v_isShared_2073_ = v_isSharedCheck_2077_;
+goto v_resetjp_2071_;
 }
 else
 {
-lean_inc(v_value_2056_);
-lean_dec(v_input_2039_);
-v___x_2058_ = lean_box(0);
-v_isShared_2059_ = v_isSharedCheck_2063_;
-goto v_resetjp_2057_;
+lean_inc(v_value_2070_);
+lean_dec(v_input_2053_);
+v___x_2072_ = lean_box(0);
+v_isShared_2073_ = v_isSharedCheck_2077_;
+goto v_resetjp_2071_;
 }
-v_resetjp_2057_:
+v_resetjp_2071_:
 {
-lean_object* v___x_2061_; 
-if (v_isShared_2059_ == 0)
+lean_object* v___x_2075_; 
+if (v_isShared_2073_ == 0)
 {
-lean_ctor_set_tag(v___x_2058_, 4);
-v___x_2061_ = v___x_2058_;
-goto v_reusejp_2060_;
+lean_ctor_set_tag(v___x_2072_, 4);
+v___x_2075_ = v___x_2072_;
+goto v_reusejp_2074_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2062_; 
-v_reuseFailAlloc_2062_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2062_, 0, v_value_2056_);
-v___x_2061_ = v_reuseFailAlloc_2062_;
-goto v_reusejp_2060_;
+lean_object* v_reuseFailAlloc_2076_; 
+v_reuseFailAlloc_2076_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2076_, 0, v_value_2070_);
+v___x_2075_ = v_reuseFailAlloc_2076_;
+goto v_reusejp_2074_;
 }
-v_reusejp_2060_:
+v_reusejp_2074_:
 {
-v___y_2045_ = v___x_2061_;
-goto v___jp_2044_;
+v___y_2059_ = v___x_2075_;
+goto v___jp_2058_;
 }
 }
 }
 else
 {
-lean_object* v_value_2064_; lean_object* v___x_2065_; lean_object* v___x_2066_; 
-v_value_2064_ = lean_ctor_get(v_input_2039_, 0);
-lean_inc(v_value_2064_);
-lean_dec_ref(v_input_2039_);
-v___x_2065_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___x_2066_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_2066_, 0, v_value_2064_);
-lean_ctor_set(v___x_2066_, 1, v___x_2065_);
-v___y_2045_ = v___x_2066_;
-goto v___jp_2044_;
+lean_object* v_value_2078_; lean_object* v___x_2079_; lean_object* v___x_2080_; 
+v_value_2078_ = lean_ctor_get(v_input_2053_, 0);
+lean_inc(v_value_2078_);
+lean_dec_ref(v_input_2053_);
+v___x_2079_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___x_2080_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_2080_, 0, v_value_2078_);
+lean_ctor_set(v___x_2080_, 1, v___x_2079_);
+v___y_2059_ = v___x_2080_;
+goto v___jp_2058_;
 }
-v___jp_2044_:
+v___jp_2058_:
 {
-lean_object* v___x_2046_; lean_object* v___x_2047_; lean_object* v___x_2048_; lean_object* v___x_2049_; lean_object* v___x_2050_; lean_object* v___x_2051_; lean_object* v___x_2052_; uint8_t v___x_2053_; lean_object* v___x_2054_; lean_object* v___x_2055_; 
-v___x_2046_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Request_new_spec__0(v_init_2040_);
-v___x_2047_ = lean_unsigned_to_nat(2u);
-v___x_2048_ = lean_mk_empty_array_with_capacity(v___x_2047_);
-v___x_2049_ = lean_array_push(v___x_2048_, v___y_2045_);
-v___x_2050_ = lean_array_push(v___x_2049_, v___x_2046_);
-v___x_2051_ = l_Lasm_JS_Web_Support_args(v___x_2050_);
-v___x_2052_ = lean_unsigned_to_nat(0u);
-v___x_2053_ = 0;
-v___x_2054_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0(v_self_2038_, v___x_2043_, v___x_2051_);
-v___x_2055_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2052_, v___x_2053_, v___x_2054_, v___f_2042_);
-return v___x_2055_;
+lean_object* v___x_2060_; lean_object* v___x_2061_; lean_object* v___x_2062_; lean_object* v___x_2063_; lean_object* v___x_2064_; lean_object* v___x_2065_; lean_object* v___x_2066_; uint8_t v___x_2067_; lean_object* v___x_2068_; lean_object* v___x_2069_; 
+v___x_2060_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Request_new_spec__0(v_init_2054_);
+v___x_2061_ = lean_unsigned_to_nat(2u);
+v___x_2062_ = lean_mk_empty_array_with_capacity(v___x_2061_);
+v___x_2063_ = lean_array_push(v___x_2062_, v___y_2059_);
+v___x_2064_ = lean_array_push(v___x_2063_, v___x_2060_);
+v___x_2065_ = l_Lasm_JS_Web_Support_args(v___x_2064_);
+v___x_2066_ = lean_unsigned_to_nat(0u);
+v___x_2067_ = 0;
+v___x_2068_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0(v_self_2052_, v___x_2057_, v___x_2065_);
+v___x_2069_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2066_, v___x_2067_, v___x_2068_, v___f_2056_);
+return v___x_2069_;
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_fetch___boxed(lean_object* v_self_2067_, lean_object* v_input_2068_, lean_object* v_init_2069_, lean_object* v_a_2070_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_fetch___boxed(lean_object* v_self_2081_, lean_object* v_input_2082_, lean_object* v_init_2083_, lean_object* v_a_2084_){
 _start:
 {
-lean_object* v_res_2071_; 
-v_res_2071_ = l_Lasm_JS_Cloudflare_DurableObjectStub_fetch(v_self_2067_, v_input_2068_, v_init_2069_);
-return v_res_2071_;
+lean_object* v_res_2085_; 
+v_res_2085_ = l_Lasm_JS_Cloudflare_DurableObjectStub_fetch(v_self_2081_, v_input_2082_, v_init_2083_);
+return v_res_2085_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_connect(lean_object* v_self_2073_, lean_object* v_address_2074_, lean_object* v_options_2075_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_connect(lean_object* v_self_2087_, lean_object* v_address_2088_, lean_object* v_options_2089_){
 _start:
 {
-lean_object* v___x_2077_; lean_object* v___y_2079_; 
-v___x_2077_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStub_connect___closed__0));
-if (lean_obj_tag(v_address_2074_) == 0)
+lean_object* v___x_2091_; lean_object* v___y_2093_; 
+v___x_2091_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStub_connect___closed__0));
+if (lean_obj_tag(v_address_2088_) == 0)
 {
-lean_object* v_value_2103_; lean_object* v___x_2105_; uint8_t v_isShared_2106_; uint8_t v_isSharedCheck_2122_; 
-v_value_2103_ = lean_ctor_get(v_address_2074_, 0);
-v_isSharedCheck_2122_ = !lean_is_exclusive(v_address_2074_);
-if (v_isSharedCheck_2122_ == 0)
+lean_object* v_value_2117_; lean_object* v___x_2119_; uint8_t v_isShared_2120_; uint8_t v_isSharedCheck_2150_; 
+v_value_2117_ = lean_ctor_get(v_address_2088_, 0);
+v_isSharedCheck_2150_ = !lean_is_exclusive(v_address_2088_);
+if (v_isSharedCheck_2150_ == 0)
 {
-v___x_2105_ = v_address_2074_;
-v_isShared_2106_ = v_isSharedCheck_2122_;
-goto v_resetjp_2104_;
+v___x_2119_ = v_address_2088_;
+v_isShared_2120_ = v_isSharedCheck_2150_;
+goto v_resetjp_2118_;
 }
 else
 {
-lean_inc(v_value_2103_);
-lean_dec(v_address_2074_);
-v___x_2105_ = lean_box(0);
-v_isShared_2106_ = v_isSharedCheck_2122_;
-goto v_resetjp_2104_;
+lean_inc(v_value_2117_);
+lean_dec(v_address_2088_);
+v___x_2119_ = lean_box(0);
+v_isShared_2120_ = v_isSharedCheck_2150_;
+goto v_resetjp_2118_;
 }
-v_resetjp_2104_:
+v_resetjp_2118_:
 {
-lean_object* v_hostname_2107_; double v_port_2108_; lean_object* v___x_2109_; lean_object* v___x_2111_; 
-v_hostname_2107_ = lean_ctor_get(v_value_2103_, 0);
-lean_inc_ref(v_hostname_2107_);
-v_port_2108_ = lean_ctor_get_float(v_value_2103_, sizeof(void*)*1);
-lean_dec_ref(v_value_2103_);
-v___x_2109_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSSocketAddressOrDOMString___lam__0___closed__0));
-if (v_isShared_2106_ == 0)
+lean_object* v_hostname_2121_; lean_object* v_port_2122_; lean_object* v___x_2124_; uint8_t v_isShared_2125_; uint8_t v_isSharedCheck_2149_; 
+v_hostname_2121_ = lean_ctor_get(v_value_2117_, 0);
+v_port_2122_ = lean_ctor_get(v_value_2117_, 1);
+v_isSharedCheck_2149_ = !lean_is_exclusive(v_value_2117_);
+if (v_isSharedCheck_2149_ == 0)
 {
-lean_ctor_set_tag(v___x_2105_, 4);
-lean_ctor_set(v___x_2105_, 0, v_hostname_2107_);
-v___x_2111_ = v___x_2105_;
-goto v_reusejp_2110_;
+v___x_2124_ = v_value_2117_;
+v_isShared_2125_ = v_isSharedCheck_2149_;
+goto v_resetjp_2123_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2121_; 
-v_reuseFailAlloc_2121_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2121_, 0, v_hostname_2107_);
-v___x_2111_ = v_reuseFailAlloc_2121_;
-goto v_reusejp_2110_;
+lean_inc(v_port_2122_);
+lean_inc(v_hostname_2121_);
+lean_dec(v_value_2117_);
+v___x_2124_ = lean_box(0);
+v_isShared_2125_ = v_isSharedCheck_2149_;
+goto v_resetjp_2123_;
 }
-v_reusejp_2110_:
+v_resetjp_2123_:
 {
-lean_object* v___x_2112_; lean_object* v___x_2113_; lean_object* v___x_2114_; lean_object* v___x_2115_; lean_object* v___x_2116_; lean_object* v___x_2117_; lean_object* v___x_2118_; lean_object* v___x_2119_; lean_object* v___x_2120_; 
-v___x_2112_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2112_, 0, v___x_2109_);
-lean_ctor_set(v___x_2112_, 1, v___x_2111_);
-v___x_2113_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSSocketAddressOrDOMString___lam__0___closed__1));
-v___x_2114_ = lean_alloc_ctor(3, 0, 8);
-lean_ctor_set_float(v___x_2114_, 0, v_port_2108_);
-v___x_2115_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2115_, 0, v___x_2113_);
-lean_ctor_set(v___x_2115_, 1, v___x_2114_);
-v___x_2116_ = lean_unsigned_to_nat(2u);
-v___x_2117_ = lean_mk_empty_array_with_capacity(v___x_2116_);
-v___x_2118_ = lean_array_push(v___x_2117_, v___x_2112_);
-v___x_2119_ = lean_array_push(v___x_2118_, v___x_2115_);
-v___x_2120_ = l_Lasm_JS_Web_Support_fields(v___x_2119_);
-lean_dec_ref(v___x_2119_);
-v___y_2079_ = v___x_2120_;
-goto v___jp_2078_;
-}
-}
-}
-else
+lean_object* v___x_2126_; lean_object* v___x_2128_; 
+v___x_2126_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSSocketAddressOrDOMString___lam__0___closed__0));
+if (v_isShared_2120_ == 0)
 {
-lean_object* v_value_2123_; lean_object* v___x_2125_; uint8_t v_isShared_2126_; uint8_t v_isSharedCheck_2130_; 
-v_value_2123_ = lean_ctor_get(v_address_2074_, 0);
-v_isSharedCheck_2130_ = !lean_is_exclusive(v_address_2074_);
-if (v_isSharedCheck_2130_ == 0)
-{
-v___x_2125_ = v_address_2074_;
-v_isShared_2126_ = v_isSharedCheck_2130_;
-goto v_resetjp_2124_;
-}
-else
-{
-lean_inc(v_value_2123_);
-lean_dec(v_address_2074_);
-v___x_2125_ = lean_box(0);
-v_isShared_2126_ = v_isSharedCheck_2130_;
-goto v_resetjp_2124_;
-}
-v_resetjp_2124_:
-{
-lean_object* v___x_2128_; 
-if (v_isShared_2126_ == 0)
-{
-lean_ctor_set_tag(v___x_2125_, 4);
-v___x_2128_ = v___x_2125_;
+lean_ctor_set_tag(v___x_2119_, 4);
+lean_ctor_set(v___x_2119_, 0, v_hostname_2121_);
+v___x_2128_ = v___x_2119_;
 goto v_reusejp_2127_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2129_; 
-v_reuseFailAlloc_2129_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2129_, 0, v_value_2123_);
-v___x_2128_ = v_reuseFailAlloc_2129_;
+lean_object* v_reuseFailAlloc_2148_; 
+v_reuseFailAlloc_2148_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2148_, 0, v_hostname_2121_);
+v___x_2128_ = v_reuseFailAlloc_2148_;
 goto v_reusejp_2127_;
 }
 v_reusejp_2127_:
 {
-v___y_2079_ = v___x_2128_;
-goto v___jp_2078_;
-}
-}
-}
-v___jp_2078_:
+lean_object* v___x_2130_; 
+if (v_isShared_2125_ == 0)
 {
-lean_object* v___x_2080_; lean_object* v___x_2081_; lean_object* v___x_2082_; lean_object* v___x_2083_; lean_object* v___x_2084_; lean_object* v___x_2085_; lean_object* v___x_2086_; 
-v___x_2080_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_connect_spec__0(v_options_2075_);
-v___x_2081_ = lean_unsigned_to_nat(2u);
-v___x_2082_ = lean_mk_empty_array_with_capacity(v___x_2081_);
-v___x_2083_ = lean_array_push(v___x_2082_, v___y_2079_);
-v___x_2084_ = lean_array_push(v___x_2083_, v___x_2080_);
-v___x_2085_ = l_Lasm_JS_Web_Support_args(v___x_2084_);
-v___x_2086_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_2073_, v___x_2077_, v___x_2085_);
-if (lean_obj_tag(v___x_2086_) == 0)
-{
-lean_object* v_a_2087_; lean_object* v___x_2089_; uint8_t v_isShared_2090_; uint8_t v_isSharedCheck_2094_; 
-v_a_2087_ = lean_ctor_get(v___x_2086_, 0);
-v_isSharedCheck_2094_ = !lean_is_exclusive(v___x_2086_);
-if (v_isSharedCheck_2094_ == 0)
-{
-v___x_2089_ = v___x_2086_;
-v_isShared_2090_ = v_isSharedCheck_2094_;
-goto v_resetjp_2088_;
+lean_ctor_set(v___x_2124_, 1, v___x_2128_);
+lean_ctor_set(v___x_2124_, 0, v___x_2126_);
+v___x_2130_ = v___x_2124_;
+goto v_reusejp_2129_;
 }
 else
 {
-lean_inc(v_a_2087_);
-lean_dec(v___x_2086_);
-v___x_2089_ = lean_box(0);
-v_isShared_2090_ = v_isSharedCheck_2094_;
-goto v_resetjp_2088_;
+lean_object* v_reuseFailAlloc_2147_; 
+v_reuseFailAlloc_2147_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v_reuseFailAlloc_2147_, 0, v___x_2126_);
+lean_ctor_set(v_reuseFailAlloc_2147_, 1, v___x_2128_);
+v___x_2130_ = v_reuseFailAlloc_2147_;
+goto v_reusejp_2129_;
 }
-v_resetjp_2088_:
+v_reusejp_2129_:
 {
-lean_object* v___x_2092_; 
-if (v_isShared_2090_ == 0)
+lean_object* v___x_2131_; lean_object* v___y_2133_; lean_object* v___x_2140_; lean_object* v___x_2141_; lean_object* v___x_2142_; uint8_t v___x_2143_; 
+v___x_2131_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSSocketAddressOrDOMString___lam__0___closed__1));
+v___x_2140_ = lean_nat_to_int(v_port_2122_);
+v___x_2141_ = lean_nat_abs(v___x_2140_);
+v___x_2142_ = lean_cstr_to_nat("9007199254740991");
+v___x_2143_ = lean_nat_dec_le(v___x_2141_, v___x_2142_);
+lean_dec(v___x_2141_);
+if (v___x_2143_ == 0)
 {
-v___x_2092_ = v___x_2089_;
-goto v_reusejp_2091_;
+lean_object* v___x_2144_; 
+v___x_2144_ = lean_alloc_ctor(5, 1, 0);
+lean_ctor_set(v___x_2144_, 0, v___x_2140_);
+v___y_2133_ = v___x_2144_;
+goto v___jp_2132_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2093_; 
-v_reuseFailAlloc_2093_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2093_, 0, v_a_2087_);
-v___x_2092_ = v_reuseFailAlloc_2093_;
-goto v_reusejp_2091_;
+double v___x_2145_; lean_object* v___x_2146_; 
+v___x_2145_ = l_Float_ofInt(v___x_2140_);
+lean_dec(v___x_2140_);
+v___x_2146_ = lean_alloc_ctor(3, 0, 8);
+lean_ctor_set_float(v___x_2146_, 0, v___x_2145_);
+v___y_2133_ = v___x_2146_;
+goto v___jp_2132_;
 }
-v_reusejp_2091_:
+v___jp_2132_:
 {
-return v___x_2092_;
+lean_object* v___x_2134_; lean_object* v___x_2135_; lean_object* v___x_2136_; lean_object* v___x_2137_; lean_object* v___x_2138_; lean_object* v___x_2139_; 
+v___x_2134_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2134_, 0, v___x_2131_);
+lean_ctor_set(v___x_2134_, 1, v___y_2133_);
+v___x_2135_ = lean_unsigned_to_nat(2u);
+v___x_2136_ = lean_mk_empty_array_with_capacity(v___x_2135_);
+v___x_2137_ = lean_array_push(v___x_2136_, v___x_2130_);
+v___x_2138_ = lean_array_push(v___x_2137_, v___x_2134_);
+v___x_2139_ = l_Lasm_JS_Web_Support_fields(v___x_2138_);
+lean_dec_ref(v___x_2138_);
+v___y_2093_ = v___x_2139_;
+goto v___jp_2092_;
+}
+}
+}
 }
 }
 }
 else
 {
-lean_object* v_a_2095_; lean_object* v___x_2097_; uint8_t v_isShared_2098_; uint8_t v_isSharedCheck_2102_; 
-v_a_2095_ = lean_ctor_get(v___x_2086_, 0);
-v_isSharedCheck_2102_ = !lean_is_exclusive(v___x_2086_);
-if (v_isSharedCheck_2102_ == 0)
+lean_object* v_value_2151_; lean_object* v___x_2153_; uint8_t v_isShared_2154_; uint8_t v_isSharedCheck_2158_; 
+v_value_2151_ = lean_ctor_get(v_address_2088_, 0);
+v_isSharedCheck_2158_ = !lean_is_exclusive(v_address_2088_);
+if (v_isSharedCheck_2158_ == 0)
 {
-v___x_2097_ = v___x_2086_;
-v_isShared_2098_ = v_isSharedCheck_2102_;
-goto v_resetjp_2096_;
+v___x_2153_ = v_address_2088_;
+v_isShared_2154_ = v_isSharedCheck_2158_;
+goto v_resetjp_2152_;
 }
 else
 {
-lean_inc(v_a_2095_);
-lean_dec(v___x_2086_);
-v___x_2097_ = lean_box(0);
-v_isShared_2098_ = v_isSharedCheck_2102_;
-goto v_resetjp_2096_;
+lean_inc(v_value_2151_);
+lean_dec(v_address_2088_);
+v___x_2153_ = lean_box(0);
+v_isShared_2154_ = v_isSharedCheck_2158_;
+goto v_resetjp_2152_;
 }
-v_resetjp_2096_:
+v_resetjp_2152_:
 {
-lean_object* v___x_2100_; 
-if (v_isShared_2098_ == 0)
+lean_object* v___x_2156_; 
+if (v_isShared_2154_ == 0)
 {
-v___x_2100_ = v___x_2097_;
-goto v_reusejp_2099_;
+lean_ctor_set_tag(v___x_2153_, 4);
+v___x_2156_ = v___x_2153_;
+goto v_reusejp_2155_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2101_; 
-v_reuseFailAlloc_2101_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2101_, 0, v_a_2095_);
-v___x_2100_ = v_reuseFailAlloc_2101_;
-goto v_reusejp_2099_;
+lean_object* v_reuseFailAlloc_2157_; 
+v_reuseFailAlloc_2157_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2157_, 0, v_value_2151_);
+v___x_2156_ = v_reuseFailAlloc_2157_;
+goto v_reusejp_2155_;
 }
-v_reusejp_2099_:
+v_reusejp_2155_:
 {
-return v___x_2100_;
+v___y_2093_ = v___x_2156_;
+goto v___jp_2092_;
+}
+}
+}
+v___jp_2092_:
+{
+lean_object* v___x_2094_; lean_object* v___x_2095_; lean_object* v___x_2096_; lean_object* v___x_2097_; lean_object* v___x_2098_; lean_object* v___x_2099_; lean_object* v___x_2100_; 
+v___x_2094_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_connect_spec__0(v_options_2089_);
+v___x_2095_ = lean_unsigned_to_nat(2u);
+v___x_2096_ = lean_mk_empty_array_with_capacity(v___x_2095_);
+v___x_2097_ = lean_array_push(v___x_2096_, v___y_2093_);
+v___x_2098_ = lean_array_push(v___x_2097_, v___x_2094_);
+v___x_2099_ = l_Lasm_JS_Web_Support_args(v___x_2098_);
+v___x_2100_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_ReadableStream_getReader_spec__1(v_self_2087_, v___x_2091_, v___x_2099_);
+if (lean_obj_tag(v___x_2100_) == 0)
+{
+lean_object* v_a_2101_; lean_object* v___x_2103_; uint8_t v_isShared_2104_; uint8_t v_isSharedCheck_2108_; 
+v_a_2101_ = lean_ctor_get(v___x_2100_, 0);
+v_isSharedCheck_2108_ = !lean_is_exclusive(v___x_2100_);
+if (v_isSharedCheck_2108_ == 0)
+{
+v___x_2103_ = v___x_2100_;
+v_isShared_2104_ = v_isSharedCheck_2108_;
+goto v_resetjp_2102_;
+}
+else
+{
+lean_inc(v_a_2101_);
+lean_dec(v___x_2100_);
+v___x_2103_ = lean_box(0);
+v_isShared_2104_ = v_isSharedCheck_2108_;
+goto v_resetjp_2102_;
+}
+v_resetjp_2102_:
+{
+lean_object* v___x_2106_; 
+if (v_isShared_2104_ == 0)
+{
+v___x_2106_ = v___x_2103_;
+goto v_reusejp_2105_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_2107_; 
+v_reuseFailAlloc_2107_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2107_, 0, v_a_2101_);
+v___x_2106_ = v_reuseFailAlloc_2107_;
+goto v_reusejp_2105_;
+}
+v_reusejp_2105_:
+{
+return v___x_2106_;
+}
+}
+}
+else
+{
+lean_object* v_a_2109_; lean_object* v___x_2111_; uint8_t v_isShared_2112_; uint8_t v_isSharedCheck_2116_; 
+v_a_2109_ = lean_ctor_get(v___x_2100_, 0);
+v_isSharedCheck_2116_ = !lean_is_exclusive(v___x_2100_);
+if (v_isSharedCheck_2116_ == 0)
+{
+v___x_2111_ = v___x_2100_;
+v_isShared_2112_ = v_isSharedCheck_2116_;
+goto v_resetjp_2110_;
+}
+else
+{
+lean_inc(v_a_2109_);
+lean_dec(v___x_2100_);
+v___x_2111_ = lean_box(0);
+v_isShared_2112_ = v_isSharedCheck_2116_;
+goto v_resetjp_2110_;
+}
+v_resetjp_2110_:
+{
+lean_object* v___x_2114_; 
+if (v_isShared_2112_ == 0)
+{
+v___x_2114_ = v___x_2111_;
+goto v_reusejp_2113_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_2115_; 
+v_reuseFailAlloc_2115_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2115_, 0, v_a_2109_);
+v___x_2114_ = v_reuseFailAlloc_2115_;
+goto v_reusejp_2113_;
+}
+v_reusejp_2113_:
+{
+return v___x_2114_;
 }
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_connect___boxed(lean_object* v_self_2131_, lean_object* v_address_2132_, lean_object* v_options_2133_, lean_object* v_a_2134_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStub_connect___boxed(lean_object* v_self_2159_, lean_object* v_address_2160_, lean_object* v_options_2161_, lean_object* v_a_2162_){
 _start:
 {
-lean_object* v_res_2135_; 
-v_res_2135_ = l_Lasm_JS_Cloudflare_DurableObjectStub_connect(v_self_2131_, v_address_2132_, v_options_2133_);
-return v_res_2135_;
+lean_object* v_res_2163_; 
+v_res_2163_ = l_Lasm_JS_Cloudflare_DurableObjectStub_connect(v_self_2159_, v_address_2160_, v_options_2161_);
+return v_res_2163_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_props(lean_object* v_self_2137_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_props(lean_object* v_self_2165_){
 _start:
 {
-lean_object* v___x_2139_; lean_object* v___x_2140_; 
-v___x_2139_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectState_props___closed__0));
-v___x_2140_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_CustomEvent_detail_spec__0(v_self_2137_, v___x_2139_);
-return v___x_2140_;
+lean_object* v___x_2167_; lean_object* v___x_2168_; 
+v___x_2167_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectState_props___closed__0));
+v___x_2168_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_CustomEvent_detail_spec__0(v_self_2165_, v___x_2167_);
+return v___x_2168_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_props___boxed(lean_object* v_self_2141_, lean_object* v_a_2142_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_props___boxed(lean_object* v_self_2169_, lean_object* v_a_2170_){
 _start:
 {
-lean_object* v_res_2143_; 
-v_res_2143_ = l_Lasm_JS_Cloudflare_DurableObjectState_props(v_self_2141_);
-return v_res_2143_;
+lean_object* v_res_2171_; 
+v_res_2171_ = l_Lasm_JS_Cloudflare_DurableObjectState_props(v_self_2169_);
+return v_res_2171_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_id(lean_object* v_self_2144_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_id(lean_object* v_self_2172_){
 _start:
 {
-lean_object* v___x_2146_; lean_object* v___x_2147_; 
-v___x_2146_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStub_id___closed__0));
-v___x_2147_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_self_2144_, v___x_2146_);
-if (lean_obj_tag(v___x_2147_) == 0)
+lean_object* v___x_2174_; lean_object* v___x_2175_; 
+v___x_2174_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStub_id___closed__0));
+v___x_2175_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_self_2172_, v___x_2174_);
+if (lean_obj_tag(v___x_2175_) == 0)
 {
-lean_object* v_a_2148_; lean_object* v___x_2150_; uint8_t v_isShared_2151_; uint8_t v_isSharedCheck_2155_; 
-v_a_2148_ = lean_ctor_get(v___x_2147_, 0);
-v_isSharedCheck_2155_ = !lean_is_exclusive(v___x_2147_);
-if (v_isSharedCheck_2155_ == 0)
+lean_object* v_a_2176_; lean_object* v___x_2178_; uint8_t v_isShared_2179_; uint8_t v_isSharedCheck_2183_; 
+v_a_2176_ = lean_ctor_get(v___x_2175_, 0);
+v_isSharedCheck_2183_ = !lean_is_exclusive(v___x_2175_);
+if (v_isSharedCheck_2183_ == 0)
 {
-v___x_2150_ = v___x_2147_;
-v_isShared_2151_ = v_isSharedCheck_2155_;
-goto v_resetjp_2149_;
+v___x_2178_ = v___x_2175_;
+v_isShared_2179_ = v_isSharedCheck_2183_;
+goto v_resetjp_2177_;
 }
 else
 {
-lean_inc(v_a_2148_);
-lean_dec(v___x_2147_);
-v___x_2150_ = lean_box(0);
-v_isShared_2151_ = v_isSharedCheck_2155_;
-goto v_resetjp_2149_;
+lean_inc(v_a_2176_);
+lean_dec(v___x_2175_);
+v___x_2178_ = lean_box(0);
+v_isShared_2179_ = v_isSharedCheck_2183_;
+goto v_resetjp_2177_;
 }
-v_resetjp_2149_:
+v_resetjp_2177_:
 {
-lean_object* v___x_2153_; 
-if (v_isShared_2151_ == 0)
+lean_object* v___x_2181_; 
+if (v_isShared_2179_ == 0)
 {
-v___x_2153_ = v___x_2150_;
-goto v_reusejp_2152_;
+v___x_2181_ = v___x_2178_;
+goto v_reusejp_2180_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2154_; 
-v_reuseFailAlloc_2154_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2154_, 0, v_a_2148_);
-v___x_2153_ = v_reuseFailAlloc_2154_;
-goto v_reusejp_2152_;
+lean_object* v_reuseFailAlloc_2182_; 
+v_reuseFailAlloc_2182_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2182_, 0, v_a_2176_);
+v___x_2181_ = v_reuseFailAlloc_2182_;
+goto v_reusejp_2180_;
 }
-v_reusejp_2152_:
+v_reusejp_2180_:
 {
-return v___x_2153_;
-}
-}
-}
-else
-{
-lean_object* v_a_2156_; lean_object* v___x_2158_; uint8_t v_isShared_2159_; uint8_t v_isSharedCheck_2163_; 
-v_a_2156_ = lean_ctor_get(v___x_2147_, 0);
-v_isSharedCheck_2163_ = !lean_is_exclusive(v___x_2147_);
-if (v_isSharedCheck_2163_ == 0)
-{
-v___x_2158_ = v___x_2147_;
-v_isShared_2159_ = v_isSharedCheck_2163_;
-goto v_resetjp_2157_;
-}
-else
-{
-lean_inc(v_a_2156_);
-lean_dec(v___x_2147_);
-v___x_2158_ = lean_box(0);
-v_isShared_2159_ = v_isSharedCheck_2163_;
-goto v_resetjp_2157_;
-}
-v_resetjp_2157_:
-{
-lean_object* v___x_2161_; 
-if (v_isShared_2159_ == 0)
-{
-v___x_2161_ = v___x_2158_;
-goto v_reusejp_2160_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_2162_; 
-v_reuseFailAlloc_2162_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2162_, 0, v_a_2156_);
-v___x_2161_ = v_reuseFailAlloc_2162_;
-goto v_reusejp_2160_;
-}
-v_reusejp_2160_:
-{
-return v___x_2161_;
-}
-}
-}
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_id___boxed(lean_object* v_self_2164_, lean_object* v_a_2165_){
-_start:
-{
-lean_object* v_res_2166_; 
-v_res_2166_ = l_Lasm_JS_Cloudflare_DurableObjectState_id(v_self_2164_);
-return v_res_2166_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_storage(lean_object* v_self_2168_){
-_start:
-{
-lean_object* v___x_2170_; lean_object* v___x_2171_; 
-v___x_2170_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectState_storage___closed__0));
-v___x_2171_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_self_2168_, v___x_2170_);
-if (lean_obj_tag(v___x_2171_) == 0)
-{
-lean_object* v_a_2172_; lean_object* v___x_2174_; uint8_t v_isShared_2175_; uint8_t v_isSharedCheck_2179_; 
-v_a_2172_ = lean_ctor_get(v___x_2171_, 0);
-v_isSharedCheck_2179_ = !lean_is_exclusive(v___x_2171_);
-if (v_isSharedCheck_2179_ == 0)
-{
-v___x_2174_ = v___x_2171_;
-v_isShared_2175_ = v_isSharedCheck_2179_;
-goto v_resetjp_2173_;
-}
-else
-{
-lean_inc(v_a_2172_);
-lean_dec(v___x_2171_);
-v___x_2174_ = lean_box(0);
-v_isShared_2175_ = v_isSharedCheck_2179_;
-goto v_resetjp_2173_;
-}
-v_resetjp_2173_:
-{
-lean_object* v___x_2177_; 
-if (v_isShared_2175_ == 0)
-{
-v___x_2177_ = v___x_2174_;
-goto v_reusejp_2176_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_2178_; 
-v_reuseFailAlloc_2178_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2178_, 0, v_a_2172_);
-v___x_2177_ = v_reuseFailAlloc_2178_;
-goto v_reusejp_2176_;
-}
-v_reusejp_2176_:
-{
-return v___x_2177_;
+return v___x_2181_;
 }
 }
 }
 else
 {
-lean_object* v_a_2180_; lean_object* v___x_2182_; uint8_t v_isShared_2183_; uint8_t v_isSharedCheck_2187_; 
-v_a_2180_ = lean_ctor_get(v___x_2171_, 0);
-v_isSharedCheck_2187_ = !lean_is_exclusive(v___x_2171_);
-if (v_isSharedCheck_2187_ == 0)
+lean_object* v_a_2184_; lean_object* v___x_2186_; uint8_t v_isShared_2187_; uint8_t v_isSharedCheck_2191_; 
+v_a_2184_ = lean_ctor_get(v___x_2175_, 0);
+v_isSharedCheck_2191_ = !lean_is_exclusive(v___x_2175_);
+if (v_isSharedCheck_2191_ == 0)
 {
-v___x_2182_ = v___x_2171_;
-v_isShared_2183_ = v_isSharedCheck_2187_;
-goto v_resetjp_2181_;
+v___x_2186_ = v___x_2175_;
+v_isShared_2187_ = v_isSharedCheck_2191_;
+goto v_resetjp_2185_;
 }
 else
 {
-lean_inc(v_a_2180_);
-lean_dec(v___x_2171_);
-v___x_2182_ = lean_box(0);
-v_isShared_2183_ = v_isSharedCheck_2187_;
-goto v_resetjp_2181_;
+lean_inc(v_a_2184_);
+lean_dec(v___x_2175_);
+v___x_2186_ = lean_box(0);
+v_isShared_2187_ = v_isSharedCheck_2191_;
+goto v_resetjp_2185_;
 }
-v_resetjp_2181_:
+v_resetjp_2185_:
 {
-lean_object* v___x_2185_; 
-if (v_isShared_2183_ == 0)
+lean_object* v___x_2189_; 
+if (v_isShared_2187_ == 0)
 {
-v___x_2185_ = v___x_2182_;
-goto v_reusejp_2184_;
+v___x_2189_ = v___x_2186_;
+goto v_reusejp_2188_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2186_; 
-v_reuseFailAlloc_2186_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2186_, 0, v_a_2180_);
-v___x_2185_ = v_reuseFailAlloc_2186_;
-goto v_reusejp_2184_;
+lean_object* v_reuseFailAlloc_2190_; 
+v_reuseFailAlloc_2190_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2190_, 0, v_a_2184_);
+v___x_2189_ = v_reuseFailAlloc_2190_;
+goto v_reusejp_2188_;
 }
-v_reusejp_2184_:
+v_reusejp_2188_:
 {
-return v___x_2185_;
+return v___x_2189_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_storage___boxed(lean_object* v_self_2188_, lean_object* v_a_2189_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_id___boxed(lean_object* v_self_2192_, lean_object* v_a_2193_){
 _start:
 {
-lean_object* v_res_2190_; 
-v_res_2190_ = l_Lasm_JS_Cloudflare_DurableObjectState_storage(v_self_2188_);
-return v_res_2190_;
+lean_object* v_res_2194_; 
+v_res_2194_ = l_Lasm_JS_Cloudflare_DurableObjectState_id(v_self_2192_);
+return v_res_2194_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_waitUntil(lean_object* v_self_2192_, lean_object* v_promise_2193_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_storage(lean_object* v_self_2196_){
 _start:
 {
-lean_object* v___x_2195_; lean_object* v___x_2196_; lean_object* v___x_2197_; lean_object* v___x_2198_; lean_object* v___x_2199_; lean_object* v___x_2200_; lean_object* v___x_2201_; lean_object* v___x_2202_; 
-v___x_2195_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectState_waitUntil___closed__0));
-v___x_2196_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___x_2197_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_2197_, 0, v_promise_2193_);
-lean_ctor_set(v___x_2197_, 1, v___x_2196_);
-v___x_2198_ = lean_unsigned_to_nat(1u);
-v___x_2199_ = lean_mk_empty_array_with_capacity(v___x_2198_);
-v___x_2200_ = lean_array_push(v___x_2199_, v___x_2197_);
-v___x_2201_ = l_Lasm_JS_Web_Support_args(v___x_2200_);
-v___x_2202_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__1(v_self_2192_, v___x_2195_, v___x_2201_);
-return v___x_2202_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_waitUntil___boxed(lean_object* v_self_2203_, lean_object* v_promise_2204_, lean_object* v_a_2205_){
-_start:
+lean_object* v___x_2198_; lean_object* v___x_2199_; 
+v___x_2198_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectState_storage___closed__0));
+v___x_2199_ = l_Lasm_JS_Value_get___at___00Lasm_JS_Web_Support_viewBytes_spec__0(v_self_2196_, v___x_2198_);
+if (lean_obj_tag(v___x_2199_) == 0)
 {
-lean_object* v_res_2206_; 
-v_res_2206_ = l_Lasm_JS_Cloudflare_DurableObjectState_waitUntil(v_self_2203_, v_promise_2204_);
-return v_res_2206_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_blockConcurrencyWhile(lean_object* v_self_2208_, lean_object* v_callback_2209_){
-_start:
+lean_object* v_a_2200_; lean_object* v___x_2202_; uint8_t v_isShared_2203_; uint8_t v_isSharedCheck_2207_; 
+v_a_2200_ = lean_ctor_get(v___x_2199_, 0);
+v_isSharedCheck_2207_ = !lean_is_exclusive(v___x_2199_);
+if (v_isSharedCheck_2207_ == 0)
 {
-lean_object* v___x_2211_; lean_object* v___x_2212_; lean_object* v___x_2213_; lean_object* v___x_2214_; lean_object* v___x_2215_; lean_object* v___x_2216_; lean_object* v___x_2217_; lean_object* v___x_2218_; 
-v___x_2211_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectState_blockConcurrencyWhile___closed__0));
-v___x_2212_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___x_2213_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_2213_, 0, v_callback_2209_);
-lean_ctor_set(v___x_2213_, 1, v___x_2212_);
-v___x_2214_ = lean_unsigned_to_nat(1u);
-v___x_2215_ = lean_mk_empty_array_with_capacity(v___x_2214_);
-v___x_2216_ = lean_array_push(v___x_2215_, v___x_2213_);
-v___x_2217_ = l_Lasm_JS_Web_Support_args(v___x_2216_);
-v___x_2218_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Request_json_spec__0(v_self_2208_, v___x_2211_, v___x_2217_);
-return v___x_2218_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_blockConcurrencyWhile___boxed(lean_object* v_self_2219_, lean_object* v_callback_2220_, lean_object* v_a_2221_){
-_start:
-{
-lean_object* v_res_2222_; 
-v_res_2222_ = l_Lasm_JS_Cloudflare_DurableObjectState_blockConcurrencyWhile(v_self_2219_, v_callback_2220_);
-return v_res_2222_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectState_abort_spec__0(lean_object* v_x_2223_){
-_start:
-{
-if (lean_obj_tag(v_x_2223_) == 0)
-{
-lean_object* v___x_2224_; 
-v___x_2224_ = lean_box(0);
-return v___x_2224_;
+v___x_2202_ = v___x_2199_;
+v_isShared_2203_ = v_isSharedCheck_2207_;
+goto v_resetjp_2201_;
 }
 else
 {
-lean_object* v_val_2225_; lean_object* v___x_2226_; lean_object* v___x_2227_; lean_object* v___x_2228_; lean_object* v___x_2229_; lean_object* v___x_2230_; lean_object* v___x_2231_; lean_object* v___x_2232_; 
-v_val_2225_ = lean_ctor_get(v_x_2223_, 0);
-v___x_2226_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectAbortOptions___lam__0___closed__0));
-v___x_2227_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_val_2225_);
-v___x_2228_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2228_, 0, v___x_2226_);
-lean_ctor_set(v___x_2228_, 1, v___x_2227_);
-v___x_2229_ = lean_unsigned_to_nat(1u);
-v___x_2230_ = lean_mk_empty_array_with_capacity(v___x_2229_);
-v___x_2231_ = lean_array_push(v___x_2230_, v___x_2228_);
-v___x_2232_ = l_Lasm_JS_Web_Support_fields(v___x_2231_);
-lean_dec_ref(v___x_2231_);
-return v___x_2232_;
+lean_inc(v_a_2200_);
+lean_dec(v___x_2199_);
+v___x_2202_ = lean_box(0);
+v_isShared_2203_ = v_isSharedCheck_2207_;
+goto v_resetjp_2201_;
+}
+v_resetjp_2201_:
+{
+lean_object* v___x_2205_; 
+if (v_isShared_2203_ == 0)
+{
+v___x_2205_ = v___x_2202_;
+goto v_reusejp_2204_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_2206_; 
+v_reuseFailAlloc_2206_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2206_, 0, v_a_2200_);
+v___x_2205_ = v_reuseFailAlloc_2206_;
+goto v_reusejp_2204_;
+}
+v_reusejp_2204_:
+{
+return v___x_2205_;
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectState_abort_spec__0___boxed(lean_object* v_x_2233_){
+else
+{
+lean_object* v_a_2208_; lean_object* v___x_2210_; uint8_t v_isShared_2211_; uint8_t v_isSharedCheck_2215_; 
+v_a_2208_ = lean_ctor_get(v___x_2199_, 0);
+v_isSharedCheck_2215_ = !lean_is_exclusive(v___x_2199_);
+if (v_isSharedCheck_2215_ == 0)
+{
+v___x_2210_ = v___x_2199_;
+v_isShared_2211_ = v_isSharedCheck_2215_;
+goto v_resetjp_2209_;
+}
+else
+{
+lean_inc(v_a_2208_);
+lean_dec(v___x_2199_);
+v___x_2210_ = lean_box(0);
+v_isShared_2211_ = v_isSharedCheck_2215_;
+goto v_resetjp_2209_;
+}
+v_resetjp_2209_:
+{
+lean_object* v___x_2213_; 
+if (v_isShared_2211_ == 0)
+{
+v___x_2213_ = v___x_2210_;
+goto v_reusejp_2212_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_2214_; 
+v_reuseFailAlloc_2214_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2214_, 0, v_a_2208_);
+v___x_2213_ = v_reuseFailAlloc_2214_;
+goto v_reusejp_2212_;
+}
+v_reusejp_2212_:
+{
+return v___x_2213_;
+}
+}
+}
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_storage___boxed(lean_object* v_self_2216_, lean_object* v_a_2217_){
+_start:
+{
+lean_object* v_res_2218_; 
+v_res_2218_ = l_Lasm_JS_Cloudflare_DurableObjectState_storage(v_self_2216_);
+return v_res_2218_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_waitUntil(lean_object* v_self_2220_, lean_object* v_promise_2221_){
+_start:
+{
+lean_object* v___x_2223_; lean_object* v___x_2224_; lean_object* v___x_2225_; lean_object* v___x_2226_; lean_object* v___x_2227_; lean_object* v___x_2228_; lean_object* v___x_2229_; lean_object* v___x_2230_; 
+v___x_2223_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectState_waitUntil___closed__0));
+v___x_2224_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___x_2225_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_2225_, 0, v_promise_2221_);
+lean_ctor_set(v___x_2225_, 1, v___x_2224_);
+v___x_2226_ = lean_unsigned_to_nat(1u);
+v___x_2227_ = lean_mk_empty_array_with_capacity(v___x_2226_);
+v___x_2228_ = lean_array_push(v___x_2227_, v___x_2225_);
+v___x_2229_ = l_Lasm_JS_Web_Support_args(v___x_2228_);
+v___x_2230_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__1(v_self_2220_, v___x_2223_, v___x_2229_);
+return v___x_2230_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_waitUntil___boxed(lean_object* v_self_2231_, lean_object* v_promise_2232_, lean_object* v_a_2233_){
 _start:
 {
 lean_object* v_res_2234_; 
-v_res_2234_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectState_abort_spec__0(v_x_2233_);
-lean_dec(v_x_2233_);
+v_res_2234_ = l_Lasm_JS_Cloudflare_DurableObjectState_waitUntil(v_self_2231_, v_promise_2232_);
 return v_res_2234_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_abort(lean_object* v_self_2236_, lean_object* v_reason_2237_, lean_object* v_options_2238_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_blockConcurrencyWhile(lean_object* v_self_2236_, lean_object* v_callback_2237_){
 _start:
 {
-lean_object* v___x_2240_; lean_object* v___x_2241_; lean_object* v___x_2242_; lean_object* v___x_2243_; lean_object* v___x_2244_; lean_object* v___x_2245_; lean_object* v___x_2246_; lean_object* v___x_2247_; lean_object* v___x_2248_; 
-v___x_2240_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectState_abort___closed__0));
-v___x_2241_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(v_reason_2237_);
-v___x_2242_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectState_abort_spec__0(v_options_2238_);
-v___x_2243_ = lean_unsigned_to_nat(2u);
-v___x_2244_ = lean_mk_empty_array_with_capacity(v___x_2243_);
-v___x_2245_ = lean_array_push(v___x_2244_, v___x_2241_);
-v___x_2246_ = lean_array_push(v___x_2245_, v___x_2242_);
-v___x_2247_ = l_Lasm_JS_Web_Support_args(v___x_2246_);
-v___x_2248_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__1(v_self_2236_, v___x_2240_, v___x_2247_);
-return v___x_2248_;
+lean_object* v___x_2239_; lean_object* v___x_2240_; lean_object* v___x_2241_; lean_object* v___x_2242_; lean_object* v___x_2243_; lean_object* v___x_2244_; lean_object* v___x_2245_; lean_object* v___x_2246_; 
+v___x_2239_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectState_blockConcurrencyWhile___closed__0));
+v___x_2240_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___x_2241_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_2241_, 0, v_callback_2237_);
+lean_ctor_set(v___x_2241_, 1, v___x_2240_);
+v___x_2242_ = lean_unsigned_to_nat(1u);
+v___x_2243_ = lean_mk_empty_array_with_capacity(v___x_2242_);
+v___x_2244_ = lean_array_push(v___x_2243_, v___x_2241_);
+v___x_2245_ = l_Lasm_JS_Web_Support_args(v___x_2244_);
+v___x_2246_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Request_json_spec__0(v_self_2236_, v___x_2239_, v___x_2245_);
+return v___x_2246_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_abort___boxed(lean_object* v_self_2249_, lean_object* v_reason_2250_, lean_object* v_options_2251_, lean_object* v_a_2252_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_blockConcurrencyWhile___boxed(lean_object* v_self_2247_, lean_object* v_callback_2248_, lean_object* v_a_2249_){
 _start:
 {
-lean_object* v_res_2253_; 
-v_res_2253_ = l_Lasm_JS_Cloudflare_DurableObjectState_abort(v_self_2249_, v_reason_2250_, v_options_2251_);
-lean_dec(v_options_2251_);
-return v_res_2253_;
+lean_object* v_res_2250_; 
+v_res_2250_ = l_Lasm_JS_Cloudflare_DurableObjectState_blockConcurrencyWhile(v_self_2247_, v_callback_2248_);
+return v_res_2250_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_get_spec__0(lean_object* v_x_2254_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectState_abort_spec__0(lean_object* v_x_2251_){
 _start:
 {
-if (lean_obj_tag(v_x_2254_) == 0)
+if (lean_obj_tag(v_x_2251_) == 0)
 {
-lean_object* v___x_2255_; 
-v___x_2255_ = lean_box(0);
-return v___x_2255_;
+lean_object* v___x_2252_; 
+v___x_2252_ = lean_box(0);
+return v___x_2252_;
 }
 else
 {
-lean_object* v_val_2256_; lean_object* v_allowConcurrency_2257_; lean_object* v_noCache_2258_; lean_object* v___x_2260_; uint8_t v_isShared_2261_; uint8_t v_isSharedCheck_2275_; 
-v_val_2256_ = lean_ctor_get(v_x_2254_, 0);
-lean_inc(v_val_2256_);
-lean_dec_ref_known(v_x_2254_, 1);
-v_allowConcurrency_2257_ = lean_ctor_get(v_val_2256_, 0);
-v_noCache_2258_ = lean_ctor_get(v_val_2256_, 1);
-v_isSharedCheck_2275_ = !lean_is_exclusive(v_val_2256_);
-if (v_isSharedCheck_2275_ == 0)
-{
-v___x_2260_ = v_val_2256_;
-v_isShared_2261_ = v_isSharedCheck_2275_;
-goto v_resetjp_2259_;
-}
-else
-{
-lean_inc(v_noCache_2258_);
-lean_inc(v_allowConcurrency_2257_);
-lean_dec(v_val_2256_);
-v___x_2260_ = lean_box(0);
-v_isShared_2261_ = v_isSharedCheck_2275_;
-goto v_resetjp_2259_;
-}
-v_resetjp_2259_:
-{
-lean_object* v___x_2262_; lean_object* v___x_2263_; lean_object* v___x_2265_; 
-v___x_2262_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
-v___x_2263_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_allowConcurrency_2257_);
-lean_dec(v_allowConcurrency_2257_);
-if (v_isShared_2261_ == 0)
-{
-lean_ctor_set(v___x_2260_, 1, v___x_2263_);
-lean_ctor_set(v___x_2260_, 0, v___x_2262_);
-v___x_2265_ = v___x_2260_;
-goto v_reusejp_2264_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_2274_; 
-v_reuseFailAlloc_2274_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v_reuseFailAlloc_2274_, 0, v___x_2262_);
-lean_ctor_set(v_reuseFailAlloc_2274_, 1, v___x_2263_);
-v___x_2265_ = v_reuseFailAlloc_2274_;
-goto v_reusejp_2264_;
-}
-v_reusejp_2264_:
-{
-lean_object* v___x_2266_; lean_object* v___x_2267_; lean_object* v___x_2268_; lean_object* v___x_2269_; lean_object* v___x_2270_; lean_object* v___x_2271_; lean_object* v___x_2272_; lean_object* v___x_2273_; 
-v___x_2266_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__1));
-v___x_2267_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_noCache_2258_);
-lean_dec(v_noCache_2258_);
-v___x_2268_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2268_, 0, v___x_2266_);
-lean_ctor_set(v___x_2268_, 1, v___x_2267_);
-v___x_2269_ = lean_unsigned_to_nat(2u);
-v___x_2270_ = lean_mk_empty_array_with_capacity(v___x_2269_);
-v___x_2271_ = lean_array_push(v___x_2270_, v___x_2265_);
-v___x_2272_ = lean_array_push(v___x_2271_, v___x_2268_);
-v___x_2273_ = l_Lasm_JS_Web_Support_fields(v___x_2272_);
-lean_dec_ref(v___x_2272_);
-return v___x_2273_;
+lean_object* v_val_2253_; lean_object* v___x_2254_; lean_object* v___x_2255_; lean_object* v___x_2256_; lean_object* v___x_2257_; lean_object* v___x_2258_; lean_object* v___x_2259_; lean_object* v___x_2260_; 
+v_val_2253_ = lean_ctor_get(v_x_2251_, 0);
+v___x_2254_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectAbortOptions___lam__0___closed__0));
+v___x_2255_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_val_2253_);
+v___x_2256_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2256_, 0, v___x_2254_);
+lean_ctor_set(v___x_2256_, 1, v___x_2255_);
+v___x_2257_ = lean_unsigned_to_nat(1u);
+v___x_2258_ = lean_mk_empty_array_with_capacity(v___x_2257_);
+v___x_2259_ = lean_array_push(v___x_2258_, v___x_2256_);
+v___x_2260_ = l_Lasm_JS_Web_Support_fields(v___x_2259_);
+lean_dec_ref(v___x_2259_);
+return v___x_2260_;
 }
 }
 }
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_get(lean_object* v_self_2276_, lean_object* v_key_2277_, lean_object* v_options_2278_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectState_abort_spec__0___boxed(lean_object* v_x_2261_){
 _start:
 {
-lean_object* v___x_2280_; lean_object* v___x_2281_; lean_object* v___x_2282_; lean_object* v___x_2283_; lean_object* v___x_2284_; lean_object* v___x_2285_; lean_object* v___x_2286_; lean_object* v___x_2287_; lean_object* v___x_2288_; 
-v___x_2280_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_get___closed__0));
-v___x_2281_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_2281_, 0, v_key_2277_);
-v___x_2282_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_get_spec__0(v_options_2278_);
-v___x_2283_ = lean_unsigned_to_nat(2u);
-v___x_2284_ = lean_mk_empty_array_with_capacity(v___x_2283_);
-v___x_2285_ = lean_array_push(v___x_2284_, v___x_2281_);
-v___x_2286_ = lean_array_push(v___x_2285_, v___x_2282_);
-v___x_2287_ = l_Lasm_JS_Web_Support_args(v___x_2286_);
-v___x_2288_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Request_json_spec__0(v_self_2276_, v___x_2280_, v___x_2287_);
-return v___x_2288_;
+lean_object* v_res_2262_; 
+v_res_2262_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectState_abort_spec__0(v_x_2261_);
+lean_dec(v_x_2261_);
+return v_res_2262_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_get___boxed(lean_object* v_self_2289_, lean_object* v_key_2290_, lean_object* v_options_2291_, lean_object* v_a_2292_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_abort(lean_object* v_self_2264_, lean_object* v_reason_2265_, lean_object* v_options_2266_){
 _start:
 {
-lean_object* v_res_2293_; 
-v_res_2293_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_get(v_self_2289_, v_key_2290_, v_options_2291_);
-return v_res_2293_;
+lean_object* v___x_2268_; lean_object* v___x_2269_; lean_object* v___x_2270_; lean_object* v___x_2271_; lean_object* v___x_2272_; lean_object* v___x_2273_; lean_object* v___x_2274_; lean_object* v___x_2275_; lean_object* v___x_2276_; 
+v___x_2268_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectState_abort___closed__0));
+v___x_2269_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(v_reason_2265_);
+v___x_2270_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectState_abort_spec__0(v_options_2266_);
+v___x_2271_ = lean_unsigned_to_nat(2u);
+v___x_2272_ = lean_mk_empty_array_with_capacity(v___x_2271_);
+v___x_2273_ = lean_array_push(v___x_2272_, v___x_2269_);
+v___x_2274_ = lean_array_push(v___x_2273_, v___x_2270_);
+v___x_2275_ = l_Lasm_JS_Web_Support_args(v___x_2274_);
+v___x_2276_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__1(v_self_2264_, v___x_2268_, v___x_2275_);
+return v___x_2276_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1_spec__2(size_t v_sz_2299_, size_t v_i_2300_, lean_object* v_bs_2301_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectState_abort___boxed(lean_object* v_self_2277_, lean_object* v_reason_2278_, lean_object* v_options_2279_, lean_object* v_a_2280_){
 _start:
 {
-uint8_t v___x_2304_; 
-v___x_2304_ = lean_usize_dec_lt(v_i_2300_, v_sz_2299_);
-if (v___x_2304_ == 0)
+lean_object* v_res_2281_; 
+v_res_2281_ = l_Lasm_JS_Cloudflare_DurableObjectState_abort(v_self_2277_, v_reason_2278_, v_options_2279_);
+lean_dec(v_options_2279_);
+return v_res_2281_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_get_spec__0(lean_object* v_x_2282_){
+_start:
 {
-lean_object* v___x_2305_; 
-v___x_2305_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v___x_2305_, 0, v_bs_2301_);
-return v___x_2305_;
+if (lean_obj_tag(v_x_2282_) == 0)
+{
+lean_object* v___x_2283_; 
+v___x_2283_ = lean_box(0);
+return v___x_2283_;
 }
 else
 {
-lean_object* v_v_2306_; 
-v_v_2306_ = lean_array_uget_borrowed(v_bs_2301_, v_i_2300_);
-if (lean_obj_tag(v_v_2306_) == 7)
+lean_object* v_val_2284_; lean_object* v_allowConcurrency_2285_; lean_object* v_noCache_2286_; lean_object* v___x_2288_; uint8_t v_isShared_2289_; uint8_t v_isSharedCheck_2303_; 
+v_val_2284_ = lean_ctor_get(v_x_2282_, 0);
+lean_inc(v_val_2284_);
+lean_dec_ref_known(v_x_2282_, 1);
+v_allowConcurrency_2285_ = lean_ctor_get(v_val_2284_, 0);
+v_noCache_2286_ = lean_ctor_get(v_val_2284_, 1);
+v_isSharedCheck_2303_ = !lean_is_exclusive(v_val_2284_);
+if (v_isSharedCheck_2303_ == 0)
 {
-lean_object* v_items_2307_; lean_object* v___x_2308_; lean_object* v___x_2309_; uint8_t v___x_2310_; 
-v_items_2307_ = lean_ctor_get(v_v_2306_, 0);
-lean_inc_ref(v_items_2307_);
-v___x_2308_ = lean_array_get_size(v_items_2307_);
-v___x_2309_ = lean_unsigned_to_nat(2u);
-v___x_2310_ = lean_nat_dec_eq(v___x_2308_, v___x_2309_);
-if (v___x_2310_ == 0)
-{
-lean_dec_ref(v_items_2307_);
-lean_dec_ref(v_bs_2301_);
-goto v___jp_2302_;
+v___x_2288_ = v_val_2284_;
+v_isShared_2289_ = v_isSharedCheck_2303_;
+goto v_resetjp_2287_;
 }
 else
 {
-lean_object* v___x_2311_; lean_object* v___x_2312_; 
-v___x_2311_ = lean_unsigned_to_nat(0u);
-v___x_2312_ = lean_array_fget_borrowed(v_items_2307_, v___x_2311_);
-if (lean_obj_tag(v___x_2312_) == 4)
+lean_inc(v_noCache_2286_);
+lean_inc(v_allowConcurrency_2285_);
+lean_dec(v_val_2284_);
+v___x_2288_ = lean_box(0);
+v_isShared_2289_ = v_isSharedCheck_2303_;
+goto v_resetjp_2287_;
+}
+v_resetjp_2287_:
 {
-lean_object* v_s_2313_; lean_object* v_bs_x27_2314_; lean_object* v___x_2315_; lean_object* v___x_2316_; lean_object* v___x_2317_; size_t v___x_2318_; size_t v___x_2319_; lean_object* v___x_2320_; 
-v_s_2313_ = lean_ctor_get(v___x_2312_, 0);
-lean_inc_ref(v_s_2313_);
-v_bs_x27_2314_ = lean_array_uset(v_bs_2301_, v_i_2300_, v___x_2311_);
-v___x_2315_ = lean_unsigned_to_nat(1u);
-v___x_2316_ = lean_array_fget(v_items_2307_, v___x_2315_);
-lean_dec_ref(v_items_2307_);
-v___x_2317_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2317_, 0, v_s_2313_);
-lean_ctor_set(v___x_2317_, 1, v___x_2316_);
-v___x_2318_ = ((size_t)1ULL);
-v___x_2319_ = lean_usize_add(v_i_2300_, v___x_2318_);
-v___x_2320_ = lean_array_uset(v_bs_x27_2314_, v_i_2300_, v___x_2317_);
-v_i_2300_ = v___x_2319_;
-v_bs_2301_ = v___x_2320_;
+lean_object* v___x_2290_; lean_object* v___x_2291_; lean_object* v___x_2293_; 
+v___x_2290_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
+v___x_2291_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_allowConcurrency_2285_);
+lean_dec(v_allowConcurrency_2285_);
+if (v_isShared_2289_ == 0)
+{
+lean_ctor_set(v___x_2288_, 1, v___x_2291_);
+lean_ctor_set(v___x_2288_, 0, v___x_2290_);
+v___x_2293_ = v___x_2288_;
+goto v_reusejp_2292_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_2302_; 
+v_reuseFailAlloc_2302_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v_reuseFailAlloc_2302_, 0, v___x_2290_);
+lean_ctor_set(v_reuseFailAlloc_2302_, 1, v___x_2291_);
+v___x_2293_ = v_reuseFailAlloc_2302_;
+goto v_reusejp_2292_;
+}
+v_reusejp_2292_:
+{
+lean_object* v___x_2294_; lean_object* v___x_2295_; lean_object* v___x_2296_; lean_object* v___x_2297_; lean_object* v___x_2298_; lean_object* v___x_2299_; lean_object* v___x_2300_; lean_object* v___x_2301_; 
+v___x_2294_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__1));
+v___x_2295_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_noCache_2286_);
+lean_dec(v_noCache_2286_);
+v___x_2296_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2296_, 0, v___x_2294_);
+lean_ctor_set(v___x_2296_, 1, v___x_2295_);
+v___x_2297_ = lean_unsigned_to_nat(2u);
+v___x_2298_ = lean_mk_empty_array_with_capacity(v___x_2297_);
+v___x_2299_ = lean_array_push(v___x_2298_, v___x_2293_);
+v___x_2300_ = lean_array_push(v___x_2299_, v___x_2296_);
+v___x_2301_ = l_Lasm_JS_Web_Support_fields(v___x_2300_);
+lean_dec_ref(v___x_2300_);
+return v___x_2301_;
+}
+}
+}
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_get(lean_object* v_self_2304_, lean_object* v_key_2305_, lean_object* v_options_2306_){
+_start:
+{
+lean_object* v___x_2308_; lean_object* v___x_2309_; lean_object* v___x_2310_; lean_object* v___x_2311_; lean_object* v___x_2312_; lean_object* v___x_2313_; lean_object* v___x_2314_; lean_object* v___x_2315_; lean_object* v___x_2316_; 
+v___x_2308_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_get___closed__0));
+v___x_2309_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v___x_2309_, 0, v_key_2305_);
+v___x_2310_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_get_spec__0(v_options_2306_);
+v___x_2311_ = lean_unsigned_to_nat(2u);
+v___x_2312_ = lean_mk_empty_array_with_capacity(v___x_2311_);
+v___x_2313_ = lean_array_push(v___x_2312_, v___x_2309_);
+v___x_2314_ = lean_array_push(v___x_2313_, v___x_2310_);
+v___x_2315_ = l_Lasm_JS_Web_Support_args(v___x_2314_);
+v___x_2316_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Request_json_spec__0(v_self_2304_, v___x_2308_, v___x_2315_);
+return v___x_2316_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_get___boxed(lean_object* v_self_2317_, lean_object* v_key_2318_, lean_object* v_options_2319_, lean_object* v_a_2320_){
+_start:
+{
+lean_object* v_res_2321_; 
+v_res_2321_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_get(v_self_2317_, v_key_2318_, v_options_2319_);
+return v_res_2321_;
+}
+}
+LEAN_EXPORT lean_object* l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1_spec__2(size_t v_sz_2327_, size_t v_i_2328_, lean_object* v_bs_2329_){
+_start:
+{
+uint8_t v___x_2332_; 
+v___x_2332_ = lean_usize_dec_lt(v_i_2328_, v_sz_2327_);
+if (v___x_2332_ == 0)
+{
+lean_object* v___x_2333_; 
+v___x_2333_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v___x_2333_, 0, v_bs_2329_);
+return v___x_2333_;
+}
+else
+{
+lean_object* v_v_2334_; 
+v_v_2334_ = lean_array_uget_borrowed(v_bs_2329_, v_i_2328_);
+if (lean_obj_tag(v_v_2334_) == 7)
+{
+lean_object* v_items_2335_; lean_object* v___x_2336_; lean_object* v___x_2337_; uint8_t v___x_2338_; 
+v_items_2335_ = lean_ctor_get(v_v_2334_, 0);
+lean_inc_ref(v_items_2335_);
+v___x_2336_ = lean_array_get_size(v_items_2335_);
+v___x_2337_ = lean_unsigned_to_nat(2u);
+v___x_2338_ = lean_nat_dec_eq(v___x_2336_, v___x_2337_);
+if (v___x_2338_ == 0)
+{
+lean_dec_ref(v_items_2335_);
+lean_dec_ref(v_bs_2329_);
+goto v___jp_2330_;
+}
+else
+{
+lean_object* v___x_2339_; lean_object* v___x_2340_; 
+v___x_2339_ = lean_unsigned_to_nat(0u);
+v___x_2340_ = lean_array_fget_borrowed(v_items_2335_, v___x_2339_);
+if (lean_obj_tag(v___x_2340_) == 4)
+{
+lean_object* v_s_2341_; lean_object* v_bs_x27_2342_; lean_object* v___x_2343_; lean_object* v___x_2344_; lean_object* v___x_2345_; size_t v___x_2346_; size_t v___x_2347_; lean_object* v___x_2348_; 
+v_s_2341_ = lean_ctor_get(v___x_2340_, 0);
+lean_inc_ref(v_s_2341_);
+v_bs_x27_2342_ = lean_array_uset(v_bs_2329_, v_i_2328_, v___x_2339_);
+v___x_2343_ = lean_unsigned_to_nat(1u);
+v___x_2344_ = lean_array_fget(v_items_2335_, v___x_2343_);
+lean_dec_ref(v_items_2335_);
+v___x_2345_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2345_, 0, v_s_2341_);
+lean_ctor_set(v___x_2345_, 1, v___x_2344_);
+v___x_2346_ = ((size_t)1ULL);
+v___x_2347_ = lean_usize_add(v_i_2328_, v___x_2346_);
+v___x_2348_ = lean_array_uset(v_bs_x27_2342_, v_i_2328_, v___x_2345_);
+v_i_2328_ = v___x_2347_;
+v_bs_2329_ = v___x_2348_;
 goto _start;
 }
 else
 {
-lean_object* v___x_2322_; 
-lean_dec_ref(v_items_2307_);
-lean_dec_ref(v_bs_2301_);
-v___x_2322_ = ((lean_object*)(l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1_spec__2___closed__2));
-return v___x_2322_;
+lean_object* v___x_2350_; 
+lean_dec_ref(v_items_2335_);
+lean_dec_ref(v_bs_2329_);
+v___x_2350_ = ((lean_object*)(l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1_spec__2___closed__2));
+return v___x_2350_;
 }
 }
 }
 else
 {
-lean_dec_ref(v_bs_2301_);
-goto v___jp_2302_;
+lean_dec_ref(v_bs_2329_);
+goto v___jp_2330_;
 }
 }
-v___jp_2302_:
+v___jp_2330_:
 {
-lean_object* v___x_2303_; 
-v___x_2303_ = ((lean_object*)(l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1_spec__2___closed__1));
-return v___x_2303_;
+lean_object* v___x_2331_; 
+v___x_2331_ = ((lean_object*)(l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1_spec__2___closed__1));
+return v___x_2331_;
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1_spec__2___boxed(lean_object* v_sz_2323_, lean_object* v_i_2324_, lean_object* v_bs_2325_){
+LEAN_EXPORT lean_object* l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1_spec__2___boxed(lean_object* v_sz_2351_, lean_object* v_i_2352_, lean_object* v_bs_2353_){
 _start:
 {
-size_t v_sz_boxed_2326_; size_t v_i_boxed_2327_; lean_object* v_res_2328_; 
-v_sz_boxed_2326_ = lean_unbox_usize(v_sz_2323_);
-lean_dec(v_sz_2323_);
-v_i_boxed_2327_ = lean_unbox_usize(v_i_2324_);
-lean_dec(v_i_2324_);
-v_res_2328_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1_spec__2(v_sz_boxed_2326_, v_i_boxed_2327_, v_bs_2325_);
-return v_res_2328_;
+size_t v_sz_boxed_2354_; size_t v_i_boxed_2355_; lean_object* v_res_2356_; 
+v_sz_boxed_2354_ = lean_unbox_usize(v_sz_2351_);
+lean_dec(v_sz_2351_);
+v_i_boxed_2355_ = lean_unbox_usize(v_i_2352_);
+lean_dec(v_i_2352_);
+v_res_2356_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1_spec__2(v_sz_boxed_2354_, v_i_boxed_2355_, v_bs_2353_);
+return v_res_2356_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1(lean_object* v_context_2334_, lean_object* v_d_2335_){
+LEAN_EXPORT lean_object* l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1(lean_object* v_context_2362_, lean_object* v_d_2363_){
 _start:
 {
-lean_object* v___y_2338_; lean_object* v___y_2339_; lean_object* v___y_2344_; lean_object* v_received_2345_; lean_object* v___y_2364_; lean_object* v_a_2367_; 
-if (lean_obj_tag(v_d_2335_) == 7)
+lean_object* v___y_2366_; lean_object* v___y_2367_; lean_object* v___y_2372_; lean_object* v_received_2373_; lean_object* v___y_2392_; lean_object* v_a_2395_; 
+if (lean_obj_tag(v_d_2363_) == 7)
 {
-lean_object* v_items_2391_; size_t v_sz_2392_; size_t v___x_2393_; lean_object* v___x_2394_; 
-v_items_2391_ = lean_ctor_get(v_d_2335_, 0);
-v_sz_2392_ = lean_array_size(v_items_2391_);
-v___x_2393_ = ((size_t)0ULL);
-lean_inc_ref(v_items_2391_);
-v___x_2394_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1_spec__2(v_sz_2392_, v___x_2393_, v_items_2391_);
-if (lean_obj_tag(v___x_2394_) == 0)
+lean_object* v_items_2419_; size_t v_sz_2420_; size_t v___x_2421_; lean_object* v___x_2422_; 
+v_items_2419_ = lean_ctor_get(v_d_2363_, 0);
+v_sz_2420_ = lean_array_size(v_items_2419_);
+v___x_2421_ = ((size_t)0ULL);
+lean_inc_ref(v_items_2419_);
+v___x_2422_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1_spec__2(v_sz_2420_, v___x_2421_, v_items_2419_);
+if (lean_obj_tag(v___x_2422_) == 0)
 {
-lean_object* v_a_2395_; lean_object* v___x_2396_; lean_object* v___x_2397_; lean_object* v___x_2398_; uint8_t v___x_2399_; 
-v_a_2395_ = lean_ctor_get(v___x_2394_, 0);
-lean_inc(v_a_2395_);
-lean_dec_ref_known(v___x_2394_, 1);
-v___x_2396_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___closed__3));
-v___x_2397_ = lean_string_utf8_byte_size(v_a_2395_);
-v___x_2398_ = lean_unsigned_to_nat(0u);
-v___x_2399_ = lean_nat_dec_eq(v___x_2397_, v___x_2398_);
+lean_object* v_a_2423_; lean_object* v___x_2424_; lean_object* v___x_2425_; lean_object* v___x_2426_; uint8_t v___x_2427_; 
+v_a_2423_ = lean_ctor_get(v___x_2422_, 0);
+lean_inc(v_a_2423_);
+lean_dec_ref_known(v___x_2422_, 1);
+v___x_2424_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___closed__3));
+v___x_2425_ = lean_string_utf8_byte_size(v_a_2423_);
+v___x_2426_ = lean_unsigned_to_nat(0u);
+v___x_2427_ = lean_nat_dec_eq(v___x_2425_, v___x_2426_);
+if (v___x_2427_ == 0)
+{
+lean_object* v___x_2428_; lean_object* v___x_2429_; lean_object* v___x_2430_; 
+v___x_2428_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___closed__4));
+v___x_2429_ = lean_string_append(v___x_2428_, v_a_2423_);
+lean_dec(v_a_2423_);
+v___x_2430_ = lean_string_append(v___x_2424_, v___x_2429_);
+lean_dec_ref(v___x_2429_);
+v_a_2395_ = v___x_2430_;
+goto v___jp_2394_;
+}
+else
+{
+lean_dec(v_a_2423_);
+v_a_2395_ = v___x_2424_;
+goto v___jp_2394_;
+}
+}
+else
+{
+if (lean_obj_tag(v___x_2422_) == 0)
+{
+lean_object* v_a_2431_; 
+v_a_2431_ = lean_ctor_get(v___x_2422_, 0);
+lean_inc(v_a_2431_);
+lean_dec_ref_known(v___x_2422_, 1);
+v_a_2395_ = v_a_2431_;
+goto v___jp_2394_;
+}
+else
+{
+lean_object* v_a_2432_; lean_object* v___x_2434_; uint8_t v_isShared_2435_; uint8_t v_isSharedCheck_2439_; 
+lean_dec_ref_known(v_d_2363_, 1);
+v_a_2432_ = lean_ctor_get(v___x_2422_, 0);
+v_isSharedCheck_2439_ = !lean_is_exclusive(v___x_2422_);
+if (v_isSharedCheck_2439_ == 0)
+{
+v___x_2434_ = v___x_2422_;
+v_isShared_2435_ = v_isSharedCheck_2439_;
+goto v_resetjp_2433_;
+}
+else
+{
+lean_inc(v_a_2432_);
+lean_dec(v___x_2422_);
+v___x_2434_ = lean_box(0);
+v_isShared_2435_ = v_isSharedCheck_2439_;
+goto v_resetjp_2433_;
+}
+v_resetjp_2433_:
+{
+lean_object* v___x_2437_; 
+if (v_isShared_2435_ == 0)
+{
+lean_ctor_set_tag(v___x_2434_, 0);
+v___x_2437_ = v___x_2434_;
+goto v_reusejp_2436_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_2438_; 
+v_reuseFailAlloc_2438_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2438_, 0, v_a_2432_);
+v___x_2437_ = v_reuseFailAlloc_2438_;
+goto v_reusejp_2436_;
+}
+v_reusejp_2436_:
+{
+return v___x_2437_;
+}
+}
+}
+}
+}
+else
+{
+lean_object* v___x_2440_; 
+v___x_2440_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v_a_2395_ = v___x_2440_;
+goto v___jp_2394_;
+}
+v___jp_2365_:
+{
+lean_object* v___x_2368_; lean_object* v___x_2369_; lean_object* v___x_2370_; 
+v___x_2368_ = lean_string_append(v___y_2366_, v___y_2367_);
+lean_dec_ref(v___y_2367_);
+v___x_2369_ = lean_alloc_ctor(18, 1, 0);
+lean_ctor_set(v___x_2369_, 0, v___x_2368_);
+v___x_2370_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v___x_2370_, 0, v___x_2369_);
+return v___x_2370_;
+}
+v___jp_2371_:
+{
+lean_object* v___x_2374_; lean_object* v___x_2375_; lean_object* v___x_2376_; lean_object* v___x_2377_; lean_object* v___x_2378_; lean_object* v___x_2379_; lean_object* v___x_2380_; lean_object* v___x_2381_; lean_object* v___x_2382_; lean_object* v___x_2383_; lean_object* v___x_2384_; uint8_t v___x_2385_; 
+v___x_2374_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__0));
+v___x_2375_ = lean_string_append(v___x_2374_, v_context_2362_);
+v___x_2376_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__1));
+v___x_2377_ = lean_string_append(v___x_2375_, v___x_2376_);
+v___x_2378_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___closed__0));
+v___x_2379_ = lean_string_append(v___x_2377_, v___x_2378_);
+v___x_2380_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__2));
+v___x_2381_ = lean_string_append(v___x_2379_, v___x_2380_);
+v___x_2382_ = lean_string_append(v___x_2381_, v_received_2373_);
+lean_dec_ref(v_received_2373_);
+v___x_2383_ = lean_string_utf8_byte_size(v___y_2372_);
+v___x_2384_ = lean_unsigned_to_nat(0u);
+v___x_2385_ = lean_nat_dec_eq(v___x_2383_, v___x_2384_);
+if (v___x_2385_ == 0)
+{
+lean_object* v___x_2386_; lean_object* v___x_2387_; lean_object* v___x_2388_; lean_object* v___x_2389_; 
+v___x_2386_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___closed__1));
+v___x_2387_ = lean_string_append(v___x_2386_, v___y_2372_);
+lean_dec_ref(v___y_2372_);
+v___x_2388_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___closed__2));
+v___x_2389_ = lean_string_append(v___x_2387_, v___x_2388_);
+v___y_2366_ = v___x_2382_;
+v___y_2367_ = v___x_2389_;
+goto v___jp_2365_;
+}
+else
+{
+lean_object* v___x_2390_; 
+lean_dec_ref(v___y_2372_);
+v___x_2390_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___y_2366_ = v___x_2382_;
+v___y_2367_ = v___x_2390_;
+goto v___jp_2365_;
+}
+}
+v___jp_2391_:
+{
+lean_object* v___x_2393_; 
+v___x_2393_ = l_Lasm_JS_Data_describe(v_d_2363_);
+v___y_2372_ = v___y_2392_;
+v_received_2373_ = v___x_2393_;
+goto v___jp_2371_;
+}
+v___jp_2394_:
+{
+if (lean_obj_tag(v_d_2363_) == 9)
+{
+lean_object* v_value_2396_; lean_object* v_description_2397_; lean_object* v___x_2398_; uint8_t v___x_2399_; 
+v_value_2396_ = lean_ctor_get(v_d_2363_, 0);
+v_description_2397_ = lean_ctor_get(v_d_2363_, 1);
+v___x_2398_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___x_2399_ = lean_string_dec_eq(v_description_2397_, v___x_2398_);
 if (v___x_2399_ == 0)
 {
-lean_object* v___x_2400_; lean_object* v___x_2401_; lean_object* v___x_2402_; 
-v___x_2400_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___closed__4));
-v___x_2401_ = lean_string_append(v___x_2400_, v_a_2395_);
-lean_dec(v_a_2395_);
-v___x_2402_ = lean_string_append(v___x_2396_, v___x_2401_);
-lean_dec_ref(v___x_2401_);
-v_a_2367_ = v___x_2402_;
-goto v___jp_2366_;
+v___y_2392_ = v_a_2395_;
+goto v___jp_2391_;
 }
 else
 {
-lean_dec(v_a_2395_);
-v_a_2367_ = v___x_2396_;
-goto v___jp_2366_;
-}
-}
-else
+lean_object* v___x_2401_; uint8_t v_isShared_2402_; uint8_t v_isSharedCheck_2416_; 
+lean_inc(v_value_2396_);
+v_isSharedCheck_2416_ = !lean_is_exclusive(v_d_2363_);
+if (v_isSharedCheck_2416_ == 0)
 {
-if (lean_obj_tag(v___x_2394_) == 0)
-{
-lean_object* v_a_2403_; 
-v_a_2403_ = lean_ctor_get(v___x_2394_, 0);
-lean_inc(v_a_2403_);
-lean_dec_ref_known(v___x_2394_, 1);
-v_a_2367_ = v_a_2403_;
-goto v___jp_2366_;
+lean_object* v_unused_2417_; lean_object* v_unused_2418_; 
+v_unused_2417_ = lean_ctor_get(v_d_2363_, 1);
+lean_dec(v_unused_2417_);
+v_unused_2418_ = lean_ctor_get(v_d_2363_, 0);
+lean_dec(v_unused_2418_);
+v___x_2401_ = v_d_2363_;
+v_isShared_2402_ = v_isSharedCheck_2416_;
+goto v_resetjp_2400_;
 }
 else
 {
-lean_object* v_a_2404_; lean_object* v___x_2406_; uint8_t v_isShared_2407_; uint8_t v_isSharedCheck_2411_; 
-lean_dec_ref_known(v_d_2335_, 1);
-v_a_2404_ = lean_ctor_get(v___x_2394_, 0);
-v_isSharedCheck_2411_ = !lean_is_exclusive(v___x_2394_);
-if (v_isSharedCheck_2411_ == 0)
+lean_dec(v_d_2363_);
+v___x_2401_ = lean_box(0);
+v_isShared_2402_ = v_isSharedCheck_2416_;
+goto v_resetjp_2400_;
+}
+v_resetjp_2400_:
 {
-v___x_2406_ = v___x_2394_;
-v_isShared_2407_ = v_isSharedCheck_2411_;
-goto v_resetjp_2405_;
+uint32_t v___x_2403_; uint64_t v___x_2404_; lean_object* v___x_2406_; 
+v___x_2403_ = 206;
+v___x_2404_ = 0ULL;
+lean_inc(v_value_2396_);
+if (v_isShared_2402_ == 0)
+{
+lean_ctor_set(v___x_2401_, 1, v___x_2398_);
+v___x_2406_ = v___x_2401_;
+goto v_reusejp_2405_;
 }
 else
 {
-lean_inc(v_a_2404_);
-lean_dec(v___x_2394_);
-v___x_2406_ = lean_box(0);
-v_isShared_2407_ = v_isSharedCheck_2411_;
-goto v_resetjp_2405_;
+lean_object* v_reuseFailAlloc_2415_; 
+v_reuseFailAlloc_2415_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v_reuseFailAlloc_2415_, 0, v_value_2396_);
+lean_ctor_set(v_reuseFailAlloc_2415_, 1, v___x_2398_);
+v___x_2406_ = v_reuseFailAlloc_2415_;
+goto v_reusejp_2405_;
 }
-v_resetjp_2405_:
+v_reusejp_2405_:
 {
-lean_object* v___x_2409_; 
-if (v_isShared_2407_ == 0)
+uint32_t v___x_2407_; lean_object* v___x_2408_; 
+v___x_2407_ = lasm_js_value_handle(v_value_2396_);
+lean_dec(v_value_2396_);
+v___x_2408_ = l___private_Lasm_JS_Core_0__Lasm_JS_hostCallWith(v___x_2403_, v___x_2404_, v___x_2406_, v___x_2407_);
+lean_dec_ref(v___x_2406_);
+if (lean_obj_tag(v___x_2408_) == 0)
 {
-lean_ctor_set_tag(v___x_2406_, 0);
-v___x_2409_ = v___x_2406_;
-goto v_reusejp_2408_;
-}
-else
+lean_object* v_a_2409_; uint8_t v___x_2410_; 
+v_a_2409_ = lean_ctor_get(v___x_2408_, 0);
+lean_inc(v_a_2409_);
+lean_dec_ref_known(v___x_2408_, 1);
+v___x_2410_ = lean_string_validate_utf8(v_a_2409_);
+if (v___x_2410_ == 0)
 {
-lean_object* v_reuseFailAlloc_2410_; 
-v_reuseFailAlloc_2410_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2410_, 0, v_a_2404_);
-v___x_2409_ = v_reuseFailAlloc_2410_;
-goto v_reusejp_2408_;
-}
-v_reusejp_2408_:
-{
-return v___x_2409_;
-}
-}
-}
-}
-}
-else
-{
-lean_object* v___x_2412_; 
-v___x_2412_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v_a_2367_ = v___x_2412_;
-goto v___jp_2366_;
-}
-v___jp_2337_:
-{
-lean_object* v___x_2340_; lean_object* v___x_2341_; lean_object* v___x_2342_; 
-v___x_2340_ = lean_string_append(v___y_2338_, v___y_2339_);
-lean_dec_ref(v___y_2339_);
-v___x_2341_ = lean_alloc_ctor(18, 1, 0);
-lean_ctor_set(v___x_2341_, 0, v___x_2340_);
-v___x_2342_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v___x_2342_, 0, v___x_2341_);
-return v___x_2342_;
-}
-v___jp_2343_:
-{
-lean_object* v___x_2346_; lean_object* v___x_2347_; lean_object* v___x_2348_; lean_object* v___x_2349_; lean_object* v___x_2350_; lean_object* v___x_2351_; lean_object* v___x_2352_; lean_object* v___x_2353_; lean_object* v___x_2354_; lean_object* v___x_2355_; lean_object* v___x_2356_; uint8_t v___x_2357_; 
-v___x_2346_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__0));
-v___x_2347_ = lean_string_append(v___x_2346_, v_context_2334_);
-v___x_2348_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__1));
-v___x_2349_ = lean_string_append(v___x_2347_, v___x_2348_);
-v___x_2350_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___closed__0));
-v___x_2351_ = lean_string_append(v___x_2349_, v___x_2350_);
-v___x_2352_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__2));
-v___x_2353_ = lean_string_append(v___x_2351_, v___x_2352_);
-v___x_2354_ = lean_string_append(v___x_2353_, v_received_2345_);
-lean_dec_ref(v_received_2345_);
-v___x_2355_ = lean_string_utf8_byte_size(v___y_2344_);
-v___x_2356_ = lean_unsigned_to_nat(0u);
-v___x_2357_ = lean_nat_dec_eq(v___x_2355_, v___x_2356_);
-if (v___x_2357_ == 0)
-{
-lean_object* v___x_2358_; lean_object* v___x_2359_; lean_object* v___x_2360_; lean_object* v___x_2361_; 
-v___x_2358_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___closed__1));
-v___x_2359_ = lean_string_append(v___x_2358_, v___y_2344_);
-lean_dec_ref(v___y_2344_);
-v___x_2360_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___closed__2));
-v___x_2361_ = lean_string_append(v___x_2359_, v___x_2360_);
-v___y_2338_ = v___x_2354_;
-v___y_2339_ = v___x_2361_;
-goto v___jp_2337_;
+lean_object* v___x_2411_; lean_object* v___x_2412_; 
+lean_dec(v_a_2409_);
+v___x_2411_ = lean_obj_once(&l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9, &l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9_once, _init_l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9);
+v___x_2412_ = l_panic___at___00System_Uri_UriEscape_decodeUri_spec__1(v___x_2411_);
+v___y_2372_ = v_a_2395_;
+v_received_2373_ = v___x_2412_;
+goto v___jp_2371_;
 }
 else
 {
-lean_object* v___x_2362_; 
-lean_dec_ref(v___y_2344_);
-v___x_2362_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___y_2338_ = v___x_2354_;
-v___y_2339_ = v___x_2362_;
-goto v___jp_2337_;
-}
-}
-v___jp_2363_:
-{
-lean_object* v___x_2365_; 
-v___x_2365_ = l_Lasm_JS_Data_describe(v_d_2335_);
-v___y_2344_ = v___y_2364_;
-v_received_2345_ = v___x_2365_;
-goto v___jp_2343_;
-}
-v___jp_2366_:
-{
-if (lean_obj_tag(v_d_2335_) == 9)
-{
-lean_object* v_value_2368_; lean_object* v_description_2369_; lean_object* v___x_2370_; uint8_t v___x_2371_; 
-v_value_2368_ = lean_ctor_get(v_d_2335_, 0);
-v_description_2369_ = lean_ctor_get(v_d_2335_, 1);
-v___x_2370_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___x_2371_ = lean_string_dec_eq(v_description_2369_, v___x_2370_);
-if (v___x_2371_ == 0)
-{
-v___y_2364_ = v_a_2367_;
-goto v___jp_2363_;
-}
-else
-{
-lean_object* v___x_2373_; uint8_t v_isShared_2374_; uint8_t v_isSharedCheck_2388_; 
-lean_inc(v_value_2368_);
-v_isSharedCheck_2388_ = !lean_is_exclusive(v_d_2335_);
-if (v_isSharedCheck_2388_ == 0)
-{
-lean_object* v_unused_2389_; lean_object* v_unused_2390_; 
-v_unused_2389_ = lean_ctor_get(v_d_2335_, 1);
-lean_dec(v_unused_2389_);
-v_unused_2390_ = lean_ctor_get(v_d_2335_, 0);
-lean_dec(v_unused_2390_);
-v___x_2373_ = v_d_2335_;
-v_isShared_2374_ = v_isSharedCheck_2388_;
-goto v_resetjp_2372_;
-}
-else
-{
-lean_dec(v_d_2335_);
-v___x_2373_ = lean_box(0);
-v_isShared_2374_ = v_isSharedCheck_2388_;
-goto v_resetjp_2372_;
-}
-v_resetjp_2372_:
-{
-uint32_t v___x_2375_; uint64_t v___x_2376_; lean_object* v___x_2378_; 
-v___x_2375_ = 206;
-v___x_2376_ = 0ULL;
-lean_inc(v_value_2368_);
-if (v_isShared_2374_ == 0)
-{
-lean_ctor_set(v___x_2373_, 1, v___x_2370_);
-v___x_2378_ = v___x_2373_;
-goto v_reusejp_2377_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_2387_; 
-v_reuseFailAlloc_2387_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v_reuseFailAlloc_2387_, 0, v_value_2368_);
-lean_ctor_set(v_reuseFailAlloc_2387_, 1, v___x_2370_);
-v___x_2378_ = v_reuseFailAlloc_2387_;
-goto v_reusejp_2377_;
-}
-v_reusejp_2377_:
-{
-uint32_t v___x_2379_; lean_object* v___x_2380_; 
-v___x_2379_ = lasm_js_value_handle(v_value_2368_);
-lean_dec(v_value_2368_);
-v___x_2380_ = l___private_Lasm_JS_Core_0__Lasm_JS_hostCallWith(v___x_2375_, v___x_2376_, v___x_2378_, v___x_2379_);
-lean_dec_ref(v___x_2378_);
-if (lean_obj_tag(v___x_2380_) == 0)
-{
-lean_object* v_a_2381_; uint8_t v___x_2382_; 
-v_a_2381_ = lean_ctor_get(v___x_2380_, 0);
-lean_inc(v_a_2381_);
-lean_dec_ref_known(v___x_2380_, 1);
-v___x_2382_ = lean_string_validate_utf8(v_a_2381_);
-if (v___x_2382_ == 0)
-{
-lean_object* v___x_2383_; lean_object* v___x_2384_; 
-lean_dec(v_a_2381_);
-v___x_2383_ = lean_obj_once(&l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9, &l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9_once, _init_l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__9);
-v___x_2384_ = l_panic___at___00System_Uri_UriEscape_decodeUri_spec__1(v___x_2383_);
-v___y_2344_ = v_a_2367_;
-v_received_2345_ = v___x_2384_;
-goto v___jp_2343_;
-}
-else
-{
-lean_object* v___x_2385_; 
-v___x_2385_ = lean_string_from_utf8_unchecked(v_a_2381_);
-v___y_2344_ = v_a_2367_;
-v_received_2345_ = v___x_2385_;
-goto v___jp_2343_;
+lean_object* v___x_2413_; 
+v___x_2413_ = lean_string_from_utf8_unchecked(v_a_2409_);
+v___y_2372_ = v_a_2395_;
+v_received_2373_ = v___x_2413_;
+goto v___jp_2371_;
 }
 }
 else
 {
-lean_object* v___x_2386_; 
-lean_dec_ref_known(v___x_2380_, 1);
-v___x_2386_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__10));
-v___y_2344_ = v_a_2367_;
-v_received_2345_ = v___x_2386_;
-goto v___jp_2343_;
+lean_object* v___x_2414_; 
+lean_dec_ref_known(v___x_2408_, 1);
+v___x_2414_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__10));
+v___y_2372_ = v_a_2395_;
+v_received_2373_ = v___x_2414_;
+goto v___jp_2371_;
 }
 }
 }
@@ -7675,3629 +7795,3628 @@ goto v___jp_2343_;
 }
 else
 {
-v___y_2364_ = v_a_2367_;
-goto v___jp_2363_;
+v___y_2392_ = v_a_2395_;
+goto v___jp_2391_;
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___boxed(lean_object* v_context_2413_, lean_object* v_d_2414_, lean_object* v_a_2415_){
+LEAN_EXPORT lean_object* l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___boxed(lean_object* v_context_2441_, lean_object* v_d_2442_, lean_object* v_a_2443_){
 _start:
 {
-lean_object* v_res_2416_; 
-v_res_2416_ = l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1(v_context_2413_, v_d_2414_);
-lean_dec_ref(v_context_2413_);
-return v_res_2416_;
+lean_object* v_res_2444_; 
+v_res_2444_ = l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1(v_context_2441_, v_d_2442_);
+lean_dec_ref(v_context_2441_);
+return v_res_2444_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0(lean_object* v_b_2417_, lean_object* v_args_2418_, uint8_t v_await_2419_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0(lean_object* v_b_2445_, lean_object* v_args_2446_, uint8_t v_await_2447_){
 _start:
 {
-uint64_t v___y_2422_; uint64_t v___y_2423_; uint64_t v___x_2466_; uint64_t v___y_2468_; 
-v___x_2466_ = lean_uint64_once(&l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0, &l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0_once, _init_l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0);
-if (v_await_2419_ == 0)
+uint64_t v___y_2450_; uint64_t v___y_2451_; uint64_t v___x_2494_; uint64_t v___y_2496_; 
+v___x_2494_ = lean_uint64_once(&l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0, &l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0_once, _init_l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0);
+if (v_await_2447_ == 0)
 {
-uint64_t v___x_2473_; 
-v___x_2473_ = 0ULL;
-v___y_2468_ = v___x_2473_;
-goto v___jp_2467_;
+uint64_t v___x_2501_; 
+v___x_2501_ = 0ULL;
+v___y_2496_ = v___x_2501_;
+goto v___jp_2495_;
 }
 else
 {
-uint64_t v___x_2474_; 
-v___x_2474_ = 2ULL;
-v___y_2468_ = v___x_2474_;
-goto v___jp_2467_;
+uint64_t v___x_2502_; 
+v___x_2502_ = 2ULL;
+v___y_2496_ = v___x_2502_;
+goto v___jp_2495_;
 }
-v___jp_2421_:
+v___jp_2449_:
 {
-uint64_t v_flags_2424_; uint32_t v___x_2425_; lean_object* v___x_2426_; uint32_t v___x_2427_; lean_object* v___x_2428_; 
-v_flags_2424_ = lean_uint64_lor(v___y_2422_, v___y_2423_);
-v___x_2425_ = 214;
-v___x_2426_ = l___private_Lasm_JS_Core_0__Lasm_JS_Binding_payload(v_b_2417_, v_args_2418_);
-v___x_2427_ = 0;
-v___x_2428_ = l___private_Lasm_JS_Core_0__Lasm_JS_hostCallWith(v___x_2425_, v_flags_2424_, v___x_2426_, v___x_2427_);
-lean_dec(v___x_2426_);
-if (lean_obj_tag(v___x_2428_) == 0)
+uint64_t v_flags_2452_; uint32_t v___x_2453_; lean_object* v___x_2454_; uint32_t v___x_2455_; lean_object* v___x_2456_; 
+v_flags_2452_ = lean_uint64_lor(v___y_2450_, v___y_2451_);
+v___x_2453_ = 214;
+v___x_2454_ = l___private_Lasm_JS_Core_0__Lasm_JS_Binding_payload(v_b_2445_, v_args_2446_);
+v___x_2455_ = 0;
+v___x_2456_ = l___private_Lasm_JS_Core_0__Lasm_JS_hostCallWith(v___x_2453_, v_flags_2452_, v___x_2454_, v___x_2455_);
+lean_dec(v___x_2454_);
+if (lean_obj_tag(v___x_2456_) == 0)
 {
-if (lean_obj_tag(v___x_2428_) == 0)
+if (lean_obj_tag(v___x_2456_) == 0)
 {
-lean_object* v_a_2429_; lean_object* v___x_2430_; 
-v_a_2429_ = lean_ctor_get(v___x_2428_, 0);
-lean_inc(v_a_2429_);
-lean_dec_ref_known(v___x_2428_, 1);
-v___x_2430_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_a_2429_);
-lean_dec(v_a_2429_);
-if (lean_obj_tag(v___x_2430_) == 0)
+lean_object* v_a_2457_; lean_object* v___x_2458_; 
+v_a_2457_ = lean_ctor_get(v___x_2456_, 0);
+lean_inc(v_a_2457_);
+lean_dec_ref_known(v___x_2456_, 1);
+v___x_2458_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_a_2457_);
+lean_dec(v_a_2457_);
+if (lean_obj_tag(v___x_2458_) == 0)
 {
-lean_object* v_a_2431_; lean_object* v___x_2432_; lean_object* v___x_2433_; 
-v_a_2431_ = lean_ctor_get(v___x_2430_, 0);
-lean_inc(v_a_2431_);
-lean_dec_ref_known(v___x_2430_, 1);
-v___x_2432_ = l___private_Lasm_JS_Core_0__Lasm_JS_Binding_context(v_b_2417_);
-v___x_2433_ = l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1(v___x_2432_, v_a_2431_);
-lean_dec_ref(v___x_2432_);
-return v___x_2433_;
-}
-else
-{
-lean_object* v_a_2434_; lean_object* v___x_2436_; uint8_t v_isShared_2437_; uint8_t v_isSharedCheck_2441_; 
-v_a_2434_ = lean_ctor_get(v___x_2430_, 0);
-v_isSharedCheck_2441_ = !lean_is_exclusive(v___x_2430_);
-if (v_isSharedCheck_2441_ == 0)
-{
-v___x_2436_ = v___x_2430_;
-v_isShared_2437_ = v_isSharedCheck_2441_;
-goto v_resetjp_2435_;
+lean_object* v_a_2459_; lean_object* v___x_2460_; lean_object* v___x_2461_; 
+v_a_2459_ = lean_ctor_get(v___x_2458_, 0);
+lean_inc(v_a_2459_);
+lean_dec_ref_known(v___x_2458_, 1);
+v___x_2460_ = l___private_Lasm_JS_Core_0__Lasm_JS_Binding_context(v_b_2445_);
+v___x_2461_ = l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1(v___x_2460_, v_a_2459_);
+lean_dec_ref(v___x_2460_);
+return v___x_2461_;
 }
 else
 {
-lean_inc(v_a_2434_);
-lean_dec(v___x_2430_);
-v___x_2436_ = lean_box(0);
-v_isShared_2437_ = v_isSharedCheck_2441_;
-goto v_resetjp_2435_;
-}
-v_resetjp_2435_:
+lean_object* v_a_2462_; lean_object* v___x_2464_; uint8_t v_isShared_2465_; uint8_t v_isSharedCheck_2469_; 
+v_a_2462_ = lean_ctor_get(v___x_2458_, 0);
+v_isSharedCheck_2469_ = !lean_is_exclusive(v___x_2458_);
+if (v_isSharedCheck_2469_ == 0)
 {
-lean_object* v___x_2439_; 
-if (v_isShared_2437_ == 0)
-{
-v___x_2439_ = v___x_2436_;
-goto v_reusejp_2438_;
+v___x_2464_ = v___x_2458_;
+v_isShared_2465_ = v_isSharedCheck_2469_;
+goto v_resetjp_2463_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2440_; 
-v_reuseFailAlloc_2440_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2440_, 0, v_a_2434_);
-v___x_2439_ = v_reuseFailAlloc_2440_;
-goto v_reusejp_2438_;
+lean_inc(v_a_2462_);
+lean_dec(v___x_2458_);
+v___x_2464_ = lean_box(0);
+v_isShared_2465_ = v_isSharedCheck_2469_;
+goto v_resetjp_2463_;
 }
-v_reusejp_2438_:
+v_resetjp_2463_:
 {
-return v___x_2439_;
-}
-}
-}
+lean_object* v___x_2467_; 
+if (v_isShared_2465_ == 0)
+{
+v___x_2467_ = v___x_2464_;
+goto v_reusejp_2466_;
 }
 else
 {
-lean_object* v_a_2442_; lean_object* v___x_2444_; uint8_t v_isShared_2445_; uint8_t v_isSharedCheck_2449_; 
-v_a_2442_ = lean_ctor_get(v___x_2428_, 0);
-v_isSharedCheck_2449_ = !lean_is_exclusive(v___x_2428_);
-if (v_isSharedCheck_2449_ == 0)
-{
-v___x_2444_ = v___x_2428_;
-v_isShared_2445_ = v_isSharedCheck_2449_;
-goto v_resetjp_2443_;
+lean_object* v_reuseFailAlloc_2468_; 
+v_reuseFailAlloc_2468_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2468_, 0, v_a_2462_);
+v___x_2467_ = v_reuseFailAlloc_2468_;
+goto v_reusejp_2466_;
 }
-else
+v_reusejp_2466_:
 {
-lean_inc(v_a_2442_);
-lean_dec(v___x_2428_);
-v___x_2444_ = lean_box(0);
-v_isShared_2445_ = v_isSharedCheck_2449_;
-goto v_resetjp_2443_;
-}
-v_resetjp_2443_:
-{
-lean_object* v___x_2447_; 
-if (v_isShared_2445_ == 0)
-{
-lean_ctor_set_tag(v___x_2444_, 1);
-v___x_2447_ = v___x_2444_;
-goto v_reusejp_2446_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_2448_; 
-v_reuseFailAlloc_2448_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2448_, 0, v_a_2442_);
-v___x_2447_ = v_reuseFailAlloc_2448_;
-goto v_reusejp_2446_;
-}
-v_reusejp_2446_:
-{
-return v___x_2447_;
+return v___x_2467_;
 }
 }
 }
 }
 else
 {
-lean_object* v_a_2450_; lean_object* v___x_2452_; uint8_t v_isShared_2453_; uint8_t v_isSharedCheck_2465_; 
-v_a_2450_ = lean_ctor_get(v___x_2428_, 0);
-v_isSharedCheck_2465_ = !lean_is_exclusive(v___x_2428_);
-if (v_isSharedCheck_2465_ == 0)
+lean_object* v_a_2470_; lean_object* v___x_2472_; uint8_t v_isShared_2473_; uint8_t v_isSharedCheck_2477_; 
+v_a_2470_ = lean_ctor_get(v___x_2456_, 0);
+v_isSharedCheck_2477_ = !lean_is_exclusive(v___x_2456_);
+if (v_isSharedCheck_2477_ == 0)
 {
-v___x_2452_ = v___x_2428_;
-v_isShared_2453_ = v_isSharedCheck_2465_;
-goto v_resetjp_2451_;
+v___x_2472_ = v___x_2456_;
+v_isShared_2473_ = v_isSharedCheck_2477_;
+goto v_resetjp_2471_;
 }
 else
 {
-lean_inc(v_a_2450_);
-lean_dec(v___x_2428_);
-v___x_2452_ = lean_box(0);
-v_isShared_2453_ = v_isSharedCheck_2465_;
-goto v_resetjp_2451_;
+lean_inc(v_a_2470_);
+lean_dec(v___x_2456_);
+v___x_2472_ = lean_box(0);
+v_isShared_2473_ = v_isSharedCheck_2477_;
+goto v_resetjp_2471_;
 }
-v_resetjp_2451_:
+v_resetjp_2471_:
 {
-lean_object* v___x_2454_; lean_object* v___x_2455_; lean_object* v___x_2456_; lean_object* v___x_2457_; lean_object* v___x_2458_; lean_object* v___x_2459_; lean_object* v___x_2460_; lean_object* v___x_2461_; lean_object* v___x_2463_; 
-v___x_2454_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__0));
-v___x_2455_ = l___private_Lasm_JS_Core_0__Lasm_JS_Binding_context(v_b_2417_);
-v___x_2456_ = lean_string_append(v___x_2454_, v___x_2455_);
-lean_dec_ref(v___x_2455_);
-v___x_2457_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___closed__4));
-v___x_2458_ = lean_string_append(v___x_2456_, v___x_2457_);
-v___x_2459_ = lean_io_error_to_string(v_a_2450_);
-v___x_2460_ = lean_string_append(v___x_2458_, v___x_2459_);
-lean_dec_ref(v___x_2459_);
-v___x_2461_ = lean_alloc_ctor(18, 1, 0);
-lean_ctor_set(v___x_2461_, 0, v___x_2460_);
-if (v_isShared_2453_ == 0)
+lean_object* v___x_2475_; 
+if (v_isShared_2473_ == 0)
 {
-lean_ctor_set(v___x_2452_, 0, v___x_2461_);
-v___x_2463_ = v___x_2452_;
-goto v_reusejp_2462_;
+lean_ctor_set_tag(v___x_2472_, 1);
+v___x_2475_ = v___x_2472_;
+goto v_reusejp_2474_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2464_; 
-v_reuseFailAlloc_2464_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2464_, 0, v___x_2461_);
-v___x_2463_ = v_reuseFailAlloc_2464_;
-goto v_reusejp_2462_;
+lean_object* v_reuseFailAlloc_2476_; 
+v_reuseFailAlloc_2476_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2476_, 0, v_a_2470_);
+v___x_2475_ = v_reuseFailAlloc_2476_;
+goto v_reusejp_2474_;
 }
-v_reusejp_2462_:
+v_reusejp_2474_:
 {
-return v___x_2463_;
+return v___x_2475_;
 }
 }
 }
-}
-v___jp_2467_:
-{
-uint8_t v_construct_2469_; uint64_t v___x_2470_; 
-v_construct_2469_ = lean_ctor_get_uint8(v_b_2417_, sizeof(void*)*4);
-v___x_2470_ = lean_uint64_lor(v___x_2466_, v___y_2468_);
-if (v_construct_2469_ == 0)
-{
-uint64_t v___x_2471_; 
-v___x_2471_ = 0ULL;
-v___y_2422_ = v___x_2470_;
-v___y_2423_ = v___x_2471_;
-goto v___jp_2421_;
 }
 else
 {
-uint64_t v___x_2472_; 
-v___x_2472_ = 4ULL;
-v___y_2422_ = v___x_2470_;
-v___y_2423_ = v___x_2472_;
-goto v___jp_2421_;
+lean_object* v_a_2478_; lean_object* v___x_2480_; uint8_t v_isShared_2481_; uint8_t v_isSharedCheck_2493_; 
+v_a_2478_ = lean_ctor_get(v___x_2456_, 0);
+v_isSharedCheck_2493_ = !lean_is_exclusive(v___x_2456_);
+if (v_isSharedCheck_2493_ == 0)
+{
+v___x_2480_ = v___x_2456_;
+v_isShared_2481_ = v_isSharedCheck_2493_;
+goto v_resetjp_2479_;
+}
+else
+{
+lean_inc(v_a_2478_);
+lean_dec(v___x_2456_);
+v___x_2480_ = lean_box(0);
+v_isShared_2481_ = v_isSharedCheck_2493_;
+goto v_resetjp_2479_;
+}
+v_resetjp_2479_:
+{
+lean_object* v___x_2482_; lean_object* v___x_2483_; lean_object* v___x_2484_; lean_object* v___x_2485_; lean_object* v___x_2486_; lean_object* v___x_2487_; lean_object* v___x_2488_; lean_object* v___x_2489_; lean_object* v___x_2491_; 
+v___x_2482_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Web_Support_arg___at___00Lasm_JS_Cloudflare_DurableObjectStorageTransactionClosure_ofFn_spec__0_spec__0___closed__0));
+v___x_2483_ = l___private_Lasm_JS_Core_0__Lasm_JS_Binding_context(v_b_2445_);
+v___x_2484_ = lean_string_append(v___x_2482_, v___x_2483_);
+lean_dec_ref(v___x_2483_);
+v___x_2485_ = ((lean_object*)(l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0_spec__1___closed__4));
+v___x_2486_ = lean_string_append(v___x_2484_, v___x_2485_);
+v___x_2487_ = lean_io_error_to_string(v_a_2478_);
+v___x_2488_ = lean_string_append(v___x_2486_, v___x_2487_);
+lean_dec_ref(v___x_2487_);
+v___x_2489_ = lean_alloc_ctor(18, 1, 0);
+lean_ctor_set(v___x_2489_, 0, v___x_2488_);
+if (v_isShared_2481_ == 0)
+{
+lean_ctor_set(v___x_2480_, 0, v___x_2489_);
+v___x_2491_ = v___x_2480_;
+goto v_reusejp_2490_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_2492_; 
+v_reuseFailAlloc_2492_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2492_, 0, v___x_2489_);
+v___x_2491_ = v_reuseFailAlloc_2492_;
+goto v_reusejp_2490_;
+}
+v_reusejp_2490_:
+{
+return v___x_2491_;
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0___boxed(lean_object* v_b_2475_, lean_object* v_args_2476_, lean_object* v_await_2477_, lean_object* v_a_2478_){
+v___jp_2495_:
+{
+uint8_t v_construct_2497_; uint64_t v___x_2498_; 
+v_construct_2497_ = lean_ctor_get_uint8(v_b_2445_, sizeof(void*)*4);
+v___x_2498_ = lean_uint64_lor(v___x_2494_, v___y_2496_);
+if (v_construct_2497_ == 0)
+{
+uint64_t v___x_2499_; 
+v___x_2499_ = 0ULL;
+v___y_2450_ = v___x_2498_;
+v___y_2451_ = v___x_2499_;
+goto v___jp_2449_;
+}
+else
+{
+uint64_t v___x_2500_; 
+v___x_2500_ = 4ULL;
+v___y_2450_ = v___x_2498_;
+v___y_2451_ = v___x_2500_;
+goto v___jp_2449_;
+}
+}
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0___boxed(lean_object* v_b_2503_, lean_object* v_args_2504_, lean_object* v_await_2505_, lean_object* v_a_2506_){
 _start:
 {
-uint8_t v_await_boxed_2479_; lean_object* v_res_2480_; 
-v_await_boxed_2479_ = lean_unbox(v_await_2477_);
-v_res_2480_ = l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0(v_b_2475_, v_args_2476_, v_await_boxed_2479_);
-lean_dec_ref(v_b_2475_);
-return v_res_2480_;
+uint8_t v_await_boxed_2507_; lean_object* v_res_2508_; 
+v_await_boxed_2507_ = lean_unbox(v_await_2505_);
+v_res_2508_ = l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0(v_b_2503_, v_args_2504_, v_await_boxed_2507_);
+lean_dec_ref(v_b_2503_);
+return v_res_2508_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0(lean_object* v_v_2490_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0(lean_object* v_v_2518_){
 _start:
 {
-uint8_t v___x_2492_; lean_object* v___x_2493_; lean_object* v___x_2494_; lean_object* v___x_2495_; lean_object* v___x_2496_; lean_object* v___x_2497_; lean_object* v___x_2498_; lean_object* v___x_2499_; 
-v___x_2492_ = 0;
-v___x_2493_ = lean_unsigned_to_nat(1u);
-v___x_2494_ = ((lean_object*)(l_Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0___closed__3));
-v___x_2495_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___x_2496_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_2496_, 0, v_v_2490_);
-lean_ctor_set(v___x_2496_, 1, v___x_2495_);
-v___x_2497_ = lean_mk_empty_array_with_capacity(v___x_2493_);
-v___x_2498_ = lean_array_push(v___x_2497_, v___x_2496_);
-v___x_2499_ = l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0(v___x_2494_, v___x_2498_, v___x_2492_);
-if (lean_obj_tag(v___x_2499_) == 0)
+uint8_t v___x_2520_; lean_object* v___x_2521_; lean_object* v___x_2522_; lean_object* v___x_2523_; lean_object* v___x_2524_; lean_object* v___x_2525_; lean_object* v___x_2526_; lean_object* v___x_2527_; 
+v___x_2520_ = 0;
+v___x_2521_ = lean_unsigned_to_nat(1u);
+v___x_2522_ = ((lean_object*)(l_Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0___closed__3));
+v___x_2523_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___x_2524_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_2524_, 0, v_v_2518_);
+lean_ctor_set(v___x_2524_, 1, v___x_2523_);
+v___x_2525_ = lean_mk_empty_array_with_capacity(v___x_2521_);
+v___x_2526_ = lean_array_push(v___x_2525_, v___x_2524_);
+v___x_2527_ = l_Lasm_JS_Binding_invoke___at___00Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0_spec__0(v___x_2522_, v___x_2526_, v___x_2520_);
+if (lean_obj_tag(v___x_2527_) == 0)
 {
-lean_object* v_a_2500_; lean_object* v___x_2502_; uint8_t v_isShared_2503_; uint8_t v_isSharedCheck_2507_; 
-v_a_2500_ = lean_ctor_get(v___x_2499_, 0);
-v_isSharedCheck_2507_ = !lean_is_exclusive(v___x_2499_);
-if (v_isSharedCheck_2507_ == 0)
+lean_object* v_a_2528_; lean_object* v___x_2530_; uint8_t v_isShared_2531_; uint8_t v_isSharedCheck_2535_; 
+v_a_2528_ = lean_ctor_get(v___x_2527_, 0);
+v_isSharedCheck_2535_ = !lean_is_exclusive(v___x_2527_);
+if (v_isSharedCheck_2535_ == 0)
 {
-v___x_2502_ = v___x_2499_;
-v_isShared_2503_ = v_isSharedCheck_2507_;
-goto v_resetjp_2501_;
+v___x_2530_ = v___x_2527_;
+v_isShared_2531_ = v_isSharedCheck_2535_;
+goto v_resetjp_2529_;
 }
 else
 {
-lean_inc(v_a_2500_);
-lean_dec(v___x_2499_);
-v___x_2502_ = lean_box(0);
-v_isShared_2503_ = v_isSharedCheck_2507_;
-goto v_resetjp_2501_;
+lean_inc(v_a_2528_);
+lean_dec(v___x_2527_);
+v___x_2530_ = lean_box(0);
+v_isShared_2531_ = v_isSharedCheck_2535_;
+goto v_resetjp_2529_;
 }
-v_resetjp_2501_:
+v_resetjp_2529_:
 {
-lean_object* v___x_2505_; 
-if (v_isShared_2503_ == 0)
+lean_object* v___x_2533_; 
+if (v_isShared_2531_ == 0)
 {
-v___x_2505_ = v___x_2502_;
-goto v_reusejp_2504_;
+v___x_2533_ = v___x_2530_;
+goto v_reusejp_2532_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2506_; 
-v_reuseFailAlloc_2506_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2506_, 0, v_a_2500_);
-v___x_2505_ = v_reuseFailAlloc_2506_;
-goto v_reusejp_2504_;
+lean_object* v_reuseFailAlloc_2534_; 
+v_reuseFailAlloc_2534_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2534_, 0, v_a_2528_);
+v___x_2533_ = v_reuseFailAlloc_2534_;
+goto v_reusejp_2532_;
 }
-v_reusejp_2504_:
+v_reusejp_2532_:
 {
-return v___x_2505_;
+return v___x_2533_;
 }
 }
 }
 else
 {
-lean_object* v_a_2508_; lean_object* v___x_2510_; uint8_t v_isShared_2511_; uint8_t v_isSharedCheck_2515_; 
-v_a_2508_ = lean_ctor_get(v___x_2499_, 0);
-v_isSharedCheck_2515_ = !lean_is_exclusive(v___x_2499_);
-if (v_isSharedCheck_2515_ == 0)
+lean_object* v_a_2536_; lean_object* v___x_2538_; uint8_t v_isShared_2539_; uint8_t v_isSharedCheck_2543_; 
+v_a_2536_ = lean_ctor_get(v___x_2527_, 0);
+v_isSharedCheck_2543_ = !lean_is_exclusive(v___x_2527_);
+if (v_isSharedCheck_2543_ == 0)
 {
-v___x_2510_ = v___x_2499_;
-v_isShared_2511_ = v_isSharedCheck_2515_;
-goto v_resetjp_2509_;
+v___x_2538_ = v___x_2527_;
+v_isShared_2539_ = v_isSharedCheck_2543_;
+goto v_resetjp_2537_;
 }
 else
 {
-lean_inc(v_a_2508_);
-lean_dec(v___x_2499_);
-v___x_2510_ = lean_box(0);
-v_isShared_2511_ = v_isSharedCheck_2515_;
-goto v_resetjp_2509_;
+lean_inc(v_a_2536_);
+lean_dec(v___x_2527_);
+v___x_2538_ = lean_box(0);
+v_isShared_2539_ = v_isSharedCheck_2543_;
+goto v_resetjp_2537_;
 }
-v_resetjp_2509_:
+v_resetjp_2537_:
 {
-lean_object* v___x_2513_; 
-if (v_isShared_2511_ == 0)
+lean_object* v___x_2541_; 
+if (v_isShared_2539_ == 0)
 {
-v___x_2513_ = v___x_2510_;
-goto v_reusejp_2512_;
+v___x_2541_ = v___x_2538_;
+goto v_reusejp_2540_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2514_; 
-v_reuseFailAlloc_2514_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2514_, 0, v_a_2508_);
-v___x_2513_ = v_reuseFailAlloc_2514_;
-goto v_reusejp_2512_;
+lean_object* v_reuseFailAlloc_2542_; 
+v_reuseFailAlloc_2542_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2542_, 0, v_a_2536_);
+v___x_2541_ = v_reuseFailAlloc_2542_;
+goto v_reusejp_2540_;
 }
-v_reusejp_2512_:
+v_reusejp_2540_:
 {
-return v___x_2513_;
+return v___x_2541_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0___boxed(lean_object* v_v_2516_, lean_object* v_a_2517_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0___boxed(lean_object* v_v_2544_, lean_object* v_a_2545_){
 _start:
 {
-lean_object* v_res_2518_; 
-v_res_2518_ = l_Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0(v_v_2516_);
-return v_res_2518_;
+lean_object* v_res_2546_; 
+v_res_2546_ = l_Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0(v_v_2544_);
+return v_res_2546_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___lam__0(lean_object* v_x_2519_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___lam__0(lean_object* v_x_2547_){
 _start:
 {
-lean_object* v_val_2522_; 
-if (lean_obj_tag(v_x_2519_) == 0)
+lean_object* v_val_2550_; 
+if (lean_obj_tag(v_x_2547_) == 0)
 {
-lean_object* v_a_2524_; lean_object* v___x_2526_; uint8_t v_isShared_2527_; uint8_t v_isSharedCheck_2532_; 
-v_a_2524_ = lean_ctor_get(v_x_2519_, 0);
-v_isSharedCheck_2532_ = !lean_is_exclusive(v_x_2519_);
-if (v_isSharedCheck_2532_ == 0)
+lean_object* v_a_2552_; lean_object* v___x_2554_; uint8_t v_isShared_2555_; uint8_t v_isSharedCheck_2560_; 
+v_a_2552_ = lean_ctor_get(v_x_2547_, 0);
+v_isSharedCheck_2560_ = !lean_is_exclusive(v_x_2547_);
+if (v_isSharedCheck_2560_ == 0)
 {
-v___x_2526_ = v_x_2519_;
-v_isShared_2527_ = v_isSharedCheck_2532_;
-goto v_resetjp_2525_;
+v___x_2554_ = v_x_2547_;
+v_isShared_2555_ = v_isSharedCheck_2560_;
+goto v_resetjp_2553_;
 }
 else
 {
-lean_inc(v_a_2524_);
-lean_dec(v_x_2519_);
-v___x_2526_ = lean_box(0);
-v_isShared_2527_ = v_isSharedCheck_2532_;
-goto v_resetjp_2525_;
+lean_inc(v_a_2552_);
+lean_dec(v_x_2547_);
+v___x_2554_ = lean_box(0);
+v_isShared_2555_ = v_isSharedCheck_2560_;
+goto v_resetjp_2553_;
 }
-v_resetjp_2525_:
+v_resetjp_2553_:
 {
-lean_object* v___x_2529_; 
-if (v_isShared_2527_ == 0)
+lean_object* v___x_2557_; 
+if (v_isShared_2555_ == 0)
 {
-v___x_2529_ = v___x_2526_;
-goto v_reusejp_2528_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_2531_; 
-v_reuseFailAlloc_2531_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2531_, 0, v_a_2524_);
-v___x_2529_ = v_reuseFailAlloc_2531_;
-goto v_reusejp_2528_;
-}
-v_reusejp_2528_:
-{
-lean_object* v___x_2530_; 
-v___x_2530_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2530_, 0, v___x_2529_);
-return v___x_2530_;
-}
-}
+v___x_2557_ = v___x_2554_;
+goto v_reusejp_2556_;
 }
 else
 {
-lean_object* v_a_2533_; lean_object* v___x_2535_; uint8_t v_isShared_2536_; uint8_t v_isSharedCheck_2546_; 
-v_a_2533_ = lean_ctor_get(v_x_2519_, 0);
-v_isSharedCheck_2546_ = !lean_is_exclusive(v_x_2519_);
-if (v_isSharedCheck_2546_ == 0)
-{
-v___x_2535_ = v_x_2519_;
-v_isShared_2536_ = v_isSharedCheck_2546_;
-goto v_resetjp_2534_;
+lean_object* v_reuseFailAlloc_2559_; 
+v_reuseFailAlloc_2559_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2559_, 0, v_a_2552_);
+v___x_2557_ = v_reuseFailAlloc_2559_;
+goto v_reusejp_2556_;
 }
-else
+v_reusejp_2556_:
 {
-lean_inc(v_a_2533_);
-lean_dec(v_x_2519_);
-v___x_2535_ = lean_box(0);
-v_isShared_2536_ = v_isSharedCheck_2546_;
-goto v_resetjp_2534_;
+lean_object* v___x_2558_; 
+v___x_2558_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2558_, 0, v___x_2557_);
+return v___x_2558_;
 }
-v_resetjp_2534_:
-{
-lean_object* v___x_2537_; 
-v___x_2537_ = l_Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0(v_a_2533_);
-if (lean_obj_tag(v___x_2537_) == 0)
-{
-lean_object* v_a_2538_; lean_object* v___x_2540_; 
-v_a_2538_ = lean_ctor_get(v___x_2537_, 0);
-lean_inc(v_a_2538_);
-lean_dec_ref_known(v___x_2537_, 1);
-if (v_isShared_2536_ == 0)
-{
-lean_ctor_set(v___x_2535_, 0, v_a_2538_);
-v___x_2540_ = v___x_2535_;
-goto v_reusejp_2539_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_2541_; 
-v_reuseFailAlloc_2541_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2541_, 0, v_a_2538_);
-v___x_2540_ = v_reuseFailAlloc_2541_;
-goto v_reusejp_2539_;
-}
-v_reusejp_2539_:
-{
-v_val_2522_ = v___x_2540_;
-goto v___jp_2521_;
 }
 }
 else
 {
-lean_object* v_a_2542_; lean_object* v___x_2544_; 
-v_a_2542_ = lean_ctor_get(v___x_2537_, 0);
-lean_inc(v_a_2542_);
-lean_dec_ref_known(v___x_2537_, 1);
-if (v_isShared_2536_ == 0)
+lean_object* v_a_2561_; lean_object* v___x_2563_; uint8_t v_isShared_2564_; uint8_t v_isSharedCheck_2574_; 
+v_a_2561_ = lean_ctor_get(v_x_2547_, 0);
+v_isSharedCheck_2574_ = !lean_is_exclusive(v_x_2547_);
+if (v_isSharedCheck_2574_ == 0)
 {
-lean_ctor_set_tag(v___x_2535_, 0);
-lean_ctor_set(v___x_2535_, 0, v_a_2542_);
-v___x_2544_ = v___x_2535_;
-goto v_reusejp_2543_;
+v___x_2563_ = v_x_2547_;
+v_isShared_2564_ = v_isSharedCheck_2574_;
+goto v_resetjp_2562_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2545_; 
-v_reuseFailAlloc_2545_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2545_, 0, v_a_2542_);
-v___x_2544_ = v_reuseFailAlloc_2545_;
-goto v_reusejp_2543_;
+lean_inc(v_a_2561_);
+lean_dec(v_x_2547_);
+v___x_2563_ = lean_box(0);
+v_isShared_2564_ = v_isSharedCheck_2574_;
+goto v_resetjp_2562_;
 }
-v_reusejp_2543_:
+v_resetjp_2562_:
 {
-v_val_2522_ = v___x_2544_;
-goto v___jp_2521_;
-}
-}
-}
-}
-v___jp_2521_:
+lean_object* v___x_2565_; 
+v___x_2565_ = l_Lasm_JS_Cloudflare_Support_mapOf___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys_spec__0(v_a_2561_);
+if (lean_obj_tag(v___x_2565_) == 0)
 {
-lean_object* v___x_2523_; 
-v___x_2523_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2523_, 0, v_val_2522_);
-return v___x_2523_;
-}
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___lam__0___boxed(lean_object* v_x_2547_, lean_object* v___y_2548_){
-_start:
+lean_object* v_a_2566_; lean_object* v___x_2568_; 
+v_a_2566_ = lean_ctor_get(v___x_2565_, 0);
+lean_inc(v_a_2566_);
+lean_dec_ref_known(v___x_2565_, 1);
+if (v_isShared_2564_ == 0)
 {
-lean_object* v_res_2549_; 
-v_res_2549_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___lam__0(v_x_2547_);
-return v_res_2549_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys(lean_object* v_self_2551_, lean_object* v_keys_2552_, lean_object* v_options_2553_){
-_start:
-{
-lean_object* v___f_2555_; lean_object* v___x_2556_; size_t v_sz_2557_; size_t v___x_2558_; lean_object* v___x_2559_; lean_object* v___x_2560_; lean_object* v___x_2561_; lean_object* v___x_2562_; lean_object* v___x_2563_; lean_object* v___x_2564_; lean_object* v___x_2565_; lean_object* v___x_2566_; lean_object* v___x_2567_; uint8_t v___x_2568_; lean_object* v___x_2569_; lean_object* v___x_2570_; 
-v___f_2555_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___closed__0));
-v___x_2556_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_get___closed__0));
-v_sz_2557_ = lean_array_size(v_keys_2552_);
-v___x_2558_ = ((size_t)0ULL);
-v___x_2559_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_URLSearchParams_new_spec__0_spec__0(v_sz_2557_, v___x_2558_, v_keys_2552_);
-v___x_2560_ = lean_alloc_ctor(7, 1, 0);
-lean_ctor_set(v___x_2560_, 0, v___x_2559_);
-v___x_2561_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_get_spec__0(v_options_2553_);
-v___x_2562_ = lean_unsigned_to_nat(2u);
-v___x_2563_ = lean_mk_empty_array_with_capacity(v___x_2562_);
-v___x_2564_ = lean_array_push(v___x_2563_, v___x_2560_);
-v___x_2565_ = lean_array_push(v___x_2564_, v___x_2561_);
-v___x_2566_ = l_Lasm_JS_Web_Support_args(v___x_2565_);
-v___x_2567_ = lean_unsigned_to_nat(0u);
-v___x_2568_ = 0;
-v___x_2569_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0(v_self_2551_, v___x_2556_, v___x_2566_);
-v___x_2570_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2567_, v___x_2568_, v___x_2569_, v___f_2555_);
-return v___x_2570_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___boxed(lean_object* v_self_2571_, lean_object* v_keys_2572_, lean_object* v_options_2573_, lean_object* v_a_2574_){
-_start:
-{
-lean_object* v_res_2575_; 
-v_res_2575_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys(v_self_2571_, v_keys_2572_, v_options_2573_);
-return v_res_2575_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_list_spec__0(lean_object* v_x_2576_){
-_start:
-{
-if (lean_obj_tag(v_x_2576_) == 0)
-{
-lean_object* v___x_2577_; 
-v___x_2577_ = lean_box(0);
-return v___x_2577_;
+lean_ctor_set(v___x_2563_, 0, v_a_2566_);
+v___x_2568_ = v___x_2563_;
+goto v_reusejp_2567_;
 }
 else
 {
-lean_object* v_val_2578_; lean_object* v_start_2579_; lean_object* v_startAfter_2580_; lean_object* v_end_2581_; lean_object* v_prefix_2582_; lean_object* v_reverse_2583_; lean_object* v_limit_2584_; lean_object* v_allowConcurrency_2585_; lean_object* v_noCache_2586_; lean_object* v___x_2587_; lean_object* v___x_2588_; lean_object* v___x_2589_; lean_object* v___x_2590_; lean_object* v___x_2591_; lean_object* v___x_2592_; lean_object* v___x_2593_; lean_object* v___x_2594_; lean_object* v___x_2595_; lean_object* v___x_2596_; lean_object* v___x_2597_; lean_object* v___x_2598_; lean_object* v___x_2599_; lean_object* v___x_2600_; lean_object* v___x_2601_; lean_object* v___x_2602_; lean_object* v___x_2603_; lean_object* v___x_2604_; lean_object* v___x_2605_; lean_object* v___x_2606_; lean_object* v___x_2607_; lean_object* v___x_2608_; lean_object* v___x_2609_; lean_object* v___x_2610_; lean_object* v___x_2611_; lean_object* v___x_2612_; lean_object* v___x_2613_; lean_object* v___x_2614_; lean_object* v___x_2615_; lean_object* v___x_2616_; lean_object* v___x_2617_; lean_object* v___x_2618_; lean_object* v___x_2619_; lean_object* v___x_2620_; lean_object* v___x_2621_; 
-v_val_2578_ = lean_ctor_get(v_x_2576_, 0);
-lean_inc(v_val_2578_);
-lean_dec_ref_known(v_x_2576_, 1);
-v_start_2579_ = lean_ctor_get(v_val_2578_, 0);
-lean_inc(v_start_2579_);
-v_startAfter_2580_ = lean_ctor_get(v_val_2578_, 1);
-lean_inc(v_startAfter_2580_);
-v_end_2581_ = lean_ctor_get(v_val_2578_, 2);
-lean_inc(v_end_2581_);
-v_prefix_2582_ = lean_ctor_get(v_val_2578_, 3);
-lean_inc(v_prefix_2582_);
-v_reverse_2583_ = lean_ctor_get(v_val_2578_, 4);
-lean_inc(v_reverse_2583_);
-v_limit_2584_ = lean_ctor_get(v_val_2578_, 5);
-lean_inc(v_limit_2584_);
-v_allowConcurrency_2585_ = lean_ctor_get(v_val_2578_, 6);
-lean_inc(v_allowConcurrency_2585_);
-v_noCache_2586_ = lean_ctor_get(v_val_2578_, 7);
-lean_inc(v_noCache_2586_);
-lean_dec(v_val_2578_);
-v___x_2587_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__0));
-v___x_2588_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(v_start_2579_);
-v___x_2589_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2589_, 0, v___x_2587_);
-lean_ctor_set(v___x_2589_, 1, v___x_2588_);
-v___x_2590_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__1));
-v___x_2591_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(v_startAfter_2580_);
-v___x_2592_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2592_, 0, v___x_2590_);
-lean_ctor_set(v___x_2592_, 1, v___x_2591_);
-v___x_2593_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__2));
-v___x_2594_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(v_end_2581_);
-v___x_2595_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2595_, 0, v___x_2593_);
-lean_ctor_set(v___x_2595_, 1, v___x_2594_);
-v___x_2596_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__3));
-v___x_2597_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(v_prefix_2582_);
-v___x_2598_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2598_, 0, v___x_2596_);
-lean_ctor_set(v___x_2598_, 1, v___x_2597_);
-v___x_2599_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__4));
-v___x_2600_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_reverse_2583_);
-lean_dec(v_reverse_2583_);
-v___x_2601_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2601_, 0, v___x_2599_);
-lean_ctor_set(v___x_2601_, 1, v___x_2600_);
-v___x_2602_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__5));
-v___x_2603_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStream_new_spec__0_spec__0(v_limit_2584_);
-lean_dec(v_limit_2584_);
-v___x_2604_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2604_, 0, v___x_2602_);
-lean_ctor_set(v___x_2604_, 1, v___x_2603_);
-v___x_2605_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
-v___x_2606_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_allowConcurrency_2585_);
-lean_dec(v_allowConcurrency_2585_);
-v___x_2607_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2607_, 0, v___x_2605_);
-lean_ctor_set(v___x_2607_, 1, v___x_2606_);
-v___x_2608_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__1));
-v___x_2609_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_noCache_2586_);
-lean_dec(v_noCache_2586_);
-v___x_2610_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2610_, 0, v___x_2608_);
-lean_ctor_set(v___x_2610_, 1, v___x_2609_);
-v___x_2611_ = lean_unsigned_to_nat(8u);
-v___x_2612_ = lean_mk_empty_array_with_capacity(v___x_2611_);
-v___x_2613_ = lean_array_push(v___x_2612_, v___x_2589_);
-v___x_2614_ = lean_array_push(v___x_2613_, v___x_2592_);
-v___x_2615_ = lean_array_push(v___x_2614_, v___x_2595_);
-v___x_2616_ = lean_array_push(v___x_2615_, v___x_2598_);
-v___x_2617_ = lean_array_push(v___x_2616_, v___x_2601_);
-v___x_2618_ = lean_array_push(v___x_2617_, v___x_2604_);
-v___x_2619_ = lean_array_push(v___x_2618_, v___x_2607_);
-v___x_2620_ = lean_array_push(v___x_2619_, v___x_2610_);
-v___x_2621_ = l_Lasm_JS_Web_Support_fields(v___x_2620_);
-lean_dec_ref(v___x_2620_);
-return v___x_2621_;
+lean_object* v_reuseFailAlloc_2569_; 
+v_reuseFailAlloc_2569_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2569_, 0, v_a_2566_);
+v___x_2568_ = v_reuseFailAlloc_2569_;
+goto v_reusejp_2567_;
 }
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_list(lean_object* v_self_2623_, lean_object* v_options_2624_){
-_start:
+v_reusejp_2567_:
 {
-lean_object* v___f_2626_; lean_object* v___x_2627_; lean_object* v___x_2628_; lean_object* v___x_2629_; lean_object* v___x_2630_; lean_object* v___x_2631_; lean_object* v___x_2632_; lean_object* v___x_2633_; uint8_t v___x_2634_; lean_object* v___x_2635_; lean_object* v___x_2636_; 
-v___f_2626_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___closed__0));
-v___x_2627_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_list___closed__0));
-v___x_2628_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_list_spec__0(v_options_2624_);
-v___x_2629_ = lean_unsigned_to_nat(1u);
-v___x_2630_ = lean_mk_empty_array_with_capacity(v___x_2629_);
-v___x_2631_ = lean_array_push(v___x_2630_, v___x_2628_);
-v___x_2632_ = l_Lasm_JS_Web_Support_args(v___x_2631_);
-v___x_2633_ = lean_unsigned_to_nat(0u);
-v___x_2634_ = 0;
-v___x_2635_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0(v_self_2623_, v___x_2627_, v___x_2632_);
-v___x_2636_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2633_, v___x_2634_, v___x_2635_, v___f_2626_);
-return v___x_2636_;
+v_val_2550_ = v___x_2568_;
+goto v___jp_2549_;
 }
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_list___boxed(lean_object* v_self_2637_, lean_object* v_options_2638_, lean_object* v_a_2639_){
-_start:
-{
-lean_object* v_res_2640_; 
-v_res_2640_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_list(v_self_2637_, v_options_2638_);
-return v_res_2640_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(lean_object* v_x_2641_){
-_start:
-{
-if (lean_obj_tag(v_x_2641_) == 0)
-{
-lean_object* v___x_2642_; 
-v___x_2642_ = lean_box(0);
-return v___x_2642_;
 }
 else
 {
-lean_object* v_val_2643_; lean_object* v_allowConcurrency_2644_; lean_object* v_allowUnconfirmed_2645_; lean_object* v_noCache_2646_; lean_object* v___x_2647_; lean_object* v___x_2648_; lean_object* v___x_2649_; lean_object* v___x_2650_; lean_object* v___x_2651_; lean_object* v___x_2652_; lean_object* v___x_2653_; lean_object* v___x_2654_; lean_object* v___x_2655_; lean_object* v___x_2656_; lean_object* v___x_2657_; lean_object* v___x_2658_; lean_object* v___x_2659_; lean_object* v___x_2660_; lean_object* v___x_2661_; 
-v_val_2643_ = lean_ctor_get(v_x_2641_, 0);
-v_allowConcurrency_2644_ = lean_ctor_get(v_val_2643_, 0);
-v_allowUnconfirmed_2645_ = lean_ctor_get(v_val_2643_, 1);
-v_noCache_2646_ = lean_ctor_get(v_val_2643_, 2);
-v___x_2647_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
-v___x_2648_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_allowConcurrency_2644_);
-v___x_2649_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2649_, 0, v___x_2647_);
-lean_ctor_set(v___x_2649_, 1, v___x_2648_);
-v___x_2650_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectPutOptions___lam__0___closed__0));
-v___x_2651_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_allowUnconfirmed_2645_);
-v___x_2652_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2652_, 0, v___x_2650_);
-lean_ctor_set(v___x_2652_, 1, v___x_2651_);
-v___x_2653_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__1));
-v___x_2654_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_noCache_2646_);
-v___x_2655_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_2655_, 0, v___x_2653_);
-lean_ctor_set(v___x_2655_, 1, v___x_2654_);
-v___x_2656_ = lean_unsigned_to_nat(3u);
-v___x_2657_ = lean_mk_empty_array_with_capacity(v___x_2656_);
-v___x_2658_ = lean_array_push(v___x_2657_, v___x_2649_);
-v___x_2659_ = lean_array_push(v___x_2658_, v___x_2652_);
-v___x_2660_ = lean_array_push(v___x_2659_, v___x_2655_);
-v___x_2661_ = l_Lasm_JS_Web_Support_fields(v___x_2660_);
-lean_dec_ref(v___x_2660_);
-return v___x_2661_;
-}
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0___boxed(lean_object* v_x_2662_){
-_start:
+lean_object* v_a_2570_; lean_object* v___x_2572_; 
+v_a_2570_ = lean_ctor_get(v___x_2565_, 0);
+lean_inc(v_a_2570_);
+lean_dec_ref_known(v___x_2565_, 1);
+if (v_isShared_2564_ == 0)
 {
-lean_object* v_res_2663_; 
-v_res_2663_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_x_2662_);
-lean_dec(v_x_2662_);
-return v_res_2663_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_put(lean_object* v_self_2665_, lean_object* v_key_2666_, lean_object* v_value_2667_, lean_object* v_options_2668_){
-_start:
-{
-lean_object* v___x_2670_; lean_object* v___x_2671_; lean_object* v___x_2672_; lean_object* v___x_2673_; lean_object* v___x_2674_; lean_object* v___x_2675_; lean_object* v___x_2676_; lean_object* v___x_2677_; lean_object* v___x_2678_; lean_object* v___x_2679_; 
-v___x_2670_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_put___closed__0));
-v___x_2671_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_2671_, 0, v_key_2666_);
-v___x_2672_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_2668_);
-v___x_2673_ = lean_unsigned_to_nat(3u);
-v___x_2674_ = lean_mk_empty_array_with_capacity(v___x_2673_);
-v___x_2675_ = lean_array_push(v___x_2674_, v___x_2671_);
-v___x_2676_ = lean_array_push(v___x_2675_, v_value_2667_);
-v___x_2677_ = lean_array_push(v___x_2676_, v___x_2672_);
-v___x_2678_ = l_Lasm_JS_Web_Support_args(v___x_2677_);
-v___x_2679_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_2665_, v___x_2670_, v___x_2678_);
-return v___x_2679_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_put___boxed(lean_object* v_self_2680_, lean_object* v_key_2681_, lean_object* v_value_2682_, lean_object* v_options_2683_, lean_object* v_a_2684_){
-_start:
-{
-lean_object* v_res_2685_; 
-v_res_2685_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_put(v_self_2680_, v_key_2681_, v_value_2682_, v_options_2683_);
-lean_dec(v_options_2683_);
-return v_res_2685_;
-}
-}
-LEAN_EXPORT lean_object* l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries_spec__0(size_t v_sz_2686_, size_t v_i_2687_, lean_object* v_bs_2688_){
-_start:
-{
-uint8_t v___x_2689_; 
-v___x_2689_ = lean_usize_dec_lt(v_i_2687_, v_sz_2686_);
-if (v___x_2689_ == 0)
-{
-return v_bs_2688_;
+lean_ctor_set_tag(v___x_2563_, 0);
+lean_ctor_set(v___x_2563_, 0, v_a_2570_);
+v___x_2572_ = v___x_2563_;
+goto v_reusejp_2571_;
 }
 else
 {
-lean_object* v_v_2690_; lean_object* v___x_2691_; lean_object* v_bs_x27_2692_; size_t v___x_2693_; size_t v___x_2694_; lean_object* v___x_2695_; 
-v_v_2690_ = lean_array_uget(v_bs_2688_, v_i_2687_);
-v___x_2691_ = lean_unsigned_to_nat(0u);
-v_bs_x27_2692_ = lean_array_uset(v_bs_2688_, v_i_2687_, v___x_2691_);
-v___x_2693_ = ((size_t)1ULL);
-v___x_2694_ = lean_usize_add(v_i_2687_, v___x_2693_);
-v___x_2695_ = lean_array_uset(v_bs_x27_2692_, v_i_2687_, v_v_2690_);
-v_i_2687_ = v___x_2694_;
-v_bs_2688_ = v___x_2695_;
+lean_object* v_reuseFailAlloc_2573_; 
+v_reuseFailAlloc_2573_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2573_, 0, v_a_2570_);
+v___x_2572_ = v_reuseFailAlloc_2573_;
+goto v_reusejp_2571_;
+}
+v_reusejp_2571_:
+{
+v_val_2550_ = v___x_2572_;
+goto v___jp_2549_;
+}
+}
+}
+}
+v___jp_2549_:
+{
+lean_object* v___x_2551_; 
+v___x_2551_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2551_, 0, v_val_2550_);
+return v___x_2551_;
+}
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___lam__0___boxed(lean_object* v_x_2575_, lean_object* v___y_2576_){
+_start:
+{
+lean_object* v_res_2577_; 
+v_res_2577_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___lam__0(v_x_2575_);
+return v_res_2577_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys(lean_object* v_self_2579_, lean_object* v_keys_2580_, lean_object* v_options_2581_){
+_start:
+{
+lean_object* v___f_2583_; lean_object* v___x_2584_; size_t v_sz_2585_; size_t v___x_2586_; lean_object* v___x_2587_; lean_object* v___x_2588_; lean_object* v___x_2589_; lean_object* v___x_2590_; lean_object* v___x_2591_; lean_object* v___x_2592_; lean_object* v___x_2593_; lean_object* v___x_2594_; lean_object* v___x_2595_; uint8_t v___x_2596_; lean_object* v___x_2597_; lean_object* v___x_2598_; 
+v___f_2583_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___closed__0));
+v___x_2584_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_get___closed__0));
+v_sz_2585_ = lean_array_size(v_keys_2580_);
+v___x_2586_ = ((size_t)0ULL);
+v___x_2587_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_URLSearchParams_new_spec__0_spec__0(v_sz_2585_, v___x_2586_, v_keys_2580_);
+v___x_2588_ = lean_alloc_ctor(7, 1, 0);
+lean_ctor_set(v___x_2588_, 0, v___x_2587_);
+v___x_2589_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_get_spec__0(v_options_2581_);
+v___x_2590_ = lean_unsigned_to_nat(2u);
+v___x_2591_ = lean_mk_empty_array_with_capacity(v___x_2590_);
+v___x_2592_ = lean_array_push(v___x_2591_, v___x_2588_);
+v___x_2593_ = lean_array_push(v___x_2592_, v___x_2589_);
+v___x_2594_ = l_Lasm_JS_Web_Support_args(v___x_2593_);
+v___x_2595_ = lean_unsigned_to_nat(0u);
+v___x_2596_ = 0;
+v___x_2597_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0(v_self_2579_, v___x_2584_, v___x_2594_);
+v___x_2598_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2595_, v___x_2596_, v___x_2597_, v___f_2583_);
+return v___x_2598_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___boxed(lean_object* v_self_2599_, lean_object* v_keys_2600_, lean_object* v_options_2601_, lean_object* v_a_2602_){
+_start:
+{
+lean_object* v_res_2603_; 
+v_res_2603_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys(v_self_2599_, v_keys_2600_, v_options_2601_);
+return v_res_2603_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_list_spec__0(lean_object* v_x_2604_){
+_start:
+{
+if (lean_obj_tag(v_x_2604_) == 0)
+{
+lean_object* v___x_2605_; 
+v___x_2605_ = lean_box(0);
+return v___x_2605_;
+}
+else
+{
+lean_object* v_val_2606_; lean_object* v_start_2607_; lean_object* v_startAfter_2608_; lean_object* v_end_2609_; lean_object* v_prefix_2610_; lean_object* v_reverse_2611_; lean_object* v_limit_2612_; lean_object* v_allowConcurrency_2613_; lean_object* v_noCache_2614_; lean_object* v___x_2615_; lean_object* v___x_2616_; lean_object* v___x_2617_; lean_object* v___x_2618_; lean_object* v___x_2619_; lean_object* v___x_2620_; lean_object* v___x_2621_; lean_object* v___x_2622_; lean_object* v___x_2623_; lean_object* v___x_2624_; lean_object* v___x_2625_; lean_object* v___x_2626_; lean_object* v___x_2627_; lean_object* v___x_2628_; lean_object* v___x_2629_; lean_object* v___x_2630_; lean_object* v___x_2631_; lean_object* v___x_2632_; lean_object* v___x_2633_; lean_object* v___x_2634_; lean_object* v___x_2635_; lean_object* v___x_2636_; lean_object* v___x_2637_; lean_object* v___x_2638_; lean_object* v___x_2639_; lean_object* v___x_2640_; lean_object* v___x_2641_; lean_object* v___x_2642_; lean_object* v___x_2643_; lean_object* v___x_2644_; lean_object* v___x_2645_; lean_object* v___x_2646_; lean_object* v___x_2647_; lean_object* v___x_2648_; lean_object* v___x_2649_; 
+v_val_2606_ = lean_ctor_get(v_x_2604_, 0);
+lean_inc(v_val_2606_);
+lean_dec_ref_known(v_x_2604_, 1);
+v_start_2607_ = lean_ctor_get(v_val_2606_, 0);
+lean_inc(v_start_2607_);
+v_startAfter_2608_ = lean_ctor_get(v_val_2606_, 1);
+lean_inc(v_startAfter_2608_);
+v_end_2609_ = lean_ctor_get(v_val_2606_, 2);
+lean_inc(v_end_2609_);
+v_prefix_2610_ = lean_ctor_get(v_val_2606_, 3);
+lean_inc(v_prefix_2610_);
+v_reverse_2611_ = lean_ctor_get(v_val_2606_, 4);
+lean_inc(v_reverse_2611_);
+v_limit_2612_ = lean_ctor_get(v_val_2606_, 5);
+lean_inc(v_limit_2612_);
+v_allowConcurrency_2613_ = lean_ctor_get(v_val_2606_, 6);
+lean_inc(v_allowConcurrency_2613_);
+v_noCache_2614_ = lean_ctor_get(v_val_2606_, 7);
+lean_inc(v_noCache_2614_);
+lean_dec(v_val_2606_);
+v___x_2615_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__0));
+v___x_2616_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(v_start_2607_);
+v___x_2617_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2617_, 0, v___x_2615_);
+lean_ctor_set(v___x_2617_, 1, v___x_2616_);
+v___x_2618_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__1));
+v___x_2619_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(v_startAfter_2608_);
+v___x_2620_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2620_, 0, v___x_2618_);
+lean_ctor_set(v___x_2620_, 1, v___x_2619_);
+v___x_2621_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__2));
+v___x_2622_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(v_end_2609_);
+v___x_2623_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2623_, 0, v___x_2621_);
+lean_ctor_set(v___x_2623_, 1, v___x_2622_);
+v___x_2624_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__3));
+v___x_2625_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_DOMException_new_spec__0(v_prefix_2610_);
+v___x_2626_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2626_, 0, v___x_2624_);
+lean_ctor_set(v___x_2626_, 1, v___x_2625_);
+v___x_2627_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__4));
+v___x_2628_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_reverse_2611_);
+lean_dec(v_reverse_2611_);
+v___x_2629_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2629_, 0, v___x_2627_);
+lean_ctor_set(v___x_2629_, 1, v___x_2628_);
+v___x_2630_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectListOptions___lam__0___closed__5));
+v___x_2631_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_ReadableStreamBYOBReader_read_spec__0_spec__0(v_limit_2612_);
+v___x_2632_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2632_, 0, v___x_2630_);
+lean_ctor_set(v___x_2632_, 1, v___x_2631_);
+v___x_2633_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
+v___x_2634_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_allowConcurrency_2613_);
+lean_dec(v_allowConcurrency_2613_);
+v___x_2635_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2635_, 0, v___x_2633_);
+lean_ctor_set(v___x_2635_, 1, v___x_2634_);
+v___x_2636_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__1));
+v___x_2637_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_noCache_2614_);
+lean_dec(v_noCache_2614_);
+v___x_2638_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2638_, 0, v___x_2636_);
+lean_ctor_set(v___x_2638_, 1, v___x_2637_);
+v___x_2639_ = lean_unsigned_to_nat(8u);
+v___x_2640_ = lean_mk_empty_array_with_capacity(v___x_2639_);
+v___x_2641_ = lean_array_push(v___x_2640_, v___x_2617_);
+v___x_2642_ = lean_array_push(v___x_2641_, v___x_2620_);
+v___x_2643_ = lean_array_push(v___x_2642_, v___x_2623_);
+v___x_2644_ = lean_array_push(v___x_2643_, v___x_2626_);
+v___x_2645_ = lean_array_push(v___x_2644_, v___x_2629_);
+v___x_2646_ = lean_array_push(v___x_2645_, v___x_2632_);
+v___x_2647_ = lean_array_push(v___x_2646_, v___x_2635_);
+v___x_2648_ = lean_array_push(v___x_2647_, v___x_2638_);
+v___x_2649_ = l_Lasm_JS_Web_Support_fields(v___x_2648_);
+lean_dec_ref(v___x_2648_);
+return v___x_2649_;
+}
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_list(lean_object* v_self_2651_, lean_object* v_options_2652_){
+_start:
+{
+lean_object* v___f_2654_; lean_object* v___x_2655_; lean_object* v___x_2656_; lean_object* v___x_2657_; lean_object* v___x_2658_; lean_object* v___x_2659_; lean_object* v___x_2660_; lean_object* v___x_2661_; uint8_t v___x_2662_; lean_object* v___x_2663_; lean_object* v___x_2664_; 
+v___f_2654_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___closed__0));
+v___x_2655_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_list___closed__0));
+v___x_2656_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_list_spec__0(v_options_2652_);
+v___x_2657_ = lean_unsigned_to_nat(1u);
+v___x_2658_ = lean_mk_empty_array_with_capacity(v___x_2657_);
+v___x_2659_ = lean_array_push(v___x_2658_, v___x_2656_);
+v___x_2660_ = l_Lasm_JS_Web_Support_args(v___x_2659_);
+v___x_2661_ = lean_unsigned_to_nat(0u);
+v___x_2662_ = 0;
+v___x_2663_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0(v_self_2651_, v___x_2655_, v___x_2660_);
+v___x_2664_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2661_, v___x_2662_, v___x_2663_, v___f_2654_);
+return v___x_2664_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_list___boxed(lean_object* v_self_2665_, lean_object* v_options_2666_, lean_object* v_a_2667_){
+_start:
+{
+lean_object* v_res_2668_; 
+v_res_2668_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_list(v_self_2665_, v_options_2666_);
+return v_res_2668_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(lean_object* v_x_2669_){
+_start:
+{
+if (lean_obj_tag(v_x_2669_) == 0)
+{
+lean_object* v___x_2670_; 
+v___x_2670_ = lean_box(0);
+return v___x_2670_;
+}
+else
+{
+lean_object* v_val_2671_; lean_object* v_allowConcurrency_2672_; lean_object* v_allowUnconfirmed_2673_; lean_object* v_noCache_2674_; lean_object* v___x_2675_; lean_object* v___x_2676_; lean_object* v___x_2677_; lean_object* v___x_2678_; lean_object* v___x_2679_; lean_object* v___x_2680_; lean_object* v___x_2681_; lean_object* v___x_2682_; lean_object* v___x_2683_; lean_object* v___x_2684_; lean_object* v___x_2685_; lean_object* v___x_2686_; lean_object* v___x_2687_; lean_object* v___x_2688_; lean_object* v___x_2689_; 
+v_val_2671_ = lean_ctor_get(v_x_2669_, 0);
+v_allowConcurrency_2672_ = lean_ctor_get(v_val_2671_, 0);
+v_allowUnconfirmed_2673_ = lean_ctor_get(v_val_2671_, 1);
+v_noCache_2674_ = lean_ctor_get(v_val_2671_, 2);
+v___x_2675_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
+v___x_2676_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_allowConcurrency_2672_);
+v___x_2677_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2677_, 0, v___x_2675_);
+lean_ctor_set(v___x_2677_, 1, v___x_2676_);
+v___x_2678_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectPutOptions___lam__0___closed__0));
+v___x_2679_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_allowUnconfirmed_2673_);
+v___x_2680_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2680_, 0, v___x_2678_);
+lean_ctor_set(v___x_2680_, 1, v___x_2679_);
+v___x_2681_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__1));
+v___x_2682_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_noCache_2674_);
+v___x_2683_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_2683_, 0, v___x_2681_);
+lean_ctor_set(v___x_2683_, 1, v___x_2682_);
+v___x_2684_ = lean_unsigned_to_nat(3u);
+v___x_2685_ = lean_mk_empty_array_with_capacity(v___x_2684_);
+v___x_2686_ = lean_array_push(v___x_2685_, v___x_2677_);
+v___x_2687_ = lean_array_push(v___x_2686_, v___x_2680_);
+v___x_2688_ = lean_array_push(v___x_2687_, v___x_2683_);
+v___x_2689_ = l_Lasm_JS_Web_Support_fields(v___x_2688_);
+lean_dec_ref(v___x_2688_);
+return v___x_2689_;
+}
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0___boxed(lean_object* v_x_2690_){
+_start:
+{
+lean_object* v_res_2691_; 
+v_res_2691_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_x_2690_);
+lean_dec(v_x_2690_);
+return v_res_2691_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_put(lean_object* v_self_2693_, lean_object* v_key_2694_, lean_object* v_value_2695_, lean_object* v_options_2696_){
+_start:
+{
+lean_object* v___x_2698_; lean_object* v___x_2699_; lean_object* v___x_2700_; lean_object* v___x_2701_; lean_object* v___x_2702_; lean_object* v___x_2703_; lean_object* v___x_2704_; lean_object* v___x_2705_; lean_object* v___x_2706_; lean_object* v___x_2707_; 
+v___x_2698_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_put___closed__0));
+v___x_2699_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v___x_2699_, 0, v_key_2694_);
+v___x_2700_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_2696_);
+v___x_2701_ = lean_unsigned_to_nat(3u);
+v___x_2702_ = lean_mk_empty_array_with_capacity(v___x_2701_);
+v___x_2703_ = lean_array_push(v___x_2702_, v___x_2699_);
+v___x_2704_ = lean_array_push(v___x_2703_, v_value_2695_);
+v___x_2705_ = lean_array_push(v___x_2704_, v___x_2700_);
+v___x_2706_ = l_Lasm_JS_Web_Support_args(v___x_2705_);
+v___x_2707_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_2693_, v___x_2698_, v___x_2706_);
+return v___x_2707_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_put___boxed(lean_object* v_self_2708_, lean_object* v_key_2709_, lean_object* v_value_2710_, lean_object* v_options_2711_, lean_object* v_a_2712_){
+_start:
+{
+lean_object* v_res_2713_; 
+v_res_2713_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_put(v_self_2708_, v_key_2709_, v_value_2710_, v_options_2711_);
+lean_dec(v_options_2711_);
+return v_res_2713_;
+}
+}
+LEAN_EXPORT lean_object* l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries_spec__0(size_t v_sz_2714_, size_t v_i_2715_, lean_object* v_bs_2716_){
+_start:
+{
+uint8_t v___x_2717_; 
+v___x_2717_ = lean_usize_dec_lt(v_i_2715_, v_sz_2714_);
+if (v___x_2717_ == 0)
+{
+return v_bs_2716_;
+}
+else
+{
+lean_object* v_v_2718_; lean_object* v___x_2719_; lean_object* v_bs_x27_2720_; size_t v___x_2721_; size_t v___x_2722_; lean_object* v___x_2723_; 
+v_v_2718_ = lean_array_uget(v_bs_2716_, v_i_2715_);
+v___x_2719_ = lean_unsigned_to_nat(0u);
+v_bs_x27_2720_ = lean_array_uset(v_bs_2716_, v_i_2715_, v___x_2719_);
+v___x_2721_ = ((size_t)1ULL);
+v___x_2722_ = lean_usize_add(v_i_2715_, v___x_2721_);
+v___x_2723_ = lean_array_uset(v_bs_x27_2720_, v_i_2715_, v_v_2718_);
+v_i_2715_ = v___x_2722_;
+v_bs_2716_ = v___x_2723_;
 goto _start;
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries_spec__0___boxed(lean_object* v_sz_2697_, lean_object* v_i_2698_, lean_object* v_bs_2699_){
+LEAN_EXPORT lean_object* l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries_spec__0___boxed(lean_object* v_sz_2725_, lean_object* v_i_2726_, lean_object* v_bs_2727_){
 _start:
 {
-size_t v_sz_boxed_2700_; size_t v_i_boxed_2701_; lean_object* v_res_2702_; 
-v_sz_boxed_2700_ = lean_unbox_usize(v_sz_2697_);
-lean_dec(v_sz_2697_);
-v_i_boxed_2701_ = lean_unbox_usize(v_i_2698_);
-lean_dec(v_i_2698_);
-v_res_2702_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries_spec__0(v_sz_boxed_2700_, v_i_boxed_2701_, v_bs_2699_);
-return v_res_2702_;
+size_t v_sz_boxed_2728_; size_t v_i_boxed_2729_; lean_object* v_res_2730_; 
+v_sz_boxed_2728_ = lean_unbox_usize(v_sz_2725_);
+lean_dec(v_sz_2725_);
+v_i_boxed_2729_ = lean_unbox_usize(v_i_2726_);
+lean_dec(v_i_2726_);
+v_res_2730_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries_spec__0(v_sz_boxed_2728_, v_i_boxed_2729_, v_bs_2727_);
+return v_res_2730_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries(lean_object* v_self_2703_, lean_object* v_entries_2704_, lean_object* v_options_2705_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries(lean_object* v_self_2731_, lean_object* v_entries_2732_, lean_object* v_options_2733_){
 _start:
 {
-lean_object* v___x_2707_; size_t v_sz_2708_; size_t v___x_2709_; lean_object* v___x_2710_; lean_object* v___x_2711_; lean_object* v___x_2712_; lean_object* v___x_2713_; lean_object* v___x_2714_; lean_object* v___x_2715_; lean_object* v___x_2716_; lean_object* v___x_2717_; lean_object* v___x_2718_; 
-v___x_2707_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_put___closed__0));
-v_sz_2708_ = lean_array_size(v_entries_2704_);
-v___x_2709_ = ((size_t)0ULL);
-v___x_2710_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries_spec__0(v_sz_2708_, v___x_2709_, v_entries_2704_);
-v___x_2711_ = lean_alloc_ctor(8, 1, 0);
-lean_ctor_set(v___x_2711_, 0, v___x_2710_);
-v___x_2712_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_2705_);
-v___x_2713_ = lean_unsigned_to_nat(2u);
-v___x_2714_ = lean_mk_empty_array_with_capacity(v___x_2713_);
-v___x_2715_ = lean_array_push(v___x_2714_, v___x_2711_);
-v___x_2716_ = lean_array_push(v___x_2715_, v___x_2712_);
-v___x_2717_ = l_Lasm_JS_Web_Support_args(v___x_2716_);
-v___x_2718_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_2703_, v___x_2707_, v___x_2717_);
-return v___x_2718_;
+lean_object* v___x_2735_; size_t v_sz_2736_; size_t v___x_2737_; lean_object* v___x_2738_; lean_object* v___x_2739_; lean_object* v___x_2740_; lean_object* v___x_2741_; lean_object* v___x_2742_; lean_object* v___x_2743_; lean_object* v___x_2744_; lean_object* v___x_2745_; lean_object* v___x_2746_; 
+v___x_2735_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_put___closed__0));
+v_sz_2736_ = lean_array_size(v_entries_2732_);
+v___x_2737_ = ((size_t)0ULL);
+v___x_2738_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries_spec__0(v_sz_2736_, v___x_2737_, v_entries_2732_);
+v___x_2739_ = lean_alloc_ctor(8, 1, 0);
+lean_ctor_set(v___x_2739_, 0, v___x_2738_);
+v___x_2740_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_2733_);
+v___x_2741_ = lean_unsigned_to_nat(2u);
+v___x_2742_ = lean_mk_empty_array_with_capacity(v___x_2741_);
+v___x_2743_ = lean_array_push(v___x_2742_, v___x_2739_);
+v___x_2744_ = lean_array_push(v___x_2743_, v___x_2740_);
+v___x_2745_ = l_Lasm_JS_Web_Support_args(v___x_2744_);
+v___x_2746_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_2731_, v___x_2735_, v___x_2745_);
+return v___x_2746_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries___boxed(lean_object* v_self_2719_, lean_object* v_entries_2720_, lean_object* v_options_2721_, lean_object* v_a_2722_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries___boxed(lean_object* v_self_2747_, lean_object* v_entries_2748_, lean_object* v_options_2749_, lean_object* v_a_2750_){
 _start:
 {
-lean_object* v_res_2723_; 
-v_res_2723_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries(v_self_2719_, v_entries_2720_, v_options_2721_);
-lean_dec(v_options_2721_);
-return v_res_2723_;
+lean_object* v_res_2751_; 
+v_res_2751_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries(v_self_2747_, v_entries_2748_, v_options_2749_);
+lean_dec(v_options_2749_);
+return v_res_2751_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_delete(lean_object* v_self_2725_, lean_object* v_key_2726_, lean_object* v_options_2727_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_delete(lean_object* v_self_2753_, lean_object* v_key_2754_, lean_object* v_options_2755_){
 _start:
 {
-lean_object* v___x_2729_; lean_object* v___x_2730_; lean_object* v___x_2731_; lean_object* v___x_2732_; lean_object* v___x_2733_; lean_object* v___x_2734_; lean_object* v___x_2735_; lean_object* v___x_2736_; lean_object* v___x_2737_; 
-v___x_2729_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_delete___closed__0));
-v___x_2730_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_2730_, 0, v_key_2726_);
-v___x_2731_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_2727_);
-v___x_2732_ = lean_unsigned_to_nat(2u);
-v___x_2733_ = lean_mk_empty_array_with_capacity(v___x_2732_);
-v___x_2734_ = lean_array_push(v___x_2733_, v___x_2730_);
-v___x_2735_ = lean_array_push(v___x_2734_, v___x_2731_);
-v___x_2736_ = l_Lasm_JS_Web_Support_args(v___x_2735_);
-v___x_2737_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_Cache_delete_spec__1(v_self_2725_, v___x_2729_, v___x_2736_);
-return v___x_2737_;
+lean_object* v___x_2757_; lean_object* v___x_2758_; lean_object* v___x_2759_; lean_object* v___x_2760_; lean_object* v___x_2761_; lean_object* v___x_2762_; lean_object* v___x_2763_; lean_object* v___x_2764_; lean_object* v___x_2765_; 
+v___x_2757_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_delete___closed__0));
+v___x_2758_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v___x_2758_, 0, v_key_2754_);
+v___x_2759_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_2755_);
+v___x_2760_ = lean_unsigned_to_nat(2u);
+v___x_2761_ = lean_mk_empty_array_with_capacity(v___x_2760_);
+v___x_2762_ = lean_array_push(v___x_2761_, v___x_2758_);
+v___x_2763_ = lean_array_push(v___x_2762_, v___x_2759_);
+v___x_2764_ = l_Lasm_JS_Web_Support_args(v___x_2763_);
+v___x_2765_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_Cache_delete_spec__1(v_self_2753_, v___x_2757_, v___x_2764_);
+return v___x_2765_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_delete___boxed(lean_object* v_self_2738_, lean_object* v_key_2739_, lean_object* v_options_2740_, lean_object* v_a_2741_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_delete___boxed(lean_object* v_self_2766_, lean_object* v_key_2767_, lean_object* v_options_2768_, lean_object* v_a_2769_){
 _start:
 {
-lean_object* v_res_2742_; 
-v_res_2742_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_delete(v_self_2738_, v_key_2739_, v_options_2740_);
-lean_dec(v_options_2740_);
-return v_res_2742_;
+lean_object* v_res_2770_; 
+v_res_2770_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_delete(v_self_2766_, v_key_2767_, v_options_2768_);
+lean_dec(v_options_2768_);
+return v_res_2770_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__2(lean_object* v___f_2743_, lean_object* v_x_2744_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__2(lean_object* v___f_2771_, lean_object* v_x_2772_){
 _start:
 {
-if (lean_obj_tag(v_x_2744_) == 0)
+if (lean_obj_tag(v_x_2772_) == 0)
 {
-lean_object* v_a_2746_; lean_object* v___x_2748_; uint8_t v_isShared_2749_; uint8_t v_isSharedCheck_2754_; 
-lean_dec_ref(v___f_2743_);
-v_a_2746_ = lean_ctor_get(v_x_2744_, 0);
-v_isSharedCheck_2754_ = !lean_is_exclusive(v_x_2744_);
-if (v_isSharedCheck_2754_ == 0)
+lean_object* v_a_2774_; lean_object* v___x_2776_; uint8_t v_isShared_2777_; uint8_t v_isSharedCheck_2782_; 
+lean_dec_ref(v___f_2771_);
+v_a_2774_ = lean_ctor_get(v_x_2772_, 0);
+v_isSharedCheck_2782_ = !lean_is_exclusive(v_x_2772_);
+if (v_isSharedCheck_2782_ == 0)
 {
-v___x_2748_ = v_x_2744_;
-v_isShared_2749_ = v_isSharedCheck_2754_;
-goto v_resetjp_2747_;
+v___x_2776_ = v_x_2772_;
+v_isShared_2777_ = v_isSharedCheck_2782_;
+goto v_resetjp_2775_;
 }
 else
 {
-lean_inc(v_a_2746_);
-lean_dec(v_x_2744_);
-v___x_2748_ = lean_box(0);
-v_isShared_2749_ = v_isSharedCheck_2754_;
-goto v_resetjp_2747_;
+lean_inc(v_a_2774_);
+lean_dec(v_x_2772_);
+v___x_2776_ = lean_box(0);
+v_isShared_2777_ = v_isSharedCheck_2782_;
+goto v_resetjp_2775_;
 }
-v_resetjp_2747_:
+v_resetjp_2775_:
 {
-lean_object* v___x_2751_; 
-if (v_isShared_2749_ == 0)
+lean_object* v___x_2779_; 
+if (v_isShared_2777_ == 0)
 {
-v___x_2751_ = v___x_2748_;
-goto v_reusejp_2750_;
+v___x_2779_ = v___x_2776_;
+goto v_reusejp_2778_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2753_; 
-v_reuseFailAlloc_2753_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2753_, 0, v_a_2746_);
-v___x_2751_ = v_reuseFailAlloc_2753_;
-goto v_reusejp_2750_;
+lean_object* v_reuseFailAlloc_2781_; 
+v_reuseFailAlloc_2781_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2781_, 0, v_a_2774_);
+v___x_2779_ = v_reuseFailAlloc_2781_;
+goto v_reusejp_2778_;
 }
-v_reusejp_2750_:
+v_reusejp_2778_:
 {
-lean_object* v___x_2752_; 
-v___x_2752_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2752_, 0, v___x_2751_);
-return v___x_2752_;
+lean_object* v___x_2780_; 
+v___x_2780_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2780_, 0, v___x_2779_);
+return v___x_2780_;
 }
 }
 }
 else
 {
-lean_object* v_a_2755_; lean_object* v___x_2756_; 
-v_a_2755_ = lean_ctor_get(v_x_2744_, 0);
-lean_inc(v_a_2755_);
-lean_dec_ref_known(v_x_2744_, 1);
-v___x_2756_ = lean_apply_2(v___f_2743_, v_a_2755_, lean_box(0));
-return v___x_2756_;
+lean_object* v_a_2783_; lean_object* v___x_2784_; 
+v_a_2783_ = lean_ctor_get(v_x_2772_, 0);
+lean_inc(v_a_2783_);
+lean_dec_ref_known(v_x_2772_, 1);
+v___x_2784_ = lean_apply_2(v___f_2771_, v_a_2783_, lean_box(0));
+return v___x_2784_;
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__2___boxed(lean_object* v___f_2757_, lean_object* v_x_2758_, lean_object* v___y_2759_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__2___boxed(lean_object* v___f_2785_, lean_object* v_x_2786_, lean_object* v___y_2787_){
 _start:
 {
-lean_object* v_res_2760_; 
-v_res_2760_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__2(v___f_2757_, v_x_2758_);
-return v_res_2760_;
+lean_object* v_res_2788_; 
+v_res_2788_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__2(v___f_2785_, v_x_2786_);
+return v_res_2788_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3(lean_object* v_a_2761_, lean_object* v_x_2762_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3(lean_object* v_a_2789_, lean_object* v_x_2790_){
 _start:
 {
-if (lean_obj_tag(v_x_2762_) == 0)
+if (lean_obj_tag(v_x_2790_) == 0)
 {
-lean_object* v_a_2764_; lean_object* v___x_2766_; uint8_t v_isShared_2767_; uint8_t v_isSharedCheck_2772_; 
-v_a_2764_ = lean_ctor_get(v_x_2762_, 0);
-v_isSharedCheck_2772_ = !lean_is_exclusive(v_x_2762_);
-if (v_isSharedCheck_2772_ == 0)
+lean_object* v_a_2792_; lean_object* v___x_2794_; uint8_t v_isShared_2795_; uint8_t v_isSharedCheck_2800_; 
+v_a_2792_ = lean_ctor_get(v_x_2790_, 0);
+v_isSharedCheck_2800_ = !lean_is_exclusive(v_x_2790_);
+if (v_isSharedCheck_2800_ == 0)
 {
-v___x_2766_ = v_x_2762_;
-v_isShared_2767_ = v_isSharedCheck_2772_;
-goto v_resetjp_2765_;
+v___x_2794_ = v_x_2790_;
+v_isShared_2795_ = v_isSharedCheck_2800_;
+goto v_resetjp_2793_;
 }
 else
 {
-lean_inc(v_a_2764_);
-lean_dec(v_x_2762_);
-v___x_2766_ = lean_box(0);
-v_isShared_2767_ = v_isSharedCheck_2772_;
-goto v_resetjp_2765_;
+lean_inc(v_a_2792_);
+lean_dec(v_x_2790_);
+v___x_2794_ = lean_box(0);
+v_isShared_2795_ = v_isSharedCheck_2800_;
+goto v_resetjp_2793_;
 }
-v_resetjp_2765_:
+v_resetjp_2793_:
 {
-lean_object* v___x_2769_; 
-if (v_isShared_2767_ == 0)
+lean_object* v___x_2797_; 
+if (v_isShared_2795_ == 0)
 {
-v___x_2769_ = v___x_2766_;
-goto v_reusejp_2768_;
+v___x_2797_ = v___x_2794_;
+goto v_reusejp_2796_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2771_; 
-v_reuseFailAlloc_2771_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2771_, 0, v_a_2764_);
-v___x_2769_ = v_reuseFailAlloc_2771_;
-goto v_reusejp_2768_;
+lean_object* v_reuseFailAlloc_2799_; 
+v_reuseFailAlloc_2799_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2799_, 0, v_a_2792_);
+v___x_2797_ = v_reuseFailAlloc_2799_;
+goto v_reusejp_2796_;
 }
-v_reusejp_2768_:
+v_reusejp_2796_:
 {
-lean_object* v___x_2770_; 
-v___x_2770_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2770_, 0, v___x_2769_);
-return v___x_2770_;
+lean_object* v___x_2798_; 
+v___x_2798_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2798_, 0, v___x_2797_);
+return v___x_2798_;
 }
 }
 }
 else
 {
-lean_object* v___x_2773_; 
-lean_dec_ref_known(v_x_2762_, 1);
-v___x_2773_ = l___private_Lasm_JS_Core_0__Lasm_JS_awaitBytes(v_a_2761_);
-return v___x_2773_;
+lean_object* v___x_2801_; 
+lean_dec_ref_known(v_x_2790_, 1);
+v___x_2801_ = l___private_Lasm_JS_Core_0__Lasm_JS_awaitBytes(v_a_2789_);
+return v___x_2801_;
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3___boxed(lean_object* v_a_2774_, lean_object* v_x_2775_, lean_object* v___y_2776_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3___boxed(lean_object* v_a_2802_, lean_object* v_x_2803_, lean_object* v___y_2804_){
 _start:
 {
-lean_object* v_res_2777_; 
-v_res_2777_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3(v_a_2774_, v_x_2775_);
-lean_dec(v_a_2774_);
-return v_res_2777_;
+lean_object* v_res_2805_; 
+v_res_2805_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3(v_a_2802_, v_x_2803_);
+lean_dec(v_a_2802_);
+return v_res_2805_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__7(lean_object* v___f_2778_, lean_object* v_a_2779_, uint32_t v_op_2780_, uint64_t v_flags_2781_, lean_object* v_payload_2782_, lean_object* v_x_2783_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__7(lean_object* v___f_2806_, lean_object* v_a_2807_, uint32_t v_op_2808_, uint64_t v_flags_2809_, lean_object* v_payload_2810_, lean_object* v_x_2811_){
 _start:
 {
-if (lean_obj_tag(v_x_2783_) == 0)
+if (lean_obj_tag(v_x_2811_) == 0)
 {
-lean_object* v___x_2785_; 
-lean_dec_ref(v___f_2778_);
-v___x_2785_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2785_, 0, v_x_2783_);
-return v___x_2785_;
+lean_object* v___x_2813_; 
+lean_dec_ref(v___f_2806_);
+v___x_2813_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2813_, 0, v_x_2811_);
+return v___x_2813_;
 }
 else
 {
-lean_object* v_a_2786_; lean_object* v___x_2788_; uint8_t v_isShared_2789_; uint8_t v_isSharedCheck_2806_; 
-v_a_2786_ = lean_ctor_get(v_x_2783_, 0);
-v_isSharedCheck_2806_ = !lean_is_exclusive(v_x_2783_);
-if (v_isSharedCheck_2806_ == 0)
+lean_object* v_a_2814_; lean_object* v___x_2816_; uint8_t v_isShared_2817_; uint8_t v_isSharedCheck_2834_; 
+v_a_2814_ = lean_ctor_get(v_x_2811_, 0);
+v_isSharedCheck_2834_ = !lean_is_exclusive(v_x_2811_);
+if (v_isSharedCheck_2834_ == 0)
 {
-v___x_2788_ = v_x_2783_;
-v_isShared_2789_ = v_isSharedCheck_2806_;
-goto v_resetjp_2787_;
+v___x_2816_ = v_x_2811_;
+v_isShared_2817_ = v_isSharedCheck_2834_;
+goto v_resetjp_2815_;
 }
 else
 {
-lean_inc(v_a_2786_);
-lean_dec(v_x_2783_);
-v___x_2788_ = lean_box(0);
-v_isShared_2789_ = v_isSharedCheck_2806_;
-goto v_resetjp_2787_;
+lean_inc(v_a_2814_);
+lean_dec(v_x_2811_);
+v___x_2816_ = lean_box(0);
+v_isShared_2817_ = v_isSharedCheck_2834_;
+goto v_resetjp_2815_;
 }
-v_resetjp_2787_:
+v_resetjp_2815_:
 {
-uint32_t v___x_2790_; lean_object* v___x_2791_; uint8_t v___x_2792_; lean_object* v_val_2794_; lean_object* v___x_2797_; 
-v___x_2790_ = 0;
-v___x_2791_ = lean_unsigned_to_nat(0u);
-v___x_2792_ = 0;
-v___x_2797_ = lasm_js_call_into(v_a_2779_, v_op_2780_, v___x_2790_, v_flags_2781_, v_a_2786_, v_payload_2782_);
-lean_dec(v_a_2786_);
-if (lean_obj_tag(v___x_2797_) == 0)
+uint32_t v___x_2818_; lean_object* v___x_2819_; uint8_t v___x_2820_; lean_object* v_val_2822_; lean_object* v___x_2825_; 
+v___x_2818_ = 0;
+v___x_2819_ = lean_unsigned_to_nat(0u);
+v___x_2820_ = 0;
+v___x_2825_ = lasm_js_call_into(v_a_2807_, v_op_2808_, v___x_2818_, v_flags_2809_, v_a_2814_, v_payload_2810_);
+lean_dec(v_a_2814_);
+if (lean_obj_tag(v___x_2825_) == 0)
 {
-lean_object* v_a_2798_; lean_object* v___x_2800_; 
-v_a_2798_ = lean_ctor_get(v___x_2797_, 0);
-lean_inc(v_a_2798_);
-lean_dec_ref_known(v___x_2797_, 1);
-if (v_isShared_2789_ == 0)
+lean_object* v_a_2826_; lean_object* v___x_2828_; 
+v_a_2826_ = lean_ctor_get(v___x_2825_, 0);
+lean_inc(v_a_2826_);
+lean_dec_ref_known(v___x_2825_, 1);
+if (v_isShared_2817_ == 0)
 {
-lean_ctor_set(v___x_2788_, 0, v_a_2798_);
-v___x_2800_ = v___x_2788_;
-goto v_reusejp_2799_;
+lean_ctor_set(v___x_2816_, 0, v_a_2826_);
+v___x_2828_ = v___x_2816_;
+goto v_reusejp_2827_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2801_; 
-v_reuseFailAlloc_2801_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2801_, 0, v_a_2798_);
-v___x_2800_ = v_reuseFailAlloc_2801_;
-goto v_reusejp_2799_;
+lean_object* v_reuseFailAlloc_2829_; 
+v_reuseFailAlloc_2829_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2829_, 0, v_a_2826_);
+v___x_2828_ = v_reuseFailAlloc_2829_;
+goto v_reusejp_2827_;
 }
-v_reusejp_2799_:
+v_reusejp_2827_:
 {
-v_val_2794_ = v___x_2800_;
-goto v___jp_2793_;
+v_val_2822_ = v___x_2828_;
+goto v___jp_2821_;
 }
 }
 else
 {
-lean_object* v_a_2802_; lean_object* v___x_2804_; 
-v_a_2802_ = lean_ctor_get(v___x_2797_, 0);
-lean_inc(v_a_2802_);
-lean_dec_ref_known(v___x_2797_, 1);
-if (v_isShared_2789_ == 0)
+lean_object* v_a_2830_; lean_object* v___x_2832_; 
+v_a_2830_ = lean_ctor_get(v___x_2825_, 0);
+lean_inc(v_a_2830_);
+lean_dec_ref_known(v___x_2825_, 1);
+if (v_isShared_2817_ == 0)
 {
-lean_ctor_set_tag(v___x_2788_, 0);
-lean_ctor_set(v___x_2788_, 0, v_a_2802_);
-v___x_2804_ = v___x_2788_;
-goto v_reusejp_2803_;
+lean_ctor_set_tag(v___x_2816_, 0);
+lean_ctor_set(v___x_2816_, 0, v_a_2830_);
+v___x_2832_ = v___x_2816_;
+goto v_reusejp_2831_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2805_; 
-v_reuseFailAlloc_2805_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2805_, 0, v_a_2802_);
-v___x_2804_ = v_reuseFailAlloc_2805_;
-goto v_reusejp_2803_;
+lean_object* v_reuseFailAlloc_2833_; 
+v_reuseFailAlloc_2833_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2833_, 0, v_a_2830_);
+v___x_2832_ = v_reuseFailAlloc_2833_;
+goto v_reusejp_2831_;
 }
-v_reusejp_2803_:
+v_reusejp_2831_:
 {
-v_val_2794_ = v___x_2804_;
-goto v___jp_2793_;
+v_val_2822_ = v___x_2832_;
+goto v___jp_2821_;
 }
 }
-v___jp_2793_:
+v___jp_2821_:
 {
-lean_object* v___x_2795_; lean_object* v___x_2796_; 
-v___x_2795_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2795_, 0, v_val_2794_);
-v___x_2796_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2791_, v___x_2792_, v___x_2795_, v___f_2778_);
-return v___x_2796_;
+lean_object* v___x_2823_; lean_object* v___x_2824_; 
+v___x_2823_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2823_, 0, v_val_2822_);
+v___x_2824_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2819_, v___x_2820_, v___x_2823_, v___f_2806_);
+return v___x_2824_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__7___boxed(lean_object* v___f_2807_, lean_object* v_a_2808_, lean_object* v_op_2809_, lean_object* v_flags_2810_, lean_object* v_payload_2811_, lean_object* v_x_2812_, lean_object* v___y_2813_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__7___boxed(lean_object* v___f_2835_, lean_object* v_a_2836_, lean_object* v_op_2837_, lean_object* v_flags_2838_, lean_object* v_payload_2839_, lean_object* v_x_2840_, lean_object* v___y_2841_){
 _start:
 {
-uint32_t v_op_boxed_2814_; uint64_t v_flags_boxed_2815_; lean_object* v_res_2816_; 
-v_op_boxed_2814_ = lean_unbox_uint32(v_op_2809_);
-lean_dec(v_op_2809_);
-v_flags_boxed_2815_ = lean_unbox_uint64(v_flags_2810_);
-lean_dec_ref(v_flags_2810_);
-v_res_2816_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__7(v___f_2807_, v_a_2808_, v_op_boxed_2814_, v_flags_boxed_2815_, v_payload_2811_, v_x_2812_);
-lean_dec(v_payload_2811_);
-lean_dec(v_a_2808_);
-return v_res_2816_;
+uint32_t v_op_boxed_2842_; uint64_t v_flags_boxed_2843_; lean_object* v_res_2844_; 
+v_op_boxed_2842_ = lean_unbox_uint32(v_op_2837_);
+lean_dec(v_op_2837_);
+v_flags_boxed_2843_ = lean_unbox_uint64(v_flags_2838_);
+lean_dec_ref(v_flags_2838_);
+v_res_2844_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__7(v___f_2835_, v_a_2836_, v_op_boxed_2842_, v_flags_boxed_2843_, v_payload_2839_, v_x_2840_);
+lean_dec(v_payload_2839_);
+lean_dec(v_a_2836_);
+return v_res_2844_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__5(lean_object* v___x_2817_, uint8_t v___x_2818_, lean_object* v___f_2819_, lean_object* v_a_2820_, uint32_t v_op_2821_, uint64_t v_flags_2822_, lean_object* v_payload_2823_, lean_object* v_x_2824_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__5(lean_object* v___x_2845_, uint8_t v___x_2846_, lean_object* v___f_2847_, lean_object* v_a_2848_, uint32_t v_op_2849_, uint64_t v_flags_2850_, lean_object* v_payload_2851_, lean_object* v_x_2852_){
 _start:
 {
-lean_object* v_val_2827_; 
-if (lean_obj_tag(v_x_2824_) == 0)
+lean_object* v_val_2855_; 
+if (lean_obj_tag(v_x_2852_) == 0)
 {
-lean_object* v___x_2830_; 
-lean_dec_ref(v___f_2819_);
-lean_dec(v___x_2817_);
-v___x_2830_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2830_, 0, v_x_2824_);
-return v___x_2830_;
+lean_object* v___x_2858_; 
+lean_dec_ref(v___f_2847_);
+lean_dec(v___x_2845_);
+v___x_2858_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2858_, 0, v_x_2852_);
+return v___x_2858_;
 }
 else
 {
-lean_object* v_a_2831_; lean_object* v___x_2833_; uint8_t v_isShared_2834_; uint8_t v_isSharedCheck_2845_; 
-v_a_2831_ = lean_ctor_get(v_x_2824_, 0);
-v_isSharedCheck_2845_ = !lean_is_exclusive(v_x_2824_);
-if (v_isSharedCheck_2845_ == 0)
+lean_object* v_a_2859_; lean_object* v___x_2861_; uint8_t v_isShared_2862_; uint8_t v_isSharedCheck_2873_; 
+v_a_2859_ = lean_ctor_get(v_x_2852_, 0);
+v_isSharedCheck_2873_ = !lean_is_exclusive(v_x_2852_);
+if (v_isSharedCheck_2873_ == 0)
 {
-v___x_2833_ = v_x_2824_;
-v_isShared_2834_ = v_isSharedCheck_2845_;
-goto v_resetjp_2832_;
+v___x_2861_ = v_x_2852_;
+v_isShared_2862_ = v_isSharedCheck_2873_;
+goto v_resetjp_2860_;
 }
 else
 {
-lean_inc(v_a_2831_);
-lean_dec(v_x_2824_);
-v___x_2833_ = lean_box(0);
-v_isShared_2834_ = v_isSharedCheck_2845_;
-goto v_resetjp_2832_;
+lean_inc(v_a_2859_);
+lean_dec(v_x_2852_);
+v___x_2861_ = lean_box(0);
+v_isShared_2862_ = v_isSharedCheck_2873_;
+goto v_resetjp_2860_;
 }
-v_resetjp_2832_:
+v_resetjp_2860_:
 {
-uint32_t v___x_2835_; lean_object* v___x_2836_; 
-v___x_2835_ = 0;
-v___x_2836_ = lasm_js_call_into(v_a_2820_, v_op_2821_, v___x_2835_, v_flags_2822_, v_a_2831_, v_payload_2823_);
-lean_dec(v_a_2831_);
-if (lean_obj_tag(v___x_2836_) == 0)
+uint32_t v___x_2863_; lean_object* v___x_2864_; 
+v___x_2863_ = 0;
+v___x_2864_ = lasm_js_call_into(v_a_2848_, v_op_2849_, v___x_2863_, v_flags_2850_, v_a_2859_, v_payload_2851_);
+lean_dec(v_a_2859_);
+if (lean_obj_tag(v___x_2864_) == 0)
 {
-lean_object* v_a_2837_; lean_object* v___x_2839_; 
-v_a_2837_ = lean_ctor_get(v___x_2836_, 0);
-lean_inc(v_a_2837_);
-lean_dec_ref_known(v___x_2836_, 1);
-if (v_isShared_2834_ == 0)
+lean_object* v_a_2865_; lean_object* v___x_2867_; 
+v_a_2865_ = lean_ctor_get(v___x_2864_, 0);
+lean_inc(v_a_2865_);
+lean_dec_ref_known(v___x_2864_, 1);
+if (v_isShared_2862_ == 0)
 {
-lean_ctor_set(v___x_2833_, 0, v_a_2837_);
-v___x_2839_ = v___x_2833_;
-goto v_reusejp_2838_;
+lean_ctor_set(v___x_2861_, 0, v_a_2865_);
+v___x_2867_ = v___x_2861_;
+goto v_reusejp_2866_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2840_; 
-v_reuseFailAlloc_2840_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2840_, 0, v_a_2837_);
-v___x_2839_ = v_reuseFailAlloc_2840_;
-goto v_reusejp_2838_;
+lean_object* v_reuseFailAlloc_2868_; 
+v_reuseFailAlloc_2868_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2868_, 0, v_a_2865_);
+v___x_2867_ = v_reuseFailAlloc_2868_;
+goto v_reusejp_2866_;
 }
-v_reusejp_2838_:
+v_reusejp_2866_:
 {
-v_val_2827_ = v___x_2839_;
-goto v___jp_2826_;
+v_val_2855_ = v___x_2867_;
+goto v___jp_2854_;
 }
 }
 else
 {
-lean_object* v_a_2841_; lean_object* v___x_2843_; 
-v_a_2841_ = lean_ctor_get(v___x_2836_, 0);
-lean_inc(v_a_2841_);
-lean_dec_ref_known(v___x_2836_, 1);
-if (v_isShared_2834_ == 0)
+lean_object* v_a_2869_; lean_object* v___x_2871_; 
+v_a_2869_ = lean_ctor_get(v___x_2864_, 0);
+lean_inc(v_a_2869_);
+lean_dec_ref_known(v___x_2864_, 1);
+if (v_isShared_2862_ == 0)
 {
-lean_ctor_set_tag(v___x_2833_, 0);
-lean_ctor_set(v___x_2833_, 0, v_a_2841_);
-v___x_2843_ = v___x_2833_;
-goto v_reusejp_2842_;
+lean_ctor_set_tag(v___x_2861_, 0);
+lean_ctor_set(v___x_2861_, 0, v_a_2869_);
+v___x_2871_ = v___x_2861_;
+goto v_reusejp_2870_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2844_; 
-v_reuseFailAlloc_2844_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2844_, 0, v_a_2841_);
-v___x_2843_ = v_reuseFailAlloc_2844_;
-goto v_reusejp_2842_;
+lean_object* v_reuseFailAlloc_2872_; 
+v_reuseFailAlloc_2872_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2872_, 0, v_a_2869_);
+v___x_2871_ = v_reuseFailAlloc_2872_;
+goto v_reusejp_2870_;
 }
-v_reusejp_2842_:
+v_reusejp_2870_:
 {
-v_val_2827_ = v___x_2843_;
-goto v___jp_2826_;
+v_val_2855_ = v___x_2871_;
+goto v___jp_2854_;
 }
 }
 }
 }
-v___jp_2826_:
+v___jp_2854_:
 {
-lean_object* v___x_2828_; lean_object* v___x_2829_; 
-v___x_2828_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2828_, 0, v_val_2827_);
-v___x_2829_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2817_, v___x_2818_, v___x_2828_, v___f_2819_);
-return v___x_2829_;
+lean_object* v___x_2856_; lean_object* v___x_2857_; 
+v___x_2856_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2856_, 0, v_val_2855_);
+v___x_2857_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2845_, v___x_2846_, v___x_2856_, v___f_2847_);
+return v___x_2857_;
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__5___boxed(lean_object* v___x_2846_, lean_object* v___x_2847_, lean_object* v___f_2848_, lean_object* v_a_2849_, lean_object* v_op_2850_, lean_object* v_flags_2851_, lean_object* v_payload_2852_, lean_object* v_x_2853_, lean_object* v___y_2854_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__5___boxed(lean_object* v___x_2874_, lean_object* v___x_2875_, lean_object* v___f_2876_, lean_object* v_a_2877_, lean_object* v_op_2878_, lean_object* v_flags_2879_, lean_object* v_payload_2880_, lean_object* v_x_2881_, lean_object* v___y_2882_){
 _start:
 {
-uint8_t v___x_890__boxed_2855_; uint32_t v_op_boxed_2856_; uint64_t v_flags_boxed_2857_; lean_object* v_res_2858_; 
-v___x_890__boxed_2855_ = lean_unbox(v___x_2847_);
-v_op_boxed_2856_ = lean_unbox_uint32(v_op_2850_);
-lean_dec(v_op_2850_);
-v_flags_boxed_2857_ = lean_unbox_uint64(v_flags_2851_);
-lean_dec_ref(v_flags_2851_);
-v_res_2858_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__5(v___x_2846_, v___x_890__boxed_2855_, v___f_2848_, v_a_2849_, v_op_boxed_2856_, v_flags_boxed_2857_, v_payload_2852_, v_x_2853_);
-lean_dec(v_payload_2852_);
-lean_dec(v_a_2849_);
-return v_res_2858_;
+uint8_t v___x_890__boxed_2883_; uint32_t v_op_boxed_2884_; uint64_t v_flags_boxed_2885_; lean_object* v_res_2886_; 
+v___x_890__boxed_2883_ = lean_unbox(v___x_2875_);
+v_op_boxed_2884_ = lean_unbox_uint32(v_op_2878_);
+lean_dec(v_op_2878_);
+v_flags_boxed_2885_ = lean_unbox_uint64(v_flags_2879_);
+lean_dec_ref(v_flags_2879_);
+v_res_2886_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__5(v___x_2874_, v___x_890__boxed_2883_, v___f_2876_, v_a_2877_, v_op_boxed_2884_, v_flags_boxed_2885_, v_payload_2880_, v_x_2881_);
+lean_dec(v_payload_2880_);
+lean_dec(v_a_2877_);
+return v_res_2886_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__6(lean_object* v_failurePrefix_2859_, uint32_t v_op_2860_, uint64_t v_flags_2861_, lean_object* v_payload_2862_, lean_object* v___f_2863_, lean_object* v___f_2864_, lean_object* v___f_2865_, lean_object* v_x_2866_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__6(lean_object* v_failurePrefix_2887_, uint32_t v_op_2888_, uint64_t v_flags_2889_, lean_object* v_payload_2890_, lean_object* v___f_2891_, lean_object* v___f_2892_, lean_object* v___f_2893_, lean_object* v_x_2894_){
 _start:
 {
-if (lean_obj_tag(v_x_2866_) == 0)
+if (lean_obj_tag(v_x_2894_) == 0)
 {
-lean_object* v_a_2868_; lean_object* v___x_2870_; uint8_t v_isShared_2871_; uint8_t v_isSharedCheck_2876_; 
-lean_dec_ref(v___f_2865_);
-lean_dec_ref(v___f_2864_);
-lean_dec_ref(v___f_2863_);
-lean_dec(v_payload_2862_);
-v_a_2868_ = lean_ctor_get(v_x_2866_, 0);
-v_isSharedCheck_2876_ = !lean_is_exclusive(v_x_2866_);
-if (v_isSharedCheck_2876_ == 0)
+lean_object* v_a_2896_; lean_object* v___x_2898_; uint8_t v_isShared_2899_; uint8_t v_isSharedCheck_2904_; 
+lean_dec_ref(v___f_2893_);
+lean_dec_ref(v___f_2892_);
+lean_dec_ref(v___f_2891_);
+lean_dec(v_payload_2890_);
+v_a_2896_ = lean_ctor_get(v_x_2894_, 0);
+v_isSharedCheck_2904_ = !lean_is_exclusive(v_x_2894_);
+if (v_isSharedCheck_2904_ == 0)
 {
-v___x_2870_ = v_x_2866_;
-v_isShared_2871_ = v_isSharedCheck_2876_;
-goto v_resetjp_2869_;
+v___x_2898_ = v_x_2894_;
+v_isShared_2899_ = v_isSharedCheck_2904_;
+goto v_resetjp_2897_;
 }
 else
 {
-lean_inc(v_a_2868_);
-lean_dec(v_x_2866_);
-v___x_2870_ = lean_box(0);
-v_isShared_2871_ = v_isSharedCheck_2876_;
-goto v_resetjp_2869_;
-}
-v_resetjp_2869_:
-{
-lean_object* v___x_2873_; 
-if (v_isShared_2871_ == 0)
-{
-v___x_2873_ = v___x_2870_;
-goto v_reusejp_2872_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_2875_; 
-v_reuseFailAlloc_2875_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2875_, 0, v_a_2868_);
-v___x_2873_ = v_reuseFailAlloc_2875_;
-goto v_reusejp_2872_;
-}
-v_reusejp_2872_:
-{
-lean_object* v___x_2874_; 
-v___x_2874_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2874_, 0, v___x_2873_);
-return v___x_2874_;
-}
-}
-}
-else
-{
-lean_object* v_a_2877_; lean_object* v___x_2879_; uint8_t v_isShared_2880_; uint8_t v_isSharedCheck_2923_; 
-v_a_2877_ = lean_ctor_get(v_x_2866_, 0);
-v_isSharedCheck_2923_ = !lean_is_exclusive(v_x_2866_);
-if (v_isSharedCheck_2923_ == 0)
-{
-v___x_2879_ = v_x_2866_;
-v_isShared_2880_ = v_isSharedCheck_2923_;
-goto v_resetjp_2878_;
-}
-else
-{
-lean_inc(v_a_2877_);
-lean_dec(v_x_2866_);
-v___x_2879_ = lean_box(0);
-v_isShared_2880_ = v_isSharedCheck_2923_;
-goto v_resetjp_2878_;
-}
-v_resetjp_2878_:
-{
-lean_object* v___x_2881_; lean_object* v___x_2882_; uint8_t v___x_2883_; 
-v___x_2881_ = lean_string_utf8_byte_size(v_failurePrefix_2859_);
-v___x_2882_ = lean_unsigned_to_nat(0u);
-v___x_2883_ = lean_nat_dec_eq(v___x_2881_, v___x_2882_);
-if (v___x_2883_ == 0)
-{
-lean_object* v___f_2884_; lean_object* v___x_2885_; lean_object* v___x_2886_; lean_object* v___x_2887_; lean_object* v___f_2888_; lean_object* v_val_2890_; lean_object* v___x_2895_; 
-lean_dec_ref(v___f_2865_);
-lean_inc(v_a_2877_);
-v___f_2884_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3___boxed), 3, 1);
-lean_closure_set(v___f_2884_, 0, v_a_2877_);
-v___x_2885_ = lean_box(v___x_2883_);
-v___x_2886_ = lean_box_uint32(v_op_2860_);
-v___x_2887_ = lean_box_uint64(v_flags_2861_);
-lean_inc(v_payload_2862_);
-v___f_2888_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__5___boxed), 9, 7);
-lean_closure_set(v___f_2888_, 0, v___x_2882_);
-lean_closure_set(v___f_2888_, 1, v___x_2885_);
-lean_closure_set(v___f_2888_, 2, v___f_2884_);
-lean_closure_set(v___f_2888_, 3, v_a_2877_);
-lean_closure_set(v___f_2888_, 4, v___x_2886_);
-lean_closure_set(v___f_2888_, 5, v___x_2887_);
-lean_closure_set(v___f_2888_, 6, v_payload_2862_);
-v___x_2895_ = l_Lasm_JS_Wire_encodeIO(v_payload_2862_);
-lean_dec(v_payload_2862_);
-if (lean_obj_tag(v___x_2895_) == 0)
-{
-lean_object* v_a_2896_; lean_object* v___x_2898_; 
-v_a_2896_ = lean_ctor_get(v___x_2895_, 0);
 lean_inc(v_a_2896_);
-lean_dec_ref_known(v___x_2895_, 1);
-if (v_isShared_2880_ == 0)
-{
-lean_ctor_set(v___x_2879_, 0, v_a_2896_);
-v___x_2898_ = v___x_2879_;
-goto v_reusejp_2897_;
+lean_dec(v_x_2894_);
+v___x_2898_ = lean_box(0);
+v_isShared_2899_ = v_isSharedCheck_2904_;
+goto v_resetjp_2897_;
 }
-else
+v_resetjp_2897_:
 {
-lean_object* v_reuseFailAlloc_2899_; 
-v_reuseFailAlloc_2899_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2899_, 0, v_a_2896_);
-v___x_2898_ = v_reuseFailAlloc_2899_;
-goto v_reusejp_2897_;
-}
-v_reusejp_2897_:
+lean_object* v___x_2901_; 
+if (v_isShared_2899_ == 0)
 {
-v_val_2890_ = v___x_2898_;
-goto v___jp_2889_;
-}
-}
-else
-{
-lean_object* v_a_2900_; lean_object* v___x_2902_; 
-v_a_2900_ = lean_ctor_get(v___x_2895_, 0);
-lean_inc(v_a_2900_);
-lean_dec_ref_known(v___x_2895_, 1);
-if (v_isShared_2880_ == 0)
-{
-lean_ctor_set_tag(v___x_2879_, 0);
-lean_ctor_set(v___x_2879_, 0, v_a_2900_);
-v___x_2902_ = v___x_2879_;
-goto v_reusejp_2901_;
+v___x_2901_ = v___x_2898_;
+goto v_reusejp_2900_;
 }
 else
 {
 lean_object* v_reuseFailAlloc_2903_; 
 v_reuseFailAlloc_2903_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2903_, 0, v_a_2900_);
-v___x_2902_ = v_reuseFailAlloc_2903_;
-goto v_reusejp_2901_;
+lean_ctor_set(v_reuseFailAlloc_2903_, 0, v_a_2896_);
+v___x_2901_ = v_reuseFailAlloc_2903_;
+goto v_reusejp_2900_;
 }
-v_reusejp_2901_:
+v_reusejp_2900_:
 {
-v_val_2890_ = v___x_2902_;
-goto v___jp_2889_;
+lean_object* v___x_2902_; 
+v___x_2902_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2902_, 0, v___x_2901_);
+return v___x_2902_;
 }
-}
-v___jp_2889_:
-{
-lean_object* v___x_2891_; lean_object* v___x_2892_; lean_object* v___x_2893_; lean_object* v___x_2894_; 
-v___x_2891_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2891_, 0, v_val_2890_);
-v___x_2892_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2882_, v___x_2883_, v___x_2891_, v___f_2888_);
-v___x_2893_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2882_, v___x_2883_, v___x_2892_, v___f_2863_);
-v___x_2894_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2882_, v___x_2883_, v___x_2893_, v___f_2864_);
-return v___x_2894_;
 }
 }
 else
 {
-lean_object* v___f_2904_; lean_object* v___x_2905_; lean_object* v___x_2906_; lean_object* v___f_2907_; uint8_t v___x_2908_; lean_object* v_val_2910_; lean_object* v___x_2914_; 
-lean_dec_ref(v___f_2864_);
-lean_dec_ref(v___f_2863_);
-lean_inc(v_a_2877_);
-v___f_2904_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3___boxed), 3, 1);
-lean_closure_set(v___f_2904_, 0, v_a_2877_);
-v___x_2905_ = lean_box_uint32(v_op_2860_);
-v___x_2906_ = lean_box_uint64(v_flags_2861_);
-lean_inc(v_payload_2862_);
-v___f_2907_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__7___boxed), 7, 5);
-lean_closure_set(v___f_2907_, 0, v___f_2904_);
-lean_closure_set(v___f_2907_, 1, v_a_2877_);
-lean_closure_set(v___f_2907_, 2, v___x_2905_);
-lean_closure_set(v___f_2907_, 3, v___x_2906_);
-lean_closure_set(v___f_2907_, 4, v_payload_2862_);
-v___x_2908_ = 0;
-v___x_2914_ = l_Lasm_JS_Wire_encodeIO(v_payload_2862_);
-lean_dec(v_payload_2862_);
-if (lean_obj_tag(v___x_2914_) == 0)
+lean_object* v_a_2905_; lean_object* v___x_2907_; uint8_t v_isShared_2908_; uint8_t v_isSharedCheck_2951_; 
+v_a_2905_ = lean_ctor_get(v_x_2894_, 0);
+v_isSharedCheck_2951_ = !lean_is_exclusive(v_x_2894_);
+if (v_isSharedCheck_2951_ == 0)
 {
-lean_object* v_a_2915_; lean_object* v___x_2917_; 
-v_a_2915_ = lean_ctor_get(v___x_2914_, 0);
-lean_inc(v_a_2915_);
-lean_dec_ref_known(v___x_2914_, 1);
-if (v_isShared_2880_ == 0)
-{
-lean_ctor_set(v___x_2879_, 0, v_a_2915_);
-v___x_2917_ = v___x_2879_;
-goto v_reusejp_2916_;
+v___x_2907_ = v_x_2894_;
+v_isShared_2908_ = v_isSharedCheck_2951_;
+goto v_resetjp_2906_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2918_; 
-v_reuseFailAlloc_2918_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2918_, 0, v_a_2915_);
-v___x_2917_ = v_reuseFailAlloc_2918_;
-goto v_reusejp_2916_;
+lean_inc(v_a_2905_);
+lean_dec(v_x_2894_);
+v___x_2907_ = lean_box(0);
+v_isShared_2908_ = v_isSharedCheck_2951_;
+goto v_resetjp_2906_;
 }
-v_reusejp_2916_:
+v_resetjp_2906_:
 {
-v_val_2910_ = v___x_2917_;
-goto v___jp_2909_;
+lean_object* v___x_2909_; lean_object* v___x_2910_; uint8_t v___x_2911_; 
+v___x_2909_ = lean_string_utf8_byte_size(v_failurePrefix_2887_);
+v___x_2910_ = lean_unsigned_to_nat(0u);
+v___x_2911_ = lean_nat_dec_eq(v___x_2909_, v___x_2910_);
+if (v___x_2911_ == 0)
+{
+lean_object* v___f_2912_; lean_object* v___x_2913_; lean_object* v___x_2914_; lean_object* v___x_2915_; lean_object* v___f_2916_; lean_object* v_val_2918_; lean_object* v___x_2923_; 
+lean_dec_ref(v___f_2893_);
+lean_inc(v_a_2905_);
+v___f_2912_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3___boxed), 3, 1);
+lean_closure_set(v___f_2912_, 0, v_a_2905_);
+v___x_2913_ = lean_box(v___x_2911_);
+v___x_2914_ = lean_box_uint32(v_op_2888_);
+v___x_2915_ = lean_box_uint64(v_flags_2889_);
+lean_inc(v_payload_2890_);
+v___f_2916_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__5___boxed), 9, 7);
+lean_closure_set(v___f_2916_, 0, v___x_2910_);
+lean_closure_set(v___f_2916_, 1, v___x_2913_);
+lean_closure_set(v___f_2916_, 2, v___f_2912_);
+lean_closure_set(v___f_2916_, 3, v_a_2905_);
+lean_closure_set(v___f_2916_, 4, v___x_2914_);
+lean_closure_set(v___f_2916_, 5, v___x_2915_);
+lean_closure_set(v___f_2916_, 6, v_payload_2890_);
+v___x_2923_ = l_Lasm_JS_Wire_encodeIO(v_payload_2890_);
+lean_dec(v_payload_2890_);
+if (lean_obj_tag(v___x_2923_) == 0)
+{
+lean_object* v_a_2924_; lean_object* v___x_2926_; 
+v_a_2924_ = lean_ctor_get(v___x_2923_, 0);
+lean_inc(v_a_2924_);
+lean_dec_ref_known(v___x_2923_, 1);
+if (v_isShared_2908_ == 0)
+{
+lean_ctor_set(v___x_2907_, 0, v_a_2924_);
+v___x_2926_ = v___x_2907_;
+goto v_reusejp_2925_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_2927_; 
+v_reuseFailAlloc_2927_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2927_, 0, v_a_2924_);
+v___x_2926_ = v_reuseFailAlloc_2927_;
+goto v_reusejp_2925_;
+}
+v_reusejp_2925_:
+{
+v_val_2918_ = v___x_2926_;
+goto v___jp_2917_;
 }
 }
 else
 {
-lean_object* v_a_2919_; lean_object* v___x_2921_; 
-v_a_2919_ = lean_ctor_get(v___x_2914_, 0);
-lean_inc(v_a_2919_);
-lean_dec_ref_known(v___x_2914_, 1);
-if (v_isShared_2880_ == 0)
+lean_object* v_a_2928_; lean_object* v___x_2930_; 
+v_a_2928_ = lean_ctor_get(v___x_2923_, 0);
+lean_inc(v_a_2928_);
+lean_dec_ref_known(v___x_2923_, 1);
+if (v_isShared_2908_ == 0)
 {
-lean_ctor_set_tag(v___x_2879_, 0);
-lean_ctor_set(v___x_2879_, 0, v_a_2919_);
-v___x_2921_ = v___x_2879_;
-goto v_reusejp_2920_;
+lean_ctor_set_tag(v___x_2907_, 0);
+lean_ctor_set(v___x_2907_, 0, v_a_2928_);
+v___x_2930_ = v___x_2907_;
+goto v_reusejp_2929_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2922_; 
-v_reuseFailAlloc_2922_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2922_, 0, v_a_2919_);
-v___x_2921_ = v_reuseFailAlloc_2922_;
-goto v_reusejp_2920_;
+lean_object* v_reuseFailAlloc_2931_; 
+v_reuseFailAlloc_2931_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2931_, 0, v_a_2928_);
+v___x_2930_ = v_reuseFailAlloc_2931_;
+goto v_reusejp_2929_;
 }
-v_reusejp_2920_:
+v_reusejp_2929_:
 {
-v_val_2910_ = v___x_2921_;
-goto v___jp_2909_;
+v_val_2918_ = v___x_2930_;
+goto v___jp_2917_;
 }
 }
-v___jp_2909_:
+v___jp_2917_:
 {
-lean_object* v___x_2911_; lean_object* v___x_2912_; lean_object* v___x_2913_; 
-v___x_2911_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2911_, 0, v_val_2910_);
-v___x_2912_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2882_, v___x_2908_, v___x_2911_, v___f_2907_);
-v___x_2913_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2882_, v___x_2908_, v___x_2912_, v___f_2865_);
-return v___x_2913_;
+lean_object* v___x_2919_; lean_object* v___x_2920_; lean_object* v___x_2921_; lean_object* v___x_2922_; 
+v___x_2919_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2919_, 0, v_val_2918_);
+v___x_2920_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2910_, v___x_2911_, v___x_2919_, v___f_2916_);
+v___x_2921_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2910_, v___x_2911_, v___x_2920_, v___f_2891_);
+v___x_2922_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2910_, v___x_2911_, v___x_2921_, v___f_2892_);
+return v___x_2922_;
+}
+}
+else
+{
+lean_object* v___f_2932_; lean_object* v___x_2933_; lean_object* v___x_2934_; lean_object* v___f_2935_; uint8_t v___x_2936_; lean_object* v_val_2938_; lean_object* v___x_2942_; 
+lean_dec_ref(v___f_2892_);
+lean_dec_ref(v___f_2891_);
+lean_inc(v_a_2905_);
+v___f_2932_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3___boxed), 3, 1);
+lean_closure_set(v___f_2932_, 0, v_a_2905_);
+v___x_2933_ = lean_box_uint32(v_op_2888_);
+v___x_2934_ = lean_box_uint64(v_flags_2889_);
+lean_inc(v_payload_2890_);
+v___f_2935_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__7___boxed), 7, 5);
+lean_closure_set(v___f_2935_, 0, v___f_2932_);
+lean_closure_set(v___f_2935_, 1, v_a_2905_);
+lean_closure_set(v___f_2935_, 2, v___x_2933_);
+lean_closure_set(v___f_2935_, 3, v___x_2934_);
+lean_closure_set(v___f_2935_, 4, v_payload_2890_);
+v___x_2936_ = 0;
+v___x_2942_ = l_Lasm_JS_Wire_encodeIO(v_payload_2890_);
+lean_dec(v_payload_2890_);
+if (lean_obj_tag(v___x_2942_) == 0)
+{
+lean_object* v_a_2943_; lean_object* v___x_2945_; 
+v_a_2943_ = lean_ctor_get(v___x_2942_, 0);
+lean_inc(v_a_2943_);
+lean_dec_ref_known(v___x_2942_, 1);
+if (v_isShared_2908_ == 0)
+{
+lean_ctor_set(v___x_2907_, 0, v_a_2943_);
+v___x_2945_ = v___x_2907_;
+goto v_reusejp_2944_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_2946_; 
+v_reuseFailAlloc_2946_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2946_, 0, v_a_2943_);
+v___x_2945_ = v_reuseFailAlloc_2946_;
+goto v_reusejp_2944_;
+}
+v_reusejp_2944_:
+{
+v_val_2938_ = v___x_2945_;
+goto v___jp_2937_;
+}
+}
+else
+{
+lean_object* v_a_2947_; lean_object* v___x_2949_; 
+v_a_2947_ = lean_ctor_get(v___x_2942_, 0);
+lean_inc(v_a_2947_);
+lean_dec_ref_known(v___x_2942_, 1);
+if (v_isShared_2908_ == 0)
+{
+lean_ctor_set_tag(v___x_2907_, 0);
+lean_ctor_set(v___x_2907_, 0, v_a_2947_);
+v___x_2949_ = v___x_2907_;
+goto v_reusejp_2948_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_2950_; 
+v_reuseFailAlloc_2950_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2950_, 0, v_a_2947_);
+v___x_2949_ = v_reuseFailAlloc_2950_;
+goto v_reusejp_2948_;
+}
+v_reusejp_2948_:
+{
+v_val_2938_ = v___x_2949_;
+goto v___jp_2937_;
+}
+}
+v___jp_2937_:
+{
+lean_object* v___x_2939_; lean_object* v___x_2940_; lean_object* v___x_2941_; 
+v___x_2939_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2939_, 0, v_val_2938_);
+v___x_2940_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2910_, v___x_2936_, v___x_2939_, v___f_2935_);
+v___x_2941_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2910_, v___x_2936_, v___x_2940_, v___f_2893_);
+return v___x_2941_;
 }
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__6___boxed(lean_object* v_failurePrefix_2924_, lean_object* v_op_2925_, lean_object* v_flags_2926_, lean_object* v_payload_2927_, lean_object* v___f_2928_, lean_object* v___f_2929_, lean_object* v___f_2930_, lean_object* v_x_2931_, lean_object* v___y_2932_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__6___boxed(lean_object* v_failurePrefix_2952_, lean_object* v_op_2953_, lean_object* v_flags_2954_, lean_object* v_payload_2955_, lean_object* v___f_2956_, lean_object* v___f_2957_, lean_object* v___f_2958_, lean_object* v_x_2959_, lean_object* v___y_2960_){
 _start:
 {
-uint32_t v_op_boxed_2933_; uint64_t v_flags_boxed_2934_; lean_object* v_res_2935_; 
-v_op_boxed_2933_ = lean_unbox_uint32(v_op_2925_);
-lean_dec(v_op_2925_);
-v_flags_boxed_2934_ = lean_unbox_uint64(v_flags_2926_);
-lean_dec_ref(v_flags_2926_);
-v_res_2935_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__6(v_failurePrefix_2924_, v_op_boxed_2933_, v_flags_boxed_2934_, v_payload_2927_, v___f_2928_, v___f_2929_, v___f_2930_, v_x_2931_);
-lean_dec_ref(v_failurePrefix_2924_);
-return v_res_2935_;
+uint32_t v_op_boxed_2961_; uint64_t v_flags_boxed_2962_; lean_object* v_res_2963_; 
+v_op_boxed_2961_ = lean_unbox_uint32(v_op_2953_);
+lean_dec(v_op_2953_);
+v_flags_boxed_2962_ = lean_unbox_uint64(v_flags_2954_);
+lean_dec_ref(v_flags_2954_);
+v_res_2963_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__6(v_failurePrefix_2952_, v_op_boxed_2961_, v_flags_boxed_2962_, v_payload_2955_, v___f_2956_, v___f_2957_, v___f_2958_, v_x_2959_);
+lean_dec_ref(v_failurePrefix_2952_);
+return v_res_2963_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__1(lean_object* v___f_2936_, lean_object* v_bytes_2937_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__1(lean_object* v___f_2964_, lean_object* v_bytes_2965_){
 _start:
 {
-lean_object* v___x_2939_; uint8_t v___x_2940_; lean_object* v_val_2942_; lean_object* v___x_2945_; 
-v___x_2939_ = lean_unsigned_to_nat(0u);
-v___x_2940_ = 0;
-v___x_2945_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_bytes_2937_);
-if (lean_obj_tag(v___x_2945_) == 0)
+lean_object* v___x_2967_; uint8_t v___x_2968_; lean_object* v_val_2970_; lean_object* v___x_2973_; 
+v___x_2967_ = lean_unsigned_to_nat(0u);
+v___x_2968_ = 0;
+v___x_2973_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_bytes_2965_);
+if (lean_obj_tag(v___x_2973_) == 0)
 {
-lean_object* v_a_2946_; lean_object* v___x_2948_; uint8_t v_isShared_2949_; uint8_t v_isSharedCheck_2953_; 
-v_a_2946_ = lean_ctor_get(v___x_2945_, 0);
-v_isSharedCheck_2953_ = !lean_is_exclusive(v___x_2945_);
-if (v_isSharedCheck_2953_ == 0)
+lean_object* v_a_2974_; lean_object* v___x_2976_; uint8_t v_isShared_2977_; uint8_t v_isSharedCheck_2981_; 
+v_a_2974_ = lean_ctor_get(v___x_2973_, 0);
+v_isSharedCheck_2981_ = !lean_is_exclusive(v___x_2973_);
+if (v_isSharedCheck_2981_ == 0)
 {
-v___x_2948_ = v___x_2945_;
-v_isShared_2949_ = v_isSharedCheck_2953_;
-goto v_resetjp_2947_;
+v___x_2976_ = v___x_2973_;
+v_isShared_2977_ = v_isSharedCheck_2981_;
+goto v_resetjp_2975_;
 }
 else
 {
-lean_inc(v_a_2946_);
-lean_dec(v___x_2945_);
-v___x_2948_ = lean_box(0);
-v_isShared_2949_ = v_isSharedCheck_2953_;
-goto v_resetjp_2947_;
+lean_inc(v_a_2974_);
+lean_dec(v___x_2973_);
+v___x_2976_ = lean_box(0);
+v_isShared_2977_ = v_isSharedCheck_2981_;
+goto v_resetjp_2975_;
 }
-v_resetjp_2947_:
+v_resetjp_2975_:
 {
-lean_object* v___x_2951_; 
-if (v_isShared_2949_ == 0)
+lean_object* v___x_2979_; 
+if (v_isShared_2977_ == 0)
 {
-lean_ctor_set_tag(v___x_2948_, 1);
-v___x_2951_ = v___x_2948_;
-goto v_reusejp_2950_;
+lean_ctor_set_tag(v___x_2976_, 1);
+v___x_2979_ = v___x_2976_;
+goto v_reusejp_2978_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_2952_; 
-v_reuseFailAlloc_2952_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2952_, 0, v_a_2946_);
-v___x_2951_ = v_reuseFailAlloc_2952_;
-goto v_reusejp_2950_;
+lean_object* v_reuseFailAlloc_2980_; 
+v_reuseFailAlloc_2980_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2980_, 0, v_a_2974_);
+v___x_2979_ = v_reuseFailAlloc_2980_;
+goto v_reusejp_2978_;
 }
-v_reusejp_2950_:
+v_reusejp_2978_:
 {
-v_val_2942_ = v___x_2951_;
-goto v___jp_2941_;
-}
-}
-}
-else
-{
-lean_object* v_a_2954_; lean_object* v___x_2956_; uint8_t v_isShared_2957_; uint8_t v_isSharedCheck_2961_; 
-v_a_2954_ = lean_ctor_get(v___x_2945_, 0);
-v_isSharedCheck_2961_ = !lean_is_exclusive(v___x_2945_);
-if (v_isSharedCheck_2961_ == 0)
-{
-v___x_2956_ = v___x_2945_;
-v_isShared_2957_ = v_isSharedCheck_2961_;
-goto v_resetjp_2955_;
-}
-else
-{
-lean_inc(v_a_2954_);
-lean_dec(v___x_2945_);
-v___x_2956_ = lean_box(0);
-v_isShared_2957_ = v_isSharedCheck_2961_;
-goto v_resetjp_2955_;
-}
-v_resetjp_2955_:
-{
-lean_object* v___x_2959_; 
-if (v_isShared_2957_ == 0)
-{
-lean_ctor_set_tag(v___x_2956_, 0);
-v___x_2959_ = v___x_2956_;
-goto v_reusejp_2958_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_2960_; 
-v_reuseFailAlloc_2960_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2960_, 0, v_a_2954_);
-v___x_2959_ = v_reuseFailAlloc_2960_;
-goto v_reusejp_2958_;
-}
-v_reusejp_2958_:
-{
-v_val_2942_ = v___x_2959_;
-goto v___jp_2941_;
-}
-}
-}
-v___jp_2941_:
-{
-lean_object* v___x_2943_; lean_object* v___x_2944_; 
-v___x_2943_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2943_, 0, v_val_2942_);
-v___x_2944_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2939_, v___x_2940_, v___x_2943_, v___f_2936_);
-return v___x_2944_;
-}
-}
-}
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__1___boxed(lean_object* v___f_2962_, lean_object* v_bytes_2963_, lean_object* v___y_2964_){
-_start:
-{
-lean_object* v_res_2965_; 
-v_res_2965_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__1(v___f_2962_, v_bytes_2963_);
-lean_dec_ref(v_bytes_2963_);
-return v_res_2965_;
-}
-}
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__8(lean_object* v___f_2966_, lean_object* v_x_2967_){
-_start:
-{
-if (lean_obj_tag(v_x_2967_) == 0)
-{
-lean_object* v_a_2969_; lean_object* v___x_2971_; uint8_t v_isShared_2972_; uint8_t v_isSharedCheck_2977_; 
-lean_dec_ref(v___f_2966_);
-v_a_2969_ = lean_ctor_get(v_x_2967_, 0);
-v_isSharedCheck_2977_ = !lean_is_exclusive(v_x_2967_);
-if (v_isSharedCheck_2977_ == 0)
-{
-v___x_2971_ = v_x_2967_;
-v_isShared_2972_ = v_isSharedCheck_2977_;
-goto v_resetjp_2970_;
-}
-else
-{
-lean_inc(v_a_2969_);
-lean_dec(v_x_2967_);
-v___x_2971_ = lean_box(0);
-v_isShared_2972_ = v_isSharedCheck_2977_;
-goto v_resetjp_2970_;
-}
-v_resetjp_2970_:
-{
-lean_object* v___x_2974_; 
-if (v_isShared_2972_ == 0)
-{
-v___x_2974_ = v___x_2971_;
-goto v_reusejp_2973_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_2976_; 
-v_reuseFailAlloc_2976_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2976_, 0, v_a_2969_);
-v___x_2974_ = v_reuseFailAlloc_2976_;
-goto v_reusejp_2973_;
-}
-v_reusejp_2973_:
-{
-lean_object* v___x_2975_; 
-v___x_2975_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2975_, 0, v___x_2974_);
-return v___x_2975_;
+v_val_2970_ = v___x_2979_;
+goto v___jp_2969_;
 }
 }
 }
 else
 {
-lean_object* v___x_2979_; uint8_t v_isShared_2980_; uint8_t v_isSharedCheck_2989_; 
-v_isSharedCheck_2989_ = !lean_is_exclusive(v_x_2967_);
+lean_object* v_a_2982_; lean_object* v___x_2984_; uint8_t v_isShared_2985_; uint8_t v_isSharedCheck_2989_; 
+v_a_2982_ = lean_ctor_get(v___x_2973_, 0);
+v_isSharedCheck_2989_ = !lean_is_exclusive(v___x_2973_);
 if (v_isSharedCheck_2989_ == 0)
 {
-lean_object* v_unused_2990_; 
-v_unused_2990_ = lean_ctor_get(v_x_2967_, 0);
-lean_dec(v_unused_2990_);
-v___x_2979_ = v_x_2967_;
-v_isShared_2980_ = v_isSharedCheck_2989_;
-goto v_resetjp_2978_;
+v___x_2984_ = v___x_2973_;
+v_isShared_2985_ = v_isSharedCheck_2989_;
+goto v_resetjp_2983_;
 }
 else
 {
-lean_dec(v_x_2967_);
-v___x_2979_ = lean_box(0);
-v_isShared_2980_ = v_isSharedCheck_2989_;
-goto v_resetjp_2978_;
+lean_inc(v_a_2982_);
+lean_dec(v___x_2973_);
+v___x_2984_ = lean_box(0);
+v_isShared_2985_ = v_isSharedCheck_2989_;
+goto v_resetjp_2983_;
 }
-v_resetjp_2978_:
+v_resetjp_2983_:
 {
-lean_object* v___x_2981_; uint8_t v___x_2982_; lean_object* v___x_2983_; lean_object* v___x_2985_; 
-v___x_2981_ = lean_unsigned_to_nat(0u);
-v___x_2982_ = 0;
-v___x_2983_ = lean_io_promise_new();
-if (v_isShared_2980_ == 0)
+lean_object* v___x_2987_; 
+if (v_isShared_2985_ == 0)
 {
-lean_ctor_set(v___x_2979_, 0, v___x_2983_);
-v___x_2985_ = v___x_2979_;
-goto v_reusejp_2984_;
+lean_ctor_set_tag(v___x_2984_, 0);
+v___x_2987_ = v___x_2984_;
+goto v_reusejp_2986_;
 }
 else
 {
 lean_object* v_reuseFailAlloc_2988_; 
-v_reuseFailAlloc_2988_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_2988_, 0, v___x_2983_);
-v___x_2985_ = v_reuseFailAlloc_2988_;
-goto v_reusejp_2984_;
+v_reuseFailAlloc_2988_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_2988_, 0, v_a_2982_);
+v___x_2987_ = v_reuseFailAlloc_2988_;
+goto v_reusejp_2986_;
 }
-v_reusejp_2984_:
+v_reusejp_2986_:
 {
-lean_object* v___x_2986_; lean_object* v___x_2987_; 
-v___x_2986_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_2986_, 0, v___x_2985_);
-v___x_2987_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2981_, v___x_2982_, v___x_2986_, v___f_2966_);
-return v___x_2987_;
+v_val_2970_ = v___x_2987_;
+goto v___jp_2969_;
 }
 }
 }
+v___jp_2969_:
+{
+lean_object* v___x_2971_; lean_object* v___x_2972_; 
+v___x_2971_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_2971_, 0, v_val_2970_);
+v___x_2972_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_2967_, v___x_2968_, v___x_2971_, v___f_2964_);
+return v___x_2972_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__8___boxed(lean_object* v___f_2991_, lean_object* v_x_2992_, lean_object* v___y_2993_){
+}
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__1___boxed(lean_object* v___f_2990_, lean_object* v_bytes_2991_, lean_object* v___y_2992_){
 _start:
 {
-lean_object* v_res_2994_; 
-v_res_2994_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__8(v___f_2991_, v_x_2992_);
-return v_res_2994_;
+lean_object* v_res_2993_; 
+v_res_2993_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__1(v___f_2990_, v_bytes_2991_);
+lean_dec_ref(v_bytes_2991_);
+return v_res_2993_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__4(lean_object* v_failurePrefix_2995_, lean_object* v_x_2996_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__8(lean_object* v___f_2994_, lean_object* v_x_2995_){
 _start:
 {
-if (lean_obj_tag(v_x_2996_) == 0)
+if (lean_obj_tag(v_x_2995_) == 0)
 {
-lean_object* v_a_2998_; lean_object* v___x_3000_; uint8_t v_isShared_3001_; uint8_t v_isSharedCheck_3009_; 
-v_a_2998_ = lean_ctor_get(v_x_2996_, 0);
-v_isSharedCheck_3009_ = !lean_is_exclusive(v_x_2996_);
-if (v_isSharedCheck_3009_ == 0)
+lean_object* v_a_2997_; lean_object* v___x_2999_; uint8_t v_isShared_3000_; uint8_t v_isSharedCheck_3005_; 
+lean_dec_ref(v___f_2994_);
+v_a_2997_ = lean_ctor_get(v_x_2995_, 0);
+v_isSharedCheck_3005_ = !lean_is_exclusive(v_x_2995_);
+if (v_isSharedCheck_3005_ == 0)
 {
-v___x_3000_ = v_x_2996_;
-v_isShared_3001_ = v_isSharedCheck_3009_;
-goto v_resetjp_2999_;
+v___x_2999_ = v_x_2995_;
+v_isShared_3000_ = v_isSharedCheck_3005_;
+goto v_resetjp_2998_;
 }
 else
 {
-lean_inc(v_a_2998_);
-lean_dec(v_x_2996_);
-v___x_3000_ = lean_box(0);
-v_isShared_3001_ = v_isSharedCheck_3009_;
-goto v_resetjp_2999_;
+lean_inc(v_a_2997_);
+lean_dec(v_x_2995_);
+v___x_2999_ = lean_box(0);
+v_isShared_3000_ = v_isSharedCheck_3005_;
+goto v_resetjp_2998_;
 }
-v_resetjp_2999_:
+v_resetjp_2998_:
 {
-lean_object* v___x_3002_; lean_object* v___x_3003_; lean_object* v___x_3004_; lean_object* v___x_3006_; 
-v___x_3002_ = lean_io_error_to_string(v_a_2998_);
-v___x_3003_ = lean_string_append(v_failurePrefix_2995_, v___x_3002_);
-lean_dec_ref(v___x_3002_);
-v___x_3004_ = lean_alloc_ctor(18, 1, 0);
-lean_ctor_set(v___x_3004_, 0, v___x_3003_);
-if (v_isShared_3001_ == 0)
+lean_object* v___x_3002_; 
+if (v_isShared_3000_ == 0)
 {
-lean_ctor_set(v___x_3000_, 0, v___x_3004_);
-v___x_3006_ = v___x_3000_;
-goto v_reusejp_3005_;
+v___x_3002_ = v___x_2999_;
+goto v_reusejp_3001_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_3008_; 
-v_reuseFailAlloc_3008_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3008_, 0, v___x_3004_);
-v___x_3006_ = v_reuseFailAlloc_3008_;
-goto v_reusejp_3005_;
+lean_object* v_reuseFailAlloc_3004_; 
+v_reuseFailAlloc_3004_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3004_, 0, v_a_2997_);
+v___x_3002_ = v_reuseFailAlloc_3004_;
+goto v_reusejp_3001_;
 }
-v_reusejp_3005_:
+v_reusejp_3001_:
 {
-lean_object* v___x_3007_; 
-v___x_3007_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3007_, 0, v___x_3006_);
-return v___x_3007_;
+lean_object* v___x_3003_; 
+v___x_3003_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3003_, 0, v___x_3002_);
+return v___x_3003_;
 }
 }
 }
 else
 {
-lean_object* v___x_3010_; 
-lean_dec_ref(v_failurePrefix_2995_);
-v___x_3010_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3010_, 0, v_x_2996_);
-return v___x_3010_;
+lean_object* v___x_3007_; uint8_t v_isShared_3008_; uint8_t v_isSharedCheck_3017_; 
+v_isSharedCheck_3017_ = !lean_is_exclusive(v_x_2995_);
+if (v_isSharedCheck_3017_ == 0)
+{
+lean_object* v_unused_3018_; 
+v_unused_3018_ = lean_ctor_get(v_x_2995_, 0);
+lean_dec(v_unused_3018_);
+v___x_3007_ = v_x_2995_;
+v_isShared_3008_ = v_isSharedCheck_3017_;
+goto v_resetjp_3006_;
+}
+else
+{
+lean_dec(v_x_2995_);
+v___x_3007_ = lean_box(0);
+v_isShared_3008_ = v_isSharedCheck_3017_;
+goto v_resetjp_3006_;
+}
+v_resetjp_3006_:
+{
+lean_object* v___x_3009_; uint8_t v___x_3010_; lean_object* v___x_3011_; lean_object* v___x_3013_; 
+v___x_3009_ = lean_unsigned_to_nat(0u);
+v___x_3010_ = 0;
+v___x_3011_ = lean_io_promise_new();
+if (v_isShared_3008_ == 0)
+{
+lean_ctor_set(v___x_3007_, 0, v___x_3011_);
+v___x_3013_ = v___x_3007_;
+goto v_reusejp_3012_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_3016_; 
+v_reuseFailAlloc_3016_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3016_, 0, v___x_3011_);
+v___x_3013_ = v_reuseFailAlloc_3016_;
+goto v_reusejp_3012_;
+}
+v_reusejp_3012_:
+{
+lean_object* v___x_3014_; lean_object* v___x_3015_; 
+v___x_3014_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3014_, 0, v___x_3013_);
+v___x_3015_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3009_, v___x_3010_, v___x_3014_, v___f_2994_);
+return v___x_3015_;
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__4___boxed(lean_object* v_failurePrefix_3011_, lean_object* v_x_3012_, lean_object* v___y_3013_){
+}
+}
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__8___boxed(lean_object* v___f_3019_, lean_object* v_x_3020_, lean_object* v___y_3021_){
 _start:
 {
-lean_object* v_res_3014_; 
-v_res_3014_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__4(v_failurePrefix_3011_, v_x_3012_);
-return v_res_3014_;
+lean_object* v_res_3022_; 
+v_res_3022_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__8(v___f_3019_, v_x_3020_);
+return v_res_3022_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__0(lean_object* v_context_3015_, lean_object* v_x_3016_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__4(lean_object* v_failurePrefix_3023_, lean_object* v_x_3024_){
 _start:
 {
-lean_object* v_val_3019_; 
-if (lean_obj_tag(v_x_3016_) == 0)
+if (lean_obj_tag(v_x_3024_) == 0)
 {
-lean_object* v_a_3021_; lean_object* v___x_3023_; uint8_t v_isShared_3024_; uint8_t v_isSharedCheck_3029_; 
-v_a_3021_ = lean_ctor_get(v_x_3016_, 0);
-v_isSharedCheck_3029_ = !lean_is_exclusive(v_x_3016_);
-if (v_isSharedCheck_3029_ == 0)
+lean_object* v_a_3026_; lean_object* v___x_3028_; uint8_t v_isShared_3029_; uint8_t v_isSharedCheck_3037_; 
+v_a_3026_ = lean_ctor_get(v_x_3024_, 0);
+v_isSharedCheck_3037_ = !lean_is_exclusive(v_x_3024_);
+if (v_isSharedCheck_3037_ == 0)
 {
-v___x_3023_ = v_x_3016_;
-v_isShared_3024_ = v_isSharedCheck_3029_;
-goto v_resetjp_3022_;
+v___x_3028_ = v_x_3024_;
+v_isShared_3029_ = v_isSharedCheck_3037_;
+goto v_resetjp_3027_;
 }
 else
 {
-lean_inc(v_a_3021_);
-lean_dec(v_x_3016_);
-v___x_3023_ = lean_box(0);
-v_isShared_3024_ = v_isSharedCheck_3029_;
-goto v_resetjp_3022_;
+lean_inc(v_a_3026_);
+lean_dec(v_x_3024_);
+v___x_3028_ = lean_box(0);
+v_isShared_3029_ = v_isSharedCheck_3037_;
+goto v_resetjp_3027_;
 }
-v_resetjp_3022_:
+v_resetjp_3027_:
 {
-lean_object* v___x_3026_; 
-if (v_isShared_3024_ == 0)
+lean_object* v___x_3030_; lean_object* v___x_3031_; lean_object* v___x_3032_; lean_object* v___x_3034_; 
+v___x_3030_ = lean_io_error_to_string(v_a_3026_);
+v___x_3031_ = lean_string_append(v_failurePrefix_3023_, v___x_3030_);
+lean_dec_ref(v___x_3030_);
+v___x_3032_ = lean_alloc_ctor(18, 1, 0);
+lean_ctor_set(v___x_3032_, 0, v___x_3031_);
+if (v_isShared_3029_ == 0)
 {
-v___x_3026_ = v___x_3023_;
-goto v_reusejp_3025_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_3028_; 
-v_reuseFailAlloc_3028_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3028_, 0, v_a_3021_);
-v___x_3026_ = v_reuseFailAlloc_3028_;
-goto v_reusejp_3025_;
-}
-v_reusejp_3025_:
-{
-lean_object* v___x_3027_; 
-v___x_3027_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3027_, 0, v___x_3026_);
-return v___x_3027_;
-}
-}
+lean_ctor_set(v___x_3028_, 0, v___x_3032_);
+v___x_3034_ = v___x_3028_;
+goto v_reusejp_3033_;
 }
 else
 {
-lean_object* v_a_3030_; lean_object* v___x_3032_; uint8_t v_isShared_3033_; uint8_t v_isSharedCheck_3043_; 
-v_a_3030_ = lean_ctor_get(v_x_3016_, 0);
-v_isSharedCheck_3043_ = !lean_is_exclusive(v_x_3016_);
-if (v_isSharedCheck_3043_ == 0)
-{
-v___x_3032_ = v_x_3016_;
-v_isShared_3033_ = v_isSharedCheck_3043_;
-goto v_resetjp_3031_;
+lean_object* v_reuseFailAlloc_3036_; 
+v_reuseFailAlloc_3036_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3036_, 0, v___x_3032_);
+v___x_3034_ = v_reuseFailAlloc_3036_;
+goto v_reusejp_3033_;
 }
-else
+v_reusejp_3033_:
 {
-lean_inc(v_a_3030_);
-lean_dec(v_x_3016_);
-v___x_3032_ = lean_box(0);
-v_isShared_3033_ = v_isSharedCheck_3043_;
-goto v_resetjp_3031_;
+lean_object* v___x_3035_; 
+v___x_3035_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3035_, 0, v___x_3034_);
+return v___x_3035_;
 }
-v_resetjp_3031_:
-{
-lean_object* v___x_3034_; 
-v___x_3034_ = l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_JS_Web_Event_timeStamp_spec__0_spec__0_spec__1(v_context_3015_, v_a_3030_);
-if (lean_obj_tag(v___x_3034_) == 0)
-{
-lean_object* v_a_3035_; lean_object* v___x_3037_; 
-v_a_3035_ = lean_ctor_get(v___x_3034_, 0);
-lean_inc(v_a_3035_);
-lean_dec_ref_known(v___x_3034_, 1);
-if (v_isShared_3033_ == 0)
-{
-lean_ctor_set(v___x_3032_, 0, v_a_3035_);
-v___x_3037_ = v___x_3032_;
-goto v_reusejp_3036_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_3038_; 
-v_reuseFailAlloc_3038_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3038_, 0, v_a_3035_);
-v___x_3037_ = v_reuseFailAlloc_3038_;
-goto v_reusejp_3036_;
-}
-v_reusejp_3036_:
-{
-v_val_3019_ = v___x_3037_;
-goto v___jp_3018_;
 }
 }
 else
 {
-lean_object* v_a_3039_; lean_object* v___x_3041_; 
-v_a_3039_ = lean_ctor_get(v___x_3034_, 0);
-lean_inc(v_a_3039_);
-lean_dec_ref_known(v___x_3034_, 1);
-if (v_isShared_3033_ == 0)
-{
-lean_ctor_set_tag(v___x_3032_, 0);
-lean_ctor_set(v___x_3032_, 0, v_a_3039_);
-v___x_3041_ = v___x_3032_;
-goto v_reusejp_3040_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_3042_; 
-v_reuseFailAlloc_3042_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3042_, 0, v_a_3039_);
-v___x_3041_ = v_reuseFailAlloc_3042_;
-goto v_reusejp_3040_;
-}
-v_reusejp_3040_:
-{
-v_val_3019_ = v___x_3041_;
-goto v___jp_3018_;
+lean_object* v___x_3038_; 
+lean_dec_ref(v_failurePrefix_3023_);
+v___x_3038_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3038_, 0, v_x_3024_);
+return v___x_3038_;
 }
 }
 }
-}
-v___jp_3018_:
-{
-lean_object* v___x_3020_; 
-v___x_3020_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3020_, 0, v_val_3019_);
-return v___x_3020_;
-}
-}
-}
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__0___boxed(lean_object* v_context_3044_, lean_object* v_x_3045_, lean_object* v___y_3046_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__4___boxed(lean_object* v_failurePrefix_3039_, lean_object* v_x_3040_, lean_object* v___y_3041_){
 _start:
 {
-lean_object* v_res_3047_; 
-v_res_3047_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__0(v_context_3044_, v_x_3045_);
-lean_dec_ref(v_context_3044_);
-return v_res_3047_;
+lean_object* v_res_3042_; 
+v_res_3042_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__4(v_failurePrefix_3039_, v_x_3040_);
+return v_res_3042_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1(lean_object* v_context_3048_, uint32_t v_op_3049_, uint64_t v_flags_3050_, lean_object* v_payload_3051_, lean_object* v_failurePrefix_3052_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__0(lean_object* v_context_3043_, lean_object* v_x_3044_){
 _start:
 {
-lean_object* v___f_3054_; lean_object* v___f_3055_; lean_object* v___f_3056_; lean_object* v___f_3057_; lean_object* v___x_3058_; lean_object* v___x_3059_; lean_object* v___f_3060_; lean_object* v___f_3061_; lean_object* v___x_3062_; uint8_t v___x_3063_; lean_object* v_val_3065_; lean_object* v___x_3068_; 
-v___f_3054_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__0___boxed), 3, 1);
-lean_closure_set(v___f_3054_, 0, v_context_3048_);
-v___f_3055_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__1___boxed), 3, 1);
-lean_closure_set(v___f_3055_, 0, v___f_3054_);
-v___f_3056_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__2___boxed), 3, 1);
-lean_closure_set(v___f_3056_, 0, v___f_3055_);
-lean_inc_ref(v_failurePrefix_3052_);
-v___f_3057_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__4___boxed), 3, 1);
-lean_closure_set(v___f_3057_, 0, v_failurePrefix_3052_);
-v___x_3058_ = lean_box_uint32(v_op_3049_);
-v___x_3059_ = lean_box_uint64(v_flags_3050_);
-lean_inc_ref(v___f_3056_);
-v___f_3060_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__6___boxed), 9, 7);
-lean_closure_set(v___f_3060_, 0, v_failurePrefix_3052_);
-lean_closure_set(v___f_3060_, 1, v___x_3058_);
-lean_closure_set(v___f_3060_, 2, v___x_3059_);
-lean_closure_set(v___f_3060_, 3, v_payload_3051_);
-lean_closure_set(v___f_3060_, 4, v___f_3057_);
-lean_closure_set(v___f_3060_, 5, v___f_3056_);
-lean_closure_set(v___f_3060_, 6, v___f_3056_);
-v___f_3061_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__8___boxed), 3, 1);
-lean_closure_set(v___f_3061_, 0, v___f_3060_);
-v___x_3062_ = lean_unsigned_to_nat(0u);
-v___x_3063_ = 0;
-v___x_3068_ = l___private_Lasm_JS_Core_0__Lasm_JS_ensureStarted();
-if (lean_obj_tag(v___x_3068_) == 0)
+lean_object* v_val_3047_; 
+if (lean_obj_tag(v_x_3044_) == 0)
 {
-lean_object* v_a_3069_; lean_object* v___x_3071_; uint8_t v_isShared_3072_; uint8_t v_isSharedCheck_3076_; 
-v_a_3069_ = lean_ctor_get(v___x_3068_, 0);
-v_isSharedCheck_3076_ = !lean_is_exclusive(v___x_3068_);
-if (v_isSharedCheck_3076_ == 0)
+lean_object* v_a_3049_; lean_object* v___x_3051_; uint8_t v_isShared_3052_; uint8_t v_isSharedCheck_3057_; 
+v_a_3049_ = lean_ctor_get(v_x_3044_, 0);
+v_isSharedCheck_3057_ = !lean_is_exclusive(v_x_3044_);
+if (v_isSharedCheck_3057_ == 0)
 {
-v___x_3071_ = v___x_3068_;
-v_isShared_3072_ = v_isSharedCheck_3076_;
-goto v_resetjp_3070_;
+v___x_3051_ = v_x_3044_;
+v_isShared_3052_ = v_isSharedCheck_3057_;
+goto v_resetjp_3050_;
 }
 else
 {
-lean_inc(v_a_3069_);
-lean_dec(v___x_3068_);
-v___x_3071_ = lean_box(0);
-v_isShared_3072_ = v_isSharedCheck_3076_;
-goto v_resetjp_3070_;
+lean_inc(v_a_3049_);
+lean_dec(v_x_3044_);
+v___x_3051_ = lean_box(0);
+v_isShared_3052_ = v_isSharedCheck_3057_;
+goto v_resetjp_3050_;
 }
-v_resetjp_3070_:
+v_resetjp_3050_:
 {
-lean_object* v___x_3074_; 
-if (v_isShared_3072_ == 0)
+lean_object* v___x_3054_; 
+if (v_isShared_3052_ == 0)
 {
-lean_ctor_set_tag(v___x_3071_, 1);
-v___x_3074_ = v___x_3071_;
-goto v_reusejp_3073_;
+v___x_3054_ = v___x_3051_;
+goto v_reusejp_3053_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_3075_; 
-v_reuseFailAlloc_3075_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3075_, 0, v_a_3069_);
-v___x_3074_ = v_reuseFailAlloc_3075_;
-goto v_reusejp_3073_;
+lean_object* v_reuseFailAlloc_3056_; 
+v_reuseFailAlloc_3056_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3056_, 0, v_a_3049_);
+v___x_3054_ = v_reuseFailAlloc_3056_;
+goto v_reusejp_3053_;
 }
-v_reusejp_3073_:
+v_reusejp_3053_:
 {
-v_val_3065_ = v___x_3074_;
-goto v___jp_3064_;
+lean_object* v___x_3055_; 
+v___x_3055_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3055_, 0, v___x_3054_);
+return v___x_3055_;
 }
 }
 }
 else
 {
-lean_object* v_a_3077_; lean_object* v___x_3079_; uint8_t v_isShared_3080_; uint8_t v_isSharedCheck_3084_; 
-v_a_3077_ = lean_ctor_get(v___x_3068_, 0);
-v_isSharedCheck_3084_ = !lean_is_exclusive(v___x_3068_);
-if (v_isSharedCheck_3084_ == 0)
+lean_object* v_a_3058_; lean_object* v___x_3060_; uint8_t v_isShared_3061_; uint8_t v_isSharedCheck_3071_; 
+v_a_3058_ = lean_ctor_get(v_x_3044_, 0);
+v_isSharedCheck_3071_ = !lean_is_exclusive(v_x_3044_);
+if (v_isSharedCheck_3071_ == 0)
 {
-v___x_3079_ = v___x_3068_;
-v_isShared_3080_ = v_isSharedCheck_3084_;
-goto v_resetjp_3078_;
+v___x_3060_ = v_x_3044_;
+v_isShared_3061_ = v_isSharedCheck_3071_;
+goto v_resetjp_3059_;
 }
 else
 {
-lean_inc(v_a_3077_);
-lean_dec(v___x_3068_);
-v___x_3079_ = lean_box(0);
-v_isShared_3080_ = v_isSharedCheck_3084_;
-goto v_resetjp_3078_;
+lean_inc(v_a_3058_);
+lean_dec(v_x_3044_);
+v___x_3060_ = lean_box(0);
+v_isShared_3061_ = v_isSharedCheck_3071_;
+goto v_resetjp_3059_;
 }
-v_resetjp_3078_:
+v_resetjp_3059_:
 {
-lean_object* v___x_3082_; 
-if (v_isShared_3080_ == 0)
+lean_object* v___x_3062_; 
+v___x_3062_ = l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_JS_Web_Event_timeStamp_spec__0_spec__0_spec__1(v_context_3043_, v_a_3058_);
+if (lean_obj_tag(v___x_3062_) == 0)
 {
-lean_ctor_set_tag(v___x_3079_, 0);
-v___x_3082_ = v___x_3079_;
-goto v_reusejp_3081_;
+lean_object* v_a_3063_; lean_object* v___x_3065_; 
+v_a_3063_ = lean_ctor_get(v___x_3062_, 0);
+lean_inc(v_a_3063_);
+lean_dec_ref_known(v___x_3062_, 1);
+if (v_isShared_3061_ == 0)
+{
+lean_ctor_set(v___x_3060_, 0, v_a_3063_);
+v___x_3065_ = v___x_3060_;
+goto v_reusejp_3064_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_3083_; 
-v_reuseFailAlloc_3083_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3083_, 0, v_a_3077_);
-v___x_3082_ = v_reuseFailAlloc_3083_;
-goto v_reusejp_3081_;
+lean_object* v_reuseFailAlloc_3066_; 
+v_reuseFailAlloc_3066_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3066_, 0, v_a_3063_);
+v___x_3065_ = v_reuseFailAlloc_3066_;
+goto v_reusejp_3064_;
 }
-v_reusejp_3081_:
+v_reusejp_3064_:
 {
-v_val_3065_ = v___x_3082_;
-goto v___jp_3064_;
+v_val_3047_ = v___x_3065_;
+goto v___jp_3046_;
 }
 }
-}
-v___jp_3064_:
+else
 {
-lean_object* v___x_3066_; lean_object* v___x_3067_; 
-v___x_3066_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3066_, 0, v_val_3065_);
-v___x_3067_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3062_, v___x_3063_, v___x_3066_, v___f_3061_);
-return v___x_3067_;
+lean_object* v_a_3067_; lean_object* v___x_3069_; 
+v_a_3067_ = lean_ctor_get(v___x_3062_, 0);
+lean_inc(v_a_3067_);
+lean_dec_ref_known(v___x_3062_, 1);
+if (v_isShared_3061_ == 0)
+{
+lean_ctor_set_tag(v___x_3060_, 0);
+lean_ctor_set(v___x_3060_, 0, v_a_3067_);
+v___x_3069_ = v___x_3060_;
+goto v_reusejp_3068_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_3070_; 
+v_reuseFailAlloc_3070_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3070_, 0, v_a_3067_);
+v___x_3069_ = v_reuseFailAlloc_3070_;
+goto v_reusejp_3068_;
+}
+v_reusejp_3068_:
+{
+v_val_3047_ = v___x_3069_;
+goto v___jp_3046_;
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___boxed(lean_object* v_context_3085_, lean_object* v_op_3086_, lean_object* v_flags_3087_, lean_object* v_payload_3088_, lean_object* v_failurePrefix_3089_, lean_object* v_a_3090_){
+}
+v___jp_3046_:
+{
+lean_object* v___x_3048_; 
+v___x_3048_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3048_, 0, v_val_3047_);
+return v___x_3048_;
+}
+}
+}
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__0___boxed(lean_object* v_context_3072_, lean_object* v_x_3073_, lean_object* v___y_3074_){
 _start:
 {
-uint32_t v_op_boxed_3091_; uint64_t v_flags_boxed_3092_; lean_object* v_res_3093_; 
-v_op_boxed_3091_ = lean_unbox_uint32(v_op_3086_);
-lean_dec(v_op_3086_);
-v_flags_boxed_3092_ = lean_unbox_uint64(v_flags_3087_);
-lean_dec_ref(v_flags_3087_);
-v_res_3093_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1(v_context_3085_, v_op_boxed_3091_, v_flags_boxed_3092_, v_payload_3088_, v_failurePrefix_3089_);
-return v_res_3093_;
+lean_object* v_res_3075_; 
+v_res_3075_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__0(v_context_3072_, v_x_3073_);
+lean_dec_ref(v_context_3072_);
+return v_res_3075_;
 }
 }
-LEAN_EXPORT uint64_t l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__0(uint8_t v_await_3094_, uint64_t v_extra_3095_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1(lean_object* v_context_3076_, uint32_t v_op_3077_, uint64_t v_flags_3078_, lean_object* v_payload_3079_, lean_object* v_failurePrefix_3080_){
 _start:
 {
-uint64_t v___x_3096_; uint64_t v___y_3098_; 
-v___x_3096_ = lean_uint64_once(&l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0, &l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0_once, _init_l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0);
-if (v_await_3094_ == 0)
+lean_object* v___f_3082_; lean_object* v___f_3083_; lean_object* v___f_3084_; lean_object* v___f_3085_; lean_object* v___x_3086_; lean_object* v___x_3087_; lean_object* v___f_3088_; lean_object* v___f_3089_; lean_object* v___x_3090_; uint8_t v___x_3091_; lean_object* v_val_3093_; lean_object* v___x_3096_; 
+v___f_3082_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__0___boxed), 3, 1);
+lean_closure_set(v___f_3082_, 0, v_context_3076_);
+v___f_3083_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__1___boxed), 3, 1);
+lean_closure_set(v___f_3083_, 0, v___f_3082_);
+v___f_3084_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__2___boxed), 3, 1);
+lean_closure_set(v___f_3084_, 0, v___f_3083_);
+lean_inc_ref(v_failurePrefix_3080_);
+v___f_3085_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__4___boxed), 3, 1);
+lean_closure_set(v___f_3085_, 0, v_failurePrefix_3080_);
+v___x_3086_ = lean_box_uint32(v_op_3077_);
+v___x_3087_ = lean_box_uint64(v_flags_3078_);
+lean_inc_ref(v___f_3084_);
+v___f_3088_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__6___boxed), 9, 7);
+lean_closure_set(v___f_3088_, 0, v_failurePrefix_3080_);
+lean_closure_set(v___f_3088_, 1, v___x_3086_);
+lean_closure_set(v___f_3088_, 2, v___x_3087_);
+lean_closure_set(v___f_3088_, 3, v_payload_3079_);
+lean_closure_set(v___f_3088_, 4, v___f_3085_);
+lean_closure_set(v___f_3088_, 5, v___f_3084_);
+lean_closure_set(v___f_3088_, 6, v___f_3084_);
+v___f_3089_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__8___boxed), 3, 1);
+lean_closure_set(v___f_3089_, 0, v___f_3088_);
+v___x_3090_ = lean_unsigned_to_nat(0u);
+v___x_3091_ = 0;
+v___x_3096_ = l___private_Lasm_JS_Core_0__Lasm_JS_ensureStarted();
+if (lean_obj_tag(v___x_3096_) == 0)
 {
-uint64_t v___x_3101_; 
-v___x_3101_ = 0ULL;
-v___y_3098_ = v___x_3101_;
-goto v___jp_3097_;
+lean_object* v_a_3097_; lean_object* v___x_3099_; uint8_t v_isShared_3100_; uint8_t v_isSharedCheck_3104_; 
+v_a_3097_ = lean_ctor_get(v___x_3096_, 0);
+v_isSharedCheck_3104_ = !lean_is_exclusive(v___x_3096_);
+if (v_isSharedCheck_3104_ == 0)
+{
+v___x_3099_ = v___x_3096_;
+v_isShared_3100_ = v_isSharedCheck_3104_;
+goto v_resetjp_3098_;
 }
 else
 {
-uint64_t v___x_3102_; 
-v___x_3102_ = 2ULL;
-v___y_3098_ = v___x_3102_;
-goto v___jp_3097_;
+lean_inc(v_a_3097_);
+lean_dec(v___x_3096_);
+v___x_3099_ = lean_box(0);
+v_isShared_3100_ = v_isSharedCheck_3104_;
+goto v_resetjp_3098_;
 }
-v___jp_3097_:
+v_resetjp_3098_:
 {
-uint64_t v___x_3099_; uint64_t v___x_3100_; 
-v___x_3099_ = lean_uint64_lor(v___x_3096_, v___y_3098_);
-v___x_3100_ = lean_uint64_lor(v___x_3099_, v_extra_3095_);
-return v___x_3100_;
+lean_object* v___x_3102_; 
+if (v_isShared_3100_ == 0)
+{
+lean_ctor_set_tag(v___x_3099_, 1);
+v___x_3102_ = v___x_3099_;
+goto v_reusejp_3101_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_3103_; 
+v_reuseFailAlloc_3103_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3103_, 0, v_a_3097_);
+v___x_3102_ = v_reuseFailAlloc_3103_;
+goto v_reusejp_3101_;
+}
+v_reusejp_3101_:
+{
+v_val_3093_ = v___x_3102_;
+goto v___jp_3092_;
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__0___boxed(lean_object* v_await_3103_, lean_object* v_extra_3104_){
+else
+{
+lean_object* v_a_3105_; lean_object* v___x_3107_; uint8_t v_isShared_3108_; uint8_t v_isSharedCheck_3112_; 
+v_a_3105_ = lean_ctor_get(v___x_3096_, 0);
+v_isSharedCheck_3112_ = !lean_is_exclusive(v___x_3096_);
+if (v_isSharedCheck_3112_ == 0)
+{
+v___x_3107_ = v___x_3096_;
+v_isShared_3108_ = v_isSharedCheck_3112_;
+goto v_resetjp_3106_;
+}
+else
+{
+lean_inc(v_a_3105_);
+lean_dec(v___x_3096_);
+v___x_3107_ = lean_box(0);
+v_isShared_3108_ = v_isSharedCheck_3112_;
+goto v_resetjp_3106_;
+}
+v_resetjp_3106_:
+{
+lean_object* v___x_3110_; 
+if (v_isShared_3108_ == 0)
+{
+lean_ctor_set_tag(v___x_3107_, 0);
+v___x_3110_ = v___x_3107_;
+goto v_reusejp_3109_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_3111_; 
+v_reuseFailAlloc_3111_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3111_, 0, v_a_3105_);
+v___x_3110_ = v_reuseFailAlloc_3111_;
+goto v_reusejp_3109_;
+}
+v_reusejp_3109_:
+{
+v_val_3093_ = v___x_3110_;
+goto v___jp_3092_;
+}
+}
+}
+v___jp_3092_:
+{
+lean_object* v___x_3094_; lean_object* v___x_3095_; 
+v___x_3094_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3094_, 0, v_val_3093_);
+v___x_3095_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3090_, v___x_3091_, v___x_3094_, v___f_3089_);
+return v___x_3095_;
+}
+}
+}
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___boxed(lean_object* v_context_3113_, lean_object* v_op_3114_, lean_object* v_flags_3115_, lean_object* v_payload_3116_, lean_object* v_failurePrefix_3117_, lean_object* v_a_3118_){
 _start:
 {
-uint8_t v_await_boxed_3105_; uint64_t v_extra_boxed_3106_; uint64_t v_res_3107_; lean_object* v_r_3108_; 
-v_await_boxed_3105_ = lean_unbox(v_await_3103_);
-v_extra_boxed_3106_ = lean_unbox_uint64(v_extra_3104_);
-lean_dec_ref(v_extra_3104_);
-v_res_3107_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__0(v_await_boxed_3105_, v_extra_boxed_3106_);
-v_r_3108_ = lean_box_uint64(v_res_3107_);
-return v_r_3108_;
+uint32_t v_op_boxed_3119_; uint64_t v_flags_boxed_3120_; lean_object* v_res_3121_; 
+v_op_boxed_3119_ = lean_unbox_uint32(v_op_3114_);
+lean_dec(v_op_3114_);
+v_flags_boxed_3120_ = lean_unbox_uint64(v_flags_3115_);
+lean_dec_ref(v_flags_3115_);
+v_res_3121_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1(v_context_3113_, v_op_boxed_3119_, v_flags_boxed_3120_, v_payload_3116_, v_failurePrefix_3117_);
+return v_res_3121_;
+}
+}
+LEAN_EXPORT uint64_t l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__0(uint8_t v_await_3122_, uint64_t v_extra_3123_){
+_start:
+{
+uint64_t v___x_3124_; uint64_t v___y_3126_; 
+v___x_3124_ = lean_uint64_once(&l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0, &l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0_once, _init_l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0);
+if (v_await_3122_ == 0)
+{
+uint64_t v___x_3129_; 
+v___x_3129_ = 0ULL;
+v___y_3126_ = v___x_3129_;
+goto v___jp_3125_;
+}
+else
+{
+uint64_t v___x_3130_; 
+v___x_3130_ = 2ULL;
+v___y_3126_ = v___x_3130_;
+goto v___jp_3125_;
+}
+v___jp_3125_:
+{
+uint64_t v___x_3127_; uint64_t v___x_3128_; 
+v___x_3127_ = lean_uint64_lor(v___x_3124_, v___y_3126_);
+v___x_3128_ = lean_uint64_lor(v___x_3127_, v_extra_3123_);
+return v___x_3128_;
+}
+}
+}
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__0___boxed(lean_object* v_await_3131_, lean_object* v_extra_3132_){
+_start:
+{
+uint8_t v_await_boxed_3133_; uint64_t v_extra_boxed_3134_; uint64_t v_res_3135_; lean_object* v_r_3136_; 
+v_await_boxed_3133_ = lean_unbox(v_await_3131_);
+v_extra_boxed_3134_ = lean_unbox_uint64(v_extra_3132_);
+lean_dec_ref(v_extra_3132_);
+v_res_3135_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__0(v_await_boxed_3133_, v_extra_boxed_3134_);
+v_r_3136_ = lean_box_uint64(v_res_3135_);
+return v_r_3136_;
 }
 }
 static uint64_t _init_l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___closed__1(void){
 _start:
 {
-uint64_t v___x_3110_; uint8_t v___x_3111_; uint64_t v___x_3112_; 
-v___x_3110_ = 8ULL;
-v___x_3111_ = 0;
-v___x_3112_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__0(v___x_3111_, v___x_3110_);
-return v___x_3112_;
+uint64_t v___x_3138_; uint8_t v___x_3139_; uint64_t v___x_3140_; 
+v___x_3138_ = 8ULL;
+v___x_3139_ = 0;
+v___x_3140_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__0(v___x_3139_, v___x_3138_);
+return v___x_3140_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0(lean_object* v_o_3113_, lean_object* v_name_3114_, lean_object* v_args_3115_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0(lean_object* v_o_3141_, lean_object* v_name_3142_, lean_object* v_args_3143_){
 _start:
 {
-lean_object* v___x_3117_; lean_object* v___x_3118_; lean_object* v___x_3119_; lean_object* v___x_3120_; lean_object* v___x_3121_; uint32_t v___x_3122_; uint64_t v___x_3123_; lean_object* v___x_3124_; lean_object* v___x_3125_; lean_object* v___x_3126_; lean_object* v___x_3127_; lean_object* v___x_3128_; lean_object* v___x_3129_; lean_object* v___x_3130_; lean_object* v___x_3131_; 
-v___x_3117_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___x_3118_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_3118_, 0, v_o_3113_);
-lean_ctor_set(v___x_3118_, 1, v___x_3117_);
-lean_inc_ref(v_name_3114_);
-v___x_3119_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_3119_, 0, v_name_3114_);
-v___x_3120_ = ((lean_object*)(l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___closed__0));
-v___x_3121_ = lean_string_append(v___x_3120_, v_name_3114_);
-lean_dec_ref(v_name_3114_);
-v___x_3122_ = 205;
-v___x_3123_ = lean_uint64_once(&l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___closed__1, &l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___closed__1_once, _init_l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___closed__1);
-v___x_3124_ = lean_alloc_ctor(7, 1, 0);
-lean_ctor_set(v___x_3124_, 0, v_args_3115_);
-v___x_3125_ = lean_unsigned_to_nat(3u);
-v___x_3126_ = lean_mk_empty_array_with_capacity(v___x_3125_);
-v___x_3127_ = lean_array_push(v___x_3126_, v___x_3118_);
-v___x_3128_ = lean_array_push(v___x_3127_, v___x_3119_);
-v___x_3129_ = lean_array_push(v___x_3128_, v___x_3124_);
-v___x_3130_ = lean_alloc_ctor(7, 1, 0);
-lean_ctor_set(v___x_3130_, 0, v___x_3129_);
-v___x_3131_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1(v___x_3121_, v___x_3122_, v___x_3123_, v___x_3130_, v___x_3117_);
-return v___x_3131_;
+lean_object* v___x_3145_; lean_object* v___x_3146_; lean_object* v___x_3147_; lean_object* v___x_3148_; lean_object* v___x_3149_; uint32_t v___x_3150_; uint64_t v___x_3151_; lean_object* v___x_3152_; lean_object* v___x_3153_; lean_object* v___x_3154_; lean_object* v___x_3155_; lean_object* v___x_3156_; lean_object* v___x_3157_; lean_object* v___x_3158_; lean_object* v___x_3159_; 
+v___x_3145_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___x_3146_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_3146_, 0, v_o_3141_);
+lean_ctor_set(v___x_3146_, 1, v___x_3145_);
+lean_inc_ref(v_name_3142_);
+v___x_3147_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v___x_3147_, 0, v_name_3142_);
+v___x_3148_ = ((lean_object*)(l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___closed__0));
+v___x_3149_ = lean_string_append(v___x_3148_, v_name_3142_);
+lean_dec_ref(v_name_3142_);
+v___x_3150_ = 205;
+v___x_3151_ = lean_uint64_once(&l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___closed__1, &l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___closed__1_once, _init_l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___closed__1);
+v___x_3152_ = lean_alloc_ctor(7, 1, 0);
+lean_ctor_set(v___x_3152_, 0, v_args_3143_);
+v___x_3153_ = lean_unsigned_to_nat(3u);
+v___x_3154_ = lean_mk_empty_array_with_capacity(v___x_3153_);
+v___x_3155_ = lean_array_push(v___x_3154_, v___x_3146_);
+v___x_3156_ = lean_array_push(v___x_3155_, v___x_3147_);
+v___x_3157_ = lean_array_push(v___x_3156_, v___x_3152_);
+v___x_3158_ = lean_alloc_ctor(7, 1, 0);
+lean_ctor_set(v___x_3158_, 0, v___x_3157_);
+v___x_3159_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1(v___x_3149_, v___x_3150_, v___x_3151_, v___x_3158_, v___x_3145_);
+return v___x_3159_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___boxed(lean_object* v_o_3132_, lean_object* v_name_3133_, lean_object* v_args_3134_, lean_object* v___y_3135_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___boxed(lean_object* v_o_3160_, lean_object* v_name_3161_, lean_object* v_args_3162_, lean_object* v___y_3163_){
 _start:
 {
-lean_object* v_res_3136_; 
-v_res_3136_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0(v_o_3132_, v_name_3133_, v_args_3134_);
-return v_res_3136_;
+lean_object* v_res_3164_; 
+v_res_3164_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0(v_o_3160_, v_name_3161_, v_args_3162_);
+return v_res_3164_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys(lean_object* v_self_3137_, lean_object* v_keys_3138_, lean_object* v_options_3139_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys(lean_object* v_self_3165_, lean_object* v_keys_3166_, lean_object* v_options_3167_){
 _start:
 {
-lean_object* v___x_3141_; size_t v_sz_3142_; size_t v___x_3143_; lean_object* v___x_3144_; lean_object* v___x_3145_; lean_object* v___x_3146_; lean_object* v___x_3147_; lean_object* v___x_3148_; lean_object* v___x_3149_; lean_object* v___x_3150_; lean_object* v___x_3151_; lean_object* v___x_3152_; 
-v___x_3141_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_delete___closed__0));
-v_sz_3142_ = lean_array_size(v_keys_3138_);
-v___x_3143_ = ((size_t)0ULL);
-v___x_3144_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_URLSearchParams_new_spec__0_spec__0(v_sz_3142_, v___x_3143_, v_keys_3138_);
-v___x_3145_ = lean_alloc_ctor(7, 1, 0);
-lean_ctor_set(v___x_3145_, 0, v___x_3144_);
-v___x_3146_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_3139_);
-v___x_3147_ = lean_unsigned_to_nat(2u);
-v___x_3148_ = lean_mk_empty_array_with_capacity(v___x_3147_);
-v___x_3149_ = lean_array_push(v___x_3148_, v___x_3145_);
-v___x_3150_ = lean_array_push(v___x_3149_, v___x_3146_);
-v___x_3151_ = l_Lasm_JS_Web_Support_args(v___x_3150_);
-v___x_3152_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0(v_self_3137_, v___x_3141_, v___x_3151_);
-return v___x_3152_;
+lean_object* v___x_3169_; size_t v_sz_3170_; size_t v___x_3171_; lean_object* v___x_3172_; lean_object* v___x_3173_; lean_object* v___x_3174_; lean_object* v___x_3175_; lean_object* v___x_3176_; lean_object* v___x_3177_; lean_object* v___x_3178_; lean_object* v___x_3179_; lean_object* v___x_3180_; 
+v___x_3169_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_delete___closed__0));
+v_sz_3170_ = lean_array_size(v_keys_3166_);
+v___x_3171_ = ((size_t)0ULL);
+v___x_3172_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_URLSearchParams_new_spec__0_spec__0(v_sz_3170_, v___x_3171_, v_keys_3166_);
+v___x_3173_ = lean_alloc_ctor(7, 1, 0);
+lean_ctor_set(v___x_3173_, 0, v___x_3172_);
+v___x_3174_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_3167_);
+v___x_3175_ = lean_unsigned_to_nat(2u);
+v___x_3176_ = lean_mk_empty_array_with_capacity(v___x_3175_);
+v___x_3177_ = lean_array_push(v___x_3176_, v___x_3173_);
+v___x_3178_ = lean_array_push(v___x_3177_, v___x_3174_);
+v___x_3179_ = l_Lasm_JS_Web_Support_args(v___x_3178_);
+v___x_3180_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0(v_self_3165_, v___x_3169_, v___x_3179_);
+return v___x_3180_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys___boxed(lean_object* v_self_3153_, lean_object* v_keys_3154_, lean_object* v_options_3155_, lean_object* v_a_3156_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys___boxed(lean_object* v_self_3181_, lean_object* v_keys_3182_, lean_object* v_options_3183_, lean_object* v_a_3184_){
 _start:
 {
-lean_object* v_res_3157_; 
-v_res_3157_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys(v_self_3153_, v_keys_3154_, v_options_3155_);
-lean_dec(v_options_3155_);
-return v_res_3157_;
+lean_object* v_res_3185_; 
+v_res_3185_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys(v_self_3181_, v_keys_3182_, v_options_3183_);
+lean_dec(v_options_3183_);
+return v_res_3185_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAll(lean_object* v_self_3159_, lean_object* v_options_3160_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAll(lean_object* v_self_3187_, lean_object* v_options_3188_){
 _start:
 {
-lean_object* v___x_3162_; lean_object* v___x_3163_; lean_object* v___x_3164_; lean_object* v___x_3165_; lean_object* v___x_3166_; lean_object* v___x_3167_; lean_object* v___x_3168_; 
-v___x_3162_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAll___closed__0));
-v___x_3163_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_3160_);
-v___x_3164_ = lean_unsigned_to_nat(1u);
-v___x_3165_ = lean_mk_empty_array_with_capacity(v___x_3164_);
-v___x_3166_ = lean_array_push(v___x_3165_, v___x_3163_);
-v___x_3167_ = l_Lasm_JS_Web_Support_args(v___x_3166_);
-v___x_3168_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3159_, v___x_3162_, v___x_3167_);
-return v___x_3168_;
+lean_object* v___x_3190_; lean_object* v___x_3191_; lean_object* v___x_3192_; lean_object* v___x_3193_; lean_object* v___x_3194_; lean_object* v___x_3195_; lean_object* v___x_3196_; 
+v___x_3190_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAll___closed__0));
+v___x_3191_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_3188_);
+v___x_3192_ = lean_unsigned_to_nat(1u);
+v___x_3193_ = lean_mk_empty_array_with_capacity(v___x_3192_);
+v___x_3194_ = lean_array_push(v___x_3193_, v___x_3191_);
+v___x_3195_ = l_Lasm_JS_Web_Support_args(v___x_3194_);
+v___x_3196_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3187_, v___x_3190_, v___x_3195_);
+return v___x_3196_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAll___boxed(lean_object* v_self_3169_, lean_object* v_options_3170_, lean_object* v_a_3171_){
-_start:
-{
-lean_object* v_res_3172_; 
-v_res_3172_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAll(v_self_3169_, v_options_3170_);
-lean_dec(v_options_3170_);
-return v_res_3172_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_transaction(lean_object* v_self_3174_, lean_object* v_closure_3175_){
-_start:
-{
-lean_object* v___x_3177_; lean_object* v___x_3178_; lean_object* v___x_3179_; lean_object* v___x_3180_; lean_object* v___x_3181_; lean_object* v___x_3182_; lean_object* v___x_3183_; lean_object* v___x_3184_; 
-v___x_3177_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_transaction___closed__0));
-v___x_3178_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___x_3179_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_3179_, 0, v_closure_3175_);
-lean_ctor_set(v___x_3179_, 1, v___x_3178_);
-v___x_3180_ = lean_unsigned_to_nat(1u);
-v___x_3181_ = lean_mk_empty_array_with_capacity(v___x_3180_);
-v___x_3182_ = lean_array_push(v___x_3181_, v___x_3179_);
-v___x_3183_ = l_Lasm_JS_Web_Support_args(v___x_3182_);
-v___x_3184_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Request_json_spec__0(v_self_3174_, v___x_3177_, v___x_3183_);
-return v___x_3184_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_transaction___boxed(lean_object* v_self_3185_, lean_object* v_closure_3186_, lean_object* v_a_3187_){
-_start:
-{
-lean_object* v_res_3188_; 
-v_res_3188_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_transaction(v_self_3185_, v_closure_3186_);
-return v_res_3188_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__0(lean_object* v_x_3189_){
-_start:
-{
-if (lean_obj_tag(v_x_3189_) == 0)
-{
-lean_object* v___x_3190_; 
-v___x_3190_ = lean_box(0);
-return v___x_3190_;
-}
-else
-{
-lean_object* v_val_3191_; lean_object* v___x_3192_; lean_object* v___x_3193_; lean_object* v___x_3194_; lean_object* v___x_3195_; lean_object* v___x_3196_; lean_object* v___x_3197_; lean_object* v___x_3198_; 
-v_val_3191_ = lean_ctor_get(v_x_3189_, 0);
-v___x_3192_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
-v___x_3193_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_val_3191_);
-v___x_3194_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_3194_, 0, v___x_3192_);
-lean_ctor_set(v___x_3194_, 1, v___x_3193_);
-v___x_3195_ = lean_unsigned_to_nat(1u);
-v___x_3196_ = lean_mk_empty_array_with_capacity(v___x_3195_);
-v___x_3197_ = lean_array_push(v___x_3196_, v___x_3194_);
-v___x_3198_ = l_Lasm_JS_Web_Support_fields(v___x_3197_);
-lean_dec_ref(v___x_3197_);
-return v___x_3198_;
-}
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__0___boxed(lean_object* v_x_3199_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAll___boxed(lean_object* v_self_3197_, lean_object* v_options_3198_, lean_object* v_a_3199_){
 _start:
 {
 lean_object* v_res_3200_; 
-v_res_3200_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__0(v_x_3199_);
-lean_dec(v_x_3199_);
+v_res_3200_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAll(v_self_3197_, v_options_3198_);
+lean_dec(v_options_3198_);
 return v_res_3200_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__2(lean_object* v___f_3201_, lean_object* v_x_3202_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_transaction(lean_object* v_self_3202_, lean_object* v_closure_3203_){
 _start:
 {
-if (lean_obj_tag(v_x_3202_) == 0)
-{
-lean_object* v_a_3204_; lean_object* v___x_3206_; uint8_t v_isShared_3207_; uint8_t v_isSharedCheck_3212_; 
-lean_dec_ref(v___f_3201_);
-v_a_3204_ = lean_ctor_get(v_x_3202_, 0);
-v_isSharedCheck_3212_ = !lean_is_exclusive(v_x_3202_);
-if (v_isSharedCheck_3212_ == 0)
-{
-v___x_3206_ = v_x_3202_;
-v_isShared_3207_ = v_isSharedCheck_3212_;
-goto v_resetjp_3205_;
-}
-else
-{
-lean_inc(v_a_3204_);
-lean_dec(v_x_3202_);
-v___x_3206_ = lean_box(0);
-v_isShared_3207_ = v_isSharedCheck_3212_;
-goto v_resetjp_3205_;
-}
-v_resetjp_3205_:
-{
-lean_object* v___x_3209_; 
-if (v_isShared_3207_ == 0)
-{
-v___x_3209_ = v___x_3206_;
-goto v_reusejp_3208_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_3211_; 
-v_reuseFailAlloc_3211_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3211_, 0, v_a_3204_);
-v___x_3209_ = v_reuseFailAlloc_3211_;
-goto v_reusejp_3208_;
-}
-v_reusejp_3208_:
-{
-lean_object* v___x_3210_; 
-v___x_3210_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3210_, 0, v___x_3209_);
-return v___x_3210_;
+lean_object* v___x_3205_; lean_object* v___x_3206_; lean_object* v___x_3207_; lean_object* v___x_3208_; lean_object* v___x_3209_; lean_object* v___x_3210_; lean_object* v___x_3211_; lean_object* v___x_3212_; 
+v___x_3205_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_transaction___closed__0));
+v___x_3206_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___x_3207_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_3207_, 0, v_closure_3203_);
+lean_ctor_set(v___x_3207_, 1, v___x_3206_);
+v___x_3208_ = lean_unsigned_to_nat(1u);
+v___x_3209_ = lean_mk_empty_array_with_capacity(v___x_3208_);
+v___x_3210_ = lean_array_push(v___x_3209_, v___x_3207_);
+v___x_3211_ = l_Lasm_JS_Web_Support_args(v___x_3210_);
+v___x_3212_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Request_json_spec__0(v_self_3202_, v___x_3205_, v___x_3211_);
+return v___x_3212_;
 }
 }
-}
-else
-{
-lean_object* v_a_3213_; lean_object* v___x_3214_; 
-v_a_3213_ = lean_ctor_get(v_x_3202_, 0);
-lean_inc(v_a_3213_);
-lean_dec_ref_known(v_x_3202_, 1);
-v___x_3214_ = lean_apply_2(v___f_3201_, v_a_3213_, lean_box(0));
-return v___x_3214_;
-}
-}
-}
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__2___boxed(lean_object* v___f_3215_, lean_object* v_x_3216_, lean_object* v___y_3217_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_transaction___boxed(lean_object* v_self_3213_, lean_object* v_closure_3214_, lean_object* v_a_3215_){
 _start:
 {
-lean_object* v_res_3218_; 
-v_res_3218_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__2(v___f_3215_, v_x_3216_);
-return v_res_3218_;
+lean_object* v_res_3216_; 
+v_res_3216_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_transaction(v_self_3213_, v_closure_3214_);
+return v_res_3216_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__0(lean_object* v_context_3219_, lean_object* v_x_3220_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__0(lean_object* v_x_3217_){
 _start:
 {
-lean_object* v_val_3223_; 
-if (lean_obj_tag(v_x_3220_) == 0)
+if (lean_obj_tag(v_x_3217_) == 0)
 {
-lean_object* v_a_3225_; lean_object* v___x_3227_; uint8_t v_isShared_3228_; uint8_t v_isSharedCheck_3233_; 
-v_a_3225_ = lean_ctor_get(v_x_3220_, 0);
-v_isSharedCheck_3233_ = !lean_is_exclusive(v_x_3220_);
-if (v_isSharedCheck_3233_ == 0)
-{
-v___x_3227_ = v_x_3220_;
-v_isShared_3228_ = v_isSharedCheck_3233_;
-goto v_resetjp_3226_;
+lean_object* v___x_3218_; 
+v___x_3218_ = lean_box(0);
+return v___x_3218_;
 }
 else
 {
-lean_inc(v_a_3225_);
-lean_dec(v_x_3220_);
-v___x_3227_ = lean_box(0);
-v_isShared_3228_ = v_isSharedCheck_3233_;
-goto v_resetjp_3226_;
+lean_object* v_val_3219_; lean_object* v___x_3220_; lean_object* v___x_3221_; lean_object* v___x_3222_; lean_object* v___x_3223_; lean_object* v___x_3224_; lean_object* v___x_3225_; lean_object* v___x_3226_; 
+v_val_3219_ = lean_ctor_get(v_x_3217_, 0);
+v___x_3220_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
+v___x_3221_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_val_3219_);
+v___x_3222_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_3222_, 0, v___x_3220_);
+lean_ctor_set(v___x_3222_, 1, v___x_3221_);
+v___x_3223_ = lean_unsigned_to_nat(1u);
+v___x_3224_ = lean_mk_empty_array_with_capacity(v___x_3223_);
+v___x_3225_ = lean_array_push(v___x_3224_, v___x_3222_);
+v___x_3226_ = l_Lasm_JS_Web_Support_fields(v___x_3225_);
+lean_dec_ref(v___x_3225_);
+return v___x_3226_;
 }
-v_resetjp_3226_:
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__0___boxed(lean_object* v_x_3227_){
+_start:
 {
-lean_object* v___x_3230_; 
-if (v_isShared_3228_ == 0)
+lean_object* v_res_3228_; 
+v_res_3228_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__0(v_x_3227_);
+lean_dec(v_x_3227_);
+return v_res_3228_;
+}
+}
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__2(lean_object* v___f_3229_, lean_object* v_x_3230_){
+_start:
 {
-v___x_3230_ = v___x_3227_;
-goto v_reusejp_3229_;
+if (lean_obj_tag(v_x_3230_) == 0)
+{
+lean_object* v_a_3232_; lean_object* v___x_3234_; uint8_t v_isShared_3235_; uint8_t v_isSharedCheck_3240_; 
+lean_dec_ref(v___f_3229_);
+v_a_3232_ = lean_ctor_get(v_x_3230_, 0);
+v_isSharedCheck_3240_ = !lean_is_exclusive(v_x_3230_);
+if (v_isSharedCheck_3240_ == 0)
+{
+v___x_3234_ = v_x_3230_;
+v_isShared_3235_ = v_isSharedCheck_3240_;
+goto v_resetjp_3233_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_3232_; 
-v_reuseFailAlloc_3232_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3232_, 0, v_a_3225_);
-v___x_3230_ = v_reuseFailAlloc_3232_;
-goto v_reusejp_3229_;
+lean_inc(v_a_3232_);
+lean_dec(v_x_3230_);
+v___x_3234_ = lean_box(0);
+v_isShared_3235_ = v_isSharedCheck_3240_;
+goto v_resetjp_3233_;
 }
-v_reusejp_3229_:
+v_resetjp_3233_:
 {
-lean_object* v___x_3231_; 
-v___x_3231_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3231_, 0, v___x_3230_);
-return v___x_3231_;
-}
-}
+lean_object* v___x_3237_; 
+if (v_isShared_3235_ == 0)
+{
+v___x_3237_ = v___x_3234_;
+goto v_reusejp_3236_;
 }
 else
 {
-lean_object* v_a_3234_; lean_object* v___x_3236_; uint8_t v_isShared_3237_; uint8_t v_isSharedCheck_3247_; 
-v_a_3234_ = lean_ctor_get(v_x_3220_, 0);
-v_isSharedCheck_3247_ = !lean_is_exclusive(v_x_3220_);
-if (v_isSharedCheck_3247_ == 0)
-{
-v___x_3236_ = v_x_3220_;
-v_isShared_3237_ = v_isSharedCheck_3247_;
-goto v_resetjp_3235_;
+lean_object* v_reuseFailAlloc_3239_; 
+v_reuseFailAlloc_3239_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3239_, 0, v_a_3232_);
+v___x_3237_ = v_reuseFailAlloc_3239_;
+goto v_reusejp_3236_;
 }
-else
-{
-lean_inc(v_a_3234_);
-lean_dec(v_x_3220_);
-v___x_3236_ = lean_box(0);
-v_isShared_3237_ = v_isSharedCheck_3247_;
-goto v_resetjp_3235_;
-}
-v_resetjp_3235_:
+v_reusejp_3236_:
 {
 lean_object* v___x_3238_; 
-v___x_3238_ = l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_JS_Web_ReadableStreamDefaultController_desiredSize_spec__0_spec__0_spec__1(v_context_3219_, v_a_3234_);
-if (lean_obj_tag(v___x_3238_) == 0)
-{
-lean_object* v_a_3239_; lean_object* v___x_3241_; 
-v_a_3239_ = lean_ctor_get(v___x_3238_, 0);
-lean_inc(v_a_3239_);
-lean_dec_ref_known(v___x_3238_, 1);
-if (v_isShared_3237_ == 0)
-{
-lean_ctor_set(v___x_3236_, 0, v_a_3239_);
-v___x_3241_ = v___x_3236_;
-goto v_reusejp_3240_;
+v___x_3238_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3238_, 0, v___x_3237_);
+return v___x_3238_;
 }
-else
-{
-lean_object* v_reuseFailAlloc_3242_; 
-v_reuseFailAlloc_3242_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3242_, 0, v_a_3239_);
-v___x_3241_ = v_reuseFailAlloc_3242_;
-goto v_reusejp_3240_;
-}
-v_reusejp_3240_:
-{
-v_val_3223_ = v___x_3241_;
-goto v___jp_3222_;
 }
 }
 else
 {
-lean_object* v_a_3243_; lean_object* v___x_3245_; 
-v_a_3243_ = lean_ctor_get(v___x_3238_, 0);
-lean_inc(v_a_3243_);
-lean_dec_ref_known(v___x_3238_, 1);
-if (v_isShared_3237_ == 0)
-{
-lean_ctor_set_tag(v___x_3236_, 0);
-lean_ctor_set(v___x_3236_, 0, v_a_3243_);
-v___x_3245_ = v___x_3236_;
-goto v_reusejp_3244_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_3246_; 
-v_reuseFailAlloc_3246_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3246_, 0, v_a_3243_);
-v___x_3245_ = v_reuseFailAlloc_3246_;
-goto v_reusejp_3244_;
-}
-v_reusejp_3244_:
-{
-v_val_3223_ = v___x_3245_;
-goto v___jp_3222_;
+lean_object* v_a_3241_; lean_object* v___x_3242_; 
+v_a_3241_ = lean_ctor_get(v_x_3230_, 0);
+lean_inc(v_a_3241_);
+lean_dec_ref_known(v_x_3230_, 1);
+v___x_3242_ = lean_apply_2(v___f_3229_, v_a_3241_, lean_box(0));
+return v___x_3242_;
 }
 }
 }
-}
-v___jp_3222_:
-{
-lean_object* v___x_3224_; 
-v___x_3224_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3224_, 0, v_val_3223_);
-return v___x_3224_;
-}
-}
-}
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__0___boxed(lean_object* v_context_3248_, lean_object* v_x_3249_, lean_object* v___y_3250_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__2___boxed(lean_object* v___f_3243_, lean_object* v_x_3244_, lean_object* v___y_3245_){
 _start:
 {
-lean_object* v_res_3251_; 
-v_res_3251_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__0(v_context_3248_, v_x_3249_);
-lean_dec_ref(v_context_3248_);
-return v_res_3251_;
+lean_object* v_res_3246_; 
+v_res_3246_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__2(v___f_3243_, v_x_3244_);
+return v_res_3246_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__9(lean_object* v_failurePrefix_3252_, uint32_t v_op_3253_, uint64_t v_flags_3254_, lean_object* v_payload_3255_, lean_object* v___f_3256_, lean_object* v___f_3257_, lean_object* v___f_3258_, lean_object* v_x_3259_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__0(lean_object* v_context_3247_, lean_object* v_x_3248_){
 _start:
 {
-if (lean_obj_tag(v_x_3259_) == 0)
+lean_object* v_val_3251_; 
+if (lean_obj_tag(v_x_3248_) == 0)
 {
-lean_object* v_a_3261_; lean_object* v___x_3263_; uint8_t v_isShared_3264_; uint8_t v_isSharedCheck_3269_; 
-lean_dec_ref(v___f_3258_);
-lean_dec_ref(v___f_3257_);
-lean_dec_ref(v___f_3256_);
-lean_dec(v_payload_3255_);
-v_a_3261_ = lean_ctor_get(v_x_3259_, 0);
-v_isSharedCheck_3269_ = !lean_is_exclusive(v_x_3259_);
-if (v_isSharedCheck_3269_ == 0)
+lean_object* v_a_3253_; lean_object* v___x_3255_; uint8_t v_isShared_3256_; uint8_t v_isSharedCheck_3261_; 
+v_a_3253_ = lean_ctor_get(v_x_3248_, 0);
+v_isSharedCheck_3261_ = !lean_is_exclusive(v_x_3248_);
+if (v_isSharedCheck_3261_ == 0)
 {
-v___x_3263_ = v_x_3259_;
-v_isShared_3264_ = v_isSharedCheck_3269_;
-goto v_resetjp_3262_;
+v___x_3255_ = v_x_3248_;
+v_isShared_3256_ = v_isSharedCheck_3261_;
+goto v_resetjp_3254_;
 }
 else
 {
-lean_inc(v_a_3261_);
-lean_dec(v_x_3259_);
-v___x_3263_ = lean_box(0);
-v_isShared_3264_ = v_isSharedCheck_3269_;
-goto v_resetjp_3262_;
+lean_inc(v_a_3253_);
+lean_dec(v_x_3248_);
+v___x_3255_ = lean_box(0);
+v_isShared_3256_ = v_isSharedCheck_3261_;
+goto v_resetjp_3254_;
 }
-v_resetjp_3262_:
+v_resetjp_3254_:
+{
+lean_object* v___x_3258_; 
+if (v_isShared_3256_ == 0)
+{
+v___x_3258_ = v___x_3255_;
+goto v_reusejp_3257_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_3260_; 
+v_reuseFailAlloc_3260_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3260_, 0, v_a_3253_);
+v___x_3258_ = v_reuseFailAlloc_3260_;
+goto v_reusejp_3257_;
+}
+v_reusejp_3257_:
+{
+lean_object* v___x_3259_; 
+v___x_3259_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3259_, 0, v___x_3258_);
+return v___x_3259_;
+}
+}
+}
+else
+{
+lean_object* v_a_3262_; lean_object* v___x_3264_; uint8_t v_isShared_3265_; uint8_t v_isSharedCheck_3275_; 
+v_a_3262_ = lean_ctor_get(v_x_3248_, 0);
+v_isSharedCheck_3275_ = !lean_is_exclusive(v_x_3248_);
+if (v_isSharedCheck_3275_ == 0)
+{
+v___x_3264_ = v_x_3248_;
+v_isShared_3265_ = v_isSharedCheck_3275_;
+goto v_resetjp_3263_;
+}
+else
+{
+lean_inc(v_a_3262_);
+lean_dec(v_x_3248_);
+v___x_3264_ = lean_box(0);
+v_isShared_3265_ = v_isSharedCheck_3275_;
+goto v_resetjp_3263_;
+}
+v_resetjp_3263_:
 {
 lean_object* v___x_3266_; 
-if (v_isShared_3264_ == 0)
+v___x_3266_ = l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_get___at___00Lasm_JS_Web_ReadableStreamDefaultController_desiredSize_spec__0_spec__0_spec__1(v_context_3247_, v_a_3262_);
+if (lean_obj_tag(v___x_3266_) == 0)
 {
-v___x_3266_ = v___x_3263_;
-goto v_reusejp_3265_;
+lean_object* v_a_3267_; lean_object* v___x_3269_; 
+v_a_3267_ = lean_ctor_get(v___x_3266_, 0);
+lean_inc(v_a_3267_);
+lean_dec_ref_known(v___x_3266_, 1);
+if (v_isShared_3265_ == 0)
+{
+lean_ctor_set(v___x_3264_, 0, v_a_3267_);
+v___x_3269_ = v___x_3264_;
+goto v_reusejp_3268_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_3268_; 
-v_reuseFailAlloc_3268_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3268_, 0, v_a_3261_);
-v___x_3266_ = v_reuseFailAlloc_3268_;
-goto v_reusejp_3265_;
+lean_object* v_reuseFailAlloc_3270_; 
+v_reuseFailAlloc_3270_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3270_, 0, v_a_3267_);
+v___x_3269_ = v_reuseFailAlloc_3270_;
+goto v_reusejp_3268_;
 }
-v_reusejp_3265_:
+v_reusejp_3268_:
 {
-lean_object* v___x_3267_; 
-v___x_3267_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3267_, 0, v___x_3266_);
-return v___x_3267_;
-}
+v_val_3251_ = v___x_3269_;
+goto v___jp_3250_;
 }
 }
 else
 {
-lean_object* v_a_3270_; lean_object* v___x_3272_; uint8_t v_isShared_3273_; uint8_t v_isSharedCheck_3316_; 
-v_a_3270_ = lean_ctor_get(v_x_3259_, 0);
-v_isSharedCheck_3316_ = !lean_is_exclusive(v_x_3259_);
-if (v_isSharedCheck_3316_ == 0)
+lean_object* v_a_3271_; lean_object* v___x_3273_; 
+v_a_3271_ = lean_ctor_get(v___x_3266_, 0);
+lean_inc(v_a_3271_);
+lean_dec_ref_known(v___x_3266_, 1);
+if (v_isShared_3265_ == 0)
 {
-v___x_3272_ = v_x_3259_;
-v_isShared_3273_ = v_isSharedCheck_3316_;
-goto v_resetjp_3271_;
+lean_ctor_set_tag(v___x_3264_, 0);
+lean_ctor_set(v___x_3264_, 0, v_a_3271_);
+v___x_3273_ = v___x_3264_;
+goto v_reusejp_3272_;
 }
 else
 {
-lean_inc(v_a_3270_);
-lean_dec(v_x_3259_);
-v___x_3272_ = lean_box(0);
-v_isShared_3273_ = v_isSharedCheck_3316_;
-goto v_resetjp_3271_;
+lean_object* v_reuseFailAlloc_3274_; 
+v_reuseFailAlloc_3274_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3274_, 0, v_a_3271_);
+v___x_3273_ = v_reuseFailAlloc_3274_;
+goto v_reusejp_3272_;
 }
-v_resetjp_3271_:
+v_reusejp_3272_:
 {
-lean_object* v___x_3274_; lean_object* v___x_3275_; uint8_t v___x_3276_; 
-v___x_3274_ = lean_string_utf8_byte_size(v_failurePrefix_3252_);
-v___x_3275_ = lean_unsigned_to_nat(0u);
-v___x_3276_ = lean_nat_dec_eq(v___x_3274_, v___x_3275_);
-if (v___x_3276_ == 0)
+v_val_3251_ = v___x_3273_;
+goto v___jp_3250_;
+}
+}
+}
+}
+v___jp_3250_:
 {
-lean_object* v___f_3277_; lean_object* v___x_3278_; lean_object* v___x_3279_; lean_object* v___x_3280_; lean_object* v___f_3281_; lean_object* v_val_3283_; lean_object* v___x_3288_; 
-lean_dec_ref(v___f_3258_);
-lean_inc(v_a_3270_);
-v___f_3277_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3___boxed), 3, 1);
-lean_closure_set(v___f_3277_, 0, v_a_3270_);
-v___x_3278_ = lean_box(v___x_3276_);
-v___x_3279_ = lean_box_uint32(v_op_3253_);
-v___x_3280_ = lean_box_uint64(v_flags_3254_);
-lean_inc(v_payload_3255_);
-v___f_3281_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__5___boxed), 9, 7);
-lean_closure_set(v___f_3281_, 0, v___x_3275_);
-lean_closure_set(v___f_3281_, 1, v___x_3278_);
-lean_closure_set(v___f_3281_, 2, v___f_3277_);
-lean_closure_set(v___f_3281_, 3, v_a_3270_);
-lean_closure_set(v___f_3281_, 4, v___x_3279_);
-lean_closure_set(v___f_3281_, 5, v___x_3280_);
-lean_closure_set(v___f_3281_, 6, v_payload_3255_);
-v___x_3288_ = l_Lasm_JS_Wire_encodeIO(v_payload_3255_);
-lean_dec(v_payload_3255_);
-if (lean_obj_tag(v___x_3288_) == 0)
+lean_object* v___x_3252_; 
+v___x_3252_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3252_, 0, v_val_3251_);
+return v___x_3252_;
+}
+}
+}
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__0___boxed(lean_object* v_context_3276_, lean_object* v_x_3277_, lean_object* v___y_3278_){
+_start:
 {
-lean_object* v_a_3289_; lean_object* v___x_3291_; 
-v_a_3289_ = lean_ctor_get(v___x_3288_, 0);
+lean_object* v_res_3279_; 
+v_res_3279_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__0(v_context_3276_, v_x_3277_);
+lean_dec_ref(v_context_3276_);
+return v_res_3279_;
+}
+}
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__9(lean_object* v_failurePrefix_3280_, uint32_t v_op_3281_, uint64_t v_flags_3282_, lean_object* v_payload_3283_, lean_object* v___f_3284_, lean_object* v___f_3285_, lean_object* v___f_3286_, lean_object* v_x_3287_){
+_start:
+{
+if (lean_obj_tag(v_x_3287_) == 0)
+{
+lean_object* v_a_3289_; lean_object* v___x_3291_; uint8_t v_isShared_3292_; uint8_t v_isSharedCheck_3297_; 
+lean_dec_ref(v___f_3286_);
+lean_dec_ref(v___f_3285_);
+lean_dec_ref(v___f_3284_);
+lean_dec(v_payload_3283_);
+v_a_3289_ = lean_ctor_get(v_x_3287_, 0);
+v_isSharedCheck_3297_ = !lean_is_exclusive(v_x_3287_);
+if (v_isSharedCheck_3297_ == 0)
+{
+v___x_3291_ = v_x_3287_;
+v_isShared_3292_ = v_isSharedCheck_3297_;
+goto v_resetjp_3290_;
+}
+else
+{
 lean_inc(v_a_3289_);
-lean_dec_ref_known(v___x_3288_, 1);
-if (v_isShared_3273_ == 0)
-{
-lean_ctor_set(v___x_3272_, 0, v_a_3289_);
-v___x_3291_ = v___x_3272_;
-goto v_reusejp_3290_;
+lean_dec(v_x_3287_);
+v___x_3291_ = lean_box(0);
+v_isShared_3292_ = v_isSharedCheck_3297_;
+goto v_resetjp_3290_;
 }
-else
+v_resetjp_3290_:
 {
-lean_object* v_reuseFailAlloc_3292_; 
-v_reuseFailAlloc_3292_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3292_, 0, v_a_3289_);
-v___x_3291_ = v_reuseFailAlloc_3292_;
-goto v_reusejp_3290_;
-}
-v_reusejp_3290_:
+lean_object* v___x_3294_; 
+if (v_isShared_3292_ == 0)
 {
-v_val_3283_ = v___x_3291_;
-goto v___jp_3282_;
-}
-}
-else
-{
-lean_object* v_a_3293_; lean_object* v___x_3295_; 
-v_a_3293_ = lean_ctor_get(v___x_3288_, 0);
-lean_inc(v_a_3293_);
-lean_dec_ref_known(v___x_3288_, 1);
-if (v_isShared_3273_ == 0)
-{
-lean_ctor_set_tag(v___x_3272_, 0);
-lean_ctor_set(v___x_3272_, 0, v_a_3293_);
-v___x_3295_ = v___x_3272_;
-goto v_reusejp_3294_;
+v___x_3294_ = v___x_3291_;
+goto v_reusejp_3293_;
 }
 else
 {
 lean_object* v_reuseFailAlloc_3296_; 
 v_reuseFailAlloc_3296_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3296_, 0, v_a_3293_);
-v___x_3295_ = v_reuseFailAlloc_3296_;
-goto v_reusejp_3294_;
+lean_ctor_set(v_reuseFailAlloc_3296_, 0, v_a_3289_);
+v___x_3294_ = v_reuseFailAlloc_3296_;
+goto v_reusejp_3293_;
 }
-v_reusejp_3294_:
+v_reusejp_3293_:
 {
-v_val_3283_ = v___x_3295_;
-goto v___jp_3282_;
+lean_object* v___x_3295_; 
+v___x_3295_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3295_, 0, v___x_3294_);
+return v___x_3295_;
 }
-}
-v___jp_3282_:
-{
-lean_object* v___x_3284_; lean_object* v___x_3285_; lean_object* v___x_3286_; lean_object* v___x_3287_; 
-v___x_3284_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3284_, 0, v_val_3283_);
-v___x_3285_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3275_, v___x_3276_, v___x_3284_, v___f_3281_);
-v___x_3286_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3275_, v___x_3276_, v___x_3285_, v___f_3256_);
-v___x_3287_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3275_, v___x_3276_, v___x_3286_, v___f_3257_);
-return v___x_3287_;
 }
 }
 else
 {
-lean_object* v___f_3297_; lean_object* v___x_3298_; lean_object* v___x_3299_; lean_object* v___f_3300_; uint8_t v___x_3301_; lean_object* v_val_3303_; lean_object* v___x_3307_; 
-lean_dec_ref(v___f_3257_);
-lean_dec_ref(v___f_3256_);
-lean_inc(v_a_3270_);
-v___f_3297_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3___boxed), 3, 1);
-lean_closure_set(v___f_3297_, 0, v_a_3270_);
-v___x_3298_ = lean_box_uint32(v_op_3253_);
-v___x_3299_ = lean_box_uint64(v_flags_3254_);
-lean_inc(v_payload_3255_);
-v___f_3300_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__7___boxed), 7, 5);
-lean_closure_set(v___f_3300_, 0, v___f_3297_);
-lean_closure_set(v___f_3300_, 1, v_a_3270_);
-lean_closure_set(v___f_3300_, 2, v___x_3298_);
-lean_closure_set(v___f_3300_, 3, v___x_3299_);
-lean_closure_set(v___f_3300_, 4, v_payload_3255_);
-v___x_3301_ = 0;
-v___x_3307_ = l_Lasm_JS_Wire_encodeIO(v_payload_3255_);
-lean_dec(v_payload_3255_);
-if (lean_obj_tag(v___x_3307_) == 0)
+lean_object* v_a_3298_; lean_object* v___x_3300_; uint8_t v_isShared_3301_; uint8_t v_isSharedCheck_3344_; 
+v_a_3298_ = lean_ctor_get(v_x_3287_, 0);
+v_isSharedCheck_3344_ = !lean_is_exclusive(v_x_3287_);
+if (v_isSharedCheck_3344_ == 0)
 {
-lean_object* v_a_3308_; lean_object* v___x_3310_; 
-v_a_3308_ = lean_ctor_get(v___x_3307_, 0);
-lean_inc(v_a_3308_);
-lean_dec_ref_known(v___x_3307_, 1);
-if (v_isShared_3273_ == 0)
-{
-lean_ctor_set(v___x_3272_, 0, v_a_3308_);
-v___x_3310_ = v___x_3272_;
-goto v_reusejp_3309_;
+v___x_3300_ = v_x_3287_;
+v_isShared_3301_ = v_isSharedCheck_3344_;
+goto v_resetjp_3299_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_3311_; 
-v_reuseFailAlloc_3311_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3311_, 0, v_a_3308_);
-v___x_3310_ = v_reuseFailAlloc_3311_;
-goto v_reusejp_3309_;
+lean_inc(v_a_3298_);
+lean_dec(v_x_3287_);
+v___x_3300_ = lean_box(0);
+v_isShared_3301_ = v_isSharedCheck_3344_;
+goto v_resetjp_3299_;
 }
-v_reusejp_3309_:
+v_resetjp_3299_:
 {
-v_val_3303_ = v___x_3310_;
-goto v___jp_3302_;
+lean_object* v___x_3302_; lean_object* v___x_3303_; uint8_t v___x_3304_; 
+v___x_3302_ = lean_string_utf8_byte_size(v_failurePrefix_3280_);
+v___x_3303_ = lean_unsigned_to_nat(0u);
+v___x_3304_ = lean_nat_dec_eq(v___x_3302_, v___x_3303_);
+if (v___x_3304_ == 0)
+{
+lean_object* v___f_3305_; lean_object* v___x_3306_; lean_object* v___x_3307_; lean_object* v___x_3308_; lean_object* v___f_3309_; lean_object* v_val_3311_; lean_object* v___x_3316_; 
+lean_dec_ref(v___f_3286_);
+lean_inc(v_a_3298_);
+v___f_3305_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3___boxed), 3, 1);
+lean_closure_set(v___f_3305_, 0, v_a_3298_);
+v___x_3306_ = lean_box(v___x_3304_);
+v___x_3307_ = lean_box_uint32(v_op_3281_);
+v___x_3308_ = lean_box_uint64(v_flags_3282_);
+lean_inc(v_payload_3283_);
+v___f_3309_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__5___boxed), 9, 7);
+lean_closure_set(v___f_3309_, 0, v___x_3303_);
+lean_closure_set(v___f_3309_, 1, v___x_3306_);
+lean_closure_set(v___f_3309_, 2, v___f_3305_);
+lean_closure_set(v___f_3309_, 3, v_a_3298_);
+lean_closure_set(v___f_3309_, 4, v___x_3307_);
+lean_closure_set(v___f_3309_, 5, v___x_3308_);
+lean_closure_set(v___f_3309_, 6, v_payload_3283_);
+v___x_3316_ = l_Lasm_JS_Wire_encodeIO(v_payload_3283_);
+lean_dec(v_payload_3283_);
+if (lean_obj_tag(v___x_3316_) == 0)
+{
+lean_object* v_a_3317_; lean_object* v___x_3319_; 
+v_a_3317_ = lean_ctor_get(v___x_3316_, 0);
+lean_inc(v_a_3317_);
+lean_dec_ref_known(v___x_3316_, 1);
+if (v_isShared_3301_ == 0)
+{
+lean_ctor_set(v___x_3300_, 0, v_a_3317_);
+v___x_3319_ = v___x_3300_;
+goto v_reusejp_3318_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_3320_; 
+v_reuseFailAlloc_3320_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3320_, 0, v_a_3317_);
+v___x_3319_ = v_reuseFailAlloc_3320_;
+goto v_reusejp_3318_;
+}
+v_reusejp_3318_:
+{
+v_val_3311_ = v___x_3319_;
+goto v___jp_3310_;
 }
 }
 else
 {
-lean_object* v_a_3312_; lean_object* v___x_3314_; 
-v_a_3312_ = lean_ctor_get(v___x_3307_, 0);
-lean_inc(v_a_3312_);
-lean_dec_ref_known(v___x_3307_, 1);
-if (v_isShared_3273_ == 0)
+lean_object* v_a_3321_; lean_object* v___x_3323_; 
+v_a_3321_ = lean_ctor_get(v___x_3316_, 0);
+lean_inc(v_a_3321_);
+lean_dec_ref_known(v___x_3316_, 1);
+if (v_isShared_3301_ == 0)
 {
-lean_ctor_set_tag(v___x_3272_, 0);
-lean_ctor_set(v___x_3272_, 0, v_a_3312_);
-v___x_3314_ = v___x_3272_;
-goto v_reusejp_3313_;
+lean_ctor_set_tag(v___x_3300_, 0);
+lean_ctor_set(v___x_3300_, 0, v_a_3321_);
+v___x_3323_ = v___x_3300_;
+goto v_reusejp_3322_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_3315_; 
-v_reuseFailAlloc_3315_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3315_, 0, v_a_3312_);
-v___x_3314_ = v_reuseFailAlloc_3315_;
-goto v_reusejp_3313_;
+lean_object* v_reuseFailAlloc_3324_; 
+v_reuseFailAlloc_3324_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3324_, 0, v_a_3321_);
+v___x_3323_ = v_reuseFailAlloc_3324_;
+goto v_reusejp_3322_;
 }
-v_reusejp_3313_:
+v_reusejp_3322_:
 {
-v_val_3303_ = v___x_3314_;
-goto v___jp_3302_;
+v_val_3311_ = v___x_3323_;
+goto v___jp_3310_;
 }
 }
-v___jp_3302_:
+v___jp_3310_:
 {
-lean_object* v___x_3304_; lean_object* v___x_3305_; lean_object* v___x_3306_; 
-v___x_3304_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3304_, 0, v_val_3303_);
-v___x_3305_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3275_, v___x_3301_, v___x_3304_, v___f_3300_);
-v___x_3306_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3275_, v___x_3301_, v___x_3305_, v___f_3258_);
-return v___x_3306_;
+lean_object* v___x_3312_; lean_object* v___x_3313_; lean_object* v___x_3314_; lean_object* v___x_3315_; 
+v___x_3312_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3312_, 0, v_val_3311_);
+v___x_3313_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3303_, v___x_3304_, v___x_3312_, v___f_3309_);
+v___x_3314_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3303_, v___x_3304_, v___x_3313_, v___f_3284_);
+v___x_3315_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3303_, v___x_3304_, v___x_3314_, v___f_3285_);
+return v___x_3315_;
+}
+}
+else
+{
+lean_object* v___f_3325_; lean_object* v___x_3326_; lean_object* v___x_3327_; lean_object* v___f_3328_; uint8_t v___x_3329_; lean_object* v_val_3331_; lean_object* v___x_3335_; 
+lean_dec_ref(v___f_3285_);
+lean_dec_ref(v___f_3284_);
+lean_inc(v_a_3298_);
+v___f_3325_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__3___boxed), 3, 1);
+lean_closure_set(v___f_3325_, 0, v_a_3298_);
+v___x_3326_ = lean_box_uint32(v_op_3281_);
+v___x_3327_ = lean_box_uint64(v_flags_3282_);
+lean_inc(v_payload_3283_);
+v___f_3328_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__7___boxed), 7, 5);
+lean_closure_set(v___f_3328_, 0, v___f_3325_);
+lean_closure_set(v___f_3328_, 1, v_a_3298_);
+lean_closure_set(v___f_3328_, 2, v___x_3326_);
+lean_closure_set(v___f_3328_, 3, v___x_3327_);
+lean_closure_set(v___f_3328_, 4, v_payload_3283_);
+v___x_3329_ = 0;
+v___x_3335_ = l_Lasm_JS_Wire_encodeIO(v_payload_3283_);
+lean_dec(v_payload_3283_);
+if (lean_obj_tag(v___x_3335_) == 0)
+{
+lean_object* v_a_3336_; lean_object* v___x_3338_; 
+v_a_3336_ = lean_ctor_get(v___x_3335_, 0);
+lean_inc(v_a_3336_);
+lean_dec_ref_known(v___x_3335_, 1);
+if (v_isShared_3301_ == 0)
+{
+lean_ctor_set(v___x_3300_, 0, v_a_3336_);
+v___x_3338_ = v___x_3300_;
+goto v_reusejp_3337_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_3339_; 
+v_reuseFailAlloc_3339_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3339_, 0, v_a_3336_);
+v___x_3338_ = v_reuseFailAlloc_3339_;
+goto v_reusejp_3337_;
+}
+v_reusejp_3337_:
+{
+v_val_3331_ = v___x_3338_;
+goto v___jp_3330_;
+}
+}
+else
+{
+lean_object* v_a_3340_; lean_object* v___x_3342_; 
+v_a_3340_ = lean_ctor_get(v___x_3335_, 0);
+lean_inc(v_a_3340_);
+lean_dec_ref_known(v___x_3335_, 1);
+if (v_isShared_3301_ == 0)
+{
+lean_ctor_set_tag(v___x_3300_, 0);
+lean_ctor_set(v___x_3300_, 0, v_a_3340_);
+v___x_3342_ = v___x_3300_;
+goto v_reusejp_3341_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_3343_; 
+v_reuseFailAlloc_3343_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3343_, 0, v_a_3340_);
+v___x_3342_ = v_reuseFailAlloc_3343_;
+goto v_reusejp_3341_;
+}
+v_reusejp_3341_:
+{
+v_val_3331_ = v___x_3342_;
+goto v___jp_3330_;
+}
+}
+v___jp_3330_:
+{
+lean_object* v___x_3332_; lean_object* v___x_3333_; lean_object* v___x_3334_; 
+v___x_3332_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3332_, 0, v_val_3331_);
+v___x_3333_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3303_, v___x_3329_, v___x_3332_, v___f_3328_);
+v___x_3334_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3303_, v___x_3329_, v___x_3333_, v___f_3286_);
+return v___x_3334_;
 }
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__9___boxed(lean_object* v_failurePrefix_3317_, lean_object* v_op_3318_, lean_object* v_flags_3319_, lean_object* v_payload_3320_, lean_object* v___f_3321_, lean_object* v___f_3322_, lean_object* v___f_3323_, lean_object* v_x_3324_, lean_object* v___y_3325_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__9___boxed(lean_object* v_failurePrefix_3345_, lean_object* v_op_3346_, lean_object* v_flags_3347_, lean_object* v_payload_3348_, lean_object* v___f_3349_, lean_object* v___f_3350_, lean_object* v___f_3351_, lean_object* v_x_3352_, lean_object* v___y_3353_){
 _start:
 {
-uint32_t v_op_boxed_3326_; uint64_t v_flags_boxed_3327_; lean_object* v_res_3328_; 
-v_op_boxed_3326_ = lean_unbox_uint32(v_op_3318_);
-lean_dec(v_op_3318_);
-v_flags_boxed_3327_ = lean_unbox_uint64(v_flags_3319_);
-lean_dec_ref(v_flags_3319_);
-v_res_3328_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__9(v_failurePrefix_3317_, v_op_boxed_3326_, v_flags_boxed_3327_, v_payload_3320_, v___f_3321_, v___f_3322_, v___f_3323_, v_x_3324_);
-lean_dec_ref(v_failurePrefix_3317_);
-return v_res_3328_;
+uint32_t v_op_boxed_3354_; uint64_t v_flags_boxed_3355_; lean_object* v_res_3356_; 
+v_op_boxed_3354_ = lean_unbox_uint32(v_op_3346_);
+lean_dec(v_op_3346_);
+v_flags_boxed_3355_ = lean_unbox_uint64(v_flags_3347_);
+lean_dec_ref(v_flags_3347_);
+v_res_3356_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__9(v_failurePrefix_3345_, v_op_boxed_3354_, v_flags_boxed_3355_, v_payload_3348_, v___f_3349_, v___f_3350_, v___f_3351_, v_x_3352_);
+lean_dec_ref(v_failurePrefix_3345_);
+return v_res_3356_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__1(lean_object* v___f_3329_, lean_object* v_bytes_3330_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__1(lean_object* v___f_3357_, lean_object* v_bytes_3358_){
 _start:
 {
-lean_object* v___x_3332_; uint8_t v___x_3333_; lean_object* v_val_3335_; lean_object* v___x_3338_; 
-v___x_3332_ = lean_unsigned_to_nat(0u);
-v___x_3333_ = 0;
-v___x_3338_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_bytes_3330_);
-if (lean_obj_tag(v___x_3338_) == 0)
+lean_object* v___x_3360_; uint8_t v___x_3361_; lean_object* v_val_3363_; lean_object* v___x_3366_; 
+v___x_3360_ = lean_unsigned_to_nat(0u);
+v___x_3361_ = 0;
+v___x_3366_ = l_Lasm_JS_Wire_decodeWith___at___00Lasm_JS_Wire_decode_spec__0(v_bytes_3358_);
+if (lean_obj_tag(v___x_3366_) == 0)
 {
-lean_object* v_a_3339_; lean_object* v___x_3341_; uint8_t v_isShared_3342_; uint8_t v_isSharedCheck_3346_; 
-v_a_3339_ = lean_ctor_get(v___x_3338_, 0);
-v_isSharedCheck_3346_ = !lean_is_exclusive(v___x_3338_);
-if (v_isSharedCheck_3346_ == 0)
+lean_object* v_a_3367_; lean_object* v___x_3369_; uint8_t v_isShared_3370_; uint8_t v_isSharedCheck_3374_; 
+v_a_3367_ = lean_ctor_get(v___x_3366_, 0);
+v_isSharedCheck_3374_ = !lean_is_exclusive(v___x_3366_);
+if (v_isSharedCheck_3374_ == 0)
 {
-v___x_3341_ = v___x_3338_;
-v_isShared_3342_ = v_isSharedCheck_3346_;
-goto v_resetjp_3340_;
+v___x_3369_ = v___x_3366_;
+v_isShared_3370_ = v_isSharedCheck_3374_;
+goto v_resetjp_3368_;
 }
 else
 {
-lean_inc(v_a_3339_);
-lean_dec(v___x_3338_);
-v___x_3341_ = lean_box(0);
-v_isShared_3342_ = v_isSharedCheck_3346_;
-goto v_resetjp_3340_;
+lean_inc(v_a_3367_);
+lean_dec(v___x_3366_);
+v___x_3369_ = lean_box(0);
+v_isShared_3370_ = v_isSharedCheck_3374_;
+goto v_resetjp_3368_;
 }
-v_resetjp_3340_:
+v_resetjp_3368_:
 {
-lean_object* v___x_3344_; 
-if (v_isShared_3342_ == 0)
+lean_object* v___x_3372_; 
+if (v_isShared_3370_ == 0)
 {
-lean_ctor_set_tag(v___x_3341_, 1);
-v___x_3344_ = v___x_3341_;
-goto v_reusejp_3343_;
+lean_ctor_set_tag(v___x_3369_, 1);
+v___x_3372_ = v___x_3369_;
+goto v_reusejp_3371_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_3345_; 
-v_reuseFailAlloc_3345_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3345_, 0, v_a_3339_);
-v___x_3344_ = v_reuseFailAlloc_3345_;
-goto v_reusejp_3343_;
+lean_object* v_reuseFailAlloc_3373_; 
+v_reuseFailAlloc_3373_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3373_, 0, v_a_3367_);
+v___x_3372_ = v_reuseFailAlloc_3373_;
+goto v_reusejp_3371_;
 }
-v_reusejp_3343_:
+v_reusejp_3371_:
 {
-v_val_3335_ = v___x_3344_;
-goto v___jp_3334_;
-}
-}
-}
-else
-{
-lean_object* v_a_3347_; lean_object* v___x_3349_; uint8_t v_isShared_3350_; uint8_t v_isSharedCheck_3354_; 
-v_a_3347_ = lean_ctor_get(v___x_3338_, 0);
-v_isSharedCheck_3354_ = !lean_is_exclusive(v___x_3338_);
-if (v_isSharedCheck_3354_ == 0)
-{
-v___x_3349_ = v___x_3338_;
-v_isShared_3350_ = v_isSharedCheck_3354_;
-goto v_resetjp_3348_;
-}
-else
-{
-lean_inc(v_a_3347_);
-lean_dec(v___x_3338_);
-v___x_3349_ = lean_box(0);
-v_isShared_3350_ = v_isSharedCheck_3354_;
-goto v_resetjp_3348_;
-}
-v_resetjp_3348_:
-{
-lean_object* v___x_3352_; 
-if (v_isShared_3350_ == 0)
-{
-lean_ctor_set_tag(v___x_3349_, 0);
-v___x_3352_ = v___x_3349_;
-goto v_reusejp_3351_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_3353_; 
-v_reuseFailAlloc_3353_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3353_, 0, v_a_3347_);
-v___x_3352_ = v_reuseFailAlloc_3353_;
-goto v_reusejp_3351_;
-}
-v_reusejp_3351_:
-{
-v_val_3335_ = v___x_3352_;
-goto v___jp_3334_;
-}
-}
-}
-v___jp_3334_:
-{
-lean_object* v___x_3336_; lean_object* v___x_3337_; 
-v___x_3336_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3336_, 0, v_val_3335_);
-v___x_3337_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3332_, v___x_3333_, v___x_3336_, v___f_3329_);
-return v___x_3337_;
-}
-}
-}
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__1___boxed(lean_object* v___f_3355_, lean_object* v_bytes_3356_, lean_object* v___y_3357_){
-_start:
-{
-lean_object* v_res_3358_; 
-v_res_3358_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__1(v___f_3355_, v_bytes_3356_);
-lean_dec_ref(v_bytes_3356_);
-return v_res_3358_;
-}
-}
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__3(lean_object* v___f_3359_, lean_object* v_x_3360_){
-_start:
-{
-if (lean_obj_tag(v_x_3360_) == 0)
-{
-lean_object* v_a_3362_; lean_object* v___x_3364_; uint8_t v_isShared_3365_; uint8_t v_isSharedCheck_3370_; 
-lean_dec_ref(v___f_3359_);
-v_a_3362_ = lean_ctor_get(v_x_3360_, 0);
-v_isSharedCheck_3370_ = !lean_is_exclusive(v_x_3360_);
-if (v_isSharedCheck_3370_ == 0)
-{
-v___x_3364_ = v_x_3360_;
-v_isShared_3365_ = v_isSharedCheck_3370_;
-goto v_resetjp_3363_;
-}
-else
-{
-lean_inc(v_a_3362_);
-lean_dec(v_x_3360_);
-v___x_3364_ = lean_box(0);
-v_isShared_3365_ = v_isSharedCheck_3370_;
-goto v_resetjp_3363_;
-}
-v_resetjp_3363_:
-{
-lean_object* v___x_3367_; 
-if (v_isShared_3365_ == 0)
-{
-v___x_3367_ = v___x_3364_;
-goto v_reusejp_3366_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_3369_; 
-v_reuseFailAlloc_3369_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3369_, 0, v_a_3362_);
-v___x_3367_ = v_reuseFailAlloc_3369_;
-goto v_reusejp_3366_;
-}
-v_reusejp_3366_:
-{
-lean_object* v___x_3368_; 
-v___x_3368_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3368_, 0, v___x_3367_);
-return v___x_3368_;
+v_val_3363_ = v___x_3372_;
+goto v___jp_3362_;
 }
 }
 }
 else
 {
-lean_object* v___x_3372_; uint8_t v_isShared_3373_; uint8_t v_isSharedCheck_3382_; 
-v_isSharedCheck_3382_ = !lean_is_exclusive(v_x_3360_);
+lean_object* v_a_3375_; lean_object* v___x_3377_; uint8_t v_isShared_3378_; uint8_t v_isSharedCheck_3382_; 
+v_a_3375_ = lean_ctor_get(v___x_3366_, 0);
+v_isSharedCheck_3382_ = !lean_is_exclusive(v___x_3366_);
 if (v_isSharedCheck_3382_ == 0)
 {
-lean_object* v_unused_3383_; 
-v_unused_3383_ = lean_ctor_get(v_x_3360_, 0);
-lean_dec(v_unused_3383_);
-v___x_3372_ = v_x_3360_;
-v_isShared_3373_ = v_isSharedCheck_3382_;
-goto v_resetjp_3371_;
+v___x_3377_ = v___x_3366_;
+v_isShared_3378_ = v_isSharedCheck_3382_;
+goto v_resetjp_3376_;
 }
 else
 {
-lean_dec(v_x_3360_);
-v___x_3372_ = lean_box(0);
-v_isShared_3373_ = v_isSharedCheck_3382_;
-goto v_resetjp_3371_;
+lean_inc(v_a_3375_);
+lean_dec(v___x_3366_);
+v___x_3377_ = lean_box(0);
+v_isShared_3378_ = v_isSharedCheck_3382_;
+goto v_resetjp_3376_;
 }
-v_resetjp_3371_:
+v_resetjp_3376_:
 {
-lean_object* v___x_3374_; uint8_t v___x_3375_; lean_object* v___x_3376_; lean_object* v___x_3378_; 
-v___x_3374_ = lean_unsigned_to_nat(0u);
-v___x_3375_ = 0;
-v___x_3376_ = lean_io_promise_new();
-if (v_isShared_3373_ == 0)
+lean_object* v___x_3380_; 
+if (v_isShared_3378_ == 0)
 {
-lean_ctor_set(v___x_3372_, 0, v___x_3376_);
-v___x_3378_ = v___x_3372_;
-goto v_reusejp_3377_;
+lean_ctor_set_tag(v___x_3377_, 0);
+v___x_3380_ = v___x_3377_;
+goto v_reusejp_3379_;
 }
 else
 {
 lean_object* v_reuseFailAlloc_3381_; 
-v_reuseFailAlloc_3381_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3381_, 0, v___x_3376_);
-v___x_3378_ = v_reuseFailAlloc_3381_;
-goto v_reusejp_3377_;
+v_reuseFailAlloc_3381_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3381_, 0, v_a_3375_);
+v___x_3380_ = v_reuseFailAlloc_3381_;
+goto v_reusejp_3379_;
 }
-v_reusejp_3377_:
+v_reusejp_3379_:
 {
-lean_object* v___x_3379_; lean_object* v___x_3380_; 
-v___x_3379_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3379_, 0, v___x_3378_);
-v___x_3380_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3374_, v___x_3375_, v___x_3379_, v___f_3359_);
-return v___x_3380_;
+v_val_3363_ = v___x_3380_;
+goto v___jp_3362_;
 }
 }
 }
+v___jp_3362_:
+{
+lean_object* v___x_3364_; lean_object* v___x_3365_; 
+v___x_3364_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3364_, 0, v_val_3363_);
+v___x_3365_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3360_, v___x_3361_, v___x_3364_, v___f_3357_);
+return v___x_3365_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__3___boxed(lean_object* v___f_3384_, lean_object* v_x_3385_, lean_object* v___y_3386_){
+}
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__1___boxed(lean_object* v___f_3383_, lean_object* v_bytes_3384_, lean_object* v___y_3385_){
 _start:
 {
-lean_object* v_res_3387_; 
-v_res_3387_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__3(v___f_3384_, v_x_3385_);
-return v_res_3387_;
+lean_object* v_res_3386_; 
+v_res_3386_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__1(v___f_3383_, v_bytes_3384_);
+lean_dec_ref(v_bytes_3384_);
+return v_res_3386_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2(lean_object* v_context_3388_, uint32_t v_op_3389_, uint64_t v_flags_3390_, lean_object* v_payload_3391_, lean_object* v_failurePrefix_3392_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__3(lean_object* v___f_3387_, lean_object* v_x_3388_){
 _start:
 {
-lean_object* v___f_3394_; lean_object* v___f_3395_; lean_object* v___f_3396_; lean_object* v___f_3397_; lean_object* v___x_3398_; lean_object* v___x_3399_; lean_object* v___f_3400_; lean_object* v___f_3401_; lean_object* v___x_3402_; uint8_t v___x_3403_; lean_object* v_val_3405_; lean_object* v___x_3408_; 
-v___f_3394_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__0___boxed), 3, 1);
-lean_closure_set(v___f_3394_, 0, v_context_3388_);
-v___f_3395_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__1___boxed), 3, 1);
-lean_closure_set(v___f_3395_, 0, v___f_3394_);
-v___f_3396_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__2___boxed), 3, 1);
-lean_closure_set(v___f_3396_, 0, v___f_3395_);
-lean_inc_ref(v_failurePrefix_3392_);
-v___f_3397_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__4___boxed), 3, 1);
-lean_closure_set(v___f_3397_, 0, v_failurePrefix_3392_);
-v___x_3398_ = lean_box_uint32(v_op_3389_);
-v___x_3399_ = lean_box_uint64(v_flags_3390_);
-lean_inc_ref(v___f_3396_);
-v___f_3400_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__9___boxed), 9, 7);
-lean_closure_set(v___f_3400_, 0, v_failurePrefix_3392_);
-lean_closure_set(v___f_3400_, 1, v___x_3398_);
-lean_closure_set(v___f_3400_, 2, v___x_3399_);
-lean_closure_set(v___f_3400_, 3, v_payload_3391_);
-lean_closure_set(v___f_3400_, 4, v___f_3397_);
-lean_closure_set(v___f_3400_, 5, v___f_3396_);
-lean_closure_set(v___f_3400_, 6, v___f_3396_);
-v___f_3401_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__3___boxed), 3, 1);
-lean_closure_set(v___f_3401_, 0, v___f_3400_);
+if (lean_obj_tag(v_x_3388_) == 0)
+{
+lean_object* v_a_3390_; lean_object* v___x_3392_; uint8_t v_isShared_3393_; uint8_t v_isSharedCheck_3398_; 
+lean_dec_ref(v___f_3387_);
+v_a_3390_ = lean_ctor_get(v_x_3388_, 0);
+v_isSharedCheck_3398_ = !lean_is_exclusive(v_x_3388_);
+if (v_isSharedCheck_3398_ == 0)
+{
+v___x_3392_ = v_x_3388_;
+v_isShared_3393_ = v_isSharedCheck_3398_;
+goto v_resetjp_3391_;
+}
+else
+{
+lean_inc(v_a_3390_);
+lean_dec(v_x_3388_);
+v___x_3392_ = lean_box(0);
+v_isShared_3393_ = v_isSharedCheck_3398_;
+goto v_resetjp_3391_;
+}
+v_resetjp_3391_:
+{
+lean_object* v___x_3395_; 
+if (v_isShared_3393_ == 0)
+{
+v___x_3395_ = v___x_3392_;
+goto v_reusejp_3394_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_3397_; 
+v_reuseFailAlloc_3397_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3397_, 0, v_a_3390_);
+v___x_3395_ = v_reuseFailAlloc_3397_;
+goto v_reusejp_3394_;
+}
+v_reusejp_3394_:
+{
+lean_object* v___x_3396_; 
+v___x_3396_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3396_, 0, v___x_3395_);
+return v___x_3396_;
+}
+}
+}
+else
+{
+lean_object* v___x_3400_; uint8_t v_isShared_3401_; uint8_t v_isSharedCheck_3410_; 
+v_isSharedCheck_3410_ = !lean_is_exclusive(v_x_3388_);
+if (v_isSharedCheck_3410_ == 0)
+{
+lean_object* v_unused_3411_; 
+v_unused_3411_ = lean_ctor_get(v_x_3388_, 0);
+lean_dec(v_unused_3411_);
+v___x_3400_ = v_x_3388_;
+v_isShared_3401_ = v_isSharedCheck_3410_;
+goto v_resetjp_3399_;
+}
+else
+{
+lean_dec(v_x_3388_);
+v___x_3400_ = lean_box(0);
+v_isShared_3401_ = v_isSharedCheck_3410_;
+goto v_resetjp_3399_;
+}
+v_resetjp_3399_:
+{
+lean_object* v___x_3402_; uint8_t v___x_3403_; lean_object* v___x_3404_; lean_object* v___x_3406_; 
 v___x_3402_ = lean_unsigned_to_nat(0u);
 v___x_3403_ = 0;
-v___x_3408_ = l___private_Lasm_JS_Core_0__Lasm_JS_ensureStarted();
-if (lean_obj_tag(v___x_3408_) == 0)
+v___x_3404_ = lean_io_promise_new();
+if (v_isShared_3401_ == 0)
 {
-lean_object* v_a_3409_; lean_object* v___x_3411_; uint8_t v_isShared_3412_; uint8_t v_isSharedCheck_3416_; 
-v_a_3409_ = lean_ctor_get(v___x_3408_, 0);
-v_isSharedCheck_3416_ = !lean_is_exclusive(v___x_3408_);
-if (v_isSharedCheck_3416_ == 0)
-{
-v___x_3411_ = v___x_3408_;
-v_isShared_3412_ = v_isSharedCheck_3416_;
-goto v_resetjp_3410_;
+lean_ctor_set(v___x_3400_, 0, v___x_3404_);
+v___x_3406_ = v___x_3400_;
+goto v_reusejp_3405_;
 }
 else
 {
-lean_inc(v_a_3409_);
-lean_dec(v___x_3408_);
-v___x_3411_ = lean_box(0);
-v_isShared_3412_ = v_isSharedCheck_3416_;
-goto v_resetjp_3410_;
+lean_object* v_reuseFailAlloc_3409_; 
+v_reuseFailAlloc_3409_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3409_, 0, v___x_3404_);
+v___x_3406_ = v_reuseFailAlloc_3409_;
+goto v_reusejp_3405_;
 }
-v_resetjp_3410_:
+v_reusejp_3405_:
 {
-lean_object* v___x_3414_; 
-if (v_isShared_3412_ == 0)
-{
-lean_ctor_set_tag(v___x_3411_, 1);
-v___x_3414_ = v___x_3411_;
-goto v_reusejp_3413_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_3415_; 
-v_reuseFailAlloc_3415_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3415_, 0, v_a_3409_);
-v___x_3414_ = v_reuseFailAlloc_3415_;
-goto v_reusejp_3413_;
-}
-v_reusejp_3413_:
-{
-v_val_3405_ = v___x_3414_;
-goto v___jp_3404_;
+lean_object* v___x_3407_; lean_object* v___x_3408_; 
+v___x_3407_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3407_, 0, v___x_3406_);
+v___x_3408_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3402_, v___x_3403_, v___x_3407_, v___f_3387_);
+return v___x_3408_;
 }
 }
 }
-else
-{
-lean_object* v_a_3417_; lean_object* v___x_3419_; uint8_t v_isShared_3420_; uint8_t v_isSharedCheck_3424_; 
-v_a_3417_ = lean_ctor_get(v___x_3408_, 0);
-v_isSharedCheck_3424_ = !lean_is_exclusive(v___x_3408_);
-if (v_isSharedCheck_3424_ == 0)
-{
-v___x_3419_ = v___x_3408_;
-v_isShared_3420_ = v_isSharedCheck_3424_;
-goto v_resetjp_3418_;
-}
-else
-{
-lean_inc(v_a_3417_);
-lean_dec(v___x_3408_);
-v___x_3419_ = lean_box(0);
-v_isShared_3420_ = v_isSharedCheck_3424_;
-goto v_resetjp_3418_;
-}
-v_resetjp_3418_:
-{
-lean_object* v___x_3422_; 
-if (v_isShared_3420_ == 0)
-{
-lean_ctor_set_tag(v___x_3419_, 0);
-v___x_3422_ = v___x_3419_;
-goto v_reusejp_3421_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_3423_; 
-v_reuseFailAlloc_3423_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_3423_, 0, v_a_3417_);
-v___x_3422_ = v_reuseFailAlloc_3423_;
-goto v_reusejp_3421_;
-}
-v_reusejp_3421_:
-{
-v_val_3405_ = v___x_3422_;
-goto v___jp_3404_;
 }
 }
-}
-v___jp_3404_:
-{
-lean_object* v___x_3406_; lean_object* v___x_3407_; 
-v___x_3406_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v___x_3406_, 0, v_val_3405_);
-v___x_3407_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3402_, v___x_3403_, v___x_3406_, v___f_3401_);
-return v___x_3407_;
-}
-}
-}
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___boxed(lean_object* v_context_3425_, lean_object* v_op_3426_, lean_object* v_flags_3427_, lean_object* v_payload_3428_, lean_object* v_failurePrefix_3429_, lean_object* v_a_3430_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__3___boxed(lean_object* v___f_3412_, lean_object* v_x_3413_, lean_object* v___y_3414_){
 _start:
 {
-uint32_t v_op_boxed_3431_; uint64_t v_flags_boxed_3432_; lean_object* v_res_3433_; 
-v_op_boxed_3431_ = lean_unbox_uint32(v_op_3426_);
-lean_dec(v_op_3426_);
-v_flags_boxed_3432_ = lean_unbox_uint64(v_flags_3427_);
-lean_dec_ref(v_flags_3427_);
-v_res_3433_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2(v_context_3425_, v_op_boxed_3431_, v_flags_boxed_3432_, v_payload_3428_, v_failurePrefix_3429_);
-return v_res_3433_;
+lean_object* v_res_3415_; 
+v_res_3415_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__3(v___f_3412_, v_x_3413_);
+return v_res_3415_;
 }
 }
-LEAN_EXPORT uint64_t l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__1(uint8_t v_await_3434_, uint64_t v_extra_3435_){
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2(lean_object* v_context_3416_, uint32_t v_op_3417_, uint64_t v_flags_3418_, lean_object* v_payload_3419_, lean_object* v_failurePrefix_3420_){
 _start:
 {
-uint64_t v___x_3436_; uint64_t v___y_3438_; 
-v___x_3436_ = lean_uint64_once(&l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0, &l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0_once, _init_l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0);
-if (v_await_3434_ == 0)
+lean_object* v___f_3422_; lean_object* v___f_3423_; lean_object* v___f_3424_; lean_object* v___f_3425_; lean_object* v___x_3426_; lean_object* v___x_3427_; lean_object* v___f_3428_; lean_object* v___f_3429_; lean_object* v___x_3430_; uint8_t v___x_3431_; lean_object* v_val_3433_; lean_object* v___x_3436_; 
+v___f_3422_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__0___boxed), 3, 1);
+lean_closure_set(v___f_3422_, 0, v_context_3416_);
+v___f_3423_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__1___boxed), 3, 1);
+lean_closure_set(v___f_3423_, 0, v___f_3422_);
+v___f_3424_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__2___boxed), 3, 1);
+lean_closure_set(v___f_3424_, 0, v___f_3423_);
+lean_inc_ref(v_failurePrefix_3420_);
+v___f_3425_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0_spec__1___lam__4___boxed), 3, 1);
+lean_closure_set(v___f_3425_, 0, v_failurePrefix_3420_);
+v___x_3426_ = lean_box_uint32(v_op_3417_);
+v___x_3427_ = lean_box_uint64(v_flags_3418_);
+lean_inc_ref(v___f_3424_);
+v___f_3428_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__9___boxed), 9, 7);
+lean_closure_set(v___f_3428_, 0, v_failurePrefix_3420_);
+lean_closure_set(v___f_3428_, 1, v___x_3426_);
+lean_closure_set(v___f_3428_, 2, v___x_3427_);
+lean_closure_set(v___f_3428_, 3, v_payload_3419_);
+lean_closure_set(v___f_3428_, 4, v___f_3425_);
+lean_closure_set(v___f_3428_, 5, v___f_3424_);
+lean_closure_set(v___f_3428_, 6, v___f_3424_);
+v___f_3429_ = lean_alloc_closure((void*)(l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___lam__3___boxed), 3, 1);
+lean_closure_set(v___f_3429_, 0, v___f_3428_);
+v___x_3430_ = lean_unsigned_to_nat(0u);
+v___x_3431_ = 0;
+v___x_3436_ = l___private_Lasm_JS_Core_0__Lasm_JS_ensureStarted();
+if (lean_obj_tag(v___x_3436_) == 0)
 {
-uint64_t v___x_3441_; 
-v___x_3441_ = 0ULL;
-v___y_3438_ = v___x_3441_;
-goto v___jp_3437_;
+lean_object* v_a_3437_; lean_object* v___x_3439_; uint8_t v_isShared_3440_; uint8_t v_isSharedCheck_3444_; 
+v_a_3437_ = lean_ctor_get(v___x_3436_, 0);
+v_isSharedCheck_3444_ = !lean_is_exclusive(v___x_3436_);
+if (v_isSharedCheck_3444_ == 0)
+{
+v___x_3439_ = v___x_3436_;
+v_isShared_3440_ = v_isSharedCheck_3444_;
+goto v_resetjp_3438_;
 }
 else
 {
-uint64_t v___x_3442_; 
-v___x_3442_ = 2ULL;
-v___y_3438_ = v___x_3442_;
-goto v___jp_3437_;
+lean_inc(v_a_3437_);
+lean_dec(v___x_3436_);
+v___x_3439_ = lean_box(0);
+v_isShared_3440_ = v_isSharedCheck_3444_;
+goto v_resetjp_3438_;
 }
-v___jp_3437_:
+v_resetjp_3438_:
 {
-uint64_t v___x_3439_; uint64_t v___x_3440_; 
-v___x_3439_ = lean_uint64_lor(v___x_3436_, v___y_3438_);
-v___x_3440_ = lean_uint64_lor(v___x_3439_, v_extra_3435_);
-return v___x_3440_;
+lean_object* v___x_3442_; 
+if (v_isShared_3440_ == 0)
+{
+lean_ctor_set_tag(v___x_3439_, 1);
+v___x_3442_ = v___x_3439_;
+goto v_reusejp_3441_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_3443_; 
+v_reuseFailAlloc_3443_ = lean_alloc_ctor(1, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3443_, 0, v_a_3437_);
+v___x_3442_ = v_reuseFailAlloc_3443_;
+goto v_reusejp_3441_;
+}
+v_reusejp_3441_:
+{
+v_val_3433_ = v___x_3442_;
+goto v___jp_3432_;
 }
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__1___boxed(lean_object* v_await_3443_, lean_object* v_extra_3444_){
+else
+{
+lean_object* v_a_3445_; lean_object* v___x_3447_; uint8_t v_isShared_3448_; uint8_t v_isSharedCheck_3452_; 
+v_a_3445_ = lean_ctor_get(v___x_3436_, 0);
+v_isSharedCheck_3452_ = !lean_is_exclusive(v___x_3436_);
+if (v_isSharedCheck_3452_ == 0)
+{
+v___x_3447_ = v___x_3436_;
+v_isShared_3448_ = v_isSharedCheck_3452_;
+goto v_resetjp_3446_;
+}
+else
+{
+lean_inc(v_a_3445_);
+lean_dec(v___x_3436_);
+v___x_3447_ = lean_box(0);
+v_isShared_3448_ = v_isSharedCheck_3452_;
+goto v_resetjp_3446_;
+}
+v_resetjp_3446_:
+{
+lean_object* v___x_3450_; 
+if (v_isShared_3448_ == 0)
+{
+lean_ctor_set_tag(v___x_3447_, 0);
+v___x_3450_ = v___x_3447_;
+goto v_reusejp_3449_;
+}
+else
+{
+lean_object* v_reuseFailAlloc_3451_; 
+v_reuseFailAlloc_3451_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v_reuseFailAlloc_3451_, 0, v_a_3445_);
+v___x_3450_ = v_reuseFailAlloc_3451_;
+goto v_reusejp_3449_;
+}
+v_reusejp_3449_:
+{
+v_val_3433_ = v___x_3450_;
+goto v___jp_3432_;
+}
+}
+}
+v___jp_3432_:
+{
+lean_object* v___x_3434_; lean_object* v___x_3435_; 
+v___x_3434_ = lean_alloc_ctor(0, 1, 0);
+lean_ctor_set(v___x_3434_, 0, v_val_3433_);
+v___x_3435_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3430_, v___x_3431_, v___x_3434_, v___f_3429_);
+return v___x_3435_;
+}
+}
+}
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2___boxed(lean_object* v_context_3453_, lean_object* v_op_3454_, lean_object* v_flags_3455_, lean_object* v_payload_3456_, lean_object* v_failurePrefix_3457_, lean_object* v_a_3458_){
 _start:
 {
-uint8_t v_await_boxed_3445_; uint64_t v_extra_boxed_3446_; uint64_t v_res_3447_; lean_object* v_r_3448_; 
-v_await_boxed_3445_ = lean_unbox(v_await_3443_);
-v_extra_boxed_3446_ = lean_unbox_uint64(v_extra_3444_);
-lean_dec_ref(v_extra_3444_);
-v_res_3447_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__1(v_await_boxed_3445_, v_extra_boxed_3446_);
-v_r_3448_ = lean_box_uint64(v_res_3447_);
-return v_r_3448_;
+uint32_t v_op_boxed_3459_; uint64_t v_flags_boxed_3460_; lean_object* v_res_3461_; 
+v_op_boxed_3459_ = lean_unbox_uint32(v_op_3454_);
+lean_dec(v_op_3454_);
+v_flags_boxed_3460_ = lean_unbox_uint64(v_flags_3455_);
+lean_dec_ref(v_flags_3455_);
+v_res_3461_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2(v_context_3453_, v_op_boxed_3459_, v_flags_boxed_3460_, v_payload_3456_, v_failurePrefix_3457_);
+return v_res_3461_;
+}
+}
+LEAN_EXPORT uint64_t l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__1(uint8_t v_await_3462_, uint64_t v_extra_3463_){
+_start:
+{
+uint64_t v___x_3464_; uint64_t v___y_3466_; 
+v___x_3464_ = lean_uint64_once(&l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0, &l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0_once, _init_l_Lasm_JS_Value_get___at___00Lasm_JS_Cloudflare_DurableObjectId_name_spec__0___closed__0);
+if (v_await_3462_ == 0)
+{
+uint64_t v___x_3469_; 
+v___x_3469_ = 0ULL;
+v___y_3466_ = v___x_3469_;
+goto v___jp_3465_;
+}
+else
+{
+uint64_t v___x_3470_; 
+v___x_3470_ = 2ULL;
+v___y_3466_ = v___x_3470_;
+goto v___jp_3465_;
+}
+v___jp_3465_:
+{
+uint64_t v___x_3467_; uint64_t v___x_3468_; 
+v___x_3467_ = lean_uint64_lor(v___x_3464_, v___y_3466_);
+v___x_3468_ = lean_uint64_lor(v___x_3467_, v_extra_3463_);
+return v___x_3468_;
+}
+}
+}
+LEAN_EXPORT lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__1___boxed(lean_object* v_await_3471_, lean_object* v_extra_3472_){
+_start:
+{
+uint8_t v_await_boxed_3473_; uint64_t v_extra_boxed_3474_; uint64_t v_res_3475_; lean_object* v_r_3476_; 
+v_await_boxed_3473_ = lean_unbox(v_await_3471_);
+v_extra_boxed_3474_ = lean_unbox_uint64(v_extra_3472_);
+lean_dec_ref(v_extra_3472_);
+v_res_3475_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__1(v_await_boxed_3473_, v_extra_boxed_3474_);
+v_r_3476_ = lean_box_uint64(v_res_3475_);
+return v_r_3476_;
 }
 }
 static uint64_t _init_l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1___closed__0(void){
 _start:
 {
-uint64_t v___x_3449_; uint8_t v___x_3450_; uint64_t v___x_3451_; 
-v___x_3449_ = 8ULL;
-v___x_3450_ = 0;
-v___x_3451_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__1(v___x_3450_, v___x_3449_);
-return v___x_3451_;
+uint64_t v___x_3477_; uint8_t v___x_3478_; uint64_t v___x_3479_; 
+v___x_3477_ = 8ULL;
+v___x_3478_ = 0;
+v___x_3479_ = l___private_Lasm_JS_Core_0__Lasm_JS_Value_flags___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__1(v___x_3478_, v___x_3477_);
+return v___x_3479_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1(lean_object* v_o_3452_, lean_object* v_name_3453_, lean_object* v_args_3454_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1(lean_object* v_o_3480_, lean_object* v_name_3481_, lean_object* v_args_3482_){
 _start:
 {
-lean_object* v___x_3456_; lean_object* v___x_3457_; lean_object* v___x_3458_; lean_object* v___x_3459_; lean_object* v___x_3460_; uint32_t v___x_3461_; uint64_t v___x_3462_; lean_object* v___x_3463_; lean_object* v___x_3464_; lean_object* v___x_3465_; lean_object* v___x_3466_; lean_object* v___x_3467_; lean_object* v___x_3468_; lean_object* v___x_3469_; lean_object* v___x_3470_; 
-v___x_3456_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
-v___x_3457_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_3457_, 0, v_o_3452_);
-lean_ctor_set(v___x_3457_, 1, v___x_3456_);
-lean_inc_ref(v_name_3453_);
-v___x_3458_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_3458_, 0, v_name_3453_);
-v___x_3459_ = ((lean_object*)(l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___closed__0));
-v___x_3460_ = lean_string_append(v___x_3459_, v_name_3453_);
-lean_dec_ref(v_name_3453_);
-v___x_3461_ = 205;
-v___x_3462_ = lean_uint64_once(&l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1___closed__0, &l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1___closed__0_once, _init_l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1___closed__0);
-v___x_3463_ = lean_alloc_ctor(7, 1, 0);
-lean_ctor_set(v___x_3463_, 0, v_args_3454_);
-v___x_3464_ = lean_unsigned_to_nat(3u);
-v___x_3465_ = lean_mk_empty_array_with_capacity(v___x_3464_);
-v___x_3466_ = lean_array_push(v___x_3465_, v___x_3457_);
-v___x_3467_ = lean_array_push(v___x_3466_, v___x_3458_);
-v___x_3468_ = lean_array_push(v___x_3467_, v___x_3463_);
-v___x_3469_ = lean_alloc_ctor(7, 1, 0);
-lean_ctor_set(v___x_3469_, 0, v___x_3468_);
-v___x_3470_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2(v___x_3460_, v___x_3461_, v___x_3462_, v___x_3469_, v___x_3456_);
-return v___x_3470_;
+lean_object* v___x_3484_; lean_object* v___x_3485_; lean_object* v___x_3486_; lean_object* v___x_3487_; lean_object* v___x_3488_; uint32_t v___x_3489_; uint64_t v___x_3490_; lean_object* v___x_3491_; lean_object* v___x_3492_; lean_object* v___x_3493_; lean_object* v___x_3494_; lean_object* v___x_3495_; lean_object* v___x_3496_; lean_object* v___x_3497_; lean_object* v___x_3498_; 
+v___x_3484_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectNamespace___lam__0___closed__0));
+v___x_3485_ = lean_alloc_ctor(9, 2, 0);
+lean_ctor_set(v___x_3485_, 0, v_o_3480_);
+lean_ctor_set(v___x_3485_, 1, v___x_3484_);
+lean_inc_ref(v_name_3481_);
+v___x_3486_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v___x_3486_, 0, v_name_3481_);
+v___x_3487_ = ((lean_object*)(l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0___closed__0));
+v___x_3488_ = lean_string_append(v___x_3487_, v_name_3481_);
+lean_dec_ref(v_name_3481_);
+v___x_3489_ = 205;
+v___x_3490_ = lean_uint64_once(&l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1___closed__0, &l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1___closed__0_once, _init_l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1___closed__0);
+v___x_3491_ = lean_alloc_ctor(7, 1, 0);
+lean_ctor_set(v___x_3491_, 0, v_args_3482_);
+v___x_3492_ = lean_unsigned_to_nat(3u);
+v___x_3493_ = lean_mk_empty_array_with_capacity(v___x_3492_);
+v___x_3494_ = lean_array_push(v___x_3493_, v___x_3485_);
+v___x_3495_ = lean_array_push(v___x_3494_, v___x_3486_);
+v___x_3496_ = lean_array_push(v___x_3495_, v___x_3491_);
+v___x_3497_ = lean_alloc_ctor(7, 1, 0);
+lean_ctor_set(v___x_3497_, 0, v___x_3496_);
+v___x_3498_ = l___private_Lasm_JS_Core_0__Lasm_JS_callAsync___at___00Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1_spec__2(v___x_3488_, v___x_3489_, v___x_3490_, v___x_3497_, v___x_3484_);
+return v___x_3498_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1___boxed(lean_object* v_o_3471_, lean_object* v_name_3472_, lean_object* v_args_3473_, lean_object* v___y_3474_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1___boxed(lean_object* v_o_3499_, lean_object* v_name_3500_, lean_object* v_args_3501_, lean_object* v___y_3502_){
 _start:
 {
-lean_object* v_res_3475_; 
-v_res_3475_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1(v_o_3471_, v_name_3472_, v_args_3473_);
-return v_res_3475_;
+lean_object* v_res_3503_; 
+v_res_3503_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1(v_o_3499_, v_name_3500_, v_args_3501_);
+return v_res_3503_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm(lean_object* v_self_3477_, lean_object* v_options_3478_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm(lean_object* v_self_3505_, lean_object* v_options_3506_){
 _start:
 {
-lean_object* v___x_3480_; lean_object* v___x_3481_; lean_object* v___x_3482_; lean_object* v___x_3483_; lean_object* v___x_3484_; lean_object* v___x_3485_; lean_object* v___x_3486_; 
-v___x_3480_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm___closed__0));
-v___x_3481_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__0(v_options_3478_);
-v___x_3482_ = lean_unsigned_to_nat(1u);
-v___x_3483_ = lean_mk_empty_array_with_capacity(v___x_3482_);
-v___x_3484_ = lean_array_push(v___x_3483_, v___x_3481_);
-v___x_3485_ = l_Lasm_JS_Web_Support_args(v___x_3484_);
-v___x_3486_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1(v_self_3477_, v___x_3480_, v___x_3485_);
-return v___x_3486_;
+lean_object* v___x_3508_; lean_object* v___x_3509_; lean_object* v___x_3510_; lean_object* v___x_3511_; lean_object* v___x_3512_; lean_object* v___x_3513_; lean_object* v___x_3514_; 
+v___x_3508_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm___closed__0));
+v___x_3509_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__0(v_options_3506_);
+v___x_3510_ = lean_unsigned_to_nat(1u);
+v___x_3511_ = lean_mk_empty_array_with_capacity(v___x_3510_);
+v___x_3512_ = lean_array_push(v___x_3511_, v___x_3509_);
+v___x_3513_ = l_Lasm_JS_Web_Support_args(v___x_3512_);
+v___x_3514_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1(v_self_3505_, v___x_3508_, v___x_3513_);
+return v___x_3514_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm___boxed(lean_object* v_self_3487_, lean_object* v_options_3488_, lean_object* v_a_3489_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm___boxed(lean_object* v_self_3515_, lean_object* v_options_3516_, lean_object* v_a_3517_){
 _start:
 {
-lean_object* v_res_3490_; 
-v_res_3490_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm(v_self_3487_, v_options_3488_);
-lean_dec(v_options_3488_);
-return v_res_3490_;
+lean_object* v_res_3518_; 
+v_res_3518_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm(v_self_3515_, v_options_3516_);
+lean_dec(v_options_3516_);
+return v_res_3518_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm_spec__0(lean_object* v_x_3491_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm_spec__0(lean_object* v_x_3519_){
 _start:
 {
-if (lean_obj_tag(v_x_3491_) == 0)
+if (lean_obj_tag(v_x_3519_) == 0)
 {
-lean_object* v___x_3492_; 
-v___x_3492_ = lean_box(0);
-return v___x_3492_;
+lean_object* v___x_3520_; 
+v___x_3520_ = lean_box(0);
+return v___x_3520_;
 }
 else
 {
-lean_object* v_val_3493_; lean_object* v_allowConcurrency_3494_; lean_object* v_allowUnconfirmed_3495_; lean_object* v___x_3497_; uint8_t v_isShared_3498_; uint8_t v_isSharedCheck_3512_; 
-v_val_3493_ = lean_ctor_get(v_x_3491_, 0);
-lean_inc(v_val_3493_);
-lean_dec_ref_known(v_x_3491_, 1);
-v_allowConcurrency_3494_ = lean_ctor_get(v_val_3493_, 0);
-v_allowUnconfirmed_3495_ = lean_ctor_get(v_val_3493_, 1);
-v_isSharedCheck_3512_ = !lean_is_exclusive(v_val_3493_);
-if (v_isSharedCheck_3512_ == 0)
+lean_object* v_val_3521_; lean_object* v_allowConcurrency_3522_; lean_object* v_allowUnconfirmed_3523_; lean_object* v___x_3525_; uint8_t v_isShared_3526_; uint8_t v_isSharedCheck_3540_; 
+v_val_3521_ = lean_ctor_get(v_x_3519_, 0);
+lean_inc(v_val_3521_);
+lean_dec_ref_known(v_x_3519_, 1);
+v_allowConcurrency_3522_ = lean_ctor_get(v_val_3521_, 0);
+v_allowUnconfirmed_3523_ = lean_ctor_get(v_val_3521_, 1);
+v_isSharedCheck_3540_ = !lean_is_exclusive(v_val_3521_);
+if (v_isSharedCheck_3540_ == 0)
 {
-v___x_3497_ = v_val_3493_;
-v_isShared_3498_ = v_isSharedCheck_3512_;
-goto v_resetjp_3496_;
+v___x_3525_ = v_val_3521_;
+v_isShared_3526_ = v_isSharedCheck_3540_;
+goto v_resetjp_3524_;
 }
 else
 {
-lean_inc(v_allowUnconfirmed_3495_);
-lean_inc(v_allowConcurrency_3494_);
-lean_dec(v_val_3493_);
-v___x_3497_ = lean_box(0);
-v_isShared_3498_ = v_isSharedCheck_3512_;
-goto v_resetjp_3496_;
+lean_inc(v_allowUnconfirmed_3523_);
+lean_inc(v_allowConcurrency_3522_);
+lean_dec(v_val_3521_);
+v___x_3525_ = lean_box(0);
+v_isShared_3526_ = v_isSharedCheck_3540_;
+goto v_resetjp_3524_;
 }
-v_resetjp_3496_:
+v_resetjp_3524_:
 {
-lean_object* v___x_3499_; lean_object* v___x_3500_; lean_object* v___x_3502_; 
-v___x_3499_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
-v___x_3500_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_allowConcurrency_3494_);
-lean_dec(v_allowConcurrency_3494_);
-if (v_isShared_3498_ == 0)
+lean_object* v___x_3527_; lean_object* v___x_3528_; lean_object* v___x_3530_; 
+v___x_3527_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectGetOptions___lam__0___closed__0));
+v___x_3528_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_allowConcurrency_3522_);
+lean_dec(v_allowConcurrency_3522_);
+if (v_isShared_3526_ == 0)
 {
-lean_ctor_set(v___x_3497_, 1, v___x_3500_);
-lean_ctor_set(v___x_3497_, 0, v___x_3499_);
-v___x_3502_ = v___x_3497_;
-goto v_reusejp_3501_;
+lean_ctor_set(v___x_3525_, 1, v___x_3528_);
+lean_ctor_set(v___x_3525_, 0, v___x_3527_);
+v___x_3530_ = v___x_3525_;
+goto v_reusejp_3529_;
 }
 else
 {
-lean_object* v_reuseFailAlloc_3511_; 
-v_reuseFailAlloc_3511_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v_reuseFailAlloc_3511_, 0, v___x_3499_);
-lean_ctor_set(v_reuseFailAlloc_3511_, 1, v___x_3500_);
-v___x_3502_ = v_reuseFailAlloc_3511_;
-goto v_reusejp_3501_;
+lean_object* v_reuseFailAlloc_3539_; 
+v_reuseFailAlloc_3539_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v_reuseFailAlloc_3539_, 0, v___x_3527_);
+lean_ctor_set(v_reuseFailAlloc_3539_, 1, v___x_3528_);
+v___x_3530_ = v_reuseFailAlloc_3539_;
+goto v_reusejp_3529_;
 }
-v_reusejp_3501_:
+v_reusejp_3529_:
 {
-lean_object* v___x_3503_; lean_object* v___x_3504_; lean_object* v___x_3505_; lean_object* v___x_3506_; lean_object* v___x_3507_; lean_object* v___x_3508_; lean_object* v___x_3509_; lean_object* v___x_3510_; 
-v___x_3503_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectPutOptions___lam__0___closed__0));
-v___x_3504_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_allowUnconfirmed_3495_);
-lean_dec(v_allowUnconfirmed_3495_);
-v___x_3505_ = lean_alloc_ctor(0, 2, 0);
-lean_ctor_set(v___x_3505_, 0, v___x_3503_);
-lean_ctor_set(v___x_3505_, 1, v___x_3504_);
-v___x_3506_ = lean_unsigned_to_nat(2u);
-v___x_3507_ = lean_mk_empty_array_with_capacity(v___x_3506_);
-v___x_3508_ = lean_array_push(v___x_3507_, v___x_3502_);
-v___x_3509_ = lean_array_push(v___x_3508_, v___x_3505_);
-v___x_3510_ = l_Lasm_JS_Web_Support_fields(v___x_3509_);
-lean_dec_ref(v___x_3509_);
-return v___x_3510_;
+lean_object* v___x_3531_; lean_object* v___x_3532_; lean_object* v___x_3533_; lean_object* v___x_3534_; lean_object* v___x_3535_; lean_object* v___x_3536_; lean_object* v___x_3537_; lean_object* v___x_3538_; 
+v___x_3531_ = ((lean_object*)(l_Lasm_JS_Cloudflare_instToJSDurableObjectPutOptions___lam__0___closed__0));
+v___x_3532_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__0_spec__0(v_allowUnconfirmed_3523_);
+lean_dec(v_allowUnconfirmed_3523_);
+v___x_3533_ = lean_alloc_ctor(0, 2, 0);
+lean_ctor_set(v___x_3533_, 0, v___x_3531_);
+lean_ctor_set(v___x_3533_, 1, v___x_3532_);
+v___x_3534_ = lean_unsigned_to_nat(2u);
+v___x_3535_ = lean_mk_empty_array_with_capacity(v___x_3534_);
+v___x_3536_ = lean_array_push(v___x_3535_, v___x_3530_);
+v___x_3537_ = lean_array_push(v___x_3536_, v___x_3533_);
+v___x_3538_ = l_Lasm_JS_Web_Support_fields(v___x_3537_);
+lean_dec_ref(v___x_3537_);
+return v___x_3538_;
 }
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm(lean_object* v_self_3514_, lean_object* v_scheduledTime_3515_, lean_object* v_options_3516_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm(lean_object* v_self_3542_, lean_object* v_scheduledTime_3543_, lean_object* v_options_3544_){
 _start:
 {
-lean_object* v___x_3518_; lean_object* v___x_3519_; lean_object* v___x_3520_; lean_object* v___x_3521_; lean_object* v___x_3522_; lean_object* v___x_3523_; lean_object* v___x_3524_; lean_object* v___x_3525_; 
-v___x_3518_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm___closed__0));
-v___x_3519_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm_spec__0(v_options_3516_);
-v___x_3520_ = lean_unsigned_to_nat(2u);
-v___x_3521_ = lean_mk_empty_array_with_capacity(v___x_3520_);
-v___x_3522_ = lean_array_push(v___x_3521_, v_scheduledTime_3515_);
-v___x_3523_ = lean_array_push(v___x_3522_, v___x_3519_);
-v___x_3524_ = l_Lasm_JS_Web_Support_args(v___x_3523_);
-v___x_3525_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3514_, v___x_3518_, v___x_3524_);
-return v___x_3525_;
+lean_object* v___x_3546_; lean_object* v___x_3547_; lean_object* v___x_3548_; lean_object* v___x_3549_; lean_object* v___x_3550_; lean_object* v___x_3551_; lean_object* v___x_3552_; lean_object* v___x_3553_; 
+v___x_3546_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm___closed__0));
+v___x_3547_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm_spec__0(v_options_3544_);
+v___x_3548_ = lean_unsigned_to_nat(2u);
+v___x_3549_ = lean_mk_empty_array_with_capacity(v___x_3548_);
+v___x_3550_ = lean_array_push(v___x_3549_, v_scheduledTime_3543_);
+v___x_3551_ = lean_array_push(v___x_3550_, v___x_3547_);
+v___x_3552_ = l_Lasm_JS_Web_Support_args(v___x_3551_);
+v___x_3553_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3542_, v___x_3546_, v___x_3552_);
+return v___x_3553_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm___boxed(lean_object* v_self_3526_, lean_object* v_scheduledTime_3527_, lean_object* v_options_3528_, lean_object* v_a_3529_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm___boxed(lean_object* v_self_3554_, lean_object* v_scheduledTime_3555_, lean_object* v_options_3556_, lean_object* v_a_3557_){
 _start:
 {
-lean_object* v_res_3530_; 
-v_res_3530_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm(v_self_3526_, v_scheduledTime_3527_, v_options_3528_);
-return v_res_3530_;
+lean_object* v_res_3558_; 
+v_res_3558_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm(v_self_3554_, v_scheduledTime_3555_, v_options_3556_);
+return v_res_3558_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAlarm(lean_object* v_self_3532_, lean_object* v_options_3533_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAlarm(lean_object* v_self_3560_, lean_object* v_options_3561_){
 _start:
 {
-lean_object* v___x_3535_; lean_object* v___x_3536_; lean_object* v___x_3537_; lean_object* v___x_3538_; lean_object* v___x_3539_; lean_object* v___x_3540_; lean_object* v___x_3541_; 
-v___x_3535_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAlarm___closed__0));
-v___x_3536_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm_spec__0(v_options_3533_);
-v___x_3537_ = lean_unsigned_to_nat(1u);
-v___x_3538_ = lean_mk_empty_array_with_capacity(v___x_3537_);
-v___x_3539_ = lean_array_push(v___x_3538_, v___x_3536_);
-v___x_3540_ = l_Lasm_JS_Web_Support_args(v___x_3539_);
-v___x_3541_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3532_, v___x_3535_, v___x_3540_);
-return v___x_3541_;
+lean_object* v___x_3563_; lean_object* v___x_3564_; lean_object* v___x_3565_; lean_object* v___x_3566_; lean_object* v___x_3567_; lean_object* v___x_3568_; lean_object* v___x_3569_; 
+v___x_3563_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAlarm___closed__0));
+v___x_3564_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm_spec__0(v_options_3561_);
+v___x_3565_ = lean_unsigned_to_nat(1u);
+v___x_3566_ = lean_mk_empty_array_with_capacity(v___x_3565_);
+v___x_3567_ = lean_array_push(v___x_3566_, v___x_3564_);
+v___x_3568_ = l_Lasm_JS_Web_Support_args(v___x_3567_);
+v___x_3569_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3560_, v___x_3563_, v___x_3568_);
+return v___x_3569_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAlarm___boxed(lean_object* v_self_3542_, lean_object* v_options_3543_, lean_object* v_a_3544_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAlarm___boxed(lean_object* v_self_3570_, lean_object* v_options_3571_, lean_object* v_a_3572_){
 _start:
 {
-lean_object* v_res_3545_; 
-v_res_3545_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAlarm(v_self_3542_, v_options_3543_);
-return v_res_3545_;
+lean_object* v_res_3573_; 
+v_res_3573_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAlarm(v_self_3570_, v_options_3571_);
+return v_res_3573_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_sync(lean_object* v_self_3547_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_sync(lean_object* v_self_3575_){
 _start:
 {
-lean_object* v___x_3549_; lean_object* v___x_3550_; lean_object* v___x_3551_; 
-v___x_3549_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_sync___closed__0));
-v___x_3550_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2, &l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2_once, _init_l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2);
-v___x_3551_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3547_, v___x_3549_, v___x_3550_);
-return v___x_3551_;
+lean_object* v___x_3577_; lean_object* v___x_3578_; lean_object* v___x_3579_; 
+v___x_3577_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_sync___closed__0));
+v___x_3578_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2, &l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2_once, _init_l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2);
+v___x_3579_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3575_, v___x_3577_, v___x_3578_);
+return v___x_3579_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_sync___boxed(lean_object* v_self_3552_, lean_object* v_a_3553_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_sync___boxed(lean_object* v_self_3580_, lean_object* v_a_3581_){
 _start:
 {
-lean_object* v_res_3554_; 
-v_res_3554_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_sync(v_self_3552_);
-return v_res_3554_;
+lean_object* v_res_3582_; 
+v_res_3582_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_sync(v_self_3580_);
+return v_res_3582_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getCurrentBookmark(lean_object* v_self_3556_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getCurrentBookmark(lean_object* v_self_3584_){
 _start:
 {
-lean_object* v___x_3558_; lean_object* v___x_3559_; lean_object* v___x_3560_; 
-v___x_3558_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getCurrentBookmark___closed__0));
-v___x_3559_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2, &l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2_once, _init_l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2);
-v___x_3560_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_text_spec__0(v_self_3556_, v___x_3558_, v___x_3559_);
-return v___x_3560_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getCurrentBookmark___boxed(lean_object* v_self_3561_, lean_object* v_a_3562_){
-_start:
-{
-lean_object* v_res_3563_; 
-v_res_3563_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_getCurrentBookmark(v_self_3561_);
-return v_res_3563_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getBookmarkForTime(lean_object* v_self_3565_, lean_object* v_timestamp_3566_){
-_start:
-{
-lean_object* v___x_3568_; lean_object* v___x_3569_; lean_object* v___x_3570_; lean_object* v___x_3571_; lean_object* v___x_3572_; lean_object* v___x_3573_; 
-v___x_3568_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getBookmarkForTime___closed__0));
-v___x_3569_ = lean_unsigned_to_nat(1u);
-v___x_3570_ = lean_mk_empty_array_with_capacity(v___x_3569_);
-v___x_3571_ = lean_array_push(v___x_3570_, v_timestamp_3566_);
-v___x_3572_ = l_Lasm_JS_Web_Support_args(v___x_3571_);
-v___x_3573_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_text_spec__0(v_self_3565_, v___x_3568_, v___x_3572_);
-return v___x_3573_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getBookmarkForTime___boxed(lean_object* v_self_3574_, lean_object* v_timestamp_3575_, lean_object* v_a_3576_){
-_start:
-{
-lean_object* v_res_3577_; 
-v_res_3577_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_getBookmarkForTime(v_self_3574_, v_timestamp_3575_);
-return v_res_3577_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_onNextSessionRestoreBookmark(lean_object* v_self_3579_, lean_object* v_bookmark_3580_){
-_start:
-{
-lean_object* v___x_3582_; lean_object* v___x_3583_; lean_object* v___x_3584_; lean_object* v___x_3585_; lean_object* v___x_3586_; lean_object* v___x_3587_; lean_object* v___x_3588_; 
-v___x_3582_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_onNextSessionRestoreBookmark___closed__0));
-v___x_3583_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_3583_, 0, v_bookmark_3580_);
-v___x_3584_ = lean_unsigned_to_nat(1u);
-v___x_3585_ = lean_mk_empty_array_with_capacity(v___x_3584_);
-v___x_3586_ = lean_array_push(v___x_3585_, v___x_3583_);
-v___x_3587_ = l_Lasm_JS_Web_Support_args(v___x_3586_);
-v___x_3588_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_text_spec__0(v_self_3579_, v___x_3582_, v___x_3587_);
+lean_object* v___x_3586_; lean_object* v___x_3587_; lean_object* v___x_3588_; 
+v___x_3586_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getCurrentBookmark___closed__0));
+v___x_3587_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2, &l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2_once, _init_l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2);
+v___x_3588_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_text_spec__0(v_self_3584_, v___x_3586_, v___x_3587_);
 return v___x_3588_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_onNextSessionRestoreBookmark___boxed(lean_object* v_self_3589_, lean_object* v_bookmark_3590_, lean_object* v_a_3591_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getCurrentBookmark___boxed(lean_object* v_self_3589_, lean_object* v_a_3590_){
 _start:
 {
-lean_object* v_res_3592_; 
-v_res_3592_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_onNextSessionRestoreBookmark(v_self_3589_, v_bookmark_3590_);
-return v_res_3592_;
+lean_object* v_res_3591_; 
+v_res_3591_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_getCurrentBookmark(v_self_3589_);
+return v_res_3591_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_get(lean_object* v_self_3593_, lean_object* v_key_3594_, lean_object* v_options_3595_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getBookmarkForTime(lean_object* v_self_3593_, lean_object* v_timestamp_3594_){
 _start:
 {
-lean_object* v___x_3597_; lean_object* v___x_3598_; lean_object* v___x_3599_; lean_object* v___x_3600_; lean_object* v___x_3601_; lean_object* v___x_3602_; lean_object* v___x_3603_; lean_object* v___x_3604_; lean_object* v___x_3605_; 
-v___x_3597_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_get___closed__0));
-v___x_3598_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_3598_, 0, v_key_3594_);
-v___x_3599_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_get_spec__0(v_options_3595_);
-v___x_3600_ = lean_unsigned_to_nat(2u);
-v___x_3601_ = lean_mk_empty_array_with_capacity(v___x_3600_);
-v___x_3602_ = lean_array_push(v___x_3601_, v___x_3598_);
-v___x_3603_ = lean_array_push(v___x_3602_, v___x_3599_);
-v___x_3604_ = l_Lasm_JS_Web_Support_args(v___x_3603_);
-v___x_3605_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Request_json_spec__0(v_self_3593_, v___x_3597_, v___x_3604_);
-return v___x_3605_;
+lean_object* v___x_3596_; lean_object* v___x_3597_; lean_object* v___x_3598_; lean_object* v___x_3599_; lean_object* v___x_3600_; lean_object* v___x_3601_; 
+v___x_3596_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getBookmarkForTime___closed__0));
+v___x_3597_ = lean_unsigned_to_nat(1u);
+v___x_3598_ = lean_mk_empty_array_with_capacity(v___x_3597_);
+v___x_3599_ = lean_array_push(v___x_3598_, v_timestamp_3594_);
+v___x_3600_ = l_Lasm_JS_Web_Support_args(v___x_3599_);
+v___x_3601_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_text_spec__0(v_self_3593_, v___x_3596_, v___x_3600_);
+return v___x_3601_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_get___boxed(lean_object* v_self_3606_, lean_object* v_key_3607_, lean_object* v_options_3608_, lean_object* v_a_3609_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_getBookmarkForTime___boxed(lean_object* v_self_3602_, lean_object* v_timestamp_3603_, lean_object* v_a_3604_){
 _start:
 {
-lean_object* v_res_3610_; 
-v_res_3610_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_get(v_self_3606_, v_key_3607_, v_options_3608_);
-return v_res_3610_;
+lean_object* v_res_3605_; 
+v_res_3605_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_getBookmarkForTime(v_self_3602_, v_timestamp_3603_);
+return v_res_3605_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_getWithKeys(lean_object* v_self_3611_, lean_object* v_keys_3612_, lean_object* v_options_3613_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_onNextSessionRestoreBookmark(lean_object* v_self_3607_, lean_object* v_bookmark_3608_){
 _start:
 {
-lean_object* v___f_3615_; lean_object* v___x_3616_; size_t v_sz_3617_; size_t v___x_3618_; lean_object* v___x_3619_; lean_object* v___x_3620_; lean_object* v___x_3621_; lean_object* v___x_3622_; lean_object* v___x_3623_; lean_object* v___x_3624_; lean_object* v___x_3625_; lean_object* v___x_3626_; lean_object* v___x_3627_; uint8_t v___x_3628_; lean_object* v___x_3629_; lean_object* v___x_3630_; 
-v___f_3615_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___closed__0));
-v___x_3616_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_get___closed__0));
-v_sz_3617_ = lean_array_size(v_keys_3612_);
-v___x_3618_ = ((size_t)0ULL);
-v___x_3619_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_URLSearchParams_new_spec__0_spec__0(v_sz_3617_, v___x_3618_, v_keys_3612_);
-v___x_3620_ = lean_alloc_ctor(7, 1, 0);
-lean_ctor_set(v___x_3620_, 0, v___x_3619_);
-v___x_3621_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_get_spec__0(v_options_3613_);
-v___x_3622_ = lean_unsigned_to_nat(2u);
-v___x_3623_ = lean_mk_empty_array_with_capacity(v___x_3622_);
-v___x_3624_ = lean_array_push(v___x_3623_, v___x_3620_);
-v___x_3625_ = lean_array_push(v___x_3624_, v___x_3621_);
-v___x_3626_ = l_Lasm_JS_Web_Support_args(v___x_3625_);
-v___x_3627_ = lean_unsigned_to_nat(0u);
-v___x_3628_ = 0;
-v___x_3629_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0(v_self_3611_, v___x_3616_, v___x_3626_);
-v___x_3630_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3627_, v___x_3628_, v___x_3629_, v___f_3615_);
-return v___x_3630_;
+lean_object* v___x_3610_; lean_object* v___x_3611_; lean_object* v___x_3612_; lean_object* v___x_3613_; lean_object* v___x_3614_; lean_object* v___x_3615_; lean_object* v___x_3616_; 
+v___x_3610_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_onNextSessionRestoreBookmark___closed__0));
+v___x_3611_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v___x_3611_, 0, v_bookmark_3608_);
+v___x_3612_ = lean_unsigned_to_nat(1u);
+v___x_3613_ = lean_mk_empty_array_with_capacity(v___x_3612_);
+v___x_3614_ = lean_array_push(v___x_3613_, v___x_3611_);
+v___x_3615_ = l_Lasm_JS_Web_Support_args(v___x_3614_);
+v___x_3616_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_text_spec__0(v_self_3607_, v___x_3610_, v___x_3615_);
+return v___x_3616_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_getWithKeys___boxed(lean_object* v_self_3631_, lean_object* v_keys_3632_, lean_object* v_options_3633_, lean_object* v_a_3634_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectStorage_onNextSessionRestoreBookmark___boxed(lean_object* v_self_3617_, lean_object* v_bookmark_3618_, lean_object* v_a_3619_){
 _start:
 {
-lean_object* v_res_3635_; 
-v_res_3635_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_getWithKeys(v_self_3631_, v_keys_3632_, v_options_3633_);
-return v_res_3635_;
+lean_object* v_res_3620_; 
+v_res_3620_ = l_Lasm_JS_Cloudflare_DurableObjectStorage_onNextSessionRestoreBookmark(v_self_3617_, v_bookmark_3618_);
+return v_res_3620_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_list(lean_object* v_self_3636_, lean_object* v_options_3637_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_get(lean_object* v_self_3621_, lean_object* v_key_3622_, lean_object* v_options_3623_){
 _start:
 {
-lean_object* v___f_3639_; lean_object* v___x_3640_; lean_object* v___x_3641_; lean_object* v___x_3642_; lean_object* v___x_3643_; lean_object* v___x_3644_; lean_object* v___x_3645_; lean_object* v___x_3646_; uint8_t v___x_3647_; lean_object* v___x_3648_; lean_object* v___x_3649_; 
-v___f_3639_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___closed__0));
-v___x_3640_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_list___closed__0));
-v___x_3641_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_list_spec__0(v_options_3637_);
-v___x_3642_ = lean_unsigned_to_nat(1u);
-v___x_3643_ = lean_mk_empty_array_with_capacity(v___x_3642_);
-v___x_3644_ = lean_array_push(v___x_3643_, v___x_3641_);
-v___x_3645_ = l_Lasm_JS_Web_Support_args(v___x_3644_);
-v___x_3646_ = lean_unsigned_to_nat(0u);
-v___x_3647_ = 0;
-v___x_3648_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0(v_self_3636_, v___x_3640_, v___x_3645_);
-v___x_3649_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3646_, v___x_3647_, v___x_3648_, v___f_3639_);
-return v___x_3649_;
+lean_object* v___x_3625_; lean_object* v___x_3626_; lean_object* v___x_3627_; lean_object* v___x_3628_; lean_object* v___x_3629_; lean_object* v___x_3630_; lean_object* v___x_3631_; lean_object* v___x_3632_; lean_object* v___x_3633_; 
+v___x_3625_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_get___closed__0));
+v___x_3626_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v___x_3626_, 0, v_key_3622_);
+v___x_3627_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_get_spec__0(v_options_3623_);
+v___x_3628_ = lean_unsigned_to_nat(2u);
+v___x_3629_ = lean_mk_empty_array_with_capacity(v___x_3628_);
+v___x_3630_ = lean_array_push(v___x_3629_, v___x_3626_);
+v___x_3631_ = lean_array_push(v___x_3630_, v___x_3627_);
+v___x_3632_ = l_Lasm_JS_Web_Support_args(v___x_3631_);
+v___x_3633_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Request_json_spec__0(v_self_3621_, v___x_3625_, v___x_3632_);
+return v___x_3633_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_list___boxed(lean_object* v_self_3650_, lean_object* v_options_3651_, lean_object* v_a_3652_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_get___boxed(lean_object* v_self_3634_, lean_object* v_key_3635_, lean_object* v_options_3636_, lean_object* v_a_3637_){
 _start:
 {
-lean_object* v_res_3653_; 
-v_res_3653_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_list(v_self_3650_, v_options_3651_);
-return v_res_3653_;
+lean_object* v_res_3638_; 
+v_res_3638_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_get(v_self_3634_, v_key_3635_, v_options_3636_);
+return v_res_3638_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_put(lean_object* v_self_3654_, lean_object* v_key_3655_, lean_object* v_value_3656_, lean_object* v_options_3657_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_getWithKeys(lean_object* v_self_3639_, lean_object* v_keys_3640_, lean_object* v_options_3641_){
 _start:
 {
-lean_object* v___x_3659_; lean_object* v___x_3660_; lean_object* v___x_3661_; lean_object* v___x_3662_; lean_object* v___x_3663_; lean_object* v___x_3664_; lean_object* v___x_3665_; lean_object* v___x_3666_; lean_object* v___x_3667_; lean_object* v___x_3668_; 
-v___x_3659_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_put___closed__0));
-v___x_3660_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_3660_, 0, v_key_3655_);
-v___x_3661_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_3657_);
-v___x_3662_ = lean_unsigned_to_nat(3u);
-v___x_3663_ = lean_mk_empty_array_with_capacity(v___x_3662_);
-v___x_3664_ = lean_array_push(v___x_3663_, v___x_3660_);
-v___x_3665_ = lean_array_push(v___x_3664_, v_value_3656_);
-v___x_3666_ = lean_array_push(v___x_3665_, v___x_3661_);
-v___x_3667_ = l_Lasm_JS_Web_Support_args(v___x_3666_);
-v___x_3668_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3654_, v___x_3659_, v___x_3667_);
-return v___x_3668_;
+lean_object* v___f_3643_; lean_object* v___x_3644_; size_t v_sz_3645_; size_t v___x_3646_; lean_object* v___x_3647_; lean_object* v___x_3648_; lean_object* v___x_3649_; lean_object* v___x_3650_; lean_object* v___x_3651_; lean_object* v___x_3652_; lean_object* v___x_3653_; lean_object* v___x_3654_; lean_object* v___x_3655_; uint8_t v___x_3656_; lean_object* v___x_3657_; lean_object* v___x_3658_; 
+v___f_3643_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___closed__0));
+v___x_3644_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectNamespace_get___closed__0));
+v_sz_3645_ = lean_array_size(v_keys_3640_);
+v___x_3646_ = ((size_t)0ULL);
+v___x_3647_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_URLSearchParams_new_spec__0_spec__0(v_sz_3645_, v___x_3646_, v_keys_3640_);
+v___x_3648_ = lean_alloc_ctor(7, 1, 0);
+lean_ctor_set(v___x_3648_, 0, v___x_3647_);
+v___x_3649_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_get_spec__0(v_options_3641_);
+v___x_3650_ = lean_unsigned_to_nat(2u);
+v___x_3651_ = lean_mk_empty_array_with_capacity(v___x_3650_);
+v___x_3652_ = lean_array_push(v___x_3651_, v___x_3648_);
+v___x_3653_ = lean_array_push(v___x_3652_, v___x_3649_);
+v___x_3654_ = l_Lasm_JS_Web_Support_args(v___x_3653_);
+v___x_3655_ = lean_unsigned_to_nat(0u);
+v___x_3656_ = 0;
+v___x_3657_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0(v_self_3639_, v___x_3644_, v___x_3654_);
+v___x_3658_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3655_, v___x_3656_, v___x_3657_, v___f_3643_);
+return v___x_3658_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_put___boxed(lean_object* v_self_3669_, lean_object* v_key_3670_, lean_object* v_value_3671_, lean_object* v_options_3672_, lean_object* v_a_3673_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_getWithKeys___boxed(lean_object* v_self_3659_, lean_object* v_keys_3660_, lean_object* v_options_3661_, lean_object* v_a_3662_){
 _start:
 {
-lean_object* v_res_3674_; 
-v_res_3674_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_put(v_self_3669_, v_key_3670_, v_value_3671_, v_options_3672_);
-lean_dec(v_options_3672_);
-return v_res_3674_;
+lean_object* v_res_3663_; 
+v_res_3663_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_getWithKeys(v_self_3659_, v_keys_3660_, v_options_3661_);
+return v_res_3663_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_putWithEntries(lean_object* v_self_3675_, lean_object* v_entries_3676_, lean_object* v_options_3677_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_list(lean_object* v_self_3664_, lean_object* v_options_3665_){
 _start:
 {
-lean_object* v___x_3679_; size_t v_sz_3680_; size_t v___x_3681_; lean_object* v___x_3682_; lean_object* v___x_3683_; lean_object* v___x_3684_; lean_object* v___x_3685_; lean_object* v___x_3686_; lean_object* v___x_3687_; lean_object* v___x_3688_; lean_object* v___x_3689_; lean_object* v___x_3690_; 
-v___x_3679_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_put___closed__0));
-v_sz_3680_ = lean_array_size(v_entries_3676_);
-v___x_3681_ = ((size_t)0ULL);
-v___x_3682_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries_spec__0(v_sz_3680_, v___x_3681_, v_entries_3676_);
-v___x_3683_ = lean_alloc_ctor(8, 1, 0);
-lean_ctor_set(v___x_3683_, 0, v___x_3682_);
-v___x_3684_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_3677_);
-v___x_3685_ = lean_unsigned_to_nat(2u);
-v___x_3686_ = lean_mk_empty_array_with_capacity(v___x_3685_);
-v___x_3687_ = lean_array_push(v___x_3686_, v___x_3683_);
-v___x_3688_ = lean_array_push(v___x_3687_, v___x_3684_);
-v___x_3689_ = l_Lasm_JS_Web_Support_args(v___x_3688_);
-v___x_3690_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3675_, v___x_3679_, v___x_3689_);
-return v___x_3690_;
+lean_object* v___f_3667_; lean_object* v___x_3668_; lean_object* v___x_3669_; lean_object* v___x_3670_; lean_object* v___x_3671_; lean_object* v___x_3672_; lean_object* v___x_3673_; lean_object* v___x_3674_; uint8_t v___x_3675_; lean_object* v___x_3676_; lean_object* v___x_3677_; 
+v___f_3667_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getWithKeys___closed__0));
+v___x_3668_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_list___closed__0));
+v___x_3669_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_list_spec__0(v_options_3665_);
+v___x_3670_ = lean_unsigned_to_nat(1u);
+v___x_3671_ = lean_mk_empty_array_with_capacity(v___x_3670_);
+v___x_3672_ = lean_array_push(v___x_3671_, v___x_3669_);
+v___x_3673_ = l_Lasm_JS_Web_Support_args(v___x_3672_);
+v___x_3674_ = lean_unsigned_to_nat(0u);
+v___x_3675_ = 0;
+v___x_3676_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_Blob_arrayBuffer_spec__0(v_self_3664_, v___x_3668_, v___x_3673_);
+v___x_3677_ = l___private_Std_Async_Basic_0__Std_Async_BaseAsync_bind_bindAsyncTask___redArg(v___x_3674_, v___x_3675_, v___x_3676_, v___f_3667_);
+return v___x_3677_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_putWithEntries___boxed(lean_object* v_self_3691_, lean_object* v_entries_3692_, lean_object* v_options_3693_, lean_object* v_a_3694_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_list___boxed(lean_object* v_self_3678_, lean_object* v_options_3679_, lean_object* v_a_3680_){
 _start:
 {
-lean_object* v_res_3695_; 
-v_res_3695_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_putWithEntries(v_self_3691_, v_entries_3692_, v_options_3693_);
-lean_dec(v_options_3693_);
-return v_res_3695_;
+lean_object* v_res_3681_; 
+v_res_3681_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_list(v_self_3678_, v_options_3679_);
+return v_res_3681_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_delete(lean_object* v_self_3696_, lean_object* v_key_3697_, lean_object* v_options_3698_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_put(lean_object* v_self_3682_, lean_object* v_key_3683_, lean_object* v_value_3684_, lean_object* v_options_3685_){
 _start:
 {
-lean_object* v___x_3700_; lean_object* v___x_3701_; lean_object* v___x_3702_; lean_object* v___x_3703_; lean_object* v___x_3704_; lean_object* v___x_3705_; lean_object* v___x_3706_; lean_object* v___x_3707_; lean_object* v___x_3708_; 
-v___x_3700_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_delete___closed__0));
-v___x_3701_ = lean_alloc_ctor(4, 1, 0);
-lean_ctor_set(v___x_3701_, 0, v_key_3697_);
-v___x_3702_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_3698_);
-v___x_3703_ = lean_unsigned_to_nat(2u);
-v___x_3704_ = lean_mk_empty_array_with_capacity(v___x_3703_);
-v___x_3705_ = lean_array_push(v___x_3704_, v___x_3701_);
-v___x_3706_ = lean_array_push(v___x_3705_, v___x_3702_);
-v___x_3707_ = l_Lasm_JS_Web_Support_args(v___x_3706_);
-v___x_3708_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_Cache_delete_spec__1(v_self_3696_, v___x_3700_, v___x_3707_);
-return v___x_3708_;
+lean_object* v___x_3687_; lean_object* v___x_3688_; lean_object* v___x_3689_; lean_object* v___x_3690_; lean_object* v___x_3691_; lean_object* v___x_3692_; lean_object* v___x_3693_; lean_object* v___x_3694_; lean_object* v___x_3695_; lean_object* v___x_3696_; 
+v___x_3687_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_put___closed__0));
+v___x_3688_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v___x_3688_, 0, v_key_3683_);
+v___x_3689_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_3685_);
+v___x_3690_ = lean_unsigned_to_nat(3u);
+v___x_3691_ = lean_mk_empty_array_with_capacity(v___x_3690_);
+v___x_3692_ = lean_array_push(v___x_3691_, v___x_3688_);
+v___x_3693_ = lean_array_push(v___x_3692_, v_value_3684_);
+v___x_3694_ = lean_array_push(v___x_3693_, v___x_3689_);
+v___x_3695_ = l_Lasm_JS_Web_Support_args(v___x_3694_);
+v___x_3696_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3682_, v___x_3687_, v___x_3695_);
+return v___x_3696_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_delete___boxed(lean_object* v_self_3709_, lean_object* v_key_3710_, lean_object* v_options_3711_, lean_object* v_a_3712_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_put___boxed(lean_object* v_self_3697_, lean_object* v_key_3698_, lean_object* v_value_3699_, lean_object* v_options_3700_, lean_object* v_a_3701_){
 _start:
 {
-lean_object* v_res_3713_; 
-v_res_3713_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_delete(v_self_3709_, v_key_3710_, v_options_3711_);
-lean_dec(v_options_3711_);
-return v_res_3713_;
+lean_object* v_res_3702_; 
+v_res_3702_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_put(v_self_3697_, v_key_3698_, v_value_3699_, v_options_3700_);
+lean_dec(v_options_3700_);
+return v_res_3702_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_deleteWithKeys(lean_object* v_self_3714_, lean_object* v_keys_3715_, lean_object* v_options_3716_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_putWithEntries(lean_object* v_self_3703_, lean_object* v_entries_3704_, lean_object* v_options_3705_){
 _start:
 {
-lean_object* v___x_3718_; size_t v_sz_3719_; size_t v___x_3720_; lean_object* v___x_3721_; lean_object* v___x_3722_; lean_object* v___x_3723_; lean_object* v___x_3724_; lean_object* v___x_3725_; lean_object* v___x_3726_; lean_object* v___x_3727_; lean_object* v___x_3728_; lean_object* v___x_3729_; 
-v___x_3718_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_delete___closed__0));
-v_sz_3719_ = lean_array_size(v_keys_3715_);
-v___x_3720_ = ((size_t)0ULL);
-v___x_3721_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_URLSearchParams_new_spec__0_spec__0(v_sz_3719_, v___x_3720_, v_keys_3715_);
-v___x_3722_ = lean_alloc_ctor(7, 1, 0);
-lean_ctor_set(v___x_3722_, 0, v___x_3721_);
-v___x_3723_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_3716_);
-v___x_3724_ = lean_unsigned_to_nat(2u);
-v___x_3725_ = lean_mk_empty_array_with_capacity(v___x_3724_);
-v___x_3726_ = lean_array_push(v___x_3725_, v___x_3722_);
-v___x_3727_ = lean_array_push(v___x_3726_, v___x_3723_);
-v___x_3728_ = l_Lasm_JS_Web_Support_args(v___x_3727_);
-v___x_3729_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0(v_self_3714_, v___x_3718_, v___x_3728_);
-return v___x_3729_;
+lean_object* v___x_3707_; size_t v_sz_3708_; size_t v___x_3709_; lean_object* v___x_3710_; lean_object* v___x_3711_; lean_object* v___x_3712_; lean_object* v___x_3713_; lean_object* v___x_3714_; lean_object* v___x_3715_; lean_object* v___x_3716_; lean_object* v___x_3717_; lean_object* v___x_3718_; 
+v___x_3707_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_put___closed__0));
+v_sz_3708_ = lean_array_size(v_entries_3704_);
+v___x_3709_ = ((size_t)0ULL);
+v___x_3710_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Cloudflare_DurableObjectStorage_putWithEntries_spec__0(v_sz_3708_, v___x_3709_, v_entries_3704_);
+v___x_3711_ = lean_alloc_ctor(8, 1, 0);
+lean_ctor_set(v___x_3711_, 0, v___x_3710_);
+v___x_3712_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_3705_);
+v___x_3713_ = lean_unsigned_to_nat(2u);
+v___x_3714_ = lean_mk_empty_array_with_capacity(v___x_3713_);
+v___x_3715_ = lean_array_push(v___x_3714_, v___x_3711_);
+v___x_3716_ = lean_array_push(v___x_3715_, v___x_3712_);
+v___x_3717_ = l_Lasm_JS_Web_Support_args(v___x_3716_);
+v___x_3718_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3703_, v___x_3707_, v___x_3717_);
+return v___x_3718_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_deleteWithKeys___boxed(lean_object* v_self_3730_, lean_object* v_keys_3731_, lean_object* v_options_3732_, lean_object* v_a_3733_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_putWithEntries___boxed(lean_object* v_self_3719_, lean_object* v_entries_3720_, lean_object* v_options_3721_, lean_object* v_a_3722_){
 _start:
 {
-lean_object* v_res_3734_; 
-v_res_3734_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_deleteWithKeys(v_self_3730_, v_keys_3731_, v_options_3732_);
-lean_dec(v_options_3732_);
-return v_res_3734_;
+lean_object* v_res_3723_; 
+v_res_3723_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_putWithEntries(v_self_3719_, v_entries_3720_, v_options_3721_);
+lean_dec(v_options_3721_);
+return v_res_3723_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_rollback(lean_object* v_self_3736_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_delete(lean_object* v_self_3724_, lean_object* v_key_3725_, lean_object* v_options_3726_){
 _start:
 {
-lean_object* v___x_3738_; lean_object* v___x_3739_; lean_object* v___x_3740_; 
-v___x_3738_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectTransaction_rollback___closed__0));
-v___x_3739_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2, &l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2_once, _init_l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2);
-v___x_3740_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__1(v_self_3736_, v___x_3738_, v___x_3739_);
-return v___x_3740_;
+lean_object* v___x_3728_; lean_object* v___x_3729_; lean_object* v___x_3730_; lean_object* v___x_3731_; lean_object* v___x_3732_; lean_object* v___x_3733_; lean_object* v___x_3734_; lean_object* v___x_3735_; lean_object* v___x_3736_; 
+v___x_3728_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_delete___closed__0));
+v___x_3729_ = lean_alloc_ctor(4, 1, 0);
+lean_ctor_set(v___x_3729_, 0, v_key_3725_);
+v___x_3730_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_3726_);
+v___x_3731_ = lean_unsigned_to_nat(2u);
+v___x_3732_ = lean_mk_empty_array_with_capacity(v___x_3731_);
+v___x_3733_ = lean_array_push(v___x_3732_, v___x_3729_);
+v___x_3734_ = lean_array_push(v___x_3733_, v___x_3730_);
+v___x_3735_ = l_Lasm_JS_Web_Support_args(v___x_3734_);
+v___x_3736_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_Cache_delete_spec__1(v_self_3724_, v___x_3728_, v___x_3735_);
+return v___x_3736_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_rollback___boxed(lean_object* v_self_3741_, lean_object* v_a_3742_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_delete___boxed(lean_object* v_self_3737_, lean_object* v_key_3738_, lean_object* v_options_3739_, lean_object* v_a_3740_){
 _start:
 {
-lean_object* v_res_3743_; 
-v_res_3743_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_rollback(v_self_3741_);
-return v_res_3743_;
+lean_object* v_res_3741_; 
+v_res_3741_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_delete(v_self_3737_, v_key_3738_, v_options_3739_);
+lean_dec(v_options_3739_);
+return v_res_3741_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_getAlarm(lean_object* v_self_3744_, lean_object* v_options_3745_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_deleteWithKeys(lean_object* v_self_3742_, lean_object* v_keys_3743_, lean_object* v_options_3744_){
 _start:
 {
-lean_object* v___x_3747_; lean_object* v___x_3748_; lean_object* v___x_3749_; lean_object* v___x_3750_; lean_object* v___x_3751_; lean_object* v___x_3752_; lean_object* v___x_3753_; 
-v___x_3747_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm___closed__0));
-v___x_3748_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__0(v_options_3745_);
-v___x_3749_ = lean_unsigned_to_nat(1u);
-v___x_3750_ = lean_mk_empty_array_with_capacity(v___x_3749_);
-v___x_3751_ = lean_array_push(v___x_3750_, v___x_3748_);
-v___x_3752_ = l_Lasm_JS_Web_Support_args(v___x_3751_);
-v___x_3753_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1(v_self_3744_, v___x_3747_, v___x_3752_);
-return v___x_3753_;
+lean_object* v___x_3746_; size_t v_sz_3747_; size_t v___x_3748_; lean_object* v___x_3749_; lean_object* v___x_3750_; lean_object* v___x_3751_; lean_object* v___x_3752_; lean_object* v___x_3753_; lean_object* v___x_3754_; lean_object* v___x_3755_; lean_object* v___x_3756_; lean_object* v___x_3757_; 
+v___x_3746_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_delete___closed__0));
+v_sz_3747_ = lean_array_size(v_keys_3743_);
+v___x_3748_ = ((size_t)0ULL);
+v___x_3749_ = l___private_Init_Data_Array_Basic_0__Array_mapMUnsafe_map___at___00Lasm_JS_Web_Support_optional___at___00Lasm_JS_Web_URLSearchParams_new_spec__0_spec__0(v_sz_3747_, v___x_3748_, v_keys_3743_);
+v___x_3750_ = lean_alloc_ctor(7, 1, 0);
+lean_ctor_set(v___x_3750_, 0, v___x_3749_);
+v___x_3751_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_put_spec__0(v_options_3744_);
+v___x_3752_ = lean_unsigned_to_nat(2u);
+v___x_3753_ = lean_mk_empty_array_with_capacity(v___x_3752_);
+v___x_3754_ = lean_array_push(v___x_3753_, v___x_3750_);
+v___x_3755_ = lean_array_push(v___x_3754_, v___x_3751_);
+v___x_3756_ = l_Lasm_JS_Web_Support_args(v___x_3755_);
+v___x_3757_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_deleteWithKeys_spec__0(v_self_3742_, v___x_3746_, v___x_3756_);
+return v___x_3757_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_getAlarm___boxed(lean_object* v_self_3754_, lean_object* v_options_3755_, lean_object* v_a_3756_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_deleteWithKeys___boxed(lean_object* v_self_3758_, lean_object* v_keys_3759_, lean_object* v_options_3760_, lean_object* v_a_3761_){
 _start:
 {
-lean_object* v_res_3757_; 
-v_res_3757_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_getAlarm(v_self_3754_, v_options_3755_);
-lean_dec(v_options_3755_);
-return v_res_3757_;
+lean_object* v_res_3762_; 
+v_res_3762_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_deleteWithKeys(v_self_3758_, v_keys_3759_, v_options_3760_);
+lean_dec(v_options_3760_);
+return v_res_3762_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_setAlarm(lean_object* v_self_3758_, lean_object* v_scheduledTime_3759_, lean_object* v_options_3760_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_rollback(lean_object* v_self_3764_){
 _start:
 {
-lean_object* v___x_3762_; lean_object* v___x_3763_; lean_object* v___x_3764_; lean_object* v___x_3765_; lean_object* v___x_3766_; lean_object* v___x_3767_; lean_object* v___x_3768_; lean_object* v___x_3769_; 
-v___x_3762_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm___closed__0));
-v___x_3763_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm_spec__0(v_options_3760_);
-v___x_3764_ = lean_unsigned_to_nat(2u);
-v___x_3765_ = lean_mk_empty_array_with_capacity(v___x_3764_);
-v___x_3766_ = lean_array_push(v___x_3765_, v_scheduledTime_3759_);
-v___x_3767_ = lean_array_push(v___x_3766_, v___x_3763_);
-v___x_3768_ = l_Lasm_JS_Web_Support_args(v___x_3767_);
-v___x_3769_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3758_, v___x_3762_, v___x_3768_);
-return v___x_3769_;
+lean_object* v___x_3766_; lean_object* v___x_3767_; lean_object* v___x_3768_; 
+v___x_3766_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectTransaction_rollback___closed__0));
+v___x_3767_ = lean_obj_once(&l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2, &l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2_once, _init_l_Lasm_JS_Cloudflare_DurableObjectId_toString___closed__2);
+v___x_3768_ = l_Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_EventTarget_addEventListener_spec__1(v_self_3764_, v___x_3766_, v___x_3767_);
+return v___x_3768_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_setAlarm___boxed(lean_object* v_self_3770_, lean_object* v_scheduledTime_3771_, lean_object* v_options_3772_, lean_object* v_a_3773_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_rollback___boxed(lean_object* v_self_3769_, lean_object* v_a_3770_){
 _start:
 {
-lean_object* v_res_3774_; 
-v_res_3774_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_setAlarm(v_self_3770_, v_scheduledTime_3771_, v_options_3772_);
-return v_res_3774_;
+lean_object* v_res_3771_; 
+v_res_3771_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_rollback(v_self_3769_);
+return v_res_3771_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_deleteAlarm(lean_object* v_self_3775_, lean_object* v_options_3776_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_getAlarm(lean_object* v_self_3772_, lean_object* v_options_3773_){
 _start:
 {
-lean_object* v___x_3778_; lean_object* v___x_3779_; lean_object* v___x_3780_; lean_object* v___x_3781_; lean_object* v___x_3782_; lean_object* v___x_3783_; lean_object* v___x_3784_; 
-v___x_3778_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAlarm___closed__0));
-v___x_3779_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm_spec__0(v_options_3776_);
-v___x_3780_ = lean_unsigned_to_nat(1u);
-v___x_3781_ = lean_mk_empty_array_with_capacity(v___x_3780_);
-v___x_3782_ = lean_array_push(v___x_3781_, v___x_3779_);
-v___x_3783_ = l_Lasm_JS_Web_Support_args(v___x_3782_);
-v___x_3784_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3775_, v___x_3778_, v___x_3783_);
-return v___x_3784_;
+lean_object* v___x_3775_; lean_object* v___x_3776_; lean_object* v___x_3777_; lean_object* v___x_3778_; lean_object* v___x_3779_; lean_object* v___x_3780_; lean_object* v___x_3781_; 
+v___x_3775_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm___closed__0));
+v___x_3776_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__0(v_options_3773_);
+v___x_3777_ = lean_unsigned_to_nat(1u);
+v___x_3778_ = lean_mk_empty_array_with_capacity(v___x_3777_);
+v___x_3779_ = lean_array_push(v___x_3778_, v___x_3776_);
+v___x_3780_ = l_Lasm_JS_Web_Support_args(v___x_3779_);
+v___x_3781_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Cloudflare_DurableObjectStorage_getAlarm_spec__1(v_self_3772_, v___x_3775_, v___x_3780_);
+return v___x_3781_;
 }
 }
-LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_deleteAlarm___boxed(lean_object* v_self_3785_, lean_object* v_options_3786_, lean_object* v_a_3787_){
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_getAlarm___boxed(lean_object* v_self_3782_, lean_object* v_options_3783_, lean_object* v_a_3784_){
 _start:
 {
-lean_object* v_res_3788_; 
-v_res_3788_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_deleteAlarm(v_self_3785_, v_options_3786_);
-return v_res_3788_;
+lean_object* v_res_3785_; 
+v_res_3785_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_getAlarm(v_self_3782_, v_options_3783_);
+lean_dec(v_options_3783_);
+return v_res_3785_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_setAlarm(lean_object* v_self_3786_, lean_object* v_scheduledTime_3787_, lean_object* v_options_3788_){
+_start:
+{
+lean_object* v___x_3790_; lean_object* v___x_3791_; lean_object* v___x_3792_; lean_object* v___x_3793_; lean_object* v___x_3794_; lean_object* v___x_3795_; lean_object* v___x_3796_; lean_object* v___x_3797_; 
+v___x_3790_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm___closed__0));
+v___x_3791_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm_spec__0(v_options_3788_);
+v___x_3792_ = lean_unsigned_to_nat(2u);
+v___x_3793_ = lean_mk_empty_array_with_capacity(v___x_3792_);
+v___x_3794_ = lean_array_push(v___x_3793_, v_scheduledTime_3787_);
+v___x_3795_ = lean_array_push(v___x_3794_, v___x_3791_);
+v___x_3796_ = l_Lasm_JS_Web_Support_args(v___x_3795_);
+v___x_3797_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3786_, v___x_3790_, v___x_3796_);
+return v___x_3797_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_setAlarm___boxed(lean_object* v_self_3798_, lean_object* v_scheduledTime_3799_, lean_object* v_options_3800_, lean_object* v_a_3801_){
+_start:
+{
+lean_object* v_res_3802_; 
+v_res_3802_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_setAlarm(v_self_3798_, v_scheduledTime_3799_, v_options_3800_);
+return v_res_3802_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_deleteAlarm(lean_object* v_self_3803_, lean_object* v_options_3804_){
+_start:
+{
+lean_object* v___x_3806_; lean_object* v___x_3807_; lean_object* v___x_3808_; lean_object* v___x_3809_; lean_object* v___x_3810_; lean_object* v___x_3811_; lean_object* v___x_3812_; 
+v___x_3806_ = ((lean_object*)(l_Lasm_JS_Cloudflare_DurableObjectStorage_deleteAlarm___closed__0));
+v___x_3807_ = l_Lasm_JS_Web_Support_optional___at___00Lasm_JS_Cloudflare_DurableObjectStorage_setAlarm_spec__0(v_options_3804_);
+v___x_3808_ = lean_unsigned_to_nat(1u);
+v___x_3809_ = lean_mk_empty_array_with_capacity(v___x_3808_);
+v___x_3810_ = lean_array_push(v___x_3809_, v___x_3807_);
+v___x_3811_ = l_Lasm_JS_Web_Support_args(v___x_3810_);
+v___x_3812_ = l_Lasm_JS_Value_callMethodAwait___at___00Lasm_JS_Web_ReadableStream_cancel_spec__0(v_self_3803_, v___x_3806_, v___x_3811_);
+return v___x_3812_;
+}
+}
+LEAN_EXPORT lean_object* l_Lasm_JS_Cloudflare_DurableObjectTransaction_deleteAlarm___boxed(lean_object* v_self_3813_, lean_object* v_options_3814_, lean_object* v_a_3815_){
+_start:
+{
+lean_object* v_res_3816_; 
+v_res_3816_ = l_Lasm_JS_Cloudflare_DurableObjectTransaction_deleteAlarm(v_self_3813_, v_options_3814_);
+return v_res_3816_;
 }
 }
 lean_object* initialize_Init(uint8_t builtin);
