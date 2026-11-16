@@ -253,8 +253,8 @@ instance : ToJS KvListSelector := ⟨fun d => Support.fields #[("prefix", Suppor
 
 /-- `dictionary KvListOptions` (Deno 2.9.6 type declarations, lib.deno.unstable.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure KvListOptions where
-  /-- `double limit` -/
-  limit : Option Float := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
   /-- `DOMString cursor` -/
   cursor : Option String := none
   /-- `boolean reverse` -/
