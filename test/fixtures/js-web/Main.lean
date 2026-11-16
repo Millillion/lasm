@@ -599,7 +599,7 @@ def fetching (r : Checks) : Async Unit := do
     -- FormData
     let form ← FormData.new
     form.append "a" "1"; form.append "a" "2"
-    form.appendWithBlobValue "f" (← Blob.new (some #[.bufferSource (bytesOf [1, 2, 3])])) (some "x.bin")
+    form.appendBlob "f" (← Blob.new (some #[.bufferSource (bytesOf [1, 2, 3])])) (some "x.bin")
     let names := (← form.getAll "a").map fun | .usvString s => s | _ => "?"
     expect r "FormData getAll" (names == #["1", "2"]) ""
     match ← form.get "f" with
