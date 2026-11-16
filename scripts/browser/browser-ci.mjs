@@ -169,11 +169,11 @@ async function platform(server, name, manifest) {
       const first = loader.appOf(document.getElementById('app'));
       app.unmount();
       return { summary, failed, cleared: document.getElementById('second').childNodes.length === 0, unmountHandler: window.lasmUnmounted === true,
-        stopped: app.stopped, firstAlive: !first.stopped };
+        signalAborted: window.lasmSignalAborted === true, stopped: app.stopped, firstAlive: !first.stopped };
     }, entry);
     const [passed, total] = second.summary.split('/').map(Number);
     expect(name, 'app.second-instance', passed === total && total === results.length, `${second.summary} ${JSON.stringify(second.failed)}`);
-    expect(name, 'app.unmount', second.cleared && second.unmountHandler && second.stopped && second.firstAlive, JSON.stringify(second));
+    expect(name, 'app.unmount', second.cleared && second.unmountHandler && second.signalAborted && second.stopped && second.firstAlive, JSON.stringify(second));
     await page.click('#app #click-me');
     expect(name, 'app.first-unaffected', (await text('#click-count')) === '3', await text('#click-count'));
     step('a blocking wait');

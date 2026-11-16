@@ -592,6 +592,10 @@ def appChecks (checks : Checks) : IO Unit := do
     | none => pure ()
   Mount.onUnmount do
     (← (← global).get "window").set "lasmUnmounted" true
+  -- A14.1: the unmount signal aborts, so a listener registered with it is removed by the platform.
+  let signal ← Mount.signal AbortSignal
+  signal.addEventListener "abort" (some (← EventListener.ofSyncFn fun _ => do
+    (← (← global).get "window").set "lasmSignalAborted" true))
 
 def main : IO Unit := do
   let root ← Mount.root Element

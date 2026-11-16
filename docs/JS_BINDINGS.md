@@ -697,9 +697,10 @@ imports a browser one).
   of the element's interface from it, as above: checked with
   `HTMLInputElement.cast? e.val`, or unchecked with `{ val := e.val }`.
 - Listeners and other callbacks act on the page directly, with nothing removed
-  for you: remove what an app adds (`removeEventListener`,
-  `cancelAnimationFrame`, `WebSocket.close`) when it no longer needs it, in a
-  mounted app in `Lasm.UI.Mount.onUnmount` ([BROWSER.md](BROWSER.md)). The
+  for you: remove what an app adds when it no longer needs it. In a mounted
+  app, pass `Lasm.UI.Mount.signal` (an `AbortSignal` that aborts on unmount)
+  where the platform takes a signal (`addEventListener`, `fetch`), or use
+  `Mount.onUnmount` ([BROWSER.md](BROWSER.md)). The
   mount glue (`Mount.root Element`, flags, ports) is `Lasm.UI.Mount`.
 - They replace the hand-written `Lasm.Web` (removed 2026-11-10);
   [release/0.7.0-notes.md](release/0.7.0-notes.md) maps each of its functions.
@@ -744,6 +745,75 @@ after `fillRect` and `putImageData`, `isPointInPath` against a rectangle,
 the ignored values of `lineWidth` and `globalAlpha`; a WebSocket echo of text
 and binary frames), and an availability probe that records the generated
 members each engine lacks.
+
+### The rest of the browser platform: `Lasm.JS.Web.Platform`
+
+`import Lasm.JS.Web.Platform` adds the rest of the browser platform to
+`Lasm.JS.Web.Browser`. It holds every interface and member of the pinned
+`@webref/idl` that is exposed to `Window` and that all three supported engines
+ship (**Chromium 153, Firefox 155 and Safari 26.6**, the engines of
+Playwright 1.63.0 that CI runs), according to the pinned
+`@mdn/browser-compat-data` (8.1.8). That is 474 more interfaces: IndexedDB,
+WebGL 1 and 2 with their extensions, Web Audio, WebRTC, Media Capture, Media
+Source, WebCodecs, SVG, Web Animations, the observers (`IntersectionObserver`,
+`ResizeObserver`, `PerformanceObserver`), Service Workers, Web Locks, the
+Clipboard, Notifications, Geolocation, Fullscreen, Web Authentication,
+WebTransport, and more. Each spec is its own module, which a program can import
+alone, so it links less:
+
+```lean
+import Lasm.JS.Web.Platform.IndexedDB
+open Lasm.JS Lasm.JS.Web
+
+def main : IO Unit := do
+  let req ← (← indexedDB).open "notes" (some 1)
+  …
+```
+
+The rules are those of the browser tier ([BINDING_RULES.md](BINDING_RULES.md)
+and the table above). What is specific to this tier
+([`scripts/bindings/web-platform.mjs`](../scripts/bindings/web-platform.mjs)):
+
+- **Shipped, measured.** An interface, or a member, is generated only when the
+  compatibility data says all three engines ship it at those versions:
+  unflagged, unprefixed, not partially implemented, and not deprecated. A
+  member the data does not list is not generated. The same filter applies to
+  `Lasm.JS.Web.Browser`'s hand-listed interfaces (decision 0.3-2). The
+  platform suite's availability probe checks the result on all three engines.
+- **One module per spec, `Lasm.JS.Web.Platform.<Spec>`**, in the namespace
+  `Lasm.JS.Web` like the rest, so a module only changes what you import, not
+  the names you write. A module holds:
+  - its spec's interfaces;
+  - the members its partials and mixins add to interfaces of other modules
+    (`Navigator.geolocation` is in `Platform.Geolocation`);
+  - its spec's additions to `WindowOrWorkerGlobalScope`, as globals
+    (`indexedDB`, `createImageBitmap`);
+  - its additions to namespaces (`CSS.escape`, `CSS.registerProperty`).
+
+  The interfaces that DOM and HTML define but the browser tier does not
+  select (`HTMLVideoElement`, `Range`, `Worker`, `OffscreenCanvas`) are in
+  `Platform.Dom` and `Platform.Html`, in the same way.
+- **Modules in dependency order.** Specs whose interfaces name each other in a
+  cycle are one module, named after them. Today one pair does:
+  `Platform.HtmlAndWebcodecs` (`VideoFrame` takes an `ImageBitmap`, and
+  `createImageBitmap` a `VideoFrame`).
+- **Types shared with the core tiers keep their shape there.** A dictionary or
+  union that tier 1 or the browser tier already generates is reused, so an
+  interface those tiers do not see stays a `Value` in it
+  (`CanvasImageSource`'s `.htmlVideoElement` takes a `Value`).
+- **Left out**, with the reason for each interface, in
+  [`scripts/bindings/web-platform-excluded.json`](../scripts/bindings/web-platform-excluded.json)
+  (decisions 0.3-3 and 0.3-4):
+  - interfaces exposed only to workers (`ServiceWorkerGlobalScope`,
+    `FileReaderSync`), because a browser program runs on the page;
+  - interfaces that one of the engines does not ship (WebGPU, WebUSB, Web
+    Bluetooth, Web Serial, WebXR, the Payment Request API, the Sensor APIs,
+    `requestIdleCallback`, and others);
+  - an iterable of `ArrayBuffer`s (`MediaKeyStatusMap`'s key IDs), whose
+    entries would each need one more host call to copy.
+
+  No spec is excluded by choice. A new BCD or webref version adds what the
+  engines have started to ship.
 
 ## Standard bindings for Node: `Lasm.JS.Node`
 

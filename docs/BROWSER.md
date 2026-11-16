@@ -244,14 +244,29 @@ WinterTC common APIs: `fetch`, timers, `URL`, `crypto`, `console`, …):
 has the modules, the mapping and the examples. Names and arguments are the
 standards' own (`document.createElement`, `element.addEventListener`,
 `ctx.fillRect`), so MDN is their documentation. Listeners and callbacks act on
-the page directly: an app removes what it added when it unmounts
-(`Mount.onUnmount`).
+the page directly: an app removes what it added when it unmounts. The
+platform's own way is `Mount.signal`, an `AbortSignal` that aborts on unmount:
+pass it where the platform takes a signal, and the platform does the removing.
+
+```lean
+let signal ← Mount.signal AbortSignal
+button.addEventListener "click" (some onClick) (some (.addEventListenerOptions { signal := some signal }))
+let res ← fetch "/api/items" (some { signal := some signal })   -- cancelled by an unmount
+let timer ← setInterval tick (some 1000)
+signal.addEventListener "abort" (some (← EventListener.ofSyncFn fun _ => clearInterval (some timer)))
+```
+
+`Mount.onUnmount` runs a Lean action after the signal aborts. The rest of the
+browser platform (IndexedDB, WebGL, Web Audio, WebRTC, SVG, the observers, …)
+is `import Lasm.JS.Web.Platform`, or one spec's module
+([JS_BINDINGS.md](JS_BINDINGS.md#the-rest-of-the-browser-platform-lasmjswebplatform)).
 
 `import Lasm.UI.Mount` ([library/Lasm/UI/Mount.lean](../library/Lasm/UI/Mount.lean))
 is what the loader's `mount(element, { flags })` gives the program (`lasm:app`):
 `root` (the element, as any handle type: `Mount.root Element`), `flags`,
 `hydrating`, `target`, ports (`port`, `Port.send`, `Port.subscribe`),
-`onMessage` (`app.send`), `onUnmount`, and `hotState`/`onHotSave` (Vite hot
+`onMessage` (`app.send`), `onUnmount`, `signal` (an `AbortSignal` that aborts on
+unmount), and `hotState`/`onHotSave` (Vite hot
 reload). `Lasm.UI.App.run` uses it; programs that draw the page themselves use
 it directly. It is Lasm's own loader, not a web standard, so it is written by
 hand (it was `Lasm.Web.App`).

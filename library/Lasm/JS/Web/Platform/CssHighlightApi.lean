@@ -75,4 +75,9 @@ def Highlight.setType (self : Highlight) (value : HighlightType) : IO Unit :=
 def HighlightRegistry.cast? (v : Value) : IO (Option HighlightRegistry) := do
   return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HighlightRegistry"] Value) v) then some { val := v } else none
 
+/-- `readonly attribute HighlightRegistry highlights` (CSS Custom Highlight API Module Level 1 (https://drafts.csswg.org/css-highlight-api-1/)) -/
+def CSS.highlights : IO HighlightRegistry := do
+  let r ← Support.getGlobal ["CSS", "highlights"] Value
+  pure { val := r }
+
 end Lasm.JS.Web

@@ -354,4 +354,9 @@ def StyleSheetList.length (self : StyleSheetList) : IO Nat := self.val.get "leng
 def StyleSheetList.item (self : StyleSheetList) (index : Nat) : IO (Option CSSStyleSheet) :=
   self.val.callMethod "item" (Support.args #[toJS index]) (Option CSSStyleSheet)
 
+/-- `CSSOMString escape(CSSOMString ident)` (CSS Object Model (CSSOM) Module Level 1 (https://drafts.csswg.org/cssom-1/)) -/
+def CSS.escape (ident : String) : IO String :=
+  Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.CSS.escape", module := "globalThis", path := "CSS.escape", construct := false, arity := 1 }
+    (Support.args #[toJS ident]) (await := false)
+
 end Lasm.JS.Web

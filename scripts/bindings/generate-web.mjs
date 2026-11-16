@@ -443,7 +443,7 @@ inTier(3, () => {
   const tier1Namespaces = new Set(tier.modules.flatMap(m => m.namespaces ?? []));
   for (const d of [...defs.values()].filter(d => d.type === 'namespace' && !tier1Namespaces.has(d.name) && !extAttr(d, 'LasmModule') && !hostOf(d)
     && exposedToWindow(d) && platform.shipped([d.name]))) {
-    for (const m of d.members.filter(m => m.name && exposedToWindow(m) && platform.shipped([d.name, m.name]))) {
+    for (const m of d.members.filter(m => m.name && exposedToWindow(m) && (platform.shipped([d.name, m.name]) || platform.shipped([d.name, `${m.name}_static`])))) {
       const pm = platformModules.get(platformModuleOf(m.spec));
       let entry = pm.nsMembers.find(e => e.ns === d.name);
       if (!entry) pm.nsMembers.push(entry = { ns: d.name, members: [] });
@@ -1019,15 +1019,19 @@ function overloadNames(group) {
   const names = group.map((m, i) => {
     if (i === 0) return m.name;
     const idx = m.arguments.findIndex((a, j) => first[j]?.name !== a.name);
-    return idx >= 0 ? `${m.name}With${capital(m.arguments[idx].name)}` : `${m.name}${m.arguments.length}`;
+    if (idx >= 0) return `${m.name}With${capital(m.arguments[idx].name)}`;
+    // The same argument names: a shorter overload adds its arity (`first0`); one of the same length differs
+    // only by its arguments' types, and adds them (RTCDataChannel's send(data): `sendWithBlob`).
+    return m.arguments.length !== first.length ? `${m.name}${m.arguments.length}` : withTypes(m);
   });
   // Two overloads that would get one name: each adds all its argument names (FileHandle's
   // read(options) and read(buffer, options): readWithOptions, readWithBufferOptions).
   const named = names.map((n, i) => i > 0 && names.indexOf(n) !== i ? `${group[i].name}With${group[i].arguments.map(a => capital(a.name)).join('')}` : n);
-  // Overloads that differ only by their arguments' types (RTCDataChannel's send(data) for a string, a Blob, an
-  // ArrayBuffer and a view): each one after the first adds its argument types instead (`sendWithBlob`).
-  return named.map((n, i) => i > 0 && named.indexOf(n) !== i ? `${group[i].name}With${group[i].arguments.map(a => typeKeyName(a.idlType)).join('')}` : n);
+  // Still one name: each one after the first adds its argument types instead.
+  return named.map((n, i) => i > 0 && named.indexOf(n) !== i ? withTypes(group[i]) : n);
 }
+/** An overload's name with its argument types: `sendWithBlob`. */
+const withTypes = m => `${m.name}With${m.arguments.map(a => typeKeyName(a.idlType)).join('')}`;
 const constructorName = 'new';
 
 /** Names taken per interface, across the modules that generate its members. */
@@ -1444,6 +1448,20 @@ scripts/bindings/web-platform.mjs; docs/JS_BINDINGS.md, "The rest of the browser
 also its own module (\`import ${PLATFORM}.IndexedDB\`), which links less.
 ${generatedBy}
 -/`, `import ${NS}.Browser`, ...platformPlan.map(m => `import ${m.key}`), ''].join('\n'));
+// What the browser tiers leave out, per spec (docs/API_DECISIONS.md 0.3-3, 0.3-4): interfaces exposed to Window
+// that not every supported engine ships, and those exposed only to workers.
+{
+  const excluded = {};
+  for (const d of [...defs.values()].filter(d => d.type === 'interface' && !d.partialOnly && d.spec && (platformSpecs.has(d.spec) || fullSpecs.includes(d.spec))
+    && !selectedInterfaces.has(d.name)).sort((a, b) => a.name < b.name ? -1 : 1)) {
+    const why = !exposedToWindow(d) ? 'workers only' : !platform.shipped([d.name]) ? 'not shipped by every supported engine' : 'its parent is not generated';
+    ((excluded[d.spec] ??= { title: specTitles[d.spec], interfaces: {} }).interfaces[d.name] = why);
+  }
+  for (const [spec, why] of Object.entries(platform.excludedSpecs)) excluded[spec] = { title: specTitles[spec], excluded: why };
+  files.set(join(root, 'scripts', 'bindings', 'web-platform-excluded.json'), JSON.stringify({
+    generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion}, @mdn/browser-compat-data ${platform.bcdVersion})`,
+    baseline: platform.baseline, specs: Object.fromEntries(Object.entries(excluded).sort()) }, null, 2) + '\n');
+}
 files.set(join(root, 'library', ...PLATFORM.split('.'), 'modules.json'), JSON.stringify({
   generatedBy: 'scripts/bindings/generate-web.mjs', modules: [...platformPlan.map(m => m.key), PLATFORM] }, null, 2) + '\n');
 files.set(join(root, 'library', 'Lasm', 'JS', 'Node.lean'), [`/-

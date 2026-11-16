@@ -61,8 +61,12 @@ test rejects one listed for them until their generator applies it.
 3. If that still leaves two overloads with one name, each of them adds all its
    argument names: `FileHandle.readWithOptions`,
    `FileHandle.readWithBufferOptions`.
-4. If no argument name differs, the overload adds its arity:
-   `first0`.
+4. If no argument name differs:
+   - an overload with fewer arguments adds its arity: `first0`;
+   - an overload with as many arguments differs only in their types, and adds
+     its argument types: `RTCDataChannel.send` (a string), `sendWithBlob`,
+     `sendWithArrayBuffer`, `sendWithArrayBufferView` (A9.2). So do the
+     overloads that rule 3 leaves with one name.
 5. A static member whose name an instance member also has gets the prefix
    `static`: `Response.staticJson`.
 6. A name listed in `names` replaces the result.

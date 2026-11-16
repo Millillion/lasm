@@ -14,6 +14,7 @@ import * as nodeTier from '../scripts/bindings/node-tier2.mjs';
 import * as serveTier from '../scripts/bindings/serve-tier2.mjs';
 import { declarations, lowerHost, parseType, typeText } from '../scripts/bindings/serve-api.mjs';
 import { modules as browserModules } from '../scripts/bindings/web-browser.mjs';
+import { shipped } from '../scripts/bindings/web-platform.mjs';
 import { libraryModules } from '../src/lasm-library.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -84,6 +85,35 @@ test('tier 1 never imports the browser tier (a server program links nothing of t
   for (const m of [...modules.map(m => `Lasm.JS.Web.${m.name}`), 'Lasm.JS.Web']) {
     const source = readFileSync(`${root}library/${m.replaceAll('.', '/')}.lean`, 'utf8');
     for (const [, imported] of source.matchAll(/^import (Lasm\.\S+)$/gm)) assert.ok(!browser.has(imported), `${m} imports ${imported}`);
+  }
+});
+
+test('the rest of the browser platform: shipped modules in import order, never imported by the core tiers', () => {
+  const platform = readdirSync(new URL('../library/Lasm/JS/Web/Platform/', import.meta.url)).filter(f => f.endsWith('.lean'))
+    .map(f => `Lasm.JS.Web.Platform.${f.replace(/\.lean$/, '')}`);
+  assert.ok(platform.length > 100, `${platform.length} platform modules`);
+  const { modules: listed } = JSON.parse(readFileSync(new URL('../library/Lasm/JS/Web/Platform/modules.json', import.meta.url), 'utf8'));
+  assert.deepEqual([...platform].sort(), listed.filter(m => m !== 'Lasm.JS.Web.Platform').sort());
+  for (const m of platform) {
+    assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
+    const source = readFileSync(`${root}library/${m.replaceAll('.', '/')}.lean`, 'utf8');
+    for (const [, imported] of source.matchAll(/^import (Lasm\.\S+)$/gm)) {
+      assert.ok(libraryModules.indexOf(imported) < libraryModules.indexOf(m), `${m} imports ${imported}, which comes later`);
+      assert.ok(/^Lasm\.JS\.Web\./.test(imported), `${m} imports ${imported}, outside Lasm.JS.Web`);
+    }
+  }
+  // Tier 1 and Lasm.JS.Web.Browser link nothing of the rest of the platform.
+  const core = [...modules.map(m => `Lasm.JS.Web.${m.name}`), ...browserModules.map(m => `Lasm.JS.Web.${m.name}`), 'Lasm.JS.Web', 'Lasm.JS.Web.Browser'];
+  for (const m of core) {
+    const source = readFileSync(`${root}library/${m.replaceAll('.', '/')}.lean`, 'utf8');
+    for (const [, imported] of source.matchAll(/^import (Lasm\.\S+)$/gm)) assert.ok(!imported.startsWith('Lasm.JS.Web.Platform'), `${m} imports ${imported}`);
+  }
+  // Every interface of the rest of the platform is one the supported engines all ship (the core tier's are
+  // hand-listed: CSSStyleProperties is what the specs return, though Chromium's style objects are CSSStyleDeclarations).
+  const { surface } = JSON.parse(readFileSync(new URL('../scripts/bindings/browser-surface.json', import.meta.url), 'utf8'));
+  for (const [name, e] of Object.entries(surface)) {
+    if (e.global || e.namespace || !e.module.startsWith('Platform.')) continue;
+    assert.ok(shipped([name]), `${name} is generated but not shipped by every supported engine`);
   }
 });
 

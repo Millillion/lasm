@@ -1407,11 +1407,11 @@ def RTCDataChannel.send (self : RTCDataChannel) (data : String) : IO Unit :=
   self.val.callMethod "send" (Support.args #[toJS data]) Unit
 
 /-- `undefined send(Blob data)` -/
-def RTCDataChannel.send1 (self : RTCDataChannel) (data : Blob) : IO Unit :=
+def RTCDataChannel.sendWithBlob (self : RTCDataChannel) (data : Blob) : IO Unit :=
   self.val.callMethod "send" (Support.args #[toJS data]) Unit
 
 /-- `undefined send(ArrayBuffer data)` -/
-def RTCDataChannel.sendWithData (self : RTCDataChannel) (data : ByteArray) : IO Unit :=
+def RTCDataChannel.sendWithArrayBuffer (self : RTCDataChannel) (data : ByteArray) : IO Unit :=
   self.val.callMethod "send" (Support.args #[toJS data]) Unit
 
 /-- `undefined send(ArrayBufferView data)` -/

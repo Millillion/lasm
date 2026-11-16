@@ -33,6 +33,7 @@ namespace Raw
 @[js "lasm:app" "port"] opaque port : String → IO Port
 @[js "lasm:app" "onMessage"] opaque onMessage : Value → IO Unit
 @[js "lasm:app" "onUnmount"] opaque onUnmount : Value → IO Unit
+@[js "lasm:app" "signal"] opaque signal : IO Value
 @[js "lasm:app" "hotState"] opaque hotState : IO Data
 @[js "lasm:app" "onHotSave"] opaque onHotSave : Value → IO Unit
 end Raw
@@ -77,6 +78,12 @@ def onMessageAsync (f : Data → Async Unit) : IO Unit := do
 stops: the place to remove listeners, timers and sockets the app added to the
 page itself. -/
 def onUnmount (f : IO Unit) : IO Unit := do Raw.onUnmount (← callback fun _ => f)
+/-- An `AbortSignal` that aborts when the app is unmounted, as `α`: `signal Lasm.JS.Web.AbortSignal`
+(`import Lasm.JS.Web`), or a `Value`. Pass it where the platform takes one, and the platform
+removes what it registered: `addEventListener`'s `signal` option, `fetch`'s, and
+`signal.addEventListener "abort"` for a timer or a socket (docs/API_DECISIONS.md A14.1).
+It aborts before the `onUnmount` handlers run. Outside a mounted app it never aborts. -/
+def signal (α : Type := Value) [FromJS α] : IO α := do decodeAs α "Lasm.UI.Mount.signal" (.ref (← Raw.signal) "")
 
 /-- During a hot reload (`@lasm/cli/vite` in development), the state the previous
 version saved with `onHotSave`, converted to `α`; `none` otherwise or when it

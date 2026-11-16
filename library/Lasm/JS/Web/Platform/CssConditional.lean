@@ -55,4 +55,14 @@ def CSSSupportsRule.cast? (v : Value) : IO (Option CSSSupportsRule) := do
 /-- `const unsigned short SUPPORTS_RULE = 12` -/
 def CSSRule.SUPPORTS_RULE : Nat := 12
 
+/-- `boolean supports(CSSOMString property, CSSOMString value)` (CSS Conditional Rules Module Level 3 (https://drafts.csswg.org/css-conditional-3/)) -/
+def CSS.supports (property : String) (value : String) : IO Bool :=
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.CSS.supports", module := "globalThis", path := "CSS.supports", construct := false, arity := 2 }
+    (Support.args #[toJS property, toJS value]) (await := false)
+
+/-- `boolean supports(CSSOMString conditionText)` (CSS Conditional Rules Module Level 3 (https://drafts.csswg.org/css-conditional-3/)) -/
+def CSS.supportsWithConditionText (conditionText : String) : IO Bool :=
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.CSS.supportsWithConditionText", module := "globalThis", path := "CSS.supports", construct := false, arity := 1 }
+    (Support.args #[toJS conditionText]) (await := false)
+
 end Lasm.JS.Web

@@ -1428,6 +1428,15 @@
         "length"
       ]
     },
+    "CSS": {
+      "module": "Platform.Cssom",
+      "namespace": [
+        "escape",
+        "supports",
+        "highlights",
+        "registerProperty"
+      ]
+    },
     "DOMMatrix": {
       "module": "Platform.Geometry",
       "static": [

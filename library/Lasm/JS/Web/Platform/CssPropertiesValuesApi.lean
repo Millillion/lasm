@@ -18,6 +18,21 @@ instance : ToJS CSSPropertyRule := ⟨fun x => .ref x.val ""⟩
 instance : FromJS CSSPropertyRule := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Web.CSSPropertyRule", .data⟩
 instance : Coe CSSPropertyRule CSSRule := ⟨CSSPropertyRule.toCSSRule⟩
 
+/-- `dictionary PropertyDefinition` (CSS Properties and Values API Level 1 (https://drafts.css-houdini.org/css-properties-values-api-1/)); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure PropertyDefinition where
+  /-- `required DOMString name` -/
+  name : String
+  /-- `DOMString syntax = "*"` -/
+  «syntax» : Option String := none
+  /-- `boolean inherits = true` -/
+  inherits : Option Bool := none
+  /-- `DOMString initialValue` -/
+  initialValue : Option String := none
+instance : ToJS PropertyDefinition := ⟨fun d => Support.fields #[("name", toJS d.name),
+    ("syntax", Support.optional d.«syntax»),
+    ("inherits", Support.optional d.inherits),
+    ("initialValue", Support.optional d.initialValue)]⟩
+
 /-- `v instanceof CSSPropertyRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSPropertyRule`). -/
 def CSSPropertyRule.cast? (v : Value) : IO (Option CSSPropertyRule) := do
   return if (← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CSSPropertyRule"] Value) v) then some { val := v } else none
@@ -33,5 +48,10 @@ def CSSPropertyRule.inherits (self : CSSPropertyRule) : IO Bool := self.val.get 
 
 /-- `readonly attribute CSSOMString? initialValue` -/
 def CSSPropertyRule.initialValue (self : CSSPropertyRule) : IO (Option String) := self.val.get "initialValue" (Option String)
+
+/-- `undefined registerProperty(PropertyDefinition definition)` (CSS Properties and Values API Level 1 (https://drafts.css-houdini.org/css-properties-values-api-1/)) -/
+def CSS.registerProperty (definition : PropertyDefinition) : IO Unit :=
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.CSS.registerProperty", module := "globalThis", path := "CSS.registerProperty", construct := false, arity := 1 }
+    (Support.args #[toJS definition]) (await := false)
 
 end Lasm.JS.Web

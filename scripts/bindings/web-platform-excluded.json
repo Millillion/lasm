@@ -1,0 +1,1520 @@
+{
+  "generatedBy": "scripts/bindings/generate-web.mjs (@webref/idl 3.86.0, @mdn/browser-compat-data 8.1.8)",
+  "baseline": {
+    "chrome": "153",
+    "firefox": "155",
+    "safari": "26.6"
+  },
+  "specs": {
+    "EXT_clip_control": {
+      "title": "WebGL EXT_clip_control Extension Specification (https://registry.khronos.org/webgl/extensions/EXT_clip_control/)",
+      "interfaces": {
+        "EXT_clip_control": "not shipped by every supported engine"
+      }
+    },
+    "EXT_conservative_depth": {
+      "title": "WebGL EXT_conservative_depth Extension Specification (https://registry.khronos.org/webgl/extensions/EXT_conservative_depth/)",
+      "interfaces": {
+        "EXT_conservative_depth": "not shipped by every supported engine"
+      }
+    },
+    "EXT_depth_clamp": {
+      "title": "WebGL EXT_depth_clamp Extension Specification (https://registry.khronos.org/webgl/extensions/EXT_depth_clamp/)",
+      "interfaces": {
+        "EXT_depth_clamp": "not shipped by every supported engine"
+      }
+    },
+    "EXT_disjoint_timer_query": {
+      "title": "WebGL EXT_disjoint_timer_query Extension Specification (https://registry.khronos.org/webgl/extensions/EXT_disjoint_timer_query/)",
+      "interfaces": {
+        "EXT_disjoint_timer_query": "not shipped by every supported engine",
+        "WebGLTimerQueryEXT": "not shipped by every supported engine"
+      }
+    },
+    "EXT_disjoint_timer_query_webgl2": {
+      "title": "WebGL EXT_disjoint_timer_query_webgl2 Extension Specification (https://registry.khronos.org/webgl/extensions/EXT_disjoint_timer_query_webgl2/)",
+      "interfaces": {
+        "EXT_disjoint_timer_query_webgl2": "not shipped by every supported engine"
+      }
+    },
+    "EXT_polygon_offset_clamp": {
+      "title": "WebGL EXT_polygon_offset_clamp Extension Specification (https://registry.khronos.org/webgl/extensions/EXT_polygon_offset_clamp/)",
+      "interfaces": {
+        "EXT_polygon_offset_clamp": "not shipped by every supported engine"
+      }
+    },
+    "EXT_render_snorm": {
+      "title": "WebGL EXT_render_snorm Extension Specification (https://registry.khronos.org/webgl/extensions/EXT_render_snorm/)",
+      "interfaces": {
+        "EXT_render_snorm": "not shipped by every supported engine"
+      }
+    },
+    "EXT_texture_mirror_clamp_to_edge": {
+      "title": "WebGL EXT_texture_mirror_clamp_to_edge Extension Specification (https://registry.khronos.org/webgl/extensions/EXT_texture_mirror_clamp_to_edge/)",
+      "interfaces": {
+        "EXT_texture_mirror_clamp_to_edge": "not shipped by every supported engine"
+      }
+    },
+    "EXT_texture_norm16": {
+      "title": "WebGL EXT_texture_norm16 Extension Specification (https://registry.khronos.org/webgl/extensions/EXT_texture_norm16/)",
+      "interfaces": {
+        "EXT_texture_norm16": "not shipped by every supported engine"
+      }
+    },
+    "FileAPI": {
+      "title": "File API (https://w3c.github.io/FileAPI/)",
+      "interfaces": {
+        "FileReaderSync": "workers only"
+      }
+    },
+    "IndexedDB": {
+      "title": "Indexed Database API 3.0 (https://w3c.github.io/IndexedDB/)",
+      "interfaces": {
+        "IDBRecord": "not shipped by every supported engine"
+      }
+    },
+    "KHR_parallel_shader_compile": {
+      "title": "WebGL KHR_parallel_shader_compile Extension Specification (https://registry.khronos.org/webgl/extensions/KHR_parallel_shader_compile/)",
+      "interfaces": {
+        "KHR_parallel_shader_compile": "not shipped by every supported engine"
+      }
+    },
+    "NV_shader_noperspective_interpolation": {
+      "title": "WebGL NV_shader_noperspective_interpolation Extension Specification (https://registry.khronos.org/webgl/extensions/NV_shader_noperspective_interpolation/)",
+      "interfaces": {
+        "NV_shader_noperspective_interpolation": "not shipped by every supported engine"
+      }
+    },
+    "OES_sample_variables": {
+      "title": "WebGL OES_sample_variables Extension Specification (https://registry.khronos.org/webgl/extensions/OES_sample_variables/)",
+      "interfaces": {
+        "OES_sample_variables": "not shipped by every supported engine"
+      }
+    },
+    "OES_shader_multisample_interpolation": {
+      "title": "WebGL OES_shader_multisample_interpolation Extension Specification (https://registry.khronos.org/webgl/extensions/OES_shader_multisample_interpolation/)",
+      "interfaces": {
+        "OES_shader_multisample_interpolation": "not shipped by every supported engine"
+      }
+    },
+    "OES_vertex_array_object": {
+      "title": "WebGL OES_vertex_array_object Khronos Ratified Extension Specification (https://registry.khronos.org/webgl/extensions/OES_vertex_array_object/)",
+      "interfaces": {
+        "WebGLVertexArrayObjectOES": "its parent is not generated"
+      }
+    },
+    "OVR_multiview2": {
+      "title": "WebGL OVR_multiview2 Extension Specification (https://registry.khronos.org/webgl/extensions/OVR_multiview2/)",
+      "interfaces": {
+        "OVR_multiview2": "not shipped by every supported engine"
+      }
+    },
+    "SVG": {
+      "title": "Scalable Vector Graphics (SVG) 2 (https://w3c.github.io/svgwg/svg2-draft/)",
+      "interfaces": {
+        "ShadowAnimation": "not shipped by every supported engine"
+      }
+    },
+    "WEBGL_blend_equation_advanced_coherent": {
+      "title": "WebGL WEBGL_blend_equation_advanced_coherent Extension Draft Specification (https://registry.khronos.org/webgl/extensions/WEBGL_blend_equation_advanced_coherent/)",
+      "interfaces": {
+        "WEBGL_blend_equation_advanced_coherent": "not shipped by every supported engine"
+      }
+    },
+    "WEBGL_blend_func_extended": {
+      "title": "WebGL WEBGL_blend_func_extended Extension Specification (https://registry.khronos.org/webgl/extensions/WEBGL_blend_func_extended/)",
+      "interfaces": {
+        "WEBGL_blend_func_extended": "not shipped by every supported engine"
+      }
+    },
+    "WEBGL_clip_cull_distance": {
+      "title": "WebGL WEBGL_clip_cull_distance Extension Specification (https://registry.khronos.org/webgl/extensions/WEBGL_clip_cull_distance/)",
+      "interfaces": {
+        "WEBGL_clip_cull_distance": "not shipped by every supported engine"
+      }
+    },
+    "WEBGL_compressed_texture_pvrtc": {
+      "title": "WebGL WEBGL_compressed_texture_pvrtc Extension Specification (https://registry.khronos.org/webgl/extensions/WEBGL_compressed_texture_pvrtc/)",
+      "interfaces": {
+        "WEBGL_compressed_texture_pvrtc": "not shipped by every supported engine"
+      }
+    },
+    "WEBGL_draw_instanced_base_vertex_base_instance": {
+      "title": "WebGL WEBGL_draw_instanced_base_vertex_base_instance Extension Draft Specification (https://registry.khronos.org/webgl/extensions/WEBGL_draw_instanced_base_vertex_base_instance/)",
+      "interfaces": {
+        "WEBGL_draw_instanced_base_vertex_base_instance": "not shipped by every supported engine"
+      }
+    },
+    "WEBGL_multi_draw": {
+      "title": "WebGL WEBGL_multi_draw Extension Specification (https://registry.khronos.org/webgl/extensions/WEBGL_multi_draw/)",
+      "interfaces": {
+        "WEBGL_multi_draw": "not shipped by every supported engine"
+      }
+    },
+    "WEBGL_multi_draw_instanced_base_vertex_base_instance": {
+      "title": "WebGL WEBGL_multi_draw_instanced_base_vertex_base_instance Extension Draft Specification (https://registry.khronos.org/webgl/extensions/WEBGL_multi_draw_instanced_base_vertex_base_instance/)",
+      "interfaces": {
+        "WEBGL_multi_draw_instanced_base_vertex_base_instance": "not shipped by every supported engine"
+      }
+    },
+    "WEBGL_polygon_mode": {
+      "title": "WebGL WEBGL_polygon_mode Extension Specification (https://registry.khronos.org/webgl/extensions/WEBGL_polygon_mode/)",
+      "interfaces": {
+        "WEBGL_polygon_mode": "not shipped by every supported engine"
+      }
+    },
+    "WEBGL_provoking_vertex": {
+      "title": "WebGL WEBGL_provoking_vertex Extension Specification (https://registry.khronos.org/webgl/extensions/WEBGL_provoking_vertex/)",
+      "interfaces": {
+        "WEBGL_provoking_vertex": "not shipped by every supported engine"
+      }
+    },
+    "WEBGL_render_shared_exponent": {
+      "title": "WebGL WEBGL_render_shared_exponent Extension Specification (https://registry.khronos.org/webgl/extensions/WEBGL_render_shared_exponent/)",
+      "interfaces": {
+        "WEBGL_render_shared_exponent": "not shipped by every supported engine"
+      }
+    },
+    "WEBGL_shader_pixel_local_storage": {
+      "title": "WebGL WEBGL_shader_pixel_local_storage Extension Specification (https://registry.khronos.org/webgl/extensions/WEBGL_shader_pixel_local_storage/)",
+      "interfaces": {
+        "WEBGL_shader_pixel_local_storage": "not shipped by every supported engine"
+      }
+    },
+    "WEBGL_stencil_texturing": {
+      "title": "WebGL WEBGL_stencil_texturing Extension Specification (https://registry.khronos.org/webgl/extensions/WEBGL_stencil_texturing/)",
+      "interfaces": {
+        "WEBGL_stencil_texturing": "not shipped by every supported engine"
+      }
+    },
+    "accelerometer": {
+      "title": "Accelerometer (https://w3c.github.io/accelerometer/)",
+      "interfaces": {
+        "Accelerometer": "not shipped by every supported engine",
+        "GravitySensor": "not shipped by every supported engine",
+        "LinearAccelerationSensor": "not shipped by every supported engine"
+      }
+    },
+    "ambient-light": {
+      "title": "Ambient Light Sensor (https://w3c.github.io/ambient-light/)",
+      "interfaces": {
+        "AmbientLightSensor": "not shipped by every supported engine"
+      }
+    },
+    "anchors": {
+      "title": "WebXR Anchors Module (https://immersive-web.github.io/anchors/)",
+      "interfaces": {
+        "XRAnchor": "not shipped by every supported engine",
+        "XRAnchorSet": "not shipped by every supported engine"
+      }
+    },
+    "animation-triggers": {
+      "title": "Animation Triggers (https://drafts.csswg.org/animation-triggers-1/)",
+      "interfaces": {
+        "AnimationTrigger": "not shipped by every supported engine"
+      }
+    },
+    "attribution": {
+      "title": "Attribution Level 1 (https://w3c.github.io/attribution/)",
+      "interfaces": {
+        "Attribution": "not shipped by every supported engine",
+        "AttributionAggregationServices": "not shipped by every supported engine"
+      }
+    },
+    "audio-session": {
+      "title": "Audio Session (https://w3c.github.io/audio-session/)",
+      "interfaces": {
+        "AudioSession": "not shipped by every supported engine"
+      }
+    },
+    "autofill-event": {
+      "title": "Autofill Event (https://wicg.github.io/autofill-event/)",
+      "interfaces": {
+        "AutofillEvent": "not shipped by every supported engine"
+      }
+    },
+    "background-fetch": {
+      "title": "Background Fetch (https://wicg.github.io/background-fetch/)",
+      "interfaces": {
+        "BackgroundFetchEvent": "workers only",
+        "BackgroundFetchManager": "not shipped by every supported engine",
+        "BackgroundFetchRecord": "not shipped by every supported engine",
+        "BackgroundFetchRegistration": "not shipped by every supported engine",
+        "BackgroundFetchUpdateUIEvent": "workers only"
+      }
+    },
+    "background-sync": {
+      "title": "Web Background Synchronization (https://wicg.github.io/background-sync/spec/)",
+      "interfaces": {
+        "SyncEvent": "workers only",
+        "SyncManager": "not shipped by every supported engine"
+      }
+    },
+    "battery-status": {
+      "title": "Battery Status API (https://w3c.github.io/battery/)",
+      "interfaces": {
+        "BatteryManager": "not shipped by every supported engine"
+      }
+    },
+    "bluetooth": {
+      "title": "Web Bluetooth (https://bluetooth.spec.whatwg.org/)",
+      "interfaces": {
+        "Bluetooth": "not shipped by every supported engine",
+        "BluetoothAdvertisingEvent": "not shipped by every supported engine",
+        "BluetoothCharacteristicProperties": "not shipped by every supported engine",
+        "BluetoothDevice": "not shipped by every supported engine",
+        "BluetoothManufacturerDataMap": "not shipped by every supported engine",
+        "BluetoothPermissionResult": "not shipped by every supported engine",
+        "BluetoothRemoteGATTCharacteristic": "not shipped by every supported engine",
+        "BluetoothRemoteGATTDescriptor": "not shipped by every supported engine",
+        "BluetoothRemoteGATTServer": "not shipped by every supported engine",
+        "BluetoothRemoteGATTService": "not shipped by every supported engine",
+        "BluetoothServiceDataMap": "not shipped by every supported engine",
+        "BluetoothUUID": "not shipped by every supported engine",
+        "ValueEvent": "not shipped by every supported engine"
+      }
+    },
+    "bluetooth-scanning": {
+      "title": "Web Bluetooth Scanning (https://bluetooth.spec.whatwg.org/scanning.html)",
+      "interfaces": {
+        "BluetoothDataFilter": "not shipped by every supported engine",
+        "BluetoothLEScan": "not shipped by every supported engine",
+        "BluetoothLEScanFilter": "not shipped by every supported engine",
+        "BluetoothLEScanPermissionResult": "not shipped by every supported engine",
+        "BluetoothManufacturerDataFilter": "not shipped by every supported engine",
+        "BluetoothServiceDataFilter": "not shipped by every supported engine"
+      }
+    },
+    "body-tracking": {
+      "title": "WebXR Body Tracking Module - Level 1 (https://immersive-web.github.io/body-tracking/)",
+      "interfaces": {
+        "XRBody": "not shipped by every supported engine",
+        "XRBodySpace": "not shipped by every supported engine"
+      }
+    },
+    "captured-mouse-events": {
+      "title": "Captured Mouse Events (https://screen-share.github.io/captured-mouse-events/)",
+      "interfaces": {
+        "CapturedMouseEvent": "not shipped by every supported engine"
+      }
+    },
+    "clipboard-apis": {
+      "title": "Clipboard API and events (https://w3c.github.io/clipboard-apis/)",
+      "interfaces": {
+        "ClipboardChangeEvent": "not shipped by every supported engine"
+      }
+    },
+    "compute-pressure": {
+      "title": "Compute Pressure Level 1 (https://w3c.github.io/compute-pressure/)",
+      "interfaces": {
+        "PressureObserver": "not shipped by every supported engine",
+        "PressureRecord": "not shipped by every supported engine"
+      }
+    },
+    "contact-picker": {
+      "title": "Contact Picker API (https://w3c.github.io/contact-picker/)",
+      "interfaces": {
+        "ContactAddress": "not shipped by every supported engine",
+        "ContactsManager": "not shipped by every supported engine"
+      }
+    },
+    "container-timing": {
+      "title": "Container Timing API (https://w3c.github.io/container-timing/)",
+      "interfaces": {
+        "PerformanceContainerTiming": "not shipped by every supported engine"
+      }
+    },
+    "content-index": {
+      "title": "Content Index (https://wicg.github.io/content-index/spec/)",
+      "interfaces": {
+        "ContentIndex": "not shipped by every supported engine",
+        "ContentIndexEvent": "workers only"
+      }
+    },
+    "cookiestore": {
+      "title": "Cookie Store API Standard (https://cookiestore.spec.whatwg.org/)",
+      "interfaces": {
+        "CookieStoreManager": "not shipped by every supported engine",
+        "ExtendableCookieChangeEvent": "workers only"
+      }
+    },
+    "crash-reporting": {
+      "title": "Crash Reporting (https://wicg.github.io/crash-reporting/)",
+      "interfaces": {
+        "CrashReportContext": "not shipped by every supported engine"
+      }
+    },
+    "credential-management": {
+      "title": "Credential Management Level 1 (https://w3c.github.io/webappsec-credential-management/)",
+      "interfaces": {
+        "FederatedCredential": "not shipped by every supported engine",
+        "PasswordCredential": "not shipped by every supported engine"
+      }
+    },
+    "cross-origin-storage": {
+      "title": "Cross-Origin Storage (https://wicg.github.io/cross-origin-storage/)",
+      "interfaces": {
+        "CrossOriginStorageManager": "not shipped by every supported engine"
+      }
+    },
+    "css-animation-worklet": {
+      "title": "CSS Animation Worklet API (https://drafts.css-houdini.org/css-animationworklet-1/)",
+      "interfaces": {
+        "AnimationWorkletGlobalScope": "workers only",
+        "WorkletAnimation": "not shipped by every supported engine",
+        "WorkletAnimationEffect": "workers only",
+        "WorkletGroupEffect": "workers only"
+      }
+    },
+    "css-color-5": {
+      "title": "CSS Color Module Level 5 (https://drafts.csswg.org/css-color-5/)",
+      "interfaces": {
+        "CSSColorProfileRule": "not shipped by every supported engine"
+      }
+    },
+    "css-conditional-5": {
+      "title": "CSS Conditional Rules Module Level 5 (https://drafts.csswg.org/css-conditional-5/)",
+      "interfaces": {
+        "CSSSupportsConditionRule": "not shipped by every supported engine"
+      }
+    },
+    "css-font-loading": {
+      "title": "CSS Font Loading Module Level 3 (https://drafts.csswg.org/css-font-loading-3/)",
+      "interfaces": {
+        "FontFaceFeatures": "not shipped by every supported engine",
+        "FontFacePalette": "not shipped by every supported engine",
+        "FontFacePalettes": "not shipped by every supported engine",
+        "FontFaceSetLoadEvent": "not shipped by every supported engine",
+        "FontFaceVariationAxis": "not shipped by every supported engine",
+        "FontFaceVariations": "not shipped by every supported engine"
+      }
+    },
+    "css-fonts": {
+      "title": "CSS Fonts Module Level 4 (https://drafts.csswg.org/css-fonts-4/)",
+      "interfaces": {
+        "CSSFontFeatureValuesMap": "not shipped by every supported engine"
+      }
+    },
+    "css-fonts-5": {
+      "title": "CSS Fonts Module Level 5 (https://drafts.csswg.org/css-fonts-5/)",
+      "interfaces": {
+        "CSSFontFaceDescriptors": "not shipped by every supported engine"
+      }
+    },
+    "css-layout-api": {
+      "title": "CSS Layout API Level 1 (https://drafts.css-houdini.org/css-layout-api-1/)",
+      "interfaces": {
+        "BreakToken": "workers only",
+        "ChildBreakToken": "workers only",
+        "FragmentResult": "workers only",
+        "IntrinsicSizes": "workers only",
+        "LayoutChild": "workers only",
+        "LayoutConstraints": "workers only",
+        "LayoutEdges": "workers only",
+        "LayoutFragment": "workers only",
+        "LayoutWorkletGlobalScope": "workers only"
+      }
+    },
+    "css-mixins": {
+      "title": "CSS Custom Functions and Mixins Module Level 1 (https://drafts.csswg.org/css-mixins-1/)",
+      "interfaces": {
+        "CSSApplyBlockRule": "not shipped by every supported engine",
+        "CSSApplyStatementRule": "not shipped by every supported engine",
+        "CSSContentsBlockRule": "not shipped by every supported engine",
+        "CSSContentsStatementRule": "not shipped by every supported engine",
+        "CSSFunctionDeclarations": "not shipped by every supported engine",
+        "CSSFunctionDescriptors": "not shipped by every supported engine",
+        "CSSFunctionRule": "not shipped by every supported engine",
+        "CSSMixinRule": "not shipped by every supported engine"
+      }
+    },
+    "css-nav": {
+      "title": "CSS Spatial Navigation Module Level 1 (https://drafts.csswg.org/css-spatial-nav-1/)",
+      "interfaces": {
+        "NavigationEvent": "not shipped by every supported engine"
+      }
+    },
+    "css-paint-api": {
+      "title": "CSS Painting API Level 1 (https://drafts.css-houdini.org/css-paint-api-1/)",
+      "interfaces": {
+        "PaintRenderingContext2D": "workers only",
+        "PaintSize": "workers only",
+        "PaintWorkletGlobalScope": "workers only"
+      }
+    },
+    "css-parser-api": {
+      "title": "CSS Parser API (https://wicg.github.io/css-parser-api/)",
+      "interfaces": {
+        "CSSParserAtRule": "not shipped by every supported engine",
+        "CSSParserBlock": "not shipped by every supported engine",
+        "CSSParserDeclaration": "not shipped by every supported engine",
+        "CSSParserFunction": "not shipped by every supported engine",
+        "CSSParserQualifiedRule": "not shipped by every supported engine",
+        "CSSParserRule": "not shipped by every supported engine",
+        "CSSParserValue": "not shipped by every supported engine"
+      }
+    },
+    "css-pseudo": {
+      "title": "CSS Pseudo-Elements Module Level 4 (https://drafts.csswg.org/css-pseudo-4/)",
+      "interfaces": {
+        "CSSPseudoElement": "not shipped by every supported engine"
+      }
+    },
+    "css-regions": {
+      "title": "CSS Regions Module Level 1 (https://drafts.csswg.org/css-regions-1/)",
+      "interfaces": {
+        "NamedFlow": "not shipped by every supported engine",
+        "NamedFlowMap": "not shipped by every supported engine"
+      }
+    },
+    "css-scroll-snap-2": {
+      "title": "CSS Scroll Snap Module Level 2 (https://drafts.csswg.org/css-scroll-snap-2/)",
+      "interfaces": {
+        "SnapEvent": "not shipped by every supported engine"
+      }
+    },
+    "css-typed-om": {
+      "title": "CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)",
+      "interfaces": {
+        "CSSColor": "not shipped by every supported engine",
+        "CSSColorValue": "not shipped by every supported engine",
+        "CSSHSL": "not shipped by every supported engine",
+        "CSSHWB": "not shipped by every supported engine",
+        "CSSImageValue": "not shipped by every supported engine",
+        "CSSKeywordValue": "not shipped by every supported engine",
+        "CSSLCH": "not shipped by every supported engine",
+        "CSSLab": "not shipped by every supported engine",
+        "CSSMathClamp": "not shipped by every supported engine",
+        "CSSMathInvert": "not shipped by every supported engine",
+        "CSSMathMax": "not shipped by every supported engine",
+        "CSSMathMin": "not shipped by every supported engine",
+        "CSSMathNegate": "not shipped by every supported engine",
+        "CSSMathProduct": "not shipped by every supported engine",
+        "CSSMathSum": "not shipped by every supported engine",
+        "CSSMathValue": "not shipped by every supported engine",
+        "CSSMatrixComponent": "not shipped by every supported engine",
+        "CSSNumericArray": "not shipped by every supported engine",
+        "CSSNumericValue": "not shipped by every supported engine",
+        "CSSOKLCH": "not shipped by every supported engine",
+        "CSSOKLab": "not shipped by every supported engine",
+        "CSSPerspective": "not shipped by every supported engine",
+        "CSSRGB": "not shipped by every supported engine",
+        "CSSRotate": "not shipped by every supported engine",
+        "CSSScale": "not shipped by every supported engine",
+        "CSSSkew": "not shipped by every supported engine",
+        "CSSSkewX": "not shipped by every supported engine",
+        "CSSSkewY": "not shipped by every supported engine",
+        "CSSStyleValue": "not shipped by every supported engine",
+        "CSSTransformComponent": "not shipped by every supported engine",
+        "CSSTransformValue": "not shipped by every supported engine",
+        "CSSTranslate": "not shipped by every supported engine",
+        "CSSUnitValue": "not shipped by every supported engine",
+        "CSSUnparsedValue": "not shipped by every supported engine",
+        "CSSVariableReferenceValue": "not shipped by every supported engine",
+        "StylePropertyMap": "not shipped by every supported engine",
+        "StylePropertyMapReadOnly": "not shipped by every supported engine"
+      }
+    },
+    "css-view-transitions": {
+      "title": "CSS View Transitions Module Level 2 (https://drafts.csswg.org/css-view-transitions-2/)",
+      "interfaces": {
+        "CSSViewTransitionRule": "not shipped by every supported engine"
+      }
+    },
+    "css-viewport": {
+      "title": "CSS Viewport Module Level 1 (https://drafts.csswg.org/css-viewport/)",
+      "interfaces": {
+        "Viewport": "not shipped by every supported engine"
+      }
+    },
+    "cssom": {
+      "title": "CSS Object Model (CSSOM) Module Level 1 (https://drafts.csswg.org/cssom-1/)",
+      "interfaces": {
+        "CSSMarginRule": "not shipped by every supported engine",
+        "CSSPageDescriptors": "not shipped by every supported engine"
+      }
+    },
+    "datacue": {
+      "title": "DataCue API (https://wicg.github.io/datacue/)",
+      "interfaces": {
+        "DataCue": "not shipped by every supported engine"
+      }
+    },
+    "device-posture": {
+      "title": "Device Posture API (https://w3c.github.io/device-posture/)",
+      "interfaces": {
+        "DevicePosture": "not shipped by every supported engine"
+      }
+    },
+    "digital-credentials": {
+      "title": "Digital Credentials (https://w3c-fedid.github.io/digital-credentials/)",
+      "interfaces": {
+        "DigitalCredential": "not shipped by every supported engine"
+      }
+    },
+    "digital-goods": {
+      "title": "Digital Goods API (https://wicg.github.io/digital-goods/)",
+      "interfaces": {
+        "DigitalGoodsService": "not shipped by every supported engine"
+      }
+    },
+    "document-picture-in-picture": {
+      "title": "Document Picture-in-Picture Specification (https://wicg.github.io/document-picture-in-picture/)",
+      "interfaces": {
+        "DocumentPictureInPicture": "not shipped by every supported engine",
+        "DocumentPictureInPictureEvent": "not shipped by every supported engine"
+      }
+    },
+    "dom": {
+      "title": "DOM Standard (https://dom.spec.whatwg.org/)",
+      "interfaces": {
+        "XSLTProcessor": "not shipped by every supported engine"
+      }
+    },
+    "edit-context": {
+      "title": "EditContext API (https://w3c.github.io/edit-context/)",
+      "interfaces": {
+        "CharacterBoundsUpdateEvent": "not shipped by every supported engine",
+        "EditContext": "not shipped by every supported engine",
+        "TextFormat": "not shipped by every supported engine",
+        "TextFormatUpdateEvent": "not shipped by every supported engine",
+        "TextUpdateEvent": "not shipped by every supported engine"
+      }
+    },
+    "element-capture": {
+      "title": "Element Capture (https://screen-share.github.io/element-capture/)",
+      "interfaces": {
+        "RestrictionTarget": "not shipped by every supported engine"
+      }
+    },
+    "element-timing": {
+      "title": "Element Timing API (https://w3c.github.io/element-timing/)",
+      "interfaces": {
+        "PerformanceElementTiming": "not shipped by every supported engine"
+      }
+    },
+    "eyedropper-api": {
+      "title": "EyeDropper API (https://wicg.github.io/eyedropper-api/)",
+      "interfaces": {
+        "EyeDropper": "not shipped by every supported engine"
+      }
+    },
+    "fedcm": {
+      "title": "Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)",
+      "interfaces": {
+        "IdentityCredential": "not shipped by every supported engine",
+        "IdentityCredentialError": "not shipped by every supported engine",
+        "IdentityProvider": "not shipped by every supported engine"
+      }
+    },
+    "fenced-frame": {
+      "title": "Fenced Frame (https://wicg.github.io/fenced-frame/)",
+      "interfaces": {
+        "Fence": "not shipped by every supported engine",
+        "FencedFrameConfig": "not shipped by every supported engine",
+        "HTMLFencedFrameElement": "not shipped by every supported engine"
+      }
+    },
+    "fetch": {
+      "title": "Fetch Standard (https://fetch.spec.whatwg.org/)",
+      "interfaces": {
+        "FetchLaterResult": "not shipped by every supported engine"
+      }
+    },
+    "font-metrics-api": {
+      "title": "Font Metrics API Level 1 (https://drafts.css-houdini.org/font-metrics-api-1/)",
+      "interfaces": {
+        "Baseline": "not shipped by every supported engine",
+        "Font": "not shipped by every supported engine",
+        "FontMetrics": "not shipped by every supported engine"
+      }
+    },
+    "fs": {
+      "title": "File System Standard (https://fs.spec.whatwg.org/)",
+      "interfaces": {
+        "FileSystemSyncAccessHandle": "workers only"
+      }
+    },
+    "gamepad-extensions": {
+      "title": "Gamepad Extensions (https://w3c.github.io/gamepad/extensions.html)",
+      "interfaces": {
+        "GamepadPose": "not shipped by every supported engine"
+      }
+    },
+    "generic-sensor": {
+      "title": "Generic Sensor API (https://w3c.github.io/sensors/)",
+      "interfaces": {
+        "Sensor": "not shipped by every supported engine",
+        "SensorErrorEvent": "not shipped by every supported engine"
+      }
+    },
+    "geolocation-element": {
+      "title": "The HTML Geolocation Element (https://wicg.github.io/PEPC/geolocation-element.html)",
+      "interfaces": {
+        "HTMLGeolocationElement": "not shipped by every supported engine"
+      }
+    },
+    "gyroscope": {
+      "title": "Gyroscope (https://w3c.github.io/gyroscope/)",
+      "interfaces": {
+        "Gyroscope": "not shipped by every supported engine"
+      }
+    },
+    "handwriting-recognition": {
+      "title": "Handwriting Recognition API (https://wicg.github.io/handwriting-recognition/)",
+      "interfaces": {
+        "HandwritingDrawing": "not shipped by every supported engine",
+        "HandwritingRecognizer": "not shipped by every supported engine",
+        "HandwritingStroke": "not shipped by every supported engine"
+      }
+    },
+    "hid": {
+      "title": "WebHID API (https://hid.spec.whatwg.org/)",
+      "interfaces": {
+        "HID": "not shipped by every supported engine",
+        "HIDConnectionEvent": "not shipped by every supported engine",
+        "HIDDevice": "not shipped by every supported engine",
+        "HIDInputReportEvent": "not shipped by every supported engine"
+      }
+    },
+    "html": {
+      "title": "HTML Standard (https://html.spec.whatwg.org/multipage/)",
+      "interfaces": {
+        "AudioTrack": "not shipped by every supported engine",
+        "AudioTrackList": "not shipped by every supported engine",
+        "CloseWatcher": "not shipped by every supported engine",
+        "DedicatedWorkerGlobalScope": "workers only",
+        "External": "not shipped by every supported engine",
+        "HTMLAllCollection": "not shipped by every supported engine",
+        "HTMLDirectoryElement": "not shipped by every supported engine",
+        "HTMLFontElement": "not shipped by every supported engine",
+        "HTMLFrameElement": "not shipped by every supported engine",
+        "HTMLFrameSetElement": "not shipped by every supported engine",
+        "HTMLMarqueeElement": "not shipped by every supported engine",
+        "HTMLParamElement": "not shipped by every supported engine",
+        "HTMLSelectedContentElement": "not shipped by every supported engine",
+        "MimeType": "not shipped by every supported engine",
+        "MimeTypeArray": "not shipped by every supported engine",
+        "NavigationPrecommitController": "not shipped by every supported engine",
+        "NotRestoredReasonDetails": "not shipped by every supported engine",
+        "NotRestoredReasons": "not shipped by every supported engine",
+        "Origin": "workers only",
+        "PageRevealEvent": "not shipped by every supported engine",
+        "PageSwapEvent": "not shipped by every supported engine",
+        "Plugin": "not shipped by every supported engine",
+        "PluginArray": "not shipped by every supported engine",
+        "Sanitizer": "not shipped by every supported engine",
+        "SharedWorkerGlobalScope": "workers only",
+        "VideoTrack": "not shipped by every supported engine",
+        "VideoTrackList": "not shipped by every supported engine",
+        "VisibilityStateEntry": "not shipped by every supported engine",
+        "WorkerGlobalScope": "workers only",
+        "WorkerLocation": "workers only",
+        "WorkerNavigator": "workers only",
+        "WorkletGlobalScope": "workers only"
+      }
+    },
+    "idle-detection": {
+      "title": "Idle Detection API (https://wicg.github.io/idle-detection/)",
+      "interfaces": {
+        "IdleDetector": "not shipped by every supported engine"
+      }
+    },
+    "image-capture": {
+      "title": "MediaStream Image Capture (https://w3c.github.io/mediacapture-image/)",
+      "interfaces": {
+        "ImageCapture": "not shipped by every supported engine"
+      }
+    },
+    "ink-enhancement": {
+      "title": "Ink API (https://wicg.github.io/ink-enhancement/)",
+      "interfaces": {
+        "DelegatedInkTrailPresenter": "not shipped by every supported engine",
+        "Ink": "not shipped by every supported engine"
+      }
+    },
+    "input-device-capabilities": {
+      "title": "Input Device Capabilities (https://wicg.github.io/input-device-capabilities/)",
+      "interfaces": {
+        "InputDeviceCapabilities": "not shipped by every supported engine"
+      }
+    },
+    "install-element": {
+      "title": "Web Install (https://wicg.github.io/install-element/)",
+      "interfaces": {
+        "HTMLInstallElement": "not shipped by every supported engine",
+        "InstallResultEvent": "not shipped by every supported engine"
+      }
+    },
+    "is-input-pending": {
+      "title": "Early detection of input events (https://wicg.github.io/is-input-pending/)",
+      "interfaces": {
+        "Scheduling": "not shipped by every supported engine"
+      }
+    },
+    "js-self-profiling": {
+      "title": "JS Self-Profiling API (https://wicg.github.io/js-self-profiling/)",
+      "interfaces": {
+        "Profiler": "not shipped by every supported engine"
+      }
+    },
+    "keyboard-lock": {
+      "title": "Keyboard Lock (https://wicg.github.io/keyboard-lock/)",
+      "interfaces": {
+        "Keyboard": "not shipped by every supported engine"
+      }
+    },
+    "keyboard-map": {
+      "title": "Keyboard Map (https://wicg.github.io/keyboard-map/)",
+      "interfaces": {
+        "KeyboardLayoutMap": "not shipped by every supported engine"
+      }
+    },
+    "layout-instability": {
+      "title": "Layout Instability API (https://wicg.github.io/layout-instability/)",
+      "interfaces": {
+        "LayoutShift": "not shipped by every supported engine",
+        "LayoutShiftAttribution": "not shipped by every supported engine"
+      }
+    },
+    "local-font-access": {
+      "title": "Local Font Access API (https://wicg.github.io/local-font-access/)",
+      "interfaces": {
+        "FontData": "not shipped by every supported engine"
+      }
+    },
+    "login-status": {
+      "title": "Login Status API (https://w3c-fedid.github.io/login-status/)",
+      "interfaces": {
+        "NavigatorLogin": "not shipped by every supported engine"
+      }
+    },
+    "long-animation-frames": {
+      "title": "Long Animation Frames API (https://w3c.github.io/long-animation-frames/)",
+      "interfaces": {
+        "PerformanceLongAnimationFrameTiming": "not shipped by every supported engine",
+        "PerformanceScriptTiming": "not shipped by every supported engine"
+      }
+    },
+    "magnetometer": {
+      "title": "Magnetometer (https://w3c.github.io/magnetometer/)",
+      "interfaces": {
+        "Magnetometer": "not shipped by every supported engine",
+        "UncalibratedMagnetometer": "not shipped by every supported engine"
+      }
+    },
+    "managed-configuration": {
+      "title": "Managed Configuration API (https://wicg.github.io/WebApiDevice/managed_config/)",
+      "interfaces": {
+        "NavigatorManagedData": "not shipped by every supported engine"
+      }
+    },
+    "manifest-incubations": {
+      "title": "Manifest Incubations (https://wicg.github.io/manifest-incubations/)",
+      "interfaces": {
+        "BeforeInstallPromptEvent": "not shipped by every supported engine"
+      }
+    },
+    "mathml-core": {
+      "title": "MathML Core (https://w3c.github.io/mathml-core/)",
+      "interfaces": {
+        "MathMLAnchorElement": "not shipped by every supported engine"
+      }
+    },
+    "media-source": {
+      "title": "Media Source Extensions™ (https://w3c.github.io/media-source/)",
+      "interfaces": {
+        "BufferedChangeEvent": "not shipped by every supported engine",
+        "ManagedMediaSource": "not shipped by every supported engine",
+        "ManagedSourceBuffer": "not shipped by every supported engine",
+        "MediaSourceHandle": "not shipped by every supported engine"
+      }
+    },
+    "mediacapture-extensions": {
+      "title": "Media Capture and Streams Extensions (https://w3c.github.io/mediacapture-extensions/)",
+      "interfaces": {
+        "HTMLCameraElement": "not shipped by every supported engine",
+        "HTMLMicrophoneElement": "not shipped by every supported engine",
+        "HTMLUserMediaElement": "not shipped by every supported engine",
+        "MediaStreamTrackAudioStats": "not shipped by every supported engine",
+        "MediaStreamTrackVideoStats": "not shipped by every supported engine"
+      }
+    },
+    "mediacapture-fromelement": {
+      "title": "Media Capture from DOM Elements (https://w3c.github.io/mediacapture-fromelement/)",
+      "interfaces": {
+        "CanvasCaptureMediaStreamTrack": "not shipped by every supported engine"
+      }
+    },
+    "mediacapture-handle-actions": {
+      "title": "The Capture-Handle Actions Mechanism (https://w3c.github.io/mediacapture-handle/actions/)",
+      "interfaces": {
+        "CaptureActionEvent": "not shipped by every supported engine"
+      }
+    },
+    "mediacapture-region": {
+      "title": "Region Capture (https://w3c.github.io/mediacapture-region/)",
+      "interfaces": {
+        "BrowserCaptureMediaStreamTrack": "not shipped by every supported engine",
+        "CropTarget": "not shipped by every supported engine"
+      }
+    },
+    "mediacapture-streams": {
+      "title": "Media Capture and Streams (https://w3c.github.io/mediacapture-main/)",
+      "interfaces": {
+        "DeviceChangeEvent": "not shipped by every supported engine",
+        "InputDeviceInfo": "not shipped by every supported engine",
+        "OverconstrainedError": "not shipped by every supported engine"
+      }
+    },
+    "mediacapture-transform": {
+      "title": "MediaStreamTrack Insertable Media Processing using Streams (https://w3c.github.io/mediacapture-transform/)",
+      "interfaces": {
+        "MediaStreamTrackHandle": "not shipped by every supported engine",
+        "MediaStreamTrackProcessor": "workers only",
+        "VideoTrackGenerator": "workers only"
+      }
+    },
+    "mediaqueries-5": {
+      "title": "Media Queries Level 5 (https://drafts.csswg.org/mediaqueries-5/)",
+      "interfaces": {
+        "CSSCustomMediaRule": "not shipped by every supported engine",
+        "PreferenceManager": "not shipped by every supported engine",
+        "PreferenceObject": "not shipped by every supported engine"
+      }
+    },
+    "mediasession": {
+      "title": "Media Session (https://w3c.github.io/mediasession/)",
+      "interfaces": {
+        "ChapterInformation": "not shipped by every supported engine"
+      }
+    },
+    "model-element": {
+      "title": "The <model> element (https://immersive-web.github.io/model-element/)",
+      "interfaces": {
+        "HTMLModelElement": "not shipped by every supported engine"
+      }
+    },
+    "navigation-timing": {
+      "title": "Navigation Timing Level 2 (https://w3c.github.io/navigation-timing/)",
+      "interfaces": {
+        "PerformanceNavigation": "not shipped by every supported engine",
+        "PerformanceTiming": "not shipped by every supported engine",
+        "PerformanceTimingConfidence": "not shipped by every supported engine"
+      }
+    },
+    "netinfo": {
+      "title": "Network Information API (https://wicg.github.io/netinfo/)",
+      "interfaces": {
+        "NetworkInformation": "not shipped by every supported engine"
+      }
+    },
+    "notifications": {
+      "title": "Notifications API Standard (https://notifications.spec.whatwg.org/)",
+      "interfaces": {
+        "NotificationEvent": "workers only"
+      }
+    },
+    "observable": {
+      "title": "Observable (https://wicg.github.io/observable/)",
+      "interfaces": {
+        "Observable": "workers only",
+        "Subscriber": "workers only"
+      }
+    },
+    "orientation-event": {
+      "title": "Device Orientation and Motion (https://w3c.github.io/deviceorientation/)",
+      "interfaces": {
+        "DeviceMotionEventAcceleration": "not shipped by every supported engine",
+        "DeviceMotionEventRotationRate": "not shipped by every supported engine"
+      }
+    },
+    "orientation-sensor": {
+      "title": "Orientation Sensor (https://w3c.github.io/orientation-sensor/)",
+      "interfaces": {
+        "AbsoluteOrientationSensor": "not shipped by every supported engine",
+        "OrientationSensor": "not shipped by every supported engine",
+        "RelativeOrientationSensor": "not shipped by every supported engine"
+      }
+    },
+    "payment-request": {
+      "title": "Payment Request API (https://w3c.github.io/payment-request/)",
+      "interfaces": {
+        "PaymentMethodChangeEvent": "not shipped by every supported engine",
+        "PaymentRequest": "not shipped by every supported engine",
+        "PaymentRequestUpdateEvent": "not shipped by every supported engine",
+        "PaymentResponse": "not shipped by every supported engine"
+      }
+    },
+    "periodic-background-sync": {
+      "title": "Web Periodic Background Synchronization (https://wicg.github.io/periodic-background-sync/)",
+      "interfaces": {
+        "PeriodicSyncEvent": "workers only",
+        "PeriodicSyncManager": "not shipped by every supported engine"
+      }
+    },
+    "permissions-policy": {
+      "title": "Permissions Policy (https://w3c.github.io/webappsec-permissions-policy/)",
+      "interfaces": {
+        "PermissionsPolicy": "not shipped by every supported engine"
+      }
+    },
+    "pointer-animations": {
+      "title": "Pointer-driven Animations Module Level 1 (https://drafts.csswg.org/pointer-animations-1/)",
+      "interfaces": {
+        "PointerTimeline": "not shipped by every supported engine"
+      }
+    },
+    "portals": {
+      "title": "Portals (https://wicg.github.io/portals/)",
+      "interfaces": {
+        "HTMLPortalElement": "not shipped by every supported engine",
+        "PortalActivateEvent": "not shipped by every supported engine",
+        "PortalHost": "not shipped by every supported engine"
+      }
+    },
+    "presentation-api": {
+      "title": "Presentation API (https://w3c.github.io/presentation-api/)",
+      "interfaces": {
+        "Presentation": "not shipped by every supported engine",
+        "PresentationAvailability": "not shipped by every supported engine",
+        "PresentationConnection": "not shipped by every supported engine",
+        "PresentationConnectionAvailableEvent": "not shipped by every supported engine",
+        "PresentationConnectionCloseEvent": "not shipped by every supported engine",
+        "PresentationConnectionList": "not shipped by every supported engine",
+        "PresentationReceiver": "not shipped by every supported engine",
+        "PresentationRequest": "not shipped by every supported engine"
+      }
+    },
+    "prompt-api": {
+      "title": "Prompt API (https://webmachinelearning.github.io/prompt-api/)",
+      "interfaces": {
+        "LanguageModel": "not shipped by every supported engine",
+        "LanguageModelParams": "not shipped by every supported engine",
+        "LanguageModelToolCall": "not shipped by every supported engine",
+        "LanguageModelToolError": "not shipped by every supported engine",
+        "LanguageModelToolSuccess": "not shipped by every supported engine"
+      }
+    },
+    "proofreader-api": {
+      "title": "Proofreader API (https://webmachinelearning.github.io/proofreader-api/)",
+      "interfaces": {
+        "Proofreader": "not shipped by every supported engine"
+      }
+    },
+    "proximity": {
+      "title": "Proximity Sensor (https://w3c.github.io/proximity/)",
+      "interfaces": {
+        "ProximitySensor": "not shipped by every supported engine"
+      }
+    },
+    "push-api": {
+      "title": "Push API (https://w3c.github.io/push-api/)",
+      "interfaces": {
+        "PushEvent": "workers only",
+        "PushMessageData": "workers only",
+        "PushSubscriptionChangeEvent": "workers only"
+      }
+    },
+    "raw-camera-access": {
+      "title": "WebXR Raw Camera Access Module (https://immersive-web.github.io/raw-camera-access/)",
+      "interfaces": {
+        "XRCamera": "not shipped by every supported engine"
+      }
+    },
+    "real-world-meshing": {
+      "title": "WebXR Mesh Detection Module (https://immersive-web.github.io/real-world-meshing/)",
+      "interfaces": {
+        "XRMesh": "not shipped by every supported engine",
+        "XRMeshSet": "not shipped by every supported engine"
+      }
+    },
+    "remote-playback": {
+      "title": "Remote Playback API (https://w3c.github.io/remote-playback/)",
+      "interfaces": {
+        "RemotePlayback": "not shipped by every supported engine"
+      }
+    },
+    "requestidlecallback": {
+      "title": "requestIdleCallback() (https://w3c.github.io/requestidlecallback/)",
+      "interfaces": {
+        "IdleDeadline": "not shipped by every supported engine"
+      }
+    },
+    "saa-non-cookie-storage": {
+      "title": "Extending Storage Access API (SAA) to non-cookie storage (https://privacycg.github.io/saa-non-cookie-storage/)",
+      "interfaces": {
+        "StorageAccessHandle": "not shipped by every supported engine"
+      }
+    },
+    "scheduling-apis": {
+      "title": "Prioritized Task Scheduling (https://wicg.github.io/scheduling-apis/)",
+      "interfaces": {
+        "Scheduler": "not shipped by every supported engine",
+        "TaskController": "not shipped by every supported engine",
+        "TaskPriorityChangeEvent": "not shipped by every supported engine",
+        "TaskSignal": "not shipped by every supported engine"
+      }
+    },
+    "screen-capture": {
+      "title": "Screen Capture (https://w3c.github.io/mediacapture-screen-share/)",
+      "interfaces": {
+        "CaptureController": "not shipped by every supported engine"
+      }
+    },
+    "scroll-animations": {
+      "title": "Scroll-driven Animations Module Level 1 (https://drafts.csswg.org/scroll-animations-1/)",
+      "interfaces": {
+        "ScrollTimeline": "not shipped by every supported engine",
+        "ViewTimeline": "not shipped by every supported engine"
+      }
+    },
+    "serial": {
+      "title": "WebSerial Standard (https://serial.spec.whatwg.org/)",
+      "interfaces": {
+        "Serial": "not shipped by every supported engine",
+        "SerialPort": "not shipped by every supported engine"
+      }
+    },
+    "service-workers": {
+      "title": "Service Workers Nightly (https://w3c.github.io/ServiceWorker/)",
+      "interfaces": {
+        "Client": "workers only",
+        "Clients": "workers only",
+        "ExtendableEvent": "workers only",
+        "ExtendableMessageEvent": "workers only",
+        "FetchEvent": "workers only",
+        "InstallEvent": "workers only",
+        "ServiceWorkerGlobalScope": "workers only",
+        "WindowClient": "workers only"
+      }
+    },
+    "shape-detection-api": {
+      "title": "Accelerated Shape Detection in Images (https://wicg.github.io/shape-detection-api/)",
+      "interfaces": {
+        "BarcodeDetector": "not shipped by every supported engine",
+        "FaceDetector": "not shipped by every supported engine"
+      }
+    },
+    "soft-navigations": {
+      "title": "Soft Navigations and Interaction Contentful Paint (https://wicg.github.io/soft-navigations/)",
+      "interfaces": {
+        "InteractionContentfulPaint": "not shipped by every supported engine",
+        "PerformanceSoftNavigation": "not shipped by every supported engine"
+      }
+    },
+    "speech-api": {
+      "title": "Web Speech API (https://webaudio.github.io/web-speech-api/)",
+      "interfaces": {
+        "SpeechGrammar": "not shipped by every supported engine",
+        "SpeechGrammarList": "not shipped by every supported engine",
+        "SpeechRecognition": "not shipped by every supported engine",
+        "SpeechRecognitionAlternative": "not shipped by every supported engine",
+        "SpeechRecognitionErrorEvent": "not shipped by every supported engine",
+        "SpeechRecognitionEvent": "not shipped by every supported engine",
+        "SpeechRecognitionPhrase": "not shipped by every supported engine",
+        "SpeechRecognitionResult": "not shipped by every supported engine",
+        "SpeechRecognitionResultList": "not shipped by every supported engine"
+      }
+    },
+    "storage-buckets": {
+      "title": "Storage Buckets API (https://wicg.github.io/storage-buckets/)",
+      "interfaces": {
+        "StorageBucket": "not shipped by every supported engine",
+        "StorageBucketManager": "not shipped by every supported engine"
+      }
+    },
+    "svg-animations": {
+      "title": "SVG Animations (https://svgwg.org/specs/animations/)",
+      "interfaces": {
+        "TimeEvent": "not shipped by every supported engine"
+      }
+    },
+    "svg-paths": {
+      "title": "SVG Paths (https://svgwg.org/specs/paths/)",
+      "interfaces": {
+        "SVGPathSegment": "not shipped by every supported engine"
+      }
+    },
+    "text-detection-api": {
+      "title": "Accelerated Text Detection in Images (https://wicg.github.io/shape-detection-api/text.html)",
+      "interfaces": {
+        "TextDetector": "not shipped by every supported engine"
+      }
+    },
+    "touch-events": {
+      "title": "Touch Events - Level 2 (https://w3c.github.io/touch-events/)",
+      "interfaces": {
+        "Touch": "not shipped by every supported engine",
+        "TouchEvent": "not shipped by every supported engine",
+        "TouchList": "not shipped by every supported engine"
+      }
+    },
+    "translation-api": {
+      "title": "Translator and Language Detector APIs (https://webmachinelearning.github.io/translation-api/)",
+      "interfaces": {
+        "LanguageDetector": "not shipped by every supported engine",
+        "Translator": "not shipped by every supported engine"
+      }
+    },
+    "trusted-types": {
+      "title": "Trusted Types (https://w3c.github.io/trusted-types/dist/spec/)",
+      "interfaces": {
+        "TrustedHTMLParserOptions": "not shipped by every supported engine"
+      }
+    },
+    "ua-client-hints": {
+      "title": "User-Agent Client Hints (https://wicg.github.io/ua-client-hints/)",
+      "interfaces": {
+        "NavigatorUAData": "not shipped by every supported engine"
+      }
+    },
+    "uievents": {
+      "title": "UI Events (https://w3c.github.io/uievents/)",
+      "interfaces": {
+        "TextEvent": "not shipped by every supported engine"
+      }
+    },
+    "usb": {
+      "title": "WebUSB API (https://usb.spec.whatwg.org/)",
+      "interfaces": {
+        "USB": "not shipped by every supported engine",
+        "USBAlternateInterface": "not shipped by every supported engine",
+        "USBConfiguration": "not shipped by every supported engine",
+        "USBConnectionEvent": "not shipped by every supported engine",
+        "USBDevice": "not shipped by every supported engine",
+        "USBEndpoint": "not shipped by every supported engine",
+        "USBInTransferResult": "not shipped by every supported engine",
+        "USBInterface": "not shipped by every supported engine",
+        "USBIsochronousInTransferPacket": "not shipped by every supported engine",
+        "USBIsochronousInTransferResult": "not shipped by every supported engine",
+        "USBIsochronousOutTransferPacket": "not shipped by every supported engine",
+        "USBIsochronousOutTransferResult": "not shipped by every supported engine",
+        "USBOutTransferResult": "not shipped by every supported engine",
+        "USBPermissionResult": "not shipped by every supported engine"
+      }
+    },
+    "virtual-keyboard": {
+      "title": "VirtualKeyboard API (https://w3c.github.io/virtual-keyboard/)",
+      "interfaces": {
+        "VirtualKeyboard": "not shipped by every supported engine"
+      }
+    },
+    "web-animations-2": {
+      "title": "Web Animations Module Level 2 (https://drafts.csswg.org/web-animations-2/)",
+      "interfaces": {
+        "AnimationNodeList": "not shipped by every supported engine",
+        "GroupEffect": "not shipped by every supported engine",
+        "SequenceEffect": "not shipped by every supported engine"
+      }
+    },
+    "web-app-launch": {
+      "title": "Web App Launch Handler API (https://wicg.github.io/web-app-launch/)",
+      "interfaces": {
+        "LaunchParams": "not shipped by every supported engine",
+        "LaunchQueue": "not shipped by every supported engine"
+      }
+    },
+    "web-based-payment-handler": {
+      "title": "Web-based Payment Handler API (https://w3c.github.io/web-based-payment-handler/)",
+      "interfaces": {
+        "CanMakePaymentEvent": "workers only",
+        "PaymentManager": "not shipped by every supported engine",
+        "PaymentRequestEvent": "workers only"
+      }
+    },
+    "web-nfc": {
+      "title": "Web NFC (https://w3c-cg.github.io/web-nfc/)",
+      "interfaces": {
+        "NDEFMessage": "not shipped by every supported engine",
+        "NDEFReader": "not shipped by every supported engine",
+        "NDEFReadingEvent": "not shipped by every supported engine",
+        "NDEFRecord": "not shipped by every supported engine"
+      }
+    },
+    "web-otp": {
+      "title": "WebOTP API (https://wicg.github.io/web-otp/)",
+      "interfaces": {
+        "OTPCredential": "not shipped by every supported engine"
+      }
+    },
+    "webaudio": {
+      "title": "Web Audio API 1.1 (https://webaudio.github.io/web-audio-api/)",
+      "interfaces": {
+        "AudioPlaybackStats": "not shipped by every supported engine",
+        "AudioProcessingEvent": "not shipped by every supported engine",
+        "AudioSinkInfo": "not shipped by every supported engine",
+        "AudioWorkletGlobalScope": "workers only",
+        "AudioWorkletProcessor": "workers only",
+        "MediaStreamTrackAudioSourceNode": "not shipped by every supported engine",
+        "ScriptProcessorNode": "not shipped by every supported engine"
+      }
+    },
+    "webcodecs": {
+      "title": "WebCodecs (https://w3c.github.io/webcodecs/)",
+      "interfaces": {
+        "ImageDecoder": "not shipped by every supported engine",
+        "ImageTrack": "not shipped by every supported engine",
+        "ImageTrackList": "not shipped by every supported engine"
+      }
+    },
+    "webgl1": {
+      "title": "WebGL Specification (https://registry.khronos.org/webgl/specs/latest/1.0/)",
+      "interfaces": {
+        "WebGLBuffer": "its parent is not generated",
+        "WebGLFramebuffer": "its parent is not generated",
+        "WebGLObject": "not shipped by every supported engine",
+        "WebGLProgram": "its parent is not generated",
+        "WebGLRenderbuffer": "its parent is not generated",
+        "WebGLShader": "its parent is not generated",
+        "WebGLTexture": "its parent is not generated"
+      }
+    },
+    "webgl2": {
+      "title": "WebGL 2.0 Specification (https://registry.khronos.org/webgl/specs/latest/2.0/)",
+      "interfaces": {
+        "WebGLQuery": "its parent is not generated",
+        "WebGLSampler": "its parent is not generated",
+        "WebGLSync": "its parent is not generated",
+        "WebGLTransformFeedback": "its parent is not generated",
+        "WebGLVertexArrayObject": "its parent is not generated"
+      }
+    },
+    "webgpu": {
+      "title": "WebGPU (https://gpuweb.github.io/gpuweb/)",
+      "interfaces": {
+        "GPU": "not shipped by every supported engine",
+        "GPUAdapter": "not shipped by every supported engine",
+        "GPUAdapterInfo": "not shipped by every supported engine",
+        "GPUBindGroup": "not shipped by every supported engine",
+        "GPUBindGroupLayout": "not shipped by every supported engine",
+        "GPUBuffer": "not shipped by every supported engine",
+        "GPUCanvasContext": "not shipped by every supported engine",
+        "GPUCommandBuffer": "not shipped by every supported engine",
+        "GPUCommandEncoder": "not shipped by every supported engine",
+        "GPUCompilationInfo": "not shipped by every supported engine",
+        "GPUCompilationMessage": "not shipped by every supported engine",
+        "GPUComputePassEncoder": "not shipped by every supported engine",
+        "GPUComputePipeline": "not shipped by every supported engine",
+        "GPUDevice": "not shipped by every supported engine",
+        "GPUDeviceLostInfo": "not shipped by every supported engine",
+        "GPUError": "not shipped by every supported engine",
+        "GPUExternalTexture": "not shipped by every supported engine",
+        "GPUInternalError": "not shipped by every supported engine",
+        "GPUOutOfMemoryError": "not shipped by every supported engine",
+        "GPUPipelineError": "not shipped by every supported engine",
+        "GPUPipelineLayout": "not shipped by every supported engine",
+        "GPUQuerySet": "not shipped by every supported engine",
+        "GPUQueue": "not shipped by every supported engine",
+        "GPURenderBundle": "not shipped by every supported engine",
+        "GPURenderBundleEncoder": "not shipped by every supported engine",
+        "GPURenderPassEncoder": "not shipped by every supported engine",
+        "GPURenderPipeline": "not shipped by every supported engine",
+        "GPUSampler": "not shipped by every supported engine",
+        "GPUShaderModule": "not shipped by every supported engine",
+        "GPUSupportedFeatures": "not shipped by every supported engine",
+        "GPUSupportedLimits": "not shipped by every supported engine",
+        "GPUTexture": "not shipped by every supported engine",
+        "GPUTextureView": "not shipped by every supported engine",
+        "GPUUncapturedErrorEvent": "not shipped by every supported engine",
+        "GPUValidationError": "not shipped by every supported engine",
+        "WGSLLanguageFeatures": "not shipped by every supported engine"
+      }
+    },
+    "webidl": {
+      "title": "Web IDL Standard (https://webidl.spec.whatwg.org/)",
+      "interfaces": {
+        "QuotaExceededError": "workers only"
+      }
+    },
+    "webmcp": {
+      "title": "WebMCP (https://webmachinelearning.github.io/webmcp/)",
+      "interfaces": {
+        "ModelContext": "not shipped by every supported engine",
+        "ToolActivatedEvent": "not shipped by every supported engine",
+        "ToolCancelEvent": "not shipped by every supported engine"
+      }
+    },
+    "webmidi": {
+      "title": "Web MIDI API (https://webaudio.github.io/web-midi-api/)",
+      "interfaces": {
+        "MIDIAccess": "not shipped by every supported engine",
+        "MIDIConnectionEvent": "not shipped by every supported engine",
+        "MIDIInput": "not shipped by every supported engine",
+        "MIDIInputMap": "not shipped by every supported engine",
+        "MIDIMessageEvent": "not shipped by every supported engine",
+        "MIDIOutput": "not shipped by every supported engine",
+        "MIDIOutputMap": "not shipped by every supported engine",
+        "MIDIPort": "not shipped by every supported engine"
+      }
+    },
+    "webnn": {
+      "title": "Web Neural Network API (https://webmachinelearning.github.io/webnn/)",
+      "interfaces": {
+        "ML": "not shipped by every supported engine",
+        "MLContext": "not shipped by every supported engine",
+        "MLGraph": "not shipped by every supported engine",
+        "MLGraphBuilder": "not shipped by every supported engine",
+        "MLOperand": "not shipped by every supported engine",
+        "MLTensor": "not shipped by every supported engine"
+      }
+    },
+    "webrtc": {
+      "title": "WebRTC: Real-Time Communication in Browsers (https://w3c.github.io/webrtc-pc/)",
+      "interfaces": {
+        "RTCIceCandidatePair": "not shipped by every supported engine"
+      }
+    },
+    "webrtc-encoded-transform": {
+      "title": "WebRTC Encoded Transform (https://w3c.github.io/webrtc-encoded-transform/)",
+      "interfaces": {
+        "KeyFrameRequestEvent": "workers only",
+        "RTCRtpSFrameDecryptor": "not shipped by every supported engine",
+        "RTCRtpSFrameEncryptor": "not shipped by every supported engine",
+        "RTCRtpScriptTransformer": "workers only",
+        "RTCTransformEvent": "workers only",
+        "SFrameDecryptorStream": "not shipped by every supported engine",
+        "SFrameEncryptorStream": "not shipped by every supported engine",
+        "SFrameTransformErrorEvent": "not shipped by every supported engine"
+      }
+    },
+    "webrtc-identity": {
+      "title": "Identity for WebRTC 1.0 (https://w3c.github.io/webrtc-identity/)",
+      "interfaces": {
+        "RTCIdentityAssertion": "not shipped by every supported engine",
+        "RTCIdentityProviderGlobalScope": "workers only",
+        "RTCIdentityProviderRegistrar": "workers only"
+      }
+    },
+    "webtransport": {
+      "title": "WebTransport (https://w3c.github.io/webtransport/)",
+      "interfaces": {
+        "WebTransportDatagramsWritable": "not shipped by every supported engine",
+        "WebTransportReceiveStream": "not shipped by every supported engine",
+        "WebTransportSendGroup": "not shipped by every supported engine",
+        "WebTransportSendStream": "not shipped by every supported engine",
+        "WebTransportWriter": "workers only"
+      }
+    },
+    "webvtt": {
+      "title": "WebVTT: The Web Video Text Tracks Format (https://w3c.github.io/webvtt/)",
+      "interfaces": {
+        "VTTRegion": "not shipped by every supported engine"
+      }
+    },
+    "webxr": {
+      "title": "WebXR Device API (https://immersive-web.github.io/webxr/)",
+      "interfaces": {
+        "XRBoundedReferenceSpace": "not shipped by every supported engine",
+        "XRFrame": "not shipped by every supported engine",
+        "XRInputSource": "not shipped by every supported engine",
+        "XRInputSourceArray": "not shipped by every supported engine",
+        "XRInputSourceEvent": "not shipped by every supported engine",
+        "XRInputSourcesChangeEvent": "not shipped by every supported engine",
+        "XRLayer": "not shipped by every supported engine",
+        "XRPermissionStatus": "not shipped by every supported engine",
+        "XRPose": "not shipped by every supported engine",
+        "XRReferenceSpace": "not shipped by every supported engine",
+        "XRReferenceSpaceEvent": "not shipped by every supported engine",
+        "XRRenderState": "not shipped by every supported engine",
+        "XRRigidTransform": "not shipped by every supported engine",
+        "XRSession": "not shipped by every supported engine",
+        "XRSessionEvent": "not shipped by every supported engine",
+        "XRSpace": "not shipped by every supported engine",
+        "XRSystem": "not shipped by every supported engine",
+        "XRView": "not shipped by every supported engine",
+        "XRViewerPose": "not shipped by every supported engine",
+        "XRViewport": "not shipped by every supported engine",
+        "XRVisibilityMaskChangeEvent": "not shipped by every supported engine",
+        "XRWebGLLayer": "not shipped by every supported engine"
+      }
+    },
+    "webxr-depth-sensing": {
+      "title": "WebXR Depth Sensing Module (https://immersive-web.github.io/depth-sensing/)",
+      "interfaces": {
+        "XRCPUDepthInformation": "not shipped by every supported engine",
+        "XRDepthInformation": "not shipped by every supported engine",
+        "XRGPUDepthInformation": "not shipped by every supported engine",
+        "XRWebGLDepthInformation": "not shipped by every supported engine"
+      }
+    },
+    "webxr-hand-input": {
+      "title": "WebXR Hand Input Module - Level 1 (https://immersive-web.github.io/webxr-hand-input/)",
+      "interfaces": {
+        "XRHand": "not shipped by every supported engine",
+        "XRJointPose": "not shipped by every supported engine",
+        "XRJointSpace": "not shipped by every supported engine"
+      }
+    },
+    "webxr-hit-test": {
+      "title": "WebXR Hit Test Module (https://immersive-web.github.io/hit-test/)",
+      "interfaces": {
+        "XRHitTestResult": "not shipped by every supported engine",
+        "XRHitTestSource": "not shipped by every supported engine",
+        "XRRay": "not shipped by every supported engine",
+        "XRTransientInputHitTestResult": "not shipped by every supported engine",
+        "XRTransientInputHitTestSource": "not shipped by every supported engine"
+      }
+    },
+    "webxr-lighting-estimation": {
+      "title": "WebXR Lighting Estimation API Level 1 (https://immersive-web.github.io/lighting-estimation/)",
+      "interfaces": {
+        "XRLightEstimate": "not shipped by every supported engine",
+        "XRLightProbe": "not shipped by every supported engine"
+      }
+    },
+    "webxr-plane-detection": {
+      "title": "WebXR Plane Detection Module (https://immersive-web.github.io/plane-detection/)",
+      "interfaces": {
+        "XRPlane": "not shipped by every supported engine",
+        "XRPlaneSet": "not shipped by every supported engine"
+      }
+    },
+    "webxr-webgpu-binding": {
+      "title": "WebXR/WebGPU Binding Module - Level 1 (https://immersive-web.github.io/webxr-webgpu-binding/)",
+      "interfaces": {
+        "XRGPUBinding": "not shipped by every supported engine",
+        "XRGPUSubImage": "not shipped by every supported engine"
+      }
+    },
+    "webxrlayers": {
+      "title": "WebXR Layers API Level 1 (https://immersive-web.github.io/layers/)",
+      "interfaces": {
+        "XRCompositionLayer": "not shipped by every supported engine",
+        "XRCubeLayer": "not shipped by every supported engine",
+        "XRCylinderLayer": "not shipped by every supported engine",
+        "XREquirectLayer": "not shipped by every supported engine",
+        "XRLayerEvent": "not shipped by every supported engine",
+        "XRMediaBinding": "not shipped by every supported engine",
+        "XRProjectionLayer": "not shipped by every supported engine",
+        "XRQuadLayer": "not shipped by every supported engine",
+        "XRSubImage": "not shipped by every supported engine",
+        "XRWebGLBinding": "not shipped by every supported engine",
+        "XRWebGLSubImage": "not shipped by every supported engine"
+      }
+    },
+    "window-controls-overlay": {
+      "title": "Window Controls Overlay (https://wicg.github.io/window-controls-overlay/)",
+      "interfaces": {
+        "WindowControlsOverlay": "not shipped by every supported engine",
+        "WindowControlsOverlayGeometryChangeEvent": "not shipped by every supported engine"
+      }
+    },
+    "window-management": {
+      "title": "Window Management (https://w3c.github.io/window-management/)",
+      "interfaces": {
+        "ScreenDetailed": "not shipped by every supported engine",
+        "ScreenDetails": "not shipped by every supported engine"
+      }
+    },
+    "writing-assistance-apis": {
+      "title": "Writing Assistance APIs (https://webmachinelearning.github.io/writing-assistance-apis/)",
+      "interfaces": {
+        "CreateMonitor": "not shipped by every supported engine",
+        "Rewriter": "not shipped by every supported engine",
+        "Summarizer": "not shipped by every supported engine",
+        "Writer": "not shipped by every supported engine"
+      }
+    }
+  }
+}
