@@ -198,7 +198,8 @@ test('dev builds for deployment targets are refused before building unless --all
 
 test('lasm build for Node: the build, its summary line, the editor, and packaging for a function platform', async () => {
   assert.equal(await cli(['build', source, '--rebuild']), 0);
-  assert.deepEqual(named('build'), [[source, { command: 'build', rebuild: true, verbose: false, args: [], input: source, profile: 'release', output: 'dist' }]]);
+  // webTarget: the target whose web APIs the build checks (src/web-availability.mjs).
+  assert.deepEqual(named('build'), [[source, { command: 'build', rebuild: true, verbose: false, args: [], input: source, profile: 'release', output: 'dist', webTarget: 'node' }]]);
   assert.deepEqual(lines.error, [`Built Lean 4.99.0 for Node (release profile): ${program}`]);
   assert.deepEqual(named('autoSetupEditor'), [[source]]);
   assert.deepEqual(named('runPackage'), []);
@@ -270,7 +271,7 @@ test('edge targets link a new edge program, building again when the Node build k
   const build = async (input, options) => { builds.push(options); return { output: 'node-out', linkWork: options.keepLinkWork === true ? linkWork() : undefined }; };
   const output = await buildEdge(source, 'supabase-edge', { profile: 'dev', output: 'fn', verbose: true }, true, { build, log: line => logged.push(line) });
   assert.equal(output, program);
-  assert.deepEqual(builds, [{ profile: 'dev', verbose: true, keepLinkWork: 'if-built', linkOnly: true }, { profile: 'dev', verbose: true, keepLinkWork: true, linkOnly: true }]);
+  assert.deepEqual(builds, [{ profile: 'dev', verbose: true, webTarget: 'supabase-edge', keepLinkWork: 'if-built', linkOnly: true }, { profile: 'dev', verbose: true, webTarget: 'supabase-edge', keepLinkWork: true, linkOnly: true }]);
   assert.deepEqual(logged, ['[lasm] Linking the single-threaded (portable) program with Asyncify (this engine has no JSPI)…', '[lasm] linker ready']);
   const [[edge, , env, suspend]] = named('provisionEdgeLinker');
   assert.equal(edge, 'edge-runtime'); assert.equal(env, process.env); assert.equal(suspend, 'asyncify');

@@ -603,10 +603,10 @@ docstrings, the propositions and the names.
   - [Url](../library/Lasm/UI/Url.lean)
   - propositions: [UI/Spec.lean](../library/Lasm/UI/Spec.lean)
   - guide: [docs/UI.md](UI.md)
-- [ ] `Lasm.JS.Web` and its browser tier (generated): the surface and its naming
+- [ ] `Lasm.JS.Web` (generated, the whole web platform since milestone 0.3): the surface and its naming
   ([JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb),
-  [scripts/bindings/web-tier1.mjs](../scripts/bindings/web-tier1.mjs),
-  [scripts/bindings/web-browser.mjs](../scripts/bindings/web-browser.mjs)).
+  [scripts/bindings/web-rules.mjs](../scripts/bindings/web-rules.mjs),
+  [BINDING_RULES.md](BINDING_RULES.md)).
   `Lasm.Web` was removed on 2026-11-10.
 - [ ] `Lasm.Fastly` (generated): [Fastly/](../library/Lasm/Fastly), the generator [generate-fastly.mjs](../scripts/bindings/generate-fastly.mjs), the mapping rules [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md), the conformance checks [Conformance.lean](../test/fixtures/fastly-abi/Fixture/Conformance.lean), the example [examples/fastly](../examples/fastly/Main.lean)
 - [ ] `Lasm.Serverless` has proofs only, with no runtime API. Its propositions about the function-platform shims are in [Serverless/Spec.lean](../library/Lasm/Serverless/Spec.lean).
