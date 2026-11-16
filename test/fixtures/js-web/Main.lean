@@ -559,6 +559,10 @@ def fetching (r : Checks) : Async Unit := do
     let red ← Response.redirect "https://example.com/next" (some 301)
     expect r "Response.redirect" ((← red.status) == 301 && (← (← red.headers).get "location") == some "https://example.com/next") ""
     expect r "invalid status throws" (← throws (Response.new none (some { status := some 99 }))) ""
+    -- Rule A12: the generated checked downcast (instanceof).
+    expect r "Response.cast? of a Response" ((← Response.cast? res.val).isSome) ""
+    expect r "Request.cast? of a Response" ((← Request.cast? res.val).isNone) ""
+    expect r "Response.cast? of the global object" ((← Response.cast? (← Lasm.JS.global)).isNone) ""
   runSection r "fetch.bytes" do
     -- ∀ b : ByteArray, (Response b).bytes = b ∧ (Response b).arrayBuffer = b
     let mut g : Rng := ⟨11⟩

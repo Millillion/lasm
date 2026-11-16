@@ -173,6 +173,10 @@ instance : FromJS URLPatternResult where
     hash := ← Lasm.JS.readField (Option URLPatternComponentResult) d "hash" }
   typeName := "Lasm.JS.Web.URLPatternResult"
 
+/-- `v instanceof URL`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `URL`). -/
+def URL.cast? (v : Value) : IO (Option URL) := do
+  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["URL"] Value) v then some { val := v } else none
+
 /-- `constructor(USVString url, optional USVString base)` -/
 def URL.new (url : String) (base : Option String := none) : IO URL :=
   Lasm.JS.Binding.invoke URL { name := "Lasm.JS.Web.URL.new", module := "globalThis", path := "URL", construct := true, arity := 2 }
@@ -283,6 +287,10 @@ def URL.canParse (url : String) (base : Option String := none) : IO Bool :=
 def URL.toJSON (self : URL) : IO String :=
   self.val.callMethod "toJSON" (Support.args #[]) String
 
+/-- `v instanceof URLSearchParams`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `URLSearchParams`). -/
+def URLSearchParams.cast? (v : Value) : IO (Option URLSearchParams) := do
+  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["URLSearchParams"] Value) v then some { val := v } else none
+
 /-- `constructor(optional (sequence<sequence<USVString>> or record<USVString, USVString> or USVString) init)` -/
 def URLSearchParams.new (init : Option SequenceOfSequenceOfUSVStringOrRecordOfUSVStringOrUSVString := none) : IO URLSearchParams :=
   Lasm.JS.Binding.invoke URLSearchParams { name := "Lasm.JS.Web.URLSearchParams.new", module := "globalThis", path := "URLSearchParams", construct := true, arity := 1 }
@@ -333,6 +341,10 @@ def URLSearchParams.keys (self : URLSearchParams) : IO (Array String) :=
 /-- `iterable<USVString, USVString>`: `values()`, collected into an array. -/
 def URLSearchParams.values (self : URLSearchParams) : IO (Array String) :=
   Support.iterate self.val "values" (Array String)
+
+/-- `v instanceof URLPattern`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `URLPattern`). -/
+def URLPattern.cast? (v : Value) : IO (Option URLPattern) := do
+  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["URLPattern"] Value) v then some { val := v } else none
 
 /-- `constructor(URLPatternInput input, USVString baseURL, optional URLPatternOptions options)` -/
 def URLPattern.new (input : URLPatternInput) (baseURL : String) (options : Option URLPatternOptions := none) : IO URLPattern :=

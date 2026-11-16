@@ -583,6 +583,10 @@ instance : ToJS Path2DOrDOMString := ⟨fun
 instance : Coe Path2D Path2DOrDOMString := ⟨.path2D⟩
 instance : Coe String Path2DOrDOMString := ⟨.domString⟩
 
+/-- `v instanceof HTMLCanvasElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLCanvasElement`). -/
+def HTMLCanvasElement.cast? (v : Value) : IO (Option HTMLCanvasElement) := do
+  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["HTMLCanvasElement"] Value) v then some { val := v } else none
+
 /-- `attribute unsigned long width` -/
 def HTMLCanvasElement.width (self : HTMLCanvasElement) : IO Nat := self.val.get "width" Nat
 
@@ -613,6 +617,10 @@ def HTMLCanvasElement.toBlob (self : HTMLCanvasElement) (callback : BlobCallback
 /-- `OffscreenCanvas transferControlToOffscreen()` -/
 def HTMLCanvasElement.transferControlToOffscreen (self : HTMLCanvasElement) : IO Data :=
   self.val.callMethod "transferControlToOffscreen" (Support.args #[]) Data
+
+/-- `v instanceof CanvasRenderingContext2D`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CanvasRenderingContext2D`). -/
+def CanvasRenderingContext2D.cast? (v : Value) : IO (Option CanvasRenderingContext2D) := do
+  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CanvasRenderingContext2D"] Value) v then some { val := v } else none
 
 /-- `readonly attribute HTMLCanvasElement canvas` -/
 def CanvasRenderingContext2D.canvas (self : CanvasRenderingContext2D) : IO HTMLCanvasElement := do
@@ -1039,13 +1047,25 @@ def CanvasRenderingContext2D.arc (self : CanvasRenderingContext2D) (x : Float) (
 def CanvasRenderingContext2D.ellipse (self : CanvasRenderingContext2D) (x : Float) (y : Float) (radiusX : Float) (radiusY : Float) (rotation : Float) (startAngle : Float) (endAngle : Float) (counterclockwise : Option Bool := none) : IO Unit :=
   self.val.callMethod "ellipse" (Support.args #[toJS x, toJS y, toJS radiusX, toJS radiusY, toJS rotation, toJS startAngle, toJS endAngle, Support.optional counterclockwise]) Unit
 
+/-- `v instanceof CanvasGradient`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CanvasGradient`). -/
+def CanvasGradient.cast? (v : Value) : IO (Option CanvasGradient) := do
+  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CanvasGradient"] Value) v then some { val := v } else none
+
 /-- `undefined addColorStop(double offset, DOMString color)` -/
 def CanvasGradient.addColorStop (self : CanvasGradient) (offset : Float) (color : String) : IO Unit :=
   self.val.callMethod "addColorStop" (Support.args #[toJS offset, toJS color]) Unit
 
+/-- `v instanceof CanvasPattern`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CanvasPattern`). -/
+def CanvasPattern.cast? (v : Value) : IO (Option CanvasPattern) := do
+  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["CanvasPattern"] Value) v then some { val := v } else none
+
 /-- `undefined setTransform(optional DOMMatrix2DInit transform)` -/
 def CanvasPattern.setTransform (self : CanvasPattern) (transform : Option DOMMatrix2DInit := none) : IO Unit :=
   self.val.callMethod "setTransform" (Support.args #[Support.optional transform]) Unit
+
+/-- `v instanceof Path2D`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Path2D`). -/
+def Path2D.cast? (v : Value) : IO (Option Path2D) := do
+  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["Path2D"] Value) v then some { val := v } else none
 
 /-- `constructor(optional (Path2D or DOMString) path)` -/
 def Path2D.new (path : Option Path2DOrDOMString := none) : IO Path2D :=
@@ -1096,6 +1116,10 @@ def Path2D.arc (self : Path2D) (x : Float) (y : Float) (radius : Float) (startAn
 def Path2D.ellipse (self : Path2D) (x : Float) (y : Float) (radiusX : Float) (radiusY : Float) (rotation : Float) (startAngle : Float) (endAngle : Float) (counterclockwise : Option Bool := none) : IO Unit :=
   self.val.callMethod "ellipse" (Support.args #[toJS x, toJS y, toJS radiusX, toJS radiusY, toJS rotation, toJS startAngle, toJS endAngle, Support.optional counterclockwise]) Unit
 
+/-- `v instanceof TextMetrics`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TextMetrics`). -/
+def TextMetrics.cast? (v : Value) : IO (Option TextMetrics) := do
+  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["TextMetrics"] Value) v then some { val := v } else none
+
 /-- `readonly attribute double width` -/
 def TextMetrics.width (self : TextMetrics) : IO Float := self.val.get "width" Float
 
@@ -1131,6 +1155,10 @@ def TextMetrics.alphabeticBaseline (self : TextMetrics) : IO Float := self.val.g
 
 /-- `readonly attribute double ideographicBaseline` -/
 def TextMetrics.ideographicBaseline (self : TextMetrics) : IO Float := self.val.get "ideographicBaseline" Float
+
+/-- `v instanceof ImageData`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ImageData`). -/
+def ImageData.cast? (v : Value) : IO (Option ImageData) := do
+  return if ← Lasm.JS.Web.Support.isInstance (Support.getGlobal ["ImageData"] Value) v then some { val := v } else none
 
 /-- `constructor(unsigned long sw, unsigned long sh, optional ImageDataSettings settings)` -/
 def ImageData.new (sw : Nat) (sh : Nat) (settings : Option ImageDataSettings := none) : IO ImageData :=

@@ -34,8 +34,8 @@ instance : FromJS stream.Writable := ⟨fun | .ref v _ => .ok { val := v } | _ =
 structure stream.Readable.FromWebOptions where
   /-- `DOMString encoding` -/
   encoding : Option String := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `boolean objectMode` -/
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
@@ -47,8 +47,8 @@ instance : ToJS stream.Readable.FromWebOptions := ⟨fun d => Support.fields #[(
 
 /-- `dictionary stream.Readable.ToWebOptionsStrategy` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.ToWebOptionsStrategy where
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `Function size` -/
   size : Option JSFunction := none
 instance : ToJS stream.Readable.ToWebOptionsStrategy := ⟨fun d => Support.fields #[("highWaterMark", Support.optional d.highWaterMark),
@@ -67,8 +67,8 @@ instance : ToJS stream.Readable.ToWebOptions := ⟨fun d => Support.fields #[("s
 structure stream.Writable.FromWebOptions where
   /-- `boolean decodeStrings` -/
   decodeStrings : Option Bool := none
-  /-- `double highWaterMark` -/
-  highWaterMark : Option Float := none
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
   /-- `boolean objectMode` -/
   objectMode : Option Bool := none
   /-- `AbortSignal signal` -/
@@ -77,6 +77,10 @@ instance : ToJS stream.Writable.FromWebOptions := ⟨fun d => Support.fields #[(
     ("highWaterMark", Support.optional d.highWaterMark),
     ("objectMode", Support.optional d.objectMode),
     ("signal", Support.optional d.signal)]⟩
+
+/-- `v instanceof Readable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Readable`). -/
+def stream.Readable.cast? (v : Value) : IO (Option stream.Readable) := do
+  return if ← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Readable"] Value) v then some { val := v } else none
 
 /-- `stream.Readable.fromWeb(readableStream[, options])` (added in Node.js v17.0.0): `static stream.Readable fromWeb(ReadableStream readableStream, optional stream.Readable.FromWebOptions options)` -/
 def stream.Readable.fromWeb (readableStream : ReadableStream) (options : Option stream.Readable.FromWebOptions := none) : IO stream.Readable := do
@@ -89,6 +93,10 @@ def stream.Readable.toWeb (streamReadable : stream.Readable) (options : Option s
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.stream.Readable.toWeb", module := "node:stream", path := "Readable.toWeb", construct := false, arity := 2 }
     (Support.args #[toJS streamReadable, Support.optional options]) (await := false)
   pure { val := r }
+
+/-- `v instanceof Writable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Writable`). -/
+def stream.Writable.cast? (v : Value) : IO (Option stream.Writable) := do
+  return if ← Lasm.JS.Web.Support.isInstance (Support.getExport "node:stream" ["Writable"] Value) v then some { val := v } else none
 
 /-- `stream.Writable.fromWeb(writableStream[, options])` (added in Node.js v17.0.0): `static stream.Writable fromWeb(WritableStream writableStream, optional stream.Writable.FromWebOptions options)` -/
 def stream.Writable.fromWeb (writableStream : WritableStream) (options : Option stream.Writable.FromWebOptions := none) : IO stream.Writable := do
