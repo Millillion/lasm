@@ -4,7 +4,7 @@ A Lasm server runs as one Vercel Function
 on the Node.js 24 runtime that answers every path.
 
 ```sh
-npx lasm build Main.lean --target vercel   # dist/ (a server on $HOST:$PORT) and .vercel/output
+npx lasm build Main.lean --target vercel   # .vercel/output (a server on $HOST:$PORT)
 vercel deploy --prebuilt                   # Vercel's own CLI uploads exactly that output
 ```
 

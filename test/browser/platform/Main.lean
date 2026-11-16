@@ -139,6 +139,13 @@ def domChecks (checks : Checks) (root : Element) : IO Unit := do
     field.setValue "typed"
     field.setDisabled true
     return (← input.checked) && (← field.value) == "typed" && (← field.disabled) |> fun ok => (ok, "checked, value, disabled")
+  check checks "dom.cast" do
+    -- Rule A12: the generated checked downcast (instanceof), up and across the hierarchy.
+    let input ← make "input"
+    let asInput ← HTMLInputElement.cast? input.val
+    let asButton ← HTMLButtonElement.cast? input.val
+    let asNode ← Node.cast? input.val
+    return (asInput.isSome && asButton.isNone && asNode.isSome, s!"input {asInput.isSome} button {asButton.isSome} node {asNode.isSome}")
   check checks "dom.query" do
     let found ← doc.querySelector "#fixture-form"
     let all ← doc.querySelectorAll "#fixture-form input"
@@ -360,7 +367,7 @@ def fetchChecks (checks : Checks) : Async Unit := do
   checkAsync checks "fetch.form-body" do
     let form ← FormData.new
     form.append "a" "1"
-    form.appendWithBlobValue "file" (← Blob.new (some #["abc".toUTF8]) (some { type := some "text/plain" })) (some "x.txt")
+    form.appendBlob "file" (← Blob.new (some #["abc".toUTF8]) (some { type := some "text/plain" })) (some "x.txt")
     let echoed ← (← fetch "/api/form" (some { method := some "POST", body := some form })).text
     return (echoed.startsWith "multipart/form-data", echoed.take 40 |>.toString)
   checkAsync checks "fetch.abort-timeout" do
