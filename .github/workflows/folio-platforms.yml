@@ -73,7 +73,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - uses: ./.github/actions/process-guard
       - name: npm ci
@@ -102,6 +102,7 @@ jobs:
       - name: fastly.toml is tools/kv.mjs's for site/
         if: matrix.platform == 'fastly'
         working-directory: ${{ env.FOLIO }}
+        shell: bash
         run: node tools/kv.mjs fastly | diff fastly.toml -
       - name: The site from the store, a changed site, the 652 CommonMark examples and the pathological inputs on the server
         working-directory: ${{ env.FOLIO }}
@@ -130,7 +131,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - uses: ./.github/actions/process-guard
       - name: npm ci, and the pinned engines
@@ -178,7 +179,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - uses: ./.github/actions/process-guard
       - name: npm ci

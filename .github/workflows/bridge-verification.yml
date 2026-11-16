@@ -78,7 +78,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - name: Upstream Lean 4.35.0 (pinned release archive)
         id: lean
@@ -90,9 +90,11 @@ jobs:
         run: lake build
       - name: Check every configuration, the mutations and the trace self-test
         working-directory: verification/host-bridge
+        shell: bash
         run: .lake/build/bin/host-bridge check --large | tee "$RUNNER_TEMP/model.txt"
       - name: Summary
         if: always()
+        shell: bash
         run: |
           { echo '### Host bridge model'; echo '```'; cat "$RUNNER_TEMP/model.txt" 2>/dev/null | grep -E '^(PASS|FAIL)|checks as' || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
   seed:
@@ -147,7 +149,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - name: Upstream Lean 4.35.0 (pinned release archive)
         id: lean

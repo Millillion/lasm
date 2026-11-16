@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { zstdCompressSync, gzipSync } from 'node:zlib';
-import { c as createTar, Header } from 'tar';
+import { directoryEntries, writeTar, tarBytes } from '../src/tar.mjs';
 import { provisionArtifact, managedCacheDirectory, validateArtifact } from '../src/managed-artifacts.mjs';
 import { selectLeanVersion, provisionLean } from '../src/managed-lean.mjs';
 
@@ -18,7 +18,7 @@ async function fixture(t) {
   await writeFile(join(source, 'tool/bin/lean'), 'compiler fixture');
   await chmod(join(source, 'tool/bin/lean'), 0o755);
   await writeFile(join(source, 'tool/LICENSE'), 'Fixture redistribution notice');
-  await createTar({ cwd: source, file: join(base, 'tool.tar'), portable: true }, ['tool']);
+  await writeTar(join(base, 'tool.tar'), directoryEntries(source, ['tool']));
   const bytes = zstdCompressSync(await readFile(join(base, 'tool.tar')));
   const artifact = description(bytes);
   let requests = 0;
@@ -30,13 +30,7 @@ function description(bytes) {
     sha256: hash(bytes), bytes: bytes.length, format: 'tar.zst', maximumExtractedBytes: 1_000_000 };
 }
 function archive(entries) {
-  const parts = [];
-  for (const entry of entries) {
-    const body = Buffer.from(entry.body ?? '');
-    const header = new Header({ mode: 0o755, type: 'File', ...entry, size: body.length });
-    header.encode(); parts.push(header.block, body, Buffer.alloc((512 - body.length % 512) % 512));
-  }
-  return zstdCompressSync(Buffer.concat([...parts, Buffer.alloc(1024)]));
+  return zstdCompressSync(tarBytes(entries.map(({ body, ...entry }) => ({ mode: 0o755, ...entry, data: body ?? '' }))));
 }
 
 test('streamed installation preserves executable files and notices; reuse verifies every file', async t => {
@@ -340,13 +334,11 @@ test('the archive writer handles PAX and GNU long names, and its hashes match th
   await mkdir(join(source, deep), { recursive: true });
   await writeFile(join(source, deep, `file-${'y'.repeat(120)}.olean`), 'long name contents');
   await writeFile(join(source, 'tool', 'short'), 'short contents');
-  const parts = [];
-  for (const portable of [true, false]) {
-    await createTar({ cwd: source, file: join(f.base, `long-${portable}.tar`), portable }, ['tool']);
-    parts.push(await readFile(join(f.base, `long-${portable}.tar`)));
-  }
-  for (const tarBytes of parts) {
-    const bytes = zstdCompressSync(tarBytes);
+  // ustar's prefix field for the deep directories, a pax header for the long file name.
+  await writeTar(join(f.base, 'long.tar'), directoryEntries(source, ['tool']));
+  const parts = [await readFile(join(f.base, 'long.tar'))];
+  for (const archiveBytes of parts) {
+    const bytes = zstdCompressSync(archiveBytes);
     const cache = await mkdtemp(join(f.base, 'cache-'));
     const installed = await provisionArtifact(description(bytes), { ...f.options, cache, fetch: async () => new Response(bytes) });
     const name = deep.slice('tool/'.length) + `/file-${'y'.repeat(120)}.olean`;

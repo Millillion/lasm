@@ -18,14 +18,14 @@ work that preceded the 4.35.0 upgrade (see [PLAN.md](PLAN.md)); its 4.34
 versions are not current.
 
 Lean 4.34.1 was published during this work and became the latest-release target then.
-Its [verified native bootstrap](evidence/lean-4.34.1-native-bootstrap-2026-09-25.json)
+Its [verified native bootstrap](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-native-bootstrap-2026-09-25.json)
 passes on Linux x64, including the unchanged upstream reference-count regression,
 both new BitVec tests and interpreted-versus-compiled ordinary IO/error cases.
 The catalog accepts explicit 4.34.1 pins and preserves the 4.34.0 default pending
 fresh installed-application acceptance. Source comparison verifies that the IO error
 constructor and decoder files are unchanged, so the reviewed host policy accepts
 4.34.1. The native checks do not validate its Wasm runtime or other platforms.
-The [complete runtime rebuild and API inventory](evidence/lean-4.34.1-runtime-build-2026-09-25.json)
+The [complete runtime rebuild and API inventory](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-runtime-build-2026-09-25.json)
 now cover all 2,516 modules with the changed runtime headers. The guarded build
 and packaging peak at 2.40 and 2.18 GiB respectively, with no resource events.
 Generated C is losslessly archived after compilation and verified by streaming
@@ -35,7 +35,7 @@ counts are not behavioral passes. Older binaries and acceptance results retain
 their original versions.
 
 The local `.25` candidate now passes
-[fresh installed main and reference-count checks](evidence/lean-4.34.1-installed-main-2026-09-25.json)
+[fresh installed main and reference-count checks](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-installed-main-2026-09-25.json)
 in stock Node on Linux x64. Six native/deployed main comparisons
 cover Unicode/empty arguments, large-integer async work, filesystem operations
 and normal/error exit status; cache reuse and the direct-file command pass. The unchanged upstream `misc_dir/rc_sticky` source and shell driver
@@ -46,7 +46,7 @@ and preprovisioned build tools; cold installation, broader IO/HTTP and upstream
 acceptance are separate gates. All six workloads finish without resource events,
 with a maximum 3.81 GiB peak.
 
-The subsequent [fresh cold installation](evidence/lean-4.34.1-cold-install-2026-09-25.json)
+The subsequent [fresh cold installation](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-cold-install-2026-09-25.json)
 also passes on Linux x64/Node 26.10.0. Filesystem isolation exposes Node/npm,
 standard OS libraries and an initially empty workspace; it denies the checkout
 and existing tools. npm installs the local `.25` tarball and Lasm provisions
@@ -57,7 +57,7 @@ covering source, compiler, toolchain and original output. Peak memory is
 5.85 GiB with no resource events; disk space stays above 6.57 GiB. This does not
 extend cold-install acceptance to the other native hosts or close full API parity.
 
-The [fresh installed IO campaign](evidence/lean-4.34.1-installed-io-2026-09-25.json)
+The [fresh installed IO campaign](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-installed-io-2026-09-25.json)
 passes all eight supplementary filesystem/console fixtures in Node
 on Linux x64. All source-hidden deployed comparisons match interpreted and
 C-compiled native output and pass cleanup checks. Peak memory is 4.48 GiB with
@@ -65,7 +65,7 @@ no resource events. The queue stops only after the final successful IO workload
 releases its guard, before the HTTP server's larger module-data copies; HTTP
 continues separately with additional disk headroom.
 
-A [byte-exact console/filesystem fixture](evidence/lean-4.34.1-binary-console-2026-09-25.json)
+A [byte-exact console/filesystem fixture](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-binary-console-2026-09-25.json)
 also passes in the installed Node target. It round-trips every byte value
 through a binary file, flushes individual console bytes, writes split UTF-8 and
 invalid UTF-8, and leaves its final output for normal shutdown. Both native
@@ -75,7 +75,7 @@ raw bytes alongside readable text; a focused control proves that distinct
 invalid bytes can evade the preceding text-only comparison. Installed builds
 peak at 3.44 GiB. These Linux x64 observations do not establish other platforms.
 
-The [real-terminal continuation](evidence/lean-4.34.1-terminal-2026-09-25.json)
+The [real-terminal continuation](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-terminal-2026-09-25.json)
 passes installed `.27` executions and interpreted/compiled native
 controls in Node. A real raw controlling terminal verifies
 standard handles and `/dev/tty`, a concurrent timer while input is blocked,
@@ -86,7 +86,7 @@ output-limit and false-handshake cases. Each deployment is relocated with source
 hidden and PATH empty. Guards release without resource events; peak memory is
 3.44 GiB. This does not establish cooked-terminal or Windows-console behavior.
 
-The [installed `.28` system-query repair](evidence/lean-4.34.1-system-memory-repair-2026-09-25.json)
+The [installed `.28` system-query repair](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-system-memory-repair-2026-09-25.json)
 passes in Node on Linux x64. Ordinary Lean programs match native
 OS identity, total memory and the cgroup constraint after relocation, with
 source hidden and PATH empty. Available/free memory is volatile; those values
@@ -108,7 +108,7 @@ under the same 1 GiB cap. A fresh package with a bounded npm heap and 4 GiB
 process-tree cap completes at 1.71 GiB, followed by byte-verified npm installation.
 Other native platforms and full API acceptance remain open.
 
-The [installed `.29` TCP repair](evidence/lean-4.34.1-tcp-error-phases-2026-09-25.json)
+The [installed `.29` TCP repair](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-tcp-error-phases-2026-09-25.json)
 matches ordinary Lean observations in Node on Linux x64.
 Both native execution modes agree with every relocated deployment, with source
 hidden and PATH empty. The private bridge now distinguishes errors raised by an
@@ -124,7 +124,7 @@ budget without OOM or swap; a bounded streaming retry with file-cache eviction
 passes under the same cap. These results leave complete TCP/API and native
 platform acceptance open.
 
-The [installed `.31` working-directory comparisons](evidence/lean-4.34.1-raw-working-directory-2026-09-25.json)
+The [installed `.31` working-directory comparisons](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-raw-working-directory-2026-09-25.json)
 pass in stock Node on Linux x64. Six cases cover valid
 Unicode, invalid UTF-8 and truncated UTF-8 directory names, each inherited at
 startup or entered through an ASCII symlink. Both ordinary Lean cwd APIs,
@@ -140,7 +140,7 @@ no resource events and at least 5.42 GiB free disk. Other platforms, Linux hosts
 without the required `/proc`/unshare facilities and broader path/process behavior
 remain open.
 
-The [fresh Node HTTP comparison](evidence/lean-4.34.1-installed-http-node-2026-09-25.json)
+The [fresh Node HTTP comparison](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-installed-http-node-2026-09-25.json)
 now passes all twenty unchanged Vitest checks, ten each against deployed Wasm
 and native Lean. This includes concurrent mutations, persistence, binary and
 chunked bodies, streaming, protocol errors and graceful restart. The installed
@@ -149,7 +149,7 @@ the redundant generated cache copy after the build. Peak memory is 7.76 GiB
 with no resource stop or OOM events, and disk free space remains above 4.71 GiB.
 Completed data and Wasm binaries are retained in verified lossless archives.
 
-An additional [Node upstream HTTP comparison](evidence/lean-4.34.1-upstream-http-io-node-2026-09-25.json)
+An additional [Node upstream HTTP comparison](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-upstream-http-io-node-2026-09-25.json)
 passes all 85 IO actions from three original elaboration tests. A separate copy
 preserves every expression byte while replacing each unwrapped `#eval` token
 with a named action called by ordinary `main`. Original native drivers, native
@@ -157,7 +157,7 @@ interpreted/compiled copies and installed relocated execution all pass. These
 are additional API checks; the original registrations remain native compiler
 tests, and this does not establish full HTTP or suite compatibility.
 
-The [full HTTP fixture continuation](evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json)
+The [full HTTP fixture continuation](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-installed-http-three-engines-2026-09-25.json)
 passes ten deployed and ten native checks in Node, with zero failures/skips and
 unchanged sources/assertions/deadlines. The maximum guarded peak is 7.76 GiB and
 no OOM, swap or proactive memory stop occurs. This closes
@@ -176,7 +176,7 @@ runs both a Lean main and Lake with global Lean/SDK paths excluded. Verified cac
 reuse passes. The real release archive exposed a chained-symlink extraction bug;
 the regression and deferred-link fix pass. The final guarded run peaks at
 3.78 GiB with no OOM, pressure-stop, swap or monitoring events. See the
-[provisioning evidence](evidence/managed-lean-provisioning-2026-09-23.json).
+[provisioning evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/managed-lean-provisioning-2026-09-23.json).
 
 The official Lean release has native downloads for Linux and macOS on x64/ARM64,
 and Windows x64. There is no upstream native Windows ARM64 distribution. After
@@ -184,23 +184,23 @@ the history below, **Windows ARM64 support was removed on 2026-10-16** (user
 decision): Lasm stops there with an explicit unsupported-platform message and
 does not substitute an emulated x64 compiler.
 
-The [native Windows ARM64 bootstrap checkpoint](evidence/windows-arm64-bootstrap-checkpoint-2026-09-24.json)
+The [native Windows ARM64 bootstrap checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-bootstrap-checkpoint-2026-09-24.json)
 reached its 260-minute guard deadline while compiling stage1 Lean modules, with
 a 1.90 GiB committed-memory peak. Completed compiler-cache entries were verified
 and saved as a 228 MB archive within the included repository allowance. A rerun
 of the same recipe reused 6,923 compiler results and completed 3,445 additional
-compilations without compiler errors. That [second checkpoint](evidence/windows-arm64-bootstrap-checkpoint-2-2026-09-24.json)
+compilations without compiler errors. That [second checkpoint](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-bootstrap-checkpoint-2-2026-09-24.json)
 reached the same deadline while linking the stage1 Lean shared library, with a
 1.90 GiB peak. Its verified cache archive is 360 MB; both retained checkpoints
 occupied 588 MB within the existing included-storage bound. The
-[third attempt completes](evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json):
+[third attempt completes](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json):
 native Lean 4.34.0 and Lake run, an interpreted main passes, and generated C
 compiles into a passing ARM64 executable. Both compiler and application pass
 the ARM64 COFF checks. The guarded build took 214.38 minutes and peaked at
 1.90 GiB, below its proactive threshold. This proves the native bootstrap;
 relocatable tool packaging, `leantar`, managed provisioning and installed Wasm
 acceptance remain open. That attempt retained only the completed compiler cache.
-The [next run preserves the completed Lean tree](evidence/windows-arm64-completed-tree-2026-09-24.json)
+The [next run preserves the completed Lean tree](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-completed-tree-2026-09-24.json)
 after repeating those native checks. Its 878.6 MB archive contains 17,686 files
 and passes full decompression/hash verification before entering the included CI
 cache. All seven guarded phases pass; the build takes 215.52 minutes with a
@@ -219,7 +219,7 @@ architecture, cache-reuse and notice checks pass on all six runners. An overly
 narrow acceptance check initially looked only for top-level license files; Unix
 Python places its license under the standard-library directory. The corrected
 run records the actual notice paths. See the
-[six-platform tool evidence](evidence/managed-native-tools-2026-09-23.json), which
+[six-platform tool evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/managed-native-tools-2026-09-23.json), which
 also verifies native Lean C compilation on the five available Lean platforms.
 This supplies one SDK dependency, not the complete managed linker distribution.
 
@@ -254,9 +254,9 @@ now use the private Python directly with bytecode disabled; long Windows Clang
 commands use ordinary LLVM response files. Cache verification remains strict.
 The corrected Linux x64 clean download, C-to-Wasm compile, execution and
 whole-cache reuse all pass, peaking at 2.63 GiB without resource events. See the
-[Linux SDK evidence](evidence/managed-sdk-linux-2026-09-23.json). The Windows
+[Linux SDK evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/managed-sdk-linux-2026-09-23.json). The Windows
 response-file change now passes on Windows x64. The
-[corrected native SDK matrix](evidence/managed-sdk-native-ci-2026-09-23.json)
+[corrected native SDK matrix](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/managed-sdk-native-ci-2026-09-23.json)
 also passes Linux x64/ARM64 and macOS ARM64. macOS x64 reached its first libc
 build but exceeded the smoke harness's three-minute compiler deadline. A
 separate run raised that cold-build deadline to fifteen minutes with the same
@@ -281,7 +281,7 @@ large natural numbers, ordinary exceptions and exit codes. Each complete output
 directory was relocated and run from a separate working directory with an empty
 PATH and no Lean toolchain environment. Host support and notices are bundled.
 Each probe peaked below 0.5 GiB. See the
-[application evidence](evidence/application-aot-three-engines-2026-09-23.json).
+[application evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-aot-three-engines-2026-09-23.json).
 
 Node uses native Wasm64 addressing. These small application
 passes do not establish full API compatibility, a finished managed CLI, or the
@@ -293,7 +293,7 @@ Lean 4.34's package-qualified symbols are included in that registry. Stock Node
 passes the twenty-check parallel Vitest suite (ten deployed HTTP
 checks and ten corresponding native checks), covering persistence,
 concurrent writes, validation, streaming, cancellation and shutdown. The
-[HTTP evidence](evidence/application-http-three-engines-2026-09-23.json) records
+[HTTP evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-http-three-engines-2026-09-23.json) records
 exact artifacts, tests, deadlines and resources.
 
 This is
@@ -312,7 +312,7 @@ filename now calls that same managed application pipeline. It preserves the
 earlier `[--rebuild] [--verbose] Main.lean [--] arguments…` syntax.
 Help and usage errors perform no tool downloads. The 23 parser/launcher controls
 now pass on all six native platforms; see the
-[launcher evidence](evidence/application-launchers-2026-09-23.json).
+[launcher evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-launchers-2026-09-23.json).
 Real installed-candidate launcher acceptance now passes on Linux x64 in Node,
 as recorded below. The
 earlier 4.32 implementation and its regression fixtures remain explicitly legacy.
@@ -358,7 +358,7 @@ Native file/descriptor checks exposed incorrect fixed-arity bindings for POSIX
 creation, permissions, reopen, append, exclusive-create and descriptor checks
 in stock Node 26.10.0 on all six native platforms.
 The two POSIX-only pipe/socket checks explicitly do not apply to Windows.
-These [host-adapter results](evidence/native-file-abi-2026-09-23.json) do not
+These [host-adapter results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/native-file-abi-2026-09-23.json) do not
 establish full filesystem or compiled-application parity on those hosts.
 
 Source generation and application caching are now serialized per project with
@@ -379,7 +379,7 @@ cache. The first SDK Wasm64 system-library build was included and peaked at
 clean npm installation claim. The ordinary Lake HTTP project also passes all
 20 differential checks through the primary CLI, peaking at 3.19 GiB.
 
-The [managed CLI evidence](evidence/managed-application-cli-2026-09-23.json)
+The [managed CLI evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/managed-application-cli-2026-09-23.json)
 keeps exact build inputs, native comparisons, cache timings and guarded resource
 reports. These passes used preprovisioned verified tool caches and a maintainer
 runtime-bundle path, so package installation remains a separate gate.
@@ -399,7 +399,7 @@ parent `package.json`; Node's worker preloader tried to read that package scope.
 Relocating the deployment outside the checkout fixes the harness without
 changing the package, application or expected results. Linux Landlock restricts
 contents and execution, but not metadata-only `stat` or network access. See the
-[installed-package evidence](evidence/installed-application-2026-09-23.json).
+[installed-package evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installed-application-2026-09-23.json).
 
 The cold run peaked at 7.94 GiB, including tool-download filesystem cache; the
 separate deployment check peaked at 1.52 GiB. Both retained the proactive 8 GiB
@@ -418,7 +418,7 @@ streaming/cancellation and graceful restart. The run uses the candidate's
 packaged runtime and host support, with no maintainer runtime override; managed
 tools are reused from the cold installation. The peak was 3.20 GiB,
 with no resource events. See the
-[installed HTTP evidence](evidence/installed-http-three-engines-2026-09-23.json).
+[installed HTTP evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installed-http-three-engines-2026-09-23.json).
 This closes the Linux installed-package HTTP example check; the broader API,
 callable/Express, dependency and platform requirements remain open.
 
@@ -428,7 +428,7 @@ the deployed entry point. The original cross-process closure-save/load test now
 passes through that installed package in Node. Host controls also
 verify Unicode/empty arguments, explicit cwd, pipes, PID/exit status and an empty
 PATH with environment inheritance disabled. See the
-[repair evidence](evidence/application-self-launch-2026-09-23.json). This exact
+[repair evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-self-launch-2026-09-23.json). This exact
 self-path mapping still needs broader alias/other-deployment/platform coverage.
 
 Installed candidate `0.1.0-experimental.9` now passes an ordinary three-module
@@ -439,7 +439,7 @@ the compatibility launcher, and relocated deployment with an
 empty PATH. Output, errors and exit status match the native Lake executable.
 Arguments include Unicode, empty strings, spaces, the literal Node executable path and
 option-like data. The sequential guarded campaign peaked at 4.85 GiB without
-resource events. See the [installed Lake evidence](evidence/installed-lake-three-engines-2026-09-23.json).
+resource events. See the [installed Lake evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installed-lake-three-engines-2026-09-23.json).
 
 A real failure led to this repair. Lake's file query resolves symlinks before
 looking up the module, which loses a configured entry whose destination is outside
@@ -457,13 +457,13 @@ still reuse the final compiled application. Stock Node passes the
 same dependency, symlink, cache, asset and relocation checks, including a
 compile-time assertion that the package's `maxRecDepth` option is honored. The
 sequential campaign peaked at 5.03 GiB with no resource events. See the
-[installed script evidence](evidence/installed-lake-scripts-three-engines-2026-09-24.json).
+[installed script evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/installed-lake-scripts-three-engines-2026-09-24.json).
 A preparatory native probe was safely stopped for memory pressure before adding
 the required base-page wrapper; it remains a separate resource result.
 
 ## Native CI
 
-The [Lean 4.34 IO error comparison](evidence/lean-4.34-io-errors-2026-09-24.json)
+The [Lean 4.34 IO error comparison](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34-io-errors-2026-09-24.json)
 found and repaired a release-specific mismatch: the newer runtime uses libuv
 messages for CRT failures and positive numbers for libuv errors. The private
 application prelude now selects the matching Lean error policy; the retained
@@ -487,7 +487,7 @@ guard for this harness, and Windows ARM64 still needs its native Lean artifact.
 The first Linux CI attempts hit their deliberately smaller 2 GiB cold-install
 profile while populating file cache, before the comparisons. Both guards stopped
 proactively without OOM or pressure events. These are
-[resource results](evidence/io-error-ci-resource-stops-2026-09-24.json), not API
+[resource results](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/io-error-ci-resource-stops-2026-09-24.json), not API
 failures. The Linux request is now 6 GiB within the existing half-RAM cap,
 8 GiB host reserve and proactive-stop policy; Windows keeps 2 GiB. The local
 guard configuration is unchanged.
@@ -496,7 +496,7 @@ guard configuration is unchanged.
 types (it also ran a failing Windows ARM64 row until that platform was removed on
 2026-10-16). CI provisioning results do not constitute Wasm application passes.
 
-The [first native matrix result](evidence/managed-lean-native-ci-2026-09-23.json)
+The [first native matrix result](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/managed-lean-native-ci-2026-09-23.json)
 verifies automatic downloads, whole-cache integrity, ordinary Lean execution and
 Lake execution on **Linux x64/ARM64, macOS x64/ARM64 and Windows x64**, with Node
 26.10.0 and Lean 4.34.0. Windows ARM64 fails at the documented missing artifact.
@@ -514,19 +514,19 @@ cap no larger than half the runner's RAM, and a proactive stop at 80% of that ca
 MSYS2's Clang tools target native ARM64; its POSIX shell/make utilities are x64
 helpers. This experiment is **not** an all-native managed distribution pass.
 The native Lean compiler and its generated executable now pass their
-[bootstrap checks](evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json);
+[bootstrap checks](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-lean-bootstrap-complete-2026-09-24.json);
 relocatable dependencies and missing ARM64 `leantar` packaging still need
 verification. The first long run reached
 stage1 shared-library linking and was cancelled at the 330-minute job deadline.
 Its last resource sample was 1.89 GiB; it has no completed guard receipt. See the
-[preserved deadline evidence](evidence/windows-arm64-lean-deadline-2026-09-24.json).
+[preserved deadline evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-lean-deadline-2026-09-24.json).
 The workflow now uses an earlier guarded deadline and a checksum-verified cache
 of completed C/C++ compilations, within the [included storage policy](CI_STORAGE.md).
 Fresh source/build trees avoid reusing partially written compiler outputs.
 The third checkpoint-assisted attempt proves the complete native bootstrap;
 end-user packaging remains a separate acceptance gate.
 
-The separate [Windows ARM64 SDK bootstrap](evidence/windows-arm64-sdk-bootstrap-2026-09-23.json)
+The separate [Windows ARM64 SDK bootstrap](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-sdk-bootstrap-2026-09-23.json)
 now passes on that native runner. Clang/LLD 24 and Binaryen 132 have verified
 ARM64 PE headers; both Wasm32 and Wasm64 compilation, linking, optimization and
 execution pass under stock Node 26.10.0. The one-worker source build took 107
@@ -536,7 +536,7 @@ DLL packaging, Emscripten sysroot integration, managed downloads and full Lean
 application validation are still required. The workflow uploaded no artifacts
 or Actions caches.
 
-The [next native SDK run](evidence/windows-arm64-sdk-package-2026-09-24.json)
+The [next native SDK run](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-arm64-sdk-package-2026-09-24.json)
 also passes relocatable DLL packaging, managed archive extraction, Emscripten
 sysroot integration and verified cache reuse. Its 174.8 MB local archive includes
 native ARM64 compiler tools and their non-system DLL dependencies. After hiding
@@ -557,7 +557,7 @@ acceptance Node version is fixed at 26.10.0.
 
 ## Outstanding product work
 
-Installed `.19` [repairs Lake project discovery](evidence/runtime-imports-and-lake-initialization-2026-09-24.json)
+Installed `.19` [repairs Lake project discovery](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/runtime-imports-and-lake-initialization-2026-09-24.json)
 for configurations whose defaults require initialized native Lake constants.
 The private helper now loads the verified managed Lake library as a Lean plugin,
 using Lake's upstream platform-specific library paths. Native Linux discovery
@@ -583,7 +583,7 @@ exclusions and unregistered drivers. All 7,669 original test/example/helper
 files and links match the pinned archive. This is an inventory milestone;
 All 3,497 managed native build-time registrations pass on Linux x64, with
 unchanged upstream files and assertions; the
-[combined native evidence](evidence/upstream-native-build-time-complete-2026-09-23.json)
+[combined native evidence](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-native-build-time-complete-2026-09-23.json)
 keeps those compiler checks separate from deployed behavior. Application-suite
 execution and complete API differential coverage remain unfinished.
 
@@ -591,7 +591,7 @@ These are implementation milestones, not replacements for any acceptance
 requirement in the plan. Broader compiler-in-Wasm research is checkpointed and
 paused while this product work proceeds.
 
-The [native IO error comparison](evidence/io-error-ci-passed-2026-09-24.json)
+The [native IO error comparison](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/io-error-ci-passed-2026-09-24.json)
 passes on standard native Linux x64, Linux ARM64 and Windows x64 runners with
 Lean 4.34.0 and Node 26.10.0. Linux checks 221 error inputs per architecture;
 Windows checks 168. Constructors, numeric codes and diagnostic messages match
@@ -601,7 +601,7 @@ Wasm, or the complete six-platform installation
 contract. The earlier cold-extraction resource stops and seven Windows failures
 remain preserved alongside the passing follow-up.
 
-Installed `.21` adds a [private native signal helper](evidence/upstream-signal-2026-09-24.json)
+Installed `.21` adds a [private native signal helper](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/upstream-signal-2026-09-24.json)
 that ships in both the npm candidate and deployment, requires no user compiler,
 and adds no Lean API. The unchanged excluded upstream signal application now matches native
 stdout, stderr and termination in Node on Linux x64 with sources
@@ -609,14 +609,14 @@ hidden and PATH empty. Nine focused controls pass; the largest application
 campaign peaks at 3.45 GiB without resource events. Other native platforms
 and the complete signal API remain pending.
 
-The [native signal CI follow-up](evidence/signal-native-ci-2026-09-24.json)
+The [native signal CI follow-up](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/signal-native-ci-2026-09-24.json)
 executes all nine checks with zero skips on both Linux x64 and ARM64, using
 native GCC helpers and stock Node. Maximum guarded memory is
 59.9 MiB without resource events. Separate Linux x64 host-adapter probes also
 pass all 22 signal names. These are source-helper controls, not
 complete installed Lean ARM64 or default-signal-behavior acceptance.
 
-Installed `.22` [matches supplementary native Lean signal comparisons](evidence/application-signal-policy-2026-09-24.json)
+Installed `.22` [matches supplementary native Lean signal comparisons](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-signal-policy-2026-09-24.json)
 on Linux x64. Node completes one-shot and repeated delivery for all 22
 signal names, then matches seven default actions both before and after stopping
 a waiter. The generated standalone entry removes the engine-owned SIGUSR1
@@ -629,7 +629,7 @@ state altered before JavaScript entry, cancellation races, callable embedding
 and other native platforms remain unverified. The native Linux workflow now
 includes the expanded controls; its new run is pending.
 
-The [corrected native signal run](evidence/signal-policy-native-ci-2026-09-24.json)
+The [corrected native signal run](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/signal-policy-native-ci-2026-09-24.json)
 passes **all 45 controls without skips on Linux x64 and ARM64**. Child diagnostics
 confirm zero core-file limits and a plain core pattern; both restoration
 steps succeed. Every process-tree guard releases without resource events.
@@ -637,7 +637,7 @@ These source-helper controls expand Linux evidence but do not establish complete
 signal acceptance.
 
 Automatic module-data packaging is now wired into the application builder,
-with [eight passing file/loader unit controls](evidence/application-module-data-units-2026-09-24.json).
+with [eight passing file/loader unit controls](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-module-data-units-2026-09-24.json).
 Generated Lean/Lake initializer dependencies select applications that need
 metaprogramming data. Their output carries the full standard module-data tree
 and built project/dependency roots in Lake search order, with hashes included
@@ -649,7 +649,7 @@ unit-tested implementation is not a completed deployment gate. Unbuilt dynamic
 modules and custom foreign consumers need separate coverage, and the full
 metadata payload's size is an outstanding deployment tradeoff.
 
-The [first native module-data campaign](evidence/application-module-data-resource-stop-2026-09-24.json)
+The [first native module-data campaign](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-module-data-resource-stop-2026-09-24.json)
 successfully evaluates the revised Lake helper and builds the native control
 on Linux x64 and ARM64, then stops proactively during metadata copying. About
 five GiB of cgroup usage is predominantly inactive file cache; neither run
@@ -660,7 +660,7 @@ an explicit sysroot with default project search paths. The installed import
 harness has a separate bundled-data mode that supplies no Lean path variables
 to deployed processes; that campaign remains pending.
 
-The [second native module-data campaign](evidence/application-module-data-native-ci-2026-09-24.json)
+The [second native module-data campaign](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-module-data-native-ci-2026-09-24.json)
 passes all nine unit controls and the real Lake/import checks on Linux x64 and
 ARM64. Sources are hidden, `PATH` is empty, and the deployment is relocated to a
 path containing spaces. Standard, project and dependency modules import
@@ -672,14 +672,14 @@ pending, and native shared-library dependencies are outside this data-layout
 control's claim.
 
 The installed import harness now supports
-[separate original and attribute selections](evidence/application-module-data-split-preflight-2026-09-24.json).
+[separate original and attribute selections](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-module-data-split-preflight-2026-09-24.json).
 Each builds one application per guard; original imports and missing-data errors
 remain together, while the supplementary runtime assertions run separately.
 Both selections are still required. This allows verified
 archival of completed generated data between checks without raising resource
 limits. Syntax checks pass; these selections have not yet executed.
 
-The [original selection now passes on Node](evidence/application-module-data-node-original-2026-09-24.json)
+The [original selection now passes on Node](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-module-data-node-original-2026-09-24.json)
 through installed `.23`, including exact native output and the missing-standard-
 data failure. The relocated deployment contains 12,600 automatically supplied
 module-data files and receives no Lean path environment inputs. The run peaked
@@ -702,7 +702,7 @@ Both cases use the same installed `.23` candidate, in separate sequential
 guards. Other native
 platforms and complete dynamic-module handling remain open.
 
-Installed `.24` [repairs the ordinary Windows timezone APIs on Linux](evidence/windows-timezone-installed-2026-09-24.json):
+Installed `.24` [repairs the ordinary Windows timezone APIs on Linux](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/windows-timezone-installed-2026-09-24.json):
 all 13 observations match native Lean in Node. The old
 package returned a synthetic UTC value, unsupported-operation errors for named
 zones and a guest errno for local-zone lookup. The private host dispatch now
@@ -723,13 +723,13 @@ relocated Node differential check use sequential resource guards. It uses the
 same immutable managed SDK as the product, with generated ABI archives in its
 separate mutable cache. Packaging requires a complete Init/Std/Lean/Lake audit.
 The libuv source is pinned to its exact existing v1.48.0 commit.
-[Local preparation checks](evidence/application-runtime-source-preflight-2026-09-24.json)
+[Local preparation checks](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-runtime-source-preflight-2026-09-24.json)
 pass three SDK/cache controls and syntax checks; full CI execution is pending.
 This source-build control preserves reports in logs and uploads no package,
 release, cache or artifact. It is separate from clean installed-package and
 six-platform acceptance.
 
-The [first cold source-build attempt](evidence/application-runtime-source-download-2026-09-24.json)
+The [first cold source-build attempt](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-runtime-source-download-2026-09-24.json)
 passes the three unit controls and both managed tool provisioning phases, then
 rejects the source download before extraction: a tag archive was requested with
 the commit archive's pinned size and checksum. The URL now selects the exact
@@ -741,17 +741,17 @@ The [module-data file matrix](https://github.com/Millillion/lasm/blob/590a923f25
 (removed 2026-11-10 with `src/application-metadata*.mjs`, which the CLI never used)
 prepares the nine small copying, search-order, linked-path and loader controls
 on all six native platforms, including Windows ARM64. The
-[local preparation run](evidence/application-module-data-matrix-preflight-2026-09-24.json)
+[local preparation run](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-module-data-matrix-preflight-2026-09-24.json)
 passes all nine without skips after limiting child fixture heaps. This workflow
 does not build Lean or the runtime, and its results will not replace installed
 Wasm import tests or the missing macOS guard for heavy workloads.
 
-The [native file matrix](evidence/application-module-data-six-platforms-2026-09-24.json)
+The [native file matrix](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-module-data-six-platforms-2026-09-24.json)
 passes all nine controls without skips on every Linux/macOS/Windows × x64/ARM64
 combination: 54 passes on stock Node 26.10.0. This verifies the small module-data
 and loader fixtures on real hosts; full installed Wasm imports remain pending.
 
-The [second cold source attempt](evidence/application-runtime-source-python-2026-09-24.json)
+The [second cold source attempt](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-runtime-source-python-2026-09-24.json)
 passes all source checks, GMP and host-helper builds, then rejects a changed
 managed Python inventory before compiling Init/Std. A focused local control
 reproduces bytecode creation when Emscripten passes Python `-E`, which ignores
@@ -761,7 +761,7 @@ trees. Four local controls pass. This is the likely cause of the CI mutation;
 the failed run did not record individual changed entries, and fresh CI remains
 necessary. All seven previous guards released without resource events.
 
-The [third source attempt](evidence/application-runtime-source-python-nesting-2026-09-24.json)
+The [third source attempt](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-runtime-source-python-nesting-2026-09-24.json)
 still rejects Python inventory drift immediately after GMP. Inspection found
 that Emscripten replaces `EMSDK_PYTHON` with the raw interpreter before starting
 configure/make children, losing the launcher's `-B` option. The reviewed SDK
@@ -774,13 +774,13 @@ reports remain intact; another cold build must validate the fix in production.
 
 The fresh source run has passed GMP verification and host-support preparation
 with the nested-launcher repair and reached runtime compilation. A
-[further local control](evidence/application-runtime-source-python-path-2026-09-24.json)
+[further local control](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-runtime-source-python-path-2026-09-24.json)
 also preserves launchers supplied by name through PATH, alongside relative and
 spaced paths. All five controls and nine exact source repairs pass. This added
 PATH case is separate from the running CI commit; final build, packaging and
 relocated execution receipts remain pending.
 
-The [fourth cold source run](evidence/application-runtime-source-complete-2026-09-24.json)
+The [fourth cold source run](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/application-runtime-source-complete-2026-09-24.json)
 now completes all 2,516 modules across Init, Std, Lean and Lake, packages the
 363,645,375-byte runtime, and exactly matches native Lean's exit status, stdout
 and stderr from a relocated stock Node application. The application exercises
@@ -792,17 +792,17 @@ The candidate has its own identity; the shipping catalog remains unchanged.
 No package or cache was uploaded. Clean installed-package acceptance, deployment
 in a separate environment, and the other platforms remain required.
 
-The [filesystem-device fixture](evidence/filesystem-devices-preflight-2026-09-24.json)
+The [filesystem-device fixture](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/filesystem-devices-preflight-2026-09-24.json)
 adds ordinary Lean coverage for Linux character devices and procfs: bounded
 reads, kernel write failures, buffering/flush state, truncation, and readable
 content despite zero stat size. The differential harness now accepts native
 case selections, and CI can run just this new oracle on Linux x64/ARM64.
-The [native oracle campaign](evidence/filesystem-devices-native-ci-2026-09-24.json)
+The [native oracle campaign](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/filesystem-devices-native-ci-2026-09-24.json)
 passes on Linux x64 and ARM64, comparing interpreted and compiled Lean with
 identical observations across architectures. In particular, a small buffered
 `/dev/full` write succeeds before flush reports errno 28; repeating the flush
 succeeds, while a large write reports errno 28. All guards release without
-resource events. [Installed `.24` comparisons now pass](evidence/filesystem-devices-installed-2026-09-24.json)
+resource events. [Installed `.24` comparisons now pass](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/filesystem-devices-installed-2026-09-24.json)
 in Node on Linux x64: 24 observations, including six
 complete error values, match native interpreted and compiled Lean exactly.
 Each relocated deployment runs with source hidden, PATH empty and build
@@ -810,7 +810,7 @@ environment removed. All six build/archive guards release without resource
 events; the largest build peak is 3.45 GiB. This adds verified device behavior,
 not complete device or platform acceptance.
 
-The internal [scalar atomic adapter](evidence/native-atomic-views-2026-09-24.json)
+The internal [scalar atomic adapter](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/native-atomic-views-2026-09-24.json)
 now connects JavaScript integer conversions to the tested memory64 primitives.
 Nine operations, eight signed/unsigned integer formats, reentrant coercions and
 four concurrent Wasm/JavaScript worker controls match stock Node's own
@@ -819,7 +819,7 @@ Atomics behavior on Linux x64. The sparse probe touches 36 cells below and above
 controls also still pass. This is a backend component under development;
 ordinary heap access, wait scheduling and real Lean execution remain required.
 
-[Blocking waits and notifications](evidence/native-atomic-waits-2026-09-24.json)
+[Blocking waits and notifications](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/native-atomic-waits-2026-09-24.json)
 now share the native Wasm queue across independent JavaScript workers in
 Node. Sixteen groups compare statuses, coercions and wake
 counts; mixed 32/64-bit waiters and notifications in both directions pass.
@@ -827,7 +827,7 @@ The guard releases at a 63 MiB peak. Async scheduling, general heap access,
 finite durations beyond the prototype's signed-nanosecond transport, and real
 Lean application integration remain open. No shipping backend selection changes.
 
-The [real-module startup probe](evidence/wasmtime-real-lean-instantiation-2026-09-24.json)
+The [real-module startup probe](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wasmtime-real-lean-instantiation-2026-09-24.json)
 now runs ordinary stack, main-thread/TLS and constructor initialization through
 the verified native cache in stock Node. Twenty-three GCD/log2
 results match native interpreted and compiled Lean. Host environment
@@ -841,7 +841,7 @@ No OOM event occurred. Full application main execution, the original large-stack
 case, worker routing, dynamic linking and installed-package integration remain
 open; unimplemented imports still trap rather than claiming unsupported behavior.
 
-The [real allocator also passes sparse high-address controls](evidence/wasmtime-real-lean-high-allocation-2026-09-24.json)
+The [real allocator also passes sparse high-address controls](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wasmtime-real-lean-high-allocation-2026-09-24.json)
 in Node: allocate/free 4 GiB plus 64 KiB twice, copy through four
 eight-byte windows per allocation across the 4 GiB boundary, then run arithmetic
 again. Actual shared memory grows to 4,433,838,080 bytes using the generated
@@ -850,7 +850,7 @@ still pass; peak physical memory is 223 MiB under the unchanged 3 GiB guard.
 This closes a component allocation prerequisite. The original large-stack
 benchmark, worker lifecycle and shipping helper integration remain unpassed.
 
-[Real guest pthread lifecycle now passes](evidence/wasmtime-real-lean-pthreads-2026-09-24.json)
+[Real guest pthread lifecycle now passes](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wasmtime-real-lean-pthreads-2026-09-24.json)
 in Node. The guest allocates each thread through `pthread_create`,
 a separate JS worker initializes its own Wasmtime store and real TLS, executes
 a guest function-table entry, and exits through the module's actual thread
@@ -861,7 +861,7 @@ All earlier startup and allocation controls pass again. The guard releases at
 concurrent/nested scheduling, complete host imports, the original benchmark main,
 and the shipping backend remain open.
 
-[Concurrent guest threads also pass](evidence/wasmtime-real-lean-concurrency-2026-09-24.json)
+[Concurrent guest threads also pass](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wasmtime-real-lean-concurrency-2026-09-24.json)
 with independent stores on the same real memory: one 2 MiB and one 4 GiB stack,
 verified mutex contention, 1,000 protected shared updates and 1,000 concurrent
 GCD checks. All five sequential/concurrent threads exit,
@@ -869,7 +869,7 @@ join and clean up. Repeated startup and allocation controls pass; peak memory is
 295 MiB with no resource events. Complete Lean task scheduling, nested spawning,
 cross-worker mailbox routing and full application execution remain separate work.
 
-[Cross-worker mailbox routing now passes](evidence/wasmtime-real-lean-mailboxes-2026-09-24.json)
+[Cross-worker mailbox routing now passes](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wasmtime-real-lean-mailboxes-2026-09-24.json)
 through actual guest proxy queues: six tasks travel from main to two
 workers, back to main, and between workers through the main relay. Exact task
 counts and values verify receiver execution; all queues and seven test threads
@@ -878,7 +878,7 @@ at 293 MiB without resource events. This exercises available receiving event
 loops. Blocked-runtime integration, nested/detached lifecycle, cancellation,
 full application main and shipping integration still remain.
 
-The [unchanged `const_fold` main now passes through the private helper](evidence/wasmtime-real-lean-main-2026-09-24.json)
+The [unchanged `const_fold` main now passes through the private helper](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wasmtime-real-lean-main-2026-09-24.json)
 in stock Node 26.10.0 on Linux x64. Two runs produce exactly `93011 93011` and exit zero, matching both native Lean
 oracles. The original argument `15` and `LEAN_STACK_SIZE_KB=4194304` remain
 unchanged. Lean allocates 4 GiB plus its upstream 128 KiB buffer for the actual
@@ -901,7 +901,7 @@ linking, cancellation, larger control stacks, transfers beyond the diagnostic's
 reclaims the remaining main/completion workers after host output is flushed;
 that does not establish reusable-instance or general task cleanup semantics.
 
-A [direct Node-API prerequisite passes](evidence/native-api-stack-2026-09-24.json)
+A [direct Node-API prerequisite passes](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/native-api-stack-2026-09-24.json)
 in stock Node. The same small addon invokes registered FFI
 callbacks, including nested calls, while executing on the actual OS thread
 stack. Each 96 MiB worker safely uses about 24 MiB of native stack and then calls
@@ -910,7 +910,7 @@ Peak memory is 69 MiB. This provides a tested route beyond Koffi's 16 MiB stack
 ceiling. Real Wasmtime integration and relocating runtime ownership onto a
 verified worker stack are still required before increasing its current limit.
 
-The [real main now passes through that direct Node-API path](evidence/wasmtime-native-api-main-2026-09-24.json)
+The [real main now passes through that direct Node-API path](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wasmtime-native-api-main-2026-09-24.json)
 in stock Node. Runtime ownership moves to a verified 96 MiB worker;
 the process main thread supervises termination. Each direct Wasm entry checks
 native stack headroom, allowing a 64 MiB Wasmtime budget with room for host
@@ -923,7 +923,7 @@ This removes the FFI stack ceiling from this real-application prototype; managed
 packaging, general imports, lifetime/cancellation, larger adaptive stack needs,
 latest-runtime coverage and native platform acceptance remain open.
 
-The [Lean 4.34.1 private application continuation](evidence/wasmtime-lean-4.34.1-application-2026-09-25.json)
+The [Lean 4.34.1 private application continuation](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wasmtime-lean-4.34.1-application-2026-09-25.json)
 now reuses the exact ordinary IO program from the cold-installed `.25` package.
 Its complete Wasm module converts to standardized exceptions and compiles with
 single-worker Wasmtime 49.0.0; the verified local compiled cache is reused.
@@ -950,13 +950,13 @@ keepalive, cancellation, reusable disposal, larger transfers/adaptive stacks
 and all other native platforms remain open.
 
 The completed private cache, converted Wasm and restored cold-deployment input
-are now [retained as verified compressed archives](evidence/wasmtime-lean-4.34.1-retention-2026-09-25.json).
+are now [retained as verified compressed archives](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wasmtime-lean-4.34.1-retention-2026-09-25.json).
 Decompression matches every original byte; recorded modes and timestamps permit
 restoration to the original paths before reuse. This recovers 712 MB without
 changing sources, results, failed experiments or the managed tool cache. The
 archival guard peaks below 0.8 GiB and releases without resource events.
 
-The [function-global continuation](evidence/wasmtime-function-globals-2026-09-25.json)
+The [function-global continuation](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/wasmtime-function-globals-2026-09-25.json)
 now resolves the private helper's six console function pointers. Its initial
 controls found that an imported host function and the instance's table entry
 can have different Wasmtime references. A preparatory transform adds private
@@ -977,7 +977,7 @@ only after matching their retained npm tarballs. General imports, dynamic/weak
 linking, real WASI descriptors, reusable runtime cleanup and managed shipping
 integration remain open.
 
-The subsequent [binary-console application comparison](evidence/lean-4.34.1-binary-console-2026-09-25.json)
+The subsequent [binary-console application comparison](https://github.com/Millillion/lasm/blob/411f4e25f4221f96f4b98f5c5b66c669cf71bcd0/docs/evidence/lean-4.34.1-binary-console-2026-09-25.json)
 matches all 302 native output bytes through the private helper in Node,
 including invalid UTF-8 and byte-at-a-time flushing. The comparison keeps
 Base64 byte records as well as readable diagnostics. Thirteen integrity controls

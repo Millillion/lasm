@@ -48,11 +48,11 @@ export function selectCacheFile(path, libraries) {
 }
 
 export async function extractSysroot(archive, directory, { readOnly = false } = {}) {
-  const { extract } = await import('tar');
+  const { extractTar } = await import('../../src/tar.mjs');
   mkdirSync(directory, { recursive: true });
   if (readdirSync(directory).length) throw new Error('Extract into a new, empty directory');
   await pipeline(createReadStream(archive), createZstdDecompress(),
-    extract({ cwd: directory, strict: true, preservePaths: false, preserveOwner: false }));
+    extractTar({ cwd: directory }));
   const [name] = readdirSync(directory);
   const cache = join(directory, name);
   if (readOnly) (function walk(path) {

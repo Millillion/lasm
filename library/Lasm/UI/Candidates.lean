@@ -18,7 +18,7 @@ import Lasm.UI.Proofs.Decode
 import Lasm.UI.Url
 
 namespace Lasm.UI.Candidates
-open Lasm.UI Lasm.UI.Proofs
+open Lasm.UI Lasm.UI.Model Lasm.UI.Proofs
 
 /-! ## The diff does no unneeded work -/
 

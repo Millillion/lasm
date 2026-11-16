@@ -17,6 +17,7 @@ on:
       - 'test/models/**'
       - 'test/helpers/property.mjs'
       - 'native/process-launcher.c'
+      - 'library/c/lasm_js_framing.h'
   push:
     branches: [main]
     paths:
@@ -26,6 +27,7 @@ on:
       - 'test/models/**'
       - 'test/helpers/property.mjs'
       - 'native/process-launcher.c'
+      - 'library/c/lasm_js_framing.h'
 permissions:
   contents: read
 concurrency:
@@ -44,7 +46,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 26.13.0
+          node-version: 26.13.1
           package-manager-cache: false
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Every Lean model agrees with its JavaScript

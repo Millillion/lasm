@@ -9,7 +9,7 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { brotliCompressSync, gzipSync } from 'node:zlib';
-import { hashedFile, listenError, mimeTypes, startStaticServer } from '../src/browser/static-server.mjs';
+import { hashedFile, listenError, mimeTypes, resolveStaticPath, startStaticServer } from '../src/browser/static-server.mjs';
 import { forAll } from './helpers/property.mjs';
 
 /** A raw request (the path is sent exactly as given): { status, headers, body }. */
@@ -124,11 +124,11 @@ test('static server: paths outside the root are refused; directories, fallback a
     assert.equal(missing.body.toString(), 'Not found\n');
     // A directory without index.html and no extension: the fallback page.
     assert.match((await raw(server, '/nested')).body.toString(), /home/);
-    // A malformed escape is a server error with its message, not a crash.
+    // A malformed escape is the client's error, not a crash.
     const bad = await raw(server, '/%E0%A4%A');
-    assert.equal(bad.status, 500);
+    assert.equal(bad.status, 400);
     assert.equal(bad.headers['content-type'], 'text/plain; charset=utf-8');
-    assert.match(bad.body.toString(), /URI malformed/);
+    assert.match(bad.body.toString(), /not valid percent-encoded/);
   } finally { await server.close(); }
   // Without a fallback, unknown routes are 404.
   const strict = await startStaticServer(root, { fallback: null });
@@ -143,20 +143,69 @@ test('static server: paths outside the root are refused; directories, fallback a
   } finally { await empty.close(); rmSync(parent, { recursive: true, force: true }); }
 });
 
-// Proposition: Lasm.Cli.Candidates.static_inside_root
-//   ∀ root path : String,
-//     (staticServe root path).1 ∈ [200, 403, 404] ∧
-//     ∀ f, (staticServe root path).2 = some f → f.startsWith (root ++ "/")
+// Proposition: Lasm.Cli.Spec.static_inside_root
+//   ∀ (fileExists : String → Bool) (root pathname accepts : String) (fallback : Option String),
+//     resolvedDirectory root → fileExists root = false → (∀ f ∈ fallback, pathSegment f.toList) →
+//     (staticServe fileExists root pathname accepts fallback).1 ∈ [200, 400, 403, 404] ∧
+//     ∀ f, (staticServe fileExists root pathname accepts fallback).2 = some f → (root ++ "/").toList <+: f.toList
+test('static server: the resolution of any path, files and Accept-Encoding stays under the root', () => {
+  const segment = ['..', '.', '', '%2e%2e', '%2E.', 'dist', 'dist-secret', 'index.html', 'app.js', 'x.css', '%2f', '%5c', '%', '%zz', '%e2%82', 'λ'];
+  forAll(gen => ({
+    root: '/' + gen.array(gen.int(1, 3), () => gen.pick(['srv', 'dist', 'a b', 'λ'])).join('/'),
+    pathname: '/' + gen.array(gen.int(0, 5), () => gen.pick(segment)).join(gen.pick(['/', '%2f', '//'])),
+    exists: gen.array(gen.int(0, 6), () => gen.pick(['/srv/x', '/etc/passwd', '/dist-secret/key.txt', 'index.html', 'app.js', 'app.js.br', 'x.css.gz', 'fallback.html'])),
+    accepts: gen.pick(['', 'br', 'gzip', 'br, gzip']),
+    fallback: gen.pick([null, 'index.html', 'fallback.html']),
+  }), ({ root, pathname, exists, accepts, fallback }) => {
+    const files = exists.map(name => name.startsWith('/') ? name : root + '/' + name);
+    const found = resolveStaticPath(root, pathname, { fallback, accepts, fileExists: file => files.includes(file) });
+    assert.ok([200, 400, 403, 404].includes(found.status));
+    if (found.served !== undefined) assert.ok(found.served.startsWith(root + '/'), `${pathname} served ${found.served}`);
+  }, { runs: 2000 });
+});
+
+// Proposition: Lasm.Cli.Spec.static_inside_root
+//   ∀ (fileExists : String → Bool) (root pathname accepts : String) (fallback : Option String),
+//     resolvedDirectory root → fileExists root = false → (∀ f ∈ fallback, pathSegment f.toList) →
+//     (staticServe fileExists root pathname accepts fallback).1 ∈ [200, 400, 403, 404] ∧
+//     ∀ f, (staticServe fileExists root pathname accepts fallback).2 = some f → (root ++ "/").toList <+: f.toList
 test('static server: no request path reaches a file outside the root', async () => {
   const { parent, root } = site();
   const server = await startStaticServer(root, { fallback: null });
   try {
     const paths = [];
-    forAll(gen => '/' + gen.array(gen.int(1, 5), () => gen.pick(['..', '%2e%2e', '.', 'nested', 'secret.txt', 'dist-secret', 'key.txt', 'dist', 'index.html'])).join(gen.pick(['/', '%2f', '%2F'])), path => { paths.push(path); }, { runs: 150 });
+    forAll(gen => '/' + gen.array(gen.int(1, 5), () => gen.pick(['..', '%2e%2e', '.', 'nested', 'secret.txt', 'dist-secret', 'key.txt', 'dist', 'index.html', '%', '%zz', '%e2%82'])).join(gen.pick(['/', '%2f', '%2F'])), path => { paths.push(path); }, { runs: 150 });
     for (const path of paths) {
       const answer = await raw(server, path);
       assert.doesNotMatch(answer.body.toString(), /outside/, path);
-      assert.ok([200, 403, 404].includes(answer.status), `${path}: ${answer.status}`);
+      assert.ok([200, 400, 403, 404].includes(answer.status), `${path}: ${answer.status}`);
+    }
+  } finally { await server.close(); rmSync(parent, { recursive: true, force: true }); }
+});
+
+test('static server: a directory named like a precompressed copy is not served as one', async () => {
+  const { parent, root, js } = site();
+  mkdirSync(join(root, 'app.js.br'));
+  const server = await startStaticServer(root);
+  try {
+    const answer = await raw(server, '/app.js', { headers: { 'accept-encoding': 'br, gzip' } });
+    assert.equal(answer.status, 200);
+    assert.equal(answer.headers['content-encoding'], 'gzip', 'app.js.br is a directory: the gzip copy is next');
+    const plain = await raw(server, '/app.js', { headers: { 'accept-encoding': 'br' } });
+    assert.equal(plain.status, 200);
+    assert.equal(plain.headers['content-encoding'], undefined);
+    assert.equal(plain.body.toString(), js);
+  } finally { await server.close(); rmSync(parent, { recursive: true, force: true }); }
+});
+
+test('static server: a path whose percent-encoding is malformed is a bad request', async () => {
+  const { parent, root } = site();
+  const server = await startStaticServer(root, { fallback: null });
+  try {
+    for (const path of ['/%', '/%zz', '/a%2', '/%e2%82', '/nested/%c0']) {
+      const answer = await raw(server, path);
+      assert.equal(answer.status, 400, path);
+      assert.equal(answer.body.toString(), 'Bad request: the path is not valid percent-encoded UTF-8\n', path);
     }
   } finally { await server.close(); rmSync(parent, { recursive: true, force: true }); }
 });
