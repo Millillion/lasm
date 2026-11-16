@@ -1039,52 +1039,52 @@ def stream.Readable.compose (self : stream.Readable) (stream_ : stream.WritableO
 def stream.Readable.iterator (self : stream.Readable) (options : Option stream.Readable.IteratorOptions := none) : IO Data :=
   self.val.callMethod "iterator" (Support.args #[Support.optional options]) Data
 
-/-- `readable.map(fn[, options])` (added in Node.js v17.4.0, v16.14.0): `stream.Readable map(Function fn, optional stream.Readable.MapOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.map(fn[, options])` (added in Node.js v17.4.0, v16.14.0): `stream.Readable map(Function fn, optional stream.Readable.MapOptions options)` -/
 def stream.Readable.map (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.MapOptions := none) : IO stream.Readable := do
   let r ← self.val.callMethod "map" (Support.args #[toJS fn, Support.optional options]) Value
   pure { val := r }
 
-/-- `readable.filter(fn[, options])` (added in Node.js v17.4.0, v16.14.0): `stream.Readable filter(Function fn, optional stream.Readable.FilterOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.filter(fn[, options])` (added in Node.js v17.4.0, v16.14.0): `stream.Readable filter(Function fn, optional stream.Readable.FilterOptions options)` -/
 def stream.Readable.filter (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.FilterOptions := none) : IO stream.Readable := do
   let r ← self.val.callMethod "filter" (Support.args #[toJS fn, Support.optional options]) Value
   pure { val := r }
 
-/-- `readable.forEach(fn[, options])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> forEach(Function fn, optional stream.Readable.ForEachOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.forEach(fn[, options])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> forEach(Function fn, optional stream.Readable.ForEachOptions options)` -/
 def stream.Readable.forEach (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.ForEachOptions := none) : Async Data :=
   self.val.callMethodAwait "forEach" (Support.args #[toJS fn, Support.optional options]) Data
 
-/-- `readable.toArray([options])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> toArray(optional stream.Readable.ToArrayOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.toArray([options])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> toArray(optional stream.Readable.ToArrayOptions options)` -/
 def stream.Readable.toArray (self : stream.Readable) (options : Option stream.Readable.ToArrayOptions := none) : Async Data :=
   self.val.callMethodAwait "toArray" (Support.args #[Support.optional options]) Data
 
-/-- `readable.some(fn[, options])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> some(Function fn, optional stream.Readable.SomeOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.some(fn[, options])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> some(Function fn, optional stream.Readable.SomeOptions options)` -/
 def stream.Readable.some (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.SomeOptions := none) : Async Data :=
   self.val.callMethodAwait "some" (Support.args #[toJS fn, Support.optional options]) Data
 
-/-- `readable.find(fn[, options])` (added in Node.js v17.5.0, v16.17.0): `Promise<any> find(Function fn, optional stream.Readable.FindOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.find(fn[, options])` (added in Node.js v17.5.0, v16.17.0): `Promise<any> find(Function fn, optional stream.Readable.FindOptions options)` -/
 def stream.Readable.find (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.FindOptions := none) : Async Data :=
   self.val.callMethodAwait "find" (Support.args #[toJS fn, Support.optional options]) Data
 
-/-- `readable.every(fn[, options])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> every(Function fn, optional stream.Readable.EveryOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.every(fn[, options])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> every(Function fn, optional stream.Readable.EveryOptions options)` -/
 def stream.Readable.every (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.EveryOptions := none) : Async Data :=
   self.val.callMethodAwait "every" (Support.args #[toJS fn, Support.optional options]) Data
 
-/-- `readable.flatMap(fn[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable flatMap(Function fn, optional stream.Readable.FlatMapOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.flatMap(fn[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable flatMap(Function fn, optional stream.Readable.FlatMapOptions options)` -/
 def stream.Readable.flatMap (self : stream.Readable) (fn : JSFunction) (options : Option stream.Readable.FlatMapOptions := none) : IO stream.Readable := do
   let r ← self.val.callMethod "flatMap" (Support.args #[toJS fn, Support.optional options]) Value
   pure { val := r }
 
-/-- `readable.drop(limit[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable drop(double limit, optional stream.Readable.DropOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.drop(limit[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable drop(double limit, optional stream.Readable.DropOptions options)` -/
 def stream.Readable.drop (self : stream.Readable) (limit : Float) (options : Option stream.Readable.DropOptions := none) : IO stream.Readable := do
   let r ← self.val.callMethod "drop" (Support.args #[toJS limit, Support.optional options]) Value
   pure { val := r }
 
-/-- `readable.take(limit[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable take(double limit, optional stream.Readable.TakeOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.take(limit[, options])` (added in Node.js v17.5.0, v16.15.0): `stream.Readable take(double limit, optional stream.Readable.TakeOptions options)` -/
 def stream.Readable.take (self : stream.Readable) (limit : Float) (options : Option stream.Readable.TakeOptions := none) : IO stream.Readable := do
   let r ← self.val.callMethod "take" (Support.args #[toJS limit, Support.optional options]) Value
   pure { val := r }
 
-/-- `readable.reduce(fn[, initial[, options]])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> reduce(Function fn, optional any initial, optional stream.Readable.ReduceOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `readable.reduce(fn[, initial[, options]])` (added in Node.js v17.5.0, v16.15.0): `Promise<any> reduce(Function fn, optional any initial, optional stream.Readable.ReduceOptions options)` -/
 def stream.Readable.reduce (self : stream.Readable) (fn : JSFunction) (initial : Data := .undefined) (options : Option stream.Readable.ReduceOptions := none) : Async Data :=
   self.val.callMethodAwait "reduce" (Support.args #[toJS fn, initial, Support.optional options]) Data
 
@@ -1171,17 +1171,17 @@ def stream.finishedWithStreamOptions (stream_ : EventEmitterOrReadableStreamOrWr
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.stream.finishedWithStreamOptions", module := "node:stream", path := "finished", construct := false, arity := 2 }
     (Support.args #[toJS stream_, Support.optional options])
 
-/-- `stream.pipeline(source[, ...transforms], destination, callback)` (added in Node.js v10.0.0): `Promise<undefined> pipeline((EventEmitter or object or Function or ReadableStream) source, (EventEmitter or Function or WritableStream) destination)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.pipeline (source : EventEmitterOrObjectOrJSFunctionOrReadableStream) (destination : EventEmitterOrJSFunctionOrWritableStream) : Async Unit :=
-  Support.promisified Unit "node:stream" "pipeline" (Support.args #[toJS source, toJS destination])
+/-- `stream.pipeline(source[, ...transforms], destination, callback)` (added in Node.js v10.0.0): `Promise<any> pipeline((EventEmitter or object or Function or ReadableStream) source, (EventEmitter or Function or WritableStream) destination)` (Node.js 24.22.2 documentation, stream.md) -/
+def stream.pipeline (source : EventEmitterOrObjectOrJSFunctionOrReadableStream) (destination : EventEmitterOrJSFunctionOrWritableStream) : Async Data :=
+  Support.promisified Data "node:stream" "pipeline" (Support.args #[toJS source, toJS destination])
 
-/-- `stream.pipeline(source[, ...transforms], destination, callback)` (added in Node.js v10.0.0): `Promise<undefined> pipeline((EventEmitter or object or Function or ReadableStream) source, (EventEmitter or Function or TransformStream)... transforms, (EventEmitter or Function or WritableStream) destination)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.pipelineWithTransforms (source : EventEmitterOrObjectOrJSFunctionOrReadableStream) (transforms : Array EventEmitterOrJSFunctionOrTransformStream := #[]) (destination : EventEmitterOrJSFunctionOrWritableStream) : Async Unit :=
-  Support.promisified Unit "node:stream" "pipeline" (Support.argsWith #[toJS source, toJS destination] (transforms.map toJS))
+/-- `stream.pipeline(source[, ...transforms], destination, callback)` (added in Node.js v10.0.0): `Promise<any> pipeline((EventEmitter or object or Function or ReadableStream) source, (EventEmitter or Function or TransformStream)... transforms, (EventEmitter or Function or WritableStream) destination)` (Node.js 24.22.2 documentation, stream.md) -/
+def stream.pipelineWithTransforms (source : EventEmitterOrObjectOrJSFunctionOrReadableStream) (transforms : Array EventEmitterOrJSFunctionOrTransformStream := #[]) (destination : EventEmitterOrJSFunctionOrWritableStream) : Async Data :=
+  Support.promisified Data "node:stream" "pipeline" (Support.argsWith #[toJS source, toJS destination] (transforms.map toJS))
 
-/-- `stream.pipeline(streams, callback)` (added in Node.js v10.0.0): `Promise<undefined> pipeline((sequence<EventEmitter> or sequence<object> or sequence<Function> or sequence<ReadableStream> or sequence<WritableStream> or sequence<TransformStream>) streams)` (Node.js 24.22.2 documentation, stream.md) -/
-def stream.pipelineWithStreams (streams : SequenceOfEventEmitterOrSequenceOfObjectOrSequenceOfJSFunctionOrSequenceOfReadableStreamOrSequenceOfWritableStreamOrSequenceOfTransformStream) : Async Unit :=
-  Support.promisified Unit "node:stream" "pipeline" (Support.args #[toJS streams])
+/-- `stream.pipeline(streams, callback)` (added in Node.js v10.0.0): `Promise<any> pipeline((sequence<EventEmitter> or sequence<object> or sequence<Function> or sequence<ReadableStream> or sequence<WritableStream> or sequence<TransformStream>) streams)` (Node.js 24.22.2 documentation, stream.md) -/
+def stream.pipelineWithStreams (streams : SequenceOfEventEmitterOrSequenceOfObjectOrSequenceOfJSFunctionOrSequenceOfReadableStreamOrSequenceOfWritableStreamOrSequenceOfTransformStream) : Async Data :=
+  Support.promisified Data "node:stream" "pipeline" (Support.args #[toJS streams])
 
 /-- `stream.pipeline(streams[, options])` (added in Node.js v15.0.0): `Promise<any> pipeline((sequence<EventEmitter> or sequence<object> or sequence<Function> or sequence<ReadableStream> or sequence<WritableStream> or sequence<TransformStream>) streams, optional stream.PipelineOptions options)` (Node.js 24.22.2 documentation, stream.md) -/
 def stream.pipelineWithStreamsOptions (streams : SequenceOfEventEmitterOrSequenceOfObjectOrSequenceOfJSFunctionOrSequenceOfReadableStreamOrSequenceOfWritableStreamOrSequenceOfTransformStream) (options : Option stream.PipelineOptions := none) : Async Data :=
@@ -1224,7 +1224,7 @@ def stream.isWritable (stream_ : stream.WritableOrDuplexOrWritableStream) : IO (
   Lasm.JS.Binding.invoke (Option Bool) { name := "Lasm.JS.Node.stream.isWritable", module := "node:stream", path := "isWritable", construct := false, arity := 1 }
     (Support.args #[toJS stream_]) (await := false)
 
-/-- `stream.addAbortSignal(signal, stream)` (added in Node.js v15.4.0): `undefined addAbortSignal(AbortSignal signal, (EventEmitter or ReadableStream or WritableStream) stream)` (Node.js 24.22.2 documentation, stream.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `stream.addAbortSignal(signal, stream)` (added in Node.js v15.4.0): `undefined addAbortSignal(AbortSignal signal, (EventEmitter or ReadableStream or WritableStream) stream)` (Node.js 24.22.2 documentation, stream.md) -/
 def stream.addAbortSignal (signal : AbortSignal) (stream_ : EventEmitterOrReadableStreamOrWritableStream) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.stream.addAbortSignal", module := "node:stream", path := "addAbortSignal", construct := false, arity := 2 }
     (Support.args #[toJS signal, toJS stream_]) (await := false)

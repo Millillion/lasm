@@ -1346,7 +1346,7 @@ def Http2Stream.onceWantTrailers (self : Http2Stream) (listener : Http2Stream.Wa
 def Http2Stream.close (self : Http2Stream) (code : Float) : IO Unit :=
   self.val.callMethod "close" (Support.args #[toJS code]) Unit
 
-/-- `http2stream.priority(options)` (added in Node.js v8.4.0): `undefined priority(any options)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `http2stream.priority(options)` (added in Node.js v8.4.0): `undefined priority(any options)` -/
 def Http2Stream.priority (self : Http2Stream) (options : Data) : IO Unit :=
   self.val.callMethod "priority" (Support.args #[toJS options]) Unit
 
@@ -1619,7 +1619,7 @@ def http2.Http2ServerRequest.authority (self : http2.Http2ServerRequest) : IO St
 /-- `request.complete` (added in Node.js v12.10.0): `readonly attribute boolean complete` -/
 def http2.Http2ServerRequest.complete (self : http2.Http2ServerRequest) : IO Bool := self.val.get "complete" Bool
 
-/-- `request.connection` (added in Node.js v8.4.0): `readonly attribute (net.Socket or tls.TLSSocket) connection` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `request.connection` (added in Node.js v8.4.0): `readonly attribute (net.Socket or tls.TLSSocket) connection` -/
 def http2.Http2ServerRequest.connection (self : http2.Http2ServerRequest) : IO Value := self.val.get "connection" Value
 
 /-- `request.headers` (added in Node.js v8.4.0): `readonly attribute object headers` -/
@@ -1683,10 +1683,10 @@ def http2.Http2ServerRequest.setTimeout (self : http2.Http2ServerRequest) (msecs
   let r ← self.val.callMethod "setTimeout" (Support.args #[toJS msecs, toJS callback]) Value
   pure { val := r }
 
-/-- `response.connection` (added in Node.js v8.4.0): `readonly attribute (net.Socket or tls.TLSSocket) connection` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `response.connection` (added in Node.js v8.4.0): `readonly attribute (net.Socket or tls.TLSSocket) connection` -/
 def http2.Http2ServerResponse.connection (self : http2.Http2ServerResponse) : IO Value := self.val.get "connection" Value
 
-/-- `response.finished` (added in Node.js v8.4.0): `readonly attribute boolean finished` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `response.finished` (added in Node.js v8.4.0): `readonly attribute boolean finished` -/
 def http2.Http2ServerResponse.finished (self : http2.Http2ServerResponse) : IO Bool := self.val.get "finished" Bool
 
 /-- `response.headersSent` (added in Node.js v8.4.0): `readonly attribute boolean headersSent` -/

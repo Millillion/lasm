@@ -101,6 +101,33 @@ structure worker_threads.Worker.GetHeapSnapshotOptions where
 instance instToJSWorker_threadsWorkerGetHeapSnapshotOptions : ToJS worker_threads.Worker.GetHeapSnapshotOptions := ⟨fun d => Support.fields #[("exposeInternals", Support.optional d.exposeInternals),
     ("exposeNumericValues", Support.optional d.exposeNumericValues)]⟩
 
+/-- `dictionary worker_threads.Worker.StartCpuProfileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure worker_threads.Worker.StartCpuProfileOptions where
+  /-- `double sampleInterval = 0` -/
+  sampleInterval : Option Float := none
+  /-- `long long maxBufferSize = 4294967295` -/
+  maxBufferSize : Option Int := none
+instance instToJSWorker_threadsWorkerStartCpuProfileOptions : ToJS worker_threads.Worker.StartCpuProfileOptions := ⟨fun d => Support.fields #[("sampleInterval", Support.optional d.sampleInterval),
+    ("maxBufferSize", Support.optional d.maxBufferSize)]⟩
+
+/-- `dictionary worker_threads.Worker.StartHeapProfileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure worker_threads.Worker.StartHeapProfileOptions where
+  /-- `double sampleInterval` -/
+  sampleInterval : Option Float := none
+  /-- `long long stackDepth = 16` -/
+  stackDepth : Option Int := none
+  /-- `boolean forceGC = false` -/
+  forceGC : Option Bool := none
+  /-- `boolean includeObjectsCollectedByMajorGC = false` -/
+  includeObjectsCollectedByMajorGC : Option Bool := none
+  /-- `boolean includeObjectsCollectedByMinorGC = false` -/
+  includeObjectsCollectedByMinorGC : Option Bool := none
+instance instToJSWorker_threadsWorkerStartHeapProfileOptions : ToJS worker_threads.Worker.StartHeapProfileOptions := ⟨fun d => Support.fields #[("sampleInterval", Support.optional d.sampleInterval),
+    ("stackDepth", Support.optional d.stackDepth),
+    ("forceGC", Support.optional d.forceGC),
+    ("includeObjectsCollectedByMajorGC", Support.optional d.includeObjectsCollectedByMajorGC),
+    ("includeObjectsCollectedByMinorGC", Support.optional d.includeObjectsCollectedByMinorGC)]⟩
+
 /-- `(MessagePort or BroadcastChannel)`: one constructor per member type. -/
 inductive MessagePortOrBroadcastChannel where
   /-- `MessagePort` -/
@@ -211,9 +238,17 @@ def worker_threads.Worker.ref (self : worker_threads.Worker) : IO Unit :=
 def worker_threads.Worker.startCpuProfile (self : worker_threads.Worker) : Async Data :=
   self.val.callMethodAwait "startCpuProfile" (Support.args #[]) Data
 
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `worker.startCpuProfile([options])` (added in Node.js v24.8.0): `Promise<any> startCpuProfile(optional worker_threads.Worker.StartCpuProfileOptions options)` -/
+def worker_threads.Worker.startCpuProfileWithOptions (self : worker_threads.Worker) (options : Option worker_threads.Worker.StartCpuProfileOptions := none) : Async Data :=
+  self.val.callMethodAwait "startCpuProfile" (Support.args #[Support.optional options]) Data
+
 /-- `worker.startHeapProfile()` (added in Node.js v24.9.0): `Promise<any> startHeapProfile()` -/
 def worker_threads.Worker.startHeapProfile (self : worker_threads.Worker) : Async Data :=
   self.val.callMethodAwait "startHeapProfile" (Support.args #[]) Data
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `worker.startHeapProfile([options])` (added in Node.js v24.9.0, v22.20.0): `Promise<any> startHeapProfile(optional worker_threads.Worker.StartHeapProfileOptions options)` -/
+def worker_threads.Worker.startHeapProfileWithOptions (self : worker_threads.Worker) (options : Option worker_threads.Worker.StartHeapProfileOptions := none) : Async Data :=
+  self.val.callMethodAwait "startHeapProfile" (Support.args #[Support.optional options]) Data
 
 /-- `worker.terminate()` (added in Node.js v10.5.0): `Promise<any> terminate()` -/
 def worker_threads.Worker.terminate (self : worker_threads.Worker) : Async Data :=
@@ -247,7 +282,7 @@ def worker_threads.threadName : IO (Option String) := Support.getExport "node:wo
 /-- `worker_threads.workerData` (added in Node.js v10.5.0): `readonly attribute any workerData` (Node.js 24.22.2 documentation, worker_threads.md) -/
 def worker_threads.workerData : IO Data := Support.getExport "node:worker_threads" ["workerData"] Data
 
-/-- `worker_threads.locks` (added in Node.js v24.5.0): `readonly attribute LockManager locks` (Node.js 24.22.2 documentation, worker_threads.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `worker_threads.locks` (added in Node.js v24.5.0): `readonly attribute LockManager locks` (Node.js 24.22.2 documentation, worker_threads.md) -/
 def worker_threads.locks : IO Data := Support.getExport "node:worker_threads" ["locks"] Data
 
 /-- `worker_threads.getEnvironmentData(key)` (added in Node.js v15.12.0, v14.18.0): `any getEnvironmentData(any key)` (Node.js 24.22.2 documentation, worker_threads.md) -/
@@ -276,7 +311,7 @@ def worker_threads.moveMessagePortToContext (port : MessagePort) (contextifiedSa
     (Support.args #[toJS port, toJS contextifiedSandbox]) (await := false)
   pure { val := r }
 
-/-- `worker_threads.postMessageToThread(threadId, value[, transferList][, timeout])` (added in Node.js v22.5.0, v20.19.0): `Promise<any> postMessageToThread(double threadId, any value, optional sequence<object> transferList, optional double timeout)` (Node.js 24.22.2 documentation, worker_threads.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `worker_threads.postMessageToThread(threadId, value[, transferList][, timeout])` (added in Node.js v22.5.0, v20.19.0): `Promise<any> postMessageToThread(double threadId, any value, optional sequence<object> transferList, optional double timeout)` (Node.js 24.22.2 documentation, worker_threads.md) -/
 def worker_threads.postMessageToThread (threadId : Float) (value : Data) (transferList : Option (Array Data) := none) (timeout : Option Float := none) : Async Data :=
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.worker_threads.postMessageToThread", module := "node:worker_threads", path := "postMessageToThread", construct := false, arity := 4 }
     (Support.args #[toJS threadId, toJS value, Support.optional transferList, Support.optional timeout])

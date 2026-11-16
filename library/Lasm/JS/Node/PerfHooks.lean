@@ -156,10 +156,10 @@ instance instToJSPerformanceTimerifyOptions : ToJS performance.TimerifyOptions :
 /-- `detail` (added in Node.js v16.0.0): `readonly attribute any detail` -/
 def PerformanceNodeEntry.detail (self : PerformanceNodeEntry) : IO Data := self.val.get "detail" Data
 
-/-- `flags` (added in Node.js v13.9.0, v12.17.0): `readonly attribute double flags` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `flags` (added in Node.js v13.9.0, v12.17.0): `readonly attribute double flags` -/
 def PerformanceNodeEntry.flags (self : PerformanceNodeEntry) : IO Float := self.val.get "flags" Float
 
-/-- `kind` (added in Node.js v8.5.0): `readonly attribute double kind` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `kind` (added in Node.js v8.5.0): `readonly attribute double kind` -/
 def PerformanceNodeEntry.kind (self : PerformanceNodeEntry) : IO Float := self.val.get "kind" Float
 
 /-- `bootstrapComplete` (added in Node.js v8.5.0): `readonly attribute double bootstrapComplete` -/
@@ -185,6 +185,9 @@ def PerformanceNodeTiming.uvMetricsInfo (self : PerformanceNodeTiming) : IO Data
 
 /-- `v8Start` (added in Node.js v8.5.0): `readonly attribute double v8Start` -/
 def PerformanceNodeTiming.v8Start (self : PerformanceNodeTiming) : IO Float := self.val.get "v8Start" Float
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `uvMetricsInfoBigInt` (added in Node.js v26.11.0): `readonly attribute object uvMetricsInfoBigInt` -/
+def PerformanceNodeTiming.uvMetricsInfoBigInt (self : PerformanceNodeTiming) : IO Data := self.val.get "uvMetricsInfoBigInt" Data
 
 /-- `histogram.count` (added in Node.js v17.4.0, v16.14.0): `readonly attribute double count` -/
 def Histogram.count (self : Histogram) : IO Float := self.val.get "count" Float
@@ -236,6 +239,9 @@ def Histogram.skewness (self : Histogram) : IO Float := self.val.get "skewness" 
 
 /-- `histogram.stddev` (added in Node.js v11.10.0): `readonly attribute double stddev` -/
 def Histogram.stddev (self : Histogram) : IO Float := self.val.get "stddev" Float
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `histogram.resetCount` (added in Node.js v26.11.0): `readonly attribute double resetCount` -/
+def Histogram.resetCount (self : Histogram) : IO Float := self.val.get "resetCount" Float
 
 /-- `histogram.ccdf(value)` (added in Node.js v24.21.0): `double ccdf(double value)` -/
 def Histogram.ccdf (self : Histogram) (value : Float) : IO Float :=
@@ -312,6 +318,16 @@ def Histogram.reset (self : Histogram) : IO Unit :=
 /-- `histogram.welchTest(other[, options])` (added in Node.js v24.21.0): `object welchTest(Histogram other, optional Histogram.WelchTestOptions options)` -/
 def Histogram.welchTest (self : Histogram) (other : Histogram) (options : Option Histogram.WelchTestOptions := none) : IO Data :=
   self.val.callMethod "welchTest" (Support.args #[toJS other, Support.optional options]) Data
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `histogram.diff(other)` (added in Node.js v26.11.0): `Histogram diff(Histogram other)` -/
+def Histogram.diff (self : Histogram) (other : Histogram) : IO Histogram := do
+  let r ← self.val.callMethod "diff" (Support.args #[toJS other]) Value
+  pure { val := r }
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `histogram.snapshot()` (added in Node.js v26.11.0): `Histogram snapshot()` -/
+def Histogram.snapshot (self : Histogram) : IO Histogram := do
+  let r ← self.val.callMethod "snapshot" (Support.args #[]) Value
+  pure { val := r }
 
 /-- `histogram.disable()` (added in Node.js v11.10.0): `boolean disable()` -/
 def ELDHistogram.disable (self : ELDHistogram) : IO Bool :=

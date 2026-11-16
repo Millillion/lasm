@@ -601,7 +601,7 @@ def net.BlockList.check (self : net.BlockList) (address : net.DOMStringOrSocketA
 def net.BlockList.clear (self : net.BlockList) : IO Unit :=
   self.val.callMethod "clear" (Support.args #[]) Unit
 
-/-- `blockList.fromJSON(value)`: `undefined fromJSON(any value)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `blockList.fromJSON(value)`: `undefined fromJSON(any value)` -/
 def net.BlockList.fromJSON (self : net.BlockList) (value : Data) : IO Unit :=
   self.val.callMethod "fromJSON" (Support.args #[toJS value]) Unit
 
@@ -626,7 +626,7 @@ def net.BlockList.removeRange (self : net.BlockList) (start : net.DOMStringOrSoc
 def net.BlockList.removeSubnet (self : net.BlockList) (net_ : net.DOMStringOrSocketAddress) («prefix» : Float) (type : Option String := none) : IO Unit :=
   self.val.callMethod "removeSubnet" (Support.args #[toJS net_, toJS «prefix», Support.optional type]) Unit
 
-/-- `blockList.toJSON()`: `undefined toJSON()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `blockList.toJSON()`: `undefined toJSON()` -/
 def net.BlockList.toJSON (self : net.BlockList) : IO Unit :=
   self.val.callMethod "toJSON" (Support.args #[]) Unit
 
@@ -768,7 +768,7 @@ def net.Socket.new (options : Option net.Socket.NewOptions := none) : IO net.Soc
 /-- `socket.autoSelectFamilyAttemptedAddresses` (added in Node.js v19.4.0, v18.18.0): `readonly attribute sequence<DOMString> autoSelectFamilyAttemptedAddresses` -/
 def net.Socket.autoSelectFamilyAttemptedAddresses (self : net.Socket) : IO (Array String) := self.val.get "autoSelectFamilyAttemptedAddresses" (Array String)
 
-/-- `socket.bufferSize` (added in Node.js v0.3.8): `readonly attribute long long bufferSize` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `socket.bufferSize` (added in Node.js v0.3.8): `readonly attribute long long bufferSize` -/
 def net.Socket.bufferSize (self : net.Socket) : IO Int := self.val.get "bufferSize" Int
 
 /-- `socket.bytesRead` (added in Node.js v0.5.3): `readonly attribute long long bytesRead` -/

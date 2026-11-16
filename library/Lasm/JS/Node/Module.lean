@@ -85,14 +85,14 @@ structure module.SetSourceMapsSupportOptions where
 instance instToJSModuleSetSourceMapsSupportOptions : ToJS module.SetSourceMapsSupportOptions := ⟨fun d => Support.fields #[("nodeModules", Support.optional d.nodeModules),
     ("generatedCode", Support.optional d.generatedCode)]⟩
 
-/-- `sourceMap.payload`: `readonly attribute object payload` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sourceMap.payload`: `readonly attribute object payload` -/
 def module.SourceMap.payload (self : module.SourceMap) : IO Data := self.val.get "payload" Data
 
-/-- `sourceMap.findEntry(lineOffset, columnOffset)`: `object findEntry(double lineOffset, double columnOffset)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sourceMap.findEntry(lineOffset, columnOffset)`: `object findEntry(double lineOffset, double columnOffset)` -/
 def module.SourceMap.findEntry (self : module.SourceMap) (lineOffset : Float) (columnOffset : Float) : IO Data :=
   self.val.callMethod "findEntry" (Support.args #[toJS lineOffset, toJS columnOffset]) Data
 
-/-- `sourceMap.findOrigin(lineNumber, columnNumber)` (added in Node.js v20.4.0, v18.18.0): `object findOrigin(double lineNumber, double columnNumber)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sourceMap.findOrigin(lineNumber, columnNumber)` (added in Node.js v20.4.0, v18.18.0): `object findOrigin(double lineNumber, double columnNumber)` -/
 def module.SourceMap.findOrigin (self : module.SourceMap) (lineNumber : Float) (columnNumber : Float) : IO Data :=
   self.val.callMethod "findOrigin" (Support.args #[toJS lineNumber, toJS columnNumber]) Data
 
@@ -104,7 +104,7 @@ def module.createRequire (filename : DOMStringOrURL) : IO JSFunction :=
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.module.createRequire", module := "node:module", path := "createRequire", construct := false, arity := 1 }
     (Support.args #[toJS filename]) (await := false)
 
-/-- `module.findPackageJSON(specifier[, base])` (added in Node.js v23.2.0, v22.14.0): `DOMString? findPackageJSON((DOMString or URL) specifier, optional (DOMString or URL) base)` (Node.js 24.22.2 documentation, module.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `module.findPackageJSON(specifier[, base])` (added in Node.js v23.2.0, v22.14.0): `DOMString? findPackageJSON((DOMString or URL) specifier, optional (DOMString or URL) base)` (Node.js 24.22.2 documentation, module.md) -/
 def module.findPackageJSON (specifier : DOMStringOrURL) (base : Option DOMStringOrURL := none) : IO (Option String) :=
   Lasm.JS.Binding.invoke (Option String) { name := "Lasm.JS.Node.module.findPackageJSON", module := "node:module", path := "findPackageJSON", construct := false, arity := 2 }
     (Support.args #[toJS specifier, Support.optional base]) (await := false)
@@ -114,17 +114,17 @@ def module.isBuiltin (moduleName : String) : IO Bool :=
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.module.isBuiltin", module := "node:module", path := "isBuiltin", construct := false, arity := 1 }
     (Support.args #[toJS moduleName]) (await := false)
 
-/-- `module.register(specifier[, parentURL][, options])` (added in Node.js v20.6.0, v18.19.0): `undefined register((DOMString or URL) specifier, optional (DOMString or URL) parentURL, optional module.RegisterOptions options)` (Node.js 24.22.2 documentation, module.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `module.register(specifier[, parentURL][, options])` (added in Node.js v20.6.0, v18.19.0): `undefined register((DOMString or URL) specifier, optional (DOMString or URL) parentURL, optional module.RegisterOptions options)` (Node.js 24.22.2 documentation, module.md) -/
 def module.register (specifier : DOMStringOrURL) (parentURL : Option DOMStringOrURL := none) (options : Option module.RegisterOptions := none) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.module.register", module := "node:module", path := "register", construct := false, arity := 3 }
     (Support.args #[toJS specifier, Support.optional parentURL, Support.optional options]) (await := false)
 
-/-- `module.registerHooks(options)` (added in Node.js v23.5.0, v22.15.0): `object registerHooks(module.RegisterHooksOptions options)` (Node.js 24.22.2 documentation, module.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `module.registerHooks(options)` (added in Node.js v23.5.0, v22.15.0): `object registerHooks(module.RegisterHooksOptions options)` (Node.js 24.22.2 documentation, module.md) -/
 def module.registerHooks (options : module.RegisterHooksOptions) : IO Data :=
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.module.registerHooks", module := "node:module", path := "registerHooks", construct := false, arity := 1 }
     (Support.args #[toJS options]) (await := false)
 
-/-- `module.stripTypeScriptTypes(code[, options])` (added in Node.js v23.2.0, v22.13.0): `DOMString stripTypeScriptTypes(DOMString code, optional module.StripTypeScriptTypesOptions options)` (Node.js 24.22.2 documentation, module.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `module.stripTypeScriptTypes(code[, options])` (added in Node.js v23.2.0, v22.13.0): `DOMString stripTypeScriptTypes(DOMString code, optional module.StripTypeScriptTypesOptions options)` (Node.js 24.22.2 documentation, module.md) -/
 def module.stripTypeScriptTypes (code : String) (options : Option module.StripTypeScriptTypesOptions := none) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.module.stripTypeScriptTypes", module := "node:module", path := "stripTypeScriptTypes", construct := false, arity := 2 }
     (Support.args #[toJS code, Support.optional options]) (await := false)
@@ -149,17 +149,17 @@ def module.getCompileCacheDir : IO (Option String) :=
   Lasm.JS.Binding.invoke (Option String) { name := "Lasm.JS.Node.module.getCompileCacheDir", module := "node:module", path := "getCompileCacheDir", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `module.getSourceMapsSupport()` (added in Node.js v23.7.0, v22.14.0): `object getSourceMapsSupport()` (Node.js 24.22.2 documentation, module.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `module.getSourceMapsSupport()` (added in Node.js v23.7.0, v22.14.0): `object getSourceMapsSupport()` (Node.js 24.22.2 documentation, module.md) -/
 def module.getSourceMapsSupport : IO Data :=
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.module.getSourceMapsSupport", module := "node:module", path := "getSourceMapsSupport", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `module.findSourceMap(path)` (added in Node.js v13.7.0, v12.17.0): `module.SourceMap? findSourceMap(DOMString path)` (Node.js 24.22.2 documentation, module.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `module.findSourceMap(path)` (added in Node.js v13.7.0, v12.17.0): `module.SourceMap? findSourceMap(DOMString path)` (Node.js 24.22.2 documentation, module.md) -/
 def module.findSourceMap (path_ : String) : IO (Option module.SourceMap) :=
   Lasm.JS.Binding.invoke (Option module.SourceMap) { name := "Lasm.JS.Node.module.findSourceMap", module := "node:module", path := "findSourceMap", construct := false, arity := 1 }
     (Support.args #[toJS path_]) (await := false)
 
-/-- `module.setSourceMapsSupport(enabled[, options])` (added in Node.js v23.7.0, v22.14.0): `undefined setSourceMapsSupport(boolean enabled, optional module.SetSourceMapsSupportOptions options)` (Node.js 24.22.2 documentation, module.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `module.setSourceMapsSupport(enabled[, options])` (added in Node.js v23.7.0, v22.14.0): `undefined setSourceMapsSupport(boolean enabled, optional module.SetSourceMapsSupportOptions options)` (Node.js 24.22.2 documentation, module.md) -/
 def module.setSourceMapsSupport (enabled : Bool) (options : Option module.SetSourceMapsSupportOptions := none) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.module.setSourceMapsSupport", module := "node:module", path := "setSourceMapsSupport", construct := false, arity := 2 }
     (Support.args #[toJS enabled, Support.optional options]) (await := false)

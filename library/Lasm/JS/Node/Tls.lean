@@ -203,10 +203,10 @@ def tls.TLSSocket.SessionListener.ofSyncFn (f : ByteArray → IO Unit) : IO tls.
 structure tls.TLSSocket.RenegotiateOptions where
   /-- `boolean rejectUnauthorized = true` -/
   rejectUnauthorized : Option Bool := none
-  /-- `undefined requestCert` -/
-  requestCert : Option Unit := none
+  /-- `any requestCert` -/
+  requestCert : Data := .undefined
 instance instToJSTlsTLSSocketRenegotiateOptions : ToJS tls.TLSSocket.RenegotiateOptions := ⟨fun d => Support.fields #[("rejectUnauthorized", Support.optional d.rejectUnauthorized),
-    ("requestCert", Support.optional d.requestCert)]⟩
+    ("requestCert", d.requestCert)]⟩
 
 /-- `(DOMString or boolean)`: one constructor per member type. -/
 inductive DOMStringOrBoolean where
@@ -235,8 +235,8 @@ instance : Coe ByteArray SequenceOfDOMStringOrUint8Array := ⟨.uint8Array⟩
 
 /-- `dictionary tls.ConnectOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure tls.ConnectOptions where
-  /-- `undefined enableTrace` -/
-  enableTrace : Option Unit := none
+  /-- `any enableTrace` -/
+  enableTrace : Data := .undefined
   /-- `DOMString host = "localhost"` -/
   host : Option String := none
   /-- `double port` -/
@@ -265,11 +265,11 @@ structure tls.ConnectOptions where
   highWaterMark : Option Float := none
   /-- `double timeout` -/
   timeout : Option Float := none
-  /-- `undefined secureContext` -/
-  secureContext : Option Unit := none
+  /-- `any secureContext` -/
+  secureContext : Data := .undefined
   /-- `object onread` -/
   onread : Data := .undefined
-instance instToJSTlsConnectOptions : ToJS tls.ConnectOptions := ⟨fun d => Support.fields #[("enableTrace", Support.optional d.enableTrace),
+instance instToJSTlsConnectOptions : ToJS tls.ConnectOptions := ⟨fun d => Support.fields #[("enableTrace", d.enableTrace),
     ("host", Support.optional d.host),
     ("port", Support.optional d.port),
     ("path", Support.optional d.path),
@@ -284,7 +284,7 @@ instance instToJSTlsConnectOptions : ToJS tls.ConnectOptions := ⟨fun d => Supp
     ("minDHSize", Support.optional d.minDHSize),
     ("highWaterMark", Support.optional d.highWaterMark),
     ("timeout", Support.optional d.timeout),
-    ("secureContext", Support.optional d.secureContext),
+    ("secureContext", d.secureContext),
     ("onread", d.onread)]⟩
 
 /-- `(DOMString or sequence<DOMString> or Uint8Array or sequence<Uint8Array>)`: one constructor per member type. -/

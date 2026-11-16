@@ -663,9 +663,14 @@ const memberIdl = (m, owner) => {
   }
 };
 /** A Lasm.JS.Node member's documented signature (LasmSignature), quoted before its WebIDL. */
+const nodeVersionOf = m => extValue(extAttr(m, 'LasmSince')) ?? nodeTier.version;
 const nodeSignature = m => {
   const sig = extValue(extAttr(m, 'LasmSignature')), added = extValue(extAttr(m, 'LasmAdded'));
-  return sig ? `\`${sig}\`${added ? ` (added in Node.js ${added})` : ''}: ` : '';
+  // Node's stability index: 0 Deprecated, 1 Experimental, 3 Legacy (docs/JS_BINDINGS.md, "Stability").
+  const stability = extValue(extAttr(m, 'LasmStability'));
+  const mark = stability === undefined ? '' : `**${{ 0: 'Deprecated', 1: 'Experimental', 3: 'Legacy' }[stability[0]] ?? 'Stability ' + stability}** in the Node.js ${nodeVersionOf(m)} docs. `;
+  const since = extValue(extAttr(m, 'LasmSince'));
+  return sig ? `${since ? `**Node.js ${since.split('.')[0]} and later** (documented from Node.js ${since}, not in ${nodeTier.version}). ` : ''}${mark}\`${sig}\`${added ? ` (added in Node.js ${added})` : ''}: ` : '';
 };
 const specOf = spec => spec === 'synthetic' ? 'written for Lasm (docs/JS_BINDINGS.md)' : specTitles[spec];
 

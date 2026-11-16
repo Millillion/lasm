@@ -87,8 +87,11 @@ def Buffer.byteOffset (self : Buffer) : IO Int := self.val.get "byteOffset" Int
 /-- `buf.length` (added in Node.js v0.1.90): `readonly attribute long long length` -/
 def Buffer.length (self : Buffer) : IO Int := self.val.get "length" Int
 
-/-- `buf.parent`: `readonly attribute any parent` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `buf.parent`: `readonly attribute any parent` -/
 def Buffer.parent (self : Buffer) : IO Data := self.val.get "parent" Data
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `buf.index`: `readonly attribute long long index` -/
+def Buffer.index (self : Buffer) : IO Int := self.val.get "index" Int
 
 /-- `buf.compare(target[, targetStart[, targetEnd[, sourceStart[, sourceEnd]]]])` (added in Node.js v0.11.13): `long long compare(Uint8Array target, optional long long targetStart, optional long long targetEnd, optional long long sourceStart, optional long long sourceEnd)` -/
 def Buffer.compare (self : ByteArray) (target : ByteArray) (targetStart : Option Int := none) (targetEnd : Option Int := none) (sourceStart : Option Int := none) (sourceEnd : Option Int := none) : IO Int :=
@@ -218,7 +221,7 @@ def Buffer.readUIntLE (self : ByteArray) (offset : Int) (byteLength : Int) : IO 
 def Buffer.subarray (self : ByteArray) (start : Option Int := none) («end» : Option Int := none) : IO ByteArray :=
   Support.callOnBytes "node:buffer" "Buffer.prototype.subarray" self (Support.args #[Support.optional start, Support.optional «end»]) ByteArray
 
-/-- `buf.slice([start[, end]])` (added in Node.js v0.3.0): `Uint8Array slice(optional long long start, optional long long end)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `buf.slice([start[, end]])` (added in Node.js v0.3.0): `Uint8Array slice(optional long long start, optional long long end)` -/
 def Buffer.slice (self : ByteArray) (start : Option Int := none) («end» : Option Int := none) : IO ByteArray :=
   Support.callOnBytes "node:buffer" "Buffer.prototype.slice" self (Support.args #[Support.optional start, Support.optional «end»]) ByteArray
 
@@ -348,10 +351,20 @@ def Buffer.allocUnsafe (size : Int) : IO ByteArray :=
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.allocUnsafe", module := "node:buffer", path := "Buffer.allocUnsafe", construct := false, arity := 1 }
     (Support.args #[toJS size]) (await := false)
 
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `Buffer.allocUnsafe(size[, alignment])` (added in Node.js v5.10.0): `static Uint8Array allocUnsafe(long long size, optional long long alignment)` -/
+def Buffer.allocUnsafeWithAlignment (size : Int) (alignment : Option Int := none) : IO ByteArray :=
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.allocUnsafeWithAlignment", module := "node:buffer", path := "Buffer.allocUnsafe", construct := false, arity := 2 }
+    (Support.args #[toJS size, Support.optional alignment]) (await := false)
+
 /-- `Buffer.allocUnsafeSlow(size)` (added in Node.js v5.12.0): `static Uint8Array allocUnsafeSlow(long long size)` -/
 def Buffer.allocUnsafeSlow (size : Int) : IO ByteArray :=
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.allocUnsafeSlow", module := "node:buffer", path := "Buffer.allocUnsafeSlow", construct := false, arity := 1 }
     (Support.args #[toJS size]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `Buffer.allocUnsafeSlow(size[, alignment])` (added in Node.js v5.12.0): `static Uint8Array allocUnsafeSlow(long long size, optional long long alignment)` -/
+def Buffer.allocUnsafeSlowWithAlignment (size : Int) (alignment : Option Int := none) : IO ByteArray :=
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.allocUnsafeSlowWithAlignment", module := "node:buffer", path := "Buffer.allocUnsafeSlow", construct := false, arity := 2 }
+    (Support.args #[toJS size, Support.optional alignment]) (await := false)
 
 /-- `Buffer.byteLength(string[, encoding])` (added in Node.js v0.1.90): `static long long byteLength((DOMString or Uint8Array) string, optional DOMString encoding)` -/
 def Buffer.byteLength (string : DOMStringOrUint8Array) (encoding : Option String := none) : IO Int :=
@@ -408,6 +421,11 @@ def Buffer.isEncoding (encoding : String) : IO Bool :=
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.Buffer.isEncoding", module := "node:buffer", path := "Buffer.isEncoding", construct := false, arity := 1 }
     (Support.args #[toJS encoding]) (await := false)
 
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `Buffer.stringLength(input[, encoding])` (added in Node.js v26.11.0): `static long long stringLength(Uint8Array input, optional DOMString encoding)` -/
+def Buffer.stringLength (input : ByteArray) (encoding : Option String := none) : IO Int :=
+  Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.Buffer.stringLength", module := "node:buffer", path := "Buffer.stringLength", construct := false, arity := 2 }
+    (Support.args #[toJS input, Support.optional encoding]) (await := false)
+
 /-- `buffer.INSPECT_MAX_BYTES` (added in Node.js v0.5.4): `readonly attribute long long INSPECT_MAX_BYTES` (Node.js 24.22.2 documentation, buffer.md) -/
 def buffer.INSPECT_MAX_BYTES : IO Int := Support.getExport "node:buffer" ["INSPECT_MAX_BYTES"] Int
 
@@ -417,12 +435,12 @@ def buffer.kMaxLength : IO Int := Support.getExport "node:buffer" ["kMaxLength"]
 /-- `buffer.kStringMaxLength` (added in Node.js v3.0.0): `readonly attribute long long kStringMaxLength` (Node.js 24.22.2 documentation, buffer.md) -/
 def buffer.kStringMaxLength : IO Int := Support.getExport "node:buffer" ["kStringMaxLength"] Int
 
-/-- `buffer.atob(data)` (added in Node.js v15.13.0, v14.17.0): `DOMString atob(any data)` (Node.js 24.22.2 documentation, buffer.md) -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `buffer.atob(data)` (added in Node.js v15.13.0, v14.17.0): `DOMString atob(any data)` (Node.js 24.22.2 documentation, buffer.md) -/
 def buffer.atob (data : Data) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.buffer.atob", module := "node:buffer", path := "atob", construct := false, arity := 1 }
     (Support.args #[toJS data]) (await := false)
 
-/-- `buffer.btoa(data)` (added in Node.js v15.13.0, v14.17.0): `DOMString btoa(any data)` (Node.js 24.22.2 documentation, buffer.md) -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `buffer.btoa(data)` (added in Node.js v15.13.0, v14.17.0): `DOMString btoa(any data)` (Node.js 24.22.2 documentation, buffer.md) -/
 def buffer.btoa (data : Data) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.buffer.btoa", module := "node:buffer", path := "btoa", construct := false, arity := 1 }
     (Support.args #[toJS data]) (await := false)
@@ -447,5 +465,10 @@ def buffer.resolveObjectURL (id : String) : IO Blob := do
 def buffer.transcode (source : ByteArray) (fromEnc : String) (toEnc : String) : IO ByteArray :=
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.buffer.transcode", module := "node:buffer", path := "transcode", construct := false, arity := 3 }
     (Support.args #[toJS source, toJS fromEnc, toJS toEnc]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `buffer.isLatin1(input)` (added in Node.js v26.11.0): `boolean isLatin1(DOMString input)` (Node.js 24.22.2 documentation, buffer.md) -/
+def buffer.isLatin1 (input : String) : IO Bool :=
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.buffer.isLatin1", module := "node:buffer", path := "isLatin1", construct := false, arity := 1 }
+    (Support.args #[toJS input]) (await := false)
 
 end Lasm.JS.Node

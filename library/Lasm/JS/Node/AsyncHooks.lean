@@ -63,18 +63,18 @@ def AsyncResource.bind (fn : JSFunction) (type : Option String := none) (thisArg
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.AsyncResource.bind", module := "node:async_hooks", path := "AsyncResource.bind", construct := false, arity := 3 }
     (Support.args #[toJS fn, Support.optional type, thisArg]) (await := false)
 
-/-- `async_hooks.asyncWrapProviders` (added in Node.js v17.2.0, v16.14.0): `readonly attribute any asyncWrapProviders` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.asyncWrapProviders` (added in Node.js v17.2.0, v16.14.0): `readonly attribute any asyncWrapProviders` -/
 def AsyncHook.asyncWrapProviders (self : AsyncHook) : IO Data := self.val.get "asyncWrapProviders" Data
 
-/-- `async_hooks.executionAsyncResource()` (added in Node.js v13.9.0, v12.17.0): `object executionAsyncResource()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.executionAsyncResource()` (added in Node.js v13.9.0, v12.17.0): `object executionAsyncResource()` -/
 def AsyncHook.executionAsyncResource (self : AsyncHook) : IO Data :=
   self.val.callMethod "executionAsyncResource" (Support.args #[]) Data
 
-/-- `async_hooks.executionAsyncId()` (added in Node.js v8.1.0): `double executionAsyncId()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.executionAsyncId()` (added in Node.js v8.1.0): `double executionAsyncId()` -/
 def AsyncHook.executionAsyncId (self : AsyncHook) : IO Float :=
   self.val.callMethod "executionAsyncId" (Support.args #[]) Float
 
-/-- `async_hooks.triggerAsyncId()`: `double triggerAsyncId()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.triggerAsyncId()`: `double triggerAsyncId()` -/
 def AsyncHook.triggerAsyncId (self : AsyncHook) : IO Float :=
   self.val.callMethod "triggerAsyncId" (Support.args #[]) Float
 
@@ -91,7 +91,7 @@ def AsyncLocalStorage.snapshot : IO JSFunction :=
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.AsyncLocalStorage.snapshot", module := "node:async_hooks", path := "AsyncLocalStorage.snapshot", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `async_hooks.createHook(options)` (added in Node.js v8.1.0): `AsyncHook createHook(async_hooks.CreateHookOptions options)` (Node.js 24.22.2 documentation, async_hooks.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.createHook(options)` (added in Node.js v8.1.0): `AsyncHook createHook(async_hooks.CreateHookOptions options)` (Node.js 24.22.2 documentation, async_hooks.md) -/
 def async_hooks.createHook (options : async_hooks.CreateHookOptions) : IO AsyncHook := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.async_hooks.createHook", module := "node:async_hooks", path := "createHook", construct := false, arity := 1 }
     (Support.args #[toJS options]) (await := false)

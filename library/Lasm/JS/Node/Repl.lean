@@ -169,7 +169,7 @@ def REPLServer.setupHistory (self : REPLServer) (historyConfig : REPLServer.Setu
   let r ← Support.promisifiedMethod Value self.val "setupHistory" (Support.args #[toJS historyConfig])
   pure { val := r }
 
-/-- `repl.builtinModules` (added in Node.js v14.5.0): `readonly attribute sequence<DOMString> builtinModules` (Node.js 24.22.2 documentation, repl.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `repl.builtinModules` (added in Node.js v14.5.0): `readonly attribute sequence<DOMString> builtinModules` (Node.js 24.22.2 documentation, repl.md) -/
 def repl.builtinModules : IO (Array String) := Support.getExport "node:repl" ["builtinModules"] (Array String)
 
 /-- `repl.start([options])` (added in Node.js v0.1.91): `REPLServer start(optional (repl.StartOptions or DOMString) options)` (Node.js 24.22.2 documentation, repl.md) -/

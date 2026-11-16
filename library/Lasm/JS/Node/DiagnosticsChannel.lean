@@ -31,6 +31,30 @@ instance : Nonempty TracingChannel := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS TracingChannel := ⟨fun x => .ref x.val ""⟩
 instance : FromJS TracingChannel := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.TracingChannel", .data⟩
 
+/-- `class RunStoresScope` of `node:diagnostics_channel` (Node.js 24.22.2 documentation, diagnostics_channel.md): a handle to the JavaScript object. -/
+structure RunStoresScope where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty RunStoresScope := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS RunStoresScope := ⟨fun x => .ref x.val ""⟩
+instance : FromJS RunStoresScope := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.RunStoresScope", .data⟩
+
+/-- `class BoundedChannel` of `node:diagnostics_channel` (Node.js 24.22.2 documentation, diagnostics_channel.md): a handle to the JavaScript object. -/
+structure BoundedChannel where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty BoundedChannel := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS BoundedChannel := ⟨fun x => .ref x.val ""⟩
+instance : FromJS BoundedChannel := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.BoundedChannel", .data⟩
+
+/-- `class BoundedChannelScope` of `node:diagnostics_channel` (Node.js 24.22.2 documentation, diagnostics_channel.md): a handle to the JavaScript object. -/
+structure BoundedChannelScope where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty BoundedChannelScope := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS BoundedChannelScope := ⟨fun x => .ref x.val ""⟩
+instance : FromJS BoundedChannelScope := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.BoundedChannelScope", .data⟩
+
 /-- `dictionary TracingChannel.SubscribeSubscribers` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TracingChannel.SubscribeSubscribers where
   /-- `Function start` -/
@@ -67,6 +91,24 @@ instance instToJSTracingChannelUnsubscribeSubscribers : ToJS TracingChannel.Unsu
     ("asyncEnd", Support.optional d.asyncEnd),
     ("error", Support.optional d.error)]⟩
 
+/-- `dictionary BoundedChannel.SubscribeHandlers` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BoundedChannel.SubscribeHandlers where
+  /-- `Function start` -/
+  start : Option JSFunction := none
+  /-- `Function end` -/
+  «end» : Option JSFunction := none
+instance instToJSBoundedChannelSubscribeHandlers : ToJS BoundedChannel.SubscribeHandlers := ⟨fun d => Support.fields #[("start", Support.optional d.start),
+    ("end", Support.optional d.«end»)]⟩
+
+/-- `dictionary BoundedChannel.UnsubscribeHandlers` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure BoundedChannel.UnsubscribeHandlers where
+  /-- `Function start` -/
+  start : Option JSFunction := none
+  /-- `Function end` -/
+  «end» : Option JSFunction := none
+instance instToJSBoundedChannelUnsubscribeHandlers : ToJS BoundedChannel.UnsubscribeHandlers := ⟨fun d => Support.fields #[("start", Support.optional d.start),
+    ("end", Support.optional d.«end»)]⟩
+
 /-- `(DOMString or TracingChannel)`: one constructor per member type. -/
 inductive DOMStringOrTracingChannel where
   /-- `DOMString` -/
@@ -78,6 +120,18 @@ instance : ToJS DOMStringOrTracingChannel := ⟨fun
   | .tracingChannel v => toJS v⟩
 instance : Coe String DOMStringOrTracingChannel := ⟨.domString⟩
 instance : Coe TracingChannel DOMStringOrTracingChannel := ⟨.tracingChannel⟩
+
+/-- `(DOMString or BoundedChannel)`: one constructor per member type. -/
+inductive DOMStringOrBoundedChannel where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `BoundedChannel` -/
+  | boundedChannel (value : BoundedChannel)
+instance : ToJS DOMStringOrBoundedChannel := ⟨fun
+  | .domString v => toJS v
+  | .boundedChannel v => toJS v⟩
+instance : Coe String DOMStringOrBoundedChannel := ⟨.domString⟩
+instance : Coe BoundedChannel DOMStringOrBoundedChannel := ⟨.boundedChannel⟩
 
 /-- `channel.hasSubscribers` (added in Node.js v15.1.0, v14.17.0): `readonly attribute boolean hasSubscribers` -/
 def Channel.hasSubscribers (self : Channel) : IO Bool := self.val.get "hasSubscribers" Bool
@@ -94,40 +148,62 @@ def Channel.subscribe (self : Channel) (onMessage : JSFunction) : IO Unit :=
 def Channel.unsubscribe (self : Channel) (onMessage : JSFunction) : IO Bool :=
   self.val.callMethod "unsubscribe" (Support.args #[toJS onMessage]) Bool
 
-/-- `channel.bindStore(store[, transform])` (added in Node.js v19.9.0, v18.19.0): `undefined bindStore(AsyncLocalStorage store, optional Function transform)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `channel.bindStore(store[, transform])` (added in Node.js v19.9.0, v18.19.0): `undefined bindStore(AsyncLocalStorage store, optional Function transform)` -/
 def Channel.bindStore (self : Channel) (store : AsyncLocalStorage) (transform : Option JSFunction := none) : IO Unit :=
   self.val.callMethod "bindStore" (Support.args #[toJS store, Support.optional transform]) Unit
 
-/-- `channel.unbindStore(store)` (added in Node.js v19.9.0, v18.19.0): `boolean unbindStore(AsyncLocalStorage store)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `channel.unbindStore(store)` (added in Node.js v19.9.0, v18.19.0): `boolean unbindStore(AsyncLocalStorage store)` -/
 def Channel.unbindStore (self : Channel) (store : AsyncLocalStorage) : IO Bool :=
   self.val.callMethod "unbindStore" (Support.args #[toJS store]) Bool
 
-/-- `channel.runStores(context, fn[, thisArg[, ...args]])` (added in Node.js v19.9.0, v18.19.0): `undefined runStores(any context, Function fn, optional any thisArg, any... args)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `channel.runStores(context, fn[, thisArg[, ...args]])` (added in Node.js v19.9.0, v18.19.0): `undefined runStores(any context, Function fn, optional any thisArg, any... args)` -/
 def Channel.runStores (self : Channel) (context : Data) (fn : JSFunction) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Unit :=
   self.val.callMethod "runStores" (Support.argsWith #[toJS context, toJS fn, thisArg] (args.map toJS)) Unit
 
-/-- `tracingChannel.hasSubscribers` (added in Node.js v22.0.0, v20.13.0): `readonly attribute boolean hasSubscribers` -/
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `channel.withStoreScope(data)` (added in Node.js v26.1.0): `RunStoresScope withStoreScope(any data)` -/
+def Channel.withStoreScope (self : Channel) (data : Data) : IO RunStoresScope := do
+  let r ← self.val.callMethod "withStoreScope" (Support.args #[toJS data]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.hasSubscribers` (added in Node.js v22.0.0, v20.13.0): `readonly attribute boolean hasSubscribers` -/
 def TracingChannel.hasSubscribers (self : TracingChannel) : IO Bool := self.val.get "hasSubscribers" Bool
 
-/-- `tracingChannel.subscribe(subscribers)` (added in Node.js v19.9.0, v18.19.0): `undefined subscribe(TracingChannel.SubscribeSubscribers subscribers)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.subscribe(subscribers)` (added in Node.js v19.9.0, v18.19.0): `undefined subscribe(TracingChannel.SubscribeSubscribers subscribers)` -/
 def TracingChannel.subscribe (self : TracingChannel) (subscribers : TracingChannel.SubscribeSubscribers) : IO Unit :=
   self.val.callMethod "subscribe" (Support.args #[toJS subscribers]) Unit
 
-/-- `tracingChannel.unsubscribe(subscribers)` (added in Node.js v19.9.0, v18.19.0): `boolean unsubscribe(TracingChannel.UnsubscribeSubscribers subscribers)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.unsubscribe(subscribers)` (added in Node.js v19.9.0, v18.19.0): `boolean unsubscribe(TracingChannel.UnsubscribeSubscribers subscribers)` -/
 def TracingChannel.unsubscribe (self : TracingChannel) (subscribers : TracingChannel.UnsubscribeSubscribers) : IO Bool :=
   self.val.callMethod "unsubscribe" (Support.args #[toJS subscribers]) Bool
 
-/-- `tracingChannel.traceSync(fn[, context[, thisArg[, ...args]]])` (added in Node.js v19.9.0, v18.19.0): `any traceSync(Function fn, optional object context, optional any thisArg, any... args)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.traceSync(fn[, context[, thisArg[, ...args]]])` (added in Node.js v19.9.0, v18.19.0): `any traceSync(Function fn, optional object context, optional any thisArg, any... args)` -/
 def TracingChannel.traceSync (self : TracingChannel) (fn : JSFunction) (context : Data := .undefined) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Data :=
   self.val.callMethod "traceSync" (Support.argsWith #[toJS fn, context, thisArg] (args.map toJS)) Data
 
-/-- `tracingChannel.tracePromise(fn[, context[, thisArg[, ...args]]])` (added in Node.js v19.9.0, v18.19.0): `Promise<any> tracePromise(Function fn, optional object context, optional any thisArg, any... args)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.tracePromise(fn[, context[, thisArg[, ...args]]])` (added in Node.js v19.9.0, v18.19.0): `Promise<any> tracePromise(Function fn, optional object context, optional any thisArg, any... args)` -/
 def TracingChannel.tracePromise (self : TracingChannel) (fn : JSFunction) (context : Data := .undefined) (thisArg : Data := .undefined) (args : Array Data := #[]) : Async Data :=
   self.val.callMethodAwait "tracePromise" (Support.argsWith #[toJS fn, context, thisArg] (args.map toJS)) Data
 
-/-- `tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])` (added in Node.js v19.9.0, v18.19.0): `any traceCallback(Function fn, optional double position, optional object context, optional any thisArg, any... args)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])` (added in Node.js v19.9.0, v18.19.0): `any traceCallback(Function fn, optional double position, optional object context, optional any thisArg, any... args)` -/
 def TracingChannel.traceCallback (self : TracingChannel) (fn : JSFunction) (position : Option Float := none) (context : Data := .undefined) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Data :=
   self.val.callMethod "traceCallback" (Support.argsWith #[toJS fn, Support.optional position, context, thisArg] (args.map toJS)) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `boundedChannel.subscribe(handlers)` (added in Node.js v26.1.0): `undefined subscribe(BoundedChannel.SubscribeHandlers handlers)` -/
+def BoundedChannel.subscribe (self : BoundedChannel) (handlers : BoundedChannel.SubscribeHandlers) : IO Unit :=
+  self.val.callMethod "subscribe" (Support.args #[toJS handlers]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `boundedChannel.unsubscribe(handlers)` (added in Node.js v26.1.0): `boolean unsubscribe(BoundedChannel.UnsubscribeHandlers handlers)` -/
+def BoundedChannel.unsubscribe (self : BoundedChannel) (handlers : BoundedChannel.UnsubscribeHandlers) : IO Bool :=
+  self.val.callMethod "unsubscribe" (Support.args #[toJS handlers]) Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `boundedChannel.run(context, fn[, thisArg[, ...args]])` (added in Node.js v26.1.0): `any run(object context, Function fn, optional any thisArg, any... args)` -/
+def BoundedChannel.run (self : BoundedChannel) (context : Data) (fn : JSFunction) (thisArg : Data := .undefined) (args : Array Data := #[]) : IO Data :=
+  self.val.callMethod "run" (Support.argsWith #[toJS context, toJS fn, thisArg] (args.map toJS)) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `boundedChannel.withScope([context])` (added in Node.js v26.1.0): `BoundedChannelScope withScope(optional object context)` -/
+def BoundedChannel.withScope (self : BoundedChannel) (context : Data := .undefined) : IO BoundedChannelScope := do
+  let r ← self.val.callMethod "withScope" (Support.args #[context]) Value
+  pure { val := r }
 
 /-- `diagnostics_channel.hasSubscribers(name)` (added in Node.js v15.1.0, v14.17.0): `boolean hasSubscribers((DOMString or symbol) name)` (Node.js 24.22.2 documentation, diagnostics_channel.md) -/
 def diagnostics_channel.hasSubscribers (name : DOMStringOrSymbol) : IO Bool :=
@@ -150,9 +226,15 @@ def diagnostics_channel.unsubscribe (name : DOMStringOrSymbol) (onMessage : JSFu
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.diagnostics_channel.unsubscribe", module := "node:diagnostics_channel", path := "unsubscribe", construct := false, arity := 2 }
     (Support.args #[toJS name, toJS onMessage]) (await := false)
 
-/-- `diagnostics_channel.tracingChannel(nameOrChannels)` (added in Node.js v19.9.0, v18.19.0): `TracingChannel tracingChannel((DOMString or TracingChannel) nameOrChannels)` (Node.js 24.22.2 documentation, diagnostics_channel.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `diagnostics_channel.tracingChannel(nameOrChannels)` (added in Node.js v19.9.0, v18.19.0): `TracingChannel tracingChannel((DOMString or TracingChannel) nameOrChannels)` (Node.js 24.22.2 documentation, diagnostics_channel.md) -/
 def diagnostics_channel.tracingChannel (nameOrChannels : DOMStringOrTracingChannel) : IO TracingChannel := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.diagnostics_channel.tracingChannel", module := "node:diagnostics_channel", path := "tracingChannel", construct := false, arity := 1 }
+    (Support.args #[toJS nameOrChannels]) (await := false)
+  pure { val := r }
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `diagnostics_channel.boundedChannel(nameOrChannels)` (added in Node.js v26.1.0): `BoundedChannel boundedChannel((DOMString or BoundedChannel) nameOrChannels)` (Node.js 24.22.2 documentation, diagnostics_channel.md) -/
+def diagnostics_channel.boundedChannel (nameOrChannels : DOMStringOrBoundedChannel) : IO BoundedChannel := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.diagnostics_channel.boundedChannel", module := "node:diagnostics_channel", path := "boundedChannel", construct := false, arity := 1 }
     (Support.args #[toJS nameOrChannels]) (await := false)
   pure { val := r }
 

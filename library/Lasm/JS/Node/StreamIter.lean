@@ -105,86 +105,94 @@ instance : ToJS ObjectOrBroadcastChannel := ⟨fun
   | .object v => toJS v
   | .broadcastChannel v => toJS v⟩
 
-/-- `share.consumerCount`: `readonly attribute double consumerCount` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `share.consumerCount`: `readonly attribute double consumerCount` -/
 def Share.consumerCount (self : Share) : IO Float := self.val.get "consumerCount" Float
 
-/-- `share.cancel([reason])`: `undefined cancel(optional any reason)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `share.cancel([reason])`: `undefined cancel(optional any reason)` -/
 def Share.cancel (self : Share) (reason : Data := .undefined) : IO Unit :=
   self.val.callMethod "cancel" (Support.args #[reason]) Unit
 
-/-- `share.pull([...transforms][, options])`: `object pull((Function or object)... transforms, optional Share.PullOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `share.pull([...transforms][, options])`: `object pull((Function or object)... transforms, optional Share.PullOptions options)` -/
 def Share.pull (self : Share) (transforms : Array JSFunctionOrObject := #[]) (options : Option Share.PullOptions := none) : IO Data :=
   self.val.callMethod "pull" (Support.argsWith #[Support.optional options] (transforms.map toJS)) Data
 
-/-- `Share.from(input[, options])` (added in Node.js v25.9.0): `static Share from(any input, optional object options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Share.from(input[, options])` (added in Node.js v25.9.0): `static Share from(any input, optional object options)` -/
 def Share.«from» (input : Data) (options : Data := .undefined) : IO Share := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.Share.from", module := "node:stream/iter", path := "Share.from", construct := false, arity := 2 }
     (Support.args #[toJS input, options]) (await := false)
   pure { val := r }
 
-/-- `share.bufferSize`: `readonly attribute double bufferSize` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `share.bufferSize`: `readonly attribute double bufferSize` -/
 def SyncShare.bufferSize (self : SyncShare) : IO Float := self.val.get "bufferSize" Float
 
-/-- `share.consumerCount`: `readonly attribute double consumerCount` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `share.consumerCount`: `readonly attribute double consumerCount` -/
 def SyncShare.consumerCount (self : SyncShare) : IO Float := self.val.get "consumerCount" Float
 
-/-- `share.cancel([reason])`: `undefined cancel(optional any reason)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `share.cancel([reason])`: `undefined cancel(optional any reason)` -/
 def SyncShare.cancel (self : SyncShare) (reason : Data := .undefined) : IO Unit :=
   self.val.callMethod "cancel" (Support.args #[reason]) Unit
 
-/-- `share.pull([...transforms][, options])`: `object pull((Function or object)... transforms, optional SyncShare.PullOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `share.pull([...transforms][, options])`: `object pull((Function or object)... transforms, optional SyncShare.PullOptions options)` -/
 def SyncShare.pull (self : SyncShare) (transforms : Array JSFunctionOrObject := #[]) (options : Option SyncShare.PullOptions := none) : IO Data :=
   self.val.callMethod "pull" (Support.argsWith #[Support.optional options] (transforms.map toJS)) Data
 
-/-- `SyncShare.fromSync(input[, options])` (added in Node.js v24.20.0): `static SyncShare fromSync(any input, optional object options)` -/
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `share.pull([...transforms])`: `sequence<Uint8Array> pull((Function or object)... transforms)` -/
+def SyncShare.pull1 (self : SyncShare) (transforms : Array JSFunctionOrObject := #[]) : IO (Array ByteArray) :=
+  self.val.callMethod "pull" (Support.argsWith #[] (transforms.map toJS)) (Array ByteArray)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `SyncShare.fromSync(input[, options])` (added in Node.js v24.20.0): `static SyncShare fromSync(any input, optional object options)` -/
 def SyncShare.fromSync (input : Data) (options : Data := .undefined) : IO SyncShare := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.SyncShare.fromSync", module := "node:stream/iter", path := "SyncShare.fromSync", construct := false, arity := 2 }
     (Support.args #[toJS input, options]) (await := false)
   pure { val := r }
 
-/-- `writer.canWrite`: `readonly attribute boolean? canWrite` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `writer.canWrite`: `readonly attribute boolean? canWrite` -/
 def Writer.canWrite (self : Writer) : IO (Option Bool) := self.val.get "canWrite" (Option Bool)
 
-/-- `writer.end([options])`: `Promise<any> end(optional Writer.EndOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `writer.end([options])`: `Promise<any> end(optional Writer.EndOptions options)` -/
 def Writer.«end» (self : Writer) (options : Option Writer.EndOptions := none) : Async Data :=
   self.val.callMethodAwait "end" (Support.args #[Support.optional options]) Data
 
-/-- `writer.endSync()`: `double endSync()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `writer.endSync()`: `double endSync()` -/
 def Writer.endSync (self : Writer) : IO Float :=
   self.val.callMethod "endSync" (Support.args #[]) Float
 
-/-- `writer.fail(reason)`: `undefined fail(any reason)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `writer.fail(reason)`: `undefined fail(any reason)` -/
 def Writer.fail (self : Writer) (reason : Data) : IO Unit :=
   self.val.callMethod "fail" (Support.args #[toJS reason]) Unit
 
-/-- `writer.write(chunk[, options])`: `Promise<any> write((Uint8Array or DOMString) chunk, optional Writer.WriteOptions options)` -/
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `writer.fail([reason])`: `undefined fail(optional any reason)` -/
+def Writer.fail1 (self : Writer) (reason : Data := .undefined) : IO Unit :=
+  self.val.callMethod "fail" (Support.args #[reason]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `writer.write(chunk[, options])`: `Promise<any> write((Uint8Array or DOMString) chunk, optional Writer.WriteOptions options)` -/
 def Writer.write (self : Writer) (chunk : Uint8ArrayOrDOMString) (options : Option Writer.WriteOptions := none) : Async Data :=
   self.val.callMethodAwait "write" (Support.args #[toJS chunk, Support.optional options]) Data
 
-/-- `writer.writeSync(chunk)`: `boolean writeSync((Uint8Array or DOMString) chunk)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `writer.writeSync(chunk)`: `boolean writeSync((Uint8Array or DOMString) chunk)` -/
 def Writer.writeSync (self : Writer) (chunk : Uint8ArrayOrDOMString) : IO Bool :=
   self.val.callMethod "writeSync" (Support.args #[toJS chunk]) Bool
 
-/-- `writer.writev(chunks[, options])`: `Promise<any> writev((sequence<Uint8Array> or sequence<DOMString>) chunks, optional Writer.WritevOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `writer.writev(chunks[, options])`: `Promise<any> writev((sequence<Uint8Array> or sequence<DOMString>) chunks, optional Writer.WritevOptions options)` -/
 def Writer.writev (self : Writer) (chunks : SequenceOfUint8ArrayOrSequenceOfDOMString) (options : Option Writer.WritevOptions := none) : Async Data :=
   self.val.callMethodAwait "writev" (Support.args #[toJS chunks, Support.optional options]) Data
 
-/-- `writer.writevSync(chunks)`: `boolean writevSync((sequence<Uint8Array> or sequence<DOMString>) chunks)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `writer.writevSync(chunks)`: `boolean writevSync((sequence<Uint8Array> or sequence<DOMString>) chunks)` -/
 def Writer.writevSync (self : Writer) (chunks : SequenceOfUint8ArrayOrSequenceOfDOMString) : IO Bool :=
   self.val.callMethod "writevSync" (Support.args #[toJS chunks]) Bool
 
-/-- `broadcast.consumerCount`: `readonly attribute double consumerCount` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `broadcast.consumerCount`: `readonly attribute double consumerCount` -/
 def Broadcast.consumerCount (self : Broadcast) : IO Float := self.val.get "consumerCount" Float
 
-/-- `broadcast.cancel([reason])`: `undefined cancel(optional any reason)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `broadcast.cancel([reason])`: `undefined cancel(optional any reason)` -/
 def Broadcast.cancel (self : Broadcast) (reason : Data := .undefined) : IO Unit :=
   self.val.callMethod "cancel" (Support.args #[reason]) Unit
 
-/-- `broadcast.push([...transforms][, options])`: `object push((Function or object)... transforms, optional Broadcast.PushOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `broadcast.push([...transforms][, options])`: `object push((Function or object)... transforms, optional Broadcast.PushOptions options)` -/
 def Broadcast.push (self : Broadcast) (transforms : Array JSFunctionOrObject := #[]) (options : Option Broadcast.PushOptions := none) : IO Data :=
   self.val.callMethod "push" (Support.argsWith #[Support.optional options] (transforms.map toJS)) Data
 
-/-- `Broadcast.from(input[, options])` (added in Node.js v24.20.0): `static object from((object or BroadcastChannel) input, optional object options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Broadcast.from(input[, options])` (added in Node.js v24.20.0): `static object from((object or BroadcastChannel) input, optional object options)` -/
 def Broadcast.«from» (input : ObjectOrBroadcastChannel) (options : Data := .undefined) : IO Data :=
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.Broadcast.from", module := "node:stream/iter", path := "Broadcast.from", construct := false, arity := 2 }
     (Support.args #[toJS input, options]) (await := false)

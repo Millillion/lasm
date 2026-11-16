@@ -38,23 +38,23 @@ instance instNonemptyAssertCallTracker : Nonempty assert.CallTracker := ⟨{ val
 instance instToJSAssertCallTracker : ToJS assert.CallTracker := ⟨fun x => .ref x.val ""⟩
 instance instFromJSAssertCallTracker : FromJS assert.CallTracker := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.assert.CallTracker", .data⟩
 
-/-- `tracker.calls([fn][, exact])` (added in Node.js v14.2.0, v12.19.0): `Function calls(optional Function fn, optional double exact)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `tracker.calls([fn][, exact])` (added in Node.js v14.2.0, v12.19.0): `Function calls(optional Function fn, optional double exact)` -/
 def assert.CallTracker.calls (self : assert.CallTracker) (fn : Option JSFunction := none) (exact : Option Float := none) : IO JSFunction :=
   self.val.callMethod "calls" (Support.args #[Support.optional fn, Support.optional exact]) JSFunction
 
-/-- `tracker.getCalls(fn)` (added in Node.js v18.8.0, v16.18.0): `sequence<any> getCalls(Function fn)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `tracker.getCalls(fn)` (added in Node.js v18.8.0, v16.18.0): `sequence<any> getCalls(Function fn)` -/
 def assert.CallTracker.getCalls (self : assert.CallTracker) (fn : JSFunction) : IO (Array Data) :=
   self.val.callMethod "getCalls" (Support.args #[toJS fn]) (Array Data)
 
-/-- `tracker.report()` (added in Node.js v14.2.0, v12.19.0): `sequence<any> report()` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `tracker.report()` (added in Node.js v14.2.0, v12.19.0): `sequence<any> report()` -/
 def assert.CallTracker.report (self : assert.CallTracker) : IO (Array Data) :=
   self.val.callMethod "report" (Support.args #[]) (Array Data)
 
-/-- `tracker.reset([fn])` (added in Node.js v18.8.0, v16.18.0): `undefined reset(optional Function fn)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `tracker.reset([fn])` (added in Node.js v18.8.0, v16.18.0): `undefined reset(optional Function fn)` -/
 def assert.CallTracker.reset (self : assert.CallTracker) (fn : Option JSFunction := none) : IO Unit :=
   self.val.callMethod "reset" (Support.args #[Support.optional fn]) Unit
 
-/-- `tracker.verify()` (added in Node.js v14.2.0, v12.19.0): `undefined verify()` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `tracker.verify()` (added in Node.js v14.2.0, v12.19.0): `undefined verify()` -/
 def assert.CallTracker.verify (self : assert.CallTracker) : IO Unit :=
   self.val.callMethod "verify" (Support.args #[]) Unit
 
@@ -93,7 +93,7 @@ def assert.fail (message : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.fail", module := "node:assert", path := "fail", construct := false, arity := 1 }
     (Support.args #[message]) (await := false)
 
-/-- `assert.fail(actual, expected[, message[, operator[, stackStartFn]]])` (added in Node.js v0.1.21): `undefined fail(any actual, any expected, optional any message, optional DOMString operator, optional Function stackStartFn)` (Node.js 24.22.2 documentation, assert.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `assert.fail(actual, expected[, message[, operator[, stackStartFn]]])` (added in Node.js v0.1.21): `undefined fail(any actual, any expected, optional any message, optional DOMString operator, optional Function stackStartFn)` (Node.js 24.22.2 documentation, assert.md) -/
 def assert.failWithActual (actual : Data) (expected : Data) (message : Data := .undefined) (operator : Option String := none) (stackStartFn : Option JSFunction := none) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.failWithActual", module := "node:assert", path := "fail", construct := false, arity := 5 }
     (Support.args #[toJS actual, toJS expected, message, Support.optional operator, Support.optional stackStartFn]) (await := false)

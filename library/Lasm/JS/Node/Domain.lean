@@ -21,38 +21,38 @@ instance : ToJS Domain := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Domain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Domain", .data⟩
 instance : Coe Domain EventEmitter := ⟨Domain.toEventEmitter⟩
 
-/-- `domain.members`: `readonly attribute sequence<any> members` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `domain.members`: `readonly attribute sequence<any> members` -/
 def Domain.members (self : Domain) : IO (Array Data) := self.val.get "members" (Array Data)
 
-/-- `domain.add(emitter)`: `undefined add(EventEmitter emitter)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `domain.add(emitter)`: `undefined add(EventEmitter emitter)` -/
 def Domain.add (self : Domain) (emitter : EventEmitter) : IO Unit :=
   self.val.callMethod "add" (Support.args #[toJS emitter]) Unit
 
-/-- `domain.bind(callback)`: `Function bind(Function callback)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `domain.bind(callback)`: `Function bind(Function callback)` -/
 def Domain.bind (self : Domain) (callback : JSFunction) : IO JSFunction :=
   self.val.callMethod "bind" (Support.args #[toJS callback]) JSFunction
 
-/-- `domain.enter()`: `undefined enter()` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `domain.enter()`: `undefined enter()` -/
 def Domain.enter (self : Domain) : IO Unit :=
   self.val.callMethod "enter" (Support.args #[]) Unit
 
-/-- `domain.exit()`: `undefined exit()` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `domain.exit()`: `undefined exit()` -/
 def Domain.exit (self : Domain) : IO Unit :=
   self.val.callMethod "exit" (Support.args #[]) Unit
 
-/-- `domain.intercept(callback)`: `Function intercept(Function callback)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `domain.intercept(callback)`: `Function intercept(Function callback)` -/
 def Domain.intercept (self : Domain) (callback : JSFunction) : IO JSFunction :=
   self.val.callMethod "intercept" (Support.args #[toJS callback]) JSFunction
 
-/-- `domain.remove(emitter)`: `undefined remove(EventEmitter emitter)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `domain.remove(emitter)`: `undefined remove(EventEmitter emitter)` -/
 def Domain.remove (self : Domain) (emitter : EventEmitter) : IO Unit :=
   self.val.callMethod "remove" (Support.args #[toJS emitter]) Unit
 
-/-- `domain.run(fn[, ...args])`: `undefined run(Function fn, any... args)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `domain.run(fn[, ...args])`: `undefined run(Function fn, any... args)` -/
 def Domain.run (self : Domain) (fn : JSFunction) (args : Array Data := #[]) : IO Unit :=
   self.val.callMethod "run" (Support.argsWith #[toJS fn] (args.map toJS)) Unit
 
-/-- `domain.create()`: `Domain create()` (Node.js 24.22.2 documentation, domain.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `domain.create()`: `Domain create()` (Node.js 24.22.2 documentation, domain.md) -/
 def domain.create : IO Domain := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.domain.create", module := "node:domain", path := "create", construct := false, arity := 0 }
     (Support.args #[]) (await := false)

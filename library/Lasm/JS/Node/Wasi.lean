@@ -27,22 +27,22 @@ structure WASI.FinalizeBindingsOptions where
   memory : Option WebAssembly.Memory := none
 instance instToJSWASIFinalizeBindingsOptions : ToJS WASI.FinalizeBindingsOptions := ⟨fun d => Support.fields #[("memory", Support.optional d.memory)]⟩
 
-/-- `wasi.wasiImport` (added in Node.js v13.3.0, v12.16.0): `readonly attribute object wasiImport` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `wasi.wasiImport` (added in Node.js v13.3.0, v12.16.0): `readonly attribute object wasiImport` -/
 def WASI.wasiImport (self : WASI) : IO Data := self.val.get "wasiImport" Data
 
-/-- `wasi.getImportObject()` (added in Node.js v19.8.0): `undefined getImportObject()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `wasi.getImportObject()` (added in Node.js v19.8.0): `undefined getImportObject()` -/
 def WASI.getImportObject (self : WASI) : IO Unit :=
   self.val.callMethod "getImportObject" (Support.args #[]) Unit
 
-/-- `wasi.start(instance)` (added in Node.js v13.3.0, v12.16.0): `undefined start(Instance instance)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `wasi.start(instance)` (added in Node.js v13.3.0, v12.16.0): `undefined start(Instance instance)` -/
 def WASI.start (self : WASI) («instance» : WebAssembly.Instance) : IO Unit :=
   self.val.callMethod "start" (Support.args #[toJS «instance»]) Unit
 
-/-- `wasi.initialize(instance)` (added in Node.js v14.6.0, v12.19.0): `undefined initialize(Instance instance)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `wasi.initialize(instance)` (added in Node.js v14.6.0, v12.19.0): `undefined initialize(Instance instance)` -/
 def WASI.«initialize» (self : WASI) («instance» : WebAssembly.Instance) : IO Unit :=
   self.val.callMethod "initialize" (Support.args #[toJS «instance»]) Unit
 
-/-- `wasi.finalizeBindings(instance[, options])` (added in Node.js v24.4.0): `undefined finalizeBindings(Instance instance, optional WASI.FinalizeBindingsOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `wasi.finalizeBindings(instance[, options])` (added in Node.js v24.4.0): `undefined finalizeBindings(Instance instance, optional WASI.FinalizeBindingsOptions options)` -/
 def WASI.finalizeBindings (self : WASI) («instance» : WebAssembly.Instance) (options : Option WASI.FinalizeBindingsOptions := none) : IO Unit :=
   self.val.callMethod "finalizeBindings" (Support.args #[toJS «instance», Support.optional options]) Unit
 

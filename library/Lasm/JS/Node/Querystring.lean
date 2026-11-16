@@ -42,10 +42,10 @@ def querystring.parse (str : String) (sep : Option String := none) (eq : Option 
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.querystring.parse", module := "node:querystring", path := "parse", construct := false, arity := 4 }
     (Support.args #[toJS str, Support.optional sep, Support.optional eq, Support.optional options]) (await := false)
 
-/-- `querystring.stringify(obj[, sep[, eq[, options]]])` (added in Node.js v0.1.25): `undefined stringify(object obj, optional DOMString sep, optional DOMString eq, optional undefined options)` (Node.js 24.22.2 documentation, querystring.md) -/
-def querystring.stringify (obj : Data) (sep : Option String := none) (eq : Option String := none) (options : Option Unit := none) : IO Unit :=
+/-- `querystring.stringify(obj[, sep[, eq[, options]]])` (added in Node.js v0.1.25): `undefined stringify(object obj, optional DOMString sep, optional DOMString eq, optional any options)` (Node.js 24.22.2 documentation, querystring.md) -/
+def querystring.stringify (obj : Data) (sep : Option String := none) (eq : Option String := none) (options : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.querystring.stringify", module := "node:querystring", path := "stringify", construct := false, arity := 4 }
-    (Support.args #[toJS obj, Support.optional sep, Support.optional eq, Support.optional options]) (await := false)
+    (Support.args #[toJS obj, Support.optional sep, Support.optional eq, options]) (await := false)
 
 /-- `querystring.unescape(str)` (added in Node.js v0.1.25): `undefined unescape(DOMString str)` (Node.js 24.22.2 documentation, querystring.md) -/
 def querystring.unescape (str : String) : IO Unit :=

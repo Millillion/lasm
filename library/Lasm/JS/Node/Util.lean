@@ -297,7 +297,7 @@ def util.throttle (fn : JSFunction) (limit : Int) (interval : Int) (options : Op
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.util.throttle", module := "node:util", path := "throttle", construct := false, arity := 4 }
     (Support.args #[toJS fn, toJS limit, toJS interval, Support.optional options]) (await := false)
 
-/-- `util.diff(actual, expected)` (added in Node.js v23.11.0, v22.15.0): `sequence<any> diff((sequence<any> or DOMString) actual, (sequence<any> or DOMString) expected)` (Node.js 24.22.2 documentation, util.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `util.diff(actual, expected)` (added in Node.js v23.11.0, v22.15.0): `sequence<any> diff((sequence<any> or DOMString) actual, (sequence<any> or DOMString) expected)` (Node.js 24.22.2 documentation, util.md) -/
 def util.diff (actual : SequenceOfAnyOrDOMString) (expected : SequenceOfAnyOrDOMString) : IO (Array Data) :=
   Lasm.JS.Binding.invoke (Array Data) { name := "Lasm.JS.Node.util.diff", module := "node:util", path := "diff", construct := false, arity := 2 }
     (Support.args #[toJS actual, toJS expected]) (await := false)
@@ -312,7 +312,7 @@ def util.formatWithOptions (inspectOptions : Data) (format : String) (args : Arr
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.util.formatWithOptions", module := "node:util", path := "formatWithOptions", construct := false, arity := 3 }
     (Support.argsWith #[toJS inspectOptions, toJS format] (args.map toJS)) (await := false)
 
-/-- `util.getCallSites([frameCount][, options])` (added in Node.js v22.9.0): `sequence<object> getCallSites(optional long long frameCount, optional util.GetCallSitesOptions options)` (Node.js 24.22.2 documentation, util.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `util.getCallSites([frameCount][, options])` (added in Node.js v22.9.0): `sequence<object> getCallSites(optional long long frameCount, optional util.GetCallSitesOptions options)` (Node.js 24.22.2 documentation, util.md) -/
 def util.getCallSites (frameCount : Option Int := none) (options : Option util.GetCallSitesOptions := none) : IO (Array Data) :=
   Lasm.JS.Binding.invoke (Array Data) { name := "Lasm.JS.Node.util.getCallSites", module := "node:util", path := "getCallSites", construct := false, arity := 2 }
     (Support.args #[Support.optional frameCount, Support.optional options]) (await := false)
@@ -337,7 +337,7 @@ def util.setTraceSigInt (enable : Bool) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.util.setTraceSigInt", module := "node:util", path := "setTraceSigInt", construct := false, arity := 1 }
     (Support.args #[toJS enable]) (await := false)
 
-/-- `util.inherits(constructor, superConstructor)` (added in Node.js v0.3.0): `undefined inherits(Function constructor_, Function superConstructor)` (Node.js 24.22.2 documentation, util.md) -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `util.inherits(constructor, superConstructor)` (added in Node.js v0.3.0): `undefined inherits(Function constructor_, Function superConstructor)` (Node.js 24.22.2 documentation, util.md) -/
 def util.inherits (constructor_ : JSFunction) (superConstructor : JSFunction) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.util.inherits", module := "node:util", path := "inherits", construct := false, arity := 2 }
     (Support.args #[toJS constructor_, toJS superConstructor]) (await := false)
@@ -408,15 +408,20 @@ def util.aborted (signal : AbortSignal) (resource : Data) : Async Data :=
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.util.aborted", module := "node:util", path := "aborted", construct := false, arity := 2 }
     (Support.args #[toJS signal, toJS resource])
 
-/-- `util._extend(target, source)` (added in Node.js v0.7.5): `undefined extend(object target, object source)` (Node.js 24.22.2 documentation, util.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `util._extend(target, source)` (added in Node.js v0.7.5): `undefined extend(object target, object source)` (Node.js 24.22.2 documentation, util.md) -/
 def util.extend (target : Data) (source : Data) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.util.extend", module := "node:util", path := "extend", construct := false, arity := 2 }
     (Support.args #[toJS target, toJS source]) (await := false)
 
-/-- `util.isArray(object)` (added in Node.js v0.6.0): `boolean isArray(any object)` (Node.js 24.22.2 documentation, util.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `util.isArray(object)` (added in Node.js v0.6.0): `boolean isArray(any object)` (Node.js 24.22.2 documentation, util.md) -/
 def util.isArray (object : Data) : IO Bool :=
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.isArray", module := "node:util", path := "isArray", construct := false, arity := 1 }
     (Support.args #[toJS object]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `util.isPartialDeepStrictEqual(val1, val2)` (added in Node.js v26.11.0): `boolean isPartialDeepStrictEqual(any val1, any val2)` (Node.js 24.22.2 documentation, util.md) -/
+def util.isPartialDeepStrictEqual (val1 : Data) (val2 : Data) : IO Bool :=
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.isPartialDeepStrictEqual", module := "node:util", path := "isPartialDeepStrictEqual", construct := false, arity := 2 }
+    (Support.args #[toJS val1, toJS val2]) (await := false)
 
 /-- `util.inspect.custom` (added in Node.js v6.6.0): `readonly attribute symbol custom` (Node.js 24.22.2 documentation, util.md) -/
 def util.inspect.custom : IO Value := Support.getExport "node:util" ["custom"] Value
@@ -554,7 +559,7 @@ def util.types.isModuleNamespaceObject (value : Data) : IO Bool :=
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isModuleNamespaceObject", module := "node:util", path := "isModuleNamespaceObject", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)
 
-/-- `util.types.isNativeError(value)` (added in Node.js v10.0.0): `boolean isNativeError(any value)` (Node.js 24.22.2 documentation, util.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `util.types.isNativeError(value)` (added in Node.js v10.0.0): `boolean isNativeError(any value)` (Node.js 24.22.2 documentation, util.md) -/
 def util.types.isNativeError (value : Data) : IO Bool :=
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.util.types.isNativeError", module := "node:util", path := "isNativeError", construct := false, arity := 1 }
     (Support.args #[toJS value]) (await := false)

@@ -78,6 +78,14 @@ instance : Nonempty HeapProfileHandle := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS HeapProfileHandle := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HeapProfileHandle := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.HeapProfileHandle", .data⟩
 
+/-- `class SyncHeapProfileHandle` of `node:v8` (Node.js 24.22.2 documentation, v8.md): a handle to the JavaScript object. -/
+structure SyncHeapProfileHandle where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty SyncHeapProfileHandle := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SyncHeapProfileHandle := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SyncHeapProfileHandle := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.SyncHeapProfileHandle", .data⟩
+
 /-- `dictionary v8.GetHeapSnapshotOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure v8.GetHeapSnapshotOptions where
   /-- `boolean exposeInternals = false` -/
@@ -114,6 +122,33 @@ structure v8.WriteHeapSnapshotOptions where
   exposeNumericValues : Option Bool := none
 instance instToJSV8WriteHeapSnapshotOptions : ToJS v8.WriteHeapSnapshotOptions := ⟨fun d => Support.fields #[("exposeInternals", Support.optional d.exposeInternals),
     ("exposeNumericValues", Support.optional d.exposeNumericValues)]⟩
+
+/-- `dictionary v8.StartCpuProfileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure v8.StartCpuProfileOptions where
+  /-- `double sampleInterval = 0` -/
+  sampleInterval : Option Float := none
+  /-- `long long maxBufferSize = 4294967295` -/
+  maxBufferSize : Option Int := none
+instance instToJSV8StartCpuProfileOptions : ToJS v8.StartCpuProfileOptions := ⟨fun d => Support.fields #[("sampleInterval", Support.optional d.sampleInterval),
+    ("maxBufferSize", Support.optional d.maxBufferSize)]⟩
+
+/-- `dictionary v8.StartHeapProfileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure v8.StartHeapProfileOptions where
+  /-- `double sampleInterval` -/
+  sampleInterval : Option Float := none
+  /-- `long long stackDepth = 16` -/
+  stackDepth : Option Int := none
+  /-- `boolean forceGC = false` -/
+  forceGC : Option Bool := none
+  /-- `boolean includeObjectsCollectedByMajorGC = false` -/
+  includeObjectsCollectedByMajorGC : Option Bool := none
+  /-- `boolean includeObjectsCollectedByMinorGC = false` -/
+  includeObjectsCollectedByMinorGC : Option Bool := none
+instance instToJSV8StartHeapProfileOptions : ToJS v8.StartHeapProfileOptions := ⟨fun d => Support.fields #[("sampleInterval", Support.optional d.sampleInterval),
+    ("stackDepth", Support.optional d.stackDepth),
+    ("forceGC", Support.optional d.forceGC),
+    ("includeObjectsCollectedByMajorGC", Support.optional d.includeObjectsCollectedByMajorGC),
+    ("includeObjectsCollectedByMinorGC", Support.optional d.includeObjectsCollectedByMinorGC)]⟩
 
 /-- `dictionary promiseHooks.CreateHookCallbacks` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure promiseHooks.CreateHookCallbacks where
@@ -234,6 +269,10 @@ def CPUProfileHandle.stop (self : CPUProfileHandle) : Async Data :=
 def HeapProfileHandle.stop (self : HeapProfileHandle) : Async Data :=
   self.val.callMethodAwait "stop" (Support.args #[]) Data
 
+/-- **Experimental** in the Node.js 24.22.2 docs. `syncHeapProfileHandle.stop()` (added in Node.js v26.1.0): `DOMString stop()` -/
+def SyncHeapProfileHandle.stop (self : SyncHeapProfileHandle) : IO String :=
+  self.val.callMethod "stop" (Support.args #[]) String
+
 /-- `v8.cachedDataVersionTag()` (added in Node.js v8.0.0): `long long cachedDataVersionTag()` (Node.js 24.22.2 documentation, v8.md) -/
 def v8.cachedDataVersionTag : IO Int :=
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.v8.cachedDataVersionTag", module := "node:v8", path := "cachedDataVersionTag", construct := false, arity := 0 }
@@ -306,6 +345,12 @@ def v8.startCpuProfile : IO SyncCPUProfileHandle := do
     (Support.args #[]) (await := false)
   pure { val := r }
 
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `v8.startCpuProfile([options])` (added in Node.js v25.0.0, v24.12.0): `SyncCPUProfileHandle startCpuProfile(optional v8.StartCpuProfileOptions options)` (Node.js 24.22.2 documentation, v8.md) -/
+def v8.startCpuProfileWithOptions (options : Option v8.StartCpuProfileOptions := none) : IO SyncCPUProfileHandle := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.v8.startCpuProfileWithOptions", module := "node:v8", path := "startCpuProfile", construct := false, arity := 1 }
+    (Support.args #[Support.optional options]) (await := false)
+  pure { val := r }
+
 /-- `v8.serialize(value)` (added in Node.js v8.0.0): `Uint8Array serialize(any value)` (Node.js 24.22.2 documentation, v8.md) -/
 def v8.serialize (value : Data) : IO ByteArray :=
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.v8.serialize", module := "node:v8", path := "serialize", construct := false, arity := 1 }
@@ -315,6 +360,17 @@ def v8.serialize (value : Data) : IO ByteArray :=
 def v8.deserialize (buffer_ : ByteArray) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.deserialize", module := "node:v8", path := "deserialize", construct := false, arity := 1 }
     (Support.args #[toJS buffer_]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `v8.startHeapProfile([options])` (added in Node.js v26.1.0): `SyncHeapProfileHandle startHeapProfile(optional v8.StartHeapProfileOptions options)` (Node.js 24.22.2 documentation, v8.md) -/
+def v8.startHeapProfile (options : Option v8.StartHeapProfileOptions := none) : IO SyncHeapProfileHandle := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.v8.startHeapProfile", module := "node:v8", path := "startHeapProfile", construct := false, arity := 1 }
+    (Support.args #[Support.optional options]) (await := false)
+  pure { val := r }
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `v8.setHeapProfileNearHeapLimit(limit)` (added in Node.js v26.9.0): `undefined setHeapProfileNearHeapLimit(long long limit)` (Node.js 24.22.2 documentation, v8.md) -/
+def v8.setHeapProfileNearHeapLimit (limit : Int) : IO Unit :=
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.v8.setHeapProfileNearHeapLimit", module := "node:v8", path := "setHeapProfileNearHeapLimit", construct := false, arity := 1 }
+    (Support.args #[toJS limit]) (await := false)
 
 /-- `promiseHooks.onInit(init)` (added in Node.js v17.1.0, v16.14.0): `Function onInit(Function init)` (Node.js 24.22.2 documentation, v8.md) -/
 def promiseHooks.onInit (init : JSFunction) : IO JSFunction :=

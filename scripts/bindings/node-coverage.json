@@ -222,7 +222,20 @@
   "sea.getRawAsset: parameter key has no documented type (any)",
   "writer.end: the promise's result is prose only (Promise<any>)",
   "writer.write: the promise's result is prose only (Promise<any>)",
-  "writer.writev: the promise's result is prose only (Promise<any>)"
+  "writer.writev: the promise's result is prose only (Promise<any>)",
+  "stream.pipeline: no documented type (any)",
+  "tlsSocket.renegotiate options.requestCert: no documented type (any)",
+  "tls.connect options.enableTrace: no documented type (any)",
+  "tls.connect options.secureContext: no documented type (any)",
+  "http.createServer options.connectionsCheckingInterval: no documented type (any)",
+  "http.createServer options.headersTimeout: no documented type (any)",
+  "http.createServer options.keepAliveTimeout: no documented type (any)",
+  "http.createServer options.requestTimeout: no documented type (any)",
+  "https.request options.protocol: no documented type (any)",
+  "https.request options.port: no documented type (any)",
+  "https.request options.agent: no documented type (any)",
+  "querystring.stringify options: no documented type (any)",
+  "mock.module options.exports.If: no documented type (any)"
  ],
  "webClasses": [
   "events: Event (Lasm.JS.Web.Event)",

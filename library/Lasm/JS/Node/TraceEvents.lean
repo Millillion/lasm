@@ -26,27 +26,27 @@ structure trace_events.CreateTracingOptions where
   categories : Option (Array String) := none
 instance instToJSTrace_eventsCreateTracingOptions : ToJS trace_events.CreateTracingOptions := ⟨fun d => Support.fields #[("categories", Support.optional d.categories)]⟩
 
-/-- `tracing.categories` (added in Node.js v10.0.0): `readonly attribute DOMString categories` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `tracing.categories` (added in Node.js v10.0.0): `readonly attribute DOMString categories` -/
 def Tracing.categories (self : Tracing) : IO String := self.val.get "categories" String
 
-/-- `tracing.enabled` (added in Node.js v10.0.0): `readonly attribute boolean enabled` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `tracing.enabled` (added in Node.js v10.0.0): `readonly attribute boolean enabled` -/
 def Tracing.enabled (self : Tracing) : IO Bool := self.val.get "enabled" Bool
 
-/-- `tracing.disable()` (added in Node.js v10.0.0): `undefined disable()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `tracing.disable()` (added in Node.js v10.0.0): `undefined disable()` -/
 def Tracing.disable (self : Tracing) : IO Unit :=
   self.val.callMethod "disable" (Support.args #[]) Unit
 
-/-- `tracing.enable()` (added in Node.js v10.0.0): `undefined enable()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `tracing.enable()` (added in Node.js v10.0.0): `undefined enable()` -/
 def Tracing.enable (self : Tracing) : IO Unit :=
   self.val.callMethod "enable" (Support.args #[]) Unit
 
-/-- `trace_events.createTracing(options)` (added in Node.js v10.0.0): `Tracing createTracing(trace_events.CreateTracingOptions options)` (Node.js 24.22.2 documentation, tracing.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `trace_events.createTracing(options)` (added in Node.js v10.0.0): `Tracing createTracing(trace_events.CreateTracingOptions options)` (Node.js 24.22.2 documentation, tracing.md) -/
 def trace_events.createTracing (options : trace_events.CreateTracingOptions) : IO Tracing := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.trace_events.createTracing", module := "node:trace_events", path := "createTracing", construct := false, arity := 1 }
     (Support.args #[toJS options]) (await := false)
   pure { val := r }
 
-/-- `trace_events.getEnabledCategories()` (added in Node.js v10.0.0): `DOMString getEnabledCategories()` (Node.js 24.22.2 documentation, tracing.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `trace_events.getEnabledCategories()` (added in Node.js v10.0.0): `DOMString getEnabledCategories()` (Node.js 24.22.2 documentation, tracing.md) -/
 def trace_events.getEnabledCategories : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.trace_events.getEnabledCategories", module := "node:trace_events", path := "getEnabledCategories", construct := false, arity := 0 }
     (Support.args #[]) (await := false)

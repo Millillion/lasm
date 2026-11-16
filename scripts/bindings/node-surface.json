@@ -309,7 +309,8 @@
         "transcode",
         "INSPECT_MAX_BYTES",
         "kMaxLength",
-        "kStringMaxLength"
+        "kStringMaxLength",
+        "isLatin1"
       ]
     },
     {
@@ -336,7 +337,8 @@
         "copyBytesFrom",
         "from",
         "isBuffer",
-        "isEncoding"
+        "isEncoding",
+        "stringLength"
       ],
       "prototype": [
         "compare",
@@ -407,7 +409,8 @@
         "buffer",
         "byteOffset",
         "length",
-        "parent"
+        "parent",
+        "index"
       ]
     },
     {
@@ -726,7 +729,8 @@
         "traceDeprecation",
         "traceProcessWarnings",
         "version",
-        "versions"
+        "versions",
+        "addUncaughtExceptionCaptureCallback"
       ]
     },
     {
@@ -1151,7 +1155,8 @@
         "utimesSync",
         "writeFileSync",
         "writeSync",
-        "writevSync"
+        "writevSync",
+        "openAsBlobSync"
       ]
     },
     {
@@ -1928,7 +1933,11 @@
         "METHODS",
         "STATUS_CODES",
         "globalAgent",
-        "maxHeaderSize"
+        "maxHeaderSize",
+        "isValidHeaderName",
+        "isValidHeaderValue",
+        "websocketMask",
+        "websocketUnmask"
       ]
     },
     {
@@ -2677,7 +2686,12 @@
         "zstdCompressSync",
         "zstdDecompress",
         "zstdDecompressSync",
-        "constants"
+        "constants",
+        "createZipArchive",
+        "createZipArchiveSync",
+        "zipFiles",
+        "getMaxZipContentSize",
+        "setMaxZipContentSize"
       ]
     },
     {
@@ -2818,6 +2832,97 @@
       "instance": []
     },
     {
+      "lean": "zlib.ZipBuffer",
+      "module": "node:zlib",
+      "path": "ZipBuffer",
+      "leanModule": "Zlib",
+      "static": [],
+      "prototype": [
+        "add",
+        "addSync",
+        "addEntry",
+        "clear",
+        "delete",
+        "entries",
+        "forEach",
+        "get",
+        "has",
+        "keys",
+        "toBuffer",
+        "toBufferSync",
+        "values"
+      ],
+      "instance": [
+        "comment",
+        "size",
+        "writable"
+      ]
+    },
+    {
+      "lean": "zlib.ZipEntry",
+      "module": "node:zlib",
+      "path": "ZipEntry",
+      "leanModule": "Zlib",
+      "static": [],
+      "prototype": [
+        "content",
+        "contentSync",
+        "contentIterator"
+      ],
+      "instance": [
+        "comment",
+        "compressed",
+        "compressedSize",
+        "crc32",
+        "flags",
+        "isDirectory",
+        "isFile",
+        "isSymlink",
+        "mode",
+        "modified",
+        "method",
+        "name",
+        "nameBuffer",
+        "rawContent",
+        "size"
+      ]
+    },
+    {
+      "lean": "zlib.ZipFile",
+      "module": "node:zlib",
+      "path": "ZipFile",
+      "leanModule": "Zlib",
+      "static": [],
+      "prototype": [
+        "add",
+        "addEntry",
+        "addEntrySync",
+        "addSync",
+        "close",
+        "closeSync",
+        "compact",
+        "compactSync",
+        "delete",
+        "deleteSync",
+        "entries",
+        "entriesSync",
+        "forEach",
+        "forEachSync",
+        "get",
+        "getSync",
+        "has",
+        "keys",
+        "stream",
+        "values",
+        "valuesSync"
+      ],
+      "instance": [
+        "comment",
+        "size",
+        "writable"
+      ]
+    },
+    {
       "lean": "util",
       "module": "node:util",
       "path": "",
@@ -2853,7 +2958,8 @@
         "aborted",
         "types",
         "extend",
-        "isArray"
+        "isArray",
+        "isPartialDeepStrictEqual"
       ]
     },
     {
@@ -3264,7 +3370,8 @@
         "channel",
         "subscribe",
         "unsubscribe",
-        "tracingChannel"
+        "tracingChannel",
+        "boundedChannel"
       ]
     },
     {
@@ -3279,7 +3386,8 @@
         "unsubscribe",
         "bindStore",
         "unbindStore",
-        "runStores"
+        "runStores",
+        "withStoreScope"
       ],
       "instance": [
         "hasSubscribers"
@@ -3301,6 +3409,38 @@
       "instance": [
         "hasSubscribers"
       ]
+    },
+    {
+      "lean": "RunStoresScope",
+      "module": "node:diagnostics_channel",
+      "path": "RunStoresScope",
+      "leanModule": "DiagnosticsChannel",
+      "static": [],
+      "prototype": [],
+      "instance": []
+    },
+    {
+      "lean": "BoundedChannel",
+      "module": "node:diagnostics_channel",
+      "path": "BoundedChannel",
+      "leanModule": "DiagnosticsChannel",
+      "static": [],
+      "prototype": [
+        "subscribe",
+        "unsubscribe",
+        "run",
+        "withScope"
+      ],
+      "instance": []
+    },
+    {
+      "lean": "BoundedChannelScope",
+      "module": "node:diagnostics_channel",
+      "path": "BoundedChannelScope",
+      "leanModule": "DiagnosticsChannel",
+      "static": [],
+      "prototype": [],
+      "instance": []
     },
     {
       "lean": "domain",
@@ -3385,7 +3525,8 @@
         "loopStart",
         "nodeStart",
         "uvMetricsInfo",
-        "v8Start"
+        "v8Start",
+        "uvMetricsInfoBigInt"
       ]
     },
     {
@@ -3413,7 +3554,9 @@
         "percentilesAt",
         "qrde",
         "reset",
-        "welchTest"
+        "welchTest",
+        "diff",
+        "snapshot"
       ],
       "instance": [
         "count",
@@ -3432,7 +3575,8 @@
         "percentiles",
         "percentilesBigInt",
         "skewness",
-        "stddev"
+        "stddev",
+        "resetCount"
       ]
     },
     {
@@ -3532,7 +3676,8 @@
         "domStorageItemRemoved",
         "domStorageItemUpdated",
         "domStorageItemsCleared",
-        "registerStorage"
+        "registerStorage",
+        "params"
       ]
     },
     {
@@ -3546,7 +3691,8 @@
         "domStorageItemRemoved",
         "domStorageItemUpdated",
         "domStorageItemsCleared",
-        "registerStorage"
+        "registerStorage",
+        "params"
       ]
     },
     {
@@ -3632,7 +3778,9 @@
         "isStringOneByteRepresentation",
         "startCpuProfile",
         "serialize",
-        "deserialize"
+        "deserialize",
+        "startHeapProfile",
+        "setHeapProfileNearHeapLimit"
       ]
     },
     {
@@ -3757,6 +3905,17 @@
       "lean": "HeapProfileHandle",
       "module": "node:v8",
       "path": "HeapProfileHandle",
+      "leanModule": "V8",
+      "static": [],
+      "prototype": [
+        "stop"
+      ],
+      "instance": []
+    },
+    {
+      "lean": "SyncHeapProfileHandle",
+      "module": "node:v8",
+      "path": "SyncHeapProfileHandle",
       "leanModule": "V8",
       "static": [],
       "prototype": [
@@ -3962,6 +4121,62 @@
         "size",
         "capacity",
         "db"
+      ]
+    },
+    {
+      "lean": "Database",
+      "module": "node:sqlite",
+      "path": "Database",
+      "leanModule": "Sqlite",
+      "static": [],
+      "prototype": [
+        "aggregate",
+        "close",
+        "loadExtension",
+        "enableLoadExtension",
+        "enableDefensive",
+        "location",
+        "exec",
+        "function",
+        "setAuthorizer",
+        "open",
+        "serialize",
+        "deserialize",
+        "prepare",
+        "createTagStore",
+        "createModule",
+        "createSession",
+        "applyChangeset"
+      ],
+      "instance": [
+        "isOpen",
+        "isTransaction",
+        "limits"
+      ]
+    },
+    {
+      "lean": "Statement",
+      "module": "node:sqlite",
+      "path": "Statement",
+      "leanModule": "Sqlite",
+      "static": [],
+      "prototype": [
+        "all",
+        "close",
+        "columns",
+        "get",
+        "iterate",
+        "resetStats",
+        "run",
+        "setAllowBareNamedParameters",
+        "setAllowUnknownNamedParameters",
+        "setReturnArrays",
+        "setReadBigInts",
+        "stat"
+      ],
+      "instance": [
+        "expandedSQL",
+        "sourceSQL"
       ]
     },
     {

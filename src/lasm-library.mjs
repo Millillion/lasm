@@ -37,11 +37,18 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   // Its browser tier (docs/JS_BINDINGS.md, "The browser tier"; scripts/bindings/web-browser.mjs).
   'Lasm.JS.Web.Geometry', 'Lasm.JS.Web.Css', 'Lasm.JS.Web.Html', 'Lasm.JS.Web.UiEvents', 'Lasm.JS.Web.Canvas', 'Lasm.JS.Web.WebSocket',
   'Lasm.JS.Web.Browser',
-  // Lasm.JS.Node (docs/JS_BINDINGS.md, "Lasm.JS.Node"): Node's server-essential modules, generated from
-  // Node's API docs (scripts/bindings/node-api.mjs, generate-web.mjs).
-  'Lasm.JS.Node.Support', 'Lasm.JS.Node.Events', 'Lasm.JS.Node.Stream', 'Lasm.JS.Node.Buffer', 'Lasm.JS.Node.Path',
-  'Lasm.JS.Node.Os', 'Lasm.JS.Node.Process', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.ChildProcess', 'Lasm.JS.Node.Net',
-  'Lasm.JS.Node.Http', 'Lasm.JS.Node.Https', 'Lasm.JS.Node',
+  // Lasm.JS.Node (docs/JS_BINDINGS.md, "Lasm.JS.Node"): every Node core module, generated from Node's API
+  // docs (scripts/bindings/node-api.mjs, generate-web.mjs), in scripts/bindings/node-modules.json's import order.
+  'Lasm.JS.Node.Support', 'Lasm.JS.Node.AsyncHooks', 'Lasm.JS.Node.Events', 'Lasm.JS.Node.Stream',
+  'Lasm.JS.Node.Buffer', 'Lasm.JS.Node.StringDecoder', 'Lasm.JS.Node.Path', 'Lasm.JS.Node.Os', 'Lasm.JS.Node.Net',
+  'Lasm.JS.Node.Process', 'Lasm.JS.Node.Readline', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.Dns',
+  'Lasm.JS.Node.Tls', 'Lasm.JS.Node.Dgram', 'Lasm.JS.Node.Http', 'Lasm.JS.Node.Https', 'Lasm.JS.Node.Http2',
+  'Lasm.JS.Node.ChildProcess', 'Lasm.JS.Node.Cluster', 'Lasm.JS.Node.WorkerThreads', 'Lasm.JS.Node.Zlib',
+  'Lasm.JS.Node.Util', 'Lasm.JS.Node.Url', 'Lasm.JS.Node.Querystring', 'Lasm.JS.Node.Punycode', 'Lasm.JS.Node.Timers',
+  'Lasm.JS.Node.Repl', 'Lasm.JS.Node.Tty', 'Lasm.JS.Node.Console', 'Lasm.JS.Node.Assert', 'Lasm.JS.Node.AsyncContext',
+  'Lasm.JS.Node.DiagnosticsChannel', 'Lasm.JS.Node.Domain', 'Lasm.JS.Node.PerfHooks', 'Lasm.JS.Node.TraceEvents',
+  'Lasm.JS.Node.Inspector', 'Lasm.JS.Node.Module', 'Lasm.JS.Node.V8', 'Lasm.JS.Node.Vm', 'Lasm.JS.Node.Wasi',
+  'Lasm.JS.Node.Sqlite', 'Lasm.JS.Node.Test', 'Lasm.JS.Node.Sea', 'Lasm.JS.Node.StreamIter', 'Lasm.JS.Node',
   // Lasm.JS.Deno and Lasm.JS.Bun (docs/JS_BINDINGS.md, "Lasm.JS.Deno and Lasm.JS.Bun"): Deno.serve and Bun.serve,
   // generated from the runtimes' TypeScript declarations (scripts/bindings/serve-api.mjs, generate-web.mjs).
   'Lasm.JS.Deno.Serve', 'Lasm.JS.Deno', 'Lasm.JS.Bun.Serve', 'Lasm.JS.Bun',

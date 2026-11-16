@@ -55,15 +55,15 @@ instance : Coe URL ObjectOrDOMStringOrURL := ⟨.url⟩
 
 /-- `dictionary https.RequestOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure https.RequestOptions where
-  /-- `undefined protocol = "https:"` -/
-  protocol : Option Unit := none
-  /-- `undefined port = 443` -/
-  port : Option Unit := none
-  /-- `undefined agent` -/
-  agent : Option Unit := none
-instance instToJSHttpsRequestOptions : ToJS https.RequestOptions := ⟨fun d => Support.fields #[("protocol", Support.optional d.protocol),
-    ("port", Support.optional d.port),
-    ("agent", Support.optional d.agent)]⟩
+  /-- `any protocol = "https:"` -/
+  protocol : Data := .undefined
+  /-- `any port = 443` -/
+  port : Data := .undefined
+  /-- `any agent` -/
+  agent : Data := .undefined
+instance instToJSHttpsRequestOptions : ToJS https.RequestOptions := ⟨fun d => Support.fields #[("protocol", d.protocol),
+    ("port", d.port),
+    ("agent", d.agent)]⟩
 
 /-- `(https.RequestOptions or DOMString or URL)`: one constructor per member type. -/
 inductive https.RequestOptionsOrDOMStringOrURL where

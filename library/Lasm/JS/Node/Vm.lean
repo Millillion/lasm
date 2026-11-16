@@ -323,53 +323,53 @@ def vm.Script.runInNewContext (self : vm.Script) (contextObject : Data := .undef
 def vm.Script.runInThisContext (self : vm.Script) (options : Option vm.Script.RunInThisContextOptions := none) : IO Data :=
   self.val.callMethod "runInThisContext" (Support.args #[Support.optional options]) Data
 
-/-- `module.error`: `readonly attribute any error` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `module.error`: `readonly attribute any error` -/
 def vm.Module.error (self : vm.Module) : IO Data := self.val.get "error" Data
 
-/-- `module.identifier`: `readonly attribute DOMString identifier` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `module.identifier`: `readonly attribute DOMString identifier` -/
 def vm.Module.identifier (self : vm.Module) : IO String := self.val.get "identifier" String
 
-/-- `module.namespace`: `readonly attribute object namespace` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `module.namespace`: `readonly attribute object namespace` -/
 def vm.Module.«namespace» (self : vm.Module) : IO Data := self.val.get "namespace" Data
 
-/-- `module.status`: `readonly attribute DOMString status` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `module.status`: `readonly attribute DOMString status` -/
 def vm.Module.status (self : vm.Module) : IO String := self.val.get "status" String
 
-/-- `module.evaluate([options])`: `Promise<undefined> evaluate(optional vm.Module.EvaluateOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `module.evaluate([options])`: `Promise<undefined> evaluate(optional vm.Module.EvaluateOptions options)` -/
 def vm.Module.evaluate (self : vm.Module) (options : Option vm.Module.EvaluateOptions := none) : Async Unit :=
   self.val.callMethodAwait "evaluate" (Support.args #[Support.optional options]) Unit
 
-/-- `module.link(linker)`: `Promise<any> link(Function linker)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `module.link(linker)`: `Promise<any> link(Function linker)` -/
 def vm.Module.link (self : vm.Module) (linker : JSFunction) : Async Data :=
   self.val.callMethodAwait "link" (Support.args #[toJS linker]) Data
 
-/-- `sourceTextModule.dependencySpecifiers`: `readonly attribute sequence<DOMString> dependencySpecifiers` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `sourceTextModule.dependencySpecifiers`: `readonly attribute sequence<DOMString> dependencySpecifiers` -/
 def vm.SourceTextModule.dependencySpecifiers (self : vm.SourceTextModule) : IO (Array String) := self.val.get "dependencySpecifiers" (Array String)
 
-/-- `sourceTextModule.moduleRequests` (added in Node.js v24.4.0): `readonly attribute sequence<object> moduleRequests` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.moduleRequests` (added in Node.js v24.4.0): `readonly attribute sequence<object> moduleRequests` -/
 def vm.SourceTextModule.moduleRequests (self : vm.SourceTextModule) : IO (Array Data) := self.val.get "moduleRequests" (Array Data)
 
-/-- `sourceTextModule.createCachedData()` (added in Node.js v13.7.0, v12.17.0): `Uint8Array createCachedData()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.createCachedData()` (added in Node.js v13.7.0, v12.17.0): `Uint8Array createCachedData()` -/
 def vm.SourceTextModule.createCachedData (self : vm.SourceTextModule) : IO ByteArray :=
   self.val.callMethod "createCachedData" (Support.args #[]) ByteArray
 
-/-- `sourceTextModule.hasAsyncGraph()` (added in Node.js v24.9.0): `boolean hasAsyncGraph()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.hasAsyncGraph()` (added in Node.js v24.9.0): `boolean hasAsyncGraph()` -/
 def vm.SourceTextModule.hasAsyncGraph (self : vm.SourceTextModule) : IO Bool :=
   self.val.callMethod "hasAsyncGraph" (Support.args #[]) Bool
 
-/-- `sourceTextModule.hasTopLevelAwait()` (added in Node.js v24.9.0): `boolean hasTopLevelAwait()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.hasTopLevelAwait()` (added in Node.js v24.9.0): `boolean hasTopLevelAwait()` -/
 def vm.SourceTextModule.hasTopLevelAwait (self : vm.SourceTextModule) : IO Bool :=
   self.val.callMethod "hasTopLevelAwait" (Support.args #[]) Bool
 
-/-- `sourceTextModule.instantiate()` (added in Node.js v24.8.0): `undefined instantiate()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.instantiate()` (added in Node.js v24.8.0): `undefined instantiate()` -/
 def vm.SourceTextModule.instantiate (self : vm.SourceTextModule) : IO Unit :=
   self.val.callMethod "instantiate" (Support.args #[]) Unit
 
-/-- `sourceTextModule.linkRequests(modules)` (added in Node.js v24.8.0): `undefined linkRequests(sequence<vm.Module> modules)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sourceTextModule.linkRequests(modules)` (added in Node.js v24.8.0): `undefined linkRequests(sequence<vm.Module> modules)` -/
 def vm.SourceTextModule.linkRequests (self : vm.SourceTextModule) (modules : Array vm.Module) : IO Unit :=
   self.val.callMethod "linkRequests" (Support.args #[toJS modules]) Unit
 
-/-- `syntheticModule.setExport(name, value)` (added in Node.js v13.0.0, v12.16.0): `undefined setExport(DOMString name, any value)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `syntheticModule.setExport(name, value)` (added in Node.js v13.0.0, v12.16.0): `undefined setExport(DOMString name, any value)` -/
 def vm.SyntheticModule.setExport (self : vm.SyntheticModule) (name : String) (value : Data) : IO Unit :=
   self.val.callMethod "setExport" (Support.args #[toJS name, toJS value]) Unit
 
@@ -391,7 +391,7 @@ def vm.isContext (object : Data) : IO Bool :=
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.vm.isContext", module := "node:vm", path := "isContext", construct := false, arity := 1 }
     (Support.args #[toJS object]) (await := false)
 
-/-- `vm.measureMemory([options])` (added in Node.js v13.10.0): `Promise<any> measureMemory(optional any options)` (Node.js 24.22.2 documentation, vm.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `vm.measureMemory([options])` (added in Node.js v13.10.0): `Promise<any> measureMemory(optional any options)` (Node.js 24.22.2 documentation, vm.md) -/
 def vm.measureMemory (options : Data := .undefined) : Async Data :=
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.vm.measureMemory", module := "node:vm", path := "measureMemory", construct := false, arity := 1 }
     (Support.args #[options])
@@ -414,7 +414,7 @@ def vm.runInThisContext (code : String) (options : Option vm.RunInThisContextOpt
 /-- `vm.constants.DONT_CONTEXTIFY`: `readonly attribute any DONT_CONTEXTIFY` (Node.js 24.22.2 documentation, vm.md) -/
 def vm.constants.DONT_CONTEXTIFY : IO Data := Support.getExport "node:vm" ["DONT_CONTEXTIFY"] Data
 
-/-- `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER` (added in Node.js v21.7.0, v20.12.0): `readonly attribute any USE_MAIN_CONTEXT_DEFAULT_LOADER` (Node.js 24.22.2 documentation, vm.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER` (added in Node.js v21.7.0, v20.12.0): `readonly attribute any USE_MAIN_CONTEXT_DEFAULT_LOADER` (Node.js 24.22.2 documentation, vm.md) -/
 def vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER : IO Data := Support.getExport "node:vm" ["USE_MAIN_CONTEXT_DEFAULT_LOADER"] Data
 
 end Lasm.JS.Node

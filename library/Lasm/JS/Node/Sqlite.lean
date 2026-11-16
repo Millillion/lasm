@@ -46,6 +46,22 @@ instance : Nonempty SQLTagStore := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS SQLTagStore := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SQLTagStore := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.SQLTagStore", .data⟩
 
+/-- `class Database` of `node:sqlite` (Node.js 24.22.2 documentation, sqlite.md): a handle to the JavaScript object. -/
+structure Database where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty Database := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS Database := ⟨fun x => .ref x.val ""⟩
+instance : FromJS Database := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Database", .data⟩
+
+/-- `class Statement` of `node:sqlite` (Node.js 24.22.2 documentation, sqlite.md): a handle to the JavaScript object. -/
+structure Statement where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty Statement := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS Statement := ⟨fun x => .ref x.val ""⟩
+instance : FromJS Statement := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Statement", .data⟩
+
 /-- `dictionary DatabaseSync.FunctionOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DatabaseSync.FunctionOptions where
   /-- `boolean deterministic = false` -/
@@ -124,6 +140,128 @@ instance : Coe Bool DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := ⟨.boolea
 instance : Coe String DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := ⟨.domString⟩
 instance : Coe ByteArray DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := ⟨.uint8Array⟩
 
+/-- `(double or DOMString or sequence<any> or object or Function)`: one constructor per member type. -/
+inductive DoubleOrDOMStringOrSequenceOfAnyOrObjectOrJSFunction where
+  /-- `double` -/
+  | double (value : Float)
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `sequence<any>` -/
+  | sequence (value : Array Data)
+  /-- `object` -/
+  | object (value : Data)
+  /-- `Function` -/
+  | jsFunction (value : JSFunction)
+instance : ToJS DoubleOrDOMStringOrSequenceOfAnyOrObjectOrJSFunction := ⟨fun
+  | .double v => toJS v
+  | .domString v => toJS v
+  | .sequence v => toJS v
+  | .object v => toJS v
+  | .jsFunction v => toJS v⟩
+instance : Coe Float DoubleOrDOMStringOrSequenceOfAnyOrObjectOrJSFunction := ⟨.double⟩
+instance : Coe String DoubleOrDOMStringOrSequenceOfAnyOrObjectOrJSFunction := ⟨.domString⟩
+instance : Coe (Array Data) DoubleOrDOMStringOrSequenceOfAnyOrObjectOrJSFunction := ⟨.sequence⟩
+instance : Coe JSFunction DoubleOrDOMStringOrSequenceOfAnyOrObjectOrJSFunction := ⟨.jsFunction⟩
+
+/-- `dictionary Database.AggregateOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Database.AggregateOptions where
+  /-- `boolean deterministic = false` -/
+  deterministic : Option Bool := none
+  /-- `boolean directOnly = false` -/
+  directOnly : Option Bool := none
+  /-- `boolean useBigIntArguments = false` -/
+  useBigIntArguments : Option Bool := none
+  /-- `boolean varargs = false` -/
+  varargs : Option Bool := none
+  /-- `(double or DOMString or sequence<any> or object or Function)? start` -/
+  start : Option DoubleOrDOMStringOrSequenceOfAnyOrObjectOrJSFunction := none
+  /-- `Function step` -/
+  step : Option JSFunction := none
+  /-- `Function result` -/
+  result : Option JSFunction := none
+  /-- `Function inverse` -/
+  inverse : Option JSFunction := none
+instance instToJSDatabaseAggregateOptions : ToJS Database.AggregateOptions := ⟨fun d => Support.fields #[("deterministic", Support.optional d.deterministic),
+    ("directOnly", Support.optional d.directOnly),
+    ("useBigIntArguments", Support.optional d.useBigIntArguments),
+    ("varargs", Support.optional d.varargs),
+    ("start", Support.optional d.start),
+    ("step", Support.optional d.step),
+    ("result", Support.optional d.result),
+    ("inverse", Support.optional d.inverse)]⟩
+
+/-- `dictionary Database.FunctionOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Database.FunctionOptions where
+  /-- `boolean deterministic = false` -/
+  deterministic : Option Bool := none
+  /-- `boolean directOnly = false` -/
+  directOnly : Option Bool := none
+  /-- `boolean useBigIntArguments = false` -/
+  useBigIntArguments : Option Bool := none
+  /-- `boolean varargs = false` -/
+  varargs : Option Bool := none
+instance instToJSDatabaseFunctionOptions : ToJS Database.FunctionOptions := ⟨fun d => Support.fields #[("deterministic", Support.optional d.deterministic),
+    ("directOnly", Support.optional d.directOnly),
+    ("useBigIntArguments", Support.optional d.useBigIntArguments),
+    ("varargs", Support.optional d.varargs)]⟩
+
+/-- `dictionary Database.DeserializeOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Database.DeserializeOptions where
+  /-- `DOMString dbName = "main"` -/
+  dbName : Option String := none
+instance instToJSDatabaseDeserializeOptions : ToJS Database.DeserializeOptions := ⟨fun d => Support.fields #[("dbName", Support.optional d.dbName)]⟩
+
+/-- `dictionary Database.PrepareOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Database.PrepareOptions where
+  /-- `boolean readBigInts` -/
+  readBigInts : Option Bool := none
+  /-- `boolean returnArrays` -/
+  returnArrays : Option Bool := none
+  /-- `boolean allowBareNamedParameters` -/
+  allowBareNamedParameters : Option Bool := none
+  /-- `boolean allowUnknownNamedParameters` -/
+  allowUnknownNamedParameters : Option Bool := none
+  /-- `boolean persistent = false` -/
+  persistent : Option Bool := none
+instance instToJSDatabasePrepareOptions : ToJS Database.PrepareOptions := ⟨fun d => Support.fields #[("readBigInts", Support.optional d.readBigInts),
+    ("returnArrays", Support.optional d.returnArrays),
+    ("allowBareNamedParameters", Support.optional d.allowBareNamedParameters),
+    ("allowUnknownNamedParameters", Support.optional d.allowUnknownNamedParameters),
+    ("persistent", Support.optional d.persistent)]⟩
+
+/-- `dictionary Database.CreateModuleOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Database.CreateModuleOptions where
+  /-- `sequence<any> columns` -/
+  columns : Option (Array Data) := none
+  /-- `Function rows` -/
+  rows : Option JSFunction := none
+  /-- `boolean directOnly = false` -/
+  directOnly : Option Bool := none
+  /-- `boolean useBigIntArguments = false` -/
+  useBigIntArguments : Option Bool := none
+instance instToJSDatabaseCreateModuleOptions : ToJS Database.CreateModuleOptions := ⟨fun d => Support.fields #[("columns", Support.optional d.columns),
+    ("rows", Support.optional d.rows),
+    ("directOnly", Support.optional d.directOnly),
+    ("useBigIntArguments", Support.optional d.useBigIntArguments)]⟩
+
+/-- `dictionary Database.CreateSessionOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Database.CreateSessionOptions where
+  /-- `DOMString table` -/
+  table : Option String := none
+  /-- `DOMString db` -/
+  db : Option String := none
+instance instToJSDatabaseCreateSessionOptions : ToJS Database.CreateSessionOptions := ⟨fun d => Support.fields #[("table", Support.optional d.table),
+    ("db", Support.optional d.db)]⟩
+
+/-- `dictionary Database.ApplyChangesetOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Database.ApplyChangesetOptions where
+  /-- `Function filter` -/
+  filter : Option JSFunction := none
+  /-- `Function onConflict` -/
+  onConflict : Option JSFunction := none
+instance instToJSDatabaseApplyChangesetOptions : ToJS Database.ApplyChangesetOptions := ⟨fun d => Support.fields #[("filter", Support.optional d.filter),
+    ("onConflict", Support.optional d.onConflict)]⟩
+
 /-- `dictionary sqlite.BackupOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure sqlite.BackupOptions where
   /-- `DOMString source = "main"` -/
@@ -139,179 +277,317 @@ instance instToJSSqliteBackupOptions : ToJS sqlite.BackupOptions := ⟨fun d => 
     ("rate", Support.optional d.rate),
     ("progress", Support.optional d.progress)]⟩
 
-/-- `database.isOpen` (added in Node.js v23.11.0, v22.15.0): `readonly attribute boolean isOpen` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.isOpen` (added in Node.js v23.11.0, v22.15.0): `readonly attribute boolean isOpen` -/
 def DatabaseSync.isOpen (self : DatabaseSync) : IO Bool := self.val.get "isOpen" Bool
 
-/-- `database.isTransaction` (added in Node.js v24.0.0): `readonly attribute boolean isTransaction` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.isTransaction` (added in Node.js v24.0.0): `readonly attribute boolean isTransaction` -/
 def DatabaseSync.isTransaction (self : DatabaseSync) : IO Bool := self.val.get "isTransaction" Bool
 
-/-- `database.limits` (added in Node.js v24.15.0): `readonly attribute object limits` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.limits` (added in Node.js v24.15.0): `readonly attribute object limits` -/
 def DatabaseSync.limits (self : DatabaseSync) : IO Data := self.val.get "limits" Data
 
-/-- `database.aggregate(name, options)` (added in Node.js v24.0.0): `undefined aggregate(any name, any options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.aggregate(name, options)` (added in Node.js v24.0.0): `undefined aggregate(any name, any options)` -/
 def DatabaseSync.aggregate (self : DatabaseSync) (name : Data) (options : Data) : IO Unit :=
   self.val.callMethod "aggregate" (Support.args #[toJS name, toJS options]) Unit
 
-/-- `database.close()` (added in Node.js v22.5.0): `undefined close()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.close()` (added in Node.js v22.5.0): `undefined close()` -/
 def DatabaseSync.close (self : DatabaseSync) : IO Unit :=
   self.val.callMethod "close" (Support.args #[]) Unit
 
-/-- `database.loadExtension(path[, entryPoint])` (added in Node.js v23.5.0, v22.13.0): `undefined loadExtension(DOMString path, optional DOMString entryPoint)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.loadExtension(path[, entryPoint])` (added in Node.js v23.5.0, v22.13.0): `undefined loadExtension(DOMString path, optional DOMString entryPoint)` -/
 def DatabaseSync.loadExtension (self : DatabaseSync) (path_ : String) (entryPoint : Option String := none) : IO Unit :=
   self.val.callMethod "loadExtension" (Support.args #[toJS path_, Support.optional entryPoint]) Unit
 
-/-- `database.enableLoadExtension(allow)` (added in Node.js v23.5.0, v22.13.0): `undefined enableLoadExtension(boolean allow)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.enableLoadExtension(allow)` (added in Node.js v23.5.0, v22.13.0): `undefined enableLoadExtension(boolean allow)` -/
 def DatabaseSync.enableLoadExtension (self : DatabaseSync) (allow : Bool) : IO Unit :=
   self.val.callMethod "enableLoadExtension" (Support.args #[toJS allow]) Unit
 
-/-- `database.enableDefensive(active)` (added in Node.js v24.12.0): `undefined enableDefensive(boolean active)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.enableDefensive(active)` (added in Node.js v24.12.0): `undefined enableDefensive(boolean active)` -/
 def DatabaseSync.enableDefensive (self : DatabaseSync) (active : Bool) : IO Unit :=
   self.val.callMethod "enableDefensive" (Support.args #[toJS active]) Unit
 
-/-- `database.location([dbName])` (added in Node.js v24.0.0): `DOMString? location(optional DOMString dbName)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.location([dbName])` (added in Node.js v24.0.0): `DOMString? location(optional DOMString dbName)` -/
 def DatabaseSync.location (self : DatabaseSync) (dbName : Option String := none) : IO (Option String) :=
   self.val.callMethod "location" (Support.args #[Support.optional dbName]) (Option String)
 
-/-- `database.exec(sql)` (added in Node.js v22.5.0): `undefined exec(DOMString sql)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.exec(sql)` (added in Node.js v22.5.0): `undefined exec(DOMString sql)` -/
 def DatabaseSync.exec (self : DatabaseSync) (sql : String) : IO Unit :=
   self.val.callMethod "exec" (Support.args #[toJS sql]) Unit
 
-/-- `database.function(name[, options], fn)` (added in Node.js v23.5.0, v22.13.0): `undefined function(DOMString name, Function fn)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.function(name[, options], fn)` (added in Node.js v23.5.0, v22.13.0): `undefined function(DOMString name, Function fn)` -/
 def DatabaseSync.function (self : DatabaseSync) (name : String) (fn : JSFunction) : IO Unit :=
   self.val.callMethod "function" (Support.args #[toJS name, toJS fn]) Unit
 
-/-- `database.function(name[, options], fn)` (added in Node.js v23.5.0, v22.13.0): `undefined function(DOMString name, DatabaseSync.FunctionOptions options, Function fn)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.function(name[, options], fn)` (added in Node.js v23.5.0, v22.13.0): `undefined function(DOMString name, DatabaseSync.FunctionOptions options, Function fn)` -/
 def DatabaseSync.functionWithOptions (self : DatabaseSync) (name : String) (options : DatabaseSync.FunctionOptions) (fn : JSFunction) : IO Unit :=
   self.val.callMethod "function" (Support.args #[toJS name, toJS options, toJS fn]) Unit
 
-/-- `database.setAuthorizer(callback)` (added in Node.js v24.10.0): `undefined setAuthorizer(Function? callback)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.setAuthorizer(callback)` (added in Node.js v24.10.0): `undefined setAuthorizer(Function? callback)` -/
 def DatabaseSync.setAuthorizer (self : DatabaseSync) (callback : Option JSFunction) : IO Unit :=
   self.val.callMethod "setAuthorizer" (Support.args #[toJS callback]) Unit
 
-/-- `database.open()` (added in Node.js v22.5.0): `undefined open()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.open()` (added in Node.js v22.5.0): `undefined open()` -/
 def DatabaseSync.«open» (self : DatabaseSync) : IO Unit :=
   self.val.callMethod "open" (Support.args #[]) Unit
 
-/-- `database.serialize([dbName])` (added in Node.js v24.16.0): `Uint8Array serialize(optional DOMString dbName)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.serialize([dbName])` (added in Node.js v24.16.0): `Uint8Array serialize(optional DOMString dbName)` -/
 def DatabaseSync.serialize (self : DatabaseSync) (dbName : Option String := none) : IO ByteArray :=
   self.val.callMethod "serialize" (Support.args #[Support.optional dbName]) ByteArray
 
-/-- `database.deserialize(buffer[, options])` (added in Node.js v24.16.0): `undefined deserialize(Uint8Array buffer, optional DatabaseSync.DeserializeOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.deserialize(buffer[, options])` (added in Node.js v24.16.0): `undefined deserialize(Uint8Array buffer, optional DatabaseSync.DeserializeOptions options)` -/
 def DatabaseSync.deserialize (self : DatabaseSync) (buffer_ : ByteArray) (options : Option DatabaseSync.DeserializeOptions := none) : IO Unit :=
   self.val.callMethod "deserialize" (Support.args #[toJS buffer_, Support.optional options]) Unit
 
-/-- `database.prepare(sql[, options])` (added in Node.js v22.5.0): `StatementSync prepare(DOMString sql, optional DatabaseSync.PrepareOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.prepare(sql[, options])` (added in Node.js v22.5.0): `StatementSync prepare(DOMString sql, optional DatabaseSync.PrepareOptions options)` -/
 def DatabaseSync.prepare (self : DatabaseSync) (sql : String) (options : Option DatabaseSync.PrepareOptions := none) : IO StatementSync := do
   let r ← self.val.callMethod "prepare" (Support.args #[toJS sql, Support.optional options]) Value
   pure { val := r }
 
-/-- `database.createTagStore([maxSize])` (added in Node.js v24.9.0): `SQLTagStore createTagStore(optional long long maxSize)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.createTagStore([maxSize])` (added in Node.js v24.9.0): `SQLTagStore createTagStore(optional long long maxSize)` -/
 def DatabaseSync.createTagStore (self : DatabaseSync) (maxSize : Option Int := none) : IO SQLTagStore := do
   let r ← self.val.callMethod "createTagStore" (Support.args #[Support.optional maxSize]) Value
   pure { val := r }
 
-/-- `database.createSession([options])` (added in Node.js v23.3.0, v22.12.0): `Session createSession(optional DatabaseSync.CreateSessionOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.createSession([options])` (added in Node.js v23.3.0, v22.12.0): `Session createSession(optional DatabaseSync.CreateSessionOptions options)` -/
 def DatabaseSync.createSession (self : DatabaseSync) (options : Option DatabaseSync.CreateSessionOptions := none) : IO Session := do
   let r ← self.val.callMethod "createSession" (Support.args #[Support.optional options]) Value
   pure { val := r }
 
-/-- `database.applyChangeset(changeset[, options])` (added in Node.js v23.3.0, v22.12.0): `boolean applyChangeset(Uint8Array changeset, optional DatabaseSync.ApplyChangesetOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.applyChangeset(changeset[, options])` (added in Node.js v23.3.0, v22.12.0): `boolean applyChangeset(Uint8Array changeset, optional DatabaseSync.ApplyChangesetOptions options)` -/
 def DatabaseSync.applyChangeset (self : DatabaseSync) (changeset : ByteArray) (options : Option DatabaseSync.ApplyChangesetOptions := none) : IO Bool :=
   self.val.callMethod "applyChangeset" (Support.args #[toJS changeset, Support.optional options]) Bool
 
-/-- `session.changeset()` (added in Node.js v23.3.0, v22.12.0): `Uint8Array changeset()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `session.changeset()` (added in Node.js v23.3.0, v22.12.0): `Uint8Array changeset()` -/
 def Session.changeset (self : Session) : IO ByteArray :=
   self.val.callMethod "changeset" (Support.args #[]) ByteArray
 
-/-- `session.patchset()` (added in Node.js v23.3.0, v22.12.0): `Uint8Array patchset()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `session.patchset()` (added in Node.js v23.3.0, v22.12.0): `Uint8Array patchset()` -/
 def Session.patchset (self : Session) : IO ByteArray :=
   self.val.callMethod "patchset" (Support.args #[]) ByteArray
 
-/-- `session.close()`: `undefined close()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `session.close()`: `undefined close()` -/
 def Session.close (self : Session) : IO Unit :=
   self.val.callMethod "close" (Support.args #[]) Unit
 
-/-- `statement.expandedSQL` (added in Node.js v22.5.0): `readonly attribute DOMString expandedSQL` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.expandedSQL` (added in Node.js v22.5.0): `readonly attribute DOMString expandedSQL` -/
 def StatementSync.expandedSQL (self : StatementSync) : IO String := self.val.get "expandedSQL" String
 
-/-- `statement.sourceSQL` (added in Node.js v22.5.0): `readonly attribute DOMString sourceSQL` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.sourceSQL` (added in Node.js v22.5.0): `readonly attribute DOMString sourceSQL` -/
 def StatementSync.sourceSQL (self : StatementSync) : IO String := self.val.get "sourceSQL" String
 
-/-- `statement.all([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `sequence<any> all(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.all([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `sequence<any> all(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
 def StatementSync.all (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Array Data) :=
   self.val.callMethod "all" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Array Data)
 
-/-- `statement.close()` (added in Node.js v24.22.0): `undefined close()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.close()` (added in Node.js v24.22.0): `undefined close()` -/
 def StatementSync.close (self : StatementSync) : IO Unit :=
   self.val.callMethod "close" (Support.args #[]) Unit
 
-/-- `statement.columns()` (added in Node.js v23.11.0): `sequence<any> columns()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.columns()` (added in Node.js v23.11.0): `sequence<any> columns()` -/
 def StatementSync.columns (self : StatementSync) : IO (Array Data) :=
   self.val.callMethod "columns" (Support.args #[]) (Array Data)
 
-/-- `statement.get([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object? get(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.get([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object? get(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
 def StatementSync.get (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Option Data) :=
   self.val.callMethod "get" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Option Data)
 
-/-- `statement.iterate([namedParameters][, ...anonymousParameters])` (added in Node.js v23.4.0, v22.13.0): `object iterate(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.iterate([namedParameters][, ...anonymousParameters])` (added in Node.js v23.4.0, v22.13.0): `object iterate(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
 def StatementSync.iterate (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data :=
   self.val.callMethod "iterate" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
 
-/-- `statement.run([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object run(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.run([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object run(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
 def StatementSync.run (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data :=
   self.val.callMethod "run" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
 
-/-- `statement.setAllowBareNamedParameters(enabled)` (added in Node.js v22.5.0): `undefined setAllowBareNamedParameters(boolean enabled)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.setAllowBareNamedParameters(enabled)` (added in Node.js v22.5.0): `undefined setAllowBareNamedParameters(boolean enabled)` -/
 def StatementSync.setAllowBareNamedParameters (self : StatementSync) (enabled : Bool) : IO Unit :=
   self.val.callMethod "setAllowBareNamedParameters" (Support.args #[toJS enabled]) Unit
 
-/-- `statement.setAllowUnknownNamedParameters(enabled)` (added in Node.js v23.11.0, v22.15.0): `undefined setAllowUnknownNamedParameters(boolean enabled)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.setAllowUnknownNamedParameters(enabled)` (added in Node.js v23.11.0, v22.15.0): `undefined setAllowUnknownNamedParameters(boolean enabled)` -/
 def StatementSync.setAllowUnknownNamedParameters (self : StatementSync) (enabled : Bool) : IO Unit :=
   self.val.callMethod "setAllowUnknownNamedParameters" (Support.args #[toJS enabled]) Unit
 
-/-- `statement.setReturnArrays(enabled)` (added in Node.js v24.0.0): `undefined setReturnArrays(boolean enabled)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.setReturnArrays(enabled)` (added in Node.js v24.0.0): `undefined setReturnArrays(boolean enabled)` -/
 def StatementSync.setReturnArrays (self : StatementSync) (enabled : Bool) : IO Unit :=
   self.val.callMethod "setReturnArrays" (Support.args #[toJS enabled]) Unit
 
-/-- `statement.setReadBigInts(enabled)` (added in Node.js v22.5.0): `undefined setReadBigInts(boolean enabled)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.setReadBigInts(enabled)` (added in Node.js v22.5.0): `undefined setReadBigInts(boolean enabled)` -/
 def StatementSync.setReadBigInts (self : StatementSync) (enabled : Bool) : IO Unit :=
   self.val.callMethod "setReadBigInts" (Support.args #[toJS enabled]) Unit
 
-/-- `sqlTagStore.size` (added in Node.js v24.9.0): `readonly attribute long long size` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.size` (added in Node.js v24.9.0): `readonly attribute long long size` -/
 def SQLTagStore.size (self : SQLTagStore) : IO Int := self.val.get "size" Int
 
-/-- `sqlTagStore.capacity` (added in Node.js v24.9.0): `readonly attribute long long capacity` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.capacity` (added in Node.js v24.9.0): `readonly attribute long long capacity` -/
 def SQLTagStore.capacity (self : SQLTagStore) : IO Int := self.val.get "capacity" Int
 
-/-- `sqlTagStore.db` (added in Node.js v24.9.0): `readonly attribute DatabaseSync db` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.db` (added in Node.js v24.9.0): `readonly attribute DatabaseSync db` -/
 def SQLTagStore.db (self : SQLTagStore) : IO DatabaseSync := do
   let r ← self.val.get "db" Value
   pure { val := r }
 
-/-- `sqlTagStore.all(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `sequence<any> all(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.all(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `sequence<any> all(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
 def SQLTagStore.all (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Array Data) :=
   self.val.callMethod "all" (Support.argsWith #[toJS stringElements] (boundParameters.map toJS)) (Array Data)
 
-/-- `sqlTagStore.get(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object? get(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.get(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object? get(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
 def SQLTagStore.get (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Option Data) :=
   self.val.callMethod "get" (Support.argsWith #[toJS stringElements] (boundParameters.map toJS)) (Option Data)
 
-/-- `sqlTagStore.iterate(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object iterate(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.iterate(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object iterate(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
 def SQLTagStore.iterate (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data :=
   self.val.callMethod "iterate" (Support.argsWith #[toJS stringElements] (boundParameters.map toJS)) Data
 
-/-- `sqlTagStore.run(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object run(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.run(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object run(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
 def SQLTagStore.run (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data :=
   self.val.callMethod "run" (Support.argsWith #[toJS stringElements] (boundParameters.map toJS)) Data
 
-/-- `sqlTagStore.clear()` (added in Node.js v24.9.0): `undefined clear()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.clear()` (added in Node.js v24.9.0): `undefined clear()` -/
 def SQLTagStore.clear (self : SQLTagStore) : IO Unit :=
   self.val.callMethod "clear" (Support.args #[]) Unit
 
-/-- `sqlite.constants` (added in Node.js v23.5.0, v22.13.0): `readonly attribute object constants` (Node.js 24.22.2 documentation, sqlite.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.isOpen` (added in Node.js v23.11.0, v22.15.0): `readonly attribute boolean isOpen` -/
+def Database.isOpen (self : Database) : IO Bool := self.val.get "isOpen" Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.isTransaction` (added in Node.js v24.0.0, v22.16.0): `readonly attribute boolean isTransaction` -/
+def Database.isTransaction (self : Database) : IO Bool := self.val.get "isTransaction" Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.limits` (added in Node.js v25.8.0): `readonly attribute object limits` -/
+def Database.limits (self : Database) : IO Data := self.val.get "limits" Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.aggregate(name, options)` (added in Node.js v24.0.0, v22.16.0): `undefined aggregate(DOMString name, Database.AggregateOptions options)` -/
+def Database.aggregate (self : Database) (name : String) (options : Database.AggregateOptions) : IO Unit :=
+  self.val.callMethod "aggregate" (Support.args #[toJS name, toJS options]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.close()` (added in Node.js v22.5.0): `undefined close()` -/
+def Database.close (self : Database) : IO Unit :=
+  self.val.callMethod "close" (Support.args #[]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.loadExtension(path[, entryPoint])` (added in Node.js v23.5.0, v22.13.0): `undefined loadExtension(DOMString path, optional DOMString entryPoint)` -/
+def Database.loadExtension (self : Database) (path_ : String) (entryPoint : Option String := none) : IO Unit :=
+  self.val.callMethod "loadExtension" (Support.args #[toJS path_, Support.optional entryPoint]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.enableLoadExtension(allow)` (added in Node.js v23.5.0, v22.13.0): `undefined enableLoadExtension(boolean allow)` -/
+def Database.enableLoadExtension (self : Database) (allow : Bool) : IO Unit :=
+  self.val.callMethod "enableLoadExtension" (Support.args #[toJS allow]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.enableDefensive(active)` (added in Node.js v25.1.0, v24.12.0): `undefined enableDefensive(boolean active)` -/
+def Database.enableDefensive (self : Database) (active : Bool) : IO Unit :=
+  self.val.callMethod "enableDefensive" (Support.args #[toJS active]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.location([dbName])` (added in Node.js v24.0.0, v22.16.0): `DOMString? location(optional DOMString dbName)` -/
+def Database.location (self : Database) (dbName : Option String := none) : IO (Option String) :=
+  self.val.callMethod "location" (Support.args #[Support.optional dbName]) (Option String)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.exec(sql)` (added in Node.js v22.5.0): `undefined exec(DOMString sql)` -/
+def Database.exec (self : Database) (sql : String) : IO Unit :=
+  self.val.callMethod "exec" (Support.args #[toJS sql]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.function(name[, options], fn)` (added in Node.js v23.5.0, v22.13.0): `undefined function(DOMString name, Function fn)` -/
+def Database.function (self : Database) (name : String) (fn : JSFunction) : IO Unit :=
+  self.val.callMethod "function" (Support.args #[toJS name, toJS fn]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.function(name[, options], fn)` (added in Node.js v23.5.0, v22.13.0): `undefined function(DOMString name, Database.FunctionOptions options, Function fn)` -/
+def Database.functionWithOptions (self : Database) (name : String) (options : Database.FunctionOptions) (fn : JSFunction) : IO Unit :=
+  self.val.callMethod "function" (Support.args #[toJS name, toJS options, toJS fn]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.setAuthorizer(callback)` (added in Node.js v24.10.0): `undefined setAuthorizer(Function? callback)` -/
+def Database.setAuthorizer (self : Database) (callback : Option JSFunction) : IO Unit :=
+  self.val.callMethod "setAuthorizer" (Support.args #[toJS callback]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.open()` (added in Node.js v22.5.0): `undefined open()` -/
+def Database.«open» (self : Database) : IO Unit :=
+  self.val.callMethod "open" (Support.args #[]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.serialize([dbName])` (added in Node.js v26.1.0): `Uint8Array serialize(optional DOMString dbName)` -/
+def Database.serialize (self : Database) (dbName : Option String := none) : IO ByteArray :=
+  self.val.callMethod "serialize" (Support.args #[Support.optional dbName]) ByteArray
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.deserialize(buffer[, options])` (added in Node.js v26.1.0): `undefined deserialize(Uint8Array buffer, optional Database.DeserializeOptions options)` -/
+def Database.deserialize (self : Database) (buffer_ : ByteArray) (options : Option Database.DeserializeOptions := none) : IO Unit :=
+  self.val.callMethod "deserialize" (Support.args #[toJS buffer_, Support.optional options]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.prepare(sql[, options])` (added in Node.js v22.5.0): `Statement prepare(DOMString sql, optional Database.PrepareOptions options)` -/
+def Database.prepare (self : Database) (sql : String) (options : Option Database.PrepareOptions := none) : IO Statement := do
+  let r ← self.val.callMethod "prepare" (Support.args #[toJS sql, Support.optional options]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.createTagStore([maxSize])` (added in Node.js v24.9.0): `SQLTagStore createTagStore(optional long long maxSize)` -/
+def Database.createTagStore (self : Database) (maxSize : Option Int := none) : IO SQLTagStore := do
+  let r ← self.val.callMethod "createTagStore" (Support.args #[Support.optional maxSize]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.createModule(name, options)` (added in Node.js v26.11.0): `undefined createModule(DOMString name, Database.CreateModuleOptions options)` -/
+def Database.createModule (self : Database) (name : String) (options : Database.CreateModuleOptions) : IO Unit :=
+  self.val.callMethod "createModule" (Support.args #[toJS name, toJS options]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.createSession([options])` (added in Node.js v23.3.0, v22.12.0): `Session createSession(optional Database.CreateSessionOptions options)` -/
+def Database.createSession (self : Database) (options : Option Database.CreateSessionOptions := none) : IO Session := do
+  let r ← self.val.callMethod "createSession" (Support.args #[Support.optional options]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `database.applyChangeset(changeset[, options])` (added in Node.js v23.3.0, v22.12.0): `boolean applyChangeset(Uint8Array changeset, optional Database.ApplyChangesetOptions options)` -/
+def Database.applyChangeset (self : Database) (changeset : ByteArray) (options : Option Database.ApplyChangesetOptions := none) : IO Bool :=
+  self.val.callMethod "applyChangeset" (Support.args #[toJS changeset, Support.optional options]) Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.expandedSQL` (added in Node.js v22.5.0): `readonly attribute DOMString expandedSQL` -/
+def Statement.expandedSQL (self : Statement) : IO String := self.val.get "expandedSQL" String
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.sourceSQL` (added in Node.js v22.5.0): `readonly attribute DOMString sourceSQL` -/
+def Statement.sourceSQL (self : Statement) : IO String := self.val.get "sourceSQL" String
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.all([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `sequence<any> all(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
+def Statement.all (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Array Data) :=
+  self.val.callMethod "all" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Array Data)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.close()` (added in Node.js v26.8.0): `undefined close()` -/
+def Statement.close (self : Statement) : IO Unit :=
+  self.val.callMethod "close" (Support.args #[]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.columns()` (added in Node.js v23.11.0, v22.16.0): `sequence<any> columns()` -/
+def Statement.columns (self : Statement) : IO (Array Data) :=
+  self.val.callMethod "columns" (Support.args #[]) (Array Data)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.get([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object? get(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
+def Statement.get (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Option Data) :=
+  self.val.callMethod "get" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Option Data)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.iterate([namedParameters][, ...anonymousParameters])` (added in Node.js v23.4.0, v22.13.0): `object iterate(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
+def Statement.iterate (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data :=
+  self.val.callMethod "iterate" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.resetStats()` (added in Node.js v26.8.0): `undefined resetStats()` -/
+def Statement.resetStats (self : Statement) : IO Unit :=
+  self.val.callMethod "resetStats" (Support.args #[]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.run([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object run(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
+def Statement.run (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data :=
+  self.val.callMethod "run" (Support.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.setAllowBareNamedParameters(enabled)` (added in Node.js v22.5.0): `undefined setAllowBareNamedParameters(boolean enabled)` -/
+def Statement.setAllowBareNamedParameters (self : Statement) (enabled : Bool) : IO Unit :=
+  self.val.callMethod "setAllowBareNamedParameters" (Support.args #[toJS enabled]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.setAllowUnknownNamedParameters(enabled)` (added in Node.js v23.11.0, v22.15.0): `undefined setAllowUnknownNamedParameters(boolean enabled)` -/
+def Statement.setAllowUnknownNamedParameters (self : Statement) (enabled : Bool) : IO Unit :=
+  self.val.callMethod "setAllowUnknownNamedParameters" (Support.args #[toJS enabled]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.setReturnArrays(enabled)` (added in Node.js v24.0.0, v22.16.0): `undefined setReturnArrays(boolean enabled)` -/
+def Statement.setReturnArrays (self : Statement) (enabled : Bool) : IO Unit :=
+  self.val.callMethod "setReturnArrays" (Support.args #[toJS enabled]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.setReadBigInts(enabled)` (added in Node.js v22.5.0): `undefined setReadBigInts(boolean enabled)` -/
+def Statement.setReadBigInts (self : Statement) (enabled : Bool) : IO Unit :=
+  self.val.callMethod "setReadBigInts" (Support.args #[toJS enabled]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.stat(counter)` (added in Node.js v26.8.0): `double stat(DOMString counter)` -/
+def Statement.stat (self : Statement) (counter : String) : IO Float :=
+  self.val.callMethod "stat" (Support.args #[toJS counter]) Float
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlite.constants` (added in Node.js v23.5.0, v22.13.0): `readonly attribute object constants` (Node.js 24.22.2 documentation, sqlite.md) -/
 def sqlite.constants : IO Data := Support.getExport "node:sqlite" ["constants"] Data
 
-/-- `sqlite.backup(sourceDb, path[, options])` (added in Node.js v23.8.0): `Promise<any> backup(DatabaseSync sourceDb, (DOMString or Uint8Array or URL) path, optional sqlite.BackupOptions options)` (Node.js 24.22.2 documentation, sqlite.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlite.backup(sourceDb, path[, options])` (added in Node.js v23.8.0): `Promise<any> backup(DatabaseSync sourceDb, (DOMString or Uint8Array or URL) path, optional sqlite.BackupOptions options)` (Node.js 24.22.2 documentation, sqlite.md) -/
 def sqlite.backup (sourceDb : DatabaseSync) (path_ : DOMStringOrUint8ArrayOrURL) (options : Option sqlite.BackupOptions := none) : Async Data :=
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.sqlite.backup", module := "node:sqlite", path := "backup", construct := false, arity := 3 }
     (Support.args #[toJS sourceDb, toJS path_, Support.optional options])

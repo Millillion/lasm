@@ -203,7 +203,7 @@ def cluster.Worker.kill (self : cluster.Worker) (signal : Option String := none)
 def cluster.Worker.send (self : cluster.Worker) (message : Data) (sendHandle : Data := .undefined) (options : Option cluster.Worker.SendOptions := none) : IO Bool :=
   self.val.callMethod "send" (Support.args #[toJS message, sendHandle, Support.optional options]) Bool
 
-/-- `cluster.isMaster` (added in Node.js v0.8.1): `readonly attribute any isMaster` (Node.js 24.22.2 documentation, cluster.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `cluster.isMaster` (added in Node.js v0.8.1): `readonly attribute any isMaster` (Node.js 24.22.2 documentation, cluster.md) -/
 def cluster.isMaster : IO Data := Support.getExport "node:cluster" ["isMaster"] Data
 
 /-- `cluster.isPrimary` (added in Node.js v16.0.0): `readonly attribute boolean isPrimary` (Node.js 24.22.2 documentation, cluster.md) -/
@@ -235,7 +235,7 @@ def cluster.fork (env : Data := .undefined) : IO cluster.Worker := do
     (Support.args #[env]) (await := false)
   pure { val := r }
 
-/-- `cluster.setupMaster([settings])` (added in Node.js v0.7.1): `undefined setupMaster(optional any settings)` (Node.js 24.22.2 documentation, cluster.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `cluster.setupMaster([settings])` (added in Node.js v0.7.1): `undefined setupMaster(optional any settings)` (Node.js 24.22.2 documentation, cluster.md) -/
 def cluster.setupMaster (settings : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.cluster.setupMaster", module := "node:cluster", path := "setupMaster", construct := false, arity := 1 }
     (Support.args #[settings]) (await := false)

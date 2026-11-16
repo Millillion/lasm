@@ -574,10 +574,10 @@ def http.IncomingMessage.CloseListener.ofSyncFn (f : IO Unit) : IO http.Incoming
 
 /-- `dictionary http.CreateServerOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure http.CreateServerOptions where
-  /-- `undefined connectionsCheckingInterval = 30000` -/
-  connectionsCheckingInterval : Option Unit := none
-  /-- `undefined headersTimeout = 60000` -/
-  headersTimeout : Option Unit := none
+  /-- `any connectionsCheckingInterval = 30000` -/
+  connectionsCheckingInterval : Data := .undefined
+  /-- `any headersTimeout = 60000` -/
+  headersTimeout : Data := .undefined
   /-- `double highWaterMark` -/
   highWaterMark : Option Float := none
   /-- `DOMString httpValidation` -/
@@ -592,14 +592,14 @@ structure http.CreateServerOptions where
   keepAlive : Option Bool := none
   /-- `double keepAliveInitialDelay = 0` -/
   keepAliveInitialDelay : Option Float := none
-  /-- `undefined keepAliveTimeout = 65000` -/
-  keepAliveTimeout : Option Unit := none
+  /-- `any keepAliveTimeout = 65000` -/
+  keepAliveTimeout : Data := .undefined
   /-- `double maxHeaderSize` -/
   maxHeaderSize : Option Float := none
   /-- `boolean noDelay = true` -/
   noDelay : Option Bool := none
-  /-- `undefined requestTimeout = 300000` -/
-  requestTimeout : Option Unit := none
+  /-- `any requestTimeout = 300000` -/
+  requestTimeout : Data := .undefined
   /-- `boolean requireHostHeader = true` -/
   requireHostHeader : Option Bool := none
   /-- `Node_http_ServerResponse ServerResponse` -/
@@ -610,8 +610,8 @@ structure http.CreateServerOptions where
   rejectNonStandardBodyWrites : Option Bool := none
   /-- `boolean optimizeEmptyRequests = false` -/
   optimizeEmptyRequests : Option Bool := none
-instance instToJSHttpCreateServerOptions : ToJS http.CreateServerOptions := ⟨fun d => Support.fields #[("connectionsCheckingInterval", Support.optional d.connectionsCheckingInterval),
-    ("headersTimeout", Support.optional d.headersTimeout),
+instance instToJSHttpCreateServerOptions : ToJS http.CreateServerOptions := ⟨fun d => Support.fields #[("connectionsCheckingInterval", d.connectionsCheckingInterval),
+    ("headersTimeout", d.headersTimeout),
     ("highWaterMark", Support.optional d.highWaterMark),
     ("httpValidation", Support.optional d.httpValidation),
     ("insecureHTTPParser", Support.optional d.insecureHTTPParser),
@@ -619,10 +619,10 @@ instance instToJSHttpCreateServerOptions : ToJS http.CreateServerOptions := ⟨f
     ("joinDuplicateHeaders", Support.optional d.joinDuplicateHeaders),
     ("keepAlive", Support.optional d.keepAlive),
     ("keepAliveInitialDelay", Support.optional d.keepAliveInitialDelay),
-    ("keepAliveTimeout", Support.optional d.keepAliveTimeout),
+    ("keepAliveTimeout", d.keepAliveTimeout),
     ("maxHeaderSize", Support.optional d.maxHeaderSize),
     ("noDelay", Support.optional d.noDelay),
-    ("requestTimeout", Support.optional d.requestTimeout),
+    ("requestTimeout", d.requestTimeout),
     ("requireHostHeader", Support.optional d.requireHostHeader),
     ("ServerResponse", Support.optional d.ServerResponse),
     ("uniqueHeaders", Support.optional d.uniqueHeaders),
@@ -722,6 +722,12 @@ instance instToJSHttpRequestOptions : ToJS http.RequestOptions := ⟨fun d => Su
     ("timeout", Support.optional d.timeout),
     ("uniqueHeaders", Support.optional d.uniqueHeaders)]⟩
 
+/-- `dictionary http.IsValidHeaderValueOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure http.IsValidHeaderValueOptions where
+  /-- `DOMString httpValidation = "strict"` -/
+  httpValidation : Option String := none
+instance instToJSHttpIsValidHeaderValueOptions : ToJS http.IsValidHeaderValueOptions := ⟨fun d => Support.fields #[("httpValidation", Support.optional d.httpValidation)]⟩
+
 /-- `new Agent([options])` (added in Node.js v0.3.4): `constructor(optional http.Agent.NewOptions options)` -/
 def http.Agent.new (options : Option http.Agent.NewOptions := none) : IO http.Agent :=
   Lasm.JS.Binding.invoke http.Agent { name := "Lasm.JS.Node.http.Agent.new", module := "node:http", path := "Agent", construct := true, arity := 1 }
@@ -766,7 +772,7 @@ def http.Agent.destroy (self : http.Agent) : IO Unit :=
 def http.Agent.getName (self : http.Agent) (options : Option http.Agent.GetNameOptions := none) : IO String :=
   self.val.callMethod "getName" (Support.args #[Support.optional options]) String
 
-/-- `outgoingMessage.connection` (added in Node.js v0.3.0): `readonly attribute any connection` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `outgoingMessage.connection` (added in Node.js v0.3.0): `readonly attribute any connection` -/
 def http.OutgoingMessage.connection (self : http.OutgoingMessage) : IO Data := self.val.get "connection" Data
 
 /-- `outgoingMessage.headersSent` (added in Node.js v0.9.3): `readonly attribute boolean headersSent` -/
@@ -899,15 +905,15 @@ def http.OutgoingMessage.uncork (self : http.OutgoingMessage) : IO Unit :=
 def http.OutgoingMessage.write (self : http.OutgoingMessage) (chunk : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool :=
   self.val.callMethod "write" (Support.args #[toJS chunk, Support.optional encoding]) Bool
 
-/-- `request.aborted` (added in Node.js v0.11.14): `readonly attribute boolean aborted` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `request.aborted` (added in Node.js v0.11.14): `readonly attribute boolean aborted` -/
 def http.ClientRequest.aborted (self : http.ClientRequest) : IO Bool := self.val.get "aborted" Bool
 
-/-- `request.connection` (added in Node.js v0.3.0): `readonly attribute stream.Duplex connection` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `request.connection` (added in Node.js v0.3.0): `readonly attribute stream.Duplex connection` -/
 def http.ClientRequest.connection (self : http.ClientRequest) : IO stream.Duplex := do
   let r ← self.val.get "connection" Value
   pure { val := r }
 
-/-- `request.finished` (added in Node.js v0.0.1): `readonly attribute boolean finished` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `request.finished` (added in Node.js v0.0.1): `readonly attribute boolean finished` -/
 def http.ClientRequest.finished (self : http.ClientRequest) : IO Bool := self.val.get "finished" Bool
 
 /-- `request.maxHeadersCount`: `readonly attribute double maxHeadersCount` -/
@@ -939,12 +945,12 @@ def http.ClientRequest.writableEnded (self : http.ClientRequest) : IO Bool := se
 /-- `request.writableFinished` (added in Node.js v12.7.0): `readonly attribute boolean writableFinished` -/
 def http.ClientRequest.writableFinished (self : http.ClientRequest) : IO Bool := self.val.get "writableFinished" Bool
 
-/-- `Event: 'abort'` (added in Node.js v1.4.1): `http.ClientRequest onAbort(http.ClientRequest.AbortListener listener)`: calls `on("abort", listener)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `Event: 'abort'` (added in Node.js v1.4.1): `http.ClientRequest onAbort(http.ClientRequest.AbortListener listener)`: calls `on("abort", listener)` -/
 def http.ClientRequest.onAbort (self : http.ClientRequest) (listener : http.ClientRequest.AbortListener) : IO http.ClientRequest := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "abort", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'abort'` (added in Node.js v1.4.1): `http.ClientRequest onceAbort(http.ClientRequest.AbortListener listener)`: calls `once("abort", listener)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `Event: 'abort'` (added in Node.js v1.4.1): `http.ClientRequest onceAbort(http.ClientRequest.AbortListener listener)`: calls `once("abort", listener)` -/
 def http.ClientRequest.onceAbort (self : http.ClientRequest) (listener : http.ClientRequest.AbortListener) : IO http.ClientRequest := do
   let r ← self.val.callMethod "once" (Support.args #[toJS "abort", toJS listener]) Value
   pure { val := r }
@@ -1039,7 +1045,7 @@ def http.ClientRequest.onceUpgrade (self : http.ClientRequest) (listener : http.
   let r ← self.val.callMethod "once" (Support.args #[toJS "upgrade", toJS listener]) Value
   pure { val := r }
 
-/-- `request.abort()` (added in Node.js v0.3.8): `undefined abort()` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `request.abort()` (added in Node.js v0.3.8): `undefined abort()` -/
 def http.ClientRequest.abort (self : http.ClientRequest) : IO Unit :=
   self.val.callMethod "abort" (Support.args #[]) Unit
 
@@ -1245,12 +1251,12 @@ def http.Server.setTimeout (self : http.Server) (msecs : Option Float := none) :
   let r ← self.val.callMethod "setTimeout" (Support.args #[Support.optional msecs]) Value
   pure { val := r }
 
-/-- `response.connection` (added in Node.js v0.3.0): `readonly attribute stream.Duplex connection` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `response.connection` (added in Node.js v0.3.0): `readonly attribute stream.Duplex connection` -/
 def http.ServerResponse.connection (self : http.ServerResponse) : IO stream.Duplex := do
   let r ← self.val.get "connection" Value
   pure { val := r }
 
-/-- `response.finished` (added in Node.js v0.0.2): `readonly attribute boolean finished` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `response.finished` (added in Node.js v0.0.2): `readonly attribute boolean finished` -/
 def http.ServerResponse.finished (self : http.ServerResponse) : IO Bool := self.val.get "finished" Bool
 
 /-- `response.headersSent` (added in Node.js v0.9.3): `readonly attribute boolean headersSent` -/
@@ -1380,13 +1386,13 @@ def http.ServerResponse.writeInformation (self : http.ServerResponse) (statusCod
 def http.ServerResponse.writeProcessing (self : http.ServerResponse) : IO Unit :=
   self.val.callMethod "writeProcessing" (Support.args #[]) Unit
 
-/-- `message.aborted` (added in Node.js v10.1.0): `readonly attribute boolean aborted` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `message.aborted` (added in Node.js v10.1.0): `readonly attribute boolean aborted` -/
 def http.IncomingMessage.aborted (self : http.IncomingMessage) : IO Bool := self.val.get "aborted" Bool
 
 /-- `message.complete` (added in Node.js v0.3.0): `readonly attribute boolean complete` -/
 def http.IncomingMessage.complete (self : http.IncomingMessage) : IO Bool := self.val.get "complete" Bool
 
-/-- `message.connection` (added in Node.js v0.1.90): `readonly attribute any connection` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `message.connection` (added in Node.js v0.1.90): `readonly attribute any connection` -/
 def http.IncomingMessage.connection (self : http.IncomingMessage) : IO Data := self.val.get "connection" Data
 
 /-- `message.headers` (added in Node.js v0.1.5): `readonly attribute object headers` -/
@@ -1432,12 +1438,12 @@ def http.IncomingMessage.trailersDistinct (self : http.IncomingMessage) : IO Dat
 /-- `message.url` (added in Node.js v0.1.90): `readonly attribute DOMString url` -/
 def http.IncomingMessage.url (self : http.IncomingMessage) : IO String := self.val.get "url" String
 
-/-- `Event: 'aborted'` (added in Node.js v0.3.8): `http.IncomingMessage onAborted(http.IncomingMessage.AbortedListener listener)`: calls `on("aborted", listener)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `Event: 'aborted'` (added in Node.js v0.3.8): `http.IncomingMessage onAborted(http.IncomingMessage.AbortedListener listener)`: calls `on("aborted", listener)` -/
 def http.IncomingMessage.onAborted (self : http.IncomingMessage) (listener : http.IncomingMessage.AbortedListener) : IO http.IncomingMessage := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "aborted", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'aborted'` (added in Node.js v0.3.8): `http.IncomingMessage onceAborted(http.IncomingMessage.AbortedListener listener)`: calls `once("aborted", listener)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `Event: 'aborted'` (added in Node.js v0.3.8): `http.IncomingMessage onceAborted(http.IncomingMessage.AbortedListener listener)`: calls `once("aborted", listener)` -/
 def http.IncomingMessage.onceAborted (self : http.IncomingMessage) (listener : http.IncomingMessage.AbortedListener) : IO http.IncomingMessage := do
   let r ← self.val.callMethod "once" (Support.args #[toJS "aborted", toJS listener]) Value
   pure { val := r }
@@ -1525,5 +1531,25 @@ def http.setMaxIdleHTTPParsers (max : Float) : IO Unit :=
 def http.setGlobalProxyFromEnv (proxyEnv : Data := .undefined) : IO JSFunction :=
   Lasm.JS.Binding.invoke JSFunction { name := "Lasm.JS.Node.http.setGlobalProxyFromEnv", module := "node:http", path := "setGlobalProxyFromEnv", construct := false, arity := 1 }
     (Support.args #[proxyEnv]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `http.isValidHeaderName(name)` (added in Node.js v26.11.0): `boolean isValidHeaderName(any name)` (Node.js 24.22.2 documentation, http.md) -/
+def http.isValidHeaderName (name : Data) : IO Bool :=
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.http.isValidHeaderName", module := "node:http", path := "isValidHeaderName", construct := false, arity := 1 }
+    (Support.args #[toJS name]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `http.isValidHeaderValue(value[, options])` (added in Node.js v26.11.0): `boolean isValidHeaderValue(any value, optional http.IsValidHeaderValueOptions options)` (Node.js 24.22.2 documentation, http.md) -/
+def http.isValidHeaderValue (value : Data) (options : Option http.IsValidHeaderValueOptions := none) : IO Bool :=
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.http.isValidHeaderValue", module := "node:http", path := "isValidHeaderValue", construct := false, arity := 2 }
+    (Support.args #[toJS value, Support.optional options]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `http.websocketMask(source, mask, output, offset, length)` (added in Node.js v26.12.0): `undefined websocketMask(Uint8Array source, Uint8Array mask, Uint8Array output, long long offset, long long length)` (Node.js 24.22.2 documentation, http.md) -/
+def http.websocketMask (source : ByteArray) (mask : ByteArray) (output : ByteArray) (offset : Int) (length : Int) : IO Unit :=
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.http.websocketMask", module := "node:http", path := "websocketMask", construct := false, arity := 5 }
+    (Support.args #[toJS source, toJS mask, toJS output, toJS offset, toJS length]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `http.websocketUnmask(buffer, mask)` (added in Node.js v26.12.0): `undefined websocketUnmask(Uint8Array buffer, Uint8Array mask)` (Node.js 24.22.2 documentation, http.md) -/
+def http.websocketUnmask (buffer_ : ByteArray) (mask : ByteArray) : IO Unit :=
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.http.websocketUnmask", module := "node:http", path := "websocketUnmask", construct := false, arity := 2 }
+    (Support.args #[toJS buffer_, toJS mask]) (await := false)
 
 end Lasm.JS.Node

@@ -20,7 +20,7 @@ instance : Nonempty RunScope := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS RunScope := ⟨fun x => .ref x.val ""⟩
 instance : FromJS RunScope := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.RunScope", .data⟩
 
-/-- `scope.dispose()` (added in Node.js v24.20.0): `undefined dispose()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `scope.dispose()` (added in Node.js v24.20.0): `undefined dispose()` -/
 def RunScope.dispose (self : RunScope) : IO Unit :=
   self.val.callMethod "dispose" (Support.args #[]) Unit
 

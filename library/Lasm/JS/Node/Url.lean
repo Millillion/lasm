@@ -60,40 +60,40 @@ structure url.PathToFileURLOptions where
   windows : Option Bool := none
 instance instToJSUrlPathToFileURLOptions : ToJS url.PathToFileURLOptions := ⟨fun d => Support.fields #[("windows", Support.optional d.windows)]⟩
 
-/-- `urlObject.auth`: `readonly attribute any auth` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.auth`: `readonly attribute any auth` -/
 def url.UrlObject.auth (self : url.UrlObject) : IO Data := self.val.get "auth" Data
 
-/-- `urlObject.hash`: `readonly attribute any hash` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.hash`: `readonly attribute any hash` -/
 def url.UrlObject.hash (self : url.UrlObject) : IO Data := self.val.get "hash" Data
 
-/-- `urlObject.host`: `readonly attribute any host` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.host`: `readonly attribute any host` -/
 def url.UrlObject.host (self : url.UrlObject) : IO Data := self.val.get "host" Data
 
-/-- `urlObject.hostname`: `readonly attribute any hostname` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.hostname`: `readonly attribute any hostname` -/
 def url.UrlObject.hostname (self : url.UrlObject) : IO Data := self.val.get "hostname" Data
 
-/-- `urlObject.href`: `readonly attribute any href` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.href`: `readonly attribute any href` -/
 def url.UrlObject.href (self : url.UrlObject) : IO Data := self.val.get "href" Data
 
-/-- `urlObject.path`: `readonly attribute any path` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.path`: `readonly attribute any path` -/
 def url.UrlObject.path (self : url.UrlObject) : IO Data := self.val.get "path" Data
 
-/-- `urlObject.pathname`: `readonly attribute any pathname` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.pathname`: `readonly attribute any pathname` -/
 def url.UrlObject.pathname (self : url.UrlObject) : IO Data := self.val.get "pathname" Data
 
-/-- `urlObject.port`: `readonly attribute any port` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.port`: `readonly attribute any port` -/
 def url.UrlObject.port (self : url.UrlObject) : IO Data := self.val.get "port" Data
 
-/-- `urlObject.protocol`: `readonly attribute any protocol` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.protocol`: `readonly attribute any protocol` -/
 def url.UrlObject.protocol (self : url.UrlObject) : IO Data := self.val.get "protocol" Data
 
-/-- `urlObject.query`: `readonly attribute any query` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.query`: `readonly attribute any query` -/
 def url.UrlObject.query (self : url.UrlObject) : IO Data := self.val.get "query" Data
 
-/-- `urlObject.search`: `readonly attribute any search` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.search`: `readonly attribute any search` -/
 def url.UrlObject.search (self : url.UrlObject) : IO Data := self.val.get "search" Data
 
-/-- `urlObject.slashes`: `readonly attribute any slashes` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.slashes`: `readonly attribute any slashes` -/
 def url.UrlObject.slashes (self : url.UrlObject) : IO Data := self.val.get "slashes" Data
 
 /-- `url.domainToASCII(domain)` (added in Node.js v7.4.0, v6.13.0): `DOMString domainToASCII(DOMString domain)` (Node.js 24.22.2 documentation, url.md) -/
@@ -121,12 +121,12 @@ def url.format (URL : URL) (options : Option url.FormatOptions := none) : IO Str
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.url.format", module := "node:url", path := "format", construct := false, arity := 2 }
     (Support.args #[toJS URL, Support.optional options]) (await := false)
 
-/-- `url.format(urlObject)` (added in Node.js v0.1.25): `DOMString format(object urlObject)` (Node.js 24.22.2 documentation, url.md) -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `url.format(urlObject)` (added in Node.js v0.1.25): `DOMString format(object urlObject)` (Node.js 24.22.2 documentation, url.md) -/
 def url.formatWithUrlObject (urlObject : Data) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.url.formatWithUrlObject", module := "node:url", path := "format", construct := false, arity := 1 }
     (Support.args #[toJS urlObject]) (await := false)
 
-/-- `url.format(urlString)` (added in Node.js v0.1.25): `DOMString format(DOMString urlString)` (Node.js 24.22.2 documentation, url.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `url.format(urlString)` (added in Node.js v0.1.25): `DOMString format(DOMString urlString)` (Node.js 24.22.2 documentation, url.md) -/
 def url.formatWithUrlString (urlString : String) : IO String :=
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.url.formatWithUrlString", module := "node:url", path := "format", construct := false, arity := 1 }
     (Support.args #[toJS urlString]) (await := false)
@@ -142,12 +142,12 @@ def url.urlToHttpOptions (url_ : URL) : IO Data :=
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.url.urlToHttpOptions", module := "node:url", path := "urlToHttpOptions", construct := false, arity := 1 }
     (Support.args #[toJS url_]) (await := false)
 
-/-- `url.parse(urlString[, parseQueryString[, slashesDenoteHost]])` (added in Node.js v0.1.25): `undefined parse(DOMString urlString, optional boolean parseQueryString, optional boolean slashesDenoteHost)` (Node.js 24.22.2 documentation, url.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `url.parse(urlString[, parseQueryString[, slashesDenoteHost]])` (added in Node.js v0.1.25): `undefined parse(DOMString urlString, optional boolean parseQueryString, optional boolean slashesDenoteHost)` (Node.js 24.22.2 documentation, url.md) -/
 def url.parse (urlString : String) (parseQueryString : Option Bool := none) (slashesDenoteHost : Option Bool := none) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.url.parse", module := "node:url", path := "parse", construct := false, arity := 3 }
     (Support.args #[toJS urlString, Support.optional parseQueryString, Support.optional slashesDenoteHost]) (await := false)
 
-/-- `url.resolve(from, to)` (added in Node.js v0.1.25): `undefined resolve(DOMString from, DOMString to)` (Node.js 24.22.2 documentation, url.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `url.resolve(from, to)` (added in Node.js v0.1.25): `undefined resolve(DOMString from, DOMString to)` (Node.js 24.22.2 documentation, url.md) -/
 def url.resolve («from» : String) (to : String) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.url.resolve", module := "node:url", path := "resolve", construct := false, arity := 2 }
     (Support.args #[toJS «from», toJS to]) (await := false)

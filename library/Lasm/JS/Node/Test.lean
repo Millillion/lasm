@@ -102,15 +102,15 @@ instance instToJSMockTrackerMethodOptions : ToJS MockTracker.MethodOptions := �
 
 /-- `dictionary MockTracker.ModuleOptionsExports` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MockTracker.ModuleOptionsExports where
-  /-- `undefined If` -/
-  If : Option Unit := none
-  /-- `undefined If` -/
-  If : Option Unit := none
-  /-- `undefined If` -/
-  If : Option Unit := none
-instance instToJSMockTrackerModuleOptionsExports : ToJS MockTracker.ModuleOptionsExports := ⟨fun d => Support.fields #[("If", Support.optional d.If),
-    ("If", Support.optional d.If),
-    ("If", Support.optional d.If)]⟩
+  /-- `any If` -/
+  If : Data := .undefined
+  /-- `any If` -/
+  If : Data := .undefined
+  /-- `any If` -/
+  If : Data := .undefined
+instance instToJSMockTrackerModuleOptionsExports : ToJS MockTracker.ModuleOptionsExports := ⟨fun d => Support.fields #[("If", d.If),
+    ("If", d.If),
+    ("If", d.If)]⟩
 
 /-- `dictionary MockTracker.ModuleOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MockTracker.ModuleOptions where
@@ -1022,7 +1022,7 @@ def MockFunctionContext.resetCalls (self : MockFunctionContext) : IO Unit :=
 def MockFunctionContext.restore (self : MockFunctionContext) : IO Unit :=
   self.val.callMethod "restore" (Support.args #[]) Unit
 
-/-- `ctx.restore()` (added in Node.js v22.3.0, v20.18.0): `undefined restore()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `ctx.restore()` (added in Node.js v22.3.0, v20.18.0): `undefined restore()` -/
 def MockModuleContext.restore (self : MockModuleContext) : IO Unit :=
   self.val.callMethod "restore" (Support.args #[]) Unit
 
@@ -1061,7 +1061,7 @@ def MockTracker.getter (self : MockTracker) (object : Data) (methodName : Data) 
 def MockTracker.method (self : MockTracker) (object : Data) (methodName : DOMStringOrSymbol) (implementation : Option JSFunction := none) (options : Option MockTracker.MethodOptions := none) : IO Data :=
   self.val.callMethod "method" (Support.args #[toJS object, toJS methodName, Support.optional implementation, Support.optional options]) Data
 
-/-- `mock.module(specifier[, options])` (added in Node.js v22.3.0, v20.18.0): `MockModuleContext module((DOMString or URL) specifier, optional MockTracker.ModuleOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `mock.module(specifier[, options])` (added in Node.js v22.3.0, v20.18.0): `MockModuleContext module((DOMString or URL) specifier, optional MockTracker.ModuleOptions options)` -/
 def MockTracker.«module» (self : MockTracker) (specifier : DOMStringOrURL) (options : Option MockTracker.ModuleOptions := none) : IO MockModuleContext := do
   let r ← self.val.callMethod "module" (Support.args #[toJS specifier, Support.optional options]) Value
   pure { val := r }
@@ -1283,7 +1283,7 @@ def TestContext.error (self : TestContext) : IO Data := self.val.get "error" Dat
 /-- `context.attempt` (added in Node.js v25.0.0): `readonly attribute double attempt` -/
 def TestContext.attempt (self : TestContext) : IO Float := self.val.get "attempt" Float
 
-/-- `context.tags` (added in Node.js v24.19.0): `readonly attribute sequence<DOMString> tags` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `context.tags` (added in Node.js v24.19.0): `readonly attribute sequence<DOMString> tags` -/
 def TestContext.tags (self : TestContext) : IO (Array String) := self.val.get "tags" (Array String)
 
 /-- `context.workerId` (added in Node.js v24.15.0): `readonly attribute double? workerId` -/

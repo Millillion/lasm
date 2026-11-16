@@ -34,29 +34,29 @@ def inspector.Session.InspectorNotificationListener.ofFn (f : Data → Async Uni
 def inspector.Session.InspectorNotificationListener.ofSyncFn (f : Data → IO Unit) : IO inspector.Session.InspectorNotificationListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
 
-/-- `Event: 'inspectorNotification'` (added in Node.js v8.0.0): `inspector.Session onInspectorNotification(inspector.Session.InspectorNotificationListener listener)`: calls `on("inspectorNotification", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'inspectorNotification'` (added in Node.js v8.0.0): `inspector.Session onInspectorNotification(inspector.Session.InspectorNotificationListener listener)`: calls `on("inspectorNotification", listener)` -/
 def inspector.Session.onInspectorNotification (self : inspector.Session) (listener : inspector.Session.InspectorNotificationListener) : IO inspector.Session := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "inspectorNotification", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'inspectorNotification'` (added in Node.js v8.0.0): `inspector.Session onceInspectorNotification(inspector.Session.InspectorNotificationListener listener)`: calls `once("inspectorNotification", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'inspectorNotification'` (added in Node.js v8.0.0): `inspector.Session onceInspectorNotification(inspector.Session.InspectorNotificationListener listener)`: calls `once("inspectorNotification", listener)` -/
 def inspector.Session.onceInspectorNotification (self : inspector.Session) (listener : inspector.Session.InspectorNotificationListener) : IO inspector.Session := do
   let r ← self.val.callMethod "once" (Support.args #[toJS "inspectorNotification", toJS listener]) Value
   pure { val := r }
 
-/-- `session.connect()` (added in Node.js v8.0.0): `undefined connect()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `session.connect()` (added in Node.js v8.0.0): `undefined connect()` -/
 def inspector.Session.connect (self : inspector.Session) : IO Unit :=
   self.val.callMethod "connect" (Support.args #[]) Unit
 
-/-- `session.connectToMainThread()` (added in Node.js v12.11.0): `undefined connectToMainThread()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `session.connectToMainThread()` (added in Node.js v12.11.0): `undefined connectToMainThread()` -/
 def inspector.Session.connectToMainThread (self : inspector.Session) : IO Unit :=
   self.val.callMethod "connectToMainThread" (Support.args #[]) Unit
 
-/-- `session.disconnect()` (added in Node.js v8.0.0): `undefined disconnect()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `session.disconnect()` (added in Node.js v8.0.0): `undefined disconnect()` -/
 def inspector.Session.disconnect (self : inspector.Session) : IO Unit :=
   self.val.callMethod "disconnect" (Support.args #[]) Unit
 
-/-- `session.post(method[, params])` (added in Node.js v19.0.0): `Promise<any> post(DOMString method, optional object params)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `session.post(method[, params])` (added in Node.js v19.0.0): `Promise<any> post(DOMString method, optional object params)` -/
 def inspector.Session.post (self : inspector.Session) (method : String) (params : Data := .undefined) : Async Data :=
   self.val.callMethodAwait "post" (Support.args #[toJS method, params]) Data
 
@@ -87,82 +87,88 @@ def inspector.waitForDebugger : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.inspector.waitForDebugger", module := "node:inspector", path := "waitForDebugger", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `inspector.Network.domStorageItemAdded` (added in Node.js v24.16.0): `readonly attribute object domStorageItemAdded` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.domStorageItemAdded` (added in Node.js v24.16.0): `readonly attribute object domStorageItemAdded` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.domStorageItemAdded : IO Data := Support.getExport "node:inspector" ["domStorageItemAdded"] Data
 
-/-- `inspector.Network.domStorageItemRemoved` (added in Node.js v24.16.0): `readonly attribute object domStorageItemRemoved` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.domStorageItemRemoved` (added in Node.js v24.16.0): `readonly attribute object domStorageItemRemoved` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.domStorageItemRemoved : IO Data := Support.getExport "node:inspector" ["domStorageItemRemoved"] Data
 
-/-- `inspector.Network.domStorageItemUpdated` (added in Node.js v24.16.0): `readonly attribute object domStorageItemUpdated` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.domStorageItemUpdated` (added in Node.js v24.16.0): `readonly attribute object domStorageItemUpdated` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.domStorageItemUpdated : IO Data := Support.getExport "node:inspector" ["domStorageItemUpdated"] Data
 
-/-- `inspector.Network.domStorageItemsCleared` (added in Node.js v24.16.0): `readonly attribute object domStorageItemsCleared` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.domStorageItemsCleared` (added in Node.js v24.16.0): `readonly attribute object domStorageItemsCleared` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.domStorageItemsCleared : IO Data := Support.getExport "node:inspector" ["domStorageItemsCleared"] Data
 
-/-- `inspector.Network.registerStorage` (added in Node.js v24.16.0): `readonly attribute object registerStorage` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.registerStorage` (added in Node.js v24.16.0): `readonly attribute object registerStorage` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.registerStorage : IO Data := Support.getExport "node:inspector" ["registerStorage"] Data
 
-/-- `inspector.Network.dataReceived([params])` (added in Node.js v24.2.0): `undefined dataReceived(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `inspector.Network.params` (added in Node.js v25.5.0): `readonly attribute object params` (Node.js 24.22.2 documentation, inspector.md) -/
+def inspector.Network.params : IO Data := Support.getExport "node:inspector" ["params"] Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.dataReceived([params])` (added in Node.js v24.2.0): `undefined dataReceived(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.dataReceived (params : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.inspector.Network.dataReceived", module := "node:inspector", path := "dataReceived", construct := false, arity := 1 }
     (Support.args #[params]) (await := false)
 
-/-- `inspector.Network.dataSent([params])` (added in Node.js v24.3.0): `undefined dataSent(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.dataSent([params])` (added in Node.js v24.3.0): `undefined dataSent(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.dataSent (params : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.inspector.Network.dataSent", module := "node:inspector", path := "dataSent", construct := false, arity := 1 }
     (Support.args #[params]) (await := false)
 
-/-- `inspector.Network.requestWillBeSent([params])` (added in Node.js v22.6.0, v20.18.0): `undefined requestWillBeSent(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.requestWillBeSent([params])` (added in Node.js v22.6.0, v20.18.0): `undefined requestWillBeSent(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.requestWillBeSent (params : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.inspector.Network.requestWillBeSent", module := "node:inspector", path := "requestWillBeSent", construct := false, arity := 1 }
     (Support.args #[params]) (await := false)
 
-/-- `inspector.Network.responseReceived([params])` (added in Node.js v22.6.0, v20.18.0): `undefined responseReceived(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.responseReceived([params])` (added in Node.js v22.6.0, v20.18.0): `undefined responseReceived(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.responseReceived (params : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.inspector.Network.responseReceived", module := "node:inspector", path := "responseReceived", construct := false, arity := 1 }
     (Support.args #[params]) (await := false)
 
-/-- `inspector.Network.loadingFinished([params])` (added in Node.js v22.6.0, v20.18.0): `undefined loadingFinished(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.loadingFinished([params])` (added in Node.js v22.6.0, v20.18.0): `undefined loadingFinished(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.loadingFinished (params : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.inspector.Network.loadingFinished", module := "node:inspector", path := "loadingFinished", construct := false, arity := 1 }
     (Support.args #[params]) (await := false)
 
-/-- `inspector.Network.loadingFailed([params])` (added in Node.js v22.7.0, v20.18.0): `undefined loadingFailed(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.loadingFailed([params])` (added in Node.js v22.7.0, v20.18.0): `undefined loadingFailed(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.loadingFailed (params : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.inspector.Network.loadingFailed", module := "node:inspector", path := "loadingFailed", construct := false, arity := 1 }
     (Support.args #[params]) (await := false)
 
-/-- `inspector.Network.webSocketCreated([params])` (added in Node.js v24.7.0): `undefined webSocketCreated(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.webSocketCreated([params])` (added in Node.js v24.7.0): `undefined webSocketCreated(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.webSocketCreated (params : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.inspector.Network.webSocketCreated", module := "node:inspector", path := "webSocketCreated", construct := false, arity := 1 }
     (Support.args #[params]) (await := false)
 
-/-- `inspector.Network.webSocketHandshakeResponseReceived([params])` (added in Node.js v24.7.0): `undefined webSocketHandshakeResponseReceived(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.webSocketHandshakeResponseReceived([params])` (added in Node.js v24.7.0): `undefined webSocketHandshakeResponseReceived(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.webSocketHandshakeResponseReceived (params : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.inspector.Network.webSocketHandshakeResponseReceived", module := "node:inspector", path := "webSocketHandshakeResponseReceived", construct := false, arity := 1 }
     (Support.args #[params]) (await := false)
 
-/-- `inspector.Network.webSocketClosed([params])` (added in Node.js v24.7.0): `undefined webSocketClosed(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.webSocketClosed([params])` (added in Node.js v24.7.0): `undefined webSocketClosed(optional object params)` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.Network.webSocketClosed (params : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.inspector.Network.webSocketClosed", module := "node:inspector", path := "webSocketClosed", construct := false, arity := 1 }
     (Support.args #[params]) (await := false)
 
-/-- `inspector.NetworkResources.put` (added in Node.js v24.5.0): `readonly attribute any put` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.NetworkResources.put` (added in Node.js v24.5.0): `readonly attribute any put` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.NetworkResources.put : IO Data := Support.getExport "node:inspector" ["put"] Data
 
-/-- `inspector.NetworkResources.domStorageItemAdded` (added in Node.js v24.16.0): `readonly attribute object domStorageItemAdded` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.NetworkResources.domStorageItemAdded` (added in Node.js v24.16.0): `readonly attribute object domStorageItemAdded` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.NetworkResources.domStorageItemAdded : IO Data := Support.getExport "node:inspector" ["domStorageItemAdded"] Data
 
-/-- `inspector.NetworkResources.domStorageItemRemoved` (added in Node.js v24.16.0): `readonly attribute object domStorageItemRemoved` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.NetworkResources.domStorageItemRemoved` (added in Node.js v24.16.0): `readonly attribute object domStorageItemRemoved` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.NetworkResources.domStorageItemRemoved : IO Data := Support.getExport "node:inspector" ["domStorageItemRemoved"] Data
 
-/-- `inspector.NetworkResources.domStorageItemUpdated` (added in Node.js v24.16.0): `readonly attribute object domStorageItemUpdated` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.NetworkResources.domStorageItemUpdated` (added in Node.js v24.16.0): `readonly attribute object domStorageItemUpdated` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.NetworkResources.domStorageItemUpdated : IO Data := Support.getExport "node:inspector" ["domStorageItemUpdated"] Data
 
-/-- `inspector.NetworkResources.domStorageItemsCleared` (added in Node.js v24.16.0): `readonly attribute object domStorageItemsCleared` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.NetworkResources.domStorageItemsCleared` (added in Node.js v24.16.0): `readonly attribute object domStorageItemsCleared` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.NetworkResources.domStorageItemsCleared : IO Data := Support.getExport "node:inspector" ["domStorageItemsCleared"] Data
 
-/-- `inspector.NetworkResources.registerStorage` (added in Node.js v24.16.0): `readonly attribute object registerStorage` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.NetworkResources.registerStorage` (added in Node.js v24.16.0): `readonly attribute object registerStorage` (Node.js 24.22.2 documentation, inspector.md) -/
 def inspector.NetworkResources.registerStorage : IO Data := Support.getExport "node:inspector" ["registerStorage"] Data
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `inspector.NetworkResources.params` (added in Node.js v25.5.0): `readonly attribute object params` (Node.js 24.22.2 documentation, inspector.md) -/
+def inspector.NetworkResources.params : IO Data := Support.getExport "node:inspector" ["params"] Data
 
 end Lasm.JS.Node

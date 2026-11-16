@@ -9,6 +9,7 @@ and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
 import Lasm.JS.Web.Streams
+import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer
 import Lasm.JS.Node.Net
 
@@ -135,8 +136,358 @@ instance : Nonempty ZstdOptions := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS ZstdOptions := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ZstdOptions := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ZstdOptions", .data⟩
 
+/-- `class zlib.ZipBuffer` of `node:zlib` (Node.js 24.22.2 documentation, zlib.md): a handle to the JavaScript object. -/
+structure zlib.ZipBuffer where
+  /-- The JavaScript object. -/
+  val : Value
+instance instNonemptyZlibZipBuffer : Nonempty zlib.ZipBuffer := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSZlibZipBuffer : ToJS zlib.ZipBuffer := ⟨fun x => .ref x.val ""⟩
+instance instFromJSZlibZipBuffer : FromJS zlib.ZipBuffer := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.zlib.ZipBuffer", .data⟩
+
+/-- `class zlib.ZipEntry` of `node:zlib` (Node.js 24.22.2 documentation, zlib.md): a handle to the JavaScript object. -/
+structure zlib.ZipEntry where
+  /-- The JavaScript object. -/
+  val : Value
+instance instNonemptyZlibZipEntry : Nonempty zlib.ZipEntry := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSZlibZipEntry : ToJS zlib.ZipEntry := ⟨fun x => .ref x.val ""⟩
+instance instFromJSZlibZipEntry : FromJS zlib.ZipEntry := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.zlib.ZipEntry", .data⟩
+
+/-- `class zlib.ZipFile` of `node:zlib` (Node.js 24.22.2 documentation, zlib.md): a handle to the JavaScript object. -/
+structure zlib.ZipFile where
+  /-- The JavaScript object. -/
+  val : Value
+instance instNonemptyZlibZipFile : Nonempty zlib.ZipFile := ⟨{ val := Classical.ofNonempty }⟩
+instance instToJSZlibZipFile : ToJS zlib.ZipFile := ⟨fun x => .ref x.val ""⟩
+instance instFromJSZlibZipFile : FromJS zlib.ZipFile := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.zlib.ZipFile", .data⟩
+
+/-- `dictionary zlib.ZipBuffer.ToBufferOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure zlib.ZipBuffer.ToBufferOptions where
+  /-- `DOMString comment` -/
+  comment : Option String := none
+  /-- `double baseOffset = 0` -/
+  baseOffset : Option Float := none
+instance instToJSZlibZipBufferToBufferOptions : ToJS zlib.ZipBuffer.ToBufferOptions := ⟨fun d => Support.fields #[("comment", Support.optional d.comment),
+    ("baseOffset", Support.optional d.baseOffset)]⟩
+
+/-- `(DOMString or zlib.ZipBuffer.ToBufferOptions)`: one constructor per member type. -/
+inductive zlib.ZipBuffer.DOMStringOrToBufferOptions where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `zlib.ZipBuffer.ToBufferOptions` -/
+  | toBufferOptions (value : zlib.ZipBuffer.ToBufferOptions)
+instance instToJSZlibZipBufferDOMStringOrToBufferOptions : ToJS zlib.ZipBuffer.DOMStringOrToBufferOptions := ⟨fun
+  | .domString v => toJS v
+  | .toBufferOptions v => toJS v⟩
+instance instCoeStringZlibZipBufferDOMStringOrToBufferOptions : Coe String zlib.ZipBuffer.DOMStringOrToBufferOptions := ⟨.domString⟩
+instance instCoeZlibZipBufferToBufferOptionsZlibZipBufferDOMStringOrToBufferOptions : Coe zlib.ZipBuffer.ToBufferOptions zlib.ZipBuffer.DOMStringOrToBufferOptions := ⟨.toBufferOptions⟩
+
+/-- `(DOMString or object)`: one constructor per member type. -/
+inductive DOMStringOrObject where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `object` -/
+  | object (value : Data)
+instance : ToJS DOMStringOrObject := ⟨fun
+  | .domString v => toJS v
+  | .object v => toJS v⟩
+instance : Coe String DOMStringOrObject := ⟨.domString⟩
+
+/-- `dictionary zlib.ZipEntry.ContentOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure zlib.ZipEntry.ContentOptions where
+  /-- `boolean verify = true` -/
+  verify : Option Bool := none
+  /-- `double maxSize` -/
+  maxSize : Option Float := none
+instance instToJSZlibZipEntryContentOptions : ToJS zlib.ZipEntry.ContentOptions := ⟨fun d => Support.fields #[("verify", Support.optional d.verify),
+    ("maxSize", Support.optional d.maxSize)]⟩
+
+/-- `dictionary zlib.ZipEntry.ContentIteratorOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure zlib.ZipEntry.ContentIteratorOptions where
+  /-- `boolean verify = true` -/
+  verify : Option Bool := none
+  /-- `double maxSize` -/
+  maxSize : Option Float := none
+instance instToJSZlibZipEntryContentIteratorOptions : ToJS zlib.ZipEntry.ContentIteratorOptions := ⟨fun d => Support.fields #[("verify", Support.optional d.verify),
+    ("maxSize", Support.optional d.maxSize)]⟩
+
+/-- `dictionary zlib.ZipFile.StreamOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure zlib.ZipFile.StreamOptions where
+  /-- `boolean verify = true` -/
+  verify : Option Bool := none
+  /-- `double maxSize` -/
+  maxSize : Option Float := none
+instance instToJSZlibZipFileStreamOptions : ToJS zlib.ZipFile.StreamOptions := ⟨fun d => Support.fields #[("verify", Support.optional d.verify),
+    ("maxSize", Support.optional d.maxSize)]⟩
+
+/-- `dictionary zlib.CreateZipArchiveOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure zlib.CreateZipArchiveOptions where
+  /-- `DOMString comment` -/
+  comment : Option String := none
+  /-- `double baseOffset = 0` -/
+  baseOffset : Option Float := none
+instance instToJSZlibCreateZipArchiveOptions : ToJS zlib.CreateZipArchiveOptions := ⟨fun d => Support.fields #[("comment", Support.optional d.comment),
+    ("baseOffset", Support.optional d.baseOffset)]⟩
+
+/-- `(DOMString or zlib.CreateZipArchiveOptions)`: one constructor per member type. -/
+inductive zlib.DOMStringOrCreateZipArchiveOptions where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `zlib.CreateZipArchiveOptions` -/
+  | createZipArchiveOptions (value : zlib.CreateZipArchiveOptions)
+instance instToJSZlibDOMStringOrCreateZipArchiveOptions : ToJS zlib.DOMStringOrCreateZipArchiveOptions := ⟨fun
+  | .domString v => toJS v
+  | .createZipArchiveOptions v => toJS v⟩
+instance instCoeStringZlibDOMStringOrCreateZipArchiveOptions : Coe String zlib.DOMStringOrCreateZipArchiveOptions := ⟨.domString⟩
+instance instCoeZlibCreateZipArchiveOptionsZlibDOMStringOrCreateZipArchiveOptions : Coe zlib.CreateZipArchiveOptions zlib.DOMStringOrCreateZipArchiveOptions := ⟨.createZipArchiveOptions⟩
+
+/-- `dictionary zlib.ZipFilesOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure zlib.ZipFilesOptions where
+  /-- `boolean followSymlinks = true` -/
+  followSymlinks : Option Bool := none
+  /-- `DOMString comment` -/
+  comment : Option String := none
+  /-- `double baseOffset` -/
+  baseOffset : Option Float := none
+instance instToJSZlibZipFilesOptions : ToJS zlib.ZipFilesOptions := ⟨fun d => Support.fields #[("followSymlinks", Support.optional d.followSymlinks),
+    ("comment", Support.optional d.comment),
+    ("baseOffset", Support.optional d.baseOffset)]⟩
+
+/-- `(DOMString or zlib.ZipFilesOptions)`: one constructor per member type. -/
+inductive zlib.DOMStringOrZipFilesOptions where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `zlib.ZipFilesOptions` -/
+  | zipFilesOptions (value : zlib.ZipFilesOptions)
+instance instToJSZlibDOMStringOrZipFilesOptions : ToJS zlib.DOMStringOrZipFilesOptions := ⟨fun
+  | .domString v => toJS v
+  | .zipFilesOptions v => toJS v⟩
+instance instCoeStringZlibDOMStringOrZipFilesOptions : Coe String zlib.DOMStringOrZipFilesOptions := ⟨.domString⟩
+instance instCoeZlibZipFilesOptionsZlibDOMStringOrZipFilesOptions : Coe zlib.ZipFilesOptions zlib.DOMStringOrZipFilesOptions := ⟨.zipFilesOptions⟩
+
 /-- `bytesWritten` (added in Node.js v10.0.0): `readonly attribute double bytesWritten` -/
 def zlib.ZlibBase.bytesWritten (self : zlib.ZlibBase) : IO Float := self.val.get "bytesWritten" Float
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.comment` (added in Node.js v26.8.0): `readonly attribute DOMString comment` -/
+def zlib.ZipBuffer.comment (self : zlib.ZipBuffer) : IO String := self.val.get "comment" String
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.size` (added in Node.js v26.8.0): `readonly attribute double size` -/
+def zlib.ZipBuffer.size (self : zlib.ZipBuffer) : IO Float := self.val.get "size" Float
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.writable` (added in Node.js v26.8.0): `readonly attribute boolean writable` -/
+def zlib.ZipBuffer.writable (self : zlib.ZipBuffer) : IO Bool := self.val.get "writable" Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.add(filename, data[, options])` (added in Node.js v26.8.0): `Promise<zlib.ZipEntry> add(DOMString filename, Uint8Array data, optional object options)` -/
+def zlib.ZipBuffer.add (self : zlib.ZipBuffer) (filename : String) (data : ByteArray) (options : Data := .undefined) : Async zlib.ZipEntry := do
+  let r ← self.val.callMethodAwait "add" (Support.args #[toJS filename, toJS data, options]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.addSync(filename, data[, options])` (added in Node.js v26.8.0): `zlib.ZipEntry addSync(DOMString filename, Uint8Array data, optional object options)` -/
+def zlib.ZipBuffer.addSync (self : zlib.ZipBuffer) (filename : String) (data : ByteArray) (options : Data := .undefined) : IO zlib.ZipEntry := do
+  let r ← self.val.callMethod "addSync" (Support.args #[toJS filename, toJS data, options]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.addEntry(entry)` (added in Node.js v26.8.0): `zlib.ZipEntry addEntry(zlib.ZipEntry entry)` -/
+def zlib.ZipBuffer.addEntry (self : zlib.ZipBuffer) (entry : zlib.ZipEntry) : IO zlib.ZipEntry := do
+  let r ← self.val.callMethod "addEntry" (Support.args #[toJS entry]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.clear()` (added in Node.js v26.8.0): `undefined clear()` -/
+def zlib.ZipBuffer.clear (self : zlib.ZipBuffer) : IO Unit :=
+  self.val.callMethod "clear" (Support.args #[]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.delete(name)` (added in Node.js v26.8.0): `boolean delete(DOMString name)` -/
+def zlib.ZipBuffer.delete (self : zlib.ZipBuffer) (name : String) : IO Bool :=
+  self.val.callMethod "delete" (Support.args #[toJS name]) Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.entries()` (added in Node.js v26.8.0): `object entries()` -/
+def zlib.ZipBuffer.entries (self : zlib.ZipBuffer) : IO Data :=
+  self.val.callMethod "entries" (Support.args #[]) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.forEach(callback[, thisArg])` (added in Node.js v26.8.0): `undefined forEach(Function callback, optional any thisArg)` -/
+def zlib.ZipBuffer.forEach (self : zlib.ZipBuffer) (callback : JSFunction) (thisArg : Data := .undefined) : IO Unit :=
+  self.val.callMethod "forEach" (Support.args #[toJS callback, thisArg]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.get(name)` (added in Node.js v26.8.0): `zlib.ZipEntry get(DOMString name)` -/
+def zlib.ZipBuffer.get (self : zlib.ZipBuffer) (name : String) : IO zlib.ZipEntry := do
+  let r ← self.val.callMethod "get" (Support.args #[toJS name]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.has(name)` (added in Node.js v26.8.0): `boolean has(DOMString name)` -/
+def zlib.ZipBuffer.has (self : zlib.ZipBuffer) (name : String) : IO Bool :=
+  self.val.callMethod "has" (Support.args #[toJS name]) Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.keys()` (added in Node.js v26.8.0): `object keys()` -/
+def zlib.ZipBuffer.keys (self : zlib.ZipBuffer) : IO Data :=
+  self.val.callMethod "keys" (Support.args #[]) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.toBuffer([options])` (added in Node.js v26.8.0): `Promise<Uint8Array> toBuffer(optional (DOMString or zlib.ZipBuffer.ToBufferOptions) options)` -/
+def zlib.ZipBuffer.toBuffer (self : zlib.ZipBuffer) (options : Option zlib.ZipBuffer.DOMStringOrToBufferOptions := none) : Async ByteArray :=
+  self.val.callMethodAwait "toBuffer" (Support.args #[Support.optional options]) ByteArray
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.toBufferSync([options])` (added in Node.js v26.8.0): `Uint8Array toBufferSync(optional (DOMString or object) options)` -/
+def zlib.ZipBuffer.toBufferSync (self : zlib.ZipBuffer) (options : Option DOMStringOrObject := none) : IO ByteArray :=
+  self.val.callMethod "toBufferSync" (Support.args #[Support.optional options]) ByteArray
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.values()` (added in Node.js v26.8.0): `object values()` -/
+def zlib.ZipBuffer.values (self : zlib.ZipBuffer) : IO Data :=
+  self.val.callMethod "values" (Support.args #[]) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.comment` (added in Node.js v26.8.0): `readonly attribute DOMString comment` -/
+def zlib.ZipEntry.comment (self : zlib.ZipEntry) : IO String := self.val.get "comment" String
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.compressed` (added in Node.js v26.8.0): `readonly attribute boolean compressed` -/
+def zlib.ZipEntry.compressed (self : zlib.ZipEntry) : IO Bool := self.val.get "compressed" Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.compressedSize` (added in Node.js v26.8.0): `readonly attribute double compressedSize` -/
+def zlib.ZipEntry.compressedSize (self : zlib.ZipEntry) : IO Float := self.val.get "compressedSize" Float
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.crc32` (added in Node.js v26.8.0): `readonly attribute double crc32` -/
+def zlib.ZipEntry.crc32 (self : zlib.ZipEntry) : IO Float := self.val.get "crc32" Float
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.flags` (added in Node.js v26.8.0): `readonly attribute double flags` -/
+def zlib.ZipEntry.flags (self : zlib.ZipEntry) : IO Float := self.val.get "flags" Float
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.isDirectory` (added in Node.js v26.8.0): `readonly attribute boolean isDirectory` -/
+def zlib.ZipEntry.isDirectory (self : zlib.ZipEntry) : IO Bool := self.val.get "isDirectory" Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.isFile` (added in Node.js v26.8.0): `readonly attribute boolean isFile` -/
+def zlib.ZipEntry.isFile (self : zlib.ZipEntry) : IO Bool := self.val.get "isFile" Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.isSymlink` (added in Node.js v26.8.0): `readonly attribute boolean isSymlink` -/
+def zlib.ZipEntry.isSymlink (self : zlib.ZipEntry) : IO Bool := self.val.get "isSymlink" Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.mode` (added in Node.js v26.8.0): `readonly attribute double mode` -/
+def zlib.ZipEntry.mode (self : zlib.ZipEntry) : IO Float := self.val.get "mode" Float
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.modified` (added in Node.js v26.8.0): `readonly attribute object modified` -/
+def zlib.ZipEntry.modified (self : zlib.ZipEntry) : IO Data := self.val.get "modified" Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.method` (added in Node.js v26.8.0): `readonly attribute double method` -/
+def zlib.ZipEntry.method (self : zlib.ZipEntry) : IO Float := self.val.get "method" Float
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.name` (added in Node.js v26.8.0): `readonly attribute DOMString name` -/
+def zlib.ZipEntry.name (self : zlib.ZipEntry) : IO String := self.val.get "name" String
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.nameBuffer` (added in Node.js v26.8.0): `readonly attribute Uint8Array nameBuffer` -/
+def zlib.ZipEntry.nameBuffer (self : zlib.ZipEntry) : IO ByteArray := self.val.get "nameBuffer" ByteArray
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.rawContent` (added in Node.js v26.8.0): `readonly attribute Uint8Array? rawContent` -/
+def zlib.ZipEntry.rawContent (self : zlib.ZipEntry) : IO (Option ByteArray) := self.val.get "rawContent" (Option ByteArray)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.size` (added in Node.js v26.8.0): `readonly attribute double size` -/
+def zlib.ZipEntry.size (self : zlib.ZipEntry) : IO Float := self.val.get "size" Float
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.content([options])` (added in Node.js v26.8.0): `Promise<Uint8Array> content(optional zlib.ZipEntry.ContentOptions options)` -/
+def zlib.ZipEntry.content (self : zlib.ZipEntry) (options : Option zlib.ZipEntry.ContentOptions := none) : Async ByteArray :=
+  self.val.callMethodAwait "content" (Support.args #[Support.optional options]) ByteArray
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.contentSync([options])` (added in Node.js v26.8.0): `Uint8Array contentSync(optional object options)` -/
+def zlib.ZipEntry.contentSync (self : zlib.ZipEntry) (options : Data := .undefined) : IO ByteArray :=
+  self.val.callMethod "contentSync" (Support.args #[options]) ByteArray
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipEntry.contentIterator([options])` (added in Node.js v26.8.0): `object contentIterator(optional zlib.ZipEntry.ContentIteratorOptions options)` -/
+def zlib.ZipEntry.contentIterator (self : zlib.ZipEntry) (options : Option zlib.ZipEntry.ContentIteratorOptions := none) : IO Data :=
+  self.val.callMethod "contentIterator" (Support.args #[Support.optional options]) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.comment` (added in Node.js v26.8.0): `readonly attribute DOMString comment` -/
+def zlib.ZipFile.comment (self : zlib.ZipFile) : IO String := self.val.get "comment" String
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.size` (added in Node.js v26.8.0): `readonly attribute double size` -/
+def zlib.ZipFile.size (self : zlib.ZipFile) : IO Float := self.val.get "size" Float
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.writable` (added in Node.js v26.8.0): `readonly attribute boolean writable` -/
+def zlib.ZipFile.writable (self : zlib.ZipFile) : IO Bool := self.val.get "writable" Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.add(filename, data[, options])` (added in Node.js v26.8.0): `Promise<zlib.ZipEntry> add(DOMString filename, Uint8Array data, optional object options)` -/
+def zlib.ZipFile.add (self : zlib.ZipFile) (filename : String) (data : ByteArray) (options : Data := .undefined) : Async zlib.ZipEntry := do
+  let r ← self.val.callMethodAwait "add" (Support.args #[toJS filename, toJS data, options]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.addEntry(entry)` (added in Node.js v26.8.0): `Promise<any> addEntry(zlib.ZipEntry entry)` -/
+def zlib.ZipFile.addEntry (self : zlib.ZipFile) (entry : zlib.ZipEntry) : Async Data :=
+  self.val.callMethodAwait "addEntry" (Support.args #[toJS entry]) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.addEntrySync(entry)` (added in Node.js v26.8.0): `zlib.ZipEntry addEntrySync(zlib.ZipEntry entry)` -/
+def zlib.ZipFile.addEntrySync (self : zlib.ZipFile) (entry : zlib.ZipEntry) : IO zlib.ZipEntry := do
+  let r ← self.val.callMethod "addEntrySync" (Support.args #[toJS entry]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.addSync(filename, data[, options])` (added in Node.js v26.8.0): `zlib.ZipEntry addSync(DOMString filename, Uint8Array data, optional object options)` -/
+def zlib.ZipFile.addSync (self : zlib.ZipFile) (filename : String) (data : ByteArray) (options : Data := .undefined) : IO zlib.ZipEntry := do
+  let r ← self.val.callMethod "addSync" (Support.args #[toJS filename, toJS data, options]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.close()` (added in Node.js v26.8.0): `Promise<any> close()` -/
+def zlib.ZipFile.close (self : zlib.ZipFile) : Async Data :=
+  self.val.callMethodAwait "close" (Support.args #[]) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.closeSync()` (added in Node.js v26.8.0): `undefined closeSync()` -/
+def zlib.ZipFile.closeSync (self : zlib.ZipFile) : IO Unit :=
+  self.val.callMethod "closeSync" (Support.args #[]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.compact([comment])` (added in Node.js v26.8.0): `stream.Readable compact(optional DOMString comment)` -/
+def zlib.ZipFile.compact (self : zlib.ZipFile) (comment : Option String := none) : IO stream.Readable := do
+  let r ← self.val.callMethod "compact" (Support.args #[Support.optional comment]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.compactSync([comment])` (added in Node.js v26.8.0): `Uint8Array compactSync(optional DOMString comment)` -/
+def zlib.ZipFile.compactSync (self : zlib.ZipFile) (comment : Option String := none) : IO ByteArray :=
+  self.val.callMethod "compactSync" (Support.args #[Support.optional comment]) ByteArray
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.delete(name)` (added in Node.js v26.8.0): `Promise<any> delete(DOMString name)` -/
+def zlib.ZipFile.delete (self : zlib.ZipFile) (name : String) : Async Data :=
+  self.val.callMethodAwait "delete" (Support.args #[toJS name]) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.deleteSync(name)` (added in Node.js v26.8.0): `boolean deleteSync(DOMString name)` -/
+def zlib.ZipFile.deleteSync (self : zlib.ZipFile) (name : String) : IO Bool :=
+  self.val.callMethod "deleteSync" (Support.args #[toJS name]) Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.entries()` (added in Node.js v26.8.0): `object entries()` -/
+def zlib.ZipFile.entries (self : zlib.ZipFile) : IO Data :=
+  self.val.callMethod "entries" (Support.args #[]) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.entriesSync()` (added in Node.js v26.8.0): `object entriesSync()` -/
+def zlib.ZipFile.entriesSync (self : zlib.ZipFile) : IO Data :=
+  self.val.callMethod "entriesSync" (Support.args #[]) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.forEach(callback[, thisArg])` (added in Node.js v26.8.0): `undefined forEach(Function callback, optional any thisArg)` -/
+def zlib.ZipFile.forEach (self : zlib.ZipFile) (callback : JSFunction) (thisArg : Data := .undefined) : IO Unit :=
+  self.val.callMethod "forEach" (Support.args #[toJS callback, thisArg]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.forEachSync(callback[, thisArg])` (added in Node.js v26.8.0): `undefined forEachSync(Function callback, optional any thisArg)` -/
+def zlib.ZipFile.forEachSync (self : zlib.ZipFile) (callback : JSFunction) (thisArg : Data := .undefined) : IO Unit :=
+  self.val.callMethod "forEachSync" (Support.args #[toJS callback, thisArg]) Unit
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.get(name)` (added in Node.js v26.8.0): `Promise<zlib.ZipEntry> get(DOMString name)` -/
+def zlib.ZipFile.get (self : zlib.ZipFile) (name : String) : Async zlib.ZipEntry := do
+  let r ← self.val.callMethodAwait "get" (Support.args #[toJS name]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.getSync(name)` (added in Node.js v26.8.0): `zlib.ZipEntry getSync(DOMString name)` -/
+def zlib.ZipFile.getSync (self : zlib.ZipFile) (name : String) : IO zlib.ZipEntry := do
+  let r ← self.val.callMethod "getSync" (Support.args #[toJS name]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.has(name)` (added in Node.js v26.8.0): `boolean has(DOMString name)` -/
+def zlib.ZipFile.has (self : zlib.ZipFile) (name : String) : IO Bool :=
+  self.val.callMethod "has" (Support.args #[toJS name]) Bool
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.keys()` (added in Node.js v26.8.0): `object keys()` -/
+def zlib.ZipFile.keys (self : zlib.ZipFile) : IO Data :=
+  self.val.callMethod "keys" (Support.args #[]) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.stream(name[, options])` (added in Node.js v26.8.0): `Promise<stream.Readable> stream(DOMString name, optional zlib.ZipFile.StreamOptions options)` -/
+def zlib.ZipFile.stream (self : zlib.ZipFile) (name : String) (options : Option zlib.ZipFile.StreamOptions := none) : Async stream.Readable := do
+  let r ← self.val.callMethodAwait "stream" (Support.args #[toJS name, Support.optional options]) Value
+  pure { val := r }
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.values()` (added in Node.js v26.8.0): `object values()` -/
+def zlib.ZipFile.values (self : zlib.ZipFile) : IO Data :=
+  self.val.callMethod "values" (Support.args #[]) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zipFile.valuesSync()` (added in Node.js v26.8.0): `object valuesSync()` -/
+def zlib.ZipFile.valuesSync (self : zlib.ZipFile) : IO Data :=
+  self.val.callMethod "valuesSync" (Support.args #[]) Data
 
 /-- `zlib.constants` (added in Node.js v7.0.0): `readonly attribute any constants` (Node.js 24.22.2 documentation, zlib.md) -/
 def zlib.constants : IO Data := Support.getExport "node:zlib" ["constants"] Data
@@ -191,12 +542,12 @@ def zlib.createUnzip (options : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createUnzip", module := "node:zlib", path := "createUnzip", construct := false, arity := 1 }
     (Support.args #[options]) (await := false)
 
-/-- `zlib.createZstdCompress([options])` (added in Node.js v23.8.0, v22.15.0): `undefined createZstdCompress(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `zlib.createZstdCompress([options])` (added in Node.js v23.8.0, v22.15.0): `undefined createZstdCompress(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
 def zlib.createZstdCompress (options : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createZstdCompress", module := "node:zlib", path := "createZstdCompress", construct := false, arity := 1 }
     (Support.args #[options]) (await := false)
 
-/-- `zlib.createZstdDecompress([options])` (added in Node.js v23.8.0, v22.15.0): `undefined createZstdDecompress(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `zlib.createZstdDecompress([options])` (added in Node.js v23.8.0, v22.15.0): `undefined createZstdDecompress(optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
 def zlib.createZstdDecompress (options : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createZstdDecompress", module := "node:zlib", path := "createZstdDecompress", construct := false, arity := 1 }
     (Support.args #[options]) (await := false)
@@ -336,34 +687,61 @@ def zlib.unzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefin
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.unzipSync", module := "node:zlib", path := "unzipSync", construct := false, arity := 2 }
     (Support.args #[toJS buffer_, options]) (await := false)
 
-/-- `zlib.zstdCompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `undefined zstdCompress((Uint8Array or DOMString) buffer, Function callback)` (Node.js 24.22.2 documentation, zlib.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `zlib.zstdCompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `undefined zstdCompress((Uint8Array or DOMString) buffer, Function callback)` (Node.js 24.22.2 documentation, zlib.md) -/
 def zlib.zstdCompress (buffer_ : Uint8ArrayOrDOMString) (callback : JSFunction) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.zstdCompress", module := "node:zlib", path := "zstdCompress", construct := false, arity := 2 }
     (Support.args #[toJS buffer_, toJS callback]) (await := false)
 
-/-- `zlib.zstdCompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `undefined zstdCompress((Uint8Array or DOMString) buffer, object options, Function callback)` (Node.js 24.22.2 documentation, zlib.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `zlib.zstdCompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `undefined zstdCompress((Uint8Array or DOMString) buffer, object options, Function callback)` (Node.js 24.22.2 documentation, zlib.md) -/
 def zlib.zstdCompressWithOptions (buffer_ : Uint8ArrayOrDOMString) (options : Data) (callback : JSFunction) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.zstdCompressWithOptions", module := "node:zlib", path := "zstdCompress", construct := false, arity := 3 }
     (Support.args #[toJS buffer_, toJS options, toJS callback]) (await := false)
 
-/-- `zlib.zstdCompressSync(buffer[, options])` (added in Node.js v23.8.0, v22.15.0): `undefined zstdCompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `zlib.zstdCompressSync(buffer[, options])` (added in Node.js v23.8.0, v22.15.0): `undefined zstdCompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
 def zlib.zstdCompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.zstdCompressSync", module := "node:zlib", path := "zstdCompressSync", construct := false, arity := 2 }
     (Support.args #[toJS buffer_, options]) (await := false)
 
-/-- `zlib.zstdDecompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `undefined zstdDecompress((Uint8Array or DOMString) buffer, Function callback)` (Node.js 24.22.2 documentation, zlib.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `zlib.zstdDecompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `undefined zstdDecompress((Uint8Array or DOMString) buffer, Function callback)` (Node.js 24.22.2 documentation, zlib.md) -/
 def zlib.zstdDecompress (buffer_ : Uint8ArrayOrDOMString) (callback : JSFunction) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.zstdDecompress", module := "node:zlib", path := "zstdDecompress", construct := false, arity := 2 }
     (Support.args #[toJS buffer_, toJS callback]) (await := false)
 
-/-- `zlib.zstdDecompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `undefined zstdDecompress((Uint8Array or DOMString) buffer, object options, Function callback)` (Node.js 24.22.2 documentation, zlib.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `zlib.zstdDecompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `undefined zstdDecompress((Uint8Array or DOMString) buffer, object options, Function callback)` (Node.js 24.22.2 documentation, zlib.md) -/
 def zlib.zstdDecompressWithOptions (buffer_ : Uint8ArrayOrDOMString) (options : Data) (callback : JSFunction) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.zstdDecompressWithOptions", module := "node:zlib", path := "zstdDecompress", construct := false, arity := 3 }
     (Support.args #[toJS buffer_, toJS options, toJS callback]) (await := false)
 
-/-- `zlib.zstdDecompressSync(buffer[, options])` (added in Node.js v23.8.0, v22.15.0): `undefined zstdDecompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `zlib.zstdDecompressSync(buffer[, options])` (added in Node.js v23.8.0, v22.15.0): `undefined zstdDecompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
 def zlib.zstdDecompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.zstdDecompressSync", module := "node:zlib", path := "zstdDecompressSync", construct := false, arity := 2 }
     (Support.args #[toJS buffer_, options]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.createZipArchive(entries[, options])` (added in Node.js v26.8.0): `stream.Readable createZipArchive(object entries, optional (DOMString or zlib.CreateZipArchiveOptions) options)` (Node.js 24.22.2 documentation, zlib.md) -/
+def zlib.createZipArchive (entries : Data) (options : Option zlib.DOMStringOrCreateZipArchiveOptions := none) : IO stream.Readable := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.zlib.createZipArchive", module := "node:zlib", path := "createZipArchive", construct := false, arity := 2 }
+    (Support.args #[toJS entries, Support.optional options]) (await := false)
+  pure { val := r }
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.createZipArchiveSync(entries[, options])` (added in Node.js v26.8.0): `object createZipArchiveSync(object entries, optional (DOMString or object) options)` (Node.js 24.22.2 documentation, zlib.md) -/
+def zlib.createZipArchiveSync (entries : Data) (options : Option DOMStringOrObject := none) : IO Data :=
+  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.zlib.createZipArchiveSync", module := "node:zlib", path := "createZipArchiveSync", construct := false, arity := 2 }
+    (Support.args #[toJS entries, Support.optional options]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.zipFiles(files[, options])` (added in Node.js v26.8.0): `stream.Readable zipFiles(object files, optional (DOMString or zlib.ZipFilesOptions) options)` (Node.js 24.22.2 documentation, zlib.md) -/
+def zlib.zipFiles (files : Data) (options : Option zlib.DOMStringOrZipFilesOptions := none) : IO stream.Readable := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.zlib.zipFiles", module := "node:zlib", path := "zipFiles", construct := false, arity := 2 }
+    (Support.args #[toJS files, Support.optional options]) (await := false)
+  pure { val := r }
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.getMaxZipContentSize()` (added in Node.js v26.8.0): `double getMaxZipContentSize()` (Node.js 24.22.2 documentation, zlib.md) -/
+def zlib.getMaxZipContentSize : IO Float :=
+  Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.zlib.getMaxZipContentSize", module := "node:zlib", path := "getMaxZipContentSize", construct := false, arity := 0 }
+    (Support.args #[]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.setMaxZipContentSize(size)` (added in Node.js v26.8.0): `undefined setMaxZipContentSize(double size)` (Node.js 24.22.2 documentation, zlib.md) -/
+def zlib.setMaxZipContentSize (size : Float) : IO Unit :=
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.setMaxZipContentSize", module := "node:zlib", path := "setMaxZipContentSize", construct := false, arity := 1 }
+    (Support.args #[toJS size]) (await := false)
 
 end Lasm.JS.Node

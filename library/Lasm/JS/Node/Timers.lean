@@ -70,7 +70,7 @@ def Immediate.unref (self : Immediate) : IO Immediate := do
   let r ← self.val.callMethod "unref" (Support.args #[]) Value
   pure { val := r }
 
-/-- `timeout.close()` (added in Node.js v0.9.1): `Timeout close()` -/
+/-- **Legacy** in the Node.js 24.22.2 docs. `timeout.close()` (added in Node.js v0.9.1): `Timeout close()` -/
 def Timeout.close (self : Timeout) : IO Timeout := do
   let r ← self.val.callMethod "close" (Support.args #[]) Value
   pure { val := r }
@@ -109,12 +109,12 @@ def timersPromises.setInterval (delay : Data := .undefined) (value : Data := .un
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.timersPromises.setInterval", module := "node:timers/promises", path := "setInterval", construct := false, arity := 3 }
     (Support.args #[delay, value, options]) (await := false)
 
-/-- `timersPromises.scheduler.wait(delay[, options])` (added in Node.js v17.3.0, v16.14.0): `Promise<any> wait(double delay, optional timersPromises.scheduler.WaitOptions options)` (Node.js 24.22.2 documentation, timers.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `timersPromises.scheduler.wait(delay[, options])` (added in Node.js v17.3.0, v16.14.0): `Promise<any> wait(double delay, optional timersPromises.scheduler.WaitOptions options)` (Node.js 24.22.2 documentation, timers.md) -/
 def timersPromises.scheduler.wait (delay : Float) (options : Option timersPromises.scheduler.WaitOptions := none) : Async Data :=
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.timersPromises.scheduler.wait", module := "node:timers", path := "wait", construct := false, arity := 2 }
     (Support.args #[toJS delay, Support.optional options])
 
-/-- `timersPromises.scheduler.yield()` (added in Node.js v17.3.0, v16.14.0): `Promise<any> yield()` (Node.js 24.22.2 documentation, timers.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `timersPromises.scheduler.yield()` (added in Node.js v17.3.0, v16.14.0): `Promise<any> yield()` (Node.js 24.22.2 documentation, timers.md) -/
 def timersPromises.scheduler.yield : Async Data :=
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.timersPromises.scheduler.yield", module := "node:timers", path := "yield", construct := false, arity := 0 }
     (Support.args #[])

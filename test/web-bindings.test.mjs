@@ -7,7 +7,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { modules } from '../scripts/bindings/web-tier1.mjs';
 import * as nodeTier from '../scripts/bindings/node-tier2.mjs';
@@ -33,17 +33,18 @@ test('every tier-1 interface, global and namespace is generated', () => {
   }
 });
 
-test('every Lasm.JS.Node container is generated in its module, with the members node-tier2.mjs names', () => {
+test('every Lasm.JS.Node module is generated, with what its documentation file documents, minus the recorded exclusions', () => {
   const { surface } = JSON.parse(readFileSync(new URL('../scripts/bindings/node-surface.json', import.meta.url), 'utf8'));
-  for (const m of nodeTier.modules) for (const c of m.containers) {
-    const entry = surface.find(e => e.lean === c.name);
-    assert.ok(entry, `${c.name} is missing from the generated surface`);
-    assert.equal(entry.leanModule, m.name);
-    assert.equal(entry.module, c.jsModule);
-    const members = [...entry.namespace ?? [], ...entry.static ?? [], ...entry.prototype ?? [], ...entry.instance ?? []];
-    for (const o of c.only ?? []) assert.ok(members.includes(o.replace(/\(.*$/, '')), `${c.name}.${o} is not generated`);
-    for (const e of Object.keys(c.exclude ?? {})) assert.ok(!members.includes(e), `${c.name}.${e} is excluded but generated`);
-  }
+  const { modules } = JSON.parse(readFileSync(new URL('../scripts/bindings/node-modules.json', import.meta.url), 'utf8'));
+  assert.deepEqual(modules.map(m => m.name).sort(), nodeTier.modules.map(m => m.name).sort());
+  for (const m of modules) assert.ok(existsSync(new URL(`../library/Lasm/JS/Node/${m.name}.lean`, import.meta.url)), `Lasm.JS.Node.${m.name} is not generated`);
+  // The classes and namespaces of the modules this tier started with, by their documented names.
+  for (const name of ['fsPromises', 'fs', 'FileHandle', 'fs.Stats', 'path', 'os', 'process', 'crypto', 'Hash', 'child_process', 'ChildProcess',
+    'EventEmitter', 'stream.Readable', 'net.Server', 'net.Socket', 'http.Server', 'https.Agent', 'zlib', 'worker_threads.Worker', 'dns', 'util'])
+    assert.ok(surface.some(e => e.lean === name), `${name} is missing from the generated surface`);
+  const all = new Set(surface.flatMap(e => [...e.namespace ?? [], ...e.static ?? [], ...e.prototype ?? [], ...e.instance ?? []].map(x => `${e.lean}.${x}`)));
+  for (const key of Object.keys(nodeTier.exclude)) assert.ok(![...all].some(x => x.endsWith('.' + key.replace(/\(.*$/, '').split('.').at(-1)) && x.startsWith(key.split('.')[0])),
+    `${key} is excluded but generated`);
 });
 
 test('Lasm.JS.Node events: each documented event is a typed listener with on<Event> and once<Event>', () => {

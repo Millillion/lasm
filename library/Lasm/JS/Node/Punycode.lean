@@ -12,38 +12,38 @@ import Lasm.JS.Node.Support
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
 
-/-- `punycode.ucs2` (added in Node.js v0.7.0): `readonly attribute any ucs2` (Node.js 24.22.2 documentation, punycode.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `punycode.ucs2` (added in Node.js v0.7.0): `readonly attribute any ucs2` (Node.js 24.22.2 documentation, punycode.md) -/
 def punycode.ucs2 : IO Data := Support.getExport "node:punycode" ["ucs2"] Data
 
-/-- `punycode.version` (added in Node.js v0.6.1): `readonly attribute DOMString version` (Node.js 24.22.2 documentation, punycode.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `punycode.version` (added in Node.js v0.6.1): `readonly attribute DOMString version` (Node.js 24.22.2 documentation, punycode.md) -/
 def punycode.version : IO String := Support.getExport "node:punycode" ["version"] String
 
-/-- `punycode.decode(string)` (added in Node.js v0.5.1): `undefined decode(DOMString string)` (Node.js 24.22.2 documentation, punycode.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `punycode.decode(string)` (added in Node.js v0.5.1): `undefined decode(DOMString string)` (Node.js 24.22.2 documentation, punycode.md) -/
 def punycode.decode (string : String) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.punycode.decode", module := "node:punycode", path := "decode", construct := false, arity := 1 }
     (Support.args #[toJS string]) (await := false)
 
-/-- `punycode.encode(string)` (added in Node.js v0.5.1): `undefined encode(DOMString string)` (Node.js 24.22.2 documentation, punycode.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `punycode.encode(string)` (added in Node.js v0.5.1): `undefined encode(DOMString string)` (Node.js 24.22.2 documentation, punycode.md) -/
 def punycode.encode (string : String) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.punycode.encode", module := "node:punycode", path := "encode", construct := false, arity := 1 }
     (Support.args #[toJS string]) (await := false)
 
-/-- `punycode.toASCII(domain)` (added in Node.js v0.6.1): `undefined toASCII(DOMString domain)` (Node.js 24.22.2 documentation, punycode.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `punycode.toASCII(domain)` (added in Node.js v0.6.1): `undefined toASCII(DOMString domain)` (Node.js 24.22.2 documentation, punycode.md) -/
 def punycode.toASCII (domain_ : String) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.punycode.toASCII", module := "node:punycode", path := "toASCII", construct := false, arity := 1 }
     (Support.args #[toJS domain_]) (await := false)
 
-/-- `punycode.toUnicode(domain)` (added in Node.js v0.6.1): `undefined toUnicode(DOMString domain)` (Node.js 24.22.2 documentation, punycode.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `punycode.toUnicode(domain)` (added in Node.js v0.6.1): `undefined toUnicode(DOMString domain)` (Node.js 24.22.2 documentation, punycode.md) -/
 def punycode.toUnicode (domain_ : String) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.punycode.toUnicode", module := "node:punycode", path := "toUnicode", construct := false, arity := 1 }
     (Support.args #[toJS domain_]) (await := false)
 
-/-- `punycode.ucs2.decode(string)` (added in Node.js v0.7.0): `undefined decode(DOMString string)` (Node.js 24.22.2 documentation, punycode.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `punycode.ucs2.decode(string)` (added in Node.js v0.7.0): `undefined decode(DOMString string)` (Node.js 24.22.2 documentation, punycode.md) -/
 def punycode.ucs2.decode (string : String) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.punycode.ucs2.decode", module := "node:punycode", path := "decode", construct := false, arity := 1 }
     (Support.args #[toJS string]) (await := false)
 
-/-- `punycode.ucs2.encode(codePoints)` (added in Node.js v0.7.0): `undefined encode(sequence<long long> codePoints)` (Node.js 24.22.2 documentation, punycode.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `punycode.ucs2.encode(codePoints)` (added in Node.js v0.7.0): `undefined encode(sequence<long long> codePoints)` (Node.js 24.22.2 documentation, punycode.md) -/
 def punycode.ucs2.encode (codePoints : Array Int) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.punycode.ucs2.encode", module := "node:punycode", path := "encode", construct := false, arity := 1 }
     (Support.args #[toJS codePoints]) (await := false)

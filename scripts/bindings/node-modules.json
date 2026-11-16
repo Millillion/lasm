@@ -178,7 +178,9 @@
    "name": "Zlib",
    "doc": "zlib",
    "title": "compression",
-   "uses": []
+   "uses": [
+    "Stream"
+   ]
   },
   {
    "name": "Util",

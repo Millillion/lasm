@@ -1995,6 +1995,12 @@ instance instToJSFsWriteSyncOptions : ToJS fs.WriteSyncOptions := ⟨fun d => Su
     ("length", Support.optional d.length),
     ("position", Support.optional d.position)]⟩
 
+/-- `dictionary fs.OpenAsBlobSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure fs.OpenAsBlobSyncOptions where
+  /-- `DOMString type` -/
+  type : Option String := none
+instance instToJSFsOpenAsBlobSyncOptions : ToJS fs.OpenAsBlobSyncOptions := ⟨fun d => Support.fields #[("type", Support.optional d.type)]⟩
+
 /-- `dictionary fs.realpath.NativeOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure fs.realpath.NativeOptions where
   /-- `DOMString encoding = "utf8"` -/
@@ -2074,11 +2080,11 @@ def FileHandle.createWriteStream (self : FileHandle) (options : Option FileHandl
 def FileHandle.datasync (self : FileHandle) : Async Unit :=
   self.val.callMethodAwait "datasync" (Support.args #[]) Unit
 
-/-- `filehandle.pull([...transforms][, options])` (added in Node.js v24.20.0): `object pull((Function or object)... transforms, optional FileHandle.PullOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `filehandle.pull([...transforms][, options])` (added in Node.js v24.20.0): `object pull((Function or object)... transforms, optional FileHandle.PullOptions options)` -/
 def FileHandle.pull (self : FileHandle) (transforms : Array JSFunctionOrObject := #[]) (options : Option FileHandle.PullOptions := none) : IO Data :=
   self.val.callMethod "pull" (Support.argsWith #[Support.optional options] (transforms.map toJS)) Data
 
-/-- `filehandle.pullSync([...transforms][, options])` (added in Node.js v24.20.0): `object pullSync((Function or object)... transforms, optional FileHandle.PullSyncOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `filehandle.pullSync([...transforms][, options])` (added in Node.js v24.20.0): `object pullSync((Function or object)... transforms, optional FileHandle.PullSyncOptions options)` -/
 def FileHandle.pullSync (self : FileHandle) (transforms : Array JSFunctionOrObject := #[]) (options : Option FileHandle.PullSyncOptions := none) : IO Data :=
   self.val.callMethod "pullSync" (Support.argsWith #[Support.optional options] (transforms.map toJS)) Data
 
@@ -2149,7 +2155,7 @@ def FileHandle.writeFile (self : FileHandle) (data : DOMStringOrUint8ArrayOrObje
 def FileHandle.writev (self : FileHandle) (buffers : Array ByteArray) (position : Option Int := none) : Async Data :=
   self.val.callMethodAwait "writev" (Support.args #[toJS buffers, Support.optional position]) Data
 
-/-- `filehandle.writer([options])` (added in Node.js v24.20.0): `object writer(optional FileHandle.WriterOptions options)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `filehandle.writer([options])` (added in Node.js v24.20.0): `object writer(optional FileHandle.WriterOptions options)` -/
 def FileHandle.writer (self : FileHandle) (options : Option FileHandle.WriterOptions := none) : IO Data :=
   self.val.callMethod "writer" (Support.args #[Support.optional options]) Data
 
@@ -2425,133 +2431,133 @@ def fs.StatFs.files (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "file
 /-- `type` (added in Node.js v19.6.0, v18.15.0): `readonly attribute (double or bigint) type` -/
 def fs.StatFs.type (self : fs.StatFs) : IO DoubleOrBigint := self.val.get "type" DoubleOrBigint
 
-/-- `utf8Stream.append`: `readonly attribute boolean append` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.append`: `readonly attribute boolean append` -/
 def fs.Utf8Stream.append (self : fs.Utf8Stream) : IO Bool := self.val.get "append" Bool
 
-/-- `utf8Stream.contentMode`: `readonly attribute DOMString contentMode` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.contentMode`: `readonly attribute DOMString contentMode` -/
 def fs.Utf8Stream.contentMode (self : fs.Utf8Stream) : IO String := self.val.get "contentMode" String
 
-/-- `utf8Stream.fd`: `readonly attribute double fd` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.fd`: `readonly attribute double fd` -/
 def fs.Utf8Stream.fd (self : fs.Utf8Stream) : IO Float := self.val.get "fd" Float
 
-/-- `utf8Stream.file`: `readonly attribute DOMString file` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.file`: `readonly attribute DOMString file` -/
 def fs.Utf8Stream.file (self : fs.Utf8Stream) : IO String := self.val.get "file" String
 
-/-- `utf8Stream.fsync`: `readonly attribute boolean fsync` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.fsync`: `readonly attribute boolean fsync` -/
 def fs.Utf8Stream.fsync (self : fs.Utf8Stream) : IO Bool := self.val.get "fsync" Bool
 
-/-- `utf8Stream.maxLength`: `readonly attribute double maxLength` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.maxLength`: `readonly attribute double maxLength` -/
 def fs.Utf8Stream.maxLength (self : fs.Utf8Stream) : IO Float := self.val.get "maxLength" Float
 
-/-- `utf8Stream.minLength`: `readonly attribute double minLength` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.minLength`: `readonly attribute double minLength` -/
 def fs.Utf8Stream.minLength (self : fs.Utf8Stream) : IO Float := self.val.get "minLength" Float
 
-/-- `utf8Stream.mkdir`: `readonly attribute boolean mkdir` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.mkdir`: `readonly attribute boolean mkdir` -/
 def fs.Utf8Stream.mkdir (self : fs.Utf8Stream) : IO Bool := self.val.get "mkdir" Bool
 
-/-- `utf8Stream.mode`: `readonly attribute (double or DOMString) mode` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.mode`: `readonly attribute (double or DOMString) mode` -/
 def fs.Utf8Stream.mode (self : fs.Utf8Stream) : IO DoubleOrDOMString := self.val.get "mode" DoubleOrDOMString
 
-/-- `utf8Stream.periodicFlush`: `readonly attribute double periodicFlush` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.periodicFlush`: `readonly attribute double periodicFlush` -/
 def fs.Utf8Stream.periodicFlush (self : fs.Utf8Stream) : IO Float := self.val.get "periodicFlush" Float
 
-/-- `utf8Stream.sync`: `readonly attribute boolean sync` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.sync`: `readonly attribute boolean sync` -/
 def fs.Utf8Stream.sync (self : fs.Utf8Stream) : IO Bool := self.val.get "sync" Bool
 
-/-- `utf8Stream.writing`: `readonly attribute boolean writing` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.writing`: `readonly attribute boolean writing` -/
 def fs.Utf8Stream.writing (self : fs.Utf8Stream) : IO Bool := self.val.get "writing" Bool
 
-/-- `Event: 'close'`: `fs.Utf8Stream onClose(fs.Utf8Stream.CloseListener listener)`: calls `on("close", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'close'`: `fs.Utf8Stream onClose(fs.Utf8Stream.CloseListener listener)`: calls `on("close", listener)` -/
 def fs.Utf8Stream.onClose (self : fs.Utf8Stream) (listener : fs.Utf8Stream.CloseListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'close'`: `fs.Utf8Stream onceClose(fs.Utf8Stream.CloseListener listener)`: calls `once("close", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'close'`: `fs.Utf8Stream onceClose(fs.Utf8Stream.CloseListener listener)`: calls `once("close", listener)` -/
 def fs.Utf8Stream.onceClose (self : fs.Utf8Stream) (listener : fs.Utf8Stream.CloseListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'drain'`: `fs.Utf8Stream onDrain(fs.Utf8Stream.DrainListener listener)`: calls `on("drain", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'drain'`: `fs.Utf8Stream onDrain(fs.Utf8Stream.DrainListener listener)`: calls `on("drain", listener)` -/
 def fs.Utf8Stream.onDrain (self : fs.Utf8Stream) (listener : fs.Utf8Stream.DrainListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "drain", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'drain'`: `fs.Utf8Stream onceDrain(fs.Utf8Stream.DrainListener listener)`: calls `once("drain", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'drain'`: `fs.Utf8Stream onceDrain(fs.Utf8Stream.DrainListener listener)`: calls `once("drain", listener)` -/
 def fs.Utf8Stream.onceDrain (self : fs.Utf8Stream) (listener : fs.Utf8Stream.DrainListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "once" (Support.args #[toJS "drain", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'drop'`: `fs.Utf8Stream onDrop(fs.Utf8Stream.DropListener listener)`: calls `on("drop", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'drop'`: `fs.Utf8Stream onDrop(fs.Utf8Stream.DropListener listener)`: calls `on("drop", listener)` -/
 def fs.Utf8Stream.onDrop (self : fs.Utf8Stream) (listener : fs.Utf8Stream.DropListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "drop", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'drop'`: `fs.Utf8Stream onceDrop(fs.Utf8Stream.DropListener listener)`: calls `once("drop", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'drop'`: `fs.Utf8Stream onceDrop(fs.Utf8Stream.DropListener listener)`: calls `once("drop", listener)` -/
 def fs.Utf8Stream.onceDrop (self : fs.Utf8Stream) (listener : fs.Utf8Stream.DropListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "once" (Support.args #[toJS "drop", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'error'`: `fs.Utf8Stream onError(fs.Utf8Stream.ErrorListener listener)`: calls `on("error", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'error'`: `fs.Utf8Stream onError(fs.Utf8Stream.ErrorListener listener)`: calls `on("error", listener)` -/
 def fs.Utf8Stream.onError (self : fs.Utf8Stream) (listener : fs.Utf8Stream.ErrorListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'error'`: `fs.Utf8Stream onceError(fs.Utf8Stream.ErrorListener listener)`: calls `once("error", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'error'`: `fs.Utf8Stream onceError(fs.Utf8Stream.ErrorListener listener)`: calls `once("error", listener)` -/
 def fs.Utf8Stream.onceError (self : fs.Utf8Stream) (listener : fs.Utf8Stream.ErrorListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'finish'`: `fs.Utf8Stream onFinish(fs.Utf8Stream.FinishListener listener)`: calls `on("finish", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'finish'`: `fs.Utf8Stream onFinish(fs.Utf8Stream.FinishListener listener)`: calls `on("finish", listener)` -/
 def fs.Utf8Stream.onFinish (self : fs.Utf8Stream) (listener : fs.Utf8Stream.FinishListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "finish", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'finish'`: `fs.Utf8Stream onceFinish(fs.Utf8Stream.FinishListener listener)`: calls `once("finish", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'finish'`: `fs.Utf8Stream onceFinish(fs.Utf8Stream.FinishListener listener)`: calls `once("finish", listener)` -/
 def fs.Utf8Stream.onceFinish (self : fs.Utf8Stream) (listener : fs.Utf8Stream.FinishListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "once" (Support.args #[toJS "finish", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'ready'`: `fs.Utf8Stream onReady(fs.Utf8Stream.ReadyListener listener)`: calls `on("ready", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'ready'`: `fs.Utf8Stream onReady(fs.Utf8Stream.ReadyListener listener)`: calls `on("ready", listener)` -/
 def fs.Utf8Stream.onReady (self : fs.Utf8Stream) (listener : fs.Utf8Stream.ReadyListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'ready'`: `fs.Utf8Stream onceReady(fs.Utf8Stream.ReadyListener listener)`: calls `once("ready", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'ready'`: `fs.Utf8Stream onceReady(fs.Utf8Stream.ReadyListener listener)`: calls `once("ready", listener)` -/
 def fs.Utf8Stream.onceReady (self : fs.Utf8Stream) (listener : fs.Utf8Stream.ReadyListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "once" (Support.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'write'`: `fs.Utf8Stream onWrite(fs.Utf8Stream.WriteListener listener)`: calls `on("write", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'write'`: `fs.Utf8Stream onWrite(fs.Utf8Stream.WriteListener listener)`: calls `on("write", listener)` -/
 def fs.Utf8Stream.onWrite (self : fs.Utf8Stream) (listener : fs.Utf8Stream.WriteListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "on" (Support.args #[toJS "write", toJS listener]) Value
   pure { val := r }
 
-/-- `Event: 'write'`: `fs.Utf8Stream onceWrite(fs.Utf8Stream.WriteListener listener)`: calls `once("write", listener)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'write'`: `fs.Utf8Stream onceWrite(fs.Utf8Stream.WriteListener listener)`: calls `once("write", listener)` -/
 def fs.Utf8Stream.onceWrite (self : fs.Utf8Stream) (listener : fs.Utf8Stream.WriteListener) : IO fs.Utf8Stream := do
   let r ← self.val.callMethod "once" (Support.args #[toJS "write", toJS listener]) Value
   pure { val := r }
 
-/-- `utf8Stream.destroy()`: `undefined destroy()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.destroy()`: `undefined destroy()` -/
 def fs.Utf8Stream.destroy (self : fs.Utf8Stream) : IO Unit :=
   self.val.callMethod "destroy" (Support.args #[]) Unit
 
-/-- `utf8Stream.end()`: `undefined end()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.end()`: `undefined end()` -/
 def fs.Utf8Stream.«end» (self : fs.Utf8Stream) : IO Unit :=
   self.val.callMethod "end" (Support.args #[]) Unit
 
-/-- `utf8Stream.flush(callback)`: `Promise<undefined> flush()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.flush(callback)`: `Promise<undefined> flush()` -/
 def fs.Utf8Stream.flush (self : fs.Utf8Stream) : Async Unit :=
   Support.promisifiedMethod Unit self.val "flush" (Support.args #[])
 
-/-- `utf8Stream.flushSync()`: `undefined flushSync()` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.flushSync()`: `undefined flushSync()` -/
 def fs.Utf8Stream.flushSync (self : fs.Utf8Stream) : IO Unit :=
   self.val.callMethod "flushSync" (Support.args #[]) Unit
 
-/-- `utf8Stream.reopen(file)`: `undefined reopen((DOMString or Uint8Array or URL) file)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.reopen(file)`: `undefined reopen((DOMString or Uint8Array or URL) file)` -/
 def fs.Utf8Stream.reopen (self : fs.Utf8Stream) (file : DOMStringOrUint8ArrayOrURL) : IO Unit :=
   self.val.callMethod "reopen" (Support.args #[toJS file]) Unit
 
-/-- `utf8Stream.write(data)`: `boolean write((DOMString or Uint8Array) data)` -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.write(data)`: `boolean write((DOMString or Uint8Array) data)` -/
 def fs.Utf8Stream.write (self : fs.Utf8Stream) (data : DOMStringOrUint8Array) : IO Bool :=
   self.val.callMethod "write" (Support.args #[toJS data]) Bool
 
@@ -2636,7 +2642,7 @@ def fsPromises.glob (pattern : DOMStringOrSequenceOfDOMString) (options : Option
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.fsPromises.glob", module := "node:fs/promises", path := "glob", construct := false, arity := 2 }
     (Support.args #[toJS pattern, Support.optional options]) (await := false)
 
-/-- `fsPromises.lchmod(path, mode)` (added in Node.js v10.0.0): `Promise<undefined> lchmod((DOMString or Uint8Array or URL) path, long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `fsPromises.lchmod(path, mode)` (added in Node.js v10.0.0): `Promise<undefined> lchmod((DOMString or Uint8Array or URL) path, long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
 def fsPromises.lchmod (path_ : DOMStringOrUint8ArrayOrURL) (mode : Int) : Async Unit :=
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Node.fsPromises.lchmod", module := "node:fs/promises", path := "lchmod", construct := false, arity := 2 }
     (Support.args #[toJS path_, toJS mode])
@@ -2807,7 +2813,7 @@ def fs.createWriteStream (path_ : DOMStringOrUint8ArrayOrURL) (options : Option 
     (Support.args #[toJS path_, Support.optional options]) (await := false)
   pure { val := r }
 
-/-- `fs.exists(path, callback)` (added in Node.js v0.0.2): `undefined exists((DOMString or Uint8Array or URL) path, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `fs.exists(path, callback)` (added in Node.js v0.0.2): `undefined exists((DOMString or Uint8Array or URL) path, Function callback)` (Node.js 24.22.2 documentation, fs.md) -/
 def fs.«exists» (path_ : DOMStringOrUint8ArrayOrURL) (callback : JSFunction) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.exists", module := "node:fs", path := "exists", construct := false, arity := 2 }
     (Support.args #[toJS path_, toJS callback]) (await := false)
@@ -2845,7 +2851,7 @@ def fs.futimes (fd : Int) (atime : DoubleOrDOMStringOrObject) (mtime : DoubleOrD
 def fs.glob (pattern : DOMStringOrSequenceOfDOMString) (options : Option fs.GlobOptions := none) : Async Unit :=
   Support.promisified Unit "node:fs" "glob" (Support.args #[toJS pattern, Support.optional options])
 
-/-- `fs.lchmod(path, mode, callback)` (added in Node.js v0.5.0): `Promise<undefined> lchmod((DOMString or Uint8Array or URL) path, long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `fs.lchmod(path, mode, callback)` (added in Node.js v0.5.0): `Promise<undefined> lchmod((DOMString or Uint8Array or URL) path, long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
 def fs.lchmod (path_ : DOMStringOrUint8ArrayOrURL) (mode : Int) : Async Unit :=
   Support.promisified Unit "node:fs" "lchmod" (Support.args #[toJS path_, toJS mode])
 
@@ -3126,7 +3132,7 @@ def fs.globSync (pattern : DOMStringOrSequenceOfDOMString) (options : Option fs.
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.fs.globSync", module := "node:fs", path := "globSync", construct := false, arity := 2 }
     (Support.args #[toJS pattern, Support.optional options]) (await := false)
 
-/-- `fs.lchmodSync(path, mode)` (added in Node.js v0.5.0): `undefined lchmodSync((DOMString or Uint8Array or URL) path, long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `fs.lchmodSync(path, mode)` (added in Node.js v0.5.0): `undefined lchmodSync((DOMString or Uint8Array or URL) path, long long mode)` (Node.js 24.22.2 documentation, fs.md) -/
 def fs.lchmodSync (path_ : DOMStringOrUint8ArrayOrURL) (mode : Int) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.fs.lchmodSync", module := "node:fs", path := "lchmodSync", construct := false, arity := 2 }
     (Support.args #[toJS path_, toJS mode]) (await := false)
@@ -3284,6 +3290,12 @@ def fs.writeSyncWithString (fd : Int) (string : String) (position : Option Int :
 def fs.writevSync (fd : Int) (buffers : Array ByteArray) (position : Option Int := none) : IO Float :=
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.fs.writevSync", module := "node:fs", path := "writevSync", construct := false, arity := 3 }
     (Support.args #[toJS fd, toJS buffers, Support.optional position]) (await := false)
+
+/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `fs.openAsBlobSync(path[, options])` (added in Node.js v26.10.0): `Blob openAsBlobSync((DOMString or Uint8Array or URL) path, optional fs.OpenAsBlobSyncOptions options)` (Node.js 24.22.2 documentation, fs.md) -/
+def fs.openAsBlobSync (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.OpenAsBlobSyncOptions := none) : IO Blob := do
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.fs.openAsBlobSync", module := "node:fs", path := "openAsBlobSync", construct := false, arity := 2 }
+    (Support.args #[toJS path_, Support.optional options]) (await := false)
+  pure { val := r }
 
 /-- `fs.realpath.native(path[, options], callback)` (added in Node.js v9.2.0): `Promise<(DOMString or Uint8Array)> native((DOMString or Uint8Array or URL) path, optional (DOMString or fs.realpath.NativeOptions) options)` (Node.js 24.22.2 documentation, fs.md) -/
 def fs.realpath.native (path_ : DOMStringOrUint8ArrayOrURL) (options : Option fs.realpath.DOMStringOrNativeOptions := none) : Async DOMStringOrUint8Array :=

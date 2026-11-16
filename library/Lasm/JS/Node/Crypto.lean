@@ -777,7 +777,7 @@ def ECDH.getPublicKey (self : ECDH) (encoding : Option String := none) (format :
 def ECDH.setPrivateKey (self : ECDH) (privateKey : DOMStringOrUint8Array) (encoding : Option String := none) : IO Unit :=
   self.val.callMethod "setPrivateKey" (Support.args #[toJS privateKey, Support.optional encoding]) Unit
 
-/-- `ecdh.setPublicKey(publicKey[, encoding])` (added in Node.js v0.11.14): `undefined setPublicKey((DOMString or Uint8Array) publicKey, optional DOMString encoding)` -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `ecdh.setPublicKey(publicKey[, encoding])` (added in Node.js v0.11.14): `undefined setPublicKey((DOMString or Uint8Array) publicKey, optional DOMString encoding)` -/
 def ECDH.setPublicKey (self : ECDH) (publicKey : DOMStringOrUint8Array) (encoding : Option String := none) : IO Unit :=
   self.val.callMethod "setPublicKey" (Support.args #[toJS publicKey, Support.optional encoding]) Unit
 
@@ -963,7 +963,7 @@ def X509Certificate.verify (self : X509Certificate) (publicKey : KeyObject) : IO
 /-- `crypto.constants` (added in Node.js v6.3.0): `readonly attribute object constants` (Node.js 24.22.2 documentation, crypto.md) -/
 def crypto.constants : IO Data := Support.getExport "node:crypto" ["constants"] Data
 
-/-- `crypto.fips` (added in Node.js v6.0.0): `readonly attribute any fips` (Node.js 24.22.2 documentation, crypto.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `crypto.fips` (added in Node.js v6.0.0): `readonly attribute any fips` (Node.js 24.22.2 documentation, crypto.md) -/
 def crypto.fips : IO Data := Support.getExport "node:crypto" ["fips"] Data
 
 /-- `crypto.webcrypto` (added in Node.js v15.0.0): `readonly attribute any webcrypto` (Node.js 24.22.2 documentation, crypto.md) -/
@@ -1035,7 +1035,7 @@ def crypto.createHmac (algorithm : String) (key : DOMStringOrUint8ArrayOrKeyObje
     (Support.args #[toJS algorithm, toJS key, Support.optional options]) (await := false)
   pure { val := r }
 
-/-- `crypto.createMac(algorithm, key[, options])` (added in Node.js v24.22.0): `Mac createMac(DOMString algorithm, (Uint8Array or KeyObject) key, optional crypto.CreateMacOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `crypto.createMac(algorithm, key[, options])` (added in Node.js v24.22.0): `Mac createMac(DOMString algorithm, (Uint8Array or KeyObject) key, optional crypto.CreateMacOptions options)` (Node.js 24.22.2 documentation, crypto.md) -/
 def crypto.createMac (algorithm : String) (key : Uint8ArrayOrKeyObject) (options : Option crypto.CreateMacOptions := none) : IO Mac := do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.crypto.createMac", module := "node:crypto", path := "createMac", construct := false, arity := 3 }
     (Support.args #[toJS algorithm, toJS key, Support.optional options]) (await := false)
@@ -1149,7 +1149,7 @@ def crypto.getHashes : IO (Array String) :=
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.crypto.getHashes", module := "node:crypto", path := "getHashes", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `crypto.getMacs()` (added in Node.js v24.22.0): `sequence<DOMString> getMacs()` (Node.js 24.22.2 documentation, crypto.md) -/
+/-- **Experimental** in the Node.js 24.22.2 docs. `crypto.getMacs()` (added in Node.js v24.22.0): `sequence<DOMString> getMacs()` (Node.js 24.22.2 documentation, crypto.md) -/
 def crypto.getMacs : IO (Array String) :=
   Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.crypto.getMacs", module := "node:crypto", path := "getMacs", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
@@ -1253,7 +1253,7 @@ def crypto.secureHeapUsed : IO Data :=
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.crypto.secureHeapUsed", module := "node:crypto", path := "secureHeapUsed", construct := false, arity := 0 }
     (Support.args #[]) (await := false)
 
-/-- `crypto.setEngine(engine[, flags])` (added in Node.js v0.11.11): `undefined setEngine(DOMString engine, optional object flags)` (Node.js 24.22.2 documentation, crypto.md) -/
+/-- **Deprecated** in the Node.js 24.22.2 docs. `crypto.setEngine(engine[, flags])` (added in Node.js v0.11.11): `undefined setEngine(DOMString engine, optional object flags)` (Node.js 24.22.2 documentation, crypto.md) -/
 def crypto.setEngine (engine : String) (flags : Data := .undefined) : IO Unit :=
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.crypto.setEngine", module := "node:crypto", path := "setEngine", construct := false, arity := 2 }
     (Support.args #[toJS engine, flags]) (await := false)
