@@ -603,6 +603,10 @@ instance : ToJS fsPromises.WriteFileOptionsOrDOMString := ⟨fun
 instance : Coe fsPromises.WriteFileOptions fsPromises.WriteFileOptionsOrDOMString := ⟨.writeFileOptions⟩
 instance : Coe String fsPromises.WriteFileOptionsOrDOMString := ⟨.domString⟩
 
+/-- `v instanceof Stats`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Stats`). -/
+def fs.Stats.cast? (v : Value) : IO (Option fs.Stats) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Stats"] Value) v) then some { val := v } else none
+
 /-- `stats.dev`: `readonly attribute (double or bigint) dev` -/
 def fs.Stats.dev (self : fs.Stats) : IO DoubleOrBigint := self.val.get "dev" DoubleOrBigint
 
@@ -697,6 +701,10 @@ def fs.Stats.isSocket (self : fs.Stats) : IO Bool :=
 def fs.Stats.isSymbolicLink (self : fs.Stats) : IO Bool :=
   self.val.callMethod "isSymbolicLink" (Support.args #[]) Bool
 
+/-- `v instanceof Dirent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Dirent`). -/
+def fs.Dirent.cast? (v : Value) : IO (Option fs.Dirent) := do
+  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:fs" ["Dirent"] Value) v) then some { val := v } else none
+
 /-- `dirent.name` (added in Node.js v10.10.0): `readonly attribute (DOMString or Uint8Array) name` -/
 def fs.Dirent.name (self : fs.Dirent) : IO DOMStringOrUint8Array := self.val.get "name" DOMStringOrUint8Array
 
@@ -731,8 +739,8 @@ def fs.Dirent.isSocket (self : fs.Dirent) : IO Bool :=
 def fs.Dirent.isSymbolicLink (self : fs.Dirent) : IO Bool :=
   self.val.callMethod "isSymbolicLink" (Support.args #[]) Bool
 
-/-- `filehandle.fd` (added in Node.js v10.0.0): `readonly attribute double fd` -/
-def FileHandle.fd (self : FileHandle) : IO Float := self.val.get "fd" Float
+/-- `filehandle.fd` (added in Node.js v10.0.0): `readonly attribute double /* integer: Nat */ fd` -/
+def FileHandle.fd (self : FileHandle) : IO Nat := self.val.get "fd" Nat
 
 /-- `filehandle.appendFile(data[, options])` (added in Node.js v10.0.0): `Promise<undefined> appendFile((DOMString or Uint8Array or object) data, optional (FileHandle.AppendFileOptions or DOMString) options)` -/
 def FileHandle.appendFile (self : FileHandle) (data : DOMStringOrUint8ArrayOrObject) (options : Option FileHandle.AppendFileOptionsOrDOMString := none) : Async Unit :=
