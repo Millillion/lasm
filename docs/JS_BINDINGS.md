@@ -104,6 +104,7 @@ is converted with `FromJS`.
 | The default export | the package | `"default"` | `@[js "some-esm" "default"] opaque f : String → IO Data` |
 | A class (with `new`) | the package | `"new ClassName"` | `@[js "pg" "new Pool"] opaque newPool : Data → IO Value` |
 | A global function | `"globalThis"` | its name | `@[js "globalThis" "fetch"] opaque fetch : String → Data → IO Value` |
+| Your own JavaScript file | its path, from this Lean file | its name | `@[js "./ffi/stream.mjs" "writeAndEnd"] opaque writeAndEnd : Value → Data → IO Unit` |
 
 Result types:
 
@@ -119,6 +120,38 @@ Result types:
 
 Arguments can be any type with `ToJS`, including `Data` and `Value`. Pass a JavaScript
 function (callback) as a `Value` created with `Function.ofFn` (see below).
+
+### Your own JavaScript files
+
+When the JavaScript you need is not an existing function (an expression such
+as `x instanceof Foo`, two calls made in one host call, a comparator), write
+it in an ES module file of your project and bind it with a path relative to
+the Lean file:
+
+```js
+// ffi/stream.mjs, next to Server.lean
+export function writeAndEnd(res, body) { res.writeHead(200); res.end(body); }
+```
+
+```lean
+-- Server.lean
+@[js "./ffi/stream.mjs" "writeAndEnd"] opaque writeAndEnd : Value → Data → IO Unit
+```
+
+- The path starts with `./` or `../` and names an ES module ending in `.mjs`,
+  beside or below the Lean files' source root (the directory of a standalone
+  program's main file, or the Lake library's source directory).
+- `lasm build` ships the file, and every file it imports by a relative path
+  (`import { x } from './lib.mjs'`), with the program on every target: under
+  `host/project-modules/` for Node, `lasm/project-modules/` for the edge
+  targets, Bun and Deno, and `project-modules/` beside the browser loader. A
+  file it imports from npm (`import pg from 'pg'`) is resolved from the
+  project's `node_modules` on Node and the edge targets, and needs Vite
+  (`@lasm/cli/vite`) in the browser, as npm bindings do.
+- The same file named from two Lean files is one module instance.
+- The binding check loads the file as it loads npm modules, so a missing file
+  or export stops the build. Nothing is evaluated from strings at run time, so
+  project files work under Cloudflare Workers and a strict Content-Security-Policy.
 
 **Binding check.** `lasm build` loads each bound module from the project's
 `node_modules` and checks that the export exists and is a function. A broken

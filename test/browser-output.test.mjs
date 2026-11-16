@@ -280,6 +280,19 @@ test('bundler: what it understands', async () => {
   assert.match(external, /^import \* as __lasmExternal0 from "pkg";\nimport \* as __lasmExternal1 from "other";$/m);
   assert.match(external, /const p = __lasmExternal0;\nconst \{ q \} = __lasmExternal0;\nconst \{ r \} = __lasmExternal1;\nconst \{ s \} = __lasm0;/);
   assert.throws(() => bundleModules({ './e.mjs': "import { s } from './s.mjs';\n" }, './e.mjs', { external: () => true }), /no module \.\/s\.mjs/);
+  // externalFile: a relative import kept as one of the bundle (the project's files, served beside it).
+  const files = bundleModules({ './e.mjs': "import * as f from './project-modules/App/x.mjs';\nimport { s } from './s.mjs';\n", './s.mjs': 'export const s = 1;\n' },
+    './e.mjs', { externalFile: specifier => specifier.startsWith('./project-modules/') });
+  assert.match(files, /^import \* as __lasmExternal0 from "\.\/project-modules\/App\/x\.mjs";$/m);
+  assert.match(files, /const f = __lasmExternal0;\nconst \{ s \} = __lasm0;/);
+});
+
+test('browser config: the project\'s files are imported from project-modules/ beside the bundle', () => {
+  const config = browserConfigModule({ name: 'a', wasmFile: 'app.0.wasm', modules: ['./App/ffi/x.mjs', 'lasm:app', 'https://x.test/m.mjs'], suspend: 'none' });
+  assert.match(config, /^import \* as m0 from "\.\/project-modules\/App\/ffi\/x\.mjs";$/m);
+  assert.match(config, /^import \* as m1 from "\.\/modules\/app\.mjs";$/m);
+  assert.match(config, /^import \* as m2 from "https:\/\/x\.test\/m\.mjs";$/m);
+  assert.match(config, /"\.\/App\/ffi\/x\.mjs": m0/);
 });
 
 test('compactModule and emscriptenModule', () => {

@@ -491,6 +491,15 @@ export function createNodeJs({ appPath, wasmMemory, serveSync, serveMailbox, spa
         throw jsFailure(error);
       }
     }
+    // The project's own files (@[js "./ffi/x.mjs" …], src/project-modules.mjs), copied beside the host.
+    if (specifier.startsWith('./')) {
+      try { return moduleRequire(fileURLToPath(new URL(`./project-modules/${specifier.slice(2)}`, import.meta.url))); }
+      catch (error) {
+        if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND')
+          throw failure(`The project's JavaScript file ${JSON.stringify(specifier)} is not in this build. Bind it with @[js "./…" …] and run lasm build again.`);
+        throw jsFailure(error);
+      }
+    }
     try { return moduleRequire(specifier); }
     catch (error) {
       if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND')

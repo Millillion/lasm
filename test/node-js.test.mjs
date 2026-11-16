@@ -323,3 +323,9 @@ test('a synchronous callback runs work the Lean thread proxied to the main threa
   assert.equal(mailboxRuns, 1);
   assert.ok(performance.now() - started < 500, 'the wait is short');
 });
+
+test('project files (./…) load from project-modules/ beside the host; a missing one says how to add it', () => {
+  const js = createNodeJs();
+  assert.throws(() => js.dispatch(214, 0, 0n, wire(['f', './App/missing.mjs', 'f', []])),
+    /The project's JavaScript file "\.\/App\/missing\.mjs" is not in this build/);
+});

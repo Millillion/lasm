@@ -71,7 +71,8 @@ const load = specifier => {
 const results = bindings.map(b => {
   const where = b.module + (b.path ? ' export ' + JSON.stringify(b.path) : '');
   let value;
-  try { value = b.module === 'globalThis' ? globalThis : load(b.module); } catch (error) {
+  // A project file (@[js "./ffi/x.mjs" …]) is loaded from its resolved path.
+  try { value = b.module === 'globalThis' ? globalThis : b.projectFile ? require(b.projectFile) : load(b.module); } catch (error) {
     return { ...b, error: error.code === 'MODULE_NOT_FOUND' ? 'module ' + JSON.stringify(b.module) + ' is not installed (add it to package.json and run npm install)'
       : error.code === 'LASM_UNKNOWN_BUILTIN' ? error.message : 'loading ' + b.module + ' failed: ' + error.message };
   }

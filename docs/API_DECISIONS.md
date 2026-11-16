@@ -47,7 +47,7 @@ linked section of the review.
 | A3 | Deno | Should Netlify Edge and Supabase Edge, which depend on the Deno runtime, be marked as at-risk targets? | [Q3](api/SHAPES_REVIEW_2026-11-11.md#0-deno-decide-first-it-affects-several-sections) | pending sign-off |
 | A4 | Lasm.JS core | Should `Function.ofFn` set `length`? | [Q4](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A5 | Lasm.JS core | Should the build-time check skip `globalThis` exports that Node lacks? | [Q5](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
-| A6 | Lasm.JS core | Inline JavaScript and classes (LASM_JS_GAPS.md, PR #169): `@[js "./ffi/foo.mjs" "f"]` paths relative to the Lean file, and a `Lasm.JS.Class.define` builder (a real `class extends`, no `eval`). | [Q6](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
+| A6 | Lasm.JS core | Inline JavaScript and classes (LASM_JS_GAPS.md, PR #169): `@[js "./ffi/foo.mjs" "f"]` paths relative to the Lean file, and a `Lasm.JS.Class.define` builder (a real `class extends`, no `eval`). | [Q6](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | part 1 decided in 0.6 ([A6.1](#a61-the-projects-own-javascript-files-jsffixmjs-f)); classes pending |
 | A7 | Lasm.JS core | Should `exportDefault` take `[ToJS α]` (branch)? | [Q7](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A8 | Lasm.JS core | Confirm the core shapes in REVIEW.md §1: Symbol and number keys (#170); no fire-and-forget `Async` in `ofSyncFn`; waits inside synchronous callbacks stay a clear error. | [Q8](api/SHAPES_REVIEW_2026-11-11.md#1-lasmjs-core) | pending sign-off |
 | A9 | Generated-binding mapping rules | Overload naming. Should Claude keep the mechanical rule, or add a small override table for names that read badly? | [Q9](api/SHAPES_REVIEW_2026-11-11.md#2-generated-binding-mapping-rules-shared-by-every-lasmjs-tier) | pending sign-off |
@@ -103,3 +103,61 @@ linked section of the review.
 | A54 | Libraries | PR #124's drafts (`Lasm.Web.Crypto`, a WebSocket upgrade in `Lasm.Fetch.serve`, `Lasm.Markdown`) not taken; kept on the `api-proposals` branch. | [REVIEW.md §1](REVIEW.md#apis-and-libraries) | pending sign-off |
 | A55 | CLI | Proposed, not built: a WASI reactor build (`lasm build … --target wasi --reactor`) for the CLI's glue; under Stage 2's backend this question may change. | [REVIEW.md §2](REVIEW.md#the-cli-surface) | pending sign-off |
 | A56 | Packaging | Where the `Lasm.*` libraries live (inside `@lasm/cli` or separate `@lasm/*` packages): deferred by Jordan until the APIs are final. | [REVIEW.md §1](REVIEW.md#major-where-the-lasm-libraries-live-deferred-by-jordan-2026-11-10) | pending decision |
+
+## Milestone 0.6: the `Lasm.*` libraries
+
+Decisions of ROADMAP.md's milestone 0.6, each with its shape, code, why, the
+alternatives, and where it shipped. New entries are numbered `0.6-1`, `0.6-2`,
+…; decisions on an existing question keep its id.
+
+### Lasm.JS core
+
+#### A6.1: the project's own JavaScript files, `@[js "./ffi/x.mjs" "f"]`
+
+**Decision.** Option 1A of [LASM_JS_GAPS.md](proposals/LASM_JS_GAPS.md): a
+binding's module may be a path starting with `./` or `../`, an ES module file
+(`.mjs`) relative to the Lean file that declares the binding. No new syntax
+and no new API.
+
+```js
+// ffi/stream.mjs, next to Server.lean
+import { status } from './lib/status.mjs';
+export function writeAndEnd(res, body) { res.writeHead(status); res.end(body); }
+```
+
+```lean
+@[js "./ffi/stream.mjs" "writeAndEnd"] opaque writeAndEnd : Value → Data → IO Unit
+```
+
+Lean records the binding under the file's path from the declaring module's
+source root (`./App/ffi/stream.mjs` for module `App.Server`), so the same file
+named from two Lean files is one module. `lasm build` resolves the file
+against the Lean file's directory, adds the files it imports by relative path,
+and ships them with the program: `host/project-modules/` on Node,
+`lasm/project-modules/` on the edge targets, Bun and Deno (imported by the
+generated entry module), and `project-modules/` beside the browser loader (an
+unbundled module the loader imports). The binding check loads the file. The
+files' contents are part of the build's identity.
+
+**Why.** It is how Gleam (`@external(javascript, "./ffi.mjs", "f")`),
+PureScript (a foreign module beside the source) and wasm-bindgen
+(`module = "/js/foo.js"`) do it: real files, with editor support, linting and
+tests, and nothing evaluated from strings, so it works on Cloudflare Workers
+and under a strict Content-Security-Policy. Before, the same needed a local
+`file:` npm package and `npm install`.
+
+**Limits.** The file is an ES module ending in `.mjs` (Node loads it with
+`require(esm)`, so no top-level await), and it and its relative imports stay
+beside or below the source root; the build refuses anything else, naming the
+binding.
+
+**Alternatives.** A `js_module` command with the JavaScript in a Lean string
+(option 1B: no editor support; possible later on top of this), a `js%`
+inline-expression elaborator (1C: the largest surface, and it encourages many
+tiny host calls), run-time `eval` (1D: refused by Workers and CSP).
+
+**Tests.** test/project-modules.test.mjs (resolution, imports, refusals);
+test/fixtures/js-core on Node 26 and 24, Bun, Deno, Workers and Chromium
+(web-bindings.yml). Docs: docs/JS_BINDINGS.md, "Your own JavaScript files".
+
+**Where.** PR (this one), next release. **Status:** pending sign-off.

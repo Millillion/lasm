@@ -69,7 +69,7 @@ function transform(id, code, resolve, { entry }) {
  * whose exports the bundle exports. Imports name other modules by a path
  * relative to the importing module. Returns the bundle's text.
  */
-export function bundleModules(modules, entry, { header = '', external = () => false } = {}) {
+export function bundleModules(modules, entry, { header = '', external = () => false, externalFile = () => false } = {}) {
   const variables = new Map(), order = [], visiting = new Set();
   // Imports that stay imports of the bundle (bare npm specifiers, URLs), when allowed.
   const externals = new Map();
@@ -86,7 +86,10 @@ export function bundleModules(modules, entry, { header = '', external = () => fa
     if (!Object.hasOwn(modules, id)) throw new Error(`The bundle has no module ${id}`);
     visiting.add(id);
     const result = transform(id, modules[id], specifier => {
-      if (!specifier.startsWith('./') && !specifier.startsWith('../') && external(specifier)) {
+      // external keeps a non-relative import (npm specifiers, URLs) as one of the bundle;
+      // externalFile a relative one, for a file served beside it (the project's JavaScript files).
+      const relative = specifier.startsWith('./') || specifier.startsWith('../');
+      if (relative ? externalFile(specifier) : external(specifier)) {
         if (!externals.has(specifier)) externals.set(specifier, `__lasmExternal${externals.size}`);
         return externals.get(specifier);
       }

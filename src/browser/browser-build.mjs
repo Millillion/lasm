@@ -18,6 +18,7 @@ import { brotliCompressSync, gzipSync, constants as zlib } from 'node:zlib';
 import { bundleModules, compactModule, emscriptenModule } from './bundle.mjs';
 import { builtinModuleClosure, builtinModuleFile, builtinPrefix } from '../edge/builtin-modules.mjs';
 import { edgeModules } from '../edge/edge-build.mjs';
+import { copyProjectModules, isProjectModule, projectModuleName, projectModules } from '../project-modules.mjs';
 import { noticeBanner, targetNotices } from '../notices.mjs';
 import { foreignOutputError, replaceOutputDirectory } from '../output-directory.mjs';
 
@@ -38,7 +39,9 @@ export function browserAppName(projectDirectory) {
 
 /** The generated configuration module the loader imports (src/browser/loader.mjs). */
 export function browserConfigModule({ name, wasmFile, modules, suspend, autoMount = true }) {
-  const source = specifier => specifier.startsWith(builtinPrefix) ? `./modules/${specifier.slice(builtinPrefix.length)}.mjs` : specifier;
+  // The project's own files (src/project-modules.mjs) are served beside the bundle, unbundled.
+  const source = specifier => specifier.startsWith(builtinPrefix) ? `./modules/${specifier.slice(builtinPrefix.length)}.mjs`
+    : isProjectModule(specifier) ? `./project-modules/${projectModuleName(specifier)}` : specifier;
   const imports = modules.map((specifier, i) => `import * as m${i} from ${JSON.stringify(source(specifier))};`);
   return [...imports,
     `export const name = ${JSON.stringify(name)};`,
@@ -53,7 +56,7 @@ export function browserConfigModule({ name, wasmFile, modules, suspend, autoMoun
 /** banner: the legal comment (src/notices.mjs noticeBanner) that names the licences and THIRD_PARTY_NOTICES.txt. */
 export function browserBundle({ programGlue, name, wasmFile, modules, suspend, autoMount = true, compact = true, banner = '' }) {
   const builtins = builtinModuleClosure(modules);
-  const external = modules.filter(m => !m.startsWith(builtinPrefix));
+  const external = modules.filter(m => !m.startsWith(builtinPrefix) && !isProjectModule(m));
   const read = file => { const text = readFileSync(file, 'utf8'); return compact ? compactModule(text) : text; };
   const sources = {
     './loader.mjs': read(join(here, 'loader.mjs')),
@@ -67,7 +70,7 @@ export function browserBundle({ programGlue, name, wasmFile, modules, suspend, a
   };
   for (const specifier of builtins) sources[`./modules/${specifier.slice(builtinPrefix.length)}.mjs`] = read(builtinModuleFile(specifier));
   return bundleModules(sources, './loader.mjs', { header: `// ${generatedMarker}: the ${name} app's loader, Lean runtime host and program glue. Do not edit.` + (banner ? '\n' + banner.trimEnd() : ''),
-    external: specifier => external.includes(specifier) });
+    external: specifier => external.includes(specifier), externalFile: specifier => specifier.startsWith('./project-modules/') });
 }
 
 const brotli = bytes => brotliCompressSync(bytes, { params: { [zlib.BROTLI_PARAM_QUALITY]: 11, [zlib.BROTLI_PARAM_SIZE_HINT]: bytes.length,
@@ -127,7 +130,7 @@ export function writeBrowserOutput({ source, projectDirectory, result, program, 
   // The modules of the program's bindings and package.json's lasm.edge.modules;
   // lasm:app is present in every browser app (mount's ports and messages).
   const builtins = [...new Set([...edgeModules(projectDirectory, result.jsBindings ?? []), 'lasm:app'])].sort();
-  const bare = builtins.filter(m => !m.startsWith(builtinPrefix) && !/^https?:\/\//.test(m));
+  const bare = builtins.filter(m => !m.startsWith(builtinPrefix) && !isProjectModule(m) && !/^https?:\/\//.test(m));
   if (bare.length && externals !== 'keep')
     throw new Error(`The program uses npm modules (${bare.join(', ')}), which a static browser build cannot resolve. Build it with Vite and the CLI's plugin, @lasm/cli/vite (it bundles npm packages), or bind a URL module (@[js "https://…" …]).`);
   // Licences (src/notices.mjs): THIRD_PARTY_NOTICES.txt is served beside the app and
@@ -144,6 +147,8 @@ export function writeBrowserOutput({ source, projectDirectory, result, program, 
   rmSync(staging, { recursive: true, force: true });
   mkdirSync(staging, { recursive: true });
   if (hasPublic) cpSync(publicDirectory, staging, { recursive: true });
+  // The project's own JavaScript files, beside the bundle that imports them.
+  copyProjectModules(staging, projectModules(result.jsBindings ?? [], projectDirectory));
   const files = {};
   // Dev builds (lasm dev) are served from this machine: no precompressed copies
   // (brotli at quality 11 took about 2 s of every rebuild).

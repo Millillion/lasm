@@ -10,19 +10,51 @@ import Lasm.JS.Core
 namespace Lasm.JS.Meta
 open Lean Elab Command Meta
 
-/-- One binding, as recorded in the module's data for `lasm build`'s binding check. -/
+/-- One binding, as recorded in the module's data for `lasm build`'s binding check.
+For a project file (`@[js "./ffi/x.mjs" …]`), `relative` is the path as written
+and `file` the Lean source file that wrote it: `lasm build` resolves the one
+against the other's directory. -/
 structure BindingInfo where
   declName : Name
   module : String
   path : String
   construct : Bool
   arity : Nat
+  relative : String := ""
+  file : String := ""
   deriving Inhabited, Repr
 
 /-- JSON text of one binding (what the binding check reads from .olean files). -/
 def BindingInfo.json (b : BindingInfo) : String :=
   let q (s : String) := (Json.str s).compress
-  s!"\{\"name\":{q b.declName.toString},\"module\":{q b.module},\"path\":{q b.path},\"construct\":{b.construct},\"arity\":{b.arity}}"
+  let project := if b.relative.isEmpty then "" else s!",\"relative\":{q b.relative},\"file\":{q b.file}"
+  s!"\{\"name\":{q b.declName.toString},\"module\":{q b.module},\"path\":{q b.path},\"construct\":{b.construct},\"arity\":{b.arity}{project}}"
+
+/-- Whether a binding's module is a JavaScript file of the project, written
+relative to the Lean file: `./ffi/x.mjs`, `../shared/y.mjs`. -/
+def isProjectFile (module : String) : Bool := module.startsWith "./" || module.startsWith "../"
+
+/-- The specifier a project file is loaded by at run time: its path from the
+source root of the declaring Lean module `mod` (whose file is `A/B/M.lean`
+for module `A.B.M`), normalized, starting with `./` (or with `../` above the
+root). The same file named from two Lean files gets the same specifier. -/
+def projectSpecifier (mod : Name) (relative : String) : String :=
+  let dir := mod.components.dropLast.map (·.toString (escape := false))
+  let parts := dir ++ relative.splitOn "/"
+  let normal := parts.foldl (init := ([] : List String)) fun acc part =>
+    match part, acc with
+    | "", _ | ".", _ => acc
+    | "..", [] => [".."]
+    | "..", ".." :: _ => ".." :: acc
+    | "..", _ :: rest => rest
+    | p, _ => p :: acc
+  let path := "/".intercalate normal.reverse
+  if path.startsWith "../" then path else "./" ++ path
+
+#guard projectSpecifier `Main "./ffi/x.mjs" == "./ffi/x.mjs"
+#guard projectSpecifier `App.Server "./ffi/x.mjs" == "./App/ffi/x.mjs"
+#guard projectSpecifier `App.Server "../ffi/./x.mjs" == "./ffi/x.mjs"
+#guard projectSpecifier `Main "../../shared/y.mjs" == "../../shared/y.mjs"
 
 /-- Bindings declared in each module (entries are JSON strings). -/
 initialize bindingExtension : SimplePersistentEnvExtension String (Array String) ←
@@ -39,6 +71,11 @@ private partial def explicitArity (type : Expr) : MetaM Nat :=
       if (← x.fvarId!.getBinderInfo).isExplicit then n := n + 1
     return n
 
+/-- The run-time specifier of project file `./…` (`projectSpecifier` of the
+module being compiled). -/
+elab "lasm_js_project% " s:str : term => do
+  return mkStrLit (projectSpecifier (← getMainModule) s.getString)
+
 syntax (name := lasmJsRecord) "lasm_js_record " str str (" new")? : attr
 
 initialize registerBuiltinAttribute {
@@ -49,13 +86,22 @@ initialize registerBuiltinAttribute {
     let `(attr| lasm_js_record $m:str $p:str $[new%$c]?) := stx | throwUnsupportedSyntax
     let info ← getConstInfo decl
     let arity ← (explicitArity info.type).run' {} {}
-    let b : BindingInfo := { declName := decl, module := m.getString, path := p.getString, construct := c.isSome, arity }
+    let written := m.getString
+    let mainModule ← getMainModule
+    let fileName ← getFileName
+    let b : BindingInfo := if isProjectFile written then
+        { declName := decl, module := projectSpecifier mainModule written, path := p.getString, construct := c.isSome, arity,
+          relative := written, file := fileName }
+      else { declName := decl, module := written, path := p.getString, construct := c.isSome, arity }
     modifyEnv fun env => bindingExtension.addEntry env b.json
 }
 
 /-- `@[js "module" "export"] opaque f : A → B → IO C` binds `f` to the export
 (`"default"`; `""` for the module value itself; `"a.b"` for a nested export).
-`@[js "module" "new Export"]` calls it with `new`. -/
+`@[js "module" "new Export"]` calls it with `new`. A module starting with
+`./` or `../` is a JavaScript file of the project, relative to this Lean
+file (`@[js "./ffi/stream.mjs" "writeAndEnd"]`): `lasm build` ships it, and
+the files it imports by relative path, with the program on every target. -/
 syntax (name := jsAttr) "js " str str : attr
 
 macro_rules
@@ -64,9 +110,14 @@ macro_rules
     let (construct, path) := if spec.startsWith "new " then (true, (spec.drop 4).trimAscii.toString) else (false, spec)
     let name := quote n.getId.toString
     let pathLit := Syntax.mkStrLit path
+    -- A project file is loaded by its path from the source root (projectSpecifier),
+    -- which needs the main module: `lasm_js_project%` and the record compute it.
+    let relative := m.getString
+    let project := isProjectFile relative
+    let moduleTerm ← if project then `(lasm_js_project% $m) else `($m:str)
     let definition ← `($[$doc:docComment]? @[noinline] def $n : $t :=
         Lasm.JS.Bindable.bind (α := $t)
-          { name := $name, module := $m, path := $pathLit, construct := $(quote construct),
+          { name := $name, module := $moduleTerm, path := $pathLit, construct := $(quote construct),
             arity := Lasm.JS.Bindable.arity (α := $t) } #[])
     let record ← if construct then `(attribute [lasm_js_record $m $pathLit new] $n)
       else `(attribute [lasm_js_record $m $pathLit] $n)
