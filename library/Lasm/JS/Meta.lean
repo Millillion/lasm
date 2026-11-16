@@ -81,32 +81,38 @@ syntax (name := jsAttr) "js " str str : attr
 
 /-- `@[js …] opaque` elaborates to a `def` over `Bindable.bind` and records the
 binding in the module's data (`bindingExtension`) for `lasm build`'s binding
-check, with no attribute or syntax of its own. -/
-elab_rules : command
-  | `($[$doc:docComment]? @[js $m:str $e:str] opaque $n:ident : $t:term) => do
-    let spec := e.getString.trimAscii.toString
-    let (construct, path) := if spec.startsWith "new " then (true, (spec.drop 4).trimAscii.toString) else (false, spec)
-    let name := quote n.getId.toString
-    let pathLit := Syntax.mkStrLit path
-    -- A project file is loaded by its path from the source root (projectSpecifier).
-    let written := m.getString
-    let project := isProjectFile written
-    let mainModule ← getMainModule
-    let module := if project then projectSpecifier mainModule written else written
-    let moduleLit := Syntax.mkStrLit module
-    elabCommand (← `($[$doc:docComment]? @[noinline] def $n : $t :=
-        Lasm.JS.Bindable.bind (α := $t)
+check, with no attribute or syntax of its own. `private` makes the `def`
+private (a library's internal binding). -/
+def elabBinding (doc? : Option (TSyntax ``Lean.Parser.Command.docComment)) (m e : TSyntax `str) (n : Ident) (t : Term)
+    (isPrivate : Bool) : CommandElabM Unit := do
+  let spec := e.getString.trimAscii.toString
+  let (construct, path) := if spec.startsWith "new " then (true, (spec.drop 4).trimAscii.toString) else (false, spec)
+  let name := quote n.getId.toString
+  let pathLit := Syntax.mkStrLit path
+  -- A project file is loaded by its path from the source root (projectSpecifier).
+  let written := m.getString
+  let project := isProjectFile written
+  let mainModule ← getMainModule
+  let module := if project then projectSpecifier mainModule written else written
+  let moduleLit := Syntax.mkStrLit module
+  let body ← `(Lasm.JS.Bindable.bind (α := $t)
           { name := $name, module := $moduleLit, path := $pathLit, construct := $(quote construct),
-            arity := Lasm.JS.Bindable.arity (α := $t) } #[]))
-    let decl := (← getCurrNamespace) ++ n.getId
-    let info ← getConstInfo decl
-    let nArgs ← liftTermElabM (explicitArity info.type)
-    let fileName ← getFileName
-    let b : BindingInfo := {
-      declName := decl, module := module, path := path, construct := construct, arity := nArgs
-      relative := if project then written else ""
-      file := if project then fileName else "" }
-    modifyEnv fun env => bindingExtension.addEntry env b.json
+            arity := Lasm.JS.Bindable.arity (α := $t) } #[])
+  if isPrivate then elabCommand (← `($[$doc?:docComment]? @[noinline] private def $n : $t := $body))
+  else elabCommand (← `($[$doc?:docComment]? @[noinline] def $n : $t := $body))
+  let decl ← liftTermElabM (realizeGlobalConstNoOverload n)
+  let info ← getConstInfo decl
+  let nArgs ← liftTermElabM (explicitArity info.type)
+  let fileName ← getFileName
+  let b : BindingInfo := {
+    declName := decl, module := module, path := path, construct := construct, arity := nArgs
+    relative := if project then written else ""
+    file := if project then fileName else "" }
+  modifyEnv fun env => bindingExtension.addEntry env b.json
+
+elab_rules : command
+  | `($[$doc:docComment]? @[js $m:str $e:str] opaque $n:ident : $t:term) => elabBinding doc m e n t false
+  | `($[$doc:docComment]? @[js $m:str $e:str] private opaque $n:ident : $t:term) => elabBinding doc m e n t true
 
 /-! Deriving -/
 

@@ -54,8 +54,8 @@ structure Spec where
   /-- Properties of the class itself (`static observedAttributes = [...]`). -/
   statics : Array (String × Data) := #[]
 
-/-- `define` of the builtin module `lasm:class`; use `Class.define`. -/
-@[js "lasm:class" "define"] opaque defineRaw : String → Option Value → Option Value →
+/-- `define` of the builtin module `lasm:class`; `Class.define` calls it. -/
+@[js "lasm:class" "define"] private opaque defineRaw : String → Option Value → Option Value →
   Array (String × Value) → Array (String × Value) → Array (String × Data) → IO Value
 
 /-- The instance (`this`) and the call's own arguments, from the arguments the
